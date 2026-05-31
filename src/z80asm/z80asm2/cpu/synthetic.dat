@@ -291,36 +291,36 @@ add.sil (hl+)|ez80|add.sil a, (hl);inc.sil hl
 add.sil (hl-)|ez80|add.sil a, (hl);dec.sil hl
 add.sil a, (hl+)|ez80|add.sil a, (hl);inc.sil hl
 add.sil a, (hl-)|ez80|add.sil a, (hl);dec.sil hl
-adi hl, %n|8080|push h;lxi d, %n;dad d;xchg;pop h
-adi hl, %n|ez80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|ez80_z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|gbz80|push hl;ld de, %n;add hl, de;push hl;push de;pop hl;pop de;pop hl
-adi hl, %n|kc160|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|kc160_z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|r2ka|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|r3k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|r4k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|r5k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|r6k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|r800|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|z180|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi hl, %n|z80n|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-adi sp, %n|8080|xchg;lxi h, %n;dad sp;xchg
-adi sp, %n|ez80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|ez80_z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|gbz80|push hl;push de;pop hl;pop de;ld hl, %n;add hl, sp;push hl;push de;pop hl;pop de
-adi sp, %n|kc160|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|kc160_z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|r2ka|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|r3k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|r4k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|r5k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|r6k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|r800|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|z180|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-adi sp, %n|z80n|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
+adi hl, %n|8080|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
+adi hl, %n|ez80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|ez80_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|gbz80|push hl;ld de, unsigned8(%n);add hl, de;push hl;push de;pop hl;pop de;pop hl
+adi hl, %n|kc160|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|kc160_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|r2ka|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|r3k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|r4k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|r5k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|r6k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|r800|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|z180|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi hl, %n|z80n|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+adi sp, %n|8080|xchg;lxi h, unsigned8(%n);dad sp;xchg
+adi sp, %n|ez80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|ez80_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|gbz80|push hl;push de;pop hl;pop de;ld hl, unsigned8(%n);add hl, sp;push hl;push de;pop hl;pop de
+adi sp, %n|kc160|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|kc160_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|r2ka|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|r3k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|r4k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|r5k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|r6k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|r800|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|z180|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+adi sp, %n|z80n|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 altd adc (hl+)|r2ka|altd adc a, (hl);inc hl
 altd adc (hl+)|r3k|altd adc a, (hl);inc hl
 altd adc (hl+)|r4k|altd adc a, (hl);inc hl
@@ -8182,51 +8182,51 @@ ld (ix), iy|r800|push iy;ex (sp), hl;ld (ix), l;ld (ix+1), h;ex (sp), hl;pop iy
 ld (ix), iy|z180|push iy;ex (sp), hl;ld (ix), l;ld (ix+1), h;ex (sp), hl;pop iy
 ld (ix), iy|z80|push iy;ex (sp), hl;ld (ix), l;ld (ix+1), h;ex (sp), hl;pop iy
 ld (ix), iy|z80n|push iy;ex (sp), hl;ld (ix), l;ld (ix+1), h;ex (sp), hl;pop iy
-ld (ix+%d), bc|kc160_z80|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|r2ka|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|r3k|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|r4k|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|r5k|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|r6k|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|r800|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|z180|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|z80|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), bc|z80n|ld (ix+%d), c;ld (ix+(%d)+1), b
-ld (ix+%d), de|kc160_z80|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|r2ka|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|r3k|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|r4k|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|r5k|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|r6k|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|r800|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|z180|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|z80|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), de|z80n|ld (ix+%d), e;ld (ix+(%d)+1), d
-ld (ix+%d), hl|kc160_z80|ld (ix+%d), l;ld (ix+(%d)+1), h
-ld (ix+%d), hl|r800|ld (ix+%d), l;ld (ix+(%d)+1), h
-ld (ix+%d), hl|z180|ld (ix+%d), l;ld (ix+(%d)+1), h
-ld (ix+%d), hl|z80|ld (ix+%d), l;ld (ix+(%d)+1), h
-ld (ix+%d), hl|z80n|ld (ix+%d), l;ld (ix+(%d)+1), h
-ld (ix+%d), ix|kc160_z80|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|r2ka|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|r3k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|r4k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|r5k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|r6k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|r800|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|z180|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|z80|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), ix|z80n|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop ix
-ld (ix+%d), iy|kc160_z80|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|r2ka|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|r3k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|r4k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|r5k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|r6k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|r800|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|z180|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|z80|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
-ld (ix+%d), iy|z80n|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+(%d)+1), h;ex (sp), hl;pop iy
+ld (ix+%d), bc|kc160_z80|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|r2ka|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|r3k|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|r4k|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|r5k|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|r6k|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|r800|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|z180|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|z80|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), bc|z80n|ld (ix+%d), c;ld (ix+signed8((%d)+1)), b
+ld (ix+%d), de|kc160_z80|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|r2ka|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|r3k|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|r4k|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|r5k|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|r6k|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|r800|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|z180|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|z80|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), de|z80n|ld (ix+%d), e;ld (ix+signed8((%d)+1)), d
+ld (ix+%d), hl|kc160_z80|ld (ix+%d), l;ld (ix+signed8((%d)+1)), h
+ld (ix+%d), hl|r800|ld (ix+%d), l;ld (ix+signed8((%d)+1)), h
+ld (ix+%d), hl|z180|ld (ix+%d), l;ld (ix+signed8((%d)+1)), h
+ld (ix+%d), hl|z80|ld (ix+%d), l;ld (ix+signed8((%d)+1)), h
+ld (ix+%d), hl|z80n|ld (ix+%d), l;ld (ix+signed8((%d)+1)), h
+ld (ix+%d), ix|kc160_z80|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|r2ka|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|r3k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|r4k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|r5k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|r6k|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|r800|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|z180|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|z80|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), ix|z80n|push ix;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (ix+%d), iy|kc160_z80|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|r2ka|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|r3k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|r4k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|r5k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|r6k|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|r800|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|z180|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|z80|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (ix+%d), iy|z80n|push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+signed8((%d)+1)), h;ex (sp), hl;pop iy
 ld (iy), bc|kc160_z80|ld (iy), c;ld (iy+1), b
 ld (iy), bc|r2ka|ld (iy), c;ld (iy+1), b
 ld (iy), bc|r3k|ld (iy), c;ld (iy+1), b
@@ -8272,51 +8272,51 @@ ld (iy), iy|r800|push iy;ex (sp), hl;ld (iy), l;ld (iy+1), h;ex (sp), hl;pop iy
 ld (iy), iy|z180|push iy;ex (sp), hl;ld (iy), l;ld (iy+1), h;ex (sp), hl;pop iy
 ld (iy), iy|z80|push iy;ex (sp), hl;ld (iy), l;ld (iy+1), h;ex (sp), hl;pop iy
 ld (iy), iy|z80n|push iy;ex (sp), hl;ld (iy), l;ld (iy+1), h;ex (sp), hl;pop iy
-ld (iy+%d), bc|kc160_z80|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|r2ka|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|r3k|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|r4k|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|r5k|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|r6k|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|r800|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|z180|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|z80|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), bc|z80n|ld (iy+%d), c;ld (iy+(%d)+1), b
-ld (iy+%d), de|kc160_z80|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|r2ka|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|r3k|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|r4k|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|r5k|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|r6k|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|r800|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|z180|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|z80|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), de|z80n|ld (iy+%d), e;ld (iy+(%d)+1), d
-ld (iy+%d), hl|kc160_z80|ld (iy+%d), l;ld (iy+(%d)+1), h
-ld (iy+%d), hl|r800|ld (iy+%d), l;ld (iy+(%d)+1), h
-ld (iy+%d), hl|z180|ld (iy+%d), l;ld (iy+(%d)+1), h
-ld (iy+%d), hl|z80|ld (iy+%d), l;ld (iy+(%d)+1), h
-ld (iy+%d), hl|z80n|ld (iy+%d), l;ld (iy+(%d)+1), h
-ld (iy+%d), ix|kc160_z80|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|r2ka|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|r3k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|r4k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|r5k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|r6k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|r800|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|z180|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|z80|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), ix|z80n|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop ix
-ld (iy+%d), iy|kc160_z80|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|r2ka|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|r3k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|r4k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|r5k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|r6k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|r800|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|z180|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|z80|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
-ld (iy+%d), iy|z80n|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+(%d)+1), h;ex (sp), hl;pop iy
+ld (iy+%d), bc|kc160_z80|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|r2ka|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|r3k|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|r4k|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|r5k|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|r6k|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|r800|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|z180|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|z80|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), bc|z80n|ld (iy+%d), c;ld (iy+signed8((%d)+1)), b
+ld (iy+%d), de|kc160_z80|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|r2ka|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|r3k|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|r4k|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|r5k|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|r6k|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|r800|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|z180|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|z80|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), de|z80n|ld (iy+%d), e;ld (iy+signed8((%d)+1)), d
+ld (iy+%d), hl|kc160_z80|ld (iy+%d), l;ld (iy+signed8((%d)+1)), h
+ld (iy+%d), hl|r800|ld (iy+%d), l;ld (iy+signed8((%d)+1)), h
+ld (iy+%d), hl|z180|ld (iy+%d), l;ld (iy+signed8((%d)+1)), h
+ld (iy+%d), hl|z80|ld (iy+%d), l;ld (iy+signed8((%d)+1)), h
+ld (iy+%d), hl|z80n|ld (iy+%d), l;ld (iy+signed8((%d)+1)), h
+ld (iy+%d), ix|kc160_z80|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|r2ka|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|r3k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|r4k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|r5k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|r6k|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|r800|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|z180|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|z80|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), ix|z80n|push ix;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop ix
+ld (iy+%d), iy|kc160_z80|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|r2ka|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|r3k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|r4k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|r5k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|r6k|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|r800|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|z180|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|z80|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
+ld (iy+%d), iy|z80n|push iy;ex (sp), hl;ld (iy+%d), l;ld (iy+signed8((%d)+1)), h;ex (sp), hl;pop iy
 ld a', (bc+)|r2ka|ld a', (bc);inc bc
 ld a', (bc+)|r3k|ld a', (bc);inc bc
 ld a', (bc+)|r4k|ld a', (bc);inc bc
@@ -8689,16 +8689,16 @@ ld bc, (ix)|r800|ld c, (ix);ld b, (ix+1)
 ld bc, (ix)|z180|ld c, (ix);ld b, (ix+1)
 ld bc, (ix)|z80|ld c, (ix);ld b, (ix+1)
 ld bc, (ix)|z80n|ld c, (ix);ld b, (ix+1)
-ld bc, (ix+%d)|kc160_z80|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|r2ka|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|r3k|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|r4k|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|r5k|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|r6k|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|r800|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|z180|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|z80|ld c, (ix+%d);ld b, (ix+(%d)+1)
-ld bc, (ix+%d)|z80n|ld c, (ix+%d);ld b, (ix+(%d)+1)
+ld bc, (ix+%d)|kc160_z80|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|r2ka|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|r3k|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|r4k|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|r5k|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|r6k|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|r800|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|z180|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|z80|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
+ld bc, (ix+%d)|z80n|ld c, (ix+%d);ld b, (ix+signed8((%d)+1))
 ld bc, (iy)|kc160_z80|ld c, (iy);ld b, (iy+1)
 ld bc, (iy)|r2ka|ld c, (iy);ld b, (iy+1)
 ld bc, (iy)|r3k|ld c, (iy);ld b, (iy+1)
@@ -8709,16 +8709,16 @@ ld bc, (iy)|r800|ld c, (iy);ld b, (iy+1)
 ld bc, (iy)|z180|ld c, (iy);ld b, (iy+1)
 ld bc, (iy)|z80|ld c, (iy);ld b, (iy+1)
 ld bc, (iy)|z80n|ld c, (iy);ld b, (iy+1)
-ld bc, (iy+%d)|kc160_z80|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|r2ka|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|r3k|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|r4k|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|r5k|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|r6k|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|r800|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|z180|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|z80|ld c, (iy+%d);ld b, (iy+(%d)+1)
-ld bc, (iy+%d)|z80n|ld c, (iy+%d);ld b, (iy+(%d)+1)
+ld bc, (iy+%d)|kc160_z80|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|r2ka|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|r3k|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|r4k|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|r5k|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|r6k|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|r800|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|z180|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|z80|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
+ld bc, (iy+%d)|z80n|ld c, (iy+%d);ld b, (iy+signed8((%d)+1))
 ld bc, bc'|ez80|exx;push bc;exx;pop bc
 ld bc, bc'|ez80_z80|exx;push bc;exx;pop bc
 ld bc, bc'|kc160|exx;push bc;exx;pop bc
@@ -9150,16 +9150,16 @@ ld de, (ix)|r800|ld e, (ix);ld d, (ix+1)
 ld de, (ix)|z180|ld e, (ix);ld d, (ix+1)
 ld de, (ix)|z80|ld e, (ix);ld d, (ix+1)
 ld de, (ix)|z80n|ld e, (ix);ld d, (ix+1)
-ld de, (ix+%d)|kc160_z80|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|r2ka|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|r3k|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|r4k|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|r5k|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|r6k|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|r800|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|z180|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|z80|ld e, (ix+%d);ld d, (ix+(%d)+1)
-ld de, (ix+%d)|z80n|ld e, (ix+%d);ld d, (ix+(%d)+1)
+ld de, (ix+%d)|kc160_z80|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|r2ka|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|r3k|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|r4k|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|r5k|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|r6k|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|r800|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|z180|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|z80|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
+ld de, (ix+%d)|z80n|ld e, (ix+%d);ld d, (ix+signed8((%d)+1))
 ld de, (iy)|kc160_z80|ld e, (iy);ld d, (iy+1)
 ld de, (iy)|r2ka|ld e, (iy);ld d, (iy+1)
 ld de, (iy)|r3k|ld e, (iy);ld d, (iy+1)
@@ -9170,16 +9170,16 @@ ld de, (iy)|r800|ld e, (iy);ld d, (iy+1)
 ld de, (iy)|z180|ld e, (iy);ld d, (iy+1)
 ld de, (iy)|z80|ld e, (iy);ld d, (iy+1)
 ld de, (iy)|z80n|ld e, (iy);ld d, (iy+1)
-ld de, (iy+%d)|kc160_z80|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|r2ka|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|r3k|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|r4k|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|r5k|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|r6k|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|r800|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|z180|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|z80|ld e, (iy+%d);ld d, (iy+(%d)+1)
-ld de, (iy+%d)|z80n|ld e, (iy+%d);ld d, (iy+(%d)+1)
+ld de, (iy+%d)|kc160_z80|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|r2ka|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|r3k|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|r4k|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|r5k|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|r6k|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|r800|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|z180|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|z80|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
+ld de, (iy+%d)|z80n|ld e, (iy+%d);ld d, (iy+signed8((%d)+1))
 ld de, bc|8080|mov d, b;mov e, c
 ld de, bc|8085|mov d, b;mov e, c
 ld de, bc|ez80|ld d, b;ld e, c
@@ -9248,21 +9248,21 @@ ld de, hl'|r800|exx;push hl;exx;pop de
 ld de, hl'|z180|exx;push hl;exx;pop de
 ld de, hl'|z80|exx;push hl;exx;pop de
 ld de, hl'|z80n|exx;push hl;exx;pop de
-ld de, hl+%n|8080|push h;lxi d, %n;dad d;xchg;pop h
-ld de, hl+%n|ez80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|ez80_z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|gbz80|push hl;ld de, %n;add hl, de;push hl;push de;pop hl;pop de;pop hl
-ld de, hl+%n|kc160|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|kc160_z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|r2ka|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|r3k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|r4k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|r5k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|r6k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|r800|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|z180|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ld de, hl+%n|z80n|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
+ld de, hl+%n|8080|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
+ld de, hl+%n|ez80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|ez80_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|gbz80|push hl;ld de, unsigned8(%n);add hl, de;push hl;push de;pop hl;pop de;pop hl
+ld de, hl+%n|kc160|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|kc160_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|r2ka|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|r3k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|r4k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|r5k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|r6k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|r800|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|z180|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ld de, hl+%n|z80n|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ld de, ix|ez80|ld d, ixh;ld e, ixl
 ld de, ix|ez80_z80|ld d, ixh;ld e, ixl
 ld de, ix|kc160|push ix;pop de
@@ -9304,21 +9304,21 @@ ld de, sp|r800|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|z180|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|z80|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
 ld de, sp|z80n|ex de, hl;ld hl, 0;add hl, sp;ex de, hl
-ld de, sp+%n|8080|xchg;lxi h, %n;dad sp;xchg
-ld de, sp+%n|ez80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|ez80_z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|gbz80|push hl;push de;pop hl;pop de;ld hl, %n;add hl, sp;push hl;push de;pop hl;pop de
-ld de, sp+%n|kc160|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|kc160_z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|r2ka|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|r3k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|r4k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|r5k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|r6k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|r800|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|z180|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ld de, sp+%n|z80n|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
+ld de, sp+%n|8080|xchg;lxi h, unsigned8(%n);dad sp;xchg
+ld de, sp+%n|ez80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|ez80_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|gbz80|push hl;push de;pop hl;pop de;ld hl, unsigned8(%n);add hl, sp;push hl;push de;pop hl;pop de
+ld de, sp+%n|kc160|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|kc160_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|r2ka|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|r3k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|r4k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|r5k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|r6k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|r800|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|z180|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ld de, sp+%n|z80n|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 ld e', (hl+)|r2ka|ld e', (hl);inc hl
 ld e', (hl+)|r3k|ld e', (hl);inc hl
 ld e', (hl+)|r4k|ld e', (hl);inc hl
@@ -9636,21 +9636,21 @@ ld hl, (ix)|r800|ld l, (ix);ld h, (ix+1)
 ld hl, (ix)|z180|ld l, (ix);ld h, (ix+1)
 ld hl, (ix)|z80|ld l, (ix);ld h, (ix+1)
 ld hl, (ix)|z80n|ld l, (ix);ld h, (ix+1)
-ld hl, (ix+%d)|kc160_z80|ld l, (ix+%d);ld h, (ix+(%d)+1)
-ld hl, (ix+%d)|r800|ld l, (ix+%d);ld h, (ix+(%d)+1)
-ld hl, (ix+%d)|z180|ld l, (ix+%d);ld h, (ix+(%d)+1)
-ld hl, (ix+%d)|z80|ld l, (ix+%d);ld h, (ix+(%d)+1)
-ld hl, (ix+%d)|z80n|ld l, (ix+%d);ld h, (ix+(%d)+1)
+ld hl, (ix+%d)|kc160_z80|ld l, (ix+%d);ld h, (ix+signed8((%d)+1))
+ld hl, (ix+%d)|r800|ld l, (ix+%d);ld h, (ix+signed8((%d)+1))
+ld hl, (ix+%d)|z180|ld l, (ix+%d);ld h, (ix+signed8((%d)+1))
+ld hl, (ix+%d)|z80|ld l, (ix+%d);ld h, (ix+signed8((%d)+1))
+ld hl, (ix+%d)|z80n|ld l, (ix+%d);ld h, (ix+signed8((%d)+1))
 ld hl, (iy)|kc160_z80|ld l, (iy);ld h, (iy+1)
 ld hl, (iy)|r800|ld l, (iy);ld h, (iy+1)
 ld hl, (iy)|z180|ld l, (iy);ld h, (iy+1)
 ld hl, (iy)|z80|ld l, (iy);ld h, (iy+1)
 ld hl, (iy)|z80n|ld l, (iy);ld h, (iy+1)
-ld hl, (iy+%d)|kc160_z80|ld l, (iy+%d);ld h, (iy+(%d)+1)
-ld hl, (iy+%d)|r800|ld l, (iy+%d);ld h, (iy+(%d)+1)
-ld hl, (iy+%d)|z180|ld l, (iy+%d);ld h, (iy+(%d)+1)
-ld hl, (iy+%d)|z80|ld l, (iy+%d);ld h, (iy+(%d)+1)
-ld hl, (iy+%d)|z80n|ld l, (iy+%d);ld h, (iy+(%d)+1)
+ld hl, (iy+%d)|kc160_z80|ld l, (iy+%d);ld h, (iy+signed8((%d)+1))
+ld hl, (iy+%d)|r800|ld l, (iy+%d);ld h, (iy+signed8((%d)+1))
+ld hl, (iy+%d)|z180|ld l, (iy+%d);ld h, (iy+signed8((%d)+1))
+ld hl, (iy+%d)|z80|ld l, (iy+%d);ld h, (iy+signed8((%d)+1))
+ld hl, (iy+%d)|z80n|ld l, (iy+%d);ld h, (iy+signed8((%d)+1))
 ld hl, bc|8080|mov h, b;mov l, c
 ld hl, bc|8085|mov h, b;mov l, c
 ld hl, bc|ez80|ld h, b;ld l, c
@@ -9746,20 +9746,20 @@ ld hl, sp|r800|ld hl, 0;add hl, sp
 ld hl, sp|z180|ld hl, 0;add hl, sp
 ld hl, sp|z80|ld hl, 0;add hl, sp
 ld hl, sp|z80n|ld hl, 0;add hl, sp
-ld hl, sp+%d|8080|lxi h, %d;dad sp
-ld hl, sp+%d|ez80|ld hl, %d;add hl, sp
-ld hl, sp+%d|ez80_z80|ld hl, %d;add hl, sp
-ld hl, sp+%d|kc160|ld hl, %d;add hl, sp
-ld hl, sp+%d|kc160_z80|ld hl, %d;add hl, sp
-ld hl, sp+%d|r2ka|ld hl, %d;add hl, sp
-ld hl, sp+%d|r3k|ld hl, %d;add hl, sp
-ld hl, sp+%d|r4k|ld hl, %d;add hl, sp
-ld hl, sp+%d|r5k|ld hl, %d;add hl, sp
-ld hl, sp+%d|r6k|ld hl, %d;add hl, sp
-ld hl, sp+%d|r800|ld hl, %d;add hl, sp
-ld hl, sp+%d|z180|ld hl, %d;add hl, sp
-ld hl, sp+%d|z80|ld hl, %d;add hl, sp
-ld hl, sp+%d|z80n|ld hl, %d;add hl, sp
+ld hl, sp+%d|8080|lxi h, signed8(%d);dad sp
+ld hl, sp+%d|ez80|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|ez80_z80|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|kc160|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|kc160_z80|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|r2ka|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|r3k|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|r4k|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|r5k|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|r6k|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|r800|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|z180|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|z80|ld hl, signed8(%d);add hl, sp
+ld hl, sp+%d|z80n|ld hl, signed8(%d);add hl, sp
 ld hl, sp+%n|8085|xchg;ldsi %n;xchg
 ld ix, (hl)|kc160|push de;ld e, (hl);inc hl;ld d, (hl);dec hl;push de;pop ix;pop de
 ld ix, (hl)|kc160_z80|push de;ld e, (hl);inc hl;ld d, (hl);dec hl;push de;pop ix;pop de
@@ -9795,16 +9795,16 @@ ld ix, (ix)|r800|push ix;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop ix
 ld ix, (ix)|z180|push ix;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop ix
 ld ix, (ix)|z80|push ix;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop ix
 ld ix, (ix)|z80n|push ix;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|kc160_z80|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|r2ka|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|r3k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|r4k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|r5k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|r6k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|r800|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|z180|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|z80|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
-ld ix, (ix+%d)|z80n|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop ix
+ld ix, (ix+%d)|kc160_z80|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|r2ka|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|r3k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|r4k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|r5k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|r6k|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|r800|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|z180|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|z80|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (ix+%d)|z80n|push ix;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop ix
 ld ix, (iy)|kc160_z80|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
 ld ix, (iy)|r2ka|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
 ld ix, (iy)|r3k|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
@@ -9815,16 +9815,16 @@ ld ix, (iy)|r800|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
 ld ix, (iy)|z180|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
 ld ix, (iy)|z80|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
 ld ix, (iy)|z80n|push ix;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|kc160_z80|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|r2ka|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|r3k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|r4k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|r5k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|r6k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|r800|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|z180|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|z80|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
-ld ix, (iy+%d)|z80n|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop ix
+ld ix, (iy+%d)|kc160_z80|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|r2ka|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|r3k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|r4k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|r5k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|r6k|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|r800|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|z180|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|z80|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
+ld ix, (iy+%d)|z80n|push ix;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop ix
 ld ix, bc|ez80|ld ixh, b;ld ixl, c
 ld ix, bc|ez80_z80|ld ixh, b;ld ixl, c
 ld ix, bc|kc160|push bc;pop ix
@@ -9944,16 +9944,16 @@ ld iy, (ix)|r800|push iy;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop iy
 ld iy, (ix)|z180|push iy;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop iy
 ld iy, (ix)|z80|push iy;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop iy
 ld iy, (ix)|z80n|push iy;ex (sp), hl;ld l, (ix);ld h, (ix+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|kc160_z80|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|r2ka|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|r3k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|r4k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|r5k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|r6k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|r800|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|z180|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|z80|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
-ld iy, (ix+%d)|z80n|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+(%d)+1);ex (sp), hl;pop iy
+ld iy, (ix+%d)|kc160_z80|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|r2ka|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|r3k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|r4k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|r5k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|r6k|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|r800|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|z180|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|z80|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (ix+%d)|z80n|push iy;ex (sp), hl;ld l, (ix+%d);ld h, (ix+signed8((%d)+1));ex (sp), hl;pop iy
 ld iy, (iy)|kc160_z80|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
 ld iy, (iy)|r2ka|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
 ld iy, (iy)|r3k|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
@@ -9964,16 +9964,16 @@ ld iy, (iy)|r800|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
 ld iy, (iy)|z180|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
 ld iy, (iy)|z80|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
 ld iy, (iy)|z80n|push iy;ex (sp), hl;ld l, (iy);ld h, (iy+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|kc160_z80|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|r2ka|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|r3k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|r4k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|r5k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|r6k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|r800|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|z180|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|z80|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
-ld iy, (iy+%d)|z80n|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+(%d)+1);ex (sp), hl;pop iy
+ld iy, (iy+%d)|kc160_z80|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|r2ka|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|r3k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|r4k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|r5k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|r6k|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|r800|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|z180|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|z80|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
+ld iy, (iy+%d)|z80n|push iy;ex (sp), hl;ld l, (iy+%d);ld h, (iy+signed8((%d)+1));ex (sp), hl;pop iy
 ld iy, bc|ez80|ld iyh, b;ld iyl, c
 ld iy, bc|ez80_z80|ld iyh, b;ld iyl, c
 ld iy, bc|kc160|push bc;pop iy
@@ -11329,21 +11329,21 @@ ldd.sil l, (hl)|ez80|ld.sil l, (hl);dec.sil hl
 lddr|8080|extern __z80asm__lddr;call __z80asm__lddr
 lddr|8085|extern __z80asm__lddr;call __z80asm__lddr
 lddr|gbz80|extern __z80asm__lddr;call __z80asm__lddr
-ldhi %n|8080|push h;lxi d, %n;dad d;xchg;pop h
-ldhi %n|ez80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|ez80_z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|gbz80|push hl;ld de, %n;add hl, de;push hl;push de;pop hl;pop de;pop hl
-ldhi %n|kc160|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|kc160_z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|r2ka|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|r3k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|r4k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|r5k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|r6k|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|r800|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|z180|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|z80|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
-ldhi %n|z80n|push hl;ld de, %n;add hl, de;ex de, hl;pop hl
+ldhi %n|8080|push h;lxi d, unsigned8(%n);dad d;xchg;pop h
+ldhi %n|ez80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|ez80_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|gbz80|push hl;ld de, unsigned8(%n);add hl, de;push hl;push de;pop hl;pop de;pop hl
+ldhi %n|kc160|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|kc160_z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|r2ka|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|r3k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|r4k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|r5k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|r6k|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|r800|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|z180|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|z80|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
+ldhi %n|z80n|push hl;ld de, unsigned8(%n);add hl, de;ex de, hl;pop hl
 ldi|8080|extern __z80asm__ldi;call __z80asm__ldi
 ldi|8085|extern __z80asm__ldi;call __z80asm__ldi
 ldi|gbz80|extern __z80asm__ldi;call __z80asm__ldi
@@ -12192,21 +12192,21 @@ ldi.sil l, (hl)|ez80|ld.sil l, (hl);inc.sil hl
 ldir|8080|extern __z80asm__ldir;call __z80asm__ldir
 ldir|8085|extern __z80asm__ldir;call __z80asm__ldir
 ldir|gbz80|extern __z80asm__ldir;call __z80asm__ldir
-ldsi %n|8080|xchg;lxi h, %n;dad sp;xchg
-ldsi %n|ez80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|ez80_z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|gbz80|push hl;push de;pop hl;pop de;ld hl, %n;add hl, sp;push hl;push de;pop hl;pop de
-ldsi %n|kc160|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|kc160_z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|r2ka|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|r3k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|r4k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|r5k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|r6k|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|r800|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|z180|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|z80|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
-ldsi %n|z80n|ex de, hl;ld hl, %n;add hl, sp;ex de, hl
+ldsi %n|8080|xchg;lxi h, unsigned8(%n);dad sp;xchg
+ldsi %n|ez80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|ez80_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|gbz80|push hl;push de;pop hl;pop de;ld hl, unsigned8(%n);add hl, sp;push hl;push de;pop hl;pop de
+ldsi %n|kc160|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|kc160_z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|r2ka|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|r3k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|r4k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|r5k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|r6k|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|r800|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|z180|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|z80|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
+ldsi %n|z80n|ex de, hl;ld hl, unsigned8(%n);add hl, sp;ex de, hl
 lhld %m|gbz80|push af;ld a, (%m);ld l, a;ld a, (+(%m)+1);ld h, a;pop af
 lhlde|8080|xchg;mov e, m;inx h;mov d, m;dcx h;xchg
 lhlde|ez80|ex de, hl;ld e, (hl);inc hl;ld d, (hl);dec hl;ex de, hl

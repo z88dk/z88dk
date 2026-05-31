@@ -91,7 +91,7 @@ ops:
         if ( @{ $ops[0] } == 3 && $ops[0][1] eq '%n' && $ops[0][2] eq '%s' ) {
             my @flat = ( $ops[0][0], '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/%n/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/unsigned8(%n)/r;
             push @instr, $instr;
             shift @ops;
             next ops;
@@ -99,7 +99,7 @@ ops:
         if ( @{ $ops[0] } == 3 && $ops[0][1] eq '%d' && $ops[0][2] eq '%s' ) {
             my @flat = ( $ops[0][0], '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/%d/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/signed8(%d)/r;
             push @instr, $instr;
             shift @ops;
             next ops;
@@ -107,7 +107,7 @@ ops:
         if ( @{ $ops[0] } == 4 && $ops[0][1] eq '%n' && $ops[0][2] eq '%s' && $ops[0][3] eq '%s' ) {
             my @flat = ( $ops[0][0], '%m', '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/%n/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/unsigned8(%n)/r;
             push @instr, $instr;
             shift @ops;
             next ops;
@@ -115,7 +115,7 @@ ops:
         if ( @{ $ops[0] } == 4 && $ops[0][1] eq '%d' && $ops[0][2] eq '%s' && $ops[0][3] eq '%s' ) {
             my @flat = ( $ops[0][0], '%m', '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/%d/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/signed8(%d)/r;
             push @instr, $instr;
             shift @ops;
             next ops;
@@ -637,7 +637,7 @@ ops:
         {
             my @flat = ( $ops[0][0], $ops[0][1], '%d' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
-            my $instr = $ops->{"@flat"}{$cpu} =~ s/%d/+(%d)+1/r =~ s/\+\+/+/r;
+            my $instr = $ops->{"@flat"}{$cpu} =~ s/%d/signed8((%d)+1)/r;
             push @instr, $instr;
             shift @ops;
             next ops;
