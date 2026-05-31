@@ -90,7 +90,7 @@ coverage:
 	$(MAKE) COVERAGE=1 test
 	gcov $(OBJ_DIR)/*.gcno | perl tools/parse_gcov.pl | tee tools/coverage.txt
 
-CLEAN_PATTERNS = *.o *.d *.i *.gcov *.exe *.orig *.core *.bak *.new *~
+CLEAN_PATTERNS = *.o *.d *.gcov *.exe *.orig *.core *.bak *.new *~
 CLEAN_DIRS = . t t/* t/*/*
 CLEAN_FILES = \
   $(foreach d,$(CLEAN_DIRS), \
