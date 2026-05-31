@@ -8,6 +8,7 @@ all: opcodes.dat opcodes.txt
 all: synthetic.dat
 all: ../opcodes_trie_token.h ../opcodes_trie_token.cpp
 all: ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp
+all: ../opcodes_parse_trie.h ../opcodes_parse_trie.cpp
 
 opcodes.dat: make_opcodes.pl Opcodes.pm $(wildcard opcodes*.pl) Makefile
 	perl make_opcodes.pl opcodes.dat
@@ -36,3 +37,9 @@ synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
 		opcodes.dat
 	perl make_synth_trie.pl synthetic.dat ../opcodes_trie_token.h opcodes_synth_trie
 	dos2unix ../opcodes_synth_trie.h ../opcodes_synth_trie.cpp
+
+../opcodes_parse_trie.h ../opcodes_parse_trie.cpp &: \
+		make_parse_trie.pl opcodes.dat ../opcodes_trie_token.h Trie.pm Makefile \
+		../opcodes_trie_token.h
+	perl make_parse_trie.pl opcodes.dat ../opcodes_trie_token.h opcodes_parse_trie
+	dos2unix ../opcodes_parse_trie.h ../opcodes_parse_trie.cpp
