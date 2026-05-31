@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-void collect_label_tokens(ParseLine& pline, std::vector<Token>& out) {
+static void collect_label_tokens(ParseLine& pline, std::vector<Token>& out) {
     size_t pos0 = pline.pos;
     auto label = parse_label(pline);
     if (label) {
@@ -31,25 +31,11 @@ void collect_label_tokens(ParseLine& pline, std::vector<Token>& out) {
     }
 }
 
-std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>& lines) {
-    std::vector<LogicalLine> out;
-
-    for (auto const& line : lines) {
-        auto m = recognize_synthetic(line);
-        if (!m.matched) {
-            out.push_back(line);
-            continue;
-        }
-        interpret_synth_bytecode(m, line, out);
-    }
-    return out;
-}
-
-static const TrieTransition* binary_search_transition(uint16_t node, TrieToken key) {
+static const TrieTransition* binary_search_transition(size_t node, TrieToken key) {
     const TrieNode& nd = opcodes_synth_trie_nodes[node];
 
-    uint16_t base = nd.first_transition;
-    uint16_t count = nd.count;
+    size_t base = nd.first_transition;
+    size_t count = nd.count;
 
     if (count == 0) {
         return nullptr;
@@ -79,10 +65,10 @@ static const TrieTransition* binary_search_transition(uint16_t node, TrieToken k
     return nullptr;
 }
 
-SynthMatch recognize_synthetic(const LogicalLine& line) {
+static SynthMatch recognize_synthetic(const LogicalLine& line) {
     ParseLine pline(line.tokens);
     SynthMatch res;
-    uint16_t node = 0;
+    size_t node = 0;
     const TrieTransition* tr = nullptr;
 
     // collect label tokens at the start of the line
@@ -94,7 +80,7 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
     if (!tr) {
         return res;    // no match
     }
-    node = tr->next_transition;
+    node = tr->next_node;
 
     // next transitions on tokens
     while (pline.pos < pline.tokens.size()) {
@@ -108,8 +94,8 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
             TrieToken kw_tt = to_trie_token(token.keyword);
             tr = binary_search_transition(node, kw_tt);
             if (tr) {
-                ++pline.pos;
-                node = tr->next_transition;
+                pline.advance();
+                node = tr->next_node;
                 continue;
             }
         }
@@ -118,8 +104,8 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
         TrieToken tt_tt = to_trie_token(token.type);
         tr = binary_search_transition(node, tt_tt);
         if (tr) {
-            ++pline.pos;
-            node = tr->next_transition;
+            pline.advance();
+            node = tr->next_node;
             continue;
         }
 
@@ -140,8 +126,7 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
             }
 
             res.expr_spans.push_back({ start, end });
-            pline.pos = end;
-            node = tr->next_transition;
+            node = tr->next_node;
             continue;
         }
 
@@ -158,8 +143,7 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
             }
 
             res.expr_spans.push_back({start, end});
-            pline.pos = end;
-            node = tr->next_transition;
+            node = tr->next_node;
             continue;
         }
 
@@ -174,8 +158,8 @@ SynthMatch recognize_synthetic(const LogicalLine& line) {
     return res;
 }
 
-void interpret_synth_bytecode(const SynthMatch& match,
-                              const LogicalLine& line, std::vector<LogicalLine>& out) {
+static void interpret_synth_bytecode(const SynthMatch& match,
+                                     const LogicalLine& line, std::vector<LogicalLine>& out) {
     LogicalLine cur(line.loc);
 
     // copy label tokens
@@ -199,8 +183,8 @@ void interpret_synth_bytecode(const SynthMatch& match,
 
     // find range of tokens for the expanded opcodes
     assert(match.accept_id >= 0);
-    const SynthTrieAction& ta = opcodes_synth_trie_actions[match.accept_id];
-    for (uint16_t i = ta.first_bytecode; i < ta.first_bytecode + ta.count; i++) {
+    const TrieAction& ta = opcodes_synth_trie_actions[match.accept_id];
+    for (size_t i = ta.first_bytecode; i < ta.first_bytecode + ta.count; i++) {
         const SynthBytecode& bc = opcodes_synth_trie_bytecode[i];
 
         switch (bc.op) {
@@ -231,7 +215,7 @@ void interpret_synth_bytecode(const SynthMatch& match,
             break;
         }
         case SynthOp::EmitExprRef: {
-            uint16_t expr_index = bc.operand;
+            size_t expr_index = bc.operand;
             assert(expr_index < match.expr_spans.size());
             auto [start, end] = match.expr_spans[expr_index];
             for (size_t j = start; j < end; j++) {
@@ -243,7 +227,7 @@ void interpret_synth_bytecode(const SynthMatch& match,
             cur.tokens.push_back(Token::token(TokenType::Plus, "+", get_end_loc()));
             cur.tokens.push_back(Token::token(TokenType::LeftParen, "(", get_end_loc()));
             {
-                uint16_t expr_index = bc.operand;
+                size_t expr_index = bc.operand;
                 assert(expr_index < match.expr_spans.size());
                 auto [start, end] = match.expr_spans[expr_index];
                 for (size_t j = start; j < end; j++) {
@@ -255,7 +239,7 @@ void interpret_synth_bytecode(const SynthMatch& match,
         }
         case SynthOp::EmitLabelRef: {
             // create temporary labels as needed
-            uint16_t label_id = bc.operand;
+            size_t label_id = bc.operand;
             while (label_id >= labels.size()) {
                 labels.emplace_back();
             }
@@ -283,5 +267,19 @@ void interpret_synth_bytecode(const SynthMatch& match,
         cur.tokens.push_back(Token::end_of_line(get_end_loc()));
         out.push_back(cur);
     }
+}
+
+std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>& lines) {
+    std::vector<LogicalLine> out;
+
+    for (auto const& line : lines) {
+        auto m = recognize_synthetic(line);
+        if (!m.matched) {
+            out.push_back(line);
+            continue;
+        }
+        interpret_synth_bytecode(m, line, out);
+    }
+    return out;
 }
 

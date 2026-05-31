@@ -78,7 +78,7 @@ struct ParseLine {
     ParseLine(const std::vector<Token>& tokens_, size_t pos_ = 0);
     const Token& peek(size_t offset = 0) const;
     void advance();
-    bool eof() const;
+    bool eol() const;
     void error(std::string_view message) const;
     bool check_end_of_line();
     std::string prev_token_text() const;
