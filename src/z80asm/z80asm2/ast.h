@@ -93,6 +93,14 @@ struct ExprTernary : Expr {
     void dump(DumpContext ctx) const override;
 };
 
+struct ExprCallUnary : Expr {
+    Keyword keyword;
+    std::unique_ptr<Expr> arg;
+    ExprCallUnary(Keyword keyword_, std::unique_ptr<Expr> arg_, const SourceLoc& loc)
+        : Expr(loc), keyword(keyword_), arg(std::move(arg_)) {}
+    void dump(DumpContext ctx) const override;
+};
+
 // base class for all statements
 struct Stmt : AstNode {
     SourceLoc loc;
