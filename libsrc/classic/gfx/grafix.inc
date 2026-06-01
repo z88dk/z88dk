@@ -238,7 +238,7 @@ ENDIF
 
 IF FORh19alt
     defc    _GFX_MAXX    = 80
-    defc    _GFX_MAXY    = 72
+    defc    _GFX_MAXY    = 75
     defc    _GFX_GENCON_PIXEL3    = 1
     defc    _GFX_TEXT_BLANK_CHAR = 32
     defc    _GFX_GENCON_USEPLOTC  = 1        ; We call generic_console_plotc, not _printc for text mode
