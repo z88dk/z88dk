@@ -5368,10 +5368,15 @@
  rrca                           ; 0F
  rrca'                          ; 76 0F
  rst 16                         ; D7
+ rst 2                          ; D7
  rst 24                         ; DF
+ rst 3                          ; DF
  rst 32                         ; E7
+ rst 4                          ; E7
  rst 40                         ; EF
+ rst 5                          ; EF
  rst 56                         ; FF
+ rst 7                          ; FF
  sbc a', (hl)                   ; 76 9E
  sbc a', (ix)                   ; 76 FD 9E 00
  sbc a', (ix+0)                 ; 76 FD 9E 00

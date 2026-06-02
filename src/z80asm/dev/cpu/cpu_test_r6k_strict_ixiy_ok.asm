@@ -12249,10 +12249,15 @@
  rrca                           ; 0F
  rrca'                          ; 76 0F
  rst 16                         ; D7
+ rst 2                          ; D7
  rst 24                         ; DF
+ rst 3                          ; DF
  rst 32                         ; E7
+ rst 4                          ; E7
  rst 40                         ; EF
+ rst 5                          ; EF
  rst 56                         ; FF
+ rst 7                          ; FF
  sbc (hl)                       ; 7F 9E
  sbc (ix)                       ; FD 9E 00
  sbc (ix+0)                     ; FD 9E 00
