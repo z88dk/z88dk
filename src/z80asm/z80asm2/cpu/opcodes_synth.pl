@@ -518,10 +518,10 @@ for my $cpu ( Opcode->cpus ) {
     if ( $cpu !~ /^r\dk/ ) {    # not yet for Rabbits
         if ( $cpu =~ /ez80/ ) {
             for my $suf (@ez80_suffixes) {
-                add_synth( $cpu, "ld$suf (hl+), hl",
-                    "ld$suf (hl), hl", "inc$suf hl", "inc$suf hl" );
-                add_synth( $cpu, "ldi$suf (hl), hl",
-                    "ld$suf (hl), hl", "inc$suf hl", "inc$suf hl" );
+                add_synth( $cpu, "ld$suf (hl+), hl", 
+                	"ld$suf (hl), hl", "inc$suf hl", "inc$suf hl" );
+                add_synth( $cpu, "ldi$suf (hl), hl", 
+                	"ld$suf (hl), hl", "inc$suf hl", "inc$suf hl" );
             }
         }
         else {
@@ -630,8 +630,9 @@ for my $cpu ( Opcode->cpus ) {
                 "ld ($x+%d1), h",
                 "ex (sp), hl", "pop $x1"
             );
-            add_synth( $cpu, "ld ($x), $x1", "push $x1", "ex (sp), hl",
-                "ld ($x), l",  "ld ($x+0x01), h",
+            add_synth( $cpu, "ld ($x), $x1", 
+            	"push $x1", "ex (sp), hl", 
+            	"ld ($x), l", "ld ($x+0x01), h",
                 "ex (sp), hl", "pop $x1" );
         }
     }
@@ -739,8 +740,9 @@ for my $cpu ( Opcode->cpus ) {
                 "ld h, ($x+%d1)",
                 "ex (sp), hl", "pop $x1"
             );
-            add_synth( $cpu, "ld $x1, ($x)", "push $x1", "ex (sp), hl",
-                "ld l, ($x)",  "ld h, ($x+0x01)",
+            add_synth( $cpu, "ld $x1, ($x)", 
+            	"push $x1", "ex (sp), hl", 
+            	"ld l, ($x)", "ld h, ($x+0x01)",
                 "ex (sp), hl", "pop $x1" );
         }
     }
@@ -876,7 +878,9 @@ for my $cpu ( Opcode->cpus ) {
         "pop af" );
     if ( get_opcode( $cpu, "ld ix, %m" ) ) {
         for my $x ( 'ix', 'iy' ) {
-            add_synth( $cpu, "bool $x", "push af", "ld a, ${x}h", "or ${x}l", "jr z, %t1",
+            add_synth( $cpu, "bool $x", 
+            	"push af", 
+            	"ld a, ${x}h", "or ${x}l", "jr z, %t1",
                 "ld $x, 0x0001",
                 "pop af" );
             add_synth(
