@@ -16503,6 +16503,13 @@
 |rrhl                       |8080 -           8085 8085_strict ez80 -           ez80_z80 -               gbz80 -            kc160 -            kc160_z80 -                r2ka -           r3k -          r4k -          r5k -          r6k -          r800 -           z180 -           z80 -          z80n -          |
 |rsmix                      |-    -           -    -           ez80 ez80_strict ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst 00h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict -    -           -   -          -   -          -   -          -   -          r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 01h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict -    -           -   -          -   -          -   -          -   -          r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 02h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 03h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 04h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 05h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 06h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict -    -           -   -          -   -          -   -          -   -          r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
+|rst 07h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
 |rst 08h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict -    -           -   -          -   -          -   -          -   -          r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
 |rst 10h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
 |rst 18h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
@@ -16512,6 +16519,13 @@
 |rst 38h                    |8080 8080_strict 8085 8085_strict ez80 ez80_strict ez80_z80 ez80_z80_strict gbz80 gbz80_strict kc160 kc160_strict kc160_z80 kc160_z80_strict r2ka r2ka_strict r3k r3k_strict r4k r4k_strict r5k r5k_strict r6k r6k_strict r800 r800_strict z180 z180_strict z80 z80_strict z80n z80n_strict|
 |rst v, 40h                 |-    -           8085 8085_strict -    -           -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.l 00h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 01h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 02h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 03h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 04h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 05h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 06h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.l 07h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.l 08h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.l 10h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.l 18h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
@@ -16520,6 +16534,13 @@
 |rst.l 30h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.l 38h                  |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.lis 00h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 01h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 02h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 03h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 04h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 05h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 06h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.lis 07h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.lis 08h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.lis 10h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.lis 18h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
@@ -16528,6 +16549,13 @@
 |rst.lis 30h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.lis 38h                |-    -           -    -           -    -           ez80_z80 ez80_z80_strict -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.s 00h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 01h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 02h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 03h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 04h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 05h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 06h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.s 07h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.s 08h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.s 10h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.s 18h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
@@ -16536,6 +16564,13 @@
 |rst.s 30h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.s 38h                  |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.sil 00h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 01h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 02h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 03h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 04h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 05h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 06h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
+|rst.sil 07h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.sil 08h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.sil 10h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
 |rst.sil 18h                |-    -           -    -           ez80 ez80_strict -        -               -     -            -     -            -         -                -    -           -   -          -   -          -   -          -   -          -    -           -    -           -   -          -    -          |
@@ -112782,6 +112817,210 @@
 |rst 00h                    |z80_strict      |-    |C7                                                            |
 |rst 00h                    |z80n            |-    |C7                                                            |
 |rst 00h                    |z80n_strict     |-    |C7                                                            |
+|rst 01h                    |8080            |-    |CF                                                            |
+|rst 01h                    |8080_strict     |-    |CF                                                            |
+|rst 01h                    |8085            |-    |CF                                                            |
+|rst 01h                    |8085_strict     |-    |CF                                                            |
+|rst 01h                    |ez80            |-    |CF                                                            |
+|rst 01h                    |ez80_strict     |-    |CF                                                            |
+|rst 01h                    |ez80_z80        |-    |CF                                                            |
+|rst 01h                    |ez80_z80_strict |-    |CF                                                            |
+|rst 01h                    |gbz80           |-    |CF                                                            |
+|rst 01h                    |gbz80_strict    |-    |CF                                                            |
+|rst 01h                    |kc160           |-    |CF                                                            |
+|rst 01h                    |kc160_strict    |-    |CF                                                            |
+|rst 01h                    |kc160_z80       |-    |CF                                                            |
+|rst 01h                    |kc160_z80_strict|-    |CF                                                            |
+|rst 01h                    |r800            |-    |CF                                                            |
+|rst 01h                    |r800_strict     |-    |CF                                                            |
+|rst 01h                    |z180            |-    |CF                                                            |
+|rst 01h                    |z180_strict     |-    |CF                                                            |
+|rst 01h                    |z80             |-    |CF                                                            |
+|rst 01h                    |z80_strict      |-    |CF                                                            |
+|rst 01h                    |z80n            |-    |CF                                                            |
+|rst 01h                    |z80n_strict     |-    |CF                                                            |
+|rst 02h                    |8080            |-    |D7                                                            |
+|rst 02h                    |8080_strict     |-    |D7                                                            |
+|rst 02h                    |8085            |-    |D7                                                            |
+|rst 02h                    |8085_strict     |-    |D7                                                            |
+|rst 02h                    |ez80            |-    |D7                                                            |
+|rst 02h                    |ez80_strict     |-    |D7                                                            |
+|rst 02h                    |ez80_z80        |-    |D7                                                            |
+|rst 02h                    |ez80_z80_strict |-    |D7                                                            |
+|rst 02h                    |gbz80           |-    |D7                                                            |
+|rst 02h                    |gbz80_strict    |-    |D7                                                            |
+|rst 02h                    |kc160           |-    |D7                                                            |
+|rst 02h                    |kc160_strict    |-    |D7                                                            |
+|rst 02h                    |kc160_z80       |-    |D7                                                            |
+|rst 02h                    |kc160_z80_strict|-    |D7                                                            |
+|rst 02h                    |r2ka            |-    |D7                                                            |
+|rst 02h                    |r2ka_strict     |-    |D7                                                            |
+|rst 02h                    |r3k             |-    |D7                                                            |
+|rst 02h                    |r3k_strict      |-    |D7                                                            |
+|rst 02h                    |r4k             |-    |D7                                                            |
+|rst 02h                    |r4k_strict      |-    |D7                                                            |
+|rst 02h                    |r5k             |-    |D7                                                            |
+|rst 02h                    |r5k_strict      |-    |D7                                                            |
+|rst 02h                    |r6k             |-    |D7                                                            |
+|rst 02h                    |r6k_strict      |-    |D7                                                            |
+|rst 02h                    |r800            |-    |D7                                                            |
+|rst 02h                    |r800_strict     |-    |D7                                                            |
+|rst 02h                    |z180            |-    |D7                                                            |
+|rst 02h                    |z180_strict     |-    |D7                                                            |
+|rst 02h                    |z80             |-    |D7                                                            |
+|rst 02h                    |z80_strict      |-    |D7                                                            |
+|rst 02h                    |z80n            |-    |D7                                                            |
+|rst 02h                    |z80n_strict     |-    |D7                                                            |
+|rst 03h                    |8080            |-    |DF                                                            |
+|rst 03h                    |8080_strict     |-    |DF                                                            |
+|rst 03h                    |8085            |-    |DF                                                            |
+|rst 03h                    |8085_strict     |-    |DF                                                            |
+|rst 03h                    |ez80            |-    |DF                                                            |
+|rst 03h                    |ez80_strict     |-    |DF                                                            |
+|rst 03h                    |ez80_z80        |-    |DF                                                            |
+|rst 03h                    |ez80_z80_strict |-    |DF                                                            |
+|rst 03h                    |gbz80           |-    |DF                                                            |
+|rst 03h                    |gbz80_strict    |-    |DF                                                            |
+|rst 03h                    |kc160           |-    |DF                                                            |
+|rst 03h                    |kc160_strict    |-    |DF                                                            |
+|rst 03h                    |kc160_z80       |-    |DF                                                            |
+|rst 03h                    |kc160_z80_strict|-    |DF                                                            |
+|rst 03h                    |r2ka            |-    |DF                                                            |
+|rst 03h                    |r2ka_strict     |-    |DF                                                            |
+|rst 03h                    |r3k             |-    |DF                                                            |
+|rst 03h                    |r3k_strict      |-    |DF                                                            |
+|rst 03h                    |r4k             |-    |DF                                                            |
+|rst 03h                    |r4k_strict      |-    |DF                                                            |
+|rst 03h                    |r5k             |-    |DF                                                            |
+|rst 03h                    |r5k_strict      |-    |DF                                                            |
+|rst 03h                    |r6k             |-    |DF                                                            |
+|rst 03h                    |r6k_strict      |-    |DF                                                            |
+|rst 03h                    |r800            |-    |DF                                                            |
+|rst 03h                    |r800_strict     |-    |DF                                                            |
+|rst 03h                    |z180            |-    |DF                                                            |
+|rst 03h                    |z180_strict     |-    |DF                                                            |
+|rst 03h                    |z80             |-    |DF                                                            |
+|rst 03h                    |z80_strict      |-    |DF                                                            |
+|rst 03h                    |z80n            |-    |DF                                                            |
+|rst 03h                    |z80n_strict     |-    |DF                                                            |
+|rst 04h                    |8080            |-    |E7                                                            |
+|rst 04h                    |8080_strict     |-    |E7                                                            |
+|rst 04h                    |8085            |-    |E7                                                            |
+|rst 04h                    |8085_strict     |-    |E7                                                            |
+|rst 04h                    |ez80            |-    |E7                                                            |
+|rst 04h                    |ez80_strict     |-    |E7                                                            |
+|rst 04h                    |ez80_z80        |-    |E7                                                            |
+|rst 04h                    |ez80_z80_strict |-    |E7                                                            |
+|rst 04h                    |gbz80           |-    |E7                                                            |
+|rst 04h                    |gbz80_strict    |-    |E7                                                            |
+|rst 04h                    |kc160           |-    |E7                                                            |
+|rst 04h                    |kc160_strict    |-    |E7                                                            |
+|rst 04h                    |kc160_z80       |-    |E7                                                            |
+|rst 04h                    |kc160_z80_strict|-    |E7                                                            |
+|rst 04h                    |r2ka            |-    |E7                                                            |
+|rst 04h                    |r2ka_strict     |-    |E7                                                            |
+|rst 04h                    |r3k             |-    |E7                                                            |
+|rst 04h                    |r3k_strict      |-    |E7                                                            |
+|rst 04h                    |r4k             |-    |E7                                                            |
+|rst 04h                    |r4k_strict      |-    |E7                                                            |
+|rst 04h                    |r5k             |-    |E7                                                            |
+|rst 04h                    |r5k_strict      |-    |E7                                                            |
+|rst 04h                    |r6k             |-    |E7                                                            |
+|rst 04h                    |r6k_strict      |-    |E7                                                            |
+|rst 04h                    |r800            |-    |E7                                                            |
+|rst 04h                    |r800_strict     |-    |E7                                                            |
+|rst 04h                    |z180            |-    |E7                                                            |
+|rst 04h                    |z180_strict     |-    |E7                                                            |
+|rst 04h                    |z80             |-    |E7                                                            |
+|rst 04h                    |z80_strict      |-    |E7                                                            |
+|rst 04h                    |z80n            |-    |E7                                                            |
+|rst 04h                    |z80n_strict     |-    |E7                                                            |
+|rst 05h                    |8080            |-    |EF                                                            |
+|rst 05h                    |8080_strict     |-    |EF                                                            |
+|rst 05h                    |8085            |-    |EF                                                            |
+|rst 05h                    |8085_strict     |-    |EF                                                            |
+|rst 05h                    |ez80            |-    |EF                                                            |
+|rst 05h                    |ez80_strict     |-    |EF                                                            |
+|rst 05h                    |ez80_z80        |-    |EF                                                            |
+|rst 05h                    |ez80_z80_strict |-    |EF                                                            |
+|rst 05h                    |gbz80           |-    |EF                                                            |
+|rst 05h                    |gbz80_strict    |-    |EF                                                            |
+|rst 05h                    |kc160           |-    |EF                                                            |
+|rst 05h                    |kc160_strict    |-    |EF                                                            |
+|rst 05h                    |kc160_z80       |-    |EF                                                            |
+|rst 05h                    |kc160_z80_strict|-    |EF                                                            |
+|rst 05h                    |r2ka            |-    |EF                                                            |
+|rst 05h                    |r2ka_strict     |-    |EF                                                            |
+|rst 05h                    |r3k             |-    |EF                                                            |
+|rst 05h                    |r3k_strict      |-    |EF                                                            |
+|rst 05h                    |r4k             |-    |EF                                                            |
+|rst 05h                    |r4k_strict      |-    |EF                                                            |
+|rst 05h                    |r5k             |-    |EF                                                            |
+|rst 05h                    |r5k_strict      |-    |EF                                                            |
+|rst 05h                    |r6k             |-    |EF                                                            |
+|rst 05h                    |r6k_strict      |-    |EF                                                            |
+|rst 05h                    |r800            |-    |EF                                                            |
+|rst 05h                    |r800_strict     |-    |EF                                                            |
+|rst 05h                    |z180            |-    |EF                                                            |
+|rst 05h                    |z180_strict     |-    |EF                                                            |
+|rst 05h                    |z80             |-    |EF                                                            |
+|rst 05h                    |z80_strict      |-    |EF                                                            |
+|rst 05h                    |z80n            |-    |EF                                                            |
+|rst 05h                    |z80n_strict     |-    |EF                                                            |
+|rst 06h                    |8080            |-    |F7                                                            |
+|rst 06h                    |8080_strict     |-    |F7                                                            |
+|rst 06h                    |8085            |-    |F7                                                            |
+|rst 06h                    |8085_strict     |-    |F7                                                            |
+|rst 06h                    |ez80            |-    |F7                                                            |
+|rst 06h                    |ez80_strict     |-    |F7                                                            |
+|rst 06h                    |ez80_z80        |-    |F7                                                            |
+|rst 06h                    |ez80_z80_strict |-    |F7                                                            |
+|rst 06h                    |gbz80           |-    |F7                                                            |
+|rst 06h                    |gbz80_strict    |-    |F7                                                            |
+|rst 06h                    |kc160           |-    |F7                                                            |
+|rst 06h                    |kc160_strict    |-    |F7                                                            |
+|rst 06h                    |kc160_z80       |-    |F7                                                            |
+|rst 06h                    |kc160_z80_strict|-    |F7                                                            |
+|rst 06h                    |r800            |-    |F7                                                            |
+|rst 06h                    |r800_strict     |-    |F7                                                            |
+|rst 06h                    |z180            |-    |F7                                                            |
+|rst 06h                    |z180_strict     |-    |F7                                                            |
+|rst 06h                    |z80             |-    |F7                                                            |
+|rst 06h                    |z80_strict      |-    |F7                                                            |
+|rst 06h                    |z80n            |-    |F7                                                            |
+|rst 06h                    |z80n_strict     |-    |F7                                                            |
+|rst 07h                    |8080            |-    |FF                                                            |
+|rst 07h                    |8080_strict     |-    |FF                                                            |
+|rst 07h                    |8085            |-    |FF                                                            |
+|rst 07h                    |8085_strict     |-    |FF                                                            |
+|rst 07h                    |ez80            |-    |FF                                                            |
+|rst 07h                    |ez80_strict     |-    |FF                                                            |
+|rst 07h                    |ez80_z80        |-    |FF                                                            |
+|rst 07h                    |ez80_z80_strict |-    |FF                                                            |
+|rst 07h                    |gbz80           |-    |FF                                                            |
+|rst 07h                    |gbz80_strict    |-    |FF                                                            |
+|rst 07h                    |kc160           |-    |FF                                                            |
+|rst 07h                    |kc160_strict    |-    |FF                                                            |
+|rst 07h                    |kc160_z80       |-    |FF                                                            |
+|rst 07h                    |kc160_z80_strict|-    |FF                                                            |
+|rst 07h                    |r2ka            |-    |FF                                                            |
+|rst 07h                    |r2ka_strict     |-    |FF                                                            |
+|rst 07h                    |r3k             |-    |FF                                                            |
+|rst 07h                    |r3k_strict      |-    |FF                                                            |
+|rst 07h                    |r4k             |-    |FF                                                            |
+|rst 07h                    |r4k_strict      |-    |FF                                                            |
+|rst 07h                    |r5k             |-    |FF                                                            |
+|rst 07h                    |r5k_strict      |-    |FF                                                            |
+|rst 07h                    |r6k             |-    |FF                                                            |
+|rst 07h                    |r6k_strict      |-    |FF                                                            |
+|rst 07h                    |r800            |-    |FF                                                            |
+|rst 07h                    |r800_strict     |-    |FF                                                            |
+|rst 07h                    |z180            |-    |FF                                                            |
+|rst 07h                    |z180_strict     |-    |FF                                                            |
+|rst 07h                    |z80             |-    |FF                                                            |
+|rst 07h                    |z80_strict      |-    |FF                                                            |
+|rst 07h                    |z80n            |-    |FF                                                            |
+|rst 07h                    |z80n_strict     |-    |FF                                                            |
 |rst 08h                    |8080            |-    |CF                                                            |
 |rst 08h                    |8080_strict     |-    |CF                                                            |
 |rst 08h                    |8085            |-    |CF                                                            |
@@ -112990,6 +113229,20 @@
 |rst v, 40h                 |8085_strict     |-    |CB                                                            |
 |rst.l 00h                  |ez80_z80        |-    |49 C7                                                         |
 |rst.l 00h                  |ez80_z80_strict |-    |49 C7                                                         |
+|rst.l 01h                  |ez80_z80        |-    |49 CF                                                         |
+|rst.l 01h                  |ez80_z80_strict |-    |49 CF                                                         |
+|rst.l 02h                  |ez80_z80        |-    |49 D7                                                         |
+|rst.l 02h                  |ez80_z80_strict |-    |49 D7                                                         |
+|rst.l 03h                  |ez80_z80        |-    |49 DF                                                         |
+|rst.l 03h                  |ez80_z80_strict |-    |49 DF                                                         |
+|rst.l 04h                  |ez80_z80        |-    |49 E7                                                         |
+|rst.l 04h                  |ez80_z80_strict |-    |49 E7                                                         |
+|rst.l 05h                  |ez80_z80        |-    |49 EF                                                         |
+|rst.l 05h                  |ez80_z80_strict |-    |49 EF                                                         |
+|rst.l 06h                  |ez80_z80        |-    |49 F7                                                         |
+|rst.l 06h                  |ez80_z80_strict |-    |49 F7                                                         |
+|rst.l 07h                  |ez80_z80        |-    |49 FF                                                         |
+|rst.l 07h                  |ez80_z80_strict |-    |49 FF                                                         |
 |rst.l 08h                  |ez80_z80        |-    |49 CF                                                         |
 |rst.l 08h                  |ez80_z80_strict |-    |49 CF                                                         |
 |rst.l 10h                  |ez80_z80        |-    |49 D7                                                         |
@@ -113006,6 +113259,20 @@
 |rst.l 38h                  |ez80_z80_strict |-    |49 FF                                                         |
 |rst.lis 00h                |ez80_z80        |-    |49 C7                                                         |
 |rst.lis 00h                |ez80_z80_strict |-    |49 C7                                                         |
+|rst.lis 01h                |ez80_z80        |-    |49 CF                                                         |
+|rst.lis 01h                |ez80_z80_strict |-    |49 CF                                                         |
+|rst.lis 02h                |ez80_z80        |-    |49 D7                                                         |
+|rst.lis 02h                |ez80_z80_strict |-    |49 D7                                                         |
+|rst.lis 03h                |ez80_z80        |-    |49 DF                                                         |
+|rst.lis 03h                |ez80_z80_strict |-    |49 DF                                                         |
+|rst.lis 04h                |ez80_z80        |-    |49 E7                                                         |
+|rst.lis 04h                |ez80_z80_strict |-    |49 E7                                                         |
+|rst.lis 05h                |ez80_z80        |-    |49 EF                                                         |
+|rst.lis 05h                |ez80_z80_strict |-    |49 EF                                                         |
+|rst.lis 06h                |ez80_z80        |-    |49 F7                                                         |
+|rst.lis 06h                |ez80_z80_strict |-    |49 F7                                                         |
+|rst.lis 07h                |ez80_z80        |-    |49 FF                                                         |
+|rst.lis 07h                |ez80_z80_strict |-    |49 FF                                                         |
 |rst.lis 08h                |ez80_z80        |-    |49 CF                                                         |
 |rst.lis 08h                |ez80_z80_strict |-    |49 CF                                                         |
 |rst.lis 10h                |ez80_z80        |-    |49 D7                                                         |
@@ -113022,6 +113289,20 @@
 |rst.lis 38h                |ez80_z80_strict |-    |49 FF                                                         |
 |rst.s 00h                  |ez80            |-    |52 C7                                                         |
 |rst.s 00h                  |ez80_strict     |-    |52 C7                                                         |
+|rst.s 01h                  |ez80            |-    |52 CF                                                         |
+|rst.s 01h                  |ez80_strict     |-    |52 CF                                                         |
+|rst.s 02h                  |ez80            |-    |52 D7                                                         |
+|rst.s 02h                  |ez80_strict     |-    |52 D7                                                         |
+|rst.s 03h                  |ez80            |-    |52 DF                                                         |
+|rst.s 03h                  |ez80_strict     |-    |52 DF                                                         |
+|rst.s 04h                  |ez80            |-    |52 E7                                                         |
+|rst.s 04h                  |ez80_strict     |-    |52 E7                                                         |
+|rst.s 05h                  |ez80            |-    |52 EF                                                         |
+|rst.s 05h                  |ez80_strict     |-    |52 EF                                                         |
+|rst.s 06h                  |ez80            |-    |52 F7                                                         |
+|rst.s 06h                  |ez80_strict     |-    |52 F7                                                         |
+|rst.s 07h                  |ez80            |-    |52 FF                                                         |
+|rst.s 07h                  |ez80_strict     |-    |52 FF                                                         |
 |rst.s 08h                  |ez80            |-    |52 CF                                                         |
 |rst.s 08h                  |ez80_strict     |-    |52 CF                                                         |
 |rst.s 10h                  |ez80            |-    |52 D7                                                         |
@@ -113038,6 +113319,20 @@
 |rst.s 38h                  |ez80_strict     |-    |52 FF                                                         |
 |rst.sil 00h                |ez80            |-    |52 C7                                                         |
 |rst.sil 00h                |ez80_strict     |-    |52 C7                                                         |
+|rst.sil 01h                |ez80            |-    |52 CF                                                         |
+|rst.sil 01h                |ez80_strict     |-    |52 CF                                                         |
+|rst.sil 02h                |ez80            |-    |52 D7                                                         |
+|rst.sil 02h                |ez80_strict     |-    |52 D7                                                         |
+|rst.sil 03h                |ez80            |-    |52 DF                                                         |
+|rst.sil 03h                |ez80_strict     |-    |52 DF                                                         |
+|rst.sil 04h                |ez80            |-    |52 E7                                                         |
+|rst.sil 04h                |ez80_strict     |-    |52 E7                                                         |
+|rst.sil 05h                |ez80            |-    |52 EF                                                         |
+|rst.sil 05h                |ez80_strict     |-    |52 EF                                                         |
+|rst.sil 06h                |ez80            |-    |52 F7                                                         |
+|rst.sil 06h                |ez80_strict     |-    |52 F7                                                         |
+|rst.sil 07h                |ez80            |-    |52 FF                                                         |
+|rst.sil 07h                |ez80_strict     |-    |52 FF                                                         |
 |rst.sil 08h                |ez80            |-    |52 CF                                                         |
 |rst.sil 08h                |ez80_strict     |-    |52 CF                                                         |
 |rst.sil 10h                |ez80            |-    |52 D7                                                         |
