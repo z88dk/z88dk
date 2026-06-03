@@ -2089,6 +2089,25 @@ static disc_spec magnolia_spec = {
     .first_sector_offset = 1,
 };
 
+// Heath H89/Zenith Z89 SSDD Soft Sectored disk
+// e.g. the 32K LLL/HEATH/ZENITH BIOS-80 for H17 or H37 units
+//      it required a jumper for the Interrupt Bus Enable line #3
+static disc_spec hz17s_spec = {
+    .name = "HZenith17s",
+    .disk_mode = MFM300,
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 // Heath H100/Zenith Z100 5" DSDD
 static disc_spec z100_spec = {
     .name = "Z-100",
@@ -2444,6 +2463,7 @@ static struct formats {
     { "x820",      "Xerox 820",             &x820_spec, 0, NULL, 1 },
     { "hz89",      "Zenith Z89, Z17-SSSD",  &hz17_spec, 0, NULL, 1 },
     { "hz89b",     "Zenith Z89, no skew",   &hz17b_spec, 0, NULL, 1 },
+    { "hz89s",     "Zenith Z89, soft-sect", &hz17s_spec, 0, NULL, 1 },
     { "hz100",     "Zenith Z100, DSDD",     &z100_spec, 0, NULL, 1 },
     { "magnolia",  "Zenith Z89, magnolia",  &magnolia_spec, 0, NULL, 1 },
     { "z80pack",   "z80pack 8\" format",    &z80pack_spec, 0, NULL, 1 },
