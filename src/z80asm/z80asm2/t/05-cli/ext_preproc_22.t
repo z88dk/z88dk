@@ -7,8 +7,10 @@ path("$test.asm.cpp")->spew("OP");
 
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
-capture_ok( "z88dk-z80asm -v -cpp=-DOP=nop -cpp=-DDUMMY=1 -dump-after-cmdline $test.asm.cpp",
-    "$dir/expected/$self.txt" );
+capture_ok(
+"z88dk-z80asm -v -cpp=-DOP=nop -cpp=-DDUMMY=1 -dump-after-cmdline $test.asm.cpp",
+    "$dir/expected/$self.txt"
+);
 
 unlink_testfiles;
 done_testing;

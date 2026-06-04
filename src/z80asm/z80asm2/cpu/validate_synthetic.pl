@@ -75,7 +75,9 @@ sub parse_effect {
 
     $asm = intel_to_zilog($asm);
     my $inst = parse_assembly( $asm, $cpu );
-    return if $inst->{type} eq "inst" && $inst->{opcode} eq "extern";    # ignore extern
+    return
+        if $inst->{type} eq "inst"
+        && $inst->{opcode} eq "extern";    # ignore extern
 
     $inst = lower_condition($inst);
     $inst = lower_emulated_ops($inst);
@@ -157,7 +159,9 @@ sub add_default_a_register {
     my ( $args_ref, $opcode ) = @_;
 
     # add default a register for certain opcodes with only one operand
-    if ( @$args_ref == 1 && $opcode =~ /\b(add|adc|sub|sbc|and|or|xor|cp|cmp)\b/ ) {
+    if (   @$args_ref == 1
+        && $opcode =~ /\b(add|adc|sub|sbc|and|or|xor|cp|cmp)\b/ )
+    {
         unshift @$args_ref, "a";
     }
     elsif ( @$args_ref == 0 && $opcode =~ /\b(neg|cpl)\b/ ) {
@@ -182,11 +186,21 @@ sub parse_operand {
     }
 
     if ( $opr =~ /^ (bc|de|hl|jk|af|sp|ix|iy) ('?) $/x ) {
-        return { type => 'regpair', name => $1, alt => $2 ? 1 : 0, width => undef };
+        return {
+            type  => 'regpair',
+            name  => $1,
+            alt   => $2 ? 1 : 0,
+            width => undef
+        };
     }
 
     if ( $opr =~ /^ (bcde|jkhl) ('?) $/x ) {
-        return { type => 'regpair', name => $1, alt => $2 ? 1 : 0, width => undef };
+        return {
+            type  => 'regpair',
+            name  => $1,
+            alt   => $2 ? 1 : 0,
+            width => undef
+        };
     }
 
     if ( $opr =~ /^ (hl|sp) \+ (%d|%n) ('?) $/x ) {
@@ -200,13 +214,21 @@ sub parse_operand {
         };
     }
 
-    if ( $opr =~ /^ (nz|z|nc|po|pe|p|m|nv|v|lz|lo|eq|ne|gtu|ltu|geu|leu|lt|gt|ge|le) $/x ) {
+    if ( $opr =~
+        /^ (nz|z|nc|po|pe|p|m|nv|v|lz|lo|eq|ne|gtu|ltu|geu|leu|lt|gt|ge|le) $/x
+        )
+    {
         return { type => 'cond', name => $1 };
     }
 
     if ( $opr =~ /^ (c) ('?) $/x ) {    # C can be a register or a flag
         my $alt = $2 ? 1 : 0;
-        return { type => $alt ? 'reg' : 'ident', name => $1, alt => $alt, width => undef };
+        return {
+            type  => $alt ? 'reg' : 'ident',
+            name  => $1,
+            alt   => $alt,
+            width => undef
+        };
     }
 
     if ( $opr =~ /^ \( (c) \) $/x ) {
@@ -398,8 +420,13 @@ sub lower_emulated_ops {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name => 'hl', alt => 0, width => undef },
-                    { type => 'regpair', name => $1,   alt => 0, width => undef }
+                    {
+                        type  => 'regpair',
+                        name  => 'hl',
+                        alt   => 0,
+                        width => undef
+                    },
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
                 ]
             };
         }
@@ -410,7 +437,7 @@ sub lower_emulated_ops {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name => $1,  alt => 0, width => undef },
+                    { type => 'regpair', name => $1, alt => 0, width => undef },
                     { type => 'reg',     name => 'a', alt => 0, width => undef }
                 ]
             };
@@ -422,8 +449,13 @@ sub lower_emulated_ops {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name => 'hl', alt => 0, width => undef },
-                    { type => 'regpair', name => $1,   alt => 0, width => undef }
+                    {
+                        type  => 'regpair',
+                        name  => 'hl',
+                        alt   => 0,
+                        width => undef
+                    },
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
                 ]
             };
         }
@@ -434,8 +466,13 @@ sub lower_emulated_ops {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name => 'hl', alt => 0, width => undef },
-                    { type => 'regpair', name => $1,   alt => 0, width => undef }
+                    {
+                        type  => 'regpair',
+                        name  => 'hl',
+                        alt   => 0,
+                        width => undef
+                    },
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
                 ]
             };
         }
@@ -446,8 +483,13 @@ sub lower_emulated_ops {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name => 'hl', alt => 0, width => undef },
-                    { type => 'regpair', name => $1,   alt => 0, width => undef }
+                    {
+                        type  => 'regpair',
+                        name  => 'hl',
+                        alt   => 0,
+                        width => undef
+                    },
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
                 ]
             };
         }
@@ -458,13 +500,26 @@ sub lower_emulated_ops {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name  => 'sp', alt   => 0, width => undef },
-                    { type => 'imm',     value => '%d', width => undef }
+                    {
+                        type  => 'regpair',
+                        name  => 'sp',
+                        alt   => 0,
+                        width => undef
+                    },
+                    { type => 'imm', value => '%d', width => undef }
                 ]
             };
         }
-        if ( $func =~ /__z80asm__(cpi|cpir|cpd|cpdr|ldi|ldir|ldd|lddr|daa|rld|rrd)$/ ) {
-            return { type => 'inst', opcode => $1, prefixes => {}, suffix => undef, args => [] };
+        if ( $func =~
+            /__z80asm__(cpi|cpir|cpd|cpdr|ldi|ldir|ldd|lddr|daa|rld|rrd)$/ )
+        {
+            return {
+                type     => 'inst',
+                opcode   => $1,
+                prefixes => {},
+                suffix   => undef,
+                args     => []
+            };
         }
         if ( $func =~ /__z80asm__sra_(\w\w)/ ) {
             return {
@@ -472,7 +527,9 @@ sub lower_emulated_ops {
                 opcode   => 'sra',
                 prefixes => {},
                 suffix   => undef,
-                args     => [ { type => 'regpair', name => $1, alt => 0, width => undef } ]
+                args     => [
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
+                ]
             };
         }
         if ( $func =~ /__z80asm__rl_(\w\w)/ ) {
@@ -481,7 +538,9 @@ sub lower_emulated_ops {
                 opcode   => 'rl',
                 prefixes => {},
                 suffix   => undef,
-                args     => [ { type => 'regpair', name => $1, alt => 0, width => undef } ]
+                args     => [
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
+                ]
             };
         }
         if ( $func =~ /__z80asm__rr_(\w\w)/ ) {
@@ -490,7 +549,9 @@ sub lower_emulated_ops {
                 opcode   => 'rr',
                 prefixes => {},
                 suffix   => undef,
-                args     => [ { type => 'regpair', name => $1, alt => 0, width => undef } ]
+                args     => [
+                    { type => 'regpair', name => $1, alt => 0, width => undef }
+                ]
             };
         }
         if ( $func =~ /__z80asm__call_(\w\w)/ ) {
@@ -526,7 +587,12 @@ sub lower_emulated_ops {
                         post  => 0,
                         width => undef
                     },
-                    { type => 'regpair', name => 'hl', alt => 0, width => undef }
+                    {
+                        type  => 'regpair',
+                        name  => 'hl',
+                        alt   => 0,
+                        width => undef
+                    }
                 ]
             };
         }
@@ -547,25 +613,31 @@ sub lower_rabbit_prefixes {
     return $inst unless $inst->{type} eq "inst";
 
     if ( $inst->{prefixes}{altd} ) {
-        @{ $inst->{args} } or die "altd prefix requires at least one argument in ", dump($inst);
+        @{ $inst->{args} }
+            or die "altd prefix requires at least one argument in ",
+            dump($inst);
         my $first_arg = $inst->{args}->[0];
         if ( $first_arg->{type} eq "reg" || $first_arg->{type} eq "regpair" ) {
             $first_arg->{alt} = 1;
         }
         else {
-            die "altd prefix requires first argument to be a register in ", dump($inst);
+            die "altd prefix requires first argument to be a register in ",
+                dump($inst);
         }
     }
 
     if ( $inst->{prefixes}{alts} ) {
         @{ $inst->{args} } == 2
-            or die "alts prefix requires exactly two arguments in ", dump($inst);
+            or die "alts prefix requires exactly two arguments in ",
+            dump($inst);
         my $second_arg = $inst->{args}->[1];
-        if ( $second_arg->{type} eq "reg" || $second_arg->{type} eq "regpair" ) {
+        if ( $second_arg->{type} eq "reg" || $second_arg->{type} eq "regpair" )
+        {
             $second_arg->{alt} = 1;
         }
         else {
-            die "alts prefix requires second argument to be a register in ", dump($inst);
+            die "alts prefix requires second argument to be a register in ",
+                dump($inst);
         }
     }
 
@@ -589,7 +661,10 @@ sub lower_ez80_suffixes {
     if ( $inst->{suffix} ) {
         my $suffix = $inst->{suffix};
         for my $arg ( @{ $inst->{args} } ) {
-            if ( $arg->{type} eq "regpair" || $arg->{type} eq "mem" || $arg->{type} eq "imm" ) {
+            if (   $arg->{type} eq "regpair"
+                || $arg->{type} eq "mem"
+                || $arg->{type} eq "imm" )
+            {
                 $arg->{width} = $suffix;
             }
         }
@@ -606,8 +681,11 @@ sub normalize_ex_args {
 
     # ensure ex arguments are in a consistent order
     @{ $inst->{args} } =
-        sort { $a->{type} cmp $b->{type} || $a->{name} cmp $b->{name} || $a->{alt} cmp $b->{alt} }
-        @{ $inst->{args} };
+        sort {
+               $a->{type} cmp $b->{type}
+            || $a->{name} cmp $b->{name}
+            || $a->{alt} cmp $b->{alt}
+        } @{ $inst->{args} };
 
     # replace ex af, af by ex af, af'
     if ( @{ $inst->{args} } == 2 ) {
@@ -647,7 +725,12 @@ sub normalize_adi {
                 prefixes => {},
                 suffix   => undef,
                 args     => [
-                    { type => 'regpair', name => "de", alt => 0, width => undef },
+                    {
+                        type  => 'regpair',
+                        name  => "de",
+                        alt   => 0,
+                        width => undef
+                    },
                     {
                         alt         => 0,
                         disp        => $disp,
@@ -669,7 +752,8 @@ sub lower_postinc {
 
     return $inst unless $inst->{type} eq "inst";
 
-    my $is_post = $inst->{opcode} eq "ldi" ? 1 : $inst->{opcode} eq "ldd" ? -1 : 0;
+    my $is_post =
+        $inst->{opcode} eq "ldi" ? 1 : $inst->{opcode} eq "ldd" ? -1 : 0;
     if ( $is_post != 0 ) {
         $inst->{opcode} = "ld";
     }
@@ -679,7 +763,9 @@ sub lower_postinc {
         my $arg         = $inst->{args}[$i];
         my $is_post_arg = defined $arg->{post} ? $arg->{post} : 0;
         if ( $is_post != 0 && $is_post_arg != 0 ) {
-            die "Post-increment/decrement not allowed on multiple arguments in ", dump($inst);
+            die
+"Post-increment/decrement not allowed on multiple arguments in ",
+                dump($inst);
         }
         my $post = $is_post + $is_post_arg;
         if ( $arg->{type} eq "mem" && $post != 0 ) {
@@ -700,8 +786,11 @@ sub lower_postinc {
             };
 
             # check if the other argument is a register pair, e.g. ld bc, (hl+)
-            $i == 0 || $i == 1 or die "Invalid argument index $i in ", dump($inst);
-            if ( $inst->{args}->[ 1 - $i ] && $inst->{args}->[ 1 - $i ]{type} eq "regpair" ) {
+            $i == 0 || $i == 1
+                or die "Invalid argument index $i in ", dump($inst);
+            if (   $inst->{args}->[ 1 - $i ]
+                && $inst->{args}->[ 1 - $i ]{type} eq "regpair" )
+            {
                 push @new_insts, clone($post_inst);
                 push @new_insts, clone($post_inst);
             }
@@ -831,7 +920,7 @@ sub normalize_effects {
                 )
             {
                 $effect->{opcode} = "clr";
-                splice @{ $effect->{args} }, 1, 1;    # remove immediate argument
+                splice @{ $effect->{args} }, 1, 1;   # remove immediate argument
                 $repeat = 1;
             }
         }
@@ -930,16 +1019,20 @@ sub normalize_effects {
                             && @{ $effects[ $i + 3 ]{args} } == 1
                             && $effects[ $i + 3 ]{args}[0]{type} eq "regpair" )
                         {
-                            my $dest2_regpair = $effects[ $i + 3 ]{args}[0]{name};
-                            my $dest2_alt     = $effects[ $i + 3 ]{args}[0]{alt};
-                            my $dest2_width   = $effects[ $i + 3 ]{args}[0]{width};
+                            my $dest2_regpair =
+                                $effects[ $i + 3 ]{args}[0]{name};
+                            my $dest2_alt = $effects[ $i + 3 ]{args}[0]{alt};
+                            my $dest2_width =
+                                $effects[ $i + 3 ]{args}[0]{width};
 
                             if (   $src1_regpair eq $dest1_regpair
-                                && ( $src1_alt   // "" ) eq ( $dest1_alt   // "" )
-                                && ( $src1_width // "" ) eq ( $dest1_width // "" )
+                                && ( $src1_alt // "" ) eq ( $dest1_alt // "" )
+                                && ( $src1_width // "" ) eq
+                                ( $dest1_width // "" )
                                 && $src2_regpair eq $dest2_regpair
-                                && ( $src2_alt   // "" ) eq ( $dest2_alt   // "" )
-                                && ( $src2_width // "" ) eq ( $dest2_width // "" ) )
+                                && ( $src2_alt // "" ) eq ( $dest2_alt // "" )
+                                && ( $src2_width // "" ) eq
+                                ( $dest2_width // "" ) )
                             {
                                 # combine into ex dest1_regpair, src1_regpair
                                 my @args = (
@@ -1047,14 +1140,16 @@ sub normalize_effects {
                             && $effects[ $i + 3 ]{opcode} eq "ld"
                             && @{ $effects[ $i + 3 ]{args} } == 2
                             && $effects[ $i + 3 ]{args}[0]{type} eq "regpair"
-                            && $effects[ $i + 3 ]{args}[0]{name} eq $dest_arg->{name}
+                            && $effects[ $i + 3 ]{args}[0]{name} eq
+                            $dest_arg->{name}
                             && $effects[ $i + 3 ]{args}[1]{type} eq "regpair"
                             && $effects[ $i + 3 ]{args}[1]{name} eq "hl" )
                         {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "pop"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[0]{name} eq "hl" )
                             {
                                 # combine into add dest_arg, imm_arg
@@ -1182,7 +1277,8 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "pop"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[0]{name} eq "hl" )
                             {
                                 # combine into ld de, hl+imm_arg
@@ -1535,29 +1631,42 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq $op_opcode
                                     && @{ $effects[ $i + 5 ]{args} } == 2
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "reg"
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "reg"
                                     && $effects[ $i + 5 ]{args}[0]{name} eq "a"
-                                    && $effects[ $i + 5 ]{args}[1]{type} eq "reg" )
+                                    && $effects[ $i + 5 ]{args}[1]{type} eq
+                                    "reg" )
                                 {
-                                    my $src_l = $effects[ $i + 5 ]{args}[1]{name};
+                                    my $src_l =
+                                        $effects[ $i + 5 ]{args}[1]{name};
 
                                     if (   $effects[ $i + 6 ]{type} eq "inst"
                                         && $effects[ $i + 6 ]{opcode} eq "ld"
                                         && @{ $effects[ $i + 6 ]{args} } == 2
-                                        && $effects[ $i + 6 ]{args}[0]{type} eq "reg"
-                                        && $effects[ $i + 6 ]{args}[0]{name} eq $dest_l
-                                        && $effects[ $i + 6 ]{args}[1]{type} eq "reg"
-                                        && $effects[ $i + 6 ]{args}[1]{name} eq "a" )
+                                        && $effects[ $i + 6 ]{args}[0]{type} eq
+                                        "reg"
+                                        && $effects[ $i + 6 ]{args}[0]{name} eq
+                                        $dest_l
+                                        && $effects[ $i + 6 ]{args}[1]{type} eq
+                                        "reg"
+                                        && $effects[ $i + 6 ]{args}[1]{name} eq
+                                        "a" )
                                     {
-                                        if (   $effects[ $i + 7 ]{type} eq "inst"
-                                            && $effects[ $i + 7 ]{opcode} eq "pop"
-                                            && @{ $effects[ $i + 7 ]{args} } == 1
-                                            && $effects[ $i + 7 ]{args}[0]{type} eq "regpair"
-                                            && $effects[ $i + 7 ]{args}[0]{name} eq "af" )
+                                        if ( $effects[ $i + 7 ]{type} eq "inst"
+                                            && $effects[ $i + 7 ]{opcode} eq
+                                            "pop"
+                                            && @{ $effects[ $i + 7 ]{args} } ==
+                                            1
+                                            && $effects[ $i + 7 ]{args}[0]{type}
+                                            eq "regpair"
+                                            && $effects[ $i + 7 ]{args}[0]{name}
+                                            eq "af" )
                                         {
                                             # combine into op dest, src
-                                            my $dest = reg_pair( $dest_h, $dest_l );
-                                            my $src  = reg_pair( $src_h,  $src_l );
+                                            my $dest =
+                                                reg_pair( $dest_h, $dest_l );
+                                            my $src =
+                                                reg_pair( $src_h, $src_l );
                                             splice @effects, $i, 8,
                                                 {
                                                 type   => 'inst',
@@ -1730,26 +1839,35 @@ sub normalize_effects {
                                 && $effects[ $i + 3 ]{opcode} eq "jp"
                                 && $effects[ $i + 3 ]{cond} eq "z"
                                 && @{ $effects[ $i + 3 ]{args} } == 1
-                                && $effects[ $i + 3 ]{args}[0]{type} eq "labelref" )
+                                && $effects[ $i + 3 ]{args}[0]{type} eq
+                                "labelref" )
                             {
                                 my $label = $effects[ $i + 3 ]{args}[0]{name};
 
                                 if (   $effects[ $i + 4 ]{type} eq "inst"
                                     && $effects[ $i + 4 ]{opcode} eq "ld"
                                     && @{ $effects[ $i + 4 ]{args} } == 2
-                                    && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 4 ]{args}[0]{name} eq $reg_pair
-                                    && $effects[ $i + 4 ]{args}[1]{type} eq "imm"
-                                    && $effects[ $i + 4 ]{args}[1]{value} eq "1" )
+                                    && $effects[ $i + 4 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 4 ]{args}[0]{name} eq
+                                    $reg_pair
+                                    && $effects[ $i + 4 ]{args}[1]{type} eq
+                                    "imm"
+                                    && $effects[ $i + 4 ]{args}[1]{value} eq
+                                    "1" )
                                 {
                                     if (   $effects[ $i + 5 ]{type} eq "label"
                                         && $effects[ $i + 5 ]{name} eq $label )
                                     {
-                                        if (   $effects[ $i + 6 ]{type} eq "inst"
-                                            && $effects[ $i + 6 ]{opcode} eq "pop"
-                                            && @{ $effects[ $i + 6 ]{args} } == 1
-                                            && $effects[ $i + 6 ]{args}[0]{type} eq "regpair"
-                                            && $effects[ $i + 6 ]{args}[0]{name} eq "af" )
+                                        if ( $effects[ $i + 6 ]{type} eq "inst"
+                                            && $effects[ $i + 6 ]{opcode} eq
+                                            "pop"
+                                            && @{ $effects[ $i + 6 ]{args} } ==
+                                            1
+                                            && $effects[ $i + 6 ]{args}[0]{type}
+                                            eq "regpair"
+                                            && $effects[ $i + 6 ]{args}[0]{name}
+                                            eq "af" )
                                         {
                                             # combine into bool reg_pair
                                             splice @effects, $i, 7,
@@ -1822,47 +1940,64 @@ sub normalize_effects {
                                     && $effects[ $i + 5 ]{opcode} eq "jp"
                                     && $effects[ $i + 5 ]{cond} eq "z"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "labelref" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "labelref" )
                                 {
-                                    my $label = $effects[ $i + 5 ]{args}[0]{name};
+                                    my $label =
+                                        $effects[ $i + 5 ]{args}[0]{name};
 
                                     if (   $effects[ $i + 6 ]{type} eq "inst"
                                         && $effects[ $i + 6 ]{opcode} eq "ld"
                                         && @{ $effects[ $i + 6 ]{args} } == 2
-                                        && $effects[ $i + 6 ]{args}[0]{type} eq "regpair"
-                                        && $effects[ $i + 6 ]{args}[0]{name} eq $reg_pair
-                                        && $effects[ $i + 6 ]{args}[1]{type} eq "imm"
-                                        && $effects[ $i + 6 ]{args}[1]{value} eq "1" )
+                                        && $effects[ $i + 6 ]{args}[0]{type} eq
+                                        "regpair"
+                                        && $effects[ $i + 6 ]{args}[0]{name} eq
+                                        $reg_pair
+                                        && $effects[ $i + 6 ]{args}[1]{type} eq
+                                        "imm"
+                                        && $effects[ $i + 6 ]{args}[1]{value}
+                                        eq "1" )
                                     {
-                                        if (   $effects[ $i + 7 ]{type} eq "label"
-                                            && $effects[ $i + 7 ]{name} eq $label )
+                                        if ( $effects[ $i + 7 ]{type} eq "label"
+                                            && $effects[ $i + 7 ]{name} eq
+                                            $label )
                                         {
-                                            if (   $effects[ $i + 8 ]{type} eq "inst"
-                                                && $effects[ $i + 8 ]{opcode} eq "pop"
-                                                && @{ $effects[ $i + 8 ]{args} } == 1
-                                                && $effects[ $i + 8 ]{args}[0]{type} eq "regpair"
-                                                && $effects[ $i + 8 ]{args}[0]{name} eq "hl" )
+                                            if ( $effects[ $i + 8 ]{type} eq
+                                                "inst"
+                                                && $effects[ $i + 8 ]{opcode}
+                                                eq "pop"
+                                                && @{ $effects[ $i + 8 ]{args} }
+                                                == 1
+                                                && $effects[ $i + 8 ]{args}[0]
+                                                {type} eq "regpair"
+                                                && $effects[ $i + 8 ]{args}[0]
+                                                {name} eq "hl" )
                                             {
-                                                if (   $effects[ $i + 9 ]{type} eq "inst"
-                                                    && $effects[ $i + 9 ]{opcode} eq "pop"
-                                                    && @{ $effects[ $i + 9 ]{args} } == 1
-                                                    && $effects[ $i + 9 ]{args}[0]{type} eq
-                                                    "regpair"
-                                                    && $effects[ $i + 9 ]{args}[0]{name} eq "af" )
+                                                if ( $effects[ $i + 9 ]{type} eq
+                                                    "inst"
+                                                    && $effects[ $i + 9 ]
+                                                    {opcode} eq "pop"
+                                                    && @{ $effects[ $i + 9 ]
+                                                            {args} } == 1
+                                                    && $effects[ $i + 9 ]{args}
+                                                    [0]{type} eq "regpair"
+                                                    && $effects[ $i + 9 ]{args}
+                                                    [0]{name} eq "af" )
                                                 {
                                                     # combine into bool reg_pair
                                                     splice @effects, $i, 10,
                                                         {
                                                         type   => 'inst',
                                                         opcode => "bool",
-                                                        args   => [
-                                                            {
-                                                                type  => 'regpair',
-                                                                name  => $reg_pair,
-                                                                alt   => $reg_pair_alt,
+                                                        args   => [ {
+                                                                type =>
+                                                                    'regpair',
+                                                                name =>
+                                                                    $reg_pair,
+                                                                alt =>
+                                                                    $reg_pair_alt,
                                                                 width => undef
-                                                            }
-                                                        ],
+                                                        } ],
                                                         };
                                                     $repeat = 1;
                                                 }
@@ -2079,15 +2214,18 @@ sub normalize_effects {
                                     && !defined $effects[ $i + 4 ]{cond}
                                     && @{ $effects[ $i + 4 ]{args} } == 1
                                     && $effects[ $i + 4 ]{opcode} eq "jp"
-                                    && $effects[ $i + 4 ]{args}[0]{type} eq "imm" )
+                                    && $effects[ $i + 4 ]{args}[0]{type} eq
+                                    "imm" )
                                 {
                                     my $imm_arg = $effects[ $i + 4 ]{args}[0];
 
                                     if (   $effects[ $i + 5 ]{type} eq "label"
-                                        && $effects[ $i + 5 ]{name} eq $false_label )
+                                        && $effects[ $i + 5 ]{name} eq
+                                        $false_label )
                                     {
                                         # combine into call leu, imm_arg
-                                        splice @effects, $i, 6 - 1,    # keep end label
+                                        splice @effects, $i,
+                                            6 - 1,    # keep end label
                                             {
                                             type   => 'inst',
                                             opcode => "jp",
@@ -2473,7 +2611,7 @@ sub normalize_effects {
             }
         }
 
-        # push af: ld a, REG_L: ld (%m), a: ld a, REG_H: ld (%m+1), a: pop af -> ld (%m), REG
+# push af: ld a, REG_L: ld (%m), a: ld a, REG_H: ld (%m+1), a: pop af -> ld (%m), REG
         for ( my $i = 0 ; $i <= $#effects - 5 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "push"
@@ -2495,7 +2633,8 @@ sub normalize_effects {
                         && @{ $effects[ $i + 2 ]{args} } == 2
                         && $effects[ $i + 2 ]{args}[0]{type} eq "mem"
                         && defined $effects[ $i + 2 ]{args}[0]{addr}
-                        && ( $effects[ $i + 2 ]{args}[0]{disp_offset} // 0 ) == 0
+                        && ( $effects[ $i + 2 ]{args}[0]{disp_offset} // 0 ) ==
+                        0
                         && $effects[ $i + 2 ]{args}[1]{type} eq "reg"
                         && $effects[ $i + 2 ]{args}[1]{name} eq "a" )
                     {
@@ -2512,24 +2651,34 @@ sub normalize_effects {
                             if ( $reg_h ne "a" && $reg_l ne "a" ) {
                                 my $reg_pair = reg_pair( $reg_h, $reg_l );
 
-                                if (   $effects[ $i + 4 ]{type} eq "inst"
+                                if (
+                                       $effects[ $i + 4 ]{type} eq "inst"
                                     && $effects[ $i + 4 ]{opcode} eq "ld"
                                     && @{ $effects[ $i + 4 ]{args} } == 2
-                                    && $effects[ $i + 4 ]{args}[0]{type} eq "mem"
+                                    && $effects[ $i + 4 ]{args}[0]{type} eq
+                                    "mem"
                                     && defined $effects[ $i + 4 ]{args}[0]{addr}
-                                    && ( $effects[ $i + 4 ]{args}[0]{disp_offset} // 0 ) == 1
-                                    && $effects[ $i + 4 ]{args}[1]{type} eq "reg"
-                                    && $effects[ $i + 4 ]{args}[1]{name} eq "a" )
+                                    && (
+                                        $effects[ $i + 4 ]{args}[0]{disp_offset}
+                                        // 0 ) == 1
+                                    && $effects[ $i + 4 ]{args}[1]{type} eq
+                                    "reg"
+                                    && $effects[ $i + 4 ]{args}[1]{name} eq "a"
+                                    )
                                 {
                                     my $addr_arg2 =
                                         $effects[ $i + 4 ]{args}[0]{addr};
 
                                     if ( $addr_arg eq $addr_arg2 ) {
-                                        if (   $effects[ $i + 5 ]{type} eq "inst"
-                                            && $effects[ $i + 5 ]{opcode} eq "pop"
-                                            && @{ $effects[ $i + 5 ]{args} } == 1
-                                            && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                            && $effects[ $i + 5 ]{args}[0]{name} eq "af" )
+                                        if ( $effects[ $i + 5 ]{type} eq "inst"
+                                            && $effects[ $i + 5 ]{opcode} eq
+                                            "pop"
+                                            && @{ $effects[ $i + 5 ]{args} } ==
+                                            1
+                                            && $effects[ $i + 5 ]{args}[0]{type}
+                                            eq "regpair"
+                                            && $effects[ $i + 5 ]{args}[0]{name}
+                                            eq "af" )
                                         {
                                             splice @effects, $i, 6,
                                                 {
@@ -2537,11 +2686,11 @@ sub normalize_effects {
                                                 opcode => "ld",
                                                 args   => [
                                                     {
-                                                        type        => 'mem',
-                                                        space       => 'mem',
-                                                        addr        => $addr_arg,
-                                                        base        => undef,
-                                                        disp        => undef,
+                                                        type  => 'mem',
+                                                        space => 'mem',
+                                                        addr  => $addr_arg,
+                                                        base  => undef,
+                                                        disp  => undef,
                                                         disp_offset => 0,
                                                         width       => undef
                                                     },
@@ -2717,7 +2866,8 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "pop"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[0]{name} eq "hl" )
                             {
                                 splice @effects, $i, 5,
@@ -2908,7 +3058,7 @@ sub normalize_effects {
             }
         }
 
-        # ex de, hl: ld (hl), e: inc hl: ld (hl), d: dec hl: ex de, hl -> ld (de), hl
+   # ex de, hl: ld (hl), e: inc hl: ld (hl), d: dec hl: ex de, hl -> ld (de), hl
         for ( my $i = 0 ; $i <= $#effects - 5 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "ex"
@@ -2945,16 +3095,20 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "dec"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[0]{name} eq "hl" )
                             {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "ex"
                                     && @{ $effects[ $i + 5 ]{args} } == 2
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
                                     && $effects[ $i + 5 ]{args}[0]{name} eq "de"
-                                    && $effects[ $i + 5 ]{args}[1]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[1]{name} eq "hl" )
+                                    && $effects[ $i + 5 ]{args}[1]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[1]{name} eq
+                                    "hl" )
                                 {
                                     splice @effects, $i, 6,
                                         {
@@ -2986,7 +3140,7 @@ sub normalize_effects {
             }
         }
 
-        # ex de, hl: ld e, (hl): inc hl: ld d, (hl): dec hl: ex de, hl -> ld hl, (de)
+   # ex de, hl: ld e, (hl): inc hl: ld d, (hl): dec hl: ex de, hl -> ld hl, (de)
         for ( my $i = 0 ; $i <= $#effects - 5 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "ex"
@@ -3023,16 +3177,20 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "dec"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[0]{name} eq "hl" )
                             {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "ex"
                                     && @{ $effects[ $i + 5 ]{args} } == 2
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
                                     && $effects[ $i + 5 ]{args}[0]{name} eq "de"
-                                    && $effects[ $i + 5 ]{args}[1]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[1]{name} eq "hl" )
+                                    && $effects[ $i + 5 ]{args}[1]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[1]{name} eq
+                                    "hl" )
                                 {
                                     splice @effects, $i, 6,
                                         {
@@ -3097,7 +3255,8 @@ sub normalize_effects {
                             if (   $effects[ $i + 3 ]{type} eq "inst"
                                 && $effects[ $i + 3 ]{opcode} eq "dec"
                                 && @{ $effects[ $i + 3 ]{args} } == 1
-                                && $effects[ $i + 3 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 3 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 3 ]{args}[0]{name} eq "hl" )
                             {
                                 splice @effects, $i, 4,
@@ -3162,7 +3321,8 @@ sub normalize_effects {
                             if (   $effects[ $i + 3 ]{type} eq "inst"
                                 && $effects[ $i + 3 ]{opcode} eq "inc"
                                 && @{ $effects[ $i + 3 ]{args} } == 1
-                                && $effects[ $i + 3 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 3 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 3 ]{args}[0]{name} eq "hl" )
                             {
                                 splice @effects, $i, 4,
@@ -3251,7 +3411,8 @@ sub normalize_effects {
                             if (   $effects[ $i + 3 ]{type} eq "inst"
                                 && $effects[ $i + 3 ]{opcode} eq "dec"
                                 && @{ $effects[ $i + 3 ]{args} } == 1
-                                && $effects[ $i + 3 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 3 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 3 ]{args}[0]{name} eq "hl" )
                             {
                                 splice @effects, $i, 4,
@@ -3316,7 +3477,8 @@ sub normalize_effects {
                             if (   $effects[ $i + 3 ]{type} eq "inst"
                                 && $effects[ $i + 3 ]{opcode} eq "inc"
                                 && @{ $effects[ $i + 3 ]{args} } == 1
-                                && $effects[ $i + 3 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 3 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 3 ]{args}[0]{name} eq "hl" )
                             {
                                 splice @effects, $i, 4,
@@ -3372,7 +3534,7 @@ sub normalize_effects {
             }
         }
 
-        # push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl -> ld (hl), hl
+     # push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;dec hl -> ld (hl), hl
         for ( my $i = 0 ; $i <= $#effects - 6 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "push"
@@ -3415,14 +3577,18 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[0]{name} eq "af" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{name} eq
+                                    "af" )
                                 {
                                     if (   $effects[ $i + 6 ]{type} eq "inst"
                                         && $effects[ $i + 6 ]{opcode} eq "dec"
                                         && @{ $effects[ $i + 6 ]{args} } == 1
-                                        && $effects[ $i + 6 ]{args}[0]{type} eq "regpair"
-                                        && $effects[ $i + 6 ]{args}[0]{name} eq "hl" )
+                                        && $effects[ $i + 6 ]{args}[0]{type} eq
+                                        "regpair"
+                                        && $effects[ $i + 6 ]{args}[0]{name} eq
+                                        "hl" )
                                     {
                                         splice @effects, $i, 7,
                                             {
@@ -3498,8 +3664,10 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[0]{name} eq "af" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{name} eq
+                                    "af" )
                                 {
                                     splice @effects, $i, 6,
                                         {
@@ -3531,7 +3699,7 @@ sub normalize_effects {
             }
         }
 
-        # push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl -> ld (hl+), hl
+    # push af;ld a, h;ld (hl), l;inc hl;ld (hl), a;pop af;inc hl -> ld (hl+), hl
         for ( my $i = 0 ; $i <= $#effects - 6 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "push"
@@ -3574,14 +3742,18 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[0]{name} eq "af" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{name} eq
+                                    "af" )
                                 {
                                     if (   $effects[ $i + 6 ]{type} eq "inst"
                                         && $effects[ $i + 6 ]{opcode} eq "inc"
                                         && @{ $effects[ $i + 6 ]{args} } == 1
-                                        && $effects[ $i + 6 ]{args}[0]{type} eq "regpair"
-                                        && $effects[ $i + 6 ]{args}[0]{name} eq "hl" )
+                                        && $effects[ $i + 6 ]{args}[0]{type} eq
+                                        "regpair"
+                                        && $effects[ $i + 6 ]{args}[0]{name} eq
+                                        "hl" )
                                     {
                                         splice @effects, $i, 7,
                                             {
@@ -3638,7 +3810,7 @@ sub normalize_effects {
             }
         }
 
-        # push de;push ix;pop de;ld (hl), e;inc hl;ld (hl), d;dec hl;pop de -> ld (hl), ix
+# push de;push ix;pop de;ld (hl), e;inc hl;ld (hl), d;dec hl;pop de -> ld (hl), ix
         for ( my $i = 0 ; $i <= $#effects - 3 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "push"
@@ -3698,7 +3870,7 @@ sub normalize_effects {
             }
         }
 
-        # push de;push ix;pop de;ld (hl), e;inc hl;ld (hl), d;inc hl;pop de -> ld (hl+), ix
+# push de;push ix;pop de;ld (hl), e;inc hl;ld (hl), d;inc hl;pop de -> ld (hl+), ix
         for ( my $i = 0 ; $i <= $#effects - 5 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "push"
@@ -3733,14 +3905,17 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "inc"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[0]{name} eq "hl" )
                             {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[0]{name} eq "de" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{name} eq
+                                    "de" )
                                 {
                                     splice @effects, $i, 6,
                                         {
@@ -3888,8 +4063,10 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "ld"
                                 && @{ $effects[ $i + 4 ]{args} } == 2
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
-                                && $effects[ $i + 4 ]{args}[1]{type} eq "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
+                                && $effects[ $i + 4 ]{args}[1]{type} eq
+                                "regpair"
                                 && $effects[ $i + 4 ]{args}[1]{name} eq "de" )
                             {
                                 my $x_reg = $effects[ $i + 4 ]{args}[0]{name};
@@ -3897,8 +4074,10 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[0]{name} eq "de" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{name} eq
+                                    "de" )
                                 {
                                     splice @effects, $i, 6,
                                         {
@@ -3993,7 +4172,11 @@ sub normalize_effects {
                                     space => 'mem',
                                     base  => $x_reg,
                                     disp  => $disp,
-                                    ( defined $disp_offset ? ( disp_offset => $disp_offset ) : () ),
+                                    (
+                                        defined $disp_offset
+                                        ? ( disp_offset => $disp_offset )
+                                        : ()
+                                    ),
                                     post  => 0,
                                     width => undef
                                 },
@@ -4072,7 +4255,7 @@ sub normalize_effects {
             }
         }
 
-        # push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+%d+1), h;ex (sp), hl;pop iy -> ld (ix), iy
+# push iy;ex (sp), hl;ld (ix+%d), l;ld (ix+%d+1), h;ex (sp), hl;pop iy -> ld (ix), iy
         for ( my $i = 0 ; $i <= $#effects - 4 ; $i++ ) {
             if (   $effects[$i]{type} eq "inst"
                 && $effects[$i]{opcode} eq "push"
@@ -4095,13 +4278,15 @@ sub normalize_effects {
                         && @{ $effects[ $i + 2 ]{args} } == 2
                         && $effects[ $i + 2 ]{args}[0]{type} eq "mem"
                         && defined $effects[ $i + 2 ]{args}[0]{base}
-                        && ( $effects[ $i + 2 ]{args}[0]{disp_offset} // 0 ) == 0
+                        && ( $effects[ $i + 2 ]{args}[0]{disp_offset} // 0 ) ==
+                        0
                         && $effects[ $i + 2 ]{args}[1]{type} eq "regpair"
                         && $effects[ $i + 2 ]{args}[1]{name} eq "hl" )
                     {
-                        my $x2_reg      = $effects[ $i + 2 ]{args}[0]{base};
-                        my $disp        = $effects[ $i + 2 ]{args}[0]{disp};
-                        my $disp_offset = $effects[ $i + 2 ]{args}[0]{disp_offset};
+                        my $x2_reg = $effects[ $i + 2 ]{args}[0]{base};
+                        my $disp   = $effects[ $i + 2 ]{args}[0]{disp};
+                        my $disp_offset =
+                            $effects[ $i + 2 ]{args}[0]{disp_offset};
 
                         if (   $effects[ $i + 3 ]{type} eq "inst"
                             && $effects[ $i + 3 ]{opcode} eq "ex"
@@ -4115,8 +4300,10 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "pop"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
-                                && $effects[ $i + 4 ]{args}[0]{name} eq $x1_reg )
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{name} eq
+                                $x1_reg )
                             {
                                 splice @effects, $i, 5,
                                     {
@@ -4130,7 +4317,8 @@ sub normalize_effects {
                                             disp  => $disp,
                                             (
                                                 defined $disp_offset
-                                                ? ( disp_offset => $disp_offset )
+                                                ? ( disp_offset =>
+                                                        $disp_offset )
                                                 : ()
                                             ),
                                             post  => 0,
@@ -4177,7 +4365,8 @@ sub normalize_effects {
                         && $effects[ $i + 2 ]{args}[0]{name} eq "hl"
                         && $effects[ $i + 2 ]{args}[1]{type} eq "mem"
                         && defined $effects[ $i + 2 ]{args}[1]{base}
-                        && ( $effects[ $i + 2 ]{args}[1]{disp_offset} // 0 ) == 0 )
+                        && ( $effects[ $i + 2 ]{args}[1]{disp_offset} // 0 ) ==
+                        0 )
                     {
                         my $x2_reg = $effects[ $i + 2 ]{args}[1]{base};
                         my $disp   = $effects[ $i + 2 ]{args}[1]{disp};
@@ -4196,8 +4385,10 @@ sub normalize_effects {
                             if (   $effects[ $i + 4 ]{type} eq "inst"
                                 && $effects[ $i + 4 ]{opcode} eq "pop"
                                 && @{ $effects[ $i + 4 ]{args} } == 1
-                                && $effects[ $i + 4 ]{args}[0]{type} eq "regpair"
-                                && $effects[ $i + 4 ]{args}[0]{name} eq $x1_reg )
+                                && $effects[ $i + 4 ]{args}[0]{type} eq
+                                "regpair"
+                                && $effects[ $i + 4 ]{args}[0]{name} eq
+                                $x1_reg )
                             {
                                 splice @effects, $i, 5,
                                     {
@@ -4217,7 +4408,8 @@ sub normalize_effects {
                                             disp  => $disp,
                                             (
                                                 defined $disp_offset
-                                                ? ( disp_offset => $disp_offset )
+                                                ? ( disp_offset =>
+                                                        $disp_offset )
                                                 : ()
                                             ),
                                             post  => 0,
@@ -4395,32 +4587,41 @@ sub normalize_effects {
                     {
                         my $reg_l = $effects[ $i + 2 ]{args}[0]{name};
 
-                        if (   $effects[ $i + 3 ]{type} eq "inst"
+                        if (
+                               $effects[ $i + 3 ]{type} eq "inst"
                             && $effects[ $i + 3 ]{opcode} eq "ld"
                             && @{ $effects[ $i + 3 ]{args} } == 2
                             && $effects[ $i + 3 ]{args}[0]{type} eq "reg"
                             && $effects[ $i + 3 ]{args}[0]{name} eq "a"
                             && $effects[ $i + 3 ]{args}[1]{type} eq "mem"
                             && defined $effects[ $i + 3 ]{args}[1]{addr}
-                            && ( $effects[ $i + 3 ]{args}[1]{disp_offset} // 0 ) == 1 )
+                            && ( $effects[ $i + 3 ]{args}[1]{disp_offset} // 0 )
+                            == 1
+                            )
                         {
                             my $mem_addr2 = $effects[ $i + 3 ]{args}[1]{addr};
                             if ( $mem_addr eq $mem_addr2 ) {
                                 if (   $effects[ $i + 4 ]{type} eq "inst"
                                     && $effects[ $i + 4 ]{opcode} eq "ld"
                                     && @{ $effects[ $i + 4 ]{args} } == 2
-                                    && $effects[ $i + 4 ]{args}[0]{type} eq "reg"
-                                    && $effects[ $i + 4 ]{args}[1]{type} eq "reg"
-                                    && $effects[ $i + 4 ]{args}[1]{name} eq "a" )
+                                    && $effects[ $i + 4 ]{args}[0]{type} eq
+                                    "reg"
+                                    && $effects[ $i + 4 ]{args}[1]{type} eq
+                                    "reg"
+                                    && $effects[ $i + 4 ]{args}[1]{name} eq
+                                    "a" )
                                 {
-                                    my $reg_h    = $effects[ $i + 4 ]{args}[0]{name};
+                                    my $reg_h =
+                                        $effects[ $i + 4 ]{args}[0]{name};
                                     my $reg_pair = reg_pair( $reg_h, $reg_l );
 
                                     if (   $effects[ $i + 5 ]{type} eq "inst"
                                         && $effects[ $i + 5 ]{opcode} eq "pop"
                                         && @{ $effects[ $i + 5 ]{args} } == 1
-                                        && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                        && $effects[ $i + 5 ]{args}[0]{name} eq "af" )
+                                        && $effects[ $i + 5 ]{args}[0]{type} eq
+                                        "regpair"
+                                        && $effects[ $i + 5 ]{args}[0]{name} eq
+                                        "af" )
                                     {
                                         splice @effects, $i, 6,
                                             {
@@ -4518,8 +4719,10 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "pop"
                                     && @{ $effects[ $i + 5 ]{args} } == 1
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "regpair"
-                                    && $effects[ $i + 5 ]{args}[0]{name} eq "af" )
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "regpair"
+                                    && $effects[ $i + 5 ]{args}[0]{name} eq
+                                    "af" )
                                 {
                                     splice @effects, $i, 6,
                                         {
@@ -4592,42 +4795,59 @@ sub normalize_effects {
                                     if (   $effects[ $i + 5 ]{type} eq "inst"
                                         && $effects[ $i + 5 ]{opcode} eq "cpl"
                                         && @{ $effects[ $i + 5 ]{args} } == 1
-                                        && $effects[ $i + 5 ]{args}[0]{type} eq "reg"
-                                        && $effects[ $i + 5 ]{args}[0]{name} eq "a" )
+                                        && $effects[ $i + 5 ]{args}[0]{type} eq
+                                        "reg"
+                                        && $effects[ $i + 5 ]{args}[0]{name} eq
+                                        "a" )
                                     {
-                                        if (   $effects[ $i + 6 ]{type} eq "inst"
-                                            && $effects[ $i + 6 ]{opcode} eq "ld"
-                                            && @{ $effects[ $i + 6 ]{args} } == 2
-                                            && $effects[ $i + 6 ]{args}[0]{type} eq "reg"
-                                            && $effects[ $i + 6 ]{args}[0]{name} eq $reg_l
-                                            && $effects[ $i + 6 ]{args}[1]{type} eq "reg"
-                                            && $effects[ $i + 6 ]{args}[1]{name} eq "a" )
+                                        if ( $effects[ $i + 6 ]{type} eq "inst"
+                                            && $effects[ $i + 6 ]{opcode} eq
+                                            "ld"
+                                            && @{ $effects[ $i + 6 ]{args} } ==
+                                            2
+                                            && $effects[ $i + 6 ]{args}[0]{type}
+                                            eq "reg"
+                                            && $effects[ $i + 6 ]{args}[0]{name}
+                                            eq $reg_l
+                                            && $effects[ $i + 6 ]{args}[1]{type}
+                                            eq "reg"
+                                            && $effects[ $i + 6 ]{args}[1]{name}
+                                            eq "a" )
                                         {
-                                            if (   $effects[ $i + 7 ]{type} eq "inst"
-                                                && $effects[ $i + 7 ]{opcode} eq "inc"
-                                                && @{ $effects[ $i + 7 ]{args} } == 1
-                                                && $effects[ $i + 7 ]{args}[0]{type} eq "regpair"
-                                                && $effects[ $i + 7 ]{args}[0]{name} eq $reg_pair )
+                                            if ( $effects[ $i + 7 ]{type} eq
+                                                "inst"
+                                                && $effects[ $i + 7 ]{opcode}
+                                                eq "inc"
+                                                && @{ $effects[ $i + 7 ]{args} }
+                                                == 1
+                                                && $effects[ $i + 7 ]{args}[0]
+                                                {type} eq "regpair"
+                                                && $effects[ $i + 7 ]{args}[0]
+                                                {name} eq $reg_pair )
                                             {
-                                                if (   $effects[ $i + 8 ]{type} eq "inst"
-                                                    && $effects[ $i + 8 ]{opcode} eq "pop"
-                                                    && @{ $effects[ $i + 8 ]{args} } == 1
-                                                    && $effects[ $i + 8 ]{args}[0]{type} eq
-                                                    "regpair"
-                                                    && $effects[ $i + 8 ]{args}[0]{name} eq "af" )
+                                                if ( $effects[ $i + 8 ]{type} eq
+                                                    "inst"
+                                                    && $effects[ $i + 8 ]
+                                                    {opcode} eq "pop"
+                                                    && @{ $effects[ $i + 8 ]
+                                                            {args} } == 1
+                                                    && $effects[ $i + 8 ]{args}
+                                                    [0]{type} eq "regpair"
+                                                    && $effects[ $i + 8 ]{args}
+                                                    [0]{name} eq "af" )
                                                 {
                                                     splice @effects, $i, 9,
                                                         {
                                                         type   => 'inst',
                                                         opcode => "neg",
-                                                        args   => [
-                                                            {
-                                                                type  => 'regpair',
-                                                                name  => $reg_pair,
+                                                        args   => [ {
+                                                                type =>
+                                                                    'regpair',
+                                                                name =>
+                                                                    $reg_pair,
                                                                 alt   => 0,
                                                                 width => undef
-                                                            }
-                                                        ],
+                                                        } ],
                                                         };
                                                     $repeat = 1;
                                                 }
@@ -4686,82 +4906,134 @@ sub normalize_effects {
                                 if (   $effects[ $i + 5 ]{type} eq "inst"
                                     && $effects[ $i + 5 ]{opcode} eq "ld"
                                     && @{ $effects[ $i + 5 ]{args} } == 2
-                                    && $effects[ $i + 5 ]{args}[0]{type} eq "reg"
+                                    && $effects[ $i + 5 ]{args}[0]{type} eq
+                                    "reg"
                                     && $effects[ $i + 5 ]{args}[0]{name} eq "h"
-                                    && $effects[ $i + 5 ]{args}[1]{type} eq "reg"
-                                    && $effects[ $i + 5 ]{args}[1]{name} eq "a" )
+                                    && $effects[ $i + 5 ]{args}[1]{type} eq
+                                    "reg"
+                                    && $effects[ $i + 5 ]{args}[1]{name} eq
+                                    "a" )
                                 {
                                     if (   $effects[ $i + 6 ]{type} eq "inst"
                                         && $effects[ $i + 6 ]{opcode} eq "ld"
                                         && @{ $effects[ $i + 6 ]{args} } == 2
-                                        && $effects[ $i + 6 ]{args}[0]{type} eq "reg"
-                                        && $effects[ $i + 6 ]{args}[0]{name} eq "a"
-                                        && $effects[ $i + 6 ]{args}[1]{type} eq "reg"
-                                        && $effects[ $i + 6 ]{args}[1]{name} eq "l" )
+                                        && $effects[ $i + 6 ]{args}[0]{type} eq
+                                        "reg"
+                                        && $effects[ $i + 6 ]{args}[0]{name} eq
+                                        "a"
+                                        && $effects[ $i + 6 ]{args}[1]{type} eq
+                                        "reg"
+                                        && $effects[ $i + 6 ]{args}[1]{name} eq
+                                        "l" )
                                     {
-                                        if (   $effects[ $i + 7 ]{type} eq "inst"
-                                            && $effects[ $i + 7 ]{opcode} eq "cpl"
-                                            && @{ $effects[ $i + 7 ]{args} } == 1
-                                            && $effects[ $i + 7 ]{args}[0]{type} eq "reg"
-                                            && $effects[ $i + 7 ]{args}[0]{name} eq "a" )
+                                        if ( $effects[ $i + 7 ]{type} eq "inst"
+                                            && $effects[ $i + 7 ]{opcode} eq
+                                            "cpl"
+                                            && @{ $effects[ $i + 7 ]{args} } ==
+                                            1
+                                            && $effects[ $i + 7 ]{args}[0]{type}
+                                            eq "reg"
+                                            && $effects[ $i + 7 ]{args}[0]{name}
+                                            eq "a" )
                                         {
-                                            if (   $effects[ $i + 8 ]{type} eq "inst"
-                                                && $effects[ $i + 8 ]{opcode} eq "ld"
-                                                && @{ $effects[ $i + 8 ]{args} } == 2
-                                                && $effects[ $i + 8 ]{args}[0]{type} eq "reg"
-                                                && $effects[ $i + 8 ]{args}[0]{name} eq "l"
-                                                && $effects[ $i + 8 ]{args}[1]{type} eq "reg"
-                                                && $effects[ $i + 8 ]{args}[1]{name} eq "a" )
+                                            if ( $effects[ $i + 8 ]{type} eq
+                                                "inst"
+                                                && $effects[ $i + 8 ]{opcode}
+                                                eq "ld"
+                                                && @{ $effects[ $i + 8 ]{args} }
+                                                == 2
+                                                && $effects[ $i + 8 ]{args}[0]
+                                                {type} eq "reg"
+                                                && $effects[ $i + 8 ]{args}[0]
+                                                {name} eq "l"
+                                                && $effects[ $i + 8 ]{args}[1]
+                                                {type} eq "reg"
+                                                && $effects[ $i + 8 ]{args}[1]
+                                                {name} eq "a" )
                                             {
-                                                if (   $effects[ $i + 9 ]{type} eq "inst"
-                                                    && $effects[ $i + 9 ]{opcode} eq "inc"
-                                                    && @{ $effects[ $i + 9 ]{args} } == 1
-                                                    && $effects[ $i + 9 ]{args}[0]{type} eq
-                                                    "regpair"
-                                                    && $effects[ $i + 9 ]{args}[0]{name} eq "hl" )
+                                                if ( $effects[ $i + 9 ]{type} eq
+                                                    "inst"
+                                                    && $effects[ $i + 9 ]
+                                                    {opcode} eq "inc"
+                                                    && @{ $effects[ $i + 9 ]
+                                                            {args} } == 1
+                                                    && $effects[ $i + 9 ]{args}
+                                                    [0]{type} eq "regpair"
+                                                    && $effects[ $i + 9 ]{args}
+                                                    [0]{name} eq "hl" )
                                                 {
-                                                    if (   $effects[ $i + 10 ]{type} eq "inst"
-                                                        && $effects[ $i + 10 ]{opcode} eq "ld"
-                                                        && @{ $effects[ $i + 10 ]{args} } == 2
-                                                        && $effects[ $i + 10 ]{args}[0]{type} eq
+                                                    if ( $effects[ $i + 10 ]
+                                                        {type} eq "inst"
+                                                        && $effects[ $i + 10 ]
+                                                        {opcode} eq "ld"
+                                                        && @{ $effects[ $i +
+                                                                10 ]{args} } ==
+                                                        2
+                                                        && $effects[ $i + 10 ]
+                                                        {args}[0]{type} eq
                                                         "regpair"
-                                                        && $effects[ $i + 10 ]{args}[0]{name} eq
+                                                        && $effects[ $i + 10 ]
+                                                        {args}[0]{name} eq
                                                         $x_reg
-                                                        && $effects[ $i + 10 ]{args}[1]{type} eq
+                                                        && $effects[ $i + 10 ]
+                                                        {args}[1]{type} eq
                                                         "regpair"
-                                                        && $effects[ $i + 10 ]{args}[1]{name} eq
+                                                        && $effects[ $i + 10 ]
+                                                        {args}[1]{name} eq
                                                         "hl" )
                                                     {
-                                                        if (   $effects[ $i + 11 ]{type} eq "inst"
-                                                            && $effects[ $i + 11 ]{opcode} eq "pop"
-                                                            && @{ $effects[ $i + 11 ]{args} } == 1
-                                                            && $effects[ $i + 11 ]{args}[0]{type}
+                                                        if ( $effects[ $i + 11 ]
+                                                            {type} eq "inst"
+                                                            && $effects[ $i +
+                                                            11 ]{opcode} eq
+                                                            "pop"
+                                                            && @{ $effects[ $i
+                                                                    + 11 ]{args}
+                                                            } == 1
+                                                            && $effects[ $i +
+                                                            11 ]{args}[0]{type}
                                                             eq "regpair"
-                                                            && $effects[ $i + 11 ]{args}[0]{name}
+                                                            && $effects[ $i +
+                                                            11 ]{args}[0]{name}
                                                             eq "hl" )
                                                         {
-                                                            if ( $effects[ $i + 12 ]{type} eq "inst"
-                                                                && $effects[ $i + 12 ]{opcode} eq
-                                                                "pop"
-                                                                && @{ $effects[ $i + 12 ]{args} }
+                                                            if ( $effects[ $i +
+                                                                12 ]{type} eq
+                                                                "inst"
+                                                                && $effects[ $i
+                                                                + 12 ]{opcode}
+                                                                eq "pop"
+                                                                && @{ $effects
+                                                                        [ $i +
+                                                                        12 ]
+                                                                        {args} }
                                                                 == 1
-                                                                && $effects[ $i + 12 ]{args}[0]
-                                                                {type} eq "regpair"
-                                                                && $effects[ $i + 12 ]{args}[0]
+                                                                && $effects[ $i
+                                                                + 12 ]{args}[0]
+                                                                {type} eq
+                                                                "regpair"
+                                                                && $effects[ $i
+                                                                + 12 ]{args}[0]
                                                                 {name} eq "af" )
                                                             {
-                                                                splice @effects, $i, 13,
+                                                                splice @effects,
+                                                                    $i, 13,
                                                                     {
-                                                                    type   => 'inst',
-                                                                    opcode => "neg",
-                                                                    args   => [
-                                                                        {
-                                                                            type  => 'regpair',
-                                                                            name  => $x_reg,
-                                                                            alt   => 0,
-                                                                            width => undef
-                                                                        }
-                                                                    ],
+                                                                    type =>
+                                                                        'inst',
+                                                                    opcode =>
+                                                                        "neg",
+                                                                    args => [ {
+                                                                            type =>
+'regpair',
+                                                                            name =>
+                                                                                $x_reg,
+                                                                            alt =>
+                                                                                0
+                                                                            ,
+                                                                            width =>
+                                                                                undef
+                                                                    } ],
                                                                     };
                                                                 $repeat = 1;
                                                             }
@@ -4844,7 +5116,7 @@ sub intel_to_zilog {
         s/\b xthl                \b/ex (sp), hl/x;
 
         # --- memory operand rewrites ---
-        s/\b ( (ld|add|adc|sub|sbc|and|xor|or|cp|cmp|inc|dec) .*? [^%] ) m \b/$1(hl)/x;
+s/\b ( (ld|add|adc|sub|sbc|and|xor|or|cp|cmp|inc|dec) .*? [^%] ) m \b/$1(hl)/x;
 
         # --- shifts and rotates ---
         s/\b arhl \b/sra hl/x;
@@ -4853,13 +5125,13 @@ sub intel_to_zilog {
         s/\b rrhl \b/sra hl/x;
 
         # --- flag condition rewrites ---
-        s/\b j _? (nz|z|nc|c|po|pe|lz|lo|nv|v|  m|ne|eq|ltu|gtu|leu|geu|lt|gt|le|ge) \b/jp $1,/x;
-        s/\b j _  (                           p                                    ) \b/jp p,/x;
+s/\b j _? (nz|z|nc|c|po|pe|lz|lo|nv|v|  m|ne|eq|ltu|gtu|leu|geu|lt|gt|le|ge) \b/jp $1,/x;
+s/\b j _  (                           p                                    ) \b/jp p,/x;
 
-        s/\b c _? (nz|z|nc|c|po|pe|lz|lo|nv|v|  m|ne|eq|ltu|gtu|leu|geu|lt|gt|le|ge) \b/call $1,/x;
-        s/\b c _  (                           p                                    ) \b/call p,/x;
+s/\b c _? (nz|z|nc|c|po|pe|lz|lo|nv|v|  m|ne|eq|ltu|gtu|leu|geu|lt|gt|le|ge) \b/call $1,/x;
+s/\b c _  (                           p                                    ) \b/call p,/x;
 
-        s/\b r _? (nz|z|nc|c|po|pe|lz|lo|nv|v|p|m|ne|eq|ltu|gtu|leu|geu|lt|gt|le|ge) \b/ret $1/x;
+s/\b r _? (nz|z|nc|c|po|pe|lz|lo|nv|v|p|m|ne|eq|ltu|gtu|leu|geu|lt|gt|le|ge) \b/ret $1/x;
     }
     return $asm;
 }

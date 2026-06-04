@@ -27,11 +27,13 @@ static void collect_label_tokens(ParseLine& pline, std::vector<Token>& out) {
     size_t pos0 = pline.pos;
     auto label = parse_label(pline);
     if (label) {
-        out.insert(out.end(), pline.tokens.begin() + pos0, pline.tokens.begin() + pline.pos);
+        out.insert(out.end(), pline.tokens.begin() + pos0,
+                   pline.tokens.begin() + pline.pos);
     }
 }
 
-static const TrieTransition* binary_search_transition(size_t node, TrieToken key) {
+static const TrieTransition* binary_search_transition(size_t node,
+        TrieToken key) {
     const TrieNode& nd = opcodes_synth_trie_nodes[node];
 
     size_t base = nd.first_transition;
@@ -163,7 +165,8 @@ static void interpret_synth_bytecode(const SynthMatch& match,
     LogicalLine cur(line.loc);
 
     // copy label tokens
-    cur.tokens.insert(cur.tokens.end(), match.label_tokens.begin(), match.label_tokens.end());
+    cur.tokens.insert(cur.tokens.end(), match.label_tokens.begin(),
+                      match.label_tokens.end());
 
     // create temporary labels as needed
     std::vector<HLA_Label> labels;
@@ -176,7 +179,8 @@ static void interpret_synth_bytecode(const SynthMatch& match,
         }
         else {
             loc = cur.tokens.back().loc;
-            loc.column += static_cast<uint16_t>(g_strings.view(cur.tokens.back().text_id).size());
+            loc.column += static_cast<uint16_t>(g_strings.view(
+                                                    cur.tokens.back().text_id).size());
         }
         return loc;
     };
@@ -269,7 +273,8 @@ static void interpret_synth_bytecode(const SynthMatch& match,
     }
 }
 
-std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>& lines) {
+std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>&
+        lines) {
     std::vector<LogicalLine> out;
 
     for (auto const& line : lines) {
