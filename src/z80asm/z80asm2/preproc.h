@@ -165,7 +165,8 @@ private:
         void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
                           StringInterner::Id name_id, const SourceLoc& name_loc,
                           ParseLine& input_line);
-    static std::unordered_map<Keyword, NameDirectiveHandler> name_directive_handlers;
+    static std::unordered_map<Keyword, NameDirectiveHandler>
+    name_directive_handlers;
 
     static bool is_directive_keyword(Keyword kw);
     static bool is_conditional_directive_keyword(Keyword kw);
@@ -355,4 +356,5 @@ private:
     void dump_symbols();
 };
 
-void output_preproc_output(std::string_view filename, const std::vector<LogicalLine>& lines);
+void output_preproc_output(std::string_view filename,
+                           const std::vector<LogicalLine>& lines);

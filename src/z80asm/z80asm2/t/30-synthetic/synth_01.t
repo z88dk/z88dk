@@ -10,8 +10,10 @@ for my $cpu (
 {
     my $dir  = path($0)->dirname;
     my $self = path($0)->basename(".t");
-    capture_ok( "z88dk-z80asm -v -m$cpu -dump-after-synth-expansion $dir/input/$self.asm",
-        "$dir/expected/${self}_${cpu}.txt" );
+    capture_ok(
+"z88dk-z80asm -v -m$cpu -dump-after-synth-expansion $dir/input/$self.asm",
+        "$dir/expected/${self}_${cpu}.txt"
+    );
 }
 
 unlink_testfiles;

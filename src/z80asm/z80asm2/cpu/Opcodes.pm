@@ -127,8 +127,11 @@ sub titles {
 
 sub to_string {
     my ($self) = @_;
-    my @output =
-        ( $self->asm, $self->cpu, $self->synth ? "X" : "_", join( ",", @{ $self->const } ) );
+    my @output = (
+        $self->asm, $self->cpu,
+        $self->synth ? "X" : "_",
+        join( ",", @{ $self->const } )
+    );
     my @ops;
     for my $op ( @{ $self->ops } ) {
         my @bytes;
@@ -253,7 +256,8 @@ sub add_synth {
         }
     }
 
-    my $opcode = Opcode->new( asm => $asm, cpu => $cpu, synth => 1, ops => \@subops );
+    my $opcode =
+        Opcode->new( asm => $asm, cpu => $cpu, synth => 1, ops => \@subops );
     $self->add($opcode);
 }
 
@@ -266,10 +270,10 @@ sub add_emul {
 
     if ( !$self->exists( $cpu, $asm ) ) {
         my @call_ops = @{ $self->opcodes->{"call %m"}{$cpu}{ops} };
-        my @call_op  = @{ shift @call_ops };                          # CD %m %m  or  CD %m %m %m
+        my @call_op  = @{ shift @call_ops };    # CD %m %m  or  CD %m %m %m
         $call_op[0] == 0xCD             or die;
         $call_op[1] =~ s/%m/'@'.$func/e or die;
-        for (@call_op) { s/%m/x/; }                                   # CD @func x  or  CD @func x x
+        for (@call_op) { s/%m/x/; }             # CD @func x  or  CD @func x x
 
         if (@args) {
             $self->add(

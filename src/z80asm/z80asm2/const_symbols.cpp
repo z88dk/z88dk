@@ -13,11 +13,13 @@
 #include <algorithm>
 #include <iostream>
 
-void ConstSymbols::set(StringInterner::Id name_id, int value, const SourceLoc& loc) {
+void ConstSymbols::set(StringInterner::Id name_id, int value,
+                       const SourceLoc& loc) {
     const ConstSymbol* existing = get(name_id);
     if (existing != nullptr && existing->value != value) {
         g_diag.error(loc, "Constant already defined: " + g_strings.to_string(name_id));
-        g_diag.note(existing->loc, "Previous definition of constant: " + g_strings.to_string(name_id));
+        g_diag.note(existing->loc,
+                    "Previous definition of constant: " + g_strings.to_string(name_id));
         return;
     }
 

@@ -98,7 +98,8 @@ void ExprSymbol::dump(DumpContext ctx) const {
 }
 
 void ExprLocalLabel::dump(DumpContext ctx) const {
-    ctx.line("ExprLocalLabel: " + g_strings.to_string(name_id) + " @ " + std::to_string(at_pos));
+    ctx.line("ExprLocalLabel: " + g_strings.to_string(name_id) + " @ " +
+             std::to_string(at_pos));
 }
 
 void ExprUnary::dump(DumpContext ctx) const {
@@ -322,7 +323,8 @@ void GlobalStmt::dump(DumpContext ctx) const {
 }
 
 // Helper for dumping statements with a single name_id
-static void dump_named_stmt(const std::string& stmt_type, StringInterner::Id name_id,
+static void dump_named_stmt(const std::string& stmt_type,
+                            StringInterner::Id name_id,
                             const SourceLoc& loc, DumpContext ctx) {
     ctx.line(stmt_type);
     auto c = ctx.child();
