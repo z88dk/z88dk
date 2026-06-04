@@ -106,7 +106,8 @@ void HLA_ProgramBuilder::handle_if(Keyword kw, const SourceLoc& kw_loc,
     branch.condition = std::move(condition);
     node->branches.push_back(std::move(branch));
 
-    auto* body = &node->branches.back().body; // pointer to the body of the first branch
+    auto* body =
+        &node->branches.back().body; // pointer to the body of the first branch
 
     auto* node_ptr = node.get();                            // save before move
     current_body()->push_back(std::move(node));             // transfer ownership
@@ -143,7 +144,8 @@ void HLA_ProgramBuilder::handle_elseif(Keyword kw, const SourceLoc& kw_loc,
     branch.condition = std::move(condition);
     node->branches.push_back(std::move(branch));
 
-    auto* body = &node->branches.back().body; // pointer to the body of the first branch
+    auto* body =
+        &node->branches.back().body; // pointer to the body of the first branch
     stack.back().body = body;
 }
 
@@ -460,7 +462,8 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
     return nullptr;
 }
 
-std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) {
+std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(
+    ParseLine& line) {
     auto node = std::make_unique<HLA_CompareExpr>();
 
     // get left hand side
@@ -554,7 +557,8 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) 
     return node;
 }
 
-std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(ParseLine& line) const {
+std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(
+    ParseLine& line) const {
     // get the expression span
     SpanSem sem;
     size_t pos0 = line.pos;

@@ -480,7 +480,8 @@ void ExprSem::literal_integer(const Token& tok) {
 }
 
 void ExprSem::literal_float(const Token& tok) {
-    stack.push_back(std::make_unique<ExprLiteralFloat>(tok.value.float_value, tok.loc));
+    stack.push_back(std::make_unique<ExprLiteralFloat>(tok.value.float_value,
+                    tok.loc));
 }
 
 bool ExprSem::literal_asmpc(const Token& tok) {
@@ -494,7 +495,8 @@ bool ExprSem::symbol(const Token& tok) {
 }
 
 bool ExprSem::local_label(const Token& tok) {
-    stack.push_back(std::make_unique<ExprLocalLabel>(tok.text_id, tok.value.label_at_pos, tok.loc));
+    stack.push_back(std::make_unique<ExprLocalLabel>(tok.text_id,
+                    tok.value.label_at_pos, tok.loc));
     return true;
 }
 
@@ -506,14 +508,16 @@ void ExprSem::unary(TokenType op, const SourceLoc& loc) {
 void ExprSem::binary(TokenType op, const SourceLoc& loc) {
     auto rhs = pop();
     auto lhs = pop();
-    stack.push_back(std::make_unique<ExprBinary>(op, std::move(lhs), std::move(rhs), loc));
+    stack.push_back(std::make_unique<ExprBinary>(op, std::move(lhs), std::move(rhs),
+                    loc));
 }
 
 void ExprSem::ternary(const SourceLoc& loc) {
     auto e = pop();
     auto t = pop();
     auto c = pop();
-    stack.push_back(std::make_unique<ExprTernary>(std::move(c), std::move(t), std::move(e), loc));
+    stack.push_back(std::make_unique<ExprTernary>(std::move(c), std::move(t),
+                    std::move(e), loc));
 }
 
 void ExprSem::call_unary(Keyword keyword, const SourceLoc& loc) {
@@ -541,7 +545,8 @@ void ExprSem::error_missing_colon(const ParseLine& pline) const {
     ::error_missing_colon(pline);
 }
 
-std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline, ParseStatus& status) {
+std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline,
+        ParseStatus& status) {
     ExprSem sem;
     if (!parse_full_expr(pline, sem, status)) {
         return nullptr; // error already reported

@@ -40,7 +40,8 @@ sub add {
     if ( !exists $self->value_id->{$value} ) {
         my $id = @{ $self->values };
         $self->value_id->{$value} = $id;
-        push @{ $self->values }, { id => $id, value => $value, _asm => $asm, _cpu => $cpu };
+        push @{ $self->values },
+            { id => $id, value => $value, _asm => $asm, _cpu => $cpu };
     }
     my $id = $self->value_id->{$value};
     $node->{_value} = $id;
@@ -121,7 +122,8 @@ sub lex {
 
 sub read_token_id {
     my ( $self, $opcodes_trie_token_h ) = @_;
-    open( my $fh, "<", $opcodes_trie_token_h ) or die "open $opcodes_trie_token_h: $!";
+    open( my $fh, "<", $opcodes_trie_token_h )
+        or die "open $opcodes_trie_token_h: $!";
     my $in = 0;
     while (<$fh>) {
         if (/enum class TrieToken/) {
@@ -162,8 +164,12 @@ sub make_table {
             my $child      = $node->{$key};
             my $child_path = "$path $key" =~ s/TrieToken:://r =~ s/^\s+//r;
             my $child_id   = ++$node_id;
-            $self->transitions->[$transition_id] =
-                { id => $transition_id, from => $id, to => $child_id, token => $key };
+            $self->transitions->[$transition_id] = {
+                id    => $transition_id,
+                from  => $id,
+                to    => $child_id,
+                token => $key
+            };
             if ( $transition_id == $first_transition_id ) {
                 $self->transitions->[$transition_id]{first} =
                     1;    # mark first transition for this node
@@ -173,7 +179,8 @@ sub make_table {
             push @stack, [ $child, $child_id, $child_path ];
         }
 
-        $node->{_num_transitions} = $transition_id - $node->{_first_transition_id};
+        $node->{_num_transitions} =
+            $transition_id - $node->{_first_transition_id};
     }
 }
 
@@ -193,16 +200,18 @@ sub output_cpp {
     for my $node ( @{ $self->nodes } ) {
         my $first_transition_id = $node->{_first_transition_id};
         my $num_transitions     = $node->{_num_transitions};
-        my $value_id            = exists $node->{_value} ? $node->{_value}     : -1;
-        my $value_id_str        = $value_id >= 0         ? " action $value_id" : "";
+        my $value_id     = exists $node->{_value} ? $node->{_value}     : -1;
+        my $value_id_str = $value_id >= 0         ? " action $value_id" : "";
 
         if ( $num_transitions == 0 ) {    # accepting node, no transitions
             defined $node->{_value}
-                or die "accepting node $node->{_id} has no value\n" . dump($node);
-            $first_transition_id = 0;     # not used, but set to a valid value for consistency
+                or die "accepting node $node->{_id} has no value\n"
+                . dump($node);
+            $first_transition_id =
+                0;    # not used, but set to a valid value for consistency
         }
         $cpp .=
-              "    /* node $node->{_id} */ { $first_transition_id, $num_transitions, $value_id }, "
+"    /* node $node->{_id} */ { $first_transition_id, $num_transitions, $value_id }, "
             . "// $node->{_path},$value_id_str\n";
     }
     $cpp .= "};\n\n";
@@ -217,7 +226,8 @@ sub output_cpp {
         if ( $trans->{first} ) {
             $cpp .= "\n    // from node $trans->{from} ($node_from->{_path})\n";
         }
-        $cpp .= "    /* trans $trans->{id} */ { $trans->{token}, $trans->{to} },\n";
+        $cpp .=
+            "    /* trans $trans->{id} */ { $trans->{token}, $trans->{to} },\n";
     }
     $cpp .= "};\n\n";
 

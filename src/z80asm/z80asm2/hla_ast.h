@@ -105,8 +105,10 @@ struct HLA_If : HLA_Node {
     struct Branch {
         SourceLoc loc;
         std::unique_ptr<HLA_Expr> condition;   // null for ELSE
-        bool is_always_true = false;  // true if condition is always true (after folding)
-        bool is_always_false = false; // true if condition is always false (after folding)
+        bool is_always_true =
+            false;  // true if condition is always true (after folding)
+        bool is_always_false =
+            false; // true if condition is always false (after folding)
         std::vector<std::unique_ptr<HLA_Node>> body;
         HLA_Label next_label;
     };
