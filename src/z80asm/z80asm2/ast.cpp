@@ -81,20 +81,6 @@ void LabelStmt::dump(DumpContext ctx) const {
     }
 }
 
-void Program::dump(DumpContext ctx) const {
-    ctx.line("Program");
-    auto c = ctx.child();
-    for (const auto& stmt : stmts) {
-        stmt->dump(c);
-    }
-}
-
-void dump_ast_and_exit(const std::unique_ptr<Program>& prog) {
-    DumpContext ctx(std::cout);
-    prog->dump(ctx);
-    exit(EXIT_SUCCESS);
-}
-
 void ExprLiteralInt::dump(DumpContext ctx) const {
     ctx.line("ExprLiteralInt: " + int_to_hex(value));
 }
@@ -282,3 +268,87 @@ void Patch::dump(DumpContext ctx) const {
         inner->dump(c.child());
     }
 }
+
+void OrgStmt::dump(DumpContext ctx) const {
+    ctx.line("OrgStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (expr) {
+        c.line("Expression:");
+        expr->dump(c.child());
+    }
+}
+
+void DefcStmt::dump(DumpContext ctx) const {
+    ctx.line("DefcStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    c.line("Name: " + g_strings.to_string(name_id));
+    if (expr) {
+        c.line("Expression:");
+        expr->dump(c.child());
+    }
+}
+
+// Helper for dumping statements with multiple name_ids
+static void dump_names_stmt(const std::string& stmt_type,
+                            const std::vector<StringInterner::Id>& name_ids,
+                            const SourceLoc& loc, DumpContext ctx) {
+    ctx.line(stmt_type);
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (!name_ids.empty()) {
+        std::string names_str = "Names: ";
+        for (size_t i = 0; i < name_ids.size(); ++i) {
+            if (i > 0) {
+                names_str += ", ";
+            }
+            names_str += g_strings.to_string(name_ids[i]);
+        }
+        c.line(names_str);
+    }
+}
+
+void ExternStmt::dump(DumpContext ctx) const {
+    dump_names_stmt("ExternStmt", name_ids, loc, ctx);
+}
+
+void PublicStmt::dump(DumpContext ctx) const {
+    dump_names_stmt("PublicStmt", name_ids, loc, ctx);
+}
+
+void GlobalStmt::dump(DumpContext ctx) const {
+    dump_names_stmt("GlobalStmt", name_ids, loc, ctx);
+}
+
+// Helper for dumping statements with a single name_id
+static void dump_named_stmt(const std::string& stmt_type, StringInterner::Id name_id,
+                            const SourceLoc& loc, DumpContext ctx) {
+    ctx.line(stmt_type);
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    c.line("Name: " + g_strings.to_string(name_id));
+}
+
+void ModuleStmt::dump(DumpContext ctx) const {
+    dump_named_stmt("ModuleStmt", name_id, loc, ctx);
+}
+
+void SectionStmt::dump(DumpContext ctx) const {
+    dump_named_stmt("SectionStmt", name_id, loc, ctx);
+}
+
+void Program::dump(DumpContext ctx) const {
+    ctx.line("Program");
+    auto c = ctx.child();
+    for (const auto& stmt : stmts) {
+        stmt->dump(c);
+    }
+}
+
+void dump_ast_and_exit(const std::unique_ptr<Program>& prog) {
+    DumpContext ctx(std::cout);
+    prog->dump(ctx);
+    exit(EXIT_SUCCESS);
+}
+

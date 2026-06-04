@@ -41,3 +41,4 @@ jp (1234)
 ret
 ret nz
 ld a, 0x1234
+ld a, 1+                ; error in expression
