@@ -10,6 +10,7 @@
 #include "file_mgr.h"
 #include "lexer.h"
 #include "lexer_keywords.h"
+#include "lexer_tokens.h"
 #include "options.h"
 #include "pathnames.h"
 #include "preproc.h"
@@ -29,7 +30,7 @@ static const size_t BYTES_PER_LINE = 16;
 //-----------------------------------------------------------------------------
 
 std::unordered_map<Keyword, Preproc::DirectiveHandler>
-Preproc::directive_handlers_ = {
+Preproc::directive_handlers = {
     { Keyword::INCLUDE,    &Preproc::process_INCLUDE },
     { Keyword::BINARY,     &Preproc::process_BINARY },
     { Keyword::INCBIN,     &Preproc::process_BINARY },
@@ -50,6 +51,10 @@ Preproc::directive_handlers_ = {
     { Keyword::REPTC,      &Preproc::process_REPTC },
     { Keyword::ENDR,       &Preproc::process_ENDR },
     { Keyword::EXITM,      &Preproc::process_EXITM },
+};
+
+std::unordered_map<Keyword, Preproc::DirectiveHandler>
+Preproc::conditional_handlers = {
     { Keyword::IF,         &Preproc::process_IF },
     { Keyword::ELSEIF,     &Preproc::process_ELSEIF },
     { Keyword::ELIF,       &Preproc::process_ELSEIF },
@@ -64,7 +69,7 @@ Preproc::directive_handlers_ = {
 };
 
 std::unordered_map<Keyword, Preproc::NameDirectiveHandler>
-Preproc::name_directive_handlers_ = {
+Preproc::name_directive_handlers = {
     { Keyword::DEFINE,   &Preproc::process_name_DEFINE },
     { Keyword::UNDEF,    &Preproc::process_name_UNDEF },
     { Keyword::UNDEFINE, &Preproc::process_name_UNDEF },
@@ -79,6 +84,19 @@ Preproc::name_directive_handlers_ = {
 // directive handlers and helpers
 //-----------------------------------------------------------------------------
 
+bool Preproc::is_directive_keyword(Keyword kw) {
+    return directive_handlers.find(kw) != directive_handlers.end() ||
+           conditional_handlers.find(kw) != conditional_handlers.end();
+}
+
+bool Preproc::is_conditional_directive_keyword(Keyword kw) {
+    return conditional_handlers.find(kw) != conditional_handlers.end();
+}
+
+bool Preproc::is_name_directive_keyword(Keyword kw) {
+    return name_directive_handlers.find(kw) != name_directive_handlers.end();
+}
+
 bool Preproc::is_directive(ParseLine& input_line,
                            Keyword& out_kw,
                            SourceLoc& out_kw_loc,
@@ -91,17 +109,17 @@ bool Preproc::is_directive(ParseLine& input_line,
 
     // DIRECTIVE
     if (input_line.peek().type == TokenType::Identifier &&
-            keyword_is_preproc_directive(input_line.peek().keyword)) {
+            is_directive_keyword(input_line.peek().keyword)) {
         out_kw = input_line.peek().keyword;
         out_kw_loc = input_line.peek().loc;
-        input_line.pos++; // consume directive keyword
+        input_line.advance(); // consume directive keyword
         return true;
     }
 
     // # DIRECTIVE
     if (input_line.peek().type == TokenType::Hash &&
             input_line.peek(1).type == TokenType::Identifier &&
-            keyword_is_preproc_directive(input_line.peek(1).keyword)) {
+            is_directive_keyword(input_line.peek(1).keyword)) {
         out_kw = input_line.peek(1).keyword;
         out_kw_loc = input_line.peek(1).loc;
         input_line.pos += 2; // consume '#' and directive keyword
@@ -113,14 +131,14 @@ bool Preproc::is_directive(ParseLine& input_line,
             input_line.peek(1).type == TokenType::Integer) {
         out_kw = Keyword::LINE;
         out_kw_loc = input_line.peek().loc;
-        input_line.pos++; // consume '#'
+        input_line.advance(); // consume '#'
         return true;
     }
 
     // name DIRECTIVE
     if (input_line.peek().type == TokenType::Identifier &&
             input_line.peek(1).type == TokenType::Identifier &&
-            keyword_is_preproc_name_directive(input_line.peek(1).keyword)) {
+            is_name_directive_keyword(input_line.peek(1).keyword)) {
         out_kw = input_line.peek(1).keyword;
         out_kw_loc = input_line.peek(1).loc;
         out_name_id = input_line.peek().text_id;
@@ -152,7 +170,7 @@ bool Preproc::parse_filename(ParseLine& input_line,
         out_is_angle_bracket = !quoted_filename.empty() &&
                                quoted_filename.front() == '<' && quoted_filename.back() == '>';
         out_filename_loc = input_line.peek().loc;
-        input_line.pos++;
+        input_line.advance();
         return true;
     }
 
@@ -168,14 +186,14 @@ bool Preproc::parse_filename(ParseLine& input_line,
     out_filename = token_text;
     out_filename_loc = input_line.peek().loc;
     size_t column = input_line.peek().loc.column + token_text.size();
-    input_line.pos++;
+    input_line.advance();
 
     while (input_line.peek().type != TokenType::EndOfLine &&
             input_line.peek().loc.column == column) {
         token_text = g_strings.view(input_line.peek().text_id);
         out_filename += token_text;
         column = input_line.peek().loc.column + token_text.size();
-        input_line.pos++;
+        input_line.advance();
     }
 
     if (!out_filename.empty() &&
@@ -242,11 +260,11 @@ bool Preproc::parse_LINE_args(ParseLine& input_line,
     }
 
     out_linenum = static_cast<size_t>(input_line.peek().value.int_value);
-    input_line.pos++;
+    input_line.advance();
 
     // skip optional comma
     if (input_line.peek().type == TokenType::Comma) {
-        input_line.pos++;
+        input_line.advance();
     }
 
     if (input_line.peek().type == TokenType::EndOfLine) {
@@ -309,11 +327,11 @@ bool Preproc::parse_params(ParseLine& input_line,
     // Optional opening parenthesis
     if (input_line.peek().type == TokenType::LeftParen) {
         out_has_parens = true;
-        input_line.pos++; // consume '('
+        input_line.advance(); // consume '('
 
         // Empty list "()"
         if (input_line.peek().type == TokenType::RightParen) {
-            input_line.pos++;
+            input_line.advance();
             return true;
         }
 
@@ -337,7 +355,7 @@ bool Preproc::parse_params(ParseLine& input_line,
         if (!add_param(input_line.peek().text_id)) {
             return false;
         }
-        input_line.pos++;
+        input_line.advance();
     }
     else {
         // Guard: should not happen due to checks above
@@ -346,12 +364,12 @@ bool Preproc::parse_params(ParseLine& input_line,
 
     // Parse subsequent ", identifier" pairs
     while (input_line.peek().type == TokenType::Comma) {
-        input_line.pos++; // skip comma
+        input_line.advance(); // skip comma
         if (input_line.peek().type == TokenType::Identifier) {
             if (!add_param(input_line.peek().text_id)) {
                 return false;
             }
-            input_line.pos++;
+            input_line.advance();
         }
         else {
             return fail("Identifier expected");
@@ -361,7 +379,7 @@ bool Preproc::parse_params(ParseLine& input_line,
     // If we started with '(', we must end with ')'
     if (out_has_parens) {
         if (input_line.peek().type == TokenType::RightParen) {
-            input_line.pos++;
+            input_line.advance();
         }
         else {
             return fail("Right parenthesis or comma expected");
@@ -505,7 +523,7 @@ std::vector<Token> Preproc::collect_and_expand_line(
     while (input_line.peek().type != TokenType::EndOfLine &&
             input_line.pos < input_line.tokens.size()) {
         raw_tokens.push_back(input_line.peek());
-        input_line.pos++;
+        input_line.advance();
     }
 
     if (raw_tokens.empty()) {
@@ -570,7 +588,7 @@ bool Preproc::eval_ifdef_name(ParseLine& input_line,
     }
 
     StringInterner::Id name_id = input_line.peek().text_id;
-    input_line.pos++;
+    input_line.advance();
 
     if (!input_line.check_end_of_line()) {
         return false;   // error already reported
@@ -841,7 +859,7 @@ void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
 
     StringInterner::Id name_id = input_line.peek().text_id;
     SourceLoc name_loc = input_line.peek().loc;
-    input_line.pos++;
+    input_line.advance();
 
     // check if it's a function-like macro, i.e. if next token is '('
     // without space
@@ -897,7 +915,7 @@ void Preproc::do_DEFINE(const Macro& macro,
 
     // scan optional '='
     if (input_line.peek().type == TokenType::EQ) {
-        input_line.pos++; // skip '='
+        input_line.advance(); // skip '='
     }
 
     // The rest of the line is the replacement list (can be empty)
@@ -906,7 +924,7 @@ void Preproc::do_DEFINE(const Macro& macro,
     while (input_line.peek().type != TokenType::EndOfLine &&
             input_line.pos < input_line.tokens.size()) {
         replacement.push_back(input_line.peek());
-        input_line.pos++;
+        input_line.advance();
     }
 
     // if macro is empty, add a default "1" token
@@ -958,7 +976,7 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
     }
 
     StringInterner::Id name_id = input_line.peek().text_id;
-    input_line.pos++;
+    input_line.advance();
 
     if (!input_line.check_end_of_line()) {
         return; // error already reported
@@ -992,7 +1010,7 @@ void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
 
     StringInterner::Id name_id = input_line.peek().text_id;
     SourceLoc name_loc = input_line.peek().loc;
-    input_line.pos++;
+    input_line.advance();
 
     // check if it's a function-like macro, i.e. if next token is '('
     // without space
@@ -1054,7 +1072,7 @@ void Preproc::do_DEFL(const Macro& macro,
 
     // scan optional '='
     if (input_line.peek().type == TokenType::EQ) {
-        input_line.pos++; // skip '='
+        input_line.advance(); // skip '='
     }
 
     // The rest of the line is the replacement list (can be empty)
@@ -1063,7 +1081,7 @@ void Preproc::do_DEFL(const Macro& macro,
     while (input_line.peek().type != TokenType::EndOfLine &&
             input_line.pos < input_line.tokens.size()) {
         replacement.push_back(input_line.peek());
-        input_line.pos++;
+        input_line.advance();
     }
 
     // if macro is empty, add a default "1" token
@@ -1113,7 +1131,7 @@ void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
 
     StringInterner::Id name_id = input_line.peek().text_id;
     SourceLoc name_loc = input_line.peek().loc;
-    input_line.pos++;
+    input_line.advance();
 
     // parse optional parameters
     std::vector<StringInterner::Id> params;
@@ -1276,7 +1294,7 @@ void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
 
     StringInterner::Id name_id = input_line.peek().text_id;
     SourceLoc name_loc = input_line.peek().loc;
-    input_line.pos++;
+    input_line.advance();
 
     // read comma after identifier
     if (input_line.peek().type != TokenType::Comma) {
@@ -1284,7 +1302,7 @@ void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
                          to_string(kw));
         return;
     }
-    input_line.pos++;
+    input_line.advance();
 
     do_REPTI(kw, kw_loc, name_id, name_loc, input_line);
 }
@@ -1363,14 +1381,14 @@ void Preproc::process_REPTC(Keyword kw, const SourceLoc& kw_loc,
 
     StringInterner::Id name_id = input_line.peek().text_id;
     SourceLoc name_loc = input_line.peek().loc;
-    input_line.pos++;
+    input_line.advance();
 
     // read comma after identifier
     if (input_line.peek().type != TokenType::Comma) {
         input_line.error("Expected comma after identifier in " + to_string(kw));
         return;
     }
-    input_line.pos++;
+    input_line.advance();
 
     do_REPTC(kw, kw_loc, name_id, name_loc, input_line);
 }
@@ -1631,7 +1649,7 @@ void Preproc::process_PRAGMA(Keyword, const SourceLoc&,
     }
 
     // consume ONCE
-    input_line.pos++;
+    input_line.advance();
 
     // PRAGMA ONCE must have no extra tokens
     if (!input_line.check_end_of_line()) {
@@ -1793,7 +1811,7 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     // If conditional block inactive, ignore all other directives
     // ---------------------------------------------------------------------
-    if (!keyword_is_conditional_directive(kw) && !cond_active) {
+    if (!is_conditional_directive_keyword(kw) && !cond_active) {
         return LineType::Skip;
     }
 
@@ -1802,8 +1820,14 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     if (name_id == 0) {
         // Handle normal directives starting with directive keyword
-        auto it = directive_handlers_.find(kw);
-        if (it != directive_handlers_.end()) {
+        auto it = directive_handlers.find(kw);
+        if (it != directive_handlers.end()) {
+            (this->*it->second)(kw, kw_loc, pl);
+            return LineType::ControlOnly;
+        }
+
+        it = conditional_handlers.find(kw);
+        if (it != conditional_handlers.end()) {
             (this->*it->second)(kw, kw_loc, pl);
             return LineType::ControlOnly;
         }
@@ -1811,8 +1835,8 @@ Preproc::LineType Preproc::process_directive_line(
     else {
         // Handle "name DEFINE 1" style directives with name
         // before directive keyword
-        auto it = name_directive_handlers_.find(kw);
-        if (it != name_directive_handlers_.end()) {
+        auto it = name_directive_handlers.find(kw);
+        if (it != name_directive_handlers.end()) {
             (this->*it->second)(kw, kw_loc, name_id, name_loc, pl);
             return LineType::ControlOnly;
         }
