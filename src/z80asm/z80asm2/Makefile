@@ -32,7 +32,7 @@ DEFS := $(wildcard *.def)
 # Dependency files
 DEPENDS := $(OBJS:.o=.d)
 
-STYLE_WIDTH = 100
+STYLE_WIDTH = 80
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
 		  --break-closing-braces --add-braces --attach-return-type \
 		  --max-code-length=$(STYLE_WIDTH) --lineend=linux --formatted 

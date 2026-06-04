@@ -14,8 +14,12 @@ use Data::Dump 'dump';
 
 for my $cpu1 ( 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k' ) {
     for my $strict ( '', '_strict' ) {
-        my $cpu    = $cpu1 . $strict;
-        my $ge_r3k = $cpu1 eq 'r3k' || $cpu1 eq 'r4k' || $cpu1 eq 'r5k' || $cpu1 eq 'r6k';
+        my $cpu = $cpu1 . $strict;
+        my $ge_r3k =
+               $cpu1 eq 'r3k'
+            || $cpu1 eq 'r4k'
+            || $cpu1 eq 'r5k'
+            || $cpu1 eq 'r6k';
         my $ge_r4k = $cpu1 eq 'r4k' || $cpu1 eq 'r5k' || $cpu1 eq 'r6k';
         my $ge_r6k = $cpu1 eq 'r6k';
 
@@ -474,7 +478,7 @@ for my $cpu1 ( 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k' ) {
             add_opcodes( $cpu, "sysret [r4k]" );
         }
 
-        # SJP smart jump not implemented - requires a third pass in the assembler
+       # SJP smart jump not implemented - requires a third pass in the assembler
 
         if ($ge_r4k) {
             add_opcodes( $cpu, "sla B, bcde/jkhl [r4k]" );
@@ -507,7 +511,8 @@ for my $cpu1 ( 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k' ) {
             for my $op ( 'add', 'adc', 'sbc' ) {
                 for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', 'a', '%n' ) {
                     my $opcode = get_opcode( $cpu, "$op a, $r" ) or die;
-                    cond_add_opcode( $cpu, "$op $r", [ $opcode->bytes ], $opcode->{const} );
+                    cond_add_opcode( $cpu, "$op $r", [ $opcode->bytes ],
+                        $opcode->{const} );
                     cond_add_opcode( $cpu, "altsd $op $r",
                         [ RABBIT_CONST('altsd'), $opcode->bytes ],
                         $opcode->{const} );
@@ -517,7 +522,8 @@ for my $cpu1 ( 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k' ) {
             for my $op ( 'add', 'adc', 'sbc' ) {
                 for my $idx ( '(hl)', '(ix+%d)', '(iy+%d)' ) {
                     my $opcode = get_opcode( $cpu, "$op a, $idx" ) or die;
-                    cond_add_opcode( $cpu, "$op $idx", [ $opcode->bytes ], $opcode->{const} );
+                    cond_add_opcode( $cpu, "$op $idx", [ $opcode->bytes ],
+                        $opcode->{const} );
                     cond_add_opcode(
                         $cpu,
                         "alts $op $idx",
@@ -530,56 +536,82 @@ for my $cpu1 ( 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k' ) {
                         [ RABBIT_CONST('altsd'), $opcode->bytes ],
                         $opcode->{const}
                     );
-                    cond_add_opcode( $cpu, "ioe $op $idx", [ RABBIT_CONST('ioe'), $opcode->bytes ],
+                    cond_add_opcode( $cpu, "ioe $op $idx",
+                        [ RABBIT_CONST('ioe'), $opcode->bytes ],
                         $opcode->{const} );
-                    cond_add_opcode( $cpu, "ioi $op $idx", [ RABBIT_CONST('ioi'), $opcode->bytes ],
+                    cond_add_opcode( $cpu, "ioi $op $idx",
+                        [ RABBIT_CONST('ioi'), $opcode->bytes ],
                         $opcode->{const} );
                     cond_add_opcode(
                         $cpu,
                         "alts ioe $op $idx",
-                        [ RABBIT_CONST('alts'), RABBIT_CONST('ioe'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('alts'), RABBIT_CONST('ioe'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "alts ioi $op $idx",
-                        [ RABBIT_CONST('alts'), RABBIT_CONST('ioi'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('alts'), RABBIT_CONST('ioi'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "ioe alts $op $idx",
-                        [ RABBIT_CONST('ioe'), RABBIT_CONST('alts'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('ioe'), RABBIT_CONST('alts'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "ioi alts $op $idx",
-                        [ RABBIT_CONST('ioi'), RABBIT_CONST('alts'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('ioi'), RABBIT_CONST('alts'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "altsd ioe $op $idx",
-                        [ RABBIT_CONST('altsd'), RABBIT_CONST('ioe'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('altsd'), RABBIT_CONST('ioe'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "altsd ioi $op $idx",
-                        [ RABBIT_CONST('altsd'), RABBIT_CONST('ioi'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('altsd'), RABBIT_CONST('ioi'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "ioe altsd $op $idx",
-                        [ RABBIT_CONST('ioe'), RABBIT_CONST('altsd'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('ioe'), RABBIT_CONST('altsd'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                     cond_add_opcode(
                         $cpu,
                         "ioi altsd $op $idx",
-                        [ RABBIT_CONST('ioi'), RABBIT_CONST('altsd'), $opcode->bytes ],
+                        [
+                            RABBIT_CONST('ioi'), RABBIT_CONST('altsd'),
+                            $opcode->bytes
+                        ],
                         $opcode->{const}
                     );
                 }
@@ -596,7 +628,8 @@ for my $cpu1 ( 'r2ka', 'r3k', 'r4k', 'r5k', 'r6k' ) {
             }
 
             my $opcode = get_opcode( $cpu, "ld xpc, hl" ) or die;
-            cond_add_opcode( $cpu, "ld lxpc, hl", [ $opcode->bytes ], $opcode->{const} );
+            cond_add_opcode( $cpu, "ld lxpc, hl", [ $opcode->bytes ],
+                $opcode->{const} );
             cond_add_opcode(
                 $cpu,
                 "alts ld lxpc, hl",
@@ -663,14 +696,19 @@ sub get_spreadsheet {
 
     my $sheet = $workbook->worksheet(0);
     my $row   = 1;
-    $sheet->get_cell( $row, ASM )->unformatted() eq "Instruction" or die "Invalid file $file";
+    $sheet->get_cell( $row, ASM )->unformatted() eq "Instruction"
+        or die "Invalid file $file";
     for my $col ( 1 .. 6 ) {
-        $sheet->get_cell( $row, OPCODE + $col - 1 )->unformatted() eq "Opcode  byte $col"
+        $sheet->get_cell( $row, OPCODE + $col - 1 )->unformatted() eq
+            "Opcode  byte $col"
             or die "Invalid file $file";
     }
-    $sheet->get_cell( $row, AD )->unformatted() eq "AD" or die "Invalid file $file";
-    $sheet->get_cell( $row, AS )->unformatted() eq "AS" or die "Invalid file $file";
-    $sheet->get_cell( $row, IO )->unformatted() eq "IO" or die "Invalid file $file";
+    $sheet->get_cell( $row, AD )->unformatted() eq "AD"
+        or die "Invalid file $file";
+    $sheet->get_cell( $row, AS )->unformatted() eq "AS"
+        or die "Invalid file $file";
+    $sheet->get_cell( $row, IO )->unformatted() eq "IO"
+        or die "Invalid file $file";
 
     $row++;
     return ( $sheet, $row );
@@ -721,31 +759,43 @@ sub parse_r6k_opcode {
     #say $data->{asm} if $data->{asm} =~ /RST/;
 
     # convert multi-byte sequences
-    if ( $data->{asm} =~ /^FLAG cc, HL$/ && $data->{ops}[1] =~ /111x0100|10011100/ ) {
-
-        # non-existing FLAG cc, HL opcodes, see Rabbit6000_Delta4000Instructions.xlsx
-        return;
-    }
-    elsif ( $data->{asm} =~ /^JP cc, mn$/
-        && ( $data->{ops}[0] =~ /010x0011|01001011/ || $data->{ops}[1] =~ /010x0011|01001011/ ) )
+    if (   $data->{asm} =~ /^FLAG cc, HL$/
+        && $data->{ops}[1] =~ /111x0100|10011100/ )
     {
-        # non-existing JP cc, mn opcodes, see Rabbit6000_Delta4000Instructions.xlsx
+
+   # non-existing FLAG cc, HL opcodes, see Rabbit6000_Delta4000Instructions.xlsx
         return;
     }
-    elsif ( $data->{asm} =~ /^JR cc, e$/
-        && ( $data->{ops}[0] =~ /100x0000|10001000/ || $data->{ops}[1] =~ /100x0000|10001000/ ) )
+    elsif (
+        $data->{asm} =~ /^JP cc, mn$/
+        && (   $data->{ops}[0] =~ /010x0011|01001011/
+            || $data->{ops}[1] =~ /010x0011|01001011/ )
+        )
     {
-        # non-existing JR cc, e opcodes, see Rabbit6000_Delta4000Instructions.xlsx
+     # non-existing JP cc, mn opcodes, see Rabbit6000_Delta4000Instructions.xlsx
         return;
     }
-    elsif ( $data->{asm} =~ /^JRE cc, ee$/ && $data->{ops}[1] =~ /111x0011|10011011/ ) {
-
-        # non-existing JRE cc, ee opcodes, see Rabbit6000_Delta4000Instructions.xlsx
+    elsif (
+        $data->{asm} =~ /^JR cc, e$/
+        && (   $data->{ops}[0] =~ /100x0000|10001000/
+            || $data->{ops}[1] =~ /100x0000|10001000/ )
+        )
+    {
+      # non-existing JR cc, e opcodes, see Rabbit6000_Delta4000Instructions.xlsx
         return;
     }
-    elsif ( $data->{asm} =~ /^LLJP cc, lxpc, mn$/ && $data->{ops}[1] =~ /111x0010|10011010/ ) {
+    elsif ($data->{asm} =~ /^JRE cc, ee$/
+        && $data->{ops}[1] =~ /111x0011|10011011/ )
+    {
 
-        # non-existing LLJP cc, lxpc, mn opcodes, see Rabbit6000_Delta4000Instructions.xlsx
+    # non-existing JRE cc, ee opcodes, see Rabbit6000_Delta4000Instructions.xlsx
+        return;
+    }
+    elsif ($data->{asm} =~ /^LLJP cc, lxpc, mn$/
+        && $data->{ops}[1] =~ /111x0010|10011010/ )
+    {
+
+# non-existing LLJP cc, lxpc, mn opcodes, see Rabbit6000_Delta4000Instructions.xlsx
         return;
     }
     elsif ( $data->{asm} =~ /^(ALTD|ALTS|ALTSD|IOE|IOI|ZDMA|ZINTACK)$/ ) {
@@ -1024,7 +1074,8 @@ sub dedup_r6k_opcode {
     if ( $asm eq "ld hl', bc" && $ac->compare( \@data_ops, [ 0xED, 0x69 ] ) ) {
         return;    # ignore, use [0x76, 0x81]
     }
-    elsif ( $asm eq "ld hl', de" && $ac->compare( \@data_ops, [ 0xED, 0x61 ] ) ) {
+    elsif ( $asm eq "ld hl', de" && $ac->compare( \@data_ops, [ 0xED, 0x61 ] ) )
+    {
         return;    # ignore, use [0x76, 0xA1]
     }
 
@@ -1035,14 +1086,17 @@ sub dedup_r6k_opcode {
         if ( $ac->compare( \@prev_ops, \@data_ops ) ) {
             return;    # identical opcode
         }
-        elsif ( $data->{asm} =~ /^(rlc|rrc) %c, (bcde|jkhl)/ ) {    # merge two instructions
+        elsif ( $data->{asm} =~ /^(rlc|rrc) %c, (bcde|jkhl)/ )
+        {              # merge two instructions
             if ( @{ $data->{const} } == 1 && $data->{const}[0] == 8 ) {
                 $prev->{const} = [ @{ $prev->{const} }, @{ $data->{const} } ];
-                $prev->{ops}[1] = "%c==8?" . $data->{ops}[1] . ":" . $prev->{ops}[1];
+                $prev->{ops}[1] =
+                    "%c==8?" . $data->{ops}[1] . ":" . $prev->{ops}[1];
             }
             elsif ( @{ $prev->{const} } == 1 && $prev->{const}[0] == 8 ) {
                 $prev->{const} = [ @{ $data->{const} }, @{ $prev->{const} } ];
-                $prev->{ops}[1] = "%c==8?" . $prev->{ops}[1] . ":" . $data->{ops}[1];
+                $prev->{ops}[1] =
+                    "%c==8?" . $prev->{ops}[1] . ":" . $data->{ops}[1];
             }
             else {
                 die;
@@ -1060,10 +1114,14 @@ sub dedup_r6k_opcode {
                 return;                            # none is correct
             }
         }
-        elsif ( $prev_ops[0] == 0x7F && $ac->compare( \@prev_ops, [ 0x7F, @data_ops ] ) ) {
+        elsif ($prev_ops[0] == 0x7F
+            && $ac->compare( \@prev_ops, [ 0x7F, @data_ops ] ) )
+        {
             $opcodes->{$asm}{$cpu} = asm_in_7F_page($asm) ? $prev : $data;
         }
-        elsif ( $data_ops[0] == 0x7F && $ac->compare( \@data_ops, [ 0x7F, @prev_ops ] ) ) {
+        elsif ($data_ops[0] == 0x7F
+            && $ac->compare( \@data_ops, [ 0x7F, @prev_ops ] ) )
+        {
             $opcodes->{$asm}{$cpu} = asm_in_7F_page($asm) ? $data : $prev;
         }
         else {
@@ -1110,44 +1168,64 @@ sub add_r6k_opcodes {
     # handle special cases
     if ( $ad eq 's' ) {
         if ( $asm eq "ex de, hl" ) {
-            add_r6k_opcode( "ex de, hl",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex de, hl'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex de, hl", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex de, hl", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex de, hl'", $cpu, [ RABBIT_CONST('altd'), @ops ],
+                \@const );
+            add_r6k_opcode( "altd ex de, hl",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
         }
         elsif ( $asm eq "ex de', hl" ) {
-            add_r6k_opcode( "ex de', hl",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex de', hl'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex de', hl", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex de', hl", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex de', hl'", $cpu,
+                [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "altd ex de', hl",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
         }
         elsif ( $asm eq "ex bc', hl" ) {
-            add_r6k_opcode( "ex bc', hl",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex bc', hl'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex bc', hl", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex bc', hl", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex bc', hl'", $cpu,
+                [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "altd ex bc', hl",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
         }
         elsif ( $asm eq "ex bc, hl" ) {
-            add_r6k_opcode( "ex bc, hl",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex bc, hl'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex bc, hl", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex bc, hl", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex bc, hl'", $cpu, [ RABBIT_CONST('altd'), @ops ],
+                \@const );
+            add_r6k_opcode( "altd ex bc, hl",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
         }
         elsif ( $asm eq "ex jkhl, bcde" ) {
-            add_r6k_opcode( "ex jkhl, bcde",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex jkhl', bcde",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex jkhl, bcde", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex jkhl, bcde", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex jkhl', bcde",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode(
+                "altd ex jkhl, bcde",           $cpu,
+                [ RABBIT_CONST('altd'), @ops ], \@const
+            );
         }
         elsif ( $asm eq "ex jkhl, bcde'" ) {
-            add_r6k_opcode( "ex jkhl, bcde'",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex jkhl', bcde'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex jkhl, bcde'", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex jkhl, bcde'", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex jkhl', bcde'",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode(
+                "altd ex jkhl, bcde'",          $cpu,
+                [ RABBIT_CONST('altd'), @ops ], \@const
+            );
         }
         elsif ( $asm eq "ex jk, hl" ) {
-            add_r6k_opcode( "ex jk, hl",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex jk, hl'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex jk, hl", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex jk, hl", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex jk, hl'", $cpu, [ RABBIT_CONST('altd'), @ops ],
+                \@const );
+            add_r6k_opcode( "altd ex jk, hl",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
         }
         elsif ( $asm eq "ex jk', hl" ) {
-            add_r6k_opcode( "ex jk', hl",      $cpu, \@ops, \@const );
-            add_r6k_opcode( "ex jk', hl'",     $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
-            add_r6k_opcode( "altd ex jk', hl", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "ex jk', hl", $cpu, \@ops, \@const );
+            add_r6k_opcode( "ex jk', hl'", $cpu,
+                [ RABBIT_CONST('altd'), @ops ], \@const );
+            add_r6k_opcode( "altd ex jk', hl",
+                $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
         }
         else {
             die "Unexpected opcode: $asm, $cpu, ", hex_dump($data);
@@ -1155,82 +1233,108 @@ sub add_r6k_opcodes {
     }
     elsif ( $ad =~ /r/ && $as eq '' ) {
         my $asm1 = add_tick_altd($asm);
-        add_r6k_opcode( $asm,        $cpu, \@ops, \@const );
-        add_r6k_opcode( $asm1,       $cpu, [ RABBIT_CONST('altd'), @ops ], \@const ) if $asm1;
-        add_r6k_opcode( "altd $asm", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+        add_r6k_opcode( $asm,  $cpu, \@ops,                          \@const );
+        add_r6k_opcode( $asm1, $cpu, [ RABBIT_CONST('altd'), @ops ], \@const )
+            if $asm1;
+        add_r6k_opcode( "altd $asm", $cpu, [ RABBIT_CONST('altd'), @ops ],
+            \@const );
         if ($io) {
             for my $ioei ( 'ioi', 'ioe' ) {
-                add_r6k_opcode( "$ioei $asm", $cpu, [ RABBIT_CONST($ioei), @ops ], \@const );
+                add_r6k_opcode( "$ioei $asm", $cpu,
+                    [ RABBIT_CONST($ioei), @ops ], \@const );
                 add_r6k_opcode( "$ioei " . $asm1,
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altd'), @ops ], \@const )
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altd'), @ops ],
+                    \@const )
                     if $asm1;
                 add_r6k_opcode( "$ioei altd $asm",
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altd'), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altd'), @ops ],
+                    \@const );
                 add_r6k_opcode( "altd $ioei $asm",
-                    $cpu, [ RABBIT_CONST('altd'), RABBIT_CONST($ioei), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST('altd'), RABBIT_CONST($ioei), @ops ],
+                    \@const );
             }
         }
     }
     elsif ( $ad eq '' && $as =~ /r/ ) {
         my $asm1 = add_tick_alts($asm);
-        add_r6k_opcode( $asm,        $cpu, \@ops, \@const );
-        add_r6k_opcode( $asm1,       $cpu, [ RABBIT_CONST('alts'), @ops ], \@const ) if $asm1;
-        add_r6k_opcode( "alts $asm", $cpu, [ RABBIT_CONST('alts'), @ops ], \@const );
+        add_r6k_opcode( $asm,  $cpu, \@ops,                          \@const );
+        add_r6k_opcode( $asm1, $cpu, [ RABBIT_CONST('alts'), @ops ], \@const )
+            if $asm1;
+        add_r6k_opcode( "alts $asm", $cpu, [ RABBIT_CONST('alts'), @ops ],
+            \@const );
         if ($io) {
             for my $ioei ( 'ioi', 'ioe' ) {
-                add_r6k_opcode( "$ioei $asm", $cpu, [ RABBIT_CONST($ioei), @ops ], \@const );
+                add_r6k_opcode( "$ioei $asm", $cpu,
+                    [ RABBIT_CONST($ioei), @ops ], \@const );
                 add_r6k_opcode( "$ioei " . $asm1,
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('alts'), @ops ], \@const )
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('alts'), @ops ],
+                    \@const )
                     if $asm1;
                 add_r6k_opcode( "$ioei alts $asm",
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('alts'), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('alts'), @ops ],
+                    \@const );
                 add_r6k_opcode( "alts $ioei $asm",
-                    $cpu, [ RABBIT_CONST('alts'), RABBIT_CONST($ioei), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST('alts'), RABBIT_CONST($ioei), @ops ],
+                    \@const );
             }
         }
     }
     elsif ( $ad =~ /r/ && $as =~ /r/ ) {
         my $asm1 = add_tick_alts($asm);
         $asm1 = add_tick_altd($asm1) if $asm1;
-        add_r6k_opcode( $asm,         $cpu, \@ops, \@const );
-        add_r6k_opcode( $asm1,        $cpu, [ RABBIT_CONST('altsd'), @ops ], \@const ) if $asm1;
-        add_r6k_opcode( "altsd $asm", $cpu, [ RABBIT_CONST('altsd'), @ops ], \@const );
+        add_r6k_opcode( $asm,  $cpu, \@ops,                           \@const );
+        add_r6k_opcode( $asm1, $cpu, [ RABBIT_CONST('altsd'), @ops ], \@const )
+            if $asm1;
+        add_r6k_opcode( "altsd $asm", $cpu, [ RABBIT_CONST('altsd'), @ops ],
+            \@const );
         if ($io) {
             for my $ioei ( 'ioi', 'ioe' ) {
-                add_r6k_opcode( "$ioei $asm", $cpu, [ RABBIT_CONST($ioei), @ops ], \@const );
+                add_r6k_opcode( "$ioei $asm", $cpu,
+                    [ RABBIT_CONST($ioei), @ops ], \@const );
                 add_r6k_opcode( "$ioei " . $asm1,
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altsd'), @ops ], \@const )
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altsd'), @ops ],
+                    \@const )
                     if $asm1;
                 add_r6k_opcode( "$ioei altsd $asm",
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altsd'), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altsd'), @ops ],
+                    \@const );
                 add_r6k_opcode( "altsd $ioei $asm",
-                    $cpu, [ RABBIT_CONST('altsd'), RABBIT_CONST($ioei), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST('altsd'), RABBIT_CONST($ioei), @ops ],
+                    \@const );
             }
         }
     }
     elsif ( $ad eq 'f' ) {
-        add_r6k_opcode( $asm,        $cpu, \@ops,                          \@const );
-        add_r6k_opcode( "altd $asm", $cpu, [ RABBIT_CONST('altd'), @ops ], \@const );
+        add_r6k_opcode( $asm, $cpu, \@ops, \@const );
+        add_r6k_opcode( "altd $asm", $cpu, [ RABBIT_CONST('altd'), @ops ],
+            \@const );
         if ($io) {
             for my $ioei ( 'ioi', 'ioe' ) {
-                add_r6k_opcode( "$ioei $asm", $cpu, [ RABBIT_CONST($ioei), @ops ], \@const );
+                add_r6k_opcode( "$ioei $asm", $cpu,
+                    [ RABBIT_CONST($ioei), @ops ], \@const );
                 add_r6k_opcode( "$ioei altd $asm",
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altd'), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('altd'), @ops ],
+                    \@const );
                 add_r6k_opcode( "altd $ioei $asm",
-                    $cpu, [ RABBIT_CONST('altd'), RABBIT_CONST($ioei), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST('altd'), RABBIT_CONST($ioei), @ops ],
+                    \@const );
             }
         }
     }
     elsif ( $as eq 'f' ) {
-        add_r6k_opcode( $asm,        $cpu, \@ops,                          \@const );
-        add_r6k_opcode( "alts $asm", $cpu, [ RABBIT_CONST('alts'), @ops ], \@const );
+        add_r6k_opcode( $asm, $cpu, \@ops, \@const );
+        add_r6k_opcode( "alts $asm", $cpu, [ RABBIT_CONST('alts'), @ops ],
+            \@const );
         if ($io) {
             for my $ioei ( 'ioi', 'ioe' ) {
-                add_r6k_opcode( "$ioei $asm", $cpu, [ RABBIT_CONST($ioei), @ops ], \@const );
+                add_r6k_opcode( "$ioei $asm", $cpu,
+                    [ RABBIT_CONST($ioei), @ops ], \@const );
                 add_r6k_opcode( "$ioei alts $asm",
-                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('alts'), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST($ioei), RABBIT_CONST('alts'), @ops ],
+                    \@const );
                 add_r6k_opcode( "alts $ioei $asm",
-                    $cpu, [ RABBIT_CONST('alts'), RABBIT_CONST($ioei), @ops ], \@const );
+                    $cpu, [ RABBIT_CONST('alts'), RABBIT_CONST($ioei), @ops ],
+                    \@const );
             }
         }
     }
@@ -1238,7 +1342,8 @@ sub add_r6k_opcodes {
         add_r6k_opcode( $asm, $cpu, \@ops, \@const );
         if ($io) {
             for my $ioei ( 'ioi', 'ioe' ) {
-                add_r6k_opcode( "$ioei $asm", $cpu, [ RABBIT_CONST($ioei), @ops ], \@const );
+                add_r6k_opcode( "$ioei $asm", $cpu,
+                    [ RABBIT_CONST($ioei), @ops ], \@const );
             }
         }
     }
