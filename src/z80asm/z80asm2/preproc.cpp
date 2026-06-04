@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <string_view>
 #include <vector>
 
 bool Preproc::is_cond_active() const {

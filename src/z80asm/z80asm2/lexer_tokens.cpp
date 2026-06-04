@@ -94,23 +94,8 @@ std::string to_string(Token token) {
     switch (token.type) {
     case TokenType::Identifier:
         return g_strings.to_string(token.text_id);
-    case TokenType::Integer: {
-        int value = token.value.int_value;
-        std::ostringstream oss;
-        if (abs(value) < 10) {
-            oss << value;
-            return oss.str();
-        }
-        else {
-            std::string sign = "";
-            if (value < 0) {
-                sign = "-";
-                value = -value;
-            }
-            oss << sign << "0x" << std::setfill('0') << std::setw(2) << std::hex << value;
-            return oss.str();
-        }
-    }
+    case TokenType::Integer:
+        return int_to_hex(token.value.int_value);
     case TokenType::Float:
         return std::to_string(token.value.float_value);
     case TokenType::String:
@@ -134,22 +119,26 @@ std::string to_string(const std::vector<Token>& tokens) {
         else if (is_ident_char(s1.back()) && is_ident_char(s2.front())) {
             return s1 + " " + s2;
         }
-        else if (is_ident_char(s1.back()) && s2.front() == '@') {
+        else if (is_ident_char(s1.back()) &&
+                 (s2.front() == '$' || s2.front() == '@' || s2.front() == '%')) {
             return s1 + " " + s2;
         }
         else if (s1.back() == '$' && is_hex_digit(s2.front())) {
             return s1 + " " + s2;
         }
         else if ((s1.back() == '%' || s1.back() == '@') &&
-                 (is_dec_digit(s2.front()) || s2.front() == '"' || is_ident_start(s2.front()))) {
+                 (is_dec_digit(s2.front()) || s2.front() == '"' ||
+                  is_ident_start(s2.front()))) {
             return s1 + " " + s2;
         }
         else if ((s1.back() == '&' && s2.front() == '&') ||
                  (s1.back() == '|' && s2.front() == '|') ||
                  (s1.back() == '^' && s2.front() == '^') ||
                  (s1.back() == '*' && s2.front() == '*') ||
-                 (s1.back() == '<' && (s2.front() == '=' || s2.front() == '<' || s2.front() == '>')) ||
-                 (s1.back() == '>' && (s2.front() == '=' || s2.front() == '>')) ||
+                 (s1.back() == '<' &&
+                  (s2.front() == '=' || s2.front() == '<' || s2.front() == '>')) ||
+                 (s1.back() == '>' &&
+                  (s2.front() == '=' || s2.front() == '>')) ||
                  (s1.back() == '=' && s2.front() == '=') ||
                  (s1.back() == '!' && s2.front() == '=') ||
                  (s1.back() == '#' && s2.front() == '#')) {
