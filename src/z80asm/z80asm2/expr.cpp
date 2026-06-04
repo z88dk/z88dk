@@ -379,7 +379,8 @@ static bool eval_expr_impl(ParseLine& pline,
     sem.silent = silent;
     sem.undefined_is_zero = undefined_is_zero;
 
-    if (!parse_full_expr(pline, sem)) {
+    ParseStatus status = ParseStatus::Ok;
+    if (!parse_full_expr(pline, sem, status)) {
         return false;
     }
 
@@ -457,7 +458,8 @@ bool SpanSem::local_label(const Token&) {
 bool parse_expression_span(ParseLine& pline) {
     size_t pos0 = pline.pos;
     SpanSem sem;
-    if (!parse_full_expr(pline, sem)) {
+    ParseStatus status = ParseStatus::Ok;
+    if (!parse_full_expr(pline, sem, status)) {
         pline.pos = pos0;
         return false;
     }
@@ -539,9 +541,9 @@ void ExprSem::error_missing_colon(const ParseLine& pline) const {
     ::error_missing_colon(pline);
 }
 
-std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline) {
+std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline, ParseStatus& status) {
     ExprSem sem;
-    if (!parse_full_expr(pline, sem)) {
+    if (!parse_full_expr(pline, sem, status)) {
         return nullptr; // error already reported
     }
 

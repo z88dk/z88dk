@@ -108,6 +108,11 @@ private:
 // Pluggable expression parsing - Pratt parser
 //-----------------------------------------------------------------------------
 
+enum class ParseStatus {
+    Ok,          // matched successfully
+    FatalError   // a sub-parser emitted an error; stop immediately
+};
+
 enum {
     BP_SENTINEL        = -1,
     BP_NONE            = 0,
@@ -135,11 +140,12 @@ struct OpInfo {
 OpInfo infix_table(TokenType t, bool restricted);
 
 template <typename Sem>
-bool nud(ParseLine& pline, Sem& sem, bool restricted) {
+bool nud(ParseLine& pline, Sem& sem, bool restricted, ParseStatus& status) {
     const Token& tok = pline.peek();
 
     if (tok.type == TokenType::EndOfLine) {
         sem.error_expected_operand(pline);
+        status = ParseStatus::FatalError;
         return false;
     }
 
@@ -150,16 +156,18 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
 
         if (pline.peek().type != TokenType::LeftParen) {
             sem.error_missing_lparen(pline);
+            status = ParseStatus::FatalError;
             return false;
         }
         pline.advance(); // consume '('
 
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted, status)) {
             return false;
         }
 
         if (pline.peek().type != TokenType::RightParen) {
             sem.error_missing_rparen(pline);
+            status = ParseStatus::FatalError;
             return false;
         }
         pline.advance(); // consume ')'
@@ -176,16 +184,18 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
 
         if (pline.peek().type != TokenType::LeftParen) {
             sem.error_missing_lparen(pline);
+            status = ParseStatus::FatalError;
             return false;
         }
         pline.advance(); // consume '('
 
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted, status)) {
             return false;
         }
 
         if (pline.peek().type != TokenType::RightParen) {
             sem.error_missing_rparen(pline);
+            status = ParseStatus::FatalError;
             return false;
         }
         pline.advance(); // consume ')'
@@ -225,7 +235,7 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
     case TokenType::LogicalNot:
     case TokenType::BitwiseNot:
         pline.advance();
-        if (!parse_expr_bp_dynamic(pline, sem, BP_UNARY, restricted)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_UNARY, restricted, status)) {
             return false;
         }
         sem.unary(tok.type, tok.loc);
@@ -239,7 +249,7 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
             ? TokenType::RightParen
             : TokenType::RightBracket;
 
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted, status)) {
             return false;
         }
 
@@ -250,6 +260,7 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
             else {
                 sem.error_missing_rbracket(pline);
             }
+            status = ParseStatus::FatalError;
             return false;
         }
 
@@ -259,30 +270,32 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted) {
 
     default:
         sem.error_expected_operand(pline);
+        status = ParseStatus::FatalError;
         return false;
     }
 }
 
 template <typename Sem>
-bool led(ParseLine& pline, Sem& sem, Token op, bool restricted) {
+bool led(ParseLine& pline, Sem& sem, Token op, bool restricted, ParseStatus& status) {
 
     // ternary operator
     if (op.type == TokenType::Question) {
 
         // true branch
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted, status)) {
             return false;
         }
 
         if (pline.peek().type != TokenType::Colon) {
             sem.error_missing_colon(pline);
+            status = ParseStatus::FatalError;
             return false;
         }
 
         pline.advance();
 
         // false branch
-        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted)) {
+        if (!parse_expr_bp_dynamic(pline, sem, BP_NONE, restricted, status)) {
             return false;
         }
 
@@ -295,7 +308,7 @@ bool led(ParseLine& pline, Sem& sem, Token op, bool restricted) {
 
     Token expr_start_tok = pline.peek();
 
-    if (!parse_expr_bp_dynamic(pline, sem, info.rbp, restricted)) {
+    if (!parse_expr_bp_dynamic(pline, sem, info.rbp, restricted, status)) {
         return false;
     }
 
@@ -304,9 +317,10 @@ bool led(ParseLine& pline, Sem& sem, Token op, bool restricted) {
 }
 
 template <typename Sem>
-bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp, bool restricted) {
+bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp, bool restricted,
+                           ParseStatus& status) {
 
-    if (!nud(pline, sem, restricted)) {
+    if (!nud(pline, sem, restricted, status)) {
         return false;
     }
 
@@ -320,7 +334,7 @@ bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp, bool restrict
 
         pline.advance();
 
-        if (!led(pline, sem, op, restricted)) {
+        if (!led(pline, sem, op, restricted, status)) {
             return false;
         }
     }
@@ -329,13 +343,15 @@ bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp, bool restrict
 }
 
 template <typename Sem>
-bool parse_full_expr(ParseLine& pline, Sem& sem) {
-    return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/false);
+bool parse_full_expr(ParseLine& pline, Sem& sem, ParseStatus& status) {
+    status = ParseStatus::Ok;
+    return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/false, status);
 }
 
 template <typename Sem>
-bool parse_restricted_expr(ParseLine& pline, Sem& sem) {
-    return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/true);
+bool parse_restricted_expr(ParseLine& pline, Sem& sem, ParseStatus& status) {
+    status = ParseStatus::Ok;
+    return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/true, status);
 }
 
 //-----------------------------------------------------------------------------
@@ -373,4 +389,4 @@ bool parse_expression_span(ParseLine& pline);
 // Semantic context for AST builder expression parsing
 //-----------------------------------------------------------------------------
 
-std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline);
+std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline, ParseStatus& status);
