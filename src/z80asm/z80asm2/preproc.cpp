@@ -260,7 +260,8 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     return final_lines;
 }
 
-void Preproc::split_lines(const std::vector<Token>& tokens, const SourceLoc& loc,
+void Preproc::split_lines(const std::vector<Token>& tokens,
+                          const SourceLoc& loc,
                           std::vector<LogicalLine>& out_lines) {
     if (tokens.empty()) {
         return;
@@ -331,7 +332,8 @@ void Preproc::split_lines(const std::vector<Token>& tokens, const SourceLoc& loc
     }
 }
 
-void output_preproc_output(std::string_view filename, const std::vector<LogicalLine>& lines) {
+void output_preproc_output(std::string_view filename,
+                           const std::vector<LogicalLine>& lines) {
     std::string filename_s(filename);
     std::ofstream ofs(filename_s, std::ios::binary);
     if (!ofs.is_open()) {
@@ -347,7 +349,8 @@ void output_preproc_output(std::string_view filename, const std::vector<LogicalL
     for (auto& line : lines) {
         // write # line "file" - if needed
         if (line.loc.file_id != loc.file_id) {
-            ofs << "# " << line.loc.line << " \"" << g_strings.view(line.loc.file_id) << "\"" << std::endl;
+            ofs << "# " << line.loc.line << " \"" << g_strings.view(
+                    line.loc.file_id) << "\"" << std::endl;
             loc = SourceLoc(line.loc.file_id, line.loc.line, 1);
         }
         else if (loc.line > line.loc.line) {

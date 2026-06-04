@@ -60,4 +60,5 @@ struct SynthMatch {
     std::vector<ExprSpan> expr_spans;
 };
 
-std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>& lines);
+std::vector<LogicalLine> synthetic_expand(const std::vector<LogicalLine>&
+        lines);

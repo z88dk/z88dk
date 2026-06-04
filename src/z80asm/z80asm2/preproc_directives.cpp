@@ -1695,7 +1695,8 @@ void Preproc::process_PRAGMA(Keyword, const SourceLoc&,
     }
 
     StringInterner::Id file_id = include_stack.back().file->file_id;
-    auto it = std::find(pragma_once_files.begin(), pragma_once_files.end(), file_id);
+    auto it = std::find(pragma_once_files.begin(), pragma_once_files.end(),
+                        file_id);
 
     if (it != pragma_once_files.end()) {
         // file already marked once -> skip remaining lines of this file

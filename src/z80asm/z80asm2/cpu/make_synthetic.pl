@@ -26,11 +26,11 @@ for my $strict ( 0 .. 1 ) {
             if ($strict) {
                 next unless $cpu =~ /strict/;    # check only official opcodes
             }
-            $cpu =~ s/_strict//;                 # save table for non-strict version
+            $cpu =~ s/_strict//;    # save table for non-strict version
             my $opcode = $opcodes->{opcodes}{$asm}{$cpu};
             if ( !$opcode->{synth} ) {
                 my @ops = map { @$_ } @{ $opcode->{ops} };    # flatten list
-                                                              #say "$asm $cpu @ops";
+                    #say "$asm $cpu @ops";
                 $ops->{"@ops"}{$cpu} = $asm;
             }
         }
@@ -76,7 +76,8 @@ ops:
             shift @ops;
             next ops;
         }
-        if ( ( @{ $ops[0] } == 3 || @{ $ops[0] } == 4 ) && $ops[0][0] == 0xCD ) {
+        if ( ( @{ $ops[0] } == 3 || @{ $ops[0] } == 4 ) && $ops[0][0] == 0xCD )
+        {
             my $sub = $ops[0][1] =~ s/^\@//r;
             push @instr, "extern $sub" unless $sub eq "%m";
             push @instr, "call $sub";
@@ -104,7 +105,11 @@ ops:
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 4 && $ops[0][1] eq '%n' && $ops[0][2] eq '%s' && $ops[0][3] eq '%s' ) {
+        if (   @{ $ops[0] } == 4
+            && $ops[0][1] eq '%n'
+            && $ops[0][2] eq '%s'
+            && $ops[0][3] eq '%s' )
+        {
             my @flat = ( $ops[0][0], '%m', '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
             my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/unsigned8(%n)/r;
@@ -112,7 +117,11 @@ ops:
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 4 && $ops[0][1] eq '%d' && $ops[0][2] eq '%s' && $ops[0][3] eq '%s' ) {
+        if (   @{ $ops[0] } == 4
+            && $ops[0][1] eq '%d'
+            && $ops[0][2] eq '%s'
+            && $ops[0][3] eq '%s' )
+        {
             my @flat = ( $ops[0][0], '%m', '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
             my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/signed8(%d)/r;
@@ -150,22 +159,38 @@ ops:
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0xDD && $ops[0][1] == 0x26 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0xDD
+            && $ops[0][1] == 0x26
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld ixh, 0";
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0xDD && $ops[0][1] == 0x2E && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0xDD
+            && $ops[0][1] == 0x2E
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld ixl, 0";
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0xFD && $ops[0][1] == 0x26 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0xFD
+            && $ops[0][1] == 0x26
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld iyh, 0";
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0xFD && $ops[0][1] == 0x2E && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0xFD
+            && $ops[0][1] == 0x2E
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld iyl, 0";
             shift @ops;
             next ops;
@@ -346,7 +371,9 @@ ops:
             splice @ops, 0, 2;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && ( $ops[0][0] == 0xDD || $ops[0][0] == 0xFD ) && $ops[0][2] eq 1 )
+        if (   @{ $ops[0] } == 3
+            && ( $ops[0][0] == 0xDD || $ops[0][0] == 0xFD )
+            && $ops[0][2] eq 1 )
         {
             my @flat = ( $ops[0][0], $ops[0][1], '%d' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
@@ -425,17 +452,29 @@ ops:
             splice @ops, 0, 2;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0x01 && $ops[0][1] eq 0 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x01
+            && $ops[0][1] eq 0
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld bc, 0";
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0x11 && $ops[0][1] eq 0 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x11
+            && $ops[0][1] eq 0
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld de, 0";
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0x21 && $ops[0][1] eq 0 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x21
+            && $ops[0][1] eq 0
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld hl, 0";
             shift @ops;
             next ops;
@@ -460,12 +499,20 @@ ops:
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0x21 && $ops[0][1] eq 1 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x21
+            && $ops[0][1] eq 1
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld hl, 1";
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][0] == 0x21 && $ops[0][1] eq 2 && $ops[0][2] eq 0 ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][0] == 0x21
+            && $ops[0][1] eq 2
+            && $ops[0][2] eq 0 )
+        {
             push @instr, "ld hl, 2";
             shift @ops;
             next ops;
@@ -615,7 +662,10 @@ ops:
             shift @ops;
             next ops;
         }
-        if ( @{ $ops[0] } == 3 && $ops[0][1] =~ /%t\d*/ && $ops[0][2] =~ /%t\d*/ ) {
+        if (   @{ $ops[0] } == 3
+            && $ops[0][1] =~ /%t\d*/
+            && $ops[0][2] =~ /%t\d*/ )
+        {
             my @flat = ( $ops[0][0], '%m', '%m' );
             exists $ops->{"@flat"}{$cpu} or die "$asm $cpu @flat";
             my $instr = $ops->{"@flat"}{$cpu} =~ s/%m/$ops[0][1]/r;
@@ -650,7 +700,8 @@ ops:
                 next ops;
             }
         }
-        die "$asm $cpu ", join( ":", @instr ), ", ", join( " ", map { @$_ } @ops );
+        die "$asm $cpu ", join( ":", @instr ), ", ",
+            join( " ", map { @$_ } @ops );
     }
 
     # check relative jumps converted to absolute jumps

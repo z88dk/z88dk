@@ -16,11 +16,13 @@
 #include <utility>
 #include <vector>
 
-using DirectiveParseFn = std::unique_ptr<Stmt>(*)(ParseLine&, const SourceLoc&, ParseStatus&);
+using DirectiveParseFn = std::unique_ptr<Stmt>(*)(ParseLine&, const SourceLoc&,
+                         ParseStatus&);
 
 // Helper to parse comma-separated list of identifiers
 template<typename StmtType>
-static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     std::vector<StringInterner::Id> name_ids;
 
@@ -45,13 +47,20 @@ static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline, const Sourc
     return std::make_unique<StmtType>(loc, std::move(name_ids));
 }
 
-static std::unique_ptr<Stmt>parse_extern(ParseLine&, const SourceLoc&, ParseStatus& );
-static std::unique_ptr<Stmt>parse_public(ParseLine&, const SourceLoc&, ParseStatus& );
-static std::unique_ptr<Stmt>parse_global(ParseLine&, const SourceLoc&, ParseStatus& );
-static std::unique_ptr<Stmt>parse_module(ParseLine&, const SourceLoc&, ParseStatus& );
-static std::unique_ptr<Stmt>parse_section(ParseLine&, const SourceLoc&, ParseStatus& );
-static std::unique_ptr<Stmt>parse_org(ParseLine&, const SourceLoc&, ParseStatus& );
-static std::unique_ptr<Stmt>parse_defc(ParseLine&, const SourceLoc&, ParseStatus& );
+static std::unique_ptr<Stmt>parse_extern(ParseLine&, const SourceLoc&,
+        ParseStatus& );
+static std::unique_ptr<Stmt>parse_public(ParseLine&, const SourceLoc&,
+        ParseStatus& );
+static std::unique_ptr<Stmt>parse_global(ParseLine&, const SourceLoc&,
+        ParseStatus& );
+static std::unique_ptr<Stmt>parse_module(ParseLine&, const SourceLoc&,
+        ParseStatus& );
+static std::unique_ptr<Stmt>parse_section(ParseLine&, const SourceLoc&,
+        ParseStatus& );
+static std::unique_ptr<Stmt>parse_org(ParseLine&, const SourceLoc&,
+                                      ParseStatus& );
+static std::unique_ptr<Stmt>parse_defc(ParseLine&, const SourceLoc&,
+                                       ParseStatus& );
 
 static const std::unordered_map<Keyword, DirectiveParseFn> directive_table = {
     { Keyword::EXTERN,  parse_extern },
@@ -63,22 +72,26 @@ static const std::unordered_map<Keyword, DirectiveParseFn> directive_table = {
     { Keyword::DEFC,    parse_defc },
 };
 
-static std::unique_ptr<Stmt> parse_extern(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_extern(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     return parse_identifier_list<ExternStmt>(pline, loc, status);
 }
 
-static std::unique_ptr<Stmt> parse_public(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_public(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     return parse_identifier_list<PublicStmt>(pline, loc, status);
 }
 
-static std::unique_ptr<Stmt> parse_global(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_global(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     return parse_identifier_list<GlobalStmt>(pline, loc, status);
 }
 
-static std::unique_ptr<Stmt> parse_module(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_module(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     if (pline.peek().type != TokenType::Identifier) {
         pline.error("Identifier expected");
@@ -91,7 +104,8 @@ static std::unique_ptr<Stmt> parse_module(ParseLine& pline, const SourceLoc& loc
     return std::make_unique<ModuleStmt>(loc, name_id);
 }
 
-static std::unique_ptr<Stmt> parse_section(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_section(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     if (pline.peek().type != TokenType::Identifier) {
         pline.error("Identifier expected");
@@ -153,7 +167,8 @@ static std::unique_ptr<Stmt> parse_defc(ParseLine& pline, const SourceLoc& loc,
     return std::make_unique<DefcStmt>(loc, name_id, std::move(expr));
 }
 
-std::unique_ptr<Stmt> parse_directive(ParseLine& pline, const SourceLoc& loc, ParseStatus& status) {
+std::unique_ptr<Stmt> parse_directive(ParseLine& pline, const SourceLoc& loc,
+                                      ParseStatus& status) {
     if (pline.eol()) {
         return nullptr;
     }

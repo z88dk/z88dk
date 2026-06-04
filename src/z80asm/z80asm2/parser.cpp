@@ -23,16 +23,20 @@
 
 std::unique_ptr<LabelStmt> parse_label(ParseLine& pline) {
     // .label
-    if (pline.peek().type == TokenType::Dot && pline.peek(1).type == TokenType::Identifier) {
-        auto label = std::make_unique<LabelStmt>(pline.peek(1).text_id, pline.peek().loc);
+    if (pline.peek().type == TokenType::Dot
+            && pline.peek(1).type == TokenType::Identifier) {
+        auto label = std::make_unique<LabelStmt>(pline.peek(1).text_id,
+                     pline.peek().loc);
         pline.advance();
         pline.advance();
         return label;
     }
 
     // .label@local
-    if (pline.peek().type == TokenType::Dot && pline.peek(1).type == TokenType::LocalLabel) {
-        auto label = std::make_unique<LabelStmt>(pline.peek(1).text_id, pline.peek().loc);
+    if (pline.peek().type == TokenType::Dot
+            && pline.peek(1).type == TokenType::LocalLabel) {
+        auto label = std::make_unique<LabelStmt>(pline.peek(1).text_id,
+                     pline.peek().loc);
         label->is_local = true;
         label->at_pos = pline.peek(1).value.label_at_pos;
         pline.advance();
@@ -41,16 +45,20 @@ std::unique_ptr<LabelStmt> parse_label(ParseLine& pline) {
     }
 
     // label:
-    if (pline.peek().type == TokenType::Identifier && pline.peek(1).type == TokenType::Colon) {
-        auto label = std::make_unique<LabelStmt>(pline.peek().text_id, pline.peek().loc);
+    if (pline.peek().type == TokenType::Identifier
+            && pline.peek(1).type == TokenType::Colon) {
+        auto label = std::make_unique<LabelStmt>(pline.peek().text_id,
+                     pline.peek().loc);
         pline.advance();
         pline.advance();
         return label;
     }
 
     // label@local:
-    if (pline.peek().type == TokenType::LocalLabel && pline.peek(1).type == TokenType::Colon) {
-        auto label = std::make_unique<LabelStmt>(pline.peek().text_id, pline.peek().loc);
+    if (pline.peek().type == TokenType::LocalLabel
+            && pline.peek(1).type == TokenType::Colon) {
+        auto label = std::make_unique<LabelStmt>(pline.peek().text_id,
+                     pline.peek().loc);
         label->is_local = true;
         label->at_pos = pline.peek().value.label_at_pos;
         pline.advance();
@@ -61,7 +69,8 @@ std::unique_ptr<LabelStmt> parse_label(ParseLine& pline) {
     return nullptr;
 }
 
-static const TrieTransition* binary_search_transition(size_t node, TrieToken key) {
+static const TrieTransition* binary_search_transition(size_t node,
+        TrieToken key) {
     const TrieNode& nd = opcodes_parse_trie_nodes[node];
 
     size_t base = nd.first_transition;
@@ -346,7 +355,8 @@ static std::unique_ptr<OpcodeStmt> interpret_parse_bytecode(OpcodesMatch& match,
     return opcode_stmt;
 }
 
-static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline,
+        const SourceLoc& loc,
         ParseStatus& status) {
     auto m = recognize_opcode(pline, status);
     if (!m.matched) {
@@ -356,7 +366,8 @@ static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline, const SourceLo
     return opcode_stmt;
 }
 
-static void parse_line(const std::vector<LogicalLine>& asm_lines, size_t& line_idx,
+static void parse_line(const std::vector<LogicalLine>& asm_lines,
+                       size_t& line_idx,
                        std::unique_ptr<Program>& prog) {
     ParseLine pline(asm_lines[line_idx].tokens);
     ParseStatus status = ParseStatus::Ok;

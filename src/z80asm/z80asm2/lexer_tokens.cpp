@@ -43,7 +43,8 @@ Token Token::identifier(std::string_view ident, const SourceLoc& loc) {
     return t;
 }
 
-Token Token::local_label(std::string_view ident, size_t at_pos, const SourceLoc& loc) {
+Token Token::local_label(std::string_view ident, size_t at_pos,
+                         const SourceLoc& loc) {
     Token t;
     t.type = TokenType::LocalLabel;
     t.text_id = g_strings.intern(ident);
@@ -177,7 +178,8 @@ const Token& ParseLine::peek(size_t offset) const {
     else {
         // point to after last token for better error messages when the expression is exhausted
         eol_token.loc = tokens.back().loc;
-        eol_token.loc.column += static_cast<uint16_t>(g_strings.view(tokens.back().text_id).size());
+        eol_token.loc.column += static_cast<uint16_t>(g_strings.view(
+                                    tokens.back().text_id).size());
     }
 
     return eol_token;

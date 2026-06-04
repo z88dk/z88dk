@@ -603,7 +603,8 @@ static void hla_lower_if(const HLA_If& node, std::vector<LogicalLine>& out) {
 // ------------------------------------------------------------
 // WHILE lowering
 // ------------------------------------------------------------
-static void hla_lower_while(const HLA_While& node, std::vector<LogicalLine>& out) {
+static void hla_lower_while(const HLA_While& node,
+                            std::vector<LogicalLine>& out) {
     if (node.never_runs) {
         // Completely dead loop
         return;
@@ -634,7 +635,8 @@ static void hla_lower_while(const HLA_While& node, std::vector<LogicalLine>& out
 // ------------------------------------------------------------
 // REPEAT lowering
 // ------------------------------------------------------------
-static void hla_lower_repeat(const HLA_Repeat& node, std::vector<LogicalLine>& out) {
+static void hla_lower_repeat(const HLA_Repeat& node,
+                             std::vector<LogicalLine>& out) {
     place_label(node.top_label, node.loc, out);
 
     // Continue inside REPEAT must jump to the bottom test/decrement point.
@@ -697,7 +699,8 @@ static void hla_lower_break(const HLA_Break& n, std::vector<LogicalLine>& out) {
     }
 }
 
-static void hla_lower_continue(const HLA_Continue& n, std::vector<LogicalLine>& out) {
+static void hla_lower_continue(const HLA_Continue& n,
+                               std::vector<LogicalLine>& out) {
     assert(!g_loop_stack.empty());
 
     if (n.condition) {

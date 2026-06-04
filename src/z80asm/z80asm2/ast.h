@@ -57,14 +57,16 @@ struct ExprLiteralAsmpc : Expr {
 
 struct ExprSymbol : Expr {
     StringInterner::Id name_id;
-    ExprSymbol(StringInterner::Id name_id_, const SourceLoc& loc) : Expr(loc), name_id(name_id_) {}
+    ExprSymbol(StringInterner::Id name_id_, const SourceLoc& loc) : Expr(loc),
+        name_id(name_id_) {}
     void dump(DumpContext ctx) const override;
 };
 
 struct ExprLocalLabel : Expr {
     StringInterner::Id name_id;
     size_t at_pos;  // position of '@' in the original identifier
-    ExprLocalLabel(StringInterner::Id name_id_, size_t at_pos_, const SourceLoc& loc)
+    ExprLocalLabel(StringInterner::Id name_id_, size_t at_pos_,
+                   const SourceLoc& loc)
         : Expr(loc), name_id(name_id_), at_pos(at_pos_) {}
     void dump(DumpContext ctx) const override;
 };
@@ -80,7 +82,8 @@ struct ExprUnary : Expr {
 struct ExprBinary : Expr {
     TokenType op;
     std::unique_ptr<Expr> lhs, rhs;
-    ExprBinary(TokenType op_, std::unique_ptr<Expr> lhs_, std::unique_ptr<Expr> rhs_,
+    ExprBinary(TokenType op_, std::unique_ptr<Expr> lhs_,
+               std::unique_ptr<Expr> rhs_,
                const SourceLoc& loc)
         : Expr(loc), op(op_), lhs(std::move(lhs_)), rhs(std::move(rhs_)) {}
     void dump(DumpContext ctx) const override;
@@ -88,16 +91,19 @@ struct ExprBinary : Expr {
 
 struct ExprTernary : Expr {
     std::unique_ptr<Expr> cond, then_expr, else_expr;
-    ExprTernary(std::unique_ptr<Expr> c, std::unique_ptr<Expr> t, std::unique_ptr<Expr> e,
+    ExprTernary(std::unique_ptr<Expr> c, std::unique_ptr<Expr> t,
+                std::unique_ptr<Expr> e,
                 const SourceLoc& loc)
-        : Expr(loc), cond(std::move(c)), then_expr(std::move(t)), else_expr(std::move(e)) {}
+        : Expr(loc), cond(std::move(c)), then_expr(std::move(t)),
+          else_expr(std::move(e)) {}
     void dump(DumpContext ctx) const override;
 };
 
 struct ExprCallUnary : Expr {
     Keyword keyword;
     std::unique_ptr<Expr> arg;
-    ExprCallUnary(Keyword keyword_, std::unique_ptr<Expr> arg_, const SourceLoc& loc)
+    ExprCallUnary(Keyword keyword_, std::unique_ptr<Expr> arg_,
+                  const SourceLoc& loc)
         : Expr(loc), keyword(keyword_), arg(std::move(arg_)) {}
     void dump(DumpContext ctx) const override;
 };
@@ -147,7 +153,8 @@ struct Patch : Expr {
     bool is_constant = false;       // true for %c patches, e.g. IM %c or BIT %c, r
 
     PatchType type = PatchType::Unsigned;       // type of patch
-    CheckRange validation = CheckRange::Is_any; // validation rule for constant expressions
+    CheckRange validation =
+        CheckRange::Is_any; // validation rule for constant expressions
     ExprFormula formula = ExprFormula::None;    // formula constant expressions
     std::vector<uint8_t> coefs;                 // coeficients for formula A..G
 
@@ -173,7 +180,8 @@ struct OpcodeStmt : Stmt {
     uint32_t address = 0;           // defined after layout
     bool is_short_jump = false;     // true if patches has a short jump
 
-    std::vector<uint8_t> bytes;     // opcode bytes, including placeholders for expressions
+    std::vector<uint8_t>
+    bytes;     // opcode bytes, including placeholders for expressions
     std::vector<std::unique_ptr<Patch>> patches;    // instruction patches
 
     OpcodeStmt(const SourceLoc& loc) : Stmt(loc) {}

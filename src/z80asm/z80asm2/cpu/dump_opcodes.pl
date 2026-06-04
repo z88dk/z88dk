@@ -74,7 +74,8 @@ sub replace_const {
 
     my $opcode1 = clone $opcode;    # deep copy
 
-    my $c_str = ( $opcode1->{asm} =~ /rst/ || $c >= 10 ) ? sprintf( "%02Xh", $c ) : $c;
+    my $c_str =
+        ( $opcode1->{asm} =~ /rst/ || $c >= 10 ) ? sprintf( "%02Xh", $c ) : $c;
     $opcode1->{asm} =~ s/%c/$c_str/;
 
     for my $op ( @{ $opcode1->ops } ) {
@@ -111,7 +112,8 @@ sub make_opcode_table {
 sub make_hex_table {
     my ($opcodes) = @_;
     my $tb =
-        Text::Table->new( $sep, "Assembly", $sep, "CPU", $sep, "Synth", $sep, "Opcodes", $sep );
+        Text::Table->new( $sep, "Assembly", $sep, "CPU", $sep, "Synth", $sep,
+        "Opcodes", $sep );
 
     for my $asm ( sort keys %{ $opcodes->opcodes } ) {
         for my $cpu ( sort keys %{ $opcodes->opcodes->{$asm} } ) {
