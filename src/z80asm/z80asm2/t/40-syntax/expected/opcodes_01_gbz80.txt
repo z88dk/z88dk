@@ -4,9 +4,6 @@ Assembling t/40-syntax/input/opcodes_01.asm...
 t/40-syntax/input/opcodes_01.asm:6:1: error: Unrecognized instruction or directive
     altd ioe bit 0, (ix)    ; long opcode, but valid in some CPUs
     ^
-t/40-syntax/input/opcodes_01.asm:7:1: error: Unrecognized instruction or directive
-    ldir                    ; invalid opcode in some CPUs, but valid in others
-    ^
 t/40-syntax/input/opcodes_01.asm:8:1: error: Unrecognized instruction or directive
     dwjnz label             ; invalid opcode in some CPUs, but valid in others
     ^
@@ -37,6 +34,9 @@ t/40-syntax/input/opcodes_01.asm:25:6: error: Unrecognized instruction or direct
 t/40-syntax/input/opcodes_01.asm:28:1: error: Unrecognized instruction or directive
     jre label               ; PCrelative
     ^
+t/40-syntax/input/opcodes_01.asm:44:8: error: Unterminated expression after "+"
+    ld a, 1+                ; error in expression
+           ^
 Program
     LabelStmt
         Location: t/40-syntax/input/opcodes_01.asm:1:1
@@ -76,6 +76,9 @@ Program
                             ExprSymbol: b
                         RHS:
                             ExprLiteralInt: 1
+    ExternStmt
+        Location: t/40-syntax/input/opcodes_01.asm:7:1
+        Names: __z80asm__ldir
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:7:1
         Address: 0

@@ -20,6 +20,9 @@ t/40-syntax/input/opcodes_01.asm:23:1: error: Unrecognized instruction or direct
 t/40-syntax/input/opcodes_01.asm:24:1: error: Unrecognized instruction or directive
     ldh (0xFF01), a         ; HighByte
     ^
+t/40-syntax/input/opcodes_01.asm:44:8: error: Unterminated expression after "+"
+    ld a, 1+                ; error in expression
+           ^
 Program
     LabelStmt
         Location: t/40-syntax/input/opcodes_01.asm:1:1
