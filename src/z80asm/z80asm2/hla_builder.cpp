@@ -40,21 +40,16 @@ bool HLA_ProgramBuilder::handle_directive(ParseLine& line) {
     if (line.peek().type != TokenType::Modulo) {
         return false;
     }
-    line.pos++; // consume '%'
+    line.advance(); // consume '%'
 
     Keyword kw = line.peek().keyword;
     SourceLoc kw_loc = line.peek().loc;
 
-    if (!keyword_is_hla_directive(kw)) {
-        return false;
-    }
-
-    line.pos++; // consume directive
     auto it = HLA_ProgramBuilder::directive_handlers.find(kw);
     if (it == HLA_ProgramBuilder::directive_handlers.end()) {
-        g_diag.error(kw_loc, "Unsupported HLA directive: " + to_string(kw));
         return false;
     }
+    line.advance(); // consume directive
 
     // call handler method
     (this->*(it->second))(kw, kw_loc, line);
@@ -286,7 +281,7 @@ void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
     }
 
     Keyword reg_kw = line.peek().keyword;
-    line.pos++;
+    line.advance();
 
     if (!line.check_end_of_line()) {
         return; // error already reported by check_end_of_line
@@ -313,7 +308,7 @@ void HLA_ProgramBuilder::handle_break(Keyword kw, const SourceLoc& kw_loc,
 
     // Check for optional IF condition
     if (line.peek().keyword == Keyword::IF) {
-        line.pos++; // consume IF
+        line.advance(); // consume IF
         node->condition = parse_condition(line);
         if (!node->condition) {
             return; // error already reported by parse_condition
@@ -340,7 +335,7 @@ void HLA_ProgramBuilder::handle_continue(Keyword kw, const SourceLoc& kw_loc,
 
     // Check for optional IF condition
     if (line.peek().keyword == Keyword::IF) {
-        line.pos++; // consume IF
+        line.advance(); // consume IF
         node->condition = parse_condition(line);
         if (!node->condition) {
             return; // error already reported by parse_condition
@@ -364,7 +359,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_or(ParseLine& line) {
         return nullptr;
     }
     while (line.peek().type == TokenType::LogicalOr) {
-        line.pos++; // consume '||'
+        line.advance(); // consume '||'
         auto right = parse_and(line);
         if (!right) {
             return nullptr;
@@ -384,7 +379,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_and(ParseLine& line) {
         return nullptr;
     }
     while (line.peek().type == TokenType::LogicalAnd) {
-        line.pos++; // consume '&&'
+        line.advance(); // consume '&&'
         auto right = parse_not(line);
         if (!right) {
             return nullptr;
@@ -400,7 +395,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_and(ParseLine& line) {
 
 std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_not(ParseLine& line) {
     if (line.peek().type == TokenType::LogicalNot) {
-        line.pos++; // consume '!'
+        line.advance(); // consume '!'
         auto child = parse_not(line);
         if (!child) {
             return nullptr;
@@ -418,14 +413,14 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
     if (line.peek().keyword == Keyword::TRUE) {
         auto node = std::make_unique<HLA_True>();
         node->loc = line.peek().loc;
-        line.pos++;
+        line.advance();
         return node;
     }
 
     if (line.peek().keyword == Keyword::FALSE) {
         auto node = std::make_unique<HLA_False>();
         node->loc = line.peek().loc;
-        line.pos++;
+        line.advance();
         return node;
     }
 
@@ -436,7 +431,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
         auto node = std::make_unique<HLA_FlagExpr>();
         node->loc = line.peek().loc;
         node->flag_token = line.peek();
-        line.pos++;
+        line.advance();
         return node;
     }
 
@@ -447,7 +442,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
     }
 
     if (line.peek().type == TokenType::LeftParen) {
-        line.pos++; // consume '('
+        line.advance(); // consume '('
         auto node = parse_condition(line);
         if (!node) {
             return nullptr;
@@ -456,7 +451,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
             line.error("Expected ')'");
             return nullptr;
         }
-        line.pos++; // consume ')'
+        line.advance(); // consume ')'
         return node;
     }
 
@@ -488,32 +483,32 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(ParseLine& line) 
     switch (op_tok.type) {
     case TokenType::LT:
         node->op = HLA_CompareExpr::Type::UnsignedLT;
-        line.pos++;
+        line.advance();
         break;
 
     case TokenType::LE:
         node->op = HLA_CompareExpr::Type::UnsignedLE;
-        line.pos++;
+        line.advance();
         break;
 
     case TokenType::GT:
         node->op = HLA_CompareExpr::Type::UnsignedGT;
-        line.pos++;
+        line.advance();
         break;
 
     case TokenType::GE:
         node->op = HLA_CompareExpr::Type::UnsignedGE;
-        line.pos++;
+        line.advance();
         break;
 
     case TokenType::EQ:
         node->op = HLA_CompareExpr::Type::EQ;
-        line.pos++;
+        line.advance();
         break;
 
     case TokenType::NE:
         node->op = HLA_CompareExpr::Type::NE;
-        line.pos++;
+        line.advance();
         break;
 
     case TokenType::Identifier:
