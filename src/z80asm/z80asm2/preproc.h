@@ -270,6 +270,12 @@ private:
     void process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
                             StringInterner::Id name_id, const SourceLoc& name_loc,
                             ParseLine& input_line);
+    void process_name_DEFC(Keyword kw, const SourceLoc& kw_loc,
+                           StringInterner::Id name_id, const SourceLoc& name_loc,
+                           ParseLine& input_line);
+    void process_name_EQU(Keyword kw, const SourceLoc& kw_loc,
+                          StringInterner::Id name_id, const SourceLoc& name_loc,
+                          ParseLine& input_line);
     void do_REPTC(Keyword kw, const SourceLoc& kw_loc,
                   StringInterner::Id name_id, const SourceLoc& name_loc,
                   ParseLine& input_line);
