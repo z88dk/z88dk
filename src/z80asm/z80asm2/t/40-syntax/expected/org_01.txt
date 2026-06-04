@@ -1,0 +1,27 @@
+% z88dk-z80asm -v -dump-after-parse t/40-syntax//input/org_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/40-syntax/input/org_01.asm...
+t/40-syntax/input/org_01.asm:1:1: error: Unterminated expression after "org"
+    org
+    ^
+t/40-syntax/input/org_01.asm:2:7: error: Unexpected token: ","
+    org 10,
+          ^
+Program
+    OrgStmt
+        Location: t/40-syntax/input/org_01.asm:2:1
+        Expression:
+            ExprLiteralInt: $0A
+    OrgStmt
+        Location: t/40-syntax/input/org_01.asm:3:1
+        Expression:
+            ExprBinary: +
+                LHS:
+                    ExprLiteralInt: 1
+                RHS:
+                    ExprBinary: *
+                        LHS:
+                            ExprLiteralInt: 2
+                        RHS:
+                            ExprLiteralInt: 3
