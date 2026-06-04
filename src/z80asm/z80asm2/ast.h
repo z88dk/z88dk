@@ -190,6 +190,70 @@ struct LabelStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
+struct OrgStmt : Stmt {
+    std::unique_ptr<Expr> expr;
+
+    OrgStmt(SourceLoc loc, std::unique_ptr<Expr> e)
+        : Stmt(loc), expr(std::move(e)) {}
+    virtual ~OrgStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct DefcStmt : Stmt {
+    StringInterner::Id name_id;
+    std::unique_ptr<Expr> expr;
+
+    DefcStmt(SourceLoc loc, StringInterner::Id name_id_, std::unique_ptr<Expr> e)
+        : Stmt(loc), name_id(name_id_), expr(std::move(e)) {}
+    virtual ~DefcStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct ExternStmt : Stmt {
+    std::vector<StringInterner::Id> name_ids;
+    ExternStmt(SourceLoc loc, std::vector<StringInterner::Id> n)
+        : Stmt(loc), name_ids(std::move(n)) {}
+
+    virtual ~ExternStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct PublicStmt : Stmt {
+    std::vector<StringInterner::Id> name_ids;
+    PublicStmt(SourceLoc loc, std::vector<StringInterner::Id> n)
+        : Stmt(loc), name_ids(std::move(n)) {}
+
+    virtual ~PublicStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct GlobalStmt : Stmt {
+    std::vector<StringInterner::Id> name_ids;
+    GlobalStmt(SourceLoc loc, std::vector<StringInterner::Id> n)
+        : Stmt(loc), name_ids(std::move(n)) {}
+
+    virtual ~GlobalStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct ModuleStmt : Stmt {
+    StringInterner::Id name_id;
+
+    ModuleStmt(SourceLoc loc, StringInterner::Id name_id_)
+        : Stmt(loc), name_id(name_id_) {}
+    virtual ~ModuleStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct SectionStmt : Stmt {
+    StringInterner::Id name_id;
+
+    SectionStmt(SourceLoc loc, StringInterner::Id name_id_)
+        : Stmt(loc), name_id(name_id_) {}
+    virtual ~SectionStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
 // root of the AST
 struct Program : AstNode {
     std::vector<std::unique_ptr<Stmt>> stmts;

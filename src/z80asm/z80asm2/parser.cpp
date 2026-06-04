@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
+#include "directives.h"
 #include "expr.h"
 #include "lexer_tokens.h"
 #include "opcodes.h"
@@ -12,6 +13,7 @@
 #include "opcodes_trie_token.h"
 #include "options.h"
 #include "parser.h"
+#include "source_loc.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -102,10 +104,11 @@ struct ChoicePoint {
     size_t expr_count;   // how many expressions were pushed so far
 };
 
-static OpcodesMatch recognize_opcode(ParseLine& pline) {
+static OpcodesMatch recognize_opcode(ParseLine& pline, ParseStatus& status) {
     OpcodesMatch res;
     size_t node = 0;
     const TrieTransition* tr = nullptr;
+    status = ParseStatus::Ok;
 
     // backtracking stack for handling multiple possible transitions
     std::vector<ChoicePoint> backtrack_stack;
@@ -188,14 +191,20 @@ next_transition:
 
             case ChoicePoint::Type::Expr: {
                 size_t start = pline.pos;
-                auto expr = parse_expression_ast(pline);
+                auto expr = parse_expression_ast(pline, status);
+                if (status == ParseStatus::FatalError) {
+                    return res;    // stop immediately on error
+                }
+
                 if (!expr) {
                     continue;   // backtrack
                 }
+
                 size_t end = pline.pos;
                 if (end == start) {
                     continue;   // backtrack
                 }
+
                 res.exprs.push_back(std::move(expr));
                 node = tr->next_node;
                 goto next_transition;
@@ -337,8 +346,9 @@ static std::unique_ptr<OpcodeStmt> interpret_parse_bytecode(OpcodesMatch& match,
     return opcode_stmt;
 }
 
-static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline, const SourceLoc& loc) {
-    auto m = recognize_opcode(pline);
+static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline, const SourceLoc& loc,
+        ParseStatus& status) {
+    auto m = recognize_opcode(pline, status);
     if (!m.matched) {
         return nullptr;
     }
@@ -349,6 +359,7 @@ static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline, const SourceLo
 static void parse_line(const std::vector<LogicalLine>& asm_lines, size_t& line_idx,
                        std::unique_ptr<Program>& prog) {
     ParseLine pline(asm_lines[line_idx].tokens);
+    ParseStatus status = ParseStatus::Ok;
 
     // skip empty lines
     if (pline.eol()) {
@@ -369,11 +380,25 @@ static void parse_line(const std::vector<LogicalLine>& asm_lines, size_t& line_i
 
     // check for directives
     pline.pos = pos0;
-    // ...
+    status = ParseStatus::Ok;
+    auto dir_stmt = parse_directive(pline, asm_lines[line_idx].loc, status);
+    if (status == ParseStatus::FatalError) {
+        return;
+    }
+
+    if (dir_stmt) {
+        pline.check_end_of_line();
+        prog->stmts.push_back(std::move(dir_stmt));
+        return;
+    }
 
     // check for opcode
     pline.pos = pos0;
-    auto opcode_stmt = parse_opcode(pline, asm_lines[line_idx].loc);
+    status = ParseStatus::Ok;
+    auto opcode_stmt = parse_opcode(pline, asm_lines[line_idx].loc, status);
+    if (status == ParseStatus::FatalError) {
+        return;
+    }
     if (!opcode_stmt) {
         pline.error("Unrecognized instruction or directive");
         return;
