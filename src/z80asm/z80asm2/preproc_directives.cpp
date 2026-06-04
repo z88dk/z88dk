@@ -78,6 +78,8 @@ Preproc::name_directive_handlers = {
     { Keyword::LOCAL,    &Preproc::process_name_LOCAL },
     { Keyword::REPTI,    &Preproc::process_name_REPTI },
     { Keyword::REPTC,    &Preproc::process_name_REPTC },
+    { Keyword::DEFC,     &Preproc::process_name_DEFC },
+    { Keyword::EQU,      &Preproc::process_name_EQU },
 };
 
 //-----------------------------------------------------------------------------
@@ -1397,6 +1399,37 @@ void Preproc::process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
                                  StringInterner::Id name_id, const SourceLoc& name_loc,
                                  ParseLine& input_line) {
     do_REPTC(kw, kw_loc, name_id, name_loc, input_line);
+}
+
+void Preproc::process_name_DEFC(Keyword, const SourceLoc&,
+                                StringInterner::Id name_id,
+                                const SourceLoc& name_loc, ParseLine& input_line) {
+    // create DEFC <name> = <rest of line> and push to output queue
+    std::string defc_str = "DEFC " + g_strings.to_string(name_id) + " = ";
+    std::vector<Token> defc_tokens = tokenize_text(defc_str, name_loc);
+
+    // skip optional '='
+    if (input_line.peek().type == TokenType::EQ) {
+        input_line.advance();
+    }
+
+    // remove end-of-line token from defc_tokens if present, since we will append
+    if (!defc_tokens.empty() && defc_tokens.back().type == TokenType::EndOfLine) {
+        defc_tokens.pop_back();
+    }
+    defc_tokens.insert(defc_tokens.end(),
+                       input_line.tokens.begin() + input_line.pos, input_line.tokens.end());
+
+    // push line to output queue
+    LogicalLine defc_line(name_loc);
+    defc_line.tokens = std::move(defc_tokens);
+    assembler_output_queue.push_back(std::move(defc_line));
+}
+
+void Preproc::process_name_EQU(Keyword kw, const SourceLoc& kw_loc,
+                               StringInterner::Id name_id,
+                               const SourceLoc& name_loc, ParseLine& input_line) {
+    process_name_DEFC(kw, kw_loc, name_id, name_loc, input_line);
 }
 
 void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
