@@ -261,7 +261,8 @@ static int parse_int_from_chars(std::string_view s, int base) {
 void tokenize_scan_line(const ScanLine& line,
                         TokenizeState& state,
                         std::vector<Token>& out) {
-    bool raw_strings = false;  // whether to treat string literals as raw (no escapes)
+    bool raw_strings =
+        false;  // whether to treat string literals as raw (no escapes)
 
     const char* p = line.text.c_str();
     const char* limit = p + line.text.size();

@@ -276,7 +276,8 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted, ParseStatus& status) {
 }
 
 template <typename Sem>
-bool led(ParseLine& pline, Sem& sem, Token op, bool restricted, ParseStatus& status) {
+bool led(ParseLine& pline, Sem& sem, Token op, bool restricted,
+         ParseStatus& status) {
 
     // ternary operator
     if (op.type == TokenType::Question) {
@@ -317,7 +318,8 @@ bool led(ParseLine& pline, Sem& sem, Token op, bool restricted, ParseStatus& sta
 }
 
 template <typename Sem>
-bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp, bool restricted,
+bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp,
+                           bool restricted,
                            ParseStatus& status) {
 
     if (!nud(pline, sem, restricted, status)) {
@@ -389,4 +391,5 @@ bool parse_expression_span(ParseLine& pline);
 // Semantic context for AST builder expression parsing
 //-----------------------------------------------------------------------------
 
-std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline, ParseStatus& status);
+std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline,
+        ParseStatus& status);
