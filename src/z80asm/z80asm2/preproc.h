@@ -14,6 +14,7 @@
 #include "string_interner.h"
 #include <deque>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 static const int MAX_EXPANSION_DEPTH = 1000;
@@ -157,13 +158,18 @@ private:
     using DirectiveHandler =
         void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
                           ParseLine& input_line);
-    static std::unordered_map<Keyword, DirectiveHandler> directive_handlers_;
+    static std::unordered_map<Keyword, DirectiveHandler> directive_handlers;
+    static std::unordered_map<Keyword, DirectiveHandler> conditional_handlers;
 
     using NameDirectiveHandler =
         void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
                           StringInterner::Id name_id, const SourceLoc& name_loc,
                           ParseLine& input_line);
-    static std::unordered_map<Keyword, NameDirectiveHandler> name_directive_handlers_;
+    static std::unordered_map<Keyword, NameDirectiveHandler> name_directive_handlers;
+
+    static bool is_directive_keyword(Keyword kw);
+    static bool is_conditional_directive_keyword(Keyword kw);
+    static bool is_name_directive_keyword(Keyword kw);
 
     // main driver for directive processing: classifies line and
     // dispatches to handlers
