@@ -322,6 +322,8 @@ private:
     void process_ASSUME(Keyword kw, const SourceLoc& kw_loc,
                         ParseLine& pline);
     void do_ASSUME(bool adl_value, const SourceLoc& kw_loc);
+    void process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
+                          ParseLine& pline);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
