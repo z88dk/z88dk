@@ -31,7 +31,9 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::DEFB,      &Parser::parse_BYTE },
     { Keyword::DEFC,      &Parser::parse_DEFC },
     { Keyword::DEFM,      &Parser::parse_BYTE },
+    { Keyword::DEFW,      &Parser::parse_WORD },
     { Keyword::DM,        &Parser::parse_BYTE },
+    { Keyword::DW,        &Parser::parse_WORD },
     { Keyword::EXTERN,    &Parser::parse_EXTERN },
     { Keyword::GLOBAL,    &Parser::parse_GLOBAL },
     { Keyword::MODULE,    &Parser::parse_MODULE },
@@ -39,6 +41,7 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::PRAGMA,    &Parser::parse_PRAGMA },
     { Keyword::PUBLIC,    &Parser::parse_PUBLIC },
     { Keyword::SECTION,   &Parser::parse_SECTION },
+    { Keyword::WORD,      &Parser::parse_WORD }
 };
 
 std::unique_ptr<Stmt> Parser::parse_directive(ParseLine& pline,
@@ -369,6 +372,50 @@ std::unique_ptr<Stmt> Parser::parse_BYTE(ParseLine& pline, const SourceLoc& loc,
         }
         else {
             break;  // end of byte list
+        }
+    }
+
+    if (!pline.check_end_of_line()) {
+        status = ParseStatus::FatalError;
+        return nullptr;    // error already reported
+    }
+
+    return stmt;
+}
+
+std::unique_ptr<Stmt> Parser::parse_WORD(ParseLine& pline, const SourceLoc& loc,
+        ParseStatus& status) {
+    // create statement with empty byte list, and fill it with expressions until end of line
+    auto stmt = std::make_unique<OpcodeStmt>(loc);
+
+    while (true) {
+        // parse expression as a byte literal
+        auto expr = parse_expression_ast(pline, status);
+        if (status == ParseStatus::FatalError) {
+            return nullptr;    // stop immediately on error
+        }
+
+        if (!expr) {
+            pline.error("Expression expected");
+            status = ParseStatus::FatalError;
+            return nullptr;
+        }
+
+        auto patch = std::make_unique<Patch>(std::move(expr), loc);
+        patch->offset = stmt->bytes.size();
+        patch->size = 2;
+        patch->is_constant = false;
+        patch->type = PatchType::Unsigned;
+
+        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
+        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
+        stmt->patches.push_back(std::move(patch));
+
+        if (pline.peek().type == TokenType::Comma) {
+            pline.advance(); // consume ','
+        }
+        else {
+            break;  // end of word list
         }
     }
 
