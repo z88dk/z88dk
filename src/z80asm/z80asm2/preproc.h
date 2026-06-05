@@ -324,6 +324,18 @@ private:
     void do_ASSUME(bool adl_value, const SourceLoc& kw_loc);
     void process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
                           ParseLine& pline);
+    void do_CU_args(Keyword kw, const SourceLoc& kw_loc,
+                    ParseLine& pline);
+    void do_CU_fixed(Keyword kw, const SourceLoc& kw_loc,
+                     ParseLine& pline, int value);
+    void process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
+                         ParseLine& pline);
+    void process_CU_MOVE(Keyword kw, const SourceLoc& kw_loc,
+                         ParseLine& pline);
+    void process_CU_STOP(Keyword kw, const SourceLoc& kw_loc,
+                         ParseLine& pline);
+    void process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
+                        ParseLine& pline);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
@@ -346,7 +358,7 @@ private:
                                          locals);
 
     // macro expansion: takes a logical line with macro invocation tokens and
-    // expands it, pushing resulting lines to macro_work_queue
+    // expands it
     void expand_line(const LogicalLine& in, std::vector<Token>& out_tokens);
 
     // split lines on colons and backslashes

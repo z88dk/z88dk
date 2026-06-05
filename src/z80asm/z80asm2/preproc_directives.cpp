@@ -54,6 +54,10 @@ Preproc::directive_handlers = {
     { Keyword::REPTI,      &Preproc::process_REPTI },
     { Keyword::UNDEF,      &Preproc::process_UNDEF },
     { Keyword::UNDEFINE,   &Preproc::process_UNDEF },
+    { Keyword::CU_WAIT,    &Preproc::process_CU_WAIT },
+    { Keyword::CU_MOVE,    &Preproc::process_CU_MOVE },
+    { Keyword::CU_STOP,    &Preproc::process_CU_STOP },
+    { Keyword::CU_NOP,     &Preproc::process_CU_NOP },
 };
 
 std::unordered_map<Keyword, Preproc::DirectiveHandler>
@@ -158,6 +162,46 @@ bool Preproc::is_directive(ParseLine& pline,
         out_kw = Keyword::ASSUME;
         out_kw_loc = pline.peek(1).loc;
         pline.pos += 2; // consume '.' and 'ASSUME'
+        return true;
+    }
+
+    // Spectrum Next copper unit directive
+    if (pline.peek().keyword == Keyword::CU &&
+            pline.peek(1).type == TokenType::Dot &&
+            pline.peek(2).keyword == Keyword::WAIT) {
+        out_kw = Keyword::CU_WAIT;
+        out_kw_loc = pline.peek(1).loc;
+        pline.pos += 3; // consume 'CU', '.' and 'WAIT'
+        return true;
+    }
+
+    // Spectrum Next copper unit directive
+    if (pline.peek().keyword == Keyword::CU &&
+            pline.peek(1).type == TokenType::Dot &&
+            pline.peek(2).keyword == Keyword::MOVE) {
+        out_kw = Keyword::CU_MOVE;
+        out_kw_loc = pline.peek(1).loc;
+        pline.pos += 3; // consume 'CU', '.' and 'MOVE'
+        return true;
+    }
+
+    // Spectrum Next copper unit directive
+    if (pline.peek().keyword == Keyword::CU &&
+            pline.peek(1).type == TokenType::Dot &&
+            pline.peek(2).keyword == Keyword::STOP) {
+        out_kw = Keyword::CU_STOP;
+        out_kw_loc = pline.peek(1).loc;
+        pline.pos += 3; // consume 'CU', '.' and 'STOP'
+        return true;
+    }
+
+    // Spectrum Next copper unit directive
+    if (pline.peek().keyword == Keyword::CU &&
+            pline.peek(1).type == TokenType::Dot &&
+            pline.peek(2).keyword == Keyword::NOP) {
+        out_kw = Keyword::CU_NOP;
+        out_kw_loc = pline.peek(1).loc;
+        pline.pos += 3; // consume 'CU', '.' and 'NOP'
         return true;
     }
 
@@ -1903,6 +1947,96 @@ void Preproc::process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
 
     // push the macro lines to the work queue
     push_macro_expansion(0, std::move(macro_lines));
+}
+
+void Preproc::do_CU_args(Keyword kw, const SourceLoc& kw_loc,
+                         ParseLine& pline) {
+    // expand macros in the line first, so that arguments can be macros
+    LogicalLine in(kw_loc);
+    in.tokens.insert(in.tokens.end(),
+                     pline.tokens.begin() + pline.pos, pline.tokens.end());
+    std::vector<Token> expanded;
+    expand_line(in, expanded);
+    ParseLine expanded_pline(expanded);
+
+    // extract the two expressions
+    ParseStatus status = ParseStatus::Unknown;
+    size_t exprs_start = expanded_pline.pos;
+    auto expr1 = parse_expression_ast(expanded_pline, status);
+    if (status == ParseStatus::FatalError || !expr1) {
+        return;    // stop immediately on error
+    }
+
+    if (expanded_pline.peek().type != TokenType::Comma) {
+        g_diag.error(expanded_pline.peek().loc,
+                     "Expected comma between expressions in " + to_string(kw));
+        return;
+    }
+    expanded_pline.advance(); // consume comma
+
+    auto expr2 = parse_expression_ast(expanded_pline, status);
+    if (status == ParseStatus::FatalError || !expr2) {
+        return;    // stop immediately on error
+    }
+    size_t exprs_end = expanded_pline.pos;
+
+    if (!expanded_pline.check_end_of_line()) {
+        return;
+    }
+
+    // create a CU_xxxx statement with the two expressions as arguments
+    // and send it to the assembler output queue, as it cannot be expanded again
+    std::string cu_op_str = to_string(kw);
+    std::vector<Token> cu_op_tokens = tokenize_text(cu_op_str, kw_loc);
+
+    // remove end-of-line token from cu_op_tokens if present, since we will append
+    if (!cu_op_tokens.empty() && cu_op_tokens.back().type == TokenType::EndOfLine) {
+        cu_op_tokens.pop_back();
+    }
+    cu_op_tokens.insert(cu_op_tokens.end(),
+                        expanded_pline.tokens.begin() + exprs_start,
+                        expanded_pline.tokens.begin() + exprs_end);
+    cu_op_tokens.push_back(Token::end_of_line(kw_loc));
+
+    LogicalLine cu_op_line(kw_loc);
+    cu_op_line.tokens = std::move(cu_op_tokens);
+    assembler_output_queue.push_back(std::move(cu_op_line));
+}
+
+void Preproc::do_CU_fixed(Keyword, const SourceLoc& kw_loc, ParseLine& pline,
+                          int value) {
+    if (!pline.check_end_of_line()) {
+        return;
+    }
+
+    // create a CU_xxxx statement with the fixed value as argument
+    // and send it to the assembler output queue
+    std::string cu_op_str = "DEFW_BE " + int_to_hex(value);
+    std::vector<Token> cu_op_tokens = tokenize_text(cu_op_str, kw_loc);
+
+    LogicalLine cu_op_line(kw_loc);
+    cu_op_line.tokens = std::move(cu_op_tokens);
+    assembler_output_queue.push_back(std::move(cu_op_line));
+}
+
+void Preproc::process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    do_CU_args(kw, kw_loc, pline);
+}
+
+void Preproc::process_CU_MOVE(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    do_CU_args(kw, kw_loc, pline);
+}
+
+void Preproc::process_CU_STOP(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    do_CU_fixed(kw, kw_loc, pline, 0xFFFF);
+}
+
+void Preproc::process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
+                             ParseLine& pline) {
+    do_CU_fixed(kw, kw_loc, pline, 0x0000);
 }
 
 //-----------------------------------------------------------------------------
