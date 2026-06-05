@@ -3,41 +3,41 @@ Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/defc_02.asm...
 # file: t/20-preproc/input/defc_02.asm
-Identifier	"DEFC"	1:1	keyword=DEFC 
-Identifier	"sym1"	1:6	
-EQ	"="	1:11	
+Identifier	"DEFC"	1:6	keyword=DEFC 
+Identifier	"sym1"	1:11	
+EQ	"="	1:16	
 Integer	"1"	1:11	int_value=1 
 EndOfLine	"\n"	1:12	
 Define constant: sym1 = 1
-Identifier	"DEFC"	2:1	keyword=DEFC 
-Identifier	"sym2"	2:6	
-EQ	"="	2:11	
+Identifier	"DEFC"	2:6	keyword=DEFC 
+Identifier	"sym2"	2:11	
+EQ	"="	2:16	
 Integer	"2"	2:11	int_value=2 
 Multiply	"*"	2:12	
 Integer	"3"	2:13	int_value=3 
 EndOfLine	"\n"	2:14	
 Define constant: sym2 = 6
-Identifier	"DEFC"	3:1	keyword=DEFC 
-Identifier	"sym3"	3:6	
-EQ	"="	3:11	
+Identifier	"DEFC"	3:6	keyword=DEFC 
+Identifier	"sym3"	3:11	
+EQ	"="	3:16	
 Integer	"4"	3:13	int_value=4 
 Multiply	"*"	3:14	
 Integer	"5"	3:15	int_value=5 
 EndOfLine	"\n"	3:16	
 Define constant: sym3 = $14
-Identifier	"DEFC"	4:1	keyword=DEFC 
-Identifier	"sym4"	4:6	
-EQ	"="	4:11	
+Identifier	"DEFC"	4:6	keyword=DEFC 
+Identifier	"sym4"	4:11	
+EQ	"="	4:16	
 ASMPC	"ASMPC"	4:13	
 EndOfLine	"\n"	4:18	
-Identifier	"DEFC"	5:1	keyword=DEFC 
-Identifier	"sym5"	5:6	
-EQ	"="	5:11	
+Identifier	"DEFC"	5:6	keyword=DEFC 
+Identifier	"sym5"	5:11	
+EQ	"="	5:16	
 Identifier	"external"	5:13	
 EndOfLine	"\n"	5:21	
 EndOfLine	"\n"	6:1	
 symbol	__CPU_Z80__	1	(defined at )
 symbol	__CPU_ZILOG__	1	(defined at )
-symbol	sym1	1	(defined at t/20-preproc/input/defc_02.asm:1:6)
-symbol	sym2	6	(defined at t/20-preproc/input/defc_02.asm:2:6)
-symbol	sym3	$14	(defined at t/20-preproc/input/defc_02.asm:3:6)
+symbol	sym1	1	(defined at t/20-preproc/input/defc_02.asm:1:11)
+symbol	sym2	6	(defined at t/20-preproc/input/defc_02.asm:2:11)
+symbol	sym3	$14	(defined at t/20-preproc/input/defc_02.asm:3:11)
