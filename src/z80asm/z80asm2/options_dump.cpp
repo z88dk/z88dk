@@ -25,6 +25,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.swap_ix_iy << "\n"
             << "date_stamp\t"
             << g_args.options.date_stamp << "\n"
+            << "filler_byte\t"
+            << int_to_hex(g_args.options.filler_byte) << "\n"
             << "dump_after_cmdline\t"
             << g_args.options.dump_after_cmdline << "\n"
             << "dump_after_tokenization\t"
