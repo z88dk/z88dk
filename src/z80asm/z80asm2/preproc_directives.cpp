@@ -79,7 +79,7 @@ Preproc::name_directive_handlers = {
     { Keyword::REPTI,    &Preproc::process_name_REPTI },
     { Keyword::REPTC,    &Preproc::process_name_REPTC },
     { Keyword::DEFC,     &Preproc::process_name_DEFC },
-    { Keyword::EQU,      &Preproc::process_name_EQU },
+    { Keyword::EQU,      &Preproc::process_name_DEFC },
 };
 
 //-----------------------------------------------------------------------------
@@ -1424,12 +1424,6 @@ void Preproc::process_name_DEFC(Keyword, const SourceLoc&,
     LogicalLine defc_line(name_loc);
     defc_line.tokens = std::move(defc_tokens);
     assembler_output_queue.push_back(std::move(defc_line));
-}
-
-void Preproc::process_name_EQU(Keyword kw, const SourceLoc& kw_loc,
-                               StringInterner::Id name_id,
-                               const SourceLoc& name_loc, ParseLine& input_line) {
-    process_name_DEFC(kw, kw_loc, name_id, name_loc, input_line);
 }
 
 void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
