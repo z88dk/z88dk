@@ -108,6 +108,21 @@ std::vector<std::string> cpu_defines(CPU cpu_id) {
     return it->second;
 }
 
+bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl) {
+    switch (in_out_cpu_id) {
+    case CPU::ez80:
+    case CPU::ez80_z80:
+        in_out_cpu_id = adl ? CPU::ez80 : CPU::ez80_z80;
+        return true;
+    case CPU::ez80_strict:
+    case CPU::ez80_z80_strict:
+        in_out_cpu_id = adl ? CPU::ez80_strict : CPU::ez80_z80_strict;
+        return true;
+    default:
+        return false;
+    }
+}
+
 Keyword cpu_invert_flag_condition(Keyword kw) {
     switch (kw) {
     case Keyword::C:

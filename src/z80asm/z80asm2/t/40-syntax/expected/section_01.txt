@@ -21,12 +21,3 @@ Program
     SectionStmt
         Location: t/40-syntax/input/section_01.asm:3:1
         Name: a1
-    SectionStmt
-        Location: t/40-syntax/input/section_01.asm:4:1
-        Name: a1
-    SectionStmt
-        Location: t/40-syntax/input/section_01.asm:5:1
-        Name: a1
-    SectionStmt
-        Location: t/40-syntax/input/section_01.asm:6:1
-        Name: a1
