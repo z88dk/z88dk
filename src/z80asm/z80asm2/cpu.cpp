@@ -59,8 +59,8 @@ std::vector<std::string> cpu_names() {
     return names;
 }
 
-static const std::unordered_map<CPU, std::vector<std::string>>&
-cpu_defines_table() {
+static const
+std::unordered_map<CPU, std::vector<std::string>>& cpu_defines_table() {
     static const std::unordered_map<CPU, std::vector<std::string>> table = []() {
         std::unordered_map<CPU, std::vector<std::string>> t;
         struct Entry {
