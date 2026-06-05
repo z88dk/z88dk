@@ -1,0 +1,24 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/call_pkg_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/20-preproc/input/call_pkg_01.asm...
+t/20-preproc/input/call_pkg_01.asm:1:1: error: Unterminated expression after "call_pkg"
+    call_pkg
+    ^
+# file: t/20-preproc/input/call_pkg_01.asm
+Identifier	"RST"	2:1	keyword=RST 
+Integer	"$08"	2:5	int_value=8 
+EndOfLine	"\n"	2:8	
+Identifier	"DEFW"	2:1	keyword=DEFW 
+Integer	"$100"	2:10	int_value=256 
+Plus	"+"	2:14	
+Integer	"2"	2:15	int_value=2 
+Multiply	"*"	2:16	
+Integer	"3"	2:17	int_value=3 
+EndOfLine	"\n"	2:1	
+t/20-preproc/input/call_pkg_01.asm:3:18: error: Unexpected token: ","
+    call_pkg $100+2*3,
+                     ^
+t/20-preproc/input/call_pkg_01.asm:4:18: error: Unexpected token: ","
+    call_pkg $100+2*3, 0
+                     ^
