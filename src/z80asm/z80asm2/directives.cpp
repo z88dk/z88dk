@@ -9,6 +9,7 @@
 #include "expr.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
+#include "options.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <memory>
@@ -44,28 +45,28 @@ static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline,
         }
     }
 
-    return std::make_unique<StmtType>(loc, std::move(name_ids));
+    return std::make_unique<StmtType>(std::move(name_ids), loc);
 }
 
-static std::unique_ptr<Stmt> parse_extern(ParseLine& pline,
+static std::unique_ptr<Stmt> parse_EXTERN(ParseLine& pline,
         const SourceLoc& loc,
         ParseStatus& status) {
     return parse_identifier_list<ExternStmt>(pline, loc, status);
 }
 
-static std::unique_ptr<Stmt> parse_public(ParseLine& pline,
+static std::unique_ptr<Stmt> parse_PUBLIC(ParseLine& pline,
         const SourceLoc& loc,
         ParseStatus& status) {
     return parse_identifier_list<PublicStmt>(pline, loc, status);
 }
 
-static std::unique_ptr<Stmt> parse_global(ParseLine& pline,
+static std::unique_ptr<Stmt> parse_GLOBAL(ParseLine& pline,
         const SourceLoc& loc,
         ParseStatus& status) {
     return parse_identifier_list<GlobalStmt>(pline, loc, status);
 }
 
-static std::unique_ptr<Stmt> parse_module(ParseLine& pline,
+static std::unique_ptr<Stmt> parse_MODULE(ParseLine& pline,
         const SourceLoc& loc,
         ParseStatus& status) {
     if (pline.peek().type != TokenType::Identifier) {
@@ -76,10 +77,10 @@ static std::unique_ptr<Stmt> parse_module(ParseLine& pline,
     auto name_id = pline.peek().text_id;
     pline.advance(); // consume identifier
 
-    return std::make_unique<ModuleStmt>(loc, name_id);
+    return std::make_unique<ModuleStmt>(name_id, loc);
 }
 
-static std::unique_ptr<Stmt> parse_section(ParseLine& pline,
+static std::unique_ptr<Stmt> parse_SECTION(ParseLine& pline,
         const SourceLoc& loc,
         ParseStatus& status) {
     if (pline.peek().type != TokenType::Identifier) {
@@ -90,10 +91,10 @@ static std::unique_ptr<Stmt> parse_section(ParseLine& pline,
     auto name_id = pline.peek().text_id;
     pline.advance(); // consume identifier
 
-    return std::make_unique<SectionStmt>(loc, name_id);
+    return std::make_unique<SectionStmt>(name_id, loc);
 }
 
-static std::unique_ptr<Stmt> parse_org(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_ORG(ParseLine& pline, const SourceLoc& loc,
                                        ParseStatus& status) {
     status = ParseStatus::Ok;
     auto expr = parse_expression_ast(pline, status);
@@ -107,10 +108,10 @@ static std::unique_ptr<Stmt> parse_org(ParseLine& pline, const SourceLoc& loc,
         return nullptr;
     }
 
-    return std::make_unique<OrgStmt>(loc, std::move(expr));
+    return std::make_unique<OrgStmt>(std::move(expr), loc);
 }
 
-static std::unique_ptr<Stmt> parse_defc(ParseLine& pline, const SourceLoc& loc,
+static std::unique_ptr<Stmt> parse_DEFC(ParseLine& pline, const SourceLoc& loc,
                                         ParseStatus& status) {
     if (pline.peek().type != TokenType::Identifier) {
         pline.error("Identifier expected");
@@ -139,17 +140,53 @@ static std::unique_ptr<Stmt> parse_defc(ParseLine& pline, const SourceLoc& loc,
         return nullptr;
     }
 
-    return std::make_unique<DefcStmt>(loc, name_id, std::move(expr));
+    return std::make_unique<DefcStmt>(name_id, std::move(expr), loc);
+}
+
+static std::unique_ptr<Stmt> parse_ALIGN(ParseLine& pline, const SourceLoc& loc,
+        ParseStatus& status) {
+
+    // get first parameter (alignment)
+    status = ParseStatus::Ok;
+    auto align_expr = parse_expression_ast(pline, status);
+    if (status == ParseStatus::FatalError) {
+        return nullptr;    // stop immediately on error
+    }
+
+    // second parameter (fill byte) is optional; if not present, use default from options
+    if (pline.eol()) {
+        auto filler_expr = std::make_unique<ExprLiteralInt>(g_args.options.filler_byte,
+                           loc);
+        return std::make_unique<AlignStmt>(std::move(align_expr),
+                                           std::move(filler_expr), loc);
+    }
+
+    // get second parameter (fill byte)
+    if (pline.peek().type != TokenType::Comma) {
+        pline.error("Expected comma after alignment expression");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+    pline.advance(); // consume comma
+
+    auto fill_expr = parse_expression_ast(pline, status);
+    if (status == ParseStatus::FatalError) {
+        return nullptr;    // stop immediately on error
+    }
+
+    return std::make_unique<AlignStmt>(std::move(align_expr),
+                                       std::move(fill_expr), loc);
 }
 
 static const std::unordered_map<Keyword, DirectiveParseFn> directive_table = {
-    { Keyword::EXTERN,  parse_extern },
-    { Keyword::PUBLIC,  parse_public },
-    { Keyword::GLOBAL,  parse_global },
-    { Keyword::MODULE,  parse_module },
-    { Keyword::SECTION, parse_section },
-    { Keyword::ORG,     parse_org },
-    { Keyword::DEFC,    parse_defc },
+    { Keyword::ALIGN,   parse_ALIGN },
+    { Keyword::DEFC,    parse_DEFC },
+    { Keyword::EXTERN,  parse_EXTERN },
+    { Keyword::GLOBAL,  parse_GLOBAL },
+    { Keyword::MODULE,  parse_MODULE },
+    { Keyword::ORG,     parse_ORG },
+    { Keyword::PUBLIC,  parse_PUBLIC },
+    { Keyword::SECTION, parse_SECTION },
 };
 
 std::unique_ptr<Stmt> parse_directive(ParseLine& pline, const SourceLoc& loc,
