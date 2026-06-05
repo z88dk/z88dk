@@ -202,7 +202,7 @@ next_transition:
                 goto next_transition;
 
             case ChoicePoint::Type::Expr: {
-                size_t start = pline.pos;
+                size_t expr_start = pline.pos;
                 auto expr = parse_expression_ast(pline, status);
                 if (status == ParseStatus::FatalError) {
                     return res;    // stop immediately on error
@@ -212,8 +212,8 @@ next_transition:
                     continue;   // backtrack
                 }
 
-                size_t end = pline.pos;
-                if (end == start) {
+                size_t expr_end = pline.pos;
+                if (expr_end == expr_start) {
                     continue;   // backtrack
                 }
 
