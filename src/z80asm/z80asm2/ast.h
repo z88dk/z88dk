@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
@@ -35,17 +36,20 @@ struct AstNode {
 // base class for all expressions
 struct Expr : AstNode {
     SourceLoc loc;
-    explicit Expr(const SourceLoc& loc_) : loc(loc_) {}
+
+    Expr(const SourceLoc& loc_) : loc(loc_) {}
 };
 
 struct ExprLiteralInt : Expr {
     int value;
+
     ExprLiteralInt(int v, const SourceLoc& loc) : Expr(loc), value(v) {}
     void dump(DumpContext ctx) const override;
 };
 
 struct ExprLiteralFloat : Expr {
     double value;
+
     ExprLiteralFloat(double v, const SourceLoc& loc) : Expr(loc), value(v) {}
     void dump(DumpContext ctx) const override;
 };
@@ -171,7 +175,7 @@ struct Patch : Expr {
 struct Stmt : AstNode {
     SourceLoc loc;
 
-    explicit Stmt(const SourceLoc& loc_) : loc(loc_) {}
+    Stmt(const SourceLoc& loc_) : loc(loc_) {}
     virtual ~Stmt() = default;
     void dump(DumpContext ctx) const override;
 };
@@ -201,7 +205,7 @@ struct LabelStmt : Stmt {
 struct OrgStmt : Stmt {
     std::unique_ptr<Expr> expr;
 
-    OrgStmt(const SourceLoc& loc, std::unique_ptr<Expr> e)
+    OrgStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
     virtual ~OrgStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -211,8 +215,8 @@ struct DefcStmt : Stmt {
     StringInterner::Id name_id;
     std::unique_ptr<Expr> expr;
 
-    DefcStmt(const SourceLoc& loc, StringInterner::Id name_id_,
-             std::unique_ptr<Expr> e)
+    DefcStmt(StringInterner::Id name_id_,
+             std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_), expr(std::move(e)) {}
     virtual ~DefcStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -220,7 +224,7 @@ struct DefcStmt : Stmt {
 
 struct ExternStmt : Stmt {
     std::vector<StringInterner::Id> name_ids;
-    ExternStmt(const SourceLoc& loc, std::vector<StringInterner::Id> n)
+    ExternStmt(std::vector<StringInterner::Id> n, const SourceLoc& loc)
         : Stmt(loc), name_ids(std::move(n)) {}
 
     virtual ~ExternStmt() = default;
@@ -229,7 +233,7 @@ struct ExternStmt : Stmt {
 
 struct PublicStmt : Stmt {
     std::vector<StringInterner::Id> name_ids;
-    PublicStmt(const SourceLoc& loc, std::vector<StringInterner::Id> n)
+    PublicStmt(std::vector<StringInterner::Id> n, const SourceLoc& loc)
         : Stmt(loc), name_ids(std::move(n)) {}
 
     virtual ~PublicStmt() = default;
@@ -238,7 +242,7 @@ struct PublicStmt : Stmt {
 
 struct GlobalStmt : Stmt {
     std::vector<StringInterner::Id> name_ids;
-    GlobalStmt(const SourceLoc& loc, std::vector<StringInterner::Id> n)
+    GlobalStmt(std::vector<StringInterner::Id> n, const SourceLoc& loc)
         : Stmt(loc), name_ids(std::move(n)) {}
 
     virtual ~GlobalStmt() = default;
@@ -248,7 +252,7 @@ struct GlobalStmt : Stmt {
 struct ModuleStmt : Stmt {
     StringInterner::Id name_id;
 
-    ModuleStmt(const SourceLoc& loc, StringInterner::Id name_id_)
+    ModuleStmt(StringInterner::Id name_id_, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~ModuleStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -257,9 +261,21 @@ struct ModuleStmt : Stmt {
 struct SectionStmt : Stmt {
     StringInterner::Id name_id;
 
-    SectionStmt(const SourceLoc& loc, StringInterner::Id name_id_)
+    SectionStmt(StringInterner::Id name_id_, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~SectionStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct AlignStmt : Stmt {
+    std::unique_ptr<Expr> align_expr;
+    std::unique_ptr<Expr> filler_expr;
+
+    AlignStmt(std::unique_ptr<Expr> align_expr_,
+              std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
+        : Stmt(loc), align_expr(std::move(align_expr_)),
+          filler_expr(std::move(filler_expr_)) {}
+    virtual ~AlignStmt() = default;
     void dump(DumpContext ctx) const override;
 };
 
