@@ -316,7 +316,6 @@ struct CuMoveStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
-
 // root of the AST
 struct Program : AstNode {
     std::vector<std::unique_ptr<Stmt>> stmts;
