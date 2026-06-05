@@ -201,7 +201,7 @@ struct LabelStmt : Stmt {
 struct OrgStmt : Stmt {
     std::unique_ptr<Expr> expr;
 
-    OrgStmt(SourceLoc loc, std::unique_ptr<Expr> e)
+    OrgStmt(const SourceLoc& loc, std::unique_ptr<Expr> e)
         : Stmt(loc), expr(std::move(e)) {}
     virtual ~OrgStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -211,7 +211,8 @@ struct DefcStmt : Stmt {
     StringInterner::Id name_id;
     std::unique_ptr<Expr> expr;
 
-    DefcStmt(SourceLoc loc, StringInterner::Id name_id_, std::unique_ptr<Expr> e)
+    DefcStmt(const SourceLoc& loc, StringInterner::Id name_id_,
+             std::unique_ptr<Expr> e)
         : Stmt(loc), name_id(name_id_), expr(std::move(e)) {}
     virtual ~DefcStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -219,7 +220,7 @@ struct DefcStmt : Stmt {
 
 struct ExternStmt : Stmt {
     std::vector<StringInterner::Id> name_ids;
-    ExternStmt(SourceLoc loc, std::vector<StringInterner::Id> n)
+    ExternStmt(const SourceLoc& loc, std::vector<StringInterner::Id> n)
         : Stmt(loc), name_ids(std::move(n)) {}
 
     virtual ~ExternStmt() = default;
@@ -228,7 +229,7 @@ struct ExternStmt : Stmt {
 
 struct PublicStmt : Stmt {
     std::vector<StringInterner::Id> name_ids;
-    PublicStmt(SourceLoc loc, std::vector<StringInterner::Id> n)
+    PublicStmt(const SourceLoc& loc, std::vector<StringInterner::Id> n)
         : Stmt(loc), name_ids(std::move(n)) {}
 
     virtual ~PublicStmt() = default;
@@ -237,7 +238,7 @@ struct PublicStmt : Stmt {
 
 struct GlobalStmt : Stmt {
     std::vector<StringInterner::Id> name_ids;
-    GlobalStmt(SourceLoc loc, std::vector<StringInterner::Id> n)
+    GlobalStmt(const SourceLoc& loc, std::vector<StringInterner::Id> n)
         : Stmt(loc), name_ids(std::move(n)) {}
 
     virtual ~GlobalStmt() = default;
@@ -247,7 +248,7 @@ struct GlobalStmt : Stmt {
 struct ModuleStmt : Stmt {
     StringInterner::Id name_id;
 
-    ModuleStmt(SourceLoc loc, StringInterner::Id name_id_)
+    ModuleStmt(const SourceLoc& loc, StringInterner::Id name_id_)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~ModuleStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -256,7 +257,7 @@ struct ModuleStmt : Stmt {
 struct SectionStmt : Stmt {
     StringInterner::Id name_id;
 
-    SectionStmt(SourceLoc loc, StringInterner::Id name_id_)
+    SectionStmt(const SourceLoc& loc, StringInterner::Id name_id_)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~SectionStmt() = default;
     void dump(DumpContext ctx) const override;

@@ -9,6 +9,7 @@
 #include "const_symbols.h"
 #include "cpu.h"
 #include "source_loc.h"
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -18,6 +19,10 @@ enum class OptionType {
 #define X(name, str, takes_arg, arg_text, usage) name,
 #include "options.def"
 };
+
+// defaults
+static const CPU DEFAULT_CPU = CPU::z80;
+static const uint8_t DEFAULT_FILLER_BYTE = 0x00;
 
 // option specification
 struct OptionSpec {
@@ -32,9 +37,10 @@ struct Options {
     bool verbose = false;
     bool ucase_symbols = false;
     bool preprocess_only = false;
-    CPU  cpu_id{ CPU::z80 }; // default CPU is Z80
+    CPU  cpu_id{ DEFAULT_CPU }; // default CPU is Z80
     bool swap_ix_iy = false;
     bool date_stamp = false;
+    uint8_t filler_byte = DEFAULT_FILLER_BYTE;
     bool dump_after_cmdline = false;
     bool dump_after_tokenization = false;
     bool dump_after_directives = false;
@@ -72,7 +78,9 @@ private:
                           std::string& out);
     void append_with_space(std::string& dst, std::string_view src);
     void parse_define(std::string_view arg, std::string_view opt_name,
-                      SourceLoc loc);
+                      const SourceLoc& loc);
+    void parse_filler_byte(std::string_view arg, std::string_view opt_name,
+                           const SourceLoc& loc);
     const OptionSpec* match_option(std::string_view arg);
     std::string check_source(std::string_view filename);
     void search_list_file(std::string_view list_filename,
