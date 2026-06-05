@@ -114,7 +114,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\opcodes_parse_trie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\directives.cpp">
+    <ClCompile Include="..\..\src\z80asm\z80asm2\parser_directives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\synth_expander.cpp">
@@ -207,9 +207,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_parse_trie.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\directives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\synth_expander.h">

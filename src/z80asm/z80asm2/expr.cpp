@@ -379,7 +379,7 @@ static bool eval_expr_impl(ParseLine& pline,
     sem.silent = silent;
     sem.undefined_is_zero = undefined_is_zero;
 
-    ParseStatus status = ParseStatus::Ok;
+    ParseStatus status = ParseStatus::Unknown;
     if (!parse_full_expr(pline, sem, status)) {
         return false;
     }
@@ -458,7 +458,7 @@ bool SpanSem::local_label(const Token&) {
 bool parse_expression_span(ParseLine& pline) {
     size_t pos0 = pline.pos;
     SpanSem sem;
-    ParseStatus status = ParseStatus::Ok;
+    ParseStatus status = ParseStatus::Unknown;
     if (!parse_full_expr(pline, sem, status)) {
         pline.pos = pos0;
         return false;
