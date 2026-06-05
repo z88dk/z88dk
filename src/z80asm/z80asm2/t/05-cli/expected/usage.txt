@@ -25,6 +25,7 @@ Preprocessor Options:
 Assembly Options:
   -m=CPU        Set target CPU (e.g. z80, z180)
   -d            Assemble only if newer
+  -f=BYTE       Set filler byte for uninitialized data (default: 0)
 
 Diagnostic Options:
   -dump-after-cmdline
