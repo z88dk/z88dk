@@ -17,7 +17,8 @@
 #include <unordered_map>
 #include <vector>
 
-static const int MAX_EXPANSION_DEPTH = 1000;
+// must be > 8192 so that a 64K blob can be included with BINARY without hitting the limit
+static const int MAX_EXPANSION_DEPTH = 10000;
 
 struct Macro {
     StringInterner::Id name_id;                 // interned identifier
