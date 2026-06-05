@@ -340,6 +340,20 @@ void SectionStmt::dump(DumpContext ctx) const {
     dump_named_stmt("SectionStmt", name_id, loc, ctx);
 }
 
+void AlignStmt::dump(DumpContext ctx) const {
+    ctx.line("AlignStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (align_expr) {
+        c.line("Alignment:");
+        align_expr->dump(c.child());
+    }
+    if (filler_expr) {
+        c.line("Filler byte:");
+        filler_expr->dump(c.child());
+    }
+}
+
 void Program::dump(DumpContext ctx) const {
     ctx.line("Program");
     auto c = ctx.child();
