@@ -13,7 +13,9 @@
 #include "parser.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include <cstdint>
 #include <memory>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -21,7 +23,15 @@
 std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
 = {
     { Keyword::ALIGN,     &Parser::parse_ALIGN },
+    { Keyword::BYTE,      &Parser::parse_BYTE },
+    { Keyword::CALL_OZ,   &Parser::parse_CALL_OZ },
+    { Keyword::CU_MOVE,   &Parser::parse_CU_MOVE },
+    { Keyword::CU_WAIT,   &Parser::parse_CU_WAIT },
+    { Keyword::DB,        &Parser::parse_BYTE },
+    { Keyword::DEFB,      &Parser::parse_BYTE },
     { Keyword::DEFC,      &Parser::parse_DEFC },
+    { Keyword::DEFM,      &Parser::parse_BYTE },
+    { Keyword::DM,        &Parser::parse_BYTE },
     { Keyword::EXTERN,    &Parser::parse_EXTERN },
     { Keyword::GLOBAL,    &Parser::parse_GLOBAL },
     { Keyword::MODULE,    &Parser::parse_MODULE },
@@ -29,9 +39,6 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::PRAGMA,    &Parser::parse_PRAGMA },
     { Keyword::PUBLIC,    &Parser::parse_PUBLIC },
     { Keyword::SECTION,   &Parser::parse_SECTION },
-    { Keyword::CALL_OZ,   &Parser::parse_CALL_OZ },
-    { Keyword::CU_WAIT,   &Parser::parse_CU_WAIT },
-    { Keyword::CU_MOVE,   &Parser::parse_CU_MOVE },
 };
 
 std::unique_ptr<Stmt> Parser::parse_directive(ParseLine& pline,
@@ -318,4 +325,57 @@ std::unique_ptr<Stmt> Parser::parse_CU_WAIT(ParseLine& pline,
 std::unique_ptr<Stmt> Parser::parse_CU_MOVE(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
     return parse_two_expr_with_comma<CuMoveStmt>(pline, loc, status);
+}
+
+std::unique_ptr<Stmt> Parser::parse_BYTE(ParseLine& pline, const SourceLoc& loc,
+        ParseStatus& status) {
+    // create statement with empty byte list, and fill it with expressions until end of line
+    auto stmt = std::make_unique<OpcodeStmt>(loc);
+
+    while (true) {
+        if (pline.peek().type == TokenType::String) {
+            // parse string literal as a sequence of byte literals
+            std::string_view str = g_strings.view(pline.peek().value.str_value_id);
+            for (char c : str) {
+                stmt->bytes.push_back(static_cast<uint8_t>(c));
+            }
+            pline.advance(); // consume string
+        }
+        else {
+            // parse expression as a byte literal
+            auto expr = parse_expression_ast(pline, status);
+            if (status == ParseStatus::FatalError) {
+                return nullptr;    // stop immediately on error
+            }
+
+            if (!expr) {
+                pline.error("Expression expected");
+                status = ParseStatus::FatalError;
+                return nullptr;
+            }
+
+            auto patch = std::make_unique<Patch>(std::move(expr), loc);
+            patch->offset = stmt->bytes.size();
+            patch->size = 1;
+            patch->is_constant = false;
+            patch->type = PatchType::Unsigned;
+
+            stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
+            stmt->patches.push_back(std::move(patch));
+        }
+
+        if (pline.peek().type == TokenType::Comma) {
+            pline.advance(); // consume ','
+        }
+        else {
+            break;  // end of byte list
+        }
+    }
+
+    if (!pline.check_end_of_line()) {
+        status = ParseStatus::FatalError;
+        return nullptr;    // error already reported
+    }
+
+    return stmt;
 }
