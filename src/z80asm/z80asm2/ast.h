@@ -279,6 +279,15 @@ struct AlignStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
+struct CallOzStmt : Stmt {
+    std::unique_ptr<Expr> expr;
+
+    CallOzStmt(std::unique_ptr<Expr> expr_, const SourceLoc& loc)
+        : Stmt(loc), expr(std::move(expr_)) {}
+    virtual ~CallOzStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
 // root of the AST
 struct Program : AstNode {
     std::vector<std::unique_ptr<Stmt>> stmts;
