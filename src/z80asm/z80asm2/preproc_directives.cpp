@@ -37,6 +37,11 @@ Preproc::directive_handlers = {
     { Keyword::BINARY,     &Preproc::process_BINARY },
     { Keyword::C_LINE,     &Preproc::process_C_LINE },
     { Keyword::CALL_PKG,   &Preproc::process_CALL_PKG },
+    { Keyword::CU_MOVE,    &Preproc::process_CU_MOVE },
+    { Keyword::CU_NOP,     &Preproc::process_CU_NOP },
+    { Keyword::CU_STOP,    &Preproc::process_CU_STOP },
+    { Keyword::CU_WAIT,    &Preproc::process_CU_WAIT },
+    { Keyword::DEFGROUP,   &Preproc::process_DEFGROUP },
     { Keyword::DEFINE,     &Preproc::process_DEFINE },
     { Keyword::DEFL,       &Preproc::process_DEFL },
     { Keyword::ENDM,       &Preproc::process_ENDM },
@@ -54,10 +59,6 @@ Preproc::directive_handlers = {
     { Keyword::REPTI,      &Preproc::process_REPTI },
     { Keyword::UNDEF,      &Preproc::process_UNDEF },
     { Keyword::UNDEFINE,   &Preproc::process_UNDEF },
-    { Keyword::CU_WAIT,    &Preproc::process_CU_WAIT },
-    { Keyword::CU_MOVE,    &Preproc::process_CU_MOVE },
-    { Keyword::CU_STOP,    &Preproc::process_CU_STOP },
-    { Keyword::CU_NOP,     &Preproc::process_CU_NOP },
 };
 
 std::unordered_map<Keyword, Preproc::DirectiveHandler>
@@ -1957,30 +1958,30 @@ void Preproc::do_CU_args(Keyword kw, const SourceLoc& kw_loc,
                      pline.tokens.begin() + pline.pos, pline.tokens.end());
     std::vector<Token> expanded;
     expand_line(in, expanded);
-    ParseLine expanded_pline(expanded);
+    ParseLine expline(expanded);
 
     // extract the two expressions
     ParseStatus status = ParseStatus::Unknown;
-    size_t exprs_start = expanded_pline.pos;
-    auto expr1 = parse_expression_ast(expanded_pline, status);
+    size_t exprs_start = expline.pos;
+    auto expr1 = parse_expression_ast(expline, status);
     if (status == ParseStatus::FatalError || !expr1) {
         return;    // stop immediately on error
     }
 
-    if (expanded_pline.peek().type != TokenType::Comma) {
-        g_diag.error(expanded_pline.peek().loc,
+    if (expline.peek().type != TokenType::Comma) {
+        g_diag.error(expline.peek().loc,
                      "Expected comma between expressions in " + to_string(kw));
         return;
     }
-    expanded_pline.advance(); // consume comma
+    expline.advance(); // consume comma
 
-    auto expr2 = parse_expression_ast(expanded_pline, status);
+    auto expr2 = parse_expression_ast(expline, status);
     if (status == ParseStatus::FatalError || !expr2) {
         return;    // stop immediately on error
     }
-    size_t exprs_end = expanded_pline.pos;
+    size_t exprs_end = expline.pos;
 
-    if (!expanded_pline.check_end_of_line()) {
+    if (!expline.check_end_of_line()) {
         return;
     }
 
@@ -1994,8 +1995,8 @@ void Preproc::do_CU_args(Keyword kw, const SourceLoc& kw_loc,
         cu_op_tokens.pop_back();
     }
     cu_op_tokens.insert(cu_op_tokens.end(),
-                        expanded_pline.tokens.begin() + exprs_start,
-                        expanded_pline.tokens.begin() + exprs_end);
+                        expline.tokens.begin() + exprs_start,
+                        expline.tokens.begin() + exprs_end);
     cu_op_tokens.push_back(Token::end_of_line(kw_loc));
 
     LogicalLine cu_op_line(kw_loc);
@@ -2037,6 +2038,146 @@ void Preproc::process_CU_STOP(Keyword kw, const SourceLoc& kw_loc,
 void Preproc::process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
                              ParseLine& pline) {
     do_CU_fixed(kw, kw_loc, pline, 0x0000);
+}
+
+void Preproc::process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
+                               ParseLine& pline) {
+    // need to collect LogicalLines (which own the tokens) for each new line
+    // retrieved by next_logical_line()
+    ParseLine* cur = &pline;
+    std::vector<LogicalLine> temp_lines;  // owns the token vectors
+    std::vector<ParseLine> temp_parselines;  // references into temp_lines
+
+    // need to collect all DEFC statements in a list, because next_logical_line() will retrieve
+    // from assembler_output_queue
+    std::vector<LogicalLine> output;
+
+    // need to collect all tokens up to '}' and expand macros in them,
+    // since the group definition may call macros
+    std::vector<Token> tokens;
+
+    // parse input between '{' and '}', allowing multiple lines until we find the closing '}'
+    bool found_opening_brace = false;
+    bool found_closing_brace = false;
+    while (!found_closing_brace) {
+        const Token& tok = cur->peek();
+        if (tok.type == TokenType::EndOfLine) {
+            // treat newlines as commas to separate definitions
+            tokens.push_back(Token::token(TokenType::Comma, ",", tok.loc));
+
+            // read the next line and continue
+            LogicalLine ll;
+            SourceLoc prev_loc = tok.loc;
+            if (!next_logical_line(ll)) {
+                g_diag.error(prev_loc,
+                             "Unexpected end of file in " + to_string(kw) + " directive");
+                return;
+            }
+
+            // Store the LogicalLine (which owns the tokens)
+            temp_lines.push_back(std::move(ll));
+
+            // Create a ParseLine referencing the tokens in the stored LogicalLine
+            temp_parselines.emplace_back(temp_lines.back().tokens);
+
+            cur = &temp_parselines.back();
+            continue;
+        }
+
+        if (tok.type == TokenType::LeftBrace) {
+            if (found_opening_brace) {
+                cur->error("Multiple '{' in " + to_string(kw) + " directive");
+                return;
+            }
+            found_opening_brace = true;
+            cur->advance(); // consume '{'
+            continue;
+        }
+
+        if (tok.type == TokenType::RightBrace) {
+            if (!found_opening_brace) {
+                cur->error("Unexpected '}' in " + to_string(kw) + " directive");
+                return;
+            }
+            found_closing_brace = true;
+            cur->advance(); // consume '}'
+            continue;
+        }
+
+        if (!found_opening_brace) {
+            cur->error("Missing '{' in " + to_string(kw) + " directive");
+            return;
+        }
+
+        tokens.push_back(tok);
+        cur->advance();
+    }
+
+    if (!cur->check_end_of_line()) {
+        return;
+    }
+
+    // tokens now contains all tokens between '{' and '}', with macros unexpanded
+    // let's expand them now
+    LogicalLine in(kw_loc);
+    in.tokens = std::move(tokens);
+
+    std::vector<Token> expanded;
+    expand_line(in, expanded);
+
+    // now parse the expanded tokens as a sequence of "name [= value]" pairs
+    ParseLine expline(expanded);
+    int value = 0;
+    while (!expline.eol()) {
+        // skip commas between definitions
+        if (expline.peek().type == TokenType::Comma) {
+            expline.advance(); // skip comma
+            continue;
+        }
+
+        // must have a identifier for the name
+        if (expline.peek().type != TokenType::Identifier) {
+            expline.error("Expected identifier in " + to_string(kw) + " directive");
+            return;
+        }
+        std::string name = g_strings.to_string(expline.peek().text_id);
+        SourceLoc name_loc = expline.peek().loc;
+        expline.advance();
+
+        // check for optional "= value" after the name
+        if (expline.peek().type == TokenType::EQ) {
+            expline.advance(); // consume '='
+
+            // evaluate expression and overwrite value if valid
+            if (!eval_const_expr(expline, const_symbols, value, /*silent=*/false)) {
+                return;  // error already reported by eval_const_expr
+            }
+        }
+
+        // now produce a DEFC <name> = <value> line for this definition and push to output queue
+        std::string defc_str = "DEFC " + name + " = " + std::to_string(value);
+        std::vector<Token> defc_tokens = tokenize_text(defc_str, name_loc);
+        LogicalLine defc_line(name_loc);
+        defc_line.tokens = std::move(defc_tokens);
+
+        // collect in output vector first, since pushing to assembler_output_queue will
+        // cause next_logical_line() to retrieve them
+        output.push_back(std::move(defc_line));
+
+        // increment value for the next definition
+        ++value;
+
+        // must have a comma (skipped at the top) or end of line after each definition
+        if (!expline.eol() && expline.peek().type != TokenType::Comma) {
+            expline.error("Expected ',' or end of line in " + to_string(kw) + " directive");
+            return;
+        }
+    }
+
+    for (auto& defc_line : output) {
+        // do not expand macros again
+        assembler_output_queue.push_back(std::move(defc_line));
+    }
 }
 
 //-----------------------------------------------------------------------------
