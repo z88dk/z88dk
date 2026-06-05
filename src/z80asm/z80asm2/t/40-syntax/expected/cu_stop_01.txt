@@ -5,7 +5,16 @@ Assembling t/40-syntax/input/cu_stop_01.asm...
 t/40-syntax/input/cu_stop_01.asm:1:9: error: Unexpected token: "x"
     cu.stop x 
             ^
-t/40-syntax/input/cu_stop_01.asm:2:3: error: Unrecognized instruction or directive
-    cu.stop
-      ^
 Program
+    OpcodeStmt
+        Location: t/40-syntax/input/cu_stop_01.asm:2:3
+        Address: 0
+        Bytes: 0 0
+        Patches:
+            Patch
+                Offset: 0, Size: 2
+                Type: BigEndian
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: $FFFF
