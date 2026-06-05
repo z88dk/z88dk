@@ -47,31 +47,6 @@ static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline,
     return std::make_unique<StmtType>(loc, std::move(name_ids));
 }
 
-static std::unique_ptr<Stmt>parse_extern(ParseLine&, const SourceLoc&,
-        ParseStatus& );
-static std::unique_ptr<Stmt>parse_public(ParseLine&, const SourceLoc&,
-        ParseStatus& );
-static std::unique_ptr<Stmt>parse_global(ParseLine&, const SourceLoc&,
-        ParseStatus& );
-static std::unique_ptr<Stmt>parse_module(ParseLine&, const SourceLoc&,
-        ParseStatus& );
-static std::unique_ptr<Stmt>parse_section(ParseLine&, const SourceLoc&,
-        ParseStatus& );
-static std::unique_ptr<Stmt>parse_org(ParseLine&, const SourceLoc&,
-                                      ParseStatus& );
-static std::unique_ptr<Stmt>parse_defc(ParseLine&, const SourceLoc&,
-                                       ParseStatus& );
-
-static const std::unordered_map<Keyword, DirectiveParseFn> directive_table = {
-    { Keyword::EXTERN,  parse_extern },
-    { Keyword::PUBLIC,  parse_public },
-    { Keyword::GLOBAL,  parse_global },
-    { Keyword::MODULE,  parse_module },
-    { Keyword::SECTION, parse_section },
-    { Keyword::ORG,     parse_org },
-    { Keyword::DEFC,    parse_defc },
-};
-
 static std::unique_ptr<Stmt> parse_extern(ParseLine& pline,
         const SourceLoc& loc,
         ParseStatus& status) {
@@ -166,6 +141,16 @@ static std::unique_ptr<Stmt> parse_defc(ParseLine& pline, const SourceLoc& loc,
 
     return std::make_unique<DefcStmt>(loc, name_id, std::move(expr));
 }
+
+static const std::unordered_map<Keyword, DirectiveParseFn> directive_table = {
+    { Keyword::EXTERN,  parse_extern },
+    { Keyword::PUBLIC,  parse_public },
+    { Keyword::GLOBAL,  parse_global },
+    { Keyword::MODULE,  parse_module },
+    { Keyword::SECTION, parse_section },
+    { Keyword::ORG,     parse_org },
+    { Keyword::DEFC,    parse_defc },
+};
 
 std::unique_ptr<Stmt> parse_directive(ParseLine& pline, const SourceLoc& loc,
                                       ParseStatus& status) {
