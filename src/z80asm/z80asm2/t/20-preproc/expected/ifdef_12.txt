@@ -9,9 +9,9 @@ EQ	"="	1:18
 Integer	"1"	1:20	int_value=1 
 EndOfLine	"\n"	1:21	
 Define constant: X = 1
-Identifier	"DEFC"	2:1	keyword=DEFC 
-Identifier	"Y"	2:6	
-EQ	"="	2:8	
+Identifier	"DEFC"	2:3	keyword=DEFC 
+Identifier	"Y"	2:8	
+EQ	"="	2:10	
 Integer	"2"	2:7	int_value=2 
 EndOfLine	"\n"	2:8	
 Define constant: Y = 2
@@ -57,7 +57,7 @@ Identifier	"X"	1:9	keyword=X
 EQ	"="	1:9	
 Integer	"1"	1:11	int_value=1 
 symbol	X	1	(defined at t/20-preproc/input/ifdef_12.asm:1:16)
-symbol	Y	2	(defined at t/20-preproc/input/ifdef_12.asm:2:6)
+symbol	Y	2	(defined at t/20-preproc/input/ifdef_12.asm:2:8)
 symbol	Z	3	(defined at t/20-preproc/input/ifdef_12.asm:3:1)
 symbol	__CPU_Z80__	1	(defined at )
 symbol	__CPU_ZILOG__	1	(defined at )
