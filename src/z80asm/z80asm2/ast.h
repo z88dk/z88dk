@@ -151,19 +151,24 @@ struct Patch : Expr {
     virtual ~Patch();
 
     std::unique_ptr<Expr> inner;    // inner expression
-    uint8_t offset = 0;             // offset into opcode
-    uint8_t size = 0;               // byte width of expression
+    size_t offset = 0;              // offset into opcode
+    size_t size = 0;                // byte width of expression
 
     bool is_constant = false;       // true for %c patches, e.g. IM %c or BIT %c, r
 
     PatchType type = PatchType::Unsigned;       // type of patch
-    CheckRange validation =
-        CheckRange::Is_any; // validation rule for constant expressions
-    ExprFormula formula = ExprFormula::None;    // formula constant expressions
-    std::vector<uint8_t> coefs;                 // coeficients for formula A..G
 
-    uint8_t alt_offset = 0;         // alternative offset of long jump
-    uint8_t alt_size = 0;           // alternative size of long jump
+    // validation rule for constant expressions
+    CheckRange validation = CheckRange::Is_any;
+
+    // formula constant expressions
+    ExprFormula formula = ExprFormula::None;
+
+    // coeficients for formula A..G
+    std::vector<uint8_t> coefs;
+
+    size_t alt_offset = 0;         // alternative offset of long jump
+    size_t alt_size = 0;           // alternative size of long jump
     std::vector<uint8_t> alt_bytes; // alternative opcode of long jump
 
     Patch(std::unique_ptr<Expr> expr, const SourceLoc& loc)
@@ -184,8 +189,8 @@ struct OpcodeStmt : Stmt {
     uint32_t address = 0;           // defined after layout
     bool is_short_jump = false;     // true if patches has a short jump
 
-    std::vector<uint8_t>
-    bytes;     // opcode bytes, including placeholders for expressions
+    // opcode bytes, including placeholders for expressions
+    std::vector<uint8_t> bytes;
     std::vector<std::unique_ptr<Patch>> patches;    // instruction patches
 
     OpcodeStmt(const SourceLoc& loc) : Stmt(loc) {}
