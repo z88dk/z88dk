@@ -336,6 +336,8 @@ private:
                          ParseLine& pline);
     void process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
                         ParseLine& pline);
+    void process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
+                          ParseLine& pline);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
