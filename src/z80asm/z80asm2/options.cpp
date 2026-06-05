@@ -11,10 +11,12 @@
 #include "file_mgr.h"
 #include "options.h"
 #include "pathnames.h"
+#include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <cstdlib>
 #include <filesystem>
 #include <initializer_list>
@@ -39,7 +41,7 @@ static const OptionSpec g_option_specs[] = {
 #include "options.def"
 };
 
-// options usage gropuing for presentation in usage screen
+// options usage grouping for presentation in usage screen
 struct UsageGroup {
     const char* title;
     std::initializer_list<OptionType> options;
@@ -71,7 +73,8 @@ static const UsageGroup usage_layout[] = {
         "Assembly Options",
         {
             OptionType::CPU,
-            OptionType::DATESTAMP
+            OptionType::DATESTAMP,
+            OptionType::FILLER_BYTE,
         }
     },
     {
@@ -152,7 +155,9 @@ void Args::append_with_space(std::string& dst, std::string_view src) {
 }
 
 void Args::parse_define(std::string_view arg, std::string_view opt_name,
-                        SourceLoc loc) {
+                        const SourceLoc& loc_) {
+    SourceLoc loc(loc_);
+
     // Strip the "-D" prefix
     if (!starts_with(arg, opt_name)) {
         return;
@@ -164,9 +169,14 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
     // Optional '=' after -D
     if (starts_with(rest, "=")) {
         rest.remove_prefix(1);
-        loc.column += 1;
+        loc.column++;
     }
 
+    // check if empty after stripping prefix and optional '='
+    if (rest.empty()) {
+        g_diag.error(loc, "Macro name missing in option: " + std::string(arg));
+        return;
+    }
     // Split NAME and EXPR
     std::string_view name, expr;
     size_t eq = rest.find('=');
@@ -180,14 +190,14 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
         name = rest.substr(0, eq);
         loc.column += static_cast<uint16_t>(name.size());
         expr = rest.substr(eq + 1);
-        loc.column += 1; // for the '=' character
+        loc.column++; // for the '=' character
         if (expr.empty()) {
             g_diag.error(loc, "Expression missing in option: " + std::string(arg));
             return;
         }
     }
 
-    // Convert to std::string for your symbol table
+    // Convert to std::string for symbol table
     std::string name_s(name);
     StringInterner::Id name_id = g_strings.intern(name_s);
     std::string expr_s(expr);
@@ -199,8 +209,47 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
         return;   // error already reported by eval_const_expr
     }
 
-    // Hand off to your assembler's define mechanism
+    // Hand off to assembler's define mechanism
     options.global_defs.set(name_id, value, loc);
+}
+
+void Args::parse_filler_byte(std::string_view arg, std::string_view opt_name,
+                             const SourceLoc& loc_) {
+    SourceLoc loc(loc_);
+
+    // Strip the "-f" prefix
+    if (!starts_with(arg, opt_name)) {
+        return;
+    }
+
+    std::string_view expr = arg.substr(opt_name.size());
+    loc.column += static_cast<uint16_t>(opt_name.size());
+
+    // Optional '=' after -f
+    if (starts_with(expr, "=")) {
+        expr.remove_prefix(1);
+        loc.column++;
+    }
+
+    // check if empty after stripping prefix and optional '='
+    if (expr.empty()) {
+        g_diag.error(loc, "Filler byte value missing in option: " + std::string(arg));
+        return;
+    }
+
+    // evaluate the expression as a constant expression
+    int value = 1;
+    if (!eval_const_expr(expr, loc, options.global_defs,
+                         value, /*silent=*/false)) {
+        return;   // error already reported by eval_const_expr
+    }
+
+    // check range of filler byte
+    if (value < -0x80 || value > 0xFF) {
+        g_diag.warning(loc, "Filler byte value out of range: " + int_to_hex(value));
+    }
+
+    options.filler_byte = static_cast<uint8_t>(value & 0xFF);
 }
 
 // match longest option prefix in arg, return nullptr if no match
@@ -376,6 +425,10 @@ void Args::parse_arg(std::string_view arg,
         }
         case OptionType::DATESTAMP:
             options.date_stamp = true;
+            return;
+
+        case OptionType::FILLER_BYTE:
+            parse_filler_byte(arg, spec->name, loc);
             return;
 
         case OptionType::DUMP_AFTER_CMDLINE:
