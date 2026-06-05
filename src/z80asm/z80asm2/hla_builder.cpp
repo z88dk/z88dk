@@ -562,7 +562,7 @@ std::vector<Token> HLA_ProgramBuilder::collect_operand_tokens(
     // get the expression span
     SpanSem sem;
     size_t pos0 = line.pos;
-    ParseStatus status = ParseStatus::Ok;
+    ParseStatus status = ParseStatus::Unknown;
     if (!parse_restricted_expr(line, sem, status)) {
         return {};  // error reprted in caller
     }

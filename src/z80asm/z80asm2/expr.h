@@ -109,8 +109,9 @@ private:
 //-----------------------------------------------------------------------------
 
 enum class ParseStatus {
-    Ok,          // matched successfully
-    FatalError   // a sub-parser emitted an error; stop immediately
+    Unknown,        // not yet matched
+    Ok,             // matched successfully
+    FatalError      // a sub-parser emitted an error; stop immediately
 };
 
 enum {
@@ -346,13 +347,13 @@ bool parse_expr_bp_dynamic(ParseLine& pline, Sem& sem, int min_bp,
 
 template <typename Sem>
 bool parse_full_expr(ParseLine& pline, Sem& sem, ParseStatus& status) {
-    status = ParseStatus::Ok;
+    status = ParseStatus::Unknown;
     return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/false, status);
 }
 
 template <typename Sem>
 bool parse_restricted_expr(ParseLine& pline, Sem& sem, ParseStatus& status) {
-    status = ParseStatus::Ok;
+    status = ParseStatus::Unknown;
     return parse_expr_bp_dynamic(pline, sem, BP_NONE, /*restricted=*/true, status);
 }
 
