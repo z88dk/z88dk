@@ -164,6 +164,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\string_interner.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\environment.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\synth_expander.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +198,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_utils.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_interner.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\synth_expander.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\cpu.def" />
