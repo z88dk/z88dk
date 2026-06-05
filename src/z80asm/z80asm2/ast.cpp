@@ -364,6 +364,34 @@ void CallOzStmt::dump(DumpContext ctx) const {
     }
 }
 
+void CuMoveStmt::dump(DumpContext ctx) const {
+    ctx.line("CuMoveStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (reg_expr) {
+        c.line("Register (0..127):");
+        reg_expr->dump(c.child());
+    }
+    if (val_expr) {
+        c.line("Value (0..255):");
+        val_expr->dump(c.child());
+    }
+}
+
+void CuWaitStmt::dump(DumpContext ctx) const {
+    ctx.line("CuWaitStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (ver_expr) {
+        c.line("Vertical (0..311):");
+        ver_expr->dump(c.child());
+    }
+    if (hor_expr) {
+        c.line("Horizontal (0..55):");
+        hor_expr->dump(c.child());
+    }
+}
+
 void Program::dump(DumpContext ctx) const {
     ctx.line("Program");
     auto c = ctx.child();
