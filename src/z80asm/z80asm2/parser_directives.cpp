@@ -28,6 +28,7 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::CU_MOVE,   &Parser::parse_CU_MOVE },
     { Keyword::CU_WAIT,   &Parser::parse_CU_WAIT },
     { Keyword::DB,        &Parser::parse_BYTE },
+    { Keyword::DC,        &Parser::parse_DEFC },
     { Keyword::DDB,       &Parser::parse_WORD_BE },
     { Keyword::DEFB,      &Parser::parse_BYTE },
     { Keyword::DEFC,      &Parser::parse_DEFC },
