@@ -1,0 +1,5 @@
+defgroup
+
+{
+    var1
+
