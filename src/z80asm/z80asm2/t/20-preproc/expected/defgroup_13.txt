@@ -1,0 +1,44 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/defgroup_13.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/20-preproc/input/defgroup_13.asm...
+# file: t/20-preproc/input/defgroup_13.asm
+Identifier	"DEFC"	3:16	keyword=DEFC 
+Identifier	"var1"	3:21	
+EQ	"="	3:26	
+Integer	"0"	3:28	int_value=0 
+EndOfLine	"\n"	3:29	
+Define constant: var1 = 0
+Identifier	"DEFC"	3:25	keyword=DEFC 
+Identifier	"var2"	3:30	
+EQ	"="	3:35	
+Integer	"7"	3:37	int_value=7 
+EndOfLine	"\n"	3:38	
+Define constant: var2 = 7
+Identifier	"DEFC"	3:42	keyword=DEFC 
+Identifier	"var3"	3:47	
+EQ	"="	3:52	
+Integer	"8"	3:54	int_value=8 
+EndOfLine	"\n"	3:55	
+Define constant: var3 = 8
+EndOfLine	"\n"	4:1	
+# file: t/20-preproc/input/defgroup_13.asm
+Identifier	"DEFINE"	2:9	keyword=DEFINE 
+Identifier	"C"	2:9	keyword=C 
+EQ	"="	2:9	
+Comma	","	2:11	
+# file: t/20-preproc/input/defgroup_13.asm
+Identifier	"DEFINE"	1:9	keyword=DEFINE 
+Identifier	"V"	1:9	keyword=V 
+LeftParen	"("	1:9	
+Identifier	"n"	1:9	
+RightParen	")"	1:9	
+EQ	"="	1:9	
+Identifier	"var"	1:14	
+DoubleHash	"##"	1:18	
+Identifier	"n"	1:21	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )
+symbol	var1	0	(defined at t/20-preproc/input/defgroup_13.asm:3:21)
+symbol	var2	7	(defined at t/20-preproc/input/defgroup_13.asm:3:30)
+symbol	var3	8	(defined at t/20-preproc/input/defgroup_13.asm:3:47)

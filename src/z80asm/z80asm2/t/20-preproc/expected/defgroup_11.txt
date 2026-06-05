@@ -1,0 +1,29 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/defgroup_11.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/20-preproc/input/defgroup_11.asm...
+# file: t/20-preproc/input/defgroup_11.asm
+Identifier	"DEFC"	1:12	keyword=DEFC 
+Identifier	"var1"	1:17	
+EQ	"="	1:22	
+Integer	"0"	1:24	int_value=0 
+EndOfLine	"\n"	1:25	
+Define constant: var1 = 0
+Identifier	"DEFC"	1:18	keyword=DEFC 
+Identifier	"var2"	1:23	
+EQ	"="	1:28	
+Integer	"7"	1:30	int_value=7 
+EndOfLine	"\n"	1:31	
+Define constant: var2 = 7
+Identifier	"DEFC"	1:32	keyword=DEFC 
+Identifier	"var3"	1:37	
+EQ	"="	1:42	
+Integer	"8"	1:44	int_value=8 
+EndOfLine	"\n"	1:45	
+Define constant: var3 = 8
+EndOfLine	"\n"	2:1	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )
+symbol	var1	0	(defined at t/20-preproc/input/defgroup_11.asm:1:17)
+symbol	var2	7	(defined at t/20-preproc/input/defgroup_11.asm:1:23)
+symbol	var3	8	(defined at t/20-preproc/input/defgroup_11.asm:1:37)
