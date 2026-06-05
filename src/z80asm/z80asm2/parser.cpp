@@ -69,7 +69,19 @@ std::unique_ptr<LabelStmt> parse_label(ParseLine& pline) {
     return nullptr;
 }
 
-static const TrieTransition* binary_search_transition(size_t node,
+Parser::Parser(const std::vector<LogicalLine>& asm_lines_)
+    : parser_cpu_id(g_args.options.cpu_id), asm_lines(asm_lines_) {
+}
+
+std::unique_ptr<Program> Parser::parse() {
+    auto prog = std::make_unique<Program>();
+    for (line_idx = 0; line_idx < asm_lines.size(); line_idx++) {
+        parse_line(prog);
+    }
+    return prog;
+}
+
+const TrieTransition* Parser::binary_search_transition(size_t node,
         TrieToken key) {
     const TrieNode& nd = opcodes_parse_trie_nodes[node];
 
@@ -104,16 +116,8 @@ static const TrieTransition* binary_search_transition(size_t node,
     return nullptr;
 }
 
-// backtracking stack for opcode recognition
-struct ChoicePoint {
-    enum class Type { Token, Expr } type;
-    size_t node;
-    size_t token_pos;
-    const TrieTransition* transition;
-    size_t expr_count;   // how many expressions were pushed so far
-};
-
-static OpcodesMatch recognize_opcode(ParseLine& pline, ParseStatus& status) {
+Parser::OpcodesMatch Parser::recognize_opcode(ParseLine& pline,
+        ParseStatus& status) {
     OpcodesMatch res;
     size_t node = 0;
     const TrieTransition* tr = nullptr;
@@ -125,7 +129,7 @@ static OpcodesMatch recognize_opcode(ParseLine& pline, ParseStatus& status) {
     // label already collected in parse_line - skipped
 
     // first transition on CPU
-    TrieToken cpu_tt = to_trie_token(g_args.options.cpu_id);
+    TrieToken cpu_tt = to_trie_token(parser_cpu_id);
     tr = binary_search_transition(node, cpu_tt);
     if (!tr) {
         return res;    // no match
@@ -237,8 +241,8 @@ next_transition:
     return res;
 }
 
-static std::unique_ptr<OpcodeStmt> interpret_parse_bytecode(OpcodesMatch& match,
-        const SourceLoc& loc) {
+std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
+    OpcodesMatch& match, const SourceLoc& loc) {
     auto opcode_stmt = std::make_unique<OpcodeStmt>(loc);
 
     // find range of tokens for the expanded opcodes
@@ -355,9 +359,8 @@ static std::unique_ptr<OpcodeStmt> interpret_parse_bytecode(OpcodesMatch& match,
     return opcode_stmt;
 }
 
-static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline,
-        const SourceLoc& loc,
-        ParseStatus& status) {
+std::unique_ptr<OpcodeStmt> Parser::parse_opcode(ParseLine& pline,
+        const SourceLoc& loc, ParseStatus& status) {
     auto m = recognize_opcode(pline, status);
     if (!m.matched) {
         return nullptr;
@@ -366,9 +369,7 @@ static std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline,
     return opcode_stmt;
 }
 
-static void parse_line(const std::vector<LogicalLine>& asm_lines,
-                       size_t& line_idx,
-                       std::unique_ptr<Program>& prog) {
+void Parser::parse_line(std::unique_ptr<Program>& prog) {
     ParseLine pline(asm_lines[line_idx].tokens);
     ParseStatus status = ParseStatus::Ok;
 
@@ -417,12 +418,4 @@ static void parse_line(const std::vector<LogicalLine>& asm_lines,
 
     pline.check_end_of_line();
     prog->stmts.push_back(std::move(opcode_stmt));
-}
-
-std::unique_ptr<Program> parse(const std::vector<LogicalLine>& asm_lines) {
-    auto prog = std::make_unique<Program>();
-    for (size_t line_idx = 0; line_idx < asm_lines.size(); line_idx++) {
-        parse_line(asm_lines, line_idx, prog);
-    }
-    return prog;
 }
