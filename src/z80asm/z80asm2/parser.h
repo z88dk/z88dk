@@ -132,4 +132,7 @@ private:
     std::unique_ptr<Stmt> parse_PTR(ParseLine& pline,
                                     const SourceLoc& loc,
                                     ParseStatus& status);
+    std::unique_ptr<Stmt> parse_DWORD(ParseLine& pline,
+                                      const SourceLoc& loc,
+                                      ParseStatus& status);
 };

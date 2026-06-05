@@ -34,12 +34,15 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::DEFDB,     &Parser::parse_WORD_BE },
     { Keyword::DEFM,      &Parser::parse_BYTE },
     { Keyword::DEFP,      &Parser::parse_PTR },
+    { Keyword::DEFQ,      &Parser::parse_DWORD },
     { Keyword::DEFW,      &Parser::parse_WORD },
     { Keyword::DEFW_BE,   &Parser::parse_WORD_BE },
     { Keyword::DM,        &Parser::parse_BYTE },
     { Keyword::DP,        &Parser::parse_PTR },
+    { Keyword::DQ,        &Parser::parse_DWORD },
     { Keyword::DW,        &Parser::parse_WORD },
     { Keyword::DW_BE,     &Parser::parse_WORD_BE },
+    { Keyword::DWORD,     &Parser::parse_DWORD },
     { Keyword::EXTERN,    &Parser::parse_EXTERN },
     { Keyword::GLOBAL,    &Parser::parse_GLOBAL },
     { Keyword::MODULE,    &Parser::parse_MODULE },
@@ -338,6 +341,57 @@ std::unique_ptr<Stmt> Parser::parse_CU_MOVE(ParseLine& pline,
     return parse_two_expr_with_comma<CuMoveStmt>(pline, loc, status);
 }
 
+// Helper to parse comma-separated list of expressions with specified patch size and type
+static std::unique_ptr<Stmt> parse_data_with_size_type(
+    ParseLine& pline,
+    const SourceLoc& loc,
+    ParseStatus& status,
+    uint8_t patch_size,
+    PatchType patch_type) {
+    // create statement with empty byte list, and fill it with expressions until end of line
+    auto stmt = std::make_unique<OpcodeStmt>(loc);
+
+    while (true) {
+        // parse expression
+        auto expr = parse_expression_ast(pline, status);
+        if (status == ParseStatus::FatalError) {
+            return nullptr;    // stop immediately on error
+        }
+
+        if (!expr) {
+            pline.error("Expression expected");
+            status = ParseStatus::FatalError;
+            return nullptr;
+        }
+
+        auto patch = std::make_unique<Patch>(std::move(expr), loc);
+        patch->offset = stmt->bytes.size();
+        patch->size = patch_size;
+        patch->is_constant = false;
+        patch->type = patch_type;
+
+        // add placeholder bytes
+        for (uint8_t i = 0; i < patch_size; i++) {
+            stmt->bytes.push_back(0);
+        }
+        stmt->patches.push_back(std::move(patch));
+
+        if (pline.peek().type == TokenType::Comma) {
+            pline.advance(); // consume ','
+        }
+        else {
+            break;  // end of list
+        }
+    }
+
+    if (!pline.check_end_of_line()) {
+        status = ParseStatus::FatalError;
+        return nullptr;    // error already reported
+    }
+
+    return stmt;
+}
+
 std::unique_ptr<Stmt> Parser::parse_BYTE(ParseLine& pline, const SourceLoc& loc,
         ParseStatus& status) {
     // create statement with empty byte list, and fill it with expressions until end of line
@@ -393,133 +447,20 @@ std::unique_ptr<Stmt> Parser::parse_BYTE(ParseLine& pline, const SourceLoc& loc,
 
 std::unique_ptr<Stmt> Parser::parse_WORD(ParseLine& pline, const SourceLoc& loc,
         ParseStatus& status) {
-    // create statement with empty byte list, and fill it with expressions until end of line
-    auto stmt = std::make_unique<OpcodeStmt>(loc);
-
-    while (true) {
-        // parse expression as a byte literal
-        auto expr = parse_expression_ast(pline, status);
-        if (status == ParseStatus::FatalError) {
-            return nullptr;    // stop immediately on error
-        }
-
-        if (!expr) {
-            pline.error("Expression expected");
-            status = ParseStatus::FatalError;
-            return nullptr;
-        }
-
-        auto patch = std::make_unique<Patch>(std::move(expr), loc);
-        patch->offset = stmt->bytes.size();
-        patch->size = 2;
-        patch->is_constant = false;
-        patch->type = PatchType::Unsigned;
-
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->patches.push_back(std::move(patch));
-
-        if (pline.peek().type == TokenType::Comma) {
-            pline.advance(); // consume ','
-        }
-        else {
-            break;  // end of word list
-        }
-    }
-
-    if (!pline.check_end_of_line()) {
-        status = ParseStatus::FatalError;
-        return nullptr;    // error already reported
-    }
-
-    return stmt;
+    return parse_data_with_size_type(pline, loc, status, 2, PatchType::Unsigned);
 }
 
 std::unique_ptr<Stmt> Parser::parse_WORD_BE(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    // create statement with empty byte list, and fill it with expressions until end of line
-    auto stmt = std::make_unique<OpcodeStmt>(loc);
-
-    while (true) {
-        // parse expression as a byte literal
-        auto expr = parse_expression_ast(pline, status);
-        if (status == ParseStatus::FatalError) {
-            return nullptr;    // stop immediately on error
-        }
-
-        if (!expr) {
-            pline.error("Expression expected");
-            status = ParseStatus::FatalError;
-            return nullptr;
-        }
-
-        auto patch = std::make_unique<Patch>(std::move(expr), loc);
-        patch->offset = stmt->bytes.size();
-        patch->size = 2;
-        patch->is_constant = false;
-        patch->type = PatchType::BigEndian;
-
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->patches.push_back(std::move(patch));
-
-        if (pline.peek().type == TokenType::Comma) {
-            pline.advance(); // consume ','
-        }
-        else {
-            break;  // end of word list
-        }
-    }
-
-    if (!pline.check_end_of_line()) {
-        status = ParseStatus::FatalError;
-        return nullptr;    // error already reported
-    }
-
-    return stmt;
+    return parse_data_with_size_type(pline, loc, status, 2, PatchType::BigEndian);
 }
 
 std::unique_ptr<Stmt> Parser::parse_PTR(ParseLine& pline, const SourceLoc& loc,
                                         ParseStatus& status) {
-    // create statement with empty byte list, and fill it with expressions until end of line
-    auto stmt = std::make_unique<OpcodeStmt>(loc);
+    return parse_data_with_size_type(pline, loc, status, 3, PatchType::Unsigned);
+}
 
-    while (true) {
-        // parse expression as a byte literal
-        auto expr = parse_expression_ast(pline, status);
-        if (status == ParseStatus::FatalError) {
-            return nullptr;    // stop immediately on error
-        }
-
-        if (!expr) {
-            pline.error("Expression expected");
-            status = ParseStatus::FatalError;
-            return nullptr;
-        }
-
-        auto patch = std::make_unique<Patch>(std::move(expr), loc);
-        patch->offset = stmt->bytes.size();
-        patch->size = 3;
-        patch->is_constant = false;
-        patch->type = PatchType::Unsigned;
-
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->bytes.push_back(0);   // placeholder byte, will be replaced by patch
-        stmt->patches.push_back(std::move(patch));
-
-        if (pline.peek().type == TokenType::Comma) {
-            pline.advance(); // consume ','
-        }
-        else {
-            break;  // end of word list
-        }
-    }
-
-    if (!pline.check_end_of_line()) {
-        status = ParseStatus::FatalError;
-        return nullptr;    // error already reported
-    }
-
-    return stmt;
+std::unique_ptr<Stmt> Parser::parse_DWORD(ParseLine& pline,
+        const SourceLoc& loc, ParseStatus& status) {
+    return parse_data_with_size_type(pline, loc, status, 4, PatchType::Unsigned);
 }
