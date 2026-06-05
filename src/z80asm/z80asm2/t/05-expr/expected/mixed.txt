@@ -14,6 +14,7 @@ ucase_symbols	0
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
+filler_byte	0
 dump_after_cmdline	1
 dump_after_tokenization	0
 dump_after_directives	0
