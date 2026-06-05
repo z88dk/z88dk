@@ -1,0 +1,29 @@
+% z88dk-z80asm -v -dump-after-parse t/40-syntax//input/cu_move_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/40-syntax/input/cu_move_01.asm...
+t/40-syntax/input/cu_move_01.asm:1:8: error: Expected a value, got "\n"
+    cu.move 
+           ^
+t/40-syntax/input/cu_move_01.asm:2:10: error: Expected comma between expressions in CU_MOVE
+    cu.move 0
+             ^
+t/40-syntax/input/cu_move_01.asm:3:10: error: Unterminated expression after ","
+    cu.move 0,
+             ^
+t/40-syntax/input/cu_move_01.asm:4:12: error: Unexpected token: ","
+    cu.move 0,0,
+               ^
+Program
+    CuMoveStmt
+        Location: t/40-syntax/input/cu_move_01.asm:5:3
+        Register (0..127):
+            ExprLiteralInt: 0
+        Value (0..255):
+            ExprLiteralInt: 0
+    CuMoveStmt
+        Location: t/40-syntax/input/cu_move_01.asm:6:3
+        Register (0..127):
+            ExprLiteralInt: $7F
+        Value (0..255):
+            ExprLiteralInt: $FF
