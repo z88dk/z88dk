@@ -9,6 +9,7 @@
 #include "ast.h"
 #include "cpu.h"
 #include "expr.h"
+#include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "opcodes.h"
 #include "opcodes_trie_token.h"
@@ -16,6 +17,7 @@
 #include "source_loc.h"
 #include <cstdint>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 // bytecode for opcodes match
@@ -59,10 +61,18 @@ private:
         size_t expr_count;   // how many expressions were pushed so far
     };
 
+    // attributes
     CPU parser_cpu_id{ DEFAULT_CPU };
     const std::vector<LogicalLine>& asm_lines;
     size_t line_idx = 0;            // current line index in asm_lines
 
+    // function pointer tables for directive parsing
+    using DirectiveParseFn =
+        std::unique_ptr<Stmt>(Parser::*)(ParseLine&, const SourceLoc&,
+                                         ParseStatus&);
+    static std::unordered_map<Keyword, DirectiveParseFn> directive_parsers;
+
+    // trie-based opcode recognition
     const TrieTransition* binary_search_transition(size_t node, TrieToken key);
     OpcodesMatch recognize_opcode(ParseLine& pline, ParseStatus& status);
     std::unique_ptr<OpcodeStmt> interpret_parse_bytecode(OpcodesMatch& match,
@@ -70,5 +80,35 @@ private:
     std::unique_ptr<OpcodeStmt> parse_opcode(ParseLine& pline,
             const SourceLoc& loc,
             ParseStatus& status);
+
+    // directive parsing helpers
+    std::unique_ptr<Stmt> parse_directive(ParseLine& pline, const SourceLoc& loc,
+                                          ParseStatus& status);
+
+    // main parsing functions
     void parse_line(std::unique_ptr<Program>& prog);
+    std::unique_ptr<Stmt> parse_EXTERN(ParseLine& pline,
+                                       const SourceLoc& loc,
+                                       ParseStatus& status);
+    std::unique_ptr<Stmt> parse_PUBLIC(ParseLine& pline,
+                                       const SourceLoc& loc,
+                                       ParseStatus& status);
+    std::unique_ptr<Stmt> parse_GLOBAL(ParseLine& pline,
+                                       const SourceLoc& loc,
+                                       ParseStatus& status);
+    std::unique_ptr<Stmt> parse_MODULE(ParseLine& pline,
+                                       const SourceLoc& loc,
+                                       ParseStatus& status);
+    std::unique_ptr<Stmt> parse_SECTION(ParseLine& pline,
+                                        const SourceLoc& loc,
+                                        ParseStatus& status);
+    std::unique_ptr<Stmt> parse_ORG(ParseLine& pline, const SourceLoc& loc,
+                                    ParseStatus& status);
+    std::unique_ptr<Stmt> parse_DEFC(ParseLine& pline, const SourceLoc& loc,
+                                     ParseStatus& status);
+    std::unique_ptr<Stmt> parse_ALIGN(ParseLine& pline, const SourceLoc& loc,
+                                      ParseStatus& status);
+    std::unique_ptr<Stmt> parse_PRAGMA(ParseLine& pline,
+                                       const SourceLoc& loc,
+                                       ParseStatus& status);
 };

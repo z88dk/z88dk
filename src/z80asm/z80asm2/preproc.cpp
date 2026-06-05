@@ -18,6 +18,10 @@
 #include <string_view>
 #include <vector>
 
+Preproc::Preproc()
+    : preproc_cpu_id(g_args.options.cpu_id) {
+}
+
 bool Preproc::is_cond_active() const {
     for (auto& cond : cond_stack) {
         if (!cond.branch_active) {
@@ -107,6 +111,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     StringInterner::Id cur_file_id = 0;
 
     // reset per-run registries and state
+    preproc_cpu_id = g_args.options.cpu_id;
     include_stack.clear();
     cond_stack.clear();
     macro_expansion_stack.clear();
