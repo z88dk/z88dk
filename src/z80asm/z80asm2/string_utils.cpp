@@ -7,12 +7,12 @@
 #include "string_utils.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <vector>
 
 static constexpr std::string_view blanks = " \t\r\n\v\f";
 
@@ -102,7 +102,8 @@ std::string escape_string(std::string_view s) {
     return result;
 }
 
-std::string int_to_hex(int value) {
+// receive a int64_t to be the same width as size_t
+std::string int_to_hex(int64_t value) {
     std::ostringstream oss;
     if (abs(value) < 10) {
         oss << value;
