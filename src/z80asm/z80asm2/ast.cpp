@@ -354,6 +354,16 @@ void AlignStmt::dump(DumpContext ctx) const {
     }
 }
 
+void CallOzStmt::dump(DumpContext ctx) const {
+    ctx.line("CallOzStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (expr) {
+        c.line("Expression:");
+        expr->dump(c.child());
+    }
+}
+
 void Program::dump(DumpContext ctx) const {
     ctx.line("Program");
     auto c = ctx.child();
