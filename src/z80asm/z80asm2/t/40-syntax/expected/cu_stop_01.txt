@@ -1,0 +1,11 @@
+% z88dk-z80asm -v -dump-after-parse t/40-syntax//input/cu_stop_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/40-syntax/input/cu_stop_01.asm...
+t/40-syntax/input/cu_stop_01.asm:1:9: error: Unexpected token: "x"
+    cu.stop x 
+            ^
+t/40-syntax/input/cu_stop_01.asm:2:3: error: Unrecognized instruction or directive
+    cu.stop
+      ^
+Program
