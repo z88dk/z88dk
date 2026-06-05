@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
-#include "directives.h"
 #include "expr.h"
 #include "lexer_tokens.h"
 #include "opcodes.h"
@@ -121,7 +120,7 @@ Parser::OpcodesMatch Parser::recognize_opcode(ParseLine& pline,
     OpcodesMatch res;
     size_t node = 0;
     const TrieTransition* tr = nullptr;
-    status = ParseStatus::Ok;
+    status = ParseStatus::Unknown;
 
     // backtracking stack for handling multiple possible transitions
     std::vector<ChoicePoint> backtrack_stack;
@@ -371,7 +370,7 @@ std::unique_ptr<OpcodeStmt> Parser::parse_opcode(ParseLine& pline,
 
 void Parser::parse_line(std::unique_ptr<Program>& prog) {
     ParseLine pline(asm_lines[line_idx].tokens);
-    ParseStatus status = ParseStatus::Ok;
+    ParseStatus status = ParseStatus::Unknown;
 
     // skip empty lines
     if (pline.eol()) {
@@ -392,21 +391,24 @@ void Parser::parse_line(std::unique_ptr<Program>& prog) {
 
     // check for directives
     pline.pos = pos0;
-    status = ParseStatus::Ok;
+    status = ParseStatus::Unknown;
     auto dir_stmt = parse_directive(pline, asm_lines[line_idx].loc, status);
     if (status == ParseStatus::FatalError) {
         return;
     }
 
     if (dir_stmt) {
-        pline.check_end_of_line();
         prog->stmts.push_back(std::move(dir_stmt));
         return;
     }
 
+    if (status == ParseStatus::Ok) {
+        return; // directive parsed successfully but returned nullptr, done with this line
+    }
+
     // check for opcode
     pline.pos = pos0;
-    status = ParseStatus::Ok;
+    status = ParseStatus::Unknown;
     auto opcode_stmt = parse_opcode(pline, asm_lines[line_idx].loc, status);
     if (status == ParseStatus::FatalError) {
         return;

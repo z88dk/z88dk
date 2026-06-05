@@ -7,9 +7,11 @@
 #pragma once
 
 #include "const_symbols.h"
+#include "cpu.h"
 #include "file_mgr.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
+#include "options.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <deque>
@@ -17,7 +19,8 @@
 #include <unordered_map>
 #include <vector>
 
-// must be > 8192 so that a 64K blob can be included with BINARY without hitting the limit
+// must be greater than 8k (64k/8 bytes per line)
+// so that a 64k blob can be included with BINARY without hitting the limit
 static const int MAX_EXPANSION_DEPTH = 10000;
 
 struct Macro {
@@ -34,7 +37,7 @@ struct Macro {
 
 class Preproc {
 public:
-    Preproc() = default;
+    Preproc();
 
     // copy defines from options, command line, or global scope
     void set_const_symbols(const ConstSymbols& defs);
@@ -44,6 +47,9 @@ public:
     std::vector<LogicalLine> preprocess(std::string_view filename);
 
 private:
+
+    // cpu for the duration of preprocessing, needed for .ASSUME ADL=0/1
+    CPU preproc_cpu_id{ DEFAULT_CPU };
 
     // ---------------------------------------------------------------------
     // Include stack: tracks nested file inclusion
@@ -158,14 +164,14 @@ private:
     // dispatch tables for directive handlers
     using DirectiveHandler =
         void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
-                          ParseLine& input_line);
+                          ParseLine& pline);
     static std::unordered_map<Keyword, DirectiveHandler> directive_handlers;
     static std::unordered_map<Keyword, DirectiveHandler> conditional_handlers;
 
     using NameDirectiveHandler =
         void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
                           StringInterner::Id name_id, const SourceLoc& name_loc,
-                          ParseLine& input_line);
+                          ParseLine& pline);
     static std::unordered_map<Keyword, NameDirectiveHandler>
     name_directive_handlers;
 
@@ -180,139 +186,142 @@ private:
         Skip,
         ControlOnly
     };
-    LineType process_directive_line(const std::vector<Token>& input_line,
+    LineType process_directive_line(const std::vector<Token>& pline,
                                     LogicalLine& out_line);
 
-    bool is_directive(ParseLine& input_line,
+    bool is_directive(ParseLine& pline,
                       Keyword& out_kw,
                       SourceLoc& out_kw_loc,
                       StringInterner::Id& out_name_id,
                       SourceLoc& out_name_loc);
-    bool parse_filename(ParseLine& input_line,
+    bool parse_filename(ParseLine& pline,
                         Keyword kw,
                         std::string& out_filename,
                         bool& out_is_angle_bracket,
                         SourceLoc& out_filename_loc);
-    bool parse_and_resolve_file(ParseLine& input_line,
+    bool parse_and_resolve_file(ParseLine& pline,
                                 Keyword kw,
                                 std::string& out_resolved,
                                 SourceLoc& out_filename_loc);
-    bool parse_LINE_args(ParseLine& input_line,
+    bool parse_LINE_args(ParseLine& pline,
                          Keyword kw,
                          size_t& out_linenum, std::string& out_filename);
-    bool parse_params(ParseLine& input_line,
+    bool parse_params(ParseLine& pline,
                       std::vector<StringInterner::Id>& out_params,
                       bool& out_has_parens);
     bool read_macro_body(Keyword start_kw,
                          const SourceLoc& macro_loc,
                          std::vector<LogicalLine>& out_lines,
                          std::vector<StringInterner::Id>& out_locals);
-    std::vector<Token> collect_and_expand_line(ParseLine& input_line,
+    std::vector<Token> collect_and_expand_line(ParseLine& pline,
             Keyword kw,
             std::string_view what);
-    bool eval_if_expr(ParseLine& input_line,
+    bool eval_if_expr(ParseLine& pline,
                       Keyword kw);
-    bool eval_ifdef_name(ParseLine& input_line,
+    bool eval_ifdef_name(ParseLine& pline,
                          bool negated, Keyword keyword);
 
     void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
 
     void process_INCLUDE(Keyword kw, const SourceLoc& kw_loc,
-                         ParseLine& input_line);
+                         ParseLine& pline);
     void process_BINARY(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void process_LINE(Keyword kw, const SourceLoc& kw_loc,
-                      ParseLine& input_line);
+                      ParseLine& pline);
     void process_C_LINE(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void process_DEFINE(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void process_name_DEFINE(Keyword kw, const SourceLoc& kw_loc,
                              StringInterner::Id name_id, const SourceLoc& name_loc,
-                             ParseLine& input_line);
+                             ParseLine& pline);
     void do_DEFINE(const Macro& macro,
-                   ParseLine& input_line);
+                   ParseLine& pline);
     void process_UNDEF(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_name_UNDEF(Keyword kw, const SourceLoc& kw_loc,
                             StringInterner::Id name_id, const SourceLoc& name_loc,
-                            ParseLine& input_line);
+                            ParseLine& pline);
     void do_UNDEF(StringInterner::Id name_id);
     void process_DEFL(Keyword kw, const SourceLoc& kw_loc,
-                      ParseLine& input_line);
+                      ParseLine& pline);
     void process_name_DEFL(Keyword kw, const SourceLoc& kw_loc,
                            StringInterner::Id name_id, const SourceLoc& name_loc,
-                           ParseLine& input_line);
+                           ParseLine& pline);
     void do_DEFL(const Macro& macro,
-                 ParseLine& input_line);
+                 ParseLine& pline);
     void process_MACRO(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_name_MACRO(Keyword kw, const SourceLoc& kw_loc,
                             StringInterner::Id name_id, const SourceLoc& name_loc,
-                            ParseLine& input_line);
+                            ParseLine& pline);
     void do_MACRO(Keyword kw, const SourceLoc& kw_loc,
                   const Macro& macro);
     void process_ENDM(Keyword kw, const SourceLoc& kw_loc,
-                      ParseLine& input_line);
+                      ParseLine& pline);
     void process_REPT(Keyword kw, const SourceLoc& kw_loc,
-                      ParseLine& input_line);
+                      ParseLine& pline);
     void process_ENDR(Keyword kw, const SourceLoc& kw_loc,
-                      ParseLine& input_line);
+                      ParseLine& pline);
     void process_REPTI(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_name_REPTI(Keyword kw, const SourceLoc& kw_loc,
                             StringInterner::Id name_id, const SourceLoc& name_loc,
-                            ParseLine& input_line);
+                            ParseLine& pline);
     void do_REPTI(Keyword kw, const SourceLoc& kw_loc,
                   StringInterner::Id name_id, const SourceLoc& name_loc,
-                  ParseLine& input_line);
+                  ParseLine& pline);
     void process_REPTC(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
                             StringInterner::Id name_id, const SourceLoc& name_loc,
-                            ParseLine& input_line);
+                            ParseLine& pline);
     void process_name_DEFC(Keyword kw, const SourceLoc& kw_loc,
                            StringInterner::Id name_id, const SourceLoc& name_loc,
-                           ParseLine& input_line);
+                           ParseLine& pline);
     void do_REPTC(Keyword kw, const SourceLoc& kw_loc,
                   StringInterner::Id name_id, const SourceLoc& name_loc,
-                  ParseLine& input_line);
+                  ParseLine& pline);
     void process_LOCAL(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
                             StringInterner::Id name_id, const SourceLoc& name_loc,
-                            ParseLine& input_line);
+                            ParseLine& pline);
     void process_EXITM(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_IF(Keyword kw, const SourceLoc& kw_loc,
-                    ParseLine& input_line);
+                    ParseLine& pline);
     void process_ELSEIF(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void process_ELSE(Keyword kw, const SourceLoc& kw_loc,
-                      ParseLine& input_line);
+                      ParseLine& pline);
     void process_ENDIF(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_IFDEF(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
     void process_IFNDEF(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void do_IFDEF_IFNDEF(bool negated,
                          Keyword kw, const SourceLoc& kw_loc,
-                         ParseLine& input_line);
+                         ParseLine& pline);
     void process_ELSEIFDEF(Keyword kw, const SourceLoc& kw_loc,
-                           ParseLine& input_line);
+                           ParseLine& pline);
     void process_ELSEIFNDEF(Keyword kw, const SourceLoc& kw_loc,
-                            ParseLine& input_line);
+                            ParseLine& pline);
     void do_ELSEIFDEF_ELSEIFNDEF(bool negated,
                                  Keyword kw, const SourceLoc& kw_loc,
-                                 ParseLine& input_line);
+                                 ParseLine& pline);
     void process_PRAGMA(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void process_ASSERT(Keyword kw, const SourceLoc& kw_loc,
-                        ParseLine& input_line);
+                        ParseLine& pline);
     void process_ERROR(Keyword kw, const SourceLoc& kw_loc,
-                       ParseLine& input_line);
+                       ParseLine& pline);
+    void process_ASSUME(Keyword kw, const SourceLoc& kw_loc,
+                        ParseLine& pline);
+    void do_ASSUME(bool adl_value, const SourceLoc& kw_loc);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
