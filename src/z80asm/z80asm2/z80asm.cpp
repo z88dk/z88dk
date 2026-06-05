@@ -17,6 +17,7 @@
 #include "pathnames.h"
 #include "preproc.h"
 #include "source_loc.h"
+#include "synth_expander.h"
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -53,7 +54,8 @@ static void assemble_file(std::string_view filename) {
 
     // process synthetic instructions and rewrite tokens
     // to their final form for the assembler
-    std::vector<LogicalLine> asm_lines = synthetic_expand(hla_lines);
+    SynthExpander synth_expander(hla_lines);
+    std::vector<LogicalLine> asm_lines = synth_expander.expand();
     if (g_args.options.dump_after_synth_expansion) {
         dump_logical_lines_and_exit(asm_lines);
         // not reached
@@ -67,7 +69,8 @@ static void assemble_file(std::string_view filename) {
     }
 
     // parse source code
-    std::unique_ptr<Program> prog = parse(asm_lines);
+    Parser parser(asm_lines);
+    std::unique_ptr<Program> prog = parser.parse();
     if (g_args.options.dump_after_parse) {
         dump_ast_and_exit(prog);
         // not reached
