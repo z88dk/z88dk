@@ -1,0 +1,58 @@
+% z88dk-z80asm -v -dump-after-parse t/40-syntax//input/ddb_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/40-syntax/input/ddb_01.asm...
+t/40-syntax/input/ddb_01.asm:1:1: error: Unterminated expression after "ddb"
+    ddb
+    ^
+t/40-syntax/input/ddb_01.asm:2:1: error: Unterminated expression after "ddb"
+    ddb ,
+    ^
+t/40-syntax/input/ddb_01.asm:4:16: error: Unterminated expression after ","
+    ddb 1,2,3,1+2*3,
+                   ^
+t/40-syntax/input/ddb_01.asm:5:17: error: Unexpected token: "@"
+    ddb 1,2,3,1+2*3 @
+                    ^
+Program
+    OpcodeStmt
+        Location: t/40-syntax/input/ddb_01.asm:3:1
+        Address: 0
+        Bytes: 0 0 0 0 0 0 0 0
+        Patches:
+            Patch
+                Offset: 0, Size: 2
+                Type: BigEndian
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: 1
+            Patch
+                Offset: 2, Size: 2
+                Type: BigEndian
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: 2
+            Patch
+                Offset: 4, Size: 2
+                Type: BigEndian
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprLiteralInt: 3
+            Patch
+                Offset: 6, Size: 2
+                Type: BigEndian
+                Validation: Any
+                Formula: None
+                Inner expression:
+                    ExprBinary: +
+                        LHS:
+                            ExprLiteralInt: 1
+                        RHS:
+                            ExprBinary: *
+                                LHS:
+                                    ExprLiteralInt: 2
+                                RHS:
+                                    ExprLiteralInt: 3

@@ -126,4 +126,7 @@ private:
     std::unique_ptr<Stmt> parse_WORD(ParseLine& pline,
                                      const SourceLoc& loc,
                                      ParseStatus& status);
+    std::unique_ptr<Stmt> parse_WORD_BE(ParseLine& pline,
+                                        const SourceLoc& loc,
+                                        ParseStatus& status);
 };
