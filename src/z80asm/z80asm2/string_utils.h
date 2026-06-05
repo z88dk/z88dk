@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cctype>
+#include <cstdint>
 #include <string>
 #include <string_view>
 
@@ -32,7 +33,7 @@ inline bool ends_with(std::string_view s, std::string_view suffix) {
 std::string escape_string(std::string_view s);
 
 // Helper function to format integer as hex string
-std::string int_to_hex(int value);
+std::string int_to_hex(int64_t value);
 
 // safe ctype functions that work with signed char values
 inline bool is_space(char c) {
