@@ -29,6 +29,7 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::PRAGMA,    &Parser::parse_PRAGMA },
     { Keyword::PUBLIC,    &Parser::parse_PUBLIC },
     { Keyword::SECTION,   &Parser::parse_SECTION },
+    { Keyword::CALL_OZ,   &Parser::parse_CALL_OZ },
 };
 
 std::unique_ptr<Stmt> Parser::parse_directive(ParseLine& pline,
@@ -244,4 +245,21 @@ std::unique_ptr<Stmt> Parser::parse_PRAGMA(ParseLine& pline, const SourceLoc&,
     }
 
     return nullptr;
+}
+
+std::unique_ptr<Stmt> Parser::parse_CALL_OZ(ParseLine& pline,
+        const SourceLoc& loc, ParseStatus& status) {
+    status = ParseStatus::Unknown;
+    auto expr = parse_expression_ast(pline, status);
+    if (status == ParseStatus::FatalError) {
+        return nullptr;    // stop immediately on error
+    }
+
+    if (!expr) {
+        pline.error("Expression expected");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+
+    return std::make_unique<CallOzStmt>(std::move(expr), loc);
 }
