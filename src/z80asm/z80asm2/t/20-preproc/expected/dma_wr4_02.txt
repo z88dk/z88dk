@@ -1,0 +1,68 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_wr4_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_wr4_02.asm...
+# file: t/20-preproc/input/dma_wr4_02.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:1	keyword=DEFB 
+Integer	"193"	2:6	int_value=193 
+EndOfLine	"\n"	2:9	
+t/20-preproc/input/dma_wr4_02.asm:3:8: error: Expression expected
+    dma.wr4				; missing argument
+           ^
+t/20-preproc/input/dma_wr4_02.asm:4:15: error: Undefined constant: ext
+    dma.wr4 0x44, ext	; ext not constant
+                  ^
+t/20-preproc/input/dma_wr4_02.asm:5:15: error: Undefined constant: start
+    dma.wr4 0x44, start	; start not constant
+                  ^
+t/20-preproc/input/dma_wr4_02.asm:6:15: error: ASMPC is not allowed in a constant expression
+    dma.wr4 0x44, $		; ASMPC not constant
+                  ^
+t/20-preproc/input/dma_wr4_02.asm:7:9: error: Illegal base register: 2
+    dma.wr4 2			; illegal base register
+            ^
+t/20-preproc/input/dma_wr4_02.asm:8:10: error: Missing value
+    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
+             ^
+t/20-preproc/input/dma_wr4_02.asm:8:16: error: Missing value
+    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
+                   ^
+t/20-preproc/input/dma_wr4_02.asm:8:22: error: Missing value
+    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
+                         ^
+t/20-preproc/input/dma_wr4_02.asm:8:28: error: Missing value
+    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
+                               ^
+t/20-preproc/input/dma_wr4_02.asm:8:34: error: Missing value
+    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
+                                     ^
+t/20-preproc/input/dma_wr4_02.asm:11:10: error: Interrupts not supported: $10
+    REPTI I, 0x10, 0x11, 0x30, 0x70
+             ^
+t/20-preproc/input/dma_wr4_02.asm:11:16: error: Interrupts not supported: $11
+    REPTI I, 0x10, 0x11, 0x30, 0x70
+                   ^
+t/20-preproc/input/dma_wr4_02.asm:11:22: error: Interrupts not supported: $30
+    REPTI I, 0x10, 0x11, 0x30, 0x70
+                         ^
+t/20-preproc/input/dma_wr4_02.asm:11:28: error: Interrupts not supported: $70
+    REPTI I, 0x10, 0x11, 0x30, 0x70
+                               ^
+t/20-preproc/input/dma_wr4_02.asm:14:10: error: Illegal mode: 0
+    REPTI I, 0x00, 0x01, 0x60, 0x61
+             ^
+t/20-preproc/input/dma_wr4_02.asm:14:16: error: Illegal mode: 1
+    REPTI I, 0x00, 0x01, 0x60, 0x61
+                   ^
+t/20-preproc/input/dma_wr4_02.asm:14:22: error: Illegal mode: $60
+    REPTI I, 0x00, 0x01, 0x60, 0x61
+                         ^
+t/20-preproc/input/dma_wr4_02.asm:14:28: error: Illegal mode: $61
+    REPTI I, 0x00, 0x01, 0x60, 0x61
+                               ^
+t/20-preproc/input/dma_wr4_02.asm:17:15: error: Too many arguments
+    dma.wr4 0x40, 99	; too many arguments
+                  ^

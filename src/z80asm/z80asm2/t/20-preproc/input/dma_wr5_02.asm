@@ -1,0 +1,7 @@
+start:
+dma.wr5 0x00		; OK
+dma.wr5				; missing argument
+REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+	dma.wr5 I		; illegal base register
+ENDR
+dma.wr5 0x00, 99	; too many arguments

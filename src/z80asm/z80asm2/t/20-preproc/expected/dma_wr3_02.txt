@@ -1,0 +1,53 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_wr3_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_wr3_02.asm...
+# file: t/20-preproc/input/dma_wr3_02.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:1	keyword=DEFB 
+Integer	"128"	2:6	int_value=128 
+EndOfLine	"\n"	2:9	
+t/20-preproc/input/dma_wr3_02.asm:3:8: error: Expression expected
+    dma.wr3				; missing argument
+           ^
+t/20-preproc/input/dma_wr3_02.asm:4:15: error: Undefined constant: ext
+    dma.wr3 0x88, ext	; ext not constant
+                  ^
+t/20-preproc/input/dma_wr3_02.asm:5:15: error: Undefined constant: start
+    dma.wr3 0x88, start	; start not constant
+                  ^
+t/20-preproc/input/dma_wr3_02.asm:6:15: error: ASMPC is not allowed in a constant expression
+    dma.wr3 0x88, $		; ASMPC not constant
+                  ^
+t/20-preproc/input/dma_wr3_02.asm:7:10: error: Illegal base register: 1
+    REPTI I, 1, 2, 3, 0x67
+             ^
+t/20-preproc/input/dma_wr3_02.asm:7:13: error: Illegal base register: 2
+    REPTI I, 1, 2, 3, 0x67
+                ^
+t/20-preproc/input/dma_wr3_02.asm:7:16: error: Illegal base register: 3
+    REPTI I, 1, 2, 3, 0x67
+                   ^
+t/20-preproc/input/dma_wr3_02.asm:7:19: error: Illegal base register: $67
+    REPTI I, 1, 2, 3, 0x67
+                      ^
+t/20-preproc/input/dma_wr3_02.asm:10:10: error: Missing value
+    REPTI I, 0x08, 0x10, 0x88
+             ^
+t/20-preproc/input/dma_wr3_02.asm:10:16: error: Missing value
+    REPTI I, 0x08, 0x10, 0x88
+                   ^
+t/20-preproc/input/dma_wr3_02.asm:10:22: error: Missing value
+    REPTI I, 0x08, 0x10, 0x88
+                         ^
+t/20-preproc/input/dma_wr3_02.asm:13:15: error: Missing value
+    dma.wr3 0x18, 0x44	; missing group member
+                  ^
+t/20-preproc/input/dma_wr3_02.asm:14:15: error: Missing value
+    dma.wr3 0x98, 0x17	; missing group member
+                  ^
+t/20-preproc/input/dma_wr3_02.asm:15:15: error: Too many arguments
+    dma.wr3 0x00, 99	; too many arguments
+                  ^
