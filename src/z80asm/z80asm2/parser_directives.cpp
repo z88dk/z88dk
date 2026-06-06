@@ -36,11 +36,13 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::DEFM,      &Parser::parse_BYTE },
     { Keyword::DEFP,      &Parser::parse_PTR },
     { Keyword::DEFQ,      &Parser::parse_DWORD },
+    { Keyword::DEFS,      &Parser::parse_DEFS },
     { Keyword::DEFW,      &Parser::parse_WORD },
     { Keyword::DEFW_BE,   &Parser::parse_WORD_BE },
     { Keyword::DM,        &Parser::parse_BYTE },
     { Keyword::DP,        &Parser::parse_PTR },
     { Keyword::DQ,        &Parser::parse_DWORD },
+    { Keyword::DS,        &Parser::parse_DEFS },
     { Keyword::DW,        &Parser::parse_WORD },
     { Keyword::DW_BE,     &Parser::parse_WORD_BE },
     { Keyword::DWORD,     &Parser::parse_DWORD },
@@ -207,6 +209,8 @@ std::unique_ptr<Stmt> Parser::parse_DEFC(ParseLine& pline, const SourceLoc& loc,
 
 std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
+    uint8_t default_filler = g_args.options.filler_byte;
+
     // get first parameter (alignment)
     status = ParseStatus::Unknown;
     auto align_expr = parse_expression_ast(pline, status);
@@ -214,10 +218,10 @@ std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
         return nullptr;    // stop immediately on error
     }
 
-    // second parameter (fill byte) is optional; if not present, use default from options
+    // second parameter (fill byte) is optional;
+    // if not present, use default from options
     if (pline.eol()) {
-        auto filler_expr = std::make_unique<ExprLiteralInt>(g_args.options.filler_byte,
-                           loc);
+        auto filler_expr = std::make_unique<ExprLiteralInt>(default_filler, loc);
         return std::make_unique<AlignStmt>(std::move(align_expr),
                                            std::move(filler_expr), loc);
     }
@@ -237,6 +241,53 @@ std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
 
     return std::make_unique<AlignStmt>(std::move(align_expr),
                                        std::move(fill_expr), loc);
+}
+
+std::unique_ptr<Stmt> Parser::parse_DEFS(ParseLine& pline, const SourceLoc& loc,
+        ParseStatus& status) {
+    uint8_t default_filler = g_args.options.filler_byte;
+
+    // get first parameter (size)
+    status = ParseStatus::Unknown;
+    auto size_expr = parse_expression_ast(pline, status);
+    if (status == ParseStatus::FatalError) {
+        return nullptr;    // stop immediately on error
+    }
+
+    // second parameter (fill byte) is optional;
+    // if not present, use default from options
+    if (pline.eol()) {
+        auto filler_expr = std::make_unique<ExprLiteralInt>(default_filler, loc);
+        return std::make_unique<DefsNumericStmt>(std::move(size_expr),
+                std::move(filler_expr), loc);
+    }
+
+    // get second parameter (fill byte or string)
+    if (pline.peek().type != TokenType::Comma) {
+        pline.error("Expected comma after size expression");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+    pline.advance(); // consume comma
+
+    if (pline.peek().type == TokenType::String) {
+        // string literal case - convert to byte array
+        auto str_value_id = pline.peek().value.str_value_id;
+        pline.advance(); // consume string
+
+        return std::make_unique<DefsStringStmt>(std::move(size_expr),
+                                                str_value_id, default_filler, loc);
+    }
+    else {
+        // expression case - evaluate to byte value
+        auto filler_expr = parse_expression_ast(pline, status);
+        if (status == ParseStatus::FatalError) {
+            return nullptr;    // stop immediately on error
+        }
+
+        return std::make_unique<DefsNumericStmt>(std::move(size_expr),
+                std::move(filler_expr), loc);
+    }
 }
 
 std::unique_ptr<Stmt> Parser::parse_PRAGMA(ParseLine& pline, const SourceLoc&,
@@ -465,3 +516,4 @@ std::unique_ptr<Stmt> Parser::parse_DWORD(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
     return parse_data_with_size_type(pline, loc, status, 4, PatchType::Unsigned);
 }
+

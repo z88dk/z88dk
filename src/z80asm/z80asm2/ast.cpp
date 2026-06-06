@@ -354,6 +354,32 @@ void AlignStmt::dump(DumpContext ctx) const {
     }
 }
 
+void DefsNumericStmt::dump(DumpContext ctx) const {
+    ctx.line("DefsNumericStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (size_expr) {
+        c.line("Size:");
+        size_expr->dump(c.child());
+    }
+    if (filler_expr) {
+        c.line("Filler byte:");
+        filler_expr->dump(c.child());
+    }
+}
+
+void DefsStringStmt::dump(DumpContext ctx) const {
+    ctx.line("DefsStringStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (size_expr) {
+        c.line("Size:");
+        size_expr->dump(c.child());
+    }
+    c.line("String literal: " + escape_string(g_strings.to_string(string_id)));
+    c.line("Filler byte: " + int_to_hex(filler_byte));
+}
+
 void CallOzStmt::dump(DumpContext ctx) const {
     ctx.line("CallOzStmt");
     auto c = ctx.child();
