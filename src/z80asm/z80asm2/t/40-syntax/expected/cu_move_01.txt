@@ -16,13 +16,13 @@ t/40-syntax/input/cu_move_01.asm:4:12: error: Unexpected token: ","
                ^
 Program
     CuMoveStmt
-        Location: t/40-syntax/input/cu_move_01.asm:5:3
+        Location: t/40-syntax/input/cu_move_01.asm:5:1
         Register (0..127):
             ExprLiteralInt: 0
         Value (0..255):
             ExprLiteralInt: 0
     CuMoveStmt
-        Location: t/40-syntax/input/cu_move_01.asm:6:3
+        Location: t/40-syntax/input/cu_move_01.asm:6:1
         Register (0..127):
             ExprLiteralInt: $7F
         Value (0..255):
