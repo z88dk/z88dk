@@ -1,0 +1,50 @@
+% z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/defvars_17.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/20-preproc/input/defvars_17.asm...
+# file: t/20-preproc/input/defvars_17.asm
+Identifier	"DEFC"	3:5	keyword=DEFC 
+Identifier	"var1"	3:10	
+EQ	"="	3:15	
+Integer	"16384"	3:17	int_value=16384 
+EndOfLine	"\n"	3:22	
+Define constant: var1 = $4000
+Identifier	"DEFC"	4:5	keyword=DEFC 
+Identifier	"var2"	4:10	
+EQ	"="	4:15	
+Integer	"16385"	4:17	int_value=16385 
+EndOfLine	"\n"	4:22	
+Define constant: var2 = $4001
+Identifier	"DEFC"	5:5	keyword=DEFC 
+Identifier	"var3"	5:10	
+EQ	"="	5:15	
+Integer	"16386"	5:17	int_value=16386 
+EndOfLine	"\n"	5:22	
+Define constant: var3 = $4002
+Identifier	"DEFC"	9:5	keyword=DEFC 
+Identifier	"var4"	9:10	
+EQ	"="	9:15	
+Integer	"16387"	9:17	int_value=16387 
+EndOfLine	"\n"	9:22	
+Define constant: var4 = $4003
+Identifier	"DEFC"	10:5	keyword=DEFC 
+Identifier	"var5"	10:10	
+EQ	"="	10:15	
+Integer	"16388"	10:17	int_value=16388 
+EndOfLine	"\n"	10:22	
+Define constant: var5 = $4004
+Identifier	"DEFC"	11:5	keyword=DEFC 
+Identifier	"var6"	11:10	
+EQ	"="	11:15	
+Integer	"16389"	11:17	int_value=16389 
+EndOfLine	"\n"	11:22	
+Define constant: var6 = $4005
+EndOfLine	"\n"	13:1	
+symbol	__CPU_Z80__	1	(defined at )
+symbol	__CPU_ZILOG__	1	(defined at )
+symbol	var1	$4000	(defined at t/20-preproc/input/defvars_17.asm:3:10)
+symbol	var2	$4001	(defined at t/20-preproc/input/defvars_17.asm:4:10)
+symbol	var3	$4002	(defined at t/20-preproc/input/defvars_17.asm:5:10)
+symbol	var4	$4003	(defined at t/20-preproc/input/defvars_17.asm:9:10)
+symbol	var5	$4004	(defined at t/20-preproc/input/defvars_17.asm:10:10)
+symbol	var6	$4005	(defined at t/20-preproc/input/defvars_17.asm:11:10)
