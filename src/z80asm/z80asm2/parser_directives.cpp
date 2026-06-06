@@ -24,8 +24,6 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
 = {
     { Keyword::ALIGN,     &Parser::parse_ALIGN },
     { Keyword::BYTE,      &Parser::parse_BYTE },
-    { Keyword::CU_MOVE,   &Parser::parse_CU_MOVE },
-    { Keyword::CU_WAIT,   &Parser::parse_CU_WAIT },
     { Keyword::DB,        &Parser::parse_BYTE },
     { Keyword::DC,        &Parser::parse_DEFC },
     { Keyword::DDB,       &Parser::parse_WORD_BE },
@@ -319,60 +317,6 @@ std::unique_ptr<Stmt> Parser::parse_PRAGMA(ParseLine& pline, const SourceLoc&,
     }
 
     return nullptr;
-}
-
-// Helper to parse two expressions separated by ','
-template<typename StmtType>
-static std::unique_ptr<Stmt> parse_two_expr_with_comma(ParseLine& pline,
-        const SourceLoc& loc,
-        ParseStatus& status) {
-    status = ParseStatus::Unknown;
-    auto first_expr = parse_expression_ast(pline, status);
-    if (status == ParseStatus::FatalError) {
-        return nullptr;    // stop immediately on error
-    }
-
-    if (!first_expr) {
-        pline.error("Expression expected");
-        status = ParseStatus::FatalError;
-        return nullptr;
-    }
-
-    if (pline.peek().type != TokenType::Comma) {
-        pline.error("Comma expected");
-        status = ParseStatus::FatalError;
-        return nullptr;
-    }
-    pline.advance(); // consume ','
-
-    auto second_expr = parse_expression_ast(pline, status);
-    if (status == ParseStatus::FatalError) {
-        return nullptr;    // stop immediately on error
-    }
-
-    if (!second_expr) {
-        pline.error("Expression expected");
-        status = ParseStatus::FatalError;
-        return nullptr;
-    }
-
-    if (!pline.check_end_of_line()) {
-        status = ParseStatus::FatalError;
-        return nullptr;    // error already reported
-    }
-
-    return std::make_unique<StmtType>(std::move(first_expr), std::move(second_expr),
-                                      loc);
-}
-
-std::unique_ptr<Stmt> Parser::parse_CU_WAIT(ParseLine& pline,
-        const SourceLoc& loc, ParseStatus& status) {
-    return parse_two_expr_with_comma<CuWaitStmt>(pline, loc, status);
-}
-
-std::unique_ptr<Stmt> Parser::parse_CU_MOVE(ParseLine& pline,
-        const SourceLoc& loc, ParseStatus& status) {
-    return parse_two_expr_with_comma<CuMoveStmt>(pline, loc, status);
 }
 
 // Helper to parse comma-separated list of expressions with specified patch size and type
