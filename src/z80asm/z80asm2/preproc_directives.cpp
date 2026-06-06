@@ -1940,52 +1940,45 @@ void Preproc::process_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
 
 void Preproc::process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
                                ParseLine& pline) {
-    // extract the expression
-    ParseStatus status = ParseStatus::Unknown;
-    size_t expr_start = pline.pos;
-    auto expr = parse_expression_ast(pline, status);
-    if (status == ParseStatus::FatalError || !expr) {
-        return;    // stop immediately on error
+    // Collect and expand the PKG instruction argument expression
+    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
+    if (expanded.empty()) {
+        return;  // error already reported
     }
 
-    size_t expr_end = pline.pos;
-    if (expr_end == expr_start) {
-        g_diag.error(kw_loc, "Expression expected after " + to_string(kw));
+    // Evaluate constant expression (not silent -> errors are reported)
+    int arg_value = 0;
+    ParseLine expr_pline(expanded);
+    if (!eval_const_expr(expr_pline,
+                         const_symbols, arg_value, /*silent=*/false)) {
+        return;  // error already reported by eval_const_expr
+    }
+
+    if (!expr_pline.check_end_of_line()) {
+        return; // error already reported by check_end_of_line
+    }
+
+    // check argument range
+    if (arg_value < 0 || arg_value > 0xFFFF) {
+        g_diag.error(expanded.front().loc,
+                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(arg_value));
         return;
     }
 
-    if (!pline.check_end_of_line()) {
-        return;
-    }
-
-    // create a macro
-    std::deque<LogicalLine> macro_lines;
-
+    // macros already expanded, send directly to assembler output queue
     // first line: RST $08
     std::string rst_str = "RST $08";
     std::vector<Token> rst_tokens = tokenize_text(rst_str, kw_loc);
     LogicalLine rst_line(kw_loc);
     rst_line.tokens = std::move(rst_tokens);
-    macro_lines.push_back(std::move(rst_line));
+    assembler_output_queue.push_back(std::move(rst_line));
 
-    // second line: DEFW <expression>
-    std::string defw_str = "DEFW";
-    std::vector<Token> defw_tokens = tokenize_text(defw_str, kw_loc);
-
-    // remove end-of-line token from defc_tokens if present, since we will append
-    if (!defw_tokens.empty() && defw_tokens.back().type == TokenType::EndOfLine) {
-        defw_tokens.pop_back();
-    }
-    defw_tokens.insert(defw_tokens.end(),
-                       pline.tokens.begin() + expr_start, pline.tokens.begin() + expr_end);
-    defw_tokens.push_back(Token::end_of_line(kw_loc));
-
-    LogicalLine defw_line(kw_loc);
-    defw_line.tokens = std::move(defw_tokens);
-    macro_lines.push_back(std::move(defw_line));
-
-    // push the macro lines to the work queue
-    push_macro_expansion(0, std::move(macro_lines));
+    // second line: DEFB | DEFW <argument>
+    std::string def_str = "DEFW " + std::to_string(arg_value);
+    std::vector<Token> def_tokens = tokenize_text(def_str, kw_loc);
+    LogicalLine def_line(kw_loc);
+    def_line.tokens = std::move(def_tokens);
+    assembler_output_queue.push_back(std::move(def_line));
 }
 
 void Preproc::do_CU_args(Keyword kw, const SourceLoc& kw_loc,
