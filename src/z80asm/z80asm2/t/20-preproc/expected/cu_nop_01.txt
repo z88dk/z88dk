@@ -6,6 +6,6 @@ t/20-preproc/input/cu_nop_01.asm:1:8: error: Unexpected token: "x"
     cu.nop x 
            ^
 # file: t/20-preproc/input/cu_nop_01.asm
-Identifier	"DEFW_BE"	2:3	keyword=DEFW_BE 
-Integer	"0"	2:11	int_value=0 
-EndOfLine	"\n"	2:12	
+Identifier	"DEFW_BE"	2:1	keyword=DEFW_BE 
+Integer	"0"	2:9	int_value=0 
+EndOfLine	"\n"	2:10	
