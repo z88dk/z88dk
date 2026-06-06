@@ -1,0 +1,15 @@
+% z88dk-z80asm -v -mz80n -E t/35-preproc-only//input/dma_wr5_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/35-preproc-only/input/dma_wr5_01.asm...
+t/35-preproc-only/input/dma_wr5_01.asm:2:9: warning: Ready signals not supported: $8A
+    dma.wr5 0x08
+            ^
+t/35-preproc-only/input/dma_wr5_01.asm:4:9: warning: Ready signals not supported: $BA
+    dma.wr5 0x38
+            ^
+t/35-preproc-only/input/dma_wr5_01.asm:5:9: warning: Ready signals not supported: $BA
+    dma.wr5 0x3A
+            ^
+Writing t/35-preproc-only/input/dma_wr5_01.i...
+Assembly completed with 0 error(s)

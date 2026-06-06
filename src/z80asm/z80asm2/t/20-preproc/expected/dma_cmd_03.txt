@@ -1,0 +1,5 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_cmd_03.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_cmd_03.asm...
+t/20-preproc/input/dma_cmd_03.asm:2:1: error: Unexpected end of file in DMA_CMD directive

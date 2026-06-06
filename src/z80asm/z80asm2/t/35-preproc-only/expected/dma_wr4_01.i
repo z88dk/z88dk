@@ -1,0 +1,77 @@
+# 1 "t/35-preproc-only/input/dma_wr4_01.asm"
+DEFB $A1
+DEFB $C1
+
+ DEFB $A5
+# 4
+ DEFB 0
+# 4
+ DEFB $A5
+# 4
+ DEFB 1
+# 4
+ DEFB $A5
+# 4
+ DEFB 2
+# 4
+ DEFB $A5
+# 4
+ DEFB $23
+
+
+ DEFB $C5
+# 7
+ DEFB 0
+# 7
+ DEFB $C5
+# 7
+ DEFB 1
+# 7
+ DEFB $C5
+# 7
+ DEFB 2
+# 7
+ DEFB $C5
+# 7
+ DEFB $23
+
+
+ DEFB $A9
+# 10
+ DEFB 0
+# 10
+ DEFB $A9
+# 10
+ DEFB 1
+# 10
+ DEFB $A9
+# 10
+ DEFB 2
+# 10
+ DEFB $A9
+# 10
+ DEFB $23
+
+
+ DEFB $C9
+# 13
+ DEFB 0
+# 13
+ DEFB $C9
+# 13
+ DEFB 1
+# 13
+ DEFB $C9
+# 13
+ DEFB 2
+# 13
+ DEFB $C9
+# 13
+ DEFB $23
+
+DEFB $AD
+# 15
+DEFW $1234
+DEFB $CD
+# 16
+DEFW $1234

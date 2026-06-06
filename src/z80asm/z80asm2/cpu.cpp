@@ -287,3 +287,464 @@ bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc) {
     out_value = 0x0000;
     return true;
 }
+
+bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
+                      CPU cpu_id,
+                      const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+                      Keyword kw, const SourceLoc& kw_loc) {
+    assert(!val_loc_data.empty());
+
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, to_string(kw) + " is only supported on the z80n");
+        return false;
+    }
+
+    // index into data
+    size_t idx = 0;
+
+    // Lambda to retrieve the last location from val_loc_data
+    auto last_loc = [&]() -> SourceLoc {
+        if (idx == 0) {
+            return val_loc_data[0].second; // no values, use first loc for error
+        }
+        else if (idx <= val_loc_data.size()) {
+            return val_loc_data[idx - 1].second; // last retrieved value loc
+        }
+        else {
+            return val_loc_data.back().second; // all values retrieved, use last loc for error
+        }
+    };
+
+    // Lambda to retrieve the next value from val_loc_data
+    auto next_val = [&](int& out_value) -> bool {
+        if (idx >= val_loc_data.size()) {
+            g_diag.error(last_loc(),
+                         "Missing value");
+            return false;
+        }
+        out_value = val_loc_data[idx++].first;
+		if (out_value < 0) {
+            g_diag.error(last_loc(),
+                         "Integer out of range: " + int_to_hex(out_value));
+            return false;
+        }
+        return true;
+    };
+
+    // Lambda to create a new entry in out_size_val_data with the given size
+    // and next value
+    auto add_entry = [&](int size) -> bool {
+        int value = 0;
+        if (!next_val(value)) {
+            return false; // error already reported
+        }
+        out_size_val_data.emplace_back(size, value);
+        return true;
+    };
+
+    // get command byte
+    int N = 0, W = 0;
+    if (!next_val(N)) {
+        return false; // error already reported
+    }
+
+    switch (kw) {
+    case Keyword::DMA_WR0:
+        /*
+        dma.wr0 n [, w, x, y, z]
+        n: bit 7 must be 0, bits 1..0 must be 01 else error "Illegal base register"
+
+        If bit 3 of n is set then accept one following byte\
+        If bit 4 of n is set then accept one following byte/ set together, expect word instead
+        If bit 5 of n is set then accept one following byte\
+        If bit 6 of n is set then accept one following byte/ set together, expect word instead
+        */
+        if ((N & 0x83) != 0x01) {
+            g_diag.error(last_loc(),
+                         "Illegal base register: " + int_to_hex(N));
+            return false;
+        }
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        // parse wr0 parameters: check bits 3,4
+        if ((N & 0x18) != 0 && idx >= val_loc_data.size()) {
+            g_diag.error(last_loc(),
+                         "Missing value");
+            return false;
+        }
+        switch (N & 0x18) {
+        case 0:
+            break;
+        case 0x08:	// bit 3
+            if (!add_entry(1)) {
+                return false;
+            }
+            break;
+        case 0x10:	// bit 4
+            if (!add_entry(1)) {
+                return false;
+            }
+            break;
+        case 0x18: 	// bits 3,4
+            if (!add_entry(2)) {
+                return false;
+            }
+            break;
+        default:
+            assert(0);
+        }
+
+        // parse wr0 parameters: check bits 5,6
+        if ((N & 0x60) != 0 && idx >= val_loc_data.size()) {
+            g_diag.error(last_loc(),
+                         "Missing value");
+            return false;
+        }
+        switch (N & 0x60) {
+        case 0:
+            break;
+        case 0x20:	// bit 5
+            if (!add_entry(1)) {
+                return false;
+            }
+            break;
+        case 0x40:	// bit 6
+            if (!add_entry(1)) {
+                return false;
+            }
+            break;
+        case 0x60: 	// bits 5,6
+            if (!add_entry(2)) {
+                return false;
+            }
+            break;
+        default:
+            assert(0);
+        }
+        break;
+
+    case Keyword::DMA_WR1:
+        /*
+        dma.wr1 n [,w]
+        or 0x04 into n
+        n: bit 7 must be 0, bits 2..0 must be 100 else error "Illegal base register"
+        If bit 6 of n is set then accept one following byte w.
+
+        In w bits 5..4 must be 0, bits 1..0 must not be 11 error "Illegal port A timing"
+        In w if any of bits 7,6,3,2 are set warning "Half cycle timing not supported"
+        */
+        if (((N & 0x87) | 0x04) != 0x04) {
+            g_diag.error(last_loc(),
+                         "Illegal base register: " + int_to_hex(N));
+            return false;
+        }
+        N |= 0x04;
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        if (N & 0x40) {
+            if (idx >= val_loc_data.size()) {
+                g_diag.error(last_loc(),
+                             "Missing value");
+                return false;
+            }
+
+            if (!next_val(W)) {
+                return false; // error already reported
+            }
+
+            out_size_val_data.emplace_back(1, W & 0xFF);
+
+            if ((W & 0x30) != 0 || (W & 0x03) == 0x03) {
+                g_diag.error(last_loc(),
+                             "Illegal port A timing: " + int_to_hex(W));
+                return false;
+            }
+            if (W & 0xCC) {
+                g_diag.warning(last_loc(),
+                            "Half cycle timing not supported: " + int_to_hex(W));
+            }
+        }
+        break;
+
+    case Keyword::DMA_WR2:
+        /*
+        dma.wr2 n [,w,x]
+        n: bit 7 must be 0, bits 2..0 must be 000 else error "Illegal base register"
+        If bit 6 of n is set then accept one following byte w
+
+        In w bit 4 must be 0, bits 1..0 must not be 11 error "Illegal port B timing"
+        In w if any of bits 7,6,3,2 are set warning "Half cycle timing not supported"
+        If bit 5 of w is set then accept one following byte x that can be anything.
+        */
+        if ((N & 0x87) != 0x00) {
+            g_diag.error(last_loc(),
+                         "Illegal base register: " + int_to_hex(N));
+            return false;
+        }
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        if (N & 0x40) {
+            if (idx >= val_loc_data.size()) {
+                g_diag.error(last_loc(),
+                             "Missing value");
+                return false;
+            }
+
+            if (!next_val(W)) {
+                return false; // error already reported
+            }
+
+            out_size_val_data.emplace_back(1, W & 0xFF);
+
+            if ((W & 0x10) != 0 || (W & 0x03) == 0x03) {
+                g_diag.error(last_loc(),
+                             "Illegal port B timing: " + int_to_hex(W));
+                return false;
+            }
+            if (W & 0xCC) {
+                g_diag.warning(last_loc(),
+                               "Half cycle timing not supported: " + int_to_hex(W));
+            }
+
+            if (W & 0x20) {
+                if (idx >= val_loc_data.size()) {
+                    g_diag.error(last_loc(),
+                                 "Missing value");
+                    return false;
+                }
+                if (!add_entry(1)) {
+                    return false;
+                }
+            }
+        }
+        break;
+
+    case Keyword::DMA_WR3:
+        /*
+        dma.wr3 n [,w,x]
+        or 0x80 into n
+        n: bit 7 must be 1, bits 1..0 must be 00 else error "Illegal base register"
+        If any of bits 6,5,2 of n are set then warning "Some DMA features not supported"
+
+        If bit 3 of n is set then accept one following byte that can be anything.
+        If bit 4 of n is set then accept one following byte that can be anything.
+        */
+        if (((N & 0x83) | 0x80) != 0x80) {
+            g_diag.error(last_loc(),
+                         "Illegal base register: " + int_to_hex(N));
+            return false;
+        }
+        N |= 0x80;
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        if (N & 0x64) {
+            g_diag.warning(last_loc(),
+                           "Some DMA features not supported: " + int_to_hex(N));
+        }
+
+        if (N & 0x08) {
+            if (idx >= val_loc_data.size()) {
+                g_diag.error(last_loc(),
+                             "Missing value");
+                return false;
+            }
+            if (!add_entry(1)) {
+                return false;
+            }
+        }
+
+        if (N & 0x10) {
+            if (idx >= val_loc_data.size()) {
+                g_diag.error(last_loc(),
+                             "Missing value");
+                return false;
+            }
+            if (!add_entry(1)) {
+                return false;
+            }
+        }
+        break;
+
+    case Keyword::DMA_WR4:
+        /*
+        dma.wr4 n, [w,x]
+        or 0x81 into n
+        n: bit 7 must be 1, bits 1..0 must be 01 else error "Illegal base register"
+        If bit 4 of n is set then error "Interrupts not supported"
+        If bits 6..5 of n are 00 or 11 error "dma mode is illegal"
+        If bit 2 of n is set then accept one following byte\
+        If bit 3 of n is set then accept one following byte/ set together, expect word instead
+
+        Again if both bits 2 & 3 are set, w,x must be combined into a single word parameter.
+        */
+        if (((N & 0x83) | 0x81) != 0x81) {
+            g_diag.error(last_loc(),
+                         "Illegal base register: " + int_to_hex(N));
+            return false;
+        }
+        if (N & 0x10) {
+            g_diag.error(last_loc(),
+                         "Interrupts not supported: " + int_to_hex(N));
+            return false;
+        }
+        if ((N & 0x60) == 0 || (N & 0x60) == 0x60) {
+            g_diag.error(last_loc(),
+                         "Illegal mode: " + int_to_hex(N));
+            return false;
+        }
+        N |= 0x81;
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        if ((N & 0x0C) == 0x0C) {
+            if (idx >= val_loc_data.size()) {
+                g_diag.error(last_loc(),
+                             "Missing value");
+                return false;
+            }
+            if (!add_entry(2)) {
+                return false;
+            }
+        }
+        else {
+            if (N & 0x04) {
+                if (idx >= val_loc_data.size()) {
+                    g_diag.error(last_loc(),
+                                 "Missing value");
+                    return false;
+                }
+                if (!add_entry(1)) {
+                    return false;
+                }
+            }
+            if (N & 0x08) {
+                if (idx >= val_loc_data.size()) {
+                    g_diag.error(last_loc(),
+                                 "Missing value");
+                    return false;
+                }
+                if (!add_entry(1)) {
+                    return false;
+                }
+            }
+        }
+        break;
+
+    case Keyword::DMA_WR5:
+        /*
+        dma.wr5 n
+        or 0x82 into n
+        n: bits 7..6 must be 10, bits 2..0 must be 010 else error "Illegal base register"
+        If bit 3 of n is set then warning "Ready signals not supported"
+        */
+        if (((N & 0xC7) | 0x82) != 0x82) {
+            g_diag.error(last_loc(),
+                         "Illegal base register: " + int_to_hex(N));
+            return false;
+        }
+        N |= 0x82;
+
+        if (N & 0x08) {
+            g_diag.warning(last_loc(),
+                           "Ready signals not supported: " + int_to_hex(N));
+        }
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        break;
+
+    case Keyword::DMA_WR6:
+    case Keyword::DMA_CMD:
+        /*
+        dma.wr6 n [,w] or dma.cmd n [,w]
+        n:
+        accept 0xcf, 0xd3, 0x87, 0x83, 0xbb
+        warning on 0xc3, 0xc7, 0xcb, 0xaf, 0xab, 0xa3, 0xb7, 0xbf, 0x8b, 0xa7, 0xb3
+        "Command not implemented"
+        anything else error "illegal dma command"
+
+        if n = 0xbb accept a following byte w
+        If bit 7 of w is set error "read mask is illegal"
+
+        If any of these are missing following bytes in the comma list then maybe error
+        "missing register group member(s)".
+        if there are too many bytes "too many arguments".
+        */
+        switch (N) {
+        case 0x83:
+        case 0x87:
+        case 0xBB:
+        case 0xCF:
+        case 0xD3:
+            break;
+
+        case 0x8B:
+        case 0xA3:
+        case 0xA7:
+        case 0xAB:
+        case 0xAF:
+        case 0xB3:
+        case 0xB7:
+        case 0xBF:
+        case 0xC3:
+        case 0xC7:
+        case 0xCB:
+            g_diag.warning(last_loc(),
+                           "Command not implemented: " + int_to_hex(N));
+            break;
+
+        default:
+            g_diag.error(last_loc(),
+                         "Illegal command: " + int_to_hex(N));
+            return false;
+        }
+
+        // add command byte
+        out_size_val_data.emplace_back(1, N & 0xFF);
+
+        if (N == 0xBB) {
+            if (idx >= val_loc_data.size()) {
+                g_diag.error(last_loc(),
+                             "Missing value");
+                return false;
+            }
+
+            if (!next_val(W)) {
+                return false; // error already reported
+            }
+
+            if (W & 0x80) {
+                g_diag.error(last_loc(),
+                             "Illegal mask" + int_to_hex(W));
+                return false;
+            }
+
+            out_size_val_data.emplace_back(1, W & 0xFF);
+        }
+        break;
+
+    default:
+        assert(0);
+        return false; // not reached
+    }
+
+    // Check for extra arguments
+    if (idx < val_loc_data.size()) {
+        g_diag.error(val_loc_data[idx].second,
+                     "Too many arguments");
+        return false;
+    }
+
+    return true;
+}
+
