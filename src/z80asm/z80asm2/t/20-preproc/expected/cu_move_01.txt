@@ -15,13 +15,13 @@ t/20-preproc/input/cu_move_01.asm:4:12: error: Unexpected token: ","
     cu.move 0,0,
                ^
 # file: t/20-preproc/input/cu_move_01.asm
-Identifier	"CU_MOVE"	5:3	keyword=CU_MOVE 
+Identifier	"CU_MOVE"	5:1	keyword=CU_MOVE 
 Integer	"0"	5:9	int_value=0 
 Comma	","	5:10	
 Integer	"0"	5:11	int_value=0 
-EndOfLine	"\n"	5:3	
-Identifier	"CU_MOVE"	6:3	keyword=CU_MOVE 
+EndOfLine	"\n"	5:1	
+Identifier	"CU_MOVE"	6:1	keyword=CU_MOVE 
 Integer	"127"	6:9	int_value=127 
 Comma	","	6:12	
 Integer	"255"	6:13	int_value=255 
-EndOfLine	"\n"	6:3	
+EndOfLine	"\n"	6:1	

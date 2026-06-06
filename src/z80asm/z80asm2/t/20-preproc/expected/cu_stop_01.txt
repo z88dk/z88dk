@@ -6,6 +6,6 @@ t/20-preproc/input/cu_stop_01.asm:1:9: error: Unexpected token: "x"
     cu.stop x 
             ^
 # file: t/20-preproc/input/cu_stop_01.asm
-Identifier	"DEFW_BE"	2:3	keyword=DEFW_BE 
-Integer	"$FFFF"	2:11	int_value=65535 
-EndOfLine	"\n"	2:16	
+Identifier	"DEFW_BE"	2:1	keyword=DEFW_BE 
+Integer	"$FFFF"	2:9	int_value=65535 
+EndOfLine	"\n"	2:14	

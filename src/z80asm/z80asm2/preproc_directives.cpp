@@ -168,43 +168,29 @@ bool Preproc::is_directive(ParseLine& pline,
 
     // Spectrum Next copper unit directive
     if (pline.peek().keyword == Keyword::CU &&
-            pline.peek(1).type == TokenType::Dot &&
-            pline.peek(2).keyword == Keyword::WAIT) {
-        out_kw = Keyword::CU_WAIT;
-        out_kw_loc = pline.peek(1).loc;
-        pline.pos += 3; // consume 'CU', '.' and 'WAIT'
-        return true;
-    }
+            pline.peek(1).type == TokenType::Dot) {
+        switch (pline.peek(2).keyword) {
+        case Keyword::WAIT:
+            out_kw = Keyword::CU_WAIT;
+            break;
+        case Keyword::MOVE:
+            out_kw = Keyword::CU_MOVE;
+            break;
+        case Keyword::STOP:
+            out_kw = Keyword::CU_STOP;
+            break;
+        case Keyword::NOP:
+            out_kw = Keyword::CU_NOP;
+            break;
+        default:
+            goto not_copper;
+        }
 
-    // Spectrum Next copper unit directive
-    if (pline.peek().keyword == Keyword::CU &&
-            pline.peek(1).type == TokenType::Dot &&
-            pline.peek(2).keyword == Keyword::MOVE) {
-        out_kw = Keyword::CU_MOVE;
-        out_kw_loc = pline.peek(1).loc;
-        pline.pos += 3; // consume 'CU', '.' and 'MOVE'
+        out_kw_loc = pline.peek().loc;
+        pline.pos += 3; // consume 'CU', '.' and <directive>
         return true;
     }
-
-    // Spectrum Next copper unit directive
-    if (pline.peek().keyword == Keyword::CU &&
-            pline.peek(1).type == TokenType::Dot &&
-            pline.peek(2).keyword == Keyword::STOP) {
-        out_kw = Keyword::CU_STOP;
-        out_kw_loc = pline.peek(1).loc;
-        pline.pos += 3; // consume 'CU', '.' and 'STOP'
-        return true;
-    }
-
-    // Spectrum Next copper unit directive
-    if (pline.peek().keyword == Keyword::CU &&
-            pline.peek(1).type == TokenType::Dot &&
-            pline.peek(2).keyword == Keyword::NOP) {
-        out_kw = Keyword::CU_NOP;
-        out_kw_loc = pline.peek(1).loc;
-        pline.pos += 3; // consume 'CU', '.' and 'NOP'
-        return true;
-    }
+not_copper:
 
     return false;
 }
