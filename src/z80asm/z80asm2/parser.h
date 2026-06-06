@@ -108,6 +108,9 @@ private:
                                      ParseStatus& status);
     std::unique_ptr<Stmt> parse_ALIGN(ParseLine& pline, const SourceLoc& loc,
                                       ParseStatus& status);
+    std::unique_ptr<Stmt> parse_DEFS(ParseLine& pline,
+                                     const SourceLoc& loc,
+                                     ParseStatus& status);
     std::unique_ptr<Stmt> parse_PRAGMA(ParseLine& pline,
                                        const SourceLoc& loc,
                                        ParseStatus& status);
