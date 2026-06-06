@@ -1,0 +1,7 @@
+# 1 "t/35-preproc-only/input/cu_wait_01.asm"
+DEFW_BE $8200
+DEFW_BE $8400
+DEFW_BE $EE00
+DEFW_BE $8001
+DEFW_BE $8002
+DEFW_BE $8137

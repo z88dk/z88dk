@@ -1,0 +1,10 @@
+# 1 "t/35-preproc-only/input/cu_move_01.asm"
+DEFW_BE 0
+DEFW_BE $100
+DEFW_BE $7F00
+DEFW_BE 1
+DEFW_BE 2
+DEFW_BE $7F
+DEFW_BE $FF
+DEFW_BE $FF
+DEFW_BE $80

@@ -7,8 +7,10 @@
 #pragma once
 
 #include "lexer_keywords.h"
+#include "source_loc.h"
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 enum class CPU {
@@ -25,3 +27,20 @@ bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl);
 
 Keyword cpu_invert_flag_condition(Keyword kw);
 void swap_ix_iy(std::string& inout_text, Keyword& inout_kw);
+
+// Spectrum Next copper unit
+bool compute_cu_wait_value(int& out_value,
+                           CPU cpu_id,
+                           int ver, int hor,
+                           const SourceLoc& kw_loc,
+                           const SourceLoc& ver_loc,
+                           const SourceLoc& hor_loc);
+bool compute_cu_move_value(int& out_value,
+                           CPU cpu_id,
+                           int reg, int val,
+                           const SourceLoc& kw_loc,
+                           const SourceLoc& reg_loc,
+                           const SourceLoc& val_loc);
+bool compute_cu_stop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
+bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
+
