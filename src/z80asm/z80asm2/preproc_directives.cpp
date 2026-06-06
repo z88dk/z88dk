@@ -19,6 +19,7 @@
 #include "string_interner.h"
 #include "string_utils.h"
 #include <algorithm>
+#include <cassert>
 #include <deque>
 #include <unordered_map>
 #include <utility>
@@ -36,8 +37,8 @@ Preproc::directive_handlers = {
     { Keyword::ASSUME,     &Preproc::process_ASSUME },
     { Keyword::BINARY,     &Preproc::process_BINARY },
     { Keyword::C_LINE,     &Preproc::process_C_LINE },
-    { Keyword::CALL_OZ,    &Preproc::process_CALL_OZ },
-    { Keyword::CALL_PKG,   &Preproc::process_CALL_PKG },
+    { Keyword::CALL_OZ,    &Preproc::process_Z88_CALL_OZ },
+    { Keyword::CALL_PKG,   &Preproc::process_Z88_CALL_PKG },
     { Keyword::CU_MOVE,    &Preproc::process_CU_MOVE },
     { Keyword::CU_NOP,     &Preproc::process_CU_NOP },
     { Keyword::CU_STOP,    &Preproc::process_CU_STOP },
@@ -1888,8 +1889,8 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
     assembler_output_queue.push_back(std::move(pragma_line));
 }
 
-void Preproc::process_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
-                              ParseLine& pline) {
+void Preproc::process_Z88_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
+                                  ParseLine& pline) {
     // Collect and expand the OZ instruction argument expression
     std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
     if (expanded.empty()) {
@@ -1938,8 +1939,8 @@ void Preproc::process_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
     assembler_output_queue.push_back(std::move(def_line));
 }
 
-void Preproc::process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
-                               ParseLine& pline) {
+void Preproc::process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
+                                   ParseLine& pline) {
     // Collect and expand the PKG instruction argument expression
     std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
     if (expanded.empty()) {
@@ -1956,6 +1957,17 @@ void Preproc::process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
 
     if (!expr_pline.check_end_of_line()) {
         return; // error already reported by check_end_of_line
+    }
+
+    // Rabbit's don't have RST $08
+    if (preproc_cpu_id == CPU::r2ka || preproc_cpu_id == CPU::r2ka_strict ||
+            preproc_cpu_id == CPU::r3k || preproc_cpu_id == CPU::r3k_strict ||
+            preproc_cpu_id == CPU::r4k || preproc_cpu_id == CPU::r4k_strict ||
+            preproc_cpu_id == CPU::r5k || preproc_cpu_id == CPU::r5k_strict ||
+            preproc_cpu_id == CPU::r6k || preproc_cpu_id == CPU::r6k_strict) {
+        g_diag.error(expanded.front().loc,
+                     "CPU " + cpu_name(preproc_cpu_id) + " does not support " + to_string(kw));
+        return;
     }
 
     // check argument range
@@ -2033,20 +2045,12 @@ void Preproc::process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
         return; // error already reported by check_end_of_line
     }
 
-    // check argument range
-    if (ver_value < 0 || ver_value > 311) {
-        g_diag.error(ver_loc,
-                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(ver_value));
-        return;
+    // check argument range and compute value
+    int argument = 0;
+    if (!compute_cu_wait_value(argument, preproc_cpu_id,
+                               ver_value, hor_value, kw_loc, ver_loc, hor_loc)) {
+        return; // error already reported by compute_cu_wait_value
     }
-
-    if (hor_value < 0 || hor_value > 55) {
-        g_diag.error(hor_loc,
-                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(hor_value));
-        return;
-    }
-
-    int argument = 0x8000 + (hor_value << 9) + ver_value;
     do_CU_fixed(kw, kw_loc, pline, argument);
 }
 
@@ -2086,31 +2090,33 @@ void Preproc::process_CU_MOVE(Keyword kw, const SourceLoc& kw_loc,
         return; // error already reported by check_end_of_line
     }
 
-    // check argument range
-    if (reg_value < 0 || reg_value > 127) {
-        g_diag.error(reg_loc,
-                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(reg_value));
-        return;
+    // check argument range and compute value
+    int argument = 0;
+    if (!compute_cu_move_value(argument, preproc_cpu_id,
+                               reg_value, value, kw_loc, reg_loc, value_loc)) {
+        return; // error already reported by compute_cu_move_value
     }
-
-    if (value < 0 || value > 255) {
-        g_diag.error(value_loc,
-                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(value));
-        return;
-    }
-
-    int argument = (reg_value << 8) + value;
     do_CU_fixed(kw, kw_loc, pline, argument);
 }
 
 void Preproc::process_CU_STOP(Keyword kw, const SourceLoc& kw_loc,
                               ParseLine& pline) {
-    do_CU_fixed(kw, kw_loc, pline, 0xFFFF);
+    int argument = 0;
+    if (!compute_cu_stop_value(argument, preproc_cpu_id, kw_loc)) {
+        return; // error already reported by compute_cu_stop_value
+    }
+
+    do_CU_fixed(kw, kw_loc, pline, argument);
 }
 
 void Preproc::process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
                              ParseLine& pline) {
-    do_CU_fixed(kw, kw_loc, pline, 0x0000);
+    int argument = 0;
+    if (!compute_cu_nop_value(argument, preproc_cpu_id, kw_loc)) {
+        return; // error already reported by compute_cu_nop_value
+    }
+
+    do_CU_fixed(kw, kw_loc, pline, argument);
 }
 
 void Preproc::process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,

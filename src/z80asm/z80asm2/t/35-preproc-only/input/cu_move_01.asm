@@ -1,0 +1,9 @@
+cu.move 0,0
+cu.move 1,0
+cu.move 127,0
+cu.move 0,1
+cu.move 0,2
+cu.move 0,127
+cu.move 0,255
+cu.move 0,-1
+cu.move 0,-128

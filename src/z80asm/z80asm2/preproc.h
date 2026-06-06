@@ -342,10 +342,10 @@ private:
     void process_ASSUME(Keyword kw, const SourceLoc& kw_loc,
                         ParseLine& pline);
     void do_ASSUME(bool adl_value, const SourceLoc& kw_loc);
-    void process_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
-                         ParseLine& pline);
-    void process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
-                          ParseLine& pline);
+    void process_Z88_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
+                             ParseLine& pline);
+    void process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline);
     void do_CU_fixed(Keyword kw, const SourceLoc& kw_loc,
                      ParseLine& pline, int value);
     void process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,

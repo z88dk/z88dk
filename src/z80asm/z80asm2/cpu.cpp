@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "cpu.h"
+#include "diag.h"
 #include "lexer_keywords.h"
 #include "string_utils.h"
 #include <algorithm>
@@ -212,3 +213,77 @@ void swap_ix_iy(std::string& inout_text, Keyword& inout_kw) {
     }
 }
 
+bool compute_cu_wait_value(int& out_value, CPU cpu_id, int ver, int hor,
+                           const SourceLoc& kw_loc,
+                           const SourceLoc& ver_loc,
+                           const SourceLoc& hor_loc) {
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, "CU_WAIT is only supported on the z80n");
+        return false;
+    }
+
+    if (ver < 0 || ver > 311) {
+        g_diag.error(ver_loc,
+                     "Vertical value out of range in CU_WAIT: "
+                     + int_to_hex(ver));
+        return false;
+    }
+
+    if (hor < 0 || hor > 55) {
+        g_diag.error(hor_loc,
+                     "Horizontal value out of range in CU_WAIT: "
+                     + int_to_hex(hor));
+        return false;
+    }
+
+    out_value = 0x8000 + (hor << 9) + ver;
+    return true;
+}
+
+bool compute_cu_move_value(int& out_value, CPU cpu_id, int reg, int val,
+                           const SourceLoc& kw_loc,
+                           const SourceLoc& reg_loc,
+                           const SourceLoc& val_loc) {
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, "CU_MOVE is only supported on the z80n");
+        return false;
+    }
+
+    if (reg < 0 || reg > 127) {
+        g_diag.error(reg_loc,
+                     "Register value out of range in CU_MOVE: "
+                     + int_to_hex(reg));
+        return false;
+    }
+
+    if (val < -128 || val > 255) {
+        g_diag.error(val_loc,
+                     "Value out of range in CU_MOVE: "
+                     + int_to_hex(val));
+        return false;
+    }
+
+    out_value = ((reg & 0x7f) << 8) | (val & 0xff);
+    return true;
+}
+
+bool compute_cu_stop_value(int& out_value, CPU cpu_id,
+                           const SourceLoc& kw_loc) {
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, "CU_STOP is only supported on the z80n");
+        return false;
+    }
+
+    out_value = 0xFFFF;
+    return true;
+}
+
+bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc) {
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, "CU_NOP is only supported on the z80n");
+        return false;
+    }
+
+    out_value = 0x0000;
+    return true;
+}

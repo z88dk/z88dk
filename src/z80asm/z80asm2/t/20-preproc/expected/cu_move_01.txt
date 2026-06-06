@@ -27,27 +27,27 @@ t/20-preproc/input/cu_move_01.asm:5:10: error: Unterminated expression after ","
 t/20-preproc/input/cu_move_01.asm:6:12: error: Unexpected token: ","
     cu.move 0,0,
                ^
-t/20-preproc/input/cu_move_01.asm:7:9: error: Argument out of range for CU_MOVE: -1
+t/20-preproc/input/cu_move_01.asm:7:1: error: CU_MOVE is only supported on the z80n
     cu.move -1,0
-            ^
-Identifier	"DEFW_BE"	8:1	keyword=DEFW_BE 
-Integer	"0"	8:9	int_value=0 
-EndOfLine	"\n"	8:10	
-Identifier	"DEFW_BE"	9:1	keyword=DEFW_BE 
-Integer	"$7F00"	9:9	int_value=32512 
-EndOfLine	"\n"	9:14	
-t/20-preproc/input/cu_move_01.asm:1:11: error: Argument out of range for CU_MOVE: $80
-    #define X 127
-              ^
-t/20-preproc/input/cu_move_01.asm:11:11: error: Argument out of range for CU_MOVE: -1
+    ^
+t/20-preproc/input/cu_move_01.asm:8:1: error: CU_MOVE is only supported on the z80n
+    cu.move 0,0
+    ^
+t/20-preproc/input/cu_move_01.asm:9:1: error: CU_MOVE is only supported on the z80n
+    cu.move X,0
+    ^
+t/20-preproc/input/cu_move_01.asm:10:1: error: CU_MOVE is only supported on the z80n
+    cu.move X+1,0
+    ^
+t/20-preproc/input/cu_move_01.asm:11:1: error: CU_MOVE is only supported on the z80n
     cu.move 0,-1
-              ^
-Identifier	"DEFW_BE"	12:1	keyword=DEFW_BE 
-Integer	"0"	12:9	int_value=0 
-EndOfLine	"\n"	12:10	
-Identifier	"DEFW_BE"	13:1	keyword=DEFW_BE 
-Integer	"$FF"	13:9	int_value=255 
-EndOfLine	"\n"	13:12	
-t/20-preproc/input/cu_move_01.asm:2:11: error: Argument out of range for CU_MOVE: $100
-    #define Y 255
-              ^
+    ^
+t/20-preproc/input/cu_move_01.asm:12:1: error: CU_MOVE is only supported on the z80n
+    cu.move 0,0
+    ^
+t/20-preproc/input/cu_move_01.asm:13:1: error: CU_MOVE is only supported on the z80n
+    cu.move 0,Y
+    ^
+t/20-preproc/input/cu_move_01.asm:14:1: error: CU_MOVE is only supported on the z80n
+    cu.move 0,Y+1
+    ^
