@@ -24,7 +24,6 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
 = {
     { Keyword::ALIGN,     &Parser::parse_ALIGN },
     { Keyword::BYTE,      &Parser::parse_BYTE },
-    { Keyword::CALL_OZ,   &Parser::parse_CALL_OZ },
     { Keyword::CU_MOVE,   &Parser::parse_CU_MOVE },
     { Keyword::CU_WAIT,   &Parser::parse_CU_WAIT },
     { Keyword::DB,        &Parser::parse_BYTE },
@@ -320,23 +319,6 @@ std::unique_ptr<Stmt> Parser::parse_PRAGMA(ParseLine& pline, const SourceLoc&,
     }
 
     return nullptr;
-}
-
-std::unique_ptr<Stmt> Parser::parse_CALL_OZ(ParseLine& pline,
-        const SourceLoc& loc, ParseStatus& status) {
-    status = ParseStatus::Unknown;
-    auto expr = parse_expression_ast(pline, status);
-    if (status == ParseStatus::FatalError) {
-        return nullptr;    // stop immediately on error
-    }
-
-    if (!expr) {
-        pline.error("Expression expected");
-        status = ParseStatus::FatalError;
-        return nullptr;
-    }
-
-    return std::make_unique<CallOzStmt>(std::move(expr), loc);
 }
 
 // Helper to parse two expressions separated by ','

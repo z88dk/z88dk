@@ -380,16 +380,6 @@ void DefsStringStmt::dump(DumpContext ctx) const {
     c.line("Filler byte: " + int_to_hex(filler_byte));
 }
 
-void CallOzStmt::dump(DumpContext ctx) const {
-    ctx.line("CallOzStmt");
-    auto c = ctx.child();
-    c.line("Location: " + loc.to_string());
-    if (expr) {
-        c.line("Expression:");
-        expr->dump(c.child());
-    }
-}
-
 void CuMoveStmt::dump(DumpContext ctx) const {
     ctx.line("CuMoveStmt");
     auto c = ctx.child();
