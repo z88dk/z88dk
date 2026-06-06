@@ -284,6 +284,32 @@ struct AlignStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
+struct DefsNumericStmt : Stmt {
+    std::unique_ptr<Expr> size_expr;
+    std::unique_ptr<Expr> filler_expr;
+
+    DefsNumericStmt(std::unique_ptr<Expr> size_expr_,
+                    std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
+        : Stmt(loc), size_expr(std::move(size_expr_)),
+          filler_expr(std::move(filler_expr_)) {}
+    virtual ~DefsNumericStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct DefsStringStmt : Stmt {
+    std::unique_ptr<Expr> size_expr;
+    StringInterner::Id
+    string_id;    // string literal to fill with, interned as an ID
+    uint8_t filler_byte;
+
+    DefsStringStmt(std::unique_ptr<Expr> size_expr_,
+                   StringInterner::Id string_id_, uint8_t filler_byte_, const SourceLoc& loc)
+        : Stmt(loc), size_expr(std::move(size_expr_)), string_id(string_id_),
+          filler_byte(filler_byte_) {}
+    virtual ~DefsStringStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
 struct CallOzStmt : Stmt {
     std::unique_ptr<Expr> expr;
 
