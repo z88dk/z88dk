@@ -113,11 +113,13 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // reset per-run registries and state
     preproc_cpu_id = g_args.options.cpu_id;
     include_stack.clear();
+    macros.clear();
     cond_stack.clear();
     macro_expansion_stack.clear();
     assembler_output_queue.clear();
     dependency_files.clear();
     pragma_once_files.clear();
+    defvars_state.clear();
 
     // Final output logical line stream
     std::vector<LogicalLine> final_lines;
