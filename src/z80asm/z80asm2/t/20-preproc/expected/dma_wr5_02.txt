@@ -1,0 +1,41 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_wr5_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_wr5_02.asm...
+# file: t/20-preproc/input/dma_wr5_02.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:1	keyword=DEFB 
+Integer	"130"	2:6	int_value=130 
+EndOfLine	"\n"	2:9	
+t/20-preproc/input/dma_wr5_02.asm:3:8: error: Expression expected
+    dma.wr5				; missing argument
+           ^
+t/20-preproc/input/dma_wr5_02.asm:4:10: error: Illegal base register: 1
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+             ^
+t/20-preproc/input/dma_wr5_02.asm:4:16: error: Illegal base register: 4
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                   ^
+t/20-preproc/input/dma_wr5_02.asm:4:22: error: Illegal base register: 5
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                         ^
+t/20-preproc/input/dma_wr5_02.asm:4:28: error: Illegal base register: $3F
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                               ^
+t/20-preproc/input/dma_wr5_02.asm:4:34: error: Illegal base register: $40
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                                     ^
+t/20-preproc/input/dma_wr5_02.asm:4:40: error: Illegal base register: $41
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                                           ^
+t/20-preproc/input/dma_wr5_02.asm:4:46: error: Illegal base register: $49
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                                                 ^
+t/20-preproc/input/dma_wr5_02.asm:4:52: error: Illegal base register: $FF
+    REPTI I, 0x01, 0x04, 0x05, 0x3F, 0x40, 0x41, 0x49, 0xFF
+                                                       ^
+t/20-preproc/input/dma_wr5_02.asm:7:15: error: Too many arguments
+    dma.wr5 0x00, 99	; too many arguments
+                  ^
