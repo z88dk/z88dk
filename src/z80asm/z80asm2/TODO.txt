@@ -2,6 +2,8 @@
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
 - Add -MD to generate .d file
+- DMA.WRx missing argument error points at last argument instead of first missing one
+- MMU instructions: add parse and documentation
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)

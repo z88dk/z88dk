@@ -364,6 +364,10 @@ private:
                              ParseLine& pline, std::vector<LogicalLine>& output);
     void expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
                              ParseLine& pline, std::vector<Token>& output);
+    void expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
+                             ParseLine& pline, std::vector<Token>& output);
+    void process_DMA(Keyword kw, const SourceLoc& kw_loc,
+                     ParseLine& pline);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
