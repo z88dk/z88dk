@@ -21,9 +21,9 @@ t/20-preproc/input/cu_move_02.asm:3:8: error: Expected argument after CU_MOVE
 t/20-preproc/input/cu_move_02.asm:4:10: error: Expected comma after expression in CU_MOVE
     cu.move 0
              ^
-t/20-preproc/input/cu_move_02.asm:5:10: error: Unterminated expression after ","
+t/20-preproc/input/cu_move_02.asm:5:11: error: Expression expected
     cu.move 0,
-             ^
+              ^
 t/20-preproc/input/cu_move_02.asm:6:12: error: Unexpected token: ","
     cu.move 0,0,
                ^
