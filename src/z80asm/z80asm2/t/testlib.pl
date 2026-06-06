@@ -94,8 +94,6 @@ sub run_ok {
 
     ok 1,                 "Running: $cmd";
     ok 0 == system($cmd), $cmd;
-
-    ( Test::More->builder->is_passing ) or die;
 }
 
 #------------------------------------------------------------------------------
@@ -105,8 +103,6 @@ sub run_nok {
 
     ok 1,                 "Running: $cmd";
     ok 0 != system($cmd), $cmd;
-
-    ( Test::More->builder->is_passing ) or die;
 }
 
 #------------------------------------------------------------------------------
