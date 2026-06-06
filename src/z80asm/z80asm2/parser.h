@@ -114,9 +114,6 @@ private:
     std::unique_ptr<Stmt> parse_PRAGMA(ParseLine& pline,
                                        const SourceLoc& loc,
                                        ParseStatus& status);
-    std::unique_ptr<Stmt> parse_CALL_OZ(ParseLine& pline,
-                                        const SourceLoc& loc,
-                                        ParseStatus& status);
     std::unique_ptr<Stmt> parse_CU_WAIT(ParseLine& pline,
                                         const SourceLoc& loc,
                                         ParseStatus& status);

@@ -310,15 +310,6 @@ struct DefsStringStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
-struct CallOzStmt : Stmt {
-    std::unique_ptr<Expr> expr;
-
-    CallOzStmt(std::unique_ptr<Expr> expr_, const SourceLoc& loc)
-        : Stmt(loc), expr(std::move(expr_)) {}
-    virtual ~CallOzStmt() = default;
-    void dump(DumpContext ctx) const override;
-};
-
 // copper unit of Spectrum Next
 struct CuWaitStmt : Stmt {
     std::unique_ptr<Expr> ver_expr;   // 0..311

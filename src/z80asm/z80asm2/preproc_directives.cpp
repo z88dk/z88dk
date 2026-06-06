@@ -36,6 +36,7 @@ Preproc::directive_handlers = {
     { Keyword::ASSUME,     &Preproc::process_ASSUME },
     { Keyword::BINARY,     &Preproc::process_BINARY },
     { Keyword::C_LINE,     &Preproc::process_C_LINE },
+    { Keyword::CALL_OZ,    &Preproc::process_CALL_OZ },
     { Keyword::CALL_PKG,   &Preproc::process_CALL_PKG },
     { Keyword::CU_MOVE,    &Preproc::process_CU_MOVE },
     { Keyword::CU_NOP,     &Preproc::process_CU_NOP },
@@ -1885,6 +1886,56 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
 
     // do not expand macros again
     assembler_output_queue.push_back(std::move(pragma_line));
+}
+
+void Preproc::process_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    // Collect and expand the OZ instruction argument expression
+    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
+    if (expanded.empty()) {
+        return;  // error already reported
+    }
+
+    // Evaluate constant expression (not silent -> errors are reported)
+    int arg_value = 0;
+    ParseLine expr_pline(expanded);
+    if (!eval_const_expr(expr_pline,
+                         const_symbols, arg_value, /*silent=*/false)) {
+        return;  // error already reported by eval_const_expr
+    }
+
+    if (!expr_pline.check_end_of_line()) {
+        return; // error already reported by check_end_of_line
+    }
+
+    // check argument range
+    std::string data_opc;
+    if (arg_value >= 0 && arg_value <= 0xFF) {
+        data_opc = "DEFB";
+    }
+    else if (arg_value >= 0x100 && arg_value <= 0xFFFF) {
+        data_opc = "DEFW";
+    }
+    else {
+        g_diag.error(expanded.front().loc,
+                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(arg_value));
+        return;
+    }
+
+    // macros already expanded, send directly to assembler output queue
+    // first line: RST $20
+    std::string rst_str = "RST $20";
+    std::vector<Token> rst_tokens = tokenize_text(rst_str, kw_loc);
+    LogicalLine rst_line(kw_loc);
+    rst_line.tokens = std::move(rst_tokens);
+    assembler_output_queue.push_back(std::move(rst_line));
+
+    // second line: DEFB | DEFW <argument>
+    std::string def_str = data_opc + " " + std::to_string(arg_value);
+    std::vector<Token> def_tokens = tokenize_text(def_str, kw_loc);
+    LogicalLine def_line(kw_loc);
+    def_line.tokens = std::move(def_tokens);
+    assembler_output_queue.push_back(std::move(def_line));
 }
 
 void Preproc::process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
