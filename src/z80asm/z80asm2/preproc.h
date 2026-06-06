@@ -346,8 +346,6 @@ private:
                          ParseLine& pline);
     void process_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
                           ParseLine& pline);
-    void do_CU_args(Keyword kw, const SourceLoc& kw_loc,
-                    ParseLine& pline);
     void do_CU_fixed(Keyword kw, const SourceLoc& kw_loc,
                      ParseLine& pline, int value);
     void process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
