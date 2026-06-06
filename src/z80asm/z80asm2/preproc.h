@@ -143,6 +143,26 @@ private:
     std::vector<StringInterner::Id> pragma_once_files;
 
     // ---------------------------------------------------------------------
+    // DEFVARS tracking
+    // ---------------------------------------------------------------------
+    struct DefvarsState {
+        bool have_last_nonzero = false;
+        size_t last_nonzero_offset = 0;   // for DEFVARS -1
+
+        bool have_current = false;
+        size_t current_offset = 0;        // for the block being parsed now
+
+        void clear() {
+            have_last_nonzero = false;
+            last_nonzero_offset = 0;
+            have_current = false;
+            current_offset = 0;
+        }
+    };
+
+    DefvarsState defvars_state;
+
+    // ---------------------------------------------------------------------
     // Methods
     // ---------------------------------------------------------------------
 
@@ -338,6 +358,12 @@ private:
                         ParseLine& pline);
     void process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
                           ParseLine& pline);
+    void process_DEFVARS(Keyword kw, const SourceLoc& kw_loc,
+                         ParseLine& pline);
+    void parse_DEFVARS_block(Keyword kw, const SourceLoc& kw_loc,
+                             ParseLine& pline, std::vector<LogicalLine>& output);
+    void expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
+                             ParseLine& pline, std::vector<Token>& output);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch
