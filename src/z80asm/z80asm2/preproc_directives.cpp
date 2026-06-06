@@ -44,6 +44,7 @@ Preproc::directive_handlers = {
     { Keyword::DEFGROUP,   &Preproc::process_DEFGROUP },
     { Keyword::DEFINE,     &Preproc::process_DEFINE },
     { Keyword::DEFL,       &Preproc::process_DEFL },
+    { Keyword::DEFVARS,    &Preproc::process_DEFVARS },
     { Keyword::ENDM,       &Preproc::process_ENDM },
     { Keyword::ENDR,       &Preproc::process_ENDR },
     { Keyword::ERROR,      &Preproc::process_ERROR },
@@ -2028,18 +2029,268 @@ void Preproc::process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
 
 void Preproc::process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
                                ParseLine& pline) {
+    // expand macros in the { } block first, since the definitions may call macros
+    std::vector<Token> expanded;
+    expand_braces_block(kw, kw_loc, pline, expanded);
+
+    // need to collect all DEFC statements in a list, because next_logical_line() will retrieve
+    // from assembler_output_queue
+    std::vector<LogicalLine> output;
+
+    // now parse the expanded tokens as a sequence of "name [= value]" pairs
+    ParseLine expline(expanded);
+    int value = 0;
+    while (!expline.eol()) {
+        // skip commas between definitions
+        if (expline.peek().type == TokenType::Comma) {
+            expline.advance(); // skip comma
+            continue;
+        }
+
+        // must have a identifier for the name
+        if (expline.peek().type != TokenType::Identifier) {
+            expline.error("Expected identifier in " + to_string(kw) + " directive");
+            return;
+        }
+        std::string name = g_strings.to_string(expline.peek().text_id);
+        SourceLoc name_loc = expline.peek().loc;
+        expline.advance();
+
+        // check for optional "= value" after the name
+        if (expline.peek().type == TokenType::EQ) {
+            expline.advance(); // consume '='
+
+            // evaluate expression and overwrite value if valid
+            if (!eval_const_expr(expline, const_symbols, value, /*silent=*/false)) {
+                return;  // error already reported by eval_const_expr
+            }
+        }
+
+        // now produce a DEFC <name> = <value> line for this definition and push to output queue
+        std::string defc_str = "DEFC " + name + " = " + std::to_string(value);
+        std::vector<Token> defc_tokens = tokenize_text(defc_str, name_loc);
+        LogicalLine defc_line(name_loc);
+        defc_line.tokens = std::move(defc_tokens);
+
+        // collect in output vector first, since pushing to assembler_output_queue will
+        // cause next_logical_line() to retrieve them
+        output.push_back(std::move(defc_line));
+
+        // increment value for the next definition
+        ++value;
+
+        // must have a comma (skipped at the top) or end of line after each definition
+        if (!expline.eol() && expline.peek().type != TokenType::Comma) {
+            expline.error("Expected ',' or end of line in " + to_string(kw) + " directive");
+            return;
+        }
+    }
+
+    // output now contains all DEFC lines for the group, with macros expanded
+    for (auto& defc_line : output) {
+        // do not expand macros again
+        assembler_output_queue.push_back(std::move(defc_line));
+    }
+}
+
+void Preproc::process_DEFVARS(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    // expression after DEFVARS keyword determines the origin of the variables in this block:
+    int origin = 0;
+
+    // Collect and expand the origin expression
+    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "origin");
+    if (expanded.empty()) {
+        return;  // error already reported
+    }
+
+    // Evaluate constant expression (not silent -> errors are reported)
+    ParseLine expr_pline(expanded);
+    if (!eval_const_expr(expr_pline,
+                         const_symbols, origin, /*silent=*/false)) {
+        return;  // error already reported by eval_const_expr
+    }
+
+    bool has_origin_error = false;
+
+    // Case A - DEFVARS <expr> with <expr> > 0
+    // Start a new non-zero struct:
+    if (origin > 0) {
+        defvars_state.current_offset = origin;
+        defvars_state.have_current = true;
+
+        // this struct is now the "last non-zero struct"
+        defvars_state.last_nonzero_offset = origin;
+        defvars_state.have_last_nonzero = true;
+    }
+    // Case B - DEFVARS 0
+    // Start a stand-alone struct that does not participate in continuation:
+    else if (origin == 0) {
+        defvars_state.current_offset = 0;
+        defvars_state.have_current = true;
+        // do NOT touch last_nonzero_* here
+    }
+    // Case C - DEFVARS -1
+    // This means "continue the last non-zero struct":
+    else if (origin == -1) {
+        if (!defvars_state.have_last_nonzero) {
+            g_diag.error(kw_loc, "DEFVARS -1 with no previous non-zero DEFVARS");
+
+            // must exit after parsing the block
+            // to avoid cascading errors on the definitions
+            has_origin_error = true;
+        }
+
+        defvars_state.current_offset = defvars_state.last_nonzero_offset;
+        defvars_state.have_current = true;
+    }
+    else {
+        g_diag.error(kw_loc, "Invalid origin for " + to_string(kw) +
+                     ": must be -1, 0, or a positive integer");
+
+        // must exit after parsing the block
+        // to avoid cascading errors on the definitions
+        has_origin_error = true;
+    }
+
+    // now parse the block between '{' and '}' and push DEFC lines to the output queue
+    // with the variable names and offsets
+    std::vector<LogicalLine> output;
+    parse_DEFVARS_block(kw, kw_loc, expr_pline, output);
+
+    if (has_origin_error) {
+        return; // do not update state or push output if there was an origin error
+    }
+
+    // at the end of the block
+    // Case A or C - if we had a non-zero origin, record the last non-zero offset
+    // for potential continuation by a later DEFVARS with origin -1
+    if (origin != 0) {
+        defvars_state.last_nonzero_offset = defvars_state.current_offset;
+        defvars_state.have_last_nonzero = true;
+    }
+
+    // output now contains all DEFC lines for the group, with macros expanded
+    for (auto& defc_line : output) {
+        // do not expand macros again
+        assembler_output_queue.push_back(std::move(defc_line));
+    }
+}
+
+void Preproc::parse_DEFVARS_block(Keyword kw, const SourceLoc& kw_loc,
+                                  ParseLine& pline, std::vector<LogicalLine>& output) {
+    // expand macros in the { } block first, since the definitions may call macros
+    std::vector<Token> expanded;
+    expand_braces_block(kw, kw_loc, pline, expanded);
+
+    // now parse the expanded tokens as a sequence of "[name] DS.[B|W|P|Q] count"
+    ParseLine expline(expanded);
+    while (!expline.eol()) {
+        // skip commas between definitions
+        if (expline.peek().type == TokenType::Comma) {
+            expline.advance(); // skip comma
+            continue;
+        }
+
+        // must have either a name or DS keyword
+        if (expline.peek().type != TokenType::Identifier) {
+            expline.error("Expected identifer or DS keyword in " + to_string(
+                              kw) + " directive");
+            return;
+        }
+
+        // optional identifier for the name
+        StringInterner::Id name_id = 0;
+        SourceLoc name_loc;
+        if (expline.peek().keyword != Keyword::DS) {
+            name_id = expline.peek().text_id;
+            name_loc = expline.peek().loc;
+            expline.advance();
+        }
+
+        // must have DS keyword a Dot and a size specifier
+        if (expline.peek().keyword != Keyword::DS) {
+            expline.error("Expected DS keyword in " + to_string(kw) + " directive");
+            return;
+        }
+        expline.advance(); // consume DS
+
+        if (expline.peek().type != TokenType::Dot) {
+            expline.error("Expected '.' after DS in " + to_string(kw) + " directive");
+            return;
+        }
+        expline.advance(); // consume '.'
+
+        int size = 0;
+        switch (expline.peek().keyword) {
+        case Keyword::B:
+            size = 1;
+            expline.advance(); // consume size specifier
+            break;
+        case Keyword::W:
+            size = 2;
+            expline.advance(); // consume size specifier
+            break;
+        case Keyword::P:
+            size = 3;
+            expline.advance(); // consume size specifier
+            break;
+        case Keyword::Q:
+            size = 4;
+            expline.advance(); // consume size specifier
+            break;
+        default:
+            expline.error("Expected size specifier (.B, .W, .P, or .Q) after DS in " +
+                          to_string(kw) + " directive");
+            return;
+        }
+
+        // parse count expression
+        int count = 0;
+        if (!eval_const_expr(expline, const_symbols, count, /*silent=*/false)) {
+            return;  // error already reported by eval_const_expr
+        }
+        if (count < 0) {
+            expline.error("Count expression must be zero or positive in " + to_string(
+                              kw) + " directive");
+            return;
+        }
+
+        // emit DEFC for each given name in the definition, with the appropriate offset
+        if (name_id != 0) {
+            std::string var_name = g_strings.to_string(name_id);
+            std::string defc_str = "DEFC " + var_name + " = " +
+                                   std::to_string(defvars_state.current_offset);
+            std::vector<Token> defc_tokens = tokenize_text(defc_str, name_loc);
+            LogicalLine defc_line(name_loc);
+            defc_line.tokens = std::move(defc_tokens);
+
+            // collect in output vector first, since pushing to assembler_output_queue will
+            // cause next_logical_line() to retrieve them
+            output.push_back(std::move(defc_line));
+        }
+
+        // advance the offset by the size of the variable(s) we just defined
+        defvars_state.current_offset += size * count;
+
+        // must have a comma (skipped at the top) or end of line after each definition
+        if (!expline.eol() && expline.peek().type != TokenType::Comma) {
+            expline.error("Expected ',' or end of line in " + to_string(kw) + " directive");
+            return;
+        }
+    }
+}
+
+void Preproc::expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
+                                  ParseLine& pline, std::vector<Token>& output) {
     // need to collect LogicalLines (which own the tokens) for each new line
     // retrieved by next_logical_line()
     ParseLine* cur = &pline;
     std::vector<LogicalLine> temp_lines;  // owns the token vectors
     std::vector<ParseLine> temp_parselines;  // references into temp_lines
 
-    // need to collect all DEFC statements in a list, because next_logical_line() will retrieve
-    // from assembler_output_queue
-    std::vector<LogicalLine> output;
-
     // need to collect all tokens up to '}' and expand macros in them,
-    // since the group definition may call macros
+    // since the DEFGROUP and DEFVARS definitions may call macros
     std::vector<Token> tokens;
 
     // parse input between '{' and '}', allowing multiple lines until we find the closing '}'
@@ -2108,62 +2359,8 @@ void Preproc::process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
     LogicalLine in(kw_loc);
     in.tokens = std::move(tokens);
 
-    std::vector<Token> expanded;
-    expand_line(in, expanded);
-
-    // now parse the expanded tokens as a sequence of "name [= value]" pairs
-    ParseLine expline(expanded);
-    int value = 0;
-    while (!expline.eol()) {
-        // skip commas between definitions
-        if (expline.peek().type == TokenType::Comma) {
-            expline.advance(); // skip comma
-            continue;
-        }
-
-        // must have a identifier for the name
-        if (expline.peek().type != TokenType::Identifier) {
-            expline.error("Expected identifier in " + to_string(kw) + " directive");
-            return;
-        }
-        std::string name = g_strings.to_string(expline.peek().text_id);
-        SourceLoc name_loc = expline.peek().loc;
-        expline.advance();
-
-        // check for optional "= value" after the name
-        if (expline.peek().type == TokenType::EQ) {
-            expline.advance(); // consume '='
-
-            // evaluate expression and overwrite value if valid
-            if (!eval_const_expr(expline, const_symbols, value, /*silent=*/false)) {
-                return;  // error already reported by eval_const_expr
-            }
-        }
-
-        // now produce a DEFC <name> = <value> line for this definition and push to output queue
-        std::string defc_str = "DEFC " + name + " = " + std::to_string(value);
-        std::vector<Token> defc_tokens = tokenize_text(defc_str, name_loc);
-        LogicalLine defc_line(name_loc);
-        defc_line.tokens = std::move(defc_tokens);
-
-        // collect in output vector first, since pushing to assembler_output_queue will
-        // cause next_logical_line() to retrieve them
-        output.push_back(std::move(defc_line));
-
-        // increment value for the next definition
-        ++value;
-
-        // must have a comma (skipped at the top) or end of line after each definition
-        if (!expline.eol() && expline.peek().type != TokenType::Comma) {
-            expline.error("Expected ',' or end of line in " + to_string(kw) + " directive");
-            return;
-        }
-    }
-
-    for (auto& defc_line : output) {
-        // do not expand macros again
-        assembler_output_queue.push_back(std::move(defc_line));
-    }
+    output.clear();
+    expand_line(in, output);
 }
 
 //-----------------------------------------------------------------------------
