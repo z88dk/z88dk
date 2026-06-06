@@ -1,0 +1,74 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_wr1_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_wr1_02.asm...
+# file: t/20-preproc/input/dma_wr1_02.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:1	keyword=DEFB 
+Integer	"4"	2:6	int_value=4 
+EndOfLine	"\n"	2:7	
+t/20-preproc/input/dma_wr1_02.asm:3:8: error: Expression expected
+    dma.wr1				; missing argument
+           ^
+t/20-preproc/input/dma_wr1_02.asm:4:15: error: Undefined constant: ext
+    dma.wr1 0x44, ext	; ext not constant
+                  ^
+t/20-preproc/input/dma_wr1_02.asm:5:15: error: Undefined constant: start
+    dma.wr1 0x44, start	; start not constant
+                  ^
+t/20-preproc/input/dma_wr1_02.asm:6:15: error: ASMPC is not allowed in a constant expression
+    dma.wr1 0x44, $		; ASMPC not constant
+                  ^
+t/20-preproc/input/dma_wr1_02.asm:7:10: error: Illegal base register: 1
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+             ^
+t/20-preproc/input/dma_wr1_02.asm:7:13: error: Illegal base register: 2
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                ^
+t/20-preproc/input/dma_wr1_02.asm:7:16: error: Illegal base register: 3
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                   ^
+t/20-preproc/input/dma_wr1_02.asm:7:19: error: Illegal base register: 5
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                      ^
+t/20-preproc/input/dma_wr1_02.asm:7:22: error: Illegal base register: 6
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                         ^
+t/20-preproc/input/dma_wr1_02.asm:7:25: error: Illegal base register: 7
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                            ^
+t/20-preproc/input/dma_wr1_02.asm:7:28: error: Illegal base register: $80
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                               ^
+t/20-preproc/input/dma_wr1_02.asm:7:34: error: Illegal base register: $84
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                                     ^
+t/20-preproc/input/dma_wr1_02.asm:7:40: error: Illegal base register: $FF
+    REPTI I, 1, 2, 3, 5, 6, 7, 0x80, 0x84, 0xFF
+                                           ^
+t/20-preproc/input/dma_wr1_02.asm:10:9: error: Missing value
+    dma.wr1 0x44		; missing group member
+            ^
+t/20-preproc/input/dma_wr1_02.asm:11:10: error: Illegal port A timing: 3
+    REPTI I, 0x03, 0x10, 0x20, 0x30, 0x33, 0x8F
+             ^
+t/20-preproc/input/dma_wr1_02.asm:11:16: error: Illegal port A timing: $10
+    REPTI I, 0x03, 0x10, 0x20, 0x30, 0x33, 0x8F
+                   ^
+t/20-preproc/input/dma_wr1_02.asm:11:22: error: Illegal port A timing: $20
+    REPTI I, 0x03, 0x10, 0x20, 0x30, 0x33, 0x8F
+                         ^
+t/20-preproc/input/dma_wr1_02.asm:11:28: error: Illegal port A timing: $30
+    REPTI I, 0x03, 0x10, 0x20, 0x30, 0x33, 0x8F
+                               ^
+t/20-preproc/input/dma_wr1_02.asm:11:34: error: Illegal port A timing: $33
+    REPTI I, 0x03, 0x10, 0x20, 0x30, 0x33, 0x8F
+                                     ^
+t/20-preproc/input/dma_wr1_02.asm:11:40: error: Illegal port A timing: $8F
+    REPTI I, 0x03, 0x10, 0x20, 0x30, 0x33, 0x8F
+                                           ^
+t/20-preproc/input/dma_wr1_02.asm:14:15: error: Too many arguments
+    dma.wr1 0x04, 99	; too many arguments
+                  ^

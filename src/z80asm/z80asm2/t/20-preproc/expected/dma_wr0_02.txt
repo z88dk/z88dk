@@ -1,0 +1,50 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_wr0_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_wr0_02.asm...
+# file: t/20-preproc/input/dma_wr0_02.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:1	keyword=DEFB 
+Integer	"1"	2:6	int_value=1 
+EndOfLine	"\n"	2:7	
+t/20-preproc/input/dma_wr0_02.asm:3:8: error: Expression expected
+    dma.wr0				; missing argument
+           ^
+t/20-preproc/input/dma_wr0_02.asm:4:12: error: Undefined constant: ext
+    dma.wr0 9, ext		; ext not constant
+               ^
+t/20-preproc/input/dma_wr0_02.asm:5:12: error: Undefined constant: start
+    dma.wr0 9, start	; start not constant
+               ^
+t/20-preproc/input/dma_wr0_02.asm:6:12: error: ASMPC is not allowed in a constant expression
+    dma.wr0 9, $		; ASMPC not constant
+               ^
+t/20-preproc/input/dma_wr0_02.asm:7:9: error: Integer out of range: -1
+    dma.wr0 -1			; -1 out of range
+            ^
+t/20-preproc/input/dma_wr0_02.asm:8:10: error: Illegal base register: $FF
+    REPTI I, 255, 0, 2, 3, 128
+             ^
+t/20-preproc/input/dma_wr0_02.asm:8:15: error: Illegal base register: 0
+    REPTI I, 255, 0, 2, 3, 128
+                  ^
+t/20-preproc/input/dma_wr0_02.asm:8:18: error: Illegal base register: 2
+    REPTI I, 255, 0, 2, 3, 128
+                     ^
+t/20-preproc/input/dma_wr0_02.asm:8:21: error: Illegal base register: 3
+    REPTI I, 255, 0, 2, 3, 128
+                        ^
+t/20-preproc/input/dma_wr0_02.asm:8:24: error: Illegal base register: $80
+    REPTI I, 255, 0, 2, 3, 128
+                           ^
+t/20-preproc/input/dma_wr0_02.asm:11:12: error: Too many arguments
+    dma.wr0 1, 99		; too many arguments
+               ^
+t/20-preproc/input/dma_wr0_02.asm:13:6: error: Too many arguments
+    		   99		; too many arguments
+    		   ^
+t/20-preproc/input/dma_wr0_02.asm:14:9: error: Missing value
+    dma.wr0 0x09		; missing group member
+            ^

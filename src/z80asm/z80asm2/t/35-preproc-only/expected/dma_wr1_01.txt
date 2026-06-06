@@ -1,0 +1,21 @@
+% z88dk-z80asm -v -mz80n -E t/35-preproc-only//input/dma_wr1_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/35-preproc-only/input/dma_wr1_01.asm...
+t/35-preproc-only/input/dma_wr1_01.asm:5:10: warning: Half cycle timing not supported: $80
+    REPTI I, 0x80, 0x40, 0x08, 0x04, 0xCC
+             ^
+t/35-preproc-only/input/dma_wr1_01.asm:5:16: warning: Half cycle timing not supported: $40
+    REPTI I, 0x80, 0x40, 0x08, 0x04, 0xCC
+                   ^
+t/35-preproc-only/input/dma_wr1_01.asm:5:22: warning: Half cycle timing not supported: 8
+    REPTI I, 0x80, 0x40, 0x08, 0x04, 0xCC
+                         ^
+t/35-preproc-only/input/dma_wr1_01.asm:5:28: warning: Half cycle timing not supported: 4
+    REPTI I, 0x80, 0x40, 0x08, 0x04, 0xCC
+                               ^
+t/35-preproc-only/input/dma_wr1_01.asm:5:34: warning: Half cycle timing not supported: $CC
+    REPTI I, 0x80, 0x40, 0x08, 0x04, 0xCC
+                                     ^
+Writing t/35-preproc-only/input/dma_wr1_01.i...
+Assembly completed with 0 error(s)

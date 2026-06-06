@@ -1,0 +1,39 @@
+% z88dk-z80asm -v -mz80n -E t/35-preproc-only//input/dma_wr6_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/35-preproc-only/input/dma_wr6_01.asm...
+t/35-preproc-only/input/dma_wr6_01.asm:5:10: warning: Command not implemented: $8B
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+             ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:16: warning: Command not implemented: $A3
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                   ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:22: warning: Command not implemented: $A7
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                         ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:28: warning: Command not implemented: $AB
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                               ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:34: warning: Command not implemented: $AF
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                     ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:40: warning: Command not implemented: $B3
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                           ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:46: warning: Command not implemented: $B7
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                                 ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:52: warning: Command not implemented: $BF
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                                       ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:58: warning: Command not implemented: $C3
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                                             ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:64: warning: Command not implemented: $C7
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                                                   ^
+t/35-preproc-only/input/dma_wr6_01.asm:5:70: warning: Command not implemented: $CB
+    REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
+                                                                         ^
+Writing t/35-preproc-only/input/dma_wr6_01.i...
+Assembly completed with 0 error(s)

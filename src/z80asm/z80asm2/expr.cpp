@@ -379,6 +379,12 @@ static bool eval_expr_impl(ParseLine& pline,
     sem.silent = silent;
     sem.undefined_is_zero = undefined_is_zero;
 
+    if (pline.eol()) {
+        if (!silent)
+            pline.error("Expression expected");
+        return false;
+    }
+
     ParseStatus status = ParseStatus::Unknown;
     if (!parse_full_expr(pline, sem, status)) {
         return false;

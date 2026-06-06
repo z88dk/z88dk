@@ -62,6 +62,14 @@ Preproc::directive_handlers = {
     { Keyword::REPTI,      &Preproc::process_REPTI },
     { Keyword::UNDEF,      &Preproc::process_UNDEF },
     { Keyword::UNDEFINE,   &Preproc::process_UNDEF },
+    { Keyword::DMA_WR0,    &Preproc::process_DMA },
+    { Keyword::DMA_WR1,    &Preproc::process_DMA },
+    { Keyword::DMA_WR2,    &Preproc::process_DMA },
+    { Keyword::DMA_WR3,    &Preproc::process_DMA },
+    { Keyword::DMA_WR4,    &Preproc::process_DMA },
+    { Keyword::DMA_WR5,    &Preproc::process_DMA },
+    { Keyword::DMA_WR6,    &Preproc::process_DMA },
+    { Keyword::DMA_CMD,    &Preproc::process_DMA },
 };
 
 std::unordered_map<Keyword, Preproc::DirectiveHandler>
@@ -194,6 +202,44 @@ bool Preproc::is_directive(ParseLine& pline,
         return true;
     }
 not_copper:
+
+    // Spectrum Next DMA unit directive
+    if (pline.peek().keyword == Keyword::DMA &&
+            pline.peek(1).type == TokenType::Dot) {
+        switch (pline.peek(2).keyword) {
+        case Keyword::WR0:
+            out_kw = Keyword::DMA_WR0;
+            break;
+        case Keyword::WR1:
+            out_kw = Keyword::DMA_WR1;
+            break;
+        case Keyword::WR2:
+            out_kw = Keyword::DMA_WR2;
+            break;
+        case Keyword::WR3:
+            out_kw = Keyword::DMA_WR3;
+            break;
+        case Keyword::WR4:
+            out_kw = Keyword::DMA_WR4;
+            break;
+        case Keyword::WR5:
+            out_kw = Keyword::DMA_WR5;
+            break;
+        case Keyword::WR6:
+            out_kw = Keyword::DMA_WR6;
+            break;
+        case Keyword::CMD:
+            out_kw = Keyword::DMA_CMD;
+            break;
+        default:
+            goto not_dma;
+        }
+
+        out_kw_loc = pline.peek().loc;
+        pline.pos += 3; // consume 'DMA', '.' and <directive>
+        return true;
+    }
+not_dma:
 
     return false;
 }
@@ -2453,6 +2499,130 @@ void Preproc::expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
 
     output.clear();
     expand_line(in, output);
+}
+
+void Preproc::expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
+                            ParseLine& pline, std::vector<Token>& output) {
+    // need to collect LogicalLines (which own the tokens) for each new line
+    // retrieved by next_logical_line()
+    ParseLine* cur = &pline;
+    std::vector<LogicalLine> temp_lines;  // owns the token vectors
+    std::vector<ParseLine> temp_parselines;  // references into temp_lines
+
+    // need to collect all tokens up to a line not terminating in comma
+    // and expand macros in them, to parse multi-line DMA arguments
+    std::vector<Token> tokens;
+
+    while (true) {
+        const Token& tok = cur->peek();
+        if (tok.type == TokenType::EndOfLine) {
+            if (tokens.empty() || tokens.back().type != TokenType::Comma) {
+                // a real end of line
+                tokens.push_back(tok);
+                break;
+            }
+            else {
+                // last was comma, so skip EndOfLine and read new line
+                LogicalLine ll;
+                SourceLoc prev_loc = tok.loc;
+                if (!next_logical_line(ll)) {
+                    g_diag.error(prev_loc,
+                                "Unexpected end of file in " + to_string(kw) + " directive");
+                    return;
+                }
+
+                // Store the LogicalLine (which owns the tokens)
+                temp_lines.push_back(std::move(ll));
+
+                // Create a ParseLine referencing the tokens in the stored LogicalLine
+                temp_parselines.emplace_back(temp_lines.back().tokens);
+
+                cur = &temp_parselines.back();
+                continue;
+            }
+        }
+        else {
+            tokens.push_back(tok);
+            cur->advance();
+        }
+    }
+
+    if (!cur->check_end_of_line()) {
+        return;
+    }
+
+    // tokens now contains all multi-line arguments, with macros unexpanded
+    // let's expand them now
+    LogicalLine in(kw_loc);
+    in.tokens = std::move(tokens);
+
+    output.clear();
+    expand_line(in, output);
+}
+
+void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
+                          ParseLine& pline) {
+    // Collect and expand the DMA instruction argument expressions
+    std::vector<Token> expanded;
+    expand_args_multiline(kw, kw_loc, pline, expanded);
+    if (expanded.empty()) {
+        return;  // error already reported
+    }
+
+    ParseLine expr_pline(expanded);
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    while (true) {
+        int value = 0;
+        SourceLoc value_loc = expr_pline.peek().loc;
+        if (!eval_const_expr(expr_pline,
+                             const_symbols, value, /*silent=*/false)) {
+            return;  // error already reported by eval_const_expr
+        }
+        val_loc_data.emplace_back(value, value_loc);
+
+        if (expr_pline.peek().type == TokenType::Comma) {
+            expr_pline.advance(); // consume comma and continue parsing arguments
+        }
+        else if (expr_pline.peek().type == TokenType::EndOfLine) {
+            break; // end of arguments
+        }
+        else {
+            g_diag.error(expr_pline.peek().loc,
+                         "Expected comma or end of line after expression in " + to_string(kw));
+            return;
+        }
+    }
+
+    if (!expr_pline.check_end_of_line()) {
+        return; // error already reported by check_end_of_line
+    }
+
+    // produce list of DEFB/DEFW lines
+    std::vector<std::pair<int, int>> size_val_data;
+    if (!compute_dma_data(size_val_data, preproc_cpu_id, val_loc_data, kw,
+                          kw_loc)) {
+        return; // error already reported by compute_dma_data
+    }
+
+    // macros already expanded, send directly to assembler output queue
+    for (const auto& [size, value] : size_val_data) {
+        std::string data_opc;
+        if (size == 1) {
+            data_opc = "DEFB";
+        }
+        else if (size == 2) {
+            data_opc = "DEFW";
+        }
+        else {
+            assert(0);
+        }
+
+        std::string def_str = data_opc + " " + std::to_string(value);
+        std::vector<Token> def_tokens = tokenize_text(def_str, kw_loc);
+        LogicalLine def_line(kw_loc);
+        def_line.tokens = std::move(def_tokens);
+        assembler_output_queue.push_back(std::move(def_line));
+    }
 }
 
 //-----------------------------------------------------------------------------

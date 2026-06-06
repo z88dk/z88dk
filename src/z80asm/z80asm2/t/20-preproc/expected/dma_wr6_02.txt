@@ -1,0 +1,740 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/dma_wr6_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/dma_wr6_02.asm...
+# file: t/20-preproc/input/dma_wr6_02.asm
+Identifier	"start"	1:1	
+Colon	":"	1:6	
+EndOfLine	"\n"	1:7	
+Identifier	"DEFB"	2:1	keyword=DEFB 
+Integer	"131"	2:6	int_value=131 
+EndOfLine	"\n"	2:9	
+t/20-preproc/input/dma_wr6_02.asm:3:8: error: Expression expected
+    dma.wr6				; missing argument
+           ^
+t/20-preproc/input/dma_wr6_02.asm:4:9: error: Missing value
+    dma.wr6 0xBB		; missing value
+            ^
+t/20-preproc/input/dma_wr6_02.asm:5:10: error: Illegal command: 0
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+             ^
+t/20-preproc/input/dma_wr6_02.asm:5:16: error: Illegal command: 1
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                   ^
+t/20-preproc/input/dma_wr6_02.asm:5:22: error: Illegal command: 2
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                         ^
+t/20-preproc/input/dma_wr6_02.asm:5:28: error: Illegal command: 3
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                               ^
+t/20-preproc/input/dma_wr6_02.asm:5:34: error: Illegal command: 4
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                                     ^
+t/20-preproc/input/dma_wr6_02.asm:5:40: error: Illegal command: 5
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                                           ^
+t/20-preproc/input/dma_wr6_02.asm:5:46: error: Illegal command: 6
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                                                 ^
+t/20-preproc/input/dma_wr6_02.asm:5:52: error: Illegal command: 7
+    REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+                                                       ^
+t/20-preproc/input/dma_wr6_02.asm:6:4: error: Illegal command: 8
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:6:10: error: Illegal command: 9
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:6:16: error: Illegal command: $0A
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:6:22: error: Illegal command: $0B
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:6:28: error: Illegal command: $0C
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:6:34: error: Illegal command: $0D
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:6:40: error: Illegal command: $0E
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:6:46: error: Illegal command: $0F
+    		 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:7:4: error: Illegal command: $10
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:7:10: error: Illegal command: $11
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:7:16: error: Illegal command: $12
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:7:22: error: Illegal command: $13
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:7:28: error: Illegal command: $14
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:7:34: error: Illegal command: $15
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:7:40: error: Illegal command: $16
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:7:46: error: Illegal command: $17
+    		 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:8:4: error: Illegal command: $18
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:8:10: error: Illegal command: $19
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:8:16: error: Illegal command: $1A
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:8:22: error: Illegal command: $1B
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:8:28: error: Illegal command: $1C
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:8:34: error: Illegal command: $1D
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:8:40: error: Illegal command: $1E
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:8:46: error: Illegal command: $1F
+    		 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:9:4: error: Illegal command: $20
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:9:10: error: Illegal command: $21
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:9:16: error: Illegal command: $22
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:9:22: error: Illegal command: $23
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:9:28: error: Illegal command: $24
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:9:34: error: Illegal command: $25
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:9:40: error: Illegal command: $26
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:9:46: error: Illegal command: $27
+    		 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:10:4: error: Illegal command: $28
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:10:10: error: Illegal command: $29
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:10:16: error: Illegal command: $2A
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:10:22: error: Illegal command: $2B
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:10:28: error: Illegal command: $2C
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:10:34: error: Illegal command: $2D
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:10:40: error: Illegal command: $2E
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:10:46: error: Illegal command: $2F
+    		 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:11:4: error: Illegal command: $30
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:11:10: error: Illegal command: $31
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:11:16: error: Illegal command: $32
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:11:22: error: Illegal command: $33
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:11:28: error: Illegal command: $34
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:11:34: error: Illegal command: $35
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:11:40: error: Illegal command: $36
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:11:46: error: Illegal command: $37
+    		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:12:4: error: Illegal command: $38
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:12:10: error: Illegal command: $39
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:12:16: error: Illegal command: $3A
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:12:22: error: Illegal command: $3B
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:12:28: error: Illegal command: $3C
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:12:34: error: Illegal command: $3D
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:12:40: error: Illegal command: $3E
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:12:46: error: Illegal command: $3F
+    		 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:13:4: error: Illegal command: $40
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:13:10: error: Illegal command: $41
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:13:16: error: Illegal command: $42
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:13:22: error: Illegal command: $43
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:13:28: error: Illegal command: $44
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:13:34: error: Illegal command: $45
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:13:40: error: Illegal command: $46
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:13:46: error: Illegal command: $47
+    		 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:14:4: error: Illegal command: $48
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:14:10: error: Illegal command: $49
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:14:16: error: Illegal command: $4A
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:14:22: error: Illegal command: $4B
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:14:28: error: Illegal command: $4C
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:14:34: error: Illegal command: $4D
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:14:40: error: Illegal command: $4E
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:14:46: error: Illegal command: $4F
+    		 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:15:4: error: Illegal command: $50
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:15:10: error: Illegal command: $51
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:15:16: error: Illegal command: $52
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:15:22: error: Illegal command: $53
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:15:28: error: Illegal command: $54
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:15:34: error: Illegal command: $55
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:15:40: error: Illegal command: $56
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:15:46: error: Illegal command: $57
+    		 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:16:4: error: Illegal command: $58
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:16:10: error: Illegal command: $59
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:16:16: error: Illegal command: $5A
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:16:22: error: Illegal command: $5B
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:16:28: error: Illegal command: $5C
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:16:34: error: Illegal command: $5D
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:16:40: error: Illegal command: $5E
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:16:46: error: Illegal command: $5F
+    		 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:17:4: error: Illegal command: $60
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:17:10: error: Illegal command: $61
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:17:16: error: Illegal command: $62
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:17:22: error: Illegal command: $63
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:17:28: error: Illegal command: $64
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:17:34: error: Illegal command: $65
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:17:40: error: Illegal command: $66
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:17:46: error: Illegal command: $67
+    		 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:18:4: error: Illegal command: $68
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:18:10: error: Illegal command: $69
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:18:16: error: Illegal command: $6A
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:18:22: error: Illegal command: $6B
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:18:28: error: Illegal command: $6C
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:18:34: error: Illegal command: $6D
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:18:40: error: Illegal command: $6E
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:18:46: error: Illegal command: $6F
+    		 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:19:4: error: Illegal command: $70
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:19:10: error: Illegal command: $71
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:19:16: error: Illegal command: $72
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:19:22: error: Illegal command: $73
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:19:28: error: Illegal command: $74
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:19:34: error: Illegal command: $75
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:19:40: error: Illegal command: $76
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:19:46: error: Illegal command: $77
+    		 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:20:4: error: Illegal command: $78
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:20:10: error: Illegal command: $79
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:20:16: error: Illegal command: $7A
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:20:22: error: Illegal command: $7B
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:20:28: error: Illegal command: $7C
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:20:34: error: Illegal command: $7D
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:20:40: error: Illegal command: $7E
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:20:46: error: Illegal command: $7F
+    		 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:21:4: error: Illegal command: $80
+    		 0x80, 0x81, 0x82,       0x84, 0x85, 0x86,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:21:10: error: Illegal command: $81
+    		 0x80, 0x81, 0x82,       0x84, 0x85, 0x86,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:21:16: error: Illegal command: $82
+    		 0x80, 0x81, 0x82,       0x84, 0x85, 0x86,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:21:28: error: Illegal command: $84
+    		 0x80, 0x81, 0x82,       0x84, 0x85, 0x86,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:21:34: error: Illegal command: $85
+    		 0x80, 0x81, 0x82,       0x84, 0x85, 0x86,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:21:40: error: Illegal command: $86
+    		 0x80, 0x81, 0x82,       0x84, 0x85, 0x86,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:22:4: error: Illegal command: $88
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:22:10: error: Illegal command: $89
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:22:16: error: Illegal command: $8A
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:22:28: error: Illegal command: $8C
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:22:34: error: Illegal command: $8D
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:22:40: error: Illegal command: $8E
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:22:46: error: Illegal command: $8F
+    		 0x88, 0x89, 0x8A,       0x8C, 0x8D, 0x8E, 0x8F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:23:4: error: Illegal command: $90
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:23:10: error: Illegal command: $91
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:23:16: error: Illegal command: $92
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:23:22: error: Illegal command: $93
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:23:28: error: Illegal command: $94
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:23:34: error: Illegal command: $95
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:23:40: error: Illegal command: $96
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:23:46: error: Illegal command: $97
+    		 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:24:4: error: Illegal command: $98
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:24:10: error: Illegal command: $99
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:24:16: error: Illegal command: $9A
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:24:22: error: Illegal command: $9B
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:24:28: error: Illegal command: $9C
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:24:34: error: Illegal command: $9D
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:24:40: error: Illegal command: $9E
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:24:46: error: Illegal command: $9F
+    		 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:25:4: error: Illegal command: $A0
+    		 0xA0, 0xA1, 0xA2,       0xA4, 0xA5, 0xA6,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:25:10: error: Illegal command: $A1
+    		 0xA0, 0xA1, 0xA2,       0xA4, 0xA5, 0xA6,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:25:16: error: Illegal command: $A2
+    		 0xA0, 0xA1, 0xA2,       0xA4, 0xA5, 0xA6,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:25:28: error: Illegal command: $A4
+    		 0xA0, 0xA1, 0xA2,       0xA4, 0xA5, 0xA6,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:25:34: error: Illegal command: $A5
+    		 0xA0, 0xA1, 0xA2,       0xA4, 0xA5, 0xA6,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:25:40: error: Illegal command: $A6
+    		 0xA0, 0xA1, 0xA2,       0xA4, 0xA5, 0xA6,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:26:4: error: Illegal command: $A8
+    		 0xA8, 0xA9, 0xAA,       0xAC, 0xAD, 0xAE,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:26:10: error: Illegal command: $A9
+    		 0xA8, 0xA9, 0xAA,       0xAC, 0xAD, 0xAE,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:26:16: error: Illegal command: $AA
+    		 0xA8, 0xA9, 0xAA,       0xAC, 0xAD, 0xAE,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:26:28: error: Illegal command: $AC
+    		 0xA8, 0xA9, 0xAA,       0xAC, 0xAD, 0xAE,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:26:34: error: Illegal command: $AD
+    		 0xA8, 0xA9, 0xAA,       0xAC, 0xAD, 0xAE,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:26:40: error: Illegal command: $AE
+    		 0xA8, 0xA9, 0xAA,       0xAC, 0xAD, 0xAE,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:27:4: error: Illegal command: $B0
+    		 0xB0, 0xB1, 0xB2,       0xB4, 0xB5, 0xB6,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:27:10: error: Illegal command: $B1
+    		 0xB0, 0xB1, 0xB2,       0xB4, 0xB5, 0xB6,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:27:16: error: Illegal command: $B2
+    		 0xB0, 0xB1, 0xB2,       0xB4, 0xB5, 0xB6,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:27:28: error: Illegal command: $B4
+    		 0xB0, 0xB1, 0xB2,       0xB4, 0xB5, 0xB6,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:27:34: error: Illegal command: $B5
+    		 0xB0, 0xB1, 0xB2,       0xB4, 0xB5, 0xB6,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:27:40: error: Illegal command: $B6
+    		 0xB0, 0xB1, 0xB2,       0xB4, 0xB5, 0xB6,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:28:4: error: Illegal command: $B8
+    		 0xB8, 0xB9, 0xBA,       0xBC, 0xBD, 0xBE,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:28:10: error: Illegal command: $B9
+    		 0xB8, 0xB9, 0xBA,       0xBC, 0xBD, 0xBE,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:28:16: error: Illegal command: $BA
+    		 0xB8, 0xB9, 0xBA,       0xBC, 0xBD, 0xBE,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:28:28: error: Illegal command: $BC
+    		 0xB8, 0xB9, 0xBA,       0xBC, 0xBD, 0xBE,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:28:34: error: Illegal command: $BD
+    		 0xB8, 0xB9, 0xBA,       0xBC, 0xBD, 0xBE,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:28:40: error: Illegal command: $BE
+    		 0xB8, 0xB9, 0xBA,       0xBC, 0xBD, 0xBE,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:29:4: error: Illegal command: $C0
+    		 0xC0, 0xC1, 0xC2,       0xC4, 0xC5, 0xC6,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:29:10: error: Illegal command: $C1
+    		 0xC0, 0xC1, 0xC2,       0xC4, 0xC5, 0xC6,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:29:16: error: Illegal command: $C2
+    		 0xC0, 0xC1, 0xC2,       0xC4, 0xC5, 0xC6,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:29:28: error: Illegal command: $C4
+    		 0xC0, 0xC1, 0xC2,       0xC4, 0xC5, 0xC6,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:29:34: error: Illegal command: $C5
+    		 0xC0, 0xC1, 0xC2,       0xC4, 0xC5, 0xC6,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:29:40: error: Illegal command: $C6
+    		 0xC0, 0xC1, 0xC2,       0xC4, 0xC5, 0xC6,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:30:4: error: Illegal command: $C8
+    		 0xC8, 0xC9, 0xCA,       0xCC, 0xCD, 0xCE,       \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:30:10: error: Illegal command: $C9
+    		 0xC8, 0xC9, 0xCA,       0xCC, 0xCD, 0xCE,       \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:30:16: error: Illegal command: $CA
+    		 0xC8, 0xC9, 0xCA,       0xCC, 0xCD, 0xCE,       \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:30:28: error: Illegal command: $CC
+    		 0xC8, 0xC9, 0xCA,       0xCC, 0xCD, 0xCE,       \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:30:34: error: Illegal command: $CD
+    		 0xC8, 0xC9, 0xCA,       0xCC, 0xCD, 0xCE,       \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:30:40: error: Illegal command: $CE
+    		 0xC8, 0xC9, 0xCA,       0xCC, 0xCD, 0xCE,       \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:31:4: error: Illegal command: $D0
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:31:10: error: Illegal command: $D1
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:31:16: error: Illegal command: $D2
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:31:28: error: Illegal command: $D4
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:31:34: error: Illegal command: $D5
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:31:40: error: Illegal command: $D6
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:31:46: error: Illegal command: $D7
+    		 0xD0, 0xD1, 0xD2,       0xD4, 0xD5, 0xD6, 0xD7, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:32:4: error: Illegal command: $D8
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:32:10: error: Illegal command: $D9
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:32:16: error: Illegal command: $DA
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:32:22: error: Illegal command: $DB
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:32:28: error: Illegal command: $DC
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:32:34: error: Illegal command: $DD
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:32:40: error: Illegal command: $DE
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:32:46: error: Illegal command: $DF
+    		 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:33:4: error: Illegal command: $E0
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:33:10: error: Illegal command: $E1
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:33:16: error: Illegal command: $E2
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:33:22: error: Illegal command: $E3
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:33:28: error: Illegal command: $E4
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:33:34: error: Illegal command: $E5
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:33:40: error: Illegal command: $E6
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:33:46: error: Illegal command: $E7
+    		 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:34:4: error: Illegal command: $E8
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:34:10: error: Illegal command: $E9
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:34:16: error: Illegal command: $EA
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:34:22: error: Illegal command: $EB
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:34:28: error: Illegal command: $EC
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:34:34: error: Illegal command: $ED
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:34:40: error: Illegal command: $EE
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:34:46: error: Illegal command: $EF
+    		 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:35:4: error: Illegal command: $F0
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:35:10: error: Illegal command: $F1
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:35:16: error: Illegal command: $F2
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:35:22: error: Illegal command: $F3
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:35:28: error: Illegal command: $F4
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:35:34: error: Illegal command: $F5
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:35:40: error: Illegal command: $F6
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:35:46: error: Illegal command: $F7
+    		 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, \
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:36:4: error: Illegal command: $F8
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		 ^
+t/20-preproc/input/dma_wr6_02.asm:36:10: error: Illegal command: $F9
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		       ^
+t/20-preproc/input/dma_wr6_02.asm:36:16: error: Illegal command: $FA
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		             ^
+t/20-preproc/input/dma_wr6_02.asm:36:22: error: Illegal command: $FB
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		                   ^
+t/20-preproc/input/dma_wr6_02.asm:36:28: error: Illegal command: $FC
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		                         ^
+t/20-preproc/input/dma_wr6_02.asm:36:34: error: Illegal command: $FD
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		                               ^
+t/20-preproc/input/dma_wr6_02.asm:36:40: error: Illegal command: $FE
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		                                     ^
+t/20-preproc/input/dma_wr6_02.asm:36:46: error: Illegal command: $FF
+    		 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+    		                                           ^
+t/20-preproc/input/dma_wr6_02.asm:39:15: error: Too many arguments
+    dma.wr6 0x83, 99	; too many arguments
+                  ^
