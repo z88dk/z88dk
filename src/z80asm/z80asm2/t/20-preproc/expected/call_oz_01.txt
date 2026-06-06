@@ -1,0 +1,50 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/call_oz_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Assembling t/20-preproc/input/call_oz_01.asm...
+# file: t/20-preproc/input/call_oz_01.asm
+Identifier	"DEFC"	1:11	keyword=DEFC 
+Identifier	"X"	1:16	keyword=X 
+EQ	"="	1:18	
+Integer	"255"	1:20	int_value=255 
+EndOfLine	"\n"	1:23	
+Define constant: X = $FF
+t/20-preproc/input/call_oz_01.asm:2:8: error: Expected argument after CALL_OZ
+    call_oz
+           ^
+t/20-preproc/input/call_oz_01.asm:3:9: error: Expected a value, got ","
+    call_oz ,
+            ^
+t/20-preproc/input/call_oz_01.asm:4:14: error: Unexpected token: ","
+    call_oz 1+2*3, 
+                 ^
+Identifier	"RST"	5:1	keyword=RST 
+Integer	"$20"	5:5	int_value=32 
+EndOfLine	"\n"	5:8	
+Identifier	"DEFB"	5:1	keyword=DEFB 
+Integer	"7"	5:6	int_value=7 
+EndOfLine	"\n"	5:7	
+Identifier	"RST"	6:1	keyword=RST 
+Integer	"$20"	6:5	int_value=32 
+EndOfLine	"\n"	6:8	
+Identifier	"DEFB"	6:1	keyword=DEFB 
+Integer	"255"	6:6	int_value=255 
+EndOfLine	"\n"	6:9	
+Identifier	"RST"	7:1	keyword=RST 
+Integer	"$20"	7:5	int_value=32 
+EndOfLine	"\n"	7:8	
+Identifier	"DEFW"	7:1	keyword=DEFW 
+Integer	"256"	7:6	int_value=256 
+EndOfLine	"\n"	7:9	
+Identifier	"RST"	8:1	keyword=RST 
+Integer	"$20"	8:5	int_value=32 
+EndOfLine	"\n"	8:8	
+Identifier	"DEFW"	8:1	keyword=DEFW 
+Integer	"65535"	8:6	int_value=65535 
+EndOfLine	"\n"	8:11	
+t/20-preproc/input/call_oz_01.asm:9:9: error: Argument out of range for CALL_OZ: $10000
+    call_oz 0x10000
+            ^
+t/20-preproc/input/call_oz_01.asm:10:9: error: Argument out of range for CALL_OZ: -1
+    call_oz -1
+            ^
