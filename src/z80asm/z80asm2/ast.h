@@ -310,29 +310,6 @@ struct DefsStringStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
-// copper unit of Spectrum Next
-struct CuWaitStmt : Stmt {
-    std::unique_ptr<Expr> ver_expr;   // 0..311
-    std::unique_ptr<Expr> hor_expr;   // 0..55
-
-    CuWaitStmt(std::unique_ptr<Expr> ver_expr_, std::unique_ptr<Expr> hor_expr_,
-               const SourceLoc& loc)
-        : Stmt(loc), ver_expr(std::move(ver_expr_)), hor_expr(std::move(hor_expr_)) {}
-    virtual ~CuWaitStmt() = default;
-    void dump(DumpContext ctx) const override;
-};
-
-struct CuMoveStmt : Stmt {
-    std::unique_ptr<Expr> reg_expr;   // 0..127
-    std::unique_ptr<Expr> val_expr;   // 0..255
-
-    CuMoveStmt(std::unique_ptr<Expr> reg_expr_, std::unique_ptr<Expr> val_expr_,
-               const SourceLoc& loc)
-        : Stmt(loc), reg_expr(std::move(reg_expr_)), val_expr(std::move(val_expr_)) {}
-    virtual ~CuMoveStmt() = default;
-    void dump(DumpContext ctx) const override;
-};
-
 // root of the AST
 struct Program : AstNode {
     std::vector<std::unique_ptr<Stmt>> stmts;

@@ -2,26 +2,52 @@
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/cu_wait_01.asm...
-t/20-preproc/input/cu_wait_01.asm:1:8: error: Expected a value, got "\n"
+# file: t/20-preproc/input/cu_wait_01.asm
+Identifier	"DEFC"	1:11	keyword=DEFC 
+Identifier	"X"	1:16	keyword=X 
+EQ	"="	1:18	
+Integer	"311"	1:20	int_value=311 
+EndOfLine	"\n"	1:23	
+Define constant: X = $137
+Identifier	"DEFC"	2:11	keyword=DEFC 
+Identifier	"Y"	2:16	
+EQ	"="	2:18	
+Integer	"55"	2:20	int_value=55 
+EndOfLine	"\n"	2:22	
+Define constant: Y = $37
+t/20-preproc/input/cu_wait_01.asm:3:8: error: Expected argument after CU_WAIT
     cu.wait 
            ^
-t/20-preproc/input/cu_wait_01.asm:2:10: error: Expected comma between expressions in CU_WAIT
+t/20-preproc/input/cu_wait_01.asm:4:10: error: Expected comma after expression in CU_WAIT
     cu.wait 0
              ^
-t/20-preproc/input/cu_wait_01.asm:3:10: error: Unterminated expression after ","
+t/20-preproc/input/cu_wait_01.asm:5:10: error: Unterminated expression after ","
     cu.wait 0,
              ^
-t/20-preproc/input/cu_wait_01.asm:4:12: error: Unexpected token: ","
+t/20-preproc/input/cu_wait_01.asm:6:12: error: Unexpected token: ","
     cu.wait 0,0,
                ^
-# file: t/20-preproc/input/cu_wait_01.asm
-Identifier	"CU_WAIT"	5:1	keyword=CU_WAIT 
-Integer	"0"	5:9	int_value=0 
-Comma	","	5:10	
-Integer	"0"	5:11	int_value=0 
-EndOfLine	"\n"	5:1	
-Identifier	"CU_WAIT"	6:1	keyword=CU_WAIT 
-Integer	"311"	6:9	int_value=311 
-Comma	","	6:12	
-Integer	"55"	6:13	int_value=55 
-EndOfLine	"\n"	6:1	
+t/20-preproc/input/cu_wait_01.asm:7:9: error: Argument out of range for CU_WAIT: -1
+    cu.wait -1, 0
+            ^
+Identifier	"DEFW_BE"	8:1	keyword=DEFW_BE 
+Integer	"$8000"	8:9	int_value=32768 
+EndOfLine	"\n"	8:14	
+Identifier	"DEFW_BE"	9:1	keyword=DEFW_BE 
+Integer	"$8137"	9:9	int_value=33079 
+EndOfLine	"\n"	9:14	
+t/20-preproc/input/cu_wait_01.asm:1:11: error: Argument out of range for CU_WAIT: $138
+    #define X 311
+              ^
+t/20-preproc/input/cu_wait_01.asm:11:12: error: Argument out of range for CU_WAIT: -1
+    cu.wait 0, -1
+               ^
+Identifier	"DEFW_BE"	12:1	keyword=DEFW_BE 
+Integer	"$8000"	12:9	int_value=32768 
+EndOfLine	"\n"	12:14	
+Identifier	"DEFW_BE"	13:1	keyword=DEFW_BE 
+Integer	"$EE00"	13:9	int_value=60928 
+EndOfLine	"\n"	13:14	
+t/20-preproc/input/cu_wait_01.asm:2:11: error: Argument out of range for CU_WAIT: $38
+    #define Y 55
+              ^

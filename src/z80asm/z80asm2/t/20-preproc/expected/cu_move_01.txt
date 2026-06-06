@@ -2,26 +2,52 @@
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Assembling t/20-preproc/input/cu_move_01.asm...
-t/20-preproc/input/cu_move_01.asm:1:8: error: Expected a value, got "\n"
+# file: t/20-preproc/input/cu_move_01.asm
+Identifier	"DEFC"	1:11	keyword=DEFC 
+Identifier	"X"	1:16	keyword=X 
+EQ	"="	1:18	
+Integer	"127"	1:20	int_value=127 
+EndOfLine	"\n"	1:23	
+Define constant: X = $7F
+Identifier	"DEFC"	2:11	keyword=DEFC 
+Identifier	"Y"	2:16	
+EQ	"="	2:18	
+Integer	"255"	2:20	int_value=255 
+EndOfLine	"\n"	2:23	
+Define constant: Y = $FF
+t/20-preproc/input/cu_move_01.asm:3:8: error: Expected argument after CU_MOVE
     cu.move 
            ^
-t/20-preproc/input/cu_move_01.asm:2:10: error: Expected comma between expressions in CU_MOVE
+t/20-preproc/input/cu_move_01.asm:4:10: error: Expected comma after expression in CU_MOVE
     cu.move 0
              ^
-t/20-preproc/input/cu_move_01.asm:3:10: error: Unterminated expression after ","
+t/20-preproc/input/cu_move_01.asm:5:10: error: Unterminated expression after ","
     cu.move 0,
              ^
-t/20-preproc/input/cu_move_01.asm:4:12: error: Unexpected token: ","
+t/20-preproc/input/cu_move_01.asm:6:12: error: Unexpected token: ","
     cu.move 0,0,
                ^
-# file: t/20-preproc/input/cu_move_01.asm
-Identifier	"CU_MOVE"	5:1	keyword=CU_MOVE 
-Integer	"0"	5:9	int_value=0 
-Comma	","	5:10	
-Integer	"0"	5:11	int_value=0 
-EndOfLine	"\n"	5:1	
-Identifier	"CU_MOVE"	6:1	keyword=CU_MOVE 
-Integer	"127"	6:9	int_value=127 
-Comma	","	6:12	
-Integer	"255"	6:13	int_value=255 
-EndOfLine	"\n"	6:1	
+t/20-preproc/input/cu_move_01.asm:7:9: error: Argument out of range for CU_MOVE: -1
+    cu.move -1,0
+            ^
+Identifier	"DEFW_BE"	8:1	keyword=DEFW_BE 
+Integer	"0"	8:9	int_value=0 
+EndOfLine	"\n"	8:10	
+Identifier	"DEFW_BE"	9:1	keyword=DEFW_BE 
+Integer	"$7F00"	9:9	int_value=32512 
+EndOfLine	"\n"	9:14	
+t/20-preproc/input/cu_move_01.asm:1:11: error: Argument out of range for CU_MOVE: $80
+    #define X 127
+              ^
+t/20-preproc/input/cu_move_01.asm:11:11: error: Argument out of range for CU_MOVE: -1
+    cu.move 0,-1
+              ^
+Identifier	"DEFW_BE"	12:1	keyword=DEFW_BE 
+Integer	"0"	12:9	int_value=0 
+EndOfLine	"\n"	12:10	
+Identifier	"DEFW_BE"	13:1	keyword=DEFW_BE 
+Integer	"$FF"	13:9	int_value=255 
+EndOfLine	"\n"	13:12	
+t/20-preproc/input/cu_move_01.asm:2:11: error: Argument out of range for CU_MOVE: $100
+    #define Y 255
+              ^
