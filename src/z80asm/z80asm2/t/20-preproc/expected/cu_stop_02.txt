@@ -1,0 +1,11 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/cu_stop_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/cu_stop_02.asm...
+t/20-preproc/input/cu_stop_02.asm:1:9: error: Unexpected token: "x"
+    cu.stop x 
+            ^
+# file: t/20-preproc/input/cu_stop_02.asm
+Identifier	"DEFW_BE"	2:1	keyword=DEFW_BE 
+Integer	"$FFFF"	2:9	int_value=65535 
+EndOfLine	"\n"	2:14	

@@ -1,0 +1,38 @@
+% z88dk-z80asm -v -mr2ka -dump-after-directives t/20-preproc//input/call_pkg_02.asm
+Define constant: __CPU_RABBIT__ = 1
+Define constant: __CPU_R2KA__ = 1
+Assembling t/20-preproc/input/call_pkg_02.asm...
+# file: t/20-preproc/input/call_pkg_02.asm
+Identifier	"DEFC"	1:11	keyword=DEFC 
+Identifier	"X"	1:16	keyword=X 
+EQ	"="	1:18	
+Integer	"6"	1:20	int_value=6 
+EndOfLine	"\n"	1:21	
+Define constant: X = 6
+t/20-preproc/input/call_pkg_02.asm:2:9: error: Expected argument after CALL_PKG
+    call_pkg
+            ^
+t/20-preproc/input/call_pkg_02.asm:3:10: error: CPU r2ka does not support CALL_PKG
+    call_pkg 2*3
+             ^
+t/20-preproc/input/call_pkg_02.asm:1:11: error: CPU r2ka does not support CALL_PKG
+    #define X 2*3
+              ^
+t/20-preproc/input/call_pkg_02.asm:5:18: error: Unexpected token: ","
+    call_pkg $100+2*3,
+                     ^
+t/20-preproc/input/call_pkg_02.asm:6:18: error: Unexpected token: ","
+    call_pkg $100+2*3, 0
+                     ^
+t/20-preproc/input/call_pkg_02.asm:7:10: error: CPU r2ka does not support CALL_PKG
+    call_pkg 0
+             ^
+t/20-preproc/input/call_pkg_02.asm:8:10: error: CPU r2ka does not support CALL_PKG
+    call_pkg $ffff
+             ^
+t/20-preproc/input/call_pkg_02.asm:9:10: error: CPU r2ka does not support CALL_PKG
+    call_pkg $10000
+             ^
+t/20-preproc/input/call_pkg_02.asm:10:10: error: CPU r2ka does not support CALL_PKG
+    call_pkg -1
+             ^
