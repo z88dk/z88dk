@@ -153,7 +153,7 @@ ENDIF
 
 .usewholeblk
 
-   ; bc = size
+   ; bc = size (unused)
    ; de = & block + 1b
    ; stack = & lagger->next + 1b
  
@@ -163,9 +163,8 @@ ENDIF
    ex de,hl
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   ld a,(hl+)
-   ld (de+),a
-   dec bc
+   ld a,(hl-)
+   ld (de-),a
 ELSE
    ldd                       ; write next block after this one into lagger's pointer
 ENDIF
