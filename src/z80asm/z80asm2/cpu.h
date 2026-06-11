@@ -19,7 +19,7 @@ enum class CPU {
 };
 
 CPU cpu_lookup(std::string_view name);
-std::string cpu_name(CPU cpu_id);
+std::string to_string(CPU cpu_id);
 std::vector<std::string> cpu_names();
 std::vector<std::string> cpu_all_defines();
 std::vector<std::string> cpu_defines(CPU cpu_id);
@@ -45,7 +45,7 @@ bool compute_cu_stop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
 bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
 
 // Spectrum Next DMA unit
-bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
+bool compute_dma_data(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                       CPU cpu_id,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
                       Keyword kw, 
