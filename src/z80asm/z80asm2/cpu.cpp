@@ -291,7 +291,8 @@ bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc) {
 bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                       CPU cpu_id,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
-                      Keyword kw, const SourceLoc& kw_loc) {
+                      Keyword kw, 
+                      const SourceLoc& kw_loc, const SourceLoc& eol_loc) {
     assert(!val_loc_data.empty());
 
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
@@ -318,7 +319,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
     // Lambda to retrieve the next value from val_loc_data
     auto next_val = [&](int& out_value) -> bool {
         if (idx >= val_loc_data.size()) {
-            g_diag.error(last_loc(),
+            g_diag.error(eol_loc,
                          "Missing value");
             return false;
         }
@@ -370,7 +371,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         // parse wr0 parameters: check bits 3,4
         if ((N & 0x18) != 0 && idx >= val_loc_data.size()) {
-            g_diag.error(last_loc(),
+            g_diag.error(eol_loc,
                          "Missing value");
             return false;
         }
@@ -398,7 +399,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         // parse wr0 parameters: check bits 5,6
         if ((N & 0x60) != 0 && idx >= val_loc_data.size()) {
-            g_diag.error(last_loc(),
+            g_diag.error(eol_loc,
                          "Missing value");
             return false;
         }
@@ -447,7 +448,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         if (N & 0x40) {
             if (idx >= val_loc_data.size()) {
-                g_diag.error(last_loc(),
+                g_diag.error(eol_loc,
                              "Missing value");
                 return false;
             }
@@ -491,7 +492,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         if (N & 0x40) {
             if (idx >= val_loc_data.size()) {
-                g_diag.error(last_loc(),
+                g_diag.error(eol_loc,
                              "Missing value");
                 return false;
             }
@@ -514,7 +515,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
             if (W & 0x20) {
                 if (idx >= val_loc_data.size()) {
-                    g_diag.error(last_loc(),
+                    g_diag.error(eol_loc,
                                  "Missing value");
                     return false;
                 }
@@ -552,7 +553,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         if (N & 0x08) {
             if (idx >= val_loc_data.size()) {
-                g_diag.error(last_loc(),
+                g_diag.error(eol_loc,
                              "Missing value");
                 return false;
             }
@@ -563,7 +564,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         if (N & 0x10) {
             if (idx >= val_loc_data.size()) {
-                g_diag.error(last_loc(),
+                g_diag.error(eol_loc,
                              "Missing value");
                 return false;
             }
@@ -607,7 +608,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         if ((N & 0x0C) == 0x0C) {
             if (idx >= val_loc_data.size()) {
-                g_diag.error(last_loc(),
+                g_diag.error(eol_loc,
                              "Missing value");
                 return false;
             }
@@ -618,7 +619,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         else {
             if (N & 0x04) {
                 if (idx >= val_loc_data.size()) {
-                    g_diag.error(last_loc(),
+                    g_diag.error(eol_loc,
                                  "Missing value");
                     return false;
                 }
@@ -628,7 +629,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
             }
             if (N & 0x08) {
                 if (idx >= val_loc_data.size()) {
-                    g_diag.error(last_loc(),
+                    g_diag.error(eol_loc,
                                  "Missing value");
                     return false;
                 }
@@ -714,7 +715,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
         if (N == 0xBB) {
             if (idx >= val_loc_data.size()) {
-                g_diag.error(last_loc(),
+                g_diag.error(eol_loc,
                              "Missing value");
                 return false;
             }

@@ -2568,6 +2568,8 @@ void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
     if (expanded.empty()) {
         return;  // error already reported
     }
+    SourceLoc eol_loc = pline.tokens.empty() ? 
+            SourceLoc() : pline.tokens.back().loc;
 
     ParseLine expr_pline(expanded);
     std::vector<std::pair<int, SourceLoc>> val_loc_data;
@@ -2600,7 +2602,7 @@ void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
     // produce list of DEFB/DEFW lines
     std::vector<std::pair<int, int>> size_val_data;
     if (!compute_dma_data(size_val_data, preproc_cpu_id, val_loc_data, kw,
-                          kw_loc)) {
+                          kw_loc, eol_loc)) {
         return; // error already reported by compute_dma_data
     }
 
