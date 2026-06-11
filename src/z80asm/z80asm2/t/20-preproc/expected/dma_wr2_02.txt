@@ -48,12 +48,12 @@ t/20-preproc/input/dma_wr2_02.asm:7:31: error: Illegal base register: $80
 t/20-preproc/input/dma_wr2_02.asm:7:37: error: Illegal base register: $FF
     REPTI I, 1, 2, 3, 4, 5, 6, 7, 0x80, 0xFF
                                         ^
-t/20-preproc/input/dma_wr2_02.asm:10:9: error: Missing value
+t/20-preproc/input/dma_wr2_02.asm:10:13: error: Missing value
     dma.wr2 0x40 		; missing group member
-            ^
-t/20-preproc/input/dma_wr2_02.asm:11:15: error: Missing value
+                ^
+t/20-preproc/input/dma_wr2_02.asm:11:19: error: Missing value
     dma.wr2 0x40, 0x20	; missing group member
-                  ^
+                      ^
 t/20-preproc/input/dma_wr2_02.asm:12:10: error: Illegal port B timing: 3
     REPTI I, 0x03, 0x10, 0x13, 0x87
              ^
