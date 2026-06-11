@@ -48,4 +48,5 @@ bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
 bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                       CPU cpu_id,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
-                      Keyword kw, const SourceLoc& kw_loc);
+                      Keyword kw, 
+                      const SourceLoc& kw_loc, const SourceLoc& eol_loc);

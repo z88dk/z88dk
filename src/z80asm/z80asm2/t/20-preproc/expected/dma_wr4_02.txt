@@ -24,21 +24,21 @@ t/20-preproc/input/dma_wr4_02.asm:6:15: error: ASMPC is not allowed in a constan
 t/20-preproc/input/dma_wr4_02.asm:7:9: error: Illegal base register: 2
     dma.wr4 2			; illegal base register
             ^
-t/20-preproc/input/dma_wr4_02.asm:8:10: error: Missing value
-    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
-             ^
-t/20-preproc/input/dma_wr4_02.asm:8:16: error: Missing value
-    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
-                   ^
-t/20-preproc/input/dma_wr4_02.asm:8:22: error: Missing value
-    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
-                         ^
-t/20-preproc/input/dma_wr4_02.asm:8:28: error: Missing value
-    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
-                               ^
-t/20-preproc/input/dma_wr4_02.asm:8:34: error: Missing value
-    REPTI I, 0x24, 0x44, 0x28, 0x48, 0x4C
-                                     ^
+t/20-preproc/input/dma_wr4_02.asm:9:11: error: Missing value
+    	dma.wr4 I 		; missing group member
+    	         ^
+t/20-preproc/input/dma_wr4_02.asm:9:11: error: Missing value
+    	dma.wr4 I 		; missing group member
+    	         ^
+t/20-preproc/input/dma_wr4_02.asm:9:11: error: Missing value
+    	dma.wr4 I 		; missing group member
+    	         ^
+t/20-preproc/input/dma_wr4_02.asm:9:11: error: Missing value
+    	dma.wr4 I 		; missing group member
+    	         ^
+t/20-preproc/input/dma_wr4_02.asm:9:11: error: Missing value
+    	dma.wr4 I 		; missing group member
+    	         ^
 t/20-preproc/input/dma_wr4_02.asm:11:10: error: Interrupts not supported: $10
     REPTI I, 0x10, 0x11, 0x30, 0x70
              ^
