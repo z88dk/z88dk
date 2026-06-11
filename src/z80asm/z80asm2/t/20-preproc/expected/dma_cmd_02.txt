@@ -12,9 +12,9 @@ EndOfLine	"\n"	2:9
 t/20-preproc/input/dma_cmd_02.asm:3:8: error: Expression expected
     dma.cmd				; missing argument
            ^
-t/20-preproc/input/dma_cmd_02.asm:4:9: error: Missing value
+t/20-preproc/input/dma_cmd_02.asm:4:13: error: Missing value
     dma.cmd 0xBB		; missing value
-            ^
+                ^
 t/20-preproc/input/dma_cmd_02.asm:5:10: error: Illegal command: 0
     REPTI I, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
              ^
