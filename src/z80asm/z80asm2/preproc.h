@@ -236,6 +236,12 @@ private:
     std::vector<Token> collect_and_expand_line(ParseLine& pline,
             Keyword kw,
             std::string_view what);
+    bool collect_and_expand_args(
+            std::vector<std::pair<int, SourceLoc>>& val_loc_data, 
+            SourceLoc& eol_loc,
+            ParseLine& pline, Keyword kw, const SourceLoc& kw_loc);
+    void push_def_instructions(const SourceLoc& loc, 
+            const std::vector<std::pair<Keyword, int>> def_val_data);
     bool eval_if_expr(ParseLine& pline,
                       Keyword kw);
     bool eval_ifdef_name(ParseLine& pline,
