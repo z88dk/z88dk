@@ -302,7 +302,7 @@ std::unique_ptr<Stmt> Parser::parse_PRAGMA(ParseLine& pline, const SourceLoc&,
         pline.advance(); // consume integer
 
         if (!cpu_set_adl_mode(parser_cpu_id, adl_value)) {
-            pline.error("CPU " + cpu_name(parser_cpu_id) + " does not support ADL mode");
+            pline.error("CPU " + to_string(parser_cpu_id) + " does not support ADL mode");
             status = ParseStatus::FatalError;
             return nullptr;
         }

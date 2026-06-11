@@ -33,7 +33,7 @@ CPU cpu_lookup(std::string_view name) {
     }
 }
 
-std::string cpu_name(CPU cpu_id) {
+std::string to_string(CPU cpu_id) {
     // CPU ids may not be sequencial
     static const std::unordered_map<CPU, std::string> lu_table = {
 #define X(code, id, name, defines)   { CPU::id, name },
@@ -218,7 +218,7 @@ bool compute_cu_wait_value(int& out_value, CPU cpu_id, int ver, int hor,
                            const SourceLoc& ver_loc,
                            const SourceLoc& hor_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_WAIT is only supported on the z80n");
+        g_diag.error(kw_loc, "CU_WAIT not supported on "+to_string(cpu_id));
         return false;
     }
 
@@ -245,7 +245,7 @@ bool compute_cu_move_value(int& out_value, CPU cpu_id, int reg, int val,
                            const SourceLoc& reg_loc,
                            const SourceLoc& val_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_MOVE is only supported on the z80n");
+        g_diag.error(kw_loc, "CU_MOVE not supported on "+to_string(cpu_id));
         return false;
     }
 
@@ -270,7 +270,7 @@ bool compute_cu_move_value(int& out_value, CPU cpu_id, int reg, int val,
 bool compute_cu_stop_value(int& out_value, CPU cpu_id,
                            const SourceLoc& kw_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_STOP is only supported on the z80n");
+        g_diag.error(kw_loc, "CU_STOP not supported on "+to_string(cpu_id));
         return false;
     }
 
@@ -280,7 +280,7 @@ bool compute_cu_stop_value(int& out_value, CPU cpu_id,
 
 bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_NOP is only supported on the z80n");
+        g_diag.error(kw_loc, "CU_NOP not supported on "+to_string(cpu_id));
         return false;
     }
 
@@ -288,7 +288,7 @@ bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc) {
     return true;
 }
 
-bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
+bool compute_dma_data(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                       CPU cpu_id,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
                       Keyword kw, 
@@ -296,7 +296,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
     assert(!val_loc_data.empty());
 
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, to_string(kw) + " is only supported on the z80n");
+        g_diag.error(kw_loc, to_string(kw) + " not supported on "+to_string(cpu_id));
         return false;
     }
 
@@ -334,12 +334,12 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
 
     // Lambda to create a new entry in out_size_val_data with the given size
     // and next value
-    auto add_entry = [&](int size) -> bool {
+    auto add_entry = [&](Keyword def) -> bool {
         int value = 0;
         if (!next_val(value)) {
             return false; // error already reported
         }
-        out_size_val_data.emplace_back(size, value);
+        out_def_val_data.emplace_back(def, value);
         return true;
     };
 
@@ -367,7 +367,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         }
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         // parse wr0 parameters: check bits 3,4
         if ((N & 0x18) != 0 && idx >= val_loc_data.size()) {
@@ -379,17 +379,17 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         case 0:
             break;
         case 0x08:	// bit 3
-            if (!add_entry(1)) {
+            if (!add_entry(Keyword::DEFB)) {
                 return false;
             }
             break;
         case 0x10:	// bit 4
-            if (!add_entry(1)) {
+            if (!add_entry(Keyword::DEFB)) {
                 return false;
             }
             break;
         case 0x18: 	// bits 3,4
-            if (!add_entry(2)) {
+            if (!add_entry(Keyword::DEFW)) {
                 return false;
             }
             break;
@@ -407,17 +407,17 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         case 0:
             break;
         case 0x20:	// bit 5
-            if (!add_entry(1)) {
+            if (!add_entry(Keyword::DEFB)) {
                 return false;
             }
             break;
         case 0x40:	// bit 6
-            if (!add_entry(1)) {
+            if (!add_entry(Keyword::DEFB)) {
                 return false;
             }
             break;
         case 0x60: 	// bits 5,6
-            if (!add_entry(2)) {
+            if (!add_entry(Keyword::DEFW)) {
                 return false;
             }
             break;
@@ -444,7 +444,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         N |= 0x04;
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         if (N & 0x40) {
             if (idx >= val_loc_data.size()) {
@@ -457,7 +457,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                 return false; // error already reported
             }
 
-            out_size_val_data.emplace_back(1, W & 0xFF);
+            out_def_val_data.emplace_back(Keyword::DEFB, W & 0xFF);
 
             if ((W & 0x30) != 0 || (W & 0x03) == 0x03) {
                 g_diag.error(last_loc(),
@@ -488,7 +488,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         }
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         if (N & 0x40) {
             if (idx >= val_loc_data.size()) {
@@ -501,7 +501,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                 return false; // error already reported
             }
 
-            out_size_val_data.emplace_back(1, W & 0xFF);
+            out_def_val_data.emplace_back(Keyword::DEFB, W & 0xFF);
 
             if ((W & 0x10) != 0 || (W & 0x03) == 0x03) {
                 g_diag.error(last_loc(),
@@ -519,7 +519,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                                  "Missing value");
                     return false;
                 }
-                if (!add_entry(1)) {
+                if (!add_entry(Keyword::DEFB)) {
                     return false;
                 }
             }
@@ -544,7 +544,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         N |= 0x80;
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         if (N & 0x64) {
             g_diag.warning(last_loc(),
@@ -557,7 +557,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                              "Missing value");
                 return false;
             }
-            if (!add_entry(1)) {
+            if (!add_entry(Keyword::DEFB)) {
                 return false;
             }
         }
@@ -568,7 +568,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                              "Missing value");
                 return false;
             }
-            if (!add_entry(1)) {
+            if (!add_entry(Keyword::DEFB)) {
                 return false;
             }
         }
@@ -604,7 +604,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         N |= 0x81;
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         if ((N & 0x0C) == 0x0C) {
             if (idx >= val_loc_data.size()) {
@@ -612,7 +612,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                              "Missing value");
                 return false;
             }
-            if (!add_entry(2)) {
+            if (!add_entry(Keyword::DEFW)) {
                 return false;
             }
         }
@@ -623,7 +623,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                                  "Missing value");
                     return false;
                 }
-                if (!add_entry(1)) {
+                if (!add_entry(Keyword::DEFB)) {
                     return false;
                 }
             }
@@ -633,7 +633,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                                  "Missing value");
                     return false;
                 }
-                if (!add_entry(1)) {
+                if (!add_entry(Keyword::DEFB)) {
                     return false;
                 }
             }
@@ -660,7 +660,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         }
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         break;
 
@@ -711,7 +711,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
         }
 
         // add command byte
-        out_size_val_data.emplace_back(1, N & 0xFF);
+        out_def_val_data.emplace_back(Keyword::DEFB, N & 0xFF);
 
         if (N == 0xBB) {
             if (idx >= val_loc_data.size()) {
@@ -730,7 +730,7 @@ bool compute_dma_data(std::vector<std::pair<int, int>>& out_size_val_data,
                 return false;
             }
 
-            out_size_val_data.emplace_back(1, W & 0xFF);
+            out_def_val_data.emplace_back(Keyword::DEFB, W & 0xFF);
         }
         break;
 

@@ -14,9 +14,9 @@ t/20-preproc/input/assume_01.asm:3:13: error: Expected '=' after ASSUME ADL
 t/20-preproc/input/assume_01.asm:4:13: error: Expected 0/1 after ASSUME ADL =
     .assume adl=42
                 ^
-t/20-preproc/input/assume_01.asm:5:2: error: CPU z80 does not support ADL mode
+t/20-preproc/input/assume_01.asm:5:2: error: ADL not supported on z80
     .assume adl=0
      ^
-t/20-preproc/input/assume_01.asm:6:2: error: CPU z80 does not support ADL mode
+t/20-preproc/input/assume_01.asm:6:2: error: ADL not supported on z80
     .assume adl=1
      ^

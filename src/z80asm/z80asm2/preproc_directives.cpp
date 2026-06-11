@@ -1909,7 +1909,7 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
     // check if ADL mode is valid
     if (!cpu_set_adl_mode(preproc_cpu_id, adl_value)) {
         g_diag.error(kw_loc,
-                     "CPU " + cpu_name(preproc_cpu_id) + " does not support ADL mode");
+                     "ADL not supported on " + to_string(preproc_cpu_id));
         return;
     }
 
@@ -2012,7 +2012,7 @@ void Preproc::process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
             preproc_cpu_id == CPU::r5k || preproc_cpu_id == CPU::r5k_strict ||
             preproc_cpu_id == CPU::r6k || preproc_cpu_id == CPU::r6k_strict) {
         g_diag.error(expanded.front().loc,
-                     "CPU " + cpu_name(preproc_cpu_id) + " does not support " + to_string(kw));
+                     to_string(kw)+" not supported on "+to_string(preproc_cpu_id));
         return;
     }
 
@@ -2560,25 +2560,31 @@ void Preproc::expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
     expand_line(in, output);
 }
 
-void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
-                          ParseLine& pline) {
-    // Collect and expand the DMA instruction argument expressions
+// Helper: collect the rest of the line, expand macros and resolve list 
+// of constant values with respective SourceLoc; return also eol_loc for
+// error messages. 
+// Returns false and issues error message if no arguments.
+// Continues on the next line if line ends with comma.
+bool Preproc::collect_and_expand_args(
+        std::vector<std::pair<int, SourceLoc>>& val_loc_data, 
+        SourceLoc& eol_loc,
+        ParseLine& pline, Keyword kw, const SourceLoc& kw_loc) {
+    // Collect and expand the instruction argument expressions
     std::vector<Token> expanded;
     expand_args_multiline(kw, kw_loc, pline, expanded);
     if (expanded.empty()) {
-        return;  // error already reported
+        return false;  // error already reported
     }
-    SourceLoc eol_loc = pline.tokens.empty() ? 
-            SourceLoc() : pline.tokens.back().loc;
-
+    eol_loc = pline.tokens.empty() ? 
+            kw_loc : pline.tokens.back().loc;
+    
     ParseLine expr_pline(expanded);
-    std::vector<std::pair<int, SourceLoc>> val_loc_data;
     while (true) {
         int value = 0;
         SourceLoc value_loc = expr_pline.peek().loc;
         if (!eval_const_expr(expr_pline,
                              const_symbols, value, /*silent=*/false)) {
-            return;  // error already reported by eval_const_expr
+            return false;  // error already reported by eval_const_expr
         }
         val_loc_data.emplace_back(value, value_loc);
 
@@ -2591,40 +2597,48 @@ void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
         else {
             g_diag.error(expr_pline.peek().loc,
                          "Expected comma or end of line after expression in " + to_string(kw));
-            return;
+            return false;
         }
     }
 
     if (!expr_pline.check_end_of_line()) {
-        return; // error already reported by check_end_of_line
+        return false; // error already reported by check_end_of_line
+    }
+
+    return true;
+}
+
+// create DEFB/DEFW/DEFW_BE instructions and push them to the 
+// assembler_output_queue, as macros are already expanded
+void Preproc::push_def_instructions(const SourceLoc& loc, 
+        const std::vector<std::pair<Keyword, int>> def_val_data) {
+    for (const auto& [def, val] : def_val_data) {
+        std::string def_str = to_string(def) + " " + std::to_string(val);
+        std::vector<Token> def_tokens = tokenize_text(def_str, loc);
+        LogicalLine def_line(loc);
+        def_line.tokens = std::move(def_tokens);
+        assembler_output_queue.push_back(std::move(def_line));
+    }
+}
+
+void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
+                          ParseLine& pline) {
+    SourceLoc eol_loc;
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    if (!collect_and_expand_args(val_loc_data, eol_loc,
+                                pline, kw, kw_loc)) {
+        return; // error already reported
     }
 
     // produce list of DEFB/DEFW lines
-    std::vector<std::pair<int, int>> size_val_data;
-    if (!compute_dma_data(size_val_data, preproc_cpu_id, val_loc_data, kw,
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_dma_data(def_val_data, preproc_cpu_id, val_loc_data, kw,
                           kw_loc, eol_loc)) {
         return; // error already reported by compute_dma_data
     }
 
     // macros already expanded, send directly to assembler output queue
-    for (const auto& [size, value] : size_val_data) {
-        std::string data_opc;
-        if (size == 1) {
-            data_opc = "DEFB";
-        }
-        else if (size == 2) {
-            data_opc = "DEFW";
-        }
-        else {
-            assert(0);
-        }
-
-        std::string def_str = data_opc + " " + std::to_string(value);
-        std::vector<Token> def_tokens = tokenize_text(def_str, kw_loc);
-        LogicalLine def_line(kw_loc);
-        def_line.tokens = std::move(def_tokens);
-        assembler_output_queue.push_back(std::move(def_line));
-    }
+    push_def_instructions(kw_loc, def_val_data);
 }
 
 //-----------------------------------------------------------------------------
