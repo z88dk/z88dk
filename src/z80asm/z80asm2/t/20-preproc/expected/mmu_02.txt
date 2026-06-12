@@ -1,0 +1,92 @@
+% z88dk-z80asm -v -mz80n -dump-after-directives t/20-preproc//input/mmu_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80N__ = 1
+Assembling t/20-preproc/input/mmu_02.asm...
+# file: t/20-preproc/input/mmu_02.asm
+Identifier	"DEFB"	1:1	keyword=DEFB 
+Integer	"237"	1:6	int_value=237 
+EndOfLine	"\n"	1:9	
+Identifier	"DEFB"	1:1	keyword=DEFB 
+Integer	"146"	1:6	int_value=146 
+EndOfLine	"\n"	1:9	
+Identifier	"DEFB"	1:1	keyword=DEFB 
+Integer	"80"	1:6	int_value=80 
+EndOfLine	"\n"	1:8	
+t/20-preproc/input/mmu_02.asm:2:9: error: Unexpected token: ","
+    mmu 0, A,x
+            ^
+t/20-preproc/input/mmu_02.asm:3:5: error: Slot value out of range: -1
+    mmu -1, A
+        ^
+t/20-preproc/input/mmu_02.asm:4:5: error: Slot value out of range: 8
+    mmu 8, A
+        ^
+t/20-preproc/input/mmu_02.asm:5:9: error: Unexpected token: ","
+    mmu 0, 0, x
+            ^
+t/20-preproc/input/mmu_02.asm:6:5: error: Slot value out of range: -1
+    mmu -1, 0
+        ^
+t/20-preproc/input/mmu_02.asm:7:5: error: Slot value out of range: 8
+    mmu 8, 0
+        ^
+t/20-preproc/input/mmu_02.asm:8:8: error: Page value out of range: -1
+    mmu 0, -1
+           ^
+t/20-preproc/input/mmu_02.asm:9:8: error: Page value out of range: $100
+    mmu 0, 256
+           ^
+t/20-preproc/input/mmu_02.asm:10:6: error: Page value out of range: -1
+    mmu0 -1
+         ^
+t/20-preproc/input/mmu_02.asm:11:6: error: Page value out of range: $100
+    mmu0 256
+         ^
+t/20-preproc/input/mmu_02.asm:12:6: error: Page value out of range: -1
+    mmu1 -1
+         ^
+t/20-preproc/input/mmu_02.asm:13:6: error: Page value out of range: $100
+    mmu1 256
+         ^
+t/20-preproc/input/mmu_02.asm:14:6: error: Page value out of range: -1
+    mmu2 -1
+         ^
+t/20-preproc/input/mmu_02.asm:15:6: error: Page value out of range: $100
+    mmu2 256
+         ^
+t/20-preproc/input/mmu_02.asm:16:6: error: Page value out of range: -1
+    mmu3 -1
+         ^
+t/20-preproc/input/mmu_02.asm:17:6: error: Page value out of range: $100
+    mmu3 256
+         ^
+t/20-preproc/input/mmu_02.asm:18:6: error: Page value out of range: -1
+    mmu4 -1
+         ^
+t/20-preproc/input/mmu_02.asm:19:6: error: Page value out of range: $100
+    mmu4 256
+         ^
+t/20-preproc/input/mmu_02.asm:20:6: error: Page value out of range: -1
+    mmu5 -1
+         ^
+t/20-preproc/input/mmu_02.asm:21:6: error: Page value out of range: $100
+    mmu5 256
+         ^
+t/20-preproc/input/mmu_02.asm:22:6: error: Page value out of range: -1
+    mmu6 -1
+         ^
+t/20-preproc/input/mmu_02.asm:23:6: error: Page value out of range: $100
+    mmu6 256
+         ^
+t/20-preproc/input/mmu_02.asm:24:6: error: Page value out of range: -1
+    mmu7 -1
+         ^
+t/20-preproc/input/mmu_02.asm:25:6: error: Page value out of range: $100
+    mmu7 256
+         ^
+t/20-preproc/input/mmu_02.asm:26:5: error: Undefined constant: x
+    mmu x, A
+        ^
+t/20-preproc/input/mmu_02.asm:27:8: error: Undefined constant: y
+    mmu 0, y
+           ^
