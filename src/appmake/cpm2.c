@@ -2246,6 +2246,7 @@ static disc_spec naburn_spec = {
      .has_skew = 0,
 };
 
+
 // Northstar Micro-Disk System MDS-A1 87.5K
 // SSSD 48 tpi 5.25" - 256 x 10
 static disc_spec ns_sssd_spec = {
@@ -2300,12 +2301,13 @@ static disc_spec ns_dsdd_spec = {
      .directory_entries = 64,
      .alternate_sides = 1,
      .extent_size = 1024,
-     .byte_size_extents = 0,
+     .byte_size_extents = 1,
      .first_sector_offset = 0,
      .has_skew = 1,
      .skew_track_start = 0,
      .skew_tab = { 0, 5, 1, 6, 2, 7, 3, 8, 4, 9 },
 };
+
 
 static disc_spec nshd8_spec = {
      .name = "Northstar Virtual Disk 8",
