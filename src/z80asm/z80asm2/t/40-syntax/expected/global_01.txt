@@ -12,12 +12,21 @@ t/40-syntax/input/global_01.asm:4:11: error: Identifier expected
     global a1,
               ^
 Program
-    GlobalStmt
+    SymbolDeclareStmt
         Location: t/40-syntax/input/global_01.asm:3:1
-        Names: a1
-    GlobalStmt
+        Type: Global
+        Symbols:
+            a1
+    SymbolDeclareStmt
         Location: t/40-syntax/input/global_01.asm:5:1
-        Names: a1, a2
-    GlobalStmt
+        Type: Global
+        Symbols:
+            a1
+            a2
+    SymbolDeclareStmt
         Location: t/40-syntax/input/global_01.asm:6:1
-        Names: a1, a2, a3
+        Type: Global
+        Symbols:
+            a1
+            a2
+            a3
