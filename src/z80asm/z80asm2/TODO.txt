@@ -2,7 +2,10 @@
 - Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
   or demotion JP->JR (if -optimize-size)
 - Add -MD to generate .d file
-- MMU instructions: add parse and documentation
+- Add location of built-in symbols:
+  symbol	__CPU_Z80__	1	(defined at )
+  symbol	__CPU_ZILOG__	1	(defined at )
+  symbol	__FLOAT_GENMATH__	1	(defined at )
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)

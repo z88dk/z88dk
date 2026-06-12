@@ -14,6 +14,7 @@
 #include "options.h"
 #include "source_loc.h"
 #include "string_interner.h"
+#include "zfloat.h"
 #include <deque>
 #include <string_view>
 #include <unordered_map>
@@ -50,6 +51,9 @@ private:
 
     // cpu for the duration of preprocessing, needed for .ASSUME ADL=0/1
     CPU preproc_cpu_id{ DEFAULT_CPU };
+
+    // float format for the duration of preprocessing, needed for SETFLOAT
+    FloatFormat preproc_float_format{ DEFAULT_FLOAT_FORMAT };
 
     // ---------------------------------------------------------------------
     // Include stack: tracks nested file inclusion
@@ -377,6 +381,10 @@ private:
                      ParseLine& pline);
     void process_MMU(Keyword kw, const SourceLoc& kw_loc,
                      ParseLine& pline);
+    void process_SETFLOAT(Keyword kw, const SourceLoc& kw_loc,
+                          ParseLine& pline);
+    void process_FLOAT(Keyword kw, const SourceLoc& kw_loc,
+                       ParseLine& pline);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch

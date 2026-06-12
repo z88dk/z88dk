@@ -19,7 +19,8 @@
 #include <vector>
 
 Preproc::Preproc()
-    : preproc_cpu_id(g_args.options.cpu_id) {
+    : preproc_cpu_id(g_args.options.cpu_id)
+    , preproc_float_format(g_args.options.float_format) {
 }
 
 bool Preproc::is_cond_active() const {

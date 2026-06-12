@@ -32,7 +32,6 @@ struct ConstEvalSem {
     explicit ConstEvalSem(const ConstSymbols& s);
     int result() const;
     void literal_integer(const Token& tok);
-    void literal_float(const Token& tok);
     bool literal_asmpc(const Token& tok);
     bool symbol(const Token& tok);
     bool local_label(const Token& tok);
@@ -58,7 +57,6 @@ private:
 struct SpanSem {
     int result() const;
     void literal_integer(const Token&) {}
-    void literal_float(const Token&) {}
     bool literal_asmpc(const Token&);
     bool symbol(const Token&);
     bool local_label(const Token&);
@@ -82,7 +80,6 @@ struct ExprSem {
 
     std::unique_ptr<Expr> result();
     void literal_integer(const Token& tok);
-    void literal_float(const Token& tok);
     bool literal_asmpc(const Token& tok);
     bool symbol(const Token& tok);
     bool local_label(const Token& tok);
@@ -210,11 +207,6 @@ bool nud(ParseLine& pline, Sem& sem, bool restricted, ParseStatus& status) {
     case TokenType::Integer:
         pline.advance();
         sem.literal_integer(tok);
-        return true;
-
-    case TokenType::Float:
-        pline.advance();
-        sem.literal_float(tok);
         return true;
 
     case TokenType::Identifier:
