@@ -18,4 +18,4 @@ t/35-preproc-only/input/dma_wr1_01.asm:5:34: warning: Half cycle timing not supp
     REPTI I, 0x80, 0x40, 0x08, 0x04, 0xCC
                                      ^
 Writing t/35-preproc-only/input/dma_wr1_01.i...
-Assembly completed with 0 error(s)
+Assembly completed with 0 errors

@@ -375,6 +375,8 @@ private:
                              ParseLine& pline, std::vector<LogicalLine>& output);
     void process_DMA(Keyword kw, const SourceLoc& kw_loc,
                      ParseLine& pline);
+    void process_MMU(Keyword kw, const SourceLoc& kw_loc,
+                     ParseLine& pline);
 
     // ---------------------------------------------------------------------
     // Macro expansion: classification and dispatch

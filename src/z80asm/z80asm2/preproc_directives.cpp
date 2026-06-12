@@ -47,6 +47,14 @@ Preproc::directive_handlers = {
     { Keyword::DEFINE,     &Preproc::process_DEFINE },
     { Keyword::DEFL,       &Preproc::process_DEFL },
     { Keyword::DEFVARS,    &Preproc::process_DEFVARS },
+    { Keyword::DMA_CMD,    &Preproc::process_DMA },
+    { Keyword::DMA_WR0,    &Preproc::process_DMA },
+    { Keyword::DMA_WR1,    &Preproc::process_DMA },
+    { Keyword::DMA_WR2,    &Preproc::process_DMA },
+    { Keyword::DMA_WR3,    &Preproc::process_DMA },
+    { Keyword::DMA_WR4,    &Preproc::process_DMA },
+    { Keyword::DMA_WR5,    &Preproc::process_DMA },
+    { Keyword::DMA_WR6,    &Preproc::process_DMA },
     { Keyword::ENDM,       &Preproc::process_ENDM },
     { Keyword::ENDR,       &Preproc::process_ENDR },
     { Keyword::ERROR,      &Preproc::process_ERROR },
@@ -56,20 +64,21 @@ Preproc::directive_handlers = {
     { Keyword::LINE,       &Preproc::process_LINE },
     { Keyword::LOCAL,      &Preproc::process_LOCAL },
     { Keyword::MACRO,      &Preproc::process_MACRO },
+    { Keyword::MMU,        &Preproc::process_MMU },
+    { Keyword::MMU0,       &Preproc::process_MMU },
+    { Keyword::MMU1,       &Preproc::process_MMU },
+    { Keyword::MMU2,       &Preproc::process_MMU },
+    { Keyword::MMU3,       &Preproc::process_MMU },
+    { Keyword::MMU4,       &Preproc::process_MMU },
+    { Keyword::MMU5,       &Preproc::process_MMU },
+    { Keyword::MMU6,       &Preproc::process_MMU },
+    { Keyword::MMU7,       &Preproc::process_MMU },
     { Keyword::PRAGMA,     &Preproc::process_PRAGMA },
     { Keyword::REPT,       &Preproc::process_REPT },
     { Keyword::REPTC,      &Preproc::process_REPTC },
     { Keyword::REPTI,      &Preproc::process_REPTI },
     { Keyword::UNDEF,      &Preproc::process_UNDEF },
     { Keyword::UNDEFINE,   &Preproc::process_UNDEF },
-    { Keyword::DMA_WR0,    &Preproc::process_DMA },
-    { Keyword::DMA_WR1,    &Preproc::process_DMA },
-    { Keyword::DMA_WR2,    &Preproc::process_DMA },
-    { Keyword::DMA_WR3,    &Preproc::process_DMA },
-    { Keyword::DMA_WR4,    &Preproc::process_DMA },
-    { Keyword::DMA_WR5,    &Preproc::process_DMA },
-    { Keyword::DMA_WR6,    &Preproc::process_DMA },
-    { Keyword::DMA_CMD,    &Preproc::process_DMA },
 };
 
 std::unordered_map<Keyword, Preproc::DirectiveHandler>
@@ -2598,6 +2607,101 @@ void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
     if (!compute_z80n_dma(def_val_data, preproc_cpu_id, val_loc_data, kw,
                           kw_loc, eol_loc)) {
         return; // error already reported by compute_z80n_dma
+    }
+
+    // macros already expanded, send directly to assembler output queue
+    push_def_instructions(kw_loc, def_val_data);
+}
+
+void Preproc::process_MMU(Keyword kw, const SourceLoc& kw_loc,
+                          ParseLine& pline) {
+    // get slot number from keyword (MMU0..MMU7) or from expression after MMU
+    int slot = 0;
+    SourceLoc slot_loc = kw_loc;
+    switch (kw) {
+    case Keyword::MMU0:
+        slot = 0;
+        break;
+
+    case Keyword::MMU1:
+        slot = 1;
+        break;
+
+    case Keyword::MMU2:
+        slot = 2;
+        break;
+
+    case Keyword::MMU3:
+        slot = 3;
+        break;
+
+    case Keyword::MMU4:
+        slot = 4;
+        break;
+
+    case Keyword::MMU5:
+        slot = 5;
+        break;
+
+    case Keyword::MMU6:
+        slot = 6;
+        break;
+
+    case Keyword::MMU7:
+        slot = 7;
+        break;
+
+    case Keyword::MMU:
+        slot_loc = pline.peek().loc;
+        if (!eval_const_expr(pline, const_symbols, slot, /*silent=*/false)) {
+            return; // error already reported by eval_const_expr
+        }
+
+        if (pline.peek().type != TokenType::Comma) {
+            pline.error("Expected comma after MMU slot expression");
+            return;
+        }
+        pline.advance(); // consume comma
+        break;
+
+    default:
+        assert(0);
+    }
+
+    // check for MMU slot, A
+    if (pline.peek().keyword == Keyword::A) {
+        pline.advance(); // consume A
+
+        if (!pline.check_end_of_line()) {
+            return; // error already reported by check_end_of_line
+        }
+
+        std::vector<std::pair<Keyword, int>> def_val_data;
+        if (!compute_z80n_mmu_A(def_val_data, preproc_cpu_id, slot, kw, kw_loc,
+                                slot_loc)) {
+            return; // error already reported by compute_z80n_mmu_A
+        }
+
+        // macros already expanded, send directly to assembler output queue
+        push_def_instructions(kw_loc, def_val_data);
+        return;
+    }
+
+    // check for MMU slot, N
+    int page = 0;
+    SourceLoc page_loc = pline.peek().loc;
+    if (!eval_const_expr(pline, const_symbols, page, /*silent=*/false)) {
+        return; // error already reported by eval_const_expr
+    }
+
+    if (!pline.check_end_of_line()) {
+        return; // error already reported by check_end_of_line
+    }
+
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z80n_mmu_N(def_val_data, preproc_cpu_id, slot, page, kw, kw_loc,
+                            slot_loc, page_loc)) {
+        return; // error already reported by compute_z80n_mmu_A
     }
 
     // macros already expanded, send directly to assembler output queue

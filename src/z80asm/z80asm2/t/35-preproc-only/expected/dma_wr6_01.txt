@@ -36,4 +36,4 @@ t/35-preproc-only/input/dma_wr6_01.asm:5:70: warning: Command not implemented: $
     REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB
                                                                          ^
 Writing t/35-preproc-only/input/dma_wr6_01.i...
-Assembly completed with 0 error(s)
+Assembly completed with 0 errors
