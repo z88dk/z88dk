@@ -3,38 +3,66 @@ Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80N__ = 1
 Assembling t/20-preproc/input/concatenation_01.asm...
 # file: t/20-preproc/input/concatenation_01.asm
-Identifier	"halt"	2:1	keyword=HALT 
-EndOfLine	"\n"	2:12	
-Identifier	"DEFB"	3:1	keyword=DEFB 
-Integer	"237"	3:6	int_value=237 
-EndOfLine	"\n"	3:9	
-Identifier	"DEFB"	3:1	keyword=DEFB 
-Integer	"146"	3:6	int_value=146 
-EndOfLine	"\n"	3:9	
-Identifier	"DEFB"	3:1	keyword=DEFB 
-Integer	"80"	3:6	int_value=80 
-EndOfLine	"\n"	3:8	
-Identifier	"DEFB"	5:5	keyword=DEFB 
-Integer	"237"	5:10	int_value=237 
-EndOfLine	"\n"	5:13	
-Identifier	"DEFB"	5:5	keyword=DEFB 
-Integer	"146"	5:10	int_value=146 
-EndOfLine	"\n"	5:13	
-Identifier	"DEFB"	5:5	keyword=DEFB 
-Integer	"80"	5:10	int_value=80 
-EndOfLine	"\n"	5:12	
-Identifier	"DEFC"	6:15	keyword=DEFC 
-Identifier	"x0"	6:20	
-EQ	"="	6:23	
-Integer	"10"	6:26	int_value=10 
-EndOfLine	"\n"	6:28	
+EndOfLine	"\n"	3:1	
+Identifier	"halt"	4:1	keyword=HALT 
+EndOfLine	"\n"	4:12	
+Identifier	"defb"	5:1	keyword=DEFB 
+Integer	"10"	5:13	int_value=10 
+EndOfLine	"\n"	5:15	
+Identifier	"DEFB"	6:1	keyword=DEFB 
+Integer	"237"	6:6	int_value=237 
+EndOfLine	"\n"	6:9	
+Identifier	"DEFB"	6:1	keyword=DEFB 
+Integer	"146"	6:6	int_value=146 
+EndOfLine	"\n"	6:9	
+Identifier	"DEFB"	6:1	keyword=DEFB 
+Integer	"80"	6:6	int_value=80 
+EndOfLine	"\n"	6:8	
+Identifier	"DEFB"	8:5	keyword=DEFB 
+Integer	"237"	8:10	int_value=237 
+EndOfLine	"\n"	8:13	
+Identifier	"DEFB"	8:5	keyword=DEFB 
+Integer	"146"	8:10	int_value=146 
+EndOfLine	"\n"	8:13	
+Identifier	"DEFB"	8:5	keyword=DEFB 
+Integer	"80"	8:10	int_value=80 
+EndOfLine	"\n"	8:12	
+Identifier	"DEFC"	9:15	keyword=DEFC 
+Identifier	"x0"	9:20	
+EQ	"="	9:23	
+Integer	"10"	9:26	int_value=10 
+EndOfLine	"\n"	9:28	
 Define constant: x0 = $0A
-Identifier	"ld"	8:1	keyword=LD 
-Identifier	"a"	8:4	keyword=A 
-Comma	","	8:5	
-Integer	"42"	8:7	int_value=42 
-EndOfLine	"\n"	8:16	
-EndOfLine	"\n"	9:1	
+Identifier	"ld"	11:1	keyword=LD 
+Identifier	"a"	11:4	keyword=A 
+Comma	","	11:5	
+Integer	"42"	11:7	int_value=42 
+EndOfLine	"\n"	11:16	
+Identifier	"DEFC"	12:3	keyword=DEFC 
+Identifier	"x"	12:8	keyword=X 
+EQ	"="	12:10	
+Integer	"10"	12:21	int_value=10 
+EndOfLine	"\n"	12:23	
+Define constant: x = $0A
+Identifier	"DEFC"	13:3	keyword=DEFC 
+Identifier	"y"	13:8	
+EQ	"="	13:10	
+Integer	"20"	13:21	int_value=20 
+EndOfLine	"\n"	13:23	
+Define constant: y = $14
+Identifier	"DEFC"	14:6	keyword=DEFC 
+Identifier	"z"	14:11	keyword=Z 
+EQ	"="	14:13	
+Integer	"30"	14:18	int_value=30 
+EndOfLine	"\n"	14:20	
+Define constant: z = $1E
+Identifier	"DEFC"	15:7	keyword=DEFC 
+Identifier	"x1"	15:12	
+EQ	"="	15:15	
+Integer	"40"	15:26	int_value=40 
+EndOfLine	"\n"	15:28	
+Define constant: x1 = $28
+EndOfLine	"\n"	16:1	
 # file: t/20-preproc/input/concatenation_01.asm
 Identifier	"DEFINE"	1:9	keyword=DEFINE 
 Identifier	"cat"	1:9	
@@ -47,6 +75,18 @@ EQ	"="	1:9
 Identifier	"a"	1:19	keyword=A 
 DoubleHash	"##"	1:21	
 Identifier	"b"	1:24	keyword=B 
+# file: t/20-preproc/input/concatenation_01.asm
+Identifier	"DEFINE"	2:9	keyword=DEFINE 
+Identifier	"id"	2:9	
+LeftParen	"("	2:9	
+Identifier	"x"	2:9	keyword=X 
+RightParen	")"	2:9	
+EQ	"="	2:9	
+Identifier	"x"	2:15	keyword=X 
 symbol	__CPU_Z80N__	1	(defined at )
 symbol	__CPU_ZILOG__	1	(defined at )
-symbol	x0	$0A	(defined at t/20-preproc/input/concatenation_01.asm:6:20)
+symbol	x	$0A	(defined at t/20-preproc/input/concatenation_01.asm:12:8)
+symbol	x0	$0A	(defined at t/20-preproc/input/concatenation_01.asm:9:20)
+symbol	x1	$28	(defined at t/20-preproc/input/concatenation_01.asm:15:12)
+symbol	y	$14	(defined at t/20-preproc/input/concatenation_01.asm:13:8)
+symbol	z	$1E	(defined at t/20-preproc/input/concatenation_01.asm:14:11)

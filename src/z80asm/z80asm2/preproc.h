@@ -393,10 +393,22 @@ private:
                                          const std::vector<StringInterner::Id>&
                                          params,
                                          const std::vector<std::vector<Token>>&
-                                         args,
+                                         expanded_args,
+                                         const std::vector<std::vector<Token>>&
+                                         unexpanded_args,
                                          const SourceLoc& call_loc,
                                          const std::vector<StringInterner::Id>&
                                          locals);
+
+    // macro expansion: recursively expand a single macro argument with hide-set tracking
+    std::vector<Token> expand_argument(const std::vector<Token>& arg_tokens,
+                                       const std::vector<StringInterner::Id>& hide_set,
+                                       const SourceLoc& call_loc);
+
+    // helper to identify which macro parameters appear adjacent to # or ## operators
+    std::unordered_set<StringInterner::Id> find_params_adjacent_to_operators(
+        const std::vector<Token>& body,
+        const std::vector<StringInterner::Id>& params);
 
     // macro expansion: takes a logical line with macro invocation tokens and
     // expands it

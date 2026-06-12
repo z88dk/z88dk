@@ -108,12 +108,14 @@ bool Preproc::collect_bare_args(const std::vector<Token>& tokens, size_t& pos,
 // For each token that matches a parameter name, replace with the
 // corresponding argument tokens. Handles # (stringification) and
 // ## (token pasting).
+// Uses unexpanded_args for # and ## contexts, expanded_args otherwise.
 // If locals is non-empty, each local label name is replaced by
 // name_N where N is a unique counter incremented per invocation.
 std::vector<Token> Preproc::substitute_params(
     const std::vector<Token>& body,
     const std::vector<StringInterner::Id>& params,
-    const std::vector<std::vector<Token>>& args,
+    const std::vector<std::vector<Token>>& expanded_args,
+    const std::vector<std::vector<Token>>& unexpanded_args,
     const SourceLoc& call_loc,
     const std::vector<StringInterner::Id>& locals) {
 
@@ -139,6 +141,7 @@ std::vector<Token> Preproc::substitute_params(
 
         // -------------------------------------------------------
         // # operator (stringification): # PARAM -> string literal
+        // Use UNEXPANDED argument
         // -------------------------------------------------------
         if (tok.type == TokenType::Hash && i + 1 < n &&
                 body[i + 1].type == TokenType::Identifier) {
@@ -149,10 +152,10 @@ std::vector<Token> Preproc::substitute_params(
                     static_cast<size_t>(pit - params.begin());
                 ++i; // consume the parameter identifier
 
-                // Build stringified value from argument tokens
+                // Build stringified value from UNEXPANDED argument tokens
                 std::string text;
-                if (param_idx < args.size()) {
-                    for (const Token& at : args[param_idx]) {
+                if (param_idx < unexpanded_args.size()) {
+                    for (const Token& at : unexpanded_args[param_idx]) {
                         if (!text.empty()) {
                             text += ' ';
                         }
@@ -189,8 +192,9 @@ std::vector<Token> Preproc::substitute_params(
                 if (pit != params.end()) {
                     size_t param_idx =
                         static_cast<size_t>(pit - params.begin());
-                    if (param_idx < args.size()) {
-                        for (const Token& at : args[param_idx]) {
+                    // Use EXPANDED argument for token pasting (z80 assembler semantics)
+                    if (param_idx < expanded_args.size()) {
+                        for (const Token& at : expanded_args[param_idx]) {
                             rhs_text +=
                                 g_strings.to_string(at.text_id);
                         }
@@ -227,6 +231,7 @@ std::vector<Token> Preproc::substitute_params(
 
         // -------------------------------------------------------
         // Parameter substitution
+        // Use EXPANDED argument (normal case)
         // -------------------------------------------------------
         if (tok.type == TokenType::Identifier) {
             auto pit = std::find(params.begin(), params.end(),
@@ -234,8 +239,9 @@ std::vector<Token> Preproc::substitute_params(
             if (pit != params.end()) {
                 size_t param_idx =
                     static_cast<size_t>(pit - params.begin());
-                if (param_idx < args.size()) {
-                    for (const Token& at : args[param_idx]) {
+                // Use EXPANDED argument for normal substitution
+                if (param_idx < expanded_args.size()) {
+                    for (const Token& at : expanded_args[param_idx]) {
                         result.push_back(at);
                     }
                 }
@@ -262,6 +268,230 @@ std::vector<Token> Preproc::substitute_params(
     }
 
     return result;
+}
+
+// Recursively expand macro invocations in a single argument's token list.
+// Used to pre-expand arguments before parameter substitution (except for
+// arguments adjacent to # or ##operators).
+// The hide_set parameter contains macros that should not be expanded in
+// this argument (inherited from the calling macro invocation).
+std::vector<Token> Preproc::expand_argument(
+    const std::vector<Token>& arg_tokens,
+    const std::vector<StringInterner::Id>& hide_set,
+    const SourceLoc& call_loc) {
+
+    // Start with the input tokens
+    std::vector<Token> work = arg_tokens;
+
+    // Per-token hide sets: initialize all with the inherited hide set
+    std::vector<std::vector<StringInterner::Id>> hide_sets(work.size(), hide_set);
+
+    // Expansion iteration tracking
+    int expansion_depth = 0;
+
+    // Main expansion loop: repeat until no more expansions
+    bool expanded_any = true;
+    while (expanded_any) {
+        if (++expansion_depth > MAX_EXPANSION_DEPTH) {
+            g_diag.error(call_loc, "Macro expansion limit exceeded in argument");
+            break;
+        }
+
+        expanded_any = false;
+
+        // Scan tokens left-to-right
+        for (size_t i = 0; i < work.size(); ++i) {
+            Token& tok = work[i];
+
+            // Only identifiers can be macro names
+            if (tok.type != TokenType::Identifier) {
+                continue;
+            }
+
+            StringInterner::Id name_id = tok.text_id;
+
+            // Is this a defined macro?
+            auto it = macros.find(name_id);
+            if (it == macros.end()) {
+                continue;
+            }
+
+            Macro& macro = it->second;
+
+            // Recursion prevention: check this token's hide set
+            if (std::find(hide_sets[i].begin(),
+                          hide_sets[i].end(),
+                          name_id) != hide_sets[i].end()) {
+                continue;
+            }
+
+            // Multi-line macros cannot be invoked in arguments
+            if (macro.is_multiline) {
+                g_diag.error(tok.loc,
+                             "Multi-line macro '" +
+                             g_strings.to_string(name_id) +
+                             "' cannot be invoked in macro argument");
+                continue;
+            }
+
+            // Function-like macro
+            if (macro.is_function_like) {
+                size_t paren_pos = i + 1;
+                if (paren_pos >= work.size() ||
+                        work[paren_pos].type != TokenType::LeftParen) {
+                    continue;
+                }
+
+                // Check adjacency
+                size_t ident_end = tok.loc.column +
+                                   g_strings.view(tok.text_id).size();
+                if (work[paren_pos].loc.column != ident_end) {
+                    continue;
+                }
+
+                paren_pos++;
+
+                // Collect arguments (recursively expand them too)
+                std::vector<std::vector<Token>> args;
+                if (!collect_parens_args(work, paren_pos, args)) {
+                    continue;
+                }
+
+                if (args.size() != macro.params.size()) {
+                    g_diag.error(tok.loc,
+                                 "Macro '" +
+                                 g_strings.to_string(name_id) +
+                                 "' expects " +
+                                 std::to_string(macro.params.size()) +
+                                 " arguments, got " +
+                                 std::to_string(args.size()));
+                    continue;
+                }
+
+                // Recursively expand each argument (with inherited hide set)
+                std::vector<std::vector<Token>> expanded_args;
+                for (const auto& arg : args) {
+                    expanded_args.push_back(expand_argument(arg, hide_sets[i], call_loc));
+                }
+
+                // Substitute parameters in macro body (with both versions)
+                std::vector<Token> substituted =
+                    substitute_params(macro.tokens, macro.params,
+                                      expanded_args, args, tok.loc, macro.locals);
+
+                // Build new hide set
+                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                new_hide.push_back(name_id);
+
+                // Replace tokens
+                size_t new_count = substituted.size();
+                std::vector<Token> new_work;
+                new_work.reserve(i + new_count + (work.size() - paren_pos));
+                new_work.insert(new_work.end(),
+                                work.begin(), work.begin() + i);
+                new_work.insert(new_work.end(),
+                                substituted.begin(), substituted.end());
+                new_work.insert(new_work.end(),
+                                work.begin() + paren_pos, work.end());
+
+                // Rebuild hide sets
+                std::vector<std::vector<StringInterner::Id>> new_hides;
+                new_hides.reserve(new_work.size());
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin(), hide_sets.begin() + i);
+                new_hides.insert(new_hides.end(), new_count, new_hide);
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin() + paren_pos, hide_sets.end());
+
+                work = std::move(new_work);
+                hide_sets = std::move(new_hides);
+
+                expanded_any = true;
+                break;
+            }
+
+            // Object-like macro
+            {
+                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                new_hide.push_back(name_id);
+
+                size_t new_count = macro.tokens.size();
+
+                std::vector<Token> new_work;
+                new_work.reserve(i + new_count + (work.size() - i - 1));
+                new_work.insert(new_work.end(),
+                                work.begin(), work.begin() + i);
+                new_work.insert(new_work.end(),
+                                macro.tokens.begin(), macro.tokens.end());
+                new_work.insert(new_work.end(),
+                                work.begin() + i + 1, work.end());
+
+                std::vector<std::vector<StringInterner::Id>> new_hides;
+                new_hides.reserve(new_work.size());
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin(), hide_sets.begin() + i);
+                new_hides.insert(new_hides.end(), new_count, new_hide);
+                new_hides.insert(new_hides.end(),
+                                 hide_sets.begin() + i + 1, hide_sets.end());
+
+                work = std::move(new_work);
+                hide_sets = std::move(new_hides);
+
+                expanded_any = true;
+                break;
+            }
+        }
+    }
+
+    return work;
+}
+
+// Scan a macro body to find which parameters appear adjacent to # or ##.
+// These parameters should NOT be pre-expanded before substitution.
+std::unordered_set<StringInterner::Id>
+Preproc::find_params_adjacent_to_operators(
+    const std::vector<Token>& body,
+    const std::vector<StringInterner::Id>& params) {
+
+    std::unordered_set<StringInterner::Id> adjacent_params;
+
+    for (size_t i = 0; i < body.size(); ++i) {
+        const Token& tok = body[i];
+
+        // Check for # PARAM (stringification)
+        if (tok.type == TokenType::Hash && i + 1 < body.size()) {
+            const Token& next = body[i + 1];
+            if (next.type == TokenType::Identifier) {
+                if (std::find(params.begin(), params.end(), next.text_id) != params.end()) {
+                    adjacent_params.insert(next.text_id);
+                }
+            }
+        }
+
+        // Check for ## on either side of a parameter
+        if (tok.type == TokenType::DoubleHash) {
+            // LHS: check previous token
+            if (i > 0) {
+                const Token& prev = body[i - 1];
+                if (prev.type == TokenType::Identifier) {
+                    if (std::find(params.begin(), params.end(), prev.text_id) != params.end()) {
+                        adjacent_params.insert(prev.text_id);
+                    }
+                }
+            }
+            // RHS: check next token
+            if (i + 1 < body.size()) {
+                const Token& next = body[i + 1];
+                if (next.type == TokenType::Identifier) {
+                    if (std::find(params.begin(), params.end(), next.text_id) != params.end()) {
+                        adjacent_params.insert(next.text_id);
+                    }
+                }
+            }
+        }
+    }
+
+    return adjacent_params;
 }
 
 void Preproc::expand_line(const LogicalLine& in,
@@ -386,6 +616,16 @@ void Preproc::expand_line(const LogicalLine& in,
                 // Build all expanded lines in a single deque
                 std::deque<LogicalLine> expanded_lines;
 
+                // Pre-expand arguments for normal substitution
+                // Keep both expanded and unexpanded versions
+                std::vector<std::vector<Token>> expanded_args;
+                for (const auto& arg : args) {
+                    // For multi-line macros, we don't have a hide_set context here
+                    // Use an empty hide set
+                    std::vector<StringInterner::Id> empty_hide;
+                    expanded_args.push_back(expand_argument(arg, empty_hide, tok.loc));
+                }
+
                 // Emit any tokens before the macro name as a separate
                 // line (e.g. a label definition like "foo: MYMACRO arg")
                 if (i > 0) {
@@ -411,7 +651,7 @@ void Preproc::expand_line(const LogicalLine& in,
 
                     std::vector<Token> substituted =
                         substitute_params(body_tokens, macro.params,
-                                          args, tok.loc, macro.locals);
+                                          expanded_args, args, tok.loc, macro.locals);
 
                     LogicalLine ll;
                     ll.tokens = std::move(substituted);
@@ -475,10 +715,19 @@ void Preproc::expand_line(const LogicalLine& in,
                     continue;
                 }
 
-                // Substitute parameters in macro body
+                // Pre-expand arguments for normal substitution
+                // Keep both expanded and unexpanded versions:
+                // - Use unexpanded for # and ## operators
+                // - Use expanded for normal parameter substitution
+                std::vector<std::vector<Token>> expanded_args;
+                for (const auto& arg : args) {
+                    expanded_args.push_back(expand_argument(arg, hide_sets[i], tok.loc));
+                }
+
+                // Substitute parameters in macro body (with both versions)
                 std::vector<Token> substituted =
                     substitute_params(macro.tokens, macro.params,
-                                      args, tok.loc, macro.locals);
+                                      expanded_args, args, tok.loc, macro.locals);
 
                 // Build the new hide set for replacement tokens:
                 // inherit the hide set of the invocation token + add
