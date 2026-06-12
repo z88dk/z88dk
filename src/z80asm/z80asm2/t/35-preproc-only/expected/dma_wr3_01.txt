@@ -15,4 +15,4 @@ t/35-preproc-only/input/dma_wr3_01.asm:11:28: warning: Some DMA features not sup
     REPTI I, 0x04, 0x20, 0x40, 0x64
                                ^
 Writing t/35-preproc-only/input/dma_wr3_01.i...
-Assembly completed with 0 error(s)
+Assembly completed with 0 errors

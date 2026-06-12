@@ -811,3 +811,50 @@ bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
     return true;
 }
 
+bool compute_z80n_mmu_N(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                        CPU cpu_id, int slot, int page,
+                        Keyword kw, const SourceLoc& kw_loc,
+                        const SourceLoc& slot_loc, const SourceLoc& page_loc) {
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, to_string(kw) + " not supported on " + to_string(cpu_id));
+        return false;
+    }
+
+    if (slot < 0 || slot > 7) {
+        g_diag.error(slot_loc, "Slot value out of range: " + int_to_hex(slot));
+        return false;
+    }
+
+    if (page < 0 || page > 0xff) {
+        g_diag.error(page_loc, "Page value out of range: " + int_to_hex(page));
+        return false;
+    }
+
+    out_def_val_data.emplace_back(Keyword::DEFB, 0xED);
+    out_def_val_data.emplace_back(Keyword::DEFB, 0x91);
+    out_def_val_data.emplace_back(Keyword::DEFB, 0x50 | (slot & 0x07));
+    out_def_val_data.emplace_back(Keyword::DEFB, (page & 0xFF));
+
+    return true;
+}
+
+bool compute_z80n_mmu_A(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                        CPU cpu_id, int slot,
+                        Keyword kw, const SourceLoc& kw_loc,
+                        const SourceLoc& slot_loc) {
+    if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
+        g_diag.error(kw_loc, to_string(kw) + " not supported on " + to_string(cpu_id));
+        return false;
+    }
+
+    if (slot < 0 || slot > 7) {
+        g_diag.error(slot_loc, "Slot value out of range: " + int_to_hex(slot));
+        return false;
+    }
+
+    out_def_val_data.emplace_back(Keyword::DEFB, 0xED);
+    out_def_val_data.emplace_back(Keyword::DEFB, 0x92);
+    out_def_val_data.emplace_back(Keyword::DEFB, 0x50 | (slot & 0x07));
+
+    return true;
+}
