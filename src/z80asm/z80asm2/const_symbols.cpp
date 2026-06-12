@@ -44,6 +44,9 @@ const ConstSymbol* ConstSymbols::get(StringInterner::Id name_id) const {
 }
 
 void ConstSymbols::erase(StringInterner::Id name_id) {
+    if (g_args.options.verbose && get(name_id) != nullptr) {
+        std::cout << "Undefine constant: " << g_strings.to_string(name_id) << std::endl;
+    }
     symbols.erase(name_id);
 }
 

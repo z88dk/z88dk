@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/local_22.asm
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/20-preproc/input/local_22.asm...
 # file: t/20-preproc/input/local_22.asm
 Identifier	"L1_1"	5:1	
@@ -146,3 +147,4 @@ EndOfLine	"\n"	7:10
 Identifier	"ENDM"	1:1	keyword=ENDM 
 symbol	__CPU_Z80__	1	(defined at )
 symbol	__CPU_ZILOG__	1	(defined at )
+symbol	__FLOAT_GENMATH__	1	(defined at )

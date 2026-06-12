@@ -17,8 +17,12 @@ void dump_after_cmdline_and_exit() {
     std::cout
             << "verbose\t"
             << g_args.options.verbose << "\n"
+            << "cpu_id\t"
+            << to_string(g_args.options.cpu_id) << "\n"
             << "ucase_symbols\t"
             << g_args.options.ucase_symbols << "\n"
+            << "float_format\t"
+            << to_string(g_args.options.float_format) << "\n"
             << "preprocess_only\t"
             << g_args.options.preprocess_only << "\n"
             << "swap_ix_iy\t"

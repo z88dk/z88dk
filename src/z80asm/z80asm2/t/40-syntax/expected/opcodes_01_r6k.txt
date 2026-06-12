@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -mr6k -dump-after-parse t/40-syntax//input/opcodes_01.asm
 Define constant: __CPU_RABBIT__ = 1
 Define constant: __CPU_R6K__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/40-syntax/input/opcodes_01.asm...
 t/40-syntax/input/opcodes_01.asm:9:1: error: Unrecognized instruction or directive
     out (bc), 0             ; Is_0, None

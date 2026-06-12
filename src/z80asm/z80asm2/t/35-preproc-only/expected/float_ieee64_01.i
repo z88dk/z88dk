@@ -1,0 +1,255 @@
+# 7 "t/35-preproc-only/input/float_ieee64_01.asm"
+ defm"0.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 7
+ defm"1.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $F0
+# 8
+ DEFB $3F
+# 7
+ defm"- 1.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $F0
+# 8
+ DEFB $BF
+# 7
+ defm"255.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $E0
+# 8
+ DEFB $6F
+# 8
+ DEFB $40
+# 7
+ defm"- 255.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $E0
+# 8
+ DEFB $6F
+# 8
+ DEFB $C0
+# 7
+ defm"256.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $70
+# 8
+ DEFB $40
+# 7
+ defm"- 256.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $70
+# 8
+ DEFB $C0
+# 7
+ defm"65535.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $E0
+# 8
+ DEFB $FF
+# 8
+ DEFB $EF
+# 8
+ DEFB $40
+# 7
+ defm"- 65535.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $E0
+# 8
+ DEFB $FF
+# 8
+ DEFB $EF
+# 8
+ DEFB $C0
+# 7
+ defm"65536.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $F0
+# 8
+ DEFB $40
+# 7
+ defm"- 65536.0"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $F0
+# 8
+ DEFB $C0
+# 7
+ defm"5.5"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $16
+# 8
+ DEFB $40
+# 7
+ defm"- 5.5"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $16
+# 8
+ DEFB $C0
+# 7
+ defm"5.5e1"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $80
+# 8
+ DEFB $4B
+# 8
+ DEFB $40
+# 7
+ defm"5.0e-1"
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB 0
+# 8
+ DEFB $E0
+# 8
+ DEFB $3F
