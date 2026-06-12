@@ -1,0 +1,328 @@
+# 3 "t/35-preproc-only/input/mmu_01.asm"
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $50
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $50
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $50
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $50
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $50
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $50
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $51
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $51
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $51
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $51
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $51
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $51
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $52
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $52
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $52
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $52
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $52
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $52
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $53
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $53
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $53
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $53
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $53
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $53
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $54
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $54
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $54
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $54
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $54
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $54
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $55
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $55
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $55
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $55
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $55
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $55
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $56
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $56
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $56
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $56
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $56
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $56
+# 7
+ DEFB $FF
+# 3
+ DEFB $ED
+# 3
+ DEFB $92
+# 3
+ DEFB $57
+ DEFB $ED
+# 4
+ DEFB $92
+# 4
+ DEFB $57
+
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $57
+# 6
+ DEFB 0
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $57
+# 7
+ DEFB 0
+# 6
+ DEFB $ED
+# 6
+ DEFB $91
+# 6
+ DEFB $57
+# 6
+ DEFB $FF
+ DEFB $ED
+# 7
+ DEFB $91
+# 7
+ DEFB $57
+# 7
+ DEFB $FF
