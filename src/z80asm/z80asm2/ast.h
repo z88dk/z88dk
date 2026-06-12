@@ -227,33 +227,6 @@ struct DefcStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
-struct ExternStmt : Stmt {
-    std::vector<StringInterner::Id> name_ids;
-    ExternStmt(std::vector<StringInterner::Id> n, const SourceLoc& loc)
-        : Stmt(loc), name_ids(std::move(n)) {}
-
-    virtual ~ExternStmt() = default;
-    void dump(DumpContext ctx) const override;
-};
-
-struct PublicStmt : Stmt {
-    std::vector<StringInterner::Id> name_ids;
-    PublicStmt(std::vector<StringInterner::Id> n, const SourceLoc& loc)
-        : Stmt(loc), name_ids(std::move(n)) {}
-
-    virtual ~PublicStmt() = default;
-    void dump(DumpContext ctx) const override;
-};
-
-struct GlobalStmt : Stmt {
-    std::vector<StringInterner::Id> name_ids;
-    GlobalStmt(std::vector<StringInterner::Id> n, const SourceLoc& loc)
-        : Stmt(loc), name_ids(std::move(n)) {}
-
-    virtual ~GlobalStmt() = default;
-    void dump(DumpContext ctx) const override;
-};
-
 struct ModuleStmt : Stmt {
     StringInterner::Id name_id;
 
@@ -307,6 +280,19 @@ struct DefsStringStmt : Stmt {
         : Stmt(loc), size_expr(std::move(size_expr_)), string_id(string_id_),
           filler_byte(filler_byte_) {}
     virtual ~DefsStringStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct SymbolDeclareStmt : Stmt {
+    enum class Type : uint8_t { Extern, Public, Global };
+    Type type;
+    std::vector<StringInterner::Id> name_ids;
+
+    SymbolDeclareStmt(Type type_,
+                      const std::vector<StringInterner::Id>& name_ids_,
+                      const SourceLoc& loc)
+        : Stmt(loc), type(type_), name_ids(name_ids_) {}
+    virtual ~SymbolDeclareStmt() = default;
     void dump(DumpContext ctx) const override;
 };
 

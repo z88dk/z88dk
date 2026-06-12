@@ -86,11 +86,12 @@ std::unique_ptr<Stmt> Parser::parse_directive(ParseLine& pline,
     return result;
 }
 
-// Helper to parse comma-separated list of identifiers
-template<typename StmtType>
-static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline,
-        const SourceLoc& loc,
-        ParseStatus& status) {
+// Helper to parse comma-separated list of identifiers for symbol declarations
+static std::unique_ptr<Stmt> parse_symbol_declare_list(
+    SymbolDeclareStmt::Type type,
+    ParseLine& pline,
+    const SourceLoc& loc,
+    ParseStatus& status) {
     std::vector<StringInterner::Id> name_ids;
 
     while (true) {
@@ -111,22 +112,25 @@ static std::unique_ptr<Stmt> parse_identifier_list(ParseLine& pline,
         }
     }
 
-    return std::make_unique<StmtType>(std::move(name_ids), loc);
+    return std::make_unique<SymbolDeclareStmt>(type, name_ids, loc);
 }
 
 std::unique_ptr<Stmt> Parser::parse_EXTERN(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    return parse_identifier_list<ExternStmt>(pline, loc, status);
+    return parse_symbol_declare_list(SymbolDeclareStmt::Type::Extern, pline, loc,
+                                     status);
 }
 
 std::unique_ptr<Stmt> Parser::parse_PUBLIC(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    return parse_identifier_list<PublicStmt>(pline, loc, status);
+    return parse_symbol_declare_list(SymbolDeclareStmt::Type::Public, pline, loc,
+                                     status);
 }
 
 std::unique_ptr<Stmt> Parser::parse_GLOBAL(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    return parse_identifier_list<GlobalStmt>(pline, loc, status);
+    return parse_symbol_declare_list(SymbolDeclareStmt::Type::Global, pline, loc,
+                                     status);
 }
 
 std::unique_ptr<Stmt> Parser::parse_MODULE(ParseLine& pline,

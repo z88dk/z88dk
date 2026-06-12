@@ -291,37 +291,6 @@ void DefcStmt::dump(DumpContext ctx) const {
     }
 }
 
-// Helper for dumping statements with multiple name_ids
-static void dump_names_stmt(const std::string& stmt_type,
-                            const std::vector<StringInterner::Id>& name_ids,
-                            const SourceLoc& loc, DumpContext ctx) {
-    ctx.line(stmt_type);
-    auto c = ctx.child();
-    c.line("Location: " + loc.to_string());
-    if (!name_ids.empty()) {
-        std::string names_str = "Names: ";
-        for (size_t i = 0; i < name_ids.size(); ++i) {
-            if (i > 0) {
-                names_str += ", ";
-            }
-            names_str += g_strings.to_string(name_ids[i]);
-        }
-        c.line(names_str);
-    }
-}
-
-void ExternStmt::dump(DumpContext ctx) const {
-    dump_names_stmt("ExternStmt", name_ids, loc, ctx);
-}
-
-void PublicStmt::dump(DumpContext ctx) const {
-    dump_names_stmt("PublicStmt", name_ids, loc, ctx);
-}
-
-void GlobalStmt::dump(DumpContext ctx) const {
-    dump_names_stmt("GlobalStmt", name_ids, loc, ctx);
-}
-
 // Helper for dumping statements with a single name_id
 static void dump_named_stmt(const std::string& stmt_type,
                             StringInterner::Id name_id,
@@ -378,6 +347,39 @@ void DefsStringStmt::dump(DumpContext ctx) const {
     }
     c.line("String literal: " + escape_string(g_strings.to_string(string_id)));
     c.line("Filler byte: " + int_to_hex(filler_byte));
+}
+
+void SymbolDeclareStmt::dump(DumpContext ctx) const {
+    ctx.line("SymbolDeclareStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+
+    // Dump declaration type
+    std::string type_str;
+    switch (type) {
+    case Type::Extern:
+        type_str = "Extern";
+        break;
+    case Type::Public:
+        type_str = "Public";
+        break;
+    case Type::Global:
+        type_str = "Global";
+        break;
+    default:
+        type_str = "Unknown";
+        break;
+    }
+    c.line("Type: " + type_str);
+
+    // Dump symbol names
+    if (!name_ids.empty()) {
+        c.line("Symbols:");
+        auto sc = c.child();
+        for (const auto& name_id : name_ids) {
+            sc.line(g_strings.to_string(name_id));
+        }
+    }
 }
 
 void Program::dump(DumpContext ctx) const {
