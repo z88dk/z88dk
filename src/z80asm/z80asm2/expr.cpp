@@ -122,10 +122,6 @@ void ConstEvalSem::literal_integer(const Token& tok) {
     push(tok.value.int_value);
 }
 
-void ConstEvalSem::literal_float(const Token& tok) {
-    push(static_cast<int>(tok.value.float_value));
-}
-
 bool ConstEvalSem::literal_asmpc(const Token& tok) {
     if (!silent) {
         g_diag.error(tok.loc,
@@ -484,11 +480,6 @@ std::unique_ptr<Expr> ExprSem::result() {
 
 void ExprSem::literal_integer(const Token& tok) {
     stack.push_back(std::make_unique<ExprLiteralInt>(tok.value.int_value, tok.loc));
-}
-
-void ExprSem::literal_float(const Token& tok) {
-    stack.push_back(std::make_unique<ExprLiteralFloat>(tok.value.float_value,
-                    tok.loc));
 }
 
 bool ExprSem::literal_asmpc(const Token& tok) {

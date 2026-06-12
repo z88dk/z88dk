@@ -18,6 +18,7 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
+#include "zfloat.h"
 #include <algorithm>
 #include <cassert>
 #include <deque>
@@ -59,6 +60,7 @@ Preproc::directive_handlers = {
     { Keyword::ENDR,       &Preproc::process_ENDR },
     { Keyword::ERROR,      &Preproc::process_ERROR },
     { Keyword::EXITM,      &Preproc::process_EXITM },
+    { Keyword::FLOAT,      &Preproc::process_FLOAT },
     { Keyword::INCBIN,     &Preproc::process_BINARY },
     { Keyword::INCLUDE,    &Preproc::process_INCLUDE },
     { Keyword::LINE,       &Preproc::process_LINE },
@@ -77,6 +79,7 @@ Preproc::directive_handlers = {
     { Keyword::REPT,       &Preproc::process_REPT },
     { Keyword::REPTC,      &Preproc::process_REPTC },
     { Keyword::REPTI,      &Preproc::process_REPTI },
+    { Keyword::SETFLOAT,   &Preproc::process_SETFLOAT },
     { Keyword::UNDEF,      &Preproc::process_UNDEF },
     { Keyword::UNDEFINE,   &Preproc::process_UNDEF },
 };
@@ -2211,12 +2214,10 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
     }
 
     // change constants for CPU
-    for (auto& var : cpu_all_defines()) {
-        StringInterner::Id var_id = g_strings.intern(var);
+    for (auto var_id : cpu_all_defines()) {
         const_symbols.erase(var_id);
     }
-    for (auto& var : cpu_defines(preproc_cpu_id)) {
-        StringInterner::Id var_id = g_strings.intern(var);
+    for (auto var_id : cpu_defines(preproc_cpu_id)) {
         const_symbols.set(var_id, 1, SourceLoc());
     }
 
@@ -2702,6 +2703,80 @@ void Preproc::process_MMU(Keyword kw, const SourceLoc& kw_loc,
     if (!compute_z80n_mmu_N(def_val_data, preproc_cpu_id, slot, page, kw, kw_loc,
                             slot_loc, page_loc)) {
         return; // error already reported by compute_z80n_mmu_A
+    }
+
+    // macros already expanded, send directly to assembler output queue
+    push_def_instructions(kw_loc, def_val_data);
+}
+
+void Preproc::process_SETFLOAT(Keyword kw, const SourceLoc&, ParseLine& pline) {
+    // Collect and expand the float type
+    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "float type");
+    if (expanded.empty()) {
+        return;  // error already reported
+    }
+
+    // must be an identifier token for the float type
+    ParseLine exp_pline(expanded);
+    if (exp_pline.peek().type != TokenType::Identifier) {
+        g_diag.error(exp_pline.peek().loc,
+                     "Expected float format identifier in " + to_string(kw) + " directive");
+        return;
+    }
+    StringInterner::Id float_type_id = exp_pline.peek().text_id;
+    SourceLoc float_type_loc = exp_pline.peek().loc;
+    exp_pline.advance();
+
+    if (!exp_pline.check_end_of_line()) {
+        return;  // error already reported by check_end_of_line
+    }
+
+    // lookup float type by name
+    FloatFormat fmt = DEFAULT_FLOAT_FORMAT;
+    if (!float_format_lookup(g_strings.view(float_type_id), fmt)) {
+        g_diag.error(float_type_loc,
+                     "Invalid float format: " + g_strings.to_string(float_type_id));
+        g_diag.note(float_type_loc, float_formats_message());
+        return;
+    }
+
+    // set the float format and change defines
+    preproc_float_format = fmt;
+    for (auto var_id : float_format_all_defines()) {
+        const_symbols.erase(var_id);
+    }
+    auto float_format_define_id = float_format_define(preproc_float_format);
+    const_symbols.set(float_format_define_id, 1, SourceLoc());
+}
+
+void Preproc::process_FLOAT(Keyword kw, const SourceLoc& kw_loc,
+                            ParseLine& pline) {
+    // Collect and expand the float expressions
+    std::vector<Token> expanded = collect_and_expand_line(pline, kw,
+                                  "float expressions");
+    if (expanded.empty()) {
+        return;  // error already reported
+    }
+
+    // Parse and evaluate the float expressions
+    ParseLine expr_pline(expanded);
+    std::vector<double> float_values;
+    if (!parse_float_expr_list(float_values, expr_pline)) {
+        return;  // syntax/non-constant errors already reported
+    }
+
+    // must end at EOL
+    if (!expr_pline.check_end_of_line()) {
+        return;  // error already reported by check_end_of_line
+    }
+
+    // convert result to binary format and emit DEFB/DEFW/DEFD/DEFQ as appropriate
+    std::vector<uint8_t> encoded_floats = encode_float_list(float_values,
+                                          preproc_float_format);
+
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    for (auto byte : encoded_floats) {
+        def_val_data.emplace_back(Keyword::DEFB, byte);
     }
 
     // macros already expanded, send directly to assembler output queue

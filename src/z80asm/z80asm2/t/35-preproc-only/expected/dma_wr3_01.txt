@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -mz80n -E t/35-preproc-only//input/dma_wr3_01.asm
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80N__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/35-preproc-only/input/dma_wr3_01.asm...
 t/35-preproc-only/input/dma_wr3_01.asm:11:10: warning: Some DMA features not supported: $84
     REPTI I, 0x04, 0x20, 0x40, 0x64

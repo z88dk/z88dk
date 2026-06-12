@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     }
 
     // define global defines from command line options
-    g_args.define_constants_from_cpu_and_ixiy();
+    g_args.define_constants_from_options();
 
     if (g_args.options.dump_after_cmdline) {
         dump_after_cmdline_and_exit();

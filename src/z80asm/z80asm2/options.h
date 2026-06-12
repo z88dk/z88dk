@@ -9,6 +9,7 @@
 #include "const_symbols.h"
 #include "cpu.h"
 #include "source_loc.h"
+#include "zfloat.h"
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -23,6 +24,7 @@ enum class OptionType {
 // defaults
 static const CPU DEFAULT_CPU = CPU::z80;
 static const uint8_t DEFAULT_FILLER_BYTE = 0x00;
+static const FloatFormat DEFAULT_FLOAT_FORMAT = FloatFormat::genmath;
 
 // option specification
 struct OptionSpec {
@@ -41,6 +43,7 @@ struct Options {
     bool swap_ix_iy = false;
     bool date_stamp = false;
     uint8_t filler_byte = DEFAULT_FILLER_BYTE;
+    FloatFormat float_format = DEFAULT_FLOAT_FORMAT;
     bool dump_after_cmdline = false;
     bool dump_after_tokenization = false;
     bool dump_after_directives = false;
@@ -70,7 +73,7 @@ struct Args {
                             const SourceLoc& loc,
                             std::vector<SourceLoc>& loc_stack);
     // define variables from cpu and -IXIY options
-    void define_constants_from_cpu_and_ixiy();
+    void define_constants_from_options();
 
 private:
     bool split_option_arg(std::string_view arg,

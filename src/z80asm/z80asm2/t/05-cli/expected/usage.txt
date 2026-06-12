@@ -19,6 +19,7 @@ External Preprocessor Options:
 Preprocessor Options:
   -IXIY         Swap IX and IY registers
   -ucase        Uppercase symbols
+  -float=FMT    Set float format (e.g. genmath)
   -D=NAME[=EXPR]Define symbol
   -E            Preprocess only
 
