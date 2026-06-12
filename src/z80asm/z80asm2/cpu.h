@@ -60,3 +60,13 @@ bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
                       Keyword kw,
                       const SourceLoc& kw_loc, const SourceLoc& eol_loc);
+
+// Spectrum Next MMU unit
+bool compute_z80n_mmu_N(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                        CPU cpu_id, int slot, int page,
+                        Keyword kw, const SourceLoc& kw_loc,
+                        const SourceLoc& slot_loc, const SourceLoc& page_loc);
+bool compute_z80n_mmu_A(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                        CPU cpu_id, int slot,
+                        Keyword kw, const SourceLoc& kw_loc,
+                        const SourceLoc& slot_loc);

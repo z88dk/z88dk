@@ -208,6 +208,39 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         else {
             // may push into macro_expansion_stack
             expand_line(processed, expanded);
+
+            // If macro expansion changed the tokens AND the expanded line contains
+            // a directive pattern, re-run directive processing on the expanded line.
+            // This handles cases like:
+            //   #define cat(a,b) a##b
+            //   REPTI I, 0
+            //       cat(mmu,I) arg   ; after substitution: cat(mmu,0) arg
+            //   ENDR
+            // After macro expansion, this becomes "mmu0 arg", and MMU0 is a directive.
+            // Also handles: x cat(eq,u) 10 -> x equ 10 (name DIRECTIVE pattern)
+            if (!expanded.empty() && ll.origin != LineOrigin::ReadyToAssemble) {
+                // Check if expanded line contains a directive pattern
+                ParseLine check_pl(expanded);
+                Keyword kw;
+                SourceLoc kw_loc;
+                StringInterner::Id name_id;
+                SourceLoc name_loc;
+
+                if (is_directive(check_pl, kw, kw_loc, name_id, name_loc)) {
+                    // Push expanded line back for re-processing
+                    LogicalLine feedback;
+                    feedback.loc = processed.loc;
+                    feedback.tokens = expanded;
+                    feedback.origin = LineOrigin::MacroFeedback;
+
+                    std::deque<LogicalLine> feedback_lines;
+                    feedback_lines.push_back(std::move(feedback));
+                    push_macro_expansion(0, std::move(feedback_lines));
+
+                    // Skip normal processing - the line will be re-processed
+                    continue;
+                }
+            }
         }
 
         if (g_args.options.dump_after_macro_expansion) {

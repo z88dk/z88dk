@@ -12,4 +12,4 @@ t/35-preproc-only/input/dma_wr5_01.asm:5:9: warning: Ready signals not supported
     dma.wr5 0x3A
             ^
 Writing t/35-preproc-only/input/dma_wr5_01.i...
-Assembly completed with 0 error(s)
+Assembly completed with 0 errors
