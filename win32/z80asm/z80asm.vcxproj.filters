@@ -289,9 +289,6 @@
     <None Include="..\..\src\z80asm\src\cpp\keyword.def">
       <Filter>Resource Files\cpp</Filter>
     </None>
-    <None Include="..\..\src\z80asm\src\cpp\float.def">
-      <Filter>Resource Files\cpp</Filter>
-    </None>
     <None Include="..\..\src\z80asm\src\cpp\scan2.def">
       <Filter>Resource Files\cpp</Filter>
     </None>
@@ -303,6 +300,9 @@
     </None>
     <None Include="..\..\src\z80asm\src\options.def">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\src\cpp\zfloat.def">
+      <Filter>Resource Files\cpp</Filter>
     </None>
   </ItemGroup>
 </Project>
