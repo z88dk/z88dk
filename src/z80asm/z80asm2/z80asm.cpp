@@ -171,8 +171,9 @@ int main(int argc, char* argv[]) {
     assemble_files();
 
     if (g_args.options.verbose) {
-        std::cout << "Assembly completed with " << g_diag.get_error_count() <<
-                  " error(s)" << std::endl;
+        auto errors = g_diag.get_error_count();
+        std::cout << "Assembly completed with " << errors <<
+                  " " << (errors == 1 ? "error" : "errors") << std::endl;
     }
 
     // if preprocess-only, exit
