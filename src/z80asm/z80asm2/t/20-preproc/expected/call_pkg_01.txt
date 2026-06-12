@@ -9,42 +9,42 @@ EQ	"="	1:18
 Integer	"6"	1:20	int_value=6 
 EndOfLine	"\n"	1:21	
 Define constant: X = 6
-t/20-preproc/input/call_pkg_01.asm:2:9: error: Expected argument after CALL_PKG
+t/20-preproc/input/call_pkg_01.asm:2:9: error: Expected expression after CALL_PKG
     call_pkg
             ^
 Identifier	"RST"	3:1	keyword=RST 
-Integer	"$08"	3:5	int_value=8 
-EndOfLine	"\n"	3:8	
+Integer	"8"	3:5	int_value=8 
+EndOfLine	"\n"	3:6	
 Identifier	"DEFW"	3:1	keyword=DEFW 
 Integer	"6"	3:6	int_value=6 
 EndOfLine	"\n"	3:7	
 Identifier	"RST"	4:1	keyword=RST 
-Integer	"$08"	4:5	int_value=8 
-EndOfLine	"\n"	4:8	
+Integer	"8"	4:5	int_value=8 
+EndOfLine	"\n"	4:6	
 Identifier	"DEFW"	4:1	keyword=DEFW 
 Integer	"6"	4:6	int_value=6 
 EndOfLine	"\n"	4:7	
-t/20-preproc/input/call_pkg_01.asm:5:18: error: Unexpected token: ","
+t/20-preproc/input/call_pkg_01.asm:5:19: error: Unexpected comma after last argument in CALL_PKG
     call_pkg $100+2*3,
-                     ^
-t/20-preproc/input/call_pkg_01.asm:6:18: error: Unexpected token: ","
+                      ^
+t/20-preproc/input/call_pkg_01.asm:6:20: error: Too many arguments for CALL_PKG, expected 1
     call_pkg $100+2*3, 0
-                     ^
+                       ^
 Identifier	"RST"	7:1	keyword=RST 
-Integer	"$08"	7:5	int_value=8 
-EndOfLine	"\n"	7:8	
+Integer	"8"	7:5	int_value=8 
+EndOfLine	"\n"	7:6	
 Identifier	"DEFW"	7:1	keyword=DEFW 
 Integer	"0"	7:6	int_value=0 
 EndOfLine	"\n"	7:7	
 Identifier	"RST"	8:1	keyword=RST 
-Integer	"$08"	8:5	int_value=8 
-EndOfLine	"\n"	8:8	
+Integer	"8"	8:5	int_value=8 
+EndOfLine	"\n"	8:6	
 Identifier	"DEFW"	8:1	keyword=DEFW 
 Integer	"65535"	8:6	int_value=65535 
 EndOfLine	"\n"	8:11	
-t/20-preproc/input/call_pkg_01.asm:9:10: error: Argument out of range for CALL_PKG: $10000
+t/20-preproc/input/call_pkg_01.asm:9:10: error: Value out of range: $10000
     call_pkg $10000
              ^
-t/20-preproc/input/call_pkg_01.asm:10:10: error: Argument out of range for CALL_PKG: -1
+t/20-preproc/input/call_pkg_01.asm:10:10: error: Value out of range: -1
     call_pkg -1
              ^

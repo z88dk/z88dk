@@ -213,12 +213,67 @@ void swap_ix_iy(std::string& inout_text, Keyword& inout_kw) {
     }
 }
 
-bool compute_cu_wait_value(int& out_value, CPU cpu_id, int ver, int hor,
-                           const SourceLoc& kw_loc,
-                           const SourceLoc& ver_loc,
-                           const SourceLoc& hor_loc) {
+bool compute_z88_call_oz(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                         const std::vector<std::pair<int, SourceLoc>>& val_loc_data) {
+    assert(val_loc_data.size() == 1);
+    int arg_value = val_loc_data.front().first;
+    SourceLoc expr_loc = val_loc_data.front().second;
+
+    out_def_val_data.emplace_back(Keyword::RST, 0x20);
+    if (arg_value >= 0 && arg_value <= 0xFF) {
+        out_def_val_data.emplace_back(Keyword::DEFB, arg_value);
+    }
+    else if (arg_value >= 0x100 && arg_value <= 0xFFFF) {
+        out_def_val_data.emplace_back(Keyword::DEFW, arg_value);
+    }
+    else {
+        g_diag.error(expr_loc,
+                     "Value out of range: " + int_to_hex(arg_value));
+        return false;
+    }
+
+    return true;
+}
+
+bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
+                          out_def_val_data,
+                          const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+                          CPU cpu_id, Keyword kw, const SourceLoc& kw_loc) {
+    assert(val_loc_data.size() == 1);
+    int arg_value = val_loc_data.front().first;
+    SourceLoc expr_loc = val_loc_data.front().second;
+
+    // Rabbit's don't have RST $08
+    if (cpu_id == CPU::r2ka || cpu_id == CPU::r2ka_strict ||
+            cpu_id == CPU::r3k || cpu_id == CPU::r3k_strict ||
+            cpu_id == CPU::r4k || cpu_id == CPU::r4k_strict ||
+            cpu_id == CPU::r5k || cpu_id == CPU::r5k_strict ||
+            cpu_id == CPU::r6k || cpu_id == CPU::r6k_strict) {
+        g_diag.error(kw_loc,
+                     to_string(kw) + " not supported on " + to_string(cpu_id));
+        return false;
+    }
+
+    // check argument range
+    if (arg_value < 0 || arg_value > 0xFFFF) {
+        g_diag.error(expr_loc,
+                     "Value out of range: " + int_to_hex(arg_value));
+        return false;
+    }
+
+    out_def_val_data.emplace_back(Keyword::RST, 0x08);
+    out_def_val_data.emplace_back(Keyword::DEFW, arg_value);
+
+    return true;
+}
+
+bool compute_z80n_cu_wait(std::vector<std::pair<Keyword, int>>& def_val_data,
+                          CPU cpu_id, int ver, int hor,
+                          const SourceLoc& kw_loc,
+                          const SourceLoc& ver_loc,
+                          const SourceLoc& hor_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_WAIT not supported on "+to_string(cpu_id));
+        g_diag.error(kw_loc, "CU_WAIT not supported on " + to_string(cpu_id));
         return false;
     }
 
@@ -236,16 +291,18 @@ bool compute_cu_wait_value(int& out_value, CPU cpu_id, int ver, int hor,
         return false;
     }
 
-    out_value = 0x8000 + (hor << 9) + ver;
+    int value = 0x8000 + (hor << 9) + ver;
+    def_val_data.emplace_back(Keyword::DEFW_BE, value);
     return true;
 }
 
-bool compute_cu_move_value(int& out_value, CPU cpu_id, int reg, int val,
-                           const SourceLoc& kw_loc,
-                           const SourceLoc& reg_loc,
-                           const SourceLoc& val_loc) {
+bool compute_z80n_cu_move(std::vector<std::pair<Keyword, int>>& def_val_data,
+                          CPU cpu_id, int reg, int val,
+                          const SourceLoc& kw_loc,
+                          const SourceLoc& reg_loc,
+                          const SourceLoc& val_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_MOVE not supported on "+to_string(cpu_id));
+        g_diag.error(kw_loc, "CU_MOVE not supported on " + to_string(cpu_id));
         return false;
     }
 
@@ -263,40 +320,45 @@ bool compute_cu_move_value(int& out_value, CPU cpu_id, int reg, int val,
         return false;
     }
 
-    out_value = ((reg & 0x7f) << 8) | (val & 0xff);
+    int value = ((reg & 0x7f) << 8) | (val & 0xff);
+    def_val_data.emplace_back(Keyword::DEFW_BE, value);
     return true;
 }
 
-bool compute_cu_stop_value(int& out_value, CPU cpu_id,
-                           const SourceLoc& kw_loc) {
+bool compute_z80n_cu_stop(std::vector<std::pair<Keyword, int>>& def_val_data,
+                          CPU cpu_id,
+                          const SourceLoc& kw_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_STOP not supported on "+to_string(cpu_id));
+        g_diag.error(kw_loc, "CU_STOP not supported on " + to_string(cpu_id));
         return false;
     }
 
-    out_value = 0xFFFF;
+    int value = 0xFFFF;
+    def_val_data.emplace_back(Keyword::DEFW_BE, value);
     return true;
 }
 
-bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc) {
+bool compute_z80n_cu_nop(std::vector<std::pair<Keyword, int>>& def_val_data,
+                         CPU cpu_id, const SourceLoc& kw_loc) {
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, "CU_NOP not supported on "+to_string(cpu_id));
+        g_diag.error(kw_loc, "CU_NOP not supported on " + to_string(cpu_id));
         return false;
     }
 
-    out_value = 0x0000;
+    int value = 0x0000;
+    def_val_data.emplace_back(Keyword::DEFW_BE, value);
     return true;
 }
 
-bool compute_dma_data(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                       CPU cpu_id,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
-                      Keyword kw, 
+                      Keyword kw,
                       const SourceLoc& kw_loc, const SourceLoc& eol_loc) {
     assert(!val_loc_data.empty());
 
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
-        g_diag.error(kw_loc, to_string(kw) + " not supported on "+to_string(cpu_id));
+        g_diag.error(kw_loc, to_string(kw) + " not supported on " + to_string(cpu_id));
         return false;
     }
 
@@ -324,7 +386,7 @@ bool compute_dma_data(std::vector<std::pair<Keyword, int>>& out_def_val_data,
             return false;
         }
         out_value = val_loc_data[idx++].first;
-		if (out_value < 0) {
+        if (out_value < 0) {
             g_diag.error(last_loc(),
                          "Integer out of range: " + int_to_hex(out_value));
             return false;
@@ -466,7 +528,7 @@ bool compute_dma_data(std::vector<std::pair<Keyword, int>>& out_def_val_data,
             }
             if (W & 0xCC) {
                 g_diag.warning(last_loc(),
-                            "Half cycle timing not supported: " + int_to_hex(W));
+                               "Half cycle timing not supported: " + int_to_hex(W));
             }
         }
         break;

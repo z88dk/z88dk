@@ -28,25 +28,35 @@ bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl);
 Keyword cpu_invert_flag_condition(Keyword kw);
 void swap_ix_iy(std::string& inout_text, Keyword& inout_kw);
 
+// Z88
+bool compute_z88_call_oz(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                         const std::vector<std::pair<int, SourceLoc>>& val_loc_data);
+bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
+                          out_def_val_data,
+                          const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+                          CPU cpu_id, Keyword kw, const SourceLoc& kw_loc);
+
 // Spectrum Next copper unit
-bool compute_cu_wait_value(int& out_value,
-                           CPU cpu_id,
-                           int ver, int hor,
-                           const SourceLoc& kw_loc,
-                           const SourceLoc& ver_loc,
-                           const SourceLoc& hor_loc);
-bool compute_cu_move_value(int& out_value,
-                           CPU cpu_id,
-                           int reg, int val,
-                           const SourceLoc& kw_loc,
-                           const SourceLoc& reg_loc,
-                           const SourceLoc& val_loc);
-bool compute_cu_stop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
-bool compute_cu_nop_value(int& out_value, CPU cpu_id, const SourceLoc& kw_loc);
+bool compute_z80n_cu_wait(std::vector<std::pair<Keyword, int>>& def_val_data,
+                          CPU cpu_id,
+                          int ver, int hor,
+                          const SourceLoc& kw_loc,
+                          const SourceLoc& ver_loc,
+                          const SourceLoc& hor_loc);
+bool compute_z80n_cu_move(std::vector<std::pair<Keyword, int>>& def_val_data,
+                          CPU cpu_id,
+                          int reg, int val,
+                          const SourceLoc& kw_loc,
+                          const SourceLoc& reg_loc,
+                          const SourceLoc& val_loc);
+bool compute_z80n_cu_stop(std::vector<std::pair<Keyword, int>>& def_val_data,
+                          CPU cpu_id, const SourceLoc& kw_loc);
+bool compute_z80n_cu_nop(std::vector<std::pair<Keyword, int>>& def_val_data,
+                         CPU cpu_id, const SourceLoc& kw_loc);
 
 // Spectrum Next DMA unit
-bool compute_dma_data(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                       CPU cpu_id,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
-                      Keyword kw, 
+                      Keyword kw,
                       const SourceLoc& kw_loc, const SourceLoc& eol_loc);

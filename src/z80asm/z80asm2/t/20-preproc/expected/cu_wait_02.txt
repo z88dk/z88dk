@@ -15,26 +15,26 @@ EQ	"="	2:18
 Integer	"55"	2:20	int_value=55 
 EndOfLine	"\n"	2:22	
 Define constant: Y = $37
-t/20-preproc/input/cu_wait_02.asm:3:8: error: Expected argument after CU_WAIT
+t/20-preproc/input/cu_wait_02.asm:3:8: error: Expected expression after CU_WAIT
     cu.wait 
            ^
-t/20-preproc/input/cu_wait_02.asm:4:10: error: Expected comma after expression in CU_WAIT
+t/20-preproc/input/cu_wait_02.asm:4:10: error: Expected 2 arguments for CU_WAIT
     cu.wait 0
              ^
-t/20-preproc/input/cu_wait_02.asm:5:11: error: Expression expected
+t/20-preproc/input/cu_wait_02.asm:5:11: error: Expected 2 arguments for CU_WAIT
     cu.wait 0,
               ^
-t/20-preproc/input/cu_wait_02.asm:6:12: error: Unexpected token: ","
+t/20-preproc/input/cu_wait_02.asm:6:13: error: Unexpected comma after last argument in CU_WAIT
     cu.wait 0,0,
-               ^
+                ^
 t/20-preproc/input/cu_wait_02.asm:7:9: error: Vertical value out of range in CU_WAIT: -1
     cu.wait -1, 0
             ^
 Identifier	"DEFW_BE"	8:1	keyword=DEFW_BE 
-Integer	"$8000"	8:9	int_value=32768 
+Integer	"32768"	8:9	int_value=32768 
 EndOfLine	"\n"	8:14	
 Identifier	"DEFW_BE"	9:1	keyword=DEFW_BE 
-Integer	"$8137"	9:9	int_value=33079 
+Integer	"33079"	9:9	int_value=33079 
 EndOfLine	"\n"	9:14	
 t/20-preproc/input/cu_wait_02.asm:1:11: error: Vertical value out of range in CU_WAIT: $138
     #define X 311
@@ -43,10 +43,10 @@ t/20-preproc/input/cu_wait_02.asm:11:12: error: Horizontal value out of range in
     cu.wait 0, -1
                ^
 Identifier	"DEFW_BE"	12:1	keyword=DEFW_BE 
-Integer	"$8000"	12:9	int_value=32768 
+Integer	"32768"	12:9	int_value=32768 
 EndOfLine	"\n"	12:14	
 Identifier	"DEFW_BE"	13:1	keyword=DEFW_BE 
-Integer	"$EE00"	13:9	int_value=60928 
+Integer	"60928"	13:9	int_value=60928 
 EndOfLine	"\n"	13:14	
 t/20-preproc/input/cu_wait_02.asm:2:11: error: Horizontal value out of range in CU_WAIT: $38
     #define Y 55

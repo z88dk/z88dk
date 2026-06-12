@@ -7,5 +7,5 @@ t/20-preproc/input/cu_stop_02.asm:1:9: error: Unexpected token: "x"
             ^
 # file: t/20-preproc/input/cu_stop_02.asm
 Identifier	"DEFW_BE"	2:1	keyword=DEFW_BE 
-Integer	"$FFFF"	2:9	int_value=65535 
+Integer	"65535"	2:9	int_value=65535 
 EndOfLine	"\n"	2:14	
