@@ -15,18 +15,18 @@ EQ	"="	2:18
 Integer	"255"	2:20	int_value=255 
 EndOfLine	"\n"	2:23	
 Define constant: Y = $FF
-t/20-preproc/input/cu_move_02.asm:3:8: error: Expected argument after CU_MOVE
+t/20-preproc/input/cu_move_02.asm:3:8: error: Expected expression after CU_MOVE
     cu.move 
            ^
-t/20-preproc/input/cu_move_02.asm:4:10: error: Expected comma after expression in CU_MOVE
+t/20-preproc/input/cu_move_02.asm:4:10: error: Expected 2 arguments for CU_MOVE
     cu.move 0
              ^
-t/20-preproc/input/cu_move_02.asm:5:11: error: Expression expected
+t/20-preproc/input/cu_move_02.asm:5:11: error: Expected 2 arguments for CU_MOVE
     cu.move 0,
               ^
-t/20-preproc/input/cu_move_02.asm:6:12: error: Unexpected token: ","
+t/20-preproc/input/cu_move_02.asm:6:13: error: Unexpected comma after last argument in CU_MOVE
     cu.move 0,0,
-               ^
+                ^
 t/20-preproc/input/cu_move_02.asm:7:9: error: Register value out of range in CU_MOVE: -1
     cu.move -1,0
             ^
@@ -34,7 +34,7 @@ Identifier	"DEFW_BE"	8:1	keyword=DEFW_BE
 Integer	"0"	8:9	int_value=0 
 EndOfLine	"\n"	8:10	
 Identifier	"DEFW_BE"	9:1	keyword=DEFW_BE 
-Integer	"$7F00"	9:9	int_value=32512 
+Integer	"32512"	9:9	int_value=32512 
 EndOfLine	"\n"	9:14	
 t/20-preproc/input/cu_move_02.asm:1:11: error: Register value out of range in CU_MOVE: $80
     #define X 127
@@ -43,13 +43,13 @@ t/20-preproc/input/cu_move_02.asm:11:11: error: Value out of range in CU_MOVE: -
     cu.move 0,-129
               ^
 Identifier	"DEFW_BE"	12:1	keyword=DEFW_BE 
-Integer	"$80"	12:9	int_value=128 
+Integer	"128"	12:9	int_value=128 
 EndOfLine	"\n"	12:12	
 Identifier	"DEFW_BE"	13:1	keyword=DEFW_BE 
 Integer	"0"	13:9	int_value=0 
 EndOfLine	"\n"	13:10	
 Identifier	"DEFW_BE"	14:1	keyword=DEFW_BE 
-Integer	"$FF"	14:9	int_value=255 
+Integer	"255"	14:9	int_value=255 
 EndOfLine	"\n"	14:12	
 t/20-preproc/input/cu_move_02.asm:2:11: error: Value out of range in CU_MOVE: $100
     #define Y 255

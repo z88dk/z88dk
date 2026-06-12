@@ -9,30 +9,30 @@ EQ	"="	1:18
 Integer	"6"	1:20	int_value=6 
 EndOfLine	"\n"	1:21	
 Define constant: X = 6
-t/20-preproc/input/call_pkg_02.asm:2:9: error: Expected argument after CALL_PKG
+t/20-preproc/input/call_pkg_02.asm:2:9: error: Expected expression after CALL_PKG
     call_pkg
             ^
-t/20-preproc/input/call_pkg_02.asm:3:10: error: CALL_PKG not supported on r2ka
+t/20-preproc/input/call_pkg_02.asm:3:1: error: CALL_PKG not supported on r2ka
     call_pkg 2*3
-             ^
-t/20-preproc/input/call_pkg_02.asm:1:11: error: CALL_PKG not supported on r2ka
-    #define X 2*3
-              ^
-t/20-preproc/input/call_pkg_02.asm:5:18: error: Unexpected token: ","
+    ^
+t/20-preproc/input/call_pkg_02.asm:4:1: error: CALL_PKG not supported on r2ka
+    call_pkg X
+    ^
+t/20-preproc/input/call_pkg_02.asm:5:19: error: Unexpected comma after last argument in CALL_PKG
     call_pkg $100+2*3,
-                     ^
-t/20-preproc/input/call_pkg_02.asm:6:18: error: Unexpected token: ","
+                      ^
+t/20-preproc/input/call_pkg_02.asm:6:20: error: Too many arguments for CALL_PKG, expected 1
     call_pkg $100+2*3, 0
-                     ^
-t/20-preproc/input/call_pkg_02.asm:7:10: error: CALL_PKG not supported on r2ka
+                       ^
+t/20-preproc/input/call_pkg_02.asm:7:1: error: CALL_PKG not supported on r2ka
     call_pkg 0
-             ^
-t/20-preproc/input/call_pkg_02.asm:8:10: error: CALL_PKG not supported on r2ka
+    ^
+t/20-preproc/input/call_pkg_02.asm:8:1: error: CALL_PKG not supported on r2ka
     call_pkg $ffff
-             ^
-t/20-preproc/input/call_pkg_02.asm:9:10: error: CALL_PKG not supported on r2ka
+    ^
+t/20-preproc/input/call_pkg_02.asm:9:1: error: CALL_PKG not supported on r2ka
     call_pkg $10000
-             ^
-t/20-preproc/input/call_pkg_02.asm:10:10: error: CALL_PKG not supported on r2ka
+    ^
+t/20-preproc/input/call_pkg_02.asm:10:1: error: CALL_PKG not supported on r2ka
     call_pkg -1
-             ^
+    ^

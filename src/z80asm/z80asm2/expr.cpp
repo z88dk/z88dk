@@ -380,8 +380,9 @@ static bool eval_expr_impl(ParseLine& pline,
     sem.undefined_is_zero = undefined_is_zero;
 
     if (pline.eol()) {
-        if (!silent)
+        if (!silent) {
             pline.error("Expression expected");
+        }
         return false;
     }
 

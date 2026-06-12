@@ -236,16 +236,23 @@ private:
     std::vector<Token> collect_and_expand_line(ParseLine& pline,
             Keyword kw,
             std::string_view what);
-    bool collect_and_expand_args(
-            std::vector<std::pair<int, SourceLoc>>& val_loc_data, 
-            SourceLoc& eol_loc,
-            ParseLine& pline, Keyword kw, const SourceLoc& kw_loc);
-    void push_def_instructions(const SourceLoc& loc, 
-            const std::vector<std::pair<Keyword, int>> def_val_data);
+    bool parse_const_expr_multiline_list(
+        std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+        SourceLoc& eol_loc,
+        ParseLine& pline, Keyword kw, const SourceLoc& kw_loc);
+    bool parse_const_expr_list(
+        std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+        ParseLine& pline, Keyword kw, size_t num_expected);
+    void push_def_instructions(const SourceLoc& loc,
+                               const std::vector<std::pair<Keyword, int>> def_val_data);
     bool eval_if_expr(ParseLine& pline,
                       Keyword kw);
     bool eval_ifdef_name(ParseLine& pline,
                          bool negated, Keyword keyword);
+    void expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
+                             ParseLine& pline, std::vector<Token>& output);
+    void expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
+                               ParseLine& pline, std::vector<Token>& output);
 
     void parse_asm_definitions(const std::vector<Token>& tokens);
     void rewrite_logical_line(LogicalLine& line);
@@ -352,8 +359,6 @@ private:
                              ParseLine& pline);
     void process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
                               ParseLine& pline);
-    void do_CU_fixed(Keyword kw, const SourceLoc& kw_loc,
-                     ParseLine& pline, int value);
     void process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
                          ParseLine& pline);
     void process_CU_MOVE(Keyword kw, const SourceLoc& kw_loc,
@@ -368,10 +373,6 @@ private:
                          ParseLine& pline);
     void parse_DEFVARS_block(Keyword kw, const SourceLoc& kw_loc,
                              ParseLine& pline, std::vector<LogicalLine>& output);
-    void expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
-                             ParseLine& pline, std::vector<Token>& output);
-    void expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
-                             ParseLine& pline, std::vector<Token>& output);
     void process_DMA(Keyword kw, const SourceLoc& kw_loc,
                      ParseLine& pline);
 
