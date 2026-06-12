@@ -645,6 +645,153 @@ std::vector<Token> Preproc::collect_and_expand_line(
     return expanded;
 }
 
+// Helper: collect the rest of the line, expand macros and resolve list
+// of constant values with respective SourceLoc; return also eol_loc for
+// error messages.
+// Returns false and issues error message if no arguments.
+// Continues on the next line if line ends with comma.
+bool Preproc::parse_const_expr_multiline_list(
+    std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+    SourceLoc& eol_loc,
+    ParseLine& pline, Keyword kw, const SourceLoc& kw_loc) {
+    // Collect and expand the instruction argument expressions
+    std::vector<Token> expanded;
+    expand_args_multiline(kw, kw_loc, pline, expanded);
+    if (expanded.empty()) {
+        return false;  // error already reported
+    }
+    eol_loc = pline.tokens.empty() ?
+              kw_loc : pline.tokens.back().loc;
+
+    ParseLine expr_pline(expanded);
+    while (true) {
+        int value = 0;
+        SourceLoc value_loc = expr_pline.peek().loc;
+        if (!eval_const_expr(expr_pline,
+                             const_symbols, value, /*silent=*/false)) {
+            return false;  // error already reported by eval_const_expr
+        }
+        val_loc_data.emplace_back(value, value_loc);
+
+        if (expr_pline.peek().type == TokenType::Comma) {
+            expr_pline.advance(); // consume comma and continue parsing arguments
+        }
+        else if (expr_pline.peek().type == TokenType::EndOfLine) {
+            break; // end of arguments
+        }
+        else {
+            g_diag.error(expr_pline.peek().loc,
+                         "Expected comma or end of line after expression in " + to_string(kw));
+            return false;
+        }
+    }
+
+    if (!expr_pline.check_end_of_line()) {
+        return false; // error already reported by check_end_of_line
+    }
+
+    return true;
+}
+
+// Helper to parse a comma-separated list of constant expressions.
+// Similar to parse_const_expr_multiline_list, but for single-line directives
+// (trailing comma is NOT treated as line continuation).
+// Returns true on success, false on error. Issues error messages as needed.
+// Validates that exactly num_expected arguments are provided.
+bool Preproc::parse_const_expr_list(
+    std::vector<std::pair<int, SourceLoc>>& val_loc_data,
+    ParseLine& pline, Keyword kw, size_t num_expected) {
+    // Collect and expand the instruction argument expressions
+    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "expression");
+    if (expanded.empty()) {
+        return false;  // error already reported
+    }
+    SourceLoc eol_loc = pline.tokens.empty() ?
+                        expanded.back().loc : pline.tokens.back().loc;
+
+    ParseLine expr_pline(expanded);
+    while (true) {
+        // Check if we've already collected enough arguments before trying to parse more
+        if (val_loc_data.size() >= num_expected) {
+            // Too many arguments - error at current location
+            if (expr_pline.peek().type == TokenType::EndOfLine) {
+                // This shouldn't happen, but handle gracefully
+                break;
+            }
+            g_diag.error(expr_pline.peek().loc,
+                         "Too many arguments for " + to_string(kw) +
+                         ", expected " + std::to_string(num_expected));
+            return false;
+        }
+
+        int value = 0;
+        SourceLoc value_loc = expr_pline.peek().loc;
+        if (!eval_const_expr(expr_pline,
+                             const_symbols, value, /*silent=*/false)) {
+            return false;  // error already reported by eval_const_expr
+        }
+        val_loc_data.emplace_back(value, value_loc);
+
+        if (expr_pline.peek().type == TokenType::Comma) {
+            expr_pline.advance(); // consume comma and continue parsing arguments
+
+            // Check if comma is followed immediately by end of line (trailing comma)
+            if (expr_pline.peek().type == TokenType::EndOfLine) {
+                // Report error at the comma location (one position back)
+                // We need to check if we have the right number of arguments
+                if (val_loc_data.size() < num_expected) {
+                    g_diag.error(eol_loc,
+                                 "Expected " + std::to_string(num_expected) +
+                                 " argument" + (num_expected > 1 ? "s" : "") +
+                                 " for " + to_string(kw));
+                }
+                else {
+                    // We have enough arguments, but there's a trailing comma
+                    g_diag.error(eol_loc,
+                                 "Unexpected comma after last argument in " + to_string(kw));
+                }
+                return false;
+            }
+        }
+        else if (expr_pline.peek().type == TokenType::EndOfLine) {
+            break; // end of arguments
+        }
+        else {
+            g_diag.error(expr_pline.peek().loc,
+                         "Expected comma or end of line after expression in " + to_string(kw));
+            return false;
+        }
+    }
+
+    if (!expr_pline.check_end_of_line()) {
+        return false; // error already reported by check_end_of_line
+    }
+
+    // Check if we have the expected number of arguments
+    if (val_loc_data.size() < num_expected) {
+        g_diag.error(eol_loc,
+                     "Expected " + std::to_string(num_expected) +
+                     " argument" + (num_expected > 1 ? "s" : "") +
+                     " for " + to_string(kw));
+        return false;
+    }
+
+    return true;
+}
+
+// create DEFB/DEFW/DEFW_BE instructions and push them to the
+// assembler_output_queue, as macros are already expanded
+void Preproc::push_def_instructions(const SourceLoc& loc,
+                                    const std::vector<std::pair<Keyword, int>> def_val_data) {
+    for (const auto& [def, val] : def_val_data) {
+        std::string def_str = to_string(def) + " " + std::to_string(val);
+        std::vector<Token> def_tokens = tokenize_text(def_str, loc);
+        LogicalLine def_line(loc);
+        def_line.tokens = std::move(def_tokens);
+        assembler_output_queue.push_back(std::move(def_line));
+    }
+}
+
 bool Preproc::eval_if_expr(ParseLine& pline,
                            Keyword kw) {
     std::vector<Token> expanded =
@@ -697,6 +844,147 @@ bool Preproc::eval_ifdef_name(ParseLine& pline,
 
     bool cond = negated ? !is_def : is_def;
     return cond;
+}
+
+void Preproc::expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
+                                  ParseLine& pline, std::vector<Token>& output) {
+    // need to collect LogicalLines (which own the tokens) for each new line
+    // retrieved by next_logical_line()
+    ParseLine* cur = &pline;
+    std::vector<LogicalLine> temp_lines;  // owns the token vectors
+    std::vector<ParseLine> temp_parselines;  // references into temp_lines
+
+    // need to collect all tokens up to '}' and expand macros in them,
+    // since the DEFGROUP and DEFVARS definitions may call macros
+    std::vector<Token> tokens;
+
+    // parse input between '{' and '}', allowing multiple lines until we find the closing '}'
+    bool found_opening_brace = false;
+    bool found_closing_brace = false;
+    while (!found_closing_brace) {
+        const Token& tok = cur->peek();
+        if (tok.type == TokenType::EndOfLine) {
+            // treat newlines as commas to separate definitions
+            tokens.push_back(Token::token(TokenType::Comma, ",", tok.loc));
+
+            // read the next line and continue
+            LogicalLine ll;
+            SourceLoc prev_loc = tok.loc;
+            if (!next_logical_line(ll)) {
+                g_diag.error(prev_loc,
+                             "Unexpected end of file in " + to_string(kw) + " directive");
+                return;
+            }
+
+            // Store the LogicalLine (which owns the tokens)
+            temp_lines.push_back(std::move(ll));
+
+            // Create a ParseLine referencing the tokens in the stored LogicalLine
+            temp_parselines.emplace_back(temp_lines.back().tokens);
+
+            cur = &temp_parselines.back();
+            continue;
+        }
+
+        if (tok.type == TokenType::LeftBrace) {
+            if (found_opening_brace) {
+                cur->error("Multiple '{' in " + to_string(kw) + " directive");
+                return;
+            }
+            found_opening_brace = true;
+            cur->advance(); // consume '{'
+            continue;
+        }
+
+        if (tok.type == TokenType::RightBrace) {
+            if (!found_opening_brace) {
+                cur->error("Unexpected '}' in " + to_string(kw) + " directive");
+                return;
+            }
+            found_closing_brace = true;
+            cur->advance(); // consume '}'
+            continue;
+        }
+
+        if (!found_opening_brace) {
+            cur->error("Missing '{' in " + to_string(kw) + " directive");
+            return;
+        }
+
+        tokens.push_back(tok);
+        cur->advance();
+    }
+
+    if (!cur->check_end_of_line()) {
+        return;
+    }
+
+    // tokens now contains all tokens between '{' and '}', with macros unexpanded
+    // let's expand them now
+    LogicalLine in(kw_loc);
+    in.tokens = std::move(tokens);
+
+    output.clear();
+    expand_line(in, output);
+}
+
+void Preproc::expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
+                                    ParseLine& pline, std::vector<Token>& output) {
+    // need to collect LogicalLines (which own the tokens) for each new line
+    // retrieved by next_logical_line()
+    ParseLine* cur = &pline;
+    std::vector<LogicalLine> temp_lines;  // owns the token vectors
+    std::vector<ParseLine> temp_parselines;  // references into temp_lines
+
+    // need to collect all tokens up to a line not terminating in comma
+    // and expand macros in them, to parse multi-line DMA arguments
+    std::vector<Token> tokens;
+
+    while (true) {
+        const Token& tok = cur->peek();
+        if (tok.type == TokenType::EndOfLine) {
+            if (tokens.empty() || tokens.back().type != TokenType::Comma) {
+                // a real end of line
+                tokens.push_back(tok);
+                break;
+            }
+            else {
+                // last was comma, so skip EndOfLine and read new line
+                LogicalLine ll;
+                SourceLoc prev_loc = tok.loc;
+                if (!next_logical_line(ll)) {
+                    g_diag.error(prev_loc,
+                                 "Unexpected end of file in " + to_string(kw) + " directive");
+                    return;
+                }
+
+                // Store the LogicalLine (which owns the tokens)
+                temp_lines.push_back(std::move(ll));
+
+                // Create a ParseLine referencing the tokens in the stored LogicalLine
+                temp_parselines.emplace_back(temp_lines.back().tokens);
+
+                cur = &temp_parselines.back();
+                continue;
+            }
+        }
+        else {
+            tokens.push_back(tok);
+            cur->advance();
+        }
+    }
+
+    if (!cur->check_end_of_line()) {
+        return;
+    }
+
+    // tokens now contains all multi-line arguments, with macros unexpanded
+    // let's expand them now
+    LogicalLine in(kw_loc);
+    in.tokens = std::move(tokens);
+
+    output.clear();
+    expand_line(in, output);
 }
 
 void Preproc::parse_asm_definitions(const std::vector<Token>& tokens) {
@@ -1937,232 +2225,109 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
 
 void Preproc::process_Z88_CALL_OZ(Keyword kw, const SourceLoc& kw_loc,
                                   ParseLine& pline) {
-    // Collect and expand the OZ instruction argument expression
-    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
-    if (expanded.empty()) {
+    // Parse constant expression list
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    if (!parse_const_expr_list(val_loc_data, pline, kw, 1)) {
         return;  // error already reported
     }
 
-    // Evaluate constant expression (not silent -> errors are reported)
-    int arg_value = 0;
-    ParseLine expr_pline(expanded);
-    if (!eval_const_expr(expr_pline,
-                         const_symbols, arg_value, /*silent=*/false)) {
-        return;  // error already reported by eval_const_expr
+    // get instructions
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z88_call_oz(def_val_data, val_loc_data)) {
+        return; // error already reported
     }
 
-    if (!expr_pline.check_end_of_line()) {
-        return; // error already reported by check_end_of_line
-    }
-
-    // check argument range
-    std::string data_opc;
-    if (arg_value >= 0 && arg_value <= 0xFF) {
-        data_opc = "DEFB";
-    }
-    else if (arg_value >= 0x100 && arg_value <= 0xFFFF) {
-        data_opc = "DEFW";
-    }
-    else {
-        g_diag.error(expanded.front().loc,
-                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(arg_value));
-        return;
-    }
-
-    // macros already expanded, send directly to assembler output queue
-    // first line: RST $20
-    std::string rst_str = "RST $20";
-    std::vector<Token> rst_tokens = tokenize_text(rst_str, kw_loc);
-    LogicalLine rst_line(kw_loc);
-    rst_line.tokens = std::move(rst_tokens);
-    assembler_output_queue.push_back(std::move(rst_line));
-
-    // second line: DEFB | DEFW <argument>
-    std::string def_str = data_opc + " " + std::to_string(arg_value);
-    std::vector<Token> def_tokens = tokenize_text(def_str, kw_loc);
-    LogicalLine def_line(kw_loc);
-    def_line.tokens = std::move(def_tokens);
-    assembler_output_queue.push_back(std::move(def_line));
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
 }
 
 void Preproc::process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
                                    ParseLine& pline) {
-    // Collect and expand the PKG instruction argument expression
-    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
-    if (expanded.empty()) {
+    // Parse constant expression list
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    if (!parse_const_expr_list(val_loc_data, pline, kw, 1)) {
         return;  // error already reported
     }
 
-    // Evaluate constant expression (not silent -> errors are reported)
-    int arg_value = 0;
-    ParseLine expr_pline(expanded);
-    if (!eval_const_expr(expr_pline,
-                         const_symbols, arg_value, /*silent=*/false)) {
-        return;  // error already reported by eval_const_expr
+    // get instructions
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z88_call_pkg(def_val_data, val_loc_data, preproc_cpu_id, kw,
+                              kw_loc)) {
+        return; // error already reported
     }
 
-    if (!expr_pline.check_end_of_line()) {
-        return; // error already reported by check_end_of_line
-    }
-
-    // Rabbit's don't have RST $08
-    if (preproc_cpu_id == CPU::r2ka || preproc_cpu_id == CPU::r2ka_strict ||
-            preproc_cpu_id == CPU::r3k || preproc_cpu_id == CPU::r3k_strict ||
-            preproc_cpu_id == CPU::r4k || preproc_cpu_id == CPU::r4k_strict ||
-            preproc_cpu_id == CPU::r5k || preproc_cpu_id == CPU::r5k_strict ||
-            preproc_cpu_id == CPU::r6k || preproc_cpu_id == CPU::r6k_strict) {
-        g_diag.error(expanded.front().loc,
-                     to_string(kw)+" not supported on "+to_string(preproc_cpu_id));
-        return;
-    }
-
-    // check argument range
-    if (arg_value < 0 || arg_value > 0xFFFF) {
-        g_diag.error(expanded.front().loc,
-                     "Argument out of range for " + to_string(kw) + ": " + int_to_hex(arg_value));
-        return;
-    }
-
-    // macros already expanded, send directly to assembler output queue
-    // first line: RST $08
-    std::string rst_str = "RST $08";
-    std::vector<Token> rst_tokens = tokenize_text(rst_str, kw_loc);
-    LogicalLine rst_line(kw_loc);
-    rst_line.tokens = std::move(rst_tokens);
-    assembler_output_queue.push_back(std::move(rst_line));
-
-    // second line: DEFB | DEFW <argument>
-    std::string def_str = "DEFW " + std::to_string(arg_value);
-    std::vector<Token> def_tokens = tokenize_text(def_str, kw_loc);
-    LogicalLine def_line(kw_loc);
-    def_line.tokens = std::move(def_tokens);
-    assembler_output_queue.push_back(std::move(def_line));
-}
-
-void Preproc::do_CU_fixed(Keyword, const SourceLoc& kw_loc, ParseLine& pline,
-                          int value) {
-    if (!pline.check_end_of_line()) {
-        return;
-    }
-
-    // create a CU_xxxx statement with the fixed value as argument
-    // and send it to the assembler output queue
-    std::string cu_op_str = "DEFW_BE " + int_to_hex(value);
-    std::vector<Token> cu_op_tokens = tokenize_text(cu_op_str, kw_loc);
-
-    LogicalLine cu_op_line(kw_loc);
-    cu_op_line.tokens = std::move(cu_op_tokens);
-    assembler_output_queue.push_back(std::move(cu_op_line));
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
 }
 
 void Preproc::process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
                               ParseLine& pline) {
-    // Collect and expand the CU_WAIT instruction argument expression
-    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
-    if (expanded.empty()) {
+    // Parse constant expression list
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    if (!parse_const_expr_list(val_loc_data, pline, kw, 2)) {
         return;  // error already reported
     }
 
-    // evaluate ver_value argument
-    ParseLine expr_pline(expanded);
-    int ver_value = 0;
-    SourceLoc ver_loc = expr_pline.peek().loc;
-    if (!eval_const_expr(expr_pline,
-                         const_symbols, ver_value, /*silent=*/false)) {
-        return;  // error already reported by eval_const_expr
-    }
-
-    if (expr_pline.peek().type != TokenType::Comma) {
-        g_diag.error(expr_pline.peek().loc,
-                     "Expected comma after expression in " + to_string(kw));
-        return;
-    }
-    expr_pline.advance(); // consume comma
-
-    // evaluate hor_value argument
-    int hor_value = 0;
-    SourceLoc hor_loc = expr_pline.peek().loc;
-    if (!eval_const_expr(expr_pline,
-                         const_symbols, hor_value, /*silent=*/false)) {
-        return;  // error already reported by eval_const_expr
-    }
-
-    if (!expr_pline.check_end_of_line()) {
-        return; // error already reported by check_end_of_line
-    }
-
     // check argument range and compute value
-    int argument = 0;
-    if (!compute_cu_wait_value(argument, preproc_cpu_id,
-                               ver_value, hor_value, kw_loc, ver_loc, hor_loc)) {
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z80n_cu_wait(def_val_data, preproc_cpu_id,
+                              val_loc_data[0].first, val_loc_data[1].first,
+                              kw_loc, val_loc_data[0].second, val_loc_data[1].second)) {
         return; // error already reported by compute_cu_wait_value
     }
-    do_CU_fixed(kw, kw_loc, pline, argument);
+
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
 }
 
 void Preproc::process_CU_MOVE(Keyword kw, const SourceLoc& kw_loc,
                               ParseLine& pline) {
-    // Collect and expand the CU_MOVE instruction argument expression
-    std::vector<Token> expanded = collect_and_expand_line(pline, kw, "argument");
-    if (expanded.empty()) {
+    // Parse constant expression list
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    if (!parse_const_expr_list(val_loc_data, pline, kw, 2)) {
         return;  // error already reported
     }
 
-    // evaluate reg_value argument
-    ParseLine expr_pline(expanded);
-    int reg_value = 0;
-    SourceLoc reg_loc = expr_pline.peek().loc;
-    if (!eval_const_expr(expr_pline,
-                         const_symbols, reg_value, /*silent=*/false)) {
-        return;  // error already reported by eval_const_expr
+    // check argument range and compute value
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z80n_cu_move(def_val_data, preproc_cpu_id,
+                              val_loc_data[0].first, val_loc_data[1].first,
+                              kw_loc, val_loc_data[0].second, val_loc_data[1].second)) {
+        return; // error already reported by compute_cu_move_value
     }
 
-    if (expr_pline.peek().type != TokenType::Comma) {
-        g_diag.error(expr_pline.peek().loc,
-                     "Expected comma after expression in " + to_string(kw));
-        return;
-    }
-    expr_pline.advance(); // consume comma
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
+}
 
-    // evaluate value argument
-    int value = 0;
-    SourceLoc value_loc = expr_pline.peek().loc;
-    if (!eval_const_expr(expr_pline,
-                         const_symbols, value, /*silent=*/false)) {
-        return;  // error already reported by eval_const_expr
-    }
-
-    if (!expr_pline.check_end_of_line()) {
+void Preproc::process_CU_STOP(Keyword, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    if (!pline.check_end_of_line()) {
         return; // error already reported by check_end_of_line
     }
 
-    // check argument range and compute value
-    int argument = 0;
-    if (!compute_cu_move_value(argument, preproc_cpu_id,
-                               reg_value, value, kw_loc, reg_loc, value_loc)) {
-        return; // error already reported by compute_cu_move_value
-    }
-    do_CU_fixed(kw, kw_loc, pline, argument);
-}
-
-void Preproc::process_CU_STOP(Keyword kw, const SourceLoc& kw_loc,
-                              ParseLine& pline) {
-    int argument = 0;
-    if (!compute_cu_stop_value(argument, preproc_cpu_id, kw_loc)) {
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z80n_cu_stop(def_val_data, preproc_cpu_id, kw_loc)) {
         return; // error already reported by compute_cu_stop_value
     }
 
-    do_CU_fixed(kw, kw_loc, pline, argument);
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
 }
 
-void Preproc::process_CU_NOP(Keyword kw, const SourceLoc& kw_loc,
+void Preproc::process_CU_NOP(Keyword, const SourceLoc& kw_loc,
                              ParseLine& pline) {
-    int argument = 0;
-    if (!compute_cu_nop_value(argument, preproc_cpu_id, kw_loc)) {
+    if (!pline.check_end_of_line()) {
+        return; // error already reported by check_end_of_line
+    }
+
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z80n_cu_nop(def_val_data, preproc_cpu_id, kw_loc)) {
         return; // error already reported by compute_cu_nop_value
     }
 
-    do_CU_fixed(kw, kw_loc, pline, argument);
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
 }
 
 void Preproc::process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
@@ -2419,222 +2584,20 @@ void Preproc::parse_DEFVARS_block(Keyword kw, const SourceLoc& kw_loc,
     }
 }
 
-void Preproc::expand_braces_block(Keyword kw, const SourceLoc& kw_loc,
-                                  ParseLine& pline, std::vector<Token>& output) {
-    // need to collect LogicalLines (which own the tokens) for each new line
-    // retrieved by next_logical_line()
-    ParseLine* cur = &pline;
-    std::vector<LogicalLine> temp_lines;  // owns the token vectors
-    std::vector<ParseLine> temp_parselines;  // references into temp_lines
-
-    // need to collect all tokens up to '}' and expand macros in them,
-    // since the DEFGROUP and DEFVARS definitions may call macros
-    std::vector<Token> tokens;
-
-    // parse input between '{' and '}', allowing multiple lines until we find the closing '}'
-    bool found_opening_brace = false;
-    bool found_closing_brace = false;
-    while (!found_closing_brace) {
-        const Token& tok = cur->peek();
-        if (tok.type == TokenType::EndOfLine) {
-            // treat newlines as commas to separate definitions
-            tokens.push_back(Token::token(TokenType::Comma, ",", tok.loc));
-
-            // read the next line and continue
-            LogicalLine ll;
-            SourceLoc prev_loc = tok.loc;
-            if (!next_logical_line(ll)) {
-                g_diag.error(prev_loc,
-                             "Unexpected end of file in " + to_string(kw) + " directive");
-                return;
-            }
-
-            // Store the LogicalLine (which owns the tokens)
-            temp_lines.push_back(std::move(ll));
-
-            // Create a ParseLine referencing the tokens in the stored LogicalLine
-            temp_parselines.emplace_back(temp_lines.back().tokens);
-
-            cur = &temp_parselines.back();
-            continue;
-        }
-
-        if (tok.type == TokenType::LeftBrace) {
-            if (found_opening_brace) {
-                cur->error("Multiple '{' in " + to_string(kw) + " directive");
-                return;
-            }
-            found_opening_brace = true;
-            cur->advance(); // consume '{'
-            continue;
-        }
-
-        if (tok.type == TokenType::RightBrace) {
-            if (!found_opening_brace) {
-                cur->error("Unexpected '}' in " + to_string(kw) + " directive");
-                return;
-            }
-            found_closing_brace = true;
-            cur->advance(); // consume '}'
-            continue;
-        }
-
-        if (!found_opening_brace) {
-            cur->error("Missing '{' in " + to_string(kw) + " directive");
-            return;
-        }
-
-        tokens.push_back(tok);
-        cur->advance();
-    }
-
-    if (!cur->check_end_of_line()) {
-        return;
-    }
-
-    // tokens now contains all tokens between '{' and '}', with macros unexpanded
-    // let's expand them now
-    LogicalLine in(kw_loc);
-    in.tokens = std::move(tokens);
-
-    output.clear();
-    expand_line(in, output);
-}
-
-void Preproc::expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
-                            ParseLine& pline, std::vector<Token>& output) {
-    // need to collect LogicalLines (which own the tokens) for each new line
-    // retrieved by next_logical_line()
-    ParseLine* cur = &pline;
-    std::vector<LogicalLine> temp_lines;  // owns the token vectors
-    std::vector<ParseLine> temp_parselines;  // references into temp_lines
-
-    // need to collect all tokens up to a line not terminating in comma
-    // and expand macros in them, to parse multi-line DMA arguments
-    std::vector<Token> tokens;
-
-    while (true) {
-        const Token& tok = cur->peek();
-        if (tok.type == TokenType::EndOfLine) {
-            if (tokens.empty() || tokens.back().type != TokenType::Comma) {
-                // a real end of line
-                tokens.push_back(tok);
-                break;
-            }
-            else {
-                // last was comma, so skip EndOfLine and read new line
-                LogicalLine ll;
-                SourceLoc prev_loc = tok.loc;
-                if (!next_logical_line(ll)) {
-                    g_diag.error(prev_loc,
-                                "Unexpected end of file in " + to_string(kw) + " directive");
-                    return;
-                }
-
-                // Store the LogicalLine (which owns the tokens)
-                temp_lines.push_back(std::move(ll));
-
-                // Create a ParseLine referencing the tokens in the stored LogicalLine
-                temp_parselines.emplace_back(temp_lines.back().tokens);
-
-                cur = &temp_parselines.back();
-                continue;
-            }
-        }
-        else {
-            tokens.push_back(tok);
-            cur->advance();
-        }
-    }
-
-    if (!cur->check_end_of_line()) {
-        return;
-    }
-
-    // tokens now contains all multi-line arguments, with macros unexpanded
-    // let's expand them now
-    LogicalLine in(kw_loc);
-    in.tokens = std::move(tokens);
-
-    output.clear();
-    expand_line(in, output);
-}
-
-// Helper: collect the rest of the line, expand macros and resolve list 
-// of constant values with respective SourceLoc; return also eol_loc for
-// error messages. 
-// Returns false and issues error message if no arguments.
-// Continues on the next line if line ends with comma.
-bool Preproc::collect_and_expand_args(
-        std::vector<std::pair<int, SourceLoc>>& val_loc_data, 
-        SourceLoc& eol_loc,
-        ParseLine& pline, Keyword kw, const SourceLoc& kw_loc) {
-    // Collect and expand the instruction argument expressions
-    std::vector<Token> expanded;
-    expand_args_multiline(kw, kw_loc, pline, expanded);
-    if (expanded.empty()) {
-        return false;  // error already reported
-    }
-    eol_loc = pline.tokens.empty() ? 
-            kw_loc : pline.tokens.back().loc;
-    
-    ParseLine expr_pline(expanded);
-    while (true) {
-        int value = 0;
-        SourceLoc value_loc = expr_pline.peek().loc;
-        if (!eval_const_expr(expr_pline,
-                             const_symbols, value, /*silent=*/false)) {
-            return false;  // error already reported by eval_const_expr
-        }
-        val_loc_data.emplace_back(value, value_loc);
-
-        if (expr_pline.peek().type == TokenType::Comma) {
-            expr_pline.advance(); // consume comma and continue parsing arguments
-        }
-        else if (expr_pline.peek().type == TokenType::EndOfLine) {
-            break; // end of arguments
-        }
-        else {
-            g_diag.error(expr_pline.peek().loc,
-                         "Expected comma or end of line after expression in " + to_string(kw));
-            return false;
-        }
-    }
-
-    if (!expr_pline.check_end_of_line()) {
-        return false; // error already reported by check_end_of_line
-    }
-
-    return true;
-}
-
-// create DEFB/DEFW/DEFW_BE instructions and push them to the 
-// assembler_output_queue, as macros are already expanded
-void Preproc::push_def_instructions(const SourceLoc& loc, 
-        const std::vector<std::pair<Keyword, int>> def_val_data) {
-    for (const auto& [def, val] : def_val_data) {
-        std::string def_str = to_string(def) + " " + std::to_string(val);
-        std::vector<Token> def_tokens = tokenize_text(def_str, loc);
-        LogicalLine def_line(loc);
-        def_line.tokens = std::move(def_tokens);
-        assembler_output_queue.push_back(std::move(def_line));
-    }
-}
-
 void Preproc::process_DMA(Keyword kw, const SourceLoc& kw_loc,
                           ParseLine& pline) {
     SourceLoc eol_loc;
     std::vector<std::pair<int, SourceLoc>> val_loc_data;
-    if (!collect_and_expand_args(val_loc_data, eol_loc,
-                                pline, kw, kw_loc)) {
+    if (!parse_const_expr_multiline_list(val_loc_data, eol_loc,
+                                         pline, kw, kw_loc)) {
         return; // error already reported
     }
 
     // produce list of DEFB/DEFW lines
     std::vector<std::pair<Keyword, int>> def_val_data;
-    if (!compute_dma_data(def_val_data, preproc_cpu_id, val_loc_data, kw,
+    if (!compute_z80n_dma(def_val_data, preproc_cpu_id, val_loc_data, kw,
                           kw_loc, eol_loc)) {
-        return; // error already reported by compute_dma_data
+        return; // error already reported by compute_z80n_dma
     }
 
     // macros already expanded, send directly to assembler output queue

@@ -15,18 +15,18 @@ EQ	"="	2:18
 Integer	"55"	2:20	int_value=55 
 EndOfLine	"\n"	2:22	
 Define constant: Y = $37
-t/20-preproc/input/cu_wait_01.asm:3:8: error: Expected argument after CU_WAIT
+t/20-preproc/input/cu_wait_01.asm:3:8: error: Expected expression after CU_WAIT
     cu.wait 
            ^
-t/20-preproc/input/cu_wait_01.asm:4:10: error: Expected comma after expression in CU_WAIT
+t/20-preproc/input/cu_wait_01.asm:4:10: error: Expected 2 arguments for CU_WAIT
     cu.wait 0
              ^
-t/20-preproc/input/cu_wait_01.asm:5:11: error: Expression expected
+t/20-preproc/input/cu_wait_01.asm:5:11: error: Expected 2 arguments for CU_WAIT
     cu.wait 0,
               ^
-t/20-preproc/input/cu_wait_01.asm:6:12: error: Unexpected token: ","
+t/20-preproc/input/cu_wait_01.asm:6:13: error: Unexpected comma after last argument in CU_WAIT
     cu.wait 0,0,
-               ^
+                ^
 t/20-preproc/input/cu_wait_01.asm:7:1: error: CU_WAIT not supported on z80
     cu.wait -1, 0
     ^
