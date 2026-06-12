@@ -166,6 +166,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\environment.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\synth_expander.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\string_interner.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\synth_expander.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\zfloat.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\cpu.def" />
@@ -205,6 +207,7 @@
     <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re" />
     <None Include="..\..\src\z80asm\z80asm2\options.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_tokens.def" />
+    <None Include="..\..\src\z80asm\z80asm2\zfloat.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

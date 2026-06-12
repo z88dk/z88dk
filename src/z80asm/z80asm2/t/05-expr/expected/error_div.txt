@@ -15,8 +15,11 @@ t/05-expr/input/error_div.lst:5:9: error: Division by zero
 Define constant: E02 = 0
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 verbose	1
+cpu_id	z80
 ucase_symbols	0
+float_format	genmath
 preprocess_only	0
 swap_ix_iy	0
 date_stamp	0
@@ -40,4 +43,5 @@ global_def	E01	0
 global_def	E02	0
 global_def	__CPU_Z80__	1
 global_def	__CPU_ZILOG__	1
+global_def	__FLOAT_GENMATH__	1
 input_file	t/05-expr/input/empty.asm

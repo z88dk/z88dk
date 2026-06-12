@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -mz80n -E t/35-preproc-only//input/cu_move_01.asm
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80N__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/35-preproc-only/input/cu_move_01.asm...
 Writing t/35-preproc-only/input/cu_move_01.i...
 Assembly completed with 0 errors
