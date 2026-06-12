@@ -1654,7 +1654,7 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
         for (const auto& body_line : body) {
             std::vector<Token> substituted =
                 substitute_params(body_line.tokens, no_params,
-                                  no_args, kw_loc, locals);
+                                  no_args, no_args, kw_loc, locals);
 
             LogicalLine ll;
             ll.tokens = std::move(substituted);
@@ -1748,7 +1748,7 @@ void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
         for (const auto& body_line : body) {
             std::vector<Token> substituted =
                 substitute_params(body_line.tokens, params,
-                                  single_arg, kw_loc, locals);
+                                  single_arg, single_arg, kw_loc, locals);
 
             LogicalLine ll;
             ll.tokens = std::move(substituted);
@@ -1876,7 +1876,7 @@ void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
         for (const auto& body_line : body) {
             std::vector<Token> substituted =
                 substitute_params(body_line.tokens, params,
-                                  single_arg, kw_loc, locals);
+                                  single_arg, single_arg, kw_loc, locals);
 
             LogicalLine ll;
             ll.tokens = std::move(substituted);
