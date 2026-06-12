@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -mr4k -dump-after-synth-expansion t/30-synthetic//input/synth_01.asm
 Define constant: __CPU_RABBIT__ = 1
 Define constant: __CPU_R4K__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/30-synthetic/input/synth_01.asm...
 # file: t/30-synthetic/input/synth_01.asm
 Identifier	"adc"	1:1	keyword=ADC 

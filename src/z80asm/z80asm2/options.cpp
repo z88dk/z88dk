@@ -65,6 +65,7 @@ static const UsageGroup usage_layout[] = {
         {
             OptionType::IXIY,
             OptionType::UCASE,
+            OptionType::FLOAT_FORMAT,
             OptionType::DEFINE,
             OptionType::PREPROC
         }
@@ -407,20 +408,34 @@ void Args::parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            CPU cpu_id = cpu_lookup(opt_arg);
-            if (cpu_id == CPU::none) {
+            CPU cpu_id = DEFAULT_CPU;
+            if (!cpu_lookup(opt_arg, cpu_id)) {
                 g_diag.error(loc, "Invalid cpu: " + opt_arg);
                 std::string valid_cpus;
-                for (const auto& name : cpu_names()) {
+                for (const auto& name_id : cpu_names()) {
                     if (!valid_cpus.empty()) {
                         valid_cpus += ", ";
                     }
-                    valid_cpus += name;
+                    valid_cpus += g_strings.view(name_id);
                 }
                 g_diag.note(loc, "Valid CPUs are: " + valid_cpus);
                 return;
             }
             options.cpu_id = cpu_id;
+            return;
+        }
+        case OptionType::FLOAT_FORMAT: {
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
+                return;
+            }
+            FloatFormat float_format = DEFAULT_FLOAT_FORMAT;
+            if (!float_format_lookup(opt_arg, float_format)) {
+                g_diag.error(loc, "Invalid float format: " + opt_arg);
+                g_diag.note(loc, float_formats_message());
+                return;
+            }
+            options.float_format = float_format;
             return;
         }
         case OptionType::DATESTAMP:
@@ -930,15 +945,13 @@ void Args::search_source_file(std::string_view filename_,
     }
 }
 
-void Args::define_constants_from_cpu_and_ixiy() {
+void Args::define_constants_from_options() {
     // define constants for CPU
-    for (auto& var : cpu_all_defines()) {
-        StringInterner::Id var_id = g_strings.intern(var);
+    for (auto var_id : cpu_all_defines()) {
         options.global_defs.erase(var_id);
     }
 
-    for (auto& var : cpu_defines(options.cpu_id)) {
-        StringInterner::Id var_id = g_strings.intern(var);
+    for (auto var_id : cpu_defines(options.cpu_id)) {
         options.global_defs.set(var_id, 1, SourceLoc());
     }
 
@@ -948,4 +961,11 @@ void Args::define_constants_from_cpu_and_ixiy() {
     if (options.swap_ix_iy) {
         options.global_defs.set(swap_id, 1, SourceLoc());
     }
+
+    // define constants for float format
+    for (auto var_id : float_format_all_defines()) {
+        options.global_defs.erase(var_id);
+    }
+    auto float_format_define_id = float_format_define(options.float_format);
+    options.global_defs.set(float_format_define_id, 1, SourceLoc());
 }

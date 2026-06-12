@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -mz80n -E t/35-preproc-only//input/dma_wr6_01.asm
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80N__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/35-preproc-only/input/dma_wr6_01.asm...
 t/35-preproc-only/input/dma_wr6_01.asm:5:10: warning: Command not implemented: $8B
     REPTI I, 0x8B, 0xA3, 0xA7, 0xAB, 0xAF, 0xB3, 0xB7, 0xBF, 0xC3, 0xC7, 0xCB

@@ -1,6 +1,7 @@
 % z88dk-z80asm -v -dump-after-macro-expansion t/20-preproc//input/defgroup_14.asm
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/20-preproc/input/defgroup_14.asm...
 t/20-preproc/input/defgroup_14.asm:1:23: error: Multiple '{' in DEFGROUP directive
     defgroup { ,, var1 ,, { var2 = 1+2*3 } ,, var3 ,, } 
@@ -9,3 +10,4 @@ t/20-preproc/input/defgroup_14.asm:1:23: error: Multiple '{' in DEFGROUP directi
 EndOfLine	"\n"	2:1	
 symbol	__CPU_Z80__	1	(defined at )
 symbol	__CPU_ZILOG__	1	(defined at )
+symbol	__FLOAT_GENMATH__	1	(defined at )
