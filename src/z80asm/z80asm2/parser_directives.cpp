@@ -45,6 +45,7 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::DWORD,     &Parser::parse_DWORD },
     { Keyword::EXTERN,    &Parser::parse_EXTERN },
     { Keyword::GLOBAL,    &Parser::parse_GLOBAL },
+    { Keyword::LIB,       &Parser::parse_EXTERN },
     { Keyword::MODULE,    &Parser::parse_MODULE },
     { Keyword::ORG,       &Parser::parse_ORG },
     { Keyword::PRAGMA,    &Parser::parse_PRAGMA },
@@ -53,6 +54,9 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::SECTION,   &Parser::parse_SECTION },
     { Keyword::WORD,      &Parser::parse_WORD },
     { Keyword::WORD_BE,   &Parser::parse_WORD_BE },
+    { Keyword::XDEF,      &Parser::parse_PUBLIC },
+    { Keyword::XLIB,      &Parser::parse_PUBLIC },
+    { Keyword::XREF,      &Parser::parse_EXTERN },
 };
 
 std::unique_ptr<Stmt> Parser::parse_directive(ParseLine& pline,
