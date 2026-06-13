@@ -14,12 +14,14 @@ l_i64_div_u:
 	ld	de,__i64_extra
 	ld	bc,8
 	ldir
+	push	ix
 	ld	ix,__i64_extra
 	call	l_divu_64_64x64
 	ld	hl,__i64_extra	;holds quotient
 	ld	de,__i64_acc
 	ld	bc,8
 	ldir
+	pop	ix
 	pop	de
         ld      hl,8
         add     hl,sp
