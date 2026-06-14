@@ -37,5 +37,9 @@ X(29, r4k_strict,       "r4k_strict",       "__CPU_RABBIT__ __CPU_R4K_STRICT__")
 X(30, r5k_strict,       "r5k_strict",       "__CPU_RABBIT__ __CPU_R5K_STRICT__")
 X(31, r6k,              "r6k",              "__CPU_RABBIT__ __CPU_R6K__")
 X(32, r6k_strict,       "r6k_strict",       "__CPU_RABBIT__ __CPU_R6K_STRICT__")
+X(33, ti83,             "ti83",             "__CPU_ZILOG__ __CPU_TI83__")
+X(34, ti83_strict,      "ti83_strict",      "__CPU_ZILOG__ __CPU_TI83_STRICT__")
+X(35, ti83plus,         "ti83plus",         "__CPU_ZILOG__ __CPU_TI83PLUS__")
+X(36, ti83plus_strict,  "ti83plus_strict",  "__CPU_ZILOG__ __CPU_TI83PLUS_STRICT__")
 
 #undef X
