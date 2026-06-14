@@ -458,7 +458,7 @@ bool SpanSem::local_label(const Token&) {
     return true;
 }
 
-bool parse_expression_span(ParseLine& pline) {
+bool parse_expr_span(ParseLine& pline) {
     size_t pos0 = pline.pos;
     SpanSem sem;
     ParseStatus status = ParseStatus::Unknown;
@@ -543,8 +543,8 @@ void ExprSem::error_missing_colon(const ParseLine& pline) const {
     ::error_missing_colon(pline);
 }
 
-std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline,
-        ParseStatus& status) {
+std::unique_ptr<Expr> parse_expr_ast(ParseLine& pline,
+                                     ParseStatus& status) {
     ExprSem sem;
     if (!parse_full_expr(pline, sem, status)) {
         return nullptr; // error already reported

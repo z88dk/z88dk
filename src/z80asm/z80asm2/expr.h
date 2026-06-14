@@ -378,11 +378,11 @@ bool eval_if_condition(ParseLine& pline,
 // Recognizer of expression spans
 //-----------------------------------------------------------------------------
 
-bool parse_expression_span(ParseLine& pline);
+bool parse_expr_span(ParseLine& pline);
 
 //-----------------------------------------------------------------------------
 // Semantic context for AST builder expression parsing
 //-----------------------------------------------------------------------------
 
-std::unique_ptr<Expr> parse_expression_ast(ParseLine& pline,
-        ParseStatus& status);
+std::unique_ptr<Expr> parse_expr_ast(ParseLine& pline,
+                                     ParseStatus& status);

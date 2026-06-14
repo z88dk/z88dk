@@ -8,7 +8,7 @@
 # z80
 #------------------------------------------------------------------------------
 
-for my $cpu1 ('z80', 'ti83', 'ti83plus') {
+for my $cpu1 ( 'z80', 'ti83', 'ti83plus' ) {
     for my $strict ( '', '_strict' ) {
         my $cpu = $cpu1 . $strict;
 
