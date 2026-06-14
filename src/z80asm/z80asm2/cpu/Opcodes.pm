@@ -49,6 +49,8 @@ my @CPUS = (
         gbz80		gbz80_strict
         kc160		kc160_strict
         kc160_z80	kc160_z80_strict
+        ti83        ti83_strict
+        ti83plus    ti83plus_strict
     )
 );
 
