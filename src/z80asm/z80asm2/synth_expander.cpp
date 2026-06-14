@@ -139,7 +139,7 @@ SynthExpander::SynthMatch SynthExpander::recognize_synthetic(
                 return res;    // no match
             }
             // include the '+' or '-' in the expression span
-            if (!parse_expression_span(pline)) {
+            if (!parse_expr_span(pline)) {
                 return res;    // no match
             }
             size_t end = pline.pos;
@@ -156,7 +156,7 @@ SynthExpander::SynthMatch SynthExpander::recognize_synthetic(
         tr = binary_search_transition(node, TrieToken::Expr);
         if (tr) {
             size_t start = pline.pos;
-            if (!parse_expression_span(pline)) {
+            if (!parse_expr_span(pline)) {
                 return res;    // no match
             }
             size_t end = pline.pos;

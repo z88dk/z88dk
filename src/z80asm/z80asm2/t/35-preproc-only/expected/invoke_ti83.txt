@@ -1,0 +1,7 @@
+% z88dk-z80asm -v -mti83 -E t/35-preproc-only//input/invoke_ti83.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_TI83__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/35-preproc-only/input/invoke_ti83.asm...
+Writing t/35-preproc-only/input/invoke_ti83.i...
+Assembly completed with 0 errors
