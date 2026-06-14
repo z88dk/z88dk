@@ -304,6 +304,22 @@ struct ListStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
+struct PhaseStmt : Stmt {
+    std::unique_ptr<Expr> expr;
+
+    PhaseStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
+        : Stmt(loc), expr(std::move(e)) {}
+    virtual ~PhaseStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+struct DephaseStmt : Stmt {
+    DephaseStmt(const SourceLoc& loc)
+        : Stmt(loc) {}
+    virtual ~DephaseStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
 // root of the AST
 struct Program : AstNode {
     std::vector<std::unique_ptr<Stmt>> stmts;

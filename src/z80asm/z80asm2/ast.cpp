@@ -389,6 +389,22 @@ void ListStmt::dump(DumpContext ctx) const {
     c.line("Enable: " + std::string(enable ? "true" : "false"));
 }
 
+void PhaseStmt::dump(DumpContext ctx) const {
+    ctx.line("PhaseStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    if (expr) {
+        c.line("Expression:");
+        expr->dump(c.child());
+    }
+}
+
+void DephaseStmt::dump(DumpContext ctx) const {
+    ctx.line("DephaseStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+}
+
 void Program::dump(DumpContext ctx) const {
     ctx.line("Program");
     auto c = ctx.child();

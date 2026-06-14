@@ -134,4 +134,10 @@ private:
     std::unique_ptr<Stmt> parse_LSTOFF(ParseLine& pline,
                                        const SourceLoc& loc,
                                        ParseStatus& status);
+    std::unique_ptr<Stmt> parse_PHASE(ParseLine& pline,
+                                      const SourceLoc& loc,
+                                      ParseStatus& status);
+    std::unique_ptr<Stmt> parse_DEPHASE(ParseLine& pline,
+                                        const SourceLoc& loc,
+                                        ParseStatus& status);
 };
