@@ -1,17 +1,17 @@
-% z88dk-z80asm -v -dump-after-parse t/40-syntax//input/org_01.asm
+% z88dk-z80asm -v -dump-after-parse t/40-syntax//input/phase_01.asm
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Define constant: __FLOAT_GENMATH__ = 1
-Assembling t/40-syntax/input/org_01.asm...
-t/40-syntax/input/org_01.asm:1:4: error: Expression expected
-    org
-       ^
-t/40-syntax/input/org_01.asm:2:7: error: Unexpected token: ","
-    org 10,
-          ^
+Assembling t/40-syntax/input/phase_01.asm...
+t/40-syntax/input/phase_01.asm:1:6: error: Expression expected
+    phase
+         ^
+t/40-syntax/input/phase_01.asm:2:9: error: Unexpected token: ","
+    phase 10,
+            ^
 Program
-    OrgStmt
-        Location: t/40-syntax/input/org_01.asm:3:1
+    PhaseStmt
+        Location: t/40-syntax/input/phase_01.asm:3:1
         Expression:
             ExprBinary: +
                 LHS:
