@@ -382,6 +382,13 @@ void SymbolDeclareStmt::dump(DumpContext ctx) const {
     }
 }
 
+void ListStmt::dump(DumpContext ctx) const {
+    ctx.line("ListStmt");
+    auto c = ctx.child();
+    c.line("Location: " + loc.to_string());
+    c.line("Enable: " + std::string(enable ? "true" : "false"));
+}
+
 void Program::dump(DumpContext ctx) const {
     ctx.line("Program");
     auto c = ctx.child();

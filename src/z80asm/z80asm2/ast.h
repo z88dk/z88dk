@@ -296,6 +296,14 @@ struct SymbolDeclareStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
+struct ListStmt : Stmt {
+    bool enable;
+    ListStmt(bool enable_, const SourceLoc& loc)
+        : Stmt(loc), enable(enable_) {}
+    virtual ~ListStmt() = default;
+    void dump(DumpContext ctx) const override;
+};
+
 // root of the AST
 struct Program : AstNode {
     std::vector<std::unique_ptr<Stmt>> stmts;
