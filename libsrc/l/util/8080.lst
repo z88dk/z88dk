@@ -1,1 +1,3 @@
 @${NEWLIB_ROOT}l/util/common.lst
+${NEWLIB_ROOT}l/util/8-8080/l_lsl_dehl
+${NEWLIB_ROOT}l/util/8-8080/l_lsr_dehl
