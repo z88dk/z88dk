@@ -1,6 +1,6 @@
 % z88dk-z80asm -v -m=xxx -dump-after-cmdline t/05-cli//input/empty.asm
 <command-line>:2:1: error: Invalid cpu: xxx
-<command-line>:2:1: note: Valid CPUs are: 8080, 8080_strict, 8085, 8085_strict, ez80, ez80_strict, ez80_z80, ez80_z80_strict, gbz80, gbz80_strict, kc160, kc160_strict, kc160_z80, kc160_z80_strict, r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, r5k, r5k_strict, r6k, r6k_strict, r800, r800_strict, z180, z180_strict, z80, z80_strict, z80n, z80n_strict
+<command-line>:2:1: note: Valid CPUs are: 8080, 8080_strict, 8085, 8085_strict, ez80, ez80_strict, ez80_z80, ez80_z80_strict, gbz80, gbz80_strict, kc160, kc160_strict, kc160_z80, kc160_z80_strict, r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, r5k, r5k_strict, r6k, r6k_strict, r800, r800_strict, ti83, ti83_strict, ti83plus, ti83plus_strict, z180, z180_strict, z80, z80_strict, z80n, z80n_strict
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Define constant: __FLOAT_GENMATH__ = 1

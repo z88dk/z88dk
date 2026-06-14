@@ -301,6 +301,25 @@ bool compute_z88_fpp(std::vector<std::pair<Keyword, int>>& out_def_val_data,
     return true;
 }
 
+bool compute_ti83_invoke_prefix(std::string& out_instr_prefix,
+                                CPU cpu_id, Keyword kw, const SourceLoc& kw_loc) {
+    if (cpu_id == CPU::ti83 || cpu_id == CPU::ti83_strict) {
+        // TI83 uses CALL
+        out_instr_prefix = "CALL";
+        return true;
+    }
+    else if (cpu_id == CPU::ti83plus || cpu_id == CPU::ti83plus_strict) {
+        // TI83+ uses RST $28
+        out_instr_prefix = "RST $28 : DEFW";
+        return true;
+    }
+    else {
+        g_diag.error(kw_loc,
+                     to_string(kw) + " not supported on " + to_string(cpu_id));
+        return false;
+    }
+}
+
 bool compute_z80n_cu_wait(std::vector<std::pair<Keyword, int>>& def_val_data,
                           CPU cpu_id, int ver, int hor,
                           const SourceLoc& kw_loc,

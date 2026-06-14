@@ -166,7 +166,7 @@ std::unique_ptr<Stmt> Parser::parse_SECTION(ParseLine& pline,
 std::unique_ptr<Stmt> Parser::parse_ORG(ParseLine& pline, const SourceLoc& loc,
                                         ParseStatus& status) {
     status = ParseStatus::Unknown;
-    auto expr = parse_expression_ast(pline, status);
+    auto expr = parse_expr_ast(pline, status);
     if (status == ParseStatus::FatalError) {
         return nullptr;    // stop immediately on error
     }
@@ -198,7 +198,7 @@ std::unique_ptr<Stmt> Parser::parse_DEFC(ParseLine& pline, const SourceLoc& loc,
     pline.advance(); // consume '='
 
     status = ParseStatus::Unknown;
-    auto expr = parse_expression_ast(pline, status);
+    auto expr = parse_expr_ast(pline, status);
     if (status == ParseStatus::FatalError) {
         return nullptr;    // stop immediately on error
     }
@@ -218,7 +218,7 @@ std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
 
     // get first parameter (alignment)
     status = ParseStatus::Unknown;
-    auto align_expr = parse_expression_ast(pline, status);
+    auto align_expr = parse_expr_ast(pline, status);
     if (status == ParseStatus::FatalError) {
         return nullptr;    // stop immediately on error
     }
@@ -239,7 +239,7 @@ std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
     }
     pline.advance(); // consume comma
 
-    auto fill_expr = parse_expression_ast(pline, status);
+    auto fill_expr = parse_expr_ast(pline, status);
     if (status == ParseStatus::FatalError) {
         return nullptr;    // stop immediately on error
     }
@@ -254,7 +254,7 @@ std::unique_ptr<Stmt> Parser::parse_DEFS(ParseLine& pline, const SourceLoc& loc,
 
     // get first parameter (size)
     status = ParseStatus::Unknown;
-    auto size_expr = parse_expression_ast(pline, status);
+    auto size_expr = parse_expr_ast(pline, status);
     if (status == ParseStatus::FatalError) {
         return nullptr;    // stop immediately on error
     }
@@ -285,7 +285,7 @@ std::unique_ptr<Stmt> Parser::parse_DEFS(ParseLine& pline, const SourceLoc& loc,
     }
     else {
         // expression case - evaluate to byte value
-        auto filler_expr = parse_expression_ast(pline, status);
+        auto filler_expr = parse_expr_ast(pline, status);
         if (status == ParseStatus::FatalError) {
             return nullptr;    // stop immediately on error
         }
@@ -339,7 +339,7 @@ static std::unique_ptr<Stmt> parse_data_with_size_type(
 
     while (true) {
         // parse expression
-        auto expr = parse_expression_ast(pline, status);
+        auto expr = parse_expr_ast(pline, status);
         if (status == ParseStatus::FatalError) {
             return nullptr;    // stop immediately on error
         }
@@ -394,7 +394,7 @@ std::unique_ptr<Stmt> Parser::parse_BYTE(ParseLine& pline, const SourceLoc& loc,
         }
         else {
             // parse expression as a byte literal
-            auto expr = parse_expression_ast(pline, status);
+            auto expr = parse_expr_ast(pline, status);
             if (status == ParseStatus::FatalError) {
                 return nullptr;    // stop immediately on error
             }
