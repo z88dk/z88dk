@@ -37,7 +37,6 @@ enum class OpcodesOp : uint8_t {
 };
 
 std::unique_ptr<LabelStmt> parse_label(ParseLine& pline);
-std::unique_ptr<Program> parse(const std::vector<LogicalLine>& asm_lines);
 
 class Parser {
 public:
@@ -129,4 +128,10 @@ private:
     std::unique_ptr<Stmt> parse_DWORD(ParseLine& pline,
                                       const SourceLoc& loc,
                                       ParseStatus& status);
+    std::unique_ptr<Stmt> parse_LSTON(ParseLine& pline,
+                                      const SourceLoc& loc,
+                                      ParseStatus& status);
+    std::unique_ptr<Stmt> parse_LSTOFF(ParseLine& pline,
+                                       const SourceLoc& loc,
+                                       ParseStatus& status);
 };
