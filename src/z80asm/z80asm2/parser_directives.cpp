@@ -36,6 +36,7 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::DEFS,      &Parser::parse_DEFS },
     { Keyword::DEFW,      &Parser::parse_WORD },
     { Keyword::DEFW_BE,   &Parser::parse_WORD_BE },
+    { Keyword::DEPHASE,   &Parser::parse_DEPHASE },
     { Keyword::DM,        &Parser::parse_BYTE },
     { Keyword::DP,        &Parser::parse_PTR },
     { Keyword::DQ,        &Parser::parse_DWORD },
@@ -50,6 +51,7 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::LSTON,     &Parser::parse_LSTON },
     { Keyword::MODULE,    &Parser::parse_MODULE },
     { Keyword::ORG,       &Parser::parse_ORG },
+    { Keyword::PHASE,     &Parser::parse_PHASE },
     { Keyword::PRAGMA,    &Parser::parse_PRAGMA },
     { Keyword::PTR,       &Parser::parse_PTR },
     { Keyword::PUBLIC,    &Parser::parse_PUBLIC },
@@ -167,6 +169,12 @@ std::unique_ptr<Stmt> Parser::parse_SECTION(ParseLine& pline,
 
 std::unique_ptr<Stmt> Parser::parse_ORG(ParseLine& pline, const SourceLoc& loc,
                                         ParseStatus& status) {
+    if (pline.eol()) {
+        pline.error("Expression expected");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+
     status = ParseStatus::Unknown;
     auto expr = parse_expr_ast(pline, status);
     if (status == ParseStatus::FatalError) {
@@ -218,6 +226,12 @@ std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
     uint8_t default_filler = g_args.options.filler_byte;
 
+    if (pline.eol()) {
+        pline.error("Expression expected");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+
     // get first parameter (alignment)
     status = ParseStatus::Unknown;
     auto align_expr = parse_expr_ast(pline, status);
@@ -253,6 +267,12 @@ std::unique_ptr<Stmt> Parser::parse_ALIGN(ParseLine& pline,
 std::unique_ptr<Stmt> Parser::parse_DEFS(ParseLine& pline, const SourceLoc& loc,
         ParseStatus& status) {
     uint8_t default_filler = g_args.options.filler_byte;
+
+    if (pline.eol()) {
+        pline.error("Expression expected");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
 
     // get first parameter (size)
     status = ParseStatus::Unknown;
@@ -340,6 +360,12 @@ static std::unique_ptr<Stmt> parse_data_with_size_type(
     auto stmt = std::make_unique<OpcodeStmt>(loc);
 
     while (true) {
+        if (pline.eol()) {
+            pline.error("Expression expected");
+            status = ParseStatus::FatalError;
+            return nullptr;
+        }
+
         // parse expression
         auto expr = parse_expr_ast(pline, status);
         if (status == ParseStatus::FatalError) {
@@ -386,6 +412,12 @@ std::unique_ptr<Stmt> Parser::parse_BYTE(ParseLine& pline, const SourceLoc& loc,
     auto stmt = std::make_unique<OpcodeStmt>(loc);
 
     while (true) {
+        if (pline.eol()) {
+            pline.error("Expression expected");
+            status = ParseStatus::FatalError;
+            return nullptr;
+        }
+
         if (pline.peek().type == TokenType::String) {
             // parse string literal as a sequence of byte literals
             std::string_view str = g_strings.view(pline.peek().value.str_value_id);
@@ -461,5 +493,33 @@ std::unique_ptr<Stmt> Parser::parse_LSTON(ParseLine&, const SourceLoc& loc,
 std::unique_ptr<Stmt> Parser::parse_LSTOFF(ParseLine&, const SourceLoc& loc,
         ParseStatus&) {
     return std::make_unique<ListStmt>(false, loc);
+}
+
+std::unique_ptr<Stmt> Parser::parse_PHASE(ParseLine& pline,
+        const SourceLoc& loc, ParseStatus& status) {
+    if (pline.eol()) {
+        pline.error("Expression expected");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+
+    status = ParseStatus::Unknown;
+    auto expr = parse_expr_ast(pline, status);
+    if (status == ParseStatus::FatalError) {
+        return nullptr;    // stop immediately on error
+    }
+
+    if (!expr) {
+        pline.error("Expression expected");
+        status = ParseStatus::FatalError;
+        return nullptr;
+    }
+
+    return std::make_unique<PhaseStmt>(std::move(expr), loc);
+}
+
+std::unique_ptr<Stmt> Parser::parse_DEPHASE(ParseLine&, const SourceLoc& loc,
+        ParseStatus&) {
+    return std::make_unique<DephaseStmt>(loc);
 }
 
