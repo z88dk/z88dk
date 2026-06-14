@@ -363,6 +363,8 @@ private:
                              ParseLine& pline);
     void process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
                               ParseLine& pline);
+    void process_Z88_FPP(Keyword kw, const SourceLoc& kw_loc,
+                         ParseLine& pline);
     void process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
                          ParseLine& pline);
     void process_CU_MOVE(Keyword kw, const SourceLoc& kw_loc,
