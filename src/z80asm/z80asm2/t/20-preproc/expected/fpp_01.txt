@@ -1,0 +1,65 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/fpp_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/20-preproc/input/fpp_01.asm...
+# file: t/20-preproc/input/fpp_01.asm
+Identifier	"DEFC"	1:11	keyword=DEFC 
+Identifier	"X"	1:16	keyword=X 
+EQ	"="	1:18	
+Integer	"6"	1:20	int_value=6 
+EndOfLine	"\n"	1:21	
+Define constant: X = 6
+t/20-preproc/input/fpp_01.asm:2:4: error: Expected expression after FPP
+    fpp
+       ^
+Identifier	"RST"	3:1	keyword=RST 
+Integer	"24"	3:5	int_value=24 
+EndOfLine	"\n"	3:7	
+Identifier	"DEFB"	3:1	keyword=DEFB 
+Integer	"6"	3:6	int_value=6 
+EndOfLine	"\n"	3:7	
+Identifier	"RST"	4:1	keyword=RST 
+Integer	"24"	4:5	int_value=24 
+EndOfLine	"\n"	4:7	
+Identifier	"DEFB"	4:1	keyword=DEFB 
+Integer	"6"	4:6	int_value=6 
+EndOfLine	"\n"	4:7	
+t/20-preproc/input/fpp_01.asm:5:9: error: Unexpected comma after last argument in FPP
+    fpp 2*3,
+            ^
+t/20-preproc/input/fpp_01.asm:6:10: error: Too many arguments for FPP, expected 1
+    fpp 2*3, 0
+             ^
+Identifier	"RST"	7:1	keyword=RST 
+Integer	"24"	7:5	int_value=24 
+EndOfLine	"\n"	7:7	
+Identifier	"DEFB"	7:1	keyword=DEFB 
+Integer	"0"	7:6	int_value=0 
+EndOfLine	"\n"	7:7	
+Identifier	"RST"	8:1	keyword=RST 
+Integer	"24"	8:5	int_value=24 
+EndOfLine	"\n"	8:7	
+Identifier	"DEFB"	8:1	keyword=DEFB 
+Integer	"255"	8:6	int_value=255 
+EndOfLine	"\n"	8:9	
+t/20-preproc/input/fpp_01.asm:9:5: error: Value out of range: $100
+    fpp $100
+        ^
+Identifier	"RST"	10:1	keyword=RST 
+Integer	"24"	10:5	int_value=24 
+EndOfLine	"\n"	10:7	
+Identifier	"DEFB"	10:1	keyword=DEFB 
+Minus	"-"	10:6	
+Integer	"1"	10:7	int_value=1 
+EndOfLine	"\n"	10:8	
+Identifier	"RST"	11:1	keyword=RST 
+Integer	"24"	11:5	int_value=24 
+EndOfLine	"\n"	11:7	
+Identifier	"DEFB"	11:1	keyword=DEFB 
+Minus	"-"	11:6	
+Integer	"128"	11:7	int_value=128 
+EndOfLine	"\n"	11:10	
+t/20-preproc/input/fpp_01.asm:12:5: error: Value out of range: -$81
+    fpp -129
+        ^
