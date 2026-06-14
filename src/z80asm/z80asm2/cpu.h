@@ -38,6 +38,8 @@ bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
                           out_def_val_data,
                           const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
                           CPU cpu_id, Keyword kw, const SourceLoc& kw_loc);
+bool compute_z88_fpp(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                     const std::vector<std::pair<int, SourceLoc>>& val_loc_data);
 
 // Spectrum Next copper unit
 bool compute_z80n_cu_wait(std::vector<std::pair<Keyword, int>>& def_val_data,

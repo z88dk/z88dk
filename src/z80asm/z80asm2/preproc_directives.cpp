@@ -61,6 +61,7 @@ Preproc::directive_handlers = {
     { Keyword::ERROR,      &Preproc::process_ERROR },
     { Keyword::EXITM,      &Preproc::process_EXITM },
     { Keyword::FLOAT,      &Preproc::process_FLOAT },
+    { Keyword::FPP,        &Preproc::process_Z88_FPP },
     { Keyword::INCBIN,     &Preproc::process_BINARY },
     { Keyword::INCLUDE,    &Preproc::process_INCLUDE },
     { Keyword::LINE,       &Preproc::process_LINE },
@@ -2263,6 +2264,24 @@ void Preproc::process_Z88_CALL_PKG(Keyword kw, const SourceLoc& kw_loc,
     std::vector<std::pair<Keyword, int>> def_val_data;
     if (!compute_z88_call_pkg(def_val_data, val_loc_data, preproc_cpu_id, kw,
                               kw_loc)) {
+        return; // error already reported
+    }
+
+    // push to output
+    push_def_instructions(kw_loc, def_val_data);
+}
+
+void Preproc::process_Z88_FPP(Keyword kw, const SourceLoc& kw_loc,
+                              ParseLine& pline) {
+    // Parse constant expression list
+    std::vector<std::pair<int, SourceLoc>> val_loc_data;
+    if (!parse_const_expr_list(val_loc_data, pline, kw, 1)) {
+        return;  // error already reported
+    }
+
+    // get instructions
+    std::vector<std::pair<Keyword, int>> def_val_data;
+    if (!compute_z88_fpp(def_val_data, val_loc_data)) {
         return; // error already reported
     }
 

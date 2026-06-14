@@ -282,6 +282,25 @@ bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
     return true;
 }
 
+bool compute_z88_fpp(std::vector<std::pair<Keyword, int>>& out_def_val_data,
+                     const std::vector<std::pair<int, SourceLoc>>& val_loc_data) {
+    assert(val_loc_data.size() == 1);
+    int arg_value = val_loc_data.front().first;
+    SourceLoc expr_loc = val_loc_data.front().second;
+
+    out_def_val_data.emplace_back(Keyword::RST, 0x18);
+    if (arg_value >= -0x80 && arg_value <= 0xFF) {
+        out_def_val_data.emplace_back(Keyword::DEFB, arg_value);
+    }
+    else {
+        g_diag.error(expr_loc,
+                     "Value out of range: " + int_to_hex(arg_value));
+        return false;
+    }
+
+    return true;
+}
+
 bool compute_z80n_cu_wait(std::vector<std::pair<Keyword, int>>& def_val_data,
                           CPU cpu_id, int ver, int hor,
                           const SourceLoc& kw_loc,
