@@ -1,0 +1,27 @@
+% z88dk-z80asm -v -dump-after-directives t/20-preproc//input/invoke_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/20-preproc/input/invoke_01.asm...
+# file: t/20-preproc/input/invoke_01.asm
+Identifier	"extern"	1:1	keyword=EXTERN 
+Identifier	"func"	1:8	
+EndOfLine	"\n"	1:12	
+t/20-preproc/input/invoke_01.asm:3:1: error: INVOKE not supported on z80
+    invoke
+    ^
+t/20-preproc/input/invoke_01.asm:4:1: error: INVOKE not supported on z80
+    invoke X
+    ^
+t/20-preproc/input/invoke_01.asm:5:1: error: INVOKE not supported on z80
+    invoke func
+    ^
+t/20-preproc/input/invoke_01.asm:6:1: error: INVOKE not supported on z80
+    invoke func,
+    ^
+t/20-preproc/input/invoke_01.asm:7:1: error: INVOKE not supported on z80
+    invoke func+3
+    ^
+t/20-preproc/input/invoke_01.asm:8:1: error: INVOKE not supported on z80
+    invoke func+
+    ^

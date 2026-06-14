@@ -203,7 +203,7 @@ next_transition:
 
             case ChoicePoint::Type::Expr: {
                 size_t expr_start = pline.pos;
-                auto expr = parse_expression_ast(pline, status);
+                auto expr = parse_expr_ast(pline, status);
                 if (status == ParseStatus::FatalError) {
                     return res;    // stop immediately on error
                 }

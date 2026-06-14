@@ -41,6 +41,10 @@ bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
 bool compute_z88_fpp(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                      const std::vector<std::pair<int, SourceLoc>>& val_loc_data);
 
+// TI83
+bool compute_ti83_invoke_prefix(std::string& out_instr_prefix,
+                                CPU cpu_id, Keyword kw, const SourceLoc& kw_loc);
+
 // Spectrum Next copper unit
 bool compute_z80n_cu_wait(std::vector<std::pair<Keyword, int>>& def_val_data,
                           CPU cpu_id,

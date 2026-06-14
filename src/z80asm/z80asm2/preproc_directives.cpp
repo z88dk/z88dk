@@ -64,6 +64,7 @@ Preproc::directive_handlers = {
     { Keyword::FPP,        &Preproc::process_Z88_FPP },
     { Keyword::INCBIN,     &Preproc::process_BINARY },
     { Keyword::INCLUDE,    &Preproc::process_INCLUDE },
+    { Keyword::INVOKE,     &Preproc::process_TI83_INVOKE },
     { Keyword::LINE,       &Preproc::process_LINE },
     { Keyword::LOCAL,      &Preproc::process_LOCAL },
     { Keyword::MACRO,      &Preproc::process_MACRO },
@@ -2287,6 +2288,45 @@ void Preproc::process_Z88_FPP(Keyword kw, const SourceLoc& kw_loc,
 
     // push to output
     push_def_instructions(kw_loc, def_val_data);
+}
+
+void Preproc::process_TI83_INVOKE(Keyword kw, const SourceLoc& kw_loc,
+                                  ParseLine& pline) {
+    // create instruction prefix <rest of line> and push to output queue
+    std::string prefix_str;
+    if (!compute_ti83_invoke_prefix(prefix_str, preproc_cpu_id, kw, kw_loc)) {
+        return; // error already reported
+    }
+
+    std::vector<Token> instr_tokens = tokenize_text(prefix_str, kw_loc);
+
+    // remove end-of-line token from instr_tokens if present, since we will append
+    if (!instr_tokens.empty() && instr_tokens.back().type == TokenType::EndOfLine) {
+        instr_tokens.pop_back();
+    }
+
+    // parse expression span
+    size_t expr_start = pline.pos;
+    if (!parse_expr_span(pline)) {
+        g_diag.error(pline.peek().loc, "Expression expected");
+        return;
+    }
+
+    if (!pline.check_end_of_line()) {
+        return; // error already reported
+    }
+
+    // append expression tokens to instruction tokens
+    instr_tokens.insert(instr_tokens.end(),
+                        pline.tokens.begin() + expr_start, pline.tokens.end());
+
+    // push line to output queue
+    LogicalLine invoke_line(kw_loc);
+    invoke_line.tokens = std::move(instr_tokens);
+
+    // create a macro expansion frame for the INVOKE line
+    std::deque<LogicalLine> invoke_lines{ std::move(invoke_line) };
+    push_macro_expansion(0, std::move(invoke_lines));
 }
 
 void Preproc::process_CU_WAIT(Keyword kw, const SourceLoc& kw_loc,
