@@ -46,6 +46,8 @@ std::unordered_map<Keyword, Parser::DirectiveParseFn> Parser::directive_parsers
     { Keyword::EXTERN,    &Parser::parse_EXTERN },
     { Keyword::GLOBAL,    &Parser::parse_GLOBAL },
     { Keyword::LIB,       &Parser::parse_EXTERN },
+    { Keyword::LSTOFF,    &Parser::parse_LSTOFF },
+    { Keyword::LSTON,     &Parser::parse_LSTON },
     { Keyword::MODULE,    &Parser::parse_MODULE },
     { Keyword::ORG,       &Parser::parse_ORG },
     { Keyword::PRAGMA,    &Parser::parse_PRAGMA },
@@ -449,5 +451,15 @@ std::unique_ptr<Stmt> Parser::parse_PTR(ParseLine& pline, const SourceLoc& loc,
 std::unique_ptr<Stmt> Parser::parse_DWORD(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
     return parse_data_with_size_type(pline, loc, status, 4, PatchType::Unsigned);
+}
+
+std::unique_ptr<Stmt> Parser::parse_LSTON(ParseLine&, const SourceLoc& loc,
+        ParseStatus&) {
+    return std::make_unique<ListStmt>(true, loc);
+}
+
+std::unique_ptr<Stmt> Parser::parse_LSTOFF(ParseLine&, const SourceLoc& loc,
+        ParseStatus&) {
+    return std::make_unique<ListStmt>(false, loc);
 }
 
