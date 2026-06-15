@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ast.h"
+#include "ir.h"
 #include "const_symbols.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
