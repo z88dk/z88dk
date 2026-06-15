@@ -27,6 +27,28 @@ struct DumpContext {
     DumpContext child() const;
 };
 
+// class for evaluated expressions
+enum class ExprType {
+    Unknown,         // not evaluated yet
+    Constant,        // fully resolved integer
+    AddressRelative, // symbol + offset
+    Computed,        // arbitrary expression involving symbols
+};
+
+struct ExprValue {
+    ExprType type = ExprType::Unknown;
+
+    // valid when Constant
+    int const_value = 0;
+
+    // valid when AddressRelative
+    StringInterner::Id section_name_id = 0;
+    int offset = 0;
+
+    // valid when Computed
+    std::vector<Token> expr_tokens; // original expression
+};
+
 // base class for all AST nodes
 struct AstNode {
     virtual ~AstNode() = default;
@@ -36,6 +58,8 @@ struct AstNode {
 // base class for all expressions
 struct Expr : AstNode {
     SourceLoc loc;
+    ExprValue value;                // evaluated value, if available
+    std::vector<Token> tokens;      // original expression
 
     Expr(const SourceLoc& loc_) : loc(loc_) {}
 };

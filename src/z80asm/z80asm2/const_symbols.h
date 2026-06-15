@@ -8,7 +8,6 @@
 
 #include "source_loc.h"
 #include "string_interner.h"
-#include <string_view>
 #include <unordered_map>
 
 struct ConstSymbol {

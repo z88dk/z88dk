@@ -22,38 +22,74 @@ Program
         Bytes: 0 0 0 0 0 0 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/dw_01.asm:3:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 0, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: 1
+                        Location: t/40-syntax/input/dw_01.asm:3:4
+                        Value type: Unknown
+                        Tokens: 1
             Patch
+                Location: t/40-syntax/input/dw_01.asm:3:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: 2
+                        Location: t/40-syntax/input/dw_01.asm:3:6
+                        Value type: Unknown
+                        Tokens: 2
             Patch
+                Location: t/40-syntax/input/dw_01.asm:3:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 4, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: 3
+                        Location: t/40-syntax/input/dw_01.asm:3:8
+                        Value type: Unknown
+                        Tokens: 3
             Patch
+                Location: t/40-syntax/input/dw_01.asm:3:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 6, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprBinary: +
+                        Location: t/40-syntax/input/dw_01.asm:3:12
+                        Value type: Unknown
+                        Tokens: 1+2*3
                         LHS:
                             ExprLiteralInt: 1
+                                Location: t/40-syntax/input/dw_01.asm:3:10
+                                Value type: Unknown
+                                Tokens: 
                         RHS:
                             ExprBinary: *
+                                Location: t/40-syntax/input/dw_01.asm:3:14
+                                Value type: Unknown
+                                Tokens: 
                                 LHS:
                                     ExprLiteralInt: 2
+                                        Location: t/40-syntax/input/dw_01.asm:3:12
+                                        Value type: Unknown
+                                        Tokens: 
                                 RHS:
                                     ExprLiteralInt: 3
+                                        Location: t/40-syntax/input/dw_01.asm:3:14
+                                        Value type: Unknown
+                                        Tokens: 
