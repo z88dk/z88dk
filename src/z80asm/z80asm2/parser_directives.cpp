@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "ast.h"
+#include "ir.h"
 #include "cpu.h"
 #include "expr.h"
 #include "lexer_keywords.h"

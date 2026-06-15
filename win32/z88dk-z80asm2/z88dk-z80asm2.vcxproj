@@ -131,7 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\ast.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\ir.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\diag.cpp" />
@@ -169,7 +169,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\ast.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\ir.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\diag.h" />
