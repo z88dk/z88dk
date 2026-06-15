@@ -5,9 +5,10 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
-
+#include "lexer_tokens.h"
 #include "string_interner.h"
 #include "string_utils.h"
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -26,6 +27,48 @@ void DumpContext::line(std::string_view text) {
 
 DumpContext DumpContext::child() const {
     return DumpContext(os, indent + 1);
+}
+
+static std::string to_string(ExprType type) {
+    switch (type) {
+    case ExprType::Unknown:
+        return "Unknown";
+    case ExprType::Constant:
+        return "Constant";
+    case ExprType::AddressRelative:
+        return "AddressRelative";
+    case ExprType::Computed:
+        return "Computed";
+    default:
+        assert(0);
+        return "Unknown";
+    }
+}
+
+static void dump_expr_value(const ExprValue& value, DumpContext ctx) {
+    ctx.line("Value type: " + to_string(value.type));
+    switch (value.type) {
+    case ExprType::Unknown:
+        break;
+    case ExprType::Constant:
+        ctx.line("Value const: " + int_to_hex(value.const_value));
+        break;
+    case ExprType::AddressRelative:
+        ctx.line("Value section: " + g_strings.to_string(value.section_name_id));
+        ctx.line("Value offset: " + int_to_hex(value.offset));
+        break;
+    case ExprType::Computed:
+        ctx.line("Value expr tokens: " + to_string(value.expr_tokens));
+        break;
+    default:
+        break;
+    }
+}
+
+static void dump_expr_common(const Expr& expr, DumpContext ctx) {
+    ctx.line("Location: " + expr.loc.to_string());
+    dump_expr_value(expr.value, ctx);
+    ctx.line("Tokens: " + to_string(expr.tokens));
 }
 
 void Stmt::dump(DumpContext ctx) const {
@@ -83,28 +126,39 @@ void LabelStmt::dump(DumpContext ctx) const {
 
 void ExprLiteralInt::dump(DumpContext ctx) const {
     ctx.line("ExprLiteralInt: " + int_to_hex(value));
+    auto c = ctx.child();
+    dump_expr_common(*this, c);
 }
 
 void ExprLiteralFloat::dump(DumpContext ctx) const {
     ctx.line("ExprLiteralFloat: " + std::to_string(value));
+    auto c = ctx.child();
+    dump_expr_common(*this, c);
 }
 
 void ExprLiteralAsmpc::dump(DumpContext ctx) const {
     ctx.line("ExprLiteralAsmpc");
+    auto c = ctx.child();
+    dump_expr_common(*this, c);
 }
 
 void ExprSymbol::dump(DumpContext ctx) const {
     ctx.line("ExprSymbol: " + g_strings.to_string(name_id));
+    auto c = ctx.child();
+    dump_expr_common(*this, c);
 }
 
 void ExprLocalLabel::dump(DumpContext ctx) const {
     ctx.line("ExprLocalLabel: " + g_strings.to_string(name_id) + " @ " +
              std::to_string(at_pos));
+    auto c = ctx.child();
+    dump_expr_common(*this, c);
 }
 
 void ExprUnary::dump(DumpContext ctx) const {
     ctx.line("ExprUnary: " + to_string(op));
     auto c = ctx.child();
+    dump_expr_common(*this, c);
     c.line("RHS:");
     rhs->dump(c.child());
 }
@@ -112,6 +166,7 @@ void ExprUnary::dump(DumpContext ctx) const {
 void ExprBinary::dump(DumpContext ctx) const {
     ctx.line("ExprBinary: " + to_string(op));
     auto c = ctx.child();
+    dump_expr_common(*this, c);
     c.line("LHS:");
     lhs->dump(c.child());
     c.line("RHS:");
@@ -121,6 +176,7 @@ void ExprBinary::dump(DumpContext ctx) const {
 void ExprTernary::dump(DumpContext ctx) const {
     ctx.line("ExprTernary");
     auto c = ctx.child();
+    dump_expr_common(*this, c);
     c.line("Condition:");
     cond->dump(c.child());
     c.line("Then:");
@@ -132,6 +188,7 @@ void ExprTernary::dump(DumpContext ctx) const {
 void ExprCallUnary::dump(DumpContext ctx) const {
     ctx.line("ExprCallUnary: " + to_string(keyword));
     auto c = ctx.child();
+    dump_expr_common(*this, c);
     c.line("Arg:");
     arg->dump(c.child());
 }
@@ -139,6 +196,7 @@ void ExprCallUnary::dump(DumpContext ctx) const {
 void Patch::dump(DumpContext ctx) const {
     ctx.line("Patch");
     auto c = ctx.child();
+    dump_expr_common(*this, c);
     c.line("Offset: " + int_to_hex(offset) + ", Size: " + int_to_hex(size));
 
     if (is_constant) {

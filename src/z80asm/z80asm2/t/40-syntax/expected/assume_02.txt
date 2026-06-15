@@ -18,33 +18,51 @@ Program
         Bytes: $21 0 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/assume_02.asm:1:2
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 3
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: 1
+                        Location: t/40-syntax/input/assume_02.asm:1:9
+                        Value type: Unknown
+                        Tokens: 1
     OpcodeStmt
         Location: t/40-syntax/input/assume_02.asm:3:2
         Address: 0
         Bytes: $21 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/assume_02.asm:3:2
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: 1
+                        Location: t/40-syntax/input/assume_02.asm:3:9
+                        Value type: Unknown
+                        Tokens: 1
     OpcodeStmt
         Location: t/40-syntax/input/assume_02.asm:5:2
         Address: 0
         Bytes: $21 0 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/assume_02.asm:5:2
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 3
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: 1
+                        Location: t/40-syntax/input/assume_02.asm:5:9
+                        Value type: Unknown
+                        Tokens: 1

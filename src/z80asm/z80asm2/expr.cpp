@@ -545,10 +545,17 @@ void ExprSem::error_missing_colon(const ParseLine& pline) const {
 
 std::unique_ptr<Expr> parse_expr_ast(ParseLine& pline,
                                      ParseStatus& status) {
+    size_t expr_start = pline.pos;
     ExprSem sem;
     if (!parse_full_expr(pline, sem, status)) {
         return nullptr; // error already reported
     }
+    size_t expr_end = pline.pos;
 
-    return sem.result();
+    std::unique_ptr<Expr> expr = sem.result();
+    expr->tokens.insert(expr->tokens.end(),
+                        pline.tokens.begin() + expr_start,
+                        pline.tokens.begin() + expr_end);
+
+    return expr;
 }
