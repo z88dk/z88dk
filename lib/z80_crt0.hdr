@@ -136,6 +136,10 @@
 	EXTERN	l_mod		;Integer % (for gbz80) hl=de%hl
 	EXTERN	l_mod_u		;Integer unsigned % (for gbz80)
 
+
+    EXTERN  l_lsr_dehl  ;Shift dehl by a
+    EXTERN  l_lsl_dehl  ;Shift dehl by a
+
 ;------------------
 ;Long functions now
 ;------------------
