@@ -53,22 +53,37 @@ Program
         Bytes: $3E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:5:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprBinary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:5:9
+                        Value type: Unknown
+                        Tokens: b+1
                         LHS:
                             ExprSymbol: b
+                                Location: t/40-syntax/input/opcodes_01.asm:5:7
+                                Value type: Unknown
+                                Tokens: 
                         RHS:
                             ExprLiteralInt: 1
+                                Location: t/40-syntax/input/opcodes_01.asm:5:9
+                                Value type: Unknown
+                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:6:1
         Address: 0
         Bytes: $76 $DB $DD $CB 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:6:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 5, Size: 1
                 Constant patch
                 Type: Unsigned
@@ -77,6 +92,9 @@ Program
                 Coefficients: $46, 8
                 Inner expression:
                     ExprLiteralInt: 0
+                        Location: t/40-syntax/input/opcodes_01.asm:6:14
+                        Value type: Unknown
+                        Tokens: 0
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:7:1
         Address: 0
@@ -88,6 +106,9 @@ Program
         Bytes: $ED $10 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:8:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 1
                 Type: PCrelative
                 Validation: Any
@@ -96,12 +117,18 @@ Program
                 Alt bytes: $0B $C2 0 0
                 Inner expression:
                     ExprSymbol: label
+                        Location: t/40-syntax/input/opcodes_01.asm:8:7
+                        Value type: Unknown
+                        Tokens: label
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:11:1
         Address: 0
         Bytes: $CB 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:11:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Constant patch
                 Type: Unsigned
@@ -110,12 +137,18 @@ Program
                 Coefficients: $47, 8
                 Inner expression:
                     ExprLiteralInt: 0
+                        Location: t/40-syntax/input/opcodes_01.asm:11:5
+                        Value type: Unknown
+                        Tokens: 0
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:12:1
         Address: 0
         Bytes: 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:12:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 0, Size: 1
                 Constant patch
                 Type: Unsigned
@@ -124,12 +157,18 @@ Program
                 Coefficients: $C7
                 Inner expression:
                     ExprLiteralInt: $20
+                        Location: t/40-syntax/input/opcodes_01.asm:12:5
+                        Value type: Unknown
+                        Tokens: $20
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:13:1
         Address: 0
         Bytes: $DD 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:13:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Constant patch
                 Type: Unsigned
@@ -138,12 +177,18 @@ Program
                 Coefficients: $67, 1
                 Inner expression:
                     ExprLiteralInt: 4
+                        Location: t/40-syntax/input/opcodes_01.asm:13:4
+                        Value type: Unknown
+                        Tokens: 4
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:14:1
         Address: 0
         Bytes: $DD 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:14:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Constant patch
                 Type: Unsigned
@@ -152,12 +197,18 @@ Program
                 Coefficients: 8, $4F, $47
                 Inner expression:
                     ExprLiteralInt: 8
+                        Location: t/40-syntax/input/opcodes_01.asm:14:5
+                        Value type: Unknown
+                        Tokens: 8
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:17:1
         Address: 0
         Bytes: $DD 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:17:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Constant patch
                 Type: Unsigned
@@ -166,68 +217,128 @@ Program
                 Coefficients: 8, $4F, $47
                 Inner expression:
                     ExprLiteralInt: 1
+                        Location: t/40-syntax/input/opcodes_01.asm:17:5
+                        Value type: Unknown
+                        Tokens: 1
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:18:1
         Address: 0
         Bytes: $3E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:18:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprBinary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:18:9
+                        Value type: Unknown
+                        Tokens: 1+2*3
                         LHS:
                             ExprLiteralInt: 1
+                                Location: t/40-syntax/input/opcodes_01.asm:18:7
+                                Value type: Unknown
+                                Tokens: 
                         RHS:
                             ExprBinary: *
+                                Location: t/40-syntax/input/opcodes_01.asm:18:11
+                                Value type: Unknown
+                                Tokens: 
                                 LHS:
                                     ExprLiteralInt: 2
+                                        Location: t/40-syntax/input/opcodes_01.asm:18:9
+                                        Value type: Unknown
+                                        Tokens: 
                                 RHS:
                                     ExprLiteralInt: 3
+                                        Location: t/40-syntax/input/opcodes_01.asm:18:11
+                                        Value type: Unknown
+                                        Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:19:1
         Address: 0
         Bytes: $3A 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:19:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprBinary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:19:10
+                        Value type: Unknown
+                        Tokens: 1+2*3
                         LHS:
                             ExprLiteralInt: 1
+                                Location: t/40-syntax/input/opcodes_01.asm:19:8
+                                Value type: Unknown
+                                Tokens: 
                         RHS:
                             ExprBinary: *
+                                Location: t/40-syntax/input/opcodes_01.asm:19:12
+                                Value type: Unknown
+                                Tokens: 
                                 LHS:
                                     ExprLiteralInt: 2
+                                        Location: t/40-syntax/input/opcodes_01.asm:19:10
+                                        Value type: Unknown
+                                        Tokens: 
                                 RHS:
                                     ExprLiteralInt: 3
+                                        Location: t/40-syntax/input/opcodes_01.asm:19:12
+                                        Value type: Unknown
+                                        Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:20:1
         Address: 0
         Bytes: $DD $7E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:20:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 1
                 Type: Signed
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprBinary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:20:13
+                        Value type: Unknown
+                        Tokens: +1+2*3
                         LHS:
                             ExprUnary: +
+                                Location: t/40-syntax/input/opcodes_01.asm:20:10
+                                Value type: Unknown
+                                Tokens: 
                                 RHS:
                                     ExprLiteralInt: 1
+                                        Location: t/40-syntax/input/opcodes_01.asm:20:11
+                                        Value type: Unknown
+                                        Tokens: 
                         RHS:
                             ExprBinary: *
+                                Location: t/40-syntax/input/opcodes_01.asm:20:15
+                                Value type: Unknown
+                                Tokens: 
                                 LHS:
                                     ExprLiteralInt: 2
+                                        Location: t/40-syntax/input/opcodes_01.asm:20:13
+                                        Value type: Unknown
+                                        Tokens: 
                                 RHS:
                                     ExprLiteralInt: 3
+                                        Location: t/40-syntax/input/opcodes_01.asm:20:15
+                                        Value type: Unknown
+                                        Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:21:1
         Address: 0
@@ -242,12 +353,18 @@ Program
         Bytes: $ED $A5 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:25:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: $1234
+                        Location: t/40-syntax/input/opcodes_01.asm:25:6
+                        Value type: Unknown
+                        Tokens: $1234
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:26:1
         Address: 0
@@ -255,6 +372,9 @@ Program
         Bytes: $18 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:26:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: PCrelative
                 Validation: Any
@@ -263,6 +383,9 @@ Program
                 Alt bytes: $C3 0 0
                 Inner expression:
                     ExprSymbol: label
+                        Location: t/40-syntax/input/opcodes_01.asm:26:4
+                        Value type: Unknown
+                        Tokens: label
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:27:1
         Address: 0
@@ -270,6 +393,9 @@ Program
         Bytes: $30 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:27:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: PCrelative
                 Validation: Any
@@ -278,12 +404,18 @@ Program
                 Alt bytes: $D2 0 0
                 Inner expression:
                     ExprSymbol: label
+                        Location: t/40-syntax/input/opcodes_01.asm:27:8
+                        Value type: Unknown
+                        Tokens: label
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:28:1
         Address: 0
         Bytes: $98 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:28:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 2
                 Type: PCrelative
                 Validation: Any
@@ -291,60 +423,120 @@ Program
                 Short jump (alt offset: 0, alt size: 0)
                 Inner expression:
                     ExprSymbol: label
+                        Location: t/40-syntax/input/opcodes_01.asm:28:5
+                        Value type: Unknown
+                        Tokens: label
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:29:1
         Address: 0
         Bytes: $DD $71 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:29:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 1
                 Type: Signed
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprUnary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:29:6
+                        Value type: Unknown
+                        Tokens: +(+1+2*3)
                         RHS:
                             ExprBinary: +
+                                Location: t/40-syntax/input/opcodes_01.asm:29:10
+                                Value type: Unknown
+                                Tokens: 
                                 LHS:
                                     ExprUnary: +
+                                        Location: t/40-syntax/input/opcodes_01.asm:29:7
+                                        Value type: Unknown
+                                        Tokens: 
                                         RHS:
                                             ExprLiteralInt: 1
+                                                Location: t/40-syntax/input/opcodes_01.asm:29:8
+                                                Value type: Unknown
+                                                Tokens: 
                                 RHS:
                                     ExprBinary: *
+                                        Location: t/40-syntax/input/opcodes_01.asm:29:12
+                                        Value type: Unknown
+                                        Tokens: 
                                         LHS:
                                             ExprLiteralInt: 2
+                                                Location: t/40-syntax/input/opcodes_01.asm:29:10
+                                                Value type: Unknown
+                                                Tokens: 
                                         RHS:
                                             ExprLiteralInt: 3
+                                                Location: t/40-syntax/input/opcodes_01.asm:29:12
+                                                Value type: Unknown
+                                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:29:1
         Address: 0
         Bytes: $DD $70 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:29:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 1
                 Type: Signed
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprUnary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:29:6
+                        Value type: Unknown
+                        Tokens: +signed8((+1+2*3)+1)
                         RHS:
                             ExprCallUnary: SIGNED8
+                                Location: t/40-syntax/input/opcodes_01.asm:29:7
+                                Value type: Unknown
+                                Tokens: 
                                 Arg:
                                     ExprBinary: +
+                                        Location: t/40-syntax/input/opcodes_01.asm:29:15
+                                        Value type: Unknown
+                                        Tokens: 
                                         LHS:
                                             ExprBinary: +
+                                                Location: t/40-syntax/input/opcodes_01.asm:29:10
+                                                Value type: Unknown
+                                                Tokens: 
                                                 LHS:
                                                     ExprUnary: +
+                                                        Location: t/40-syntax/input/opcodes_01.asm:29:7
+                                                        Value type: Unknown
+                                                        Tokens: 
                                                         RHS:
                                                             ExprLiteralInt: 1
+                                                                Location: t/40-syntax/input/opcodes_01.asm:29:8
+                                                                Value type: Unknown
+                                                                Tokens: 
                                                 RHS:
                                                     ExprBinary: *
+                                                        Location: t/40-syntax/input/opcodes_01.asm:29:12
+                                                        Value type: Unknown
+                                                        Tokens: 
                                                         LHS:
                                                             ExprLiteralInt: 2
+                                                                Location: t/40-syntax/input/opcodes_01.asm:29:10
+                                                                Value type: Unknown
+                                                                Tokens: 
                                                         RHS:
                                                             ExprLiteralInt: 3
+                                                                Location: t/40-syntax/input/opcodes_01.asm:29:12
+                                                                Value type: Unknown
+                                                                Tokens: 
                                         RHS:
                                             ExprLiteralInt: 1
+                                                Location: t/40-syntax/input/opcodes_01.asm:29:15
+                                                Value type: Unknown
+                                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:30:1
         Address: 0
@@ -355,24 +547,48 @@ Program
         Bytes: $21 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:30:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprCallUnary: UNSIGNED8
+                        Location: t/40-syntax/input/opcodes_01.asm:30:6
+                        Value type: Unknown
+                        Tokens: unsigned8(+1+2*3)
                         Arg:
                             ExprBinary: +
+                                Location: t/40-syntax/input/opcodes_01.asm:30:13
+                                Value type: Unknown
+                                Tokens: 
                                 LHS:
                                     ExprUnary: +
+                                        Location: t/40-syntax/input/opcodes_01.asm:30:10
+                                        Value type: Unknown
+                                        Tokens: 
                                         RHS:
                                             ExprLiteralInt: 1
+                                                Location: t/40-syntax/input/opcodes_01.asm:30:11
+                                                Value type: Unknown
+                                                Tokens: 
                                 RHS:
                                     ExprBinary: *
+                                        Location: t/40-syntax/input/opcodes_01.asm:30:15
+                                        Value type: Unknown
+                                        Tokens: 
                                         LHS:
                                             ExprLiteralInt: 2
+                                                Location: t/40-syntax/input/opcodes_01.asm:30:13
+                                                Value type: Unknown
+                                                Tokens: 
                                         RHS:
                                             ExprLiteralInt: 3
+                                                Location: t/40-syntax/input/opcodes_01.asm:30:15
+                                                Value type: Unknown
+                                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:30:1
         Address: 0
@@ -395,74 +611,125 @@ Program
         Bytes: $3A 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:33:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprBinary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:33:10
+                        Value type: Unknown
+                        Tokens: b+c
                         LHS:
                             ExprSymbol: b
+                                Location: t/40-syntax/input/opcodes_01.asm:33:8
+                                Value type: Unknown
+                                Tokens: 
                         RHS:
                             ExprSymbol: c
+                                Location: t/40-syntax/input/opcodes_01.asm:33:10
+                                Value type: Unknown
+                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:34:1
         Address: 0
         Bytes: $3E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:34:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprUnary: -
+                        Location: t/40-syntax/input/opcodes_01.asm:34:7
+                        Value type: Unknown
+                        Tokens: -1
                         RHS:
                             ExprLiteralInt: 1
+                                Location: t/40-syntax/input/opcodes_01.asm:34:8
+                                Value type: Unknown
+                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:35:1
         Address: 0
         Bytes: $3E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:35:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprUnary: ~
+                        Location: t/40-syntax/input/opcodes_01.asm:35:7
+                        Value type: Unknown
+                        Tokens: ~1
                         RHS:
                             ExprLiteralInt: 1
+                                Location: t/40-syntax/input/opcodes_01.asm:35:8
+                                Value type: Unknown
+                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:36:1
         Address: 0
         Bytes: $DD $7E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:36:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 1
                 Type: Signed
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprUnary: -
+                        Location: t/40-syntax/input/opcodes_01.asm:36:10
+                        Value type: Unknown
+                        Tokens: -3
                         RHS:
                             ExprLiteralInt: 3
+                                Location: t/40-syntax/input/opcodes_01.asm:36:11
+                                Value type: Unknown
+                                Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:37:1
         Address: 0
         Bytes: $FD $7E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:37:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 2, Size: 1
                 Type: Signed
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprUnary: +
+                        Location: t/40-syntax/input/opcodes_01.asm:37:10
+                        Value type: Unknown
+                        Tokens: +(-2)
                         RHS:
                             ExprUnary: -
+                                Location: t/40-syntax/input/opcodes_01.asm:37:12
+                                Value type: Unknown
+                                Tokens: 
                                 RHS:
                                     ExprLiteralInt: 2
+                                        Location: t/40-syntax/input/opcodes_01.asm:37:13
+                                        Value type: Unknown
+                                        Tokens: 
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:38:1
         Address: 0
@@ -477,12 +744,18 @@ Program
         Bytes: $C3 0 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:40:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 2
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: $4D2
+                        Location: t/40-syntax/input/opcodes_01.asm:40:5
+                        Value type: Unknown
+                        Tokens: ($4D2)
     OpcodeStmt
         Location: t/40-syntax/input/opcodes_01.asm:41:1
         Address: 0
@@ -497,9 +770,15 @@ Program
         Bytes: $3E 0
         Patches:
             Patch
+                Location: t/40-syntax/input/opcodes_01.asm:43:1
+                Value type: Unknown
+                Tokens: 
                 Offset: 1, Size: 1
                 Type: Unsigned
                 Validation: Any
                 Formula: None
                 Inner expression:
                     ExprLiteralInt: $1234
+                        Location: t/40-syntax/input/opcodes_01.asm:43:7
+                        Value type: Unknown
+                        Tokens: $1234
