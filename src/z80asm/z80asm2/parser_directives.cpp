@@ -96,11 +96,11 @@ std::unique_ptr<Stmt> Parser::parse_directive(ParseLine& pline,
 
 // Helper to parse comma-separated list of identifiers for symbol declarations
 static std::unique_ptr<Stmt> parse_symbol_declare_list(
-    SymbolDeclareStmt::Type type,
+    SymbolDeclareType type,
     ParseLine& pline,
     const SourceLoc& loc,
     ParseStatus& status) {
-    std::vector<StringInterner::Id> name_ids;
+    std::vector<SymbolRef> names;
 
     while (true) {
         if (pline.peek().type != TokenType::Identifier) {
@@ -109,7 +109,8 @@ static std::unique_ptr<Stmt> parse_symbol_declare_list(
             return nullptr;
         }
         auto name_id = pline.peek().text_id;
-        name_ids.push_back(name_id);
+        auto name_loc = pline.peek().loc;
+        names.push_back({name_id, name_loc});
         pline.advance(); // consume identifier
 
         if (pline.peek().type == TokenType::Comma) {
@@ -120,24 +121,24 @@ static std::unique_ptr<Stmt> parse_symbol_declare_list(
         }
     }
 
-    return std::make_unique<SymbolDeclareStmt>(type, name_ids, loc);
+    return std::make_unique<SymbolDeclareStmt>(type, names, loc);
 }
 
 std::unique_ptr<Stmt> Parser::parse_EXTERN(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    return parse_symbol_declare_list(SymbolDeclareStmt::Type::Extern, pline, loc,
+    return parse_symbol_declare_list(SymbolDeclareType::Extern, pline, loc,
                                      status);
 }
 
 std::unique_ptr<Stmt> Parser::parse_PUBLIC(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    return parse_symbol_declare_list(SymbolDeclareStmt::Type::Public, pline, loc,
+    return parse_symbol_declare_list(SymbolDeclareType::Public, pline, loc,
                                      status);
 }
 
 std::unique_ptr<Stmt> Parser::parse_GLOBAL(ParseLine& pline,
         const SourceLoc& loc, ParseStatus& status) {
-    return parse_symbol_declare_list(SymbolDeclareStmt::Type::Global, pline, loc,
+    return parse_symbol_declare_list(SymbolDeclareType::Global, pline, loc,
                                      status);
 }
 

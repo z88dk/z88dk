@@ -6,10 +6,11 @@
   symbol	__CPU_Z80__	1	(defined at )
   symbol	__CPU_ZILOG__	1	(defined at )
   symbol	__FLOAT_GENMATH__	1	(defined at )
+- Add BASIC { ... } to assemble BASIC tokens for zx81, zx
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)
-- [x] Line?continuation joining (backslash at end of line)
+- [x] Line-continuation joining (backslash at end of line)
 - [x] Macro expansion (object?like, function?like, variadic, recursive)
 - [x] Conditional?assembly evaluation (#if/#elif/#else/#endif)
 - [x] Include resolution and file?stack management
@@ -17,10 +18,13 @@
 - [x] High-Level-Assembly constructs
 - [x] Synthetic?opcode expansion
 - [x] Output of preprocessed text with -E option
-- [ ] AST construction for instructions and expressions
+- [x] AST construction for instructions and expressions
+- [x] Module and segment-switching annotation
+- [ ] Resolution of local labels
+- [x] Collection of symbols into symbol tables
+- [x] Resolution of symbols used in expressions
+- [x] Resolution of GLOBAL, detecion of undefined symbols
 - [ ] AST validation and semantic checks
-- [ ] Module and segment?switching annotation
-- [ ] Collection of symbols into symbol tables
 - [ ] Size computation and JR promotion (iterative until stable)
 - [ ] Freeze of segment offsets
 - [ ] Fixup classification (absolute / relocatable / external)
@@ -72,7 +76,7 @@ t/05-cli/timestamp_selection.t
 t/05-cli/input/
 t/05-cli/expected/
 
-t/05-expr/
+t/10-expr/
 
 t/10-lex/
 t/10-lex/identifiers.t

@@ -1,0 +1,12 @@
+% z88dk-z80asm -v -dump-after-symbol-collection t/45-symbols//input/decl_matrix_9D.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/45-symbols/input/decl_matrix_9D.asm...
+t/45-symbols/input/decl_matrix_9D.asm:3:11: error: Undefined symbol: x
+        ld a,(x)
+              ^
+t/45-symbols/input/decl_matrix_9D.asm:2:12: error: Undefined symbol: x
+        public x
+               ^
+Assembly completed with 2 errors

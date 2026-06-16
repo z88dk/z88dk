@@ -19,6 +19,7 @@ dump_after_hla_expansion	0
 dump_after_synth_expansion	0
 dump_after_preprocessing	0
 dump_after_parse	0
+dump_after_symbol_collection	0
 m4_options	
 perl_options	
 cpp_options	

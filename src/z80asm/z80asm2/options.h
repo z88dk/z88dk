@@ -52,6 +52,7 @@ struct Options {
     bool dump_after_synth_expansion = false;
     bool dump_after_preprocessing = false;
     bool dump_after_parse = false;
+    bool dump_after_symbol_collection = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;
@@ -63,7 +64,6 @@ struct Options {
 struct Args {
     Options options;
     std::vector<std::string> input_files;   // command line input files
-    std::vector<std::string> obj_files;     // resulting object files
 
     // parse arguments and options
     void parse_arg(std::string_view arg,

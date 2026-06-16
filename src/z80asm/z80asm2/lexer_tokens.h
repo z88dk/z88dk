@@ -20,6 +20,9 @@ enum class TokenType : uint8_t {
 #include "lexer_tokens.def"
 };
 
+// convert a text to identifier, replacing invalid chars by '_'
+std::string make_ident(const std::string& text);
+
 std::string to_string(TokenType token_type);
 
 struct Token {

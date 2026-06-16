@@ -16,38 +16,43 @@ t/40-syntax/input/defc_01.asm:3:9: error: Unterminated expression after "="
 t/40-syntax/input/defc_01.asm:5:12: error: Unterminated expression after "+"
     defc a1 = 1+
                ^
-Program
-    DefcStmt
-        Location: t/40-syntax/input/defc_01.asm:4:1
-        Name: a1
-        Expression:
-            ExprLiteralInt: 1
-                Location: t/40-syntax/input/defc_01.asm:4:11
-                Value type: Unknown
-                Tokens: 1
-    DefcStmt
-        Location: t/40-syntax/input/defc_01.asm:6:1
-        Name: a1
-        Expression:
-            ExprSymbol: a2
-                Location: t/40-syntax/input/defc_01.asm:6:11
-                Value type: Unknown
-                Tokens: a2
-    DefcStmt
-        Location: t/40-syntax/input/defc_01.asm:7:1
-        Name: a1
-        Expression:
-            ExprBinary: +
-                Location: t/40-syntax/input/defc_01.asm:7:14
-                Value type: Unknown
-                Tokens: a2+a3
-                LHS:
-                    ExprSymbol: a2
-                        Location: t/40-syntax/input/defc_01.asm:7:11
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprSymbol: a3
-                        Location: t/40-syntax/input/defc_01.asm:7:14
-                        Value type: Unknown
-                        Tokens: 
+Program: defc_01
+    Modules:
+        Module: defc_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        DefcStmt
+            Location: t/40-syntax/input/defc_01.asm:4:1
+            Name: a1
+            Expression:
+                ExprLiteralInt: 1
+                    Location: t/40-syntax/input/defc_01.asm:4:11
+                    Value type: Unknown
+                    Tokens: 1
+        DefcStmt
+            Location: t/40-syntax/input/defc_01.asm:6:1
+            Name: a1
+            Expression:
+                ExprSymbol: a2
+                    Location: t/40-syntax/input/defc_01.asm:6:11
+                    Value type: Unknown
+                    Tokens: a2
+        DefcStmt
+            Location: t/40-syntax/input/defc_01.asm:7:1
+            Name: a1
+            Expression:
+                ExprBinary: +
+                    Location: t/40-syntax/input/defc_01.asm:7:14
+                    Value type: Unknown
+                    Tokens: a2+a3
+                    LHS:
+                        ExprSymbol: a2
+                            Location: t/40-syntax/input/defc_01.asm:7:11
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprSymbol: a3
+                            Location: t/40-syntax/input/defc_01.asm:7:14
+                            Value type: Unknown
+                            Tokens: 

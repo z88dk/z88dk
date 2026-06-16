@@ -14,10 +14,19 @@
 #include <iostream>
 #include <memory>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
+using uint = unsigned int;
+
+struct Section;
+struct Stmt;
+struct SymbolInfo;
+
+//-----------------------------------------------------------------------------
 // helper for dumping AST in a readable format
+//-----------------------------------------------------------------------------
 struct DumpContext {
     std::ostream& os;
     int indent{0};
@@ -27,7 +36,9 @@ struct DumpContext {
     DumpContext child() const;
 };
 
+//-----------------------------------------------------------------------------
 // class for evaluated expressions
+//-----------------------------------------------------------------------------
 enum class ExprType {
     Unknown,         // not evaluated yet
     Constant,        // fully resolved integer
@@ -42,21 +53,25 @@ struct ExprValue {
     int const_value = 0;
 
     // valid when AddressRelative
-    StringInterner::Id section_name_id = 0;
-    int offset = 0;
+    Section* section = nullptr;
+    uint offset = 0;
 
     // valid when Computed
     std::vector<Token> expr_tokens; // original expression
 };
 
-// base class for all AST nodes
-struct AstNode {
-    virtual ~AstNode() = default;
+//-----------------------------------------------------------------------------
+// base class for all tree nodes
+//-----------------------------------------------------------------------------
+struct TreeNode {
+    virtual ~TreeNode() = default;
     virtual void dump(DumpContext ctx) const = 0;
 };
 
+//-----------------------------------------------------------------------------
 // base class for all expressions
-struct Expr : AstNode {
+//-----------------------------------------------------------------------------
+struct Expr : public TreeNode {
     SourceLoc loc;
     ExprValue value;                // evaluated value, if available
     std::vector<Token> tokens;      // original expression
@@ -64,52 +79,60 @@ struct Expr : AstNode {
     Expr(const SourceLoc& loc_) : loc(loc_) {}
 };
 
-struct ExprLiteralInt : Expr {
+struct ExprLiteralInt : public Expr {
     int value;
 
     ExprLiteralInt(int v, const SourceLoc& loc) : Expr(loc), value(v) {}
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprLiteralFloat : Expr {
+struct ExprLiteralFloat : public Expr {
     double value;
 
     ExprLiteralFloat(double v, const SourceLoc& loc) : Expr(loc), value(v) {}
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprLiteralAsmpc : Expr {
+struct ExprLiteralAsmpc : public Expr {
     ExprLiteralAsmpc(const SourceLoc& loc) : Expr(loc) {}
+    Stmt* stmt = nullptr;  // pointer to the statement that generated this asmpc
+
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprSymbol : Expr {
+struct ExprSymbol : public Expr {
     StringInterner::Id name_id;
+    SymbolInfo* symbol = nullptr;  // pointer to the symbol info
+
     ExprSymbol(StringInterner::Id name_id_, const SourceLoc& loc) : Expr(loc),
         name_id(name_id_) {}
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprLocalLabel : Expr {
+struct ExprLocalLabel : public Expr {
     StringInterner::Id name_id;
     size_t at_pos;  // position of '@' in the original identifier
+    SymbolInfo* symbol = nullptr;  // pointer to the symbol info
+
     ExprLocalLabel(StringInterner::Id name_id_, size_t at_pos_,
                    const SourceLoc& loc)
         : Expr(loc), name_id(name_id_), at_pos(at_pos_) {}
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprUnary : Expr {
+struct ExprUnary : public Expr {
     TokenType op;
     std::unique_ptr<Expr> rhs;
+
     ExprUnary(TokenType op_, std::unique_ptr<Expr> rhs_, const SourceLoc& loc)
         : Expr(loc), op(op_), rhs(std::move(rhs_)) {}
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprBinary : Expr {
+struct ExprBinary : public Expr {
     TokenType op;
     std::unique_ptr<Expr> lhs, rhs;
+
     ExprBinary(TokenType op_, std::unique_ptr<Expr> lhs_,
                std::unique_ptr<Expr> rhs_,
                const SourceLoc& loc)
@@ -117,8 +140,9 @@ struct ExprBinary : Expr {
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprTernary : Expr {
+struct ExprTernary : public Expr {
     std::unique_ptr<Expr> cond, then_expr, else_expr;
+
     ExprTernary(std::unique_ptr<Expr> c, std::unique_ptr<Expr> t,
                 std::unique_ptr<Expr> e,
                 const SourceLoc& loc)
@@ -127,9 +151,10 @@ struct ExprTernary : Expr {
     void dump(DumpContext ctx) const override;
 };
 
-struct ExprCallUnary : Expr {
+struct ExprCallUnary : public Expr {
     Keyword keyword;
     std::unique_ptr<Expr> arg;
+
     ExprCallUnary(Keyword keyword_, std::unique_ptr<Expr> arg_,
                   const SourceLoc& loc)
         : Expr(loc), keyword(keyword_), arg(std::move(arg_)) {}
@@ -153,28 +178,28 @@ enum class CheckRange : uint8_t {
 
 // formula for constant expression patching in opcodes
 enum class ExprFormula : uint8_t {
-    None,                           // no patching needed
-    ScaleBelowThreshold,            // A+(%c<8?%c*8:%c), followed by A
-    AddScaled,                      // A+B*%c, followed by A, B
-    SelectOrAdd,                    // %c==A?B:C+%c, followed by A, B, C
-    Select2,                        // %c==A?B:%c==C?D:E, followed by A, B, C, D, E
-    Select3,                        // %c==A?B:%c==C?D:%c==E?F:G, followed by A, B, C, D, E, F, G
+    None,                   // no patching needed
+    ScaleBelowThreshold,    // A+(%c<8?%c*8:%c), followed by A
+    AddScaled,              // A+B*%c, followed by A, B
+    SelectOrAdd,            // %c==A?B:C+%c, followed by A, B, C
+    Select2,                // %c==A?B:%c==C?D:E, followed by A, B, C, D, E
+    Select3,                // %c==A?B:%c==C?D:%c==E?F:G, followed by A, B, C, D, E, F, G
 };
 
 // type of patch
 enum class PatchType : uint8_t {
-    Unsigned,                       // unsigned, default
-    Signed,                         // signed
-    HighByte,                       // ldh a, (%h) of gbz80
-    BigEndian,                      // push %M of z80n
-    PCrelative,                     // JR or JRE
+    Unsigned,               // unsigned, default
+    Signed,                 // signed
+    HighByte,               // ldh a, (%h) of gbz80
+    BigEndian,              // push %M of z80n
+    PCrelative,             // JR or JRE
 };
 
 // class for patches
-struct Patch : Expr {
+struct Patch : public Expr {
     virtual ~Patch();
 
-    std::unique_ptr<Expr> inner;    // inner expression
+    std::unique_ptr<Expr> inner;    // expression
     size_t offset = 0;              // offset into opcode
     size_t size = 0;                // byte width of expression
 
@@ -200,8 +225,10 @@ struct Patch : Expr {
     void dump(DumpContext ctx) const override;
 };
 
+//-----------------------------------------------------------------------------
 // base class for all statements
-struct Stmt : AstNode {
+//-----------------------------------------------------------------------------
+struct Stmt : public TreeNode {
     SourceLoc loc;
 
     Stmt(const SourceLoc& loc_) : loc(loc_) {}
@@ -210,7 +237,8 @@ struct Stmt : AstNode {
 };
 
 struct OpcodeStmt : Stmt {
-    uint32_t address = 0;           // defined after layout
+    Section* section = nullptr;     // section where opcode is located
+    uint address = 0;               // address of opcode
     bool is_short_jump = false;     // true if patches has a short jump
 
     // opcode bytes, including placeholders for expressions
@@ -222,11 +250,14 @@ struct OpcodeStmt : Stmt {
 };
 
 struct LabelStmt : Stmt {
-    StringInterner::Id text_id;
+    StringInterner::Id name_id;
+    Section* section = nullptr; // section where label is located
+    uint address = 0;       // address of label
     bool is_local = false;  // whether this is a local label (has '@')
     size_t at_pos = 0;      // position of '@' in the original identifier, if local
+    SymbolInfo* symbol = nullptr; // symbol info for this label
 
-    LabelStmt(StringInterner::Id text_id_, const SourceLoc& loc_);
+    LabelStmt(StringInterner::Id name_id_, const SourceLoc& loc_);
     virtual ~LabelStmt() = default;
     void dump(DumpContext ctx) const override;
 };
@@ -243,6 +274,8 @@ struct OrgStmt : Stmt {
 struct DefcStmt : Stmt {
     StringInterner::Id name_id;
     std::unique_ptr<Expr> expr;
+    Section* section = nullptr;
+    SymbolInfo* symbol = nullptr; // symbol info for this defc
 
     DefcStmt(StringInterner::Id name_id_,
              std::unique_ptr<Expr> e, const SourceLoc& loc)
@@ -284,6 +317,7 @@ struct AlignStmt : Stmt {
 struct DefsNumericStmt : Stmt {
     std::unique_ptr<Expr> size_expr;
     std::unique_ptr<Expr> filler_expr;
+    Section* section = nullptr;
 
     DefsNumericStmt(std::unique_ptr<Expr> size_expr_,
                     std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
@@ -295,9 +329,9 @@ struct DefsNumericStmt : Stmt {
 
 struct DefsStringStmt : Stmt {
     std::unique_ptr<Expr> size_expr;
-    StringInterner::Id
-    string_id;    // string literal to fill with, interned as an ID
+    StringInterner::Id string_id;    // string literal to fill with
     uint8_t filler_byte;
+    Section* section = nullptr;
 
     DefsStringStmt(std::unique_ptr<Expr> size_expr_,
                    StringInterner::Id string_id_, uint8_t filler_byte_, const SourceLoc& loc)
@@ -307,21 +341,30 @@ struct DefsStringStmt : Stmt {
     void dump(DumpContext ctx) const override;
 };
 
-struct SymbolDeclareStmt : Stmt {
-    enum class Type : uint8_t { Extern, Public, Global };
-    Type type;
-    std::vector<StringInterner::Id> name_ids;
+enum class SymbolDeclareType : uint8_t {
+    Extern, Public, Global,
+};
 
-    SymbolDeclareStmt(Type type_,
-                      const std::vector<StringInterner::Id>& name_ids_,
+struct SymbolRef {
+    StringInterner::Id id;
+    SourceLoc loc;
+};
+
+struct SymbolDeclareStmt : Stmt {
+    SymbolDeclareType type;
+    std::vector<SymbolRef> names;
+
+    SymbolDeclareStmt(SymbolDeclareType type_,
+                      const std::vector<SymbolRef>& names_,
                       const SourceLoc& loc)
-        : Stmt(loc), type(type_), name_ids(name_ids_) {}
+        : Stmt(loc), type(type_), names(names_) {}
     virtual ~SymbolDeclareStmt() = default;
     void dump(DumpContext ctx) const override;
 };
 
 struct ListStmt : Stmt {
     bool enable;
+
     ListStmt(bool enable_, const SourceLoc& loc)
         : Stmt(loc), enable(enable_) {}
     virtual ~ListStmt() = default;
@@ -330,6 +373,7 @@ struct ListStmt : Stmt {
 
 struct PhaseStmt : Stmt {
     std::unique_ptr<Expr> expr;
+    Section* section = nullptr;
 
     PhaseStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
@@ -338,16 +382,106 @@ struct PhaseStmt : Stmt {
 };
 
 struct DephaseStmt : Stmt {
+    Section* section = nullptr;
+
     DephaseStmt(const SourceLoc& loc)
         : Stmt(loc) {}
     virtual ~DephaseStmt() = default;
     void dump(DumpContext ctx) const override;
 };
 
-// root of the AST
-struct Program : AstNode {
+//-----------------------------------------------------------------------------
+// symbols
+//-----------------------------------------------------------------------------
+struct SymbolDeclare {
+    StringInterner::Id name_id = 0;         // name of symbol
+    SymbolDeclareType type = SymbolDeclareType::Extern; // type of declaration
+    SourceLoc loc;                          // location where declared
+    bool saw_extern = false;
+    bool saw_public = false;
+    bool saw_global = false;
+
+    SymbolDeclare() = default;
+    SymbolDeclare(StringInterner::Id name_id_, SymbolDeclareType type_,
+                  const SourceLoc& loc_) :
+        name_id(name_id_), type(type_), loc(loc_) {}
+};
+
+struct SymbolInfo : public TreeNode {
+    enum class SymbolType : uint8_t {
+        Undefined, Constant, Label, Defc,
+    };
+
+    StringInterner::Id name_id = 0;         // name of symbol
+    SymbolType type = SymbolType::Undefined;// type of symbol
+    SourceLoc loc;                          // location where defined
+
+    // for constant symbols
+    int const_value = 0;
+
+    // for label and defc symbols
+    Section* section = nullptr;     // section where opcode is located
+    Stmt* stmt = nullptr;           // pointer to statement
+
+    // for defc symbols
+    Expr* defc_expr = nullptr;      // expression for defc value
+
+    SymbolInfo(StringInterner::Id name_id_, SymbolType type_, const SourceLoc& loc_)
+        : name_id(name_id_), type(type_), loc(loc_) {}
+    virtual ~SymbolInfo() = default;
+    void dump(DumpContext ctx) const override;
+};
+
+//-----------------------------------------------------------------------------
+// sections
+//-----------------------------------------------------------------------------
+static const std::string_view DEFAULT_SECTION = "";
+
+struct Section : public TreeNode {
+    StringInterner::Id name_id = 0;         // name of section
+    std::vector<Stmt*> stmts;               // point to statemens of section
+    bool has_opcodes = false;               // to signal if a section has code
+    OrgStmt* org_stmt = nullptr;            // set if section has ORG
+    AlignStmt* align_stmt = nullptr;        // set if section has ALIGN
+
+    Section(StringInterner::Id name_id_);
+    virtual ~Section() = default;
+    void dump(DumpContext ctx) const override;
+    void dump(DumpContext ctx, const Section* current) const;
+};
+
+//-----------------------------------------------------------------------------
+// modules
+//-----------------------------------------------------------------------------
+struct Module : public TreeNode {
+    StringInterner::Id name_id = 0;         // name of module
+
+    std::unordered_map<StringInterner::Id, std::unique_ptr<SymbolInfo>>
+            symbols;                            // symbol table
+    std::vector<std::unique_ptr<Section>> sections;
+    Section* cur_section = nullptr;
+
+    Module(StringInterner::Id name_id_);
+    Section* set_section(StringInterner::Id sec_name_id);
+    virtual ~Module() = default;
+    void dump(DumpContext ctx) const override;
+    void dump(DumpContext ctx, const Module* current) const;
+};
+
+//-----------------------------------------------------------------------------
+// root of the AST and Intermediate Representation
+//-----------------------------------------------------------------------------
+struct Program : public TreeNode {
+    StringInterner::Id name_id = 0;         // name of program
     std::vector<std::unique_ptr<Stmt>> stmts;
 
+    std::unordered_map<StringInterner::Id, std::unique_ptr<SymbolDeclare>>
+            declarations;
+    std::vector<std::unique_ptr<Module>> modules;
+    Module* cur_module = nullptr;
+
+    Program(StringInterner::Id name_id_);
+    Module* set_module(StringInterner::Id mod_name_id);
     virtual ~Program() = default;
     void dump(DumpContext ctx) const override;
 };

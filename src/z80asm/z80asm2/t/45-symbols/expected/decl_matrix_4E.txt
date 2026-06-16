@@ -1,0 +1,52 @@
+% z88dk-z80asm -v -dump-after-symbol-collection t/45-symbols//input/decl_matrix_4E.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/45-symbols/input/decl_matrix_4E.asm...
+Program: decl_matrix_4E
+    Declarations:
+        x: Public at t/45-symbols/input/decl_matrix_4E.asm:2:12
+    Modules:
+        Module: decl_matrix_4E (current)
+            Symbols:
+                x: Label in section 
+                    Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+            Sections:
+                Section:  (current)
+                    Has opcodes
+                    Statements:
+                        LabelStmt
+                            Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+                            Label: x
+                            Section: 
+                            Address: 0
+                            Symbol info:
+                                x: Label in section 
+                                    Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+                        OpcodeStmt
+                            Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+                            Address: 0
+                            Bytes: 0
+    Statements:
+        SymbolDeclareStmt
+            Location: t/45-symbols/input/decl_matrix_4E.asm:2:5
+            Type: Public
+            Symbols:
+                x at t/45-symbols/input/decl_matrix_4E.asm:2:12
+        SymbolDeclareStmt
+            Location: t/45-symbols/input/decl_matrix_4E.asm:3:5
+            Type: Public
+            Symbols:
+                x at t/45-symbols/input/decl_matrix_4E.asm:3:12
+        LabelStmt
+            Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+            Label: x
+            Section: 
+            Address: 0
+            Symbol info:
+                x: Label in section 
+                    Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+        OpcodeStmt
+            Location: t/45-symbols/input/decl_matrix_4E.asm:4:1
+            Address: 0
+            Bytes: 0
