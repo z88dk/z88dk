@@ -9,31 +9,36 @@ t/40-syntax/input/phase_01.asm:1:6: error: Expression expected
 t/40-syntax/input/phase_01.asm:2:9: error: Unexpected token: ","
     phase 10,
             ^
-Program
-    PhaseStmt
-        Location: t/40-syntax/input/phase_01.asm:3:1
-        Expression:
-            ExprBinary: +
-                Location: t/40-syntax/input/phase_01.asm:3:9
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/phase_01.asm:3:7
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/phase_01.asm:3:11
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/phase_01.asm:3:9
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/phase_01.asm:3:11
-                                Value type: Unknown
-                                Tokens: 
+Program: phase_01
+    Modules:
+        Module: phase_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        PhaseStmt
+            Location: t/40-syntax/input/phase_01.asm:3:1
+            Expression:
+                ExprBinary: +
+                    Location: t/40-syntax/input/phase_01.asm:3:9
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/phase_01.asm:3:7
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/phase_01.asm:3:11
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/phase_01.asm:3:9
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/phase_01.asm:3:11
+                                    Value type: Unknown
+                                    Tokens: 

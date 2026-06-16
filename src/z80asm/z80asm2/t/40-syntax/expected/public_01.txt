@@ -12,22 +12,27 @@ t/40-syntax/input/public_01.asm:2:8: error: Identifier expected
 t/40-syntax/input/public_01.asm:4:11: error: Identifier expected
     public a1,
               ^
-Program
-    SymbolDeclareStmt
-        Location: t/40-syntax/input/public_01.asm:3:1
-        Type: Public
-        Symbols:
-            a1
-    SymbolDeclareStmt
-        Location: t/40-syntax/input/public_01.asm:5:1
-        Type: Public
-        Symbols:
-            a1
-            a2
-    SymbolDeclareStmt
-        Location: t/40-syntax/input/public_01.asm:6:1
-        Type: Public
-        Symbols:
-            a1
-            a2
-            a3
+Program: public_01
+    Modules:
+        Module: public_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        SymbolDeclareStmt
+            Location: t/40-syntax/input/public_01.asm:3:1
+            Type: Public
+            Symbols:
+                a1 at t/40-syntax/input/public_01.asm:3:8
+        SymbolDeclareStmt
+            Location: t/40-syntax/input/public_01.asm:5:1
+            Type: Public
+            Symbols:
+                a1 at t/40-syntax/input/public_01.asm:5:8
+                a2 at t/40-syntax/input/public_01.asm:5:11
+        SymbolDeclareStmt
+            Location: t/40-syntax/input/public_01.asm:6:1
+            Type: Public
+            Symbols:
+                a1 at t/40-syntax/input/public_01.asm:6:8
+                a2 at t/40-syntax/input/public_01.asm:6:11
+                a3 at t/40-syntax/input/public_01.asm:6:14

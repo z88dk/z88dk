@@ -12,33 +12,38 @@ t/40-syntax/input/ds_string_01.asm:2:1: error: Unterminated expression after "ds
 t/40-syntax/input/ds_string_01.asm:3:13: error: Unexpected token: ","
     ds 1,"hello",
                 ^
-Program
-    DefsStringStmt
-        Location: t/40-syntax/input/ds_string_01.asm:4:1
-        Size:
-            ExprBinary: +
-                Location: t/40-syntax/input/ds_string_01.asm:4:6
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/ds_string_01.asm:4:4
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/ds_string_01.asm:4:8
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/ds_string_01.asm:4:6
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/ds_string_01.asm:4:8
-                                Value type: Unknown
-                                Tokens: 
-        String literal: "hello"
-        Filler byte: 0
+Program: ds_string_01
+    Modules:
+        Module: ds_string_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        DefsStringStmt
+            Location: t/40-syntax/input/ds_string_01.asm:4:1
+            Size:
+                ExprBinary: +
+                    Location: t/40-syntax/input/ds_string_01.asm:4:6
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/ds_string_01.asm:4:4
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/ds_string_01.asm:4:8
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/ds_string_01.asm:4:6
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/ds_string_01.asm:4:8
+                                    Value type: Unknown
+                                    Tokens: 
+            String literal: "hello"
+            Filler byte: 0

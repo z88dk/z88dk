@@ -1,0 +1,47 @@
+% z88dk-z80asm -v -dump-after-symbol-collection t/45-symbols//input/decl_matrix_5A.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/45-symbols/input/decl_matrix_5A.asm...
+Program: decl_matrix_5A
+    Declarations:
+        x: Extern at t/45-symbols/input/decl_matrix_5A.asm:7:12
+    Modules:
+        Module: decl_matrix_5A (current)
+            Symbols:
+                x: Label in section 
+                    Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+            Sections:
+                Section:  (current)
+                    Has opcodes
+                    Statements:
+                        LabelStmt
+                            Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+                            Label: x
+                            Section: 
+                            Address: 0
+                            Symbol info:
+                                x: Label in section 
+                                    Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+                        OpcodeStmt
+                            Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+                            Address: 0
+                            Bytes: 0
+    Statements:
+        LabelStmt
+            Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+            Label: x
+            Section: 
+            Address: 0
+            Symbol info:
+                x: Label in section 
+                    Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+        OpcodeStmt
+            Location: t/45-symbols/input/decl_matrix_5A.asm:6:1
+            Address: 0
+            Bytes: 0
+        SymbolDeclareStmt
+            Location: t/45-symbols/input/decl_matrix_5A.asm:7:5
+            Type: Extern
+            Symbols:
+                x at t/45-symbols/input/decl_matrix_5A.asm:7:12

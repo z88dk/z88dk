@@ -12,88 +12,93 @@ t/40-syntax/input/ds_numeric_01.asm:2:1: error: Unterminated expression after "d
 t/40-syntax/input/ds_numeric_01.asm:3:7: error: Unexpected token: ","
     ds 1,2,
           ^
-Program
-    DefsNumericStmt
-        Location: t/40-syntax/input/ds_numeric_01.asm:4:1
-        Size:
-            ExprBinary: +
-                Location: t/40-syntax/input/ds_numeric_01.asm:4:6
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/ds_numeric_01.asm:4:4
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/ds_numeric_01.asm:4:8
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/ds_numeric_01.asm:4:6
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/ds_numeric_01.asm:4:8
-                                Value type: Unknown
-                                Tokens: 
-        Filler byte:
-            ExprLiteralInt: 0
-                Location: t/40-syntax/input/ds_numeric_01.asm:4:1
-                Value type: Unknown
-                Tokens: 
-    DefsNumericStmt
-        Location: t/40-syntax/input/ds_numeric_01.asm:5:1
-        Size:
-            ExprBinary: +
-                Location: t/40-syntax/input/ds_numeric_01.asm:5:6
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/ds_numeric_01.asm:5:4
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/ds_numeric_01.asm:5:8
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/ds_numeric_01.asm:5:6
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/ds_numeric_01.asm:5:8
-                                Value type: Unknown
-                                Tokens: 
-        Filler byte:
-            ExprBinary: +
-                Location: t/40-syntax/input/ds_numeric_01.asm:5:13
-                Value type: Unknown
-                Tokens: 2+3*4
-                LHS:
-                    ExprLiteralInt: 2
-                        Location: t/40-syntax/input/ds_numeric_01.asm:5:11
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/ds_numeric_01.asm:5:15
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/ds_numeric_01.asm:5:13
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 4
-                                Location: t/40-syntax/input/ds_numeric_01.asm:5:15
-                                Value type: Unknown
-                                Tokens: 
+Program: ds_numeric_01
+    Modules:
+        Module: ds_numeric_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        DefsNumericStmt
+            Location: t/40-syntax/input/ds_numeric_01.asm:4:1
+            Size:
+                ExprBinary: +
+                    Location: t/40-syntax/input/ds_numeric_01.asm:4:6
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/ds_numeric_01.asm:4:4
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/ds_numeric_01.asm:4:8
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/ds_numeric_01.asm:4:6
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/ds_numeric_01.asm:4:8
+                                    Value type: Unknown
+                                    Tokens: 
+            Filler byte:
+                ExprLiteralInt: 0
+                    Location: t/40-syntax/input/ds_numeric_01.asm:4:1
+                    Value type: Unknown
+                    Tokens: 
+        DefsNumericStmt
+            Location: t/40-syntax/input/ds_numeric_01.asm:5:1
+            Size:
+                ExprBinary: +
+                    Location: t/40-syntax/input/ds_numeric_01.asm:5:6
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/ds_numeric_01.asm:5:4
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/ds_numeric_01.asm:5:8
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/ds_numeric_01.asm:5:6
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/ds_numeric_01.asm:5:8
+                                    Value type: Unknown
+                                    Tokens: 
+            Filler byte:
+                ExprBinary: +
+                    Location: t/40-syntax/input/ds_numeric_01.asm:5:13
+                    Value type: Unknown
+                    Tokens: 2+3*4
+                    LHS:
+                        ExprLiteralInt: 2
+                            Location: t/40-syntax/input/ds_numeric_01.asm:5:11
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/ds_numeric_01.asm:5:15
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/ds_numeric_01.asm:5:13
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 4
+                                    Location: t/40-syntax/input/ds_numeric_01.asm:5:15
+                                    Value type: Unknown
+                                    Tokens: 

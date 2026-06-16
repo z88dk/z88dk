@@ -15,38 +15,43 @@ t/40-syntax/input/dc_01.asm:3:7: error: Unterminated expression after "="
 t/40-syntax/input/dc_01.asm:5:10: error: Unterminated expression after "+"
     dc a1 = 1+
              ^
-Program
-    DefcStmt
-        Location: t/40-syntax/input/dc_01.asm:4:1
-        Name: a1
-        Expression:
-            ExprLiteralInt: 1
-                Location: t/40-syntax/input/dc_01.asm:4:9
-                Value type: Unknown
-                Tokens: 1
-    DefcStmt
-        Location: t/40-syntax/input/dc_01.asm:6:1
-        Name: a1
-        Expression:
-            ExprSymbol: a2
-                Location: t/40-syntax/input/dc_01.asm:6:9
-                Value type: Unknown
-                Tokens: a2
-    DefcStmt
-        Location: t/40-syntax/input/dc_01.asm:7:1
-        Name: a1
-        Expression:
-            ExprBinary: +
-                Location: t/40-syntax/input/dc_01.asm:7:12
-                Value type: Unknown
-                Tokens: a2+a3
-                LHS:
-                    ExprSymbol: a2
-                        Location: t/40-syntax/input/dc_01.asm:7:9
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprSymbol: a3
-                        Location: t/40-syntax/input/dc_01.asm:7:12
-                        Value type: Unknown
-                        Tokens: 
+Program: dc_01
+    Modules:
+        Module: dc_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        DefcStmt
+            Location: t/40-syntax/input/dc_01.asm:4:1
+            Name: a1
+            Expression:
+                ExprLiteralInt: 1
+                    Location: t/40-syntax/input/dc_01.asm:4:9
+                    Value type: Unknown
+                    Tokens: 1
+        DefcStmt
+            Location: t/40-syntax/input/dc_01.asm:6:1
+            Name: a1
+            Expression:
+                ExprSymbol: a2
+                    Location: t/40-syntax/input/dc_01.asm:6:9
+                    Value type: Unknown
+                    Tokens: a2
+        DefcStmt
+            Location: t/40-syntax/input/dc_01.asm:7:1
+            Name: a1
+            Expression:
+                ExprBinary: +
+                    Location: t/40-syntax/input/dc_01.asm:7:12
+                    Value type: Unknown
+                    Tokens: a2+a3
+                    LHS:
+                        ExprSymbol: a2
+                            Location: t/40-syntax/input/dc_01.asm:7:9
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprSymbol: a3
+                            Location: t/40-syntax/input/dc_01.asm:7:12
+                            Value type: Unknown
+                            Tokens: 
