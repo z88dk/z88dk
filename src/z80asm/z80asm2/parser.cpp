@@ -72,8 +72,8 @@ Parser::Parser(const std::vector<LogicalLine>& asm_lines_)
     : parser_cpu_id(g_args.options.cpu_id), asm_lines(asm_lines_) {
 }
 
-std::unique_ptr<Program> Parser::parse() {
-    auto prog = std::make_unique<Program>();
+std::unique_ptr<Program> Parser::parse(std::string_view prog_name) {
+    auto prog = std::make_unique<Program>(g_strings.intern(prog_name));
     for (line_idx = 0; line_idx < asm_lines.size(); line_idx++) {
         parse_line(prog);
     }

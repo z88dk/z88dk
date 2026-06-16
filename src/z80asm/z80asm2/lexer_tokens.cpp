@@ -25,6 +25,23 @@ std::string to_string(TokenType token_type) {
     return std::string(lut[static_cast<size_t>(token_type)]);
 }
 
+std::string make_ident(const std::string& text) {
+    if (text.empty()) {
+        return "_";
+    }
+
+    std::string ident = text;
+    if (!is_ident_start(ident[0])) {
+        ident[0] = '_';
+    }
+    for (auto& c : ident) {
+        if (!is_ident_char(c)) {
+            c = '_';
+        }
+    }
+    return ident;
+}
+
 Token Token::token(TokenType type_, std::string_view text,
                    const SourceLoc& loc) {
     Token t;

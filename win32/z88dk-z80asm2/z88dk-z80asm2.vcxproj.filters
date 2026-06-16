@@ -123,6 +123,12 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\asm_driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\asm_symbols.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
@@ -216,6 +222,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\zfloat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\asm_driver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\asm_symbols.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
