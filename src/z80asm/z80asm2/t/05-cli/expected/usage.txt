@@ -45,3 +45,5 @@ Diagnostic Options:
                 Dump the token stream after synthetic opcode expansion and exit
   -dump-after-parse
                 Dump the AST after parsing and exit
+  -dump-after-symbol-collection
+                Dump the symbol table after symbol collection and exit

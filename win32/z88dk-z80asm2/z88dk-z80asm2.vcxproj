@@ -131,6 +131,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\asm_driver.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\asm_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\ir.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
@@ -169,6 +171,8 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\asm_driver.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\asm_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\ir.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />

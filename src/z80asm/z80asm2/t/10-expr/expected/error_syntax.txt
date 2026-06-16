@@ -1,0 +1,59 @@
+% z88dk-z80asm -v -dump-after-cmdline @t/10-expr//input/error_syntax.lst t/10-expr//input/empty.asm
+t/10-expr/input/error_syntax.lst:1:8: error: Unterminated expression after "+"
+    -DE00=1+
+           ^
+t/10-expr/input/error_syntax.lst:2:7: error: Expected a value, got "*"
+    -DE01=*3
+          ^
+t/10-expr/input/error_syntax.lst:3:8: error: Unterminated expression after "**"
+    -DE02=1**
+           ^
+t/10-expr/input/error_syntax.lst:4:10: error: Missing ')' after token "2"
+    -DE03=(1+2
+             ^
+t/10-expr/input/error_syntax.lst:5:10: error: Unexpected token after expression: ")"
+    -DE04=1+2)
+             ^
+t/10-expr/input/error_syntax.lst:6:10: error: Missing ')' after token ")"
+    -DE05=((3)
+             ^
+t/10-expr/input/error_syntax.lst:7:11: error: Unterminated expression after "*"
+    -DE06=3+(4*)
+              ^
+t/10-expr/input/error_syntax.lst:8:8: error: Unexpected token after expression: "$ff"
+    -DE07=3$ff
+           ^
+t/10-expr/input/error_syntax.lst:9:7: error: Expected a value, got "||"
+    -DE08=||5
+          ^
+t/10-expr/input/error_syntax.lst:10:10: error: Unexpected token after expression: "#"
+    -DE09=2+3#
+             ^
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+verbose	1
+cpu_id	z80
+ucase_symbols	0
+float_format	genmath
+preprocess_only	0
+swap_ix_iy	0
+date_stamp	0
+filler_byte	0
+dump_after_cmdline	1
+dump_after_tokenization	0
+dump_after_directives	0
+dump_after_macro_expansion	0
+dump_after_hla_expansion	0
+dump_after_synth_expansion	0
+dump_after_preprocessing	0
+dump_after_parse	0
+dump_after_symbol_collection	0
+m4_options	
+perl_options	
+cpp_options	
+output_dir	
+global_def	__CPU_Z80__	1
+global_def	__CPU_ZILOG__	1
+global_def	__FLOAT_GENMATH__	1
+input_file	t/10-expr/input/empty.asm

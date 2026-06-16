@@ -6,6 +6,11 @@ Assembling t/40-syntax/input/dephase_01.asm...
 t/40-syntax/input/dephase_01.asm:1:9: error: Unexpected token: "xxx"
     dephase xxx
             ^
-Program
-    DephaseStmt
-        Location: t/40-syntax/input/dephase_01.asm:2:1
+Program: dephase_01
+    Modules:
+        Module: dephase_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        DephaseStmt
+            Location: t/40-syntax/input/dephase_01.asm:2:1

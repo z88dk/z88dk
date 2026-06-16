@@ -21,88 +21,93 @@ t/40-syntax/input/align_01.asm:7:20: error: Unexpected token: "@"
 t/40-syntax/input/align_01.asm:8:19: error: Unexpected token: ","
     align 1+2*3, 2+3*4,
                       ^
-Program
-    AlignStmt
-        Location: t/40-syntax/input/align_01.asm:3:1
-        Alignment:
-            ExprBinary: +
-                Location: t/40-syntax/input/align_01.asm:3:9
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/align_01.asm:3:7
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/align_01.asm:3:11
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/align_01.asm:3:9
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/align_01.asm:3:11
-                                Value type: Unknown
-                                Tokens: 
-        Filler byte:
-            ExprLiteralInt: 0
-                Location: t/40-syntax/input/align_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-    AlignStmt
-        Location: t/40-syntax/input/align_01.asm:6:1
-        Alignment:
-            ExprBinary: +
-                Location: t/40-syntax/input/align_01.asm:6:9
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/align_01.asm:6:7
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/align_01.asm:6:11
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/align_01.asm:6:9
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/align_01.asm:6:11
-                                Value type: Unknown
-                                Tokens: 
-        Filler byte:
-            ExprBinary: +
-                Location: t/40-syntax/input/align_01.asm:6:16
-                Value type: Unknown
-                Tokens: 2+3*4
-                LHS:
-                    ExprLiteralInt: 2
-                        Location: t/40-syntax/input/align_01.asm:6:14
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/align_01.asm:6:18
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/align_01.asm:6:16
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 4
-                                Location: t/40-syntax/input/align_01.asm:6:18
-                                Value type: Unknown
-                                Tokens: 
+Program: align_01
+    Modules:
+        Module: align_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        AlignStmt
+            Location: t/40-syntax/input/align_01.asm:3:1
+            Alignment:
+                ExprBinary: +
+                    Location: t/40-syntax/input/align_01.asm:3:9
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/align_01.asm:3:7
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/align_01.asm:3:11
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/align_01.asm:3:9
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/align_01.asm:3:11
+                                    Value type: Unknown
+                                    Tokens: 
+            Filler byte:
+                ExprLiteralInt: 0
+                    Location: t/40-syntax/input/align_01.asm:3:1
+                    Value type: Unknown
+                    Tokens: 
+        AlignStmt
+            Location: t/40-syntax/input/align_01.asm:6:1
+            Alignment:
+                ExprBinary: +
+                    Location: t/40-syntax/input/align_01.asm:6:9
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/align_01.asm:6:7
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/align_01.asm:6:11
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/align_01.asm:6:9
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/align_01.asm:6:11
+                                    Value type: Unknown
+                                    Tokens: 
+            Filler byte:
+                ExprBinary: +
+                    Location: t/40-syntax/input/align_01.asm:6:16
+                    Value type: Unknown
+                    Tokens: 2+3*4
+                    LHS:
+                        ExprLiteralInt: 2
+                            Location: t/40-syntax/input/align_01.asm:6:14
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/align_01.asm:6:18
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/align_01.asm:6:16
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 4
+                                    Location: t/40-syntax/input/align_01.asm:6:18
+                                    Value type: Unknown
+                                    Tokens: 

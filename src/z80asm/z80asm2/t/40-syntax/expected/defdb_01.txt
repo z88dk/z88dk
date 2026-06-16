@@ -15,81 +15,86 @@ t/40-syntax/input/defdb_01.asm:4:19: error: Expression expected
 t/40-syntax/input/defdb_01.asm:5:19: error: Unexpected token: "@"
     defdb 1,2,3,1+2*3 @
                       ^
-Program
-    OpcodeStmt
-        Location: t/40-syntax/input/defdb_01.asm:3:1
-        Address: 0
-        Bytes: 0 0 0 0 0 0 0 0
-        Patches:
-            Patch
-                Location: t/40-syntax/input/defdb_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 0, Size: 2
-                Type: BigEndian
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/defdb_01.asm:3:7
-                        Value type: Unknown
-                        Tokens: 1
-            Patch
-                Location: t/40-syntax/input/defdb_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 2, Size: 2
-                Type: BigEndian
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprLiteralInt: 2
-                        Location: t/40-syntax/input/defdb_01.asm:3:9
-                        Value type: Unknown
-                        Tokens: 2
-            Patch
-                Location: t/40-syntax/input/defdb_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 4, Size: 2
-                Type: BigEndian
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprLiteralInt: 3
-                        Location: t/40-syntax/input/defdb_01.asm:3:11
-                        Value type: Unknown
-                        Tokens: 3
-            Patch
-                Location: t/40-syntax/input/defdb_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 6, Size: 2
-                Type: BigEndian
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprBinary: +
-                        Location: t/40-syntax/input/defdb_01.asm:3:15
-                        Value type: Unknown
-                        Tokens: 1+2*3
-                        LHS:
-                            ExprLiteralInt: 1
-                                Location: t/40-syntax/input/defdb_01.asm:3:13
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprBinary: *
-                                Location: t/40-syntax/input/defdb_01.asm:3:17
-                                Value type: Unknown
-                                Tokens: 
-                                LHS:
-                                    ExprLiteralInt: 2
-                                        Location: t/40-syntax/input/defdb_01.asm:3:15
-                                        Value type: Unknown
-                                        Tokens: 
-                                RHS:
-                                    ExprLiteralInt: 3
-                                        Location: t/40-syntax/input/defdb_01.asm:3:17
-                                        Value type: Unknown
-                                        Tokens: 
+Program: defdb_01
+    Modules:
+        Module: defdb_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        OpcodeStmt
+            Location: t/40-syntax/input/defdb_01.asm:3:1
+            Address: 0
+            Bytes: 0 0 0 0 0 0 0 0
+            Patches:
+                Patch
+                    Location: t/40-syntax/input/defdb_01.asm:3:7
+                    Value type: Unknown
+                    Tokens: 1
+                    Offset: 0, Size: 2
+                    Type: BigEndian
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/defdb_01.asm:3:7
+                            Value type: Unknown
+                            Tokens: 1
+                Patch
+                    Location: t/40-syntax/input/defdb_01.asm:3:9
+                    Value type: Unknown
+                    Tokens: 2
+                    Offset: 2, Size: 2
+                    Type: BigEndian
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 2
+                            Location: t/40-syntax/input/defdb_01.asm:3:9
+                            Value type: Unknown
+                            Tokens: 2
+                Patch
+                    Location: t/40-syntax/input/defdb_01.asm:3:11
+                    Value type: Unknown
+                    Tokens: 3
+                    Offset: 4, Size: 2
+                    Type: BigEndian
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 3
+                            Location: t/40-syntax/input/defdb_01.asm:3:11
+                            Value type: Unknown
+                            Tokens: 3
+                Patch
+                    Location: t/40-syntax/input/defdb_01.asm:3:15
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    Offset: 6, Size: 2
+                    Type: BigEndian
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/40-syntax/input/defdb_01.asm:3:15
+                            Value type: Unknown
+                            Tokens: 1+2*3
+                            LHS:
+                                ExprLiteralInt: 1
+                                    Location: t/40-syntax/input/defdb_01.asm:3:13
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprBinary: *
+                                    Location: t/40-syntax/input/defdb_01.asm:3:17
+                                    Value type: Unknown
+                                    Tokens: 
+                                    LHS:
+                                        ExprLiteralInt: 2
+                                            Location: t/40-syntax/input/defdb_01.asm:3:15
+                                            Value type: Unknown
+                                            Tokens: 
+                                    RHS:
+                                        ExprLiteralInt: 3
+                                            Location: t/40-syntax/input/defdb_01.asm:3:17
+                                            Value type: Unknown
+                                            Tokens: 

@@ -15,85 +15,90 @@ t/40-syntax/input/byte_01.asm:4:18: error: Expression expected
 t/40-syntax/input/byte_01.asm:5:18: error: Unexpected token: "@"
     byte 1,2,3,1+2*3 @
                      ^
-Program
-    OpcodeStmt
-        Location: t/40-syntax/input/byte_01.asm:3:1
-        Address: 0
-        Bytes: 0 0 0 0
-        Patches:
-            Patch
-                Location: t/40-syntax/input/byte_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 0, Size: 1
-                Type: Unsigned
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/byte_01.asm:3:6
-                        Value type: Unknown
-                        Tokens: 1
-            Patch
-                Location: t/40-syntax/input/byte_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 1, Size: 1
-                Type: Unsigned
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprLiteralInt: 2
-                        Location: t/40-syntax/input/byte_01.asm:3:8
-                        Value type: Unknown
-                        Tokens: 2
-            Patch
-                Location: t/40-syntax/input/byte_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 2, Size: 1
-                Type: Unsigned
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprLiteralInt: 3
-                        Location: t/40-syntax/input/byte_01.asm:3:10
-                        Value type: Unknown
-                        Tokens: 3
-            Patch
-                Location: t/40-syntax/input/byte_01.asm:3:1
-                Value type: Unknown
-                Tokens: 
-                Offset: 3, Size: 1
-                Type: Unsigned
-                Validation: Any
-                Formula: None
-                Inner expression:
-                    ExprBinary: +
-                        Location: t/40-syntax/input/byte_01.asm:3:14
-                        Value type: Unknown
-                        Tokens: 1+2*3
-                        LHS:
-                            ExprLiteralInt: 1
-                                Location: t/40-syntax/input/byte_01.asm:3:12
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprBinary: *
-                                Location: t/40-syntax/input/byte_01.asm:3:16
-                                Value type: Unknown
-                                Tokens: 
-                                LHS:
-                                    ExprLiteralInt: 2
-                                        Location: t/40-syntax/input/byte_01.asm:3:14
-                                        Value type: Unknown
-                                        Tokens: 
-                                RHS:
-                                    ExprLiteralInt: 3
-                                        Location: t/40-syntax/input/byte_01.asm:3:16
-                                        Value type: Unknown
-                                        Tokens: 
-    OpcodeStmt
-        Location: t/40-syntax/input/byte_01.asm:6:1
-        Address: 0
-        Bytes: $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $21 $0A
+Program: byte_01
+    Modules:
+        Module: byte_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        OpcodeStmt
+            Location: t/40-syntax/input/byte_01.asm:3:1
+            Address: 0
+            Bytes: 0 0 0 0
+            Patches:
+                Patch
+                    Location: t/40-syntax/input/byte_01.asm:3:6
+                    Value type: Unknown
+                    Tokens: 1
+                    Offset: 0, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/byte_01.asm:3:6
+                            Value type: Unknown
+                            Tokens: 1
+                Patch
+                    Location: t/40-syntax/input/byte_01.asm:3:8
+                    Value type: Unknown
+                    Tokens: 2
+                    Offset: 1, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 2
+                            Location: t/40-syntax/input/byte_01.asm:3:8
+                            Value type: Unknown
+                            Tokens: 2
+                Patch
+                    Location: t/40-syntax/input/byte_01.asm:3:10
+                    Value type: Unknown
+                    Tokens: 3
+                    Offset: 2, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 3
+                            Location: t/40-syntax/input/byte_01.asm:3:10
+                            Value type: Unknown
+                            Tokens: 3
+                Patch
+                    Location: t/40-syntax/input/byte_01.asm:3:14
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    Offset: 3, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/40-syntax/input/byte_01.asm:3:14
+                            Value type: Unknown
+                            Tokens: 1+2*3
+                            LHS:
+                                ExprLiteralInt: 1
+                                    Location: t/40-syntax/input/byte_01.asm:3:12
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprBinary: *
+                                    Location: t/40-syntax/input/byte_01.asm:3:16
+                                    Value type: Unknown
+                                    Tokens: 
+                                    LHS:
+                                        ExprLiteralInt: 2
+                                            Location: t/40-syntax/input/byte_01.asm:3:14
+                                            Value type: Unknown
+                                            Tokens: 
+                                    RHS:
+                                        ExprLiteralInt: 3
+                                            Location: t/40-syntax/input/byte_01.asm:3:16
+                                            Value type: Unknown
+                                            Tokens: 
+        OpcodeStmt
+            Location: t/40-syntax/input/byte_01.asm:6:1
+            Address: 0
+            Bytes: $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $21 $0A

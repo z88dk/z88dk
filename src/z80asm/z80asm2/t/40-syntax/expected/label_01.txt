@@ -6,25 +6,36 @@ Assembling t/40-syntax/input/label_01.asm...
 t/40-syntax/input/label_01.asm:7:1: error: Unrecognized instruction or directive
     label3 ; error
     ^
-Program
-    LabelStmt
-        Location: t/40-syntax/input/label_01.asm:1:1
-        Label: label1
-    LabelStmt
-        Location: t/40-syntax/input/label_01.asm:2:1
-        Label: label2
-    LabelStmt
-        Location: t/40-syntax/input/label_01.asm:3:1
-        Label: global@local1
-        Local part: @local1
-    LabelStmt
-        Location: t/40-syntax/input/label_01.asm:4:1
-        Label: global@local2
-        Local part: @local2
-    LabelStmt
-        Location: t/40-syntax/input/label_01.asm:5:1
-        Label: @local3
-        Local part: @local3
-    LabelStmt
-        Location: t/40-syntax/input/label_01.asm:6:1
-        Label: local4
+Program: label_01
+    Modules:
+        Module: label_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        LabelStmt
+            Location: t/40-syntax/input/label_01.asm:1:1
+            Label: label1
+            Address: 0
+        LabelStmt
+            Location: t/40-syntax/input/label_01.asm:2:1
+            Label: label2
+            Address: 0
+        LabelStmt
+            Location: t/40-syntax/input/label_01.asm:3:1
+            Label: global@local1
+            Local part: @local1
+            Address: 0
+        LabelStmt
+            Location: t/40-syntax/input/label_01.asm:4:1
+            Label: global@local2
+            Local part: @local2
+            Address: 0
+        LabelStmt
+            Location: t/40-syntax/input/label_01.asm:5:1
+            Label: @local3
+            Local part: @local3
+            Address: 0
+        LabelStmt
+            Location: t/40-syntax/input/label_01.asm:6:1
+            Label: local4
+            Address: 0

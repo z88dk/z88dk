@@ -47,6 +47,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.dump_after_preprocessing << "\n"
             << "dump_after_parse\t"
             << g_args.options.dump_after_parse << "\n"
+            << "dump_after_symbol_collection\t"
+            << g_args.options.dump_after_symbol_collection << "\n"
             << "m4_options\t"
             << g_args.options.m4_options << "\n"
             << "perl_options\t"
@@ -79,10 +81,6 @@ void dump_after_cmdline_and_exit() {
     // collect filenames
     for (auto& filename : g_args.input_files) {
         std::cout << "input_file\t" << filename << "\n";
-    }
-
-    for (auto& filename : g_args.obj_files) {
-        std::cout << "obj_file\t" << filename << "\n";
     }
 
     exit(EXIT_SUCCESS);

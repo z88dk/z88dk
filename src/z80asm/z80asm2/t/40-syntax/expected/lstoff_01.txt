@@ -6,7 +6,12 @@ Assembling t/40-syntax/input/lstoff_01.asm...
 t/40-syntax/input/lstoff_01.asm:1:8: error: Unexpected token: "xxx"
     lstoff xxx
            ^
-Program
-    ListStmt
-        Location: t/40-syntax/input/lstoff_01.asm:2:1
-        Enable: false
+Program: lstoff_01
+    Modules:
+        Module: lstoff_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        ListStmt
+            Location: t/40-syntax/input/lstoff_01.asm:2:1
+            Enable: false

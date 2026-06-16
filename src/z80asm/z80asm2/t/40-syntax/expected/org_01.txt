@@ -9,31 +9,36 @@ t/40-syntax/input/org_01.asm:1:4: error: Expression expected
 t/40-syntax/input/org_01.asm:2:7: error: Unexpected token: ","
     org 10,
           ^
-Program
-    OrgStmt
-        Location: t/40-syntax/input/org_01.asm:3:1
-        Expression:
-            ExprBinary: +
-                Location: t/40-syntax/input/org_01.asm:3:7
-                Value type: Unknown
-                Tokens: 1+2*3
-                LHS:
-                    ExprLiteralInt: 1
-                        Location: t/40-syntax/input/org_01.asm:3:5
-                        Value type: Unknown
-                        Tokens: 
-                RHS:
-                    ExprBinary: *
-                        Location: t/40-syntax/input/org_01.asm:3:9
-                        Value type: Unknown
-                        Tokens: 
-                        LHS:
-                            ExprLiteralInt: 2
-                                Location: t/40-syntax/input/org_01.asm:3:7
-                                Value type: Unknown
-                                Tokens: 
-                        RHS:
-                            ExprLiteralInt: 3
-                                Location: t/40-syntax/input/org_01.asm:3:9
-                                Value type: Unknown
-                                Tokens: 
+Program: org_01
+    Modules:
+        Module: org_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        OrgStmt
+            Location: t/40-syntax/input/org_01.asm:3:1
+            Expression:
+                ExprBinary: +
+                    Location: t/40-syntax/input/org_01.asm:3:7
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    LHS:
+                        ExprLiteralInt: 1
+                            Location: t/40-syntax/input/org_01.asm:3:5
+                            Value type: Unknown
+                            Tokens: 
+                    RHS:
+                        ExprBinary: *
+                            Location: t/40-syntax/input/org_01.asm:3:9
+                            Value type: Unknown
+                            Tokens: 
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/40-syntax/input/org_01.asm:3:7
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprLiteralInt: 3
+                                    Location: t/40-syntax/input/org_01.asm:3:9
+                                    Value type: Unknown
+                                    Tokens: 

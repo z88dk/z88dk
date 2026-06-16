@@ -36,5 +36,6 @@ X(DUMP_AFTER_PREPROCESSING, "-dump-after-preprocessing", false, "", "Dump the to
 X(DUMP_AFTER_HLA_EXPANSION, "-dump-after-hla-expansion", false, "", "Dump the token stream after High-Level-Assembly processing and exit")
 X(DUMP_AFTER_SYNTH_EXPANSION, "-dump-after-synth-expansion", false, "", "Dump the token stream after synthetic opcode expansion and exit")
 X(DUMP_AFTER_PARSE, "-dump-after-parse", false, "", "Dump the AST after parsing and exit")
+X(DUMP_AFTER_SYMBOL_COLLECTION, "-dump-after-symbol-collection", false, "", "Dump the symbol table after symbol collection and exit")
 
 #undef X
