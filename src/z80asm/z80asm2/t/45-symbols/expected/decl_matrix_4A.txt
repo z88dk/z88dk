@@ -1,0 +1,23 @@
+% z88dk-z80asm -v -dump-after-symbol-collection t/45-symbols//input/decl_matrix_4A.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/45-symbols/input/decl_matrix_4A.asm...
+Program: decl_matrix_4A
+    Declarations:
+        x: Extern at t/45-symbols/input/decl_matrix_4A.asm:6:12
+    Modules:
+        Module: decl_matrix_4A (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        SymbolDeclareStmt
+            Location: t/45-symbols/input/decl_matrix_4A.asm:6:5
+            Type: Extern
+            Symbols:
+                x at t/45-symbols/input/decl_matrix_4A.asm:6:12
+        SymbolDeclareStmt
+            Location: t/45-symbols/input/decl_matrix_4A.asm:7:5
+            Type: Extern
+            Symbols:
+                x at t/45-symbols/input/decl_matrix_4A.asm:7:12

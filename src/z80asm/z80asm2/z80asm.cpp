@@ -4,95 +4,19 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "ir.h"
+#include "asm_driver.h"
 #include "diag.h"
 #include "environment.h"
-#include "hla.h"
-#include "lexer_dump.h"
-#include "lexer_tokens.h"
-#include "opcodes.h"
 #include "options.h"
 #include "options_dump.h"
-#include "parser.h"
-#include "pathnames.h"
-#include "preproc.h"
 #include "source_loc.h"
-#include "synth_expander.h"
-#include <cstdlib>
 #include <filesystem>
 #include <iostream>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <vector>
 
 static constexpr std::string_view z80asm_env = "Z80ASM";
-
-static void assemble_file(std::string_view filename) {
-    if (g_args.options.verbose) {
-        std::cout << "Assembling " << filename << "..." << std::endl;
-    }
-
-    // run tokenizer and cache tokens in SourceFile
-    if (g_args.options.dump_after_tokenization) {
-        dump_after_tokenization_and_exit(filename);
-        // not reached
-    }
-
-    // run preprocessor and get final token stream
-    Preproc preproc;
-    preproc.set_const_symbols(g_args.options.global_defs);
-    std::vector<LogicalLine> preprocessed_tokens = preproc.preprocess(filename);
-
-    // process High-Level-Assembly instructions
-    std::vector<LogicalLine> hla_lines = hla_process(preprocessed_tokens);
-    if (g_args.options.dump_after_hla_expansion) {
-        dump_logical_lines_and_exit(hla_lines);
-        // not reached
-    }
-
-    // process synthetic instructions and rewrite tokens
-    // to their final form for the assembler
-    SynthExpander synth_expander(hla_lines);
-    std::vector<LogicalLine> asm_lines = synth_expander.expand();
-    if (g_args.options.dump_after_synth_expansion) {
-        dump_logical_lines_and_exit(asm_lines);
-        // not reached
-    }
-
-    // generate -E output and terminate assembly, if requested
-    if (g_args.options.preprocess_only) {
-        std::string i_filename = get_i_filename(filename);
-        output_preproc_output(i_filename, asm_lines);
-        return;
-    }
-
-    // parse source code
-    Parser parser(asm_lines);
-    std::unique_ptr<Program> prog = parser.parse();
-    if (g_args.options.dump_after_parse) {
-        dump_ast_and_exit(prog);
-        // not reached
-    }
-}
-
-static void assemble_files() {
-    for (const std::string& filename : g_args.input_files) {
-        if (is_o_filename(filename)) {
-            if (g_args.options.verbose) {
-                std::cout << "Skipping object file " << filename
-                          << "..." << std::endl;
-            }
-            g_args.obj_files.push_back(filename);
-        }
-        else {
-            // assemble source file
-            // will push resulting object file to g_args.obj_files
-            assemble_file(filename);
-        }
-    }
-}
 
 static bool has_verbose(int argc, char* argv[]) {
     std::string env_options = get_env_value(z80asm_env);
@@ -168,7 +92,7 @@ int main(int argc, char* argv[]) {
     }
 
     // execute requested actions
-    assemble_files();
+    assemble_files(g_args.input_files);
 
     if (g_args.options.verbose) {
         auto errors = g_diag.get_error_count();

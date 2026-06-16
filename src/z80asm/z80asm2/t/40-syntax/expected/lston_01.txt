@@ -6,7 +6,12 @@ Assembling t/40-syntax/input/lston_01.asm...
 t/40-syntax/input/lston_01.asm:1:7: error: Unexpected token: "xxx"
     lston xxx
           ^
-Program
-    ListStmt
-        Location: t/40-syntax/input/lston_01.asm:2:1
-        Enable: true
+Program: lston_01
+    Modules:
+        Module: lston_01 (current)
+            Sections:
+                Section:  (current)
+    Statements:
+        ListStmt
+            Location: t/40-syntax/input/lston_01.asm:2:1
+            Enable: true

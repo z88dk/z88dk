@@ -41,7 +41,7 @@ std::unique_ptr<LabelStmt> parse_label(ParseLine& pline);
 class Parser {
 public:
     Parser(const std::vector<LogicalLine>& asm_lines_);
-    std::unique_ptr<Program> parse();
+    std::unique_ptr<Program> parse(std::string_view prog_name);
 
 private:
     // match of opcode pattern, used during opcode search
