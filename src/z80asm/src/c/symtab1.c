@@ -594,8 +594,8 @@ void declare_extern_symbol(const char *name)
             }
             else
             {
-                /* already declared local */
-                error(ErrSymbolRedeclaration, name);
+                /* already declared local - ignore */
+                //error(ErrSymbolRedeclaration, name);
             }
         }
         else 

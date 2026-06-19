@@ -17,8 +17,8 @@ X(zx)			// ZX-Spectrum 40 bit format
 X(z88)			// zcc -math-z88, 40 bit format for Z88
 
 X(mbfs)			// zcc -fp-mode=mbf32, 32 bit Microsoft single precision
-X(mbf40)		    // zcc -fp-mode=mbf40, 40 bit Microsoft
-X(mbf64)		    // zcc -fp-mode=mbf64, 64 bit Microsoft double precision
+X(mbf40)		// zcc -fp-mode=mbf40, 40 bit Microsoft
+X(mbf64)		// zcc -fp-mode=mbf64, 64 bit Microsoft double precision
 
 X(am9511)		// zcc -fp-mode=am9511, AM9511 math processor format
 

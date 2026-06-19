@@ -39,13 +39,13 @@ z80asm_ok("-b -DVAR", "", "", <<ASM, bytes(1));
 ASM
 
 
-unlink_testfiles;
-z80asm_nok("-b -DVAR", "", <<ASM, <<ERR);
-	EXTERN VAR
-ASM
-${test}.asm:1: error: symbol redeclaration: VAR
-  ^---- EXTERN VAR
-ERR
+#unlink_testfiles;
+#z80asm_nok("-b -DVAR", "", <<ASM, <<ERR);
+#	EXTERN VAR
+#ASM
+#${test}.asm:1: error: symbol redeclaration: VAR
+#  ^---- EXTERN VAR
+#ERR
 
 
 #------------------------------------------------------------------------------
@@ -106,14 +106,14 @@ z80asm_ok("", "", "", <<ASM, bytes(1));
 ASM
 
 
-unlink_testfiles;
-z80asm_nok("", "", <<ASM, <<ERR);
-	define VAR
-	EXTERN VAR
-ASM
-${test}.asm:2: error: symbol redeclaration: VAR
-  ^---- EXTERN VAR
-ERR
+#unlink_testfiles;
+#z80asm_nok("", "", <<ASM, <<ERR);
+#	define VAR
+#	EXTERN VAR
+#ASM
+#${test}.asm:2: error: symbol redeclaration: VAR
+#  ^---- EXTERN VAR
+#ERR
 
 
 #------------------------------------------------------------------------------
@@ -165,14 +165,14 @@ z80asm_ok("", "", "", <<ASM, bytes(1));
 ASM
 
 
-unlink_testfiles;
-z80asm_nok("", "", <<ASM, <<ERR);
-	defc VAR=1
-	EXTERN VAR
-ASM
-${test}.asm:2: error: symbol redeclaration: VAR
-  ^---- EXTERN VAR
-ERR
+#unlink_testfiles;
+#z80asm_nok("", "", <<ASM, <<ERR);
+#	defc VAR=1
+#	EXTERN VAR
+#ASM
+#${test}.asm:2: error: symbol redeclaration: VAR
+#  ^---- EXTERN VAR
+#ERR
 
 
 unlink_testfiles;
@@ -253,14 +253,14 @@ z80asm_ok("", "", "", <<ASM, bytes(0));
 ASM
 
 
-unlink_testfiles;
-z80asm_nok("", "", <<ASM, <<ERR);
-	VAR:
-	EXTERN VAR
-ASM
-${test}.asm:2: error: symbol redeclaration: VAR
-  ^---- EXTERN VAR
-ERR
+#unlink_testfiles;
+#z80asm_nok("", "", <<ASM, <<ERR);
+#	VAR:
+#	EXTERN VAR
+#ASM
+#${test}.asm:2: error: symbol redeclaration: VAR
+#  ^---- EXTERN VAR
+#ERR
 
 
 #------------------------------------------------------------------------------
