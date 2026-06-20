@@ -13,28 +13,22 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
    see t\developer\benchmark_symtab.t
 */
 
-#include "ctype.h"
 #include "die.h"
 #include "errors.h"
 #include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
-#include "limits.h"
 #include "options.h"
 #include "reloc_code.h"
-#include "scan1.h"
-#include "stdint.h"
 #include "str.h"
 #include "strutil.h"
 #include "symtab1.h"
 #include "types.h"
-#include "uthash.h"
-#include "utlist.h"
 #include "utstring.h"
 #include "xassert.h"
-#include "xmalloc.h"
 #include "z80asm1.h"
 #include "zobjfile.h"
+#include <string.h>
 
 #define COLUMN_WIDTH	32
 
@@ -735,6 +729,11 @@ void init_local_labels(void) {
     last_global_label = spool_add("");
 }
 
+void local_labels_reset(void)
+{
+    init_local_labels();
+}
+
 static const char* local_labels_add_use(bool is_add, const char* short_name) {
     const char* p = strchr(short_name, '@');
     if (p == NULL) {                // standard label, no @
@@ -760,7 +759,13 @@ static const char* local_labels_add_use(bool is_add, const char* short_name) {
         }
     }
     else {                          // label@label
-        return spool_add(short_name);
+        if (is_add) {
+            error(ErrLocalLabelWithGlobalPrefix, short_name);
+            return short_name;
+        }
+        else {
+            return spool_add(short_name);
+        }
     }
 }
 
