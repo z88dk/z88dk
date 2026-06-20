@@ -19,7 +19,8 @@ Program: ptr_01
     Modules:
         Module: ptr_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/ptr_01.asm:3:1

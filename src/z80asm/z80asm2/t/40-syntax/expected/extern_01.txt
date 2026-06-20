@@ -16,7 +16,8 @@ Program: extern_01
     Modules:
         Module: extern_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         SymbolDeclareStmt
             Location: t/40-syntax/input/extern_01.asm:3:1

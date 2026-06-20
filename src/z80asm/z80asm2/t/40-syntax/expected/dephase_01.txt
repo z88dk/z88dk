@@ -10,7 +10,9 @@ Program: dephase_01
     Modules:
         Module: dephase_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         DephaseStmt
             Location: t/40-syntax/input/dephase_01.asm:2:1
+            Address: 0

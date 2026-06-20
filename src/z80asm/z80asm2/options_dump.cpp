@@ -49,6 +49,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.dump_after_parse << "\n"
             << "dump_after_symbol_collection\t"
             << g_args.options.dump_after_symbol_collection << "\n"
+            << "dump_after_layout\t"
+            << g_args.options.dump_after_layout << "\n"
             << "m4_options\t"
             << g_args.options.m4_options << "\n"
             << "perl_options\t"

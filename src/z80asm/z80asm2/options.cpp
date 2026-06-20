@@ -90,6 +90,7 @@ static const UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_SYNTH_EXPANSION,
             OptionType::DUMP_AFTER_PARSE,
             OptionType::DUMP_AFTER_SYMBOL_COLLECTION,
+            OptionType::DUMP_AFTER_LAYOUT,
         }
     }
 };
@@ -481,6 +482,10 @@ void Args::parse_arg(std::string_view arg,
 
         case OptionType::DUMP_AFTER_SYMBOL_COLLECTION:
             options.dump_after_symbol_collection = true;
+            return;
+
+        case OptionType::DUMP_AFTER_LAYOUT:
+            options.dump_after_layout = true;
             return;
 
         default:

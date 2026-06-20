@@ -16,7 +16,8 @@ Program: xref_01
     Modules:
         Module: xref_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         SymbolDeclareStmt
             Location: t/40-syntax/input/xref_01.asm:3:1

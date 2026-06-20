@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "asm_driver.h"
+#include "asm_layout.h"
 #include "asm_symbols.h"
 #include "diag.h"
 #include "hla.h"
@@ -92,6 +93,21 @@ void assemble_file(std::string_view filename) {
     }
 
     if (g_args.options.dump_after_symbol_collection) {
+        dump_ast_and_exit(prog);
+        // not reached
+    }
+
+    // fixpoint loop for layout and address resolution
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        // compute layout and addresses
+        if (!compute_layout(*prog, changed)) {
+            return; // error already reported
+        }
+    }
+
+    if (g_args.options.dump_after_layout) {
         dump_ast_and_exit(prog);
         // not reached
     }
