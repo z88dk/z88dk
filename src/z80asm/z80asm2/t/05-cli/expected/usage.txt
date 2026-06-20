@@ -46,4 +46,6 @@ Diagnostic Options:
   -dump-after-parse
                 Dump the AST after parsing and exit
   -dump-after-symbol-collection
-                Dump the symbol table after symbol collection and exit
+                Dump the AST after symbol collection and exit
+  -dump-after-layout
+                Dump the AST after layout processing and exit

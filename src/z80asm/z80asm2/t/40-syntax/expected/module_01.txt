@@ -22,7 +22,8 @@ Program: module_01
     Modules:
         Module: module_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         ModuleStmt
             Location: t/40-syntax/input/module_01.asm:3:1

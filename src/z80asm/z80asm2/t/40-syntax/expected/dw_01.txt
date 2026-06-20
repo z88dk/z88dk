@@ -19,7 +19,8 @@ Program: dw_01
     Modules:
         Module: dw_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/dw_01.asm:3:1

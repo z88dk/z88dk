@@ -1,0 +1,243 @@
+% z88dk-z80asm -v -dump-after-layout t/50-layout//input/layout_defs_string_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_defs_string_01.asm...
+Program: layout_defs_string_01
+    Modules:
+        Module: layout_defs_string_01 (current)
+            Sections:
+                Section: ""
+                    Size: 0
+                Section: code (current)
+                    Size: $10
+                    Has opcodes
+                    Statements:
+                        DefsStringStmt
+                            Location: t/50-layout/input/layout_defs_string_01.asm:2:1
+                            Section: code
+                            Address: 0
+                            Size:
+                                ExprLiteralInt: $10
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:2:6
+                                    Value type: Unknown
+                                    Tokens: $10
+                            String literal: "hello"
+                            Filler byte: 0
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_defs_string_01.asm:3:1
+                            Section: code
+                            Address: 5
+                            Bytes: 0 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:3:6
+                                    Value type: Unknown
+                                    Tokens: 1
+                                    Offset: 0, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 1
+                                            Location: t/50-layout/input/layout_defs_string_01.asm:3:6
+                                            Value type: Unknown
+                                            Tokens: 1
+                                Patch
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:3:9
+                                    Value type: Unknown
+                                    Tokens: 2
+                                    Offset: 1, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 2
+                                            Location: t/50-layout/input/layout_defs_string_01.asm:3:9
+                                            Value type: Unknown
+                                            Tokens: 2
+                                Patch
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:3:12
+                                    Value type: Unknown
+                                    Tokens: 3
+                                    Offset: 2, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 3
+                                            Location: t/50-layout/input/layout_defs_string_01.asm:3:12
+                                            Value type: Unknown
+                                            Tokens: 3
+                        DefsStringStmt
+                            Location: t/50-layout/input/layout_defs_string_01.asm:4:1
+                            Section: code
+                            Address: 8
+                            Size:
+                                ExprLiteralInt: $10
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:4:6
+                                    Value type: Unknown
+                                    Tokens: $10
+                            String literal: "world"
+                            Filler byte: 0
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_defs_string_01.asm:5:1
+                            Section: code
+                            Address: $0D
+                            Bytes: 0 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:5:6
+                                    Value type: Unknown
+                                    Tokens: 4
+                                    Offset: 0, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 4
+                                            Location: t/50-layout/input/layout_defs_string_01.asm:5:6
+                                            Value type: Unknown
+                                            Tokens: 4
+                                Patch
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:5:9
+                                    Value type: Unknown
+                                    Tokens: 5
+                                    Offset: 1, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 5
+                                            Location: t/50-layout/input/layout_defs_string_01.asm:5:9
+                                            Value type: Unknown
+                                            Tokens: 5
+                                Patch
+                                    Location: t/50-layout/input/layout_defs_string_01.asm:5:12
+                                    Value type: Unknown
+                                    Tokens: 6
+                                    Offset: 2, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 6
+                                            Location: t/50-layout/input/layout_defs_string_01.asm:5:12
+                                            Value type: Unknown
+                                            Tokens: 6
+    Statements:
+        SectionStmt
+            Location: t/50-layout/input/layout_defs_string_01.asm:1:1
+            Name: code
+        DefsStringStmt
+            Location: t/50-layout/input/layout_defs_string_01.asm:2:1
+            Section: code
+            Address: 0
+            Size:
+                ExprLiteralInt: $10
+                    Location: t/50-layout/input/layout_defs_string_01.asm:2:6
+                    Value type: Unknown
+                    Tokens: $10
+            String literal: "hello"
+            Filler byte: 0
+        OpcodeStmt
+            Location: t/50-layout/input/layout_defs_string_01.asm:3:1
+            Section: code
+            Address: 5
+            Bytes: 0 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_defs_string_01.asm:3:6
+                    Value type: Unknown
+                    Tokens: 1
+                    Offset: 0, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 1
+                            Location: t/50-layout/input/layout_defs_string_01.asm:3:6
+                            Value type: Unknown
+                            Tokens: 1
+                Patch
+                    Location: t/50-layout/input/layout_defs_string_01.asm:3:9
+                    Value type: Unknown
+                    Tokens: 2
+                    Offset: 1, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 2
+                            Location: t/50-layout/input/layout_defs_string_01.asm:3:9
+                            Value type: Unknown
+                            Tokens: 2
+                Patch
+                    Location: t/50-layout/input/layout_defs_string_01.asm:3:12
+                    Value type: Unknown
+                    Tokens: 3
+                    Offset: 2, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 3
+                            Location: t/50-layout/input/layout_defs_string_01.asm:3:12
+                            Value type: Unknown
+                            Tokens: 3
+        DefsStringStmt
+            Location: t/50-layout/input/layout_defs_string_01.asm:4:1
+            Section: code
+            Address: 8
+            Size:
+                ExprLiteralInt: $10
+                    Location: t/50-layout/input/layout_defs_string_01.asm:4:6
+                    Value type: Unknown
+                    Tokens: $10
+            String literal: "world"
+            Filler byte: 0
+        OpcodeStmt
+            Location: t/50-layout/input/layout_defs_string_01.asm:5:1
+            Section: code
+            Address: $0D
+            Bytes: 0 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_defs_string_01.asm:5:6
+                    Value type: Unknown
+                    Tokens: 4
+                    Offset: 0, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 4
+                            Location: t/50-layout/input/layout_defs_string_01.asm:5:6
+                            Value type: Unknown
+                            Tokens: 4
+                Patch
+                    Location: t/50-layout/input/layout_defs_string_01.asm:5:9
+                    Value type: Unknown
+                    Tokens: 5
+                    Offset: 1, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 5
+                            Location: t/50-layout/input/layout_defs_string_01.asm:5:9
+                            Value type: Unknown
+                            Tokens: 5
+                Patch
+                    Location: t/50-layout/input/layout_defs_string_01.asm:5:12
+                    Value type: Unknown
+                    Tokens: 6
+                    Offset: 2, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 6
+                            Location: t/50-layout/input/layout_defs_string_01.asm:5:12
+                            Value type: Unknown
+                            Tokens: 6

@@ -25,10 +25,12 @@ Program: align_01
     Modules:
         Module: align_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         AlignStmt
             Location: t/40-syntax/input/align_01.asm:3:1
+            Address: 0
             Alignment:
                 ExprBinary: +
                     Location: t/40-syntax/input/align_01.asm:3:9
@@ -61,6 +63,7 @@ Program: align_01
                     Tokens: 
         AlignStmt
             Location: t/40-syntax/input/align_01.asm:6:1
+            Address: 0
             Alignment:
                 ExprBinary: +
                     Location: t/40-syntax/input/align_01.asm:6:9

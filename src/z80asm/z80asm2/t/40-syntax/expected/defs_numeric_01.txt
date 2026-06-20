@@ -16,10 +16,12 @@ Program: defs_numeric_01
     Modules:
         Module: defs_numeric_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         DefsNumericStmt
             Location: t/40-syntax/input/defs_numeric_01.asm:4:1
+            Address: 0
             Size:
                 ExprBinary: +
                     Location: t/40-syntax/input/defs_numeric_01.asm:4:8
@@ -52,6 +54,7 @@ Program: defs_numeric_01
                     Tokens: 
         DefsNumericStmt
             Location: t/40-syntax/input/defs_numeric_01.asm:5:1
+            Address: 0
             Size:
                 ExprBinary: +
                     Location: t/40-syntax/input/defs_numeric_01.asm:5:8

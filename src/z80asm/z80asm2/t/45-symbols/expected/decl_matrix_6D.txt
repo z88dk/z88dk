@@ -9,22 +9,24 @@ Program: decl_matrix_6D
     Modules:
         Module: decl_matrix_6D (current)
             Symbols:
-                x: Label in section 
+                x: Label in section ""
                     Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
                     Has opcodes
                     Statements:
                         LabelStmt
                             Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
                             Label: x
-                            Section: 
+                            Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section 
+                                x: Label in section ""
                                     Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
+                            Section: ""
                             Address: 0
                             Bytes: 0
     Statements:
@@ -46,12 +48,13 @@ Program: decl_matrix_6D
         LabelStmt
             Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
             Label: x
-            Section: 
+            Section: ""
             Address: 0
             Symbol info:
-                x: Label in section 
+                x: Label in section ""
                     Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_6D.asm:5:1
+            Section: ""
             Address: 0
             Bytes: 0

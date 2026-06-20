@@ -16,7 +16,8 @@ Program: global_01
     Modules:
         Module: global_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         SymbolDeclareStmt
             Location: t/40-syntax/input/global_01.asm:3:1

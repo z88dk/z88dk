@@ -9,14 +9,16 @@ Program: decl_matrix_10B
     Modules:
         Module: decl_matrix_10B (current)
             Symbols:
-                x: Label in section 
+                x: Label in section ""
                     Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
                     Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_10B.asm:3:5
+                            Section: ""
                             Address: 0
                             Bytes: $3A 0 0
                             Patches:
@@ -34,18 +36,19 @@ Program: decl_matrix_10B
                                             Value type: Unknown
                                             Tokens: x
                                             Symbol info:
-                                                x: Label in section 
+                                                x: Label in section ""
                                                     Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
                         LabelStmt
                             Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
                             Label: x
-                            Section: 
+                            Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section 
+                                x: Label in section ""
                                     Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
+                            Section: ""
                             Address: 0
                             Bytes: 0
     Statements:
@@ -56,6 +59,7 @@ Program: decl_matrix_10B
                 x at t/45-symbols/input/decl_matrix_10B.asm:2:12
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_10B.asm:3:5
+            Section: ""
             Address: 0
             Bytes: $3A 0 0
             Patches:
@@ -73,17 +77,18 @@ Program: decl_matrix_10B
                             Value type: Unknown
                             Tokens: x
                             Symbol info:
-                                x: Label in section 
+                                x: Label in section ""
                                     Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
         LabelStmt
             Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
             Label: x
-            Section: 
+            Section: ""
             Address: 0
             Symbol info:
-                x: Label in section 
+                x: Label in section ""
                     Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_10B.asm:4:1
+            Section: ""
             Address: 0
             Bytes: 0

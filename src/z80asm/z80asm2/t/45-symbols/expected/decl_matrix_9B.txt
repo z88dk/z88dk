@@ -12,11 +12,13 @@ Program: decl_matrix_9B
                 x: Undefined
                     Location: t/45-symbols/input/decl_matrix_9B.asm:3:11
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
                     Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_9B.asm:3:5
+                            Section: ""
                             Address: 0
                             Bytes: $3A 0 0
                             Patches:
@@ -44,6 +46,7 @@ Program: decl_matrix_9B
                 x at t/45-symbols/input/decl_matrix_9B.asm:2:12
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_9B.asm:3:5
+            Section: ""
             Address: 0
             Bytes: $3A 0 0
             Patches:

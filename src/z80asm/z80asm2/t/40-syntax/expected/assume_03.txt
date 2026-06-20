@@ -15,7 +15,8 @@ Program: assume_03
     Modules:
         Module: assume_03 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/assume_03.asm:1:2

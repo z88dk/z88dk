@@ -28,7 +28,8 @@ Program: opcodes_01
     Modules:
         Module: opcodes_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         LabelStmt
             Location: t/40-syntax/input/opcodes_01.asm:1:1

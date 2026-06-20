@@ -13,10 +13,12 @@ Program: org_01
     Modules:
         Module: org_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OrgStmt
             Location: t/40-syntax/input/org_01.asm:3:1
+            Address: 0
             Expression:
                 ExprBinary: +
                     Location: t/40-syntax/input/org_01.asm:3:7
