@@ -53,6 +53,7 @@ struct Options {
     bool dump_after_preprocessing = false;
     bool dump_after_parse = false;
     bool dump_after_symbol_collection = false;
+    bool dump_after_layout = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

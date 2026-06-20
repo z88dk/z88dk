@@ -230,6 +230,8 @@ struct Patch : public Expr {
 //-----------------------------------------------------------------------------
 struct Stmt : public TreeNode {
     SourceLoc loc;
+    Section* section = nullptr;     // section where located
+    uint address = 0;               // address of statement
 
     Stmt(const SourceLoc& loc_) : loc(loc_) {}
     virtual ~Stmt() = default;
@@ -237,8 +239,6 @@ struct Stmt : public TreeNode {
 };
 
 struct OpcodeStmt : Stmt {
-    Section* section = nullptr;     // section where opcode is located
-    uint address = 0;               // address of opcode
     bool is_short_jump = false;     // true if patches has a short jump
 
     // opcode bytes, including placeholders for expressions
@@ -251,8 +251,6 @@ struct OpcodeStmt : Stmt {
 
 struct LabelStmt : Stmt {
     StringInterner::Id name_id;
-    Section* section = nullptr; // section where label is located
-    uint address = 0;       // address of label
     bool is_local = false;  // whether this is a local label (has '@')
     size_t at_pos = 0;      // position of '@' in the original identifier, if local
     SymbolInfo* symbol = nullptr; // symbol info for this label
@@ -264,6 +262,7 @@ struct LabelStmt : Stmt {
 
 struct OrgStmt : Stmt {
     std::unique_ptr<Expr> expr;
+    uint padding_size = 0;      // number of bytes to pad to reach new address
 
     OrgStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
@@ -274,8 +273,7 @@ struct OrgStmt : Stmt {
 struct DefcStmt : Stmt {
     StringInterner::Id name_id;
     std::unique_ptr<Expr> expr;
-    Section* section = nullptr;
-    SymbolInfo* symbol = nullptr; // symbol info for this defc
+    SymbolInfo* symbol = nullptr;   // symbol info for this defc
 
     DefcStmt(StringInterner::Id name_id_,
              std::unique_ptr<Expr> e, const SourceLoc& loc)
@@ -305,6 +303,7 @@ struct SectionStmt : Stmt {
 struct AlignStmt : Stmt {
     std::unique_ptr<Expr> align_expr;
     std::unique_ptr<Expr> filler_expr;
+    uint padding_size = 0;          // number of bytes to pad to reach new address
 
     AlignStmt(std::unique_ptr<Expr> align_expr_,
               std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
@@ -317,7 +316,7 @@ struct AlignStmt : Stmt {
 struct DefsNumericStmt : Stmt {
     std::unique_ptr<Expr> size_expr;
     std::unique_ptr<Expr> filler_expr;
-    Section* section = nullptr;
+    uint padding_size = 0;          // number of bytes to pad to reach new address
 
     DefsNumericStmt(std::unique_ptr<Expr> size_expr_,
                     std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
@@ -331,7 +330,7 @@ struct DefsStringStmt : Stmt {
     std::unique_ptr<Expr> size_expr;
     StringInterner::Id string_id;    // string literal to fill with
     uint8_t filler_byte;
-    Section* section = nullptr;
+    uint padding_size = 0;          // number of bytes to pad to reach new address
 
     DefsStringStmt(std::unique_ptr<Expr> size_expr_,
                    StringInterner::Id string_id_, uint8_t filler_byte_, const SourceLoc& loc)
@@ -373,7 +372,6 @@ struct ListStmt : Stmt {
 
 struct PhaseStmt : Stmt {
     std::unique_ptr<Expr> expr;
-    Section* section = nullptr;
 
     PhaseStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
@@ -382,8 +380,6 @@ struct PhaseStmt : Stmt {
 };
 
 struct DephaseStmt : Stmt {
-    Section* section = nullptr;
-
     DephaseStmt(const SourceLoc& loc)
         : Stmt(loc) {}
     virtual ~DephaseStmt() = default;
@@ -420,8 +416,9 @@ struct SymbolInfo : public TreeNode {
     int const_value = 0;
 
     // for label and defc symbols
-    Section* section = nullptr;     // section where opcode is located
+    Section* section = nullptr;     // section where located
     Stmt* stmt = nullptr;           // pointer to statement
+    uint offset = 0;                // offset of label or defc in section
 
     // for defc symbols
     Expr* defc_expr = nullptr;      // expression for defc value
@@ -440,6 +437,7 @@ static const std::string_view DEFAULT_SECTION = "";
 struct Section : public TreeNode {
     StringInterner::Id name_id = 0;         // name of section
     std::vector<Stmt*> stmts;               // point to statemens of section
+    uint size = 0;                          // total size of section
     bool has_opcodes = false;               // to signal if a section has code
     OrgStmt* org_stmt = nullptr;            // set if section has ORG
     AlignStmt* align_stmt = nullptr;        // set if section has ALIGN

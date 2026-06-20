@@ -1,0 +1,233 @@
+% z88dk-z80asm -v -dump-after-layout t/50-layout//input/layout_opcodes_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_opcodes_01.asm...
+Program: layout_opcodes_01
+    Modules:
+        Module: layout_opcodes_01 (current)
+            Symbols:
+                end: Label in section ""
+                    Location: t/50-layout/input/layout_opcodes_01.asm:6:1
+                start: Label in section ""
+                    Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+            Sections:
+                Section: "" (current)
+                    Size: 8
+                    Has opcodes
+                    Statements:
+                        LabelStmt
+                            Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+                            Label: start
+                            Section: ""
+                            Address: 0
+                            Symbol info:
+                                start: Label in section ""
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_opcodes_01.asm:2:5
+                            Section: ""
+                            Address: 0
+                            Bytes: 0
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_opcodes_01.asm:3:5
+                            Section: ""
+                            Address: 1
+                            Bytes: $3E 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:3:13
+                                    Value type: Unknown
+                                    Tokens: 1+2*3
+                                    Offset: 1, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: +
+                                            Location: t/50-layout/input/layout_opcodes_01.asm:3:13
+                                            Value type: Unknown
+                                            Tokens: 1+2*3
+                                            LHS:
+                                                ExprLiteralInt: 1
+                                                    Location: t/50-layout/input/layout_opcodes_01.asm:3:11
+                                                    Value type: Unknown
+                                                    Tokens: 
+                                            RHS:
+                                                ExprBinary: *
+                                                    Location: t/50-layout/input/layout_opcodes_01.asm:3:15
+                                                    Value type: Unknown
+                                                    Tokens: 
+                                                    LHS:
+                                                        ExprLiteralInt: 2
+                                                            Location: t/50-layout/input/layout_opcodes_01.asm:3:13
+                                                            Value type: Unknown
+                                                            Tokens: 
+                                                    RHS:
+                                                        ExprLiteralInt: 3
+                                                            Location: t/50-layout/input/layout_opcodes_01.asm:3:15
+                                                            Value type: Unknown
+                                                            Tokens: 
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_opcodes_01.asm:4:5
+                            Section: ""
+                            Address: 3
+                            Is short jump
+                            Bytes: $18 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:4:8
+                                    Value type: Unknown
+                                    Tokens: start
+                                    Offset: 1, Size: 1
+                                    Type: PCrelative
+                                    Validation: Any
+                                    Formula: None
+                                    Short jump (alt offset: 1, alt size: 2)
+                                    Alt bytes: $C3 0 0
+                                    Inner expression:
+                                        ExprSymbol: start
+                                            Location: t/50-layout/input/layout_opcodes_01.asm:4:8
+                                            Value type: Unknown
+                                            Tokens: start
+                                            Symbol info:
+                                                start: Label in section ""
+                                                    Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_opcodes_01.asm:5:5
+                            Section: ""
+                            Address: 5
+                            Bytes: $C3 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:5:8
+                                    Value type: Unknown
+                                    Tokens: end
+                                    Offset: 1, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprSymbol: end
+                                            Location: t/50-layout/input/layout_opcodes_01.asm:5:8
+                                            Value type: Unknown
+                                            Tokens: end
+                                            Symbol info:
+                                                end: Label in section ""
+                                                    Location: t/50-layout/input/layout_opcodes_01.asm:6:1
+                        LabelStmt
+                            Location: t/50-layout/input/layout_opcodes_01.asm:6:1
+                            Label: end
+                            Section: ""
+                            Address: 8
+                            Symbol info:
+                                end: Label in section ""
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:6:1
+    Statements:
+        LabelStmt
+            Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+            Label: start
+            Section: ""
+            Address: 0
+            Symbol info:
+                start: Label in section ""
+                    Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_opcodes_01.asm:2:5
+            Section: ""
+            Address: 0
+            Bytes: 0
+        OpcodeStmt
+            Location: t/50-layout/input/layout_opcodes_01.asm:3:5
+            Section: ""
+            Address: 1
+            Bytes: $3E 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_opcodes_01.asm:3:13
+                    Value type: Unknown
+                    Tokens: 1+2*3
+                    Offset: 1, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/50-layout/input/layout_opcodes_01.asm:3:13
+                            Value type: Unknown
+                            Tokens: 1+2*3
+                            LHS:
+                                ExprLiteralInt: 1
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:3:11
+                                    Value type: Unknown
+                                    Tokens: 
+                            RHS:
+                                ExprBinary: *
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:3:15
+                                    Value type: Unknown
+                                    Tokens: 
+                                    LHS:
+                                        ExprLiteralInt: 2
+                                            Location: t/50-layout/input/layout_opcodes_01.asm:3:13
+                                            Value type: Unknown
+                                            Tokens: 
+                                    RHS:
+                                        ExprLiteralInt: 3
+                                            Location: t/50-layout/input/layout_opcodes_01.asm:3:15
+                                            Value type: Unknown
+                                            Tokens: 
+        OpcodeStmt
+            Location: t/50-layout/input/layout_opcodes_01.asm:4:5
+            Section: ""
+            Address: 3
+            Is short jump
+            Bytes: $18 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_opcodes_01.asm:4:8
+                    Value type: Unknown
+                    Tokens: start
+                    Offset: 1, Size: 1
+                    Type: PCrelative
+                    Validation: Any
+                    Formula: None
+                    Short jump (alt offset: 1, alt size: 2)
+                    Alt bytes: $C3 0 0
+                    Inner expression:
+                        ExprSymbol: start
+                            Location: t/50-layout/input/layout_opcodes_01.asm:4:8
+                            Value type: Unknown
+                            Tokens: start
+                            Symbol info:
+                                start: Label in section ""
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:1:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_opcodes_01.asm:5:5
+            Section: ""
+            Address: 5
+            Bytes: $C3 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_opcodes_01.asm:5:8
+                    Value type: Unknown
+                    Tokens: end
+                    Offset: 1, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprSymbol: end
+                            Location: t/50-layout/input/layout_opcodes_01.asm:5:8
+                            Value type: Unknown
+                            Tokens: end
+                            Symbol info:
+                                end: Label in section ""
+                                    Location: t/50-layout/input/layout_opcodes_01.asm:6:1
+        LabelStmt
+            Location: t/50-layout/input/layout_opcodes_01.asm:6:1
+            Label: end
+            Section: ""
+            Address: 8
+            Symbol info:
+                end: Label in section ""
+                    Location: t/50-layout/input/layout_opcodes_01.asm:6:1
