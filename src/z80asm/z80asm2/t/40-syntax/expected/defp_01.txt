@@ -19,7 +19,8 @@ Program: defp_01
     Modules:
         Module: defp_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/defp_01.asm:3:1

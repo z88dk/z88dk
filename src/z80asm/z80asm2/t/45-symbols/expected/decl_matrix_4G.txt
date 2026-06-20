@@ -9,22 +9,24 @@ Program: decl_matrix_4G
     Modules:
         Module: decl_matrix_4G (current)
             Symbols:
-                x: Label in section 
+                x: Label in section ""
                     Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
                     Has opcodes
                     Statements:
                         LabelStmt
                             Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
                             Label: x
-                            Section: 
+                            Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section 
+                                x: Label in section ""
                                     Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
+                            Section: ""
                             Address: 0
                             Bytes: 0
     Statements:
@@ -41,12 +43,13 @@ Program: decl_matrix_4G
         LabelStmt
             Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
             Label: x
-            Section: 
+            Section: ""
             Address: 0
             Symbol info:
-                x: Label in section 
+                x: Label in section ""
                     Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_4G.asm:4:1
+            Section: ""
             Address: 0
             Bytes: 0

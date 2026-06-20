@@ -10,7 +10,8 @@ Program: lstoff_01
     Modules:
         Module: lstoff_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         ListStmt
             Location: t/40-syntax/input/lstoff_01.asm:2:1

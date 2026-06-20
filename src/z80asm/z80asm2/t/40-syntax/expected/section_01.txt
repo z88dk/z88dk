@@ -22,7 +22,8 @@ Program: section_01
     Modules:
         Module: section_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         SectionStmt
             Location: t/40-syntax/input/section_01.asm:3:1
