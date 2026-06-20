@@ -10,13 +10,17 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cassert>
+#include <string>
+#include <string_view>
 
 static bool resolve_local_labels(Program& prog);
+static bool resolve_local_labels_in_expr(std::string_view parent_label,
+        Expr* expr);
 static bool collect_program_declarations(Program& prog);
 static bool collect_module_defined_symbols(Program& prog);
 static bool collect_module_used_symbols(Program& prog);
-static bool collect_used_symbols_in_expr(Program& prog, Module& mod, Stmt* stmt,
-        Expr* expr);
+static bool collect_used_symbols_in_expr(Program& prog, Module& mod,
+        Stmt* stmt, Expr* expr);
 static bool compare_declarations_definitions(Program& prog);
 static bool declare_symbol(Program& prog,
                            StringInterner::Id name_id, SymbolDeclareType type,
@@ -52,7 +56,176 @@ bool collect_symbols(Program& prog) {
 }
 
 static bool resolve_local_labels(Program& prog) {
-    (void)prog; // TODO
+    // collect label definitions and resolve local labels to their corresponding global labels
+    bool failed = false;
+    for (auto& mod : prog.modules) {
+        for (auto& sec : mod->sections) {
+            std::string parent_label;
+            for (auto& stmt : sec->stmts) {
+                // handle labels
+                if (auto label_stmt = dynamic_cast<LabelStmt*>(stmt)) {
+                    if (label_stmt->is_local) {         // has @
+                        if (label_stmt->at_pos == 0) {  // @l1
+                            std::string label = g_strings.to_string(label_stmt->name_id);
+                            if (parent_label.empty()) {
+                                g_diag.error(label_stmt->loc,
+                                             "Local label without a parent label: " + label);
+                                failed = true;
+                            }
+                            else {
+                                std::string global_label = parent_label + label;
+                                StringInterner::Id global_label_id =
+                                    g_strings.intern(global_label);
+                                label_stmt->name_id = global_label_id;
+                                label_stmt->at_pos = parent_label.size();
+                            }
+                        }
+                        else {                          // g1@l1
+                            g_diag.error(label_stmt->loc,
+                                         "Local label cannot have a parent label: " +
+                                         g_strings.to_string(label_stmt->name_id));
+                            failed = true;
+                        }
+                    }
+                    else {                              // g1
+                        parent_label = g_strings.to_string(label_stmt->name_id);
+                    }
+                    continue;
+                }
+
+                // recurse into expressions to resolve local labels
+                if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
+                    for (auto& patch : opc_stmt->patches) {
+                        if (!resolve_local_labels_in_expr(parent_label, patch->inner.get())) {
+                            failed = true;
+                        }
+                    }
+                    continue;
+                }
+
+                if (auto org_stmt = dynamic_cast<OrgStmt*>(stmt)) {
+                    if (!resolve_local_labels_in_expr(parent_label, org_stmt->expr.get())) {
+                        failed = true;
+                    }
+                    continue;
+                }
+
+                if (auto defc_stmt = dynamic_cast<DefcStmt*>(stmt)) {
+                    if (!resolve_local_labels_in_expr(parent_label, defc_stmt->expr.get())) {
+                        failed = true;
+                    }
+                    continue;
+                }
+
+                if (auto align_stmt = dynamic_cast<AlignStmt*>(stmt)) {
+                    if (!resolve_local_labels_in_expr(parent_label, align_stmt->align_expr.get())) {
+                        failed = true;
+                    }
+                    if (!resolve_local_labels_in_expr(parent_label,
+                                                      align_stmt->filler_expr.get())) {
+                        failed = true;
+                    }
+                    continue;
+                }
+
+                if (auto defs_stmt = dynamic_cast<DefsNumericStmt*>(stmt)) {
+                    if (!resolve_local_labels_in_expr(parent_label, defs_stmt->size_expr.get())) {
+                        failed = true;
+                    }
+                    if (!resolve_local_labels_in_expr(parent_label, defs_stmt->filler_expr.get())) {
+                        failed = true;
+                    }
+                    continue;
+                }
+
+                if (auto defs_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
+                    if (!resolve_local_labels_in_expr(parent_label, defs_stmt->size_expr.get())) {
+                        failed = true;
+                    }
+                    continue;
+                }
+
+                if (auto phase_stmt = dynamic_cast<PhaseStmt*>(stmt)) {
+                    if (!resolve_local_labels_in_expr(parent_label, phase_stmt->expr.get())) {
+                        failed = true;
+                    }
+                    parent_label.clear(); // phase resets parent label
+                    continue;
+                }
+
+                if (dynamic_cast<DephaseStmt*>(stmt)) {
+                    parent_label.clear(); // dephase resets parent label
+                    continue;
+                }
+            }
+        }
+    }
+
+    return !failed;
+}
+
+bool resolve_local_labels_in_expr(std::string_view parent_label, Expr* expr) {
+    if (auto loc_label_expr = dynamic_cast<ExprLocalLabel*>(expr)) {
+        if (loc_label_expr->at_pos == 0) { // @l1
+            if (parent_label.empty()) {
+                g_diag.error(loc_label_expr->loc,
+                             "Local label without a parent label: " +
+                             g_strings.to_string(loc_label_expr->name_id));
+                return false;
+            }
+            else {
+                std::string local_label = g_strings.to_string(loc_label_expr->name_id);
+                std::string global_label = std::string(parent_label) + local_label;
+                loc_label_expr->name_id = g_strings.intern(global_label);
+                loc_label_expr->at_pos = parent_label.size();
+                return true;
+            }
+        }
+        else {      // g1@l1
+            // already resolved
+            return true;
+        }
+    }
+
+    if (auto un_expr = dynamic_cast<ExprUnary*>(expr)) {
+        if (!resolve_local_labels_in_expr(parent_label, un_expr->rhs.get())) {
+            return false; // error already reported
+        }
+        return true;
+    }
+
+    if (auto bin_expr = dynamic_cast<ExprBinary*>(expr)) {
+        bool failed = false;
+        if (!resolve_local_labels_in_expr(parent_label, bin_expr->lhs.get())) {
+            failed = true; // error already reported
+        }
+        if (!resolve_local_labels_in_expr(parent_label, bin_expr->rhs.get())) {
+            failed = true; // error already reported
+        }
+        return !failed;
+    }
+
+    if (auto tern_expr = dynamic_cast<ExprTernary*>(expr)) {
+        bool failed = false;
+        if (!resolve_local_labels_in_expr(parent_label, tern_expr->cond.get())) {
+            failed = true; // error already reported
+        }
+        if (!resolve_local_labels_in_expr(parent_label, tern_expr->then_expr.get())) {
+            failed = true; // error already reported
+        }
+        if (!resolve_local_labels_in_expr(parent_label, tern_expr->else_expr.get())) {
+            failed = true; // error already reported
+        }
+        return !failed;
+    }
+
+    if (auto arg_expr = dynamic_cast<ExprCallUnary*>(expr)) {
+        if (!resolve_local_labels_in_expr(parent_label, arg_expr->arg.get())) {
+            return false; // error already reported
+        }
+        return true;
+    }
+
     return true;
 }
 
@@ -248,7 +421,7 @@ bool collect_used_symbols_in_expr(Program& prog, Module& mod,
         return true;
     }
 
-    return false;
+    return true;
 }
 
 static bool compare_declarations_definitions(Program& prog) {
