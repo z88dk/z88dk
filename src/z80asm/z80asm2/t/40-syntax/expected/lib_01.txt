@@ -16,7 +16,8 @@ Program: lib_01
     Modules:
         Module: lib_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         SymbolDeclareStmt
             Location: t/40-syntax/input/lib_01.asm:3:1

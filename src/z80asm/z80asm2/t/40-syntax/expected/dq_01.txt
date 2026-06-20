@@ -19,7 +19,8 @@ Program: dq_01
     Modules:
         Module: dq_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/dq_01.asm:3:1

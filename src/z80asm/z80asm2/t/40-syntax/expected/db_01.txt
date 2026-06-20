@@ -19,7 +19,8 @@ Program: db_01
     Modules:
         Module: db_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/db_01.asm:3:1

@@ -13,10 +13,12 @@ Program: phase_01
     Modules:
         Module: phase_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         PhaseStmt
             Location: t/40-syntax/input/phase_01.asm:3:1
+            Address: 0
             Expression:
                 ExprBinary: +
                     Location: t/40-syntax/input/phase_01.asm:3:9

@@ -9,7 +9,8 @@ Program: decl_matrix_8B
     Modules:
         Module: decl_matrix_8B (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         SymbolDeclareStmt
             Location: t/45-symbols/input/decl_matrix_8B.asm:2:5

@@ -20,11 +20,13 @@ Program: defc_01
     Modules:
         Module: defc_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         DefcStmt
             Location: t/40-syntax/input/defc_01.asm:4:1
             Name: a1
+            Address: 0
             Expression:
                 ExprLiteralInt: 1
                     Location: t/40-syntax/input/defc_01.asm:4:11
@@ -33,6 +35,7 @@ Program: defc_01
         DefcStmt
             Location: t/40-syntax/input/defc_01.asm:6:1
             Name: a1
+            Address: 0
             Expression:
                 ExprSymbol: a2
                     Location: t/40-syntax/input/defc_01.asm:6:11
@@ -41,6 +44,7 @@ Program: defc_01
         DefcStmt
             Location: t/40-syntax/input/defc_01.asm:7:1
             Name: a1
+            Address: 0
             Expression:
                 ExprBinary: +
                     Location: t/40-syntax/input/defc_01.asm:7:14

@@ -19,7 +19,8 @@ Program: defq_01
     Modules:
         Module: defq_01 (current)
             Sections:
-                Section:  (current)
+                Section: "" (current)
+                    Size: 0
     Statements:
         OpcodeStmt
             Location: t/40-syntax/input/defq_01.asm:3:1
