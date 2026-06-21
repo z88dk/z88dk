@@ -22,6 +22,7 @@ Preprocessor Options:
   -float=FMT    Set float format (e.g. genmath)
   -D=NAME[=EXPR]Define symbol
   -E            Preprocess only
+  -MD           Generate dependencies file
 
 Assembly Options:
   -m=CPU        Set target CPU (e.g. z80, z180)
