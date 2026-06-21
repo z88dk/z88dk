@@ -8,7 +8,10 @@
 #include "diag.h"
 #include "expr.h"
 #include "ir.h"
+#include "options.h"
+#include "string_utils.h"
 #include <cassert>
+#include <cstdint>
 #include <string>
 #include <string_view>
 
@@ -412,7 +415,418 @@ static bool eval_const_expr(Expr* expr, bool& changed, bool silent) {
     }
 }
 
-bool compute_relocations(Program& prog) {
-    (void)prog;  // unused for now
+// Helper to check byte range (0-255) and issue warning if out of range
+static void check_byte_range(int value, const SourceLoc& loc) {
+    if (value < 0 || value > 255) {
+        g_diag.warning(loc, "Integer range: " + int_to_hex(value));
+    }
+}
+
+// Helper to check unsigned 8-bit range and issue warning if out of range
+static void check_unsigned_8bit_range(int value, const SourceLoc& loc) {
+    if (value < -128 || value > 255) {
+        g_diag.warning(loc, "Integer range: " + int_to_hex(value));
+    }
+}
+
+// Helper to check unsigned 16-bit range and issue warning if out of range
+static void check_unsigned_16bit_range(int value, const SourceLoc& loc) {
+    if (value < -32768 || value > 65535) {
+        g_diag.warning(loc, "Integer range: " + int_to_hex(value));
+    }
+}
+
+// Helper to check signed 8-bit range and issue warning if out of range
+static void check_signed_8bit_range(int value, const SourceLoc& loc) {
+    if (value < -128 || value > 127) {
+        g_diag.warning(loc, "Integer range: " + int_to_hex(value));
+    }
+}
+
+// Helper to check signed 16-bit range and issue warning if out of range
+static void check_signed_16bit_range(int value, const SourceLoc& loc) {
+    if (value < -32768 || value > 32767) {
+        g_diag.warning(loc, "Integer range: " + int_to_hex(value));
+    }
+}
+
+// Helper to check signed 8-bit range and issue error if out of range
+static bool check_pcrel_8bit_range(int value, const SourceLoc& loc) {
+    if (value < -128 || value > 127) {
+        g_diag.error(loc, "Relative jump out of range: " + int_to_hex(value));
+        return false;
+    }
     return true;
+}
+
+// Helper to check signed 16-bit range and issue error if out of range
+static bool check_pcrel_16bit_range(int value, const SourceLoc& loc) {
+    if (value < -32768 || value > 32767) {
+        g_diag.error(loc, "Relative jump out of range: " + int_to_hex(value));
+        return false;
+    }
+    return true;
+}
+
+bool apply_patches(Program& prog) {
+    bool failed = false;
+    for (auto& mod : prog.modules) {
+        for (auto& sec : mod->sections) {
+            for (auto& stmt : sec->stmts) {
+                if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
+                    for (auto& patch : opc_stmt->patches) {
+                        if (patch->is_constant) {
+                            // constant patch, expression must be constant
+                            if (patch->inner->value.type != ExprType::Constant) {
+                                g_diag.error(patch->loc,
+                                             "Constant expression expected");
+                                failed = true;
+                            }
+                            else {
+                                if (!apply_patch(*stmt, opc_stmt->bytes, *patch)) {
+                                    failed = true;
+                                }
+                            }
+                        }
+                        else if (patch->inner->value.type == ExprType::Constant) {
+                            // constant expression
+                            if (!apply_patch(*stmt, opc_stmt->bytes, *patch)) {
+                                failed = true;
+                            }
+                        }
+                        else if (patch->type == PatchType::PCrelative &&
+                                 patch->inner->value.type == ExprType::AddressRelative &&
+                                 opc_stmt->section == patch->inner->value.section) {
+                            // short jump patch, expression must be address relative
+                            if (!apply_patch(*stmt, opc_stmt->bytes, *patch)) {
+                                failed = true;
+                            }
+                        }
+                        else {
+                            // non-constant expression must be handled by the linker
+                        }
+                    }
+                    continue;
+                }
+
+                if (auto org_stmt = dynamic_cast<OrgStmt*>(stmt)) {
+                    org_stmt->bytes.clear();
+                    for (uint i = 0; i < org_stmt->padding_size; i++) {
+                        org_stmt->bytes.push_back(g_args.options.filler_byte);
+                    }
+                    continue;
+                }
+
+                if (auto align_stmt = dynamic_cast<AlignStmt*>(stmt)) {
+                    int filler_value = align_stmt->filler_expr->value.const_value;
+                    check_byte_range(filler_value, align_stmt->filler_expr->loc);
+
+                    align_stmt->bytes.clear();
+                    for (uint i = 0; i < align_stmt->padding_size; i++) {
+                        align_stmt->bytes.push_back(static_cast<uint8_t>(filler_value));
+                    }
+                    continue;
+                }
+
+                if (auto defs_stmt = dynamic_cast<DefsNumericStmt*>(stmt)) {
+                    int filler_value = defs_stmt->filler_expr->value.const_value;
+                    check_byte_range(filler_value, defs_stmt->filler_expr->loc);
+
+                    defs_stmt->bytes.clear();
+                    for (uint i = 0; i < defs_stmt->padding_size; i++) {
+                        defs_stmt->bytes.push_back(static_cast<uint8_t>(filler_value));
+                    }
+                    continue;
+                }
+
+                if (auto defs_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
+                    defs_stmt->bytes.clear();
+                    std::string str_value = g_strings.to_string(defs_stmt->string_id);
+                    uint i;
+                    for (i = 0; i < str_value.size() && i < defs_stmt->padding_size; i++) {
+                        defs_stmt->bytes.push_back(static_cast<uint8_t>(str_value[i]));
+                    }
+                    for (; i < defs_stmt->padding_size; i++) {
+                        defs_stmt->bytes.push_back(g_args.options.filler_byte);
+                    }
+                    continue;
+                }
+            }
+        }
+    }
+    return !failed;
+}
+
+static bool check_range(int value, CheckRange validation) {
+    switch (validation) {
+    case CheckRange::Is_any:
+        return true;
+    case CheckRange::Is_0:
+        if (value == 0) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_0_1_2:
+        if (value >= 0 && value <= 2) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_0_1_2_3:
+        if (value >= 0 && value <= 3) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_0_1_2_3_4_5_6_7:
+        if (value >= 0 && value <= 7) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_1_2_3_4_5_6_7_0_8_10_18_20_28_30_38:
+        if ((value >= 0 && value <= 8) || value == 0x10 || value == 0x18
+                || value == 0x20 || value == 0x28 || value == 0x30 || value == 0x38) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_2_3_4_5_7_10_18_20_28_38:
+        if ((value >= 2 && value <= 5) || value == 7 || value == 0x10 || value == 0x18
+                || value == 0x20 || value == 0x28 || value == 0x38) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_1_2_4:
+        if (value == 1 || value == 2 || value == 4) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_1_2_4_8:
+        if (value == 1 || value == 2 || value == 4 || value == 8) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_40:
+        if (value == 0x40) {
+            return true;
+        }
+        break;
+    case CheckRange::Is_8:
+        if (value == 8) {
+            return true;
+        }
+        break;
+    default:
+        assert(0);
+        break;
+    }
+    return false;
+}
+
+static void apply_formula(std::vector<uint8_t>& bytes, int value,
+                          ExprFormula formula, const std::vector<uint8_t>& coefs,
+                          size_t offset, size_t size) {
+    switch (formula) {
+    case ExprFormula::None:
+        // no patching needed
+        break;
+
+    case ExprFormula::ScaleBelowThreshold: {
+        assert(size == 1);
+        assert(offset < bytes.size());
+        assert(coefs.size() == 1);
+
+        // A+(%c<8?%c*8:%c), followed by A
+        uint8_t A = coefs[0];
+        bytes[offset] = static_cast<uint8_t>(A + (value < 8 ? value * 8 : value));
+        break;
+    }
+    case ExprFormula::AddScaled: {
+        assert(size == 1);
+        assert(offset < bytes.size());
+        assert(coefs.size() == 2);
+
+        // A+B*%c, followed by A, B
+        uint8_t A = coefs[0];
+        uint8_t B = coefs[1];
+        bytes[offset] = static_cast<uint8_t>(A + B * value);
+        break;
+    }
+    case ExprFormula::SelectOrAdd: {
+        assert(size == 1);
+        assert(offset < bytes.size());
+        assert(coefs.size() == 3);
+
+        // %c==A?B:C+%c, followed by A, B, C
+        uint8_t A = coefs[0];
+        uint8_t B = coefs[1];
+        uint8_t C = coefs[2];
+        bytes[offset] = static_cast<uint8_t>(value == A ? B : C + value);
+        break;
+    }
+    case ExprFormula::Select2: {
+        assert(size == 1);
+        assert(offset < bytes.size());
+        assert(coefs.size() == 5);
+
+        // %c==A?B:%c==C?D:E, followed by A, B, C, D, E
+        uint8_t A = coefs[0];
+        uint8_t B = coefs[1];
+        uint8_t C = coefs[2];
+        uint8_t D = coefs[3];
+        uint8_t E = coefs[4];
+        bytes[offset] = static_cast<uint8_t>(value == A ? B :
+                                             value == C ? D : E);
+        break;
+    }
+    case ExprFormula::Select3: {
+        assert(size == 1);
+        assert(offset < bytes.size());
+        assert(coefs.size() == 7);
+
+        // %c==A?B:%c==C?D:%c==E?F:G, followed by A, B, C, D, E, F, G
+        uint8_t A = coefs[0];
+        uint8_t B = coefs[1];
+        uint8_t C = coefs[2];
+        uint8_t D = coefs[3];
+        uint8_t E = coefs[4];
+        uint8_t F = coefs[5];
+        uint8_t G = coefs[6];
+        bytes[offset] = static_cast<uint8_t>(value == A ? B :
+                                             value == C ? D :
+                                             value == E ? F : G);
+        break;
+    }
+    default:
+        assert(0);
+        break;
+    }
+}
+
+bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
+    bool failed = false;
+
+    // get value to be patched
+    int value = 0;
+    if (patch.inner->value.type == ExprType::Constant) {
+        value = patch.inner->value.const_value;
+    }
+    else if (patch.inner->value.type == ExprType::AddressRelative &&
+             patch.type == PatchType::PCrelative) {
+        // calculate relative offset for short jump
+        int target = static_cast<int>(patch.inner->value.offset);
+        int source = static_cast<int>(stmt.address + bytes.size());
+        value = target - source;
+    }
+    else {
+        assert(0);
+    }
+
+    // check range
+    if (!check_range(value, patch.validation)) {
+        g_diag.error(patch.inner->loc,
+                     "Patch value out of range: " + int_to_hex(value));
+        return false;
+    }
+
+    // apply formula if needed
+    apply_formula(bytes, value, patch.formula, patch.coefs, patch.offset,
+                  patch.size);
+
+    // apply patch
+    switch (patch.type) {
+    case PatchType::None:
+        // already patched, no further action needed
+        break;
+
+    case PatchType::Unsigned:
+        assert(patch.size >= 1 && patch.size <= 4);
+
+        if (patch.size == 1) {
+            check_unsigned_8bit_range(value, patch.inner->loc);
+        }
+        else if (patch.size == 2) {
+            check_unsigned_16bit_range(value, patch.inner->loc);
+        }
+
+        for (size_t i = 0; i < patch.size; ++i) {
+            assert(patch.offset + i < bytes.size());
+            bytes[patch.offset + i] = static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
+        }
+        break;
+
+    case PatchType::Signed:
+        assert(patch.size >= 1 && patch.size <= 4);
+
+        if (patch.size == 1) {
+            check_signed_8bit_range(value, patch.inner->loc);
+        }
+        else if (patch.size == 2) {
+            check_signed_16bit_range(value, patch.inner->loc);
+        }
+
+        for (size_t i = 0; i < patch.size; ++i) {
+            assert(patch.offset + i < bytes.size());
+            bytes[patch.offset + i] =
+                static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
+        }
+        break;
+
+    case PatchType::HighByte:
+        assert(patch.size == 1);
+        assert(patch.offset < bytes.size());
+
+        if ((value & 0xff00) != 0) {
+            if ((value & 0xff00) != 0xff00) {
+                g_diag.warning(patch.inner->loc,
+                               "Integer range: " + int_to_hex(value));
+            }
+        }
+
+        bytes[patch.offset] = static_cast<uint8_t>(value & 0xFF);
+        break;
+
+    case PatchType::BigEndian:
+        assert(patch.size >= 1 && patch.size <= 4);
+
+        if (patch.size == 1) {
+            check_unsigned_8bit_range(value, patch.inner->loc);
+        }
+        else if (patch.size == 2) {
+            check_unsigned_16bit_range(value, patch.inner->loc);
+        }
+
+        for (size_t i = 0; i < patch.size; ++i) {
+            assert(patch.offset + patch.size - 1 - i < bytes.size());
+            bytes[patch.offset + patch.size - 1 - i] =
+                static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
+        }
+        break;
+
+    case PatchType::PCrelative:
+        assert(patch.size >= 1 && patch.size <= 2);
+
+        if (patch.size == 1) {
+            if (!check_pcrel_8bit_range(value, patch.inner->loc)) {
+                failed = true;
+            }
+        }
+        else if (patch.size == 2) {
+            if (!check_pcrel_16bit_range(value, patch.inner->loc)) {
+                failed = true;
+            }
+        }
+
+        for (size_t i = 0; i < patch.size; ++i) {
+            assert(patch.offset + i < bytes.size());
+            bytes[patch.offset + i] =
+                static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
+        }
+        break;
+
+    default:
+        assert(0);
+    }
+
+    // mark as patched
+    patch.type = PatchType::None;
+
+    return !failed;
 }

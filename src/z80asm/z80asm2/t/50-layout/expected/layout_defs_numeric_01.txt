@@ -29,11 +29,13 @@ Program: layout_defs_numeric_01
                                     Value type: Constant
                                     Value const: 0
                                     Expr: 0
+                            Padding size: 8
+                            Bytes: 0 0 0 0 0 0 0 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_defs_numeric_01.asm:3:1
                             Section: code
                             Address: 8
-                            Bytes: 0 0 0
+                            Bytes: 1 2 3
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defs_numeric_01.asm:3:6
@@ -41,7 +43,7 @@ Program: layout_defs_numeric_01
                                     Value const: 1
                                     Expr: 1
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -56,7 +58,7 @@ Program: layout_defs_numeric_01
                                     Value const: 2
                                     Expr: 2
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -71,7 +73,7 @@ Program: layout_defs_numeric_01
                                     Value const: 3
                                     Expr: 3
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -96,11 +98,13 @@ Program: layout_defs_numeric_01
                                     Value type: Constant
                                     Value const: $FF
                                     Expr: $FF
+                            Padding size: 8
+                            Bytes: $FF $FF $FF $FF $FF $FF $FF $FF
                         OpcodeStmt
                             Location: t/50-layout/input/layout_defs_numeric_01.asm:5:1
                             Section: code
                             Address: $13
-                            Bytes: 0 0 0
+                            Bytes: 4 5 6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defs_numeric_01.asm:5:6
@@ -108,7 +112,7 @@ Program: layout_defs_numeric_01
                                     Value const: 4
                                     Expr: 4
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -123,7 +127,7 @@ Program: layout_defs_numeric_01
                                     Value const: 5
                                     Expr: 5
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -138,7 +142,7 @@ Program: layout_defs_numeric_01
                                     Value const: 6
                                     Expr: 6
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -167,11 +171,13 @@ Program: layout_defs_numeric_01
                     Value type: Constant
                     Value const: 0
                     Expr: 0
+            Padding size: 8
+            Bytes: 0 0 0 0 0 0 0 0
         OpcodeStmt
             Location: t/50-layout/input/layout_defs_numeric_01.asm:3:1
             Section: code
             Address: 8
-            Bytes: 0 0 0
+            Bytes: 1 2 3
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defs_numeric_01.asm:3:6
@@ -179,7 +185,7 @@ Program: layout_defs_numeric_01
                     Value const: 1
                     Expr: 1
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -194,7 +200,7 @@ Program: layout_defs_numeric_01
                     Value const: 2
                     Expr: 2
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -209,7 +215,7 @@ Program: layout_defs_numeric_01
                     Value const: 3
                     Expr: 3
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -234,11 +240,13 @@ Program: layout_defs_numeric_01
                     Value type: Constant
                     Value const: $FF
                     Expr: $FF
+            Padding size: 8
+            Bytes: $FF $FF $FF $FF $FF $FF $FF $FF
         OpcodeStmt
             Location: t/50-layout/input/layout_defs_numeric_01.asm:5:1
             Section: code
             Address: $13
-            Bytes: 0 0 0
+            Bytes: 4 5 6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defs_numeric_01.asm:5:6
@@ -246,7 +254,7 @@ Program: layout_defs_numeric_01
                     Value const: 4
                     Expr: 4
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -261,7 +269,7 @@ Program: layout_defs_numeric_01
                     Value const: 5
                     Expr: 5
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -276,7 +284,7 @@ Program: layout_defs_numeric_01
                     Value const: 6
                     Expr: 6
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
