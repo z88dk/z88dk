@@ -10,16 +10,29 @@
 #include "asm_symbols.h"
 #include "diag.h"
 #include "hla.h"
+#include "ir.h"
 #include "lexer_dump.h"
+#include "lexer_tokens.h"
+#include "obj_file.h"
+#include "options.h"
 #include "parser.h"
 #include "pathnames.h"
 #include "preproc.h"
 #include "synth_expander.h"
 #include <filesystem>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
+
+static const uint MAX_PASSES = 100;
 
 static bool split_modules_sections(Program& prog);
+static ObjectFile build_object_file_from_program(const Program& prog);
 
-void assemble_files(std::vector<std::string>& filenames) {
+void assemble_files(std::vector<std::string>& filenames,
+                    std::string_view output_dir) {
     for (const std::string& filename : filenames) {
         if (is_o_filename(filename)) {
             if (g_args.options.verbose) {
@@ -28,12 +41,12 @@ void assemble_files(std::vector<std::string>& filenames) {
             }
         }
         else {
-            assemble_file(filename);
+            assemble_file(filename, output_dir);
         }
     }
 }
 
-void assemble_file(std::string_view filename) {
+void assemble_file(std::string_view filename, std::string_view output_dir) {
     if (g_args.options.verbose) {
         std::cout << "Assembling " << filename << "..." << std::endl;
     }
@@ -100,8 +113,17 @@ void assemble_file(std::string_view filename) {
 
     // fixpoint loop for layout and address resolution
     bool changed = true;
+    uint pass = 0;
     while (changed) {
         changed = false;
+
+        // safegard against infinite loops in case of errors that cause addresses to keep changing
+        pass++;
+        if (pass > MAX_PASSES) {
+            g_diag.error(SourceLoc(), "Maximum number of passes exceeded");
+            return; // error already reported
+        }
+
         // compute layout and addresses
         if (!compute_layout(*prog, changed)) {
             return; // error already reported
@@ -113,9 +135,7 @@ void assemble_file(std::string_view filename) {
         }
 
         // check if jumps must be converted to long jumps
-        if (!check_jumps(*prog, changed)) {
-            return; // error already reported
-        }
+        check_jumps(*prog, changed);
     }
 
     // final evaluation of expressions with error reporting
@@ -123,13 +143,22 @@ void assemble_file(std::string_view filename) {
         return; // error already reported
     }
 
-    if (!verify_expr_ranges(*prog)) {
+    // TODO: compute patches and emit range errors
+    if (!compute_relocations(*prog)) {
         return; // error already reported
     }
 
     if (g_args.options.dump_after_layout) {
         dump_ast_and_exit(prog);
         // not reached
+    }
+
+    // TODO: object file writer
+    ObjectFile obj = build_object_file_from_program(*prog);
+    std::string obj_filename = get_o_filename(filename, output_dir);
+    if (!write_object_file(obj, obj_filename)) {
+        g_diag.error(SourceLoc(), "Failed to write object file");
+        return; // error already reported
     }
 }
 
@@ -239,4 +268,9 @@ static bool split_modules_sections(Program& prog) {
     }
 
     return !failed;
+}
+
+ObjectFile build_object_file_from_program(const Program& prog) {
+    (void)prog; // suppress unused parameter warning
+    return ObjectFile();
 }
