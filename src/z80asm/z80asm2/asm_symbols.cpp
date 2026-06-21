@@ -265,6 +265,7 @@ bool collect_module_defined_symbols(Program& prog) {
                 if (auto defc_stmt = dynamic_cast<DefcStmt*>(stmt)) {
                     SymbolInfo* sym = define_defc(prog, *mod, defc_stmt->name_id, *defc_stmt);
                     if (sym) {
+                        sym->defc_expr = defc_stmt->expr.get();
                         defc_stmt->symbol = sym;
                     }
                     else {
@@ -434,7 +435,7 @@ static bool compare_declarations_definitions(Program& prog) {
     // collect all modules' symbol definitions
     for (auto& mod : prog.modules) {
         for (auto& [name_id, sym] : mod->symbols) {
-            if (sym->type != SymbolInfo::SymbolType::Undefined) {
+            if (sym->def_type != SymbolInfo::DefType::Undefined) {
                 definitions[name_id].push_back(sym->loc);
             }
         }
@@ -598,9 +599,8 @@ static SymbolInfo* define_label(Program& prog, Module& mod,
     }
 
     // define symbol
-    auto sym = std::make_unique<SymbolInfo>(name_id, SymbolInfo::SymbolType::Label,
+    auto sym = std::make_unique<SymbolInfo>(name_id, SymbolInfo::DefType::Label,
                                             lbl_stmt.loc);
-    sym->section = lbl_stmt.section;
     sym->stmt = &lbl_stmt;
     auto ret = sym.get();
     mod.symbols[name_id] = std::move(sym);
@@ -615,10 +615,10 @@ static SymbolInfo* define_defc(Program& prog, Module& mod,
     }
 
     // define symbol
-    auto sym = std::make_unique<SymbolInfo>(name_id, SymbolInfo::SymbolType::Defc,
+    auto sym = std::make_unique<SymbolInfo>(name_id, SymbolInfo::DefType::Defc,
                                             defc_stmt.loc);
-    sym->section = defc_stmt.section;
     sym->stmt = &defc_stmt;
+    sym->defc_expr = defc_stmt.expr.get();
     auto ret = sym.get();
     mod.symbols[name_id] = std::move(sym);
     return ret;
@@ -647,7 +647,7 @@ static SymbolInfo* define_used_symbol(Program& prog, Module& mod,
 
         // Extern or GLobal: create undefined symbol info
         auto sym = std::make_unique<SymbolInfo>(name_id,
-                                                SymbolInfo::SymbolType::Undefined,
+                                                SymbolInfo::DefType::Undefined,
                                                 loc);
         auto ret = sym.get();
         mod.symbols[name_id] = std::move(sym);

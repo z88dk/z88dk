@@ -13,3 +13,5 @@ bool get_const_expr_value(const Expr* expr, uint& out_value,
                           std::string_view error_kw);
 bool get_const_expr_value(const Expr* expr, int& out_value,
                           std::string_view error_kw);
+bool eval_exprs(Program& prog, bool& changed, bool silent);
+bool verify_expr_ranges(Program& prog);

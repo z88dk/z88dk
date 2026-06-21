@@ -7,9 +7,9 @@ Program: layout_opcodes_01
     Modules:
         Module: layout_opcodes_01 (current)
             Symbols:
-                end: Label in section ""
+                end: Label 8 in section ""
                     Location: t/50-layout/input/layout_opcodes_01.asm:6:1
-                start: Label in section ""
+                start: Label 0 in section ""
                     Location: t/50-layout/input/layout_opcodes_01.asm:1:1
             Sections:
                 Section: "" (current)
@@ -22,7 +22,7 @@ Program: layout_opcodes_01
                             Section: ""
                             Address: 0
                             Symbol info:
-                                start: Label in section ""
+                                start: Label 0 in section ""
                                     Location: t/50-layout/input/layout_opcodes_01.asm:1:1
                         OpcodeStmt
                             Location: t/50-layout/input/layout_opcodes_01.asm:2:5
@@ -37,8 +37,9 @@ Program: layout_opcodes_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_opcodes_01.asm:3:13
-                                    Value type: Unknown
-                                    Tokens: 1+2*3
+                                    Value type: Constant
+                                    Value const: 7
+                                    Expr: 1+2*3
                                     Offset: 1, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -46,28 +47,29 @@ Program: layout_opcodes_01
                                     Inner expression:
                                         ExprBinary: +
                                             Location: t/50-layout/input/layout_opcodes_01.asm:3:13
-                                            Value type: Unknown
-                                            Tokens: 1+2*3
+                                            Value type: Constant
+                                            Value const: 7
+                                            Expr: 1+2*3
                                             LHS:
                                                 ExprLiteralInt: 1
                                                     Location: t/50-layout/input/layout_opcodes_01.asm:3:11
-                                                    Value type: Unknown
-                                                    Tokens: 
+                                                    Value type: Constant
+                                                    Value const: 1
                                             RHS:
                                                 ExprBinary: *
                                                     Location: t/50-layout/input/layout_opcodes_01.asm:3:15
-                                                    Value type: Unknown
-                                                    Tokens: 
+                                                    Value type: Constant
+                                                    Value const: 6
                                                     LHS:
                                                         ExprLiteralInt: 2
                                                             Location: t/50-layout/input/layout_opcodes_01.asm:3:13
-                                                            Value type: Unknown
-                                                            Tokens: 
+                                                            Value type: Constant
+                                                            Value const: 2
                                                     RHS:
                                                         ExprLiteralInt: 3
                                                             Location: t/50-layout/input/layout_opcodes_01.asm:3:15
-                                                            Value type: Unknown
-                                                            Tokens: 
+                                                            Value type: Constant
+                                                            Value const: 3
                         OpcodeStmt
                             Location: t/50-layout/input/layout_opcodes_01.asm:4:5
                             Section: ""
@@ -77,8 +79,10 @@ Program: layout_opcodes_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_opcodes_01.asm:4:8
-                                    Value type: Unknown
-                                    Tokens: start
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 0
+                                    Expr: start
                                     Offset: 1, Size: 1
                                     Type: PCrelative
                                     Validation: Any
@@ -88,10 +92,12 @@ Program: layout_opcodes_01
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_opcodes_01.asm:4:8
-                                            Value type: Unknown
-                                            Tokens: start
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 0
+                                            Expr: start
                                             Symbol info:
-                                                start: Label in section ""
+                                                start: Label 0 in section ""
                                                     Location: t/50-layout/input/layout_opcodes_01.asm:1:1
                         OpcodeStmt
                             Location: t/50-layout/input/layout_opcodes_01.asm:5:5
@@ -101,8 +107,10 @@ Program: layout_opcodes_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_opcodes_01.asm:5:8
-                                    Value type: Unknown
-                                    Tokens: end
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 8
+                                    Expr: end
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -110,10 +118,12 @@ Program: layout_opcodes_01
                                     Inner expression:
                                         ExprSymbol: end
                                             Location: t/50-layout/input/layout_opcodes_01.asm:5:8
-                                            Value type: Unknown
-                                            Tokens: end
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 8
+                                            Expr: end
                                             Symbol info:
-                                                end: Label in section ""
+                                                end: Label 8 in section ""
                                                     Location: t/50-layout/input/layout_opcodes_01.asm:6:1
                         LabelStmt
                             Location: t/50-layout/input/layout_opcodes_01.asm:6:1
@@ -121,7 +131,7 @@ Program: layout_opcodes_01
                             Section: ""
                             Address: 8
                             Symbol info:
-                                end: Label in section ""
+                                end: Label 8 in section ""
                                     Location: t/50-layout/input/layout_opcodes_01.asm:6:1
     Statements:
         LabelStmt
@@ -130,7 +140,7 @@ Program: layout_opcodes_01
             Section: ""
             Address: 0
             Symbol info:
-                start: Label in section ""
+                start: Label 0 in section ""
                     Location: t/50-layout/input/layout_opcodes_01.asm:1:1
         OpcodeStmt
             Location: t/50-layout/input/layout_opcodes_01.asm:2:5
@@ -145,8 +155,9 @@ Program: layout_opcodes_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_opcodes_01.asm:3:13
-                    Value type: Unknown
-                    Tokens: 1+2*3
+                    Value type: Constant
+                    Value const: 7
+                    Expr: 1+2*3
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -154,28 +165,29 @@ Program: layout_opcodes_01
                     Inner expression:
                         ExprBinary: +
                             Location: t/50-layout/input/layout_opcodes_01.asm:3:13
-                            Value type: Unknown
-                            Tokens: 1+2*3
+                            Value type: Constant
+                            Value const: 7
+                            Expr: 1+2*3
                             LHS:
                                 ExprLiteralInt: 1
                                     Location: t/50-layout/input/layout_opcodes_01.asm:3:11
-                                    Value type: Unknown
-                                    Tokens: 
+                                    Value type: Constant
+                                    Value const: 1
                             RHS:
                                 ExprBinary: *
                                     Location: t/50-layout/input/layout_opcodes_01.asm:3:15
-                                    Value type: Unknown
-                                    Tokens: 
+                                    Value type: Constant
+                                    Value const: 6
                                     LHS:
                                         ExprLiteralInt: 2
                                             Location: t/50-layout/input/layout_opcodes_01.asm:3:13
-                                            Value type: Unknown
-                                            Tokens: 
+                                            Value type: Constant
+                                            Value const: 2
                                     RHS:
                                         ExprLiteralInt: 3
                                             Location: t/50-layout/input/layout_opcodes_01.asm:3:15
-                                            Value type: Unknown
-                                            Tokens: 
+                                            Value type: Constant
+                                            Value const: 3
         OpcodeStmt
             Location: t/50-layout/input/layout_opcodes_01.asm:4:5
             Section: ""
@@ -185,8 +197,10 @@ Program: layout_opcodes_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_opcodes_01.asm:4:8
-                    Value type: Unknown
-                    Tokens: start
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 0
+                    Expr: start
                     Offset: 1, Size: 1
                     Type: PCrelative
                     Validation: Any
@@ -196,10 +210,12 @@ Program: layout_opcodes_01
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_opcodes_01.asm:4:8
-                            Value type: Unknown
-                            Tokens: start
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 0
+                            Expr: start
                             Symbol info:
-                                start: Label in section ""
+                                start: Label 0 in section ""
                                     Location: t/50-layout/input/layout_opcodes_01.asm:1:1
         OpcodeStmt
             Location: t/50-layout/input/layout_opcodes_01.asm:5:5
@@ -209,8 +225,10 @@ Program: layout_opcodes_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_opcodes_01.asm:5:8
-                    Value type: Unknown
-                    Tokens: end
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 8
+                    Expr: end
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -218,10 +236,12 @@ Program: layout_opcodes_01
                     Inner expression:
                         ExprSymbol: end
                             Location: t/50-layout/input/layout_opcodes_01.asm:5:8
-                            Value type: Unknown
-                            Tokens: end
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 8
+                            Expr: end
                             Symbol info:
-                                end: Label in section ""
+                                end: Label 8 in section ""
                                     Location: t/50-layout/input/layout_opcodes_01.asm:6:1
         LabelStmt
             Location: t/50-layout/input/layout_opcodes_01.asm:6:1
@@ -229,5 +249,5 @@ Program: layout_opcodes_01
             Section: ""
             Address: 8
             Symbol info:
-                end: Label in section ""
+                end: Label 8 in section ""
                     Location: t/50-layout/input/layout_opcodes_01.asm:6:1

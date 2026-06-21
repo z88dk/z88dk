@@ -30,7 +30,7 @@ Program: dm_01
                 Patch
                     Location: t/40-syntax/input/dm_01.asm:3:4
                     Value type: Unknown
-                    Tokens: 1
+                    Expr: 1
                     Offset: 0, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -39,11 +39,11 @@ Program: dm_01
                         ExprLiteralInt: 1
                             Location: t/40-syntax/input/dm_01.asm:3:4
                             Value type: Unknown
-                            Tokens: 1
+                            Expr: 1
                 Patch
                     Location: t/40-syntax/input/dm_01.asm:3:6
                     Value type: Unknown
-                    Tokens: 2
+                    Expr: 2
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -52,11 +52,11 @@ Program: dm_01
                         ExprLiteralInt: 2
                             Location: t/40-syntax/input/dm_01.asm:3:6
                             Value type: Unknown
-                            Tokens: 2
+                            Expr: 2
                 Patch
                     Location: t/40-syntax/input/dm_01.asm:3:8
                     Value type: Unknown
-                    Tokens: 3
+                    Expr: 3
                     Offset: 2, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -65,11 +65,11 @@ Program: dm_01
                         ExprLiteralInt: 3
                             Location: t/40-syntax/input/dm_01.asm:3:8
                             Value type: Unknown
-                            Tokens: 3
+                            Expr: 3
                 Patch
                     Location: t/40-syntax/input/dm_01.asm:3:12
                     Value type: Unknown
-                    Tokens: 1+2*3
+                    Expr: 1+2*3
                     Offset: 3, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -78,27 +78,23 @@ Program: dm_01
                         ExprBinary: +
                             Location: t/40-syntax/input/dm_01.asm:3:12
                             Value type: Unknown
-                            Tokens: 1+2*3
+                            Expr: 1+2*3
                             LHS:
                                 ExprLiteralInt: 1
                                     Location: t/40-syntax/input/dm_01.asm:3:10
                                     Value type: Unknown
-                                    Tokens: 
                             RHS:
                                 ExprBinary: *
                                     Location: t/40-syntax/input/dm_01.asm:3:14
                                     Value type: Unknown
-                                    Tokens: 
                                     LHS:
                                         ExprLiteralInt: 2
                                             Location: t/40-syntax/input/dm_01.asm:3:12
                                             Value type: Unknown
-                                            Tokens: 
                                     RHS:
                                         ExprLiteralInt: 3
                                             Location: t/40-syntax/input/dm_01.asm:3:14
                                             Value type: Unknown
-                                            Tokens: 
         OpcodeStmt
             Location: t/40-syntax/input/dm_01.asm:6:1
             Address: 0

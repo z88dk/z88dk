@@ -52,6 +52,10 @@ struct Token {
     static Token string(std::string_view text, std::string_view value,
                         const SourceLoc& loc);
     static Token end_of_line(const SourceLoc& loc);
+
+    // Compare tokens for semantic equality (ignoring location)
+    bool operator==(const Token& other) const noexcept;
+    bool operator!=(const Token& other) const noexcept;
 };
 
 std::string to_string(Token token);

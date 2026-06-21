@@ -3,13 +3,13 @@ Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/50-layout/input/layout_phase_02.asm...
-t/50-layout/input/layout_phase_02.asm:4:1: error: Nested PHASE statements are not allowed
+t/50-layout/input/layout_phase_02.asm:4:1: error: Nested PHASE not allowed
     phase 0x2000
     ^
 t/50-layout/input/layout_phase_02.asm:3:1: note: Previous PHASE here
     phase 0x1000
     ^
-t/50-layout/input/layout_phase_02.asm:8:1: error: DEPHASE statements are not allowed outside of a PHASE
+t/50-layout/input/layout_phase_02.asm:8:1: error: DEPHASE without PHASE
     dephase
     ^
 Assembly completed with 2 errors
