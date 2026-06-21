@@ -225,6 +225,8 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
         default:
             assert(0);
         }
+
+        return true;
     }
 
     if (auto llbl_expr = dynamic_cast<ExprLocalLabel*>(expr)) {
@@ -410,7 +412,7 @@ static bool eval_const_expr(Expr* expr, bool& changed, bool silent) {
     }
 }
 
-bool verify_expr_ranges(Program& prog) {
+bool compute_relocations(Program& prog) {
     (void)prog;  // unused for now
     return true;
 }

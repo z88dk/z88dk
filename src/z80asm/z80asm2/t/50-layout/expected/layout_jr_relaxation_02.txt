@@ -1,0 +1,62 @@
+% z88dk-z80asm -v -dump-after-layout t/50-layout//input/layout_jr_relaxation_02.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_jr_relaxation_02.asm...
+Program: layout_jr_relaxation_02
+    Modules:
+        Module: layout_jr_relaxation_02 (current)
+            Sections:
+                Section: "" (current)
+                    Size: 2
+                    Has opcodes
+                    Statements:
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_02.asm:1:1
+                            Section: ""
+                            Address: 0
+                            Is short jump
+                            Bytes: $18 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_jr_relaxation_02.asm:1:4
+                                    Value type: Constant
+                                    Value const: $100
+                                    Expr: $100
+                                    Offset: 1, Size: 1
+                                    Type: PCrelative
+                                    Validation: Any
+                                    Formula: None
+                                    Short jump (alt offset: 1, alt size: 2)
+                                    Alt bytes: $C3 0 0
+                                    Inner expression:
+                                        ExprLiteralInt: $100
+                                            Location: t/50-layout/input/layout_jr_relaxation_02.asm:1:4
+                                            Value type: Constant
+                                            Value const: $100
+                                            Expr: $100
+    Statements:
+        OpcodeStmt
+            Location: t/50-layout/input/layout_jr_relaxation_02.asm:1:1
+            Section: ""
+            Address: 0
+            Is short jump
+            Bytes: $18 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_jr_relaxation_02.asm:1:4
+                    Value type: Constant
+                    Value const: $100
+                    Expr: $100
+                    Offset: 1, Size: 1
+                    Type: PCrelative
+                    Validation: Any
+                    Formula: None
+                    Short jump (alt offset: 1, alt size: 2)
+                    Alt bytes: $C3 0 0
+                    Inner expression:
+                        ExprLiteralInt: $100
+                            Location: t/50-layout/input/layout_jr_relaxation_02.asm:1:4
+                            Value type: Constant
+                            Value const: $100
+                            Expr: $100
