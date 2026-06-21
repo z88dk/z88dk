@@ -27,7 +27,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: 0
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $FE
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -36,11 +36,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -56,7 +54,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: 2
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $FC
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -65,11 +63,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -85,7 +81,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: 4
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $FA
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -94,11 +90,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -114,7 +108,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: 6
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $F8
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -123,11 +117,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -143,7 +135,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: 8
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $F6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -152,11 +144,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -172,7 +162,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $0A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $F4
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -181,11 +171,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -201,7 +189,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $0C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $F2
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -210,11 +198,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -230,7 +216,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $0E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $F0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -239,11 +225,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -259,7 +243,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $10
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $EE
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -268,11 +252,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -288,7 +270,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $12
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $EC
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -297,11 +279,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -317,7 +297,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $14
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $EA
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -326,11 +306,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -346,7 +324,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $16
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $E8
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -355,11 +333,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -375,7 +351,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $18
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $E6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -384,11 +360,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -404,7 +378,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $1A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $E4
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -413,11 +387,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -433,7 +405,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $1C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $E2
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -442,11 +414,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -462,7 +432,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $1E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $E0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -471,11 +441,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -491,7 +459,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $20
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $DE
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -500,11 +468,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -520,7 +486,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $22
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $DC
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -529,11 +495,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -549,7 +513,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $24
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $DA
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -558,11 +522,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -578,7 +540,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $26
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $D8
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -587,11 +549,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -607,7 +567,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $28
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $D6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -616,11 +576,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -636,7 +594,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $2A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $D4
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -645,11 +603,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -665,7 +621,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $2C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $D2
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -674,11 +630,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -694,7 +648,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $2E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $D0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -703,11 +657,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -723,7 +675,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $30
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $CE
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -732,11 +684,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -752,7 +702,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $32
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $CC
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -761,11 +711,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -781,7 +729,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $34
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $CA
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -790,11 +738,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -810,7 +756,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $36
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $C8
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -819,11 +765,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -839,7 +783,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $38
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $C6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -848,11 +792,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -868,7 +810,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $3A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $C4
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -877,11 +819,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -897,7 +837,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $3C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $C2
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -906,11 +846,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -926,7 +864,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $3E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $C0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -935,11 +873,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -955,7 +891,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $40
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $BE
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -964,11 +900,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -984,7 +918,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $42
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $BC
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -993,11 +927,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1013,7 +945,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $44
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $BA
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1022,11 +954,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1042,7 +972,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $46
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $B8
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1051,11 +981,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1071,7 +999,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $48
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $B6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1080,11 +1008,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1100,7 +1026,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $4A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $B4
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1109,11 +1035,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1129,7 +1053,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $4C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $B2
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1138,11 +1062,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1158,7 +1080,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $4E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $B0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1167,11 +1089,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1187,7 +1107,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $50
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $AE
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1196,11 +1116,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1216,7 +1134,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $52
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $AC
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1225,11 +1143,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1245,7 +1161,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $54
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $AA
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1254,11 +1170,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1274,7 +1188,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $56
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $A8
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1283,11 +1197,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1303,7 +1215,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $58
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $A6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1312,11 +1224,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1332,7 +1242,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $5A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $A4
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1341,11 +1251,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1361,7 +1269,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $5C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $A2
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1370,11 +1278,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1390,7 +1296,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $5E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $A0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1399,11 +1305,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1419,7 +1323,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $60
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $9E
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1428,11 +1332,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1448,7 +1350,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $62
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $9C
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1457,11 +1359,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1477,7 +1377,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $64
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $9A
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1486,11 +1386,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1506,7 +1404,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $66
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $98
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1515,11 +1413,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1535,7 +1431,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $68
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $96
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1544,11 +1440,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1564,7 +1458,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $6A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $94
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1573,11 +1467,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1593,7 +1485,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $6C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $92
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1602,11 +1494,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1622,7 +1512,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $6E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $90
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1631,11 +1521,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1651,7 +1539,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $70
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $8E
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1660,11 +1548,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1680,7 +1566,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $72
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $8C
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1689,11 +1575,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1709,7 +1593,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $74
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $8A
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1718,11 +1602,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1738,7 +1620,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $76
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $88
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1747,11 +1629,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1767,7 +1647,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $78
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $86
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1776,11 +1656,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1796,7 +1674,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $7A
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $84
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1805,11 +1683,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1825,7 +1701,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $7C
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $82
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1834,11 +1710,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1854,7 +1728,7 @@ Program: layout_jr_relaxation_07
                             Section: ""
                             Address: $7E
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $80
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -1863,11 +1737,9 @@ Program: layout_jr_relaxation_07
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3556,7 +3428,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: 0
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $FE
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3565,11 +3437,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3585,7 +3455,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: 2
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $FC
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3594,11 +3464,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3614,7 +3482,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: 4
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $FA
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3623,11 +3491,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3643,7 +3509,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: 6
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $F8
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3652,11 +3518,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3672,7 +3536,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: 8
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $F6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3681,11 +3545,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3701,7 +3563,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $0A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $F4
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3710,11 +3572,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3730,7 +3590,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $0C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $F2
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3739,11 +3599,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3759,7 +3617,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $0E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $F0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3768,11 +3626,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3788,7 +3644,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $10
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $EE
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3797,11 +3653,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3817,7 +3671,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $12
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $EC
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3826,11 +3680,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3846,7 +3698,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $14
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $EA
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3855,11 +3707,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3875,7 +3725,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $16
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $E8
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3884,11 +3734,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3904,7 +3752,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $18
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $E6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3913,11 +3761,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3933,7 +3779,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $1A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $E4
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3942,11 +3788,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3962,7 +3806,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $1C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $E2
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3971,11 +3815,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -3991,7 +3833,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $1E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $E0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4000,11 +3842,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4020,7 +3860,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $20
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $DE
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4029,11 +3869,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4049,7 +3887,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $22
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $DC
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4058,11 +3896,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4078,7 +3914,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $24
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $DA
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4087,11 +3923,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4107,7 +3941,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $26
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $D8
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4116,11 +3950,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4136,7 +3968,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $28
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $D6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4145,11 +3977,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4165,7 +3995,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $2A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $D4
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4174,11 +4004,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4194,7 +4022,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $2C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $D2
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4203,11 +4031,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4223,7 +4049,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $2E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $D0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4232,11 +4058,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4252,7 +4076,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $30
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $CE
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4261,11 +4085,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4281,7 +4103,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $32
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $CC
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4290,11 +4112,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4310,7 +4130,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $34
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $CA
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4319,11 +4139,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4339,7 +4157,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $36
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $C8
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4348,11 +4166,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4368,7 +4184,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $38
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $C6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4377,11 +4193,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4397,7 +4211,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $3A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $C4
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4406,11 +4220,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4426,7 +4238,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $3C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $C2
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4435,11 +4247,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4455,7 +4265,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $3E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $C0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4464,11 +4274,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4484,7 +4292,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $40
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $BE
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4493,11 +4301,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4513,7 +4319,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $42
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $BC
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4522,11 +4328,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4542,7 +4346,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $44
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $BA
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4551,11 +4355,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4571,7 +4373,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $46
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $B8
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4580,11 +4382,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4600,7 +4400,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $48
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $B6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4609,11 +4409,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4629,7 +4427,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $4A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $B4
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4638,11 +4436,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4658,7 +4454,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $4C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $B2
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4667,11 +4463,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4687,7 +4481,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $4E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $B0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4696,11 +4490,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4716,7 +4508,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $50
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $AE
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4725,11 +4517,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4745,7 +4535,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $52
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $AC
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4754,11 +4544,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4774,7 +4562,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $54
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $AA
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4783,11 +4571,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4803,7 +4589,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $56
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $A8
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4812,11 +4598,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4832,7 +4616,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $58
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $A6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4841,11 +4625,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4861,7 +4643,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $5A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $A4
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4870,11 +4652,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4890,7 +4670,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $5C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $A2
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4899,11 +4679,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4919,7 +4697,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $5E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $A0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4928,11 +4706,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4948,7 +4724,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $60
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $9E
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4957,11 +4733,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4977,7 +4751,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $62
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $9C
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -4986,11 +4760,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5006,7 +4778,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $64
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $9A
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5015,11 +4787,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5035,7 +4805,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $66
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $98
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5044,11 +4814,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5064,7 +4832,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $68
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $96
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5073,11 +4841,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5093,7 +4859,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $6A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $94
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5102,11 +4868,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5122,7 +4886,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $6C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $92
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5131,11 +4895,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5151,7 +4913,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $6E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $90
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5160,11 +4922,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5180,7 +4940,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $70
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $8E
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5189,11 +4949,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5209,7 +4967,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $72
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $8C
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5218,11 +4976,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5238,7 +4994,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $74
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $8A
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5247,11 +5003,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5267,7 +5021,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $76
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $88
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5276,11 +5030,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5296,7 +5048,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $78
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $86
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5305,11 +5057,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5325,7 +5075,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $7A
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $84
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5334,11 +5084,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5354,7 +5102,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $7C
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $82
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5363,11 +5111,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5383,7 +5129,7 @@ Program: layout_jr_relaxation_07
             Section: ""
             Address: $7E
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $80
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6
@@ -5392,11 +5138,9 @@ Program: layout_jr_relaxation_07
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:3:6

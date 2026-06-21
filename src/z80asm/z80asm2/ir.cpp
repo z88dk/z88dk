@@ -55,6 +55,18 @@ static std::string section_name_or_empty(const Section* section) {
     return name.empty() ? "\"\"" : name;
 }
 
+// Helper to format a vector of bytes as a hex string
+static std::string format_bytes(const std::vector<uint8_t>& bytes) {
+    std::string result;
+    for (size_t i = 0; i < bytes.size(); ++i) {
+        if (i > 0) {
+            result += " ";
+        }
+        result += int_to_hex(bytes[i]);
+    }
+    return result;
+}
+
 static void dump_expr_value(const ExprValue& value, DumpContext ctx) {
     ctx.line("Value type: " + to_string(value.type));
     switch (value.type) {
@@ -112,14 +124,7 @@ void OpcodeStmt::dump(DumpContext ctx) const {
 
     // Dump bytes
     if (!bytes.empty()) {
-        std::string bytes_str = "Bytes: ";
-        for (size_t i = 0; i < bytes.size(); ++i) {
-            if (i > 0) {
-                bytes_str += " ";
-            }
-            bytes_str += int_to_hex(bytes[i]);
-        }
-        c.line(bytes_str);
+        c.line("Bytes: " + format_bytes(bytes));
     }
 
     // Dump patches
@@ -248,6 +253,9 @@ void Patch::dump(DumpContext ctx) const {
     // Dump patch type
     std::string type_str;
     switch (type) {
+    case PatchType::None:
+        type_str = "None";
+        break;
     case PatchType::Unsigned:
         type_str = "Unsigned";
         break;
@@ -264,7 +272,7 @@ void Patch::dump(DumpContext ctx) const {
         type_str = "PCrelative";
         break;
     default:
-        type_str = "Unknown";
+        assert(0);
         break;
     }
     c.line("Type: " + type_str);
@@ -306,8 +314,7 @@ void Patch::dump(DumpContext ctx) const {
         validation_str = "8";
         break;
     default:
-        validation_str = "Unknown";
-        break;
+        assert(0);
     }
     c.line("Validation: " + validation_str);
 
@@ -333,8 +340,7 @@ void Patch::dump(DumpContext ctx) const {
         formula_str = "Select3";
         break;
     default:
-        formula_str = "Unknown";
-        break;
+        assert(0);
     }
     c.line("Formula: " + formula_str);
 
@@ -353,14 +359,7 @@ void Patch::dump(DumpContext ctx) const {
         c.line("Short jump (alt offset: " + int_to_hex(alt_offset) +
                ", alt size: " + int_to_hex(alt_size) + ")");
         if (!alt_bytes.empty()) {
-            std::string alt_str = "Alt bytes: ";
-            for (size_t i = 0; i < alt_bytes.size(); ++i) {
-                if (i > 0) {
-                    alt_str += " ";
-                }
-                alt_str += int_to_hex(alt_bytes[i]);
-            }
-            c.line(alt_str);
+            c.line("Alt bytes: " + format_bytes(alt_bytes));
         }
     }
 
@@ -381,6 +380,10 @@ void OrgStmt::dump(DumpContext ctx) const {
     if (expr) {
         c.line("Expression:");
         expr->dump(c.child());
+    }
+    c.line("Padding size: " + int_to_hex(padding_size));
+    if (!bytes.empty()) {
+        c.line("Bytes: " + format_bytes(bytes));
     }
 }
 
@@ -437,6 +440,10 @@ void AlignStmt::dump(DumpContext ctx) const {
         c.line("Filler byte:");
         filler_expr->dump(c.child());
     }
+    c.line("Padding size: " + int_to_hex(padding_size));
+    if (!bytes.empty()) {
+        c.line("Bytes: " + format_bytes(bytes));
+    }
 }
 
 void DefsNumericStmt::dump(DumpContext ctx) const {
@@ -455,6 +462,10 @@ void DefsNumericStmt::dump(DumpContext ctx) const {
         c.line("Filler byte:");
         filler_expr->dump(c.child());
     }
+    c.line("Padding size: " + int_to_hex(padding_size));
+    if (!bytes.empty()) {
+        c.line("Bytes: " + format_bytes(bytes));
+    }
 }
 
 void DefsStringStmt::dump(DumpContext ctx) const {
@@ -471,6 +482,10 @@ void DefsStringStmt::dump(DumpContext ctx) const {
     }
     c.line("String literal: " + escape_string(g_strings.to_string(string_id)));
     c.line("Filler byte: " + int_to_hex(filler_byte));
+    c.line("Padding size: " + int_to_hex(padding_size));
+    if (!bytes.empty()) {
+        c.line("Bytes: " + format_bytes(bytes));
+    }
 }
 
 void SymbolDeclareStmt::dump(DumpContext ctx) const {

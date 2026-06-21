@@ -189,6 +189,7 @@ enum class ExprFormula : uint8_t {
 
 // type of patch
 enum class PatchType : uint8_t {
+    None,                   // already patched, no further action needed
     Unsigned,               // unsigned, default
     Signed,                 // signed
     HighByte,               // ldh a, (%h) of gbz80
@@ -264,6 +265,7 @@ struct LabelStmt : Stmt {
 struct OrgStmt : Stmt {
     std::unique_ptr<Expr> expr;
     uint padding_size = 0;      // number of bytes to pad to reach new address
+    std::vector<uint8_t> bytes;
 
     OrgStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
@@ -305,6 +307,7 @@ struct AlignStmt : Stmt {
     std::unique_ptr<Expr> align_expr;
     std::unique_ptr<Expr> filler_expr;
     uint padding_size = 0;          // number of bytes to pad to reach new address
+    std::vector<uint8_t> bytes;
 
     AlignStmt(std::unique_ptr<Expr> align_expr_,
               std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
@@ -318,6 +321,7 @@ struct DefsNumericStmt : Stmt {
     std::unique_ptr<Expr> size_expr;
     std::unique_ptr<Expr> filler_expr;
     uint padding_size = 0;          // number of bytes to pad to reach new address
+    std::vector<uint8_t> bytes;
 
     DefsNumericStmt(std::unique_ptr<Expr> size_expr_,
                     std::unique_ptr<Expr> filler_expr_, const SourceLoc& loc)
@@ -332,6 +336,7 @@ struct DefsStringStmt : Stmt {
     StringInterner::Id string_id;    // string literal to fill with
     uint8_t filler_byte;
     uint padding_size = 0;          // number of bytes to pad to reach new address
+    std::vector<uint8_t> bytes;
 
     DefsStringStmt(std::unique_ptr<Expr> size_expr_,
                    StringInterner::Id string_id_, uint8_t filler_byte_, const SourceLoc& loc)

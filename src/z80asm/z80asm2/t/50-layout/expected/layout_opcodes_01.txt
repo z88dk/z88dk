@@ -33,7 +33,7 @@ Program: layout_opcodes_01
                             Location: t/50-layout/input/layout_opcodes_01.asm:3:5
                             Section: ""
                             Address: 1
-                            Bytes: $3E 0
+                            Bytes: $3E 7
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_opcodes_01.asm:3:13
@@ -41,7 +41,7 @@ Program: layout_opcodes_01
                                     Value const: 7
                                     Expr: 1+2*3
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -75,7 +75,7 @@ Program: layout_opcodes_01
                             Section: ""
                             Address: 3
                             Is short jump
-                            Bytes: $18 0
+                            Bytes: $18 $FB
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_opcodes_01.asm:4:8
@@ -84,11 +84,9 @@ Program: layout_opcodes_01
                                     Value offset: 0
                                     Expr: start
                                     Offset: 1, Size: 1
-                                    Type: PCrelative
+                                    Type: None
                                     Validation: Any
                                     Formula: None
-                                    Short jump (alt offset: 1, alt size: 2)
-                                    Alt bytes: $C3 0 0
                                     Inner expression:
                                         ExprSymbol: start
                                             Location: t/50-layout/input/layout_opcodes_01.asm:4:8
@@ -151,7 +149,7 @@ Program: layout_opcodes_01
             Location: t/50-layout/input/layout_opcodes_01.asm:3:5
             Section: ""
             Address: 1
-            Bytes: $3E 0
+            Bytes: $3E 7
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_opcodes_01.asm:3:13
@@ -159,7 +157,7 @@ Program: layout_opcodes_01
                     Value const: 7
                     Expr: 1+2*3
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -193,7 +191,7 @@ Program: layout_opcodes_01
             Section: ""
             Address: 3
             Is short jump
-            Bytes: $18 0
+            Bytes: $18 $FB
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_opcodes_01.asm:4:8
@@ -202,11 +200,9 @@ Program: layout_opcodes_01
                     Value offset: 0
                     Expr: start
                     Offset: 1, Size: 1
-                    Type: PCrelative
+                    Type: None
                     Validation: Any
                     Formula: None
-                    Short jump (alt offset: 1, alt size: 2)
-                    Alt bytes: $C3 0 0
                     Inner expression:
                         ExprSymbol: start
                             Location: t/50-layout/input/layout_opcodes_01.asm:4:8

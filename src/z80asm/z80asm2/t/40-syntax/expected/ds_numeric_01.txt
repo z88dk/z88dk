@@ -47,6 +47,7 @@ Program: ds_numeric_01
                 ExprLiteralInt: 0
                     Location: t/40-syntax/input/ds_numeric_01.asm:4:1
                     Value type: Unknown
+            Padding size: 0
         DefsNumericStmt
             Location: t/40-syntax/input/ds_numeric_01.asm:5:1
             Address: 0
@@ -92,3 +93,4 @@ Program: ds_numeric_01
                                 ExprLiteralInt: 4
                                     Location: t/40-syntax/input/ds_numeric_01.asm:5:15
                                     Value type: Unknown
+            Padding size: 0
