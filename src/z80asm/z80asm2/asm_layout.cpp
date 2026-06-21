@@ -9,7 +9,7 @@
 #include "diag.h"
 #include "ir.h"
 #include "source_loc.h"
-#include "string_utils.h"
+#include <cassert>
 #include <string_view>
 
 bool compute_layout(Program& prog, bool& changed) {
@@ -235,8 +235,55 @@ bool compute_layout(Program& prog, bool& changed) {
     return !failed;
 }
 
-bool check_jumps(Program& prog, bool& changed) {
-    (void)prog; // suppress unused parameter warning
-    (void)changed; // suppress unused parameter warning
-    return true;
+static void check_jump(OpcodeStmt* opc_stmt, Patch* patch, bool& changed) {
+    assert(patch->type == PatchType::PCrelative);
+    assert(patch->size == 1);
+    assert(!opc_stmt->bytes.empty());
+
+    // check the target address is known
+    if (patch->inner->value.type == ExprType::AddressRelative &&
+            patch->inner->value.section == opc_stmt->section) {
+        // JR to a label in the same section
+        int offset = static_cast<int>(patch->inner->value.offset) -
+                     static_cast<int>(opc_stmt->address + opc_stmt->bytes.size());
+
+        if (offset >= -128 && offset <= 127) {
+            // offset fits in a short jump, no change needed
+            return;
+        }
+
+        // transform into a long jump
+        patch->type = PatchType::Unsigned;
+        patch->offset = patch->alt_offset;
+        patch->size = patch->alt_size;
+        opc_stmt->bytes = patch->alt_bytes;
+        opc_stmt->is_short_jump = false;
+        changed = true;
+    }
+    else {
+        // either Unnown, Constant, Computed or AddressRelative to a different section
+        // must be handled by the linker
+    }
+}
+
+void check_jumps(Program& prog, bool& changed) {
+    for (auto& mod : prog.modules) {
+        for (auto& sec : mod->sections) {
+            for (auto& stmt : sec->stmts) {
+                // only look into opcodes
+                if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
+                    if (opc_stmt->is_short_jump) {
+                        // patches if opcode is a short jump
+                        for (auto& patch : opc_stmt->patches) {
+                            if (patch->type == PatchType::PCrelative &&
+                                    patch->size == 1) {
+                                // only JR jumps (size 1), not JRE (size 2)
+                                check_jump(opc_stmt, patch.get(), changed);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

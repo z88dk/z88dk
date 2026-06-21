@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
     }
 
     // execute requested actions
-    assemble_files(g_args.input_files);
+    assemble_files(g_args.input_files, g_args.options.output_dir);
 
     if (g_args.options.verbose) {
         auto errors = g_diag.get_error_count();

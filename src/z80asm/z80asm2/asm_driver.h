@@ -10,5 +10,6 @@
 #include <string_view>
 #include <vector>
 
-void assemble_files(std::vector<std::string>& filenames);
-void assemble_file(std::string_view filename);
+void assemble_files(std::vector<std::string>& filenames,
+                    std::string_view output_dir);
+void assemble_file(std::string_view filename, std::string_view output_dir);
