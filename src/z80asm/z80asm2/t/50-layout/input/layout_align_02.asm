@@ -1,5 +1,5 @@
 section code
-align 8
+align 4
 defb 1, 2, 3
-align 16
+align 4, 0xFF
 defb 4, 5, 6

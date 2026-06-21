@@ -9,7 +9,7 @@ Program: decl_matrix_10D
     Modules:
         Module: decl_matrix_10D (current)
             Symbols:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
             Sections:
                 Section: "" (current)
@@ -25,7 +25,7 @@ Program: decl_matrix_10D
                                 Patch
                                     Location: t/45-symbols/input/decl_matrix_10D.asm:3:11
                                     Value type: Unknown
-                                    Tokens: x
+                                    Expr: x
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -34,9 +34,9 @@ Program: decl_matrix_10D
                                         ExprSymbol: x
                                             Location: t/45-symbols/input/decl_matrix_10D.asm:3:11
                                             Value type: Unknown
-                                            Tokens: x
+                                            Expr: x
                                             Symbol info:
-                                                x: Label in section ""
+                                                x: Label 0 in section ""
                                                     Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
                         LabelStmt
                             Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
@@ -44,7 +44,7 @@ Program: decl_matrix_10D
                             Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section ""
+                                x: Label 0 in section ""
                                     Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
@@ -66,7 +66,7 @@ Program: decl_matrix_10D
                 Patch
                     Location: t/45-symbols/input/decl_matrix_10D.asm:3:11
                     Value type: Unknown
-                    Tokens: x
+                    Expr: x
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -75,9 +75,9 @@ Program: decl_matrix_10D
                         ExprSymbol: x
                             Location: t/45-symbols/input/decl_matrix_10D.asm:3:11
                             Value type: Unknown
-                            Tokens: x
+                            Expr: x
                             Symbol info:
-                                x: Label in section ""
+                                x: Label 0 in section ""
                                     Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
         LabelStmt
             Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
@@ -85,7 +85,7 @@ Program: decl_matrix_10D
             Section: ""
             Address: 0
             Symbol info:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_10D.asm:4:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_10D.asm:4:1

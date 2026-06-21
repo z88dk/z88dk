@@ -1,0 +1,885 @@
+% z88dk-z80asm -v -dump-after-layout t/50-layout//input/layout_expr_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_expr_01.asm...
+Program: layout_expr_01
+    Modules:
+        Module: layout_expr_01 (current)
+            Symbols:
+                end_code: Label $12 in section code
+                    Location: t/50-layout/input/layout_expr_01.asm:12:1
+                end_data: Label 4 in section data
+                    Location: t/50-layout/input/layout_expr_01.asm:18:1
+                start_code: Label 0 in section code
+                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+                start_data: Label 0 in section data
+                    Location: t/50-layout/input/layout_expr_01.asm:15:1
+            Sections:
+                Section: ""
+                    Size: 0
+                Section: code
+                    Size: $12
+                    Has opcodes
+                    Statements:
+                        LabelStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+                            Label: start_code
+                            Section: code
+                            Address: 0
+                            Symbol info:
+                                start_code: Label 0 in section code
+                                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:3:5
+                            Section: code
+                            Address: 0
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:3:10
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 0
+                                    Expr: $
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralAsmpc
+                                            Location: t/50-layout/input/layout_expr_01.asm:3:10
+                                            Value type: AddressRelative
+                                            Value section: code
+                                            Value offset: 0
+                                            Expr: $
+                                            Address: 0
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:4:5
+                            Section: code
+                            Address: 2
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:4:12
+                                    Value type: Constant
+                                    Value const: 7
+                                    Expr: 1+2*3
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: +
+                                            Location: t/50-layout/input/layout_expr_01.asm:4:12
+                                            Value type: Constant
+                                            Value const: 7
+                                            Expr: 1+2*3
+                                            LHS:
+                                                ExprLiteralInt: 1
+                                                    Location: t/50-layout/input/layout_expr_01.asm:4:10
+                                                    Value type: Constant
+                                                    Value const: 1
+                                            RHS:
+                                                ExprBinary: *
+                                                    Location: t/50-layout/input/layout_expr_01.asm:4:14
+                                                    Value type: Constant
+                                                    Value const: 6
+                                                    LHS:
+                                                        ExprLiteralInt: 2
+                                                            Location: t/50-layout/input/layout_expr_01.asm:4:12
+                                                            Value type: Constant
+                                                            Value const: 2
+                                                    RHS:
+                                                        ExprLiteralInt: 3
+                                                            Location: t/50-layout/input/layout_expr_01.asm:4:14
+                                                            Value type: Constant
+                                                            Value const: 3
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:5:5
+                            Section: code
+                            Address: 4
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:5:10
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 0
+                                    Expr: start_code
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprSymbol: start_code
+                                            Location: t/50-layout/input/layout_expr_01.asm:5:10
+                                            Value type: AddressRelative
+                                            Value section: code
+                                            Value offset: 0
+                                            Expr: start_code
+                                            Symbol info:
+                                                start_code: Label 0 in section code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:6:5
+                            Section: code
+                            Address: 6
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:6:21
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 2
+                                    Expr: start_code+2
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: +
+                                            Location: t/50-layout/input/layout_expr_01.asm:6:21
+                                            Value type: AddressRelative
+                                            Value section: code
+                                            Value offset: 2
+                                            Expr: start_code+2
+                                            LHS:
+                                                ExprSymbol: start_code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:6:10
+                                                    Value type: AddressRelative
+                                                    Value section: code
+                                                    Value offset: 0
+                                                    Symbol info:
+                                                        start_code: Label 0 in section code
+                                                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+                                            RHS:
+                                                ExprLiteralInt: 2
+                                                    Location: t/50-layout/input/layout_expr_01.asm:6:21
+                                                    Value type: Constant
+                                                    Value const: 2
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:7:5
+                            Section: code
+                            Address: 8
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:7:12
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 2
+                                    Expr: 2+start_code
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: +
+                                            Location: t/50-layout/input/layout_expr_01.asm:7:12
+                                            Value type: AddressRelative
+                                            Value section: code
+                                            Value offset: 2
+                                            Expr: 2+start_code
+                                            LHS:
+                                                ExprLiteralInt: 2
+                                                    Location: t/50-layout/input/layout_expr_01.asm:7:10
+                                                    Value type: Constant
+                                                    Value const: 2
+                                            RHS:
+                                                ExprSymbol: start_code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:7:12
+                                                    Value type: AddressRelative
+                                                    Value section: code
+                                                    Value offset: 0
+                                                    Symbol info:
+                                                        start_code: Label 0 in section code
+                                                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:8:5
+                            Section: code
+                            Address: $0A
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:8:23
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 4
+                                    Expr: 2+start_code+2
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: +
+                                            Location: t/50-layout/input/layout_expr_01.asm:8:23
+                                            Value type: AddressRelative
+                                            Value section: code
+                                            Value offset: 4
+                                            Expr: 2+start_code+2
+                                            LHS:
+                                                ExprBinary: +
+                                                    Location: t/50-layout/input/layout_expr_01.asm:8:12
+                                                    Value type: AddressRelative
+                                                    Value section: code
+                                                    Value offset: 2
+                                                    LHS:
+                                                        ExprLiteralInt: 2
+                                                            Location: t/50-layout/input/layout_expr_01.asm:8:10
+                                                            Value type: Constant
+                                                            Value const: 2
+                                                    RHS:
+                                                        ExprSymbol: start_code
+                                                            Location: t/50-layout/input/layout_expr_01.asm:8:12
+                                                            Value type: AddressRelative
+                                                            Value section: code
+                                                            Value offset: 0
+                                                            Symbol info:
+                                                                start_code: Label 0 in section code
+                                                                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+                                            RHS:
+                                                ExprLiteralInt: 2
+                                                    Location: t/50-layout/input/layout_expr_01.asm:8:23
+                                                    Value type: Constant
+                                                    Value const: 2
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:9:5
+                            Section: code
+                            Address: $0C
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:9:19
+                                    Value type: Constant
+                                    Value const: $12
+                                    Expr: end_code-start_code
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: -
+                                            Location: t/50-layout/input/layout_expr_01.asm:9:19
+                                            Value type: Constant
+                                            Value const: $12
+                                            Expr: end_code-start_code
+                                            LHS:
+                                                ExprSymbol: end_code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:9:10
+                                                    Value type: AddressRelative
+                                                    Value section: code
+                                                    Value offset: $12
+                                                    Symbol info:
+                                                        end_code: Label $12 in section code
+                                                            Location: t/50-layout/input/layout_expr_01.asm:12:1
+                                            RHS:
+                                                ExprSymbol: start_code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:9:19
+                                                    Value type: AddressRelative
+                                                    Value section: code
+                                                    Value offset: 0
+                                                    Symbol info:
+                                                        start_code: Label 0 in section code
+                                                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:10:5
+                            Section: code
+                            Address: $0E
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:10:21
+                                    Value type: Computed
+                                    Expr: start_data-end_code
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: -
+                                            Location: t/50-layout/input/layout_expr_01.asm:10:21
+                                            Value type: Computed
+                                            Expr: start_data-end_code
+                                            LHS:
+                                                ExprSymbol: start_data
+                                                    Location: t/50-layout/input/layout_expr_01.asm:10:10
+                                                    Value type: AddressRelative
+                                                    Value section: data
+                                                    Value offset: 0
+                                                    Symbol info:
+                                                        start_data: Label 0 in section data
+                                                            Location: t/50-layout/input/layout_expr_01.asm:15:1
+                                            RHS:
+                                                ExprSymbol: end_code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:10:21
+                                                    Value type: AddressRelative
+                                                    Value section: code
+                                                    Value offset: $12
+                                                    Symbol info:
+                                                        end_code: Label $12 in section code
+                                                            Location: t/50-layout/input/layout_expr_01.asm:12:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:11:5
+                            Section: code
+                            Address: $10
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:11:19
+                                    Value type: Constant
+                                    Value const: 4
+                                    Expr: end_data-start_data
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: -
+                                            Location: t/50-layout/input/layout_expr_01.asm:11:19
+                                            Value type: Constant
+                                            Value const: 4
+                                            Expr: end_data-start_data
+                                            LHS:
+                                                ExprSymbol: end_data
+                                                    Location: t/50-layout/input/layout_expr_01.asm:11:10
+                                                    Value type: AddressRelative
+                                                    Value section: data
+                                                    Value offset: 4
+                                                    Symbol info:
+                                                        end_data: Label 4 in section data
+                                                            Location: t/50-layout/input/layout_expr_01.asm:18:1
+                                            RHS:
+                                                ExprSymbol: start_data
+                                                    Location: t/50-layout/input/layout_expr_01.asm:11:19
+                                                    Value type: AddressRelative
+                                                    Value section: data
+                                                    Value offset: 0
+                                                    Symbol info:
+                                                        start_data: Label 0 in section data
+                                                            Location: t/50-layout/input/layout_expr_01.asm:15:1
+                        LabelStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:12:1
+                            Label: end_code
+                            Section: code
+                            Address: $12
+                            Symbol info:
+                                end_code: Label $12 in section code
+                                    Location: t/50-layout/input/layout_expr_01.asm:12:1
+                Section: data (current)
+                    Size: 4
+                    Has opcodes
+                    Statements:
+                        LabelStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:15:1
+                            Label: start_data
+                            Section: data
+                            Address: 0
+                            Symbol info:
+                                start_data: Label 0 in section data
+                                    Location: t/50-layout/input/layout_expr_01.asm:15:1
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:16:5
+                            Section: data
+                            Address: 0
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:16:10
+                                    Value type: AddressRelative
+                                    Value section: data
+                                    Value offset: 0
+                                    Expr: $
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralAsmpc
+                                            Location: t/50-layout/input/layout_expr_01.asm:16:10
+                                            Value type: AddressRelative
+                                            Value section: data
+                                            Value offset: 0
+                                            Expr: $
+                                            Address: 0
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:17:5
+                            Section: data
+                            Address: 2
+                            Bytes: 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_expr_01.asm:17:12
+                                    Value type: Constant
+                                    Value const: 7
+                                    Expr: 1+2*3
+                                    Offset: 0, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprBinary: +
+                                            Location: t/50-layout/input/layout_expr_01.asm:17:12
+                                            Value type: Constant
+                                            Value const: 7
+                                            Expr: 1+2*3
+                                            LHS:
+                                                ExprLiteralInt: 1
+                                                    Location: t/50-layout/input/layout_expr_01.asm:17:10
+                                                    Value type: Constant
+                                                    Value const: 1
+                                            RHS:
+                                                ExprBinary: *
+                                                    Location: t/50-layout/input/layout_expr_01.asm:17:14
+                                                    Value type: Constant
+                                                    Value const: 6
+                                                    LHS:
+                                                        ExprLiteralInt: 2
+                                                            Location: t/50-layout/input/layout_expr_01.asm:17:12
+                                                            Value type: Constant
+                                                            Value const: 2
+                                                    RHS:
+                                                        ExprLiteralInt: 3
+                                                            Location: t/50-layout/input/layout_expr_01.asm:17:14
+                                                            Value type: Constant
+                                                            Value const: 3
+                        LabelStmt
+                            Location: t/50-layout/input/layout_expr_01.asm:18:1
+                            Label: end_data
+                            Section: data
+                            Address: 4
+                            Symbol info:
+                                end_data: Label 4 in section data
+                                    Location: t/50-layout/input/layout_expr_01.asm:18:1
+    Statements:
+        SectionStmt
+            Location: t/50-layout/input/layout_expr_01.asm:1:1
+            Name: code
+        LabelStmt
+            Location: t/50-layout/input/layout_expr_01.asm:2:1
+            Label: start_code
+            Section: code
+            Address: 0
+            Symbol info:
+                start_code: Label 0 in section code
+                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:3:5
+            Section: code
+            Address: 0
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:3:10
+                    Value type: AddressRelative
+                    Value section: code
+                    Value offset: 0
+                    Expr: $
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralAsmpc
+                            Location: t/50-layout/input/layout_expr_01.asm:3:10
+                            Value type: AddressRelative
+                            Value section: code
+                            Value offset: 0
+                            Expr: $
+                            Address: 0
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:4:5
+            Section: code
+            Address: 2
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:4:12
+                    Value type: Constant
+                    Value const: 7
+                    Expr: 1+2*3
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/50-layout/input/layout_expr_01.asm:4:12
+                            Value type: Constant
+                            Value const: 7
+                            Expr: 1+2*3
+                            LHS:
+                                ExprLiteralInt: 1
+                                    Location: t/50-layout/input/layout_expr_01.asm:4:10
+                                    Value type: Constant
+                                    Value const: 1
+                            RHS:
+                                ExprBinary: *
+                                    Location: t/50-layout/input/layout_expr_01.asm:4:14
+                                    Value type: Constant
+                                    Value const: 6
+                                    LHS:
+                                        ExprLiteralInt: 2
+                                            Location: t/50-layout/input/layout_expr_01.asm:4:12
+                                            Value type: Constant
+                                            Value const: 2
+                                    RHS:
+                                        ExprLiteralInt: 3
+                                            Location: t/50-layout/input/layout_expr_01.asm:4:14
+                                            Value type: Constant
+                                            Value const: 3
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:5:5
+            Section: code
+            Address: 4
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:5:10
+                    Value type: AddressRelative
+                    Value section: code
+                    Value offset: 0
+                    Expr: start_code
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprSymbol: start_code
+                            Location: t/50-layout/input/layout_expr_01.asm:5:10
+                            Value type: AddressRelative
+                            Value section: code
+                            Value offset: 0
+                            Expr: start_code
+                            Symbol info:
+                                start_code: Label 0 in section code
+                                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:6:5
+            Section: code
+            Address: 6
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:6:21
+                    Value type: AddressRelative
+                    Value section: code
+                    Value offset: 2
+                    Expr: start_code+2
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/50-layout/input/layout_expr_01.asm:6:21
+                            Value type: AddressRelative
+                            Value section: code
+                            Value offset: 2
+                            Expr: start_code+2
+                            LHS:
+                                ExprSymbol: start_code
+                                    Location: t/50-layout/input/layout_expr_01.asm:6:10
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 0
+                                    Symbol info:
+                                        start_code: Label 0 in section code
+                                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+                            RHS:
+                                ExprLiteralInt: 2
+                                    Location: t/50-layout/input/layout_expr_01.asm:6:21
+                                    Value type: Constant
+                                    Value const: 2
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:7:5
+            Section: code
+            Address: 8
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:7:12
+                    Value type: AddressRelative
+                    Value section: code
+                    Value offset: 2
+                    Expr: 2+start_code
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/50-layout/input/layout_expr_01.asm:7:12
+                            Value type: AddressRelative
+                            Value section: code
+                            Value offset: 2
+                            Expr: 2+start_code
+                            LHS:
+                                ExprLiteralInt: 2
+                                    Location: t/50-layout/input/layout_expr_01.asm:7:10
+                                    Value type: Constant
+                                    Value const: 2
+                            RHS:
+                                ExprSymbol: start_code
+                                    Location: t/50-layout/input/layout_expr_01.asm:7:12
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 0
+                                    Symbol info:
+                                        start_code: Label 0 in section code
+                                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:8:5
+            Section: code
+            Address: $0A
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:8:23
+                    Value type: AddressRelative
+                    Value section: code
+                    Value offset: 4
+                    Expr: 2+start_code+2
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/50-layout/input/layout_expr_01.asm:8:23
+                            Value type: AddressRelative
+                            Value section: code
+                            Value offset: 4
+                            Expr: 2+start_code+2
+                            LHS:
+                                ExprBinary: +
+                                    Location: t/50-layout/input/layout_expr_01.asm:8:12
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 2
+                                    LHS:
+                                        ExprLiteralInt: 2
+                                            Location: t/50-layout/input/layout_expr_01.asm:8:10
+                                            Value type: Constant
+                                            Value const: 2
+                                    RHS:
+                                        ExprSymbol: start_code
+                                            Location: t/50-layout/input/layout_expr_01.asm:8:12
+                                            Value type: AddressRelative
+                                            Value section: code
+                                            Value offset: 0
+                                            Symbol info:
+                                                start_code: Label 0 in section code
+                                                    Location: t/50-layout/input/layout_expr_01.asm:2:1
+                            RHS:
+                                ExprLiteralInt: 2
+                                    Location: t/50-layout/input/layout_expr_01.asm:8:23
+                                    Value type: Constant
+                                    Value const: 2
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:9:5
+            Section: code
+            Address: $0C
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:9:19
+                    Value type: Constant
+                    Value const: $12
+                    Expr: end_code-start_code
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: -
+                            Location: t/50-layout/input/layout_expr_01.asm:9:19
+                            Value type: Constant
+                            Value const: $12
+                            Expr: end_code-start_code
+                            LHS:
+                                ExprSymbol: end_code
+                                    Location: t/50-layout/input/layout_expr_01.asm:9:10
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: $12
+                                    Symbol info:
+                                        end_code: Label $12 in section code
+                                            Location: t/50-layout/input/layout_expr_01.asm:12:1
+                            RHS:
+                                ExprSymbol: start_code
+                                    Location: t/50-layout/input/layout_expr_01.asm:9:19
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: 0
+                                    Symbol info:
+                                        start_code: Label 0 in section code
+                                            Location: t/50-layout/input/layout_expr_01.asm:2:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:10:5
+            Section: code
+            Address: $0E
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:10:21
+                    Value type: Computed
+                    Expr: start_data-end_code
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: -
+                            Location: t/50-layout/input/layout_expr_01.asm:10:21
+                            Value type: Computed
+                            Expr: start_data-end_code
+                            LHS:
+                                ExprSymbol: start_data
+                                    Location: t/50-layout/input/layout_expr_01.asm:10:10
+                                    Value type: AddressRelative
+                                    Value section: data
+                                    Value offset: 0
+                                    Symbol info:
+                                        start_data: Label 0 in section data
+                                            Location: t/50-layout/input/layout_expr_01.asm:15:1
+                            RHS:
+                                ExprSymbol: end_code
+                                    Location: t/50-layout/input/layout_expr_01.asm:10:21
+                                    Value type: AddressRelative
+                                    Value section: code
+                                    Value offset: $12
+                                    Symbol info:
+                                        end_code: Label $12 in section code
+                                            Location: t/50-layout/input/layout_expr_01.asm:12:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:11:5
+            Section: code
+            Address: $10
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:11:19
+                    Value type: Constant
+                    Value const: 4
+                    Expr: end_data-start_data
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: -
+                            Location: t/50-layout/input/layout_expr_01.asm:11:19
+                            Value type: Constant
+                            Value const: 4
+                            Expr: end_data-start_data
+                            LHS:
+                                ExprSymbol: end_data
+                                    Location: t/50-layout/input/layout_expr_01.asm:11:10
+                                    Value type: AddressRelative
+                                    Value section: data
+                                    Value offset: 4
+                                    Symbol info:
+                                        end_data: Label 4 in section data
+                                            Location: t/50-layout/input/layout_expr_01.asm:18:1
+                            RHS:
+                                ExprSymbol: start_data
+                                    Location: t/50-layout/input/layout_expr_01.asm:11:19
+                                    Value type: AddressRelative
+                                    Value section: data
+                                    Value offset: 0
+                                    Symbol info:
+                                        start_data: Label 0 in section data
+                                            Location: t/50-layout/input/layout_expr_01.asm:15:1
+        LabelStmt
+            Location: t/50-layout/input/layout_expr_01.asm:12:1
+            Label: end_code
+            Section: code
+            Address: $12
+            Symbol info:
+                end_code: Label $12 in section code
+                    Location: t/50-layout/input/layout_expr_01.asm:12:1
+        SectionStmt
+            Location: t/50-layout/input/layout_expr_01.asm:14:1
+            Name: data
+        LabelStmt
+            Location: t/50-layout/input/layout_expr_01.asm:15:1
+            Label: start_data
+            Section: data
+            Address: 0
+            Symbol info:
+                start_data: Label 0 in section data
+                    Location: t/50-layout/input/layout_expr_01.asm:15:1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:16:5
+            Section: data
+            Address: 0
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:16:10
+                    Value type: AddressRelative
+                    Value section: data
+                    Value offset: 0
+                    Expr: $
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralAsmpc
+                            Location: t/50-layout/input/layout_expr_01.asm:16:10
+                            Value type: AddressRelative
+                            Value section: data
+                            Value offset: 0
+                            Expr: $
+                            Address: 0
+        OpcodeStmt
+            Location: t/50-layout/input/layout_expr_01.asm:17:5
+            Section: data
+            Address: 2
+            Bytes: 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_expr_01.asm:17:12
+                    Value type: Constant
+                    Value const: 7
+                    Expr: 1+2*3
+                    Offset: 0, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprBinary: +
+                            Location: t/50-layout/input/layout_expr_01.asm:17:12
+                            Value type: Constant
+                            Value const: 7
+                            Expr: 1+2*3
+                            LHS:
+                                ExprLiteralInt: 1
+                                    Location: t/50-layout/input/layout_expr_01.asm:17:10
+                                    Value type: Constant
+                                    Value const: 1
+                            RHS:
+                                ExprBinary: *
+                                    Location: t/50-layout/input/layout_expr_01.asm:17:14
+                                    Value type: Constant
+                                    Value const: 6
+                                    LHS:
+                                        ExprLiteralInt: 2
+                                            Location: t/50-layout/input/layout_expr_01.asm:17:12
+                                            Value type: Constant
+                                            Value const: 2
+                                    RHS:
+                                        ExprLiteralInt: 3
+                                            Location: t/50-layout/input/layout_expr_01.asm:17:14
+                                            Value type: Constant
+                                            Value const: 3
+        LabelStmt
+            Location: t/50-layout/input/layout_expr_01.asm:18:1
+            Label: end_data
+            Section: data
+            Address: 4
+            Symbol info:
+                end_data: Label 4 in section data
+                    Location: t/50-layout/input/layout_expr_01.asm:18:1

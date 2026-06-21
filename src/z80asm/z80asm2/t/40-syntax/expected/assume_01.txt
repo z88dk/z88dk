@@ -24,7 +24,7 @@ Program: assume_01
                 Patch
                     Location: t/40-syntax/input/assume_01.asm:1:9
                     Value type: Unknown
-                    Tokens: 1
+                    Expr: 1
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -33,7 +33,7 @@ Program: assume_01
                         ExprLiteralInt: 1
                             Location: t/40-syntax/input/assume_01.asm:1:9
                             Value type: Unknown
-                            Tokens: 1
+                            Expr: 1
         OpcodeStmt
             Location: t/40-syntax/input/assume_01.asm:3:2
             Address: 0
@@ -42,7 +42,7 @@ Program: assume_01
                 Patch
                     Location: t/40-syntax/input/assume_01.asm:3:9
                     Value type: Unknown
-                    Tokens: 1
+                    Expr: 1
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -51,7 +51,7 @@ Program: assume_01
                         ExprLiteralInt: 1
                             Location: t/40-syntax/input/assume_01.asm:3:9
                             Value type: Unknown
-                            Tokens: 1
+                            Expr: 1
         OpcodeStmt
             Location: t/40-syntax/input/assume_01.asm:5:2
             Address: 0
@@ -60,7 +60,7 @@ Program: assume_01
                 Patch
                     Location: t/40-syntax/input/assume_01.asm:5:9
                     Value type: Unknown
-                    Tokens: 1
+                    Expr: 1
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -69,4 +69,4 @@ Program: assume_01
                         ExprLiteralInt: 1
                             Location: t/40-syntax/input/assume_01.asm:5:9
                             Value type: Unknown
-                            Tokens: 1
+                            Expr: 1

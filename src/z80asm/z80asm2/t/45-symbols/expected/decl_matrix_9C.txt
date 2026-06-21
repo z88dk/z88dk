@@ -25,7 +25,7 @@ Program: decl_matrix_9C
                                 Patch
                                     Location: t/45-symbols/input/decl_matrix_9C.asm:3:11
                                     Value type: Unknown
-                                    Tokens: x
+                                    Expr: x
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -34,7 +34,7 @@ Program: decl_matrix_9C
                                         ExprSymbol: x
                                             Location: t/45-symbols/input/decl_matrix_9C.asm:3:11
                                             Value type: Unknown
-                                            Tokens: x
+                                            Expr: x
                                             Symbol info:
                                                 x: Undefined
                                                     Location: t/45-symbols/input/decl_matrix_9C.asm:3:11
@@ -53,7 +53,7 @@ Program: decl_matrix_9C
                 Patch
                     Location: t/45-symbols/input/decl_matrix_9C.asm:3:11
                     Value type: Unknown
-                    Tokens: x
+                    Expr: x
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -62,7 +62,7 @@ Program: decl_matrix_9C
                         ExprSymbol: x
                             Location: t/45-symbols/input/decl_matrix_9C.asm:3:11
                             Value type: Unknown
-                            Tokens: x
+                            Expr: x
                             Symbol info:
                                 x: Undefined
                                     Location: t/45-symbols/input/decl_matrix_9C.asm:3:11

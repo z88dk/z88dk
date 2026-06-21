@@ -70,7 +70,9 @@ static void dump_expr_value(const ExprValue& value, DumpContext ctx) {
         ctx.line("Value offset: " + int_to_hex(value.offset));
         break;
     case ExprType::Computed:
-        ctx.line("Value expr tokens: " + to_string(value.expr_tokens));
+        if (!value.tokens.empty()) {
+            ctx.line("Value expr: " + to_string(value.tokens));
+        }
         break;
     default:
         break;
@@ -80,7 +82,9 @@ static void dump_expr_value(const ExprValue& value, DumpContext ctx) {
 static void dump_expr_common(const Expr& expr, DumpContext ctx) {
     ctx.line("Location: " + expr.loc.to_string());
     dump_expr_value(expr.value, ctx);
-    ctx.line("Tokens: " + to_string(expr.tokens));
+    if (!expr.tokens.empty()) {
+        ctx.line("Expr: " + to_string(expr.tokens));
+    }
 }
 
 void Stmt::dump(DumpContext ctx) const {
@@ -152,13 +156,13 @@ void LabelStmt::dump(DumpContext ctx) const {
 }
 
 void ExprLiteralInt::dump(DumpContext ctx) const {
-    ctx.line("ExprLiteralInt: " + int_to_hex(value));
+    ctx.line("ExprLiteralInt: " + int_to_hex(int_value));
     auto c = ctx.child();
     dump_expr_common(*this, c);
 }
 
 void ExprLiteralFloat::dump(DumpContext ctx) const {
-    ctx.line("ExprLiteralFloat: " + std::to_string(value));
+    ctx.line("ExprLiteralFloat: " + std::to_string(float_value));
     auto c = ctx.child();
     dump_expr_common(*this, c);
 }
@@ -550,23 +554,24 @@ static std::string to_string(SymbolDeclareType type) {
 void SymbolInfo::dump(DumpContext ctx) const {
     std::string sym_str = g_strings.to_string(name_id) + ": ";
 
-    switch (type) {
-    case SymbolType::Undefined:
+    switch (def_type) {
+    case SymbolInfo::DefType::Undefined:
         sym_str += "Undefined";
         break;
-    case SymbolType::Constant:
-        sym_str += "Constant = " + int_to_hex(const_value);
-        break;
-    case SymbolType::Label:
+    case SymbolInfo::DefType::Label:
         sym_str += "Label";
-        if (section) {
-            sym_str += " in section " + section_name_or_empty(section);
+        if (stmt && stmt->section) {
+            sym_str += " " + int_to_hex(stmt->address);
+            sym_str += " in section " + section_name_or_empty(stmt->section);
         }
         break;
-    case SymbolType::Defc:
+    case SymbolInfo::DefType::Defc:
         sym_str += "Defc";
-        if (section) {
-            sym_str += " in section " + section_name_or_empty(section);
+        if (stmt && stmt->section) {
+            sym_str += " in section " + section_name_or_empty(stmt->section);
+        }
+        if (defc_expr) {
+            sym_str += " = " + to_string(defc_expr->tokens);
         }
         break;
     default:
@@ -578,7 +583,7 @@ void SymbolInfo::dump(DumpContext ctx) const {
     auto c = ctx.child();
     c.line("Location: " + loc.to_string());
 
-    if (type == SymbolType::Defc && defc_expr) {
+    if (def_type == SymbolInfo::DefType::Defc && defc_expr) {
         c.line("Expression:");
         defc_expr->dump(c.child());
     }
@@ -607,12 +612,12 @@ void Section::dump(DumpContext ctx, const Section* current) const {
     }
 
     if (org_stmt) {
-        c.line("ORG:");
+        c.line("Section ORG:");
         org_stmt->dump(c.child());
     }
 
     if (align_stmt) {
-        c.line("ALIGN:");
+        c.line("Section ALIGN:");
         align_stmt->dump(c.child());
     }
 

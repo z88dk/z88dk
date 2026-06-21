@@ -9,7 +9,7 @@ Program: decl_matrix_6B
     Modules:
         Module: decl_matrix_6B (current)
             Symbols:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_6B.asm:6:1
             Sections:
                 Section: "" (current)
@@ -22,7 +22,7 @@ Program: decl_matrix_6B
                             Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section ""
+                                x: Label 0 in section ""
                                     Location: t/45-symbols/input/decl_matrix_6B.asm:6:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_6B.asm:6:1
@@ -51,7 +51,7 @@ Program: decl_matrix_6B
             Section: ""
             Address: 0
             Symbol info:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_6B.asm:6:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_6B.asm:6:1

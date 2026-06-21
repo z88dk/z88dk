@@ -37,6 +37,125 @@ int int_pow(int base, int exp, const SourceLoc& loc) {
     return result;
 }
 
+int int_unary(TokenType op, int arg, const SourceLoc&, bool) {
+    switch (op) {
+    case TokenType::Plus:
+        return +arg;
+    case TokenType::Minus:
+        return -arg;
+    case TokenType::LogicalNot:
+        return !arg;
+    case TokenType::BitwiseNot:
+        return ~arg;
+    default:
+        assert(0);
+        return 0;
+    }
+}
+
+int int_binary(TokenType op, int lhs, int rhs, const SourceLoc& loc,
+               bool silent) {
+    switch (op) {
+    case TokenType::Plus:
+        return lhs + rhs;
+    case TokenType::Minus:
+        return lhs - rhs;
+    case TokenType::Multiply:
+        return lhs * rhs;
+    case TokenType::Divide:
+        if (rhs == 0) {
+            if (!silent) {
+                g_diag.error(loc, "Division by zero");
+            }
+            return 0;
+        }
+        else {
+            return lhs / rhs;
+        }
+    case TokenType::Modulo:
+        if (rhs == 0) {
+            if (!silent) {
+                g_diag.error(loc, "Modulo by zero");
+            }
+            return 0;
+        }
+        else {
+            return lhs % rhs;
+        }
+    case TokenType::Power:
+        return int_pow(lhs, rhs, loc);
+    case TokenType::LeftShift:
+        return lhs << rhs;
+    case TokenType::RightShift:
+        return lhs >> rhs;
+    case TokenType::LT:
+        return lhs < rhs;
+    case TokenType::LE:
+        return lhs <= rhs;
+    case TokenType::GT:
+        return lhs > rhs;
+    case TokenType::GE:
+        return lhs >= rhs;
+    case TokenType::EQ:
+        return lhs == rhs;
+    case TokenType::NE:
+        return lhs != rhs;
+    case TokenType::BitwiseAnd:
+        return lhs & rhs;
+    case TokenType::BitwiseXor:
+        return lhs ^ rhs;
+    case TokenType::BitwiseOr:
+        return lhs | rhs;
+    case TokenType::LogicalAnd:
+        return lhs && rhs;
+    case TokenType::LogicalOr:
+        return lhs || rhs;
+    case TokenType::LogicalXor:
+        return (!!lhs) ^ (!!rhs);
+    default:
+        assert(0);
+        return 0;
+    }
+}
+
+int int_ternary(int cond, int true_value, int false_value,
+                const SourceLoc&, bool ) {
+    return cond ? true_value : false_value;
+}
+
+int int_call_unary(Keyword kw, int arg, const SourceLoc& loc, bool silent) {
+    switch (kw) {
+    case Keyword::MEM:
+        if (!silent && arg < 0) {
+            g_diag.warning(loc, "Integer range: " + int_to_hex(arg));
+        }
+        return arg;
+    case Keyword::SIGNED8:
+        if (!silent && (arg < -128 || arg > 127)) {
+            g_diag.warning(loc, "Integer range: " + int_to_hex(arg));
+        }
+        return arg;
+    case Keyword::SIGNED16:
+        if (!silent && (arg < -32768 || arg > 32767)) {
+            g_diag.warning(loc, "Integer range: " + int_to_hex(arg));
+        }
+        return arg;
+    case Keyword::UNSIGNED8:
+        if (!silent && (arg < 0 || arg > 255)) {
+            g_diag.warning(loc, "Integer range: " + int_to_hex(arg));
+        }
+        return arg;
+    case Keyword::UNSIGNED16:
+        if (!silent && (arg < 0 || arg > 65535)) {
+            g_diag.warning(loc, "Integer range: " + int_to_hex(arg));
+        }
+        return arg;
+    default:
+        assert(0);
+        return arg;
+    }
+}
+
 //-----------------------------------------------------------------------------
 // Pluggable expression parsing - Pratt parser
 //-----------------------------------------------------------------------------
@@ -160,114 +279,25 @@ bool ConstEvalSem::local_label(const Token& tok) {
     return false;
 }
 
-void ConstEvalSem::unary(TokenType op, const SourceLoc& ) {
-    int v = pop();
-    switch (op) {
-    case TokenType::Plus:
-        push(+v);
-        break;
-    case TokenType::Minus:
-        push(-v);
-        break;
-    case TokenType::LogicalNot:
-        push(!v);
-        break;
-    case TokenType::BitwiseNot:
-        push(~v);
-        break;
-    default:
-        assert(0);
-        break;
-    }
+void ConstEvalSem::unary(TokenType op, const SourceLoc& loc) {
+    int arg = pop();
+    int result = int_unary(op, arg, loc, /*silent=*/false);
+    push(result);
 }
 
 void ConstEvalSem::binary(TokenType op, const SourceLoc& loc) {
     int rhs = pop();
     int lhs = pop();
-    switch (op) {
-    case TokenType::Plus:
-        push(lhs + rhs);
-        break;
-    case TokenType::Minus:
-        push(lhs - rhs);
-        break;
-    case TokenType::Multiply:
-        push(lhs * rhs);
-        break;
-    case TokenType::Divide:
-        if (rhs == 0) {
-            g_diag.error(loc, "Division by zero");
-            push(0);
-        }
-        else {
-            push(lhs / rhs);
-        }
-        break;
-    case TokenType::Modulo:
-        if (rhs == 0) {
-            g_diag.error(loc, "Modulo by zero");
-            push(0);
-        }
-        else {
-            push(lhs % rhs);
-        }
-        break;
-    case TokenType::Power:
-        push(int_pow(lhs, rhs, loc));
-        break;
-    case TokenType::LeftShift:
-        push(lhs << rhs);
-        break;
-    case TokenType::RightShift:
-        push(lhs >> rhs);
-        break;
-    case TokenType::LT:
-        push(lhs < rhs);
-        break;
-    case TokenType::LE:
-        push(lhs <= rhs);
-        break;
-    case TokenType::GT:
-        push(lhs > rhs);
-        break;
-    case TokenType::GE:
-        push(lhs >= rhs);
-        break;
-    case TokenType::EQ:
-        push (lhs == rhs);
-        break;
-    case TokenType::NE:
-        push(lhs != rhs);
-        break;
-    case TokenType::BitwiseAnd:
-        push(lhs & rhs);
-        break;
-    case TokenType::BitwiseXor:
-        push(lhs ^ rhs);
-        break;
-    case TokenType::BitwiseOr:
-        push (lhs | rhs);
-        break;
-    case TokenType::LogicalAnd:
-        push(lhs && rhs);
-        break;
-    case TokenType::LogicalOr:
-        push(lhs || rhs);
-        break;
-    case TokenType::LogicalXor:
-        push((!!lhs) ^ (!!rhs));
-        break;
-    default:
-        assert(0);
-        break;
-    }
+    int result = int_binary(op, lhs, rhs, loc, /*silent=*/false);
+    push(result);
 }
 
-void ConstEvalSem::ternary(const SourceLoc&) {
+void ConstEvalSem::ternary(const SourceLoc& loc) {
     int false_val = pop();
     int true_val = pop();
     int cond = pop();
-    push(cond ? true_val : false_val);
+    int result = int_ternary(cond, true_val, false_val, loc, /*silent=*/false);
+    push(result);
 }
 
 static void error_expected_operand(const ParseLine& pline) {

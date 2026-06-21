@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
@@ -57,7 +58,7 @@ struct ExprValue {
     uint offset = 0;
 
     // valid when Computed
-    std::vector<Token> expr_tokens; // original expression
+    std::vector<Token> tokens;
 };
 
 //-----------------------------------------------------------------------------
@@ -80,16 +81,16 @@ struct Expr : public TreeNode {
 };
 
 struct ExprLiteralInt : public Expr {
-    int value;
+    int int_value = 0;
 
-    ExprLiteralInt(int v, const SourceLoc& loc) : Expr(loc), value(v) {}
+    ExprLiteralInt(int v, const SourceLoc& loc) : Expr(loc), int_value(v) {}
     void dump(DumpContext ctx) const override;
 };
 
 struct ExprLiteralFloat : public Expr {
-    double value;
+    double float_value = 0.0;
 
-    ExprLiteralFloat(double v, const SourceLoc& loc) : Expr(loc), value(v) {}
+    ExprLiteralFloat(double v, const SourceLoc& loc) : Expr(loc), float_value(v) {}
     void dump(DumpContext ctx) const override;
 };
 
@@ -404,27 +405,19 @@ struct SymbolDeclare {
 };
 
 struct SymbolInfo : public TreeNode {
-    enum class SymbolType : uint8_t {
-        Undefined, Constant, Label, Defc,
+    enum class DefType : uint8_t {
+        Undefined, Label, Defc,
     };
 
     StringInterner::Id name_id = 0;         // name of symbol
-    SymbolType type = SymbolType::Undefined;// type of symbol
+    DefType def_type = DefType::Undefined;  // type of definition
     SourceLoc loc;                          // location where defined
+    Stmt* stmt = nullptr;                   // for Label
+    Expr* defc_expr = nullptr;              // for Defc
 
-    // for constant symbols
-    int const_value = 0;
-
-    // for label and defc symbols
-    Section* section = nullptr;     // section where located
-    Stmt* stmt = nullptr;           // pointer to statement
-    uint offset = 0;                // offset of label or defc in section
-
-    // for defc symbols
-    Expr* defc_expr = nullptr;      // expression for defc value
-
-    SymbolInfo(StringInterner::Id name_id_, SymbolType type_, const SourceLoc& loc_)
-        : name_id(name_id_), type(type_), loc(loc_) {}
+    SymbolInfo(StringInterner::Id name_id_, DefType def_type_,
+               const SourceLoc& loc_)
+        : name_id(name_id_), def_type(def_type_), loc(loc_) {}
     virtual ~SymbolInfo() = default;
     void dump(DumpContext ctx) const override;
 };
