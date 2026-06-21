@@ -1,0 +1,133 @@
+% z88dk-z80asm -v -dump-after-layout t/50-layout//input/layout_jr_relaxation_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_jr_relaxation_01.asm...
+Program: layout_jr_relaxation_01
+    Modules:
+        Module: layout_jr_relaxation_01 (current)
+            Symbols:
+                func1: Label 0 in section code2
+                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
+            Sections:
+                Section: ""
+                    Size: 0
+                Section: code1
+                    Size: $102
+                    Has opcodes
+                    Statements:
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_01.asm:2:1
+                            Section: code1
+                            Address: 0
+                            Is short jump
+                            Bytes: $18 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:2:4
+                                    Value type: AddressRelative
+                                    Value section: code2
+                                    Value offset: 0
+                                    Expr: func1
+                                    Offset: 1, Size: 1
+                                    Type: PCrelative
+                                    Validation: Any
+                                    Formula: None
+                                    Short jump (alt offset: 1, alt size: 2)
+                                    Alt bytes: $C3 0 0
+                                    Inner expression:
+                                        ExprSymbol: func1
+                                            Location: t/50-layout/input/layout_jr_relaxation_01.asm:2:4
+                                            Value type: AddressRelative
+                                            Value section: code2
+                                            Value offset: 0
+                                            Expr: func1
+                                            Symbol info:
+                                                func1: Label 0 in section code2
+                                                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
+                        DefsNumericStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_01.asm:3:1
+                            Section: code1
+                            Address: 2
+                            Size:
+                                ExprLiteralInt: $100
+                                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:3:6
+                                    Value type: Constant
+                                    Value const: $100
+                                    Expr: $100
+                            Filler byte:
+                                ExprLiteralInt: 0
+                                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:3:1
+                                    Value type: Constant
+                                    Value const: 0
+                Section: code2 (current)
+                    Size: 0
+                    Has opcodes
+                    Statements:
+                        LabelStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
+                            Label: func1
+                            Section: code2
+                            Address: 0
+                            Symbol info:
+                                func1: Label 0 in section code2
+                                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
+    Statements:
+        SectionStmt
+            Location: t/50-layout/input/layout_jr_relaxation_01.asm:1:1
+            Name: code1
+        OpcodeStmt
+            Location: t/50-layout/input/layout_jr_relaxation_01.asm:2:1
+            Section: code1
+            Address: 0
+            Is short jump
+            Bytes: $18 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:2:4
+                    Value type: AddressRelative
+                    Value section: code2
+                    Value offset: 0
+                    Expr: func1
+                    Offset: 1, Size: 1
+                    Type: PCrelative
+                    Validation: Any
+                    Formula: None
+                    Short jump (alt offset: 1, alt size: 2)
+                    Alt bytes: $C3 0 0
+                    Inner expression:
+                        ExprSymbol: func1
+                            Location: t/50-layout/input/layout_jr_relaxation_01.asm:2:4
+                            Value type: AddressRelative
+                            Value section: code2
+                            Value offset: 0
+                            Expr: func1
+                            Symbol info:
+                                func1: Label 0 in section code2
+                                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
+        DefsNumericStmt
+            Location: t/50-layout/input/layout_jr_relaxation_01.asm:3:1
+            Section: code1
+            Address: 2
+            Size:
+                ExprLiteralInt: $100
+                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:3:6
+                    Value type: Constant
+                    Value const: $100
+                    Expr: $100
+            Filler byte:
+                ExprLiteralInt: 0
+                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:3:1
+                    Value type: Constant
+                    Value const: 0
+        SectionStmt
+            Location: t/50-layout/input/layout_jr_relaxation_01.asm:5:1
+            Name: code2
+        LabelStmt
+            Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
+            Label: func1
+            Section: code2
+            Address: 0
+            Symbol info:
+                func1: Label 0 in section code2
+                    Location: t/50-layout/input/layout_jr_relaxation_01.asm:6:1
