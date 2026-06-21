@@ -19,8 +19,10 @@ Program: layout_phase_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:1:6
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 0
+                                    Expr: $
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -28,8 +30,10 @@ Program: layout_phase_01
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:1:6
-                                            Value type: Unknown
-                                            Tokens: $
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 0
+                                            Expr: $
                                             Address: 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_phase_01.asm:2:1
@@ -39,8 +43,10 @@ Program: layout_phase_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:2:6
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 2
+                                    Expr: $
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -48,28 +54,33 @@ Program: layout_phase_01
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:2:6
-                                            Value type: Unknown
-                                            Tokens: $
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 2
+                                            Expr: $
                                             Address: 2
                         PhaseStmt
                             Location: t/50-layout/input/layout_phase_01.asm:3:1
                             Section: ""
-                            Address: 0
+                            Address: $1000
                             Expression:
                                 ExprLiteralInt: $1000
                                     Location: t/50-layout/input/layout_phase_01.asm:3:7
-                                    Value type: Unknown
-                                    Tokens: $1000
+                                    Value type: Constant
+                                    Value const: $1000
+                                    Expr: $1000
                         OpcodeStmt
                             Location: t/50-layout/input/layout_phase_01.asm:4:1
                             Section: ""
-                            Address: 0
+                            Address: $1000
                             Bytes: 0 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:4:6
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: $1000
+                                    Expr: $
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -77,19 +88,23 @@ Program: layout_phase_01
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:4:6
-                                            Value type: Unknown
-                                            Tokens: $
-                                            Address: 0
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: $1000
+                                            Expr: $
+                                            Address: $1000
                         OpcodeStmt
                             Location: t/50-layout/input/layout_phase_01.asm:5:1
                             Section: ""
-                            Address: 2
+                            Address: $1002
                             Bytes: 0 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:5:6
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: $1002
+                                    Expr: $
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -97,9 +112,11 @@ Program: layout_phase_01
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:5:6
-                                            Value type: Unknown
-                                            Tokens: $
-                                            Address: 2
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: $1002
+                                            Expr: $
+                                            Address: $1002
                         DephaseStmt
                             Location: t/50-layout/input/layout_phase_01.asm:6:1
                             Section: ""
@@ -112,8 +129,10 @@ Program: layout_phase_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:7:6
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 8
+                                    Expr: $
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -121,8 +140,10 @@ Program: layout_phase_01
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:7:6
-                                            Value type: Unknown
-                                            Tokens: $
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 8
+                                            Expr: $
                                             Address: 8
                         OpcodeStmt
                             Location: t/50-layout/input/layout_phase_01.asm:8:1
@@ -132,8 +153,10 @@ Program: layout_phase_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:8:6
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: $0A
+                                    Expr: $
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -141,8 +164,10 @@ Program: layout_phase_01
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:8:6
-                                            Value type: Unknown
-                                            Tokens: $
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: $0A
+                                            Expr: $
                                             Address: $0A
     Statements:
         OpcodeStmt
@@ -153,8 +178,10 @@ Program: layout_phase_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:1:6
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 0
+                    Expr: $
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -162,8 +189,10 @@ Program: layout_phase_01
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:1:6
-                            Value type: Unknown
-                            Tokens: $
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 0
+                            Expr: $
                             Address: 0
         OpcodeStmt
             Location: t/50-layout/input/layout_phase_01.asm:2:1
@@ -173,8 +202,10 @@ Program: layout_phase_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:2:6
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 2
+                    Expr: $
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -182,28 +213,33 @@ Program: layout_phase_01
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:2:6
-                            Value type: Unknown
-                            Tokens: $
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 2
+                            Expr: $
                             Address: 2
         PhaseStmt
             Location: t/50-layout/input/layout_phase_01.asm:3:1
             Section: ""
-            Address: 0
+            Address: $1000
             Expression:
                 ExprLiteralInt: $1000
                     Location: t/50-layout/input/layout_phase_01.asm:3:7
-                    Value type: Unknown
-                    Tokens: $1000
+                    Value type: Constant
+                    Value const: $1000
+                    Expr: $1000
         OpcodeStmt
             Location: t/50-layout/input/layout_phase_01.asm:4:1
             Section: ""
-            Address: 0
+            Address: $1000
             Bytes: 0 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:4:6
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: $1000
+                    Expr: $
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -211,19 +247,23 @@ Program: layout_phase_01
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:4:6
-                            Value type: Unknown
-                            Tokens: $
-                            Address: 0
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: $1000
+                            Expr: $
+                            Address: $1000
         OpcodeStmt
             Location: t/50-layout/input/layout_phase_01.asm:5:1
             Section: ""
-            Address: 2
+            Address: $1002
             Bytes: 0 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:5:6
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: $1002
+                    Expr: $
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -231,9 +271,11 @@ Program: layout_phase_01
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:5:6
-                            Value type: Unknown
-                            Tokens: $
-                            Address: 2
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: $1002
+                            Expr: $
+                            Address: $1002
         DephaseStmt
             Location: t/50-layout/input/layout_phase_01.asm:6:1
             Section: ""
@@ -246,8 +288,10 @@ Program: layout_phase_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:7:6
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 8
+                    Expr: $
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -255,8 +299,10 @@ Program: layout_phase_01
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:7:6
-                            Value type: Unknown
-                            Tokens: $
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 8
+                            Expr: $
                             Address: 8
         OpcodeStmt
             Location: t/50-layout/input/layout_phase_01.asm:8:1
@@ -266,8 +312,10 @@ Program: layout_phase_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:8:6
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: $0A
+                    Expr: $
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -275,6 +323,8 @@ Program: layout_phase_01
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:8:6
-                            Value type: Unknown
-                            Tokens: $
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: $0A
+                            Expr: $
                             Address: $0A

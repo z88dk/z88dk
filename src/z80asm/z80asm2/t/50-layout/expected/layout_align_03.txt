@@ -10,7 +10,7 @@ Program: layout_align_03
                 Section: ""
                     Size: 0
                 Section: code (current)
-                    Size: 6
+                    Size: $0B
                     Has opcodes
                     Statements:
                         OpcodeStmt
@@ -21,8 +21,9 @@ Program: layout_align_03
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:2:6
-                                    Value type: Unknown
-                                    Tokens: 1
+                                    Value type: Constant
+                                    Value const: 1
+                                    Expr: 1
                                     Offset: 0, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -30,12 +31,14 @@ Program: layout_align_03
                                     Inner expression:
                                         ExprLiteralInt: 1
                                             Location: t/50-layout/input/layout_align_03.asm:2:6
-                                            Value type: Unknown
-                                            Tokens: 1
+                                            Value type: Constant
+                                            Value const: 1
+                                            Expr: 1
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:2:9
-                                    Value type: Unknown
-                                    Tokens: 2
+                                    Value type: Constant
+                                    Value const: 2
+                                    Expr: 2
                                     Offset: 1, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -43,12 +46,14 @@ Program: layout_align_03
                                     Inner expression:
                                         ExprLiteralInt: 2
                                             Location: t/50-layout/input/layout_align_03.asm:2:9
-                                            Value type: Unknown
-                                            Tokens: 2
+                                            Value type: Constant
+                                            Value const: 2
+                                            Expr: 2
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:2:12
-                                    Value type: Unknown
-                                    Tokens: 3
+                                    Value type: Constant
+                                    Value const: 3
+                                    Expr: 3
                                     Offset: 2, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -56,32 +61,35 @@ Program: layout_align_03
                                     Inner expression:
                                         ExprLiteralInt: 3
                                             Location: t/50-layout/input/layout_align_03.asm:2:12
-                                            Value type: Unknown
-                                            Tokens: 3
+                                            Value type: Constant
+                                            Value const: 3
+                                            Expr: 3
                         AlignStmt
                             Location: t/50-layout/input/layout_align_03.asm:3:1
                             Section: code
                             Address: 3
                             Alignment:
-                                ExprLiteralInt: 3
+                                ExprLiteralInt: 4
                                     Location: t/50-layout/input/layout_align_03.asm:3:7
-                                    Value type: Unknown
-                                    Tokens: 3
+                                    Value type: Constant
+                                    Value const: 4
+                                    Expr: 4
                             Filler byte:
                                 ExprLiteralInt: 0
                                     Location: t/50-layout/input/layout_align_03.asm:3:1
-                                    Value type: Unknown
-                                    Tokens: 
+                                    Value type: Constant
+                                    Value const: 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_align_03.asm:4:1
                             Section: code
-                            Address: 3
+                            Address: 4
                             Bytes: 0 0 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:4:6
-                                    Value type: Unknown
-                                    Tokens: 4
+                                    Value type: Constant
+                                    Value const: 4
+                                    Expr: 4
                                     Offset: 0, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -89,12 +97,14 @@ Program: layout_align_03
                                     Inner expression:
                                         ExprLiteralInt: 4
                                             Location: t/50-layout/input/layout_align_03.asm:4:6
-                                            Value type: Unknown
-                                            Tokens: 4
+                                            Value type: Constant
+                                            Value const: 4
+                                            Expr: 4
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:4:9
-                                    Value type: Unknown
-                                    Tokens: 5
+                                    Value type: Constant
+                                    Value const: 5
+                                    Expr: 5
                                     Offset: 1, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -102,12 +112,14 @@ Program: layout_align_03
                                     Inner expression:
                                         ExprLiteralInt: 5
                                             Location: t/50-layout/input/layout_align_03.asm:4:9
-                                            Value type: Unknown
-                                            Tokens: 5
+                                            Value type: Constant
+                                            Value const: 5
+                                            Expr: 5
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:4:12
-                                    Value type: Unknown
-                                    Tokens: 6
+                                    Value type: Constant
+                                    Value const: 6
+                                    Expr: 6
                                     Offset: 2, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -115,8 +127,76 @@ Program: layout_align_03
                                     Inner expression:
                                         ExprLiteralInt: 6
                                             Location: t/50-layout/input/layout_align_03.asm:4:12
-                                            Value type: Unknown
-                                            Tokens: 6
+                                            Value type: Constant
+                                            Value const: 6
+                                            Expr: 6
+                        AlignStmt
+                            Location: t/50-layout/input/layout_align_03.asm:5:1
+                            Section: code
+                            Address: 7
+                            Alignment:
+                                ExprLiteralInt: 4
+                                    Location: t/50-layout/input/layout_align_03.asm:5:7
+                                    Value type: Constant
+                                    Value const: 4
+                                    Expr: 4
+                            Filler byte:
+                                ExprLiteralInt: $100
+                                    Location: t/50-layout/input/layout_align_03.asm:5:10
+                                    Value type: Constant
+                                    Value const: $100
+                                    Expr: $100
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_align_03.asm:6:1
+                            Section: code
+                            Address: 8
+                            Bytes: 0 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_align_03.asm:6:6
+                                    Value type: Constant
+                                    Value const: 7
+                                    Expr: 7
+                                    Offset: 0, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 7
+                                            Location: t/50-layout/input/layout_align_03.asm:6:6
+                                            Value type: Constant
+                                            Value const: 7
+                                            Expr: 7
+                                Patch
+                                    Location: t/50-layout/input/layout_align_03.asm:6:9
+                                    Value type: Constant
+                                    Value const: 8
+                                    Expr: 8
+                                    Offset: 1, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 8
+                                            Location: t/50-layout/input/layout_align_03.asm:6:9
+                                            Value type: Constant
+                                            Value const: 8
+                                            Expr: 8
+                                Patch
+                                    Location: t/50-layout/input/layout_align_03.asm:6:12
+                                    Value type: Constant
+                                    Value const: 9
+                                    Expr: 9
+                                    Offset: 2, Size: 1
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprLiteralInt: 9
+                                            Location: t/50-layout/input/layout_align_03.asm:6:12
+                                            Value type: Constant
+                                            Value const: 9
+                                            Expr: 9
     Statements:
         SectionStmt
             Location: t/50-layout/input/layout_align_03.asm:1:1
@@ -129,8 +209,9 @@ Program: layout_align_03
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:2:6
-                    Value type: Unknown
-                    Tokens: 1
+                    Value type: Constant
+                    Value const: 1
+                    Expr: 1
                     Offset: 0, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -138,12 +219,14 @@ Program: layout_align_03
                     Inner expression:
                         ExprLiteralInt: 1
                             Location: t/50-layout/input/layout_align_03.asm:2:6
-                            Value type: Unknown
-                            Tokens: 1
+                            Value type: Constant
+                            Value const: 1
+                            Expr: 1
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:2:9
-                    Value type: Unknown
-                    Tokens: 2
+                    Value type: Constant
+                    Value const: 2
+                    Expr: 2
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -151,12 +234,14 @@ Program: layout_align_03
                     Inner expression:
                         ExprLiteralInt: 2
                             Location: t/50-layout/input/layout_align_03.asm:2:9
-                            Value type: Unknown
-                            Tokens: 2
+                            Value type: Constant
+                            Value const: 2
+                            Expr: 2
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:2:12
-                    Value type: Unknown
-                    Tokens: 3
+                    Value type: Constant
+                    Value const: 3
+                    Expr: 3
                     Offset: 2, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -164,32 +249,35 @@ Program: layout_align_03
                     Inner expression:
                         ExprLiteralInt: 3
                             Location: t/50-layout/input/layout_align_03.asm:2:12
-                            Value type: Unknown
-                            Tokens: 3
+                            Value type: Constant
+                            Value const: 3
+                            Expr: 3
         AlignStmt
             Location: t/50-layout/input/layout_align_03.asm:3:1
             Section: code
             Address: 3
             Alignment:
-                ExprLiteralInt: 3
+                ExprLiteralInt: 4
                     Location: t/50-layout/input/layout_align_03.asm:3:7
-                    Value type: Unknown
-                    Tokens: 3
+                    Value type: Constant
+                    Value const: 4
+                    Expr: 4
             Filler byte:
                 ExprLiteralInt: 0
                     Location: t/50-layout/input/layout_align_03.asm:3:1
-                    Value type: Unknown
-                    Tokens: 
+                    Value type: Constant
+                    Value const: 0
         OpcodeStmt
             Location: t/50-layout/input/layout_align_03.asm:4:1
             Section: code
-            Address: 3
+            Address: 4
             Bytes: 0 0 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:4:6
-                    Value type: Unknown
-                    Tokens: 4
+                    Value type: Constant
+                    Value const: 4
+                    Expr: 4
                     Offset: 0, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -197,12 +285,14 @@ Program: layout_align_03
                     Inner expression:
                         ExprLiteralInt: 4
                             Location: t/50-layout/input/layout_align_03.asm:4:6
-                            Value type: Unknown
-                            Tokens: 4
+                            Value type: Constant
+                            Value const: 4
+                            Expr: 4
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:4:9
-                    Value type: Unknown
-                    Tokens: 5
+                    Value type: Constant
+                    Value const: 5
+                    Expr: 5
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -210,12 +300,14 @@ Program: layout_align_03
                     Inner expression:
                         ExprLiteralInt: 5
                             Location: t/50-layout/input/layout_align_03.asm:4:9
-                            Value type: Unknown
-                            Tokens: 5
+                            Value type: Constant
+                            Value const: 5
+                            Expr: 5
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:4:12
-                    Value type: Unknown
-                    Tokens: 6
+                    Value type: Constant
+                    Value const: 6
+                    Expr: 6
                     Offset: 2, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -223,5 +315,73 @@ Program: layout_align_03
                     Inner expression:
                         ExprLiteralInt: 6
                             Location: t/50-layout/input/layout_align_03.asm:4:12
-                            Value type: Unknown
-                            Tokens: 6
+                            Value type: Constant
+                            Value const: 6
+                            Expr: 6
+        AlignStmt
+            Location: t/50-layout/input/layout_align_03.asm:5:1
+            Section: code
+            Address: 7
+            Alignment:
+                ExprLiteralInt: 4
+                    Location: t/50-layout/input/layout_align_03.asm:5:7
+                    Value type: Constant
+                    Value const: 4
+                    Expr: 4
+            Filler byte:
+                ExprLiteralInt: $100
+                    Location: t/50-layout/input/layout_align_03.asm:5:10
+                    Value type: Constant
+                    Value const: $100
+                    Expr: $100
+        OpcodeStmt
+            Location: t/50-layout/input/layout_align_03.asm:6:1
+            Section: code
+            Address: 8
+            Bytes: 0 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_align_03.asm:6:6
+                    Value type: Constant
+                    Value const: 7
+                    Expr: 7
+                    Offset: 0, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 7
+                            Location: t/50-layout/input/layout_align_03.asm:6:6
+                            Value type: Constant
+                            Value const: 7
+                            Expr: 7
+                Patch
+                    Location: t/50-layout/input/layout_align_03.asm:6:9
+                    Value type: Constant
+                    Value const: 8
+                    Expr: 8
+                    Offset: 1, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 8
+                            Location: t/50-layout/input/layout_align_03.asm:6:9
+                            Value type: Constant
+                            Value const: 8
+                            Expr: 8
+                Patch
+                    Location: t/50-layout/input/layout_align_03.asm:6:12
+                    Value type: Constant
+                    Value const: 9
+                    Expr: 9
+                    Offset: 2, Size: 1
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprLiteralInt: 9
+                            Location: t/50-layout/input/layout_align_03.asm:6:12
+                            Value type: Constant
+                            Value const: 9
+                            Expr: 9

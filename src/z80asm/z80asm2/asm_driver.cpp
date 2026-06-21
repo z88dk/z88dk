@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "asm_driver.h"
+#include "asm_expr.h"
 #include "asm_layout.h"
 #include "asm_symbols.h"
 #include "diag.h"
@@ -105,6 +106,25 @@ void assemble_file(std::string_view filename) {
         if (!compute_layout(*prog, changed)) {
             return; // error already reported
         }
+
+        // evaluate expressions
+        if (!eval_exprs(*prog, changed, /*silent=*/true)) {
+            return; // error already reported
+        }
+
+        // check if jumps must be converted to long jumps
+        if (!check_jumps(*prog, changed)) {
+            return; // error already reported
+        }
+    }
+
+    // final evaluation of expressions with error reporting
+    if (!eval_exprs(*prog, changed, /*silent=*/false)) {
+        return; // error already reported
+    }
+
+    if (!verify_expr_ranges(*prog)) {
+        return; // error already reported
     }
 
     if (g_args.options.dump_after_layout) {

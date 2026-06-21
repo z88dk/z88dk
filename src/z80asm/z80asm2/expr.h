@@ -19,6 +19,14 @@
 // integer power function
 int int_pow(int base, int exp, const SourceLoc& loc);
 
+// integer functions
+int int_unary(TokenType op, int arg, const SourceLoc& loc, bool silent);
+int int_binary(TokenType op, int lhs, int rhs, const SourceLoc& loc,
+               bool silent);
+int int_ternary(int cond, int true_value, int false_value,
+                const SourceLoc& loc, bool silent);
+int int_call_unary(Keyword kw, int arg, const SourceLoc& loc, bool silent);
+
 //-----------------------------------------------------------------------------
 // Semantic context for constant expression evaluation
 //-----------------------------------------------------------------------------

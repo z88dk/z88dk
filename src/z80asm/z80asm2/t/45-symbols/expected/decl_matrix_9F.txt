@@ -7,7 +7,7 @@ Program: decl_matrix_9F
     Modules:
         Module: decl_matrix_9F (current)
             Symbols:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_9F.asm:2:1
             Sections:
                 Section: "" (current)
@@ -20,7 +20,7 @@ Program: decl_matrix_9F
                             Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section ""
+                                x: Label 0 in section ""
                                     Location: t/45-symbols/input/decl_matrix_9F.asm:2:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_9F.asm:2:1
@@ -36,7 +36,7 @@ Program: decl_matrix_9F
                                 Patch
                                     Location: t/45-symbols/input/decl_matrix_9F.asm:3:11
                                     Value type: Unknown
-                                    Tokens: x
+                                    Expr: x
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -45,9 +45,9 @@ Program: decl_matrix_9F
                                         ExprSymbol: x
                                             Location: t/45-symbols/input/decl_matrix_9F.asm:3:11
                                             Value type: Unknown
-                                            Tokens: x
+                                            Expr: x
                                             Symbol info:
-                                                x: Label in section ""
+                                                x: Label 0 in section ""
                                                     Location: t/45-symbols/input/decl_matrix_9F.asm:2:1
     Statements:
         LabelStmt
@@ -56,7 +56,7 @@ Program: decl_matrix_9F
             Section: ""
             Address: 0
             Symbol info:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_9F.asm:2:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_9F.asm:2:1
@@ -72,7 +72,7 @@ Program: decl_matrix_9F
                 Patch
                     Location: t/45-symbols/input/decl_matrix_9F.asm:3:11
                     Value type: Unknown
-                    Tokens: x
+                    Expr: x
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -81,7 +81,7 @@ Program: decl_matrix_9F
                         ExprSymbol: x
                             Location: t/45-symbols/input/decl_matrix_9F.asm:3:11
                             Value type: Unknown
-                            Tokens: x
+                            Expr: x
                             Symbol info:
-                                x: Label in section ""
+                                x: Label 0 in section ""
                                     Location: t/45-symbols/input/decl_matrix_9F.asm:2:1

@@ -9,7 +9,7 @@ Program: decl_matrix_5D
     Modules:
         Module: decl_matrix_5D (current)
             Symbols:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_5D.asm:2:1
             Sections:
                 Section: "" (current)
@@ -22,7 +22,7 @@ Program: decl_matrix_5D
                             Section: ""
                             Address: 0
                             Symbol info:
-                                x: Label in section ""
+                                x: Label 0 in section ""
                                     Location: t/45-symbols/input/decl_matrix_5D.asm:2:1
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_5D.asm:2:1
@@ -36,7 +36,7 @@ Program: decl_matrix_5D
             Section: ""
             Address: 0
             Symbol info:
-                x: Label in section ""
+                x: Label 0 in section ""
                     Location: t/45-symbols/input/decl_matrix_5D.asm:2:1
         OpcodeStmt
             Location: t/45-symbols/input/decl_matrix_5D.asm:2:1

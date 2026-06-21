@@ -8,6 +8,8 @@
 #include "asm_layout.h"
 #include "diag.h"
 #include "ir.h"
+#include "source_loc.h"
+#include "string_utils.h"
 #include <string_view>
 
 bool compute_layout(Program& prog, bool& changed) {
@@ -37,6 +39,15 @@ bool compute_layout(Program& prog, bool& changed) {
         }
     };
 
+    // validate ALIGN value is a power of two
+    auto validate_align = [](uint align_value, const SourceLoc & loc) -> bool {
+        if (align_value == 0 || (align_value & (align_value - 1)) != 0) {
+            g_diag.error(loc, "ALIGN value must be a power of two");
+            return false;
+        }
+        return true;
+    };
+
     bool failed = false;
     for (auto& mod : prog.modules) {
         for (auto& sec : mod->sections) {
@@ -45,10 +56,33 @@ bool compute_layout(Program& prog, bool& changed) {
             phase_pc = 0;
             phase_loc = SourceLoc();
 
+            // section level ORG
+            uint base_address = 0;
+            if (sec->org_stmt) {
+                if (!get_const_expr_value(sec->org_stmt->expr.get(),
+                                          base_address, "ORG")) {
+                    failed = true;
+                }
+            }
+
+            // section level ALIGN
+            uint align_value = 1;
+            if (sec->align_stmt) {
+                if (!get_const_expr_value(sec->align_stmt->align_expr.get(),
+                                          align_value, "ALIGN")) {
+                    failed = true;
+                }
+                if (!validate_align(align_value, sec->align_stmt->align_expr->loc)) {
+                    failed = true;
+                }
+            }
+
+            // section statements
             for (auto& stmt : sec->stmts) {
                 if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
                     opc_stmt->section = sec.get();
-                    layout(opc_stmt->address, static_cast<uint>(opc_stmt->bytes.size()));
+                    layout(opc_stmt->address,
+                           static_cast<uint>(opc_stmt->bytes.size()));
                     continue;
                 }
 
@@ -62,29 +96,25 @@ bool compute_layout(Program& prog, bool& changed) {
                     org_stmt->section = sec.get();
                     layout(org_stmt->address, 0);
 
-                    uint base_address = 0;
-                    if (sec->org_stmt) {
-                        if (!get_const_expr_value(sec->org_stmt->expr.get(), base_address,
-                                                  "ORG")) {
-                            failed = true;
-                        }
-                    }
-
                     uint new_address = org_stmt->address;
-                    if (!get_const_expr_value(org_stmt->expr.get(), new_address,
-                                              "ORG")) {
+                    if (!get_const_expr_value(org_stmt->expr.get(),
+                                              new_address, "ORG")) {
                         failed = true;
                     }
+                    uint new_offset = new_address - base_address;
 
                     if (new_address < base_address ||
-                            new_address < org_stmt->address) {
-                        g_diag.error(org_stmt->loc,
-                                     "ORG address cannot be less than previously allocated address");
+                            new_offset < org_stmt->address) {
+                        g_diag.error(org_stmt->expr->loc,
+                                     "ORG address cannot be less "
+                                     "than previously allocated");
                         failed = true;
-                        break; // cannot continue, org_stmt->padding_size would be very large
+
+                        // cannot continue, org_stmt->padding_size would be very large
+                        break;
                     }
 
-                    org_stmt->padding_size = new_address - org_stmt->address;
+                    org_stmt->padding_size = new_offset - org_stmt->address;
                     layout(org_stmt->address, org_stmt->padding_size);
 
                     continue;
@@ -100,17 +130,14 @@ bool compute_layout(Program& prog, bool& changed) {
                     align_stmt->section = sec.get();
                     layout(align_stmt->address, 0);
 
-                    uint align_value = 1;
-                    if (!get_const_expr_value(align_stmt->align_expr.get(), align_value,
-                                              "ALIGN")) {
+                    align_value = 1;
+                    if (!get_const_expr_value(align_stmt->align_expr.get(),
+                                              align_value, "ALIGN")) {
                         failed = true;
                     }
 
-                    if (align_value == 0 || (align_value & (align_value - 1)) != 0) {
-                        g_diag.error(align_stmt->loc,
-                                     "ALIGN value must be a power of two");
+                    if (!validate_align(align_value, align_stmt->align_expr->loc)) {
                         failed = true;
-                        break;
                     }
 
                     uint new_address =
@@ -125,8 +152,8 @@ bool compute_layout(Program& prog, bool& changed) {
                     layout(defs_stmt->address, 0);
 
                     uint size_value = 0;
-                    if (!get_const_expr_value(defs_stmt->size_expr.get(), size_value,
-                                              "DEFS")) {
+                    if (!get_const_expr_value(defs_stmt->size_expr.get(),
+                                              size_value, "DEFS")) {
                         failed = true;
                     }
 
@@ -141,16 +168,18 @@ bool compute_layout(Program& prog, bool& changed) {
 
                     std::string_view str_value = g_strings.view(defs_stmt->string_id);
                     uint size_value = static_cast<uint>(str_value.size());
-                    if (!get_const_expr_value(defs_stmt->size_expr.get(), size_value,
-                                              "DEFS")) {
+                    if (!get_const_expr_value(defs_stmt->size_expr.get(),
+                                              size_value, "DEFS")) {
                         failed = true;
                     }
 
                     if (size_value < str_value.size()) {
-                        g_diag.error(defs_stmt->loc,
+                        g_diag.error(defs_stmt->size_expr->loc,
                                      "DEFS size cannot be less than the string length");
                         failed = true;
-                        break;
+
+                        // use string length to avoid negative padding
+                        size_value = static_cast<uint>(str_value.size());
                     }
 
                     defs_stmt->padding_size = size_value;
@@ -161,7 +190,7 @@ bool compute_layout(Program& prog, bool& changed) {
                 if (auto phase_stmt = dynamic_cast<PhaseStmt*>(stmt)) {
                     if (in_phase) {
                         g_diag.error(phase_stmt->loc,
-                                     "Nested PHASE statements are not allowed");
+                                     "Nested PHASE not allowed");
                         g_diag.note(phase_loc, "Previous PHASE here");
                         failed = true;
                     }
@@ -171,8 +200,8 @@ bool compute_layout(Program& prog, bool& changed) {
                         phase_stmt->section = sec.get();
 
                         uint phase_value = 0;
-                        if (!get_const_expr_value(phase_stmt->expr.get(), phase_value,
-                                                  "PHASE")) {
+                        if (!get_const_expr_value(phase_stmt->expr.get(),
+                                                  phase_value, "PHASE")) {
                             failed = true;
                             break;
                         }
@@ -186,7 +215,7 @@ bool compute_layout(Program& prog, bool& changed) {
                 if (auto dephase_stmt = dynamic_cast<DephaseStmt*>(stmt)) {
                     if (!in_phase) {
                         g_diag.error(dephase_stmt->loc,
-                                     "DEPHASE statements are not allowed outside of a PHASE");
+                                     "DEPHASE without PHASE");
                         failed = true;
                     }
                     else {
@@ -204,4 +233,10 @@ bool compute_layout(Program& prog, bool& changed) {
     }
 
     return !failed;
+}
+
+bool check_jumps(Program& prog, bool& changed) {
+    (void)prog; // suppress unused parameter warning
+    (void)changed; // suppress unused parameter warning
+    return true;
 }

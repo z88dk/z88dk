@@ -10,7 +10,7 @@ Program: layout_org_04
                 Section: ""
                     Size: 0
                 Section: code (current)
-                    Size: 6
+                    Size: $13
                     Has opcodes
                     Statements:
                         OpcodeStmt
@@ -21,8 +21,9 @@ Program: layout_org_04
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:2:6
-                                    Value type: Unknown
-                                    Tokens: 1
+                                    Value type: Constant
+                                    Value const: 1
+                                    Expr: 1
                                     Offset: 0, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -30,12 +31,14 @@ Program: layout_org_04
                                     Inner expression:
                                         ExprLiteralInt: 1
                                             Location: t/50-layout/input/layout_org_04.asm:2:6
-                                            Value type: Unknown
-                                            Tokens: 1
+                                            Value type: Constant
+                                            Value const: 1
+                                            Expr: 1
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:2:9
-                                    Value type: Unknown
-                                    Tokens: 2
+                                    Value type: Constant
+                                    Value const: 2
+                                    Expr: 2
                                     Offset: 1, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -43,12 +46,14 @@ Program: layout_org_04
                                     Inner expression:
                                         ExprLiteralInt: 2
                                             Location: t/50-layout/input/layout_org_04.asm:2:9
-                                            Value type: Unknown
-                                            Tokens: 2
+                                            Value type: Constant
+                                            Value const: 2
+                                            Expr: 2
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:2:12
-                                    Value type: Unknown
-                                    Tokens: 3
+                                    Value type: Constant
+                                    Value const: 3
+                                    Expr: 3
                                     Offset: 2, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -56,8 +61,9 @@ Program: layout_org_04
                                     Inner expression:
                                         ExprLiteralInt: 3
                                             Location: t/50-layout/input/layout_org_04.asm:2:12
-                                            Value type: Unknown
-                                            Tokens: 3
+                                            Value type: Constant
+                                            Value const: 3
+                                            Expr: 3
                         OrgStmt
                             Location: t/50-layout/input/layout_org_04.asm:3:1
                             Section: code
@@ -65,18 +71,20 @@ Program: layout_org_04
                             Expression:
                                 ExprLiteralInt: $10
                                     Location: t/50-layout/input/layout_org_04.asm:3:5
-                                    Value type: Unknown
-                                    Tokens: $10
+                                    Value type: Constant
+                                    Value const: $10
+                                    Expr: $10
                         OpcodeStmt
                             Location: t/50-layout/input/layout_org_04.asm:4:1
                             Section: code
-                            Address: 3
+                            Address: $10
                             Bytes: 0 0 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:4:6
-                                    Value type: Unknown
-                                    Tokens: 4
+                                    Value type: Constant
+                                    Value const: 4
+                                    Expr: 4
                                     Offset: 0, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -84,12 +92,14 @@ Program: layout_org_04
                                     Inner expression:
                                         ExprLiteralInt: 4
                                             Location: t/50-layout/input/layout_org_04.asm:4:6
-                                            Value type: Unknown
-                                            Tokens: 4
+                                            Value type: Constant
+                                            Value const: 4
+                                            Expr: 4
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:4:9
-                                    Value type: Unknown
-                                    Tokens: 5
+                                    Value type: Constant
+                                    Value const: 5
+                                    Expr: 5
                                     Offset: 1, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -97,12 +107,14 @@ Program: layout_org_04
                                     Inner expression:
                                         ExprLiteralInt: 5
                                             Location: t/50-layout/input/layout_org_04.asm:4:9
-                                            Value type: Unknown
-                                            Tokens: 5
+                                            Value type: Constant
+                                            Value const: 5
+                                            Expr: 5
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:4:12
-                                    Value type: Unknown
-                                    Tokens: 6
+                                    Value type: Constant
+                                    Value const: 6
+                                    Expr: 6
                                     Offset: 2, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -110,8 +122,9 @@ Program: layout_org_04
                                     Inner expression:
                                         ExprLiteralInt: 6
                                             Location: t/50-layout/input/layout_org_04.asm:4:12
-                                            Value type: Unknown
-                                            Tokens: 6
+                                            Value type: Constant
+                                            Value const: 6
+                                            Expr: 6
     Statements:
         SectionStmt
             Location: t/50-layout/input/layout_org_04.asm:1:1
@@ -124,8 +137,9 @@ Program: layout_org_04
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:2:6
-                    Value type: Unknown
-                    Tokens: 1
+                    Value type: Constant
+                    Value const: 1
+                    Expr: 1
                     Offset: 0, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -133,12 +147,14 @@ Program: layout_org_04
                     Inner expression:
                         ExprLiteralInt: 1
                             Location: t/50-layout/input/layout_org_04.asm:2:6
-                            Value type: Unknown
-                            Tokens: 1
+                            Value type: Constant
+                            Value const: 1
+                            Expr: 1
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:2:9
-                    Value type: Unknown
-                    Tokens: 2
+                    Value type: Constant
+                    Value const: 2
+                    Expr: 2
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -146,12 +162,14 @@ Program: layout_org_04
                     Inner expression:
                         ExprLiteralInt: 2
                             Location: t/50-layout/input/layout_org_04.asm:2:9
-                            Value type: Unknown
-                            Tokens: 2
+                            Value type: Constant
+                            Value const: 2
+                            Expr: 2
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:2:12
-                    Value type: Unknown
-                    Tokens: 3
+                    Value type: Constant
+                    Value const: 3
+                    Expr: 3
                     Offset: 2, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -159,8 +177,9 @@ Program: layout_org_04
                     Inner expression:
                         ExprLiteralInt: 3
                             Location: t/50-layout/input/layout_org_04.asm:2:12
-                            Value type: Unknown
-                            Tokens: 3
+                            Value type: Constant
+                            Value const: 3
+                            Expr: 3
         OrgStmt
             Location: t/50-layout/input/layout_org_04.asm:3:1
             Section: code
@@ -168,18 +187,20 @@ Program: layout_org_04
             Expression:
                 ExprLiteralInt: $10
                     Location: t/50-layout/input/layout_org_04.asm:3:5
-                    Value type: Unknown
-                    Tokens: $10
+                    Value type: Constant
+                    Value const: $10
+                    Expr: $10
         OpcodeStmt
             Location: t/50-layout/input/layout_org_04.asm:4:1
             Section: code
-            Address: 3
+            Address: $10
             Bytes: 0 0 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:4:6
-                    Value type: Unknown
-                    Tokens: 4
+                    Value type: Constant
+                    Value const: 4
+                    Expr: 4
                     Offset: 0, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -187,12 +208,14 @@ Program: layout_org_04
                     Inner expression:
                         ExprLiteralInt: 4
                             Location: t/50-layout/input/layout_org_04.asm:4:6
-                            Value type: Unknown
-                            Tokens: 4
+                            Value type: Constant
+                            Value const: 4
+                            Expr: 4
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:4:9
-                    Value type: Unknown
-                    Tokens: 5
+                    Value type: Constant
+                    Value const: 5
+                    Expr: 5
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -200,12 +223,14 @@ Program: layout_org_04
                     Inner expression:
                         ExprLiteralInt: 5
                             Location: t/50-layout/input/layout_org_04.asm:4:9
-                            Value type: Unknown
-                            Tokens: 5
+                            Value type: Constant
+                            Value const: 5
+                            Expr: 5
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:4:12
-                    Value type: Unknown
-                    Tokens: 6
+                    Value type: Constant
+                    Value const: 6
+                    Expr: 6
                     Offset: 2, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -213,5 +238,6 @@ Program: layout_org_04
                     Inner expression:
                         ExprLiteralInt: 6
                             Location: t/50-layout/input/layout_org_04.asm:4:12
-                            Value type: Unknown
-                            Tokens: 6
+                            Value type: Constant
+                            Value const: 6
+                            Expr: 6

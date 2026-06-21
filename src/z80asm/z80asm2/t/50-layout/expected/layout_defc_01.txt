@@ -7,8 +7,16 @@ Program: layout_defc_01
     Modules:
         Module: layout_defc_01 (current)
             Symbols:
-                x: Defc in section ""
+                x: Defc in section "" = $
                     Location: t/50-layout/input/layout_defc_01.asm:2:1
+                    Expression:
+                        ExprLiteralAsmpc
+                            Location: t/50-layout/input/layout_defc_01.asm:2:10
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 3
+                            Expr: $
+                            Address: 3
             Sections:
                 Section: "" (current)
                     Size: 5
@@ -22,8 +30,9 @@ Program: layout_defc_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defc_01.asm:1:6
-                                    Value type: Unknown
-                                    Tokens: 1
+                                    Value type: Constant
+                                    Value const: 1
+                                    Expr: 1
                                     Offset: 0, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -31,12 +40,14 @@ Program: layout_defc_01
                                     Inner expression:
                                         ExprLiteralInt: 1
                                             Location: t/50-layout/input/layout_defc_01.asm:1:6
-                                            Value type: Unknown
-                                            Tokens: 1
+                                            Value type: Constant
+                                            Value const: 1
+                                            Expr: 1
                                 Patch
                                     Location: t/50-layout/input/layout_defc_01.asm:1:9
-                                    Value type: Unknown
-                                    Tokens: 2
+                                    Value type: Constant
+                                    Value const: 2
+                                    Expr: 2
                                     Offset: 1, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -44,12 +55,14 @@ Program: layout_defc_01
                                     Inner expression:
                                         ExprLiteralInt: 2
                                             Location: t/50-layout/input/layout_defc_01.asm:1:9
-                                            Value type: Unknown
-                                            Tokens: 2
+                                            Value type: Constant
+                                            Value const: 2
+                                            Expr: 2
                                 Patch
                                     Location: t/50-layout/input/layout_defc_01.asm:1:12
-                                    Value type: Unknown
-                                    Tokens: 3
+                                    Value type: Constant
+                                    Value const: 3
+                                    Expr: 3
                                     Offset: 2, Size: 1
                                     Type: Unsigned
                                     Validation: Any
@@ -57,21 +70,32 @@ Program: layout_defc_01
                                     Inner expression:
                                         ExprLiteralInt: 3
                                             Location: t/50-layout/input/layout_defc_01.asm:1:12
-                                            Value type: Unknown
-                                            Tokens: 3
+                                            Value type: Constant
+                                            Value const: 3
+                                            Expr: 3
                         DefcStmt
                             Location: t/50-layout/input/layout_defc_01.asm:2:1
                             Name: x
                             Section: ""
                             Address: 3
                             Symbol info:
-                                x: Defc in section ""
+                                x: Defc in section "" = $
                                     Location: t/50-layout/input/layout_defc_01.asm:2:1
+                                    Expression:
+                                        ExprLiteralAsmpc
+                                            Location: t/50-layout/input/layout_defc_01.asm:2:10
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 3
+                                            Expr: $
+                                            Address: 3
                             Expression:
                                 ExprLiteralAsmpc
                                     Location: t/50-layout/input/layout_defc_01.asm:2:10
-                                    Value type: Unknown
-                                    Tokens: $
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 3
+                                    Expr: $
                                     Address: 3
                         OpcodeStmt
                             Location: t/50-layout/input/layout_defc_01.asm:3:1
@@ -81,8 +105,10 @@ Program: layout_defc_01
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defc_01.asm:3:6
-                                    Value type: Unknown
-                                    Tokens: x
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: 3
+                                    Expr: x
                                     Offset: 0, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -90,11 +116,21 @@ Program: layout_defc_01
                                     Inner expression:
                                         ExprSymbol: x
                                             Location: t/50-layout/input/layout_defc_01.asm:3:6
-                                            Value type: Unknown
-                                            Tokens: x
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 3
+                                            Expr: x
                                             Symbol info:
-                                                x: Defc in section ""
+                                                x: Defc in section "" = $
                                                     Location: t/50-layout/input/layout_defc_01.asm:2:1
+                                                    Expression:
+                                                        ExprLiteralAsmpc
+                                                            Location: t/50-layout/input/layout_defc_01.asm:2:10
+                                                            Value type: AddressRelative
+                                                            Value section: ""
+                                                            Value offset: 3
+                                                            Expr: $
+                                                            Address: 3
     Statements:
         OpcodeStmt
             Location: t/50-layout/input/layout_defc_01.asm:1:1
@@ -104,8 +140,9 @@ Program: layout_defc_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defc_01.asm:1:6
-                    Value type: Unknown
-                    Tokens: 1
+                    Value type: Constant
+                    Value const: 1
+                    Expr: 1
                     Offset: 0, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -113,12 +150,14 @@ Program: layout_defc_01
                     Inner expression:
                         ExprLiteralInt: 1
                             Location: t/50-layout/input/layout_defc_01.asm:1:6
-                            Value type: Unknown
-                            Tokens: 1
+                            Value type: Constant
+                            Value const: 1
+                            Expr: 1
                 Patch
                     Location: t/50-layout/input/layout_defc_01.asm:1:9
-                    Value type: Unknown
-                    Tokens: 2
+                    Value type: Constant
+                    Value const: 2
+                    Expr: 2
                     Offset: 1, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -126,12 +165,14 @@ Program: layout_defc_01
                     Inner expression:
                         ExprLiteralInt: 2
                             Location: t/50-layout/input/layout_defc_01.asm:1:9
-                            Value type: Unknown
-                            Tokens: 2
+                            Value type: Constant
+                            Value const: 2
+                            Expr: 2
                 Patch
                     Location: t/50-layout/input/layout_defc_01.asm:1:12
-                    Value type: Unknown
-                    Tokens: 3
+                    Value type: Constant
+                    Value const: 3
+                    Expr: 3
                     Offset: 2, Size: 1
                     Type: Unsigned
                     Validation: Any
@@ -139,21 +180,32 @@ Program: layout_defc_01
                     Inner expression:
                         ExprLiteralInt: 3
                             Location: t/50-layout/input/layout_defc_01.asm:1:12
-                            Value type: Unknown
-                            Tokens: 3
+                            Value type: Constant
+                            Value const: 3
+                            Expr: 3
         DefcStmt
             Location: t/50-layout/input/layout_defc_01.asm:2:1
             Name: x
             Section: ""
             Address: 3
             Symbol info:
-                x: Defc in section ""
+                x: Defc in section "" = $
                     Location: t/50-layout/input/layout_defc_01.asm:2:1
+                    Expression:
+                        ExprLiteralAsmpc
+                            Location: t/50-layout/input/layout_defc_01.asm:2:10
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 3
+                            Expr: $
+                            Address: 3
             Expression:
                 ExprLiteralAsmpc
                     Location: t/50-layout/input/layout_defc_01.asm:2:10
-                    Value type: Unknown
-                    Tokens: $
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 3
+                    Expr: $
                     Address: 3
         OpcodeStmt
             Location: t/50-layout/input/layout_defc_01.asm:3:1
@@ -163,8 +215,10 @@ Program: layout_defc_01
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defc_01.asm:3:6
-                    Value type: Unknown
-                    Tokens: x
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: 3
+                    Expr: x
                     Offset: 0, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -172,8 +226,18 @@ Program: layout_defc_01
                     Inner expression:
                         ExprSymbol: x
                             Location: t/50-layout/input/layout_defc_01.asm:3:6
-                            Value type: Unknown
-                            Tokens: x
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: 3
+                            Expr: x
                             Symbol info:
-                                x: Defc in section ""
+                                x: Defc in section "" = $
                                     Location: t/50-layout/input/layout_defc_01.asm:2:1
+                                    Expression:
+                                        ExprLiteralAsmpc
+                                            Location: t/50-layout/input/layout_defc_01.asm:2:10
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: 3
+                                            Expr: $
+                                            Address: 3
