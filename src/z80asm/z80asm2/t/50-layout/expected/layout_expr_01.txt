@@ -58,7 +58,7 @@ Program: layout_expr_01
                             Location: t/50-layout/input/layout_expr_01.asm:4:5
                             Section: code
                             Address: 2
-                            Bytes: 0 0
+                            Bytes: 7 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_expr_01.asm:4:12
@@ -66,7 +66,7 @@ Program: layout_expr_01
                                     Value const: 7
                                     Expr: 1+2*3
                                     Offset: 0, Size: 2
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -247,7 +247,7 @@ Program: layout_expr_01
                             Location: t/50-layout/input/layout_expr_01.asm:9:5
                             Section: code
                             Address: $0C
-                            Bytes: 0 0
+                            Bytes: $12 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_expr_01.asm:9:19
@@ -255,7 +255,7 @@ Program: layout_expr_01
                                     Value const: $12
                                     Expr: end_code-start_code
                                     Offset: 0, Size: 2
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -323,7 +323,7 @@ Program: layout_expr_01
                             Location: t/50-layout/input/layout_expr_01.asm:11:5
                             Section: code
                             Address: $10
-                            Bytes: 0 0
+                            Bytes: 4 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_expr_01.asm:11:19
@@ -331,7 +331,7 @@ Program: layout_expr_01
                                     Value const: 4
                                     Expr: end_data-start_data
                                     Offset: 0, Size: 2
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -406,7 +406,7 @@ Program: layout_expr_01
                             Location: t/50-layout/input/layout_expr_01.asm:17:5
                             Section: data
                             Address: 2
-                            Bytes: 0 0
+                            Bytes: 7 0
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_expr_01.asm:17:12
@@ -414,7 +414,7 @@ Program: layout_expr_01
                                     Value const: 7
                                     Expr: 1+2*3
                                     Offset: 0, Size: 2
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -491,7 +491,7 @@ Program: layout_expr_01
             Location: t/50-layout/input/layout_expr_01.asm:4:5
             Section: code
             Address: 2
-            Bytes: 0 0
+            Bytes: 7 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_expr_01.asm:4:12
@@ -499,7 +499,7 @@ Program: layout_expr_01
                     Value const: 7
                     Expr: 1+2*3
                     Offset: 0, Size: 2
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -680,7 +680,7 @@ Program: layout_expr_01
             Location: t/50-layout/input/layout_expr_01.asm:9:5
             Section: code
             Address: $0C
-            Bytes: 0 0
+            Bytes: $12 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_expr_01.asm:9:19
@@ -688,7 +688,7 @@ Program: layout_expr_01
                     Value const: $12
                     Expr: end_code-start_code
                     Offset: 0, Size: 2
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -756,7 +756,7 @@ Program: layout_expr_01
             Location: t/50-layout/input/layout_expr_01.asm:11:5
             Section: code
             Address: $10
-            Bytes: 0 0
+            Bytes: 4 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_expr_01.asm:11:19
@@ -764,7 +764,7 @@ Program: layout_expr_01
                     Value const: 4
                     Expr: end_data-start_data
                     Offset: 0, Size: 2
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -838,7 +838,7 @@ Program: layout_expr_01
             Location: t/50-layout/input/layout_expr_01.asm:17:5
             Section: data
             Address: 2
-            Bytes: 0 0
+            Bytes: 7 0
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_expr_01.asm:17:12
@@ -846,7 +846,7 @@ Program: layout_expr_01
                     Value const: 7
                     Expr: 1+2*3
                     Offset: 0, Size: 2
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:

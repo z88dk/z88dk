@@ -10,7 +10,7 @@ Program: layout_defs_string_01
                 Section: ""
                     Size: 0
                 Section: code (current)
-                    Size: $26
+                    Size: $1B
                     Has opcodes
                     Statements:
                         DefsStringStmt
@@ -25,11 +25,13 @@ Program: layout_defs_string_01
                                     Expr: $10
                             String literal: "hello"
                             Filler byte: 0
+                            Padding size: $10
+                            Bytes: $68 $65 $6C $6C $6F 0 0 0 0 0 0 0 0 0 0 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_defs_string_01.asm:3:1
                             Section: code
                             Address: $10
-                            Bytes: 0 0 0
+                            Bytes: 1 2 3
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defs_string_01.asm:3:6
@@ -37,7 +39,7 @@ Program: layout_defs_string_01
                                     Value const: 1
                                     Expr: 1
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -52,7 +54,7 @@ Program: layout_defs_string_01
                                     Value const: 2
                                     Expr: 2
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -67,7 +69,7 @@ Program: layout_defs_string_01
                                     Value const: 3
                                     Expr: 3
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -81,18 +83,20 @@ Program: layout_defs_string_01
                             Section: code
                             Address: $13
                             Size:
-                                ExprLiteralInt: $10
+                                ExprLiteralInt: 5
                                     Location: t/50-layout/input/layout_defs_string_01.asm:4:6
                                     Value type: Constant
-                                    Value const: $10
-                                    Expr: $10
+                                    Value const: 5
+                                    Expr: 5
                             String literal: "world"
                             Filler byte: 0
+                            Padding size: 5
+                            Bytes: $77 $6F $72 $6C $64
                         OpcodeStmt
                             Location: t/50-layout/input/layout_defs_string_01.asm:5:1
                             Section: code
-                            Address: $23
-                            Bytes: 0 0 0
+                            Address: $18
+                            Bytes: 4 5 6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defs_string_01.asm:5:6
@@ -100,7 +104,7 @@ Program: layout_defs_string_01
                                     Value const: 4
                                     Expr: 4
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -115,7 +119,7 @@ Program: layout_defs_string_01
                                     Value const: 5
                                     Expr: 5
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -130,7 +134,7 @@ Program: layout_defs_string_01
                                     Value const: 6
                                     Expr: 6
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -155,11 +159,13 @@ Program: layout_defs_string_01
                     Expr: $10
             String literal: "hello"
             Filler byte: 0
+            Padding size: $10
+            Bytes: $68 $65 $6C $6C $6F 0 0 0 0 0 0 0 0 0 0 0
         OpcodeStmt
             Location: t/50-layout/input/layout_defs_string_01.asm:3:1
             Section: code
             Address: $10
-            Bytes: 0 0 0
+            Bytes: 1 2 3
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defs_string_01.asm:3:6
@@ -167,7 +173,7 @@ Program: layout_defs_string_01
                     Value const: 1
                     Expr: 1
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -182,7 +188,7 @@ Program: layout_defs_string_01
                     Value const: 2
                     Expr: 2
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -197,7 +203,7 @@ Program: layout_defs_string_01
                     Value const: 3
                     Expr: 3
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -211,18 +217,20 @@ Program: layout_defs_string_01
             Section: code
             Address: $13
             Size:
-                ExprLiteralInt: $10
+                ExprLiteralInt: 5
                     Location: t/50-layout/input/layout_defs_string_01.asm:4:6
                     Value type: Constant
-                    Value const: $10
-                    Expr: $10
+                    Value const: 5
+                    Expr: 5
             String literal: "world"
             Filler byte: 0
+            Padding size: 5
+            Bytes: $77 $6F $72 $6C $64
         OpcodeStmt
             Location: t/50-layout/input/layout_defs_string_01.asm:5:1
             Section: code
-            Address: $23
-            Bytes: 0 0 0
+            Address: $18
+            Bytes: 4 5 6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defs_string_01.asm:5:6
@@ -230,7 +238,7 @@ Program: layout_defs_string_01
                     Value const: 4
                     Expr: 4
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -245,7 +253,7 @@ Program: layout_defs_string_01
                     Value const: 5
                     Expr: 5
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -260,7 +268,7 @@ Program: layout_defs_string_01
                     Value const: 6
                     Expr: 6
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:

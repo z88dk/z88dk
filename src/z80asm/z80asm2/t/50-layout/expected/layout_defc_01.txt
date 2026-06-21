@@ -26,7 +26,7 @@ Program: layout_defc_01
                             Location: t/50-layout/input/layout_defc_01.asm:1:1
                             Section: ""
                             Address: 0
-                            Bytes: 0 0 0
+                            Bytes: 1 2 3
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_defc_01.asm:1:6
@@ -34,7 +34,7 @@ Program: layout_defc_01
                                     Value const: 1
                                     Expr: 1
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -49,7 +49,7 @@ Program: layout_defc_01
                                     Value const: 2
                                     Expr: 2
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -64,7 +64,7 @@ Program: layout_defc_01
                                     Value const: 3
                                     Expr: 3
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -136,7 +136,7 @@ Program: layout_defc_01
             Location: t/50-layout/input/layout_defc_01.asm:1:1
             Section: ""
             Address: 0
-            Bytes: 0 0 0
+            Bytes: 1 2 3
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_defc_01.asm:1:6
@@ -144,7 +144,7 @@ Program: layout_defc_01
                     Value const: 1
                     Expr: 1
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -159,7 +159,7 @@ Program: layout_defc_01
                     Value const: 2
                     Expr: 2
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -174,7 +174,7 @@ Program: layout_defc_01
                     Value const: 3
                     Expr: 3
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
