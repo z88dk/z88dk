@@ -143,8 +143,8 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
         return; // error already reported
     }
 
-    // TODO: compute patches and emit range errors
-    if (!compute_relocations(*prog)) {
+    // compute patches and emit range errors
+    if (!apply_patches(*prog)) {
         return; // error already reported
     }
 

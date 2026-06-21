@@ -3,6 +3,9 @@ Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Define constant: __FLOAT_GENMATH__ = 1
 Assembling t/50-layout/input/layout_align_03.asm...
+t/50-layout/input/layout_align_03.asm:5:10: warning: Integer range: $100
+    align 4, 256
+             ^
 Program: layout_align_03
     Modules:
         Module: layout_align_03 (current)
@@ -17,7 +20,7 @@ Program: layout_align_03
                             Location: t/50-layout/input/layout_align_03.asm:2:1
                             Section: code
                             Address: 0
-                            Bytes: 0 0 0
+                            Bytes: 1 2 3
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:2:6
@@ -25,7 +28,7 @@ Program: layout_align_03
                                     Value const: 1
                                     Expr: 1
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -40,7 +43,7 @@ Program: layout_align_03
                                     Value const: 2
                                     Expr: 2
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -55,7 +58,7 @@ Program: layout_align_03
                                     Value const: 3
                                     Expr: 3
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -79,11 +82,13 @@ Program: layout_align_03
                                     Location: t/50-layout/input/layout_align_03.asm:3:1
                                     Value type: Constant
                                     Value const: 0
+                            Padding size: 1
+                            Bytes: 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_align_03.asm:4:1
                             Section: code
                             Address: 4
-                            Bytes: 0 0 0
+                            Bytes: 4 5 6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:4:6
@@ -91,7 +96,7 @@ Program: layout_align_03
                                     Value const: 4
                                     Expr: 4
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -106,7 +111,7 @@ Program: layout_align_03
                                     Value const: 5
                                     Expr: 5
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -121,7 +126,7 @@ Program: layout_align_03
                                     Value const: 6
                                     Expr: 6
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -146,11 +151,13 @@ Program: layout_align_03
                                     Value type: Constant
                                     Value const: $100
                                     Expr: $100
+                            Padding size: 1
+                            Bytes: 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_align_03.asm:6:1
                             Section: code
                             Address: 8
-                            Bytes: 0 0 0
+                            Bytes: 7 8 9
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_align_03.asm:6:6
@@ -158,7 +165,7 @@ Program: layout_align_03
                                     Value const: 7
                                     Expr: 7
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -173,7 +180,7 @@ Program: layout_align_03
                                     Value const: 8
                                     Expr: 8
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -188,7 +195,7 @@ Program: layout_align_03
                                     Value const: 9
                                     Expr: 9
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -205,7 +212,7 @@ Program: layout_align_03
             Location: t/50-layout/input/layout_align_03.asm:2:1
             Section: code
             Address: 0
-            Bytes: 0 0 0
+            Bytes: 1 2 3
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:2:6
@@ -213,7 +220,7 @@ Program: layout_align_03
                     Value const: 1
                     Expr: 1
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -228,7 +235,7 @@ Program: layout_align_03
                     Value const: 2
                     Expr: 2
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -243,7 +250,7 @@ Program: layout_align_03
                     Value const: 3
                     Expr: 3
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -267,11 +274,13 @@ Program: layout_align_03
                     Location: t/50-layout/input/layout_align_03.asm:3:1
                     Value type: Constant
                     Value const: 0
+            Padding size: 1
+            Bytes: 0
         OpcodeStmt
             Location: t/50-layout/input/layout_align_03.asm:4:1
             Section: code
             Address: 4
-            Bytes: 0 0 0
+            Bytes: 4 5 6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:4:6
@@ -279,7 +288,7 @@ Program: layout_align_03
                     Value const: 4
                     Expr: 4
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -294,7 +303,7 @@ Program: layout_align_03
                     Value const: 5
                     Expr: 5
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -309,7 +318,7 @@ Program: layout_align_03
                     Value const: 6
                     Expr: 6
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -334,11 +343,13 @@ Program: layout_align_03
                     Value type: Constant
                     Value const: $100
                     Expr: $100
+            Padding size: 1
+            Bytes: 0
         OpcodeStmt
             Location: t/50-layout/input/layout_align_03.asm:6:1
             Section: code
             Address: 8
-            Bytes: 0 0 0
+            Bytes: 7 8 9
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_align_03.asm:6:6
@@ -346,7 +357,7 @@ Program: layout_align_03
                     Value const: 7
                     Expr: 7
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -361,7 +372,7 @@ Program: layout_align_03
                     Value const: 8
                     Expr: 8
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -376,7 +387,7 @@ Program: layout_align_03
                     Value const: 9
                     Expr: 9
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:

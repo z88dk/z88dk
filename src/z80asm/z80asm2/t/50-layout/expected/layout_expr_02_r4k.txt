@@ -1,0 +1,45 @@
+% z88dk-z80asm -v -mr4k -dump-after-layout t/50-layout//input/layout_expr_02.asm
+Define constant: __CPU_RABBIT__ = 1
+Define constant: __CPU_R4K__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_expr_02.asm...
+t/50-layout/input/layout_expr_02.asm:1:6: warning: Integer range: -$81
+    defb -129, -128, -127, -1, 0, 1, 127, 128, 255, 256
+         ^
+t/50-layout/input/layout_expr_02.asm:1:49: warning: Integer range: $100
+    defb -129, -128, -127, -1, 0, 1, 127, 128, 255, 256
+                                                    ^
+t/50-layout/input/layout_expr_02.asm:2:6: warning: Integer range: -$8001
+    defw -32769, -32768, -32767, -1, 0, 1, 32767, 32768, 65535, 65536
+         ^
+t/50-layout/input/layout_expr_02.asm:2:61: warning: Integer range: $10000
+    defw -32769, -32768, -32767, -1, 0, 1, 32767, 32768, 65535, 65536
+                                                                ^
+t/50-layout/input/layout_expr_02.asm:5:9: warning: Integer range: -$81
+    ld a,(ix-129)
+            ^
+t/50-layout/input/layout_expr_02.asm:10:9: warning: Integer range: $80
+    ld a,(ix+128)
+            ^
+t/50-layout/input/layout_expr_02.asm:11:9: warning: Integer range: $FF
+    ld a,(ix+255)
+            ^
+t/50-layout/input/layout_expr_02.asm:24:9: warning: Integer range: -$8001
+    defw_be -32769, -32768, -32767, -1, 0, 1, 32767, 32768, 65535, 65536
+            ^
+t/50-layout/input/layout_expr_02.asm:24:64: warning: Integer range: $10000
+    defw_be -32769, -32768, -32767, -1, 0, 1, 32767, 32768, 65535, 65536
+                                                                   ^
+t/50-layout/input/layout_expr_02.asm:25:4: error: Relative jump out of range: -$81
+    jr -129
+       ^
+t/50-layout/input/layout_expr_02.asm:26:4: error: Relative jump out of range: $80
+    jr 128
+       ^
+t/50-layout/input/layout_expr_02.asm:29:5: error: Relative jump out of range: -$8001
+    jre -32769
+        ^
+t/50-layout/input/layout_expr_02.asm:30:5: error: Relative jump out of range: $8000
+    jre 32768
+        ^
+Assembly completed with 4 errors

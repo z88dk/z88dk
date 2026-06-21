@@ -17,7 +17,7 @@ Program: layout_org_04
                             Location: t/50-layout/input/layout_org_04.asm:2:1
                             Section: code
                             Address: 0
-                            Bytes: 0 0 0
+                            Bytes: 1 2 3
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:2:6
@@ -25,7 +25,7 @@ Program: layout_org_04
                                     Value const: 1
                                     Expr: 1
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -40,7 +40,7 @@ Program: layout_org_04
                                     Value const: 2
                                     Expr: 2
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -55,7 +55,7 @@ Program: layout_org_04
                                     Value const: 3
                                     Expr: 3
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -74,11 +74,13 @@ Program: layout_org_04
                                     Value type: Constant
                                     Value const: $10
                                     Expr: $10
+                            Padding size: $0D
+                            Bytes: 0 0 0 0 0 0 0 0 0 0 0 0 0
                         OpcodeStmt
                             Location: t/50-layout/input/layout_org_04.asm:4:1
                             Section: code
                             Address: $10
-                            Bytes: 0 0 0
+                            Bytes: 4 5 6
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_org_04.asm:4:6
@@ -86,7 +88,7 @@ Program: layout_org_04
                                     Value const: 4
                                     Expr: 4
                                     Offset: 0, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -101,7 +103,7 @@ Program: layout_org_04
                                     Value const: 5
                                     Expr: 5
                                     Offset: 1, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -116,7 +118,7 @@ Program: layout_org_04
                                     Value const: 6
                                     Expr: 6
                                     Offset: 2, Size: 1
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
@@ -133,7 +135,7 @@ Program: layout_org_04
             Location: t/50-layout/input/layout_org_04.asm:2:1
             Section: code
             Address: 0
-            Bytes: 0 0 0
+            Bytes: 1 2 3
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:2:6
@@ -141,7 +143,7 @@ Program: layout_org_04
                     Value const: 1
                     Expr: 1
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -156,7 +158,7 @@ Program: layout_org_04
                     Value const: 2
                     Expr: 2
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -171,7 +173,7 @@ Program: layout_org_04
                     Value const: 3
                     Expr: 3
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -190,11 +192,13 @@ Program: layout_org_04
                     Value type: Constant
                     Value const: $10
                     Expr: $10
+            Padding size: $0D
+            Bytes: 0 0 0 0 0 0 0 0 0 0 0 0 0
         OpcodeStmt
             Location: t/50-layout/input/layout_org_04.asm:4:1
             Section: code
             Address: $10
-            Bytes: 0 0 0
+            Bytes: 4 5 6
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_org_04.asm:4:6
@@ -202,7 +206,7 @@ Program: layout_org_04
                     Value const: 4
                     Expr: 4
                     Offset: 0, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -217,7 +221,7 @@ Program: layout_org_04
                     Value const: 5
                     Expr: 5
                     Offset: 1, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
@@ -232,7 +236,7 @@ Program: layout_org_04
                     Value const: 6
                     Expr: 6
                     Offset: 2, Size: 1
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
