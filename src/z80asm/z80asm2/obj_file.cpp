@@ -4,9 +4,11 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#pragma once
+#include "obj_file.h"
+#include <string_view>
 
-#include "ir.h"
-
-bool compute_layout(Program& prog, bool& changed);
-void check_jumps(Program& prog, bool& changed);
+bool write_object_file(const ObjectFile& obj, std::string_view filename) {
+    (void)obj;
+    (void)filename;
+    return false;
+}

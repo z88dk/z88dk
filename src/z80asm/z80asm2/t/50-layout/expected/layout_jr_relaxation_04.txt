@@ -1,0 +1,117 @@
+% z88dk-z80asm -v -dump-after-layout t/50-layout//input/layout_jr_relaxation_04.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_jr_relaxation_04.asm...
+Program: layout_jr_relaxation_04
+    Modules:
+        Module: layout_jr_relaxation_04 (current)
+            Symbols:
+                func1: Label $103 in section ""
+                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
+            Sections:
+                Section: "" (current)
+                    Size: $103
+                    Has opcodes
+                    Statements:
+                        OpcodeStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_04.asm:1:1
+                            Section: ""
+                            Address: 0
+                            Bytes: $C3 0 0
+                            Patches:
+                                Patch
+                                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:1:4
+                                    Value type: AddressRelative
+                                    Value section: ""
+                                    Value offset: $103
+                                    Expr: func1
+                                    Offset: 1, Size: 2
+                                    Type: Unsigned
+                                    Validation: Any
+                                    Formula: None
+                                    Inner expression:
+                                        ExprSymbol: func1
+                                            Location: t/50-layout/input/layout_jr_relaxation_04.asm:1:4
+                                            Value type: AddressRelative
+                                            Value section: ""
+                                            Value offset: $103
+                                            Expr: func1
+                                            Symbol info:
+                                                func1: Label $103 in section ""
+                                                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
+                        DefsNumericStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_04.asm:2:1
+                            Section: ""
+                            Address: 3
+                            Size:
+                                ExprLiteralInt: $100
+                                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:2:6
+                                    Value type: Constant
+                                    Value const: $100
+                                    Expr: $100
+                            Filler byte:
+                                ExprLiteralInt: 0
+                                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:2:11
+                                    Value type: Constant
+                                    Value const: 0
+                                    Expr: 0
+                        LabelStmt
+                            Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
+                            Label: func1
+                            Section: ""
+                            Address: $103
+                            Symbol info:
+                                func1: Label $103 in section ""
+                                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
+    Statements:
+        OpcodeStmt
+            Location: t/50-layout/input/layout_jr_relaxation_04.asm:1:1
+            Section: ""
+            Address: 0
+            Bytes: $C3 0 0
+            Patches:
+                Patch
+                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:1:4
+                    Value type: AddressRelative
+                    Value section: ""
+                    Value offset: $103
+                    Expr: func1
+                    Offset: 1, Size: 2
+                    Type: Unsigned
+                    Validation: Any
+                    Formula: None
+                    Inner expression:
+                        ExprSymbol: func1
+                            Location: t/50-layout/input/layout_jr_relaxation_04.asm:1:4
+                            Value type: AddressRelative
+                            Value section: ""
+                            Value offset: $103
+                            Expr: func1
+                            Symbol info:
+                                func1: Label $103 in section ""
+                                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
+        DefsNumericStmt
+            Location: t/50-layout/input/layout_jr_relaxation_04.asm:2:1
+            Section: ""
+            Address: 3
+            Size:
+                ExprLiteralInt: $100
+                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:2:6
+                    Value type: Constant
+                    Value const: $100
+                    Expr: $100
+            Filler byte:
+                ExprLiteralInt: 0
+                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:2:11
+                    Value type: Constant
+                    Value const: 0
+                    Expr: 0
+        LabelStmt
+            Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
+            Label: func1
+            Section: ""
+            Address: $103
+            Symbol info:
+                func1: Label $103 in section ""
+                    Location: t/50-layout/input/layout_jr_relaxation_04.asm:3:1
