@@ -15,8 +15,11 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string_view>
 #include <vector>
+
+static const int LINE_WRAP_COLUMN = 80;
 
 Preproc::Preproc()
     : preproc_cpu_id(g_args.options.cpu_id)
@@ -412,4 +415,53 @@ void output_preproc_output(std::string_view filename,
         ofs << to_string(line.tokens);
         loc.line++;
     }
+}
+
+void output_dependencies(std::string_view output_filename,
+                         std::string_view o_filename,
+                         std::string_view asm_filename,
+                         const std::vector<LogicalLine>& lines) {
+    std::string filename_s(output_filename);
+    std::ofstream ofs(filename_s, std::ios::binary);
+    if (!ofs.is_open()) {
+        g_diag.error(SourceLoc(), "Cannot write file: " + filename_s);
+        return;
+    }
+
+    if (g_args.options.verbose) {
+        std::cout << "Writing " << filename_s << "..." << std::endl;
+    }
+
+    // write o_filename : asm_filename
+    ofs << o_filename << " :";
+    int col = static_cast<int>(o_filename.size() + 2);
+
+    // collect all referenced filenames
+    std::set<StringInterner::Id> seen_files;
+
+    // lambda to add a filename to the output, handling line wrapping
+    auto add_file = [&](std::string_view filename) {
+        int needed = static_cast<int>(filename.size()) + 1;  // space + filename
+        if (col + needed > LINE_WRAP_COLUMN) {
+            ofs << " \\\n        ";  // backslash, newline, 8 spaces
+            col = 8;
+        }
+        ofs << " " << filename;
+        col += needed;
+    };
+
+    // add the main asm file
+    seen_files.insert(g_strings.intern(asm_filename));
+    add_file(asm_filename);
+
+    // add all referenced files
+    for (const auto& line : lines) {
+        if (line.loc.file_id != 0
+                && seen_files.find(line.loc.file_id) == seen_files.end()) {
+            seen_files.insert(line.loc.file_id);
+            add_file(g_strings.view(line.loc.file_id));
+        }
+    }
+
+    ofs << std::endl;
 }
