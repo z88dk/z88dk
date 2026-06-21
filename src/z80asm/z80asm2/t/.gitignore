@@ -1,2 +1,3 @@
 # have .bin input files for tests
 !*.bin
+!*.d

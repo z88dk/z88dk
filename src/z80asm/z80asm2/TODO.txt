@@ -1,7 +1,4 @@
 ## Pending issues
-- Make AST node for jumps to allow promotion JR->JP (if -optimize-speed or jump too far)
-  or demotion JP->JR (if -optimize-size)
-- Add -MD to generate .d file
 - Add location of built-in symbols:
   symbol	__CPU_Z80__	1	(defined at )
   symbol	__CPU_ZILOG__	1	(defined at )
@@ -20,16 +17,16 @@
 - [x] Output of preprocessed text with -E option
 - [x] AST construction for instructions and expressions
 - [x] Module and segment-switching annotation
-- [ ] Resolution of local labels
+- [x] Resolution of local labels
 - [x] Collection of symbols into symbol tables
 - [x] Resolution of symbols used in expressions
 - [x] Resolution of GLOBAL, detecion of undefined symbols
-- [ ] AST validation and semantic checks
-- [ ] Size computation and JR promotion (iterative until stable)
-- [ ] Freeze of segment offsets
-- [ ] Fixup classification (absolute / relocatable / external)
-- [ ] Relocation record generation
-- [ ] Expression evaluation and patching or postponing to linker
+- [x] AST validation and semantic checks
+- [x] Size computation and JR promotion (iterative until stable)
+- [x] Freeze of segment offsets
+- [x] Fixup classification (absolute / relocatable / external)
+- [x] Relocation record generation
+- [x] Expression evaluation and patching or postponing to linker
 - [ ] Final byte emission with relocation placeholders
 - [ ] Emission of Object file format
 

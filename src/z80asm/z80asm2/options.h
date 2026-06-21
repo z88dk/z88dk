@@ -39,6 +39,7 @@ struct Options {
     bool verbose = false;
     bool ucase_symbols = false;
     bool preprocess_only = false;
+    bool generate_dependencies = false;
     CPU  cpu_id{ DEFAULT_CPU }; // immutable, from -m
     bool swap_ix_iy = false;
     bool date_stamp = false;

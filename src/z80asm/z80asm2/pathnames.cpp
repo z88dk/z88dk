@@ -40,6 +40,11 @@ std::string get_o_filename(std::string_view filename,
     return prepend_output_dir(replace_extension(filename, o_extension), output_dir);
 }
 
+std::string get_d_filename(std::string_view filename,
+                           std::string_view output_dir) {
+    return prepend_output_dir(replace_extension(filename, d_extension), output_dir);
+}
+
 std::string get_i_filename(std::string_view filename) {
     return replace_extension(filename, i_extension);
 }

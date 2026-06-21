@@ -67,7 +67,8 @@ static const UsageGroup usage_layout[] = {
             OptionType::UCASE,
             OptionType::FLOAT_FORMAT,
             OptionType::DEFINE,
-            OptionType::PREPROC
+            OptionType::PREPROC,
+            OptionType::GENERATE_DEPENDENCIES,
         }
     },
     {
@@ -403,6 +404,10 @@ void Args::parse_arg(std::string_view arg,
 
         case OptionType::PREPROC:
             options.preprocess_only = true;
+            return;
+
+        case OptionType::GENERATE_DEPENDENCIES:
+            options.generate_dependencies = true;
             return;
 
         case OptionType::CPU: {
