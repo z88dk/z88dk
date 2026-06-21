@@ -108,6 +108,33 @@ Token Token::end_of_line(const SourceLoc& loc) {
     return t;
 }
 
+bool Token::operator==(const Token& other) const noexcept {
+    // Compare type, keyword, and text_id
+    if (type != other.type || keyword != other.keyword
+            || text_id != other.text_id) {
+        return false;
+    }
+
+    // Compare union value based on token type
+    switch (type) {
+    case TokenType::Integer:
+        return value.int_value == other.value.int_value;
+    case TokenType::Float:
+        return value.float_value == other.value.float_value;
+    case TokenType::String:
+        return value.str_value_id == other.value.str_value_id;
+    case TokenType::LocalLabel:
+        return value.label_at_pos == other.value.label_at_pos;
+    default:
+        // For other token types, the union is not used or already compared via text_id
+        return true;
+    }
+}
+
+bool Token::operator!=(const Token& other) const noexcept {
+    return !(*this == other);
+}
+
 std::string to_string(Token token) {
     switch (token.type) {
     case TokenType::Identifier:

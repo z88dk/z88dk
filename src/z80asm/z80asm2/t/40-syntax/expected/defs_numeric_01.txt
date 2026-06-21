@@ -26,32 +26,27 @@ Program: defs_numeric_01
                 ExprBinary: +
                     Location: t/40-syntax/input/defs_numeric_01.asm:4:8
                     Value type: Unknown
-                    Tokens: 1+2*3
+                    Expr: 1+2*3
                     LHS:
                         ExprLiteralInt: 1
                             Location: t/40-syntax/input/defs_numeric_01.asm:4:6
                             Value type: Unknown
-                            Tokens: 
                     RHS:
                         ExprBinary: *
                             Location: t/40-syntax/input/defs_numeric_01.asm:4:10
                             Value type: Unknown
-                            Tokens: 
                             LHS:
                                 ExprLiteralInt: 2
                                     Location: t/40-syntax/input/defs_numeric_01.asm:4:8
                                     Value type: Unknown
-                                    Tokens: 
                             RHS:
                                 ExprLiteralInt: 3
                                     Location: t/40-syntax/input/defs_numeric_01.asm:4:10
                                     Value type: Unknown
-                                    Tokens: 
             Filler byte:
                 ExprLiteralInt: 0
                     Location: t/40-syntax/input/defs_numeric_01.asm:4:1
                     Value type: Unknown
-                    Tokens: 
         DefsNumericStmt
             Location: t/40-syntax/input/defs_numeric_01.asm:5:1
             Address: 0
@@ -59,49 +54,41 @@ Program: defs_numeric_01
                 ExprBinary: +
                     Location: t/40-syntax/input/defs_numeric_01.asm:5:8
                     Value type: Unknown
-                    Tokens: 1+2*3
+                    Expr: 1+2*3
                     LHS:
                         ExprLiteralInt: 1
                             Location: t/40-syntax/input/defs_numeric_01.asm:5:6
                             Value type: Unknown
-                            Tokens: 
                     RHS:
                         ExprBinary: *
                             Location: t/40-syntax/input/defs_numeric_01.asm:5:10
                             Value type: Unknown
-                            Tokens: 
                             LHS:
                                 ExprLiteralInt: 2
                                     Location: t/40-syntax/input/defs_numeric_01.asm:5:8
                                     Value type: Unknown
-                                    Tokens: 
                             RHS:
                                 ExprLiteralInt: 3
                                     Location: t/40-syntax/input/defs_numeric_01.asm:5:10
                                     Value type: Unknown
-                                    Tokens: 
             Filler byte:
                 ExprBinary: +
                     Location: t/40-syntax/input/defs_numeric_01.asm:5:15
                     Value type: Unknown
-                    Tokens: 2+3*4
+                    Expr: 2+3*4
                     LHS:
                         ExprLiteralInt: 2
                             Location: t/40-syntax/input/defs_numeric_01.asm:5:13
                             Value type: Unknown
-                            Tokens: 
                     RHS:
                         ExprBinary: *
                             Location: t/40-syntax/input/defs_numeric_01.asm:5:17
                             Value type: Unknown
-                            Tokens: 
                             LHS:
                                 ExprLiteralInt: 3
                                     Location: t/40-syntax/input/defs_numeric_01.asm:5:15
                                     Value type: Unknown
-                                    Tokens: 
                             RHS:
                                 ExprLiteralInt: 4
                                     Location: t/40-syntax/input/defs_numeric_01.asm:5:17
                                     Value type: Unknown
-                                    Tokens: 

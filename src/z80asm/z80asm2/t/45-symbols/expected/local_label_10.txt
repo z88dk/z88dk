@@ -7,17 +7,17 @@ Program: local_label_10
     Modules:
         Module: local_label_10 (current)
             Symbols:
-                g1: Label in section ""
+                g1: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:1:1
-                g1@l1: Label in section ""
+                g1@l1: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:3:1
-                g1@l2: Label in section ""
+                g1@l2: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:8:1
-                g2: Label in section ""
+                g2: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:9:1
-                g2@l1: Label in section ""
+                g2@l1: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:11:1
-                g2@l2: Label in section ""
+                g2@l2: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:16:1
             Sections:
                 Section: "" (current)
@@ -30,7 +30,7 @@ Program: local_label_10
                             Section: ""
                             Address: 0
                             Symbol info:
-                                g1: Label in section ""
+                                g1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:1:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:2:5
@@ -41,7 +41,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:2:8
                                     Value type: Unknown
-                                    Tokens: g1
+                                    Expr: g1
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -50,9 +50,9 @@ Program: local_label_10
                                         ExprSymbol: g1
                                             Location: t/45-symbols/input/local_label_10.asm:2:8
                                             Value type: Unknown
-                                            Tokens: g1
+                                            Expr: g1
                                             Symbol info:
-                                                g1: Label in section ""
+                                                g1: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:1:1
                         LabelStmt
                             Location: t/45-symbols/input/local_label_10.asm:3:1
@@ -61,7 +61,7 @@ Program: local_label_10
                             Section: ""
                             Address: 0
                             Symbol info:
-                                g1@l1: Label in section ""
+                                g1@l1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:3:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:4:5
@@ -72,7 +72,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:4:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -81,9 +81,9 @@ Program: local_label_10
                                         ExprLocalLabel: g1@l1 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:4:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g1@l1: Label in section ""
+                                                g1@l1: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:3:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:5:5
@@ -94,7 +94,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:5:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -103,9 +103,9 @@ Program: local_label_10
                                         ExprLocalLabel: g1@l2 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:5:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g1@l2: Label in section ""
+                                                g1@l2: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:8:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:6:5
@@ -116,7 +116,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:6:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -125,9 +125,9 @@ Program: local_label_10
                                         ExprLocalLabel: g1@l1 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:6:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g1@l1: Label in section ""
+                                                g1@l1: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:3:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:7:5
@@ -138,7 +138,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:7:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -147,9 +147,9 @@ Program: local_label_10
                                         ExprLocalLabel: g1@l2 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:7:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g1@l2: Label in section ""
+                                                g1@l2: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:8:1
                         LabelStmt
                             Location: t/45-symbols/input/local_label_10.asm:8:1
@@ -158,7 +158,7 @@ Program: local_label_10
                             Section: ""
                             Address: 0
                             Symbol info:
-                                g1@l2: Label in section ""
+                                g1@l2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:8:1
                         LabelStmt
                             Location: t/45-symbols/input/local_label_10.asm:9:1
@@ -166,7 +166,7 @@ Program: local_label_10
                             Section: ""
                             Address: 0
                             Symbol info:
-                                g2: Label in section ""
+                                g2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:9:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:10:5
@@ -177,7 +177,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:10:8
                                     Value type: Unknown
-                                    Tokens: g2
+                                    Expr: g2
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -186,9 +186,9 @@ Program: local_label_10
                                         ExprSymbol: g2
                                             Location: t/45-symbols/input/local_label_10.asm:10:8
                                             Value type: Unknown
-                                            Tokens: g2
+                                            Expr: g2
                                             Symbol info:
-                                                g2: Label in section ""
+                                                g2: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:9:1
                         LabelStmt
                             Location: t/45-symbols/input/local_label_10.asm:11:1
@@ -197,7 +197,7 @@ Program: local_label_10
                             Section: ""
                             Address: 0
                             Symbol info:
-                                g2@l1: Label in section ""
+                                g2@l1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:11:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:12:5
@@ -208,7 +208,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:12:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -217,9 +217,9 @@ Program: local_label_10
                                         ExprLocalLabel: g2@l1 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:12:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g2@l1: Label in section ""
+                                                g2@l1: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:11:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:13:5
@@ -230,7 +230,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:13:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -239,9 +239,9 @@ Program: local_label_10
                                         ExprLocalLabel: g2@l2 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:13:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g2@l2: Label in section ""
+                                                g2@l2: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:16:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:14:5
@@ -252,7 +252,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:14:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -261,9 +261,9 @@ Program: local_label_10
                                         ExprLocalLabel: g2@l1 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:14:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g2@l1: Label in section ""
+                                                g2@l1: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:11:1
                         OpcodeStmt
                             Location: t/45-symbols/input/local_label_10.asm:15:5
@@ -274,7 +274,7 @@ Program: local_label_10
                                 Patch
                                     Location: t/45-symbols/input/local_label_10.asm:15:8
                                     Value type: Unknown
-                                    Tokens: LocalLabel
+                                    Expr: LocalLabel
                                     Offset: 1, Size: 2
                                     Type: Unsigned
                                     Validation: Any
@@ -283,9 +283,9 @@ Program: local_label_10
                                         ExprLocalLabel: g2@l2 at 2
                                             Location: t/45-symbols/input/local_label_10.asm:15:8
                                             Value type: Unknown
-                                            Tokens: LocalLabel
+                                            Expr: LocalLabel
                                             Symbol info:
-                                                g2@l2: Label in section ""
+                                                g2@l2: Label 0 in section ""
                                                     Location: t/45-symbols/input/local_label_10.asm:16:1
                         LabelStmt
                             Location: t/45-symbols/input/local_label_10.asm:16:1
@@ -294,7 +294,7 @@ Program: local_label_10
                             Section: ""
                             Address: 0
                             Symbol info:
-                                g2@l2: Label in section ""
+                                g2@l2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:16:1
     Statements:
         LabelStmt
@@ -303,7 +303,7 @@ Program: local_label_10
             Section: ""
             Address: 0
             Symbol info:
-                g1: Label in section ""
+                g1: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:1:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:2:5
@@ -314,7 +314,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:2:8
                     Value type: Unknown
-                    Tokens: g1
+                    Expr: g1
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -323,9 +323,9 @@ Program: local_label_10
                         ExprSymbol: g1
                             Location: t/45-symbols/input/local_label_10.asm:2:8
                             Value type: Unknown
-                            Tokens: g1
+                            Expr: g1
                             Symbol info:
-                                g1: Label in section ""
+                                g1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:1:1
         LabelStmt
             Location: t/45-symbols/input/local_label_10.asm:3:1
@@ -334,7 +334,7 @@ Program: local_label_10
             Section: ""
             Address: 0
             Symbol info:
-                g1@l1: Label in section ""
+                g1@l1: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:3:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:4:5
@@ -345,7 +345,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:4:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -354,9 +354,9 @@ Program: local_label_10
                         ExprLocalLabel: g1@l1 at 2
                             Location: t/45-symbols/input/local_label_10.asm:4:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g1@l1: Label in section ""
+                                g1@l1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:3:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:5:5
@@ -367,7 +367,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:5:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -376,9 +376,9 @@ Program: local_label_10
                         ExprLocalLabel: g1@l2 at 2
                             Location: t/45-symbols/input/local_label_10.asm:5:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g1@l2: Label in section ""
+                                g1@l2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:8:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:6:5
@@ -389,7 +389,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:6:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -398,9 +398,9 @@ Program: local_label_10
                         ExprLocalLabel: g1@l1 at 2
                             Location: t/45-symbols/input/local_label_10.asm:6:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g1@l1: Label in section ""
+                                g1@l1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:3:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:7:5
@@ -411,7 +411,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:7:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -420,9 +420,9 @@ Program: local_label_10
                         ExprLocalLabel: g1@l2 at 2
                             Location: t/45-symbols/input/local_label_10.asm:7:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g1@l2: Label in section ""
+                                g1@l2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:8:1
         LabelStmt
             Location: t/45-symbols/input/local_label_10.asm:8:1
@@ -431,7 +431,7 @@ Program: local_label_10
             Section: ""
             Address: 0
             Symbol info:
-                g1@l2: Label in section ""
+                g1@l2: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:8:1
         LabelStmt
             Location: t/45-symbols/input/local_label_10.asm:9:1
@@ -439,7 +439,7 @@ Program: local_label_10
             Section: ""
             Address: 0
             Symbol info:
-                g2: Label in section ""
+                g2: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:9:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:10:5
@@ -450,7 +450,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:10:8
                     Value type: Unknown
-                    Tokens: g2
+                    Expr: g2
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -459,9 +459,9 @@ Program: local_label_10
                         ExprSymbol: g2
                             Location: t/45-symbols/input/local_label_10.asm:10:8
                             Value type: Unknown
-                            Tokens: g2
+                            Expr: g2
                             Symbol info:
-                                g2: Label in section ""
+                                g2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:9:1
         LabelStmt
             Location: t/45-symbols/input/local_label_10.asm:11:1
@@ -470,7 +470,7 @@ Program: local_label_10
             Section: ""
             Address: 0
             Symbol info:
-                g2@l1: Label in section ""
+                g2@l1: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:11:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:12:5
@@ -481,7 +481,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:12:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -490,9 +490,9 @@ Program: local_label_10
                         ExprLocalLabel: g2@l1 at 2
                             Location: t/45-symbols/input/local_label_10.asm:12:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g2@l1: Label in section ""
+                                g2@l1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:11:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:13:5
@@ -503,7 +503,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:13:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -512,9 +512,9 @@ Program: local_label_10
                         ExprLocalLabel: g2@l2 at 2
                             Location: t/45-symbols/input/local_label_10.asm:13:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g2@l2: Label in section ""
+                                g2@l2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:16:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:14:5
@@ -525,7 +525,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:14:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -534,9 +534,9 @@ Program: local_label_10
                         ExprLocalLabel: g2@l1 at 2
                             Location: t/45-symbols/input/local_label_10.asm:14:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g2@l1: Label in section ""
+                                g2@l1: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:11:1
         OpcodeStmt
             Location: t/45-symbols/input/local_label_10.asm:15:5
@@ -547,7 +547,7 @@ Program: local_label_10
                 Patch
                     Location: t/45-symbols/input/local_label_10.asm:15:8
                     Value type: Unknown
-                    Tokens: LocalLabel
+                    Expr: LocalLabel
                     Offset: 1, Size: 2
                     Type: Unsigned
                     Validation: Any
@@ -556,9 +556,9 @@ Program: local_label_10
                         ExprLocalLabel: g2@l2 at 2
                             Location: t/45-symbols/input/local_label_10.asm:15:8
                             Value type: Unknown
-                            Tokens: LocalLabel
+                            Expr: LocalLabel
                             Symbol info:
-                                g2@l2: Label in section ""
+                                g2@l2: Label 0 in section ""
                                     Location: t/45-symbols/input/local_label_10.asm:16:1
         LabelStmt
             Location: t/45-symbols/input/local_label_10.asm:16:1
@@ -567,5 +567,5 @@ Program: local_label_10
             Section: ""
             Address: 0
             Symbol info:
-                g2@l2: Label in section ""
+                g2@l2: Label 0 in section ""
                     Location: t/45-symbols/input/local_label_10.asm:16:1
