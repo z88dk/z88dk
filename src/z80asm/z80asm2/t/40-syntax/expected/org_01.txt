@@ -40,3 +40,4 @@ Program: org_01
                                 ExprLiteralInt: 3
                                     Location: t/40-syntax/input/org_01.asm:3:9
                                     Value type: Unknown
+            Padding size: 0

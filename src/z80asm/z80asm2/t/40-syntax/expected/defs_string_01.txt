@@ -45,3 +45,4 @@ Program: defs_string_01
                                     Value type: Unknown
             String literal: "hello"
             Filler byte: 0
+            Padding size: 0
