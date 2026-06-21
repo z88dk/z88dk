@@ -6,6 +6,7 @@ cpu_id	r800
 ucase_symbols	0
 float_format	genmath
 preprocess_only	0
+generate_dependencies	0
 swap_ix_iy	0
 date_stamp	0
 filler_byte	0

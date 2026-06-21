@@ -25,6 +25,8 @@ void dump_after_cmdline_and_exit() {
             << to_string(g_args.options.float_format) << "\n"
             << "preprocess_only\t"
             << g_args.options.preprocess_only << "\n"
+            << "generate_dependencies\t"
+            << g_args.options.generate_dependencies << "\n"
             << "swap_ix_iy\t"
             << g_args.options.swap_ix_iy << "\n"
             << "date_stamp\t"

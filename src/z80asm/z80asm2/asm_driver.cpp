@@ -78,6 +78,13 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
         // not reached
     }
 
+    // generate -MD output, if requested
+    if (g_args.options.generate_dependencies) {
+        std::string o_filename = get_o_filename(filename, output_dir);
+        std::string d_filename = get_d_filename(filename, output_dir);
+        output_dependencies(d_filename, o_filename, filename, asm_lines);
+    }
+
     // generate -E output and terminate assembly, if requested
     if (g_args.options.preprocess_only) {
         std::string i_filename = get_i_filename(filename);

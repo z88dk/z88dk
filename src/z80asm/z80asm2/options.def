@@ -20,7 +20,8 @@ X(IXIY,     "-IXIY",   false, "", "Swap IX and IY registers")
 X(UCASE,    "-ucase",  false, "", "Uppercase symbols")
 X(FLOAT_FORMAT, "-float", true, "=FMT", "Set float format (e.g. genmath)")
 X(DEFINE,   "-D",      true, "=NAME[=EXPR]", "Define symbol")
-X(PREPROC,  "-E",      false, "", "Preprocess only")
+X(PREPROC, "-E", false, "", "Preprocess only")
+X(GENERATE_DEPENDENCIES, "-MD", false, "", "Generate dependencies file")
 
 // Assembly options
 X(CPU,      "-m",      true, "=CPU", "Set target CPU (e.g. z80, z180)")

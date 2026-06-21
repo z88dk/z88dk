@@ -444,3 +444,7 @@ private:
 
 void output_preproc_output(std::string_view filename,
                            const std::vector<LogicalLine>& lines);
+void output_dependencies(std::string_view output_filename,
+                         std::string_view o_filename,
+                         std::string_view asm_filename,
+                         const std::vector<LogicalLine>& lines);
