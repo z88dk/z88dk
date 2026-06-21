@@ -9,3 +9,4 @@
 #include "ir.h"
 
 bool compute_layout(Program& prog, bool& changed);
+bool check_jumps(Program& prog, bool& changed);
