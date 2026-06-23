@@ -9,7 +9,6 @@ Program: layout_phase_01
             Sections:
                 Section: "" (current)
                     Size: $0C
-                    Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/50-layout/input/layout_phase_01.asm:1:1

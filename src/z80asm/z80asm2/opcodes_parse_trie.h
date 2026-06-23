@@ -3,9 +3,9 @@
 #include "opcodes.h"
 #include "parser.h"
 
-extern TrieNode opcodes_parse_trie_nodes[];
-extern TrieTransition opcodes_parse_trie_transitions[];
+extern const TrieNode opcodes_parse_trie_nodes[];
+extern const TrieTransition opcodes_parse_trie_transitions[];
 
-extern TrieAction opcodes_parse_trie_actions[];
-extern uint8_t opcodes_parse_trie_bytecode[];
+extern const TrieAction opcodes_parse_trie_actions[];
+extern const uint8_t opcodes_parse_trie_bytecode[];
 

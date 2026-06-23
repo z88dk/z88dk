@@ -590,15 +590,15 @@ sub lookup_opcode_ops {
 
 sub output_h {
     my ($basename) = @_;
-    my $h = "extern TrieAction ${basename}_actions[];\n";
-    $h .= "extern uint8_t ${basename}_bytecode[];\n";
+    my $h = "extern const TrieAction ${basename}_actions[];\n";
+    $h .= "extern const uint8_t ${basename}_bytecode[];\n";
     return $h;
 }
 
 sub output_cpp {
     my ($basename) = @_;
     my $cpp =
-          "TrieAction ${basename}_actions["
+          "const TrieAction ${basename}_actions["
         . scalar( @{ $trie->values } )
         . "] = {\n";
     for my $value ( @{ $trie->values } ) {
@@ -610,7 +610,7 @@ sub output_cpp {
     $cpp .= "};\n\n";
 
     $cpp .=
-          "uint8_t ${basename}_bytecode["
+          "const uint8_t ${basename}_bytecode["
         . scalar( @{ $trie->bytecode } )
         . "] = {\n";
     for my $id ( 0 .. $#{ $trie->bytecode } ) {

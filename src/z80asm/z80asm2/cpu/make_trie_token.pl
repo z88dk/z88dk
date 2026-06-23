@@ -101,7 +101,7 @@ say $out_h "};\n";
 my $num_cpus = scalar(@cpus);
 say $out_h "extern TrieToken to_trie_token(CPU cpu);";
 say $out_cpp "TrieToken to_trie_token(CPU cpu) {";
-say $out_cpp "    static const TrieToken lut[$num_cpus] = {";
+say $out_cpp "    static constexpr TrieToken lut[$num_cpus] = {";
 for my $cpu_id ( 0 .. $num_cpus - 1 ) {
     my $trie = "TrieToken::None";
     if ( $cpus[$cpu_id] ne 'none' ) {
@@ -116,7 +116,7 @@ say $out_cpp "}\n";
 my $num_trie_tokens = scalar(@TrieToken);
 say $out_h "extern CPU to_cpu(TrieToken trie_token);";
 say $out_cpp "CPU to_cpu(TrieToken trie_token) {";
-say $out_cpp "    static const CPU lut[$num_trie_tokens] = {";
+say $out_cpp "    static constexpr CPU lut[$num_trie_tokens] = {";
 for my $trie_id ( 0 .. $num_trie_tokens - 1 ) {
     my $trie = $TrieToken[$trie_id];
     my $cpu  = "CPU::none";
@@ -133,7 +133,7 @@ say $out_cpp "}\n";
 my $num_token_types = scalar(@token_types);
 say $out_h "extern TrieToken to_trie_token(TokenType token_type);";
 say $out_cpp "TrieToken to_trie_token(TokenType token_type) {";
-say $out_cpp "    static const TrieToken lut[$num_token_types] = {";
+say $out_cpp "    static constexpr TrieToken lut[$num_token_types] = {";
 for my $token_type_id ( 0 .. $num_token_types - 1 ) {
     my $trie = "TrieToken::None";
     if ( $token_types[$token_type_id] ne 'None' ) {
@@ -148,7 +148,7 @@ say $out_cpp "}\n";
 
 say $out_h "extern TokenType to_token_type(TrieToken trie_token);";
 say $out_cpp "TokenType to_token_type(TrieToken trie_token) {";
-say $out_cpp "    static const TokenType lut[$num_trie_tokens] = {";
+say $out_cpp "    static constexpr TokenType lut[$num_trie_tokens] = {";
 for my $trie_id ( 0 .. $num_trie_tokens - 1 ) {
     my $trie       = $TrieToken[$trie_id];
     my $token_type = "TokenType::None";
@@ -165,7 +165,7 @@ say $out_cpp "}\n";
 my $num_keywords = scalar(@keywords);
 say $out_h "extern TrieToken to_trie_token(Keyword keyword);";
 say $out_cpp "TrieToken to_trie_token(Keyword keyword) {";
-say $out_cpp "    static const TrieToken lut[$num_keywords] = {";
+say $out_cpp "    static constexpr TrieToken lut[$num_keywords] = {";
 for my $keyword_id ( 0 .. $num_keywords - 1 ) {
     my $trie = "TrieToken::None";
     if ( $keywords[$keyword_id] ne 'None' ) {
@@ -180,7 +180,7 @@ say $out_cpp "}\n";
 
 say $out_h "extern Keyword to_keyword(TrieToken trie_token);";
 say $out_cpp "Keyword to_keyword(TrieToken trie_token) {";
-say $out_cpp "    static const Keyword lut[$num_trie_tokens] = {";
+say $out_cpp "    static constexpr Keyword lut[$num_trie_tokens] = {";
 for my $trie_id ( 0 .. $num_trie_tokens - 1 ) {
     my $trie    = $TrieToken[$trie_id];
     my $keyword = "Keyword::None";

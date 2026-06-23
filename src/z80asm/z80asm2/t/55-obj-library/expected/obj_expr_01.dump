@@ -1,0 +1,25 @@
+Library file t/55-obj-library//input/obj_expr_01.o at $0000: Z80LMF18
+Object  file t/55-obj-library//input/obj_expr_01.o at $0014: Z80RMF18
+  Name: obj_expr_01
+  CPU:  z80 
+  Section "": 0 bytes
+  Section code: 18 bytes
+    C $0000: 00 00 07 00 00 00 00 00 00 00 00 00 12 00 00 00
+    C $0010: 04 00
+  Section data: 4 bytes
+    C $0000: 00 00 07 00
+  Symbols:
+    L A $0004: end_data (section data) (file t/55-obj-library/input/obj_expr_01.asm:18)
+    L A $0000: start_data (section data) (file t/55-obj-library/input/obj_expr_01.asm:15)
+    L A $0012: end_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:12)
+    L A $0000: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:2)
+  Externs:
+  Expressions:
+    E W $0000 $0000 2: $ (section code) (file t/55-obj-library/input/obj_expr_01.asm:3)
+    E W $0004 $0004 2: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:5)
+    E W $0006 $0006 2: start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:6)
+    E W $0008 $0008 2: 2+start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:7)
+    E W $000A $000A 2: 2+start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:8)
+    E W $000E $000E 2: start_data-end_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:10)
+    E W $0000 $0000 2: $ (section data) (file t/55-obj-library/input/obj_expr_01.asm:16)
+

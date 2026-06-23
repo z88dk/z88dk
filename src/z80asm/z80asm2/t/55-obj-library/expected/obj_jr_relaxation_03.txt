@@ -1,0 +1,22 @@
+% z88dk-z80asm -v -dump-after-assembly t/55-obj-library//input/obj_jr_relaxation_03.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/55-obj-library/input/obj_jr_relaxation_03.asm...
+Writing object file: t/55-obj-library/input/obj_jr_relaxation_03.o
+ObjectLibrary
+    Modules (1):
+        ObjectModule: obj_jr_relaxation_03
+            CPU: z80
+            Expressions:
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_03.asm:2:1
+                    Text: "func1"
+                    Range: JrOffset
+                    ASMPC: 0
+                    Code pos: 1
+                    Opcode size: 2
+            Sections:
+                ObjSection: ""
+                    Align: 1
+                    Bytes (2): $18 0

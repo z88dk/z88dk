@@ -12,8 +12,7 @@ StringInterner g_strings;
 
 // Reserve ID 0 for the empty string
 StringInterner::StringInterner() {
-    pool.emplace_back("");                 // pool[0] = ""
-    map.emplace(std::string(""), 0);
+    clear();
 }
 
 // Returns an ID for the given string, interning it if needed.
@@ -30,11 +29,6 @@ StringInterner::Id StringInterner::intern(std::string_view s) {
     return id;
 }
 
-// Get C-string for an ID (stable pointer).
-const char* StringInterner::c_str(Id id) const {
-    return pool[id].c_str();
-}
-
 // Get string_view for an ID.
 std::string_view StringInterner::view(Id id) const {
     return std::string_view(pool[id]);
@@ -48,4 +42,11 @@ std::string StringInterner::to_string(Id id) const {
 // Optional: number of unique strings.
 size_t StringInterner::size() const noexcept {
     return pool.size();
+}
+
+// clear the strings
+void StringInterner::clear() {
+    pool.clear();
+    map.clear();
+    intern("");     // ID 0 is ""
 }

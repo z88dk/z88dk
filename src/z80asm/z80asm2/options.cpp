@@ -29,13 +29,13 @@
 
 Args g_args;
 
-static const int option_col_width = 16 - 2;
+static constexpr int option_col_width = 16 - 2;
 
-static const std::string_view copyright =
+static constexpr std::string_view copyright =
     "Usage: z88dk-z80asm [options] files...\n"
     "Copyright (C) Paulo Custodio, 2011-2026\n";
 
-static const OptionSpec g_option_specs[] = {
+static constexpr OptionSpec g_option_specs[] = {
 #define X(name, str, takes_arg, arg_text, usage) \
         { str, OptionType::name, takes_arg, arg_text, usage },
 #include "options.def"
@@ -47,7 +47,7 @@ struct UsageGroup {
     std::initializer_list<OptionType> options;
 };
 
-static const UsageGroup usage_layout[] = {
+static constexpr UsageGroup usage_layout[] = {
     {
         "Help Options",
         { OptionType::HELP, OptionType::VERBOSE }
@@ -92,6 +92,7 @@ static const UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_PARSE,
             OptionType::DUMP_AFTER_SYMBOL_COLLECTION,
             OptionType::DUMP_AFTER_LAYOUT,
+            OptionType::DUMP_AFTER_ASSEMBLY,
         }
     }
 };
@@ -491,6 +492,10 @@ void Args::parse_arg(std::string_view arg,
 
         case OptionType::DUMP_AFTER_LAYOUT:
             options.dump_after_layout = true;
+            return;
+
+        case OptionType::DUMP_AFTER_ASSEMBLY:
+            options.dump_after_assembly = true;
             return;
 
         default:
@@ -982,6 +987,6 @@ void Args::define_constants_from_options() {
         options.global_defs.erase(var_id);
     }
     auto float_format_define_id = float_format_define(options.float_format);
-    options.global_defs.set(float_format_define_id, 1,
-                            SourceLoc("<builtin>", 1, 1));
+    options.global_defs.set(float_format_define_id, 1, SourceLoc("<builtin>", 1,
+                            1));
 }

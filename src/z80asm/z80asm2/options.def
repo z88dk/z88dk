@@ -39,5 +39,6 @@ X(DUMP_AFTER_SYNTH_EXPANSION, "-dump-after-synth-expansion", false, "", "Dump th
 X(DUMP_AFTER_PARSE, "-dump-after-parse", false, "", "Dump the AST after parsing and exit")
 X(DUMP_AFTER_SYMBOL_COLLECTION, "-dump-after-symbol-collection", false, "", "Dump the AST after symbol collection and exit")
 X(DUMP_AFTER_LAYOUT, "-dump-after-layout", false, "", "Dump the AST after layout processing and exit")
+X(DUMP_AFTER_ASSEMBLY, "-dump-after-assembly", false, "", "Dump the object library after assembly and exit")
 
 #undef X

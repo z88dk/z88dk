@@ -1,0 +1,33 @@
+% z88dk-z80asm -v -dump-after-assembly t/55-obj-library//input/obj_opcodes_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/55-obj-library/input/obj_opcodes_01.asm...
+Writing object file: t/55-obj-library/input/obj_opcodes_01.o
+ObjectLibrary
+    Modules (1):
+        ObjectModule: obj_opcodes_01
+            CPU: z80
+            Expressions:
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_opcodes_01.asm:5:5
+                    Text: "end"
+                    Range: Word
+                    ASMPC: 5
+                    Code pos: 6
+                    Opcode size: 3
+            Defined symbols:
+                ObjSymbol: end
+                    Location: t/55-obj-library/input/obj_opcodes_01.asm:6:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: 8
+                ObjSymbol: start
+                    Location: t/55-obj-library/input/obj_opcodes_01.asm:1:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: 0
+            Sections:
+                ObjSection: ""
+                    Align: 1
+                    Bytes (8): 0 $3E 7 $18 $FB $C3 0 0

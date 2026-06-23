@@ -1,0 +1,11 @@
+Library file t/55-obj-library//input/obj_jr_relaxation_03.o at $0000: Z80LMF18
+Object  file t/55-obj-library//input/obj_jr_relaxation_03.o at $0014: Z80RMF18
+  Name: obj_jr_relaxation_03
+  CPU:  z80 
+  Section "": 2 bytes
+    C $0000: 18 00
+  Symbols:
+  Externs:
+  Expressions:
+    E J $0000 $0001 2: func1 (section "") (file t/55-obj-library/input/obj_jr_relaxation_03.asm:2)
+

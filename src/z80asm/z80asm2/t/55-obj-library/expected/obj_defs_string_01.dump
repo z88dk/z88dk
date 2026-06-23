@@ -1,0 +1,12 @@
+Library file t/55-obj-library//input/obj_defs_string_01.o at $0000: Z80LMF18
+Object  file t/55-obj-library//input/obj_defs_string_01.o at $0014: Z80RMF18
+  Name: obj_defs_string_01
+  CPU:  z80 
+  Section "": 0 bytes
+  Section code: 27 bytes
+    C $0000: 68 65 6C 6C 6F 00 00 00 00 00 00 00 00 00 00 00
+    C $0010: 01 02 03 77 6F 72 6C 64 04 05 06
+  Symbols:
+  Externs:
+  Expressions:
+

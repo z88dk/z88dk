@@ -155,15 +155,15 @@ sub build_actions {
 
 sub output_h {
     my ($basename) = @_;
-    my $h = "extern TrieAction ${basename}_actions[];\n";
-    $h .= "extern SynthBytecode ${basename}_bytecode[];\n";
+    my $h = "extern const TrieAction ${basename}_actions[];\n";
+    $h .= "extern const SynthBytecode ${basename}_bytecode[];\n";
     return $h;
 }
 
 sub output_cpp {
     my ($basename) = @_;
     my $cpp =
-          "TrieAction ${basename}_actions["
+          "const TrieAction ${basename}_actions["
         . scalar( @{ $trie->values } )
         . "] = {\n";
     for my $value ( @{ $trie->values } ) {
@@ -174,7 +174,7 @@ sub output_cpp {
     $cpp .= "};\n\n";
 
     $cpp .=
-          "SynthBytecode ${basename}_bytecode["
+          "const SynthBytecode ${basename}_bytecode["
         . scalar( @{ $trie->bytecode } )
         . "] = {\n";
     for my $id ( 0 .. $#{ $trie->bytecode } ) {
