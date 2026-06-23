@@ -14,7 +14,6 @@ Program: layout_align_03
                     Size: 0
                 Section: code (current)
                     Size: $0B
-                    Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/50-layout/input/layout_align_03.asm:2:1

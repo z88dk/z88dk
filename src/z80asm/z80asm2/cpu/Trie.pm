@@ -186,8 +186,8 @@ sub make_table {
 
 sub output_h {
     my ( $self, $basename ) = @_;
-    my $h = "extern TrieNode ${basename}_nodes[];\n";
-    $h .= "extern TrieTransition ${basename}_transitions[];\n";
+    my $h = "extern const TrieNode ${basename}_nodes[];\n";
+    $h .= "extern const TrieTransition ${basename}_transitions[];\n";
     return $h;
 }
 
@@ -196,7 +196,7 @@ sub output_cpp {
 
     # TrieNode table
     my $num_nodes = @{ $self->nodes };
-    my $cpp       = "TrieNode ${basename}_nodes[$num_nodes] = {\n";
+    my $cpp       = "const TrieNode ${basename}_nodes[$num_nodes] = {\n";
     for my $node ( @{ $self->nodes } ) {
         my $first_transition_id = $node->{_first_transition_id};
         my $num_transitions     = $node->{_num_transitions};
@@ -218,7 +218,8 @@ sub output_cpp {
 
     # TrieTransition table
     my $num_transitions = @{ $self->transitions };
-    $cpp .= "TrieTransition ${basename}_transitions[$num_transitions] = {\n";
+    $cpp .=
+        "const TrieTransition ${basename}_transitions[$num_transitions] = {\n";
     for my $trans ( @{ $self->transitions } ) {
         my $node_from = $self->nodes->[ $trans->{from} ];
         my $node_to   = $self->nodes->[ $trans->{to} ];

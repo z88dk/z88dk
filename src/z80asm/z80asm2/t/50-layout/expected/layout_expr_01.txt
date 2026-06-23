@@ -20,7 +20,6 @@ Program: layout_expr_01
                     Size: 0
                 Section: code
                     Size: $12
-                    Has opcodes
                     Statements:
                         LabelStmt
                             Location: t/50-layout/input/layout_expr_01.asm:2:1
@@ -368,7 +367,6 @@ Program: layout_expr_01
                                     Location: t/50-layout/input/layout_expr_01.asm:12:1
                 Section: data (current)
                     Size: 4
-                    Has opcodes
                     Statements:
                         LabelStmt
                             Location: t/50-layout/input/layout_expr_01.asm:15:1

@@ -19,7 +19,7 @@
 #include <string_view>
 #include <vector>
 
-static const int LINE_WRAP_COLUMN = 80;
+static constexpr int LINE_WRAP_COLUMN = 80;
 
 Preproc::Preproc()
     : preproc_cpu_id(g_args.options.cpu_id)

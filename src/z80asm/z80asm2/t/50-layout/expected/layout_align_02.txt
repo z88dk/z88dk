@@ -11,8 +11,7 @@ Program: layout_align_02
                     Size: 0
                 Section: code (current)
                     Size: 7
-                    Has opcodes
-                    Section ALIGN:
+                    Section ALIGN: 4
                         AlignStmt
                             Location: t/50-layout/input/layout_align_02.asm:2:1
                             Address: 0

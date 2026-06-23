@@ -18,7 +18,7 @@
 #include <string_view>
 
 std::string to_string(TokenType token_type) {
-    static const std::string_view lut[] = {
+    static constexpr std::string_view lut[] = {
 #define X(id, text) text,
 #include "lexer_tokens.def"
     };

@@ -58,10 +58,26 @@ bool compute_layout(Program& prog, bool& changed) {
             phase_loc = SourceLoc();
 
             // section level ORG
-            uint base_address = 0;
+            sec->base_address = 0;
             if (sec->org_stmt) {
+                int value = 0;  // int to be able to read ORG -1
                 if (!get_const_expr_value(sec->org_stmt->expr.get(),
-                                          base_address, "ORG")) {
+                                          value, "ORG")) {
+                    failed = true;
+                }
+                else if (value == -1) {
+                    sec->section_split = true;
+                    sec->base_address = 0;
+                    sec->org_defined = false;
+                }
+                else if (value >= 0) {
+                    sec->section_split = false;
+                    sec->base_address = value;
+                    sec->org_defined = true;
+                }
+                else {
+                    g_diag.error(sec->org_stmt->expr->loc,
+                                 "Interger range: " + int_to_hex(value));
                     failed = true;
                 }
             }
@@ -73,8 +89,11 @@ bool compute_layout(Program& prog, bool& changed) {
                                           align_value, "ALIGN")) {
                     failed = true;
                 }
-                if (!validate_align(align_value, sec->align_stmt->align_expr->loc)) {
+                else if (!validate_align(align_value, sec->align_stmt->align_expr->loc)) {
                     failed = true;
+                }
+                else {
+                    sec->align = align_value;
                 }
             }
 
@@ -102,21 +121,19 @@ bool compute_layout(Program& prog, bool& changed) {
                                               new_address, "ORG")) {
                         failed = true;
                     }
-                    uint new_offset = new_address - base_address;
+                    uint new_offset = new_address - sec->base_address;
 
-                    if (new_address < base_address ||
+                    if (new_address < sec->base_address ||
                             new_offset < org_stmt->address) {
                         g_diag.error(org_stmt->expr->loc,
                                      "ORG address cannot be less "
                                      "than previously allocated");
                         failed = true;
-
-                        // cannot continue, org_stmt->padding_size would be very large
-                        break;
                     }
-
-                    org_stmt->padding_size = new_offset - org_stmt->address;
-                    layout(org_stmt->address, org_stmt->padding_size);
+                    else {
+                        org_stmt->padding_size = new_offset - org_stmt->address;
+                        layout(org_stmt->address, org_stmt->padding_size);
+                    }
 
                     continue;
                 }

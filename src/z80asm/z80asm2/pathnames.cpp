@@ -6,7 +6,10 @@
 
 #include "pathnames.h"
 #include "string_utils.h"
+#include <cstdint>
 #include <filesystem>
+#include <fstream>
+#include <vector>
 
 // On Linux, lexically_normal() does not regard backslashes as path separators
 static std::string nomalize_slashes(std::string_view path) {
@@ -399,3 +402,27 @@ std::vector<std::string> expand_wildcards(std::string_view pattern) {
     return results;
 }
 
+bool write_binary_file(const std::filesystem::path& target,
+                       const std::vector<uint8_t>& data) {
+    auto temp = target;
+    temp += ".tmp";
+
+    try {
+        {
+            std::ofstream out(temp, std::ios::binary);
+            out.exceptions(std::ios::failbit | std::ios::badbit);
+
+            out.write(
+                reinterpret_cast<const char*>(data.data()),
+                static_cast<std::streamsize>(data.size()));
+        } // close happens here
+
+        std::filesystem::rename(temp, target);
+        return true;
+    }
+    catch (...) {
+        std::error_code ec;
+        std::filesystem::remove(temp, ec);
+        return false;
+    }
+}

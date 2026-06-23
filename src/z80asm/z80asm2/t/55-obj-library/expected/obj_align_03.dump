@@ -1,0 +1,11 @@
+Library file t/55-obj-library//input/obj_align_03.o at $0000: Z80LMF18
+Object  file t/55-obj-library//input/obj_align_03.o at $0014: Z80RMF18
+  Name: obj_align_03
+  CPU:  z80 
+  Section "": 0 bytes
+  Section code: 11 bytes
+    C $0000: 01 02 03 00 04 05 06 00 07 08 09
+  Symbols:
+  Externs:
+  Expressions:
+

@@ -31,6 +31,7 @@ dump_after_preprocessing	0
 dump_after_parse	0
 dump_after_symbol_collection	0
 dump_after_layout	0
+dump_after_assembly	0
 m4_options	
 perl_options	
 cpp_options	

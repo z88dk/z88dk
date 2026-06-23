@@ -1,0 +1,469 @@
+% z88dk-z80asm -v -dump-after-assembly t/55-obj-library//input/obj_jr_relaxation_07.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/55-obj-library/input/obj_jr_relaxation_07.asm...
+Writing object file: t/55-obj-library/input/obj_jr_relaxation_07.o
+ObjectLibrary
+    Modules (1):
+        ObjectModule: obj_jr_relaxation_07
+            CPU: z80
+            Expressions:
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $80
+                    Code pos: $81
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $83
+                    Code pos: $84
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $86
+                    Code pos: $87
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $89
+                    Code pos: $8A
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $8C
+                    Code pos: $8D
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $8F
+                    Code pos: $90
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $92
+                    Code pos: $93
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $95
+                    Code pos: $96
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $98
+                    Code pos: $99
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $9B
+                    Code pos: $9C
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $9E
+                    Code pos: $9F
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $A1
+                    Code pos: $A2
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $A4
+                    Code pos: $A5
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $A7
+                    Code pos: $A8
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $AA
+                    Code pos: $AB
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $AD
+                    Code pos: $AE
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $B0
+                    Code pos: $B1
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $B3
+                    Code pos: $B4
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $B6
+                    Code pos: $B7
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $B9
+                    Code pos: $BA
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $BC
+                    Code pos: $BD
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $BF
+                    Code pos: $C0
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $C2
+                    Code pos: $C3
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $C5
+                    Code pos: $C6
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $C8
+                    Code pos: $C9
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $CB
+                    Code pos: $CC
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $CE
+                    Code pos: $CF
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $D1
+                    Code pos: $D2
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $D4
+                    Code pos: $D5
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $D7
+                    Code pos: $D8
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $DA
+                    Code pos: $DB
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $DD
+                    Code pos: $DE
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $E0
+                    Code pos: $E1
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $E3
+                    Code pos: $E4
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $E6
+                    Code pos: $E7
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $E9
+                    Code pos: $EA
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $EC
+                    Code pos: $ED
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $EF
+                    Code pos: $F0
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $F2
+                    Code pos: $F3
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $F5
+                    Code pos: $F6
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $F8
+                    Code pos: $F9
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $FB
+                    Code pos: $FC
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $FE
+                    Code pos: $FF
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $101
+                    Code pos: $102
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $104
+                    Code pos: $105
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $107
+                    Code pos: $108
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $10A
+                    Code pos: $10B
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $10D
+                    Code pos: $10E
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $110
+                    Code pos: $111
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $113
+                    Code pos: $114
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $116
+                    Code pos: $117
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $119
+                    Code pos: $11A
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $11C
+                    Code pos: $11D
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $11F
+                    Code pos: $120
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $122
+                    Code pos: $123
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $125
+                    Code pos: $126
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $128
+                    Code pos: $129
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $12B
+                    Code pos: $12C
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $12E
+                    Code pos: $12F
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $131
+                    Code pos: $132
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $134
+                    Code pos: $135
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $137
+                    Code pos: $138
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $13A
+                    Code pos: $13B
+                    Opcode size: 3
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:3:3
+                    Text: "start"
+                    Range: Word
+                    ASMPC: $13D
+                    Code pos: $13E
+                    Opcode size: 3
+            Defined symbols:
+                ObjSymbol: start
+                    Location: t/55-obj-library/input/obj_jr_relaxation_07.asm:1:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: 0
+            Sections:
+                ObjSection: ""
+                    Align: 1
+                    Bytes (320): $18 $FE $18 $FC $18 $FA $18 $F8 $18 $F6 $18 $F4 $18 $F2 $18 $F0 $18 $EE $18 $EC $18 $EA $18 $E8 $18 $E6 $18 $E4 $18 $E2 $18 $E0 $18 $DE $18 $DC $18 $DA $18 $D8 $18 $D6 $18 $D4 $18 $D2 $18 $D0 $18 $CE $18 $CC $18 $CA $18 $C8 $18 $C6 $18 $C4 $18 $C2 $18 $C0 $18 $BE $18 $BC $18 $BA $18 $B8 $18 $B6 $18 $B4 $18 $B2 $18 $B0 $18 $AE $18 $AC $18 $AA $18 $A8 $18 $A6 $18 $A4 $18 $A2 $18 $A0 $18 $9E $18 $9C $18 $9A $18 $98 $18 $96 $18 $94 $18 $92 $18 $90 $18 $8E $18 $8C $18 $8A $18 $88 $18 $86 $18 $84 $18 $82 $18 $80 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0 $C3 0 0
