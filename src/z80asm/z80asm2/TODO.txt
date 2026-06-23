@@ -1,5 +1,6 @@
 ## Pending issues
 - Add BASIC { ... } to assemble BASIC tokens for zx81, zx
+- z80nm must show list of public symbols defined in library
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)
@@ -145,3 +146,53 @@ t/90-fuzz/randomized.t
 t/90-fuzz/pathological.t
 t/90-fuzz/input/
 t/90-fuzz/expected/
+
+Linker script
+
+BANK <name>
+    BASE <addr>
+    SIZE <size>
+
+    HOLE    <name> AT <addr> SIZE <size>    ; hardware hole
+    RESERVE <name> AT <addr> SIZE <size>    ; reserve memory
+
+GROUP CODE = code_*
+GROUP DATA = data_*
+GROUP BSS  = bss_*
+
+PLACE CODE IN BANK0
+PLACE DATA AFTER CODE
+PLACE BSS  IN BANK1
+
+bank switching
+
+
+BANK COMMON 0x0000 SIZE 16K
+
+BANK GAME0  0x4000 SIZE 16K
+BANK GAME1  0x4000 SIZE 16K
+BANK GAME2  0x4000 SIZE 16K
+
+BANKSWITCH PORT 0x7F
+
+TRAMPOLINES IN COMMON
+
+PLACE CORE     IN COMMON
+PLACE GRAPHICS IN GAME0
+PLACE AUDIO    IN GAME1
+PLACE AI       IN GAME2
+
+AUTO FARCALLS
+
+
+BANK COMMON 0x0000 SIZE 16K
+
+BANK GAME0 NUMBER 0
+BANK GAME1 NUMBER 1
+BANK GAME2 NUMBER 2
+
+FARCALLS USING __bank_call
+
+Then the linker generates calls to __bank_call, passing the destination bank and address according to a documented ABI.
+That keeps the linker portable across virtually every Z80 banking scheme while still providing all the value of automatic trampoline generation. In my view, that's the cleanest separation of responsibilities.
+

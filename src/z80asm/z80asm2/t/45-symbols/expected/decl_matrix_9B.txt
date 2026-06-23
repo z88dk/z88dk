@@ -14,7 +14,6 @@ Program: decl_matrix_9B
             Sections:
                 Section: "" (current)
                     Size: 0
-                    Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_9B.asm:3:5

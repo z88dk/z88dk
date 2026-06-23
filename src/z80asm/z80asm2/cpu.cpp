@@ -82,7 +82,7 @@ std::unordered_map<CPU, std::vector<StringInterner::Id>>& cpu_defines_table() {
             CPU id;
             const char* defines;
         };
-        static const Entry entries[] = {
+        static constexpr Entry entries[] = {
 #define X(code, id, name, defines)   { CPU::id, defines },
 #include "cpu.def"
         };

@@ -5,7 +5,7 @@
 #include "lexer_tokens.h"
 
 TrieToken to_trie_token(CPU cpu) {
-    static const TrieToken lut[37] = {
+    static constexpr TrieToken lut[37] = {
         TrieToken::None, // CPU::none = 0
         TrieToken::cpu_z80, // CPU::z80 = 1
         TrieToken::cpu_z80_strict, // CPU::z80_strict = 2
@@ -48,7 +48,7 @@ TrieToken to_trie_token(CPU cpu) {
 }
 
 CPU to_cpu(TrieToken trie_token) {
-    static const CPU lut[810] = {
+    static constexpr CPU lut[810] = {
         CPU::none, // TrieToken::None = 0
         CPU::none, // TrieToken::Expr = 1
         CPU::none, // TrieToken::DispExpr = 2
@@ -864,7 +864,7 @@ CPU to_cpu(TrieToken trie_token) {
 }
 
 TrieToken to_trie_token(TokenType token_type) {
-    static const TrieToken lut[46] = {
+    static constexpr TrieToken lut[46] = {
         TrieToken::None, // TokenType::None = 0
         TrieToken::TK_Identifier, // TokenType::Identifier = 1
         TrieToken::TK_LocalLabel, // TokenType::LocalLabel = 2
@@ -916,7 +916,7 @@ TrieToken to_trie_token(TokenType token_type) {
 }
 
 TokenType to_token_type(TrieToken trie_token) {
-    static const TokenType lut[810] = {
+    static constexpr TokenType lut[810] = {
         TokenType::None, // TrieToken::None = 0
         TokenType::None, // TrieToken::Expr = 1
         TokenType::None, // TrieToken::DispExpr = 2
@@ -1732,7 +1732,7 @@ TokenType to_token_type(TrieToken trie_token) {
 }
 
 TrieToken to_trie_token(Keyword keyword) {
-    static const TrieToken lut[726] = {
+    static constexpr TrieToken lut[726] = {
         TrieToken::None, // Keyword::None = 0
         TrieToken::KW_A, // Keyword::A = 1
         TrieToken::KW_ABC, // Keyword::ABC = 2
@@ -2464,7 +2464,7 @@ TrieToken to_trie_token(Keyword keyword) {
 }
 
 Keyword to_keyword(TrieToken trie_token) {
-    static const Keyword lut[810] = {
+    static constexpr Keyword lut[810] = {
         Keyword::None, // TrieToken::None = 0
         Keyword::None, // TrieToken::Expr = 1
         Keyword::None, // TrieToken::DispExpr = 2

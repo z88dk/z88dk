@@ -1,0 +1,13 @@
+Library file t/55-obj-library//input/obj_opcodes_01.o at $0000: Z80LMF18
+Object  file t/55-obj-library//input/obj_opcodes_01.o at $0014: Z80RMF18
+  Name: obj_opcodes_01
+  CPU:  z80 
+  Section "": 8 bytes
+    C $0000: 00 3E 07 18 FB C3 00 00
+  Symbols:
+    L A $0008: end (section "") (file t/55-obj-library/input/obj_opcodes_01.asm:6)
+    L A $0000: start (section "") (file t/55-obj-library/input/obj_opcodes_01.asm:1)
+  Externs:
+  Expressions:
+    E W $0005 $0006 3: end (section "") (file t/55-obj-library/input/obj_opcodes_01.asm:5)
+

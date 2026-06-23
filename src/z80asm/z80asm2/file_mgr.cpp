@@ -224,7 +224,7 @@ std::string FileManager::read_line(const SourceFile& sf, size_t line,
                                    const SourceLoc& loc) {
     // If line is within bounds, read normally
     if (line < sf.line_offsets.size()) {
-        const char* filename = g_strings.c_str(sf.file_id);
+        std::string_view filename = g_strings.view(sf.file_id);
         std::ifstream* in = g_file_handle_cache.get(filename, loc);
 
         if (!in) {

@@ -1,0 +1,101 @@
+% z88dk-z80asm -v -dump-after-assembly t/55-obj-library//input/obj_expr_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/55-obj-library/input/obj_expr_01.asm...
+Writing object file: t/55-obj-library/input/obj_expr_01.o
+ObjectLibrary
+    Modules (1):
+        ObjectModule: obj_expr_01
+            CPU: z80
+            Expressions:
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:3:5
+                    Text: "$"
+                    Range: Word
+                    ASMPC: 0
+                    Code pos: 0
+                    Opcode size: 2
+                    Section: code
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:5:5
+                    Text: "start_code"
+                    Range: Word
+                    ASMPC: 4
+                    Code pos: 4
+                    Opcode size: 2
+                    Section: code
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:6:5
+                    Text: "start_code+2"
+                    Range: Word
+                    ASMPC: 6
+                    Code pos: 6
+                    Opcode size: 2
+                    Section: code
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:7:5
+                    Text: "2+start_code"
+                    Range: Word
+                    ASMPC: 8
+                    Code pos: 8
+                    Opcode size: 2
+                    Section: code
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:8:5
+                    Text: "2+start_code+2"
+                    Range: Word
+                    ASMPC: $0A
+                    Code pos: $0A
+                    Opcode size: 2
+                    Section: code
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:10:5
+                    Text: "start_data-end_code"
+                    Range: Word
+                    ASMPC: $0E
+                    Code pos: $0E
+                    Opcode size: 2
+                    Section: code
+                ObjExpr
+                    Location: t/55-obj-library/input/obj_expr_01.asm:16:5
+                    Text: "$"
+                    Range: Word
+                    ASMPC: 0
+                    Code pos: 0
+                    Opcode size: 2
+                    Section: data
+            Defined symbols:
+                ObjSymbol: end_data
+                    Location: t/55-obj-library/input/obj_expr_01.asm:18:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: 4
+                    Section: data
+                ObjSymbol: start_data
+                    Location: t/55-obj-library/input/obj_expr_01.asm:15:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: 0
+                    Section: data
+                ObjSymbol: end_code
+                    Location: t/55-obj-library/input/obj_expr_01.asm:12:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: $12
+                    Section: code
+                ObjSymbol: start_code
+                    Location: t/55-obj-library/input/obj_expr_01.asm:2:1
+                    Scope: Local
+                    Type: AddressRelative
+                    Value: 0
+                    Section: code
+            Sections:
+                ObjSection: ""
+                    Align: 1
+                ObjSection: code
+                    Align: 1
+                    Bytes (18): 0 0 7 0 0 0 0 0 0 0 0 0 $12 0 0 0 4 0
+                ObjSection: data
+                    Align: 1
+                    Bytes (4): 0 0 7 0

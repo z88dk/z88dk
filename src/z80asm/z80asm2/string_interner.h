@@ -22,9 +22,6 @@ public:
     // Returns an ID for the given string, interning it if needed.
     Id intern(std::string_view s);
 
-    // Get C-string for an ID (stable pointer).
-    const char* c_str(Id id) const;
-
     // Get string_view for an ID.
     std::string_view view(Id id) const;
 
@@ -33,6 +30,9 @@ public:
 
     // Optional: number of unique strings.
     size_t size() const noexcept;
+
+    // clear the strings
+    void clear();
 
 private:
     std::vector<std::string> pool;

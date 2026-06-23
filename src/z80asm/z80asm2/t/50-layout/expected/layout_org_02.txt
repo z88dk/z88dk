@@ -11,8 +11,7 @@ Program: layout_org_02
                     Size: 0
                 Section: code (current)
                     Size: $13
-                    Has opcodes
-                    Section ORG:
+                    Section ORG: $1000
                         OrgStmt
                             Location: t/50-layout/input/layout_org_02.asm:2:1
                             Address: 0

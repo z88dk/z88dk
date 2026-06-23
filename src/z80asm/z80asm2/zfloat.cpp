@@ -23,7 +23,7 @@
 // FloatFormat
 //-----------------------------------------------------------------------------
 
-static const std::string_view float_formats_lu_table[] = {
+static constexpr std::string_view float_formats_lu_table[] = {
 #define X(type)		# type,
 #include "zfloat.def"
 };
@@ -471,7 +471,7 @@ union mydouble {
     uint8_t  bytes[8];
     uint64_t raw;	// 1 bit sign, 11 bits exponent, 52 bits mantissa, bias 1023
 };
-static const int mydouble_exp_bias = 1023;
+static constexpr int mydouble_exp_bias = 1023;
 static_assert(sizeof(double) == 8, "expected 8 bytes");
 static_assert(sizeof(mydouble) == 8, "expected 8 bytes");
 
