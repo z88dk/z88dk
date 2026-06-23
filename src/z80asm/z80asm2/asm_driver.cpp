@@ -47,6 +47,8 @@ void assemble_files(std::vector<std::string>& filenames,
 }
 
 void assemble_file(std::string_view filename, std::string_view output_dir) {
+    std::string o_filename = get_o_filename(filename, output_dir);
+
     if (g_args.options.verbose) {
         std::cout << "Assembling " << filename << "..." << std::endl;
     }
@@ -62,6 +64,12 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
     preproc.set_const_symbols(g_args.options.global_defs);
     std::vector<LogicalLine> preprocessed_tokens = preproc.preprocess(filename);
 
+    // generate -MD output, if requested
+    if (g_args.options.generate_dependencies) {
+        std::string d_filename = get_d_filename(filename, output_dir);
+        preproc.output_dependencies(d_filename, o_filename);
+    }
+
     // process High-Level-Assembly instructions
     std::vector<LogicalLine> hla_lines = hla_process(preprocessed_tokens);
     if (g_args.options.dump_after_hla_expansion) {
@@ -76,13 +84,6 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
     if (g_args.options.dump_after_synth_expansion) {
         dump_logical_lines_and_exit(asm_lines);
         // not reached
-    }
-
-    // generate -MD output, if requested
-    if (g_args.options.generate_dependencies) {
-        std::string o_filename = get_o_filename(filename, output_dir);
-        std::string d_filename = get_d_filename(filename, output_dir);
-        output_dependencies(d_filename, o_filename, filename, asm_lines);
     }
 
     // generate -E output and terminate assembly, if requested
@@ -162,8 +163,7 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
 
     // TODO: object file writer
     ObjectFile obj = build_object_file_from_program(*prog);
-    std::string obj_filename = get_o_filename(filename, output_dir);
-    if (!write_object_file(obj, obj_filename)) {
+    if (!write_object_file(obj, o_filename)) {
         g_diag.error(SourceLoc(), "Failed to write object file");
         return; // error already reported
     }

@@ -417,10 +417,8 @@ void output_preproc_output(std::string_view filename,
     }
 }
 
-void output_dependencies(std::string_view output_filename,
-                         std::string_view o_filename,
-                         std::string_view asm_filename,
-                         const std::vector<LogicalLine>& lines) {
+void Preproc::output_dependencies(std::string_view output_filename,
+                                  std::string_view o_filename) {
     std::string filename_s(output_filename);
     std::ofstream ofs(filename_s, std::ios::binary);
     if (!ofs.is_open()) {
@@ -432,7 +430,7 @@ void output_dependencies(std::string_view output_filename,
         std::cout << "Writing " << filename_s << "..." << std::endl;
     }
 
-    // write o_filename : asm_filename
+    // write o_filename :
     ofs << o_filename << " :";
     int col = static_cast<int>(o_filename.size() + 2);
 
@@ -442,7 +440,7 @@ void output_dependencies(std::string_view output_filename,
     // lambda to add a filename to the output, handling line wrapping
     auto add_file = [&](std::string_view filename) {
         int needed = static_cast<int>(filename.size()) + 1;  // space + filename
-        if (col + needed > LINE_WRAP_COLUMN) {
+        if (col != 8 && col + needed > LINE_WRAP_COLUMN) {
             ofs << " \\\n        ";  // backslash, newline, 8 spaces
             col = 8;
         }
@@ -450,16 +448,11 @@ void output_dependencies(std::string_view output_filename,
         col += needed;
     };
 
-    // add the main asm file
-    seen_files.insert(g_strings.intern(asm_filename));
-    add_file(asm_filename);
-
     // add all referenced files
-    for (const auto& line : lines) {
-        if (line.loc.file_id != 0
-                && seen_files.find(line.loc.file_id) == seen_files.end()) {
-            seen_files.insert(line.loc.file_id);
-            add_file(g_strings.view(line.loc.file_id));
+    for (const auto& file_id : dependency_files) {
+        if (file_id != 0 && seen_files.find(file_id) == seen_files.end()) {
+            seen_files.insert(file_id);
+            add_file(g_strings.view(file_id));
         }
     }
 
