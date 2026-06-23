@@ -967,14 +967,14 @@ void Args::define_constants_from_options() {
     }
 
     for (auto var_id : cpu_defines(options.cpu_id)) {
-        options.global_defs.set(var_id, 1, SourceLoc());
+        options.global_defs.set(var_id, 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
     StringInterner::Id swap_id = g_strings.intern("__SWAP_IX_IY__");
     options.global_defs.erase(swap_id);
     if (options.swap_ix_iy) {
-        options.global_defs.set(swap_id, 1, SourceLoc());
+        options.global_defs.set(swap_id, 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // define constants for float format
@@ -982,5 +982,6 @@ void Args::define_constants_from_options() {
         options.global_defs.erase(var_id);
     }
     auto float_format_define_id = float_format_define(options.float_format);
-    options.global_defs.set(float_format_define_id, 1, SourceLoc());
+    options.global_defs.set(float_format_define_id, 1,
+                            SourceLoc("<builtin>", 1, 1));
 }

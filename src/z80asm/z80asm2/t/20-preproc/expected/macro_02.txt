@@ -32,6 +32,6 @@ EndOfLine	"\n"	8:7
 Identifier	"M1"	9:2	
 EndOfLine	"\n"	9:4	
 Identifier	"ENDM"	8:7	keyword=ENDM 
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)

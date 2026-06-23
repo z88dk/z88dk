@@ -166,7 +166,7 @@ Identifier	"DEFINE"	10:8	keyword=DEFINE
 Identifier	"version"	10:8	
 EQ	"="	10:8	
 Integer	"123"	10:18	int_value=123 
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)
 symbol	version	$7B	(defined at t/20-preproc/input/reptc_02.asm:10:23)
