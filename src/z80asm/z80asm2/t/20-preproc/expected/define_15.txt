@@ -17,6 +17,6 @@ RightParen	")"	1:9
 EQ	"="	1:9	
 Hash	"#"	1:15	
 Identifier	"a"	1:16	keyword=A 
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)

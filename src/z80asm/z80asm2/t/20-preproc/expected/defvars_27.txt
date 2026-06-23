@@ -38,9 +38,9 @@ EQ	"="	1:9
 Identifier	"var"	1:14	
 DoubleHash	"##"	1:18	
 Identifier	"n"	1:21	
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)
 symbol	var1	0	(defined at t/20-preproc/input/defvars_27.asm:3:22)
 symbol	var2	1	(defined at t/20-preproc/input/defvars_27.asm:3:38)
 symbol	var3	2	(defined at t/20-preproc/input/defvars_27.asm:3:54)
