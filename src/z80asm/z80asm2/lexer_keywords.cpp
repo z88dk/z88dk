@@ -28,7 +28,7 @@ std::string to_string(Keyword kw) {
     return keyword_strings[static_cast<size_t>(kw)];
 }
 
-static const int keyword_flags[] = {
+static constexpr int keyword_flags[] = {
 #define X(id, text, flags) flags,
 #include "lexer_keywords.def"
 };

@@ -14,7 +14,6 @@ Program: layout_opcodes_01
             Sections:
                 Section: "" (current)
                     Size: 8
-                    Has opcodes
                     Statements:
                         LabelStmt
                             Location: t/50-layout/input/layout_opcodes_01.asm:1:1

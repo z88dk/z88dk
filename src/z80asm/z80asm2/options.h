@@ -22,9 +22,9 @@ enum class OptionType {
 };
 
 // defaults
-static const CPU DEFAULT_CPU = CPU::z80;
-static const uint8_t DEFAULT_FILLER_BYTE = 0x00;
-static const FloatFormat DEFAULT_FLOAT_FORMAT = FloatFormat::genmath;
+static constexpr CPU DEFAULT_CPU = CPU::z80;
+static constexpr uint8_t DEFAULT_FILLER_BYTE = 0x00;
+static constexpr FloatFormat DEFAULT_FLOAT_FORMAT = FloatFormat::genmath;
 
 // option specification
 struct OptionSpec {
@@ -55,6 +55,7 @@ struct Options {
     bool dump_after_parse = false;
     bool dump_after_symbol_collection = false;
     bool dump_after_layout = false;
+    bool dump_after_assembly = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

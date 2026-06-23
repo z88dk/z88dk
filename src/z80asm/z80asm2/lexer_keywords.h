@@ -10,10 +10,10 @@
 #include <cstdint>
 
 // Keyword flags
-static const int IS_REGISTER = 1 << 0;
-static const int IS_X_REGISTER = 1 << 1;
-static const int IS_HLA_DJNZ_REGISTER = 1 << 2;
-static const int IS_FLAG = 1 << 3;
+static constexpr int IS_REGISTER = 1 << 0;
+static constexpr int IS_X_REGISTER = 1 << 1;
+static constexpr int IS_HLA_DJNZ_REGISTER = 1 << 2;
+static constexpr int IS_FLAG = 1 << 3;
 
 #define X(id, text, flags) id,
 enum class Keyword : uint16_t {

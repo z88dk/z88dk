@@ -622,17 +622,14 @@ void Section::dump(DumpContext ctx, const Section* current) const {
 
     c.line("Size: " + int_to_hex(size));
 
-    if (has_opcodes) {
-        c.line("Has opcodes");
-    }
-
     if (org_stmt) {
-        c.line("Section ORG:");
+        std::string split_str = section_split ? " (section_split)" : "";
+        c.line("Section ORG: " + int_to_hex(base_address) + split_str);
         org_stmt->dump(c.child());
     }
 
     if (align_stmt) {
-        c.line("Section ALIGN:");
+        c.line("Section ALIGN: " + int_to_hex(align));
         align_stmt->dump(c.child());
     }
 

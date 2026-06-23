@@ -14,7 +14,6 @@ Program: layout_jr_relaxation_03
             Sections:
                 Section: "" (current)
                     Size: 2
-                    Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/50-layout/input/layout_jr_relaxation_03.asm:2:1

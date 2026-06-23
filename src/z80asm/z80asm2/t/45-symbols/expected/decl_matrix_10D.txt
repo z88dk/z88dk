@@ -14,7 +14,6 @@ Program: decl_matrix_10D
             Sections:
                 Section: "" (current)
                     Size: 0
-                    Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/45-symbols/input/decl_matrix_10D.asm:3:5

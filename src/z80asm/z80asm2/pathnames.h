@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -60,3 +61,7 @@ bool has_wildcards(std::string_view pat);
 
 // Expand wildcards using std::filesystem only: supports '*', '?', and '**'
 std::vector<std::string> expand_wildcards(std::string_view pattern);
+
+// atomically write a binary file
+bool write_binary_file(const std::filesystem::path& target,
+                       const std::vector<uint8_t>& data);

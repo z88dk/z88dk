@@ -1,0 +1,16 @@
+% z88dk-z80asm -v -dump-after-assembly t/55-obj-library//input/obj_defs_string_01.asm
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/55-obj-library/input/obj_defs_string_01.asm...
+Writing object file: t/55-obj-library/input/obj_defs_string_01.o
+ObjectLibrary
+    Modules (1):
+        ObjectModule: obj_defs_string_01
+            CPU: z80
+            Sections:
+                ObjSection: ""
+                    Align: 1
+                ObjSection: code
+                    Align: 1
+                    Bytes (27): $68 $65 $6C $6C $6F 0 0 0 0 0 0 0 0 0 0 0 1 2 3 $77 $6F $72 $6C $64 4 5 6

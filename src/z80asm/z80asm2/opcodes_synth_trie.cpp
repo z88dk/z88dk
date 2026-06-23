@@ -4,7 +4,7 @@
 #include "opcodes_trie_token.h"
 #include <cstdint>
 
-TrieNode opcodes_synth_trie_nodes[37550] = {
+const TrieNode opcodes_synth_trie_nodes[37550] = {
     /* node 0 */ { 0, 18, -1 }, // ,
     /* node 1 */ { 36466, 87, -1 }, // cpu_z80,
     /* node 2 */ { 35411, 87, -1 }, // cpu_z180,
@@ -37557,7 +37557,7 @@ TrieNode opcodes_synth_trie_nodes[37550] = {
     /* node 37549 */ { 0, 0, 1 }, // cpu_z80 KW_ADC TK_LeftParen KW_HL TK_Plus TK_RightParen, action 1
 };
 
-TrieTransition opcodes_synth_trie_transitions[37549] = {
+const TrieTransition opcodes_synth_trie_transitions[37549] = {
 
     // from node 0 ()
     /* trans 0 */ { TrieToken::cpu_z80, 1 },
@@ -121778,7 +121778,7 @@ TrieTransition opcodes_synth_trie_transitions[37549] = {
 };
 
 
-TrieAction opcodes_synth_trie_actions[1324] = {
+const TrieAction opcodes_synth_trie_actions[1324] = {
     /* action 0 */ { 0, 5 }, // adc (hl+) => adc m;inx h
     /* action 1 */ { 5, 9 }, // adc (hl+) => adc a, (hl);inc hl
     /* action 2 */ { 14, 5 }, // adc (hl-) => adc m;dcx h
@@ -123105,7 +123105,7 @@ TrieAction opcodes_synth_trie_actions[1324] = {
     /* action 1323 */ { 16694, 13 }, // xor.s (hl-) => xor.sil a, (hl);dec.sil hl
 };
 
-SynthBytecode opcodes_synth_trie_bytecode[16707] = {
+const SynthBytecode opcodes_synth_trie_bytecode[16707] = {
 
     // bytecode 0: adc m;inx h
     /* bytecode 0 */ { SynthOp::EmitToken, static_cast<uint16_t>(TrieToken::KW_ADC) },

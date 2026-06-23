@@ -22,7 +22,7 @@
 
 // must be greater than 8k (64k/8 bytes per line)
 // so that a 64k blob can be included with BINARY without hitting the limit
-static const int MAX_EXPANSION_DEPTH = 10000;
+static constexpr int MAX_EXPANSION_DEPTH = 10000;
 
 struct Macro {
     StringInterner::Id name_id;                 // interned identifier
