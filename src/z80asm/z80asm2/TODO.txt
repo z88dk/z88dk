@@ -1,20 +1,17 @@
 ## Pending issues
-- Add location of built-in symbols:
-  symbol	__CPU_Z80__	1	(defined at )
-  symbol	__CPU_ZILOG__	1	(defined at )
-  symbol	__FLOAT_GENMATH__	1	(defined at )
 - Add BASIC { ... } to assemble BASIC tokens for zx81, zx
 
 ## Assembler Pipeline
 - [x] Token stream normalization (lowercasing, whitespace, comment removal)
 - [x] Line-continuation joining (backslash at end of line)
-- [x] Macro expansion (object?like, function?like, variadic, recursive)
-- [x] Conditional?assembly evaluation (#if/#elif/#else/#endif)
-- [x] Include resolution and file?stack management
+- [x] Macro expansion (object-like, function-like, variadic, recursive)
+- [x] Conditional-assembly evaluation (#if/#elif/#else/#endif)
+- [x] Include resolution and file-stack management
 - [x] Preprocessor directives handling
 - [x] High-Level-Assembly constructs
-- [x] Synthetic?opcode expansion
+- [x] Synthetic-opcode expansion
 - [x] Output of preprocessed text with -E option
+- [x] Output of dependencies file with -MD option
 - [x] AST construction for instructions and expressions
 - [x] Module and segment-switching annotation
 - [x] Resolution of local labels

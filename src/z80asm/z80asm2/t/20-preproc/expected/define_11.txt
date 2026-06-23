@@ -164,6 +164,6 @@ EQ	"="	4:9
 Integer	"1"	4:10	int_value=1 
 symbol	X	1	(defined at t/20-preproc/input/define_11.asm:2:15)
 symbol	Y	1	(defined at t/20-preproc/input/define_11.asm:4:15)
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)
