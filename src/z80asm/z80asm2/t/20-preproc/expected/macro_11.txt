@@ -212,6 +212,6 @@ Comma	","	9:6
 Integer	"3"	9:8	int_value=3 
 EndOfLine	"\n"	9:9	
 Identifier	"ENDM"	8:8	keyword=ENDM 
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)

@@ -83,8 +83,8 @@ std::vector<StringInterner::Id> float_format_all_defines() {
     defines.reserve(std::size(float_formats_lu_table));
 
     for (const auto& fmt : float_formats_lu_table) {
-        FloatFormat float_id = static_cast<FloatFormat>(std::distance(
-                                   float_formats_lu_table, &fmt));
+        FloatFormat float_id = static_cast<FloatFormat>(
+                                   std::distance(float_formats_lu_table, &fmt));
         StringInterner::Id id = float_format_define(float_id);
         defines.push_back(id);
     }

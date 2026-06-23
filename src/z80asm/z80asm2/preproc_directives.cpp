@@ -2220,7 +2220,7 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
         const_symbols.erase(var_id);
     }
     for (auto var_id : cpu_defines(preproc_cpu_id)) {
-        const_symbols.set(var_id, 1, SourceLoc());
+        const_symbols.set(var_id, 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // create PRAGMA CPU_ADL 0/1 and push to output queue
@@ -2805,7 +2805,7 @@ void Preproc::process_SETFLOAT(Keyword kw, const SourceLoc&, ParseLine& pline) {
         const_symbols.erase(var_id);
     }
     auto float_format_define_id = float_format_define(preproc_float_format);
-    const_symbols.set(float_format_define_id, 1, SourceLoc());
+    const_symbols.set(float_format_define_id, 1, SourceLoc("<builtin>", 1, 1));
 }
 
 void Preproc::process_FLOAT(Keyword kw, const SourceLoc& kw_loc,

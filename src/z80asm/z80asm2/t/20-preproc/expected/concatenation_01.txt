@@ -84,9 +84,9 @@ Identifier	"x"	2:9	keyword=X
 RightParen	")"	2:9	
 EQ	"="	2:9	
 Identifier	"x"	2:15	keyword=X 
-symbol	__CPU_Z80N__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80N__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)
 symbol	x	$0A	(defined at t/20-preproc/input/concatenation_01.asm:12:8)
 symbol	x0	$0A	(defined at t/20-preproc/input/concatenation_01.asm:9:20)
 symbol	x1	$28	(defined at t/20-preproc/input/concatenation_01.asm:15:12)

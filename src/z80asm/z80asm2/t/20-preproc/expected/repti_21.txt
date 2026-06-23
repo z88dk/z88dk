@@ -47,6 +47,6 @@ t/20-preproc/input/repti_21.asm:12:1: error: Unexpected ENDR directive
 t/20-preproc/input/repti_21.asm:13:3: error: Unexpected end of file, missing ENDR for REPTI
     v repti a, b, c ; no endr
       ^
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)

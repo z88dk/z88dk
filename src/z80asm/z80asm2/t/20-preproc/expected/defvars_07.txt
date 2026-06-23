@@ -8,6 +8,6 @@ t/20-preproc/input/defvars_07.asm:3:13: error: Expected size specifier (.B, .W, 
                 ^
 # file: t/20-preproc/input/defvars_07.asm
 EndOfLine	"\n"	5:1	
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)

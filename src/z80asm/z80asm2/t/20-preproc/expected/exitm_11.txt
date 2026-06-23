@@ -38,6 +38,6 @@ Identifier	"exitm"	3:3	keyword=EXITM
 Identifier	"extra"	3:9	
 EndOfLine	"\n"	3:14	
 Identifier	"ENDM"	2:8	keyword=ENDM 
-symbol	__CPU_Z80__	1	(defined at )
-symbol	__CPU_ZILOG__	1	(defined at )
-symbol	__FLOAT_GENMATH__	1	(defined at )
+symbol	__CPU_Z80__	1	(defined at <builtin>:1:1)
+symbol	__CPU_ZILOG__	1	(defined at <builtin>:1:1)
+symbol	__FLOAT_GENMATH__	1	(defined at <builtin>:1:1)
