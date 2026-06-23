@@ -32,3 +32,7 @@ nop
 nop
 # 5 "t/35-preproc-only/input/generate_dependencies_01.asm"
 nop
+ DEFB $68,$65,$6C,$6C,$6F,$20,$77,$6F,$72,$6C,$64,$0A
+nop
+ DEFB $68,$65,$6C,$6C,$6F,$20,$77,$6F,$72,$6C,$64,$0A
+nop

@@ -448,8 +448,7 @@ std::vector<Token> Preproc::expand_argument(
 
 // Scan a macro body to find which parameters appear adjacent to # or ##.
 // These parameters should NOT be pre-expanded before substitution.
-std::unordered_set<StringInterner::Id>
-Preproc::find_params_adjacent_to_operators(
+std::unordered_set<StringInterner::Id> Preproc::find_params_adjacent_to_operators(
     const std::vector<Token>& body,
     const std::vector<StringInterner::Id>& params) {
 

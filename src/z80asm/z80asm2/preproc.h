@@ -47,6 +47,10 @@ public:
     // for assembler
     std::vector<LogicalLine> preprocess(std::string_view filename);
 
+    // output the .d file
+    void output_dependencies(std::string_view output_filename,
+                             std::string_view o_filename);
+
 private:
 
     // cpu for the duration of preprocessing, needed for .ASSUME ADL=0/1
@@ -444,7 +448,3 @@ private:
 
 void output_preproc_output(std::string_view filename,
                            const std::vector<LogicalLine>& lines);
-void output_dependencies(std::string_view output_filename,
-                         std::string_view o_filename,
-                         std::string_view asm_filename,
-                         const std::vector<LogicalLine>& lines);
