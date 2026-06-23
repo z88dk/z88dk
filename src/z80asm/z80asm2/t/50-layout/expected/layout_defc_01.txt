@@ -20,7 +20,6 @@ Program: layout_defc_01
             Sections:
                 Section: "" (current)
                     Size: 5
-                    Has opcodes
                     Statements:
                         OpcodeStmt
                             Location: t/50-layout/input/layout_defc_01.asm:1:1

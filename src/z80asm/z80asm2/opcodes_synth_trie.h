@@ -2,9 +2,9 @@
 #pragma once
 #include "opcodes.h"
 
-extern TrieNode opcodes_synth_trie_nodes[];
-extern TrieTransition opcodes_synth_trie_transitions[];
+extern const TrieNode opcodes_synth_trie_nodes[];
+extern const TrieTransition opcodes_synth_trie_transitions[];
 
-extern TrieAction opcodes_synth_trie_actions[];
-extern SynthBytecode opcodes_synth_trie_bytecode[];
+extern const TrieAction opcodes_synth_trie_actions[];
+extern const SynthBytecode opcodes_synth_trie_bytecode[];
 

@@ -12,7 +12,6 @@ Program: layout_jr_relaxation_07
             Sections:
                 Section: "" (current)
                     Size: $140
-                    Has opcodes
                     Statements:
                         LabelStmt
                             Location: t/50-layout/input/layout_jr_relaxation_07.asm:1:1

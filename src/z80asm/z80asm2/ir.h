@@ -430,7 +430,7 @@ struct SymbolInfo : public TreeNode {
 //-----------------------------------------------------------------------------
 // sections
 //-----------------------------------------------------------------------------
-static const std::string_view DEFAULT_SECTION = "";
+static constexpr std::string_view DEFAULT_SECTION = "";
 
 struct Section : public TreeNode {
     StringInterner::Id name_id = 0;         // name of section
@@ -438,7 +438,11 @@ struct Section : public TreeNode {
     uint size = 0;                          // total size of section
     bool has_opcodes = false;               // to signal if a section has code
     OrgStmt* org_stmt = nullptr;            // set if section has ORG
+    bool org_defined = false;               // true if section has ORG defined
+    uint base_address = 0;                  // section level ORG
+    bool section_split = false;             // true after ORG -1
     AlignStmt* align_stmt = nullptr;        // set if section has ALIGN
+    uint align = 1;                         // section level ALIGN
 
     Section(StringInterner::Id name_id_);
     virtual ~Section() = default;

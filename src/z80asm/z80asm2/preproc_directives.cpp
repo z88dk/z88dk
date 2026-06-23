@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-static const size_t BYTES_PER_LINE = 16;
+static constexpr size_t BYTES_PER_LINE = 16;
 
 //-----------------------------------------------------------------------------
 // dispatch table for directives
