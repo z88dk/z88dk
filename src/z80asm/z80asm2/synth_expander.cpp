@@ -14,12 +14,12 @@
 #include "opcodes_trie_token.h"
 #include "options.h"
 #include "parser.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include "synth_expander.h"
 #include <algorithm>
-#include <cassert>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -206,7 +206,7 @@ void SynthExpander::interpret_synth_bytecode(const SynthMatch& match,
     };
 
     // find range of tokens for the expanded opcodes
-    assert(match.accept_id >= 0);
+    release_assert(match.accept_id >= 0);
     const TrieAction& ta = opcodes_synth_trie_actions[match.accept_id];
     for (size_t i = ta.first_bytecode; i < ta.first_bytecode + ta.count; i++) {
         const SynthBytecode& bc = opcodes_synth_trie_bytecode[i];
@@ -227,7 +227,7 @@ void SynthExpander::interpret_synth_bytecode(const SynthMatch& match,
                 }
                 else {
                     // Invalid trie token
-                    assert(0);
+                    release_assert(0);
                 }
             }
             break;
@@ -240,7 +240,7 @@ void SynthExpander::interpret_synth_bytecode(const SynthMatch& match,
         }
         case SynthOp::EmitExprRef: {
             size_t expr_index = bc.operand;
-            assert(expr_index < match.expr_spans.size());
+            release_assert(expr_index < match.expr_spans.size());
             auto [start, end] = match.expr_spans[expr_index];
             for (size_t j = start; j < end; j++) {
                 cur.tokens.push_back(line.tokens[j]);
@@ -252,7 +252,7 @@ void SynthExpander::interpret_synth_bytecode(const SynthMatch& match,
             cur.tokens.push_back(Token::token(TokenType::LeftParen, "(", get_end_loc()));
             {
                 size_t expr_index = bc.operand;
-                assert(expr_index < match.expr_spans.size());
+                release_assert(expr_index < match.expr_spans.size());
                 auto [start, end] = match.expr_spans[expr_index];
                 for (size_t j = start; j < end; j++) {
                     cur.tokens.push_back(line.tokens[j]);
@@ -282,7 +282,7 @@ void SynthExpander::interpret_synth_bytecode(const SynthMatch& match,
             break;
         }
         default:
-            assert(0);
+            release_assert(0);
         }
     }
 

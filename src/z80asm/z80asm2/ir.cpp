@@ -6,10 +6,10 @@
 
 #include "ir.h"
 #include "lexer_tokens.h"
+#include "release_assert.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include <algorithm>
-#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -42,7 +42,7 @@ static std::string to_string(ExprType type) {
     case ExprType::Computed:
         return "Computed";
     default:
-        assert(0);
+        release_assert(0);
         return "Unknown";
     }
 }
@@ -272,7 +272,7 @@ void Patch::dump(DumpContext ctx) const {
         type_str = "PCrelative";
         break;
     default:
-        assert(0);
+        release_assert(0);
         break;
     }
     c.line("Type: " + type_str);
@@ -314,7 +314,7 @@ void Patch::dump(DumpContext ctx) const {
         validation_str = "8";
         break;
     default:
-        assert(0);
+        release_assert(0);
     }
     c.line("Validation: " + validation_str);
 
@@ -340,7 +340,7 @@ void Patch::dump(DumpContext ctx) const {
         formula_str = "Select3";
         break;
     default:
-        assert(0);
+        release_assert(0);
     }
     c.line("Formula: " + formula_str);
 
@@ -590,7 +590,7 @@ void SymbolInfo::dump(DumpContext ctx) const {
         }
         break;
     default:
-        assert(0);
+        release_assert(0);
         break;
     }
 

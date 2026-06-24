@@ -7,10 +7,10 @@
 #include "cpu.h"
 #include "diag.h"
 #include "lexer_keywords.h"
+#include "release_assert.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include <algorithm>
-#include <cassert>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -27,7 +27,7 @@ std::string to_string(CPU cpu_id) {
 
     auto it = lu_table.find(cpu_id);
     if (it == lu_table.end()) {
-        assert(0);
+        release_assert(0);
         return "unknown";
     }
     else {
@@ -194,7 +194,7 @@ Keyword cpu_invert_flag_condition(Keyword kw) {
     case Keyword::Z:
         return Keyword::NZ;
     default:
-        assert(0);
+        release_assert(0);
         return Keyword::None;
     }
 }
@@ -230,7 +230,7 @@ void swap_ix_iy(std::string& inout_text, Keyword& inout_kw) {
 
 bool compute_z88_call_oz(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                          const std::vector<std::pair<int, SourceLoc>>& val_loc_data) {
-    assert(val_loc_data.size() == 1);
+    release_assert(val_loc_data.size() == 1);
     int arg_value = val_loc_data.front().first;
     SourceLoc expr_loc = val_loc_data.front().second;
 
@@ -254,7 +254,7 @@ bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
                           out_def_val_data,
                           const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
                           CPU cpu_id, Keyword kw, const SourceLoc& kw_loc) {
-    assert(val_loc_data.size() == 1);
+    release_assert(val_loc_data.size() == 1);
     int arg_value = val_loc_data.front().first;
     SourceLoc expr_loc = val_loc_data.front().second;
 
@@ -284,7 +284,7 @@ bool compute_z88_call_pkg(std::vector<std::pair<Keyword, int>>&
 
 bool compute_z88_fpp(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                      const std::vector<std::pair<int, SourceLoc>>& val_loc_data) {
-    assert(val_loc_data.size() == 1);
+    release_assert(val_loc_data.size() == 1);
     int arg_value = val_loc_data.front().first;
     SourceLoc expr_loc = val_loc_data.front().second;
 
@@ -408,7 +408,7 @@ bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
                       const std::vector<std::pair<int, SourceLoc>>& val_loc_data,
                       Keyword kw,
                       const SourceLoc& kw_loc, const SourceLoc& eol_loc) {
-    assert(!val_loc_data.empty());
+    release_assert(!val_loc_data.empty());
 
     if (cpu_id != CPU::z80n && cpu_id != CPU::z80n_strict) {
         g_diag.error(kw_loc, to_string(kw) + " not supported on " + to_string(cpu_id));
@@ -509,7 +509,7 @@ bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
             }
             break;
         default:
-            assert(0);
+            release_assert(0);
         }
 
         // parse wr0 parameters: check bits 5,6
@@ -537,7 +537,7 @@ bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
             }
             break;
         default:
-            assert(0);
+            release_assert(0);
         }
         break;
 
@@ -850,7 +850,7 @@ bool compute_z80n_dma(std::vector<std::pair<Keyword, int>>& out_def_val_data,
         break;
 
     default:
-        assert(0);
+        release_assert(0);
         return false; // not reached
     }
 

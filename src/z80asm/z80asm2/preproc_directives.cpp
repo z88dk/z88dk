@@ -15,12 +15,12 @@
 #include "options.h"
 #include "pathnames.h"
 #include "preproc.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include "zfloat.h"
 #include <algorithm>
-#include <cassert>
 #include <deque>
 #include <unordered_map>
 #include <utility>
@@ -2725,7 +2725,7 @@ void Preproc::process_MMU(Keyword kw, const SourceLoc& kw_loc,
         break;
 
     default:
-        assert(0);
+        release_assert(0);
     }
 
     // check for MMU slot, A

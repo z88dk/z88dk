@@ -8,8 +8,9 @@
 #include "asm_layout.h"
 #include "diag.h"
 #include "ir.h"
+#include "release_assert.h"
 #include "source_loc.h"
-#include <cassert>
+#include "string_utils.h"
 #include <string_view>
 
 bool compute_layout(Program& prog, bool& changed) {
@@ -236,9 +237,9 @@ bool compute_layout(Program& prog, bool& changed) {
 }
 
 static void check_jump(OpcodeStmt* opc_stmt, Patch* patch, bool& changed) {
-    assert(patch->type == PatchType::PCrelative);
-    assert(patch->size == 1);
-    assert(!opc_stmt->bytes.empty());
+    release_assert(patch->type == PatchType::PCrelative);
+    release_assert(patch->size == 1);
+    release_assert(!opc_stmt->bytes.empty());
 
     // check the target address is known
     if (patch->inner->value.type == ExprType::AddressRelative &&

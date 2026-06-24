@@ -18,12 +18,14 @@
 #include "parser.h"
 #include "pathnames.h"
 #include "preproc.h"
+#include "release_assert.h"
 #include "synth_expander.h"
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 static const uint MAX_PASSES = 100;

@@ -10,9 +10,9 @@
 #include "hla_builder.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_utils.h"
-#include <cassert>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -69,7 +69,7 @@ std::unique_ptr<HLA_Program> HLA_ProgramBuilder::finish() {
 }
 
 void HLA_ProgramBuilder::handle_asm(ParseLine& line) {
-    assert(!line.tokens.empty());
+    release_assert(!line.tokens.empty());
 
     SourceLoc loc = line.tokens.front().loc;
 
@@ -124,7 +124,7 @@ void HLA_ProgramBuilder::handle_elseif(Keyword kw, const SourceLoc& kw_loc,
     }
 
     auto node = dynamic_cast<HLA_If*>(stack.back().node);
-    assert(node);
+    release_assert(node);
     if (node->found_else) {
         g_diag.error(kw_loc, to_string(kw) + " invalid after ELSE");
         g_diag.note(node->else_loc, "ELSE definition");
@@ -160,7 +160,7 @@ void HLA_ProgramBuilder::handle_else(Keyword kw, const SourceLoc& kw_loc,
     }
 
     auto node = dynamic_cast<HLA_If*>(stack.back().node);
-    assert(node);
+    release_assert(node);
     if (node->found_else) {
         g_diag.error(kw_loc, to_string(kw) + " already defined");
         g_diag.note(node->else_loc, "Previous definition");
@@ -258,7 +258,7 @@ void HLA_ProgramBuilder::handle_until(Keyword kw, const SourceLoc& kw_loc,
     }
 
     auto node = dynamic_cast<HLA_Repeat*>(stack.back().node);
-    assert(node);
+    release_assert(node);
     node->type = RepeatType::UntilExpr;
     node->condition = std::move(condition);
 
@@ -290,7 +290,7 @@ void HLA_ProgramBuilder::handle_djnz(Keyword kw, const SourceLoc& kw_loc,
     }
 
     auto node = dynamic_cast<HLA_Repeat*>(stack.back().node);
-    assert(node);
+    release_assert(node);
     node->type = RepeatType::DjnzReg;
     node->reg_kw = reg_kw;
 
