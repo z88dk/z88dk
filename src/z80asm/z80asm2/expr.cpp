@@ -4,15 +4,15 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "ir.h"
 #include "diag.h"
 #include "expr.h"
+#include "ir.h"
 #include "lexer.h"
 #include "lexer_tokens.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
-#include <cassert>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -48,7 +48,7 @@ int int_unary(TokenType op, int arg, const SourceLoc&, bool) {
     case TokenType::BitwiseNot:
         return ~arg;
     default:
-        assert(0);
+        release_assert(0);
         return 0;
     }
 }
@@ -113,7 +113,7 @@ int int_binary(TokenType op, int lhs, int rhs, const SourceLoc& loc,
     case TokenType::LogicalXor:
         return (!!lhs) ^ (!!rhs);
     default:
-        assert(0);
+        release_assert(0);
         return 0;
     }
 }
@@ -151,7 +151,7 @@ int int_call_unary(Keyword kw, int arg, const SourceLoc& loc, bool silent) {
         }
         return arg;
     default:
-        assert(0);
+        release_assert(0);
         return arg;
     }
 }
@@ -387,7 +387,7 @@ void ConstEvalSem::push(int value) {
 }
 
 int ConstEvalSem::pop() {
-    assert(!stack.empty());
+    release_assert(!stack.empty());
     int v = stack.back();
     stack.pop_back();
     return v;

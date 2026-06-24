@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 #include "lexer_keywords.h"
+#include "release_assert.h"
 #include "string_utils.h"
-#include <cassert>
 #include <string>
 #include <string_view>
 #include <unordered_map>
