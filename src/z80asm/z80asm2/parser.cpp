@@ -4,17 +4,17 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "ir.h"
 #include "expr.h"
+#include "ir.h"
 #include "lexer_tokens.h"
 #include "opcodes.h"
 #include "opcodes_parse_trie.h"
 #include "opcodes_trie_token.h"
 #include "options.h"
 #include "parser.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include <algorithm>
-#include <cassert>
 #include <cstdint>
 #include <memory>
 #include <utility>
@@ -190,7 +190,7 @@ next_transition:
             node = cp.node;
             pline.pos = cp.token_pos;
             tr = cp.transition;
-            assert(res.exprs.size() >= cp.expr_count);
+            release_assert(res.exprs.size() >= cp.expr_count);
             while (res.exprs.size() > cp.expr_count) {
                 res.exprs.pop_back();
             }
@@ -222,7 +222,7 @@ next_transition:
                 goto next_transition;
             }
             default:
-                assert(0);
+                release_assert(0);
             }
         }
 
@@ -245,7 +245,7 @@ std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
     auto opcode_stmt = std::make_unique<OpcodeStmt>(loc);
 
     // find range of tokens for the expanded opcodes
-    assert(match.accept_id >= 0);
+    release_assert(match.accept_id >= 0);
     const TrieAction& ta = opcodes_parse_trie_actions[match.accept_id];
     for (size_t i = ta.first_bytecode; i < ta.first_bytecode + ta.count; i++) {
         uint8_t bc = opcodes_parse_trie_bytecode[i];
@@ -261,7 +261,7 @@ std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
         }
         case static_cast<uint8_t>(OpcodesOp::ExprConst): {
             // create a Patch
-            assert(!match.exprs.empty());
+            release_assert(!match.exprs.empty());
             auto expr = std::move(match.exprs.front());
             match.exprs.erase(match.exprs.begin());
             auto patch = std::make_unique<Patch>(std::move(expr), loc);
@@ -307,7 +307,7 @@ std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
                 patch->coefs.push_back(opcodes_parse_trie_bytecode[++i]); // G
                 break;
             default:
-                assert(0);
+                release_assert(0);
             }
 
             opcode_stmt->patches.push_back(std::move(patch));
@@ -315,7 +315,7 @@ std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
         }
         case static_cast<uint8_t>(OpcodesOp::ExprPatch): {
             // create a Patch
-            assert(!match.exprs.empty());
+            release_assert(!match.exprs.empty());
             auto expr = std::move(match.exprs.front());
             match.exprs.erase(match.exprs.begin());
             auto patch = std::make_unique<Patch>(std::move(expr), loc);
@@ -333,9 +333,9 @@ std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
         }
         case static_cast<uint8_t>(OpcodesOp::AltJpOpcode): {
             // update the last patch
-            assert(!opcode_stmt->patches.empty());
+            release_assert(!opcode_stmt->patches.empty());
             auto& patch = opcode_stmt->patches.back();
-            assert(patch->type == PatchType::PCrelative);
+            release_assert(patch->type == PatchType::PCrelative);
 
             // load alternative data
             if (patch->size == 1) {
@@ -351,7 +351,7 @@ std::unique_ptr<OpcodeStmt> Parser::interpret_parse_bytecode(
             break;
         }
         default:
-            assert(0);
+            release_assert(0);
         }
     }
 

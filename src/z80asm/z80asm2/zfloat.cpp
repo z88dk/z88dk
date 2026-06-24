@@ -6,16 +6,16 @@
 
 #include "diag.h"
 #include "lexer_tokens.h"
+#include "release_assert.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include "zfloat.h"
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <iterator>
-#include <string>
 #include <string.h>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -486,7 +486,7 @@ static bool is_big_endian() {
         return false;
     }
     else {
-        assert(0);
+        release_assert(0);
         return false;	// not reached
     }
 }
@@ -836,7 +836,7 @@ std::vector<uint8_t> encode_float(double value, FloatFormat fmt) {
 #define X(type)	case FloatFormat::type: return float_to_##type(value);
 #include "zfloat.def"
     default:
-        assert(0);
+        release_assert(0);
         return std::vector<uint8_t>();
     }
 }

@@ -9,8 +9,8 @@
 #include "expr.h"
 #include "ir.h"
 #include "options.h"
+#include "release_assert.h"
 #include "string_utils.h"
-#include <cassert>
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -37,7 +37,7 @@ bool get_const_expr_value(const Expr* expr, int& out_value,
             return false;
 
         default:
-            assert(0);
+            release_assert(0);
         }
     }
 
@@ -171,8 +171,8 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
     }
 
     if (auto asmpc_expr = dynamic_cast<ExprLiteralAsmpc*>(expr)) {
-        assert(asmpc_expr->stmt != nullptr);
-        assert(asmpc_expr->stmt->section != nullptr);
+        release_assert(asmpc_expr->stmt != nullptr);
+        release_assert(asmpc_expr->stmt->section != nullptr);
         update_if_changed(asmpc_expr->value.type, ExprType::AddressRelative, changed);
         update_if_changed(asmpc_expr->value.section,
                           asmpc_expr->stmt->section, changed);
@@ -182,14 +182,14 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
     }
 
     if (auto sym_expr = dynamic_cast<ExprSymbol*>(expr)) {
-        assert(sym_expr->symbol != nullptr);
+        release_assert(sym_expr->symbol != nullptr);
         switch (sym_expr->symbol->def_type) {
         case SymbolInfo::DefType::Undefined: // extern
             update_if_changed(sym_expr->value.type, ExprType::Unknown, changed);
             break;
 
         case SymbolInfo::DefType::Label:
-            assert(sym_expr->symbol->stmt != nullptr);
+            release_assert(sym_expr->symbol->stmt != nullptr);
             update_if_changed(sym_expr->value.type, ExprType::AddressRelative, changed);
             update_if_changed(sym_expr->value.section,
                               sym_expr->symbol->stmt->section, changed);
@@ -198,7 +198,7 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
             return true;
 
         case SymbolInfo::DefType::Defc:
-            assert(sym_expr->symbol->defc_expr != nullptr);
+            release_assert(sym_expr->symbol->defc_expr != nullptr);
             switch (sym_expr->symbol->defc_expr->value.type) {
             case ExprType::Unknown:
                 update_if_changed(sym_expr->value.type, ExprType::Unknown, changed);
@@ -221,20 +221,20 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
                                   sym_expr->symbol->defc_expr->value.tokens, changed);
                 break;
             default:
-                assert(0);
+                release_assert(0);
             }
             return true;
 
         default:
-            assert(0);
+            release_assert(0);
         }
 
         return true;
     }
 
     if (auto llbl_expr = dynamic_cast<ExprLocalLabel*>(expr)) {
-        assert(llbl_expr->symbol != nullptr);
-        assert(llbl_expr->symbol->stmt != nullptr);
+        release_assert(llbl_expr->symbol != nullptr);
+        release_assert(llbl_expr->symbol->stmt != nullptr);
         update_if_changed(llbl_expr->value.type, ExprType::AddressRelative, changed);
         update_if_changed(llbl_expr->value.section,
                           llbl_expr->symbol->stmt->section, changed);
@@ -389,7 +389,7 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
         return true;
     }
 
-    assert(0);
+    release_assert(0);
     return false;
 }
 
@@ -410,7 +410,7 @@ static bool eval_const_expr(Expr* expr, bool& changed, bool silent) {
         return false;
 
     default:
-        assert(0);
+        release_assert(0);
         return false;
     }
 }
@@ -614,7 +614,7 @@ static bool check_range(int value, CheckRange validation) {
         }
         break;
     default:
-        assert(0);
+        release_assert(0);
         break;
     }
     return false;
@@ -629,9 +629,9 @@ static void apply_formula(std::vector<uint8_t>& bytes, int value,
         break;
 
     case ExprFormula::ScaleBelowThreshold: {
-        assert(size == 1);
-        assert(offset < bytes.size());
-        assert(coefs.size() == 1);
+        release_assert(size == 1);
+        release_assert(offset < bytes.size());
+        release_assert(coefs.size() == 1);
 
         // A+(%c<8?%c*8:%c), followed by A
         uint8_t A = coefs[0];
@@ -639,9 +639,9 @@ static void apply_formula(std::vector<uint8_t>& bytes, int value,
         break;
     }
     case ExprFormula::AddScaled: {
-        assert(size == 1);
-        assert(offset < bytes.size());
-        assert(coefs.size() == 2);
+        release_assert(size == 1);
+        release_assert(offset < bytes.size());
+        release_assert(coefs.size() == 2);
 
         // A+B*%c, followed by A, B
         uint8_t A = coefs[0];
@@ -650,9 +650,9 @@ static void apply_formula(std::vector<uint8_t>& bytes, int value,
         break;
     }
     case ExprFormula::SelectOrAdd: {
-        assert(size == 1);
-        assert(offset < bytes.size());
-        assert(coefs.size() == 3);
+        release_assert(size == 1);
+        release_assert(offset < bytes.size());
+        release_assert(coefs.size() == 3);
 
         // %c==A?B:C+%c, followed by A, B, C
         uint8_t A = coefs[0];
@@ -662,9 +662,9 @@ static void apply_formula(std::vector<uint8_t>& bytes, int value,
         break;
     }
     case ExprFormula::Select2: {
-        assert(size == 1);
-        assert(offset < bytes.size());
-        assert(coefs.size() == 5);
+        release_assert(size == 1);
+        release_assert(offset < bytes.size());
+        release_assert(coefs.size() == 5);
 
         // %c==A?B:%c==C?D:E, followed by A, B, C, D, E
         uint8_t A = coefs[0];
@@ -677,9 +677,9 @@ static void apply_formula(std::vector<uint8_t>& bytes, int value,
         break;
     }
     case ExprFormula::Select3: {
-        assert(size == 1);
-        assert(offset < bytes.size());
-        assert(coefs.size() == 7);
+        release_assert(size == 1);
+        release_assert(offset < bytes.size());
+        release_assert(coefs.size() == 7);
 
         // %c==A?B:%c==C?D:%c==E?F:G, followed by A, B, C, D, E, F, G
         uint8_t A = coefs[0];
@@ -695,7 +695,7 @@ static void apply_formula(std::vector<uint8_t>& bytes, int value,
         break;
     }
     default:
-        assert(0);
+        release_assert(0);
         break;
     }
 }
@@ -716,7 +716,7 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         value = target - source;
     }
     else {
-        assert(0);
+        release_assert(0);
     }
 
     // check range
@@ -737,7 +737,7 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         break;
 
     case PatchType::Unsigned:
-        assert(patch.size >= 1 && patch.size <= 4);
+        release_assert(patch.size >= 1 && patch.size <= 4);
 
         if (patch.size == 1) {
             check_unsigned_8bit_range(value, patch.inner->loc);
@@ -747,13 +747,13 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         }
 
         for (size_t i = 0; i < patch.size; ++i) {
-            assert(patch.offset + i < bytes.size());
+            release_assert(patch.offset + i < bytes.size());
             bytes[patch.offset + i] = static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
         }
         break;
 
     case PatchType::Signed:
-        assert(patch.size >= 1 && patch.size <= 4);
+        release_assert(patch.size >= 1 && patch.size <= 4);
 
         if (patch.size == 1) {
             check_signed_8bit_range(value, patch.inner->loc);
@@ -763,15 +763,15 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         }
 
         for (size_t i = 0; i < patch.size; ++i) {
-            assert(patch.offset + i < bytes.size());
+            release_assert(patch.offset + i < bytes.size());
             bytes[patch.offset + i] =
                 static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
         }
         break;
 
     case PatchType::HighByte:
-        assert(patch.size == 1);
-        assert(patch.offset < bytes.size());
+        release_assert(patch.size == 1);
+        release_assert(patch.offset < bytes.size());
 
         if ((value & 0xff00) != 0) {
             if ((value & 0xff00) != 0xff00) {
@@ -784,7 +784,7 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         break;
 
     case PatchType::BigEndian:
-        assert(patch.size >= 1 && patch.size <= 4);
+        release_assert(patch.size >= 1 && patch.size <= 4);
 
         if (patch.size == 1) {
             check_unsigned_8bit_range(value, patch.inner->loc);
@@ -794,14 +794,14 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         }
 
         for (size_t i = 0; i < patch.size; ++i) {
-            assert(patch.offset + patch.size - 1 - i < bytes.size());
+            release_assert(patch.offset + patch.size - 1 - i < bytes.size());
             bytes[patch.offset + patch.size - 1 - i] =
                 static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
         }
         break;
 
     case PatchType::PCrelative:
-        assert(patch.size >= 1 && patch.size <= 2);
+        release_assert(patch.size >= 1 && patch.size <= 2);
 
         if (patch.size == 1) {
             if (!check_pcrel_8bit_range(value, patch.inner->loc)) {
@@ -815,14 +815,14 @@ bool apply_patch(Stmt& stmt, std::vector<uint8_t>& bytes, Patch& patch) {
         }
 
         for (size_t i = 0; i < patch.size; ++i) {
-            assert(patch.offset + i < bytes.size());
+            release_assert(patch.offset + i < bytes.size());
             bytes[patch.offset + i] =
                 static_cast<uint8_t>((value >> (8 * i)) & 0xFF);
         }
         break;
 
     default:
-        assert(0);
+        release_assert(0);
     }
 
     // mark as patched

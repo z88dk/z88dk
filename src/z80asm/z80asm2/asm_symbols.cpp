@@ -7,9 +7,9 @@
 #include "asm_symbols.h"
 #include "diag.h"
 #include "ir.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_interner.h"
-#include <cassert>
 #include <string>
 #include <string_view>
 
@@ -491,7 +491,7 @@ static bool declare_symbol(Program& prog,
             decl.saw_global = true;
             break;
         default:
-            assert(0);
+            release_assert(0);
         }
     };
 
@@ -542,7 +542,7 @@ static bool declare_symbol(Program& prog,
         break; // issue error
 
     default:
-        assert(0);
+        release_assert(0);
     }
 
     // checks failed, error message

@@ -11,11 +11,11 @@
 #include "file_mgr.h"
 #include "options.h"
 #include "pathnames.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
 #include <algorithm>
-#include <cassert>
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
@@ -494,7 +494,7 @@ void Args::parse_arg(std::string_view arg,
             return;
 
         default:
-            assert(0);
+            release_assert(0);
         }
     }
 
