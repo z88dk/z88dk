@@ -9,9 +9,9 @@
 #include "lexer.h"
 #include "lexer_scan.h"
 #include "lexer_tokens.h"
+#include "release_assert.h"
 #include "source_loc.h"
 #include "string_interner.h"
-#include <cassert>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -115,8 +115,8 @@ void tokenize(SourceFile& sf, std::string_view content) {
 
     for (size_t i = 0; i < num_lines; ++i) {
         auto& tokens = sf.lines[i].tokens;
-        assert(!tokens.empty() &&
-               tokens.back().type == TokenType::EndOfLine);
+        release_assert(!tokens.empty() &&
+                       tokens.back().type == TokenType::EndOfLine);
 
         size_t j = i + 1;
 
@@ -128,8 +128,8 @@ void tokenize(SourceFile& sf, std::string_view content) {
             while (j < num_lines && started_in_comment[j]) {
                 // Append non-EndOfLine tokens from the next line
                 auto& next_tokens = sf.lines[j].tokens;
-                assert(!next_tokens.empty() &&
-                       next_tokens.back().type == TokenType::EndOfLine);
+                release_assert(!next_tokens.empty() &&
+                               next_tokens.back().type == TokenType::EndOfLine);
 
                 // Copy everything except the EndOfLine from next line
                 tokens.insert(tokens.end(),
@@ -170,8 +170,8 @@ void tokenize(SourceFile& sf, std::string_view content) {
 
             // copy tokens from next line
             auto& next_tokens = sf.lines[j].tokens;
-            assert(!next_tokens.empty() &&
-                   next_tokens.back().type == TokenType::EndOfLine);
+            release_assert(!next_tokens.empty() &&
+                           next_tokens.back().type == TokenType::EndOfLine);
             tokens.insert(tokens.end(),
                           next_tokens.begin(),
                           next_tokens.end());

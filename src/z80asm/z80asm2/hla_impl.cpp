@@ -10,8 +10,8 @@
 #include "hla_impl.h"
 #include "lexer.h"
 #include "lexer_tokens.h"
+#include "release_assert.h"
 #include "source_loc.h"
-#include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
@@ -206,7 +206,7 @@ void emit_djnz(Keyword reg_kw, HLA_Label label,
     case Keyword::DE:
     case Keyword::HL: {
         std::string register_pair = to_string(reg_kw);
-        assert(register_pair.size() == 2); // sanity check
+        release_assert(register_pair.size() == 2); // sanity check
         std::string reg1(1, register_pair[0]);
         std::string reg2(1, register_pair[1]);
 
@@ -217,7 +217,7 @@ void emit_djnz(Keyword reg_kw, HLA_Label label,
         break;
     }
     default:
-        assert(0);
+        release_assert(0);
     }
 
     for (auto& text : code) {
@@ -311,7 +311,7 @@ static Keyword compare_to_condition(const HLA_CompareExpr& cmp) {
     case HLA_CompareExpr::Type::NE:
         return Keyword::NZ;
     default:
-        assert(0);
+        release_assert(0);
         return Keyword::None;
     }
 }
@@ -533,7 +533,7 @@ void hla_emit_cond(const HLA_Expr& e,
     // ------------------------------------------------------------
     // Should never reach here
     // ------------------------------------------------------------
-    assert(0);
+    release_assert(0);
 }
 
 // Loop context for break/continue
@@ -683,7 +683,7 @@ static void hla_lower_repeat(const HLA_Repeat& node,
 // BREAK / CONTINUE lowering
 // ------------------------------------------------------------
 static void hla_lower_break(const HLA_Break& n, std::vector<LogicalLine>& out) {
-    assert(!g_loop_stack.empty());
+    release_assert(!g_loop_stack.empty());
 
     if (n.condition) {
         // Conditional break: jump to break label if condition is true
@@ -701,7 +701,7 @@ static void hla_lower_break(const HLA_Break& n, std::vector<LogicalLine>& out) {
 
 static void hla_lower_continue(const HLA_Continue& n,
                                std::vector<LogicalLine>& out) {
-    assert(!g_loop_stack.empty());
+    release_assert(!g_loop_stack.empty());
 
     if (n.condition) {
         // Conditional continue: jump to continue label if condition is true
@@ -751,7 +751,7 @@ static void hla_lower_node(const HLA_Node& n, std::vector<LogicalLine>& out) {
         return;
     }
 
-    assert(0);
+    release_assert(0);
 }
 
 // ------------------------------------------------------------
