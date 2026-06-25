@@ -61,8 +61,8 @@ uint32_t pw_,px_,py_,pz_;
             zero = (lhs == rhs);       \
             break;                     \
     }                                  \
-    if ( altd  ) { fr_ = zero; ff_ = carry << 8; } \
-    else { fr = zero; ff_ = carry << 8; } \
+    if ( altd  ) { fr_ = !zero; ff_ = carry << 8; } \
+    else { fr = !zero; ff = carry << 8; } \
 } while(0)
 
 
