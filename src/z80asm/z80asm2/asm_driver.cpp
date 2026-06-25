@@ -9,6 +9,7 @@
 #include "asm_layout.h"
 #include "asm_symbols.h"
 #include "diag.h"
+#include "files.h"
 #include "hla.h"
 #include "ir.h"
 #include "lexer_dump.h"
@@ -16,7 +17,6 @@
 #include "obj_file.h"
 #include "options.h"
 #include "parser.h"
-#include "pathnames.h"
 #include "preproc.h"
 #include "release_assert.h"
 #include "synth_expander.h"
@@ -283,20 +283,20 @@ static bool split_modules_sections(Program& prog) {
     return !failed;
 }
 
-static ObjectModule build_object_module(const Program& prog,
-                                        const Module& mod) {
-    ObjectModule obj_mod;
+static std::unique_ptr<ObjectModule> build_object_module(const Program& prog,
+        const Module& mod) {
+    auto obj_mod = std::make_unique<ObjectModule>();
 
     // global information for the module
-    obj_mod.module_name_id = mod.name_id;
-    obj_mod.cpu_id = g_args.options.cpu_id;
-    obj_mod.swap_ix_iy = g_args.options.swap_ix_iy;
+    obj_mod->module_name_id = mod.name_id;
+    obj_mod->cpu_id = g_args.options.cpu_id;
+    obj_mod->swap_ix_iy = g_args.options.swap_ix_iy;
 
     // symbol table
     for (const auto& [name_id, sym_info] : mod.symbols) {
-        ObjSymbol obj_sym;
-        obj_sym.name_id = name_id;
-        obj_sym.loc = sym_info->loc;
+        auto obj_sym = std::make_unique<ObjSymbol>();
+        obj_sym->name_id = name_id;
+        obj_sym->loc = sym_info->loc;
 
         // check scope
         auto it_decl = prog.declarations.find(name_id);
@@ -304,25 +304,25 @@ static ObjectModule build_object_module(const Program& prog,
             const SymbolDeclare* decl = it_decl->second.get();
             if (decl->type == SymbolDeclareType::Public ||
                     decl->type == SymbolDeclareType::Global) {
-                obj_sym.scope = ObjSymbolScope::Public;
+                obj_sym->scope = ObjSymbolScope::Public;
             }
             else if (decl->type == SymbolDeclareType::Extern) {
                 continue; // skip external symbols
             }
         }
         else {
-            obj_sym.scope = ObjSymbolScope::Local;
+            obj_sym->scope = ObjSymbolScope::Local;
         }
 
         switch (sym_info->def_type) {
         case SymbolInfo::DefType::Label:
             release_assert(sym_info->stmt != nullptr);
             release_assert(sym_info->stmt->section != nullptr);
-            obj_sym.type = ObjSymbolType::AddressRelative;
-            obj_sym.value = sym_info->stmt->address;
-            obj_sym.section_name_id = sym_info->stmt->section->name_id;
+            obj_sym->type = ObjSymbolType::AddressRelative;
+            obj_sym->value = sym_info->stmt->address;
+            obj_sym->section_name_id = sym_info->stmt->section->name_id;
 
-            obj_mod.symbols.push_back(std::move(obj_sym));
+            obj_mod->symbols.push_back(std::move(obj_sym));
             break;
 
         case SymbolInfo::DefType::Defc:
@@ -331,47 +331,47 @@ static ObjectModule build_object_module(const Program& prog,
 
             switch (sym_info->defc_expr->value.type) {
             case ExprType::Constant:
-                obj_sym.type = ObjSymbolType::Constant;
-                obj_sym.value = sym_info->defc_expr->value.const_value;
-                obj_sym.section_name_id =
+                obj_sym->type = ObjSymbolType::Constant;
+                obj_sym->value = sym_info->defc_expr->value.const_value;
+                obj_sym->section_name_id =
                     sym_info->defc_expr->value.section->name_id;
                 break;
 
             case ExprType::AddressRelative:
-                obj_sym.type = ObjSymbolType::AddressRelative;
-                obj_sym.value = sym_info->defc_expr->value.offset;
-                obj_sym.section_name_id =
+                obj_sym->type = ObjSymbolType::AddressRelative;
+                obj_sym->value = sym_info->defc_expr->value.offset;
+                obj_sym->section_name_id =
                     sym_info->defc_expr->value.section->name_id;
                 break;
 
             case ExprType::Computed: {
-                obj_sym.type = ObjSymbolType::Computed;
-                obj_sym.value = 0;
-                obj_sym.section_name_id =
+                obj_sym->type = ObjSymbolType::Computed;
+                obj_sym->value = 0;
+                obj_sym->section_name_id =
                     sym_info->defc_expr->value.section->name_id;
 
                 // create expression to define symbol value at link time
-                ObjExpr obj_expr;
-                obj_expr.text_id = g_strings.intern(to_string(sym_info->defc_expr->tokens));
-                obj_expr.range = ObjExprRange::Assignment;
-                obj_expr.section_name_id =
+                auto obj_expr = std::make_unique<ObjExpr>();
+                obj_expr->text_id = g_strings.intern(to_string(sym_info->defc_expr->tokens));
+                obj_expr->range = ObjExprRange::Assignment;
+                obj_expr->section_name_id =
                     sym_info->defc_expr->value.section->name_id;
-                obj_expr.target_name_id = sym_info->name_id;
-                obj_expr.loc = sym_info->defc_expr->loc;
-                obj_mod.exprs.push_back(std::move(obj_expr));
+                obj_expr->target_name_id = sym_info->name_id;
+                obj_expr->loc = sym_info->defc_expr->loc;
+                obj_mod->exprs.push_back(std::move(obj_expr));
                 break;
             }
             default:
                 release_assert(0); // should not happen
             }
 
-            obj_mod.symbols.push_back(std::move(obj_sym));
+            obj_mod->symbols.push_back(std::move(obj_sym));
             break;
 
         case SymbolInfo::DefType::Undefined: {
             release_assert(sym_info->def_type == SymbolInfo::DefType::Undefined);
 
-            obj_mod.externs.push_back(sym_info->name_id);
+            obj_mod->externs.push_back(sym_info->name_id);
             break;
         }
         default:
@@ -381,19 +381,19 @@ static ObjectModule build_object_module(const Program& prog,
 
     // sections
     for (const auto& sec : mod.sections) {
-        ObjSection obj_sec;
-        obj_sec.name_id = sec->name_id;
-        obj_sec.org_defined = sec->org_defined;
-        obj_sec.base_address = sec->base_address;
-        obj_sec.section_split = sec->section_split;
-        obj_sec.align = sec->align;
+        auto obj_sec = std::make_unique<ObjSection>();
+        obj_sec->name_id = sec->name_id;
+        obj_sec->org_defined = sec->org_defined;
+        obj_sec->base_address = sec->base_address;
+        obj_sec->section_split = sec->section_split;
+        obj_sec->align = sec->align;
 
         // statements
         for (auto& stmt : sec->stmts) {
             if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
                 for (auto& patch : opc_stmt->patches) {
-                    ObjExpr obj_expr;
-                    obj_expr.text_id = g_strings.intern(to_string(patch->inner->tokens));
+                    auto obj_expr = std::make_unique<ObjExpr>();
+                    obj_expr->text_id = g_strings.intern(to_string(patch->inner->tokens));
 
                     // patch range is determined by the patch type and size
                     switch (patch->type) {
@@ -402,16 +402,16 @@ static ObjectModule build_object_module(const Program& prog,
 
                     case PatchType::Unsigned:
                         if (patch->size == 1) {
-                            obj_expr.range = ObjExprRange::ByteUnsigned;
+                            obj_expr->range = ObjExprRange::ByteUnsigned;
                         }
                         else if (patch->size == 2) {
-                            obj_expr.range = ObjExprRange::Word;
+                            obj_expr->range = ObjExprRange::Word;
                         }
                         else if (patch->size == 3) {
-                            obj_expr.range = ObjExprRange::Ptr24;
+                            obj_expr->range = ObjExprRange::Ptr24;
                         }
                         else if (patch->size == 4) {
-                            obj_expr.range = ObjExprRange::DWord;
+                            obj_expr->range = ObjExprRange::DWord;
                         }
                         else {
                             release_assert(0); // should not happen
@@ -420,16 +420,16 @@ static ObjectModule build_object_module(const Program& prog,
 
                     case PatchType::Signed:
                         if (patch->size == 1) {
-                            obj_expr.range = ObjExprRange::ByteSigned;
+                            obj_expr->range = ObjExprRange::ByteSigned;
                         }
                         else if (patch->size == 2) {
-                            obj_expr.range = ObjExprRange::Word;
+                            obj_expr->range = ObjExprRange::Word;
                         }
                         else if (patch->size == 3) {
-                            obj_expr.range = ObjExprRange::Ptr24;
+                            obj_expr->range = ObjExprRange::Ptr24;
                         }
                         else if (patch->size == 4) {
-                            obj_expr.range = ObjExprRange::DWord;
+                            obj_expr->range = ObjExprRange::DWord;
                         }
                         else {
                             release_assert(0); // should not happen
@@ -438,20 +438,20 @@ static ObjectModule build_object_module(const Program& prog,
 
                     case PatchType::HighByte:
                         release_assert(patch->size == 1);
-                        obj_expr.range = ObjExprRange::HighOffset;
+                        obj_expr->range = ObjExprRange::HighOffset;
                         break;
 
                     case PatchType::BigEndian:
                         release_assert(patch->size == 2);
-                        obj_expr.range = ObjExprRange::WordBE;
+                        obj_expr->range = ObjExprRange::WordBE;
                         break;
 
                     case PatchType::PCrelative:
                         if (patch->size == 1) {
-                            obj_expr.range = ObjExprRange::JrOffset;
+                            obj_expr->range = ObjExprRange::JrOffset;
                         }
                         else if (patch->size == 2) {
-                            obj_expr.range = ObjExprRange::JreOffset;
+                            obj_expr->range = ObjExprRange::JreOffset;
                         }
                         else {
                             release_assert(0); // should not happen
@@ -459,50 +459,50 @@ static ObjectModule build_object_module(const Program& prog,
                         break;
                     }
 
-                    obj_expr.asmpc = stmt->address;
-                    obj_expr.code_pos = static_cast<uint>(obj_sec.bytes.size() + patch->offset);
-                    obj_expr.opcode_size = static_cast<uint>(opc_stmt->bytes.size());
-                    obj_expr.section_name_id = sec->name_id;
-                    obj_expr.target_name_id = 0; // not used for opcode patches
-                    obj_expr.loc = patch->loc;
-                    obj_mod.exprs.push_back(std::move(obj_expr));
+                    obj_expr->asmpc = stmt->address;
+                    obj_expr->code_pos = static_cast<uint>(obj_sec->bytes.size() + patch->offset);
+                    obj_expr->opcode_size = static_cast<uint>(opc_stmt->bytes.size());
+                    obj_expr->section_name_id = sec->name_id;
+                    obj_expr->target_name_id = 0; // not used for opcode patches
+                    obj_expr->loc = patch->loc;
+                    obj_mod->exprs.push_back(std::move(obj_expr));
                 }
-                obj_sec.bytes.insert(obj_sec.bytes.end(),
-                                     opc_stmt->bytes.begin(),
-                                     opc_stmt->bytes.end());
+                obj_sec->bytes.insert(obj_sec->bytes.end(),
+                                      opc_stmt->bytes.begin(),
+                                      opc_stmt->bytes.end());
                 continue;
             }
 
             if (auto org_stmt = dynamic_cast<OrgStmt*>(stmt)) {
-                obj_sec.bytes.insert(obj_sec.bytes.end(),
-                                     org_stmt->bytes.begin(),
-                                     org_stmt->bytes.end());
+                obj_sec->bytes.insert(obj_sec->bytes.end(),
+                                      org_stmt->bytes.begin(),
+                                      org_stmt->bytes.end());
                 continue;
             }
 
             if (auto align_stmt = dynamic_cast<AlignStmt*>(stmt)) {
-                obj_sec.bytes.insert(obj_sec.bytes.end(),
-                                     align_stmt->bytes.begin(),
-                                     align_stmt->bytes.end());
+                obj_sec->bytes.insert(obj_sec->bytes.end(),
+                                      align_stmt->bytes.begin(),
+                                      align_stmt->bytes.end());
                 continue;
             }
 
             if (auto defs_num_stmt = dynamic_cast<DefsNumericStmt*>(stmt)) {
-                obj_sec.bytes.insert(obj_sec.bytes.end(),
-                                     defs_num_stmt->bytes.begin(),
-                                     defs_num_stmt->bytes.end());
+                obj_sec->bytes.insert(obj_sec->bytes.end(),
+                                      defs_num_stmt->bytes.begin(),
+                                      defs_num_stmt->bytes.end());
                 continue;
             }
 
             if (auto defs_str_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
-                obj_sec.bytes.insert(obj_sec.bytes.end(),
-                                     defs_str_stmt->bytes.begin(),
-                                     defs_str_stmt->bytes.end());
+                obj_sec->bytes.insert(obj_sec->bytes.end(),
+                                      defs_str_stmt->bytes.begin(),
+                                      defs_str_stmt->bytes.end());
                 continue;
             }
         }
 
-        obj_mod.sections.push_back(std::move(obj_sec));
+        obj_mod->sections.push_back(std::move(obj_sec));
     }
 
     return obj_mod;
@@ -512,15 +512,16 @@ ObjectLibrary build_object_library(const Program& prog) {
     ObjectLibrary obj_lib;
     for (auto& mod : prog.modules) {
         // convert the module
-        ObjectModule obj_mod = build_object_module(prog, *mod);
-        obj_lib.modules.push_back(std::move(obj_mod));
+        auto obj_mod = build_object_module(prog, *mod);
 
         // get list of public symbols
-        for (auto sym : obj_mod.symbols) {
-            if (sym.scope == ObjSymbolScope::Public) {
-                obj_lib.public_symbols.insert(sym.name_id);
+        for (const auto& sym : obj_mod->symbols) {
+            if (sym->scope == ObjSymbolScope::Public) {
+                obj_lib.public_symbols.insert(sym->name_id);
             }
         }
+
+        obj_lib.modules.push_back(std::move(obj_mod));
     }
 
     return obj_lib;

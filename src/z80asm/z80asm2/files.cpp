@@ -4,7 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "pathnames.h"
+#include "files.h"
 #include "string_utils.h"
 #include <cstdint>
 #include <filesystem>
@@ -402,27 +402,84 @@ std::vector<std::string> expand_wildcards(std::string_view pattern) {
     return results;
 }
 
-bool write_binary_file(const std::filesystem::path& target,
-                       const std::vector<uint8_t>& data) {
-    auto temp = target;
+bool write_binary_file(const std::filesystem::path& path,
+                       const std::vector<uint8_t>& bytes) {
+    auto temp = path;
     temp += ".tmp";
 
-    try {
-        {
-            std::ofstream out(temp, std::ios::binary);
-            out.exceptions(std::ios::failbit | std::ios::badbit);
-
-            out.write(
-                reinterpret_cast<const char*>(data.data()),
-                static_cast<std::streamsize>(data.size()));
-        } // close happens here
-
-        std::filesystem::rename(temp, target);
-        return true;
+    std::ofstream out(temp, std::ios::binary);
+    if (!out) {
+        return false;
     }
-    catch (...) {
+
+    if (!bytes.empty()) {
+        out.write(
+            reinterpret_cast<const char*>(bytes.data()),
+            static_cast<std::streamsize>(bytes.size()));
+
+        if (!out) {
+            out.close();
+
+            std::error_code ec;
+            std::filesystem::remove(temp, ec);
+
+            return false;
+        }
+    }
+
+    out.close();
+
+    if (!out) {
         std::error_code ec;
+        std::filesystem::remove(temp, ec);
+
+        return false;
+    }
+
+    std::error_code ec;
+
+    // On Windows, rename() may fail if the target exists.
+    std::filesystem::remove(path, ec);
+    ec.clear();
+
+    std::filesystem::rename(temp, path, ec);
+
+    if (ec) {
         std::filesystem::remove(temp, ec);
         return false;
     }
+
+    return true;
+}
+
+bool read_binary_file(const std::filesystem::path& path,
+                      std::vector<uint8_t>& bytes) {
+    bytes.clear();
+
+    std::error_code ec;
+    auto size = std::filesystem::file_size(path, ec);
+
+    if (ec) {
+        return false;
+    }
+
+    std::ifstream in(path, std::ios::binary);
+    if (!in) {
+        return false;
+    }
+
+    bytes.resize(size);
+
+    if (size > 0) {
+        in.read(
+            reinterpret_cast<char*>(bytes.data()),
+            static_cast<std::streamsize>(size));
+
+        if (!in) {
+            bytes.clear();
+            return false;
+        }
+    }
+
+    return true;
 }
