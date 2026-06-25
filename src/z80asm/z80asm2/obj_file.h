@@ -11,6 +11,7 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>
+#include <memory>
 #include <set>
 #include <string_view>
 #include <unordered_map>
@@ -105,25 +106,41 @@ struct ObjectModule : public TreeNode {
     CPU cpu_id = CPU::z80;
     bool swap_ix_iy = false;
 
-    std::vector<ObjExpr> exprs;
-    std::vector<ObjSymbol> symbols;
+    std::vector<std::unique_ptr<ObjExpr>> exprs;
+    std::vector<std::unique_ptr<ObjSymbol>> symbols;
     std::vector<StringInterner::Id> externs;
-    std::vector<ObjSection> sections;
+    std::vector<std::unique_ptr<ObjSection>> sections;
+
+    ObjectModule() = default;
+    ObjectModule(const ObjectModule&) = delete;
+    ObjectModule& operator=(const ObjectModule&) = delete;
+    ObjectModule(ObjectModule&&) = default;
+    ObjectModule& operator=(ObjectModule&&) = default;
 
     virtual ~ObjectModule() = default;
     void dump(DumpContext ctx) const override;
+    void clear();
 };
 
 struct ObjectLibrary : public TreeNode {
-    std::vector<ObjectModule> modules;
+    std::vector<std::unique_ptr<ObjectModule>> modules;
     std::set<StringInterner::Id> public_symbols;
+
+    ObjectLibrary() = default;
+    ObjectLibrary(const ObjectLibrary&) = delete;
+    ObjectLibrary& operator=(const ObjectLibrary&) = delete;
+    ObjectLibrary(ObjectLibrary&&) = default;
+    ObjectLibrary& operator=(ObjectLibrary&&) = default;
 
     virtual ~ObjectLibrary() = default;
     void dump(DumpContext ctx) const override;
+    void clear();
 };
 
 bool write_object_library(const ObjectLibrary& obj_lib,
                           std::string_view filename);
+bool read_object_library(ObjectLibrary& obj_lib,
+                         std::string_view filename);
 
 [[noreturn]]
 void dump_obj_lib_and_exit(const ObjectLibrary& obj_lib);

@@ -135,6 +135,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\asm_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\asm_layout.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\asm_symbols.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\files.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\ir.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
@@ -158,7 +159,6 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\options.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\options_dump.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\pathnames.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_directives.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\preproc_dump.cpp" />
@@ -178,6 +178,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\asm_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\asm_layout.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\asm_symbols.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\files.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\ir.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\cpu.h" />
@@ -200,8 +201,8 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\options.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\options_dump.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\parser.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\pathnames.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\preproc.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\release_assert.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\semantic_rewrite.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\file_mgr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\source_loc.h" />
