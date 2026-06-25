@@ -149,6 +149,8 @@ t/90-fuzz/expected/
 
 Linker script
 
+-T memmap.ld
+
 BANK <name>
     BASE <addr>
     SIZE <size>
