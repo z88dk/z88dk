@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <string_view>
@@ -65,3 +66,7 @@ std::vector<std::string> expand_wildcards(std::string_view pattern);
 // atomically write a binary file
 bool write_binary_file(const std::filesystem::path& target,
                        const std::vector<uint8_t>& data);
+
+// read a binary file
+bool read_binary_file(const std::filesystem::path& target,
+                      std::vector<uint8_t>& data);
