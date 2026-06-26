@@ -55,6 +55,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.dump_after_layout << "\n"
             << "dump_after_assembly\t"
             << g_args.options.dump_after_assembly << "\n"
+            << "dump_after_link_collection\t"
+            << g_args.options.dump_after_link_collection << "\n"
             << "m4_options\t"
             << g_args.options.m4_options << "\n"
             << "perl_options\t"
@@ -66,6 +68,14 @@ void dump_after_cmdline_and_exit() {
 
     for (auto& fullpath : g_args.options.include_paths) {
         std::cout << "include_path\t" << fullpath << "\n";
+    }
+
+    for (auto& fullpath : g_args.options.library_paths) {
+        std::cout << "library_path\t" << fullpath << "\n";
+    }
+
+    for (auto& fullpath : g_args.options.libs) {
+        std::cout << "library\t" << fullpath << "\n";
     }
 
     // collect global_defs and sort by name

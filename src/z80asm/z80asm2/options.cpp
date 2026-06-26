@@ -54,7 +54,11 @@ static constexpr UsageGroup usage_layout[] = {
     },
     {
         "File and Directory Options",
-        { OptionType::INCLUDE, OptionType::OUTPUT }
+        {
+            OptionType::INCLUDE,
+            OptionType::LIBRARY_PATH,
+            OptionType::OUTPUT,
+        }
     },
     {
         "External Preprocessor Options",
@@ -80,6 +84,13 @@ static constexpr UsageGroup usage_layout[] = {
         }
     },
     {
+        "Linker Options",
+        {
+            OptionType::LIBRARY,
+            OptionType::DO_LINK,
+        }
+    },
+    {
         "Diagnostic Options",
         {
             OptionType::DUMP_AFTER_CMDLINE,
@@ -93,6 +104,7 @@ static constexpr UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_SYMBOL_COLLECTION,
             OptionType::DUMP_AFTER_LAYOUT,
             OptionType::DUMP_AFTER_ASSEMBLY,
+            OptionType::DUMP_AFTER_LINK_COLLECTION,
         }
     }
 };
@@ -359,6 +371,22 @@ void Args::parse_arg(std::string_view arg,
             options.include_paths.push_back(normalize_path(opt_arg));
             return;
 
+        case OptionType::LIBRARY_PATH:
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
+                return;
+            }
+            options.library_paths.push_back(normalize_path(opt_arg));
+            return;
+
+        case OptionType::LIBRARY:
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
+                return;
+            }
+            options.libs.push_back(normalize_path(opt_arg));
+            return;
+
         case OptionType::OUTPUT:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
@@ -454,6 +482,10 @@ void Args::parse_arg(std::string_view arg,
             parse_filler_byte(arg, spec->name, loc);
             return;
 
+        case OptionType::DO_LINK:
+            options.do_link = true;
+            return;
+
         case OptionType::DUMP_AFTER_CMDLINE:
             options.dump_after_cmdline = true;
             return;
@@ -496,6 +528,10 @@ void Args::parse_arg(std::string_view arg,
 
         case OptionType::DUMP_AFTER_ASSEMBLY:
             options.dump_after_assembly = true;
+            return;
+
+        case OptionType::DUMP_AFTER_LINK_COLLECTION:
+            options.dump_after_link_collection = true;
             return;
 
         default:
