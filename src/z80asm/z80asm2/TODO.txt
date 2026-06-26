@@ -1,32 +1,25 @@
 ## Pending issues
 - Add BASIC { ... } to assemble BASIC tokens for zx81, zx
 - z80nm must show list of public symbols defined in library
+- when generating object files sort the symbols by name so that output is stable
+- deprecate z80objcopy
+- add import/export to ASCII to z80nm
+- add version 19: public symbol index
 
-## Assembler Pipeline
-- [x] Token stream normalization (lowercasing, whitespace, comment removal)
-- [x] Line-continuation joining (backslash at end of line)
-- [x] Macro expansion (object-like, function-like, variadic, recursive)
-- [x] Conditional-assembly evaluation (#if/#elif/#else/#endif)
-- [x] Include resolution and file-stack management
-- [x] Preprocessor directives handling
-- [x] High-Level-Assembly constructs
-- [x] Synthetic-opcode expansion
-- [x] Output of preprocessed text with -E option
-- [x] Output of dependencies file with -MD option
-- [x] AST construction for instructions and expressions
-- [x] Module and segment-switching annotation
-- [x] Resolution of local labels
-- [x] Collection of symbols into symbol tables
-- [x] Resolution of symbols used in expressions
-- [x] Resolution of GLOBAL, detecion of undefined symbols
-- [x] AST validation and semantic checks
-- [x] Size computation and JR promotion (iterative until stable)
-- [x] Freeze of segment offsets
-- [x] Fixup classification (absolute / relocatable / external)
-- [x] Relocation record generation
-- [x] Expression evaluation and patching or postponing to linker
-- [ ] Final byte emission with relocation placeholders
-- [ ] Emission of Object file format
+ASCII format structure
+Top-level:
+A sequence of .module blocks
+
+No indentation required
+
+No nesting
+
+No ambiguity
+
+Inside each module:
+.cpu, .swap_ix_iy, .symbol, .extern, .section, .expr, etc.
+
+.bytes / .endbytes for large data
 
 ## Linker Pipeline
 - [ ] Loading of input modules
@@ -198,3 +191,41 @@ FARCALLS USING __bank_call
 Then the linker generates calls to __bank_call, passing the destination bank and address according to a documented ABI.
 That keeps the linker portable across virtually every Z80 banking scheme while still providing all the value of automatic trampoline generation. In my view, that's the cleanest separation of responsibilities.
 
+
+
+Mark and sweep algorithm:
+
+selected_modules = input modules
+unresolved = externs from input modules
+
+repeat:
+    added_any = false
+
+    for each library in input order:
+        for each module in library order:
+            if module not selected:
+                if module defines any symbol in unresolved:
+                    select(module)
+                    unresolved += module.externs
+                    added_any = true
+
+    remove from unresolved all symbols now defined in selected_modules
+
+until added_any == false
+
+if unresolved not empty:
+    error("Undefined symbols: ...")
+
+std::vector<ObjectModule*> final_modules;
+
+for (auto& lib : libraries_in_input_order) {
+    for (auto& mod : lib->modules) {
+        if (selected_modules.contains(mod.get())) {
+            final_modules.push_back(mod.get());
+        }
+    }
+}
+
+for (auto& mod : input_modules_in_order) {
+    final_modules.push_back(mod);
+}

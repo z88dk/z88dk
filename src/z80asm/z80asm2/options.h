@@ -45,6 +45,7 @@ struct Options {
     bool date_stamp = false;
     uint8_t filler_byte = DEFAULT_FILLER_BYTE;
     FloatFormat float_format = DEFAULT_FLOAT_FORMAT;
+    bool do_link = false;
     bool dump_after_cmdline = false;
     bool dump_after_tokenization = false;
     bool dump_after_directives = false;
@@ -56,11 +57,14 @@ struct Options {
     bool dump_after_symbol_collection = false;
     bool dump_after_layout = false;
     bool dump_after_assembly = false;
+    bool dump_after_link_collection = false;
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;
     std::string output_dir;
     std::vector<std::string> include_paths;
+    std::vector<std::string> library_paths;
+    std::vector<std::string> libs;
     ConstSymbols global_defs;
 };
 

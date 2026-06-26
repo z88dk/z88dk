@@ -10,6 +10,8 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <string>
+#include <string_view>
 
 // On Linux, lexically_normal() does not regard backslashes as path separators
 static std::string nomalize_slashes(std::string_view path) {
@@ -32,6 +34,10 @@ bool is_asm_filename(std::string_view filename) {
 
 bool is_o_filename(std::string_view filename) {
     return ends_with(filename, o_extension);
+}
+
+bool is_lib_filename(std::string_view filename) {
+    return ends_with(filename, lib_extension);
 }
 
 std::string get_asm_filename(std::string_view filename) {

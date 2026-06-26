@@ -9,6 +9,7 @@ Help Options:
 
 File and Directory Options:
   -I=DIR        Add directory to search for source/include files
+  -L=DIR        Add directory to search for libraries
   -O=DIR        Set directory to store output files
 
 External Preprocessor Options:
@@ -28,6 +29,10 @@ Assembly Options:
   -m=CPU        Set target CPU (e.g. z80, z180)
   -d            Assemble only if newer
   -f=BYTE       Set filler byte for uninitialized data (default: 0)
+
+Linker Options:
+  -l=LIB        Link with library
+  -b            Link object files into executable
 
 Diagnostic Options:
   -dump-after-cmdline
@@ -52,3 +57,5 @@ Diagnostic Options:
                 Dump the AST after layout processing and exit
   -dump-after-assembly
                 Dump the object library after assembly and exit
+  -dump-after-link-collection
+                Dump the modules after link collection and exit
