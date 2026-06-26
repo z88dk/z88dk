@@ -15,6 +15,7 @@
 // file extensions
 static constexpr std::string_view asm_extension = ".asm";
 static constexpr std::string_view o_extension = ".o";
+static constexpr std::string_view lib_extension = ".lib";
 static constexpr std::string_view d_extension = ".d";
 static constexpr std::string_view i_extension = ".i";
 static constexpr std::string_view m4_extension = ".m4";
@@ -23,6 +24,7 @@ static constexpr std::string_view cpp_extension = ".cpp";
 
 bool is_asm_filename(std::string_view filename);
 bool is_o_filename(std::string_view filename);
+bool is_lib_filename(std::string_view filename);
 
 std::string get_asm_filename(std::string_view filename);
 std::string get_o_filename(std::string_view filename,

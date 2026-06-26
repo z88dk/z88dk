@@ -5,28 +5,35 @@
 //-----------------------------------------------------------------------------
 
 // Help options
-X(HELP,     "-h",      false, "", "Show this screen")
-X(VERBOSE,  "-v",      false, "", "Verbose output")
+X(HELP,     "-h",       false, "", "Show this screen")
+X(VERBOSE,  "-v",       false, "", "Verbose output")
 
 // File and directory options
-X(INCLUDE,  "-I",      true, "=DIR", "Add directory to search for source/include files")
-X(OUTPUT,   "-O",      true, "=DIR", "Set directory to store output files")
+X(INCLUDE,  "-I",       true, "=DIR", "Add directory to search for source/include files")
+X(OUTPUT,   "-O",       true, "=DIR", "Set directory to store output files")
+
 // External preprocessor options
-X(CPP,      "-cpp",    true, "=OPTS", "Pass options to cpp")
-X(M4,       "-m4",     true, "=OPTS", "Pass options to m4")
-X(PERL,     "-perl",   true, "=OPTS", "Pass options to perl")
+X(CPP,      "-cpp",     true, "=OPTS", "Pass options to cpp")
+X(M4,       "-m4",      true, "=OPTS", "Pass options to m4")
+X(PERL,     "-perl",    true, "=OPTS", "Pass options to perl")
+
 // Preprocessor options
-X(IXIY,     "-IXIY",   false, "", "Swap IX and IY registers")
-X(UCASE,    "-ucase",  false, "", "Uppercase symbols")
+X(IXIY,     "-IXIY",    false, "", "Swap IX and IY registers")
+X(UCASE,    "-ucase",   false, "", "Uppercase symbols")
 X(FLOAT_FORMAT, "-float", true, "=FMT", "Set float format (e.g. genmath)")
-X(DEFINE,   "-D",      true, "=NAME[=EXPR]", "Define symbol")
-X(PREPROC, "-E", false, "", "Preprocess only")
+X(DEFINE,   "-D",       true, "=NAME[=EXPR]", "Define symbol")
+X(PREPROC,  "-E",       false, "", "Preprocess only")
 X(GENERATE_DEPENDENCIES, "-MD", false, "", "Generate dependencies file")
 
 // Assembly options
-X(CPU,      "-m",      true, "=CPU", "Set target CPU (e.g. z80, z180)")
-X(DATESTAMP,"-d",      false, "", "Assemble only if newer")
-X(FILLER_BYTE, "-f",   true, "=BYTE", "Set filler byte for uninitialized data (default: 0)")
+X(CPU,      "-m",       true, "=CPU", "Set target CPU (e.g. z80, z180)")
+X(DATESTAMP,"-d",       false, "", "Assemble only if newer")
+X(FILLER_BYTE, "-f",    true, "=BYTE", "Set filler byte for uninitialized data (default: 0)")
+
+// Link options
+X(LIBRARY,  "-l",       true, "=LIB", "Link with library")
+X(LIBRARY_PATH, "-L",   true, "=DIR", "Add directory to search for libraries")
+X(DO_LINK,  "-b",       false, "", "Link object files into executable")
 
 // Diagnostic options
 X(DUMP_AFTER_CMDLINE, "-dump-after-cmdline", false, "", "Dump the command line arguments and exit")
@@ -40,5 +47,6 @@ X(DUMP_AFTER_PARSE, "-dump-after-parse", false, "", "Dump the AST after parsing 
 X(DUMP_AFTER_SYMBOL_COLLECTION, "-dump-after-symbol-collection", false, "", "Dump the AST after symbol collection and exit")
 X(DUMP_AFTER_LAYOUT, "-dump-after-layout", false, "", "Dump the AST after layout processing and exit")
 X(DUMP_AFTER_ASSEMBLY, "-dump-after-assembly", false, "", "Dump the object library after assembly and exit")
+X(DUMP_AFTER_LINK_COLLECTION, "-dump-after-link-collection", false, "", "Dump the modules after link collection and exit")
 
 #undef X

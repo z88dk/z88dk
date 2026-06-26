@@ -33,9 +33,9 @@ static constexpr uint MAX_PASSES = 100;
 static bool split_modules_sections(Program& prog);
 static ObjectLibrary build_object_library(const Program& prog);
 
-void assemble_files(std::vector<std::string>& filenames,
+void assemble_files(const std::vector<std::string>& filenames,
                     std::string_view output_dir) {
-    for (const std::string& filename : filenames) {
+    for (auto& filename : filenames) {
         if (is_o_filename(filename)) {
             if (g_args.options.verbose) {
                 std::cout << "Skipping object file " << filename

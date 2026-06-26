@@ -13,18 +13,6 @@ TODO List
 - Linking
 - List file
 - finish the split between front-end and back-end;
-
-
-Update z80nm to support the new object file format
-
-Current z80asm has object format v18. The new z80asm under development will 
-update to v19 to add:
-
-- Relocations of symbol+addend to avoid parsing expressions during linking
-
-- Symbol index per cpu/swap-ixiy configuration for the library to
-  parse only the needed modules instead of whole library
-
-Added a tool z88dk-z80objcopy.pl to read/write any version of object file
-and to export/import to an ASCII dump that can be used to change object 
-files.
+- z80asm - support TASM cascading constant evaluation (RomWBW) (Issue #2759)
+  Support TASM's SET directive: create a new instance of a variable with 
+  the same name, compute based on the previous value
