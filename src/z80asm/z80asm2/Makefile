@@ -23,6 +23,8 @@ endif
 RE2C ?= re2c
 RE2CFLAGS ?= -W --no-debug-info --no-generation-date --tags
 
+INSTALL ?= install
+
 OBJ_DIR = obj
 
 SRCS := $(wildcard *.cpp)
@@ -103,5 +105,8 @@ CLEAN_FILES = \
 clean:
 	$(RM) $(PROJ) $(PROJ)$(EXE) $(CLEAN_FILES) $(TIDY_STAMP) $(OBJS) $(DEPENDS)
 	$(RM) -r $(OBJ_DIR)
+
+install:  $(PROJ)$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)
