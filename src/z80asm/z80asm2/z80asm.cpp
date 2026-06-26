@@ -7,6 +7,7 @@
 #include "asm_driver.h"
 #include "diag.h"
 #include "environment.h"
+#include "linker.h"
 #include "options.h"
 #include "options_dump.h"
 #include "source_loc.h"
@@ -91,8 +92,16 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    // execute requested actions
+    // assemble each input file
     assemble_files(g_args.input_files, g_args.options.output_dir);
+
+    // link if requested
+    if (g_args.options.do_link) {
+        link_files(g_args.input_files,
+                   g_args.options.libs,
+                   g_args.options.library_paths,
+                   g_args.options.output_dir);
+    }
 
     if (g_args.options.verbose) {
         auto errors = g_diag.get_error_count();
