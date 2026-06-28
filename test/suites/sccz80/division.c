@@ -56,8 +56,8 @@ void test_long_division()
 void test_long_mod()
 {
      int32_t val = -1;
-     Assert( val % 2           == 1, "val % 2");
-     Assert( val % 4           == 1, "val % 4");
+     Assert( val % 2           == -1, "val % 2");   /* C99: remainder takes the dividend's sign */
+     Assert( val % 4           == -1, "val % 4");
 }
 
 void test_signed_division()
@@ -77,9 +77,9 @@ void test_signed_mod()
 {
     int16_t val = -1;
 
-    Assert( val % 2  == 1, "-1 % 2");
+    Assert( val % 2  == -1, "-1 % 2");      /* C99: remainder takes the dividend's sign */
     Assert( val % -4  == -1, "-1 % -4");
-    Assert( val % 8  == 1, "-1 % 8");
+    Assert( val % 8  == -1, "-1 % 8");
     Assert( val % -16  == -1, "-1 % -16");
     Assert( -val % -32  == 1, " 1 % -32");
     Assert( -val % 64  == 1, " 1 % 64");

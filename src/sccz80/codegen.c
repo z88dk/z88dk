@@ -2946,6 +2946,24 @@ void zmod_const(LVALUE *lval, int64_t value64)
     else
         templval.ltype = type_int;
 
+    /* The x & (2^k-1) bitmask shortcut below is only valid for UNSIGNED
+       modulo; for signed x it yields |x| & mask, not the C99 sign-of-dividend
+       result (e.g. -1 % 2 would give 1, not -1). Route signed `%` through the
+       sign-correct l_div / l_long_mod helper instead. (value 1 -> 0 holds
+       either way, so leave it to the switch.) */
+    if ( !ulvalue(lval) && value != 1 ) {
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_ACCUM32 ) {
+            lpush();
+            vlongconst(value);
+            zmod(lval);
+        } else {
+            const2(value & 0xffff);
+            swap();
+            zmod(&templval);
+        }
+        return;
+    }
+
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_ACCUM32 ) {
         if ( value <= 256 && value > 0 ) {
             // Fall through to the logical and operation
