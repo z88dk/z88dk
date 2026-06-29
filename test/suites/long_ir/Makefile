@@ -6,7 +6,11 @@ include ../make.config
 # also already at the MSX 64K ceiling).
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin wr.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
+# fnptr-dispatch thunks (l_jpix/l_jpiy), linked explicitly until they live in
+# the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
+JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
+
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin sdcccall.bin sdcccall_kc160.bin wr.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -45,6 +49,16 @@ irgaps_8080.bin: $(SOURCES) irgaps.c
 irgaps_8085.bin: $(SOURCES) irgaps.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# __sdcccall(1) calling convention — z80 (z180/z80n share the ABI), and
+# kc160 (no SDCC port; zsdcc builds kc160 in z80 mode, so same ABI).
+sdcccall.bin: $(SOURCES) sdcccall.c $(JPTH)
+	$(compile)
+	$(runtest)
+
+sdcccall_kc160.bin: $(SOURCES) sdcccall.c $(JPTH)
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=kc160 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mkc160 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 umaxd.bin: $(SOURCES) umaxd.c
 	$(compile)
@@ -110,9 +124,6 @@ aggregate_init.bin: $(SOURCES) aggregate_init.c
 	$(compile)
 	$(runtest)
 
-# fnptr-fastcall dispatch thunks (l_jpix/l_jpiy) linked explicitly until the lib
-# carries them; drop the .asm prereqs once they are in the standard lib.
-JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 fnptr_fastcall.bin: $(SOURCES) fnptr_fastcall.c $(JPTH)
 	$(compile)
 	$(runtest)

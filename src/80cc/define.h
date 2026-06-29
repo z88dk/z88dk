@@ -118,6 +118,7 @@ struct type_s {
         uint16_t shortcall_value;
         uint16_t hlcall_module;
         uint16_t hlcall_addr;
+        int      sdcccall;       // __sdcccall(N) ABI version (0 = unset/legacy, 1 = register conv)
     } funcattrs;
 
     UT_hash_handle hh;
@@ -165,6 +166,7 @@ enum symbol_flags {
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
         NONBANKED = 0x100000,       /* Symbol is in HOME section */
+        SDCCCALL1 = 0x200000,    /* __sdcccall(1): SDCC register calling convention */
 };
 
 

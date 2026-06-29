@@ -398,7 +398,8 @@ static int param_caller_off(const Func *f, int vreg_id)
         if (!(v->flags & IR_VREG_PARAM)) continue;
         if (v->id == fc) continue;   /* fastcall arg: in a slot, not caller-pushed */
         int width = (v->width > 0) ? v->width : 2;
-        int caller_w = (width == 1) ? ((f->flags & SDCCDECL) ? 1 : 2) : width;
+        int caller_w = (width == 1)
+                     ? ((f->flags & (SDCCDECL | SDCCCALL1)) ? 1 : 2) : width;
         /* For byte params, the caller's slot is the low byte of the
            pushed int — same sp offset. */
         if (rl_layout) {
@@ -6907,6 +6908,60 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* ---- __sdcccall(1) register assignment (z80/z180/z80n, widths 1-2) ----
+   Mirrors SDCC's aopArg / aopRet (src/sdcc-build/src/z80/gen.c) for the
+   supported subset. 4-byte (HLDE) args/returns are handled/rejected
+   elsewhere. */
+typedef enum { SC1_STACK = 0, SC1_A, SC1_HL, SC1_L, SC1_DE, SC1_DEHL } Sc1Reg;
+
+/* Register for argument `idx` (1-based, byte-width `w`), given the register
+   the 1st argument got (`first`; SC1_STACK if it wasn't register-passed).
+   SC1_STACK => the argument is pushed on the stack. */
+static Sc1Reg sdcccall1_arg_reg(int idx, int w, Sc1Reg first)
+{
+    if (idx == 1) {
+        if (w == 1) return SC1_A;
+        if (w == 2) return SC1_HL;
+        if (w == 4) return SC1_DEHL;   /* HLDE: DE=low, HL=high (a 4-byte 1st
+                                          arg uses both pairs — no register 2nd) */
+        return SC1_STACK;
+    }
+    if (idx == 2) {
+        if (first == SC1_A && w == 1) return SC1_L;
+        if (first == SC1_A && w == 2) return SC1_DE;
+        if (first == SC1_HL && w == 2) return SC1_DE;
+        return SC1_STACK;
+    }
+    return SC1_STACK;
+}
+
+/* Return register for a __sdcccall(1) function returning `w` bytes:
+   1 byte -> A, 2 -> DE, 4 -> HLDE (DE=low, HL=high). SC1_STACK => out of subset. */
+static Sc1Reg sdcccall1_ret_reg(int w)
+{
+    if (w == 1) return SC1_A;
+    if (w == 2) return SC1_DE;
+    if (w == 4) return SC1_DEHL;
+    return SC1_STACK;
+}
+
+/* Read a stacked-arg byte into A during the push loop. fp mode: one
+   `ld a,(ix+d)`, no sp adjustment or HL clobber. sp mode: the sp-relative
+   dance (sp_adj = bytes pushed so far + the bc-save). */
+static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
+{
+    if (fp_active(f)) {
+        int ixoff = slot_ix_off(f, vreg);
+        if (fp_offset_fits(ixoff)) {
+            emit(out, "ld\ta,(%s%+d)", frame_reg(), ixoff);
+            return;
+        }
+    }
+    emit(out, "ld\thl,%d", slot_off(f, vreg) + sp_adj + cur_sp_adjust);
+    emit(out, "add\thl,sp");
+    emit(out, "ld\ta,(hl)");
+}
+
 static int gen_call(FILE *out, Func *f, const Op *op)
 {
     CallInfo *ci = op->call;
@@ -6924,6 +6979,44 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
 
     int pre = (ci->pre_pushed > 0);
+
+    /* __sdcccall(1) register convention (z80/z180/z80n): 1st arg A/HL/HLDE,
+       2nd DE (when eligible), the rest stacked (STDC R→L, pushed below).
+       `sc1_n_reg` = count of register-passed args. Reject the deferred
+       shapes (indirect, A,L two-char 2nd, 1-byte/wide stacked args, long
+       long, odd-width return). */
+    int sc1 = (ci->flags & SDCCCALL1) != 0;
+    Sc1Reg sc1_r1 = SC1_STACK, sc1_r2 = SC1_STACK;
+    int sc1_n_reg = 0;
+    if (sc1) {
+        int w0 = ci->n_args >= 1 ? f->vregs[ci->args[0]].width : 0;
+        int w1 = ci->n_args >= 2 ? f->vregs[ci->args[1]].width : 0;
+        if (ci->n_args >= 1) sc1_r1 = sdcccall1_arg_reg(1, w0, SC1_STACK);
+        if (ci->n_args >= 2) sc1_r2 = sdcccall1_arg_reg(2, w1, sc1_r1);
+        sc1_n_reg = (sc1_r1 == SC1_STACK) ? 0
+                  : (sc1_r1 == SC1_DEHL)  ? 1
+                  : (sc1_r2 == SC1_DE || sc1_r2 == SC1_L) ? 2 : 1;
+        int ret_w = ci->ret_vreg >= 0 ? f->vregs[ci->ret_vreg].width : 0;
+        /* Indirect (fnptr) sc1 calls are dispatched via the fc_idx/fc_ret
+           machinery below — no longer rejected here. */
+        int supported =
+               (ci->n_args < 1 || sc1_r1 == SC1_A || sc1_r1 == SC1_HL
+                               || sc1_r1 == SC1_DEHL)
+            && !ci->ret_longlong
+            && (ret_w <= 2 || ret_w == 4);
+        for (int k = sc1_n_reg; k < ci->n_args && supported; k++) {
+            int w = f->vregs[ci->args[k]].width;
+            if (w != 1 && w != 2 && w != 4) supported = 0;  /* stacked: char/int/long */
+        }
+        if (!supported) {
+            ir_lower_loc();
+            fprintf(stderr, "ir_lower: __sdcccall(1) call shape not yet supported "
+                    "(1st char/int/long, 2nd int->DE, extra args stacked as "
+                    "int/long; 1-2-4 byte return)\n");
+            ir_lower_src();
+            return -1;
+        }
+    }
 
     /* PR_BC across calls: callees clobber BC, so save it if the
        function has any PR_BC vreg. Conservative — saved
@@ -6958,9 +7051,14 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        the last arg's load is emitted further down. */
     int pushed_bytes = 0;
     int is_fastcall = (ci->abi == IR_ABI_FASTCALL);
-    int n_to_push   = is_fastcall ? (ci->n_args - 1) : ci->n_args;
-    int push_step = (ci->abi == IR_ABI_STDC) ? -1 : 1;
-    int start    = (ci->abi == IR_ABI_STDC) ? (n_to_push - 1) : 0;
+    int n_to_push   = is_fastcall ? (ci->n_args - 1)
+                    : sc1          ? (ci->n_args - sc1_n_reg)  /* stacked remainder */
+                    : ci->n_args;
+    /* sc1 stacked args use STDC order (R→L) regardless of the cleanup-driven
+       ci->abi; push from the rightmost down to the first stacked index. */
+    int push_step = (ci->abi == IR_ABI_STDC || sc1) ? -1 : 1;
+    int start    = sc1 ? (ci->n_args - 1)
+                 : (ci->abi == IR_ABI_STDC) ? (n_to_push - 1) : 0;
     if (pre) {
         /* Args already on the stack via IR_PUSH_ARG ops (which bumped
            cur_sp_adjust). Just tally the bytes for the variadic count
@@ -6996,14 +7094,28 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit(out, "push\tde");
             emit(out, "push\thl");
             pushed_bytes += 4;
-        } else if (width == 1 && (ci->flags & SDCCDECL)) {
-            /* __z88dk_sdccdecl char arg: push ONE byte. Read the byte from
-               its slot (offset adj covers prior pushes), then `push af;
-               inc sp` leaves A (the char) at sp+0 and reclaims the F byte
-               — no BC clobber (unlike sccz80's `ld b,l; push bc; inc sp`). */
-            emit(out, "ld\thl,%d", adj);
-            emit(out, "add\thl,sp");
-            emit(out, "ld\ta,(hl)");
+        } else if (width == 1 && push_step == -1
+                   && (ci->flags & (SDCCDECL | SDCCCALL1))
+                   && k + 1 < n_to_push
+                   && f->vregs[ci->args[start + (k + 1) * push_step]].width == 1) {
+            /* Two adjacent stacked chars → one `push de` (matches SDCC
+               sc1/sdccdecl, which push 1-byte chars R→L): higher-index char →
+               D, lower → E, so the byte layout matches two 1-byte pushes at
+               half the cost. push_step==-1 keeps that D/E mapping valid. */
+            int j   = start + (k + 1) * push_step;
+            int sda = pushed_bytes + sp_adj_extra;
+            push_arg_byte_to_a(out, f, ci->args[i], sda); /* current i (higher) */
+            emit(out, "ld\td,a");
+            push_arg_byte_to_a(out, f, ci->args[j], sda); /* next (lower) */
+            emit(out, "ld\te,a");
+            emit(out, "push\tde");
+            pushed_bytes += 2;
+            invalidate_hl_cache();   /* sp path clobbered HL; both clobber DE */
+            k++;   /* the paired char is consumed here */
+        } else if (width == 1 && (ci->flags & (SDCCDECL | SDCCCALL1))) {
+            /* sc1/sdccdecl char arg: push ONE byte. `push af; inc sp` leaves
+               the char (A) at sp+0 and reclaims F — no BC clobber. */
+            push_arg_byte_to_a(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
             emit(out, "push\taf");
             emit(out, "inc\tsp");
             pushed_bytes += 1;
@@ -7028,25 +7140,38 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         }
     }
 
-    /* Fastcall through a function pointer: the arg must sit in HL/DEHL at
-       entry, so the fnptr can't also go via HL (l_jphl). Load it into the
-       spare index register (the one NOT used as the frame pointer — same
-       choice as idx2) BEFORE the arg lands in HL, then dispatch via
-       l_jpix/l_jpiy. (808x/gbz80 have no index reg and were deferred in
-       ir_build.) */
-    int fc_pr = (is_indirect && is_fastcall) ? ir_idx2_reg() : IR_PR_NONE;
+    /* Fastcall and __sdcccall(1) indirect calls need the fnptr OFF HL (the
+       args ride HL/DEHL resp. A/HL/DE): load it into a spare index reg (ix/iy,
+       not the frame pointer) when free, else push it and dispatch via the
+       pushed-retaddr `ret` fallback below. */
+    int idx_dispatch = is_indirect && (is_fastcall || sc1) && !ci->far_fnptr;
+    int fc_pr = idx_dispatch ? ir_idx2_reg() : IR_PR_NONE;
     const char *fc_idx = (fc_pr == IR_PR_IX) ? "ix"
                        : (fc_pr == IR_PR_IY) ? "iy" : NULL;
     /* No free index reg (idx2 off, target reserves one, or 808x/gbz80): the
        fnptr can't sit in ix/iy, so push it and dispatch via pushed-retaddr +
        `ret` (the arg still rides HL/DEHL/acc). */
-    int fc_ret = (is_indirect && is_fastcall && !fc_idx);
+    int fc_ret = (idx_dispatch && !fc_idx);
     int fnptr_pushed = 0;
+    int sc1_fcret_lbl = -1;
     if (fc_idx) {
         load_to_hl_adj(out, f, ci->fnptr_vreg,
                        pre ? 0 : pushed_bytes + sp_adj_extra);
         emit(out, "push\thl");
         emit(out, "pop\t%s", fc_idx);   /* fnptr → ix/iy (HL freed for the arg) */
+        invalidate_hl_cache();
+    } else if (fc_ret && sc1) {
+        /* The fastcall `pop af` fnptr shuttle would clobber A (an sc1 char
+           arg), so sc1 diverges: HL is still free here (before the args
+           load), so push [retlabel][fnptr] now and `ret` at dispatch — the
+           callee's ret lands on retlabel. fnptr_pushed shifts sc1_adj below. */
+        sc1_fcret_lbl = fc_ret_label_counter++;
+        load_to_hl_adj(out, f, ci->fnptr_vreg,
+                       pre ? 0 : pushed_bytes + sp_adj_extra);
+        emit(out, "ld\tbc,L_f%d_fcret_%d", func_emit_idx, sc1_fcret_lbl);
+        emit(out, "push\tbc");          /* return address (below the fnptr) */
+        emit(out, "push\thl");          /* fnptr on TOS — `ret` jumps to it */
+        fnptr_pushed = 4;
         invalidate_hl_cache();
     } else if (fc_ret) {
         load_to_hl_adj(out, f, ci->fnptr_vreg,
@@ -7079,6 +7204,41 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             load_to_dehl_adj(out, f, ci->args[last], adj);
         } else {
             load_to_hl_adj(out, f, ci->args[last], adj);
+        }
+    }
+
+    /* __sdcccall(1): place the register args. Load the 2nd arg (DE) first,
+       then the 1st (A/HL) — loading HL/A doesn't disturb DE. The slot loads
+       must clear the stacked-arg pushes (pushed_bytes), the bc-save, AND any
+       fnptr+retlabel pushed for the indirect `ret` dispatch (fnptr_pushed). */
+    if (sc1) {
+        int sc1_adj = pushed_bytes + sp_adj_extra + fnptr_pushed;
+        if (sc1_r1 == SC1_DEHL) {         /* 4-byte sole arg -> HLDE */
+            load_to_dehl_adj(out, f, ci->args[0], sc1_adj);  /* native HL=lo,DE=hi */
+            emit(out, "ex\tde,hl");       /* -> sc1: DE=low, HL=high */
+            invalidate_hl_cache();
+            invalidate_de_cache();
+        } else if (sc1_r2 == SC1_L) {     /* two chars: 1st -> A, 2nd -> L */
+            /* Both byte loads use A as scratch, so stage the 2nd in C: load
+               2nd -> C, then 1st -> A, then L = C. (C is free — the call
+               clobbers BC and a PR_BC tenant is saved by bc_saved.) */
+            load_to_hl_adj(out, f, ci->args[1], sc1_adj);  /* L = 2nd char */
+            emit(out, "ld\tc,l");                          /* C = 2nd char */
+            load_to_hl_adj(out, f, ci->args[0], sc1_adj);  /* L = 1st char */
+            emit(out, "ld\ta,l");                          /* A = 1st char */
+            emit(out, "ld\tl,c");                          /* L = 2nd char */
+            invalidate_hl_cache();
+        } else {
+            if (sc1_r2 == SC1_DE) {       /* 2nd arg -> DE (via HL + ex) */
+                load_to_hl_adj(out, f, ci->args[1], sc1_adj);
+                emit(out, "ex\tde,hl");
+                invalidate_hl_cache();    /* HL now holds junk (was arg1) */
+            }
+            if (ci->n_args >= 1) {
+                load_to_hl_adj(out, f, ci->args[0], sc1_adj);
+                if (sc1_r1 == SC1_A)
+                    emit(out, "ld\ta,l"); /* 1st char arg -> A */
+            }
         }
     }
 
@@ -7118,9 +7278,15 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         else               emit(out, "ld\ta,%d", argwords);
         emit(out, "call\tl_farcall");
     } else if (is_indirect && fc_idx) {
-        /* Fastcall fnptr: the fnptr is already in ix/iy (loaded above, before
-           the arg took HL/DEHL); dispatch through the jp(ix)/jp(iy) thunk. */
+        /* Fastcall / sc1 fnptr: the fnptr is already in ix/iy (loaded above,
+           before the args took A/HL/DE); dispatch via the jp(ix)/jp(iy) thunk
+           (l_jpix/l_jpiy are pure `jp (ix)`, no A/HL/DE clobber). */
         emit(out, "call\tl_jp%s", fc_idx);
+    } else if (is_indirect && fc_ret && sc1) {
+        /* [retlabel][fnptr] already pushed above (before the args); just
+           `ret` into the fnptr — its own `ret` returns to our label. */
+        emit(out, "ret");
+        fprintf(out, "L_f%d_fcret_%d:\n", func_emit_idx, sc1_fcret_lbl);
     } else if (is_indirect && fc_ret) {
         /* No spare index reg (idx2 off / target reserves one / 808x / gbz80):
            the fnptr is on TOS and the arg rides HL/DEHL/acc. Reclaim the fnptr
@@ -7252,7 +7418,22 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        vreg would drop the high half. */
     if (ci->ret_vreg >= 0) {
         int ret_w = f->vregs[ci->ret_vreg].width;
-        if (ret_w > 4) {
+        if (sc1) {
+            /* __sdcccall(1) return: 1B in A, 2B in DE, 4B in HLDE (DE=low,
+               HL=high — `ex de,hl` converts to native DEHL). */
+            if (ret_w == 1) {
+                if (cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+                    cache_a(ci->ret_vreg);
+                else
+                    store_a_byte(out, f, ci->ret_vreg);
+            } else if (ret_w == 4) {
+                emit(out, "ex\tde,hl");    /* sc1 HLDE -> native DEHL */
+                store_dehl_cached(out, f, ci->ret_vreg);
+            } else {                       /* width 2 -> DE */
+                emit(out, "ex\tde,hl");    /* HL = result; store_hl writes it */
+                store_hl(out, f, ci->ret_vreg);
+            }
+        } else if (ret_w > 4) {
             /* Wide return: the callee left it in the accumulator (FA for
                double, __i64_acc for long long); store it to the ret slot. */
             emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
@@ -8859,6 +9040,11 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            arg, so the callee must strip it too — else the caller's stack
            is left 2 bytes off and the next call reads garbage. */
         if (f->returns_longlong) callee_args += 2;
+    } else if ((f->flags & SDCCCALL1) && f->ret_width <= 2) {
+        /* __sdcccall(1) cleans the stacked remainder callee-side for a 1-2
+           byte return (SDCC isFuncCalleeStackCleanup); a 4-byte/long return
+           is caller-cleaned (the call site's IR_ABI_STDC handles it). */
+        callee_args = param_stack_width(f);
     }
     if (callee_args > 0) {
         if (is_acc || IS_RABBIT() || IS_GBZ80()) {
@@ -8906,6 +9092,15 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
             emit(out, "push\tbc");
         }
     }
+    /* __sdcccall(1) return register: the value is in HL after the teardown
+       (the ≤2-byte non-acc path). Move it to the ABI register by the
+       DECLARED return width — A for 1 byte, DE for 2. */
+    if ((f->flags & SDCCCALL1) && op->src[0] >= 0 && !is_acc && width <= 4) {
+        if (sdcccall1_ret_reg(f->ret_width) == SC1_A)
+            emit(out, "ld\ta,l");          /* 1-byte return -> A */
+        else
+            emit(out, "ex\tde,hl");        /* 2B -> DE; 4B native DEHL -> sc1 HLDE */
+    }
     emit(out, "ret");
     return 0;
 }
@@ -8930,17 +9125,51 @@ static int fastcall_arg_vreg(const Func *f)
     return last;
 }
 
+/* __sdcccall(1) callee: identify the REGISTER-passed param vregs and their
+   registers. p1 = 1st param (A/HL/DEHL); p2 = 2nd param ONLY if it lands in
+   DE (else it's part of the stacked remainder and p2 stays -1, so the
+   generic copy-in handles it). *ok=0 only if the 1st param isn't
+   register-eligible (struct / wide 1st — deferred). >2 params are fine:
+   everything past the register slots is stacked (STDC layout). */
+static void sdcccall1_params(const Func *f, int *p1, int *p2,
+                             Sc1Reg *r1, Sc1Reg *r2, int *ok)
+{
+    *p1 = *p2 = -1; *r1 = *r2 = SC1_STACK; *ok = 1;
+    int idx = 0;
+    for (int i = 0; i < f->n_vregs; i++) {
+        if (!(f->vregs[i].flags & IR_VREG_PARAM)) continue;
+        idx++;
+        int w = f->vregs[i].width > 0 ? f->vregs[i].width : 2;
+        if (idx == 1) {
+            *r1 = sdcccall1_arg_reg(1, w, SC1_STACK);
+            if (*r1 != SC1_STACK) *p1 = i; else *ok = 0;   /* 1st must be a reg */
+        } else if (idx == 2) {
+            Sc1Reg rr = sdcccall1_arg_reg(2, w, *r1);
+            if (rr == SC1_DE || rr == SC1_L) { *p2 = i; *r2 = rr; }  /* else: stacked */
+        }
+        /* idx > 2: stacked remainder (handled by the copy-in loop). */
+    }
+}
+
+/* Caller-stack width of the params NOT passed in registers: excludes the
+   fastcall arg and the __sdcccall(1) register params (1st, and 2nd-if-DE). */
 static int param_stack_width(const Func *f)
 {
     int fc = fastcall_arg_vreg(f);   /* not on the caller stack */
+    int sc1p1 = -1, sc1p2 = -1;
+    if (f->flags & SDCCCALL1) {
+        Sc1Reg r1, r2; int ok;
+        sdcccall1_params(f, &sc1p1, &sc1p2, &r1, &r2, &ok);
+    }
     int total = 0;
     for (int i = 0; i < f->n_vregs; i++) {
         const VReg *v = &f->vregs[i];
-        if ((v->flags & IR_VREG_PARAM) && v->id != fc) {
+        if ((v->flags & IR_VREG_PARAM) && v->id != fc
+            && v->id != sc1p1 && v->id != sc1p2) {
             int w = (v->width > 0) ? v->width : 2;
-            /* char promoted to int (2 bytes) at the smallc call site —
-               except __z88dk_sdccdecl, where a char arg is 1 byte. */
-            if (w == 1 && !(f->flags & SDCCDECL)) w = 2;
+            /* char promoted to int (2 bytes) at the smallc call site — except
+               __z88dk_sdccdecl / __sdcccall(1), where a stacked char is 1 byte. */
+            if (w == 1 && !(f->flags & (SDCCDECL | SDCCCALL1))) w = 2;
             total += w;
         }
     }
@@ -9008,6 +9237,27 @@ static void emit_prologue(FILE *out, Func *f)
         /* w > 4: fa / __i64_acc is in memory, no register stash needed. */
     }
 
+    /* __sdcccall(1) args arrive in registers: 1st in A (char) / HL (int),
+       2nd in DE. Stash the 1st across the frame alloc — A survives it, but
+       HL is clobbered, so move HL→BC (free at entry; DE holds the 2nd). */
+    int sc1 = (f->flags & SDCCCALL1) != 0;
+    int sc1_p1 = -1, sc1_p2 = -1, sc1_ok = 1;
+    Sc1Reg sc1_r1 = SC1_STACK, sc1_r2 = SC1_STACK;
+    if (sc1) {
+        sdcccall1_params(f, &sc1_p1, &sc1_p2, &sc1_r1, &sc1_r2, &sc1_ok);
+        if (sc1_ok && sc1_r1 == SC1_HL) {
+            emit(out, "ld\tb,h");        /* 1st (int) → BC across frame alloc */
+            emit(out, "ld\tc,l");
+        } else if (sc1_ok && sc1_r1 == SC1_DEHL) {
+            emit(out, "ex\tde,hl");      /* sc1 HLDE -> native DEHL (HL=lo, DE=hi) */
+            emit(out, "ld\tb,h");        /* low half → BC across frame alloc */
+            emit(out, "ld\tc,l");
+        } else if (sc1_ok && sc1_r2 == SC1_L) {
+            emit(out, "ld\tc,l");        /* 2nd char (L) → C across frame alloc
+                                            (1st char in A survives) */
+        }
+    }
+
     /* Allocate the frame. */
     if (f->frame_size > 0) {
         if (use_add_sp(f, -f->frame_size, 0)) {
@@ -9058,6 +9308,39 @@ static void emit_prologue(FILE *out, Func *f)
         }
     }
 
+    /* __sdcccall(1) register args → their (forced) spill slots. Place the
+       2nd (DE) first: store_hl leaves the value in DE, so doing the 1st
+       first would clobber the 2nd. The 1st int was stashed HL→BC above; a
+       1st char survives the frame alloc in A. */
+    if (sc1 && sc1_ok && sc1_r2 == SC1_L) {
+        /* two chars: 1st in A, 2nd stashed in C. Distinct byte slots — order
+           free; store 1st (A) then 2nd (via A). */
+        if (sc1_p1 >= 0) store_a_byte(out, f, sc1_p1);
+        if (sc1_p2 >= 0) { emit(out, "ld\ta,c"); store_a_byte(out, f, sc1_p2); }
+        invalidate_hl_bc();
+        invalidate_de_cache();
+    } else if (sc1 && sc1_ok) {
+        if (sc1_p2 >= 0) {                 /* 2nd arg in DE */
+            emit(out, "ex\tde,hl");
+            store_hl(out, f, sc1_p2);
+        }
+        if (sc1_p1 >= 0) {
+            if (sc1_r1 == SC1_A) {         /* 1st char in A */
+                store_a_byte(out, f, sc1_p1);
+            } else if (sc1_r1 == SC1_DEHL) { /* 1st long: low in BC, high in DE */
+                emit(out, "ld\th,b");      /* native DEHL: HL=low (from BC) */
+                emit(out, "ld\tl,c");
+                store_dehl_finalize(out, f, sc1_p1);
+            } else {                       /* 1st int stashed in BC */
+                emit(out, "ld\th,b");
+                emit(out, "ld\tl,c");
+                store_hl(out, f, sc1_p1);
+            }
+        }
+        invalidate_hl_bc();
+        invalidate_de_cache();
+    }
+
     /* Copy caller-pushed args into our local frame slots so the rest of
        the lowerer can treat params identically to other vregs. Push order
        determines the layout: SMALLC / CALLEE push left-to-right (param0
@@ -9087,12 +9370,15 @@ static void emit_prologue(FILE *out, Func *f)
         VReg *v = &f->vregs[i];
         if (!(v->flags & IR_VREG_PARAM)) continue;
         if (v->id == fc_vreg) continue;  /* fastcall arg: stored from HL above */
+        if (sc1 && sc1_ok && (v->id == sc1_p1 || v->id == sc1_p2))
+            continue;                     /* sc1 register arg: placed above */
         param_count++;
         int width = (v->width > 0) ? v->width : 2;
         /* Char params are pushed as int (2 bytes) by smallc; consume
            2 caller-bytes but only store the low byte into the vreg.
            __z88dk_sdccdecl pushes a char as 1 byte. */
-        int caller_w = (width == 1) ? ((f->flags & SDCCDECL) ? 1 : 2) : width;
+        int caller_w = (width == 1)
+                     ? ((f->flags & (SDCCDECL | SDCCCALL1)) ? 1 : 2) : width;
         int poff;
         if (rl_layout) { poff = caller_off; caller_off += caller_w; }
         else           { caller_off -= caller_w; poff = caller_off; }
@@ -9112,10 +9398,15 @@ static void emit_prologue(FILE *out, Func *f)
            later loads/stores in the body walk into the caller frame. */
         if (v->flags & IR_VREG_PARAM_IN_PLACE) continue;
         if (width == 1) {
-            /* Caller pushed a 2-byte int; take its low byte. */
+            /* Caller pushed a 2-byte int (or 1-byte sdcccall/sdcccdecl char);
+               take its low byte. The raw `ld hl,poff;add hl,sp` clobbers HL
+               to the caller-slot address, so invalidate the byte slot-address
+               cache — else store_a_byte's inc/dec-from-cached-slot fast path
+               would apply a delta to this (now unrelated) HL. */
             emit(out, "ld\thl,%d", poff);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,(hl)");
+            invalidate_hl_cache();
             store_a_byte(out, f, v->id);
         } else if (width == 2) {
             load_sp_off_to_hl(out, poff);

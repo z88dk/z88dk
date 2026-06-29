@@ -308,6 +308,24 @@ static int is_register_float_kind(Kind k)
         || (k == KIND_DOUBLE && c_fp_size == 4);
 }
 
+/* __sdcccall(1) passes/returns a double in the 4-byte HLDE slot, which only
+   works when `double` is 4 bytes (c_fp_size==4: -fp-mode=ieee / --math-mbf32).
+   A 6/8-byte double can't use the register ABI — interop would be silently
+   wrong, so reject it. Returns 1 if `fntype` has a double param or return and
+   c_fp_size != 4. */
+static int sc1_has_wide_double(const Type *fntype)
+{
+    if (c_fp_size == 4 || !fntype) return 0;
+    if (fntype->return_type && fntype->return_type->kind == KIND_DOUBLE)
+        return 1;
+    if (fntype->parameters)
+        for (int i = 0; i < (int)array_len(fntype->parameters); i++) {
+            Type *pt = array_get_byindex(fntype->parameters, i);
+            if (pt && pt->kind == KIND_DOUBLE) return 1;
+        }
+    return 0;
+}
+
 /* The value kind an operand actually produces. A function-pointer call
    node keeps its KIND_FUNC type because the call lowering still reads
    return_type/flags/funcattrs from it (direct calls are unwrapped to the
@@ -3471,7 +3489,12 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                be 2 or 4 (byte args use the slot-load promote path).
                Any violation rolls ALL pushes back to IR_NOP — the
                legacy slot path in gen_call still works off args[]. */
-            int n_to_push = is_fastcall ? n_args - 1 : n_args;
+            /* __sdcccall(1) passes its args in registers (loaded by
+               gen_call), so none are pre-pushed — leave them in args[]. */
+            int is_sdcccall1 = (fl & SDCCCALL1) != 0;
+            int n_to_push = is_fastcall ? n_args - 1
+                          : is_sdcccall1 ? 0
+                          : n_args;
             int push_bb   = b->cur_bb_id;
             int pushable  = 1;
             int push_ops[64];
@@ -3500,7 +3523,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                    arg also fails the pushable test below, so the call
                    falls to gen_call's slot loop where the 1-byte push
                    lives.) */
-                if ((n->sym->ctype->flags & SDCCDECL)
+                if ((n->sym->ctype->flags & (SDCCDECL | SDCCCALL1))
                     && n->sym->ctype->parameters) {
                     Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
                     if (pt && pt->kind == KIND_CHAR
@@ -3597,8 +3620,24 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            overrides — last arg goes in HL/DEHL, rest pushed in ABI
            order. */
         uint32_t flags = n->sym->ctype ? n->sym->ctype->flags : 0;
+        if ((flags & SDCCCALL1) && sc1_has_wide_double(n->sym->ctype)) {
+            free(args);
+            return build_fail("__sdcccall(1) call needs 4-byte doubles for a "
+                              "double param/return (build with -fp-mode=ieee "
+                              "or --math-mbf32); current double is %d bytes",
+                              c_fp_size);
+        }
         if (is_fastcall) {
             ci->abi = IR_ABI_FASTCALL;
+        } else if (flags & SDCCCALL1) {
+            /* __sdcccall(1) cleanup is return-size dependent (SDCC
+               isFuncCalleeStackCleanup): a 1-2 byte return is callee-cleaned
+               (IR_ABI_CALLEE), a 4-byte/long return is caller-cleaned
+               (IR_ABI_STDC). The stacked-remainder push order is STDC (R→L)
+               either way — gen_call forces that for the SDCCCALL1 flag. */
+            int rw = n->sym->ctype && n->sym->ctype->return_type
+                   ? type_width(n->sym->ctype->return_type) : 2;
+            ci->abi = (rw == 4) ? IR_ABI_STDC : IR_ABI_CALLEE;
         } else if (flags & CALLEE) {
             ci->abi = IR_ABI_CALLEE;
         } else if (flags & SMALLC) {
@@ -3639,6 +3678,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         Type *fntype = n->type; /* callfunction() stashes the FUNC
                                    type on the call node */
         uint32_t flags = fntype ? fntype->flags : 0;
+        /* __sdcccall(1) via a function pointer: dispatched through the fastcall
+           ix/iy / push+ret machinery — see gen_call. __far and wide-double sc1
+           fnptrs are rejected: SDCC has no __far sc1, and a 6/8-byte double
+           can't ride the 4-byte HLDE slot. */
+        if ((flags & SDCCCALL1) && node_is_far_ptr(n->callee))
+            return build_fail("__sdcccall(1) via a __far function pointer is not "
+                              "supported");
+        if ((flags & SDCCCALL1) && sc1_has_wide_double(fntype))
+            return build_fail("__sdcccall(1) fnptr needs 4-byte doubles for a "
+                              "double param/return (build with -fp-mode=ieee or "
+                              "--math-mbf32); current double is %d bytes",
+                              c_fp_size);
         /* Fastcall through a fnptr: when a spare index reg is free the fnptr
            rides it (ix/iy) while the arg occupies HL/DEHL; otherwise the
            lowerer pushes the fnptr and dispatches via pushed-retaddr + `ret`
@@ -3655,6 +3706,17 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                       ? agg_lvalue_addr(b, a)
                       : build_expr(b, a);
                 if (v < 0) { free(args); return -1; }
+                /* sc1/sdccdecl char arg: pass as ONE byte (not the smallc int
+                   promotion) so the 1-byte push/slot align — as the direct path. */
+                if ((flags & (SDCCDECL | SDCCCALL1)) && fntype && fntype->parameters) {
+                    Type *pt = array_get_byindex(fntype->parameters, i);
+                    if (pt && pt->kind == KIND_CHAR && b->f->vregs[v].width != 1) {
+                        int t = new_temp_kind(b, KIND_CHAR);
+                        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                        cv->dst = t; cv->src[0] = v;
+                        v = t;
+                    }
+                }
                 /* Widen narrow int args to the fnptr's prototyped param
                    width (long / long long) — same as the direct-call
                    path, else long params get corrupted through a fnptr. */
@@ -3691,7 +3753,16 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ci->args       = args;
         ci->n_args     = n_args;
         ci->ret_vreg   = ret_v;
+        /* Carry the stack-layout calling conventions onto ci so gen_call sees
+           them via `& bit` (other dispatch flags like SHORTCALL/BANKED can't
+           apply to a fnptr — they need a fixed symbol). */
+        ci->flags = flags & (SDCCCALL1 | SDCCDECL);
         if (flags & FASTCALL)      ci->abi = IR_ABI_FASTCALL;
+        else if (flags & SDCCCALL1) {
+            /* sc1 cleanup is return-size dependent (same as the direct path):
+               1-2 byte return callee-cleaned, 4-byte caller-cleaned. */
+            ci->abi = (ret_w == 4) ? IR_ABI_STDC : IR_ABI_CALLEE;
+        }
         else if (flags & CALLEE)   ci->abi = IR_ABI_CALLEE;
         else if (flags & SMALLC)   ci->abi = IR_ABI_SMALLC;
         else                       ci->abi = IR_ABI_STDC;
@@ -6242,6 +6313,8 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     if (fn->ctype && fn->ctype->return_type
         && fn->ctype->return_type->kind == KIND_LONGLONG)
         f->returns_longlong = 1;
+    if (fn->ctype && fn->ctype->return_type)
+        f->ret_width = type_width(fn->ctype->return_type);
 
     /* Copy the function's ctype flags onto the IR func so the lowerer can
        test modifiers (SDCCDECL, …) with `& bit`. __z88dk_sdccdecl makes a
@@ -6266,6 +6339,49 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
        SYMBOL lives in loctab keyed by its source name. (Naked functions
        have no managed prologue — the asm reads params directly off the
        caller stack — so skip param vregs entirely.) */
+    /* __sdcccall(1) callee: validate the supported subset (z80, <=2 params
+       passed in A/HL + DE, 1-2 byte return). The register-passed params are
+       captured from registers in emit_prologue and forced to spill slots
+       below so the placement never has to juggle register homes. */
+    int fn_sc1 = (f->flags & SDCCCALL1) != 0;
+    if (fn_sc1 && !f->is_naked && sc1_has_wide_double(fn->ctype)) {
+        builder_free(&b);
+        ir_func_free(f);
+        return build_fail("__sdcccall(1) needs 4-byte doubles for a double "
+                          "param/return (build with -fp-mode=ieee or "
+                          "--math-mbf32); current double is %d bytes", c_fp_size);
+    }
+    if (fn_sc1 && !f->is_naked) {
+        int np = fn->ctype && fn->ctype->parameters
+               ? (int)array_len(fn->ctype->parameters) : 0;
+        int rw = fn->ctype && fn->ctype->return_type
+               ? type_width(fn->ctype->return_type) : 0;
+        int w0 = np >= 1 ? type_width(array_get_byindex(fn->ctype->parameters, 0)) : 0;
+        int w1 = np >= 2 ? type_width(array_get_byindex(fn->ctype->parameters, 1)) : 0;
+        /* register slots: 1st in A/HL/HLDE; 2nd in DE iff the 1st is A/HL and
+           the 2nd is 2 bytes. Everything past those stacks (STDC layout). The
+           A,L two-char combo and a non-register 1st (struct/wide) are still
+           deferred. Stacked params: int/long only for now. */
+        int r1_ok     = (w0 == 1 || w0 == 2 || w0 == 4);
+        int snd_in_de = (np >= 2) && (w0 == 1 || w0 == 2) && (w1 == 2);
+        int snd_in_l  = (np >= 2) && (w0 == 1) && (w1 == 1);  /* A,L two-char */
+        int reg_count = (w0 == 4) ? 1 : (snd_in_de || snd_in_l) ? 2 : 1;
+        int bad = (rw != 1 && rw != 2 && rw != 4) || !r1_ok;
+        for (int i = 0; i < np && !bad; i++) {
+            Type *pt = array_get_byindex(fn->ctype->parameters, i);
+            int w = pt ? type_width(pt) : 0;
+            if (pt && pt->kind == KIND_ELLIPSES) { bad = 1; break; }
+            if (i >= reg_count && w != 1 && w != 2 && w != 4) bad = 1;  /* stacked: char/int/long */
+        }
+        if (bad) {
+            builder_free(&b);
+            ir_func_free(f);
+            return build_fail("__sdcccall(1) function shape not yet supported "
+                              "(1st char/int/long, 2nd char->L or int->DE, "
+                              "extra args stacked as int/long, 1-2-4 byte "
+                              "return; no struct/wide 1st)");
+        }
+    }
     if (!f->is_naked && fn->ctype && fn->ctype->parameters) {
         int np = (int)array_len(fn->ctype->parameters);
         for (int i = 0; i < np; i++) {
@@ -6297,6 +6413,11 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
             int v = ir_vreg_new(b.f, (int)psym->type, psym, IR_VREG_PARAM);
             int pw = width_for_kind((Kind)psym->type);
             b.f->vregs[v].width = (int16_t)(pw ? pw : 2);
+            /* __sdcccall(1) register params arrive in A/HL/DE and are placed
+               into their slots by emit_prologue; force a spill slot so the
+               placement is a plain store (no register-home juggling). */
+            if (fn_sc1)
+                b.f->vregs[v].flags |= IR_VREG_VOLATILE;
             sym_map_set(&b, psym, v);
         }
     }

@@ -726,6 +726,33 @@ static void parse_trailing_modifiers(Type *type)
             type->flags |= SDCCDECL;
             type->flags &= ~(SMALLC|FLOATINGDECL);
             continue;
+        } else if ( swallow(KW_SDCCCALL)) {
+            /* __sdcccall(N): SDCC's calling-convention ABI selector.
+               (1) = the register convention; (0) is the legacy all-stack +
+               SDCC char convention, which __z88dk_sdccdecl already models —
+               alias to it. */
+            double   val = 1;
+            Kind     valtype;
+            needchar('(');
+            if ( constexpr(&val, &valtype, 0) == 0 )
+                errorfmt("Expecting an ABI version (0 or 1) for __sdcccall", 1);
+            needchar(')');
+            type->funcattrs.sdcccall = (int)val;
+            type->flags &= ~(SMALLC|FLOATINGDECL);
+            if ( (int)val == 1 ) {
+                /* kc160 has no SDCC port — zsdcc builds it in z80 mode, so it
+                   takes the plain-z80 sc1 ABI (which our reg helpers encode).
+                   Rabbit/eZ80 use a different ABI (HL int-return, different
+                   2nd-arg regs) — not yet implemented. gbz80/808x differ too. */
+                if ( IS_RABBIT() || IS_EZ80() || IS_GBZ80() || IS_808x() )
+                    errorfmt("__sdcccall(1) is only supported on z80/z180/z80n/kc160", 1);
+                type->flags |= SDCCCALL1;
+            } else if ( (int)val == 0 ) {
+                type->flags |= SDCCDECL;   /* alias of __z88dk_sdccdecl */
+            } else {
+                errorfmt("Unsupported __sdcccall ABI version %d (expected 0 or 1)", 1, (int)val);
+            }
+            continue;
         } else if ( swallow(KW_Z88DK_PARAMS_OFFSET)) {
             needchar('(');
             double   val;

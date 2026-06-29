@@ -119,6 +119,12 @@ void ir_alloc(Func *f)
         VReg *vr = &f->vregs[v];
         if (!(vr->flags & IR_VREG_PARAM)) continue;
         if (v == fc_param) continue;
+        /* __sdcccall(1) params (flagged VOLATILE by ir_build) are NOT on the
+           caller stack — register args arrive in A/HL/DE, and even the
+           stacked remainder is placed into local slots by emit_prologue.
+           Reading them "in place" would alias the return address / a
+           still-pending stacked slot, so give them real local slots. */
+        if ((f->flags & SDCCCALL1) && (vr->flags & IR_VREG_VOLATILE)) continue;
         vr->flags |= IR_VREG_PARAM_IN_PLACE;
     }
 

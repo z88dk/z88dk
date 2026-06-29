@@ -71,6 +71,7 @@ typedef enum {
     KW_Z88DK_PARAMS_OFFSET,     /* __z88dk_params_offset */
     KW_Z88DK_SAVEFRAME,         /* __z88dk_saveframe */
     KW_Z88DK_SDCCDECL,          /* __z88dk_sdccdecl */
+    KW_SDCCCALL,                /* __sdcccall(N) */
     KW_Z88DK_SHORTCALL,         /* __z88dk_shortcall */
     KW_Z88DK_SHORTCALL_HL,      /* __z88dk_shortcall_hl */
     KW_CALLEE_LEGACY,           /* __CALLEE__ */

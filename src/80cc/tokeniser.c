@@ -73,6 +73,7 @@ static const KeywordEntry tk_keywords[] = {
     {"__z88dk_params_offset",    KW_Z88DK_PARAMS_OFFSET},
     {"__z88dk_saveframe",        KW_Z88DK_SAVEFRAME},
     {"__z88dk_sdccdecl",         KW_Z88DK_SDCCDECL},
+    {"__sdcccall",               KW_SDCCCALL},
     {"__z88dk_shortcall",        KW_Z88DK_SHORTCALL},
     {"__z88dk_shortcall_hl",     KW_Z88DK_SHORTCALL_HL},
     {"__CALLEE__",               KW_CALLEE_LEGACY},

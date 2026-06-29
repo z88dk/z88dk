@@ -573,6 +573,11 @@ typedef struct {
        the return lowering needs no copy — see lower_ret. */
     int        returns_longlong;
 
+    /* Declared return-type width (bytes). Used by __sdcccall(1)'s return
+       lowering to pick the ABI register (A for 1, DE for 2) independent of
+       the return expression's possibly-widened width. 0 if unknown/void. */
+    int        ret_width;
+
     /* Allocation results — filled by ir_alloc.c. */
     PhysReg   *vreg_to_phys;    /* by vreg id; PR_SPILL means stack-only */
     int       *vreg_spill_slot; /* by vreg id; valid when vreg_to_phys == PR_SPILL */
