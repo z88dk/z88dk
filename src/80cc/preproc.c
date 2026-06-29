@@ -88,19 +88,15 @@ void vinline(void)
         }
         if (lptr) {
             if (c_intermix_ccode && cmode) {
-                /* Cache the source line so the walker can re-emit it
-                   interleaved with each statement's asm at AST-walk
-                   time (gen_comment here would be too early). */
+                /* Cache the source line so the walker / IR lowerer can
+                   re-emit it interleaved with each statement's asm at
+                   code-emit time (gen_comment here would be too early). */
                 cache_source_line(lineno, line);
             }
-            if (c_cline_directive || c_intermix_ccode) {
-                int trailing = lptr;
-                while (trailing--) {
-                    if (!isspace(line[trailing])) break;
-                }
-                if (trailing >= 0)
-                    gen_emit_line(lineno);
-            }
+            /* C_LINE directives are emitted at code-emit time (walker's
+               cg2_emit_cline_for / IR lowerer's emit_op_cline), not at
+               input-read time — emitting them here clusters them at the
+               top of every function before any asm is produced. */
             /* Feed the line into the singleton tokeniser so it stays
                in lockstep with line[]. tk_feed_line appends an
                implicit '\n'; caller passes just the line content. */

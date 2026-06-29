@@ -1540,7 +1540,177 @@ run_test "llong_oror_first_zero" "0001" 'int main(void) {
     return a || b;
 }'
 
-echo "Phase A smoke test:"
+# &p->member / &arr[i]: folded address-of shapes. Also guards the AST
+# DSE pass: the read of `p` inside py'\''s initializer must keep
+# `p = &s` alive (it was dropped as a dead store — the use counter
+# skipped OP_ADDR subtrees wholesale).
+run_test "addr_member_via_ptr" "0007" 'typedef struct { int x; int y; } P;
+int main(void) { P s; P *p = &s; int *py = &p->y; *py = 7; return s.y; }'
+run_test "addr_array_elem" "000B" 'int main(void) {
+    int arr[4]; int i = 2; int *pa = &arr[i]; *pa = 11; return arr[2];
+}'
+run_test "addr_global_elem" "000D" 'int g_arr[5];
+int main(void) { int i = 2; int *pg = &g_arr[i + 1]; *pg = 13; return g_arr[3]; }'
+
+# Prototype param names differ from the definition: the retained
+# prototype Type adopts the definition names at definition time, so
+# loctab lookups by name resolve.
+run_test "proto_param_rename" "0022" 'extern int f(int alpha, int beta);
+int f(int a, int b) { return a * 10 + b; }
+int main(void) { return f(3, 4); }'
+
+# Switch dispatch routes (l_case table / inline char cp / l_long_case).
+# The assign-then-break shape also guards the LICM single-def gate:
+# the per-case `r = K` defs must NOT be hoisted above the dispatch
+# (the case-label BBs have lower ids than the body fall-through BBs,
+# so their BRs look like back-edges to the id-order loop finder).
+run_test "switch_int_assign" "0003" 'int main(void) {
+    int x = 30, r = 0;
+    switch (x) {
+    case 10: r = 1; break;
+    case 20: r = 2; break;
+    case 30: r = 3; break;
+    case 40: r = 4; break;
+    default: r = 9; break;
+    }
+    return r;
+}'
+run_test "switch_char_assign" "0014" 'int main(void) {
+    char c = 98; int r = 0;
+    switch (c) {
+    case 97: r = 10; break;
+    case 98: r = 20; break;
+    case 99: r = 30; break;
+    }
+    return r;
+}'
+run_test "switch_long_assign" "0002" 'int main(void) {
+    unsigned long v = 0x12340002UL; int r = 0;
+    switch (v) {
+    case 0x12340001UL: r = 1; break;
+    case 0x12340002UL: r = 2; break;
+    case 3UL:          r = 3; break;
+    default:           r = 9; break;
+    }
+    return r;
+}'
+# Post-step fusion (IR_POSTSTEP): `while (n--)` / `*p++` / `arr[i++]`
+# loop-carried post-steps lower to one slot read + writeback with the
+# old value kept in HL — no frame-temp round trip. The md5 byte-copy
+# loop shape, exercised with wraparound.
+run_test "poststep_copy_loop" "019C" 'typedef struct { unsigned char in[8]; } C;
+C g; unsigned char sbuf[8];
+void copy(C *c, unsigned char *p, unsigned int n) {
+    unsigned int mdi = 0;
+    while (n--) { c->in[mdi++] = *p++; if (mdi == 8) mdi = 0; }
+}
+int main(void) {
+    int k; unsigned char i;
+    for (i = 0; i < 8; i++) sbuf[i] = (unsigned char)(i + 48);
+    copy(&g, sbuf, 8);
+    k = 0;
+    for (i = 0; i < 8; i++) k += g.in[i];
+    return k;
+}'
+
+# Long indirect stores, both fast paths: slot-resident value (address
+# in DE, bytes walked through A) and DEHL-cached value (BC=low DE=high,
+# HL takes the address) — no stack staging in either.
+run_test "long_store_paths" "645C" 'typedef unsigned long UINT4;
+UINT4 g4[3];
+void wr(UINT4 *p, UINT4 v) { *p = v; }
+void wr2(UINT4 *p) { *p = *p + 0x01020304UL; }
+int main(void) {
+    wr(&g4[1], 0xAABBCCDDUL);
+    wr2(&g4[1]);
+    return (int)((g4[1] >> 16) ^ (g4[1] & 0xFFFF));
+}'
+
+# Byte-pack idiom → wide load (ir_opt_pack_bytes): the little-endian
+# ((long)b[k+3]<<24)|...|(long)b[k] gather collapses to one width-4
+# LD_MEM. Verifies values through a pointer-based gather.
+run_test "byte_pack_gather" "0042" 'typedef unsigned long UINT4;
+void gather(UINT4 *out, unsigned char *b, int n) {
+    int i, ii;
+    for (i = 0, ii = 0; i < n; i++, ii += 4)
+        out[i] = (((UINT4)b[ii+3]) << 24) | (((UINT4)b[ii+2]) << 16) |
+                 (((UINT4)b[ii+1]) << 8)  | ((UINT4)b[ii]);
+}
+unsigned char src[8];
+UINT4 dst2[2];
+void dirty(void) { volatile int junk[16]; int i; for (i=0;i<16;i++) junk[i]=23130; }
+int main(void) {
+    int i;
+    dirty();
+    for (i = 0; i < 8; i++) src[i] = (unsigned char)(16 + i);
+    gather(dst2, src, 2);
+    if (dst2[0] != 0x13121110UL) return 1;
+    if (dst2[1] != 0x17161514UL) return 2;
+    return 0x42;
+}'
+
+# Struct decl-init via init_typed_region: field-by-field stores with
+# zero-fill of uncovered members (C semantics). Mixed member widths,
+# nested structs, char-array members from string literals.
+run_test "struct_init_basic" "0031" 'typedef struct { int x; int y; } P;
+int main(void) { P p = { 4, 9 }; return p.x * 10 + p.y; }'
+run_test "struct_init_zero_fill" "0000" 'typedef struct { int x; int y; int z; } P;
+void dirty(void) { volatile int junk[8]; int i; for (i = 0; i < 8; i++) junk[i] = 23130; }
+int sub(void) { P p = { 1 }; return p.y | p.z; }
+int main(void) { dirty(); return sub(); }'
+run_test "struct_init_nested" "0315" 'typedef struct { int x; } In;
+typedef struct { In a; int b; char c; } Out;
+int main(void) { Out o = { {7}, 8, 9 }; return o.a.x * 100 + o.b * 10 + o.c; }'
+run_test "struct_init_mixed_widths" "01A5" 'typedef struct { char tag; int big; long huge; } M;
+int main(void) { M m = { 120, 300, 70000L }; return m.big + (int)(m.huge >> 16) + m.tag; }'
+# Partial ARRAY init must zero-fill the tail (was a miscompile: the
+# old flattener stored only the listed elements).
+run_test "array_init_zero_fill" "0000" 'void dirty(void) { volatile int junk[8]; int i; for (i = 0; i < 8; i++) junk[i] = 23130; }
+int sub(void) { int arr[4] = { 9 }; return arr[1] | arr[2] | arr[3]; }
+int main(void) { dirty(); return sub(); }'
+
+# Push-at-producer call args (IR_PUSH_ARG): every arg is pushed right
+# after its producer, so arg temps live in HL/DEHL with no slot.
+run_test "call_args_pushed" "0026" 'int add3(int a, int b, int c) { return a + b * 2 + c * 3; }
+int main(void) { return add3(5, 6, 7); }'
+# Nested call as a middle argument — inner call pushes/cleans its own
+# args between the outer pushes (cur_sp_adjust nesting).
+run_test "call_nested_arg" "0018" 'int twice(int x) { return x * 2; }
+int sum3(int a, int b, int c) { return a + b + c; }
+int main(void) { return sum3(1, twice(10), 3); }'
+# Multi-BB arg expr (ternary) rolls back to the legacy slot path.
+run_test "call_ternary_arg" "000F" 'int pick(int a, int b) { return a * 10 + b; }
+int main(void) { int x = 5; return pick(x > 3 ? 1 : 2, x); }'
+# PR_BC tenant across a pre-pushed call: BC is saved by the call'\''s
+# first IR_PUSH_ARG (below the arg block) and popped after cleanup.
+run_test "pr_bc_pre_push_call" "000F" 'int sink_g;
+int sink(int v) { sink_g = v; return 0; }
+int wrapped(int a, int b) { int sum = a + b; sink(sum); return sum + 1; }
+int main(void) { return wrapped(3, 4) + sink_g; }'
+# Fastcall callee definitions defer to the walker (IR prologue does
+# not model the pushed-HL param) — execution must still be correct.
+run_test "fastcall_callee" "0011" 'int dbl(int x) __z88dk_fastcall;
+int dbl(int x) { return x * 2 + 1; }
+int main(void) { return dbl(8); }'
+
+# Switch inside a loop with a var live across the dispatch into the
+# case bodies — l_case walks its table through BC, so PR_BC must not
+# hold a value across a table-dispatch IR_SWITCH.
+run_test "switch_in_loop_live" "003F" 'int main(void) {
+    int total = 0;
+    int i;
+    for (i = 0; i < 4; i++) {
+        int k = i * 10;
+        switch (i) {
+        case 0: total += k + 1; break;
+        case 2: total += k + 2; break;
+        default: total += k; break;
+        }
+    }
+    return total;
+}'
+
+echo "smoke test:"
 echo "  ok: $ok"
 echo "  fail: $fail"
 if [ $fail -gt 0 ]; then

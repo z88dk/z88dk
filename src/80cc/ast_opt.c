@@ -218,8 +218,12 @@ Node *ast_fold_constants(Node *node)
             && L && L->type) {
             int width = 0;
             Kind k = L->type->kind;
-            if      (k == KIND_CHAR)     width = 8;
-            else if (k == KIND_INT || k == KIND_SHORT) width = 16;
+            /* Integer promotion: char and short shift as int, so only
+               counts >= the PROMOTED width are out of range. Folding
+               `byte << 8` to zero silently deleted valid code like
+               `(dig[0] << 8) | dig[1]`. */
+            if      (k == KIND_CHAR || k == KIND_SHORT
+                  || k == KIND_INT)      width = 16;
             else if (k == KIND_LONG || k == KIND_CPTR) width = 32;
             else if (k == KIND_LONGLONG) width = 64;
             int64_t shamt = (int64_t)R->zval;
@@ -3375,7 +3379,13 @@ static void dse_collect_ever_read(Node *n, sym_set *ever_read)
         }
         return;
     case OP_ADDR: case AST_ADDR:
-        /* Address-of: not a value read; handled by escape pass. */
+        /* &bare-local is not a value read (the escape pass keeps the
+           local alive). A folded address expression (&p->member,
+           &arr[i]) DOES read the locals inside it — walk the
+           subtree. */
+        if (n->operand && n->operand->ast_type != AST_LOCAL_VAR
+                       && n->operand->ast_type != AST_GLOBAL_VAR)
+            dse_collect_ever_read(n->operand, ever_read);
         return;
     case AST_FUNC_CALL: case AST_FUNCPTR_CALL:
         for (int i = 0; i < (int)array_len(n->args); i++)

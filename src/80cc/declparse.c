@@ -1898,6 +1898,21 @@ static void declfunc(Type *functype, enum storage_type storage)
         functype->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
         if (currfn->storage == EXTERNAL)
             currfn->storage = STATIK;
+        // currfn keeps the prototype's Type, but loctab is populated
+        // from the definition's parameter names below. Adopt the
+        // definition's names so name-based lookups against loctab
+        // (e.g. ir_build's param mapping via findloc) resolve.
+        if ( currfn->ctype != functype
+             && currfn->ctype->parameters && functype->parameters
+             && array_len(currfn->ctype->parameters) == array_len(functype->parameters) ) {
+            int i;
+            for ( i = 0; i < array_len(functype->parameters); i++ ) {
+                Type *pp = array_get_byindex(currfn->ctype->parameters, i);
+                Type *dp = array_get_byindex(functype->parameters, i);
+                if ( pp && dp )
+                    snprintf(pp->name, sizeof(pp->name), "%s", dp->name);
+            }
+        }
         debug_write_symbol(currfn);
     } else {
         currfn = addglb(functype->name, functype, ID_VARIABLE, functype->kind, 0, storage);

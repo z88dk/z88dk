@@ -1,13 +1,12 @@
 /*
  * ir.c — IR constructors, dumpers, validation, op-metadata table.
  *
- * See ir.h for the type definitions and the design docs under
- * src/80cc/.tmp/IR_DESIGN.md for the rationale.
+ * Type definitions in ir.h; rationale in src/80cc/.tmp/IR_DESIGN.md.
  *
- * This file is logic-light by design: anything that requires the full
- * 80cc type system (Kind enum decode, SYMBOL name resolution, etc.)
- * goes through small helpers that take only what's needed. The IR
- * itself stays decoupled from the AST machinery.
+ * Logic-light by design: anything that requires the full 80cc type
+ * system (Kind enum decode, SYMBOL name resolution, etc.) goes through
+ * small helpers that take only what's needed. The IR stays decoupled
+ * from the AST machinery.
  */
 
 #include "ir.h"
@@ -17,13 +16,12 @@
 #include <string.h>
 
 /* ----- Op metadata table -------------------------------------------------
-   One row per OpKind. The static initialiser order MUST match the enum
-   order in ir.h; ir.c::init runtime asserts the count. */
+   One row per OpKind, indexed by the enum value. */
 
 typedef struct {
     const char *name;
     int         is_aliased;       /* dst aliases src[0] (z80 two-op rule) */
-    int         is_terminator;    /* terminates a BB */
+    int         is_terminator;    /* ends a BB */
 } OpInfo;
 
 static const OpInfo op_table[] = {
@@ -79,12 +77,13 @@ static const OpInfo op_table[] = {
 
     /* control flow */
     [IR_BR]                 = { "BR",                   0, 1 },
-    /* BR_COND / BR_ZERO are NOT terminators — they're conditional jumps
-       that fall through if the condition doesn't match. Each BB ends
-       with an explicit IR_BR (or RET) for the fall-through case. This
-       avoids relying on BB array-emit order matching fall-through. */
+    /* BR_COND / BR_ZERO are NOT terminators — they fall through if the
+       condition doesn't match. Each BB ends with an explicit IR_BR (or
+       RET) for the fall-through, so correctness doesn't rely on BB
+       array-emit order matching fall-through. */
     [IR_BR_COND]            = { "BR_COND",              0, 0 },
     [IR_BR_ZERO]            = { "BR_ZERO",              0, 0 },
+    [IR_SWITCH]             = { "SWITCH",               0, 1 },
     [IR_RET]                = { "RET",                  0, 1 },
 
     /* calls */
@@ -104,12 +103,15 @@ static const OpInfo op_table[] = {
     [IR_CRITICAL_ENTER]     = { "CRITICAL_ENTER",       0, 0 },
     [IR_CRITICAL_LEAVE]     = { "CRITICAL_LEAVE",       0, 0 },
 
-    /* Phase D stack-save markers — src[0] is the long vreg being
-       saved (PUSH) or restored (POP). PUSH reads src[0] (the live
-       long currently in DEHL); POP defines src[0] (the vreg is
-       'reborn' in DEHL after the pop). */
+    /* Long stack-save markers — src[0] is the long vreg. PUSH reads
+       src[0] (the live long in DEHL); POP defines src[0] (reborn in
+       DEHL after the pop). */
     [IR_PUSH_DEHL_LONG]     = { "PUSH_DEHL_LONG",       0, 0 },
     [IR_POP_DEHL_LONG]      = { "POP_DEHL_LONG",        0, 0 },
+    [IR_PUSH_ARG]           = { "PUSH_ARG",             0, 0 },
+
+    [IR_POSTSTEP]           = { "POSTSTEP",             0, 0 },
+    [IR_EXTRACT_BYTE]       = { "EXTRACT_BYTE",         0, 0 },
 
     /* misc */
     [IR_NOP]                = { "NOP",                  0, 0 },
@@ -127,6 +129,37 @@ int ir_op_is_terminator(OpKind kind)
 {
     if (kind < 0 || kind >= IR_OP_COUNT) return 0;
     return op_table[kind].is_terminator;
+}
+
+/* Successor iteration covering IR_SWITCH's multi-way targets. For a
+   switch-terminated BB the successors are target_bb[0..n) followed by
+   default_bb; otherwise the plain succ[2] pair. */
+static const SwitchInfo *bb_switch_term(const BB *bb)
+{
+    if (bb->n_ops <= 0) return NULL;
+    const Op *last = &bb->ops[bb->n_ops - 1];
+    return (last->kind == IR_SWITCH) ? last->sw : NULL;
+}
+
+int ir_bb_n_succ(const BB *bb)
+{
+    if (!bb) return 0;
+    const SwitchInfo *sw = bb_switch_term(bb);
+    if (sw) return sw->n_cases + 1;
+    if (bb->succ[0] < 0) return 0;
+    return (bb->succ[1] < 0) ? 1 : 2;
+}
+
+int ir_bb_succ_at(const BB *bb, int i)
+{
+    if (!bb || i < 0) return -1;
+    const SwitchInfo *sw = bb_switch_term(bb);
+    if (sw) {
+        if (i < sw->n_cases) return sw->target_bb[i];
+        if (i == sw->n_cases) return sw->default_bb;
+        return -1;
+    }
+    return (i < 2) ? bb->succ[i] : -1;
 }
 
 const char *ir_op_name(OpKind kind)
@@ -186,6 +219,7 @@ Func *ir_func_new(SYMBOL *fn)
     f->bbs   = NULL;     f->n_bbs   = 0; f->cap_bbs   = 0;
     f->frame_size = 0;
     f->slot_offsets = NULL; f->n_slots = 0;
+    f->features = 0;
     f->abi = IR_ABI_SMALLC;
     f->is_interrupt = 0;
     f->is_naked = 0;
@@ -213,12 +247,17 @@ void ir_func_free(Func *f)
                 free(o->hcall->args);
                 free(o->hcall);
             }
+            if (o->sw) {
+                free(o->sw->values);
+                free(o->sw->target_bb);
+                free(o->sw);
+            }
             if (o->mem.port) free(o->mem.port);
         }
         free(bb->ops);
         free(bb->pred);
-        /* live_in/live_out are owned by ir_analysis.c; freed via its API
-           when that module exists. For now they're always NULL. */
+        /* live_in/live_out are owned by ir_analysis.c, freed via its
+           API (ir_free_liveness). */
     }
     free(f->bbs);
     free(f->vregs);
@@ -229,16 +268,12 @@ void ir_func_free(Func *f)
     free(f);
 }
 
-/* Kind → width in bytes. Kept as a small switch rather than pulling in
-   the full kind table; the values mirror existing 80cc conventions. */
+/* Kind → width in bytes. Fallback only: ir_build.c sets each vreg's
+   width explicitly from the AST type info. */
 static int kind_width(Kind k)
 {
-    /* These constants mirror define.h's KIND_* enum values, but ir.c
-       avoids including define.h. Treat unknown as 2 (int). The list is
-       short enough to maintain by hand; ir_build.c sets the width
-       explicitly from the AST type info, so this is only the fallback. */
     (void)k;
-    return 2; /* sensible default; ir_build overrides */
+    return 2; /* default to int; ir_build overrides */
 }
 
 int ir_vreg_new(Func *f, Kind k, SYMBOL *sym, uint8_t flags)
@@ -280,6 +315,17 @@ int ir_bb_new(Func *f)
     return id;
 }
 
+/* Source-location stash, stamped onto each emitted op. ir_build sets
+   these at each statement boundary. */
+static const char *ir_emit_file;
+static int         ir_emit_line;
+
+void ir_set_emit_loc(const char *file, int line)
+{
+    ir_emit_file = file;
+    ir_emit_line = line;
+}
+
 Op *ir_op_emit(BB *bb, OpKind kind)
 {
     if (bb->n_ops >= bb->cap_ops) {
@@ -294,6 +340,8 @@ Op *ir_op_emit(BB *bb, OpKind kind)
     op->dst = -1;
     op->src[0] = -1; op->src[1] = -1;
     op->label = -1;
+    op->file = ir_emit_file;
+    op->line = ir_emit_line;
     return op;
 }
 
@@ -325,15 +373,13 @@ Op *ir_emit_unop(BB *bb, OpKind kind, int dst, int src)
     return o;
 }
 
-/* succ-slot pick: if succ[0] is unused, fill it; else fill succ[1].
-   Lets a BB ending with `BR_ZERO X; BR Y` register both X and Y
-   instead of overwriting succ[0]. */
+/* Fill the first free succ slot. Lets a BB ending `BR_ZERO X; BR Y`
+   register both targets. A third succ is silently dropped — never
+   happens for well-formed IR (max two succs per BB). */
 static void bb_add_succ(BB *bb, int target)
 {
     if (bb->succ[0] < 0)      bb->succ[0] = target;
     else if (bb->succ[1] < 0) bb->succ[1] = target;
-    /* If both filled, the extra succ is dropped — should never happen
-       for well-formed IR (max two succs per BB). */
 }
 
 Op *ir_emit_br(BB *bb, int target_bb)
@@ -382,7 +428,7 @@ void ir_dump_vreg(FILE *out, const Func *f, int vreg_id)
     }
     const VReg *v = &f->vregs[vreg_id];
     fprintf(out, "v%d", v->id);
-    /* If we know an allocation, append it. */
+    /* Append the phys assignment if one exists. */
     if (f->vreg_to_phys && f->vreg_to_phys[vreg_id] != IR_PR_NONE) {
         fprintf(out, "[%s]", ir_phys_name(f->vreg_to_phys[vreg_id]));
     }
@@ -398,10 +444,9 @@ static void dump_memop(FILE *out, const Func *f, const MemOp *m)
         break;
     case IR_MEM_SYM:
         fprintf(out, "sym[%s",
-                (m->sym ? "<sym>" : "<null>"));   /* sym name resolution
-                                                     deferred — ir.c stays
-                                                     decoupled from SYMBOL
-                                                     internals */
+                (m->sym ? "<sym>" : "<null>"));   /* name not resolved:
+                                                     ir.c is decoupled
+                                                     from SYMBOL */
         if (m->offset) fprintf(out, "+%d", m->offset);
         fputs("]", out);
         break;
@@ -477,6 +522,16 @@ void ir_dump_op(FILE *out, const Func *f, const Op *op)
             fputs("<hcall ?>", out);
         }
         break;
+    case IR_SWITCH:
+        ir_dump_vreg(out, f, op->src[0]);
+        if (op->sw) {
+            for (int i = 0; i < op->sw->n_cases; i++)
+                fprintf(out, "%s %lld→BB%d", i ? "," : "",
+                        (long long)op->sw->values[i],
+                        op->sw->target_bb[i]);
+            fprintf(out, " default→BB%d", op->sw->default_bb);
+        }
+        break;
     case IR_ASM:
         fprintf(out, "<asm: %.40s...>", op->asm_text ? op->asm_text : "");
         break;
@@ -524,8 +579,7 @@ void ir_dump_func(FILE *out, const Func *f)
     if (f->has_setjmp)   fputs("  attrs: contains setjmp\n", out);
     /* Live ranges: one line per vreg with [start,end] in linearised op
        index. Printed only when ir_compute_live_ranges has populated the
-       table; the pass is opt-in (run by ir_lower_func) so we don't
-       force the cost on dumps from earlier compile stages. */
+       table (opt-in, run by ir_lower_func). */
     if (f->live_ranges && f->n_vregs > 0) {
         fputs("  live ranges:\n", out);
         const struct { int start, end; } *lr = (const void *)f->live_ranges;
@@ -579,20 +633,20 @@ int ir_validate(const Func *f)
                     return validate_fail("src vreg out of range", i, j);
             }
 
-            /* Aliased-two-op rule: dst aliases src[0]. We don't enforce
-               equality of vreg ids in the IR — that's the allocator's
-               job. But we DO check that if dst exists, src[0] also
-               exists for aliased ops. */
+            /* Aliased-two-op rule: dst aliases src[0]. Vreg-id equality
+               is the allocator's job, not enforced here; we only check
+               that aliased ops have both dst and src[0]. */
             if (ir_op_is_aliased(op->kind)) {
                 if (op->dst < 0 || op->src[0] < 0)
                     return validate_fail("aliased op missing dst or src[0]", i, j);
             }
         }
 
-        /* Successor BB ids in range. */
-        for (int k = 0; k < 2; k++) {
-            int s = bb->succ[k];
-            if (s >= f->n_bbs)
+        /* Successor BB ids in range (covers IR_SWITCH targets). */
+        int ns = ir_bb_n_succ(bb);
+        for (int k = 0; k < ns; k++) {
+            int s = ir_bb_succ_at(bb, k);
+            if (s < 0 || s >= f->n_bbs)
                 return validate_fail("succ BB out of range", i, -1);
         }
     }

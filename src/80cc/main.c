@@ -8,6 +8,7 @@
 #include "../config.h"
 #include "ccdefs.h"
 #include "tokeniser.h"
+#include "ir_match.h"   /* ir_match_disable for --opt-disable=pattern: */
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. */
@@ -142,7 +143,7 @@ static option  sccz80_opts[] = {
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "Optimise for speed not size", NULL, opt_code_speed, 0},
-    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named AST optimiser passes (comma-separated). Names: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
+    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named AST optimiser passes (comma-separated). Names: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse; pattern:<name> disables one IR pattern-matcher entry. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
     { 0, "ast-print", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Build the AST per function, print it to stderr, and skip code generation", &c_ast_print, NULL, 0 },
     { 0, "ast-print-types", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Decorate the AST print with type/qualifier/attribute info; implies --ast-print", &c_ast_print_types, NULL, 0 },
     { 0, "use-ir", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Route function codegen through the new IR pipeline (ir_build → ir_lower). Phase 1 — most C constructs unsupported", &c_use_ir, NULL, 0 },
@@ -962,6 +963,20 @@ static void opt_disable(option *arg, char *val)
         /* Skip leading separators. */
         while (*ptr == ',' || *ptr == ' ') ptr++;
         if (!*ptr) break;
+        /* pattern:<name> — an IR pattern-matcher entry, disabled by
+           name in ir_match.c rather than a bit here. */
+        if (strncmp(ptr, "pattern:", 8) == 0) {
+            char name[64];
+            size_t n = 0;
+            ptr += 8;
+            while (*ptr && *ptr != ',' && *ptr != ' ') {
+                if (n < sizeof(name) - 1) name[n++] = *ptr;
+                ptr++;
+            }
+            name[n] = 0;
+            ir_match_disable(name);
+            continue;
+        }
         size_t matched = 0;
         for (size_t i = 0; i < sizeof(opt_disable_names)/sizeof(opt_disable_names[0]); i++) {
             size_t n = strlen(opt_disable_names[i].name);

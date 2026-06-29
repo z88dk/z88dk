@@ -45,6 +45,7 @@ OBJS =	callfunc.o     	\
 	ir_analysis.o	\
 	ir_alloc.o	\
 	ir_opt.o	\
+	ir_match.o	\
 	ir_compiler_glue.o \
 	tokeniser.o
 
@@ -57,11 +58,20 @@ CFLAGS += -MMD -Wall -I../common -I../../ext/uthash/src/ -g -pedantic -std=gnu11
 z88dk-80cc$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o z88dk-80cc$(EXESUFFIX) $(OBJS) -lm
 
+# Standalone IR selftest — links the ccdefs-free IR layer only (the
+# selftest provides its own SYMBOL/global stubs). Run after touching
+# ir*.c: `make ir_selftest && ./ir_selftest`.
+IR_SELFTEST_SRCS = ir_selftest.c ir.c ir_lower.c ir_analysis.c \
+	ir_alloc.c ir_opt.c ir_match.c
+
+ir_selftest$(EXESUFFIX): $(IR_SELFTEST_SRCS)
+	$(CC) $(CFLAGS) -o $@ $(IR_SELFTEST_SRCS) -lm
+
 install: z88dk-80cc$(EXESUFFIX)
 	$(INSTALL) -m 755 z88dk-80cc$(EXESUFFIX) $(PREFIX)/bin/z88dk-80cc$(EXESUFFIX)
 
 clean :
-	$(RM) *.o *~ core z88dk-80cc$(EXESUFFIX)
+	$(RM) *.o *~ core z88dk-80cc$(EXESUFFIX) ir_selftest$(EXESUFFIX)
 	$(RM) -rf Debug Release
 	$(RM) $(DEPENDS)
 

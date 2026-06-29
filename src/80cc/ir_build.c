@@ -1,9 +1,7 @@
 /*
  * ir_build.c — AST → IR translator.
  *
- * Phase 1 minimal cut. Target: grow this just enough to make the
- * CRC-16-CCITT kernel in test/suites/intbench/intbench.c compile and
- * run via the IR pipeline. Anything not yet handled aborts with a
+ * Coverage grows on demand: anything not yet handled aborts with a
  * diagnostic so we can see exactly which AST shape needs the next
  * coverage bump.
  *
@@ -26,7 +24,7 @@
 
 typedef struct {
     Func *f;
-    int   cur_bb_id;   /* index into f->bbs[]; pointer would be invalidated
+    int   cur_bb_id;   /* index into f->bbs[]; a pointer would dangle
                           when ir_bb_new realloc's the array */
 
     /* Map from SYMBOL* → vreg id. Linear search — function-local syms
@@ -70,8 +68,8 @@ static int get_or_create_label_bb(Builder *b, int label_id)
     return bb;
 }
 
-/* Ensure current BB ends with a terminator. If it doesn't, emit an
-   IR_BR to `target_bb` (fall-through). Used when transitioning BBs. */
+/* Ensure current BB ends with a terminator; if not, emit IR_BR to
+   `target_bb` (fall-through). Used when transitioning BBs. */
 static void close_bb_with_fallthrough(Builder *b, int target_bb)
 {
     BB *bb = cur_bb(b);
@@ -134,14 +132,15 @@ static int build_fail(const char *fmt, ...)
 
    `hint` is an optional caller-provided destination vreg. When >= 0 and
    the expression supports it, the result is written directly to `hint`
-   and `hint` is returned. This eliminates the intermediate-temp + MOV
-   pair that the caller would otherwise emit (`MOV dst, temp`). Cases
-   that don't support a hint (e.g. a bare local-var read where the
-   value already lives in another vreg) fall back to returning that
-   vreg; the caller is responsible for emitting a MOV in that case.
-   Pass -1 to force a fresh temp. */
+   and `hint` is returned, eliminating the intermediate-temp + MOV the
+   caller would otherwise emit. Cases that don't support a hint (e.g. a
+   bare local-var read where the value already lives in another vreg)
+   return that vreg; the caller must emit the MOV. Pass -1 to force a
+   fresh temp. */
 
 static int build_expr_hinted(Builder *b, Node *n, int hint);
+static int init_typed_region(Builder *b, int base, int off,
+                             Type *t, Node *init, int *budget);
 
 static int build_expr(Builder *b, Node *n)
 {
@@ -162,21 +161,36 @@ static int is_int2_kind(Kind k)
     return k == KIND_INT || k == KIND_SHORT || k == KIND_PTR;
 }
 
-/* True for any integer-class kind we currently support (1/2/4 byte). */
+/* Integer kinds + _Accum. _Accum ADD/SUB/CMP/NEG are bit-identical
+   to integer ops; MUL/DIV need fix-scaling helpers and bail. */
 static int is_supported_int_kind(Kind k)
 {
     return k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT
-        || k == KIND_PTR  || k == KIND_LONG;
+        || k == KIND_PTR  || k == KIND_LONG
+        || k == KIND_ACCUM16 || k == KIND_ACCUM32;
 }
 
-/* Width in bytes for the integer kinds we care about. Returns 0 for
-   anything outside the supported set so callers can bail. */
+/* Width in bytes for the integer/fix kinds we care about. Returns 0
+   for anything outside the supported set so callers can bail. */
 static int width_for_kind(Kind k)
 {
     if (k == KIND_CHAR)  return 1;
-    if (k == KIND_INT || k == KIND_SHORT || k == KIND_PTR) return 2;
-    if (k == KIND_LONG)  return 4;
+    if (k == KIND_INT || k == KIND_SHORT || k == KIND_PTR
+        || k == KIND_ACCUM16) return 2;
+    if (k == KIND_LONG || k == KIND_ACCUM32)  return 4;
     return 0;
+}
+
+/* Scale an AST_LITERAL's zval to the raw bit pattern for target
+   kind k. _Accum / long _Accum get the Q-format multiply (×256 /
+   ×65536, round to nearest). Everything else is a plain truncate
+   to int64_t. */
+static int64_t scale_literal_for_kind(const Node *lit, Kind k)
+{
+    double v = (double)lit->zval;
+    if (k == KIND_ACCUM16) return (int64_t)(v * 256.0   + (v >= 0 ? 0.5 : -0.5));
+    if (k == KIND_ACCUM32) return (int64_t)(v * 65536.0 + (v >= 0 ? 0.5 : -0.5));
+    return (int64_t)v;
 }
 
 /* Width for a Type pointer, falling back to 2 if absent. */
@@ -187,35 +201,132 @@ static int type_width(Type *t)
     return w ? w : 2;
 }
 
-/* Allocate a vreg for a local declared in the source. Registers it
-   in the sym_map and gives it the local's sym for the dumper.
+/* Allocate a vreg for a source-declared local. Registers it in the
+   sym_map and gives it the local's sym for the dumper.
 
-   Arrays (KIND_ARRAY) get a slot sized to sym->size. The vreg's
-   `width` field is overloaded to mean "slot byte count" for arrays
-   — VReg.width is int8_t, so arrays larger than 127 bytes can't be
-   represented and the caller should bail. The vreg is always
-   marked IR_VREG_ADDR_TAKEN since references decay to its address.
-   The vreg's "value" is meaningless on its own — it's only ever
-   read via IR_LEA in expression context. */
+   Arrays/structs overload the vreg's int16_t `width` as slot byte
+   count (so ~32KB fits) and mark it IR_VREG_ADDR_TAKEN: references
+   decay to its address, and the value is only ever read via IR_LEA. */
 static int new_local_vreg(Builder *b, SYMBOL *sym)
 {
     int v = ir_vreg_new(b->f, (int)sym->type, sym, 0);
-    if ((Kind)sym->type == KIND_ARRAY) {
-        /* Array byte count lives in sym->ctype->size (not sym->size,
-           which is used for goto labels / per-symbol bookkeeping). */
+    Kind k = (Kind)sym->type;
+    if (k == KIND_ARRAY || k == KIND_STRUCT) {
+        /* Byte count lives in sym->ctype->size (sym->size is used
+           for goto labels / per-sym bookkeeping). */
         int sz = sym->ctype ? sym->ctype->size : 0;
-        b->f->vregs[v].width = (int8_t)sz;
+        b->f->vregs[v].width = (int16_t)sz;
         b->f->vregs[v].flags |= IR_VREG_ADDR_TAKEN;
     } else {
-        int w = width_for_kind((Kind)sym->type);
-        b->f->vregs[v].width = (int8_t)(w ? w : 2);
+        int w = width_for_kind(k);
+        b->f->vregs[v].width = (int16_t)(w ? w : 2);
     }
     sym_map_set(b, sym, v);
     return v;
 }
 
-/* Map a C OP_* binary op to an IR OpKind. Returns IR_OP_COUNT (invalid)
-   for shapes the Phase 1 builder can't lower. */
+/* Typed-region initialiser for AST_DECL aggregate init lists.
+
+   Walks the TYPE (struct fields / array elements / scalar leaf) in
+   parallel with the init nodes, emitting IR_ST_MEM at base+off for
+   each leaf — and ZERO-FILLING leaves the list doesn't cover (C
+   semantics: a partial initialiser zeroes the remainder; the old
+   flattener skipped this, leaving `int a[4] = {9}` with garbage in
+   a[1..3]).
+
+   `*budget` caps the total stores (zero-fill of a big `= {0}` array
+   would explode the function — past the cap we bail to the walker,
+   which emits a fill loop).
+
+   Returns 0 ok, -1 hard error (already reported), -2 unsupported
+   shape (caller emits the build_fail; the partially built IR is
+   discarded with the function). */
+#define INIT_REGION_MAX_STORES 32
+
+static int init_typed_region(Builder *b, int base, int off,
+                             Type *t, Node *init, int *budget)
+{
+    if (!t) return -2;
+
+    if (t->kind == KIND_STRUCT) {
+        Type *tag = t->tag ? t->tag : t;
+        if (!tag->isstruct) return -2;          /* union init */
+        if (init && init->ast_type != AST_INIT_LIST) return -2;
+        int n_init = (init && init->stmts)
+                   ? (int)array_len(init->stmts) : 0;
+        int n_fld = tag->fields ? (int)array_len(tag->fields) : 0;
+        for (int i = 0; i < n_fld; i++) {
+            Type *fld = array_get_byindex(tag->fields, i);
+            if (!fld) continue;
+            if (fld->bit_size > 0) return -2;   /* bitfields */
+            Node *sub = (i < n_init)
+                      ? array_get_byindex(init->stmts, i) : NULL;
+            int rc = init_typed_region(b, base, off + (int)fld->offset,
+                                       fld, sub, budget);
+            if (rc < 0) return rc;
+        }
+        return 0;
+    }
+
+    if (t->kind == KIND_ARRAY) {
+        Type *el = t->ptr;
+        if (!el) return -2;
+        int n = t->len;
+        if (n <= 0) return -2;
+        int el_sz = (el->kind == KIND_STRUCT || el->kind == KIND_ARRAY)
+                  ? (int)el->size : type_width(el);
+        if (el_sz <= 0) return -2;
+        if (init && init->ast_type != AST_INIT_LIST) return -2;
+        int n_init = (init && init->stmts)
+                   ? (int)array_len(init->stmts) : 0;
+        for (int i = 0; i < n; i++) {
+            Node *sub = (i < n_init)
+                      ? array_get_byindex(init->stmts, i) : NULL;
+            int rc = init_typed_region(b, base, off + i * el_sz,
+                                       el, sub, budget);
+            if (rc < 0) return rc;
+        }
+        return 0;
+    }
+
+    /* Scalar leaf. */
+    int w = width_for_kind(t->kind);
+    if (t->kind == KIND_PTR || t->kind == KIND_CPTR) w = 2;
+    if (w != 1 && w != 2 && w != 4) return -2;
+    if (--(*budget) < 0) return -2;
+    int val_v;
+    if (init) {
+        if (init->ast_type == AST_INIT_LIST) return -2; /* over-braced */
+        val_v = build_expr(b, init);
+        if (val_v < 0) return -1;
+        int vw = b->f->vregs[val_v].width;
+        if (vw != w) {
+            int tmp = new_temp(b, w);
+            b->f->vregs[tmp].width = (int16_t)w;
+            OpKind cv = (vw > w)
+                ? IR_CONV_TRUNC
+                : (init->type && init->type->isunsigned
+                   ? IR_CONV_ZX : IR_CONV_SX);
+            Op *op = ir_op_emit(cur_bb(b), cv);
+            op->dst = tmp; op->src[0] = val_v;
+            val_v = tmp;
+        }
+    } else {
+        val_v = new_temp(b, w);
+        b->f->vregs[val_v].width = (int16_t)w;
+        ir_emit_ld_imm(cur_bb(b), val_v, 0);
+    }
+    Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+    st->src[0]   = val_v;
+    st->mem.kind = IR_MEM_VREG;
+    st->mem.base = base;
+    st->mem.offset = off;
+    st->mem.elem = (w == 1) ? KIND_CHAR : (w == 2) ? KIND_INT : KIND_LONG;
+    return 0;
+}
+
+/* Map a C OP_* binary op to an IR OpKind. Returns IR_OP_COUNT for
+   shapes the builder can't lower. */
 static OpKind op_to_ir_binop(int op)
 {
     switch (op) {
@@ -243,32 +354,49 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     if (!n) return build_fail("null expr node");
 
     /* alloc_dst: return `hint` if provided, else a fresh temp.
-       Use this whenever an op writes a result into a new vreg.
-       Note that not every site is hint-safe: ops with an aliased
-       constraint (binops where dst aliases src[0]) need the hint
-       to be the same as src[0], which the caller can't guarantee
-       — so binops still allocate a fresh dst for now. The win is
-       elsewhere: LD_IMM, unary ops, and the "passthrough" cases. */
+       Not every site is hint-safe: aliased-constraint ops (binops
+       where dst aliases src[0]) would need hint == src[0], which the
+       caller can't guarantee, so binops still allocate a fresh dst.
+       The win is in LD_IMM, unary ops, and the passthrough cases. */
     #define ALLOC_DST(width) ((hint) >= 0 ? (hint) : new_temp(b, (width)))
 
     switch (n->ast_type) {
 
     case AST_LITERAL: {
-        /* Width comes from the literal's type. A `long` constant
-           (e.g. 0x12345678UL) must materialise into a 4-byte vreg —
-           writing it into width=2 truncates the high half silently.
-           Default to int when type info is missing. */
+        /* Width from the literal's type. A `long` constant must
+           materialise into a width-4 vreg — width=2 would silently
+           drop the high half. Default to int when type info is gone. */
         int w = n->type ? type_width(n->type) : 2;
         if (w != 1 && w != 2 && w != 4) w = 2;
+        /* If the caller hinted a destination vreg whose kind is
+           _Accum, the literal is an FP value being implicitly
+           converted — scale to Q-format raw bits and use the
+           target width (ACCUM32 needs width 4 even when the
+           literal was a 2-byte double). */
+        Kind target_k = (hint >= 0) ? (Kind)b->f->vregs[hint].kind
+                                    : KIND_NONE;
+        if      (target_k == KIND_ACCUM32) w = 4;
+        else if (target_k == KIND_ACCUM16) w = 2;
         int v = ALLOC_DST(w);
-        b->f->vregs[v].width = (int8_t)w;
-        ir_emit_ld_imm(cur_bb(b), v, (int64_t)n->zval);
+        /* A hinted dst (decl-init) keeps its DECLARED width — the
+           literal adapts to the variable, not vice versa. `UINT4
+           crc = 0` used to shrink crc's vreg to the int literal's
+           width 2, so EVERY later long op on crc ran 16-bit
+           (crcbench's accumulate; masked for ages because the
+           assertEqual compare was truncated by the same bug). */
+        if (hint >= 0 && b->f->vregs[v].width > 0
+            && target_k != KIND_ACCUM16 && target_k != KIND_ACCUM32)
+            w = b->f->vregs[v].width;
+        b->f->vregs[v].width = (int16_t)w;
+        if (target_k == KIND_ACCUM16 || target_k == KIND_ACCUM32)
+            b->f->vregs[v].kind = target_k;
+        ir_emit_ld_imm(cur_bb(b), v, scale_literal_for_kind(n, target_k));
         return v;
     }
 
     case AST_STR_LIT: {
-        /* String-literal queue ref: address of `i_<litlab>+<zval>`.
-           IR_LD_STR emits `ld hl,i_<litlab>+<offs>`. */
+        /* String-literal queue ref: IR_LD_STR emits
+           `ld hl,i_<litlab>+<zval>`. */
         int v = new_temp(b, 2);
         Op *op = ir_op_emit(cur_bb(b), IR_LD_STR);
         op->dst = v;
@@ -283,10 +411,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            there). Arrays are the exception: by C decay rules, an
            array name in expression context evaluates to a pointer to
            the first element — emit IR_LEA to produce that address. */
-        if (n->sym && (Kind)n->sym->type == KIND_ARRAY) {
+        if (n->sym && ((Kind)n->sym->type == KIND_ARRAY
+                    || (Kind)n->sym->type == KIND_STRUCT)) {
             int src = sym_map_get(b, n->sym);
             if (src < 0)
-                return build_fail("AST_LOCAL_VAR array unmapped %s",
+                return build_fail("AST_LOCAL_VAR aggregate unmapped %s",
                                   n->sym->name);
             int dst = new_temp(b, 2);
             Op *op = ir_op_emit(cur_bb(b), IR_LEA);
@@ -304,7 +433,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            most common decays and extend if needed. */
         if (n->sym && n->sym->ctype &&
             (n->sym->ctype->kind == KIND_FUNC ||
-             n->sym->ctype->kind == KIND_ARRAY)) {
+             n->sym->ctype->kind == KIND_ARRAY ||
+             n->sym->ctype->kind == KIND_STRUCT)) {
             int v = new_temp(b, 2);
             Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
             op->dst = v;
@@ -312,12 +442,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->mem.sym  = n->sym;
             return v;
         }
-        /* Global — load from MEM_SYM. Width comes from the symbol's
-           type kind so long globals stay long through the lowerer.
-           Without this, `unsigned long g = ...; foo(g);` truncates
-           `g` to int on read (mirror of the long-store-to-global bug).
-           sym->type is the symbol-table KIND_* code (KIND_LONG → 4),
-           same convention new_local_vreg uses. */
+        /* Global — load from MEM_SYM. Width from the symbol's type
+           kind so long globals stay long through the lowerer; without
+           it `unsigned long g; foo(g)` truncates g to int on read
+           (mirror of the long-store-to-global bug). sym->type is the
+           KIND_* code (KIND_LONG → 4), as new_local_vreg uses. */
         int gv_w = 2;
         if (n->sym) {
             int w = width_for_kind((Kind)n->sym->type);
@@ -333,7 +462,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
     case OP_DEREF:
         /* Most common shape: OP_DEREF(AST_LOCAL_VAR) — read a local.
-           Phase 1 also accepts OP_DEREF(AST_GLOBAL_VAR) so we can
+           OP_DEREF(AST_GLOBAL_VAR) is also accepted so we can
            collapse `(deref (gv=x))` to a sym-mem load.
 
            OP_DEREF wrapping a pre/post step (`(deref (post++ X))`) is
@@ -343,11 +472,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                            n->operand->ast_type == OP_POST_INC ||
                            n->operand->ast_type == OP_PRE_DEC ||
                            n->operand->ast_type == OP_POST_DEC)) {
-            /* sccz80's rvalue() wraps every step with this OP_DEREF
-               and stamps it with the lvalue's value type
-               (lval->ltype). The inner step node's own type was left
-               at the operand's *address* type by normalize_types, so
-               the step builder can't use it to size loads/stores.
+            /* sccz80's rvalue() wraps every step in this OP_DEREF
+               stamped with the lvalue's value type (lval->ltype). The
+               step node's own type was left at the operand's *address*
+               type by normalize_types, so it can't size loads/stores.
                Transfer this OP_DEREF's value type onto the step for
                the duration of the call. */
             Type *saved = n->operand->type;
@@ -387,10 +515,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             if (elem_w != 1 && elem_w != 2)
                 return build_fail("deref-step elem width %d not supported",
                                   elem_w);
-            /* Step amount: sizeof(*p) for pointer arithmetic. char* →
-               +/-1 (IR_INC/IR_DEC); int* → +/-2 (IR_ADD/SUB with imm).
-               The pointee width comes from the local's pointed-to type;
-               fall back to the deref's result width if unavailable. */
+            /* Step amount: sizeof(*p). char* → +/-1 (IR_INC/IR_DEC);
+               int* → +/-2 (IR_ADD/SUB with imm). Pointee width from
+               the local's pointed-to type, falling back to the deref's
+               result width if unavailable. */
             int pointee_w = lsym->ctype && lsym->ctype->ptr
                 ? type_width(lsym->ctype->ptr) : elem_w;
             if (pointee_w != 1 && pointee_w != 2)
@@ -413,7 +541,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
             if (is_pre) EMIT_BUMP();
             int dst = new_temp(b, elem_w);
-            b->f->vregs[dst].width = (int8_t)elem_w;
+            b->f->vregs[dst].width = (int16_t)elem_w;
             Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
             ld->dst      = dst;
             ld->mem.kind = IR_MEM_VREG;
@@ -428,16 +556,61 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int v = sym_map_get(b, n->operand->sym);
             if (v < 0) return build_fail("deref of unknown local %s",
                                   n->operand->sym ? n->operand->sym->name : "?");
+            /* Aggregate local: the vreg is the slot base. The parser
+               folds offset-0 member access to `(deref (lv=struct_p))`
+               — we need a real load through &p, not the bare vreg. */
+            Kind lk = n->operand->sym ? (Kind)n->operand->sym->type
+                                       : KIND_NONE;
+            if (lk == KIND_STRUCT || lk == KIND_ARRAY) {
+                int elem_w = type_width(n->type);
+                if (elem_w != 1 && elem_w != 2 && elem_w != 4)
+                    return build_fail("OP_DEREF aggregate elem width %d "
+                                      "not supported", elem_w);
+                int base = new_temp(b, 2);
+                Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
+                lea->dst = base; lea->src[0] = v;
+                int dst = new_temp(b, elem_w);
+                b->f->vregs[dst].width = (int16_t)elem_w;
+                Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+                ld->dst       = dst;
+                ld->mem.kind  = IR_MEM_VREG;
+                ld->mem.base  = base;
+                ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
+                              : (elem_w == 2) ? KIND_INT
+                              :                 KIND_LONG;
+                return dst;
+            }
             return v;
         }
         if (n->operand && n->operand->ast_type == AST_GLOBAL_VAR) {
             /* Same width sourcing as the bare-AST_GLOBAL_VAR case
                above — without this, OP_DEREF(global long) truncates
-               to int. */
+               to int. For ARRAY globals the deref reads ELEMENT 0
+               (the parser const-folds `arr[0]` to this shape):
+               width must come from the element type — KIND_ARRAY
+               itself has no width and silently defaulted to a WORD
+               load of byte arrays. */
             int gv_w = 2;
-            if (n->operand->sym) {
-                int w = width_for_kind((Kind)n->operand->sym->type);
+            SYMBOL *gs = n->operand->sym;
+            /* The deref node's own type is the VALUE type — the only
+               reliable width source when the parser folds a struct
+               member read (`g.i[0]`, struct sym, offset 0) to this
+               bare-global shape: KIND_STRUCT has no usable elem in
+               ctype->ptr (q4: long member read 16-bit). */
+            if (n->type && is_supported_int_kind(n->type->kind)) {
+                int w = type_width(n->type);
                 if (w > 0) gv_w = w;
+                gs = NULL;   /* width resolved; skip sym fallback */
+            }
+            if (gs) {
+                if ((Kind)gs->type == KIND_ARRAY
+                    && gs->ctype && gs->ctype->ptr) {
+                    int w = type_width(gs->ctype->ptr);
+                    if (w > 0) gv_w = w;
+                } else {
+                    int w = width_for_kind((Kind)gs->type);
+                    if (w > 0) gv_w = w;
+                }
             }
             int v = new_temp(b, gv_w);
             Op *op = ir_op_emit(cur_bb(b), IR_LD_MEM);
@@ -479,15 +652,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (k == IR_OP_COUNT) return build_fail("binop dispatch hole");
 
         /* Operand-type-aware compare dispatch. op_to_ir_binop maps
-           OP_LT / LE / GT / GE to the signed IR_CMP_LT / LE / GT / GE
-           variants unconditionally. C's usual arithmetic conversions
-           promote `signed < unsigned` to unsigned-vs-unsigned at the
-           same rank, so checking either operand's `isunsigned` is
-           sufficient — if either is unsigned, the compare is unsigned.
-           Without this, `unsigned long < K` emitted the signed S^V
-           correction, miscompiling for values with bit 31 set. EQ/NE
-           are sign-independent (the byte XOR-OR chain doesn't care)
-           so they're left alone. */
+           OP_LT/LE/GT/GE to the signed variants unconditionally. C's
+           usual arithmetic conversions promote `signed < unsigned` to
+           unsigned-vs-unsigned at the same rank, so if either operand
+           is unsigned the compare is unsigned. Without this,
+           `unsigned long < K` emitted the signed S^V correction and
+           miscompiled values with bit 31 set. EQ/NE are sign-
+           independent (the byte XOR-OR chain doesn't care). */
         if (k == IR_CMP_LT || k == IR_CMP_LE
             || k == IR_CMP_GT || k == IR_CMP_GE) {
             int uns = (n->left  && n->left->type  && n->left->type->isunsigned)
@@ -507,11 +678,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            be made so by inverting), swap operands so the literal lands
            on the RHS where the imm-fold path handles it.
 
-           ast_opt already commutes for the truly-commutative cases
-           (ADD, AND, OR, XOR, EQ, NE) — but it leaves the non-symmetric
-           compares (LT/LE/GT/GE) with `lit OP var` because swapping
-           them requires inverting the op (`5 < x` → `x > 5`). Catch
-           those here. */
+           ast_opt already commutes the truly-commutative cases (ADD,
+           AND, OR, XOR, EQ, NE) but leaves the compares (LT/LE/GT/GE)
+           as `lit OP var` since swapping them inverts the op
+           (`5 < x` → `x > 5`). Catch those here. */
         Node *lhs = n->left;
         Node *rhs = n->right;
         if (lhs && lhs->ast_type == AST_LITERAL &&
@@ -544,6 +714,32 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int l = build_expr(b, lhs);
         if (l < 0) return -1;
         int width = b->f->vregs[l].width;
+        /* Integer promotion: byte operands take part in arithmetic
+           and shifts as int — a width-1 result vreg would compute
+           `byte << 8` as zero and truncate `byte + byte` carries.
+           `byte << 8` itself is the combined widen+shift op. */
+        if (width == 1
+            && (k == IR_ADD || k == IR_SUB
+             || k == IR_SHL || k == IR_SHR)) {
+            int uns = !lhs->type || lhs->type->isunsigned;
+            if (k == IR_SHL && rhs && rhs->ast_type == AST_LITERAL
+                && (int64_t)rhs->zval == 8) {
+                int dst = new_temp(b, 2);
+                b->f->vregs[dst].width = 2;
+                Op *bh = ir_op_emit(cur_bb(b), IR_CONV_BYTE_TO_HIGH);
+                bh->dst = dst;
+                bh->src[0] = l;
+                return dst;
+            }
+            int wtmp = new_temp(b, 2);
+            b->f->vregs[wtmp].width = 2;
+            Op *cvp = ir_op_emit(cur_bb(b),
+                                 uns ? IR_CONV_ZX : IR_CONV_SX);
+            cvp->dst = wtmp;
+            cvp->src[0] = l;
+            l = wtmp;
+            width = 2;
+        }
         /* Long binops: ADD/SUB via helper calls; AND/OR/XOR byte-wise
            inline; SHL/SHR with const count inline; CMP_EQ/NE byte-wise
            OR-of-diffs (#340). Others bail. */
@@ -561,13 +757,45 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* Comparisons produce a bool/int result regardless of operand
            width — the dst is always width 2. */
         int is_cmp = (k >= IR_CMP_EQ && k <= IR_CMP_UGE);
+        /* Shift counts never participate in width convergence (the
+           count is an imm / width-2 vreg, not an arithmetic operand);
+           pointer results keep 16-bit address math. */
+        int is_shift = (k == IR_SHL || k == IR_SHR);
+        int is_ptrish = (n->type && n->type->kind == KIND_PTR)
+                     || (lhs->type && lhs->type->kind == KIND_PTR);
+        /* Widen the LHS to the RESULT width when the literal RHS or
+           the expression type is wider than the LHS vreg. The
+           commutative swap above moves literals to the RHS, so
+           `0x01000100UL + i` arrives with l = i (width 2) and a LONG
+           literal — without this the add ran at 16 bits, truncating
+           the constant to its low word (tt2/tt3: png[i] init lost
+           the 0x0100 high half in BOTH modes). */
+        if (!is_shift && !is_ptrish
+            && rhs && rhs->ast_type == AST_LITERAL) {
+            int tw = width;
+            if (rhs->type && is_supported_int_kind(rhs->type->kind)
+                && type_width(rhs->type) > tw)
+                tw = type_width(rhs->type);
+            if (n->type && is_supported_int_kind(n->type->kind)
+                && type_width(n->type) > tw)
+                tw = type_width(n->type);
+            if (tw > width) {
+                int uns = !lhs->type || lhs->type->isunsigned;
+                int wtmp = new_temp(b, tw);
+                b->f->vregs[wtmp].width = (int16_t)tw;
+                Op *cv = ir_op_emit(cur_bb(b),
+                                    uns ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = wtmp; cv->src[0] = l;
+                l = wtmp;
+                width = tw;
+            }
+        }
         int dst_w  = is_cmp ? 2 : width;
-        /* Literal-RHS fold: when rhs is an AST_LITERAL, emit
-           the binop with src[1] = -1 and op->imm = literal value.
-           This lets the lowerer materialise the constant inline
-           (`ld de, K` for binops, unrolled `add hl,hl` for shifts).
-           Saves a frame slot and the LD_IMM-then-store-then-reload
-           churn the dumb path would otherwise emit. */
+        /* Literal-RHS fold: emit the binop with src[1] = -1 and
+           op->imm = literal so the lowerer materialises the constant
+           inline (`ld de, K` for binops, unrolled `add hl,hl` for
+           shifts). Saves a frame slot and the LD_IMM/store/reload
+           churn of the dumb path. */
         if (rhs && rhs->ast_type == AST_LITERAL) {
             int dst = ALLOC_DST(dst_w);
             Op *op = ir_op_emit(cur_bb(b), k);
@@ -575,7 +803,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->src[0] = l;
             op->src[1] = -1;
             op->imm    = (int64_t)rhs->zval;
-            b->f->vregs[dst].width = (int8_t)dst_w;
+            b->f->vregs[dst].width = (int16_t)dst_w;
             return dst;
         }
         int r = build_expr(b, rhs);
@@ -590,53 +818,187 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             && k != IR_CMP_ULT && k != IR_CMP_ULE
             && k != IR_CMP_UGT && k != IR_CMP_UGE)
             return build_fail("long binop rhs op %d deferred", (int)k);
+        /* Mixed-width variable operands: converge to the wider side
+           (each by its OWN signedness) — the long lowerings read
+           BOTH operands at the binop width, so a narrower vreg would
+           contribute a garbage high half. Shifts keep their width-2
+           count; pointer math stays 16-bit. */
+        if (!is_shift && !is_ptrish
+            && b->f->vregs[r].width != width) {
+            if (b->f->vregs[r].width > width) {
+                int uns = !lhs->type || lhs->type->isunsigned;
+                int tw = b->f->vregs[r].width;
+                int wtmp = new_temp(b, tw);
+                b->f->vregs[wtmp].width = (int16_t)tw;
+                Op *cv = ir_op_emit(cur_bb(b),
+                                    uns ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = wtmp; cv->src[0] = l;
+                l = wtmp;
+                width = tw;
+                dst_w = is_cmp ? 2 : width;
+            } else {
+                int uns = !rhs->type || rhs->type->isunsigned;
+                int wtmp = new_temp(b, width);
+                b->f->vregs[wtmp].width = (int16_t)width;
+                Op *cv = ir_op_emit(cur_bb(b),
+                                    uns ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = wtmp; cv->src[0] = r;
+                r = wtmp;
+            }
+        }
         int dst = ALLOC_DST(dst_w);
         ir_emit_binop(cur_bb(b), k, dst, l, r);
-        b->f->vregs[dst].width = (int8_t)dst_w;
+        b->f->vregs[dst].width = (int16_t)dst_w;
         return dst;
     }
 
     case OP_ASSIGN: {
         /* LHS = RHS. LHS is an lvalue: AST_LOCAL_VAR (address) or
-           AST_GLOBAL_VAR or a more complex address expression. Phase 1:
-           bare local / bare global only. */
+           AST_GLOBAL_VAR or a more complex address expression. Bare
+           local / bare global only. */
         if (!n->left)
             return build_fail("OP_ASSIGN with NULL LHS");
+        /* Derive the destination's _Accum kind so float-literal RHS
+           gets Q-format scaling. Only set when the LHS sym carries a
+           fix-point type. */
+        Kind dst_accum = KIND_NONE;
+        if (n->left->ast_type == AST_GLOBAL_VAR
+            && n->left->sym
+            && ((Kind)n->left->sym->type == KIND_ACCUM16
+             || (Kind)n->left->sym->type == KIND_ACCUM32))
+            dst_accum = (Kind)n->left->sym->type;
+        if (n->left->ast_type == OP_DEREF
+            && n->left->type
+            && n->left->type->kind == KIND_PTR
+            && n->left->type->ptr
+            && (n->left->type->ptr->kind == KIND_ACCUM16
+             || n->left->type->ptr->kind == KIND_ACCUM32))
+            dst_accum = n->left->type->ptr->kind;
         if (n->left->ast_type == AST_LOCAL_VAR) {
             int dst_v = sym_map_get(b, n->left->sym);
             if (dst_v < 0)
                 return build_fail("OP_ASSIGN to unknown local %s",
                                   n->left->sym ? n->left->sym->name : "?");
-            /* Pass dst_v as hint: if the RHS expression supports it,
-               it will write directly into dst_v and we can skip the
-               MOV. Otherwise it returns a different vreg and we copy. */
+            Kind lk = n->left->sym ? (Kind)n->left->sym->type : KIND_NONE;
+            if (lk == KIND_ARRAY || lk == KIND_STRUCT) {
+                /* Folded offset-0 aggregate store: parser collapses
+                   `arr[0] = X` to `(= (lv=arr) X)`. Emit LEA + ST_MEM
+                   with element width from ctype->ptr. */
+                Type *elem_t = n->left->sym->ctype
+                             ? n->left->sym->ctype->ptr : NULL;
+                int elem_w = type_width(elem_t);
+                Kind elem_k = elem_t ? elem_t->kind : KIND_INT;
+                if (elem_w != 1 && elem_w != 2 && elem_w != 4)
+                    return build_fail("OP_ASSIGN aggregate elem width %d",
+                                      elem_w);
+                int rhs_v = build_expr(b, n->right);
+                if (rhs_v < 0) return -1;
+                int rhs_w = b->f->vregs[rhs_v].width;
+                if (rhs_w != elem_w) {
+                    int tmp = new_temp(b, elem_w);
+                    b->f->vregs[tmp].width = (int16_t)elem_w;
+                    OpKind cv = (rhs_w > elem_w)
+                        ? IR_CONV_TRUNC
+                        : (n->right->type && n->right->type->isunsigned
+                           ? IR_CONV_ZX : IR_CONV_SX);
+                    Op *op = ir_op_emit(cur_bb(b), cv);
+                    op->dst = tmp; op->src[0] = rhs_v;
+                    rhs_v = tmp;
+                }
+                int addr = new_temp(b, 2);
+                Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
+                lea->dst = addr; lea->src[0] = dst_v;
+                Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                st->src[0]   = rhs_v;
+                st->mem.kind = IR_MEM_VREG;
+                st->mem.base = addr;
+                st->mem.elem = elem_k;
+                return rhs_v;
+            }
+            /* Pass dst_v as hint: the RHS writes into it directly when
+               it can (skipping the MOV), else returns another vreg we
+               copy. The hint vreg's kind also drives literal-to-_Accum
+               scaling in the AST_LITERAL handler. */
             int rhs_v = build_expr_hinted(b, n->right, dst_v);
             if (rhs_v < 0) return -1;
             if (rhs_v != dst_v)
                 ir_emit_mov(cur_bb(b), dst_v, rhs_v);
             return dst_v;
         }
-        int rhs_v = build_expr(b, n->right);
+        /* Non-local LHS: for a float-literal RHS heading into an
+           _Accum slot, allocate a typed hint vreg so the literal
+           handler's scaling fires. */
+        int rhs_hint = -1;
+        if (dst_accum != KIND_NONE
+            && n->right && n->right->ast_type == AST_LITERAL) {
+            int w = (dst_accum == KIND_ACCUM32) ? 4 : 2;
+            rhs_hint = new_temp(b, w);
+            b->f->vregs[rhs_hint].width = (int16_t)w;
+            b->f->vregs[rhs_hint].kind  = dst_accum;
+        }
+        int rhs_v = (rhs_hint >= 0)
+                  ? build_expr_hinted(b, n->right, rhs_hint)
+                  : build_expr(b, n->right);
         if (rhs_v < 0) return -1;
         if (n->left->ast_type == AST_GLOBAL_VAR) {
+            /* Store width comes from the GLOBAL's type, not the RHS
+               vreg: gen_st_mem keys the store size off src width, so
+               an int-width RHS into a byte global emits `ld (_g),hl`
+               and clobbers the adjacent byte (the parser also folds
+               `g[0] = X` into this bare-global shape). Converge the
+               RHS to the element width first, mirroring the local
+               aggregate path above. */
+            Kind gk = n->left->sym ? (Kind)n->left->sym->type : KIND_NONE;
+            int elem_w;
+            if (n->type && is_supported_int_kind(n->type->kind)) {
+                /* OP_ASSIGN's own type IS the stored value type —
+                   and the only reliable source when the parser folds
+                   `g.member = X` / `g_arr[0] = X` to a bare-global
+                   assign: a STRUCT sym's ctype->ptr is NOT the member
+                   type (q4: g.i[0] = long stored 16 bits via that
+                   path). */
+                elem_w = type_width(n->type);
+            } else if (gk == KIND_ARRAY || gk == KIND_STRUCT) {
+                Type *elem_t = n->left->sym->ctype
+                             ? n->left->sym->ctype->ptr : NULL;
+                elem_w = type_width(elem_t);
+            } else {
+                int w = width_for_kind(gk);
+                elem_w = w ? w : 2;
+            }
+            if (elem_w != 1 && elem_w != 2 && elem_w != 4)
+                return build_fail("OP_ASSIGN global elem width %d",
+                                  elem_w);
+            int rhs_w = b->f->vregs[rhs_v].width;
+            if (rhs_w != elem_w) {
+                int tmp = new_temp(b, elem_w);
+                b->f->vregs[tmp].width = (int16_t)elem_w;
+                OpKind cv = (rhs_w > elem_w)
+                    ? IR_CONV_TRUNC
+                    : (n->right->type && n->right->type->isunsigned
+                       ? IR_CONV_ZX : IR_CONV_SX);
+                Op *op = ir_op_emit(cur_bb(b), cv);
+                op->dst = tmp; op->src[0] = rhs_v;
+                rhs_v = tmp;
+            }
             Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
             op->src[0]   = rhs_v;
             op->mem.kind = IR_MEM_SYM;
             op->mem.sym  = n->left->sym;
+            op->mem.elem = (elem_w == 1) ? KIND_CHAR
+                         : (elem_w == 2) ? KIND_INT : KIND_LONG;
             return rhs_v;
         }
         if (n->left->ast_type == OP_DEREF && n->left->operand) {
-            /* Indirect store: `*p = X`, where p is some pointer
-               expression. Walk it to a vreg holding the address,
-               then emit IR_ST_MEM via IR_MEM_VREG. Element width
-               comes from the LHS deref's result type.
+            /* Indirect store `*p = X`: walk p to a vreg holding the
+               address, emit IR_ST_MEM via IR_MEM_VREG, element width
+               from the LHS deref's result type.
 
                Special case: a bare AST_LOCAL_VAR pointer operand
-               (`*q = X` where q is a pointer-typed local). The
-               generic build_expr would bail with "bare AST_LOCAL_VAR
-               outside lvalue context" — but here we want the local's
-               *value* (the pointer), which the symbol's vreg already
-               holds directly. Shortcut to the vreg map. */
+               (`*q = X`, q a pointer local). build_expr would bail
+               "bare AST_LOCAL_VAR outside lvalue context", but here we
+               want the local's *value* (the pointer), which its vreg
+               already holds. Shortcut to the vreg map. */
             int ptr_v;
             if (n->left->operand->ast_type == AST_LOCAL_VAR) {
                 ptr_v = sym_map_get(b, n->left->operand->sym);
@@ -650,15 +1012,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 ptr_v = build_expr(b, n->left->operand);
                 if (ptr_v < 0) return -1;
             }
-            /* Element width: prefer n->type (the OP_ASSIGN's own type,
-               which is by definition the stored value's type — the
-               most reliable source). Fall back to n->left->type->ptr
-               for the OP_DEREF lvalue convention, then to
-               n->left->type itself for the parser's scalar-folded
-               shape. Earlier code derived elem_w purely from n->left
-               which silently truncated long stores to int for the
-               chained-assign / member-store shape because the parser
-               sometimes records the scalar value type there. */
+            /* Element width: prefer n->type (the OP_ASSIGN's own type
+               = stored value type, most reliable). Fall back to
+               n->left->type->ptr (OP_DEREF lvalue convention), then
+               n->left->type itself (parser's scalar-folded shape).
+               Deriving elem_w purely from n->left silently truncated
+               long stores to int for the chained-assign / member-store
+               shape, where the parser records the scalar value type. */
             int elem_w = 0;
             if (n->type && is_supported_int_kind(n->type->kind))
                 elem_w = type_width(n->type);
@@ -671,16 +1031,15 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             if (elem_w != 1 && elem_w != 2 && elem_w != 4)
                 return build_fail("OP_ASSIGN via deref elem width %d "
                                   "not yet supported", elem_w);
-            /* Match the rhs vreg's width to the store's element width
-               via narrow (TRUNC) or widen (ZX/SX) as needed. The
-               lowerer's IR_ST_MEM dispatches on src vreg width — a
-               mismatch here would emit the wrong-sized store (e.g. a
-               4-byte source storing only 2 bytes for a long deref). */
+            /* Match rhs width to the store's element width (TRUNC or
+               ZX/SX). The lowerer's IR_ST_MEM dispatches on src vreg
+               width — a mismatch emits a wrong-sized store (e.g. a
+               4-byte source writing only 2 bytes for a long deref). */
             int rhs_w = b->f->vregs[rhs_v].width;
             if (rhs_w != elem_w) {
                 if (rhs_w > elem_w) {
                     int tmp = new_temp(b, elem_w);
-                    b->f->vregs[tmp].width = (int8_t)elem_w;
+                    b->f->vregs[tmp].width = (int16_t)elem_w;
                     Op *cv = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
                     cv->dst    = tmp;
                     cv->src[0] = rhs_v;
@@ -692,7 +1051,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     int unsigned_src = !n->right->type ||
                                        n->right->type->isunsigned;
                     int tmp = new_temp(b, elem_w);
-                    b->f->vregs[tmp].width = (int8_t)elem_w;
+                    b->f->vregs[tmp].width = (int16_t)elem_w;
                     Op *cv = ir_op_emit(cur_bb(b),
                                         unsigned_src ? IR_CONV_ZX : IR_CONV_SX);
                     cv->dst    = tmp;
@@ -712,50 +1071,42 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* Address-yielding LHS (#342 / #343): the parser folds
            `*(p + K)`, array subscripts (`arr[i] = K`, `global_arr[N]
            = K`), and chained assigns into a bare expression in lvalue
-           context. n->left is an OP_ADD / OP_SUB / etc. that evaluates
-           to an address. The type kind on n->left varies:
-             - KIND_PTR  (e.g. `p[K]` for pointer p) → use ->ptr
-             - KIND_ARRAY (e.g. `arr[K]` for an array local) → use ->ptr
+           context. n->left is an OP_ADD / OP_SUB / etc. yielding an
+           address. The type kind on n->left varies:
+             - KIND_PTR  (`p[K]` for pointer p)        → use ->ptr
+             - KIND_ARRAY (`arr[K]` for an array local) → use ->ptr
              - element scalar kind (KIND_INT/LONG/CHAR) — the parser
-               sometimes uses the value type on a folded address node,
-               losing the "pointer to" wrapping. Treat n->left->type
-               itself as the element type. */
+               sometimes records the value type on a folded address
+               node, losing the "pointer to". Treat n->left->type
+               itself as the element type.
+           KIND_ARRAY long-element stores (`in[i] = long`) are gated
+           off in sp mode only. With byte-pack + pointer-spill-skip +
+           offset folds + the stack-free long store + post-step
+           fusion, ungated md5 BEATS the walker mix in fp mode
+           (36.55M vs 36.84M) — so fp ungates. sp still trails
+           (38.51M vs 37.14M, +3.7%): the remaining sp residue is
+           the per-input-byte copy loop's slot walks. sp stays gated
+           until that flips too. */
         if (n->left->type
-            && (n->left->type->kind == KIND_PTR
-             || (n->left->type->kind == KIND_ARRAY
-                 && (!n->type || n->type->kind != KIND_LONG)))
-            && n->left->type->ptr) {
-            /* KIND_ARRAY (local- or global-array stores like
-               `arr[i] = K`) gated on non-long element width.
-               Char/int/ptr element stores compile through IR cleanly
-               and give measurable wins (intbench -6.8% from the
-               `buffer[i] = byte` shape in init_data + similar).
-
-               Long-element array stores (`in[i] = long_val` in
-               MD5Update's bit-packing loop) DO compile correctly here
-               but expose a structural slowdown: every intermediate
-               long value (byte<<24 / byte<<16 / etc.) spills to a
-               frame slot — costing ~50T per spill + 40T per reload —
-               because long vregs can't sit in PR_HL / PR_DE / PR_BC
-               (those are width-2 only) and we don't yet have stack-
-               push preservation for cross-op long lifetimes. Net
-               +39% on md5 with the long-array case enabled.
-
-               Re-enable for long element width once Phase D (stack
-               push/pop preservation for long DEHL across DEHL-
-               clobbering ops) lands. See src/80cc/.tmp/HELPER_PLAN.md. */
+            && ((n->left->type->kind == KIND_PTR
+                 || n->left->type->kind == KIND_ARRAY)
+                || is_supported_int_kind(n->left->type->kind))
+            && (n->left->type->ptr
+                || is_supported_int_kind(n->left->type->kind))) {
             int ptr_v = build_expr(b, n->left);
             if (ptr_v < 0) return -1;
-            /* Prefer n->type (the OP_ASSIGN's own type = stored value
-               type) over n->left->type->ptr — same reasoning as the
-               OP_DEREF-LHS path's #344 fix. For chained assigns the
-               inner OP_ASSIGN's RHS-value type IS the store width;
-               the LHS pointer type can mislead. */
+            /* Prefer n->type (OP_ASSIGN's own type = stored value
+               type) over n->left->type->ptr — same as the OP_DEREF-LHS
+               #344 fix. For chained assigns the inner OP_ASSIGN's
+               RHS-value type IS the store width; the LHS pointer type
+               can mislead. */
             int elem_w = 0;
             if (n->type && is_supported_int_kind(n->type->kind))
                 elem_w = type_width(n->type);
-            if (elem_w == 0)
+            if (elem_w == 0 && n->left->type->ptr)
                 elem_w = type_width(n->left->type->ptr);
+            if (elem_w == 0 && is_supported_int_kind(n->left->type->kind))
+                elem_w = type_width(n->left->type);
             if (elem_w != 1 && elem_w != 2 && elem_w != 4)
                 return build_fail("OP_ASSIGN ptr-LHS elem width %d "
                                   "not yet supported", elem_w);
@@ -765,7 +1116,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             if (rhs_w != elem_w) {
                 if (rhs_w > elem_w) {
                     int tmp = new_temp(b, elem_w);
-                    b->f->vregs[tmp].width = (int8_t)elem_w;
+                    b->f->vregs[tmp].width = (int16_t)elem_w;
                     Op *cv = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
                     cv->dst    = tmp;
                     cv->src[0] = rhs_v;
@@ -774,7 +1125,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     int unsigned_src = !n->right->type ||
                                        n->right->type->isunsigned;
                     int tmp = new_temp(b, elem_w);
-                    b->f->vregs[tmp].width = (int8_t)elem_w;
+                    b->f->vregs[tmp].width = (int16_t)elem_w;
                     Op *cv = ir_op_emit(cur_bb(b),
                                         unsigned_src ? IR_CONV_ZX : IR_CONV_SX);
                     cv->dst    = tmp;
@@ -796,54 +1147,110 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     }
 
     case AST_PRESERVE_BC:
-        /* Expression context: passthrough to operand. Same rationale
-           as the statement-context handler — our IR doesn't pin to BC. */
+        /* Expression context: passthrough — our IR doesn't pin to BC.
+           Same rationale as the statement-context handler. */
         return n->operand ? build_expr(b, n->operand) : -1;
 
     case OP_MOD:
-        /* The l_div_*-family helpers return quot in HL, rem in DE.
-           For mod we want DE — needs an `ex de,hl` after the call
-           that IR_HCALL doesn't currently express. Defer to legacy. */
-        return build_fail("OP_MOD deferred (needs HL/DE swap path)");
-
     case OP_MULT:
     case OP_DIV: {
-        /* 16-bit integer mul/div via runtime helpers. Convention:
-           HL = LHS, DE = RHS, return in HL. */
+        Kind lk = n->left  && n->left->type  ? n->left->type->kind  : KIND_NONE;
+        Kind rk = n->right && n->right->type ? n->right->type->kind : KIND_NONE;
+        int is_fix16 = (lk == KIND_ACCUM16 || rk == KIND_ACCUM16);
+        int is_fix32 = (lk == KIND_ACCUM32 || rk == KIND_ACCUM32);
+        if ((is_fix16 || is_fix32) && n->ast_type == OP_MOD)
+            return build_fail("OP_MOD on _Accum not defined");
         int l = build_expr(b, n->left);
         if (l < 0) return -1;
         int r = build_expr(b, n->right);
         if (r < 0) return -1;
+        int width = b->f->vregs[l].width;
+        if (b->f->vregs[r].width > width) width = b->f->vregs[r].width;
+        /* Converge mixed-width operands to the helper width BEFORE
+           the HCALL: gen_hcall marshals each arg by its vreg width,
+           so a narrower operand hands the helper a garbage high half
+           (`(UINT4)K * (i+1)` fed l_long_mult_u a 16-bit i+1 — junk
+           above bit 15; sp hung, fp returned wrong products). Each
+           operand widens by its OWN signedness (C value-preserving
+           promotion). */
+        if (b->f->vregs[l].width != width) {
+            int uns = n->left && n->left->type
+                   && n->left->type->isunsigned;
+            int tmp = new_temp(b, width);
+            b->f->vregs[tmp].width = (int16_t)width;
+            Op *cv = ir_op_emit(cur_bb(b),
+                                uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = tmp; cv->src[0] = l;
+            l = tmp;
+        }
+        if (b->f->vregs[r].width != width) {
+            int uns = n->right && n->right->type
+                   && n->right->type->isunsigned;
+            int tmp = new_temp(b, width);
+            b->f->vregs[tmp].width = (int16_t)width;
+            Op *cv = ir_op_emit(cur_bb(b),
+                                uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = tmp; cv->src[0] = r;
+            r = tmp;
+        }
+        /* C arithmetic conversion: result is unsigned if either
+           operand is unsigned. */
+        int unsigned_op = (n->type && n->type->isunsigned)
+            || (n->left  && n->left->type  && n->left->type->isunsigned)
+            || (n->right && n->right->type && n->right->type->isunsigned);
         const char *helper;
-        int unsigned_op = n->type && n->type->isunsigned;
-        if (n->ast_type == OP_MULT) {
-            /* Multiplication: low 16 bits are identical for signed and
-               unsigned, so a single helper suffices. */
-            helper = "l_mult";
-        } else {
-            helper = unsigned_op ? "l_div_u" : "l_div";
-        }
-        /* IR_HCALL puts args[0] in HL, args[1] in DE.
-           - l_mult: hl = hl * de — args = [LHS, RHS]
-           - l_div / l_div_u: computes secondary/primary = DE/HL.
-             To get LHS/RHS, LHS must be in DE (secondary), RHS in HL
-             (primary). So args = [RHS, LHS] — swapped. */
-        int dst = new_temp(b, 2);
+        int n_stacked = 0;
+        int ret_in_de = 0;
         int *args = calloc(2, sizeof(int));
-        if (n->ast_type == OP_MULT) {
-            args[0] = l;
-            args[1] = r;
+        if (is_fix16) {
+            /* l_fix16_{muls,mulu,divs,divu}: hl = rhs, stack = lhs;
+               result in hl, helper pops the pushed lhs itself. */
+            helper = (n->ast_type == OP_MULT)
+                ? (unsigned_op ? "l_fix16_mulu" : "l_fix16_muls")
+                : (unsigned_op ? "l_fix16_divu" : "l_fix16_divs");
+            args[0] = l; args[1] = r; n_stacked = 1;
+        } else if (is_fix32) {
+            /* l_fix32_{muls,mulu,divs,divu}: same shape as l_long_*
+               (DEHL=RHS, stack=LHS, result DEHL). Helpers not in
+               libsrc yet — walker references them too. */
+            helper = (n->ast_type == OP_MULT)
+                ? (unsigned_op ? "l_fix32_mulu" : "l_fix32_muls")
+                : (unsigned_op ? "l_fix32_divu" : "l_fix32_divs");
+            args[0] = l; args[1] = r; n_stacked = 1;
+        } else if (width == 4) {
+            /* l_long_{mult,mult_u,div,div_u,mod,mod_u}: dehl = arg1,
+               stack = arg2 (4 bytes), result in DEHL, helper pops. */
+            if (n->ast_type == OP_MULT)
+                helper = unsigned_op ? "l_long_mult_u" : "l_long_mult";
+            else if (n->ast_type == OP_DIV)
+                helper = unsigned_op ? "l_long_div_u" : "l_long_div";
+            else
+                helper = unsigned_op ? "l_long_mod_u" : "l_long_mod";
+            /* For long: helper's dehl = RHS, stack = LHS. */
+            args[0] = l;            /* pushed */
+            args[1] = r;            /* DEHL */
+            n_stacked = 1;
+        } else if (n->ast_type == OP_MULT) {
+            helper = "l_mult";
+            args[0] = l; args[1] = r;
         } else {
-            args[0] = r;        /* RHS → HL (primary) */
-            args[1] = l;        /* LHS → DE (secondary) */
+            /* l_div / l_div_u: hl = de/hl (quot in HL, rem in DE). */
+            helper = unsigned_op ? "l_div_u" : "l_div";
+            args[0] = r;            /* RHS → HL (primary) */
+            args[1] = l;            /* LHS → DE (secondary) */
+            if (n->ast_type == OP_MOD) ret_in_de = 1;
         }
+        int dst = new_temp(b, width);
+        b->f->vregs[dst].width = (int16_t)width;
         Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
         op->dst = dst;
         HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-        hi->name     = helper;
-        hi->args     = args;
-        hi->n_args   = 2;
-        hi->ret_vreg = dst;
+        hi->name      = helper;
+        hi->args      = args;
+        hi->n_args    = 2;
+        hi->n_stacked = n_stacked;
+        hi->ret_vreg  = dst;
+        hi->ret_in_de = ret_in_de;
         op->hcall = hi;
         return dst;
     }
@@ -854,7 +1261,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (v < 0) return -1;
         int width = b->f->vregs[v].width;
         int dst = ALLOC_DST(width);
-        b->f->vregs[dst].width = (int8_t)width;
+        b->f->vregs[dst].width = (int16_t)width;
         ir_emit_unop(cur_bb(b), IR_NEG, dst, v);
         return dst;
     }
@@ -866,22 +1273,27 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (v < 0) return -1;
         int width = b->f->vregs[v].width;
         int dst = ALLOC_DST(width);
-        b->f->vregs[dst].width = (int8_t)width;
+        b->f->vregs[dst].width = (int16_t)width;
         ir_emit_unop(cur_bb(b), IR_NOT, dst, v);
         return dst;
     }
 
     case OP_LNEG: {
-        /* !x — logical not. Materialise as `x == 0` so we get a 0/1
-           result. IR_CMP_EQ compares against a fresh 0 vreg. */
+        /* !x logical not, materialised as `x == 0`. Long form
+           uses the IR_CMP_EQ const-RHS fold (lowerer's byte-wise
+           XOR-OR chain); int form goes through a fresh 0 vreg. */
         if (!n->operand) return build_fail("OP_LNEG with no operand");
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
-        if (b->f->vregs[v].width == 4)
-            return build_fail("long OP_LNEG deferred (operand width 4)");
+        int dst = new_temp(b, 2);
+        b->f->vregs[dst].width = 2;
+        if (b->f->vregs[v].width == 4) {
+            Op *op = ir_op_emit(cur_bb(b), IR_CMP_EQ);
+            op->dst = dst; op->src[0] = v; op->src[1] = -1; op->imm = 0;
+            return dst;
+        }
         int zero_v = new_temp(b, 2);
         ir_emit_ld_imm(cur_bb(b), zero_v, 0);
-        int dst = new_temp(b, 2);
         ir_emit_binop(cur_bb(b), IR_CMP_EQ, dst, v, zero_v);
         return dst;
     }
@@ -889,34 +1301,85 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     case AST_FUNC_CALL: {
         /* Direct call only (sym set, callee NULL). All args are walked
            to int-width vregs. Result lands in a new int vreg via
-           IR_CALL's ret_vreg. Phase 1: int-class args + return only;
-           variadic / fastcall / fnptr-call all deferred. */
+           IR_CALL's ret_vreg. Int-class args + return only; variadic /
+           fastcall / fnptr-call all deferred. */
         if (!n->sym)
             return build_fail("AST_FUNC_CALL without sym (fnptr deferred)");
-        /* Fastcall callees pass args via HL/DEHL — not via the stack.
-           Bail out so the legacy walker handles these (it knows the
-           per-arg register pinning). */
-        if (n->sym->ctype && (n->sym->ctype->flags & FASTCALL))
-            return build_fail("AST_FUNC_CALL to fastcall %s deferred",
-                              n->sym->name);
+        int is_fastcall = (n->sym->ctype
+                           && (n->sym->ctype->flags & FASTCALL));
         int n_args = n->args ? (int)array_len(n->args) : 0;
+        /* R→L build/push order ONLY for plain stdc — CALLEE pushes
+           L→R like SMALLC (must mirror gen_call's push_step). */
+        uint32_t fl = n->sym->ctype ? n->sym->ctype->flags : 0;
+        int is_stdc = !is_fastcall && !(fl & SMALLC) && !(fl & CALLEE);
         int *args = NULL;
+        int pre_pushed = 0;
         if (n_args > 0) {
             args = calloc(n_args, sizeof(int));
-            for (int i = 0; i < n_args; i++) {
+            /* Push-at-producer: build args in PUSH order (smallc /
+               callee: left-to-right; stdc: right-to-left; fastcall:
+               first n-1 pushed, last arg built last for the HL load)
+               and emit IR_PUSH_ARG right after each producer. The
+               value is consumed at the very next op, so the dead-
+               spill analysis keeps these temps in HL/DEHL — no slot,
+               no store. Constraints: pushes must stay in ONE BB
+               (cur_sp_adjust resets at BB boundaries) and widths must
+               be 2 or 4 (byte args use the slot-load promote path).
+               Any violation rolls ALL pushes back to IR_NOP — the
+               legacy slot path in gen_call still works off args[]. */
+            int n_to_push = is_fastcall ? n_args - 1 : n_args;
+            int push_bb   = b->cur_bb_id;
+            int pushable  = 1;
+            int push_ops[64];
+            int n_push_ops = 0;
+            for (int k = 0; k < n_args; k++) {
+                int i;
+                if (is_fastcall)
+                    i = k;                    /* 0..n-2 pushed, n-1 last */
+                else if (is_stdc)
+                    i = n_args - 1 - k;       /* right-to-left */
+                else
+                    i = k;                    /* left-to-right */
                 Node *a = array_get_byindex(n->args, i);
                 int v = build_expr(b, a);
                 if (v < 0) { free(args); return -1; }
                 args[i] = v;
+                if (b->cur_bb_id != push_bb) pushable = 0;
+                int w = b->f->vregs[v].width;
+                int want_push = (k < n_to_push);
+                if (want_push && pushable
+                    && (w == 2 || w == 4)
+                    && n_push_ops < 64) {
+                    Op *p = ir_op_emit(cur_bb(b), IR_PUSH_ARG);
+                    p->src[0] = v;
+                    p->src[1] = -1;
+                    /* imm=1 marks the call's FIRST push: if the
+                       function keeps a PR_BC tenant, the lowerer
+                       saves BC there — BELOW the arg block — and
+                       gen_call pops it after the cleanup. */
+                    p->imm = (n_push_ops == 0) ? 1 : 0;
+                    push_ops[n_push_ops++] = cur_bb(b)->n_ops - 1;
+                } else if (want_push) {
+                    pushable = 0;
+                }
+            }
+            if (pushable && n_push_ops == n_to_push) {
+                pre_pushed = n_to_push;
+            } else {
+                /* Roll back: NOP the pushes; gen_call loads from
+                   slots as before. (All pushes live in push_bb —
+                   pushable drops to 0 the moment the BB changes.) */
+                BB *pbb = &b->f->bbs[push_bb];
+                for (int k = 0; k < n_push_ops; k++)
+                    pbb->ops[push_ops[k]].kind = IR_NOP;
+                pre_pushed = 0;
             }
         }
-        /* Width of the return vreg comes from the callee's return
-           type — for long-returning functions this needs to be 4 so
-           subsequent IR_ST_MEM / IR_MOV / etc. operate on all four
-           bytes (the long-return convention is DEHL). Without this,
-           crc32's `g = shr1(x)` silently truncated to int because the
-           ret vreg was hardcoded to width 2 and ST_MEM IR_MEM_SYM
-           then wrote only HL. */
+        /* Return vreg width from the callee's return type — long
+           returns need width 4 so later IR_ST_MEM / IR_MOV operate on
+           all four bytes (long-return convention is DEHL). Without it,
+           crc32's `g = shr1(x)` truncated to int: the ret vreg was
+           hardcoded width 2 and ST_MEM IR_MEM_SYM wrote only HL. */
         int ret_w = 2;
         if (n->sym->ctype && n->sym->ctype->return_type) {
             int w = type_width(n->sym->ctype->return_type);
@@ -933,9 +1396,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ci->ret_vreg   = ret_v;
         /* ABI is determined by ctype flags. SMALLC = L→R push (z88dk
            default); absence = STDC = R→L push (matches C standard).
-           CALLEE wins regardless: callee pops its own args. */
+           CALLEE wins regardless: callee pops its own args. FASTCALL
+           overrides — last arg goes in HL/DEHL, rest pushed in ABI
+           order. */
         uint32_t flags = n->sym->ctype ? n->sym->ctype->flags : 0;
-        if (flags & CALLEE) {
+        if (is_fastcall) {
+            ci->abi = IR_ABI_FASTCALL;
+        } else if (flags & CALLEE) {
             ci->abi = IR_ABI_CALLEE;
         } else if (flags & SMALLC) {
             ci->abi = IR_ABI_SMALLC;
@@ -944,6 +1411,58 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
         ci->is_variadic = (n->sym->ctype && n->sym->ctype->funcattrs.hasva)
                           ? 1 : 0;
+        ci->pre_pushed  = pre_pushed;
+        op->call = ci;
+        return ret_v;
+    }
+
+    case AST_FUNCPTR_CALL: {
+        /* Indirect call through a function pointer (`(*fp)(args)` or
+           `fp(args)`). Same arg shape as AST_FUNC_CALL but the target
+           is computed at runtime from `n->callee`. Fastcall fnptrs
+           are deferred (legacy walker handles the zpush/ex(sp),hl
+           gymnastics that keep the fnptr addressable while args are
+           evaluated). */
+        if (!n->callee)
+            return build_fail("AST_FUNCPTR_CALL without callee");
+        Type *fntype = n->type; /* callfunction() stashes the FUNC
+                                   type on the call node */
+        uint32_t flags = fntype ? fntype->flags : 0;
+        if (flags & FASTCALL)
+            return build_fail("AST_FUNCPTR_CALL fastcall deferred");
+        int n_args = n->args ? (int)array_len(n->args) : 0;
+        int *args = NULL;
+        if (n_args > 0) {
+            args = calloc(n_args, sizeof(int));
+            for (int i = 0; i < n_args; i++) {
+                Node *a = array_get_byindex(n->args, i);
+                int v = build_expr(b, a);
+                if (v < 0) { free(args); return -1; }
+                args[i] = v;
+            }
+        }
+        /* Compute the callee address last so the vreg holding it is
+           still live at call-emit time (it'll get loaded into HL). */
+        int fnptr_v = build_expr(b, n->callee);
+        if (fnptr_v < 0) { free(args); return -1; }
+        int ret_w = 2;
+        if (fntype && fntype->return_type) {
+            int w = type_width(fntype->return_type);
+            if (w > 0) ret_w = w;
+        }
+        int ret_v = new_temp(b, ret_w);
+        Op *op = ir_op_emit(cur_bb(b), IR_CALL);
+        op->dst = ret_v;
+        CallInfo *ci = calloc(1, sizeof(CallInfo));
+        ci->target     = NULL;       /* indirect */
+        ci->fnptr_vreg = fnptr_v;
+        ci->args       = args;
+        ci->n_args     = n_args;
+        ci->ret_vreg   = ret_v;
+        if (flags & CALLEE)        ci->abi = IR_ABI_CALLEE;
+        else if (flags & SMALLC)   ci->abi = IR_ABI_SMALLC;
+        else                       ci->abi = IR_ABI_STDC;
+        ci->is_variadic = (fntype && fntype->funcattrs.hasva) ? 1 : 0;
         op->call = ci;
         return ret_v;
     }
@@ -999,10 +1518,126 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 }
             }
         }
+        Kind src_k = n->operand->type ? n->operand->type->kind : KIND_NONE;
+        Kind dst_k = n->type ? n->type->kind : KIND_NONE;
+        /* Literal → _Accum: fold the Q-format scaling into the
+           IR_LD_IMM at IR-build time. Bypasses the build_expr
+           dance — same value goes straight to the right vreg. */
+        if (n->operand->ast_type == AST_LITERAL
+            && (dst_k == KIND_ACCUM16 || dst_k == KIND_ACCUM32)) {
+            int w = (dst_k == KIND_ACCUM32) ? 4 : 2;
+            int v = new_temp(b, w);
+            b->f->vregs[v].width = (int16_t)w;
+            b->f->vregs[v].kind  = dst_k;
+            ir_emit_ld_imm(cur_bb(b), v,
+                           scale_literal_for_kind(n->operand, dst_k));
+            return v;
+        }
         int src_v = build_expr(b, n->operand);
         if (src_v < 0) return -1;
+        /* integer → _Accum: l_fix16_{s,u}{char,int,long}2f or
+           l_fix32_{s,u}{int,long}2f. Source goes through HL (the
+           fix16 helpers operate on HL only, so width-4 sources are
+           pre-truncated); the fix32 helpers expect HL on entry and
+           produce DEHL on exit. */
+        if (!kind_is_decimal(src_k)
+            && (dst_k == KIND_ACCUM16 || dst_k == KIND_ACCUM32)) {
+            if (b->f->vregs[src_v].width == 4) {
+                int tmp = new_temp(b, 2);
+                b->f->vregs[tmp].width = 2;
+                Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                tr->dst = tmp; tr->src[0] = src_v;
+                src_v = tmp;
+            }
+            int src_unsigned = n->operand->type
+                            && n->operand->type->isunsigned;
+            const char *helper;
+            int conv_w;
+            if (dst_k == KIND_ACCUM32) {
+                helper = src_unsigned ? "l_fix32_uint2f"
+                                      : "l_fix32_sint2f";
+                conv_w = 4;
+            } else {
+                helper = src_unsigned ? "l_fix16_uint2f"
+                                      : "l_fix16_sint2f";
+                conv_w = 2;
+            }
+            int conv_v = new_temp(b, conv_w);
+            b->f->vregs[conv_v].width = (int16_t)conv_w;
+            b->f->vregs[conv_v].kind  = dst_k;
+            int *args = calloc(1, sizeof(int));
+            args[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = conv_v;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name     = helper;
+            hi->args     = args;
+            hi->n_args   = 1;
+            hi->ret_vreg = conv_v;
+            op->hcall = hi;
+            return conv_v;
+        }
+        /* _Accum → integer: l_fix16_f2{s,u}{int,long} preserves
+           signed semantics for negative values (arithmetic shift +
+           sign-extend). Helper overhead is acceptable — _Accum is
+           not a hot type. */
+        if (src_k == KIND_ACCUM16 && !kind_is_decimal(dst_k)) {
+            int dst_unsigned = n->type && n->type->isunsigned;
+            int helper_ret_w = (dst_w == 4) ? 4 : 2;
+            const char *helper;
+            if (helper_ret_w == 4)
+                helper = dst_unsigned ? "l_fix16_f2ulong"
+                                       : "l_fix16_f2slong";
+            else
+                helper = dst_unsigned ? "l_fix16_f2uint"
+                                       : "l_fix16_f2sint";
+            int conv_v = new_temp(b, helper_ret_w);
+            b->f->vregs[conv_v].width = (int16_t)helper_ret_w;
+            int *args = calloc(1, sizeof(int));
+            args[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = conv_v;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name     = helper;
+            hi->args     = args;
+            hi->n_args   = 1;
+            hi->ret_vreg = conv_v;
+            op->hcall = hi;
+            src_v = conv_v;
+            if (helper_ret_w == dst_w) return src_v;
+            /* Fall through (e.g. _Accum → char: helper gave int,
+               TRUNC below narrows to byte). */
+        } else if (src_k == KIND_ACCUM32 && !kind_is_decimal(dst_k)) {
+            /* long _Accum → integer via l_fix32_f2{s,u}{int,long}.
+               DEHL in, HL or DEHL out depending on dst width.
+               Helpers don't exist in libsrc yet — walker references
+               them too. */
+            int dst_unsigned = n->type && n->type->isunsigned;
+            int helper_ret_w = (dst_w == 4) ? 4 : 2;
+            const char *helper;
+            if (helper_ret_w == 4)
+                helper = dst_unsigned ? "l_fix32_f2ulong"
+                                       : "l_fix32_f2slong";
+            else
+                helper = dst_unsigned ? "l_fix32_f2uint"
+                                       : "l_fix32_f2sint";
+            int conv_v = new_temp(b, helper_ret_w);
+            b->f->vregs[conv_v].width = (int16_t)helper_ret_w;
+            int *args = calloc(1, sizeof(int));
+            args[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = conv_v;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name     = helper;
+            hi->args     = args;
+            hi->n_args   = 1;
+            hi->ret_vreg = conv_v;
+            op->hcall = hi;
+            src_v = conv_v;
+            if (helper_ret_w == dst_w) return src_v;
+        }
         if (src_w == dst_w) {
-            /* Same-width cast (e.g. signed↔unsigned int) — no codegen. */
+            /* Same-width (e.g. signed↔unsigned int) — no codegen. */
             return src_v;
         }
         if (src_w == 1 && (dst_w == 2 || dst_w == 4)) {
@@ -1013,7 +1648,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int unsigned_src = n->operand->type &&
                                n->operand->type->isunsigned;
             int dst = new_temp(b, dst_w);
-            b->f->vregs[dst].width = (int8_t)dst_w;
+            b->f->vregs[dst].width = (int16_t)dst_w;
             Op *op = ir_op_emit(cur_bb(b),
                                 unsigned_src ? IR_CONV_ZX : IR_CONV_SX);
             op->dst    = dst;
@@ -1044,7 +1679,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             /* Long → int / char truncation: take the low half (HL of
                DEHL), then narrow to byte if needed via another TRUNC. */
             int dst = new_temp(b, dst_w);
-            b->f->vregs[dst].width = (int8_t)dst_w;
+            b->f->vregs[dst].width = (int16_t)dst_w;
             Op *op = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
             op->dst    = dst;
             op->src[0] = src_v;
@@ -1083,6 +1718,49 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return v;
         }
 
+        /* Global var step: load via IR_LD_MEM IR_MEM_SYM, step,
+           store back via IR_ST_MEM IR_MEM_SYM. Common shape
+           (`gcount++`, ISR counter bumps, etc.). int/long widths
+           supported via type_width on n->type. */
+        if (n->operand->ast_type == AST_GLOBAL_VAR
+            && n->operand->sym) {
+            SYMBOL *gsym = n->operand->sym;
+            int w = type_width(n->type);
+            if (w <= 0) w = 2;
+            if (w != 2 && w != 4)
+                return build_fail("step on global width %d not supported",
+                                  w);
+            int old_v = new_temp(b, w);
+            b->f->vregs[old_v].width = (int16_t)w;
+            Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+            ld->dst       = old_v;
+            ld->mem.kind  = IR_MEM_SYM;
+            ld->mem.sym   = gsym;
+
+            int new_v = new_temp(b, w);
+            b->f->vregs[new_v].width = (int16_t)w;
+            if (w == 2) {
+                ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
+                             new_v, old_v);
+            } else {
+                /* Long step: ADD/SUB with imm=1. */
+                Op *bop = ir_op_emit(cur_bb(b),
+                                     is_inc ? IR_ADD : IR_SUB);
+                bop->dst    = new_v;
+                bop->src[0] = old_v;
+                bop->src[1] = -1;
+                bop->imm    = 1;
+                b->f->vregs[new_v].width = (int16_t)w;
+            }
+
+            Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            st->src[0]    = new_v;
+            st->mem.kind  = IR_MEM_SYM;
+            st->mem.sym   = gsym;
+
+            return is_post ? old_v : new_v;
+        }
+
         /* Non-LV: build address, load, step, store back. Mirrors
            cg2_step's general path. The lvalue's value type is taken
            from n->type (the step's own result type — see #344 for
@@ -1116,12 +1794,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return build_fail("post/pre step elem width %d not "
                               "yet supported (non-LV)", elem_w);
 
-        /* Bare AST_LOCAL_VAR pointer operand (`(*q)++` where q is
-           a pointer-typed local). build_expr would bail "bare
-           AST_LOCAL_VAR outside lvalue context" — we want the
-           local's *value* (the pointer), which sym_map already
-           holds directly. Same shortcut as OP_ASSIGN's deref-LHS
-           path takes. */
+        /* Bare AST_LOCAL_VAR pointer operand (`(*q)++`, q a pointer
+           local): want the local's *value* (the pointer), which
+           sym_map holds directly. Same shortcut as OP_ASSIGN's
+           deref-LHS path. */
         int ptr_v;
         if (addr_node->ast_type == AST_LOCAL_VAR) {
             ptr_v = sym_map_get(b, addr_node->sym);
@@ -1136,7 +1812,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
 
         int old_v = new_temp(b, elem_w);
-        b->f->vregs[old_v].width = (int8_t)elem_w;
+        b->f->vregs[old_v].width = (int16_t)elem_w;
         Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
         ld->dst       = old_v;
         ld->mem.kind  = IR_MEM_VREG;
@@ -1144,9 +1820,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ld->mem.elem  = (elem_w == 2) ? KIND_INT : KIND_LONG;
 
         int new_v = new_temp(b, elem_w);
-        b->f->vregs[new_v].width = (int8_t)elem_w;
+        b->f->vregs[new_v].width = (int16_t)elem_w;
         if (elem_w == 2) {
-            /* 16-bit step: single inc/dec hl after load. */
             ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
                          new_v, old_v);
         } else {
@@ -1172,7 +1847,19 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     case OP_ADDR:
         /* &x. AST_GLOBAL_VAR operand → IR_LD_SYM. AST_LOCAL_VAR
            operand → IR_LEA on the local's vreg; the source must be
-           marked addr-taken so the allocator keeps it in memory. */
+           marked addr-taken so the allocator keeps it in memory.
+           &(*x) → x (the parser emits this for array-decay shapes
+           like `&(*jp)` where jp is a pointer-to-array). */
+        if (n->operand && n->operand->ast_type == OP_DEREF)
+            return build_expr(b, n->operand);
+        /* &p->member / &arr[i]: the parser folds these to an additive
+           address expression — `(addr (+ (deref (lv=p)) K))` etc. The
+           operand already computes the address (aggregate locals decay
+           via IR_LEA, array/struct globals via IR_LD_SYM), so just
+           evaluate it. */
+        if (n->operand && (n->operand->ast_type == OP_ADD
+                        || n->operand->ast_type == OP_SUB))
+            return build_expr(b, n->operand);
         if (n->operand && n->operand->ast_type == AST_GLOBAL_VAR) {
             int dst = new_temp(b, 2);
             Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
@@ -1208,9 +1895,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int then_bb = ir_bb_new(b->f);
         int els_bb  = ir_bb_new(b->f);
         int exit_bb = ir_bb_new(b->f);
-        /* If the caller passed a hint vreg, write the ternary's value
-           directly into it from both arms — no separate result temp,
-           and the caller skips the wrapping MOV. */
+        /* A hint vreg lets both arms write the value directly — no
+           result temp, and the caller skips the wrapping MOV. */
         int result  = ALLOC_DST(2);
 
         /* current bb: BR_ZERO to els, then explicit BR to then.
@@ -1277,6 +1963,37 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return lhs_v;
         }
 
+        /* Global scalar: `g op= x`. load/store via MEM_SYM — no pointer
+           indirection (build_expr on AST_GLOBAL_VAR yields the value, not
+           the address, so using it as ptr_v would dereference a garbage
+           address). */
+        if (n->left->operand->ast_type == AST_GLOBAL_VAR) {
+            SYMBOL *gsym = n->left->operand->sym;
+            if (!gsym) return build_fail("compound op= on null global sym");
+            int gv_w = 2;
+            { int w = width_for_kind((Kind)gsym->type); if (w > 0) gv_w = w; }
+            int loaded_g = new_temp(b, gv_w);
+            b->f->vregs[loaded_g].width = (int16_t)gv_w;
+            Op *ld_g = ir_op_emit(cur_bb(b), IR_LD_MEM);
+            ld_g->dst = loaded_g; ld_g->mem.kind = IR_MEM_SYM;
+            ld_g->mem.sym = gsym;
+            int dst_g = new_temp(b, gv_w);
+            b->f->vregs[dst_g].width = (int16_t)gv_w;
+            if (n->right && n->right->ast_type == AST_LITERAL) {
+                Op *op = ir_op_emit(cur_bb(b), k);
+                op->dst = dst_g; op->src[0] = loaded_g;
+                op->src[1] = -1; op->imm = (int64_t)n->right->zval;
+            } else {
+                int rhs_v = build_expr(b, n->right);
+                if (rhs_v < 0) return -1;
+                ir_emit_binop(cur_bb(b), k, dst_g, loaded_g, rhs_v);
+            }
+            Op *st_g = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            st_g->src[0] = dst_g; st_g->mem.kind = IR_MEM_SYM;
+            st_g->mem.sym = gsym;
+            return dst_g;
+        }
+
         /* Indirection: `*p op= x` / `*(p+K) op= x`. LHS->operand is any
            pointer expression — walk it to a vreg, load through it,
            combine, store back. */
@@ -1316,6 +2033,197 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         return dst;
     }
 
+    case OP_AMULT: case OP_ADIV: case OP_AMOD: {
+        /* Compound multiply/divide/modulo: LHS op= RHS.
+           Always uses a runtime helper (no direct IR binop).
+           Same helper table and argument convention as OP_MULT/DIV/MOD. */
+        if (!n->left || n->left->ast_type != OP_DEREF || !n->left->operand)
+            return build_fail("compound *=/div/mod LHS shape not yet supported");
+
+        int is_local  = (n->left->operand->ast_type == AST_LOCAL_VAR);
+        int is_global = (n->left->operand->ast_type == AST_GLOBAL_VAR);
+        int lhs_v, ptr_v = -1, elem_w;
+        Kind elem_kind = KIND_INT;
+        SYMBOL *gsym_md = NULL;   /* set when is_global */
+
+        if (is_local) {
+            SYMBOL *lsym = n->left->operand->sym;
+            lhs_v = sym_map_get(b, lsym);
+            if (lhs_v < 0)
+                return build_fail("compound *=/div/mod to unknown local %s",
+                                  lsym ? lsym->name : "?");
+            elem_w = b->f->vregs[lhs_v].width;
+        } else if (is_global) {
+            gsym_md = n->left->operand->sym;
+            if (!gsym_md)
+                return build_fail("compound *=/div/mod on null global sym");
+            elem_w = 2;
+            { int w = width_for_kind((Kind)gsym_md->type); if (w > 0) elem_w = w; }
+            elem_kind = (elem_w == 1) ? KIND_CHAR
+                      : (elem_w == 2) ? KIND_INT : KIND_LONG;
+            lhs_v = new_temp(b, elem_w);
+            b->f->vregs[lhs_v].width = (int16_t)elem_w;
+            Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+            ld->dst = lhs_v; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = gsym_md;
+        } else {
+            ptr_v = build_expr(b, n->left->operand);
+            if (ptr_v < 0) return -1;
+            elem_w = type_width(n->left->type);
+            if (elem_w != 1 && elem_w != 2 && elem_w != 4)
+                return build_fail("compound *=/div/mod deref elem width %d not supported",
+                                  elem_w);
+            elem_kind = (elem_w == 1) ? KIND_CHAR
+                      : (elem_w == 2) ? KIND_INT : KIND_LONG;
+            lhs_v = new_temp(b, elem_w);
+            b->f->vregs[lhs_v].width = (int16_t)elem_w;
+            Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+            ld->dst      = lhs_v;
+            ld->mem.kind = IR_MEM_VREG;
+            ld->mem.base = ptr_v;
+            ld->mem.elem = elem_kind;
+        }
+
+        int rhs_v = build_expr(b, n->right);
+        if (rhs_v < 0) return -1;
+
+        /* Widen or truncate rhs to match element width. */
+        int rhs_w = b->f->vregs[rhs_v].width;
+        if (rhs_w != elem_w) {
+            int unsigned_rhs = !n->right->type || n->right->type->isunsigned;
+            int tmp = new_temp(b, elem_w);
+            b->f->vregs[tmp].width = (int16_t)elem_w;
+            Op *cv = ir_op_emit(cur_bb(b),
+                                (rhs_w > elem_w) ? IR_CONV_TRUNC
+                                : unsigned_rhs   ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = tmp; cv->src[0] = rhs_v;
+            rhs_v = tmp;
+        }
+
+        int unsigned_op = (n->type && n->type->isunsigned)
+            || (n->left->type && n->left->type->isunsigned);
+        const char *helper;
+        int n_stacked = 0, ret_in_de = 0;
+        int *args = calloc(2, sizeof(int));
+        if (elem_w == 4) {
+            if (n->ast_type == OP_AMULT)
+                helper = unsigned_op ? "l_long_mult_u" : "l_long_mult";
+            else if (n->ast_type == OP_ADIV)
+                helper = unsigned_op ? "l_long_div_u" : "l_long_div";
+            else
+                helper = unsigned_op ? "l_long_mod_u" : "l_long_mod";
+            args[0] = lhs_v; args[1] = rhs_v; n_stacked = 1;
+        } else if (n->ast_type == OP_AMULT) {
+            helper = "l_mult";
+            args[0] = lhs_v; args[1] = rhs_v;
+        } else {
+            helper = unsigned_op ? "l_div_u" : "l_div";
+            args[0] = rhs_v; args[1] = lhs_v;
+            if (n->ast_type == OP_AMOD) ret_in_de = 1;
+        }
+
+        int dst = new_temp(b, elem_w);
+        b->f->vregs[dst].width = (int16_t)elem_w;
+        Op *call = ir_op_emit(cur_bb(b), IR_HCALL);
+        call->dst = dst;
+        HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+        hi->name      = helper;
+        hi->args      = args;
+        hi->n_args    = 2;
+        hi->n_stacked = n_stacked;
+        hi->ret_vreg  = dst;
+        hi->ret_in_de = ret_in_de;
+        call->hcall   = hi;
+
+        if (is_local) {
+            ir_emit_mov(cur_bb(b), lhs_v, dst);
+            return lhs_v;
+        } else if (is_global) {
+            Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            st->src[0] = dst; st->mem.kind = IR_MEM_SYM;
+            st->mem.sym = gsym_md;
+            return dst;
+        } else {
+            Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            st->src[0]   = dst;
+            st->mem.kind = IR_MEM_VREG;
+            st->mem.base = ptr_v;
+            st->mem.elem = elem_kind;
+            return dst;
+        }
+    }
+
+    case OP_OROR:
+    case OP_ANDAND: {
+        /* Short-circuit `a && b` / `a || b`. C semantics: result is
+           int 0/1, b is evaluated only when a's truth value doesn't
+           settle the outcome.
+
+           Lowering uses 2 new BBs (eval-b path + exit) and a shared
+           result vreg pre-loaded with the short-circuit value:
+             ANDAND: result = 0; if (a == 0) skip eval_b; result = (b!=0)
+             OROR:   result = 1; if (a != 0) skip eval_b; result = (b!=0)
+           In both cases, when we DO eval b, the result is set to the
+           truthiness of b (== 0 → 0, != 0 → 1). */
+        if (!n->left || !n->right)
+            return build_fail("OP_%s with missing operand",
+                              n->ast_type == OP_ANDAND ? "ANDAND" : "OROR");
+        int a_v = build_expr(b, n->left);
+        if (a_v < 0) return -1;
+
+        int result   = ALLOC_DST(2);
+        int short_v  = (n->ast_type == OP_ANDAND) ? 0 : 1;
+        int eval_bb  = ir_bb_new(b->f);
+        int exit_bb  = ir_bb_new(b->f);
+
+        /* Pre-load result with the short-circuit value. */
+        ir_emit_ld_imm(cur_bb(b), result, short_v);
+
+        /* ANDAND: if a == 0, skip b (use short value). BR_ZERO matches.
+           OROR:   if a != 0, skip b (use short value). BR_COND matches. */
+        if (n->ast_type == OP_ANDAND)
+            ir_emit_br_zero(cur_bb(b), a_v, exit_bb);
+        else
+            ir_emit_br_cond(cur_bb(b), a_v, exit_bb);
+        ir_emit_br(cur_bb(b), eval_bb);
+
+        /* eval_bb: result = (b != 0 ? 1 : 0) — done via CMP_NE
+           with zero so the result is canonical 0/1. */
+        b->cur_bb_id = eval_bb;
+        int b_v = build_expr(b, n->right);
+        if (b_v < 0) return -1;
+        int zero_v = new_temp(b, 2);
+        ir_emit_ld_imm(cur_bb(b), zero_v, 0);
+        int b_truth = new_temp(b, 2);
+        ir_emit_binop(cur_bb(b), IR_CMP_NE, b_truth, b_v, zero_v);
+        /* Both ANDAND and OROR set result = (b != 0) in the eval
+           path — the short-circuit pre-load is only used when we
+           don't evaluate b. Overwrite the pre-loaded result. */
+        ir_emit_mov(cur_bb(b), result, b_truth);
+        ir_emit_br(cur_bb(b), exit_bb);
+
+        b->cur_bb_id = exit_bb;
+        return result;
+    }
+
+    case AST_COMPOUND_STMT: {
+        /* Comma expression / doexpr() singleton wrap. Walk each
+           sub-expression in order, discarding all results except
+           the last (which becomes the compound's value). The parser
+           wraps every doexpr-collected statement in this even when
+           there's only one comma operand — switch sw_expr, for
+           init/step, and any context using doexpr(). */
+        if (!n->stmts) return -1;
+        int n_stmts = (int)array_len(n->stmts);
+        if (n_stmts == 0) return -1;
+        int last = -1;
+        for (int i = 0; i < n_stmts; i++) {
+            Node *s = array_get_byindex(n->stmts, i);
+            last = build_expr(b, s);
+            if (last < 0) return -1;
+        }
+        return last;
+    }
+
     default:
         return build_fail("unsupported expr ast_type=%d", (int)n->ast_type);
     }
@@ -1326,6 +2234,12 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 static int build_stmt(Builder *b, Node *n)
 {
     if (!n) return 0;
+
+    /* Stamp source location on every op emitted for this stmt — the
+       lowerer reads it to drive C_LINE / -cc emission. AST_COMPOUND_STMT
+       recurses, so child stmts will override before their ops fire. */
+    if (n->filename && n->line > 0)
+        ir_set_emit_loc(n->filename, n->line);
 
     switch (n->ast_type) {
 
@@ -1344,6 +2258,18 @@ static int build_stmt(Builder *b, Node *n)
         if (n->retval) {
             v = build_expr(b, n->retval);
             if (v < 0) return -1;
+            /* Widen byte retvals to int — z80 return ABI puts the
+               value in HL even when the C return type is char. */
+            if (b->f->vregs[v].width == 1) {
+                int unsigned_src = n->retval->type
+                                && n->retval->type->isunsigned;
+                int tmp = new_temp(b, 2);
+                b->f->vregs[tmp].width = 2;
+                Op *cv = ir_op_emit(cur_bb(b),
+                                    unsigned_src ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = tmp; cv->src[0] = v;
+                v = tmp;
+            }
         }
         ir_emit_ret(cur_bb(b), v);
         return 0;
@@ -1351,27 +2277,34 @@ static int build_stmt(Builder *b, Node *n)
 
     case AST_DECL: {
         /* Local declaration. Scalars (int-class or long) get a vreg
-           sized for their value. Arrays (KIND_ARRAY) get a vreg whose
-           slot is sym->size bytes — references decay to the address
-           via IR_LEA. Init lists for arrays are not yet handled (the
-           declvar branch only fires for scalar inits). */
+           sized for their value. Aggregates (struct / array) get a
+           vreg whose slot is sym->ctype->size bytes — references
+           decay to the address via IR_LEA. Init lists initialise
+           field-by-field / element-by-element via init_typed_region
+           (zero-filling what the list doesn't cover, per C). */
         if (!n->sym)
             return build_fail("AST_DECL without sym");
-        if ((Kind)n->sym->type == KIND_ARRAY) {
-            /* Array byte count lives in sym->ctype->size. Bail on
-               arrays > 127 bytes — VReg.width is int8_t and we
-               overload it as the slot size. */
+        if ((Kind)n->sym->type == KIND_STRUCT
+            || (Kind)n->sym->type == KIND_ARRAY) {
             int sz = n->sym->ctype ? n->sym->ctype->size : 0;
-            if (sz <= 0 || sz > 127)
-                return build_fail("AST_DECL array sym=%s size=%d "
-                                  "out of int8_t slot range",
+            if (sz <= 0 || sz > 32767)
+                return build_fail("AST_DECL aggregate sym=%s size=%d "
+                                  "out of int16_t slot range",
                                   n->sym->name, sz);
-            (void)new_local_vreg(b, n->sym);
-            /* declvar (initializer) for arrays would be an init list —
-               not yet handled; fall through to legacy. */
-            if (n->declvar)
-                return build_fail("AST_DECL array init list not yet "
-                                  "supported (sym=%s)", n->sym->name);
+            int agg_v = new_local_vreg(b, n->sym);
+            if (n->declvar) {
+                int base = new_temp(b, 2);
+                Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
+                lea->dst = base; lea->src[0] = agg_v;
+                int budget = INIT_REGION_MAX_STORES;
+                int rc = init_typed_region(b, base, 0, n->sym->ctype,
+                                           n->declvar, &budget);
+                if (rc == -1) return -1;
+                if (rc == -2)
+                    return build_fail("AST_DECL aggregate init shape "
+                                      "not supported (sym=%s)",
+                                      n->sym->name);
+            }
             return 0;
         }
         if (!is_supported_int_kind(n->sym->type))
@@ -1426,7 +2359,6 @@ static int build_stmt(Builder *b, Node *n)
         ir_emit_br_zero(cur_bb(b), counter, exit_bb);
         ir_emit_br(cur_bb(b), header_bb);
 
-        /* header_bb: body, then dec + back-edge */
         b->cur_bb_id = header_bb;
         if (build_stmt(b, n->loop_body) != 0) return -1;
         close_bb_with_fallthrough(b, step_bb);
@@ -1460,6 +2392,70 @@ static int build_stmt(Builder *b, Node *n)
         int target = get_or_create_label_bb(b, n->label);
         ir_emit_br(cur_bb(b), target);
         b->cur_bb_id = ir_bb_new(b->f);
+        return 0;
+    }
+
+    case AST_SWITCH: {
+        /* `switch (e) { case K1: ...; case K2: ...; default: ...; }`.
+           sw_cases is the dispatch array of AST_SWITCH_CASE nodes
+           (each with sw_value = case constant, sw_label = goto
+           target). sw_body contains AST_LABELs that match those
+           targets, plus the case bodies. sw_default_label is the
+           default target (== sw_exit_label if no `default:`).
+           sw_exit_label is the break / post-switch target.
+
+           Lowering: eval sw_expr → v, then one IR_SWITCH terminator
+           carrying the (value, target-BB) table + default. The
+           lowerer routes by kind: char → inline cp chain, int →
+           l_case table, long → l_long_case table. Walk sw_body —
+           its AST_LABELs land cleanly via the existing AST_LABEL
+           handler. */
+        if (!n->sw_expr)
+            return build_fail("AST_SWITCH missing sw_expr");
+        Kind swk = n->type ? (Kind)n->type->kind : KIND_INT;
+        if (swk == KIND_LONGLONG)
+            return build_fail("switch on long long not yet supported");
+        int v = build_expr(b, n->sw_expr);
+        if (v < 0) return -1;
+        int n_cases = n->sw_cases ? (int)array_len(n->sw_cases) : 0;
+        int default_bb = get_or_create_label_bb(b, n->sw_default_label);
+        if (n_cases > 0) {
+            SwitchInfo *sw = calloc(1, sizeof(SwitchInfo));
+            int64_t *vals  = calloc((size_t)n_cases, sizeof(int64_t));
+            int     *tgts  = calloc((size_t)n_cases, sizeof(int));
+            if (!sw || !vals || !tgts) {
+                free(sw); free(vals); free(tgts);
+                return build_fail("switch: out of memory");
+            }
+            int nc = 0;
+            for (int i = 0; i < n_cases; i++) {
+                Node *c = array_get_byindex(n->sw_cases, i);
+                if (!c || c->ast_type != AST_SWITCH_CASE) continue;
+                vals[nc] = c->sw_value ? (int64_t)c->sw_value->zval : 0;
+                tgts[nc] = get_or_create_label_bb(b, c->sw_label);
+                nc++;
+            }
+            sw->values     = vals;
+            sw->target_bb  = tgts;
+            sw->n_cases    = nc;
+            sw->default_bb = default_bb;
+            sw->is_char    = (swk == KIND_CHAR);
+            Op *op = ir_op_emit(cur_bb(b), IR_SWITCH);
+            op->src[0] = v;
+            op->src[1] = -1;
+            op->sw     = sw;
+        } else {
+            ir_emit_br(cur_bb(b), default_bb);
+        }
+        /* Walk the body. First label in the body (the first case
+           or default:) will redirect via close_bb_with_fallthrough. */
+        b->cur_bb_id = ir_bb_new(b->f);
+        if (n->sw_body && build_stmt(b, n->sw_body) != 0) return -1;
+        if (n->sw_exit_label) {
+            int exit_bb = get_or_create_label_bb(b, n->sw_exit_label);
+            close_bb_with_fallthrough(b, exit_bb);
+            b->cur_bb_id = exit_bb;
+        }
         return 0;
     }
 
@@ -1515,14 +2511,24 @@ static int build_stmt(Builder *b, Node *n)
             n->ast_type == OP_ASSHL ||
             n->ast_type == OP_PRE_INC || n->ast_type == OP_POST_INC ||
             n->ast_type == OP_PRE_DEC || n->ast_type == OP_POST_DEC ||
-            n->ast_type == OP_DEREF) {
-            /* OP_DEREF as a statement (#343) — discarded read, but
+            n->ast_type == OP_DEREF ||
+            n->ast_type == OP_CAST) {
+            /* OP_DEREF / OP_CAST as a statement — discarded read, but
                the operand may carry side effects (`*p++;`, function
                call return, etc.). Walk as an expression; the loaded
                value just lands in a dead vreg. */
             int v = build_expr(b, n);
             (void)v;
             return v < 0 ? -1 : 0;
+        }
+        if (n->ast_type == AST_ASM) {
+            /* `asm("...")` / `__asm__` / `#asm` block. Pass the
+               captured text through verbatim; the IR pipeline treats
+               it as a full register/memory clobber (handled by the
+               lowerer's IR_ASM emit + cache invalidations). */
+            Op *op = ir_op_emit(cur_bb(b), IR_ASM);
+            op->asm_text = n->labelname;
+            return 0;
         }
         return build_fail("unsupported stmt ast_type=%d", (int)n->ast_type);
     }
@@ -1538,12 +2544,26 @@ int ir_generate_code(Node *body, SYMBOL *fn)
 
     Func *f = ir_func_new(fn);
     if (!f) return build_fail("ir_func_new returned NULL");
+    f->features = ir_features_from_cpu();
 
     /* Entry BB. */
     int entry = ir_bb_new(f);
     Builder b;
     builder_init(&b, f);
     b.cur_bb_id = entry;
+
+    /* Fastcall CALLEES are wrong-code on the IR path: the prologue's
+       `push hl` (the fastcall arg) isn't reflected in the param slot
+       offsets — the body reads the return address as the arg and the
+       ret leaks 2 bytes of stack. Defer to the walker until the IR
+       prologue models the pushed-HL param. (Calling INTO fastcall
+       targets works fine — this is the definition side only.) */
+    if (fn->ctype && (fn->ctype->flags & FASTCALL)
+        && fn->ctype->parameters && array_len(fn->ctype->parameters) > 0) {
+        builder_free(&b);
+        ir_func_free(f);
+        return build_fail("fastcall callee not yet supported");
+    }
 
     /* Pre-create PARAM vregs in declaration order so the lowerer's
        param-init prologue picks them up before any temps. Each param's
@@ -1574,7 +2594,7 @@ int ir_generate_code(Node *body, SYMBOL *fn)
             }
             int v = ir_vreg_new(b.f, (int)psym->type, psym, IR_VREG_PARAM);
             int pw = width_for_kind((Kind)psym->type);
-            b.f->vregs[v].width = (int8_t)(pw ? pw : 2);
+            b.f->vregs[v].width = (int16_t)(pw ? pw : 2);
             sym_map_set(&b, psym, v);
         }
     }

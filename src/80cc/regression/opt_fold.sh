@@ -1121,7 +1121,7 @@ extern unsigned long g(void);
 unsigned long g(void) { return 0x12345678UL; }
 extern void take(unsigned int);
 void take(unsigned int x) { (void)x; }' > "$cfile_p256b"
-RULES="${RULES:-/Users/dom/z88dk/lib/80cc_rules.1}"
+RULES="${RULES:-$Z88DK_LIB/80cc_rules.1}"
 asm_p256b_post="${asm_p256b%.asm}.post.asm"
 if ( cd "$WORK" && "$COMPILER" -mz80 copt_long_narrow_high.c 2>/dev/null ) \
     && z88dk-copt -mz80 "$RULES" < "$asm_p256b" > "$asm_p256b_post" 2>/dev/null; then
@@ -1984,7 +1984,7 @@ fi
 cfile_p283="$WORK/p283_long_inc.c"
 asm_p283="$WORK/p283_long_inc.asm"
 asm_p283_post="$WORK/p283_long_inc.post.asm"
-RULES_p283="${Z88DK_LIB:-/Users/dom/z88dk/lib}/80cc_rules.1"
+RULES_p283="$Z88DK_LIB/80cc_rules.1"
 printf '%s\n' '
 extern unsigned long *gp;
 int main(void) {

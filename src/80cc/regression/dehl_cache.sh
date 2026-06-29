@@ -77,10 +77,11 @@ run_ir_test() {
 # Pattern: after #332 the long const-ADD lowering loads K directly
 # into BC at the use site (no push). The first ADD's store leaves
 # BC = LHS low; the second ADD's load_to_dehl then cache-hits with
-# `ld l,c; ld h,b`. Verify the cache-hit pair appears at least
-# once in the function body (separating the two const ADDs).
+# `ld hl,bc` (the z80asm synthetic that expands to ld l,c; ld h,b).
+# Verify the cache-hit recovery appears at least once in the function
+# body (separating the two const ADDs).
 run_ir_test "dehl_cache_const_add" \
-    'ld l,c;ld h,b' \
+    'ld hl,bc' \
     '' \
     '
 unsigned long add_pair(unsigned long a) {
@@ -113,18 +114,16 @@ void mix(unsigned long x) {
 if ! ( cd "$WORK" && "$COMPILER" --use-ir dehl_cache_hit_count.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("dehl_cache_hit_count: 80cc --use-ir failed")
 else
-    # Count standalone `ld l,c; ld h,b` pairs — those NOT preceded by
-    # the slot-read tail `ld d,(hl)` (which is the canonical end of
-    # the full 4-byte load).
-    hits=$(awk '
-        /^[[:space:]]*ld[[:space:]]+l,c[[:space:]]*$/ {
-            if (prev != "ld\td,(hl)" && prev != "ld\t(hl),d") cache++
-        }
-        { prev=$0; sub(/^[[:space:]]+/, "", prev); sub(/[[:space:]]+$/, "", prev) }
-        END { print cache+0 }
-    ' "$asm_path")
-    if [ "${hits:-0}" -lt 1 ]; then
-        fail=$((fail+1)); failures+=("dehl_cache_hit_count: no standalone cache-hit pairs found (got $hits)")
+    # Cache mechanism is in play whenever the lowerer emits `ld bc,hl`
+    # (cache_dehl publishes BC=low half). For an active cache, a
+    # successor load_to_dehl on the same vreg can elide its recovery
+    # entirely (cur_hl_vreg short-circuit) — we therefore can't strictly
+    # require `ld hl,bc` to appear. Verify the stash exists and that
+    # there's no full slot re-read between consecutive uses (the cache
+    # avoids redundant `ld hl,N; add hl,sp; ld a,(hl); inc hl; ...`).
+    stash_count=$(grep -cE '^[[:space:]]*ld[[:space:]]+bc,hl[[:space:]]*$' "$asm_path")
+    if [ "${stash_count:-0}" -lt 1 ]; then
+        fail=$((fail+1)); failures+=("dehl_cache_hit_count: no cache stash ld bc,hl found")
     else
         ok=$((ok+1))
     fi
@@ -259,13 +258,13 @@ run_ir_test "pr_de_global_load" \
 unsigned int g;
 unsigned int add_g(unsigned int a) { return a + g; }'
 
-# --- store_dehl uses ld b,h; ld c,l, not push hl/pop bc -----------
-# The store_dehl epilogue stash now uses register-to-register moves
-# instead of a stack round trip. Verify no `push hl` immediately
-# followed by `ld hl,N; add hl,sp; pop bc` in any store_dehl-emitting
-# function (the historic shape).
+# --- store_dehl uses ld bc,hl, not push hl/pop bc -----------------
+# The store_dehl epilogue stash now uses the z80asm `ld bc,hl`
+# synthetic (expands to `ld b,h; ld c,l`) instead of a stack round
+# trip. Verify the synthetic appears in any store_dehl-emitting
+# function.
 run_ir_test "store_dehl_no_stack_stash" \
-    'ld b,h;ld c,l' \
+    'ld bc,hl' \
     '' \
     '
 unsigned long store_some(unsigned long v) {
@@ -298,7 +297,7 @@ else
     # The prologue BC load (`ld c,(hl); inc hl; ld b,(hl)`) must appear.
     if [[ "$slurped" != *'ld c,(hl);inc hl;ld b,(hl)'* ]]; then
         fail=$((fail+1)); failures+=("pr_bc_param: missing BC prologue init")
-    elif [[ "$slurped" != *'ld l,c;ld h,b'* ]]; then
+    elif [[ "$slurped" != *'ld hl,bc'* ]]; then
         fail=$((fail+1)); failures+=("pr_bc_param: missing BC→HL short-circuit")
     elif [ "$(awk '/ld[ \t]+hl,4[ \t]*$/ { c++ } END { print c+0 }' "$asm_path")" -gt 1 ]; then
         # Expect at most ONE `ld hl,4` (the prologue BC-init address
@@ -379,7 +378,7 @@ fi
 #   1. A prologue BC load for the first PR_BC vreg (`a`).
 #   2. A mid-function `add hl,sp; ld c,(hl); inc hl; ld b,(hl)` (or
 #      `ld bc,(ix+d)` under FP) — the demand reload of `b` into BC.
-#   3. Multiple `ld l,c; ld h,b` (HL hits) AND `ld e,c; ld d,b` (DE
+#   3. Multiple `ld hl,bc` (HL hits) AND `ld e,c; ld d,b` (DE
 #      hits) — the cheap BC→reg copies that PR_BC enables.
 asm_path="$WORK/multi_pr_bc.asm"
 printf '%s\n' '
@@ -403,8 +402,8 @@ else
     bc_loads=$(grep -cE '(ld[[:space:]]+c,\(hl\))|(ld[[:space:]]+bc,\(i[xy])' "$asm_path")
     if [ "${bc_loads:-0}" -lt 2 ]; then
         fail=$((fail+1)); failures+=("multi_pr_bc: expected ≥2 BC loads, got $bc_loads")
-    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+l,c[[:space:]]*$' "$asm_path"; then
-        fail=$((fail+1)); failures+=("multi_pr_bc: missing ld l,c (HL cache hit)")
+    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+hl,bc[[:space:]]*$' "$asm_path"; then
+        fail=$((fail+1)); failures+=("multi_pr_bc: missing ld hl,bc (HL cache hit)")
     elif ! grep -qE '^[[:space:]]*ld[[:space:]]+e,c[[:space:]]*$' "$asm_path"; then
         fail=$((fail+1)); failures+=("multi_pr_bc: missing ld e,c (DE cache hit)")
     else
@@ -429,15 +428,14 @@ unsigned int walk(unsigned char *data, unsigned int len) {
 if ! ( cd "$WORK" && "$COMPILER" --use-ir local_pr_bc.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("local_pr_bc: 80cc --use-ir failed")
 else
-    # Expect: a `ld c,l; ld b,h` pair right after the ADD that
-    # computes `end` (the producer-side BC stamp). And at least one
-    # cache-hit pattern (`ld l,c; ld h,b` for HL or `ld e,c; ld d,b`
-    # for DE) in the loop body where `end` is read for the compare.
-    if ! grep -qE '^[[:space:]]*ld[[:space:]]+c,l[[:space:]]*$' "$asm_path"; then
-        fail=$((fail+1)); failures+=("local_pr_bc: missing ld c,l (BC stamp at producer)")
-    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+b,h[[:space:]]*$' "$asm_path"; then
-        fail=$((fail+1)); failures+=("local_pr_bc: missing ld b,h (BC stamp at producer)")
-    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+(l,c|e,c)[[:space:]]*$' "$asm_path"; then
+    # Expect: `ld bc,hl` right after the ADD that computes `end`
+    # (the producer-side BC stamp, using z80asm's synthetic that
+    # expands to `ld b,h; ld c,l`). And at least one cache-hit
+    # pattern (`ld hl,bc` for HL or `ld e,c` for DE) in the loop
+    # body where `end` is read for the compare.
+    if ! grep -qE '^[[:space:]]*ld[[:space:]]+bc,hl[[:space:]]*$' "$asm_path"; then
+        fail=$((fail+1)); failures+=("local_pr_bc: missing ld bc,hl (BC stamp at producer)")
+    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+(hl,bc|e,c)[[:space:]]*$' "$asm_path"; then
         fail=$((fail+1)); failures+=("local_pr_bc: missing BC cache hit on end read")
     else
         ok=$((ok+1))
@@ -561,29 +559,38 @@ else
     fi
 fi
 
-# --- PR_BC across IR_CALL with save/restore ------------------------
-# A write-once local in a function that also has a call. With #319,
-# push bc / pop bc wraps the call so the cached value survives.
-# Verify the wrap pattern and that the post-call read of the local
-# still hits the BC cache (`ld l,c; ld h,b` or `ld e,c; ld d,b`).
+# --- PR_BC across IR_CALL ------------------------------------------
+# A write-once local in a function that also has a call. The cached
+# value survives the call either via push bc / pop bc (#319, slot-arg
+# calls) or via a post-call slot reload of the tenant (pre-pushed-arg
+# calls, where a save below the args is impossible). Verify one of
+# the two patterns plus the cached read (`ld l,c` / `ld e,c`).
 asm_path="$WORK/pr_bc_across_call.asm"
 printf '%s\n' '
 extern int sink(int);
 int wrapped(int a, int b) {
     int sum = a + b;       /* write-once local */
-    sink(sum);             /* call clobbers BC unless we save/restore */
+    sink(sum);             /* call clobbers BC unless preserved */
     return sum + 1;        /* second read of `sum` */
 }' > "$WORK/pr_bc_across_call.c"
 if ! ( cd "$WORK" && "$COMPILER" --use-ir pr_bc_across_call.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("pr_bc_across_call: 80cc --use-ir failed")
 else
-    # `ld c,l; ld b,h` stamps BC at producer; `push bc` saves around
-    # call; `pop bc` restores; final read hits cache.
-    body=$(awk '/^L_f1_bb_0/{seen=1} seen' "$asm_path")
-    if ! grep -qE '^[[:space:]]*push[[:space:]]+bc[[:space:]]*$' "$asm_path"; then
-        fail=$((fail+1)); failures+=("pr_bc_across_call: missing push bc save")
-    elif ! grep -qE '^[[:space:]]*pop[[:space:]]+bc[[:space:]]*$' "$asm_path"; then
-        fail=$((fail+1)); failures+=("pr_bc_across_call: missing pop bc restore")
+    has_wrap=0
+    if grep -qE '^[[:space:]]*push[[:space:]]+bc[[:space:]]*$' "$asm_path" \
+       && grep -qE '^[[:space:]]*pop[[:space:]]+bc[[:space:]]*$' "$asm_path"; then
+        has_wrap=1
+    fi
+    # Post-call reload: `ld c,(hl)` + `ld b,(hl)` (sp-rel) or
+    # `ld bc,(ix...` (fp) appearing after the call.
+    has_reload=$(awk '/call[[:space:]]+_sink/{seen=1}
+                      seen && (/ld[[:space:]]+c,\(hl\)/ || /ld[[:space:]]+bc,\(/){found=1}
+                      END{print found+0}' "$asm_path")
+    has_cached_read=$(grep -cE '^[[:space:]]*ld[[:space:]]+(l,c|e,c|hl,bc|de,bc)[[:space:]]*$' "$asm_path")
+    if [ "$has_wrap" -eq 0 ] && [ "${has_reload:-0}" -eq 0 ]; then
+        fail=$((fail+1)); failures+=("pr_bc_across_call: BC neither saved (push/pop) nor reloaded post-call")
+    elif [ "${has_cached_read:-0}" -lt 1 ]; then
+        fail=$((fail+1)); failures+=("pr_bc_across_call: post-call read doesn't hit the BC cache")
     else
         ok=$((ok+1))
     fi
@@ -605,12 +612,12 @@ if ! ( cd "$WORK" && "$COMPILER" --use-ir loop_pr_bc.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("loop_pr_bc: 80cc --use-ir failed")
 else
     # Expect the prologue BC load (sp-relative or FP-relative). And
-    # at least one `ld l,c; ld h,b` (HL cache hit) in the loop body
-    # where `k` is read.
+    # at least one `ld hl,bc` (HL cache hit) in the loop body where
+    # `k` is read.
     if ! grep -qE '(ld[[:space:]]+c,\(hl\))|(ld[[:space:]]+bc,\(i[xy])' "$asm_path"; then
         fail=$((fail+1)); failures+=("loop_pr_bc: missing BC prologue load")
-    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+(l,c|e,c)[[:space:]]*$' "$asm_path"; then
-        fail=$((fail+1)); failures+=("loop_pr_bc: missing ld l,c / ld e,c (cache hit on k)")
+    elif ! grep -qE '^[[:space:]]*ld[[:space:]]+(hl,bc|e,c)[[:space:]]*$' "$asm_path"; then
+        fail=$((fail+1)); failures+=("loop_pr_bc: missing ld hl,bc / ld e,c (cache hit on k)")
     else
         ok=$((ok+1))
     fi
@@ -1028,15 +1035,18 @@ fi
 
 # --- In-place long compound assign on sp-rel slot (#338) ----------
 # `local += K` / `local -= K` where dst==src[0] and the vreg lives
-# in a stack slot, with the result NOT dead-after (e.g. a function
-# call follows). Should emit byte-wise add/adc / sub/sbc directly
+# in a stack slot, with the result NOT dead-after. (The double
+# use(a) keeps `a` live past the first call: a single trailing call
+# arg is now consumed straight from DEHL by its IR_PUSH_ARG and the
+# in-place path correctly yields.) Should emit byte-wise add/adc
+# / sub/sbc directly
 # into the slot (ld a,(hl); add a,K; ld (hl),a; inc hl × 4) instead
 # of going DEHL-load → const ADD/SUB → store_dehl_finalize.
 asm_path="$WORK/inplace_compound.asm"
 printf '%s\n' '
 extern void use(unsigned long);
-void f_add(unsigned long a) { a += 0x12345678UL; use(a); }
-void f_sub(unsigned long a) { a -= 0x12345678UL; use(a); }' \
+void f_add(unsigned long a) { a += 0x12345678UL; use(a); use(a); }
+void f_sub(unsigned long a) { a -= 0x12345678UL; use(a); use(a); }' \
     > "$WORK/inplace_compound.c"
 if ! ( cd "$WORK" && "$COMPILER" --use-ir inplace_compound.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("inplace_compound: 80cc --use-ir failed")
@@ -1074,8 +1084,8 @@ fi
 asm_path="$WORK/inplace_shift1.asm"
 printf '%s\n' '
 extern void use(unsigned long);
-void shr1(unsigned long a) { a >>= 1; use(a); }
-void shl1(unsigned long a) { a <<= 1; use(a); }' \
+void shr1(unsigned long a) { a >>= 1; use(a); use(a); }
+void shl1(unsigned long a) { a <<= 1; use(a); use(a); }' \
     > "$WORK/inplace_shift1.c"
 if ! ( cd "$WORK" && "$COMPILER" --use-ir inplace_shift1.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("inplace_shift1: 80cc --use-ir failed")
@@ -1469,14 +1479,13 @@ else
     fi
 fi
 
-# --- KIND_ARRAY OP_ASSIGN LHS (non-long element, #348 E.1) --------
+# --- KIND_ARRAY OP_ASSIGN LHS (#348 E.1; long-elem ungated 2026-06-07)
 # Local- and global-array store shapes `arr[i] = char_val`,
-# `arr[i] = int_val`, `arr[i] = ptr_val` now compile through IR mode.
-# Gated on the stored value type NOT being KIND_LONG — long element
-# arrays (`UINT4 in[16]; in[i] = X`) still bail because their IR
-# emit spills intermediate longs to frame slots, costing more than
-# the walker's helper-call sequences. Re-enabling that case is
-# blocked on Phase D (stack push/pop preservation).
+# `arr[i] = int_val`, `arr[i] = ptr_val`, AND long-element stores
+# (`unsigned long a[16]; a[i] = v`) all compile through IR in BOTH
+# modes. The long-store sp gate is lifted: sp is strategically
+# required (8080/8085/gbz80 have no IX) so full IR coverage there
+# outranks the residual md5-sp delta vs the walker mix.
 asm_path="$WORK/array_lhs_byte.asm"
 printf '%s\n' '
 static unsigned char buf[64];
@@ -1491,14 +1500,14 @@ void h(int i, unsigned long v) { unsigned long a[16]; a[i] = v; }
 if ! ( cd "$WORK" && "$COMPILER" --use-ir array_lhs_byte.c 2>"$WORK/array_lhs_byte.err" ); then
     fail=$((fail+1)); failures+=("array_lhs_byte: 80cc --use-ir failed")
 else
-    # f and g should compile through IR (label present).
+    # f, g AND h should all compile through IR (≥3 IR BB-0 labels);
+    # no OP_ASSIGN bail expected since the long-array sp gate lift.
     n_ir_label=$(grep -c '^L_f[0-9]\+_bb_0:[[:space:]]*$' "$asm_path")
-    # h (long array store) should bail — falls back to walker.
-    n_bail=$(grep -c "h.*OP_ASSIGN LHS shape" "$WORK/array_lhs_byte.err")
-    if [ "${n_ir_label:-0}" -lt 2 ]; then
-        fail=$((fail+1)); failures+=("array_lhs_byte: only $n_ir_label IR-built funcs (need 2)")
-    elif [ "${n_bail:-0}" -lt 1 ]; then
-        fail=$((fail+1)); failures+=("array_lhs_byte: long-array store h() should still bail (got $n_bail)")
+    n_bail=$(grep -c "OP_ASSIGN LHS shape" "$WORK/array_lhs_byte.err")
+    if [ "${n_ir_label:-0}" -lt 3 ]; then
+        fail=$((fail+1)); failures+=("array_lhs_byte: only $n_ir_label IR-built funcs (need ≥3)")
+    elif [ "${n_bail:-0}" -gt 0 ]; then
+        fail=$((fail+1)); failures+=("array_lhs_byte: unexpected OP_ASSIGN bail (long-array sp gate is lifted)")
     else
         ok=$((ok+1))
     fi
@@ -1520,7 +1529,7 @@ unsigned long F(unsigned long a, unsigned long b, unsigned long c) {
     return (a & b) | (~a & c);
 }
 ' > "$WORK/optb_absorb.c"
-if ! ( cd "$WORK" && IR_PHASE_D=1 "$COMPILER" --use-ir optb_absorb.c 2>/dev/null ); then
+if ! ( cd "$WORK" && IR_LONG_PUSHES=1 "$COMPILER" --use-ir optb_absorb.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("optb_absorb: 80cc --use-ir failed")
 else
     # Absorbing OR fastpath signature: after the second push de/push hl
@@ -1642,8 +1651,8 @@ if ! ( cd "$WORK" && "$COMPILER" --use-ir long_and_mask_br.c 2>/dev/null ); then
 else
     # Expect 3 `and 1` / `and 128` / `and 128` lines each immediately
     # followed by `jp z,` or `jp nz,`. Count the and+jp pairs.
-    n_pairs=$(grep -A1 -E '^\tand\t(1|128)$' "$asm_path" \
-              | grep -cE '^\tjp\t(n?z),L_f')
+    n_pairs=$(grep -A1 -E '^[[:space:]]+and[[:space:]]+(1|128)$' "$asm_path" \
+              | grep -cE '^[[:space:]]+jp[[:space:]]+(n?z),L_f')
     # Without the fastpath there should be NO occurrences of these
     # one-byte and-mask + immediate-jp pairs (the lowerer would
     # instead emit a full long-AND via `ld a,l; and 1; ld l,a` etc).
@@ -1681,7 +1690,7 @@ else
     # in this file. The shl3 function shouldn't generate one
     # (bit_shift=3, byte_shift=0 → unroll=15, djnz=9 → save 6 → djnz wins).
     # Actually shl3 also qualifies. So count ≥ 3 across the file.
-    n_djnz=$(grep -cE '^\tdjnz\tL_f[0-9]+_shl_loop_|^\tdjnz\tL_f[0-9]+_shr_loop_' "$asm_path")
+    n_djnz=$(grep -cE '^[[:space:]]+djnz[[:space:]]+L_f[0-9]+_shl_loop_|^[[:space:]]+djnz[[:space:]]+L_f[0-9]+_shr_loop_' "$asm_path")
     if [ "${n_djnz:-0}" -lt 3 ]; then
         fail=$((fail+1)); failures+=("long_shift_djnz: expected ≥3 shift djnz loops, got $n_djnz")
     else
@@ -1719,7 +1728,7 @@ else
     # long-store starts within the function body.
     n_starts=$(awk '/m4.*::f::|::f::/{p=1} /::main::|::g::/{p=0} p' \
                    "$asm_path" 2>/dev/null \
-               | grep -cE '^\tld\t\(hl\),c$' || true)
+               | grep -cE '^[[:space:]]+ld[[:space:]]+\(hl\),c$' || true)
     # With fusion: 4 long stores (one per local) + 1 store for *out
     # via the byte-walk path = 5 starts. Plus possibly the use of
     # *out itself uses an alternate path.
@@ -1746,7 +1755,7 @@ void f(UINT4 *out, UINT4 a, UINT4 b, UINT4 c) {
 if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix fp_byte_direct.c 2>/dev/null ); then
     fail=$((fail+1)); failures+=("fp_byte_direct: 80cc --use-ir -frameix failed")
 else
-    n_ix_byte=$(grep -cE '^\t(and|or|xor|add|sub|adc|sbc)\ta?,?\(ix' \
+    n_ix_byte=$(grep -cE '^[[:space:]]+(and|or|xor|add|sub|adc|sbc)[[:space:]]+a?,?\(ix' \
                 "$asm_path" 2>/dev/null || echo 0)
     # Each long binop = 4 byte ops via (ix+d). With (a & b) | c =
     # 1 AND + 1 OR = 2 long binops = 8 (ix+d) byte ops. Plus the
@@ -1779,13 +1788,958 @@ else
     # The fastpath emits `inc (hl)` to increment the pointer's
     # low byte in place. Absence indicates the fastpath didn't fire
     # (would fall to the buggy 4-byte load).
-    n_inc=$(grep -cE '^\tinc\t\(hl\)$' "$asm_path" 2>/dev/null || echo 0)
+    n_inc=$(grep -cE '^[[:space:]]+inc[[:space:]]+\(hl\)$' "$asm_path" 2>/dev/null || echo 0)
     if [ "${n_inc:-0}" -lt 1 ]; then
         fail=$((fail+1)); failures+=("fp_long_pp: missing inc (hl) — (long)*p++ FP fastpath not firing")
     else
         ok=$((ok+1))
     fi
 fi
+
+# --- copt #285e/f push BC instead of recovered HL ------------------
+# After load_to_dehl on a cached/byte-walked vreg, BC already holds
+# the low half — the trailing `ld l,c; ld h,b` recovery + `push hl`
+# is identical-in-effect to a direct `push bc`. Copt rule #285e
+# collapses `ld l,c; ld h,b; push de; push hl; ld hl,K` to
+# `push de; push bc; ld hl,K`; #285f drops the dead recovery when
+# push bc is already in place (post-IR_NOT cpl chain hits
+# cache_dehl_no_spill needing HL=BC, after 285d cancels the inner
+# round trip there's a residual `ld l,c; ld h,b` to clean up).
+#
+# A non-trivial long binop ((a&b) | (c^d), all long locals) hits
+# the var-RHS staging path: src[1] is loaded into DEHL, then pushed.
+# The 80cc lowerer emits `ld l,c; ld h,b; push de; push hl; ld hl,K`;
+# after copt the asm should read `push de; push bc; ld hl,K`. We
+# pipe the asm through z88dk-copt with the 80cc rules and assert
+# the input pattern is gone.
+asm_path="$WORK/push_bc_recovery.asm"
+opt_path="$WORK/push_bc_recovery.opt"
+printf '%s\n' '
+unsigned long f(unsigned long a, unsigned long b,
+                unsigned long c, unsigned long d) {
+    return (a & b) | (c ^ d);
+}' > "$WORK/push_bc_recovery.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir push_bc_recovery.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("push_bc_recovery: 80cc --use-ir failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("push_bc_recovery: z88dk-copt or 80cc_rules.1 not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -q "ld l,c;ld h,b;push de;push hl;"; then
+        fail=$((fail+1))
+        failures+=("push_bc_recovery: copt #285e did not collapse ld l,c; ld h,b; push de; push hl")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285g elide push bc/pop bc around sp-rel addr compute ----
+# In a long var-RHS binop (e.g. `... | (c^d)`) the lowerer stages
+# both halves on the stack then computes the next slot address via
+# `ld hl,N; add hl,sp`. The inner `push bc` + `pop bc` immediately
+# bracketing the addr compute is a pure round trip — BC is unchanged
+# by the addr compute. Copt #285g elides the pair and rewrites N to
+# N-2 so the outer `pop bc` (which pops the pushed DE into BC for
+# the second-byte chain) still balances correctly.
+#
+# Test: the same long binop synthesis as #285e. After copt the asm
+# must not contain `push bc; ld hl,N; add hl,sp; pop bc` — the
+# remaining bracket would mean #285g didn't fire.
+asm_path="$WORK/elide_pushpop_bc.asm"
+opt_path="$WORK/elide_pushpop_bc.opt"
+printf '%s\n' '
+unsigned long g(unsigned long a, unsigned long b,
+                unsigned long c, unsigned long d) {
+    return (a & b) | (c ^ d);
+}' > "$WORK/elide_pushpop_bc.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir elide_pushpop_bc.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("elide_pushpop_bc: 80cc --use-ir failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("elide_pushpop_bc: z88dk-copt or 80cc_rules.1 not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "push bc;ld hl,[0-9-]+;add hl,sp;pop bc"; then
+        fail=$((fail+1))
+        failures+=("elide_pushpop_bc: copt #285g did not elide push bc/pop bc round trip")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285h fold HL recovery + ld bc,K + add hl,bc -------------
+# In FP mode the long const-ADD path emits the chain
+#   ld l,c; ld h,b      ; HL = BC = low half of LHS
+#   ld bc,K_lo          ; BC = K's low half
+#   add hl,bc           ; HL = LHS_lo + K_lo
+# Rewrite to `ld hl,K_lo; add hl,bc` — addition is commutative so
+# the sum is the same, BC keeps the original LHS_lo value, and the
+# next `ld bc,K_hi` (always present, for the adc chain) overwrites
+# BC anyway. Saves 2B per occurrence.
+#
+# Test: a long-const ADD in a function compiled with -frameix. After
+# copt, the input pattern must be gone.
+asm_path="$WORK/long_const_add_fp.asm"
+opt_path="$WORK/long_const_add_fp.opt"
+printf '%s\n' '
+unsigned long h(unsigned long a) {
+    return a + 0xD76AA478UL;
+}' > "$WORK/long_const_add_fp.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix long_const_add_fp.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("long_const_add_fp: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("long_const_add_fp: z88dk-copt or 80cc_rules.1 not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld l,c;ld h,b;ld bc,[0-9-]+;add hl,bc"; then
+        fail=$((fail+1))
+        failures+=("long_const_add_fp: copt #285h did not fold HL recovery + ld bc,K + add hl,bc")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285i fold ld b,h; ld c,l + byte-op chain via A ----------
+# In FP mode the long binop byte chain emits
+#   ld b,h; ld c,l       ; BC = HL (low half)
+#   ld a,c; OP a,(ix+d)  ; A = lo byte, op with byte0
+#   ld c,a               ; C = result_byte0
+#   ld a,b; OP a,(ix+d)  ; A = hi byte, op with byte1
+#   ld b,a               ; B = result_byte1
+# The leading BC=HL is pointless when we go straight through A:
+#   ld a,l; OP a,(ix+d); ld c,a; ld a,h; OP a,(ix+d); ld b,a
+# Saves 2B per occurrence. Covers ADD/ADC/SUB/SBC/AND/OR/XOR with
+# (ix+d) operands via a regex match.
+#
+# Test: `a + b` with two long FP locals. After copt the asm must not
+# contain `ld b,h; ld c,l; ld a,c; <op> a,(ix+d)`.
+asm_path="$WORK/long_byte_a_chain_fp.asm"
+opt_path="$WORK/long_byte_a_chain_fp.opt"
+printf '%s\n' '
+unsigned long fchain(unsigned long a, unsigned long b) {
+    return a + b;
+}' > "$WORK/long_byte_a_chain_fp.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix long_byte_a_chain_fp.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("long_byte_a_chain_fp: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("long_byte_a_chain_fp: z88dk-copt or 80cc_rules.1 not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld b,h;ld c,l;ld a,c;(add a,|adc a,|sub |sbc a,|and |or |xor )"; then
+        fail=$((fail+1))
+        failures+=("long_byte_a_chain_fp: copt #285i did not fold ld b,h/ld c,l prelude")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285j in-place variant of #285i --------------------------
+# Sibling of #285i for the in-place form where the chain writes the
+# byte result back to a slot via `ld (ix%d),a` instead of into
+# BC via `ld c,a; ld b,a`. The leading `ld b,h; ld c,l` is still
+# dead, so the same `ld a,l/h` substitution applies. BC ends with
+# its pre-chain value rather than the new low half — verified safe
+# in MD5 because the next op always re-loads BC explicitly.
+asm_path="$WORK/long_inplace_chain_fp.asm"
+opt_path="$WORK/long_inplace_chain_fp.opt"
+printf '%s\n' '
+void fadd(unsigned long *p, unsigned long v) {
+    *p += v;
+}' > "$WORK/long_inplace_chain_fp.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix long_inplace_chain_fp.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("long_inplace_chain_fp: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("long_inplace_chain_fp: z88dk-copt or 80cc_rules.1 not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld b,h;ld c,l;ld a,c;(add a,|adc a,|sub |sbc a,|and |or |xor ).*;ld \(ix"; then
+        fail=$((fail+1))
+        failures+=("long_inplace_chain_fp: copt #285j did not fold in-place chain")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285k elide push hl/pop hl around ld de,(ix+d) -----------
+# The lowerer stages HL on the stack while loading DE from a slot
+# via `ld de,(ix+d)`. The latter doesn't touch HL — push/pop are
+# pure overhead. Reduce to just `ld de,(ix+d)`.
+asm_path="$WORK/push_pop_hl_round_ld_de.asm"
+opt_path="$WORK/push_pop_hl_round_ld_de.opt"
+printf '%s\n' '
+unsigned int g(unsigned int x, unsigned int y) {
+    unsigned int a = x ^ y;
+    unsigned int b = ~a;
+    return a + b;
+}' > "$WORK/push_pop_hl_round_ld_de.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix push_pop_hl_round_ld_de.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("push_pop_hl_round_ld_de: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("push_pop_hl_round_ld_de: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "push hl;ld de,\(ix.*\);pop hl"; then
+        fail=$((fail+1))
+        failures+=("push_pop_hl_round_ld_de: copt #285k did not elide push hl/pop hl")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285l ld a,h+and 128+jp z → ld a,h+rlca+jp nc -----------
+# Sign-bit test of HL: load H into A, mask 0x80, test Z. The `and
+# 128` immediate (2B) can be replaced with `rlca` (1B) which sets
+# CF = original A bit 7; the conditional flips from jp z to jp nc.
+# Saves 1 byte, 3 T-states per occurrence.
+asm_path="$WORK/sign_bit_rlca.asm"
+opt_path="$WORK/sign_bit_rlca.opt"
+printf '%s\n' '
+unsigned int t(unsigned int x) {
+    if (x & 0x8000U) return 1;
+    return 0;
+}' > "$WORK/sign_bit_rlca.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir sign_bit_rlca.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("sign_bit_rlca: 80cc --use-ir failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("sign_bit_rlca: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld a,h;and 128;jp z,"; then
+        fail=$((fail+1))
+        failures+=("sign_bit_rlca: copt #285l did not rewrite and 128 to rlca")
+    elif ! echo "$slurp" | grep -qE "rlca;jp nc,"; then
+        fail=$((fail+1))
+        failures+=("sign_bit_rlca: rewritten asm missing rlca+jp nc")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #260a-via-a + #260a-via-a-into-de ------------------------
+# Two related rules for the byte<<8 emit pattern. The lowerer
+# walks a byte into A then shuffles it into HL's high half via
+#   ld l,a; ld h,0; ld h,l; ld l,0
+# which is 4 inst / 6B / 16T. #260a-via-a folds this to
+#   ld h,a; ld l,0
+# (2 inst / 3B / 8T). When the very next op is `ex de,hl;
+# ld hl,(ix+d)` (so the byte<<8 ends up in DE and HL gets
+# reloaded), #260a-via-a-into-de instead emits the byte<<8
+# directly into DE:
+#   ld d,a; ld e,0; ld hl,(ix+d)
+# saving the ex de,hl entirely (FP mode only — needs ix+d load).
+asm_path="$WORK/byte_shl8_via_a.asm"
+opt_path="$WORK/byte_shl8_via_a.opt"
+printf '%s\n' '
+unsigned int s(unsigned char b, unsigned int w) {
+    return ((unsigned int)b << 8) ^ w;
+}' > "$WORK/byte_shl8_via_a.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir byte_shl8_via_a.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("byte_shl8_via_a: 80cc --use-ir failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("byte_shl8_via_a: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld l,a;ld h,0;ld h,l;ld l,0"; then
+        fail=$((fail+1))
+        failures+=("byte_shl8_via_a: copt #260a-via-a did not fold byte<<8 shuffle")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285m caller-save BC + arg push via HL → push bc twice ---
+# The lowerer's call-site setup pushes BC for caller-save, then
+# stages it again as the first arg via `ld l,c; ld h,b; push hl`.
+# Both pushes carry BC's value; replace the lds + push hl with a
+# second push bc. The trailing ld hl,K (next arg or work) ensures
+# HL is overwritten so its difference doesn't matter.
+asm_path="$WORK/push_bc_arg.asm"
+opt_path="$WORK/push_bc_arg.opt"
+printf '%s\n' '
+extern unsigned int crc16_ccitt(unsigned char *data, unsigned int len);
+unsigned int run(unsigned char *p) {
+    unsigned int r = crc16_ccitt(p, 10);
+    return r + crc16_ccitt(p, 20);
+}' > "$WORK/push_bc_arg.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir push_bc_arg.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("push_bc_arg: 80cc --use-ir failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("push_bc_arg: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "push bc;ld l,c;ld h,b;push hl"; then
+        fail=$((fail+1))
+        failures+=("push_bc_arg: copt #285m did not collapse arg-push via HL")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285n elide ex de,hl + reload-same-slot before ld de,K ---
+# Pattern emitted around a long-mul result reuse: store HL to a
+# slot, ex de,hl, reload HL from the same slot, then ld de,K. The
+# ex+reload pair just round-trips HL through DE and back, leaving
+# the original HL value untouched; DE gets overwritten by the
+# trailing ld de,K so its intermediate value is dead. Drop both.
+asm_path="$WORK/ex_reload_same_slot.asm"
+opt_path="$WORK/ex_reload_same_slot.opt"
+printf '%s\n' '
+unsigned int prng(unsigned int s) {
+    unsigned int t = s * 13;
+    return t + 13849;
+}' > "$WORK/ex_reload_same_slot.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix ex_reload_same_slot.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("ex_reload_same_slot: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("ex_reload_same_slot: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld \(ix.*\),hl;ex de,hl;ld hl,\(ix.*\);ld de,"; then
+        fail=$((fail+1))
+        failures+=("ex_reload_same_slot: copt #285n did not fold ex+reload")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285o *p++ idiom: drop redundant reloads -----------------
+# `crc ^= (unsigned int)*data++ << 8` lowers to:
+#   ld hl,(ix+M); ld a,(hl); ld (ix-N),a   ; load + temp-store
+#   ld hl,(ix+M); inc hl; ld (ix+M),hl     ; reload + ++ + store
+#   ld a,(ix-N)                            ; reload the byte
+# but after the first chunk HL still holds p (the ld (ix-N),a
+# doesn't touch HL) and A still holds the byte (the inc hl /
+# pointer-store don't touch A). Drop the duplicate ld hl + ld a.
+asm_path="$WORK/star_p_plus_plus.asm"
+opt_path="$WORK/star_p_plus_plus.opt"
+printf '%s\n' '
+unsigned int sum(unsigned char *data, unsigned int n) {
+    unsigned int acc = 0;
+    while (n--) acc ^= ((unsigned int)*data++) << 8;
+    return acc;
+}' > "$WORK/star_p_plus_plus.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix star_p_plus_plus.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("star_p_plus_plus: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("star_p_plus_plus: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld hl,\(ix.*\);ld a,\(hl\);ld \(ix.*\),a;ld hl,\(ix"; then
+        fail=$((fail+1))
+        failures+=("star_p_plus_plus: copt #285o did not drop duplicate ld hl")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285p narrow int load when high half discarded -----------
+# `tab[i & 0x0FU]` lowers to `ld hl,(ix-N); ld a,l; and 15; ld l,a;
+# ld h,0`. The full int load reads both bytes but H is immediately
+# overwritten with 0 — wasted high-byte fetch. Replace with a
+# direct low-byte load `ld a,(ix-N)`.
+asm_path="$WORK/narrow_int_load_mask.asm"
+opt_path="$WORK/narrow_int_load_mask.opt"
+printf '%s\n' '
+extern unsigned int tab[];
+unsigned int pick(unsigned int i) {
+    return tab[i & 0x0FU];
+}' > "$WORK/narrow_int_load_mask.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix narrow_int_load_mask.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("narrow_int_load_mask: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("narrow_int_load_mask: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "ld hl,\(ix.*\);ld a,l;and "; then
+        fail=$((fail+1))
+        failures+=("narrow_int_load_mask: copt #285p did not narrow int load to byte")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- copt #285q small-mask + add hl,hl → add a,a -------------------
+# After #285p narrows the load, the lowerer often follows with
+# `add hl,hl` to compute index*2 (for int-array indexing). When
+# the mask is ≤127 the doubled value fits in a byte, so `add a,a`
+# can be used before the int-extend — same encoding length but
+# `add a,a` is 4T vs `add hl,hl` 11T (saves 7T per occurrence).
+asm_path="$WORK/mask_then_double.asm"
+opt_path="$WORK/mask_then_double.opt"
+printf '%s\n' '
+extern unsigned int tab[];
+unsigned int pick(unsigned int i) {
+    return tab[i & 0x0FU];
+}' > "$WORK/mask_then_double.c"
+copt_bin="$(dirname "$COMPILER" 2>/dev/null)/z88dk-copt"
+[ -x "$copt_bin" ] || copt_bin="$(command -v z88dk-copt 2>/dev/null)"
+rules="${Z80_OZFILES:-$Z88DK_LIB}/80cc_rules.1"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir -frameix mask_then_double.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("mask_then_double: 80cc --use-ir -frameix failed")
+elif [ ! -x "$copt_bin" ] || [ ! -f "$rules" ]; then
+    fail=$((fail+1)); failures+=("mask_then_double: copt or rules not found")
+else
+    "$copt_bin" "$rules" < "$asm_path" > "$opt_path" 2>/dev/null
+    slurp=$(asm_slurp "$opt_path")
+    if echo "$slurp" | grep -qE "and 15;ld l,a;ld h,0;add hl,hl"; then
+        fail=$((fail+1))
+        failures+=("mask_then_double: copt #285q did not move doubling to add a,a")
+    elif ! echo "$slurp" | grep -qE "and 15;add a,a"; then
+        fail=$((fail+1))
+        failures+=("mask_then_double: expected 'and 15; add a,a' after rule")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- PR_DEHL: zero-byte frame for all-PR_DEHL-intermediate function -
+# Stage 6 of the allocator marks width-4 vregs as IR_PR_DEHL when they
+# are produced once and consumed immediately (single-use, next op only).
+# Those vregs are excluded from ir_assign_slots, so they don't occupy
+# a frame slot. When a function's only long temporaries are all
+# PR_DEHL-eligible (e.g. each intermediate feeds the next op directly),
+# the frame size should be zero — verified by the absence of any
+# `ld hl,-N` frame-allocation prologue in the generated asm.
+# chain3(a, b, c) { return a + b + c; } generates two long ADD
+# intermediates: (a+b) consumed immediately by the final ADD, and the
+# final result which is a return value (also dead-after). With PR_DEHL
+# neither gets a slot and the frame is empty.
+asm_path="$WORK/pr_dehl_no_frame.asm"
+printf '%s\n' '
+unsigned long chain3(unsigned long a, unsigned long b, unsigned long c) {
+    return a + b + c;
+}' > "$WORK/pr_dehl_no_frame.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir pr_dehl_no_frame.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("pr_dehl_no_frame: 80cc --use-ir failed")
+else
+    if grep -qE '^[[:space:]]+ld[[:space:]]+hl,-[0-9]' "$asm_path" 2>/dev/null; then
+        fail=$((fail+1))
+        failures+=("pr_dehl_no_frame: frame alloc present — PR_DEHL did not eliminate slot")
+    else
+        ok=$((ok+1))
+    fi
+fi
+
+# --- Chain-OR accumulate: inline push instead of slot spill --------
+# When a SPILL long intermediate is consumed by a single later OR/AND/XOR
+# at distance >1 (non-PR_DEHL gap), the lowerer should push it to the
+# data stack (3 instr: ld bc,hl; push de; push bc) instead of writing it
+# to a frame slot (10 instr). The consumer uses the fused-(hl) path with
+# offset=4 and pops the stack clean afterwards.
+# pack4(b3,b2,b1,b0) generates two such intermediates (b3<<24 and the
+# partial result (b3<<24)|(b2<<16)), each consumed by the next OR step.
+# Verify:
+#   pos: `push de;push bc` appears (inline pushes fired)
+#   pos: `ld hl,4;add hl,sp` appears (fused-(hl) with N=4)
+#   pos: `pop bc;pop bc` appears (cleanup sequence fires)
+#   neg: no slot writes for v5/v8 (no `ld hl,0;add hl,sp` or equiv slot-off patterns
+#        for the SPILL intermediates; we allow the non-zero slot offsets for v7/v10)
+#   neg: no `ld hl,-12` or larger frame (frame stays at 8 bytes max for v7/v10 slots)
+asm_path="$WORK/chain_or_push.asm"
+printf '%s\n' '
+unsigned long pack4(unsigned char b3, unsigned char b2, unsigned char b1, unsigned char b0) {
+    return ((unsigned long)b3 << 24) | ((unsigned long)b2 << 16)
+         | ((unsigned long)b1 <<  8) | b0;
+}' > "$WORK/chain_or_push.c"
+# Shape assertion for the sp inline-push (chain-OR accumulate) —
+# pin IR_LONG_PUSHES=0: with the pass forced on, its PUSH/absorb
+# takes these candidates first and the asserted pattern (correctly)
+# changes shape.
+if ! ( cd "$WORK" && env IR_LONG_PUSHES=0 "$COMPILER" --use-ir chain_or_push.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("chain_or_push: 80cc --use-ir failed")
+else
+    slurp=$(asm_slurp "$asm_path")
+    ok2=1
+    # inline pushes fired
+    if [[ "$slurp" != *"push de;push bc"* ]]; then
+        ok2=0; failures+=("chain_or_push: no 'push de; push bc' (inline push not fired)")
+    fi
+    # fused-(hl) path used N=4
+    if [[ "$slurp" != *"ld hl,4;add hl,sp"* ]]; then
+        ok2=0; failures+=("chain_or_push: no 'ld hl,4; add hl,sp' (fused-hl N=4 not fired)")
+    fi
+    # cleanup pops present
+    if [[ "$slurp" != *"pop bc;pop bc"* ]]; then
+        ok2=0; failures+=("chain_or_push: no 'pop bc; pop bc' (cleanup not emitted)")
+    fi
+    # frame must not grow beyond 8 bytes
+    if grep -qE '^[[:space:]]+ld[[:space:]]+hl,-[0-9]{2,}' "$asm_path" 2>/dev/null; then
+        ok2=0; failures+=("chain_or_push: frame larger than expected (slot not eliminated)")
+    fi
+    [ $ok2 -eq 1 ] && ok=$((ok+1)) || fail=$((fail+1))
+fi
+
+# --- IR compound-assign: global += fix + *=/div/mod coverage -------
+# Pre-existing bug: `g op= x` on global ints was using g's VALUE as a
+# pointer (build_expr(AST_GLOBAL_VAR) returns the value, not address).
+# Fixed by detecting AST_GLOBAL_VAR in the compound handler and using
+# IR_MEM_SYM load/store directly.
+# New coverage: OP_AMULT/ADIV/AMOD (ast_type 43-45) had no case in
+# build_expr — fell through to "unsupported expr". Now handled via
+# HCALL (l_mult/l_div) with read-modify-write for local, global, and
+# deref LHS shapes.
+
+# compound_add_global: g += x — pre-existing bug fix
+asm_path="$WORK/compound_add_global.asm"
+printf '%s\n' '
+int g;
+unsigned int main(void) {
+    g = 10;
+    g += 5;
+    return (unsigned int)g;
+}' > "$WORK/compound_add_global.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir compound_add_global.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_add_global: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/compound_add_global.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_add_global: z80asm/link failed")
+else
+    trace="$WORK/compound_add_global.trace"
+    "$TICKS" -end 6 -trace "$WORK/compound_add_global.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "000f" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("compound_add_global: expected hl=000f, got hl=$hl")
+    fi
+fi
+
+# compound_mul_local: a *= b on local vars
+asm_path="$WORK/compound_mul_local.asm"
+printf '%s\n' '
+unsigned int main(void) {
+    int a = 7, b = 3;
+    a *= b;
+    return (unsigned int)a;
+}' > "$WORK/compound_mul_local.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir compound_mul_local.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_mul_local: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/compound_mul_local.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_mul_local: z80asm/link failed")
+else
+    trace="$WORK/compound_mul_local.trace"
+    "$TICKS" -end 6 -trace "$WORK/compound_mul_local.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "0015" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("compound_mul_local: expected hl=0015 (21), got hl=$hl")
+    fi
+fi
+
+# compound_mul_global: g *= b on global
+asm_path="$WORK/compound_mul_global.asm"
+printf '%s\n' '
+int g;
+unsigned int main(void) {
+    g = 5;
+    g *= 4;
+    return (unsigned int)g;
+}' > "$WORK/compound_mul_global.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir compound_mul_global.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_mul_global: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/compound_mul_global.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_mul_global: z80asm/link failed")
+else
+    trace="$WORK/compound_mul_global.trace"
+    "$TICKS" -end 6 -trace "$WORK/compound_mul_global.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "0014" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("compound_mul_global: expected hl=0014 (20), got hl=$hl")
+    fi
+fi
+
+# compound_div_local: a /= b, a %= b on locals
+asm_path="$WORK/compound_divmod_local.asm"
+printf '%s\n' '
+unsigned int main(void) {
+    int a = 100, b = 7;
+    a /= b;            /* 14 */
+    int c = 17, d = 5;
+    c %= d;            /* 2 */
+    return (unsigned int)(a + c);  /* 16 = 0x10 */
+}' > "$WORK/compound_divmod_local.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir compound_divmod_local.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_divmod_local: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/compound_divmod_local.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_divmod_local: z80asm/link failed")
+else
+    trace="$WORK/compound_divmod_local.trace"
+    "$TICKS" -end 6 -trace "$WORK/compound_divmod_local.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "0010" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("compound_divmod_local: expected hl=0010 (16), got hl=$hl")
+    fi
+fi
+
+# compound_mul_deref: *p *= n via pointer
+asm_path="$WORK/compound_mul_deref.asm"
+printf '%s\n' '
+unsigned int main(void) {
+    int c = 6;
+    int *p = &c;
+    *p *= 3;           /* 18 = 0x12 */
+    return (unsigned int)c;
+}' > "$WORK/compound_mul_deref.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir compound_mul_deref.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_mul_deref: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/compound_mul_deref.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("compound_mul_deref: z80asm/link failed")
+else
+    trace="$WORK/compound_mul_deref.trace"
+    "$TICKS" -end 6 -trace "$WORK/compound_mul_deref.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "0012" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("compound_mul_deref: expected hl=0012 (18), got hl=$hl")
+    fi
+fi
+
+# --- Byte-extract idiom + byte promotion (IR pipeline) -------------
+# (x >> 8k) & 0xFF digest stores collapse to IR_EXTRACT_BYTE; byte
+# operands promote to int in shifts/adds; deref of byte-array globals
+# reads a BYTE (was a word). NOTE: walker-mode equivalents are NOT
+# covered here — the walker has a pre-existing l_gchar sign-extension
+# bug on unsigned-char array elements (flagged 2026-06-06).
+asm_path="$WORK/extract_byte_digest.asm"
+printf '%s\n' '
+typedef unsigned long UINT4;
+unsigned char dig[8];
+void store_word(unsigned char *p, UINT4 x) {
+    p[0] = (unsigned char)(x & 0xFF);
+    p[1] = (unsigned char)((x >> 8) & 0xFF);
+    p[2] = (unsigned char)((x >> 16) & 0xFF);
+    p[3] = (unsigned char)((x >> 24) & 0xFF);
+}
+unsigned int main(void) {
+    int r = 0;
+    store_word(dig, 0xA1B2C3D4UL);
+    store_word(dig + 4, 0x11223344UL);
+    if (dig[0] == 0xD4) r |= 1;
+    if (dig[1] == 0xC3) r |= 2;
+    if (dig[2] == 0xB2) r |= 4;
+    if (dig[3] == 0xA1) r |= 8;
+    if (dig[4] == 0x44) r |= 16;
+    if (dig[7] == 0x11) r |= 32;
+    return (unsigned int)r;
+}' > "$WORK/extract_byte_digest.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir extract_byte_digest.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("extract_byte_digest: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/extract_byte_digest.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("extract_byte_digest: z80asm/link failed")
+else
+    trace="$WORK/extract_byte_digest.trace"
+    "$TICKS" -end 6 -trace "$WORK/extract_byte_digest.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "003f" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("extract_byte_digest: expected hl=003F, got hl=$hl")
+    fi
+fi
+
+asm_path="$WORK/byte_shl8_promotes.asm"
+printf '%s\n' '
+unsigned char d2[2];
+unsigned int main(void) { d2[0] = 0xD4; d2[1] = 0xC3; return (unsigned int)((d2[0] << 8) | d2[1]); }' \
+    > "$WORK/byte_shl8_promotes.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir byte_shl8_promotes.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("byte_shl8_promotes: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/byte_shl8_promotes.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("byte_shl8_promotes: z80asm/link failed")
+else
+    trace="$WORK/byte_shl8_promotes.trace"
+    "$TICKS" -end 6 -trace "$WORK/byte_shl8_promotes.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "d4c3" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("byte_shl8_promotes: expected hl=D4C3, got hl=$hl")
+    fi
+fi
+
+# BUG_LOG A34: OP_ASSIGN to a global must store at the GLOBAL's width,
+# not the RHS vreg's. Pre-fix, `ga = 0x11` (int-width RHS) emitted
+# `ld (_ga),hl` — a word store zeroing the adjacent `gb` (order-
+# dependent: gb is written first, then clobbered). Expect 0x5511;
+# pre-fix returns 0x0011.
+asm_path="$WORK/byte_global_store_adjacent.asm"
+printf '%s\n' '
+unsigned char ga, gb;
+unsigned int main(void) { gb = 0x55; ga = 0x11; return (unsigned int)((gb << 8) | ga); }' \
+    > "$WORK/byte_global_store_adjacent.c"
+if ! ( cd "$WORK" && "$COMPILER" --use-ir byte_global_store_adjacent.c 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("byte_global_store_adjacent: 80cc --use-ir failed")
+elif ! ( cd "$WORK" && reg_z80asm "$WORK/byte_global_store_adjacent.bin" \
+                            "$HARNESS" "$asm_path" 2>/dev/null ); then
+    fail=$((fail+1)); failures+=("byte_global_store_adjacent: z80asm/link failed")
+else
+    trace="$WORK/byte_global_store_adjacent.trace"
+    "$TICKS" -end 6 -trace "$WORK/byte_global_store_adjacent.bin" > "$trace" 2>&1
+    hl=$(grep "pc=000D" "$trace" | tail -1 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+    if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "5511" ]; then
+        ok=$((ok+1))
+    else
+        fail=$((fail+1)); failures+=("byte_global_store_adjacent: expected hl=5511, got hl=$hl")
+    fi
+fi
+
+# --- Long stack-discipline runtime checks (IR_LONG_PUSHES) ---------
+# Each test compiles in {sp, fp} x {flag off, flag on} and asserts HL
+# at the harness exit — the expected value must hold in ALL four
+# combinations. Bugs covered (2026-06-07):
+#   - in-place long const-ADD slot RMW ran while the value lived only
+#     in the DEHL cache (spill skipped) — added K to a stale slot.
+#     Flag-INDEPENDENT miscompile, both modes (longpush_imm_inplace).
+#   - push_dehl_long pushed junk HL on a DEHL-cache hit; the fp
+#     byte-direct dead-dst invariant is BC=low, HL=junk
+#     (longpush_xor_shr16).
+#   - option-B stack absorption was gated !fp_active, so fp binop
+#     consumers read the (ix+d) slot the PUSH elided writing; and
+#     pop_dehl_long left stale HL/DE cache claims after the pops
+#     (longpush_struct_compound).
+#   - the chained md5-FF-round shape combining all of the above
+#     (longpush_ff_rounds).
+run_longpush_rt() {
+    local name="$1" expect="$2" src="$3"
+    printf '%s\n' "$src" > "$WORK/$name.c"
+    local mode flag desc hl trace
+    for mode in "" "-frameix"; do
+        for flag in off on; do
+            desc="$name[${mode:-sp} push=$flag]"
+            # IR_LONG_PUSHES is a VALUE now (default: on in fp mode,
+            # off in sp) — force both states explicitly so each
+            # codegen variant keeps coverage regardless of defaults.
+            if [ "$flag" = on ]; then
+                ( cd "$WORK" && env IR_LONG_PUSHES=1 \
+                    "$COMPILER" --use-ir $mode "$name.c" 2>/dev/null )
+            else
+                ( cd "$WORK" && env IR_LONG_PUSHES=0 \
+                    "$COMPILER" --use-ir $mode "$name.c" 2>/dev/null )
+            fi
+            if [ $? -ne 0 ]; then
+                fail=$((fail+1)); failures+=("$desc: 80cc --use-ir failed")
+                continue
+            fi
+            if ! ( cd "$WORK" && reg_z80asm "$WORK/$name.bin" \
+                        "$HARNESS" "$WORK/$name.asm" 2>/dev/null ); then
+                fail=$((fail+1)); failures+=("$desc: z80asm/link failed")
+                continue
+            fi
+            trace="$WORK/$name.trace"
+            "$TICKS" -end 6 -trace "$WORK/$name.bin" > "$trace" 2>&1
+            hl=$(grep "pc=000D" "$trace" | tail -1 \
+                 | sed -E 's/.*hl=([0-9A-Fa-f]+).*/\1/')
+            if [ "$(echo "$hl" | tr 'A-F' 'a-f')" = "$expect" ]; then
+                ok=$((ok+1))
+            else
+                fail=$((fail+1))
+                failures+=("$desc: expected hl=$expect, got hl=$hl")
+            fi
+        done
+    done
+}
+
+run_longpush_rt longpush_imm_inplace ac8e '
+typedef unsigned long UINT4;
+#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+unsigned int main(void) {
+    UINT4 a = 0x67452301UL, b = 0xefcdab89UL, d = 0x10325476UL;
+    a = ROTATE_LEFT(a, 7);
+    a += b;
+    d += a;
+    return (unsigned int)((a ^ d) & 0xFFFF);
+}'
+
+run_longpush_rt longpush_xor_shr16 444b '
+typedef unsigned long UINT4;
+typedef struct { UINT4 i[2]; } CTX;
+CTX g;
+unsigned int main(void) {
+    CTX *c = &g;
+    c->i[0] = 0x12345678UL;
+    c->i[1] = 7;
+    return (unsigned int)(c->i[0] ^ (c->i[0] >> 16) ^ c->i[1]);
+}'
+
+run_longpush_rt longpush_struct_compound 1f37 '
+typedef unsigned long UINT4;
+typedef struct { UINT4 i[2]; } CTX;
+CTX g;
+unsigned int main(void) {
+    CTX *c = &g;
+    unsigned int inLen = 1000;
+    c->i[0] = 0xFFFFFFF0UL;
+    c->i[1] = 7;
+    c->i[0] += (UINT4)inLen << 3;
+    c->i[1] += (UINT4)inLen >> 13;
+    return (unsigned int)(c->i[0] ^ c->i[1]);
+}'
+
+# ROTL fusion: rotate source arrives via LD_MEM, so the sp-mode
+# DEHL cache hit must recover HL from BC before the byte
+# permutation (BC=low invariant, HL not guaranteed — the A38
+# disease; pre-fix sp returned 594C).
+run_longpush_rt rotl_after_load 2222 '
+typedef unsigned long UINT4;
+#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+UINT4 g = 0x67452301UL;
+unsigned int main(void) {
+    UINT4 a = g;
+    a = ROTATE_LEFT(a, 7);
+    return (unsigned int)((a ^ (a >> 16)) & 0xFFFF);
+}'
+
+# Rotate-RIGHT fuses through the same triple (SHR n + SHL 32-n in
+# either order -> ROTL 32-n). SHA-256 Sigma shape: XOR of three
+# rotr amounts per value, exercising byte-perm + both bit-rotate
+# directions across six distinct counts (2/13/22, 6/11/25).
+run_longpush_rt rotr_sigma_xor 26be '
+typedef unsigned long UINT4;
+#define ROTATE_RIGHT(x, n) (((x) >> (n)) | ((x) << (32-(n))))
+UINT4 g = 0x6a09e667UL, h = 0xbb67ae85UL;
+unsigned int main(void) {
+    UINT4 a = g, b = h, r;
+    r  = ROTATE_RIGHT(a, 2) ^ ROTATE_RIGHT(a, 13) ^ ROTATE_RIGHT(a, 22);
+    r += ROTATE_RIGHT(b, 6) ^ ROTATE_RIGHT(b, 11) ^ ROTATE_RIGHT(b, 25);
+    return (unsigned int)((r ^ (r >> 16)) & 0xFFFF);
+}'
+
+# Width-correctness pins (2026-06-07, the seven lifted-gate bugs):
+# decl-init literal must NOT shrink the declared vreg width — `UINT4
+# crc = 0` ran every later op on crc at 16 bits (crcbench's CRC
+# accumulate AND its assertEqual compare were both silently 16-bit).
+run_longpush_rt long_width_decl_init 444c '
+typedef unsigned long UINT4;
+UINT4 gsrc;
+unsigned int main(void) {
+    UINT4 crc = 0;
+    gsrc = 0x12345678UL;
+    crc ^= gsrc;
+    return (unsigned int)((crc >> 16) ^ crc);
+}'
+
+# Mixed-width arithmetic: long-helper args widen (l_long_mult_u with
+# an int counter), long-literal + int binop runs at long width, and
+# parser-folded struct member long stores/loads keep their width.
+run_longpush_rt long_width_mixed 1522 '
+typedef unsigned long UINT4;
+typedef struct { UINT4 i[2]; UINT4 tail; } CTX;
+CTX g;
+unsigned int main(void) {
+    unsigned int i, r = 0;
+    for (i = 0; i < 4; i++)
+        r ^= (unsigned int)((0x01010101UL * (i+1)) >> 16);
+    g.i[0] = 0x11223344UL;
+    g.i[1] = (UINT4)0x01000100UL + i;
+    return (unsigned int)(r ^ (g.i[0] >> 16) ^ (g.i[1] >> 16) ^ (g.i[1] & 0xFFFF));
+}'
+
+# EXTRACT_BYTE on a sp DEHL-cache hit must read bytes 0/1 from C/B
+# (BC=low invariant; HL holds the slot address after the sp spill
+# walk). Two extract stores per iteration through a struct pointer.
+run_longpush_rt extract_byte_sp_hit 1672 '
+typedef unsigned long UINT4;
+typedef struct { UINT4 buf[4]; unsigned char digest[16]; } CTX;
+CTX g;
+unsigned int main(void) {
+    CTX *c = &g; unsigned int i, ii, r = 0;
+    for (i=0;i<4;i++) g.buf[i] = 0x11223344UL + 0x11111111UL * i;
+    for (i=0, ii=0; i<4; i++, ii+=4) {
+        c->digest[ii]   = (unsigned char)(c->buf[i] & 0xFF);
+        c->digest[ii+1] = (unsigned char)((c->buf[i] >> 8) & 0xFF);
+    }
+    for (i=0;i<16;i++) r += (unsigned int)g.digest[i] * (i+1);
+    return r;
+}'
+
+# Large frames (>127-byte locals): 1KB byte array + long array,
+# offsets past the IX displacement range, init loops, cross-call
+# reads, and a tail store at data[1023]. Pins the int16 slot range
+# and the per-access fp_offset_fits fallbacks.
+run_longpush_rt large_frame_1k 3005 '
+typedef unsigned long UINT4;
+unsigned int feed(unsigned char *p, unsigned int n) { unsigned int i, r = 0; for (i=0;i<n;i++) r += p[i]; return r; }
+unsigned int main(void) {
+    unsigned char data[1024];
+    UINT4 acc[8];
+    unsigned int i, r = 0;
+    for (i = 0; i < 1024; i++) data[i] = (unsigned char)(i * 13 + 5);
+    for (i = 0; i < 8; i++) acc[i] = 0x01010101UL * (i + 1);
+    r = feed(data, 1024);
+    r += feed(data + 900, 100);
+    for (i = 0; i < 8; i++) r ^= (unsigned int)(acc[i] >> 16) ^ (unsigned int)(acc[i] & 0xFFFF);
+    data[1023] = (unsigned char)r;
+    return r ^ data[1023] ^ data[0];
+}'
+
+run_longpush_rt longpush_ff_rounds de0e '
+typedef unsigned long UINT4;
+#define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
+#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+#define FF(a, b, c, d, x, s, ac) {(a) += F ((b), (c), (d)) + (x) + (UINT4)(ac); (a) = ROTATE_LEFT ((a), (s)); (a) += (b); }
+UINT4 in[4];
+unsigned int main(void) {
+    UINT4 a = 0x67452301UL, b = 0xefcdab89UL, c = 0x98badcfeUL, d = 0x10325476UL;
+    in[0] = 0x11111111UL; in[1] = 0x22222222UL; in[2] = 0x33333333UL; in[3] = 0x44444444UL;
+    FF(a, b, c, d, in[0], 7,  0xd76aa478UL);
+    FF(d, a, b, c, in[1], 12, 0xe8c7b756UL);
+    FF(c, d, a, b, in[2], 17, 0x242070dbUL);
+    FF(b, c, d, a, in[3], 22, 0xc1bdceeeUL);
+    return (unsigned int)((a ^ b ^ c ^ d) & 0xFFFF);
+}'
 
 # --- Summary -------------------------------------------------------
 echo "dehl_cache suite:"

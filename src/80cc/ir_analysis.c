@@ -1,15 +1,15 @@
 /*
  * ir_analysis.c — analyses over the IR.
  *
- * Phase 2 first slice: liveness via standard iterative dataflow.
+ * Liveness via standard iterative dataflow:
  *
  *   USE[b]      = vregs read before written in BB b
  *   DEF[b]      = vregs written in BB b
  *   live_in[b]  = USE[b] ∪ (live_out[b] − DEF[b])
  *   live_out[b] = ∪ over successors s of live_in[s]
  *
- * Iterate to fixed point (worklist would be marginally faster — for the
- * small BB counts in Phase 2 this isn't worth the bookkeeping).
+ * Iterate to fixed point (a worklist would be marginally faster — not
+ * worth the bookkeeping at our BB counts).
  *
  * No dependency on the rest of the compiler; ir_selftest can link this
  * standalone.
@@ -138,6 +138,7 @@ int ir_op_defs(const Op *op, int *out, int max)
     case IR_BR:
     case IR_BR_COND:
     case IR_BR_ZERO:
+    case IR_SWITCH:
     case IR_RET:
     case IR_ST_MEM:
     case IR_OUT:
@@ -146,6 +147,7 @@ int ir_op_defs(const Op *op, int *out, int max)
     case IR_ASM:
     case IR_PHI:
     case IR_PUSH_DEHL_LONG:
+    case IR_PUSH_ARG:
         /* No vreg def. */
         return 0;
     case IR_CALL:
@@ -155,6 +157,11 @@ int ir_op_defs(const Op *op, int *out, int max)
     case IR_HCALL:
         if (op->hcall && op->hcall->ret_vreg >= 0)
             n = add_unique(out, n, max, op->hcall->ret_vreg);
+        return n;
+    case IR_POSTSTEP:
+        /* Defines dst (the old value) AND src[0] (the stepped var). */
+        n = add_unique(out, n, max, op->dst);
+        n = add_unique(out, n, max, op->src[0]);
         return n;
     case IR_POP_DEHL_LONG:
         /* Defines src[0] — the vreg is reborn after the pop.
@@ -208,6 +215,8 @@ int ir_op_uses(const Op *op, int *out, int max)
         return n;
     case IR_BR_COND:
     case IR_BR_ZERO:
+    case IR_SWITCH:
+    case IR_POSTSTEP:
         n = add_unique(out, n, max, op->src[0]);
         return n;
     case IR_RET:
@@ -218,7 +227,10 @@ int ir_op_uses(const Op *op, int *out, int max)
         if (op->call) {
             if (op->call->fnptr_vreg >= 0)
                 n = add_unique(out, n, max, op->call->fnptr_vreg);
-            for (int i = 0; i < op->call->n_args; i++)
+            /* Pre-pushed args were consumed by their IR_PUSH_ARG ops;
+               gen_call never reads them. Only the non-pushed tail
+               (fastcall's HL arg) is a use here. */
+            for (int i = op->call->pre_pushed; i < op->call->n_args; i++)
                 n = add_unique(out, n, max, op->call->args[i]);
         }
         return n;
@@ -234,7 +246,8 @@ int ir_op_uses(const Op *op, int *out, int max)
                 n = add_unique(out, n, max, op->src[i]);
         return n;
     case IR_PUSH_DEHL_LONG:
-        /* Reads src[0] (the long value to push from DEHL). */
+    case IR_PUSH_ARG:
+        /* Reads src[0] (the value to push). */
         n = add_unique(out, n, max, op->src[0]);
         return n;
     case IR_POP_DEHL_LONG:
@@ -287,7 +300,6 @@ void ir_compute_liveness(Func *f)
 {
     if (!f || f->n_bbs == 0) return;
 
-    /* Re-use existing allocations if compatible; else free + reallocate. */
     ir_free_liveness(f);
 
     int n_vregs = f->n_vregs;
@@ -305,7 +317,7 @@ void ir_compute_liveness(Func *f)
         f->bbs[i].live_out = ir_bitset_new(n_vregs);
     }
 
-    /* Iterate to fixed point. backward dataflow. */
+    /* Backward dataflow, iterate to fixed point. */
     BitSet *tmp = ir_bitset_new(n_vregs);
     int changed;
     do {
@@ -315,8 +327,9 @@ void ir_compute_liveness(Func *f)
             /* live_out = ∪ live_in of successors */
             BitSet *lo = (BitSet *)bb->live_out;
             bitset_clear_all(tmp);
-            for (int s = 0; s < 2; s++) {
-                int suc = bb->succ[s];
+            int ns = ir_bb_n_succ(bb);
+            for (int s = 0; s < ns; s++) {
+                int suc = ir_bb_succ_at(bb, s);
                 if (suc < 0 || suc >= f->n_bbs) continue;
                 bitset_or_changed(tmp, (BitSet *)f->bbs[suc].live_in);
             }
@@ -331,7 +344,6 @@ void ir_compute_liveness(Func *f)
         }
     } while (changed);
 
-    /* Cleanup transients. */
     for (int i = 0; i < f->n_bbs; i++) {
         ir_bitset_free(use[i]);
         ir_bitset_free(def[i]);
@@ -378,10 +390,8 @@ void ir_compute_op_liveness(Func *f)
 
         for (int j = bb->n_ops - 1; j >= 0; j--) {
             const Op *op = &bb->ops[j];
-            /* Drop this op's DEFs from the live-after set, then add its
-               USEs to get the live-before (= live_in[j]) set. Use the
-               same heap-overflow pattern as bb_use_def for rare wide
-               IR_CALL arg lists. */
+            /* live_in[j] = USE[j] ∪ (live-after − DEF[j]). Same heap
+               fallback as bb_use_def for wide IR_CALL arg lists. */
             int n = ir_op_defs(op, defs, (int)(sizeof defs / sizeof defs[0]));
             if (n > (int)(sizeof defs / sizeof defs[0])) {
                 int *big = malloc(n * sizeof(int));
@@ -404,7 +414,6 @@ void ir_compute_op_liveness(Func *f)
                 for (int k = 0; k < n; k++)
                     if (uses[k] >= 0) ir_bitset_set(cur, uses[k]);
             }
-            /* Snapshot the live_in for this op. */
             BitSet *snap = ir_bitset_new(n_vregs);
             bitset_copy_changed(snap, cur);
             bb->live_in_per_op[j] = snap;
@@ -564,8 +573,7 @@ int ir_live_ranges_overlap(const Func *f, int a, int b)
     const LiveRange *rb = ir_live_range(f, b);
     if (!ra || !rb) return 0;
     if (ra->start < 0 || rb->start < 0) return 0;
-    /* Inclusive [start, end] intervals overlap iff
-       max(starts) <= min(ends). */
+    /* Inclusive intervals: overlap iff max(starts) <= min(ends). */
     int s = ra->start > rb->start ? ra->start : rb->start;
     int e = ra->end   < rb->end   ? ra->end   : rb->end;
     return s <= e;

@@ -24,12 +24,9 @@ typedef struct {
     int     offset;
     int     stored_vreg;
     int     width;
-    /* For 3c (dead-store): when this entry was created by a IR_ST_MEM,
-       store_origin_op is the op index of that store; -1 if the entry
-       came from a IR_LD_MEM (RLE source — never dead-eliminable). When
-       a later IR_ST_MEM exactly overwrites this entry and the entry has
-       store_origin_op >= 0, the original store is dead and gets marked
-       in the per-BB dead[] bitset. */
+    /* Dead-store (3c): op index of the IR_ST_MEM that created this
+       entry; -1 if it came from a IR_LD_MEM (never dead-eliminable).
+       An exact overwrite of a >=0 entry marks that store dead. */
     int     store_origin_op;
 } ShadowEntry;
 
@@ -66,9 +63,7 @@ int ir_opt_st2ld(Func *f)
         BB *bb = &f->bbs[b];
         int n = 0;
         if (bb->n_ops <= 0) continue;
-        /* Dead-op bitset, sized to the BB. Marked ops are compacted out
-           at the end of the BB walk. Allocated per-BB so the size is
-           always exact. */
+        /* Dead-op bitset; marked ops are compacted out after the walk. */
         unsigned char *dead = calloc((size_t)bb->n_ops, 1);
         if (!dead) continue;
 
@@ -86,9 +81,8 @@ int ir_opt_st2ld(Func *f)
                 continue;
             }
 
-            /* IR_LD_MEM: try to forward against the shadow. If no match,
-               track THIS load — a subsequent IR_LD_MEM of the same
-               address can MOV from this dst (redundant load elimination,
+            /* IR_LD_MEM: forward against the shadow, else track this
+               load so a later same-address load can MOV from it (RLE,
                roadmap 3b). */
             if (op->kind == IR_LD_MEM && op->dst >= 0) {
                 if (op->mem.volatile_) continue;
@@ -103,13 +97,9 @@ int ir_opt_st2ld(Func *f)
                     break;
                 }
                 if (hit >= 0) {
-                    /* Forward: rewrite IR_LD_MEM dst <- [mem]
-                                as     IR_MOV    dst <- sh[hit].stored_vreg.
-                       The original ST_MEM's store_origin_op (if any) is
-                       NOT marked dead here — the load above used the
-                       cached vreg directly, not memory. Dead-store
-                       elimination only fires when a later ST_MEM
-                       overwrites; the read happening here is fine. */
+                    /* Forward: rewrite as IR_MOV dst <- cached vreg.
+                       Does NOT mark the origin store dead — only a
+                       later overwriting ST_MEM does that. */
                     op->kind   = IR_MOV;
                     op->src[0] = sh[hit].stored_vreg;
                     op->src[1] = -1;
@@ -123,9 +113,8 @@ int ir_opt_st2ld(Func *f)
                     changed++;
                     continue;
                 }
-                /* No prior match — track this load as a fresh source.
-                   store_origin_op = -1 marks it as a load-source (not
-                   eligible for dead-store elim if overwritten). */
+                /* No match — track as an RLE source (origin -1: never
+                   dead-store eligible). */
                 if (n < MAX_SHADOW) {
                     sh[n].kind             = op->mem.kind;
                     sh[n].sym              = op->mem.sym;
@@ -147,9 +136,8 @@ int ir_opt_st2ld(Func *f)
                     n = 0;
                     continue;
                 }
-                /* Drop any entry that doesn't address-match — alias risk
-                   (we don't have points-to analysis). The matching entry,
-                   if any, gets overwritten with the new stored vreg. */
+                /* Drop non-matching entries — alias risk, no points-to
+                   analysis. A matching entry gets the new stored vreg. */
                 int matched = -1;
                 for (int k = 0; k < n; ) {
                     if (addr_matches(&sh[k], &op->mem)) {
@@ -162,12 +150,10 @@ int ir_opt_st2ld(Func *f)
                 int width = (op->src[0] < f->n_vregs)
                           ? f->vregs[op->src[0]].width : 0;
                 if (matched >= 0) {
-                    /* Dead-store elimination (3c): if the existing entry
-                       came from a IR_ST_MEM (store_origin_op >= 0) and the
-                       new store also has matching width, the original
-                       store's memory effect is dead — overwritten with no
-                       intervening memory read (forwarded reads use the
-                       vreg directly, not memory). Mark for compaction. */
+                    /* Dead-store elim (3c): same-width overwrite of a
+                       store-origin entry — memory was never read in
+                       between (forwarded reads used the vreg), so the
+                       old store is dead. */
                     if (sh[matched].store_origin_op >= 0
                         && sh[matched].width == width) {
                         dead[sh[matched].store_origin_op] = 1;
@@ -190,23 +176,30 @@ int ir_opt_st2ld(Func *f)
             }
 
             /* Any other op that writes a vreg: invalidate entries whose
-               base or stored_vreg is overwritten. */
-            if (op->dst >= 0) {
-                for (int k = 0; k < n; ) {
-                    int kill = 0;
-                    if (sh[k].kind == IR_MEM_VREG && sh[k].base == op->dst)
-                        kill = 1;
-                    else if (sh[k].stored_vreg == op->dst)
-                        kill = 1;
-                    if (kill) drop(sh, &n, k);
-                    else k++;
+               base or stored_vreg is overwritten. ir_op_defs covers
+               multi-def ops (IR_POSTSTEP writes src[0] as well). */
+            {
+                int defs[4];
+                int nd = ir_op_defs(op, defs,
+                                    (int)(sizeof defs / sizeof defs[0]));
+                for (int di = 0; di < nd && di < 4; di++) {
+                    int d = defs[di];
+                    if (d < 0) continue;
+                    for (int k = 0; k < n; ) {
+                        int kill = 0;
+                        if (sh[k].kind == IR_MEM_VREG && sh[k].base == d)
+                            kill = 1;
+                        else if (sh[k].stored_vreg == d)
+                            kill = 1;
+                        if (kill) drop(sh, &n, k);
+                        else k++;
+                    }
                 }
             }
         }
 
-        /* Compaction: walk the BB and skip dead ops. The shadow's
-           `store_origin_op` indices reference positions in the *original*
-           array; we've finished using them by this point. */
+        /* Compact out dead ops. store_origin_op indexed the original
+           array; not used past this point. */
         int new_n = 0;
         for (int j = 0; j < bb->n_ops; j++) {
             if (dead[j]) continue;
@@ -215,7 +208,6 @@ int ir_opt_st2ld(Func *f)
         }
         bb->n_ops = new_n;
         free(dead);
-        /* BB boundary: shadow resets implicitly via the loop. */
     }
     return changed;
 }
@@ -311,8 +303,9 @@ static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
     }
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
-        for (int s = 0; s < 2; s++) {
-            int sid = bb->succ[s];
+        int ns = ir_bb_n_succ(bb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(bb, s);
             if (sid < 0 || sid > b) continue;
             int lo = sid, hi = b;
             for (int k = lo; k <= hi; k++) {
@@ -338,8 +331,9 @@ static int licm_pre_header(const Func *f, const int *in_loop, int header)
     for (int b = 0; b < f->n_bbs; b++) {
         if (in_loop[b] && b >= header) continue;
         const BB *bb = &f->bbs[b];
-        for (int s = 0; s < 2; s++) {
-            if (bb->succ[s] == header) {
+        int ns = ir_bb_n_succ(bb);
+        for (int s = 0; s < ns; s++) {
+            if (ir_bb_succ_at(bb, s) == header) {
                 outside = b;
                 count++;
                 break;
@@ -380,7 +374,6 @@ static int licm_insert_before_terminator(BB *dst_bb, const Op *src_op)
         dst_bb->n_ops = 1;
         return 0;
     }
-    /* Shift last op (terminator) down by one and insert before it. */
     dst_bb->ops[n] = dst_bb->ops[n - 1];
     dst_bb->ops[n - 1] = *src_op;
     dst_bb->n_ops = n + 1;
@@ -417,6 +410,31 @@ int ir_opt_licm(Func *f)
 
     int hoisted = 0;
 
+    /* Per-vreg def counts: hoisting is only sound for single-def
+       dsts. A multi-def vreg (e.g. `r = K` in each arm of a switch
+       whose forward-goto BRs look like back-edges in id order) gets
+       every arm's def stacked into the pre-header, leaving the last
+       writer's value. Single-def pure ops are safe: nothing else
+       writes the dst, so executing the def earlier/unconditionally
+       preserves every use. */
+    int *def_count = calloc((size_t)f->n_vregs, sizeof(int));
+    if (!def_count) {
+        free(in_loop); free(loop_header); free(loop_end);
+        free(pre_header);
+        return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[16];
+            int nd = ir_op_defs(&bb->ops[j], defs,
+                                (int)(sizeof defs / sizeof defs[0]));
+            for (int k = 0; k < nd && k < 16; k++)
+                if (defs[k] >= 0 && defs[k] < f->n_vregs)
+                    def_count[defs[k]]++;
+        }
+    }
+
     /* Walk loop BBs and hoist eligible ops. Mark hoisted ops dead,
        compact each BB at the end. We do the walk in BB-id order so a
        hoisted op landing in the pre-header is visible (in terms of
@@ -438,14 +456,14 @@ int ir_opt_licm(Func *f)
             Op *op = &bb->ops[j];
             if (!licm_eligible_kind(op->kind)) continue;
             if (op->mem.volatile_) continue;
-            /* Copy to pre-header before its terminator. */
+            if (op->dst < 0 || op->dst >= f->n_vregs
+                || def_count[op->dst] != 1) continue;
             BB *pbb = &f->bbs[ph];
             if (licm_insert_before_terminator(pbb, op) != 0) continue;
             dead[j] = 1;
             hoisted++;
         }
 
-        /* Compact: drop dead ops. */
         int new_n = 0;
         for (int j = 0; j < bb->n_ops; j++) {
             if (dead[j]) continue;
@@ -456,6 +474,7 @@ int ir_opt_licm(Func *f)
         free(dead);
     }
 
+    free(def_count);
     free(in_loop);
     free(loop_header);
     free(loop_end);
@@ -479,7 +498,6 @@ int ir_opt_cse(Func *f)
             /* IR_ASM: unknown clobbers, wipe everything. */
             if (op->kind == IR_ASM) { n = 0; continue; }
 
-            /* If the op is CSE-eligible, try to match against the table. */
             if (cse_eligible(op->kind) && op->dst >= 0) {
                 int has_imm = op_has_imm_identity(op->kind);
                 int dst_w = (op->dst < f->n_vregs)
@@ -496,9 +514,8 @@ int ir_opt_cse(Func *f)
                     break;
                 }
                 if (hit >= 0) {
-                    /* Rewrite to IR_MOV dst <- existing dst. The MOV's
-                       width takes care of long vs int (the lowerer's
-                       IR_MOV case branches on dst width). */
+                    /* Rewrite to IR_MOV dst <- existing dst; the lowerer
+                       branches on dst width for long vs int. */
                     int src_dst = tbl[hit].dst;
                     op->kind   = IR_MOV;
                     op->src[0] = src_dst;
@@ -514,21 +531,40 @@ int ir_opt_cse(Func *f)
                     rewritten++;
                     /* Fall through to invalidation — the MOV writes
                        op->dst, which may match other entries. */
-                } else if (n < MAX_CSE) {
-                    tbl[n].kind    = op->kind;
-                    tbl[n].src0    = op->src[0];
-                    tbl[n].src1    = op->src[1];
-                    tbl[n].imm     = op->imm;
-                    tbl[n].has_imm = has_imm;
-                    tbl[n].dst     = op->dst;
-                    tbl[n].width   = dst_w;
-                    n++;
+                } else {
+                    /* Invalidate for the write BEFORE recording the
+                       new entry — recording first dropped the fresh
+                       entry on its own dst and CSE never fired. Skip
+                       recording self-referencing ops (dst == a src):
+                       their inputs name the pre-write value. */
+                    cse_invalidate_for_write(tbl, &n, op->dst);
+                    if (n < MAX_CSE
+                        && op->src[0] != op->dst
+                        && op->src[1] != op->dst) {
+                        tbl[n].kind    = op->kind;
+                        tbl[n].src0    = op->src[0];
+                        tbl[n].src1    = op->src[1];
+                        tbl[n].imm     = op->imm;
+                        tbl[n].has_imm = has_imm;
+                        tbl[n].dst     = op->dst;
+                        tbl[n].width   = dst_w;
+                        n++;
+                    }
+                    goto cse_invalidated;
                 }
             }
 
-            /* Invalidate entries based on what this op wrote. */
-            if (op->dst >= 0)
-                cse_invalidate_for_write(tbl, &n, op->dst);
+            /* Invalidate entries based on what this op wrote.
+               ir_op_defs covers multi-def ops (IR_POSTSTEP). */
+            {
+                int defs[4];
+                int nd = ir_op_defs(op, defs,
+                                    (int)(sizeof defs / sizeof defs[0]));
+                for (int di = 0; di < nd && di < 4; di++)
+                    if (defs[di] >= 0)
+                        cse_invalidate_for_write(tbl, &n, defs[di]);
+            }
+            cse_invalidated:
             if (op->kind == IR_CALL && op->call
                 && op->call->ret_vreg >= 0)
                 cse_invalidate_for_write(tbl, &n, op->call->ret_vreg);
@@ -536,284 +572,110 @@ int ir_opt_cse(Func *f)
                 && op->hcall->ret_vreg >= 0)
                 cse_invalidate_for_write(tbl, &n, op->hcall->ret_vreg);
         }
-        /* BB boundary: table resets via loop. */
     }
     return rewritten;
 }
 
-/* ---- LD_SYM + ADD/SUB imm fold ------------------------------------
+/* sym_offset_fold and vreg_offset_fold migrated to the ir_match
+   table as symoff / vregoff_sym / vregoff_imm / vregoff_idx — see
+   ir_match.c. */
 
-   Pattern (per BB, adjacent ops):
-     IR_LD_SYM  v_a <- sym+K1         (single use across function)
-     IR_ADD     v_b <- v_a (imm=K2)   (literal RHS, src[1]==-1)
-   →
-     IR_LD_SYM  v_b <- sym+(K1+K2)
-   (original LD_SYM marked dead and compacted out)
+/* Long (*p)++ fuse (long_inc_mhl) migrated to the ir_match table
+   as the `incmhl` pattern — see ir_match.c. */
 
-   SUB analogous: new offset = K1 - K2.
+/* Post-step fusion (fuse_poststep) migrated to the ir_match early
+   phase as the `poststep` pattern — see ir_match.c. */
 
-   Eliminates the `ld hl,_sym; ld de,K; add hl,de` (5 inst) sequence
-   that the lowerer emits for member access shapes like `g.counter`,
-   `mdContext->buf[N]`, etc. The merged LD_SYM lowers to a single
-   `ld hl,_sym+K` instruction.
+/* Byte-extract idiom (extract_byte) migrated to the ir_match late
+   phase as the xbyte / xbyte_b0 / xbyte_shr patterns — see
+   ir_match.c. */
 
-   Single-use gate: the LD_SYM's dst must have exactly one use across
-   the whole function (the immediately-following ADD/SUB). Multi-use
-   shapes can still benefit from a future extension that keeps the
-   original LD_SYM alive alongside the rewritten consumer.
-*/
-int ir_opt_sym_offset_fold(Func *f)
+/* ---- Dead pure-op elimination -------------------------------------
+   Remove side-effect-free ops whose dst has zero function-wide uses.
+   Iterates to a fixed point so copy/address chains orphaned by other
+   passes (pack_bytes kills loads -> their MOV'd bases die -> the ADDs
+   feeding those die) unravel completely. Liveness isn't computed yet
+   at opt time, but a function-wide use count of zero means no op
+   anywhere reads the vreg — cross-BB liveness can't resurrect it. */
+static int dce_pure_kind(const Op *op)
 {
-    if (!f) return 0;
-    int changed = 0;
-
-    int *use_count = calloc((size_t)f->n_vregs, sizeof(int));
-    if (!use_count) return 0;
-    for (int b = 0; b < f->n_bbs; b++) {
-        BB *bb = &f->bbs[b];
-        for (int j = 0; j < bb->n_ops; j++) {
-            int uses[16];
-            int nu = ir_op_uses(&bb->ops[j], uses,
-                                (int)(sizeof uses / sizeof uses[0]));
-            for (int u = 0; u < nu; u++) {
-                int v = uses[u];
-                if (v >= 0 && v < f->n_vregs) use_count[v]++;
-            }
-        }
-    }
-
-    for (int b = 0; b < f->n_bbs; b++) {
-        BB *bb = &f->bbs[b];
-        if (bb->n_ops < 2) continue;
-        unsigned char *dead = calloc((size_t)bb->n_ops, 1);
-        if (!dead) continue;
-
-        for (int j = 0; j + 1 < bb->n_ops; j++) {
-            Op *ld = &bb->ops[j];
-            Op *ar = &bb->ops[j + 1];
-            if (ld->kind != IR_LD_SYM) continue;
-            if (ld->mem.kind != IR_MEM_SYM) continue;
-            if (ld->mem.sym == NULL) continue;
-            if (ld->dst < 0 || ld->dst >= f->n_vregs) continue;
-            if (use_count[ld->dst] != 1) continue;
-
-            if (ar->kind != IR_ADD && ar->kind != IR_SUB) continue;
-            if (ar->src[0] != ld->dst) continue;
-            if (ar->src[1] != -1) continue;
-
-            int64_t add_off = (ar->kind == IR_ADD) ? ar->imm : -ar->imm;
-            int64_t new_off = (int64_t)ld->mem.offset + add_off;
-            if (new_off < INT32_MIN || new_off > INT32_MAX) continue;
-
-            int b_dst = ar->dst;
-            SYMBOL *sym = ld->mem.sym;
-
-            memset(ar, 0, sizeof(*ar));
-            ar->kind         = IR_LD_SYM;
-            ar->dst          = b_dst;
-            ar->src[0]       = -1;
-            ar->src[1]       = -1;
-            ar->mem.kind     = IR_MEM_SYM;
-            ar->mem.sym      = sym;
-            ar->mem.base     = -1;
-            ar->mem.offset   = (int)new_off;
-
-            dead[j] = 1;
-            changed++;
-            j++;   /* skip the rewritten op; chain-folds handled by rerun */
-        }
-
-        int new_n = 0;
-        for (int j = 0; j < bb->n_ops; j++) {
-            if (dead[j]) continue;
-            if (new_n != j) bb->ops[new_n] = bb->ops[j];
-            new_n++;
-        }
-        bb->n_ops = new_n;
-        free(dead);
-    }
-    free(use_count);
-    return changed;
-}
-
-/* ---- Long (*p)++ fuse → l_long_inc_mhl ----------------------------
-
-   Pattern (per BB, three adjacent ops):
-     IR_LD_MEM  v_old <- [v_p, off]          (width 4, MEM_VREG)
-     IR_ADD     v_new <- v_old (imm=1)       (width 4)
-     IR_ST_MEM            [v_p, off], v_new  (width 4)
-
-   When both v_old and v_new have NO uses outside this triple (the
-   classic discarded-result statement `(*p)++;` or `c->i[k]++;`),
-   rewrites to a single
-     IR_HCALL  l_long_inc_mhl(v_p, off)
-
-   The helper increments the long at *HL in place. IX-clean (uses
-   only F + HL). Replaces ~30 inst of inline LD_MEM-long + ADD-imm-1
-   long + ST_MEM-long with ~5 inst (one slot load to HL + call).
-
-   POST/PRE shapes where the value IS used (`x = (*p)++`, `x = ++(*p)`)
-   fall through to the inline path — a future extension could pair
-   `l_long_load_mhl` with `l_long_inc_mhl` to cover those, but it
-   requires IR_HCALL lowerer changes (long-result via DEHL) that
-   aren't in place yet.
-*/
-int ir_opt_long_inc_mhl(Func *f)
-{
-    if (!f) return 0;
-    int changed = 0;
-
-    int *use_count = calloc((size_t)f->n_vregs, sizeof(int));
-    if (!use_count) return 0;
-    for (int b = 0; b < f->n_bbs; b++) {
-        BB *bb = &f->bbs[b];
-        for (int j = 0; j < bb->n_ops; j++) {
-            int uses[16];
-            int nu = ir_op_uses(&bb->ops[j], uses,
-                                (int)(sizeof uses / sizeof uses[0]));
-            for (int u = 0; u < nu; u++) {
-                int v = uses[u];
-                if (v >= 0 && v < f->n_vregs) use_count[v]++;
-            }
-        }
-    }
-
-    for (int b = 0; b < f->n_bbs; b++) {
-        BB *bb = &f->bbs[b];
-        if (bb->n_ops < 3) continue;
-        unsigned char *dead = calloc((size_t)bb->n_ops, 1);
-        if (!dead) continue;
-
-        for (int j = 0; j + 2 < bb->n_ops; j++) {
-            Op *ld = &bb->ops[j];
-            Op *ad = &bb->ops[j + 1];
-            Op *st = &bb->ops[j + 2];
-
-            if (ld->kind != IR_LD_MEM) continue;
-            if (ld->mem.kind != IR_MEM_VREG) continue;
-            if (ld->mem.volatile_) continue;
-            if (ld->dst < 0 || ld->dst >= f->n_vregs) continue;
-            if (f->vregs[ld->dst].width != 4) continue;
-
-            if (ad->kind != IR_ADD) continue;
-            if (ad->src[0] != ld->dst) continue;
-            if (ad->src[1] != -1) continue;
-            if (ad->imm != 1) continue;
-            if (ad->dst < 0 || ad->dst >= f->n_vregs) continue;
-            if (f->vregs[ad->dst].width != 4) continue;
-
-            if (st->kind != IR_ST_MEM) continue;
-            if (st->mem.kind != IR_MEM_VREG) continue;
-            if (st->mem.volatile_) continue;
-            if (st->mem.base != ld->mem.base) continue;
-            if (st->mem.offset != ld->mem.offset) continue;
-            if (st->src[0] != ad->dst) continue;
-
-            /* v_old (ld->dst) used only as ad's src[0]?
-               v_new (ad->dst) used only as st's src[0]? */
-            if (use_count[ld->dst] != 1) continue;
-            if (use_count[ad->dst] != 1) continue;
-
-            int ptr_v  = ld->mem.base;
-            int offset = ld->mem.offset;
-
-            /* Rewrite ld → IR_HCALL inc_mhl(ptr_v + offset).
-               The helper expects HL = pointer, so when offset != 0
-               we still need to add it. For now restrict to offset==0
-               — covers `mdContext->i[1]++` where the address ADD has
-               folded into the base vreg already. Non-zero-offset
-               shapes fall through to inline. */
-            if (offset != 0) continue;
-
-            memset(ld, 0, sizeof(*ld));
-            ld->kind   = IR_HCALL;
-            ld->dst    = -1;
-            ld->src[0] = -1;
-            ld->src[1] = -1;
-            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-            if (!hi) { free(dead); free(use_count); return changed; }
-            hi->name     = "l_long_inc_mhl";
-            hi->args     = calloc(1, sizeof(int));
-            if (!hi->args) {
-                free(hi); free(dead); free(use_count); return changed;
-            }
-            hi->args[0]  = ptr_v;
-            hi->n_args   = 1;
-            hi->ret_vreg = -1;
-            ld->hcall = hi;
-
-            dead[j + 1] = 1;
-            dead[j + 2] = 1;
-            changed++;
-            j += 2;
-        }
-
-        int new_n = 0;
-        for (int j = 0; j < bb->n_ops; j++) {
-            if (dead[j]) continue;
-            if (new_n != j) bb->ops[new_n] = bb->ops[j];
-            new_n++;
-        }
-        bb->n_ops = new_n;
-        free(dead);
-    }
-    free(use_count);
-    return changed;
-}
-
-/* ---- IR_MOV elimination via producer fusion ---------------------
-
-   Pattern (per BB, two adjacent ops):
-     op j:    <producer> v_t <- ...
-     op j+1:  IR_MOV v_dst <- v_t
-
-   Conditions for fusion:
-     - v_t has exactly one function-wide use (the MOV).
-     - v_t and v_dst have the same width.
-     - Producer's kind is one whose dst is a plain write target (no
-       aliased-with-src constraint we can't satisfy by simply
-       changing the dst vreg id).
-     - v_dst is not also defined by the producer (no self-MOV).
-
-   Rewrite:
-     op j:    <producer> v_dst <- ...
-     op j+1:  deleted
-
-   Eliminates a slot store + slot reload + slot store pair: typically
-   ~14 bytes per fusion. MD5 Transform's `UINT4 a = buf[0], b=buf[1],
-   c=buf[2], d=buf[3]` prologue is the canonical hit (4 LD_MEM/MOV
-   pairs each saving the MOV's store).
-
-   Only fires for producers that write into the vreg as a final
-   "result" (LD_MEM, LD_IMM, LD_SYM, LD_STR, LEA, arithmetic, conv).
-   IR_CALL and IR_HCALL excluded since changing ret_vreg requires
-   touching CallInfo/HelperInfo (separate work). */
-static int fuse_mov_producer_ok(OpKind k)
-{
-    switch (k) {
-    case IR_LD_MEM: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+    switch (op->kind) {
+    case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
     case IR_LEA:
     case IR_ADD: case IR_SUB:
-    case IR_AND: case IR_OR:  case IR_XOR:
-    case IR_NEG: case IR_NOT:
-    case IR_INC: case IR_DEC:
+    case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
+    case IR_INC: case IR_DEC:
+    case IR_NEG: case IR_NOT:
     case IR_CONV_ZX: case IR_CONV_SX:
     case IR_CONV_TRUNC: case IR_CONV_BYTE_TO_HIGH:
-    case IR_CMP_EQ: case IR_CMP_NE:
-    case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
     case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
-    /* MOV-MOV chain: st2ld converts forwardable LD_MEMs into MOVs,
-       leaving `MOV b <- a; MOV c <- b` shapes — copy-propagate b
-       out by redirecting the first MOV's dst to c. */
-    case IR_MOV:
         return 1;
+    case IR_LD_MEM:
+        return !op->mem.volatile_ && op->mem.post_step == 0;
     default:
         return 0;
     }
 }
 
-int ir_opt_fuse_mov(Func *f)
+int ir_opt_dce(Func *f)
+{
+    if (!f) return 0;
+    if (getenv("IR_NO_DCE")) return 0;
+    int removed = 0;
+    int pass_changed;
+    do {
+        pass_changed = 0;
+        int *use_count = calloc((size_t)f->n_vregs, sizeof(int));
+        if (!use_count) break;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                int uses[16];
+                int nu = ir_op_uses(&bb->ops[j], uses,
+                                    (int)(sizeof uses / sizeof uses[0]));
+                for (int u = 0; u < nu && u < 16; u++) {
+                    int v = uses[u];
+                    if (v >= 0 && v < f->n_vregs) use_count[v]++;
+                }
+            }
+        }
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int new_n = 0;
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                int is_dead = (op->dst >= 0 && op->dst < f->n_vregs
+                               && use_count[op->dst] == 0
+                               && dce_pure_kind(op));
+                if (is_dead) { pass_changed++; continue; }
+                if (new_n != j) bb->ops[new_n] = bb->ops[j];
+                new_n++;
+            }
+            bb->n_ops = new_n;
+        }
+        free(use_count);
+        removed += pass_changed;
+    } while (pass_changed);
+    return removed;
+}
+
+/* Byte-pack to wide load (pack_bytes) migrated to the ir_match
+   packbytes phase as `packbytes` - see ir_match.c. */
+
+/* IR_MOV elimination via producer fusion (fuse_mov) migrated to
+   the ir_match early phase as the `movfuse` pattern — see
+   ir_match.c. */
+
+/* ---- Dead call-result elimination ---------------------------------
+   `printf(...);` style statements allocate a ret vreg that is never
+   read; gen_call then stores HL (or DEHL) to its slot after every
+   call. Clear ret_vreg when it has zero function-wide uses — the
+   store disappears and, since the vreg no longer appears in any op,
+   so does its frame slot. */
+int ir_opt_drop_dead_ret(Func *f)
 {
     if (!f) return 0;
     int changed = 0;
@@ -826,7 +688,7 @@ int ir_opt_fuse_mov(Func *f)
             int uses[16];
             int nu = ir_op_uses(&bb->ops[j], uses,
                                 (int)(sizeof uses / sizeof uses[0]));
-            for (int u = 0; u < nu; u++) {
+            for (int u = 0; u < nu && u < 16; u++) {
                 int v = uses[u];
                 if (v >= 0 && v < f->n_vregs) use_count[v]++;
             }
@@ -835,56 +697,32 @@ int ir_opt_fuse_mov(Func *f)
 
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
-        if (bb->n_ops < 2) continue;
-        unsigned char *dead = calloc((size_t)bb->n_ops, 1);
-        if (!dead) continue;
-
-        for (int j = 1; j < bb->n_ops; j++) {
-            if (dead[j]) continue;
-            Op *mov = &bb->ops[j];
-            if (mov->kind != IR_MOV) continue;
-            int src = mov->src[0];
-            int dst = mov->dst;
-            if (src < 0 || dst < 0) continue;
-            if (src == dst) continue;
-            if (src >= f->n_vregs || dst >= f->n_vregs) continue;
-            if (use_count[src] != 1) continue;
-            if (f->vregs[src].width != f->vregs[dst].width) continue;
-
-            /* Walk back to the producer of src — must be the previous
-               non-dead op. (Phase D and other passes may have inserted
-               dead markers; honour them.) */
-            int pj = j - 1;
-            while (pj >= 0 && dead[pj]) pj--;
-            if (pj < 0) continue;
-            Op *prev = &bb->ops[pj];
-            if (prev->dst != src) continue;
-            if (!fuse_mov_producer_ok(prev->kind)) continue;
-
-            /* Redirect producer's dst to the MOV's dst; drop the MOV. */
-            prev->dst = dst;
-            dead[j] = 1;
-            /* use_count of src is now logically 0 (the MOV is gone);
-               keep the table consistent in case a later iter checks it. */
-            use_count[src] = 0;
-            changed++;
-        }
-
-        int new_n = 0;
         for (int j = 0; j < bb->n_ops; j++) {
-            if (dead[j]) continue;
-            if (new_n != j) bb->ops[new_n] = bb->ops[j];
-            new_n++;
+            Op *op = &bb->ops[j];
+            if (op->kind == IR_CALL && op->call
+                && op->call->ret_vreg >= 0
+                && op->call->ret_vreg < f->n_vregs
+                && use_count[op->call->ret_vreg] == 0) {
+                if (op->dst == op->call->ret_vreg) op->dst = -1;
+                op->call->ret_vreg = -1;
+                changed++;
+            }
+            if (op->kind == IR_HCALL && op->hcall
+                && op->hcall->ret_vreg >= 0
+                && op->hcall->ret_vreg < f->n_vregs
+                && use_count[op->hcall->ret_vreg] == 0) {
+                if (op->dst == op->hcall->ret_vreg) op->dst = -1;
+                op->hcall->ret_vreg = -1;
+                changed++;
+            }
         }
-        bb->n_ops = new_n;
-        free(dead);
     }
     free(use_count);
     return changed;
 }
 
-/* ---- Phase D — insert IR_PUSH/POP_DEHL_LONG for long vregs that
-   live across DEHL-clobbering ops ---------------------------------
+/* ---- Insert IR_PUSH/POP_DEHL_LONG for long vregs that live across
+   DEHL-clobbering ops ---------------------------------------------
 
    For each BB, find long-typed vregs whose def is followed by
    intermediate ops that clobber DEHL before the consumer reads
@@ -915,7 +753,7 @@ static int long_producer_kind_d(OpKind k)
 {
     return k == IR_LD_MEM || k == IR_ADD || k == IR_SUB
         || k == IR_AND || k == IR_OR || k == IR_XOR
-        || k == IR_SHL || k == IR_SHR
+        || k == IR_SHL || k == IR_SHR || k == IR_ROTL
         || k == IR_NEG || k == IR_NOT
         || k == IR_MOV
         || k == IR_CONV_ZX || k == IR_CONV_SX;
@@ -925,7 +763,7 @@ static int long_consumer_kind_d(OpKind k)
 {
     return k == IR_ADD || k == IR_SUB
         || k == IR_AND || k == IR_OR || k == IR_XOR
-        || k == IR_SHL || k == IR_SHR
+        || k == IR_SHL || k == IR_SHR || k == IR_ROTL
         || k == IR_NEG || k == IR_NOT
         || k == IR_ST_MEM
         || k == IR_PUSH_DEHL_LONG;
@@ -934,6 +772,7 @@ static int long_consumer_kind_d(OpKind k)
 static int op_is_branch_or_call_d(OpKind k)
 {
     return k == IR_BR || k == IR_BR_COND || k == IR_BR_ZERO
+        || k == IR_SWITCH || k == IR_PUSH_ARG
         || k == IR_RET || k == IR_CALL || k == IR_HCALL;
 }
 
@@ -1018,8 +857,12 @@ int ir_opt_insert_long_pushes(Func *f)
                     /* Long-binop consumers with the stacked vreg as
                        src[0] absorb it directly via the option-B
                        fastpath. SHL/SHR/NOT/NEG/MOV are single-source
-                       and need the POP to materialize DEHL. */
-                    if (use_op->kind == IR_ADD || use_op->kind == IR_SUB
+                       and need the POP to materialize DEHL. SUB has
+                       NO option-B block in the lowerer (only ADD and
+                       the AND/OR/XOR family do) — marking it absorbing
+                       left the value orphaned on the stack and the
+                       consumer reading the stale slot. */
+                    if (use_op->kind == IR_ADD
                      || use_op->kind == IR_AND || use_op->kind == IR_OR
                      || use_op->kind == IR_XOR)
                         absorbs = 1;
@@ -1103,3 +946,9 @@ int ir_opt_insert_long_pushes(Func *f)
     free(use_count);
     return changed;
 }
+
+/* Immediate-conversion folding (fold_imm_conv) migrated to the
+   ir_match table as the `immconv` pattern — see ir_match.c. */
+
+/* ROTATE_LEFT triple fusion (fuse_rotl) migrated to the ir_match
+   table as the `rotl` pattern — see ir_match.c. */

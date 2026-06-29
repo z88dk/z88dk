@@ -1,12 +1,10 @@
 /*
  * ir_opt.h — IR-level optimisation passes.
  *
- * Run between ir_build (which emits the raw IR from the AST) and the
- * analysis/allocator pipeline. Each pass takes a `Func *` in-place and
- * mutates the IR.
+ * Run between ir_build and the analysis/allocator pipeline. Each pass
+ * mutates a `Func *` in place.
  *
- * Decoupled from compiler internals — ir_opt links against ir.c +
- * ir.h only.
+ * Decoupled from compiler internals — links against ir.c + ir.h only.
  */
 #ifndef IR_OPT_H
 #define IR_OPT_H
@@ -27,13 +25,13 @@
  *        store outright. (Forwarded reads don't keep the first store
  *        alive — they read the vreg directly, not memory.)
  *
- * Common invalidation: IR_CALL / IR_HCALL / IR_ASM wipe the shadow.
- * A non-matching IR_ST_MEM drops alias-risk entries. Writes to a
- * tracked base or stored vreg invalidate the matching entry.
- * Volatile ops are never tracked nor forwarded.
+ * Invalidation: IR_CALL / IR_HCALL / IR_ASM wipe the shadow; a
+ * non-matching IR_ST_MEM drops alias-risk entries; writes to a tracked
+ * base or stored vreg drop the matching entry. Volatile ops are never
+ * tracked.
  *
- * Tracks IR_MEM_SYM (sym+offset) and IR_MEM_VREG (base+offset). No
- * cross-BB tracking — table resets at BB boundary.
+ * Tracks IR_MEM_SYM (sym+offset) and IR_MEM_VREG (base+offset). Per-BB
+ * only — the table resets at each BB boundary.
  *
  * Returns the number of LD_MEM ops rewritten plus the number of
  * ST_MEM ops eliminated.
@@ -69,11 +67,11 @@ int ir_opt_cse(Func *f);
 
 /* Loop-invariant code motion (roadmap #3e).
  *
- * Detects loops via a back-edge scan (a successor with id ≤ current
- * BB id implies a back-edge into a loop header). For each loop with a
- * unique natural pre-header (the only outside predecessor of the
- * header), hoists invariant ops from the body to the pre-header,
- * placing them just before the pre-header's terminator.
+ * Detects loops via back-edge scan (a successor with id ≤ current BB
+ * id is a back-edge into a loop header). For each loop with a unique
+ * natural pre-header (the header's only outside predecessor), hoists
+ * invariant ops from the body to just before the pre-header's
+ * terminator.
  *
  * Current scope: constant/address-load ops that are always invariant
  * regardless of source vregs:
@@ -91,65 +89,47 @@ int ir_opt_cse(Func *f);
  */
 int ir_opt_licm(Func *f);
 
-/* LD_SYM + ADD/SUB imm fold.
- *
- * Pattern (per BB, adjacent ops):
- *   IR_LD_SYM  v_a <- sym+K1         (single use across function)
- *   IR_ADD     v_b <- v_a (imm=K2)   (literal RHS, src[1]==-1)
- * rewrites to
- *   IR_LD_SYM  v_b <- sym+(K1+K2)
- *
- * SUB analogous: new offset = K1 - K2. The original LD_SYM is marked
- * dead and compacted out at the end of the BB.
- *
- * Lowerer emits `ld hl,_sym+K` for IR_LD_SYM-with-offset (1 inst);
- * without this fold the same pattern emits `ld hl,_sym; ld de,K;
- * add hl,de` (5 inst) for every member access like `g.counter`.
- *
- * Returns the number of folds applied.
- */
-int ir_opt_sym_offset_fold(Func *f);
+/* sym_offset_fold and vreg_offset_fold live in the ir_match table as
+   symoff / vregoff_sym / vregoff_imm / vregoff_idx;
+   --opt-disable=pattern:symoff etc. */
 
-/* Long (*p)++ fuse to l_long_inc_mhl.
- *
- * Pattern (per BB, three adjacent ops, all width 4):
- *   IR_LD_MEM  v_old <- [v_p, 0]      (MEM_VREG, offset 0)
- *   IR_ADD     v_new <- v_old (imm=1)
- *   IR_ST_MEM            [v_p, 0], v_new
- *
- * When both v_old and v_new have no uses outside the triple (the
- * discarded-result statement `(*p)++;` shape), rewrites to a single
- * IR_HCALL to l_long_inc_mhl. The helper increments the long at *HL
- * in place; lowers to one slot-load + one call (~5 inst), replacing
- * the inline ~30-inst long-LD/ADD/ST chain.
- *
- * Returns the number of triples fused.
- */
-int ir_opt_long_inc_mhl(Func *f);
+/* pack_bytes (little-endian 4-lane byte-pack → width-4 LD_MEM) lives
+   in the ir_match packbytes phase as `packbytes`;
+   --opt-disable=pattern:packbytes. */
 
-/* IR_MOV elimination via producer fusion.
- *
- * Pattern (per BB, two adjacent ops):
- *   <producer> v_t <- ...
- *   IR_MOV v_dst <- v_t       (v_t single-use, same width as v_dst)
- *
- * Rewrites the producer to write v_dst directly and drops the MOV.
- * Eliminates the producer's slot store + MOV's reload + MOV's store
- * triple (~14 bytes per fused pair).
- *
- * Returns the number of MOVs eliminated.
- */
-int ir_opt_fuse_mov(Func *f);
+/* extract_byte (SHR/AND/TRUNC chains → IR_EXTRACT_BYTE) lives in the
+   ir_match late phase as xbyte / xbyte_b0 / xbyte_shr;
+   --opt-disable=pattern:xbyte etc. */
 
-/* Phase D — RPN-style stack preservation for long DEHL.
+/* fuse_poststep (MOV+INC/DEC → IR_POSTSTEP) lives in the ir_match
+   early phase as the `poststep` pattern;
+   --opt-disable=pattern:poststep. */
+
+/* Dead pure-op elimination: side-effect-free ops whose dst has zero
+ * function-wide uses, iterated to a fixed point. Returns removals. */
+int ir_opt_dce(Func *f);
+
+/* long_inc_mhl (the long (*p)++ triple → HCALL l_long_inc_mhl) lives
+   in the ir_match table as `incmhl`; --opt-disable=pattern:incmhl. */
+
+/* fuse_mov (producer + single-use MOV → producer writes the MOV's
+   dst) lives in the ir_match early phase as the `movfuse` pattern;
+   --opt-disable=pattern:movfuse. */
+
+/* Clear IR_CALL / IR_HCALL ret_vregs that have zero function-wide
+   uses (discarded results, e.g. bare `printf(...)`). Kills the
+   post-call store and the result's frame slot. Returns the number
+   of calls cleaned. */
+int ir_opt_drop_dead_ret(Func *f);
+
+/* RPN-style stack preservation for long DEHL.
  *
  * For each BB, find a width-4 vreg whose def is followed by
- * intermediate DEHL-clobbering ops before the consumer. Insert
- * IR_PUSH_DEHL_LONG after the def and IR_POP_DEHL_LONG before
- * the use. The lowerer replaces the implicit slot-spill with a
- * `push de; push hl` (saves ~80T per intermediate long) and
- * tracks cur_sp_adjust through intervening sp-relative slot
- * reads.
+ * DEHL-clobbering ops before its consumer. Insert IR_PUSH_DEHL_LONG
+ * after the def and IR_POP_DEHL_LONG before the use; the lowerer
+ * swaps the implicit slot-spill for `push de; push hl` (~80T saved
+ * per intermediate long) and tracks cur_sp_adjust through intervening
+ * sp-relative slot reads.
  *
  * MVP — non-overlapping single-level pushes only:
  *   - dst width 4
@@ -165,5 +145,12 @@ int ir_opt_fuse_mov(Func *f);
  * Returns the number of (def, use) pairs annotated.
  */
 int ir_opt_insert_long_pushes(Func *f);
+
+/* fold_imm_conv lived here until it became the ir_match table's
+   `immconv` pattern (LD_IMM + CONV_* → re-width'd LD_IMM); disable
+   with --opt-disable=pattern:immconv. */
+
+/* fuse_rotl (the ROTATE_LEFT triple → IR_ROTL) lives in the ir_match
+   table as the `rotl` pattern; disable with --opt-disable=pattern:rotl. */
 
 #endif /* IR_OPT_H */

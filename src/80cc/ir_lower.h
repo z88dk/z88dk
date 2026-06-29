@@ -1,18 +1,15 @@
 /*
  * ir_lower.h — IR → asm lowerer.
  *
- * Phase 1: dumb spill-everything lowerer. Every vreg lives in a frame
- * slot. Each op loads its operands from frame, computes in HL/DE, stores
- * the result back. No register allocation, no peepholes.
+ * Dumb spill-everything lowerer: every vreg lives in a frame slot;
+ * each op loads operands from frame, computes in HL/DE, stores back.
+ * No register allocation, no peepholes.
  *
- * Output goes to a FILE* (typically the same asm-output stream the rest
- * of the compiler writes to). The lowerer doesn't depend on codegen.c's
- * global emit machinery — for the prototype it emits directly via
- * fprintf. Later phases may rewire to the existing helpers once we have
- * an allocator providing PhysReg choices.
+ * Output goes to a FILE* (typically the compiler's asm-output stream).
+ * Emits directly via fprintf rather than codegen.c's global machinery.
  *
- * Z80 only in Phase 1. Other CPUs (gbz80 / r2ka / 8085 / kc160 / ez80)
- * land as the lowerer gets per-op CPU-dispatch in later phases.
+ * Z80 only; other CPUs (gbz80 / r2ka / 8085 / kc160 / ez80) land once
+ * the lowerer gains per-op CPU dispatch.
  */
 
 #ifndef IR_LOWER_H

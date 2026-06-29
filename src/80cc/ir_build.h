@@ -1,14 +1,12 @@
 /*
  * ir_build.h — AST → IR translator.
  *
- * Entry point invoked from declparse.c when --use-ir is set. Walks
- * the per-function AST and produces a Func* that ir_lower then turns
- * into z80 asm. Sits behind a feature flag — the legacy walker
- * (ast_codegen2.c) remains the default until Phase 7 cutover.
+ * Entry point from declparse.c when --use-ir is set. Walks the
+ * per-function AST into a Func* that ir_lower turns into z80 asm.
+ * Behind a feature flag; the legacy walker (ast_codegen2.c) stays
+ * the default until cutover.
  *
- * Scope (Phase 1): grows incrementally toward making the CRC-16-CCITT
- * kernel in test/suites/intbench/intbench.c compile + run. Most C
- * constructs are not yet handled and will abort with a diagnostic.
+ * Incomplete: unhandled C constructs abort with a diagnostic.
  */
 
 #ifndef IR_BUILD_H

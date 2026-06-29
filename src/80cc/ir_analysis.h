@@ -1,9 +1,9 @@
 /*
  * ir_analysis.h — analyses over the IR: liveness, loop info, etc.
  *
- * Phase 2 first slice: per-BB live_in / live_out via iterative
- * dataflow. Drives the allocator's choice of which vregs to keep in
- * registers vs spill to the frame.
+ * Per-BB live_in / live_out via iterative dataflow. Drives the
+ * allocator's choice of which vregs to keep in registers vs spill
+ * to the frame.
  */
 
 #ifndef IR_ANALYSIS_H
@@ -38,10 +38,8 @@ void ir_compute_liveness(Func *f);
    holding the vregs live at the entry to ops[k] for every BB.
    Idempotent — calling twice replaces the previous result.
 
-   Memory: each set is sized to f->n_vregs. n_ops × n_bbs sets total —
-   typical functions have ~50 ops × ~10 BBs, so ~500 small sets. Stage 1
-   foundation for the typed allocator (PR_HL/PR_DE/PR_BC live-range
-   placement). */
+   Memory: each set sized to f->n_vregs; n_ops × n_bbs sets total.
+   Foundation for the typed allocator (PR_HL/PR_DE/PR_BC placement). */
 void ir_compute_op_liveness(Func *f);
 
 /* Returns the live-in set at op_idx within bb. NULL if op liveness
@@ -58,15 +56,13 @@ void ir_op_live_out(const BB *bb, int op_idx, BitSet *out);
    to call multiple times. */
 void ir_free_liveness(Func *f);
 
-/* Per-vreg live ranges in linearised op-index space. ir_compute_live_ranges
-   walks the BBs in id order, assigns each op a global index, and for each
-   vreg records [start, end] — start = first op index where the vreg is
-   live (def site, param entry, or first live_in occurrence); end = last
-   op index where the vreg is live (use site, or last live_out occurrence).
-   Two vregs interfere iff their [start, end] intervals overlap.
-   Conservative: a vreg with holes in non-linear control flow gets one
-   span covering the union — over-approximates interference but never
-   under-approximates, which is what a correct allocator needs.
+/* Per-vreg live ranges in linearised op-index space. Walks BBs in id
+   order assigning each op a global index, then records [start, end] per
+   vreg — start = first op where it's live (def/param-entry/first
+   live_in), end = last (use or last live_out). Two vregs interfere iff
+   their intervals overlap. Conservative: a vreg with holes gets one
+   span covering the union (over- but never under-approximates, which is
+   what a correct allocator needs).
    Requires ir_compute_liveness + ir_compute_op_liveness to have run. */
 typedef struct {
     int start;       /* first global op-index where vreg is live; -1 if unused */

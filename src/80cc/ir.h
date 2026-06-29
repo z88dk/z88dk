@@ -4,14 +4,12 @@
  * Pipeline: AST → ir_build → IR → ir_analysis → ir_alloc → ir_lower → asm.
  * Design docs in src/80cc/.tmp/IR_DESIGN.md and IR_PAPER_TRACE.md.
  *
- * This header defines the data shape only — VReg, Op, BB, Func, plus
- * the operation enum, physical-register pool, and call-info / memory-
- * operand descriptors. No logic. Constructors and basic dumpers live
- * in ir.c.
+ * Data shape only — VReg, Op, BB, Func, plus the operation enum,
+ * physical-register pool, and call-info / memory-operand descriptors.
+ * No logic; constructors and basic dumpers live in ir.c.
  *
- * Phase 1 status: skeleton. The walker (ast_codegen2.c) is unchanged
- * and remains the default codegen path. The IR pipeline is gated
- * behind a build flag once ir_build / ir_lower exist.
+ * The legacy walker (ast_codegen2.c) remains the default codegen path;
+ * the IR pipeline is gated behind a build flag.
  */
 
 #ifndef IR_H
@@ -21,10 +19,9 @@
 #include <stdio.h>
 
 /* ----- Forward declarations ---------------------------------------------
-   We avoid including ccdefs.h here to keep the IR header lightweight and
-   prevent the zdouble / uthash transitive include from leaking into
-   every IR consumer. Concrete struct definitions are pulled in by ir.c
-   and the few IR modules that need them. */
+   ccdefs.h is deliberately not included: it keeps the IR header light
+   and stops the zdouble / uthash transitive includes leaking into every
+   IR consumer. Modules that need the full structs include it themselves. */
 
 struct symbol_s;
 typedef struct symbol_s SYMBOL;
@@ -32,19 +29,17 @@ typedef struct symbol_s SYMBOL;
 struct node_s;
 typedef struct node_s Node;
 
-/* Kind is the existing 80cc type-kind enum (KIND_CHAR, KIND_INT, etc.)
-   defined in define.h. We use the same integer values; the IR doesn't
-   reinterpret them. Treated as an int here so ir_selftest can build
-   without define.h — guarded so the real enum wins when define.h has
-   already been included by a compiler-internal TU. */
+/* Kind is the 80cc type-kind enum (KIND_CHAR, KIND_INT, etc.) from
+   define.h; the IR uses its integer values without reinterpreting them.
+   Aliased to int here so ir_selftest builds without define.h; the guard
+   lets the real enum win when define.h is already included. */
 #ifndef DEFINE_H
 typedef int Kind;
 #endif
 
 /* ----- Register masks ---------------------------------------------------
-   Used for the "registers read / written / clobbered" effect sets on
-   IR ops and helper-call descriptors. The bit positions don't need to
-   match anything outside the IR layer. */
+   The read / written / clobbered effect sets on IR ops and helper-call
+   descriptors. Bit positions are private to the IR layer. */
 
 typedef uint32_t RegMask;
 
@@ -62,6 +57,20 @@ typedef uint32_t RegMask;
 #define IR_R_DE_ALT  (1u << 11)
 #define IR_R_BC_ALT  (1u << 12)
 #define IR_R_ALL     (~0u)
+
+/* ----- Target feature bits ----------------------------------------------
+   Capability word stamped onto Func (f->features) by
+   ir_features_from_cpu() in ir_compiler_glue.c, so the ccdefs-free IR
+   layers (ir_match in particular) can gate rewrites per target without
+   seeing c_cpu. Feature bits rather than CPU ids: they document WHY a
+   pattern is gated and age better as CPU variants accumulate
+   (PATTERN_MATCHER_PLAN.md decision #1). */
+#define IR_FEAT_CB_BITOPS  (1u << 0)  /* CB-prefix srl/sla/rl/rr — absent
+                                         on 8080/8085 (only RAL/RAR via A) */
+#define IR_FEAT_EX_DE_HL   (1u << 1)  /* ex de,hl — absent on gbz80 */
+#define IR_FEAT_IX         (1u << 2)  /* IX/IY index registers — absent on
+                                         8080/8085/gbz80 */
+#define IR_FEAT_DJNZ       (1u << 3)  /* djnz — absent on 8080/8085/gbz80 */
 
 /* ----- Physical register pool ------------------------------------------ */
 
@@ -84,21 +93,23 @@ typedef enum {
 /* ----- Virtual register ------------------------------------------------- */
 
 typedef enum {
-    IR_VREG_ADDR_TAKEN   = 1 << 0, /* `&v` taken — must spill */
-    IR_VREG_VOLATILE     = 1 << 1, /* every access is a memory op */
-    IR_VREG_INDUCTION    = 1 << 2, /* loop induction var — BC bias */
-    IR_VREG_PARAM        = 1 << 3, /* function parameter */
-    IR_VREG_RETURN       = 1 << 4, /* function return value */
-    IR_VREG_PARAM_RO     = 1 << 5, /* param never written in the function
-                                      body; access directly from caller's
-                                      pushed-arg slot, no copy in prologue,
-                                      no local frame slot */
+    IR_VREG_ADDR_TAKEN     = 1 << 0, /* `&v` taken — must spill */
+    IR_VREG_VOLATILE       = 1 << 1, /* every access is a memory op */
+    IR_VREG_INDUCTION      = 1 << 2, /* loop induction var — BC bias */
+    IR_VREG_PARAM          = 1 << 3, /* function parameter */
+    IR_VREG_RETURN         = 1 << 4, /* function return value */
+    IR_VREG_PARAM_IN_PLACE = 1 << 5, /* param accessed in place via the
+                                        caller's pushed-arg slot — no
+                                        prologue copy, no local frame
+                                        slot */
 } VRegFlags;
 
 typedef struct {
     int      id;        /* unique within Func; -1 = invalid */
     Kind     kind;      /* KIND_CHAR / KIND_INT / KIND_LONG / KIND_PTR / etc. */
-    int8_t   width;     /* 1, 2, 4, 8 bytes — derived from kind at construction */
+    int16_t  width;     /* scalar size in bytes (1/2/4/8); for KIND_ARRAY
+                           locals, overloaded as the slot byte count
+                           (int16_t fits arrays up to ~32KB). */
     SYMBOL  *sym;       /* backing sym (NULL = compiler temp) */
     uint8_t  flags;     /* VRegFlags bitset */
 } VReg;
@@ -133,10 +144,9 @@ typedef struct {
     int      base;      /* IR_MEM_VREG: vreg id holding base address; -1 if none */
     Kind     elem;      /* width hint: KIND_CHAR / KIND_INT / KIND_LONG / etc. */
     int      volatile_; /* mirror of VREG_VOLATILE for ops whose vreg is volatile */
-    int      post_step; /* IR_MEM_VREG only: ±N to increment/decrement base
-                           after the load. Lets the lowerer fuse the step
-                           into the addressing (cf. walker's *p++ pattern
-                           inc (hl) / dec hl). Default 0 = no step. */
+    int      post_step; /* IR_MEM_VREG only: ±N applied to base after the
+                           load, so the lowerer can fuse the step into
+                           the addressing (the *p++ pattern). 0 = none. */
     PortInfo *port;     /* IR_MEM_PORT only — heap-allocated */
 } MemOp;
 
@@ -147,12 +157,12 @@ typedef enum {
     IR_MOV,             /* dst ← src[0] */
     IR_LD_IMM,          /* dst ← imm */
     IR_LD_SYM,          /* dst ← &sym (+offset) */
-    IR_LD_STR,          /* dst ← &literal_queue + imm (byte offset within
-                           the per-TU string-literal queue; the global
-                           `litlab` label resolves at link time) */
-    IR_LEA,             /* dst ← &src[0]'s frame slot. src[0] must have
-                           IR_VREG_ADDR_TAKEN set so the allocator keeps
-                           it in memory. Width-2 pointer result. */
+    IR_LD_STR,          /* dst ← &string_literal_queue + imm; imm is the
+                           byte offset, the `litlab` label resolves at
+                           link time */
+    IR_LEA,             /* dst ← &src[0]'s frame slot (width-2 pointer).
+                           src[0] must have IR_VREG_ADDR_TAKEN so the
+                           allocator keeps it in memory. */
     IR_LD_MEM,          /* dst ← *mem */
     IR_ST_MEM,          /* *mem ← src[0] */
 
@@ -195,6 +205,10 @@ typedef enum {
     IR_BR,              /* unconditional jump to mem.label (BB id in .imm) */
     IR_BR_COND,         /* if src[0] != 0: jump */
     IR_BR_ZERO,         /* if src[0] == 0: jump (fastpath for cmp→branch fusion) */
+    IR_SWITCH,          /* multi-way dispatch on src[0] — SwitchInfo.
+                           Lowers to the l_case / l_long_case inline
+                           table (char: inline cp chain). Terminator;
+                           successors are sw->target_bb[] + default. */
     IR_RET,             /* return src[0] (or no value if src[0]==-1) */
 
     /* calls */
@@ -214,33 +228,53 @@ typedef enum {
     IR_CRITICAL_ENTER,
     IR_CRITICAL_LEAVE,
 
-    /* Phase D RPN-style long-value preservation. The Z80 data stack
-       acts as an operand stack; DEHL is the implicit "top" register.
-       IR_PUSH_DEHL_LONG saves a long value currently in DEHL onto
-       the stack (emits `push de; push hl`); IR_POP_DEHL_LONG pulls
-       it back (emits `pop hl; pop de`). Inserted by ir_opt for
-       width-4 vregs whose live range crosses DEHL-clobbering ops —
-       cheaper than the slot-spill (~22T push vs ~100T slot store +
-       read). The lowerer maintains `cur_sp_adjust` between the
-       push and pop so intervening sp-relative slot reads stay
-       correct.
+    /* RPN-style long-value preservation. DEHL is the implicit
+       "top" of the Z80 data stack. PUSH emits `push de; push hl`, POP
+       emits `pop hl; pop de`. Inserted by ir_opt for width-4 vregs
+       whose live range crosses DEHL-clobbering ops — cheaper than a
+       slot-spill (~22T push vs ~100T store+read). The lowerer tracks
+       `cur_sp_adjust` between push and pop so intervening sp-relative
+       slot reads stay correct.
 
-       Stack-consuming helpers (l_long_or, l_long_add, etc. — the
-       sccz80 family that pops its secondary off the stack) can
-       chain directly against an outstanding push without an
-       intermediate IR_POP_DEHL_LONG: the helper's `pop bc; pop bc`
-       inside the body consumes the four bytes. The lowerer notes
-       this as a stack-consuming hcall and decrements cur_sp_adjust
-       accordingly. */
+       Stack-consuming helpers (the sccz80 l_long_* family that pop
+       their secondary off the stack) can chain directly against an
+       outstanding push, skipping the POP: the helper's own `pop bc;
+       pop bc` consumes the four bytes, and the lowerer decrements
+       cur_sp_adjust to match. */
     IR_PUSH_DEHL_LONG,
     IR_POP_DEHL_LONG,
 
+    /* Call-argument push, emitted by ir_build immediately after the
+       arg's producer (walker-style push-at-producer). The value is
+       consumed at the very next op, so the dead-spill analysis gives
+       arg temps PR_HL / PR_DEHL — no frame slot, no store. Width 2:
+       `push hl`; width 4: `push de; push hl`. The matching IR_CALL
+       has CallInfo.pre_pushed set and skips its own arg loads; its
+       caller-cleanup pops rebalance cur_sp_adjust. */
+    IR_PUSH_ARG,
+
+    /* Byte extract: dst = (src[0] >> 8*imm) & 0xFF, imm in 0..3.
+       Replaces the SHR(8k) / AND 0xFF / CONV_TRUNC chain on width-4
+       sources (digest stores, crc table indexing). dst width 1 keeps
+       the byte in A; width 2 zero-extends into HL. Lowering: one
+       register copy on a DEHL-cache hit, one byte load from slot+k
+       otherwise. */
+    IR_EXTRACT_BYTE,
+
+    /* Fused post-step: dst = old value of src[0], then src[0] += imm
+       (+1 / -1). Replaces the builder's MOV old<-x; INC/DEC x pair —
+       lowers to ONE slot read + writeback with the old value left in
+       HL, instead of the old-value round-trip through a frame temp
+       (~88T vs ~230T per `x++`-as-value in fp mode). Defines BOTH
+       dst and src[0]. */
+    IR_POSTSTEP,
+
     /* misc */
     IR_NOP,
-    IR_ASM,             /* raw __asm{} block — opaque, full clobber.
-                           Text held in op.asm_text. */
-    IR_PHI,             /* φ-node at basic-block joins. src[] is the
-                           predecessor-list values; resolved by allocator. */
+    IR_ASM,             /* raw __asm{} block — opaque, full clobber;
+                           text in op.asm_text */
+    IR_PHI,             /* φ-node at BB joins; src[] are the per-pred
+                           values, resolved by the allocator */
 
     IR_OP_COUNT
 } OpKind;
@@ -264,6 +298,10 @@ typedef struct {
     int      is_critical;   /* __critical: di/ei wrap around the call */
     int      returns_twice; /* setjmp etc. — allocator spills R_ALL\\{IX,IY} */
     int      is_variadic;   /* smallc variadic: emit `ld a,bytes/2` pre-call */
+    int      pre_pushed;    /* args already pushed via IR_PUSH_ARG ops;
+                               gen_call skips its arg-load loop (still
+                               emits the cleanup pops). 0 = legacy slot
+                               path. */
     RegMask  clobbers;      /* derived from target attrs + ABI */
 } CallInfo;
 
@@ -271,11 +309,35 @@ typedef struct {
     const char *name;       /* "l_gintsp", "l_long_xor", etc. */
     int        *args;       /* vreg ids — input convention per helper */
     int         n_args;
+    /* Stack-passed prefix: args[0..n_stacked-1] pushed (2 bytes each
+       via HL) before the call; args[n_stacked..] go in HL, DE. The
+       helper consumes the pushed bytes. Used by the fix-point mul/div
+       helpers whose convention is `hl = rhs, stack = lhs`. */
+    int         n_stacked;
+    /* Return value is in DE not HL (l_div / l_div_u mod path: quot in
+       HL, rem in DE). gen_hcall emits `ex de,hl` before the store. */
+    int         ret_in_de;
     int         ret_vreg;   /* -1 if void */
     RegMask     reads;      /* registers read (besides explicit args) */
     RegMask     writes;     /* registers defined (besides explicit ret) */
     RegMask     clobbers;   /* registers trashed (allocator spills these) */
 } HelperInfo;
+
+/* IR_SWITCH payload. Lowering route:
+   is_char   → inline `ld a,l` + cp/jp z chain (cp is cheap);
+   width-2   → `call l_case`     + defw target,value entries;
+   width-4   → `call l_long_case`+ defw target,value_lo,value_hi.
+   Table is emitted inline after the call (the helper pops its return
+   address as the table pointer); a `jp default` follows the defw 0
+   terminator as the no-match continuation. */
+typedef struct {
+    int64_t *values;        /* case constants */
+    int     *target_bb;     /* case target BB ids (parallel to values) */
+    int      n_cases;
+    int      default_bb;    /* default / break target BB id */
+    int      is_char;       /* scrutinee is KIND_CHAR — ir_build decides
+                               (the IR layer doesn't see define.h) */
+} SwitchInfo;
 
 /* ----- Operation -------------------------------------------------------- */
 
@@ -288,6 +350,7 @@ typedef struct {
     int      label;         /* target BB id for IR_BR / IR_BR_COND / IR_BR_ZERO */
     CallInfo *call;         /* IR_CALL only — heap allocated */
     HelperInfo *hcall;      /* IR_HCALL only — heap allocated */
+    SwitchInfo *sw;         /* IR_SWITCH only — heap allocated */
     const char *asm_text;   /* IR_ASM raw asm payload */
 
     /* Source location for debug / -gcline output. */
@@ -310,11 +373,10 @@ typedef struct {
     /* Analysis fields — filled by ir_analysis.c after IR build completes. */
     void  *live_in;         /* opaque BitSet, defined in ir_analysis.c */
     void  *live_out;
-    /* Per-op live-in sets — `live_in_per_op[k]` is the set of vregs live
-       at the *entry* to ops[k] (i.e., before ops[k] executes). Length is
-       n_ops; element type is `BitSet *`. NULL until ir_compute_op_liveness
-       runs. The op-k live_out is derivable: it's live_in_per_op[k+1] for
-       k < n_ops-1, and bb->live_out for the last op. */
+    /* Per-op live-in sets — live_in_per_op[k] is the BitSet * of vregs
+       live at the entry to ops[k]. Length n_ops; NULL until
+       ir_compute_op_liveness runs. op-k's live_out is derivable:
+       live_in_per_op[k+1], or bb->live_out for the last op. */
     void **live_in_per_op;
     int    loop_depth;      /* 0 = not in any loop */
     int    loop_header;     /* 1 if this BB heads a loop */
@@ -346,6 +408,12 @@ typedef struct {
     int       *slot_offsets;    /* by frame-slot id, sp-relative offset */
     int        n_slots;
 
+    /* Target capability word (IR_FEAT_* bits). Stamped by ir_build from
+       ir_features_from_cpu(); 0 in standalone/selftest contexts unless
+       set explicitly. Pattern-matcher entries whose `features` bits
+       aren't all present here don't fire. */
+    uint32_t   features;
+
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
     IrAbi      abi;
@@ -359,14 +427,11 @@ typedef struct {
     PhysReg   *vreg_to_phys;    /* by vreg id; PR_SPILL means stack-only */
     int       *vreg_spill_slot; /* by vreg id; valid when vreg_to_phys == PR_SPILL */
 
-    /* Per-vreg live ranges in linearised op index. Each vreg has a
-       [start, end] interval in the flattened BB-order op index space.
-       Filled by ir_compute_live_ranges; NULL until then. Used by the
-       register allocator to detect interference (two vregs interfere
-       iff their ranges overlap) and to order live-range starts for
-       linear-scan assignment. Conservative — over-approximates by
-       treating the range as contiguous even if the vreg has holes
-       in non-linear control flow. */
+    /* Per-vreg [start, end] intervals in flattened BB-order op-index
+       space. Filled by ir_compute_live_ranges; NULL until then. The
+       allocator uses them for interference (two vregs interfere iff
+       their ranges overlap) and to order linear-scan starts.
+       Conservative: a vreg with holes gets one contiguous span. */
     void      *live_ranges;     /* opaque LiveRange*, defined in ir_analysis.h */
 } Func;
 
@@ -383,6 +448,12 @@ int   ir_bb_new(Func *f);
    on the same BB (because the underlying array may be reallocated). */
 Op   *ir_op_emit(BB *bb, OpKind kind);
 
+/* Source-location stash for ir_op_emit. ir_build calls this at each
+   statement boundary; subsequent ir_op_emit calls stamp op->file/line
+   from these values so ir_lower can emit C_LINE / -cc source comments
+   per op. Pass NULL/0 to clear. */
+void  ir_set_emit_loc(const char *file, int line);
+
 /* Convenience constructors — fill common fields. All return a pointer
    into the BB's op array (see lifetime note above). */
 Op *ir_emit_mov(BB *bb, int dst, int src);
@@ -396,16 +467,10 @@ Op *ir_emit_ret(BB *bb, int src);
 
 /* ----- Dumpers ---------------------------------------------------------- */
 
-/* Pretty-print one op. The format is for diagnostics; not asm. */
+/* Human-readable dump for diagnostics, not asm. */
 void ir_dump_op(FILE *out, const Func *f, const Op *op);
-
-/* Pretty-print one BB. */
 void ir_dump_bb(FILE *out, const Func *f, const BB *bb);
-
-/* Pretty-print the whole function. */
 void ir_dump_func(FILE *out, const Func *f);
-
-/* Pretty-print a vreg in human form. */
 void ir_dump_vreg(FILE *out, const Func *f, int vreg_id);
 
 /* ----- Validation ------------------------------------------------------- */
@@ -413,7 +478,7 @@ void ir_dump_vreg(FILE *out, const Func *f, int vreg_id);
 /* Sanity-check the IR: vreg ids in range, BB succ targets valid, the
    aliased-two-operand rule holds for arithmetic ops, etc.
    Returns 0 on success, non-zero (and prints to stderr) on first failure.
-   Cheap — call at the end of each phase during bring-up. */
+   Cheap — call after each pass during bring-up. */
 int ir_validate(const Func *f);
 
 /* ----- Op metadata ------------------------------------------------------ */
@@ -424,6 +489,12 @@ int ir_op_is_aliased(OpKind kind);
 /* True if the op is a branch / call / ret that terminates a BB. */
 int ir_op_is_terminator(OpKind kind);
 
+/* Successor iteration that covers IR_SWITCH's multi-way targets as
+   well as the plain succ[2] pair. CFG consumers (liveness, loop
+   detection) must use these, not succ[] directly. */
+int ir_bb_n_succ(const BB *bb);
+int ir_bb_succ_at(const BB *bb, int i);   /* -1 if out of range */
+
 /* Human name for diagnostics ("ADD", "LD_MEM", etc.). */
 const char *ir_op_name(OpKind kind);
 
@@ -431,12 +502,16 @@ const char *ir_phys_name(PhysReg pr);
 
 /* ----- Compiler-internal accessors ------------------------------------- */
 
-/* The lowerer needs the C-level symbol name to emit asm labels, but
-   ir.c is kept decoupled from the rest of the compiler (so ir_selftest
-   can build standalone). This accessor lives in a separate TU
-   (ir_compiler_glue.c) that pulls in the full compiler headers.
-   The selftest provides its own stub. */
+/* The lowerer needs C-level symbol names for asm labels, but ir.c
+   stays decoupled from the compiler (so ir_selftest builds standalone).
+   These accessors live in ir_compiler_glue.c, which pulls in the full
+   headers; the selftest provides its own stubs. */
 const char *ir_sym_name(const SYMBOL *sym);
 const char *ir_sym_prefix(const SYMBOL *sym);
+
+/* Derive the IR_FEAT_* capability word from the global c_cpu. Lives in
+   ir_compiler_glue.c (needs define.h's CPU_* ids); ir_build stamps the
+   result onto each Func it creates. */
+uint32_t ir_features_from_cpu(void);
 
 #endif /* IR_H */
