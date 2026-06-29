@@ -1,0 +1,4 @@
+target/northstar/graphics/clg
+target/northstar/graphics/w_pixladdr
+target/northstar/graphics/swapgfxbk
+@classic/gfx/wide/gfx_wide.lst
