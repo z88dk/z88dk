@@ -1912,6 +1912,21 @@ static void declfunc(Type *functype, enum storage_type storage)
                 if ( pp && dp )
                     snprintf(pp->name, sizeof(pp->name), "%s", dp->name);
             }
+        } else if ( currfn->ctype != functype
+                    && functype->parameters
+                    && array_len(functype->parameters) > 0
+                    && ( currfn->ctype->funcattrs.oldstyle
+                         || !currfn->ctype->parameters
+                         || array_len(currfn->ctype->parameters) == 0 ) ) {
+            /* Empty-paren / unspecified-args prototype (`extern T f();`)
+               followed by a definition that names its parameters (K&R or
+               ANSI): adopt the definition's full parameter list. loctab is
+               populated from the definition's params below, but ir_build
+               iterates currfn->ctype->parameters — left as the prototype's
+               empty list, every parameter read in the body bails as an
+               unknown local. */
+            currfn->ctype->parameters       = functype->parameters;
+            currfn->ctype->funcattrs.oldstyle = functype->funcattrs.oldstyle;
         }
         debug_write_symbol(currfn);
     } else {

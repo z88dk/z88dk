@@ -6,11 +6,45 @@ include ../make.config
 # also already at the MSX 64K ceiling).
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 
-all:	test.bin wr.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin wr.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
 	$(runtest)
+
+# Non-z80 IR coverage. gbz80/8080/8085 have no 64-bit and no math16 maths
+# (the suite gates those tests off via __GBZ80/__8080/__8085), and use the
+# 32-bit MBF library for `double` (--math-mbf32). ticks runs them with the
+# CPU flag and no -b (their crt0 sets the origin).
+test_gbz80.bin: $(SOURCES) long_ir.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+test_8080.bin: $(SOURCES) long_ir.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+test_8085.bin: $(SOURCES) long_ir.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# IR coverage-gap regressions — own binary (long_ir.c is at the MSX 64K
+# ceiling). Same CPU matrix as long_ir: z80 (math48) + gbz80/8080/8085 (mbf32).
+irgaps.bin: $(SOURCES) irgaps.c
+	$(compile)
+	$(runtest)
+
+irgaps_gbz80.bin: $(SOURCES) irgaps.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+irgaps_8080.bin: $(SOURCES) irgaps.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+irgaps_8085.bin: $(SOURCES) irgaps.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 umaxd.bin: $(SOURCES) umaxd.c
 	$(compile)

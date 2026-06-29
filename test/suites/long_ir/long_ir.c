@@ -26,9 +26,23 @@
 #endif
 
 /* __critical pulls asm_cpu_push_di / asm_cpu_pop_ei, absent from the ez80
-   clib — gate the __critical test off ez80 so the suite links there. */
-#if !defined(__EZ80) && !defined(__EZ80_Z80)
+   clib — gate the __critical test off ez80 so the suite links there.
+   gbz80 and 8080 have no IFF readback, so the IR emits bare di/ei (no
+   helper) and they keep the test. 8085's helper reads the IFF via `rim`,
+   which is correct on real hardware but unimplemented in the ticks
+   emulator — gate it off there too so the suite runs. */
+#if !defined(__EZ80) && !defined(__EZ80_Z80) && !defined(__8085)
 #  define HAVE_CRITICAL 1
+#endif
+
+/* 64-bit `long long` uses the l_i64_* helpers and `_Float16` the math16
+   l_f16_* helpers — neither exists on gbz80 or 8080/8085 (no 64-bit and no
+   16-bit float maths). Gate those tests off so the suite links there; the
+   integer/long/double IR coverage still runs. __8080 is defined for both
+   8080 and 8085. */
+#if !defined(__GBZ80) && !defined(__8080)
+#  define HAVE_LONGLONG 1
+#  define HAVE_FLOAT16 1
 #endif
 
 /* ---- Add ----------------------------------------------------------- */
@@ -271,8 +285,10 @@ int cc_fcc(char c) __z88dk_fastcall;
 int cc_fcc(char c) { return c + 1; }
 long cc_fcl(long x) __z88dk_fastcall;     /* width-4 arg: DEHL, low half via BC */
 long cc_fcl(long x) { return x + 0x100; }
+#ifdef HAVE_LONGLONG
 long long cc_fcll(long long x) __z88dk_fastcall;  /* wide arg: __i64_acc → slot */
 long long cc_fcll(long long x) { return x + 1; }
+#endif
 
 /* Bitfields: a member access folds to a plain deref whose TYPE carries
    bit_offset/bit_size. Read is IR-native (load storage unit, shift down,
@@ -323,16 +339,20 @@ int sw_nodef(int x) { int r = 7; switch (x) { case 1: r = 1; break; case 2: r = 
 /* switch on long long: l_i64_load into __i64_acc + l_i64_case 8-byte table.
    Driven by a global to use a genuine 8-byte value (the narrow-arg widening
    at a call site is a separate gap). */
+#ifdef HAVE_LONGLONG
 long long sw_ll_in;
 int sw_ll(void) { switch (sw_ll_in) { case 1: return 11; case 0x100000001LL: return 33; default: return 99; } }
+#endif
 /* Narrow int arg passed to a long / long long parameter: codegen must widen
    it (the front-end leaves the int→long / int→ll promotion to the backend);
    without it the value was pushed narrow and the param's high bytes were
    stack garbage. Driven by a runtime int (not a literal) to exercise the
    sign-/zero-extend, not constant folding. */
+#ifdef HAVE_LONGLONG
 long long aw_ll_fn(long long x) { return x + 1; }
-long      aw_l_fn (long x)      { return x + 1; }
 int aw_ll(int n) { return (int)aw_ll_fn(n); }
+#endif
+long      aw_l_fn (long x)      { return x + 1; }
 int aw_l (int n) { return (int)aw_l_fn(n); }
 /* Function-level __critical: prologue l_push_di / epilogue l_pop_ei, and
    the 2-byte DI state shifts every param's stack offset (the IR adds it to
@@ -1026,18 +1046,22 @@ static void test_volatile_bitfield(void)
    through zdouble (constexpr_z). Also exercises the wide-aggregate init
    store + the dropped-mem.offset wide-load fix (elem1/2 at offset 8/16).
    The call defeats const-fold so the reads are real wide loads. */
+#ifdef HAVE_LONGLONG
 static void lr_clobber3(void) { }
 static long long lr_ll_arr(int i) {
     long long a[3] = { 0x1122334455667788LL, 0x00000002ffffff03LL, -5LL };
     lr_clobber3();
     return a[i];
 }
+#endif
 
 static void test_ll_array_init(void)
 {
+#ifdef HAVE_LONGLONG
     Assert(lr_ll_arr(0) == 0x1122334455667788LL, "ll[] init elem0 keeps 64 bits");
     Assert(lr_ll_arr(1) == 0x00000002ffffff03LL, "ll[] init elem1 (offset 8)");
     Assert(lr_ll_arr(2) == -5LL,                 "ll[] init elem2 (offset 16)");
+#endif
 }
 
 /* `!x * -1 < 0` (== 1 for x==0). Two bugs: (a) `!x` is a compare result
@@ -1110,9 +1134,11 @@ static int lr_shl8(void) {
    as the signed op, and the fold sign-extended a bit-63-set value
    (0x8000…>>1 → 0xC000… instead of 0x4000…); v>>1 at runtime is the logical
    IR_SHR, so the suite's `v>>1 == CONST>>1` mismatched. */
+#ifdef HAVE_LONGLONG
 static int lr_ushr64(unsigned long long v) {
     return (v >> 1) == (0x8000000000000000ULL >> 1);
 }
+#endif
 /* Mirror of lr_shl8 for SHR: `int>>8` of a register-only (PR_BC) operand.
    The SHR≥8 partial-load fastpath read the operand's SLOT directly; a
    register-only vreg has no slot, so it read a bogus below-frame offset
@@ -1132,7 +1158,9 @@ static void test_shift_edges(void)
 {
     Assert(lr_shl8() == 0, "int<<8 of a register-only operand reads the right byte");
     Assert(lr_shr8() == 0, "int>>8 of a register-only operand reads the right byte");
+#ifdef HAVE_LONGLONG
     Assert(lr_ushr64(0x8000000000000000ULL) == 1, "unsigned long long >>1 folds logically");
+#endif
 }
 
 /* Signed-char arithmetic narrows: `(signed char)(acc op b)` promotes both
@@ -1271,8 +1299,10 @@ static void test_far(void)
     Assert(cc_fc(50, 8) == 42,      "__z88dk_fastcall int arg in HL");
     Assert(cc_fcc(41) == 42,        "__z88dk_fastcall char arg in HL");
     Assert(cc_fcl(0x11223344L) == 0x11223444L, "__z88dk_fastcall long arg in DEHL");
+#ifdef HAVE_LONGLONG
     Assert((int)cc_fcll((long long)41) == 42,
            "__z88dk_fastcall long long arg in __i64_acc");
+#endif
 #ifdef HAVE_CRITICAL
     Assert(cc_crit(40, 2) == 42,    "__critical push_di/pop_ei + param shift");
 #endif
@@ -1491,17 +1521,21 @@ long tern_long(int c, long a, long b) { return c ? a : b; }
    0/1 bool: an ast_opt identity folded it to raw x, so `(3 || 0)` was 3. */
 static int  id_int (int x)       { return x; }
 static long id_long(long x)      { return x; }
-static long long id_ll(long long x) { return x; }
 /* loop bodies run iff the low-word-zero value is correctly truthy */
 static int lw0_long_truthy(void)
     { long a = id_long(0x10000L); int n = 0; while (a) { a = id_long(0L); n++; } return n; }
+#ifdef HAVE_LONGLONG
+static long long id_ll(long long x) { return x; }
 static int lw0_ll_truthy(void)
     { long long a = id_ll(0x100000000LL); int n = 0; while (a) { a = id_ll(0LL); n++; } return n; }
+#endif
 
 static void test_truth(void)
 {
     Assert(lw0_long_truthy() == 1, "long 0x10000 (low word 0) truthy (BR_ZERO all bytes)");
+#ifdef HAVE_LONGLONG
     Assert(lw0_ll_truthy()   == 1, "long long 0x1_00000000 (low word 0) truthy");
+#endif
     Assert((id_int(3) || 0)  == 1, "(x||0) is canonical bool 1, not raw x");
     Assert((0 || id_int(3))  == 1, "(0||x) is canonical bool 1, not raw x");
     Assert((id_int(0) || 0)  == 0, "(0||0) is 0");
@@ -1597,6 +1631,7 @@ static void test_shifts(void)
    f16bits() takes the address of its param -> bails to the walker,
    yielding a reinterpret of the result's raw IEEE-half bits without an
    f16->int conversion (not yet lowered in the IR). */
+#ifdef HAVE_FLOAT16
 _Float16 f16_add (_Float16 a, _Float16 b) { return a + b; }
 _Float16 f16_sub (_Float16 a, _Float16 b) { return a - b; }
 _Float16 f16_mul (_Float16 a, _Float16 b) { return a * b; }
@@ -1624,6 +1659,7 @@ _Float16 f16_caddl(_Float16 a, _Float16 b) { a += b; return a; }
 _Float16 f16_cmull(_Float16 a, _Float16 b) { a *= b; return a; }
 void     f16_csubp(_Float16 *p, _Float16 b) { *p -= b; }
 void     f16_caddg(_Float16 b) { gf16 += b; }
+#endif /* HAVE_FLOAT16 */
 
 /* ---- width-4 double (l_f32_*, only under --math32 / -fp-mode=ieee;
    otherwise these bail to the walker and still compute correctly) ---- */
@@ -1662,14 +1698,17 @@ double d_litc  (void)               { return 2.5; }         /* double literal (p
 double d_neg   (double a)           { return -a; }          /* FA negate (minusfa) */
 double d_negx  (double a, double b) { return -(a + b); }    /* negate of an expr */
 /* _Float16 <-> double cross-format conversion (l_f48_f16tof / l_f48_ftof16). */
+#ifdef HAVE_FLOAT16
 double   h_to_d (_Float16 x) { return (double)x; }
 _Float16 d_to_h (double x)   { return (_Float16)x; }
+#endif
 
 /* ---- long long (width-8 __i64_acc, IR acc-int tier) ----------------
  * Wide call & return use the stuffed-pointer ABI (Phase 2), so each
  * helper keeps `long long` internal — int/long in, int/long out — and
  * is fully IR-native. Exercises l_i64_* arith/compare/convert + the
  * shared IR_ACC_* layer (acc holds RHS, address-in-BC store). */
+#ifdef HAVE_LONGLONG
 int  ll_add (int a, int b) { long long x = a, y = b; return (int)(x + y); }
 int  ll_sub (int a, int b) { return (int)((long long)a - (long long)b); }
 int  ll_mul (int a, int b) { return (int)((long long)a * (long long)b); }
@@ -1708,14 +1747,18 @@ unsigned ll_ushr(int sh)   { long long x = -1; return (unsigned)((unsigned long 
 int  ll_neg1(void)         { long long x = -1; return (int)x; }      /* negative ll literal sign-extend */
 int  ll_cshl(int a, int n) { long long x = a; x <<= n; return (int)x; }      /* compound <<= */
 int  ll_cushr(int n) { unsigned long long x = 0xFFFFFFFFFFFFFFFFULL; x >>= n; return (unsigned)x; } /* compound unsigned >>= */
+#endif /* HAVE_LONGLONG */
 
 /* Build/read _Float16 from raw IEEE-half bits (no double->f16 convert,
    so the test needs only --math16, not the default-double library). */
+#ifdef HAVE_FLOAT16
 static _Float16 mkf16(unsigned bits) { _Float16 x; *(unsigned short *)&x = (unsigned short)bits; return x; }
 static unsigned f16bits(_Float16 x)  { return *(unsigned short *)&x; }
+#endif
 
 static void test_float16(void)
 {
+#ifdef HAVE_FLOAT16
     _Float16 a = mkf16(0x4200);   /* 3.0 */
     _Float16 b = mkf16(0x4400);   /* 4.0 */
     _Float16 two = mkf16(0x4000); /* 2.0 */
@@ -1758,6 +1801,7 @@ static void test_float16(void)
     gf16 = mkf16(0x4200);             /* 3.0 */
     f16_caddg(b);                     /* 3 + 4 = 7 */
     Assert(f16bits(gf16) == 0x4700u, "f16 g+=b -> 7");
+#endif /* HAVE_FLOAT16 */
 }
 
 static void test_double(void)
@@ -1796,10 +1840,13 @@ static void test_double(void)
     Assert(d_to_i(d_neg(i_to_d(6)))  == -6, "dbl unary neg -6 (minusfa)");
     Assert(d_to_i(d_neg(i_to_d(-4))) == 4,  "dbl unary neg of negative");
     Assert(d_to_i(d_negx(i_to_d(3), i_to_d(4))) == -7, "dbl neg of (3+4)");
+#ifdef HAVE_FLOAT16
     Assert(d_to_i(h_to_d(d_to_h(i_to_d(9)))) == 9, "dbl<->_Float16 round trip");
     Assert(d_to_i(d_add(h_to_d(d_to_h(i_to_d(2))), i_to_d(3))) == 5,
            "_Float16->double in an expr");
+#endif
 }
+
 
 /* ---- 16-bit int eq/ne (emulated-sbc Z flag) ----------------------- */
 int int_eq(int a, int b) { return a == b; }
@@ -1839,6 +1886,7 @@ static void test_fold_signed_unsigned_cmp(void)
 
 static void test_longlong(void)
 {
+#ifdef HAVE_LONGLONG
     /* All helpers keep long long internal (int/long boundary) — verified
        through int<->ll conversions so no 64-bit literal math is needed. */
     Assert(ll_add(3, 4)   == 7,   "ll 3+4=7");
@@ -1876,6 +1924,7 @@ static void test_longlong(void)
     Assert(ll_cshl(3, 4)  == 48, "ll x<<=4 -> 48");
     Assert(ll_cushr(60)   == 15, "ll x>>=60 (u) -> 15");
     Assert((int)(ll_litpool() / 1000000000LL) == 10, "ll >32-bit literal pool 1e10/1e9");
+#endif /* HAVE_LONGLONG */
 }
 
 static void test_struct(void)
@@ -1895,11 +1944,13 @@ static void test_struct(void)
            "switch int constant-return bodies (LICM fake-loop)");
     Assert(sw_nodef(1) == 1 && sw_nodef(2) == 2 && sw_nodef(9) == 7,
            "switch no-default keeps init value on no-match (slot-liveness)");
+#ifdef HAVE_LONGLONG
     sw_ll_in = 1;             Assert(sw_ll() == 11, "switch long long case");
     sw_ll_in = 0x100000001LL; Assert(sw_ll() == 33, "switch long long 64-bit case value");
     sw_ll_in = 7;             Assert(sw_ll() == 99, "switch long long default");
     Assert(aw_ll(5)  == 6,  "int arg widened to long long param");
     Assert(aw_ll(-3) == -2, "negative int arg sign-extended to long long param");
+#endif
     Assert(aw_l(5)   == 6,  "int arg widened to long param");
     Assert(aw_l(-3)  == -2, "negative int arg sign-extended to long param");
 }

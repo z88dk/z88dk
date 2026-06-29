@@ -4,7 +4,6 @@
 
 #include "ccdefs.h"
 
-static void output_double_string_load(double value);
 static int init(Type *type, int dump, Node **out_node);
 static int agg_init(Type *type, int isflexible, array **out_list);
 

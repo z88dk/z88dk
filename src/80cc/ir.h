@@ -410,6 +410,17 @@ typedef struct {
     int         acc_holds_lhs; /* 1: LHS loaded into acc, RHS pushed (float);
                                   0: RHS in acc, LHS pushed (i64) */
     int         acc_store_bc;  /* store address goes in BC (i64) not HL (float) */
+    int         acc_count_in_a; /* i64 shift: args[0]=value (pushed), args[1]=an
+                                   int count whose low byte goes in A; the helper
+                                   (l_i64_aslo/asro/asr_uo) reads A. No i64 count. */
+    int         acc_commutative; /* operands interchangeable (add/and/or/xor/mult/
+                                    eq/ne) — lets the lowerer push whichever operand
+                                    is already accumulator-resident, skipping a reload. */
+    int         acc_src_is_pool[2]; /* operand i is a wide constant in the literal
+                                       pool (args[i] = -1, no vreg) — the lowerer
+                                       loads it via `ld hl,i_<litlab>` directly into
+                                       the accumulator, so no slot is materialised. */
+    int         acc_src_litlab[2];  /* the i_<litlab> when acc_src_is_pool[i] */
     AccSubkind  acc_subkind;   /* IR_ACC_UNOP shape — see AccSubkind */
 } HelperInfo;
 
@@ -592,6 +603,7 @@ Op   *ir_op_emit(BB *bb, OpKind kind);
    from these values so ir_lower can emit C_LINE / -cc source comments
    per op. Pass NULL/0 to clear. */
 void  ir_set_emit_loc(const char *file, int line);
+void  ir_get_emit_loc(const char **file, int *line);
 
 /* Convenience constructors — fill common fields. All return a pointer
    into the BB's op array (see lifetime note above). */

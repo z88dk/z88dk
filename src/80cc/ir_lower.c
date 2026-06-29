@@ -59,6 +59,54 @@ extern FILE *output;   /* gen_emit_line/gen_comment write here via outfmt */
 static const char *cur_emitted_file;
 static int         cur_emitted_line;
 
+/* Source location of the op currently being lowered (set in lower_op,
+   independent of C_LINE emit mode). Used to annotate lowering aborts. */
+static const char *lower_cur_file;
+static int         lower_cur_line;
+
+/* Strip the surrounding quotes that op->file carries (from `Filename`). */
+static const char *lower_unquote(const char *file, char *buf, size_t n)
+{
+    if (!file || !*file) return NULL;
+    size_t len = strlen(file);
+    if (len >= 2 && file[0] == '"' && file[len-1] == '"') { file++; len -= 2; }
+    if (len >= n) len = n - 1;
+    memcpy(buf, file, len);
+    buf[len] = 0;
+    return buf;
+}
+
+/* Prefix a lowering-abort message with `file:line: ` (when known) and,
+   after the message, echo the offending source line. Call as:
+     ir_lower_loc(); fprintf(stderr, "ir_lower: ...\n"); ir_lower_src(); */
+static void ir_lower_loc(void)
+{
+    char path[512];
+    const char *file = lower_unquote(lower_cur_file, path, sizeof path);
+    if (file && lower_cur_line > 0)
+        fprintf(stderr, "%s:%d: error: ", file, lower_cur_line);
+}
+static void ir_lower_src(void)
+{
+    char path[512];
+    const char *file = lower_unquote(lower_cur_file, path, sizeof path);
+    if (!file || lower_cur_line <= 0) return;
+    FILE *f = fopen(path, "r");
+    if (!f) return;
+    char buf[512];
+    int cur = 0;
+    while (fgets(buf, sizeof buf, f)) {
+        if (++cur != lower_cur_line) continue;
+        size_t len = strlen(buf);
+        while (len && (buf[len-1] == '\n' || buf[len-1] == '\r')) buf[--len] = 0;
+        const char *p = buf;
+        while (*p == ' ' || *p == '\t') p++;
+        fprintf(stderr, "    %s\n", p);
+        break;
+    }
+    fclose(f);
+}
+
 static void emit_op_cline(FILE *out, const Op *op)
 {
     if (!c_intermix_ccode && !c_cline_directive) return;
@@ -103,6 +151,7 @@ typedef enum {
 } Clobber;
 
 static void apply_clobbers(Clobber c);
+static int wide_acc_result_dead_in_acc(const Func *f, int v);
 
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
@@ -163,8 +212,18 @@ static struct RegState {
     int dehl;   /* long vreg split across DE(high)/BC(low) */
     int bc;     /* BC value cache */
     int a;      /* byte vreg in A */
-    int fa;     /* vreg in the wide accumulator (FA / __i64_acc) */
-} rs = { .fa = -1 };
+    int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
+    int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
+                   store from FA, so its residency is tracked independently */
+} rs = { .fa = -1, .i64_acc = -1 };
+
+/* The wide-accumulator residency cell for `vreg` — __i64_acc for a long long,
+   FA for a double. They are distinct stores, so never share a marker. */
+static inline int *wide_acc_cell(const Func *f, int vreg)
+{
+    return (vreg >= 0 && f->vregs[vreg].kind == KIND_LONGLONG)
+        ? &rs.i64_acc : &rs.fa;
+}
 
 /* HL slot-ADDRESS cache (distinct from the value cache above): the slot
    OFFSET whose address (sp+off) sits in HL, or -1. Set by the sp-mode byte
@@ -322,10 +381,11 @@ static int param_caller_off(const Func *f, int vreg_id)
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
                        between the locals and the return address. Rabbit's
-                       ipset 3 (Rabbit __critical) uses no data stack → 0. */
+                       ipset 3 and gbz80/8080's bare di use no data stack → 0. */
                     + (f->is_interrupt ? 12
                        : ((f->flags & CRITICAL)
-                          && !(IS_RABBIT()) ? 2 : 0));
+                          && !(IS_RABBIT()) && !(IS_GBZ80())
+                          && !(IS_8080()) ? 2 : 0));
     /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
        / __z88dk_sdccdecl R→L (param0 lowest — just above the return addr).
        Must match emit_prologue. */
@@ -371,11 +431,16 @@ static int slot_off(const Func *f, int vreg_id)
 static void require_slot(const Func *f, int vreg_id)
 {
     if (slot_off(f, vreg_id) >= 0) return;
-    fprintf(stderr, "ir_lower: v%d (phys %d, width %d) accessed via a frame "
-            "slot it has none — register-only value lost across a clobber. "
-            "Codegen bug; aborting rather than emit a below-frame access.\n",
+    ir_lower_loc();
+    fprintf(stderr, "ir_lower: value read with no live register and no stack slot "
+            "(v%d, phys %d, width %d). This usually means a variable is read "
+            "before it is assigned — undefined behaviour in the source (e.g. a "
+            "`for(i==0; ...)` typo, or passing an uninitialised local). If the "
+            "variable is definitely set before use, it is a codegen bug. "
+            "Aborting rather than emit a below-frame read.\n",
             vreg_id, f->vreg_to_phys ? f->vreg_to_phys[vreg_id] : -1,
             f->vregs[vreg_id].width);
+    ir_lower_src();
     exit(1);
 }
 
@@ -614,6 +679,45 @@ static int cur_dehl_push_to_stack;       /* one-shot flag: set by lookahead */
    ld l,c / ld e,c emit. */
 static int sp_rel_max(const Func *f);
 
+/* Walk a multi-byte slot via (hl), loading/storing one byte and advancing
+   to the next — except the final byte (last=1), which is not followed by
+   an advance. On gbz80 a non-final byte uses the native post-increment
+   `ld a,(hl+)` (12T incl. the A->reg move vs 16T for `ld r,(hl); inc hl`,
+   same 2 bytes); the post-increment is A-only, so it clobbers A — hence
+   invalidate_a_cache(). Other CPUs / the final byte keep the direct form
+   ((hl+) lowers back to `ld r,(hl); inc hl` there, plus a redundant A move,
+   so it would only cost cycles off gbz80). Gated on rs.a < 0: clobbering A
+   is only safe when nothing live is cached there (an A-only byte with no
+   slot would otherwise be lost — invalidate_a_cache can't recover it). */
+static void load_byte_adv(FILE *out, const char *reg, int last)
+{
+    int is_a = (reg[0] == 'a' && reg[1] == 0);
+    /* reg==a needs no guard or move: the post-increment loads straight
+       into A (the intended target). reg!=a routes through A, so it both
+       clobbers A (guard rs.a < 0) and pays an A->reg move. */
+    if (IS_GBZ80() && !last && (is_a || rs.a < 0)) {
+        emit(out, "ld\ta,(hl+)");
+        if (!is_a) emit(out, "ld\t%s,a", reg);
+        invalidate_a_cache();
+    } else {
+        emit(out, "ld\t%s,(hl)", reg);
+        if (!last) emit(out, "inc\thl");
+    }
+}
+
+static void store_byte_adv(FILE *out, const char *reg, int last)
+{
+    int is_a = (reg[0] == 'a' && reg[1] == 0);
+    if (IS_GBZ80() && !last && (is_a || rs.a < 0)) {
+        if (!is_a) emit(out, "ld\ta,%s", reg);
+        emit(out, "ld\t(hl+),a");
+        if (!is_a) invalidate_a_cache();
+    } else {
+        emit(out, "ld\t(hl),%s", reg);
+        if (!last) emit(out, "inc\thl");
+    }
+}
+
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     if (fp_active(f)) {
@@ -637,9 +741,8 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (IS_EZ80()) {
         emit(out, "ld\tbc,(hl)");   /* ez80: BC = *HL (HL preserved) */
     } else {
-        emit(out, "ld\tc,(hl)");
-        emit(out, "inc\thl");
-        emit(out, "ld\tb,(hl)");
+        load_byte_adv(out, "c", 0);
+        load_byte_adv(out, "b", 1);
     }
     cache_bc(vreg_id);
     invalidate_hl_cache();
@@ -1070,9 +1173,8 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         if (IS_EZ80()) {
             emit(out, "ld\tde,(hl)");   /* ez80: DE = *HL (HL preserved) */
         } else {
-            emit(out, "ld\te,(hl)");
-            emit(out, "inc\thl");
-            emit(out, "ld\td,(hl)");
+            load_byte_adv(out, "e", 0);
+            load_byte_adv(out, "d", 1);
         }
         hl_about_to_change(-1);
         cache_de(vreg_id);
@@ -1590,13 +1692,10 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\tc,(hl)");        /* C = byte 0 */
-    emit(out, "inc\thl");
-    emit(out, "ld\tb,(hl)");        /* B = byte 1 — BC = low half */
-    emit(out, "inc\thl");
-    emit(out, "ld\te,(hl)");        /* E = byte 2 */
-    emit(out, "inc\thl");
-    emit(out, "ld\td,(hl)");        /* D = byte 3 — DE = high half */
+    load_byte_adv(out, "c", 0);     /* C = byte 0 */
+    load_byte_adv(out, "b", 0);     /* B = byte 1 — BC = low half */
+    load_byte_adv(out, "e", 0);     /* E = byte 2 */
+    load_byte_adv(out, "d", 1);     /* D = byte 3 — DE = high half */
     if (!no_hl) {
         emit(out, "ld\thl,bc");     /* HL = BC = low half */
     }
@@ -1690,13 +1789,10 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
     emit(out, "ld\tbc,hl");          /* BC = low (B=hi byte, C=lo byte) */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");         /* HL = &slot+0 */
-    emit(out, "ld\t(hl),c");
-    emit(out, "inc\thl");
-    emit(out, "ld\t(hl),b");
-    emit(out, "inc\thl");
-    emit(out, "ld\t(hl),e");
-    emit(out, "inc\thl");
-    emit(out, "ld\t(hl),d");
+    store_byte_adv(out, "c", 0);
+    store_byte_adv(out, "b", 0);
+    store_byte_adv(out, "e", 0);
+    store_byte_adv(out, "d", 1);
     /* HL now points one past slot+3 — junk. Caller wanting HL=low
        must reload via ld l,c; ld h,b before we clobber BC. For
        simplicity store_dehl leaves HL invalid; callers that need
@@ -2533,6 +2629,7 @@ static void invalidate_hl_cache(void)
     invalidate_de_cache();   /* clears rs.de + rs.dehl */
     rs.a = -1;
     rs.fa = -1;
+    rs.i64_acc = -1;
 }
 
 /* Both HL and BC clobbered (16-bit ops through HL that also stash via BC,
@@ -3069,24 +3166,6 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
     invalidate_de_cache();
 }
 
-/* Skip store_hl only — for ops that leave the value in HL and don't
-   need a swap-back. The caller is responsible for the cache_hl(dst)
-   advertisement (the dead-dst cache check on op[i+1] needs it). */
-static void spill_unless_dead(FILE *out, const Func *f, int vreg)
-{
-    if (cur_dst_dead || vreg_in_register_pool(f, vreg)) return;
-    ss_note_store(f, vreg);
-    if (ss_store_dead_here()) return;   /* dead spill; HL already holds it */
-    store_hl(out, f, vreg);
-    /* store_hl's internal `ex de,hl` puts the spilled value into DE
-       (then walks HL through memory). DE now has dst's value; the
-       caller advertises that via cache_de if it cares. Conservatively
-       invalidate — most callers don't care, and a stale cache here
-       would mismatch the slot. */
-    invalidate_de_cache();
-}
-
-
 /* Emit a forward conditional skip over the next `skip_bytes` of code via
    an ASMPC-relative jump. `jr` is 2 bytes; on 8080/8085 (no relative jump)
    z80asm rewrites `jr` to a 3-byte `jp`, so the relative target needs one
@@ -3264,14 +3343,14 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
     if (dst_w > 4) {
         /* Wide (5/6/8-byte) slot-to-slot copy via the accumulator:
            dload(src); dstore(dst). Reuses the FA-residency cache. */
-        if (rs.fa != op->src[0]) {
+        if (*wide_acc_cell(f, op->src[0]) != op->src[0]) {
             emit_acc_slot_addr(out, f, op->src[0], 0);
             emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
         }
         emit_acc_slot_addr(out, f, op->dst, 0);
         emit_acc_store_hl(out, f, op->dst);
         invalidate_hl_bc();
-        rs.fa = op->dst;
+        *wide_acc_cell(f, op->dst) = op->dst;
         return 0;
     }
     if (dst_w == 4) {
@@ -4053,7 +4132,6 @@ static int gen_pop_dehl_long(FILE *out, Func *f, const Op *op)
 
 static int gen_asm(FILE *out, Func *f, const Op *op)
 {
-    (void)f;
     if (op->asm_text) {
         /* Raw passthrough — text is one or more newline-separated
            lines the user wrote inside __asm{}. Emit verbatim. */
@@ -4064,6 +4142,25 @@ static int gen_asm(FILE *out, Func *f, const Op *op)
     }
     /* Inline asm is opaque — assume full register/cache clobber. */
     invalidate_hl_bc();
+    /* asm-as-expression: capture the result the asm left in the return
+       register(s) into op->dst, mirroring a call return — HL for width<=2,
+       DEHL for width 4. No HL->DEHL widening: a width-4 context trusts the
+       asm to have filled DEHL. (Statement-level asm has dst<0 and is left
+       exactly as before.) */
+    if (op->dst >= 0) {
+        int w = f->vregs[op->dst].width;
+        invalidate_de_cache();   /* asm clobbered DE too; clean before store */
+        if (w == 4)
+            store_dehl_cached(out, f, op->dst);
+        else if (w == 1) {
+            emit(out, "ld\ta,l");
+            if (cur_dst_dead || vreg_in_register_pool(f, op->dst))
+                cache_a(op->dst);
+            else
+                store_a_byte(out, f, op->dst);
+        } else
+            store_hl(out, f, op->dst);
+    }
     return 0;
 }
 
@@ -4874,10 +4971,12 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             emit_hl_add_offset(out, op->mem.offset, 0);  /* base+off (DE free) */
         }
         emit(out, "call\t%s", acc_prim(f, op->dst, "load"));
-        emit_acc_slot_addr(out, f, op->dst, 0);
-        emit_acc_store_hl(out, f, op->dst);
-        invalidate_hl_bc();
-        rs.fa = op->dst;
+        if (!wide_acc_result_dead_in_acc(f, op->dst)) {
+            emit_acc_slot_addr(out, f, op->dst, 0);
+            emit_acc_store_hl(out, f, op->dst);
+        }
+        invalidate_hl_bc();          /* the acc_load clobbered HL/BC regardless */
+        *wide_acc_cell(f, op->dst) = op->dst;
         return 0;
     }
     if (op->mem.kind == IR_MEM_SYM) {
@@ -5124,13 +5223,10 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                    Load the low word straight into BC, the high word into DE,
                    then mirror BC into HL — reaching DE=high/HL=low with
                    BC=low (the DEHL cache invariant) already set, no ex. */
-                emit(out, "ld\tc,(hl)");        /* C = byte 0 */
-                emit(out, "inc\thl");
-                emit(out, "ld\tb,(hl)");        /* B = byte 1  (BC = LOW) */
-                emit(out, "inc\thl");
-                emit(out, "ld\te,(hl)");        /* E = byte 2 */
-                emit(out, "inc\thl");
-                emit(out, "ld\td,(hl)");        /* D = byte 3  (DE = HIGH) */
+                load_byte_adv(out, "c", 0);     /* C = byte 0 */
+                load_byte_adv(out, "b", 0);     /* B = byte 1  (BC = LOW) */
+                load_byte_adv(out, "e", 0);     /* E = byte 2 */
+                load_byte_adv(out, "d", 1);     /* D = byte 3  (DE = HIGH) */
                 emit(out, "ld\tl,c");
                 emit(out, "ld\th,b");           /* HL = LOW */
             } else {
@@ -5183,7 +5279,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->src[0] >= 0 && f->vregs[op->src[0]].width > 4) {
         /* Wide double store: dload(src)→FA, address into HL, dstore. */
-        if (rs.fa != op->src[0]) {
+        if (*wide_acc_cell(f, op->src[0]) != op->src[0]) {
             emit_acc_slot_addr(out, f, op->src[0], 0);
             emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
         }
@@ -5197,8 +5293,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
             emit_hl_add_offset(out, op->mem.offset, 0);  /* base+off (DE free) */
         }
         emit_acc_store_hl(out, f, op->src[0]);
-        invalidate_hl_bc();
-        rs.fa = -1;
+        invalidate_hl_bc();          /* clears both wide-acc cells */
         return 0;
     }
     if (op->mem.kind == IR_MEM_SYM) {
@@ -5275,13 +5370,10 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 if (!hl_has(op->mem.base))
                     load_to_hl(out, f, op->mem.base);
                 emit_hl_add_offset(out, op->mem.offset, 0); /* inc/dec only */
-                emit(out, "ld\t(hl),c");
-                emit(out, "inc\thl");
-                emit(out, "ld\t(hl),b");
-                emit(out, "inc\thl");
-                emit(out, "ld\t(hl),e");
-                emit(out, "inc\thl");
-                emit(out, "ld\t(hl),d");
+                store_byte_adv(out, "c", 0);
+                store_byte_adv(out, "b", 0);
+                store_byte_adv(out, "e", 0);
+                store_byte_adv(out, "d", 1);
                 invalidate_hl_cache();
                 /* DE/BC untouched — the DEHL cache stays valid. */
             } else if (src_slotted && small_off) {
@@ -6255,6 +6347,46 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             b[3] = (uint8_t)((kk >> 24) & 0xff);
             uint8_t identity = (op->kind == IR_AND) ? 0xff : 0x00;
             static const char *regs[4] = { "l", "h", "e", "d" };
+            /* Fuse the op straight into the store walk: read each value
+               byte, apply the immediate, store via (hl+) — skipping the
+               register write-back AND the separate store_dehl walk. The
+               result lives only in its slot afterwards (caches
+               invalidated), which is provably fine when no adjacent op
+               wants it register-resident (!dst_dead_safe). Gated to the
+               case where store_dehl would otherwise emit the generic sp
+               byte walk: not fp (ix store is 2 ops), not the sp+0 TOS
+               pop/push trick, not a Rabbit/kc160 native sp-rel store.
+               In sp-mode load_to_dehl leaves BC=low (C=b0,B=b1), DE=high
+               (E=b2,D=b3) — the no-bc-stash skip only fires under fp. */
+            if (!fp_active(f) && !cur_dehl_dst_dead_safe
+                && !cur_dehl_push_to_stack && op->dst >= 0
+                && !vreg_is_pr_dehl(f, op->dst)
+                && !vreg_is_pr_de(f, op->dst)
+                && !vreg_in_pr_bc(f, op->dst)) {
+                require_slot(f, op->dst);
+                int doff = slot_off(f, op->dst) + cur_sp_adjust;
+                /* The sp+0 TOS pop/push store beats the fused byte walk on
+                   the z80 family (measured: crc +0.2% if fused), but on
+                   808x its dearer push/pop loses to the fused walk
+                   (8080 crc -1.2%), so let 808x fuse even at sp+0. */
+                int tos  = (doff == 0 && tos_pushpop_ok(f) && !IS_808x());
+                int sprel = (doff >= 0 && doff + 2 <= sp_rel_max(f));
+                if (doff >= 0 && !tos && !sprel) {
+                    static const char *vb[4] = { "c", "b", "e", "d" };
+                    load_to_dehl(out, f, op->src[0]);
+                    emit(out, "ld\thl,%d", doff);
+                    emit(out, "add\thl,sp");
+                    for (int i = 0; i < 4; i++) {
+                        emit(out, "ld\ta,%s", vb[i]);
+                        if (b[i] != identity)
+                            emit(out, "%s\t%u", mnem, (unsigned)b[i]);
+                        emit(out, i < 3 ? "ld\t(hl+),a" : "ld\t(hl),a");
+                    }
+                    invalidate_hl_bc();
+                    invalidate_de_cache();   /* clears rs.de AND rs.dehl */
+                    return 0;
+                }
+            }
             load_to_dehl(out, f, op->src[0]);
             for (int i = 0; i < 4; i++) {
                 if (b[i] == identity) continue;
@@ -6334,9 +6466,19 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tc,a");
             emit(out, "ld\ta,b");
             emit(out, "%s\t(hl)", mnem);
-            emit(out, "ld\th,a");
-            emit(out, "ld\tl,c");
-            emit(out, "ex\tde,hl");           /* DEHL = result */
+            /* Normalise to canonical DEHL (HL=low, DE=high). On gbz80
+               ex de,hl is a 56T push/pop emulation; build the layout
+               directly instead (A=b3, C=b2, D=b1, E=b0 here). */
+            if (IS_GBZ80()) {
+                emit(out, "ld\th,d");          /* H = b1 */
+                emit(out, "ld\tl,e");          /* L = b0  -> HL = low */
+                emit(out, "ld\td,a");          /* D = b3 */
+                emit(out, "ld\te,c");          /* E = b2  -> DE = high */
+            } else {
+                emit(out, "ld\th,a");
+                emit(out, "ld\tl,c");
+                emit(out, "ex\tde,hl");           /* DEHL = result */
+            }
             /* Drop the data-stack frame. */
             emit(out, "pop\tbc");
             emit(out, "pop\tbc");
@@ -6482,9 +6624,18 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tc,a");           /* stash byte2 in C */
             emit(out, "ld\ta,b");
             emit(out, "%s\t(hl)", mnem);   /* A = byte3 result */
-            emit(out, "ld\th,a");           /* H = byte3 */
-            emit(out, "ld\tl,c");           /* L = byte2 */
-            emit(out, "ex\tde,hl");        /* DEHL: D=b3 E=b2 H=b1 L=b0 */
+            /* Normalise to canonical DEHL. gbz80 builds it directly to
+               dodge the 56T ex de,hl emulation (A=b3, C=b2, D=b1, E=b0). */
+            if (IS_GBZ80()) {
+                emit(out, "ld\th,d");           /* H = b1 */
+                emit(out, "ld\tl,e");           /* L = b0  -> HL = low */
+                emit(out, "ld\td,a");           /* D = b3 */
+                emit(out, "ld\te,c");           /* E = b2  -> DE = high */
+            } else {
+                emit(out, "ld\th,a");           /* H = byte3 */
+                emit(out, "ld\tl,c");           /* L = byte2 */
+                emit(out, "ex\tde,hl");        /* DEHL: D=b3 E=b2 H=b1 L=b0 */
+            }
             if (src1_inline_pushed) {
                 emit(out, "pop\tbc");
                 emit(out, "pop\tbc");
@@ -7107,7 +7258,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
             emit_acc_store_hl(out, f, ci->ret_vreg);
             invalidate_hl_cache();
-            rs.fa = ci->ret_vreg;
+            *wide_acc_cell(f, ci->ret_vreg) = ci->ret_vreg;
         } else if (ret_w == 4)
             store_dehl_cached(out, f, ci->ret_vreg);
         else if (ret_w == 1) {
@@ -7137,6 +7288,89 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Push one operand of a wide binop/cmp and return the operand to be loaded
+   into the accumulator. Honours acc_holds_lhs (non-commutative sub/div get
+   the right operand order); for a commutative op, picks whichever operand is
+   already accumulator-resident as the one to push. An accumulator-resident
+   pushed operand is pushed straight from the accumulator (l_i64_push / dpush
+   copy it and leave the accumulator intact), skipping a slot reload. */
+/* Address of ACC operand `pos` into HL: a pool constant's `i_<litlab>`, else
+   the vreg's frame slot. Ready for an acc load / loadpush. */
+static void emit_acc_operand_addr(FILE *out, Func *f, const HelperInfo *hi, int pos)
+{
+    if (hi->acc_src_is_pool[pos])
+        emit(out, "ld\thl,i_%d", hi->acc_src_litlab[pos]);
+    else
+        emit_acc_slot_addr(out, f, hi->args[pos], 0);
+}
+
+/* Is ACC operand `pos` a vreg already resident in the accumulator? */
+static int acc_operand_resident(const Func *f, const HelperInfo *hi, int pos)
+{
+    return !hi->acc_src_is_pool[pos] && hi->args[pos] >= 0
+        && *wide_acc_cell(f, hi->args[pos]) == hi->args[pos];
+}
+
+/* Push one operand of a wide binop/cmp and return the POSITION (0/1) to load
+   into the accumulator. Honours acc_holds_lhs (non-commutative order); for a
+   commutative op pushes whichever operand is accumulator-resident (straight
+   from the accumulator — no reload). Pool-constant operands are loaded by
+   address; never resident, so they end up loaded-last. */
+static int acc_push_one_operand(FILE *out, Func *f, const HelperInfo *hi)
+{
+    int push_pos = hi->acc_holds_lhs ? 1 : 0;
+    int acc_pos  = hi->acc_holds_lhs ? 0 : 1;
+    if (hi->acc_commutative) {
+        if      (acc_operand_resident(f, hi, 1)) { push_pos = 1; acc_pos = 0; }
+        else if (acc_operand_resident(f, hi, 0)) { push_pos = 0; acc_pos = 1; }
+    }
+    if (acc_operand_resident(f, hi, push_pos)) {
+        emit(out, "call\t%s", hi->acc_push);          /* already resident */
+    } else {
+        emit_acc_operand_addr(out, f, hi, push_pos);
+        if (hi->acc_loadpush) {
+            emit(out, "call\t%s", hi->acc_loadpush);
+        } else {
+            emit(out, "call\t%s", hi->acc_load);
+            emit(out, "call\t%s", hi->acc_push);
+        }
+    }
+    return acc_pos;
+}
+
+/* Would ACC op `h` push vreg `v` straight from the accumulator (rather than
+   load it from its slot), given v is accumulator-resident? Mirrors exactly
+   acc_push_one_operand's choice — they must never disagree. */
+static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
+{
+    if (!h || h->n_args != 2 || h->acc_count_in_a) return 0;
+    int a0 = h->args[0], a1 = h->args[1];
+    if (a0 == a1) return 0;            /* used as both operands → the load reads the slot */
+    if (h->acc_commutative) return (v == a0 || v == a1);
+    return v == (h->acc_holds_lhs ? a1 : a0);   /* the fixed pushed operand */
+}
+
+/* A wide-accumulator result `v` just produced (and left resident) needs no
+   slot store: the next real op consumes it straight from the accumulator
+   (push-from-acc) and v is dead afterwards, so its slot is never read.
+   Conservative — any uncertainty (no liveness, BB-end, non-acc next op)
+   keeps the store. */
+static int wide_acc_result_dead_in_acc(const Func *f, int v)
+{
+    if (getenv("IR_NO_ACC_DROP") || !cur_bb || v < 0) return 0;
+    int j = cur_op_idx + 1;
+    while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
+    if (j >= cur_bb->n_ops) return 0;
+    const Op *nx = &cur_bb->ops[j];
+    if (nx->kind != IR_ACC_BINOP && nx->kind != IR_ACC_CMP) return 0;
+    if (!acc_op_pushes_from_acc(nx->hcall, v)) return 0;
+    /* v must be dead after nx (its slot then never read). */
+    const BitSet *after = (j + 1 < cur_bb->n_ops)
+        ? ir_op_live_in(cur_bb, j + 1) : cur_bb->live_out;
+    (void)f;
+    return after && !ir_bitset_get(after, v);
+}
+
 /* Wide memory-accumulator binop (IR_ACC_BINOP). Operands and result are
    slot-resident wide vregs (width 6/8); the accumulator (FA / __i64_acc)
    is the working store. Sequence (sp-relative addressing; ir_build gates
@@ -7155,40 +7389,67 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int lhs = hi->args[0], rhs = hi->args[1];
-    int acc_op  = hi->acc_holds_lhs ? lhs : rhs;   /* loaded into acc last */
-    int push_op = hi->acc_holds_lhs ? rhs : lhs;   /* pushed */
     int w = hi->acc_width;
 
-    /* 1. push_op -> acc, then push acc to the stack (combined dldpsh
-       when available, else load+push). */
-    emit_acc_slot_addr(out, f, push_op, 0);
-    if (hi->acc_loadpush) {
-        emit(out, "call\t%s", hi->acc_loadpush);
-    } else {
+    /* i64 shift: push the value (lhs), put the count's low byte in A, call the
+       count-in-A helper (it pops the value). A literal count (rhs < 0) is an
+       immediate in op->imm; a variable count is loaded from its (slot-backed)
+       vreg after the push. No i64 count is ever materialised. */
+    if (hi->acc_count_in_a) {
+        emit_acc_slot_addr(out, f, lhs, 0);
         emit(out, "call\t%s", hi->acc_load);
         emit(out, "call\t%s", hi->acc_push);
+        cur_sp_adjust += w;
+        /* The value load + push physically clobbered HL/DE/BC (via plain
+           calls, no cache invalidation), so drop the stale register caches
+           before reading the count — else load_byte_to_a takes a phantom
+           HL/DE hit (e.g. Rabbit's sp-rel `ld (sp+N),hl` leaves the ++counter
+           cached in HL) and shifts by garbage. */
+        invalidate_hl_bc();
+        if (rhs < 0)
+            emit(out, "ld\ta,%d", (int)(op->imm & 0xff));
+        else
+            load_byte_to_a(out, f, rhs);      /* count -> A (offsets incl. push) */
+        emit(out, "call\t%s", hi->name);
+        cur_sp_adjust -= w;
+        if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
+            emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
+            if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+            emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
+        }
+        invalidate_de_cache();
+        invalidate_bc_cache();
+        invalidate_a_cache();
+        *wide_acc_cell(f, hi->ret_vreg) = hi->ret_vreg;
+        return 0;
     }
+
+    (void)lhs; (void)rhs;
+    /* 1. push one operand (from the accumulator if already resident). */
+    int acc_pos = acc_push_one_operand(out, f, hi);
     cur_sp_adjust += w;
-    /* 2. acc_op -> acc (offsets now include the push) */
-    emit_acc_slot_addr(out, f, acc_op, 0);
+    /* 2. acc operand -> acc (offsets now include the push) */
+    emit_acc_operand_addr(out, f, hi, acc_pos);
     emit(out, "call\t%s", hi->acc_load);
     /* 3. binop — the helper pops the pushed operand */
     emit(out, "call\t%s", hi->name);
     cur_sp_adjust -= w;
-    /* 4. acc -> dst slot */
-    emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
-    if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
-        emit(out, "ld\tb,h");
-        emit(out, "ld\tc,l");
+    /* 4. acc -> dst slot — unless the result is consumed straight from the
+       accumulator by the next op and dies there (slot never read). */
+    if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
+        emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
+        if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
+            emit(out, "ld\tb,h");
+            emit(out, "ld\tc,l");
+        }
+        emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
     }
-    emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
     invalidate_de_cache();
     invalidate_bc_cache();
     invalidate_a_cache();
-    /* The result is left in the accumulator (the store above wrote a
-       copy to the slot but didn't disturb the accumulator). Advertise
-       it so an immediately-following return skips the reload. */
-    rs.fa = hi->ret_vreg;
+    /* The result stays in the accumulator; advertise it so the next op (or a
+       return) consumes it from there instead of reloading the slot. */
+    *wide_acc_cell(f, hi->ret_vreg) = hi->ret_vreg;
     return 0;
 }
 
@@ -7202,23 +7463,19 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
         fputs("ir_lower: IR_ACC_CMP malformed\n", stderr);
         return -1;
     }
-    int acc_op  = hi->acc_holds_lhs ? hi->args[0] : hi->args[1];
-    int push_op = hi->acc_holds_lhs ? hi->args[1] : hi->args[0];
     int w = hi->acc_width;
-    emit_acc_slot_addr(out, f, push_op, 0);
-    if (hi->acc_loadpush) {
-        emit(out, "call\t%s", hi->acc_loadpush);
-    } else {
-        emit(out, "call\t%s", hi->acc_load);
-        emit(out, "call\t%s", hi->acc_push);
-    }
+    int acc_pos = acc_push_one_operand(out, f, hi);
     cur_sp_adjust += w;
-    emit_acc_slot_addr(out, f, acc_op, 0);
+    emit_acc_operand_addr(out, f, hi, acc_pos);
     emit(out, "call\t%s", hi->acc_load);
     emit(out, "call\t%s", hi->name);
     cur_sp_adjust -= w;
+    /* The bool (0/1) is in HL. Commit it the word-result way: spill to the
+       slot only if live-read from there (dead → skipped), and advertise
+       HL = result so an immediately-following push/consumer takes it straight
+       from HL instead of a slot reload. */
     invalidate_hl_bc();
-    store_hl(out, f, hi->ret_vreg);
+    commit_hl_word(out, f, hi->ret_vreg);
     return 0;
 }
 
@@ -7243,13 +7500,13 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
-        rs.fa = dst;
+        *wide_acc_cell(f, dst) = dst;
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC2INT) {
         /* acc → int: load the accumulator (unless already resident),
            convert (result in HL/DEHL), store to the int dst. */
-        if (rs.fa != src) {
+        if (*wide_acc_cell(f, src) != src) {
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
@@ -7274,7 +7531,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
-        rs.fa = dst;
+        *wide_acc_cell(f, dst) = dst;
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC_UNARY) {
@@ -7282,7 +7539,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
            (unless already resident), call the in-place helper, store back.
            The i64 store takes the address in BC (acc_store_bc); the float
            store takes it in HL. */
-        if (rs.fa != src) {
+        if (*wide_acc_cell(f, src) != src) {
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
@@ -7291,11 +7548,11 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
-        rs.fa = dst;
+        *wide_acc_cell(f, dst) = dst;
         return 0;
     }
     /* acc → acc move */
-    if (rs.fa != src) {
+    if (*wide_acc_cell(f, src) != src) {
         emit_acc_slot_addr(out, f, src, 0);
         emit(out, "call\t%s", hi->acc_load);
     }
@@ -7303,7 +7560,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
     if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
     emit(out, "call\t%s", hi->acc_store);
     invalidate_hl_bc();
-    rs.fa = dst;
+    *wide_acc_cell(f, dst) = dst;
     return 0;
 }
 
@@ -7442,7 +7699,7 @@ static int gen_ld_far(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, op->dst, 0);
             emit_acc_store_hl(out, f, op->dst);
             invalidate_hl_bc();
-            rs.fa = op->dst;
+            *wide_acc_cell(f, op->dst) = op->dst;
         } else if (dst_w == 4)
             store_dehl_finalize(out, f, op->dst);   /* lp_glong/lp_gptr → DEHL */
         else
@@ -7488,7 +7745,7 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
           narrow value into the primary set (DEHL for 4B, HL/L otherwise).
           The address is safe on the stack; this may clobber DEHL/BC. */
     if (val_w > 4) {
-        if (rs.fa != val) {
+        if (*wide_acc_cell(f, val) != val) {
             emit_acc_slot_addr(out, f, val, 0);
             emit(out, "call\t%s", acc_prim(f, val, "load"));
         }
@@ -7511,7 +7768,7 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
     if (!bc_saved) invalidate_bc_cache();
     invalidate_de_cache();
     invalidate_a_cache();
-    if (val_w > 4) rs.fa = -1;   /* helper clobbered the accumulator */
+    if (val_w > 4) *wide_acc_cell(f, val) = -1;   /* helper clobbered the accumulator */
     cur_bank_fn = NULL;
     return 0;
 }
@@ -8408,6 +8665,10 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
 
 static int lower_op(FILE *out, Func *f, const Op *op)
 {
+    /* Track the op's source location (independent of C_LINE emit mode) so
+       a lowering abort can name file:line + echo the source line. */
+    lower_cur_file = op->file;
+    lower_cur_line = op->line;
     switch (op->kind) {
 
     case IR_NOP:               return gen_nop(out, f, op);
@@ -8488,7 +8749,7 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
                accumulator (FA for double); the teardown below preserves
                it (it lives in memory / the alt-reg set, not HL/DEHL). */
             is_acc = 1;
-            if (rs.fa != op->src[0]) {
+            if (*wide_acc_cell(f, op->src[0]) != op->src[0]) {
                 emit_acc_slot_addr(out, f, op->src[0], 0);
                 emit_c(out, CLOB_HL, "call\t%s", acc_prim(f, op->src[0], "load"));
             }
@@ -8577,8 +8838,14 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
        is balanced by l_pop_ei here (it pops the saved DI state and re-ei's,
        preserving the return value in HL/DEHL). Mirrors codegen_critical_leave.
        Rabbit restores the IP priority with ipres (no stack). */
-    if (f->flags & CRITICAL)
-        emit(out, (IS_RABBIT()) ? "ipres" : "call\tl_pop_ei");
+    if (f->flags & CRITICAL) {
+        if (IS_RABBIT())
+            emit(out, "ipres");
+        else if (IS_GBZ80() || IS_8080())
+            emit(out, "ei");          /* gbz80/8080: bare ei (IFF not readable) */
+        else
+            emit(out, "call\tl_pop_ei");
+    }
     /* __z88dk_callee: the callee strips its own caller-pushed args (the caller
        emits no cleanup — gen_call). The teardown above left sp at the return
        address, args just above it. Remove them while preserving the return
@@ -8696,10 +8963,17 @@ static void emit_prologue(FILE *out, Func *f)
         emit(out, "push\tix");
         emit(out, "push\tiy");
     } else if (f->flags & CRITICAL) {
-        /* Rabbit: ipset 3 (no data-stack push); z80: l_push_di saves DI
-           state on the stack (frame offsets account for the 2 bytes). */
-        emit(out, (IS_RABBIT()) ? "ipset\t3"
-                                                  : "call\tl_push_di");
+        /* Rabbit: ipset 3 (no data-stack push); gbz80/8080: bare di — the IFF
+           state can't be read back (no asm_cpu_push_di), so leave re-enables
+           unconditionally with ei (no stack push, no frame offset); z80 (and
+           8085, which expands the z80 form) save DI state on the stack via
+           l_push_di (frame offsets account for the 2 bytes). */
+        if (IS_RABBIT())
+            emit(out, "ipset\t3");
+        else if (IS_GBZ80() || IS_8080())
+            emit(out, "di");
+        else
+            emit(out, "call\tl_push_di");
     }
     if (frame_has_saved_fp(f))      /* gen_push_frame: preserve caller's IX */
         emit(out, "push\t%s", frame_reg());
@@ -8751,7 +9025,7 @@ static void emit_prologue(FILE *out, Func *f)
         emit_acc_slot_addr(out, f, fc_vreg, 0);
         emit_acc_store_hl(out, f, fc_vreg);
         invalidate_hl_bc();
-        rs.fa = fc_vreg;
+        *wide_acc_cell(f, fc_vreg) = fc_vreg;
     } else if (fc_vreg >= 0 && f->vregs[fc_vreg].width == 4) {
         /* width-4: reconstruct DEHL (low half from BC, high half survived
            in DE) and place it in the param's home (DEHL register or slot). */
@@ -8851,13 +9125,10 @@ static void emit_prologue(FILE *out, Func *f)
                then store_dehl to the local slot. */
             emit(out, "ld\thl,%d", poff);
             emit(out, "add\thl,sp");
-            emit(out, "ld\tc,(hl)");
-            emit(out, "inc\thl");
-            emit(out, "ld\tb,(hl)");
-            emit(out, "inc\thl");
-            emit(out, "ld\te,(hl)");
-            emit(out, "inc\thl");
-            emit(out, "ld\td,(hl)");
+            load_byte_adv(out, "c", 0);
+            load_byte_adv(out, "b", 0);
+            load_byte_adv(out, "e", 0);
+            load_byte_adv(out, "d", 1);
             emit(out, "ld\thl,bc");
             store_dehl(out, f, v->id);
         } else {

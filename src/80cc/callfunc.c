@@ -35,8 +35,6 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
     zdouble val;
     int watcharg = 0;       /* For watching printf etc */
     int minifunc = 0;       /* Call cut down version */
-    int   isconstarg[5];
-    zdouble constargval[5];
     int   function_pointer_call = ptr == NULL ? YES : NO;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
@@ -78,10 +76,6 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
 
         pair = expression(&vconst, &val, &type);
         array_add(function_args, pair->node);
-        if ( argnumber < 5 ) {
-            isconstarg[argnumber] = vconst;
-            constargval[argnumber] = val;
-        }
 
         /* printf/scanf format-string watcher. SetWatch in the prologue
            sets `watcharg` to the format-string arg index for known

@@ -123,7 +123,7 @@ void ir_alloc(Func *f)
     }
 
     /* `cacheable[v]` is 1 iff every def of v is in an op whose lowerer
-       path runs through spill_unless_dead / spill_and_swap_unless_dead
+       path runs through spill_and_swap_unless_dead
        (i.e., the cache-aware emit paths) AND the dst is dead-after at
        every def AND v's width is 2 (HL cache only). Other ops always
        store to the slot, so the slot is needed. */

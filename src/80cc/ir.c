@@ -336,6 +336,12 @@ void ir_set_emit_loc(const char *file, int line)
     ir_emit_line = line;
 }
 
+void ir_get_emit_loc(const char **file, int *line)
+{
+    if (file) *file = ir_emit_file;
+    if (line) *line = ir_emit_line;
+}
+
 Op *ir_op_emit(BB *bb, OpKind kind)
 {
     if (bb->n_ops >= bb->cap_ops) {

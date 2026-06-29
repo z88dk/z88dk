@@ -135,14 +135,68 @@ static const char *cur_fn_name = "?";
    IR coverage with no diagnostic, so we flag it. */
 static int build_fail_emitted;
 
+/* Source location of the node currently being built — updated at each
+   build_stmt / build_expr entry so build_fail can name the file:line (and
+   echo the offending source line). Kept separate from ir_set_emit_loc so
+   finer expression-level tracking here does NOT perturb the statement-level
+   C_LINE stamping on emitted ops. */
+static const char *cur_node_file;
+static int         cur_node_line;
+
+/* Copy `file` into `buf` stripped of the surrounding quotes that node
+   filenames carry (set from `Filename`, which keeps the #line quotes).
+   Returns buf, or NULL if file is empty. */
+static const char *unquote_file(const char *file, char *buf, size_t n)
+{
+    if (!file || !*file) return NULL;
+    size_t len = strlen(file);
+    if (len >= 2 && file[0] == '"' && file[len-1] == '"') { file++; len -= 2; }
+    if (len >= n) len = n - 1;
+    memcpy(buf, file, len);
+    buf[len] = 0;
+    return buf;
+}
+
+/* Echo the offending source line (gcc-style), indented, to stderr. The
+   node filenames are the original sources (same as C_LINE), so this opens
+   the real .c — best-effort, silent on any error. */
+static void build_fail_show_src(const char *file, int line)
+{
+    char path[512];
+    if (!unquote_file(file, path, sizeof path) || line <= 0) return;
+    FILE *f = fopen(path, "r");
+    if (!f) return;
+    char buf[512];
+    int cur = 0;
+    while (fgets(buf, sizeof buf, f)) {
+        if (++cur != line) continue;
+        size_t len = strlen(buf);
+        while (len && (buf[len-1] == '\n' || buf[len-1] == '\r')) buf[--len] = 0;
+        const char *p = buf;
+        while (*p == ' ' || *p == '\t') p++;   /* trim leading indent */
+        fprintf(stderr, "    %s\n", p);
+        break;
+    }
+    fclose(f);
+}
+
 static int build_fail(const char *fmt, ...)
 {
+    char path[512];
+    const char *file = unquote_file(cur_node_file, path, sizeof path);
     va_list ap;
     va_start(ap, fmt);
-    fprintf(stderr, "ir_build: [%s] ", cur_fn_name);
+    /* Lead with `file:line:` (gcc-style) so editors / make output scanners
+       pick it up; the ir_build tag + function follow the `error:` keyword. */
+    if (file && cur_node_line > 0)
+        fprintf(stderr, "%s:%d: error: ir_build: [%s] ",
+                file, cur_node_line, cur_fn_name);
+    else
+        fprintf(stderr, "ir_build: [%s] ", cur_fn_name);
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
     va_end(ap);
+    build_fail_show_src(cur_node_file, cur_node_line);
     build_fail_emitted = 1;
     return -1;
 }
@@ -234,12 +288,6 @@ static int new_temp_kind(Builder *b, Kind k)
     return v;
 }
 
-/* True for kinds the builder can store in a 2-byte slot. */
-static int is_int2_kind(Kind k)
-{
-    return k == KIND_INT || k == KIND_SHORT || k == KIND_PTR;
-}
-
 /* Integer kinds + _Accum. _Accum ADD/SUB/CMP/NEG are bit-identical
    to integer ops; MUL/DIV need fix-scaling helpers and bail. */
 static int is_register_int_kind(Kind k)
@@ -307,10 +355,6 @@ static int is_acc_float_kind(Kind k)
 static int sym_is_namespaced(const SYMBOL *sym)
 {
     return sym && sym->ctype && sym->ctype->namespace != NULL;
-}
-static int type_is_namespaced(const Type *t)
-{
-    return t && t->namespace != NULL;
 }
 /* Namespace name carried by a type itself OR by its pointee (a pointer/
    array type tags the space on ->ptr). NULL = default address space. */
@@ -460,8 +504,12 @@ static const char *acc_int_name(const char *stem, int is_unsigned)
     if (!strcmp(stem, "and")) return "l_i64_and";
     if (!strcmp(stem, "or"))  return "l_i64_or";
     if (!strcmp(stem, "xor")) return "l_i64_xor";
-    if (!strcmp(stem, "shl")) return "l_i64_asl";
-    if (!strcmp(stem, "shr")) return is_unsigned ? "l_i64_asr_u" : "l_i64_asr";
+    /* Shift count never exceeds 63, so it always fits in A — use the
+       count-in-A entries (l_i64_aslo/asro/asr_uo) and never widen the count
+       to an i64 (the l_i64_asl/asr entries just copy __i64_acc's low byte
+       into A and fall through to these). */
+    if (!strcmp(stem, "shl")) return "l_i64_aslo";
+    if (!strcmp(stem, "shr")) return is_unsigned ? "l_i64_asr_uo" : "l_i64_asro";
     if (!strcmp(stem, "lt"))  return is_unsigned ? "l_i64_ult" : "l_i64_lt";
     if (!strcmp(stem, "le"))  return is_unsigned ? "l_i64_ule" : "l_i64_le";
     if (!strcmp(stem, "gt"))  return is_unsigned ? "l_i64_ugt" : "l_i64_gt";
@@ -469,6 +517,17 @@ static const char *acc_int_name(const char *stem, int is_unsigned)
     if (!strcmp(stem, "eq"))  return "l_i64_eq";
     if (!strcmp(stem, "ne"))  return "l_i64_ne";
     return NULL;
+}
+
+/* Operands of these stems are interchangeable, so the lowerer may push
+   whichever is already accumulator-resident (skipping a reload). Excludes
+   sub/div/mod/shifts and the ordered compares (lt/le/gt/ge). */
+static int acc_stem_commutative(const char *stem)
+{
+    return stem && (!strcmp(stem, "add") || !strcmp(stem, "and")
+                 || !strcmp(stem, "or")  || !strcmp(stem, "xor")
+                 || !strcmp(stem, "mul") || !strcmp(stem, "eq")
+                 || !strcmp(stem, "ne"));
 }
 
 /* Accumulator-tier helper name for an op stem, by the active maths
@@ -708,7 +767,7 @@ static int init_typed_region(Builder *b, int base, int off,
             Type *fld = array_get_byindex(tag->fields, i);
             if (!fld) continue;
             if (fld->bit_size > 0) {
-                if (!fld->name || !fld->name[0]) continue;  /* unnamed: zeroed */
+                if (!fld->name[0]) continue;  /* unnamed: zeroed */
                 Node *sub = (ii < n_init)
                           ? array_get_byindex(init->stmts, ii) : NULL;
                 ii++;
@@ -891,6 +950,7 @@ static int emit_acc_binop(Builder *b, const char *stem, int lv, int rv)
     hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
     hi->acc_push = acc_name("push"); hi->acc_loadpush = acc_name("loadpush");
     hi->acc_width = w; hi->acc_holds_lhs = 0; hi->acc_store_bc = 0;
+    hi->acc_commutative = acc_stem_commutative(stem);
     op->hcall = hi;
     return dst;
 }
@@ -976,6 +1036,35 @@ static int emit_acc_int_binop(Builder *b, const char *stem,
     hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
     hi->acc_push = "l_i64_push"; hi->acc_loadpush = NULL;
     hi->acc_width = 8; hi->acc_holds_lhs = 0; hi->acc_store_bc = 1;
+    hi->acc_commutative = acc_stem_commutative(stem);
+    op->hcall = hi;
+    return dst;
+}
+
+/* i64 shift (stem "shl"/"shr"): `val` is the i64 value (pushed), the count's
+   low byte goes in A — the count-in-A helper entries shift by A, so the count
+   is never widened to an i64. A LITERAL count (has_imm) is emitted as `ld a,N`
+   (args[1]=-1, op->imm=N); a variable count is the int vreg `count` (loaded to
+   A after the value push, so it must be slot-backed — the allocator slots it
+   as it's live across the push). Returns the result. */
+static int emit_acc_int_shift(Builder *b, const char *stem, int val,
+                              int count, int64_t imm, int has_imm,
+                              int is_unsigned)
+{
+    const char *name = acc_int_name(stem, is_unsigned);
+    if (!name) return -1;
+    int dst = new_temp_kind(b, KIND_LONGLONG);
+    int *args = calloc(2, sizeof(int));
+    args[0] = val; args[1] = has_imm ? -1 : count;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_BINOP);
+    op->dst = dst;
+    if (has_imm) op->imm = imm & 0xff;     /* shift count, 0..63 */
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 2; hi->ret_vreg = dst;
+    hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
+    hi->acc_push = "l_i64_push"; hi->acc_loadpush = NULL;
+    hi->acc_width = 8; hi->acc_holds_lhs = 0; hi->acc_store_bc = 1;
+    hi->acc_count_in_a = 1;
     op->hcall = hi;
     return dst;
 }
@@ -983,14 +1072,19 @@ static int emit_acc_int_binop(Builder *b, const char *stem,
 /* Wide-accumulator i64 compare (IR_ACC_CMP): l_i64_{lt,le,gt,ge,eq,ne}
    (+ unsigned ult/… variants) → int 0/1 bool in HL. Same push/load dance
    as the binop; no accumulator store. Returns the width-2 int dst or -1. */
-static int emit_acc_int_cmp(Builder *b, const char *cstem,
-                            int lv, int rv, int is_unsigned)
+/* `l_pool`/`r_pool` >= 0 mark that operand as a literal-pool constant (i_<litlab>)
+   rather than a vreg — the lowerer loads it directly into the accumulator, so it
+   needs no materialised slot, and the other (computed) operand stays adjacent to
+   its producer (its store then drops out). -1 = ordinary vreg lv/rv. */
+static int emit_acc_int_cmp(Builder *b, const char *cstem, int lv, int l_pool,
+                            int rv, int r_pool, int is_unsigned)
 {
     const char *name = acc_int_name(cstem, is_unsigned);
     if (!name) return -1;
     int dst = new_temp_kind(b, KIND_INT);
     int *args = calloc(2, sizeof(int));
-    args[0] = lv; args[1] = rv;
+    args[0] = (l_pool >= 0) ? -1 : lv;
+    args[1] = (r_pool >= 0) ? -1 : rv;
     Op *op = ir_op_emit(cur_bb(b), IR_ACC_CMP);
     op->dst = dst;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
@@ -998,6 +1092,9 @@ static int emit_acc_int_cmp(Builder *b, const char *cstem,
     hi->acc_load = "l_i64_load"; hi->acc_push = "l_i64_push";
     hi->acc_loadpush = NULL;
     hi->acc_width = 8; hi->acc_holds_lhs = 0;
+    hi->acc_commutative = acc_stem_commutative(cstem);
+    if (l_pool >= 0) { hi->acc_src_is_pool[0] = 1; hi->acc_src_litlab[0] = l_pool; }
+    if (r_pool >= 0) { hi->acc_src_is_pool[1] = 1; hi->acc_src_litlab[1] = r_pool; }
     op->hcall = hi;
     return dst;
 }
@@ -1698,16 +1795,27 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
     int is_uns = is_shift
         ? n->left->type->isunsigned
         : (n->left->type->isunsigned || n->right->type->isunsigned);
-    int rv = build_expr(b, n->right);
-    if (rv < 0) return -1;
-    /* Promote a narrower rhs to long long (`x += 3`). */
-    rv = promote_to_acc_int(b, rv, n->right->type->isunsigned);
-    if (rv < 0) return -1;
+    /* A literal shift count becomes an immediate (no count vreg); otherwise
+       build it. For a shift the count stays an int (low byte in A, not widened);
+       other ops promote the rhs to long long (`x += 3`). */
+    Node *cn = n->right;
+    int count_is_imm = is_shift && cn && cn->ast_type == AST_LITERAL;
+    int64_t count_imm = count_is_imm ? (int64_t)cn->zval : 0;
+    int rv = -1;
+    if (!count_is_imm) {
+        rv = build_expr(b, n->right);
+        if (rv < 0) return -1;
+        if (!is_shift) {
+            rv = promote_to_acc_int(b, rv, n->right->type->isunsigned);
+            if (rv < 0) return -1;
+        }
+    }
 
     if (lvn->ast_type == AST_LOCAL_VAR) {
         int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
         if (lhs_v < 0) return build_fail("ll compound-assign: unknown local");
-        int res = emit_acc_int_binop(b, stem, lhs_v, rv, is_uns);
+        int res = is_shift ? emit_acc_int_shift(b, stem, lhs_v, rv, count_imm, count_is_imm, is_uns)
+                           : emit_acc_int_binop(b, stem, lhs_v, rv, is_uns);
         if (res < 0) return -1;
         ir_emit_mov(cur_bb(b), lhs_v, res);
         return lhs_v;
@@ -1719,7 +1827,8 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
         Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
         ld->dst = loaded; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g;
         ld->mem.elem = KIND_LONGLONG;
-        int res = emit_acc_int_binop(b, stem, loaded, rv, is_uns);
+        int res = is_shift ? emit_acc_int_shift(b, stem, loaded, rv, count_imm, count_is_imm, is_uns)
+                           : emit_acc_int_binop(b, stem, loaded, rv, is_uns);
         if (res < 0) return -1;
         Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
         st->src[0] = res; st->mem.kind = IR_MEM_SYM; st->mem.sym = g;
@@ -1735,7 +1844,8 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
     ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
     ld->mem.base = ptr_v; ld->mem.elem = KIND_LONGLONG;
     ld->mem.bank_fn = bf;
-    int res = emit_acc_int_binop(b, stem, loaded, rv, is_uns);
+    int res = is_shift ? emit_acc_int_shift(b, stem, loaded, rv, count_imm, count_is_imm, is_uns)
+                       : emit_acc_int_binop(b, stem, loaded, rv, is_uns);
     if (res < 0) return -1;
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
     st->src[0] = res; st->mem.kind = IR_MEM_VREG;
@@ -1954,11 +2064,19 @@ static int build_binop_float(Builder *b, Node *n)
         if (cstem) {
             int lf = build_operand_as_acc(b, n->left);
             if (lf < 0) return build_fail("float cmp: lhs not promotable");
-            int rf = build_operand_as_acc(b, n->right);
-            if (rf < 0) return build_fail("float cmp: rhs not promotable");
+            /* A genuine double literal RHS becomes a direct pool constant
+               (loaded into FA by the compare), so the computed LHS stays
+               adjacent to its producer and that store drops out. Only for a
+               real FA accumulator (c_fp_size > 4); a 4-byte register-tier
+               double doesn't go through this slot-resident acc path. */
+            int r_pool = (c_fp_size > 4 && n->right && n->right->ast_type == AST_LITERAL
+                          && n->right->type && n->right->type->kind == KIND_DOUBLE)
+                       ? ir_pool_litlab_double(n->right->zval) : -1;
+            int rf = (r_pool >= 0) ? -1 : build_operand_as_acc(b, n->right);
+            if (r_pool < 0 && rf < 0) return build_fail("float cmp: rhs not promotable");
             int dst = new_temp_kind(b, KIND_INT);
             int *cargs = calloc(2, sizeof(int));
-            cargs[0] = lf; cargs[1] = rf;
+            cargs[0] = lf; cargs[1] = (r_pool >= 0) ? -1 : rf;
             Op *cop = ir_op_emit(cur_bb(b), IR_ACC_CMP);
             cop->dst = dst;
             HelperInfo *chi = calloc(1, sizeof(HelperInfo));
@@ -1968,6 +2086,8 @@ static int build_binop_float(Builder *b, Node *n)
             chi->acc_push = acc_name("push");
             chi->acc_loadpush = acc_name("loadpush");
             chi->acc_width = c_fp_size; chi->acc_holds_lhs = 0;
+            chi->acc_commutative = acc_stem_commutative(cstem);
+            if (r_pool >= 0) { chi->acc_src_is_pool[1] = 1; chi->acc_src_litlab[1] = r_pool; }
             cop->hcall = chi;
             return dst;
         }
@@ -2079,16 +2199,49 @@ static int build_binop_i64(Builder *b, Node *n)
         : ((lvt && lvt->isunsigned) || (rvt && rvt->isunsigned));
     int l = build_expr(b, n->left);
     if (l < 0) return -1;
-    int r = build_expr(b, n->right);
-    if (r < 0) return -1;
-    /* Promote mixed int operands to long long (C promotion; for a shift the
-       count widens too — the helper reads its low byte from __i64_acc). */
+    int is_shift = stem && (!strcmp(stem, "shl") || !strcmp(stem, "shr"));
+    if (is_shift) {
+        /* value -> i64; the count stays an int (low byte in A). A literal
+           count goes straight to an immediate, materialising no count vreg. */
+        l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
+        if (l < 0) return -1;
+        Node *cn = n->right;
+        int dst;
+        if (cn && cn->ast_type == AST_LITERAL) {
+            dst = emit_acc_int_shift(b, stem, l, -1, (int64_t)cn->zval, 1, is_uns);
+        } else {
+            int r = build_expr(b, n->right);
+            if (r < 0) return -1;
+            dst = emit_acc_int_shift(b, stem, l, r, 0, 0, is_uns);
+        }
+        if (dst < 0) return build_fail("i64 shift emit failed");
+        return dst;
+    }
+    if (stem) {
+        int r = build_expr(b, n->right);
+        if (r < 0) return -1;
+        l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
+        r = promote_to_acc_int(b, r, rvt && rvt->isunsigned);
+        if (l < 0 || r < 0) return -1;
+        int dst = emit_acc_int_binop(b, stem, l, r, is_uns);
+        if (dst < 0) return build_fail("i64 binop emit failed");
+        return dst;
+    }
+    /* Compare: a literal right operand becomes a pool constant the compare
+       loads directly (no vreg), keeping the computed left operand adjacent to
+       its producer so the producer's store drops out. */
+    int r_pool = (n->right && n->right->ast_type == AST_LITERAL)
+               ? ir_pool_litlab_llong((int64_t)n->right->zval) : -1;
+    int r = (r_pool >= 0) ? -1 : build_expr(b, n->right);
+    if (r_pool < 0 && r < 0) return -1;
     l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
-    r = promote_to_acc_int(b, r, rvt && rvt->isunsigned);
-    if (l < 0 || r < 0) return -1;
-    int dst = stem ? emit_acc_int_binop(b, stem, l, r, is_uns)
-                   : emit_acc_int_cmp(b, cstem, l, r, is_uns);
-    if (dst < 0) return build_fail("i64 binop/cmp emit failed");
+    if (l < 0) return -1;
+    if (r_pool < 0) {
+        r = promote_to_acc_int(b, r, rvt && rvt->isunsigned);
+        if (r < 0) return -1;
+    }
+    int dst = emit_acc_int_cmp(b, cstem, l, -1, r, r_pool, is_uns);
+    if (dst < 0) return build_fail("i64 cmp emit failed");
     return dst;
 }
 
@@ -2543,6 +2696,10 @@ static inline int get_dest_typed(Builder *b, int hint, int width, Kind kind)
 
 static int build_expr_hinted(Builder *b, Node *n, int hint)
 {
+    if (n && n->filename && n->line > 0) {
+        cur_node_file = n->filename;
+        cur_node_line = n->line;
+    }
     if (!n) return build_fail("null expr node");
 
     switch (n->ast_type) {
@@ -3216,7 +3373,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            and uses an overlapping-`ldir` fill for larger ones. Any const
            count (1..65536, ldir's BC limit) inlines; non-const falls
            through to the library memset (redirected below). */
-        if (n->sym->name && strcmp(n->sym->name, "__builtin_memset") == 0
+        if (strcmp(n->sym->name, "__builtin_memset") == 0
             && n_args == 3) {
             Node *cnt = array_get_byindex(n->args, 2);
             if (cnt && cnt->ast_type == AST_LITERAL
@@ -3239,7 +3396,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            tiny counts unroll, larger ones use `ldir`, any const count
            (1..65536) inlines; non-const falls back to the library
            memcpy. memcpy returns dst (the dst vreg still holds it). */
-        if (n->sym->name && strcmp(n->sym->name, "__builtin_memcpy") == 0
+        if (strcmp(n->sym->name, "__builtin_memcpy") == 0
             && n_args == 3) {
             Node *cnt = array_get_byindex(n->args, 2);
             if (cnt && cnt->ast_type == AST_LITERAL
@@ -3260,7 +3417,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* Inline __builtin_strcpy (always — variable length, no const
            needed): IR_STRCPY (dst, src), lowered to a NUL-terminated
            copy loop. strcpy returns dst. */
-        if (n->sym->name && strcmp(n->sym->name, "__builtin_strcpy") == 0
+        if (strcmp(n->sym->name, "__builtin_strcpy") == 0
             && n_args == 2 && ir_inline_block_ops_ok()) {
             int dst_v = build_expr(b, array_get_byindex(n->args, 0));
             if (dst_v < 0) return -1;
@@ -3276,7 +3433,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            string, src[1] = char vreg (or -1 + imm for a literal char),
            lowered to a scan loop leaving the match pointer / NULL in the
            result vreg. */
-        if (n->sym->name && strcmp(n->sym->name, "__builtin_strchr") == 0
+        if (strcmp(n->sym->name, "__builtin_strchr") == 0
             && n_args == 2 && ir_inline_block_ops_ok()) {
             Node *c_node = array_get_byindex(n->args, 1);
             int str_v = build_expr(b, array_get_byindex(n->args, 0));
@@ -3424,7 +3581,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            same-name/same-ABI library function, which the smallc lib
            provides; the prefix/ABI come from the (LIBRARY __smallc)
            builtin sym, so only the emitted name changes. */
-        if (n->sym->name && strncmp(n->sym->name, "__builtin_", 10) == 0) {
+        if (strncmp(n->sym->name, "__builtin_", 10) == 0) {
             const char *base = n->sym->name + 10;
             if (!strcmp(base, "memset") || !strcmp(base, "memcpy")
              || !strcmp(base, "strcpy") || !strcmp(base, "strchr"))
@@ -3813,7 +3970,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->src[0] = src;
             return dst;
         }
-        return build_fail("OP_ADDR on non-global/non-local not yet supported");
+        return build_fail("cannot take the address of a non-lvalue — `&` needs "
+                          "a variable, *ptr, array element or struct member, not "
+                          "an expression/rvalue (operand ast_type=%d; e.g. `&&x` "
+                          "or a macro that already added `&`)",
+                          n->operand ? (int)n->operand->ast_type : -1);
 
     case AST_TERNARY: {
         /* Ternary as expression: cond ? then_e : els_e, both arms
@@ -4008,6 +4169,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         return last;
     }
 
+    case AST_ASM: {
+        /* Inline asm used as an expression VALUE (a z88dk/BDS-C extension,
+           e.g. bdscio.h's `#define sbrk(a) malloc(a)?asm("\n"):-1`). The asm
+           leaves its result in the return register(s) — HL for width <= 2,
+           DEHL for width 4 — exactly like a function-call return. The width
+           follows the consuming context: the caller's hint when present,
+           else the node's resolved type, else int. A width-4 (long/pointer)
+           context trusts DEHL as the asm left it — NO HL->DEHL widening (the
+           asm is responsible for filling the high half). */
+        int w = (hint >= 0) ? b->f->vregs[hint].width
+              : (n->type ? type_width(n->type) : 2);
+        if (w != 1 && w != 2 && w != 4) w = 2;
+        int dst = new_temp(b, w);
+        b->f->vregs[dst].width = (int16_t)w;
+        Op *op = ir_op_emit(cur_bb(b), IR_ASM);
+        op->asm_text = n->labelname;
+        op->dst = dst;
+        return dst;
+    }
+
     default:
         return build_fail("unsupported expr ast_type=%d", (int)n->ast_type);
     }
@@ -4109,6 +4290,25 @@ static int build_assign(Builder *b, Node *n)
                          ? n->left->sym->ctype->ptr : NULL;
             int elem_w = type_width(elem_t);
             Kind elem_k = elem_t ? elem_t->kind : KIND_INT;
+            /* Wide float/double element (`double a[N]; a[0] = x;`): build the
+               RHS as a float (converting an int RHS to the element's format)
+               and store via IR_ST_MEM's acc path. The integer LEA+ST_MEM
+               below would CONV_TRUNC the float to garbage / bail on width 6. */
+            if (is_acc_float_kind(elem_k)) {
+                int rhs_v = build_expr(b, n->right);
+                if (rhs_v < 0) return -1;
+                if (!is_acc_float_kind(node_value_kind(n->right)))
+                    rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, elem_k);
+                int faddr = new_temp(b, 2);
+                Op *flea = ir_op_emit(cur_bb(b), IR_LEA);
+                flea->dst = faddr; flea->src[0] = dst_v;
+                Op *fst = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                fst->src[0]   = rhs_v;
+                fst->mem.kind = IR_MEM_VREG;
+                fst->mem.base = faddr;
+                fst->mem.elem = elem_k;
+                return rhs_v;
+            }
             if (elem_w != 1 && elem_w != 2 && elem_w != 4)
                 return build_fail("OP_ASSIGN aggregate elem width %d",
                                   elem_w);
@@ -5562,8 +5762,11 @@ static int build_stmt(Builder *b, Node *n)
     /* Stamp source location on every op emitted for this stmt — the
        lowerer reads it to drive C_LINE / -cc emission. AST_COMPOUND_STMT
        recurses, so child stmts will override before their ops fire. */
-    if (n->filename && n->line > 0)
+    if (n->filename && n->line > 0) {
         ir_set_emit_loc(n->filename, n->line);
+        cur_node_file = n->filename;   /* also for build_fail diagnostics */
+        cur_node_line = n->line;
+    }
 
     switch (n->ast_type) {
 
@@ -5939,46 +6142,29 @@ static int build_stmt(Builder *b, Node *n)
         return 0;
     }
 
-    default:
-        /* Expression statement — many AST_FUNC_CALL, OP_*, etc. land
-           here. Walk as an expression and discard the result. Same set
-           the AST validates as legal in statement context (any
-           side-effecting expression). */
-        if (n->ast_type == AST_FUNC_CALL ||
-            n->ast_type == AST_FUNCPTR_CALL ||
-            n->ast_type == OP_ASSIGN ||
-            n->ast_type == OP_AADD || n->ast_type == OP_ASUB ||
-            n->ast_type == OP_AAND || n->ast_type == OP_AOR ||
-            n->ast_type == OP_AXOR ||
-            n->ast_type == OP_AMULT || n->ast_type == OP_ADIV ||
-            n->ast_type == OP_AMOD || n->ast_type == OP_ASSHR ||
-            n->ast_type == OP_ASSHL ||
-            n->ast_type == OP_PRE_INC || n->ast_type == OP_POST_INC ||
-            n->ast_type == OP_PRE_DEC || n->ast_type == OP_POST_DEC ||
-            n->ast_type == OP_DEREF ||
-            n->ast_type == OP_CAST ||
-            n->ast_type == AST_STR_LIT ||
-            n->ast_type == AST_LITERAL) {
-            /* OP_DEREF / OP_CAST as a statement — discarded read, but
-               the operand may carry side effects (`*p++;`, function
-               call return, etc.). Walk as an expression; the loaded
-               value just lands in a dead vreg. AST_STR_LIT / AST_LITERAL
-               as a bare statement (`"foo";` / `42;`) are side-effect-free
-               no-ops — walk-and-discard leaves a dead vreg DCE removes. */
-            int v = build_expr(b, n);
-            (void)v;
-            return v < 0 ? -1 : 0;
-        }
-        if (n->ast_type == AST_ASM) {
-            /* `asm("...")` / `__asm__` / `#asm` block. Pass the
-               captured text through verbatim; the IR pipeline treats
-               it as a full register/memory clobber (handled by the
-               lowerer's IR_ASM emit + cache invalidations). */
-            Op *op = ir_op_emit(cur_bb(b), IR_ASM);
-            op->asm_text = n->labelname;
-            return 0;
-        }
-        return build_fail("unsupported stmt ast_type=%d", (int)n->ast_type);
+    case AST_ASM: {
+        /* `asm("...")` / `__asm__` / `#asm` block. Pass the captured
+           text through verbatim; the IR pipeline treats it as a full
+           register/memory clobber (handled by the lowerer's IR_ASM emit
+           + cache invalidations). */
+        Op *op = ir_op_emit(cur_bb(b), IR_ASM);
+        op->asm_text = n->labelname;
+        return 0;
+    }
+
+    default: {
+        /* Expression statement — every other node in statement position is
+           an expression whose result is discarded (the parser only places
+           expression nodes here). Function calls, assignments, compound
+           assigns, inc/dec, casts, derefs all carry side effects; pure
+           expressions (`a == b;`, `x + y;`, a bare var, `a ? b : c;`,
+           `"foo";`, `42;`) are no-ops that leave a dead vreg DCE removes.
+           A side-effecting subexpression (`arr[i++];`, `(a=f())==0;`)
+           still fires. build_expr emits its own diagnostic for a node it
+           genuinely cannot build, so a real gap is never silent. */
+        int v = build_expr(b, n);
+        return v < 0 ? -1 : 0;
+    }
     }
 }
 

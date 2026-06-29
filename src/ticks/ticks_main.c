@@ -371,6 +371,7 @@ int main (int argc, char **argv){
         *get_memory_addr(0x19, MEM_TYPE_INST) = 0xFE;
         *get_memory_addr(0x1a, MEM_TYPE_INST) = 0xC9;
         c_rc2014_mode = 1;
+        if (pc + size > 0x10000) { fclose(fh); exit_log(1, "Binary too large: %d bytes at 0x%04X exceeds 64K\n", size, pc); }
         if (1 != fread(get_memory_addr(pc, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
         *get_memory_addr(5, MEM_TYPE_INST) = 0xED;
@@ -391,6 +392,7 @@ int main (int argc, char **argv){
 
         pc = 256;
         // CP/M emulator
+        if (256 + size > 0x10000) { fclose(fh); exit_log(1, "Binary too large: %d bytes at 0x0100 exceeds 64K\n", size); }
         if (1 != fread(get_memory_addr(256, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else {
         int l;

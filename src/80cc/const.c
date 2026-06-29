@@ -386,7 +386,6 @@ void offset_of(LVALUE *lval)
 void size_of(LVALUE* lval)
 {
     char sname[NAMESIZE];
-    int length;
     Type *type;
     SYMBOL *ptr;
     int          deref = 0;

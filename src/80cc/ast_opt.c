@@ -43,18 +43,9 @@ static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
     case OP_SUB:  *out = l - r; return 1;
     case OP_MULT: *out = l * r; return 1;
     case OP_DIV:  if (r == 0) return 0; *out = l / r; return 1;
-    /* CAVEAT — signed `%` folds with C99 semantics (remainder takes the
-       dividend's sign): -1 % 2 == -1. sdcc folds it identically and fails the
-       same sccz80 division-suite cases we do — so 80cc matches sdcc here, NOT
-       a regression. sccz80 alone passes the suite: it does NOT fold signed
-       `% 2^k` at all — it strength-reduces to inline `|val| & mask` (always
-       non-negative, -1 % 2 -> 1), with l_div for other divisors. That mix
-       follows no single convention (it yields 1 % -32 == 1 but -1 % -4 == -1),
-       and the suite was written to it. So our C99 fold is correct and
-       sdcc-consistent; "matching sccz80" would mean reproducing its non-C99
-       ad-hoc modulo in the fold. Left as-is pending a decision on whether to
-       make z88dk's signed `%` C99-conforming lib-wide. (Signed `/` agrees with
-       the runtime either way: both truncate toward zero, like C99.) */
+    /* Signed `/` and `%` fold with C99 semantics (truncate toward zero;
+       remainder takes the dividend's sign, -1 % 2 == -1), matching the runtime
+       l_div / l_long_mod helpers and sdcc. */
     case OP_MOD:  if (r == 0) return 0; *out = l % r; return 1;
     case OP_AND:  *out = l & r; return 1;
     case OP_OR:   *out = l | r; return 1;
@@ -895,16 +886,6 @@ static int extract_pow2(int64_t v, int *shift)
     }
     *shift = s;
     return 1;
-}
-
-/* True if the operand is integer-class AND fits in a 16-bit register
-   path. Long / longlong / float / accum types have their own legacy
-   paths and aren't worth touching at the AST level. */
-static int is_int_class_16(Node *n)
-{
-    if (!n || !n->type) return 0;
-    Kind k = n->type->kind;
-    return (k == KIND_INT || k == KIND_CHAR || k == KIND_SHORT);
 }
 
 /* True if integer-class up to 32-bit (long included). Used to gate
@@ -2229,10 +2210,17 @@ static Node *cse_walk(Node *node, cse_env *env, int *had_break)
             cse_env_clear(env);
         } else if (lhs_sym) {
             cse_env_invalidate_sym(env, lhs_sym);
+            /* Record only when the destination is a local: the substitution
+               (cse_make_lv_deref) reads the recorded sym back as an
+               AST_LOCAL_VAR. A global destination would be re-read as a
+               bogus "unknown local" and abort the build, so globals are
+               invalidated above but never recorded (as the comment in
+               cse_walk_lvalue notes). */
             if (node->right
                 && is_cse_interesting(node->right)
                 && is_side_effect_free(node->right)
-                && lhs_sym->ctype && !lhs_sym->ctype->isvolatile) {
+                && lhs_sym->ctype && !lhs_sym->ctype->isvolatile
+                && node->left->ast_type != AST_GLOBAL_VAR) {
                 cse_env_add(env, node->right, lhs_sym);
             }
         }
