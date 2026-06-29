@@ -487,6 +487,13 @@ int heira(LVALUE *lval)
             rvalue(lval);
         lval->const_val = !lval->const_val;
         lval->node = ast_uop(OP_LNEG, lval->node);
+        /* `!x` always yields int (C §6.5.3.3). Reset the lvalue type so a
+           surrounding expression doesn't inherit the operand's signedness
+           — `!ui * -1 < 0` must compare SIGNED (else -1 reads as 0xffff
+           and the `<0` is false). */
+        lval->ltype = type_int;
+        lval->val_type = KIND_INT;
+        if (lval->node) lval->node->type = type_int;
         return 0;
     } else if (cmatch('-')) {
         if (heira(lval))

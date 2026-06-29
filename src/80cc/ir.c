@@ -37,6 +37,7 @@ static const OpInfo op_table[] = {
     /* aliased two-op arithmetic */
     [IR_ADD]                = { "ADD",                  1, 0 },
     [IR_SUB]                = { "SUB",                  1, 0 },
+    [IR_RSUB]               = { "RSUB",                 1, 0 },
     [IR_AND]                = { "AND",                  1, 0 },
     [IR_OR]                 = { "OR",                   1, 0 },
     [IR_XOR]                = { "XOR",                  1, 0 },

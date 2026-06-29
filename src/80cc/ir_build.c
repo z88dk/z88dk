@@ -93,6 +93,18 @@ static void builder_free(Builder *b)
 
 static void sym_map_set(Builder *b, SYMBOL *sym, int vreg)
 {
+    /* Rebind an existing entry rather than appending a shadow. The legacy
+       symbol table reuses one SYMBOL for same-named locals in sequential
+       (non-overlapping) scopes — e.g. two `for (unsigned long i ...)` in a
+       row. sym_map_get returns the FIRST match, so an append left the
+       second `i`'s references resolving to the FIRST loop's vreg: the new
+       loop's counter was never initialised and ran from a stale value. */
+    for (int i = 0; i < b->sym_map_n; i++) {
+        if (b->sym_map[i].sym == sym) {
+            b->sym_map[i].vreg = vreg;
+            return;
+        }
+    }
     if (b->sym_map_n >= b->sym_map_cap) {
         b->sym_map_cap = b->sym_map_cap ? b->sym_map_cap * 2 : 8;
         b->sym_map = realloc(b->sym_map,
@@ -199,6 +211,21 @@ static int is_supported_float_kind(Kind k)
 {
     return k == KIND_FLOAT16
         || (k == KIND_DOUBLE && c_fp_size == 4);
+}
+
+/* The value kind an operand actually produces. A function-pointer call
+   node keeps its KIND_FUNC type because the call lowering still reads
+   return_type/flags/funcattrs from it (direct calls are unwrapped to the
+   return type by normalize_types; fnptr calls are not). For type
+   inspection (e.g. choosing a float compare helper) we want the call's
+   return kind, not KIND_FUNC. */
+static Kind node_value_kind(Node *n)
+{
+    if (!n || !n->type) return KIND_NONE;
+    if ((n->ast_type == AST_FUNCPTR_CALL || n->ast_type == AST_FUNC_CALL)
+        && n->type->kind == KIND_FUNC && n->type->return_type)
+        return n->type->return_type->kind;
+    return n->type->kind;
 }
 
 /* Wide memory-accumulator float kind: KIND_DOUBLE in a 5/6-byte (d* /
@@ -1666,8 +1693,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            (KIND_DOUBLE, all float compares) bails to the walker. */
         {
             Kind res_k = n->type ? n->type->kind : KIND_NONE;
-            Kind lkf = (n->left  && n->left->type)  ? n->left->type->kind  : KIND_NONE;
-            Kind rkf = (n->right && n->right->type) ? n->right->type->kind : KIND_NONE;
+            Kind lkf = node_value_kind(n->left);
+            Kind rkf = node_value_kind(n->right);
             if (kind_is_floating(res_k) || kind_is_floating(lkf)
                 || kind_is_floating(rkf)) {
                 if (is_supported_float_kind(res_k)
@@ -1910,6 +1937,37 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             }
         }
 
+        /* `lit - var` is non-commutative, so the swap above left the
+           literal on the LHS. Rather than materialise it into a vreg
+           (which forces a push/pop to preserve it across the var load
+           on every CPU without a register-preserving slot load), emit
+           IR_RSUB (dst = imm - src[0]); the lowerer does immediate-
+           minus-register. Int width only — long stays on the SUB path. */
+        if (k == IR_SUB
+            && lhs && lhs->ast_type == AST_LITERAL
+            && rhs && rhs->ast_type != AST_LITERAL
+            && rhs->type && is_supported_int_kind(rhs->type->kind)
+            && (int)type_width(rhs->type) <= 2
+            && (!n->type || (int)type_width(n->type) <= 2)
+            && (int64_t)lhs->zval >= -32768 && (int64_t)lhs->zval <= 65535) {
+            int rv = build_expr(b, rhs);
+            if (rv < 0) return -1;
+            if (b->f->vregs[rv].width == 1) {
+                int uns = !rhs->type || rhs->type->isunsigned;
+                int wt = new_temp(b, 2);
+                b->f->vregs[wt].width = 2;
+                Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = wt; cv->src[0] = rv;
+                rv = wt;
+            }
+            int dst = ALLOC_DST(2);
+            Op *op = ir_op_emit(cur_bb(b), IR_RSUB);
+            op->dst = dst; op->src[0] = rv; op->src[1] = -1;
+            op->imm = (int64_t)lhs->zval;
+            b->f->vregs[dst].width = 2;
+            return dst;
+        }
+
         int l = build_expr(b, lhs);
         if (l < 0) return -1;
         int width = b->f->vregs[l].width;
@@ -1996,12 +2054,53 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            shifts). Saves a frame slot and the LD_IMM/store/reload
            churn of the dumb path. */
         if (rhs && rhs->ast_type == AST_LITERAL) {
+            int64_t imm = (int64_t)rhs->zval;
+            /* GT/LE with a const RHS has no correct direct lowering at any
+               width — the const-RHS handlers only exist for LT/GE, and the
+               GT/LE paths read an uninitialised slot for the constant
+               (width-1/2) or fatally bail (width-4). Canonicalize
+               `a>K` -> `a>=K+1` and `a<=K` -> `a<K+1` so it routes to the
+               LT/GE-const path. Exact for integers unless K is the type
+               max (K+1 wraps) — leave that degenerate edge alone. The
+               type max is keyed off the compare's signedness (unsigned for
+               U* kinds) and the operand width. */
+            if (k == IR_CMP_LE || k == IR_CMP_GT
+                || k == IR_CMP_ULE || k == IR_CMP_UGT) {
+                int uns = (k == IR_CMP_ULE || k == IR_CMP_UGT);
+                int64_t mask = (width <= 1) ? 0xFFLL
+                             : (width == 2) ? 0xFFFFLL : 0xFFFFFFFFLL;
+                int64_t tmax = uns ? mask
+                             : ((width <= 1) ? 0x7F
+                              : (width == 2) ? 0x7FFF : 0x7FFFFFFFLL);
+                /* Interpret the literal at the operand's width+signedness:
+                   an unsigned compare with a negative literal (`a <= -1`)
+                   means `a <= UMAX`, not a<=-1. */
+                int64_t eff = uns ? (imm & mask) : imm;
+                int is_le = (k == IR_CMP_LE || k == IR_CMP_ULE);
+                if (eff >= tmax) {
+                    /* `a <= typemax` is always true, `a > typemax` always
+                       false (K+1 would wrap). `a` (= l) was already built;
+                       DCE drops it if its eval is side-effect-free. */
+                    int dst = ALLOC_DST(2);
+                    ir_emit_ld_imm(cur_bb(b), dst, is_le ? 1 : 0);
+                    b->f->vregs[dst].width = 2;
+                    return dst;
+                }
+                switch (k) {
+                case IR_CMP_LE:  k = IR_CMP_LT;  break;
+                case IR_CMP_GT:  k = IR_CMP_GE;  break;
+                case IR_CMP_ULE: k = IR_CMP_ULT; break;
+                case IR_CMP_UGT: k = IR_CMP_UGE; break;
+                default: break;
+                }
+                imm = eff + 1;
+            }
             int dst = ALLOC_DST(dst_w);
             Op *op = ir_op_emit(cur_bb(b), k);
             op->dst    = dst;
             op->src[0] = l;
             op->src[1] = -1;
-            op->imm    = (int64_t)rhs->zval;
+            op->imm    = imm;
             b->f->vregs[dst].width = (int16_t)dst_w;
             return dst;
         }
@@ -2470,8 +2569,16 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             if (elem_w == 0)
                 elem_w = type_width(n->left->type);
             {
+                /* Stored-value kind. Prefer a floating n->type, but also
+                   accept a floating lvalue (n->left->type, the deref'd
+                   member/pointee type) — for a struct-member store like
+                   `gs.d = X` the parser can record n->type as int, which
+                   would mis-size the store below. */
                 Kind dk = (n->type && kind_is_floating(n->type->kind))
                             ? n->type->kind
+                        : (n->left->type
+                           && kind_is_floating(n->left->type->kind))
+                            ? n->left->type->kind
                         : (n->left->type
                            && n->left->type->kind == KIND_PTR
                            && n->left->type->ptr)
@@ -2486,6 +2593,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     op->mem.bank_fn = bf;
                     return rhs_v;
                 }
+                /* 4-byte f32 double: a plain 4-byte DEHL value — store all
+                   4 bytes. n->type can read back as int for the member
+                   shape (elem_w=2 above), which would truncate; force 4. */
+                if (dk == KIND_DOUBLE || dk == KIND_FLOAT)
+                    elem_w = 4;
                 if (is_acc_int_kind(dk)) {
                     /* `*p = X` wide long long store via l_i64_store. */
                     rhs_v = promote_to_acc_int(b, rhs_v,
@@ -2592,6 +2704,47 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
             int ptr_v = build_expr(b, n->left);
             if (ptr_v < 0) return -1;
+            /* Wide-value store (this path otherwise only handles 1/2/4-byte
+               integers). The member/element lvalue type can read back as
+               int (e.g. `gs.d = X` records n->left->type int), so key the
+               float/long-long decision off n->type (the value type).
+               acc-double → dstore; f32 → plain 4-byte store; long long →
+               l_i64_store. */
+            {
+                Kind vk = (n->type && (kind_is_floating(n->type->kind)
+                                       || n->type->kind == KIND_LONGLONG))
+                            ? n->type->kind
+                        : (n->left->type
+                           && (kind_is_floating(n->left->type->kind)
+                               || n->left->type->kind == KIND_LONGLONG))
+                            ? n->left->type->kind : KIND_NONE;
+                if (is_acc_float_kind(vk) || vk == KIND_DOUBLE
+                    || vk == KIND_FLOAT) {
+                    Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                    op->src[0]   = rhs_v;
+                    op->mem.kind = IR_MEM_VREG;
+                    op->mem.base = ptr_v;
+                    /* acc-double uses the dstore helper (elem=DOUBLE); f32
+                       is a plain 4-byte DEHL value (elem=LONG). */
+                    op->mem.elem = is_acc_float_kind(vk) ? KIND_DOUBLE
+                                                         : KIND_LONG;
+                    op->mem.bank_fn = bf;
+                    return rhs_v;
+                }
+                if (is_acc_int_kind(vk)) {
+                    rhs_v = promote_to_acc_int(b, rhs_v,
+                                n->right && n->right->type
+                                && n->right->type->isunsigned);
+                    if (rhs_v < 0) return -1;
+                    Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                    op->src[0]   = rhs_v;
+                    op->mem.kind = IR_MEM_VREG;
+                    op->mem.base = ptr_v;
+                    op->mem.elem = KIND_LONGLONG;
+                    op->mem.bank_fn = bf;
+                    return rhs_v;
+                }
+            }
             /* Prefer n->type (OP_ASSIGN's own type = stored value
                type) over n->left->type->ptr — same as the OP_DEREF-LHS
                #344 fix. For chained assigns the inner OP_ASSIGN's
@@ -2827,6 +2980,33 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             }
             if (is_acc_float_kind(nk))     /* 5/6/8-byte double: minusfa */
                 return emit_acc_float_neg(b, fv);
+            /* 4-byte float (IEEE single / MBF32 / daimath / …): negate is
+               a sign-bit flip. IEEE sign = bit 31 → XOR 0x80000000 (byte
+               D); MBF32 sign = bit 23 → XOR 0x00800000 (byte E). Both
+               match sccz80 neg(). Any other 4-byte format (sign location
+               unknown here) → the l_f32_negate helper. */
+            if (b->f->vregs[fv].width == 4) {
+                uint32_t mask = (c_maths_mode == MATHS_IEEE) ? 0x80000000U
+                              : (c_maths_mode == MATHS_MBFS) ? 0x00800000U
+                              : 0;
+                int dst = new_temp(b, 4);
+                b->f->vregs[dst].width = 4;
+                b->f->vregs[dst].kind  = nk;
+                if (mask) {
+                    Op *op = ir_op_emit(cur_bb(b), IR_XOR);
+                    op->dst = dst; op->src[0] = fv; op->src[1] = -1;
+                    op->imm = (int64_t)mask;
+                } else {
+                    int *args = calloc(1, sizeof(int)); args[0] = fv;
+                    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+                    op->dst = dst;
+                    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+                    hi->name = "l_f32_negate"; hi->args = args;
+                    hi->n_args = 1; hi->ret_vreg = dst;
+                    op->hcall = hi;
+                }
+                return dst;
+            }
             return build_fail("float unary neg kind %d not yet supported",
                               (int)nk);
         }
@@ -3532,6 +3712,36 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int uns = n->type && n->type->isunsigned;
             return emit_acc_lldouble(b, src_v, /*to_double=*/0, uns);
         }
+        /* long long <-> 4-byte f32 double: no acc tier (f32 lives in DEHL,
+           not FA). Emit the conventional l_f32_{s,u}llong2f / f2{s,u}llong
+           helper call. These may be absent from a given f32 lib — prefer a
+           LINK error there over a hard compile-time bail (the call is
+           emitted so the op assembles; the missing symbol surfaces at
+           link). */
+        if (is_acc_int_kind(src_k) && dst_k == KIND_DOUBLE && c_fp_size == 4) {
+            int uns = n->operand->type && n->operand->type->isunsigned;
+            int dst = new_temp(b, 4);
+            b->f->vregs[dst].width = 4; b->f->vregs[dst].kind = KIND_DOUBLE;
+            int *a = calloc(1, sizeof(int)); a[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL); op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = uns ? "l_f32_ullong2f" : "l_f32_sllong2f";
+            hi->args = a; hi->n_args = 1; hi->ret_vreg = dst;
+            op->hcall = hi;
+            return dst;
+        }
+        if (src_k == KIND_DOUBLE && c_fp_size == 4 && is_acc_int_kind(dst_k)) {
+            int uns = n->type && n->type->isunsigned;
+            int dst = new_temp(b, 8);
+            b->f->vregs[dst].width = 8; b->f->vregs[dst].kind = KIND_LONGLONG;
+            int *a = calloc(1, sizeof(int)); a[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL); op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = uns ? "l_f32_f2ullong" : "l_f32_f2sllong";
+            hi->args = a; hi->n_args = 1; hi->ret_vreg = dst;
+            op->hcall = hi;
+            return dst;
+        }
         /* _Float16 <-> 5/6/8-byte double (FA cross-format): l_f48_f16tof
            loads an f16 (HL) into FA; l_f48_ftof16 converts FA back to an
            f16 (HL). Reuse the acc-unop int<->acc shapes — the f16 rides
@@ -3923,8 +4133,15 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int els_bb  = ir_bb_new(b->f);
         int exit_bb = ir_bb_new(b->f);
         /* A hint vreg lets both arms write the value directly — no
-           result temp, and the caller skips the wrapping MOV. */
-        int result  = ALLOC_DST(2);
+           result temp, and the caller skips the wrapping MOV. Size the
+           result from the ternary's type: hardcoding width 2 truncated
+           a double/long/long-long ternary (`c ? da : db`) to its low
+           word via the arm MOVs. */
+        int rw = n->type ? width_for_kind(n->type->kind) : 2;
+        if (rw <= 0) rw = 2;
+        int result  = ALLOC_DST(rw);
+        b->f->vregs[result].width = (int16_t)rw;
+        if (n->type) b->f->vregs[result].kind = n->type->kind;
 
         /* current bb: BR_ZERO to els, then explicit BR to then.
            Conditional jumps are not terminators in our IR — the BB
@@ -4919,15 +5136,29 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
                           fn->name[0] ? fn->name : "?");
     }
 
-    /* Flag the wide-accumulator tier: any vreg wider than 4 bytes is a
-       memory-FA value (Phase 0 invariant), so the function uses the acc
-       helpers — which clobber IX. The lowerer keys -frameix frame layout
-       off this (sp-relative body, IX preserved only). */
-    for (int i = 0; i < f->n_vregs; i++) {
-        if (f->vregs[i].width > 4) { f->uses_acc = 1; break; }
+    /* Flag a function that uses an IX-clobbering maths helper so the
+       lowerer keeps it off the IX frame under -frameix. The only such
+       helper now is genmath (6-byte double, c_fp_size==6): its dcallee
+       shim stashes the return address in IX. long long (l_i64_*) and
+       4/5-byte double (daimath32/cpcmath) preserve IX, so those stay on
+       the frame pointer. */
+    if (c_fp_size == 6) {
+        for (int i = 0; i < f->n_vregs; i++) {
+            if (f->vregs[i].width > 4
+                && f->vregs[i].kind == KIND_DOUBLE) {
+                f->uses_acc = 1;
+                break;
+            }
+        }
     }
 
     rc = ir_lower_to_output(f);
+    /* A lowering failure (ir_lower returns nonzero) used to propagate as a
+       SILENT bail — ir_lower has no build_fail. Name it so the bail is
+       diagnosed (the walker is gone, so this is fatal). ir_lower prints
+       its own `ir_lower: ...` reason above for the specific op. */
+    if (rc != 0 && !build_fail_emitted)
+        build_fail("ir_lower could not lower an op (see ir_lower diagnostic above)");
 
     builder_free(&b);
     ir_func_free(f);

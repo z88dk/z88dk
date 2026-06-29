@@ -16,6 +16,23 @@
 #include <string.h>
 #include <stdint.h>
 
+extern int c_framepointer_is_ix;   /* -1 = no frame pointer (sp mode) */
+
+/* True iff the sp+0 pop/push fastpath could ever fire in this function:
+   sp-mode (no IX frame pointer, or one not actually used) AND a CPU
+   without cheap sp-relative addressing. Mirrors !fp_active(f) &&
+   tos_pushpop_ok(f) in ir_lower.c. When false, seeding the hottest vreg
+   at offset 0 buys nothing, so we leave the slot layout untouched. */
+static int sp0_fastpath_possible(const Func *f)
+{
+    int fp_active = (c_framepointer_is_ix != -1) && !f->is_naked
+                  && !f->uses_acc;
+    if (fp_active) return 0;
+    return !(f->features & (IR_FEAT_ADD_SP_IMM
+                          | IR_FEAT_SP_REL_HL
+                          | IR_FEAT_SP_REL_PAIRS));
+}
+
 void ir_assign_slots(Func *f)
 {
     free(f->vreg_spill_slot);
@@ -129,20 +146,115 @@ void ir_assign_slots(Func *f)
     #undef LIVE_SET
     #undef LIVE_CLEAR
 
+    /* Hotness seed: the sp+0 pop/push fastpath (z80/z180/ez80/808x,
+       sp-mode) only fires on the slot at frame offset 0, and ONLY when
+       no pushes are outstanding (cur_sp_adjust==0 — otherwise the access
+       falls back to the generic ld hl,N;add hl,sp path regardless of
+       offset). So we score each spillable width-2 vreg by its count of
+       *fastpath-eligible* accesses and seed the winner at offset 0.
+
+       cur_sp_adjust resets to 0 at each BB start (the lowerer rebalances
+       the stack at BB boundaries) and goes nonzero between an arg push
+       and its call, and between a long-stack push and its pop. We mirror
+       that with a per-BB push-depth counter; accesses while depth>0 are
+       not eligible and don't count. Non-interfering width-2 vregs still
+       first-fit into offset 0 below — they get the fastpath too. */
+    int hot = -1;
+    if (n_vregs > 0 && sp0_fastpath_possible(f)) {
+        long *use_cnt = calloc((size_t)n_vregs, sizeof(long));
+        if (!use_cnt) {
+            fputs("ir_lower: out of memory (use_cnt)\n", stderr);
+            abort();
+        }
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int depth = 0;   /* outstanding pushes ~ cur_sp_adjust != 0 */
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *op = &bb->ops[j];
+                /* Accesses see the depth at op entry (any value loaded is
+                   read before this op's own push, and a call reads its
+                   slot args while the prior pushes are still live). */
+                if (depth == 0) {
+                    int tmp[16];
+                    int nu = ir_op_uses(op, tmp, 16);
+                    for (int k = 0; k < nu; k++)
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]]++;
+                    int nd = ir_op_defs(op, tmp, 16);
+                    for (int k = 0; k < nd; k++)
+                        if (tmp[k] >= 0 && tmp[k] < n_vregs) use_cnt[tmp[k]]++;
+                }
+                switch (op->kind) {
+                case IR_PUSH_ARG:       depth++; break;
+                case IR_PUSH_DEHL_LONG: depth++; break;
+                case IR_POP_DEHL_LONG:  if (depth > 0) depth--; break;
+                case IR_CALL:           depth = 0; break;  /* pops pre-pushed args */
+                default: break;
+                }
+            }
+        }
+        /* Both width-2 (pop hl;push hl) and width-4 (pop hl;pop de;...)
+           have a sp+0 fastpath; only one vreg can own offset 0. Score by
+           raw clean-access count, width-2 and width-4 competing equally:
+           a width-4 hit saves a bit more per access, but a width-2 slot
+           at offset 0 is SHARED among all non-interfering width-2 vregs
+           (so its value is really the sum of theirs) while width-4 there
+           serves only width-4 vregs. Those roughly cancel, and raw count
+           lets a dominant inner-loop accumulator (often the wide one) win
+           offset 0 without displacing a hotter narrow var elsewhere. */
+        long best = 0;
+        for (int v = 0; v < n_vregs; v++) {
+            if (!needs_slot[v]) continue;
+            VReg *vr = &f->vregs[v];
+            int width = (vr->width > 0) ? vr->width : 2;
+            if (width != 2 && width != 4) continue;
+            /* Skip pinned vregs: addr-taken liveness is under-approximated
+               (escaped addresses outlive IR lifetime) so slot 0 must stay
+               a normal shareable local slot. Params keep their own slots
+               in pass 0 as before. */
+            if (vr->flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN)) continue;
+            if (use_cnt[v] > best) { best = use_cnt[v]; hot = v; }
+        }
+        free(use_cnt);
+    }
+
     /* Greedy slot allocator. slot_members[s] = bitmap of vregs in slot s.
        slot_width[s] = byte width. A new vreg can join slot s iff it
        doesn't interfere with any current member of s. */
     uint32_t *slot_members = NULL;
     int      *slot_width   = NULL;
+    char     *slot_excl    = NULL;   /* slot holds a pinned (param/addr-taken)
+                                        vreg → never share it: its live range
+                                        is under-approximated (an escaped &v
+                                        outlives the IR-visible lifetime; a
+                                        param slot is fixed by the prologue) */
     int       slot_cap     = 0;
     int       slot_n       = 0;
     int       offset       = 0;
     #define SLOT_ROW(s) (&slot_members[(s) * row_words])
 
+    /* Place the hot vreg first so it lands at offset 0. */
+    if (hot >= 0 && row_words > 0) {
+        int hot_w = (f->vregs[hot].width > 0) ? f->vregs[hot].width : 2;
+        slot_cap = 16;
+        slot_members = calloc((size_t)slot_cap * row_words, sizeof(uint32_t));
+        slot_width   = malloc((size_t)slot_cap * sizeof(int));
+        slot_excl    = calloc((size_t)slot_cap, sizeof(char));
+        if (!slot_members || !slot_width || !slot_excl) {
+            fputs("ir_lower: out of memory (slot tables)\n", stderr);
+            abort();
+        }
+        slot_width[0] = hot_w;   /* hot is never pinned (see best-loop skip) */
+        slot_n = 1;
+        f->vreg_spill_slot[hot] = 0;
+        offset = hot_w;
+        SLOT_ROW(0)[hot >> 5] |= (uint32_t)1 << (hot & 31);
+    }
+
     /* Pass 0: params and addr-taken — own slot each, vreg-id order.
        Pass 1: others — first-fit across existing same-width slots. */
     for (int pass = 0; pass < 2; pass++) {
         for (int v = 0; v < n_vregs; v++) {
+            if (v == hot) continue;   /* already seeded at offset 0 */
             if (!needs_slot[v]) {
                 if (pass == 0) f->vreg_spill_slot[v] = -1;
                 continue;
@@ -161,6 +273,7 @@ void ir_assign_slots(Func *f)
                 uint32_t *vrow = INTERF_ROW(v);
                 for (int s = 0; s < slot_n; s++) {
                     if (slot_width[s] != width) continue;
+                    if (slot_excl[s]) continue;   /* pinned-vreg slot, never share */
                     uint32_t *srow = SLOT_ROW(s);
                     int conflict = 0;
                     for (int w = 0; w < row_words; w++) {
@@ -177,11 +290,16 @@ void ir_assign_slots(Func *f)
                         (size_t)slot_cap * row_words * sizeof(uint32_t));
                     slot_width   = realloc(slot_width,
                         (size_t)slot_cap * sizeof(int));
-                    if ((!slot_members && row_words > 0) || !slot_width) {
+                    slot_excl    = realloc(slot_excl,
+                        (size_t)slot_cap * sizeof(char));
+                    if ((!slot_members && row_words > 0) || !slot_width
+                        || !slot_excl) {
                         fputs("ir_lower: out of memory (slot tables)\n",
                               stderr);
                         abort();
                     }
+                    memset(slot_excl + slot_n, 0,
+                           (size_t)(slot_cap - slot_n) * sizeof(char));
                     if (row_words > 0)
                         memset(SLOT_ROW(slot_n), 0,
                                (size_t)(slot_cap - slot_n) * row_words
@@ -189,6 +307,7 @@ void ir_assign_slots(Func *f)
                 }
                 chosen = slot_n++;
                 slot_width[chosen] = width;
+                slot_excl[chosen]  = (pass == 0);   /* pinned vregs run in pass 0 */
                 if (row_words > 0)
                     memset(SLOT_ROW(chosen), 0,
                            (size_t)row_words * sizeof(uint32_t));
@@ -211,6 +330,7 @@ void ir_assign_slots(Func *f)
     #undef INTERF_SET
     free(slot_members);
     free(slot_width);
+    free(slot_excl);
     free(interf);
     free(needs_slot);
 }

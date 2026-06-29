@@ -109,6 +109,19 @@ int ir_opt_licm(Func *f);
  * function-wide uses, iterated to a fixed point. Returns removals. */
 int ir_opt_dce(Func *f);
 
+/* Byte-width narrowing: a promoted int binop (add/sub/and/or/xor/shl)
+ * whose result is only truncated back to a byte is re-typed width-1 so
+ * ir_lower emits the 8-bit-in-A form. IR_NO_NARROW_BYTE opts out.
+ * Returns the number of ops narrowed. */
+int ir_opt_narrow_byte(Func *f);
+
+/* Local (per-BB) copy propagation: rewrites src operands reading an
+ * identity copy (MOV / same-width CONV_SX|ZX) to read the copy's source,
+ * so the copy becomes dead (removed by a following DCE). Pairs with
+ * narrow_byte, whose narrowed CONV operands are byte-identity copies that
+ * would otherwise spill to a slot. Returns operands rewritten. */
+int ir_opt_copy_prop(Func *f);
+
 /* long_inc_mhl (the long (*p)++ triple → HCALL l_long_inc_mhl) lives
    in the ir_match table as `incmhl`; --opt-disable=pattern:incmhl. */
 

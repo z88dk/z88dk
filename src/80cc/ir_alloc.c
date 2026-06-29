@@ -140,7 +140,7 @@ void ir_alloc(Func *f)
             case IR_LD_IMM: case IR_LD_SYM: case IR_LD_MEM:
             case IR_LD_STR: case IR_LEA:
             case IR_MOV: case IR_POSTSTEP:
-            case IR_ADD: case IR_SUB:
+            case IR_ADD: case IR_SUB: case IR_RSUB:
             case IR_AND: case IR_OR: case IR_XOR:
             case IR_SHL: case IR_SHR:
             case IR_INC: case IR_DEC:
@@ -223,7 +223,7 @@ void ir_alloc(Func *f)
                 producer_ok = (op->mem.kind == IR_MEM_SYM
                                || op->mem.kind == IR_MEM_VREG);
                 break;
-            case IR_ADD: case IR_SUB:
+            case IR_ADD: case IR_SUB: case IR_RSUB:
             case IR_AND: case IR_OR: case IR_XOR:
                 /* The int (width-2) binop lowerers route the final
                    byte writes into D/E (for AND/OR/XOR) or wrap the
@@ -267,7 +267,7 @@ void ir_alloc(Func *f)
             if (nxt->src[1] != v || nxt->src[0] == v) continue;
             int nxt_eligible;
             switch (nxt->kind) {
-            case IR_ADD: case IR_SUB:
+            case IR_ADD: case IR_SUB: case IR_RSUB:
             case IR_AND: case IR_OR: case IR_XOR:
             case IR_CMP_EQ:  case IR_CMP_NE:
             case IR_CMP_LT:  case IR_CMP_LE:
@@ -341,6 +341,13 @@ void ir_alloc(Func *f)
                (and the helper jumps away — no save/restore point).
                The char route is an inline cp chain: BC-clean. */
             if (o->kind == IR_SWITCH && !(o->sw && o->sw->is_char))
+                has_bc_clobber = 1;
+            /* Inline asm is opaque — it may clobber BC, and unlike a call
+               the lowerer has no save/restore point around it. A PR_BC
+               LOCAL has no backing slot, so it couldn't be reloaded after
+               the asm anyway (emit_bc_reload would read a bogus offset).
+               Disqualify PR_BC for the whole function. */
+            if (o->kind == IR_ASM)
                 has_bc_clobber = 1;
             /* Pre-pushed call args (IR_PUSH_ARG) don't disqualify
                PR_BC: gen_call can't wrap such calls in push/pop bc
@@ -523,7 +530,7 @@ void ir_alloc(Func *f)
                 switch (k) {
                 case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
                 case IR_LD_MEM: case IR_LEA: case IR_MOV:
-                case IR_ADD: case IR_SUB:
+                case IR_ADD: case IR_SUB: case IR_RSUB:
                 case IR_AND: case IR_OR: case IR_XOR:
                 case IR_SHL: case IR_SHR:
                 case IR_INC: case IR_DEC:
@@ -560,7 +567,7 @@ void ir_alloc(Func *f)
                         switch (k) {
                         case IR_LD_IMM: case IR_LD_SYM: case IR_LD_MEM:
                         case IR_MOV:
-                        case IR_ADD: case IR_SUB:
+                        case IR_ADD: case IR_SUB: case IR_RSUB:
                         case IR_AND: case IR_OR: case IR_XOR:
                         case IR_SHL: case IR_SHR:
                         case IR_INC: case IR_DEC:
@@ -650,7 +657,7 @@ void ir_alloc(Func *f)
                 switch (op->kind) {
                 case IR_LD_IMM: case IR_LD_SYM: case IR_LD_MEM:
                 case IR_MOV:
-                case IR_ADD: case IR_SUB:
+                case IR_ADD: case IR_SUB: case IR_RSUB:
                 case IR_AND: case IR_OR: case IR_XOR:
                 case IR_SHL: case IR_SHR:
                 case IR_NEG: case IR_NOT:

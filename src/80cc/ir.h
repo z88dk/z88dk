@@ -71,6 +71,39 @@ typedef uint32_t RegMask;
 #define IR_FEAT_IX         (1u << 2)  /* IX/IY index registers — absent on
                                          8080/8085/gbz80 */
 #define IR_FEAT_DJNZ       (1u << 3)  /* djnz — absent on 8080/8085/gbz80 */
+#define IR_FEAT_HL_DE_LOGIC  (1u << 4) /* native and/or/sub hl,de — Rabbit r2k+ */
+#define IR_FEAT_HL_DE_LOGIC4 (1u << 5) /* native xor/cp hl,de, neg hl — Rabbit r4k */
+#define IR_FEAT_SP_REL_HL    (1u << 6) /* ld hl,(sp+d) / ld (sp+d),hl — Rabbit, kc160 */
+#define IR_FEAT_SP_REL_PAIRS (1u << 7) /* de/bc sp-rel too — kc160 */
+#define IR_FEAT_SP_REL_WIDE  (1u << 8) /* sp disp 0..255 (Rabbit); else 0..127 (kc160) */
+#define IR_FEAT_ADD_SP_IMM   (1u << 9) /* add sp,d (signed byte) — Rabbit, gbz80 */
+#define IR_FEAT_LEA          (1u << 10) /* lea hl/de/bc,ix+d (signed byte) — ez80 */
+#define IR_FEAT_LD_HL_IND    (1u << 11) /* ld hl/de/bc,(hl) word indirect — ez80 */
+#define IR_FEAT_BOOL_HL      (1u << 12) /* bool hl (hl = hl!=0 ? 1 : 0) — Rabbit */
+#define IR_FEAT_PAIR_ROT     (1u << 13) /* native rr hl/de (1B) for 16-bit shift — Rabbit */
+#define IR_FEAT_OVERFLOW_FLAG (1u << 14) /* P/V is overflow (signed cmp via flags) — NOT gbz80/808x */
+#define IR_FEAT_IX_WORD       (1u << 15) /* native word-wise ld hl,(ix+d) — ez80, kc160;
+                                            elsewhere it's synthetic (two ld r,(ix+d)) */
+/* z80n (Spectrum Next) extra ops. NOTE: add hl/de/bc,nn and add hl/de/bc,a
+   do NOT affect flags — usable only for a standalone 16-bit add whose
+   carry-out is dead, never in a multi-word carry chain. */
+#define IR_FEAT_ADD_PAIR_IMM  (1u << 16) /* add hl/de/bc,nn (ED 34/35/36) — z80n */
+#define IR_FEAT_ADD_PAIR_A    (1u << 17) /* add hl/de/bc,a  (ED 31/32/33) — z80n */
+#define IR_FEAT_BARREL_SHIFT  (1u << 18) /* bsla/bsrl/bsra/brlc de,b (ED 28-2C) — z80n */
+#define IR_FEAT_JR            (1u << 19) /* relative jumps (jr) — absent on 8080/8085, where
+                                            z80asm expands `jr` to a 3-byte `jp` (so ASMPC-
+                                            relative skip offsets must be +1) */
+#define IR_FEAT_SP_REL_DEPTR  (1u << 20) /* 8085 LDSI+LHLX/SHLX: `ld de,sp+N` (N 0..255) points
+                                            DE at a slot, then `ld hl,(de)` / `ld (de),hl` does
+                                            the word load/store. Clobbers DE (the pointer reg),
+                                            unlike Rabbit's DE-preserving ld hl,(sp+N) */
+#define IR_FEAT_DSUB          (1u << 21) /* 8085 DSUB (`sub hl,bc`): 1-byte 16-bit subtract
+                                            setting CF=unsigned borrow AND K=signed(HL<BC). With
+                                            `jp k`/`jp nk` it fuses a signed 16-bit compare into a
+                                            branch, replacing the sign-flip + byte-wise sub. */
+#define IR_FEAT_CRIT_IP       (1u << 22) /* Rabbit: __critical uses `ipset 3`/`ipres` (IP-priority
+                                            shift register, no data-stack effect), not z80's di/ei +
+                                            l_push_di/l_pop_ei. So no critical frame-offset shift. */
 
 /* ----- Physical register pool ------------------------------------------ */
 
@@ -176,6 +209,7 @@ typedef enum {
     /* binary arithmetic — aliased two-operand: dst aliases src[0] */
     IR_ADD,
     IR_SUB,
+    IR_RSUB,        /* dst = imm - src[0]  (reverse subtract; `const - var`) */
     IR_AND,
     IR_OR,
     IR_XOR,

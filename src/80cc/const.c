@@ -852,33 +852,6 @@ void write_constant_queue(void)
     nl();
 }
 
-void load_llong_into_acc(zdouble val)
-{
-    uint64_t v,l;
-    char    buf[8];
-    elem_t *elem;
-
-    if ( val < 0 ) v = (uint64_t)(int64_t)val;
-    else v = val;
-
-
-    l = v & 0xffffffff;
-    buf[0] = (l % 65536) % 256;
-    buf[1] = (l % 65536) / 256;
-    buf[2] = (l / 65536) % 256;
-    buf[3] =  (l / 65536) / 256;
-    l = (v >> 32) & 0xffffffff;
-    buf[4] = (l % 65536) % 256;
-    buf[5] = (l % 65536) / 256;
-    buf[6] = (l / 65536) % 256;
-    buf[7] =  (l / 65536) / 256;
-
-    elem = get_elem_for_llong(buf);
-    immedlit(elem->litlab,0);
-    nl();
-    callrts("l_i64_load");
-}
-
 /* IR literal-pool helpers. Reserve a big-constant slot for a wide value,
    mark it written (the IR fwrites its asm directly, bypassing outstr's
    `ld hl,i_N` auto-marking), and return the litlab. The IR emits the

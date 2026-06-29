@@ -1,382 +1,3 @@
-%title #255 elide redundant sp-rel address recompute (-3b, -21t)
-%eval 2 = %2 %1 -
-	ld	hl,%1	;const
-	add	hl,sp
-	push	hl
-	ld	hl,%2	;const
-	add	hl,sp
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	push	hl
-
-%title #256a redundant ld de,0 pair → re-use H as zero source (-1b, -2t)
-	ld	de,0
-	ld	h,0
-	ld	de,0
-=
-	ld	h,0
-	ld	e,h
-	ld	d,h
-
-%title #256b narrow long-load to int when high-half-only used (-1b, -15t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ex	de,hl
-	ld	de,0
-=
-	ld	hl,%eval(%1 2 +)	;const
-	add	hl,sp
-	call	l_gint
-	ld	de,0
-
-%title #256c narrow long-load to byte-3 extract with srl (-0b, -28t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	l,d
-	ld	h,0
-	srl	l
-	ld	de,0
-=
-	ld	hl,%eval(%1 3 +)	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-	srl	l
-	ld	d,h
-	ld	e,d
-
-%title #256d narrow long-load to byte-3 extract no shift (-0b, -28t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	l,d
-	ld	h,0
-	ld	de,0
-=
-	ld	hl,%eval(%1 3 +)	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-	ld	d,h
-	ld	e,d
-
-%title #256f l_gint2sp → pop/push inline (+1b, -18t)
-	call	l_gint2sp
-=
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-
-%title #256k l_glong+push de+push hl → l_glong2sp (-2b, +0t)
-%notcpu gbz80
-%notcpu ez80
-%notcpu ez80_z80
-	call	l_glong
-	push	de
-	push	hl
-=
-	call	l_glong2sp
-
-%title #256h compound long add via l_glong2sp → inline byte loop (-4b, -83t)
-	ld	hl,%1	;const
-	add	hl,sp
-	push	hl
-	call	l_glong2sp
-	ld	hl,%2	;const
-	add	hl,sp
-	call	l_glong
-	call	l_long_add
-	pop	bc
-	call	l_plong
-	ld	hl,%3
-=
-	ld	hl,%eval(%2 6 -)	;const
-	add	hl,sp
-	ex	de,hl
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	b,4
-.i_o%N
-	ld	a,(de)
-	adc	a,(hl)
-	ld	(hl),a
-	inc	hl
-	inc	de
-	djnz	i_o%N
-	ld	hl,%3
-
-%title #256g sp+N int + const offset → load via BC (+2b, -23t)
-	ld	hl,%1	;const
-	call	l_gintsp
-	ex	de,hl
-	ld	hl,%2	;const
-	add	hl,de
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	ld	hl,%2	;const
-	add	hl,bc
-
-%title #256j zero-high long-OR with stacked long → 16-bit OR (-1b, -30t)
-	ld	de,0
-	call	l_long_or
-=
-	pop	de
-	call	l_or
-	pop	de
-
-%title #256p zero-high long-OR variant (after srl) → 16-bit OR (-0b, -38t)
-	ld	h,0
-	srl	l
-	ld	d,h
-	ld	e,d
-	call	l_long_or
-=
-	ld	h,0
-	srl	l
-	pop	de
-	call	l_or
-	pop	de
-
-%title #256i shift-right-8 long-load → inline 3-byte load drop low byte (-0b, -22t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	l,h
-	ld	h,e
-	ld	e,d
-	ld	d,0
-=
-	ld	hl,%eval(%1 1 +)	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	inc	hl
-	ld	l,(hl)
-	ld	h,0
-	ex	de,hl
-
-%title #256n call l_sub → ex de,hl; or a; sbc hl,de (+1b, -27t) — z80 only
-%notcpu 8080
-%notcpu 8085
-	call	l_sub
-=
-	ex	de,hl
-	or	a
-	sbc	hl,de
-
-%title #256l post-#256e shift-by-1 inline (+1b, -33t) — z80 only (sla/rl)
-%notcpu 8080
-%notcpu 8085
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	h,c
-	ld	l,0
-	ld	a,1
-	call	l_long_aslo
-=
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	h,c
-	ld	l,0
-	sla	h
-	rl	e
-	rl	d
-
-%title #256m narrow long-load to high-half-in-HL (-0b, -30t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	hl,0
-	ex	de,hl
-=
-	ld	hl,%eval(%1 2 +)	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,0
-	ex	de,hl
-
-%title #256o int-store via push/pop+l_pint → inline ld (hl),e/d (-2b, -40t)
-	push	hl
-	ld	hl,%1	;const
-	add	hl,sp
-	pop	de
-	ex	de,hl
-	call	l_pint
-	ld	hl,%2
-=
-	ex	de,hl
-	ld	hl,%eval(%1 2 -)	;const
-	add	hl,sp
-	ld	(hl),e
-	inc	hl
-	ld	(hl),d
-	ld	hl,%2
-
-%title #256q1 l_glong + l_asr_u 10 + inc e → load byte-3 + srl×2 (-0b, -215t) z80
-%notcpu 8080
-%notcpu 8085
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	hl,10
-	call	l_asr_u
-	inc	e
-=
-	ld	hl,%eval(%1 3 +)	;const
-	add	hl,sp
-	ld	a,(hl)
-	srl	a
-	srl	a
-	ld	l,a
-	ld	h,0
-	ld	d,h
-	ld	e,h
-
-%title #256q2 l_glong + l_asr_u 12 + inc e → byte-3 + rrca×4 + mask (-2b, -270t) z80
-%notcpu 8080
-%notcpu 8085
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	hl,12
-	call	l_asr_u
-	inc	e
-=
-	ld	hl,%eval(%1 3 +)	;const
-	add	hl,sp
-	ld	a,(hl)
-	rrca
-	rrca
-	rrca
-	rrca
-	and	15
-	ld	l,a
-	ld	h,0
-	ld	d,h
-	ld	e,h
-
-%title #256q3 l_glong + l_asr_u 9 + inc e → load byte-3 + srl×1 (-0b, -195t) z80
-%notcpu 8080
-%notcpu 8085
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	hl,9
-	call	l_asr_u
-	inc	e
-=
-	ld	hl,%eval(%1 3 +)	;const
-	add	hl,sp
-	ld	a,(hl)
-	srl	a
-	ld	l,a
-	ld	h,0
-	ld	d,h
-	ld	e,h
-
-%title #256q4 l_glong + l_asr_u 8 + inc e → just load byte-3 (-1b, -180t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	hl,8
-	call	l_asr_u
-	inc	e
-=
-	ld	hl,%eval(%1 3 +)	;const
-	add	hl,sp
-	ld	a,(hl)
-	ld	l,a
-	ld	h,0
-	ld	d,h
-	ld	e,h
-
-%title #256q-gen l_glong + l_asr_u (any shift) → load 16-bit high half (-0b, -30t)
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	ld	hl,%2
-	call	l_asr_u
-	inc	e
-=
-	ld	hl,%eval(%1 2 +)	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,%2
-	call	l_asr_u
-	inc	e
-
-%title #260a byte→int<<8 inline (ld l,(hl);ld h,0;ld h,l;ld l,0 fuse) (-3b, -11t)
-	ld	l,(hl)
-	ld	h,0
-	ld	h,l
-	ld	l,0
-=
-	ld	h,(hl)
-	ld	l,0
-
-%title #260b drop redundant ld a,h;or l after and N;ld h,a;ld l,0 before jp z (-2b, -8t)
-	and	%1
-	ld	h,a
-	ld	l,0
-	ld	a,h
-	or	l
-	jp	z,%2
-=
-	and	%1
-	ld	h,a
-	ld	l,0
-	jp	z,%2
-
-%title #260c #260b variant for jp nz (-2b, -8t)
-	and	%1
-	ld	h,a
-	ld	l,0
-	ld	a,h
-	or	l
-	jp	nz,%2
-=
-	and	%1
-	ld	h,a
-	ld	l,0
-	jp	nz,%2
-
-%title #269 elide char store-then-reload of same sp-rel slot (-5b, -22t)
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	(hl),a
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	a,(hl)
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	(hl),a
-
-%title #269 elide char store-then-reload of same global (-3b, -13t)
-	ld	(_%1),a
-	ld	a,(_%1)
-=
-	ld	(_%1),a
-
 %title #269 elide char store-then-reload of same FP slot (-3b, -19t)
 	ld	(ix%1),a
 	ld	a,(ix%1)
@@ -388,32 +9,6 @@
 	ld	a,(iy%1)
 =
 	ld	(iy%1),a
-
-%title #270 inc hl across byte-op between two sp-rel slots (+1) (-3b, -17t)
-%eval 1 = %2 %1 -
-	ld	hl,%1	;const
-	add	hl,sp
-	%"add	\(hl\)|add	a,\(hl\)|sub	\(hl\)|and	\(hl\)|or	\(hl\)|xor	\(hl\)|cp	\(hl\)|sbc	\(hl\)|sbc	a,\(hl\)|ld	a,\(hl\)|ld	\(hl\),a"3
-	ld	hl,%2	;const
-	add	hl,sp
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	%3
-	inc	hl
-
-%title #270 dec hl across byte-op between two sp-rel slots (-1) (-3b, -17t)
-%eval -1 = %2 %1 -
-	ld	hl,%1	;const
-	add	hl,sp
-	%"add	\(hl\)|add	a,\(hl\)|sub	\(hl\)|and	\(hl\)|or	\(hl\)|xor	\(hl\)|cp	\(hl\)|sbc	\(hl\)|sbc	a,\(hl\)|ld	a,\(hl\)|ld	\(hl\),a"3
-	ld	hl,%2	;const
-	add	hl,sp
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	%3
-	dec	hl
 
 %title #G1 gbz80 elide store-then-reload of same sp-rel int slot (-5b, -24t)
 %cpu gbz80
@@ -433,172 +28,6 @@
 	ld	(hl),d
 	ex	de,hl
 
-%title #271 collapse duplicate ld h,0 (walker emits both from AND-mask and OP_CAST) (-2b, -7t)
-	ld	h,0
-	ld	h,0
-=
-	ld	h,0
-
-%title #271 ld hl,N; ex de,hl; ld hl,M → ld de,N; ld hl,M (-1b, -4t)
-	ld	hl,%1	;const
-	ex	de,hl
-	ld	hl,%2	;const
-=
-	ld	de,%1
-	ld	hl,%2	;const
-
-%title #272 l_gchar + ld a,l + ld hl,_ → ld a,(hl) + ld hl,_ (-2b, -40t)
-	call	l_gchar
-	ld	a,l
-	ld	hl,%1
-=
-	ld	a,(hl)
-	ld	hl,%1
-
-%title #273 push hl; pop bc → ld bc,hl (-0b, -13t)
-	push	hl
-	pop	bc
-=
-	ld	bc,hl
-
-%title #273 push hl; pop de → ld d,h; ld e,l (-0b, -13t)
-	push	hl
-	pop	de
-=
-	ld	d,h
-	ld	e,l
-
-%title #256e shift-left-8 long-load → inline 3-byte load drop byte 3 (+2b, -30t)
-	ld	hl,%1	;const
-	add	hl,sp
-	push	hl
-	call	l_glong
-	ld	d,e
-	ld	e,h
-	ld	h,l
-	ld	l,0
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	push	hl
-	ld	c,(hl)
-	inc	hl
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	h,c
-	ld	l,0
-
-
-%title #275 (long & N) truthiness: l_glong + low-byte AND + 32b zero-test → ld a,(hl) + flag-from-AND (-8b, -96t)
-	call	l_glong
-	ld	a,l
-	and	%1
-	ld	l,a
-	ld	h,0
-	ld	de,0
-	ld	a,h
-	or	l
-	or	d
-	or	e
-	jp	%3z,%2
-=
-	ld	a,(hl)
-	and	%1
-	ld	l,a
-	ld	h,0
-	ld	e,h
-	ld	d,e
-	jp	%3z,%2
-
-%title #278 in-place int inc + dead HL reload + jp: collapse to flag-from-inc + cold-path carry (-2b, -36t hot)
-	inc	(hl)
-	ld	a,(hl)
-	inc	hl
-	jr	nz,ASMPC+3
-	inc	(hl)
-	ld	h,(hl)
-	ld	l,a
-	jp	%1
-=
-	inc	(hl)
-	jp	nz,%1
-	inc	hl
-	inc	(hl)
-	jp	%1
-
-
-%title #279 peek-top + sp-load via duplicated stack → direct peek + sp-load (-1b, -33t)
-	pop	hl
-	push	hl
-	push	hl
-	ld	hl,%1	;const
-	call	l_gintsp
-	pop	de
-	ex	de,hl
-=
-	pop	de
-	push	de
-	ld	hl,%eval(%1 2 -)	;const
-	add	hl,sp
-	call	l_gint
-	ex	de,hl
-
-
-%title #281 inline int xor/or/and with const → register-immediate pair (+2b, -27t)
-	ld	de,%1	;const
-	call	l_%"xor|or|and"2
-=
-	ld	a,l
-	%2	%eval(%1 256 %%)
-	ld	l,a
-	ld	a,h
-	%2	%eval(%1 256 /)
-	ld	h,a
-
-%title #281b same, without ;const tag
-	ld	de,%1
-	call	l_%"xor|or|and"2
-=
-	ld	a,l
-	%2	%eval(%1 256 %%)
-	ld	l,a
-	ld	a,h
-	%2	%eval(%1 256 /)
-	ld	h,a
-
-%title #282 inline l_long_xor/or/and with two-const operand (+5b, -60t)
-	push	de
-	push	hl
-	ld	hl,%1	;const
-	ld	de,%2
-	call	l_long_%"xor|or|and"3
-=
-	ld	a,l
-	%3	%eval(%1 256 %%)
-	ld	l,a
-	ld	a,h
-	%3	%eval(%1 256 /)
-	ld	h,a
-	ld	a,e
-	%3	%eval(%2 256 %%)
-	ld	e,a
-	ld	a,d
-	%3	%eval(%2 256 /)
-	ld	d,a
-
-
-
-
-%title #283 long++ via push/glong/inclong/pop/plong → l_long_inc_mhl (-5b, -90t)
-	push	hl
-	call	l_glong
-	call	l_inclong
-	pop	bc
-	call	l_plong
-=
-	call	l_long_inc_mhl
-
 %title #284 paired ex de,hl cancellation (-2b, -8t)
 	ex	de,hl
 	ex	de,hl
@@ -611,6 +40,11 @@
 	ld	bc,%1
 
 %title #285b HL recovery overwritten by immediate ld hl (-2b, -8t)
+; NOT on ez80: there `ld hl,%1` can be `ld hl,(hl)` (native word deref,
+; ed 27) which READS hl, so dropping the `ld hl,bc` that set the pointer
+; miscompiles. No other CPU emits `ld hl,(hl)`, so the rule is safe there.
+%notcpu ez80
+%notcpu ez80_z80
 	ld	hl,bc
 	ld	hl,%1
 =
@@ -640,52 +74,6 @@
 	ld	h,c
 	ld	l,0
 
-%title #286b SHL byte_shift=2 shuffle through BC (-2b)
-	ld	hl,bc
-	ld	d,h
-	ld	e,l
-	ld	h,0
-	ld	l,h
-=
-	ld	d,b
-	ld	e,c
-	ld	hl,0
-
-%title #286c SHL byte_shift=3 shuffle through BC (-2b)
-	ld	hl,bc
-	ld	d,l
-	ld	e,0
-	ld	h,e
-	ld	l,h
-=
-	ld	d,c
-	ld	e,0
-	ld	h,e
-	ld	l,h
-
-%title #286d SHR byte_shift=1 shuffle through BC (-2b)
-	ld	hl,bc
-	ld	l,h
-	ld	h,e
-	ld	e,d
-	ld	d,0
-=
-	ld	l,b
-	ld	h,e
-	ld	e,d
-	ld	d,0
-
-%title #286e SHR byte_shift=2 shuffle through DE (-2b)
-	ld	hl,bc
-	ld	l,e
-	ld	h,d
-	ld	e,0
-	ld	d,e
-=
-	ld	l,e
-	ld	h,d
-	ld	de,0
-
 %title #286f SHR byte_shift=3 shuffle through DE (-2b)
 	ld	hl,bc
 	ld	l,d
@@ -697,8 +85,6 @@
 	ld	h,0
 	ld	e,h
 	ld	d,e
-
-
 
 %title #285e push BC instead of recovered HL before ld hl (-2b, -8t)
 	ld	hl,bc
@@ -743,15 +129,6 @@
 	pop	hl
 =
 	%1
-
-%title #285l ld a,h+and 128+jp z → ld a,h+rlca+jp nc (-1b, -3t)
-	ld	a,h
-	and	128
-	jp	z,%1
-=
-	ld	a,h
-	rlca
-	jp	nc,%1
 
 %title #260a-via-a byte→int<<8 inline through A (-2b, -8t)
 	ld	l,a
@@ -886,47 +263,50 @@
 	and	(ix%eval(%1 1 +))
 	ld	h,a
 
-%title #285r-or 16-bit slot OR via byte-direct or (ix+d) (z80, -4b, -16t)
-%notcpu ez80
-%notcpu ez80_z80
-%notcpu gbz80
-%notcpu r2ka
-%notcpu r3k
-%notcpu kc160
-	ld	de,(ix%1)
-	ld	hl,(ix%2)
-	ld	a,l
-	or	e
-	ld	l,a
-	ld	a,h
-	or	d
-	ld	h,a
+%title #286 IR gbz80 fuse slot-addr ld hl,N + add hl,sp -> ld hl,sp+N (-2b, -7t)
+%cpu gbz80
+%check -128 <= %1 <= 127
+	ld	hl,%1
+	add	hl,sp
 =
-	ld	a,(ix%2)
-	or	(ix%1)
-	ld	l,a
-	ld	a,(ix%eval(%2 1 +))
-	or	(ix%eval(%1 1 +))
-	ld	h,a
+	ld	hl,sp+%1
 
-%title #285r-cpl 16-bit slot CPL via byte-direct (z80, -4b, -16t)
-%notcpu ez80
-%notcpu ez80_z80
-%notcpu gbz80
-%notcpu r2ka
-%notcpu r3k
-%notcpu kc160
-	ld	hl,(ix%1)
-	ld	a,l
-	cpl
+%title #G6 IR gbz80 word-load + ex de,hl -> load straight into DE (HL reloaded)
+%cpu gbz80
+	ld	a,(hl+)
+	ld	h,(hl)
 	ld	l,a
-	ld	a,h
-	cpl
-	ld	h,a
+	ex	de,hl
+	ld	hl,%1
 =
-	ld	a,(ix%1)
-	cpl
-	ld	l,a
-	ld	a,(ix%eval(%1 1 +))
-	cpl
-	ld	h,a
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+
+%title #G2 IR gbz80 drop dead ex de,hl (both DE,HL reloaded: ld de;ld hl)
+%cpu gbz80
+	ex	de,hl
+	ld	de,%1
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+%title #G3 IR gbz80 drop dead ex de,hl (both reloaded: ld hl;ld de)
+%cpu gbz80
+	ex	de,hl
+	ld	hl,%2
+	ld	de,%1
+=
+	ld	hl,%2
+	ld	de,%1
+
+%title #G4 IR gbz80 ex de,hl + ld hl -> ld d,h;ld e,l (emulated ex is push/pop x4)
+%cpu gbz80
+	ex	de,hl
+	ld	hl,%1
+=
+	ld	d,h
+	ld	e,l
+	ld	hl,%1

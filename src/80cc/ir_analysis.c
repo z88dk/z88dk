@@ -172,6 +172,17 @@ int ir_op_defs(const Op *op, int *out, int max)
            same vreg id in and out, just reaches a fresh def point.) */
         n = add_unique(out, n, max, op->src[0]);
         return n;
+    case IR_LD_MEM:
+        n = add_unique(out, n, max, op->dst);
+        /* A post-step load (`*p++`) also REDEFINES the base pointer
+           (base += step). The fuse pass dropped the separate INC that
+           used to be base's def, so list it here or liveness/slot
+           allocation would miss the redefinition (and could free or
+           reuse base's slot while it is still the live, bumped pointer). */
+        if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG
+            && op->mem.base >= 0)
+            n = add_unique(out, n, max, op->mem.base);
+        return n;
     default:
         /* All other ops define op->dst. */
         n = add_unique(out, n, max, op->dst);

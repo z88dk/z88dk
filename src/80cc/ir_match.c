@@ -741,6 +741,9 @@ static const PatternDef ir_patterns[] = {
 
     { .name = "rotl", .n_ops = 3,
       .flags = IR_PAT_EITHER_ORDER | IR_PAT_COMMUTATIVE,
+      /* gen_rotl emits CB shifts (srl/rr/set); on 8080/8085 (no CB ops)
+         leave the SHL|SHR|OR unfused so it lowers via the shift helpers. */
+      .features = IR_FEAT_CB_BITOPS,
       .ops = {
           { .kind = IR_SHL, .dst = RV_T1, .src0 = RV_V,
             .imm_pred = IR_IMM_ANY, .width = 4 },
@@ -950,6 +953,72 @@ static const PatternDef pat_poststep = {
     .check = poststep_check, .apply = poststep_apply,
 };
 
+/* derefpp — `*p++` / `*p--`: a load through a pointer immediately
+   followed by stepping that same pointer fuses into one post-step load
+   (mem.post_step = ±step), so the lowerer dereferences AND bumps p in a
+   single HL tenancy instead of reloading p's slot for the separate step.
+   The pointer p is in mem.base (not a template src slot), so the base↔step
+   identity is checked in derefpp_check. Anchors on the LOAD (op[0]); the
+   step op is the satellite. NO_AUTO_TEMPS: p is a real multi-use loop
+   var whose def folds into the post-step anchor (ir_op_defs reports the
+   post-step's base def), exactly like poststep's INC. Supported shapes
+   (gated to what the post-step lowering emits): byte load + INC/DEC
+   (char* `*p++`, step ±1); word load + forward ADD-imm (int* `*p++`,
+   step +K). */
+enum { DPV_P = 1 };
+
+static int derefpp_check(Func *f, BB *bb, const int idx[],
+                         const int64_t imm[], const int bind[], const int uc[])
+{
+    (void)imm; (void)uc;
+    const Op *ld = &bb->ops[idx[0]];
+    const Op *st = &bb->ops[idx[1]];
+    int p = bind[DPV_P];
+    if (ld->mem.kind != IR_MEM_VREG) return 0;
+    if (ld->mem.offset != 0 || ld->mem.post_step != 0 || ld->mem.volatile_)
+        return 0;
+    if (ld->mem.base != p) return 0;          /* the load is through p */
+    if (ld->dst < 0 || ld->dst == p) return 0; /* `p = *p++` would self-clobber */
+    if (f->vregs[p].flags & IR_VREG_VOLATILE) return 0;
+    int w = f->vregs[ld->dst].width;
+    if (st->kind == IR_ADD || st->kind == IR_SUB) {
+        if (st->src[1] != -1) return 0;        /* imm-form step only */
+        if (st->kind == IR_SUB || imm[1] <= 0) return 0; /* forward only */
+        return w == 2;                          /* word `*p++` (int*) */
+    }
+    return w == 1;                              /* byte `*p++` (INC/DEC) */
+}
+
+static void derefpp_apply(Func *f, BB *bb, const int idx[],
+                          const int64_t imm[], const int bind[])
+{
+    (void)f; (void)bind;
+    Op *ld = &bb->ops[idx[0]];
+    const Op *st = &bb->ops[idx[1]];
+    int64_t step;
+    switch (st->kind) {
+    case IR_INC: step = 1;       break;
+    case IR_DEC: step = -1;      break;
+    case IR_ADD: step = imm[1];  break;
+    default:     step = -imm[1]; break;   /* IR_SUB (unreached: gated out) */
+    }
+    ld->mem.post_step = (int)step;
+}
+
+static const PatternDef pat_derefpp = {
+    .name = "derefpp", .n_ops = 2, .anchor = 1,
+    .flags = IR_PAT_NO_AUTO_TEMPS,
+    .ops = {
+        { .kind = IR_LD_MEM, .dst = IR_MS_ANY,
+          .src0 = IR_MS_NONE, .src1 = IR_MS_NONE },
+        { .kind = IR_INC, .kind_alt = 1 + IR_DEC,
+          .kind_alt2 = 1 + IR_ADD, .kind_alt3 = 1 + IR_SUB,
+          .dst = DPV_P, .src0 = DPV_P, .src1 = IR_MS_NONE,
+          .imm_pred = IR_IMM_ANY },
+    },
+    .check = derefpp_check, .apply = derefpp_apply,
+};
+
 /* movfuse — producer + single-use MOV (migrated from
    ir_opt_fuse_mov): `<producer> t <- ...; MOV d <- t` with t
    function-wide single-use and same width as d redirects the
@@ -1021,6 +1090,7 @@ static const PatternDef pat_movfuse = {
 int ir_match_run_early(Func *f)
 {
     int n = ir_match_run_table(f, &pat_poststep, 1);
+    n += ir_match_run_table(f, &pat_derefpp, 1);
     n += ir_match_run_table(f, &pat_movfuse, 1);
     return n;
 }

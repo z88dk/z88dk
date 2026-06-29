@@ -53,10 +53,13 @@ static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
     case OP_LE:   *out = (l <= r); return 1;
     case OP_GT:   *out = (l >  r); return 1;
     case OP_GE:   *out = (l >= r); return 1;
-    case OP_SSHR:
-    case OP_USHR: *out = l >> r; return 1;
+    case OP_SSHR: *out = l >> r; return 1;                  /* arithmetic */
+    case OP_USHR: *out = (int64_t)((uint64_t)l >> r); return 1; /* logical: a
+                    64-bit value with bit 63 set (e.g. 0x8000…ULL) folded with
+                    the signed `>>` sign-extended instead of zero-filling */
     case OP_SSHL:
-    case OP_USHL: *out = l << r; return 1;
+    case OP_USHL: *out = (int64_t)((uint64_t)l << r); return 1; /* shift the
+                    bit pattern; signed `<<` into bit 63 is UB in C */
     case OP_OROR:   *out = (l || r); return 1;
     case OP_ANDAND: *out = (l && r); return 1;
     }
@@ -68,6 +71,12 @@ static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
    bitwise ops aren't defined for non-integer operands and bail.
    Comparisons return 0/1 as zdouble; the caller's result type is
    already int so subsequent integer fold handles it. */
+static int is_compare_op(int kind)
+{
+    return kind == OP_EQ || kind == OP_NE || kind == OP_LT
+        || kind == OP_LE || kind == OP_GT || kind == OP_GE;
+}
+
 static int try_fold_binop_decimal(int kind, zdouble l, zdouble r, zdouble *out)
 {
     switch (kind) {
@@ -113,6 +122,20 @@ Node *ast_fold_constants(Node *node)
        lvalue/address marker ops and the side-effect-laden steps). */
     case OP_NEG: case OP_COMP: case OP_LNEG:
         if (node->operand && node->operand->ast_type == AST_LITERAL) {
+            /* Floating literal: fold in the double domain. The integer
+               path below casts zval to int64_t, which would truncate the
+               fraction (e.g. -2.5 → -2.0). ~ on a float is invalid C —
+               leave it for diagnosis. */
+            if (node->operand->type
+                && kind_is_floating(node->operand->type->kind)) {
+                zdouble fv = node->operand->zval;
+                Type *t = node->type ? node->type : node->operand->type;
+                if (node->ast_type == OP_NEG)
+                    return ast_literal(t, -fv);
+                if (node->ast_type == OP_LNEG)
+                    return ast_literal(type_int, (zdouble)(fv == 0));
+                return node;
+            }
             int64_t v = (int64_t)node->operand->zval, r;
             if (try_fold_unop(node->ast_type, v, &r)) {
                 Type *t = node->type ? node->type : node->operand->type;
@@ -149,34 +172,38 @@ Node *ast_fold_constants(Node *node)
             int64_t narrowed = v;
             Kind dst = node->type->kind;
             Kind src = node->operand->type->kind;
-            /* Kind enum ordering: KIND_CHAR < KIND_SHORT < KIND_INT
-               < KIND_LONG < KIND_LONGLONG. We only consider narrowing
-               when dst < src. Even then we skip the narrow if the
-               value is already representable in *either* signed or
-               unsigned interpretation of dst — matches legacy's
-               docast(), which gates narrowing on the parser-tracked
-               val_type and treats e.g. `(char)200` as no-op (200 fits
-               in the loose char range used by const.c::number, which
-               accepts -127..255 as char-kind). */
-            if (dst < src) {
+            /* Reduce the literal to the TARGET type's representable range:
+               mask to its width and reinterpret per its signedness. Not
+               gated on dst<src — a same-width signedness change is also a
+               value change (`(unsigned int)-1` is 65535, not -1; `(int)
+               0xffff` is -1) and a widen-to-unsigned reinterprets a
+               negative (`(unsigned long)-1` is 0xFFFFFFFF). The range MUST
+               track signedness: a sign-agnostic [-128,255]-style range
+               leaves `(unsigned char)-7` as -7 and `(signed char)200` as
+               200. In-range values mask to themselves (no-op). KIND src
+               ordering: CHAR<SHORT<INT<LONG<LONGLONG. */
+            (void)src;
+            if (kind_is_integer(dst)) {
+                int is_un = node->type->isunsigned;
                 int64_t lo = 0, hi = 0;
+                int known = 1;
                 if (dst == KIND_CHAR) {
-                    lo = -128; hi = 255;
+                    lo = is_un ? 0 : -128;       hi = is_un ? 255 : 127;
                 } else if (dst == KIND_INT || dst == KIND_SHORT) {
-                    lo = -32768; hi = 65535;
+                    lo = is_un ? 0 : -32768;     hi = is_un ? 65535 : 32767;
                 } else if (dst == KIND_LONG) {
-                    lo = INT32_MIN; hi = UINT32_MAX;
+                    lo = is_un ? 0 : INT32_MIN;  hi = is_un ? UINT32_MAX : INT32_MAX;
+                } else {
+                    known = 0;   /* LONGLONG: int64 zval already models it */
                 }
-                int fits_loose = (v >= lo && v <= hi);
-                if (!fits_loose) {
-                    int is_un = node->type->isunsigned;
+                if (known && (v < lo || v > hi)) {
                     if (dst == KIND_CHAR) {
                         narrowed = is_un ? (int64_t)(uint8_t)(v & 0xff)
                                          : (int64_t)(int8_t)(v & 0xff);
                     } else if (dst == KIND_INT || dst == KIND_SHORT) {
                         narrowed = is_un ? (int64_t)(uint16_t)(v & 0xffff)
                                          : (int64_t)(int16_t)(v & 0xffff);
-                    } else if (dst == KIND_LONG) {
+                    } else {
                         narrowed = is_un ? (int64_t)(uint32_t)(v & 0xffffffff)
                                          : (int64_t)(int32_t)(v & 0xffffffff);
                     }
@@ -248,14 +275,25 @@ Node *ast_fold_constants(Node *node)
             if (decimal) {
                 zdouble lv = L->zval, rv = R->zval, dv;
                 if (try_fold_binop_decimal(node->ast_type, lv, rv, &dv)) {
-                    Type *t = node->type ? node->type : L->type;
+                    /* A comparison yields int (0/1) — force int so the
+                       literal isn't re-encoded as a DOUBLE 1.0/0.0 (IEEE
+                       0x3F800000). Arithmetic keeps the operand type. */
+                    Type *t = is_compare_op(node->ast_type) ? type_int
+                            : (node->type ? node->type : L->type);
                     return ast_literal(t ? t : type_int, dv);
                 }
             } else {
                 int64_t l = (int64_t)L->zval;
                 int64_t r = (int64_t)R->zval;
                 int64_t v;
-                if (try_fold_binop(node->ast_type, l, r, &v)) {
+                int fold_op = node->ast_type;
+                /* `>>` is parsed OP_SSHR unconditionally; for an unsigned
+                   LHS it shifts LOGICALLY (and the runtime lowers both to
+                   the logical IR_SHR). Fold logically so `0x8000…ULL >> 1`
+                   zero-fills (0x4000…) instead of sign-extending (0xC000…). */
+                if (fold_op == OP_SSHR && L->type && L->type->isunsigned)
+                    fold_op = OP_USHR;
+                if (try_fold_binop(fold_op, l, r, &v)) {
                     Type *t = node->type ? node->type : L->type;
                     return ast_literal(t ? t : type_int, (zdouble)v);
                 }
@@ -578,8 +616,9 @@ static Node *try_simplify_binop(Node *node)
             }
             return r;          /* literal 0 (could short-circuit eval of l, but x might have side effects) */
             /* TODO: preserve side effects of l. For now: keep node. */
-        case OP_OROR:
-            return l;          /* x || 0 → x (in bool context; x's truth value preserved) */
+        /* NOT `x || 0 → x`: the result of || is a normalised 0/1 bool, but
+           x can be any nonzero value (or a wide/float whose low word is 0).
+           `int r = x || 0` proved this folds to the raw x. Build the OROR. */
         case OP_ANDAND:
             return r;          /* x && 0 → 0 (x might have side effects! but legacy short-circuits anyway) */
         }
@@ -592,10 +631,9 @@ static Node *try_simplify_binop(Node *node)
         case OP_MULT:
         case OP_AND:
             return l;          /* 0 * x / 0 & x → 0 (assuming x side-effect-free; conservative) */
-        case OP_OROR:
-            return r;
+        /* NOT `0 || x → x`: result is a normalised 0/1 bool, not raw x. */
         case OP_ANDAND:
-            return l;
+            return l;          /* 0 && x → 0 (x not evaluated; 0 side-effect-free) */
         }
     }
 
@@ -4025,6 +4063,7 @@ typedef struct loop_recognized {
 
     int   exit_label;     /* label number */
     int   cont_label;     /* label number */
+    int   init_is_decl;   /* init was AST_DECL (iv scoped to the loop) */
 } loop_recognized;
 
 static int try_recognize_loop(array *stmts, int label_idx, loop_recognized *out)
@@ -4120,6 +4159,7 @@ static int try_recognize_loop(array *stmts, int label_idx, loop_recognized *out)
     Node *init = peel_singleton_compound(array_get_byindex(stmts, init_idx));
     int init_value = 0;
     int have_init = 0;
+    int init_is_decl = 0;
     if (init) {
         if (init->ast_type == OP_ASSIGN && init->left && init->right
             && init->right->ast_type == AST_LITERAL) {
@@ -4132,6 +4172,7 @@ static int try_recognize_loop(array *stmts, int label_idx, loop_recognized *out)
                 && init->declvar && init->declvar->ast_type == AST_LITERAL) {
             init_value = (int)init->declvar->zval;
             have_init = 1;
+            init_is_decl = 1;   /* iv declared in the for → scoped to it */
         }
     }
     if (!have_init) return 0;
@@ -4166,6 +4207,7 @@ static int try_recognize_loop(array *stmts, int label_idx, loop_recognized *out)
     out->init_idx = init_idx;
     out->exit_label = exit_label;
     out->cont_label = cont_lbl ? cont_lbl->label : 0;
+    out->init_is_decl = init_is_decl;
     return 1;
 }
 
@@ -4194,7 +4236,25 @@ static int try_reverse_loop(array *stmts, int label_idx)
         array_set_byindex(stmts, info.cont_label_idx, NULL);
     array_set_byindex(stmts, info.step_idx, NULL);
     array_set_byindex(stmts, info.back_jump_idx, NULL);
-    array_set_byindex(stmts, info.exit_label_idx, NULL);
+    /* Restore the induction variable's post-loop value. The original
+       `for (iv = init; iv < bound; iv++)` leaves iv == bound on exit; the
+       countdown counter is a fresh temp, so without this any later read of
+       iv (e.g. `assertEqual(i, 10)`) saw a stale value. Placed at the
+       (now-removed) exit-label slot so it builds into the loop's exit BB,
+       which the countdown marker already created from info.exit_label. If
+       iv is dead afterwards, IR DCE drops the store.
+       Skip when iv was declared in the for header (`for (int iv ...)`): it
+       is scoped to the loop, so it is never read afterwards AND a reference
+       to it past its scope doesn't translate to IR. */
+    if (!info.init_is_decl) {
+        Node *iv_lhs = ast_local_var(info.iv, info.iv->name);
+        Node *iv_val = ast_literal(info.iv->ctype, (zdouble)info.bound_value);
+        Node *iv_restore = ast_binop(OP_ASSIGN, iv_lhs, iv_val);
+        iv_restore->type = info.iv->ctype;
+        array_set_byindex(stmts, info.exit_label_idx, iv_restore);
+    } else {
+        array_set_byindex(stmts, info.exit_label_idx, NULL);
+    }
     return 1;
 }
 

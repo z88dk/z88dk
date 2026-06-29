@@ -16,6 +16,21 @@
 #include "test.h"
 #include <string.h>   /* memset/memcpy → __builtin_* (const-count inline) */
 
+/* __far access pulls the banking lp_* helpers, which live only in the
+   pure-z80 clib (z80n/z180/ez80/gbz80 lack them, and __far isn't even a
+   valid keyword on some). Gate the __far tests to z80 so the rest of the
+   suite still builds and runs on the other CPUs. __Z80 is defined for
+   both z80 and z80n; exclude z80n explicitly. */
+#if defined(__Z80) && !defined(__Z80N)
+#  define HAVE_FAR 1
+#endif
+
+/* __critical pulls asm_cpu_push_di / asm_cpu_pop_ei, absent from the ez80
+   clib — gate the __critical test off ez80 so the suite links there. */
+#if !defined(__EZ80) && !defined(__EZ80_Z80)
+#  define HAVE_CRITICAL 1
+#endif
+
 /* ---- Add ----------------------------------------------------------- */
 long long_add_vv(long a, long b) { return a + b; }
 long long_add_vc(long a)         { return a + 0x11223344L; }
@@ -53,6 +68,17 @@ long long_cast_uint (unsigned int x)  { return (long)x; }   /* ZX 2→4 */
 long long_cast_sint (signed int x)    { return (long)x; }   /* SX 2→4 */
 int  int_cast_long  (long x)          { return (int)x; }    /* TRUNC 4→2 */
 unsigned char uchar_cast_long(long x) { return (unsigned char)x; } /* TRUNC 4→1 */
+/* `(signed char)(byte_expr)` where the expr was already evaluated at byte
+   width emits a no-op 1→1 CONV_TRUNC that the lowerer once rejected
+   (charbench's signed-char loop). The call in the RHS forces the byte expr
+   (not a plain copy) so the cast survives to lowering. */
+signed char sc_three(void) { return 3; }
+signed char sc_loop_trunc1(void)
+{
+    signed char mix = 0; int i;
+    for (i = 0; i < 5; i++) mix = (signed char)(mix ^ sc_three());
+    return mix;                                /* 0^3 toggling over 5 iters → 3 */
+}
 
 /* ---- Single FF-macro mirror -------------------------------------- */
 long long_ff_one(long *buf, long *in_ptr)
@@ -190,6 +216,7 @@ int           far_gbuf[8];
 long          far_lbuf[4];
 unsigned char far_cbuf[8];
 
+#ifdef HAVE_FAR
 void far_wr(int v)             { int * __far fp = (int * __far)far_gbuf; *fp = v; }      /* *fp = v   */
 int  far_rd(void)              { int * __far fp = (int * __far)far_gbuf; return *fp; }   /* x = *fp   */
 void far_idx_wr(int i, int v)  { int * __far fp = (int * __far)far_gbuf; fp[i] = v; }    /* fp[i] = v */
@@ -211,6 +238,7 @@ int * __far far_ret(void)      { return (int * __far)far_gbuf; }       /* __far 
 _Float16 far_hbuf[2];
 void far_h_wr(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; *p = v; }
 int  far_h_eq(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; return *p == v; }
+#endif /* HAVE_FAR */
 
 /* Pointer DIFFERENCE returns the element count, not the byte count — the
    IR scales by 1/sizeof(*p) (shift for power-of-2, l_div_u else), for near
@@ -218,7 +246,9 @@ int  far_h_eq(_Float16 v) { _Float16 * __far p = (_Float16 * __far)far_hbuf; ret
    difference; near pointers were affected too, the walker divides.) */
 int near_idiff(int i) { int *a = far_gbuf, *b = far_gbuf; b += i; return (int)(b - a); }
 int near_ldiff(int i) { long *a = far_lbuf, *b = far_lbuf; b += i; return (int)(b - a); }
+#ifdef HAVE_FAR
 int far_idiff(int i)  { int * __far a = (int * __far)far_gbuf, * __far b; b = a; b += i; return (int)(b - a); }
+#endif
 
 /* Special calling conventions, caller AND callee both IR-native:
  *  __stdc forces right-to-left push, so the callee param layout flips
@@ -307,8 +337,10 @@ int aw_l (int n) { return (int)aw_l_fn(n); }
 /* Function-level __critical: prologue l_push_di / epilogue l_pop_ei, and
    the 2-byte DI state shifts every param's stack offset (the IR adds it to
    the param base). */
+#ifdef HAVE_CRITICAL
 int cc_crit(int a, int b) __critical;
 int cc_crit(int a, int b) __critical { return a + b; }
+#endif
 
 /* ---- Inlined const-count memset / memcpy (IR_MEMSET / IR_MEMCPY) ---
  * memset/memcpy with a const count are lowered inline by ir_build: tiny
@@ -477,6 +509,76 @@ static void test_byte_overrun(void)
     Assert((unsigned char)ro_smix((signed char *)buf, 10) == 2, "signed byte mix");
 }
 
+/* ---- Byte-width narrowing (ir_opt_narrow_byte / 8-bit-in-A lowering) -
+ * A promoted int op (char op char / char op const) whose result is only
+ * truncated back to a byte is re-typed width-1 and lowered in A — no
+ * widening to HL, no 16-bit ALU on the dead high byte. Assert each
+ * narrowable shape gives the correct low byte (incl. wrap) for both
+ * signednesses. Args (not constants) keep the ops out of the folder so
+ * the runtime byte path is what's exercised; the crc8 shift-diamond and
+ * the signed accumulator are covered by test_byte_overrun above. */
+static unsigned char bn_and(unsigned char a, unsigned char b) { return a & b; }
+static unsigned char bn_or (unsigned char a, unsigned char b) { return a | b; }
+static unsigned char bn_xor(unsigned char a, unsigned char b) { return a ^ b; }
+static unsigned char bn_add(unsigned char a, unsigned char b) { return a + b; }
+static unsigned char bn_sub(unsigned char a, unsigned char b) { return a - b; }
+static unsigned char bn_shl(unsigned char a)                  { return a << 1; }
+static unsigned char bn_chain(unsigned char a)                { return (a & 0x0fU) | 0x20U; }
+static signed char   bn_sadd(signed char a, signed char b)
+                                       { signed char r = (signed char)(a + b); return r; }
+
+static void test_byte_narrow(void)
+{
+    Assert(bn_and(0x5a, 0x0f) == 0x0a,            "byte and (var,var)");
+    Assert(bn_or (0x12, 0x20) == 0x32,            "byte or (var,var)");
+    Assert(bn_xor(0xff, 0x55) == 0xaa,            "byte xor (var,var)");
+    Assert(bn_add(0xf0, 0x20) == 0x10,            "byte add wrap");   /* 0x110 */
+    Assert(bn_sub(0x10, 0x20) == 0xf0,            "byte sub wrap");   /* -0x10 */
+    Assert(bn_shl(0xc3)       == 0x86,            "byte shl<<1 wrap"); /* 0x186 */
+    Assert(bn_chain(0xff)     == 0x2f,            "byte (&imm)|imm chain");
+    /* Signed byte add narrows too; the signed accumulator/sub shapes are
+       covered by ro_smix in test_byte_overrun (a known pre-existing
+       multi-call signed-sub spill bug — diamond-carry family — is out of
+       scope for the byte-narrow change and tracked separately). */
+    Assert((unsigned char)bn_sadd((signed char)-2, (signed char)5) == 3,
+                                                  "signed byte add");
+}
+
+/* ---- Diamond-carry: value live across a control-flow merge ----------
+ * A value that must survive an if/else (or ||/&& short-circuit, or switch)
+ * merge must be materialised on EVERY incoming edge, not just one — else
+ * the merge reads a stale register on the missing edge (historic crash:
+ * the then-arm ended `ld bc,K` but the else-arm didn't). The cross-BB HL
+ * carry now only fires when all preds are lowered, agree, and the vreg is
+ * live-in; these shapes pin that. Args are runtime (params), so the
+ * condition is a real branch, not a fold. */
+static int dc_g(int x) { return x + 1; }
+static int dc_sel(int a) { int r; if (a) r = 1; else r = 2; return r; }
+static int dc_orlong(long v) { return (v || 0); }   /* wide truth-test + || merge */
+/* register pressure: a..d all live across the merge AND after it */
+static int dc_hp(int sel) {
+    int a = dc_g(1), b = dc_g(2), c = dc_g(3), d = dc_g(4);
+    int r = sel ? (a + b) : (c + d);
+    return r + a + b + c + d;
+}
+static long dc_wter(int s) { long r = s ? 0x11110000L : 0x22220000L; return r | 0xABCDL; }
+static int dc_andv(int a, int b) { int r = (a && b); return r * 10 + 5; }
+static int dc_sw(int k) { int r = 100; switch (k) { case 1: r = 1; break;
+                          case 2: r = 2; break; default: r = 9; } return r + 1000; }
+
+static void test_diamond_carry(void)
+{
+    Assert(dc_sel(1) == 1 && dc_sel(0) == 2,        "if/else merge both edges");
+    Assert(dc_orlong(0x10000L) == 1,                "wide || truthy (was 0: stale merge reg)");
+    Assert(dc_orlong(0L) == 0,                       "wide || falsy");
+    Assert(dc_hp(1) == 5 + 14 && dc_hp(0) == 9 + 14, "merge under register pressure");
+    Assert(dc_wter(1) == (long)(0x11110000L | 0xABCDL), "wide ternary then");
+    Assert(dc_wter(0) == (long)(0x22220000L | 0xABCDL), "wide ternary else");
+    Assert(dc_andv(1, 1) == 15 && dc_andv(1, 0) == 5,   "&& result used in arith");
+    Assert(dc_sw(1) == 1001 && dc_sw(2) == 1002 && dc_sw(7) == 1009,
+                                                     "switch merge carries value");
+}
+
 /* ---- Pointer-increment stride (regex ++test miscompile) -----------
  * `++p` / `p++` on a pointer LOCAL must advance by sizeof(*p), not 1.
  * A bare-local step used to emit IR_INC (+1) regardless of pointee size,
@@ -509,6 +611,238 @@ static void test_ptr_stride(void)
     q = ps_ints; sum = 0;
     for (i = 0; i < 4; i++) { sum += *q; ++q; }
     Assert(sum == 100, "int* increment stride");          /* 10+20+30+40 */
+}
+
+/* LICM false back-edge: an if/else whose merge block is numbered BELOW
+   the else arm made the arm->merge join edge look like a loop back-edge
+   (the detector keyed only on succ.id <= bb.id), so the "loop body" was
+   bogus and LICM hoisted the else arm's LD_IMM into the OTHER arm's
+   pre-header — the constant no longer dominated its use, feeding the call
+   a garbage argument. lf_licm(0) must take the else arm and pass 16. */
+static int lf_g(int x) { return x + 1; }
+static int lf_licm(int a) { int s = 0; if (a < 0) {} else { s += lf_g(15); } return s; }
+
+static void test_licm_join(void)
+{
+    Assert(lf_licm(0) == 16,  "if/else join not a loop (else arm const hoist)");
+    Assert(lf_licm(-1) == 0,  "if/else then arm");
+}
+
+/* A char loop counter and a char body var land in ADJACENT 1-byte frame
+   slots. INC/DEC of a width-1 vreg used to store-back 2 bytes (HL), whose
+   high byte zeroed the neighbouring char every iteration. Non-const bound
+   so the loop isn't reversed — exercises the in-body byte-INC store. */
+static unsigned char lr_byte_n(unsigned char n) {
+    unsigned char acc = 0, i;
+    for (i = 0; i < n; i++) acc++;
+    return acc;                 /* bug: returned 0 (acc clobbered by i++) */
+}
+/* loop-reverse rewrites `for(i=0;i<N;i++)` into a countdown over a fresh
+   temp; it must restore the induction var's post-loop value (i==N) for a
+   later read. Pre-declared i (OP_ASSIGN init) → live after, restore needed. */
+static unsigned char lr_iv_after(void) {
+    unsigned char i, acc = 0;
+    for (i = 0; i < 10; i++) acc++;
+    return i;                   /* bug: returned a stale counter value (7) */
+}
+
+static void test_loop_lower(void)
+{
+    Assert(lr_byte_n(10) == 10, "byte INC/DEC stores one byte (no adjacent clobber)");
+    Assert(lr_iv_after() == 10, "loop-reverse restores induction var");
+}
+
+/* Long compare with one operand at the TOS frame slot. The long-compare
+   lowering stages the OTHER operand on the data stack first (sp_adj>0),
+   then loads this one — but the fp-mode TOS pop/push load-trick is sp-
+   relative and ignored that adjustment, popping the just-pushed operand
+   instead of the slot (so `a<b` compared b against b → false). The call
+   defeats const-fold so the compare is a genuine runtime long compare; the
+   -10 local lands at the deepest (TOS) frame slot. */
+static void lr_clobber(void) { }
+static int lr_long_cmp_tos(void) { long a = -10, b = 20; lr_clobber(); return a < b; }
+
+static void test_long_cmp_tos(void)
+{
+    Assert(lr_long_cmp_tos() == 1, "long compare reads TOS-slot operand past a stack push");
+}
+
+/* Address-taken local must keep its frame slot for the whole escape
+   lifetime. The value-vreg's live range ENDS at `&a` (LEA), so the slot
+   allocator packed a later temp (here the *_b load for the compare) into
+   a's slot — corrupting the memory _a still points to, so *_a read *_b's
+   value (both operands equal → b>a false). The call defeats const-fold so
+   the derefs are real loads through the pinned slots. */
+static int lr_sink(int x) { return x; }
+static int lr_addr_alias(void) {
+    unsigned long a = 0x1000UL, b = 0x9000UL;
+    unsigned long *pa = &a, *pb = &b;
+    lr_sink(0);
+    return (*pb > *pa) ? 1 : 0;   /* 0x9000 > 0x1000 → 1 */
+}
+
+static void test_addr_taken_slot(void)
+{
+    Assert(lr_addr_alias() == 1, "address-taken local slot not reused by a temp");
+}
+
+/* `!x * -1 < 0` (== 1 for x==0). Two bugs: (a) `!x` is a compare result
+   cached in HL with no spill slot; the `* -1` NEG read its operand into DE
+   via a bogus below-frame slot offset (the preceding asserts add the
+   register pressure that keeps it slotless). (b) `!` must yield signed int
+   — `!ui` kept `unsigned`, so the `< 0` compared unsigned and `-1 < 0` was
+   false. The earlier const-cast asserts reproduce the slot pressure. */
+static void test_not_expr(void)
+{
+    signed char  sc = 0;
+    unsigned int ui = 0;
+    Assert(!(signed char)0 * -1 < 0, "!(char)0 *-1 <0");
+    Assert(!(unsigned char)0 * -1 < 0, "!(uchar)0 *-1 <0");
+    Assert(!sc * -1 < 0, "!signed-char *-1 <0 (reg-operand NEG)");
+    Assert(!ui * -1 < 0, "!unsigned *-1 <0 stays signed");
+}
+
+/* Two same-named locals in sequential scopes reuse one SYMBOL; the IR
+   builder's sym→vreg map appended a shadow and lookups returned the FIRST
+   binding, so the second loop's `i` references resolved to the FIRST
+   loop's vreg — its counter was never initialised and it ran from a stale
+   value. `i` is used in the body (sa[i]=) so loop-reverse doesn't mask it
+   with a fresh countdown counter. Only a stale 2nd loop writes sa[5]. */
+static unsigned char lr_sa[16];
+static int lr_seq_loops(void) {
+    for (unsigned long i = 0; i < 3; i++)   lr_sa[i] = 1;
+    for (unsigned long i = 10; i < 13; i++) lr_sa[i] = 2;
+    return lr_sa[5];
+}
+
+static void test_seq_scope_loops(void)
+{
+    Assert(lr_seq_loops() == 0, "sequential same-named loop counter rebinds to its own vreg");
+}
+
+/* A value live across inline asm must not be kept register-only: an opaque
+   `asm` may clobber the register (and there's no save/restore around it),
+   and a PR_BC LOCAL has no backing slot — so it was reloaded from a bogus
+   below-frame offset, reading garbage. The `scf` also defeats const-fold so
+   `b` is a genuine runtime value spanning the asm. With b=1, b<=0 is false. */
+static int lr_asm_live(void)
+{
+    int a = 0, b = 1, r = 0;
+    __asm__("scf");
+    if (a <= 0) {} else { r += 1; }
+    if (b <= 0) { r += 2; }
+    return r;
+}
+
+static void test_asm_live(void)
+{
+    Assert(lr_asm_live() == 0, "value live across inline asm not reloaded from a bogus slot");
+}
+
+/* int << 8 where the operand is register-only (PR_BC local, no slot): the
+   SHL≥8 byte-grab fastpath read the low byte from a bogus below-frame slot
+   instead of the register. The call makes `v` a runtime PR_BC local; two
+   uses keep it live. With v=1, v<<8 is 256. */
+static int lr_shl_call(int x) { return x; }
+static int lr_shl8(void) {
+    int v = 1;
+    lr_shl_call(0);
+    int r = 0;
+    if (v << 8 != (1 << 8)) r += 1;
+    if (v << 8 != (1 << 8)) r += 2;
+    return r;
+}
+/* `unsigned long long >> 1` const-folds logically (zero-fill). `>>` parses
+   as the signed op, and the fold sign-extended a bit-63-set value
+   (0x8000…>>1 → 0xC000… instead of 0x4000…); v>>1 at runtime is the logical
+   IR_SHR, so the suite's `v>>1 == CONST>>1` mismatched. */
+static int lr_ushr64(unsigned long long v) {
+    return (v >> 1) == (0x8000000000000000ULL >> 1);
+}
+/* Mirror of lr_shl8 for SHR: `int>>8` of a register-only (PR_BC) operand.
+   The SHR≥8 partial-load fastpath read the operand's SLOT directly; a
+   register-only vreg has no slot, so it read a bogus below-frame offset
+   (the SHL≥8 path already guarded this; the SHR mirror did not). v=0x1234
+   in BC; v>>8 must be 0x12. */
+static int lr_shr_call(int x) { return x; }
+static int lr_shr8(void) {
+    int v = 0x1234;
+    lr_shr_call(0);
+    int r = 0;
+    if ((v >> 8) != 0x12) r += 1;
+    if ((v >> 8) != 0x12) r += 2;
+    return r;
+}
+
+static void test_shift_edges(void)
+{
+    Assert(lr_shl8() == 0, "int<<8 of a register-only operand reads the right byte");
+    Assert(lr_shr8() == 0, "int>>8 of a register-only operand reads the right byte");
+    Assert(lr_ushr64(0x8000000000000000ULL) == 1, "unsigned long long >>1 folds logically");
+}
+
+/* Signed-char arithmetic narrows: `(signed char)(acc op b)` promotes both
+   operands via CONV_SX; narrow_byte makes those byte-identity copies and
+   copy_prop removes them (no per-operand 16-bit sign-extend). Guard the
+   wrap + sign of the byte arithmetic is still correct. Mirrors charbench's
+   schar_mix. */
+static signed char lr_smix_data[5] = { 3, -5, 100, -100, 7 };
+static signed char lr_smix(signed char *p, int n) {
+    signed char acc = -1;
+    int i;
+    for (i = 0; i < n; i++) {
+        signed char b = p[i];
+        if (b < 0) acc = (signed char)(acc - b);
+        else       acc = (signed char)(acc + b);
+        acc = (signed char)((acc << 1) ^ b);
+    }
+    return acc;
+}
+
+static void test_schar_arith(void)
+{
+    Assert((unsigned char)lr_smix(lr_smix_data, 5) == 9,
+           "signed-char mix (sub/add/shl/xor, narrowed CONV_SX)");
+}
+
+/* A byte-mask AND feeding a branch (`if (c & 0x80)`) narrows to width-1 and
+   tests the low byte directly (no `ld h,0` widen) — guard that dropping the
+   high byte doesn't flip any branch. crc8's hot test is exactly this shape. */
+static int lr_byte_mask_br(unsigned char c)
+{
+    int r = 0;
+    if (c & 0x80) r += 1;
+    if (c & 0x01) r += 2;
+    if (c & 0x40) r += 4;
+    if (!(c & 0x08)) r += 8;
+    return r;
+}
+
+static void test_byte_mask_branch(void)
+{
+    Assert(lr_byte_mask_br(0x00) == 8,  "byte-mask branch all-clear");
+    Assert(lr_byte_mask_br(0x80) == 9,  "byte-mask branch high bit");   /* 1+8 */
+    Assert(lr_byte_mask_br(0xC1) == 15, "byte-mask branch C1");         /* 1+2+4+8 */
+    Assert(lr_byte_mask_br(0x08) == 0,  "byte-mask branch bit3 set");
+}
+
+/* `*p++` byte deref + post-increment fuses to one post-step load. The
+   bumped pointer must be written back to its HOME (BC when register-
+   allocated, else the slot) — leaving a stale BC made the loop never
+   advance (infinite loop). Forward (++) and backward (--) walks. */
+static unsigned char lr_pp_buf[6] = { 1, 2, 4, 8, 16, 32 };
+static int lr_sum_pp(unsigned char *p, int n)   { int s = 0; while (n--) s += *p++; return s; }
+static int lr_sum_mm(unsigned char *p, int n)   { int s = 0; while (n--) s += *p--; return s; }
+static int lr_iw_buf[5] = { 100, 200, 400, 800, 1600 };
+static int lr_sum_iw(int *p, int n)             { int s = 0; while (n--) s += *p++; return s; }
+
+static void test_deref_postinc(void)
+{
+    Assert(lr_sum_pp(lr_pp_buf, 6) == 63,        "*p++ byte walk (1+2+4+8+16+32)");
+    Assert(lr_sum_mm(lr_pp_buf + 5, 6) == 63,    "*p-- byte walk");
+    Assert(lr_sum_pp(lr_pp_buf + 2, 3) == 28,    "*p++ mid-array (4+8+16)");
+    Assert(lr_sum_iw(lr_iw_buf, 5) == 3100,      "int* *p++ word walk (+2 step)");
+    Assert(lr_sum_iw(lr_iw_buf + 2, 3) == 2800,  "int* *p++ mid-array (400+800+1600)");
 }
 
 static void test_ctrlflow(void)
@@ -553,6 +887,7 @@ static void test_addressmod(void)
 
 static void test_far(void)
 {
+#ifdef HAVE_FAR
     int i;
     int * __far r;
     far_wr(0x1234);
@@ -571,9 +906,12 @@ static void test_far(void)
     Assert(r[0] == 0x4321,        "__far pointer return value");
     far_h_wr((_Float16)7);
     Assert(far_h_eq((_Float16)7), "__far _Float16 element (2B float via lp_gint)");
+#endif /* HAVE_FAR */
     Assert(near_idiff(5) == 5,    "near int* difference (scaled /2)");
     Assert(near_ldiff(3) == 3,    "near long* difference (scaled /4)");
+#ifdef HAVE_FAR
     Assert(far_idiff(6) == 6,     "__far int* difference (scaled /2)");
+#endif
     Assert(cc_stdc(1, 2, 3) == 123, "__stdc R\xe2\x86\x92L param order");
     Assert(cc_sdcc(10, 20, 300) == 330, "__z88dk_sdccdecl 1-byte char args");
     Assert(cc_fc(50, 8) == 42,      "__z88dk_fastcall int arg in HL");
@@ -581,7 +919,9 @@ static void test_far(void)
     Assert(cc_fcl(0x11223344L) == 0x11223444L, "__z88dk_fastcall long arg in DEHL");
     Assert((int)cc_fcll((long long)41) == 42,
            "__z88dk_fastcall long long arg in __i64_acc");
+#ifdef HAVE_CRITICAL
     Assert(cc_crit(40, 2) == 42,    "__critical push_di/pop_ei + param shift");
+#endif
     bf_set(5, 20, 200);
     Assert(bf_get_a() == 5,   "bitfield read a:3 (masked)");
     Assert(bf_get_b() == 20,  "bitfield read b:5 (shift+mask)");
@@ -648,6 +988,22 @@ static void test_casts(void)
     Assert(long_cast_sint(-1)            == (long)0xffffffffL, "sint→long");
     Assert(int_cast_long(0x12345678L)    == (int)0x5678,        "long→int");
     Assert(uchar_cast_long(0x12345678L)  == 0x78,               "long→uchar");
+    Assert(sc_loop_trunc1()              == 3,    "(signed char) of byte expr (1→1 CONV_TRUNC)");
+    /* Constant-fold of a narrowing cast must reinterpret sign, not just
+       union-range-check (ast_opt OP_CAST): a sign-agnostic [-128,255]
+       range left (unsigned char)-7 as -7 and (signed char)200 as 200. */
+    Assert((unsigned char)-7  == 0xf9, "fold (unsigned char)-7 -> 0xF9");
+    Assert((unsigned char)-1  == 0xff, "fold (unsigned char)-1 -> 0xFF");
+    Assert((signed char)200   == -56,  "fold (signed char)200 -> -56");
+    Assert((char)200          == -56,  "fold (char)200 -> -56 (char signed)");
+    Assert((unsigned char)300 == 44,   "fold (unsigned char)300 -> 44");
+    Assert((unsigned char)200 == 200,  "fold (unsigned char)200 in range");
+    Assert((signed char)-7    == -7,   "fold (signed char)-7 in range");
+    /* Same-width signedness cast also reinterprets (dst==src kind, so the
+       old dst<src gate skipped it): (unsigned int)-1 is 0xFFFF, not -1. */
+    Assert((unsigned int)-1   == 0xffffU,      "fold (unsigned int)-1 -> 0xFFFF");
+    Assert((unsigned int)-1    > 0,            "fold (unsigned int)-1 > 0");
+    Assert((unsigned long)-1L == 0xffffffffUL, "fold (unsigned long)-1 -> 0xFFFFFFFF");
 }
 
 static void test_ff_one(void)
@@ -690,6 +1046,180 @@ static void test_big_bb(void)
     Assert(long_big_bb(0x12345678L, (long)0xaabbccddL,
                         0x5a5a5a5aL, 0x00010001L)
            == (long)0xdfe109c6L, "big bb");
+}
+
+/* ---- int variable shifts + const adds -----------------------------
+   Regression guards for the z80n extra-ALU lowering: variable 16-bit
+   `<<`/`>>` lower to `bsla/bsrl de,b` on z80n and to the add-hl-hl /
+   srl-rr loop elsewhere — both must give identical results. Const adds
+   lower to `add hl,nn` on z80n (flags-free, carry-out dead) vs
+   `ld de,nn; add hl,de`. n is a param so nothing const-folds. */
+int      int_shl_v (int x, int n)           { return x << n; }
+unsigned uint_shr_v(unsigned x, int n)      { return x >> n; }
+/* constant counts: exercise the const-barrel (N>=6 SHL / N>=3 SHR) and
+   the unrolled (small N) paths — both must agree across CPUs. */
+int      int_shl_c6 (int x)                 { return x << 6; }
+int      int_shl_c2 (int x)                 { return x << 2; }
+unsigned uint_shr_c5(unsigned x)            { return x >> 5; }
+unsigned uint_shr_c1(unsigned x)            { return x >> 1; }
+int      int_add_c (int x)                  { return x + 0x1234; }
+int      int_add_cneg(int x)                { return x + (-7); }
+unsigned uint_add_c(unsigned x)             { return x + 50000u; }
+/* deep-locals: several int locals plus a hot long accumulator, exercising
+   frame-slot ordering / the sp+0 (and width-4 TOS) access paths. */
+long deep_locals(int a, int b, int c, int d)
+{
+    int  w = a + 1, x = b + 2, y = c + 3, z = d + 4;
+    long acc = 0;
+    int  i;
+    for (i = 0; i < 4; i++) acc += (long)(w + x + y + z) << 1;
+    return acc + w - x + y - z;
+}
+
+/* 8085 sp-relative word load/store via the undocumented LDSI (`ld
+   de,sp+N`) + LHLX/SHLX (`ld hl,(de)` / `ld (de),hl`): the lowerer
+   addresses 16-bit frame slots through DE. load_to_hl MUST preserve a
+   live operand already parked in DE — the regression was an LHLX load
+   form that clobbered DE, miscompiling binops whose RHS is a local.
+   This forces locals through both HL- and DE-operand positions with
+   stores and reloads between. Other CPUs take their existing paths. */
+int sprel_binop(int a, int b, int c, int d)
+{
+    int w = a + b;          /* store w to a slot */
+    int x = c + d;          /* store x to a slot */
+    int y = w - x;          /* w,x both locals: one -> DE, the other -> HL */
+    int z = w * x;          /* reload w,x as the mul operands */
+    return y + z - w + x;   /* reload all from slots */
+}
+
+/* Signed 16-bit comparisons used as BRANCH conditions, including the
+   overflow regime (|a-b| > 32767) where the true ordering can't be read
+   off the raw subtraction's sign bit. On 8085 these fuse to DSUB +
+   jp k/nk (K = S^V, the signed-LT flag); elsewhere to the sign-flip
+   path. The if() form is the fused branch that exercises it. */
+int scmp(int a, int b)
+{
+    int r = 0;
+    if (a <  b) r += 1;
+    if (a <= b) r += 2;
+    if (a >  b) r += 4;
+    if (a >= b) r += 8;
+    return r;
+}
+
+/* Multi-field pointer deref p->a+p->b+p->c+p->d. On ez80 each word field
+   loads via `ld hl,(hl)` (native, ed 27); the pointer is kept in BC and
+   copied to HL (`ld hl,bc`) before each deref. A copt rule (#285b: drop
+   `ld hl,bc` when followed by `ld hl,%1`) wrongly removed that copy for
+   the offset-0 field, since `ld hl,(hl)` READS hl — miscompiling the
+   first field. */
+struct quad { int a, b, c, d; };
+struct quad quad_g = { 10, 20, 30, 40 };
+int field_sum4(struct quad *p) { return p->a + p->b + p->c + p->d; }
+
+/* 16-bit rotate-left-5 with extra live operands. On z80n the `>>11` half
+   lowers to `bsrl de,b`; its `ld b,N` clobbered a live BC tenant (here a
+   kept operand) — the barrel paths must push/pop a live BC. */
+unsigned rot11_keep(unsigned x, unsigned k1, unsigned k2)
+{
+    unsigned r = (x << 5) | (x >> 11);
+    return r + k1 + k2;
+}
+
+/* Ternary on a wide value: the result vreg must be sized from the
+   ternary's type. It was hardcoded width 2, truncating a long (or
+   double / long long) ternary to its low word via the arm MOVs. */
+long tern_long(int c, long a, long b) { return c ? a : b; }
+
+/* Truth-test of a wide value: BR_ZERO/BR_COND must test ALL bytes, not
+   just the low word — a long/long long whose low 16 bits are zero (but is
+   nonzero overall) once read as false. And `x || 0` must yield a canonical
+   0/1 bool: an ast_opt identity folded it to raw x, so `(3 || 0)` was 3. */
+static int  id_int (int x)       { return x; }
+static long id_long(long x)      { return x; }
+static long long id_ll(long long x) { return x; }
+/* loop bodies run iff the low-word-zero value is correctly truthy */
+static int lw0_long_truthy(void)
+    { long a = id_long(0x10000L); int n = 0; while (a) { a = id_long(0L); n++; } return n; }
+static int lw0_ll_truthy(void)
+    { long long a = id_ll(0x100000000LL); int n = 0; while (a) { a = id_ll(0LL); n++; } return n; }
+
+static void test_truth(void)
+{
+    Assert(lw0_long_truthy() == 1, "long 0x10000 (low word 0) truthy (BR_ZERO all bytes)");
+    Assert(lw0_ll_truthy()   == 1, "long long 0x1_00000000 (low word 0) truthy");
+    Assert((id_int(3) || 0)  == 1, "(x||0) is canonical bool 1, not raw x");
+    Assert((0 || id_int(3))  == 1, "(0||x) is canonical bool 1, not raw x");
+    Assert((id_int(0) || 0)  == 0, "(0||0) is 0");
+}
+
+static void test_int_arith(void)
+{
+    Assert(int_shl_v(3, 5)       == 96,             "int <<5");
+    Assert(int_shl_v(1, 15)      == (int)0x8000,    "int <<15");
+    Assert(int_shl_v(0x1234, 0)  == 0x1234,         "int <<0");
+    Assert(uint_shr_v(0xF000u, 5) == 0x0780u,       "uint >>5");
+    Assert(uint_shr_v(0xFFFFu, 1) == 0x7FFFu,       "uint >>1");
+    Assert(uint_shr_v(0xFFFFu, 0) == 0xFFFFu,       "uint >>0");
+    Assert(int_shl_c6(0x0101)    == 0x4040,         "int <<6 const");
+    Assert(int_shl_c2(0x1111)    == 0x4444,         "int <<2 const");
+    Assert(uint_shr_c5(0xF000u)  == 0x0780u,        "uint >>5 const");
+    Assert(uint_shr_c1(0x8001u)  == 0x4000u,        "uint >>1 const");
+    Assert(int_add_c(0x1000)     == 0x2234,         "int +0x1234");
+    Assert(int_add_cneg(10)      == 3,              "int +(-7)");
+    Assert(uint_add_c(20000u)    == 4464u,          "uint +50000 wrap");
+    Assert(deep_locals(10, 20, 30, 40) == 858L,     "deep locals");
+    Assert(sprel_binop(3, 4, 5, 6) == 77,           "8085 sp-rel word ld/st preserves DE operand");
+    Assert(scmp(30000, -30000) == 12,               "signed cmp overflow: 30000 vs -30000 (gt/ge)");
+    Assert(scmp(-30000, 30000) == 3,                "signed cmp overflow: -30000 vs 30000 (lt/le)");
+    Assert(scmp(32767, -32768) == 12,               "signed cmp overflow: INT_MAX vs INT_MIN");
+    Assert(scmp(-32768, 32767) == 3,                "signed cmp overflow: INT_MIN vs INT_MAX");
+    Assert(scmp(5, 5) == 10,                        "signed cmp equal (le/ge)");
+    Assert(field_sum4(&quad_g) == 100,              "multi-field ptr deref (ez80 ld hl,(hl))");
+    Assert(rot11_keep(0x1234, 0x1111, 0x2222) == 0x79B5U, "rotl5 + live operands (z80n bsrl BC)");
+    Assert(tern_long(1, 0x11223344L, 0x55667788L) == 0x11223344L, "long ternary then-arm (no width-2 truncation)");
+    Assert(tern_long(0, 0x11223344L, 0x55667788L) == 0x55667788L, "long ternary else-arm");
+}
+
+/* ---- Long ordered compare with a constant RHS --------------------------
+ * `a > K` / `a <= K` on a width-4 operand have no direct lowering; ir_build
+ * canonicalizes them to `a >= K+1` / `a < K+1` (the LT/GE-const path). This
+ * used to be a fatal silent bail (sccz80 compare* suites couldn't build).
+ * Cover signed + unsigned, low- and high-word, both branch directions.
+ * L()/U() are pass-through so the operand is a runtime value, not a fold. */
+static long          licmp_L(long x)          { return x; }
+static unsigned long licmp_U(unsigned long x) { return x; }
+static int           licmp_I(int x)           { return x; }
+static unsigned      licmp_UI(unsigned x)     { return x; }
+static signed char   licmp_C(signed char x)   { return x; }
+static unsigned char licmp_UC(unsigned char x){ return x; }
+
+static void test_long_cmp_const(void)
+{
+    /* `a>K` / `a<=K` const has no direct lowering at ANY width; ir_build
+       canonicalizes to `a>=K+1` / `a<K+1`. Width-1/2 used to read an
+       uninitialised slot for the constant; width-4 fatally bailed. */
+    Assert((licmp_L(5)  <= 5) == 1 && (licmp_L(6) <= 5) == 0, "long a<=K");
+    Assert((licmp_L(-3) <= 0) == 1 && (licmp_L(1) <= 0) == 0, "long a<=0");
+    Assert((licmp_L(6)  >  5) == 1 && (licmp_L(5) >  5) == 0, "long a>K");
+    Assert((licmp_L(1)  >  0) == 1 && (licmp_L(-3) > 0) == 0, "long a>0");
+    Assert((licmp_L(0x10000L) > 5) == 1,            "long a>K high word");
+    Assert((licmp_L(0x10000L) <= 0xFFFFL) == 0,     "long a<=K high word");
+    Assert((licmp_U(5UL) <= 5UL) == 1 && (licmp_U(6UL) <= 5UL) == 0, "ulong a<=K");
+    Assert((licmp_U(0x80000000UL) > 3UL) == 1,      "ulong a>K bit31 set");
+    /* int / unsigned int */
+    Assert((licmp_I(1) <= 0) == 0 && (licmp_I(-1) <= 0) == 1, "int a<=0");
+    Assert((licmp_I(6) >  5) == 1 && (licmp_I(5) >  5) == 0,  "int a>K");
+    Assert((licmp_UI(0u) <= 0u) == 1 && (licmp_UI(6u) > 5u) == 1, "uint a<=0 / a>K");
+    /* signed / unsigned char */
+    Assert((licmp_C(-1) <= 0) == 1 && (licmp_C(1) <= 0) == 0, "schar a<=0");
+    Assert((licmp_UC(200) > 5) == 1 && (licmp_UC(3) <= 5) == 1, "uchar a>K / a<=K");
+    /* Degenerate K = type-max (incl. unsigned compare vs a negative literal,
+       which means UMAX): `a<=max` always true, `a>max` always false — K+1
+       would wrap, so these fold to a constant instead of canonicalizing. */
+    Assert((licmp_U(7u)  <= -1) == 1 && (licmp_U(7u)  > -1) == 0, "uint a<=/>-1 (UMAX)");
+    Assert((licmp_UI(7u) <= 0xFFFFu) == 1,            "uint a<=UMAX");
+    Assert((licmp_I(7)   <= 0x7FFF) == 1,             "int a<=INT_MAX");
 }
 
 static void test_shifts(void)
@@ -761,6 +1291,19 @@ double gd6;
 double d_locrt (double a, double b) { double x; x = a; x = x + b; return x; }
 double d_globrt(double a)           { gd6 = a; return gd6; }
 double d_ptrrt (double *p, double a){ *p = a; return *p; }
+/* Struct-member double store. The member lvalue type can read back as int,
+   so the store must size off the value type or the double gets truncated. */
+struct sd_s { int pad; double d; };
+struct sd_s sd_g;
+double d_smemg(double a)                  { sd_g.d = a; return sd_g.d; }  /* gs.d = a   */
+double d_smemp(struct sd_s *p, double a)  { p->d = a;   return p->d;   }  /* p->d = a   */
+/* Float compare on a function-pointer call result. The fnptr-call node keeps
+   its KIND_FUNC type (not unwrapped to the return type like a direct call),
+   so the compare must read the call's *return* kind or it never picks the
+   float compare helper. */
+double (*d_fp)(double);
+int d_fp_eq(int x) { d_fp = d_id; return d_fp(i_to_d(x)) == i_to_d(x); }
+int d_fp_lt(int x) { d_fp = d_id; return d_fp(i_to_d(x)) <  i_to_d(x + 1); }
 double d_litc  (void)               { return 2.5; }         /* double literal (pool @ 6-byte) */
 double d_neg   (double a)           { return -a; }          /* FA negate (minusfa) */
 double d_negx  (double a, double b) { return -(a + b); }    /* negate of an expr */
@@ -888,6 +1431,13 @@ static void test_double(void)
         double pv;
         Assert(d_to_i(d_ptrrt(&pv, i_to_d(8)))    == 8, "dbl *p=a");
     }
+    Assert(d_to_i(d_smemg(i_to_d(9))) == 9, "dbl global struct member store gs.d=a");
+    {
+        struct sd_s sl;
+        Assert(d_to_i(d_smemp(&sl, i_to_d(6))) == 6, "dbl ptr->member store p->d=a");
+    }
+    Assert(d_fp_eq(5) == 1, "dbl fnptr-call result in == compare");
+    Assert(d_fp_lt(5) == 1, "dbl fnptr-call result in < compare");
     Assert(d_to_i(d_add(d_litc(), d_litc())) == 5, "dbl literal 2.5+2.5=5");
     Assert(d_to_i(d_neg(i_to_d(6)))  == -6, "dbl unary neg -6 (minusfa)");
     Assert(d_to_i(d_neg(i_to_d(-4))) == 4,  "dbl unary neg of negative");
@@ -895,6 +1445,25 @@ static void test_double(void)
     Assert(d_to_i(h_to_d(d_to_h(i_to_d(9)))) == 9, "dbl<->_Float16 round trip");
     Assert(d_to_i(d_add(h_to_d(d_to_h(i_to_d(2))), i_to_d(3))) == 5,
            "_Float16->double in an expr");
+}
+
+/* ---- 16-bit int eq/ne (emulated-sbc Z flag) ----------------------- */
+int int_eq(int a, int b) { return a == b; }
+int int_ne(int a, int b) { return a != b; }
+
+static void test_int_eq(void)
+{
+    /* On CPUs without a real `sbc hl,de` (gbz80/808x) the z80asm emulation
+       sets Z from the high byte only; values differing solely in the low
+       byte (high byte of a-b is 0) once false-matched as equal, breaking
+       eq/ne and any setjmp loop built on them. */
+    Assert(int_eq(1, 0)           == 0, "1==0 false");
+    Assert(int_ne(1, 0)           == 1, "1!=0 true");
+    Assert(int_eq(0x0105, 0x0103) == 0, "0x0105==0x0103 false (low differs)");
+    Assert(int_ne(0x0105, 0x0103) == 1, "0x0105!=0x0103 true");
+    Assert(int_eq(0x0305, 0x0305) == 1, "0x0305==0x0305 true");
+    Assert(int_ne(0x0200, 0x0100) == 1, "high differs -> ne");
+    Assert(int_eq(7, 7)           == 1, "7==7 true");
 }
 
 static void test_longlong(void)
@@ -973,6 +1542,9 @@ int suite_long_ir(void)
     suite_add_test(test_bitwise);
     suite_add_test(test_unary);
     suite_add_test(test_shifts);
+    suite_add_test(test_int_arith);
+    suite_add_test(test_long_cmp_const);
+    suite_add_test(test_truth);
     suite_add_test(test_compound);
     suite_add_test(test_casts);
     suite_add_test(test_ff_one);
@@ -981,13 +1553,27 @@ int suite_long_ir(void)
     suite_add_test(test_strinline);
     suite_add_test(test_cse_array);
     suite_add_test(test_byte_overrun);
+    suite_add_test(test_byte_narrow);
+    suite_add_test(test_diamond_carry);
     suite_add_test(test_ptr_stride);
+    suite_add_test(test_licm_join);
+    suite_add_test(test_loop_lower);
+    suite_add_test(test_long_cmp_tos);
+    suite_add_test(test_addr_taken_slot);
+    suite_add_test(test_not_expr);
+    suite_add_test(test_seq_scope_loops);
+    suite_add_test(test_asm_live);
+    suite_add_test(test_shift_edges);
+    suite_add_test(test_schar_arith);
+    suite_add_test(test_byte_mask_branch);
+    suite_add_test(test_deref_postinc);
     suite_add_test(test_ctrlflow);
     suite_add_test(test_addressmod);
     suite_add_test(test_far);
     suite_add_test(test_float16);
     suite_add_test(test_double);
     suite_add_test(test_longlong);
+    suite_add_test(test_int_eq);
     return suite_run();
 }
 

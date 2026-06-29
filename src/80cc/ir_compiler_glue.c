@@ -61,11 +61,35 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
 uint32_t ir_features_from_cpu(void)
 {
     uint32_t feat = IR_FEAT_CB_BITOPS | IR_FEAT_EX_DE_HL
-                  | IR_FEAT_IX | IR_FEAT_DJNZ;
-    if (IS_808x())
-        feat &= ~(IR_FEAT_CB_BITOPS | IR_FEAT_IX | IR_FEAT_DJNZ);
-    if (IS_GBZ80())   /* LR35902 keeps the CB prefix */
-        feat &= ~(IR_FEAT_EX_DE_HL | IR_FEAT_IX | IR_FEAT_DJNZ);
+                  | IR_FEAT_IX | IR_FEAT_DJNZ | IR_FEAT_OVERFLOW_FLAG
+                  | IR_FEAT_JR;
+    if (IS_808x())   /* P flag is parity, not overflow; no relative jumps */
+        feat &= ~(IR_FEAT_CB_BITOPS | IR_FEAT_IX | IR_FEAT_DJNZ
+                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_JR);
+    if (IS_8085())   /* undocumented LDSI+LHLX/SHLX sp-rel ld/st; DSUB+K signed compare */
+        feat |= IR_FEAT_SP_REL_DEPTR | IR_FEAT_DSUB;
+    if (IS_GBZ80())   /* LR35902 keeps the CB prefix; no overflow/sign flags */
+        feat &= ~(IR_FEAT_EX_DE_HL | IR_FEAT_IX | IR_FEAT_DJNZ
+                  | IR_FEAT_OVERFLOW_FLAG);
+    if (c_cpu & CPU_RABBIT) {          /* and/or/sub hl,de, bool hl, rr hl */
+        feat |= IR_FEAT_HL_DE_LOGIC | IR_FEAT_BOOL_HL | IR_FEAT_PAIR_ROT;
+        feat |= IR_FEAT_CRIT_IP;       /* no di/ei: __critical via ipset/ipres */
+    }
+    if (c_cpu & (CPU_R4K | CPU_R6K))   /* native `xor/sub/cp hl,de` */
+        feat |= IR_FEAT_HL_DE_LOGIC4;
+    if (c_cpu & CPU_RABBIT)            /* ld hl,(sp+N), N 0..255, HL only */
+        feat |= IR_FEAT_SP_REL_HL | IR_FEAT_SP_REL_WIDE;
+    if (IS_KC160())                    /* ld hl/de/bc,(sp+d), d signed byte */
+        feat |= IR_FEAT_SP_REL_HL | IR_FEAT_SP_REL_PAIRS;
+    if (IS_EZ80() || IS_KC160())       /* native word-wise ld hl,(ix+d) */
+        feat |= IR_FEAT_IX_WORD;
+    if ((c_cpu & CPU_RABBIT) || IS_GBZ80())   /* add sp,d (signed byte) */
+        feat |= IR_FEAT_ADD_SP_IMM;
+    if (IS_EZ80())                            /* lea ix+d; ld r,(hl) word */
+        feat |= IR_FEAT_LEA | IR_FEAT_LD_HL_IND;
+    if (IS_Z80N())                            /* Spectrum Next extra ALU ops */
+        feat |= IR_FEAT_ADD_PAIR_IMM | IR_FEAT_ADD_PAIR_A
+              | IR_FEAT_BARREL_SHIFT;
     return feat;
 }
 

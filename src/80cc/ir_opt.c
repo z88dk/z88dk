@@ -229,7 +229,7 @@ typedef struct {
 static int cse_eligible(OpKind k)
 {
     switch (k) {
-    case IR_ADD: case IR_SUB:
+    case IR_ADD: case IR_SUB: case IR_RSUB:
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
     case IR_NEG: case IR_NOT:
@@ -253,7 +253,7 @@ static int cse_eligible(OpKind k)
 static int op_has_imm_identity(OpKind k)
 {
     switch (k) {
-    case IR_ADD: case IR_SUB:
+    case IR_ADD: case IR_SUB: case IR_RSUB:
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
     case IR_ROTL: case IR_ROTR:
@@ -286,10 +286,46 @@ static void cse_invalidate_for_write(CSEntry *tbl, int *n, int v)
 
 /* ---- 3e: loop-invariant code motion ------------------------------ */
 
+/* Forward reachability: can `from` reach `to` following succ edges?
+   Used to validate a candidate back-edge: an edge B->S is only a real
+   natural-loop back-edge if the header S reaches the latch B (closing
+   the cycle S->...->B->S). Without this, a plain forward JOIN edge whose
+   target happens to have a lower block id than its source (e.g. an
+   if/else else-arm BB3 -> merge BB2, where the merge was numbered before
+   the arm) is misread as a back-edge — LICM then "hoists" the arm's
+   single-def LD_IMMs into a bogus pre-header on the OTHER arm, a
+   miscompile (def no longer dominates its use). */
+static int licm_reaches(Func *f, int from, int to)
+{
+    if (from == to) return 1;
+    int *seen = calloc((size_t)f->n_bbs, sizeof(int));
+    int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+    int found = 0;
+    if (seen && stack) {
+        int sp = 0;
+        seen[from] = 1; stack[sp++] = from;
+        while (sp > 0) {
+            int cur = stack[--sp];
+            BB *cbb = &f->bbs[cur];
+            int ns = ir_bb_n_succ(cbb);
+            for (int s = 0; s < ns; s++) {
+                int sid = ir_bb_succ_at(cbb, s);
+                if (sid < 0 || sid >= f->n_bbs) continue;
+                if (sid == to) { found = 1; sp = 0; break; }
+                if (!seen[sid]) { seen[sid] = 1; stack[sp++] = sid; }
+            }
+        }
+    }
+    free(seen); free(stack);
+    return found;
+}
+
 /* Walk succ[] to detect loops via back-edges. For each BB B, any
-   successor S with S.id ≤ B.id is a back-edge into a loop header at S.
-   The loop body is the contiguous range [S.id, B.id]. (Reducible CFG
-   assumption — true for IR produced by our builder.) Sets bb_in_loop[]
+   successor S with S.id ≤ B.id is a candidate back-edge into a loop
+   header at S — confirmed only when S actually reaches B (licm_reaches),
+   so a forward join edge to a lower-numbered block isn't mistaken for a
+   loop. The loop body is the contiguous range [S.id, B.id]. (Reducible
+   CFG assumption — true for IR produced by our builder.) Sets bb_in_loop[]
    and per-BB loop_header[] (-1 if not in any loop). For nested loops,
    keeps the OUTERMOST header (lowest id) — sufficient for hoisting all
    the way out. */
@@ -337,6 +373,10 @@ static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
         for (int s = 0; s < ns; s++) {
             int sid = ir_bb_succ_at(bb, s);
             if (sid < 0 || sid > b) continue;
+            /* sid <= b is necessary but not sufficient: confirm the
+               header reaches the latch (real cycle), else this is a
+               forward join edge with a low-numbered target, not a loop. */
+            if (!licm_reaches(f, sid, b)) continue;
             int lo = sid, hi = b;
             for (int k = lo; k <= hi; k++) {
                 in_loop[k] = 1;
@@ -633,7 +673,7 @@ static int dce_pure_kind(const Op *op)
     switch (op->kind) {
     case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
     case IR_LEA:
-    case IR_ADD: case IR_SUB:
+    case IR_ADD: case IR_SUB: case IR_RSUB:
     case IR_AND: case IR_OR: case IR_XOR:
     case IR_SHL: case IR_SHR:
     case IR_INC: case IR_DEC:
@@ -692,6 +732,205 @@ int ir_opt_dce(Func *f)
     } while (pass_changed);
     return removed;
 }
+
+/* ---- Byte-width narrowing (ir_opt_narrow_byte) ----------------------
+   C promotes char operands to int, so `crc ^ d[i]`, `x & 0x0f`, `c << 1`
+   etc. become width-2 IR ops whose result is immediately truncated back
+   to a byte (CONV_TRUNC → width-1). The high byte of such an op is dead.
+   This pass narrows the producing op to width 1 so ir_lower emits the
+   8-bit-in-A form (no `ld h,0`, no 16-bit ALU on the always-dead high
+   byte). The lowerer's byte paths read only the low byte of each operand,
+   which is exactly what truncation demands — so narrowing the result is
+   sufficient; operand widths are left alone. */
+
+static int narrow_kind(const Op *op)
+{
+    switch (op->kind) {
+    case IR_ADD: case IR_SUB:
+    case IR_AND: case IR_OR: case IR_XOR:
+    /* Zero/sign-extend feeding only byte uses degrades to a byte copy:
+       the low byte of zext(src)/sext(src) == low byte of src for any
+       source width, so the extension's high-byte work is dead. (Signed
+       char arithmetic `(char)(acc op b)` promotes both operands via
+       CONV_SX — narrowing those kills the per-operand sign-extend.) */
+    case IR_CONV_ZX: case IR_CONV_SX:
+        return 1;
+    case IR_SHL:
+        return op->src[1] == -1;   /* imm count only (byte path) */
+    default:
+        return 0;
+    }
+}
+
+/* True if EVERY def of v is an AND with an immediate mask whose high byte
+   is clear — so v's value provably fits in 8 bits and a zero/cond test on
+   its low byte is a test of the whole value. */
+static int v_fits_byte(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            seen = 1;
+            if (op->kind != IR_AND || op->src[1] != -1
+                || (op->imm & ~0xFFLL) != 0)
+                return 0;
+        }
+    }
+    return seen;
+}
+
+/* Every use of vreg v demands only its low 8 bits? True when each using
+   op is either a CONV_TRUNC to a byte, or a narrowable op already at
+   width 1 with v in a value (not shift-count) position. A BR_ZERO/BR_COND
+   truth-test counts too WHEN v provably fits a byte (a byte-mask AND, e.g.
+   `crc & 0x80`): then testing the low byte is testing the whole value, so
+   the producer can stay 8-bit (no `ld h,0` widen for the branch). */
+static int demands_low_byte_only(const Func *f, int v)
+{
+    int byte_val = v_fits_byte(f, v);
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *u = &bb->ops[j];
+            int uses[16];
+            int nu = ir_op_uses(u, uses, (int)(sizeof uses / sizeof uses[0]));
+            int here = 0;
+            for (int k = 0; k < nu; k++) if (uses[k] == v) here = 1;
+            if (!here) continue;
+            seen = 1;
+            if (u->kind == IR_CONV_TRUNC && u->dst >= 0
+                && f->vregs[u->dst].width == 1)
+                continue;
+            if (narrow_kind(u) && u->dst >= 0
+                && f->vregs[u->dst].width == 1) {
+                /* SHL count position needs full value, not just byte. */
+                if (u->kind == IR_SHL && u->src[1] == v) return 0;
+                continue;
+            }
+            if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
+                continue;
+            return 0;
+        }
+    }
+    return seen;   /* a dead vreg (no uses) stays width-2 */
+}
+
+int ir_opt_narrow_byte(Func *f)
+{
+    if (!f) return 0;
+    if (getenv("IR_NO_NARROW_BYTE")) return 0;
+    /* A vreg is a candidate iff it has ≥1 def and EVERY def is a
+       narrowable op (so each def has an 8-bit lowering). Multi-def is
+       allowed — the diamond `if(c&m) c=(c<<1)^p; else c<<=1;` defines
+       the same temp in both arms; narrowing the vreg narrows both. */
+    char *bad = calloc((size_t)f->n_vregs, 1);   /* def disqualifies */
+    char *hasdef = calloc((size_t)f->n_vregs, 1);
+    if (!bad || !hasdef) { free(bad); free(hasdef); return 0; }
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int d = op->dst;
+            if (d < 0 || d >= f->n_vregs) continue;
+            hasdef[d] = 1;
+            if (!narrow_kind(op)) bad[d] = 1;
+        }
+    }
+    int changed = 0, pass_changed;
+    do {
+        pass_changed = 0;
+        for (int d = 0; d < f->n_vregs; d++) {
+            if (!hasdef[d] || bad[d]) continue;
+            if (f->vregs[d].width != 2) continue;
+            if (demands_low_byte_only(f, d)) {
+                f->vregs[d].width = 1;
+                pass_changed++;
+            }
+        }
+        changed += pass_changed;
+    } while (pass_changed);
+    free(bad);
+    free(hasdef);
+    return changed;
+}
+
+/* ---- Local copy propagation (ir_opt_copy_prop) ---------------------
+   Per-BB: an identity copy `vd <- vs` (IR_MOV, or IR_CONV_SX/CONV_ZX
+   with width(vd)==width(vs) — a byte-identity copy) lets later reads of
+   vd read vs directly. Narrowing signed-char arithmetic turns the
+   promoting CONV_SX operands into such byte copies; without this the
+   copy spills to a slot (a store + reload) where the original
+   sign-extend kept the value flowing through registers — a net loss.
+   Propagating the copy away and DCE-ing it recovers that.
+
+   Surgical + safe: rewrites only src[0]/src[1] (every arithmetic /
+   compare / conv / mov / branch consumer carries its inputs there; uses
+   in mem.base / call args are left alone, keeping the copy live and
+   correct — just unpropagated). Invalidation is by redefinition
+   (ir_op_defs), so multiply-defined vregs are handled. Per-BB only — the
+   copy map resets at each BB boundary. DCE then removes copies whose dst
+   became unused. */
+int ir_opt_copy_prop(Func *f)
+{
+    if (!f) return 0;
+    int *copy_of = malloc((size_t)f->n_vregs * sizeof(int));
+    if (!copy_of) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int i = 0; i < f->n_vregs; i++) copy_of[i] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            /* Rewrite value operands to the copy root. */
+            for (int s = 0; s < 2; s++) {
+                int v = op->src[s];
+                if (v >= 0 && v < f->n_vregs && copy_of[v] >= 0) {
+                    op->src[s] = copy_of[v];
+                    changed++;
+                }
+            }
+            /* Invalidate any copy whose source (or dst) this op redefines. */
+            int defs[8];
+            int nd = ir_op_defs(op, defs, 8);
+            for (int d = 0; d < nd; d++) {
+                int D = defs[d];
+                if (D < 0 || D >= f->n_vregs) continue;
+                copy_of[D] = -1;
+                for (int x = 0; x < f->n_vregs; x++)
+                    if (copy_of[x] == D) copy_of[x] = -1;
+            }
+            /* Record this op if it's a byte-identity copy. Scoped to
+               width-1: that is exactly what narrow_byte produces (the
+               signed-char CONV_SX/ZX operands), and a byte vreg has no
+               wide/pointer/bank lowering semantics — so propagating it
+               can't expose a positional assumption (e.g. far-pointer ADD
+               lowered in-place expecting dst==src0). */
+            int vd = op->dst, vs = op->src[0];
+            if (vd < 0 || vd >= f->n_vregs || vs < 0 || vs >= f->n_vregs
+                || vs == vd)
+                continue;
+            if (f->vregs[vd].width != 1 || f->vregs[vs].width != 1)
+                continue;
+            int is_copy = (op->kind == IR_MOV
+                           || op->kind == IR_CONV_SX
+                           || op->kind == IR_CONV_ZX);
+            if (!is_copy) continue;
+            if ((f->vregs[vd].flags & IR_VREG_VOLATILE)
+                || (f->vregs[vs].flags & IR_VREG_VOLATILE))
+                continue;
+            copy_of[vd] = (copy_of[vs] >= 0) ? copy_of[vs] : vs;
+        }
+    }
+    free(copy_of);
+    return changed;
+}
+
+/* `*p++` deref + post-step fusion migrated to the ir_match early phase
+   as the `derefpp` pattern — see ir_match.c. */
 
 /* Byte-pack to wide load (pack_bytes) migrated to the ir_match
    packbytes phase as `packbytes` - see ir_match.c. */
