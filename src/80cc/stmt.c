@@ -60,9 +60,8 @@ struct nodepair *statement(void)
     blanks();
     if (lineno != lastline) {
         lastline = lineno;
-        /* C_LINE markers are emitted by the walker (cg2_walk) from the
-           per-node `filename` / `line` fields so they interleave with
-           the body asm instead of clustering at the top. */
+        /* C_LINE markers are emitted by the IR from the per-node
+           line fields so they interleave with the body asm. */
     }
     if (tk_peek_kind_at_lptr() == TK_EOF) {
         lastst = st;
@@ -293,8 +292,7 @@ Node *compound(void)
  */
 Node *doiferror(void)
 {
-    /* AST-mode: the iferror legacy construct is no longer emitted —
-       leaving it as a stub returning NULL. */
+    /* iferror is no longer supported — stub returning NULL. */
     statement();
     if (swallow(KW_ELSE) == 0) return NULL;
     statement();
@@ -491,8 +489,8 @@ Node *doswitch(void)
     pair = statement();
 
     /* Collect dispatch cases into a local array — they belong inside
-       the AST_SWITCH node so the walker can process the switch
-       end-to-end without peeking at siblings. */
+       the AST_SWITCH node so it can be processed end-to-end
+       without peeking at siblings. */
     array *cases = array_init(NULL);
     while (swptr < swnext ) {
         array_add(cases, ast_switch_case(switch_type,
@@ -555,8 +553,8 @@ Node *doreturn(char type)
 {
     (void)type;
     array *arr = array_init(NULL);
-    /* AST-mode: just build the AST_RETURN node. The walker
-       (cg2_return) emits the conversion + gen_leave_function dance. */
+    /* Build the AST_RETURN node; the IR emits the conversion +
+       epilogue. */
     if (endst() == 0) {
         struct nodepair *pair;
         zdouble val;
@@ -695,8 +693,8 @@ static void asm_buf_puts(asm_buf *b, const char *s)
  *      New: 3/3/99 djm
  *
  *      Captures the asm text into a buffer and hands it to ast_asm()
- *      so the walker emits it inline at the AST_ASM node. No direct
- *      outbyte/outstr — those would duplicate the walker's emit.
+ *      so the IR emits it inline at the AST_ASM node. No direct
+ *      outbyte/outstr — those would duplicate the emit.
  */
 
 Node *doasmfunc(char wantbr)

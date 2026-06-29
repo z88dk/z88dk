@@ -1858,34 +1858,6 @@ static int get_parameter_size(Type *functype, Type *type)
 }
 
 
-/* Legacy (walker) function-prologue EMISSION: interrupt/critical register
-   saves, the frame-pointer push, and the fastcall-arg spill. Under
-   --use-ir the IR's emit_prologue owns the prologue, so this is emitted
-   only on the walker paths — the default compiler and the IR→walker bail
-   fallback. The matching param-offset COMPUTATION (where/stackargs/
-   ptr->offset) stays inline in declfunc and runs unconditionally (it's
-   walker state the IR ignores, and the bail fallback needs it). */
-static void emit_legacy_prologue(Type *functype)
-{
-    if ( (functype->flags & INTERRUPT) == INTERRUPT ) {
-        gen_interrupt_enter(currfn);
-    } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
-        codegen_critical_enter();
-    }
-    gen_push_frame();
-    if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
-        Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);
-        if ( fastarg->size == 2 || fastarg->size == 1)
-            zpush();
-        else if ( kind_is_floating(fastarg->kind) )
-            gen_push_float(fastarg->kind);
-        else if ( fastarg->size == 4 || fastarg->size == 3)
-            lpush();
-        else if ( fastarg->kind == KIND_LONGLONG )
-            llpush();
-    }
-}
-
 static void declfunc(Type *functype, enum storage_type storage)
 {
     int where;
@@ -2070,14 +2042,8 @@ static void declfunc(Type *functype, enum storage_type storage)
     
    
 
-    /* Prologue EMISSION: walker paths only. The IR (--use-ir) owns its
-       prologue in emit_prologue; if the IR later bails, the fallback at
-       the codegen dispatch re-emits this. */
-    if ( !c_use_ir )
-        emit_legacy_prologue(functype);
-
-    /* Fastcall param-offset COMPUTATION (walker state — always; the IR
-       computes its own offsets but the bail fallback reads these). */
+    /* Fastcall param-offset COMPUTATION: the IR reads these param slot
+       offsets, so this runs unconditionally. */
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);
         int   adjust = ( fastarg->size == 1 || fastarg->size == 2
@@ -2129,20 +2095,16 @@ static void declfunc(Type *functype, enum storage_type storage)
             utstring_free(output);
         }
         if (!c_ast_print && !c_ast_print_types) {
-            if (c_use_ir) {
-                /* IR pipeline (experimental, --use-ir). On any failure
-                   to translate the function, fall back to the legacy
-                   walker so the file as a whole still compiles. */
-                extern int ir_generate_code(Node *, SYMBOL *);
-                if (ir_generate_code(pair->node, currfn) != 0) {
-                    /* IR bailed before emitting (all build_fail()s precede
-                       lowering) — emit the walker prologue it skipped, then
-                       run the walker body. */
-                    emit_legacy_prologue(functype);
-                    ast_generate_code2(pair->node);
-                }
-            } else {
-                ast_generate_code2(pair->node);
+            /* IR is the only codegen path. A translation failure is fatal
+               (no walker fallback) — every build_fail precedes emission, so
+               nothing partial has been written. Hard failure surfaces the
+               unsupported construct instead of silently degrading. */
+            extern int ir_generate_code(Node *, SYMBOL *);
+            if (ir_generate_code(pair->node, currfn) != 0) {
+                errorfmt("80cc: cannot translate '%s' to IR — unsupported "
+                         "construct\n", 1,
+                         currfn && currfn->name[0] ? currfn->name : "<function>");
+                exit(1);
             }
         }
         /* --ast-print / --ast-print-types: skip codegen entirely.
@@ -2150,13 +2112,12 @@ static void declfunc(Type *functype, enum storage_type storage)
            has function labels + prologue/epilogue but no body —
            the intended validation mode. */
     }
-    if (pair->i != STRETURN && (functype->flags & NAKED) == 0 ) {
-        if ( functype->return_type->kind != KIND_VOID && lastst != STASM) {
-            warningfmt("return-type","Control reaches end of non-void function");
-        }
-        /* do a statement, but if it's a return, skip */
-        /* cleaning up the stack */
-        gen_leave_function(KIND_NONE, NO, 0);
+    /* The IR emits the full epilogue (frame teardown + ret) on every exit
+       path, fall-through included, so no leave is emitted here. Keep the
+       missing-return diagnostic for a non-void function that runs off the end. */
+    if (pair->i != STRETURN && (functype->flags & NAKED) == 0
+        && functype->return_type->kind != KIND_VOID && lastst != STASM) {
+        warningfmt("return-type","Control reaches end of non-void function");
     }
     goto_cleanup();
     function_appendix(currfn);

@@ -13,7 +13,7 @@
 static int        heir1a(LVALUE *lval);
 static int        heir2a(LVALUE *lval);
 static int        heir2b(LVALUE *lval);
-static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), TokenKind tk_op, void (*oper)(LVALUE *lval), int ast_type);
+static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), TokenKind tk_op, int ast_type);
 static int        heir2(LVALUE *lval);
 static int        heir3(LVALUE *lval);
 static int        heir4(LVALUE *lval);
@@ -46,13 +46,10 @@ struct nodepair *expression(int  *con, zdouble *val, Type **type)
 int heir1(LVALUE* lval)
 {
     LVALUE lval2={0}, lval3={0};
-    void (*oper)(LVALUE *) = NULL;
-    void  (*doper)(LVALUE *lval) = NULL;
     int asttype;
     int k;
 
     k = plnge1(heir1a, lval);
-    doper = NULL;
     if (cmatch('=')) {
         if (k == 0) {
             if ( lval->ltype->kind != KIND_STRUCT ) {
@@ -123,42 +120,32 @@ int heir1(LVALUE* lval)
         }
         store(lval);
         lval->node = ast_binop(OP_ASSIGN, lval->node, lval2.node);
-        /* Carry the *target storage type* on the assignment so AST-mode
-           codegen knows the write width — for struct member writes the
+        /* Carry the *target storage type* on the assignment so codegen
+           knows the write width — for struct member writes the
            LHS expression simplifies to `(+ (lv=p) offset)` which has no
            recoverable storage type. lval->ltype is the lvalue type at
            the point of assignment (the member type for member access). */
         lval->node->type = lval->ltype;
         return 0;
     } else if (match("|=")) {
-        oper = zor;
         asttype = OP_AOR;
     } else if (match("^=")) {
-        oper = zxor;
         asttype = OP_AXOR;
     } else if (match("&=")) {
-        oper = zand;
         asttype = OP_AAND;
     } else if (match("+=")) {
-        oper = doper = zadd;
         asttype = OP_AADD;
     } else if (match("-=")) {
-        oper = doper = zsub;
         asttype = OP_ASUB;
     } else if (match("*=")) {
-        oper = doper = mult;
         asttype = OP_AMULT;
     } else if (match("/=")) {
-        oper = doper = zdiv;
         asttype = OP_ADIV;
     } else if (match("%=")) {
-        oper = zmod;
         asttype = OP_AMOD;
     } else if (match(">>=")) {
-        oper = asr;
         asttype = OP_ASSHR;
     } else if (match("<<=")) {
-        oper = asl;
         asttype = OP_ASSHL;
     } else
         return k;
@@ -178,8 +165,8 @@ int heir1(LVALUE* lval)
     lval3.is_const = lval->is_const;
     rvalue(lval);
     Node *compound_lhs_node = lval->node;
-    if (oper == zadd || oper == zsub) {
-        plnge2b(heir1, lval, &lval2, oper);
+    if (asttype == OP_AADD || asttype == OP_ASUB) {
+        plnge2b(heir1, lval, &lval2, asttype == OP_AADD ? OP_ADD : OP_SUB);
         /* plnge2b builds a plain OP_ADD/OP_SUB whose LHS is `compound_lhs_node`
            (the deref'd lvalue) and RHS is lval2.node. For compound assigns we
            need the same (LHS,RHS) shape but tagged OP_AADD/OP_ASUB so the
@@ -187,7 +174,7 @@ int heir1(LVALUE* lval)
            rebuild with the correct tag. */
         lval->node = ast_binop(asttype, compound_lhs_node, lval2.node);
     } else
-        plnge2a(heir1, lval, &lval2, oper, doper, asttype);
+        plnge2a(heir1, lval, &lval2, asttype);
 
     store(&lval3);
     return 0;
@@ -209,16 +196,14 @@ int heir1a(LVALUE* lval)
         if (k) rvalue(lval);
 
         /* TRUE branch into lval2, FALSE branch overwrites lval — same
-           lval roles as the legacy code so subsequent decisions (and
-           the resulting lval->ltype/val_type) reflect the FALSE arm. */
+           lval roles so subsequent decisions (and the resulting
+           lval->ltype/val_type) reflect the FALSE arm. */
         if (heir1(&lval2)) rvalue(&lval2);
         needchar(':');
         if (heir1(lval)) rvalue(lval);
 
-        /* Result type promotion mirrors the legacy widening so the
-           AST has the right `val_type` / `ltype` on lval. The emit
-           is gone — the walker handles the actual conversion via
-           cg2_walk_to_decimal / cg2_walk_to_long. */
+        /* Set the result-promotion `val_type` / `ltype` on lval; the
+           IR emits the actual conversion from the AST. */
         if (lval2.val_type != lval->val_type) {
             if (kind_is_decimal(lval2.val_type)) {
                 /* promotion handled in walker; nothing to mutate */
@@ -254,7 +239,7 @@ int heir2b(LVALUE* lval)
     return skim(TK_LAND, heir2, lval);
 }
 
-int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), TokenKind tk_op, void (*oper)(LVALUE *lval), int ast_type)
+int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), TokenKind tk_op, int ast_type)
 {
     LVALUE lval2={0};
     int k;
@@ -269,7 +254,7 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), TokenKind tk_op, void (*ope
         rvalue(lval);
     while (1) {
         if (tk_match_kind_at_lptr(tk_op)) {
-            plnge2a(heir, lval, &lval2, oper, NULL, ast_type);
+            plnge2a(heir, lval, &lval2, ast_type);
         } else
             return 0;
     }
@@ -277,17 +262,17 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), TokenKind tk_op, void (*ope
 
 int heir2(LVALUE* lval)
 {
-    return heir234(lval, heir3, TK_PIPE, zor, OP_OR);
+    return heir234(lval, heir3, TK_PIPE, OP_OR);
 }
 
 int heir3(LVALUE* lval)
 {
-    return heir234(lval, heir4, TK_CARET, zxor, OP_XOR);
+    return heir234(lval, heir4, TK_CARET, OP_XOR);
 }
 
 int heir4(LVALUE* lval)
 {
-    return heir234(lval, heir5, TK_AMP, zand, OP_AND);
+    return heir234(lval, heir5, TK_AMP, OP_AND);
 }
 
 int heir5(LVALUE* lval)
@@ -308,9 +293,9 @@ int heir5(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (tk_match_kind_at_lptr(TK_EQ)) {
-            plnge2a(heir6, lval, &lval2, zeq, zeq, OP_EQ);
+            plnge2a(heir6, lval, &lval2, OP_EQ);
         } else if (tk_match_kind_at_lptr(TK_NE)) {
-            plnge2a(heir6, lval, &lval2, zne, zne, OP_NE);
+            plnge2a(heir6, lval, &lval2, OP_NE);
         } else
             return 0;
     }
@@ -334,13 +319,13 @@ int heir6(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (tk_match_kind_at_lptr(TK_LE)) {
-            plnge2a(heir7, lval, &lval2, zle, zle, OP_LE);
+            plnge2a(heir7, lval, &lval2, OP_LE);
         } else if (tk_match_kind_at_lptr(TK_GE)) {
-            plnge2a(heir7, lval, &lval2, zge, zge, OP_GE);
+            plnge2a(heir7, lval, &lval2, OP_GE);
         } else if (tk_match_kind_at_lptr(TK_LT)) {
-            plnge2a(heir7, lval, &lval2, zlt, zlt, OP_LT);
+            plnge2a(heir7, lval, &lval2, OP_LT);
         } else if (tk_match_kind_at_lptr(TK_GT)) {
-            plnge2a(heir7, lval, &lval2, zgt, zgt, OP_GT);
+            plnge2a(heir7, lval, &lval2, OP_GT);
         } else
             return 0;
     }
@@ -363,9 +348,9 @@ int heir7(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (tk_match_kind_at_lptr(TK_SHR)) {
-            plnge2a(heir8, lval, &lval2, asr, NULL, OP_SSHR);
+            plnge2a(heir8, lval, &lval2, OP_SSHR);
         } else if (tk_match_kind_at_lptr(TK_SHL)) {
-            plnge2a(heir8, lval, &lval2, asl, NULL, OP_SSHL);
+            plnge2a(heir8, lval, &lval2, OP_SSHL);
         } else
             return 0;
     }
@@ -391,9 +376,9 @@ int heir8(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (cmatch('+')) {
-            plnge2b(heir9, lval, &lval2, zadd);
+            plnge2b(heir9, lval, &lval2, OP_ADD);
         } else if (cmatch('-')) {
-            plnge2b(heir9, lval, &lval2, zsub);
+            plnge2b(heir9, lval, &lval2, OP_SUB);
         } else
             return 0;
     }
@@ -416,11 +401,11 @@ int heir9(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (cmatch('*')) {
-            plnge2a(heira, lval, &lval2, mult, mult, OP_MULT);
+            plnge2a(heira, lval, &lval2, OP_MULT);
         } else if (cmatch('/')) {
-            plnge2a(heira, lval, &lval2, zdiv, zdiv, OP_DIV);
+            plnge2a(heira, lval, &lval2, OP_DIV);
         } else if (cmatch('%')) {
-            plnge2a(heira, lval, &lval2, zmod, zmod, OP_MOD);
+            plnge2a(heira, lval, &lval2, OP_MOD);
         } else
             return 0;
     }
@@ -482,10 +467,10 @@ int heira(LVALUE *lval)
     }
 
     if (match("++")) {
-        prestep(lval, 1, inc, OP_PRE_INC);
+        prestep(lval, OP_PRE_INC);
         return 0;
     } else if (match("--")) {
-        prestep(lval, -1, dec, OP_PRE_DEC);
+        prestep(lval, OP_PRE_DEC);
         return 0;
     } else if (cmatch('~')) {
         if (heira(lval))
@@ -525,9 +510,8 @@ int heira(LVALUE *lval)
         /* No OP_DEREF wrap here: the rvalue(lval) above already added one
            when it loaded the operand's pointer value, and the next rvalue()
            call (when *p is consumed as a value) will add another, giving
-           OP_DEREF(OP_DEREF(p)) — exactly two emits, matching legacy. An
-           extra wrap here would produce three OP_DEREFs and a duplicate
-           gen_load_indirect emit in the walker. */
+           OP_DEREF(OP_DEREF(p)) — exactly two emits. An extra wrap here
+           would produce three OP_DEREFs and a duplicate load. */
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
@@ -565,10 +549,10 @@ int heira(LVALUE *lval)
     k = heirb(lval);
 
     if (match("++")) {
-        poststep(k, lval, 1, inc, dec, OP_POST_INC);
+        poststep(k, lval, OP_POST_INC);
         return 0;
     } else if (match("--")) {
-        poststep(k, lval, -1, dec, inc, OP_POST_DEC);
+        poststep(k, lval, OP_POST_DEC);
         return 0;
     }
     return k;
@@ -639,11 +623,8 @@ int heirb(LVALUE* lval)
                     lval->is_const = 0;   /* Can no longer be constant */
                     /* Capture the runtime index in the AST: arr[i] becomes
                        `(+ arr (* i elem_size))`. The OP_MULT scale was
-                       previously claimed to be the walker's job but
-                       wasn't actually emitted there — `int arr[10]; int
-                       i; arr[i]` returned *(arr + i) instead of
-                       *(arr + i*2). Scale at parse time so the walker
-                       sees a plain byte-offset OP_ADD. ast_fold_constants
+                       scaled at parse time so the IR sees a plain
+                       byte-offset OP_ADD. ast_fold_constants
                        collapses `i * 1` and `i * 0` on its own. */
                     if (array_node && idx_node) {
                         int elem = 1;
@@ -717,9 +698,8 @@ int heirb(LVALUE* lval)
                     // No idea what you are doing, calling a non pointer
                     errorfmt("Calling a non-pointer function?",1);
                 }
-                /* SDCC char-return widening: in AST mode the walker
-                   handles the conversion via the result-type/OP_CAST
-                   chain; the parser-side emit is gone. */
+                /* SDCC char-return widening: the IR handles the
+                   conversion via the result-type / OP_CAST chain. */
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
                 lval->ltype = return_type;

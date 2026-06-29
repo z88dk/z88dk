@@ -358,12 +358,8 @@ void offset_of(LVALUE *lval)
         lval->is_const = 1;
         lval->ltype = type_int;
         lval->val_type = KIND_INT;
-        /* Build an AST literal so the walker has a node to emit and
-           expressions like `__builtin_offsetof(S,f) + 10` can fold.
-           The previous `vconst(lval->const_val)` emitted `ld hl, N`
-           at parse time and left lval->node = NULL — the walker
-           segfaulted as soon as the expression was wrapped in
-           anything else. */
+        /* Build an AST literal so the offset is a foldable node
+           (e.g. `__builtin_offsetof(S,f) + 10`). */
         lval->node = ast_literal(lval->ltype, lval->const_val);
     } else {
         errorfmt("Cannot evaluate __builtin_offsetof(%s,%s)", 1, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
@@ -492,11 +488,7 @@ void size_of(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     lval->ltype = type_int;
     lval->node = ast_literal(lval->ltype, lval->const_val);
-    /* The parser-side `vconst(lval->const_val)` here was a leftover
-       from the legacy emit path — it emitted `ld hl, <size>` directly,
-       then the walker emitted the same `ld hl, <size>` again from the
-       AST_LITERAL, producing a redundant instruction in every sizeof
-       expression. The walker is the sole emit path post-Phase-H. */
+    /* The sizeof value is emitted from the AST_LITERAL node. */
 }
 
 static Type *get_member(Type *tag)
@@ -806,25 +798,6 @@ void indicate_constant_written(int litlab)
     }
 }
 
-elem_t *get_elem_for_buf(char *str, double value) 
-{
-    elem_t  *elem;
-
-    LL_FOREACH(bigconst_queue, elem ) {
-        if ( elem->kind == KIND_DOUBLE && strcmp(elem->str, str) == 0 ) {
-            return elem;
-        }
-    }
-    elem = MALLOC(sizeof(*elem));
-    elem->kind = KIND_DOUBLE;
-    elem->litlab = getlabel();
-    elem->value = value;
-    elem->written = 0;
-    strcpy(elem->str,str);
-    LL_APPEND(bigconst_queue, elem);
-    return elem;
-}
-
 
 elem_t *get_elem_for_llong(char buf[8]) 
 {
@@ -858,20 +831,14 @@ void write_constant_queue(void)
             col();
             nl();
             if ( elem->kind == KIND_DOUBLE) {
-                if ( c_double_strings ) {
-                    defmesg(); outstr(elem->str); outstr("\"\n");
-                    defbyte(); outdec(0); nl();
-                } else {
-                    char   buf[128];
-                    int    i, offs;
+                char   buf[128];
+                int    i, offs;
 
-                    for ( i = 0, offs = 0; i < c_fp_size; i++) {
-                        offs += snprintf(buf + offs, sizeof(buf) - offs,"%s0x%02x", i != 0 ? "," : "", elem->fa[i]);
-                    }
-                    //outfmt("\t;%lf ref: %d written: %d\n",elem->value,elem->refcount, elem->written);
-                    outfmt("\t;%Lf\n",elem->value);
-                    outfmt("\tdefb\t%s\n", buf);
+                for ( i = 0, offs = 0; i < c_fp_size; i++) {
+                    offs += snprintf(buf + offs, sizeof(buf) - offs,"%s0x%02x", i != 0 ? "," : "", elem->fa[i]);
                 }
+                outfmt("\t;%Lf\n",elem->value);
+                outfmt("\tdefb\t%s\n", buf);
             } else {
                 char   buf[128];
                 int    i, offs;
@@ -944,48 +911,4 @@ int ir_pool_litlab_double(zdouble value)
     elem = get_elem_for_fa(fa, value);
     indicate_constant_written(elem->litlab);
     return elem->litlab;
-}
-
-
-void load_fixed(LVALUE *lval)
-{
-    if ( lval->val_type == KIND_ACCUM16) {
-        int16_t val = ((int16_t)((lval->const_val) / (1.0 / 256.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5)));
-        vconst(val);
-    } else {
-        int32_t val = ((int32_t)((lval->const_val) / (1.0 / 65536.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5))); 
-        vlongconst(val);
-    }
-}
-
-
-void load_double_into_fa(LVALUE *lval)
-{            
-    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
-    elem_t          *elem;
-    memset(fa, 0, sizeof(fa));
-    
-    if ( c_double_strings ) {
-        char  buf[40];
-        snprintf(buf, sizeof(buf), "%Lf", lval->const_val);
-        elem = get_elem_for_buf(buf, lval->const_val);
-        immedlit(elem->litlab,0);
-        nl();
-        callrts("__atof2");
-        WriteDefined("math_atof", 1);
-    } else {
-        dofloat(c_maths_mode,lval->const_val, fa);
-        if ( lval->val_type == KIND_FLOAT16 ) {
-            dofloat_ieee16(lval->const_val, fa);
-            vconst(fa[1] << 8 | fa[0]);
-        } else if ( c_fp_size == 4 ) {
-            vconst(fa[1] << 8 | fa[0]);
-            const2(fa[3] << 8 | fa[2]);
-        } else {
-            elem = get_elem_for_fa(fa,lval->const_val);
-            immedlit(elem->litlab,0);
-            nl();
-            callrts("dload");
-        }
-    }
 }

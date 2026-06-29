@@ -1667,8 +1667,12 @@ static signed char *ss_compute_dead(Func *f, const int *op_base,
         for (int b = f->n_bbs - 1; b >= 0; b--) {
             BB *bb = &f->bbs[b];
             memset(work, 0, (size_t)nv);
-            for (int s = 0; s < 2; s++) {
-                int sb = bb->succ[s];
+            /* All successors, incl. IR_SWITCH's targets + default — NOT the
+               raw succ[0..1] pair (which omits them, so a value read only on
+               the default arm looks slot-dead and its store gets elided). */
+            int ns = ir_bb_n_succ(bb);
+            for (int s = 0; s < ns; s++) {
+                int sb = ir_bb_succ_at(bb, s);
                 if (sb >= 0 && sb < f->n_bbs)
                     for (int v = 0; v < nv; v++) if (lin[sb][v]) work[v] = 1;
             }
@@ -1689,8 +1693,9 @@ static signed char *ss_compute_dead(Func *f, const int *op_base,
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
         memset(work, 0, (size_t)nv);
-        for (int s = 0; s < 2; s++) {
-            int sb = bb->succ[s];
+        int ns = ir_bb_n_succ(bb);
+        for (int s = 0; s < ns; s++) {
+            int sb = ir_bb_succ_at(bb, s);
             if (sb >= 0 && sb < f->n_bbs)
                 for (int v = 0; v < nv; v++) if (lin[sb][v]) work[v] = 1;
         }
@@ -5024,7 +5029,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int src = hi->args[0], dst = hi->ret_vreg;
-    if (hi->acc_subkind == 0) {
+    if (hi->acc_subkind == ACC_SUB_INT2ACC) {
         /* int → acc: load the int into HL/DEHL, convert (result in the
            accumulator), store the accumulator to the dst slot. */
         if (f->vregs[src].width == 4) load_to_dehl(out, f, src);
@@ -5037,7 +5042,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         cur_fa_vreg = dst;
         return 0;
     }
-    if (hi->acc_subkind == 1) {
+    if (hi->acc_subkind == ACC_SUB_ACC2INT) {
         /* acc → int: load the accumulator (unless already resident),
            convert (result in HL/DEHL), store to the int dst. */
         if (cur_fa_vreg != src) {
@@ -5050,7 +5055,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         else                         store_hl(out, f, dst);
         return 0;
     }
-    if (hi->acc_subkind == 3) {
+    if (hi->acc_subkind == ACC_SUB_CROSS) {
         /* Cross-family conversion (long long <-> 5/6/8-byte double): load the
            source into its accumulator via the SRC family's load (l_i64_load
            or dload), call the conversion (it reads one accumulator and writes
@@ -5063,6 +5068,21 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         emit(out, "call\t%s", hi->name);
         emit_acc_slot_addr(out, f, dst, 0);
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+        emit(out, "call\t%s", hi->acc_store);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = dst;
+        return 0;
+    }
+    if (hi->acc_subkind == ACC_SUB_ACC_UNARY) {
+        /* acc → acc in-place unary (float negate): load FA (unless already
+           resident), call the in-place helper (minusfa / l_f64_neg), store
+           FA to the float dst. */
+        if (cur_fa_vreg != src) {
+            emit_acc_slot_addr(out, f, src, 0);
+            emit(out, "call\t%s", hi->acc_load);
+        }
+        emit(out, "call\t%s", hi->name);
+        emit_acc_slot_addr(out, f, dst, 0);
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_cache(); invalidate_bc_cache();
         cur_fa_vreg = dst;

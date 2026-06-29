@@ -54,8 +54,7 @@ int primary(LVALUE* lval)
             return(0);
         } else if ( strcmp(sname, "__func__") == 0 ) {
             /* Append currfn->name (with trailing \0) to the literal
-               queue; the walker emits `ld hl, i_<litlab>+<offs>`
-               from the AST_STR_LIT node. */
+               queue; the IR emits the reference from the AST_STR_LIT node. */
             int32_t offs;
             size_t len = strlen(currfn->name);
             storeq(len + 1, (unsigned char *)currfn->name, &offs);
@@ -134,9 +133,9 @@ int primary(LVALUE* lval)
                 }
                 return (0);
             } else {
-                /* KIND_FUNC or pointer-to-FUNC. Legacy never set lval->node
-                   here; for AST mode we need it so callfunction() can stash
-                   the callee expression on AST_FUNCPTR_CALL.callee. */
+                /* KIND_FUNC or pointer-to-FUNC: set lval->node so
+                   callfunction() can stash the callee expression on
+                   AST_FUNCPTR_CALL.callee. */
                 lval->symbol = ptr;
                 lval->ltype = ptr->ctype;
                 lval->val_type = KIND_INT;
@@ -188,10 +187,6 @@ int primary(LVALUE* lval)
 }
 
 
-/* calc() / calcun() / CalcStand() removed by F3-narrow. The single
-   remaining caller (plunge.c::plnge2a's parser-side const-tracking
-   path) inlined the logic as a local static helper. AST-side fold
-   for emit goes through ast_opt::ast_fold_constants. */
 
 /* Complains if an operand isn't int */
 int intcheck(LVALUE* lval, LVALUE* lval2)
@@ -203,70 +198,6 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
     return 0;
 }
 
-/* Forces result, having type t2, to have type t1 */
-void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
-{
-    if (t2 == KIND_CARRY) {
-        gen_conv_carry2int();
-        isunsigned2 = NO;
-        t2 = KIND_INT;
-    }
-
-    if (kind_is_decimal(t1)) {
-        zconvert_to_decimal(t2, t1, isunsigned2, isunsigned1);
-    } else {
-        if (kind_is_decimal(t2)) {
-            zconvert_from_decimal(t2, t1, isunsigned1);
-            return;
-        }
-    }
-
-    if (t1 == KIND_LONGLONG) {
-        if (t2 != KIND_LONGLONG ) {
-            zconvert_to_llong(isunsigned1, t2, isunsigned2);
-        }
-        return;
-    }
-
-    /* t2 =source, t1=dest */
-    /* int to long, if signed, do sign, if not ld de,0 */
-    /* Check to see if constant or not... */
-    if (t1 == KIND_LONG) {
-        if (t2 != KIND_LONG ) {
-            zconvert_to_long(isunsigned1, t2, isunsigned2);
-        }
-        return;
-    }
-
-    if ( t2 == KIND_LONGLONG ) {
-        if ( t1 != KIND_LONGLONG && !kind_is_decimal(t1)) {
-            // Just convert down to a 32 bit number regardless of destination type
-            // inefficient, but we have just been dealing with 64 bit numbers!
-            zconvert_to_long(isunsigned1, t2, isunsigned2);
-        }
-        return;
-    }
-    
-
-    /* Converting between pointer types..far and near. The narrowing
-       far→near warning has been migrated to ast_opt (ast_typecheck
-       pass at OP_CAST sites). */
-    if (t1 == KIND_CPTR && t2 == KIND_INT)
-        gen_conv_uint2long();
-        
-    /* Char conversion */
-    if (t1 == KIND_CHAR && isunsigned2 == NO && !isconst) {
-        if (isunsigned1 == NO)
-            gen_conv_sint2char();
-        else
-            gen_conv_uint2char();
-    } else if (t1 == KIND_CHAR && isunsigned2 == YES && !isconst) {
-        if (isunsigned1 == NO)
-            gen_conv_sint2char();
-        else
-            gen_conv_uint2char();
-    }
-}
 
 /*
  * If only one operand is KIND_DOUBLE, converts the other one to
@@ -274,14 +205,11 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
  *
  * Maybe should an operand in here for KIND_LONG?
  */
-int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
+int widen_if_float(LVALUE* lval, LVALUE* lval2)
 {
-    (void)operator_is_commutative;
-    /* AST-mode helper: mirror the legacy decimal-promotion rules onto
-       lval / lval2 state (val_type, ltype) so the parser's later
-       decision-making picks the right widened type, but skip the
-       runtime conversion emit — the walker (cg2_walk_to_decimal in
-       ast_codegen2.c) does that from the AST. */
+    /* Apply decimal promotion to lval / lval2 state (val_type, ltype) so
+       later parser decisions pick the right widened type. The conversion
+       itself is emitted from the AST (OP_CAST) by the IR. */
     if (kind_is_floating(lval2->val_type)) {
         if ( kind_is_floating(lval->val_type)) {
             if ( lval->val_type == KIND_DOUBLE) {
@@ -315,10 +243,9 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
 
 void widenintegers(LVALUE* lval, LVALUE* lval2)
 {
-    /* AST-mode: mirror integer-promotion rules onto lval / lval2 state
-       (val_type, ltype) so later parser logic sees the right widened
-       type. Skip the runtime widening emit — the walker handles that
-       via OP_CAST nodes and cg2_walk_to_long / cg2_walk_to_llong. */
+    /* Apply integer promotion to lval / lval2 state (val_type, ltype) so
+       later parser logic sees the right widened type. The widening itself
+       is emitted from the AST (OP_CAST) by the IR. */
     if (lval2->val_type == KIND_CARRY) {
         lval2->ltype = type_int;
         lval2->val_type = KIND_INT;
@@ -434,20 +361,13 @@ void result(LVALUE* lval, LVALUE* lval2)
  * prestep - preincrement or predecrement lvalue
  */
 
-void prestep(
-    LVALUE* lval,
-    int n,
-    void (*step)(LVALUE *lval),
-    int ast_type)
+void prestep(LVALUE* lval, int ast_type)
 {
-    (void)n; (void)step;
     if (heira(lval) == 0) {
         needlval();
     } else {
-        /* AST-mode: emit (load / step / store) for the pre-step is
-           done by the walker via cg2_step. Here we just wrap the
-           AST with the appropriate step uop and mark the symbol
-           as written. */
+        /* Wrap the lvalue in the pre-step uop and mark the symbol
+           written; the IR emits the load/step/store. */
         lval->node = ast_uop(ast_type, lval->node);
         rvalue(lval);
         if (lval->symbol)
@@ -458,21 +378,13 @@ void prestep(
 /*
  * poststep - postincrement or postdecrement lvalue
  */
-void poststep(
-    int k,
-    LVALUE* lval,
-    int n,
-    void (*step)(LVALUE *lval),
-    void (*unstep)(LVALUE *lval),
-    int ast_type)
+void poststep(int k, LVALUE* lval, int ast_type)
 {
-    (void)n; (void)step; (void)unstep;
     if (k == 0) {
         needlval();
     } else {
-        /* AST-mode: emit (load / step / store / un-step) for the
-           post-step is done by the walker via cg2_step. Just wrap
-           the AST and mark the symbol as written. */
+        /* Wrap the lvalue in the post-step uop and mark the symbol
+           written; the IR emits the load/step/store/un-step. */
         lval->node = ast_uop(ast_type, lval->node);
         rvalue(lval);
         if (lval->symbol)
@@ -500,14 +412,12 @@ void store(LVALUE* lval)
 void rvalue(LVALUE* lval)
 {
     /* AST construction: wrap the lvalue's address in an OP_DEREF and
-       stamp it with the storage type so the walker knows the load
+       stamp it with the storage type so the IR knows the load
        width — for member access the operand simplifies to
        `(+ (lv=p) offset)` whose own type is meaningless.
        The maybe-uninitialised warning fires here because rvalue() is
        the canonical "use this lvalue's value" hook.
-       Legacy emit (gen_load_static / gen_load_indirect / docast /
-       gen_intrinsic_in) deleted in Phase H.2.b.1 — the walker emits
-       the loads from the AST. */
+       The IR emits the load from the AST. */
     lval->node = ast_uop(OP_DEREF, lval->node);
     lval->node->type = lval->ltype;
     if ( lval->symbol && lval->symbol->isassigned == NO ) {
@@ -585,10 +495,6 @@ struct nodepair *test(int label, int parens)
         return pair;
     }
     
-    /* AST-mode: the testjump/jumpnc emit is gone — the walker handles
-       conditional branches from AST_IF / AST_TERNARY / AST_CONDITIONAL
-       nodes via gen_jp_label + truthiness test. */
-
     pair->node = lval.node;
     pair->i = -1;
     return pair;
@@ -651,12 +557,11 @@ void cscale(Type *type, int* val)
  */
 int docast(LVALUE* lval, LVALUE *dest_lval)
 {
-    /* AST-mode: wrap the cast target with an OP_CAST AST node, fold
+    /* Wrap the cast target with an OP_CAST AST node, fold
        the constant value through the narrowing-cast, then update the
        destination lval state (ltype / val_type / ptr_type /
-       indirect_kind) to reflect the cast target. The runtime
-       conversion emit is dropped — the walker emits OP_CAST via
-       zconvert_to_decimal / zconvert_to_long / zconvert_to_llong. */
+       indirect_kind) to reflect the cast target. The IR emits the
+       conversion from the OP_CAST node. */
     dest_lval->node = ast_cast(lval->cast_type, dest_lval->node);
 
     if ( kind_is_integer(lval->cast_type->kind) && dest_lval->is_const) {

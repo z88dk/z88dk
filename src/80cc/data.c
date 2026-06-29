@@ -91,10 +91,6 @@ int debuglevel;
 
 
 
-/* Doubles stored as strings? */
-
-int c_double_strings;
-
 /*
  *        Framepointer stuff - tis broken!
  */

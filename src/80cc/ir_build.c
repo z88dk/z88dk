@@ -416,6 +416,9 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "ge"))       return f64 ? "l_f64_ge"  : "dge";
     if (!strcmp(stem, "eq"))       return f64 ? "l_f64_eq"  : "deq";
     if (!strcmp(stem, "ne"))       return f64 ? "l_f64_ne"  : "dne";
+    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_neg"    : "minusfa";
+    if (!strcmp(stem, "ftof16"))   return f64 ? "l_f64_ftof16" : "l_f48_ftof16";
+    if (!strcmp(stem, "f16tof"))   return f64 ? "l_f64_f16tof" : "l_f48_f16tof";
     if (!strcmp(stem, "sint2f"))   return f64 ? "l_f64_sint2f"  : "l_int2long_s_float";
     if (!strcmp(stem, "uint2f"))   return f64 ? "l_f64_uint2f"  : "l_int2long_u_float";
     if (!strcmp(stem, "slong2f"))  return f64 ? "l_f64_slong2f" : "float";
@@ -451,6 +454,8 @@ static const char *float_helper(Kind k, const char *base)
         { "f2uint",  "l_f16_f2uint",  "l_f32_f2uint"  },
         { "f2slong", "l_f16_f2slong", "l_f32_f2slong" },
         { "f2ulong", "l_f16_f2ulong", "l_f32_f2ulong" },
+        { "ftof16",  NULL,            "l_f32_ftof16"  },
+        { "f16tof",  NULL,            "l_f32_f16tof"  },
         { NULL, NULL, NULL }
     };
     int is16 = (k == KIND_FLOAT16);
@@ -715,7 +720,7 @@ static int emit_acc_from_int(Builder *b, int src_v, int src_unsigned)
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
     hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
     hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = w; hi->acc_subkind = 0;
+    hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
     op->hcall = hi;
     return dst;
 }
@@ -734,7 +739,30 @@ static int emit_acc_to_int(Builder *b, int src_v, int ret_w)
     hi->name = acc_name((ret_w == 4) ? "f2slong" : "f2sint");
     hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
     hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
-    hi->acc_width = c_fp_size; hi->acc_subkind = 1;
+    hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
+    op->hcall = hi;
+    return dst;
+}
+
+/* Unary negate of a 5/6/8-byte double (IR_ACC_UNOP, subkind 4): load the
+   value into FA, call minusfa / l_f64_neg (in-place sign flip), store FA
+   back. Matches the walker's `dload; minusfa`. A sign-bit XOR would be
+   format-specific (MBF's sign isn't the value's top bit), so the helper
+   is the safe path. */
+static int emit_acc_float_neg(Builder *b, int src_v)
+{
+    int w = c_fp_size;
+    int dst = new_temp(b, w);
+    b->f->vregs[dst].width = (int16_t)w;
+    b->f->vregs[dst].kind  = KIND_DOUBLE;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = acc_name("neg"); hi->args = args; hi->n_args = 1;
+    hi->ret_vreg = dst;
+    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+    hi->acc_width = w; hi->acc_subkind = ACC_SUB_ACC_UNARY;
     op->hcall = hi;
     return dst;
 }
@@ -807,7 +835,7 @@ static int emit_acc_int_from_int(Builder *b, int src_v, int src_unsigned)
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
     hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
     hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
-    hi->acc_width = 8; hi->acc_subkind = 0; hi->acc_store_bc = 1;
+    hi->acc_width = 8; hi->acc_subkind = ACC_SUB_INT2ACC; hi->acc_store_bc = 1;
     op->hcall = hi;
     return dst;
 }
@@ -859,7 +887,7 @@ static int emit_acc_int_to_int(Builder *b, int src_v, int ret_w)
     hi->name = "l_i64_s64_toi32";
     hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
     hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
-    hi->acc_width = 8; hi->acc_subkind = 1;
+    hi->acc_width = 8; hi->acc_subkind = ACC_SUB_ACC2INT;
     op->hcall = hi;
     return dst;
 }
@@ -899,7 +927,7 @@ static int emit_acc_lldouble(Builder *b, int src_v, int to_double, int is_unsign
     op->dst = dst;
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
     hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    hi->acc_subkind = 3;
+    hi->acc_subkind = ACC_SUB_CROSS;
     if (to_double) {        /* src ll (l_i64_load) → dst double (dstore) */
         hi->acc_load = "l_i64_load";
         hi->acc_store = acc_name("store");
@@ -2155,13 +2183,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 return v;
             }
         }
-        /* Whole-aggregate (struct/union) copy: `s1 = s2` — block-copy
-           sizeof bytes (IR_MEMCPY → ldir, matching the walker's
-           HL=src/DE=dst/BC=size/ldir). The assignment node's own type is
-           the struct (an lvalue deref LHS like `*d` is mis-typed as the
-           pointer, so don't key off n->left). A struct-returning call RHS
-           is NOT handled here (agg_lvalue_addr bails on AST_FUNC_CALL →
-           walker), pending hidden-pointer return support. */
+        /* Whole-aggregate (struct/union) copy `s1 = s2`: block-copy sizeof
+           bytes via IR_MEMCPY. Key off the assign node's type — an `*d`
+           LHS is mis-typed as the pointer. A struct-returning call RHS
+           bails in agg_lvalue_addr (NRV return unimplemented). */
         if (n->type && n->type->kind == KIND_STRUCT) {
             int size = n->type->size;
             if (size <= 0 || size > 65536)
@@ -2787,17 +2812,23 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            on the 2-byte value — no helper, same as the walker's inline
            `xor 128` on the high byte. KIND_DOUBLE bails. */
         if (n->operand->type && kind_is_floating(n->operand->type->kind)) {
-            if (n->operand->type->kind != KIND_FLOAT16)
-                return build_fail("double unary neg not yet supported");
+            Kind nk = n->operand->type->kind;
             int fv = build_expr(b, n->operand);
             if (fv < 0) return -1;
-            int dst = new_temp(b, 2);
-            b->f->vregs[dst].width = 2;
-            b->f->vregs[dst].kind  = KIND_FLOAT16;
-            Op *op = ir_op_emit(cur_bb(b), IR_XOR);
-            op->dst = dst; op->src[0] = fv; op->src[1] = -1;
-            op->imm = 0x8000;
-            return dst;
+            if (nk == KIND_FLOAT16) {
+                /* IEEE half: sign in bit 15 — XOR 0x8000, no helper. */
+                int dst = new_temp(b, 2);
+                b->f->vregs[dst].width = 2;
+                b->f->vregs[dst].kind  = KIND_FLOAT16;
+                Op *op = ir_op_emit(cur_bb(b), IR_XOR);
+                op->dst = dst; op->src[0] = fv; op->src[1] = -1;
+                op->imm = 0x8000;
+                return dst;
+            }
+            if (is_acc_float_kind(nk))     /* 5/6/8-byte double: minusfa */
+                return emit_acc_float_neg(b, fv);
+            return build_fail("float unary neg kind %d not yet supported",
+                              (int)nk);
         }
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
@@ -2999,6 +3030,39 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         Op *cv = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
                         cv->dst = t; cv->src[0] = v;
                         v = t;
+                    }
+                }
+                /* Widen a narrow integer ARG to a wider prototyped PARAM.
+                   The front-end leaves the int→long / int→long-long
+                   promotion to codegen (the walker uses l_int2long_s /
+                   l_i64_sint2i64); without it the value is pushed at its
+                   own width and the param's high bytes are stack garbage.
+                   Only long / long long params (the confirmed-broken
+                   cases — char→int already promotes via the smallc push);
+                   integer args only; an unprototyped (variadic) slot has
+                   no Type and is left as-is. */
+                if (n->sym->ctype && n->sym->ctype->parameters) {
+                    Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
+                    Kind ak  = a->type ? (Kind)a->type->kind : KIND_NONE;
+                    int  uns = a->type && a->type->isunsigned;
+                    if (pt && kind_is_integer(pt->kind) && kind_is_integer(ak)) {
+                        int aw = b->f->vregs[v].width;
+                        if (pt->kind == KIND_LONGLONG && ak != KIND_LONGLONG) {
+                            if (aw == 1) {
+                                int wt = new_temp(b, 2);
+                                b->f->vregs[wt].width = 2;
+                                Op *cv = ir_op_emit(cur_bb(b),
+                                          uns ? IR_CONV_ZX : IR_CONV_SX);
+                                cv->dst = wt; cv->src[0] = v; v = wt;
+                            }
+                            v = emit_acc_int_from_int(b, v, uns);
+                        } else if (type_width(pt) == 4 && aw < 4) {
+                            int wt = new_temp(b, 4);
+                            b->f->vregs[wt].width = 4;
+                            Op *cv = ir_op_emit(cur_bb(b),
+                                      uns ? IR_CONV_ZX : IR_CONV_SX);
+                            cv->dst = wt; cv->src[0] = v; v = wt;
+                        }
                     }
                 }
                 args[i] = v;
@@ -3467,6 +3531,70 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (is_acc_float_kind(src_k) && is_acc_int_kind(dst_k)) {
             int uns = n->type && n->type->isunsigned;
             return emit_acc_lldouble(b, src_v, /*to_double=*/0, uns);
+        }
+        /* _Float16 <-> 5/6/8-byte double (FA cross-format): l_f48_f16tof
+           loads an f16 (HL) into FA; l_f48_ftof16 converts FA back to an
+           f16 (HL). Reuse the acc-unop int<->acc shapes — the f16 rides
+           the width-2 "int reg" slot. (f32-tier double, c_fp_size==4, is
+           NOT acc-tier and still bails below.) */
+        if (src_k == KIND_FLOAT16 && is_acc_float_kind(dst_k)) {
+            int w = c_fp_size;
+            int dst = new_temp(b, w);
+            b->f->vregs[dst].width = (int16_t)w;
+            b->f->vregs[dst].kind  = KIND_DOUBLE;
+            int *a = calloc(1, sizeof(int)); a[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = acc_name("f16tof"); hi->args = a; hi->n_args = 1;
+            hi->ret_vreg = dst;
+            hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+            hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
+            op->hcall = hi;
+            return dst;
+        }
+        if (is_acc_float_kind(src_k) && dst_k == KIND_FLOAT16) {
+            int dst = new_temp(b, 2);
+            b->f->vregs[dst].width = 2;
+            b->f->vregs[dst].kind  = KIND_FLOAT16;
+            int *a = calloc(1, sizeof(int)); a[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = acc_name("ftof16"); hi->args = a; hi->n_args = 1;
+            hi->ret_vreg = dst;
+            hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+            hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
+            op->hcall = hi;
+            return dst;
+        }
+        /* _Float16 <-> 4-byte (f32-tier) double: register-based l_f32
+           conversions. f16 in HL, f32 in DEHL. */
+        if (src_k == KIND_FLOAT16 && dst_k == KIND_DOUBLE && c_fp_size == 4) {
+            int dst = new_temp(b, 4);
+            b->f->vregs[dst].width = 4;
+            b->f->vregs[dst].kind  = KIND_DOUBLE;
+            int *a = calloc(1, sizeof(int)); a[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = float_helper(KIND_DOUBLE, "f16tof");
+            hi->args = a; hi->n_args = 1; hi->ret_vreg = dst;
+            op->hcall = hi;
+            return dst;
+        }
+        if (src_k == KIND_DOUBLE && c_fp_size == 4 && dst_k == KIND_FLOAT16) {
+            int dst = new_temp(b, 2);
+            b->f->vregs[dst].width = 2;
+            b->f->vregs[dst].kind  = KIND_FLOAT16;
+            int *a = calloc(1, sizeof(int)); a[0] = src_v;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = float_helper(KIND_DOUBLE, "ftof16");
+            hi->args = a; hi->n_args = 1; hi->ret_vreg = dst;
+            op->hcall = hi;
+            return dst;
         }
         /* Remaining float conversions (DOUBLE, float↔float of different
            formats) are NOT yet lowered. Bail rather than fall through to

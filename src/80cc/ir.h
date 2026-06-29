@@ -233,10 +233,10 @@ typedef enum {
                            returns an int 0/1 bool in HL; dst is a width-2
                            int vreg, no accumulator store. */
     IR_ACC_UNOP,        /* wide memory-accumulator unary op — HelperInfo.
-                           acc_subkind selects: 0 = int→acc (load int reg, call
-                           conv, store acc); 1 = acc→int (load acc, call conv,
-                           store int reg); 2 = acc→acc move (load acc, store
-                           acc). args[0] = source vreg, ret_vreg = dst. */
+                           acc_subkind (AccSubkind) selects the load/helper/
+                           store wiring (int↔acc convert, acc move, cross-
+                           family, in-place unary). args[0] = source vreg,
+                           ret_vreg = dst. */
 
     /* I/O ports (__sfr) */
     IR_IN,              /* dst ← in_port(port_desc) — dst constrained to A */
@@ -381,6 +381,16 @@ typedef struct {
     RegMask  clobbers;      /* derived from target attrs + ABI */
 } CallInfo;
 
+/* IR_ACC_UNOP shape — selects how gen_acc_unop wires the accumulator
+   load/helper/store around the single operand. */
+typedef enum {
+    ACC_SUB_INT2ACC  = 0,  /* int reg → accumulator (convert; HL/DEHL in)   */
+    ACC_SUB_ACC2INT  = 1,  /* accumulator → int reg (convert; HL/DEHL out)  */
+    ACC_SUB_ACC_MOVE = 2,  /* accumulator → accumulator (plain copy)        */
+    ACC_SUB_CROSS    = 3,  /* cross-family long long <-> double             */
+    ACC_SUB_ACC_UNARY = 4, /* accumulator → accumulator in-place unary (neg)*/
+} AccSubkind;
+
 typedef struct {
     const char *name;       /* "l_gintsp", "l_long_xor", etc. */
     int        *args;       /* vreg ids — input convention per helper */
@@ -411,7 +421,7 @@ typedef struct {
     int         acc_holds_lhs; /* 1: LHS loaded into acc, RHS pushed (float);
                                   0: RHS in acc, LHS pushed (i64) */
     int         acc_store_bc;  /* store address goes in BC (i64) not HL (float) */
-    int         acc_subkind;   /* IR_ACC_UNOP: 0=int→acc, 1=acc→int, 2=acc→acc */
+    AccSubkind  acc_subkind;   /* IR_ACC_UNOP shape — see AccSubkind */
 } HelperInfo;
 
 /* IR_SWITCH payload. Lowering route:

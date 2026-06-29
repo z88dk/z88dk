@@ -118,7 +118,6 @@ static option  sccz80_opts[] = {
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, NULL, 0 },
     { 0, "disable-builtins", OPT_BOOL|OPT_DOUBLE_DASH, "Disable builtin functions",&c_disable_builtins, NULL, 0},
     { 0, "params-offset", OPT_INT, "=<num> Base offset for the function parameters (default: 2)",&c_params_offset,NULL, 0},
-    { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, NULL, 0 },
     { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, NULL, MATHS_Z88 },
     { 0, "banked-style=regular", OPT_ASSIGN|OPT_INT, "Use regular banked calling style", &c_banked_style, NULL, BANKED_STYLE_REGULAR },
     { 0, "banked-style=ti", OPT_ASSIGN|OPT_INT, "Use ticalc banked calling style", &c_banked_style, NULL, BANKED_STYLE_TICALC },
@@ -236,7 +235,6 @@ int main(int argc, char** argv)
     c_intermix_ccode = 0; /* don't include the C text as comments */
     c_errstop =0;  /* don't stop after errors */
     c_verbose = 0;
-    c_double_strings = 0;
     c_notaltreg = NO;
     debuglevel = NO;
     c_framepointer_is_ix = -1;
@@ -261,6 +259,10 @@ int main(int argc, char** argv)
         info();
         exit(1);
     }
+
+    /* The IR is the only codegen path — the AST walker has been removed.
+       An IR translation failure is fatal (no fallback); see declparse. */
+    c_use_ir = 1;
 
     if ( c_maths_mode == MATHS_IEEE ) {
         c_fp_size = 4;

@@ -59,30 +59,14 @@ int skim(TokenKind tk_op, int (*heir)(LVALUE* lval), LVALUE* lval)
     }
 }
 
-void load_constant(LVALUE *lval)
-{
-    if (lval->val_type == KIND_LONGLONG) {
-        vllongconst(lval->const_val);
-    } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-        vlongconst(lval->const_val);
-    } else if (kind_is_floating(lval->val_type) ){
-        gen_load_constant_as_float(lval->const_val, lval->val_type, 0);
-    } else if (kind_is_fixed(lval->val_type) ) {
-        load_fixed(lval);
-    } else {
-        vconst(lval->const_val);
-    }
-}
 
 /*
  * test for early dropout from || or && evaluations
  */
 void dropout(int k, int is_or, int exit1, LVALUE* lval)
 {
-    /* AST-mode: legacy emitted a test-zero / carry-conditional jump
-       at the short-circuit boundary (the `exit1` label). The walker
-       reconstructs the equivalent control flow from AST_OROR /
-       AST_ANDAND nodes, so the emit call is gone. `rvalue(lval)`
+    /* The IR reconstructs short-circuit control flow from AST_OROR /
+       AST_ANDAND nodes, so no jump is emitted here. `rvalue(lval)`
        stays — it wraps the value-yielding operand in OP_DEREF for
        the AST builder. The constant-short-circuit early-return is
        a behaviour-preserving optimisation that skim() relies on:
@@ -112,27 +96,24 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 }
 
 
-int operator_is_comparison(void (*oper)(LVALUE *lval)) 
+/* Ops valid on decimal (float / fixed) operands. The `%` vs `%=`
+   asymmetry is intentional: `%=` (OP_AMOD) is integer-only. */
+static int op_is_decimal_capable(int ast_type)
 {
-    if ( oper == zeq || oper == zne || oper == zle || oper == zlt || oper == zge || oper == zgt ) {
+    switch (ast_type) {
+    case OP_EQ: case OP_NE: case OP_LE: case OP_GE: case OP_LT: case OP_GT:
+    case OP_MULT: case OP_DIV: case OP_MOD:
+    case OP_AMULT: case OP_ADIV:
         return 1;
+    default: return 0;
     }
-    return 0;
-}
-
-int operator_is_commutative(void (*oper)(LVALUE *lval))
-{
-    if ( oper == zeq || oper == zne || oper == zadd || oper == mult || oper == zand || oper == zor || oper == zxor ) 
-        return 1;
-    return 0;
 }
 
 
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval),
-             void (*doper)(LVALUE *lval), int ast_type)
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, int ast_type)
 {
     Kind   lhs_val_type = lval->val_type;
     Kind   rhs_val_type;
@@ -205,9 +186,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      lval->val_type = lval2->val_type;
                      lval->ltype = lval2->ltype;
                  }
-                 /* Previously rewrote `float / const` → `float *
-                    (1/const)`. Dead with the constoper block gone — the
-                    walker sees OP_DIV and emits a div regardless. */
                  if ( kind_is_decimal(lval->val_type) ) {
                      lval2->val_type = lval->val_type;
                      lval2->ltype = lval->ltype;
@@ -228,7 +206,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval2->ltype = lval->ltype;
             }
 
-            if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
+            if (lval2->const_val == 0 && (ast_type == OP_DIV || ast_type == OP_ADIV
+                                       || ast_type == OP_MOD || ast_type == OP_AMOD)) {
                 /* Diagnostic moved to ast_opt::ast_fold_constants
                    so it also fires for const-prop-revealed cases
                    like `int x = 0; ... y = z / x;`. */
@@ -239,12 +218,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     }
     lval->is_const &= lval2->is_const;
 
-    if ( doper != NULL || intcheck(lval,lval2) == 0 ) {
+    if ( op_is_decimal_capable(ast_type) || intcheck(lval,lval2) == 0 ) {
         if ( lval->is_const && lval2->is_const ) {
             int isun = lval->ltype->isunsigned || lval2->ltype->isunsigned;
-            /* Drive the const fold through the walker. lval->node is
-               already the binop AST after `lval->node = ast_binop(...)`
-               above. ast_fold_constants handles div/mod-by-zero (warns
+            /* Const-fold the binop AST built above (lval->node =
+               ast_binop(...)). ast_fold_constants handles div/mod-by-zero (warns
                + folds to 0), shift-out-of-range (warns + folds to 0),
                integer and decimal arithmetic. After this call,
                lval->node is either an AST_LITERAL (folded) or the
@@ -274,13 +252,14 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
             lval->is_const = 0;
         }
-        if (widen_if_float(lval, lval2, operator_is_commutative(oper))) {
+        if (widen_if_float(lval, lval2)) {
             // Float op. Mod doesn't apply to floats; warn and skip.
-            if ( doper == zmod ) {
+            if ( ast_type == OP_MOD ) {
                 errorfmt("Cannot apply operator %% to floating point",1);
             }
             /* Result of comparison is int regardless of operand type. */
-            if (doper != mult && doper != zdiv) {
+            if (ast_type != OP_MULT && ast_type != OP_AMULT
+             && ast_type != OP_DIV  && ast_type != OP_ADIV) {
                 lval->val_type = KIND_INT;
                 lval->ltype = type_int;
             }
@@ -305,11 +284,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     }
 
     /* Signedness-mismatch warning migrated to ast_opt (ast_typecheck).
-       Const-RHS / const-LHS operator optimisations (mult_const,
-       zeq_const, asr_const, ...) used to be coordinated here; that
-       work moved into the walker (cg2_binop dispatches on AST_LITERAL
-       operands), and the legacy parser-side block that funnelled
-       constoper / dconstoper was provably dead — computed a value and
+       Const-RHS / const-LHS operator selection happens in the IR
+       (dispatch on AST_LITERAL operands); the old parser-side block
+       that funnelled constoper / dconstoper was dead — computed a value and
        returned without emitting. Both parameters dropped from the
        function signature. */
 }
@@ -317,7 +294,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 /*
  * binary plunge to lower level (for +/-)
  */
-void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
+void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, int ast_type)
 {
     int lhs_val_type, rhs_val_type;
 
@@ -340,12 +317,12 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->node = ast_binop(OP_MULT, lval->node,
                 ast_literal(type_int, (zdouble)lval2->ltype->ptr->size));
         }
-        lval->node = ast_binop(oper == zadd ? OP_ADD : OP_SUB, lval->node, lval2->node);
+        lval->node = ast_binop(ast_type, lval->node, lval2->node);
         rhs_val_type = lval2->val_type;
 
 
         // We'll use const operator if it's add and RHS is lvalue (implicitly LHS is const since we're here)
-        doconst_oper = oper == zadd && lval2->is_const == 0;
+        doconst_oper = ast_type == OP_ADD && lval2->is_const == 0;
         
         if ( kind_is_decimal(lval->val_type) && lval2->is_const == 0 ) {
             if ( kind_is_decimal(lval2->val_type)) {
@@ -407,12 +384,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
         /* Pointer arithmetic: scale the RHS by pointee size before
-           the OP_ADD/OP_SUB so the walker emits a plain byte-offset
-           binop. Matches legacy: `int *p; p + i` → `*(p + i*2)`,
-           `p + 5` → `*(p + 10)`. ast_fold_constants will collapse
-           the OP_MULT when the index is a literal. Subtraction's
-           ptr-minus-int case is symmetric; ptr-minus-ptr is handled
-           by cg2_binop's post-zsub byte→element divide. We update
+           the OP_ADD/OP_SUB so the IR emits a plain byte-offset binop
+           (`int *p; p + i` → `*(p + i*2)`, `p + 5` → `*(p + 10)`).
+           ast_fold_constants collapses the OP_MULT when the index is a
+           literal. ptr-minus-int is symmetric; ptr-minus-ptr element
+           scaling is handled by the IR. We update
            lval2->node in place so heir1's compound-assign rebuild
            (which discards plnge2b's binop and reuses lval2.node)
            still sees the scaled offset for `p += N` / `p -= N`. */
@@ -422,7 +398,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval2->node = ast_binop(OP_MULT, lval2->node,
                 ast_literal(type_int, (zdouble)lval->ltype->ptr->size));
         }
-        lval->node = ast_binop(oper == zadd ? OP_ADD : OP_SUB, lval->node, lval2->node);
+        lval->node = ast_binop(ast_type, lval->node, lval2->node);
         rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right */
@@ -453,7 +429,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         } else {
             /* non-constant on both sides  */
-            if (widen_if_float(lval, lval2,operator_is_commutative(oper))) {
+            if (widen_if_float(lval, lval2)) {
                 /* floating point operation */
                 lval->is_const = 0;
                 return;
@@ -467,9 +443,9 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
     if (lval->is_const && lval2->is_const) {
         // Both operators are constant fold them
-        if (oper == zadd) 
+        if (ast_type == OP_ADD) 
             lval->const_val += lval2->const_val;
-        else if (oper == zsub)
+        else if (ast_type == OP_SUB)
             lval->const_val -= lval2->const_val;
         else
             lval->const_val = 0;
@@ -490,13 +466,12 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     }
 
     
-    if (oper == zsub && lval->ptr_type) {
-        /* Pointer subtraction: byte→element scaling is emitted by
-           cg2_binop's OP_SUB case (after `zsub`, divides by pointee
-           size via shifts or l_div_u). The "Pointer arithmetic with
-           non-matching types" warning has been migrated to ast_opt
+    if (ast_type == OP_SUB && lval->ptr_type) {
+        /* Pointer subtraction: byte→element scaling is emitted by the
+           IR. The "Pointer arithmetic with non-matching types" warning
+           has been migrated to ast_opt
            (ast_typecheck pass). */
-    } else if ( oper == zadd && lval->ptr_type && lval2->ptr_type ) {
+    } else if ( ast_type == OP_ADD && lval->ptr_type && lval2->ptr_type ) {
         UT_string  *str;
         utstring_new(str);
         utstring_printf(str,"Pointer addition: ");

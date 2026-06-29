@@ -28,8 +28,7 @@ int initials(const char *dropname, Type *type, Node **out_init)
     gltptr = 0;
     glblab = getlabel();
 
-    // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
-    if ( (type->isconst && !c_double_strings) ||
+    if ( type->isconst ||
         ( (ispointer(type) || type->kind == KIND_ARRAY) &&
 		(type->ptr->isconst || ((ispointer(type->ptr) || type->ptr->kind == KIND_ARRAY) && type->ptr->ptr->isconst) ) ) ) {
         gen_switch_section(get_section_name(type->namespace,c_rodata_section));
@@ -629,16 +628,12 @@ constdecl:
                 if ( type->kind == KIND_DOUBLE ) {
                     unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     int      i;
-                    /* It was a float, lets parse the float and then dump it */
-                    if ( c_double_strings ) { 
-                        output_double_string_load(value);
-                    } else {
-                        dofloat(c_maths_mode,value, fa);
-                        defbyte();
-                        for ( i = 0; i < c_fp_size; i++ ) {
-                            if ( i ) outbyte(',');
-                            outdec(fa[i]);
-                        }
+                    /* parse the float constant and dump its bytes */
+                    dofloat(c_maths_mode,value, fa);
+                    defbyte();
+                    for ( i = 0; i < c_fp_size; i++ ) {
+                        if ( i ) outbyte(',');
+                        outdec(fa[i]);
                     }
                 } else if (type->kind == KIND_FLOAT16) {
                     unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
@@ -717,14 +712,10 @@ constdecl:
                     unsigned char  fa[6];
                     int            i;
 
-                    /* It was a float, lets parse the float and then dump it */
-                      if ( c_double_strings ) {
-                        output_double_string_load(value);
-                    } else {
-                        dofloat(c_maths_mode,value, fa);
-                        for ( i = 0; i < c_fp_size; i++ ) {
-                            stowlit(fa[i], 1);
-                        }
+                    /* parse the float constant and dump its bytes */
+                    dofloat(c_maths_mode,value, fa);
+                    for ( i = 0; i < c_fp_size; i++ ) {
+                        stowlit(fa[i], 1);
                     }
                 } else {
                     stowlit(value, type->size);
@@ -739,22 +730,3 @@ constdecl:
 }
 
 
-static void output_double_string_load(double value)
-{
-    int   dumplocation = getlabel();
-    LVALUE lval;
-
-    lval.val_type = KIND_DOUBLE;
-
-    postlabel(dumplocation);
-    defstorage(); outdec(6); nl();
-    
-    gen_switch_section(c_init_section);
-    lval.const_val = value;
-    lval.val_type = KIND_DOUBLE;
-    lval.ltype = type_double;
-    load_constant(&lval);
-    immedlit(dumplocation,0); nl();
-    callrts("dstore");
-    gen_switch_section(c_data_section);
-}

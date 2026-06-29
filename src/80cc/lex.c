@@ -162,10 +162,6 @@ int rmatch2(char* lit)
     return 0;
 }
 
-/*
- * djm, reversible character match (case insensitive)
- */
-
 /* Peek-only variant of cmatch — no lptr advance. Same two-mode
    split: tokeniser kind check for punctuators, raw char peek for
    non-punctuator chars. */
