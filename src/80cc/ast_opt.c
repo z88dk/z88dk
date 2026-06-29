@@ -77,6 +77,71 @@ static int is_compare_op(int kind)
         || kind == OP_LE || kind == OP_GT || kind == OP_GE;
 }
 
+/* Promoted integer width (bits) and signedness of a fold operand's type,
+   per C's integer promotions: char (and anything narrower than int) promotes
+   to signed int — a 16-bit signed int represents every 8-bit value, so even
+   unsigned char becomes signed. short/int stay 16-bit (z88dk short == int);
+   long/pointers 32-bit; long long 64-bit. Null type → signed int. */
+static void fold_promoted_int_type(const Type *t, int *width, int *is_unsigned)
+{
+    Kind k = t ? t->kind : KIND_INT;
+    if (k == KIND_LONGLONG)       { *width = 64; *is_unsigned = t->isunsigned; }
+    else if (k == KIND_LONG || k == KIND_CPTR || k == KIND_PTR)
+                                  { *width = 32; *is_unsigned = t ? t->isunsigned : 0; }
+    else if ((k == KIND_INT || k == KIND_SHORT) && t && t->isunsigned)
+                                  { *width = 16; *is_unsigned = 1; }
+    else                          { *width = 16; *is_unsigned = 0; }
+}
+
+/* Sign-extend the low `width` bits of v into a full int64_t. */
+static int64_t fold_sext(int64_t v, int width)
+{
+    if (width >= 64) return v;
+    int sh = 64 - width;
+    return (int64_t)((uint64_t)v << sh) >> sh;
+}
+
+/* Fold an integer comparison honouring C's usual arithmetic conversions:
+   normalise both operands to their common type's width and signedness before
+   comparing. Without this the operands are compared as raw signed int64, so
+   e.g. (int)0x8000 == (unsigned)0x8000 folds false (-32768 vs 32768) instead
+   of true (both 0x8000 as unsigned int). */
+static int try_fold_compare(int kind, int64_t l, int64_t r,
+                            const Type *lt, const Type *rt, int64_t *out)
+{
+    int wl, ul, wr, ur;
+    fold_promoted_int_type(lt, &wl, &ul);
+    fold_promoted_int_type(rt, &wr, &ur);
+    int cw, cu;
+    if (wl == wr)      { cw = wl;          cu = ul || ur; }
+    else if (wl > wr)  { cw = wl;          cu = ul; }
+    else               { cw = wr;          cu = ur; }
+
+    if (cu) {
+        uint64_t mask = (cw >= 64) ? ~(uint64_t)0 : (((uint64_t)1 << cw) - 1);
+        uint64_t a = (uint64_t)l & mask, b = (uint64_t)r & mask;
+        switch (kind) {
+        case OP_EQ: *out = (a == b); return 1;
+        case OP_NE: *out = (a != b); return 1;
+        case OP_LT: *out = (a <  b); return 1;
+        case OP_LE: *out = (a <= b); return 1;
+        case OP_GT: *out = (a >  b); return 1;
+        case OP_GE: *out = (a >= b); return 1;
+        }
+    } else {
+        int64_t a = fold_sext(l, cw), b = fold_sext(r, cw);
+        switch (kind) {
+        case OP_EQ: *out = (a == b); return 1;
+        case OP_NE: *out = (a != b); return 1;
+        case OP_LT: *out = (a <  b); return 1;
+        case OP_LE: *out = (a <= b); return 1;
+        case OP_GT: *out = (a >  b); return 1;
+        case OP_GE: *out = (a >= b); return 1;
+        }
+    }
+    return 0;
+}
+
 static int try_fold_binop_decimal(int kind, zdouble l, zdouble r, zdouble *out)
 {
     switch (kind) {
@@ -293,7 +358,14 @@ Node *ast_fold_constants(Node *node)
                    zero-fills (0x4000…) instead of sign-extending (0xC000…). */
                 if (fold_op == OP_SSHR && L->type && L->type->isunsigned)
                     fold_op = OP_USHR;
-                if (try_fold_binop(fold_op, l, r, &v)) {
+                /* Comparisons need the usual arithmetic conversions applied
+                   to the operands' common type; the raw signed-int64 path
+                   below mis-handles mixed signedness (e.g. int vs unsigned
+                   int at the 0x8000 boundary). Result type is always int. */
+                if (is_compare_op(fold_op)) {
+                    if (try_fold_compare(fold_op, l, r, L->type, R->type, &v))
+                        return ast_literal(type_int, (zdouble)v);
+                } else if (try_fold_binop(fold_op, l, r, &v)) {
                     Type *t = node->type ? node->type : L->type;
                     return ast_literal(t ? t : type_int, (zdouble)v);
                 }
@@ -4488,6 +4560,30 @@ static Node *clone_literal(Node *lit)
     return c;
 }
 
+/* A read of a tracked local yields the local's DECLARED type, not the
+   type of whatever constant was last stored into it. Coerce the stored
+   literal to the symbol's type (widen / narrow + signedness) before
+   tracking it, reusing the OP_CAST literal fold. Otherwise a narrow
+   constant forwarded into a wider use is materialised at the constant's
+   width and the use reads the wrong byte count — e.g. `long a = 0xffff`
+   (0xffff is a 16-bit unsigned int) then `printf("%ld", a)` pushed a
+   2-byte vararg for a %ld. Returns the (re-typed) literal, or NULL when
+   it can't be safely retyped (caller then drops it from tracking). */
+static Node *coerce_literal_to_sym(Node *lit, SYMBOL *sym)
+{
+    if (!lit || lit->ast_type != AST_LITERAL) return NULL;
+    Type *st = sym ? sym->ctype : NULL;
+    if (!st) return lit;
+    if (lit->type && lit->type->kind == st->kind
+        && !!lit->type->isunsigned == !!st->isunsigned)
+        return lit;                              /* already the right type */
+    Node *folded = ast_fold_constants(ast_cast(st, lit));
+    if (folded && folded->ast_type == AST_LITERAL
+        && folded->type && folded->type->kind == st->kind)
+        return folded;
+    return NULL;                                 /* can't retype → don't track */
+}
+
 /* Try to substitute one of the leaf node patterns we know how to
    propagate. Returns the replacement, or NULL if no substitution. */
 static Node *try_substitute(Node *node, prop_env *env)
@@ -4575,20 +4671,18 @@ static Node *prop_walk(Node *node, prop_env *env, int *had_call_or_escape)
             if (s) {
                 if (s->ast_type == AST_DECL && s->sym && prop_eligible(s->sym)) {
                     if (s->declvar) s->declvar = ast_fold_constants(s->declvar);
-                    if (s->declvar && s->declvar->ast_type == AST_LITERAL) {
-                        prop_env_set(env, s->sym, s->declvar);
-                    } else {
-                        prop_env_remove(env, s->sym);
-                    }
+                    Node *lit = (s->declvar && s->declvar->ast_type == AST_LITERAL)
+                              ? coerce_literal_to_sym(s->declvar, s->sym) : NULL;
+                    if (lit) prop_env_set(env, s->sym, lit);
+                    else     prop_env_remove(env, s->sym);
                 } else if (s->ast_type == OP_ASSIGN && s->left
                            && s->left->ast_type == AST_LOCAL_VAR && s->left->sym) {
                     if (s->right) s->right = ast_fold_constants(s->right);
-                    if (s->right && s->right->ast_type == AST_LITERAL
-                        && prop_eligible(s->left->sym)) {
-                        prop_env_set(env, s->left->sym, s->right);
-                    } else {
-                        prop_env_remove(env, s->left->sym);
-                    }
+                    Node *lit = (s->right && s->right->ast_type == AST_LITERAL
+                                 && prop_eligible(s->left->sym))
+                              ? coerce_literal_to_sym(s->right, s->left->sym) : NULL;
+                    if (lit) prop_env_set(env, s->left->sym, lit);
+                    else     prop_env_remove(env, s->left->sym);
                 } else if ((s->ast_type == OP_AADD || s->ast_type == OP_ASUB
                             || s->ast_type == OP_AMULT || s->ast_type == OP_ADIV
                             || s->ast_type == OP_AMOD || s->ast_type == OP_AAND

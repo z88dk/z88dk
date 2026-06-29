@@ -63,6 +63,13 @@ void ir_assign_slots(Func *f)
             && (f->vreg_to_phys[v] == IR_PR_E
                 || f->vreg_to_phys[v] == IR_PR_D))
             needs_slot[v] = 1;
+        /* The word DE-home (a multi-def PR_DE accumulator) is likewise
+           slot-backed: it rides DE across its loop but the loop test / a
+           DE-scratch op clobbers DE, so the lowerer spills DE→slot and
+           reloads. Ordinary single-def PR_DE transients stay slotless. */
+        if (v == f->word_home_vreg && f->vreg_to_phys
+            && f->vreg_to_phys[v] == IR_PR_DE)
+            needs_slot[v] = 1;
         /* Read-only param lives in the caller's pushed-arg slot;
            slot_off returns that caller offset directly. */
         if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
@@ -160,6 +167,13 @@ void ir_assign_slots(Func *f)
         if (!f->vreg_to_phys) break;
         if (f->vreg_to_phys[v] != IR_PR_E && f->vreg_to_phys[v] != IR_PR_D)
             continue;
+        for (int w = 0; w < n_vregs; w++)
+            if (w != v) INTERF_SET(v, w);
+    }
+    /* Same exclusivity for the word DE-home's backing slot. */
+    if (f->word_home_vreg >= 0 && f->word_home_vreg < n_vregs && f->vreg_to_phys
+        && f->vreg_to_phys[f->word_home_vreg] == IR_PR_DE) {
+        int v = f->word_home_vreg;
         for (int w = 0; w < n_vregs; w++)
             if (w != v) INTERF_SET(v, w);
     }

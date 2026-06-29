@@ -113,6 +113,7 @@ static void emit_bb_label(FILE *out, int bb_id)
 /* Per-function counter for compare-overflow correction labels. Reset at
    the start of each ir_lower_func() call. */
 static int cmp_label_counter;
+static int fc_ret_label_counter;   /* unique labels for ret-based fnptr-fastcall dispatch */
 
 /* HL value cache. Reset at each BB boundary and at any op that
    clobbers HL the cache can't reason about (calls, branches, shifts
@@ -123,7 +124,7 @@ static int cur_hl_vreg;
 /* HL slot-ADDRESS cache (distinct from the value cache above): the slot
    OFFSET whose address (sp+off) sits in HL, or -1. Set by the sp-mode byte
    load/store helpers after `ld hl,off;add hl,sp` so a back-to-back access to
-   the same slot reuses HL (charbench's accumulator hits its slot ~16×/iter).
+   the same slot reuses HL.
    Keyed on offset not vreg, so a coalesced read/write of one C var (crc<<1 =
    SHL v2<-v1) hits. spadj pins cur_sp_adjust (sp moved → miss). Cleared on
    every HL clobber; a cached address implies cur_hl_vreg==-1, so value and
@@ -139,7 +140,7 @@ static int cur_hl_addr_spadj;
    (alt-register set) — and is the wide analog of the HL/DEHL cache. */
 static int cur_fa_vreg = -1;
 
-/* Lazy spill (store-on-clobber) — LAZY_SPILL_PLAN.md §11. Behind the
+/* Lazy spill (store-on-clobber). Behind the
    IR_LAZY_SPILL env gate; the deferral itself is wired in a later step,
    so while `pending_spill_v < 0` (always, until then) every hook below
    is a no-op and codegen is byte-identical regardless of the flag.
@@ -164,8 +165,7 @@ static int cur_de_vreg;
    DE (high) and BC (low) — the layout load_to_dehl / store_dehl leave
    behind. Holds while DE *and* BC are preserved. On hit,
    load_to_dehl_adj emits just `ld l,c; ld h,b` instead of the full
-   slot load. Hot in md5 Transform's compound `a = (a<<7)|(a>>25); a
-   += b` chains. */
+   slot load. */
 static int cur_dehl_vreg;
 
 /* Framepointer mode predicates.
@@ -349,7 +349,16 @@ static const char *byte_home_reg(PhysReg pr);
 static int  byte_home_holds(int v);
 static void byte_home_note(int v);
 static void byte_home_flush(FILE *out, const Func *f);
-static void byte_home_clobber(FILE *out, const Func *f);
+/* Word (int) DE-home — width-aware siblings of the byte-home helpers; the
+   home register is the whole DE pair (a loop-carried accumulator). The
+   home_* dispatchers below pick the byte or word variant per cur_home_is_word
+   so the shared BB-loop residency logic serves both. */
+static void word_home_flush(FILE *out, const Func *f);
+static int  rehome_word_home(FILE *out, const Func *f);
+static void home_flush(FILE *out, const Func *f);
+static void home_clobber(FILE *out, const Func *f);
+static int  home_rehome(FILE *out, const Func *f);
+static int  home_is_slotbacked(const Func *f, int v);
 static void cache_de(int v);
 static void cache_bc(int v);
 static void cache_dehl(int v);
@@ -375,7 +384,7 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v);
 static void hl_about_to_change(int v_new);
 static void swap_hl_de_caches(void);
 
-/* Lazy-spill choke-point helpers (LAZY_SPILL_PLAN.md §11). Defined
+/* Lazy-spill choke-point helpers. Defined
    below, after cur_bb / store_hl / the cache helpers are all visible.
    `pending_spill_resolve` is called from hl_about_to_change when HL is
    about to be clobbered with a different tenant: it flushes the pending
@@ -396,8 +405,7 @@ static int  ss_store_dead_here(void);
    two-pass path (pass 1 deferral-off to a scratch stream to populate the
    complete bb_hl_out HL-tenant map, pass 2 for real with deferral on and
    the cross-BB defer decision consulting bb_hl_out_p1). func_emit_idx is
-   NOT bumped here — both passes share the same labels. See
-   LAZY_SPILL_PLAN.md §11.6 / the two-pass design. */
+   NOT bumped here — both passes share the same labels. */
 static int lower_func_render(FILE *out, Func *f, int lazy,
                              const int *bb_hl_out_p1,
                              int *bb_hl_out, int *bb_lowered,
@@ -565,9 +573,13 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\tc,(hl)");
-    emit(out, "inc\thl");
-    emit(out, "ld\tb,(hl)");
+    if (f->features & IR_FEAT_LD_HL_IND) {
+        emit(out, "ld\tbc,(hl)");   /* ez80: BC = *HL (HL preserved) */
+    } else {
+        emit(out, "ld\tc,(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\tb,(hl)");
+    }
     cache_bc(vreg_id);
     invalidate_hl_cache();
 }
@@ -664,6 +676,18 @@ static int fp_tos_slot(const Func *f, int vreg_id)
         && slot_off(f, vreg_id) == 0;
 }
 
+/* Word DE-home: when this function has a width-2 loop-carried accumulator
+   homed in the DE pair (allocator's f->word_home_vreg, --word-resident), the
+   shared home-residency machinery (cur_byte_home_vreg/_dirty, bb_byte_out,
+   cur_func_ehome, the region span, the BB-loop carry/flush) is reused with
+   cur_home_is_word=1 and cur_func_whome set to that vreg. A byte E/D-home and
+   a word DE-home never coexist (the allocator gives up the word home when a
+   byte E/D-home already claimed DE's low half), so the state is shared, not
+   duplicated. The width-specific leaf ops (flush/rehome = 2 bytes, the
+   accumulate, the DE→HL read) dispatch on cur_home_is_word. */
+static int cur_home_is_word = 0;
+static int cur_func_whome   = -1;
+
 static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     /* HL cache hit: HL already holds the wanted vreg. No-op. Most
@@ -678,9 +702,21 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (hl_has(vreg_id) && sp_adj == 0) { ss_note_cache_read(f, vreg_id); return; }
     /* Every path below clobbers HL (with vreg_id, or with a slot
        address). If a width-2 spill is pending in HL, flush/discard it
-       here, while HL still holds it (LAZY_SPILL_PLAN.md §11). Dormant
+       here, while HL still holds it. Dormant
        until the deferral step sets pending_spill_v. */
     pending_spill_resolve();
+    /* Word DE-home resident: the running sum lives in DE — copy it to HL with
+       `ld l,e; ld h,d`, leaving DE = home intact (a read never evicts the
+       home). Serves accumulate addends, returns, and any other use. */
+    if (cur_home_is_word && vreg_id == cur_func_whome && vreg_id >= 0
+        && byte_home_holds(vreg_id) && f->vregs[vreg_id].width == 2
+        && sp_adj == 0) {
+        ss_note_cache_read(f, vreg_id);
+        emit(out, "ld\tl,e");
+        emit(out, "ld\th,d");
+        hl_about_to_change(vreg_id);   /* HL = home copy; DE still = home */
+        return;
+    }
     /* PR_BC hit: skip the slot reload and copy from BC. 2 instructions
        vs the 6 the slot-read path emits. Only fires for width-2 vregs;
        ir_alloc enforces width=2 for PR_BC, but guard width anyway in
@@ -897,8 +933,8 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         /* The wanted value is in HL. If it is the pending spill (I1:
            pending_spill_v == cur_hl_vreg == vreg_id), flushing it writes
            the slot AND leaves it in DE (store_hl's internal `ex de,hl`)
-           — the swap's exact result — so resolve instead of swapping
-           (LAZY_SPILL_PLAN.md §11). Dormant until the deferral step. */
+           — the swap's exact result — so resolve instead of swapping.
+           Dormant until the deferral step. */
         if (lazy_spill_on && pending_spill_v == vreg_id) {
             pending_spill_flush();   /* DE := vreg_id, slot written */
             cache_de(vreg_id);
@@ -968,9 +1004,13 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         ss_note_reload(f, vreg_id);
         emit(out, "ld\thl,%d", off);
         emit(out, "add\thl,sp");
-        emit(out, "ld\te,(hl)");
-        emit(out, "inc\thl");
-        emit(out, "ld\td,(hl)");
+        if (f->features & IR_FEAT_LD_HL_IND) {
+            emit(out, "ld\tde,(hl)");   /* ez80: DE = *HL (HL preserved) */
+        } else {
+            emit(out, "ld\te,(hl)");
+            emit(out, "inc\thl");
+            emit(out, "ld\td,(hl)");
+        }
         hl_about_to_change(-1);
         cache_de(vreg_id);
         return;
@@ -1101,7 +1141,7 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
     emit(out, "ld\t(hl),d");
 }
 
-/* Byte-home residency state (Plan B). Defined here (ahead of the byte
+/* Byte-home residency state. Defined here (ahead of the byte
    load/store emitters that read them); the comment block + helper functions
    live further down with the rest of the cache helpers. */
 static int cur_byte_home_vreg = -1;
@@ -1149,7 +1189,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     }
     /* The sp-rel slot read clobbers HL with the slot address. Reuse the
        cached slot address (exact or within 2 bytes via inc/dec hl —
-       charbench's accumulator / adjacent byte slots) instead of
+       same or adjacent byte slots) instead of
        recomputing; pending spill resolved here for the cold path.
        emit_byte_slot_addr advertises the address for the next access.
        NOTE: a slot-backed home is NOT re-homed into E on a read — the home
@@ -1380,7 +1420,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     cur_load_to_dehl_no_hl = 0;
     /* The long-load emits below (`ld hl,bc` cache recover, `ld hl,(ix)`,
        the sp-rel slot walk) all clobber HL. Flush a pending width-2
-       spill first (LAZY_SPILL_PLAN.md §11; dormant for now). The
+       spill first (dormant for now). The
        no-emit returns are safe: the no_hl cache-hit means the caller
        overwrites HL itself, and the cur_hl_vreg==vreg_id hit can't
        coincide with a width-2 pending (different widths). */
@@ -1498,11 +1538,11 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     /* Keep cur_hl_vreg honest: HL holds the low half (low-half tenant
        when !no_hl) or junk (no_hl). The fp / TOS / cache-hit paths above
-       all do this via hl_about_to_change; the generic sp walk used to
-       skip it, leaving cur_hl_vreg stale at the previous tenant. That
-       stale tenant fed bb_hl_out and made an if/else (or ||/&&) merge
+       all do this via hl_about_to_change; the generic sp walk must too,
+       else cur_hl_vreg stays stale at the previous tenant. A stale tenant
+       would feed bb_hl_out and make an if/else (or ||/&&) merge
        carry trust HL holding a vreg it didn't — e.g. `return (long_v ||
-       0)` returned 0 on the short-circuit edge (sp-mode only). */
+       0)` returning 0 on the short-circuit edge (sp-mode only). */
     hl_about_to_change(no_hl ? -1 : vreg_id);
     cache_dehl(vreg_id);
 }
@@ -1520,9 +1560,7 @@ static void load_to_dehl(FILE *out, const Func *f, int vreg_id)
    `ld l,c; ld h,b` (which restores HL = low half from BC). Callers
    set this when they don't need HL set after the load — typically
    because the next instruction overwrites HL (e.g. `pop hl`,
-   `ld hl,K`). After: BC = low half, DE = high half, HL = junk.
-   (The cur_store_dehl_bc_ready flag is gone — copt 285d catches
-   the round trip post-emit instead.) */
+   `ld hl,K`). After: BC = low half, DE = high half, HL = junk. */
 
 static void store_dehl(FILE *out, const Func *f, int vreg_id)
 {
@@ -1606,8 +1644,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
    still holds high half; BC holds low half. We invalidate HL/DE/DEHL
    (HL clobbered, DE+BC tracking reset to a clean slate), then re-cache
    DEHL = vreg to let a follow-on load_to_dehl(vreg) recover via 2-inst
-   `ld l,c; ld h,b`. md5 Transform's `a += ...; a = rotl(a, k); a +=
-   b;` chain hits this cache on every `a` re-read. */
+   `ld l,c; ld h,b`. */
 static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
 {
     store_dehl(out, f, vreg_id);
@@ -1646,8 +1683,7 @@ static void cache_dehl_no_spill(FILE *out, int vreg_id)
     /* HL still holds the long's low half (precondition of this
        function — caller's compute left HL = low). Advertise it via
        cur_hl_vreg so the next load_to_dehl on cache hit can skip
-       its `ld hl,bc` recovery (saves 2 bytes per chained
-       long-binop in MD5's `a += ...` rounds). */
+       its `ld hl,bc` recovery (saves 2 bytes per chained long-binop). */
     hl_about_to_change(vreg_id);
     cur_de_vreg = -1;
     cur_dehl_vreg = vreg_id;
@@ -1754,7 +1790,7 @@ static int a_has(int v) { return v >= 0 && cur_a_vreg == v; }
 static void cache_a(int v) { cur_a_vreg = v; }
 static void invalidate_a_cache(void) { cur_a_vreg = -1; }
 
-/* Byte-register residency (Plan B, Phase 1). A width-1 vreg the allocator
+/* Byte-register residency. A width-1 vreg the allocator
    pinned to a byte register (PR_C in the no-call BC-clean envelope) keeps
    its value there across the loop. `cur_byte_home_vreg` is which home vreg
    currently lives in its register; the home is a READ-cache over a real
@@ -1795,8 +1831,7 @@ static const char *byte_home_reg(PhysReg pr)
 }
 static int  byte_home_holds(int v) { return v >= 0 && cur_byte_home_vreg == v; }
 static void byte_home_note(int v)  { cur_byte_home_vreg = v; }
-/* Is v homed in a clobberable slot-backed byte register (PR_E/PR_D)? The
-   recurring slotbacked(phys(...)) guard. */
+/* Is v homed in a clobberable slot-backed byte register (PR_E/PR_D)? */
 static int byte_home_is_slotbacked(const Func *f, int v)
 {
     return byte_home_slotbacked(byte_home_phys(f, v));
@@ -1836,10 +1871,51 @@ static int cmp_bytewise_shape_ok(const Func *f, const Op *o)
     return 1;
 }
 
+/* Word DE-home DE-clean SIGNED loop test: `i < n` / `i >= n` lowered as
+   `<load n→HL>; ld a,(ix+i_lo); sub l; ld a,(ix+i_hi); sbc a,h` + the S^V
+   sign correction — A/HL only, so the home in DE survives the test (the loop's
+   only DE-clobber for the index_walk shape). Eligible iff: fp-mode, signed
+   ordered (LT/GE), LHS (i) in an ix-addressable slot, RHS (n) any width-2 vreg
+   loadable to HL (idx2/BC/slot — all DE-clean in fp) other than the home.
+   Branch-fused only (the compare emits its own jp). */
+static int word_dehome_signed_test_shape_ok(const Func *f, const Op *o)
+{
+    if (!cur_home_is_word || !fp_active(f)) return 0;
+    if (o->kind != IR_CMP_LT && o->kind != IR_CMP_GE) return 0;
+    int s0 = o->src[0], s1 = o->src[1];
+    if (s0 < 0 || s1 < 0 || s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
+    if (!f->vreg_to_phys || !f->vreg_spill_slot) return 0;
+    if (f->vreg_to_phys[s0] != IR_PR_SPILL) return 0;   /* LHS i in a slot */
+    if (f->vreg_spill_slot[s0] < 0) return 0;
+    if (f->vregs[s0].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    if (s1 == cur_func_whome) return 0;                 /* RHS not the home */
+    int ix = slot_ix_off(f, s0);
+    if (!fp_offset_fits(ix) || !fp_offset_fits(ix + 1)) return 0;
+    return 1;
+}
+
 static int cmp_bytewise_ok(const Func *f, const Op *o)
 {
     if (cur_branch_test_kind == 0) return 0;
     return cmp_bytewise_shape_ok(f, o);
+}
+
+/* Is op `o` the word DE-home's accumulate — `home = home OP w` with w a
+   vreg? It lowers to `add hl,de; ex de,hl` (try_word_accumulate), which
+   re-establishes DE = home, so it preserves the home (DE-clean). Must agree
+   with try_word_accumulate exactly (same conditions) so the region analysis
+   never disagrees with the emitter. ADD only for now (the only reduction the
+   ptrbench/word_resident kernels use); SUB/AND/OR/XOR are pending. */
+static int is_word_accumulate(const Func *f, const Op *o)
+{
+    if (!cur_home_is_word || cur_func_whome < 0) return 0;
+    if (o->dst != cur_func_whome) return 0;
+    if (o->kind != IR_ADD) return 0;
+    if (o->src[1] < 0) return 0;                       /* needs a vreg addend */
+    if (o->src[0] != o->dst && o->src[1] != o->dst) return 0;
+    if (o->dst >= f->n_vregs || f->vregs[o->dst].width != 2) return 0;
+    return 1;
 }
 
 /* Is op `o`'s lowering proven DE-clean — i.e. does the slot-backed byte
@@ -1855,6 +1931,45 @@ static int op_de_clean(const Func *f, const Op *o)
 {
     int dw = (o->dst >= 0 && o->dst < f->n_vregs)
            ? f->vregs[o->dst].width : 0;
+    /* Word DE-home: the accumulate and the home's own `ld de,K` init both
+       re-establish DE = home; everything else that is DE-clean for the byte
+       home (it touches A/HL/BC, never DE) is equally clean here. */
+    if (cur_home_is_word) {
+        if (is_word_accumulate(f, o)) return 1;
+        if (o->kind == IR_LD_IMM && o->dst == cur_func_whome) return 1;
+        /* Int deref (fp): register/sym base, |offset|<=3 (inc/dec hl, no DE
+           scratch), no post-step, not a far/banked load, dst is not the home.
+           Loads into HL/A; commit_hl_word's spill is the DE-preserving slot
+           store (spill_and_swap_unless_dead). So DE (the home) survives — vs
+           the *p++ word form (loads into DE) and wide/offset>3 forms (DE
+           scratch), which stay dirty. */
+        if (o->kind == IR_LD_MEM && dw == 2 && fp_active(f)
+            && o->dst != cur_func_whome
+            && o->mem.post_step == 0 && mem_bank_fn(&o->mem) == NULL
+            && o->mem.elem != KIND_CPTR
+            && (o->mem.kind == IR_MEM_VREG || o->mem.kind == IR_MEM_SYM)
+            && o->mem.offset >= -3)        /* any +offset: emit_pair_add_de_clean */
+            return 1;
+        /* Counter step (i++/i--): width-2 INC/DEC of a non-home vreg lowers to
+           `ex (sp),hl` (TOS) or load_to_hl + the DE-preserving slot store — A/HL
+           only, DE survives. (fp; the home itself is stepped via the accumulate,
+           not INC.) */
+        if ((o->kind == IR_INC || o->kind == IR_DEC) && dw == 2 && fp_active(f)
+            && o->dst != cur_func_whome)
+            return 1;
+        /* IVSR stepped pointer `bc += k` (PR_BC dst, small const step, dst==src0)
+           → `inc bc` chain in gen_add — DE-clean. */
+        if (o->kind == IR_ADD && dw == 2 && o->src[1] < 0
+            && o->dst == o->src[0] && o->dst != cur_func_whome
+            && o->imm >= 1                 /* any stride: emit_pair_add_de_clean */
+            && f->vreg_to_phys && f->vreg_to_phys[o->dst] == IR_PR_BC)
+            return 1;
+        /* DE-clean signed loop test (branch-fused). */
+        if ((o->kind == IR_CMP_LT || o->kind == IR_CMP_GE)
+            && cur_branch_test_kind != 0
+            && word_dehome_signed_test_shape_ok(f, o))
+            return 1;
+    }
     switch (o->kind) {
     case IR_NOP: case IR_BR:
         return 1;
@@ -1905,11 +2020,25 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
             && cmp_bytewise_shape_ok(f, o))
             return 1;
     }
+    /* Word DE-home signed loop test (CMP_LT/GE + the branch on its result):
+       both lower to the A/HL-only DE-clean form. cur_branch_test_kind is unset
+       here, so match structurally via the shape predicate. */
+    if ((o->kind == IR_CMP_LT || o->kind == IR_CMP_GE) && j + 1 < bb->n_ops) {
+        const Op *nxt = &bb->ops[j + 1];
+        if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
+            && nxt->src[0] == o->dst
+            && word_dehome_signed_test_shape_ok(f, o))
+            return 1;
+    }
     if ((o->kind == IR_BR_ZERO || o->kind == IR_BR_COND) && j > 0) {
         const Op *prv = &bb->ops[j - 1];
         if ((prv->kind == IR_CMP_ULT || prv->kind == IR_CMP_UGE)
             && prv->dst == o->src[0]
             && cmp_bytewise_shape_ok(f, prv))
+            return 1;
+        if ((prv->kind == IR_CMP_LT || prv->kind == IR_CMP_GE)
+            && prv->dst == o->src[0]
+            && word_dehome_signed_test_shape_ok(f, prv))
             return 1;
     }
     return op_de_clean(f, o);
@@ -1934,6 +2063,24 @@ static int home_span_valid(const Func *f, int home, int lo, int hi)
     const BB *hdr = &f->bbs[lo];
     if (!hdr->live_in || !ir_bitset_get((const BitSet *)hdr->live_in, home))
         return 0;
+    /* The region must UPDATE the home in-loop (an accumulate / byte-ALU write
+       of `home`). That in-region def is what re-establishes DE/E = home each
+       iteration; a span that merely carries the home THROUGH without a def
+       (e.g. an outer-loop step block reached from a nested inner loop that
+       clobbered DE) is NOT a residency loop — its exit-flush would write
+       whatever junk DE holds, not the home. Require ≥1 def of home. */
+    int home_def = 0;
+    for (int b = lo; b <= hi && !home_def; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&bb->ops[j], defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == home) { home_def = 1; break; }
+            if (home_def) break;
+        }
+    }
+    if (!home_def) return 0;
     for (int b = lo; b <= hi; b++) {
         const BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++)
@@ -2033,7 +2180,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
     if (hl_has(op->src[1])) {
         /* HL holds src[1] (the would-be DE-operand). If it is the
            pending spill, flush it — store_hl writes the slot AND leaves
-           it in DE, the swap's intent (LAZY_SPILL_PLAN.md §11). */
+           it in DE, the swap's intent. */
         if (lazy_spill_on && pending_spill_v == op->src[1]) {
             pending_spill_flush();   /* DE := src1, slot written, HL junk */
             cache_de(op->src[1]);
@@ -2057,8 +2204,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         /* HL here holds neither src — if a spill is pending it is an
            UNRELATED vreg, and store_hl's `ex de,hl` would clobber DE
            (=src0). Resolve it (flush/discard), then rebuild both
-           operands from scratch since the src0 DE-cache may be gone
-           (LAZY_SPILL_PLAN.md §11). */
+           operands from scratch since the src0 DE-cache may be gone. */
         if (lazy_spill_on && pending_spill_v >= 0) {
             pending_spill_resolve();
             invalidate_de_cache();
@@ -2179,16 +2325,6 @@ static void byte_home_flush(FILE *out, const Func *f)
     cur_byte_home_dirty = 0;
 }
 
-/* A DE-clobbering op is about to run: flush the dirty home (slot coherent)
-   then drop the belief — the register no longer reliably holds the value
-   after the op. A later read reloads from the (now coherent) slot. */
-static void byte_home_clobber(FILE *out, const Func *f)
-{
-    if (cur_byte_home_vreg < 0) return;
-    if (!byte_home_is_slotbacked(f, cur_byte_home_vreg)) return;
-    byte_home_flush(out, f);
-    cur_byte_home_vreg = -1;
-}
 
 /* Load the slot-backed home into its register (E/D) at a resident-loop
    preheader exit so the header can assert residency: the preheader's own home
@@ -2226,6 +2362,93 @@ static int rehome_byte_home(FILE *out, const Func *f)
     return 1;
 }
 
+/* Flush the word DE-home (the running sum, in DE) to its 2-byte backing slot
+   so the slot is coherent for a read / return / cross-BB reload. Mirror of
+   byte_home_flush, but writes both bytes (E=low, D=high). DE is preserved. */
+static void word_home_flush(FILE *out, const Func *f)
+{
+    int v = cur_byte_home_vreg;
+    if (v < 0 || v != cur_func_whome || !cur_byte_home_dirty) return;
+    if (fp_active(f)) {
+        int ix_off = slot_ix_off(f, v);
+        if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            emit(out, "ld\t(%s%+d),e", frame_reg(), ix_off);
+            emit(out, "ld\t(%s%+d),d", frame_reg(), ix_off + 1);
+            cur_byte_home_dirty = 0;
+            return;
+        }
+    }
+    /* sp-mode: the slot-address math clobbers HL (DE, the value, is untouched).
+       Preserve the A-cache (the triggering op may still read a cache_a'd byte
+       temp); invalidate_hl_cache clears A, so save/restore it. */
+    int saved_a = cur_a_vreg;
+    pending_spill_resolve();
+    invalidate_hl_cache();
+    cur_a_vreg = saved_a;
+    emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust);
+    emit(out, "add\thl,sp");
+    emit(out, "ld\t(hl),e");
+    emit(out, "inc\thl");
+    emit(out, "ld\t(hl),d");
+    cur_byte_home_dirty = 0;
+}
+
+/* Reload the word DE-home into DE from its (coherent) slot, preserving HL —
+   so an addend already loaded in HL by the accumulate survives. Mirror of
+   rehome_byte_home for the full pair. Returns 1 once DE holds the home. */
+static int rehome_word_home(FILE *out, const Func *f)
+{
+    int v = cur_func_whome;
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (cur_byte_home_vreg == v) return 1;          /* already resident */
+    if (fp_active(f)) {
+        int off = slot_ix_off(f, v);
+        if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return 0;
+        emit(out, "ld\te,(%s%+d)", frame_reg(), off);
+        emit(out, "ld\td,(%s%+d)", frame_reg(), off + 1);
+    } else {
+        emit(out, "push\thl");
+        emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust + 2);
+        emit(out, "add\thl,sp");
+        emit(out, "ld\te,(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\td,(hl)");
+        emit(out, "pop\thl");
+    }
+    byte_home_note(v);
+    cache_de(v);                                    /* DE physically = home */
+    cur_byte_home_dirty = 0;                        /* loaded from coherent slot */
+    return 1;
+}
+
+/* Width-aware home dispatchers — pick the byte (E/D) or word (DE) variant per
+   cur_home_is_word, so the shared BB-loop residency logic serves both. */
+static int home_is_slotbacked(const Func *f, int v)
+{
+    if (cur_home_is_word) return v >= 0 && v == cur_func_whome;
+    return byte_home_is_slotbacked(f, v);
+}
+static void home_flush(FILE *out, const Func *f)
+{
+    if (cur_home_is_word) word_home_flush(out, f);
+    else                  byte_home_flush(out, f);
+}
+/* A DE-clobbering op is about to run: flush the dirty home (slot now
+   coherent) then drop the belief — the register no longer reliably holds the
+   value after the op. A later read reloads from the (now coherent) slot. */
+static void home_clobber(FILE *out, const Func *f)
+{
+    if (cur_byte_home_vreg < 0) return;
+    if (!home_is_slotbacked(f, cur_byte_home_vreg)) return;
+    home_flush(out, f);
+    cur_byte_home_vreg = -1;
+}
+static int home_rehome(FILE *out, const Func *f)
+{
+    if (cur_home_is_word) return rehome_word_home(out, f);
+    return rehome_byte_home(out, f);
+}
+
 /* Sole choke point for the `ex de,hl` cache swap: HL and DE trade
    tenants. The value leaving HL survives in DE, so this is distinct
    from hl_about_to_change (a clobber). Callers emit the `ex de,hl`
@@ -2255,7 +2478,7 @@ static void invalidate_hl_cache(void)
 }
 
 /* Both HL and BC clobbered (16-bit ops through HL that also stash via BC,
-   calls, etc.). The recurring ~30x invalidate pair. */
+   calls, etc.). */
 static void invalidate_hl_bc(void) { invalidate_hl_cache(); invalidate_bc_cache(); }
 
 /* Dead-store elimination: set per-op by lower_func before calling
@@ -2292,7 +2515,7 @@ static int cur_skip_next_op;
    inspect successor BBs' first ops. */
 static const BB *cur_bb;
 
-/* ---- Lazy spill (store-on-clobber) helpers — LAZY_SPILL_PLAN.md §11 --
+/* ---- Lazy spill (store-on-clobber) helpers -------------------------
    Dormant until the deferral step wires `pending_spill_v` at the
    spill sites; `pending_spill_v` is -1 here, so flush/resolve never run
    and codegen is unchanged. Defined here (not at the cache helpers)
@@ -2426,9 +2649,8 @@ static int byte_dst_cache_ok(const Func *f, int v)
     return cur_dst_dead || vreg_in_register_pool(f, v);
 }
 
-/* The op's byte result is in A. Keep it live in the A-cache (claim dst) when
-   dst's next read is A-serviceable, else spill it to dst's home/slot. The
-   ~10x tail of the byte lowering paths. */
+/* Byte result is in A: keep it live in the A-cache (claim dst) when dst's next
+   read is A-serviceable, else spill to dst's home/slot. */
 static void commit_a_byte(FILE *out, const Func *f, int v)
 {
     if (byte_dst_cache_ok(f, v))
@@ -2438,15 +2660,14 @@ static void commit_a_byte(FILE *out, const Func *f, int v)
 }
 
 /* ---- Static lazy spill — reaching-reloads dead-store elimination -------
-   LAZY_SPILL_PLAN.md §11 / §11.4 ("the two-pass static model made
-   faithful"). Behind IR_LAZY_SPILL. Pass 1 (record) lowers eagerly and
+   Behind IR_LAZY_SPILL. Pass 1 (record) lowers eagerly and
    observes, per op, the deferrable-vreg slot accesses the lowerer makes —
    ground truth, since deferral changes only stores, never which loads
    cache-hit. A backward slot-liveness dataflow then marks a spill store
    DEAD iff no reload of its slot is reachable before the next store. Pass
    2 (elide) skips the dead stores; the value rides to its readers in HL
    via the existing bb_hl_out carry. Keys on the lowerer's OWN behaviour,
-   not an IR-level deadness guess, so it survives the §2 fused-add-hl-hl
+   not an IR-level deadness guess, so it survives the fused-add-hl-hl
    artifact.
 
    SOUND-BY-CONSTRUCTION reload model: the per-op reload (GEN) set is
@@ -2664,8 +2885,20 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
         /* Dead spill (no reload reaches it before the next store): skip
            the store AND the swap-back — HL already holds the value, the
            caller's cache_hl(dst) keeps it advertised, and it reaches its
-           readers via the HL carry (folds §10a). */
+           readers via the HL carry. */
         return;
+    }
+    /* Word DE-home resident (fp): store HL straight to the slot with NO
+       `ex de,hl` staging — preserves DE (the running sum) so an int deref's
+       live-result spill is DE-clean, keeping the home resident across the
+       body. HL keeps the value (caller's cache_hl advertises it). sp-mode
+       needs HL for the slot address, so it falls through to store_hl. */
+    if (cur_home_is_word && byte_home_holds(cur_func_whome) && fp_active(f)) {
+        int ix_off = slot_ix_off(f, vreg);
+        if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off);
+            return;
+        }
     }
     store_hl(out, f, vreg);
     /* store_hl leaves DE=value, HL=dead slot address; recover HL=value.
@@ -2681,18 +2914,16 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
     invalidate_de_cache();
 }
 
-/* The op's word result sits in HL. Spill-and-swap it to v's slot unless dead,
-   then advertise HL = v. The word analog of commit_a_byte; the 40x tail of the
-   word lowering paths (caller still does its own `return 0`). */
+/* Word result is in HL: spill-and-swap to v's slot unless dead, then advertise
+   HL = v. */
 static void commit_hl_word(FILE *out, const Func *f, int v)
 {
     spill_and_swap_unless_dead(out, f, v);
     cache_hl(v);
 }
 
-/* Result is in HL but dst v is a PR_DE-pool vreg: swap it into DE and advertise
-   DE = v. The recurring `ex de,hl; invalidate_hl_cache(); cache_de` trio (raw
-   ex de,hl — only reached on EX_DE_HL paths). */
+/* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise
+   DE = v. Raw ex de,hl — only reached on EX_DE_HL paths. */
 static void commit_hl_to_de(FILE *out, int v)
 {
     emit(out, "ex\tde,hl");
@@ -2700,9 +2931,8 @@ static void commit_hl_to_de(FILE *out, int v)
     cache_de(v);
 }
 
-/* Commit a word result sitting in HL to dst v: route into the DE home if v is
-   a PR_DE-pool vreg, else spill-and-swap + cache HL. The recurring 8x
-   pr_de-branch/word-commit tail (caller still does its own `return 0`). */
+/* Commit a word result in HL to dst v: into the DE home if v is a PR_DE-pool
+   vreg, else spill-and-swap + cache HL. */
 static void commit_hl_result(FILE *out, const Func *f, int v)
 {
     if (vreg_is_pr_de(f, v)) commit_hl_to_de(out, v);
@@ -2866,6 +3096,13 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
         && f->vreg_to_phys[op->dst] == IR_PR_DE) {
         emit(out, "ld\tde,%lld", (long long)op->imm);
         cache_de(op->dst);
+        /* Word DE-home init (sum = K): the value is in DE only, slot stale —
+           register residency + dirty so the first DE-clobber / BB exit flushes
+           it to the coherent slot (else a later reload reads garbage). */
+        if (cur_home_is_word && op->dst == cur_func_whome) {
+            byte_home_note(op->dst);
+            cur_byte_home_dirty = 1;
+        }
         return 0;
     }
     /* PR_BC dst: `ld bc,K` and stamp the cache. Downstream readers
@@ -2898,11 +3135,15 @@ static int gen_ld_sym(FILE *out, Func *f, const Op *op)
     }
     if (ns_sym_bails(op->mem.sym))
         return -1;   /* __addressmod address-of → walker */
+    /* A __LIB__ function decays to its address with NO leading underscore
+       (classic lib symbols are unprefixed); ordinary globals (incl. arrays/
+       structs) keep the `_`. ir_sym_prefix encodes that rule. */
+    const char *pfx = ir_sym_prefix(op->mem.sym);
     if (op->mem.offset)
-        emit(out, "ld\thl,_%s+%d",
-             ir_sym_name(op->mem.sym), op->mem.offset);
+        emit(out, "ld\thl,%s%s+%d",
+             pfx, ir_sym_name(op->mem.sym), op->mem.offset);
     else
-        emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
+        emit(out, "ld\thl,%s%s", pfx, ir_sym_name(op->mem.sym));
     commit_hl_word(out, f, op->dst);
     return 0;
 }
@@ -3104,6 +3345,18 @@ static void emit_test_zero(FILE *out, Func *f, int src)
         return;
     }
     if (w <= 2) {
+        /* r4k `test hl`/`test bc`: one-op zero test (reg OR 0 → Z), no A
+           clobber. `test bc` avoids the BC→HL move for a BC-resident value;
+           HL/A caches stay valid (test modifies no register). */
+        if (f->features & IR_FEAT_TEST_RP) {
+            if (!hl_has(src) && cur_bc_vreg == src) {
+                emit(out, "test\tbc");
+                return;
+            }
+            if (!hl_has(src)) load_to_hl(out, f, src);
+            emit(out, "test\thl");
+            return;
+        }
         if (!hl_has(src)) load_to_hl(out, f, src);
         emit(out, "ld\ta,h");
         emit(out, "or\tl");
@@ -3699,7 +3952,7 @@ static int gen_pop_dehl_long(FILE *out, Func *f, const Op *op)
            store_dehl_cached convention). Without this, a consumer
            like gen_st_mem's DEHL-hit path stale-hits hl_has(base)
            and stores the value through itself as the address
-           (md5 MD5Update miscompile under IR_LONG_PUSHES). */
+           (guards a miscompile under IR_LONG_PUSHES). */
         emit(out, "ld\tbc,hl");
         invalidate_hl_cache();
         cache_dehl(op->src[0]);
@@ -3857,6 +4110,11 @@ static int gen_conv_zx(FILE *out, Func *f, const Op *op)
         store_dehl_finalize(out, f, op->dst);
         return 0;
     }
+    if (src_w == 4 && dst_w == 4) {     /* identity (same-width zero-extend) */
+        load_to_dehl(out, f, op->src[0]);
+        store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
     if (src_w == 2 && dst_w == 2) {     /* identity */
         load_to_hl(out, f, op->src[0]);
         store_hl(out, f, op->dst);
@@ -3926,6 +4184,14 @@ static int gen_conv_sx(FILE *out, Func *f, const Op *op)
     if (src_w == 2 && dst_w == 2) {
         load_to_hl(out, f, op->src[0]);
         store_hl(out, f, op->dst);
+        return 0;
+    }
+    if (src_w == 4 && dst_w == 4) {
+        /* Same-width long sign-extend = identity; copy through DEHL.
+           (A redundant CONV_SX long→long reaches here from a conversion
+           site that didn't special-case equal widths — umchess's `D`.) */
+        load_to_dehl(out, f, op->src[0]);
+        store_dehl_finalize(out, f, op->dst);
         return 0;
     }
     fprintf(stderr, "ir_lower: CONV_SX %d→%d not supported\n", src_w, dst_w);
@@ -4040,8 +4306,8 @@ static int try_const_barrel(FILE *out, Func *f, const Op *op, int is_shr)
 /* 8080/8085 constant long (width-4) shift. Whole-byte shifts are free
    register moves (no CB ops); only the count%8 residual goes to the
    l_lsl_dehl/l_lsr_dehl bit-loop. Without this split a `>>25` would loop
-   the helper 25× instead of "drop 3 bytes + >>1" (the md5 ROTATE_LEFT
-   hot path). DEHL byte layout: L=b0, H=b1, E=b2, D=b3 (D = MSB).
+   the helper 25× instead of "drop 3 bytes + >>1".
+   DEHL byte layout: L=b0, H=b1, E=b2, D=b3 (D = MSB).
    Caller has already handled count==0 and count>=32. */
 static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
                                       int count, int is_shr)
@@ -4304,7 +4570,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            For larger bit_shift counts, wrap the body in a
            djnz loop instead of unrolling — small T-state cost
            (~13T per loop trip) for a meaningful byte saving on
-           MD5's rotate-heavy hot path. The formula
+           rotate-heavy code. The formula
            `bit_shift * body_sz > body_sz + 4` is the exact
            size break-even (djnz adds ld b,N + djnz = 4 fixed
            bytes). Use the strict form so we never grow code. */
@@ -4465,6 +4731,42 @@ static void emit_hl_add_offset(FILE *out, int off, int use_bc)
     }
     emit(out, "ld\t%s,%d", use_bc ? "bc" : "de", off);
     emit(out, "add\thl,%s", use_bc ? "bc" : "de");
+    /* The scratch pair just got clobbered — drop any cached value living
+       there, INCLUDING a long whose halves the DEHL cache splits across
+       DE (high) + BC (low). Missing this let a member/index offset compute
+       silently corrupt a register-resident long (e.g. `strtol()` result
+       pushed via gen_push_dehl_long picked up the stale `ld de,N` offset
+       as its high word). */
+    if (use_bc) { invalidate_bc_cache(); cur_dehl_vreg = -1; }
+    else        invalidate_de_cache();
+}
+
+/* Add a constant `k` (any sign) to a register pair while keeping DE intact —
+   for a word DE-home body, where DE holds the accumulator and BC the stepped
+   base, so neither is free as `add hl,de`/`ld de,k` scratch. Two DE-clean
+   forms, both leaving DE (and HL, when pair!=hl) untouched:
+     - A free: `ld a,lo; add a,k.lo; ld a,hi; adc a,k.hi` — 6 bytes for ANY k.
+     - else  : an inc/dec <pair> chain — |k| bytes, A-clean, any k.
+   Because BOTH are DE-clean for any k, op_de_clean can treat the step/offset
+   as clean regardless of magnitude (no cap). `a_free` is the caller's belief
+   that A holds nothing live (cur_a_vreg < 0, or A is about to be reloaded). */
+static void emit_pair_add_de_clean(FILE *out, const char *pair, const char *lo,
+                                   const char *hi, int k, int a_free)
+{
+    if (k == 0) return;
+    if (a_free && (k > 4 || k < -4)) {           /* A-add wins past the inc range */
+        emit(out, "ld\ta,%s", lo);
+        emit(out, "add\ta,%d", k & 0xff);
+        emit(out, "ld\t%s,a", lo);
+        emit(out, "ld\ta,%s", hi);
+        emit(out, "adc\ta,%d", (k >> 8) & 0xff);
+        emit(out, "ld\t%s,a", hi);
+        invalidate_a_cache();
+        return;
+    }
+    const char *op = k > 0 ? "inc" : "dec";
+    int n = k > 0 ? k : -k;
+    for (int i = 0; i < n; i++) emit(out, "%s\t%s", op, pair);
 }
 
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
@@ -4482,6 +4784,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
         } else {
             load_to_hl(out, f, op->mem.base);
+            emit_hl_add_offset(out, op->mem.offset, 0);  /* base+off (DE free) */
         }
         emit(out, "call\t%s", acc_prim(f, op->dst, "load"));
         emit_acc_slot_addr(out, f, op->dst, 0);
@@ -4700,10 +5003,21 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         if (!hl_has(op->mem.base))
             load_to_hl(out, f, op->mem.base);
         int dst_w = f->vregs[op->dst].width;
-        /* Width 4 can't clobber DE (needed for the high half) —
-           scratch through BC; widths 1/2 use DE. Small offsets
-           become inc/dec hl chains. */
-        emit_hl_add_offset(out, op->mem.offset, dst_w == 4);
+        /* Word DE-home active: reach the field offset DE-clean (DE holds the
+           home accumulator, BC the stepped base — neither free as scratch).
+           A is free here (the load below clobbers it via `ld a,(hl+)` on the
+           common path; on CPUs whose word load skips A we gate on the cache).
+           Any offset works (A-add is constant-size), so no struct-size cap. */
+        if (cur_home_is_word && dst_w == 2 && op->dst != cur_func_whome
+            && op->mem.offset > 3) {
+            emit_pair_add_de_clean(out, "hl", "l", "h", op->mem.offset,
+                                   cur_a_vreg < 0);
+        } else {
+            /* Width 4 can't clobber DE (needed for the high half) —
+               scratch through BC; widths 1/2 use DE. Small offsets
+               become inc/dec hl chains. */
+            emit_hl_add_offset(out, op->mem.offset, dst_w == 4);
+        }
         if (dst_w == 1) {
             /* Byte load into A. If dst is dead-after-next (the
                common `b = *p; foo((int)b)` shape via CONV), keep
@@ -4713,7 +5027,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,(hl)");
             /* NOTE: caching the base here (HL is intact when offset==0)
                looked like a free win for the following p++ but
-               regressed crc16 fp +1.4% through a cache-interaction
+               regressed through a cache-interaction
                chain (the INC hit changes what spill staging leaves in
                DE for the next CONV). Needs a lookahead-gated version;
                keep the plain invalidate for now. */
@@ -4796,6 +5110,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
         } else {
             load_to_hl(out, f, op->mem.base);
+            emit_hl_add_offset(out, op->mem.offset, 0);  /* base+off (DE free) */
         }
         emit_acc_store_hl(out, f, op->src[0]);
         invalidate_hl_bc();
@@ -4809,9 +5124,9 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
             /* Long store to a global. `ld (_sym),hl` writes the
                low half; `ld (_sym+2),de` writes the high half.
                Without the high-half write, long-typed globals get
-               silently truncated to int — the bug that turned
-               `g = shr1(0xffffffaa)` into g = 0x0000ffd5 and made
-               crcbench's XOR-chain end at the wrong digest. */
+               silently truncated to int — e.g.
+               `g = shr1(0xffffffaa)` would become g = 0x0000ffd5,
+               yielding a wrong result downstream. */
             load_to_dehl(out, f, op->src[0]);
             int off = op->mem.offset;
             if (off)
@@ -4932,14 +5247,22 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 load_to_hl_adj(out, f, op->mem.base, 4);
                 emit_hl_add_offset(out, op->mem.offset, 1);
                 emit(out, "pop\tbc");           /* BC = LOW */
-                emit(out, "ld\t(hl),c");
-                emit(out, "inc\thl");
-                emit(out, "ld\t(hl),b");
-                emit(out, "inc\thl");
-                emit(out, "pop\tbc");           /* BC = HIGH */
-                emit(out, "ld\t(hl),c");
-                emit(out, "inc\thl");
-                emit(out, "ld\t(hl),b");
+                if (f->features & IR_FEAT_LD_HL_IND) {
+                    emit(out, "ld\t(hl),bc");   /* ez80: *HL = BC (HL preserved) */
+                    emit(out, "inc\thl");
+                    emit(out, "inc\thl");
+                    emit(out, "pop\tbc");       /* BC = HIGH */
+                    emit(out, "ld\t(hl),bc");
+                } else {
+                    emit(out, "ld\t(hl),c");
+                    emit(out, "inc\thl");
+                    emit(out, "ld\t(hl),b");
+                    emit(out, "inc\thl");
+                    emit(out, "pop\tbc");       /* BC = HIGH */
+                    emit(out, "ld\t(hl),c");
+                    emit(out, "inc\thl");
+                    emit(out, "ld\t(hl),b");
+                }
                 invalidate_hl_bc();
             }
         } else {
@@ -4964,8 +5287,37 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* Word DE-home accumulate: `home = home + t` with the running sum riding DE.
+   Lowers to `add hl,de; ex de,hl` — the addend goes to HL, the sum stays in
+   DE — eliminating the per-iter `ld hl,(slot); add hl,de; ld (slot),hl`. If a
+   prior DE-clobber dropped residency, reload the home into DE first (HL is not
+   yet loaded, so the reload is free to use it). Returns 1 when handled. */
+static int try_word_accumulate(FILE *out, Func *f, const Op *op)
+{
+    if (!is_word_accumulate(f, op)) return 0;
+    int home = op->dst;
+    int t = (op->src[0] == home) ? op->src[1] : op->src[0];
+    if (!byte_home_holds(home)) {
+        /* DE = home from its (coherent, because non-resident ⇒ flushed) slot.
+           rehome preserves HL; the offset-fail fallback may clobber HL, but
+           the addend is not loaded until after, so that is harmless. */
+        if (!rehome_word_home(out, f))
+            load_to_de(out, f, home);
+    }
+    load_to_hl(out, f, t);             /* HL = addend (preserves DE = home) */
+    emit(out, "add\thl,de");           /* HL = home + t */
+    emit(out, "ex\tde,hl");            /* DE = new home; HL = old home (junk) */
+    invalidate_hl_cache();             /* drops HL/DE/A beliefs */
+    cache_de(home);                    /* DE now holds the new home */
+    byte_home_note(home);              /* residency (re)established */
+    cur_byte_home_dirty = 1;           /* slot stale → flush before clobber/exit */
+    return 1;                          /* handled */
+}
+
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
+    if (try_word_accumulate(out, f, op))
+        return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         /* Byte add in A. Commutative — pick the A-resident operand as
            the accumulator when one is already cached. */
@@ -5071,7 +5423,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            Valid in FP mode too — the reads are sp-relative and sp
            is live alongside IX. MUST come before the fp byte-direct
            path: that path reads the operand's (ix+d) slot, which the
-           PUSH elided the write to (md5 MD5Update miscompile under
+           PUSH elided the write to (guards a miscompile under
            IR_LONG_PUSHES). */
         {
         int optb_dehl_src = -1;
@@ -5268,8 +5620,15 @@ static int gen_add(FILE *out, Func *f, const Op *op)
        pre-step pointer), so drop its cache. */
     if (op->src[1] < 0 && op->dst == op->src[0]
         && vreg_in_pr_bc(f, op->dst) && bc_has(op->dst)
-        && op->imm >= 1 && op->imm <= 4) {
-        for (int t = 0; t < (int)op->imm; t++) emit(out, "inc\tbc");
+        && op->imm >= 1
+        && (cur_home_is_word || op->imm <= 4)) {
+        /* Normally an inc-bc chain only up to 4 (past that `ld de,k; add hl,de`
+           is fewer T). With a word DE-home active DE isn't free, so step the
+           pointer DE-clean for ANY stride: A-add (constant 6 bytes) when A is
+           free, else the inc chain — the resident region it unlocks outweighs
+           the step cost. */
+        emit_pair_add_de_clean(out, "bc", "c", "b", (int)op->imm,
+                               cur_home_is_word && cur_a_vreg < 0);
         invalidate_hl_cache();
         cache_bc(op->dst);
         return 0;
@@ -5737,9 +6096,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Long AND-mask + immediately-following BR_ZERO/COND
-           fastpath. crcbench's `(crc & 1UL) ? ... : ...` is the
-           archetype — 8 bit-tests per byte × 1024 × 63 reps =
-           half a million per run. Without this, each test goes
+           fastpath. A `(crc & 1UL) ? ... : ...` bit-test is the
+           archetype. Without this, each test goes
            through the full DEHL load + 4-byte AND + slot spill +
            reload + or h,or l + jp (~40 inst per test). The
            mirror of the width=2 fastpath at line 2231 — when
@@ -6434,6 +6792,35 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         }
     }
 
+    /* Fastcall through a function pointer: the arg must sit in HL/DEHL at
+       entry, so the fnptr can't also go via HL (l_jphl). Load it into the
+       spare index register (the one NOT used as the frame pointer — same
+       choice as idx2) BEFORE the arg lands in HL, then dispatch via
+       l_jpix/l_jpiy. (808x/gbz80 have no index reg and were deferred in
+       ir_build.) */
+    int fc_pr = (is_indirect && is_fastcall) ? ir_idx2_reg() : IR_PR_NONE;
+    const char *fc_idx = (fc_pr == IR_PR_IX) ? "ix"
+                       : (fc_pr == IR_PR_IY) ? "iy" : NULL;
+    /* No free index reg (idx2 off, target reserves one, or 808x/gbz80): the
+       fnptr can't sit in ix/iy, so push it and dispatch via pushed-retaddr +
+       `ret` (the arg still rides HL/DEHL/acc). */
+    int fc_ret = (is_indirect && is_fastcall && !fc_idx);
+    int fnptr_pushed = 0;
+    if (fc_idx) {
+        load_to_hl_adj(out, f, ci->fnptr_vreg,
+                       pre ? 0 : pushed_bytes + sp_adj_extra);
+        emit(out, "push\thl");
+        emit(out, "pop\t%s", fc_idx);   /* fnptr → ix/iy (HL freed for the arg) */
+        invalidate_hl_cache();
+    } else if (fc_ret) {
+        load_to_hl_adj(out, f, ci->fnptr_vreg,
+                       pre ? 0 : pushed_bytes + sp_adj_extra);
+        emit(out, "push\thl");          /* fnptr on TOS; `pop af` reclaims it */
+        fnptr_pushed = 2;
+        if (pre) cur_sp_adjust += 2;
+        invalidate_hl_cache();
+    }
+
     /* Fastcall: load the last arg into HL (width 1/2) or DEHL
        (width 4) immediately before the call. The arg's load
        must come AFTER all pushes — earlier pushes shift sp,
@@ -6441,11 +6828,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        parameter to compensate. */
     if (is_fastcall && ci->n_args > 0) {
         /* Pre-pushed args already live in cur_sp_adjust, which the
-           load helpers add themselves — no extra adj then. */
-        int adj = pre ? 0 : pushed_bytes + sp_adj_extra;
+           load helpers add themselves — no extra adj then. A ret-dispatch
+           fnptr pushed just above shifts the slots by 2 more (non-pre). */
+        int adj = pre ? 0 : pushed_bytes + sp_adj_extra + fnptr_pushed;
         int last = ci->n_args - 1;
         int width = f->vregs[ci->args[last]].width;
-        if (width == 4) {
+        if (width > 4) {
+            /* Wide fastcall arg (long long / 5-8B double): it rides the
+               accumulator (__i64_acc or FA), not HL — the callee binds it
+               from there. Load the slot into the accumulator. */
+            emit_acc_slot_addr(out, f, ci->args[last], adj);
+            emit(out, "call\t%s", acc_prim(f, ci->args[last], "load"));
+            invalidate_hl_cache();
+        } else if (width == 4) {
             load_to_dehl_adj(out, f, ci->args[last], adj);
         } else {
             load_to_hl_adj(out, f, ci->args[last], adj);
@@ -6465,7 +6860,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        last, so it lands just above the return address (callee param offsets
        already account for the +2). The result comes back in __i64_acc; the
        caller-cleanup below pops this with the args. */
-    if (ci->ret_longlong) {
+    if (ci->ret_longlong && !fc_ret) {
         emit(out, "ld\tbc,__i64_acc");
         emit(out, "push\tbc");
         pushed_bytes += 2;
@@ -6488,6 +6883,29 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         if (argwords == 0) emit(out, "xor\ta");
         else               emit(out, "ld\ta,%d", argwords);
         emit(out, "call\tl_farcall");
+    } else if (is_indirect && fc_idx) {
+        /* Fastcall fnptr: the fnptr is already in ix/iy (loaded above, before
+           the arg took HL/DEHL); dispatch through the jp(ix)/jp(iy) thunk. */
+        emit(out, "call\tl_jp%s", fc_idx);
+    } else if (is_indirect && fc_ret) {
+        /* No spare index reg (idx2 off / target reserves one / 808x / gbz80):
+           the fnptr is on TOS and the arg rides HL/DEHL/acc. Reclaim the fnptr
+           into AF, push a return label then the fnptr, and `ret` into it — the
+           callee's own `ret` lands back at the label. (Mirrors the walker.) */
+        int lbl = fc_ret_label_counter++;
+        emit(out, "pop\taf");           /* fnptr → AF */
+        if (pre) cur_sp_adjust -= 2;
+        if (ci->ret_longlong) {
+            /* hidden &__i64_acc must sit just above the return address */
+            emit(out, "ld\tbc,__i64_acc");
+            emit(out, "push\tbc");
+            pushed_bytes += 2;
+        }
+        emit(out, "ld\tbc,L_f%d_fcret_%d", func_emit_idx, lbl);
+        emit(out, "push\tbc");          /* return address */
+        emit(out, "push\taf");          /* fnptr */
+        emit(out, "ret");               /* jump to fnptr; its ret → our label */
+        fprintf(out, "L_f%d_fcret_%d:\n", func_emit_idx, lbl);
     } else if (is_indirect) {
         /* Load funcptr into HL then `call l_jphl` (the `jp (hl)`
            thunk). The call pushes the return address; l_jphl
@@ -6597,8 +7015,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     /* Return value lands in HL (width ≤ 2) or DEHL (width 4) per
        z88dk's smallc/stdc convention. Pick the correct store
        routine from the ret vreg's width — using store_hl for a
-       width-4 vreg silently dropped the high half (the bug behind
-       crcbench's wrong crc and lglob's missing g.hi). */
+       width-4 vreg silently dropped the high half (a wrong-result
+       and missing-high-half bug). */
     if (ci->ret_vreg >= 0) {
         int ret_w = f->vregs[ci->ret_vreg].width;
         if (ret_w > 4) {
@@ -6782,15 +7200,17 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC_UNARY) {
-        /* acc → acc in-place unary (float negate): load FA (unless already
-           resident), call the in-place helper (minusfa / l_f64_neg), store
-           FA to the float dst. */
+        /* acc → acc in-place unary (float negate / l_i64_neg): load the acc
+           (unless already resident), call the in-place helper, store back.
+           The i64 store takes the address in BC (acc_store_bc); the float
+           store takes it in HL. */
         if (cur_fa_vreg != src) {
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
         emit(out, "call\t%s", hi->name);
         emit_acc_slot_addr(out, f, dst, 0);
+        if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
         cur_fa_vreg = dst;
@@ -7153,6 +7573,31 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         cur_skip_next_op = 1;
         return 0;
     }
+    /* Word DE-home DE-clean signed loop test (fp): RHS (n) → HL, then subtract
+       LHS (i) from it byte-wise reading i from its ix-slot. Uses only A/HL,
+       so DE (the resident sum) survives — letting compute_home_region admit
+       the loop. HL keeps n, DE keeps the home; only A is clobbered. */
+    if (word_dehome_signed_test_shape_ok(f, op) && cur_branch_test_kind != 0) {
+        int s0 = op->src[0];
+        int ix = slot_ix_off(f, s0);
+        load_to_hl(out, f, op->src[1]);          /* HL = n (DE-clean in fp) */
+        emit(out, "ld\ta,(%s%+d)", frame_reg(), ix);
+        emit(out, "sub\tl");                     /* i_lo - n_lo */
+        emit(out, "ld\ta,(%s%+d)", frame_reg(), ix + 1);
+        emit(out, "sbc\ta,h");                   /* A=hi(i-n), P/V=ovf, CF=borrow */
+        int lbl = cmp_label_counter++;
+        emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, lbl);
+        emit(out, "xor\t0x80");
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", func_emit_idx, lbl);
+        emit(out, "rla");                        /* CF = signed (i < n) */
+        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int want_carry = (cf_true_long == br_true);
+        emit(out, "jp\t%s,L_f%d_bb_%d",
+             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
+        cur_a_vreg = -1;                         /* A clobbered; HL=n, DE=home kept */
+        cur_skip_next_op = 1;
+        return 0;
+    }
     load_binop_operands(out, f, op);   /* HL=src0, DE=src1 */
     /* 8085 DSUB + jp k/nk: fuse the compare into the branch. `sub hl,bc`
        (BC=src1) sets K=signed(src0<src1) and CF=unsigned borrow in one
@@ -7221,6 +7666,66 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
     carry_to_bool(out, f, cf_true);
     commit_hl_word(out, f, op->dst);
     return 0;
+}
+
+/* Operand load for the GT/LE swap-subtraction: DE = src[0], HL = src[1]
+   (the mirror of load_binop_operands, which yields HL=src0/DE=src1). The
+   swap lets `HL-DE` compute src1-src0 so CF=borrow means src0>src1. Modeled
+   branch-for-branch on load_binop_operands with the src roles exchanged, so
+   it handles every cache/spill case safely — crucially, when src[1] is the
+   DE-resident operand a naive `load_to_de(src0); load_to_hl(src1)` would
+   evict src1 from DE and then reload it from a slot it never had (slot_off
+   returns the -1 "no slot" sentinel → `ld hl,-1; add hl,sp` reads below the
+   frame). Const RHS never reaches here (canonicalized to LT/GE), so src[1]
+   is always a real vreg. */
+static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
+{
+    if (hl_has(op->src[1])) {
+        /* src1 already in HL (its target). Load src0 into DE, keeping HL. */
+        load_to_de_preserve_hl(out, f, op->src[0]);
+        cache_de(op->src[0]);
+        return;
+    }
+    if (hl_has(op->src[0])) {
+        /* src0 in HL but wanted in DE. If it's the pending spill, flush it
+           (store_hl leaves it in DE — the swap's intent). Else ex de,hl. */
+        if (lazy_spill_on && pending_spill_v == op->src[0]) {
+            pending_spill_flush();
+            cache_de(op->src[0]);
+            load_to_hl(out, f, op->src[1]);
+            return;
+        }
+        emit(out, "ex\tde,hl");
+        swap_hl_de_caches();
+        load_to_hl(out, f, op->src[1]);
+        return;
+    }
+    if (de_has(op->src[0])) {
+        /* src0 already in DE: just bring src1 into HL (preserves DE). */
+        load_to_hl(out, f, op->src[1]);
+        return;
+    }
+    if (de_has(op->src[1])) {
+        /* src1 in DE but wanted in HL. An unrelated pending spill in HL
+           would be clobbered by store_hl's ex de,hl, so resolve and rebuild;
+           otherwise swap src1 into HL and load src0 into DE preserving HL. */
+        if (lazy_spill_on && pending_spill_v >= 0) {
+            pending_spill_resolve();
+            invalidate_de_cache();
+            load_to_de(out, f, op->src[0]);
+            cache_de(op->src[0]);
+            load_to_hl(out, f, op->src[1]);
+            return;
+        }
+        emit(out, "ex\tde,hl");
+        swap_hl_de_caches();
+        load_to_de_preserve_hl(out, f, op->src[0]);
+        cache_de(op->src[0]);
+        return;
+    }
+    load_to_de(out, f, op->src[0]);    /* DE = src0; trashes HL */
+    cache_de(op->src[0]);
+    load_to_hl(out, f, op->src[1]);    /* HL = src1; preserves DE */
 }
 
 static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
@@ -7301,9 +7806,9 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         commit_hl_word(out, f, op->dst);
         return 0;
     }
-    /* Swap operand load to reuse the same ordering arithmetic. */
-    load_to_de(out, f, op->src[0]);    /* DE = src0 */
-    load_to_hl(out, f, op->src[1]);    /* HL = src1 */
+    /* Swap operand load to reuse the same ordering arithmetic
+       (DE=src0, HL=src1 — the mirror of load_binop_operands). */
+    load_cmp_swap_operands(out, f, op);
     /* 8085 DSUB + jp k/nk (see gen_cmp_lt_ge). `sub hl,bc` (BC=src0)
        computes src1-src0, so K=signed(src1<src0)=signed(src0>src1)=GT,
        CF=unsigned borrow. Fused-branch path, signed only; push/pop a
@@ -7856,6 +8361,8 @@ static int lower_op(FILE *out, Func *f, const Op *op)
 /* IR_RET is dispatched here directly (not through lower_op) so the
    sp restore can be sequenced after the return-value load without
    clobbering HL. */
+static int param_stack_width(const Func *f);   /* defined below */
+
 static int lower_ret(FILE *out, Func *f, const Op *op)
 {
     int width = 0;
@@ -7959,6 +8466,66 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
        Rabbit restores the IP priority with ipres (no stack). */
     if (f->flags & CRITICAL)
         emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipres" : "call\tl_pop_ei");
+    /* __z88dk_callee: the callee strips its own caller-pushed args (the caller
+       emits no cleanup — gen_call). The teardown above left sp at the return
+       address, args just above it. Remove them while preserving the return
+       value (HL / DEHL / FA) and the return address. */
+    int callee_args = 0;
+    if (f->flags & CALLEE) {
+        callee_args = param_stack_width(f);
+        /* A long-long returner also receives a hidden result-buffer
+           pointer just above the return address (returns_longlong → +2
+           in the param-offset layout); the caller counts it as a pushed
+           arg, so the callee must strip it too — else the caller's stack
+           is left 2 bytes off and the next call reads garbage. */
+        if (f->returns_longlong) callee_args += 2;
+    }
+    if (callee_args > 0) {
+        if (is_acc || (f->features & IR_FEAT_ADD_SP_IMM)) {
+            /* Result not in HL/DEHL — a wide (double) return lives in FA
+               (memory / the ALT register set, which `exx` would corrupt), so
+               HL/DE/BC are free; or gbz80, where `add sp,d` touches no register.
+               Either way do the sp math without preserving a register pair. */
+            emit(out, "pop\tbc");                 /* BC = return address */
+            if (f->features & IR_FEAT_ADD_SP_IMM) {
+                int rem = callee_args;            /* gbz80/Rabbit: add sp,d */
+                while (rem > 0) { int s = rem > 127 ? 127 : rem;
+                                  emit(out, "add\tsp,%d", s); rem -= s; }
+            } else {
+                emit(out, "ld\thl,%d", callee_args);
+                emit(out, "add\thl,sp");
+                emit(out, "ld\tsp,hl");           /* drop the args (HL free) */
+            }
+            emit(out, "push\tbc");
+        } else if (f->features & IR_FEAT_EXX) {
+            /* int/long result in HL/DEHL: park it + the return address in the
+               shadow set across the sp arithmetic (exx preserves DEHL). */
+            emit(out, "pop\tbc");                 /* BC = return address */
+            emit(out, "exx");
+            emit(out, "ld\thl,%d", callee_args);
+            emit(out, "add\thl,sp");
+            emit(out, "ld\tsp,hl");               /* drop the args */
+            emit(out, "exx");                     /* restore value + retaddr */
+            emit(out, "push\tbc");
+        } else if (width == 4) {
+            /* 8080/8085: no alt regs and no `add sp,d`, so the sp math needs HL
+               — which a long result also occupies, with no spare pair (BC holds
+               the retaddr). Genuinely unsupported; diagnose, don't miscompile. */
+            fprintf(stderr, "ir_lower: __z88dk_callee with a long return is "
+                            "unsupported on 8080/8085\n");
+            return -1;
+        } else {
+            /* 8080/8085, int result in HL (≤2B): park it in DE via ex de,hl
+               while HL does the sp math and BC holds the return address. */
+            emit(out, "ex\tde,hl");               /* DE = result (HL now free) */
+            emit(out, "pop\tbc");                 /* BC = return address */
+            emit(out, "ld\thl,%d", callee_args);
+            emit(out, "add\thl,sp");
+            emit(out, "ld\tsp,hl");               /* drop the args */
+            emit(out, "ex\tde,hl");               /* HL = result */
+            emit(out, "push\tbc");
+        }
+    }
     emit(out, "ret");
     return 0;
 }
@@ -8294,10 +8861,10 @@ int ir_lower_func(FILE *out, Func *f)
         int ivsr    = ir_opt_ivsr(f);
         /* Early matcher phase (poststep, movfuse) runs BEFORE st2ld:
            its load-forwarding creates fresh MOVs that consume the
-           same vregs the prologue binds to locals (e.g. MD5
-           Transform's end-of-function `buf[i] += a/b/c/d` LD_MEMs get
+           same vregs the prologue binds to locals (e.g. an
+           end-of-function `buf[i] += a/b/c/d` LD_MEM gets
            forwarded from the prologue's `UINT4 a = buf[0]` load,
-           multiplying v_a's use count past movfuse's single-use
+           multiplying the use count past movfuse's single-use
            gate). */
         int early   = ir_match_run_early(f);   /* incl. derefpp (`*p++`) */
         int fwd     = ir_opt_st2ld(f);
@@ -8315,6 +8882,15 @@ int ir_lower_func(FILE *out, Func *f)
            long-push inserter. Per-pattern counts print under
            IR_OPT_VERBOSE. */
         int match   = ir_match_run(f);
+        /* Reassociate a reduction's add-tree into direct accumulates
+           (`acc += a+b+c+…` → `acc+=a; acc+=b; …`), interleaving each load
+           with its accumulate so the word DE-home can keep the accumulator
+           resident — the tree form computes sub-sums through DE and blocks it.
+           After ir_match (so field offsets are folded INTO the loads —
+           `LD [base+k]`, not a separate live address-add), before CSE/DCE that
+           clean the NOPs it leaves. Gated on c_word_resident ⇒ inert
+           (byte-identical) when off. */
+        int reassoc = ir_opt_reassoc_reduction(f);
         int cse     = ir_opt_cse(f);
         /* After cse so duplicate per-lane address ADDs have been
            merged; before the long-push inserter. */
@@ -8343,11 +8919,11 @@ int ir_lower_func(FILE *out, Func *f)
         int coal    = ir_opt_coalesce_copies(f);
         if (coal) dce += ir_opt_dce(f);
         /* Long push/pop insertion runs last — it expects the IR in
-           its final shape. Default: ON in fp mode (md5 −0.4%/−13B,
-           no exposure elsewhere — the option-B/byte-direct paths
+           its final shape. Default: ON in fp mode (a small size win,
+           no exposure elsewhere — the byte-direct paths
            are regression-pinned by dehl_cache's longpush matrix),
            OFF in sp mode where the staging costs slightly more
-           than the slot writes it replaces (md5 +0.26%/+40B).
+           than the slot writes it replaces.
            IR_LONG_PUSHES=0 / =1 force off / on regardless of mode
            (NOTE: this was an existence check once — =0 ENABLED the
            pass; it is a value now). */
@@ -8360,14 +8936,14 @@ int ir_lower_func(FILE *out, Func *f)
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0
-             || cse > 0 || pushes > 0 || deadret > 0)
+             || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
                     "ir_opt: %d licm, %d ivsr, %d early, %d st2ld, %d cfold, "
-                    "%d match, %d cse, "
+                    "%d reassoc, %d match, %d cse, "
                     "%d packs, %d late, %d pushes, %d deadret, "
                     "%d dce, %d narrow in func\n",
-                    hoisted, ivsr, early, fwd, cfold, match,
+                    hoisted, ivsr, early, fwd, cfold, reassoc, match,
                     cse, packs, late, pushes, deadret, dce, narrow);
     }
 
@@ -8385,10 +8961,10 @@ int ir_lower_func(FILE *out, Func *f)
     /* Bumped once per function — both lowering passes (when lazy spill
        does two) share the same func label prefix. */
     func_emit_idx++;
-    /* Lazy-spill config (LAZY_SPILL_PLAN.md §11). Read once; the
+    /* Lazy-spill config. Read once; the
        per-pass deferral state lives in lower_func_render. Default ON
        (sound-by-construction static reaching-reloads model; validated
-       flag-on === flag-off across the suite corpus, intbench −30%);
+       flag-on === flag-off across the corpus);
        IR_NO_LAZY_SPILL opts out (restores the single-pass, byte-
        identical-to-pre-lazy-spill lowering for A/B + bisecting). */
     lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
@@ -8406,11 +8982,11 @@ int ir_lower_func(FILE *out, Func *f)
     int *bb_lowered = calloc((size_t)f->n_bbs, sizeof(int));
     /* Per-BB pending-spill out: which width-2 vreg (if any) left this BB
        deferred (unstored, riding the HL carry) — the dual of bb_hl_out
-       for the lazy-spill cross-BB carry (LAZY_SPILL_PLAN.md §11). -1 =
+       for the lazy-spill cross-BB carry. -1 =
        none. Plumbing only in this step; the inherit decision and the
        deferral that populates it land with the defer step. */
     int *bb_pending_out = malloc((size_t)f->n_bbs * sizeof(int));
-    /* Byte-home cross-BB residency map (Plan B Phase 2): which slot-backed
+    /* Byte-home cross-BB residency map: which slot-backed
        home (E/D) each BB exits with in its register. Module-static so it
        needn't thread through lower_func_render's signature. */
     bb_byte_out = malloc((size_t)f->n_bbs * sizeof(int));
@@ -8472,6 +9048,34 @@ int ir_lower_func(FILE *out, Func *f)
             else
                 bb_alias[i] = t;
         }
+    }
+
+    /* Word DE-home tentative-pick gate. The allocator picked the home and
+       evicted other PR_DE tenants to give it exclusive DE — a net loss if no
+       resident region forms (the home would only churn per-iter flush+rehome
+       around the body's DE-scratch ops). Region formation needs slots +
+       bb_alias, so it could not be decided in the allocator; decide it here
+       with the SAME compute_home_region the render uses (no divergence). No
+       region ⇒ restore the saved pre-pick allocation and re-slot, reverting
+       this function to baseline. Only the win (a region forms) ships the home. */
+    int *wh_prepick = ir_alloc_take_word_home_prepick();
+    if (wh_prepick) {
+        if (f->word_home_vreg >= 0) {
+            int wlo = -1, whi = -1;
+            cur_home_is_word = 1;
+            cur_func_whome = f->word_home_vreg;
+            cur_branch_test_kind = 0;
+            compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
+            cur_home_is_word = 0;
+            cur_func_whome = -1;
+            if (wlo < 0) {
+                memcpy(f->vreg_to_phys, wh_prepick,
+                       (size_t)f->n_vregs * sizeof(int));
+                f->word_home_vreg = -1;
+                ir_assign_slots(f);
+            }
+        }
+        free(wh_prepick);
     }
 
     /* === Pass driver ===
@@ -8628,11 +9232,25 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     cur_byte_home_vreg = -1;   /* byte home: no resident at function entry */
     cur_byte_home_dirty = 0;
     cur_func_ehome = -1;
+    cur_home_is_word = 0;
+    cur_func_whome = -1;
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vreg_to_phys
             && byte_home_slotbacked(f->vreg_to_phys[v])) { cur_func_ehome = v; break; }
-    /* Home-resident loop: where the slot-backed home stays in E/D across a
-       loop, suppress per-iter spills + assert residency at the header. */
+    /* Word DE-home (--word-resident): a width-2 loop accumulator homed in DE.
+       Mutually exclusive with a byte E/D-home (allocator gives up the word home
+       when DE's low half is taken), so it reuses the same residency machinery
+       — cur_func_ehome names "the home" either way; cur_home_is_word selects the
+       width-specific leaf ops (flush/rehome/accumulate/DE→HL read). */
+    if (cur_func_ehome < 0 && f->word_home_vreg >= 0 && f->vreg_to_phys
+        && f->vreg_to_phys[f->word_home_vreg] == IR_PR_DE) {
+        cur_func_whome = f->word_home_vreg;
+        cur_func_ehome = cur_func_whome;
+        cur_home_is_word = 1;
+    }
+    /* Home-resident loop: where the slot-backed home stays in E/D (or DE)
+       across a loop, suppress per-iter spills + assert residency at the
+       header. */
     cur_home_region_lo = cur_home_region_hi = -1;
     if (cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
         compute_home_region(f, cur_func_ehome, bb_alias,
@@ -8685,6 +9303,25 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 bb_hl_out[bb->id] = acarry;
             else
                 bb_hl_out[bb->id] = -1;
+            /* Word DE-home: pass the home-residency carry through the trampoline
+               too (mirror of bb_hl_out) — else a region body reached via an
+               alias (index_walk's bb2→bb3) loses the carry and needlessly
+               rehomes. Byte-home left untouched (byte-identical gate). */
+            if (cur_home_is_word && cur_func_ehome >= 0 && bb_byte_out) {
+                int bcarry = -2;
+                for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                    int pid = bb_preds[bb->id][p];
+                    if (!bb_lowered[pid]) { bcarry = -1; break; }
+                    int v = bb_byte_out[pid];
+                    if (v < 0) { bcarry = -1; break; }
+                    if (bcarry == -2) bcarry = v;
+                    else if (bcarry != v) { bcarry = -1; break; }
+                }
+                bb_byte_out[bb->id] =
+                    (bcarry >= 0 && bb->live_in
+                     && ir_bitset_get((const BitSet *)bb->live_in, bcarry))
+                    ? bcarry : -1;
+            }
             bb_lowered[bb->id] = 1;
             continue;
         }
@@ -8773,8 +9410,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            keeps the home in E. Assert residency when every already-lowered
            pred (the preheader entries) carries it — the unlowered back-edge
            preds are covered by the proof. */
+        /* For the word DE-home, assert at ANY in-region BB whose belief was
+           dropped by an unlowered back-edge pred — a diamond/multi-latch loop
+           body (e.g. index_walk's bb3) is itself a back-edge target, not just
+           the header. The region proof covers the whole span, so trusting the
+           unlowered preds is sound wherever a lowered pred carries the home.
+           Byte-home keeps the header-only assertion (byte codegen unchanged). */
         if (cur_func_ehome >= 0 && cur_home_region_lo >= 0
-            && bb->id == cur_home_region_lo
+            && (bb->id == cur_home_region_lo
+                || (cur_home_is_word && bb->id >= cur_home_region_lo
+                    && bb->id <= cur_home_region_hi))
             && cur_byte_home_vreg < 0
             && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, cur_func_ehome)) {
@@ -8846,8 +9491,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         }
         if (region_exit_here && cur_byte_home_vreg == cur_func_ehome
             && cur_byte_home_dirty
-            && byte_home_is_slotbacked(f, cur_func_ehome))
-            byte_home_flush(out, f);   /* keep belief; slot now coherent */
+            && home_is_slotbacked(f, cur_func_ehome))
+            home_flush(out, f);   /* keep belief; slot now coherent */
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             int rc;
@@ -9069,9 +9714,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                load_to_dehl (cache hit, no slot read) AND redefines
                dst (nxt->dst == op->dst). Every later read sees nxt's
                value, whose own finalize owns the slot — this def's
-               writeback can never be observed. Fires on the md5
+               writeback can never be observed. Fires on a
                round-carry chain (`a = ROTATE(a); a += b;` — the
-               rotate result's spill is dead, ~12B/76T per round).
+               rotate result's spill is dead).
                Same recognised-consumer set as the dead-dst switch
                above. Excluded: ADDR_TAKEN/PARAM (slot readable
                behind the IR's back) and dst doubling as the other
@@ -9202,7 +9847,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        the slot-backed home into E here too (this elided BR is
                        the entry edge). */
                     if (is_region_preheader && cur_func_ehome >= 0)
-                        rehome_byte_home(out, f);
+                        home_rehome(out, f);
                     /* HL state unchanged — bb_hl_out captures
                        cur_hl_vreg. But an elided fall-through still crosses
                        a BB boundary: spill a dirty slot-backed home (keeping
@@ -9210,9 +9855,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        a coherent slot if it doesn't carry. */
                     if (cur_func_ehome >= 0 && bb_exit_flush_needed
                         && cur_byte_home_dirty && cur_byte_home_vreg >= 0
-                        && byte_home_slotbacked(
-                               byte_home_phys(f, cur_byte_home_vreg)))
-                        byte_home_flush(out, f);
+                        && home_is_slotbacked(f, cur_byte_home_vreg))
+                        home_flush(out, f);
                     continue;
                 }
             }
@@ -9260,15 +9904,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             if (is_region_preheader && cur_func_ehome >= 0
                 && (op->kind == IR_BR || op->kind == IR_BR_COND
                     || op->kind == IR_BR_ZERO))
-                rehome_byte_home(out, f);
+                home_rehome(out, f);
             if (cur_byte_home_vreg >= 0
-                && byte_home_is_slotbacked(f, cur_byte_home_vreg)) {
+                && home_is_slotbacked(f, cur_byte_home_vreg)) {
                 if (!op_de_clean(f, op)) {
-                    byte_home_clobber(out, f);
+                    home_clobber(out, f);
                 } else if (cur_byte_home_dirty && bb_exit_flush_needed
                            && (op->kind == IR_BR || op->kind == IR_BR_COND
                                || op->kind == IR_BR_ZERO)) {
-                    byte_home_flush(out, f);   /* keep belief */
+                    home_flush(out, f);   /* keep belief */
                 }
             }
             /* Static lazy-spill: tag the store/reload hooks with this op's
@@ -9293,12 +9937,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            branch in the dispatch above. */
         if (cur_func_ehome >= 0 && bb_exit_flush_needed && cur_byte_home_dirty
             && cur_byte_home_vreg >= 0
-            && byte_home_is_slotbacked(f, cur_byte_home_vreg)) {
+            && home_is_slotbacked(f, cur_byte_home_vreg)) {
             int lastk = bb->n_ops ? bb->ops[bb->n_ops - 1].kind : IR_NOP;
             if (lastk != IR_BR && lastk != IR_BR_COND
                 && lastk != IR_BR_ZERO && lastk != IR_RET
                 && lastk != IR_SWITCH)
-                byte_home_flush(out, f);
+                home_flush(out, f);
         }
         /* Record the home's exit residency for successors' carry decision:
            the slot-backed home is in E/D here iff the belief still holds it. */

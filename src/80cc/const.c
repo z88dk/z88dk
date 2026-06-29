@@ -158,6 +158,7 @@ int number(LVALUE *lval)
     int64_t value = tok->num.value;
     int isunsigned = tok->num.isunsigned;
     int tok_kind = tok->num.kind;
+    int tok_base = tok->num.base;
     lptr += span;
     tk_consume(current_tokeniser);
 
@@ -179,6 +180,19 @@ int number(LVALUE *lval)
        magnitude says CHAR. */
     if (tok_kind >= KIND_LONG && tok_kind > lval->val_type)
         lval->val_type = tok_kind;
+    /* C integer-constant rule: an unsuffixed HEX/OCTAL/BINARY constant whose
+       value exceeds the SIGNED range of its size class takes the corresponding
+       UNSIGNED type (decimal stays signed and widens instead). Without this,
+       e.g. 0x80000001 became signed `long` and sign-extended in const-fold —
+       `3 * 0x2AAAAAAB == 0x80000001` folded to false. Only the non-negated
+       literal path (minus>=0); the legacy embedded-minus path stays signed. */
+    if (!isunsigned && tok_base != 10 && minus >= 0) {
+        int64_t smax = (lval->val_type == KIND_INT)  ? 32767
+                     : (lval->val_type == KIND_LONG) ? 2147483647LL
+                     : INT64_MAX;
+        if ((uint64_t)lval->const_val > (uint64_t)smax)
+            isunsigned = 1;
+    }
     lval->is_const = 1;
 
     if ( lval->val_type == KIND_LONGLONG ) {

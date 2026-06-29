@@ -510,7 +510,13 @@ struct nodepair *test(int label, int parens)
  * `lval->const_val` tracking — paving the way for F3 to delete
  * those LVALUE fields entirely. Caller contract unchanged.
  */
-int constexpr(double *val, Kind *type, int flag)
+/* Full-precision variant: returns the folded constant as a zdouble
+   (long double) so a 64-bit integer literal survives unclipped — the
+   plain `constexpr` truncates to `double`, dropping the low bits of a
+   long long > 2^53 (caller must want the wide value, e.g. a long long
+   initialiser). NB: long double == double on macOS/ARM, so even this is
+   limited there; on x86 it carries the full int64. */
+int constexpr_z(zdouble *val, Kind *type, int flag)
 {
     zdouble valtemp;
     int con;
@@ -535,6 +541,14 @@ int constexpr(double *val, Kind *type, int flag)
     *val = 0;
     *type = KIND_INT;
     return 0;
+}
+
+int constexpr(double *val, Kind *type, int flag)
+{
+    zdouble z = 0;
+    int r = constexpr_z(&z, type, flag);
+    *val = (double)z;
+    return r;
 }
 
 /*

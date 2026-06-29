@@ -275,7 +275,7 @@ Node *compound(void)
     --ncmp; /* close current level */
     sym_undecl_frame(array, savloc, lastst != STRETURN);
 
-    locptr = savloc; /* delete local symbols */
+    sym_leave_scope(savloc); /* hide block locals; keep storage for the AST */
     declared = 0;
     return ast_compound(array);
 }
@@ -455,7 +455,7 @@ Node *dofor(void)
     sym_undecl_frame(arr, savedloc, 1);
 
     --ncmp;
-    locptr = savedloc;
+    sym_leave_scope(savedloc); /* hide loop-scope locals; keep storage */
     declared = 0;
     delwhile();
 

@@ -41,7 +41,11 @@
 #if defined(__MSDOS__) && defined(__TURBOC__)
 #define NUMLOC          33
 #else
-#define NUMLOC          512
+/* The AST holds SYMBOL* into loctab and is lowered after the whole function
+   is parsed, so block-scope storage can't be reused mid-function (sibling
+   scopes would alias). Without reuse the peak is the function's *total*
+   local count, hence the larger table. */
+#define NUMLOC          4096
 #endif
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
@@ -228,6 +232,8 @@ struct symbol_s {
                               */
         int level;           /* Compound level that this variable is declared at */
         int scope_block;     /* Scope block throughout file? */
+        char out_of_scope;   /* block exited: hidden from findloc, storage kept
+                                live for AST SYMBOL* refs (no slot reuse) */
         UT_hash_handle  hh;
 
 };

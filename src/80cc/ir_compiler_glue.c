@@ -62,23 +62,29 @@ uint32_t ir_features_from_cpu(void)
 {
     uint32_t feat = IR_FEAT_CB_BITOPS | IR_FEAT_EX_DE_HL
                   | IR_FEAT_IX | IR_FEAT_DJNZ | IR_FEAT_OVERFLOW_FLAG
-                  | IR_FEAT_JR | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY;
+                  | IR_FEAT_JR | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY
+                  | IR_FEAT_EXX;
     if (IS_808x())   /* P flag is parity, not overflow; no relative jumps (XTHL still present);
-                        no native ldi/ldir (z80asm expands to a helper call) */
+                        no native ldi/ldir (z80asm expands to a helper call); no alt-reg set */
         feat &= ~(IR_FEAT_CB_BITOPS | IR_FEAT_IX | IR_FEAT_DJNZ
-                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_JR | IR_FEAT_BLOCK_COPY);
+                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_JR | IR_FEAT_BLOCK_COPY
+                  | IR_FEAT_EXX);
     if (IS_8085())   /* undocumented LDSI+LHLX/SHLX sp-rel ld/st; DSUB+K signed compare */
         feat |= IR_FEAT_SP_REL_DEPTR | IR_FEAT_DSUB;
     if (IS_GBZ80())   /* LR35902 keeps the CB prefix; no overflow/sign flags; no ex (sp),hl;
-                         no native ldi/ldir */
+                         no native ldi/ldir; no exx/alt regs */
         feat &= ~(IR_FEAT_EX_DE_HL | IR_FEAT_IX | IR_FEAT_DJNZ
-                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY);
+                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY
+                  | IR_FEAT_EXX);
     if (c_cpu & CPU_RABBIT) {          /* and/or/sub hl,de, bool hl, rr hl */
         feat |= IR_FEAT_HL_DE_LOGIC | IR_FEAT_BOOL_HL | IR_FEAT_PAIR_ROT;
         feat |= IR_FEAT_CRIT_IP;       /* no di/ei: __critical via ipset/ipres */
+        feat |= IR_FEAT_FAST_MULT;     /* native `mul` (HL:BC = BC*DE) */
     }
-    if (c_cpu & (CPU_R4K | CPU_R6K))   /* native `xor/sub/cp hl,de` */
+    if (c_cpu & (CPU_R4K | CPU_R6K)) { /* native `xor/sub/cp hl,de`, `test hl/bc` */
         feat |= IR_FEAT_HL_DE_LOGIC4;
+        feat |= IR_FEAT_TEST_RP;
+    }
     if (c_cpu & CPU_RABBIT)            /* ld hl,(sp+N), N 0..255, HL only */
         feat |= IR_FEAT_SP_REL_HL | IR_FEAT_SP_REL_WIDE;
     if (IS_KC160())                    /* ld hl/de/bc,(sp+d), d signed byte */

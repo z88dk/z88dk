@@ -164,6 +164,9 @@ typedef struct {
     int64_t  value;
     int      kind;        /* KIND_INT / KIND_LONG / KIND_LONGLONG */
     int      isunsigned;
+    int      base;        /* radix: 10 / 16 / 8 / 2. C types a hex/octal/binary
+                             constant that overflows the signed range as the
+                             corresponding UNSIGNED type; decimal stays signed. */
 } TokenNumeric;
 
 typedef struct {

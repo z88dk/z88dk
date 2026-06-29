@@ -106,6 +106,15 @@ int c_idx2_invariant = 1;
    slot. IR_NO_BYTE_RESIDENT in the environment forces off. */
 int c_byte_resident = 1;
 
+/* Word (int) accumulator residency: keep a hot loop-carried width-2
+   accumulator in the DE pair instead of a frame slot (the word analog of
+   c_byte_resident's E-home). The allocator picks the home; ir_lower gates it
+   on a resident-loop region forming (else it reverts to the plain slot, so
+   non-clean loops never regress), accumulates via `add hl,de; ex de,hl` with
+   a DE-clean signed loop test. DEFAULT ON; --no-word-resident /
+   IR_NO_WORD_RESIDENT opts out. */
+int c_word_resident = 1;
+
 
 int c_use_r2l_calling_convention;
 

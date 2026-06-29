@@ -235,6 +235,7 @@ Func *ir_func_new(SYMBOL *fn)
     f->is_critical = 0;
     f->has_setjmp = 0;
     f->ns = NULL;
+    f->word_home_vreg = -1;
     f->vreg_to_phys = NULL;
     f->vreg_spill_slot = NULL;
     f->live_ranges = NULL;

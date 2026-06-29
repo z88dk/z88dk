@@ -387,6 +387,9 @@ int agg_init(Type *type, int isflexible, array **out_list)
 static int init(Type *type, int dump, Node **out_node)
 {
     double value;
+    zdouble zvalue = 0; /* full-precision mirror of `value` for the constdecl
+                           path — a long long literal > 2^53 loses its low
+                           bits as a plain double (see constexpr_z). */
     Kind   valtype;
     int sz = 0; /* number of chars in queue */
     int klptr, parencount;
@@ -449,11 +452,13 @@ static int init(Type *type, int dump, Node **out_node)
             outbyte('+');
             outdec(ivalue);
             nl();
-            /* AST: a string-pointer literal — type is char*, zval holds
-               the litq label so the consumer can re-emit the immedlit
-               reference. The +ivalue offset is folded into zval. */
+            /* AST: a string-pool reference. IR_LD_STR re-emits
+               `i_<litlab>+offset` (matching the static defw above);
+               ivalue is the pool offset set by storeq. The old code folded
+               litlab+ivalue into a plain int, losing the label → it lowered
+               to a bogus immediate (e.g. char* field got 17, not &"Hello"). */
             if (out_node) {
-                *out_node = ast_literal(make_pointer(type_char), (zdouble)((int64_t)litlab + ivalue));
+                *out_node = ast_str_lit(ivalue);
             }
             return 2;
         }
@@ -465,10 +470,11 @@ static int init(Type *type, int dump, Node **out_node)
 
         if ( rmatch2("sizeof") || rmatch2("__builtin_offsetof")) {
             if ( constexpr(&value, &valtype, 1) ) {
+                zvalue = value;   /* small; keep zvalue in sync for constdecl */
                 goto constdecl;
             }
             errorfmt("Expecting a constant expression for static initialisation\n",1);
-        } 
+        }
         
         // Kill any casts
         if (rcmatch('(') ) {
@@ -596,6 +602,7 @@ again:
                 } else if (ptr->type == KIND_ENUM) {
                     lptr = klptr;
                     constexpr(&value, &valtype, 1);
+                    zvalue = value;   /* small; keep zvalue in sync for constdecl */
                     goto constdecl;
                 } else {
                     errorfmt("Dodgy declaration (not pointer)", 0);
@@ -613,15 +620,16 @@ again:
 #endif
             lptr = klptr;
             return 0;
-        } else if ( lptr= klptr, constexpr(&value, &valtype, 1)) {
+        } else if ( lptr= klptr, constexpr_z(&zvalue, &valtype, 1)) {
+            value = (double)zvalue;
 constdecl:
             check_assign_range(type, value);
             /* AST: capture the constant init as a single AST_LITERAL of
-               the declared type. Float / long long values fit in zdouble
-               (long double) without precision loss; the print walker
-               formats per-kind. */
+               the declared type. zvalue (zdouble / long double) carries a
+               64-bit long long literal unclipped on x86; `value` (double)
+               would drop its low bits. (long double == double on macOS.) */
             if (out_node) {
-                *out_node = ast_literal(type, (zdouble)value);
+                *out_node = ast_literal(type, zvalue);
             }
             if (dump) {
                 /* struct member or array of pointer to char */
@@ -641,7 +649,7 @@ constdecl:
                     defword();
                     outdec(fa[1] << 8 | fa[0]);
                 } else if (type->kind == KIND_LONGLONG ){
-                    uint32_t val = (uint32_t)((int64_t)value & 0xffffffff);
+                    uint32_t val = (uint32_t)((int64_t)zvalue & 0xffffffff);
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
                     outdec(((uint32_t)val % 65536UL) % 256);
@@ -652,7 +660,7 @@ constdecl:
                     outbyte(',');
                     outdec(((uint32_t)val / 65536UL) / 256);
                     nl();
-                    val = (uint32_t)(((int64_t)value >> 32) & 0xffffffff);
+                    val = (uint32_t)(((int64_t)zvalue >> 32) & 0xffffffff);
                     defbyte();
                     outdec(((uint32_t)val % 65536UL) % 256);
                     outbyte(',');

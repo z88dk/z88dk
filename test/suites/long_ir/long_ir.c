@@ -628,6 +628,62 @@ static void test_licm_join(void)
     Assert(lf_licm(-1) == 0,  "if/else then arm");
 }
 
+/* LICM non-contiguous loop body: an `if` inside a `while` whose loop-exit
+   block is numbered BELOW the if-body blocks. The old contiguous-range
+   [header,latch] loop detector missed the if-body, then read the
+   latch->if-body forward path as a spurious inner back-edge whose
+   pre-header was a dead block — so the if-body's loop-invariant constant
+   args (100/200/300) were hoisted into unreachable code and arrived as
+   garbage. Dominator-based back-edge detection fixes it. */
+static int lf_licm_sink;
+static void lf_licm_take(int a, int b, int c, int d) { lf_licm_sink = a + b + c + d; }
+static int lf_licm_data[] = { 1, 2, 3, 0 };
+static int lf_licm_loop(void)
+{
+    int *p = &lf_licm_data[0];
+    int total = 0;
+    while ( *p ) {
+        if ( *p > 1 ) {
+            lf_licm_take(*p, 100, 200, 300);
+            total += lf_licm_sink;
+        }
+        p++;
+    }
+    return total;                /* bug: 1541 (garbage consts) vs 1205 */
+}
+
+static void test_licm_if_in_loop(void)
+{
+    Assert(lf_licm_loop() == 1205, "invariant if-body consts hoisted to dead block");
+}
+
+/* An unsuffixed hex/octal/binary constant takes the first fitting type
+   from {int, unsigned int, long, ...}: 0xffff (65535) is a 16-bit
+   unsigned int, NOT a long. The lexer used to promote it to long (it
+   applied the SIGNED 32767 limit to non-decimal constants too), so it
+   was pushed as a 4-byte arg and mis-aligned 2-byte-param callee frames
+   (e.g. sbrk_far). Decimal 40000 is still signed → long. */
+static int hexw_sum2(unsigned a, unsigned b) { return (int)(a + b); }
+static void test_hex_const_width(void)
+{
+    /* (65535 + 7) truncated to 16-bit int == 6: confirms 0xffff is a
+       2-byte unsigned-int arg. The lexer used to promote it to `long`
+       (signed 32767 limit applied to non-decimal constants), so it was
+       pushed as 4 bytes and mis-aligned the callee frame (e.g. sbrk_far). */
+    Assert(hexw_sum2(0xffff, 7) == 6, "0xffff is a 16-bit unsigned arg");
+    Assert(hexw_sum2(0x8000, 0) == 0x8000, "0x8000 is a 16-bit unsigned arg");
+    long a = 0xffff;
+    Assert(a == 65535L, "0xffff zero-extends to long");
+    /* const-prop must forward a tracked local as ITS DECLARED type, not
+       the stored literal's: char masks 300 to 44, so a forward of the raw
+       int 300 (instead of the char value 44) would read 300. The decl
+       precedes the use with no intervening call (a call clears the prop
+       env, masking the bug via a slot load). */
+    char cc = 300;
+    int x = cc;
+    Assert(x == 44, "const-forwarded char keeps declared width/value");
+}
+
 /* A char loop counter and a char body var land in ADJACENT 1-byte frame
    slots. INC/DEC of a width-1 vreg used to store-back 2 bytes (HL), whose
    high byte zeroed the neighbouring char every iteration. Non-const bound
@@ -912,6 +968,48 @@ static int lr_addr_alias(void) {
 static void test_addr_taken_slot(void)
 {
     Assert(lr_addr_alias() == 1, "address-taken local slot not reused by a temp");
+}
+
+/* A bitfield store whose VALUE comes from a volatile local must re-read
+   that local from memory on every use. ir_build gave volatile locals an
+   ordinary vreg, so the allocator kept the init value in a register and
+   const-forwarded it: the second use read a never-stored slot (garbage,
+   masked to 0). Fix marks volatile-typed local vregs IR_VREG_VOLATILE so
+   each access is a real load/store. Two statements + two uses of each
+   volatile reproduce the lost value (single-use cases happened to work). */
+static struct { unsigned int b0:4; unsigned int b1:5; } lr_vbf;
+static int lr_vbf_o0, lr_vbf_o1;
+static void lr_vol_bitfield(void) {
+    volatile int allones = 0xffff, zero = 0;
+    lr_vbf.b0 = allones; lr_vbf.b1 = zero; lr_vbf_o0 = lr_vbf.b0;
+    lr_vbf.b1 = allones; lr_vbf.b0 = zero; lr_vbf_o1 = lr_vbf.b1;
+}
+
+static void test_volatile_bitfield(void)
+{
+    lr_vol_bitfield();
+    Assert(lr_vbf_o0 == 0x0f, "bitfield store from volatile (b0=allones)");
+    Assert(lr_vbf_o1 == 0x1f, "bitfield store from volatile (b1=allones)");
+}
+
+/* A local long long ARRAY initialiser must keep all 64 bits of each
+   element. declinit fed the constant through a `double` (constexpr), so a
+   literal > 2^53 lost its low bits (0x...667788 → 0x...667800); now routed
+   through zdouble (constexpr_z). Also exercises the wide-aggregate init
+   store + the dropped-mem.offset wide-load fix (elem1/2 at offset 8/16).
+   The call defeats const-fold so the reads are real wide loads. */
+static void lr_clobber3(void) { }
+static long long lr_ll_arr(int i) {
+    long long a[3] = { 0x1122334455667788LL, 0x00000002ffffff03LL, -5LL };
+    lr_clobber3();
+    return a[i];
+}
+
+static void test_ll_array_init(void)
+{
+    Assert(lr_ll_arr(0) == 0x1122334455667788LL, "ll[] init elem0 keeps 64 bits");
+    Assert(lr_ll_arr(1) == 0x00000002ffffff03LL, "ll[] init elem1 (offset 8)");
+    Assert(lr_ll_arr(2) == -5LL,                 "ll[] init elem2 (offset 16)");
 }
 
 /* `!x * -1 < 0` (== 1 for x==0). Two bugs: (a) `!x` is a compare result
@@ -1694,6 +1792,23 @@ static void test_int_eq(void)
     Assert(int_eq(7, 7)           == 1, "7==7 true");
 }
 
+/* Constant-folded comparisons must honour C's usual arithmetic conversions.
+   The ast_opt folder compared operands as raw signed int64, so a signed int
+   at the 0x8000 boundary mis-folded against an unsigned-int constant:
+   `(int)0x8000 == 0x8000` folded false (-32768 vs 32768) instead of true
+   (both convert to unsigned int 0x8000). These are pure-literal expressions
+   so they fold at compile time — the runtime path is correct either way, so
+   the fold is what's under test. This was the sccz80 rshift `>>0` failure
+   (`val>>v == 0x8000>>0`, val a const-propagated signed int). */
+static void test_fold_signed_unsigned_cmp(void)
+{
+    Assert(((int)0x8000 == 0x8000)  == 1, "int 0x8000 == unsigned 0x8000");
+    Assert(((int)0x8000 != 0x8000)  == 0, "int 0x8000 != unsigned 0x8000 is false");
+    Assert((-1 < (unsigned)1)       == 0, "signed -1 vs unsigned 1u -> unsigned compare");
+    Assert((-1 > (unsigned)1)       == 1, "signed -1 (=65535u) > unsigned 1u");
+    Assert(((int)0x8000 >= 0x8000)  == 1, "int 0x8000 >= unsigned 0x8000");
+}
+
 static void test_longlong(void)
 {
     /* All helpers keep long long internal (int/long boundary) — verified
@@ -1785,11 +1900,15 @@ int suite_long_ir(void)
     suite_add_test(test_diamond_carry);
     suite_add_test(test_ptr_stride);
     suite_add_test(test_licm_join);
+    suite_add_test(test_licm_if_in_loop);
+    suite_add_test(test_hex_const_width);
     suite_add_test(test_loop_lower);
     suite_add_test(test_ivsr);
     suite_add_test(test_long_cmp_tos);
     suite_add_test(test_addr_taken_slot);
+    suite_add_test(test_volatile_bitfield);
     suite_add_test(test_not_expr);
+    suite_add_test(test_ll_array_init);
     suite_add_test(test_seq_scope_loops);
     suite_add_test(test_asm_live);
     suite_add_test(test_shift_edges);
@@ -1803,6 +1922,7 @@ int suite_long_ir(void)
     suite_add_test(test_double);
     suite_add_test(test_longlong);
     suite_add_test(test_int_eq);
+    suite_add_test(test_fold_signed_unsigned_cmp);
     return suite_run();
 }
 

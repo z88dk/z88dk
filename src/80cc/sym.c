@@ -40,11 +40,25 @@ SYMBOL* findloc(char* sname)
 
     ptr = locptr - 1;
     while (ptr >= STARTLOC) {
-        if (strcmp(sname, ptr->name) == 0)
+        if (!ptr->out_of_scope && strcmp(sname, ptr->name) == 0)
             return ptr;
         --ptr;
     }
     return 0;
+}
+
+/* Leave a block scope: mark every local declared since `from` out of scope so
+   findloc no longer resolves it, but DON'T rewind locptr. The AST built for the
+   block holds SYMBOL* into this storage and is lowered only after the whole
+   function is parsed, so reusing the slots for a later sibling/nested block
+   would alias two distinct locals onto one SYMBOL (the later decl's type would
+   retroactively rewrite the earlier one). Keeping the storage live is correct;
+   the IR's own liveness-based slot allocator still packs non-overlapping
+   locals into shared frame slots, so this costs no frame space. */
+void sym_leave_scope(SYMBOL *from)
+{
+    for (SYMBOL *p = from; p < locptr; p++)
+        p->out_of_scope = 1;
 }
 
 // Probably not needed since we should clear up at the end of a compound

@@ -277,6 +277,7 @@ extern void     store(LVALUE *lval);
 extern void     rvalue(LVALUE *lval);
 extern struct nodepair *test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
+extern int      constexpr_z(zdouble *val, Kind *valtype, int flag);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern int      ulvalue(LVALUE *lval);
@@ -296,6 +297,7 @@ extern SYMBOL  *findloc(char *sname);
 extern SYMBOL  *addglb(char *sname, Type *type, enum ident_type id, Kind kind, int value, enum storage_type storage);
 extern SYMBOL  *addloc(char *sname, Type *type, enum ident_type id, Kind kind, int where);
 extern void     sym_undecl_frame(array *arr, SYMBOL *target, int need_undecl);
+extern void     sym_leave_scope(SYMBOL *from);
 
 
 

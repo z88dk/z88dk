@@ -26,6 +26,22 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
+
+/* Word DE-home tentative-pick undo: the picker evicts other PR_DE tenants to
+   give the home exclusive DE, which is a net loss if the home's loop doesn't
+   end up DE-clean (no resident region forms). Region formation can only be
+   decided once slots are assigned (after ir_alloc), so the picker saves the
+   pre-pick allocation here; the lowerer checks the region and, if none forms,
+   restores this and re-slots — reverting the function to baseline. */
+static int *word_home_prepick;
+
+int *ir_alloc_take_word_home_prepick(void)
+{
+    int *p = word_home_prepick;
+    word_home_prepick = NULL;
+    return p;
+}
 
 /* Returns 1 if the spill of op->dst at bb->ops[op_idx] is dead — its
    value is never read from the frame, only consumed via the HL cache
@@ -761,6 +777,114 @@ void ir_alloc(Func *f)
             }
             free(first_def);
             free(first_read);
+        }
+        /* Word (int) accumulator residency (DE-home) — word analog of the
+           byte E-home above, INDEPENDENT of c_byte_resident. Keep a hot
+           loop-carried width-2 accumulator in the DE pair across its loop
+           instead of a frame slot; the lowerer accumulates via `add hl,de;
+           ex de,hl` (addend through HL) so DE stays live with no per-iter
+           slot store. Same gates as the byte E-home: NO calls (DE survives
+           by construction), def-DOMINATES-use (home established first), hot +
+           write-many (a real loop accumulator). The home OWNS DE: any other
+           PR_DE tenant (e.g. a single-use addend the transient pass parked in
+           DE) is demoted to SPILL so its def can't clobber the home — it
+           reloads through HL at the accumulate. Skipped when a byte E/D-home
+           already claimed DE's low half. One occupant. */
+        if (c_word_resident && !getenv("IR_NO_WORD_RESIDENT")) {
+            int wd_call = 0, de_half_taken = 0;
+            for (int i = 0; i < f->n_bbs && !wd_call; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    OpKind k = f->bbs[i].ops[j].kind;
+                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) {
+                        wd_call = 1; break;
+                    }
+                }
+            for (int v = 0; v < f->n_vregs && !de_half_taken; v++)
+                if (f->vreg_to_phys[v] == IR_PR_E || f->vreg_to_phys[v] == IR_PR_D)
+                    de_half_taken = 1;
+            int *wd_def  = calloc((size_t)f->n_vregs, sizeof(int));
+            int *wd_read = calloc((size_t)f->n_vregs, sizeof(int));
+            int *wd_base = calloc((size_t)f->n_vregs, sizeof(int));
+            int *wd_acc  = calloc((size_t)f->n_vregs, sizeof(int));
+            if (!wd_call && !de_half_taken && wd_def && wd_read && wd_base && wd_acc) {
+                for (int v = 0; v < f->n_vregs; v++) {
+                    wd_def[v] = INT_MAX; wd_read[v] = INT_MAX;
+                }
+                int g = 0;
+                for (int i = 0; i < f->n_bbs; i++) {
+                    BB *bb = &f->bbs[i];
+                    for (int j = 0; j < bb->n_ops; j++, g++) {
+                        const Op *o = &bb->ops[j];
+                        int u[16];
+                        int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                        for (int k = 0; k < nu; k++)
+                            if (u[k] >= 0 && u[k] < f->n_vregs && g < wd_read[u[k]])
+                                wd_read[u[k]] = g;
+                        if (o->dst >= 0 && o->dst < f->n_vregs && g < wd_def[o->dst])
+                            wd_def[o->dst] = g;
+                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                            && o->src[0] < f->n_vregs && g < wd_def[o->src[0]])
+                            wd_def[o->src[0]] = g;
+                        /* deref'd / stepped pointers are not accumulators */
+                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                            && o->mem.kind == IR_MEM_VREG
+                            && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                            wd_base[o->mem.base] = 1;
+                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                            && o->src[0] < f->n_vregs)
+                            wd_base[o->src[0]] = 1;
+                        /* A true reduction accumulator is redefined as
+                           `v = v OP w` with w a VREG (sum += a[i]) — not an
+                           induction variable (`i = i + const` / INC, whose
+                           other operand is an immediate). Distinguishes the
+                           accumulator from the loop counter (both are hot,
+                           multi-def width-2). */
+                        switch (o->kind) {
+                        case IR_ADD: case IR_SUB: case IR_RSUB:
+                        case IR_AND: case IR_OR:  case IR_XOR:
+                            if (o->dst >= 0 && o->dst < f->n_vregs
+                                && o->src[1] >= 0
+                                && (o->src[0] == o->dst || o->src[1] == o->dst))
+                                wd_acc[o->dst] = 1;
+                            break;
+                        default: break;
+                        }
+                    }
+                }
+                int wbest = -1;
+                for (int v = 0; v < f->n_vregs; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 2) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                     | IR_VREG_PARAM)) continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (wd_base[v]) continue;             /* not a deref'd ptr */
+                    if (!wd_acc[v]) continue;             /* reduction acc, not IV */
+                    if (use_count[v] < 8) continue;       /* hot, in a loop */
+                    if (write_count[v] < 2) continue;     /* init + per-iter redef */
+                    if (wd_def[v] >= f->bbs[0].n_ops) continue;  /* def in entry bb0 */
+                    if (wd_def[v] >= wd_read[v]) continue;       /* def-first */
+                    if (wbest < 0 || use_count[v] > use_count[wbest]) wbest = v;
+                }
+                if (wbest >= 0) {
+                    /* Save the pre-pick allocation so the lowerer can revert
+                       this function to baseline if no resident region forms. */
+                    free(word_home_prepick);
+                    word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
+                    if (word_home_prepick)
+                        memcpy(word_home_prepick, f->vreg_to_phys,
+                               (size_t)f->n_vregs * sizeof(int));
+                    for (int v = 0; v < f->n_vregs; v++)
+                        if (v != wbest && f->vreg_to_phys[v] == IR_PR_DE)
+                            f->vreg_to_phys[v] = IR_PR_SPILL;
+                    f->vreg_to_phys[wbest] = IR_PR_DE;
+                    f->word_home_vreg = wbest;
+                }
+            }
+            free(wd_def);
+            free(wd_read);
+            free(wd_base);
+            free(wd_acc);
         }
         free(write_count);
         free(use_count);

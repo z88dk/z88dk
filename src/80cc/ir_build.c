@@ -24,6 +24,8 @@
 
 typedef struct {
     Func *f;
+    Type *ret_type;    /* current function's C return type — used to widen
+                          a narrower `return x;` to the declared width */
     int   cur_bb_id;   /* index into f->bbs[]; a pointer would dangle
                           when ir_bb_new realloc's the array */
 
@@ -219,13 +221,18 @@ static int is_supported_float_kind(Kind k)
    return type by normalize_types; fnptr calls are not). For type
    inspection (e.g. choosing a float compare helper) we want the call's
    return kind, not KIND_FUNC. */
-static Kind node_value_kind(Node *n)
+static Type *node_value_type(Node *n)
 {
-    if (!n || !n->type) return KIND_NONE;
+    if (!n || !n->type) return n ? n->type : NULL;
     if ((n->ast_type == AST_FUNCPTR_CALL || n->ast_type == AST_FUNC_CALL)
         && n->type->kind == KIND_FUNC && n->type->return_type)
-        return n->type->return_type->kind;
-    return n->type->kind;
+        return n->type->return_type;
+    return n->type;
+}
+static Kind node_value_kind(Node *n)
+{
+    Type *t = node_value_type(n);
+    return t ? t->kind : KIND_NONE;
 }
 
 /* Wide memory-accumulator float kind: KIND_DOUBLE in a 5/6-byte (d* /
@@ -553,6 +560,10 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
         int w = width_for_kind(k);
         b->f->vregs[v].width = (int16_t)(w ? w : 2);
     }
+    /* volatile local: force a memory slot so every access is a real
+       load/store (no register residency, const-prop or store-forward). */
+    if (sym->ctype && sym->ctype->isvolatile)
+        b->f->vregs[v].flags |= IR_VREG_VOLATILE;
     sym_map_set(b, sym, v);
     return v;
 }
@@ -575,6 +586,51 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
    discarded with the function). */
 #define INIT_REGION_MAX_STORES 32
 
+/* Store one bitfield's initialiser into its storage unit at base+unit_off.
+   The struct region was zeroed first (caller), so this only has to OR in
+   `(value & mask) << bit_offset` (no clear-bits step). Read-modify-write of
+   the unit preserves sibling fields already written. Returns 0 / -1 / -2. */
+static int init_bitfield(Builder *b, int base, int unit_off,
+                         Type *fld, Node *init, int *budget)
+{
+    int bsize = fld->bit_size, boff = fld->bit_offset;
+    int unit_w = (boff + bsize <= 8) ? 1 : 2;
+    Kind unit_k = (unit_w == 1) ? KIND_CHAR : KIND_INT;
+    int64_t mask = ((int64_t)1 << bsize) - 1;
+    if (--(*budget) < 0) return -2;
+    int v = build_expr(b, init);
+    if (v < 0) return -1;
+    if (b->f->vregs[v].width != 2) {
+        int t2 = new_temp(b, 2); b->f->vregs[t2].width = 2;
+        OpKind cv = (b->f->vregs[v].width > 2)
+                  ? IR_CONV_TRUNC
+                  : (init->type && init->type->isunsigned ? IR_CONV_ZX : IR_CONV_SX);
+        Op *c = ir_op_emit(cur_bb(b), cv); c->dst = t2; c->src[0] = v; v = t2;
+    }
+    /* (v & mask) << boff. unit_w-wide so a byte unit emits a BYTE RMW (the
+       lowerer sizes mem ops by vreg width, not elem); a word RMW would clobber
+       the neighbouring byte. A byte unit's value fits a byte (boff+bsize<=8). */
+    int vm = new_temp(b, unit_w); b->f->vregs[vm].width = (int16_t)unit_w;
+    Op *a1 = ir_op_emit(cur_bb(b), IR_AND);
+    a1->dst = vm; a1->src[0] = v; a1->src[1] = -1; a1->imm = mask;
+    int vms = vm;
+    if (boff > 0) {
+        vms = new_temp(b, unit_w); b->f->vregs[vms].width = (int16_t)unit_w;
+        Op *sl = ir_op_emit(cur_bb(b), IR_SHL);
+        sl->dst = vms; sl->src[0] = vm; sl->src[1] = -1; sl->imm = boff;
+    }
+    int cont = new_temp(b, unit_w); b->f->vregs[cont].width = (int16_t)unit_w;
+    Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+    ld->dst = cont; ld->mem.kind = IR_MEM_VREG;
+    ld->mem.base = base; ld->mem.offset = unit_off; ld->mem.elem = unit_k;
+    int newv = new_temp(b, unit_w); b->f->vregs[newv].width = (int16_t)unit_w;
+    ir_emit_binop(cur_bb(b), IR_OR, newv, cont, vms);
+    Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+    st->src[0] = newv; st->mem.kind = IR_MEM_VREG;
+    st->mem.base = base; st->mem.offset = unit_off; st->mem.elem = unit_k;
+    return 0;
+}
+
 static int init_typed_region(Builder *b, int base, int off,
                              Type *t, Node *init, int *budget)
 {
@@ -587,12 +643,51 @@ static int init_typed_region(Builder *b, int base, int off,
         int n_init = (init && init->stmts)
                    ? (int)array_len(init->stmts) : 0;
         int n_fld = tag->fields ? (int)array_len(tag->fields) : 0;
+        int has_bf = 0;
+        for (int i = 0; i < n_fld; i++) {
+            Type *fld = array_get_byindex(tag->fields, i);
+            if (fld && fld->bit_size > 0) { has_bf = 1; break; }
+        }
+        /* Bitfields pack several fields (and unnamed padding) into one storage
+           unit, so a per-field plain store would clobber siblings. Zero the
+           whole struct region first, then OR each named bitfield in — padding /
+           unnamed / unlisted bits stay 0. */
+        if (has_bf) {
+            int sz = (int)t->size;
+            for (int z = 0; z < sz; ) {
+                int cw = (sz - z >= 2) ? 2 : 1;
+                if (--(*budget) < 0) return -2;
+                int zv = new_temp(b, cw); b->f->vregs[zv].width = (int16_t)cw;
+                ir_emit_ld_imm(cur_bb(b), zv, 0);
+                Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                st->src[0] = zv; st->mem.kind = IR_MEM_VREG; st->mem.base = base;
+                st->mem.offset = off + z;
+                st->mem.elem = (cw == 1) ? KIND_CHAR : KIND_INT;
+                z += cw;
+            }
+        }
+        /* `ii` walks the init list; an UNNAMED bitfield occupies layout but
+           consumes no initialiser (C positional rule), so it doesn't advance
+           ii. For a struct without unnamed bitfields ii == field index. */
+        int ii = 0;
         for (int i = 0; i < n_fld; i++) {
             Type *fld = array_get_byindex(tag->fields, i);
             if (!fld) continue;
-            if (fld->bit_size > 0) return -2;   /* bitfields */
-            Node *sub = (i < n_init)
-                      ? array_get_byindex(init->stmts, i) : NULL;
+            if (fld->bit_size > 0) {
+                if (!fld->name || !fld->name[0]) continue;  /* unnamed: zeroed */
+                Node *sub = (ii < n_init)
+                          ? array_get_byindex(init->stmts, ii) : NULL;
+                ii++;
+                if (!sub) continue;                          /* zero-initialised */
+                if (sub->ast_type == AST_INIT_LIST) return -2;
+                int rc = init_bitfield(b, base, off + (int)fld->offset,
+                                       fld, sub, budget);
+                if (rc < 0) return rc;
+                continue;
+            }
+            Node *sub = (ii < n_init)
+                      ? array_get_byindex(init->stmts, ii) : NULL;
+            ii++;
             int rc = init_typed_region(b, base, off + (int)fld->offset,
                                        fld, sub, budget);
             if (rc < 0) return rc;
@@ -624,7 +719,12 @@ static int init_typed_region(Builder *b, int base, int off,
     /* Scalar leaf. */
     int w = width_for_kind(t->kind);
     if (t->kind == KIND_PTR || t->kind == KIND_CPTR) w = 2;
-    if (w != 1 && w != 2 && w != 4) return -2;
+    /* Wide accumulator-tier leaf: a 5-8B double or a long long. Stored via
+       IR_ST_MEM's acc path (dload→FA→dstore / __i64 helpers) with the
+       element's true kind, base+off honoured by the lowerer. */
+    int wide_acc = ((t->kind == KIND_DOUBLE || t->kind == KIND_FLOAT) && w >= 5)
+                || (t->kind == KIND_LONGLONG);
+    if (w != 1 && w != 2 && w != 4 && !wide_acc) return -2;
     if (--(*budget) < 0) return -2;
     int val_v;
     if (init) {
@@ -632,7 +732,12 @@ static int init_typed_region(Builder *b, int base, int off,
         val_v = build_expr(b, init);
         if (val_v < 0) return -1;
         int vw = b->f->vregs[val_v].width;
-        if (vw != w) {
+        if (wide_acc) {
+            /* The init must already be the leaf's wide type — int→double /
+               narrowing conversions aren't modelled here; bail (whole
+               function) rather than miscompile. */
+            if (vw != w) return -2;
+        } else if (vw != w) {
             int tmp = new_temp(b, w);
             b->f->vregs[tmp].width = (int16_t)w;
             OpKind cv = (vw > w)
@@ -643,6 +748,21 @@ static int init_typed_region(Builder *b, int base, int off,
             op->dst = tmp; op->src[0] = val_v;
             val_v = tmp;
         }
+    } else if (wide_acc) {
+        /* Zero-fill an uninitialised wide leaf word/byte-wise — no acc
+           zero literal needed (partial init: `double a[4]={1.0}`). */
+        for (int z = 0; z < w; ) {
+            int cw = (w - z >= 2) ? 2 : 1;
+            if (--(*budget) < 0) return -2;
+            int zv = new_temp(b, cw); b->f->vregs[zv].width = (int16_t)cw;
+            ir_emit_ld_imm(cur_bb(b), zv, 0);
+            Op *zst = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            zst->src[0] = zv; zst->mem.kind = IR_MEM_VREG; zst->mem.base = base;
+            zst->mem.offset = off + z;
+            zst->mem.elem = (cw == 1) ? KIND_CHAR : KIND_INT;
+            z += cw;
+        }
+        return 0;
     } else {
         val_v = new_temp(b, w);
         b->f->vregs[val_v].width = (int16_t)w;
@@ -653,7 +773,24 @@ static int init_typed_region(Builder *b, int base, int off,
     st->mem.kind = IR_MEM_VREG;
     st->mem.base = base;
     st->mem.offset = off;
-    st->mem.elem = (w == 1) ? KIND_CHAR : (w == 2) ? KIND_INT : KIND_LONG;
+    st->mem.elem = wide_acc ? t->kind
+                 : (w == 1) ? KIND_CHAR : (w == 2) ? KIND_INT : KIND_LONG;
+    return 0;
+}
+
+/* True if an initialiser zero-fills its whole object — NULL (default init),
+   an all-zero brace list, or a literal 0. Lets a `= {0}` / `= {}` aggregate
+   be lowered as one block-zero instead of per-element stores. */
+static int init_is_all_zero(const Node *init)
+{
+    if (!init) return 1;
+    if (init->ast_type == AST_INIT_LIST) {
+        int n = init->stmts ? (int)array_len(init->stmts) : 0;
+        for (int i = 0; i < n; i++)
+            if (!init_is_all_zero(array_get_byindex(init->stmts, i))) return 0;
+        return 1;
+    }
+    if (init->ast_type == AST_LITERAL) return init->zval == 0;
     return 0;
 }
 
@@ -867,6 +1004,87 @@ static int emit_acc_int_from_int(Builder *b, int src_v, int src_unsigned)
     return dst;
 }
 
+/* In-place unary op on a width-8 long long (IR_ACC_UNOP, subkind 4): load
+   the value into __i64_acc, call the in-place helper (l_i64_neg two's
+   complement / l_i64_com bitwise complement), store back. There is no
+   width-8 IR_NEG/IR_NOT lowering — gen_neg/gen_not only handle 2/4-byte — so
+   long long `-x` / `~x` must take this path, not emit IR_NEG/IR_NOT. */
+static int emit_acc_int_unary(Builder *b, int src_v, const char *name)
+{
+    int dst = new_temp(b, 8);
+    b->f->vregs[dst].width = 8;
+    b->f->vregs[dst].kind  = KIND_LONGLONG;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    hi->acc_load = "l_i64_load"; hi->acc_store = "l_i64_store";
+    hi->acc_width = 8; hi->acc_subkind = ACC_SUB_ACC_UNARY; hi->acc_store_bc = 1;
+    op->hcall = hi;
+    return dst;
+}
+
+/* Widen a narrow integer call ARG (vreg v, source AST node a) to its
+   prototyped PARAM type pt. The front-end leaves the int→long /
+   int→long-long promotion to codegen; without it the value is pushed at
+   its own width and the param's high bytes are stack garbage. Only long /
+   long long params and integer args (char→int already promotes via the
+   smallc push); an unprototyped (variadic) slot has no Type → left as-is.
+   Returns the (possibly new) vreg. Shared by direct + fnptr call paths. */
+static int widen_arg_to_param(Builder *b, int v, Node *a, Type *pt)
+{
+    if (!pt) return v;
+    /* Near pointer / narrow value passed to a __far (KIND_CPTR) param:
+       build the 4-byte far representation (bank high word = 0) by
+       zero-extension, matching an explicit (T *__far) cast. Without this
+       the 2-byte near value is pushed and the callee reads a garbage bank
+       byte for the rest of the far pointer. An already-far source keeps
+       its KIND_CPTR. */
+    if (pt->kind == KIND_CPTR) {
+        if (b->f->vregs[v].width >= 4 || (Kind)b->f->vregs[v].kind == KIND_CPTR) {
+            b->f->vregs[v].kind = KIND_CPTR;
+            return v;
+        }
+        int wt = new_temp(b, 4);
+        b->f->vregs[wt].width = 4;
+        b->f->vregs[wt].kind  = KIND_CPTR;
+        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+        cv->dst = wt; cv->src[0] = v;
+        return wt;
+    }
+    if (!kind_is_integer(pt->kind)) return v;
+    Kind ak  = a->type ? (Kind)a->type->kind : KIND_NONE;
+    if (!kind_is_integer(ak)) return v;
+    int  uns = a->type && a->type->isunsigned;
+    int  aw  = b->f->vregs[v].width;
+    if (pt->kind == KIND_LONGLONG && ak != KIND_LONGLONG) {
+        if (aw == 1) {
+            int wt = new_temp(b, 2);
+            b->f->vregs[wt].width = 2;
+            Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = wt; cv->src[0] = v; v = wt;
+        }
+        v = emit_acc_int_from_int(b, v, uns);
+    } else if (type_width(pt) == 4 && aw < 4) {
+        int wt = new_temp(b, 4);
+        b->f->vregs[wt].width = 4;
+        Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+        cv->dst = wt; cv->src[0] = v; v = wt;
+    } else if (type_width(pt) == 2 && aw == 4) {
+        /* WIDE arg to a narrow int/short param: truncate to 2 bytes. Else
+           a __smallc/__z88dk_callee callee pops a fixed frame that doesn't
+           match the over-wide push (qsort `nel = 550L` pushed the long as
+           4 bytes vs the 2-byte `unsigned int` param → 2 stray bytes left
+           on the stack → corrupted return → crash). */
+        int wt = new_temp(b, 2);
+        b->f->vregs[wt].width = 2;
+        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+        cv->dst = wt; cv->src[0] = v; v = wt;
+    }
+    return v;
+}
+
 /* Promote an already-built operand to the i64 acc tier when it isn't
    already long long — the implicit C promotion in a mixed `ll OP int`
    (e.g. `(long long)a + 3`, where the literal stays int). Each operand
@@ -882,6 +1100,68 @@ static int promote_to_acc_int(Builder *b, int v, int uns)
         cv->dst = wt; cv->src[0] = v; v = wt;
     }
     return emit_acc_int_from_int(b, v, uns);
+}
+
+/* Emit `v << sh` (logical left) at width w; sh==0 returns v unchanged. */
+static int sr_shift_left(Builder *b, int v, int sh, int w)
+{
+    if (sh == 0) return v;
+    int t = new_temp(b, w);
+    b->f->vregs[t].width = (int16_t)w;
+    b->f->vregs[t].kind  = (w == 4) ? KIND_LONG : KIND_INT;
+    Op *s = ir_op_emit(cur_bb(b), IR_SHL);
+    s->dst = t; s->src[0] = v; s->src[1] = -1; s->imm = sh;
+    return t;
+}
+
+/* Constant-multiply strength reduction: rewrite x*C into shifts + one
+   add/sub when C decomposes into <=2 power-of-two terms — cheaper than the
+   l_mult / l_long_mult helper on targets without a hardware multiply. v is
+   the non-constant operand, already at the result width w (2 or 4). A
+   product's low w bytes are sign-agnostic, so SHL/ADD/SUB serve signed and
+   unsigned alike. Covers C = 2^a (defensive), 2^a+2^b, and runs of 1-bits
+   (2^a-2^b: 3,5,6,7,9,10,12,14,15,...). Returns the result vreg or -1 (use
+   the helper). pow2 is normally already reduced at the AST level. */
+static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
+{
+    if (w != 2 && w != 4) return -1;
+    if (C < 3) return -1;                       /* 0/1/2: fold / pow2 path */
+    uint64_t u = (uint64_t)C;
+    int maxsh = (w == 4) ? 31 : 15;
+    Kind kw = (w == 4) ? KIND_LONG : KIND_INT;
+
+    int lo_bit = 0; while (!((u >> lo_bit) & 1u)) lo_bit++;
+    int hi_bit = 0, pop = 0;
+    for (int i = 0; i < 64; i++) if ((u >> i) & 1u) { hi_bit = i; pop++; }
+    if (hi_bit > maxsh) return -1;              /* top term shifts out of range */
+
+    if (pop == 1)                               /* pure power of two */
+        return sr_shift_left(b, v, lo_bit, w);
+
+    if (pop == 2) {                             /* (v<<hi) + (v<<lo) */
+        int hi = sr_shift_left(b, v, hi_bit, w);
+        int lo = sr_shift_left(b, v, lo_bit, w);
+        int dst = new_temp(b, w);
+        b->f->vregs[dst].width = (int16_t)w; b->f->vregs[dst].kind = kw;
+        ir_emit_binop(cur_bb(b), IR_ADD, dst, hi, lo);
+        return dst;
+    }
+
+    /* Run of consecutive 1-bits: C = 2^a - 2^lo → (v<<a) - (v<<lo). */
+    uint64_t lb = u & (~u + 1u);                /* lowest set bit */
+    uint64_t up = u + lb;
+    if ((up & (up - 1)) == 0) {                 /* u+lb a power of two ⇒ run */
+        int a = 0;
+        for (int i = 0; i < 64; i++) if ((up >> i) & 1u) a = i;
+        if (a > maxsh) return -1;
+        int hi = sr_shift_left(b, v, a, w);
+        int lo = sr_shift_left(b, v, lo_bit, w);
+        int dst = new_temp(b, w);
+        b->f->vregs[dst].width = (int16_t)w; b->f->vregs[dst].kind = kw;
+        ir_emit_binop(cur_bb(b), IR_SUB, dst, hi, lo);
+        return dst;
+    }
+    return -1;
 }
 
 /* Load a wide (long long / 5-8B double) constant from the const.c literal
@@ -968,6 +1248,335 @@ static int emit_acc_lldouble(Builder *b, int src_v, int to_double, int is_unsign
     return dst;
 }
 
+/* _Float16 → acc-tier double (l_f48_f16tof / l_f64_f16tof): f16 in HL, result
+   double in FA, stored to the dst slot — same IR_ACC_UNOP shape as int2f. */
+static int emit_acc_from_f16(Builder *b, int src_v)
+{
+    const char *name = (c_fp_size == 8) ? "l_f64_f16tof" : "l_f48_f16tof";
+    int w = c_fp_size;
+    int dst = new_temp(b, w);
+    b->f->vregs[dst].width = (int16_t)w;
+    b->f->vregs[dst].kind  = KIND_DOUBLE;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+    hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
+    op->hcall = hi;
+    return dst;
+}
+
+/* acc-tier double → _Float16 (l_f48_ftof16 / l_f64_ftof16): double in FA,
+   result f16 in HL, stored to the 2-byte dst — mirror of f2sint. */
+static int emit_f16_from_acc(Builder *b, int src_v)
+{
+    const char *name = (c_fp_size == 8) ? "l_f64_ftof16" : "l_f48_ftof16";
+    int dst = new_temp(b, 2);
+    b->f->vregs[dst].width = 2;
+    b->f->vregs[dst].kind  = KIND_FLOAT16;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+    hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
+    op->hcall = hi;
+    return dst;
+}
+
+/* _Accum (fixed) → acc-tier double (l_f48_fix16tof / l_f48_fix32tof): the
+   fixed value in HL (Q8.8) / DEHL (Q16.16) → double in FA → dst slot. */
+static int emit_acc_from_accum(Builder *b, int src_v, Kind src_k)
+{
+    const char *name = (src_k == KIND_ACCUM32)
+        ? (c_fp_size == 8 ? "l_f64_fix32tof" : "l_f48_fix32tof")
+        : (c_fp_size == 8 ? "l_f64_fix16tof" : "l_f48_fix16tof");
+    int w = c_fp_size;
+    int dst = new_temp(b, w);
+    b->f->vregs[dst].width = (int16_t)w;
+    b->f->vregs[dst].kind  = KIND_DOUBLE;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+    hi->acc_width = w; hi->acc_subkind = ACC_SUB_INT2ACC;
+    op->hcall = hi;
+    return dst;
+}
+
+/* acc-tier double → _Accum (l_f48_ftofix16{s,u} / l_f48_ftofix32{s,u}): double
+   in FA → fixed in HL/DEHL → dst slot. */
+static int emit_accum_from_acc(Builder *b, int src_v, Kind dst_k, int uns)
+{
+    int w = (dst_k == KIND_ACCUM32) ? 4 : 2;
+    const char *name = (dst_k == KIND_ACCUM32)
+        ? (c_fp_size == 8 ? (uns ? "l_f64_ftofix32u" : "l_f64_ftofix32s")
+                          : (uns ? "l_f48_ftofix32u" : "l_f48_ftofix32s"))
+        : (c_fp_size == 8 ? (uns ? "l_f64_ftofix16u" : "l_f64_ftofix16s")
+                          : (uns ? "l_f48_ftofix16u" : "l_f48_ftofix16s"));
+    int dst = new_temp(b, w);
+    b->f->vregs[dst].width = (int16_t)w;
+    b->f->vregs[dst].kind  = dst_k;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_ACC_UNOP);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    hi->acc_load = acc_name("load"); hi->acc_store = acc_name("store");
+    hi->acc_width = c_fp_size; hi->acc_subkind = ACC_SUB_ACC2INT;
+    op->hcall = hi;
+    return dst;
+}
+
+/* Runtime integer → _Accum (l_fix16_{s,u}int2f / l_fix32_{s,u}int2f): scales
+   the integer by the Q factor (×256 for Q8.8, ×65536 for Q16.16). Source in
+   HL (fix16) — width-4 pre-truncated; fix32 HL→DEHL. 1-arg HCALL. */
+static int emit_accum_from_int(Builder *b, int src_v, Kind fk, int uns)
+{
+    if (fk == KIND_ACCUM16 && b->f->vregs[src_v].width == 4) {
+        int t = new_temp(b, 2); b->f->vregs[t].width = 2;
+        Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+        tr->dst = t; tr->src[0] = src_v; src_v = t;
+    }
+    int w = (fk == KIND_ACCUM32) ? 4 : 2;
+    const char *name = (fk == KIND_ACCUM32)
+        ? (uns ? "l_fix32_uint2f" : "l_fix32_sint2f")
+        : (uns ? "l_fix16_uint2f" : "l_fix16_sint2f");
+    int dst = new_temp(b, w);
+    b->f->vregs[dst].width = (int16_t)w;
+    b->f->vregs[dst].kind  = fk;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
+/* Build `node` as the _Accum kind `fk`, promoting a mixed operand: an int
+   LITERAL is scaled to Q-format at compile time (3 → 3<<8); an int variable
+   via emit_accum_from_int; a double via emit_accum_from_acc; same-kind as-is.
+   Returns -1 if not promotable. */
+static int build_operand_as_accum(Builder *b, Node *node, Kind fk)
+{
+    Kind k = node_value_kind(node);
+    /* Any numeric literal (int OR fp, e.g. `a * 2.5`) scales to Q-format at
+       compile time — no runtime conversion, and `_Accum * fp-literal` stays
+       _Accum (sccz80 semantics). */
+    if (node && node->ast_type == AST_LITERAL
+        && (kind_is_integer(k) || kind_is_floating(k))) {
+        int w = (fk == KIND_ACCUM32) ? 4 : 2;
+        int v = new_temp(b, w);
+        b->f->vregs[v].width = (int16_t)w;
+        b->f->vregs[v].kind  = fk;
+        ir_emit_ld_imm(cur_bb(b), v, scale_literal_for_kind(node, fk));
+        return v;
+    }
+    int v = build_expr(b, node);
+    if (v < 0) return -1;
+    if (k == fk) return v;
+    int uns = node && node->type && node->type->isunsigned;
+    if (kind_is_integer(k)) return emit_accum_from_int(b, v, fk, uns);
+    if (is_acc_float_kind(k)) return emit_accum_from_acc(b, v, fk, uns);
+    return -1;
+}
+
+
+/* Build `node` and promote it to the acc-tier double when it is an integer
+   operand — the mixed `int OP double` conversion the (removed) walker did.
+   Covers every integer width: char/short widen to int first, int/short→int2f,
+   long→long2f, long long→sllong2f (cross-acc). Returns -1 if the operand is
+   neither an acc-double nor a promotable int (a register-tier float16 / _Accum
+   is handled by its own path). node_value_kind unwraps a fnptr/func-call's
+   KIND_FUNC so a double-returning call is recognised as already-double. */
+/* Convert an already-built INTEGER vreg `v` to the acc-tier double. Width
+   dispatch: char/short widen to int, int/short→int2f, long→long2f, long
+   long→sllong2f (cross-acc). Returns -1 on an unhandled width. */
+static int conv_int_vreg_to_acc(Builder *b, int v, int uns)
+{
+    int w = b->f->vregs[v].width;
+    if (w == 8)                                         /* long long → double */
+        return emit_acc_lldouble(b, v, 1, uns);
+    if (w == 1) {                                       /* char → widen to int */
+        int t = new_temp(b, 2);
+        b->f->vregs[t].width = 2;
+        Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+        cv->dst = t; cv->src[0] = v;
+        v = t; w = 2;
+    }
+    if (w == 2 || w == 4)
+        return emit_acc_from_int(b, v, uns);
+    return -1;
+}
+
+/* Build `node` and promote it to the acc-tier double when it is an integer
+   operand — the mixed `int OP double` conversion the (removed) walker did.
+   Returns -1 if the operand is neither an acc-double nor a promotable int (a
+   register-tier float16 / _Accum is handled by its own path). node_value_kind
+   unwraps a fnptr/func-call's KIND_FUNC so a double-returning call is
+   recognised as already-double. */
+static int build_operand_as_acc(Builder *b, Node *node)
+{
+    int v = build_expr(b, node);
+    if (v < 0) return -1;
+    Kind k = node_value_kind(node);
+    if (is_acc_float_kind(k)) return v;                 /* already double */
+    if (k == KIND_FLOAT16) return emit_acc_from_f16(b, v);  /* f16 → double */
+    if (k == KIND_ACCUM16 || k == KIND_ACCUM32)            /* _Accum → double */
+        return emit_acc_from_accum(b, v, k);
+    if (!kind_is_integer(k)) return -1;
+    return conv_int_vreg_to_acc(b, v, node->type && node->type->isunsigned);
+}
+
+
+/* int → register-tier float (f16 / IEEE-32) conversion: l_f{16,32}_{s,u}{int,
+   long}2f. char/short widen to int first; the int source goes in HL (2-byte)
+   or DEHL (4-byte), the float result comes back in HL/DEHL. 1-arg HCALL.
+   Returns dst, or -1 if no helper for the kind (e.g. width-8 ll, not built). */
+static int emit_float_reg_from_int(Builder *b, int src_v, Kind fk, int uns)
+{
+    if (b->f->vregs[src_v].width == 1) {
+        int wtmp = new_temp(b, 2);
+        b->f->vregs[wtmp].width = 2;
+        Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+        cv->dst = wtmp; cv->src[0] = src_v;
+        src_v = wtmp;
+    }
+    int sw = b->f->vregs[src_v].width;
+    if (sw != 2 && sw != 4) return -1;       /* width-8 ll → reg float: not built */
+    const char *helper = float_helper(fk, (sw == 4)
+        ? (uns ? "ulong2f" : "slong2f")
+        : (uns ? "uint2f"  : "sint2f"));
+    if (!helper) return -1;
+    int fw = width_for_kind(fk);
+    int dst = new_temp(b, fw);
+    b->f->vregs[dst].width = (int16_t)fw;
+    b->f->vregs[dst].kind  = fk;
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = helper; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
+/* Build `node`, promoting a mixed integer operand to the register-tier float
+   kind `fk` (the f16/f32 analog of build_operand_as_acc). Already-`fk` returns
+   as-is; a different float kind or a width-8 int isn't handled here (-1). */
+static int build_operand_as_float_reg(Builder *b, Node *node, Kind fk)
+{
+    int v = build_expr(b, node);
+    if (v < 0) return -1;
+    Kind k = node_value_kind(node);
+    if (k == fk) return v;
+    if (!kind_is_integer(k)) return -1;
+    int uns = node->type && node->type->isunsigned;
+    return emit_float_reg_from_int(b, v, fk, uns);
+}
+
+/* Coerce an already-built value `v` (from `src`) into the float kind `dst_k`
+   for an assignment / initialiser / return. Integer source → the right
+   int→float conversion (acc or register tier). Same float kind or a
+   non-integer source (incl. cross-tier float→float, handled elsewhere) is
+   returned unchanged. Centralises the conversion the front end no longer
+   inserts (walker removed). */
+static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
+{
+    if (v < 0) return v;
+    Kind sk = node_value_kind(src);
+    if (sk == dst_k) return v;
+    int uns = src && src->type && src->type->isunsigned;
+    if (is_acc_float_kind(dst_k)) {                     /* → 5/6/8-byte double */
+        if (sk == KIND_FLOAT16) return emit_acc_from_f16(b, v);
+        if (sk == KIND_ACCUM16 || sk == KIND_ACCUM32) return emit_acc_from_accum(b, v, sk);
+        if (kind_is_integer(sk)) { int c = conv_int_vreg_to_acc(b, v, uns); return c < 0 ? v : c; }
+        return v;
+    }
+    if (is_supported_float_kind(dst_k)) {               /* → f16 / IEEE-32 */
+        if (dst_k == KIND_FLOAT16 && is_acc_float_kind(sk))
+            return emit_f16_from_acc(b, v);             /* double → f16 */
+        if (kind_is_integer(sk)) { int c = emit_float_reg_from_int(b, v, dst_k, uns); return c < 0 ? v : c; }
+        return v;
+    }
+    if (dst_k == KIND_ACCUM16 || dst_k == KIND_ACCUM32) {   /* → _Accum (fixed) */
+        if (kind_is_integer(sk)) return emit_accum_from_int(b, v, dst_k, uns);
+        if (is_acc_float_kind(sk)) return emit_accum_from_acc(b, v, dst_k, uns);
+        return v;
+    }
+    return v;
+}
+
+/* Coerce a float/double RHS to an INTEGER destination — the implicit
+   conversion the front end leaves to codegen (`int i = dbl;`, `return dbl;`
+   from an int function, `arr[k] = dbl;`). Mirrors OP_CAST's acc-float→int:
+   ifix/f2s{int,long} to int/long, then narrow to a byte dst. Without it the
+   6-byte double flows into the integer width-coercion below and gets a plain
+   CONV_TRUNC (a bail at 6→1, garbage otherwise). Source must be the 5/6/8-byte
+   acc double (the default `double`); f16 / f32-tier and long long dsts are
+   handled by their own cast paths. Returns v unchanged when it doesn't apply. */
+static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
+                                    Kind dst_k, int dst_w)
+{
+    if (v < 0) return v;
+    Kind sk = node_value_kind(src);
+    if (!is_acc_float_kind(sk)) return v;
+    if (!kind_is_integer(dst_k) || is_acc_int_kind(dst_k)) return v;
+    int iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+    if (dst_w == 1) {
+        int bt = new_temp(b, 1);
+        b->f->vregs[bt].width = 1;
+        Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+        tr->dst = bt; tr->src[0] = iv;
+        return bt;
+    }
+    return iv;
+}
+
+/* A "1.0" constant in the decimal kind `fk` — for ++/-- on a float/_Accum.
+   _Accum scales 1 to Q-format at compile time; double/f16/f32 convert int 1. */
+static int emit_decimal_one(Builder *b, Kind fk)
+{
+    if (fk == KIND_ACCUM16 || fk == KIND_ACCUM32) {
+        int w = (fk == KIND_ACCUM32) ? 4 : 2;
+        int v = new_temp(b, w);
+        b->f->vregs[v].width = (int16_t)w; b->f->vregs[v].kind = fk;
+        ir_emit_ld_imm(cur_bb(b), v, (fk == KIND_ACCUM32) ? (1LL << 16) : (1LL << 8));
+        return v;
+    }
+    int one = new_temp(b, 2);
+    b->f->vregs[one].width = 2;
+    ir_emit_ld_imm(cur_bb(b), one, 1);
+    if (is_acc_float_kind(fk)) return conv_int_vreg_to_acc(b, one, 0);
+    if (is_supported_float_kind(fk)) return emit_float_reg_from_int(b, one, fk, 0);
+    return -1;
+}
+
+/* value `v` (decimal kind `fk`) +/- 1.0 — the step for float/_Accum ++/--. */
+static int emit_decimal_step(Builder *b, int v, Kind fk, int is_inc)
+{
+    int one = emit_decimal_one(b, fk);
+    if (one < 0) return -1;
+    const char *stem = is_inc ? "add" : "sub";
+    if (is_acc_float_kind(fk)) return emit_acc_binop(b, stem, v, one);
+    if (is_supported_float_kind(fk)) return emit_float_arith(b, fk, stem, v, one);
+    if (fk == KIND_ACCUM16 || fk == KIND_ACCUM32) {
+        int w = (fk == KIND_ACCUM32) ? 4 : 2;
+        int dst = new_temp(b, w);
+        b->f->vregs[dst].width = (int16_t)w; b->f->vregs[dst].kind = fk;
+        Op *o = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB);
+        o->dst = dst; o->src[0] = v; o->src[1] = one;
+        return dst;
+    }
+    return -1;
+}
+
 /* Float compound-assign `lhs op= rhs` (stem "add"/"sub"/"mul"/"div").
    n->left is OP_DEREF(lvalue); the lvalue may be a local, global, or
    *ptr. Loads the lvalue, computes via the float helper, stores back.
@@ -981,8 +1590,8 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     int is_acc = is_acc_float_kind(fk);
     if (!is_supported_float_kind(fk) && !is_acc)
         return build_fail("float compound-assign: unsupported kind %d", (int)fk);
-    if (!n->right || !n->right->type || n->right->type->kind != fk)
-        return build_fail("float compound-assign: rhs kind mismatch");
+    if (!n->right || !n->right->type)
+        return build_fail("float compound-assign: null rhs");
     Node *lvn = n->left->operand;
     int fw = width_for_kind(fk);
     Kind elem = is_acc ? KIND_DOUBLE : (fw == 2) ? KIND_INT : KIND_LONG;
@@ -992,6 +1601,9 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
 
     int rv = build_expr(b, n->right);
     if (rv < 0) return -1;
+    /* Convert a mixed rhs (int, or the other float tier) to the lvalue's
+       float kind — the conversion the front end no longer inserts. */
+    rv = coerce_int_to_float_kind(b, rv, n->right, fk);
 
     if (lvn->ast_type == AST_LOCAL_VAR) {
         int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
@@ -1142,6 +1754,76 @@ static int agg_lvalue_addr(Builder *b, Node *node)
     if (node->ast_type == OP_ADD || node->ast_type == OP_SUB)
         return build_expr(b, node);
     return build_fail("aggregate address lvalue shape deferred");
+}
+
+/* Read-modify-write store of value vreg `v` into the bitfield `bft`
+   (carries bit_size/bit_offset) whose storage unit is addressed by the
+   lvalue node `lv` (global / local / folded address expr). `unsigned_rhs`
+   selects ZX vs SX when `v` is narrower than a word. Clears the field's
+   bits in the loaded unit and ORs in `(v & mask) << boff`, then writes the
+   unit back at its natural width (byte if the field fits in one byte, else
+   word — a wider store would clobber the neighbour / overrun the struct).
+   Returns `v` (the assigned value) or -1 on a deferred lvalue shape. Shared
+   by plain `bf = x` (OP_ASSIGN) and `bf op= x` (compound). */
+static int emit_bitfield_store(Builder *b, Node *lv, Type *bft,
+                               int v, int unsigned_rhs)
+{
+    int bsize = bft->bit_size, boff = bft->bit_offset;
+    int64_t mask = ((int64_t)1 << bsize) - 1;
+    int64_t fieldmask = mask << boff;
+    int unit_w = (boff + bsize <= 8) ? 1 : 2;
+    Kind unit_k = (unit_w == 1) ? KIND_CHAR : KIND_INT;
+    int addr;
+    if (lv->ast_type == AST_GLOBAL_VAR && lv->sym
+        && !sym_is_faracc(lv->sym) && !sym_is_namespaced(lv->sym)) {
+        addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+        Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
+        op->dst = addr; op->mem.kind = IR_MEM_SYM; op->mem.sym = lv->sym;
+    } else if (lv->ast_type == AST_LOCAL_VAR && lv->sym) {
+        int src = sym_map_get(b, lv->sym);
+        if (src < 0) return build_fail("bitfield store unknown local");
+        b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
+        addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+        Op *op = ir_op_emit(cur_bb(b), IR_LEA);
+        op->dst = addr; op->src[0] = src;
+    } else if (lv->ast_type == OP_ADD || lv->ast_type == OP_SUB
+            || lv->ast_type == OP_DEREF) {
+        addr = build_expr(b, lv);
+        if (addr < 0) return -1;
+    } else {
+        return build_fail("bitfield store lvalue shape deferred");
+    }
+    if (b->f->vregs[v].width != 2) {
+        int t = new_temp(b, 2); b->f->vregs[t].width = 2;
+        OpKind cv = (b->f->vregs[v].width > 2) ? IR_CONV_TRUNC
+                  : (unsigned_rhs ? IR_CONV_ZX : IR_CONV_SX);
+        Op *c = ir_op_emit(cur_bb(b), cv);
+        c->dst = t; c->src[0] = v; v = t;
+    }
+    /* (v & mask) << boff — unit_w-wide so a byte field emits byte mem ops. */
+    int vm = new_temp(b, unit_w); b->f->vregs[vm].width = (int16_t)unit_w;
+    Op *a1 = ir_op_emit(cur_bb(b), IR_AND);
+    a1->dst = vm; a1->src[0] = v; a1->src[1] = -1; a1->imm = mask;
+    int vms = vm;
+    if (boff > 0) {
+        vms = new_temp(b, unit_w); b->f->vregs[vms].width = (int16_t)unit_w;
+        Op *sl = ir_op_emit(cur_bb(b), IR_SHL);
+        sl->dst = vms; sl->src[0] = vm; sl->src[1] = -1; sl->imm = boff;
+    }
+    int cont = new_temp(b, unit_w); b->f->vregs[cont].width = (int16_t)unit_w;
+    Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+    ld->dst = cont; ld->mem.kind = IR_MEM_VREG;
+    ld->mem.base = addr; ld->mem.elem = unit_k;
+    int cleared = new_temp(b, unit_w); b->f->vregs[cleared].width = (int16_t)unit_w;
+    Op *a2 = ir_op_emit(cur_bb(b), IR_AND);
+    a2->dst = cleared; a2->src[0] = cont; a2->src[1] = -1;
+    a2->imm = (~fieldmask) & (unit_w == 1 ? 0xFF : 0xFFFF);
+    int newv = new_temp(b, unit_w); b->f->vregs[newv].width = (int16_t)unit_w;
+    ir_emit_binop(cur_bb(b), IR_OR, newv, cleared, vms);
+    Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+    st->src[0] = newv; st->mem.kind = IR_MEM_VREG;
+    st->mem.base = addr; st->mem.elem = unit_k;
+    return v;
 }
 
 static int build_expr_hinted(Builder *b, Node *n, int hint)
@@ -1542,7 +2224,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                                        : KIND_NONE;
             if (lk == KIND_STRUCT || lk == KIND_ARRAY) {
                 int elem_w = type_width(n->type);
-                if (elem_w != 1 && elem_w != 2 && elem_w != 4)
+                Kind ek = n->type ? (Kind)n->type->kind : KIND_NONE;
+                int wide_acc = ((ek == KIND_DOUBLE || ek == KIND_FLOAT)
+                                && elem_w >= 5) || ek == KIND_LONGLONG;
+                if (elem_w != 1 && elem_w != 2 && elem_w != 4 && !wide_acc)
                     return build_fail("OP_DEREF aggregate elem width %d "
                                       "not supported", elem_w);
                 int base = new_temp(b, 2);
@@ -1550,11 +2235,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 lea->dst = base; lea->src[0] = v;
                 int dst = new_temp(b, elem_w);
                 b->f->vregs[dst].width = (int16_t)elem_w;
+                if (wide_acc || elem_w == 4 || ek == KIND_CPTR)
+                    b->f->vregs[dst].kind = ek; /* acc/float ops dispatch on kind */
                 Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
                 ld->dst       = dst;
                 ld->mem.kind  = IR_MEM_VREG;
                 ld->mem.base  = base;
-                ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
+                ld->mem.elem  = wide_acc ? ek
+                              : (elem_w == 1) ? KIND_CHAR
                               : (elem_w == 2) ? KIND_INT
                               :                 KIND_LONG;
                 return dst;
@@ -1685,6 +2373,35 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         OpKind k = op_to_ir_binop(n->ast_type);
         if (k == IR_OP_COUNT) return build_fail("binop dispatch hole");
 
+        /* _Accum (fixed-point) ADD/SUB/compare with a mixed int/literal
+           operand: scale the int to Q-format, then a plain integer add/sub/
+           compare (Q values are additive + ordered like ints). `_Accum OP
+           double` promotes to double — left to the float block below (skip
+           when either operand is floating). mul/div is the OP_MULT path. */
+        {
+            Kind lka = node_value_kind(n->left), rka = node_value_kind(n->right);
+            Kind ak = (lka == KIND_ACCUM16 || lka == KIND_ACCUM32) ? lka
+                    : (rka == KIND_ACCUM16 || rka == KIND_ACCUM32) ? rka
+                    : KIND_NONE;
+            int is_cmp = (n->ast_type == OP_EQ || n->ast_type == OP_NE
+                       || n->ast_type == OP_LT || n->ast_type == OP_LE
+                       || n->ast_type == OP_GT || n->ast_type == OP_GE);
+            if (ak != KIND_NONE && lka != rka
+                && (n->ast_type == OP_ADD || n->ast_type == OP_SUB || is_cmp)
+                && !kind_is_floating(lka) && !kind_is_floating(rka)) {
+                int l = build_operand_as_accum(b, n->left, ak);
+                int r = build_operand_as_accum(b, n->right, ak);
+                if (l < 0 || r < 0) return build_fail("_Accum binop operand");
+                int w = is_cmp ? 2 : ((ak == KIND_ACCUM32) ? 4 : 2);
+                int dst = new_temp(b, w);
+                b->f->vregs[dst].width = (int16_t)w;
+                b->f->vregs[dst].kind  = is_cmp ? KIND_INT : ak;
+                Op *o = ir_op_emit(cur_bb(b), k);
+                o->dst = dst; o->src[0] = l; o->src[1] = r;
+                return dst;
+            }
+        }
+
         /* Floating-point binops are helper calls, not integer ops —
            intercept before any integer promotion/imm-fold machinery.
            Only KIND_FLOAT16 ADD/SUB are handled here (l_f16_add/sub:
@@ -1700,10 +2417,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 if (is_supported_float_kind(res_k)
                     && (n->ast_type == OP_ADD || n->ast_type == OP_SUB)) {
                     int fw = width_for_kind(res_k);   /* 2 or 4 */
-                    int lf = build_expr(b, n->left);
-                    if (lf < 0) return -1;
-                    int rf = build_expr(b, n->right);
-                    if (rf < 0) return -1;
+                    int lf = build_operand_as_float_reg(b, n->left, res_k);
+                    if (lf < 0) return build_fail("float add/sub: lhs not promotable");
+                    int rf = build_operand_as_float_reg(b, n->right, res_k);
+                    if (rf < 0) return build_fail("float add/sub: rhs not promotable");
                     int dst = new_temp(b, fw);
                     b->f->vregs[dst].width = (int16_t)fw;
                     b->f->vregs[dst].kind  = res_k;
@@ -1728,7 +2445,12 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                    Only when BOTH operands are the same supported float
                    kind (mixed float/int should have been converted by the
                    front end; if not, bail). */
-                if (is_supported_float_kind(lkf) && lkf == rkf) {
+                if ((is_supported_float_kind(lkf) || is_supported_float_kind(rkf))
+                    && !is_acc_float_kind(lkf) && !is_acc_float_kind(rkf)) {
+                    /* Both register tier (f16/f32). A register-float vs an
+                       acc-double promotes to the WIDER (double) — defer to the
+                       acc compare below, which promotes f16→double. */
+                    Kind fk = is_supported_float_kind(lkf) ? lkf : rkf;
                     const char *stem = NULL;
                     switch (n->ast_type) {
                     case OP_LT: stem = "lt"; break;
@@ -1739,12 +2461,12 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     case OP_NE: stem = "ne"; break;
                     default: break;
                     }
-                    const char *cmp = stem ? float_helper(lkf, stem) : NULL;
+                    const char *cmp = stem ? float_helper(fk, stem) : NULL;
                     if (cmp) {
-                        int lf = build_expr(b, n->left);
-                        if (lf < 0) return -1;
-                        int rf = build_expr(b, n->right);
-                        if (rf < 0) return -1;
+                        int lf = build_operand_as_float_reg(b, n->left, fk);
+                        if (lf < 0) return build_fail("float cmp: lhs not promotable");
+                        int rf = build_operand_as_float_reg(b, n->right, fk);
+                        if (rf < 0) return build_fail("float cmp: rhs not promotable");
                         int dst = new_temp(b, 2);   /* int bool result */
                         b->f->vregs[dst].width = 2;
                         int *cargs = calloc(2, sizeof(int));
@@ -1763,8 +2485,9 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     }
                 }
                 /* 5/6-byte double compare → wide-accumulator compare
-                   (dlt/dleq/dgt/dge/deq/dne → int 0/1 bool in HL). */
-                if (is_acc_float_kind(lkf) && lkf == rkf) {
+                   (dlt/dleq/dgt/dge/deq/dne → int 0/1 bool in HL). Either
+                   operand may be a mixed int → promoted to double first. */
+                if (is_acc_float_kind(lkf) || is_acc_float_kind(rkf)) {
                     const char *cstem = NULL;
                     switch (n->ast_type) {
                     case OP_LT: cstem = "lt"; break;
@@ -1776,10 +2499,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     default: break;
                     }
                     if (cstem) {
-                        int lf = build_expr(b, n->left);
-                        if (lf < 0) return -1;
-                        int rf = build_expr(b, n->right);
-                        if (rf < 0) return -1;
+                        int lf = build_operand_as_acc(b, n->left);
+                        if (lf < 0) return build_fail("float cmp: lhs not promotable");
+                        int rf = build_operand_as_acc(b, n->right);
+                        if (rf < 0) return build_fail("float cmp: rhs not promotable");
                         int dst = new_temp(b, 2);
                         b->f->vregs[dst].width = 2;
                         int *cargs = calloc(2, sizeof(int));
@@ -1797,13 +2520,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         return dst;
                     }
                 }
-                /* 5/6-byte double add/sub → wide-accumulator op. */
+                /* 5/6-byte double add/sub → wide-accumulator op. Promote a
+                   mixed int operand to double first (walker used to). */
                 if (is_acc_float_kind(res_k)
                     && (n->ast_type == OP_ADD || n->ast_type == OP_SUB)) {
-                    int lf = build_expr(b, n->left);
-                    if (lf < 0) return -1;
-                    int rf = build_expr(b, n->right);
-                    if (rf < 0) return -1;
+                    int lf = build_operand_as_acc(b, n->left);
+                    if (lf < 0) return build_fail("float add/sub: lhs not promotable");
+                    int rf = build_operand_as_acc(b, n->right);
+                    if (rf < 0) return build_fail("float add/sub: rhs not promotable");
                     int dst = emit_acc_binop(b,
                                  (n->ast_type == OP_ADD) ? "add" : "sub",
                                  lf, rf);
@@ -1819,8 +2543,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            shifts, and the six compares lower to l_i64_* via the shared
            IR_ACC_* layer. Mul/div/mod are in the OP_MULT/DIV/MOD case. */
         {
-            Kind lki = (n->left  && n->left->type)  ? n->left->type->kind  : KIND_NONE;
-            Kind rki = (n->right && n->right->type) ? n->right->type->kind : KIND_NONE;
+            /* Use the operands' VALUE types: a fnptr-call node keeps its
+               KIND_FUNC type, so n->left->type->kind would mis-read an
+               ll-returning call as KIND_FUNC and route the op to the 16-bit
+               integer path (which then mis-loads the 8-byte slot). */
+            Type *lvt = node_value_type(n->left);
+            Type *rvt = node_value_type(n->right);
+            Kind lki = lvt ? lvt->kind : KIND_NONE;
+            Kind rki = rvt ? rvt->kind : KIND_NONE;
             Kind reski = n->type ? n->type->kind : KIND_NONE;
             const char *stem = NULL, *cstem = NULL;
             int shift_uns = -1;   /* >=0 overrides the helper signedness */
@@ -1836,8 +2566,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                    unsigned — the parser doesn't always pick OP_USHR for a
                    cast like `(unsigned long long)x >> n`. */
                 stem = "shr";
-                shift_uns = (n->left && n->left->type
-                             && n->left->type->isunsigned);
+                shift_uns = (lvt && lvt->isunsigned);
                 break;
             case OP_LT: cstem = "lt"; break;
             case OP_LE: cstem = "le"; break;
@@ -1847,17 +2576,21 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             case OP_NE: cstem = "ne"; break;
             default: break;
             }
+            int is_shift_op = stem && (!strcmp(stem, "shl") || !strcmp(stem, "shr"));
             /* Arithmetic/shift is long long iff the RESULT is (so `ptr + ll`
-               stays pointer arithmetic); a compare (int result) is long
-               long iff either operand is. */
-            int ll_arith = stem  && is_acc_int_kind(reski);
+               stays pointer arithmetic); a compare (int result) is long long
+               iff either operand is. A shift's result kind follows the shifted
+               (LHS) operand, and its declared result type is unreliable when
+               the LHS is a fnptr call (KIND_FUNC) — fall back to the LHS value
+               kind so an ll shift routes to l_i64_* not a 16-bit SHR. */
+            int ll_arith = stem && (is_acc_int_kind(reski)
+                           || (is_shift_op && is_acc_int_kind(lki)));
             int ll_cmp   = cstem && (is_acc_int_kind(lki) || is_acc_int_kind(rki));
             if (ll_arith || ll_cmp) {
                 /* Shift helper signedness comes from the op (asr vs asr_u);
                    other ops use the usual either-operand-unsigned rule. */
                 int is_uns = (shift_uns >= 0) ? shift_uns
-                    : ((n->left->type && n->left->type->isunsigned)
-                       || (n->right->type && n->right->type->isunsigned));
+                    : ((lvt && lvt->isunsigned) || (rvt && rvt->isunsigned));
                 int l = build_expr(b, n->left);
                 if (l < 0) return -1;
                 int r = build_expr(b, n->right);
@@ -1865,10 +2598,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 /* Promote mixed int operands to long long (C promotion; for
                    a shift the count widens too — the helper reads its low
                    byte from __i64_acc). */
-                l = promote_to_acc_int(b, l,
-                        n->left->type && n->left->type->isunsigned);
-                r = promote_to_acc_int(b, r,
-                        n->right->type && n->right->type->isunsigned);
+                l = promote_to_acc_int(b, l, lvt && lvt->isunsigned);
+                r = promote_to_acc_int(b, r, rvt && rvt->isunsigned);
                 if (l < 0 || r < 0) return -1;
                 int dst = stem ? emit_acc_int_binop(b, stem, l, r, is_uns)
                                : emit_acc_int_cmp(b, cstem, l, r, is_uns);
@@ -2216,70 +2947,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                       : (n->left->type && n->left->type->bit_size > 0)
                           ? n->left->type : NULL;
             if (bft) {
-                int bsize = bft->bit_size, boff = bft->bit_offset;
-                int64_t mask = ((int64_t)1 << bsize) - 1;
-                int64_t fieldmask = mask << boff;          /* bits this field owns */
-                int unit_w = (boff + bsize <= 8) ? 1 : 2;
-                Kind unit_k = (unit_w == 1) ? KIND_CHAR : KIND_INT;
-                /* Address of the storage unit into a vreg. */
-                Node *lv = n->left;
-                int addr;
-                if (lv->ast_type == AST_GLOBAL_VAR && lv->sym
-                    && !sym_is_faracc(lv->sym) && !sym_is_namespaced(lv->sym)) {
-                    addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
-                    Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
-                    op->dst = addr; op->mem.kind = IR_MEM_SYM; op->mem.sym = lv->sym;
-                } else if (lv->ast_type == AST_LOCAL_VAR && lv->sym) {
-                    int src = sym_map_get(b, lv->sym);
-                    if (src < 0) return build_fail("bitfield store unknown local");
-                    b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
-                    addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
-                    Op *op = ir_op_emit(cur_bb(b), IR_LEA);
-                    op->dst = addr; op->src[0] = src;
-                } else if (lv->ast_type == OP_ADD || lv->ast_type == OP_SUB
-                        || lv->ast_type == OP_DEREF) {
-                    addr = build_expr(b, lv);
-                    if (addr < 0) return -1;
-                } else {
-                    return build_fail("bitfield store lvalue shape deferred");
-                }
                 int v = build_expr(b, n->right);
                 if (v < 0) return -1;
-                if (b->f->vregs[v].width != 2) {
-                    int t = new_temp(b, 2); b->f->vregs[t].width = 2;
-                    OpKind cv = (b->f->vregs[v].width > 2)
-                              ? IR_CONV_TRUNC
-                              : (n->right->type && n->right->type->isunsigned
-                                 ? IR_CONV_ZX : IR_CONV_SX);
-                    Op *c = ir_op_emit(cur_bb(b), cv);
-                    c->dst = t; c->src[0] = v; v = t;
-                }
-                /* (v & mask) << boff */
-                int vm = new_temp(b, 2); b->f->vregs[vm].width = 2;
-                Op *a1 = ir_op_emit(cur_bb(b), IR_AND);
-                a1->dst = vm; a1->src[0] = v; a1->src[1] = -1; a1->imm = mask;
-                int vms = vm;
-                if (boff > 0) {
-                    vms = new_temp(b, 2); b->f->vregs[vms].width = 2;
-                    Op *sl = ir_op_emit(cur_bb(b), IR_SHL);
-                    sl->dst = vms; sl->src[0] = vm; sl->src[1] = -1; sl->imm = boff;
-                }
-                /* container & ~fieldmask */
-                int cont = new_temp(b, 2); b->f->vregs[cont].width = 2;
-                Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
-                ld->dst = cont; ld->mem.kind = IR_MEM_VREG;
-                ld->mem.base = addr; ld->mem.elem = unit_k;
-                int cleared = new_temp(b, 2); b->f->vregs[cleared].width = 2;
-                Op *a2 = ir_op_emit(cur_bb(b), IR_AND);
-                a2->dst = cleared; a2->src[0] = cont; a2->src[1] = -1;
-                a2->imm = (~fieldmask) & (unit_w == 1 ? 0xFF : 0xFFFF);
-                /* new = cleared | vms */
-                int newv = new_temp(b, 2); b->f->vregs[newv].width = 2;
-                ir_emit_binop(cur_bb(b), IR_OR, newv, cleared, vms);
-                Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
-                st->src[0] = newv; st->mem.kind = IR_MEM_VREG;
-                st->mem.base = addr; st->mem.elem = unit_k;
-                return v;
+                int uns = n->right->type && n->right->type->isunsigned;
+                return emit_bitfield_store(b, n->left, bft, v, uns);
             }
         }
         /* Whole-aggregate (struct/union) copy `s1 = s2`: block-copy sizeof
@@ -2356,6 +3027,19 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 st->mem.elem = elem_k;
                 return rhs_v;
             }
+            /* Float/double RHS into an integer local (`int i = dbl;`): convert
+               float→int first, then store. Without this the 6-byte double
+               reaches the byte/general paths below and gets a plain CONV_TRUNC
+               (bail at 6→1, garbage at 6→2/4). */
+            if (kind_is_integer(lk) && !is_acc_int_kind(lk)
+                && n->right && is_acc_float_kind(node_value_kind(n->right))) {
+                int rv = build_expr(b, n->right);
+                if (rv < 0) return -1;
+                rv = coerce_float_to_int_kind(b, rv, n->right, lk,
+                                              b->f->vregs[dst_v].width);
+                if (rv != dst_v) ir_emit_mov(cur_bb(b), dst_v, rv);
+                return dst_v;
+            }
             /* Byte (width-1) local: build the RHS at its natural
                (int-promoted) width and TRUNC into the byte slot. Hinting
                dst_v would let a wider producer (binop / deref / cast)
@@ -2374,6 +3058,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     Op *op = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
                     op->dst = dst_v; op->src[0] = rhs_v;
                 }
+                return dst_v;
+            }
+            /* Integer RHS into a float local: build WITHOUT the dst hint (so
+               the int producer can't write its raw value into the float vreg),
+               convert int→float, then move. */
+            Kind ldst_k = n->left->type ? n->left->type->kind : KIND_NONE;
+            if (is_acc_float_kind(ldst_k) || is_supported_float_kind(ldst_k)
+                || ldst_k == KIND_ACCUM16 || ldst_k == KIND_ACCUM32) {
+                int rv = build_expr(b, n->right);
+                if (rv < 0) return -1;
+                rv = coerce_int_to_float_kind(b, rv, n->right, ldst_k);
+                if (rv != dst_v) ir_emit_mov(cur_bb(b), dst_v, rv);
                 return dst_v;
             }
             /* Pass dst_v as hint: the RHS writes into it directly when
@@ -2401,6 +3097,29 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                   ? build_expr_hinted(b, n->right, rhs_hint)
                   : build_expr(b, n->right);
         if (rhs_v < 0) return -1;
+        /* Storing an integer into a float lvalue: convert int→float (the
+           front end no longer inserts the cast). No-op for matching kinds. */
+        rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right,
+                    n->left->type ? n->left->type->kind : KIND_NONE);
+        /* Symmetric: storing a float/double into an integer lvalue
+           (`arr[k] = dbl;`, `g = dbl;`). Convert float→long here; the
+           per-shape width-coercion below narrows to the element/global width.
+           Without it the raw double reaches CONV_TRUNC (bail/garbage). */
+        {
+            /* The stored value's type is the assign node's own type (n->type)
+               — reliable even when the parser folds `g.member = X` /
+               `arr[k] = X` to a bare-global / address shape whose lvalue type
+               is a pointer/array/struct (same reason the global path below
+               keys elem_w off n->type). Deriving from n->left->type would
+               read a folded double-member ADDRESS as an integer and wrongly
+               convert (ifix) a double→double member store. */
+            Kind store_k = n->type ? n->type->kind : KIND_NONE;
+            if ((store_k == KIND_PTR || store_k == KIND_ARRAY) && n->type->ptr)
+                store_k = n->type->ptr->kind;
+            if (is_acc_float_kind(node_value_kind(n->right))
+                && kind_is_integer(store_k) && !is_acc_int_kind(store_k))
+                rhs_v = emit_acc_to_int(b, rhs_v, 4);
+        }
         if (n->left->ast_type == AST_GLOBAL_VAR) {
             /* FARACC (`__banked`) global store: map the far address then
                write through it (lp_p*), not a plain near `ld (_g),hl`. */
@@ -2814,6 +3533,37 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     || (n->type && kind_is_floating(n->type->kind));
         if ((is_fix16 || is_fix32) && n->ast_type == OP_MOD)
             return build_fail("OP_MOD on _Accum not defined");
+        /* _Accum (fixed) mul/div with an _Accum result: scale a mixed int/
+           literal operand to Q-format, then the l_fix{16,32}_{mul,div} helper.
+           `_Accum OP double` (result double) is left to the is_flt block. */
+        if ((is_fix16 || is_fix32)
+            && (n->ast_type == OP_MULT || n->ast_type == OP_DIV)
+            && n->type
+            && (n->type->kind == KIND_ACCUM16 || n->type->kind == KIND_ACCUM32)) {
+            Kind ak = n->type->kind;
+            int l = build_operand_as_accum(b, n->left, ak);
+            int r = build_operand_as_accum(b, n->right, ak);
+            if (l < 0 || r < 0) return build_fail("_Accum mul/div operand");
+            int us = (n->left->type && n->left->type->isunsigned)
+                  || (n->right->type && n->right->type->isunsigned);
+            const char *helper = (ak == KIND_ACCUM32)
+                ? (n->ast_type == OP_MULT ? (us ? "l_fix32_mulu" : "l_fix32_muls")
+                                          : (us ? "l_fix32_divu" : "l_fix32_divs"))
+                : (n->ast_type == OP_MULT ? (us ? "l_fix16_mulu" : "l_fix16_muls")
+                                          : (us ? "l_fix16_divu" : "l_fix16_divs"));
+            int w = (ak == KIND_ACCUM32) ? 4 : 2;
+            int dst = new_temp(b, w);
+            b->f->vregs[dst].width = (int16_t)w;
+            b->f->vregs[dst].kind  = ak;
+            int *args = calloc(2, sizeof(int)); args[0] = l; args[1] = r;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            hi->name = helper; hi->args = args; hi->n_args = 2;
+            hi->n_stacked = 1; hi->ret_vreg = dst;
+            op->hcall = hi;
+            return dst;
+        }
         if (is_flt) {
             if (n->ast_type != OP_MULT && n->ast_type != OP_DIV)
                 return build_fail("float op %d not yet supported", (int)n->ast_type);
@@ -2828,8 +3578,35 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 if (dst < 0) return build_fail("acc mul/div emit failed");
                 return dst;
             }
+            /* Mixed `int OP double` (result is acc-double): promote the int
+               operand to double, then the same acc mul/div. The walker used to
+               do this front-end conversion; do it here. */
+            if (is_acc_float_kind(n->type ? n->type->kind : KIND_NONE)) {
+                int l = build_operand_as_acc(b, n->left);
+                if (l < 0) return build_fail("float mul/div: lhs not promotable");
+                int r = build_operand_as_acc(b, n->right);
+                if (r < 0) return build_fail("float mul/div: rhs not promotable");
+                int dst = emit_acc_binop(b,
+                             (n->ast_type == OP_MULT) ? "mul" : "div", l, r);
+                if (dst < 0) return build_fail("acc mul/div emit failed");
+                return dst;
+            }
+            /* Mixed int × register-float (f16 / IEEE-32): promote the int to
+               the float kind, then the same l_f{16,32}_mul/div the same-kind
+               path emits. Same-kind (both supported) falls through unchanged. */
+            if (is_supported_float_kind(lk) != is_supported_float_kind(rk)) {
+                Kind fk = is_supported_float_kind(lk) ? lk : rk;
+                int l = build_operand_as_float_reg(b, n->left, fk);
+                if (l < 0) return build_fail("float mul/div: lhs not promotable");
+                int r = build_operand_as_float_reg(b, n->right, fk);
+                if (r < 0) return build_fail("float mul/div: rhs not promotable");
+                int dst = emit_float_arith(b, fk,
+                             (n->ast_type == OP_MULT) ? "mul" : "div", l, r);
+                if (dst < 0) return build_fail("float mul/div emit failed");
+                return dst;
+            }
             /* Register-tier float: both operands the same supported kind;
-               mixed float/int bails to the walker (front end converts). */
+               anything else (e.g. f16 × f32) still bails. */
             if (!is_supported_float_kind(lk) || lk != rk)
                 return build_fail("float mul/div: operands not both supported float");
         }
@@ -2887,6 +3664,22 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                                 uns ? IR_CONV_ZX : IR_CONV_SX);
             cv->dst = tmp; cv->src[0] = r;
             r = tmp;
+        }
+        /* Constant-multiply strength reduction: x*C → shifts + add/sub for
+           cheap C, replacing the l_mult/l_long_mult helper. Skipped on
+           targets with a hardware multiply (Rabbit `mul`), which keep the
+           helper. Integer width 2/4 only; one literal operand. */
+        if (n->ast_type == OP_MULT
+            && !(b->f->features & IR_FEAT_FAST_MULT)
+            && (width == 2 || width == 4)) {
+            Node *litn = (n->right && n->right->ast_type == AST_LITERAL) ? n->right
+                       : (n->left  && n->left->ast_type  == AST_LITERAL) ? n->left
+                       : NULL;
+            if (litn) {
+                int vv = (litn == n->right) ? l : r;  /* non-constant operand */
+                int srd = emit_const_mult_sr(b, vv, (int64_t)litn->zval, width);
+                if (srd >= 0) return srd;
+            }
         }
         /* C arithmetic conversion: result is unsigned if either
            operand is unsigned. */
@@ -3012,9 +3805,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
+        /* long long: no width-8 IR_NEG lowering — negate via __i64_acc. */
+        if ((int)b->f->vregs[v].kind == KIND_LONGLONG)
+            return emit_acc_int_unary(b, v, "l_i64_neg");
         int width = b->f->vregs[v].width;
         int dst = ALLOC_DST(width);
         b->f->vregs[dst].width = (int16_t)width;
+        b->f->vregs[dst].kind = b->f->vregs[v].kind;   /* preserve long/etc. */
         ir_emit_unop(cur_bb(b), IR_NEG, dst, v);
         return dst;
     }
@@ -3024,9 +3821,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (!n->operand) return build_fail("OP_COMP with no operand");
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
+        /* long long: no width-8 IR_NOT lowering — complement via __i64_acc. */
+        if ((int)b->f->vregs[v].kind == KIND_LONGLONG)
+            return emit_acc_int_unary(b, v, "l_i64_com");
         int width = b->f->vregs[v].width;
         int dst = ALLOC_DST(width);
         b->f->vregs[dst].width = (int16_t)width;
+        b->f->vregs[dst].kind = b->f->vregs[v].kind;   /* preserve long/etc. */
         ir_emit_unop(cur_bb(b), IR_NOT, dst, v);
         return dst;
     }
@@ -3223,27 +4024,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                    no Type and is left as-is. */
                 if (n->sym->ctype && n->sym->ctype->parameters) {
                     Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
-                    Kind ak  = a->type ? (Kind)a->type->kind : KIND_NONE;
-                    int  uns = a->type && a->type->isunsigned;
-                    if (pt && kind_is_integer(pt->kind) && kind_is_integer(ak)) {
-                        int aw = b->f->vregs[v].width;
-                        if (pt->kind == KIND_LONGLONG && ak != KIND_LONGLONG) {
-                            if (aw == 1) {
-                                int wt = new_temp(b, 2);
-                                b->f->vregs[wt].width = 2;
-                                Op *cv = ir_op_emit(cur_bb(b),
-                                          uns ? IR_CONV_ZX : IR_CONV_SX);
-                                cv->dst = wt; cv->src[0] = v; v = wt;
-                            }
-                            v = emit_acc_int_from_int(b, v, uns);
-                        } else if (type_width(pt) == 4 && aw < 4) {
-                            int wt = new_temp(b, 4);
-                            b->f->vregs[wt].width = 4;
-                            Op *cv = ir_op_emit(cur_bb(b),
-                                      uns ? IR_CONV_ZX : IR_CONV_SX);
-                            cv->dst = wt; cv->src[0] = v; v = wt;
-                        }
-                    }
+                    v = widen_arg_to_param(b, v, a, pt);
                 }
                 args[i] = v;
                 if (b->cur_bb_id != push_bb) pushable = 0;
@@ -3355,17 +4136,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
     case AST_FUNCPTR_CALL: {
         /* Indirect call through a function pointer (`(*fp)(args)` or
            `fp(args)`). Same arg shape as AST_FUNC_CALL but the target
-           is computed at runtime from `n->callee`. Fastcall fnptrs
-           are deferred (legacy walker handles the zpush/ex(sp),hl
-           gymnastics that keep the fnptr addressable while args are
-           evaluated). */
+           is computed at runtime from `n->callee`. Fastcall fnptrs are
+           handled in the lowerer (ix/iy when a spare index reg is free,
+           else a pushed-retaddr `ret` dance). */
         if (!n->callee)
             return build_fail("AST_FUNCPTR_CALL without callee");
         Type *fntype = n->type; /* callfunction() stashes the FUNC
                                    type on the call node */
         uint32_t flags = fntype ? fntype->flags : 0;
-        if (flags & FASTCALL)
-            return build_fail("AST_FUNCPTR_CALL fastcall deferred");
+        /* Fastcall through a fnptr: when a spare index reg is free the fnptr
+           rides it (ix/iy) while the arg occupies HL/DEHL; otherwise the
+           lowerer pushes the fnptr and dispatches via pushed-retaddr + `ret`
+           (covers idx2-off, reserved-index targets, 808x and gbz80). */
         int n_args = n->args ? (int)array_len(n->args) : 0;
         int *args = NULL;
         if (n_args > 0) {
@@ -3374,6 +4156,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 Node *a = array_get_byindex(n->args, i);
                 int v = build_expr(b, a);
                 if (v < 0) { free(args); return -1; }
+                /* Widen narrow int args to the fnptr's prototyped param
+                   width (long / long long) — same as the direct-call
+                   path; the indirect path used to push them at their own
+                   width, corrupting long params through a fnptr. */
+                if (fntype && fntype->parameters) {
+                    Type *pt = array_get_byindex(fntype->parameters, i);
+                    v = widen_arg_to_param(b, v, a, pt);
+                }
                 args[i] = v;
             }
         }
@@ -3403,7 +4193,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ci->args       = args;
         ci->n_args     = n_args;
         ci->ret_vreg   = ret_v;
-        if (flags & CALLEE)        ci->abi = IR_ABI_CALLEE;
+        if (flags & FASTCALL)      ci->abi = IR_ABI_FASTCALL;
+        else if (flags & CALLEE)   ci->abi = IR_ABI_CALLEE;
         else if (flags & SMALLC)   ci->abi = IR_ABI_SMALLC;
         else                       ci->abi = IR_ABI_STDC;
         ci->is_variadic = (fntype && fntype->funcattrs.hasva) ? 1 : 0;
@@ -3418,6 +4209,16 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return build_fail("OP_CAST without operand");
         int src_w = type_width(n->operand->type);
         int dst_w = type_width(n->type);
+        /* A fnptr-call operand keeps its KIND_FUNC type (direct calls are
+           unwrapped to the return type by normalize_types, indirect ones are
+           not) — type_width(FUNC) is meaningless, so take the return type's
+           width. Without this the ll→int narrow below never fires for
+           `(int)fnptr(...)` and the truncated result is left unloaded. */
+        if ((n->operand->ast_type == AST_FUNCPTR_CALL
+          || n->operand->ast_type == AST_FUNC_CALL)
+            && n->operand->type && n->operand->type->kind == KIND_FUNC
+            && n->operand->type->return_type)
+            src_w = type_width(n->operand->type->return_type);
         /* (cast long *p++) fastpath: recognise the
               OP_CAST(long, OP_DEREF(OP_DEREF(POST/PRE_INC/DEC(LV=p))))
            shape and emit a single fused IR_LD_MEM that loads the byte,
@@ -3462,7 +4263,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 }
             }
         }
-        Kind src_k = n->operand->type ? n->operand->type->kind : KIND_NONE;
+        Kind src_k = node_value_kind(n->operand);   /* unwraps a fnptr call's KIND_FUNC */
         Kind dst_k = n->type ? n->type->kind : KIND_NONE;
         /* Literal → _Accum: fold the Q-format scaling into the
            IR_LD_IMM at IR-build time. Bypasses the build_expr
@@ -3479,6 +4280,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
         int src_v = build_expr(b, n->operand);
         if (src_v < 0) return -1;
+        /* A KIND_FUNC src_k is a stale type propagated up from a fnptr-call
+           operand (the call node keeps KIND_FUNC and any parent expr — a
+           shift, an arith op — inherits it). The built vreg carries the real
+           kind/width, so trust it; otherwise the ll/double→int narrow below
+           never fires and the converted value is left unloaded. */
+        if (src_k == KIND_FUNC) {
+            Kind vk = (Kind)b->f->vregs[src_v].kind;
+            int  vw = b->f->vregs[src_v].width;
+            if (vk == KIND_LONGLONG || vk == KIND_DOUBLE) src_k = vk;
+            else if (vw == 8) src_k = KIND_LONGLONG;
+            if (vw > 0) src_w = vw;
+        }
         /* integer → _Accum: l_fix16_{s,u}{char,int,long}2f or
            l_fix32_{s,u}{int,long}2f. Source goes through HL (the
            fix16 helpers operate on HL only, so width-4 sources are
@@ -3675,8 +4488,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return iv;
         }
         /* int/char/long → long long (l_i64_{s,u}{int,long}2i64). char
-           source is widened to int first (the helpers take HL/DEHL). */
-        if (!kind_is_floating(src_k) && is_acc_int_kind(dst_k)) {
+           source is widened to int first (the helpers take HL/DEHL).
+           Excludes a long long source: a ll↔ull cast is a same-width
+           signedness reinterpret (handled by the src_w==dst_w no-op below),
+           not an int2i64 conversion — feeding the already-width-8 value to
+           l_i64_{u,s}int2i64 would re-extend only its low 16 bits. */
+        if (!kind_is_floating(src_k) && !is_acc_int_kind(src_k)
+            && is_acc_int_kind(dst_k)) {
             int uns = n->operand->type && n->operand->type->isunsigned;
             if (b->f->vregs[src_v].width == 1) {
                 int wt = new_temp(b, 2);
@@ -3688,8 +4506,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return emit_acc_int_from_int(b, src_v, uns);
         }
         /* long long → int/long via l_i64_s64_toi32 (truncates to DEHL; HL
-           for an int dst, DEHL for long). A char dst narrows further. */
-        if (is_acc_int_kind(src_k) && !kind_is_floating(dst_k)) {
+           for an int dst, DEHL for long). A char dst narrows further.
+           Excludes a long long dst (ll↔ull): that is the same-width
+           reinterpret handled by the src_w==dst_w no-op below. */
+        if (is_acc_int_kind(src_k) && !kind_is_floating(dst_k)
+            && !is_acc_int_kind(dst_k)) {
             int iv = emit_acc_int_to_int(b, src_v, (dst_w == 4) ? 4 : 2);
             if (dst_w == 1) {
                 int bt = new_temp(b, 1);
@@ -3898,6 +4719,49 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                       n->ast_type == OP_POST_INC);
         int is_post = (n->ast_type == OP_POST_INC ||
                        n->ast_type == OP_POST_DEC);
+
+        /* Float / _Accum ++/-- : step by 1.0 in the value's type (not a raw
+           integer inc of the bits). Load lvalue, decimal-step, store back,
+           return old (post) / new (pre). Local + global lvalues. */
+        {
+            Kind lvk = n->operand->type ? n->operand->type->kind : KIND_NONE;
+            int dec = is_acc_float_kind(lvk) || is_supported_float_kind(lvk)
+                   || lvk == KIND_ACCUM16 || lvk == KIND_ACCUM32;
+            if (dec && n->operand->ast_type == AST_LOCAL_VAR && n->operand->sym) {
+                int v = sym_map_get(b, n->operand->sym);
+                if (v < 0) return build_fail("decimal step unknown local");
+                int w = width_for_kind(lvk);
+                int old = -1;
+                if (is_post) {
+                    old = new_temp(b, w);
+                    b->f->vregs[old].width = (int16_t)w; b->f->vregs[old].kind = lvk;
+                    ir_emit_mov(cur_bb(b), old, v);
+                }
+                int stepped = emit_decimal_step(b, v, lvk, is_inc);
+                if (stepped < 0) return build_fail("decimal step emit");
+                ir_emit_mov(cur_bb(b), v, stepped);
+                return is_post ? old : v;
+            }
+            if (dec && n->operand->ast_type == AST_GLOBAL_VAR && n->operand->sym) {
+                SYMBOL *g = n->operand->sym;
+                int w = width_for_kind(lvk);
+                int x = new_temp(b, w);
+                b->f->vregs[x].width = (int16_t)w; b->f->vregs[x].kind = lvk;
+                Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+                ld->dst = x; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g; ld->mem.elem = lvk;
+                int old = -1;
+                if (is_post) {
+                    old = new_temp(b, w);
+                    b->f->vregs[old].width = (int16_t)w; b->f->vregs[old].kind = lvk;
+                    ir_emit_mov(cur_bb(b), old, x);
+                }
+                int stepped = emit_decimal_step(b, x, lvk, is_inc);
+                if (stepped < 0) return build_fail("decimal step emit");
+                Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                st->src[0] = stepped; st->mem.kind = IR_MEM_SYM; st->mem.sym = g; st->mem.elem = lvk;
+                return is_post ? old : stepped;
+            }
+        }
 
         /* Bare local fastpath: 16-bit slot, IR_INC/IR_DEC aliased
            write to the same vreg. A POINTER local steps by sizeof(the
@@ -4209,6 +5073,39 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 return build_fail("ll compound-assign op %d not supported",
                                   (int)n->ast_type);
             return build_ll_compound(b, n, stem);
+        }
+
+        /* Bitfield compound assign: `bf op= rhs` == `bf = extract(bf) op rhs`,
+           then a read-modify-write store. The generic paths below treat the
+           LHS as the whole storage unit, which operates on the wrong bits
+           (e.g. `b |= 1` at bit offset 3 ORs bit 0). The LHS rvalue
+           (OP_DEREF carrying bit_size) extracts the field on read; the
+           helper re-inserts the result at the field's offset. */
+        if (n->left && n->left->ast_type == OP_DEREF && n->left->operand
+            && n->left->type && n->left->type->bit_size > 0) {
+            Type *bft = n->left->type;
+            int cur = build_expr(b, n->left);       /* extracted field value */
+            if (cur < 0) return -1;
+            int rhs = build_expr(b, n->right);
+            if (rhs < 0) return -1;
+            if (b->f->vregs[cur].width != 2) {
+                int t = new_temp(b, 2); b->f->vregs[t].width = 2;
+                Op *c = ir_op_emit(cur_bb(b),
+                    bft->isunsigned ? IR_CONV_ZX : IR_CONV_SX);
+                c->dst = t; c->src[0] = cur; cur = t;
+            }
+            if (b->f->vregs[rhs].width != 2) {
+                int t = new_temp(b, 2); b->f->vregs[t].width = 2;
+                OpKind cv = (b->f->vregs[rhs].width > 2) ? IR_CONV_TRUNC
+                          : (n->right->type && n->right->type->isunsigned
+                             ? IR_CONV_ZX : IR_CONV_SX);
+                Op *c = ir_op_emit(cur_bb(b), cv);
+                c->dst = t; c->src[0] = rhs; rhs = t;
+            }
+            int res = new_temp(b, 2); b->f->vregs[res].width = 2;
+            ir_emit_binop(cur_bb(b), k, res, cur, rhs);
+            return emit_bitfield_store(b, n->left->operand, bft, res,
+                                       bft->isunsigned);
         }
 
         if (!n->left || n->left->ast_type != OP_DEREF || !n->left->operand)
@@ -4626,6 +5523,17 @@ static int build_stmt(Builder *b, Node *n)
         if (rv) {
             v = build_expr(b, rv);
             if (v < 0) return -1;
+            /* `return <float>;` from an integer function: convert float→int
+               first (to the return type's width), so the byte/int widening
+               below handles the ABI. Without it the raw double reached the
+               return unconverted (garbage). */
+            {
+                Kind retk0 = b->ret_type ? b->ret_type->kind : KIND_NONE;
+                if (kind_is_integer(retk0) && !is_acc_int_kind(retk0)
+                    && is_acc_float_kind(node_value_kind(rv)))
+                    v = coerce_float_to_int_kind(b, v, rv, retk0,
+                                                 type_width(b->ret_type));
+            }
             /* Widen byte retvals to int — z80 return ABI puts the
                value in HL even when the C return type is char. */
             if (b->f->vregs[v].width == 1) {
@@ -4636,6 +5544,19 @@ static int build_stmt(Builder *b, Node *n)
                                     unsigned_src ? IR_CONV_ZX : IR_CONV_SX);
                 cv->dst = tmp; cv->src[0] = v;
                 v = tmp;
+            }
+            /* `return <int>` from a float function: convert int→float. */
+            Kind retk = b->ret_type ? b->ret_type->kind : KIND_NONE;
+            if (is_acc_float_kind(retk) || is_supported_float_kind(retk)) {
+                v = coerce_int_to_float_kind(b, v, rv, retk);
+            } else {
+                /* Widen a narrower integer `return x;` to the declared return
+                   width (int→long / int→long long). The front-end leaves the
+                   implicit C conversion to codegen — without it a long long
+                   returner that `return`s an int produced only HL/2 bytes,
+                   and the caller read the rest as garbage. widen_arg_to_param
+                   keys off the SOURCE node's type vs the target Type. */
+                v = widen_arg_to_param(b, v, rv, b->ret_type);
             }
         }
         ir_emit_ret(cur_bb(b), v);
@@ -4663,6 +5584,19 @@ static int build_stmt(Builder *b, Node *n)
                 int base = new_temp(b, 2);
                 Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
                 lea->dst = base; lea->src[0] = agg_v;
+                /* `= {0}` / `= {}` : block-zero the whole slot — one IR_MEMSET
+                   (unrolls small / `ldir` large) rather than per-element stores
+                   that blow the budget on a big array-of-struct. */
+                if (init_is_all_zero(n->declvar)
+                    && (sz <= 8 || ir_inline_block_ops_ok())) {
+                    int zc = new_temp(b, 2);
+                    b->f->vregs[zc].width = 2;
+                    ir_emit_ld_imm(cur_bb(b), zc, 0);
+                    Op *ms = ir_op_emit(cur_bb(b), IR_MEMSET);
+                    ms->dst = -1; ms->src[0] = base; ms->src[1] = zc;
+                    ms->imm = sz;
+                    return 0;
+                }
                 int budget = INIT_REGION_MAX_STORES;
                 int rc = init_typed_region(b, base, 0, n->sym->ctype,
                                            n->declvar, &budget);
@@ -4683,6 +5617,22 @@ static int build_stmt(Builder *b, Node *n)
                               (int)n->sym->type, n->sym->name);
         int v = new_local_vreg(b, n->sym);
         if (n->declvar) {
+            /* Float/double initialiser into an integer local (`int i = dbl;`,
+               `char c = dbl;`): convert float→int first — the byte/int/long
+               store paths below would otherwise CONV_TRUNC the raw 6-byte
+               double (bail at 6→1, garbage else). */
+            {
+                Kind vk0 = (Kind)n->sym->type;
+                if (kind_is_integer(vk0) && !is_acc_int_kind(vk0)
+                    && is_acc_float_kind(node_value_kind(n->declvar))) {
+                    int iv = build_expr(b, n->declvar);
+                    if (iv < 0) return -1;
+                    iv = coerce_float_to_int_kind(b, iv, n->declvar, vk0,
+                                                  b->f->vregs[v].width);
+                    if (iv != v) ir_emit_mov(cur_bb(b), v, iv);
+                    return 0;
+                }
+            }
             /* Byte (width-1) local init: build at natural width and
                TRUNC into the byte slot — same overrun guard as the
                OP_ASSIGN byte path (a wide initialiser hinted into the
@@ -4707,24 +5657,28 @@ static int build_stmt(Builder *b, Node *n)
                this also silently mis-lowered `double d = i;`). Don't hint
                into v: v is wider than the register the init lands in. */
             Kind vk = (Kind)n->sym->type;
-            if (is_acc_int_kind(vk) || is_acc_float_kind(vk)) {
+            if (is_acc_int_kind(vk) || is_acc_float_kind(vk)
+                || is_supported_float_kind(vk)
+                || vk == KIND_ACCUM16 || vk == KIND_ACCUM32) {
                 int init_v = build_expr(b, n->declvar);
                 if (init_v < 0) return -1;
                 Kind ik = b->f->vregs[init_v].kind;
-                if (b->f->vregs[init_v].width <= 4
-                    && ((is_acc_int_kind(vk)   && !is_acc_int_kind(ik))
-                     || (is_acc_float_kind(vk) && !kind_is_floating(ik)))) {
-                    int uns = n->declvar->type && n->declvar->type->isunsigned;
-                    if (b->f->vregs[init_v].width == 1) {
-                        int wt = new_temp(b, 2); b->f->vregs[wt].width = 2;
-                        Op *cv = ir_op_emit(cur_bb(b),
-                                            uns ? IR_CONV_ZX : IR_CONV_SX);
-                        cv->dst = wt; cv->src[0] = init_v; init_v = wt;
+                if (is_acc_int_kind(vk)) {
+                    /* int → long long */
+                    if (b->f->vregs[init_v].width <= 4 && !is_acc_int_kind(ik)) {
+                        int uns = n->declvar->type && n->declvar->type->isunsigned;
+                        if (b->f->vregs[init_v].width == 1) {
+                            int wt = new_temp(b, 2); b->f->vregs[wt].width = 2;
+                            Op *cv = ir_op_emit(cur_bb(b),
+                                                uns ? IR_CONV_ZX : IR_CONV_SX);
+                            cv->dst = wt; cv->src[0] = init_v; init_v = wt;
+                        }
+                        init_v = emit_acc_int_from_int(b, init_v, uns);
+                        if (init_v < 0) return -1;
                     }
-                    init_v = is_acc_int_kind(vk)
-                        ? emit_acc_int_from_int(b, init_v, uns)
-                        : emit_acc_from_int(b, init_v, uns);
-                    if (init_v < 0) return -1;
+                } else {
+                    /* int → float (acc or register tier); same-kind passthrough. */
+                    init_v = coerce_int_to_float_kind(b, init_v, n->declvar, vk);
                 }
                 if (init_v != v)
                     ir_emit_mov(cur_bb(b), v, init_v);
@@ -4988,6 +5942,7 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     Builder b;
     builder_init(&b, f);
     b.cur_bb_id = entry;
+    b.ret_type = (fn->ctype) ? fn->ctype->return_type : NULL;
 
     /* Fastcall CALLEES are wrong-code on the IR path: the prologue's
        `push hl` (the fastcall arg) isn't reflected in the param slot

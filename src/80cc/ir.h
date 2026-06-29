@@ -111,6 +111,18 @@ typedef uint32_t RegMask;
 #define IR_FEAT_BLOCK_COPY    (1u << 24) /* native ldi/ldir. Absent on 8080/8085/gbz80, where z80asm
                                             expands them to a __z80asm__ldi helper CALL (clobbers BC)
                                             — prefer the A-based byte copy there. */
+#define IR_FEAT_EXX           (1u << 25) /* exx (alternate register set BC'/DE'/HL'). Lets a value
+                                            pair be parked in the shadow set across sp arithmetic
+                                            (e.g. __z88dk_callee arg-cleanup preserving the result).
+                                            Absent on 8080/8085 (no alt regs) and gbz80 (dropped the
+                                            ex/exx family). */
+#define IR_FEAT_FAST_MULT     (1u << 26) /* native 16x16 hardware multiply (Rabbit `mul`: HL:BC =
+                                            BC*DE). When set, a constant multiply keeps the l_mult
+                                            helper (which uses `mul`); when absent, x*C is strength-
+                                            reduced to shifts + add/sub for cheap constants. */
+#define IR_FEAT_TEST_RP       (1u << 27) /* `test hl` / `test bc` (Rabbit 4000+): one-op 16-bit
+                                            zero/sign test (reg OR 0 → flags), no A clobber, no
+                                            ld→HL move for a BC-resident value. */
 
 /* ----- Physical register pool ------------------------------------------ */
 
@@ -565,6 +577,13 @@ typedef struct {
        allocator may put ONE invariant width-2 vreg here; lowerer reads it via
        `push <idx>;pop de`. */
     int        idx2_reg;
+
+    /* Word (int) accumulator residency: the one width-2 vreg the allocator
+       elected to keep in the DE pair across its loop (slot-backed lazy-spill,
+       the word analog of the byte E-home), or -1. Distinguishes the resident
+       home from ordinary single-def IR_PR_DE transients (both carry phys
+       IR_PR_DE). Set by ir_alloc, read by ir_lower. */
+    int        word_home_vreg;
 
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */

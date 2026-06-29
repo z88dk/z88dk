@@ -19,4 +19,9 @@
    call multiple times on the same Func. */
 void ir_alloc(Func *f);
 
+/* Hand off (and clear) the allocation snapshot saved just before the word
+   DE-home pick, or NULL if no home was picked this function. The lowerer uses
+   it to revert the pick when no resident region forms. Caller frees it. */
+int *ir_alloc_take_word_home_prepick(void);
+
 #endif /* IR_ALLOC_H */

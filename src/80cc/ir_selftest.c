@@ -388,11 +388,13 @@ static void build_hcall_test(Func *f)
 int c_framepointer_is_ix = -1;
 int c_idx2_invariant = 0;       /* selftest builds IR by hand; idx2 off */
 int c_byte_resident = 0;        /* selftest builds IR by hand; byte-home off */
+int c_word_resident = 0;        /* selftest builds IR by hand; word-home off */
 FILE *output = NULL;            /* emit_op_cline redirects to its own stream */
 int litlab = 0;
 int c_intermix_ccode = 0;
 int c_cline_directive = 0;
 int lineno = 0;
+int ir_idx2_reg(void) { return 0; }   /* glue lives in ir_compiler_glue.c */
 void gen_emit_line(int line) { (void)line; }
 void gen_comment(const char *message) { (void)message; }
 const char *get_source_line(const char *filename, int n)
@@ -796,6 +798,7 @@ static int run_match_tests(void)
        distance to the long-push inserter). */
     {
         Func *f = ir_func_new(NULL);
+        f->features = IR_FEAT_CB_BITOPS;   /* rotl fuses only on CB-capable CPUs */
         int v  = ir_vreg_new(f, 2, NULL, IR_VREG_PARAM);
         int t1 = ir_vreg_new(f, 2, NULL, 0);
         int t2 = ir_vreg_new(f, 2, NULL, 0);
@@ -825,6 +828,7 @@ static int run_match_tests(void)
            into the source vreg. The anchor's dst must stay
            unconstrained or it collides with the source binding. */
         Func *f = ir_func_new(NULL);
+        f->features = IR_FEAT_CB_BITOPS;   /* rotl fuses only on CB-capable CPUs */
         int v  = ir_vreg_new(f, 2, NULL, IR_VREG_PARAM);
         int t1 = ir_vreg_new(f, 2, NULL, 0);
         int t2 = ir_vreg_new(f, 2, NULL, 0);

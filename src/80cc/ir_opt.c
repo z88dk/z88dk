@@ -320,15 +320,20 @@ static int licm_reaches(Func *f, int from, int to)
     return found;
 }
 
-/* Walk succ[] to detect loops via back-edges. For each BB B, any
-   successor S with S.id ≤ B.id is a candidate back-edge into a loop
-   header at S — confirmed only when S actually reaches B (licm_reaches),
-   so a forward join edge to a lower-numbered block isn't mistaken for a
-   loop. The loop body is the contiguous range [S.id, B.id]. (Reducible
-   CFG assumption — true for IR produced by our builder.) Sets bb_in_loop[]
-   and per-BB loop_header[] (-1 if not in any loop). For nested loops,
-   keeps the OUTERMOST header (lowest id) — sufficient for hoisting all
-   the way out. */
+/* Detect loops via dominator-confirmed back-edges. An edge B->S is a real
+   natural-loop back-edge iff its target S dominates its source B; the loop
+   body is then S (the header) plus every node that can reach the latch B
+   without passing through S. Sets bb_in_loop[] and per-BB loop_header[]
+   (-1 if not in any loop). For nested loops, keeps the OUTERMOST header
+   (lowest id) — sufficient for hoisting all the way out.
+
+   An earlier cut used "S.id <= B.id and S reaches B" with a contiguous
+   id-range [S,B] body. That mis-modelled an `if` nested in a loop: the
+   loop-exit block can be numbered BELOW the if-body, so the body isn't a
+   contiguous range and the latch->...->if-body forward path produced a
+   spurious inner back-edge whose "pre-header" was a dead block — LICM then
+   hoisted invariants into unreachable code (a miscompile). Dominance is
+   the correct back-edge test and handles non-contiguous bodies. */
 static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
                             int *loop_end)
 {
@@ -366,19 +371,74 @@ static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
             for (int i = 0; i < f->n_bbs; i++) reachable[i] = 1;
         }
     }
-    for (int b = 0; b < f->n_bbs; b++) {
-        if (reachable && !reachable[b]) continue;   /* dead BB: no real edges */
+    int n = f->n_bbs;
+
+    /* Iterative dominators over the reachable sub-CFG (entry = BB0).
+       dom[b*n + d] != 0  iff  d dominates b. */
+    char *dom = (reachable && n > 0) ? malloc((size_t)n * (size_t)n) : NULL;
+    int  *tmp = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    if (dom && tmp) {
+        for (int b = 0; b < n; b++) {
+            if (!reachable[b]) { for (int d = 0; d < n; d++) dom[b*n+d] = 0; }
+            else if (b == 0)   { for (int d = 0; d < n; d++) dom[d] = (d == 0); }
+            else               { for (int d = 0; d < n; d++) dom[b*n+d] = (char)reachable[d]; }
+        }
+        int changed = 1;
+        while (changed) {
+            changed = 0;
+            for (int b = 0; b < n; b++) {
+                if (!reachable[b] || b == 0) continue;
+                int have = 0;
+                for (int p = 0; p < n; p++) {
+                    if (!reachable[p]) continue;
+                    BB *pb = &f->bbs[p];
+                    int pns = ir_bb_n_succ(pb), is_pred = 0;
+                    for (int ps = 0; ps < pns; ps++)
+                        if (ir_bb_succ_at(pb, ps) == b) { is_pred = 1; break; }
+                    if (!is_pred) continue;
+                    if (!have) { for (int d = 0; d < n; d++) tmp[d] = dom[p*n+d]; have = 1; }
+                    else       { for (int d = 0; d < n; d++) tmp[d] = tmp[d] && dom[p*n+d]; }
+                }
+                if (!have) for (int d = 0; d < n; d++) tmp[d] = 0;
+                tmp[b] = 1;                          /* b dominates itself */
+                for (int d = 0; d < n; d++)
+                    if (dom[b*n+d] != (char)tmp[d]) { dom[b*n+d] = (char)tmp[d]; changed = 1; }
+            }
+        }
+    }
+
+    /* For each dominator-confirmed back-edge, mark the natural loop body. */
+    int *inthis = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    int *wstack = calloc((size_t)(n > 0 ? n : 1), sizeof(int));
+    for (int b = 0; dom && inthis && wstack && b < n; b++) {
+        if (!reachable[b]) continue;
         BB *bb = &f->bbs[b];
         int ns = ir_bb_n_succ(bb);
         for (int s = 0; s < ns; s++) {
             int sid = ir_bb_succ_at(bb, s);
-            if (sid < 0 || sid > b) continue;
-            /* sid <= b is necessary but not sufficient: confirm the
-               header reaches the latch (real cycle), else this is a
-               forward join edge with a low-numbered target, not a loop. */
-            if (!licm_reaches(f, sid, b)) continue;
+            if (sid < 0 || sid >= n || !reachable[sid]) continue;
+            if (!dom[b*n + sid]) continue;          /* not a back-edge: sid !dom b */
+            /* Natural loop: header sid + every node reaching latch b
+               without passing through sid (backward DFS over preds). */
+            for (int k = 0; k < n; k++) inthis[k] = 0;
+            inthis[sid] = 1;
+            int sp = 0;
+            if (b != sid) { inthis[b] = 1; wstack[sp++] = b; }
+            while (sp > 0) {
+                int x = wstack[--sp];
+                for (int p = 0; p < n; p++) {
+                    if (!reachable[p] || inthis[p]) continue;
+                    BB *pb = &f->bbs[p];
+                    int pns = ir_bb_n_succ(pb);
+                    for (int ps = 0; ps < pns; ps++)
+                        if (ir_bb_succ_at(pb, ps) == x) {
+                            inthis[p] = 1; wstack[sp++] = p; break;
+                        }
+                }
+            }
             int lo = sid, hi = b;
-            for (int k = lo; k <= hi; k++) {
+            for (int k = 0; k < n; k++) {
+                if (!inthis[k]) continue;
                 in_loop[k] = 1;
                 /* Outermost header wins (smallest id). */
                 if (loop_header[k] < 0 || lo < loop_header[k]) {
@@ -388,6 +448,7 @@ static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
             }
         }
     }
+    free(inthis); free(wstack); free(tmp); free(dom);
     free(reachable);
 }
 
@@ -1656,6 +1717,193 @@ int ir_opt_const_fold(Func *f)
     free(known); free(val);
     return changed;
 }
+
+/* ---- Reassociate a reduction's add-tree into the accumulator -------------
+   `acc += x0 + x1 + … + xk` is built left-leaning: (((x0+x1)+x2)+…+xk)
+   feeding one `acc = acc + tree` accumulate. The tree materialises k-1
+   single-use intermediates and — fatally for the word DE-home — computes the
+   sub-sums through DE/HL, so the accumulator can't stay resident in DE while
+   the tree uses it as scratch. Rewrite the chain IN PLACE into k+1 direct
+   accumulates `acc += xi`, each an is_word_accumulate (`add hl,de; ex de,hl`)
+   the DE-home recognises. The k tree-adds plus the final accumulate are the
+   exact k+1 ADD slots needed, so the rewrite reuses them 1:1 — no insertion;
+   the intermediate vregs simply go dead.
+
+   Soundness: integer add is associative/commutative (2's-complement wrap), so
+   reordering the addends is value-preserving. LD_MEMs are left untouched in
+   program order (aliasing/volatile safe), and each reused add slot is checked
+   to still see its assigned leaf already defined. Gated on c_word_resident so
+   flag-off is inert (byte-identical); the win only materialises if the home
+   is then picked and a resident region forms. */
+extern int c_word_resident;
+
+#define RR_MAX_CHAIN 16
+int ir_opt_reassoc_reduction(Func *f)
+{
+    if (!f) return 0;
+    if (!c_word_resident || getenv("IR_NO_WORD_RESIDENT")) return 0;
+    if (getenv("IR_NO_REASSOC")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+
+    /* Function-wide: total src-uses, and the single def site of each vreg. */
+    int *use_cnt  = calloc((size_t)nv, sizeof(int));
+    int *def_bb   = calloc((size_t)nv, sizeof(int));
+    int *def_idx  = calloc((size_t)nv, sizeof(int));
+    int *def_cnt  = calloc((size_t)nv, sizeof(int));
+    if (!use_cnt || !def_bb || !def_idx || !def_cnt) {
+        free(use_cnt); free(def_bb); free(def_idx); free(def_cnt); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *o = &bb->ops[j];
+            int u[16];
+            int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+            for (int k = 0; k < nu; k++)
+                if (u[k] >= 0 && u[k] < nv) use_cnt[u[k]]++;
+            if (o->dst >= 0 && o->dst < nv) {
+                if (def_cnt[o->dst]++ == 0) { def_bb[o->dst] = b; def_idx[o->dst] = j; }
+            }
+        }
+    }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int h = 0; h < bb->n_ops; h++) {
+            Op *acc_op = &bb->ops[h];
+            if (acc_op->kind != IR_ADD) continue;
+            int acc = acc_op->dst;
+            /* Left-leaning reduction: `acc = acc + t`, acc width-2. */
+            if (acc < 0 || acc >= nv || f->vregs[acc].width != 2) continue;
+            if (acc_op->src[0] != acc || acc_op->src[1] < 0) continue;
+            /* acc must appear nowhere else in THIS bb (no partial-sum reader
+               between the rewritten slots). It is read+written only at h. */
+            int acc_refs = 0;
+            for (int j = 0; j < bb->n_ops; j++) {
+                Op *o = &bb->ops[j];
+                if (o->dst == acc) acc_refs++;
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+                for (int k = 0; k < nu; k++) if (u[k] == acc) acc_refs++;
+            }
+            if (acc_refs != 2) continue;   /* exactly: dst@h + src0@h */
+
+            /* Walk the spine down src[0] of each intermediate, collecting the
+               per-level leaf (src[1]) and finally the innermost-left leaf. */
+            int chain_op[RR_MAX_CHAIN];   /* op indices, chain_op[0]=h */
+            int leaf[RR_MAX_CHAIN];
+            int chain_n = 0, leaf_n = 0, ok = 1;
+            chain_op[chain_n++] = h;
+            int cur = acc_op->src[1];
+            while (1) {
+                if (cur < 0 || cur >= nv) { ok = 0; break; }
+                if (use_cnt[cur] != 1) break;          /* shared ⇒ a leaf, stop */
+                if (def_cnt[cur] != 1 || def_bb[cur] != b) break;  /* not a local single def */
+                int di = def_idx[cur];
+                Op *da = &bb->ops[di];
+                if (da->kind != IR_ADD) break;          /* leaf (e.g. LD_MEM), stop */
+                if (f->vregs[cur].width != 2) { ok = 0; break; }
+                if (da->src[0] < 0 || da->src[1] < 0) { ok = 0; break; }
+                if (chain_n >= RR_MAX_CHAIN || leaf_n >= RR_MAX_CHAIN) { ok = 0; break; }
+                chain_op[chain_n++] = di;
+                leaf[leaf_n++] = da->src[1];
+                cur = da->src[0];
+            }
+            if (!ok) continue;
+            if (leaf_n >= RR_MAX_CHAIN) continue;
+            leaf[leaf_n++] = cur;                        /* innermost-left leaf */
+            if (chain_n < 2 || chain_n != leaf_n) continue;   /* need a real tree */
+
+            /* Each leaf must be a width-2 LD_MEM defined once in THIS bb — so
+               we own a load op to pair with each accumulate. (Live-in leaves
+               have no local load to interleave; bail rather than spill.) */
+            int bad = 0, ld_idx[RR_MAX_CHAIN];
+            for (int i = 0; i < leaf_n; i++) {
+                int lv = leaf[i];
+                if (lv < 0 || lv >= nv || f->vregs[lv].width != 2) { bad = 1; break; }
+                if (def_cnt[lv] != 1 || def_bb[lv] != b) { bad = 1; break; }
+                ld_idx[i] = def_idx[lv];
+                if (bb->ops[ld_idx[i]].kind != IR_LD_MEM) { bad = 1; break; }
+            }
+            if (bad) continue;
+
+            /* Reorder the chain's span into interleaved load/accumulate pairs
+               (`LD li; acc += li`), so each leaf is consumed the instant it is
+               loaded and never spills. The span [lo..h] holds the k+1 loads +
+               k+1 chain adds; any OTHER op in it must be a dead pure temp
+               (its dst unused — e.g. the address-calc adds DCE will remove),
+               which we overwrite with a NOP. A live/impure foreign op ⇒ bail. */
+            int span_lo = h, span_hi = h;
+            for (int i = 0; i < chain_n; i++) {
+                if (chain_op[i] < span_lo) span_lo = chain_op[i];
+                if (chain_op[i] > span_hi) span_hi = chain_op[i];
+                if (ld_idx[i] < span_lo) span_lo = ld_idx[i];
+                if (ld_idx[i] > span_hi) span_hi = ld_idx[i];
+            }
+            /* Mark the chain ops; classify the rest. */
+            for (int q = span_lo; q <= span_hi && !bad; q++) {
+                int is_chain = (q == h);
+                for (int i = 0; i < chain_n && !is_chain; i++)
+                    if (q == chain_op[i] || q == ld_idx[i]) is_chain = 1;
+                if (is_chain) continue;
+                const Op *o = &bb->ops[q];
+                /* Foreign op: a NOP (e.g. an address-add the matcher folded
+                   into a load) is free to overwrite; any other op must be a
+                   dead, pure value temp (dst unused) we can drop. */
+                if (o->kind == IR_NOP) continue;
+                switch (o->kind) {
+                case IR_MOV: case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+                case IR_ADD: case IR_SUB: case IR_RSUB: case IR_AND:
+                case IR_OR:  case IR_XOR: case IR_SHL: case IR_SHR:
+                case IR_NOT: case IR_NEG: case IR_LEA:
+                    if (o->dst < 0 || o->dst >= nv || use_cnt[o->dst] != 0) bad = 1;
+                    break;
+                default: bad = 1; break;   /* load/store/call/branch — don't move */
+                }
+            }
+            if (bad) continue;
+
+            /* Order leaves by load position (program order ⇒ memory reads stay
+               ordered). Insertion sort the parallel (leaf, load-index) arrays. */
+            int ord_leaf[RR_MAX_CHAIN], ord_ld[RR_MAX_CHAIN];
+            for (int i = 0; i < leaf_n; i++) { ord_leaf[i] = leaf[i]; ord_ld[i] = ld_idx[i]; }
+            for (int i = 0; i < leaf_n - 1; i++)
+                for (int j = i + 1; j < leaf_n; j++)
+                    if (ord_ld[j] < ord_ld[i]) {
+                        int t = ord_ld[i]; ord_ld[i] = ord_ld[j]; ord_ld[j] = t;
+                        t = ord_leaf[i]; ord_leaf[i] = ord_leaf[j]; ord_leaf[j] = t;
+                    }
+            /* Snapshot the load ops before overwriting the span. */
+            Op saved_ld[RR_MAX_CHAIN];
+            for (int i = 0; i < leaf_n; i++) saved_ld[i] = bb->ops[ord_ld[i]];
+            const char *afile = bb->ops[h].file; int aline = bb->ops[h].line;
+            /* Write the interleaved pairs into the front of the span; NOP-fill
+               the trailing slots vacated by the dropped dead temps. */
+            int w = span_lo;
+            for (int i = 0; i < chain_n; i++) {
+                bb->ops[w++] = saved_ld[i];               /* LD leaf i */
+                Op *ad = &bb->ops[w++];
+                memset(ad, 0, sizeof *ad);
+                ad->kind = IR_ADD;
+                ad->dst = acc; ad->src[0] = acc; ad->src[1] = ord_leaf[i];
+                ad->mem.base = -1;
+                ad->file = afile; ad->line = aline;
+            }
+            for (; w <= span_hi; w++) {
+                Op *nop = &bb->ops[w];
+                memset(nop, 0, sizeof *nop);
+                nop->kind = IR_NOP; nop->dst = -1; nop->src[0] = -1; nop->src[1] = -1;
+                nop->mem.base = -1;
+            }
+            changed++;
+        }
+    }
+    free(use_cnt); free(def_bb); free(def_idx); free(def_cnt);
+    return changed;
+}
+#undef RR_MAX_CHAIN
 
 /* `*p++` deref + post-step fusion migrated to the ir_match early phase
    as the `derefpp` pattern — see ir_match.c. */

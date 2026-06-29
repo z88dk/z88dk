@@ -542,9 +542,15 @@ static void lex_number(Tokeniser *t, Token *tok, int first)
     int s_kind = KIND_INT;
     int s_unsigned = 0;
     lex_int_suffix(t, &s_kind, &s_unsigned);
-    /* No-suffix size promotion: int → long when out of 16-bit range. */
+    /* No-suffix size promotion: int → long when out of 16-bit range.
+       A hex/octal/binary (or U-suffixed) constant may take the UNSIGNED
+       type of its rank first (C integer-constant rule), so a value that
+       still fits in 16 unsigned bits stays KIND_INT — const.c marks it
+       unsigned. Only a plain DECIMAL constant is signed-only and leaves
+       16-bit range past INT_MAX. (Without this `0xffff` became `long` and
+       was pushed as a 4-byte arg, mis-aligning callee stack frames.) */
     if (s_kind == KIND_INT) {
-        if (s_unsigned) {
+        if (s_unsigned || base != 10) {
             if ((uint64_t)value > 65535) s_kind = KIND_LONG;
         } else {
             if (value > 32767 || value < -32768) s_kind = KIND_LONG;
@@ -554,6 +560,7 @@ static void lex_number(Tokeniser *t, Token *tok, int first)
     tok->num.value = value;
     tok->num.kind = s_kind;
     tok->num.isunsigned = s_unsigned;
+    tok->num.base = base;
 }
 
 /* Char literal — single char, simple escapes. Stores the value as a

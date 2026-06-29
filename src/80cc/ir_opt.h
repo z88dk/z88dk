@@ -156,6 +156,13 @@ int ir_opt_coalesce_copies(Func *f);
  * acc op= …` idiom (e.g. `main`'s `res += f()`). Returns ops simplified. */
 int ir_opt_const_fold(Func *f);
 
+/* Reassociate a reduction's left-leaning add-tree (`acc += x0+x1+…+xk`)
+   into k+1 direct accumulates `acc += xi`, in place (no op insertion). Frees
+   the accumulator to stay in the word DE-home — the tree form computes the
+   sub-sums through DE/HL, blocking residency. Gated on c_word_resident
+   (inert when off ⇒ byte-identical). Returns chains reassociated. */
+int ir_opt_reassoc_reduction(Func *f);
+
 /* long_inc_mhl (the long (*p)++ triple → HCALL l_long_inc_mhl) lives
    in the ir_match table as `incmhl`; --opt-disable=pattern:incmhl. */
 
