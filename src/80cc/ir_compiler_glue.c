@@ -53,54 +53,6 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
     return ns ? ns->bank_function : NULL;
 }
 
-/* c_cpu → IR_FEAT_* capability word (PATTERN_MATCHER_PLAN.md decision
-   #1: feature bits, not CPU ids — they document WHY a pattern is gated
-   and age better as Rabbit/KC160 variants accumulate). ir_build stamps
-   the result onto each Func so the ccdefs-free IR layers never see
-   c_cpu. Start from the full z80 set and strip what a target lacks. */
-uint32_t ir_features_from_cpu(void)
-{
-    uint32_t feat = IR_FEAT_CB_BITOPS | IR_FEAT_EX_DE_HL
-                  | IR_FEAT_IX | IR_FEAT_DJNZ | IR_FEAT_OVERFLOW_FLAG
-                  | IR_FEAT_JR | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY
-                  | IR_FEAT_EXX;
-    if (IS_808x())   /* P flag is parity, not overflow; no relative jumps (XTHL still present);
-                        no native ldi/ldir (z80asm expands to a helper call); no alt-reg set */
-        feat &= ~(IR_FEAT_CB_BITOPS | IR_FEAT_IX | IR_FEAT_DJNZ
-                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_JR | IR_FEAT_BLOCK_COPY
-                  | IR_FEAT_EXX);
-    if (IS_8085())   /* undocumented LDSI+LHLX/SHLX sp-rel ld/st; DSUB+K signed compare */
-        feat |= IR_FEAT_SP_REL_DEPTR | IR_FEAT_DSUB;
-    if (IS_GBZ80())   /* LR35902 keeps the CB prefix; no overflow/sign flags; no ex (sp),hl;
-                         no native ldi/ldir; no exx/alt regs */
-        feat &= ~(IR_FEAT_EX_DE_HL | IR_FEAT_IX | IR_FEAT_DJNZ
-                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY
-                  | IR_FEAT_EXX);
-    if (c_cpu & CPU_RABBIT) {          /* and/or/sub hl,de, bool hl, rr hl */
-        feat |= IR_FEAT_HL_DE_LOGIC | IR_FEAT_BOOL_HL | IR_FEAT_PAIR_ROT;
-        feat |= IR_FEAT_CRIT_IP;       /* no di/ei: __critical via ipset/ipres */
-        feat |= IR_FEAT_FAST_MULT;     /* native `mul` (HL:BC = BC*DE) */
-    }
-    if (c_cpu & (CPU_R4K | CPU_R6K)) { /* native `xor/sub/cp hl,de`, `test hl/bc` */
-        feat |= IR_FEAT_HL_DE_LOGIC4;
-        feat |= IR_FEAT_TEST_RP;
-    }
-    if (c_cpu & CPU_RABBIT)            /* ld hl,(sp+N), N 0..255, HL only */
-        feat |= IR_FEAT_SP_REL_HL | IR_FEAT_SP_REL_WIDE;
-    if (IS_KC160())                    /* ld hl/de/bc,(sp+d), d signed byte */
-        feat |= IR_FEAT_SP_REL_HL | IR_FEAT_SP_REL_PAIRS;
-    if (IS_EZ80() || IS_KC160())       /* native word-wise ld hl,(ix+d) */
-        feat |= IR_FEAT_IX_WORD;
-    if ((c_cpu & CPU_RABBIT) || IS_GBZ80())   /* add sp,d (signed byte) */
-        feat |= IR_FEAT_ADD_SP_IMM;
-    if (IS_EZ80())                            /* lea ix+d; ld r,(hl) word */
-        feat |= IR_FEAT_LEA | IR_FEAT_LD_HL_IND;
-    if (IS_Z80N())                            /* Spectrum Next extra ALU ops */
-        feat |= IR_FEAT_ADD_PAIR_IMM | IR_FEAT_ADD_PAIR_A
-              | IR_FEAT_BARREL_SHIFT;
-    return feat;
-}
-
 /* Spare index register for a loop-invariant resident — the one opposite the
    frame pointer. c_framepointer_is_ix: 1=IX frame→spare IY, 0=IY frame→spare
    IX, -1=sp-mode→IX (both free, pick IX). 808x/gbz80 have no index regs →
@@ -122,10 +74,9 @@ int ir_lower_to_output(Func *f)
     if (getenv("IR_DUMP"))
         ir_dump_func(stderr, f);
     /* Buffer the lowering and only flush on success. A mid-function
-       lowering failure returns nonzero and the caller falls back to
-       the walker — without buffering, the partially emitted asm
-       stays in the output with dangling label references, followed
-       by a duplicate walker body. */
+       lowering failure returns nonzero (fatal in the caller); without
+       buffering, the partially emitted asm would land in the output
+       with dangling label references. */
     char *buf = NULL;
     size_t len = 0;
     FILE *mem = open_memstream(&buf, &len);

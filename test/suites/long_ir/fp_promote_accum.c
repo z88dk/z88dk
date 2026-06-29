@@ -22,6 +22,15 @@ static int ainc(void){ g_acc = mk(5); g_acc++; ++g_acc; --g_acc; return (int)g_a
 /* --- _Accum → double cross-tier (fix16tof) --- */
 static int a_to_d(_Accum a){ double d = a; return (int)d; }
 static int a_x_d(_Accum a){ double d = 5.0; return (int)(a * d); }
+
+/* A double LITERAL arg to an _Accum param scales to Q-format at compile time
+   (matching sccz80 — no runtime ftofix helper). Without it the wide double
+   was pushed and the narrow _Accum param misaligned: a==b then read garbage.
+   Tests both the alignment (a==b holds) and the scaled value (0.1*1000). */
+static int eps_arg(_Accum a, _Accum b, _Accum eps){
+    if (a != b) return 7;           /* alignment: a==b must hold */
+    return (int)(eps * 8);          /* 0.5*8 = 4 (0.5 is Q-exact) */
+}
 /* NOTE: double → _Accum (ftofix16) is lib-side pending — the helper gives a
    wrong runtime value; codegen is correct (same FA ABI as the working
    fix16tof). Re-add `_Accum a = double` cases once the lib helper is fixed. */
@@ -37,6 +46,7 @@ static void test_accum_int(void)
 static void test_accum_cross(void)
 {
     assertEqual(a_to_d(mk(4)), 4); assertEqual(a_x_d(mk(4)), 20);
+    assertEqual(eps_arg(mk(2), mk(2), 0.5), 4);
 }
 int main(void)
 {

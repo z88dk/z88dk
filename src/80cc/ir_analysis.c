@@ -17,6 +17,7 @@
 
 #include "ir_analysis.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -594,4 +595,279 @@ int ir_live_ranges_overlap(const Func *f, int a, int b)
     int s = ra->start > rb->start ? ra->start : rb->start;
     int e = ra->end   < rb->end   ? ra->end   : rb->end;
     return s <= e;
+}
+
+/* ----- Structural verifier -------------------------------------------- */
+
+static int ir_bb_id_valid(const Func *f, int id)
+{
+    for (int i = 0; i < f->n_bbs; i++)
+        if (f->bbs[i].id == id) return 1;
+    return 0;
+}
+
+/* Width-keyed arithmetic / shift / unary ops: a KC_FLOAT or KC_LONGLONG result
+   is a mis-sort — those need a fused IR_ACC_* / helper (dadd, l_i64_*). This is
+   the OP_NEG-width-8 / test_double bug family. (Float negate/abs are NOT here:
+   they're done as bitwise sign-bit tricks — see ir_op_bitwise.) */
+static int ir_op_arith_no_float_ll(OpKind k)
+{
+    switch (k) {
+    case IR_ADD: case IR_SUB: case IR_RSUB:
+    case IR_SHL: case IR_SHR:
+    case IR_NEG: case IR_NOT: case IR_INC: case IR_DEC:
+    case IR_ROTL: case IR_ROTR:
+    case IR_SHL_INTO_CARRY: case IR_SHR_INTO_CARRY:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* Bitwise ops are legitimately applied to FLOAT bits (negate via `^ sign`,
+   abs via `& ~sign`), so a float result is fine. A long long result, though,
+   must go through l_i64_and/or/xor via IR_ACC_*. */
+static int ir_op_bitwise(OpKind k)
+{
+    return k == IR_AND || k == IR_OR || k == IR_XOR;
+}
+
+int ir_verify_func(const Func *f, const char *stage)
+{
+    int n = 0;
+    if (!f) return 0;
+    if (!stage) stage = "?";
+
+#define VERR(...) do { \
+        fprintf(stderr, "ir_verify[%s]: ", stage); \
+        fprintf(stderr, __VA_ARGS__); \
+        fputc('\n', stderr); \
+        n++; \
+    } while (0)
+
+    int nv = f->n_vregs;
+
+    if (f->n_bbs < 1) VERR("function has no basic blocks");
+
+    /* VReg sanity. NB: PR_SPILL with slot == -1 is NOT an error — a
+       register-only or dead vreg (e.g. a compare result cached in HL,
+       never spilled) legitimately has no slot. The -1 'no slot' sentinel
+       only miscompiles if a slot LOAD reaches it (`ld hl,-1; add hl,sp`),
+       which is a use-site condition the lowerer must guard, not a static
+       vreg-property invariant. */
+    for (int v = 0; f->vregs && v < nv; v++) {
+        int w = (int)f->vregs[v].width;
+        Kind k = f->vregs[v].kind;
+        if (w <= 0)
+            VERR("vreg %d: non-positive width %d", v, w);
+        int ksw = kind_scalar_width(k);
+        if (ksw && w != ksw)
+            VERR("vreg %d: kind %d implies width %d but width is %d", v, (int)k, ksw, w);
+        else if ((k == KIND_DOUBLE || k == KIND_FLOAT)
+                 && !(w == 2 || w == 4 || w == 5 || w == 6 || w == 8))
+            VERR("vreg %d: float/double kind %d implausible width %d", v, (int)k, w);
+    }
+
+    /* Per-BB / per-op structure. */
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+
+        for (int s = 0; s < 2; s++)
+            if (bb->succ[s] != -1 && !ir_bb_id_valid(f, bb->succ[s]))
+                VERR("bb %d: succ[%d]=%d is not a valid BB id",
+                     bb->id, s, bb->succ[s]);
+        for (int p = 0; bb->pred && p < bb->n_pred; p++)
+            if (!ir_bb_id_valid(f, bb->pred[p]))
+                VERR("bb %d: pred[%d]=%d is not a valid BB id",
+                     bb->id, p, bb->pred[p]);
+
+        for (int k = 0; k < bb->n_ops; k++) {
+            const Op *op = &bb->ops[k];
+
+            if (op->dst != -1 && (op->dst < 0 || op->dst >= nv))
+                VERR("bb %d op %d (kind %d): dst vreg %d out of range [0,%d)",
+                     bb->id, k, (int)op->kind, op->dst, nv);
+            for (int s = 0; s < 2; s++)
+                if (op->src[s] != -1 && (op->src[s] < 0 || op->src[s] >= nv))
+                    VERR("bb %d op %d (kind %d): src[%d] vreg %d out of range [0,%d)",
+                         bb->id, k, (int)op->kind, s, op->src[s], nv);
+
+            /* Mis-sort tripwire: a helper-dispatched (float / long long) result
+               must never reach a width-keyed generic op — it belongs in a fused
+               IR_ACC_*. Bitwise ops may carry a float (sign-bit tricks). */
+            if (op->dst >= 0 && op->dst < nv) {
+                KindClass kc = kind_class(f->vregs[op->dst].kind);
+                if (ir_op_arith_no_float_ll(op->kind)
+                    && (kc == KC_FLOAT || kc == KC_LONGLONG))
+                    VERR("bb %d op %d (kind %d): generic arith with %s result "
+                         "(kind %d) — should be a fused IR_ACC_* / helper",
+                         bb->id, k, (int)op->kind,
+                         kc == KC_FLOAT ? "float" : "long long",
+                         (int)f->vregs[op->dst].kind);
+                else if (ir_op_bitwise(op->kind) && kc == KC_LONGLONG)
+                    VERR("bb %d op %d (kind %d): generic bitwise with long long "
+                         "result (kind %d) — should be l_i64_* via IR_ACC_*",
+                         bb->id, k, (int)op->kind, (int)f->vregs[op->dst].kind);
+            }
+
+            switch (op->kind) {
+            case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+                if (!ir_bb_id_valid(f, op->label))
+                    VERR("bb %d op %d: branch target %d is not a valid BB id",
+                         bb->id, k, op->label);
+                break;
+            case IR_SWITCH:
+                if (!op->sw) {
+                    VERR("bb %d op %d: IR_SWITCH has NULL SwitchInfo", bb->id, k);
+                    break;
+                }
+                if (!ir_bb_id_valid(f, op->sw->default_bb))
+                    VERR("bb %d op %d: switch default target %d invalid",
+                         bb->id, k, op->sw->default_bb);
+                for (int c = 0; op->sw->target_bb && c < op->sw->n_cases; c++)
+                    if (!ir_bb_id_valid(f, op->sw->target_bb[c]))
+                        VERR("bb %d op %d: switch case %d target %d invalid",
+                             bb->id, k, c, op->sw->target_bb[c]);
+                break;
+            case IR_CALL:
+                if (!op->call)
+                    VERR("bb %d op %d: IR_CALL has NULL CallInfo", bb->id, k);
+                break;
+            case IR_HCALL:
+                if (!op->hcall)
+                    VERR("bb %d op %d: IR_HCALL has NULL HelperInfo", bb->id, k);
+                break;
+            case IR_ASM:
+                if (!op->asm_text)
+                    VERR("bb %d op %d: IR_ASM has NULL asm_text", bb->id, k);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+#undef VERR
+    return n;
+}
+
+/* Visit a pointer to every vreg-id field in `op` (dst, both srcs, an
+   IR_MEM_VREG base, an IR_MEM_PORT port vreg, and the CALL/HCALL ret / fnptr /
+   arg ids). The SINGLE source of truth for "where the vreg ids live in an op":
+   both the dead-vreg scan and the compaction rewrite drive off it, so a missed
+   field can't make them disagree. -1 fields are visited too (callback skips). */
+static void ir_op_for_each_vreg_slot(Op *op, void (*fn)(int *, void *), void *ud)
+{
+    fn(&op->dst, ud);
+    fn(&op->src[0], ud);
+    fn(&op->src[1], ud);
+    if (op->mem.kind == IR_MEM_VREG)
+        fn(&op->mem.base, ud);
+    if (op->mem.kind == IR_MEM_PORT && op->mem.port)
+        fn(&op->mem.port->port_vreg, ud);
+    if (op->call) {
+        fn(&op->call->ret_vreg, ud);
+        fn(&op->call->fnptr_vreg, ud);
+        for (int i = 0; i < op->call->n_args; i++)
+            fn(&op->call->args[i], ud);
+    }
+    if (op->hcall) {
+        fn(&op->hcall->ret_vreg, ud);
+        for (int i = 0; i < op->hcall->n_args; i++)
+            fn(&op->hcall->args[i], ud);
+    }
+}
+
+static void slot_mark(int *slot, void *ud)
+{
+    char *ref = ud;
+    if (*slot >= 0) ref[*slot] = 1;
+}
+
+/* Mark every vreg that appears in any op slot; ABI roots (PARAM/RETURN) and
+   address-taken / volatile vregs are always kept. Caller owns `ref` sized
+   f->n_vregs. */
+static void mark_referenced_vregs(const Func *f, char *ref)
+{
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int o = 0; o < f->bbs[b].n_ops; o++)
+            ir_op_for_each_vreg_slot(&f->bbs[b].ops[o], slot_mark, ref);
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_RETURN
+                                 | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+            ref[v] = 1;
+}
+
+/* Report vregs that appear in NO op slot and are not roots — pure allocation
+   cruft (ir_build minted a temp and abandoned it, e.g. the return-value temp
+   of a discarded/void-context call). Harmless to codegen (never emitted).
+   Read-only; returns the count, printing each when `verbose`. */
+int ir_report_dead_vregs(const Func *f, const char *stage, int verbose)
+{
+    if (!f || f->n_vregs <= 0) return 0;
+    if (!stage) stage = "?";
+
+    char *ref = calloc((size_t)f->n_vregs, 1);
+    if (!ref) return 0;
+    mark_referenced_vregs(f, ref);
+
+    int dead = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (ref[v]) continue;
+        if (verbose)
+            fprintf(stderr,
+                    "ir_dead[%s]: vreg %d unreferenced (kind %d width %d flags %#x)\n",
+                    stage, v, (int)f->vregs[v].kind,
+                    (int)f->vregs[v].width, f->vregs[v].flags);
+        dead++;
+    }
+    free(ref);
+    return dead;
+}
+
+struct remap_ud { const int *remap; };
+static void slot_remap(int *slot, void *ud)
+{
+    const int *remap = ((struct remap_ud *)ud)->remap;
+    if (*slot >= 0) *slot = remap[*slot];
+}
+
+/* Remove orphan vregs (in no op slot, not a root) and renumber the survivors,
+   preserving their relative order. Rewrites every op slot through the remap so
+   no reference dangles. Returns the count removed. Run BEFORE liveness/alloc,
+   so the id-indexed allocation tables (vreg_to_phys / vreg_spill_slot) and
+   word_home_vreg don't yet exist to update. Order-preserving so a linear-scan
+   allocator keyed on live-range start (not raw id) is unaffected. */
+int ir_compact_vregs(Func *f)
+{
+    if (!f || f->n_vregs <= 0) return 0;
+
+    char *ref = calloc((size_t)f->n_vregs, 1);
+    int  *remap = malloc((size_t)f->n_vregs * sizeof(int));
+    if (!ref || !remap) { free(ref); free(remap); return 0; }
+    mark_referenced_vregs(f, ref);
+
+    int nn = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (ref[v]) {
+            remap[v] = nn;
+            if (nn != v) f->vregs[nn] = f->vregs[v];
+            f->vregs[nn].id = nn;
+            nn++;
+        } else {
+            remap[v] = -1;   /* orphan — must never appear in a slot */
+        }
+    }
+    int removed = f->n_vregs - nn;
+    f->n_vregs = nn;
+
+    if (removed) {
+        struct remap_ud ud = { remap };
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int o = 0; o < f->bbs[b].n_ops; o++)
+                ir_op_for_each_vreg_slot(&f->bbs[b].ops[o], slot_remap, &ud);
+    }
+    free(ref);
+    free(remap);
+    return removed;
 }

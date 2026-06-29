@@ -28,4 +28,10 @@ int ir_lower_func(FILE *out, Func *f);
    sized to its width, packed back-to-back from sp+0 upward. */
 void ir_assign_slots(Func *f);
 
+/* True on targets WITHOUT cheap sp-relative addressing (z80/z180/ez80/808x/
+   z80n), where the sp+0 pop/push slot trick beats the ld hl,N;add hl,sp walk.
+   False on Rabbit/gbz80/kc160 (native sp-rel access + dearer push/pop).
+   Exposed so ir_slots' sp0 fastpath shares one definition. */
+int tos_pushpop_ok(const Func *f);
+
 #endif /* IR_LOWER_H */

@@ -363,6 +363,34 @@ char *schr_c (char *s)          { return strchr(s, 'l');  } /* literal char */
 char *schr_v (char *s, int c)   { return strchr(s, c);    } /* variable char */
 char *schr_nul(char *s)         { return strchr(s, 0);    } /* find the NUL  */
 
+/* Struct/union passed BY VALUE where the callee expects a pointer/scalar:
+   z88dk decays the aggregate lvalue to its address (by-reference ABI, as
+   sccz80 does). Regression for the zx tshc_py2aaddr shape
+   `memcmp(struct,struct,n)` — the IR builder used to bail the whole call. */
+typedef struct { unsigned char a, b, c, d; } sbv_t;
+static sbv_t sbv_g = { 1, 2, 3, 4 };
+
+static int sbv_sum(void *p, int n)
+{
+    unsigned char *q = p;
+    int s = 0;
+    while (n--) s += *q++;
+    return s;
+}
+
+static void test_struct_byval_arg(void)
+{
+    sbv_t loc = { 10, 20, 30, 40 };
+    /* global struct lvalue → &sbv_g (IR_LD_SYM) */
+    Assert(sbv_sum(sbv_g, 4) == 10, "struct byval arg: global decays to addr");
+    /* local struct lvalue → &loc (IR_LEA) */
+    Assert(sbv_sum(loc, 4) == 100, "struct byval arg: local decays to addr");
+    /* the reported shape: memcmp of two struct lvalues */
+    Assert(memcmp(sbv_g, sbv_g, 4) == 0, "struct byval arg: memcmp equal");
+    loc.c = 99;
+    Assert(memcmp(sbv_g, loc, 4) != 0, "struct byval arg: memcmp differ");
+}
+
 static void test_meminline(void)
 {
     int i;
@@ -1892,6 +1920,7 @@ int suite_long_ir(void)
     suite_add_test(test_casts);
     suite_add_test(test_ff_one);
     suite_add_test(test_big_bb);
+    suite_add_test(test_struct_byval_arg);
     suite_add_test(test_meminline);
     suite_add_test(test_strinline);
     suite_add_test(test_cse_array);

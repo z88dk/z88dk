@@ -26,12 +26,11 @@
 
 /* Global FRAMEPTR opt-in: -1 disabled, 1 IX, 0 IY. Owned by the
    compiler (data.c) but consulted directly here so the lowerer stays
-   decoupled from ccdefs.h. Mirrors the walker's check. */
+   decoupled from ccdefs.h. */
 extern int c_framepointer_is_ix;
 
-/* Per-TU string-literal queue label number. Walker emits string
-   literal addresses as `ld hl,i_<litlab>+<offset>`; we mirror that
-   for IR_LD_STR. */
+/* Per-TU string-literal queue label number. String literal addresses
+   emit as `ld hl,i_<litlab>+<offset>` (IR_LD_STR). */
 extern int litlab;
 
 /* Debug-info flags. -cc emits a `; "file":line: source` comment + a
@@ -44,11 +43,10 @@ extern int litlab;
 extern int c_intermix_ccode;
 extern int c_cline_directive;
 
-/* Walker helpers we reuse so the C_LINE / comment format matches
-   walker output exactly. gen_emit_line consults globals (Filename /
-   currfn); gen_comment consults lineno. Both are walker-time
-   cursors — by lowerer time they sit at EOF, so we save/restore
-   around the emit. */
+/* Emit helpers reused for the C_LINE / comment format. gen_emit_line
+   consults globals (Filename / currfn); gen_comment consults lineno.
+   Both are emit-time cursors — by lowerer time they sit at EOF, so we
+   save/restore around the emit. */
 extern void  gen_emit_line(int line);
 extern void  gen_comment(const char *message);
 extern const char *get_source_line(const char *filename, int n);
@@ -90,14 +88,49 @@ static void emit_op_cline(FILE *out, const Op *op)
 
 /* ----- Tiny emit helpers ------------------------------------------------ */
 
+/* Clobber mask for emit_c(): declares which register caches an emitted
+   instruction destroys, so the invalidation happens at the emit site and
+   can't be forgotten. Each bit maps faithfully to the matching legacy
+   invalidate_* routine (apply_clobbers below), so a faithful migration of a
+   `emit(); invalidate_X();` pair is byte-identical when no HL spill is
+   pending. Bits compose: CLOB_HL|CLOB_BC == the old invalidate_hl_bc(). */
+typedef enum {
+    CLOB_NONE = 0,
+    CLOB_HL   = 1,   /* invalidate_hl_cache(): HL+DE+DEHL+A+FA, flushes pending HL spill */
+    CLOB_BC   = 2,   /* invalidate_bc_cache() */
+    CLOB_A    = 4,   /* invalidate_a_cache() */
+    CLOB_DE   = 8,   /* invalidate_de_cache(): DE+DEHL */
+} Clobber;
+
+static void apply_clobbers(Clobber c);
+
+static void vemit(FILE *out, const char *fmt, va_list ap)
+{
+    fputc('\t', out);
+    vfprintf(out, fmt, ap);
+    fputc('\n', out);
+}
+
 static void emit(FILE *out, const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    fputc('\t', out);
-    vfprintf(out, fmt, ap);
+    vemit(out, fmt, ap);
     va_end(ap);
-    fputc('\n', out);
+}
+
+/* Emit a clobbering instruction: apply the declared register-cache clobbers
+   FIRST (so CLOB_HL's hl_about_to_change flush stores the pending value while
+   HL still holds it — i.e. before the instruction destroys it), then the
+   instruction text. The apply-before order is what makes the lazy-spill flush
+   correct-by-construction at every HL-clobbering emit site. */
+static void emit_c(FILE *out, Clobber c, const char *fmt, ...)
+{
+    apply_clobbers(c);
+    va_list ap;
+    va_start(ap, fmt);
+    vemit(out, fmt, ap);
+    va_end(ap);
 }
 
 /* Monotonic counter, bumped on every ir_lower_func() entry. Used to
@@ -117,9 +150,21 @@ static int fc_ret_label_counter;   /* unique labels for ret-based fnptr-fastcall
 
 /* HL value cache. Reset at each BB boundary and at any op that
    clobbers HL the cache can't reason about (calls, branches, shifts
-   that loop on HL). When the next op reads cur_hl_vreg as src[0] we
+   that loop on HL). When the next op reads rs.hl as src[0] we
    skip the load and use load_to_de_preserve_hl for src[1]. */
-static int cur_hl_vreg;
+/* Register residency cache: which vreg currently lives in each physical
+   register / wide accumulator (-1 = none). Grouped into one struct so the
+   set is greppable, snapshot/restorable, and (next step) invalidated
+   through a single clobber-aware chokepoint. Per-field semantics are
+   documented at the comment blocks below that introduce each field. */
+static struct RegState {
+    int hl;     /* HL value cache (this comment block) */
+    int de;     /* DE value cache */
+    int dehl;   /* long vreg split across DE(high)/BC(low) */
+    int bc;     /* BC value cache */
+    int a;      /* byte vreg in A */
+    int fa;     /* vreg in the wide accumulator (FA / __i64_acc) */
+} rs = { .fa = -1 };
 
 /* HL slot-ADDRESS cache (distinct from the value cache above): the slot
    OFFSET whose address (sp+off) sits in HL, or -1. Set by the sp-mode byte
@@ -127,7 +172,7 @@ static int cur_hl_vreg;
    the same slot reuses HL.
    Keyed on offset not vreg, so a coalesced read/write of one C var (crc<<1 =
    SHL v2<-v1) hits. spadj pins cur_sp_adjust (sp moved → miss). Cleared on
-   every HL clobber; a cached address implies cur_hl_vreg==-1, so value and
+   every HL clobber; a cached address implies rs.hl==-1, so value and
    address caches are never both live. */
 static int cur_hl_addr_off = -1;   /* slot byte-offset in HL, or -1 = none */
 static int cur_hl_addr_spadj;
@@ -138,14 +183,13 @@ static int cur_hl_addr_spadj;
    (so any call / HL-clobbering op drops it). Lets lower_ret skip the
    store+reload round-trip that would otherwise corrupt the math48 FA
    (alt-register set) — and is the wide analog of the HL/DEHL cache. */
-static int cur_fa_vreg = -1;
 
 /* Lazy spill (store-on-clobber). Behind the
    IR_LAZY_SPILL env gate; the deferral itself is wired in a later step,
    so while `pending_spill_v < 0` (always, until then) every hook below
    is a no-op and codegen is byte-identical regardless of the flag.
    `pending_spill_v` is the width-2 vreg whose slot store has been
-   deferred (it rides in HL, I1: pending_spill_v >= 0 ⇒ cur_hl_vreg ==
+   deferred (it rides in HL, I1: pending_spill_v >= 0 ⇒ rs.hl ==
    pending_spill_v); -1 = nothing pending. `cur_lazy_out`/`cur_lazy_func`
    /`cur_op_idx` give the choke-point flush the emit stream + the
    per-op liveness context (ir_op_live_in) it needs. */
@@ -159,21 +203,19 @@ static int          cur_op_idx;
    emits that preserve DE (load_to_hl, add/sbc hl,de, byte ops),
    invalidated where DE is written (load_to_dehl, ex de,hl, pop de,
    calls). */
-static int cur_de_vreg;
 
 /* Long-DEHL cache. Tracks which long vreg has its halves split across
    DE (high) and BC (low) — the layout load_to_dehl / store_dehl leave
    behind. Holds while DE *and* BC are preserved. On hit,
    load_to_dehl_adj emits just `ld l,c; ld h,b` instead of the full
    slot load. */
-static int cur_dehl_vreg;
 
 /* Framepointer mode predicates.
 
    `fp_active(f)` returns 1 iff the function should use IX/IY as a
    frame pointer. Gated globally by -frameix / -frameiy (which set
    `c_framepointer_is_ix` to 1 / 0 respectively; -1 means off) and
-   per-function by __naked. Mirrors the walker's gate.
+   per-function by __naked.
 
    `fp_offset_fits(off)` returns 1 iff `off` is in the signed 8-bit
    range that `(ix±d)` addressing supports.
@@ -280,10 +322,10 @@ static int param_caller_off(const Func *f, int vreg_id)
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
                        between the locals and the return address. Rabbit's
-                       ipset 3 (IR_FEAT_CRIT_IP) uses no data stack → 0. */
+                       ipset 3 (Rabbit __critical) uses no data stack → 0. */
                     + (f->is_interrupt ? 12
                        : ((f->flags & CRITICAL)
-                          && !(f->features & IR_FEAT_CRIT_IP) ? 2 : 0));
+                          && !(IS_RABBIT()) ? 2 : 0));
     /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
        / __z88dk_sdccdecl R→L (param0 lowest — just above the return addr).
        Must match emit_prologue. */
@@ -319,6 +361,22 @@ static int slot_off(const Func *f, int vreg_id)
     if (f->vregs[vreg_id].flags & IR_VREG_PARAM_IN_PLACE)
         return param_caller_off(f, vreg_id);
     return f->vreg_spill_slot[vreg_id];
+}
+
+/* A vreg read/written through its frame slot MUST have one. A negative
+   slot_off means a register-only vreg (PR_HL/DE/BC/DEHL) reached a slot
+   access with its register already clobbered and no backing slot to
+   reload from — an allocator/lowering bug. `ld hl,-1; add hl,sp` would
+   read below the frame and silently miscompile, so fail loudly instead. */
+static void require_slot(const Func *f, int vreg_id)
+{
+    if (slot_off(f, vreg_id) >= 0) return;
+    fprintf(stderr, "ir_lower: v%d (phys %d, width %d) accessed via a frame "
+            "slot it has none — register-only value lost across a clobber. "
+            "Codegen bug; aborting rather than emit a below-frame access.\n",
+            vreg_id, f->vreg_to_phys ? f->vreg_to_phys[vreg_id] : -1,
+            f->vregs[vreg_id].width);
+    exit(1);
 }
 
 /* IX-relative offset for a vreg's slot, valid when fp_active(f).
@@ -364,6 +422,8 @@ static void cache_bc(int v);
 static void cache_dehl(int v);
 static void invalidate_hl_cache(void);
 static void invalidate_de_cache(void);
+static void invalidate_hl_keep_de(void);
+static void invalidate_hl_keep_a(void);
 static int  vreg_in_idx2(const Func *f, int v);
 static const char *idx2_reg_name(const Func *f);
 static void cache_hl_slot_addr(const Func *f, int v);
@@ -372,7 +432,7 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v);
 /* The single choke point through which HL's logical tenant changes.
    `hl_about_to_change(v_new)` is called immediately before HL is loaded
    or clobbered: v_new is the vreg that will newly occupy HL, or -1 when
-   HL becomes junk. Every clobber/load write of cur_hl_vreg routes
+   HL becomes junk. Every clobber/load write of rs.hl routes
    through here so the lazy-spill machinery (later stage) has exactly one
    place to flush a pending slot store before the value leaves HL. In
    this stage the body is a pure setter — no emit — so codegen is
@@ -428,7 +488,7 @@ static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
     if (fp_active(f)) {
         int ixoff = slot_ix_off(f, vreg);
         /* ez80: lea hl,ix+d in one op, no DE clobber, vs push/pop + add. */
-        if ((f->features & IR_FEAT_LEA) && ixoff >= -128 && ixoff <= 127) {
+        if ((IS_EZ80()) && ixoff >= -128 && ixoff <= 127) {
             emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
             return;
         }
@@ -547,7 +607,7 @@ static int cur_dehl_push_to_stack;       /* one-shot flag: set by lookahead */
 
 /* Load a PR_BC vreg's slot value into BC. Used both by the prologue
    (function entry) and by on-demand reload sites — when a PR_BC vreg
-   is read but `cur_bc_vreg` holds a different occupant, the reader
+   is read but `rs.bc` holds a different occupant, the reader
    fires this to swap BC's contents. Caller is responsible for calling
    `cache_bc(vreg_id)` after; we don't do it here because the prologue
    wants the cache set, the on-demand path wants it set before the
@@ -564,16 +624,17 @@ static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
             return;
         }
     }
+    require_slot(f, vreg_id);
     int off = slot_off(f, vreg_id) + cur_sp_adjust + sp_adj;
     /* kc160 native ld bc,(sp+d): BC=value, HL untouched (no invalidate). */
-    if ((f->features & IR_FEAT_SP_REL_PAIRS) && off >= 0 && off <= sp_rel_max(f)) {
+    if (IS_KC160() && off >= 0 && off <= sp_rel_max(f)) {
         emit(out, "ld\tbc,(sp+%d)", off);
         cache_bc(vreg_id);
         return;
     }
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    if (f->features & IR_FEAT_LD_HL_IND) {
+    if (IS_EZ80()) {
         emit(out, "ld\tbc,(hl)");   /* ez80: BC = *HL (HL preserved) */
     } else {
         emit(out, "ld\tc,(hl)");
@@ -612,8 +673,9 @@ static int vreg_kind_is_integer(const Func *f, int vreg_id)
    unsigned byte (0..255); kc160's d is a signed byte (0..127). */
 static int sp_rel_max(const Func *f)
 {
-    if (!(f->features & IR_FEAT_SP_REL_HL)) return -1;
-    return (f->features & IR_FEAT_SP_REL_WIDE) ? 255 : 127;
+    (void)f;
+    if (!(IS_RABBIT() || IS_KC160())) return -1;
+    return (IS_RABBIT()) ? 255 : 127;
 }
 
 /* Number of `add sp,d` ops (each d in [-128,127]) to move sp by delta. */
@@ -641,7 +703,8 @@ static void emit_add_sp_chain(FILE *out, int delta)
    also preserves all registers, so the caller can drop the preservation. */
 static int use_add_sp(const Func *f, int delta, int hl_extra)
 {
-    return (f->features & IR_FEAT_ADD_SP_IMM)
+    (void)f;
+    return (IS_RABBIT() || IS_GBZ80())
         && delta != 0
         && sp_add_chunks(delta) * 2 <= 5 + hl_extra;
 }
@@ -655,23 +718,24 @@ static int use_add_sp(const Func *f, int delta, int hl_extra)
    sp-relative addressing). CPUs that DO have it — gbz80 (`ld hl,sp+d`),
    rabbit/kc160 (`ld hl,(sp+N)`) — also have dearer push/pop, so the trick
    regresses speed there; keep them on their native byte-walk. */
-static int tos_pushpop_ok(const Func *f)
+int tos_pushpop_ok(const Func *f)
 {
-    return !(f->features & (IR_FEAT_ADD_SP_IMM
-                          | IR_FEAT_SP_REL_HL
-                          | IR_FEAT_SP_REL_PAIRS));
+    (void)f;
+    return !(IS_RABBIT() || IS_GBZ80() || IS_KC160());
 }
 
 /* True when even in fp-mode the pop/push trick beats the IX access for
    the DEEPEST local (slot_off==0). With cur_sp_adjust==0, SP == body base
    == ix-frame_size == that slot's address, so `pop hl;push hl` reads it.
-   On z80/z180/z80n `ld hl,(ix+d)` is synthetic (two ld r,(ix+d) = 6B/38t)
-   so pop/push (2B/21t) wins; ez80/kc160 have a native indexed word load
-   (IR_FEAT_IX_WORD) that's cheaper, so leave them on the IX path. */
+   On z80/z180/z80n `ld rr,(ix+d)` is synthetic (two ld r,(ix+d) = 6B/38t)
+   so pop/push (2B/21t) wins; ez80/kc160 have native indexed word loads into
+   any pair (incl. ld de/bc,(ix+d)) that are cheaper, so leave them on the IX
+   path. (Rabbit has only `ld hl,(ix+d)` — de/bc stay synthetic — so it does
+   NOT qualify; tos_pushpop_ok already excludes it regardless.) */
 static int fp_tos_slot(const Func *f, int vreg_id)
 {
     return fp_active(f) && tos_pushpop_ok(f)
-        && !(f->features & IR_FEAT_IX_WORD)
+        && !(IS_EZ80() || IS_KC160())
         && cur_sp_adjust == 0
         && slot_off(f, vreg_id) == 0;
 }
@@ -695,10 +759,8 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        (e.g. IR_ST_MEM's MEM_VREG path for width-2 stores) call us
        unconditionally — and for PR_HL vregs (cacheable, no slot
        allocated), the slot read at the bottom would land at sp-1
-       (slot_off returns -1) and silently read garbage. Without this
-       check, `*p = x + 1` miscompiled: the IR_ADD's PR_HL result
-       was overwritten by `ld hl,-1; add hl,sp; <byte load>` reading
-       below the stack frame. */
+       (slot_off returns -1) and read garbage below the frame, so
+       return early when the value is already cached in HL. */
     if (hl_has(vreg_id) && sp_adj == 0) { ss_note_cache_read(f, vreg_id); return; }
     /* Every path below clobbers HL (with vreg_id, or with a slot
        address). If a width-2 spill is pending in HL, flush/discard it
@@ -760,6 +822,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     /* Past every register-cache hit: a real slot read follows on every
        remaining path → record it for the dead-store analysis. */
     ss_note_reload(f, vreg_id);
+    require_slot(f, vreg_id);
     int off = slot_off(f, vreg_id) + sp_adj + cur_sp_adjust;
     /* FP-relative fast path. IX captures sp at function entry, so its
        offset to any slot is invariant under push/pop activity — sp_adj
@@ -835,7 +898,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        A-clobber — a strict win even with the push/pop. The balanced
        push/pop runs with nothing between, so cur_sp_adjust is untouched;
        just shift the slot offset +2 for the in-flight push. */
-    if ((f->features & IR_FEAT_SP_REL_DEPTR) && off >= 0 && off + 2 <= 255) {
+    if ((IS_8085()) && off >= 0 && off + 2 <= 255) {
         emit(out, "push\tde");
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\thl,(de)");
@@ -862,11 +925,11 @@ static void load_to_hl(FILE *out, const Func *f, int vreg_id)
 /* Load 16-bit value into DE (used for binop second operand).
    Cache-aware: if DE already holds the wanted vreg, no-op. Else if
    HL holds it, `ex de,hl` is a single-instruction shortcut. Else
-   load via HL then ex de,hl. After: cur_de_vreg = vreg_id; HL
+   load via HL then ex de,hl. After: rs.de = vreg_id; HL
    holds whatever DE was (junk to the caller). */
 static void load_to_de(FILE *out, const Func *f, int vreg_id)
 {
-    if (cur_de_vreg == vreg_id && vreg_id >= 0) {
+    if (rs.de == vreg_id && vreg_id >= 0) {
         ss_note_cache_read(f, vreg_id);
         return;
     }
@@ -927,11 +990,11 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
-    if (cur_hl_vreg == vreg_id && vreg_id >= 0) {
+    if (rs.hl == vreg_id && vreg_id >= 0) {
         /* Served from HL (no slot read) — record the cache hit. */
         ss_note_cache_read(f, vreg_id);
         /* The wanted value is in HL. If it is the pending spill (I1:
-           pending_spill_v == cur_hl_vreg == vreg_id), flushing it writes
+           pending_spill_v == rs.hl == vreg_id), flushing it writes
            the slot AND leaves it in DE (store_hl's internal `ex de,hl`)
            — the swap's exact result — so resolve instead of swapping.
            Dormant until the deferral step. */
@@ -942,7 +1005,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         }
         emit(out, "ex\tde,hl");
         /* HL ↔ DE swap: caches swap too. cur_hl now has what DE held
-           (the old cur_de_vreg or -1); cur_de gets what HL held. */
+           (the old rs.de or -1); cur_de gets what HL held. */
         swap_hl_de_caches();
         return;
     }
@@ -955,7 +1018,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         int off = slot_off(f, vreg_id) + cur_sp_adjust;
         /* kc160 native ld de,(sp+d): DE=value, HL untouched — better
            than the byte walk, and leaves a pending HL spill intact. */
-        if ((f->features & IR_FEAT_SP_REL_PAIRS)
+        if (IS_KC160()
             && off >= 0 && off <= sp_rel_max(f)) {
             ss_note_reload(f, vreg_id);
             emit(out, "ld\tde,(sp+%d)", off);
@@ -964,7 +1027,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         }
         /* Rabbit HL-only: ld hl,(sp+N); ex de,hl. Clobbers HL (same as
            the byte walk), so flush a pending spill first. */
-        if ((f->features & IR_FEAT_SP_REL_HL)
+        if ((IS_RABBIT() || IS_KC160())
             && off >= 0 && off <= sp_rel_max(f)) {
             pending_spill_resolve();
             ss_note_reload(f, vreg_id);
@@ -987,7 +1050,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         /* 8085: LDSI + LHLX. `ld de,sp+N` points DE at the slot, LHLX
            loads the word into HL, ex de,hl lands it in DE. 4 bytes vs
            the 7-byte byte walk; like it, clobbers HL. */
-        if ((f->features & IR_FEAT_SP_REL_DEPTR) && off >= 0 && off <= 255) {
+        if ((IS_8085()) && off >= 0 && off <= 255) {
             pending_spill_resolve();
             ss_note_reload(f, vreg_id);
             emit(out, "ld\tde,sp+%d", off);
@@ -1004,7 +1067,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         ss_note_reload(f, vreg_id);
         emit(out, "ld\thl,%d", off);
         emit(out, "add\thl,sp");
-        if (f->features & IR_FEAT_LD_HL_IND) {
+        if (IS_EZ80()) {
             emit(out, "ld\tde,(hl)");   /* ez80: DE = *HL (HL preserved) */
         } else {
             emit(out, "ld\te,(hl)");
@@ -1026,7 +1089,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
    keep a cached value in HL across the load. */
 static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
 {
-    if (cur_de_vreg == vreg_id && vreg_id >= 0) return;
+    if (rs.de == vreg_id && vreg_id >= 0) return;
     /* PR_BC hit: BC→DE doesn't touch HL, so the push/pop is pointless. */
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
         emit(out, "ld\te,c");
@@ -1049,7 +1112,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
         }
     }
     /* kc160 native ld de,(sp+d) preserves HL on its own — no push/pop. */
-    if ((f->features & IR_FEAT_SP_REL_PAIRS) && f->vregs[vreg_id].width == 2) {
+    if (IS_KC160() && f->vregs[vreg_id].width == 2) {
         int off = slot_off(f, vreg_id) + cur_sp_adjust;
         if (off >= 0 && off <= sp_rel_max(f)) {
             ss_note_reload(f, vreg_id);
@@ -1060,7 +1123,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     }
     /* Rabbit: park HL in DE across the load — ex de,hl; ld hl,(sp+d);
        ex de,hl. DE ends with the value, HL restored, no stack touch. */
-    if ((f->features & IR_FEAT_SP_REL_HL) && f->vregs[vreg_id].width == 2) {
+    if ((IS_RABBIT() || IS_KC160()) && f->vregs[vreg_id].width == 2) {
         int off = slot_off(f, vreg_id) + cur_sp_adjust;
         if (off >= 0 && off <= sp_rel_max(f)) {
             ss_note_reload(f, vreg_id);
@@ -1127,7 +1190,7 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
        restores the store_hl contract (DE=value, HL=junk). 4 bytes vs
        the 6-byte byte walk. Clobbering DE is consistent — the byte
        walk's leading `ex de,hl` destroys the prior DE too. */
-    if ((f->features & IR_FEAT_SP_REL_DEPTR) && off >= 0 && off <= 255) {
+    if ((IS_8085()) && off >= 0 && off <= 255) {
         emit(out, "ld\tde,sp+%d", off);
         emit(out, "ld\t(de),hl");
         emit(out, "ex\tde,hl");
@@ -1228,7 +1291,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
         }
     }
     /* Address cache live ⇒ no pending spill (a cached address implies
-       cur_hl_vreg==-1), and inc/dec hl / ld+add all preserve A — so store
+       rs.hl==-1), and inc/dec hl / ld+add all preserve A — so store
        A directly via emit_byte_slot_addr (exact/near/recompute), no E-stash. */
     if (cur_hl_addr_off >= 0 && cur_hl_addr_spadj == cur_sp_adjust) {
         emit_byte_slot_addr(out, f, vreg_id);
@@ -1422,7 +1485,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        the sp-rel slot walk) all clobber HL. Flush a pending width-2
        spill first (dormant for now). The
        no-emit returns are safe: the no_hl cache-hit means the caller
-       overwrites HL itself, and the cur_hl_vreg==vreg_id hit can't
+       overwrites HL itself, and the rs.hl==vreg_id hit can't
        coincide with a width-2 pending (different widths). */
     pending_spill_resolve();
     if (dehl_has(vreg_id)) {
@@ -1430,10 +1493,10 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
            HL with 2 instructions (~12 T-states) vs ~120 for a full
            slot read. sp_adj is irrelevant — data is in registers.
            Skip the recovery when no_hl flag is set (caller is about
-           to overwrite HL) OR when cur_hl_vreg == vreg_id (HL already
+           to overwrite HL) OR when rs.hl == vreg_id (HL already
            holds the low half from a previous cache_dehl_no_spill that
            preserved HL). */
-        if (!no_hl && cur_hl_vreg != vreg_id) {
+        if (!no_hl && rs.hl != vreg_id) {
             emit(out, "ld\thl,bc");
         }
         if (!no_hl) hl_about_to_change(vreg_id);
@@ -1468,7 +1531,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             emit(out, "ld\thl,(%s%+d)", frame_reg(), ix_off);
             emit(out, "ld\tde,(%s%+d)", frame_reg(), ix_off + 2);
             /* BC is untouched — set it to HL (low) so the DEHL cache
-               invariant (BC = low half when cur_dehl_vreg is set) holds.
+               invariant (BC = low half when rs.dehl is set) holds.
                Then publish the cache: subsequent load_to_dehl(v) hits
                and emits `ld hl,bc` with correct BC. Skip the stash
                when the caller signals it won't read BC — typically a
@@ -1486,6 +1549,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         }
     }
     ss_note_reload(f, vreg_id);       /* defensive: width-2 never here */
+    require_slot(f, vreg_id);
     int off = slot_off(f, vreg_id) + sp_adj + cur_sp_adjust;
     /* Top-of-stack long load: a slot at sp+0 is read whole with
        `pop hl; pop de` (HL=low half, DE=high half) and the two pushes
@@ -1509,7 +1573,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        =low half (BC keeps the dehl-cache invariant). Both halves in
        range (off+2). */
     if (off >= 0 && off + 2 <= sp_rel_max(f)) {
-        if (f->features & IR_FEAT_SP_REL_PAIRS) {
+        if (IS_KC160()) {
             emit(out, "ld\tde,(sp+%d)", off + 2);
         } else {
             emit(out, "ld\thl,(sp+%d)", off + 2);
@@ -1517,7 +1581,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         }
         emit(out, "ld\thl,(sp+%d)", off);
         emit(out, "ld\tbc,hl");
-        /* HL now holds the low half — advertise it so cur_hl_vreg is
+        /* HL now holds the low half — advertise it so rs.hl is
            honest (else a stale prior tenant leaks into bb_hl_out and a
            merge carry trusts HL holding the wrong vreg). */
         hl_about_to_change(vreg_id);
@@ -1536,10 +1600,10 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (!no_hl) {
         emit(out, "ld\thl,bc");     /* HL = BC = low half */
     }
-    /* Keep cur_hl_vreg honest: HL holds the low half (low-half tenant
+    /* Keep rs.hl honest: HL holds the low half (low-half tenant
        when !no_hl) or junk (no_hl). The fp / TOS / cache-hit paths above
        all do this via hl_about_to_change; the generic sp walk must too,
-       else cur_hl_vreg stays stale at the previous tenant. A stale tenant
+       else rs.hl stays stale at the previous tenant. A stale tenant
        would feed bb_hl_out and make an if/else (or ||/&&) merge
        carry trust HL holding a vreg it didn't — e.g. `return (long_v ||
        0)` returning 0 on the short-circuit edge (sp-mode only). */
@@ -1610,7 +1674,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
     if (off >= 0 && off + 2 <= sp_rel_max(f)) {
         emit(out, "ld\t(sp+%d),hl", off);
         emit(out, "ld\tbc,hl");
-        if (f->features & IR_FEAT_SP_REL_PAIRS) {
+        if (IS_KC160()) {
             emit(out, "ld\t(sp+%d),de", off + 2);
         } else {
             emit(out, "ex\tde,hl");
@@ -1674,7 +1738,7 @@ static void cache_dehl_no_spill(FILE *out, int vreg_id)
 {
     /* The `ld bc,hl` stash is wasted when the next consumer is the
        FP-mode byte-direct binop chain — that chain reads from H/L
-       directly (using the cur_hl_vreg advertise below). Skip the
+       directly (using the rs.hl advertise below). Skip the
        stash; chained byte-direct binops write BC themselves at
        the chain's tail, so subsequent ops still see BC = low. */
     if (!cur_dehl_dst_no_bc_stash)
@@ -1682,11 +1746,11 @@ static void cache_dehl_no_spill(FILE *out, int vreg_id)
     cur_dehl_dst_no_bc_stash = 0;
     /* HL still holds the long's low half (precondition of this
        function — caller's compute left HL = low). Advertise it via
-       cur_hl_vreg so the next load_to_dehl on cache hit can skip
+       rs.hl so the next load_to_dehl on cache hit can skip
        its `ld hl,bc` recovery (saves 2 bytes per chained long-binop). */
     hl_about_to_change(vreg_id);
-    cur_de_vreg = -1;
-    cur_dehl_vreg = vreg_id;
+    rs.de = -1;
+    rs.dehl = vreg_id;
 }
 
 /* Forward decl: cur_dehl_dst_dead_safe lives with the other lookahead
@@ -1747,35 +1811,34 @@ static void load_sp_off_to_hl(FILE *out, int sp_off)
 
 /* ----- Op dispatch ------------------------------------------------------ */
 
-/* Returns 1 if cur_hl_vreg matches `v` (and v >= 0). The caller uses
+/* Returns 1 if rs.hl matches `v` (and v >= 0). The caller uses
    this to skip a redundant load_to_hl. */
 static int hl_has(int v)
 {
-    return v >= 0 && cur_hl_vreg == v;
+    return v >= 0 && rs.hl == v;
 }
 
 static int de_has(int v)
 {
-    return v >= 0 && cur_de_vreg == v;
+    return v >= 0 && rs.de == v;
 }
 
 /* Any DE change invalidates the long-DEHL cache (DE holds the high
    half — clobbering it breaks the cache). */
-static void cache_de(int v) { cur_de_vreg = v; cur_dehl_vreg = -1; }
-static void invalidate_de_cache(void) { cur_de_vreg = -1; cur_dehl_vreg = -1; }
+static void cache_de(int v) { rs.de = v; rs.dehl = -1; }
+static void invalidate_de_cache(void) { rs.de = -1; rs.dehl = -1; }
 
-static int dehl_has(int v) { return v >= 0 && cur_dehl_vreg == v; }
-static void cache_dehl(int v) { cur_dehl_vreg = v; }
+static int dehl_has(int v) { return v >= 0 && rs.dehl == v; }
+static void cache_dehl(int v) { rs.dehl = v; }
 
 /* BC cache. Function-lifetime: ir_alloc marks at most one PARAM as
    PR_BC and only in a narrow safety envelope (no CALL/HCALL, no
    width-4 vregs). Within that envelope BC is loaded by the prologue
    and never overwritten by body emits. load_to_hl / load_to_de
    short-circuit slot reads with `ld l,c; ld h,b` / `ld e,c; ld d,b`. */
-static int cur_bc_vreg;
-static int bc_has(int v) { return v >= 0 && cur_bc_vreg == v; }
-static void cache_bc(int v) { cur_bc_vreg = v; }
-static void invalidate_bc_cache(void) { cur_bc_vreg = -1; }
+static int bc_has(int v) { return v >= 0 && rs.bc == v; }
+static void cache_bc(int v) { rs.bc = v; }
+static void invalidate_bc_cache(void) { rs.bc = -1; }
 
 /* Byte (A) value cache. Tracks which width-1 vreg the accumulator
    currently holds. Set by IR_LD_MEM_VREG width=1 when the byte spill
@@ -1785,10 +1848,9 @@ static void invalidate_bc_cache(void) { cur_bc_vreg = -1; }
    invalidated: every `ld a,*` clobbers it, every byte op clobbers it.
    Most lowerer paths conservatively invalidate via invalidate_hl_cache
    (which now also clears A). */
-static int cur_a_vreg;
-static int a_has(int v) { return v >= 0 && cur_a_vreg == v; }
-static void cache_a(int v) { cur_a_vreg = v; }
-static void invalidate_a_cache(void) { cur_a_vreg = -1; }
+static int a_has(int v) { return v >= 0 && rs.a == v; }
+static void cache_a(int v) { rs.a = v; }
+static void invalidate_a_cache(void) { rs.a = -1; }
 
 /* Byte-register residency. A width-1 vreg the allocator
    pinned to a byte register (PR_C in the no-call BC-clean envelope) keeps
@@ -2246,7 +2308,7 @@ static void hl_about_to_change(int v_new)
 {
     if (lazy_spill_on && pending_spill_v >= 0 && pending_spill_v != v_new)
         pending_spill_resolve();
-    cur_hl_vreg = v_new;
+    rs.hl = v_new;
     cur_hl_addr_off = -1;    /* HL no longer holds a cached slot address */
 }
 
@@ -2255,7 +2317,7 @@ static void hl_about_to_change(int v_new)
    clears the address belief). Pending spill already resolved (addr ⇒ none). */
 static void cache_hl_slot_addr(const Func *f, int v)
 {
-    cur_hl_vreg = -1;
+    rs.hl = -1;
     cur_hl_addr_off = slot_off(f, v);
     cur_hl_addr_spadj = cur_sp_adjust;
 }
@@ -2272,7 +2334,7 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
            hl,sp` for deltas ≤3. gbz80's recompute is the 12T/2B `ld hl,sp+d`
            and its inc hl is 8T, so only delta 1 wins there. gbz80 is the
            only target lacking ex de,hl → use that as the discriminator. */
-        int cap = (f->features & IR_FEAT_EX_DE_HL) ? 3 : 1;
+        int cap = (!IS_GBZ80()) ? 3 : 1;
         if (d == 0) return;                       /* exact hit */
         if (d >= 1 && d <= cap) {
             while (d-- > 0) emit(out, "inc\thl");
@@ -2316,10 +2378,8 @@ static void byte_home_flush(FILE *out, const Func *f)
        only `ld (hl),e` + address math (never touches A), and the dirty op
        that triggered this flush may still consume its operand from A (a
        cache_a'd temp). invalidate_hl_cache clears A, so save/restore it. */
-    int saved_a = cur_a_vreg;
     pending_spill_resolve();
-    invalidate_hl_cache();
-    cur_a_vreg = saved_a;
+    invalidate_hl_keep_a();
     emit_byte_slot_addr(out, f, v);
     emit(out, "ld\t(hl),%s", r);
     cur_byte_home_dirty = 0;
@@ -2381,10 +2441,8 @@ static void word_home_flush(FILE *out, const Func *f)
     /* sp-mode: the slot-address math clobbers HL (DE, the value, is untouched).
        Preserve the A-cache (the triggering op may still read a cache_a'd byte
        temp); invalidate_hl_cache clears A, so save/restore it. */
-    int saved_a = cur_a_vreg;
     pending_spill_resolve();
-    invalidate_hl_cache();
-    cur_a_vreg = saved_a;
+    invalidate_hl_keep_a();
     emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust);
     emit(out, "add\thl,sp");
     emit(out, "ld\t(hl),e");
@@ -2455,9 +2513,9 @@ static int home_rehome(FILE *out, const Func *f)
    themselves, then call this to keep the caches in sync. */
 static void swap_hl_de_caches(void)
 {
-    int tmp = cur_hl_vreg;
-    cur_hl_vreg = cur_de_vreg;
-    cur_de_vreg = tmp;
+    int tmp = rs.hl;
+    rs.hl = rs.de;
+    rs.de = tmp;
 }
 
 /* Invalidate the HL cache. Use before/after any op that clobbers HL
@@ -2468,18 +2526,48 @@ static void swap_hl_de_caches(void)
    invalidating emit also writes DE (long arith stages through DE,
    literal-fold's `ld de,K`, calls clobber both). Specific sites
    that *do* preserve DE (CMP fastpaths, etc.) save+restore
-   cur_de_vreg around this call. */
+   rs.de around this call. */
 static void invalidate_hl_cache(void)
 {
     hl_about_to_change(-1);
-    invalidate_de_cache();   /* clears cur_de_vreg + cur_dehl_vreg */
-    cur_a_vreg = -1;
-    cur_fa_vreg = -1;
+    invalidate_de_cache();   /* clears rs.de + rs.dehl */
+    rs.a = -1;
+    rs.fa = -1;
 }
 
 /* Both HL and BC clobbered (16-bit ops through HL that also stash via BC,
    calls, etc.). */
 static void invalidate_hl_bc(void) { invalidate_hl_cache(); invalidate_bc_cache(); }
+
+/* HL clobbered but DE provably preserved (DSUB / `sbc hl,de` leave DE intact):
+   drop the full HL-cache set, then re-assert the surviving DE tenant. */
+static void invalidate_hl_keep_de(void) {
+    int saved_de = rs.de;
+    invalidate_hl_cache();
+    rs.de = saved_de;
+}
+
+/* HL clobbered but A provably preserved (sp-mode slot-address math touches
+   only HL; the triggering op may still consume a cache_a'd byte operand):
+   drop the full HL-cache set, then re-assert the surviving A tenant. */
+static void invalidate_hl_keep_a(void) {
+    int saved_a = rs.a;
+    invalidate_hl_cache();
+    rs.a = saved_a;
+}
+
+/* Apply an emit_c clobber mask by dispatching to the legacy invalidate_*
+   routines, faithfully: CLOB_HL alone == invalidate_hl_cache(), and
+   CLOB_HL|CLOB_BC == invalidate_hl_bc() (HL set first, then BC). The non-HL
+   bits are pure field clears (order-independent); only CLOB_HL can emit (its
+   pending-spill flush), and it runs first. */
+static void apply_clobbers(Clobber c)
+{
+    if (c & CLOB_HL) invalidate_hl_cache();
+    if (c & CLOB_DE) invalidate_de_cache();
+    if (c & CLOB_A)  invalidate_a_cache();
+    if (c & CLOB_BC) invalidate_bc_cache();
+}
 
 /* Dead-store elimination: set per-op by lower_func before calling
    lower_op. When 1, the dst's value won't be re-read from its frame
@@ -2545,7 +2633,7 @@ static void pending_spill_flush(void)
     int v = pending_spill_v;
     pending_spill_v = -1;
     store_hl(cur_lazy_out, cur_lazy_func, v);
-    cur_hl_vreg = -1;
+    rs.hl = -1;
     invalidate_de_cache();
 }
 
@@ -2565,7 +2653,7 @@ static void pending_spill_resolve(void)
    fastpath. When the fastpath fires, both succs' leading IR_SHL ops
    would re-shift a value the fused `add hl,hl` already produced.
    Record their (bb_id, op_idx) here; the per-op loop checks before
-   emitting and elides the SHL while advertising cur_hl_vreg to the
+   emitting and elides the SHL while advertising rs.hl to the
    SHL's dst vreg. Per-function; small cap (the unrolled CRC loop has
    2 entries per iter × 8 = 16 max). */
 #define SHL_SKIP_CAP 32
@@ -2590,7 +2678,7 @@ static int cur_skip_shl_byte;
    producer's `ld bc,hl` stash in cache_dehl_no_spill is wasted —
    the chain doesn't read BC. Set by lower_func's lookahead; read
    by cache_dehl_no_spill to skip the stash. The chain itself
-   checks `cur_hl_vreg == from_dehl` to know when to read from
+   checks `rs.hl == from_dehl` to know when to read from
    H/L instead of C/B. */
 
 /* Caller-side one-shot: when set before a load_to_dehl call, the
@@ -2905,7 +2993,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
        Only gbz80 emulates `ex de,hl` (808x has native XCHG) — there a
        one-way DE->HL copy is equivalent (old HL is dead) and far cheaper
        (2 ops vs push/pop x4). */
-    if (f->features & IR_FEAT_EX_DE_HL) {
+    if (!IS_GBZ80()) {
         emit(out, "ex\tde,hl");
     } else {
         emit(out, "ld\th,d");
@@ -3000,14 +3088,15 @@ static void spill_unless_dead(FILE *out, const Func *f, int vreg)
 
 
 /* Emit a forward conditional skip over the next `skip_bytes` of code via
-   an ASMPC-relative jump. `jr` is 2 bytes; on 8080/8085 (no IR_FEAT_JR)
+   an ASMPC-relative jump. `jr` is 2 bytes; on 8080/8085 (no relative jump)
    z80asm rewrites `jr` to a 3-byte `jp`, so the relative target needs one
    extra byte. We emit `jp` explicitly there with the adjusted offset.
    (A label would be cleaner but disturbs the copt peephole patterns that
    match these ASMPC skips.) */
 static void emit_skip(FILE *out, const Func *f, const char *cc, int skip_bytes)
 {
-    if (f->features & IR_FEAT_JR)
+    (void)f;
+    if (!IS_808x())
         emit(out, "jr\t%s,ASMPC+%d", cc, 2 + skip_bytes);
     else
         emit(out, "jp\t%s,ASMPC+%d", cc, 3 + skip_bytes);
@@ -3048,7 +3137,7 @@ static void signed_result_to_carry(FILE *out)
    skips signed_result_to_carry). Clobbers A and D → invalidate DE. */
 static int signed_cmp_signflip(FILE *out, const Func *f, int is_signed)
 {
-    if (!is_signed || (f->features & IR_FEAT_OVERFLOW_FLAG)) return 0;
+    if (!is_signed || (!(IS_808x() || IS_GBZ80()))) return 0;
     emit(out, "ld\ta,h"); emit(out, "xor\t0x80"); emit(out, "ld\th,a");
     emit(out, "ld\ta,d"); emit(out, "xor\t0x80"); emit(out, "ld\td,a");
     invalidate_de_cache();
@@ -3134,7 +3223,7 @@ static int gen_ld_sym(FILE *out, Func *f, const Op *op)
         return -1;
     }
     if (ns_sym_bails(op->mem.sym))
-        return -1;   /* __addressmod address-of → walker */
+        return -1;   /* __addressmod address-of: not yet supported */
     /* A __LIB__ function decays to its address with NO leading underscore
        (classic lib symbols are unprefixed); ordinary globals (incl. arrays/
        structs) keep the `_`. ir_sym_prefix encodes that rule. */
@@ -3175,14 +3264,14 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
     if (dst_w > 4) {
         /* Wide (5/6/8-byte) slot-to-slot copy via the accumulator:
            dload(src); dstore(dst). Reuses the FA-residency cache. */
-        if (cur_fa_vreg != op->src[0]) {
+        if (rs.fa != op->src[0]) {
             emit_acc_slot_addr(out, f, op->src[0], 0);
             emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
         }
         emit_acc_slot_addr(out, f, op->dst, 0);
         emit_acc_store_hl(out, f, op->dst);
         invalidate_hl_bc();
-        cur_fa_vreg = op->dst;
+        rs.fa = op->dst;
         return 0;
     }
     if (dst_w == 4) {
@@ -3217,20 +3306,20 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
         cache_de(op->dst);
         return 0;
     }
-    if (cur_hl_vreg != op->src[0] || cur_hl_vreg < 0)
+    if (rs.hl != op->src[0] || rs.hl < 0)
         load_to_hl(out, f, op->src[0]);
     commit_hl_word(out, f, op->dst);
     return 0;
 }
 
 /* In-place step (i++/i--) of a width-2 local homed at the TOS word, via
-   `ex (sp),hl` (IR_FEAT_EX_SP_HL): swap the counter into HL, step, swap back.
+   `ex (sp),hl` (absent on gbz80): swap the counter into HL, step, swap back.
    HL round-trips through TOS (prior content restored), DE untouched — vs the
    generic pop/push + `inc sp;inc sp;push de` dance. Returns 1 if handled.
    Gated: real TOS slot, value not already in HL, no pending HL-carry spill. */
 static int try_tos_step_xthl(FILE *out, Func *f, const Op *op, int is_inc)
 {
-    if (!(f->features & IR_FEAT_EX_SP_HL)) return 0;
+    if (IS_GBZ80()) return 0;   /* XTHL absent on gbz80 only */
     int v = op->dst;
     if (v < 0 || op->src[0] != v) return 0;          /* in-place self-step */
     if (f->vregs[v].width != 2) return 0;
@@ -3263,13 +3352,14 @@ static int try_tos_step_xthl(FILE *out, Func *f, const Op *op, int is_inc)
    ld e,a` triple. Returns 1 if emitted. Fires only when the home is live in
    its register NOW (so the op acts on the live value) and there's no fused
    branch test on the result (the through-A finalize handles that). `cb_only`
-   ops (the CB shifts) need IR_FEAT_CB_BITOPS; inc/dec are all-CPU. */
+   ops (the CB shifts) need CB-prefix support (absent on 808x); inc/dec are
+   all-CPU. */
 static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
                                  const char *mnem, int cb_only)
 {
     if (op->dst < 0 || op->dst != op->src[0]) return 0;
     if (cur_branch_test_kind != 0) return 0;
-    if (cb_only && !(f->features & IR_FEAT_CB_BITOPS)) return 0;
+    if (cb_only && IS_808x()) return 0;
     if (!byte_home_holds(op->dst)) return 0;
     PhysReg pr = byte_home_phys(f, op->dst);
     if (pr == IR_PR_NONE) return 0;
@@ -3348,8 +3438,8 @@ static void emit_test_zero(FILE *out, Func *f, int src)
         /* r4k `test hl`/`test bc`: one-op zero test (reg OR 0 → Z), no A
            clobber. `test bc` avoids the BC→HL move for a BC-resident value;
            HL/A caches stay valid (test modifies no register). */
-        if (f->features & IR_FEAT_TEST_RP) {
-            if (!hl_has(src) && cur_bc_vreg == src) {
+        if (IS_RABBIT4K()) {
+            if (!hl_has(src) && rs.bc == src) {
                 emit(out, "test\tbc");
                 return;
             }
@@ -3386,7 +3476,7 @@ static int gen_br_zero(FILE *out, Func *f, const Op *op)
     emit_test_zero(out, f, op->src[0]);
     emit(out, "jp\tz,L_f%d_bb_%d", func_emit_idx, op->label);
     /* For width<=2, HL still holds the tested value (`or l` doesn't touch
-       HL) so cur_hl_vreg stays valid for the next op; wider forms managed
+       HL) so rs.hl stays valid for the next op; wider forms managed
        their own caches in emit_test_zero. */
     return 0;
 }
@@ -3407,7 +3497,7 @@ static int gen_extract_byte(FILE *out, Func *f, const Op *op)
     int k = (int)op->imm;
     if (dehl_has(x)) {
         /* DEHL-cache invariant: BC = low half, DE = high half; HL
-           only holds the low half when cur_hl_vreg advertises it.
+           only holds the low half when rs.hl advertises it.
            In sp mode the producer's spill walks HL through the slot
            (HL = slot+3 afterwards), so bytes 0/1 MUST come from C/B
            there — reading L/H returned slot-address bytes (dg3:
@@ -3415,7 +3505,7 @@ static int gen_extract_byte(FILE *out, Func *f, const Op *op)
            spills preserve HL). */
         static const char *hl_for_byte[4] = { "l", "h", "e", "d" };
         static const char *bc_for_byte[4] = { "c", "b", "e", "d" };
-        const char **rb = (cur_hl_vreg == x) ? hl_for_byte
+        const char **rb = (rs.hl == x) ? hl_for_byte
                                              : bc_for_byte;
         emit(out, "ld\ta,%s", rb[k & 3]);
     } else if (fp_active(f)
@@ -3549,8 +3639,8 @@ static int gen_memset(FILE *out, Func *f, const Op *op)
         invalidate_hl_cache();
         return 0;
     }
-    int bc_live = (cur_bc_vreg >= 0);
-    int save_bc = cur_bc_vreg;
+    int bc_live = (rs.bc >= 0);
+    int save_bc = rs.bc;
     if (bc_live) emit(out, "push\tbc");
     if (n < 256) {
         int lbl = cmp_label_counter++;
@@ -3569,7 +3659,7 @@ static int gen_memset(FILE *out, Func *f, const Op *op)
     }
     if (bc_live) emit(out, "pop\tbc");
     invalidate_hl_cache();            /* HL/DE/DEHL/A all junk now */
-    if (bc_live) cur_bc_vreg = save_bc; /* pop restored BC */
+    if (bc_live) rs.bc = save_bc; /* pop restored BC */
     return 0;
 }
 
@@ -3592,7 +3682,7 @@ static int gen_memcpy(FILE *out, Func *f, const Op *op)
     load_to_de(out, f, op->src[0]);   /* DE = dst */
     load_to_hl(out, f, op->src[1]);   /* HL = src (preserves DE) */
     if (n <= 3) {
-        if (cur_bc_vreg < 0 && (f->features & IR_FEAT_BLOCK_COPY)) {
+        if (rs.bc < 0 && (!(IS_808x() || IS_GBZ80()))) {
             for (int i = 0; i < n; i++) emit(out, "ldi");
         } else {
             for (int i = 0; i < n; i++) {
@@ -3607,14 +3697,14 @@ static int gen_memcpy(FILE *out, Func *f, const Op *op)
         invalidate_hl_cache();        /* clears HL/DE/A caches */
         return 0;
     }
-    int bc_live  = (cur_bc_vreg >= 0);
-    int save_bc  = cur_bc_vreg;
+    int bc_live  = (rs.bc >= 0);
+    int save_bc  = rs.bc;
     if (bc_live) emit(out, "push\tbc");
     emit(out, "ld\tbc,%d", n);
     emit(out, "ldir");
     if (bc_live) emit(out, "pop\tbc");
     invalidate_hl_cache();
-    if (bc_live) cur_bc_vreg = save_bc;
+    if (bc_live) rs.bc = save_bc;
     return 0;
 }
 
@@ -3630,8 +3720,8 @@ static int gen_strcpy(FILE *out, Func *f, const Op *op)
     int lbl = cmp_label_counter++;
     load_to_de(out, f, op->src[0]);   /* DE = dst */
     load_to_hl(out, f, op->src[1]);   /* HL = src (preserves DE) */
-    int bc_live = (cur_bc_vreg >= 0);
-    int save_bc = cur_bc_vreg;
+    int bc_live = (rs.bc >= 0);
+    int save_bc = rs.bc;
     if (bc_live) emit(out, "push\tbc");
     emit(out, "xor\ta");
     fprintf(out, "L_f%d_strcpy_%d:\n", func_emit_idx, lbl);
@@ -3640,7 +3730,7 @@ static int gen_strcpy(FILE *out, Func *f, const Op *op)
     emit(out, "jr\tnz,L_f%d_strcpy_%d", func_emit_idx, lbl);
     if (bc_live) emit(out, "pop\tbc");
     invalidate_hl_cache();
-    if (bc_live) cur_bc_vreg = save_bc;
+    if (bc_live) rs.bc = save_bc;
     return 0;
 }
 
@@ -3674,10 +3764,10 @@ static int gen_strchr(FILE *out, Func *f, const Op *op)
     emit(out, "ld\th,a");                 /* a==0 here → HL = 0 (NULL) */
     emit(out, "ld\tl,h");
     fprintf(out, "L_f%d_strchr_%d:\n", func_emit_idx, end);
-    /* Result is in HL (cur_hl_vreg still claims the string vreg — stale,
+    /* Result is in HL (rs.hl still claims the string vreg — stale,
        but the canonical finalize below overwrites it, same as gen_neg).
        The loop clobbered A and (const path) E → drop those claims. */
-    cur_a_vreg = -1;
+    rs.a = -1;
     invalidate_de_cache();
     commit_hl_word(out, f, op->dst);
     return 0;
@@ -3708,8 +3798,8 @@ static int gen_poststep(FILE *out, Func *f, const Op *op)
            DE holds a live cached value, pay push/pop (11+10T) to keep
            the DE / DEHL caches valid — usually cheaper than the
            downstream reload they'd otherwise eat. */
-        int de_live = (cur_de_vreg >= 0 || cur_dehl_vreg >= 0);
-        int save_de = cur_de_vreg, save_dehl = cur_dehl_vreg;
+        int de_live = (rs.de >= 0 || rs.dehl >= 0);
+        int save_de = rs.de, save_dehl = rs.dehl;
         if (de_live)
             emit(out, "push\tde");
         ss_note_reload(f, x);
@@ -3731,8 +3821,8 @@ static int gen_poststep(FILE *out, Func *f, const Op *op)
            DE/DEHL caches — restore them when we preserved DE. */
         invalidate_hl_cache();
         if (de_live) {
-            cur_de_vreg   = save_de;
-            cur_dehl_vreg = save_dehl;
+            rs.de   = save_de;
+            rs.dehl = save_dehl;
         }
         commit_hl_word(out, f, op->dst);
         return 0;
@@ -3757,11 +3847,11 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
     int is_ll   = (op->src[0] >= 0 && op->src[0] < f->n_vregs
                    && f->vregs[op->src[0]].width == 8);
 
-    /* long long (8-byte) dispatch: load the scrutinee into __i64_acc, then
-       l_i64_case with a `defw target ; <8-byte value>` table (matches the
-       walker's l_i64_load / l_i64_case). l_i64_case reads __i64_acc, pops
-       its return address as the table pointer, and on no-match continues
-       past the defw 0 terminator into the `jp default`. */
+    /* long long (8-byte) dispatch: load the scrutinee into __i64_acc
+       (l_i64_load), then l_i64_case with a `defw target ; <8-byte value>`
+       table. l_i64_case reads __i64_acc, pops its return address as the
+       table pointer, and on no-match continues past the defw 0 terminator
+       into the `jp default`. */
     if (is_ll) {
         emit_acc_slot_addr(out, f, op->src[0], 0);
         emit(out, "call\tl_i64_load");
@@ -3836,19 +3926,19 @@ static int gen_critical_enter(FILE *out, Func *f, const Op *op)
 {
     (void)op;
     /* Rabbit has no di/ei — raise the IP priority to mask interrupts. */
-    emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipset\t3" : "di");
+    emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
     return 0;
 }
 
 static int gen_critical_leave(FILE *out, Func *f, const Op *op)
 {
     (void)op;
-    emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipres" : "ei");
+    emit(out, (IS_RABBIT()) ? "ipres" : "ei");
     return 0;
 }
 
 /* BC tenant saved below a pre-pushed arg block (op->imm==1 on the
-   call's first IR_PUSH_ARG). Stack of saved cur_bc_vreg values —
+   call's first IR_PUSH_ARG). Stack of saved rs.bc values —
    nested calls pair LIFO with their gen_call pops. */
 #define BC_ARGS_SAVE_MAX 8
 static int bc_args_save_stack[BC_ARGS_SAVE_MAX];
@@ -3876,7 +3966,7 @@ static int gen_push_arg(FILE *out, Func *f, const Op *op)
            arg block (a save in gen_call would land above the args).
            gen_call's matching pop restores it after the cleanup. */
         emit(out, "push\tbc");
-        bc_args_save_stack[bc_args_save_depth++] = cur_bc_vreg;
+        bc_args_save_stack[bc_args_save_depth++] = rs.bc;
         cur_sp_adjust += 2;
     }
     int v = op->src[0];
@@ -3910,14 +4000,14 @@ static int gen_push_dehl_long(FILE *out, Func *f, const Op *op)
         emit(out, "push\thl");       /* low half — popped first */
     } else {
         /* DEHL-cache hit. The invariant is BC = low half; HL only
-           holds the low half when cur_hl_vreg advertises it (e.g.
+           holds the low half when rs.hl advertises it (e.g.
            after cache_dehl_no_spill). The fp byte-direct dead-dst
            binop path caches with BC=low and HL=junk — pushing HL
            there pushed garbage as the low half (r10: gi^(gi>>16)
            lost the first operand under IR_LONG_PUSHES). */
         emit(out, "push\tde");       /* high half */
         emit(out, "push\t%s",
-             (cur_hl_vreg == op->src[0]) ? "hl" : "bc");
+             (rs.hl == op->src[0]) ? "hl" : "bc");
     }
     cur_sp_adjust += 4;
     /* Option B: advertise the vreg as stack-resident so a later
@@ -3949,10 +4039,9 @@ static int gen_pop_dehl_long(FILE *out, Func *f, const Op *op)
            HL → BC so the cache state is consistent.
            The pops physically clobbered HL and DE — drop any stale
            tenant claims BEFORE re-advertising DEHL (matches the
-           store_dehl_cached convention). Without this, a consumer
-           like gen_st_mem's DEHL-hit path stale-hits hl_has(base)
-           and stores the value through itself as the address
-           (guards a miscompile under IR_LONG_PUSHES). */
+           store_dehl_cached convention), else a consumer like
+           gen_st_mem's DEHL-hit path stale-hits hl_has(base) and
+           stores the value through itself as the address. */
         emit(out, "ld\tbc,hl");
         invalidate_hl_cache();
         cache_dehl(op->src[0]);
@@ -4001,7 +4090,7 @@ static int gen_neg(FILE *out, Func *f, const Op *op)
     }
     /* HL = -src[0]. Rabbit r4k negates HL in place; else load src to DE
        and sbc HL=0,DE. */
-    if (f->features & IR_FEAT_HL_DE_LOGIC4) {
+    if (IS_RABBIT4K()) {
         if (!hl_has(op->src[0]))
             load_to_hl(out, f, op->src[0]);
         emit(out, "neg\thl");
@@ -4274,21 +4363,21 @@ static int gen_conv_byte_to_high(FILE *out, Func *f, const Op *op)
    Returns 1 if it emitted the shift. */
 static int try_const_barrel(FILE *out, Func *f, const Op *op, int is_shr)
 {
-    if (!(f->features & IR_FEAT_BARREL_SHIFT) || op->src[1] >= 0)
+    if (!(IS_Z80N()) || op->src[1] >= 0)
         return 0;
     int n = (int)op->imm & 0x1f;
     if (n < 1 || n >= 16) return 0;          /* 0 and >=16 handled by caller */
     int unroll = (n >= 8) ? (n - 6) : (is_shr ? 2 * n : n);
     int pr_de  = vreg_is_pr_de(f, op->dst);
     /* +2 when a live BC must be saved around the count load (see below). */
-    int barrel = 5 + (pr_de ? 0 : 1) + (cur_bc_vreg >= 0 ? 2 : 0);
+    int barrel = 5 + (pr_de ? 0 : 1) + (rs.bc >= 0 ? 2 : 0);
     if (unroll < barrel) return 0;
     load_to_hl(out, f, op->src[0]);
-    /* `ld b,N` clobbers B; a live BC tenant (cur_bc_vreg>=0) may be
+    /* `ld b,N` clobbers B; a live BC tenant (rs.bc>=0) may be
        register-resident with a stale slot, so push/pop it — bsxa sets no
        flags and pop bc doesn't touch them, so K/CF etc. are irrelevant
        here anyway and BC is restored intact. */
-    int bc_live = (cur_bc_vreg >= 0);
+    int bc_live = (rs.bc >= 0);
     if (bc_live) emit(out, "push\tbc");
     emit(out, "ld\tb,%d", n);
     emit(out, "ex\tde,hl");                  /* DE = value */
@@ -4509,7 +4598,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
         }
         /* 8080/8085: no CB shifts — byte-boundary split (whole-byte moves
            inline, only count%8 bits via l_lsl_dehl). */
-        if (!(f->features & IR_FEAT_CB_BITOPS)) {
+        if (IS_808x()) {
             gen_808x_long_const_shift(out, f, op, count, 0);
             return 0;
         }
@@ -4682,9 +4771,9 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
     /* z80n: variable 16-bit shift-left as a flat `bsla de,b` (8T)
        instead of the add-hl-hl;dec;jr loop (~per-bit). bsla sets no
        flags, but the result feeds a value dst, not a branch. */
-    if (f->features & IR_FEAT_BARREL_SHIFT) {
+    if (IS_Z80N()) {
         load_binop_operands(out, f, op);   /* HL=value(src0), DE=count(src1) */
-        int bc_live = (cur_bc_vreg >= 0);  /* `ld b,e` clobbers B — preserve */
+        int bc_live = (rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tb,e");              /* B = count low byte */
         emit(out, "ex\tde,hl");            /* DE = value */
@@ -4733,11 +4822,9 @@ static void emit_hl_add_offset(FILE *out, int off, int use_bc)
     emit(out, "add\thl,%s", use_bc ? "bc" : "de");
     /* The scratch pair just got clobbered — drop any cached value living
        there, INCLUDING a long whose halves the DEHL cache splits across
-       DE (high) + BC (low). Missing this let a member/index offset compute
-       silently corrupt a register-resident long (e.g. `strtol()` result
-       pushed via gen_push_dehl_long picked up the stale `ld de,N` offset
-       as its high word). */
-    if (use_bc) { invalidate_bc_cache(); cur_dehl_vreg = -1; }
+       DE (high) + BC (low), else an offset compute corrupts a
+       register-resident long. */
+    if (use_bc) { invalidate_bc_cache(); rs.dehl = -1; }
     else        invalidate_de_cache();
 }
 
@@ -4749,7 +4836,7 @@ static void emit_hl_add_offset(FILE *out, int off, int use_bc)
      - else  : an inc/dec <pair> chain — |k| bytes, A-clean, any k.
    Because BOTH are DE-clean for any k, op_de_clean can treat the step/offset
    as clean regardless of magnitude (no cap). `a_free` is the caller's belief
-   that A holds nothing live (cur_a_vreg < 0, or A is about to be reloaded). */
+   that A holds nothing live (rs.a < 0, or A is about to be reloaded). */
 static void emit_pair_add_de_clean(FILE *out, const char *pair, const char *lo,
                                    const char *hi, int k, int a_free)
 {
@@ -4790,7 +4877,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         emit_acc_slot_addr(out, f, op->dst, 0);
         emit_acc_store_hl(out, f, op->dst);
         invalidate_hl_bc();
-        cur_fa_vreg = op->dst;
+        rs.fa = op->dst;
         return 0;
     }
     if (op->mem.kind == IR_MEM_SYM) {
@@ -4800,11 +4887,9 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             fprintf(stderr, "LD_MEM SYM dst=v%d width=%d\n",
                     op->dst, dst_w);
         if (dst_w == 4) {
-            /* Long load from a global. Mirror of the long-store
-               path: `ld hl,(_sym)` for the low half, `ld de,(_sym+2)`
-               for the high half. Without this, long globals are
-               silently truncated to int on read — the matching
-               bug to the long-store path. */
+            /* Long load from a global, mirror of the long-store path:
+               `ld hl,(_sym)` low half, `ld de,(_sym+2)` high half
+               (else the read truncates to int). */
             int off = op->mem.offset;
             if (off)
                 emit(out, "ld\thl,(_%s+%d)",
@@ -4958,8 +5043,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 /* Store p+step (HL) to the slot WITHOUT disturbing DE —
                    it holds the just-loaded value. store_hl can't be used
                    directly: its `ex de,hl` contract relocates DE, and the
-                   8085/generic-sp paths destroy it outright (the value was
-                   added as the pointer → miscompile). Emit the DE-clean
+                   8085/generic-sp paths destroy it outright. Emit the DE-clean
                    store inline for the cases that have one; else stage the
                    value on the stack across store_hl. store_hl is BC-clean,
                    so a live PR_BC resident's belief is preserved either way. */
@@ -5011,7 +5095,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         if (cur_home_is_word && dst_w == 2 && op->dst != cur_func_whome
             && op->mem.offset > 3) {
             emit_pair_add_de_clean(out, "hl", "l", "h", op->mem.offset,
-                                   cur_a_vreg < 0);
+                                   rs.a < 0);
         } else {
             /* Width 4 can't clobber DE (needed for the high half) —
                scratch through BC; widths 1/2 use DE. Small offsets
@@ -5035,7 +5119,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             commit_a_byte(out, f, op->dst);
         } else if (dst_w == 4) {
             /* Long load: 4 bytes from (hl) into DEHL (DE=high, HL=low). */
-            if (!(f->features & IR_FEAT_EX_DE_HL)) {
+            if (IS_GBZ80()) {
                 /* gbz80 only emulates `ex de,hl` (808x has native XCHG).
                    Load the low word straight into BC, the high word into DE,
                    then mirror BC into HL — reaching DE=high/HL=low with
@@ -5065,7 +5149,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                spill. HL becomes scratch (slot+1, untracked). */
             if (op->dst >= 0 && f->vreg_to_phys
                 && f->vreg_to_phys[op->dst] == IR_PR_DE) {
-                if (f->features & IR_FEAT_LD_HL_IND) {
+                if (IS_EZ80()) {
                     emit(out, "ld\tde,(hl)");   /* ez80: DE = *HL */
                 } else {
                     emit(out, "ld\ta,(hl+)");
@@ -5076,7 +5160,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 cache_de(op->dst);
                 return 0;
             }
-            if (f->features & IR_FEAT_LD_HL_IND) {
+            if (IS_EZ80()) {
                 emit(out, "ld\thl,(hl)");        /* ez80: HL = *HL */
             } else {
                 emit(out, "ld\ta,(hl+)");
@@ -5099,7 +5183,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->src[0] >= 0 && f->vregs[op->src[0]].width > 4) {
         /* Wide double store: dload(src)→FA, address into HL, dstore. */
-        if (cur_fa_vreg != op->src[0]) {
+        if (rs.fa != op->src[0]) {
             emit_acc_slot_addr(out, f, op->src[0], 0);
             emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
         }
@@ -5114,7 +5198,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         }
         emit_acc_store_hl(out, f, op->src[0]);
         invalidate_hl_bc();
-        cur_fa_vreg = -1;
+        rs.fa = -1;
         return 0;
     }
     if (op->mem.kind == IR_MEM_SYM) {
@@ -5122,11 +5206,8 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                   ? f->vregs[op->src[0]].width : 2;
         if (src_w == 4) {
             /* Long store to a global. `ld (_sym),hl` writes the
-               low half; `ld (_sym+2),de` writes the high half.
-               Without the high-half write, long-typed globals get
-               silently truncated to int — e.g.
-               `g = shr1(0xffffffaa)` would become g = 0x0000ffd5,
-               yielding a wrong result downstream. */
+               low half; `ld (_sym+2),de` writes the high half
+               (else a long-typed global truncates to int). */
             load_to_dehl(out, f, op->src[0]);
             int off = op->mem.offset;
             if (off)
@@ -5247,7 +5328,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 load_to_hl_adj(out, f, op->mem.base, 4);
                 emit_hl_add_offset(out, op->mem.offset, 1);
                 emit(out, "pop\tbc");           /* BC = LOW */
-                if (f->features & IR_FEAT_LD_HL_IND) {
+                if (IS_EZ80()) {
                     emit(out, "ld\t(hl),bc");   /* ez80: *HL = BC (HL preserved) */
                     emit(out, "inc\thl");
                     emit(out, "inc\thl");
@@ -5270,7 +5351,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
             emit(out, "ex\tde,hl");         /* DE = value */
             load_to_hl(out, f, op->mem.base);
             emit_hl_add_offset(out, op->mem.offset, 1);
-            if (f->features & IR_FEAT_LD_HL_IND) {
+            if (IS_EZ80()) {
                 emit(out, "ld\t(hl),de");   /* ez80: *HL = DE */
             } else {
                 emit(out, "ld\t(hl),e");
@@ -5395,7 +5476,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                invariant) — about to be overwritten. */
             emit(out, "ld\tbc,%u", (unsigned)(k & 0xffff));
             emit(out, "add\thl,bc");                /* HL = LHS_LOW + K_LOW */
-            if (!(f->features & IR_FEAT_OVERFLOW_FLAG)) {
+            if ((IS_808x() || IS_GBZ80())) {
                 /* gbz80/808x: avoid emulated `adc hl,bc` + `ex de,hl`.
                    DE already holds LHS_HIGH; add K_HIGH byte-wise into
                    it, leaving DE=high/HL=low with no swaps. */
@@ -5422,9 +5503,8 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            / ld don't touch flags.
            Valid in FP mode too — the reads are sp-relative and sp
            is live alongside IX. MUST come before the fp byte-direct
-           path: that path reads the operand's (ix+d) slot, which the
-           PUSH elided the write to (guards a miscompile under
-           IR_LONG_PUSHES). */
+           path: that path reads the operand's (ix+d) slot, whose
+           write the PUSH elided. */
         {
         int optb_dehl_src = -1;
         if (cur_stack_long_top >= 0) {
@@ -5507,14 +5587,14 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                     /* Prefer H/L for the low half when HL is
                        advertised as holding from_dehl (the
                        producer's cache_dehl_no_spill set
-                       cur_hl_vreg). The `ld bc,hl` stash in the
+                       rs.hl). The `ld bc,hl` stash in the
                        producer is then dead and was skipped via
                        cur_dehl_dst_no_bc_stash. Falls back to
                        B/C for mid-chain consumers where
-                       cur_hl_vreg got reset by the previous
+                       rs.hl got reset by the previous
                        byte-direct emit. */
                     int use_hl = (from_dehl >= 0
-                                  && cur_hl_vreg == from_dehl);
+                                  && rs.hl == from_dehl);
                     static const char *bc_byte[4] =
                         { "c", "b", "e", "d" };
                     static const char *hl_byte[4] =
@@ -5544,8 +5624,8 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                            recover itself; downstream byte-direct
                            or byte-A ops never need HL. */
                         hl_about_to_change(-1);
-                        cur_de_vreg = -1;
-                        cur_dehl_vreg = op->dst;
+                        rs.de = -1;
+                        rs.dehl = op->dst;
                     } else {
                         invalidate_hl_bc();
                     }
@@ -5593,7 +5673,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         load_to_dehl_adj(out, f, op->src[0], 4);  /* BC = a.LSW */
         emit(out, "pop\thl");                       /* HL = b.LSW */
         emit(out, "add\thl,bc");                    /* HL = LOW result; DE = a.MSW */
-        if (!(f->features & IR_FEAT_OVERFLOW_FLAG)) {
+        if ((IS_808x() || IS_GBZ80())) {
             /* gbz80/808x: `adc hl,bc` and `ex de,hl` are emulated. DE
                already holds a.MSW and HL the LOW result, so add the high
                word byte-wise into DE — lands DEHL with no swaps. */
@@ -5628,7 +5708,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            free, else the inc chain — the resident region it unlocks outweighs
            the step cost. */
         emit_pair_add_de_clean(out, "bc", "c", "b", (int)op->imm,
-                               cur_home_is_word && cur_a_vreg < 0);
+                               cur_home_is_word && rs.a < 0);
         invalidate_hl_cache();
         cache_bc(op->dst);
         return 0;
@@ -5639,7 +5719,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
        sets NO flags, but a width-2 add's carry-out is never consumed
        (the multi-word carry chains live in the width-4 path above and
        must keep add/adc hl,bc). */
-    if ((f->features & IR_FEAT_ADD_PAIR_IMM) && op->src[1] < 0) {
+    if ((IS_Z80N()) && op->src[1] < 0) {
         load_to_hl(out, f, op->src[0]);
         emit(out, "add\thl,%u", (unsigned)((uint32_t)op->imm & 0xffffu));
         commit_hl_result(out, f, op->dst);
@@ -5712,7 +5792,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                into BC at the use site. No push/pop needed. */
             load_to_dehl(out, f, op->src[0]);
             /* DEHL = LHS (HL = LOW, DE = HIGH). */
-            if (!(f->features & IR_FEAT_OVERFLOW_FLAG)) {
+            if ((IS_808x() || IS_GBZ80())) {
                 /* gbz80/808x: no native 16-bit subtract (sbc hl,bc is
                    emulated) and ex de,hl is emulated. Subtract all 4
                    const bytes via sub/sbc a, landing HL=low/DE=high. */
@@ -5802,11 +5882,11 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                 (void)s_subtra;
                 if (srcs_ok && dst_ok) {
                     /* See ADD fastpath: prefer H/L for low half
-                       when cur_hl_vreg matches from_dehl. Saves
+                       when rs.hl matches from_dehl. Saves
                        the producer's ld bc,hl when paired with
                        the cur_dehl_dst_no_bc_stash lookahead. */
                     int use_hl = (from_dehl >= 0
-                                  && cur_hl_vreg == from_dehl);
+                                  && rs.hl == from_dehl);
                     static const char *bc_byte[4] =
                         { "c", "b", "e", "d" };
                     static const char *hl_byte[4] =
@@ -5849,8 +5929,8 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                         /* See ADD fastpath comment on the cache
                            state we leave behind. */
                         hl_about_to_change(-1);
-                        cur_de_vreg = -1;
-                        cur_dehl_vreg = op->dst;
+                        rs.de = -1;
+                        rs.dehl = op->dst;
                     } else {
                         invalidate_hl_bc();
                     }
@@ -5895,7 +5975,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         cur_load_to_dehl_no_hl = 1;
         load_to_dehl_adj(out, f, op->src[1], 4);    /* BC = b.LSW */
         emit(out, "pop\thl");                       /* HL = a.LSW */
-        if (!(f->features & IR_FEAT_OVERFLOW_FLAG)) {
+        if ((IS_808x() || IS_GBZ80())) {
             /* gbz80/808x: sbc hl,bc and ex de,hl are emulated. Subtract
                byte-wise (a - b) — b is BC=low/DE=high, a's high half is
                the next stack word — landing HL=low/DE=high, no swaps. */
@@ -5925,9 +6005,9 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         return 0;
     }
     load_binop_operands(out, f, op);
-    if (f->features & IR_FEAT_HL_DE_LOGIC) {
+    if (IS_RABBIT()) {
         emit(out, "sub\thl,de");        /* Rabbit native (r2k+), DE preserved */
-    } else if (!(f->features & IR_FEAT_OVERFLOW_FLAG)) {
+    } else if ((IS_808x() || IS_GBZ80())) {
         /* gbz80/808x: `sbc hl,de` is emulated (push/pop x4 + helper).
            Subtract byte-wise; write straight into DE when that's the dst
            (skips the ex de,hl that the sbc-path would need). */
@@ -5962,7 +6042,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
 static int gen_rsub(FILE *out, Func *f, const Op *op)
 {
     uint16_t k = (uint16_t)op->imm;
-    if (f->features & IR_FEAT_OVERFLOW_FLAG) {
+    if (!(IS_808x() || IS_GBZ80())) {
         /* Native 16-bit subtract: DE = var, HL = imm, HL -= DE. */
         load_to_de(out, f, op->src[0]);
         emit(out, "ld\thl,%u", (unsigned)k);
@@ -6004,7 +6084,7 @@ static int gen_rsub(FILE *out, Func *f, const Op *op)
    fired (the AND op and its branch are then fully emitted). */
 static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
 {
-    if (!(f->features & IR_FEAT_CB_BITOPS)) return 0;
+    if (IS_808x()) return 0;
     if (!byte_home_holds(op->src[0])) return 0;
     PhysReg pr = byte_home_phys(f, op->src[0]);
     if (pr == IR_PR_NONE) return 0;
@@ -6097,12 +6177,11 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Long AND-mask + immediately-following BR_ZERO/COND
            fastpath. A `(crc & 1UL) ? ... : ...` bit-test is the
-           archetype. Without this, each test goes
-           through the full DEHL load + 4-byte AND + slot spill +
-           reload + or h,or l + jp (~40 inst per test). The
-           mirror of the width=2 fastpath at line 2231 — when
-           the mask hits exactly one of the 4 bytes, just byte-
-           AND that byte and branch on Z. */
+           archetype. The slow path is a full DEHL load + 4-byte
+           AND + slot spill + reload + or h,or l + jp (~40 inst per
+           test). The mirror of the width=2 fastpath — when the mask
+           hits exactly one of the 4 bytes, just byte-AND that byte
+           and branch on Z. */
         if (op->kind == IR_AND
             && op->src[1] == -1
             && cur_branch_test_kind != 0) {
@@ -6185,12 +6264,15 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 }
                 /* Single-bit shortcut: OR with one bit → `set n,r`,
                    AND with one bit clear → `res n,r`. XOR has no
-                   toggle-bit instruction. */
+                   toggle-bit instruction. set/res are CB-prefix —
+                   absent on 808x, so gate on !IS_808x() (the
+                   ld a,r; and/or N; ld r,a fallback below is all-CPU). */
                 uint8_t v = b[i];
                 uint8_t bit_mask = (op->kind == IR_AND)
                                  ? (uint8_t)(~v & 0xff)
                                  : v;
-                if (op->kind != IR_XOR &&
+                if ((!IS_808x()) &&
+                    op->kind != IR_XOR &&
                     bit_mask != 0 &&
                     (bit_mask & (bit_mask - 1)) == 0) {
                     int bit = 0;
@@ -6306,9 +6388,9 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                        && fp_offset_fits(dd + 3));
                 if (srcs_ok && dst_ok) {
                     /* See ADD fastpath: prefer H/L for low half
-                       when cur_hl_vreg matches from_dehl. */
+                       when rs.hl matches from_dehl. */
                     int use_hl = (from_dehl >= 0
-                                  && cur_hl_vreg == from_dehl);
+                                  && rs.hl == from_dehl);
                     static const char *bc_byte[4] =
                         { "c", "b", "e", "d" };
                     static const char *hl_byte[4] =
@@ -6331,8 +6413,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                     }
                     if (cur_dst_dead) {
                         hl_about_to_change(-1);
-                        cur_de_vreg = -1;
-                        cur_dehl_vreg = op->dst;
+                        rs.de = -1;
+                        rs.dehl = op->dst;
                     } else {
                         invalidate_hl_bc();
                     }
@@ -6512,7 +6594,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                    skips with the cache vreg id to advertise at BB
                    entry. */
                 /* cache_vreg is the SHL's src[0] (= op->src[0]
-                   for the AND-mask op too). Setting cur_hl_vreg
+                   for the AND-mask op too). Setting rs.hl
                    to this makes the SHL handler's `hl_has(src[0])`
                    check return true, so it skips load_to_hl. With
                    cur_skip_shl_add_hl=1 the shift loop is also
@@ -6545,7 +6627,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                  cc, func_emit_idx, cur_branch_test_label);
             /* HL still holds src[0] (`and` only touched A and F).
                Advertise it explicitly — load_to_hl above does not
-               update cur_hl_vreg, so a cache miss followed by a
+               update rs.hl, so a cache miss followed by a
                non-cached load would leave the global var stale. */
             cache_hl(op->src[0]);
             /* Mark cur_skip_next_op so the dispatcher skips the
@@ -6573,7 +6655,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             load_to_hl(out, f, op->src[0]);
         /* PR_DE dst: route the byte writes into E/D instead of
            L/H. HL preserves src[0] (we never touch it during the
-           op-with-A dance), so cur_hl_vreg = src[0] stays valid. */
+           op-with-A dance), so rs.hl = src[0] stays valid. */
         if (vreg_is_pr_de(f, op->dst)) {
             const char *low_dst  = "e";
             const char *high_dst = "d";
@@ -6601,14 +6683,17 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         }
         /* Single-bit shortcut (int variant): set/res for AND/OR
            when K or ~K is a single bit. XOR excluded — no
-           toggle-bit instruction. */
+           toggle-bit instruction. set/res are CB-prefix (absent on
+           808x), so gate on !IS_808x(); the ld a,r; and/or N;
+           ld r,a fallback below is all-CPU. */
+        int cb = (!IS_808x()) != 0;
         uint8_t lo_bm = (op->kind == IR_AND)
                       ? (uint8_t)(~lo & 0xff) : lo;
         uint8_t hi_bm = (op->kind == IR_AND)
                       ? (uint8_t)(~hi & 0xff) : hi;
-        int lo_single = (op->kind != IR_XOR && lo_bm != 0 &&
+        int lo_single = (cb && op->kind != IR_XOR && lo_bm != 0 &&
                          (lo_bm & (lo_bm - 1)) == 0);
-        int hi_single = (op->kind != IR_XOR && hi_bm != 0 &&
+        int hi_single = (cb && op->kind != IR_XOR && hi_bm != 0 &&
                          (hi_bm & (hi_bm - 1)) == 0);
         const char *setres = (op->kind == IR_AND) ? "res" : "set";
         if (lo_zero) {
@@ -6640,8 +6725,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
        preserved so the HL finalize below is unchanged. Off elsewhere:
        the assembler synthetic push-af-wraps. PR_DE dst falls through. */
     if ((op->kind == IR_AND || op->kind == IR_OR
-         || (op->kind == IR_XOR && (f->features & IR_FEAT_HL_DE_LOGIC4)))
-        && (f->features & IR_FEAT_HL_DE_LOGIC)
+         || (op->kind == IR_XOR && (IS_RABBIT4K())))
+        && (IS_RABBIT())
         && !vreg_is_pr_de(f, op->dst)) {
         emit(out, "%s\thl,de", mnem);
         commit_hl_word(out, f, op->dst);
@@ -6658,7 +6743,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         emit(out, "%s\td", mnem);
         emit(out, "ld\td,a");
         cache_de(op->dst);
-        /* cur_hl_vreg = src[0] unchanged. */
+        /* rs.hl = src[0] unchanged. */
         return 0;
     }
     emit(out, "ld\ta,l");
@@ -6685,7 +6770,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         return -1;
     }
     if (ci->is_critical)
-        emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipset\t3" : "di");
+        emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
 
     int pre = (ci->pre_pushed > 0);
 
@@ -6696,7 +6781,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        the already-pushed args); ir_alloc disables the PR_BC pool in
        functions containing IR_PUSH_ARG. */
     int bc_saved = 0;
-    int bc_vreg_at_call_entry = cur_bc_vreg;
+    int bc_vreg_at_call_entry = rs.bc;
     if (!pre) {
         for (int i = 0; i < f->n_vregs; i++) {
             if (f->vreg_to_phys[i] == IR_PR_BC) { bc_saved = 1; break; }
@@ -6838,8 +6923,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                accumulator (__i64_acc or FA), not HL — the callee binds it
                from there. Load the slot into the accumulator. */
             emit_acc_slot_addr(out, f, ci->args[last], adj);
-            emit(out, "call\t%s", acc_prim(f, ci->args[last], "load"));
-            invalidate_hl_cache();
+            emit_c(out, CLOB_HL, "call\t%s", acc_prim(f, ci->args[last], "load"));
         } else if (width == 4) {
             load_to_dehl_adj(out, f, ci->args[last], adj);
         } else {
@@ -6871,12 +6955,11 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         /* __far function pointer: materialize the far address into DEHL
            (EHL = E:bank, HL:offset), set A = arg-word count, and dispatch
            through l_farcall (the banking trampoline pages bank E and calls
-           offset HL). Mirrors the walker's gen_farcall register contract;
-           l_farcall reads EHL, so — unlike sccz80's calling convention —
-           the fnptr need not also sit on the stack. The args are popped by
-           the caller-cleanup below. (l_farcall is not yet provided by any
-           target lib: this emits a loud link error rather than the silent
-           near miscompile l_jphl produced.) */
+           offset HL). l_farcall reads EHL, so — unlike sccz80's calling
+           convention — the fnptr need not also sit on the stack. The args
+           are popped by the caller-cleanup below. (l_farcall is not yet
+           provided by any target lib, so this currently emits a link
+           error.) */
         load_to_dehl_adj(out, f, ci->fnptr_vreg,
                          pre ? 0 : pushed_bytes + sp_adj_extra);
         int argwords = pushed_bytes / 2;
@@ -6891,7 +6974,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         /* No spare index reg (idx2 off / target reserves one / 808x / gbz80):
            the fnptr is on TOS and the arg rides HL/DEHL/acc. Reclaim the fnptr
            into AF, push a return label then the fnptr, and `ret` into it — the
-           callee's own `ret` lands back at the label. (Mirrors the walker.) */
+           callee's own `ret` lands back at the label. */
         int lbl = fc_ret_label_counter++;
         emit(out, "pop\taf");           /* fnptr → AF */
         if (pre) cur_sp_adjust -= 2;
@@ -6963,14 +7046,14 @@ static int gen_call(FILE *out, Func *f, const Op *op)
 
     /* Caller-cleanup for SMALLC and STDC (CALLEE cleans its own).
        Rabbit/gbz80 reclaim the whole arg block in one `add sp,N`
-       (IR_FEAT_ADD_SP_IMM) — preserves all regs incl. the HL/DEHL return
+       (IS_RABBIT()/IS_GBZ80()) — preserves all regs incl. the HL/DEHL return
        value, and from 2 args up it's size-equal-or-smaller AND faster than
        the pop chain (gbz80 `add sp,e` 16T vs 2×`pop bc` 24T; Rabbit cheaper
        still). Below that, and on plain z80, `pop bc` (10T/1 byte each,
        DEHL/HL-preserving) wins; the ex/add/ld dance only pays off at N≥10
        args, not hot enough to bother. */
     if (ci->abi != IR_ABI_CALLEE && pushed_bytes > 0) {
-        if ((f->features & IR_FEAT_ADD_SP_IMM) && pushed_bytes >= 4) {
+        if ((IS_RABBIT() || IS_GBZ80()) && pushed_bytes >= 4) {
             emit_add_sp_chain(out, pushed_bytes);
         } else {
             int n = pushed_bytes;
@@ -6986,15 +7069,15 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         cur_sp_adjust -= pushed_bytes;
 
     if (ci->is_critical)
-        emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipres" : "ei");
+        emit(out, (IS_RABBIT()) ? "ipres" : "ei");
 
     /* Restore the BC we pushed before the call. The pop restores BC
-       to exactly what cur_bc_vreg held at call entry — but arg setup
+       to exactly what rs.bc held at call entry — but arg setup
        may have reloaded BC to a different tenant via emit_bc_reload.
        Restore the cache to reflect what is actually in BC now. */
     if (bc_saved) {
         emit(out, "pop\tbc");
-        cur_bc_vreg = bc_vreg_at_call_entry;
+        rs.bc = bc_vreg_at_call_entry;
     }
 
     /* Callee clobbers caller-saved registers (HL, DE, BC, A
@@ -7014,9 +7097,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     cur_bank_fn = NULL;
     /* Return value lands in HL (width ≤ 2) or DEHL (width 4) per
        z88dk's smallc/stdc convention. Pick the correct store
-       routine from the ret vreg's width — using store_hl for a
-       width-4 vreg silently dropped the high half (a wrong-result
-       and missing-high-half bug). */
+       routine from the ret vreg's width — store_hl on a width-4
+       vreg would drop the high half. */
     if (ci->ret_vreg >= 0) {
         int ret_w = f->vregs[ci->ret_vreg].width;
         if (ret_w > 4) {
@@ -7025,16 +7107,13 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
             emit_acc_store_hl(out, f, ci->ret_vreg);
             invalidate_hl_cache();
-            cur_fa_vreg = ci->ret_vreg;
+            rs.fa = ci->ret_vreg;
         } else if (ret_w == 4)
             store_dehl_cached(out, f, ci->ret_vreg);
         else if (ret_w == 1) {
             /* Byte return: the value is in HL (low byte in L, char-
-               widened by the callee). store_hl writes 2 bytes and
-               overruns a 1-byte slot — `unsigned char c = f();` (c
-               coalesced with the ret vreg) clobbered the next local /
-               the return address. Same overrun class as the gen_mov /
-               gen_ld_imm byte paths. */
+               widened by the callee). store_hl writes 2 bytes and would
+               overrun a 1-byte slot, so store the low byte via A. */
             emit(out, "ld\ta,l");
             if (cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                 cache_a(ci->ret_vreg);
@@ -7052,7 +7131,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        keep the pairing adjacent to the cleanup pops it follows. */
     if (pre && func_has_pr_bc(f) && bc_args_save_depth > 0) {
         emit(out, "pop\tbc");
-        cur_bc_vreg = bc_args_save_stack[--bc_args_save_depth];
+        rs.bc = bc_args_save_stack[--bc_args_save_depth];
         cur_sp_adjust -= 2;
     }
     return 0;
@@ -7102,15 +7181,14 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
         emit(out, "ld\tb,h");
         emit(out, "ld\tc,l");
     }
-    emit(out, "call\t%s", hi->acc_store);
-    invalidate_hl_cache();
+    emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
     invalidate_de_cache();
     invalidate_bc_cache();
     invalidate_a_cache();
     /* The result is left in the accumulator (the store above wrote a
        copy to the slot but didn't disturb the accumulator). Advertise
        it so an immediately-following return skips the reload. */
-    cur_fa_vreg = hi->ret_vreg;
+    rs.fa = hi->ret_vreg;
     return 0;
 }
 
@@ -7165,13 +7243,13 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
-        cur_fa_vreg = dst;
+        rs.fa = dst;
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC2INT) {
         /* acc → int: load the accumulator (unless already resident),
            convert (result in HL/DEHL), store to the int dst. */
-        if (cur_fa_vreg != src) {
+        if (rs.fa != src) {
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
@@ -7196,7 +7274,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
-        cur_fa_vreg = dst;
+        rs.fa = dst;
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC_UNARY) {
@@ -7204,7 +7282,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
            (unless already resident), call the in-place helper, store back.
            The i64 store takes the address in BC (acc_store_bc); the float
            store takes it in HL. */
-        if (cur_fa_vreg != src) {
+        if (rs.fa != src) {
             emit_acc_slot_addr(out, f, src, 0);
             emit(out, "call\t%s", hi->acc_load);
         }
@@ -7213,11 +7291,11 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
         emit(out, "call\t%s", hi->acc_store);
         invalidate_hl_bc();
-        cur_fa_vreg = dst;
+        rs.fa = dst;
         return 0;
     }
     /* acc → acc move */
-    if (cur_fa_vreg != src) {
+    if (rs.fa != src) {
         emit_acc_slot_addr(out, f, src, 0);
         emit(out, "call\t%s", hi->acc_load);
     }
@@ -7225,7 +7303,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
     if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
     emit(out, "call\t%s", hi->acc_store);
     invalidate_hl_bc();
-    cur_fa_vreg = dst;
+    rs.fa = dst;
     return 0;
 }
 
@@ -7364,7 +7442,7 @@ static int gen_ld_far(FILE *out, Func *f, const Op *op)
             emit_acc_slot_addr(out, f, op->dst, 0);
             emit_acc_store_hl(out, f, op->dst);
             invalidate_hl_bc();
-            cur_fa_vreg = op->dst;
+            rs.fa = op->dst;
         } else if (dst_w == 4)
             store_dehl_finalize(out, f, op->dst);   /* lp_glong/lp_gptr → DEHL */
         else
@@ -7378,10 +7456,10 @@ static int gen_ld_far(FILE *out, Func *f, const Op *op)
    set (E'H'L') and the value in the PRIMARY set (HL, or DEHL for wide).
    The IR has no model of the alt register file, so the address is moved
    into it via an opaque `exx; pop hl; pop de; exx` over a stack push —
-   never a cache-aware load in the alt bank (FAR_IR_PLAN risk #2).
+   never a cache-aware load in the alt bank.
 
-   Order mirrors the walker (gen_far_store): the ADDRESS is materialized
-   and pushed FIRST. The far address is typically the freshly-computed
+   The ADDRESS is materialized and pushed FIRST. The far address is
+   typically the freshly-computed
    DEHL value (an IR_ADD result that may be DEHL-resident with no frame
    slot); pushing it before the value's load_to_* clobbers DEHL keeps it
    recoverable. The value is then materialized into the primary set, and
@@ -7410,7 +7488,7 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
           narrow value into the primary set (DEHL for 4B, HL/L otherwise).
           The address is safe on the stack; this may clobber DEHL/BC. */
     if (val_w > 4) {
-        if (cur_fa_vreg != val) {
+        if (rs.fa != val) {
             emit_acc_slot_addr(out, f, val, 0);
             emit(out, "call\t%s", acc_prim(f, val, "load"));
         }
@@ -7421,8 +7499,7 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
     }
     /* 3. Move the address into the alt set (E'H'L') via the opaque
           exx-pop, leaving the value untouched in the primary set (the
-          maths accumulator survives — the pops only touch alt HL/DE,
-          exactly the walker's gen_far_store sequence). */
+          maths accumulator survives — the pops only touch alt HL/DE). */
     emit(out, "exx");
     emit(out, "pop\thl");          /* alt HL = offset */
     emit(out, "pop\tde");          /* alt DE = (D=0,E=bank) → E'H'L' = addr */
@@ -7434,7 +7511,7 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
     if (!bc_saved) invalidate_bc_cache();
     invalidate_de_cache();
     invalidate_a_cache();
-    if (val_w > 4) cur_fa_vreg = -1;   /* helper clobbered the accumulator */
+    if (val_w > 4) rs.fa = -1;   /* helper clobbered the accumulator */
     cur_bank_fn = NULL;
     return 0;
 }
@@ -7464,10 +7541,37 @@ static int gen_ld_farsym(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* gbz80/808x signed long (32-bit) compare: they lack the P/V flag, so the
+   inline `jp po; xor 0x80` S^V correction is illegal. Instead flip bit 31 of
+   BOTH operands (the unsigned borrow of minu^0x80000000 vs subtr^0x80000000
+   then equals signed minu<subtr). The two `xor 0x80` flips run on D while the
+   operand is in DEHL — BEFORE any subtract — since an xor mid-chain would
+   clear the borrow CF. After: CF = (minu < subtr signed). Clobbers A/BC/DE/HL.
+   Mirrors load_binop_operands' push/pop staging with sp_adj=4. */
+static void emit_long_signflip_sub(FILE *out, Func *f, int minu, int subtr)
+{
+    load_to_dehl(out, f, subtr);
+    emit(out, "ld\ta,d"); emit(out, "xor\t0x80"); emit(out, "ld\td,a");
+    emit(out, "push\tde"); emit(out, "push\thl");
+    load_to_dehl_adj(out, f, minu, 4);
+    emit(out, "ld\ta,d"); emit(out, "xor\t0x80"); emit(out, "ld\td,a");
+    emit(out, "pop\tbc");                 /* BC = subtr low */
+    emit(out, "ld\ta,l"); emit(out, "sub\tc");
+    emit(out, "ld\ta,h"); emit(out, "sbc\ta,b");
+    emit(out, "pop\tbc");                 /* BC = subtr high */
+    emit(out, "ld\ta,e"); emit(out, "sbc\ta,c");
+    emit(out, "ld\ta,d"); emit(out, "sbc\ta,b");
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
     int is_signed = (op->kind == IR_CMP_LT || op->kind == IR_CMP_GE);
     int cf_true_long = (op->kind == IR_CMP_ULT || op->kind == IR_CMP_LT);
+    /* gbz80 has no jp po/pe at all, so the inline S^V correction can't run —
+       sign-flip the operands instead. (808x also lacks the overflow flag but
+       DOES have jp po (parity), which works for these compares, so they stay
+       on the jp-po path.) */
+    int long_signflip = is_signed && IS_GBZ80();
     /* Long ordered compare: byte-wise sub/sbc chain. Final sbc
        leaves CF = unsigned borrow (a<b) and A = high byte of result.
        Signed gets the S^V correction inline (`jp po ok; xor 0x80;
@@ -7475,7 +7579,23 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        already has the high byte. */
     int src0w_lt = (op->src[0] >= 0) ? f->vregs[op->src[0]].width : 0;
     if (src0w_lt == 4) {
-        if (op->src[1] == -1) {
+        if (long_signflip && op->src[1] == -1) {
+            /* gbz80 signed vs const: flip bit31 of src0 and of K, then the
+               unsigned borrow = signed LT (no S^V correction below). */
+            uint32_t k = (uint32_t)op->imm;
+            load_to_dehl(out, f, op->src[0]);
+            emit(out, "ld\ta,d"); emit(out, "xor\t0x80"); emit(out, "ld\td,a");
+            emit(out, "ld\ta,l");
+            emit(out, "sub\t%u", (unsigned)(k & 0xff));
+            emit(out, "ld\ta,h");
+            emit(out, "sbc\ta,%u", (unsigned)((k >> 8) & 0xff));
+            emit(out, "ld\ta,e");
+            emit(out, "sbc\ta,%u", (unsigned)((k >> 16) & 0xff));
+            emit(out, "ld\ta,d");
+            emit(out, "sbc\ta,%u", (unsigned)(((k >> 24) & 0xff) ^ 0x80));
+        } else if (long_signflip) {
+            emit_long_signflip_sub(out, f, op->src[0], op->src[1]);
+        } else if (op->src[1] == -1) {
             uint32_t k = (uint32_t)op->imm;
             load_to_dehl(out, f, op->src[0]);
             emit(out, "ld\ta,l");
@@ -7519,9 +7639,10 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,d");
             emit(out, "sbc\ta,b");
         }
-        if (is_signed) {
+        if (is_signed && !long_signflip) {
             /* A holds high byte of result; CF set iff borrow. Apply
-               the S^V correction so CF ends up = signed-LT. */
+               the S^V correction so CF ends up = signed-LT. (gbz80 took
+               the sign-flip path above — CF is already signed-LT.) */
             int n = cmp_label_counter++;
             emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, n);
             emit(out, "xor\t0x80");
@@ -7594,7 +7715,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         int want_carry = (cf_true_long == br_true);
         emit(out, "jp\t%s,L_f%d_bb_%d",
              want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
-        cur_a_vreg = -1;                         /* A clobbered; HL=n, DE=home kept */
+        rs.a = -1;                         /* A clobbered; HL=n, DE=home kept */
         cur_skip_next_op = 1;
         return 0;
     }
@@ -7611,12 +7732,12 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        + byte-sub. Signed only: for unsigned the byte-wise sub/sbc is
        already cheap (no sign-flip to beat), so DSUB+push/pop would only
        add stack traffic. */
-    if ((f->features & IR_FEAT_DSUB) && is_signed
+    if ((IS_8085()) && is_signed
         && cur_branch_test_kind != 0) {
         int br_true = (cur_branch_test_kind == IR_BR_COND);
         int want = (cf_true_long == br_true);
         const char *cc = want ? "k" : "nk";
-        int bc_live = (cur_bc_vreg >= 0);
+        int bc_live = (rs.bc >= 0);
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tc,e");
         emit(out, "ld\tb,d");          /* BC = src1 */
@@ -7624,15 +7745,13 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         if (bc_live) emit(out, "pop\tbc"); /* restores BC; flags survive */
         emit(out, "jp\t%s,L_f%d_bb_%d", cc, func_emit_idx,
              cur_branch_test_label);
-        int saved_de = cur_de_vreg;    /* DSUB preserves DE */
-        invalidate_hl_cache();         /* clears HL/DE/A, not BC */
-        cur_de_vreg = saved_de;
+        invalidate_hl_keep_de();       /* DSUB clobbers HL, preserves DE/BC */
         if (!bc_live) invalidate_bc_cache();
         cur_skip_next_op = 1;
         return 0;
     }
     int sflip_lt = signed_cmp_signflip(out, f, is_signed);
-    if (f->features & IR_FEAT_OVERFLOW_FLAG) {
+    if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
     } else {
@@ -7657,9 +7776,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "jp\t%s,L_f%d_bb_%d",
              cc, func_emit_idx, cur_branch_test_label);
         /* `sbc hl,de` clobbered HL but preserved DE — keep cache. */
-        int saved_de = cur_de_vreg;
-        invalidate_hl_cache();
-        cur_de_vreg = saved_de;
+        invalidate_hl_keep_de();
         cur_skip_next_op = 1;
         return 0;
     }
@@ -7734,24 +7851,28 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
     /* After swap-load, CF=true means swapped operand src1 < src0
        = original src0 > src1 → GT/UGT. */
     int cf_true_gt = (op->kind == IR_CMP_UGT || op->kind == IR_CMP_GT);
+    int long_signflip = is_signed && IS_GBZ80();   /* see gen_cmp_lt_ge */
     /* Long ordered compare, GT/LE variant: subtract src[0] from
        src[1] byte-wise — the swap means CF=borrow iff src1<src0 iff
        src0>src1. Const-RHS not folded (ast_opt rewrites it to
        LT/GE before reaching IR). */
     int src0w_gt = (op->src[0] >= 0) ? f->vregs[op->src[0]].width : 0;
     if (src0w_gt == 4) {
-        if (op->src[1] == -1) {
+        if (long_signflip) {
+            /* gbz80: minu=src1, subtr=src0 (the swap) — CF = src1<src0
+               signed = src0>src1, no S^V correction below. */
+            emit_long_signflip_sub(out, f, op->src[1], op->src[0]);
+        } else if (op->src[1] == -1) {
             /* `a > K` / `a <= K` (width 4, const RHS): ir_build now
                canonicalizes these to `a >= K+1` / `a < K+1` (the LT/GE
                const path above). If one still reaches here it's the
-               degenerate type-max edge — name the bail (no walker to fall
-               back to). */
+               degenerate type-max edge — name the bail (failure is
+               fatal). */
             fprintf(stderr, "ir_lower: long %s with const RHS unsupported "
                     "(width-4 GT/LE const should be canonicalized to GE/LT)\n",
                     op->kind == IR_CMP_GT ? "a>K" : "a<=K");
             return -1;
-        }
-        if (!fp_active(f) && !dehl_has(op->src[0])) {
+        } else if (!fp_active(f) && !dehl_has(op->src[0])) {
             /* Load src[1] (the "left" of the swapped subtraction) into
                DEHL, point HL at &src[0], subtract through (hl). */
             load_to_dehl(out, f, op->src[1]);
@@ -7785,7 +7906,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,d");
             emit(out, "sbc\ta,b");
         }
-        if (is_signed) {
+        if (is_signed && !long_signflip) {
             int n = cmp_label_counter++;
             emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, n);
             emit(out, "xor\t0x80");
@@ -7814,12 +7935,12 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
        CF=unsigned borrow. Fused-branch path, signed only; push/pop a
        live BC around the subtract (see gen_cmp_lt_ge — pop leaves flags
        and unsigned wouldn't beat the byte-wise sub). */
-    if ((f->features & IR_FEAT_DSUB) && is_signed
+    if ((IS_8085()) && is_signed
         && cur_branch_test_kind != 0) {
         int br_true = (cur_branch_test_kind == IR_BR_COND);
         int want = (cf_true_gt == br_true);
         const char *cc = want ? "k" : "nk";
-        int bc_live = (cur_bc_vreg >= 0);
+        int bc_live = (rs.bc >= 0);
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tc,e");
         emit(out, "ld\tb,d");          /* BC = src0 */
@@ -7827,15 +7948,13 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         if (bc_live) emit(out, "pop\tbc"); /* restores BC; flags survive */
         emit(out, "jp\t%s,L_f%d_bb_%d", cc, func_emit_idx,
              cur_branch_test_label);
-        int saved_de = cur_de_vreg;    /* DSUB preserves DE */
-        invalidate_hl_cache();         /* clears HL/DE/A, not BC */
-        cur_de_vreg = saved_de;
+        invalidate_hl_keep_de();       /* DSUB clobbers HL, preserves DE/BC */
         if (!bc_live) invalidate_bc_cache();
         cur_skip_next_op = 1;
         return 0;
     }
     int sflip_gt = signed_cmp_signflip(out, f, is_signed);
-    if (f->features & IR_FEAT_OVERFLOW_FLAG) {
+    if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
     } else {
@@ -7854,9 +7973,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         const char *cc = want_carry ? "c" : "nc";
         emit(out, "jp\t%s,L_f%d_bb_%d",
              cc, func_emit_idx, cur_branch_test_label);
-        int saved_de = cur_de_vreg;
-        invalidate_hl_cache();
-        cur_de_vreg = saved_de;
+        invalidate_hl_keep_de();
         cur_skip_next_op = 1;
         return 0;
     }
@@ -7964,7 +8081,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
        call — for equality, XOR the halves instead (Z = equal, no helper,
        no DE load for a constant RHS). */
     int z_true = (op->kind == IR_CMP_EQ);
-    if (f->features & IR_FEAT_OVERFLOW_FLAG) {
+    if (!(IS_808x() || IS_GBZ80())) {
         load_binop_operands(out, f, op);
         emit(out, "or\ta");
         emit(out, "sbc\thl,de");
@@ -8002,13 +8119,11 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
         const char *cc = want_z ? "z" : "nz";
         emit(out, "jp\t%s,L_f%d_bb_%d",
              cc, func_emit_idx, cur_branch_test_label);
-        int saved_de = cur_de_vreg;
-        invalidate_hl_cache();
-        cur_de_vreg = saved_de;
+        invalidate_hl_keep_de();
         cur_skip_next_op = 1;
         return 0;
     }
-    if (f->features & IR_FEAT_BOOL_HL) {
+    if (IS_RABBIT()) {
         /* Rabbit: HL = src0-src1 (from sbc above). bool hl → 0/1 = NE;
            for EQ, bool hl;dec hl;bool hl inverts it (logical NOT). */
         emit(out, "bool\thl");
@@ -8055,7 +8170,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         }
         /* 8080/8085: no CB shifts — byte-boundary split (whole-byte moves
            inline, only count%8 bits via l_lsr_dehl). */
-        if (!(f->features & IR_FEAT_CB_BITOPS)) {
+        if (IS_808x()) {
             gen_808x_long_const_shift(out, f, op, count, 1);
             return 0;
         }
@@ -8171,11 +8286,10 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     /* 8080/8085: no CB shifts — route 16-bit `>>` (logical) to l_asr_u
        (DE=value, HL=count, result HL). Covers const and variable counts.
        `<<` stays the add-hl-hl path below (dad h, 8080-safe). */
-    if (!(f->features & IR_FEAT_CB_BITOPS)) {
+    if (IS_808x()) {
         load_binop_operands(out, f, op);   /* HL=value, DE=count */
         emit(out, "ex\tde,hl");            /* DE=value, HL=count */
-        emit(out, "call\tl_asr_u");
-        invalidate_hl_cache();
+        emit_c(out, CLOB_HL, "call\tl_asr_u");
         invalidate_de_cache();
         /* l_asr_u is BC-clean on every non-CB target (8080/8085/gbz80/
            r2ka byte-rotate loops) — do NOT drop a live slotless PR_BC
@@ -8238,7 +8352,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                 emit(out, "srl\tl");
         } else {
             for (int k = 0; k < count; k++) {
-                if (f->features & IR_FEAT_PAIR_ROT) {
+                if (IS_RABBIT()) {
                     emit(out, "or\ta");      /* clear carry → logical >>1 */
                     emit(out, "rr\thl");
                 } else {
@@ -8253,9 +8367,9 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     /* z80n: variable 16-bit logical shift-right as flat `bsrl de,b`
        (IR_SHR is always logical here). Sets no flags; result is a
        value, not a branch condition. */
-    if (f->features & IR_FEAT_BARREL_SHIFT) {
+    if (IS_Z80N()) {
         load_binop_operands(out, f, op);   /* HL=value(src0), DE=count(src1) */
-        int bc_live = (cur_bc_vreg >= 0);  /* `ld b,e` clobbers B — preserve */
+        int bc_live = (rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tb,e");              /* B = count low byte */
         emit(out, "ex\tde,hl");            /* DE = value */
@@ -8278,7 +8392,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     emit(out, "or\ta");
     emit(out, "jr\tz,L_f%d_shift_end_%d", func_emit_idx, n);
     fprintf(out, "L_f%d_shift_loop_%d:\n", func_emit_idx, n);
-    if (f->features & IR_FEAT_PAIR_ROT) {
+    if (IS_RABBIT()) {
         emit(out, "or\ta");          /* clear carry → logical >>1 */
         emit(out, "rr\thl");
     } else {
@@ -8374,10 +8488,9 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
                accumulator (FA for double); the teardown below preserves
                it (it lives in memory / the alt-reg set, not HL/DEHL). */
             is_acc = 1;
-            if (cur_fa_vreg != op->src[0]) {
+            if (rs.fa != op->src[0]) {
                 emit_acc_slot_addr(out, f, op->src[0], 0);
-                emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
-                invalidate_hl_cache();
+                emit_c(out, CLOB_HL, "call\t%s", acc_prim(f, op->src[0], "load"));
             }
         } else if (width == 4) {
             load_to_dehl(out, f, op->src[0]);
@@ -8436,9 +8549,9 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
     }
     if (f->is_interrupt) {
         /* Interrupt epilogue: restore the registers the prologue saved
-           (in reverse) and return via reti/retn/ei;reti. Mirrors the
-           walker's gen_interrupt_leave; the IR targets z80 only, so the
-           ix/iy saves are always present. The return form follows the
+           (in reverse) and return via reti/retn/ei;reti. The IR targets
+           z80 only, so the ix/iy saves are always present. The return
+           form follows the
            critical / vector combination:
              __interrupt           → reti
              __critical __interrupt → retn
@@ -8465,7 +8578,7 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
        preserving the return value in HL/DEHL). Mirrors codegen_critical_leave.
        Rabbit restores the IP priority with ipres (no stack). */
     if (f->flags & CRITICAL)
-        emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipres" : "call\tl_pop_ei");
+        emit(out, (IS_RABBIT()) ? "ipres" : "call\tl_pop_ei");
     /* __z88dk_callee: the callee strips its own caller-pushed args (the caller
        emits no cleanup — gen_call). The teardown above left sp at the return
        address, args just above it. Remove them while preserving the return
@@ -8481,13 +8594,13 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         if (f->returns_longlong) callee_args += 2;
     }
     if (callee_args > 0) {
-        if (is_acc || (f->features & IR_FEAT_ADD_SP_IMM)) {
+        if (is_acc || IS_RABBIT() || IS_GBZ80()) {
             /* Result not in HL/DEHL — a wide (double) return lives in FA
                (memory / the ALT register set, which `exx` would corrupt), so
                HL/DE/BC are free; or gbz80, where `add sp,d` touches no register.
                Either way do the sp math without preserving a register pair. */
             emit(out, "pop\tbc");                 /* BC = return address */
-            if (f->features & IR_FEAT_ADD_SP_IMM) {
+            if (IS_RABBIT() || IS_GBZ80()) {
                 int rem = callee_args;            /* gbz80/Rabbit: add sp,d */
                 while (rem > 0) { int s = rem > 127 ? 127 : rem;
                                   emit(out, "add\tsp,%d", s); rem -= s; }
@@ -8497,7 +8610,7 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\tsp,hl");           /* drop the args (HL free) */
             }
             emit(out, "push\tbc");
-        } else if (f->features & IR_FEAT_EXX) {
+        } else if (!(IS_808x() || IS_GBZ80())) {
             /* int/long result in HL/DEHL: park it + the return address in the
                shadow set across the sp arithmetic (exx preserves DEHL). */
             emit(out, "pop\tbc");                 /* BC = return address */
@@ -8569,10 +8682,9 @@ static int param_stack_width(const Func *f)
 
 static void emit_prologue(FILE *out, Func *f)
 {
-    /* Register-save prologue — moved out of declparse's walker scaffolding
-       (gen_interrupt_enter / codegen_critical_enter / gen_push_frame); the
-       IR owns it under --use-ir. Same order and instructions, z80 only (the
-       IR aborts other CPUs). The matching teardown is in lower_ret. */
+    /* Register-save prologue: interrupt enter, critical enter, then frame
+       push. z80 only (the IR aborts other CPUs). The matching teardown is
+       in lower_ret. */
     if (f->is_interrupt) {
         /* gen_interrupt_enter: ei only for a bare, non-critical __interrupt. */
         if (!(f->flags & CRITICAL) && f->interrupt_irq < 0)
@@ -8586,7 +8698,7 @@ static void emit_prologue(FILE *out, Func *f)
     } else if (f->flags & CRITICAL) {
         /* Rabbit: ipset 3 (no data-stack push); z80: l_push_di saves DI
            state on the stack (frame offsets account for the 2 bytes). */
-        emit(out, (f->features & IR_FEAT_CRIT_IP) ? "ipset\t3"
+        emit(out, (IS_RABBIT()) ? "ipset\t3"
                                                   : "call\tl_push_di");
     }
     if (frame_has_saved_fp(f))      /* gen_push_frame: preserve caller's IX */
@@ -8639,7 +8751,7 @@ static void emit_prologue(FILE *out, Func *f)
         emit_acc_slot_addr(out, f, fc_vreg, 0);
         emit_acc_store_hl(out, f, fc_vreg);
         invalidate_hl_bc();
-        cur_fa_vreg = fc_vreg;
+        rs.fa = fc_vreg;
     } else if (fc_vreg >= 0 && f->vregs[fc_vreg].width == 4) {
         /* width-4: reconstruct DEHL (low half from BC, high half survived
            in DE) and place it in the param's home (DEHL register or slot). */
@@ -8947,6 +9059,12 @@ int ir_lower_func(FILE *out, Func *f)
                     cse, packs, late, pushes, deadret, dce, narrow);
     }
 
+    /* Drop orphan vregs (abandoned builder temps — in no op slot) before the
+       id-indexed analysis/allocation tables get built. Renumbers survivors;
+       order-preserving so allocation is unaffected. */
+    int n_orphans = ir_compact_vregs(f);
+    if (n_orphans && getenv("IR_DEAD"))
+        fprintf(stderr, "ir_compact: removed %d orphan vreg(s)\n", n_orphans);
     ir_compute_liveness(f);
     ir_compute_op_liveness(f);
     ir_compute_live_ranges(f);
@@ -8961,6 +9079,22 @@ int ir_lower_func(FILE *out, Func *f)
     /* Bumped once per function — both lowering passes (when lazy spill
        does two) share the same func label prefix. */
     func_emit_idx++;
+    /* Structural IR verify (opt-in via IR_VERIFY): runs after ir_alloc/
+       ir_assign_slots so the spilled-slot check sees populated
+       vreg_to_phys[]. Reports to stderr; IR_VERIFY_ABORT turns a
+       violation fatal. `stage` carries func_emit_idx so a report maps to
+       the L_f<idx> labels in the emitted asm. */
+    if (getenv("IR_VERIFY")) {
+        char stage[24];
+        snprintf(stage, sizeof stage, "lower f%d", func_emit_idx);
+        int viol = ir_verify_func(f, stage);
+        /* Compaction ran above, so there must be no orphan vregs left — a
+           residual one means a slot was missed or a later pass minted dead
+           state. Folded into IR_VERIFY as a standing tripwire. */
+        viol += ir_report_dead_vregs(f, stage, 1);
+        if (viol && getenv("IR_VERIFY_ABORT"))
+            abort();
+    }
     /* Lazy-spill config. Read once; the
        per-pass deferral state lives in lower_func_render. Default ON
        (sound-by-construction static reaching-reloads model; validated
@@ -9359,7 +9493,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             hl_about_to_change(carry);
             /* DE / DEHL caches don't survive BB boundaries yet (no
                bb_de_out tracking). Reset them here even when HL
-               carries — invalidate_hl_cache would clear cur_hl_vreg
+               carries — invalidate_hl_cache would clear rs.hl
                which we just set. */
             invalidate_de_cache();
         } else {
@@ -9651,7 +9785,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             /* FP byte-direct chain narrow: when the next op is a long
                binop with dst as either src (commutative byte-direct
                chain picks whichever is in the DEHL cache), the chain
-               reads from H/L via the cur_hl_vreg advertise — the
+               reads from H/L via the rs.hl advertise — the
                producer's `ld bc,hl` is wasted. Set the no-bc-stash
                flag for cache_dehl_no_spill to skip the stash. Note
                this is broader than dst_dead_safe (which needs pos
@@ -9849,7 +9983,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     if (is_region_preheader && cur_func_ehome >= 0)
                         home_rehome(out, f);
                     /* HL state unchanged — bb_hl_out captures
-                       cur_hl_vreg. But an elided fall-through still crosses
+                       rs.hl. But an elided fall-through still crosses
                        a BB boundary: spill a dirty slot-backed home (keeping
                        the belief) so the merge/back-edge successor can reload
                        a coherent slot if it doesn't carry. */
@@ -9949,7 +10083,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         bb_byte_out[bb->id] =
             (cur_func_ehome >= 0 && cur_byte_home_vreg == cur_func_ehome)
             ? cur_byte_home_vreg : -1;
-        bb_hl_out[bb->id] = cur_hl_vreg;
+        bb_hl_out[bb->id] = rs.hl;
         bb_pending_out[bb->id] = pending_spill_v;
         bb_lowered[bb->id] = 1;
     }

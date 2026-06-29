@@ -36,6 +36,26 @@ static int inc_post(void){ double d = 5.0; int r = (int)(d++); return r*100+(int
 static int inc_pre(void){ double d = 5.0; int r = (int)(++d); return r*100+(int)d; }  /* 606 */
 static int inc_dec(void){ g = 5.0; g--; --g; return (int)g; }        /* 3 */
 
+/* A write-once int reused across several acc-double ops becomes a slotless
+   PR_BC tenant; the float helpers (dadd/dmul/l_int2long_s_float) clobber BC,
+   and with no backing slot its value was reloaded from the -1 "no slot"
+   address (below-frame garbage). Each op must see b==2. */
+static int acc_int_reuse(void){
+    double a = 2; int b = 2;
+    a += b; a *= b; a /= b; a -= b;       /* 2 -> 4 -> 8 -> 4 -> 2 */
+    return (int)a;
+}
+
+/* An int ARG (literal or value) to a double PARAM needs the int->double
+   conversion at the call site (widen_arg_to_param). Without it the int is
+   pushed at its narrow width and the callee reads a garbage wide value —
+   e.g. `run_sqrt(6400, 80.0)` arrived with x==0. */
+static int dparam(double x, double y){ return (int)(x + y); }
+static int int_arg_to_double_param(void){
+    int n = 9;
+    return dparam(6400, 80) + dparam(n, 3);   /* 6480 + 12 = 6492 */
+}
+
 static void test_fp_promote(void)
 {
     assertEqual(a_mul(), 32); assertEqual(a_div(), 12); assertEqual(a_addsub(), 10);
@@ -47,5 +67,7 @@ static void test_fp_promote(void)
     assertEqual(ca_add(), 15); assertEqual(ca_sub(), 7); assertEqual(ca_mul(), 20);
     assertEqual(ca_div(), 5); assertEqual(ca_glob(), 16);
     assertEqual(inc_post(), 506); assertEqual(inc_pre(), 606); assertEqual(inc_dec(), 3);
+    assertEqual(acc_int_reuse(), 2);
+    assertEqual(int_arg_to_double_param(), 6492);
 }
 int main(void){ suite_setup("fp-promote"); suite_add_test(test_fp_promote); return suite_run(); }

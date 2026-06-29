@@ -8,10 +8,9 @@
  * rewritten) plus up to 3 preceding satellite ops (which get NOPed) —
  * with binding variables and side conditions.
  *
- * Decoupled from compiler internals (no ccdefs.h) — links against
- * ir.c + ir_analysis.c only, so ir_selftest builds standalone. CPU
- * applicability travels as IR_FEAT_* bits on Func->features, never as
- * c_cpu.
+ * A pattern's CPU applicability travels as an exclude_cpus bitmask tested
+ * against Func->cpu (the target's CPU_* bit from define.h), rather than a
+ * direct c_cpu read in the matching code.
  */
 #ifndef IR_MATCH_H
 #define IR_MATCH_H
@@ -134,8 +133,8 @@ typedef struct {
 typedef struct {
     const char *name;      /* used by IR_OPT_VERBOSE counts and
                               --opt-disable=pattern:<name> */
-    uint32_t    features;  /* IR_FEAT_* bits that must ALL be present in
-                              f->features; 0 = fire on every target */
+    uint32_t    exclude_cpus; /* CPU_* bits this pattern must NOT fire on
+                                 (tested against f->cpu); 0 = every target */
     uint8_t     n_ops;     /* 1 .. IR_MATCH_MAX_OPS; ops[n_ops-1] is the
                               anchor */
     uint8_t     flags;     /* IR_PAT_* */

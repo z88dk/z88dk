@@ -29,13 +29,11 @@ typedef struct symbol_s SYMBOL;
 struct node_s;
 typedef struct node_s Node;
 
-/* Kind is the 80cc type-kind enum (KIND_CHAR, KIND_INT, etc.) from
-   define.h; the IR uses its integer values without reinterpreting them.
-   Aliased to int here so ir_selftest builds without define.h; the guard
-   lets the real enum win when define.h is already included. */
-#ifndef DEFINE_H
-typedef int Kind;
-#endif
+/* The 80cc type-kind enum (KIND_CHAR, KIND_INT, …), shared verbatim with
+   the front end. ir_kind.h is dependency-free, so the IR/analysis layer
+   now reasons about kinds by name and ir_selftest still links without the
+   rest of ccdefs. */
+#include "ir_kind.h"
 
 /* ----- Register masks ---------------------------------------------------
    The read / written / clobbered effect sets on IR ops and helper-call
@@ -57,72 +55,6 @@ typedef uint32_t RegMask;
 #define IR_R_DE_ALT  (1u << 11)
 #define IR_R_BC_ALT  (1u << 12)
 #define IR_R_ALL     (~0u)
-
-/* ----- Target feature bits ----------------------------------------------
-   Capability word stamped onto Func (f->features) by
-   ir_features_from_cpu() in ir_compiler_glue.c, so the ccdefs-free IR
-   layers (ir_match in particular) can gate rewrites per target without
-   seeing c_cpu. Feature bits rather than CPU ids: they document WHY a
-   pattern is gated and age better as CPU variants accumulate
-   (PATTERN_MATCHER_PLAN.md decision #1). */
-#define IR_FEAT_CB_BITOPS  (1u << 0)  /* CB-prefix srl/sla/rl/rr — absent
-                                         on 8080/8085 (only RAL/RAR via A) */
-#define IR_FEAT_EX_DE_HL   (1u << 1)  /* ex de,hl — absent on gbz80 */
-#define IR_FEAT_IX         (1u << 2)  /* IX/IY index registers — absent on
-                                         8080/8085/gbz80 */
-#define IR_FEAT_DJNZ       (1u << 3)  /* djnz — absent on 8080/8085/gbz80 */
-#define IR_FEAT_HL_DE_LOGIC  (1u << 4) /* native and/or/sub hl,de — Rabbit r2k+ */
-#define IR_FEAT_HL_DE_LOGIC4 (1u << 5) /* native xor/cp hl,de, neg hl — Rabbit r4k */
-#define IR_FEAT_SP_REL_HL    (1u << 6) /* ld hl,(sp+d) / ld (sp+d),hl — Rabbit, kc160 */
-#define IR_FEAT_SP_REL_PAIRS (1u << 7) /* de/bc sp-rel too — kc160 */
-#define IR_FEAT_SP_REL_WIDE  (1u << 8) /* sp disp 0..255 (Rabbit); else 0..127 (kc160) */
-#define IR_FEAT_ADD_SP_IMM   (1u << 9) /* add sp,d (signed byte) — Rabbit, gbz80 */
-#define IR_FEAT_LEA          (1u << 10) /* lea hl/de/bc,ix+d (signed byte) — ez80 */
-#define IR_FEAT_LD_HL_IND    (1u << 11) /* ld hl/de/bc,(hl) word indirect — ez80 */
-#define IR_FEAT_BOOL_HL      (1u << 12) /* bool hl (hl = hl!=0 ? 1 : 0) — Rabbit */
-#define IR_FEAT_PAIR_ROT     (1u << 13) /* native rr hl/de (1B) for 16-bit shift — Rabbit */
-#define IR_FEAT_OVERFLOW_FLAG (1u << 14) /* P/V is overflow (signed cmp via flags) — NOT gbz80/808x */
-#define IR_FEAT_IX_WORD       (1u << 15) /* native word-wise ld hl,(ix+d) — ez80, kc160;
-                                            elsewhere it's synthetic (two ld r,(ix+d)) */
-/* z80n (Spectrum Next) extra ops. NOTE: add hl/de/bc,nn and add hl/de/bc,a
-   do NOT affect flags — usable only for a standalone 16-bit add whose
-   carry-out is dead, never in a multi-word carry chain. */
-#define IR_FEAT_ADD_PAIR_IMM  (1u << 16) /* add hl/de/bc,nn (ED 34/35/36) — z80n */
-#define IR_FEAT_ADD_PAIR_A    (1u << 17) /* add hl/de/bc,a  (ED 31/32/33) — z80n */
-#define IR_FEAT_BARREL_SHIFT  (1u << 18) /* bsla/bsrl/bsra/brlc de,b (ED 28-2C) — z80n */
-#define IR_FEAT_JR            (1u << 19) /* relative jumps (jr) — absent on 8080/8085, where
-                                            z80asm expands `jr` to a 3-byte `jp` (so ASMPC-
-                                            relative skip offsets must be +1) */
-#define IR_FEAT_SP_REL_DEPTR  (1u << 20) /* 8085 LDSI+LHLX/SHLX: `ld de,sp+N` (N 0..255) points
-                                            DE at a slot, then `ld hl,(de)` / `ld (de),hl` does
-                                            the word load/store. Clobbers DE (the pointer reg),
-                                            unlike Rabbit's DE-preserving ld hl,(sp+N) */
-#define IR_FEAT_DSUB          (1u << 21) /* 8085 DSUB (`sub hl,bc`): 1-byte 16-bit subtract
-                                            setting CF=unsigned borrow AND K=signed(HL<BC). With
-                                            `jp k`/`jp nk` it fuses a signed 16-bit compare into a
-                                            branch, replacing the sign-flip + byte-wise sub. */
-#define IR_FEAT_CRIT_IP       (1u << 22) /* Rabbit: __critical uses `ipset 3`/`ipres` (IP-priority
-                                            shift register, no data-stack effect), not z80's di/ei +
-                                            l_push_di/l_pop_ei. So no critical frame-offset shift. */
-#define IR_FEAT_EX_SP_HL      (1u << 23) /* ex (sp),hl / XTHL: swap HL with the TOS word in one op
-                                            — HL + the top stack slot act as two loop-carried
-                                            residents traded by one swap, untouching DE/BC. Absent
-                                            on gbz80 (dropped the ex/exx family). */
-#define IR_FEAT_BLOCK_COPY    (1u << 24) /* native ldi/ldir. Absent on 8080/8085/gbz80, where z80asm
-                                            expands them to a __z80asm__ldi helper CALL (clobbers BC)
-                                            — prefer the A-based byte copy there. */
-#define IR_FEAT_EXX           (1u << 25) /* exx (alternate register set BC'/DE'/HL'). Lets a value
-                                            pair be parked in the shadow set across sp arithmetic
-                                            (e.g. __z88dk_callee arg-cleanup preserving the result).
-                                            Absent on 8080/8085 (no alt regs) and gbz80 (dropped the
-                                            ex/exx family). */
-#define IR_FEAT_FAST_MULT     (1u << 26) /* native 16x16 hardware multiply (Rabbit `mul`: HL:BC =
-                                            BC*DE). When set, a constant multiply keeps the l_mult
-                                            helper (which uses `mul`); when absent, x*C is strength-
-                                            reduced to shifts + add/sub for cheap constants. */
-#define IR_FEAT_TEST_RP       (1u << 27) /* `test hl` / `test bc` (Rabbit 4000+): one-op 16-bit
-                                            zero/sign test (reg OR 0 → flags), no A clobber, no
-                                            ld→HL move for a BC-resident value. */
 
 /* ----- Physical register pool ------------------------------------------ */
 
@@ -566,11 +498,11 @@ typedef struct {
     int       *slot_offsets;    /* by frame-slot id, sp-relative offset */
     int        n_slots;
 
-    /* Target capability word (IR_FEAT_* bits). Stamped by ir_build from
-       ir_features_from_cpu(); 0 in standalone/selftest contexts unless
-       set explicitly. Pattern-matcher entries whose `features` bits
-       aren't all present here don't fire. */
-    uint32_t   features;
+    /* Target CPU id bit (define.h's CPU_*, one-hot). Stamped by ir_build
+       from c_cpu; 0 in standalone/selftest contexts unless set explicitly.
+       The pattern matcher skips a pattern whose exclude_cpus mask includes
+       this bit. */
+    uint32_t   cpu;
 
     /* Spare index register (opposite the frame pointer) for a loop-invariant
        resident, or IR_PR_NONE. Stamped by ir_build from ir_idx2_reg(). The
@@ -723,11 +655,6 @@ const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym);
    field of a Type). Used for indirect access where the namespace lives on
    the pointer's pointee type / array element type, not a symbol. */
 const SYMBOL *ir_namespace_bank_fn(const char *ns_name);
-
-/* Derive the IR_FEAT_* capability word from the global c_cpu. Lives in
-   ir_compiler_glue.c (needs define.h's CPU_* ids); ir_build stamps the
-   result onto each Func it creates. */
-uint32_t ir_features_from_cpu(void);
 
 /* Spare-index-register choice (the index reg opposite the frame pointer)
    for a loop-invariant resident: IR_PR_IY/IR_PR_IX, or IR_PR_NONE if

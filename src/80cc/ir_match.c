@@ -9,11 +9,13 @@
  * here (BUG_LOG A33–A40): the bugs live in the side conditions, not
  * the match — so those are written, and fixed, exactly once.
  *
- * ccdefs-free: links against ir.c + ir_analysis.c only, so
- * ir_selftest builds standalone. CPU applicability arrives as
- * IR_FEAT_* bits on f->features (stamped by ir_build), never c_cpu.
+ * The engine itself reads only the IR (ir.c / ir_analysis.c), so the
+ * pattern tests stay portable; CPU applicability arrives as the target's
+ * CPU_* bit on f->cpu (stamped by ir_build), tested against each pattern's
+ * exclude_cpus mask rather than a direct c_cpu read.
  */
 
+#include "ccdefs.h"      /* define.h's CPU_* ids for per-CPU pattern exclusion */
 #include "ir_match.h"
 #include "ir_analysis.h"
 
@@ -358,8 +360,7 @@ static int run_table_rounds(Func *f, const PatternDef *pats, int n_pats,
                     const PatternDef *P = &pats[p];
                     if (P->n_ops < 1 || P->n_ops > IR_MATCH_MAX_OPS)
                         continue;
-                    if (P->features
-                        && (f->features & P->features) != P->features)
+                    if (P->exclude_cpus & f->cpu)
                         continue;
                     if (pattern_disabled(P)) continue;
 
@@ -546,11 +547,9 @@ static void immconv_apply(Func *f, BB *bb, const int idx[],
    registers instead of running two count-N shift loops + a 4-byte OR.
    Width-4 only.
 
-   Cost note (re-cost before CPU diversification): the ROTL lowering
-   bit-rotates via CB-prefix srl/rl — 8080/8085 only have RAL/RAR
-   through A, so those targets need an A-walk lowering or a
-   .features = IR_FEAT_CB_BITOPS gate here. All-CPU today, matching
-   the pass this migrated from. */
+   The ROTL lowering bit-rotates via CB-prefix srl/rl — 8080/8085 only
+   have RAL/RAR through A, so the pattern is excluded there (exclude_cpus)
+   and the SHL|SHR|OR triple lowers via the shift helpers instead. */
 
 enum { RV_V = 1, RV_T1, RV_T2 };   /* rotl binding vars */
 
@@ -743,7 +742,7 @@ static const PatternDef ir_patterns[] = {
       .flags = IR_PAT_EITHER_ORDER | IR_PAT_COMMUTATIVE,
       /* gen_rotl emits CB shifts (srl/rr/set); on 8080/8085 (no CB ops)
          leave the SHL|SHR|OR unfused so it lowers via the shift helpers. */
-      .features = IR_FEAT_CB_BITOPS,
+      .exclude_cpus = CPU_8080 | CPU_8085,
       .ops = {
           { .kind = IR_SHL, .dst = RV_T1, .src0 = RV_V,
             .imm_pred = IR_IMM_ANY, .width = 4 },

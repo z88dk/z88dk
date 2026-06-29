@@ -386,6 +386,14 @@ static void build_hcall_test(Func *f)
 /* Compiler globals the lowerer consults; ir_selftest links standalone
    so we stub the ones it needs to default-off values. */
 int c_framepointer_is_ix = -1;
+int c_cpu = 1;                  /* = CPU_Z80 (define.h not in selftest includes);
+                                   the IS_*() macros read this — z80 default path */
+
+/* Two distinct one-hot CPU bits for exercising a pattern's exclude_cpus
+   mask. The engine only does a bitmask test, so the values needn't match
+   define.h's CPU_* — ST_CPU_INCL stands in for "a CPU the pattern allows",
+   ST_CPU_EXCL for "one it excludes". */
+enum { ST_CPU_INCL = 1u, ST_CPU_EXCL = 2u };
 int c_idx2_invariant = 0;       /* selftest builds IR by hand; idx2 off */
 int c_byte_resident = 0;        /* selftest builds IR by hand; byte-home off */
 int c_word_resident = 0;        /* selftest builds IR by hand; word-home off */
@@ -432,9 +440,10 @@ static const PatternDef pat_dblneg_gap = {
     .new_kind = IR_MOV, .new_src0 = MV_V,
 };
 
-/* Same, gated on a feature bit. */
-static const PatternDef pat_dblneg_feat = {
-    .name = "dblneg_feat", .n_ops = 2, .features = IR_FEAT_CB_BITOPS,
+/* Same, excluded on a specific CPU bit. */
+static const PatternDef pat_dblneg_excl = {
+    .name = "dblneg_excl", .n_ops = 2,
+    .exclude_cpus = ST_CPU_EXCL,
     .ops = {
         { .kind = IR_NEG, .dst = MV_T, .src0 = MV_V },
         { .kind = IR_NEG, .dst = MV_D, .src0 = MV_T },
@@ -667,12 +676,10 @@ static int run_match_tests(void)
     MCHECK(match_dblneg_shape(&pat_dblneg, 0, 0) == 1,
            "cleared disable fires again");
 
-    /* 7 — feature gating. */
-    MCHECK(match_dblneg_shape(&pat_dblneg_feat, 0, 0) == 0,
-           "missing feature bit gates pattern off");
-    {
+    /* 7 — per-CPU exclusion gating. */
+    for (int excluded = 0; excluded <= 1; excluded++) {
         Func *f = ir_func_new(NULL);
-        f->features = IR_FEAT_CB_BITOPS;
+        f->cpu = excluded ? ST_CPU_EXCL : ST_CPU_INCL;
         int v = ir_vreg_new(f, 2, NULL, 0);
         int t = ir_vreg_new(f, 2, NULL, 0);
         int d = ir_vreg_new(f, 2, NULL, IR_VREG_RETURN);
@@ -682,8 +689,11 @@ static int run_match_tests(void)
         ir_emit_unop(bb, IR_NEG, t, v);
         ir_emit_unop(bb, IR_NEG, d, t);
         ir_emit_ret(bb, d);
-        MCHECK(ir_match_run_table(f, &pat_dblneg_feat, 1) == 1,
-               "present feature bit lets pattern fire");
+        int n = ir_match_run_table(f, &pat_dblneg_excl, 1);
+        if (excluded)
+            MCHECK(n == 0, "excluded CPU gates pattern off");
+        else
+            MCHECK(n == 1, "non-excluded CPU lets pattern fire");
         ir_func_free(f);
     }
 
@@ -798,7 +808,8 @@ static int run_match_tests(void)
        distance to the long-push inserter). */
     {
         Func *f = ir_func_new(NULL);
-        f->features = IR_FEAT_CB_BITOPS;   /* rotl fuses only on CB-capable CPUs */
+        f->cpu = ST_CPU_INCL;   /* a non-808x bit: production rotl is excluded
+                                   only on 8080/8085, so it fires here */
         int v  = ir_vreg_new(f, 2, NULL, IR_VREG_PARAM);
         int t1 = ir_vreg_new(f, 2, NULL, 0);
         int t2 = ir_vreg_new(f, 2, NULL, 0);
@@ -828,7 +839,8 @@ static int run_match_tests(void)
            into the source vreg. The anchor's dst must stay
            unconstrained or it collides with the source binding. */
         Func *f = ir_func_new(NULL);
-        f->features = IR_FEAT_CB_BITOPS;   /* rotl fuses only on CB-capable CPUs */
+        f->cpu = ST_CPU_INCL;   /* a non-808x bit: production rotl is excluded
+                                   only on 8080/8085, so it fires here */
         int v  = ir_vreg_new(f, 2, NULL, IR_VREG_PARAM);
         int t1 = ir_vreg_new(f, 2, NULL, 0);
         int t2 = ir_vreg_new(f, 2, NULL, 0);

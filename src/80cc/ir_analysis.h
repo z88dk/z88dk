@@ -93,4 +93,21 @@ int ir_func_total_ops(const Func *f);
 int  ir_op_defs(const Op *op, int *out, int max);
 int  ir_op_uses(const Op *op, int *out, int max);
 
+/* Structural IR verifier. Walks the function and reports invariant
+   violations to stderr (vreg-operand bounds, branch/switch targets,
+   BB succ/pred ids, required heap payloads, spilled-vreg slot validity,
+   vreg widths). Read-only — never mutates `f`. Returns the number of
+   violations found (0 = clean). `stage` is a label for the report line
+   (e.g. "lower"). Cheap enough to gate on an env var per function. */
+int ir_verify_func(const Func *f, const char *stage);
+
+/* Report vregs that appear in no op slot and are not roots — abandoned
+   builder temps. Read-only; returns the count, printing each when `verbose`. */
+int ir_report_dead_vregs(const Func *f, const char *stage, int verbose);
+
+/* Remove orphan vregs (in no op slot, not a root) and renumber survivors,
+   rewriting every op slot. Run before liveness/allocation. Returns the count
+   removed. */
+int ir_compact_vregs(Func *f);
+
 #endif /* IR_ANALYSIS_H */

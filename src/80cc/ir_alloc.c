@@ -205,7 +205,7 @@ void ir_alloc(Func *f)
        eligible-producer set, exactly-one use at op_idx+1 as src[1],
        not src[0], not live-out, not param / addr-taken (those rules
        came from the HL pool pre-filter). Anything else falls back to
-       PR_SPILL with the dynamic DE cache (cur_de_vreg) handling
+       PR_SPILL with the dynamic DE cache (rs.de) handling
        opportunistic hits at emit time. */
     int *de_defs = calloc((size_t)f->n_vregs, sizeof(int));
     int *de_uses = calloc((size_t)f->n_vregs, sizeof(int));
@@ -366,13 +366,32 @@ void ir_alloc(Func *f)
                Disqualify PR_BC for the whole function. */
             if (o->kind == IR_ASM)
                 has_bc_clobber = 1;
-            /* Pre-pushed call args (IR_PUSH_ARG) don't disqualify
-               PR_BC: gen_call can't wrap such calls in push/pop bc
-               (the save would land above the arg block), but it
-               restores the tenant post-call by reloading its backing
-               slot via emit_bc_reload — stack-layout-neutral. */
+            /* Wide-accumulator float/long-long ops (IR_ACC_*) call helpers
+               (dadd/dmul/l_int2long_s_float/…) that clobber BC, and — unlike
+               IR_CALL/IR_HCALL — gen_acc_* emit NO push bc/pop bc around them.
+               A PR_BC LOCAL has no backing slot, so emit_bc_reload after the
+               clobber would read a bogus below-frame offset. Disqualify. */
+            if (o->kind == IR_ACC_BINOP || o->kind == IR_ACC_UNOP
+                || o->kind == IR_ACC_CMP)
+                has_bc_clobber = 1;
+            /* Pre-pushed call args (IR_PUSH_ARG): gen_call can't wrap such
+               calls in push/pop bc (the save would land above the arg block),
+               so it restores the PR_BC tenant by reloading its backing slot
+               via emit_bc_reload. That works for a PARAM (caller slot) but
+               NOT a slotless write-once LOCAL — handled by the per-candidate
+               `is_param || !has_prepushed_call` guard below, not here. */
         }
     }
+    /* A pre-pushed-arg call restores the PR_BC tenant via emit_bc_reload
+       (slot read), which a slotless LOCAL candidate can't satisfy. */
+    int has_prepushed_call = 0;
+    for (int i = 0; i < f->n_bbs && !has_prepushed_call; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++)
+            if (f->bbs[i].ops[j].kind == IR_CALL && f->bbs[i].ops[j].call
+                && f->bbs[i].ops[j].call->pre_pushed > 0) {
+                has_prepushed_call = 1;
+                break;
+            }
     if (!has_long && !has_bc_clobber) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
@@ -536,6 +555,9 @@ void ir_alloc(Func *f)
             if (use_count[v] < 2) continue;
             int is_param  = (vr->flags & IR_VREG_PARAM) != 0;
             int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
+            /* Slotless (non-PARAM) candidate + a pre-pushed-arg call =
+               unreloadable across that call (emit_bc_reload reads -1). */
+            if (!is_param && has_prepushed_call) continue;
             if (is_param) {
                 if (write_count[v] > 0) continue;
             } else if (is_induct) {
@@ -586,6 +608,7 @@ void ir_alloc(Func *f)
                     if (use_count[v] < 2) continue;
                     int is_param = (vr->flags & IR_VREG_PARAM) != 0;
                     int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
+                    if (!is_param && has_prepushed_call) continue;
                     if (is_param) {
                         if (write_count[v] > 0) continue;
                     } else if (is_induct) {

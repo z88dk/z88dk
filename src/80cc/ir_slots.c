@@ -20,17 +20,15 @@ extern int c_framepointer_is_ix;   /* -1 = no frame pointer (sp mode) */
 
 /* True iff the sp+0 pop/push fastpath could ever fire in this function:
    sp-mode (no IX frame pointer, or one not actually used) AND a CPU
-   without cheap sp-relative addressing. Mirrors !fp_active(f) &&
-   tos_pushpop_ok(f) in ir_lower.c. When false, seeding the hottest vreg
-   at offset 0 buys nothing, so we leave the slot layout untouched. */
+   without cheap sp-relative addressing (tos_pushpop_ok, defined in
+   ir_lower.c). When false, seeding the hottest vreg at offset 0 buys
+   nothing, so we leave the slot layout untouched. */
 static int sp0_fastpath_possible(const Func *f)
 {
     int fp_active = (c_framepointer_is_ix != -1) && !f->is_naked
                   && !f->uses_acc;
     if (fp_active) return 0;
-    return !(f->features & (IR_FEAT_ADD_SP_IMM
-                          | IR_FEAT_SP_REL_HL
-                          | IR_FEAT_SP_REL_PAIRS));
+    return tos_pushpop_ok(f);
 }
 
 void ir_assign_slots(Func *f)

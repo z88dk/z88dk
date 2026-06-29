@@ -29,6 +29,16 @@ static double f32_ret(int i){ return i; }
 static int f32_caddmul(void){ double d = 10; d += 5; d *= 2; return (int)d; }     /* 30 */
 static int f32_inc(void){ double d = 5; d++; ++d; --d; return (int)d; }            /* 6 */
 
+/* --- mixed f16 x f32: usual arithmetic conversions promote f16->f32 --- */
+static int mix_mul(void){ _Float16 a = 3; double b = 4; return (int)(a * b); }      /* 12 */
+static int mix_div(void){ _Float16 a = 12; double b = 4; return (int)(a / b); }     /* 3 */
+static int mix_add(void){ _Float16 a = 3; double b = 4; return (int)(a + b); }      /* 7 */
+static int mix_sub(void){ _Float16 a = 10; double b = 4; return (int)(a - b); }     /* 6 */
+static int mix_cmp(void){ _Float16 a = 3; double b = 4; return (a < b) + (b > a); } /* 2 */
+static int mix_cmp2(void){ _Float16 a = 5; double b = 4; return (a > b) + (b < a); }/* 2 */
+static int mix_narrow(void){ double b = 7; _Float16 a = b; return (int)a; }         /* 7 */
+static int mix_widen(void){ _Float16 a = 9; double b = a; return (int)b; }          /* 9 */
+
 static void test_f16(void)
 {
     assertEqual(f16_mul(), 32); assertEqual(f16_div(), 12);
@@ -44,4 +54,11 @@ static void test_f32(void)
     assertEqual(f32_glob(9), 9); assertEqual((int)f32_ret(11), 11);
     assertEqual(f32_caddmul(), 30); assertEqual(f32_inc(), 6);
 }
-int main(void){ suite_setup("fp-reg"); suite_add_test(test_f16); suite_add_test(test_f32); return suite_run(); }
+static void test_mixed(void)
+{
+    assertEqual(mix_mul(), 12); assertEqual(mix_div(), 3);
+    assertEqual(mix_add(), 7); assertEqual(mix_sub(), 6);
+    assertEqual(mix_cmp(), 2); assertEqual(mix_cmp2(), 2);
+    assertEqual(mix_narrow(), 7); assertEqual(mix_widen(), 9);
+}
+int main(void){ suite_setup("fp-reg"); suite_add_test(test_f16); suite_add_test(test_f32); suite_add_test(test_mixed); return suite_run(); }

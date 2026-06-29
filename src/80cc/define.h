@@ -59,36 +59,7 @@ typedef enum {
 
 
 
-typedef enum {
-    KIND_NONE,
-    KIND_VOID,
-    KIND_CHAR,
-    KIND_SHORT,
-    KIND_INT,
-    KIND_LONG,
-    KIND_FLOAT,
-    KIND_DOUBLE,
-    KIND_ARRAY,
-    KIND_PTR,
-    KIND_CPTR,
-    KIND_STRUCT, /* 11 */
-    KIND_FUNC,
-    KIND_ELLIPSES,
-    KIND_PORT8,
-    KIND_PORT16,
-    KIND_ENUM,
-    KIND_CARRY,
-    KIND_FLOAT16,
-    KIND_LONGLONG,
-    KIND_ACCUM16,
-    KIND_ACCUM32,
-} Kind;
-
-#define kind_is_fixed(x)  ( (x) == KIND_ACCUM16 || (x) == KIND_ACCUM32)
-#define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
-#define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG || k == KIND_LONGLONG )
-
-#define kind_is_decimal(x)  ( kind_is_floating(x) || kind_is_fixed(x) )
+#include "ir_kind.h"   /* Kind enum + kind_is_* helpers (shared with ir.h) */
 
 
 #define get_decimal_type(k,us) (k == KIND_ACCUM16 ? us ? type_uaccum16 : type_accum16 \
@@ -390,6 +361,8 @@ struct gototab_s {
 #define IS_Z80N() (c_cpu == CPU_Z80N)
 #define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
 #define IS_KC160() (c_cpu == CPU_KC160)
+#define IS_RABBIT()   (c_cpu & CPU_RABBIT)            /* any Rabbit (r2k/r3k/r4k/r6k) */
+#define IS_RABBIT4K() (c_cpu & (CPU_R4K | CPU_R6K))   /* Rabbit 4000+ */
 
 
 

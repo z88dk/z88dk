@@ -1373,6 +1373,7 @@ int ir_opt_narrow_byte(Func *f)
             if (f->vregs[d].width != 2) continue;
             if (demands_low_byte_only(f, d)) {
                 f->vregs[d].width = 1;
+                f->vregs[d].kind  = KIND_CHAR;   /* keep kind/width consistent */
                 pass_changed++;
             }
         }

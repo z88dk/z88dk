@@ -227,7 +227,7 @@ Func *ir_func_new(SYMBOL *fn)
     f->bbs   = NULL;     f->n_bbs   = 0; f->cap_bbs   = 0;
     f->frame_size = 0;
     f->slot_offsets = NULL; f->n_slots = 0;
-    f->features = 0;
+    f->cpu = 0;
     f->abi = IR_ABI_SMALLC;
     f->is_interrupt = 0;
     f->interrupt_irq = -1;

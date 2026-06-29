@@ -43,6 +43,18 @@ static int try_fold_binop(int kind, int64_t l, int64_t r, int64_t *out)
     case OP_SUB:  *out = l - r; return 1;
     case OP_MULT: *out = l * r; return 1;
     case OP_DIV:  if (r == 0) return 0; *out = l / r; return 1;
+    /* CAVEAT — signed `%` folds with C99 semantics (remainder takes the
+       dividend's sign): -1 % 2 == -1. sdcc folds it identically and fails the
+       same sccz80 division-suite cases we do — so 80cc matches sdcc here, NOT
+       a regression. sccz80 alone passes the suite: it does NOT fold signed
+       `% 2^k` at all — it strength-reduces to inline `|val| & mask` (always
+       non-negative, -1 % 2 -> 1), with l_div for other divisors. That mix
+       follows no single convention (it yields 1 % -32 == 1 but -1 % -4 == -1),
+       and the suite was written to it. So our C99 fold is correct and
+       sdcc-consistent; "matching sccz80" would mean reproducing its non-C99
+       ad-hoc modulo in the fold. Left as-is pending a decision on whether to
+       make z88dk's signed `%` C99-conforming lib-wide. (Signed `/` agrees with
+       the runtime either way: both truncate toward zero, like C99.) */
     case OP_MOD:  if (r == 0) return 0; *out = l % r; return 1;
     case OP_AND:  *out = l & r; return 1;
     case OP_OR:   *out = l | r; return 1;
