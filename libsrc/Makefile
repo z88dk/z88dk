@@ -89,6 +89,7 @@ TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib)
 TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib)
 TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
+TOCREATE += $(call check_target,northstar,northstar.lib $(CPMLIBS))
 TOCREATE += $(call check_target,osborne,gfxosborne1.lib $(CPMLIBS))
 TOCREATE += $(call check_target,ondra,ondra_clib.lib)
 TOCREATE += $(call check_target,osca,osca_clib.lib)
@@ -1871,6 +1872,14 @@ newbrain_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=newbrain
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(TARGET_DIRECTORY)/newbrain/newbrain.lst
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(TARGET_DIRECTORY)/newbrain/newbrain_cpm.lst
+
+# Northstar Advantage - Stefano
+northstar.lib: cpm_clib.lib
+	@echo ''
+	@echo '--- Building Northstar Advantage graphics Library ---'
+	@echo ''
+	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=northstar
+	TARGET=northstar TYPE=z80 $(LIBLINKER) -DFORnorthstar -x$(OUTPUT_DIRECTORY)/northstar @$(TARGET_DIRECTORY)/northstar/northstar.lst
 
 # TIKI-100 library - Stefano
 tiki100.lib: cpm_clib.lib
