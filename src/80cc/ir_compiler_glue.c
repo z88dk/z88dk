@@ -62,15 +62,17 @@ uint32_t ir_features_from_cpu(void)
 {
     uint32_t feat = IR_FEAT_CB_BITOPS | IR_FEAT_EX_DE_HL
                   | IR_FEAT_IX | IR_FEAT_DJNZ | IR_FEAT_OVERFLOW_FLAG
-                  | IR_FEAT_JR;
-    if (IS_808x())   /* P flag is parity, not overflow; no relative jumps */
+                  | IR_FEAT_JR | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY;
+    if (IS_808x())   /* P flag is parity, not overflow; no relative jumps (XTHL still present);
+                        no native ldi/ldir (z80asm expands to a helper call) */
         feat &= ~(IR_FEAT_CB_BITOPS | IR_FEAT_IX | IR_FEAT_DJNZ
-                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_JR);
+                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_JR | IR_FEAT_BLOCK_COPY);
     if (IS_8085())   /* undocumented LDSI+LHLX/SHLX sp-rel ld/st; DSUB+K signed compare */
         feat |= IR_FEAT_SP_REL_DEPTR | IR_FEAT_DSUB;
-    if (IS_GBZ80())   /* LR35902 keeps the CB prefix; no overflow/sign flags */
+    if (IS_GBZ80())   /* LR35902 keeps the CB prefix; no overflow/sign flags; no ex (sp),hl;
+                         no native ldi/ldir */
         feat &= ~(IR_FEAT_EX_DE_HL | IR_FEAT_IX | IR_FEAT_DJNZ
-                  | IR_FEAT_OVERFLOW_FLAG);
+                  | IR_FEAT_OVERFLOW_FLAG | IR_FEAT_EX_SP_HL | IR_FEAT_BLOCK_COPY);
     if (c_cpu & CPU_RABBIT) {          /* and/or/sub hl,de, bool hl, rr hl */
         feat |= IR_FEAT_HL_DE_LOGIC | IR_FEAT_BOOL_HL | IR_FEAT_PAIR_ROT;
         feat |= IR_FEAT_CRIT_IP;       /* no di/ei: __critical via ipset/ipres */
@@ -91,6 +93,19 @@ uint32_t ir_features_from_cpu(void)
         feat |= IR_FEAT_ADD_PAIR_IMM | IR_FEAT_ADD_PAIR_A
               | IR_FEAT_BARREL_SHIFT;
     return feat;
+}
+
+/* Spare index register for a loop-invariant resident — the one opposite the
+   frame pointer. c_framepointer_is_ix: 1=IX frame→spare IY, 0=IY frame→spare
+   IX, -1=sp-mode→IX (both free, pick IX). 808x/gbz80 have no index regs →
+   gate on CPU. */
+int ir_idx2_reg(void)
+{
+    if (!c_idx2_invariant) return IR_PR_NONE;
+    if (getenv("IR_NO_IDX2")) return IR_PR_NONE;
+    if (IS_808x() || IS_GBZ80()) return IR_PR_NONE;
+    if (c_framepointer_is_ix == 1) return IR_PR_IY;   /* frame IX → spare IY */
+    return IR_PR_IX;                                  /* frame IY, or sp-mode → IX */
 }
 
 /* Bridge the lowerer's FILE* interface to the compiler's global

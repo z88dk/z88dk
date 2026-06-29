@@ -104,6 +104,13 @@ typedef uint32_t RegMask;
 #define IR_FEAT_CRIT_IP       (1u << 22) /* Rabbit: __critical uses `ipset 3`/`ipres` (IP-priority
                                             shift register, no data-stack effect), not z80's di/ei +
                                             l_push_di/l_pop_ei. So no critical frame-offset shift. */
+#define IR_FEAT_EX_SP_HL      (1u << 23) /* ex (sp),hl / XTHL: swap HL with the TOS word in one op
+                                            — HL + the top stack slot act as two loop-carried
+                                            residents traded by one swap, untouching DE/BC. Absent
+                                            on gbz80 (dropped the ex/exx family). */
+#define IR_FEAT_BLOCK_COPY    (1u << 24) /* native ldi/ldir. Absent on 8080/8085/gbz80, where z80asm
+                                            expands them to a __z80asm__ldi helper CALL (clobbers BC)
+                                            — prefer the A-based byte copy there. */
 
 /* ----- Physical register pool ------------------------------------------ */
 
@@ -113,6 +120,10 @@ typedef enum {
     IR_PR_HL,
     IR_PR_DE,
     IR_PR_BC,
+    IR_PR_C,           /* width-1 byte home: low half of BC */
+    IR_PR_E,           /* width-1 byte home: low half of DE */
+    IR_PR_D,           /* width-1 byte home: high half of DE (headroom) */
+    IR_PR_B,           /* width-1 byte home: high half of BC (headroom) */
     IR_PR_IX,
     IR_PR_IY,
     IR_PR_DEHL,        /* 32-bit pair occupying DE and HL together */
@@ -549,6 +560,12 @@ typedef struct {
        aren't all present here don't fire. */
     uint32_t   features;
 
+    /* Spare index register (opposite the frame pointer) for a loop-invariant
+       resident, or IR_PR_NONE. Stamped by ir_build from ir_idx2_reg(). The
+       allocator may put ONE invariant width-2 vreg here; lowerer reads it via
+       `push <idx>;pop de`. */
+    int        idx2_reg;
+
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
     IrAbi      abi;
@@ -692,5 +709,10 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name);
    ir_compiler_glue.c (needs define.h's CPU_* ids); ir_build stamps the
    result onto each Func it creates. */
 uint32_t ir_features_from_cpu(void);
+
+/* Spare-index-register choice (the index reg opposite the frame pointer)
+   for a loop-invariant resident: IR_PR_IY/IR_PR_IX, or IR_PR_NONE if
+   disabled/unavailable. See ir_compiler_glue.c. */
+int ir_idx2_reg(void);
 
 #endif /* IR_H */

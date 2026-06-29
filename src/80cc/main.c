@@ -149,6 +149,10 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "Framepointer configuration (for debugging):", NULL, NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, NULL, 1},
     { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, NULL, 0},
+    { 0, "idx2-invariant", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Hold a loop-invariant in the spare index register (opposite the frame pointer)", &c_idx2_invariant, NULL, 1},
+    { 0, "no-idx2-invariant", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable the spare-index-register loop-invariant resident", &c_idx2_invariant, NULL, 0},
+    { 0, "byte-resident", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Keep a hot loop-carried char accumulator in a byte register", &c_byte_resident, NULL, 1},
+    { 0, "no-byte-resident", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable byte-register residency for char accumulators", &c_byte_resident, NULL, 0},
     { 0, "zcc-opt", OPT_STRING, "Location for zcc_opt.def", &c_zcc_opt, NULL, (intptr_t)(void *)"zcc_opt.def"},
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, NULL, 0 },

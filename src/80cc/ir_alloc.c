@@ -25,6 +25,7 @@
 #include "ir_analysis.h"
 
 #include <stdlib.h>
+#include <limits.h>
 
 /* Returns 1 if the spill of op->dst at bb->ops[op_idx] is dead — its
    value is never read from the frame, only consumed via the HL cache
@@ -518,8 +519,18 @@ void ir_alloc(Func *f)
             if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
             if (use_count[v] < 2) continue;
             int is_param  = (vr->flags & IR_VREG_PARAM) != 0;
+            int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
             if (is_param) {
                 if (write_count[v] > 0) continue;
+            } else if (is_induct) {
+                /* IVSR stepped pointer: a pre-header init + exactly one
+                   in-loop self-step, both lowered through the BC-stamping
+                   producer path (MOV / ADD-imm). write_count==2 — the
+                   only twice-written PR_BC case, admitted solely on the
+                   IVSR-set INDUCTION flag. Held in BC, the deref reads it
+                   for free and the step is `ld l,c;ld h,b; add hl,de; ld
+                   bc,hl` — no slot round-trip per iteration. */
+                if (write_count[v] != 2) continue;
             } else {
                 if (write_count[v] != 1) continue;
                 /* Producer must be a kind whose lowerer ends in
@@ -558,8 +569,11 @@ void ir_alloc(Func *f)
                     if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
                     if (use_count[v] < 2) continue;
                     int is_param = (vr->flags & IR_VREG_PARAM) != 0;
+                    int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
                     if (is_param) {
                         if (write_count[v] > 0) continue;
+                    } else if (is_induct) {
+                        if (write_count[v] != 2) continue;   /* init + step */
                     } else {
                         if (write_count[v] != 1) continue;
                         int k = def_kind[v];
@@ -611,6 +625,142 @@ void ir_alloc(Func *f)
                 }
                 free(cand);
             }
+        }
+        /* idx2: ONE width-2 read-only PARAM read inside a loop and still
+           spilled — held in the spare index register (f->idx2_reg, opposite
+           the frame pointer), read via `push <idx>;pop de` at the compare.
+           Gated call/asm/acc-free: those clobber the spare reg (the frame
+           reg survives via the prologue push, the spare one doesn't). */
+        if (f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt) {
+            int idx2_safe = 1;
+            for (int i = 0; i < f->n_bbs && idx2_safe; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    OpKind k = f->bbs[i].ops[j].kind;
+                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) {
+                        idx2_safe = 0;
+                        break;
+                    }
+                }
+            /* Exclude deref'd/stepped pointers: a fused `*p++` writes its
+               base via LD_MEM/ST_MEM post_step (invisible to write_count),
+               so it looks invariant yet would advance the slot, not the reg.
+               An idx2 bound is only ever compared. */
+            int *is_base = calloc((size_t)f->n_vregs, sizeof(int));
+            if (is_base) {
+                for (int i = 0; i < f->n_bbs; i++)
+                    for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                        const Op *o = &f->bbs[i].ops[j];
+                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                            && o->mem.kind == IR_MEM_VREG
+                            && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                            is_base[o->mem.base] = 1;
+                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                            && o->src[0] < f->n_vregs)
+                            is_base[o->src[0]] = 1;
+                    }
+                int best = -1;
+                for (int v = 0; idx2_safe && v < f->n_vregs; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 2) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                    if (!(vr->flags & IR_VREG_PARAM)) continue;
+                    if (write_count[v] != 0) continue;        /* invariant */
+                    if (is_base[v]) continue;                 /* not a deref'd ptr */
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (use_count[v] < 4) continue;           /* used in a loop */
+                    if (best < 0 || use_count[v] > use_count[best]) best = v;
+                }
+                if (best >= 0) f->vreg_to_phys[best] = f->idx2_reg;
+                free(is_base);
+            }
+        }
+        /* Byte-register residency (Plan B, Phase 1 — C-home only).
+           Keep a hot loop-carried width-1 accumulator in C instead of a
+           frame slot. C is the low half of BC; in this block's envelope
+           (!has_long && !has_bc_clobber) BC is preserved-by-construction,
+           so a byte in C is rock-solid for the whole function — TRUE
+           residency: the value rides C for the whole function with NO slot
+           store (the lowerer's store_a_byte emits `ld c,a` and returns;
+           every byte read funnels through load_byte_to_a, home-aware).
+           Three gates make this audit-free + correct: NO calls (sidesteps
+           the PR_BC call save/restore, keyed on a word PR_BC tenant); BC
+           FREE (no word vreg took IR_PR_BC); and DEF-BEFORE-USE — the
+           value's first def must strictly precede its first read (else a
+           read would consult an unestablished home). Unlike PR_BC this
+           admits a WRITE-MANY vreg (the accumulator is the point). One
+           occupant. */
+        if (c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT")) {
+            int has_call = 0, bc_taken = 0;
+            for (int i = 0; i < f->n_bbs && !has_call; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    OpKind k = f->bbs[i].ops[j].kind;
+                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) {
+                        has_call = 1; break;
+                    }
+                }
+            for (int v = 0; v < f->n_vregs && !bc_taken; v++)
+                if (f->vreg_to_phys[v] == IR_PR_BC) bc_taken = 1;
+            /* first_def/first_read in global op order (def-before-use). */
+            int *first_def  = calloc((size_t)f->n_vregs, sizeof(int));
+            int *first_read = calloc((size_t)f->n_vregs, sizeof(int));
+            if (!has_call && first_def && first_read) {
+                for (int v = 0; v < f->n_vregs; v++) {
+                    first_def[v] = INT_MAX; first_read[v] = INT_MAX;
+                }
+                int g = 0;
+                for (int i = 0; i < f->n_bbs; i++) {
+                    BB *bb = &f->bbs[i];
+                    for (int j = 0; j < bb->n_ops; j++, g++) {
+                        const Op *o = &bb->ops[j];
+                        int u[16];
+                        int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                        for (int k = 0; k < nu; k++)
+                            if (u[k] >= 0 && u[k] < f->n_vregs
+                                && g < first_read[u[k]])
+                                first_read[u[k]] = g;
+                        if (o->dst >= 0 && o->dst < f->n_vregs
+                            && g < first_def[o->dst])
+                            first_def[o->dst] = g;
+                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                            && o->src[0] < f->n_vregs
+                            && g < first_def[o->src[0]])
+                            first_def[o->src[0]] = g;
+                    }
+                }
+                int best = -1;
+                for (int v = 0; v < f->n_vregs; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 1) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                        continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    /* Must actually be touched in a loop body — the
+                       use-count weighting (×4 in-loop) clears this when the
+                       vreg is loop-carried. Cold byte locals stay in slots. */
+                    if (use_count[v] < 8) continue;
+                    if (write_count[v] < 1) continue;
+                    /* Def must DOMINATE every read so the home is always
+                       established first. Sufficient + cheap: the first def
+                       lands in the entry block (bb0, global index <
+                       bb0.n_ops — global indices number bb0 first) AND
+                       strictly precedes the first read. bb0 dominates all
+                       blocks, so a read can never run before this def.
+                       (Rejects conditionally-initialised bytes — they keep
+                       their slot.) */
+                    if (first_def[v] >= f->bbs[0].n_ops) continue;
+                    if (first_def[v] >= first_read[v]) continue;  /* def-first */
+                    if (best < 0 || use_count[v] > use_count[best]) best = v;
+                }
+                /* C-home (slotless TRUE residency) when BC is free; else
+                   E-home (low half of DE, slot-backed lazy-spill — Plan B
+                   Phase 2) where DE-scratch ops clobber it across the loop
+                   test, so it carries a backing slot and the lowerer spills
+                   E→slot before any DE-clobbering op. */
+                if (best >= 0)
+                    f->vreg_to_phys[best] = bc_taken ? IR_PR_E : IR_PR_C;
+            }
+            free(first_def);
+            free(first_read);
         }
         free(write_count);
         free(use_count);

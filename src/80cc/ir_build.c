@@ -4974,6 +4974,7 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     Func *f = ir_func_new(fn);
     if (!f) return build_fail("ir_func_new returned NULL");
     f->features = ir_features_from_cpu();
+    f->idx2_reg = ir_idx2_reg();
     /* Wide memory-accumulator primitive names for the active maths mode —
        the lowerer's generic MOV/LD_MEM/ST_MEM/RET/CALL paths read these
        (keeps ir_lower decoupled from c_fp_size / the maths table). */

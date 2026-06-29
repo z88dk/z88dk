@@ -310,3 +310,49 @@
 	ld	d,h
 	ld	e,l
 	ld	hl,%1
+
+%title #IR drop dead ld a,l after a byte widen (ld l,a makes A==L, ld h,0 keeps it)
+	ld	l,a
+	ld	h,0
+	ld	a,l
+=
+	ld	l,a
+	ld	h,0
+
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). NOT ez80: ld de,(hl)/ld hl,(hl) READ the reg there, so the ex may be a live deref
+%notcpu ez80
+%notcpu ez80_z80
+	ex	de,hl
+	ld	de,%1
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (hl first)
+%notcpu ez80
+%notcpu ez80_z80
+	ex	de,hl
+	ld	hl,%2
+	ld	de,%1
+=
+	ld	hl,%2
+	ld	de,%1
+
+%title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl
+	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
+	ex	de,hl
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+%title #IR const/sym straight to DE, gbz80 emulated-swap form (ld d,h;ld e,l copies HL->DE; same symbol/immediate-only guard)
+%cpu gbz80
+	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
+	ld	d,h
+	ld	e,l
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2

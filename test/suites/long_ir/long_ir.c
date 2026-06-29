@@ -652,6 +652,234 @@ static void test_loop_lower(void)
     Assert(lr_iv_after() == 10, "loop-reverse restores induction var");
 }
 
+/* IVSR (stepped-pointer strength reduction) + LFTR (linear function test
+   replacement). Each walk has a known sum, so a miscompiled address /
+   step / bound / dead-IV kill flips the result. `ivsr_param_walk` keeps
+   the signed compare (param bound — not LFTR-safe); `ivsr_const_walk` /
+   `ivsr_struct_walk` LFTR to a pointer compare. `ivsr_write_idx` uses the
+   IV as a stored value, so LFTR must NOT kill it. */
+static int ivsr_arr[8] = { 3, 1, 4, 1, 5, 9, 2, 6 };   /* sum 31 */
+struct ivsr_rec { int a, b; };
+static struct ivsr_rec ivsr_recs[4] = { {1,2},{3,4},{5,6},{7,8} }; /* sum 36 */
+static int ivsr_dst[8];
+
+static int ivsr_const_walk(void) {
+    int i, s = 0;
+    for (i = 0; i < 8; i++) s += ivsr_arr[i];
+    return s;
+}
+static int ivsr_param_walk(int *a, int n) {
+    int i, s = 0;
+    for (i = 0; i < n; i++) s += a[i];
+    return s;
+}
+static int ivsr_struct_walk(void) {
+    int i, s = 0;
+    for (i = 0; i < 4; i++) s += ivsr_recs[i].a + ivsr_recs[i].b;
+    return s;
+}
+static int ivsr_write_idx(void) {
+    int i, s = 0;
+    for (i = 0; i < 8; i++) ivsr_dst[i] = i;   /* IV stored — keep it live */
+    for (i = 0; i < 8; i++) s += ivsr_dst[i];
+    return s;                                  /* 0+1+..+7 = 28 */
+}
+static int ivsr_from3(void) {
+    int i, s = 0;
+    for (i = 3; i < 8; i++) s += ivsr_arr[i];  /* 1+5+9+2+6 = 23 */
+    return s;
+}
+static int ivsr_down(void) {
+    int i, s = 0;
+    for (i = 7; i >= 0; i--) s += ivsr_arr[i]; /* 31, down-count */
+    return s;
+}
+/* TOS counter self-step via `ex (sp),hl`: a param-bound (no-LFTR) loop
+   keeps `i` on the deepest (TOS) frame slot. The step lowers to
+   `ex (sp),hl; inc hl; ex (sp),hl`, which round-trips HL through the
+   stack — so both the counter's own running value AND whatever HL/the
+   accumulator hold across the step must survive. Returning i*100+s
+   makes a corrupted counter (i != n) or a clobbered accumulator visible.
+   a={3,1,4,1,5},n=5 → s=14, i=5 → 514. */
+static int ivsr_tos_step(int *a, int n) {
+    int i, s = 0;
+    for (i = 0; i < n; i++) s += a[i];
+    return i * 100 + s;
+}
+/* idx2 (spare index register) invariant resident: the param bound `n`
+   rides the spare index reg (read via push <idx>;pop de at the compare)
+   while a SEPARATE param pointer is deref'd+stepped (`*p++`) in the same
+   loop. idx2 must pick the never-deref'd bound, NOT the stepped pointer —
+   `*p++`'s post_step writeback hits the slot, not the index reg, so a
+   pointer in idx2 would go stale. p=ivsr_arr{3,1,4,1,5,9,2,6},n=5 →
+   3+1+4+1+5 = 14. */
+static int ivsr_idx2_ptr_bound(int *p, int n) {
+    int i, s = 0;
+    for (i = 0; i < n; i++) s += *p++;
+    return s;
+}
+/* sp-mode byte slot-address cache: `a` (a byte local) is read then written
+   back-to-back in `a = a + a` (the store reuses HL's cached slot address,
+   no `ld hl,off;add hl,sp` recompute), while the interleaved `*p++` deref
+   clobbers HL and MUST invalidate the cache — a stale cached address would
+   read/write the wrong slot. p={1,1,1,1},n=4: 1→2,3→6,7→14,15→30 ⇒ 30. */
+static unsigned char lr_sc_buf[4] = { 1, 1, 1, 1 };
+static int lr_byte_slotcache(unsigned char *p, int n) {
+    unsigned char a = 0;
+    int i;
+    for (i = 0; i < n; i++) { a = a + *p++; a = a + a; }
+    return a;
+}
+/* Single-bit test feeding a branch: `x & 0x80` lowers to `add a,a; jp nc/c`
+   (bit7→CF) and `x & 0x01` to `rrca; jp nc/c` (bit0→CF), not `and mask; jp
+   z/nz`. A wrong carry polarity or wrong bit flips the result. x=0x81 →
+   1+2=3; x=0x80 → 1; x=0x01 → 2; x=0 → 0. */
+static int lr_bittest(unsigned char x) {
+    int r = 0;
+    if (x & 0x80) r += 1;
+    if (x & 0x01) r += 2;
+    return r;
+}
+/* Near slot-address reuse: two byte locals accessed alternately so the
+   2nd reuses HL's cached address by stepping with inc/dec hl (within the
+   per-CPU cap) instead of recomputing ld hl,off;add hl,sp. A wrong step
+   count reads/writes the wrong slot. p={1,1,1,1},n=4: a→4, b→10. */
+static int lr_near_slots(unsigned char *p, int n) {
+    unsigned char a = 0, b = 0;
+    int i;
+    for (i = 0; i < n; i++) { a += *p; b += a; p++; }
+    return a * 256 + b;
+}
+
+/* Byte-register residency, slot-backed E-home (Plan B Phase 2): the data
+   pointer takes BC, so the char accumulator `a` can't use C — it rides E
+   (low half of DE) and is lazy-spilled to its slot before each DE-clobbering
+   op (the 16-bit loop test, the sign-extend compare, int-promoted adds) and
+   reloaded after. Exercises: the cross-BB carry through the if/else diamond,
+   the flush-preserves-A path (a cache_a'd temp consumed by an int add right
+   after a flush), and the back-edge spill. data={5,-7,9,-11,13,-3},n=6 → 101
+   (host-verified). A stale E or a flush that clobbered A would diverge. */
+static signed char lr_ehd[6] = { 5, -7, 9, -11, 13, -3 };
+static int lr_ehome_diamond(signed char *p, int n) {
+    signed char a = 2;
+    int i;
+    for (i = 0; i < n; i++) {
+        signed char b = *p++;
+        if (b < 0) a = (signed char)(a - b); else a = (signed char)(a + b);
+        a = (signed char)((a << 1) ^ b);
+    }
+    return a;
+}
+
+/* Byte-register residency (Plan B Phase 1): a hot char accumulator in a
+   no-call, BC-free loop is pinned to C — TRUE residency (no frame slot;
+   reads `ld a,c`, writes `ld c,a`). A stale-home read or a dropped
+   write-back would diverge. Host-verified: rb(200)=155, rb(5)=91. */
+static unsigned char lr_byte_resident(unsigned char n) {
+    unsigned char acc = 0xFF;
+    while (n) { acc ^= n; acc = (unsigned char)(acc << 1); acc += 3u; n--; }
+    return acc;
+}
+/* Conditional-def variant: both arms of the if/else write the accumulator,
+   so the home must hold across the diamond merge. data={1,200,3,150,5},
+   n=5 → 138 (host-verified). */
+static unsigned char lr_br_data[5] = { 1, 200, 3, 150, 5 };
+static unsigned char lr_byte_resident_br(unsigned char *p, int n) {
+    unsigned char a = 1;
+    int i;
+    for (i = 0; i < n; i++) {
+        unsigned char b = p[i];
+        if (b & 0x80) a ^= b; else a += b;
+        a = (unsigned char)(a << 1);
+    }
+    return a;
+}
+
+/* PR_BC residency correctness: a slotless write-once local held in BC
+   (read several times → wins the PR_BC pool) coexists with a `*p++`
+   fused deref of a DIFFERENT, slot-resident pointer in the same loop.
+   The `*p++` write-back goes through store_hl (which is BC-clean) but
+   used to spuriously `invalidate_bc_cache` — so the next read of the
+   BC local hit emit_bc_reload, reading a bogus below-frame offset
+   (the local has no slot). Result diverged. p=res_buf,n=6,k=5 →
+   lim=105; running sum 10,30,60,100,150→45,105 → 105. */
+static unsigned char lr_res_buf[6] = { 10, 20, 30, 40, 50, 60 };
+static int lr_res_bc(unsigned char *p, int n, int k)
+{
+    int lim = k + 100;
+    int s = 0;
+    while (n-- > 0) {
+        s += *p++;
+        if (s > lim) s -= lim;
+        if (s + lim > 9999) s += lim;   /* extra reads pin lim into BC */
+    }
+    return s;
+}
+
+/* Word `*p++` (int*) whose pointer landed in a SLOT (BC taken by `lim`):
+   the fused word-deref loads the value into DE, then writes p+2 back —
+   store_hl's `ex de,hl` used to relocate/destroy DE (the value), so
+   `s += *p++` added the pointer. p=buf,n=6,k=5 → lim=1005; running sum
+   100,300,600,1000,1500→495,1095→90 → 90. */
+static int lr_resw_buf[6] = { 100, 200, 300, 400, 500, 600 };
+static int lr_res_word(int *p, int n, int k)
+{
+    int lim = k + 1000;
+    int s = 0;
+    while (n-- > 0) {
+        s += *p++;
+        if (s > lim) s -= lim;
+        if (s + lim > 99999) s += lim;
+    }
+    return s;
+}
+
+/* Home-resident loop (Plan B Phase 4 + resident-loop): a char ternary
+   accumulator updated through a `*p++` pointer loop — the charbench crc8
+   shape. Coalescing folds each `(crc<<1)^7` result temp into the byte E-home,
+   making the whole loop body DE-clean, so the home rides E across the loop
+   with NO per-iteration slot spill (re-homed once in the preheader, flushed
+   once before the loop-exit edge). A stale-E read, a missed re-home, or a
+   suppressed-but-needed flush would diverge. data="12345",len=5 → 248
+   (host-verified, poly 0x07, 3 bit-steps/byte). */
+static unsigned char lr_crc_buf[5] = { 0x31, 0x32, 0x33, 0x34, 0x35 };
+static unsigned char lr_crc_resident(unsigned char *data, unsigned int len) {
+    unsigned char crc = 0xFFU;
+    unsigned char *end = data + len;
+    while (data < end) {
+        crc ^= *data++;
+        crc = (crc & 0x80U) ? ((unsigned char)(crc << 1) ^ 0x07U) : (unsigned char)(crc << 1);
+        crc = (crc & 0x80U) ? ((unsigned char)(crc << 1) ^ 0x07U) : (unsigned char)(crc << 1);
+        crc = (crc & 0x80U) ? ((unsigned char)(crc << 1) ^ 0x07U) : (unsigned char)(crc << 1);
+    }
+    return crc;
+}
+
+static void test_ivsr(void)
+{
+    Assert(lr_crc_resident(lr_crc_buf, 5) == 248, "home-resident crc8 loop: char ternary acc rides E across *p++ loop, no per-iter spill");
+    Assert(lr_res_bc(lr_res_buf, 6, 5) == 105, "PR_BC local survives a *p++ deref of a slot pointer");
+    Assert(lr_res_word(lr_resw_buf, 6, 5) == 90, "word *p++ slot pointer keeps the loaded value (no DE clobber)");
+    Assert(ivsr_const_walk() == 31, "ivsr const-bound a[i] sum + LFTR");
+    Assert(ivsr_param_walk(ivsr_arr, 8) == 31, "ivsr param-bound a[i] sum (SR only)");
+    Assert(ivsr_struct_walk() == 36, "ivsr struct-stride s[i].a+.b sum");
+    Assert(ivsr_write_idx() == 28, "ivsr b[i]=i keeps live IV correct (no LFTR)");
+    Assert(ivsr_from3() == 23, "ivsr non-zero start i=3");
+    Assert(ivsr_down() == 31, "ivsr down-count walk");
+    Assert(ivsr_tos_step(ivsr_arr, 5) == 514, "TOS counter ex(sp),hl self-step preserves counter+accumulator");
+    Assert(ivsr_idx2_ptr_bound(ivsr_arr, 5) == 14, "idx2 holds the param bound, not the *p++ pointer");
+    Assert(lr_byte_slotcache(lr_sc_buf, 4) == 30, "sp byte slot-address cache: reuse on same slot, invalidate on deref");
+    Assert(lr_bittest(0x81) == 3, "bit7+bit0 set (add a,a / rrca carry tests)");
+    Assert(lr_bittest(0x80) == 1, "bit7 set, bit0 clear");
+    Assert(lr_bittest(0x01) == 2, "bit0 set, bit7 clear");
+    Assert(lr_bittest(0x00) == 0, "both clear");
+    Assert(lr_near_slots(lr_sc_buf, 4) == 1034, "near byte-slot address reuse via inc/dec hl");
+    Assert(lr_byte_resident(200) == 155, "byte accumulator pinned to C (true residency)");
+    Assert(lr_byte_resident(5) == 91, "byte residency short loop");
+    Assert(lr_byte_resident_br(lr_br_data, 5) == 138, "byte home held across if/else merge");
+    Assert(lr_ehome_diamond(lr_ehd, 6) == 101, "slot-backed E-home: lazy-spill across diamond + DE-clobbers");
+}
+
 /* Long compare with one operand at the TOS frame slot. The long-compare
    lowering stages the OTHER operand on the data stack first (sp_adj>0),
    then loads this one — but the fp-mode TOS pop/push load-trick is sp-
@@ -1558,6 +1786,7 @@ int suite_long_ir(void)
     suite_add_test(test_ptr_stride);
     suite_add_test(test_licm_join);
     suite_add_test(test_loop_lower);
+    suite_add_test(test_ivsr);
     suite_add_test(test_long_cmp_tos);
     suite_add_test(test_addr_taken_slot);
     suite_add_test(test_not_expr);

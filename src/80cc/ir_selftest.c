@@ -386,6 +386,9 @@ static void build_hcall_test(Func *f)
 /* Compiler globals the lowerer consults; ir_selftest links standalone
    so we stub the ones it needs to default-off values. */
 int c_framepointer_is_ix = -1;
+int c_idx2_invariant = 0;       /* selftest builds IR by hand; idx2 off */
+int c_byte_resident = 0;        /* selftest builds IR by hand; byte-home off */
+FILE *output = NULL;            /* emit_op_cline redirects to its own stream */
 int litlab = 0;
 int c_intermix_ccode = 0;
 int c_cline_directive = 0;

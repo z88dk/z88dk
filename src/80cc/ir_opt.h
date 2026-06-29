@@ -89,6 +89,26 @@ int ir_opt_cse(Func *f);
  */
 int ir_opt_licm(Func *f);
 
+/* Induction-variable strength reduction (roadmap #3f).
+ *
+ * For a natural loop with a unique pre-header and single latch, replaces
+ * a recomputed indexed address `base + iv*scale` (the `SHL iv,s; ADD
+ * base,t` an `a[i]`/`s[i].f` walk emits each iteration) with a stepped
+ * pointer `p`: `p = base + K*scale` in the pre-header, `p += step*scale`
+ * in the latch, every address use rewritten to `p`, the SHL/ADD NOPed.
+ * The basic IV is left driving the exit test (no LFTR yet).
+ *
+ * Conservative — bails unless: the basic IV has one self-step in-loop
+ * def + one LD_IMM pre-header init; the scale is 1 or a power of two; the
+ * base is loop-invariant; the derived address is single-def, not
+ * live-out, and every use is redirectable. IR_NO_IVSR opts out.
+ *
+ * Runs after LICM (loops found, invariants hoisted so `base` is clearly
+ * invariant) and before CSE/DCE (CSE dedups duplicate inits, DCE clears
+ * the NOPed SHL/ADD). Returns the number of derived IVs reduced.
+ */
+int ir_opt_ivsr(Func *f);
+
 /* sym_offset_fold and vreg_offset_fold live in the ir_match table as
    symoff / vregoff_sym / vregoff_imm / vregoff_idx;
    --opt-disable=pattern:symoff etc. */
@@ -121,6 +141,20 @@ int ir_opt_narrow_byte(Func *f);
  * narrow_byte, whose narrowed CONV operands are byte-identity copies that
  * would otherwise spill to a slot. Returns operands rewritten. */
 int ir_opt_copy_prop(Func *f);
+
+/* Coalesce a single-use width-1 copy `d <- t` by folding t into d (renaming
+ * every def of t to d, dropping the now-identity copy), so a char-ternary
+ * update chain writes the byte-home accumulator directly instead of a temp
+ * that the merge copies in. Guarded by a Chaitin interference check (single-
+ * use alone is not sufficient). IR_NO_COALESCE_COPIES opts out. Run after
+ * narrow_byte + copy_prop, before ir_alloc. Returns copies coalesced. */
+int ir_opt_coalesce_copies(Func *f);
+
+/* Local (per-BB) constant folding + algebraic identity: track each vreg's
+ * known constant and simplify `x op identity` (x+0, x-0, x|0, x^0, x&0,
+ * x&all-ones, x<<0, x>>0, …) to a MOV or LD_IMM. Folds the `acc = 0;
+ * acc op= …` idiom (e.g. `main`'s `res += f()`). Returns ops simplified. */
+int ir_opt_const_fold(Func *f);
 
 /* long_inc_mhl (the long (*p)++ triple → HCALL l_long_inc_mhl) lives
    in the ir_match table as `incmhl`; --opt-disable=pattern:incmhl. */

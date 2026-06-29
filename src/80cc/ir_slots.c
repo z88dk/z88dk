@@ -54,6 +54,15 @@ void ir_assign_slots(Func *f)
     for (int v = 0; v < f->n_vregs; v++) {
         needs_slot[v] = (f->vreg_to_phys
                          && f->vreg_to_phys[v] != IR_PR_SPILL) ? 0 : 1;
+        /* Clobberable byte homes (PR_E/PR_D — low/high of DE, hit by
+           DE-scratch ops) carry a backing slot: the lazy-spill lowerer
+           spills the home register there before a DE-clobbering op and
+           reloads after. (PR_C/PR_B stay slotless — the no-clobber
+           envelope keeps them resident for the whole function.) */
+        if (f->vreg_to_phys
+            && (f->vreg_to_phys[v] == IR_PR_E
+                || f->vreg_to_phys[v] == IR_PR_D))
+            needs_slot[v] = 1;
         /* Read-only param lives in the caller's pushed-arg slot;
            slot_off returns that caller offset directly. */
         if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
@@ -140,6 +149,19 @@ void ir_assign_slots(Func *f)
                 if (u >= 0 && u < n_vregs) LIVE_SET(u);
             }
         }
+    }
+    /* A slot-backed byte home (PR_E/PR_D) lives in its register across the
+       loop; the lowerer reloads it from this backing slot after any clobber.
+       But the IR sees the home as DEAD between its SSA-temp redefinitions, so
+       the packer would coalesce an unrelated temp into the home's slot —
+       then a post-clobber reload reads that temp. Force the home to interfere
+       with EVERY other slotted vreg so its backing slot is exclusive. */
+    for (int v = 0; v < n_vregs; v++) {
+        if (!f->vreg_to_phys) break;
+        if (f->vreg_to_phys[v] != IR_PR_E && f->vreg_to_phys[v] != IR_PR_D)
+            continue;
+        for (int w = 0; w < n_vregs; w++)
+            if (w != v) INTERF_SET(v, w);
     }
     free(live);
     #undef LIVE_GET

@@ -553,6 +553,462 @@ int ir_opt_licm(Func *f)
     return hoisted;
 }
 
+/* ---- 3f: induction-variable strength reduction (IVSR) ------------ */
+
+/* The canonical indexed-array walk `for(i;i<n;i++) sum += a[i]` builds,
+   per iteration, a fresh address `a + i*scale` (an `SHL i,s` + `ADD
+   base,i`). IVSR replaces that recompute with a stepped pointer `p`:
+   `p = base + K*scale` once in the pre-header, `p += step*scale` in the
+   latch, and every use of the derived address reads `p` directly. The
+   basic IV `i` is left alone (it still drives the exit test — LFTR, a
+   later pass, is what would kill it). Conservative: bails on anything it
+   can't prove safe (see the guards below). IR_NO_IVSR opts out. */
+
+/* Rewrite a use of `old` in `op` to `newv`: covers the src operands and
+   an IR_MEM_VREG base (LD_MEM/ST_MEM). Returns the number of fields
+   changed — callers compare it against the use count to detect a use
+   shape they can't redirect (and then bail). */
+static int ivsr_rewrite_use(Op *op, int old, int newv)
+{
+    int n = 0;
+    if (op->src[0] == old) { op->src[0] = newv; n++; }
+    if (op->src[1] == old) { op->src[1] = newv; n++; }
+    if ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+        && op->mem.kind == IR_MEM_VREG && op->mem.base == old) {
+        op->mem.base = newv; n++;
+    }
+    return n;
+}
+
+/* Count defs of vreg v inside vs. outside the loop body [lo,hi]. When a
+   side's count is exactly 1, its bb/idx out-params point at that def. */
+static void ivsr_def_sites(Func *f, int v, int lo, int hi,
+                           int *n_in, int *in_bb, int *in_idx,
+                           int *n_out, int *out_bb, int *out_idx)
+{
+    *n_in = *n_out = 0;
+    *in_bb = *in_idx = *out_bb = *out_idx = -1;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int inside = (b >= lo && b <= hi);
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&bb->ops[j], defs, 8);
+            for (int k = 0; k < nd; k++) {
+                if (defs[k] != v) continue;
+                if (inside) { (*n_in)++;  *in_bb  = b; *in_idx  = j; }
+                else        { (*n_out)++; *out_bb = b; *out_idx = j; }
+            }
+        }
+    }
+}
+
+/* True if v is used in any BB outside the loop body [lo,hi]. */
+static int ivsr_used_outside(Func *f, int v, int lo, int hi)
+{
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (b >= lo && b <= hi) continue;
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[8];
+            int nu = ir_op_uses(&bb->ops[j], uses, 8);
+            for (int k = 0; k < nu; k++)
+                if (uses[k] == v) return 1;
+        }
+    }
+    return 0;
+}
+
+/* Number of in-loop uses of v. */
+static int ivsr_uses_in_loop(Func *f, int v, int lo, int hi)
+{
+    int c = 0;
+    for (int b = lo; b <= hi; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int uses[8];
+            int nu = ir_op_uses(&bb->ops[j], uses, 8);
+            for (int k = 0; k < nu; k++)
+                if (uses[k] == v) c++;
+        }
+    }
+    return c;
+}
+
+/* Recognise a basic IV `v`: exactly one in-loop self-step def
+   (v = v ± c via INC/DEC/ADD-imm/SUB-imm) and exactly one out-of-loop
+   def that is an LD_IMM init in the pre-header `ph`. Returns 1 and fills
+   *K (init) / *D (signed step). Address-taken / volatile vregs bail. */
+static int ivsr_basic_iv(Func *f, int v, int lo, int hi, int ph,
+                         int64_t *K, int64_t *D)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
+    int n_in, in_bb, in_idx, n_out, out_bb, out_idx;
+    ivsr_def_sites(f, v, lo, hi, &n_in, &in_bb, &in_idx,
+                   &n_out, &out_bb, &out_idx);
+    if (n_in != 1 || n_out != 1) return 0;
+    if (out_bb != ph) return 0;
+    Op *initop = &f->bbs[out_bb].ops[out_idx];
+    if (initop->kind != IR_LD_IMM) return 0;
+    Op *step = &f->bbs[in_bb].ops[in_idx];
+    if (step->dst != v || step->src[0] != v) return 0;
+    int64_t d;
+    switch (step->kind) {
+    case IR_INC: d =  1; break;
+    case IR_DEC: d = -1; break;
+    case IR_ADD: if (step->src[1] != -1) return 0; d =  step->imm; break;
+    case IR_SUB: if (step->src[1] != -1) return 0; d = -step->imm; break;
+    default: return 0;
+    }
+    *K = initop->imm;
+    *D = d;
+    return 1;
+}
+
+/* Is `x` a derived-IV scaling term off a basic IV in loop [lo,hi]?
+   Either x is itself a basic IV (scale 1, *shl_bb = -1) or x is a
+   single-use `SHL x <- iv, s` whose iv is a basic IV (scale 2^s, *shl_bb
+   points at the SHL). Fills *iv / *scale / *K / *D. */
+static int ivsr_iv_term(Func *f, int x, int lo, int hi, int ph,
+                        int *iv_out, int64_t *scale, int64_t *K, int64_t *D,
+                        int *shl_bb, int *shl_idx)
+{
+    int64_t k, d;
+    if (ivsr_basic_iv(f, x, lo, hi, ph, &k, &d)) {
+        *iv_out = x; *scale = 1; *K = k; *D = d;
+        *shl_bb = -1; *shl_idx = -1;
+        return 1;
+    }
+    int n_in, in_bb, in_idx, n_out, out_bb, out_idx;
+    ivsr_def_sites(f, x, lo, hi, &n_in, &in_bb, &in_idx,
+                   &n_out, &out_bb, &out_idx);
+    if (n_in != 1 || n_out != 0) return 0;
+    Op *sh = &f->bbs[in_bb].ops[in_idx];
+    if (sh->kind != IR_SHL || sh->src[1] != -1) return 0;
+    if (sh->imm < 0 || sh->imm >= 16) return 0;
+    if (!ivsr_basic_iv(f, sh->src[0], lo, hi, ph, &k, &d)) return 0;
+    /* The SHL must feed only this loop (its sole consumer is the ADD we
+       are about to fold away), else NOPing it drops a live value. */
+    if (ivsr_uses_in_loop(f, x, lo, hi) != 1) return 0;
+    if (ivsr_used_outside(f, x, lo, hi)) return 0;
+    *iv_out = sh->src[0]; *scale = (int64_t)1 << sh->imm;
+    *K = k; *D = d;
+    *shl_bb = in_bb; *shl_idx = in_idx;
+    return 1;
+}
+
+/* Every in-loop use of `d` must be redirectable by ivsr_rewrite_use
+   (src operand or IR_MEM_VREG base) — a call-arg / port use we can't
+   rewrite would dangle after the def is NOPed. */
+static int ivsr_d_rewritable(Func *f, int d, int lo, int hi,
+                             int add_bb, int add_idx)
+{
+    for (int b = lo; b <= hi; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            if (b == add_bb && j == add_idx) continue; /* the defining ADD */
+            Op *op = &bb->ops[j];
+            int uses[8];
+            int nu = ir_op_uses(op, uses, 8);
+            int nd = 0;
+            for (int k = 0; k < nu; k++) if (uses[k] == d) nd++;
+            if (!nd) continue;
+            int ok = (op->src[0] == d) + (op->src[1] == d)
+                   + (((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                       && op->mem.kind == IR_MEM_VREG
+                       && op->mem.base == d) ? 1 : 0);
+            if (ok != nd) return 0;   /* a use we can't redirect */
+        }
+    }
+    return 1;
+}
+
+typedef struct {
+    int     d;          /* derived-IV vreg (the recomputed address) */
+    int     iv;         /* the basic IV it derives from */
+    int     base;       /* loop-invariant base */
+    int64_t scale;      /* element scale (1 / 2^s) */
+    int64_t K, D;       /* basic-IV init / step */
+    int     add_bb, add_idx;   /* the `ADD d <- base, term` to NOP */
+    int     shl_bb, shl_idx;   /* the scale `SHL` to NOP (-1 if scale 1) */
+    int     p;          /* synthesised stepped pointer */
+} IvsrCand;
+
+#define IVSR_MAX_CAND 32
+
+/* Set on a fresh stack Op so synthesised ADD/MOV are well-formed. */
+static void ivsr_init_op(Op *o, OpKind kind)
+{
+    memset(o, 0, sizeof(*o));
+    o->kind = kind;
+    o->dst = -1;
+    o->src[0] = -1; o->src[1] = -1;
+    o->label = -1;
+    o->mem.base = -1;
+}
+
+/* True if the exit-test bound is a provably non-negative compile-time
+   constant — an immediate on the compare, or an invariant LD_IMM>=0
+   vreg. The signed→unsigned pointer-compare LFTR is only safe then (a
+   negative bound makes `i<n` a 0-trip loop that `p<p_end` would run as a
+   huge wrapped loop). ir_opt can't see KIND signedness, so a constant is
+   the safe signal we can check here. */
+static int ivsr_const_bound(Func *f, const Op *cmp, int lo, int hi,
+                            int64_t *N)
+{
+    if (cmp->src[1] == -1) {                 /* immediate bound */
+        if (cmp->imm < 0) return 0;
+        *N = cmp->imm; return 1;
+    }
+    int v = cmp->src[1];
+    if (v < 0) return 0;
+    int ni, ib, ii, no, ob, oi;
+    ivsr_def_sites(f, v, lo, hi, &ni, &ib, &ii, &no, &ob, &oi);
+    if (ni != 0 || no != 1) return 0;        /* invariant, single def */
+    Op *d = &f->bbs[ob].ops[oi];
+    if (d->kind != IR_LD_IMM || d->imm < 0) return 0;
+    *N = d->imm; return 1;
+}
+
+/* Linear-function test replacement. After strength reduction, if the
+   loop's header exit test is `iv < N` (signed or unsigned) with iv a
+   reduced basic IV stepping up, N a non-negative constant, and iv now
+   used only by its own step and this test, swap the test for the pointer
+   compare `p < p_end` (unsigned; p_end = base + N*scale built in the
+   pre-header) and NOP iv's step + init. The basic IV is then dead — its
+   slot, its per-iteration step (the costly stack-TOS `i++` dance) and the
+   signed compare all vanish. Returns 1 if applied. */
+static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
+                         IvsrCand *cand, int n_cand)
+{
+    if (getenv("IR_NO_LFTR")) return 0;
+    BB *hb = &f->bbs[lo];
+    int cond = -1;
+    for (int j = 0; j < hb->n_ops; j++) {
+        OpKind k = hb->ops[j].kind;
+        if (k == IR_BR_ZERO || k == IR_BR_COND) cond = hb->ops[j].src[0];
+    }
+    if (cond < 0) return 0;
+    int ni, ib, ii, no, ob, oi;
+    ivsr_def_sites(f, cond, lo, hi, &ni, &ib, &ii, &no, &ob, &oi);
+    if (ni != 1 || no != 0) return 0;
+    int cmp_bb = ib, cmp_idx = ii;
+    Op *cmp = &f->bbs[cmp_bb].ops[cmp_idx];
+    if (cmp->kind != IR_CMP_LT && cmp->kind != IR_CMP_ULT) return 0;
+    int iv = cmp->src[0];
+    int c = -1;
+    for (int t = 0; t < n_cand; t++)
+        if (cand[t].iv == iv && cand[t].D > 0 && cand[t].K >= 0) { c = t; break; }
+    if (c < 0) return 0;
+    int64_t N;
+    if (!ivsr_const_bound(f, cmp, lo, hi, &N)) return 0;
+    /* iv used only by its step + this test, not live-out. */
+    if (ivsr_uses_in_loop(f, iv, lo, hi) != 2) return 0;
+    if (ivsr_used_outside(f, iv, lo, hi)) return 0;
+    int s_ni, s_ib, s_ii, s_no, s_ob, s_oi;
+    ivsr_def_sites(f, iv, lo, hi, &s_ni, &s_ib, &s_ii, &s_no, &s_ob, &s_oi);
+    if (s_ni != 1 || s_no != 1 || s_ob != ph) return 0;
+
+    int64_t end_off = N * cand[c].scale;
+    int base = cand[c].base, p = cand[c].p;
+    int pend = ir_vreg_new(f, f->vregs[p].kind, NULL, 0);
+    f->vregs[pend].width = f->vregs[p].width;
+    /* Rewrite the test (re-fetch by index — ir_vreg_new may realloc). */
+    Op *c2 = &f->bbs[cmp_bb].ops[cmp_idx];
+    c2->kind = IR_CMP_ULT;
+    c2->src[0] = p; c2->src[1] = pend; c2->imm = 0;
+    /* Kill the now-dead basic IV (step + init). */
+    f->bbs[s_ib].ops[s_ii].kind = IR_NOP;
+    f->bbs[s_ob].ops[s_oi].kind = IR_NOP;
+    /* p_end = base + N*scale in the pre-header. */
+    Op o;
+    if (end_off == 0) { ivsr_init_op(&o, IR_MOV); o.dst = pend; o.src[0] = base; }
+    else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
+    licm_insert_before_terminator(&f->bbs[ph], &o);
+    return 1;
+}
+
+/* Strength-reduce one natural loop (header h, single latch, pre-header
+   ph; body = contiguous range [h, latch]). Returns derived IVs reduced. */
+static int ivsr_process_loop(Func *f, int h, int latch, int ph)
+{
+    int lo = h, hi = latch;
+    IvsrCand cand[IVSR_MAX_CAND];
+    int n_cand = 0;
+
+    for (int b = lo; b <= hi && n_cand < IVSR_MAX_CAND; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops && n_cand < IVSR_MAX_CAND; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_ADD) continue;
+            if (op->src[0] < 0 || op->src[1] < 0) continue; /* need 2 vregs */
+            int d = op->dst;
+            if (d < 0) continue;
+
+            /* Try each operand as the IV term, the other as the base. */
+            for (int swap = 0; swap < 2; swap++) {
+                int term = swap ? op->src[1] : op->src[0];
+                int base = swap ? op->src[0] : op->src[1];
+                int iv; int64_t scale, K, D; int sb, si;
+                if (!ivsr_iv_term(f, term, lo, hi, ph,
+                                  &iv, &scale, &K, &D, &sb, &si))
+                    continue;
+                if (base == d || base == iv || base < 0) continue;
+                /* base loop-invariant: no def inside the loop. */
+                int ni, ib, ii, no, ob, oi;
+                ivsr_def_sites(f, base, lo, hi, &ni, &ib, &ii,
+                               &no, &ob, &oi);
+                if (ni != 0) continue;
+                /* d: single in-loop def (this ADD), not live-out, and
+                   every other in-loop use is redirectable. */
+                ivsr_def_sites(f, d, lo, hi, &ni, &ib, &ii, &no, &ob, &oi);
+                if (ni != 1 || ib != b || ii != j) continue;
+                if (ivsr_used_outside(f, d, lo, hi)) continue;
+                if (!ivsr_d_rewritable(f, d, lo, hi, b, j)) continue;
+
+                cand[n_cand].d = d;     cand[n_cand].base = base;
+                cand[n_cand].iv = iv;
+                cand[n_cand].scale = scale;
+                cand[n_cand].K = K;     cand[n_cand].D = D;
+                cand[n_cand].add_bb = b; cand[n_cand].add_idx = j;
+                cand[n_cand].shl_bb = sb; cand[n_cand].shl_idx = si;
+                cand[n_cand].p = -1;
+                n_cand++;
+                break;  /* one reduction per ADD */
+            }
+        }
+    }
+
+    if (n_cand == 0) return 0;
+
+    /* Create the stepped pointers (may realloc f->vregs — index after). */
+    for (int c = 0; c < n_cand; c++) {
+        int d = cand[c].d;
+        /* INDUCTION marks the stepped pointer for the allocator's PR_BC
+           pool — the one twice-written (init + step) vreg it admits, so
+           the pointer lives in BC across the back-edge. */
+        int pv = ir_vreg_new(f, f->vregs[d].kind, NULL, IR_VREG_INDUCTION);
+        f->vregs[pv].width = f->vregs[d].width;  /* exact pointer width */
+        cand[c].p = pv;
+    }
+
+    /* Phase A — in-place rewrites + NOPs (no insertions yet, so op
+       indices stay stable for the still-pending candidates). */
+    for (int c = 0; c < n_cand; c++) {
+        int d = cand[c].d, p = cand[c].p;
+        for (int b = lo; b <= hi; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops; j++) {
+                if (b == cand[c].add_bb && j == cand[c].add_idx) continue;
+                ivsr_rewrite_use(&bb->ops[j], d, p);
+            }
+        }
+        f->bbs[cand[c].add_bb].ops[cand[c].add_idx].kind = IR_NOP;
+        if (cand[c].shl_bb >= 0)
+            f->bbs[cand[c].shl_bb].ops[cand[c].shl_idx].kind = IR_NOP;
+    }
+
+    /* Phase B — synthesise pre-header init and latch step. */
+    for (int c = 0; c < n_cand; c++) {
+        int64_t init_off = cand[c].K * cand[c].scale;
+        int64_t step_off = cand[c].D * cand[c].scale;
+        Op o;
+        if (init_off == 0) {
+            ivsr_init_op(&o, IR_MOV);
+            o.dst = cand[c].p; o.src[0] = cand[c].base;
+        } else {
+            ivsr_init_op(&o, IR_ADD);
+            o.dst = cand[c].p; o.src[0] = cand[c].base; o.imm = init_off;
+        }
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+
+        ivsr_init_op(&o, IR_ADD);
+        o.dst = cand[c].p; o.src[0] = cand[c].p; o.imm = step_off;
+        licm_insert_before_terminator(&f->bbs[latch], &o);
+    }
+
+    /* LFTR — eliminate the basic IV when the exit test allows it. */
+    ivsr_try_lftr(f, lo, hi, ph, cand, n_cand);
+    return n_cand;
+}
+
+int ir_opt_ivsr(Func *f)
+{
+    if (!f || f->n_bbs <= 0) return 0;
+    if (getenv("IR_NO_IVSR")) return 0;
+
+    /* The stepped pointer only pays off if it can live in BC across the
+       back-edge (else it is a second spilled loop-carried var and the
+       per-iteration slot RMW costs more than the SHL;ADD removed). The
+       allocator's PR_BC envelope is function-wide and barred by any
+       width-4 vreg (long ops stage through BC) or BC-clobbering op
+       (IR_ST_MEM vreg+offset, non-char IR_SWITCH, IR_ASM). Mirror that
+       gate here so IVSR fires only where BC residency is reachable — md5
+       (full of UINT4) would otherwise regress 13%. */
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vregs[v].width == 4) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
+                && o->mem.offset != 0) return 0;
+            if (o->kind == IR_SWITCH && !(o->sw && o->sw->is_char)) return 0;
+            if (o->kind == IR_ASM) return 0;
+        }
+    }
+
+    /* Reachable-from-entry set: an unreachable BB's `succ.id <= self`
+       edge is not a real back-edge (mirrors licm_find_loops). */
+    int *reach = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!reach) return 0;
+    {
+        int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+        if (!stack) { free(reach); return 0; }
+        int sp = 0; reach[0] = 1; stack[sp++] = 0;
+        while (sp > 0) {
+            BB *cbb = &f->bbs[stack[--sp]];
+            int ns = ir_bb_n_succ(cbb);
+            for (int s = 0; s < ns; s++) {
+                int sid = ir_bb_succ_at(cbb, s);
+                if (sid >= 0 && sid < f->n_bbs && !reach[sid]) {
+                    reach[sid] = 1; stack[sp++] = sid;
+                }
+            }
+        }
+        free(stack);
+    }
+
+    int reduced = 0;
+    /* A header `h` heads a single-latch natural loop when it has exactly
+       one entry predecessor (id < h → pre-header) and exactly one
+       back-edge predecessor (id >= h, and h reaches it). Found by
+       scanning succ edges (pred[] isn't populated this early). */
+    for (int h = 0; h < f->n_bbs; h++) {
+        if (!reach[h]) continue;
+        int ph = -1, latch = -1, n_entry = 0, n_back = 0;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int ns = ir_bb_n_succ(bb);
+            int targets_h = 0;
+            for (int s = 0; s < ns; s++)
+                if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
+            if (!targets_h) continue;
+            if (b < h)              { ph = b; n_entry++; }
+            else if (b >= h && reach[b] && licm_reaches(f, h, b))
+                                    { latch = b; n_back++; }
+        }
+        if (n_entry != 1 || n_back != 1) continue;
+        if (ph < 0 || latch < 0 || ph == h) continue;
+        reduced += ivsr_process_loop(f, h, latch, ph);
+    }
+
+    free(reach);
+    return reduced;
+}
+
 int ir_opt_cse(Func *f)
 {
     if (!f) return 0;
@@ -755,6 +1211,14 @@ static int narrow_kind(const Op *op)
        CONV_SX — narrowing those kills the per-operand sign-extend.) */
     case IR_CONV_ZX: case IR_CONV_SX:
         return 1;
+    /* A plain copy is narrowable too: low byte of dst == low byte of src.
+       The char ternary defines its result temp by XOR in one arm and by a
+       bare MOV in the other; narrowing demands EVERY def be narrowable, so
+       the MOV arm must qualify or the temp stays width-2 (and the `^7` arm
+       keeps the dead `ld h,0` widen). Pairs with ir_opt_coalesce_copies,
+       which folds the narrowed temp into the byte home. */
+    case IR_MOV:
+        return 1;
     case IR_SHL:
         return op->src[1] == -1;   /* imm count only (byte path) */
     default:
@@ -915,9 +1379,15 @@ int ir_opt_copy_prop(Func *f)
                 continue;
             if (f->vregs[vd].width != 1 || f->vregs[vs].width != 1)
                 continue;
+            /* width1<-width1 CONV_TRUNC is a byte-identity copy too — it
+               only arises once narrow_byte shrinks the source (e.g. the
+               `(unsigned char)(c<<1)` step in a char ternary). Propagating
+               it away keeps the SHL→XOR chain immediate so the intermediate
+               rides A (cache_a) instead of spilling. */
             int is_copy = (op->kind == IR_MOV
                            || op->kind == IR_CONV_SX
-                           || op->kind == IR_CONV_ZX);
+                           || op->kind == IR_CONV_ZX
+                           || op->kind == IR_CONV_TRUNC);
             if (!is_copy) continue;
             if ((f->vregs[vd].flags & IR_VREG_VOLATILE)
                 || (f->vregs[vs].flags & IR_VREG_VOLATILE))
@@ -926,6 +1396,264 @@ int ir_opt_copy_prop(Func *f)
         }
     }
     free(copy_of);
+    return changed;
+}
+
+/* ---- Byte-copy coalescing into the home accumulator (ir_opt_coalesce_copies)
+   The char ternary `c = (c&m) ? (uchar)(c<<1)^p : (uchar)(c<<1)` lowers to a
+   diamond that defines a RESULT TEMP in each arm and copies it to the
+   accumulator at the merge:
+       BB5: SHL t1<-c,1 ; XOR v<-t1,p      BB7: (copy) c <- v
+       BB6: SHL t2<-c,1 ; MOV v<-t2
+   The copy keeps `v` on its own register (HL), so `c`'s byte home (E) only
+   gets written at the merge — and the wide `v` carries a dead `ld h,0` widen.
+   Coalescing `v` INTO `c` (rename every def of v to c, drop the now-identity
+   merge copy) makes both arms write the home directly:
+       BB5: SHL t1<-c,1 ; XOR c<-t1,p      BB7: (gone)
+       BB6: SHL t2<-c,1 ; MOV c<-t2
+   so the E-home's cross-BB carry keeps `c` resident across the diamond and
+   the per-arm copy + widen vanish.
+
+   Scoped to width-1 copies — that bounds the transform to byte values (the
+   residency target) and avoids exposing the positional / pointer / long
+   lowering assumptions a wider copy might carry. The source `t` need NOT be
+   single-use: in the real ternary the result temp is read twice in the merge
+   block — once by the copy to the accumulator and once by the next bit's
+   `crc & 0x80` test — and coalescing routes BOTH onto the home, which is
+   exactly the win. Correctness rests entirely on a real interference check
+   (the standard Chaitin test: t and d interfere if a def of one is live-out
+   alongside the other, the connecting copy excepted, since it makes them
+   equal). Single-use alone would be neither sufficient nor necessary. */
+
+/* live-out set of ops[j] in B: live-in of the next op, or the BB's live_out
+   for the last op (mirrors ir_op_live_out without allocating). Requires
+   ir_compute_op_liveness to have run. */
+static const BitSet *op_live_out_set(const BB *B, int j)
+{
+    if (j + 1 < B->n_ops) return ir_op_live_in(B, j + 1);
+    return (const BitSet *)B->live_out;
+}
+
+/* Chaitin interference between t and d, ignoring the connecting copy
+   (copy_bb,copy_idx). True if any def of one is live-out alongside the other. */
+static int coalesce_interfere(const Func *f, int t, int d,
+                              const BB *copy_bb, int copy_idx)
+{
+    int defs[8];
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *B = &f->bbs[b];
+        for (int j = 0; j < B->n_ops; j++) {
+            const Op *op = &B->ops[j];
+            if (B == copy_bb && j == copy_idx) continue;   /* the copy: d==t */
+            int nd = ir_op_defs(op, defs, 8);
+            int defs_t = 0, defs_d = 0;
+            for (int k = 0; k < nd; k++) {
+                if (defs[k] == t) defs_t = 1;
+                if (defs[k] == d) defs_d = 1;
+            }
+            if (!defs_t && !defs_d) continue;
+            const BitSet *lo = op_live_out_set(B, j);
+            if (!lo) return 1;   /* no liveness here — be conservative */
+            if (defs_t && ir_bitset_get(lo, d)) return 1;
+            if (defs_d && ir_bitset_get(lo, t)) return 1;
+        }
+    }
+    return 0;
+}
+
+/* Replace every occurrence of vreg `from` with `to` in one op. */
+static void op_rename_vreg(Op *op, int from, int to)
+{
+    if (op->dst == from)    op->dst = to;
+    if (op->src[0] == from) op->src[0] = to;
+    if (op->src[1] == from) op->src[1] = to;
+    if (op->mem.kind == IR_MEM_VREG && op->mem.base == from) op->mem.base = to;
+    if (op->mem.port && op->mem.port->port_vreg == from)
+        op->mem.port->port_vreg = to;
+    if (op->call) {
+        if (op->call->fnptr_vreg == from) op->call->fnptr_vreg = to;
+        if (op->call->ret_vreg == from)   op->call->ret_vreg = to;
+        for (int i = 0; i < op->call->n_args; i++)
+            if (op->call->args[i] == from) op->call->args[i] = to;
+    }
+    if (op->hcall) {
+        if (op->hcall->ret_vreg == from) op->hcall->ret_vreg = to;
+        for (int i = 0; i < op->hcall->n_args; i++)
+            if (op->hcall->args[i] == from) op->hcall->args[i] = to;
+    }
+}
+
+int ir_opt_coalesce_copies(Func *f)
+{
+    if (!f) return 0;
+    if (getenv("IR_NO_COALESCE_COPIES")) return 0;
+
+    int total = 0, round_changed;
+    do {
+        round_changed = 0;
+        ir_compute_liveness(f);
+        ir_compute_op_liveness(f);
+
+        for (int b = 0; b < f->n_bbs && !round_changed; b++) {
+            BB *bb = &f->bbs[b];
+            for (int j = 0; j < bb->n_ops && !round_changed; j++) {
+                Op *op = &bb->ops[j];
+                int is_copy = (op->kind == IR_MOV
+                               || op->kind == IR_CONV_TRUNC
+                               || op->kind == IR_CONV_ZX
+                               || op->kind == IR_CONV_SX);
+                if (!is_copy) continue;
+                int d = op->dst, t = op->src[0];
+                if (d < 0 || d >= f->n_vregs || t < 0 || t >= f->n_vregs
+                    || d == t)
+                    continue;
+                if (f->vregs[d].width != 1 || f->vregs[t].width != 1) continue;
+                /* t must be a plain temp (renaming its defs to d must not
+                   alias memory or a param's entry-live range); d must not be
+                   pinned to memory. */
+                if (f->vregs[t].flags
+                    & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+                    continue;
+                if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                    continue;
+                if (coalesce_interfere(f, t, d, bb, j)) continue;
+
+                /* Safe: fold t into d everywhere, then NOP the (now d<-d) copy. */
+                for (int b2 = 0; b2 < f->n_bbs; b2++) {
+                    BB *B = &f->bbs[b2];
+                    for (int k = 0; k < B->n_ops; k++)
+                        op_rename_vreg(&B->ops[k], t, d);
+                }
+                op->kind = IR_NOP;
+                op->dst = op->src[0] = op->src[1] = -1;
+                round_changed = 1;
+                total++;
+            }
+        }
+    } while (round_changed);
+
+    ir_free_liveness(f);   /* main pipeline recomputes before ir_alloc */
+    return total;
+}
+
+/* ---- Local constant folding + algebraic identity (ir_opt_const_fold) ----
+   Per-BB. Tracks each vreg's known constant (from LD_IMM, propagated through
+   const-valued MOV) and simplifies arithmetic/logic ops with an identity
+   constant operand into a MOV or LD_IMM — never materialising the constant
+   or creating an imm-form op, so the result is always trivially lowerable.
+
+   Motivating case (`main`): `int res = 0; res += f();` lowers to
+   `LD_IMM res,0` then `ADD res<-res, t`. res is known 0 → the ADD becomes
+   `MOV res<-t`, the LD_IMM goes dead (DCE), and downstream copy-prop can
+   carry it. Folds handled (mask = width's all-ones):
+     ADD/SUB/OR/XOR  with a 0 operand        → MOV (the other operand)
+     SHL/SHR         with a 0 shift count    → MOV (the value)
+     AND             with a 0 operand        → LD_IMM 0
+     AND             with an all-ones operand→ MOV (the other operand)
+     OR              with an all-ones operand→ LD_IMM mask
+   Per-BB (constants reset at each BB head — no cross-block dataflow), which
+   is enough for the straight-line `x = K; … x op y` idiom. */
+static int cf_width_mask(int w, int64_t *mask)
+{
+    switch (w) {
+    case 1: *mask = 0xFF; return 1;
+    case 2: *mask = 0xFFFF; return 1;
+    case 4: *mask = 0xFFFFFFFFLL; return 1;
+    default: return 0;   /* width 8 / unknown: don't fold */
+    }
+}
+
+int ir_opt_const_fold(Func *f)
+{
+    if (!f) return 0;
+    if (getenv("IR_NO_CONST_FOLD")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int8_t  *known = calloc((size_t)nv, 1);
+    int64_t *val   = calloc((size_t)nv, sizeof(int64_t));
+    if (!known || !val) { free(known); free(val); return 0; }
+    int changed = 0;
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        memset(known, 0, (size_t)nv);
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int d = op->dst;
+            int s0 = op->src[0], s1 = op->src[1];
+            int w = (d >= 0 && d < nv) ? f->vregs[d].width : 2;
+            int64_t mask;
+            int have_mask = cf_width_mask(w, &mask);
+            /* Is operand `s` (a vreg or, for imm-form, the imm) the constant
+               C masked to width? `*c` returns its masked value. */
+            #define KCONST(s, cout) \
+                ((s) >= 0 && (s) < nv && known[(s)] \
+                 ? (*(cout) = val[(s)] & (have_mask ? mask : -1LL), 1) : 0)
+
+            int folded = 0;
+            if (have_mask) switch (op->kind) {
+            case IR_ADD: case IR_OR: case IR_XOR: {
+                int64_t c;
+                if (s1 == -1) {                 /* imm form */
+                    if ((op->imm & mask) == 0) { op->kind = IR_MOV; folded = 1; }
+                    else if (op->kind == IR_OR && (op->imm & mask) == mask) {
+                        op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; folded = 1;
+                    }
+                } else if (KCONST(s0, &c) && c == 0) {   /* 0 op x → x */
+                    op->kind = IR_MOV; op->src[0] = s1; op->src[1] = -1; folded = 1;
+                } else if (KCONST(s1, &c) && c == 0) {   /* x op 0 → x */
+                    op->kind = IR_MOV; op->src[1] = -1; folded = 1;
+                } else if (op->kind == IR_OR && (KCONST(s0, &c) && c == mask)) {
+                    op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                } else if (op->kind == IR_OR && (KCONST(s1, &c) && c == mask)) {
+                    op->kind = IR_LD_IMM; op->imm = mask; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_SUB:                        /* x - 0 → x (s1 only) */
+                if (s1 == -1) { if ((op->imm & mask) == 0) { op->kind = IR_MOV; folded = 1; } }
+                else { int64_t c; if (KCONST(s1, &c) && c == 0) { op->kind = IR_MOV; op->src[1] = -1; folded = 1; } }
+                break;
+            case IR_SHL: case IR_SHR:           /* x << 0 / x >> 0 → x */
+                if (s1 == -1) { if ((op->imm & mask) == 0) { op->kind = IR_MOV; folded = 1; } }
+                else { int64_t c; if (KCONST(s1, &c) && c == 0) { op->kind = IR_MOV; op->src[1] = -1; folded = 1; } }
+                break;
+            case IR_AND: {
+                int64_t c;
+                if (s1 == -1) {
+                    if ((op->imm & mask) == 0) { op->kind = IR_LD_IMM; op->imm = 0; op->src[0] = -1; folded = 1; }
+                    else if ((op->imm & mask) == mask) { op->kind = IR_MOV; folded = 1; }
+                } else if ((KCONST(s0, &c) && c == 0) || (KCONST(s1, &c) && c == 0)) {
+                    op->kind = IR_LD_IMM; op->imm = 0; op->src[0] = -1; op->src[1] = -1; folded = 1;
+                } else if (KCONST(s0, &c) && c == mask) {
+                    op->kind = IR_MOV; op->src[0] = s1; op->src[1] = -1; folded = 1;
+                } else if (KCONST(s1, &c) && c == mask) {
+                    op->kind = IR_MOV; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            default: break;
+            }
+            if (folded) { op->imm = (op->kind == IR_LD_IMM) ? op->imm : 0; changed++; }
+
+            /* Update constant tracking for the (possibly rewritten) op. */
+            if (op->kind == IR_POSTSTEP && s0 >= 0 && s0 < nv)
+                known[s0] = 0;          /* steps src[0] in place */
+            if (d >= 0 && d < nv) {
+                if (op->kind == IR_LD_IMM) {
+                    known[d] = 1;
+                    val[d] = have_mask ? (op->imm & mask) : op->imm;
+                } else if (op->kind == IR_MOV && op->src[0] >= 0
+                           && op->src[0] < nv && known[op->src[0]]) {
+                    known[d] = 1; val[d] = val[op->src[0]];
+                } else {
+                    known[d] = 0;
+                }
+            }
+            #undef KCONST
+        }
+    }
+    free(known); free(val);
     return changed;
 }
 

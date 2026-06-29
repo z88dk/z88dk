@@ -96,6 +96,16 @@ int debuglevel;
  */
 int c_framepointer_is_ix;
 
+/* Keep one loop-invariant in the spare index register (the one NOT used as
+   the frame pointer). Command-line settable (--idx2-invariant / --no-idx2-
+   invariant); IR_NO_IDX2 in the environment forces off. Resolved per-CPU to
+   a concrete register by ir_idx2_reg(). */
+int c_idx2_invariant = 1;
+/* Width-1 byte-register residency: keep a hot loop-carried char accumulator
+   in a byte register (C in the no-call BC-clean envelope) instead of a frame
+   slot. IR_NO_BYTE_RESIDENT in the environment forces off. */
+int c_byte_resident = 1;
+
 
 int c_use_r2l_calling_convention;
 
