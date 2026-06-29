@@ -70,7 +70,7 @@ extern void gen_conv_sint2char(void);
 extern void gen_conv_uint2long(void);
 extern void gen_conv_sint2long(void);
 extern void gen_conv_carry2int(void);
-extern void gen_call(int nargs_count, const char *name, SYMBOL *sym);
+extern void codegen_call(int nargs_count, const char *name, SYMBOL *sym);
 
 extern void gen_intrinsic_in(SYMBOL *sym);
 extern void gen_intrinsic_out(SYMBOL *sym);
@@ -84,8 +84,8 @@ extern int zinterruptoffset(SYMBOL *sym);
 extern void gen_interrupt_enter(SYMBOL *func);
 extern void gen_interrupt_leave(SYMBOL *func);
 
-extern void gen_critical_enter(void);
-extern void gen_critical_leave(void);
+extern void codegen_critical_enter(void);
+extern void codegen_critical_leave(void);
 extern void gen_shortcall(Type *functype, int rst, int value);
 extern void gen_bankedcall(SYMBOL *sym, Type* functype);
 extern void gen_hl_call(Type *functype, int module, int address);

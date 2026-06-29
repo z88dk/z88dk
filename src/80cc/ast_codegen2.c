@@ -1581,9 +1581,9 @@ static void cg2_walk(Node *node)
         return;
     }
     case AST_CRITICAL:
-        gen_critical_enter();
+        codegen_critical_enter();
         cg2_walk(node->operand);
-        gen_critical_leave();
+        codegen_critical_leave();
         return;
     case AST_LOOP_COUNTDOWN: {
         /* Reversed loop emitted by the loop-reversal pass.
@@ -4390,7 +4390,7 @@ static void cg2_func_call(Node *node)
         if (fntype && fntype->funcattrs.hasva && smallc && !fastcall) {
             va_arg_count = total_arg_bytes;
         }
-        gen_call(va_arg_count, sym ? sym->name : "(unknown)", sym);
+        codegen_call(va_arg_count, sym ? sym->name : "(unknown)", sym);
     }
 
 post_call:

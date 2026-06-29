@@ -11,6 +11,8 @@
  * z80 only — other CPUs abort at lower_unit.
  */
 
+#include "ccdefs.h"     /* real KIND_* / function-modifier flags / c_banked_style
+                           — sets DEFINE_H so ir.h uses the actual enum */
 #include "ir_lower.h"
 #include "ir_analysis.h"
 #include "ir_alloc.h"
@@ -187,14 +189,17 @@ static const char *frame_reg(void)
     return c_framepointer_is_ix == 1 ? "ix" : "iy";
 }
 
+static int fastcall_arg_vreg(const Func *f);
+
 static int param_caller_off(const Func *f, int vreg_id)
 {
+    int fc = fastcall_arg_vreg(f);   /* in HL, not on the caller stack */
     int args_total = 0;
     for (int i = 0; i < f->n_vregs; i++) {
         const VReg *v = &f->vregs[i];
-        if (v->flags & IR_VREG_PARAM) {
+        if ((v->flags & IR_VREG_PARAM) && v->id != fc) {
             int w = (v->width > 0) ? v->width : 2;
-            if (w == 1) w = 2;       /* char promoted to int at call site */
+            if (w == 1 && !(f->flags & SDCCDECL)) w = 2; /* char→int (smallc) / 1B (sdccdecl) */
             args_total += w;
         }
     }
@@ -208,18 +213,31 @@ static int param_caller_off(const Func *f, int vreg_id)
        make room for the saved IX. So caller_off becomes
        frame_size + 4 + args_total instead of frame_size + 2 + args_total. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
-                    + (f->returns_longlong ? 2 : 0);
-    int caller_off = retaddr_off + args_total;
+                    + (f->returns_longlong ? 2 : 0)
+                    /* interrupt push-all (12) / critical l_push_di (2) sit
+                       between the locals and the return address. */
+                    + (f->is_interrupt ? 12 : ((f->flags & CRITICAL) ? 2 : 0));
+    /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
+       / __z88dk_sdccdecl R→L (param0 lowest — just above the return addr).
+       Must match emit_prologue. */
+    int rl_layout = !(f->flags & SMALLC) && !(f->flags & CALLEE)
+                  && !(f->flags & FASTCALL);
+    int base = retaddr_off + f->params_offset;
+    int caller_off = rl_layout ? base : (base + args_total);
     for (int i = 0; i < f->n_vregs; i++) {
         const VReg *v = &f->vregs[i];
         if (!(v->flags & IR_VREG_PARAM)) continue;
+        if (v->id == fc) continue;   /* fastcall arg: in a slot, not caller-pushed */
         int width = (v->width > 0) ? v->width : 2;
-        int caller_w = (width == 1) ? 2 : width;
-        caller_off -= caller_w;
-        if (v->id == vreg_id) {
-            /* For byte params, caller's slot is the low byte of an
-               int — same sp offset. */
-            return caller_off;
+        int caller_w = (width == 1) ? ((f->flags & SDCCDECL) ? 1 : 2) : width;
+        /* For byte params, the caller's slot is the low byte of the
+           pushed int — same sp offset. */
+        if (rl_layout) {
+            if (v->id == vreg_id) return caller_off;
+            caller_off += caller_w;
+        } else {
+            caller_off -= caller_w;
+            if (v->id == vreg_id) return caller_off;
         }
     }
     return -1;  /* shouldn't happen — caller verified PARAM flag */
@@ -339,9 +357,7 @@ static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
    for the (absent) i64 loadpush so the caller falls back to load+push. */
 static const char *acc_prim(const Func *f, int vreg, const char *which)
 {
-    /* KIND_LONGLONG == 19 (inlined from define.h to keep ir_lower
-       decoupled — same convention as vreg_kind_is_integer). */
-    if (vreg >= 0 && (int)f->vregs[vreg].kind == 19) {
+    if (vreg >= 0 && f->vregs[vreg].kind == KIND_LONGLONG) {
         if (!strcmp(which, "load"))  return "l_i64_load";
         if (!strcmp(which, "store")) return "l_i64_store";
         if (!strcmp(which, "push"))  return "l_i64_push";
@@ -360,11 +376,53 @@ static const char *acc_prim(const Func *f, int vreg, const char *which)
    long long family. */
 static void emit_acc_store_hl(FILE *out, const Func *f, int vreg)
 {
-    if (vreg >= 0 && (int)f->vregs[vreg].kind == 19 /* KIND_LONGLONG */) {
+    if (vreg >= 0 && f->vregs[vreg].kind == KIND_LONGLONG) {
         emit(out, "ld\tb,h");
         emit(out, "ld\tc,l");
     }
     emit(out, "call\t%s", acc_prim(f, vreg, "store"));
+}
+
+/* __addressmod (named address spaces). A namespaced symbol's bank must be
+   paged into the address window (a call to the page-in function) before a
+   direct access. The page function preserves HL/DE (the value registers)
+   and IX/IY but may CLOBBER AF/BC (the MSX mapper page fn does `ld c,n;
+   ld a,(hl)`). So we conservatively bracket the call with push/pop bc to
+   protect a BC-resident vreg and invalidate the A cache; HL/DE survive by
+   contract, so the access value (in HL/DEHL) is intact. (When __preserve_regs
+   is modelled on the page fn's Type, the push/pop bc can be elided if BC is
+   declared preserved.) `cur_bank_fn` dedups consecutive same-space accesses;
+   it resets at each BB boundary and after any call. Used for DIRECT (MEM_SYM)
+   access; indirect array/pointer access still bails (the namespace is lost
+   in the address computation). */
+static void invalidate_a_cache(void);
+static const SYMBOL *cur_bank_fn;
+static void emit_ns_switch(FILE *out, const SYMBOL *bf)
+{
+    if (!bf || bf == cur_bank_fn) return;
+    emit(out, "push\tbc");
+    emit(out, "call\t%s%s", ir_sym_prefix(bf), ir_sym_name(bf));
+    emit(out, "pop\tbc");
+    invalidate_a_cache();
+    cur_bank_fn = bf;
+}
+/* The page-in fn for a memory access. Indirect (array/pointer) access
+   carries it on MemOp.bank_fn (ir_build recovered it from the pointee/
+   element type); the symoff matcher fold preserves that field when it
+   rewrites such a load into MEM_SYM (`arr[2]` → `_arr+4`). Direct scalar
+   MEM_SYM access leaves bank_fn NULL and resolves it from the symbol. */
+static const SYMBOL *mem_bank_fn(const MemOp *m)
+{
+    if (m->bank_fn) return m->bank_fn;
+    if (m->kind == IR_MEM_SYM) return ir_sym_bank_fn(m->sym);
+    return NULL;
+}
+/* Taking the ADDRESS of a namespaced scalar (IR_LD_SYM) still bails — the
+   namespace escapes into a plain pointer the deref site can't recover.
+   (Indirect load/store IS handled: it carries MemOp.bank_fn.) */
+static int ns_sym_bails(const SYMBOL *sym)
+{
+    return sym && ir_sym_bank_fn(sym) != NULL;
 }
 
 /* One-shot flag forward decls (definitions further down with the
@@ -431,13 +489,14 @@ static int vreg_in_pr_bc(const Func *f, int vreg_id)
 /* Width-4 byte-arithmetic fastpath gate. True for KIND_LONG,
    KIND_LONGLONG, KIND_ACCUM32 (ADD/SUB bit-identical to integer);
    false for float/double which need FP helpers. Numeric KIND
-   values inlined from define.h to keep ir_lower decoupled. */
+   uses the real KIND_* enum (ir_lower includes ccdefs.h). */
 static int vreg_kind_is_integer(const Func *f, int vreg_id)
 {
     if (!f || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
-    int k = (int)f->vregs[vreg_id].kind;
-    return k == 2 || k == 3 || k == 4 || k == 5
-        || k == 9 || k == 10 || k == 19 || k == 21;
+    Kind k = f->vregs[vreg_id].kind;
+    return k == KIND_CHAR || k == KIND_SHORT || k == KIND_INT
+        || k == KIND_LONG || k == KIND_PTR || k == KIND_CPTR
+        || k == KIND_LONGLONG || k == KIND_ACCUM32;
 }
 
 /* Load a vreg's frame-slot value into HL with optional sp adjustment,
@@ -1847,6 +1906,8 @@ static int gen_ld_sym(FILE *out, Func *f, const Op *op)
         fputs("ir_lower: IR_LD_SYM with NULL sym\n", stderr);
         return -1;
     }
+    if (ns_sym_bails(op->mem.sym))
+        return -1;   /* __addressmod address-of → walker */
     if (op->mem.offset)
         emit(out, "ld\thl,_%s+%d",
              ir_sym_name(op->mem.sym), op->mem.offset);
@@ -2347,6 +2408,29 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
 
     int is_long = (op->src[0] >= 0 && op->src[0] < f->n_vregs
                    && f->vregs[op->src[0]].width == 4);
+    int is_ll   = (op->src[0] >= 0 && op->src[0] < f->n_vregs
+                   && f->vregs[op->src[0]].width == 8);
+
+    /* long long (8-byte) dispatch: load the scrutinee into __i64_acc, then
+       l_i64_case with a `defw target ; <8-byte value>` table (matches the
+       walker's l_i64_load / l_i64_case). l_i64_case reads __i64_acc, pops
+       its return address as the table pointer, and on no-match continues
+       past the defw 0 terminator into the `jp default`. */
+    if (is_ll) {
+        emit_acc_slot_addr(out, f, op->src[0], 0);
+        emit(out, "call\tl_i64_load");
+        emit(out, "call\tl_i64_case");
+        for (int i = 0; i < sw->n_cases; i++) {
+            emit(out, "defw\tL_f%d_bb_%d", func_emit_idx, sw->target_bb[i]);
+            emit(out, "defw\t%d", (int)(sw->values[i]        & 0xFFFF));
+            emit(out, "defw\t%d", (int)((sw->values[i] >> 16) & 0xFFFF));
+            emit(out, "defw\t%d", (int)((sw->values[i] >> 32) & 0xFFFF));
+            emit(out, "defw\t%d", (int)((sw->values[i] >> 48) & 0xFFFF));
+        }
+        emit(out, "defw\t0");
+        emit(out, "jp\tL_f%d_bb_%d", func_emit_idx, sw->default_bb);
+        return 0;
+    }
 
     if (sw->is_char && !is_long) {
         /* Inline cp chain — cp is cheap and the table's call/terminator
@@ -3064,6 +3148,7 @@ static void emit_hl_add_offset(FILE *out, int off, int use_bc)
 
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
+    emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->dst >= 0 && f->vregs[op->dst].width > 4) {
         /* Wide load: address into HL, acc_load→accumulator, store→dst slot. */
         if (op->mem.kind == IR_MEM_POOL) {
@@ -3104,6 +3189,11 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,(_%s)", ir_sym_name(op->mem.sym));
             emit(out, "ld\tde,(_%s+%d)",
                  ir_sym_name(op->mem.sym), off + 2);
+            /* __far pointer VALUE is 3 bytes in memory: the 4th byte read
+               by `ld de,(sym+2)` is garbage (it's sym+3). Zero D to keep
+               the DEHL far-ptr invariant (D=0, E=bank, HL=offset). */
+            if (op->mem.elem == KIND_CPTR)
+                emit(out, "ld\td,0");
             store_dehl_finalize(out, f, op->dst);
             return 0;
         }
@@ -3253,6 +3343,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->src[0] >= 0 && f->vregs[op->src[0]].width > 4) {
         /* Wide double store: dload(src)→FA, address into HL, dstore. */
         if (cur_fa_vreg != op->src[0]) {
@@ -3289,6 +3380,15 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                      ir_sym_name(op->mem.sym), off);
             else
                 emit(out, "ld\t(_%s),hl", ir_sym_name(op->mem.sym));
+            if (op->mem.elem == KIND_CPTR) {
+                /* __far pointer VALUE is 3 bytes in memory: write the
+                   bank byte (E) only, never the 4th DEHL byte (D) — that
+                   would clobber the adjacent global (sym+3). */
+                emit(out, "ld\ta,e");
+                emit(out, "ld\t(_%s+%d),a", ir_sym_name(op->mem.sym), off + 2);
+                invalidate_a_cache();
+                return 0;
+            }
             emit(out, "ld\t(_%s+%d),de",
                  ir_sym_name(op->mem.sym), off + 2);
             return 0;
@@ -4597,6 +4697,17 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit(out, "push\tde");
             emit(out, "push\thl");
             pushed_bytes += 4;
+        } else if (width == 1 && (ci->flags & SDCCDECL)) {
+            /* __z88dk_sdccdecl char arg: push ONE byte. Read the byte from
+               its slot (offset adj covers prior pushes), then `push af;
+               inc sp` leaves A (the char) at sp+0 and reclaims the F byte
+               — no BC clobber (unlike sccz80's `ld b,l; push bc; inc sp`). */
+            emit(out, "ld\thl,%d", adj);
+            emit(out, "add\thl,sp");
+            emit(out, "ld\ta,(hl)");
+            emit(out, "push\taf");
+            emit(out, "inc\tsp");
+            pushed_bytes += 1;
         } else if (width == 1) {
             emit(out, "ld\thl,%d", adj);
             emit(out, "add\thl,sp");
@@ -4656,7 +4767,23 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         if (pre) cur_sp_adjust += 2;
     }
 
-    if (is_indirect) {
+    if (is_indirect && ci->far_fnptr) {
+        /* __far function pointer: materialize the far address into DEHL
+           (EHL = E:bank, HL:offset), set A = arg-word count, and dispatch
+           through l_farcall (the banking trampoline pages bank E and calls
+           offset HL). Mirrors the walker's gen_farcall register contract;
+           l_farcall reads EHL, so — unlike sccz80's calling convention —
+           the fnptr need not also sit on the stack. The args are popped by
+           the caller-cleanup below. (l_farcall is not yet provided by any
+           target lib: this emits a loud link error rather than the silent
+           near miscompile l_jphl produced.) */
+        load_to_dehl_adj(out, f, ci->fnptr_vreg,
+                         pre ? 0 : pushed_bytes + sp_adj_extra);
+        int argwords = pushed_bytes / 2;
+        if (argwords == 0) emit(out, "xor\ta");
+        else               emit(out, "ld\ta,%d", argwords);
+        emit(out, "call\tl_farcall");
+    } else if (is_indirect) {
         /* Load funcptr into HL then `call l_jphl` (the `jp (hl)`
            thunk). The call pushes the return address; l_jphl
            immediately jumps to HL — the target's `ret` returns
@@ -4666,6 +4793,45 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         load_to_hl_adj(out, f, ci->fnptr_vreg,
                        pre ? 0 : pushed_bytes + sp_adj_extra);
         emit(out, "call\tl_jphl");
+    } else if ((ci->flags & SHORTCALL) && !(ci->flags & SHORTCALL_HL)) {
+        /* __z88dk_shortcall: dispatch via the rst vector, with the value
+           as an inline operand (defb if it fits a byte, else defw) that
+           the rst handler reads. (long-long return's __i64_acc push was
+           already emitted above.) */
+        emit(out, "rst\t%d", ci->shortcall_rst);
+        emit(out, "%s\t%d",
+             ci->shortcall_value < 0x100 ? "defb" : "defw",
+             ci->shortcall_value);
+    } else if (ci->flags & SHORTCALL_HL) {
+        /* __z88dk_shortcall_hl: value passed in HL, no inline operand.
+           A fastcall arg already in HL is preserved into BC first. */
+        if (ci->abi == IR_ABI_FASTCALL)
+            emit(out, "ld\tbc,hl");
+        emit(out, "ld\thl,%d", ci->shortcall_value);
+        emit(out, "rst\t%d", ci->shortcall_rst);
+    } else if (ci->flags & HL_CALL) {
+        /* __z88dk_hl_call: module in HL, then a direct call to the fixed
+           numeric address. A fastcall arg in HL is preserved into BC. */
+        if (ci->abi == IR_ABI_FASTCALL)
+            emit(out, "ld\tbc,hl");
+        emit(out, "ld\thl,%d", ci->hlcall_module);
+        emit(out, "call\t%d", ci->hlcall_addr);
+    } else if ((ci->flags & BANKED) && c_banked_style == BANKED_STYLE_TICALC) {
+        /* TICALC banked call: BCALL via rst $28, a unique import label
+           (patched by appmake) and a defw 0 placeholder. */
+        static int banked_label = 0;
+        emit(out, "rst\t$28");
+        fprintf(out, ".__banked_import_%x%s%s\n", banked_label++,
+             ir_sym_prefix(ci->target),
+             ci->target_name ? ci->target_name : ir_sym_name(ci->target));
+        emit(out, "defw 0");
+    } else if (ci->flags & BANKED) {
+        /* REGULAR banked call: the banked_call trampoline reads the inline
+           4-byte target (defq) after the call, pages it in and jumps. */
+        emit(out, "call\tbanked_call");
+        emit(out, "defq\t%s%s",
+             ir_sym_prefix(ci->target),
+             ci->target_name ? ci->target_name : ir_sym_name(ci->target));
     } else {
         emit(out, "call\t%s%s",
              ir_sym_prefix(ci->target),
@@ -4677,8 +4843,11 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        returns) at 10T / 1 byte each. The ex/add/ld dance only wins
        for N >= 10 args, which isn't hot enough to bother with. */
     if (ci->abi != IR_ABI_CALLEE && pushed_bytes > 0) {
-        for (int n = pushed_bytes; n > 0; n -= 2)
+        int n = pushed_bytes;
+        for (; n >= 2; n -= 2)
             emit(out, "pop\tbc");
+        if (n == 1)             /* odd byte (a __z88dk_sdccdecl char arg) */
+            emit(out, "inc\tsp");
     }
     /* Pre-pushed args bumped cur_sp_adjust at each IR_PUSH_ARG; the
        stack is rebalanced now (our pops, or the callee's cleanup). */
@@ -4708,6 +4877,10 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     invalidate_hl_cache();
     if (!bc_saved)
         invalidate_bc_cache();
+    /* The callee may have paged a different __addressmod bank — re-page on
+       the next namespaced access. (The page-in call is emitted inline, not
+       via gen_call, so it doesn't reach here.) */
+    cur_bank_fn = NULL;
     /* Return value lands in HL (width ≤ 2) or DEHL (width 4) per
        z88dk's smallc/stdc convention. Pick the correct store
        routine from the ret vreg's width — using store_hl for a
@@ -4983,6 +5156,163 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
         else
             store_hl(out, f, hi->ret_vreg);
     }
+    return 0;
+}
+
+/* The lp_* far-access helper for an element kind + width + sign.
+   load=1 → lp_g*, load=0 → lp_p*. Dispatch by width with the
+   char/cptr/wide-double/longlong special-cases — mirrors
+   ir_build.c:far_helper. */
+static const char *far_helper_name(Kind elem, int width, int is_unsigned, int load)
+{
+    if (elem == KIND_CHAR)
+        return load ? (is_unsigned ? "lp_guchar" : "lp_gchar") : "lp_pchar";
+    if (elem == KIND_CPTR)
+        return load ? "lp_gptr" : "lp_pptr";
+    if (elem == KIND_LONGLONG)
+        return load ? "lp_glonglong" : "lp_i64_load";
+    if ((elem == KIND_DOUBLE || elem == KIND_FLOAT) && width >= 5)
+        return load ? "lp_gdoub" : "lp_pdoub";
+    if (width == 1)
+        return load ? (is_unsigned ? "lp_guchar" : "lp_gchar") : "lp_pchar";
+    if (width == 2)
+        return load ? "lp_gint" : "lp_pint";
+    if (width == 4)
+        return load ? "lp_glong" : "lp_plong";
+    return NULL;
+}
+
+/* IR_LD_FAR: dst ← *src[0], where src[0] is a __far pointer (KIND_CPTR)
+   held in DEHL (D=0, E=bank, HL=offset). The access routes through an
+   lp_g* helper that pages the bank in/out. A far helper is a CALL: it
+   clobbers AF/BC/DE + the alt register set, so a PR_BC tenant is saved
+   across it and the HL/BC/A/bank caches are invalidated afterwards.
+   Result lands in HL (char/int → width-2 promoted) or DEHL (long/cptr). */
+static int gen_ld_far(FILE *out, Func *f, const Op *op)
+{
+    int dst_w = (op->dst >= 0) ? f->vregs[op->dst].width : 2;
+    const char *h = far_helper_name((int)op->mem.elem, dst_w, (int)op->imm, 1);
+    if (!h) {
+        fprintf(stderr, "ir_lower: IR_LD_FAR element kind %d width %d "
+                "unsupported\n", (int)op->mem.elem, dst_w);
+        return -1;
+    }
+    int bc_saved = func_has_pr_bc(f);
+    if (bc_saved) { emit(out, "push\tbc"); cur_sp_adjust += 2; }
+    /* Materialize the far pointer into DEHL = EHL far address (D=0). */
+    load_to_dehl(out, f, op->src[0]);
+    emit(out, "call\t%s", h);
+    if (bc_saved) { emit(out, "pop\tbc"); cur_sp_adjust -= 2; }
+    invalidate_hl_cache();
+    if (!bc_saved) invalidate_bc_cache();
+    invalidate_de_cache();
+    invalidate_a_cache();
+    cur_bank_fn = NULL;   /* the helper paged a bank; re-page on next access */
+    if (op->dst >= 0) {
+        if (dst_w > 4) {
+            /* Wide: lp_gdoub left the value in FA, lp_glonglong in
+               __i64_acc — store the accumulator to the dst slot, exactly
+               like gen_ld_mem's wide path. */
+            emit_acc_slot_addr(out, f, op->dst, 0);
+            emit_acc_store_hl(out, f, op->dst);
+            invalidate_hl_cache(); invalidate_bc_cache();
+            cur_fa_vreg = op->dst;
+        } else if (dst_w == 4)
+            store_dehl_finalize(out, f, op->dst);   /* lp_glong/lp_gptr → DEHL */
+        else
+            store_hl(out, f, op->dst);              /* lp_g{char,uchar,int} → HL */
+    }
+    return 0;
+}
+
+/* IR_ST_FAR: *src[0] ← src[1], src[0] a __far pointer (KIND_CPTR / DEHL),
+   src[1] the value. Store helpers (lp_p*) take the address in the ALT
+   set (E'H'L') and the value in the PRIMARY set (HL, or DEHL for wide).
+   The IR has no model of the alt register file, so the address is moved
+   into it via an opaque `exx; pop hl; pop de; exx` over a stack push —
+   never a cache-aware load in the alt bank (FAR_IR_PLAN risk #2).
+
+   Order mirrors the walker (gen_far_store): the ADDRESS is materialized
+   and pushed FIRST. The far address is typically the freshly-computed
+   DEHL value (an IR_ADD result that may be DEHL-resident with no frame
+   slot); pushing it before the value's load_to_* clobbers DEHL keeps it
+   recoverable. The value is then materialized into the primary set, and
+   the opaque exx-pop loads the address into the alt set without
+   disturbing it. A far helper is a CALL — full clobber. */
+static int gen_st_far(FILE *out, Func *f, const Op *op)
+{
+    int val   = op->src[1];
+    int val_w = (val >= 0) ? f->vregs[val].width : 2;
+    const char *h = far_helper_name((int)op->mem.elem, val_w, 0, 0);
+    if (!h) {
+        fprintf(stderr, "ir_lower: IR_ST_FAR element kind %d width %d "
+                "unsupported\n", (int)op->mem.elem, val_w);
+        return -1;
+    }
+    int bc_saved = func_has_pr_bc(f);
+    if (bc_saved) { emit(out, "push\tbc"); cur_sp_adjust += 2; }
+    /* 1. Address → primary DEHL, then onto the stack. */
+    load_to_dehl(out, f, op->src[0]);
+    emit(out, "push\tde");
+    emit(out, "push\thl");
+    cur_sp_adjust += 4;
+    /* 2. Value into its delivery register(s): a wide (5/6/8B double / long
+          long) value goes into the accumulator (lp_pdoub takes FA,
+          lp_i64_load takes __i64_acc) via the maths load primitive; a
+          narrow value into the primary set (DEHL for 4B, HL/L otherwise).
+          The address is safe on the stack; this may clobber DEHL/BC. */
+    if (val_w > 4) {
+        if (cur_fa_vreg != val) {
+            emit_acc_slot_addr(out, f, val, 0);
+            emit(out, "call\t%s", acc_prim(f, val, "load"));
+        }
+    } else if (val_w == 4) {
+        load_to_dehl(out, f, val);
+    } else {
+        load_to_hl(out, f, val);
+    }
+    /* 3. Move the address into the alt set (E'H'L') via the opaque
+          exx-pop, leaving the value untouched in the primary set (the
+          maths accumulator survives — the pops only touch alt HL/DE,
+          exactly the walker's gen_far_store sequence). */
+    emit(out, "exx");
+    emit(out, "pop\thl");          /* alt HL = offset */
+    emit(out, "pop\tde");          /* alt DE = (D=0,E=bank) → E'H'L' = addr */
+    cur_sp_adjust -= 4;
+    emit(out, "exx");
+    emit(out, "call\t%s", h);
+    if (bc_saved) { emit(out, "pop\tbc"); cur_sp_adjust -= 2; }
+    invalidate_hl_cache();
+    if (!bc_saved) invalidate_bc_cache();
+    invalidate_de_cache();
+    invalidate_a_cache();
+    if (val_w > 4) cur_fa_vreg = -1;   /* helper clobbered the accumulator */
+    cur_bank_fn = NULL;
+    return 0;
+}
+
+/* IR_LD_FARSYM: dst (KIND_CPTR) ← the far address of a banked (FARACC)
+   symbol. The symbol's link-time address encodes the bank in its high
+   half; l_far_mapaddr turns the (bank, offset) pair into a logical far
+   pointer (EHL, D=0). A CALL — full clobber. (A near symbol cast to far
+   reaches the far world via IR_LD_SYM + the near→far widen cast, not
+   here.) */
+static int gen_ld_farsym(FILE *out, Func *f, const Op *op)
+{
+    const char *nm = ir_sym_name(op->mem.sym);
+    int bc_saved = func_has_pr_bc(f);
+    if (bc_saved) { emit(out, "push\tbc"); cur_sp_adjust += 2; }
+    emit(out, "ld\thl,+(_%s %% 65536)", nm);
+    emit(out, "ld\tde,+(_%s / 65536)", nm);
+    emit(out, "call\tl_far_mapaddr");
+    if (bc_saved) { emit(out, "pop\tbc"); cur_sp_adjust -= 2; }
+    invalidate_hl_cache();
+    if (!bc_saved) invalidate_bc_cache();
+    invalidate_de_cache();
+    invalidate_a_cache();
+    cur_bank_fn = NULL;
+    if (op->dst >= 0)
+        store_dehl_finalize(out, f, op->dst);   /* EHL far ptr → DEHL */
     return 0;
 }
 
@@ -5580,6 +5910,9 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_CMP_EQ:  case IR_CMP_NE:  return gen_cmp_eq_ne(out, f, op);
     case IR_LD_MEM:                   return gen_ld_mem(out, f, op);
     case IR_ST_MEM:                   return gen_st_mem(out, f, op);
+    case IR_LD_FAR:                   return gen_ld_far(out, f, op);
+    case IR_ST_FAR:                   return gen_st_far(out, f, op);
+    case IR_LD_FARSYM:                return gen_ld_farsym(out, f, op);
     case IR_ADD:                      return gen_add(out, f, op);
     case IR_SUB:                      return gen_sub(out, f, op);
     case IR_AND: case IR_OR: case IR_XOR: return gen_bitop(out, f, op);
@@ -5666,6 +5999,37 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            IX/SP, leaving the return value in HL/DEHL/FA intact. */
         emit(out, "pop\t%s", frame_reg());
     }
+    if (f->is_interrupt) {
+        /* Interrupt epilogue: restore the registers the prologue saved
+           (in reverse) and return via reti/retn/ei;reti. Mirrors the
+           walker's gen_interrupt_leave; the IR targets z80 only, so the
+           ix/iy saves are always present. The return form follows the
+           critical / vector combination:
+             __interrupt           → reti
+             __critical __interrupt → retn
+             __interrupt(N) / __critical __interrupt(0) → ei; reti        */
+        emit(out, "pop\tiy");
+        emit(out, "pop\tix");
+        emit(out, "pop\thl");
+        emit(out, "pop\tde");
+        emit(out, "pop\tbc");
+        emit(out, "pop\taf");
+        int critical = (f->flags & CRITICAL) != 0;
+        if (critical && f->interrupt_irq < 0) {
+            emit(out, "retn");
+        } else if (!critical && f->interrupt_irq < 0) {
+            emit(out, "reti");
+        } else {
+            emit(out, "ei");
+            emit(out, "reti");
+        }
+        return 0;
+    }
+    /* Function-level __critical (non-interrupt): the prologue's l_push_di
+       is balanced by l_pop_ei here (it pops the saved DI state and re-ei's,
+       preserving the return value in HL/DEHL). Mirrors codegen_critical_leave. */
+    if (f->flags & CRITICAL)
+        emit(out, "call\tl_pop_ei");
     emit(out, "ret");
     return 0;
 }
@@ -5675,14 +6039,32 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
 /* Count IR_VREG_PARAM vregs and return their total caller-stack width.
    Note: char params are passed as int (2 bytes) by the smallc ABI even
    though the local vreg holds a 1-byte value. */
+/* The vreg holding the __z88dk_fastcall register arg — the last declared
+   param, delivered in HL (width 1/2; wider args bail in ir_build) rather
+   than on the caller stack. -1 if not a fastcall function. Identified as
+   the highest-indexed PARAM vreg (params are created in declaration order
+   before any temp). */
+static int fastcall_arg_vreg(const Func *f)
+{
+    if (!(f->flags & FASTCALL)) return -1;
+    int last = -1;
+    for (int i = 0; i < f->n_vregs; i++)
+        if (f->vregs[i].flags & IR_VREG_PARAM)
+            last = i;
+    return last;
+}
+
 static int param_stack_width(const Func *f)
 {
+    int fc = fastcall_arg_vreg(f);   /* not on the caller stack */
     int total = 0;
     for (int i = 0; i < f->n_vregs; i++) {
         const VReg *v = &f->vregs[i];
-        if (v->flags & IR_VREG_PARAM) {
+        if ((v->flags & IR_VREG_PARAM) && v->id != fc) {
             int w = (v->width > 0) ? v->width : 2;
-            if (w == 1) w = 2;       /* char promoted to int at call site */
+            /* char promoted to int (2 bytes) at the smallc call site —
+               except __z88dk_sdccdecl, where a char arg is 1 byte. */
+            if (w == 1 && !(f->flags & SDCCDECL)) w = 2;
             total += w;
         }
     }
@@ -5691,11 +6073,29 @@ static int param_stack_width(const Func *f)
 
 static void emit_prologue(FILE *out, Func *f)
 {
-    /* FRAMEPTR setup. The walker scaffolding (declparse.c →
-       gen_push_frame) already emitted `push ix` to preserve caller's
-       IX, but walker FP addressing is disabled so it does NOT load
-       `ld ix,0; add ix,sp` — that's our responsibility now. IX must
-       be set BEFORE the frame alloc so it captures sp at function
+    /* Register-save prologue — moved out of declparse's walker scaffolding
+       (gen_interrupt_enter / codegen_critical_enter / gen_push_frame); the
+       IR owns it under --use-ir. Same order and instructions, z80 only (the
+       IR aborts other CPUs). The matching teardown is in lower_ret. */
+    if (f->is_interrupt) {
+        /* gen_interrupt_enter: ei only for a bare, non-critical __interrupt. */
+        if (!(f->flags & CRITICAL) && f->interrupt_irq < 0)
+            emit(out, "ei");
+        emit(out, "push\taf");
+        emit(out, "push\tbc");
+        emit(out, "push\tde");
+        emit(out, "push\thl");
+        emit(out, "push\tix");
+        emit(out, "push\tiy");
+    } else if (f->flags & CRITICAL) {
+        emit(out, "call\tl_push_di");
+    }
+    if (frame_has_saved_fp(f))      /* gen_push_frame: preserve caller's IX */
+        emit(out, "push\t%s", frame_reg());
+
+    /* FRAMEPTR setup. push of IX (above) preserves the caller's frame
+       pointer; here we point IX at entry-sp when FP addressing is active.
+       IX must be set BEFORE the frame alloc so it captures sp at function
        entry (between locals and caller's frame) for full [-128,+127]
        reach per slot. Teardown is OUR responsibility too because IR
        emits `ret` directly and gen_pop_frame doesn't fire. */
@@ -5704,6 +6104,25 @@ static void emit_prologue(FILE *out, Func *f)
         emit(out, "ld\t%s,0", fr);
         emit(out, "add\t%s,sp", fr);
     }
+    /* Fastcall arg arrives in HL (width 1/2), DEHL (width 4), or the
+       memory accumulator fa / __i64_acc (width 5/6/8) — not on the caller
+       stack. The frame alloc below clobbers HL, so stash the register
+       cases across it: width 1/2 → DE (free); width 4 → the low half in BC
+       (free at fastcall entry — only DEHL holds the arg), DE keeps the high
+       half. A wide acc arg is memory-resident and survives the frame alloc,
+       so it needs no stash. Placed into the param's home after the frame. */
+    int fc_vreg = fastcall_arg_vreg(f);
+    if (fc_vreg >= 0) {
+        int w = f->vregs[fc_vreg].width;
+        if (w == 4) {
+            emit(out, "ld\tb,h");        /* low half → BC */
+            emit(out, "ld\tc,l");
+        } else if (w <= 2) {
+            emit(out, "ex\tde,hl");      /* arg → DE */
+        }
+        /* w > 4: fa / __i64_acc is in memory, no register stash needed. */
+    }
+
     /* Allocate the frame. */
     if (f->frame_size > 0) {
         emit(out, "ld\thl,-%d", f->frame_size);
@@ -5711,47 +6130,100 @@ static void emit_prologue(FILE *out, Func *f)
         emit(out, "ld\tsp,hl");
     }
 
+    if (fc_vreg >= 0 && f->vregs[fc_vreg].width > 4) {
+        /* wide (acc-tier) arg: still in fa / __i64_acc (memory) — store it
+           to the param's slot, like gen_ld_mem's wide path. */
+        emit_acc_slot_addr(out, f, fc_vreg, 0);
+        emit_acc_store_hl(out, f, fc_vreg);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = fc_vreg;
+    } else if (fc_vreg >= 0 && f->vregs[fc_vreg].width == 4) {
+        /* width-4: reconstruct DEHL (low half from BC, high half survived
+           in DE) and place it in the param's home (DEHL register or slot). */
+        emit(out, "ld\th,b");
+        emit(out, "ld\tl,c");
+        store_dehl_finalize(out, f, fc_vreg);
+    } else if (fc_vreg >= 0) {
+        /* The arg is now in DE (stashed before the frame alloc). Place it
+           in the param vreg's allocated home: a register move (FREE when
+           the allocator chose PR_DE — the register-residency win) or a
+           slot store. */
+        if (f->vregs[fc_vreg].width == 1) {
+            emit(out, "ld\ta,e");                /* low byte */
+            if (vreg_in_register_pool(f, fc_vreg))
+                cache_a(fc_vreg);
+            else
+                store_a_byte(out, f, fc_vreg);
+        } else if (vreg_is_pr_de(f, fc_vreg)) {
+            cache_de(fc_vreg);                   /* already in DE — no move */
+        } else if (vreg_in_pr_bc(f, fc_vreg)) {
+            emit(out, "ld\tb,d");
+            emit(out, "ld\tc,e");
+            cache_bc(fc_vreg);
+        } else if (vreg_in_register_pool(f, fc_vreg)) {   /* PR_HL */
+            emit(out, "ex\tde,hl");
+            cache_hl(fc_vreg);
+        } else {                                 /* spill slot */
+            emit(out, "ex\tde,hl");
+            store_hl(out, f, fc_vreg);
+        }
+    }
+
     /* Copy caller-pushed args into our local frame slots so the rest of
-       the lowerer can treat params identically to other vregs. SMALLC
-       convention (z88dk default): args pushed left-to-right, so the
-       leftmost param sits at the highest sp offset. */
+       the lowerer can treat params identically to other vregs. Push order
+       determines the layout: SMALLC / CALLEE push left-to-right (param0
+       deepest → HIGHEST sp offset); STDC (and __z88dk_sdccdecl, which is
+       flagged __stdc) pushes right-to-left (param0 on top → LOWEST offset,
+       just above the return address). */
     int args_total = param_stack_width(f);
+    int rl_layout = !(f->flags & SMALLC) && !(f->flags & CALLEE)
+                  && !(f->flags & FASTCALL);
     /* When entry pushed IX (frame_has_saved_fp), the saved IX sits between
        the locals and the return address — args start 2 bytes higher. A
        long long return adds a stuffed pointer just above the return
        address, shifting args up another 2. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 2 : 0)
-                    + (f->returns_longlong ? 2 : 0);
-    int caller_off = retaddr_off + 2 + args_total; /* top of pushed args */
+                    + (f->returns_longlong ? 2 : 0)
+                    /* interrupt push-all (12) / critical l_push_di (2). */
+                    + (f->is_interrupt ? 12 : ((f->flags & CRITICAL) ? 2 : 0));
+    /* R→L: walk up from just above the return address; L→R: walk down
+       from the top of the arg block. __z88dk_params_offset(N) (and TICALC
+       banked) inserts N extra bytes below the params. */
+    int base = retaddr_off + 2 + f->params_offset;
+    int caller_off = rl_layout ? base : (base + args_total);
 
     /* Walk PARAM vregs in declaration order (creation order). */
     int param_count = 0;
     for (int i = 0; i < f->n_vregs; i++) {
         VReg *v = &f->vregs[i];
         if (!(v->flags & IR_VREG_PARAM)) continue;
+        if (v->id == fc_vreg) continue;  /* fastcall arg: stored from HL above */
         param_count++;
         int width = (v->width > 0) ? v->width : 2;
         /* Char params are pushed as int (2 bytes) by smallc; consume
-           2 caller-bytes but only store the low byte into the vreg. */
-        int caller_w = (width == 1) ? 2 : width;
-        caller_off -= caller_w;
+           2 caller-bytes but only store the low byte into the vreg.
+           __z88dk_sdccdecl pushes a char as 1 byte. */
+        int caller_w = (width == 1) ? ((f->flags & SDCCDECL) ? 1 : 2) : width;
+        int poff;
+        if (rl_layout) { poff = caller_off; caller_off += caller_w; }
+        else           { caller_off -= caller_w; poff = caller_off; }
         /* Read-only params live in place on the caller's stack — no
            copy-in. slot_off() returns their caller offset directly so
            later loads/stores in the body walk into the caller frame. */
         if (v->flags & IR_VREG_PARAM_IN_PLACE) continue;
         if (width == 1) {
             /* Caller pushed a 2-byte int; take its low byte. */
-            emit(out, "ld\thl,%d", caller_off);
+            emit(out, "ld\thl,%d", poff);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,(hl)");
             store_a_byte(out, f, v->id);
         } else if (width == 2) {
-            load_sp_off_to_hl(out, caller_off);
+            load_sp_off_to_hl(out, poff);
             store_hl(out, f, v->id);
         } else if (width == 4) {
             /* Long param: read 4 bytes from caller stack into DEHL,
                then store_dehl to the local slot. */
-            emit(out, "ld\thl,%d", caller_off);
+            emit(out, "ld\thl,%d", poff);
             emit(out, "add\thl,sp");
             emit(out, "ld\tc,(hl)");
             emit(out, "inc\thl");
@@ -5841,6 +6313,20 @@ int ir_lower_func(FILE *out, Func *f)
     if (!f) {
         fputs("ir_lower: null Func\n", stderr);
         return -1;
+    }
+
+    /* __naked: emit the body asm verbatim — no prologue, no epilogue, no
+       frame, no BB labels, no trailing `ret` (the asm owns the entire
+       body). ir_build has already validated the body is asm-only. */
+    if (f->is_naked) {
+        func_emit_idx++;
+        for (int i = 0; i < f->n_bbs; i++) {
+            BB *bb = &f->bbs[i];
+            for (int o = 0; o < bb->n_ops; o++)
+                if (bb->ops[o].kind == IR_ASM)
+                    gen_asm(out, f, &bb->ops[o]);
+        }
+        return 0;
     }
 
     /* Liveness runs before ir_alloc / ir_assign_slots — both passes
@@ -6169,6 +6655,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     cur_emitted_line = 0;
     shl_skip_n = 0;
     cur_bb = NULL;
+    cur_bank_fn = NULL;   /* __addressmod: bank unknown at function entry */
     ss_cur_g = -1;   /* no current op during prologue */
     for (int i = 0; i < f->n_bbs; i++) {
         bb_hl_out[i] = -1;
@@ -6215,6 +6702,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         cur_dehl_inline_push = -1;
         cur_dehl_inline_push_base_sp = 0;
         cur_dehl_push_to_stack = 0;
+        cur_bank_fn = NULL;   /* __addressmod: bank unknown at a BB merge */
         /* No pending spill crosses into a BB yet — the cross-BB inherit
            lands with the defer step. Clear it so nothing leaks. */
         pending_spill_v = -1;

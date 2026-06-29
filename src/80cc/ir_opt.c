@@ -301,7 +301,37 @@ static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
         loop_header[i] = -1;
         loop_end[i]    = -1;
     }
+    /* Reachability from the entry (BB0). An UNREACHABLE BB never executes,
+       so a `succ.id <= b.id` edge out of it is NOT a real back-edge — it
+       can't form a loop. The switch builder leaves exactly such a BB: a
+       dead post-SWITCH block that falls through to the first case label
+       (whose id is lower), e.g. BB4 -> BB2. Without this guard that fake
+       back-edge marks the case bodies as a loop and LICM hoists their
+       (single-def) `LD_IMM`s into the switch block — a miscompile. */
+    int *reachable = calloc((size_t)f->n_bbs, sizeof(int));
+    if (reachable) {
+        int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+        if (stack) {
+            int sp = 0;
+            reachable[0] = 1; stack[sp++] = 0;
+            while (sp > 0) {
+                int cur = stack[--sp];
+                BB *cbb = &f->bbs[cur];
+                int cns = ir_bb_n_succ(cbb);
+                for (int s = 0; s < cns; s++) {
+                    int sid = ir_bb_succ_at(cbb, s);
+                    if (sid >= 0 && sid < f->n_bbs && !reachable[sid]) {
+                        reachable[sid] = 1; stack[sp++] = sid;
+                    }
+                }
+            }
+            free(stack);
+        } else {
+            for (int i = 0; i < f->n_bbs; i++) reachable[i] = 1;
+        }
+    }
     for (int b = 0; b < f->n_bbs; b++) {
+        if (reachable && !reachable[b]) continue;   /* dead BB: no real edges */
         BB *bb = &f->bbs[b];
         int ns = ir_bb_n_succ(bb);
         for (int s = 0; s < ns; s++) {
@@ -318,6 +348,7 @@ static void licm_find_loops(Func *f, int *in_loop, int *loop_header,
             }
         }
     }
+    free(reachable);
 }
 
 /* Find the unique outside predecessor of `header`. Returns its BB id,

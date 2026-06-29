@@ -1858,6 +1858,34 @@ static int get_parameter_size(Type *functype, Type *type)
 }
 
 
+/* Legacy (walker) function-prologue EMISSION: interrupt/critical register
+   saves, the frame-pointer push, and the fastcall-arg spill. Under
+   --use-ir the IR's emit_prologue owns the prologue, so this is emitted
+   only on the walker paths — the default compiler and the IR→walker bail
+   fallback. The matching param-offset COMPUTATION (where/stackargs/
+   ptr->offset) stays inline in declfunc and runs unconditionally (it's
+   walker state the IR ignores, and the bail fallback needs it). */
+static void emit_legacy_prologue(Type *functype)
+{
+    if ( (functype->flags & INTERRUPT) == INTERRUPT ) {
+        gen_interrupt_enter(currfn);
+    } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
+        codegen_critical_enter();
+    }
+    gen_push_frame();
+    if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
+        Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);
+        if ( fastarg->size == 2 || fastarg->size == 1)
+            zpush();
+        else if ( kind_is_floating(fastarg->kind) )
+            gen_push_float(fastarg->kind);
+        else if ( fastarg->size == 4 || fastarg->size == 3)
+            lpush();
+        else if ( fastarg->kind == KIND_LONGLONG )
+            llpush();
+    }
+}
+
 static void declfunc(Type *functype, enum storage_type storage)
 {
     int where;
@@ -2042,35 +2070,26 @@ static void declfunc(Type *functype, enum storage_type storage)
     
    
 
-    if ( (functype->flags & INTERRUPT) == INTERRUPT ) {
-        gen_interrupt_enter(currfn);
-    } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
-        gen_critical_enter();
-    }
+    /* Prologue EMISSION: walker paths only. The IR (--use-ir) owns its
+       prologue in emit_prologue; if the IR later bails, the fallback at
+       the codegen dispatch re-emits this. */
+    if ( !c_use_ir )
+        emit_legacy_prologue(functype);
 
-    gen_push_frame();
-
+    /* Fastcall param-offset COMPUTATION (walker state — always; the IR
+       computes its own offsets but the bail fallback reads these). */
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);
-        int   adjust = 1;
-
-        if ( fastarg->size == 2 || fastarg->size == 1) 
-            zpush();
-        else if ( kind_is_floating(fastarg->kind) )
-            gen_push_float(fastarg->kind);     
-        else if ( fastarg->size == 4 || fastarg->size == 3)
-            lpush();
-        else if ( fastarg->kind == KIND_LONGLONG ) 
-            llpush();
-        else
-            adjust = 0;
-
+        int   adjust = ( fastarg->size == 1 || fastarg->size == 2
+                       || kind_is_floating(fastarg->kind)
+                       || fastarg->size == 3 || fastarg->size == 4
+                       || fastarg->kind == KIND_LONGLONG );
         if ( adjust ) {
             SYMBOL *ptr = findloc(fastarg->name);
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i = -get_parameter_size(functype,fastarg); 
+                ptr->offset.i = -get_parameter_size(functype,fastarg);
                 where += 2;
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
@@ -2087,7 +2106,7 @@ static void declfunc(Type *functype, enum storage_type storage)
             }
         }
     }
-    
+
     stackargs = where;
     lastst = STEXP;
     struct nodepair *pair;
@@ -2116,6 +2135,10 @@ static void declfunc(Type *functype, enum storage_type storage)
                    walker so the file as a whole still compiles. */
                 extern int ir_generate_code(Node *, SYMBOL *);
                 if (ir_generate_code(pair->node, currfn) != 0) {
+                    /* IR bailed before emitting (all build_fail()s precede
+                       lowering) — emit the walker prologue it skipped, then
+                       run the walker body. */
+                    emit_legacy_prologue(functype);
                     ast_generate_code2(pair->node);
                 }
             } else {

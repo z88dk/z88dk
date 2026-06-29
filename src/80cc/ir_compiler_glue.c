@@ -29,6 +29,30 @@ const char *ir_sym_prefix(const SYMBOL *sym)
     return "_";
 }
 
+/* For a symbol in a named address space (__addressmod), return the page-in
+   "bank function" that maps its bank into the address window. The lowerer
+   must `call` it before accessing the symbol. Contract (matching sdcc):
+   the bank function preserves ALL registers, so the access is transparent —
+   no register/cache clobber. Returns NULL for the default address space. */
+const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym)
+{
+    if (!sym || !sym->ctype || !sym->ctype->namespace)
+        return NULL;
+    namespace *ns = get_namespace(sym->ctype->namespace);
+    return ns ? ns->bank_function : NULL;
+}
+
+/* As ir_sym_bank_fn but keyed on a namespace NAME — for indirect
+   (array/pointer) access where the namespace is carried on the pointee /
+   element type rather than on a symbol. Returns NULL for the default space. */
+const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
+{
+    if (!ns_name)
+        return NULL;
+    namespace *ns = get_namespace(ns_name);
+    return ns ? ns->bank_function : NULL;
+}
+
 /* c_cpu → IR_FEAT_* capability word (PATTERN_MATCHER_PLAN.md decision
    #1: feature bits, not CPU ids — they document WHY a pattern is gated
    and age better as Rabbit/KC160 variants accumulate). ir_build stamps

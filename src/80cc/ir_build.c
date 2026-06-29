@@ -215,6 +215,152 @@ static int is_acc_float_kind(Kind k)
         && (c_fp_size == 5 || c_fp_size == 6 || c_fp_size == 8);
 }
 
+/* True iff a symbol/type lives in a named address space (__addressmod).
+   Its bank must be paged in (the page-in function) before access. The IR
+   handles DIRECT scalar load/store of a namespaced global (lowerer emits
+   the page-in call at the IR_MEM_SYM access) as well as INDIRECT access —
+   array index (`arr[i]`) and pointer deref (`*p`) — by recovering the
+   namespace from the pointee/element type and stamping the page-in fn onto
+   MemOp.bank_fn, which the lowerer pages on at the IR_MEM_VREG access
+   (matching sccz80, which pages for all of these). Only taking the ADDRESS
+   of a namespaced symbol (`&g`) still bails — the namespace escapes into a
+   plain pointer whose later deref site can't recover it. */
+static int sym_is_namespaced(const SYMBOL *sym)
+{
+    return sym && sym->ctype && sym->ctype->namespace != NULL;
+}
+static int type_is_namespaced(const Type *t)
+{
+    return t && t->namespace != NULL;
+}
+/* Namespace name carried by a type itself OR by its pointee (a pointer/
+   array type tags the space on ->ptr). NULL = default address space. */
+static const char *type_or_pointee_ns(const Type *t)
+{
+    if (!t) return NULL;
+    if (t->namespace) return t->namespace;
+    if (t->ptr && t->ptr->namespace) return t->ptr->namespace;
+    return NULL;
+}
+/* Page-in (bank) function for an indirect access through a deref/index
+   node `n`: the value type (n->type) carries the namespace, or it lives on
+   the pointer operand's pointee type. NULL for the default space. */
+static const SYMBOL *deref_bank_fn(const Node *n)
+{
+    const char *ns = n ? type_or_pointee_ns(n->type) : NULL;
+    if (!ns && n && n->operand)
+        ns = type_or_pointee_ns(n->operand->type);
+    return ns ? ir_namespace_bank_fn(ns) : NULL;
+}
+
+/* A __far pointer (KIND_CPTR): every access through it routes via an
+   lp_* runtime helper (paging the bank in/out). Detected on the pointer
+   node's own type. */
+static int node_is_far_ptr(const Node *p)
+{
+    return p && p->type && p->type->kind == KIND_CPTR;
+}
+
+/* The lp_* far-access helper for an element of `kind`/`width`/`sign`.
+   load=1 picks the lp_g* loaders, load=0 the lp_p* stores.
+
+   Dispatch is by WIDTH with a few kind special-cases: a char carries its
+   sign; a __far pointer element uses the D=0 ptr helpers; a wide (5/6/8B)
+   double / long long routes through the accumulator helpers (FA /
+   __i64_acc). 2- and 4-byte floats / fixes (_Float16, _Accum, the IEEE-32
+   `double`) are plain HL / DEHL values, so they reuse the integer helpers
+   — exactly as the walker does. Returns NULL only for widths with no far
+   helper. (lp_gdoub/lp_glonglong may not exist in every maths lib — like
+   the walker, we emit the call regardless and let the link resolve it.) */
+static const char *far_helper(Kind elem, int width, int is_unsigned, int load)
+{
+    if (elem == KIND_CHAR)
+        return load ? (is_unsigned ? "lp_guchar" : "lp_gchar") : "lp_pchar";
+    if (elem == KIND_CPTR)
+        return load ? "lp_gptr" : "lp_pptr";
+    if (elem == KIND_LONGLONG)
+        return load ? "lp_glonglong" : "lp_i64_load"; /* sccz80's store name */
+    if ((elem == KIND_DOUBLE || elem == KIND_FLOAT) && width >= 5)
+        return load ? "lp_gdoub" : "lp_pdoub";        /* wide double → FA */
+    if (width == 1)
+        return load ? (is_unsigned ? "lp_guchar" : "lp_gchar") : "lp_pchar";
+    if (width == 2)
+        return load ? "lp_gint" : "lp_pint";
+    if (width == 4)
+        return load ? "lp_glong" : "lp_plong";
+    return NULL;
+}
+
+/* Coerce a far-store RHS vreg to the element's in-register width. Wide
+   (acc-tier double / long long) values pass through unchanged — they are
+   already the right width from the front end and the lowerer's acc store
+   handles them. Narrow values are TRUNC'd / ZX/SX'd to the element's
+   register width (char→1, int/2-4B-float→2, long/cptr/4B-float→4).
+   Returns the (possibly new) vreg, or -1 on error. */
+static int far_store_value(Builder *b, const Node *n, Kind ek, int ew, int rhs_v)
+{
+    int wide = (ek == KIND_LONGLONG)
+            || ((ek == KIND_DOUBLE || ek == KIND_FLOAT) && ew >= 5);
+    if (wide) return rhs_v;
+    int regw = (ek == KIND_CHAR || ew == 1) ? 1
+             : (ek == KIND_LONG || ek == KIND_CPTR || ew == 4) ? 4 : 2;
+    int rhs_w = b->f->vregs[rhs_v].width;
+    if (rhs_w == regw) return rhs_v;
+    int tmp = new_temp(b, regw);
+    b->f->vregs[tmp].width = (int16_t)regw;
+    if (ek == KIND_CPTR) b->f->vregs[tmp].kind = KIND_CPTR;
+    OpKind cv = (rhs_w > regw)
+        ? IR_CONV_TRUNC
+        : (n->right && n->right->type && n->right->type->isunsigned
+           ? IR_CONV_ZX : IR_CONV_SX);
+    Op *cvo = ir_op_emit(cur_bb(b), cv);
+    cvo->dst = tmp; cvo->src[0] = rhs_v;
+    return tmp;
+}
+
+/* A FARACC symbol: a __banked global living in the far heap. Its address
+   and every access route through the far machinery (l_far_mapaddr +
+   lp_*), exactly like a __far pointer. */
+static int sym_is_faracc(const SYMBOL *s)
+{
+    return s && s->ctype && (s->ctype->flags & FARACC);
+}
+
+/* Emit IR_LD_FARSYM: the far address (KIND_CPTR vreg) of a FARACC symbol. */
+static int emit_far_symaddr(Builder *b, SYMBOL *sym)
+{
+    int fp = new_temp(b, 4);
+    b->f->vregs[fp].width = 4;
+    b->f->vregs[fp].kind  = KIND_CPTR;
+    Op *op = ir_op_emit(cur_bb(b), IR_LD_FARSYM);
+    op->dst = fp;
+    op->mem.kind = IR_MEM_SYM;
+    op->mem.sym  = sym;
+    return fp;
+}
+
+/* Emit IR_LD_FAR: load element (ek/ew) through a far pointer vreg ptr_v.
+   Result width/kind follow the helper-return convention: HL (char/int →
+   width-2 promoted), DEHL (long / far-ptr / 4B float), or the accumulator
+   (wide 5/6/8B double → FA, long long → __i64_acc). Returns the dst vreg. */
+static int emit_far_load(Builder *b, int ptr_v, Kind ek, int ew, int is_uns)
+{
+    int wide = (ek == KIND_LONGLONG)
+            || ((ek == KIND_DOUBLE || ek == KIND_FLOAT) && ew >= 5);
+    int rw = wide ? ew
+           : (ek == KIND_LONG || ek == KIND_CPTR || ew == 4) ? 4 : 2;
+    int dst = new_temp(b, rw);
+    b->f->vregs[dst].width = (int16_t)rw;
+    if (ek == KIND_CPTR || wide || ew == 4)
+        b->f->vregs[dst].kind = ek;
+    Op *op = ir_op_emit(cur_bb(b), IR_LD_FAR);
+    op->dst    = dst;
+    op->src[0] = ptr_v;
+    op->mem.elem = ek;
+    op->imm      = is_uns;
+    return dst;
+}
+
 /* Wide memory-accumulator integer kind: `long long` (width 8, the
    __i64_acc / l_i64_* set). Shares the IR_ACC_* layer with the float FA
    tier — distinguished by KIND (acc holds the RHS, the address-in-BC store
@@ -323,6 +469,12 @@ static int width_for_kind(Kind k)
     if (k == KIND_CHAR)  return 1;
     if (k == KIND_INT || k == KIND_SHORT || k == KIND_PTR
         || k == KIND_ACCUM16 || k == KIND_FLOAT16) return 2;
+    /* __far pointer (KIND_CPTR): modelled as a width-4 DEHL value
+       (D=0, E=bank, HL=offset) — the low 3 bytes of a long. Reuses the
+       long-tier register residency / arg-push / return ABI. The far
+       pointer is 3 bytes in *memory* (load/store specialised below) but
+       4 bytes in registers. */
+    if (k == KIND_CPTR) return 4;
     if (k == KIND_LONG || k == KIND_ACCUM32)  return 4;
     if (k == KIND_LONGLONG) return 8;
     if (k == KIND_DOUBLE || k == KIND_FLOAT)  return c_fp_size;
@@ -809,7 +961,8 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
         st->src[0] = res; st->mem.kind = IR_MEM_SYM; st->mem.sym = g;
         return res;
     }
-    /* *ptr op= rhs */
+    /* *ptr op= rhs (pages the bank on both load and store if namespaced) */
+    SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
     int ptr_v = build_expr(b, lvn);
     if (ptr_v < 0) return -1;
     int loaded = new_temp(b, fw);
@@ -818,11 +971,13 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
     ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
     ld->mem.base = ptr_v; ld->mem.elem = elem;
+    ld->mem.bank_fn = bf;
     int res = COMPOUND_ARITH(loaded);
     if (res < 0) return -1;
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
     st->src[0] = res; st->mem.kind = IR_MEM_VREG;
     st->mem.base = ptr_v; st->mem.elem = elem;
+    st->mem.bank_fn = bf;
     return res;
     #undef COMPOUND_ARITH
 }
@@ -877,7 +1032,8 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
         st->mem.elem = KIND_LONGLONG;
         return res;
     }
-    /* *ptr op= rhs */
+    /* *ptr op= rhs (pages the bank on both load and store if namespaced) */
+    SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
     int ptr_v = build_expr(b, lvn);
     if (ptr_v < 0) return -1;
     int loaded = new_temp(b, 8);
@@ -885,12 +1041,52 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
     Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
     ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
     ld->mem.base = ptr_v; ld->mem.elem = KIND_LONGLONG;
+    ld->mem.bank_fn = bf;
     int res = emit_acc_int_binop(b, stem, loaded, rv, is_uns);
     if (res < 0) return -1;
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
     st->src[0] = res; st->mem.kind = IR_MEM_VREG;
     st->mem.base = ptr_v; st->mem.elem = KIND_LONGLONG;
+    st->mem.bank_fn = bf;
     return res;
+}
+
+/* Address of an aggregate (struct/union/array) lvalue node into a fresh
+   vreg, used by whole-aggregate copy and by-value argument passing. Mirrors
+   the OP_ADDR shapes: a bare global → IR_LD_SYM; a bare local → IR_LEA (slot
+   marked addr-taken); a folded address expression (`(+ base K)` / deref) is
+   already an address, so just evaluate it. Returns -1 (with build_fail) for
+   shapes that don't yield a stable address. */
+static int agg_lvalue_addr(Builder *b, Node *node)
+{
+    if (!node) return build_fail("aggregate address of NULL node");
+    if (node->ast_type == AST_GLOBAL_VAR && node->sym
+        && !sym_is_faracc(node->sym) && !sym_is_namespaced(node->sym)) {
+        int addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+        Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
+        op->dst = addr; op->mem.kind = IR_MEM_SYM; op->mem.sym = node->sym;
+        return addr;
+    }
+    if (node->ast_type == AST_LOCAL_VAR && node->sym) {
+        int src = sym_map_get(b, node->sym);
+        if (src < 0) return build_fail("aggregate address of unknown local %s",
+                                       node->sym->name);
+        b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
+        int addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+        Op *op = ir_op_emit(cur_bb(b), IR_LEA);
+        op->dst = addr; op->src[0] = src;
+        return addr;
+    }
+    /* `*ptr` as an aggregate lvalue: its address is the pointer value, i.e.
+       the deref's operand — NOT a load through it (build_expr on the deref
+       itself would try to load the aggregate). */
+    if (node->ast_type == OP_DEREF)
+        return build_expr(b, node->operand);
+    /* `&arr[i]` / `&s.m` fold to an additive address expression that already
+       computes the address. */
+    if (node->ast_type == OP_ADD || node->ast_type == OP_SUB)
+        return build_expr(b, node);
+    return build_fail("aggregate address lvalue shape deferred");
 }
 
 static int build_expr_hinted(Builder *b, Node *n, int hint)
@@ -1044,6 +1240,23 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
 
     case AST_GLOBAL_VAR: {
+        /* FARACC (`__banked`) global: lives in the far heap. Its rvalue
+           is a far access — map the far address (l_far_mapaddr) then read
+           through it (lp_g*), instead of a plain near `ld hl,(_g)` (which
+           silently dropped the banking). */
+        if (n->sym && sym_is_faracc(n->sym)
+            && (Kind)n->sym->type != KIND_ARRAY
+            && (Kind)n->sym->type != KIND_STRUCT
+            && (Kind)n->sym->type != KIND_FUNC) {
+            Kind ek = (Kind)n->sym->type;
+            int  ew = type_width(n->type);   /* NULL → 2 */
+            if (!far_helper(ek, ew, n->type && n->type->isunsigned, 1))
+                return build_fail("FARACC load kind %d width %d deferred",
+                                  ek, ew);
+            int fp = emit_far_symaddr(b, n->sym);
+            return emit_far_load(b, fp, ek, ew,
+                                 n->type && n->type->isunsigned);
+        }
         /* Function-typed and array-typed globals decay to their ADDRESS
            in expression context (C §6.3.2.1). Walker emits `ld hl,_sym`
            (not `ld hl,(_sym)`). Aggregates (struct/union) at the AST
@@ -1079,10 +1292,57 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         op->dst = v;
         op->mem.kind = IR_MEM_SYM;
         op->mem.sym  = n->sym;
+        /* __far pointer VALUE (3 bytes in memory): tag the vreg + load so
+           the lowerer does the 3-byte read (`ld hl,(sym); ld de,(sym+2);
+           ld d,0`) instead of a 4-byte long read that would pull a
+           garbage 4th byte. */
+        if (n->sym && (Kind)n->sym->type == KIND_CPTR) {
+            b->f->vregs[v].kind = KIND_CPTR;
+            op->mem.elem = KIND_CPTR;
+        }
         return v;
     }
 
     case OP_DEREF:
+        /* Bitfield rvalue: a member access folds to a plain deref whose
+           TYPE carries bit_offset/bit_size. Load the whole storage unit,
+           shift the field down to bit 0, then mask to its width. (Was a
+           silent miscompile — the deref loaded the unit unmasked.) Signed
+           bitfields need sign-extension of the masked value — defer those
+           to the walker for now. */
+        if (n->type && n->type->bit_size > 0) {
+            int bsize = n->type->bit_size;
+            int boff  = n->type->bit_offset;
+            n->type->bit_size = 0;          /* load the plain storage unit */
+            int cont = build_expr(b, n);
+            n->type->bit_size = (int16_t)bsize;
+            if (cont < 0) return -1;
+            int val = cont;
+            if (boff > 0) {
+                int t = new_temp(b, 2); b->f->vregs[t].width = 2;
+                Op *sh = ir_op_emit(cur_bb(b), IR_SHR);
+                sh->dst = t; sh->src[0] = val; sh->src[1] = -1; sh->imm = boff;
+                val = t;
+            }
+            int m = new_temp(b, 2); b->f->vregs[m].width = 2;
+            Op *an = ir_op_emit(cur_bb(b), IR_AND);
+            an->dst = m; an->src[0] = val; an->src[1] = -1;
+            an->imm = ((int64_t)1 << bsize) - 1;
+            /* Signed bitfield: sign-extend the bsize-bit value. Branchless
+               `(x ^ sb) - sb` with sb = 1<<(bsize-1) (avoids the IR's
+               logical-only shift-right). */
+            if (!n->type->isunsigned && bsize < 16) {
+                int64_t sb = (int64_t)1 << (bsize - 1);
+                int x = new_temp(b, 2); b->f->vregs[x].width = 2;
+                Op *xo = ir_op_emit(cur_bb(b), IR_XOR);
+                xo->dst = x; xo->src[0] = m; xo->src[1] = -1; xo->imm = sb;
+                int r = new_temp(b, 2); b->f->vregs[r].width = 2;
+                Op *su = ir_op_emit(cur_bb(b), IR_SUB);
+                su->dst = r; su->src[0] = x; su->src[1] = -1; su->imm = sb;
+                return r;
+            }
+            return m;
+        }
         /* Most common shape: OP_DEREF(AST_LOCAL_VAR) — read a local.
            OP_DEREF(AST_GLOBAL_VAR) is also accepted so we can
            collapse `(deref (gv=x))` to a sym-mem load.
@@ -1169,9 +1429,51 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.kind = IR_MEM_VREG;
             ld->mem.base = p_vreg;
             ld->mem.elem = (elem_w == 1) ? KIND_CHAR : KIND_INT;
+            ld->mem.bank_fn = (SYMBOL *)deref_bank_fn(n);  /* `*p++` into a space */
             if (!is_pre) EMIT_BUMP();
             #undef EMIT_BUMP
 
+            return dst;
+        }
+        /* __far pointer deref (`*fp`, `fp[const]`): every access routes
+           through an lp_g* helper that pages the bank. Materialize the far
+           pointer VALUE (DEHL: D=0, E=bank, HL=offset), then IR_LD_FAR.
+
+           The far ACCESS is the OUTER deref of a far-pointer VALUE. A
+           plain variable read (`OP_DEREF(AST_GLOBAL_VAR fp)` / the local
+           vreg) is the INNER deref that produces that value from near
+           memory — NOT a far access. The parser nests these
+           (`*fp` = OP_DEREF(OP_DEREF(gv fp))), so a bare-lvalue operand is
+           the inner read; exclude it (it routes to the 3-byte value
+           load below). */
+        if (node_is_far_ptr(n->operand)
+            && n->operand->ast_type != AST_GLOBAL_VAR
+            && n->operand->ast_type != AST_LOCAL_VAR) {
+            int ptr_v = build_expr(b, n->operand);
+            if (ptr_v < 0) return -1;
+            Kind ek    = n->type ? n->type->kind : KIND_INT;
+            int is_uns = n->type ? n->type->isunsigned : 0;
+            int ew     = type_width(n->type);
+            if (!far_helper(ek, ew, is_uns, 1))
+                return build_fail("__far load of element kind %d width %d "
+                                  "deferred", ek, ew);
+            /* Result width: a char/int promotes into HL (width-2); long /
+               far-ptr / 4-byte float into DEHL (width-4); a wide (5/6/8B)
+               double lands in FA and long long in __i64_acc (the lowerer's
+               width>4 acc path). */
+            int wide = (ek == KIND_LONGLONG)
+                    || ((ek == KIND_DOUBLE || ek == KIND_FLOAT) && ew >= 5);
+            int rw = wide ? ew
+                   : (ek == KIND_LONG || ek == KIND_CPTR || ew == 4) ? 4 : 2;
+            int dst = new_temp(b, rw);
+            b->f->vregs[dst].width = (int16_t)rw;
+            if (ek == KIND_CPTR || wide || ew == 4)
+                b->f->vregs[dst].kind = ek;   /* acc store / float ops dispatch on kind */
+            Op *op = ir_op_emit(cur_bb(b), IR_LD_FAR);
+            op->dst    = dst;
+            op->src[0] = ptr_v;
+            op->mem.elem = ek;
+            op->imm      = is_uns;
             return dst;
         }
         if (n->operand && n->operand->ast_type == AST_LOCAL_VAR) {
@@ -1203,6 +1505,22 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 return dst;
             }
             return v;
+        }
+        if (n->operand && n->operand->ast_type == AST_GLOBAL_VAR
+            && sym_is_faracc(n->operand->sym)
+            && (Kind)n->operand->sym->type != KIND_ARRAY
+            && (Kind)n->operand->sym->type != KIND_STRUCT) {
+            /* Reading a FARACC (`__banked`) scalar global: this deref reads
+               the variable, which lives in the far heap — map its far
+               address then load through it (lp_g*). */
+            Kind ek = (Kind)n->operand->sym->type;
+            int  ew = type_width(n->type);
+            int  uns = n->type && n->type->isunsigned;
+            if (!far_helper(ek, ew, uns, 1))
+                return build_fail("FARACC load kind %d width %d deferred",
+                                  ek, ew);
+            int fp = emit_far_symaddr(b, n->operand->sym);
+            return emit_far_load(b, fp, ek, ew, uns);
         }
         if (n->operand && n->operand->ast_type == AST_GLOBAL_VAR) {
             /* Same width sourcing as the bare-AST_GLOBAL_VAR case
@@ -1244,12 +1562,23 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->dst = v;
             op->mem.kind = IR_MEM_SYM;
             op->mem.sym  = n->operand->sym;
+            /* Reading a __far pointer VARIABLE: its 3-byte value loads with
+               the 4th byte zeroed (DEHL far-ptr invariant). */
+            if (n->type && n->type->kind == KIND_CPTR) {
+                b->f->vregs[v].kind = KIND_CPTR;
+                op->mem.elem = KIND_CPTR;
+            }
             return v;
         }
         /* Real indirection: operand is a pointer expression. Walk it
            to get a vreg holding the address, then emit IR_LD_MEM via
            MEM_VREG. Element width comes from the deref's result type. */
         if (n->operand) {
+            /* Deref of a pointer into a named address space (`*p`, `arr[i]`):
+               recover the page-in fn from the pointee/element type and stamp
+               it on the load; the lowerer pages the bank in at the MEM_VREG
+               access (push/pop bc around the call). Matches sccz80. */
+            SYMBOL *bf = (SYMBOL *)deref_bank_fn(n);
             int ptr_v = build_expr(b, n->operand);
             if (ptr_v < 0) return -1;
             if (n->type && is_acc_float_kind(n->type->kind)) {
@@ -1260,6 +1589,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 Op *op = ir_op_emit(cur_bb(b), IR_LD_MEM);
                 op->dst = dv; op->mem.kind = IR_MEM_VREG;
                 op->mem.base = ptr_v; op->mem.elem = KIND_DOUBLE;
+                op->mem.bank_fn = bf;
                 return dv;
             }
             if (n->type && is_acc_int_kind(n->type->kind)) {
@@ -1270,6 +1600,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 Op *op = ir_op_emit(cur_bb(b), IR_LD_MEM);
                 op->dst = dv; op->mem.kind = IR_MEM_VREG;
                 op->mem.base = ptr_v; op->mem.elem = KIND_LONGLONG;
+                op->mem.bank_fn = bf;
                 return dv;
             }
             int elem_w = type_width(n->type);
@@ -1285,6 +1616,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->mem.elem  = (elem_w == 1) ? KIND_CHAR
                           : (elem_w == 2) ? KIND_INT
                           :                 KIND_LONG;
+            op->mem.bank_fn = bf;
             return dst;
         }
         return build_fail("OP_DEREF without operand");
@@ -1688,6 +2020,51 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int dst = ALLOC_DST(dst_w);
         ir_emit_binop(cur_bb(b), k, dst, l, r);
         b->f->vregs[dst].width = (int16_t)dst_w;
+        /* Pointer DIFFERENCE: `p - q` yields the element COUNT, not the
+           byte difference — divide the IR_SUB result by sizeof(*p) when
+           both operands are pointer-typed (KIND_PTR/CPTR/ARRAY). Mirrors
+           the walker's gen_ptr_diff_scale: a power-of-2 element is a
+           logical shift right (`srl;rr` ×log2, signedness per sccz80),
+           else an l_div_u. Without this the IR returned the raw byte
+           count for near AND far pointer subtraction. */
+        if (n->ast_type == OP_SUB && lhs && rhs && lhs->type && rhs->type
+            && (lhs->type->kind == KIND_PTR || lhs->type->kind == KIND_CPTR
+                || lhs->type->kind == KIND_ARRAY)
+            && (rhs->type->kind == KIND_PTR || rhs->type->kind == KIND_CPTR
+                || rhs->type->kind == KIND_ARRAY)
+            && lhs->type->ptr) {
+            int elem = lhs->type->ptr->size;
+            if (elem > 1) {
+                int e = elem, log2 = 0;
+                while (e > 1 && (e & 1) == 0) { e >>= 1; log2++; }
+                if (e == 1) {                       /* power of two → shift */
+                    Op *sh = ir_op_emit(cur_bb(b), IR_SHR);
+                    sh->dst = dst; sh->src[0] = dst; sh->src[1] = -1;
+                    sh->imm = log2;
+                } else if (dst_w == 2) {            /* odd size → l_div_u */
+                    int dv = new_temp(b, 2);
+                    b->f->vregs[dv].width = 2;
+                    int kimm = new_temp(b, 2);
+                    b->f->vregs[kimm].width = 2;
+                    ir_emit_ld_imm(cur_bb(b), kimm, elem);
+                    /* l_div_u computes DE/HL → HL: walker sets HL=divisor
+                       (elem), DE=dividend (byte-diff). HCALL puts args[0]
+                       in HL, args[1] in DE. */
+                    int *dargs = calloc(2, sizeof(int));
+                    dargs[0] = kimm; dargs[1] = dst;
+                    Op *dop = ir_op_emit(cur_bb(b), IR_HCALL);
+                    dop->dst = dv;
+                    HelperInfo *dhi = calloc(1, sizeof(HelperInfo));
+                    dhi->name = "l_div_u"; dhi->args = dargs;
+                    dhi->n_args = 2; dhi->ret_vreg = dv;
+                    dop->hcall = dhi;
+                    return dv;
+                } else {
+                    return build_fail("far pointer diff by non-power-of-2 "
+                                      "element size %d", elem);
+                }
+            }
+        }
         return dst;
     }
 
@@ -1697,6 +2074,107 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            local / bare global only. */
         if (!n->left)
             return build_fail("OP_ASSIGN with NULL LHS");
+        /* Bitfield store = read-modify-write of the storage unit: clear the
+           field's bits, OR in the shifted value, write the unit back (the
+           plain store would clobber the neighbouring fields). The parser
+           records the bitfield member type on the OP_ASSIGN node (n->type)
+           and the storage unit's address as n->left — a global/local lvalue
+           or, for a field in a byte beyond the first, the folded address
+           expression `(+ (gv) K)`. The unit is byte-wide when the field
+           fits in one byte (matches sccz80's byte rmw), word-wide otherwise;
+           a byte store is essential for a non-zero byte offset, where a word
+           store would run past the struct into the next object. */
+        {
+            Type *bft = (n->type && n->type->bit_size > 0) ? n->type
+                      : (n->left->type && n->left->type->bit_size > 0)
+                          ? n->left->type : NULL;
+            if (bft) {
+                int bsize = bft->bit_size, boff = bft->bit_offset;
+                int64_t mask = ((int64_t)1 << bsize) - 1;
+                int64_t fieldmask = mask << boff;          /* bits this field owns */
+                int unit_w = (boff + bsize <= 8) ? 1 : 2;
+                Kind unit_k = (unit_w == 1) ? KIND_CHAR : KIND_INT;
+                /* Address of the storage unit into a vreg. */
+                Node *lv = n->left;
+                int addr;
+                if (lv->ast_type == AST_GLOBAL_VAR && lv->sym
+                    && !sym_is_faracc(lv->sym) && !sym_is_namespaced(lv->sym)) {
+                    addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+                    Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
+                    op->dst = addr; op->mem.kind = IR_MEM_SYM; op->mem.sym = lv->sym;
+                } else if (lv->ast_type == AST_LOCAL_VAR && lv->sym) {
+                    int src = sym_map_get(b, lv->sym);
+                    if (src < 0) return build_fail("bitfield store unknown local");
+                    b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
+                    addr = new_temp(b, 2); b->f->vregs[addr].width = 2;
+                    Op *op = ir_op_emit(cur_bb(b), IR_LEA);
+                    op->dst = addr; op->src[0] = src;
+                } else if (lv->ast_type == OP_ADD || lv->ast_type == OP_SUB
+                        || lv->ast_type == OP_DEREF) {
+                    addr = build_expr(b, lv);
+                    if (addr < 0) return -1;
+                } else {
+                    return build_fail("bitfield store lvalue shape deferred");
+                }
+                int v = build_expr(b, n->right);
+                if (v < 0) return -1;
+                if (b->f->vregs[v].width != 2) {
+                    int t = new_temp(b, 2); b->f->vregs[t].width = 2;
+                    OpKind cv = (b->f->vregs[v].width > 2)
+                              ? IR_CONV_TRUNC
+                              : (n->right->type && n->right->type->isunsigned
+                                 ? IR_CONV_ZX : IR_CONV_SX);
+                    Op *c = ir_op_emit(cur_bb(b), cv);
+                    c->dst = t; c->src[0] = v; v = t;
+                }
+                /* (v & mask) << boff */
+                int vm = new_temp(b, 2); b->f->vregs[vm].width = 2;
+                Op *a1 = ir_op_emit(cur_bb(b), IR_AND);
+                a1->dst = vm; a1->src[0] = v; a1->src[1] = -1; a1->imm = mask;
+                int vms = vm;
+                if (boff > 0) {
+                    vms = new_temp(b, 2); b->f->vregs[vms].width = 2;
+                    Op *sl = ir_op_emit(cur_bb(b), IR_SHL);
+                    sl->dst = vms; sl->src[0] = vm; sl->src[1] = -1; sl->imm = boff;
+                }
+                /* container & ~fieldmask */
+                int cont = new_temp(b, 2); b->f->vregs[cont].width = 2;
+                Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+                ld->dst = cont; ld->mem.kind = IR_MEM_VREG;
+                ld->mem.base = addr; ld->mem.elem = unit_k;
+                int cleared = new_temp(b, 2); b->f->vregs[cleared].width = 2;
+                Op *a2 = ir_op_emit(cur_bb(b), IR_AND);
+                a2->dst = cleared; a2->src[0] = cont; a2->src[1] = -1;
+                a2->imm = (~fieldmask) & (unit_w == 1 ? 0xFF : 0xFFFF);
+                /* new = cleared | vms */
+                int newv = new_temp(b, 2); b->f->vregs[newv].width = 2;
+                ir_emit_binop(cur_bb(b), IR_OR, newv, cleared, vms);
+                Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                st->src[0] = newv; st->mem.kind = IR_MEM_VREG;
+                st->mem.base = addr; st->mem.elem = unit_k;
+                return v;
+            }
+        }
+        /* Whole-aggregate (struct/union) copy: `s1 = s2` — block-copy
+           sizeof bytes (IR_MEMCPY → ldir, matching the walker's
+           HL=src/DE=dst/BC=size/ldir). The assignment node's own type is
+           the struct (an lvalue deref LHS like `*d` is mis-typed as the
+           pointer, so don't key off n->left). A struct-returning call RHS
+           is NOT handled here (agg_lvalue_addr bails on AST_FUNC_CALL →
+           walker), pending hidden-pointer return support. */
+        if (n->type && n->type->kind == KIND_STRUCT) {
+            int size = n->type->size;
+            if (size <= 0 || size > 65536)
+                return build_fail("struct copy size %d", size);
+            int dstp = agg_lvalue_addr(b, n->left);
+            if (dstp < 0) return -1;
+            int srcp = agg_lvalue_addr(b, n->right);
+            if (srcp < 0) return -1;
+            Op *op = ir_op_emit(cur_bb(b), IR_MEMCPY);
+            op->dst = -1; op->src[0] = dstp; op->src[1] = srcp;
+            op->imm = size;
+            return dstp;
+        }
         /* Derive the destination's _Accum kind so float-literal RHS
            gets Q-format scaling. Only set when the LHS sym carries a
            fix-point type. */
@@ -1800,6 +2278,25 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                   : build_expr(b, n->right);
         if (rhs_v < 0) return -1;
         if (n->left->ast_type == AST_GLOBAL_VAR) {
+            /* FARACC (`__banked`) global store: map the far address then
+               write through it (lp_p*), not a plain near `ld (_g),hl`. */
+            if (n->left->sym && sym_is_faracc(n->left->sym)
+                && (Kind)n->left->sym->type != KIND_ARRAY
+                && (Kind)n->left->sym->type != KIND_STRUCT) {
+                Kind ek = (Kind)n->left->sym->type;
+                int  ew = type_width(n->left->type);
+                if (!far_helper(ek, ew, 0, 0))
+                    return build_fail("FARACC store kind %d width %d "
+                                      "deferred", ek, ew);
+                int fp = emit_far_symaddr(b, n->left->sym);
+                rhs_v = far_store_value(b, n, ek, ew, rhs_v);
+                if (rhs_v < 0) return -1;
+                Op *op = ir_op_emit(cur_bb(b), IR_ST_FAR);
+                op->src[0]   = fp;
+                op->src[1]   = rhs_v;
+                op->mem.elem = ek;
+                return rhs_v;
+            }
             /* Store width comes from the GLOBAL's type, not the RHS
                vreg: gen_st_mem keys the store size off src width, so
                an int-width RHS into a byte global emits `ld (_g),hl`
@@ -1849,6 +2346,17 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 op->mem.elem = KIND_LONGLONG;
                 return rhs_v;
             }
+            if (gk == KIND_CPTR) {
+                /* __far pointer VALUE store (`fp = q`): write only the
+                   low 3 bytes (`ld (sym),hl; ld a,e; ld (sym+2),a`) so
+                   the 4th DEHL byte never clobbers the adjacent global. */
+                Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                op->src[0]   = rhs_v;
+                op->mem.kind = IR_MEM_SYM;
+                op->mem.sym  = n->left->sym;
+                op->mem.elem = KIND_CPTR;
+                return rhs_v;
+            }
             if (elem_w != 1 && elem_w != 2 && elem_w != 4)
                 return build_fail("OP_ASSIGN global elem width %d",
                                   elem_w);
@@ -1882,6 +2390,9 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                "bare AST_LOCAL_VAR outside lvalue context", but here we
                want the local's *value* (the pointer), which its vreg
                already holds. Shortcut to the vreg map. */
+            /* `*p = X` into a named address space: page in the bank at the
+               store (namespace recovered from the deref's pointee type). */
+            SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
             int ptr_v;
             if (n->left->operand->ast_type == AST_LOCAL_VAR) {
                 ptr_v = sym_map_get(b, n->left->operand->sym);
@@ -1894,6 +2405,28 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             } else {
                 ptr_v = build_expr(b, n->left->operand);
                 if (ptr_v < 0) return -1;
+            }
+            /* __far store (`*fp = v`): route through an lp_p* helper.
+               Element kind = the far pointer's POINTEE (n->left->operand
+               is the CPTR value; its ->type->ptr is the element). The
+               OP_ASSIGN's own type / n->left->type can read back as the
+               far-pointer kind, so prefer the pointee. */
+            if (node_is_far_ptr(n->left->operand)) {
+                Type *pte = n->left->operand->type
+                          ? n->left->operand->type->ptr : NULL;
+                Kind ek = pte ? pte->kind
+                        : (n->type ? n->type->kind : KIND_INT);
+                int  ew = pte ? type_width(pte) : 2;
+                if (!far_helper(ek, ew, 0, 0))
+                    return build_fail("__far store of element kind %d "
+                                      "width %d deferred", ek, ew);
+                rhs_v = far_store_value(b, n, ek, ew, rhs_v);
+                if (rhs_v < 0) return -1;
+                Op *op = ir_op_emit(cur_bb(b), IR_ST_FAR);
+                op->src[0]   = ptr_v;   /* far pointer (DEHL) */
+                op->src[1]   = rhs_v;   /* value */
+                op->mem.elem = ek;
+                return rhs_v;
             }
             /* Element width: prefer n->type (the OP_ASSIGN's own type
                = stored value type, most reliable). Fall back to
@@ -1925,6 +2458,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     op->mem.kind = IR_MEM_VREG;
                     op->mem.base = ptr_v;
                     op->mem.elem = KIND_DOUBLE;
+                    op->mem.bank_fn = bf;
                     return rhs_v;
                 }
                 if (is_acc_int_kind(dk)) {
@@ -1938,6 +2472,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                     op->mem.kind = IR_MEM_VREG;
                     op->mem.base = ptr_v;
                     op->mem.elem = KIND_LONGLONG;
+                    op->mem.bank_fn = bf;
                     return rhs_v;
                 }
             }
@@ -1979,6 +2514,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->mem.elem = (elem_w == 1) ? KIND_CHAR
                          : (elem_w == 2) ? KIND_INT
                          :                 KIND_LONG;
+            op->mem.bank_fn = bf;
             return rhs_v;
         }
         /* Address-yielding LHS (#342 / #343): the parser folds
@@ -2000,12 +2536,35 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            (38.51M vs 37.14M, +3.7%): the remaining sp residue is
            the per-input-byte copy loop's slot walks. sp stays gated
            until that flips too. */
+        /* Address-yielding __far LHS (`fp[i] = v`, `*(fp+K) = v`): the
+           parser folds the subscript-assign into a bare far-pointer
+           expression (OP_ADD, type CPTR). Store through an lp_p* helper. */
+        if (n->left->type && n->left->type->kind == KIND_CPTR) {
+            Type *pte = n->left->type->ptr;
+            Kind ek = pte ? pte->kind : KIND_INT;
+            int  ew = pte ? type_width(pte) : 2;
+            if (!far_helper(ek, ew, 0, 0))
+                return build_fail("__far store of element kind %d width %d "
+                                  "deferred", ek, ew);
+            int ptr_v = build_expr(b, n->left);
+            if (ptr_v < 0) return -1;
+            rhs_v = far_store_value(b, n, ek, ew, rhs_v);
+            if (rhs_v < 0) return -1;
+            Op *op = ir_op_emit(cur_bb(b), IR_ST_FAR);
+            op->src[0]   = ptr_v;
+            op->src[1]   = rhs_v;
+            op->mem.elem = ek;
+            return rhs_v;
+        }
         if (n->left->type
             && ((n->left->type->kind == KIND_PTR
                  || n->left->type->kind == KIND_ARRAY)
                 || is_supported_int_kind(n->left->type->kind))
             && (n->left->type->ptr
                 || is_supported_int_kind(n->left->type->kind))) {
+            /* `arr[i] = X` into a named address space: page in the bank at
+               the store (namespace recovered from the array element type). */
+            SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
             int ptr_v = build_expr(b, n->left);
             if (ptr_v < 0) return -1;
             /* Prefer n->type (OP_ASSIGN's own type = stored value
@@ -2053,6 +2612,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->mem.elem = (elem_w == 1) ? KIND_CHAR
                          : (elem_w == 2) ? KIND_INT
                          :                 KIND_LONG;
+            op->mem.bank_fn = bf;
             return rhs_v;
         }
         ptr_lhs_skip:
@@ -2376,6 +2936,17 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             }
             return dst;
         }
+        /* Struct/union BY-VALUE argument: the walker allocates `size`
+           bytes on the stack and ldir's the struct in; the IR's arg path
+           only knows how to push a 2/4-byte scalar, so a struct arg would
+           push its 2-byte address instead — a silent miscompile. Defer the
+           whole call to the walker until the by-value push path exists.
+           (The struct-param callee already bails on "param kind 11".) */
+        for (int i = 0; i < n_args; i++) {
+            Node *a = array_get_byindex(n->args, i);
+            if (a && a->type && a->type->kind == KIND_STRUCT)
+                return build_fail("struct-by-value argument deferred");
+        }
         /* R→L build/push order ONLY for plain stdc — CALLEE pushes
            L→R like SMALLC (must mirror gen_call's push_step). */
         uint32_t fl = n->sym->ctype ? n->sym->ctype->flags : 0;
@@ -2411,6 +2982,25 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 Node *a = array_get_byindex(n->args, i);
                 int v = build_expr(b, a);
                 if (v < 0) { free(args); return -1; }
+                /* __z88dk_sdccdecl: a char parameter is passed as ONE
+                   byte (not the smallc 2-byte int promotion). Truncate
+                   the arg to width-1 so gen_call emits the 1-byte push
+                   and the callee's 1-byte param slot lines up. (A width-1
+                   arg also fails the pushable test below, so the call
+                   falls to gen_call's slot loop where the 1-byte push
+                   lives.) */
+                if ((n->sym->ctype->flags & SDCCDECL)
+                    && n->sym->ctype->parameters) {
+                    Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
+                    if (pt && pt->kind == KIND_CHAR
+                        && b->f->vregs[v].width != 1) {
+                        int t = new_temp(b, 1);
+                        b->f->vregs[t].width = 1;
+                        Op *cv = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                        cv->dst = t; cv->src[0] = v;
+                        v = t;
+                    }
+                }
                 args[i] = v;
                 if (b->cur_bb_id != push_bb) pushable = 0;
                 int w = b->f->vregs[v].width;
@@ -2496,6 +3086,21 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         } else {
             ci->abi = IR_ABI_STDC;
         }
+        /* Special calling conventions live on ci->flags (a copy of the
+           target's ctype flags); gen_call reads them with `& bit` and
+           emits the trampoline / rst / banked dispatch instead of a plain
+           `call _name` (each was a silent miscompile). Args/cleanup/return
+           stay the normal ABI. The rst/module/address operands aren't in
+           the flags, so carry them as values. */
+        ci->flags = flags;
+        if (flags & SHORTCALL) {
+            ci->shortcall_rst   = n->sym->ctype->funcattrs.shortcall_rst;
+            ci->shortcall_value = n->sym->ctype->funcattrs.shortcall_value;
+        }
+        if (flags & HL_CALL) {
+            ci->hlcall_module = n->sym->ctype->funcattrs.hlcall_module;
+            ci->hlcall_addr   = n->sym->ctype->funcattrs.hlcall_addr;
+        }
         ci->is_variadic = (n->sym->ctype && n->sym->ctype->funcattrs.hasva)
                           ? 1 : 0;
         ci->pre_pushed  = pre_pushed;
@@ -2547,6 +3152,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ci->ret_longlong = ret_ll;
         ci->target     = NULL;       /* indirect */
         ci->fnptr_vreg = fnptr_v;
+        /* __far function pointer: dispatch via the banking trampoline
+           (l_farcall) rather than the near l_jphl, which silently dropped
+           the bank and only did a near `jp (hl)`. */
+        ci->far_fnptr  = node_is_far_ptr(n->callee);
         ci->args       = args;
         ci->n_args     = n_args;
         ci->ret_vreg   = ret_v;
@@ -2869,6 +3478,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             && src_k != dst_k)
             return build_fail("float OP_CAST kind %d→%d not yet supported",
                               (int)src_k, (int)dst_k);
+        /* → __far pointer: build the 4-byte DEHL far representation with
+           bank (E) and pad (D) = 0. A near pointer / int widens by
+           ZERO-extension (the high half is the bank, never a sign
+           extension); an already-4-byte source (far/long) is just
+           reinterpreted. */
+        if (dst_k == KIND_CPTR) {
+            if (src_w >= 4) {
+                b->f->vregs[src_v].kind = KIND_CPTR;
+                return src_v;
+            }
+            int dst = new_temp(b, 4);
+            b->f->vregs[dst].width = 4;
+            b->f->vregs[dst].kind  = KIND_CPTR;
+            Op *op = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+            op->dst = dst; op->src[0] = src_v;
+            return dst;
+        }
+        /* __far pointer → near pointer / int / char: drop the bank by
+           truncating to the low half (offset). Falls through to the
+           width-based TRUNC paths (4→2 / 4→1) below. */
         if (src_w == dst_w) {
             /* Same-width (e.g. signed↔unsigned int) — no codegen. */
             return src_v;
@@ -3123,6 +3752,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                         || n->operand->ast_type == OP_SUB))
             return build_expr(b, n->operand);
         if (n->operand && n->operand->ast_type == AST_GLOBAL_VAR) {
+            /* &faracc_global: a __banked global's address IS a far pointer
+               — map it via l_far_mapaddr (IR_LD_FARSYM → KIND_CPTR). */
+            if (sym_is_faracc(n->operand->sym))
+                return emit_far_symaddr(b, n->operand->sym);
+            /* &namespaced_global escapes the address into a plain pointer
+               whose later deref can't page the bank — bail. */
+            if (sym_is_namespaced(n->operand->sym))
+                return build_fail("address of __addressmod symbol deferred");
             int dst = new_temp(b, 2);
             Op *op = ir_op_emit(cur_bb(b), IR_LD_SYM);
             op->dst = dst;
@@ -3271,6 +3908,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             }
             int rhs_v = build_expr(b, n->right);
             if (rhs_v < 0) return -1;
+            /* A width-4 LHS (long, or a __far pointer whose scaled index
+               is a width-2 int — `fp += i`) needs the RHS widened to 4
+               bytes first: the aliased 4-byte add otherwise reads the
+               high half of the narrow RHS from below sp (garbage). */
+            int lw = b->f->vregs[lhs_v].width;
+            int rw = b->f->vregs[rhs_v].width;
+            if (lw == 4 && rw < 4) {
+                int tmp = new_temp(b, 4);
+                b->f->vregs[tmp].width = 4;
+                int uns = n->right->type && n->right->type->isunsigned;
+                Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+                cv->dst = tmp; cv->src[0] = rhs_v;
+                rhs_v = tmp;
+            }
             ir_emit_binop(cur_bb(b), k, lhs_v, lhs_v, rhs_v);  /* aliased */
             return lhs_v;
         }
@@ -3308,7 +3959,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
         /* Indirection: `*p op= x` / `*(p+K) op= x`. LHS->operand is any
            pointer expression — walk it to a vreg, load through it,
-           combine, store back. */
+           combine, store back. A namespaced LHS (`arr[i] += x`) pages the
+           bank on both the load and the store; the lowerer dedups the two
+           page-in calls to one (same bank, no intervening call), matching
+           sccz80's single `_setb1` for the rmw. */
+        SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
         int ptr_v = build_expr(b, n->left->operand);
         if (ptr_v < 0) return -1;
         int elem_w = type_width(n->left->type);
@@ -3324,6 +3979,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
                       : (elem_w == 2) ? KIND_INT
                       :                 KIND_LONG;
+        ld->mem.bank_fn = bf;
         int dst = new_temp(b, elem_w);
         b->f->vregs[dst].width = elem_w;
         if (n->right && n->right->ast_type == AST_LITERAL) {
@@ -3342,6 +3998,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         st->mem.kind  = IR_MEM_VREG;
         st->mem.base  = ptr_v;
         st->mem.elem  = ld->mem.elem;
+        st->mem.bank_fn = bf;
         return dst;
     }
 
@@ -3395,7 +4052,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             b->f->vregs[lhs_v].width = (int16_t)elem_w;
             Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
             ld->dst = lhs_v; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = gsym_md;
-        } else {
+        }
+        SYMBOL *bf_md = NULL;
+        if (!is_local && !is_global) {
+            /* `arr[i] *= x` into a named address space: page the bank on
+               both the load and the store (the helper call between them
+               resets the dedup, so both re-page — matching sccz80). */
+            bf_md = (SYMBOL *)deref_bank_fn(n->left);
             ptr_v = build_expr(b, n->left->operand);
             if (ptr_v < 0) return -1;
             elem_w = type_width(n->left->type);
@@ -3411,6 +4074,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.kind = IR_MEM_VREG;
             ld->mem.base = ptr_v;
             ld->mem.elem = elem_kind;
+            ld->mem.bank_fn = bf_md;
         }
 
         int rhs_v = build_expr(b, n->right);
@@ -3478,6 +4142,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             st->mem.kind = IR_MEM_VREG;
             st->mem.base = ptr_v;
             st->mem.elem = elem_kind;
+            st->mem.bank_fn = bf_md;
             return dst;
         }
     }
@@ -3560,6 +4225,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 }
 
 /* ----- Statement walker ------------------------------------------------ */
+
+/* A __naked function body may contain ONLY asm — no prologue/epilogue/frame
+   is generated, so any C statement would have no frame to run against.
+   True iff `n` is a bare asm block, or a compound of nothing but asm blocks.
+   An empty body is vacuously asm-only (emits nothing). */
+static int naked_body_is_asm_only(const Node *n)
+{
+    if (!n) return 1;
+    if (n->ast_type == AST_ASM) return 1;
+    if (n->ast_type == AST_COMPOUND_STMT) {
+        if (!n->stmts) return 1;
+        int ns = (int)array_len(n->stmts);
+        for (int i = 0; i < ns; i++) {
+            const Node *s = array_get_byindex(n->stmts, i);
+            if (s && s->ast_type != AST_ASM) return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
 
 static int build_stmt(Builder *b, Node *n)
 {
@@ -3647,7 +4332,8 @@ static int build_stmt(Builder *b, Node *n)
         if (!is_supported_int_kind(n->sym->type)
             && !is_supported_float_kind(n->sym->type)
             && !is_acc_float_kind(n->sym->type)
-            && !is_acc_int_kind(n->sym->type))
+            && !is_acc_int_kind(n->sym->type)
+            && (Kind)n->sym->type != KIND_CPTR)   /* __far pointer local */
             return build_fail("AST_DECL: kind %d not yet supported (sym=%s)",
                               (int)n->sym->type, n->sym->name);
         int v = new_local_vreg(b, n->sym);
@@ -3800,8 +4486,6 @@ static int build_stmt(Builder *b, Node *n)
         if (!n->sw_expr)
             return build_fail("AST_SWITCH missing sw_expr");
         Kind swk = n->type ? (Kind)n->type->kind : KIND_INT;
-        if (swk == KIND_LONGLONG)
-            return build_fail("switch on long long not yet supported");
         int v = build_expr(b, n->sw_expr);
         if (v < 0) return -1;
         int n_cases = n->sw_cases ? (int)array_len(n->sw_cases) : 0;
@@ -3965,11 +4649,44 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
        ret leaks 2 bytes of stack. Defer to the walker until the IR
        prologue models the pushed-HL param. (Calling INTO fastcall
        targets works fine — this is the definition side only.) */
+    /* Fastcall CALLEE: the last param arrives in HL (width 1/2) or DEHL
+       (width 4 — long / __far ptr / IEEE-32 double). emit_prologue captures
+       it into the param's home across the frame alloc (width 1/2 via DE,
+       width 4 via BC for the low half — DE keeps the high half). A wide
+       (5/6/8-byte) arg arrives in the FA / __i64_acc accumulator and is
+       stored to its slot after the frame alloc. Only widths 3 and 0 (none
+       real for a scalar) bail. */
     if (fn->ctype && (fn->ctype->flags & FASTCALL)
         && fn->ctype->parameters && array_len(fn->ctype->parameters) > 0) {
-        builder_free(&b);
-        ir_func_free(f);
-        return build_fail("fastcall callee not yet supported");
+        Type *fa = array_get_byindex(fn->ctype->parameters,
+                                     array_len(fn->ctype->parameters) - 1);
+        int fw = fa ? width_for_kind(fa->kind) : 0;
+        if (fw != 1 && fw != 2 && fw != 4 && fw < 5) {
+            builder_free(&b);
+            ir_func_free(f);
+            return build_fail("fastcall callee arg width %d not yet supported",
+                              fw);
+        }
+    }
+
+    /* __naked: the user owns the entire body. No prologue/epilogue/frame
+       is generated — `is_naked` gates the IX setup, frame alloc and the
+       trailing `ret` off (the asm provides its own). Because there is no
+       frame, the body may contain ONLY asm; any C statement would have
+       nothing to run against. Reject anything else with a hard error
+       (not a walker bail, which would silently miscompile it). */
+    if (fn->ctype && (fn->ctype->flags & NAKED)) {
+        f->is_naked = 1;
+        if (!naked_body_is_asm_only(body)) {
+            errorfmt_at(body ? body->filename : NULL,
+                        body ? body->line : 0, 0,
+                        "__naked function '%s' may contain only an asm block",
+                        fn->name[0] ? fn->name : "?");
+            builder_free(&b);
+            ir_func_free(f);
+            return 0;   /* error reported; do NOT fall back to the walker */
+        }
+        /* fall through — build the asm with no params/frame/epilogue */
     }
 
     /* A function that *returns* long long receives a hidden stuffed
@@ -3981,10 +4698,30 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
         && fn->ctype->return_type->kind == KIND_LONGLONG)
         f->returns_longlong = 1;
 
+    /* Copy the function's ctype flags onto the IR func so the lowerer can
+       test modifiers (SDCCDECL, …) with `& bit`. __z88dk_sdccdecl makes a
+       char param occupy 1 caller-byte (not the smallc 2-byte int promote);
+       the prologue / param-offset layout reads f->flags & SDCCDECL. */
+    if (fn->ctype) f->flags = fn->ctype->flags;
+
+    /* __z88dk_params_offset(N) (and the implicit 4 for a TICALC banked
+       definition): every parameter sits N bytes higher on the caller
+       stack. emit_prologue / param_caller_off add this to the base. */
+    if (fn->ctype) f->params_offset = fn->ctype->funcattrs.params_offset;
+
+    /* __interrupt: the IR owns the epilogue (pop-all + reti/retn). The
+       irq value picks the return form (bare __interrupt = -1 → reti). */
+    if (fn->ctype && (fn->ctype->flags & INTERRUPT)) {
+        f->is_interrupt  = 1;
+        f->interrupt_irq = fn->ctype->funcattrs.interrupt;
+    }
+
     /* Pre-create PARAM vregs in declaration order so the lowerer's
        param-init prologue picks them up before any temps. Each param's
-       SYMBOL lives in loctab keyed by its source name. */
-    if (fn->ctype && fn->ctype->parameters) {
+       SYMBOL lives in loctab keyed by its source name. (Naked functions
+       have no managed prologue — the asm reads params directly off the
+       caller stack — so skip param vregs entirely.) */
+    if (!f->is_naked && fn->ctype && fn->ctype->parameters) {
         int np = (int)array_len(fn->ctype->parameters);
         for (int i = 0; i < np; i++) {
             Type *pt = array_get_byindex(fn->ctype->parameters, i);
@@ -4005,7 +4742,8 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
             if (!is_supported_int_kind(psym->type)
                 && !is_supported_float_kind(psym->type)
                 && !is_acc_float_kind(psym->type)
-                && !is_acc_int_kind(psym->type)) {
+                && !is_acc_int_kind(psym->type)
+                && (Kind)psym->type != KIND_CPTR) {  /* __far pointer param */
                 builder_free(&b);
                 ir_func_free(f);
                 return build_fail("param %s kind %d not yet supported",

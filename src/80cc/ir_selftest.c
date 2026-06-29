@@ -22,6 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Stub for c_banked_style — ir_lower.c now reads it (via ccdefs.h) for
+ * the __banked TICALC/REGULAR choice; its real definition is in main.c,
+ * which the selftest doesn't link. */
+int c_banked_style = 0;
+
 /* Stub for ir_sym_name — the real impl lives in ir_compiler_glue.c
  * which pulls in ccdefs.h. The selftest fakes a SYMBOL by stashing a
  * `char *` at offset 0 (the SYMBOL.name field) and reading it back. */
@@ -34,6 +39,11 @@ const char *ir_sym_prefix(const SYMBOL *sym)
 {
     (void)sym;
     return "_";
+}
+const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym)
+{
+    (void)sym;
+    return NULL;   /* selftest has no __addressmod symbols */
 }
 
 static int build_add_two(Func *f)

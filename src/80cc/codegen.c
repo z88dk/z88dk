@@ -271,7 +271,7 @@ static void switch_namespace(char *name)
     if ( name != NULL ) {
         ns = get_namespace(name);
         if ( ns != NULL ) {
-            gen_call(-1, ns->bank_function->name, ns->bank_function);
+            codegen_call(-1, ns->bank_function->name, ns->bank_function);
         }
     }
 
@@ -2249,7 +2249,7 @@ void zpop(void)
 }
 
 /* Output the call op code */
-void gen_call(int arg_count, const char *name, SYMBOL *sym)
+void codegen_call(int arg_count, const char *name, SYMBOL *sym)
 {
     if (sym->ctype->return_type->kind == KIND_LONGLONG) {
         ol("ld\tbc,__i64_acc");
@@ -2606,7 +2606,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
     /* Naked has already returned */
     if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
-        gen_critical_leave();
+        codegen_critical_leave();
     }
 
     if ( !callee_cleanup && save == KIND_LONGLONG ) {
@@ -6905,7 +6905,7 @@ void gen_interrupt_leave(SYMBOL *func)
 
 
 
-void gen_critical_enter(void)
+void codegen_critical_enter(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipset\t3");
@@ -6915,7 +6915,7 @@ void gen_critical_enter(void)
     }
 }
 
-void gen_critical_leave(void)
+void codegen_critical_leave(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipres");

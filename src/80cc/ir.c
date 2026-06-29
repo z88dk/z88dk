@@ -229,6 +229,7 @@ Func *ir_func_new(SYMBOL *fn)
     f->features = 0;
     f->abi = IR_ABI_SMALLC;
     f->is_interrupt = 0;
+    f->interrupt_irq = -1;
     f->is_naked = 0;
     f->is_critical = 0;
     f->has_setjmp = 0;

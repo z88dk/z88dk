@@ -149,6 +149,11 @@ typedef struct {
     int      post_step; /* IR_MEM_VREG only: ±N applied to base after the
                            load, so the lowerer can fuse the step into
                            the addressing (the *p++ pattern). 0 = none. */
+    SYMBOL  *bank_fn;   /* __addressmod: page-in fn to call before an
+                           indirect (IR_MEM_VREG) namespaced access; the
+                           namespace is recovered from the pointer/array
+                           type at build time. NULL = default space.
+                           (MEM_SYM recovers it from sym at lower time.) */
     PortInfo *port;     /* IR_MEM_PORT only — heap-allocated */
 } MemOp;
 
@@ -342,6 +347,22 @@ typedef struct {
                                prefix). Used to redirect inline builtins
                                like __builtin_memset → the real memset. */
     int      fnptr_vreg;    /* indirect call: vreg holding fnptr (-1 if direct) */
+    uint32_t flags;         /* copy of the target's ctype->flags — the
+                               special calling conventions are read off this
+                               with `& BANKED` / `& SHORTCALL[_HL]` / `& HL_CALL`
+                               (banked TICALC vs REGULAR keys off the global
+                               c_banked_style). Direct calls only; args /
+                               cleanup / return use the normal ABI. Was a
+                               sprawl of one-bool-per-convention ints. */
+    int      shortcall_rst; /* __z88dk_shortcall: the rst vector number */
+    int      shortcall_value; /* shortcall inline operand (plain) / HL value (_hl) */
+    int      hlcall_module; /* __z88dk_hl_call: value loaded into HL */
+    int      hlcall_addr;   /* __z88dk_hl_call: the numeric call target */
+    int      far_fnptr;     /* fnptr_vreg is a __far (KIND_CPTR) function
+                               pointer: dispatch via l_farcall (EHL = far
+                               address, A = arg-word count) instead of the
+                               near l_jphl. (Derived from the callee kind,
+                               not a ctype flag.) */
     int     *args;          /* array of vreg ids */
     int      n_args;
     int      ret_vreg;      /* vreg receiving the return value (-1 if void) */
@@ -487,9 +508,21 @@ typedef struct {
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
     IrAbi      abi;
+    uint32_t   flags;           /* copy of this function's ctype->flags;
+                                   modifier predicates read off it with
+                                   `& SDCCDECL` etc. (the older is_* bools
+                                   below predate this and could fold in). */
     int        is_interrupt;
+    int        interrupt_irq;   /* __interrupt(N) vector, or -1 for a bare
+                                   __interrupt — selects the epilogue's
+                                   return (reti / retn / ei;reti). */
     int        is_naked;
     int        is_critical;     /* function-level __critical */
+    int        params_offset;   /* __z88dk_params_offset(N): extra bytes
+                                   between the return address and the first
+                                   parameter (also set to 4 implicitly for a
+                                   BANKED_STYLE_TICALC definition). Added to
+                                   every param's caller-stack offset. */
     int        has_setjmp;      /* contains an IR_CALL with returns_twice */
     Namespace *ns;              /* current __addressmod namespace, NULL if default */
 
@@ -602,6 +635,14 @@ const char *ir_phys_name(PhysReg pr);
    headers; the selftest provides its own stubs. */
 const char *ir_sym_name(const SYMBOL *sym);
 const char *ir_sym_prefix(const SYMBOL *sym);
+/* __addressmod page-in function for a namespaced symbol (NULL if default
+   address space). The lowerer `call`s it before accessing the symbol;
+   the bank function preserves all registers (sdcc contract). */
+const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym);
+/* As ir_sym_bank_fn but resolved from a namespace NAME (the `namespace`
+   field of a Type). Used for indirect access where the namespace lives on
+   the pointer's pointee type / array element type, not a symbol. */
+const SYMBOL *ir_namespace_bank_fn(const char *ns_name);
 
 /* Derive the IR_FEAT_* capability word from the global c_cpu. Lives in
    ir_compiler_glue.c (needs define.h's CPU_* ids); ir_build stamps the

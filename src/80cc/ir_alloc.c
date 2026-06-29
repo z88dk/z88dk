@@ -20,6 +20,7 @@
  * this standalone alongside ir.c / ir_analysis.c / ir_lower.c.
  */
 
+#include "ccdefs.h"     /* FASTCALL flag bit (sets DEFINE_H for ir.h) */
 #include "ir_alloc.h"
 #include "ir_analysis.h"
 
@@ -88,9 +89,19 @@ void ir_alloc(Func *f)
        ADDR_TAKEN params are safe too: `&param` only has to stay valid
        for the function's lifetime (escaping it is UB), which is
        exactly the window the pushed-arg slot covers. */
+    /* The __z88dk_fastcall arg (the last param) arrives in HL, NOT on the
+       caller stack — it can't be read in place. emit_prologue stores it to
+       a real local slot (or its allocated register), so leave it off the
+       in-place list. It's the highest-indexed PARAM vreg (params precede
+       temps in creation order). */
+    int fc_param = -1;
+    if (f->flags & FASTCALL)
+        for (int v = 0; v < f->n_vregs; v++)
+            if (f->vregs[v].flags & IR_VREG_PARAM) fc_param = v;
     for (int v = 0; v < f->n_vregs; v++) {
         VReg *vr = &f->vregs[v];
         if (!(vr->flags & IR_VREG_PARAM)) continue;
+        if (v == fc_param) continue;
         vr->flags |= IR_VREG_PARAM_IN_PLACE;
     }
 
