@@ -211,6 +211,8 @@ extern void       load_double_into_fa(LVALUE *lval);
 extern void       load_llong_into_acc(zdouble val);
 extern void       write_constant_queue(void);
 extern void       indicate_constant_written(int litlab);
+extern int        ir_pool_litlab_llong(zdouble dval);
+extern int        ir_pool_litlab_double(zdouble value);
 
 extern void       dofloat(enum maths_mode mode, double raw, unsigned char fa[]);
 #include "data.h"

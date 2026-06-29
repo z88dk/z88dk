@@ -912,6 +912,40 @@ void load_llong_into_acc(zdouble val)
     callrts("l_i64_load");
 }
 
+/* IR literal-pool helpers. Reserve a big-constant slot for a wide value,
+   mark it written (the IR fwrites its asm directly, bypassing outstr's
+   `ld hl,i_N` auto-marking), and return the litlab. The IR emits the
+   `ld hl,i_<lab>` + wide-load itself (IR_MEM_POOL). */
+int ir_pool_litlab_llong(zdouble dval)
+{
+    uint64_t v, l;
+    char     buf[8];
+    elem_t  *elem;
+
+    if ( dval < 0 ) v = (uint64_t)(int64_t)dval;
+    else            v = (uint64_t)dval;
+    l = v & 0xffffffff;
+    buf[0] = (l % 65536) % 256; buf[1] = (l % 65536) / 256;
+    buf[2] = (l / 65536) % 256; buf[3] = (l / 65536) / 256;
+    l = (v >> 32) & 0xffffffff;
+    buf[4] = (l % 65536) % 256; buf[5] = (l % 65536) / 256;
+    buf[6] = (l / 65536) % 256; buf[7] = (l / 65536) / 256;
+    elem = get_elem_for_llong(buf);
+    indicate_constant_written(elem->litlab);
+    return elem->litlab;
+}
+
+int ir_pool_litlab_double(zdouble value)
+{
+    unsigned char  fa[MAX_MANTISSA_SIZE+1] = {0};
+    elem_t        *elem;
+
+    dofloat(c_maths_mode, value, fa);
+    elem = get_elem_for_fa(fa, value);
+    indicate_constant_written(elem->litlab);
+    return elem->litlab;
+}
+
 
 void load_fixed(LVALUE *lval)
 {

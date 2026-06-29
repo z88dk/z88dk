@@ -155,6 +155,9 @@ int ir_op_defs(const Op *op, int *out, int max)
             n = add_unique(out, n, max, op->call->ret_vreg);
         return n;
     case IR_HCALL:
+    case IR_ACC_BINOP:
+    case IR_ACC_UNOP:
+    case IR_ACC_CMP:
         if (op->hcall && op->hcall->ret_vreg >= 0)
             n = add_unique(out, n, max, op->hcall->ret_vreg);
         return n;
@@ -235,6 +238,9 @@ int ir_op_uses(const Op *op, int *out, int max)
         }
         return n;
     case IR_HCALL:
+    case IR_ACC_BINOP:
+    case IR_ACC_UNOP:
+    case IR_ACC_CMP:
         if (op->hcall) {
             for (int i = 0; i < op->hcall->n_args; i++)
                 n = add_unique(out, n, max, op->hcall->args[i]);

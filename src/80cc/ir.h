@@ -121,6 +121,8 @@ typedef enum {
     IR_MEM_SYM,         /* absolute: sym+offset */
     IR_MEM_VREG,        /* indirect: vreg-holding-pointer (+offset) */
     IR_MEM_PORT,        /* __sfr I/O port — see PortInfo */
+    IR_MEM_POOL,        /* big-constant literal pool: address is `i_<offset>`
+                           (the const.c bigconst_queue litlab). Wide only. */
 } MemKind;
 
 typedef enum {
@@ -214,6 +216,22 @@ typedef enum {
     /* calls */
     IR_CALL,            /* call function — CallInfo */
     IR_HCALL,           /* call runtime helper — HelperInfo */
+    IR_ACC_BINOP,       /* wide (>4-byte) memory-accumulator binop — HelperInfo
+                           with the acc_* fields set. dst/src[0..1] are slot-
+                           resident wide vregs; lowering does
+                           load(push-operand)→push→load(acc-operand)→call→store.
+                           Shared by 6/8-byte float (FA, d*) and long long
+                           (__i64_acc, l_i64_*). */
+    IR_ACC_CMP,         /* wide memory-accumulator compare — HelperInfo.
+                           Like IR_ACC_BINOP (two wide operands via the
+                           push/load dance) but the helper (dlt/dleq/…)
+                           returns an int 0/1 bool in HL; dst is a width-2
+                           int vreg, no accumulator store. */
+    IR_ACC_UNOP,        /* wide memory-accumulator unary op — HelperInfo.
+                           acc_subkind selects: 0 = int→acc (load int reg, call
+                           conv, store acc); 1 = acc→int (load acc, call conv,
+                           store int reg); 2 = acc→acc move (load acc, store
+                           acc). args[0] = source vreg, ret_vreg = dst. */
 
     /* I/O ports (__sfr) */
     IR_IN,              /* dst ← in_port(port_desc) — dst constrained to A */
@@ -327,6 +345,10 @@ typedef struct {
     int     *args;          /* array of vreg ids */
     int      n_args;
     int      ret_vreg;      /* vreg receiving the return value (-1 if void) */
+    int      ret_longlong;  /* callee returns long long: push &__i64_acc as
+                               the hidden result-buffer pointer before the
+                               call (stuffed-pointer ABI); result then in
+                               __i64_acc, read back into ret_vreg's slot. */
     IrAbi    abi;
     int      is_critical;   /* __critical: di/ei wrap around the call */
     int      returns_twice; /* setjmp etc. — allocator spills R_ALL\\{IX,IY} */
@@ -354,6 +376,21 @@ typedef struct {
     RegMask     reads;      /* registers read (besides explicit args) */
     RegMask     writes;     /* registers defined (besides explicit ret) */
     RegMask     clobbers;   /* registers trashed (allocator spills these) */
+
+    /* IR_ACC_BINOP only — wide memory-accumulator family params. `name`
+       holds the binop helper (dadd / l_i64_add); args = {lhs, rhs};
+       ret_vreg = dst (a slot-resident wide vreg). */
+    const char *acc_load;   /* addr in HL → accumulator (dload / l_i64_load) */
+    const char *acc_store;  /* accumulator → addr (dstore / l_i64_store) */
+    const char *acc_push;   /* accumulator → stack, sp -= acc_width (dpush) */
+    const char *acc_loadpush;/* combined load-from-(HL)+push (dldpsh); when set,
+                                replaces the acc_load+acc_push pair on the pushed
+                                operand. NULL → emit the two calls separately. */
+    int         acc_width;  /* bytes pushed/copied (6 / 8) */
+    int         acc_holds_lhs; /* 1: LHS loaded into acc, RHS pushed (float);
+                                  0: RHS in acc, LHS pushed (i64) */
+    int         acc_store_bc;  /* store address goes in BC (i64) not HL (float) */
+    int         acc_subkind;   /* IR_ACC_UNOP: 0=int→acc, 1=acc→int, 2=acc→acc */
 } HelperInfo;
 
 /* IR_SWITCH payload. Lowering route:
@@ -455,6 +492,30 @@ typedef struct {
     int        is_critical;     /* function-level __critical */
     int        has_setjmp;      /* contains an IR_CALL with returns_twice */
     Namespace *ns;              /* current __addressmod namespace, NULL if default */
+
+    /* Wide memory-accumulator (>4-byte float) primitive names, set by
+       ir_build from the active maths mode so the lowerer's generic
+       MOV/LD_MEM/ST_MEM/RET/CALL paths stay decoupled from the type
+       system. 6-byte: dload/dstore/dpush/dldpsh; 8-byte (mbf64):
+       l_f64_load/l_f64_store/l_f64_dpush/(none). NULL loadpush → emit
+       the load+push pair. */
+    const char *acc_load;
+    const char *acc_store;
+    const char *acc_push;
+    const char *acc_loadpush;
+    /* Set by ir_build when the function uses the wide memory-accumulator
+       tier (>4-byte float ops). The acc helpers (dadd/ddiv/… via their
+       dcallee `pop ix` retaddr stash) clobber IX, so under -frameix such a
+       function must NOT hold its frame pointer in IX: the lowerer addresses
+       sp-relative throughout and only push/pop ix to preserve the caller's
+       frame pointer. Makes fp_active() return 0. */
+    int        uses_acc;
+    /* Set by ir_build when the function's return type is long long. The
+       caller passes a hidden result-buffer pointer (the stuffed pointer)
+       just above the return address, so every param offset shifts +2. The
+       result is delivered in __i64_acc (the universal i64 accumulator), so
+       the return lowering needs no copy — see lower_ret. */
+    int        returns_longlong;
 
     /* Allocation results — filled by ir_alloc.c. */
     PhysReg   *vreg_to_phys;    /* by vreg id; PR_SPILL means stack-only */

@@ -5,6 +5,12 @@
  * -Cc--use-ir so each `long_*_*` function exercises the IR's long
  * lowering. main is on legacy (variadic printf, l_longjmp from
  * Assert all bail) but reads the IR-produced longs via cross-call.
+ *
+ * The _Float16 / double tests (test_float16 / test_double) need the
+ * float libraries linked — run this suite with `--math32 --math16`
+ * (math32 also sets -fp-mode=ieee so `double` is the IR-supported
+ * width-4 IEEE-32 format; without it doubles are 6-byte and bail to the
+ * walker, which would need genmath linked instead).
  */
 
 #include "test.h"
@@ -429,6 +435,226 @@ static void test_shifts(void)
     Assert(long_shr_27(0x80000000L) == 0x00000010L,                       "shr 27");
 }
 
+/* ---- _Float16 (math16) IR helper-call lowering --------------------
+   Each does ONE _Float16 op so the IR emits the l_f16_* helper call
+   (left pushed, right in HL, result HL). Requires --math16 at link.
+   f16bits() takes the address of its param -> bails to the walker,
+   yielding a reinterpret of the result's raw IEEE-half bits without an
+   f16->int conversion (not yet lowered in the IR). */
+_Float16 f16_add (_Float16 a, _Float16 b) { return a + b; }
+_Float16 f16_sub (_Float16 a, _Float16 b) { return a - b; }
+_Float16 f16_mul (_Float16 a, _Float16 b) { return a * b; }
+_Float16 f16_div (_Float16 a, _Float16 b) { return a / b; }
+_Float16 f16_expr(_Float16 a, _Float16 b, _Float16 c) { return a * b - c; }
+/* int<->_Float16 conversions (l_f16_*2f / l_f16_f2*) — IR-lowered. */
+int      f16_to_i (_Float16 x) { return (int)x; }
+long     f16_to_l (_Float16 x) { return (long)x; }
+_Float16 i_to_f16 (int x)      { return (_Float16)x; }
+_Float16 l_to_f16 (long x)     { return (_Float16)x; }
+/* _Float16 comparisons (l_f16_{lt,le,gt,ge,eq,ne}) — IR-lowered, each
+   returns the int bool (0/1) in HL. f16_pick exercises a compare as an
+   `if` condition. */
+int f16_lt  (_Float16 a, _Float16 b) { return a <  b; }
+int f16_le  (_Float16 a, _Float16 b) { return a <= b; }
+int f16_gt  (_Float16 a, _Float16 b) { return a >  b; }
+int f16_ge  (_Float16 a, _Float16 b) { return a >= b; }
+int f16_eq  (_Float16 a, _Float16 b) { return a == b; }
+int f16_ne  (_Float16 a, _Float16 b) { return a != b; }
+int f16_pick(_Float16 a, _Float16 b) { if (a < b) return 111; return 222; }
+_Float16 f16_neg(_Float16 a) { return -a; }   /* sign-bit XOR */
+/* compound-assign across local / *ptr / global LHS shapes */
+_Float16 gf16;
+_Float16 f16_caddl(_Float16 a, _Float16 b) { a += b; return a; }
+_Float16 f16_cmull(_Float16 a, _Float16 b) { a *= b; return a; }
+void     f16_csubp(_Float16 *p, _Float16 b) { *p -= b; }
+void     f16_caddg(_Float16 b) { gf16 += b; }
+
+/* ---- width-4 double (l_f32_*, only under --math32 / -fp-mode=ieee;
+   otherwise these bail to the walker and still compute correctly) ---- */
+double d_add (double a, double b) { return a + b; }
+double d_sub (double a, double b) { return a - b; }
+double d_mul (double a, double b) { return a * b; }
+double d_div (double a, double b) { return a / b; }
+int    d_lt  (double a, double b) { return a <  b; }
+int    d_eq  (double a, double b) { return a == b; }
+double i_to_d(int x)  { return (double)x; }
+double l_to_d(long x) { return (double)x; }
+int    d_to_i(double x) { return (int)x; }
+long   d_to_l(double x) { return (long)x; }
+double d_caddl(double a, double b) { a += b; return a; }
+double d_cdivl(double a, double b) { a /= b; return a; }
+double d_id  (double a)           { return a; }            /* param->return */
+double d_id2 (double a, double b) { return b; }            /* 2nd of 2 params */
+double gd6;
+double d_locrt (double a, double b) { double x; x = a; x = x + b; return x; }
+double d_globrt(double a)           { gd6 = a; return gd6; }
+double d_ptrrt (double *p, double a){ *p = a; return *p; }
+double d_litc  (void)               { return 2.5; }         /* double literal (pool @ 6-byte) */
+
+/* ---- long long (width-8 __i64_acc, IR acc-int tier) ----------------
+ * Wide call & return use the stuffed-pointer ABI (Phase 2), so each
+ * helper keeps `long long` internal — int/long in, int/long out — and
+ * is fully IR-native. Exercises l_i64_* arith/compare/convert + the
+ * shared IR_ACC_* layer (acc holds RHS, address-in-BC store). */
+int  ll_add (int a, int b) { long long x = a, y = b; return (int)(x + y); }
+int  ll_sub (int a, int b) { return (int)((long long)a - (long long)b); }
+int  ll_mul (int a, int b) { return (int)((long long)a * (long long)b); }
+int  ll_div (int a, int b) { return (int)((long long)a / (long long)b); }
+int  ll_mod (int a, int b) { return (int)((long long)a % (long long)b); }
+int  ll_and (int a, int b) { return (int)((long long)a & (long long)b); }
+int  ll_or  (int a, int b) { return (int)((long long)a | (long long)b); }
+int  ll_xor (int a, int b) { return (int)((long long)a ^ (long long)b); }
+int  ll_lt  (int a, int b) { return (long long)a <  (long long)b; }
+int  ll_le  (int a, int b) { return (long long)a <= (long long)b; }
+int  ll_gt  (int a, int b) { return (long long)a >  (long long)b; }
+int  ll_ge  (int a, int b) { return (long long)a >= (long long)b; }
+int  ll_eq  (int a, int b) { return (long long)a == (long long)b; }
+int  ll_ne  (int a, int b) { return (long long)a != (long long)b; }
+int  ll_ult (unsigned a, unsigned b)
+                           { return (unsigned long long)a < (unsigned long long)b; }
+/* genuine 64-bit: 100000*100000 = 1e10; /1e6 = 10000 (a 32-bit-truncated
+ * product would give 1410065408/1e6 = 1410). */
+int  ll_big (void)         { long long x = 100000; x = x * x; return (int)(x / 1000000); }
+/* named local reassign — exercises the wide ll MOV / slot path */
+int  ll_locrt(int a, int b){ long long x = a; x = x * (long long)b; return (int)x; }
+/* long -> ll -> long, through a >16-bit value (slong2i64 / s64_toi32) */
+long ll_lrt (long a)       { long long x = a; return (long)(x + 1); }
+
+/* Phase 2 — long long crossing the call boundary (stuffed-pointer return,
+ * wide stack-push args). These are fully IR-native (ll params + returns). */
+long long ll_passthru(long long x)            { return x; }          /* ll param + ll return */
+long long ll_addll  (long long a, long long b){ return a + b; }      /* 2 ll args + ll return */
+long long ll_litbig (void)                    { return 1000000000LL; }/* ll literal (32-bit) */
+long long ll_litpool(void)                    { return 10000000000LL; }/* >32-bit literal (pool) */
+int  ll_shl (int a, int n) { return (int)((long long)a << n); }      /* l_i64_asl */
+int  ll_shr (int a, int n) { return (int)((long long)a >> n); }      /* l_i64_asr */
+/* 64-bit round-trip shift (variable count, no const-fold): a<<40>>40 = a */
+int  ll_shlr(int a, int sh){ long long x = a; return (int)((x << sh) >> sh); }
+unsigned ll_ushr(int sh)   { long long x = -1; return (unsigned)((unsigned long long)x >> sh); }
+int  ll_neg1(void)         { long long x = -1; return (int)x; }      /* negative ll literal sign-extend */
+int  ll_cshl(int a, int n) { long long x = a; x <<= n; return (int)x; }      /* compound <<= */
+int  ll_cushr(int n) { unsigned long long x = 0xFFFFFFFFFFFFFFFFULL; x >>= n; return (unsigned)x; } /* compound unsigned >>= */
+
+/* Build/read _Float16 from raw IEEE-half bits (no double->f16 convert,
+   so the test needs only --math16, not the default-double library). */
+static _Float16 mkf16(unsigned bits) { _Float16 x; *(unsigned short *)&x = (unsigned short)bits; return x; }
+static unsigned f16bits(_Float16 x)  { return *(unsigned short *)&x; }
+
+static void test_float16(void)
+{
+    _Float16 a = mkf16(0x4200);   /* 3.0 */
+    _Float16 b = mkf16(0x4400);   /* 4.0 */
+    _Float16 two = mkf16(0x4000); /* 2.0 */
+    Assert(f16bits(f16_add(a, b))       == 0x4700u, "f16 3+4=7");
+    Assert(f16bits(f16_sub(a, b))       == 0xBC00u, "f16 3-4=-1");
+    Assert(f16bits(f16_mul(a, b))       == 0x4A00u, "f16 3*4=12");
+    Assert(f16bits(f16_div(b, two))     == 0x4000u, "f16 4/2=2");
+    Assert(f16bits(f16_expr(a, b, two)) == 0x4900u, "f16 3*4-2=10");
+    /* int<->_Float16 conversions */
+    Assert(f16bits(i_to_f16(5))     == 0x4500u, "int 5 -> f16 5.0");
+    Assert(f16bits(i_to_f16(-3))    == 0xC200u, "int -3 -> f16 -3.0");
+    Assert(f16bits(l_to_f16(7L))    == 0x4700u, "long 7 -> f16 7.0");
+    Assert(f16_to_i(mkf16(0x4700))  == 7,       "f16 7.0 -> int 7");
+    Assert(f16_to_i(mkf16(0xC500))  == -5,      "f16 -5.0 -> int -5");
+    Assert(f16_to_l(mkf16(0x4A00))  == 12L,     "f16 12.0 -> long 12");
+    Assert(f16_to_i(f16_mul(a, b))  == 12,      "3*4 -> int 12");
+    Assert(f16_to_i(i_to_f16(-9))   == -9,      "int->f16->int -9");
+    /* comparisons (3.0 vs 4.0) — exact 0/1 results */
+    Assert(f16_lt(a, b) == 1, "f16 3<4");
+    Assert(f16_lt(b, a) == 0, "f16 !(4<3)");
+    Assert(f16_le(a, a) == 1, "f16 3<=3");
+    Assert(f16_gt(b, a) == 1, "f16 4>3");
+    Assert(f16_ge(a, a) == 1, "f16 3>=3");
+    Assert(f16_eq(a, a) == 1, "f16 3==3");
+    Assert(f16_eq(a, b) == 0, "f16 !(3==4)");
+    Assert(f16_ne(a, b) == 1, "f16 3!=4");
+    Assert(f16_pick(a, b) == 111, "f16 if a<b");
+    Assert(f16_pick(b, a) == 222, "f16 if !(a<b)");
+    /* unary negate (sign-bit flip): -3.0 = 0xC200, -(-3.0)=3.0 */
+    Assert(f16bits(f16_neg(a))          == 0xC200u, "f16 -(3.0)");
+    Assert(f16bits(f16_neg(mkf16(0xC200))) == 0x4200u, "f16 -(-3.0)");
+    /* compound-assign: local, *ptr, global */
+    Assert(f16bits(f16_caddl(a, b)) == 0x4700u, "f16 a+=b -> 7");
+    Assert(f16bits(f16_cmull(a, b)) == 0x4A00u, "f16 a*=b -> 12");
+    {
+        _Float16 v = mkf16(0x4700);   /* 7.0 */
+        f16_csubp(&v, b);             /* 7 - 4 = 3 */
+        Assert(f16bits(v) == 0x4200u, "f16 *p-=b -> 3");
+    }
+    gf16 = mkf16(0x4200);             /* 3.0 */
+    f16_caddg(b);                     /* 3 + 4 = 7 */
+    Assert(f16bits(gf16) == 0x4700u, "f16 g+=b -> 7");
+}
+
+static void test_double(void)
+{
+    /* Verified through int<->double conversions so no bit-pattern math
+       is needed; exercises l_f32_* arith, compare, and conversions. */
+    Assert(d_to_i(d_id(i_to_d(7)))   == 7, "dbl id param->ret");
+    Assert(d_to_i(d_id2(i_to_d(3), i_to_d(9))) == 9, "dbl id2 2nd param");
+    Assert(d_to_i(d_add(i_to_d(3), i_to_d(4)))  == 7,  "dbl 3+4=7");
+    Assert(d_to_i(d_sub(i_to_d(3), i_to_d(4)))  == -1, "dbl 3-4=-1");
+    Assert(d_to_i(d_mul(i_to_d(3), i_to_d(4)))  == 12, "dbl 3*4=12");
+    Assert(d_to_i(d_div(i_to_d(20), i_to_d(4))) == 5,  "dbl 20/4=5");
+    Assert(d_lt(i_to_d(3), i_to_d(4)) == 1,            "dbl 3<4");
+    Assert(d_lt(i_to_d(4), i_to_d(3)) == 0,            "dbl !(4<3)");
+    Assert(d_eq(i_to_d(5), i_to_d(5)) == 1,            "dbl 5==5");
+    Assert(d_to_l(d_add(l_to_d(100000L), l_to_d(1L))) == 100001L, "dbl 1e5+1");
+    Assert(d_to_l(l_to_d(70000L)) == 70000L, "dbl->long 70000");
+    Assert(d_to_l(i_to_d(-5))     == -5L,    "dbl->long -5");
+    Assert(d_to_i(i_to_d(-9)) == -9,                   "dbl int rt -9");
+    Assert(d_to_i(d_caddl(i_to_d(3), i_to_d(4)))  == 7, "dbl a+=b -> 7");
+    Assert(d_to_i(d_cdivl(i_to_d(20), i_to_d(4))) == 5, "dbl a/=b -> 5");
+    Assert(d_to_i(d_locrt(i_to_d(3), i_to_d(4)))  == 7, "dbl local x=a;x=x+b");
+    Assert(d_to_i(d_globrt(i_to_d(5)))            == 5, "dbl global g=a");
+    {
+        double pv;
+        Assert(d_to_i(d_ptrrt(&pv, i_to_d(8)))    == 8, "dbl *p=a");
+    }
+    Assert(d_to_i(d_add(d_litc(), d_litc())) == 5, "dbl literal 2.5+2.5=5");
+}
+
+static void test_longlong(void)
+{
+    /* All helpers keep long long internal (int/long boundary) — verified
+       through int<->ll conversions so no 64-bit literal math is needed. */
+    Assert(ll_add(3, 4)   == 7,   "ll 3+4=7");
+    Assert(ll_add(-3, -4) == -7,  "ll -3+-4=-7 (sign-extend)");
+    Assert(ll_sub(3, 4)   == -1,  "ll 3-4=-1");
+    Assert(ll_mul(6, 7)   == 42,  "ll 6*7=42");
+    Assert(ll_div(20, 4)  == 5,   "ll 20/4=5");
+    Assert(ll_div(-20, 3) == -6,  "ll -20/3=-6 (signed)");
+    Assert(ll_mod(20, 7)  == 6,   "ll 20%7=6");
+    Assert(ll_and(0x0f, 0x33) == 0x03, "ll &");
+    Assert(ll_or (0x0f, 0x30) == 0x3f, "ll |");
+    Assert(ll_xor(0x0f, 0x33) == 0x3c, "ll ^");
+    Assert(ll_lt(3, 4)    == 1,   "ll 3<4");
+    Assert(ll_lt(-5, 3)   == 1,   "ll -5<3 (signed)");
+    Assert(ll_lt(4, 3)    == 0,   "ll !(4<3)");
+    Assert(ll_le(4, 4)    == 1,   "ll 4<=4");
+    Assert(ll_gt(5, 3)    == 1,   "ll 5>3");
+    Assert(ll_ge(3, 4)    == 0,   "ll !(3>=4)");
+    Assert(ll_eq(5, 5)    == 1,   "ll 5==5");
+    Assert(ll_ne(5, 6)    == 1,   "ll 5!=6");
+    Assert(ll_ult(1, 2)   == 1,   "ll 1<2 (unsigned)");
+    Assert(ll_big()       == 10000, "ll 1e5*1e5/1e6=1e4 (64-bit product)");
+    Assert(ll_locrt(7, 6) == 42,  "ll local x=a;x=x*b");
+    Assert(ll_lrt(70000L) == 70001L, "ll long->ll->long 70000+1");
+    /* Phase 2: stuffed-pointer return + wide-arg call boundary. */
+    Assert((int)ll_passthru((long long)12345) == 12345, "ll passthru param+ret");
+    Assert((int)ll_addll((long long)100, (long long)200) == 300, "ll args a+b=300");
+    Assert((int)(ll_litbig() / 100000LL) == 10000, "ll literal 1e9/1e5=1e4");
+    Assert((int)ll_addll(ll_passthru((long long)7), (long long)35) == 42, "ll nested call");
+    Assert(ll_shl(3, 4)   == 48, "ll 3<<4=48");
+    Assert(ll_shr(160, 2) == 40, "ll 160>>2=40");
+    Assert(ll_shlr(5, 40) == 5,  "ll 5<<40>>40=5 (64-bit shift)");
+    Assert(ll_ushr(60)    == 15, "ll (u)-1>>60=15 (logical)");
+    Assert(ll_neg1()      == -1, "ll x=-1 sign-extend");
+    Assert(ll_cshl(3, 4)  == 48, "ll x<<=4 -> 48");
+    Assert(ll_cushr(60)   == 15, "ll x>>=60 (u) -> 15");
+    Assert((int)(ll_litpool() / 1000000000LL) == 10, "ll >32-bit literal pool 1e10/1e9");
+}
+
 int suite_long_ir(void)
 {
     suite_setup("long IR ops");
@@ -447,6 +673,9 @@ int suite_long_ir(void)
     suite_add_test(test_byte_overrun);
     suite_add_test(test_ptr_stride);
     suite_add_test(test_ctrlflow);
+    suite_add_test(test_float16);
+    suite_add_test(test_double);
+    suite_add_test(test_longlong);
     return suite_run();
 }
 

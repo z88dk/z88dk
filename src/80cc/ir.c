@@ -89,6 +89,9 @@ static const OpInfo op_table[] = {
     /* calls */
     [IR_CALL]               = { "CALL",                 0, 0 },
     [IR_HCALL]              = { "HCALL",                0, 0 },
+    [IR_ACC_BINOP]          = { "ACC_BINOP",            0, 0 },
+    [IR_ACC_UNOP]           = { "ACC_UNOP",             0, 0 },
+    [IR_ACC_CMP]            = { "ACC_CMP",              0, 0 },
 
     /* I/O */
     [IR_IN]                 = { "IN",                   0, 0 },
@@ -469,6 +472,9 @@ static void dump_memop(FILE *out, const Func *f, const MemOp *m)
             fputs("port[<null>]", out);
         }
         break;
+    case IR_MEM_POOL:
+        fprintf(out, "pool[i_%d]", m->offset);
+        break;
     default:
         fputs("mem?", out);
     }
@@ -518,6 +524,9 @@ void ir_dump_op(FILE *out, const Func *f, const Op *op)
         }
         break;
     case IR_HCALL:
+    case IR_ACC_BINOP:
+    case IR_ACC_UNOP:
+    case IR_ACC_CMP:
         if (op->hcall) {
             fprintf(out, "%s(%d args)",
                     op->hcall->name ? op->hcall->name : "?",

@@ -108,6 +108,14 @@ static int cmp_label_counter;
    skip the load and use load_to_de_preserve_hl for src[1]. */
 static int cur_hl_vreg;
 
+/* Wide-accumulator (FA / __i64_acc) residency cache: the vreg whose
+   value currently sits in the accumulator, or -1. Set by gen_acc_binop
+   (its result is left in the accumulator); cleared by invalidate_hl_cache
+   (so any call / HL-clobbering op drops it). Lets lower_ret skip the
+   store+reload round-trip that would otherwise corrupt the math48 FA
+   (alt-register set) — and is the wide analog of the HL/DEHL cache. */
+static int cur_fa_vreg = -1;
+
 /* Lazy spill (store-on-clobber) — LAZY_SPILL_PLAN.md §11. Behind the
    IR_LAZY_SPILL env gate; the deferral itself is wired in a later step,
    so while `pending_spill_v < 0` (always, until then) every hook below
@@ -148,11 +156,24 @@ static int cur_dehl_vreg;
    range that `(ix±d)` addressing supports.
 
    `frame_reg()` returns "ix" or "iy" matching the user's choice. */
-static int fp_active(const Func *f)
+/* True iff entry emitted a `push ix` (gen_push_frame) — i.e. -frameix is on
+   for a non-naked function. The saved IX then occupies 2 bytes between the
+   locals and the return address on the stack, regardless of whether IX is
+   actually used as a frame pointer. */
+static int frame_has_saved_fp(const Func *f)
 {
     if (!f) return 0;
     if (c_framepointer_is_ix == -1) return 0;
     if (f->is_naked) return 0;
+    return 1;
+}
+
+static int fp_active(const Func *f)
+{
+    if (!frame_has_saved_fp(f)) return 0;
+    /* Wide-accumulator functions can't keep their frame pointer in IX: the
+       acc helpers clobber it. They save/restore IX but address sp-relative. */
+    if (f->uses_acc) return 0;
     return 1;
 }
 
@@ -186,7 +207,8 @@ static int param_caller_off(const Func *f, int vreg_id)
        With FP active, everything above the locals shifts up by 2 to
        make room for the saved IX. So caller_off becomes
        frame_size + 4 + args_total instead of frame_size + 2 + args_total. */
-    int retaddr_off = f->frame_size + (fp_active(f) ? 4 : 2);
+    int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
+                    + (f->returns_longlong ? 2 : 0);
     int caller_off = retaddr_off + args_total;
     for (int i = 0; i < f->n_vregs; i++) {
         const VReg *v = &f->vregs[i];
@@ -285,6 +307,65 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 /* Data-stack sp adjustment — see comment at cur_stack_long_top below.
    Forward-defined here because the load_to_* wrappers depend on it. */
 static int cur_sp_adjust;
+
+/* Materialize the ADDRESS of a vreg's frame slot into HL — for the
+   wide-accumulator helpers (dload/dstore/dldpsh take the address in HL).
+   sp-mode: `ld hl,off+adj; add hl,sp`. fp-mode: `HL = frame_reg + ix_off`
+   (no `add hl,ix`, so push/pop the frame reg then add the offset via DE;
+   `adj` — the prior-push sp shift — does NOT apply since IX is fixed).
+   Clobbers DE in fp-mode (acc callers invalidate DE around the call). */
+static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
+{
+    if (fp_active(f)) {
+        int ixoff = slot_ix_off(f, vreg);
+        emit(out, "push\t%s", frame_reg());
+        emit(out, "pop\thl");
+        if (ixoff) {
+            emit(out, "ld\tde,%d", ixoff);
+            emit(out, "add\thl,de");
+        }
+    } else {
+        emit(out, "ld\thl,%d", slot_off(f, vreg) + cur_sp_adjust + adj);
+        emit(out, "add\thl,sp");
+    }
+}
+
+/* Wide memory-accumulator primitive name for `vreg`, dispatched on its
+   KIND. A width-8 vreg can be either a `long long` (`__i64_acc` / fixed
+   `l_i64_*` set) or an 8-byte `double` (mbf64), and both may be live in
+   one function — so the family can't be a Func-global; it keys off the
+   vreg. Non-long-long wide kinds use the maths-mode names ir_build stored
+   on the Func. `which` is "load"/"store"/"push"/"loadpush"; returns NULL
+   for the (absent) i64 loadpush so the caller falls back to load+push. */
+static const char *acc_prim(const Func *f, int vreg, const char *which)
+{
+    /* KIND_LONGLONG == 19 (inlined from define.h to keep ir_lower
+       decoupled — same convention as vreg_kind_is_integer). */
+    if (vreg >= 0 && (int)f->vregs[vreg].kind == 19) {
+        if (!strcmp(which, "load"))  return "l_i64_load";
+        if (!strcmp(which, "store")) return "l_i64_store";
+        if (!strcmp(which, "push"))  return "l_i64_push";
+        return NULL;                 /* no combined loadpush for i64 */
+    }
+    if (!strcmp(which, "load"))     return f->acc_load;
+    if (!strcmp(which, "store"))    return f->acc_store;
+    if (!strcmp(which, "push"))     return f->acc_push;
+    if (!strcmp(which, "loadpush")) return f->acc_loadpush;
+    return NULL;
+}
+
+/* Emit the accumulator store for `vreg` given its destination address in
+   HL. The float d* / l_f64_ store takes the address in HL; l_i64_store
+   wants it in BC (the acc_store_bc convention), so move it first for the
+   long long family. */
+static void emit_acc_store_hl(FILE *out, const Func *f, int vreg)
+{
+    if (vreg >= 0 && (int)f->vregs[vreg].kind == 19 /* KIND_LONGLONG */) {
+        emit(out, "ld\tb,h");
+        emit(out, "ld\tc,l");
+    }
+    emit(out, "call\t%s", acc_prim(f, vreg, "store"));
+}
 
 /* One-shot flag forward decls (definitions further down with the
    rest of the lookahead state). Need to be visible to
@@ -1244,6 +1325,7 @@ static void invalidate_hl_cache(void)
     cur_de_vreg = -1;
     cur_dehl_vreg = -1;
     cur_a_vreg = -1;
+    cur_fa_vreg = -1;
 }
 
 /* Dead-store elimination: set per-op by lower_func before calling
@@ -1792,8 +1874,7 @@ static int gen_lea(FILE *out, Func *f, const Op *op)
         fputs("ir_lower: IR_LEA with no src\n", stderr);
         return -1;
     }
-    emit(out, "ld\thl,%d", slot_off(f, op->src[0]) + cur_sp_adjust);
-    emit(out, "add\thl,sp");
+    emit_acc_slot_addr(out, f, op->src[0], 0);
     spill_and_swap_unless_dead(out, f, op->dst);
     cache_hl(op->dst);
     return 0;
@@ -1802,6 +1883,19 @@ static int gen_lea(FILE *out, Func *f, const Op *op)
 static int gen_mov(FILE *out, Func *f, const Op *op)
 {
     int dst_w = (op->dst >= 0) ? f->vregs[op->dst].width : 2;
+    if (dst_w > 4) {
+        /* Wide (5/6/8-byte) slot-to-slot copy via the accumulator:
+           dload(src); dstore(dst). Reuses the FA-residency cache. */
+        if (cur_fa_vreg != op->src[0]) {
+            emit_acc_slot_addr(out, f, op->src[0], 0);
+            emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
+        }
+        emit_acc_slot_addr(out, f, op->dst, 0);
+        emit_acc_store_hl(out, f, op->dst);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = op->dst;
+        return 0;
+    }
     if (dst_w == 4) {
         /* Long slot-to-slot copy. */
         load_to_dehl(out, f, op->src[0]);
@@ -2970,6 +3064,26 @@ static void emit_hl_add_offset(FILE *out, int off, int use_bc)
 
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
+    if (op->dst >= 0 && f->vregs[op->dst].width > 4) {
+        /* Wide load: address into HL, acc_load→accumulator, store→dst slot. */
+        if (op->mem.kind == IR_MEM_POOL) {
+            /* Big-constant literal pool: `i_<litlab>` (const.c bigconst). */
+            emit(out, "ld\thl,i_%d", op->mem.offset);
+        } else if (op->mem.kind == IR_MEM_SYM) {
+            if (op->mem.offset)
+                emit(out, "ld\thl,_%s+%d", ir_sym_name(op->mem.sym), op->mem.offset);
+            else
+                emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
+        } else {
+            load_to_hl(out, f, op->mem.base);
+        }
+        emit(out, "call\t%s", acc_prim(f, op->dst, "load"));
+        emit_acc_slot_addr(out, f, op->dst, 0);
+        emit_acc_store_hl(out, f, op->dst);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = op->dst;
+        return 0;
+    }
     if (op->mem.kind == IR_MEM_SYM) {
         int dst_w = (op->dst >= 0)
                   ? f->vregs[op->dst].width : 2;
@@ -3139,6 +3253,25 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    if (op->src[0] >= 0 && f->vregs[op->src[0]].width > 4) {
+        /* Wide double store: dload(src)→FA, address into HL, dstore. */
+        if (cur_fa_vreg != op->src[0]) {
+            emit_acc_slot_addr(out, f, op->src[0], 0);
+            emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
+        }
+        if (op->mem.kind == IR_MEM_SYM) {
+            if (op->mem.offset)
+                emit(out, "ld\thl,_%s+%d", ir_sym_name(op->mem.sym), op->mem.offset);
+            else
+                emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
+        } else {
+            load_to_hl(out, f, op->mem.base);
+        }
+        emit_acc_store_hl(out, f, op->src[0]);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = -1;
+        return 0;
+    }
     if (op->mem.kind == IR_MEM_SYM) {
         int src_w = (op->src[0] >= 0)
                   ? f->vregs[op->src[0]].width : 2;
@@ -4442,7 +4575,20 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         int slot = slot_off(f, ci->args[i]);
         int adj  = slot + pushed_bytes + sp_adj_extra + cur_sp_adjust;
         int width = f->vregs[ci->args[i]].width;
-        if (width == 4) {
+        if (width > 4) {
+            /* Wide double arg: load the slot into the accumulator and push
+               it — combined (dldpsh) when the format provides it, else
+               load + push. */
+            emit_acc_slot_addr(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
+            if (acc_prim(f, ci->args[i], "loadpush")) {
+                emit(out, "call\t%s", acc_prim(f, ci->args[i], "loadpush"));
+            } else {
+                emit(out, "call\t%s", acc_prim(f, ci->args[i], "load"));
+                emit(out, "call\t%s", acc_prim(f, ci->args[i], "push"));
+            }
+            pushed_bytes += width;
+            invalidate_hl_cache();
+        } else if (width == 4) {
             /* Long arg: load via load_to_dehl_adj (DEHL = value),
                then `push de; push hl` so sp[0]=low, sp[2]=high
                matching the z88dk lpush() convention. */
@@ -4491,11 +4637,23 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     }
 
     /* SMALLC variadic ABI: emit `ld a,bytes/2` (or `xor a` if 0)
-       immediately before the call. Stdc and fastcall don't need it. */
+       immediately before the call. Stdc and fastcall don't need it. The
+       stuffed pointer (pushed below) is not part of the arg count. */
     if (ci->is_variadic && ci->abi == IR_ABI_SMALLC) {
         int n = pushed_bytes / 2;
         if (n == 0) emit(out, "xor\ta");
         else        emit(out, "ld\ta,%d", n);
+    }
+
+    /* long long return: push the hidden result-buffer pointer (&__i64_acc)
+       last, so it lands just above the return address (callee param offsets
+       already account for the +2). The result comes back in __i64_acc; the
+       caller-cleanup below pops this with the args. */
+    if (ci->ret_longlong) {
+        emit(out, "ld\tbc,__i64_acc");
+        emit(out, "push\tbc");
+        pushed_bytes += 2;
+        if (pre) cur_sp_adjust += 2;
     }
 
     if (is_indirect) {
@@ -4557,7 +4715,14 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        crcbench's wrong crc and lglob's missing g.hi). */
     if (ci->ret_vreg >= 0) {
         int ret_w = f->vregs[ci->ret_vreg].width;
-        if (ret_w == 4)
+        if (ret_w > 4) {
+            /* Wide return: the callee left it in the accumulator (FA for
+               double, __i64_acc for long long); store it to the ret slot. */
+            emit_acc_slot_addr(out, f, ci->ret_vreg, 0);
+            emit_acc_store_hl(out, f, ci->ret_vreg);
+            invalidate_hl_cache();
+            cur_fa_vreg = ci->ret_vreg;
+        } else if (ret_w == 4)
             store_dehl_cached(out, f, ci->ret_vreg);
         else if (ret_w == 1) {
             /* Byte return: the value is in HL (low byte in L, char-
@@ -4586,6 +4751,160 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         cur_bc_vreg = bc_args_save_stack[--bc_args_save_depth];
         cur_sp_adjust -= 2;
     }
+    return 0;
+}
+
+/* Wide memory-accumulator binop (IR_ACC_BINOP). Operands and result are
+   slot-resident wide vregs (width 6/8); the accumulator (FA / __i64_acc)
+   is the working store. Sequence (sp-relative addressing; ir_build gates
+   this to !fp_active):
+     dload(push_operand); push;        ; one operand to acc, push it
+     dload(acc_operand);                ; other operand into acc (last)
+     call <binop>                        ; helper consumes the pushed operand
+     store(dst)                          ; acc -> result slot
+   `acc_holds_lhs` selects which operand is loaded-last vs pushed so
+   non-commutative ops (sub/div) get the right order. */
+static int gen_acc_binop(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name || hi->n_args != 2 || hi->ret_vreg < 0) {
+        fputs("ir_lower: IR_ACC_BINOP malformed\n", stderr);
+        return -1;
+    }
+    int lhs = hi->args[0], rhs = hi->args[1];
+    int acc_op  = hi->acc_holds_lhs ? lhs : rhs;   /* loaded into acc last */
+    int push_op = hi->acc_holds_lhs ? rhs : lhs;   /* pushed */
+    int w = hi->acc_width;
+
+    /* 1. push_op -> acc, then push acc to the stack (combined dldpsh
+       when available, else load+push). */
+    emit_acc_slot_addr(out, f, push_op, 0);
+    if (hi->acc_loadpush) {
+        emit(out, "call\t%s", hi->acc_loadpush);
+    } else {
+        emit(out, "call\t%s", hi->acc_load);
+        emit(out, "call\t%s", hi->acc_push);
+    }
+    cur_sp_adjust += w;
+    /* 2. acc_op -> acc (offsets now include the push) */
+    emit_acc_slot_addr(out, f, acc_op, 0);
+    emit(out, "call\t%s", hi->acc_load);
+    /* 3. binop — the helper pops the pushed operand */
+    emit(out, "call\t%s", hi->name);
+    cur_sp_adjust -= w;
+    /* 4. acc -> dst slot */
+    emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
+    if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
+        emit(out, "ld\tb,h");
+        emit(out, "ld\tc,l");
+    }
+    emit(out, "call\t%s", hi->acc_store);
+    invalidate_hl_cache();
+    invalidate_de_cache();
+    invalidate_bc_cache();
+    invalidate_a_cache();
+    /* The result is left in the accumulator (the store above wrote a
+       copy to the slot but didn't disturb the accumulator). Advertise
+       it so an immediately-following return skips the reload. */
+    cur_fa_vreg = hi->ret_vreg;
+    return 0;
+}
+
+/* Wide memory-accumulator compare (IR_ACC_CMP): same push/load dance as
+   the binop, but the helper (dlt/dleq/…) returns an int 0/1 bool in HL,
+   stored to the width-2 int dst (no accumulator store). */
+static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name || hi->n_args != 2 || hi->ret_vreg < 0) {
+        fputs("ir_lower: IR_ACC_CMP malformed\n", stderr);
+        return -1;
+    }
+    int acc_op  = hi->acc_holds_lhs ? hi->args[0] : hi->args[1];
+    int push_op = hi->acc_holds_lhs ? hi->args[1] : hi->args[0];
+    int w = hi->acc_width;
+    emit_acc_slot_addr(out, f, push_op, 0);
+    if (hi->acc_loadpush) {
+        emit(out, "call\t%s", hi->acc_loadpush);
+    } else {
+        emit(out, "call\t%s", hi->acc_load);
+        emit(out, "call\t%s", hi->acc_push);
+    }
+    cur_sp_adjust += w;
+    emit_acc_slot_addr(out, f, acc_op, 0);
+    emit(out, "call\t%s", hi->acc_load);
+    emit(out, "call\t%s", hi->name);
+    cur_sp_adjust -= w;
+    invalidate_hl_cache(); invalidate_bc_cache();
+    store_hl(out, f, hi->ret_vreg);
+    return 0;
+}
+
+/* Wide memory-accumulator unary op (IR_ACC_UNOP): int→acc conversion,
+   acc→int conversion, or acc→acc move. Reuses the FA-residency cache so
+   a value already in the accumulator isn't reloaded. */
+static int gen_acc_unop(FILE *out, Func *f, const Op *op)
+{
+    HelperInfo *hi = op->hcall;
+    if (!hi || !hi->name || hi->ret_vreg < 0 || hi->n_args != 1) {
+        fputs("ir_lower: IR_ACC_UNOP malformed\n", stderr);
+        return -1;
+    }
+    int src = hi->args[0], dst = hi->ret_vreg;
+    if (hi->acc_subkind == 0) {
+        /* int → acc: load the int into HL/DEHL, convert (result in the
+           accumulator), store the accumulator to the dst slot. */
+        if (f->vregs[src].width == 4) load_to_dehl(out, f, src);
+        else                          load_to_hl(out, f, src);
+        emit(out, "call\t%s", hi->name);
+        emit_acc_slot_addr(out, f, dst, 0);
+        if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+        emit(out, "call\t%s", hi->acc_store);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = dst;
+        return 0;
+    }
+    if (hi->acc_subkind == 1) {
+        /* acc → int: load the accumulator (unless already resident),
+           convert (result in HL/DEHL), store to the int dst. */
+        if (cur_fa_vreg != src) {
+            emit_acc_slot_addr(out, f, src, 0);
+            emit(out, "call\t%s", hi->acc_load);
+        }
+        emit(out, "call\t%s", hi->name);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        if (f->vregs[dst].width == 4) store_dehl_finalize(out, f, dst);
+        else                         store_hl(out, f, dst);
+        return 0;
+    }
+    if (hi->acc_subkind == 3) {
+        /* Cross-family conversion (long long <-> 5/6/8-byte double): load the
+           source into its accumulator via the SRC family's load (l_i64_load
+           or dload), call the conversion (it reads one accumulator and writes
+           the other — __i64_acc / FA), then store from the DST accumulator
+           via the DST family's store (dstore or l_i64_store, BC for the
+           latter). The two accumulators are distinct memory areas, so no
+           FA-residency shortcut on the source. */
+        emit_acc_slot_addr(out, f, src, 0);
+        emit(out, "call\t%s", hi->acc_load);
+        emit(out, "call\t%s", hi->name);
+        emit_acc_slot_addr(out, f, dst, 0);
+        if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+        emit(out, "call\t%s", hi->acc_store);
+        invalidate_hl_cache(); invalidate_bc_cache();
+        cur_fa_vreg = dst;
+        return 0;
+    }
+    /* acc → acc move */
+    if (cur_fa_vreg != src) {
+        emit_acc_slot_addr(out, f, src, 0);
+        emit(out, "call\t%s", hi->acc_load);
+    }
+    emit_acc_slot_addr(out, f, dst, 0);
+    if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+    emit(out, "call\t%s", hi->acc_store);
+    invalidate_hl_cache(); invalidate_bc_cache();
+    cur_fa_vreg = dst;
     return 0;
 }
 
@@ -5266,6 +5585,9 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_AND: case IR_OR: case IR_XOR: return gen_bitop(out, f, op);
     case IR_CALL:                     return gen_call(out, f, op);
     case IR_HCALL:                    return gen_hcall(out, f, op);
+    case IR_ACC_BINOP:                return gen_acc_binop(out, f, op);
+    case IR_ACC_UNOP:                 return gen_acc_unop(out, f, op);
+    case IR_ACC_CMP:                  return gen_acc_cmp(out, f, op);
 
     default:
         fprintf(stderr, "ir_lower: unsupported op %s (kind=%d)\n",
@@ -5280,9 +5602,20 @@ static int lower_op(FILE *out, Func *f, const Op *op)
 static int lower_ret(FILE *out, Func *f, const Op *op)
 {
     int width = 0;
+    int is_acc = 0;
     if (op->src[0] >= 0) {
         width = f->vregs[op->src[0]].width;
-        if (width == 4) {
+        if (width > 4) {
+            /* Wide accumulator return: load the value into the
+               accumulator (FA for double); the teardown below preserves
+               it (it lives in memory / the alt-reg set, not HL/DEHL). */
+            is_acc = 1;
+            if (cur_fa_vreg != op->src[0]) {
+                emit_acc_slot_addr(out, f, op->src[0], 0);
+                emit(out, "call\t%s", acc_prim(f, op->src[0], "load"));
+                invalidate_hl_cache();
+            }
+        } else if (width == 4) {
             load_to_dehl(out, f, op->src[0]);
         } else {
             if (!hl_has(op->src[0]))
@@ -5300,7 +5633,13 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
         emit(out, "ld\tsp,%s", fr);
         emit(out, "pop\t%s", fr);
     } else if (f->frame_size > 0) {
-        if (width == 4) {
+        if (is_acc) {
+            /* Result is in the accumulator (memory / alt-regs) — a plain
+               sp restore is safe, nothing in HL/DE to preserve. */
+            emit(out, "ld\thl,%d", f->frame_size);
+            emit(out, "add\thl,sp");
+            emit(out, "ld\tsp,hl");
+        } else if (width == 4) {
             /* Long return: DE holds high half (preserved naturally by
                the sp-adjust). HL holds low half — stash in BC across
                the modstk, then restore. Mirrors sccz80's c_notaltreg
@@ -5318,6 +5657,14 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tsp,hl");
             emit(out, "ex\tde,hl");
         }
+    }
+    if (!fp_active(f) && frame_has_saved_fp(f)) {
+        /* Acc-tier function under -frameix: body addressed sp-relative, but
+           entry pushed IX (gen_push_frame). The locals (if any) were dropped
+           above, so sp now points at the saved IX — restore the caller's
+           frame pointer so `ret` reads the return address. Touches only
+           IX/SP, leaving the return value in HL/DEHL/FA intact. */
+        emit(out, "pop\t%s", frame_reg());
     }
     emit(out, "ret");
     return 0;
@@ -5369,7 +5716,12 @@ static void emit_prologue(FILE *out, Func *f)
        convention (z88dk default): args pushed left-to-right, so the
        leftmost param sits at the highest sp offset. */
     int args_total = param_stack_width(f);
-    int retaddr_off = f->frame_size;       /* return addr sits just above */
+    /* When entry pushed IX (frame_has_saved_fp), the saved IX sits between
+       the locals and the return address — args start 2 bytes higher. A
+       long long return adds a stuffed pointer just above the return
+       address, shifting args up another 2. */
+    int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 2 : 0)
+                    + (f->returns_longlong ? 2 : 0);
     int caller_off = retaddr_off + 2 + args_total; /* top of pushed args */
 
     /* Walk PARAM vregs in declaration order (creation order). */
