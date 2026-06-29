@@ -544,20 +544,6 @@
 	call	l_gint
 	ex	de,hl
 
-%title #280 inline l_pint via ld d,h; ld e,l; address; ld (hl),e/d (-0b, -27t)
-	ex	de,hl
-	ld	hl,%1	;const
-	add	hl,sp
-	ex	de,hl
-	call	l_pint
-=
-	ld	d,h
-	ld	e,l
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	(hl),e
-	inc	hl
-	ld	(hl),d
 
 %title #281 inline int xor/or/and with const → register-immediate pair (+2b, -27t)
 	ld	de,%1	;const

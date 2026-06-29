@@ -2190,6 +2190,14 @@ static SYMBOL *cse_make_stub_sym(Type *type)
     /* Leading digit means the name can never collide with a C
        identifier — every name with a digit prefix is internal-only. */
     snprintf(s->name, sizeof(s->name), "1cse_%d", cse_temp_seq++);
+    /* Decay arrays to pointers — the hoisted expression's "value" is
+       the array's first-element address, which fits a 2-byte pointer
+       slot. Storing it as KIND_ARRAY would ask the backend to allocate
+       a full array temp (which neither IR build nor the walker can do
+       for a synthesized local). Same rationale as make_licm_stub_sym. */
+    if (type && type->kind == KIND_ARRAY && type->ptr) {
+        type = make_pointer(type->ptr);
+    }
     s->ident = ID_VARIABLE;
     s->type = type ? type->kind : KIND_INT;
     s->ctype = type;

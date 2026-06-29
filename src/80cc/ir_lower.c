@@ -76,207 +76,6 @@ static void emit_op_cline(const Op *op)
     cur_emitted_file = op->file;
 }
 
-/* ----- Frame-slot assignment ------------------------------------------- */
-
-void ir_assign_slots(Func *f)
-{
-    free(f->vreg_spill_slot);
-    f->vreg_spill_slot = calloc(f->n_vregs, sizeof(int));
-    if (!f->vreg_spill_slot && f->n_vregs > 0) {
-        fputs("ir_lower: out of memory in ir_assign_slots\n", stderr);
-        abort();
-    }
-
-    /* Per-vreg "needs slot" decision is owned by ir_alloc.c: vregs with
-       phys == IR_PR_SPILL go into the interference / coloring loop below;
-       vregs with any register-pool assignment (IR_PR_HL / DE / BC /
-       DEHL) get slot = -1 — the lowerer never reads them from memory. */
-    int *needs_slot = calloc((size_t)f->n_vregs, sizeof(int));
-    if (!needs_slot && f->n_vregs > 0) {
-        fputs("ir_lower: out of memory in ir_assign_slots\n", stderr);
-        abort();
-    }
-    for (int v = 0; v < f->n_vregs; v++) {
-        needs_slot[v] = (f->vreg_to_phys
-                         && f->vreg_to_phys[v] != IR_PR_SPILL) ? 0 : 1;
-        /* Read-only param lives in the caller's pushed-arg slot;
-           slot_off returns that caller offset directly. */
-        if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
-            needs_slot[v] = 0;
-    }
-
-    /* Spill-slot coalescing: per-op interference. Walk each BB
-       backward from live_out, tracking live just AFTER each op; each
-       def interferes with the after-op live set. Same-width only.
-       Params and addr-taken vregs keep their own slots — the prologue
-       depends on a fixed param location, escaped addresses can outlive
-       the IR-visible lifetime. */
-    const int n_vregs = f->n_vregs;
-    const int row_words = (n_vregs + 31) / 32;
-    uint32_t *interf = NULL;
-    if (n_vregs > 0 && row_words > 0) {
-        interf = calloc((size_t)n_vregs * row_words, sizeof(uint32_t));
-        if (!interf) {
-            fputs("ir_lower: out of memory (interf)\n", stderr);
-            abort();
-        }
-    }
-    #define INTERF_ROW(v)         (&interf[(v) * row_words])
-    #define INTERF_SET(v1, v2)    do {                                       \
-        if ((v1) != (v2)) {                                                  \
-            INTERF_ROW(v1)[(v2) >> 5] |= (uint32_t)1 << ((v2) & 31);         \
-            INTERF_ROW(v2)[(v1) >> 5] |= (uint32_t)1 << ((v1) & 31);         \
-        }                                                                    \
-    } while (0)
-
-    /* Scratch live-set bitmap, one row of size n_vregs bits. */
-    uint32_t *live = NULL;
-    if (n_vregs > 0) {
-        live = calloc((size_t)row_words, sizeof(uint32_t));
-        if (!live) {
-            fputs("ir_lower: out of memory (live)\n", stderr);
-            abort();
-        }
-    }
-    #define LIVE_GET(v)   ((live[(v) >> 5] >> ((v) & 31)) & 1)
-    #define LIVE_SET(v)   (live[(v) >> 5] |=  (uint32_t)1 << ((v) & 31))
-    #define LIVE_CLEAR(v) (live[(v) >> 5] &= ~((uint32_t)1 << ((v) & 31)))
-
-    for (int b = 0; b < f->n_bbs; b++) {
-        BB *bb = &f->bbs[b];
-        memset(live, 0, (size_t)row_words * sizeof(uint32_t));   /* live = live_out */
-        if (bb->live_out) {
-            for (int v = 0; v < n_vregs; v++) {
-                if (ir_bitset_get((const BitSet *)bb->live_out, v))
-                    LIVE_SET(v);
-            }
-        }
-        /* Walk ops in reverse. At each op, `live` is the set of vregs
-           live just AFTER the op. Each def conflicts with every vreg in
-           the live set. Then update: live = (live - {defs}) ∪ {uses}. */
-        for (int j = bb->n_ops - 1; j >= 0; j--) {
-            Op *op = &bb->ops[j];
-            int defs[2]; int nd = ir_op_defs(op, defs, 2);
-            for (int k = 0; k < nd; k++) {
-                int d = defs[k];
-                if (d < 0 || d >= n_vregs) continue;
-                /* Conflict d with every currently-live vreg. */
-                uint32_t *drow = INTERF_ROW(d);
-                for (int w = 0; w < row_words; w++) {
-                    uint32_t live_w = live[w];
-                    if (!live_w) continue;
-                    drow[w] |= live_w;
-                    /* Reflect: each set bit in live_w points to a vreg
-                       v2; mark v2 → d. Walk bits in live_w. */
-                    while (live_w) {
-                        int bit = __builtin_ctz(live_w);
-                        int v2 = w * 32 + bit;
-                        if (v2 != d)
-                            INTERF_ROW(v2)[d >> 5] |=
-                                (uint32_t)1 << (d & 31);
-                        live_w &= live_w - 1;
-                    }
-                }
-                LIVE_CLEAR(d);
-            }
-            int uses[16]; int nu = ir_op_uses(op, uses, 16);
-            for (int k = 0; k < nu; k++) {
-                int u = uses[k];
-                if (u >= 0 && u < n_vregs) LIVE_SET(u);
-            }
-        }
-    }
-    free(live);
-    #undef LIVE_GET
-    #undef LIVE_SET
-    #undef LIVE_CLEAR
-
-    /* Greedy slot allocator. slot_members[s] = bitmap of vregs in slot s.
-       slot_width[s] = byte width. A new vreg can join slot s iff it
-       doesn't interfere with any current member of s. */
-    uint32_t *slot_members = NULL;
-    int      *slot_width   = NULL;
-    int       slot_cap     = 0;
-    int       slot_n       = 0;
-    int       offset       = 0;
-    #define SLOT_ROW(s) (&slot_members[(s) * row_words])
-
-    /* Pass 0: params and addr-taken — own slot each, vreg-id order.
-       Pass 1: others — first-fit across existing same-width slots. */
-    for (int pass = 0; pass < 2; pass++) {
-        for (int v = 0; v < n_vregs; v++) {
-            if (!needs_slot[v]) {
-                if (pass == 0) f->vreg_spill_slot[v] = -1;
-                continue;
-            }
-            VReg *vr = &f->vregs[v];
-            int is_pinned = (vr->flags & IR_VREG_PARAM)
-                         || (vr->flags & IR_VREG_ADDR_TAKEN);
-            if ((pass == 0) != is_pinned) continue;
-
-            int width = (vr->width > 0) ? vr->width : 2;
-            int chosen = -1;
-
-            if (pass == 1 && row_words > 0) {
-                /* First-fit across same-width slots. A slot is compatible
-                   if no member of the slot interferes with v. */
-                uint32_t *vrow = INTERF_ROW(v);
-                for (int s = 0; s < slot_n; s++) {
-                    if (slot_width[s] != width) continue;
-                    uint32_t *srow = SLOT_ROW(s);
-                    int conflict = 0;
-                    for (int w = 0; w < row_words; w++) {
-                        if (srow[w] & vrow[w]) { conflict = 1; break; }
-                    }
-                    if (!conflict) { chosen = s; break; }
-                }
-            }
-
-            if (chosen < 0) {
-                if (slot_n == slot_cap) {
-                    slot_cap = slot_cap ? slot_cap * 2 : 16;
-                    slot_members = realloc(slot_members,
-                        (size_t)slot_cap * row_words * sizeof(uint32_t));
-                    slot_width   = realloc(slot_width,
-                        (size_t)slot_cap * sizeof(int));
-                    if ((!slot_members && row_words > 0) || !slot_width) {
-                        fputs("ir_lower: out of memory (slot tables)\n",
-                              stderr);
-                        abort();
-                    }
-                    if (row_words > 0)
-                        memset(SLOT_ROW(slot_n), 0,
-                               (size_t)(slot_cap - slot_n) * row_words
-                               * sizeof(uint32_t));
-                }
-                chosen = slot_n++;
-                slot_width[chosen] = width;
-                if (row_words > 0)
-                    memset(SLOT_ROW(chosen), 0,
-                           (size_t)row_words * sizeof(uint32_t));
-                f->vreg_spill_slot[v] = offset;
-                offset += width;
-            } else {
-                int off_acc = 0;
-                for (int s = 0; s < chosen; s++) off_acc += slot_width[s];
-                f->vreg_spill_slot[v] = off_acc;
-            }
-            /* Add v itself to slot membership (so future candidates check
-               v's interference row). */
-            SLOT_ROW(chosen)[v >> 5] |= (uint32_t)1 << (v & 31);
-        }
-    }
-    f->frame_size = offset;
-
-    #undef SLOT_ROW
-    #undef INTERF_ROW
-    #undef INTERF_SET
-    free(slot_members);
-    free(slot_width);
-    free(interf);
-    free(needs_slot);
-}
-
 /* ----- Tiny emit helpers ------------------------------------------------ */
 
 static void emit(FILE *out, const char *fmt, ...)
@@ -308,6 +107,21 @@ static int cmp_label_counter;
    that loop on HL). When the next op reads cur_hl_vreg as src[0] we
    skip the load and use load_to_de_preserve_hl for src[1]. */
 static int cur_hl_vreg;
+
+/* Lazy spill (store-on-clobber) — LAZY_SPILL_PLAN.md §11. Behind the
+   IR_LAZY_SPILL env gate; the deferral itself is wired in a later step,
+   so while `pending_spill_v < 0` (always, until then) every hook below
+   is a no-op and codegen is byte-identical regardless of the flag.
+   `pending_spill_v` is the width-2 vreg whose slot store has been
+   deferred (it rides in HL, I1: pending_spill_v >= 0 ⇒ cur_hl_vreg ==
+   pending_spill_v); -1 = nothing pending. `cur_lazy_out`/`cur_lazy_func`
+   /`cur_op_idx` give the choke-point flush the emit stream + the
+   per-op liveness context (ir_op_live_in) it needs. */
+static int          lazy_spill_on;
+static int          pending_spill_v = -1;
+static FILE        *cur_lazy_out;
+static const Func  *cur_lazy_func;
+static int          cur_op_idx;
 
 /* DE value cache. Tracks which vreg currently lives in DE; survives
    emits that preserve DE (load_to_hl, add/sbc hl,de, byte ops),
@@ -414,11 +228,14 @@ static int slot_ix_off(const Func *f, int vreg_id)
    later in the file (kept together for readability). */
 static int  bc_has(int v);
 static int  hl_has(int v);
+static int  de_has(int v);
+static int  a_has(int v);
+static int  dehl_has(int v);
 static void cache_de(int v);
 static void cache_bc(int v);
+static void cache_dehl(int v);
 static void invalidate_hl_cache(void);
 static void invalidate_de_cache(void);
-static int a_has(int v);
 
 /* The single choke point through which HL's logical tenant changes.
    `hl_about_to_change(v_new)` is called immediately before HL is loaded
@@ -434,6 +251,36 @@ static int a_has(int v);
    rather than through hl_about_to_change. */
 static void hl_about_to_change(int v_new);
 static void swap_hl_de_caches(void);
+
+/* Lazy-spill choke-point helpers (LAZY_SPILL_PLAN.md §11). Defined
+   below, after cur_bb / store_hl / the cache helpers are all visible.
+   `pending_spill_resolve` is called from hl_about_to_change when HL is
+   about to be clobbered with a different tenant: it flushes the pending
+   store (if the value is still live) or discards it (if dead/redefined). */
+static void pending_spill_flush(void);
+static void pending_spill_resolve(void);
+
+/* Static lazy-spill recording hooks (defined below, after the cache
+   helpers). Called from the slot-read/write emitters above their
+   definitions. */
+static void ss_note_reload(const Func *f, int v);
+static void ss_note_store(const Func *f, int v);
+static void ss_note_cache_read(const Func *f, int v);
+static int  ss_store_dead_here(void);
+
+/* One lowering pass of a function: prologue + the per-BB emit loop.
+   Run once for the flag-off (single-pass) path, twice for the lazy-spill
+   two-pass path (pass 1 deferral-off to a scratch stream to populate the
+   complete bb_hl_out HL-tenant map, pass 2 for real with deferral on and
+   the cross-BB defer decision consulting bb_hl_out_p1). func_emit_idx is
+   NOT bumped here — both passes share the same labels. See
+   LAZY_SPILL_PLAN.md §11.6 / the two-pass design. */
+static int lower_func_render(FILE *out, Func *f, int lazy,
+                             const int *bb_hl_out_p1,
+                             int *bb_hl_out, int *bb_lowered,
+                             int *bb_pending_out,
+                             const int *bb_pred_cnt, int *const *bb_preds,
+                             const int *bb_alias);
 
 /* Data-stack sp adjustment — see comment at cur_stack_long_top below.
    Forward-defined here because the load_to_* wrappers depend on it. */
@@ -527,12 +374,18 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        check, `*p = x + 1` miscompiled: the IR_ADD's PR_HL result
        was overwritten by `ld hl,-1; add hl,sp; <byte load>` reading
        below the stack frame. */
-    if (hl_has(vreg_id) && sp_adj == 0) return;
+    if (hl_has(vreg_id) && sp_adj == 0) { ss_note_cache_read(f, vreg_id); return; }
+    /* Every path below clobbers HL (with vreg_id, or with a slot
+       address). If a width-2 spill is pending in HL, flush/discard it
+       here, while HL still holds it (LAZY_SPILL_PLAN.md §11). Dormant
+       until the deferral step sets pending_spill_v. */
+    pending_spill_resolve();
     /* PR_BC hit: skip the slot reload and copy from BC. 2 instructions
        vs the 6 the slot-read path emits. Only fires for width-2 vregs;
        ir_alloc enforces width=2 for PR_BC, but guard width anyway in
        case any caller passes a different vreg id. */
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
         emit(out, "ld\thl,bc");
         hl_about_to_change(vreg_id);
         return;
@@ -559,6 +412,9 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         hl_about_to_change(vreg_id);
         return;
     }
+    /* Past every register-cache hit: a real slot read follows on every
+       remaining path → record it for the dead-store analysis. */
+    ss_note_reload(f, vreg_id);
     int off = slot_off(f, vreg_id) + sp_adj + cur_sp_adjust;
     /* FP-relative fast path. IX captures sp at function entry, so its
        offset to any slot is invariant under push/pop activity — sp_adj
@@ -611,10 +467,14 @@ static void load_to_hl(FILE *out, const Func *f, int vreg_id)
    holds whatever DE was (junk to the caller). */
 static void load_to_de(FILE *out, const Func *f, int vreg_id)
 {
-    if (cur_de_vreg == vreg_id && vreg_id >= 0) return;
+    if (cur_de_vreg == vreg_id && vreg_id >= 0) {
+        ss_note_cache_read(f, vreg_id);
+        return;
+    }
     /* PR_BC hit: copy DE from BC directly. 2 instructions, doesn't
        disturb HL — better than load-via-HL-then-swap. */
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
         emit(out, "ld\te,c");
         emit(out, "ld\td,b");
         cache_de(vreg_id);
@@ -637,12 +497,25 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
     if (fp_active(f) && f->vregs[vreg_id].width == 2) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            ss_note_reload(f, vreg_id);
             emit(out, "ld\tde,(%s%+d)", frame_reg(), ix_off);
             cache_de(vreg_id);
             return;
         }
     }
     if (cur_hl_vreg == vreg_id && vreg_id >= 0) {
+        /* Served from HL (no slot read) — record the cache hit. */
+        ss_note_cache_read(f, vreg_id);
+        /* The wanted value is in HL. If it is the pending spill (I1:
+           pending_spill_v == cur_hl_vreg == vreg_id), flushing it writes
+           the slot AND leaves it in DE (store_hl's internal `ex de,hl`)
+           — the swap's exact result — so resolve instead of swapping
+           (LAZY_SPILL_PLAN.md §11). Dormant until the deferral step. */
+        if (lazy_spill_on && pending_spill_v == vreg_id) {
+            pending_spill_flush();   /* DE := vreg_id, slot written */
+            cache_de(vreg_id);
+            return;
+        }
         emit(out, "ex\tde,hl");
         /* HL ↔ DE swap: caches swap too. cur_hl now has what DE held
            (the old cur_de_vreg or -1); cur_de gets what HL held. */
@@ -655,6 +528,11 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
        load_to_hl + ex de,hl. HL is clobbered (same as the ex de,hl
        form when DE held junk — common). */
     if (f->vregs[vreg_id].width == 2) {
+        /* sp-rel byte walk clobbers HL with the slot address — flush a
+           pending spill first (here vreg_id != pending_spill_v; the
+           equal case was handled by the swap path above). Dormant. */
+        pending_spill_resolve();
+        ss_note_reload(f, vreg_id);
         int off = slot_off(f, vreg_id) + cur_sp_adjust;
         emit(out, "ld\thl,%d", off);
         emit(out, "add\thl,sp");
@@ -730,10 +608,6 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
     emit(out, "ld\t(hl),d");
 }
 
-static int a_has(int v);
-static int hl_has(int v);
-static int de_has(int v);
-
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
    if A already holds the wanted vreg (set by a prior IR_LD_MEM_VREG
    width=1 dead-skip or similar), skip the slot read entirely. */
@@ -744,8 +618,11 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
        register (L / E) — z80 little-endian. Honour those caches so
        a producer that left the byte in HL via the cur_dst_dead path
        (no spill) is still readable. */
-    if (hl_has(vreg_id)) { emit(out, "ld\ta,l"); return; }
-    if (de_has(vreg_id)) { emit(out, "ld\ta,e"); return; }
+    if (hl_has(vreg_id)) { ss_note_cache_read(f, vreg_id); emit(out, "ld\ta,l"); return; }
+    if (de_has(vreg_id)) { ss_note_cache_read(f, vreg_id); emit(out, "ld\ta,e"); return; }
+    /* Past the register-cache hits: a slot read follows (fp or sp). For a
+       width-2 deferrable vreg this is a partial reload of its slot. */
+    ss_note_reload(f, vreg_id);
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {
@@ -753,6 +630,9 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
+    /* The sp-rel slot read clobbers HL with the slot address — flush a
+       pending spill first (LAZY_SPILL_PLAN.md §11; dormant for now). */
+    pending_spill_resolve();
     int off = slot_off(f, vreg_id) + cur_sp_adjust;
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
@@ -776,6 +656,11 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
+    /* The sp-rel path clobbers HL (the slot address). Flush a pending
+       spill first, while HL still holds it and before `ld e,a` stashes
+       the byte into E (the flush's `ex de,hl` would otherwise trash it).
+       LAZY_SPILL_PLAN.md §11; dormant for now. */
+    pending_spill_resolve();
     int off = slot_off(f, vreg_id) + cur_sp_adjust;
     emit(out, "ld\te,a");          /* stash value across sp+off load */
     emit(out, "ld\thl,%d", off);
@@ -794,9 +679,6 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
    `sp_adj` compensates for caller pushes since the slot offset
    was last canonical (e.g. pushed args during a runtime-helper
    call setup). Pass 0 if sp is at its frame-entry position. */
-static int dehl_has(int v);
-static void cache_dehl(int v);
-static void invalidate_hl_cache(void);
 
 /* Partial load of a width-4 source for long IR_SHR with byte_shift ≥ 1.
    Reads only the source bytes that survive the shift directly into
@@ -960,6 +842,13 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     int no_hl = cur_load_to_dehl_no_hl;
     cur_load_to_dehl_no_hl = 0;
+    /* The long-load emits below (`ld hl,bc` cache recover, `ld hl,(ix)`,
+       the sp-rel slot walk) all clobber HL. Flush a pending width-2
+       spill first (LAZY_SPILL_PLAN.md §11; dormant for now). The
+       no-emit returns are safe: the no_hl cache-hit means the caller
+       overwrites HL itself, and the cur_hl_vreg==vreg_id hit can't
+       coincide with a width-2 pending (different widths). */
+    pending_spill_resolve();
     if (dehl_has(vreg_id)) {
         /* Cache hit: DE still has high half, BC has low half. Recover
            HL with 2 instructions (~12 T-states) vs ~120 for a full
@@ -978,6 +867,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 3)) {
+            ss_note_reload(f, vreg_id);   /* defensive: width-2 never here */
             emit(out, "ld\thl,(%s%+d)", frame_reg(), ix_off);
             emit(out, "ld\tde,(%s%+d)", frame_reg(), ix_off + 2);
             /* BC is untouched — set it to HL (low) so the DEHL cache
@@ -998,6 +888,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             return;
         }
     }
+    ss_note_reload(f, vreg_id);       /* defensive: width-2 never here */
     int off = slot_off(f, vreg_id) + sp_adj + cur_sp_adjust;
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
@@ -1243,7 +1134,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 {
     if (op->src[1] < 0) {
         /* Literal RHS — emit directly. Doesn't touch HL. */
-        if (!hl_has(op->src[0])) load_to_hl(out, f, op->src[0]);
+        load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         emit(out, "ld\tde,%lld", (long long)op->imm);
         invalidate_de_cache();
         return;
@@ -1255,9 +1146,18 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         return;
     }
     if (hl_has(op->src[1])) {
-        /* HL holds src[1] (the would-be DE-operand). Swap into DE.
-           Cache: HL ↔ DE swap. After: DE has src[1], HL has whatever
-           DE held — invalidate HL since the caller wants src[0] there. */
+        /* HL holds src[1] (the would-be DE-operand). If it is the
+           pending spill, flush it — store_hl writes the slot AND leaves
+           it in DE, the swap's intent (LAZY_SPILL_PLAN.md §11). */
+        if (lazy_spill_on && pending_spill_v == op->src[1]) {
+            pending_spill_flush();   /* DE := src1, slot written, HL junk */
+            cache_de(op->src[1]);
+            load_to_hl(out, f, op->src[0]);
+            return;
+        }
+        /* Swap into DE. Cache: HL ↔ DE swap. After: DE has src[1], HL
+           has whatever DE held — invalidate HL since the caller wants
+           src[0] there. */
         emit(out, "ex\tde,hl");
         swap_hl_de_caches();
         load_to_hl(out, f, op->src[0]);
@@ -1269,6 +1169,19 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         return;
     }
     if (de_has(op->src[0])) {
+        /* HL here holds neither src — if a spill is pending it is an
+           UNRELATED vreg, and store_hl's `ex de,hl` would clobber DE
+           (=src0). Resolve it (flush/discard), then rebuild both
+           operands from scratch since the src0 DE-cache may be gone
+           (LAZY_SPILL_PLAN.md §11). */
+        if (lazy_spill_on && pending_spill_v >= 0) {
+            pending_spill_resolve();
+            invalidate_de_cache();
+            load_to_de(out, f, op->src[1]);
+            cache_de(op->src[1]);
+            load_to_hl(out, f, op->src[0]);
+            return;
+        }
         /* DE has src[0] but we want it in HL. ex de,hl moves it; then
            we need src[1] loaded into DE. After ex de,hl: HL has src[0]
            (good), DE has whatever HL had (junk, but we're about to
@@ -1293,9 +1206,15 @@ static void cache_hl(int vreg)
 }
 
 /* Sole choke point for an HL clobber/load: see the forward-decl comment
-   near the cache-helper forward declarations. Pure setter for now. */
+   near the cache-helper forward declarations. When a width-2 spill is
+   pending in HL and HL is about to take a different tenant, resolve it
+   (flush if still live, discard if dead) BEFORE the physical clobber.
+   The `!= v_new` guard lets a def re-advertise its own dst (cache_hl) or
+   a carry re-assert the same vreg without spuriously flushing. */
 static void hl_about_to_change(int v_new)
 {
+    if (lazy_spill_on && pending_spill_v >= 0 && pending_spill_v != v_new)
+        pending_spill_resolve();
     cur_hl_vreg = v_new;
 }
 
@@ -1362,6 +1281,52 @@ static int cur_skip_next_op;
    inspect successor BBs' first ops. */
 static const BB *cur_bb;
 
+/* ---- Lazy spill (store-on-clobber) helpers — LAZY_SPILL_PLAN.md §11 --
+   Dormant until the deferral step wires `pending_spill_v` at the
+   spill sites; `pending_spill_v` is -1 here, so flush/resolve never run
+   and codegen is unchanged. Defined here (not at the cache helpers)
+   because the flush needs store_hl, the de-cache invalidator, cur_bb
+   and the per-op liveness — all visible by this point. */
+
+/* Is the pending vreg still live entering the op currently being
+   lowered? Conservative default (assume live → flush) when liveness
+   context is unavailable, so an unknown state never drops a live store. */
+static int pending_spill_live(void)
+{
+    if (pending_spill_v < 0) return 0;
+    if (!cur_bb) return 1;
+    const BitSet *li = ir_op_live_in(cur_bb, cur_op_idx);
+    if (!li) return 1;
+    return ir_bitset_get(li, pending_spill_v);
+}
+
+/* Emit the deferred slot store. Precondition (I1): HL physically holds
+   pending_spill_v. After: slot written, HL is junk (store_hl clobbers
+   it), DE cache dropped, nothing pending. Clears `pending_spill_v`
+   before emitting so a re-entrant choke-point call can't double-flush
+   (store_hl itself emits no cache-mutating calls). */
+static void pending_spill_flush(void)
+{
+    if (pending_spill_v < 0) return;
+    int v = pending_spill_v;
+    pending_spill_v = -1;
+    store_hl(cur_lazy_out, cur_lazy_func, v);
+    cur_hl_vreg = -1;
+    invalidate_de_cache();
+}
+
+/* Resolve a pending spill at a point where HL is about to be clobbered:
+   flush it if the value is still live (needed from a later slot read),
+   else discard it (dead or about to be redefined → the store was dead). */
+static void pending_spill_resolve(void)
+{
+    if (pending_spill_v < 0) return;
+    if (pending_spill_live())
+        pending_spill_flush();
+    else
+        pending_spill_v = -1;
+}
+
 /* Skip-and-cache list for the AND 0x8000 + BR + SHL-in-both-succs
    fastpath. When the fastpath fires, both succs' leading IR_SHL ops
    would re-shift a value the fused `add hl,hl` already produced.
@@ -1418,6 +1383,188 @@ static int vreg_in_register_pool(const Func *f, int v)
         || pr == IR_PR_BC || pr == IR_PR_DEHL;
 }
 
+/* ---- Static lazy spill — reaching-reloads dead-store elimination -------
+   LAZY_SPILL_PLAN.md §11 / §11.4 ("the two-pass static model made
+   faithful"). Behind IR_LAZY_SPILL. Pass 1 (record) lowers eagerly and
+   observes, per op, the deferrable-vreg slot accesses the lowerer makes —
+   ground truth, since deferral changes only stores, never which loads
+   cache-hit. A backward slot-liveness dataflow then marks a spill store
+   DEAD iff no reload of its slot is reachable before the next store. Pass
+   2 (elide) skips the dead stores; the value rides to its readers in HL
+   via the existing bb_hl_out carry. Keys on the lowerer's OWN behaviour,
+   not an IR-level deadness guess, so it survives the §2 fused-add-hl-hl
+   artifact.
+
+   SOUND-BY-CONSTRUCTION reload model: the per-op reload (GEN) set is
+   computed in ss_compute_dead as
+
+       { deferrable v in uses(op) : v NOT proven cache-served } ∪ explicit
+
+   i.e. EVERY deferrable source vreg is assumed reloaded from its slot
+   UNLESS pass 1 recorded a genuine register-cache hit for it (ss_op_cacheread,
+   set only at the loaders' cache-hit returns). So a MISSED hook can only
+   leave a store un-elided (lost optimization) — never elide a live store
+   (miscompile). Discipline is therefore INVERTED between the two arrays:
+     - cacheread MUST be precise (only at true cache hits) — over-recording
+       it is the unsafe direction (would hide a real reload);
+     - reload/store hooks may be incomplete — they are a belt-and-suspenders
+       backstop (e.g. the rare cache-hit-then-slot-reload of the same vreg
+       within one op), not the safety mechanism.
+   uses(op) comes from the IR (ir_op_uses), which is reliable. */
+static int                ss_phase;       /* 0 off, 1 record, 2 elide */
+static int               *ss_op_store;    /* [total_ops]   stored vreg / -1 */
+static int               *ss_op_reload;   /* [2*ops] explicit slot reloads   */
+static int               *ss_op_cacheread;/* [2*ops] proven register-served  */
+static const signed char *ss_store_dead;  /* [total_ops]   pass-2 verdict    */
+static const int         *ss_op_base;     /* [n_bbs] op-global-index base    */
+static int                ss_cur_g;       /* current op global idx, -1 none */
+static int                ss_pinned;      /* >2 accesses in an op → no elide */
+
+/* A width-2 local with a real slot whose spill store may be elided
+   (I4 exclusions: never ADDR_TAKEN / VOLATILE / PARAM / register-pool). */
+static int vreg_slot_deferrable(const Func *f, int v)
+{
+    if (v < 0) return 0;
+    if (f->vregs[v].width != 2) return 0;
+    if (f->vregs[v].flags
+        & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+        return 0;
+    if (vreg_in_register_pool(f, v)) return 0;
+    return 1;
+}
+
+/* Pass-1 hooks: note a slot reload / store of a deferrable vreg at the
+   op currently being lowered. */
+static void ss_note_reload(const Func *f, int v)
+{
+    if (ss_phase != 1 || ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
+    int *slot = &ss_op_reload[ss_cur_g * 2];
+    if (slot[0] == v || slot[1] == v) return;       /* dedup */
+    if (slot[0] < 0) { slot[0] = v; return; }
+    if (slot[1] < 0) { slot[1] = v; return; }
+    ss_pinned = 1;          /* >2 distinct reloads in one op — bail safely */
+}
+static void ss_note_store(const Func *f, int v)
+{
+    if (ss_phase != 1 || ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
+    ss_op_store[ss_cur_g] = v;
+}
+/* Pass-1 hook at a GENUINE register-cache hit (the loaders' early returns
+   that serve v from HL/DE/BC/A with no slot read). MUST be precise — this
+   is the proof that a use is NOT a reload, so a false positive would hide
+   a real reload. Under-recording only forgoes optimisation. */
+static void ss_note_cache_read(const Func *f, int v)
+{
+    if (ss_phase != 1 || ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
+    int *slot = &ss_op_cacheread[ss_cur_g * 2];
+    if (slot[0] == v || slot[1] == v) return;       /* dedup */
+    if (slot[0] < 0) { slot[0] = v; return; }
+    if (slot[1] < 0) { slot[1] = v; return; }
+    ss_pinned = 1;          /* >2 cache-served vregs in one op — bail safely */
+}
+/* Pass-2: is the store at the current op dead (slot never reloaded before
+   the next store)? */
+static int ss_store_dead_here(void)
+{
+    return ss_phase == 2 && ss_cur_g >= 0 && ss_store_dead
+        && ss_store_dead[ss_cur_g];
+}
+
+/* Set the GEN (reload) bits for op (b,j) into `work`. The sound-by-
+   construction set: every deferrable source vreg of the op is a reload
+   UNLESS pass 1 proved it register-served (in op_cacheread), plus the
+   explicit slot reloads as a backstop. Conservative: an unrecorded
+   cache-hit just leaves the vreg in GEN (store kept). */
+static void ss_gen_op(Func *f, int b, int j, int g, int nv,
+                      const int *op_reload, const int *op_cacheread,
+                      char *work)
+{
+    int r0 = op_reload[g * 2], r1 = op_reload[g * 2 + 1];
+    if (r0 >= 0 && r0 < nv) work[r0] = 1;
+    if (r1 >= 0 && r1 < nv) work[r1] = 1;
+    int uses[16];
+    int nu = ir_op_uses(&f->bbs[b].ops[j], uses,
+                        (int)(sizeof uses / sizeof uses[0]));
+    int c0 = op_cacheread[g * 2], c1 = op_cacheread[g * 2 + 1];
+    for (int u = 0; u < nu; u++) {
+        int uv = uses[u];
+        if (uv < 0 || uv >= nv || !vreg_slot_deferrable(f, uv)) continue;
+        if (uv == c0 || uv == c1) continue;   /* proven cache-served */
+        work[uv] = 1;                         /* assume slot reload */
+    }
+}
+
+/* Backward slot-liveness over the CFG. Returns a [total_ops] verdict
+   array: dead[g]==1 iff the spill store recorded at op g writes a slot
+   that no reload reads before the next store overwrites it — so the
+   store is dead and the value reaches its readers in HL. Standard
+   backward dataflow: per op, the store KILLs its vreg and the GEN set
+   (see ss_gen_op) re-adds reloaded vregs; a store is dead iff its vreg is
+   not slot-live immediately after. Caller owns the result (free). */
+static signed char *ss_compute_dead(Func *f, const int *op_base,
+                                    int total_ops, const int *op_store,
+                                    const int *op_reload,
+                                    const int *op_cacheread)
+{
+    int sz = total_ops > 0 ? total_ops : 1;
+    signed char *dead = calloc((size_t)sz, 1);
+    int nv = f->n_vregs > 0 ? f->n_vregs : 1;
+    char **lin = calloc((size_t)f->n_bbs, sizeof(char *));
+    char *work = malloc((size_t)nv);
+    if (!dead || !lin || !work) { free(dead); free(lin); free(work); return NULL; }
+    for (int b = 0; b < f->n_bbs; b++) {
+        lin[b] = calloc((size_t)nv, 1);
+        if (!lin[b]) {
+            for (int k = 0; k < b; k++) free(lin[k]);
+            free(lin); free(work); free(dead); return NULL;
+        }
+    }
+    /* Fixpoint: slot-live-in grows monotonically, so this converges. */
+    int changed = 1;
+    while (changed) {
+        changed = 0;
+        for (int b = f->n_bbs - 1; b >= 0; b--) {
+            BB *bb = &f->bbs[b];
+            memset(work, 0, (size_t)nv);
+            for (int s = 0; s < 2; s++) {
+                int sb = bb->succ[s];
+                if (sb >= 0 && sb < f->n_bbs)
+                    for (int v = 0; v < nv; v++) if (lin[sb][v]) work[v] = 1;
+            }
+            for (int j = bb->n_ops - 1; j >= 0; j--) {
+                int g = op_base[b] + j;
+                int sv = op_store[g];
+                if (sv >= 0 && sv < nv) work[sv] = 0;        /* store kills */
+                ss_gen_op(f, b, j, g, nv, op_reload, op_cacheread, work);
+            }
+            if (memcmp(work, lin[b], (size_t)nv) != 0) {
+                memcpy(lin[b], work, (size_t)nv);
+                changed = 1;
+            }
+        }
+    }
+    /* Final backward sweep: a store is dead iff its slot is not live
+       immediately after it (processed before the kill, in op order). */
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        memset(work, 0, (size_t)nv);
+        for (int s = 0; s < 2; s++) {
+            int sb = bb->succ[s];
+            if (sb >= 0 && sb < f->n_bbs)
+                for (int v = 0; v < nv; v++) if (lin[sb][v]) work[v] = 1;
+        }
+        for (int j = bb->n_ops - 1; j >= 0; j--) {
+            int g = op_base[b] + j;
+            int sv = op_store[g];
+            if (sv >= 0 && sv < nv) { dead[g] = work[sv] ? 0 : 1; work[sv] = 0; }
+            ss_gen_op(f, b, j, g, nv, op_reload, op_cacheread, work);
+        }
+    }
+    for (int b = 0; b < f->n_bbs; b++) free(lin[b]);
+    free(lin); free(work);
+    return dead;
+}
+
 /* True if v is allocator-pinned to DE. Producer sites use this to
    redirect the final write into D/E instead of H/L then cache_de(v). */
 static int vreg_is_pr_de(const Func *f, int v)
@@ -1453,6 +1600,14 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
         }
         return;
     }
+    ss_note_store(f, vreg);
+    if (ss_store_dead_here()) {
+        /* Dead spill (no reload reaches it before the next store): skip
+           the store AND the swap-back — HL already holds the value, the
+           caller's cache_hl(dst) keeps it advertised, and it reaches its
+           readers via the HL carry (folds §10a). */
+        return;
+    }
     store_hl(out, f, vreg);
     emit(out, "ex\tde,hl");
     invalidate_de_cache();
@@ -1466,6 +1621,14 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 {
     if (cur_dst_dead || vreg_in_register_pool(f, vreg)) {
+        emit(out, "ex\tde,hl");
+        invalidate_de_cache();
+        return;
+    }
+    ss_note_store(f, vreg);
+    if (ss_store_dead_here()) {
+        /* Dead spill: skip the slot write, just bring the value into HL
+           (the value is in DE on entry here). */
         emit(out, "ex\tde,hl");
         invalidate_de_cache();
         return;
@@ -1486,6 +1649,8 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 static void spill_unless_dead(FILE *out, const Func *f, int vreg)
 {
     if (cur_dst_dead || vreg_in_register_pool(f, vreg)) return;
+    ss_note_store(f, vreg);
+    if (ss_store_dead_here()) return;   /* dead spill; HL already holds it */
     store_hl(out, f, vreg);
     /* store_hl's internal `ex de,hl` puts the spilled value into DE
        (then walks HL through memory). DE now has dst's value; the
@@ -1641,6 +1806,31 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
         /* Long slot-to-slot copy. */
         load_to_dehl(out, f, op->src[0]);
         store_dehl_finalize(out, f, op->dst);
+        return 0;
+    }
+    if (dst_w == 1) {
+        /* Byte dst: store ONE byte via A. The generic HL path below
+           uses store_hl, which always writes TWO bytes and overruns a
+           slot ir_assign_slots sized at 1 (BUG_LOG A33 overrun class —
+           same fix as gen_ld_imm / gen_conv_trunc). A MOV with a wider
+           source (e.g. `c = c ^ x` where c is char: the int-promoted
+           XOR is width 2) takes the source's low byte. */
+        int src_w = f->vregs[op->src[0]].width;
+        if (src_w == 1) {
+            load_byte_to_a(out, f, op->src[0]);
+        } else if (src_w == 4) {
+            load_to_dehl(out, f, op->src[0]);
+            emit(out, "ld\ta,l");
+            invalidate_hl_cache();
+        } else {
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,l");
+        }
+        if (cur_dst_dead || vreg_in_register_pool(f, op->dst)) {
+            cache_a(op->dst);
+        } else {
+            store_a_byte(out, f, op->dst);
+        }
         return 0;
     }
     if (vreg_is_pr_de(f, op->dst)) {
@@ -1826,6 +2016,170 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Inlined const-count memset (IR_MEMSET): src[0] = dst pointer,
+   src[1] = fill byte value, imm = count (>0). Loads the fill byte
+   into E (load_to_de leaves the low byte there) and the dst pointer into
+   HL (load_to_hl preserves DE).
+
+   Small counts (<=8): unroll `ld (hl),e; inc hl`. Uses E (not A, not B)
+   so it neither disturbs a byte-cache nor clobbers a PR_BC tenant. HL is
+   left junk → invalidate.
+
+   Mid counts (9..255): a `djnz` fill loop (`ld b,N; ld (hl),e; inc hl;
+   djnz`). 6 bytes — 3 smaller than the ldir form — at the cost of 5 T/
+   byte (26 vs 21), so the size win runs ~42 T at N=9 up to ~1.3k T near
+   N=255. Chosen for size, since avoiding the library call is the point.
+
+   Large counts (>=256, B can't hold the count): overlapping-`ldir` fill
+   — store the byte once at dst, then `ld d,h; ld e,l; inc de; ld bc,N-1;
+   ldir` copies it forward (each step reads the byte just written), a
+   constant 9 bytes.
+
+   Both clobber BC/DE/HL: DE is a reload-safe cache (cleared below); a
+   live PR_BC tenant is saved/restored around the loop (djnz writes B). */
+static int gen_memset(FILE *out, Func *f, const Op *op)
+{
+    int n = (int)op->imm;
+    if (n <= 0) return 0;
+    load_to_de(out, f, op->src[1]);   /* DE = fill value; E = low byte */
+    load_to_hl(out, f, op->src[0]);   /* HL = dst (preserves DE) */
+    if (n <= 8) {
+        for (int i = 0; i < n; i++) {
+            emit(out, "ld\t(hl),e");
+            if (i < n - 1) emit(out, "inc\thl");
+        }
+        invalidate_hl_cache();
+        return 0;
+    }
+    int bc_live = (cur_bc_vreg >= 0);
+    int save_bc = cur_bc_vreg;
+    if (bc_live) emit(out, "push\tbc");
+    if (n < 256) {
+        int lbl = cmp_label_counter++;
+        emit(out, "ld\tb,%d", n);
+        fprintf(out, "L_f%d_memset_loop_%d:\n", func_emit_idx, lbl);
+        emit(out, "ld\t(hl),e");
+        emit(out, "inc\thl");
+        emit(out, "djnz\tL_f%d_memset_loop_%d", func_emit_idx, lbl);
+    } else {
+        emit(out, "ld\t(hl),e");      /* dst[0] = fill */
+        emit(out, "ld\td,h");
+        emit(out, "ld\te,l");
+        emit(out, "inc\tde");         /* DE = dst+1, HL = dst */
+        emit(out, "ld\tbc,%d", n - 1);
+        emit(out, "ldir");
+    }
+    if (bc_live) emit(out, "pop\tbc");
+    invalidate_hl_cache();            /* HL/DE/DEHL/A all junk now */
+    if (bc_live) cur_bc_vreg = save_bc; /* pop restored BC */
+    return 0;
+}
+
+/* Inlined const-count memcpy (IR_MEMCPY): src[0] = dst pointer,
+   src[1] = src pointer, imm = count (>0). Loads dst into DE and src into
+   HL (load_to_hl preserves DE).
+
+   Tiny counts (<=3): unroll `ld a,(hl); ld (de),a; inc hl; inc de` — no
+   BC clobber, so no PR_BC save needed; A is left junk.
+
+   Larger counts: `ld bc,N; ldir` (HL=src → DE=dst). Clobbers BC/DE/HL;
+   DE is a reload-safe cache (cleared below); a live PR_BC tenant is
+   saved/restored. HL/DE are left junk → invalidate. */
+static int gen_memcpy(FILE *out, Func *f, const Op *op)
+{
+    int n = (int)op->imm;
+    if (n <= 0) return 0;
+    load_to_de(out, f, op->src[0]);   /* DE = dst */
+    load_to_hl(out, f, op->src[1]);   /* HL = src (preserves DE) */
+    if (n <= 3) {
+        for (int i = 0; i < n; i++) {
+            emit(out, "ld\ta,(hl)");
+            emit(out, "ld\t(de),a");
+            if (i < n - 1) {
+                emit(out, "inc\thl");
+                emit(out, "inc\tde");
+            }
+        }
+        invalidate_hl_cache();        /* clears HL/DE/A caches */
+        return 0;
+    }
+    int bc_live  = (cur_bc_vreg >= 0);
+    int save_bc  = cur_bc_vreg;
+    if (bc_live) emit(out, "push\tbc");
+    emit(out, "ld\tbc,%d", n);
+    emit(out, "ldir");
+    if (bc_live) emit(out, "pop\tbc");
+    invalidate_hl_cache();
+    if (bc_live) cur_bc_vreg = save_bc;
+    return 0;
+}
+
+/* Inlined __builtin_strcpy (IR_STRCPY): src[0] = dst, src[1] = src.
+   DE = dst, HL = src, then a NUL-terminated copy loop:
+   `xor a; L: cp (hl); ldi; jr nz,L` — cp sets Z when *src==0 (ldi
+   leaves Z untouched, only touching P/V), so the NUL is copied and the
+   loop exits. `ldi` decrements BC: a live PR_BC tenant is saved/
+   restored. Returns dst (the dst vreg reaches its readers via its slot;
+   HL/DE/A left junk → invalidate). */
+static int gen_strcpy(FILE *out, Func *f, const Op *op)
+{
+    int lbl = cmp_label_counter++;
+    load_to_de(out, f, op->src[0]);   /* DE = dst */
+    load_to_hl(out, f, op->src[1]);   /* HL = src (preserves DE) */
+    int bc_live = (cur_bc_vreg >= 0);
+    int save_bc = cur_bc_vreg;
+    if (bc_live) emit(out, "push\tbc");
+    emit(out, "xor\ta");
+    fprintf(out, "L_f%d_strcpy_%d:\n", func_emit_idx, lbl);
+    emit(out, "cp\t(hl)");
+    emit(out, "ldi");
+    emit(out, "jr\tnz,L_f%d_strcpy_%d", func_emit_idx, lbl);
+    if (bc_live) emit(out, "pop\tbc");
+    invalidate_hl_cache();
+    if (bc_live) cur_bc_vreg = save_bc;
+    return 0;
+}
+
+/* Inlined __builtin_strchr (IR_STRCHR): dst = result, src[0] = string,
+   src[1] = char vreg (or -1 + imm for a literal char). HL = string,
+   E = search char, then a scan loop:
+       L: ld a,(hl); cp e; jr z,END   ; match → HL points at it
+          and a; inc hl; jr nz,L      ; not NUL → keep scanning
+          ld h,a; ld l,h              ; hit NUL (a==0) → HL = NULL
+       END:
+   Pure read (no memory write); result HL stored to dst. */
+static int gen_strchr(FILE *out, Func *f, const Op *op)
+{
+    int start = cmp_label_counter++;
+    int end   = cmp_label_counter++;
+    if (op->src[1] >= 0) {
+        load_to_de(out, f, op->src[1]);   /* E = search char (low byte) */
+        load_to_hl(out, f, op->src[0]);   /* HL = string (preserves DE) */
+    } else {
+        load_to_hl(out, f, op->src[0]);   /* HL = string */
+        emit(out, "ld\te,%d", (int)(op->imm & 0xff));
+        invalidate_de_cache();            /* E no longer caches a vreg */
+    }
+    fprintf(out, "L_f%d_strchr_%d:\n", func_emit_idx, start);
+    emit(out, "ld\ta,(hl)");
+    emit(out, "cp\te");
+    emit(out, "jr\tz,L_f%d_strchr_%d", func_emit_idx, end);
+    emit(out, "and\ta");
+    emit(out, "inc\thl");
+    emit(out, "jr\tnz,L_f%d_strchr_%d", func_emit_idx, start);
+    emit(out, "ld\th,a");                 /* a==0 here → HL = 0 (NULL) */
+    emit(out, "ld\tl,h");
+    fprintf(out, "L_f%d_strchr_%d:\n", func_emit_idx, end);
+    /* Result is in HL (cur_hl_vreg still claims the string vreg — stale,
+       but the canonical finalize below overwrites it, same as gen_neg).
+       The loop clobbered A and (const path) E → drop those claims. */
+    cur_a_vreg = -1;
+    invalidate_de_cache();
+    spill_and_swap_unless_dead(out, f, op->dst);
+    cache_hl(op->dst);
+    return 0;
+}
+
 static int gen_poststep(FILE *out, Func *f, const Op *op)
 {
     /* dst = old value of src[0]; src[0] += imm (+1 / -1). The stepped
@@ -1838,6 +2192,7 @@ static int gen_poststep(FILE *out, Func *f, const Op *op)
         && fp_offset_fits(slot_ix_off(f, x) + 1)) {
         int d = slot_ix_off(f, x);
         if (!hl_has(x)) {
+            ss_note_reload(f, x);
             emit(out, "ld\tl,(%s%+d)", frame_reg(), d);
             emit(out, "ld\th,(%s%+d)", frame_reg(), d + 1);
         }
@@ -1854,6 +2209,7 @@ static int gen_poststep(FILE *out, Func *f, const Op *op)
         int save_de = cur_de_vreg, save_dehl = cur_dehl_vreg;
         if (de_live)
             emit(out, "push\tde");
+        ss_note_reload(f, x);
         int off = slot_off(f, x) + cur_sp_adjust + (de_live ? 2 : 0);
         emit(out, "ld\thl,%d", off);
         emit(out, "add\thl,sp");
@@ -1901,7 +2257,7 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
     if (sw->is_char && !is_long) {
         /* Inline cp chain — cp is cheap and the table's call/terminator
            overhead doesn't pay for byte compares. */
-        if (!hl_has(op->src[0])) load_to_hl(out, f, op->src[0]);
+        load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         emit(out, "ld\ta,l");
         for (int i = 0; i < sw->n_cases; i++) {
             int k = (int)(sw->values[i] & 0xFF);
@@ -1930,7 +2286,7 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
             emit(out, "defw\t%d", (int)((sw->values[i] >> 16) & 0xFFFF));
         }
     } else {
-        if (!hl_has(op->src[0])) load_to_hl(out, f, op->src[0]);
+        load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         emit(out, "call\tl_case");
         for (int i = 0; i < sw->n_cases; i++) {
             emit(out, "defw\tL_f%d_bb_%d", func_emit_idx,
@@ -2528,6 +2884,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            result. Read it directly; skip the high byte. Only
            fires on a slot read. */
         if (count >= 8 && !hl_has(op->src[0])) {
+            ss_note_reload(f, op->src[0]);
             if (fp_active(f)) {
                 int ix = slot_ix_off(f, op->src[0]);
                 if (fp_offset_fits(ix)) {
@@ -2543,7 +2900,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tl,0");
             goto shl_int_bit_remainder;
         }
-        if (!hl_has(op->src[0])) load_to_hl(out, f, op->src[0]);
+        load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         /* Strength reduction for shifts of 8+: the high byte of
            the input is shifted out entirely, so the result has
            input's low byte in H and 0 in L. Then any extra shifts
@@ -3853,6 +4210,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             if (ok) {
                 if (!hl_has(op->src[0]))
                     load_to_hl(out, f, op->src[0]);
+                else
+                    ss_note_cache_read(f, op->src[0]);  /* served from HL */
                 emit(out, "add\thl,hl");
                 /* CF = old bit 15 of src[0]. BR_ZERO branches when
                    AND result was 0 → old bit 15 was 0 → CF clear. */
@@ -4151,7 +4510,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         emit(out, "call\tl_jphl");
     } else {
         emit(out, "call\t%s%s",
-             ir_sym_prefix(ci->target), ir_sym_name(ci->target));
+             ir_sym_prefix(ci->target),
+             ci->target_name ? ci->target_name : ir_sym_name(ci->target));
     }
 
     /* Caller-cleanup for SMALLC and STDC (CALLEE cleans its own).
@@ -4199,7 +4559,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         int ret_w = f->vregs[ci->ret_vreg].width;
         if (ret_w == 4)
             store_dehl_cached(out, f, ci->ret_vreg);
-        else
+        else if (ret_w == 1) {
+            /* Byte return: the value is in HL (low byte in L, char-
+               widened by the callee). store_hl writes 2 bytes and
+               overruns a 1-byte slot — `unsigned char c = f();` (c
+               coalesced with the ret vreg) clobbered the next local /
+               the return address. Same overrun class as the gen_mov /
+               gen_ld_imm byte paths. */
+            emit(out, "ld\ta,l");
+            if (cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+                cache_a(ci->ret_vreg);
+            else
+                store_a_byte(out, f, ci->ret_vreg);
+        } else
             store_hl(out, f, ci->ret_vreg);
     }
 
@@ -4779,6 +5151,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            result. Read it directly; skip the low byte. Only fires
            on a slot read (HL cache hit takes the existing path). */
         if (count >= 8 && !hl_has(op->src[0])) {
+            ss_note_reload(f, op->src[0]);
             if (fp_active(f)) {
                 int ix = slot_ix_off(f, op->src[0]);
                 if (fp_offset_fits(ix + 1)) {
@@ -4794,7 +5167,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit(out, "ld\th,0");
             goto shr_int_bit_remainder;
         }
-        if (!hl_has(op->src[0])) load_to_hl(out, f, op->src[0]);
+        load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         /* Mirror of the SHL ≥8 strength reduction: shift right by
            8 just moves H→L and zeros H. Extra `srl l` cycles cover
            the remainder above 8. */
@@ -4866,6 +5239,10 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_POP_DEHL_LONG:     return gen_pop_dehl_long(out, f, op);
     case IR_PUSH_ARG:          return gen_push_arg(out, f, op);
     case IR_ASM:               return gen_asm(out, f, op);
+    case IR_MEMSET:            return gen_memset(out, f, op);
+    case IR_MEMCPY:            return gen_memcpy(out, f, op);
+    case IR_STRCPY:            return gen_strcpy(out, f, op);
+    case IR_STRCHR:            return gen_strchr(out, f, op);
 
     case IR_LD_IMM:            return gen_ld_imm(out, f, op);
     case IR_MOV:               return gen_mov(out, f, op);
@@ -5193,26 +5570,21 @@ int ir_lower_func(FILE *out, Func *f)
        computed, so the dump reflects the allocator's view. */
     if (getenv("IR_DUMP_ALLOC"))
         ir_dump_func(stderr, f);
-    cmp_label_counter = 0;
+    /* Bumped once per function — both lowering passes (when lazy spill
+       does two) share the same func label prefix. */
     func_emit_idx++;
-    invalidate_hl_cache();
-    invalidate_bc_cache();
-    cur_sp_adjust = 0;
-    bc_args_save_depth = 0;
-    cur_stack_long_top = -1;
-    cur_dehl_inline_push = -1;
-    cur_dehl_inline_push_base_sp = 0;
-    cur_dehl_push_to_stack = 0;
-    cur_emitted_file = NULL;
-    cur_emitted_line = 0;
-    shl_skip_n = 0;
-    cur_bb = NULL;
+    /* Lazy-spill config (LAZY_SPILL_PLAN.md §11). Read once; the
+       per-pass deferral state lives in lower_func_render. Default ON
+       (sound-by-construction static reaching-reloads model; validated
+       flag-on === flag-off across the suite corpus, intbench −30%);
+       IR_NO_LAZY_SPILL opts out (restores the single-pass, byte-
+       identical-to-pre-lazy-spill lowering for A/B + bisecting). */
+    lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
+    int want_lazy = lazy_spill_on;
 
     /* No function label here — the surrounding legacy scaffolding
-       (declparse.c + codegen.c) already emits `._<name>`. The lowerer
-       just emits the prologue + body inside that label. */
-
-    emit_prologue(out, f);
+       (declparse.c + codegen.c) already emits `._<name>`. The render
+       helper emits the prologue + body inside that label. */
 
     /* Per-BB hl_out: which vreg HL holds at the end of the BB's
        emission, or -1 if unknown. Used to carry the cache across
@@ -5220,12 +5592,19 @@ int ir_lower_func(FILE *out, Func *f)
        on the HL state. */
     int *bb_hl_out = malloc((size_t)f->n_bbs * sizeof(int));
     int *bb_lowered = calloc((size_t)f->n_bbs, sizeof(int));
+    /* Per-BB pending-spill out: which width-2 vreg (if any) left this BB
+       deferred (unstored, riding the HL carry) — the dual of bb_hl_out
+       for the lazy-spill cross-BB carry (LAZY_SPILL_PLAN.md §11). -1 =
+       none. Plumbing only in this step; the inherit decision and the
+       deferral that populates it land with the defer step. */
+    int *bb_pending_out = malloc((size_t)f->n_bbs * sizeof(int));
     /* Predecessor table: bb_preds[bb] = list of pred bb ids,
        bb_pred_cnt[bb] = length. Derived from succ[] of every BB. */
     int *bb_pred_cnt = calloc((size_t)f->n_bbs, sizeof(int));
     int **bb_preds = calloc((size_t)f->n_bbs, sizeof(int *));
     for (int i = 0; i < f->n_bbs; i++) {
         bb_hl_out[i] = -1;
+        bb_pending_out[i] = -1;
         for (int s = 0; s < 2; s++) {
             int sb = f->bbs[i].succ[s];
             if (sb >= 0 && sb < f->n_bbs) bb_pred_cnt[sb]++;
@@ -5277,6 +5656,177 @@ int ir_lower_func(FILE *out, Func *f)
         }
     }
 
+    /* === Pass driver ===
+       Flag-off: a single render with deferral off — byte-identical to
+       the pre-lazy-spill lowerer (zero master risk). Flag-on: pass 1
+       renders deferral-off into a throwaway memstream purely to populate
+       the COMPLETE bb_hl_out HL-tenant map (deferral never changes which
+       vreg HL holds at a BB end — cache_hl(v) advertises HL=v whether or
+       not the store is emitted), then pass 2 renders for real with
+       deferral on, its cross-BB defer decision consulting that complete
+       map. */
+    int rc;
+    int *bb_hl_out_p1 = NULL;
+    /* Static lazy-spill state — off unless the two-pass path arms it. */
+    ss_phase = 0;
+    ss_op_base = NULL;
+    ss_op_store = NULL;
+    ss_op_reload = NULL;
+    ss_op_cacheread = NULL;
+    ss_store_dead = NULL;
+    ss_cur_g = -1;
+    ss_pinned = 0;
+    if (!want_lazy) {
+        rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
+                               bb_pending_out, bb_pred_cnt, bb_preds,
+                               bb_alias);
+    } else {
+        bb_hl_out_p1 = malloc((size_t)f->n_bbs * sizeof(int));
+        /* Snapshot the only operands the lowering loop mutates in place
+           (the commutative-swap at the DEHL-cache lookahead, ~src[0]<->
+           src[1] of the next op). Pass 1 re-applies that swap; without a
+           restore, pass 2 would lower already-swapped IR and its
+           downstream lookaheads (e.g. the inline-push predictor) would
+           diverge from a single pass. */
+        int total_ops = 0;
+        int *op_base = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1)
+                              * sizeof(int));
+        for (int b = 0; b < f->n_bbs; b++) {
+            if (op_base) op_base[b] = total_ops;
+            total_ops += f->bbs[b].n_ops;
+        }
+        int osz = total_ops > 0 ? total_ops : 1;
+        int *op_store = malloc((size_t)osz * sizeof(int));
+        int *op_reload = malloc((size_t)osz * 2 * sizeof(int));
+        int *op_cacheread = malloc((size_t)osz * 2 * sizeof(int));
+        if (op_store) for (int i = 0; i < osz; i++) op_store[i] = -1;
+        if (op_reload) for (int i = 0; i < osz * 2; i++) op_reload[i] = -1;
+        if (op_cacheread) for (int i = 0; i < osz * 2; i++) op_cacheread[i] = -1;
+        int *src_snap = total_ops
+            ? malloc((size_t)total_ops * 2 * sizeof(int)) : NULL;
+        if (src_snap) {
+            int t = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int o = 0; o < f->bbs[b].n_ops; o++) {
+                    src_snap[t++] = f->bbs[b].ops[o].src[0];
+                    src_snap[t++] = f->bbs[b].ops[o].src[1];
+                }
+        }
+        char *sbuf = NULL;
+        size_t slen = 0;
+        int alloc_ok = bb_hl_out_p1 && op_base && op_store && op_reload
+            && op_cacheread && (src_snap || !total_ops);
+        FILE *scratch = alloc_ok ? open_memstream(&sbuf, &slen) : NULL;
+        if (!scratch) {
+            /* Degraded (OOM / no memstream): single deferral-off pass.
+               Correct, just forgoes the lazy win. */
+            rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
+                                   bb_pending_out, bb_pred_cnt, bb_preds,
+                                   bb_alias);
+            free(src_snap);
+        } else {
+            /* Pass 1: record the slot stores/reloads the lowerer emits. */
+            ss_op_base = op_base;
+            ss_op_store = op_store;
+            ss_op_reload = op_reload;
+            ss_op_cacheread = op_cacheread;
+            ss_store_dead = NULL;
+            ss_pinned = 0;
+            ss_phase = 1;
+            rc = lower_func_render(scratch, f, 0, NULL, bb_hl_out,
+                                   bb_lowered, bb_pending_out, bb_pred_cnt,
+                                   bb_preds, bb_alias);
+            ss_phase = 0;
+            fclose(scratch);
+            free(sbuf);
+            /* Restore the operands pass 1 swapped in place (see snapshot
+               above) so pass 2 lowers the same IR a single pass would. */
+            if (src_snap) {
+                int t = 0;
+                for (int b = 0; b < f->n_bbs; b++)
+                    for (int o = 0; o < f->bbs[b].n_ops; o++) {
+                        f->bbs[b].ops[o].src[0] = src_snap[t++];
+                        f->bbs[b].ops[o].src[1] = src_snap[t++];
+                    }
+            }
+            if (rc == 0) {
+                /* Backward slot-liveness → which spill stores are dead.
+                   ss_pinned (an op with >2 distinct reloads — never seen
+                   in practice) bails to no elision, which is correct. */
+                signed char *store_dead = ss_pinned ? NULL
+                    : ss_compute_dead(f, op_base, total_ops, op_store,
+                                      op_reload, op_cacheread);
+                /* Pass 2: skip the dead stores. */
+                ss_store_dead = store_dead;
+                ss_phase = store_dead ? 2 : 0;
+                rc = lower_func_render(out, f, 1, bb_hl_out_p1, bb_hl_out,
+                                       bb_lowered, bb_pending_out,
+                                       bb_pred_cnt, bb_preds, bb_alias);
+                ss_phase = 0;
+                ss_store_dead = NULL;
+                free(store_dead);
+            }
+            free(src_snap);
+        }
+        free(op_base);
+        free(op_store);
+        free(op_reload);
+        free(op_cacheread);
+        ss_op_base = NULL;
+        ss_op_store = NULL;
+        ss_op_reload = NULL;
+        ss_op_cacheread = NULL;
+    }
+    free(bb_hl_out_p1);
+
+    free(bb_alias);
+    free(bb_hl_out);
+    free(bb_pending_out);
+    free(bb_lowered);
+    free(bb_pred_cnt);
+    for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
+    free(bb_preds);
+    ir_free_liveness(f);
+    return rc;
+}
+
+static int lower_func_render(FILE *out, Func *f, int lazy,
+                             const int *bb_hl_out_p1,
+                             int *bb_hl_out, int *bb_lowered,
+                             int *bb_pending_out,
+                             const int *bb_pred_cnt, int *const *bb_preds,
+                             const int *bb_alias)
+{
+    /* Per-pass state reset (everything that was at function entry except
+       func_emit_idx, which the caller bumps once for both passes). */
+    cmp_label_counter = 0;
+    lazy_spill_on = lazy;
+    pending_spill_v = -1;
+    cur_lazy_out = out;
+    cur_lazy_func = f;
+    cur_op_idx = 0;
+    invalidate_hl_cache();
+    invalidate_bc_cache();
+    cur_sp_adjust = 0;
+    bc_args_save_depth = 0;
+    cur_stack_long_top = -1;
+    cur_dehl_inline_push = -1;
+    cur_dehl_inline_push_base_sp = 0;
+    cur_dehl_push_to_stack = 0;
+    cur_emitted_file = NULL;
+    cur_emitted_line = 0;
+    shl_skip_n = 0;
+    cur_bb = NULL;
+    ss_cur_g = -1;   /* no current op during prologue */
+    for (int i = 0; i < f->n_bbs; i++) {
+        bb_hl_out[i] = -1;
+        bb_pending_out[i] = -1;
+        bb_lowered[i] = 0;
+    }
+    (void)bb_hl_out_p1;   /* consulted by the pass-2 defer decision */
+
+    emit_prologue(out, f);
+
     for (int i = 0; i < f->n_bbs; i++) {
         BB *bb = &f->bbs[i];
         if (bb_alias && bb_alias[i] >= 0) {
@@ -5313,6 +5863,9 @@ int ir_lower_func(FILE *out, Func *f)
         cur_dehl_inline_push = -1;
         cur_dehl_inline_push_base_sp = 0;
         cur_dehl_push_to_stack = 0;
+        /* No pending spill crosses into a BB yet — the cross-BB inherit
+           lands with the defer step. Clear it so nothing leaks. */
+        pending_spill_v = -1;
         /* Carry the HL cache across the BB boundary when ALL
            predecessors have already been lowered AND agree on
            hl_out, AND that vreg is live-in here. This handles both
@@ -5704,45 +6257,45 @@ int ir_lower_func(FILE *out, Func *f)
                fused emit; set cur_skip_shl_add_hl so the SHL lowerer
                drops the redundant `add hl,hl` but still runs its
                spill / cache tail to publish HL to the dst vreg. */
+            ss_cur_g = ss_op_base ? ss_op_base[bb->id] + j : -1;
             for (int s = 0; s < shl_skip_n; s++) {
                 if (shl_skip[s].bb_id == bb->id
                     && shl_skip[s].op_idx == j) {
                     hl_about_to_change(shl_skip[s].cache_vreg);
+                    /* The skipped SHL consumes its source from HL (the
+                       fused add hl,hl already produced it) — a genuine
+                       cache hit with no loader call, so record it so the
+                       dead-store analysis doesn't treat it as a reload. */
+                    ss_note_cache_read(f, shl_skip[s].cache_vreg);
                     cur_skip_shl_add_hl = 1;
                     break;
                 }
             }
             cur_bb = bb;
+            cur_op_idx = j;
+            /* Static lazy-spill: tag the store/reload hooks with this op's
+               global index so pass 1 records against it and pass 2's
+               verdict (ss_store_dead) is read for it. */
+            ss_cur_g = ss_op_base ? ss_op_base[bb->id] + j : -1;
             if (op->kind == IR_RET) {
                 rc = lower_ret(out, f, op);
             } else {
                 rc = lower_op(out, f, op);
             }
+            ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
             if (cur_skip_next_op) {
                 j++;  /* the fastpath consumed op[i+1] (the branch) */
             }
         }
         bb_hl_out[bb->id] = cur_hl_vreg;
+        bb_pending_out[bb->id] = pending_spill_v;
         bb_lowered[bb->id] = 1;
     }
 
-    free(bb_alias);
-    free(bb_hl_out);
-    free(bb_lowered);
-    free(bb_pred_cnt);
-    for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
-    free(bb_preds);
-    ir_free_liveness(f);
     return 0;
 
 cleanup_err:
-    free(bb_alias);
-    free(bb_hl_out);
-    free(bb_lowered);
-    free(bb_pred_cnt);
-    for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
-    free(bb_preds);
-    ir_free_liveness(f);
+    /* Caller (ir_lower_func) owns the bb_* arrays and ir_free_liveness. */
     return -1;
 }

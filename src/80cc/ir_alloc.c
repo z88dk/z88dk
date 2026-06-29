@@ -453,6 +453,16 @@ void ir_alloc(Func *f)
                         first_use[d] = eff_first;
                     if (eff_last > last_use[d]) last_use[d] = eff_last;
                 }
+                /* IR_POSTSTEP writes its stepped var via src[0], not dst
+                   (dst holds the old value). Count that write — else a
+                   post-inc/dec'd param/local looks write-free and lands
+                   in PR_BC, where the in-place slot step doesn't update
+                   BC and later reads see the stale register (while(k--)
+                   read 4 every iteration). */
+                if (bb->ops[j].kind == IR_POSTSTEP) {
+                    int sv = bb->ops[j].src[0];
+                    if (sv >= 0 && sv < f->n_vregs) write_count[sv]++;
+                }
                 int u[16];
                 int nu = ir_op_uses(&bb->ops[j], u,
                                     (int)(sizeof u / sizeof u[0]));

@@ -112,6 +112,10 @@ static const OpInfo op_table[] = {
 
     [IR_POSTSTEP]           = { "POSTSTEP",             0, 0 },
     [IR_EXTRACT_BYTE]       = { "EXTRACT_BYTE",         0, 0 },
+    [IR_MEMSET]             = { "MEMSET",               0, 0 },
+    [IR_MEMCPY]             = { "MEMCPY",               0, 0 },
+    [IR_STRCPY]             = { "STRCPY",               0, 0 },
+    [IR_STRCHR]             = { "STRCHR",               0, 0 },
 
     /* misc */
     [IR_NOP]                = { "NOP",                  0, 0 },

@@ -116,6 +116,13 @@ static int sym_map_get(const Builder *b, const SYMBOL *sym)
    Plain global — single-threaded compiler. */
 static const char *cur_fn_name = "?";
 
+/* Set by build_fail so ir_generate_code can tell a diagnosed bail from a
+   SILENT one (a bare `return -1`/`-2` that named no reason). A silent
+   fall-back to the walker is invisible — it quietly drops IR coverage
+   (and can mask a walker miscompile), as the dstar_gencon return-in-loop
+   case did — so we flag it. */
+static int build_fail_emitted;
+
 static int build_fail(const char *fmt, ...)
 {
     va_list ap;
@@ -124,6 +131,7 @@ static int build_fail(const char *fmt, ...)
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
     va_end(ap);
+    build_fail_emitted = 1;
     return -1;
 }
 
@@ -141,6 +149,18 @@ static int build_fail(const char *fmt, ...)
 static int build_expr_hinted(Builder *b, Node *n, int hint);
 static int init_typed_region(Builder *b, int base, int off,
                              Type *t, Node *init, int *budget);
+
+/* The inline mem/str loop forms (IR_MEMSET ldir/djnz, IR_MEMCPY ldir,
+   IR_STRCPY ldi, IR_STRCHR jr) use Z80-only block ops and relative
+   jumps. 8080/8085 lack them; gbz80 encodes them differently than the
+   IR loop forms emit. On those targets we keep the inline only for the
+   pure ld/inc unrolls (tiny counts) and otherwise fall back to the
+   library call — correct, just not inlined. Mirrors the walker, which
+   bails its inline builtins entirely on IS_808x. */
+static int ir_inline_block_ops_ok(void)
+{
+    return !IS_808x() && !IS_GBZ80();
+}
 
 static int build_expr(Builder *b, Node *n)
 {
@@ -423,7 +443,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             op->src[0] = src;
             return dst;
         }
-        return build_fail("bare AST_LOCAL_VAR outside lvalue context");
+        /* Scalar bare local in a value context — e.g. a ternary / logical
+           condition the parser left un-deref'd (`k ? a : b`, `while (k)`).
+           In the IR a scalar local's value lives in its vreg, so return
+           that — consistent with the OP_DEREF / OP_ASSIGN local-operand
+           shortcuts, which also read the value via sym_map_get. A scalar
+           local's *address* only ever arrives via OP_ADDR (handled
+           separately), so this is unambiguously the value. */
+        {
+            int v = sym_map_get(b, n->sym);
+            if (v < 0)
+                return build_fail("bare AST_LOCAL_VAR unmapped %s",
+                                  n->sym ? n->sym->name : "?");
+            return v;
+        }
 
     case AST_GLOBAL_VAR: {
         /* Function-typed and array-typed globals decay to their ADDRESS
@@ -915,6 +948,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 st->mem.elem = elem_k;
                 return rhs_v;
             }
+            /* Byte (width-1) local: build the RHS at its natural
+               (int-promoted) width and TRUNC into the byte slot. Hinting
+               dst_v would let a wider producer (binop / deref / cast)
+               write its 2-byte result straight into the 1-byte slot and
+               overrun the adjacent local — `c ^= *p` (char c) wrote HL
+               (2 bytes) into c's 1-byte slot, clobbering the next local.
+               This is BUG_LOG A33's overrun class, the store-side dual of
+               the byte paths already in gen_ld_imm / gen_ld_mem. */
+            int ldst_w = b->f->vregs[dst_v].width;
+            if (ldst_w == 1) {
+                int rhs_v = build_expr(b, n->right);
+                if (rhs_v < 0) return -1;
+                if (b->f->vregs[rhs_v].width == 1) {
+                    ir_emit_mov(cur_bb(b), dst_v, rhs_v);
+                } else {
+                    Op *op = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                    op->dst = dst_v; op->src[0] = rhs_v;
+                }
+                return dst_v;
+            }
             /* Pass dst_v as hint: the RHS writes into it directly when
                it can (skipping the MOV), else returns another vreg we
                copy. The hint vreg's kind also drives literal-to-_Accum
@@ -1308,6 +1361,92 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int is_fastcall = (n->sym->ctype
                            && (n->sym->ctype->flags & FASTCALL));
         int n_args = n->args ? (int)array_len(n->args) : 0;
+        /* Inline a const-count __builtin_memset as IR_MEMSET — the whole
+           point of the builtin is to inline when the count is const, no
+           call. The lowerer unrolls `ld (hl),e; inc hl` for small counts
+           and uses an overlapping-`ldir` fill for larger ones. Any const
+           count (1..65536, ldir's BC limit) inlines; non-const falls
+           through to the library memset (redirected below). */
+        if (n->sym->name && strcmp(n->sym->name, "__builtin_memset") == 0
+            && n_args == 3) {
+            Node *cnt = array_get_byindex(n->args, 2);
+            if (cnt && cnt->ast_type == AST_LITERAL
+                && cnt->zval > 0 && cnt->zval <= 65536
+                && (cnt->zval <= 8 || ir_inline_block_ops_ok())) {
+                int dst_v = build_expr(b, array_get_byindex(n->args, 0));
+                if (dst_v < 0) return -1;
+                int c_v = build_expr(b, array_get_byindex(n->args, 1));
+                if (c_v < 0) return -1;
+                Op *op = ir_op_emit(cur_bb(b), IR_MEMSET);
+                op->dst    = -1;
+                op->src[0] = dst_v;          /* dst pointer */
+                op->src[1] = c_v;            /* fill byte value */
+                op->imm    = (int)cnt->zval; /* byte count */
+                /* memset returns dst; the dst vreg still holds it. */
+                return dst_v;
+            }
+        }
+        /* Inline a const-count __builtin_memcpy as IR_MEMCPY — same idea:
+           tiny counts unroll, larger ones use `ldir`, any const count
+           (1..65536) inlines; non-const falls back to the library
+           memcpy. memcpy returns dst (the dst vreg still holds it). */
+        if (n->sym->name && strcmp(n->sym->name, "__builtin_memcpy") == 0
+            && n_args == 3) {
+            Node *cnt = array_get_byindex(n->args, 2);
+            if (cnt && cnt->ast_type == AST_LITERAL
+                && cnt->zval > 0 && cnt->zval <= 65536
+                && (cnt->zval <= 3 || ir_inline_block_ops_ok())) {
+                int dst_v = build_expr(b, array_get_byindex(n->args, 0));
+                if (dst_v < 0) return -1;
+                int src_v = build_expr(b, array_get_byindex(n->args, 1));
+                if (src_v < 0) return -1;
+                Op *op = ir_op_emit(cur_bb(b), IR_MEMCPY);
+                op->dst    = -1;
+                op->src[0] = dst_v;          /* dst pointer */
+                op->src[1] = src_v;          /* src pointer */
+                op->imm    = (int)cnt->zval; /* byte count */
+                return dst_v;
+            }
+        }
+        /* Inline __builtin_strcpy (always — variable length, no const
+           needed): IR_STRCPY (dst, src), lowered to a NUL-terminated
+           copy loop. strcpy returns dst. */
+        if (n->sym->name && strcmp(n->sym->name, "__builtin_strcpy") == 0
+            && n_args == 2 && ir_inline_block_ops_ok()) {
+            int dst_v = build_expr(b, array_get_byindex(n->args, 0));
+            if (dst_v < 0) return -1;
+            int src_v = build_expr(b, array_get_byindex(n->args, 1));
+            if (src_v < 0) return -1;
+            Op *op = ir_op_emit(cur_bb(b), IR_STRCPY);
+            op->dst    = -1;
+            op->src[0] = dst_v;          /* dst pointer */
+            op->src[1] = src_v;          /* src pointer */
+            return dst_v;
+        }
+        /* Inline __builtin_strchr: IR_STRCHR (result = dst), src[0] =
+           string, src[1] = char vreg (or -1 + imm for a literal char),
+           lowered to a scan loop leaving the match pointer / NULL in the
+           result vreg. */
+        if (n->sym->name && strcmp(n->sym->name, "__builtin_strchr") == 0
+            && n_args == 2 && ir_inline_block_ops_ok()) {
+            Node *c_node = array_get_byindex(n->args, 1);
+            int str_v = build_expr(b, array_get_byindex(n->args, 0));
+            if (str_v < 0) return -1;
+            int dst = new_temp(b, 2);
+            b->f->vregs[dst].width = 2;
+            Op *op = ir_op_emit(cur_bb(b), IR_STRCHR);
+            op->dst    = dst;
+            op->src[0] = str_v;          /* string pointer */
+            if (c_node && c_node->ast_type == AST_LITERAL) {
+                op->src[1] = -1;
+                op->imm    = (int)c_node->zval;   /* literal search char */
+            } else {
+                int c_v = build_expr(b, c_node);
+                if (c_v < 0) return -1;
+                op->src[1] = c_v;        /* search char value */
+            }
+            return dst;
+        }
         /* R→L build/push order ONLY for plain stdc — CALLEE pushes
            L→R like SMALLC (must mirror gen_call's push_step). */
         uint32_t fl = n->sym->ctype ? n->sym->ctype->flags : 0;
@@ -1390,6 +1529,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         op->dst = ret_v;
         CallInfo *ci = calloc(1, sizeof(CallInfo));
         ci->target     = n->sym;
+        /* Inline string/mem builtins (__builtin_memset/memcpy/strcpy/
+           strchr) have no callable library symbol — the walker inlines
+           them (cg2_try_builtin_call). In IR, redirect to the real
+           same-name/same-ABI library function, which the smallc lib
+           provides; the prefix/ABI come from the (LIBRARY __smallc)
+           builtin sym, so only the emitted name changes. */
+        if (n->sym->name && strncmp(n->sym->name, "__builtin_", 10) == 0) {
+            const char *base = n->sym->name + 10;
+            if (!strcmp(base, "memset") || !strcmp(base, "memcpy")
+             || !strcmp(base, "strcpy") || !strcmp(base, "strchr"))
+                ci->target_name = base;
+        }
         ci->fnptr_vreg = -1;
         ci->args       = args;
         ci->n_args     = n_args;
@@ -1700,21 +1851,49 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                        n->ast_type == OP_POST_DEC);
 
         /* Bare local fastpath: 16-bit slot, IR_INC/IR_DEC aliased
-           write to the same vreg. */
+           write to the same vreg. A POINTER local steps by sizeof(the
+           pointee), not 1 — `++p` on `struct S *p` must add sizeof(S),
+           not 1 (the regex `++test` over a 6-byte struct array read
+           garbage when it advanced one byte). char* keeps stride 1
+           (IR_INC), which is why byte-pointer `*data++` was unaffected. */
         if (n->operand->ast_type == AST_LOCAL_VAR) {
             SYMBOL *lsym = n->operand->sym;
             int v = sym_map_get(b, lsym);
             if (v < 0)
                 return build_fail("step on unknown local %s",
                                   lsym ? lsym->name : "?");
-            OpKind step_op = is_inc ? IR_INC : IR_DEC;
+            int stride = 1;
+            Kind lk = lsym ? (Kind)lsym->type : KIND_NONE;
+            if (lk == KIND_PTR || lk == KIND_CPTR) {
+                Type *pte = (lsym->ctype) ? lsym->ctype->ptr : NULL;
+                /* sizeof(pointee): struct/array carry the real byte size
+                   in ->size; scalars come from type_width (type_width
+                   returns 2 for aggregates, so it can't be used alone). */
+                stride = !pte ? 0
+                       : (pte->kind == KIND_STRUCT || pte->kind == KIND_ARRAY)
+                         ? (int)pte->size : type_width(pte);
+                if (stride <= 0)
+                    return build_fail("step on pointer to incomplete/"
+                                      "unknown type (sym=%s)",
+                                      lsym ? lsym->name : "?");
+            }
+            #define EMIT_STEP_LOCAL() do { \
+                if (stride == 1) { \
+                    ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC, v, v); \
+                } else { \
+                    Op *sop = ir_op_emit(cur_bb(b), is_inc ? IR_ADD : IR_SUB); \
+                    sop->dst = v; sop->src[0] = v; sop->src[1] = -1; \
+                    sop->imm = stride; \
+                } \
+            } while (0)
             if (is_post) {
                 int old = new_temp(b, 2);
                 ir_emit_mov(cur_bb(b), old, v);
-                ir_emit_unop(cur_bb(b), step_op, v, v);
+                EMIT_STEP_LOCAL();
                 return old;
             }
-            ir_emit_unop(cur_bb(b), step_op, v, v);
+            EMIT_STEP_LOCAL();
+            #undef EMIT_STEP_LOCAL
             return v;
         }
 
@@ -1727,7 +1906,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             SYMBOL *gsym = n->operand->sym;
             int w = type_width(n->type);
             if (w <= 0) w = 2;
-            if (w != 2 && w != 4)
+            if (w != 1 && w != 2 && w != 4)
                 return build_fail("step on global width %d not supported",
                                   w);
             int old_v = new_temp(b, w);
@@ -1739,7 +1918,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 
             int new_v = new_temp(b, w);
             b->f->vregs[new_v].width = (int16_t)w;
-            if (w == 2) {
+            if (w == 1 || w == 2) {
                 ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
                              new_v, old_v);
             } else {
@@ -1790,7 +1969,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                               "yet supported",
                               n->type ? n->type->kind : -1);
         int elem_w = type_width(n->type);
-        if (elem_w != 2 && elem_w != 4)
+        if (elem_w != 1 && elem_w != 2 && elem_w != 4)
             return build_fail("post/pre step elem width %d not "
                               "yet supported (non-LV)", elem_w);
 
@@ -1817,11 +1996,12 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         ld->dst       = old_v;
         ld->mem.kind  = IR_MEM_VREG;
         ld->mem.base  = ptr_v;
-        ld->mem.elem  = (elem_w == 2) ? KIND_INT : KIND_LONG;
+        ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
+                      : (elem_w == 2) ? KIND_INT : KIND_LONG;
 
         int new_v = new_temp(b, elem_w);
         b->f->vregs[new_v].width = (int16_t)elem_w;
-        if (elem_w == 2) {
+        if (elem_w == 1 || elem_w == 2) {
             ir_emit_unop(cur_bb(b), is_inc ? IR_INC : IR_DEC,
                          new_v, old_v);
         } else {
@@ -1948,6 +2128,27 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             if (lhs_v < 0)
                 return build_fail("compound to unknown local %s",
                                   lsym ? lsym->name : "?");
+            /* Byte (width-1) local: the binop computes the int-promoted
+               result in HL and store_hl writes 2 bytes — into a 1-byte
+               slot, overrunning the adjacent local (the `crc ^= *p` /
+               `c ^= *d` bug; BUG_LOG A33 class). Compute into a width-2
+               temp then TRUNC back to the byte slot. */
+            if (b->f->vregs[lhs_v].width == 1) {
+                int tmp = new_temp(b, 2);
+                b->f->vregs[tmp].width = 2;
+                if (n->right && n->right->ast_type == AST_LITERAL) {
+                    Op *op = ir_op_emit(cur_bb(b), k);
+                    op->dst = tmp; op->src[0] = lhs_v;
+                    op->src[1] = -1; op->imm = (int64_t)n->right->zval;
+                } else {
+                    int rhs_v = build_expr(b, n->right);
+                    if (rhs_v < 0) return -1;
+                    ir_emit_binop(cur_bb(b), k, tmp, lhs_v, rhs_v);
+                }
+                Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                tr->dst = lhs_v; tr->src[0] = tmp;
+                return lhs_v;
+            }
             /* Literal-RHS fold (mirror of binop). */
             if (n->right && n->right->ast_type == AST_LITERAL) {
                 Op *op = ir_op_emit(cur_bb(b), k);
@@ -2255,14 +2456,21 @@ static int build_stmt(Builder *b, Node *n)
 
     case AST_RETURN: {
         int v = -1;
-        if (n->retval) {
-            v = build_expr(b, n->retval);
+        Node *rv = n->retval;
+        /* A void `return;` desugared inside a loop/if can arrive with
+           retval set to an empty AST_COMPOUND_STMT (the parser's noop
+           wrap) rather than NULL — treat that as no return value, else
+           build_expr bails silently on the empty compound. */
+        if (rv && rv->ast_type == AST_COMPOUND_STMT
+            && (!rv->stmts || array_len(rv->stmts) == 0))
+            rv = NULL;
+        if (rv) {
+            v = build_expr(b, rv);
             if (v < 0) return -1;
             /* Widen byte retvals to int — z80 return ABI puts the
                value in HL even when the C return type is char. */
             if (b->f->vregs[v].width == 1) {
-                int unsigned_src = n->retval->type
-                                && n->retval->type->isunsigned;
+                int unsigned_src = rv->type && rv->type->isunsigned;
                 int tmp = new_temp(b, 2);
                 b->f->vregs[tmp].width = 2;
                 Op *cv = ir_op_emit(cur_bb(b),
@@ -2312,6 +2520,22 @@ static int build_stmt(Builder *b, Node *n)
                               (int)n->sym->type, n->sym->name);
         int v = new_local_vreg(b, n->sym);
         if (n->declvar) {
+            /* Byte (width-1) local init: build at natural width and
+               TRUNC into the byte slot — same overrun guard as the
+               OP_ASSIGN byte path (a wide initialiser hinted into the
+               1-byte slot would store 2 bytes and clobber the next
+               local). */
+            if (b->f->vregs[v].width == 1) {
+                int init_v = build_expr(b, n->declvar);
+                if (init_v < 0) return -1;
+                if (b->f->vregs[init_v].width == 1) {
+                    ir_emit_mov(cur_bb(b), v, init_v);
+                } else {
+                    Op *op = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
+                    op->dst = v; op->src[0] = init_v;
+                }
+                return 0;
+            }
             /* Hint the init expr to write directly into v's vreg.
                For AST_LITERAL inits this skips an LD_IMM + MOV pair
                and the intermediate slot. */
@@ -2466,8 +2690,17 @@ static int build_stmt(Builder *b, Node *n)
            parser desugars `while` into this shape with else=goto).
            Empty then (e.g. `if (cond) ;`) is allowed; we still emit
            the cond test so any side-effects fire. */
-        if (!n->cond)
-            return build_fail("AST_IF/TERNARY stmt missing cond");
+        if (!n->cond) {
+            /* Condition-less loop test: the parser emits `for(;;)` as
+               ast_conditional(NULL, then, els=goto-exit) (stmt.c dofor) —
+               the condition is "always true", so take `then` (empty for
+               a bare for(;;)) and never the else. Build `then` and fall
+               through to the loop body; iteration is the loop's own
+               back-edge jump and exit is via break/goto to the exit
+               label, so the else (goto-exit) is correctly dropped. */
+            if (n->then && build_stmt(b, n->then) != 0) return -1;
+            return 0;
+        }
         int cond_v = build_expr(b, n->cond);
         if (cond_v < 0) return -1;
 
@@ -2512,11 +2745,15 @@ static int build_stmt(Builder *b, Node *n)
             n->ast_type == OP_PRE_INC || n->ast_type == OP_POST_INC ||
             n->ast_type == OP_PRE_DEC || n->ast_type == OP_POST_DEC ||
             n->ast_type == OP_DEREF ||
-            n->ast_type == OP_CAST) {
+            n->ast_type == OP_CAST ||
+            n->ast_type == AST_STR_LIT ||
+            n->ast_type == AST_LITERAL) {
             /* OP_DEREF / OP_CAST as a statement — discarded read, but
                the operand may carry side effects (`*p++;`, function
                call return, etc.). Walk as an expression; the loaded
-               value just lands in a dead vreg. */
+               value just lands in a dead vreg. AST_STR_LIT / AST_LITERAL
+               as a bare statement (`"foo";` / `42;`) are side-effect-free
+               no-ops — walk-and-discard leaves a dead vreg DCE removes. */
             int v = build_expr(b, n);
             (void)v;
             return v < 0 ? -1 : 0;
@@ -2536,7 +2773,7 @@ static int build_stmt(Builder *b, Node *n)
 
 /* ----- Public entry ---------------------------------------------------- */
 
-int ir_generate_code(Node *body, SYMBOL *fn)
+static int ir_generate_code_impl(Node *body, SYMBOL *fn)
 {
     if (!body) return 0;
     if (!fn)   return build_fail("ir_generate_code with NULL fn");
@@ -2638,5 +2875,20 @@ int ir_generate_code(Node *body, SYMBOL *fn)
 
     builder_free(&b);
     ir_func_free(f);
+    return rc;
+}
+
+int ir_generate_code(Node *body, SYMBOL *fn)
+{
+    build_fail_emitted = 0;
+    int rc = ir_generate_code_impl(body, fn);
+    /* A nonzero rc routes the caller to the legacy walker. If we got
+       there without printing a reason, the bail was SILENT — surface it
+       so unsupported shapes can't quietly degrade (or miscompile, as a
+       walker bug then would). Cheap, only fires on the fall-back path. */
+    if (rc != 0 && !build_fail_emitted)
+        fprintf(stderr, "ir_build: [%s] silent bail to walker "
+                "(no diagnostic — please report)\n",
+                fn && fn->name[0] ? fn->name : "?");
     return rc;
 }

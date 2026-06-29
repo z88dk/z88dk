@@ -41,6 +41,7 @@ OBJS =	callfunc.o     	\
 	ast_iter.o	\
 	ir.o		\
 	ir_lower.o	\
+	ir_slots.o	\
 	ir_build.o	\
 	ir_analysis.o	\
 	ir_alloc.o	\
@@ -61,7 +62,7 @@ z88dk-80cc$(EXESUFFIX): $(OBJS)
 # Standalone IR selftest — links the ccdefs-free IR layer only (the
 # selftest provides its own SYMBOL/global stubs). Run after touching
 # ir*.c: `make ir_selftest && ./ir_selftest`.
-IR_SELFTEST_SRCS = ir_selftest.c ir.c ir_lower.c ir_analysis.c \
+IR_SELFTEST_SRCS = ir_selftest.c ir.c ir_lower.c ir_slots.c ir_analysis.c \
 	ir_alloc.c ir_opt.c ir_match.c
 
 ir_selftest$(EXESUFFIX): $(IR_SELFTEST_SRCS)

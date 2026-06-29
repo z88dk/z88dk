@@ -269,6 +269,35 @@ typedef enum {
        dst and src[0]. */
     IR_POSTSTEP,
 
+    /* Inlined const-count __builtin_memset: src[0] = dst pointer,
+       src[1] = the fill byte value (vreg), imm = byte count (const > 0).
+       Writes memory only (no vreg dst). Small counts lower to an
+       unrolled `ld (hl),e; inc hl` fill; larger counts to an
+       overlapping-`ldir` fill. Chosen by ir_build for any const count;
+       non-const memset falls back to a library call. */
+    IR_MEMSET,
+
+    /* Inlined const-count __builtin_memcpy: src[0] = dst pointer,
+       src[1] = src pointer, imm = byte count (const > 0). Writes memory
+       only (no vreg dst). Tiny counts lower to an unrolled
+       `ld a,(hl); ld (de),a; inc hl; inc de`; larger counts to `ldir`.
+       Chosen by ir_build for any const count; non-const memcpy falls
+       back to a library call. memcpy returns dst (the dst vreg). */
+    IR_MEMCPY,
+
+    /* Inlined __builtin_strcpy: src[0] = dst pointer, src[1] = src
+       pointer. Writes memory only (no vreg dst). Lowered to a Z80 NUL-
+       terminated copy loop (`cp (hl); ldi; jr nz`). strcpy returns dst
+       (the dst vreg). Gated to Z80-family by ir_build (block ops). */
+    IR_STRCPY,
+
+    /* Inlined __builtin_strchr: dst = result pointer vreg, src[0] = the
+       string pointer, src[1] = the search char vreg (or -1 when the
+       char is a literal, then imm holds it). Lowered to a Z80 scan loop;
+       leaves the match pointer (or NULL) in the dst vreg. Pure read (no
+       side effect). Gated to Z80-family by ir_build. */
+    IR_STRCHR,
+
     /* misc */
     IR_NOP,
     IR_ASM,             /* raw __asm{} block — opaque, full clobber;
@@ -290,6 +319,10 @@ typedef enum {
 
 typedef struct {
     SYMBOL  *target;        /* NULL for indirect (function-pointer) call */
+    const char *target_name;/* if set, emit `call <this>` instead of the
+                               target sym's name (keeps target for ABI/
+                               prefix). Used to redirect inline builtins
+                               like __builtin_memset → the real memset. */
     int      fnptr_vreg;    /* indirect call: vreg holding fnptr (-1 if direct) */
     int     *args;          /* array of vreg ids */
     int      n_args;
