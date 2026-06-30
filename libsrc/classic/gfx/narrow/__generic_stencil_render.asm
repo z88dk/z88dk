@@ -120,7 +120,15 @@ ENDIF
     ; adjust horizontal pattern position for the current line
     and     7
 pattern_shift:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
+ELSE
+	push    af
+	ld      a,e
+	rrca
+	ld      e,a
+	pop     af
+ENDIF
     dec     a
     jr      nz, pattern_shift
 
@@ -134,7 +142,15 @@ pattern_shift:
     ld      l, c                        ; Y
 xloop:
     ;;;ld    h,a    ; X1
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
+ELSE
+	push    af
+	ld      a,e
+	rrca
+	ld      e,a
+	pop     af
+ENDIF
     push    hl
     push    de
     push    bc
