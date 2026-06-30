@@ -1,0 +1,3 @@
+Object  file t/00-fundamental//input/show_01.def.o at $0000: Z80RMF02
+  Name: module1
+  Org:  $FFFF
