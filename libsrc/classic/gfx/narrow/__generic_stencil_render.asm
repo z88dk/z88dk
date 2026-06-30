@@ -1,7 +1,7 @@
 ;
 ;    z88dk GFX library
 ;    Render the "stencil" - plot/unplot based version.
-;     Stefano - Jul 2017
+;     Stefano - Jul 2017, June 2026
 ;
 ;    Render the "stencil".
 ;    The dithered horizontal lines base their pattern on the Y coordinate
@@ -27,7 +27,7 @@
     EXTERN  __graphics_end
 
 ;
-;    $Id: stencil_render2.asm - Stefano Exp, 2017 $
+;    $Id: __generic_stencil_render.asm $
 ;
 
 __generic_stencil_render:
@@ -39,10 +39,12 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ELSE
     ld      hl,2
     add     hl, sp
-	ld      (smc1+1),hl
-	inc     hl
-	inc     hl
-	ld      (smc2+1),hl
+    ld      a,(hl)
+    ld      (smc1),a
+    inc     hl
+    inc     hl
+    ld      hl,(hl)
+    ld      (smc2),hl
 ENDIF
 
   IFDEF _GFX_PAGE_VRAM
@@ -63,7 +65,7 @@ yloop:
     jr      nz, noret
     pop     hl
     ld      (__gfx_coords), hl
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -71,6 +73,7 @@ yloop:
     ENDIF
     ret
   ENDIF
+
 noret:
     push    bc
 
@@ -81,8 +84,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      l, (ix+2)                   ; stencil
     ld      h, (ix+3)
 ELSE
-smc2:
-	ld      hl,(0)
+    ld      hl,(smc2)
 ENDIF
 
     add     hl, de
@@ -106,8 +108,7 @@ ENDIF
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      a, (ix+0)                   ; intensity
 ELSE
-smc1:
-    ld      a, (0)
+    ld      a, (smc1)
 ENDIF
 
     call    dither_pattern
@@ -123,11 +124,11 @@ pattern_shift:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
 ELSE
-	push    af
-	ld      a,e
-	rrca
-	ld      e,a
-	pop     af
+    push    af
+    ld      a,e
+    rrca
+    ld      e,a
+    pop     af
 ENDIF
     dec     a
     jr      nz, pattern_shift
@@ -145,11 +146,11 @@ xloop:
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
 ELSE
-	push    af
-	ld      a,e
-	rrca
-	ld      e,a
-	pop     af
+    push    af
+    ld      a,e
+    rrca
+    ld      e,a
+    pop     af
 ENDIF
     push    hl
     push    de
@@ -173,3 +174,20 @@ done:
     jr      nz, xloop
 
     jr      yloop
+
+
+    SECTION bss_graphics
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
+; Z80 has got index registers
+
+ELSE
+
+smc1:
+    defb    0
+
+smc2:
+    defw    0
+
+ENDIF
