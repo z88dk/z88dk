@@ -9882,11 +9882,12 @@ int ir_lower_func(FILE *out, Func *f)
                     src_snap[t++] = f->bbs[b].ops[o].src[1];
                 }
         }
-        char *sbuf = NULL;
-        size_t slen = 0;
         int alloc_ok = bb_hl_out_p1 && op_base && op_store && op_reload
             && op_cacheread && (src_snap || !total_ops);
-        FILE *scratch = alloc_ok ? open_memstream(&sbuf, &slen) : NULL;
+        /* Scratch sink for pass 1: only its slot-store side-effects (the ss_op_*
+           arrays) matter — the rendered text is discarded. tmpfile() is portable;
+           open_memstream is POSIX-only (absent on mingw/Windows). */
+        FILE *scratch = alloc_ok ? tmpfile() : NULL;
         if (!scratch) {
             /* Degraded (OOM / no memstream): single deferral-off pass.
                Correct, just forgoes the lazy win. */
@@ -9908,7 +9909,6 @@ int ir_lower_func(FILE *out, Func *f)
                                    bb_preds, bb_alias);
             ss_phase = 0;
             fclose(scratch);
-            free(sbuf);
             /* Restore the operands pass 1 swapped in place (see snapshot
                above) so pass 2 lowers the same IR a single pass would. */
             if (src_snap) {

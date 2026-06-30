@@ -77,16 +77,20 @@ int ir_lower_to_output(Func *f)
        lowering failure returns nonzero (fatal in the caller); without
        buffering, the partially emitted asm would land in the output
        with dangling label references. */
-    char *buf = NULL;
-    size_t len = 0;
-    FILE *mem = open_memstream(&buf, &len);
+    /* Buffer to a temp file rather than open_memstream — the latter is POSIX-
+       only and absent on mingw/Windows. Copy to `output` only on success. */
+    FILE *mem = tmpfile();
     if (!mem)
         return ir_lower_func(output, f);   /* degraded: direct emit */
     int rc = ir_lower_func(mem, f);
+    if (rc == 0) {
+        rewind(mem);
+        char chunk[4096];
+        size_t n;
+        while ((n = fread(chunk, 1, sizeof chunk, mem)) > 0)
+            fwrite(chunk, 1, n, output);
+    }
     fclose(mem);
-    if (rc == 0 && buf)
-        fwrite(buf, 1, len, output);
-    free(buf);
     return rc;
 }
 
