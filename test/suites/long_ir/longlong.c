@@ -175,6 +175,32 @@ static void test_nested_cast(void)
     Assert(nc_int_of_char(0x12FFL)  == -1,      "(int)(char)x sign-extends 0xFF");
 }
 
+/* Host-independent signedness of integer constants at the sign boundary.
+ * const.c keyed the implicit "exceeds-signed-range -> unsigned" promotion off
+ * (uint64_t)(long double)const_val; casting a negative/out-of-range long double
+ * to uint64_t is UB that diverges by host (x86 -> 0x8000…, ARM -> 0), so an
+ * unsuffixed/LL hex constant at the top-bit boundary was typed unsigned on
+ * some hosts and signed on others. The const-folder then picked logical vs
+ * arithmetic shift accordingly, so `0x8000000000000000LL >> 1` folded to
+ * 0x4000… (Intel) or 0xC000… (ARM). Now the typing reads the exact parsed
+ * integer and a full-width 64-bit constant stays signed unless U-suffixed,
+ * matching sccz80 and the signed runtime. */
+static void test_ll_const_sign_typing(void)
+{
+    /* Signed LL: arithmetic (sign-extending) shift, like the signed runtime. */
+    Assert((0x8000000000000000LL >> 1) == 0xC000000000000000LL,
+           "signed 0x8000…LL >> 1 arithmetic-shifts (host-independent)");
+    Assert((0x8000000000000000LL >> 1) != 0x4000000000000000LL,
+           "signed 0x8000…LL >> 1 does NOT zero-fill");
+    /* Explicit U suffix: logical (zero-filling) shift. */
+    Assert((0x8000000000000000ULL >> 1) == 0x4000000000000000ULL,
+           "unsigned 0x8000…ULL >> 1 zero-fills");
+    /* The narrower-size unsigned-promotion rule still fires. */
+    Assert(0xffff == -1,                        "0xffff is unsigned int (== -1)");
+    Assert((int)0x8000 == (unsigned)0x8000,     "0x8000 unsigned-int boundary");
+    Assert(3 * 0x2AAAAAAB == 0x80000001,        "0x80000001 unsigned long boundary");
+}
+
 static void test_ll_compound(void)
 {
     Assert(ll_cmp_scalar(10, 5) == 88,  "ll scalar += *= -= <<=");
@@ -192,6 +218,7 @@ int main(int argc, char *argv[])
     suite_add_test(test_ll_signedness_cast);
     suite_add_test(test_ll_aggregate_rw);
     suite_add_test(test_nested_cast);
+    suite_add_test(test_ll_const_sign_typing);
     suite_add_test(test_ll_compound);
     return suite_run();
 }

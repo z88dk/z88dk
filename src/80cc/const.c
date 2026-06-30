@@ -185,12 +185,20 @@ int number(LVALUE *lval)
        UNSIGNED type (decimal stays signed and widens instead). Without this,
        e.g. 0x80000001 became signed `long` and sign-extended in const-fold —
        `3 * 0x2AAAAAAB == 0x80000001` folded to false. Only the non-negated
-       literal path (minus>=0); the legacy embedded-minus path stays signed. */
-    if (!isunsigned && tok_base != 10 && minus >= 0) {
-        int64_t smax = (lval->val_type == KIND_INT)  ? 32767
-                     : (lval->val_type == KIND_LONG) ? 2147483647LL
-                     : INT64_MAX;
-        if ((uint64_t)lval->const_val > (uint64_t)smax)
+       literal path (minus>=0); the legacy embedded-minus path stays signed.
+
+       Test the magnitude against the EXACT parsed integer (`value`), never
+       (uint64_t)const_val: const_val is a long double, and casting a negative
+       / out-of-range long double to uint64_t is UB that diverges by host
+       (x86 yields the integer-indefinite 0x8000…, ARM saturates to 0), which
+       made the typing — and any signed-vs-logical const-fold keyed off it —
+       host-dependent. Exclude KIND_LONGLONG: a full-width 64-bit constant
+       stays signed unless U-suffixed, matching sccz80 (so e.g.
+       `0x8000000000000000LL >> 1` arithmetic-shifts like the signed runtime). */
+    if (!isunsigned && tok_base != 10 && minus >= 0
+        && lval->val_type != KIND_LONGLONG) {
+        uint64_t smax = (lval->val_type == KIND_INT) ? 32767u : 2147483647ULL;
+        if ((uint64_t)value > smax)
             isunsigned = 1;
     }
     lval->is_const = 1;

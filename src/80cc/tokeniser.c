@@ -530,7 +530,10 @@ static void lex_number(Tokeniser *t, Token *tok, int first)
         }
         if (d < 0) break;
         if (digit_len < TK_NAME_MAX) digit_buf[digit_len++] = (char)c;
-        value = value * base + d;
+        /* Accumulate in unsigned: a full-width constant like 0x8000…0000
+           overflows int64_t, and signed overflow is UB (host-divergent).
+           Unsigned wraps with a defined bit pattern; reinterpret as int64. */
+        value = (int64_t)((uint64_t)value * (uint64_t)base + (uint64_t)d);
         c = tk_getc(t);
     }
     /* Float fall-through: decimal `.` / `e` / `E` after digits. */
