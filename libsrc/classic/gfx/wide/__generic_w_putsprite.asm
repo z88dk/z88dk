@@ -192,11 +192,11 @@ noblockx:
   ENDIF
 
   IF  !__CPU_INTEL__&!__CPU_GBZ80__
-	pop     ix
+    pop     ix
   ELSE
-	pop     de
+    pop     de
   ENDIF
-	ret
+    ret
 
 
 
@@ -319,11 +319,11 @@ noblocka:
   ENDIF
 
   IF  !__CPU_INTEL__&!__CPU_GBZ80__
-	pop     ix
+    pop     ix
   ELSE
-	pop     de
+    pop     de
   ENDIF
-	ret
+    ret
 
 
 
@@ -446,11 +446,11 @@ noblocko:
   ENDIF
 
   IF  !__CPU_INTEL__&!__CPU_GBZ80__
-	pop     ix
+    pop     ix
   ELSE
-	pop     de
+    pop     de
   ENDIF
-	ret
+    ret
 
 
     SECTION bss_graphics
