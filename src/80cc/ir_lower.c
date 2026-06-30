@@ -10339,15 +10339,23 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         int uses[16];
                         int nu = ir_op_uses(&bb->ops[k], uses,
                                             (int)(sizeof uses / sizeof uses[0]));
-                        /* An op that both reads AND redefines op->dst (a
-                           POSTSTEP / in-place read-modify-write) reads the
-                           value from its slot, not the HL cache the def
-                           leaves behind — so the cache-served handoff is
-                           invalid and the producing def MUST spill. Without
-                           this, `int x=5; x++` elides the `x=5` slot store
-                           and the increment reads an uninitialised slot. */
+                        /* A redefinition of op->dst by op k invalidates the
+                           cache-served handoff ONLY when k reads that operand
+                           from its SLOT and writes it back there: a POSTSTEP
+                           (its base is allocator-pinned slot-resident) or a
+                           post-stepping LD_MEM (`*p++`, which bumps and
+                           rewrites its base). For those the producing def MUST
+                           spill — else `int x=5; int y=x++;` (the MOV+INC fuses
+                           to a POSTSTEP) and `a=*p++; b=*p;` read an
+                           uninitialised / un-stepped slot.
+                           A regular ALU redefinition (`a = a + b`, IR_ADD with
+                           dst==src) instead reads dst from the HL/DEHL cache the
+                           def leaves, so the handoff stays valid and the
+                           producing spill can be elided */
                         int k_redefs_dst = 0;
-                        {
+                        if (bb->ops[k].kind == IR_POSTSTEP
+                            || (bb->ops[k].kind == IR_LD_MEM
+                                && bb->ops[k].mem.post_step != 0)) {
                             int kd[2];
                             int knd = ir_op_defs(&bb->ops[k], kd, 2);
                             for (int d = 0; d < knd; d++)
