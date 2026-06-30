@@ -20,7 +20,14 @@ subdirs-clean:
 
 .PHONY:	subdirs-all $(SUBDIRS)
 
-$(SUBDIRS):
+
+suites:
+	$(MAKE) -C $@ clean
+	$(MAKE) -C $@ COMPILER=sccz80
+	$(MAKE) -C $@ clean
+	$(MAKE) -C $@ COMPILER=80cc
+
+feature:
 	$(MAKE) -C $@ all
 
 all: src-all
@@ -30,3 +37,4 @@ src-all:
 	$(MAKE) -C ../src/ucpp test
 	$(MAKE) -C ../src/z80asm test
 	$(MAKE) -C ../src/zobjcopy test
+	$(MAKE) -C ../src/80cc test
