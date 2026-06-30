@@ -27,6 +27,7 @@
     EXTERN  w_respixel
     EXTERN  w_xorpixel
 
+
 ; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
 
@@ -191,12 +192,19 @@ noblockx:
     call    __gfx_vram_page_out
   ENDIF
 
-  IF  !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-  ELSE
+  IF    _GFX_PAGE_VRAM
+   IF __CPU_INTEL__ | __CPU_GBZ80__
     pop     de
-  ENDIF
+   ENDIF
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ELSE
+    pop     de
+    ENDIF
     ret
+  ENDIF
 
 
 
@@ -318,12 +326,19 @@ noblocka:
     call    __gfx_vram_page_out
   ENDIF
 
-  IF  !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-  ELSE
+  IF    _GFX_PAGE_VRAM
+   IF __CPU_INTEL__ | __CPU_GBZ80__
     pop     de
-  ENDIF
+   ENDIF
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ELSE
+    pop     de
+    ENDIF
     ret
+  ENDIF
 
 
 
@@ -445,12 +460,19 @@ noblocko:
     call    __gfx_vram_page_out
   ENDIF
 
-  IF  !__CPU_INTEL__&!__CPU_GBZ80__
-    pop     ix
-  ELSE
+  IF    _GFX_PAGE_VRAM
+   IF __CPU_INTEL__ | __CPU_GBZ80__
     pop     de
-  ENDIF
+   ENDIF
+    jp      __graphics_end
+  ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    pop     ix
+    ELSE
+    pop     de
+    ENDIF
     ret
+  ENDIF
 
 
     SECTION bss_graphics
