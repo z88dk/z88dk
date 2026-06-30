@@ -96,7 +96,6 @@ up to the next existing section. Each name has the following format:
 	
 	* *name* (string) : contains the name.
 
-
 * *External Names* : contains a set of external names referred 
   by this module up to the next existing section. Each name has the 
   following format:
