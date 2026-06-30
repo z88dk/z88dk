@@ -11,9 +11,9 @@
 ;
 
     INCLUDE "classic/gfx/grafix.inc"
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
+	
     SECTION code_graphics
+
     PUBLIC  __generic_stencil_render
     EXTERN  dither_pattern
 
@@ -30,12 +30,24 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ;
 
 __generic_stencil_render:
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix                          ;save callers
     ld      ix, 4
     add     ix, sp
+ELSE
+    ld      hl,2
+    add     hl, sp
+	ld      (smc1+1),hl
+	inc     hl
+	inc     hl
+	ld      (smc2+1),hl
+ENDIF
+
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
+  
     ld      bc, _GFX_MAXY
     ld      hl, (__gfx_coords)
     push    hl
@@ -55,12 +67,17 @@ yloop:
     pop     hl
     ld      (__gfx_coords), hl
     jp      __graphics_end
+
 noret:
     push    bc
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      l, (ix+2)                   ; stencil
     ld      h, (ix+3)
-
+ELSE
+smc2:
+	ld      hl,(0)
+ENDIF
     add     hl, bc                      ; find the current X1 position on the left Y vector
     add     hl, bc
     ld      e, (hl)
@@ -88,7 +105,13 @@ noret:
     pop     bc
     push    bc
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      a, (ix+0)                   ; intensity
+ELSE
+smc1:
+    ld      a, (0)
+ENDIF
+
     push    hl
     push    de
     push    hl
@@ -142,4 +165,3 @@ done:
 in_row:
     pop     af
     jp      xloop                       ; otherwise, loop
-ENDIF
