@@ -15,8 +15,8 @@
 
     INCLUDE "classic/gfx/grafix.inc"
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
+
     PUBLIC  __generic_stencil_render
     EXTERN  dither_pattern
 
@@ -31,9 +31,19 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ;
 
 __generic_stencil_render:
-    push    ix
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    push    ix                          ;save callers
     ld      ix, 4
     add     ix, sp
+ELSE
+    ld      hl,2
+    add     hl, sp
+	ld      (smc1+1),hl
+	inc     hl
+	inc     hl
+	ld      (smc2+1),hl
+ENDIF
 
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
@@ -53,7 +63,7 @@ yloop:
     jr      nz, noret
     pop     hl
     ld      (__gfx_coords), hl
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
@@ -67,8 +77,14 @@ noret:
     ld      d, 0
     ld      e, c
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      l, (ix+2)                   ; stencil
     ld      h, (ix+3)
+ELSE
+smc2:
+	ld      hl,(0)
+ENDIF
+
     add     hl, de
     ld      a, (hl)                     ;X1
 
@@ -87,7 +103,13 @@ noret:
     ld      a, (hl)
     ld      b, a                        ; X2
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      a, (ix+0)                   ; intensity
+ELSE
+smc1:
+    ld      a, (0)
+ENDIF
+
     call    dither_pattern
     ;ld    (pattern2+1),a
     ld      e, a
@@ -98,7 +120,15 @@ noret:
     ; adjust horizontal pattern position for the current line
     and     7
 pattern_shift:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
+ELSE
+	push    af
+	ld      a,e
+	rrca
+	ld      e,a
+	pop     af
+ENDIF
     dec     a
     jr      nz, pattern_shift
 
@@ -112,7 +142,15 @@ pattern_shift:
     ld      l, c                        ; Y
 xloop:
     ;;;ld    h,a    ; X1
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
+ELSE
+	push    af
+	ld      a,e
+	rrca
+	ld      e,a
+	pop     af
+ENDIF
     push    hl
     push    de
     push    bc
@@ -135,5 +173,3 @@ done:
     jr      nz, xloop
 
     jr      yloop
-
-ENDIF
