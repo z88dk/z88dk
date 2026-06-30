@@ -121,7 +121,15 @@ ENDIF
     ld      a, l
     and     7
 pattern_shift:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     h                           ; shifted pattern
+ELSE
+	push    af
+	ld      a,h
+	rrca
+	ld      h,a
+	pop     af
+ENDIF
     dec     a
     jr      nz, pattern_shift
     ld      a, h
