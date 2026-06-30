@@ -59,7 +59,7 @@ int nxtlab, /* next avail label # */
     ncmp, /* # open compound statements */
     errcnt, /* # errors in compilation */
     c_errstop, /* stop on error */
-    eof, /* set non-zero on final input eof */
+    c_eof, /* set non-zero on final input eof */
     c_intermix_ccode, /* non-zero to intermix c-source */
     cmode, /* non-zero while parsing c-code */
     /* zero when passing assembly code */

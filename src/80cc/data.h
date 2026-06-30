@@ -31,7 +31,7 @@ extern int Zsp;
 extern int ncmp;
 extern int errcnt;
 extern int c_errstop;
-extern int eof;
+extern int c_eof;
 extern int c_intermix_ccode;
 extern int cmode;
 extern int declared;

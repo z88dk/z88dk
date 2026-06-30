@@ -79,11 +79,119 @@ static void test_ll_signedness_cast(void)
     Assert(ull_lt(0xFFFFFFFF00000000ULL, 5ULL) == 0, "unsigned ll !(big < 5)");
 }
 
+/* Compound assignment (`op=`) on long long destinations: local scalar,
+ * local array (folded `a[0]` and indexed `a[i]`), global scalar/array, and
+ * via a pointer. The aggregate stores once bailed with "OP_ASSIGN
+ * aggregate/global elem width 8" — the offset-0 folded store (local and
+ * global) now widens the RHS into the i64 acc and stores via l_i64_store
+ * like the indexed / `*p` stores. Args are runtime ints so the ops don't
+ * const-fold. */
+long long cmp_g;
+long long cmp_ga[3];
+
+int ll_cmp_scalar(int a, int b)
+{
+    long long x = a;
+    x += b; x *= 3; x -= 1; x <<= 1;
+    return (int)x;
+}
+int ll_cmp_ops(int a)
+{
+    long long x = a;
+    x %= 7;                 /* 1000 % 7  = 6   */
+    x &= 0x0E;              /* 6 & 14    = 6   */
+    x |= 0x01;              /* 6 | 1     = 7   */
+    x ^= 0x05;              /* 7 ^ 5     = 2   */
+    x >>= 1;               /* 2 >> 1    = 1   */
+    return (int)x;
+}
+int ll_cmp_array(int a, int b)
+{
+    long long la[3];
+    la[0] = a; la[0] *= b;          /* folded offset-0 compound */
+    la[1] = a; la[1] += b; la[1] /= 2;
+    return (int)(la[0] + la[1]);
+}
+int ll_cmp_global(int a, int b)
+{
+    cmp_g = a; cmp_g |= b; cmp_g ^= 1;
+    cmp_ga[0] = a; cmp_ga[0] *= b;  /* global folded offset-0 */
+    cmp_ga[2] = a; cmp_ga[2] += b;  /* global indexed */
+    return (int)(cmp_g + cmp_ga[0] + cmp_ga[2]);
+}
+int ll_cmp_ptr(int a, int b)
+{
+    long long buf[2];
+    long long *p = &buf[1];
+    *p = a; *p -= b; *p *= 2;
+    return (int)*p;
+}
+
+/* Plain long long aggregate store + load: array element (offset-0 folded and
+ * indexed) and via a stepped pointer (`p++` stride 8). The element store once
+ * bailed ("OP_ASSIGN aggregate elem width 8"); the read narrows back to int. */
+int ll_array_rw(int a, int b, int c)
+{
+    long long arr[4];
+    arr[0] = a; arr[1] = b; arr[2] = c; arr[3] = a + b + c;
+    return (int)(arr[0] + arr[2] + arr[3]);
+}
+int ll_via_ptr(int a, int b, int c)
+{
+    long long vals[3];
+    long long *p = vals;
+    vals[0] = a; vals[1] = b; vals[2] = c;
+    p++;                        /* stride 8 */
+    return (int)*p;             /* vals[1] */
+}
+
+static void test_ll_aggregate_rw(void)
+{
+    Assert(ll_array_rw(10, 100, 500) == 1120,
+           "long long array element store + load (folded + indexed)");
+    Assert(ll_via_ptr(10, 1000, 7) == 1000,
+           "long long *p after p++ (stride 8) reads the next element");
+}
+
+/* Nested narrowing cast `(wide)(narrow)x`: the inner cast must truncate before
+ * the outer widens. heira() deferred an lvalue cast onto a single cast_type
+ * slot, so the outer cast clobbered the inner — `(long long)(int)x` widened the
+ * full long instead of the 16-bit int. Runtime args (no const-fold). */
+long long nc_ll_of_int (long x) { return (long long)(int)x; }
+long      nc_long_of_char(long x) { return (long)(char)x; }
+int       nc_int_of_char (long x) { return (int)(char)x; }
+
+static void test_nested_cast(void)
+{
+    /* low 16 bits, positive: high bits of the long are dropped */
+    Assert(nc_ll_of_int(0x12345L) == 0x2345LL,
+           "(long long)(int)x truncates to 16 bits before widening");
+    /* (int) of 0xABCDE = 0xBCDE = -17186; sign-extends into the long long */
+    Assert(nc_ll_of_int(0xABCDEL) == -17186LL,
+           "(long long)(int)x sign-extends the truncated value");
+    /* (char) truncates to 8 bits, then widen */
+    Assert(nc_long_of_char(0x1234L) == 0x34L,   "(long)(char)x keeps 8 bits (positive)");
+    Assert(nc_long_of_char(0x12FFL) == -1L,     "(long)(char)x sign-extends 0xFF");
+    Assert(nc_int_of_char(0x12FFL)  == -1,      "(int)(char)x sign-extends 0xFF");
+}
+
+static void test_ll_compound(void)
+{
+    Assert(ll_cmp_scalar(10, 5) == 88,  "ll scalar += *= -= <<=");
+    Assert(ll_cmp_ops(1000)     == 1,   "ll scalar %= &= |= ^= >>=");
+    Assert(ll_cmp_array(8, 4)   == 38,  "ll local array *= (folded) and += /= (indexed)");
+    Assert(ll_cmp_global(7, 8)  == 85,  "ll global scalar |= ^= and array *= +=");
+    Assert(ll_cmp_ptr(50, 8)    == 84,  "ll compound via pointer -= *=");
+}
+
 int main(int argc, char *argv[])
 {
     suite_setup("long long unary ops (neg / complement)");
     suite_add_test(test_ll_negate);
     suite_add_test(test_ll_complement);
     suite_add_test(test_ll_signedness_cast);
+    suite_add_test(test_ll_aggregate_rw);
+    suite_add_test(test_nested_cast);
+    suite_add_test(test_ll_compound);
     return suite_run();
 }

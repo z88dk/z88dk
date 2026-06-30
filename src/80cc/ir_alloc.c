@@ -745,9 +745,12 @@ void ir_alloc(Func *f)
                 }
             for (int v = 0; v < f->n_vregs && !bc_taken; v++)
                 if (f->vreg_to_phys[v] == IR_PR_BC) bc_taken = 1;
-            /* first_def/first_read in global op order (def-before-use). */
-            int *first_def  = calloc((size_t)f->n_vregs, sizeof(int));
-            int *first_read = calloc((size_t)f->n_vregs, sizeof(int));
+            /* first_def/first_read in global op order (def-before-use).
+               clamp the count so the int->size_t cast is provably non-negative
+               (-Walloc-size-larger-than). */
+            size_t nvr = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+            int *first_def  = calloc(nvr, sizeof(int));
+            int *first_read = calloc(nvr, sizeof(int));
             if (!has_call && first_def && first_read) {
                 for (int v = 0; v < f->n_vregs; v++) {
                     first_def[v] = INT_MAX; first_read[v] = INT_MAX;
@@ -831,10 +834,13 @@ void ir_alloc(Func *f)
             for (int v = 0; v < f->n_vregs && !de_half_taken; v++)
                 if (f->vreg_to_phys[v] == IR_PR_E || f->vreg_to_phys[v] == IR_PR_D)
                     de_half_taken = 1;
-            int *wd_def  = calloc((size_t)f->n_vregs, sizeof(int));
-            int *wd_read = calloc((size_t)f->n_vregs, sizeof(int));
-            int *wd_base = calloc((size_t)f->n_vregs, sizeof(int));
-            int *wd_acc  = calloc((size_t)f->n_vregs, sizeof(int));
+            /* clamp to a provably non-negative size_t so GCC's value-range
+               analysis doesn't flag the int->size_t cast (-Walloc-size-larger-than) */
+            size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+            int *wd_def  = calloc(nv, sizeof(int));
+            int *wd_read = calloc(nv, sizeof(int));
+            int *wd_base = calloc(nv, sizeof(int));
+            int *wd_acc  = calloc(nv, sizeof(int));
             if (!wd_call && !de_half_taken && wd_def && wd_read && wd_base && wd_acc) {
                 for (int v = 0; v < f->n_vregs; v++) {
                     wd_def[v] = INT_MAX; wd_read[v] = INT_MAX;

@@ -265,6 +265,15 @@ typedef enum {
        caller-cleanup pops rebalance cur_sp_adjust. */
     IR_PUSH_ARG,
 
+    /* Struct/union by-value argument push: src[0] = vreg holding the
+       struct's address, imm = byte count (type->size). Allocates `size`
+       bytes on the data stack and block-copies the struct in, so byte i
+       lands at sp+i (natural order, exact size — matches sccz80 and SDCC
+       sdcccall(0)). The copy reuses emit_block_copy (ldir on z80, the
+       __z80asm__ldir lib helper on 808x/gbz80). Like IR_PUSH_ARG it is a
+       pre-pushed arg; the matching IR_CALL's caller-cleanup pops it. */
+    IR_PUSH_STRUCT,
+
     /* Byte extract: dst = (src[0] >> 8*imm) & 0xFF, imm in 0..3.
        Replaces the SHR(8k) / AND 0xFF / CONV_TRUNC chain on width-4
        sources (digest stores, crc table indexing). dst width 1 keeps
@@ -353,6 +362,12 @@ typedef struct {
                                near l_jphl. (Derived from the callee kind,
                                not a ctype flag.) */
     int     *args;          /* array of vreg ids */
+    int     *arg_pushed_bytes; /* parallel to args: bytes each arg occupies on
+                                  the caller stack. Scalars = their width; a
+                                  struct-by-value arg = type->size (its `args`
+                                  vreg is just the 2-byte address, so the byte
+                                  count can't be read off the vreg width). NULL
+                                  = all scalar, use the vreg widths. */
     int      n_args;
     int      ret_vreg;      /* vreg receiving the return value (-1 if void) */
     int      ret_longlong;  /* callee returns long long: push &__i64_acc as

@@ -222,7 +222,7 @@ int main(int argc, char** argv)
     Zsp = /* stack ptr (relative) */
         errcnt = /* no errors */
         c_errstop = /* keep going after an error */
-        eof = /* not eof yet */
+        c_eof = /* not c_eof yet */
         ncmp = /* no open compound states */
         lastst = /* not first file to asm */
         lineno = /* no lines read from file */
@@ -389,7 +389,7 @@ void ccabort(void)
  */
 void parse(void)
 {
-    while (eof == 0) { /* do until no more input */
+    while (c_eof == 0) { /* do until no more input */
         if (swallow(KW_EXTERN)) {
             dodeclare(EXTERNAL);
         } else if (swallow(KW_STATIC)) {
@@ -410,7 +410,7 @@ void parse(void)
         } else {
             declare_func_kr();
         }
-        blanks(); /* force eof if pending */
+        blanks(); /* force c_eof if pending */
     }
 }
 
@@ -787,14 +787,14 @@ void openout(void)
     strcpy(Filename, filen2);
 
     if ( c_output_file != NULL ) {
-        if ((output = fopen(c_output_file, "w")) == NULL && (!eof)) {
+        if ((output = fopen(c_output_file, "w")) == NULL && (!c_eof)) {
             fprintf(stderr, "Cannot open output file: %s\n", line);
             exit(1);
         }
     } else {
         strcpy(Filenorig, filen2);
         changesuffix(filen2, extension); /* Change appendix to .asm */
-        if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
+        if ((output = fopen(filen2, "w")) == NULL && (!c_eof)) {
             fprintf(stderr, "Cannot open output file: %s\n", line);
             exit(1);
         }
@@ -810,7 +810,7 @@ void openin(void)
     input = NULL; /* none to start with */
     while (input == NULL) { /* any above 1 allowed */
         clear(); /* clear line */
-        if (eof)
+        if (c_eof)
             break; /* if user said none */
         /* Deleted hopefully irrelevant code */
         if (Filename[0] == '-') {

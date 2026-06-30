@@ -110,7 +110,7 @@ int match(char* lit)
 int cmatch(char lit)
 {
     blanks();
-    if (eof)
+    if (c_eof)
         errorfmt("Unexpected end of file", 1);
 
     TokenKind want = punct_kind_for_char((unsigned char)lit);
@@ -137,7 +137,7 @@ int cmatch(char lit)
 /* Get the next character, don't skip spaces */
 int acmatch(char lit)
 {
-    if (eof)
+    if (c_eof)
         errorfmt("Unexpected end of file", 1);
     if (line[lptr] == lit) {
         ++lptr;
@@ -168,7 +168,7 @@ int rmatch2(char* lit)
 int rcmatch(char lit)
 {
     blanks();
-    if (eof)
+    if (c_eof)
         errorfmt("Unexpected end of file", 1);
 
     TokenKind want = punct_kind_for_char((unsigned char)lit);

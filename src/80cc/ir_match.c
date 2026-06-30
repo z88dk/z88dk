@@ -505,6 +505,13 @@ static int immconv_check(Func *f, BB *bb, const int idx[],
     (void)imm; (void)uc;
     const Op *a = &bb->ops[idx[1]];
     if (a->dst < 0 || a->dst >= f->n_vregs) return 0;
+    /* Don't converge the constant through the CONV when the source is an
+       address-taken or volatile local: its slot can be written through an
+       aliasing pointer between the LD_IMM and the CONV, so the CONV must
+       reload from memory rather than reuse the literal (`long n; long *p=&n;
+       n=10; *p+=31; return n;` would fold the return to a stale 10). */
+    if (f->vregs[bind[IV_V]].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+        return 0;
     int sw = f->vregs[bind[IV_V]].width;
     int dw = f->vregs[a->dst].width;
     return (sw == 1 || sw == 2 || sw == 4)

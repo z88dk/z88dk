@@ -55,7 +55,7 @@ void clear(void)
 char inbyte(void)
 {
     while (ch() == 0) {
-        if (eof)
+        if (c_eof)
             return 0;
         preprocess();
     }
@@ -69,7 +69,7 @@ void vinline(void)
     while (1) {
         if (input == NULL)
             openin();
-        if (eof)
+        if (c_eof)
             return;
         clear();
         while ((k = getc(input)) > 0) {
@@ -84,7 +84,7 @@ void vinline(void)
         if (k <= 0) {
             fclose(input);
             input = 0;
-            eof = 1;
+            c_eof = 1;
         }
         if (lptr) {
             if (c_intermix_ccode && cmode) {
@@ -119,7 +119,7 @@ void ifline(void)
 {
     while (1) {
         vinline();
-        if (eof)
+        if (c_eof)
             return;
 
         while (ch() == ' ' || ch() == '\t')

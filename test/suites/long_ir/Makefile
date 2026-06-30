@@ -10,7 +10,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin sdcccall.bin sdcccall_kc160.bin wr.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -49,6 +49,29 @@ irgaps_8080.bin: $(SOURCES) irgaps.c
 irgaps_8085.bin: $(SOURCES) irgaps.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# struct/union by-value params — z80 (math48) + gbz80/8080/8085 (mbf32). The
+# non-z80 variants exercise the no-`ldir` struct block-copy (__z80asm__ldir).
+structval.bin: $(SOURCES) structval.c
+	$(compile)
+	$(runtest)
+
+structval_gbz80.bin: $(SOURCES) structval.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+structval_8080.bin: $(SOURCES) structval.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+structval_8085.bin: $(SOURCES) structval.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# _Accum fixed-point codegen — z80 only (math48 + the l_fix16_* helpers).
+fixed.bin: $(SOURCES) fixed.c
+	$(compile)
+	$(runtest)
 
 # __sdcccall(1) calling convention — z80 (z180/z80n share the ABI), and
 # kc160 (no SDCC port; zsdcc builds kc160 in z80 mode, so same ABI).

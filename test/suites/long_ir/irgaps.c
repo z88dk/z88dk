@@ -149,15 +149,148 @@ static void test_asm_expr(void)
     Assert(ae_long() == 0x12345678L, "asm expression result in DEHL (long, no widening)");
 }
 
+/* ---- Initialiser store dropped for an address-taken local ----------
+ * `int x = 100; int *p = &x; return *p;` once returned garbage: x's
+ * value was held in a register vreg and `&x` (IR_LEA) took its slot
+ * address, but the def of an address-taken vreg was judged dead (its
+ * only "use" is the address, not a register read), so the slot store
+ * was elided and the deref read an uninitialised slot. The deref is
+ * routed through a callee so it can't fold back to the constant. */
+static int gap_deref_int(int *p) { return *p; }
+static int gap_addr_taken_init(void)
+{
+    int x = 100;
+    int *p = &x;
+    return gap_deref_int(p);   /* p escapes → x must be a real slot */
+}
+
+static void test_addr_taken_init(void)
+{
+    Assert(gap_addr_taken_init() == 100,
+           "init store of an address-taken local is not dropped");
+}
+
+/* ---- Initialiser store dropped for an in-place RMW local -----------
+ * `int x = 5; int y = x++;` fused MOV+INC into a POSTSTEP that reads x
+ * from its slot. The deadness lookahead counted the POSTSTEP's read as
+ * an HL cache-hit (j+1, src[0]==dst) and elided the `x=5` slot store,
+ * so the increment read an uninitialised slot. */
+static void test_postinc_init(void)
+{
+    int x = 5;
+    int y = x++;
+    Assert(x + y == 11, "init store survives a fused post-increment (POSTSTEP)");
+}
+
+/* ---- `*p++` value forwarded past the pointer step ------------------
+ * The load-forwarding pass (ir_opt_st2ld) tracked a post-stepping load
+ * `*p++` by its base pointer and then forwarded the *next* `*p` from it,
+ * ignoring that the load had bumped p — `a = *p++; b = *p;` read the
+ * same element twice (10+10 instead of 10+20). */
+static int gap_ppinc_arr[5] = { 10, 20, 30, 40, 50 };
+static int gap_ptr_post_inc(void)
+{
+    int *p = &gap_ppinc_arr[0];
+    int a = *p++;
+    int b = *p;
+    return a + b;
+}
+
+static void test_ptr_post_inc(void)
+{
+    Assert(gap_ptr_post_inc() == 30,
+           "*p++ does not forward its value past the pointer step");
+}
+
+/* ---- Long compare against a constant read a slotless operand -------
+ * `long g, h; g || h` lowered `h != 0` as a long CMP_NE against a
+ * constant vreg (LD_IMM 0) that had no slot — the var-RHS long-compare
+ * path read it via the `-1` no-slot sentinel below the frame, so
+ * `0L || 0L` compared unequal and evaluated true. Constant compare
+ * operands now fold into the immediate form. Globals are set at run
+ * time so the compare can't const-fold away. */
+long gap_ol_g, gap_ol_h;
+static int gap_or_long(void) { return (gap_ol_g || gap_ol_h) ? 0xBEEF : 0xDEAD; }
+
+static void test_or_long_zero(void)
+{
+    gap_ol_g = 0L; gap_ol_h = 0L;
+    Assert(gap_or_long() == 0xDEAD, "long || with both operands zero is false");
+    gap_ol_g = 0L; gap_ol_h = 7L;
+    Assert(gap_or_long() == 0xBEEF, "long || with a nonzero operand is true");
+}
+
+/* ---- `*p++` deref-step with a 4-byte (long) element ---------------
+ * The deref-step fastpath (`*p++`) once handled only 1/2-byte strides and
+ * bailed on `long *p` ("deref-step elem width 4 not supported"). Width-4
+ * now loads the long element into DEHL and bumps the pointer by 4. */
+static long gap_long_arr[3] = { 111111L, 222222L, 333333L };
+static long gap_deref_step_long(void)
+{
+    long *p = &gap_long_arr[0];
+    long a = *p++;       /* 111111, p -> [1] */
+    long b = *p;         /* 222222 */
+    return a + b;
+}
+
+static void test_deref_step_long(void)
+{
+    Assert(gap_deref_step_long() == 333333L,
+           "*p++ with a 4-byte (long) element loads and steps by 4");
+}
+
+/* ---- Address-taken local read after an aliasing store -------------
+ * `long n; long *p=&n; n=10; *p+=31; return n;` returned the stale 10:
+ * `n`'s value was const-forwarded (immconv fold + the lowerer's value
+ * cache) past the `*p` store that aliases n's slot. An address-taken
+ * scalar must be memory-coherent — reads reload from the slot. */
+long gap_alias(long init, long add)
+{
+    long n;
+    long *p = &n;
+    n = init;
+    *p += add;          /* aliases n */
+    return n;            /* must observe the aliased write */
+}
+
+static void test_addr_alias_read(void)
+{
+    Assert(gap_alias(10L, 31L) == 41L,
+           "read of an address-taken local sees an aliased *p store");
+}
+
+/* ---- Variable-count long shift clobbered the count on gbz80 -------
+ * `x >> n` / `x << n` (long, variable count) staged the count in A then
+ * loaded the value into DEHL. gbz80's byte-walk used `ld a,(hl+)` (an
+ * A-clobbering speed idiom) because A wasn't marked live, destroying the
+ * count — l_lsr_dehl/l_lsl_dehl then saw count 0 and returned the value
+ * unshifted. Runtime args keep the count out of the constant path. */
+unsigned long gap_vshr(unsigned long x, int n) { return x >> n; }
+unsigned long gap_vshl(unsigned long x, int n) { return x << n; }
+
+static void test_var_long_shift(void)
+{
+    Assert(gap_vshr(0x80000000UL, 1) == 0x40000000UL, "var-count long >> keeps the count (gbz80 A-clobber)");
+    Assert(gap_vshr(0xFF00UL, 4)     == 0x0FF0UL,      "var-count long >> by 4");
+    Assert(gap_vshl(0x00000001UL, 20) == 0x00100000UL, "var-count long << keeps the count");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
     suite_setup("IR coverage-gap regressions");
+    suite_add_test(test_deref_step_long);
+    suite_add_test(test_addr_alias_read);
+    suite_add_test(test_var_long_shift);
     suite_add_test(test_const_bitop_fuse);
     suite_add_test(test_expr_stmt);
     suite_add_test(test_cse_global_dest);
     suite_add_test(test_dbl_aggr_store);
     suite_add_test(test_knr_params);
     suite_add_test(test_asm_expr);
+    suite_add_test(test_addr_taken_init);
+    suite_add_test(test_postinc_init);
+    suite_add_test(test_ptr_post_inc);
+    suite_add_test(test_or_long_zero);
     return suite_run();
 }

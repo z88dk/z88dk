@@ -87,6 +87,24 @@ int ir_opt_st2ld(Func *f)
             if (op->kind == IR_LD_MEM && op->dst >= 0) {
                 if (op->mem.volatile_) continue;
                 if (!trackable_kind(op->mem.kind)) continue;
+                /* A post-stepping load (`*p++`/`*p--`) bumps its base
+                   pointer as a side effect. It must NOT be forwarded to a
+                   plain MOV (that would silently drop the increment), and
+                   after it any shadow entry keyed on the stepped base is
+                   stale — a later `*p` reads the NEW address, not this
+                   load's value. Drop those entries and don't track this
+                   load (its [base] is about to mean something else). */
+                if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG) {
+                    for (int k = 0; k < n; ) {
+                        if ((sh[k].kind == IR_MEM_VREG
+                             && sh[k].base == op->mem.base)
+                            || sh[k].stored_vreg == op->dst)
+                            drop(sh, &n, k);
+                        else
+                            k++;
+                    }
+                    continue;
+                }
                 int dst_w = (op->dst < f->n_vregs)
                           ? f->vregs[op->dst].width : 0;
                 int hit = -1;
@@ -1691,6 +1709,27 @@ int ir_opt_const_fold(Func *f)
                     op->kind = IR_MOV; op->src[0] = s1; op->src[1] = -1; folded = 1;
                 } else if (KCONST(s1, &c) && c == mask) {
                     op->kind = IR_MOV; op->src[1] = -1; folded = 1;
+                }
+                break;
+            }
+            case IR_CMP_EQ: case IR_CMP_NE: {
+                /* Fold a constant RHS vreg into the immediate form so the
+                   lowerer takes its const-RHS path. Otherwise the RHS is a
+                   slotless constant vreg and the long-compare lowering reads
+                   it from a slot it was never given — the `-1` no-slot
+                   sentinel below the frame (`0L || 0L` read garbage and
+                   compared unequal). Mask to the OPERAND width, not the
+                   bool-result dst width. Done outside the `folded` path
+                   because line below would zero op->imm for a non-LD_IMM. */
+                if (s1 >= 0 && s1 < nv && known[s1]
+                    && !(s0 >= 0 && s0 < nv && known[s0])) {
+                    int sw = (s0 >= 0 && s0 < nv) ? f->vregs[s0].width : 2;
+                    int64_t smask;
+                    if (cf_width_mask(sw, &smask)) {
+                        op->imm = val[s1] & smask;
+                        op->src[1] = -1;
+                        changed++;
+                    }
                 }
                 break;
             }

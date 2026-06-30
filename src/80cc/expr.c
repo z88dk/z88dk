@@ -455,6 +455,19 @@ int heira(LVALUE *lval)
             needchar(')');
             cast_lval.cast_type = ctype;
             k = heira(lval);
+            if ( k == 1 && lval->cast_type ) {
+                /* Nested cast on an lvalue operand (`(long long)(int)x`): the
+                   inner cast was deferred onto the single cast_type slot, to be
+                   applied by rvalue() AFTER the lvalue is dereferenced. A bare
+                   `lval->cast_type = outer` would clobber it and lose the inner
+                   narrowing. Resolve the inner cast properly first — rvalue()
+                   derefs the lvalue and applies the deferred inner cast — then
+                   apply the outer cast to that rvalue. The result is an rvalue
+                   (a cast is never an lvalue), so return 0. */
+                rvalue(lval);                       /* OP_DEREF + inner docast */
+                if (cast_lval.cast_type) docast(&cast_lval, lval);
+                return 0;
+            }
             if ( k == 1 ) {
                 lval->cast_type = cast_lval.cast_type;
             } else {

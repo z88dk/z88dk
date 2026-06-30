@@ -149,6 +149,7 @@ int ir_op_defs(const Op *op, int *out, int max)
     case IR_PHI:
     case IR_PUSH_DEHL_LONG:
     case IR_PUSH_ARG:
+    case IR_PUSH_STRUCT:
         /* No vreg def. */
         return 0;
     case IR_CALL:
@@ -265,7 +266,8 @@ int ir_op_uses(const Op *op, int *out, int max)
         return n;
     case IR_PUSH_DEHL_LONG:
     case IR_PUSH_ARG:
-        /* Reads src[0] (the value to push). */
+    case IR_PUSH_STRUCT:
+        /* Reads src[0] (the value to push / the struct's address). */
         n = add_unique(out, n, max, op->src[0]);
         return n;
     case IR_POP_DEHL_LONG:

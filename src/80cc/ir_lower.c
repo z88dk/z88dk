@@ -3755,12 +3755,16 @@ static int gen_memset(FILE *out, Func *f, const Op *op)
    Larger counts: `ld bc,N; ldir` (HL=src → DE=dst). Clobbers BC/DE/HL;
    DE is a reload-safe cache (cleared below); a live PR_BC tenant is
    saved/restored. HL/DE are left junk → invalidate. */
-static int gen_memcpy(FILE *out, Func *f, const Op *op)
+/* Block-copy `n` bytes from (HL) to (DE). Precondition: HL=src, DE=dst.
+   Clobbers HL/DE/A (caches invalidated); a live PR_BC tenant is saved and
+   restored. CPU-portable: z80 unrolls `ldi` (or `ldir` for n>3); 808x+gbz80
+   have no `ldi`/`ldir`, so tiny counts use the A-based byte loop and larger
+   counts emit `ldir`, which z80asm lowers to the __z80asm__ldir lib helper.
+   Shared by gen_memcpy and gen_push_struct. */
+static void emit_block_copy(FILE *out, Func *f, int n)
 {
-    int n = (int)op->imm;
-    if (n <= 0) return 0;
-    load_to_de(out, f, op->src[0]);   /* DE = dst */
-    load_to_hl(out, f, op->src[1]);   /* HL = src (preserves DE) */
+    (void)f;
+    if (n <= 0) return;
     if (n <= 3) {
         if (rs.bc < 0 && (!(IS_808x() || IS_GBZ80()))) {
             for (int i = 0; i < n; i++) emit(out, "ldi");
@@ -3775,7 +3779,7 @@ static int gen_memcpy(FILE *out, Func *f, const Op *op)
             }
         }
         invalidate_hl_cache();        /* clears HL/DE/A caches */
-        return 0;
+        return;
     }
     int bc_live  = (rs.bc >= 0);
     int save_bc  = rs.bc;
@@ -3785,6 +3789,37 @@ static int gen_memcpy(FILE *out, Func *f, const Op *op)
     if (bc_live) emit(out, "pop\tbc");
     invalidate_hl_cache();
     if (bc_live) rs.bc = save_bc;
+}
+
+static int gen_memcpy(FILE *out, Func *f, const Op *op)
+{
+    int n = (int)op->imm;
+    if (n <= 0) return 0;
+    load_to_de(out, f, op->src[0]);   /* DE = dst */
+    load_to_hl(out, f, op->src[1]);   /* HL = src (preserves DE) */
+    emit_block_copy(out, f, n);
+    return 0;
+}
+
+/* IR_PUSH_STRUCT: allocate imm bytes on the data stack and block-copy the
+   struct (address in src[0]) into it, so byte i lands at sp+i (natural order,
+   exact size) — matches sccz80's struct-arg push (codegen.c:1041-1050) and
+   SDCC sdcccall(0). For n>3 the copy uses `ldir`; on 808x/gbz80 z80asm lowers
+   that to a __z80asm__ldir call whose return address sits below the freshly
+   allocated region, so it doesn't clobber the copied bytes. */
+static int gen_push_struct(FILE *out, Func *f, const Op *op)
+{
+    int size = (int)op->imm;
+    if (size <= 0) return 0;
+    load_to_hl(out, f, op->src[0]);   /* HL = struct source address */
+    emit(out, "ex\tde,hl");           /* DE = source */
+    emit(out, "ld\thl,%d", -size);
+    emit(out, "add\thl,sp");
+    emit(out, "ld\tsp,hl");           /* sp = allocated top; HL = dst */
+    emit(out, "ex\tde,hl");           /* HL = source, DE = dst */
+    emit_block_copy(out, f, size);
+    cur_sp_adjust += size;
+    invalidate_hl_bc();
     return 0;
 }
 
@@ -4647,14 +4682,19 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
                shadow set — IX-clean by design).
 
                Stage count into HL, copy low byte to A, then load
-               value into DEHL. load_to_dehl_adj uses BC/DE/HL for
-               byte staging — it does NOT touch A — so the count
-               in A survives the DEHL load. */
+               value into DEHL. Mark A live first so load_to_dehl's gbz80
+               byte-walk uses the A-preserving `ld r,(hl); inc hl` form
+               instead of `ld a,(hl+)` (which clobbers the count). On z80
+               the walk never touches A, so this is inert there. The
+               cache is a transient and the helper clobbers A — drop it
+               after. */
             if (!hl_has(op->src[1]))
                 load_to_hl(out, f, op->src[1]);
             emit(out, "ld\ta,l");
+            cache_a(op->src[1]);
             load_to_dehl(out, f, op->src[0]);
             emit(out, "call\tl_lsl_dehl");
+            invalidate_a_cache();
             invalidate_hl_bc();
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -7060,11 +7100,14 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     int start    = sc1 ? (ci->n_args - 1)
                  : (ci->abi == IR_ABI_STDC) ? (n_to_push - 1) : 0;
     if (pre) {
-        /* Args already on the stack via IR_PUSH_ARG ops (which bumped
-           cur_sp_adjust). Just tally the bytes for the variadic count
-           and the cleanup pops. */
+        /* Args already on the stack via IR_PUSH_ARG/IR_PUSH_STRUCT ops (which
+           bumped cur_sp_adjust). Just tally the bytes for the variadic count
+           and the cleanup pops. A struct arg occupies its full size (its vreg
+           is the 2-byte address) — use arg_pushed_bytes when present. */
         for (int k = 0; k < n_to_push; k++)
-            pushed_bytes += (f->vregs[ci->args[k]].width == 4) ? 4 : 2;
+            pushed_bytes += ci->arg_pushed_bytes
+                          ? ci->arg_pushed_bytes[k]
+                          : ((f->vregs[ci->args[k]].width == 4) ? 4 : 2);
         n_to_push = 0;
     }
     for (int k = 0; k < n_to_push; k++) {
@@ -8588,8 +8631,15 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             if (!hl_has(op->src[1]))
                 load_to_hl(out, f, op->src[1]);
             emit(out, "ld\ta,l");
+            /* The count now lives in A. Mark A live so load_to_dehl's gbz80
+               byte-walk uses the A-preserving `ld r,(hl); inc hl` form, not
+               `ld a,(hl+)` (which would clobber the count the helper needs).
+               The cache is a transient (A holds the count, not src[1]'s full
+               value) and the helper clobbers A, so drop it right after. */
+            cache_a(op->src[1]);
             load_to_dehl(out, f, op->src[0]);
             emit(out, "call\tl_lsr_dehl");
+            invalidate_a_cache();
             invalidate_hl_bc();
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -8871,6 +8921,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_PUSH_DEHL_LONG:    return gen_push_dehl_long(out, f, op);
     case IR_POP_DEHL_LONG:     return gen_pop_dehl_long(out, f, op);
     case IR_PUSH_ARG:          return gen_push_arg(out, f, op);
+    case IR_PUSH_STRUCT:       return gen_push_struct(out, f, op);
     case IR_ASM:               return gen_asm(out, f, op);
     case IR_MEMSET:            return gen_memset(out, f, op);
     case IR_MEMCPY:            return gen_memcpy(out, f, op);
@@ -9120,7 +9171,8 @@ static int fastcall_arg_vreg(const Func *f)
     if (!(f->flags & FASTCALL)) return -1;
     int last = -1;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vregs[i].flags & IR_VREG_PARAM)
+        if ((f->vregs[i].flags & IR_VREG_PARAM)
+            && f->vregs[i].kind != KIND_STRUCT)  /* a struct can't ride HL */
             last = i;
     return last;
 }
@@ -10265,7 +10317,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             if (op->dst >= 0) {
                 int live_out_dst = bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, op->dst);
-                if (!live_out_dst) {
+                /* A def of an address-taken or volatile vreg is never dead:
+                   its slot store is observable through the pointer (IR_LEA
+                   reads the slot, not the value in HL) or required by
+                   volatile semantics. The cache-served exception below
+                   wrongly counts IR_LEA's read as a register use, which
+                   would otherwise elide the spill and leave the slot
+                   uninitialised (`&x` of a const/copy-init local read garbage). */
+                int addr_observable = (f->vregs[op->dst].flags
+                    & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) != 0;
+                if (!addr_observable && !live_out_dst) {
                     int safe = 1;
                     int allow_cache_hit = 1; /* one cache-hit use OK */
                     int cache_pos = 0;
@@ -10278,11 +10339,26 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         int uses[16];
                         int nu = ir_op_uses(&bb->ops[k], uses,
                                             (int)(sizeof uses / sizeof uses[0]));
+                        /* An op that both reads AND redefines op->dst (a
+                           POSTSTEP / in-place read-modify-write) reads the
+                           value from its slot, not the HL cache the def
+                           leaves behind — so the cache-served handoff is
+                           invalid and the producing def MUST spill. Without
+                           this, `int x=5; x++` elides the `x=5` slot store
+                           and the increment reads an uninitialised slot. */
+                        int k_redefs_dst = 0;
+                        {
+                            int kd[2];
+                            int knd = ir_op_defs(&bb->ops[k], kd, 2);
+                            for (int d = 0; d < knd; d++)
+                                if (kd[d] == op->dst) { k_redefs_dst = 1; break; }
+                        }
                         for (int u = 0; u < nu; u++) {
                             if (uses[u] != op->dst) continue;
                             int cache_served =
                                 allow_cache_hit &&
                                 k == j + 1 &&
+                                !k_redefs_dst &&
                                 bb->ops[k].src[cache_pos] == op->dst &&
                                 bb->ops[k].src[1 - cache_pos] != op->dst;
                             if (!cache_served) { safe = 0; break; }

@@ -204,7 +204,7 @@ void blanks(void)
     while (1) {
         while (ch() == 0) {
             preprocess();
-            if (eof)
+            if (c_eof)
                 break;
         }
         if (ch() == ' ')

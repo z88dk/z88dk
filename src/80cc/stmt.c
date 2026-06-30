@@ -757,14 +757,14 @@ Node *doasm(void)
 
     while (1) {
         preprocess(); /* get and print lines */
-        if (match("#endasm") || eof) {
+        if (match("#endasm") || c_eof) {
             break;
         }
         asm_buf_puts(&buf, line);
         asm_buf_putc(&buf, '\n');
     }
     clear(); /* invalidate line */
-    if (eof)
+    if (c_eof)
         errorfmt("Unterminated assembler code",1);
     cmode = 1; /* then back to parse level */
     Node *n = ast_asm(buf.data ? buf.data : "");

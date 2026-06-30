@@ -1607,6 +1607,47 @@ static int emit_reg_float_convert(Builder *b, int src_v, Kind from_k, Kind to_k)
     return dst;
 }
 
+/* register-float (f16 / IEEE-32) → _Accum16, via the DIRECT helper
+   l_f{16,32}_ftofix16{s,u} (value in HL/DEHL, fix16 in HL) — not the f16→int
+   `f2sint` (which drops the fraction) nor the 48-bit-FA detour. 1-arg HCALL.
+   _Accum32 has no f16/f32-source helper in libsrc, so return -1 there. */
+static int emit_fix_from_float(Builder *b, int src_v, Kind src_fk, int uns)
+{
+    const char *name =
+        (src_fk == KIND_FLOAT16) ? (uns ? "l_f16_ftofix16u" : "l_f16_ftofix16s")
+      : (src_fk == KIND_DOUBLE && c_fp_size == 4)
+                                 ? (uns ? "l_f32_ftofix16u" : "l_f32_ftofix16s")
+      : NULL;
+    if (!name) return -1;
+    int dst = new_temp_kind(b, KIND_ACCUM16);
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
+/* _Accum16 → register-float (f16 / IEEE-32), via l_f{16,32}_fix16tof. 1-arg
+   HCALL; result width from the dst float kind. -1 for unsupported tiers. */
+static int emit_float_from_fix(Builder *b, int src_v, Kind dst_fk)
+{
+    const char *name =
+        (dst_fk == KIND_FLOAT16) ? "l_f16_fix16tof"
+      : (dst_fk == KIND_DOUBLE && c_fp_size == 4) ? "l_f32_fix16tof"
+      : NULL;
+    if (!name) return -1;
+    int dst = new_temp_kind(b, dst_fk);
+    int *args = calloc(1, sizeof(int)); args[0] = src_v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
 /* The common register-float kind of two register-float operands: C's usual
    arithmetic conversions promote to the wider (IEEE-32 over _Float16). */
 static Kind reg_float_common(Kind a, Kind b)
@@ -1652,6 +1693,9 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     if (is_register_float_kind(dst_k)) {               /* → f16 / IEEE-32 */
         if (dst_k == KIND_FLOAT16 && is_acc_float_kind(sk))
             return emit_f16_from_acc(b, v);             /* acc double → f16 */
+        if (sk == KIND_ACCUM16) {                       /* _Accum16 → f16/f32 */
+            int c = emit_float_from_fix(b, v, dst_k); return c < 0 ? v : c;
+        }
         if (is_register_float_kind(sk)) {               /* f16 ↔ f32 */
             int c = emit_reg_float_convert(b, v, sk, dst_k); return c < 0 ? v : c;
         }
@@ -1660,6 +1704,9 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     }
     if (dst_k == KIND_ACCUM16 || dst_k == KIND_ACCUM32) {   /* → _Accum (fixed) */
         if (kind_is_integer(sk)) return emit_accum_from_int(b, v, dst_k, uns);
+        if (dst_k == KIND_ACCUM16 && is_register_float_kind(sk)) {
+            int c = emit_fix_from_float(b, v, sk, uns); return c < 0 ? v : c;
+        }
         if (is_acc_float_kind(sk)) return emit_accum_from_acc(b, v, dst_k, uns);
         return v;
     }
@@ -1792,6 +1839,93 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     #undef COMPOUND_ARITH
 }
 
+/* Compute `lv op rv` for a fixed-point (_Accum) compound assign. add/sub are
+   plain integer ops on the Q-format representation (Q is additive); mul/div go
+   through l_fix{16,32}_{mul,div}{s,u} (multiply-then-shift). Returns the result
+   vreg (kind ak). */
+static int emit_accum_compound_op(Builder *b, int lv, int rv, int ast_type,
+                                  Kind ak, int uns)
+{
+    if (ast_type == OP_AADD || ast_type == OP_ASUB) {
+        int dst = new_temp_kind(b, ak);
+        Op *o = ir_op_emit(cur_bb(b), ast_type == OP_AADD ? IR_ADD : IR_SUB);
+        o->dst = dst; o->src[0] = lv; o->src[1] = rv;
+        return dst;
+    }
+    const char *helper = (ak == KIND_ACCUM32)
+        ? (ast_type == OP_AMULT ? (uns ? "l_fix32_mulu" : "l_fix32_muls")
+                                : (uns ? "l_fix32_divu" : "l_fix32_divs"))
+        : (ast_type == OP_AMULT ? (uns ? "l_fix16_mulu" : "l_fix16_muls")
+                                : (uns ? "l_fix16_divu" : "l_fix16_divs"));
+    int dst = new_temp_kind(b, ak);
+    int *args = calloc(2, sizeof(int)); args[0] = lv; args[1] = rv;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = helper; hi->args = args; hi->n_args = 2;
+    hi->n_stacked = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
+/* _Accum compound-assign `lhs op= rhs` (op = AADD/ASUB/AMULT/ADIV). Mirror of
+   build_float_compound: load the fixed lvalue, build the rhs scaled to the same
+   _Accum kind, op, store back. The rhs build scales a fixed/int literal to
+   Q-format (so `a += 2.5k` adds 640, not a raw 2) and uses the fixed mul/div
+   helpers (so `a *= b` is l_fix16_muls, not an integer l_mult). */
+static int build_accum_compound(Builder *b, Node *n, Kind ak)
+{
+    if (!n->left || n->left->ast_type != OP_DEREF || !n->left->operand)
+        return build_fail("_Accum compound-assign LHS shape not supported");
+    if (!n->right || !n->right->type)
+        return build_fail("_Accum compound-assign: null rhs");
+    Node *lvn = n->left->operand;
+    int uns = (n->left->type && n->left->type->isunsigned);
+    int rv = build_operand_as_accum(b, n->right, ak);   /* scales literal rhs */
+    if (rv < 0) return -1;
+    Kind elem = (ak == KIND_ACCUM32) ? KIND_LONG : KIND_INT;
+    #define ACC_ARITH(LV) emit_accum_compound_op(b, (LV), rv, n->ast_type, ak, uns)
+
+    if (lvn->ast_type == AST_LOCAL_VAR) {
+        int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
+        if (lhs_v < 0)
+            return build_fail("_Accum compound-assign: unknown local");
+        int res = ACC_ARITH(lhs_v);
+        if (res < 0) return -1;
+        ir_emit_mov(cur_bb(b), lhs_v, res);
+        return lhs_v;
+    }
+    if (lvn->ast_type == AST_GLOBAL_VAR) {
+        SYMBOL *g = lvn->sym;
+        if (!g) return build_fail("_Accum compound-assign: null global");
+        int loaded = new_temp_kind(b, ak);
+        Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+        ld->dst = loaded; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g;
+        int res = ACC_ARITH(loaded);
+        if (res < 0) return -1;
+        Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+        st->src[0] = res; st->mem.kind = IR_MEM_SYM; st->mem.sym = g;
+        return res;
+    }
+    /* *ptr op= rhs */
+    SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
+    int ptr_v = build_expr(b, lvn);
+    if (ptr_v < 0) return -1;
+    int loaded = new_temp_kind(b, ak);
+    Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+    ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
+    ld->mem.base = ptr_v; ld->mem.elem = elem;
+    ld->mem.bank_fn = bf;
+    int res = ACC_ARITH(loaded);
+    if (res < 0) return -1;
+    Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+    st->src[0] = res; st->mem.kind = IR_MEM_VREG;
+    st->mem.base = ptr_v; st->mem.elem = elem;
+    st->mem.bank_fn = bf;
+    return res;
+    #undef ACC_ARITH
+}
+
 /* long long compound-assign `lhs op= rhs` via the acc-int tier
    (load-modify-store, l_i64_*). stem add/sub/mul/div/mod/and/or/xor.
    ast_opt folds `x = x OP y` into these OP_A* nodes, so this is the path
@@ -1832,6 +1966,27 @@ static int build_ll_compound(Builder *b, Node *n, const char *stem)
     if (lvn->ast_type == AST_LOCAL_VAR) {
         int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
         if (lhs_v < 0) return build_fail("ll compound-assign: unknown local");
+        Kind lk = lvn->sym ? (Kind)lvn->sym->type : KIND_NONE;
+        if (lk == KIND_ARRAY || lk == KIND_STRUCT) {
+            /* Folded offset-0 aggregate element (`la[0] op= x`): lhs_v is the
+               slot base, NOT a scalar value — LEA &la[0] then load-modify-
+               store (mirrors the *ptr branch). Treating it as a scalar would
+               read/overwrite the array base vreg with the result. */
+            int addr = new_temp(b, 2);
+            Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
+            lea->dst = addr; lea->src[0] = lhs_v;
+            int loaded = new_temp_kind(b, KIND_LONGLONG);
+            Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+            ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
+            ld->mem.base = addr; ld->mem.elem = KIND_LONGLONG;
+            int res = is_shift ? emit_acc_int_shift(b, stem, loaded, rv, count_imm, count_is_imm, is_uns)
+                               : emit_acc_int_binop(b, stem, loaded, rv, is_uns);
+            if (res < 0) return -1;
+            Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+            st->src[0] = res; st->mem.kind = IR_MEM_VREG;
+            st->mem.base = addr; st->mem.elem = KIND_LONGLONG;
+            return res;
+        }
         int res = is_shift ? emit_acc_int_shift(b, stem, lhs_v, rv, count_imm, count_is_imm, is_uns)
                            : emit_acc_int_binop(b, stem, lhs_v, rv, is_uns);
         if (res < 0) return -1;
@@ -2794,20 +2949,32 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            literal was a 2-byte double). */
         Kind target_k = (hint >= 0) ? (Kind)b->f->vregs[hint].kind
                                     : KIND_NONE;
-        if      (target_k == KIND_ACCUM32) w = 4;
-        else if (target_k == KIND_ACCUM16) w = 2;
+        /* Effective fixed-point kind for the Q-format scaling. Prefer the hint
+           dst (an int literal implicitly converted, `_Accum a = 3;` → 3×256),
+           but fall back to the literal's OWN type — a folded or cast-operand
+           _Accum constant carries no hint yet must still materialise scaled,
+           else `(int)(1.5k+1.5k)` emits raw 3 (→ l_fix16_f2sint → 0) instead of
+           768. Mirrors how the FLOAT16/DOUBLE paths above key on n->type->kind. */
+        Kind accum_k = (target_k == KIND_ACCUM16 || target_k == KIND_ACCUM32)
+                         ? target_k
+                     : (n->type && (n->type->kind == KIND_ACCUM16
+                                    || n->type->kind == KIND_ACCUM32))
+                         ? n->type->kind
+                     : KIND_NONE;
+        if      (accum_k == KIND_ACCUM32) w = 4;
+        else if (accum_k == KIND_ACCUM16) w = 2;
         int v = get_dest_vreg(b, hint, w);
         /* A hinted dst (decl-init) keeps its DECLARED width — the
            literal adapts to the variable, not vice versa, so `UINT4
            crc = 0` doesn't shrink crc's vreg to the int literal's
            width 2 (which would run every later long op on crc 16-bit). */
         if (hint >= 0 && b->f->vregs[v].width > 0
-            && target_k != KIND_ACCUM16 && target_k != KIND_ACCUM32)
+            && accum_k != KIND_ACCUM16 && accum_k != KIND_ACCUM32)
             w = b->f->vregs[v].width;
         b->f->vregs[v].width = (int16_t)w;
-        if (target_k == KIND_ACCUM16 || target_k == KIND_ACCUM32)
-            b->f->vregs[v].kind = target_k;
-        ir_emit_ld_imm(cur_bb(b), v, scale_literal_for_kind(n, target_k));
+        if (accum_k == KIND_ACCUM16 || accum_k == KIND_ACCUM32)
+            b->f->vregs[v].kind = accum_k;
+        ir_emit_ld_imm(cur_bb(b), v, scale_literal_for_kind(n, accum_k));
         return v;
     }
 
@@ -3004,7 +3171,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int is_pre = (step->ast_type == OP_PRE_INC ||
                           step->ast_type == OP_PRE_DEC);
             int elem_w = type_width(n->type);
-            if (elem_w != 1 && elem_w != 2)
+            if (elem_w != 1 && elem_w != 2 && elem_w != 4)
                 return build_fail("deref-step elem width %d not supported",
                                   elem_w);
             /* Step amount: sizeof(*p). char* → +/-1 (IR_INC/IR_DEC);
@@ -3013,7 +3180,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                result width if unavailable. */
             int pointee_w = lsym->ctype && lsym->ctype->ptr
                 ? type_width(lsym->ctype->ptr) : elem_w;
-            if (pointee_w != 1 && pointee_w != 2)
+            if (pointee_w != 1 && pointee_w != 2 && pointee_w != 4)
                 return build_fail("deref-step pointee width %d "
                                   "not supported", pointee_w);
 
@@ -3034,11 +3201,19 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             if (is_pre) EMIT_BUMP();
             int dst = new_temp(b, elem_w);
             b->f->vregs[dst].width = (int16_t)elem_w;
+            /* Width-4 element (long / pointer-to-pointer): the result lands
+               in DEHL — tag the vreg kind so the long store/use path
+               dispatches correctly. */
+            Kind ek = n->type ? (Kind)n->type->kind : KIND_NONE;
+            if (elem_w == 4)
+                b->f->vregs[dst].kind = ek;
             Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
             ld->dst      = dst;
             ld->mem.kind = IR_MEM_VREG;
             ld->mem.base = p_vreg;
-            ld->mem.elem = (elem_w == 1) ? KIND_CHAR : KIND_INT;
+            ld->mem.elem = (elem_w == 1) ? KIND_CHAR
+                         : (elem_w == 2) ? KIND_INT
+                         :                 KIND_LONG;
             ld->mem.bank_fn = (SYMBOL *)deref_bank_fn(n);  /* `*p++` into a space */
             if (!is_pre) EMIT_BUMP();
             #undef EMIT_BUMP
@@ -3475,9 +3650,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         uint32_t fl = n->sym->ctype ? n->sym->ctype->flags : 0;
         int is_stdc = !is_fastcall && !(fl & SMALLC) && !(fl & CALLEE);
         int *args = NULL;
+        int *arg_pushed_bytes = NULL;
         int pre_pushed = 0;
         if (n_args > 0) {
             args = calloc(n_args, sizeof(int));
+            arg_pushed_bytes = calloc(n_args, sizeof(int));
             /* Push-at-producer: build args in PUSH order (smallc /
                callee: left-to-right; stdc: right-to-left; fastcall:
                first n-1 pushed, last arg built last for the HL load)
@@ -3499,6 +3676,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             int pushable  = 1;
             int push_ops[64];
             int n_push_ops = 0;
+            int has_struct_arg = 0;
             for (int k = 0; k < n_args; k++) {
                 int i;
                 if (is_fastcall)
@@ -3508,14 +3686,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 else
                     i = k;                    /* left-to-right */
                 Node *a = array_get_byindex(n->args, i);
-                /* A struct/union passed by value decays to its address
-                   (z88dk pushes aggregates by reference — matches sccz80,
-                   e.g. memcmp(struct,struct,n)). agg_lvalue_addr bails on
-                   shapes it can't address, rolling back the whole call. */
-                int v = (a && a->type && a->type->kind == KIND_STRUCT)
-                      ? agg_lvalue_addr(b, a)
-                      : build_expr(b, a);
-                if (v < 0) { free(args); return -1; }
+                /* A struct argument is materialised as its ADDRESS
+                   (agg_lvalue_addr bails on shapes it can't address, rolling
+                   back the whole call). What happens next depends on the
+                   PARAMETER type:
+                     - param is also a struct (by value): push a COPY of
+                       `size` bytes (IR_PUSH_STRUCT) — sccz80 / SDCC
+                       sdcccall(0) ABI.
+                     - param is a pointer / void* (or unprototyped): the
+                       struct decays to its address — push that 2-byte
+                       pointer like any scalar (z88dk's lax by-reference
+                       idiom, e.g. memcmp(struct,struct,n)). */
+                int arg_is_struct = (a && a->type && a->type->kind == KIND_STRUCT);
+                Type *pt_i = (n->sym->ctype && n->sym->ctype->parameters
+                              && i < (int)array_len(n->sym->ctype->parameters))
+                           ? array_get_byindex(n->sym->ctype->parameters, i)
+                           : NULL;
+                int is_struct = arg_is_struct && pt_i && pt_i->kind == KIND_STRUCT;
+                if (is_struct) has_struct_arg = 1;
+                int v = arg_is_struct ? agg_lvalue_addr(b, a) : build_expr(b, a);
+                if (v < 0) { free(args); free(arg_pushed_bytes); return -1; }
                 /* __z88dk_sdccdecl: a char parameter is passed as ONE
                    byte (not the smallc 2-byte int promotion). Truncate
                    the arg to width-1 so gen_call emits the 1-byte push
@@ -3523,7 +3713,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                    arg also fails the pushable test below, so the call
                    falls to gen_call's slot loop where the 1-byte push
                    lives.) */
-                if ((n->sym->ctype->flags & (SDCCDECL | SDCCCALL1))
+                if (!arg_is_struct
+                    && (n->sym->ctype->flags & (SDCCDECL | SDCCCALL1))
                     && n->sym->ctype->parameters) {
                     Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
                     if (pt && pt->kind == KIND_CHAR
@@ -3541,15 +3732,29 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                    already promotes via the smallc push); integer args
                    only; an unprototyped (variadic) slot has no Type and is
                    left as-is. */
-                if (n->sym->ctype && n->sym->ctype->parameters) {
+                if (!arg_is_struct && n->sym->ctype && n->sym->ctype->parameters) {
                     Type *pt = array_get_byindex(n->sym->ctype->parameters, i);
                     v = widen_arg_to_param(b, v, a, pt);
                 }
                 args[i] = v;
+                /* Bytes this arg occupies on the caller stack: a struct's full
+                   size (its vreg is just the 2-byte address), else the vreg
+                   width. Drives the variadic count + caller cleanup. */
+                int struct_bytes = is_struct ? a->type->size : 0;
+                arg_pushed_bytes[i] = is_struct ? struct_bytes
+                                                : b->f->vregs[v].width;
                 if (b->cur_bb_id != push_bb) pushable = 0;
                 int w = b->f->vregs[v].width;
                 int want_push = (k < n_to_push);
-                if (want_push && pushable
+                if (want_push && pushable && is_struct
+                    && struct_bytes > 0 && n_push_ops < 64) {
+                    /* Push a copy of the struct's bytes (size in imm). */
+                    Op *p = ir_op_emit(cur_bb(b), IR_PUSH_STRUCT);
+                    p->src[0] = v;
+                    p->src[1] = -1;
+                    p->imm    = struct_bytes;
+                    push_ops[n_push_ops++] = cur_bb(b)->n_ops - 1;
+                } else if (want_push && pushable && !is_struct
                     && (w == 2 || w == 4)
                     && n_push_ops < 64) {
                     Op *p = ir_op_emit(cur_bb(b), IR_PUSH_ARG);
@@ -3575,6 +3780,24 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 for (int k = 0; k < n_push_ops; k++)
                     pbb->ops[push_ops[k]].kind = IR_NOP;
                 pre_pushed = 0;
+                /* The legacy slot loop in gen_call pushes scalar args from
+                   their slots; it has no struct block-copy, so a rolled-back
+                   struct arg would push only its 2-byte address (silent ABI
+                   break). Rare (struct-address eval spanning BBs) — bail. */
+                if (has_struct_arg) {
+                    free(args); free(arg_pushed_bytes);
+                    return build_fail("struct-by-value argument not pre-pushable "
+                                      "(address computation spans basic blocks) "
+                                      "— not yet supported");
+                }
+            }
+            /* fastcall puts the last arg in HL and __sdcccall(1) passes args
+               in registers — neither can carry a by-value struct, and those
+               paths don't pre-push it. Bail rather than mishandle. */
+            if (has_struct_arg && (is_fastcall || is_sdcccall1)) {
+                free(args); free(arg_pushed_bytes);
+                return build_fail("struct-by-value argument under fastcall / "
+                                  "__sdcccall(1) not yet supported");
             }
         }
         /* Return vreg width from the callee's return type — long
@@ -3612,6 +3835,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         }
         ci->fnptr_vreg = -1;
         ci->args       = args;
+        ci->arg_pushed_bytes = arg_pushed_bytes;
         ci->n_args     = n_args;
         ci->ret_vreg   = ret_v;
         /* ABI is determined by ctype flags. SMALLC = L→R push (z88dk
@@ -3621,7 +3845,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            order. */
         uint32_t flags = n->sym->ctype ? n->sym->ctype->flags : 0;
         if ((flags & SDCCCALL1) && sc1_has_wide_double(n->sym->ctype)) {
-            free(args);
+            free(args); free(arg_pushed_bytes);
             return build_fail("__sdcccall(1) call needs 4-byte doubles for a "
                               "double param/return (build with -fp-mode=ieee "
                               "or --math-mbf32); current double is %d bytes",
@@ -4035,6 +4259,16 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 return build_fail("OP_ADDR on unknown local %s",
                                   sym ? sym->name : "?");
             b->f->vregs[src].flags |= IR_VREG_ADDR_TAKEN;
+            /* A scalar whose address escapes can be read/written through that
+               pointer (aliasing). Force memory residency (treat like volatile)
+               so every access goes through the slot — otherwise a cached or
+               const-forwarded value survives an aliasing `*p = …` store:
+               `long n; long *p=&n; n=10; *p+=31; return n;` returned the stale
+               10. Aggregate locals are already memory-resident (the vreg holds
+               a slot base, not a forwarded value), so leave them alone. */
+            Kind lk = sym ? (Kind)sym->type : KIND_NONE;
+            if (lk != KIND_ARRAY && lk != KIND_STRUCT)
+                b->f->vregs[src].flags |= IR_VREG_VOLATILE;
             int dst = new_temp(b, 2);
             Op *op = ir_op_emit(cur_bb(b), IR_LEA);
             op->dst = dst;
@@ -4138,6 +4372,14 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return build_ll_compound(b, n, stem);
         }
 
+        /* _Accum (fixed) += / -=: integer add/sub of the Q-format reps, but the
+           rhs literal must be scaled (`a += 2.5k` adds 640). Bitwise/shift on a
+           fixed value fall to the integer path. */
+        if ((n->ast_type == OP_AADD || n->ast_type == OP_ASUB)
+            && n->left && n->left->type
+            && kind_is_fixed(n->left->type->kind))
+            return build_accum_compound(b, n, n->left->type->kind);
+
         return build_compound_int(b, n, k);
     }
 
@@ -4165,6 +4407,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                              : (n->ast_type == OP_ADIV)  ? "div" : "mod";
             return build_ll_compound(b, n, stem);
         }
+        /* _Accum (fixed) *= / /= via l_fix{16,32}_{mul,div}{s,u} (the integer
+           l_mult/l_div would skip the Q-format shift). %= falls to integer. */
+        if ((n->ast_type == OP_AMULT || n->ast_type == OP_ADIV)
+            && n->left->type && kind_is_fixed(n->left->type->kind))
+            return build_accum_compound(b, n, n->left->type->kind);
         return build_compound_muldiv(b, n);
     }
 
@@ -4380,6 +4627,27 @@ static int build_assign(Builder *b, Node *n)
                 fst->mem.elem = elem_k;
                 return rhs_v;
             }
+            /* Wide long long element (`long long a[N]; a[0] = x;`): widen the
+               RHS into the i64 acc and store via IR_ST_MEM's l_i64_store path
+               (mirrors the indexed `arr[i] = <long long>` and `*p = <long
+               long>` stores, which already route here). */
+            if (is_acc_int_kind(elem_k)) {
+                int rhs_v = build_expr(b, n->right);
+                if (rhs_v < 0) return -1;
+                rhs_v = promote_to_acc_int(b, rhs_v,
+                            n->right && n->right->type
+                            && n->right->type->isunsigned);
+                if (rhs_v < 0) return -1;
+                int laddr = new_temp(b, 2);
+                Op *llea = ir_op_emit(cur_bb(b), IR_LEA);
+                llea->dst = laddr; llea->src[0] = dst_v;
+                Op *lst = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                lst->src[0]   = rhs_v;
+                lst->mem.kind = IR_MEM_VREG;
+                lst->mem.base = laddr;
+                lst->mem.elem = KIND_LONGLONG;
+                return rhs_v;
+            }
             if (elem_w != 1 && elem_w != 2 && elem_w != 4)
                 return build_fail("OP_ASSIGN aggregate elem width %d",
                                   elem_w);
@@ -4542,7 +4810,14 @@ static int build_assign(Builder *b, Node *n)
             int w = width_for_kind(gk);
             elem_w = w ? w : 2;
         }
-        if (is_acc_float_kind(gk)) {
+        /* For an aggregate global (`ll_arr[0] = x`, `g.d = x`) the wide-
+           element decision keys off the element/value type, not the
+           array/struct kind itself (gk == KIND_ARRAY/STRUCT carries no
+           width). n->type is the stored-value (element) type. */
+        Kind wk = gk;
+        if ((gk == KIND_ARRAY || gk == KIND_STRUCT) && n->type)
+            wk = n->type->kind;
+        if (is_acc_float_kind(wk)) {
             /* Wide double global store via dstore (elem=KIND_DOUBLE);
                rhs is already the width-c_fp_size value. */
             Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -4552,7 +4827,7 @@ static int build_assign(Builder *b, Node *n)
             op->mem.elem = KIND_DOUBLE;
             return rhs_v;
         }
-        if (is_acc_int_kind(gk)) {
+        if (is_acc_int_kind(wk)) {
             /* Wide long long global store via l_i64_store; promote a
                narrower rhs to long long first. */
             rhs_v = promote_to_acc_int(b, rhs_v,
@@ -5071,11 +5346,26 @@ static int build_cast(Builder *b, Node *n)
         src_v = conv_v;
         if (helper_ret_w == dst_w) return src_v;
     }
+    /* register-float (f16/f32) ↔ _Accum16: DIRECT l_f{16,32}_ftofix16{s,u} /
+       l_f{16,32}_fix16tof. Must precede the generic float↔int branches below —
+       _Accum is not kind_is_floating, so those would treat it as an int and
+       pick l_f16_f2sint (drops the fraction, and is undefined in the lib). */
+    if (is_register_float_kind(src_k) && dst_k == KIND_ACCUM16) {
+        int uns = n->type && n->type->isunsigned;
+        int c = emit_fix_from_float(b, src_v, src_k, uns);
+        if (c >= 0) return c;
+    }
+    if (src_k == KIND_ACCUM16 && is_register_float_kind(dst_k)) {
+        int c = emit_float_from_fix(b, src_v, dst_k);
+        if (c >= 0) return c;
+    }
     /* int/long → float: l_f{16,32}_{s,u}{int,long}2f. The int2f
        helpers take HL (int) / DEHL (long), not a bare byte — widen a
        char source to int first (by its own signedness). Result width
-       is the float's (2 for f16, 4 for f32). */
+       is the float's (2 for f16, 4 for f32). _Accum src is excluded
+       (handled by the fixed↔float branch above / l_fix16_fix16tof). */
     if (!kind_is_floating(src_k) && !is_acc_int_kind(src_k)
+        && !kind_is_fixed(src_k)
         && is_register_float_kind(dst_k)) {
         int uns = n->operand->type && n->operand->type->isunsigned;
         if (b->f->vregs[src_v].width == 1) {
@@ -5105,7 +5395,7 @@ static int build_cast(Builder *b, Node *n)
        register-tier ll<->float path not yet built), so exclude it
        (build_fail). */
     if (is_register_float_kind(src_k) && !kind_is_floating(dst_k)
-        && !is_acc_int_kind(dst_k)) {
+        && !is_acc_int_kind(dst_k) && !kind_is_fixed(dst_k)) {
         int dst_uns = n->type && n->type->isunsigned;
         int ret_w = (dst_w == 4) ? 4 : 2;
         const char *helper = float_helper(src_k, (ret_w == 4)
@@ -6400,6 +6690,27 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
                a regular vreg in this loop. Skip the marker. */
             if ((Kind)psym->type == KIND_ELLIPSES)
                 continue;
+            /* struct/union by-value param: a struct-sized, address-taken vreg
+               accessed IN PLACE in the caller's pushed arg area. ir_alloc marks
+               it PARAM_IN_PLACE (no local slot, no prologue copy — so no double
+               stack), slot_off resolves to the caller offset, and member access
+               reuses the aggregate-local LEA+offset path. Do NOT set the sc1
+               VOLATILE flag below (a struct is never a register arg; VOLATILE
+               would force an unsupported prologue copy-in). */
+            if ((Kind)psym->type == KIND_STRUCT) {
+                int sz = psym->ctype ? psym->ctype->size : 0;
+                if (sz <= 0 || sz > 32767) {
+                    builder_free(&b);
+                    ir_func_free(f);
+                    return build_fail("struct-by-value param %s size %d "
+                                      "unsupported", pt->name, sz);
+                }
+                int sv = ir_vreg_new(b.f, (int)psym->type, psym, IR_VREG_PARAM);
+                b.f->vregs[sv].width  = (int16_t)sz;
+                b.f->vregs[sv].flags |= IR_VREG_ADDR_TAKEN;
+                sym_map_set(&b, psym, sv);
+                continue;
+            }
             if (!is_register_int_kind(psym->type)
                 && !is_register_float_kind(psym->type)
                 && !is_acc_float_kind(psym->type)
