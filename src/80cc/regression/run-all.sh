@@ -10,6 +10,7 @@
 
 case "`uname -s`" in
     CYGWIN*)    exit 0 ;;
+    MINGW*)    exit 0 ;;
     *)          export ZCCCFG=$CFG ;;
 esac
 
