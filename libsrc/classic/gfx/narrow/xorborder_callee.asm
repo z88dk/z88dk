@@ -9,7 +9,6 @@
     EXTERN  xorpixel
     EXTERN  __gfx_vram_page_in
     EXTERN  __gfx_vram_page_out
-    INCLUDE "classic/gfx/grafix.inc"
 
 
 ;
