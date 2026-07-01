@@ -514,15 +514,11 @@ sgn:
     ld      a, h
     or      l
     ret     z                           ; integer    is zero, return 0...
-;    bit    7,h
-    ld      a, 128                      ; trying to be 8080 compatible  ;)
-    and     h
-    jr      nz, negative_int
-    ld      a, 1
-    ret
-negative_int:
-    ld      a, -1
-    ret
+	ld		a, h
+	add		a, a						; CF = sign bit of H
+	sbc		a, a
+	or      1							; A = +1/-1 based on CF, ZF=0
+	ret
 
 
 ; ******************************************************************************
