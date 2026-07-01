@@ -481,7 +481,7 @@ plot_point:
     ld      h, a                        ;    x0 =    x0 +    ix
     ld      de, plot_RET
     push    de                          ;    hl =    (x0,y0)...
-    ld      de, __plot_ADDR
+    ld      de, (__plot_ADDR)
 	push    de
     ret                                 ;    execute PLOT at (x0,y0)
 plot_RET:
