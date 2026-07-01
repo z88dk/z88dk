@@ -14,6 +14,7 @@
     EXTERN  xorpixel
 
     EXTERN  __gfx_coords
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 xordrawto_callee:
