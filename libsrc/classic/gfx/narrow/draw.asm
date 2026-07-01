@@ -10,7 +10,6 @@
     EXTERN  asm_draw
     INCLUDE "classic/gfx/grafix.inc"
 
-defc __CPU_INTEL__=1
 
 draw:
 _draw:
