@@ -28,6 +28,8 @@
 ;    BC    = (width,heigth)
 ;
 
+    INCLUDE "classic/gfx/grafix.inc"
+
 xorborder_callee:
 _xorborder_callee:
 
