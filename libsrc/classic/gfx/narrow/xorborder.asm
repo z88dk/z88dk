@@ -7,6 +7,8 @@
 
     EXTERN  asm_xorborder
 
+    INCLUDE "classic/gfx/grafix.inc"
+
 ;
 ;    $Id: xorborder.asm $
 ;
