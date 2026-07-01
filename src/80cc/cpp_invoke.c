@@ -57,6 +57,8 @@ FILE *cpp_open(const char *cpp_exe, const char *input_file)
 {
     UT_string *cmd;
     utstring_new(cmd);
+    utstring_printf (cmd, "%s", cpp_exe);
+
     for (int i = 0; i < cpp_argc; i++) {
         utstring_printf(cmd, " ");
         shell_quote(cpp_args[i], cmd);
