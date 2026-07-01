@@ -8,6 +8,12 @@
 #   common env overrides: COMPILER, LEGACY_SCCZ80, Z80ASM, Z88DK_LIB,
 #                          TICKS, UCPP
 
+case "`uname -s`" in
+    CYGWIN*)    exit 0 ;;
+    *)          export ZCCCFG=$CFG ;;
+esac
+
+
 set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HERE/lib.sh"

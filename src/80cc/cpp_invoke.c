@@ -41,12 +41,12 @@ void cpp_add_arg(const char *arg)
    without special chars) this is good enough as a first pass. */
 static void shell_quote(const char *s, UT_string *out)
 {
-    utstring_printf(out, "'");
+    utstring_printf(out, "\"");
     for (const char *p = s; *p; ++p) {
-        if (*p == '\'') utstring_printf(out, "'\\''");
+        if (*p == '\"') utstring_printf(out, "'\\\'\'");
         else            utstring_printf(out, "%c", *p);
     }
-    utstring_printf(out, "'");
+    utstring_printf(out, "\"");
 }
 
 
