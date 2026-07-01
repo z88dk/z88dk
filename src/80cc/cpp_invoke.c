@@ -1,16 +1,6 @@
 /*
- *      sccz80 — preprocessor subprocess wrapper.
+ *      80cc — preprocessor subprocess wrapper.
  *
- *      Phase L1 of the tokeniser migration: when the input is a raw
- *      `.c` file (no --c1mode), sccz80 spawns z88dk-ucpp via popen
- *      and reads the preprocessed text off the pipe. In --c1mode the
- *      input is opened directly as already-preprocessed source.
- *
- *      Forwards -I, -D, -U flags collected during option parsing
- *      to the subprocess. ucpp's stderr is inherited, so its
- *      diagnostics appear directly on the user's terminal (we
- *      accept that they don't carry the sccz80 prefix — the cost
- *      of avoiding pipe+fork+exec for a side stream).
  */
 
 #include "ccdefs.h"
@@ -47,7 +37,7 @@ void cpp_add_arg(const char *arg)
    macro values, which may contain spaces, `=`, parens, etc. Single-
    quote wrap is sufficient on POSIX; for embedded single quotes,
    escape as `'\''`. On Windows _popen uses cmd.exe — quoting is
-   different (`"...\""`) but for sccz80's typical usage (paths
+   different (`"...\""`) but for 80cc's typical usage (paths
    without special chars) this is good enough as a first pass. */
 static void shell_quote(const char *s, UT_string *out)
 {
@@ -67,7 +57,6 @@ FILE *cpp_open(const char *cpp_exe, const char *input_file)
 {
     UT_string *cmd;
     utstring_new(cmd);
-    shell_quote(cpp_exe, cmd);
     for (int i = 0; i < cpp_argc; i++) {
         utstring_printf(cmd, " ");
         shell_quote(cpp_args[i], cmd);
@@ -76,11 +65,11 @@ FILE *cpp_open(const char *cpp_exe, const char *input_file)
     shell_quote(input_file, cmd);
 
     if (c_verbose)
-        fprintf(stderr, "sccz80: %s\n", utstring_body(cmd));
+        fprintf(stderr, "80cc: %s\n", utstring_body(cmd));
 
     FILE *p = POPEN(utstring_body(cmd), "r");
     if (p == NULL)
-        fprintf(stderr, "sccz80: failed to spawn preprocessor: %s\n",
+        fprintf(stderr, "80cc: failed to spawn preprocessor: %s\n",
                 utstring_body(cmd));
     utstring_free(cmd);
     return p;
