@@ -1,5 +1,4 @@
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorborder_callee
@@ -10,7 +9,6 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  xorpixel
     EXTERN  __gfx_vram_page_in
     EXTERN  __gfx_vram_page_out
-    INCLUDE "classic/gfx/grafix.inc"
 
 
 ;
@@ -28,6 +26,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ; IN:    HL    = (x,y)
 ;    BC    = (width,heigth)
 ;
+
+    INCLUDE "classic/gfx/grafix.inc"
 
 xorborder_callee:
 _xorborder_callee:
@@ -103,4 +103,3 @@ vrowloop:
   ELSE
     ret
   ENDIF
-ENDIF

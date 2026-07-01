@@ -1,6 +1,5 @@
 ; ----- void __CALLEE__ xordrawto(int x2, int y2)
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xordrawto_callee
@@ -12,9 +11,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  __graphics_end
 
     EXTERN  Line
-    EXTERN  respixel
+    EXTERN  xorpixel
 
     EXTERN  __gfx_coords
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 xordrawto_callee:
@@ -26,25 +26,32 @@ _xordrawto_callee:
     push    af                          ; ret addr
 
 asm_xordrawto:
-    ld      hl, (__gfx_coords)
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
-  IFDEF _GFX_PAGE_VRAM
+ELSE
+    EXTERN  __plot_ADDR
+    ld      hl,xorpixel
+    ld      (__plot_ADDR),hl
+ENDIF
+    ld      hl, (__gfx_coords)
+  IFDEF _gfx_vram_page
     call    __gfx_vram_page_in
   ENDIF
     push    hl
     push    de
-    call    respixel
+    call    xorpixel
     pop     de
     pop     hl
-    ld      ix, respixel
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      ix, xorpixel
+ENDIF
     call    Line
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
+ENDIF
     ret
   ENDIF
 
-ENDIF

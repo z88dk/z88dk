@@ -1,6 +1,5 @@
     INCLUDE "classic/gfx/grafix.inc"
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  Line
 
@@ -100,4 +99,3 @@ distance:
     ret     nc
     ld      h, -1
     ret
-ENDIF

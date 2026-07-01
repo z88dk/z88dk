@@ -1,5 +1,4 @@
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorborder
@@ -7,6 +6,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___xorborder
 
     EXTERN  asm_xorborder
+
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ;    $Id: xorborder.asm $
@@ -27,6 +28,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 xorborder:
 _xorborder:
 ___xorborder:
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
     ld      ix, 2
     add     ix, sp
@@ -35,5 +38,20 @@ ___xorborder:
     ld      l, (ix+6)
     ld      h, (ix+8)
     pop     ix
-    jp      asm_xorborder
+ELSE
+    pop     af
+    pop     bc                          ; height
+    pop     de
+    ld      b, e                        ; width
+
+    pop     hl                          ; x
+    pop     de
+    push    de
+    push    hl
+    ld      h, e                        ; y
+
+    push    de                          ; foo value, the original one is gone
+    push    bc
+    push    af
 ENDIF
+    jp      asm_xorborder

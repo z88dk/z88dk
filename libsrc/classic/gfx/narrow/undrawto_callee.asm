@@ -1,7 +1,6 @@
 ; ----- void __CALLEE__ undrawto(int x2, int y2)
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  undrawto_callee
@@ -28,9 +27,15 @@ _undrawto_callee:
     push    af                          ; ret addr
 
 asm_undrawto:
-    ld      hl, (__gfx_coords)
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
-  IFDEF _GFX_PAGE_VRAM
+ELSE
+    EXTERN  __plot_ADDR
+    ld      hl,respixel
+    ld      (__plot_ADDR),hl
+ENDIF
+    ld      hl, (__gfx_coords)
+  IFDEF _gfx_vram_page
     call    __gfx_vram_page_in
   ENDIF
     push    hl
@@ -38,15 +43,16 @@ asm_undrawto:
     call    respixel
     pop     de
     pop     hl
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      ix, respixel
+ENDIF
     call    Line
-  IF    _GFX_PAGE_VRAM
+  IF    _gfx_vram_page
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
+ENDIF
     ret
   ENDIF
 
-ENDIF

@@ -1,6 +1,5 @@
 ; ----- void __CALLEE__ xordraw(int x, int y, int x2, int y2)
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xordraw_callee
@@ -28,7 +27,15 @@ _xordraw_callee:
     push    af                          ; ret addr
 
 asm_xordraw:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+ELSE
+    EXTERN  __plot_ADDR
+    push    hl
+    ld      hl,xorpixel
+    ld      (__plot_ADDR),hl
+    pop     hl
+ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -37,8 +44,11 @@ asm_xordraw:
     call    xorpixel
     pop     de
     pop     hl
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      ix, xorpixel
+ENDIF
     call    Line
+
   IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
@@ -47,5 +57,3 @@ asm_xordraw:
     ENDIF
     ret
   ENDIF
-
-ENDIF
