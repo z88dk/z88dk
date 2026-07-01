@@ -34,7 +34,7 @@ ELSE
     ld      (__plot_ADDR),hl
 ENDIF
     ld      hl, (__gfx_coords)
-  IFDEF _gfx_vram_page
+  IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     push    hl
@@ -46,7 +46,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      ix, xorpixel
 ENDIF
     call    Line
-  IF    _gfx_vram_page
+  IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
