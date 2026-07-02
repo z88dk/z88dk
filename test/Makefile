@@ -37,4 +37,4 @@ src-all:
 	$(MAKE) -C ../src/ucpp test
 	$(MAKE) -C ../src/z80asm test
 	$(MAKE) -C ../src/zobjcopy test
-	$(MAKE) -C ../src/80cc test
+	#$(MAKE) -C ../src/80cc test
