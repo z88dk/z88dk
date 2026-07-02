@@ -2182,7 +2182,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           ADC(xl,ALURxy_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d) // (R4K) LD (PW+d),A
-        if (israbbit4k()) r4k_ld_ipdd_a(opc);
+        if (israbbit4k() && ih) r4k_ld_ipdd_a(opc);
         else if( ih )
           ADC(get_memory_data(l|h<<8),ALUiHL_TICKS);
         else if( iy )

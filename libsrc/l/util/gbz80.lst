@@ -1,1 +1,5 @@
 @${NEWLIB_ROOT}l/util/common.lst
+${NEWLIB_ROOT}l/util/5-z80/long/l_lsl_dehl
+${NEWLIB_ROOT}l/util/5-z80/long/l_lsr_dehl
+${NEWLIB_ROOT}l/util/5-z80/long/small/l_small_lsl_dehl
+${NEWLIB_ROOT}l/util/5-z80/long/small/l_small_lsr_dehl
