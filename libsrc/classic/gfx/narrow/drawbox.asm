@@ -1,8 +1,8 @@
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawbox
+    INCLUDE "classic/gfx/grafix.inc"
 
 ;
 ;    $Id: drawbox.asm $
@@ -80,11 +80,26 @@ vrowloop:
 p_sub:
     push    hl
     push    de
-    ld      de, p_RET1
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
+    ld      de, plot_RET
     push    de
     jp      (ix)                        ;    execute PLOT at (h,l)
-p_RET1:
+
+ELSE
+
+    EXTERN  __plot_ADDR
+
+    ld      de, plot_RET
+    push    de                          ;    hl =    (x0,y0)...
+    ld      de, (__plot_ADDR)
+	push    de
+    ret                                 ;    execute PLOT at (x0,y0)
+
+ENDIF
+
+plot_RET:
     pop     de
     pop     hl
     ret
-ENDIF
