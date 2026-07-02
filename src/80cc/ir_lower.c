@@ -5498,6 +5498,12 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         if (src_w == 1) {
             load_byte_to_a(out, f, op->src[0]);
             emit(out, "ld\te,a");           /* stash byte across HL load */
+            /* E (DE's low half) is now the store value, NOT whatever vreg the
+               DE cache believed it held — e.g. an `arr[i]=v` store right after
+               `&arr + i` left i cached in DE. Drop the belief or the next read
+               of that vreg picks up the store value. (gbz80 miscompiled
+               `a[i]=0; b[i]=(char)(i+1)` — the i+1 read `ld a,e` saw 0.) */
+            invalidate_de_cache();
             load_to_hl(out, f, op->mem.base);
             emit_hl_add_offset(out, op->mem.offset, 1);
             emit(out, "ld\t(hl),e");
