@@ -4732,6 +4732,26 @@ static int build_assign(Builder *b, Node *n)
                 fst->mem.elem = elem_k;
                 return rhs_v;
             }
+            /* Register-float element (`_Float16 a[N]; a[0] = x;` or IEEE-32
+               `float`): convert the RHS to the element's float format — an
+               int RHS becomes the folded float constant, not raw int bits
+               stored as if they were a float. The generic int path below
+               stores the same-width RHS unconverted. */
+            if (is_register_float_kind(elem_k)) {
+                int rhs_v = build_expr(b, n->right);
+                if (rhs_v < 0) return -1;
+                if (node_value_kind(n->right) != elem_k)
+                    rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, elem_k);
+                int faddr = new_temp(b, 2);
+                Op *flea = ir_op_emit(cur_bb(b), IR_LEA);
+                flea->dst = faddr; flea->src[0] = dst_v;
+                Op *fst = ir_op_emit(cur_bb(b), IR_ST_MEM);
+                fst->src[0]   = rhs_v;
+                fst->mem.kind = IR_MEM_VREG;
+                fst->mem.base = faddr;
+                fst->mem.elem = elem_k;
+                return rhs_v;
+            }
             /* Wide long long element (`long long a[N]; a[0] = x;`): widen the
                RHS into the i64 acc and store via IR_ST_MEM's l_i64_store path
                (mirrors the indexed `arr[i] = <long long>` and `*p = <long
@@ -4856,10 +4876,26 @@ static int build_assign(Builder *b, Node *n)
         rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, dst_accum);
         if (rhs_v < 0) return -1;
     }
-    /* Storing an integer into a float lvalue: convert int→float (the
-       front end no longer inserts the cast). No-op for matching kinds. */
-    rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right,
-                n->left->type ? n->left->type->kind : KIND_NONE);
+    /* Storing an integer into a float lvalue: convert int→float (the front
+       end no longer inserts the cast). Derive the destination float kind from
+       the LHS type, unwrapping a folded array/index shape (`f16_arr[0] = 100`
+       leaves n->left->type as KIND_ARRAY, its element in ->ptr) — a deref `*p`
+       already carries the element kind directly. n->type is unreliable here:
+       for a deref store it is the RHS (int) type, which would suppress the
+       conversion and store the raw integer bits. */
+    {
+        Kind ldk = n->left->type ? n->left->type->kind : KIND_NONE;
+        /* Only a folded bare register-float array (`f16_arr[0] = 100` /
+           `f32_arr[0] = 100`, n->left is the bare array var) needs unwrapping
+           to the element here. _Accum / acc-double arrays are already scaled
+           by the dst_accum path above (unwrapping them would double-convert),
+           and a deref `*p` carries its pointee kind with its own store-side
+           conversion. */
+        if (ldk == KIND_ARRAY && n->left->type->ptr
+            && is_register_float_kind(n->left->type->ptr->kind))
+            ldk = n->left->type->ptr->kind;
+        rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, ldk);
+    }
     /* Symmetric: storing a float/double into an integer lvalue
        (`arr[k] = dbl;`, `g = dbl;`). Convert float→long here; the
        per-shape width-coercion below narrows to the element/global width.
@@ -5083,14 +5119,15 @@ static int build_assign(Builder *b, Node *n)
                 op->mem.bank_fn = bf;
                 return rhs_v;
             }
-            /* 4-byte f32 double: a plain 4-byte DEHL value — store all
-               4 bytes. n->type can read back as int for the member
-               shape (elem_w=2 above), which would truncate; force 4.
-               Coerce an INTEGER rhs to f32 (`*p = 5` → 5.0): the raw int
-               vreg stored as 4 bytes is a float denormal (~0), not 5.0.
-               No-op when rhs is already f32. */
-            if (dk == KIND_DOUBLE || dk == KIND_FLOAT) {
-                elem_w = 4;
+            /* Register-float element: a plain 2-byte (f16) or 4-byte (f32)
+               DEHL value — store the whole element. n->type can read back as
+               int for the member shape (elem_w=2 above), which would truncate;
+               force the float width. Coerce an INTEGER rhs to the float format
+               (`*p = 5` → 5.0): the raw int vreg stored as float bits is a
+               denormal (~0) / garbage, not 5.0. No-op when rhs is already that
+               float kind. */
+            if (dk == KIND_DOUBLE || dk == KIND_FLOAT || dk == KIND_FLOAT16) {
+                elem_w = (dk == KIND_FLOAT16) ? 2 : 4;
                 rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, dk);
                 if (rhs_v < 0) return -1;
             }
