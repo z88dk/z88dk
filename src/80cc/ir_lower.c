@@ -983,9 +983,8 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
         }
-        emit(out, "ld\ta,(hl)");
-        emit(out, "ld\tl,a");
-        emit(out, "ld\th,0");
+        emit(out, "ld\tl,(hl)");       /* read the byte straight into L … */
+        emit(out, "ld\th,0");          /* … zero-extend; no detour through A */
         hl_about_to_change(vreg_id);   /* HL now holds the value, not the addr */
         return;
     }
@@ -8299,6 +8298,27 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        DOES have jp po (parity), which works for these compares, so they stay
        on the jp-po path.) */
     int long_signflip = is_signed && IS_GBZ80();
+    /* Byte compare against a small constant: a width-1 operand is loaded
+       zero-extended (`ld l,(hl); ld h,0`), so the existing widen+16-bit
+       compare is really an UNSIGNED compare of a [0,255] value against a
+       [0,255] constant — identical to a single `cp K`. Emit that directly
+       for the branch-fused `c REL K` (K in a byte): CF = (c < K) unsigned,
+       matching cf_true_long. Removes the widen + the 16-bit sbc machinery.
+       Chiefly the range-narrowed loop counter (`i < 16`). */
+    if (op->src[0] >= 0 && op->src[1] == -1
+        && f->vregs[op->src[0]].width == 1
+        && op->imm >= 0 && op->imm <= 255
+        && cur_branch_test_kind != 0) {
+        load_byte_to_a(out, f, op->src[0]);
+        emit(out, "cp\t%u", (unsigned)(op->imm & 0xff));
+        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int want_carry = (cf_true_long == br_true);
+        emit(out, "jp\t%s,L_f%d_bb_%d",
+             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
+        rs.a = -1;                     /* A clobbered; HL/DE/BC untouched */
+        cur_skip_next_op = 1;
+        return 0;
+    }
     /* Long ordered compare: byte-wise sub/sbc chain. Final sbc
        leaves CF = unsigned borrow (a<b) and A = high byte of result.
        Signed gets the S^V correction inline (`jp po ok; xor 0x80;
@@ -9922,6 +9942,9 @@ int ir_lower_func(FILE *out, Func *f)
            byte as width-1 — must run after dce (fewer ops to scan, dead
            producers already gone) and before liveness/slots, which size
            frame slots off the (now-narrowed) widths. */
+        /* Range-narrow bounded loop counters to a byte before narrow_byte
+           and slot sizing (which reads the now-narrowed widths). */
+        int ivnarrow = ir_opt_narrow_iv(f);
         int narrow  = ir_opt_narrow_byte(f);
         /* narrow_byte turns promoting CONV_SX|ZX operands into
            byte-identity copies; propagate them away (else they spill to a
@@ -9952,16 +9975,16 @@ int ir_lower_func(FILE *out, Func *f)
         int pushes  = want_pushes ? ir_opt_insert_long_pushes(f) : 0;
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
-             || late > 0 || match > 0 || narrow > 0
+             || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
              || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
                     "ir_opt: %d licm, %d ivsr, %d early, %d st2ld, %d cfold, "
                     "%d reassoc, %d match, %d cse, "
                     "%d packs, %d late, %d pushes, %d deadret, "
-                    "%d dce, %d narrow in func\n",
+                    "%d dce, %d narrow, %d ivnarrow in func\n",
                     hoisted, ivsr, early, fwd, cfold, reassoc, match,
-                    cse, packs, late, pushes, deadret, dce, narrow);
+                    cse, packs, late, pushes, deadret, dce, narrow, ivnarrow);
     }
 
     /* Drop orphan vregs (abandoned builder temps — in no op slot) before the

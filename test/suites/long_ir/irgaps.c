@@ -306,6 +306,24 @@ static void test_const_store_fold(void)
            "const store fold byte+word+long, MEM_VREG + MEM_SYM");
 }
 
+/* IV range-narrowing: a counter proven to fit [0,256) is retyped to a byte
+   (step becomes inc/dec, int uses zero-extend). Must stay value-exact for
+   up-counters, down-counters, post-loop use, and — critically — must NOT
+   narrow a counter that exceeds 255 (would wrap in a byte). */
+static int iv_arr[20];
+static int iv_up(void)   { int s=0,i; for(i=0;i<16;i++) s+=iv_arr[i]; return s; }
+static int iv_down(void) { int s=0,i; for(i=16;i>0;i--) s+=iv_arr[i-1]; return s; }
+static int iv_post(void) { int i; for(i=0;i<16;i++) {} return i; }        /* post = 16 */
+static long iv_big(void) { long s=0; int i; for(i=0;i<300;i++) s+=(i&15); return s; }
+static void test_iv_narrow(void)
+{
+    int i; for (i=0;i<16;i++) iv_arr[i]=i;      /* 0..15, sum 120 */
+    Assert(iv_up()   == 120, "iv narrow: up-counter [0,16)");
+    Assert(iv_down() == 120, "iv narrow: down-counter (16..1]");
+    Assert(iv_post() == 16,  "iv narrow: post-loop counter value");
+    Assert(iv_big()  == 2226, "iv NOT narrowed at >255 (no byte wrap)");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -324,5 +342,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_ptr_post_inc);
     suite_add_test(test_or_long_zero);
     suite_add_test(test_const_store_fold);
+    suite_add_test(test_iv_narrow);
     return suite_run();
 }

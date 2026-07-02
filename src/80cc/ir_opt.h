@@ -135,6 +135,11 @@ int ir_opt_dce(Func *f);
  * Returns the number of ops narrowed. */
 int ir_opt_narrow_byte(Func *f);
 
+/* Range-narrow a loop counter proven to fit [0,256) to a byte (width-1):
+ * byte inc/dec step, 1-byte slot, int uses auto-widen. IR_NO_IV_NARROW opts
+ * out. Returns the number of counters narrowed. */
+int ir_opt_narrow_iv(Func *f);
+
 /* Local (per-BB) copy propagation: rewrites src operands reading an
  * identity copy (MOV / same-width CONV_SX|ZX) to read the copy's source,
  * so the copy becomes dead (removed by a following DCE). Pairs with

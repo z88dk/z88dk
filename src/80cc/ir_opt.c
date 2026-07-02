@@ -1341,6 +1341,169 @@ int ir_opt_dce(Func *f)
     return removed;
 }
 
+/* ---- Induction-variable range narrowing (ir_opt_narrow_iv) ----------
+   A loop counter whose value range provably fits [0,256) is retyped to a
+   byte (width 1, KIND_CHAR): the step becomes a byte inc/dec and its slot is
+   one byte, while every int use auto-widens (load_to_hl zero-extends a
+   width-1 vreg). Sound because zero-extending a value proven in [0,256)
+   reproduces its exact int value. Two shapes, both off a single-latch
+   natural loop whose header holds the guard:
+     up:   c=c0 (0..255); header CMP_LT/ULT c,B (B<=255) or LE/ULE (B<=254);
+           exactly one INC c, no DEC.               range [c0, max] <= 255
+     down: c=c0 (0..255); header CMP_GT/GE/NE c,0(/1); exactly one DEC c, no
+           INC (dec runs after the guard, so c stays >= 0). range [0, c0]
+   IR_NO_IV_NARROW opts out. Retype only (no op insertion): the lowerer's
+   width-1 paths do the rest. */
+
+/* Classify every vreg's defs in one function-wide scan (mirrors the idx2
+   counter scan in ir_alloc.c). */
+typedef struct {
+    int n_ldimm, n_inc, n_dec, n_other, is_base;
+    int64_t initval;
+} IvClass;
+
+static int niv_classify(Func *f, IvClass *cl)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_VREG && o->mem.base >= 0
+                && o->mem.base < f->n_vregs)
+                cl[o->mem.base].is_base = 1;
+            if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                && o->src[0] < f->n_vregs)
+                cl[o->src[0]].is_base = 1;
+            int d = o->dst;
+            if (d < 0 || d >= f->n_vregs) continue;
+            if (o->kind == IR_LD_IMM)              { cl[d].n_ldimm++; cl[d].initval = o->imm; }
+            else if (o->kind == IR_INC && o->src[0] == d) cl[d].n_inc++;
+            else if (o->kind == IR_DEC && o->src[0] == d) cl[d].n_dec++;
+            else                                    cl[d].n_other++;
+        }
+    }
+    return 1;
+}
+
+/* Is `v` a clean counter (single const init in [0,255], only ±1 self-steps
+   in one direction, no other def, no aliasing) narrowable to a byte? */
+static int niv_counter_ok(Func *f, const IvClass *cl, int v, int *is_down)
+{
+    const VReg *vr = &f->vregs[v];
+    if (vr->width != 2 || !kind_is_integer((int)vr->kind)) return 0;
+    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    const IvClass *c = &cl[v];
+    if (c->is_base || c->n_other != 0 || c->n_ldimm != 1) return 0;
+    if (c->initval < 0 || c->initval > 255) return 0;
+    if (c->n_inc == 1 && c->n_dec == 0) { *is_down = 0; return 1; }
+    if (c->n_dec == 1 && c->n_inc == 0) { *is_down = 1; return 1; }
+    return 0;
+}
+
+/* Header-guard bound: find a CMP in header `h` that tests counter `c`
+   against a constant and bounds it. Returns 1 and sets *maxval (the largest
+   value c can hold) for the up-counter; for a down-counter it only checks
+   the exit test stops at >= 0 (range [0,c0], caller uses initval). */
+static int niv_up_bound_ok(Func *f, int h, int c, int64_t *maxval)
+{
+    BB *hb = &f->bbs[h];
+    for (int j = 0; j < hb->n_ops; j++) {
+        const Op *o = &hb->ops[j];
+        if (o->src[0] != c || o->src[1] != -1) continue;
+        /* c < B: max value c reaches is B; c <= B: max is B+1. */
+        if (o->kind == IR_CMP_LT || o->kind == IR_CMP_ULT) {
+            if (o->imm >= 0 && o->imm <= 255) { *maxval = o->imm; return 1; }
+        } else if (o->kind == IR_CMP_LE || o->kind == IR_CMP_ULE) {
+            if (o->imm >= 0 && o->imm <= 254) { *maxval = o->imm + 1; return 1; }
+        }
+    }
+    return 0;
+}
+
+static int niv_down_exit_ok(Func *f, int h, int c)
+{
+    BB *hb = &f->bbs[h];
+    for (int j = 0; j < hb->n_ops; j++) {
+        const Op *o = &hb->ops[j];
+        /* while (c) / while (c != 0) / while (c > 0): stops at 0, never neg. */
+        if (o->kind == IR_BR_ZERO && o->src[0] == c) return 1;
+        if (o->src[0] != c || o->src[1] != -1) continue;
+        if ((o->kind == IR_CMP_NE || o->kind == IR_CMP_GT
+             || o->kind == IR_CMP_UGT) && o->imm == 0) return 1;
+        if ((o->kind == IR_CMP_GE || o->kind == IR_CMP_UGE) && o->imm == 1) return 1;
+    }
+    return 0;
+}
+
+int ir_opt_narrow_iv(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || getenv("IR_NO_IV_NARROW")) return 0;
+
+    IvClass *cl = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(IvClass));
+    if (!cl) return 0;
+    niv_classify(f, cl);
+
+    /* Reachability (unreachable back-edges aren't real loops). */
+    int *reach = calloc((size_t)f->n_bbs, sizeof(int));
+    int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!reach || !stack) { free(cl); free(reach); free(stack); return 0; }
+    int sp = 0; reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *cbb = &f->bbs[stack[--sp]];
+        int ns = ir_bb_n_succ(cbb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(cbb, s);
+            if (sid >= 0 && sid < f->n_bbs && !reach[sid]) { reach[sid] = 1; stack[sp++] = sid; }
+        }
+    }
+    free(stack);
+
+    int narrowed = 0;
+    for (int h = 0; h < f->n_bbs; h++) {
+        if (!reach[h]) continue;
+        /* Single-latch natural loop (mirror ir_opt_ivsr's scan). */
+        int n_entry = 0, n_back = 0;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int ns = ir_bb_n_succ(bb), targets_h = 0;
+            for (int s = 0; s < ns; s++)
+                if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
+            if (!targets_h) continue;
+            if (b < h) n_entry++;
+            else if (b >= h && reach[b] && licm_reaches(f, h, b)) n_back++;
+        }
+        if (n_entry != 1 || n_back != 1) continue;
+
+        /* Look in the header for a counter-vs-constant guard. */
+        BB *hb = &f->bbs[h];
+        for (int j = 0; j < hb->n_ops; j++) {
+            const Op *o = &hb->ops[j];
+            int c = -1;
+            if ((o->kind >= IR_CMP_EQ && o->kind <= IR_CMP_UGE)
+                && o->src[0] >= 0 && o->src[1] == -1) c = o->src[0];
+            else if (o->kind == IR_BR_ZERO && o->src[0] >= 0) c = o->src[0];
+            if (c < 0 || c >= f->n_vregs) continue;
+            int is_down = 0;
+            if (!niv_counter_ok(f, cl, c, &is_down)) continue;
+            int ok = 0;
+            if (!is_down) {
+                int64_t maxv = 0;
+                ok = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
+            } else {
+                ok = niv_down_exit_ok(f, h, c) && cl[c].initval <= 255;
+            }
+            if (!ok) continue;
+            f->vregs[c].width = 1;
+            f->vregs[c].kind  = KIND_CHAR;
+            narrowed++;
+        }
+    }
+    free(reach);
+    free(cl);
+    return narrowed;
+}
+
 /* ---- Byte-width narrowing (ir_opt_narrow_byte) ----------------------
    C promotes char operands to int, so `crc ^ d[i]`, `x & 0x0f`, `c << 1`
    etc. become width-2 IR ops whose result is immediately truncated back
