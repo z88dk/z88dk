@@ -1,16 +1,8 @@
-;
-;     Z88 Graphics Functions - Small C+ stubs
-;
-;     Written around the Interlogic Standard Library
-;
-;
-; ----- void __CALLEE__ drawb(int x, int y, int h, int v)
+; ----- void __CALLEE__ undrawb(int x, int y, int h, int v)
 ;
 ;    $Id: drawb_callee.asm $
 ;
 
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawb_callee
@@ -37,8 +29,16 @@ _drawb_callee:
     push    af
 
 asm_drawb:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
     ld      ix, plotpixel
+	ELSE
+    EXTERN  __plot_ADDR
+	push    hl
+    ld      hl,plotpixel
+    ld      (__plot_ADDR),hl
+	pop     hl
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -51,4 +51,3 @@ asm_drawb:
     ENDIF
     ret
   ENDIF
-ENDIF

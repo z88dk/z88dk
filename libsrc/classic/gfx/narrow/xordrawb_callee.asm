@@ -1,8 +1,9 @@
 ; ----- void __CALLEE__ xordrawb(int x, int y, int h, int v)
+;
+;    $Id: xordrawb_callee.asm $
+;
 
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
-    SECTION code_graphics
+   SECTION code_graphics
 
     PUBLIC  xordrawb_callee
     PUBLIC  _xordrawb_callee
@@ -13,6 +14,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  xorpixel
     EXTERN  __gfx_vram_page_in
     EXTERN  __graphics_end
+    INCLUDE "classic/gfx/grafix.inc"
 
 
 xordrawb_callee:
@@ -27,8 +29,16 @@ _xordrawb_callee:
     push    af
 
 asm_xordrawb:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
     ld      ix, xorpixel
+    ELSE
+    EXTERN  __plot_ADDR
+    push    hl
+    ld      hl,xorpixel
+    ld      (__plot_ADDR),hl
+    pop     hl
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -41,4 +51,3 @@ asm_xordrawb:
     ENDIF
     ret
   ENDIF
-ENDIF
