@@ -1,0 +1,358 @@
+%title #269 elide char store-then-reload of same FP slot (-3b, -19t)
+	ld	(ix%1),a
+	ld	a,(ix%1)
+=
+	ld	(ix%1),a
+
+%title #269 elide char store-then-reload of same FP slot (iy variant)
+	ld	(iy%1),a
+	ld	a,(iy%1)
+=
+	ld	(iy%1),a
+
+%title #G1 gbz80 elide store-then-reload of same sp-rel int slot (-5b, -24t)
+%cpu gbz80
+	ld	hl,sp+%1
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+	ld	hl,sp+%1
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,sp+%1
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+
+%title #284 paired ex de,hl cancellation (-2b, -8t)
+	ex	de,hl
+	ex	de,hl
+=
+
+%title #285a BC stash overwritten by immediate ld bc (-2b, -8t)
+	ld	bc,hl
+	ld	bc,%1
+=
+	ld	bc,%1
+
+%title #285b HL recovery overwritten by immediate ld hl (-2b, -8t)
+; NOT on ez80: there `ld hl,%1` can be `ld hl,(hl)` (native word deref,
+; ed 27) which READS hl, so dropping the `ld hl,bc` that set the pointer
+; miscompiles. No other CPU emits `ld hl,(hl)`, so the rule is safe there.
+%notcpu ez80
+%notcpu ez80_z80
+	ld	hl,bc
+	ld	hl,%1
+=
+	ld	hl,%1
+
+%title #285c BC<->HL round trip cancellation, HL->BC->HL (-2b, -8t)
+	ld	bc,hl
+	ld	hl,bc
+=
+	ld	bc,hl
+
+%title #285d BC<->HL round trip cancellation, BC->HL->BC (-2b, -8t)
+	ld	hl,bc
+	ld	bc,hl
+=
+	ld	hl,bc
+
+%title #286a SHL byte_shift=1 shuffle through BC (skip cache-hit HL recovery, -2b)
+	ld	hl,bc
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
+=
+	ld	d,e
+	ld	e,b
+	ld	h,c
+	ld	l,0
+
+%title #286f SHR byte_shift=3 shuffle through DE (-2b)
+	ld	hl,bc
+	ld	l,d
+	ld	h,0
+	ld	e,h
+	ld	d,e
+=
+	ld	l,d
+	ld	h,0
+	ld	e,h
+	ld	d,e
+
+%title #285e push BC instead of recovered HL before ld hl (-2b, -8t)
+	ld	hl,bc
+	push	de
+	push	hl
+	ld	hl,%1
+=
+	push	de
+	push	bc
+	ld	hl,%1
+
+%title #285f dead HL recovery before push de;push bc;ld hl (-2b, -8t)
+	ld	hl,bc
+	push	de
+	push	bc
+	ld	hl,%1
+=
+	push	de
+	push	bc
+	ld	hl,%1
+
+%title #285g elide redundant push bc/pop bc around sp-rel addr compute (-2b, -21t)
+	push	bc
+	ld	hl,%1
+	add	hl,sp
+	pop	bc
+=
+	ld	hl,%eval(%1 2 -)
+	add	hl,sp
+
+%title #285h fold HL recovery+ld bc,K+add hl,bc to ld hl,K+add hl,bc (-2b, -8t)
+	ld	hl,bc
+	ld	bc,%1
+	add	hl,bc
+=
+	ld	hl,%1
+	add	hl,bc
+
+%title #285k elide push hl/pop hl around ld de,(ix+d) — HL unchanged (-2b, -28t)
+	push	hl
+	%"ld	de,\(ix[-+0-9]*\)"1
+	pop	hl
+=
+	%1
+
+%title #260a-via-a byte→int<<8 inline through A (-2b, -8t)
+	ld	l,a
+	ld	h,0
+	ld	h,l
+	ld	l,0
+=
+	ld	h,a
+	ld	l,0
+
+%title #260a-into-de byte->int<<8 built straight into DE, drop dead ex (FP, -1b, -4t)
+	ld	h,a
+	ld	l,0
+	ex	de,hl
+	ld	hl,(ix%1)
+=
+	ld	d,a
+	ld	e,0
+	ld	hl,(ix%1)
+
+%title #287 drop dead ex de,hl when both DE and HL are reloaded from ix (FP, -1b, -4t)
+	ex	de,hl
+	ld	de,(ix%1)
+	ld	hl,(ix%2)
+=
+	ld	de,(ix%1)
+	ld	hl,(ix%2)
+
+%title #285m caller-save BC + arg push via HL → push bc twice (-2b, -8t)
+	push	bc
+	ld	hl,bc
+	push	hl
+	ld	hl,%1
+=
+	push	bc
+	push	bc
+	ld	hl,%1
+
+%title #285n elide ex de,hl + reload same slot when DE gets overwritten (-4b)
+	ld	(ix%1),hl
+	ex	de,hl
+	ld	hl,(ix%1)
+	ld	de,%2
+=
+	ld	(ix%1),hl
+	ld	de,%2
+
+%title #285o *p++ idiom: drop redundant ld hl,(ix+M) + ld a,(ix-N) (-9b, ~-40t)
+	ld	hl,(ix%1)
+	ld	a,(hl)
+	ld	(ix%2),a
+	ld	hl,(ix%1)
+	inc	hl
+	ld	(ix%1),hl
+	ld	a,(ix%2)
+=
+	ld	hl,(ix%1)
+	ld	a,(hl)
+	ld	(ix%2),a
+	inc	hl
+	ld	(ix%1),hl
+
+%title #285p narrow int-load to byte when high half discarded (-4b, -16t)
+	ld	hl,(ix%1)
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	h,0
+=
+	ld	a,(ix%1)
+	and	%2
+	ld	l,a
+	ld	h,0
+
+%title #285q small-mask + add hl,hl → add a,a before the int-extend (-0b, -7t)
+%check 0 <= %2 <= 127
+	ld	a,(ix%1)
+	and	%2
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+=
+	ld	a,(ix%1)
+	and	%2
+	add	a,a
+	ld	l,a
+	ld	h,0
+
+%title #285r 16-bit slot XOR via byte-direct xor (ix+d) (z80, -4b, -16t)
+%notcpu ez80
+%notcpu ez80_z80
+%notcpu gbz80
+%notcpu r2ka
+%notcpu r3k
+%notcpu kc160
+	ld	de,(ix%1)
+	ld	hl,(ix%2)
+	ld	a,l
+	xor	e
+	ld	l,a
+	ld	a,h
+	xor	d
+	ld	h,a
+=
+	ld	a,(ix%2)
+	xor	(ix%1)
+	ld	l,a
+	ld	a,(ix%eval(%2 1 +))
+	xor	(ix%eval(%1 1 +))
+	ld	h,a
+
+%title #285r-and 16-bit slot AND via byte-direct and (ix+d) (z80, -4b, -16t)
+%notcpu ez80
+%notcpu ez80_z80
+%notcpu gbz80
+%notcpu r2ka
+%notcpu r3k
+%notcpu kc160
+	ld	de,(ix%1)
+	ld	hl,(ix%2)
+	ld	a,l
+	and	e
+	ld	l,a
+	ld	a,h
+	and	d
+	ld	h,a
+=
+	ld	a,(ix%2)
+	and	(ix%1)
+	ld	l,a
+	ld	a,(ix%eval(%2 1 +))
+	and	(ix%eval(%1 1 +))
+	ld	h,a
+
+%title #286 IR gbz80 fuse slot-addr ld hl,N + add hl,sp -> ld hl,sp+N (-2b, -7t)
+%cpu gbz80
+%check -128 <= %1 <= 127
+	ld	hl,%1
+	add	hl,sp
+=
+	ld	hl,sp+%1
+
+%title #G6 IR gbz80 word-load + ex de,hl -> load straight into DE (HL reloaded)
+%cpu gbz80
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ex	de,hl
+	ld	hl,%1
+=
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+
+%title #G2 IR gbz80 drop dead ex de,hl (both DE,HL reloaded: ld de;ld hl)
+%cpu gbz80
+	ex	de,hl
+	ld	de,%1
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+%title #G3 IR gbz80 drop dead ex de,hl (both reloaded: ld hl;ld de)
+%cpu gbz80
+	ex	de,hl
+	ld	hl,%2
+	ld	de,%1
+=
+	ld	hl,%2
+	ld	de,%1
+
+%title #G4 IR gbz80 ex de,hl + ld hl -> ld d,h;ld e,l (emulated ex is push/pop x4)
+%cpu gbz80
+	ex	de,hl
+	ld	hl,%1
+=
+	ld	d,h
+	ld	e,l
+	ld	hl,%1
+
+%title #IR drop dead ld a,l after a byte widen (ld l,a makes A==L, ld h,0 keeps it)
+	ld	l,a
+	ld	h,0
+	ld	a,l
+=
+	ld	l,a
+	ld	h,0
+
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). NOT ez80: ld de,(hl)/ld hl,(hl) READ the reg there, so the ex may be a live deref
+%notcpu ez80
+%notcpu ez80_z80
+	ex	de,hl
+	ld	de,%1
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (hl first)
+%notcpu ez80
+%notcpu ez80_z80
+	ex	de,hl
+	ld	hl,%2
+	ld	de,%1
+=
+	ld	hl,%2
+	ld	de,%1
+
+%title #IR const/sym straight to DE: ld hl,X;ex de,hl;ld hl,Y -> ld de,X;ld hl,Y. X is symbol(_x)/immediate(digit) ONLY (regex) — NOT (mem)/sp+N, whose ld de,(nn)/ld de,sp+N are absent on 808x/gbz80; the ex's HL output dies in the next ld hl
+	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
+	ex	de,hl
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+%title #IR const/sym straight to DE, gbz80 emulated-swap form (ld d,h;ld e,l copies HL->DE; same symbol/immediate-only guard)
+%cpu gbz80
+	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
+	ld	d,h
+	ld	e,l
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2

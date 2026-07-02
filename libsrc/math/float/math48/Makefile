@@ -4,12 +4,14 @@
 
 include ../../../Make.config
 
+vpath %.c ../cimpl
+
 TARGET ?= test
 
 #NEWLIBGLOBS := "$(Z88DK_LIBSRC)/math/float/math48/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/c/sdcc_ix/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/lm/c/sccz80/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/lm/c/sdcc_ix/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/lm/z80/*.asm" "$(Z88DK_LIBSRC)/math/float/math48/z80/*.asm"
 
 AFILES = $(wildcard c/smallc/*.asm)
-CFILES  = $(wildcard cimpl/*.c) 
+CFILES  = $(wildcard cimpl/*.c)  fromfix16.c  tofix16.c
 OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 CFLAGS += -DFLOAT_IS_48BITS
