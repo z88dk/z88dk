@@ -281,6 +281,38 @@ void test_fmax()
 
 #endif
 
+/* Storing an INTEGER into a float lvalue via an index / pointer deref must
+   convert int→float (`fa[i] = 5` → 5.0), not store the raw integer. The
+   indexed/deref store paths skipped the conversion, storing an int-width
+   value into the float slot: for a 4-byte double (math32/mbf32) `fa[i]=0`
+   left the high 2 bytes stale, so a prior value leaked. */
+static FLOAT itf_a[4];
+static FLOAT *itf_p;
+void test_int_to_float_store()
+{
+    int i, five = 5;
+    for (i = 0; i < 4; i++) itf_a[i] = 100;      /* int literal → float (array) */
+    Assert(approx_equal(itf_a[0], 100.0, EPSILON), "int lit -> float arr");
+    itf_p = &itf_a[2]; *itf_p = five;            /* int var → float (deref) */
+    Assert(approx_equal(itf_a[2], 5.0, EPSILON), "int var -> float deref");
+    for (i = 0; i < 4; i++) itf_a[i] = 0;         /* int 0 → float: clear ALL bytes */
+    Assert(approx_equal(itf_a[0], 0.0, EPSILON), "int 0 -> float arr (no stale high bytes)");
+    Assert(approx_equal(itf_a[1], 0.0, EPSILON), "int 0 -> float arr [1]");
+}
+
+/* `1.0 / x` is lowered to the reciprocal helper (l_f32_invf / l_f16_invf)
+   on IEEE-f32 and f16, and stays a full divide elsewhere — either way the
+   result must match. The divisor comes from a runtime-written global so the
+   quotient can't const-fold away. */
+static FLOAT recip_in[3];
+void test_reciprocal()
+{
+    recip_in[0] = 4.0; recip_in[1] = 0.5; recip_in[2] = 8.0;
+    Assert(approx_equal(1.0 / recip_in[0], 0.25,  EPSILON), "1/4 = 0.25");
+    Assert(approx_equal(1.0 / recip_in[1], 2.0,   EPSILON), "1/0.5 = 2");
+    Assert(approx_equal(1.0 / recip_in[2], 0.125, EPSILON), "1/8 = 0.125");
+}
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -293,6 +325,8 @@ int suite_math()
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
+    suite_add_test(test_int_to_float_store);
+    suite_add_test(test_reciprocal);
     suite_add_test(test_sqrt);
     suite_add_test(test_pow);
 #ifndef MATH16

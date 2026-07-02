@@ -610,6 +610,7 @@ static const char *float_helper(Kind k, const char *base)
         { "f2ulong", "l_f16_f2ulong", "l_f32_f2ulong" },
         { "ftof16",  NULL,            "l_f32_ftof16"  },
         { "f16tof",  NULL,            "l_f32_f16tof"  },
+        { "invf",    "l_f16_invf",    "l_f32_invf"    },
         { NULL, NULL, NULL }
     };
     int is16 = (k == KIND_FLOAT16);
@@ -946,6 +947,41 @@ static int emit_float_arith(Builder *b, Kind fk, const char *stem,
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
     hi->name = name; hi->args = args; hi->n_args = 2;
     hi->n_stacked = 1; hi->ret_vreg = dst;
+    op->hcall = hi;
+    return dst;
+}
+
+/* True when `n` is a numeric literal equal to 1 (int `1` or float `1.0`) —
+   the dividend that turns `1.0 / x` into a reciprocal. */
+static int node_is_numeric_one(Node *n)
+{
+    return n && n->ast_type == AST_LITERAL && (double)n->zval == 1.0;
+}
+
+/* Reciprocal-eligible float kinds, mirroring sccz80 zdiv_dconst: the half
+   float and IEEE single ship an inverse helper; the acc-tier 48/64-bit
+   doubles and MBF32 do not, so `1.0/x` stays a full divide there. */
+static int float_reciprocal_ok(Kind fk)
+{
+    if (fk == KIND_FLOAT16) return 1;
+    if (fk == KIND_DOUBLE && c_fp_size == 4 && c_maths_mode == MATHS_IEEE)
+        return 1;
+    return 0;
+}
+
+/* Emit a register-float reciprocal HCALL (l_f{16,32}_invf) computing 1/rv.
+   Unary ABI: operand in HL/DEHL, result in HL/DEHL. Returns the result
+   vreg or -1 if fk has no inverse helper. */
+static int emit_float_reciprocal(Builder *b, Kind fk, int rv)
+{
+    const char *name = float_helper(fk, "invf");
+    if (!name) return -1;
+    int dst = new_temp_kind(b, fk);
+    int *args = calloc(1, sizeof(int)); args[0] = rv;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = dst;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
     op->hcall = hi;
     return dst;
 }
@@ -1672,6 +1708,36 @@ static int build_operand_as_float_reg(Builder *b, Node *node, Kind fk)
     return emit_float_reg_from_int(b, v, fk, uns);
 }
 
+/* Materialise a compile-time float constant (`value`) directly in float kind
+   fk: the FA/IEEE bit pattern as an immediate (f16 / register f32) or a
+   const-pool dload (acc-tier double). Mirrors the AST_LITERAL float path so a
+   CONSTANT int→float conversion folds here instead of a runtime l_f32_sint2f.
+   Returns the vreg, or -1 if fk isn't a register/acc float kind. */
+static int emit_float_const(Builder *b, double value, Kind fk)
+{
+    if (fk == KIND_FLOAT16) {
+        unsigned char fa[8];
+        dofloat(MATHS_IEEE16, value, fa);
+        int fv = new_temp_kind(b, KIND_FLOAT16);
+        ir_emit_ld_imm(cur_bb(b), fv, (int64_t)(((int)fa[1] << 8) | fa[0]));
+        return fv;
+    }
+    if (fk == KIND_DOUBLE) {
+        if (is_register_float_kind(KIND_DOUBLE)) {   /* IEEE-32 / MBF-single */
+            unsigned char fa[8];
+            dofloat(c_maths_mode, value, fa);
+            uint32_t bits = ((uint32_t)fa[3] << 24) | ((uint32_t)fa[2] << 16)
+                          | ((uint32_t)fa[1] << 8)  | (uint32_t)fa[0];
+            int fv = new_temp_kind(b, KIND_DOUBLE);
+            ir_emit_ld_imm(cur_bb(b), fv, (int64_t)bits);
+            return fv;
+        }
+        return emit_pool_load(b, ir_pool_litlab_double((zdouble)value),
+                              c_fp_size, KIND_DOUBLE);   /* 5/6/8-byte double */
+    }
+    return -1;
+}
+
 /* Coerce an already-built value `v` (from `src`) into the float kind `dst_k`
    for an assignment / initialiser / return. Integer source → the right
    int→float conversion (acc or register tier). Same float kind or a
@@ -1684,6 +1750,14 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     Kind sk = node_value_kind(src);
     if (sk == dst_k) return v;
     int uns = src && src->type && src->type->isunsigned;
+    /* Constant int → register/acc float: fold the conversion at compile time
+       (store the float bit pattern) rather than emit a runtime l_f32_sint2f /
+       int→acc call. `Au[i] = 0` becomes a direct 0.0 store, matching sdcc. */
+    if (src && src->ast_type == AST_LITERAL && kind_is_integer(sk)
+        && (is_register_float_kind(dst_k) || is_acc_float_kind(dst_k))) {
+        int c = emit_float_const(b, (double)src->zval, dst_k);
+        if (c >= 0) return c;
+    }
     if (is_acc_float_kind(dst_k)) {                     /* → 5/6/8-byte double */
         if (sk == KIND_FLOAT16) return emit_acc_from_f16(b, v);
         if (sk == KIND_ACCUM16 || sk == KIND_ACCUM32) return emit_acc_from_accum(b, v, sk);
@@ -1789,9 +1863,19 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     Node *lvn = n->left->operand;
     int fw = width_for_kind(fk);
     Kind elem = is_acc ? KIND_DOUBLE : (fw == 2) ? KIND_INT : KIND_LONG;
+    /* For a commutative register-float op (`acc += x`, `acc *= x`) put the
+       rhs — built first, typically a call/mul result — in the STACKED slot
+       so the lowerer can push it to the data stack inline (Lever A), and
+       the freshly-loaded accumulator in the DEHL/reg slot. Matches sccz80's
+       staging; without it the rhs is spilled to a frame slot and reloaded.
+       Acc tier (FA model) keeps lhs-first — it doesn't use the DEHL stack. */
+    int fc_commutative = !is_acc
+        && (!strcmp(stem, "add") || !strcmp(stem, "mul"))
+        && getenv("IR_NO_F32_STACK_ARG") == NULL;
     #define COMPOUND_ARITH(LV) (is_acc \
         ? emit_acc_binop(b, stem, (LV), rv) \
-        : emit_float_arith(b, fk, stem, (LV), rv))
+        : fc_commutative ? emit_float_arith(b, fk, stem, rv, (LV)) \
+                         : emit_float_arith(b, fk, stem, (LV), rv))
 
     int rv = build_expr(b, n->right);
     if (rv < 0) return -1;
@@ -2506,6 +2590,22 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
     Kind rk = n->right && n->right->type ? n->right->type->kind : KIND_NONE;
     if (n->ast_type != OP_MULT && n->ast_type != OP_DIV)
         return build_fail("float op %d not yet supported", (int)n->ast_type);
+    /* `1.0 / x` → reciprocal(x): a float divide is reciprocal-then-multiply,
+       so a unit numerator lets us call the inverse helper directly and skip
+       the trailing multiply-by-one (and the 1.0 operand load). Only where a
+       register-float inverse helper exists (see float_reciprocal_ok). */
+    if (n->ast_type == OP_DIV && node_is_numeric_one(n->left)) {
+        Kind rfk = (n->type && kind_is_floating(n->type->kind))
+                     ? n->type->kind
+                 : is_register_float_kind(rk) ? rk : KIND_NONE;
+        if (float_reciprocal_ok(rfk)) {
+            int r = build_operand_as_float_reg(b, n->right, rfk);
+            if (r < 0) return build_fail("reciprocal: divisor not promotable");
+            int dst = emit_float_reciprocal(b, rfk, r);
+            if (dst < 0) return build_fail("reciprocal emit failed");
+            return dst;
+        }
+    }
     /* 5/6-byte double mul/div → wide-accumulator op. */
     if (is_acc_float_kind(lk) && lk == rk) {
         int l = build_expr(b, n->left);
@@ -4587,9 +4687,14 @@ static int build_assign(Builder *b, Node *n)
         && ((Kind)n->left->sym->type == KIND_ACCUM16
          || (Kind)n->left->sym->type == KIND_ACCUM32))
         dst_accum = (Kind)n->left->sym->type;
-    if (n->left->ast_type == OP_DEREF
-        && n->left->type
-        && n->left->type->kind == KIND_PTR
+    /* Any pointer/array-to-_Accum address LHS: `*p` (OP_DEREF), `a[i]`
+       (OP_ADD address, type KIND_PTR) AND a global _Accum array index
+       (type KIND_ARRAY, element in ->ptr). Without these, `acc_arr[i] = 5`
+       built the int literal unscaled (no _Accum hint) and stored the raw
+       integer — reading back ~0. */
+    if (n->left->type
+        && (n->left->type->kind == KIND_PTR
+            || n->left->type->kind == KIND_ARRAY)
         && n->left->type->ptr
         && (n->left->type->ptr->kind == KIND_ACCUM16
          || n->left->type->ptr->kind == KIND_ACCUM32))
@@ -4742,6 +4847,15 @@ static int build_assign(Builder *b, Node *n)
               ? build_expr_hinted(b, n->right, rhs_hint)
               : build_expr(b, n->right);
     if (rhs_v < 0) return -1;
+    /* Non-literal int RHS into an _Accum lvalue (`acc_arr[i] = intvar`):
+       scale it to fixed-point. The hint above only scales LITERALS; a
+       variable needs the runtime int→_Accum conversion, and the coerce
+       below keys off n->left->type (KIND_PTR/ARRAY for an indexed store,
+       not the _Accum kind) so it would miss. No-op if already _Accum. */
+    if (dst_accum != KIND_NONE && rhs_hint < 0) {
+        rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, dst_accum);
+        if (rhs_v < 0) return -1;
+    }
     /* Storing an integer into a float lvalue: convert int→float (the
        front end no longer inserts the cast). No-op for matching kinds. */
     rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right,
@@ -4955,7 +5069,12 @@ static int build_assign(Builder *b, Node *n)
                        && n->left->type->ptr)
                         ? n->left->type->ptr->kind : KIND_NONE;
             if (is_acc_float_kind(dk)) {
-                /* `*p = X` wide double store via dstore. */
+                /* `*p = X` wide double store via dstore. Coerce an INTEGER
+                   rhs to the acc-double (`*p = 5` → 5.0): without it the raw
+                   int vreg is dstore'd as garbage. No-op when already a
+                   double. */
+                rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, dk);
+                if (rhs_v < 0) return -1;
                 Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
                 op->src[0]   = rhs_v;
                 op->mem.kind = IR_MEM_VREG;
@@ -4966,9 +5085,15 @@ static int build_assign(Builder *b, Node *n)
             }
             /* 4-byte f32 double: a plain 4-byte DEHL value — store all
                4 bytes. n->type can read back as int for the member
-               shape (elem_w=2 above), which would truncate; force 4. */
-            if (dk == KIND_DOUBLE || dk == KIND_FLOAT)
+               shape (elem_w=2 above), which would truncate; force 4.
+               Coerce an INTEGER rhs to f32 (`*p = 5` → 5.0): the raw int
+               vreg stored as 4 bytes is a float denormal (~0), not 5.0.
+               No-op when rhs is already f32. */
+            if (dk == KIND_DOUBLE || dk == KIND_FLOAT) {
                 elem_w = 4;
+                rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, dk);
+                if (rhs_v < 0) return -1;
+            }
             if (is_acc_int_kind(dk)) {
                 /* `*p = X` wide long long store via l_i64_store. */
                 rhs_v = promote_to_acc_int(b, rhs_v,
@@ -5087,8 +5212,26 @@ static int build_assign(Builder *b, Node *n)
                        && (kind_is_floating(n->left->type->kind)
                            || n->left->type->kind == KIND_LONGLONG))
                         ? n->left->type->kind : KIND_NONE;
+            /* A double/ll *array* lvalue reads back as KIND_ARRAY/KIND_PTR
+               with the element float/ll kind on ->ptr, and n->type can be
+               int (`da[i] = 100`). Follow the pointee so the coercion below
+               fires — else the raw int is stored into the wide slot. */
+            if (vk == KIND_NONE && n->left->type
+                && (n->left->type->kind == KIND_PTR
+                    || n->left->type->kind == KIND_ARRAY)
+                && n->left->type->ptr
+                && (kind_is_floating(n->left->type->ptr->kind)
+                    || n->left->type->ptr->kind == KIND_LONGLONG))
+                vk = n->left->type->ptr->kind;
             if (is_acc_float_kind(vk) || vk == KIND_DOUBLE
                 || vk == KIND_FLOAT) {
+                /* Coerce an INTEGER rhs to the float kind (`o[i] = 0` →
+                   0.0): without it the raw int vreg (width 2) is stored as
+                   the 4-byte value, writing only 2 bytes and leaving the
+                   double's high half stale. No-op when rhs is already that
+                   float kind (`o[i] = 1.0`). */
+                rhs_v = coerce_int_to_float_kind(b, rhs_v, n->right, vk);
+                if (rhs_v < 0) return -1;
                 Op *op = ir_op_emit(cur_bb(b), IR_ST_MEM);
                 op->src[0]   = rhs_v;
                 op->mem.kind = IR_MEM_VREG;

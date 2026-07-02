@@ -120,6 +120,22 @@ void test_pow()
     run_pow(FIX16_FROM_FLOAT(2.0), FIX16_FROM_FLOAT(0.5), FIX16_FROM_FLOAT(1.42));
 }
 
+/* Storing an INTEGER into an _Accum lvalue via an index / pointer deref must
+   scale int→fixed-point (`fa[i] = 5` → 5.0, not the raw bits 5). The
+   indexed/deref store paths skipped the scaling, storing the unshifted int. */
+static FIX itf_a[4];
+static FIX *itf_p;
+static int itf_seed = 7;
+static int seven(void) { return itf_seed; }   /* opaque: no const-fold to a literal */
+void test_int_to_accum_store()
+{
+    int i;
+    for (i = 0; i < 4; i++) itf_a[i] = 5;         /* int literal -> _Accum (array) */
+    Assert(FIX16_TO_INT(itf_a[0]) == 5, "int lit -> accum arr");
+    itf_p = &itf_a[2]; *itf_p = seven();          /* int var -> _Accum (deref) */
+    Assert(FIX16_TO_INT(itf_a[2]) == 7, "int var -> accum deref");
+}
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -127,6 +143,7 @@ int suite_math()
     suite_add_test(test_comparison);
     suite_add_test(test_integer_constant_operations);
     suite_add_test(test_approx_equal);
+    suite_add_test(test_int_to_accum_store);
     suite_add_test(test_sqrt);
     suite_add_test(test_pow);
     return suite_run();

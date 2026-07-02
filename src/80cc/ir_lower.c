@@ -671,6 +671,12 @@ static int cur_dehl_inline_push;         /* vreg pushed inline, -1=none */
 static int cur_dehl_inline_push_base_sp; /* cur_sp_adjust at push time */
 static int cur_dehl_push_to_stack;       /* one-shot flag: set by lookahead */
 
+/* Lever A: push a width-4 call/op result straight to the data stack when
+   its sole use is the stacked operand of a later HCALL (l_f32_mul etc.),
+   instead of spilling to a frame slot and reloading. Off via
+   IR_NO_F32_STACK_ARG. */
+static int f32_stack_arg_on;
+
 /* Load a PR_BC vreg's slot value into BC. Used both by the prologue
    (function entry) and by on-demand reload sites — when a PR_BC vreg
    is read but `rs.bc` holds a different occupant, the reader
@@ -1868,6 +1874,28 @@ static int vreg_is_pr_dehl(const Func *f, int v);
    has determined that the slot write would be dead (cur_dehl_dst_dead
    _safe), we emit the 2-instruction `ld b,h; ld c,l + cache` shape
    instead of the full 11-instruction store_dehl. */
+/* Push a width-4 result (in DEHL) to the data stack instead of a frame
+   slot. `ld bc,hl` stashes the low half so the pushed image is [low][high]
+   (low on top) — identical to a normal stacked-arg push — and the DEHL
+   cache invariant (BC=low) holds after cache_dehl. Records the pending
+   push for the consumer (a long bitop's fused-(hl) path, or gen_hcall's
+   stacked-arg skip). */
+static void emit_dehl_stack_push(FILE *out, int vreg_id)
+{
+    emit(out, "ld\tbc,hl");
+    emit(out, "push\tde");
+    emit(out, "push\tbc");
+    cur_sp_adjust += 4;
+    cur_dehl_inline_push = vreg_id;
+    cur_dehl_inline_push_base_sp = cur_sp_adjust;
+    /* HL was consumed producing the value; any prior tenant claim is
+       stale. Claim HL for OUR low half so the next op doesn't treat the
+       value as an address. */
+    invalidate_hl_cache();
+    hl_about_to_change(vreg_id);
+    cache_dehl(vreg_id);
+}
+
 static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
 {
     if (cur_dehl_dst_dead_safe || vreg_is_pr_dehl(f, vreg_id)) {
@@ -1875,25 +1903,7 @@ static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
     } else if (cur_dehl_push_to_stack
                && cur_dehl_inline_push < 0
                && cur_stack_long_top < 0) {
-        /* Push to data stack instead of writing to frame slot.
-           Result is in DEHL (D=b3, E=b2, H=b1, L=b0).
-           ld bc,hl stashes the low half into BC so the DEHL cache
-           invariant (BC=low) holds after cache_dehl. */
-        emit(out, "ld\tbc,hl");
-        emit(out, "push\tde");
-        emit(out, "push\tbc");
-        cur_sp_adjust += 4;
-        cur_dehl_inline_push = vreg_id;
-        cur_dehl_inline_push_base_sp = cur_sp_adjust;
-        /* HL was consumed producing the value (e.g. the long
-           indirect-load byte walk ran the BASE pointer through HL) —
-           any prior tenant claim is stale. HL now holds OUR low
-           half; claim it, else the next op's hl_has(base) hit
-           operates on the value as an address (r7: ADD base+4
-           computed value+4 after this push staging). */
-        invalidate_hl_cache();
-        hl_about_to_change(vreg_id);
-        cache_dehl(vreg_id);
+        emit_dehl_stack_push(out, vreg_id);
     } else {
         store_dehl_cached(out, f, vreg_id);
     }
@@ -7699,9 +7709,18 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit_acc_store_hl(out, f, ci->ret_vreg);
             invalidate_hl_cache();
             *wide_acc_cell(f, ci->ret_vreg) = ci->ret_vreg;
-        } else if (ret_w == 4)
-            store_dehl_cached(out, f, ci->ret_vreg);
-        else if (ret_w == 1) {
+        } else if (ret_w == 4) {
+            /* Lever A: a width-4 result feeding a later HCALL's stacked
+               arg is pushed straight to the data stack (the lookahead set
+               cur_dehl_push_to_stack) rather than spilled to its slot. */
+            if (cur_dehl_push_to_stack && cur_dehl_inline_push < 0
+                && cur_stack_long_top < 0 && !cur_dehl_dst_dead_safe
+                && !vreg_is_pr_dehl(f, ci->ret_vreg))
+                emit_dehl_stack_push(out, ci->ret_vreg);
+            else
+                store_dehl_cached(out, f, ci->ret_vreg);
+            cur_dehl_push_to_stack = 0;
+        } else if (ret_w == 1) {
             /* Byte return: the value is in HL (low byte in L, char-
                widened by the callee). store_hl writes 2 bytes and would
                overrun a 1-byte slot, so store the low byte via A. */
@@ -8038,6 +8057,17 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     for (int i = 0; i < n_stacked; i++) {
         int v = hi->args[i];
         int w = (v >= 0) ? f->vregs[v].width : 2;
+        /* Lever A: this stacked arg was already pushed to the data stack
+           at its production (cur_dehl_inline_push). Its pushed image is
+           [low][high] — exactly a normal stacked arg — and sits topmost
+           (the lookahead barred any intervening push, and !hc_bc_saved).
+           Skip the reload+push; the helper still pops it (popped_bytes). */
+        if (w == 4 && v >= 0 && v == cur_dehl_inline_push && !hc_bc_saved
+            && cur_sp_adjust == cur_dehl_inline_push_base_sp) {
+            cur_dehl_inline_push = -1;
+            popped_bytes += 4;
+            continue;
+        }
         if (w == 4) {
             load_to_dehl(out, f, v);
             emit(out, "push\tde");
@@ -9978,6 +10008,7 @@ int ir_lower_func(FILE *out, Func *f)
        identical-to-pre-lazy-spill lowering for A/B + bisecting). */
     lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
     int want_lazy = lazy_spill_on;
+    f32_stack_arg_on = getenv("IR_NO_F32_STACK_ARG") == NULL;
 
     /* No function label here — the surrounding legacy scaffolding
        (declparse.c + codegen.c) already emits `._<name>`. The render
@@ -10923,6 +10954,75 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     if (is_bitop && w4 && dst_in_src0
                         && other_at_km1 && other_dies)
                         cur_dehl_push_to_stack = 1;
+                }
+            }
+
+            /* Lever A (f32 stacked-arg residency): a width-4 result whose
+               SOLE in-BB use is the stacked operand of a later HCALL
+               (l_f32_mul etc.) is pushed to the data stack at production
+               (2 instr) instead of a frame-slot spill+reload (~19), and
+               gen_hcall skips its push. Unlike the chain-OR block above —
+               which bails on an intervening call — the target here is the
+               `t=call(); ...; hcall(t, x)` straddle. Gated on no PR_BC
+               (else gen_hcall's bc-save lands atop the staged arg) and no
+               call/hcall/push between (keeps it topmost at a fixed sp). */
+            /* A pending inline push normally blocks a second (one data-stack
+               slot at a time), but CHAINED pushes are fine when THIS op
+               consumes the pending one as its own stacked arg before
+               producing its result — e.g. `p = mul(a,b); s = add(p,c)`:
+               the mul consumes a's push, then its result p is pushed for
+               the add. Allow it when op is that consuming HCALL. */
+            int pending_ok = (cur_dehl_inline_push < 0);
+            if (!pending_ok && op->kind == IR_HCALL && op->hcall
+                && op->hcall->args)
+                for (int a = 0; a < op->hcall->n_stacked; a++)
+                    if (op->hcall->args[a] == cur_dehl_inline_push) {
+                        pending_ok = 1; break;
+                    }
+            if (f32_stack_arg_on
+                && !cur_dehl_push_to_stack
+                && !fp_active(f)
+                && !func_has_pr_bc(f)
+                && !cur_dehl_dst_dead_safe
+                && op->dst >= 0
+                && f->vregs[op->dst].width == 4
+                && !vreg_is_pr_dehl(f, op->dst)
+                && cur_stack_long_top < 0
+                && pending_ok
+                && !(bb->live_out
+                     && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
+                int consumer = -1, ok = 1;
+                for (int k = j + 1; k < bb->n_ops && ok; k++) {
+                    const Op *ko = &bb->ops[k];
+                    int uses[16];
+                    int nu = ir_op_uses(ko, uses,
+                                (int)(sizeof uses / sizeof uses[0]));
+                    for (int u = 0; u < nu && ok; u++) {
+                        if (uses[u] != op->dst) continue;
+                        if (consumer >= 0) { ok = 0; break; }
+                        consumer = k;
+                    }
+                    /* Any data-stack push before the consumer would leave
+                       the staged arg no longer topmost. */
+                    if (consumer < 0
+                        && (ko->kind == IR_CALL || ko->kind == IR_HCALL
+                            || ko->kind == IR_PUSH_DEHL_LONG))
+                        ok = 0;
+                }
+                if (ok && consumer >= 0) {
+                    const Op *ko = &bb->ops[consumer];
+                    if (ko->kind == IR_HCALL && ko->hcall
+                        && ko->hcall->n_stacked == 1
+                        && ko->hcall->n_args >= 1
+                        && ko->hcall->args
+                        && ko->hcall->args[0] == op->dst) {
+                        int also_reg = 0;
+                        for (int a = ko->hcall->n_stacked;
+                             a < ko->hcall->n_args; a++)
+                            if (ko->hcall->args[a] == op->dst) also_reg = 1;
+                        if (!also_reg)
+                            cur_dehl_push_to_stack = 1;
+                    }
                 }
             }
 
