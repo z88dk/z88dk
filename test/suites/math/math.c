@@ -305,12 +305,18 @@ void test_int_to_float_store()
    result must match. The divisor comes from a runtime-written global so the
    quotient can't const-fold away. */
 static FLOAT recip_in[3];
+static int   recip_den[2];
 void test_reciprocal()
 {
     recip_in[0] = 4.0; recip_in[1] = 0.5; recip_in[2] = 8.0;
     Assert(approx_equal(1.0 / recip_in[0], 0.25,  EPSILON), "1/4 = 0.25");
     Assert(approx_equal(1.0 / recip_in[1], 2.0,   EPSILON), "1/0.5 = 2");
     Assert(approx_equal(1.0 / recip_in[2], 0.125, EPSILON), "1/8 = 0.125");
+    /* int reciprocal: sint2f feeds invf directly (the eval_A shape) — the
+       int-to-float result must survive in the DEHL cache for invf. */
+    recip_den[0] = 4; recip_den[1] = 8;
+    Assert(approx_equal(1.0 / recip_den[0], 0.25,  EPSILON), "1/int4 = 0.25");
+    Assert(approx_equal(1.0 / recip_den[1], 0.125, EPSILON), "1/int8 = 0.125");
 }
 
 int suite_math()

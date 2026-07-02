@@ -686,6 +686,14 @@ static int f32_stack_arg_on;
    ld l,c / ld e,c emit. */
 static int sp_rel_max(const Func *f);
 
+/* Set by lower_func's lookahead (fp-mode only): the trailing `ld bc,hl`
+   cache-maintenance in store_dehl's FP path is dead — the next op clobbers
+   BC and doesn't read this value, so the BC=low invariant can never be used
+   before it's destroyed. store_dehl skips the `ld bc,hl`; store_dehl_cached
+   then leaves the value in its slot (no DEHL-cache claim), so a later read
+   reloads directly via (ix+d). */
+static int cur_store_dehl_bc_dead;
+
 /* Walk a multi-byte slot via (hl), loading/storing one byte and advancing
    to the next — except the final byte (last=1), which is not followed by
    an advance. On gbz80 a non-final byte uses the native post-increment
@@ -1079,8 +1087,11 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
        (e.g. a compare result cached in HL with no slot) has
        vreg_spill_slot == -1, and slot_ix_off would then synthesise a bogus
        below-frame offset (`ld de,(ix-9)`). It must fall through to the
-       HL/cache paths below. */
+       HL/cache paths below. Also skip when the value is already live in HL:
+       the ex de,hl path below is a register move, cheaper than the 6-byte
+       (ix±d) slot read — HL-preservation is moot when HL holds this vreg. */
     if (fp_active(f) && f->vregs[vreg_id].width == 2
+        && rs.hl != vreg_id
         && f->vreg_spill_slot && f->vreg_spill_slot[vreg_id] >= 0) {
         /* Deepest slot at TOS: pop de;push de beats synthetic ld de,(ix+d)
            and likewise preserves HL. By-coincidence only. */
@@ -1757,10 +1768,13 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 3)) {
             emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off);
             emit(out, "ld\t(%s%+d),de", frame_reg(), ix_off + 2);
-            /* DEHL cache contract: BC = low half after store_dehl.
-               Subsequent load_to_dehl_adj on a cache hit recovers HL
-               via `ld hl,bc` — needs BC. */
-            emit(out, "ld\tbc,hl");
+            /* DEHL cache contract: BC = low half after store_dehl, so a
+               later load_to_dehl_adj cache hit recovers HL via `ld hl,bc`.
+               Dead when the next op clobbers BC before any such hit —
+               store_dehl_cached then drops the cache claim so reads reload
+               via (ix+d). */
+            if (!cur_store_dehl_bc_dead)
+                emit(out, "ld\tbc,hl");
             return;
         }
     }
@@ -1819,9 +1833,18 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
    `ld l,c; ld h,b`. */
 static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
 {
+    int bc_dead = cur_store_dehl_bc_dead;
     store_dehl(out, f, vreg_id);
     invalidate_hl_cache();
-    cache_dehl(vreg_id);
+    if (bc_dead) {
+        /* store_dehl skipped the `ld bc,hl`, so BC != low — don't claim a
+           DEHL cache that a later hit would recover via `ld hl,bc`. The
+           value is safely in the slot; reads reload via (ix+d). */
+        rs.bc = -1;
+        rs.dehl = -1;
+    } else {
+        cache_dehl(vreg_id);
+    }
 }
 
 /* Forward decl: defined with the rest of the per-op lookahead state.
@@ -8022,6 +8045,19 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* True if args[idx]'s vreg is loaded again by a later operand — then its
+   DEHL cache (BC=low) may be recovered via a cache-hit `ld hl,bc`, so the
+   BC-stash must be kept. Otherwise the stash is dead (the call clobbers BC
+   before any re-read). */
+static int hcall_vreg_used_after(const HelperInfo *hi, int idx)
+{
+    int v = hi->args[idx];
+    if (v < 0) return 0;
+    for (int k = idx + 1; k < hi->n_args; k++)
+        if (hi->args[k] == v) return 1;
+    return 0;
+}
+
 static int gen_hcall(FILE *out, Func *f, const Op *op)
 {
     HelperInfo *hi = op->hcall;
@@ -8068,6 +8104,11 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
             continue;
         }
         if (w == 4) {
+            /* The helper clobbers BC, so this operand's DEHL BC=low stash is
+               dead unless the same vreg is re-loaded as a later operand.
+               (frameix: drops the trailing `ld bc,hl`; sp-mode byte-walk is
+               unaffected — its BC=low is inherent.) */
+            cur_load_to_dehl_no_bc = !hcall_vreg_used_after(hi, i);
             load_to_dehl(out, f, v);
             emit(out, "push\tde");
             emit(out, "push\thl");
@@ -8086,8 +8127,14 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     if (n_regs >= 1) {
         int v = hi->args[n_stacked];
         int w = (v >= 0) ? f->vregs[v].width : 2;
-        if (w == 4) load_to_dehl(out, f, v);
-        else        load_to_hl(out, f, v);
+        if (w == 4) {
+            /* Last operand loaded before the call → its BC=low stash is
+               always dead (nothing re-reads it; the call clobbers BC). */
+            cur_load_to_dehl_no_bc = 1;
+            load_to_dehl(out, f, v);
+        } else {
+            load_to_hl(out, f, v);
+        }
     }
     emit(out, "call\t%s", hi->name);
     cur_sp_adjust -= popped_bytes;
@@ -8829,13 +8876,19 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             emit(out, "xor\t(hl)");
             emit(out, "or\tc");
         } else {
-            /* RHS already in DEHL cache or FP-mode: load both and
-               XOR through registers. Less common. */
-            load_to_dehl(out, f, op->src[1]);
+            /* Both operands in registers / FP-mode: stage one, load the
+               other, XOR through registers. Push whichever is currently
+               DEHL-cached FIRST — a register-only operand has no coherent
+               slot, so loading the other would clobber it beyond recovery
+               (frameix long-compare of a just-loaded temp vs a slot value).
+               The XOR/OR chain is symmetric, so operand order is irrelevant. */
+            int pushed = dehl_has(op->src[0]) ? op->src[0] : op->src[1];
+            int loaded = (pushed == op->src[0]) ? op->src[1] : op->src[0];
+            load_to_dehl(out, f, pushed);
             emit(out, "push\tde");
             emit(out, "push\thl");
-            load_to_dehl_adj(out, f, op->src[0], 4);
-            emit(out, "pop\tbc");          /* BC = RHS low */
+            load_to_dehl_adj(out, f, loaded, 4);
+            emit(out, "pop\tbc");          /* BC = pushed operand low */
             emit(out, "ld\ta,l");
             emit(out, "xor\tc");
             emit(out, "ld\tc,a");
@@ -9845,6 +9898,11 @@ static int nxt_first_dehl_src(const Op *nxt)
            the push captures DEHL directly, no intermediate slot
            write. */
         return 0;
+    case IR_MOV:
+        /* A width-4 MOV copies src[0] via load_to_dehl (cache hit off the
+           producer). When src is dead here, the producer's store is dead —
+           the MOV does the single store to its own dst. */
+        return 0;
     default:
         return -1;
     }
@@ -10806,6 +10864,36 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                (`ld l,c; ld h,b`) — no slot read, no register clobber. */
             cur_dehl_dst_dead_safe = 0;
             cur_dehl_dst_no_bc_stash = 0;
+            /* FP-mode: the trailing `ld bc,hl` DEHL-cache maintenance in a
+               width-4 store is dead when, scanning forward in the BB, the
+               value's BC=low invariant is clobbered before any op reads it
+               back — i.e. the first event touching it is a call/hcall/asm
+               (clobbers BC) or another width-4 result (re-caches DEHL, its
+               own `ld bc,hl` overwrites BC), not a read. Eliding is always
+               correct: store_dehl_cached drops the cache claim, so a later
+               read reloads via (ix+d) rather than a stale cache hit. */
+            cur_store_dehl_bc_dead = 0;
+            if (fp_active(f) && op->dst >= 0
+                && f->vregs[op->dst].width == 4) {
+                int V = op->dst;
+                for (int k = j + 1; k < bb->n_ops; k++) {
+                    const Op *ko = &bb->ops[k];
+                    int uses[16];
+                    int nu = ir_op_uses(ko, uses,
+                                (int)(sizeof uses / sizeof uses[0]));
+                    int reads_v = 0;
+                    for (int u = 0; u < nu; u++)
+                        if (uses[u] == V) { reads_v = 1; break; }
+                    if (reads_v) break;           /* read first → maint may hit */
+                    if (ko->kind == IR_CALL || ko->kind == IR_HCALL
+                        || ko->kind == IR_ASM
+                        || (ko->dst >= 0 && ko->dst < f->n_vregs
+                            && f->vregs[ko->dst].width == 4)) {
+                        cur_store_dehl_bc_dead = 1;   /* clobbered before read */
+                        break;
+                    }
+                }
+            }
             /* FP byte-direct chain narrow: when the next op is a long
                binop with dst as either src (commutative byte-direct
                chain picks whichever is in the DEHL cache), the chain
@@ -10833,12 +10921,29 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 && f->vregs[op->dst].width == 4
                 && j + 1 < bb->n_ops) {
                 const Op *nxt = &bb->ops[j + 1];
+                /* Unary HCALL consumer (e.g. l_f32_invf reciprocal): its one
+                   width-4 operand is loaded via load_to_dehl → a cache hit off
+                   this dying producer, so the slot store is dead. Kills the
+                   sint2f→invf double-store in `1.0/x`. HCALL operands live in
+                   hi->args, not nxt->src[]. */
+                if (nxt->kind == IR_HCALL && nxt->hcall
+                    && nxt->hcall->n_args == 1 && nxt->hcall->args
+                    && nxt->hcall->args[0] == op->dst) {
+                    cur_dehl_dst_dead_safe = 1;
+                }
                 int pos = nxt_first_dehl_src(nxt);
-                if (pos >= 0 && nxt->src[pos] == op->dst) {
+                if (!cur_dehl_dst_dead_safe && pos >= 0 && nxt->src[pos] == op->dst) {
                     switch (nxt->kind) {
                     case IR_ST_MEM:
                     case IR_NEG: case IR_NOT:
                     case IR_PUSH_DEHL_LONG:
+                        cur_dehl_dst_dead_safe = 1;
+                        break;
+                    case IR_MOV:
+                        /* Copy of a dying width-4 producer: skip the
+                           producer's slot store; the MOV reads it from the
+                           DEHL cache and does the one store (kills the
+                           `acc += x` compound-assign double-store). */
                         cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_ADD:
@@ -10900,6 +11005,38 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         break;
                     default: break;
                     }
+                }
+            }
+            /* HCALL producer → unary HCALL consumer: an HCALL's width-4
+               result whose sole remaining use is the immediately-following
+               unary HCALL (e.g. sint2f→invf in `1.0/x`) stays in the DEHL
+               cache for that consumer, so the result's slot store is dead.
+               The producer's dst lives in hcall->ret_vreg (not op->dst), so
+               the cur_dst_dead paths above never reach it. */
+            if (!cur_dehl_dst_dead_safe
+                && op->kind == IR_HCALL && op->hcall
+                && op->hcall->ret_vreg >= 0
+                && f->vregs[op->hcall->ret_vreg].width == 4
+                && !(f->vregs[op->hcall->ret_vreg].flags
+                     & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                && j + 1 < bb->n_ops) {
+                int rv = op->hcall->ret_vreg;
+                const Op *nxt = &bb->ops[j + 1];
+                if (nxt->kind == IR_HCALL && nxt->hcall
+                    && nxt->hcall->n_args == 1 && nxt->hcall->args
+                    && nxt->hcall->args[0] == rv
+                    && !(bb->live_out
+                         && ir_bitset_get((const BitSet *)bb->live_out, rv))) {
+                    /* rv must have no other use past the consumer in this BB. */
+                    int used_later = 0;
+                    for (int k = j + 2; k < bb->n_ops && !used_later; k++) {
+                        int uses[16];
+                        int nu = ir_op_uses(&bb->ops[k], uses,
+                                            (int)(sizeof uses / sizeof uses[0]));
+                        for (int u = 0; u < nu; u++)
+                            if (uses[u] == rv) { used_later = 1; break; }
+                    }
+                    if (!used_later) cur_dehl_dst_dead_safe = 1;
                 }
             }
 
