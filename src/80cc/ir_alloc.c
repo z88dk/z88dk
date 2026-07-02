@@ -671,12 +671,67 @@ void ir_alloc(Func *f)
                 free(cand);
             }
         }
+        /* idx2 STEPPING COUNTER (register-residency phase A): a monotonic
+           width-2 loop counter whose only writes are one LD_IMM init + INC/DEC
+           self-steps, never a deref/step base — held in the spare index reg and
+           stepped with `inc/dec <idx>` (2 bytes, no memory) instead of the TOS
+           `ex(sp),hl;inc;ex(sp),hl` dance. Preferred over the invariant bound
+           for idx2 because it's stepped every iteration. Same call/asm/acc-free
+           gate. IR_NO_IDX2_COUNTER opts out. */
+        int idx2_taken = 0;
+        if (f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt
+            && !getenv("IR_NO_IDX2_COUNTER")) {
+            int cnt_safe = 1;
+            for (int i = 0; i < f->n_bbs && cnt_safe; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    OpKind k = f->bbs[i].ops[j].kind;
+                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { cnt_safe = 0; break; }
+                }
+            size_t nvc = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+            int *cbase = calloc(nvc, sizeof(int));   /* deref/step base → not a counter */
+            int *cstep = calloc(nvc, sizeof(int));   /* INC/DEC self-step defs */
+            int *cinit = calloc(nvc, sizeof(int));   /* LD_IMM init defs */
+            int *cother = calloc(nvc, sizeof(int));  /* any other def → disqualify */
+            if (cnt_safe && cbase && cstep && cinit && cother) {
+                for (int i = 0; i < f->n_bbs; i++)
+                    for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                        const Op *o = &f->bbs[i].ops[j];
+                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                            && o->mem.kind == IR_MEM_VREG
+                            && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                            cbase[o->mem.base] = 1;
+                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                            && o->src[0] < f->n_vregs) { cbase[o->src[0]] = 1; }
+                        int d = o->dst;
+                        if (d < 0 || d >= f->n_vregs) continue;
+                        if ((o->kind == IR_INC || o->kind == IR_DEC)
+                            && o->src[0] == d) cstep[d]++;
+                        else if (o->kind == IR_LD_IMM) cinit[d]++;
+                        else cother[d]++;
+                    }
+                int cbest = -1;
+                for (int v = 0; v < f->n_vregs; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 2) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (cbase[v]) continue;                 /* deref/step base */
+                    if (cstep[v] < 1) continue;             /* actually stepped */
+                    if (cother[v] != 0) continue;           /* only init + steps write it */
+                    if (cinit[v] > 1) continue;             /* one init */
+                    if (use_count[v] < 4) continue;         /* hot, in a loop */
+                    if (cbest < 0 || use_count[v] > use_count[cbest]) cbest = v;
+                }
+                if (cbest >= 0) { f->vreg_to_phys[cbest] = f->idx2_reg; idx2_taken = 1; }
+            }
+            free(cbase); free(cstep); free(cinit); free(cother);
+        }
         /* idx2: ONE width-2 read-only PARAM read inside a loop and still
            spilled — held in the spare index register (f->idx2_reg, opposite
            the frame pointer), read via `push <idx>;pop de` at the compare.
            Gated call/asm/acc-free: those clobber the spare reg (the frame
            reg survives via the prologue push, the spare one doesn't). */
-        if (f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt) {
+        if (!idx2_taken && f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt) {
             int idx2_safe = 1;
             for (int i = 0; i < f->n_bbs && idx2_safe; i++)
                 for (int j = 0; j < f->bbs[i].n_ops; j++) {

@@ -881,8 +881,28 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     for (int t = 0; t < n_cand; t++)
         if (cand[t].iv == iv && cand[t].D > 0 && cand[t].K >= 0) { c = t; break; }
     if (c < 0) return 0;
-    int64_t N;
-    if (!ivsr_const_bound(f, cmp, lo, hi, &N)) return 0;
+    /* The exit bound. Two cases:
+       - a proven-nonnegative COMPILE-TIME CONSTANT: p_end = base + N*scale, a
+         single pre-header ADD (the original, cheapest path);
+       - a loop-invariant VARIABLE bound `n` (e.g. a signed int param, the
+         index_walk shape): the unsigned pointer compare `p < p_end` would turn
+         a 0-trip signed loop (`n <= 0`) into a huge wrapped one if p_end fell
+         below base. Guard it by clamping the bound to max(0,n) when building
+         p_end — branchless, no CFG surgery: p_end = base + max(0,n)*scale >=
+         base always (0-trip when n<=0, no wrap). IR_NO_LFTR_SIGNED opts out. */
+    int64_t N = 0;
+    int bound_v = -1;
+    if (!ivsr_const_bound(f, cmp, lo, hi, &N)) {
+        if (getenv("IR_NO_LFTR_SIGNED")) return 0;
+        int bv = cmp->src[1];
+        if (bv < 0 || bv >= f->n_vregs) return 0;   /* immediate handled above */
+        if (f->vregs[bv].width != 2) return 0;       /* int bound only */
+        if (f->vregs[bv].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+        int bni, bib, bii, bno, bob, boi;
+        ivsr_def_sites(f, bv, lo, hi, &bni, &bib, &bii, &bno, &bob, &boi);
+        if (bni != 0) return 0;                       /* must be loop-invariant */
+        bound_v = bv;
+    }
     /* iv used only by its step + this test, not live-out. */
     if (ivsr_uses_in_loop(f, iv, lo, hi) != 2) return 0;
     if (ivsr_used_outside(f, iv, lo, hi)) return 0;
@@ -890,22 +910,64 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     ivsr_def_sites(f, iv, lo, hi, &s_ni, &s_ib, &s_ii, &s_no, &s_ob, &s_oi);
     if (s_ni != 1 || s_no != 1 || s_ob != ph) return 0;
 
-    int64_t end_off = N * cand[c].scale;
+    int64_t scale = cand[c].scale;
     int base = cand[c].base, p = cand[c].p;
+    /* log2(scale) — scale is 1 or a power of two (from ivsr_iv_term). */
+    int sh = 0; { int64_t sc = scale; while (sc > 1) { sc >>= 1; sh++; } }
+
+    /* Create all vregs up front (ir_vreg_new may realloc f->vregs / f->bbs
+       op arrays — re-fetch the compare op by index afterwards). */
     int pend = ir_vreg_new(f, f->vregs[p].kind, NULL, 0);
     f->vregs[pend].width = f->vregs[p].width;
-    /* Rewrite the test (re-fetch by index — ir_vreg_new may realloc). */
+    int v_b = -1, v_m = -1, v_neff = -1, v_scaled = -1;
+    if (bound_v >= 0) {
+        v_b = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_b].width = 2;
+        v_m = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_m].width = 2;
+        v_neff = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_neff].width = 2;
+        if (sh > 0) {
+            v_scaled = ir_vreg_new(f, KIND_INT, NULL, 0);
+            f->vregs[v_scaled].width = 2;
+        } else {
+            v_scaled = v_neff;
+        }
+    }
+
+    /* Rewrite the test to the unsigned pointer compare. */
     Op *c2 = &f->bbs[cmp_bb].ops[cmp_idx];
     c2->kind = IR_CMP_ULT;
     c2->src[0] = p; c2->src[1] = pend; c2->imm = 0;
     /* Kill the now-dead basic IV (step + init). */
     f->bbs[s_ib].ops[s_ii].kind = IR_NOP;
     f->bbs[s_ob].ops[s_oi].kind = IR_NOP;
-    /* p_end = base + N*scale in the pre-header. */
+
     Op o;
-    if (end_off == 0) { ivsr_init_op(&o, IR_MOV); o.dst = pend; o.src[0] = base; }
-    else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
-    licm_insert_before_terminator(&f->bbs[ph], &o);
+    if (bound_v < 0) {
+        /* p_end = base + N*scale (constant). */
+        int64_t end_off = N * scale;
+        if (end_off == 0) { ivsr_init_op(&o, IR_MOV); o.dst = pend; o.src[0] = base; }
+        else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+    } else {
+        /* neff = max(0, n), branchlessly and with only reliable ops (80cc has
+           no arithmetic >> — IR_SHR is logical, #289 — and a standalone
+           compare-to-value mis-lowers here):
+             sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
+             mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
+             neff = n & mask            (n if n>=0, 0 if n<0) */
+        ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+        ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+        ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+        if (sh > 0) {
+            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = v_neff; o.imm = sh;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+        }
+        /* p_end = base + neff*scale. */
+        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_scaled;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+    }
     return 1;
 }
 

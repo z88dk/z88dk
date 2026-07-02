@@ -1322,6 +1322,12 @@ static int cur_func_ehome = -1; /* this function's PR_E/PR_D vreg, or -1 */
    back-edge). -1 = no such loop in this function. */
 static int cur_home_region_lo = -1;
 static int cur_home_region_hi = -1;
+/* Word DE-home only: the id of a dedicated loop-exit block (reached ONLY from
+   the resident region) at whose entry the home is flushed ONCE — hoisting the
+   flush off the per-iteration header path. -1 = not applicable (multi-target
+   exit, non-fp, or a slot too far for ix-relative store) → fall back to the
+   per-iter header flush. */
+static int cur_home_exit_flush_bb = -1;
 
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
    if A already holds the wanted vreg (set by a prior IR_LD_MEM_VREG
@@ -2060,6 +2066,63 @@ static int cmp_bytewise_ok(const Func *f, const Op *o)
     return cmp_bytewise_shape_ok(f, o);
 }
 
+/* Slot-vs-slot unsigned word compare lowered byte-wise through A
+   (`ld a,(ix+lo0); sub (ix+lo1); ld a,(ix+hi0); sbc a,(ix+hi1)`) instead of two
+   synthetic ix pair-loads + `sbc hl,de`. fp only; 12B/76T vs 15B/95T AND
+   DE/BC/HL-clean, so a word DE-home rides through a mem-vs-mem loop test (the
+   matrix/struct/deref inner-pointer compare `p < end`). ULT/UGE, both operands
+   in ix-addressable slots. The BC-resident LHS case is cmp_bytewise_shape_ok;
+   this is the both-in-frame case. */
+static int cmp_bytewise_mem_shape_ok(const Func *f, const Op *o)
+{
+    if (o->kind != IR_CMP_ULT && o->kind != IR_CMP_UGE) return 0;
+    if (!fp_active(f)) return 0;
+    int s0 = o->src[0], s1 = o->src[1];
+    if (s0 < 0 || s1 < 0 || s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
+    if (!f->vreg_to_phys) return 0;
+    if (f->vreg_to_phys[s0] != IR_PR_SPILL) return 0;   /* both in a slot */
+    if (f->vreg_to_phys[s1] != IR_PR_SPILL) return 0;
+    if (f->vregs[s0].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    if (f->vregs[s1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    int ix0 = slot_ix_off(f, s0), ix1 = slot_ix_off(f, s1);
+    if (!fp_offset_fits(ix0) || !fp_offset_fits(ix0 + 1)) return 0;
+    if (!fp_offset_fits(ix1) || !fp_offset_fits(ix1 + 1)) return 0;
+    return 1;
+}
+
+static int cmp_bytewise_mem_ok(const Func *f, const Op *o)
+{
+    if (cur_branch_test_kind == 0) return 0;
+    return cmp_bytewise_mem_shape_ok(f, o);
+}
+
+/* 8085 slot-vs-slot unsigned compare via DSUB (`sub hl,bc`, CF = unsigned
+   borrow). Load src1 → BC and src0 → HL with LDSI+LHLX (`ld de,sp+N; ld
+   hl,(de)`), committing src1 to BC before the second LDSI reloads DE — so NO
+   push/pop is needed (unlike load_binop_operands, which stages both through HL
+   and must save DE). `sub hl,bc` then folds the whole compare into one byte:
+   9 bytes vs the 13-byte push/pop double-load + byte-wise sub/sbc. sp-mode
+   (8085 has no IX); both operands in LDSI-addressable slots; BC free (else the
+   byte-wise fall-through preserves a live BC). */
+static int cmp_dsub_slot_ok_8085(const Func *f, const Op *o)
+{
+    if (!IS_8085() || fp_active(f)) return 0;
+    if (o->kind != IR_CMP_ULT && o->kind != IR_CMP_UGE) return 0;
+    int s0 = o->src[0], s1 = o->src[1];
+    if (s0 < 0 || s1 < 0 || s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
+    if (!f->vreg_to_phys) return 0;
+    if (f->vreg_to_phys[s0] != IR_PR_SPILL) return 0;   /* both in a slot */
+    if (f->vreg_to_phys[s1] != IR_PR_SPILL) return 0;
+    if (f->vregs[s0].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    if (f->vregs[s1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    int o0 = slot_off(f, s0) + cur_sp_adjust;
+    int o1 = slot_off(f, s1) + cur_sp_adjust;
+    if (o0 < 0 || o0 + 1 > 255 || o1 < 0 || o1 + 1 > 255) return 0;  /* LDSI range */
+    return 1;
+}
+
 /* Is op `o` the word DE-home's accumulate — `home = home OP w` with w a
    vreg? It lowers to `add hl,de; ex de,hl` (try_word_accumulate), which
    re-establishes DE = home, so it preserves the home (DE-clean). Must agree
@@ -2123,6 +2186,15 @@ static int op_de_clean(const Func *f, const Op *o)
             && o->imm >= 1                 /* any stride: emit_pair_add_de_clean */
             && f->vreg_to_phys && f->vreg_to_phys[o->dst] == IR_PR_BC)
             return 1;
+        /* Small const add `dst = src0 + k` (k<=3, any home): gen_add lowers it
+           to `inc hl` chain + the DE-preserving fp slot store — DE-clean, so a
+           slot/HL-resident element pointer stepped inside the loop (`p += 2`)
+           no longer reverts the resident region. fp only (sp commit_hl_word
+           clobbers DE). Mirror gen_add's condition EXACTLY. */
+        if (o->kind == IR_ADD && dw == 2 && o->src[1] < 0 && fp_active(f)
+            && o->dst != cur_func_whome && o->imm >= 1 && o->imm <= 3
+            && !(f->vreg_to_phys && f->vreg_to_phys[o->dst] == IR_PR_BC))
+            return 1;
         /* DE-clean signed loop test (branch-fused). */
         if ((o->kind == IR_CMP_LT || o->kind == IR_CMP_GE)
             && cur_branch_test_kind != 0
@@ -2156,7 +2228,8 @@ static int op_de_clean(const Func *f, const Op *o)
     case IR_LD_MEM:
         return dw == 1;               /* byte deref → A */
     case IR_CMP_ULT: case IR_CMP_UGE:
-        return cmp_bytewise_ok(f, o); /* byte-wise loop test: A-only, DE-clean */
+        /* byte-wise loop test: A-only, DE-clean — BC-vs-slot or slot-vs-slot */
+        return cmp_bytewise_ok(f, o) || cmp_bytewise_mem_ok(f, o);
     default:
         return 0;                     /* assume DE-clobbering */
     }
@@ -2176,7 +2249,7 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
         const Op *nxt = &bb->ops[j + 1];
         if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
             && nxt->src[0] == o->dst
-            && cmp_bytewise_shape_ok(f, o))
+            && (cmp_bytewise_shape_ok(f, o) || cmp_bytewise_mem_shape_ok(f, o)))
             return 1;
     }
     /* Word DE-home signed loop test (CMP_LT/GE + the branch on its result):
@@ -2193,7 +2266,7 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
         const Op *prv = &bb->ops[j - 1];
         if ((prv->kind == IR_CMP_ULT || prv->kind == IR_CMP_UGE)
             && prv->dst == o->src[0]
-            && cmp_bytewise_shape_ok(f, prv))
+            && (cmp_bytewise_shape_ok(f, prv) || cmp_bytewise_mem_shape_ok(f, prv)))
             return 1;
         if ((prv->kind == IR_CMP_LT || prv->kind == IR_CMP_GE)
             && prv->dst == o->src[0]
@@ -2546,6 +2619,23 @@ static void word_home_flush(FILE *out, const Func *f)
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
     cur_byte_home_dirty = 0;
+}
+
+/* Word DE-home region-exit flush — emitted ONCE at the entry of a dedicated
+   loop-exit block (a block reached ONLY from the resident region). Replaces the
+   per-iteration entry flush the region header would otherwise emit. Correct
+   without a reload: compute_home_region proves the home rides physical DE across
+   the whole region and no leaving-edge source redefines it before the branch, so
+   on every region-leaving edge DE = the final accumulator — and a dedicated exit
+   is reached only via those edges. fp-only (the word DE-home forms only in fp). */
+static void word_home_exit_flush(FILE *out, const Func *f)
+{
+    int v = cur_func_whome;
+    if (v < 0 || !fp_active(f)) return;
+    int off = slot_ix_off(f, v);
+    if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return;
+    emit(out, "ld\t(%s%+d),e", frame_reg(), off);
+    emit(out, "ld\t(%s%+d),d", frame_reg(), off + 1);
 }
 
 /* Reload the word DE-home into DE from its (coherent) slot, preserving HL —
@@ -3259,6 +3349,11 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
         commit_a_byte(out, f, op->dst);
         return 0;
     }
+    /* idx2 counter init: `ld <idx>,K` (the loop counter's pre-header init). */
+    if (op->dst >= 0 && vreg_in_idx2(f, op->dst)) {
+        emit(out, "ld\t%s,%lld", idx2_reg_name(f), (long long)op->imm);
+        return 0;
+    }
     /* PR_DE dst: emit `ld de,K` directly — no HL detour, spill, or
        swap. The consumer hits load_binop_operands's de_has src[1]. */
     if (op->dst >= 0 && f->vreg_to_phys
@@ -3463,6 +3558,15 @@ static int gen_inc(FILE *out, Func *f, const Op *op)
         commit_a_byte(out, f, op->dst);
         return 0;
     }
+    /* idx2 stepping counter (register residency): the counter lives in the
+       spare index register — step in place with `inc <idx>` (2 bytes, no
+       memory) instead of the TOS ex(sp) dance. */
+    if (op->dst == op->src[0] && vreg_in_idx2(f, op->dst)) {
+        emit(out, "inc\t%s", idx2_reg_name(f));
+        if (hl_has(op->dst)) invalidate_hl_cache();
+        if (de_has(op->dst)) invalidate_de_cache();
+        return 0;
+    }
     if (try_tos_step_xthl(out, f, op, 1)) return 0;
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
@@ -3478,6 +3582,12 @@ static int gen_dec(FILE *out, Func *f, const Op *op)
         load_byte_to_a(out, f, op->src[0]);
         emit(out, "dec\ta");
         commit_a_byte(out, f, op->dst);
+        return 0;
+    }
+    if (op->dst == op->src[0] && vreg_in_idx2(f, op->dst)) {
+        emit(out, "dec\t%s", idx2_reg_name(f));
+        if (hl_has(op->dst)) invalidate_hl_cache();
+        if (de_has(op->dst)) invalidate_de_cache();
         return 0;
     }
     if (try_tos_step_xthl(out, f, op, 0)) return 0;
@@ -5858,6 +5968,41 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         commit_hl_result(out, f, op->dst);
         return 0;
     }
+    /* Small positive const add `dst = src0 + k` (k<=3): an `inc hl` chain
+       instead of `ld de,k; add hl,de`. Fewer bytes/T for k<=3, and — the
+       lever — DE-clean, so a word DE-home (a loop accumulator) rides
+       through a stepped element/pointer walk (`sum += *p; p += 2`) instead
+       of the step's `add hl,de` reverting the resident region. Matched in
+       op_de_clean (fp only: the sp-mode commit clobbers DE). Excludes the
+       PR_BC stepped-pointer form (handled above) and z80n (add hl,nn). */
+    if (op->src[1] < 0 && op->imm >= 1 && op->imm <= 3) {
+        load_to_hl(out, f, op->src[0]);
+        for (long i = 0; i < (long)op->imm; i++) emit(out, "inc\thl");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
+    /* Commutative chain (a+b+c+d, field sums): src0 (the running value) is
+       already in HL and src1 sits in a frame slot. load_binop_operands would
+       keep src0 in HL and `push hl; <load src1→DE via HL>; pop hl` (slot
+       addressing needs HL). ADD is commutative, so instead move the running
+       value to DE (`ex de,hl`, 1 byte) and load src1 into the now-free HL —
+       `add hl,de` still yields src0+src1 in HL. Saves the push/pop (1 byte +
+       stack traffic) per chain term. Only where load_to_de_preserve_hl would
+       actually push/pop: needs ex de,hl (not gbz80), and src1 not already
+       cheap-to-DE (BC/DE cache, Rabbit/kc160 native loads). Not inside a word
+       DE-home region (DE is the home there). Skip with a pending HL spill —
+       the normal path resolves it. */
+    if (op->src[1] >= 0 && hl_has(op->src[0]) && pending_spill_v < 0
+        && !cur_home_is_word && !IS_GBZ80() && !IS_RABBIT() && !IS_KC160()
+        && !de_has(op->src[1]) && !bc_has(op->src[1])
+        && !(vreg_in_pr_bc(f, op->src[1]) && fp_active(f))) {
+        emit(out, "ex\tde,hl");            /* DE = src0 (running value) */
+        swap_hl_de_caches();
+        load_to_hl(out, f, op->src[1]);    /* HL = src1 (preserves DE) */
+        emit(out, "add\thl,de");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     load_binop_operands(out, f, op);
     emit(out, "add\thl,de");
     /* PR_DE dst: move result HL→DE via ex de,hl (+4 T-states).
@@ -8175,6 +8320,25 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         cur_skip_next_op = 1;
         return 0;
     }
+    /* Slot-vs-slot unsigned loop test, byte-wise through A (fp). Both operands
+       read from their ix-slots; CF = unsigned borrow (src0 < src1). A-only, so
+       DE (a word home), BC and HL all survive — vs two synthetic ix pair-loads
+       + `sbc hl,de` that clobber DE and HL. Mirrors cmp_bytewise_mem_ok. */
+    if (cmp_bytewise_mem_ok(f, op)) {
+        int s0 = op->src[0], s1 = op->src[1];
+        int ix0 = slot_ix_off(f, s0), ix1 = slot_ix_off(f, s1);
+        emit(out, "ld\ta,(%s%+d)", frame_reg(), ix0);
+        emit(out, "sub\t(%s%+d)", frame_reg(), ix1);
+        emit(out, "ld\ta,(%s%+d)", frame_reg(), ix0 + 1);
+        emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix1 + 1);
+        rs.a = -1;                        /* A clobbered; DE/BC/HL untouched */
+        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int want_carry = (cf_true_long == br_true);
+        emit(out, "jp\t%s,L_f%d_bb_%d",
+             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
+        cur_skip_next_op = 1;
+        return 0;
+    }
     /* Word DE-home DE-clean signed loop test (fp): RHS (n) → HL, then subtract
        LHS (i) from it byte-wise reading i from its ix-slot. Uses only A/HL,
        so DE (the resident sum) survives — letting compute_home_region admit
@@ -8197,6 +8361,32 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "jp\t%s,L_f%d_bb_%d",
              want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
         rs.a = -1;                         /* A clobbered; HL=n, DE=home kept */
+        cur_skip_next_op = 1;
+        return 0;
+    }
+    /* 8085 slot-vs-slot unsigned compare via DSUB, no push/pop (BC free).
+       LDSI+LHLX load src1→BC then src0→HL, `sub hl,bc` sets CF = unsigned
+       borrow (src0<src1). Mirrors cmp_dsub_slot_ok_8085; must run before
+       load_binop_operands (it loads the operands itself). */
+    if (rs.bc < 0 && cmp_dsub_slot_ok_8085(f, op)) {
+        pending_spill_resolve();                 /* slots coherent before reading */
+        int s0 = op->src[0], s1 = op->src[1];
+        int off1 = slot_off(f, s1) + cur_sp_adjust;
+        int off0 = slot_off(f, s0) + cur_sp_adjust;
+        emit(out, "ld\tde,sp+%d", off1);         /* LDSI: DE = &src1 */
+        emit(out, "ld\thl,(de)");                /* LHLX: HL = src1 */
+        emit(out, "ld\tc,l");
+        emit(out, "ld\tb,h");                    /* BC = src1 */
+        emit(out, "ld\tde,sp+%d", off0);         /* LDSI: DE = &src0 */
+        emit(out, "ld\thl,(de)");                /* LHLX: HL = src0 */
+        emit(out, "sub\thl,bc");                 /* DSUB: CF = uns (src0 < src1) */
+        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int want_carry = (cf_true_long == br_true);
+        emit(out, "jp\t%s,L_f%d_bb_%d",
+             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
+        invalidate_hl_cache();      /* HL clobbered by DSUB */
+        invalidate_de_cache();      /* DE holds a raw slot address, not a vreg */
+        invalidate_bc_cache();      /* BC = src1, uncached */
         cur_skip_next_op = 1;
         return 0;
     }
@@ -10003,6 +10193,54 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     if (cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
         compute_home_region(f, cur_func_ehome, bb_alias,
                             &cur_home_region_lo, &cur_home_region_hi);
+    /* Word DE-home exit-flush hoist: if the region leaves to exactly ONE target
+       block that is reached ONLY from the region (every real edge into it comes
+       from within [lo,hi]), flush the home once at that block's entry instead of
+       every iteration at the header. DE = the final accumulator is guaranteed
+       there by the region proof (home rides DE, no leaving-edge redef). Gated on
+       fp + a slot reachable by an ix-relative store. IR_NO_WH_EXIT_HOIST opts
+       out. Byte-home path untouched. */
+    cur_home_exit_flush_bb = -1;
+    if (cur_home_is_word && cur_func_whome >= 0 && fp_active(f)
+        && cur_home_region_lo >= 0 && !getenv("IR_NO_WH_EXIT_HOIST")) {
+        int tgt = -1, ok = 1;
+        for (int b = cur_home_region_lo; b <= cur_home_region_hi && ok; b++) {
+            const BB *sb = &f->bbs[b];
+            int ns = ir_bb_n_succ(sb);
+            for (int s = 0; s < ns; s++) {
+                int sid = ir_bb_succ_at(sb, s);
+                if (sid < 0 || sid >= f->n_bbs) continue;
+                if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
+                if (sid >= cur_home_region_lo && sid <= cur_home_region_hi)
+                    continue;                       /* in-region edge */
+                if (tgt < 0) tgt = sid;
+                else if (tgt != sid) { ok = 0; break; }  /* >1 distinct target */
+            }
+        }
+        if (ok && tgt >= 0) {
+            /* tgt reached ONLY from the region: every real (non-trampoline)
+               block with an alias-resolved edge to tgt lies in [lo,hi]. */
+            int all_in = 1;
+            for (int b = 0; b < f->n_bbs && all_in; b++) {
+                if (bb_alias && bb_alias[b] >= 0) continue;   /* trampoline label */
+                const BB *sb = &f->bbs[b];
+                int ns = ir_bb_n_succ(sb);
+                for (int s = 0; s < ns; s++) {
+                    int sid = ir_bb_succ_at(sb, s);
+                    if (sid < 0 || sid >= f->n_bbs) continue;
+                    if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
+                    if (sid != tgt) continue;
+                    if (b < cur_home_region_lo || b > cur_home_region_hi) {
+                        all_in = 0; break;
+                    }
+                }
+            }
+            /* the slot must be reachable by the ix-relative store the flush uses */
+            int off = slot_ix_off(f, cur_func_whome);
+            if (all_in && fp_offset_fits(off) && fp_offset_fits(off + 1))
+                cur_home_exit_flush_bb = tgt;
+        }
+    }
     cur_func_uses_params = func_uses_params(f);   /* frame-pointer elision */
     if (bb_byte_out)
         for (int i = 0; i < f->n_bbs; i++) bb_byte_out[i] = -1;
@@ -10086,6 +10324,18 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         /* No pending spill crosses into a BB yet — the cross-BB inherit
            lands with the defer step. Clear it so nothing leaks. */
         pending_spill_v = -1;
+        /* Word DE-home exit-flush hoist: this block is the region's sole,
+           dedicated exit — physical DE still holds the final accumulator (the
+           region proof; nothing has emitted since the exit branch). Flush it to
+           the slot ONCE here, then drop the belief. The per-iter header flush is
+           suppressed below. Emitted before the cache-carry logic so no ex de,hl
+           can clobber DE first (pending spill already cleared). */
+        if (cur_home_is_word && cur_home_exit_flush_bb >= 0
+            && bb->id == cur_home_exit_flush_bb) {
+            word_home_exit_flush(out, f);
+            cur_byte_home_dirty = 0;
+            cur_byte_home_vreg = -1;
+        }
         /* Carry the HL cache across the BB boundary when ALL
            predecessors have already been lowered AND agree on
            hl_out, AND that vreg is live-in here. This handles both
@@ -10237,9 +10487,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 }
             }
         }
+        /* The exit-flush is hoisted to the dedicated exit block's entry (once),
+           so suppress the per-iteration header flush when that hoist is active. */
         if (region_exit_here && cur_byte_home_vreg == cur_func_ehome
             && cur_byte_home_dirty
-            && home_is_slotbacked(f, cur_func_ehome))
+            && home_is_slotbacked(f, cur_func_ehome)
+            && !(cur_home_is_word && cur_home_exit_flush_bb >= 0))
             home_flush(out, f);   /* keep belief; slot now coherent */
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
