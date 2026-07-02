@@ -5425,6 +5425,45 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
     return -1;
 }
 
+/* Store a folded constant (const_fold set src[0]=-1) of `w` bytes little-endian
+   at (HL), walking HL to base+w-1 (caller invalidates the HL cache). On gbz80 an
+   all-equal-byte value (e.g. 0 / 0L) loads A once and stores via `ld (hl+),a`
+   (cheaper than repeated `ld (hl),n`). Shared by the MEM_VREG and MEM_SYM folded
+   paths; w is 1/2/4 (long) — never a float/double (const_fold gates elem). */
+static void emit_folded_imm_store(FILE *out, int w, uint32_t v)
+{
+    if (IS_GBZ80() && w >= 2) {
+        int same = 1;
+        for (int i = 1; i < w; i++)
+            if (((v >> (8 * i)) & 0xff) != (v & 0xff)) { same = 0; break; }
+        if (same) {
+            emit(out, "ld\ta,%d", (int)(v & 0xff));
+            for (int i = 0; i < w - 1; i++) emit(out, "ld\t(hl+),a");
+            emit(out, "ld\t(hl),a");
+            invalidate_a_cache();
+            return;
+        }
+    }
+    for (int i = 0; i < w; i++) {
+        emit(out, "ld\t(hl),%d", (int)((v >> (8 * i)) & 0xff));
+        if (i < w - 1) emit(out, "inc\thl");
+    }
+}
+
+/* May ir_opt_const_fold rewrite a constant store of `width` bytes into the
+   immediate form? Byte (`ld (hl),n`) exists and wins on EVERY target (drops the
+   value register — no A/E clobber, no DE-cache invalidation — and is compact),
+   so it always fires. Word (`ld (hl),lo; inc hl; ld (hl),hi`, leaving PR_DE
+   free) is only a win where the register path isn't already cheap: excludes
+   ez80/kc160 (native ld (ix+d),rr + cheap slot reloads), Rabbit, and 8085 (SHLX
+   `ld (de),hl` stores a word in one op). Consulted before the fold, so non-listed
+   targets never see the word imm form (their word-store codegen is unchanged). */
+int ir_cpu_const_store_ok(int width)
+{
+    if (width == 1) return 1;                       /* byte: everywhere */
+    return !IS_RABBIT() && !IS_EZ80() && !IS_KC160() && !IS_8085();
+}
+
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
@@ -5448,6 +5487,20 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (op->mem.kind == IR_MEM_SYM) {
+        /* Constant value folded into op->imm (const_fold marks src[0]=-1 on a
+           MEM_VREG store; a later pass may fold its &sym+const base into this
+           MEM_SYM form, carrying the marker along). Store the immediate direct
+           — width from mem.elem, NOT the (now absent) value vreg. */
+        if (op->src[0] < 0) {
+            int w = kind_scalar_width(op->mem.elem);
+            const char *s = ir_sym_name(op->mem.sym);
+            int off = op->mem.offset;
+            if (off) emit(out, "ld\thl,_%s+%d", s, off);
+            else     emit(out, "ld\thl,_%s", s);
+            emit_folded_imm_store(out, w, (uint32_t)op->imm);
+            invalidate_hl_cache();
+            return 0;
+        }
         int src_w = (op->src[0] >= 0)
                   ? f->vregs[op->src[0]].width : 2;
         if (src_w == 4) {
@@ -5493,6 +5546,18 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (op->mem.kind == IR_MEM_VREG) {
+        /* Constant value folded into op->imm by ir_opt_const_fold. Store the
+           immediate straight to memory — no value register, no A/E clobber, no
+           DE-cache drop (leaves PR_DE free). Width (1/2/4) from mem.elem. */
+        if (op->src[0] < 0) {
+            int w = kind_scalar_width(op->mem.elem);
+            load_to_hl(out, f, op->mem.base);
+            emit_hl_add_offset(out, op->mem.offset, 1);  /* use BC scratch → keep DE */
+            emit_folded_imm_store(out, w, (uint32_t)op->imm);
+            if (w > 1 || op->mem.offset != 0)
+                invalidate_hl_cache();
+            return 0;
+        }
         /* Indirect store: load value (DE), load address (HL), store. */
         int src_w = f->vregs[op->src[0]].width;
         if (src_w == 1) {

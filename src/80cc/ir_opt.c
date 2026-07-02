@@ -8,6 +8,11 @@
 #include "ir_opt.h"
 #include "ir_analysis.h"
 
+/* Defined in ir_lower.c (the CPU-lowering layer). Target predicate for the
+   const-store fold — no ccdefs.h dependency, so the decoupling above holds.
+   `width` = store size in bytes (byte folds everywhere; word is gated). */
+extern int ir_cpu_const_store_ok(int width);
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -500,8 +505,14 @@ static int licm_pre_header(const Func *f, const int *in_loop, int header)
    address), LEA (local frame address). */
 static int licm_eligible_kind(OpKind k)
 {
-    return k == IR_LD_IMM || k == IR_LD_SYM
-        || k == IR_LD_STR || k == IR_LEA;
+    /* LD_IMM (a true constant) is trivially rematerialisable — a 3-byte
+       immediate at each use. Hoisting it only makes the allocator spill it to
+       a slot and reload per iteration (the greedy allocator can't hold it in a
+       register across a body that clobbers HL/DE/BC), which is strictly worse.
+       Leave literals at the use site. LD_SYM (&global) STAYS eligible: hoisting
+       the invariant base is what lets IVSR strength-reduce `base + i` into a
+       register pointer walk (`inc bc`), a real win we must not forgo. */
+    return k == IR_LD_SYM || k == IR_LD_STR || k == IR_LEA;
 }
 
 /* Insert `src_op` into `dst_bb` just BEFORE its last op (the
@@ -1799,6 +1810,34 @@ int ir_opt_const_fold(Func *f)
             }
             if (folded) { op->imm = (op->kind == IR_LD_IMM) ? op->imm : 0; changed++; }
 
+            /* Constant value into an indirect store: fold it into op->imm
+               (src[0]=-1) so the lowerer stores the immediate directly — no
+               value register, no A/E clobber, no DE-cache invalidation (word
+               leaves PR_DE free). Byte and word; require the element-width hint
+               to agree (the lowerer recovers the store width from mem.elem once
+               src[0] is gone — incl. after a &sym+const base folds this into a
+               MEM_SYM store). Byte folds everywhere, word is CPU-gated. Skip
+               volatile / __addressmod (special lowering). */
+            if (op->kind == IR_ST_MEM && op->mem.kind == IR_MEM_VREG
+                && s0 >= 0 && s0 < nv && known[s0]
+                && !op->mem.volatile_ && !op->mem.bank_fn) {
+                int sw = f->vregs[s0].width;
+                /* byte/word: any integer elem of that width (known[] tracks only
+                   integer LD_IMM, so a float const never reaches here). width 4:
+                   KIND_LONG ONLY — NOT KIND_CPTR (3 bytes in memory), nor
+                   KIND_DOUBLE (4-byte float in math32/mbf32, format-dependent
+                   bits, not an integer constant). */
+                int ok = (sw == 1 || sw == 2) ? (kind_scalar_width(op->mem.elem) == sw)
+                       : (sw == 4)            ? (op->mem.elem == KIND_LONG)
+                       : 0;
+                if (ok && ir_cpu_const_store_ok(sw)) {
+                    op->imm = val[s0] & (sw == 1 ? 0xffULL
+                                       : sw == 2 ? 0xffffULL : 0xffffffffULL);
+                    op->src[0] = -1;
+                    changed++;
+                }
+            }
+
             /* Update constant tracking for the (possibly rewritten) op. */
             if (op->kind == IR_POSTSTEP && s0 >= 0 && s0 < nv)
                 known[s0] = 0;          /* steps src[0] in place */
@@ -1809,6 +1848,13 @@ int ir_opt_const_fold(Func *f)
                 } else if (op->kind == IR_MOV && op->src[0] >= 0
                            && op->src[0] < nv && known[op->src[0]]) {
                     known[d] = 1; val[d] = val[op->src[0]];
+                } else if (op->kind == IR_CONV_TRUNC && op->src[0] >= 0
+                           && op->src[0] < nv && known[op->src[0]]) {
+                    /* Narrowing a known constant stays constant (masked to the
+                       dst width) — lets a `(unsigned char)K` store fold to an
+                       immediate (sieve's flags[k]=1). */
+                    known[d] = 1;
+                    val[d] = have_mask ? (val[op->src[0]] & mask) : val[op->src[0]];
                 } else {
                     known[d] = 0;
                 }
