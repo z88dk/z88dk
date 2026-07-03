@@ -2,9 +2,6 @@
 ;Result is true/false
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
-
-
     SECTION code_graphics
 
     PUBLIC  point_callee
@@ -28,7 +25,9 @@ _point_callee:
     push    bc                          ; ret addr
 
 asm_point:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+	ELSE
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -39,9 +38,10 @@ asm_point:
     call    __gfx_vram_page_out
   ENDIF
     pop     af
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+	ELSE
     ld      hl, 1
     ret     nz                          ;pixel set
     dec     hl
     ret
-ENDIF
