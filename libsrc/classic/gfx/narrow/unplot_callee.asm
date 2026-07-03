@@ -1,7 +1,5 @@
 ; ----- void  unplot(int x, int y)
 
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  unplot_callee
@@ -24,7 +22,9 @@ _unplot_callee:
     push    bc                          ; ret addr
 
 asm_unplot:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -37,4 +37,3 @@ asm_unplot:
     ENDIF
     ret
   ENDIF
-ENDIF
