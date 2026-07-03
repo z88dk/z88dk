@@ -7,129 +7,161 @@
 use Modern::Perl;
 use Getopt::Std;
 use Path::Tiny;
+use Text::Diff;
 use Data::Dump 'dump';
 
-#------------------------------------------------------------------------------
-# String table
-#------------------------------------------------------------------------------
-package StringTable;
+use lib '.';
+use ObjModule;
 
-use Modern::Perl;
-use Object::Tiny qw( strs index );
+# build module
+my $mod = ObjModule->new;
+$mod->name("module1");
+$mod->org(0x1000);
 
-sub new {
-	my($class) = @_;
-	return bless {strs => [""], index => {0 => ""}}, $class;
-}
+my $expr = ObjExpr->new;
+$expr->type("Word");
+$expr->file("test.asm");
+$expr->line(10);
+$expr->section("code");
+$expr->asmpc(0);
+$expr->patch_ptr(1);
+$expr->opcode_size(3);
+$expr->text("asmpc");
 
-sub add {
-	my($self, $str) = @_;
-	if (exists $self->index->{$str}) {
-		return $self->index->{$str};
-	}
+$mod->exprs->add($expr);
 
-	my $index = $self->size;
-	push @{$self->strs}, $str;
-	$self->index->{$str} = $index;
-	return $index;
-}
+$expr = ObjExpr->new;
+$expr->type("Assignment");
+$expr->file("test.asm");
+$expr->line(12);
+$expr->section("code");
+$expr->asmpc(0);
+$expr->patch_ptr(0);
+$expr->opcode_size(0);
+$expr->target_name("z");
+$expr->text("asmpc");
 
-sub get {
-	my($self, $index) = @_;
-	return $self->strs->[$index];
-}
+$mod->exprs->add($expr);
 
-sub size {
-	my($self) = @_;
-	return scalar @{$self->strs};
-}
+my $symbol = ObjSymbol->new;
+$symbol->name("x");
+$symbol->scope("Local");
+$symbol->type("Constant");
+$symbol->value(42);
+$symbol->section("code");
+$symbol->file("test.asm");
+$symbol->line(15);
 
-#------------------------------------------------------------------------------
-# Binary data
-#------------------------------------------------------------------------------
-package BinData;
+$mod->symbols->add($symbol);
 
-use Modern::Perl;
-use Object::Tiny qw( bytes st );
+$symbol = ObjSymbol->new;
+$symbol->name("y");
+$symbol->scope("Public");
+$symbol->type("AddressRelative");
+$symbol->value(21);
+$symbol->section("code");
+$symbol->file("test.asm");
+$symbol->line(17);
 
-sub new {
-	my($class) = @_;
-	return bless {bytes => [], st => StringTable->new }, $class;
-}
+$mod->symbols->add($symbol);
 
-sub size {
-	my($self) = @_;
-	return scalar @{$self->bytes};
-}
+$symbol = ObjSymbol->new;
+$symbol->name("z");
+$symbol->scope("Local");
+$symbol->type("Computed");
+$symbol->value(0);
+$symbol->section("code");
+$symbol->file("test.asm");
+$symbol->line(17);
 
-sub data { 
-	my($self) = @_;
-	return pack("C*", @{$self->bytes});
-}
+$mod->symbols->add($symbol);
 
-sub pack_byte {
-	my($self, $value) = @_;
-	push @{$self->bytes}, $value & 0xFF;
-}
+$mod->externs->add("func1");
+$mod->externs->add("func2");
+$mod->externs->add("func3");
 
-sub pack_word {
-	my($self, $value) = @_;
-	push @{$self->bytes}, $value & 0xFF, ($value >> 8) & 0xFF;
-}
+my $section = ObjSection->new;
+$section->name("code");
+push @{$section->bytes}, 0..0xFF;
 
-sub pack_long {
-	my($self, $value) = @_;
-	push @{$self->bytes}, $value & 0xFF, ($value >> 8) & 0xFF, 
-						($value >> 16) & 0xFF, ($value >> 24) & 0xFF;
-}
+$mod->sections->add($section);
 
-sub patch_long {
-	my($self, $addr, $value) = @_;
-	$addr+4 <= $self->size or die "invalid patch at address $addr";
-	$self->bytes->[$addr] = $value & 0xFF;
-	$self->bytes->[$addr + 1] = ($value >> 8) & 0xFF;
-	$self->bytes->[$addr + 2] = ($value >> 16) & 0xFF;
-	$self->bytes->[$addr + 3] = ($value >> 24) & 0xFF;
-}
+$section = ObjSection->new;
+$section->name("data");
+$section->org(0x1000);
+push @{$section->bytes}, 0..0xFF;
 
-sub pack_string {
-	my($self, $text) = @_;
-	push @{$self->bytes}, map {ord} split //, $text;
-}
+$mod->sections->add($section);
 
-sub pack_cstring {
-	my($self, $text) = @_;
-	length($text) <= 0xFF or die "string too long: $text";
-	$self->pack_byte(length($text));
-	$self->pack_string($text);
-}
+$section = ObjSection->new;
+$section->name("bss");
+$section->split(1);
+push @{$section->bytes}, 0..0xFF;
 
-sub pack_lstring {
-	my($self, $text) = @_;
-	length($text) <= 0xFFFF or die "string too long: $text";
-	$self->pack_word(length($text));
-	$self->pack_string($text);
-}
+$mod->sections->add($section);
 
-sub pack_strid {
-	my($self, $text) = @_;
-	my $id = $self->st->add($text);
-	$self->pack_long($id);
-}
+# save to file
+open(my $fh, ">", "module.def") or die "open module.def: $!";
+my $ctx = ContextDumper->new($fh);
+$mod->dump($ctx);
+close($fh);
 
-sub pack_signature {
-	my($self, $signature, $version) = @_;
-	$self->pack_string(sprintf("%-6.6s%02d", $signature, $version));
-}
+# read file
+my $scanner = Scanner->new;
+$scanner->scan_file("module.def");
+$mod = ObjModule->parse($scanner);
 
-#------------------------------------------------------------------------------
-# main
-#------------------------------------------------------------------------------
-package main;
+# write to second file
+open($fh, ">", "module2.def") or die "open module2.def: $!";
+$ctx = ContextDumper->new($fh);
+$mod->dump($ctx);
+close($fh);
+
+# compare
+say diff("module.def", "module2.def");
+
+# build library
+my $lib = ObjLibrary->new;
+$lib->add($mod);
+
+# show on screen
+$ctx = ContextDumper->new();
+$lib->dump($ctx);
+
+# save to file
+open($fh, ">", "library.def") or die "open library.def: $!";
+$ctx = ContextDumper->new($fh);
+$lib->dump($ctx);
+close($fh);
+
+# read file
+$scanner = Scanner->new;
+$scanner->scan_file("library.def");
+$lib = ObjLibrary->parse($scanner);
+
+# write to second file
+open($fh, ">", "library2.def") or die "open library2.def: $!";
+$ctx = ContextDumper->new($fh);
+$lib->dump($ctx);
+close($fh);
+
+# compare
+say diff("library.def", "library2.def");
+
+my $bin = BinData->new;
+$mod->pack($bin);
+path("module.o")->spew_raw($bin->data);
+
+my $raw = path("module.o")->slurp_raw;
+$bin->data($raw);
+my $obj = Obj->unpack($bin);
+say dump($obj);
+
+
+__END__
 
 my $usage = "usage: $0 [-vNN] input...\n";
 my $version = 19;
-my @CPUS = parse_cpus("../z80asm/z80asm2/cpu.def");
 my %opts;
 getopts('v:b', \%opts) or die $usage;
 my @files = @ARGV or die $usage;
@@ -407,32 +439,4 @@ sub pack_sections {
 sub pack_modname {
 	my($modname, $bin, $version) = @_;
 	$bin->pack_cstring($modname);
-}
-
-#------------------------------------------------------------------------------
-# CPUS
-#------------------------------------------------------------------------------
-sub parse_cpus {
-	my($file) = @_;
-	my @cpus;
-	for (path($file)->lines({chomp=>1})) {
-		next unless /^\s*X\(\s*(\d+)\s*,\s*\w+\s*,\s*"(\w+)"/;
-		push @cpus, [$1, $2];
-	}
-	return @cpus;
-}
-
-sub lookup_cpu {
-	my($key) = @_;
-	for (@CPUS) {
-		my($id, $name) = @$_;
-	
-		if ($key =~ /^\d+$/ && $key != 8080 && $key != 8085) {
-			return $name if $id == $key;
-		}
-		else {
-			return $id if $name eq $key;
-		}
-	}
-	return undef;
 }

@@ -1,0 +1,222 @@
+## z80asm File formats (v19)
+[[Top](Tool---z80asm)]
+
+This document describes the object and libary formats used by *z80asm*. 
+
+*NOTE:* v18 is the version used in production; v19 is the version for the new z80asm v2 in development.
+
+The object and library files are stored in binary form as a set of 
+contiguous sections, i.e. each section follows the previous one. 
+
+The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.
+
+A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain *0xFFFFFFFF* 
+(-1) if that section does not exist.
+
+The following object types exist in the file:
+
+* *char* :	one signed 8-bit value containing an ASCII character;
+
+* *byte* :	one unsigned 8-bit value;
+
+* *long* :	one signed 32-bit value, stored in low byte - high byte order;
+
+* *strid* : one signed 32-bit value indicating the string index in the 
+string table; index 0 allways points to an empty string;
+
+Object file format
+------------------
+
+The format of the object file is as follows:
+
+|Addr  |Type   |Object|
+|---   |---    |---   |
+|      |       | **File header**|
+|   0  |8 chars|'Z80RMF18' - file signature and version|
+|   8  | long  | CPU id: 
+         1 : z80 
+         2 : z80_strict 
+         3 : z180 
+         4 : ez80_z80 
+         5 : ez80 
+         6 : z80n 
+         7 : r2ka 
+         8 : r3k 
+         9 : gbz80 
+         10 : i8080 
+         11 : i8085 
+         12 : r800 
+         13 : r4k 
+         14 : r5k 
+         15 : kc160 
+         16 : kc160_z80 
+         17 : i8080_strict 
+         18 : i8085_strict 
+         19 : gbz80_strict 
+         20 : z180_strict 
+         21 : z80n_strict 
+         22 : ez80_z80_strict 
+         23 : ez80_strict 
+         24 : r800_strict 
+         25 : kc160_strict 
+         26 : kc160_z80_strict 
+         27 : r2ka_strict 
+         28 : r3k_strict 
+         29 : r4k_strict 
+         30 : r5k_strict 
+         31 : r6k 
+         32 : r6k_strict 
+         33 : ti83 
+         34 : ti83_strict 
+         35 : ti83plus 
+         36 : ti83plus_strict 
+         |
+|  12  | long  | -IXIY option used in the assembly: 
+         0 : no -IXIY option used 
+         1 : -IXIY option used |
+|  16  | long  | File pointer to *Module Name* |
+|  20  | long  | File pointer to *Expressions*, may be -1               |
+|  24  | long  | File pointer to *Defined Symbols*, may be -1              |
+|  28  | long  | File pointer to *External Symbols*, may be -1            |
+|  32  | long  | File pointer to *Sections*, may be -1              |
+|  36  | long  | File pointer to *String Table*                         |
+|      |       | **Expressions**
+         expressions defined in this module
+|expr+0| long  | Expression type: 
+         0 : end marker 
+         1 : signed 8-bit value, JR-offset 
+         2 : unsigned 8-bit value 
+         3 : signed 8-bit value 
+         4 : 16-bit value 
+         5 : 16-bit value, big-endian 
+         6 : 32-bit value 
+         7 : unsigned 8-bit value, extended to 16 bits (appending a 0) 
+         8 : signed 8-bit value, sign-extended to 16 bits (appending a 0xff if negative or 0 otherwise) 
+         9 : 24-bit value 
+         10 : unsigned 8-bit value, offset to 0xFF00 
+         11 : DEFC expression copmputed at link time and assigning a symbol 
+         12 : signed 16-bit value, JRE-offset |
+|      | strid | Source file name where expression was defined |
+|      | long  | Line number in source file where expression was defined |
+|      | strid | Section name where expression was defined |
+|      | long  | *ASMPC*: relative module code address of the start of the assembly instruction to be used as *ASMPC* during expression evaluation |
+|      | long  | *patchptr*: relative module code patch pointer to store the result of evaluating the expression |
+|      | long  | *opcode_size*: size of the instruction using this expression, needed to compute relative jumps |
+|      | strid | *target_name*: name of the symbol that receives the result of evaluating the expression, only used for type 11 expressions, empty string for the other types |
+|      | strid | *expression*: expression text as parsed from the source file |
+|...|...|...|
+|       |       | **Defined Symbols**
+        symbols defined in this module |
+|names+0| long  | *scope* of the name: 
+         0 : end marker 
+         1 : is local 
+         2 : is public |
+|       | long  | *type*: defines whether it is a: 
+         1 : a constant 
+         2 : a relocatable address 
+         3 : a symbol computed at link time, the corresponding expression is in the *Expressions* section |
+|       | strid | Section name where symbol was defined |
+|       | long  | *value*: contains the absolute value for a constant, or the relative address to the start of the code block for a relocatable address |
+|       | strid | *name*: contains the name |
+|       | strid | *filename*: contains the source file name where the symbol was defined |
+|       | long  | *line_nr*: contains the source line number where the symbols was defined |
+|...|...|...|
+|       |       | **External Symbols**
+         external symbols names referred by this module |
+|names+0| strid | *name*: external symbol name, empty string to signal last
+|...|...|...|
+|       |       | **Module Name** 
+         module name
+|name+0 | strid | *name*: module name
+|...|...|...|
+|       |       | **Sections**
+        contains the binary code of each section of the module |
+|code+0 | long  | *length*: defines the total code length, -1 to signal the end |
+|       | strid | *section*: source file section name
+|       | long  | *ORG Address*: contains the user defined ORG address for the start of this section,
+        -1 for no ORG address was defined, or
+        -2 to split section to a different binary file
+        If multiple sections are given with an ORG address each, the assembler generates one binary file for each section with a defined ORG, followed by all sections without one |
+|       | long  | *ALIGN*: defines the address alignment of this section,
+        -1 if not defined
+        The previous section is padded to align the start address of this section |
+|       |byte[length]| *code*: contains the binary code |
+|...|...|...|
+|       |       | **String Table**
+        contains the array of strings used in the object file |
+|table+0| long  | *count*, number of strings in the table |
+|       | long  | *size*, total size of blob of all the strings rounded up to the next aligned address |
+|...|...|...|
+|...|...| Table of indices: |
+|       | long  | *index*, index of first character of this string in the end blob of all strings |
+|...|...|...|
+|...|...| Blob of strings: |
+|       | char[] | Characters of the string followed by '\0' terminator |
+
+Library file format
+-------------------
+
+The library file format is a sequence of object files with additional
+structures.
+
+|Addr  |Type   |Object|
+|---   |---    |---   |
+|      |       |**File header**
+|   0  |8 chars|'Z80LMF18' - file signature and version |
+|   8  | long  | File pointer to *Symbol Index Table* (new in v19) |
+|  12  | long  | File pointer to *String Table*                         |
+|      |       |**Object Modules**
+        object files in the library
+|mod+0 | long  |*next*: contains the file pointer of the next object file in the library, or
+        *0* as end marker (v19)
+        *-1* if this object file is the last in the library (v18)
+|      | long  |*length*: contains the length of this object file, or
+        *0* if this object files has been marked "deleted" and will not be used
+|      |byte[length]|contains the object module
+|...|...|...|
+|       |       | **Symbol Index Table**
+        contains the index of all PUBLIC symbols defined in any of the object files with the link to the object file |
+|table+0| strid | *symbol* name index in string table, or
+        *0* to mark end |
+|table+4| long  | *object-ptr*: file pointer of the object file that defines this symbol |
+|table+8| long  | *length*: the length of the object file that defines this symbol |
+|...|...|...|
+|       |       | **String Table**
+        contains the array of strings used in the library file |
+|table+0| long  | *count*, number of strings in the table |
+|       | long  | *size*, total size of blob of all the strings rounded up to the next aligned address |
+|...|...|...|
+|...|...| Table of indices: |
+|       | long  | *index*, index of first character of this string in the end blob of all strings |
+|...|...|...|
+|...|...| Blob of strings: |
+|       | char[] | Characters of the string followed by '\0' terminator |
+
+History
+-------
+
+|Version|Description
+|---    |---
+|*01*   |original z80asm version
+|*02*   |allow expressions to use standard C operators instead of the original (legacy) z80asm specific syntax
+|*03*   |include the address of the start of the assembly instruction in the object file, so that expressions with ASMPC are correctly computed at link time;
+        remove type 'X' symbols (global library), no longer used
+|*04*   |include the source file location of expressions in order to give meaningful link-time error messages
+|*05*   |include source code sections
+|*06*   |incomplete implementation, fixed in version *07*
+|*07*   |include *DEFC* symbols that are defined as an expression using other symbols and are computed at link time, after all addresses are allocated
+|*08*   |include a user defined ORG address per section
+|*09*   |include the file and line number where each symbol was defined
+|*10*   |allow a section alignment to be defined
+|*11*   |allow big-endian 16-bit expressions to be patched; these big-endian values are used in the ZXN coper unit
+|*12*   |allow the target expression of relative jumps to be computed in the link phase
+|*13*   |add 8-bit signed and unsigned values extended to 16-bits
+|*14*   |add 24-bit pointers
+|*15*   |add byte offset to 0xFF00
+|*16*   |convert all *string* to *lstring* in the object file to allow for very large symbol names, needed for C debugging symbols
+|*17*   |add size of opcode so that DJNZ emulation on Intel and ALD DJNZ on Rabbit compute the right offset
+|*18*   |add CPU and -IXIY option to disallow linking of objects built for a different architecture; add a string table to remove duplicate strings and speed up linking
+|*19*   |(not yet in production) add symbol index in the library to speed up linking - only the modules that will be needed are parsed; add end marker in the library instead of -1 file pointer in the last module (easier parsing).
+

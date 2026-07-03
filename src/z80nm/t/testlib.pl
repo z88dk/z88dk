@@ -112,4 +112,58 @@ sub unlink_testfiles {
         if Test::More->builder->is_passing;
 }
 
+#------------------------------------------------------------------------------
+sub check_obj {
+    my ( $obj, $exp_def, $exp_txt ) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    # write def file
+    open my $fh, '>', "$test.def" or die "Can't open output file: $!";
+    my $ctx = ContextDumper->new($fh);
+    $obj->dump($ctx);
+    close $fh;
+    check_text_file( "$test.def", $exp_def );
+
+    ( Test::More->builder->is_passing ) or die;
+
+    # read def file and check that it matches the original object
+    my $scanner = Scanner->new;
+    $scanner->scan_file("$test.def");
+    my $obj2 = Obj->parse($scanner);
+    close $fh;
+
+    open $fh, '>', "$test.2.def" or die "Can't open output file: $!";
+    $ctx = ContextDumper->new($fh);
+    $obj2->dump($ctx);
+    close $fh;
+
+    check_text_file( "$test.2.def", $exp_def );
+    
+    ( Test::More->builder->is_passing ) or die;
+
+    # write binary file
+    my $bin = BinData->new;
+    $obj->pack($bin);
+    path("$test.o")->spew_raw( $bin->data );
+
+    # read binary file and check that it matches the original object
+    my $bin3 = BinData->new;
+    $bin3->data( path("$test.o")->slurp_raw );
+    my $obj3 = Obj->unpack($bin3);
+
+    open $fh, '>', "$test.3.def" or die "Can't open output file: $!";
+    $ctx = ContextDumper->new($fh);
+    $obj3->dump($ctx);
+    close $fh;
+
+    check_text_file( "$test.3.def", $exp_def );
+
+    ( Test::More->builder->is_passing ) or die;
+
+    # check output of z80nm
+    capture_ok( "z88dk-z80nm -a $test.o", $exp_txt );
+
+    ( Test::More->builder->is_passing ) or die;
+}
+
 1;

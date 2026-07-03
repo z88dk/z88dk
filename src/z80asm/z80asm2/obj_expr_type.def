@@ -1,0 +1,23 @@
+//-----------------------------------------------------------------------------
+// Z80 assembler
+// Copyright (C) Paulo Custodio, 2011-2026
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+X(0, Undefined)             // end marker
+X(1, JrOffset)              // 8-bit relative offset for JR
+X(2, ByteUnsigned)          // 8-bit unsigned
+X(3, ByteSigned)            // 8-bit signed
+X(4, Word)                  // 16-bit value little-endian
+X(5, WordBE)                // 16-bit value big-endian
+X(6, DWord)                 // 32-bit signed
+X(7, ByteToWordUnsigned)	// unsigned byte extended to 16 bits
+X(8, ByteToWordSigned)      // signed byte sign-extended to 16 bits
+X(9, Ptr24)                 // 24-bit pointer
+X(10, HighOffset)           // byte offset to 0xFF00
+X(11, Assignment)           // DEFC expression assigning a symbol
+X(12, JreOffset)            // 16-bit relative offset for JRE
+X(13, ByteToPtrUnsigned)    // unsigned byte extended to 24 bits
+X(14, ByteToPtrSigned)      // signed byte sign-extended to 24 bits
+
+#undef X

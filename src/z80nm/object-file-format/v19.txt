@@ -97,7 +97,9 @@ The format of the object file is as follows:
          9 : 24-bit value 
          10 : unsigned 8-bit value, offset to 0xFF00 
          11 : DEFC expression copmputed at link time and assigning a symbol 
-         12 : signed 16-bit value, JRE-offset |
+         12 : signed 16-bit value, JRE-offset
+         13 : unsigned byte extended to 24 bits
+         14 : signed byte sign-extended to 24 bits		 |
 |     | strid | Source file name where expression was defined |
 |     | long  | Line number in source file where expression was defined |
 |     | strid | Section name where expression was defined |

@@ -19,8 +19,8 @@ extern "C" {
 #endif
 
 #define MIN_VERSION				1
-#define MAX_VERSION				18
-#define OBJ_FILE_VERSION		MAX_VERSION
+#define MAX_VERSION				19		// next version with library index
+#define OBJ_FILE_VERSION		    18		// production version
 #define SIGNATURE_SIZE			8
 #define SIGNATURE_BASE_SIZE		6
 #define OBJ_FILE_SIGNATURE		"Z80RMF"
