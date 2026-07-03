@@ -1832,12 +1832,22 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
 {
     if (!lower_verify_on) return;
     const char *bad = NULL;
+    /* Consumed-inline load flags: reset by their consumer, so 0 at a boundary. */
     if (cur_load_to_dehl_no_bc)
         bad = "cur_load_to_dehl_no_bc set at op entry (leaked past a load_to_dehl)";
     else if (cur_load_to_dehl_no_hl)
         bad = "cur_load_to_dehl_no_hl set at op entry (leaked past a load_to_dehl)";
+    /* NB: cur_dehl_dst_no_bc_stash / cur_store_dehl_bc_dead are recomputed
+       (reset) at op-top, not consumed-inline, so they legitimately carry the
+       previous op's value into an entry — NOT assertable here. */
+    else if (cur_dehl_push_to_stack)
+        bad = "cur_dehl_push_to_stack set at op entry (leaked)";
+    /* HL address-cache and value-cache are mutually exclusive. */
     else if (cur_hl_addr_off >= 0 && rs.hl >= 0)
         bad = "HL address-cache and value-cache both live";
+    /* Lazy-spill I1: a deferred spill rides in HL until flushed. */
+    else if (pending_spill_v >= 0 && rs.hl != pending_spill_v)
+        bad = "pending_spill_v set but rs.hl doesn't hold it (I1 violated)";
     if (bad) {
         fprintf(stderr, "ir_lower_verify: f%d bb%d op%d: %s\n",
                 func_emit_idx, bb_id, op_idx, bad);
