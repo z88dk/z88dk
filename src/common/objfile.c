@@ -748,8 +748,11 @@ void objfile_read(objfile_t* obj, FILE* fp)
 		obj->global_org = ORG_NOT_DEFINED;
 	else if (obj->version >= 5)
 		obj->global_org = xfread_dword(fp);
-	else
+    else {
 		obj->global_org = xfread_word(fp);
+        if (obj->global_org == 0xFFFF)
+            obj->global_org = ORG_NOT_DEFINED;
+    }
 
 	// file pointers
 	long fpos_modname = xfread_dword(fp);
