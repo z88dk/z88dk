@@ -653,6 +653,11 @@ static int ns_sym_bails(const SYMBOL *sym)
 static int cur_load_to_dehl_no_hl;
 static int cur_load_to_dehl_no_bc;
 
+/* IR_VERIFY: emission-time cache/lookahead-flag tripwire (set in ir_lower_func).
+   Distinct from ir_verify_func (structural IR); this asserts the register-cache
+   model + one-shot flag discipline hold at each op boundary. */
+static int lower_verify_on;
+
 /* vreg sitting on top of the data stack from an IR_PUSH_DEHL_LONG,
    waiting to be consumed by a long-binop with its stack-resident
    variant (ADD/SUB/AND/OR/XOR). -1 when nothing staged. Reset at BB
@@ -1550,6 +1555,7 @@ int ir_lower_func(FILE *out, Func *f)
        vreg_to_phys[]. Reports to stderr; IR_VERIFY_ABORT turns a
        violation fatal. `stage` carries func_emit_idx so a report maps to
        the L_f<idx> labels in the emitted asm. */
+    lower_verify_on = getenv("IR_VERIFY") != NULL;
     if (getenv("IR_VERIFY")) {
         char stage[24];
         snprintf(stage, sizeof stage, "lower f%d", func_emit_idx);
@@ -1812,6 +1818,31 @@ int ir_lower_func(FILE *out, Func *f)
     free(bb_preds);
     ir_free_liveness(f);
     return rc;
+}
+
+/* Emission-time tripwire, run at each op's entry (IR_VERIFY). Asserts the
+   invariants whose violation silently miscompiled this cycle:
+     - consumed-inline load flags must be reset by their consumer, so they are
+       0 at an op boundary; a set one leaked past a load_to_dehl that didn't
+       consume it (the long-loop-counter bug: cur_load_to_dehl_no_bc leaked into
+       the header's counter reload and lied about the DEHL cache).
+     - HL's address-cache and value-cache are mutually exclusive.
+   Reports to stderr with the bb/op site; IR_VERIFY_ABORT makes it fatal. */
+static void lower_verify_op_entry(int bb_id, int op_idx)
+{
+    if (!lower_verify_on) return;
+    const char *bad = NULL;
+    if (cur_load_to_dehl_no_bc)
+        bad = "cur_load_to_dehl_no_bc set at op entry (leaked past a load_to_dehl)";
+    else if (cur_load_to_dehl_no_hl)
+        bad = "cur_load_to_dehl_no_hl set at op entry (leaked past a load_to_dehl)";
+    else if (cur_hl_addr_off >= 0 && rs.hl >= 0)
+        bad = "HL address-cache and value-cache both live";
+    if (bad) {
+        fprintf(stderr, "ir_lower_verify: f%d bb%d op%d: %s\n",
+                func_emit_idx, bb_id, op_idx, bad);
+        if (getenv("IR_VERIFY_ABORT")) abort();
+    }
 }
 
 static int lower_func_render(FILE *out, Func *f, int lazy,
@@ -2160,6 +2191,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             int rc;
+            lower_verify_op_entry(bb->id, j);
 
             /* Commutative-swap: if the next op is a commutative long
                binop with dst sitting in the non-first-loaded src slot,
