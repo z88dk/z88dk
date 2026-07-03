@@ -861,13 +861,13 @@ static void partial_load_long_shl(FILE *out, const Func *f, int v,
 
 static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
-    int no_hl = L.cur_load_to_dehl_no_hl;
-    L.cur_load_to_dehl_no_hl = 0;
+    int no_hl = L.la.cur_load_to_dehl_no_hl;
+    L.la.cur_load_to_dehl_no_hl = 0;
     /* Capture + reset the no-BC-stash request up front: every early return
        below (incl. the cache-hit) must consume it, else it leaks into the
        NEXT load_to_dehl and wrongly suppresses that load's BC stash. */
-    int no_bc = L.cur_load_to_dehl_no_bc;
-    L.cur_load_to_dehl_no_bc = 0;
+    int no_bc = L.la.cur_load_to_dehl_no_bc;
+    L.la.cur_load_to_dehl_no_bc = 0;
     /* The long-load emits below (`ld hl,bc` cache recover, `ld hl,(ix)`,
        the sp-rel slot walk) all clobber HL. Flush a pending width-2
        spill first (dormant for now). The
@@ -1050,7 +1050,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
                Dead when the next op clobbers BC before any such hit —
                store_dehl_cached then drops the cache claim so reads reload
                via (ix+d). */
-            if (!L.cur_store_dehl_bc_dead)
+            if (!L.la.cur_store_dehl_bc_dead)
                 emit(out, "ld\tbc,hl");
             return;
         }
@@ -1110,7 +1110,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
    `ld l,c; ld h,b`. */
 static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
 {
-    int bc_dead = L.cur_store_dehl_bc_dead;
+    int bc_dead = L.la.cur_store_dehl_bc_dead;
     store_dehl(out, f, vreg_id);
     invalidate_hl_cache();
     if (bc_dead) {
@@ -1148,9 +1148,9 @@ static void cache_dehl_no_spill(FILE *out, int vreg_id)
        directly (using the rs.hl advertise below). Skip the
        stash; chained byte-direct binops write BC themselves at
        the chain's tail, so subsequent ops still see BC = low. */
-    if (!L.cur_dehl_dst_no_bc_stash)
+    if (!L.la.cur_dehl_dst_no_bc_stash)
         emit(out, "ld\tbc,hl");
-    L.cur_dehl_dst_no_bc_stash = 0;
+    L.la.cur_dehl_dst_no_bc_stash = 0;
     /* HL still holds the long's low half (precondition of this
        function — caller's compute left HL = low). Advertise it via
        rs.hl so the next load_to_dehl on cache hit can skip
@@ -1183,8 +1183,8 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
     emit(out, "push\tde");
     emit(out, "push\tbc");
     L.cur_sp_adjust += 4;
-    L.cur_dehl_inline_push = vreg_id;
-    L.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
+    L.la.cur_dehl_inline_push = vreg_id;
+    L.la.cur_dehl_inline_push_base_sp = L.cur_sp_adjust;
     /* HL was consumed producing the value; any prior tenant claim is
        stale. Claim HL for OUR low half so the next op doesn't treat the
        value as an address. */
@@ -1195,16 +1195,16 @@ static void emit_dehl_stack_push(FILE *out, int vreg_id)
 
 static void store_dehl_finalize(FILE *out, const Func *f, int vreg_id)
 {
-    if (L.cur_dehl_dst_dead_safe || vreg_is_pr_dehl(f, vreg_id)) {
+    if (L.la.cur_dehl_dst_dead_safe || vreg_is_pr_dehl(f, vreg_id)) {
         cache_dehl_no_spill(out, vreg_id);
-    } else if (L.cur_dehl_push_to_stack
-               && L.cur_dehl_inline_push < 0
-               && L.cur_stack_long_top < 0) {
+    } else if (L.la.cur_dehl_push_to_stack
+               && L.la.cur_dehl_inline_push < 0
+               && L.la.cur_stack_long_top < 0) {
         emit_dehl_stack_push(out, vreg_id);
     } else {
         store_dehl_cached(out, f, vreg_id);
     }
-    L.cur_dehl_push_to_stack = 0;
+    L.la.cur_dehl_push_to_stack = 0;
 }
 
 /* Load 16-bit value from a raw sp-relative offset into HL.
@@ -1368,7 +1368,7 @@ static int word_dehome_signed_test_shape_ok(const Func *f, const Op *o)
 
 static int cmp_bytewise_ok(const Func *f, const Op *o)
 {
-    if (L.cur_branch_test_kind == 0) return 0;
+    if (L.la.cur_branch_test_kind == 0) return 0;
     return cmp_bytewise_shape_ok(f, o);
 }
 
@@ -1399,7 +1399,7 @@ static int cmp_bytewise_mem_shape_ok(const Func *f, const Op *o)
 
 static int cmp_bytewise_mem_ok(const Func *f, const Op *o)
 {
-    if (L.cur_branch_test_kind == 0) return 0;
+    if (L.la.cur_branch_test_kind == 0) return 0;
     return cmp_bytewise_mem_shape_ok(f, o);
 }
 
@@ -1477,7 +1477,7 @@ static int op_de_clean(const Func *f, const Op *o)
             return 1;
         /* DE-clean signed loop test (branch-fused). */
         if ((o->kind == IR_CMP_LT || o->kind == IR_CMP_GE)
-            && L.cur_branch_test_kind != 0
+            && L.la.cur_branch_test_kind != 0
             && word_dehome_signed_test_shape_ok(f, o))
             return 1;
     }

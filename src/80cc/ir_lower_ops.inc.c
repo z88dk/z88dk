@@ -57,7 +57,7 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     /* Stage in DE when we're going to spill: skips the initial
        `ex de,hl` of store_hl. On dead-dst, falls back to the plain
        HL load (we need HL=K for any cache-served consumer). */
-    if (L.cur_dst_dead) {
+    if (L.la.cur_dst_dead) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
@@ -175,7 +175,7 @@ static int try_tos_step_xthl(FILE *out, Func *f, const Op *op, int is_inc)
     int v = op->dst;
     if (v < 0 || op->src[0] != v) return 0;          /* in-place self-step */
     if (f->vregs[v].width != 2) return 0;
-    if (L.cur_dst_dead) return 0;                      /* dead → no store at all */
+    if (L.la.cur_dst_dead) return 0;                      /* dead → no store at all */
     if (vreg_in_register_pool(f, v)) return 0;       /* must be a real slot */
     if (hl_has(v)) return 0;                         /* value is in HL, not TOS */
     /* Home must be the topmost stack word right now. */
@@ -210,7 +210,7 @@ static int try_inplace_home_unop(FILE *out, const Func *f, const Op *op,
                                  const char *mnem, int cb_only)
 {
     if (op->dst < 0 || op->dst != op->src[0]) return 0;
-    if (L.cur_branch_test_kind != 0) return 0;
+    if (L.la.cur_branch_test_kind != 0) return 0;
     if (cb_only && IS_808x()) return 0;
     if (!byte_home_holds(op->dst)) return 0;
     PhysReg pr = byte_home_phys(f, op->dst);
@@ -916,7 +916,7 @@ static int gen_push_dehl_long(FILE *out, Func *f, const Op *op)
        long-binop consumer (OR/AND/XOR/ADD/SUB) can absorb it directly
        via its stack-resident fastpath, eliding both the POP and a
        fresh slot spill of the intermediate result. */
-    L.cur_stack_long_top = op->src[0];
+    L.la.cur_stack_long_top = op->src[0];
     return 0;
 }
 
@@ -934,8 +934,8 @@ static int gen_pop_dehl_long(FILE *out, Func *f, const Op *op)
     emit(out, "pop\thl");            /* low half (pushed last) */
     emit(out, "pop\tde");            /* high half */
     L.cur_sp_adjust -= 4;
-    if (L.cur_stack_long_top == op->src[0])
-        L.cur_stack_long_top = -1;
+    if (L.la.cur_stack_long_top == op->src[0])
+        L.la.cur_stack_long_top = -1;
     if (op->src[0] >= 0) {
         /* The DEHL cache invariant wants BC = low half. Mirror
            HL → BC so the cache state is consistent.
@@ -977,7 +977,7 @@ static int gen_asm(FILE *out, Func *f, const Op *op)
             store_dehl_cached(out, f, op->dst);
         else if (w == 1) {
             emit(out, "ld\ta,l");
-            if (L.cur_dst_dead || vreg_in_register_pool(f, op->dst))
+            if (L.la.cur_dst_dead || vreg_in_register_pool(f, op->dst))
                 cache_a(op->dst);
             else
                 store_a_byte(out, f, op->dst);
@@ -1055,7 +1055,7 @@ static int gen_not(FILE *out, Func *f, const Op *op)
            only — no BC use. Tell load_to_dehl's FP path to skip
            its BC stash (saves 2B). store_dehl_finalize at the
            tail handles re-publishing BC for the new dst. */
-        L.cur_load_to_dehl_no_bc = 1;
+        L.la.cur_load_to_dehl_no_bc = 1;
         load_to_dehl(out, f, op->src[0]);
         emit(out, "ld\ta,l"); emit(out, "cpl"); emit(out, "ld\tl,a");
         emit(out, "ld\ta,h"); emit(out, "cpl"); emit(out, "ld\th,a");
@@ -1413,12 +1413,12 @@ static void byte_alu_operand(FILE *out, const Func *f,
 static int finalize_byte_result(FILE *out, Func *f, const Op *op,
                                 int want_flags)
 {
-    if (L.cur_branch_test_kind != 0) {
+    if (L.la.cur_branch_test_kind != 0) {
         if (want_flags) emit(out, "or\ta");
-        const char *cc = (L.cur_branch_test_kind == IR_BR_ZERO) ? "z" : "nz";
+        const char *cc = (L.la.cur_branch_test_kind == IR_BR_ZERO) ? "z" : "nz";
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             cc, L.func_emit_idx, L.cur_branch_test_label);
-        L.cur_skip_next_op = 1;
+             cc, L.func_emit_idx, L.la.cur_branch_test_label);
+        L.la.cur_skip_next_op = 1;
         invalidate_a_cache();
         return 0;
     }
@@ -1428,8 +1428,8 @@ static int finalize_byte_result(FILE *out, Func *f, const Op *op,
 
 static int gen_shl(FILE *out, Func *f, const Op *op)
 {
-    int skip_byte = L.cur_skip_shl_byte;
-    L.cur_skip_shl_byte = 0;
+    int skip_byte = L.la.cur_skip_shl_byte;
+    L.la.cur_skip_shl_byte = 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         /* Byte shift+test fuse already did `home<<=1` via `sla <home>`: the
            shifted value is in the home register. In-place SHL → nothing to
@@ -1493,7 +1493,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            (ix+d)`; works in FP mode (sp still valid). */
         if (count == 1
             && op->dst == op->src[0]
-            && !L.cur_dst_dead
+            && !L.la.cur_dst_dead
             && !vreg_in_pr_bc(f, op->dst)
             && f->vreg_to_phys
             && f->vreg_to_phys[op->dst] == IR_PR_SPILL) {
@@ -1678,8 +1678,8 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
            above 8 are normal `add hl,hl` steps. Saves 8 instructions
            vs the straight unroll for count==8 (the common
            `byte << 8` zero-extend-and-promote pattern). */
-        int skip = L.cur_skip_shl_add_hl;
-        L.cur_skip_shl_add_hl = 0;
+        int skip = L.la.cur_skip_shl_add_hl;
+        L.la.cur_skip_shl_add_hl = 0;
         if (count >= 8) {
             emit(out, "ld\th,l");
             emit(out, "ld\tl,0");
@@ -2417,9 +2417,9 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                trip. Gated off when dst is dead. */
             uint32_t k = (uint32_t)op->imm;
             if (op->dst == op->src[0]
-                && !L.cur_dst_dead
+                && !L.la.cur_dst_dead
                 && !dehl_has(op->src[0])
-                && L.cur_stack_long_top != op->src[0]
+                && L.la.cur_stack_long_top != op->src[0]
                 && !vreg_in_pr_bc(f, op->dst)
                 && f->vreg_to_phys
                 && f->vreg_to_phys[op->dst] == IR_PR_SPILL) {
@@ -2498,12 +2498,12 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            write the PUSH elided. */
         {
         int optb_dehl_src = -1;
-        if (L.cur_stack_long_top >= 0) {
-            if (L.cur_stack_long_top == op->src[0]
-                && op->src[1] != L.cur_stack_long_top)
+        if (L.la.cur_stack_long_top >= 0) {
+            if (L.la.cur_stack_long_top == op->src[0]
+                && op->src[1] != L.la.cur_stack_long_top)
                 optb_dehl_src = op->src[1];
-            else if (L.cur_stack_long_top == op->src[1]
-                && op->src[0] != L.cur_stack_long_top)
+            else if (L.la.cur_stack_long_top == op->src[1]
+                && op->src[0] != L.la.cur_stack_long_top)
                 optb_dehl_src = op->src[0];
         }
         if (optb_dehl_src >= 0) {
@@ -2537,7 +2537,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
             emit(out, "pop\tbc");
             emit(out, "pop\tbc");
             L.cur_sp_adjust -= 4;
-            L.cur_stack_long_top = -1;
+            L.la.cur_stack_long_top = -1;
             store_dehl_finalize(out, f, op->dst);
             return 0;
         }
@@ -2563,14 +2563,14 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 int s1 = slot_ix_off(f, from_slot);
                 int s0 = (from_dehl < 0)
                        ? slot_ix_off(f, op->src[0]) : 0;
-                int dd = L.cur_dst_dead
+                int dd = L.la.cur_dst_dead
                        ? 0 : slot_ix_off(f, op->dst);
                 int srcs_ok = fp_offset_fits(s1)
                            && fp_offset_fits(s1 + 3)
                            && (from_dehl >= 0
                                || (fp_offset_fits(s0)
                                    && fp_offset_fits(s0 + 3)));
-                int dst_ok = L.cur_dst_dead
+                int dst_ok = L.la.cur_dst_dead
                     ? 1
                     : (fp_offset_fits(dd)
                        && fp_offset_fits(dd + 3));
@@ -2600,14 +2600,14 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                         emit(out, "%s\ta,(%s%+d)",
                              i == 0 ? "add" : "adc",
                              frame_reg(), s1 + i);
-                        if (L.cur_dst_dead)
+                        if (L.la.cur_dst_dead)
                             emit(out, "ld\t%s,a",
                                  bc_byte[i]);
                         else
                             emit(out, "ld\t(%s%+d),a",
                                  frame_reg(), dd + i);
                     }
-                    if (L.cur_dst_dead) {
+                    if (L.la.cur_dst_dead) {
                         /* Skip eager `ld hl,bc` — DEHL cache
                            invariant is BC=low + DE=high + (HL may
                            or may not have low). Downstream
@@ -2660,7 +2660,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         load_to_dehl(out, f, op->src[1]);
         emit(out, "push\tde");                  /* HIGH */
         emit(out, "push\thl");                  /* LOW */
-        L.cur_load_to_dehl_no_hl = 1;
+        L.la.cur_load_to_dehl_no_hl = 1;
         load_to_dehl_adj(out, f, op->src[0], 4);  /* BC = a.LSW */
         emit(out, "pop\thl");                       /* HL = b.LSW */
         emit(out, "add\thl,bc");                    /* HL = LOW result; DE = a.MSW */
@@ -2785,7 +2785,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
             /* In-place const SUB on a stack slot (mirror of the ADD
                form). `sub` clears carry on entry; later bytes sbc. */
             if (op->dst == op->src[0]
-                && !L.cur_dst_dead
+                && !L.la.cur_dst_dead
                 && !vreg_in_pr_bc(f, op->dst)
                 && f->vreg_to_phys
                 && f->vreg_to_phys[op->dst] == IR_PR_SPILL) {
@@ -2889,14 +2889,14 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                        ? -1                 /* minuend from DEHL */
                        : (swap ? slot_ix_off(f, op->src[0])
                                : slot_ix_off(f, op->src[0]));
-                int dd = L.cur_dst_dead
+                int dd = L.la.cur_dst_dead
                        ? 0 : slot_ix_off(f, op->dst);
                 int srcs_ok = fp_offset_fits(slot_off_ix)
                            && fp_offset_fits(slot_off_ix + 3)
                            && (from_dehl >= 0
                                || (fp_offset_fits(s0)
                                    && fp_offset_fits(s0 + 3)));
-                int dst_ok = L.cur_dst_dead
+                int dst_ok = L.la.cur_dst_dead
                     ? 1
                     : (fp_offset_fits(dd)
                        && fp_offset_fits(dd + 3));
@@ -2944,14 +2944,14 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                                 emit(out, "sbc\ta,(%s%+d)",
                                      frame_reg(), off);
                         }
-                        if (L.cur_dst_dead)
+                        if (L.la.cur_dst_dead)
                             emit(out, "ld\t%s,a",
                                  bc_byte[i]);
                         else
                             emit(out, "ld\t(%s%+d),a",
                                  frame_reg(), dd + i);
                     }
-                    if (L.cur_dst_dead) {
+                    if (L.la.cur_dst_dead) {
                         /* See ADD fastpath comment on the cache
                            state we leave behind. */
                         hl_about_to_change(-1);
@@ -2998,7 +2998,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         load_to_dehl(out, f, op->src[0]);
         emit(out, "push\tde");
         emit(out, "push\thl");
-        L.cur_load_to_dehl_no_hl = 1;
+        L.la.cur_load_to_dehl_no_hl = 1;
         load_to_dehl_adj(out, f, op->src[1], 4);    /* BC = b.LSW */
         emit(out, "pop\thl");                       /* HL = a.LSW */
         if ((IS_808x() || IS_GBZ80())) {
@@ -3115,9 +3115,9 @@ static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
     PhysReg pr = byte_home_phys(f, op->src[0]);
     if (pr == IR_PR_NONE) return 0;
     if (!cur_bb || cur_bb->succ[0] < 0 || cur_bb->succ[1] < 0) return 0;
-    if (L.shl_skip_n + 2 > SHL_SKIP_CAP) return 0;
+    if (L.la.shl_skip_n + 2 > SHL_SKIP_CAP) return 0;
 
-    int skip_id = L.cur_branch_test_label;            /* bit7==0 → crc<<1 only */
+    int skip_id = L.la.cur_branch_test_label;            /* bit7==0 → crc<<1 only */
     int poly_id = (cur_bb->succ[0] == skip_id)
                   ? cur_bb->succ[1] : cur_bb->succ[0];
     const BB *bb_skip = NULL, *bb_poly = NULL;
@@ -3139,17 +3139,17 @@ static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
     emit(out, "sla\t%s", byte_home_reg(pr));        /* home<<=1, CF=old bit7 */
     if (byte_home_slotbacked(pr)) L.cur_byte_home_dirty = 1;
     invalidate_a_cache();
-    const char *cc = (L.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
+    const char *cc = (L.la.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
     emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx, skip_id);
     for (int k = 0; k < 2; k++) {
         const BB *b = k ? bb_poly : bb_skip;
-        shl_skip[L.shl_skip_n].bb_id = b->id;
-        shl_skip[L.shl_skip_n].op_idx = 0;
-        shl_skip[L.shl_skip_n].cache_vreg = op->src[0];
-        shl_skip[L.shl_skip_n].is_byte = 1;
-        L.shl_skip_n++;
+        shl_skip[L.la.shl_skip_n].bb_id = b->id;
+        shl_skip[L.la.shl_skip_n].op_idx = 0;
+        shl_skip[L.la.shl_skip_n].cache_vreg = op->src[0];
+        shl_skip[L.la.shl_skip_n].is_byte = 1;
+        L.la.shl_skip_n++;
     }
-    L.cur_skip_next_op = 1;   /* the BR_ZERO is now the emitted jp */
+    L.la.cur_skip_next_op = 1;   /* the BR_ZERO is now the emitted jp */
     return 1;
 }
 
@@ -3171,7 +3171,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                `crc<<1` shift into `sla e; jp` (skips the per-arm SHL).
                Falls through to the through-A bit test when the home isn't
                resident, CB is absent, or the arms don't match. */
-            if (op->kind == IR_AND && m == 0x80 && L.cur_branch_test_kind != 0
+            if (op->kind == IR_AND && m == 0x80 && L.la.cur_branch_test_kind != 0
                 && try_byte_shift_test_fuse(out, f, op))
                 return 0;
             load_byte_to_a(out, f, op->src[0]);
@@ -3179,14 +3179,14 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                via `rrca` (bit→CF), branch on carry — 1B/4T vs `and mask` +
                Z-branch, CPU-portable. Safe: cur_branch_test_kind ⇒ the AND
                result is dead after the branch (only CF is read). */
-            if (op->kind == IR_AND && L.cur_branch_test_kind != 0
+            if (op->kind == IR_AND && L.la.cur_branch_test_kind != 0
                 && (m == 0x80 || m == 0x01)) {
                 emit(out, m == 0x80 ? "add\ta,a" : "rrca");
                 const char *cc =
-                    (L.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
+                    (L.la.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
                 emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx,
-                     L.cur_branch_test_label);
-                L.cur_skip_next_op = 1;
+                     L.la.cur_branch_test_label);
+                L.la.cur_skip_next_op = 1;
                 invalidate_a_cache();
                 return 0;
             }
@@ -3210,7 +3210,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
            and branch on Z. */
         if (op->kind == IR_AND
             && op->src[1] == -1
-            && L.cur_branch_test_kind != 0) {
+            && L.la.cur_branch_test_kind != 0) {
             uint32_t kk = (uint32_t)op->imm;
             uint8_t b4[4];
             b4[0] = (uint8_t)(kk & 0xff);
@@ -3257,12 +3257,12 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                     emit(out, "and\t%u",
                          (unsigned)b4[nz_idx]);
                     const char *cc =
-                        (L.cur_branch_test_kind == IR_BR_ZERO)
+                        (L.la.cur_branch_test_kind == IR_BR_ZERO)
                             ? "z" : "nz";
                     emit(out, "jp\t%s,L_f%d_bb_%d",
                          cc, L.func_emit_idx,
-                         L.cur_branch_test_label);
-                    L.cur_skip_next_op = 1;
+                         L.la.cur_branch_test_label);
+                    L.la.cur_skip_next_op = 1;
                     return 0;
                 }
             }
@@ -3292,8 +3292,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                pop/push trick, not a Rabbit/kc160 native sp-rel store.
                In sp-mode load_to_dehl leaves BC=low (C=b0,B=b1), DE=high
                (E=b2,D=b3) — the no-bc-stash skip only fires under fp. */
-            if (!fp_active(f) && !L.cur_dehl_dst_dead_safe
-                && !L.cur_dehl_push_to_stack && op->dst >= 0
+            if (!fp_active(f) && !L.la.cur_dehl_dst_dead_safe
+                && !L.la.cur_dehl_push_to_stack && op->dst >= 0
                 && !vreg_is_pr_dehl(f, op->dst)
                 && !vreg_is_pr_de(f, op->dst)
                 && !vreg_in_pr_bc(f, op->dst)) {
@@ -3364,12 +3364,12 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
            before the fp byte-direct path, which would read the
            stale (ix+d) slot the PUSH elided the write to. */
         int optb_dehl_src = -1;
-        if (L.cur_stack_long_top >= 0) {
-            if (L.cur_stack_long_top == op->src[0]
-                && op->src[1] != L.cur_stack_long_top)
+        if (L.la.cur_stack_long_top >= 0) {
+            if (L.la.cur_stack_long_top == op->src[0]
+                && op->src[1] != L.la.cur_stack_long_top)
                 optb_dehl_src = op->src[1];
-            else if (L.cur_stack_long_top == op->src[1]
-                && op->src[0] != L.cur_stack_long_top)
+            else if (L.la.cur_stack_long_top == op->src[1]
+                && op->src[0] != L.la.cur_stack_long_top)
                 optb_dehl_src = op->src[0];
         }
         if (optb_dehl_src >= 0) {
@@ -3417,7 +3417,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             emit(out, "pop\tbc");
             emit(out, "pop\tbc");
             L.cur_sp_adjust -= 4;
-            L.cur_stack_long_top = -1;
+            L.la.cur_stack_long_top = -1;
             store_dehl_finalize(out, f, op->dst);
             return 0;
         }
@@ -3451,14 +3451,14 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 int s1 = slot_ix_off(f, from_slot);
                 int s0 = (from_dehl < 0)
                        ? slot_ix_off(f, op->src[0]) : 0;
-                int dd = L.cur_dst_dead
+                int dd = L.la.cur_dst_dead
                        ? 0 : slot_ix_off(f, op->dst);
                 int srcs_ok = fp_offset_fits(s1)
                            && fp_offset_fits(s1 + 3)
                            && (from_dehl >= 0
                                || (fp_offset_fits(s0)
                                    && fp_offset_fits(s0 + 3)));
-                int dst_ok = L.cur_dst_dead
+                int dst_ok = L.la.cur_dst_dead
                     ? 1
                     : (fp_offset_fits(dd)
                        && fp_offset_fits(dd + 3));
@@ -3480,14 +3480,14 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                                  frame_reg(), s0 + i);
                         emit(out, "%s\ta,(%s%+d)",
                              mnem, frame_reg(), s1 + i);
-                        if (L.cur_dst_dead)
+                        if (L.la.cur_dst_dead)
                             emit(out, "ld\t%s,a",
                                  bc_byte[i]);
                         else
                             emit(out, "ld\t(%s%+d),a",
                                  frame_reg(), dd + i);
                     }
-                    if (L.cur_dst_dead) {
+                    if (L.la.cur_dst_dead) {
                         hl_about_to_change(-1);
                         L.rs.de = -1;
                         L.rs.dehl = op->dst;
@@ -3535,8 +3535,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
            bc/hl = 4 bytes).  Must pop it BEFORE store_dehl_finalize
            so a chained push for dst lands cleanly at sp+0. */
         int src1_inline_pushed = (!fp_active(f)
-                                  && L.cur_dehl_inline_push == bsrc1
-                                  && L.cur_sp_adjust == L.cur_dehl_inline_push_base_sp);
+                                  && L.la.cur_dehl_inline_push == bsrc1
+                                  && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp);
         if (!fp_active(f) && (!dehl_has(bsrc1) || src1_inline_pushed)) {
             int off = src1_inline_pushed ? 4
                     : slot_off(f, bsrc1) + 4 + L.cur_sp_adjust;
@@ -3574,7 +3574,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 emit(out, "pop\tbc");
                 emit(out, "pop\tbc");
                 L.cur_sp_adjust -= 4;
-                L.cur_dehl_inline_push = -1;
+                L.la.cur_dehl_inline_push = -1;
             }
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -3611,7 +3611,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
            when cur_dst_dead is true)                              */
     if (op->kind == IR_AND
         && op->src[1] == -1
-        && L.cur_branch_test_kind != 0) {
+        && L.la.cur_branch_test_kind != 0) {
         uint16_t k = (uint16_t)op->imm;
         uint8_t hi = (uint8_t)(k >> 8);
         uint8_t lo = (uint8_t)(k & 0xff);
@@ -3633,7 +3633,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                (in-place "v <<= 1") so HL-tracking lines up */
         if (k == 0x8000 && cur_bb != NULL
             && cur_bb->succ[0] >= 0 && cur_bb->succ[1] >= 0
-            && L.shl_skip_n + 2 <= SHL_SKIP_CAP) {
+            && L.la.shl_skip_n + 2 <= SHL_SKIP_CAP) {
             /* cur_bb->succ[0] is the conditional-branch target
                (the BR_ZERO/COND label), succ[1] the fall-through.
                IR convention: BR_ZERO branches to succ[0] when
@@ -3642,7 +3642,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                does `v <<= 1` (in-place SHL writing to src[0]);
                the poly BB does `t = v << 1; v ^= P; ...` (SHL
                to a fresh vreg, then XOR-in-place). */
-            int skip_id = L.cur_branch_test_label;
+            int skip_id = L.la.cur_branch_test_label;
             int poly_id = (cur_bb->succ[0] == skip_id)
                           ? cur_bb->succ[1] : cur_bb->succ[0];
             const BB *bb_skip = NULL, *bb_poly = NULL;
@@ -3670,7 +3670,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 /* CF = old bit 15 of src[0]. BR_ZERO branches when
                    AND result was 0 → old bit 15 was 0 → CF clear. */
                 const char *cc =
-                    (L.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
+                    (L.la.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
                 emit(out, "jp\t%s,L_f%d_bb_%d",
                      cc, L.func_emit_idx, skip_id);
                 /* HL now holds the shifted value. From the lowerer's
@@ -3685,16 +3685,16 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                    cur_skip_shl_add_hl=1 the shift loop is also
                    skipped — the spill + cache_hl(dst) tail then
                    publishes the shifted HL to dst's slot/cache. */
-                shl_skip[L.shl_skip_n].bb_id = bb_skip->id;
-                shl_skip[L.shl_skip_n].op_idx = 0;
-                shl_skip[L.shl_skip_n].cache_vreg = op->src[0];
-                L.shl_skip_n++;
-                shl_skip[L.shl_skip_n].bb_id = bb_poly->id;
-                shl_skip[L.shl_skip_n].op_idx = 0;
-                shl_skip[L.shl_skip_n].cache_vreg = op->src[0];
-                L.shl_skip_n++;
+                shl_skip[L.la.shl_skip_n].bb_id = bb_skip->id;
+                shl_skip[L.la.shl_skip_n].op_idx = 0;
+                shl_skip[L.la.shl_skip_n].cache_vreg = op->src[0];
+                L.la.shl_skip_n++;
+                shl_skip[L.la.shl_skip_n].bb_id = bb_poly->id;
+                shl_skip[L.la.shl_skip_n].op_idx = 0;
+                shl_skip[L.la.shl_skip_n].cache_vreg = op->src[0];
+                L.la.shl_skip_n++;
                 hl_about_to_change(op->src[0]);
-                L.cur_skip_next_op = 1;
+                L.la.cur_skip_next_op = 1;
                 return 0;
             }
         }
@@ -3707,9 +3707,9 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,%s", reg);
             emit(out, "and\t%u", (unsigned)mask);
             const char *cc =
-                (L.cur_branch_test_kind == IR_BR_ZERO) ? "z" : "nz";
+                (L.la.cur_branch_test_kind == IR_BR_ZERO) ? "z" : "nz";
             emit(out, "jp\t%s,L_f%d_bb_%d",
-                 cc, L.func_emit_idx, L.cur_branch_test_label);
+                 cc, L.func_emit_idx, L.la.cur_branch_test_label);
             /* HL still holds src[0] (`and` only touched A and F).
                Advertise it explicitly — load_to_hl above does not
                update rs.hl, so a cache miss followed by a
@@ -3717,7 +3717,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             cache_hl(op->src[0]);
             /* Mark cur_skip_next_op so the dispatcher skips the
                now-consumed branch op. */
-            L.cur_skip_next_op = 1;
+            L.la.cur_skip_next_op = 1;
             return 0;
         }
     }

@@ -593,7 +593,7 @@ static int vreg_in_register_pool(const Func *f, int v)
 static int byte_dst_cache_ok(const Func *f, int v)
 {
     if (byte_home_is_slotbacked(f, v)) return 0;
-    return L.cur_dst_dead || vreg_in_register_pool(f, v);
+    return L.la.cur_dst_dead || vreg_in_register_pool(f, v);
 }
 
 /* Byte result is in A: keep it live in the A-cache (claim dst) when dst's next
@@ -807,7 +807,7 @@ static int vreg_is_pr_dehl(const Func *f, int v)
    for vregs in a register pool: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
-    if (L.cur_dst_dead) return;
+    if (L.la.cur_dst_dead) return;
     /* Pooled vreg: value lives in a phys reg, no slot. PR_HL is the
        caller's responsibility (cache_hl(dst) tops it up). PR_BC needs
        an HL→BC copy so subsequent loads hit the BC short-circuit;
@@ -885,7 +885,7 @@ static void commit_hl_result(FILE *out, const Func *f, int v)
    byte / 4 T-states vs `ld hl,K + store_hl + ex de,hl`. */
 static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 {
-    if (L.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
+    if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
         emit(out, "ex\tde,hl");
         invalidate_de_cache();
         return;

@@ -462,7 +462,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             /* __sdcccall(1) return: 1B in A, 2B in DE, 4B in HLDE (DE=low,
                HL=high — `ex de,hl` converts to native DEHL). */
             if (ret_w == 1) {
-                if (L.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+                if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                     cache_a(ci->ret_vreg);
                 else
                     store_a_byte(out, f, ci->ret_vreg);
@@ -484,19 +484,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             /* Lever A: a width-4 result feeding a later HCALL's stacked
                arg is pushed straight to the data stack (the lookahead set
                cur_dehl_push_to_stack) rather than spilled to its slot. */
-            if (L.cur_dehl_push_to_stack && L.cur_dehl_inline_push < 0
-                && L.cur_stack_long_top < 0 && !L.cur_dehl_dst_dead_safe
+            if (L.la.cur_dehl_push_to_stack && L.la.cur_dehl_inline_push < 0
+                && L.la.cur_stack_long_top < 0 && !L.la.cur_dehl_dst_dead_safe
                 && !vreg_is_pr_dehl(f, ci->ret_vreg))
                 emit_dehl_stack_push(out, ci->ret_vreg);
             else
                 store_dehl_cached(out, f, ci->ret_vreg);
-            L.cur_dehl_push_to_stack = 0;
+            L.la.cur_dehl_push_to_stack = 0;
         } else if (ret_w == 1) {
             /* Byte return: the value is in HL (low byte in L, char-
                widened by the callee). store_hl writes 2 bytes and would
                overrun a 1-byte slot, so store the low byte via A. */
             emit(out, "ld\ta,l");
-            if (L.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+            if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                 cache_a(ci->ret_vreg);
             else
                 store_a_byte(out, f, ci->ret_vreg);
@@ -846,9 +846,9 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
            [low][high] — exactly a normal stacked arg — and sits topmost
            (the lookahead barred any intervening push, and !hc_bc_saved).
            Skip the reload+push; the helper still pops it (popped_bytes). */
-        if (w == 4 && v >= 0 && v == L.cur_dehl_inline_push && !hc_bc_saved
-            && L.cur_sp_adjust == L.cur_dehl_inline_push_base_sp) {
-            L.cur_dehl_inline_push = -1;
+        if (w == 4 && v >= 0 && v == L.la.cur_dehl_inline_push && !hc_bc_saved
+            && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp) {
+            L.la.cur_dehl_inline_push = -1;
             popped_bytes += 4;
             continue;
         }
@@ -857,7 +857,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
                dead unless the same vreg is re-loaded as a later operand.
                (frameix: drops the trailing `ld bc,hl`; sp-mode byte-walk is
                unaffected — its BC=low is inherent.) */
-            L.cur_load_to_dehl_no_bc = !hcall_vreg_used_after(hi, i);
+            L.la.cur_load_to_dehl_no_bc = !hcall_vreg_used_after(hi, i);
             load_to_dehl(out, f, v);
             emit(out, "push\tde");
             emit(out, "push\thl");
@@ -879,7 +879,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
         if (w == 4) {
             /* Last operand loaded before the call → its BC=low stash is
                always dead (nothing re-reads it; the call clobbers BC). */
-            L.cur_load_to_dehl_no_bc = 1;
+            L.la.cur_load_to_dehl_no_bc = 1;
             load_to_dehl(out, f, v);
         } else {
             load_to_hl(out, f, v);

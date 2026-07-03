@@ -93,12 +93,19 @@ typedef struct {
     int ss_phase, *ss_op_store, *ss_op_reload, *ss_op_cacheread;
     const signed char *ss_store_dead; const int *ss_op_base;
     int ss_cur_g, ss_pinned;
-    int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
-    int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
-    int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
-    int cur_dehl_dst_dead_safe, cur_branch_test_kind, cur_dst_dead;
-    int cur_branch_test_label, cur_skip_next_op;
-    int shl_skip_n, cur_skip_shl_add_hl, cur_skip_shl_byte;
+    /* "the tower": transient per-op lookahead one-shots — set while lowering
+       one op to steer the next emit, then consumed. Grouped so they read as
+       one unit (and so a leak past an op boundary is greppable / verifiable).
+       Most are same-op transient; cur_skip_next_op and cur_branch_test_* are
+       the deliberate op-N→op-N+1 forward signals. */
+    struct {
+        int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
+        int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
+        int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
+        int cur_dehl_dst_dead_safe, cur_branch_test_kind, cur_dst_dead;
+        int cur_branch_test_label, cur_skip_next_op;
+        int shl_skip_n, cur_skip_shl_add_hl, cur_skip_shl_byte;
+    } la;
 } LowerState;
 
 static LowerState L = {
@@ -1692,7 +1699,7 @@ int ir_lower_func(FILE *out, Func *f)
             int wlo = -1, whi = -1;
             L.cur_home_is_word = 1;
             L.cur_func_whome = f->word_home_vreg;
-            L.cur_branch_test_kind = 0;
+            L.la.cur_branch_test_kind = 0;
             compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
             L.cur_home_is_word = 0;
             L.cur_func_whome = -1;
@@ -1854,14 +1861,14 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
     if (!lower_verify_on) return;
     const char *bad = NULL;
     /* Consumed-inline load flags: reset by their consumer, so 0 at a boundary. */
-    if (L.cur_load_to_dehl_no_bc)
+    if (L.la.cur_load_to_dehl_no_bc)
         bad = "cur_load_to_dehl_no_bc set at op entry (leaked past a load_to_dehl)";
-    else if (L.cur_load_to_dehl_no_hl)
+    else if (L.la.cur_load_to_dehl_no_hl)
         bad = "cur_load_to_dehl_no_hl set at op entry (leaked past a load_to_dehl)";
     /* NB: cur_dehl_dst_no_bc_stash / cur_store_dehl_bc_dead are recomputed
        (reset) at op-top, not consumed-inline, so they legitimately carry the
        previous op's value into an entry — NOT assertable here. */
-    else if (L.cur_dehl_push_to_stack)
+    else if (L.la.cur_dehl_push_to_stack)
         bad = "cur_dehl_push_to_stack set at op entry (leaked)";
     /* HL address-cache and value-cache are mutually exclusive. */
     else if (L.cur_hl_addr_off >= 0 && L.rs.hl >= 0)
@@ -1981,13 +1988,13 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out[i] = -1;
     L.cur_sp_adjust = 0;
     bc_args_save_depth = 0;
-    L.cur_stack_long_top = -1;
-    L.cur_dehl_inline_push = -1;
-    L.cur_dehl_inline_push_base_sp = 0;
-    L.cur_dehl_push_to_stack = 0;
+    L.la.cur_stack_long_top = -1;
+    L.la.cur_dehl_inline_push = -1;
+    L.la.cur_dehl_inline_push_base_sp = 0;
+    L.la.cur_dehl_push_to_stack = 0;
     cur_emitted_file = NULL;
     cur_emitted_line = 0;
-    L.shl_skip_n = 0;
+    L.la.shl_skip_n = 0;
     cur_bb = NULL;
     cur_bank_fn = NULL;   /* __addressmod: bank unknown at function entry */
     L.ss_cur_g = -1;   /* no current op during prologue */
@@ -2051,10 +2058,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
         bc_args_save_depth = 0;
-        L.cur_stack_long_top = -1;
-        L.cur_dehl_inline_push = -1;
-        L.cur_dehl_inline_push_base_sp = 0;
-        L.cur_dehl_push_to_stack = 0;
+        L.la.cur_stack_long_top = -1;
+        L.la.cur_dehl_inline_push = -1;
+        L.la.cur_dehl_inline_push_base_sp = 0;
+        L.la.cur_dehl_push_to_stack = 0;
         cur_bank_fn = NULL;   /* __addressmod: bank unknown at a BB merge */
         /* No pending spill crosses into a BB yet — the cross-BB inherit
            lands with the defer step. Clear it so nothing leaks. */
@@ -2302,7 +2309,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                nxt_first_dehl_src() returns the actual first slot for
                recognised long-DEHL ops; we fall back to 0 otherwise so
                int / unrecognised ops keep the original src[0] semantics. */
-            L.cur_dst_dead = 0;
+            L.la.cur_dst_dead = 0;
             if (op->dst >= 0) {
                 int live_out_dst = bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, op->dst);
@@ -2383,7 +2390,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         }
                         if (redef) break;
                     }
-                    if (safe) L.cur_dst_dead = 1;
+                    if (safe) L.la.cur_dst_dead = 1;
                 }
             }
 
@@ -2392,15 +2399,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                cur_dst_dead is set, since that requires the next op's
                src[0]==dst pattern), publish the branch info for the
                op's fastpath to consume. */
-            L.cur_branch_test_kind = 0;
-            L.cur_branch_test_label = -1;
-            L.cur_skip_next_op = 0;
-            if (L.cur_dst_dead && j + 1 < bb->n_ops) {
+            L.la.cur_branch_test_kind = 0;
+            L.la.cur_branch_test_label = -1;
+            L.la.cur_skip_next_op = 0;
+            if (L.la.cur_dst_dead && j + 1 < bb->n_ops) {
                 const Op *nxt = &bb->ops[j + 1];
                 if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
                     && nxt->src[0] == op->dst) {
-                    L.cur_branch_test_kind = nxt->kind;
-                    L.cur_branch_test_label = nxt->label;
+                    L.la.cur_branch_test_kind = nxt->kind;
+                    L.la.cur_branch_test_label = nxt->label;
                 }
             }
 
@@ -2415,8 +2422,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                op returns 0. When dst sits in that position, the next
                op's load_to_dehl emits the 2-instruction cache-hit path
                (`ld l,c; ld h,b`) — no slot read, no register clobber. */
-            L.cur_dehl_dst_dead_safe = 0;
-            L.cur_dehl_dst_no_bc_stash = 0;
+            L.la.cur_dehl_dst_dead_safe = 0;
+            L.la.cur_dehl_dst_no_bc_stash = 0;
             /* FP-mode: the trailing `ld bc,hl` DEHL-cache maintenance in a
                width-4 store is dead when, scanning forward in the BB, the
                value's BC=low invariant is clobbered before any op reads it
@@ -2425,7 +2432,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                own `ld bc,hl` overwrites BC), not a read. Eliding is always
                correct: store_dehl_cached drops the cache claim, so a later
                read reloads via (ix+d) rather than a stale cache hit. */
-            L.cur_store_dehl_bc_dead = 0;
+            L.la.cur_store_dehl_bc_dead = 0;
             if (fp_active(f) && op->dst >= 0
                 && f->vregs[op->dst].width == 4) {
                 int V = op->dst;
@@ -2442,7 +2449,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         || ko->kind == IR_ASM
                         || (ko->dst >= 0 && ko->dst < f->n_vregs
                             && f->vregs[ko->dst].width == 4)) {
-                        L.cur_store_dehl_bc_dead = 1;   /* clobbered before read */
+                        L.la.cur_store_dehl_bc_dead = 1;   /* clobbered before read */
                         break;
                     }
                 }
@@ -2468,9 +2475,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     && f->vregs[nxt2->src[1]].width == 4
                     && (nxt2->src[0] == op->dst
                         || nxt2->src[1] == op->dst))
-                    L.cur_dehl_dst_no_bc_stash = 1;
+                    L.la.cur_dehl_dst_no_bc_stash = 1;
             }
-            if (L.cur_dst_dead && op->dst >= 0
+            if (L.la.cur_dst_dead && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && j + 1 < bb->n_ops) {
                 const Op *nxt = &bb->ops[j + 1];
@@ -2482,22 +2489,22 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (nxt->kind == IR_HCALL && nxt->hcall
                     && nxt->hcall->n_args == 1 && nxt->hcall->args
                     && nxt->hcall->args[0] == op->dst) {
-                    L.cur_dehl_dst_dead_safe = 1;
+                    L.la.cur_dehl_dst_dead_safe = 1;
                 }
                 int pos = nxt_first_dehl_src(nxt);
-                if (!L.cur_dehl_dst_dead_safe && pos >= 0 && nxt->src[pos] == op->dst) {
+                if (!L.la.cur_dehl_dst_dead_safe && pos >= 0 && nxt->src[pos] == op->dst) {
                     switch (nxt->kind) {
                     case IR_ST_MEM:
                     case IR_NEG: case IR_NOT:
                     case IR_PUSH_DEHL_LONG:
-                        L.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_MOV:
                         /* Copy of a dying width-4 producer: skip the
                            producer's slot store; the MOV reads it from the
                            DEHL cache and does the one store (kills the
                            `acc += x` compound-assign double-store). */
-                        L.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_ADD:
                     case IR_SUB:
@@ -2505,7 +2512,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         /* Both const-RHS (pos=0, no DEHL load of src[1])
                            and variable-RHS (pos matches first load)
                            are safe — load_to_dehl(dst) hits the cache. */
-                        L.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_SHL: case IR_SHR:
                         /* Both const-count and var-count fire — A.1
@@ -2513,12 +2520,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                            helpers, DEHL = value). load_to_dehl(dst)
                            on the helper side hits the cache when dst
                            is already there. */
-                        L.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_ROTL:
                         /* gen_rotl consumes src[0] via load_to_dehl
                            first — cache hit, no slot read. */
-                        L.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_dead_safe = 1;
                         break;
                     default: break;
                     }
@@ -2537,7 +2544,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                above. Excluded: ADDR_TAKEN/PARAM (slot readable
                behind the IR's back) and dst doubling as the other
                src (its second read may take the slot path). */
-            if (!L.cur_dehl_dst_dead_safe
+            if (!L.la.cur_dehl_dst_dead_safe
                 && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && !(f->vregs[op->dst].flags
@@ -2554,7 +2561,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     case IR_ADD: case IR_SUB:
                     case IR_AND: case IR_OR: case IR_XOR:
                     case IR_SHL: case IR_SHR: case IR_ROTL:
-                        L.cur_dehl_dst_dead_safe = 1;
+                        L.la.cur_dehl_dst_dead_safe = 1;
                         break;
                     default: break;
                     }
@@ -2566,7 +2573,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                cache for that consumer, so the result's slot store is dead.
                The producer's dst lives in hcall->ret_vreg (not op->dst), so
                the cur_dst_dead paths above never reach it. */
-            if (!L.cur_dehl_dst_dead_safe
+            if (!L.la.cur_dehl_dst_dead_safe
                 && op->kind == IR_HCALL && op->hcall
                 && op->hcall->ret_vreg >= 0
                 && f->vregs[op->hcall->ret_vreg].width == 4
@@ -2589,7 +2596,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         for (int u = 0; u < nu; u++)
                             if (uses[u] == rv) { used_later = 1; break; }
                     }
-                    if (!used_later) L.cur_dehl_dst_dead_safe = 1;
+                    if (!used_later) L.la.cur_dehl_dst_dead_safe = 1;
                 }
             }
 
@@ -2603,14 +2610,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                Guard: src[0] pre-swap == op->dst (swap at k-1 moves
                it to src[1]); other operand (src[1] pre-swap) must be
                produced at k-1 and die at k (guarantees swap fires). */
-            L.cur_dehl_push_to_stack = 0;
+            L.la.cur_dehl_push_to_stack = 0;
             if (!fp_active(f)
-                && !L.cur_dehl_dst_dead_safe
-                && !L.cur_dst_dead
+                && !L.la.cur_dehl_dst_dead_safe
+                && !L.la.cur_dst_dead
                 && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)
-                && L.cur_stack_long_top < 0) {
+                && L.la.cur_stack_long_top < 0) {
                 /* Note: cur_dehl_inline_push may be non-(-1) here (a
                    chained push is still pending); the runtime check in
                    store_dehl_finalize handles that case — the cleanup in
@@ -2666,7 +2673,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     }
                     if (is_bitop && w4 && dst_in_src0
                         && other_at_km1 && other_dies)
-                        L.cur_dehl_push_to_stack = 1;
+                        L.la.cur_dehl_push_to_stack = 1;
                 }
             }
 
@@ -2685,22 +2692,22 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                producing its result — e.g. `p = mul(a,b); s = add(p,c)`:
                the mul consumes a's push, then its result p is pushed for
                the add. Allow it when op is that consuming HCALL. */
-            int pending_ok = (L.cur_dehl_inline_push < 0);
+            int pending_ok = (L.la.cur_dehl_inline_push < 0);
             if (!pending_ok && op->kind == IR_HCALL && op->hcall
                 && op->hcall->args)
                 for (int a = 0; a < op->hcall->n_stacked; a++)
-                    if (op->hcall->args[a] == L.cur_dehl_inline_push) {
+                    if (op->hcall->args[a] == L.la.cur_dehl_inline_push) {
                         pending_ok = 1; break;
                     }
             if (f32_stack_arg_on
-                && !L.cur_dehl_push_to_stack
+                && !L.la.cur_dehl_push_to_stack
                 && !fp_active(f)
                 && !func_has_pr_bc(f)
-                && !L.cur_dehl_dst_dead_safe
+                && !L.la.cur_dehl_dst_dead_safe
                 && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)
-                && L.cur_stack_long_top < 0
+                && L.la.cur_stack_long_top < 0
                 && pending_ok
                 && !(bb->live_out
                      && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
@@ -2734,7 +2741,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              a < ko->hcall->n_args; a++)
                             if (ko->hcall->args[a] == op->dst) also_reg = 1;
                         if (!also_reg)
-                            L.cur_dehl_push_to_stack = 1;
+                            L.la.cur_dehl_push_to_stack = 1;
                     }
                 }
             }
@@ -2786,14 +2793,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                drops the redundant `add hl,hl` but still runs its
                spill / cache tail to publish HL to the dst vreg. */
             L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
-            for (int s = 0; s < L.shl_skip_n; s++) {
+            for (int s = 0; s < L.la.shl_skip_n; s++) {
                 if (shl_skip[s].bb_id == bb->id
                     && shl_skip[s].op_idx == j) {
                     if (shl_skip[s].is_byte) {
                         /* Byte fuse: `sla <home>` in the test BB already did
                            the shift; gen_shl's byte path emits nothing (in-
                            place) or just republishes the home reg to A. */
-                        L.cur_skip_shl_byte = 1;
+                        L.la.cur_skip_shl_byte = 1;
                         break;
                     }
                     hl_about_to_change(shl_skip[s].cache_vreg);
@@ -2802,7 +2809,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        cache hit with no loader call, so record it so the
                        dead-store analysis doesn't treat it as a reload. */
                     ss_note_cache_read(f, shl_skip[s].cache_vreg);
-                    L.cur_skip_shl_add_hl = 1;
+                    L.la.cur_skip_shl_add_hl = 1;
                     break;
                 }
             }
@@ -2843,7 +2850,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
-            if (L.cur_skip_next_op) {
+            if (L.la.cur_skip_next_op) {
                 j++;  /* the fastpath consumed op[i+1] (the branch) */
             }
         }
