@@ -27,7 +27,7 @@ _point_callee:
 asm_point:
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
-	ELSE
+	ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -40,7 +40,7 @@ asm_point:
     pop     af
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-	ELSE
+	ENDIF
     ld      hl, 1
     ret     nz                          ;pixel set
     dec     hl
