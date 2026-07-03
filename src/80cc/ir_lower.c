@@ -1606,6 +1606,11 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     int no_hl = cur_load_to_dehl_no_hl;
     cur_load_to_dehl_no_hl = 0;
+    /* Capture + reset the no-BC-stash request up front: every early return
+       below (incl. the cache-hit) must consume it, else it leaks into the
+       NEXT load_to_dehl and wrongly suppresses that load's BC stash. */
+    int no_bc = cur_load_to_dehl_no_bc;
+    cur_load_to_dehl_no_bc = 0;
     /* The long-load emits below (`ld hl,bc` cache recover, `ld hl,(ix)`,
        the sp-rel slot walk) all clobber HL. Flush a pending width-2
        spill first (dormant for now). The
@@ -1643,11 +1648,17 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
             emit(out, "push\tde");
             emit(out, "push\thl");
-            if (!cur_load_to_dehl_no_bc)
-                emit(out, "ld\tbc,hl");     /* BC = low half (cache invariant) */
-            cur_load_to_dehl_no_bc = 0;
-            hl_about_to_change(vreg_id);
-            cache_dehl(vreg_id);
+            {
+                int nb = no_bc;
+                if (!nb)
+                    emit(out, "ld\tbc,hl"); /* BC = low half (cache invariant) */
+                hl_about_to_change(vreg_id);
+                /* When the BC=low stash is skipped, BC does NOT back the DEHL
+                   cache — so don't publish the (BC-implying) dehl claim, or a
+                   later cache-hit `ld hl,bc` reads stale BC. */
+                if (nb) rs.dehl = -1;
+                else    cache_dehl(vreg_id);
+            }
             return;
         }
         int ix_off = slot_ix_off(f, vreg_id);
@@ -1662,14 +1673,19 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
                when the caller signals it won't read BC — typically a
                byte-direct unary chain (IR_NOT/IR_NEG) that walks
                H/L/E/D through A. */
-            if (!cur_load_to_dehl_no_bc)
-                emit(out, "ld\tbc,hl");
-            cur_load_to_dehl_no_bc = 0;
-            /* HL really does hold the low half here — advertise it
-               so downstream byte-direct chains can read from L/H
-               directly instead of going through BC. */
-            hl_about_to_change(vreg_id);
-            cache_dehl(vreg_id);
+            {
+                int nb = no_bc;
+                if (!nb)
+                    emit(out, "ld\tbc,hl");
+                /* HL really does hold the low half here — advertise it
+                   so downstream byte-direct chains can read from L/H
+                   directly instead of going through BC. */
+                hl_about_to_change(vreg_id);
+                /* BC=low stash skipped ⇒ don't assert the BC-backed dehl
+                   claim (a later cache-hit would `ld hl,bc` stale BC). */
+                if (nb) rs.dehl = -1;
+                else    cache_dehl(vreg_id);
+            }
             return;
         }
     }
@@ -1686,11 +1702,15 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
         emit(out, "push\tde");
         emit(out, "push\thl");
-        if (!cur_load_to_dehl_no_bc)
-            emit(out, "ld\tbc,hl");     /* BC = low half (cache invariant) */
-        cur_load_to_dehl_no_bc = 0;
-        hl_about_to_change(vreg_id);
-        cache_dehl(vreg_id);
+        {
+            int nb = no_bc;
+            if (!nb)
+                emit(out, "ld\tbc,hl"); /* BC = low half (cache invariant) */
+            hl_about_to_change(vreg_id);
+            /* BC=low stash skipped ⇒ don't assert the BC-backed dehl claim. */
+            if (nb) rs.dehl = -1;
+            else    cache_dehl(vreg_id);
+        }
         return;
     }
     /* Rabbit/kc160 native sp-relative long load. DE=high half (native
@@ -2127,32 +2147,6 @@ static int cmp_bytewise_mem_ok(const Func *f, const Op *o)
 {
     if (cur_branch_test_kind == 0) return 0;
     return cmp_bytewise_mem_shape_ok(f, o);
-}
-
-/* 8085 slot-vs-slot unsigned compare via DSUB (`sub hl,bc`, CF = unsigned
-   borrow). Load src1 → BC and src0 → HL with LDSI+LHLX (`ld de,sp+N; ld
-   hl,(de)`), committing src1 to BC before the second LDSI reloads DE — so NO
-   push/pop is needed (unlike load_binop_operands, which stages both through HL
-   and must save DE). `sub hl,bc` then folds the whole compare into one byte:
-   9 bytes vs the 13-byte push/pop double-load + byte-wise sub/sbc. sp-mode
-   (8085 has no IX); both operands in LDSI-addressable slots; BC free (else the
-   byte-wise fall-through preserves a live BC). */
-static int cmp_dsub_slot_ok_8085(const Func *f, const Op *o)
-{
-    if (!IS_8085() || fp_active(f)) return 0;
-    if (o->kind != IR_CMP_ULT && o->kind != IR_CMP_UGE) return 0;
-    int s0 = o->src[0], s1 = o->src[1];
-    if (s0 < 0 || s1 < 0 || s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
-    if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
-    if (!f->vreg_to_phys) return 0;
-    if (f->vreg_to_phys[s0] != IR_PR_SPILL) return 0;   /* both in a slot */
-    if (f->vreg_to_phys[s1] != IR_PR_SPILL) return 0;
-    if (f->vregs[s0].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
-    if (f->vregs[s1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
-    int o0 = slot_off(f, s0) + cur_sp_adjust;
-    int o1 = slot_off(f, s1) + cur_sp_adjust;
-    if (o0 < 0 || o0 + 1 > 255 || o1 < 0 || o1 + 1 > 255) return 0;  /* LDSI range */
-    return 1;
 }
 
 /* Is op `o` the word DE-home's accumulate — `home = home OP w` with w a
@@ -8529,32 +8523,6 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "jp\t%s,L_f%d_bb_%d",
              want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
         rs.a = -1;                         /* A clobbered; HL=n, DE=home kept */
-        cur_skip_next_op = 1;
-        return 0;
-    }
-    /* 8085 slot-vs-slot unsigned compare via DSUB, no push/pop (BC free).
-       LDSI+LHLX load src1→BC then src0→HL, `sub hl,bc` sets CF = unsigned
-       borrow (src0<src1). Mirrors cmp_dsub_slot_ok_8085; must run before
-       load_binop_operands (it loads the operands itself). */
-    if (rs.bc < 0 && cmp_dsub_slot_ok_8085(f, op)) {
-        pending_spill_resolve();                 /* slots coherent before reading */
-        int s0 = op->src[0], s1 = op->src[1];
-        int off1 = slot_off(f, s1) + cur_sp_adjust;
-        int off0 = slot_off(f, s0) + cur_sp_adjust;
-        emit(out, "ld\tde,sp+%d", off1);         /* LDSI: DE = &src1 */
-        emit(out, "ld\thl,(de)");                /* LHLX: HL = src1 */
-        emit(out, "ld\tc,l");
-        emit(out, "ld\tb,h");                    /* BC = src1 */
-        emit(out, "ld\tde,sp+%d", off0);         /* LDSI: DE = &src0 */
-        emit(out, "ld\thl,(de)");                /* LHLX: HL = src0 */
-        emit(out, "sub\thl,bc");                 /* DSUB: CF = uns (src0 < src1) */
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
-        int want_carry = (cf_true_long == br_true);
-        emit(out, "jp\t%s,L_f%d_bb_%d",
-             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
-        invalidate_hl_cache();      /* HL clobbered by DSUB */
-        invalidate_de_cache();      /* DE holds a raw slot address, not a vreg */
-        invalidate_bc_cache();      /* BC = src1, uncached */
         cur_skip_next_op = 1;
         return 0;
     }
