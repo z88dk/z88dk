@@ -133,8 +133,6 @@ static int fp_tos_slot(const Func *f, int vreg_id)
    byte E/D-home already claimed DE's low half), so the state is shared, not
    duplicated. The width-specific leaf ops (flush/rehome = 2 bytes, the
    accumulate, the DE→HL read) dispatch on cur_home_is_word. */
-static int cur_home_is_word = 0;
-static int cur_func_whome   = -1;
 
 static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
@@ -592,24 +590,17 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
 /* Byte-home residency state. Defined here (ahead of the byte
    load/store emitters that read them); the comment block + helper functions
    live further down with the rest of the cache helpers. */
-static int cur_byte_home_vreg = -1;
-static int cur_byte_home_dirty = 0;
-static int *bb_byte_out;        /* per-function, alloc'd by lower_func */
-static int cur_func_ehome = -1; /* this function's PR_E/PR_D vreg, or -1 */
 /* Home-resident loop: the bb-id span [lo,hi] of a loop the slot-backed E/D
    home stays register-resident across — proven (compute_home_region) so that
    every body op preserves E and the home is live-in at the header. Within it
    the per-iteration spill is suppressed and residency is ASSERTED at the
    header (the single forward pass can't carry E in from the unlowered
    back-edge). -1 = no such loop in this function. */
-static int cur_home_region_lo = -1;
-static int cur_home_region_hi = -1;
 /* Word DE-home only: the id of a dedicated loop-exit block (reached ONLY from
    the resident region) at whose entry the home is flushed ONCE — hoisting the
    flush off the per-iteration header path. -1 = not applicable (multi-target
    exit, non-fp, or a slot too far for ix-relative store) → fall back to the
    per-iter header flush. */
-static int cur_home_exit_flush_bb = -1;
 
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
    if A already holds the wanted vreg (set by a prior IR_LD_MEM_VREG
@@ -1136,7 +1127,6 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
 /* Forward decl: defined with the rest of the per-op lookahead state.
    Read by cache_dehl_no_spill (just below) to skip the BC stash when
    the next op is the FP byte-direct binop chain. */
-static int cur_dehl_dst_no_bc_stash;
 
 /* Forward decl: same family. Read by load_to_dehl_adj's FP-mode path
    to skip the BC stash when the caller doesn't read BC — typically
@@ -1172,7 +1162,6 @@ static void cache_dehl_no_spill(FILE *out, int vreg_id)
 
 /* Forward decl: cur_dehl_dst_dead_safe lives with the other lookahead
    flags further down. lower_func sets it before each op. */
-static int cur_dehl_dst_dead_safe;
 
 /* Forward decl: defined with the other vreg_is_pr_* helpers below. */
 static int vreg_is_pr_dehl(const Func *f, int v);
@@ -1322,7 +1311,6 @@ static int byte_home_is_slotbacked(const Func *f, int v)
 
 /* cur_branch_test_kind is fully defined below (tentative def — same object);
    declared here so cmp_bytewise_ok / op_de_clean can see it. */
-static int cur_branch_test_kind;
 
 /* A width-2 unsigned ordered compare lowered byte-wise (`ld a,c; sub mem; ld
    a,b; sbc a,mem`) instead of `load_binop_operands + sbc hl,de` — shorter AND

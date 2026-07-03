@@ -64,6 +64,96 @@ static int         cur_emitted_line;
 static const char *lower_cur_file;
 static int         lower_cur_line;
 
+struct RegState {
+    int hl;     /* HL value cache (this comment block) */
+    int de;     /* DE value cache */
+    int dehl;   /* long vreg split across DE(high)/BC(low) */
+    int bc;     /* BC value cache */
+    int a;      /* byte vreg in A */
+    int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
+    int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
+                   store from FA, so its residency is tracked independently */
+};
+
+/* Option B: the lowerer's mutable state, grouped into one struct. Field names
+   match the historical globals; the #define shims below rewrite every use to
+   L.<field>, so the spine and all fragments share one instance with no
+   per-site churn. (bc_args_save[] and the debug-line cursors stay standalone —
+   localized, not part of the register-lowering state.) */
+typedef struct {
+    struct RegState rs;
+    int cur_hl_addr_off, cur_hl_addr_spadj, cur_sp_adjust;
+    int func_emit_idx, cmp_label_counter, fc_ret_label_counter;
+    int cur_func_uses_params;
+    int cur_home_is_word, cur_func_whome;
+    int cur_byte_home_vreg, cur_byte_home_dirty, cur_func_ehome;
+    int cur_home_region_lo, cur_home_region_hi, cur_home_exit_flush_bb;
+    int *bb_byte_out;
+    int lazy_spill_on, pending_spill_v;
+    int ss_phase, *ss_op_store, *ss_op_reload, *ss_op_cacheread;
+    const signed char *ss_store_dead; const int *ss_op_base;
+    int ss_cur_g, ss_pinned;
+    int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
+    int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
+    int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
+    int cur_dehl_dst_dead_safe, cur_branch_test_kind, cur_dst_dead;
+    int cur_branch_test_label, cur_skip_next_op;
+    int shl_skip_n, cur_skip_shl_add_hl, cur_skip_shl_byte;
+} LowerState;
+
+static LowerState L = {
+    .rs = { .fa = -1, .i64_acc = -1 },
+    .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
+    .cur_func_whome = -1, .cur_byte_home_vreg = -1, .cur_func_ehome = -1,
+    .cur_home_region_lo = -1, .cur_home_region_hi = -1,
+    .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
+};
+
+#define rs L.rs
+#define cur_hl_addr_off L.cur_hl_addr_off
+#define cur_hl_addr_spadj L.cur_hl_addr_spadj
+#define cur_sp_adjust L.cur_sp_adjust
+#define func_emit_idx L.func_emit_idx
+#define cmp_label_counter L.cmp_label_counter
+#define fc_ret_label_counter L.fc_ret_label_counter
+#define cur_func_uses_params L.cur_func_uses_params
+#define cur_home_is_word L.cur_home_is_word
+#define cur_func_whome L.cur_func_whome
+#define cur_byte_home_vreg L.cur_byte_home_vreg
+#define cur_byte_home_dirty L.cur_byte_home_dirty
+#define cur_func_ehome L.cur_func_ehome
+#define cur_home_region_lo L.cur_home_region_lo
+#define cur_home_region_hi L.cur_home_region_hi
+#define cur_home_exit_flush_bb L.cur_home_exit_flush_bb
+#define bb_byte_out L.bb_byte_out
+#define lazy_spill_on L.lazy_spill_on
+#define pending_spill_v L.pending_spill_v
+#define ss_phase L.ss_phase
+#define ss_op_store L.ss_op_store
+#define ss_op_reload L.ss_op_reload
+#define ss_op_cacheread L.ss_op_cacheread
+#define ss_store_dead L.ss_store_dead
+#define ss_op_base L.ss_op_base
+#define ss_cur_g L.ss_cur_g
+#define ss_pinned L.ss_pinned
+#define cur_load_to_dehl_no_hl L.cur_load_to_dehl_no_hl
+#define cur_load_to_dehl_no_bc L.cur_load_to_dehl_no_bc
+#define cur_stack_long_top L.cur_stack_long_top
+#define cur_dehl_inline_push L.cur_dehl_inline_push
+#define cur_dehl_inline_push_base_sp L.cur_dehl_inline_push_base_sp
+#define cur_dehl_push_to_stack L.cur_dehl_push_to_stack
+#define cur_store_dehl_bc_dead L.cur_store_dehl_bc_dead
+#define cur_dehl_dst_no_bc_stash L.cur_dehl_dst_no_bc_stash
+#define cur_dehl_dst_dead_safe L.cur_dehl_dst_dead_safe
+#define cur_branch_test_kind L.cur_branch_test_kind
+#define cur_dst_dead L.cur_dst_dead
+#define cur_branch_test_label L.cur_branch_test_label
+#define cur_skip_next_op L.cur_skip_next_op
+#define shl_skip_n L.shl_skip_n
+#define cur_skip_shl_add_hl L.cur_skip_shl_add_hl
+#define cur_skip_shl_byte L.cur_skip_shl_byte
+
+
 /* Strip the surrounding quotes that op->file carries (from `Filename`). */
 static const char *lower_unquote(const char *file, char *buf, size_t n)
 {
@@ -185,7 +275,6 @@ static void emit_c(FILE *out, Clobber c, const char *fmt, ...)
 /* Monotonic counter, bumped on every ir_lower_func() entry. Used to
    prefix per-function labels so they don't collide across functions in
    the same module (`L_bb_0` would otherwise duplicate). */
-static int func_emit_idx;
 
 static void emit_bb_label(FILE *out, int bb_id)
 {
@@ -194,8 +283,6 @@ static void emit_bb_label(FILE *out, int bb_id)
 
 /* Per-function counter for compare-overflow correction labels. Reset at
    the start of each ir_lower_func() call. */
-static int cmp_label_counter;
-static int fc_ret_label_counter;   /* unique labels for ret-based fnptr-fastcall dispatch */
 
 /* HL value cache. Reset at each BB boundary and at any op that
    clobbers HL the cache can't reason about (calls, branches, shifts
@@ -206,16 +293,6 @@ static int fc_ret_label_counter;   /* unique labels for ret-based fnptr-fastcall
    set is greppable, snapshot/restorable, and (next step) invalidated
    through a single clobber-aware chokepoint. Per-field semantics are
    documented at the comment blocks below that introduce each field. */
-static struct RegState {
-    int hl;     /* HL value cache (this comment block) */
-    int de;     /* DE value cache */
-    int dehl;   /* long vreg split across DE(high)/BC(low) */
-    int bc;     /* BC value cache */
-    int a;      /* byte vreg in A */
-    int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
-    int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
-                   store from FA, so its residency is tracked independently */
-} rs = { .fa = -1, .i64_acc = -1 };
 
 /* The wide-accumulator residency cell for `vreg` — __i64_acc for a long long,
    FA for a double. They are distinct stores, so never share a marker. */
@@ -233,8 +310,6 @@ static inline int *wide_acc_cell(const Func *f, int vreg)
    SHL v2<-v1) hits. spadj pins cur_sp_adjust (sp moved → miss). Cleared on
    every HL clobber; a cached address implies rs.hl==-1, so value and
    address caches are never both live. */
-static int cur_hl_addr_off = -1;   /* slot byte-offset in HL, or -1 = none */
-static int cur_hl_addr_spadj;
 
 /* Wide-accumulator (FA / __i64_acc) residency cache: the vreg whose
    value currently sits in the accumulator, or -1. Set by gen_acc_binop
@@ -252,8 +327,6 @@ static int cur_hl_addr_spadj;
    pending_spill_v); -1 = nothing pending. `cur_lazy_out`/`cur_lazy_func`
    /`cur_op_idx` give the choke-point flush the emit stream + the
    per-op liveness context (ir_op_live_in) it needs. */
-static int          lazy_spill_on;
-static int          pending_spill_v = -1;
 static FILE        *cur_lazy_out;
 static const Func  *cur_lazy_func;
 static int          cur_op_idx;
@@ -287,7 +360,6 @@ static int fastcall_arg_vreg(const Func *f);
    elision below. O(ops) — frame_has_saved_fp reads the cached
    cur_func_uses_params (set once per function) rather than calling this
    per slot access. */
-static int cur_func_uses_params = 1;   /* safe default: don't elide */
 static int func_uses_params(const Func *f)
 {
     int r = 0;
@@ -541,7 +613,6 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 
 /* Data-stack sp adjustment — see comment at cur_stack_long_top below.
    Forward-defined here because the load_to_* wrappers depend on it. */
-static int cur_sp_adjust;
 
 /* Materialize the ADDRESS of a vreg's frame slot into HL — for the
    wide-accumulator helpers (dload/dstore/dldpsh take the address in HL).
@@ -650,8 +721,6 @@ static int ns_sym_bails(const SYMBOL *sym)
 /* One-shot flag forward decls (definitions further down with the
    rest of the lookahead state). Need to be visible to
    load_to_dehl_adj / store_dehl which sit above the cache helpers. */
-static int cur_load_to_dehl_no_hl;
-static int cur_load_to_dehl_no_bc;
 
 /* IR_VERIFY: emission-time cache/lookahead-flag tripwire (set in ir_lower_func).
    Distinct from ir_verify_func (structural IR); this asserts the register-cache
@@ -664,7 +733,6 @@ static int lower_verify_on;
    boundaries. Cleared by the consumer that absorbs it OR by an
    explicit IR_POP_DEHL_LONG (for consumers — ST_MEM/NOT/NEG/SHL/SHR —
    whose lowering needs the value in DEHL). */
-static int cur_stack_long_top;
 
 /* Chain-OR accumulate: when a SPILL long intermediate has a single
    in-BB consumer at distance >1 that is a long OR/AND/XOR, push the
@@ -672,9 +740,6 @@ static int cur_stack_long_top;
    (10 instr). The consumer's gen_bitop fused-(hl) path absorbs it
    directly using off=4. One slot at a time; cleared when consumed or
    at BB boundaries. */
-static int cur_dehl_inline_push;         /* vreg pushed inline, -1=none */
-static int cur_dehl_inline_push_base_sp; /* cur_sp_adjust at push time */
-static int cur_dehl_push_to_stack;       /* one-shot flag: set by lookahead */
 
 /* Lever A: push a width-4 call/op result straight to the data stack when
    its sole use is the stacked operand of a later HCALL (l_f32_mul etc.),
@@ -697,7 +762,6 @@ static int sp_rel_max(const Func *f);
    before it's destroyed. store_dehl skips the `ld bc,hl`; store_dehl_cached
    then leaves the value in its slot (no DEHL-cache claim), so a later read
    reloads directly via (ix+d). */
-static int cur_store_dehl_bc_dead;
 
 /* Walk a multi-byte slot via (hl), loading/storing one byte and advancing
    to the next — except the final byte (last=1), which is not followed by

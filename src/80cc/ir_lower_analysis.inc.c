@@ -439,7 +439,6 @@ static void apply_clobbers(Clobber c)
    slot (no live-out, no later in-BB use), so the spill can be skipped.
    The cache_hl flag is still set so adjacent cache-served reads work,
    though if dst really has no users that doesn't matter. */
-static int cur_dst_dead;
 
 /* cur_dehl_dst_dead_safe forward-declared earlier (used by
    store_dehl_finalize); the actual definition lives there. Documented
@@ -460,8 +459,6 @@ static int cur_dst_dead;
    op kind and `cur_branch_test_label` to its target. When the lowerer
    fastpaths the combined op, it sets `cur_skip_next_op = 1` so the
    dispatcher skips the now-consumed branch. */
-static int cur_branch_test_label;
-static int cur_skip_next_op;
 
 /* Current BB being lowered (the per-BB loop in lower_func sets this
    before each op). Read by the AND-mask + shift-test peephole to
@@ -523,19 +520,16 @@ static void pending_spill_resolve(void)
    2 entries per iter × 8 = 16 max). */
 #define SHL_SKIP_CAP 32
 static struct { int bb_id, op_idx, cache_vreg, is_byte; } shl_skip[SHL_SKIP_CAP];
-static int shl_skip_n;
 
 /* When set before IR_SHL imm=N is lowered, the int-SHL fastpath drops
    the first `add hl,hl` emit (HL already holds the shifted value
    produced by a fused fastpath such as the shift+test peephole).
    The spill / cache_hl tail still runs so the dst's slot and HL
    cache are correctly published. Cleared by the SHL lowerer. */
-static int cur_skip_shl_add_hl;
 /* Byte analog: the BYTE shift+test fuse (`sla e` did `home<<=1` AND the
    bit-7 test in the test BB) — the leading per-arm SHL is already done.
    gen_shl's byte path then emits nothing for an in-place home SHL, or just
    `ld a,<home>` to republish the shifted value for a fresh-temp SHL. */
-static int cur_skip_shl_byte;
 
 /* Per-op lookahead: when the producer's dst is consumed by an
    FP-mode byte-direct binop next (the consumer reads bytes via
@@ -639,14 +633,6 @@ static void commit_a_byte(FILE *out, const Func *f, int v)
        backstop (e.g. the rare cache-hit-then-slot-reload of the same vreg
        within one op), not the safety mechanism.
    uses(op) comes from the IR (ir_op_uses), which is reliable. */
-static int                ss_phase;       /* 0 off, 1 record, 2 elide */
-static int               *ss_op_store;    /* [total_ops]   stored vreg / -1 */
-static int               *ss_op_reload;   /* [2*ops] explicit slot reloads   */
-static int               *ss_op_cacheread;/* [2*ops] proven register-served  */
-static const signed char *ss_store_dead;  /* [total_ops]   pass-2 verdict    */
-static const int         *ss_op_base;     /* [n_bbs] op-global-index base    */
-static int                ss_cur_g;       /* current op global idx, -1 none */
-static int                ss_pinned;      /* >2 accesses in an op → no elide */
 
 /* A width-2 local with a real slot whose spill store may be elided
    (I4 exclusions: never ADDR_TAKEN / VOLATILE / PARAM / register-pool). */
