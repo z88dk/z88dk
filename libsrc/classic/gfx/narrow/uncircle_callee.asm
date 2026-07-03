@@ -1,7 +1,6 @@
 ; Usage: uncircle(int x, int y, int radius, int skip);
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  uncircle_callee
@@ -28,21 +27,23 @@ _uncircle_callee:
     ld      b, l
     push    af
 
-    push    ix
-
-
 asm_uncircle:
+    ld      hl, respixel
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    push    ix
+	ELSE
+    EXTERN  __plot_ADDR
+    ld      (__plot_ADDR),hl
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
-    ld      hl, respixel
     call    draw_circle
   IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
-    IF  !__CPU_INTEL__&!__CPU_GBZ80__
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-    ENDIF
+ENDIF
     ret
   ENDIF
-ENDIF
