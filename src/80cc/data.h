@@ -81,8 +81,8 @@ extern uint32_t c_speed_optimisation;
    (handler in main.c). Bits are checked in ast_opt_run; setting a bit
    makes that pass become a no-op. Useful for bisecting miscompiles. */
 extern uint32_t c_opt_disable;
-/* --use-ir: route function codegen through ir_build → ir_lower instead
-   of ast_codegen2. Phase 1 — most C constructs unsupported. */
+/* Function codegen goes through the IR pipeline (ir_build → ir_lower),
+   now the sole codegen path (forced on at startup). */
 extern int      c_use_ir;
 #define OPT_DISABLE_FOLD            (1u << 0)
 #define OPT_DISABLE_PROP            (1u << 1)

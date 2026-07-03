@@ -1,23 +1,9 @@
 /*
- *      sccz80 — AST-driven codegen, second walker
+ *      sccz80 — AST integer-promotion / type-normalisation pass.
  *
- *  Reuses primitives from `codegen.c`. The parser builds AST only;
- *  this walker is the sole emitter for the function body.
- *
- *  Phase B scope: frame planning with stack-slot coalescing.  All
- *  locals in the function body are assigned offsets via greedy
- *  coloring over an interference graph derived from scope nesting.
- *  A single `modstk(-frame_size,...)` is emitted at function entry;
- *  the matching deallocation is handled by `gen_leave_function` at
- *  function exit.
- *
- *  Walker support (Phase B + minimal Phase C):
- *    AST_COMPOUND_STMT, AST_RETURN, AST_LITERAL (16-bit int),
- *    AST_DECL (with optional SEF init),
- *    OP_DEREF(AST_LOCAL_VAR) (load),
- *    OP_ASSIGN(AST_LOCAL_VAR, RHS) — minimal subset.
- *
- *  See CODEGEN_FROM_AST_PLAN.md for the wider plan.
+ *  This file once held the AST-driven codegen walker; that is retired —
+ *  function codegen now runs through the IR pipeline (ir_build → ir_lower).
+ *  What remains is the type-normalisation helpers below.
  */
 
 #include "ccdefs.h"
