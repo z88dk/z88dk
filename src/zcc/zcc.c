@@ -315,6 +315,8 @@ static enum iostyle    compiler_style = outimplied;
 #define CC_SDCC      1
 #define CC_EZ80CLANG 2
 #define CC_80CC      3
+#define CC_XCC       4
+
 static char           *c_compiler_type = "sccz80";
 static int             compiler_type = CC_SCCZ80;
 
@@ -366,6 +368,7 @@ static char  *c_coptrules_target = NULL;
 static char  *coptrules_cpu = NULL;
 static char  *c_ez80clang_opt = NULL;
 static char  *c_80cc_opt = NULL;
+static char  *c_xcc_opt = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -442,6 +445,7 @@ static arg_t  config[] = {
     { "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
     { "EZ80CLANGRULES", 0, SetStringConfig, &c_ez80clang_opt, NULL, "Rules for ez80 clang", "DESTDIR/lib/clang_rules.1"},
     { "80CCRULES", 0, SetStringConfig, &c_80cc_opt, NULL, "Options for 80cc", "DESTDIR/lib/80cc_rules.1"},
+    { "XCCRULES", 0, SetStringConfig, &c_xcc_opt, NULL, "Options for xcc", "DESTDIR/lib/xcc_rules.1"},
     { "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.1\"" },
     { "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.2\"" },
     { "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/lib/sdcc/sdcc_opt.3\"" },
@@ -1473,6 +1477,14 @@ int main(int argc, char **argv)
                 int    num_rules = 0;
 
                 rules[num_rules++] = c_ez80clang_opt;
+
+                apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
+            } else if (compiler_type == CC_XCC) {
+                char  *rules[MAX_COPT_RULE_FILES];
+                int    num_rules = 0;
+                rules[num_rules++] = c_sdccopt1;
+                rules[num_rules++] = c_sdccopt9;
+                rules[num_rules++] = c_xcc_opt;
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
@@ -3116,6 +3128,16 @@ static void configure_compiler(void)
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__SDCC");
         BuildOptions(&linkargs, "-D__SDCC");
+    } else if (strcmp(c_compiler_type,"xcc") == 0 ) {
+        compiler_type = CC_XCC;
+        preprocarg = " -D__XCC";
+        BuildOptions(&cpparg, preprocarg);
+        c_compiler = "xcc";
+        add_option_to_compiler("-S -O2 --sdcccall 0 --c1mode");
+        c_cpp_exe = c_sdcc_preproc_exe;
+        compiler_style = filter_outspecified_flag;
+        BuildOptions(&asmargs, "-D__XCC");
+        BuildOptions(&linkargs, "-D__XCC");
     } else if (strcmp(c_compiler_type,"sccz80") == 0 ) {
         preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
         BuildOptions(&cpparg, preprocarg);
