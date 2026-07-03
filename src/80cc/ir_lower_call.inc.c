@@ -62,7 +62,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        the already-pushed args); ir_alloc disables the PR_BC pool in
        functions containing IR_PUSH_ARG. */
     int bc_saved = 0;
-    int bc_vreg_at_call_entry = rs.bc;
+    int bc_vreg_at_call_entry = L.rs.bc;
     if (!pre) {
         for (int i = 0; i < f->n_vregs; i++) {
             if (f->vreg_to_phys[i] == IR_PR_BC) { bc_saved = 1; break; }
@@ -110,7 +110,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     for (int k = 0; k < n_to_push; k++) {
         int i = start + k * push_step;
         int slot = slot_off(f, ci->args[i]);
-        int adj  = slot + pushed_bytes + sp_adj_extra + cur_sp_adjust;
+        int adj  = slot + pushed_bytes + sp_adj_extra + L.cur_sp_adjust;
         int width = f->vregs[ci->args[i]].width;
         if (width > 4) {
             /* Wide double arg: load the slot into the accumulator and push
@@ -205,10 +205,10 @@ static int gen_call(FILE *out, Func *f, const Op *op)
            arg), so sc1 diverges: HL is still free here (before the args
            load), so push [retlabel][fnptr] now and `ret` at dispatch — the
            callee's ret lands on retlabel. fnptr_pushed shifts sc1_adj below. */
-        sc1_fcret_lbl = fc_ret_label_counter++;
+        sc1_fcret_lbl = L.fc_ret_label_counter++;
         load_to_hl_adj(out, f, ci->fnptr_vreg,
                        pre ? 0 : pushed_bytes + sp_adj_extra);
-        emit(out, "ld\tbc,L_f%d_fcret_%d", func_emit_idx, sc1_fcret_lbl);
+        emit(out, "ld\tbc,L_f%d_fcret_%d", L.func_emit_idx, sc1_fcret_lbl);
         emit(out, "push\tbc");          /* return address (below the fnptr) */
         emit(out, "push\thl");          /* fnptr on TOS — `ret` jumps to it */
         fnptr_pushed = 4;
@@ -218,7 +218,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                        pre ? 0 : pushed_bytes + sp_adj_extra);
         emit(out, "push\thl");          /* fnptr on TOS; `pop af` reclaims it */
         fnptr_pushed = 2;
-        if (pre) cur_sp_adjust += 2;
+        if (pre) L.cur_sp_adjust += 2;
         invalidate_hl_cache();
     }
 
@@ -299,7 +299,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         emit(out, "ld\tbc,__i64_acc");
         emit(out, "push\tbc");
         pushed_bytes += 2;
-        if (pre) cur_sp_adjust += 2;
+        if (pre) L.cur_sp_adjust += 2;
     }
 
     if (is_indirect && ci->far_fnptr) {
@@ -326,26 +326,26 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         /* [retlabel][fnptr] already pushed above (before the args); just
            `ret` into the fnptr — its own `ret` returns to our label. */
         emit(out, "ret");
-        fprintf(out, "L_f%d_fcret_%d:\n", func_emit_idx, sc1_fcret_lbl);
+        fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, sc1_fcret_lbl);
     } else if (is_indirect && fc_ret) {
         /* No spare index reg (idx2 off / target reserves one / 808x / gbz80):
            the fnptr is on TOS and the arg rides HL/DEHL/acc. Reclaim the fnptr
            into AF, push a return label then the fnptr, and `ret` into it — the
            callee's own `ret` lands back at the label. */
-        int lbl = fc_ret_label_counter++;
+        int lbl = L.fc_ret_label_counter++;
         emit(out, "pop\taf");           /* fnptr → AF */
-        if (pre) cur_sp_adjust -= 2;
+        if (pre) L.cur_sp_adjust -= 2;
         if (ci->ret_longlong) {
             /* hidden &__i64_acc must sit just above the return address */
             emit(out, "ld\tbc,__i64_acc");
             emit(out, "push\tbc");
             pushed_bytes += 2;
         }
-        emit(out, "ld\tbc,L_f%d_fcret_%d", func_emit_idx, lbl);
+        emit(out, "ld\tbc,L_f%d_fcret_%d", L.func_emit_idx, lbl);
         emit(out, "push\tbc");          /* return address */
         emit(out, "push\taf");          /* fnptr */
         emit(out, "ret");               /* jump to fnptr; its ret → our label */
-        fprintf(out, "L_f%d_fcret_%d:\n", func_emit_idx, lbl);
+        fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, lbl);
     } else if (is_indirect) {
         /* Load funcptr into HL then `call l_jphl` (the `jp (hl)`
            thunk). The call pushes the return address; l_jphl
@@ -423,7 +423,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     /* Pre-pushed args bumped cur_sp_adjust at each IR_PUSH_ARG; the
        stack is rebalanced now (our pops, or the callee's cleanup). */
     if (pre)
-        cur_sp_adjust -= pushed_bytes;
+        L.cur_sp_adjust -= pushed_bytes;
 
     if (ci->is_critical)
         emit(out, (IS_RABBIT()) ? "ipres" : "ei");
@@ -434,7 +434,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        Restore the cache to reflect what is actually in BC now. */
     if (bc_saved) {
         emit(out, "pop\tbc");
-        rs.bc = bc_vreg_at_call_entry;
+        L.rs.bc = bc_vreg_at_call_entry;
     }
 
     /* Callee clobbers caller-saved registers (HL, DE, BC, A
@@ -462,7 +462,7 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             /* __sdcccall(1) return: 1B in A, 2B in DE, 4B in HLDE (DE=low,
                HL=high — `ex de,hl` converts to native DEHL). */
             if (ret_w == 1) {
-                if (cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+                if (L.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                     cache_a(ci->ret_vreg);
                 else
                     store_a_byte(out, f, ci->ret_vreg);
@@ -484,19 +484,19 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             /* Lever A: a width-4 result feeding a later HCALL's stacked
                arg is pushed straight to the data stack (the lookahead set
                cur_dehl_push_to_stack) rather than spilled to its slot. */
-            if (cur_dehl_push_to_stack && cur_dehl_inline_push < 0
-                && cur_stack_long_top < 0 && !cur_dehl_dst_dead_safe
+            if (L.cur_dehl_push_to_stack && L.cur_dehl_inline_push < 0
+                && L.cur_stack_long_top < 0 && !L.cur_dehl_dst_dead_safe
                 && !vreg_is_pr_dehl(f, ci->ret_vreg))
                 emit_dehl_stack_push(out, ci->ret_vreg);
             else
                 store_dehl_cached(out, f, ci->ret_vreg);
-            cur_dehl_push_to_stack = 0;
+            L.cur_dehl_push_to_stack = 0;
         } else if (ret_w == 1) {
             /* Byte return: the value is in HL (low byte in L, char-
                widened by the callee). store_hl writes 2 bytes and would
                overrun a 1-byte slot, so store the low byte via A. */
             emit(out, "ld\ta,l");
-            if (cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
+            if (L.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                 cache_a(ci->ret_vreg);
             else
                 store_a_byte(out, f, ci->ret_vreg);
@@ -512,8 +512,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        keep the pairing adjacent to the cleanup pops it follows. */
     if (pre && func_has_pr_bc(f) && bc_args_save_depth > 0) {
         emit(out, "pop\tbc");
-        rs.bc = bc_args_save_stack[--bc_args_save_depth];
-        cur_sp_adjust -= 2;
+        L.rs.bc = bc_args_save_stack[--bc_args_save_depth];
+        L.cur_sp_adjust -= 2;
     }
     return 0;
 }
@@ -629,7 +629,7 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
         emit_acc_slot_addr(out, f, lhs, 0);
         emit(out, "call\t%s", hi->acc_load);
         emit(out, "call\t%s", hi->acc_push);
-        cur_sp_adjust += w;
+        L.cur_sp_adjust += w;
         /* The value load + push physically clobbered HL/DE/BC (via plain
            calls, no cache invalidation), so drop the stale register caches
            before reading the count — else load_byte_to_a takes a phantom
@@ -641,7 +641,7 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
         else
             load_byte_to_a(out, f, rhs);      /* count -> A (offsets incl. push) */
         emit(out, "call\t%s", hi->name);
-        cur_sp_adjust -= w;
+        L.cur_sp_adjust -= w;
         if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
             emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
             if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
@@ -657,13 +657,13 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
     (void)lhs; (void)rhs;
     /* 1. push one operand (from the accumulator if already resident). */
     int acc_pos = acc_push_one_operand(out, f, hi);
-    cur_sp_adjust += w;
+    L.cur_sp_adjust += w;
     /* 2. acc operand -> acc (offsets now include the push) */
     emit_acc_operand_addr(out, f, hi, acc_pos);
     emit(out, "call\t%s", hi->acc_load);
     /* 3. binop — the helper pops the pushed operand */
     emit(out, "call\t%s", hi->name);
-    cur_sp_adjust -= w;
+    L.cur_sp_adjust -= w;
     /* 4. acc -> dst slot — unless the result is consumed straight from the
        accumulator by the next op and dies there (slot never read). */
     if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
@@ -695,11 +695,11 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
     }
     int w = hi->acc_width;
     int acc_pos = acc_push_one_operand(out, f, hi);
-    cur_sp_adjust += w;
+    L.cur_sp_adjust += w;
     emit_acc_operand_addr(out, f, hi, acc_pos);
     emit(out, "call\t%s", hi->acc_load);
     emit(out, "call\t%s", hi->name);
-    cur_sp_adjust -= w;
+    L.cur_sp_adjust -= w;
     /* The bool (0/1) is in HL. Commit it the word-result way: spill to the
        slot only if live-read from there (dead → skipped), and advertise
        HL = result so an immediately-following push/consumer takes it straight
@@ -835,7 +835,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     }
     if (hc_bc_saved) {
         emit(out, "push\tbc");
-        cur_sp_adjust += 2;
+        L.cur_sp_adjust += 2;
     }
     int popped_bytes = 0;
     for (int i = 0; i < n_stacked; i++) {
@@ -846,9 +846,9 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
            [low][high] — exactly a normal stacked arg — and sits topmost
            (the lookahead barred any intervening push, and !hc_bc_saved).
            Skip the reload+push; the helper still pops it (popped_bytes). */
-        if (w == 4 && v >= 0 && v == cur_dehl_inline_push && !hc_bc_saved
-            && cur_sp_adjust == cur_dehl_inline_push_base_sp) {
-            cur_dehl_inline_push = -1;
+        if (w == 4 && v >= 0 && v == L.cur_dehl_inline_push && !hc_bc_saved
+            && L.cur_sp_adjust == L.cur_dehl_inline_push_base_sp) {
+            L.cur_dehl_inline_push = -1;
             popped_bytes += 4;
             continue;
         }
@@ -857,16 +857,16 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
                dead unless the same vreg is re-loaded as a later operand.
                (frameix: drops the trailing `ld bc,hl`; sp-mode byte-walk is
                unaffected — its BC=low is inherent.) */
-            cur_load_to_dehl_no_bc = !hcall_vreg_used_after(hi, i);
+            L.cur_load_to_dehl_no_bc = !hcall_vreg_used_after(hi, i);
             load_to_dehl(out, f, v);
             emit(out, "push\tde");
             emit(out, "push\thl");
-            cur_sp_adjust += 4;
+            L.cur_sp_adjust += 4;
             popped_bytes += 4;
         } else {
             load_to_hl(out, f, v);
             emit(out, "push\thl");
-            cur_sp_adjust += 2;
+            L.cur_sp_adjust += 2;
             popped_bytes += 2;
         }
     }
@@ -879,17 +879,17 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
         if (w == 4) {
             /* Last operand loaded before the call → its BC=low stash is
                always dead (nothing re-reads it; the call clobbers BC). */
-            cur_load_to_dehl_no_bc = 1;
+            L.cur_load_to_dehl_no_bc = 1;
             load_to_dehl(out, f, v);
         } else {
             load_to_hl(out, f, v);
         }
     }
     emit(out, "call\t%s", hi->name);
-    cur_sp_adjust -= popped_bytes;
+    L.cur_sp_adjust -= popped_bytes;
     if (hc_bc_saved) {
         emit(out, "pop\tbc");
-        cur_sp_adjust -= 2;
+        L.cur_sp_adjust -= 2;
     }
     invalidate_hl_cache();
     if (!hc_bc_saved)
@@ -946,11 +946,11 @@ static int gen_ld_far(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int bc_saved = func_has_pr_bc(f);
-    if (bc_saved) { emit(out, "push\tbc"); cur_sp_adjust += 2; }
+    if (bc_saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
     /* Materialize the far pointer into DEHL = EHL far address (D=0). */
     load_to_dehl(out, f, op->src[0]);
     emit(out, "call\t%s", h);
-    if (bc_saved) { emit(out, "pop\tbc"); cur_sp_adjust -= 2; }
+    if (bc_saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
     invalidate_hl_cache();
     if (!bc_saved) invalidate_bc_cache();
     invalidate_de_cache();
@@ -998,12 +998,12 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
         return -1;
     }
     int bc_saved = func_has_pr_bc(f);
-    if (bc_saved) { emit(out, "push\tbc"); cur_sp_adjust += 2; }
+    if (bc_saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
     /* 1. Address → primary DEHL, then onto the stack. */
     load_to_dehl(out, f, op->src[0]);
     emit(out, "push\tde");
     emit(out, "push\thl");
-    cur_sp_adjust += 4;
+    L.cur_sp_adjust += 4;
     /* 2. Value into its delivery register(s): a wide (5/6/8B double / long
           long) value goes into the accumulator (lp_pdoub takes FA,
           lp_i64_load takes __i64_acc) via the maths load primitive; a
@@ -1025,10 +1025,10 @@ static int gen_st_far(FILE *out, Func *f, const Op *op)
     emit(out, "exx");
     emit(out, "pop\thl");          /* alt HL = offset */
     emit(out, "pop\tde");          /* alt DE = (D=0,E=bank) → E'H'L' = addr */
-    cur_sp_adjust -= 4;
+    L.cur_sp_adjust -= 4;
     emit(out, "exx");
     emit(out, "call\t%s", h);
-    if (bc_saved) { emit(out, "pop\tbc"); cur_sp_adjust -= 2; }
+    if (bc_saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
     invalidate_hl_cache();
     if (!bc_saved) invalidate_bc_cache();
     invalidate_de_cache();
@@ -1048,11 +1048,11 @@ static int gen_ld_farsym(FILE *out, Func *f, const Op *op)
 {
     const char *nm = ir_sym_name(op->mem.sym);
     int bc_saved = func_has_pr_bc(f);
-    if (bc_saved) { emit(out, "push\tbc"); cur_sp_adjust += 2; }
+    if (bc_saved) { emit(out, "push\tbc"); L.cur_sp_adjust += 2; }
     emit(out, "ld\thl,+(_%s %% 65536)", nm);
     emit(out, "ld\tde,+(_%s / 65536)", nm);
     emit(out, "call\tl_far_mapaddr");
-    if (bc_saved) { emit(out, "pop\tbc"); cur_sp_adjust -= 2; }
+    if (bc_saved) { emit(out, "pop\tbc"); L.cur_sp_adjust -= 2; }
     invalidate_hl_cache();
     if (!bc_saved) invalidate_bc_cache();
     invalidate_de_cache();

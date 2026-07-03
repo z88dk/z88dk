@@ -18,15 +18,15 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
     if (op->src[0] >= 0 && op->src[1] == -1
         && f->vregs[op->src[0]].width == 1
         && op->imm >= 0 && op->imm <= 255
-        && cur_branch_test_kind != 0) {
+        && L.cur_branch_test_kind != 0) {
         load_byte_to_a(out, f, op->src[0]);
         emit(out, "cp\t%u", (unsigned)(op->imm & 0xff));
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_carry = (cf_true_long == br_true);
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
-        rs.a = -1;                     /* A clobbered; HL/DE/BC untouched */
-        cur_skip_next_op = 1;
+             want_carry ? "c" : "nc", L.func_emit_idx, L.cur_branch_test_label);
+        L.rs.a = -1;                     /* A clobbered; HL/DE/BC untouched */
+        L.cur_skip_next_op = 1;
         return 0;
     }
     /* Long ordered compare: byte-wise sub/sbc chain. Final sbc
@@ -65,7 +65,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "sbc\ta,%u", (unsigned)((k >> 24) & 0xff));
         } else if (!fp_active(f) && !dehl_has(op->src[1])) {
             load_to_dehl(out, f, op->src[0]);
-            int off = slot_off(f, op->src[1]) + cur_sp_adjust;
+            int off = slot_off(f, op->src[1]) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");        /* LHS b0 via BC mirror */
@@ -100,20 +100,20 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             /* A holds high byte of result; CF set iff borrow. Apply
                the S^V correction so CF ends up = signed-LT. (gbz80 took
                the sign-flip path above — CF is already signed-LT.) */
-            int n = cmp_label_counter++;
-            emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, n);
+            int n = L.cmp_label_counter++;
+            emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, n);
             emit(out, "xor\t0x80");
-            fprintf(out, "L_f%d_cmp_ok_%d:\n", func_emit_idx, n);
+            fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, n);
             emit(out, "rla");
         }
         invalidate_hl_bc();
-        if (cur_branch_test_kind != 0) {
-            int br_true = (cur_branch_test_kind == IR_BR_COND);
+        if (L.cur_branch_test_kind != 0) {
+            int br_true = (L.cur_branch_test_kind == IR_BR_COND);
             int want_carry = (cf_true_long == br_true);
             const char *cc = want_carry ? "c" : "nc";
             emit(out, "jp\t%s,L_f%d_bb_%d",
-                 cc, func_emit_idx, cur_branch_test_label);
-            cur_skip_next_op = 1;
+                 cc, L.func_emit_idx, L.cur_branch_test_label);
+            L.cur_skip_next_op = 1;
             return 0;
         }
         carry_to_bool(out, f, cf_true_long);
@@ -134,7 +134,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "ld\ta,b");
             emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix + 1);
         } else {
-            int off = slot_off(f, s1) + cur_sp_adjust;
+            int off = slot_off(f, s1) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");
@@ -144,11 +144,11 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "sbc\ta,(hl)");
             invalidate_hl_cache();     /* HL now holds the slot address */
         }
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_carry = (cf_true_long == br_true);
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
-        cur_skip_next_op = 1;
+             want_carry ? "c" : "nc", L.func_emit_idx, L.cur_branch_test_label);
+        L.cur_skip_next_op = 1;
         return 0;
     }
     /* Slot-vs-slot unsigned loop test, byte-wise through A (fp). Both operands
@@ -162,19 +162,19 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "sub\t(%s%+d)", frame_reg(), ix1);
         emit(out, "ld\ta,(%s%+d)", frame_reg(), ix0 + 1);
         emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix1 + 1);
-        rs.a = -1;                        /* A clobbered; DE/BC/HL untouched */
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        L.rs.a = -1;                        /* A clobbered; DE/BC/HL untouched */
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_carry = (cf_true_long == br_true);
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
-        cur_skip_next_op = 1;
+             want_carry ? "c" : "nc", L.func_emit_idx, L.cur_branch_test_label);
+        L.cur_skip_next_op = 1;
         return 0;
     }
     /* Word DE-home DE-clean signed loop test (fp): RHS (n) → HL, then subtract
        LHS (i) from it byte-wise reading i from its ix-slot. Uses only A/HL,
        so DE (the resident sum) survives — letting compute_home_region admit
        the loop. HL keeps n, DE keeps the home; only A is clobbered. */
-    if (word_dehome_signed_test_shape_ok(f, op) && cur_branch_test_kind != 0) {
+    if (word_dehome_signed_test_shape_ok(f, op) && L.cur_branch_test_kind != 0) {
         int s0 = op->src[0];
         int ix = slot_ix_off(f, s0);
         load_to_hl(out, f, op->src[1]);          /* HL = n (DE-clean in fp) */
@@ -182,17 +182,17 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         emit(out, "sub\tl");                     /* i_lo - n_lo */
         emit(out, "ld\ta,(%s%+d)", frame_reg(), ix + 1);
         emit(out, "sbc\ta,h");                   /* A=hi(i-n), P/V=ovf, CF=borrow */
-        int lbl = cmp_label_counter++;
-        emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, lbl);
+        int lbl = L.cmp_label_counter++;
+        emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
         emit(out, "xor\t0x80");
-        fprintf(out, "L_f%d_cmp_ok_%d:\n", func_emit_idx, lbl);
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
         emit(out, "rla");                        /* CF = signed (i < n) */
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_carry = (cf_true_long == br_true);
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             want_carry ? "c" : "nc", func_emit_idx, cur_branch_test_label);
-        rs.a = -1;                         /* A clobbered; HL=n, DE=home kept */
-        cur_skip_next_op = 1;
+             want_carry ? "c" : "nc", L.func_emit_idx, L.cur_branch_test_label);
+        L.rs.a = -1;                         /* A clobbered; HL=n, DE=home kept */
+        L.cur_skip_next_op = 1;
         return 0;
     }
     load_binop_operands(out, f, op);   /* HL=src0, DE=src1 */
@@ -209,21 +209,21 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        already cheap (no sign-flip to beat), so DSUB+push/pop would only
        add stack traffic. */
     if ((IS_8085()) && is_signed
-        && cur_branch_test_kind != 0) {
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        && L.cur_branch_test_kind != 0) {
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want = (cf_true_long == br_true);
         const char *cc = want ? "k" : "nk";
-        int bc_live = (rs.bc >= 0);
+        int bc_live = (L.rs.bc >= 0);
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tc,e");
         emit(out, "ld\tb,d");          /* BC = src1 */
         emit(out, "sub\thl,bc");       /* HL-BC: K=signed LT, CF=uns borrow */
         if (bc_live) emit(out, "pop\tbc"); /* restores BC; flags survive */
-        emit(out, "jp\t%s,L_f%d_bb_%d", cc, func_emit_idx,
-             cur_branch_test_label);
+        emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx,
+             L.cur_branch_test_label);
         invalidate_hl_keep_de();       /* DSUB clobbers HL, preserves DE/BC */
         if (!bc_live) invalidate_bc_cache();
-        cur_skip_next_op = 1;
+        L.cur_skip_next_op = 1;
         return 0;
     }
     int sflip_lt = signed_cmp_signflip(out, f, is_signed);
@@ -244,16 +244,16 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
     }
     if (is_signed && !sflip_lt) signed_result_to_carry(out);
     int cf_true = cf_true_long;
-    if (cur_branch_test_kind != 0) {
+    if (L.cur_branch_test_kind != 0) {
         const char *cc;
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_carry = (cf_true == br_true);
         cc = want_carry ? "c" : "nc";
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             cc, func_emit_idx, cur_branch_test_label);
+             cc, L.func_emit_idx, L.cur_branch_test_label);
         /* `sbc hl,de` clobbered HL but preserved DE — keep cache. */
         invalidate_hl_keep_de();
-        cur_skip_next_op = 1;
+        L.cur_skip_next_op = 1;
         return 0;
     }
     carry_to_bool(out, f, cf_true);
@@ -282,7 +282,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
     if (hl_has(op->src[0])) {
         /* src0 in HL but wanted in DE. If it's the pending spill, flush it
            (store_hl leaves it in DE — the swap's intent). Else ex de,hl. */
-        if (lazy_spill_on && pending_spill_v == op->src[0]) {
+        if (L.lazy_spill_on && L.pending_spill_v == op->src[0]) {
             pending_spill_flush();
             cache_de(op->src[0]);
             load_to_hl(out, f, op->src[1]);
@@ -302,7 +302,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
         /* src1 in DE but wanted in HL. An unrelated pending spill in HL
            would be clobbered by store_hl's ex de,hl, so resolve and rebuild;
            otherwise swap src1 into HL and load src0 into DE preserving HL. */
-        if (lazy_spill_on && pending_spill_v >= 0) {
+        if (L.lazy_spill_on && L.pending_spill_v >= 0) {
             pending_spill_resolve();
             invalidate_de_cache();
             load_to_de(out, f, op->src[0]);
@@ -352,7 +352,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
             /* Load src[1] (the "left" of the swapped subtraction) into
                DEHL, point HL at &src[0], subtract through (hl). */
             load_to_dehl(out, f, op->src[1]);
-            int off = slot_off(f, op->src[0]) + cur_sp_adjust;
+            int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");
@@ -383,20 +383,20 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
             emit(out, "sbc\ta,b");
         }
         if (is_signed && !long_signflip) {
-            int n = cmp_label_counter++;
-            emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, n);
+            int n = L.cmp_label_counter++;
+            emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, n);
             emit(out, "xor\t0x80");
-            fprintf(out, "L_f%d_cmp_ok_%d:\n", func_emit_idx, n);
+            fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, n);
             emit(out, "rla");
         }
         invalidate_hl_bc();
-        if (cur_branch_test_kind != 0) {
-            int br_true = (cur_branch_test_kind == IR_BR_COND);
+        if (L.cur_branch_test_kind != 0) {
+            int br_true = (L.cur_branch_test_kind == IR_BR_COND);
             int want_carry = (cf_true_gt == br_true);
             const char *cc = want_carry ? "c" : "nc";
             emit(out, "jp\t%s,L_f%d_bb_%d",
-                 cc, func_emit_idx, cur_branch_test_label);
-            cur_skip_next_op = 1;
+                 cc, L.func_emit_idx, L.cur_branch_test_label);
+            L.cur_skip_next_op = 1;
             return 0;
         }
         carry_to_bool(out, f, cf_true_gt);
@@ -412,21 +412,21 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
        live BC around the subtract (see gen_cmp_lt_ge — pop leaves flags
        and unsigned wouldn't beat the byte-wise sub). */
     if ((IS_8085()) && is_signed
-        && cur_branch_test_kind != 0) {
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+        && L.cur_branch_test_kind != 0) {
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want = (cf_true_gt == br_true);
         const char *cc = want ? "k" : "nk";
-        int bc_live = (rs.bc >= 0);
+        int bc_live = (L.rs.bc >= 0);
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tc,e");
         emit(out, "ld\tb,d");          /* BC = src0 */
         emit(out, "sub\thl,bc");       /* HL-BC = src1-src0 */
         if (bc_live) emit(out, "pop\tbc"); /* restores BC; flags survive */
-        emit(out, "jp\t%s,L_f%d_bb_%d", cc, func_emit_idx,
-             cur_branch_test_label);
+        emit(out, "jp\t%s,L_f%d_bb_%d", cc, L.func_emit_idx,
+             L.cur_branch_test_label);
         invalidate_hl_keep_de();       /* DSUB clobbers HL, preserves DE/BC */
         if (!bc_live) invalidate_bc_cache();
-        cur_skip_next_op = 1;
+        L.cur_skip_next_op = 1;
         return 0;
     }
     int sflip_gt = signed_cmp_signflip(out, f, is_signed);
@@ -443,14 +443,14 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
     }
     if (is_signed && !sflip_gt) signed_result_to_carry(out);
     int cf_true = cf_true_gt;
-    if (cur_branch_test_kind != 0) {
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+    if (L.cur_branch_test_kind != 0) {
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_carry = (cf_true == br_true);
         const char *cc = want_carry ? "c" : "nc";
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             cc, func_emit_idx, cur_branch_test_label);
+             cc, L.func_emit_idx, L.cur_branch_test_label);
         invalidate_hl_keep_de();
-        cur_skip_next_op = 1;
+        L.cur_skip_next_op = 1;
         return 0;
     }
     carry_to_bool(out, f, cf_true);
@@ -492,7 +492,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             /* Var-RHS sp-rel: point HL at &RHS, XOR through (hl).
                BC mirrors LHS low half via DEHL cache invariant. */
             load_to_dehl(out, f, op->src[0]);
-            int off = slot_off(f, op->src[1]) + cur_sp_adjust;
+            int off = slot_off(f, op->src[1]) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off);
             emit(out, "add\thl,sp");
             emit(out, "ld\ta,c");
@@ -543,13 +543,13 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             emit(out, "or\tc");
         }
         invalidate_hl_bc();
-        if (cur_branch_test_kind != 0) {
-            int br_true = (cur_branch_test_kind == IR_BR_COND);
+        if (L.cur_branch_test_kind != 0) {
+            int br_true = (L.cur_branch_test_kind == IR_BR_COND);
             int want_z = (z_true_long == br_true);
             const char *cc = want_z ? "z" : "nz";
             emit(out, "jp\t%s,L_f%d_bb_%d",
-                 cc, func_emit_idx, cur_branch_test_label);
-            cur_skip_next_op = 1;
+                 cc, L.func_emit_idx, L.cur_branch_test_label);
+            L.cur_skip_next_op = 1;
             return 0;
         }
         emit(out, "ld\thl,0");
@@ -595,14 +595,14 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
         emit(out, "xor\te");
         emit(out, "or\th");                     /* Z iff HL==DE */
     }
-    if (cur_branch_test_kind != 0) {
-        int br_true = (cur_branch_test_kind == IR_BR_COND);
+    if (L.cur_branch_test_kind != 0) {
+        int br_true = (L.cur_branch_test_kind == IR_BR_COND);
         int want_z = (z_true == br_true);
         const char *cc = want_z ? "z" : "nz";
         emit(out, "jp\t%s,L_f%d_bb_%d",
-             cc, func_emit_idx, cur_branch_test_label);
+             cc, L.func_emit_idx, L.cur_branch_test_label);
         invalidate_hl_keep_de();
-        cur_skip_next_op = 1;
+        L.cur_skip_next_op = 1;
         return 0;
     }
     if (IS_RABBIT()) {
@@ -668,11 +668,11 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            — IR_SHR is always unsigned at this level. */
         if (count == 1
             && op->dst == op->src[0]
-            && !cur_dst_dead
+            && !L.cur_dst_dead
             && !vreg_in_pr_bc(f, op->dst)
             && f->vreg_to_phys
             && f->vreg_to_phys[op->dst] == IR_PR_SPILL) {
-            int off = slot_off(f, op->dst) + cur_sp_adjust;
+            int off = slot_off(f, op->dst) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off + 3);
             emit(out, "add\thl,sp");        /* HL = &slot[3] (MSB) */
             emit(out, "srl\t(hl)");          /* byte3: high=0, low→C */
@@ -736,10 +736,10 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         int iters = use_djnz ? 1 : bit_shift;
         int loop_label = 0;
         if (use_djnz) {
-            loop_label = cmp_label_counter++;
+            loop_label = L.cmp_label_counter++;
             emit(out, "ld\tb,%d", bit_shift);
             fprintf(out, "L_f%d_shr_loop_%d:\n",
-                    func_emit_idx, loop_label);
+                    L.func_emit_idx, loop_label);
         }
         for (int i = 0; i < iters; i++) {
             switch (byte_shift) {
@@ -765,7 +765,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         }
         if (use_djnz) {
             emit(out, "djnz\tL_f%d_shr_loop_%d",
-                 func_emit_idx, loop_label);
+                 L.func_emit_idx, loop_label);
             invalidate_bc_cache();
         }
         }
@@ -822,7 +822,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
                     goto shr_int_bit_remainder;
                 }
             }
-            int off = slot_off(f, op->src[0]) + cur_sp_adjust;
+            int off = slot_off(f, op->src[0]) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off + 1);
             emit(out, "add\thl,sp");
             emit(out, "ld\tl,(hl)");        /* L = byte 1 */
@@ -858,7 +858,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
        value, not a branch condition. */
     if (IS_Z80N()) {
         load_binop_operands(out, f, op);   /* HL=value(src0), DE=count(src1) */
-        int bc_live = (rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
+        int bc_live = (L.rs.bc >= 0);  /* `ld b,e` clobbers B — preserve */
         if (bc_live) emit(out, "push\tbc");
         emit(out, "ld\tb,e");              /* B = count low byte */
         emit(out, "ex\tde,hl");            /* DE = value */
@@ -875,12 +875,12 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         commit_hl_word(out, f, op->dst);
         return 0;
     }
-    int n = cmp_label_counter++;
+    int n = L.cmp_label_counter++;
     load_binop_operands(out, f, op);
     emit(out, "ld\ta,e");
     emit(out, "or\ta");
-    emit(out, "jr\tz,L_f%d_shift_end_%d", func_emit_idx, n);
-    fprintf(out, "L_f%d_shift_loop_%d:\n", func_emit_idx, n);
+    emit(out, "jr\tz,L_f%d_shift_end_%d", L.func_emit_idx, n);
+    fprintf(out, "L_f%d_shift_loop_%d:\n", L.func_emit_idx, n);
     if (IS_RABBIT()) {
         emit(out, "or\ta");          /* clear carry → logical >>1 */
         emit(out, "rr\thl");
@@ -889,8 +889,8 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         emit(out, "rr\tl");
     }
     emit(out, "dec\ta");
-    emit(out, "jr\tnz,L_f%d_shift_loop_%d", func_emit_idx, n);
-    fprintf(out, "L_f%d_shift_end_%d:\n", func_emit_idx, n);
+    emit(out, "jr\tnz,L_f%d_shift_loop_%d", L.func_emit_idx, n);
+    fprintf(out, "L_f%d_shift_end_%d:\n", L.func_emit_idx, n);
     commit_hl_result(out, f, op->dst);
     return 0;
 }

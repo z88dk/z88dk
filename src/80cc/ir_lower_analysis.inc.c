@@ -90,7 +90,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         /* HL holds src[1] (the would-be DE-operand). If it is the
            pending spill, flush it — store_hl writes the slot AND leaves
            it in DE, the swap's intent. */
-        if (lazy_spill_on && pending_spill_v == op->src[1]) {
+        if (L.lazy_spill_on && L.pending_spill_v == op->src[1]) {
             pending_spill_flush();   /* DE := src1, slot written, HL junk */
             cache_de(op->src[1]);
             load_to_hl(out, f, op->src[0]);
@@ -114,7 +114,7 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
            UNRELATED vreg, and store_hl's `ex de,hl` would clobber DE
            (=src0). Resolve it (flush/discard), then rebuild both
            operands from scratch since the src0 DE-cache may be gone. */
-        if (lazy_spill_on && pending_spill_v >= 0) {
+        if (L.lazy_spill_on && L.pending_spill_v >= 0) {
             pending_spill_resolve();
             invalidate_de_cache();
             load_to_de(out, f, op->src[1]);
@@ -153,10 +153,10 @@ static void cache_hl(int vreg)
    a carry re-assert the same vreg without spuriously flushing. */
 static void hl_about_to_change(int v_new)
 {
-    if (lazy_spill_on && pending_spill_v >= 0 && pending_spill_v != v_new)
+    if (L.lazy_spill_on && L.pending_spill_v >= 0 && L.pending_spill_v != v_new)
         pending_spill_resolve();
-    rs.hl = v_new;
-    cur_hl_addr_off = -1;    /* HL no longer holds a cached slot address */
+    L.rs.hl = v_new;
+    L.cur_hl_addr_off = -1;    /* HL no longer holds a cached slot address */
 }
 
 /* HL now holds v's slot address (after `ld hl,off;add hl,sp`): set the
@@ -164,9 +164,9 @@ static void hl_about_to_change(int v_new)
    clears the address belief). Pending spill already resolved (addr ⇒ none). */
 static void cache_hl_slot_addr(const Func *f, int v)
 {
-    rs.hl = -1;
-    cur_hl_addr_off = slot_off(f, v);
-    cur_hl_addr_spadj = cur_sp_adjust;
+    L.rs.hl = -1;
+    L.cur_hl_addr_off = slot_off(f, v);
+    L.cur_hl_addr_spadj = L.cur_sp_adjust;
 }
 
 /* Materialize &slot(v) into HL for an sp-rel byte access, reusing a cached
@@ -175,8 +175,8 @@ static void cache_hl_slot_addr(const Func *f, int v)
    spill first. Updates the cache. */
 static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
 {
-    if (cur_hl_addr_off >= 0 && cur_hl_addr_spadj == cur_sp_adjust) {
-        int d = slot_off(f, v) - cur_hl_addr_off;
+    if (L.cur_hl_addr_off >= 0 && L.cur_hl_addr_spadj == L.cur_sp_adjust) {
+        int d = slot_off(f, v) - L.cur_hl_addr_off;
         /* inc/dec hl (6T z80 / 5-6T 808x) beats the 21T/4B `ld hl,nn;add
            hl,sp` for deltas ≤3. gbz80's recompute is the 12T/2B `ld hl,sp+d`
            and its inc hl is 8T, so only delta 1 wins there. gbz80 is the
@@ -194,7 +194,7 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
             return;
         }
     }
-    emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust);
+    emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
     emit(out, "add\thl,sp");
     cache_hl_slot_addr(f, v);
 }
@@ -206,8 +206,8 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
    DE-clobbering op and at every BB end so the slot is coherent. */
 static void byte_home_flush(FILE *out, const Func *f)
 {
-    int v = cur_byte_home_vreg;
-    if (v < 0 || !cur_byte_home_dirty) return;
+    int v = L.cur_byte_home_vreg;
+    if (v < 0 || !L.cur_byte_home_dirty) return;
     PhysReg pr = byte_home_phys(f, v);
     if (!byte_home_slotbacked(pr)) return;
     const char *r = byte_home_reg(pr);
@@ -215,7 +215,7 @@ static void byte_home_flush(FILE *out, const Func *f)
         int ix_off = slot_ix_off(f, v);
         if (fp_offset_fits(ix_off)) {
             emit(out, "ld\t(%s%+d),%s", frame_reg(), ix_off, r);
-            cur_byte_home_dirty = 0;
+            L.cur_byte_home_dirty = 0;
             return;
         }
     }
@@ -229,7 +229,7 @@ static void byte_home_flush(FILE *out, const Func *f)
     invalidate_hl_keep_a();
     emit_byte_slot_addr(out, f, v);
     emit(out, "ld\t(hl),%s", r);
-    cur_byte_home_dirty = 0;
+    L.cur_byte_home_dirty = 0;
 }
 
 
@@ -243,11 +243,11 @@ static void byte_home_flush(FILE *out, const Func *f)
    still correct). */
 static int rehome_byte_home(FILE *out, const Func *f)
 {
-    int v = cur_func_ehome;
+    int v = L.cur_func_ehome;
     if (v < 0 || v >= f->n_vregs) return 0;
     PhysReg bh = byte_home_phys(f, v);
     if (!byte_home_slotbacked(bh)) return 0;
-    if (cur_byte_home_vreg == v) return 1;          /* already resident */
+    if (L.cur_byte_home_vreg == v) return 1;          /* already resident */
     const char *r = byte_home_reg(bh);
     if (fp_active(f)) {
         int off = slot_ix_off(f, v);
@@ -259,13 +259,13 @@ static int rehome_byte_home(FILE *out, const Func *f)
            entry. The offset adds 2 for the push lowering sp; the pop restores
            HL bit-for-bit, so every HL/pending-spill cache belief stays valid. */
         emit(out, "push\thl");
-        emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust + 2);
+        emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust + 2);
         emit(out, "add\thl,sp");
         emit(out, "ld\t%s,(hl)", r);                /* ld e,(hl) */
         emit(out, "pop\thl");
     }
     byte_home_note(v);
-    cur_byte_home_dirty = 0;                         /* loaded from coherent slot */
+    L.cur_byte_home_dirty = 0;                         /* loaded from coherent slot */
     return 1;
 }
 
@@ -274,14 +274,14 @@ static int rehome_byte_home(FILE *out, const Func *f)
    byte_home_flush, but writes both bytes (E=low, D=high). DE is preserved. */
 static void word_home_flush(FILE *out, const Func *f)
 {
-    int v = cur_byte_home_vreg;
-    if (v < 0 || v != cur_func_whome || !cur_byte_home_dirty) return;
+    int v = L.cur_byte_home_vreg;
+    if (v < 0 || v != L.cur_func_whome || !L.cur_byte_home_dirty) return;
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, v);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
             emit(out, "ld\t(%s%+d),e", frame_reg(), ix_off);
             emit(out, "ld\t(%s%+d),d", frame_reg(), ix_off + 1);
-            cur_byte_home_dirty = 0;
+            L.cur_byte_home_dirty = 0;
             return;
         }
     }
@@ -290,12 +290,12 @@ static void word_home_flush(FILE *out, const Func *f)
        temp); invalidate_hl_cache clears A, so save/restore it. */
     pending_spill_resolve();
     invalidate_hl_keep_a();
-    emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust);
+    emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
     emit(out, "add\thl,sp");
     emit(out, "ld\t(hl),e");
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
-    cur_byte_home_dirty = 0;
+    L.cur_byte_home_dirty = 0;
 }
 
 /* Word DE-home region-exit flush — emitted ONCE at the entry of a dedicated
@@ -307,7 +307,7 @@ static void word_home_flush(FILE *out, const Func *f)
    is reached only via those edges. fp-only (the word DE-home forms only in fp). */
 static void word_home_exit_flush(FILE *out, const Func *f)
 {
-    int v = cur_func_whome;
+    int v = L.cur_func_whome;
     if (v < 0 || !fp_active(f)) return;
     int off = slot_ix_off(f, v);
     if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return;
@@ -320,9 +320,9 @@ static void word_home_exit_flush(FILE *out, const Func *f)
    rehome_byte_home for the full pair. Returns 1 once DE holds the home. */
 static int rehome_word_home(FILE *out, const Func *f)
 {
-    int v = cur_func_whome;
+    int v = L.cur_func_whome;
     if (v < 0 || v >= f->n_vregs) return 0;
-    if (cur_byte_home_vreg == v) return 1;          /* already resident */
+    if (L.cur_byte_home_vreg == v) return 1;          /* already resident */
     if (fp_active(f)) {
         int off = slot_ix_off(f, v);
         if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return 0;
@@ -330,7 +330,7 @@ static int rehome_word_home(FILE *out, const Func *f)
         emit(out, "ld\td,(%s%+d)", frame_reg(), off + 1);
     } else {
         emit(out, "push\thl");
-        emit(out, "ld\thl,%d", slot_off(f, v) + cur_sp_adjust + 2);
+        emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust + 2);
         emit(out, "add\thl,sp");
         emit(out, "ld\te,(hl)");
         emit(out, "inc\thl");
@@ -339,7 +339,7 @@ static int rehome_word_home(FILE *out, const Func *f)
     }
     byte_home_note(v);
     cache_de(v);                                    /* DE physically = home */
-    cur_byte_home_dirty = 0;                        /* loaded from coherent slot */
+    L.cur_byte_home_dirty = 0;                        /* loaded from coherent slot */
     return 1;
 }
 
@@ -347,12 +347,12 @@ static int rehome_word_home(FILE *out, const Func *f)
    cur_home_is_word, so the shared BB-loop residency logic serves both. */
 static int home_is_slotbacked(const Func *f, int v)
 {
-    if (cur_home_is_word) return v >= 0 && v == cur_func_whome;
+    if (L.cur_home_is_word) return v >= 0 && v == L.cur_func_whome;
     return byte_home_is_slotbacked(f, v);
 }
 static void home_flush(FILE *out, const Func *f)
 {
-    if (cur_home_is_word) word_home_flush(out, f);
+    if (L.cur_home_is_word) word_home_flush(out, f);
     else                  byte_home_flush(out, f);
 }
 /* A DE-clobbering op is about to run: flush the dirty home (slot now
@@ -360,14 +360,14 @@ static void home_flush(FILE *out, const Func *f)
    value after the op. A later read reloads from the (now coherent) slot. */
 static void home_clobber(FILE *out, const Func *f)
 {
-    if (cur_byte_home_vreg < 0) return;
-    if (!home_is_slotbacked(f, cur_byte_home_vreg)) return;
+    if (L.cur_byte_home_vreg < 0) return;
+    if (!home_is_slotbacked(f, L.cur_byte_home_vreg)) return;
     home_flush(out, f);
-    cur_byte_home_vreg = -1;
+    L.cur_byte_home_vreg = -1;
 }
 static int home_rehome(FILE *out, const Func *f)
 {
-    if (cur_home_is_word) return rehome_word_home(out, f);
+    if (L.cur_home_is_word) return rehome_word_home(out, f);
     return rehome_byte_home(out, f);
 }
 
@@ -377,9 +377,9 @@ static int home_rehome(FILE *out, const Func *f)
    themselves, then call this to keep the caches in sync. */
 static void swap_hl_de_caches(void)
 {
-    int tmp = rs.hl;
-    rs.hl = rs.de;
-    rs.de = tmp;
+    int tmp = L.rs.hl;
+    L.rs.hl = L.rs.de;
+    L.rs.de = tmp;
 }
 
 /* Invalidate the HL cache. Use before/after any op that clobbers HL
@@ -395,9 +395,9 @@ static void invalidate_hl_cache(void)
 {
     hl_about_to_change(-1);
     invalidate_de_cache();   /* clears rs.de + rs.dehl */
-    rs.a = -1;
-    rs.fa = -1;
-    rs.i64_acc = -1;
+    L.rs.a = -1;
+    L.rs.fa = -1;
+    L.rs.i64_acc = -1;
 }
 
 /* Both HL and BC clobbered (16-bit ops through HL that also stash via BC,
@@ -407,18 +407,18 @@ static void invalidate_hl_bc(void) { invalidate_hl_cache(); invalidate_bc_cache(
 /* HL clobbered but DE provably preserved (DSUB / `sbc hl,de` leave DE intact):
    drop the full HL-cache set, then re-assert the surviving DE tenant. */
 static void invalidate_hl_keep_de(void) {
-    int saved_de = rs.de;
+    int saved_de = L.rs.de;
     invalidate_hl_cache();
-    rs.de = saved_de;
+    L.rs.de = saved_de;
 }
 
 /* HL clobbered but A provably preserved (sp-mode slot-address math touches
    only HL; the triggering op may still consume a cache_a'd byte operand):
    drop the full HL-cache set, then re-assert the surviving A tenant. */
 static void invalidate_hl_keep_a(void) {
-    int saved_a = rs.a;
+    int saved_a = L.rs.a;
     invalidate_hl_cache();
-    rs.a = saved_a;
+    L.rs.a = saved_a;
 }
 
 /* Apply an emit_c clobber mask by dispatching to the legacy invalidate_*
@@ -477,11 +477,11 @@ static const BB *cur_bb;
    context is unavailable, so an unknown state never drops a live store. */
 static int pending_spill_live(void)
 {
-    if (pending_spill_v < 0) return 0;
+    if (L.pending_spill_v < 0) return 0;
     if (!cur_bb) return 1;
     const BitSet *li = ir_op_live_in(cur_bb, cur_op_idx);
     if (!li) return 1;
-    return ir_bitset_get(li, pending_spill_v);
+    return ir_bitset_get(li, L.pending_spill_v);
 }
 
 /* Emit the deferred slot store. Precondition (I1): HL physically holds
@@ -491,11 +491,11 @@ static int pending_spill_live(void)
    (store_hl itself emits no cache-mutating calls). */
 static void pending_spill_flush(void)
 {
-    if (pending_spill_v < 0) return;
-    int v = pending_spill_v;
-    pending_spill_v = -1;
+    if (L.pending_spill_v < 0) return;
+    int v = L.pending_spill_v;
+    L.pending_spill_v = -1;
     store_hl(cur_lazy_out, cur_lazy_func, v);
-    rs.hl = -1;
+    L.rs.hl = -1;
     invalidate_de_cache();
 }
 
@@ -504,11 +504,11 @@ static void pending_spill_flush(void)
    else discard it (dead or about to be redefined → the store was dead). */
 static void pending_spill_resolve(void)
 {
-    if (pending_spill_v < 0) return;
+    if (L.pending_spill_v < 0) return;
     if (pending_spill_live())
         pending_spill_flush();
     else
-        pending_spill_v = -1;
+        L.pending_spill_v = -1;
 }
 
 /* Skip-and-cache list for the AND 0x8000 + BR + SHL-in-both-succs
@@ -593,7 +593,7 @@ static int vreg_in_register_pool(const Func *f, int v)
 static int byte_dst_cache_ok(const Func *f, int v)
 {
     if (byte_home_is_slotbacked(f, v)) return 0;
-    return cur_dst_dead || vreg_in_register_pool(f, v);
+    return L.cur_dst_dead || vreg_in_register_pool(f, v);
 }
 
 /* Byte result is in A: keep it live in the A-cache (claim dst) when dst's next
@@ -651,17 +651,17 @@ static int vreg_slot_deferrable(const Func *f, int v)
    op currently being lowered. */
 static void ss_note_reload(const Func *f, int v)
 {
-    if (ss_phase != 1 || ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
-    int *slot = &ss_op_reload[ss_cur_g * 2];
+    if (L.ss_phase != 1 || L.ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
+    int *slot = &L.ss_op_reload[L.ss_cur_g * 2];
     if (slot[0] == v || slot[1] == v) return;       /* dedup */
     if (slot[0] < 0) { slot[0] = v; return; }
     if (slot[1] < 0) { slot[1] = v; return; }
-    ss_pinned = 1;          /* >2 distinct reloads in one op — bail safely */
+    L.ss_pinned = 1;          /* >2 distinct reloads in one op — bail safely */
 }
 static void ss_note_store(const Func *f, int v)
 {
-    if (ss_phase != 1 || ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
-    ss_op_store[ss_cur_g] = v;
+    if (L.ss_phase != 1 || L.ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
+    L.ss_op_store[L.ss_cur_g] = v;
 }
 /* Pass-1 hook at a GENUINE register-cache hit (the loaders' early returns
    that serve v from HL/DE/BC/A with no slot read). MUST be precise — this
@@ -669,19 +669,19 @@ static void ss_note_store(const Func *f, int v)
    a real reload. Under-recording only forgoes optimisation. */
 static void ss_note_cache_read(const Func *f, int v)
 {
-    if (ss_phase != 1 || ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
-    int *slot = &ss_op_cacheread[ss_cur_g * 2];
+    if (L.ss_phase != 1 || L.ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
+    int *slot = &L.ss_op_cacheread[L.ss_cur_g * 2];
     if (slot[0] == v || slot[1] == v) return;       /* dedup */
     if (slot[0] < 0) { slot[0] = v; return; }
     if (slot[1] < 0) { slot[1] = v; return; }
-    ss_pinned = 1;          /* >2 cache-served vregs in one op — bail safely */
+    L.ss_pinned = 1;          /* >2 cache-served vregs in one op — bail safely */
 }
 /* Pass-2: is the store at the current op dead (slot never reloaded before
    the next store)? */
 static int ss_store_dead_here(void)
 {
-    return ss_phase == 2 && ss_cur_g >= 0 && ss_store_dead
-        && ss_store_dead[ss_cur_g];
+    return L.ss_phase == 2 && L.ss_cur_g >= 0 && L.ss_store_dead
+        && L.ss_store_dead[L.ss_cur_g];
 }
 
 /* Set the GEN (reload) bits for op (b,j) into `work`. The sound-by-
@@ -807,7 +807,7 @@ static int vreg_is_pr_dehl(const Func *f, int v)
    for vregs in a register pool: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
-    if (cur_dst_dead) return;
+    if (L.cur_dst_dead) return;
     /* Pooled vreg: value lives in a phys reg, no slot. PR_HL is the
        caller's responsibility (cache_hl(dst) tops it up). PR_BC needs
        an HL→BC copy so subsequent loads hit the BC short-circuit;
@@ -832,7 +832,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
        live-result spill is DE-clean, keeping the home resident across the
        body. HL keeps the value (caller's cache_hl advertises it). sp-mode
        needs HL for the slot address, so it falls through to store_hl. */
-    if (cur_home_is_word && byte_home_holds(cur_func_whome) && fp_active(f)) {
+    if (L.cur_home_is_word && byte_home_holds(L.cur_func_whome) && fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
             emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off);
@@ -885,7 +885,7 @@ static void commit_hl_result(FILE *out, const Func *f, int v)
    byte / 4 T-states vs `ld hl,K + store_hl + ex de,hl`. */
 static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 {
-    if (cur_dst_dead || vreg_in_register_pool(f, vreg)) {
+    if (L.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
         emit(out, "ex\tde,hl");
         invalidate_de_cache();
         return;
@@ -898,7 +898,7 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    int off = slot_off(f, vreg) + cur_sp_adjust;
+    int off = slot_off(f, vreg) + L.cur_sp_adjust;
     /* Deepest slot at TOS: discard the old word (inc sp x2) and push the
        value straight from DE, then ex de,hl to honour the contract (HL =
        value). 4 ops vs the 6-op byte walk, and no address compute. */
@@ -954,11 +954,11 @@ static void carry_to_bool(FILE *out, const Func *f, int hl_one_when_carry)
    Then RLA moves bit 7 into CF. */
 static void signed_result_to_carry(FILE *out)
 {
-    int n = cmp_label_counter++;
+    int n = L.cmp_label_counter++;
     emit(out, "ld\ta,h");
-    emit(out, "jp\tpo,L_f%d_cmp_ok_%d", func_emit_idx, n);
+    emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, n);
     emit(out, "xor\t0x80");
-    fprintf(out, "L_f%d_cmp_ok_%d:\n", func_emit_idx, n);
+    fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, n);
     emit(out, "rla");           /* CF = bit 7 of A (correct sign bit) */
     /* CF=1 means src0-src1 < 0 (signed) → src0 < src1. */
 }

@@ -109,49 +109,6 @@ static LowerState L = {
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
 };
 
-#define rs L.rs
-#define cur_hl_addr_off L.cur_hl_addr_off
-#define cur_hl_addr_spadj L.cur_hl_addr_spadj
-#define cur_sp_adjust L.cur_sp_adjust
-#define func_emit_idx L.func_emit_idx
-#define cmp_label_counter L.cmp_label_counter
-#define fc_ret_label_counter L.fc_ret_label_counter
-#define cur_func_uses_params L.cur_func_uses_params
-#define cur_home_is_word L.cur_home_is_word
-#define cur_func_whome L.cur_func_whome
-#define cur_byte_home_vreg L.cur_byte_home_vreg
-#define cur_byte_home_dirty L.cur_byte_home_dirty
-#define cur_func_ehome L.cur_func_ehome
-#define cur_home_region_lo L.cur_home_region_lo
-#define cur_home_region_hi L.cur_home_region_hi
-#define cur_home_exit_flush_bb L.cur_home_exit_flush_bb
-#define bb_byte_out L.bb_byte_out
-#define lazy_spill_on L.lazy_spill_on
-#define pending_spill_v L.pending_spill_v
-#define ss_phase L.ss_phase
-#define ss_op_store L.ss_op_store
-#define ss_op_reload L.ss_op_reload
-#define ss_op_cacheread L.ss_op_cacheread
-#define ss_store_dead L.ss_store_dead
-#define ss_op_base L.ss_op_base
-#define ss_cur_g L.ss_cur_g
-#define ss_pinned L.ss_pinned
-#define cur_load_to_dehl_no_hl L.cur_load_to_dehl_no_hl
-#define cur_load_to_dehl_no_bc L.cur_load_to_dehl_no_bc
-#define cur_stack_long_top L.cur_stack_long_top
-#define cur_dehl_inline_push L.cur_dehl_inline_push
-#define cur_dehl_inline_push_base_sp L.cur_dehl_inline_push_base_sp
-#define cur_dehl_push_to_stack L.cur_dehl_push_to_stack
-#define cur_store_dehl_bc_dead L.cur_store_dehl_bc_dead
-#define cur_dehl_dst_no_bc_stash L.cur_dehl_dst_no_bc_stash
-#define cur_dehl_dst_dead_safe L.cur_dehl_dst_dead_safe
-#define cur_branch_test_kind L.cur_branch_test_kind
-#define cur_dst_dead L.cur_dst_dead
-#define cur_branch_test_label L.cur_branch_test_label
-#define cur_skip_next_op L.cur_skip_next_op
-#define shl_skip_n L.shl_skip_n
-#define cur_skip_shl_add_hl L.cur_skip_shl_add_hl
-#define cur_skip_shl_byte L.cur_skip_shl_byte
 
 
 /* Strip the surrounding quotes that op->file carries (from `Filename`). */
@@ -278,7 +235,7 @@ static void emit_c(FILE *out, Clobber c, const char *fmt, ...)
 
 static void emit_bb_label(FILE *out, int bb_id)
 {
-    fprintf(out, "L_f%d_bb_%d:\n", func_emit_idx, bb_id);
+    fprintf(out, "L_f%d_bb_%d:\n", L.func_emit_idx, bb_id);
 }
 
 /* Per-function counter for compare-overflow correction labels. Reset at
@@ -299,7 +256,7 @@ static void emit_bb_label(FILE *out, int bb_id)
 static inline int *wide_acc_cell(const Func *f, int vreg)
 {
     return (vreg >= 0 && f->vregs[vreg].kind == KIND_LONGLONG)
-        ? &rs.i64_acc : &rs.fa;
+        ? &L.rs.i64_acc : &L.rs.fa;
 }
 
 /* HL slot-ADDRESS cache (distinct from the value cache above): the slot
@@ -402,7 +359,7 @@ static int frame_has_saved_fp(const Func *f)
     if (c_framepointer_is_ix == -1) return 0;
     if (f->is_naked) return 0;
     if (f->frame_size == 0 && !f->uses_acc && !f->is_interrupt
-        && fastcall_arg_vreg(f) < 0 && !cur_func_uses_params)
+        && fastcall_arg_vreg(f) < 0 && !L.cur_func_uses_params)
         return 0;            /* no frame needed → no IX */
     return 1;
 }
@@ -636,7 +593,7 @@ static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
             emit(out, "add\thl,de");
         }
     } else {
-        emit(out, "ld\thl,%d", slot_off(f, vreg) + cur_sp_adjust + adj);
+        emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj);
         emit(out, "add\thl,sp");
     }
 }
@@ -779,7 +736,7 @@ static void load_byte_adv(FILE *out, const char *reg, int last)
     /* reg==a needs no guard or move: the post-increment loads straight
        into A (the intended target). reg!=a routes through A, so it both
        clobbers A (guard rs.a < 0) and pays an A->reg move. */
-    if (IS_GBZ80() && !last && (is_a || rs.a < 0)) {
+    if (IS_GBZ80() && !last && (is_a || L.rs.a < 0)) {
         emit(out, "ld\ta,(hl+)");
         if (!is_a) emit(out, "ld\t%s,a", reg);
         invalidate_a_cache();
@@ -792,7 +749,7 @@ static void load_byte_adv(FILE *out, const char *reg, int last)
 static void store_byte_adv(FILE *out, const char *reg, int last)
 {
     int is_a = (reg[0] == 'a' && reg[1] == 0);
-    if (IS_GBZ80() && !last && (is_a || rs.a < 0)) {
+    if (IS_GBZ80() && !last && (is_a || L.rs.a < 0)) {
         if (!is_a) emit(out, "ld\ta,%s", reg);
         emit(out, "ld\t(hl+),a");
         if (!is_a) invalidate_a_cache();
@@ -1477,7 +1434,7 @@ int ir_lower_func(FILE *out, Func *f)
        frame, no BB labels, no trailing `ret` (the asm owns the entire
        body). ir_build has already validated the body is asm-only. */
     if (f->is_naked) {
-        func_emit_idx++;
+        L.func_emit_idx++;
         for (int i = 0; i < f->n_bbs; i++) {
             BB *bb = &f->bbs[i];
             for (int o = 0; o < bb->n_ops; o++)
@@ -1613,7 +1570,7 @@ int ir_lower_func(FILE *out, Func *f)
         ir_dump_func(stderr, f);
     /* Bumped once per function — both lowering passes (when lazy spill
        does two) share the same func label prefix. */
-    func_emit_idx++;
+    L.func_emit_idx++;
     /* Structural IR verify (opt-in via IR_VERIFY): runs after ir_alloc/
        ir_assign_slots so the spilled-slot check sees populated
        vreg_to_phys[]. Reports to stderr; IR_VERIFY_ABORT turns a
@@ -1622,7 +1579,7 @@ int ir_lower_func(FILE *out, Func *f)
     lower_verify_on = getenv("IR_VERIFY") != NULL;
     if (getenv("IR_VERIFY")) {
         char stage[24];
-        snprintf(stage, sizeof stage, "lower f%d", func_emit_idx);
+        snprintf(stage, sizeof stage, "lower f%d", L.func_emit_idx);
         int viol = ir_verify_func(f, stage);
         /* Compaction ran above, so there must be no orphan vregs left — a
            residual one means a slot was missed or a later pass minted dead
@@ -1637,8 +1594,8 @@ int ir_lower_func(FILE *out, Func *f)
        flag-on === flag-off across the corpus);
        IR_NO_LAZY_SPILL opts out (restores the single-pass, byte-
        identical-to-pre-lazy-spill lowering for A/B + bisecting). */
-    lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
-    int want_lazy = lazy_spill_on;
+    L.lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
+    int want_lazy = L.lazy_spill_on;
     f32_stack_arg_on = getenv("IR_NO_F32_STACK_ARG") == NULL;
 
     /* No function label here — the surrounding legacy scaffolding
@@ -1660,9 +1617,9 @@ int ir_lower_func(FILE *out, Func *f)
     /* Byte-home cross-BB residency map: which slot-backed
        home (E/D) each BB exits with in its register. Module-static so it
        needn't thread through lower_func_render's signature. */
-    bb_byte_out = malloc((size_t)f->n_bbs * sizeof(int));
-    if (bb_byte_out)
-        for (int i = 0; i < f->n_bbs; i++) bb_byte_out[i] = -1;
+    L.bb_byte_out = malloc((size_t)f->n_bbs * sizeof(int));
+    if (L.bb_byte_out)
+        for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out[i] = -1;
     /* Predecessor table: bb_preds[bb] = list of pred bb ids,
        bb_pred_cnt[bb] = length. Derived from succ[] of every BB. */
     int *bb_pred_cnt = calloc((size_t)f->n_bbs, sizeof(int));
@@ -1733,12 +1690,12 @@ int ir_lower_func(FILE *out, Func *f)
     if (wh_prepick) {
         if (f->word_home_vreg >= 0) {
             int wlo = -1, whi = -1;
-            cur_home_is_word = 1;
-            cur_func_whome = f->word_home_vreg;
-            cur_branch_test_kind = 0;
+            L.cur_home_is_word = 1;
+            L.cur_func_whome = f->word_home_vreg;
+            L.cur_branch_test_kind = 0;
             compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
-            cur_home_is_word = 0;
-            cur_func_whome = -1;
+            L.cur_home_is_word = 0;
+            L.cur_func_whome = -1;
             if (wlo < 0) {
                 memcpy(f->vreg_to_phys, wh_prepick,
                        (size_t)f->n_vregs * sizeof(int));
@@ -1761,14 +1718,14 @@ int ir_lower_func(FILE *out, Func *f)
     int rc;
     int *bb_hl_out_p1 = NULL;
     /* Static lazy-spill state — off unless the two-pass path arms it. */
-    ss_phase = 0;
-    ss_op_base = NULL;
-    ss_op_store = NULL;
-    ss_op_reload = NULL;
-    ss_op_cacheread = NULL;
-    ss_store_dead = NULL;
-    ss_cur_g = -1;
-    ss_pinned = 0;
+    L.ss_phase = 0;
+    L.ss_op_base = NULL;
+    L.ss_op_store = NULL;
+    L.ss_op_reload = NULL;
+    L.ss_op_cacheread = NULL;
+    L.ss_store_dead = NULL;
+    L.ss_cur_g = -1;
+    L.ss_pinned = 0;
     if (!want_lazy) {
         rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
                                bb_pending_out, bb_pred_cnt, bb_preds,
@@ -1820,17 +1777,17 @@ int ir_lower_func(FILE *out, Func *f)
             free(src_snap);
         } else {
             /* Pass 1: record the slot stores/reloads the lowerer emits. */
-            ss_op_base = op_base;
-            ss_op_store = op_store;
-            ss_op_reload = op_reload;
-            ss_op_cacheread = op_cacheread;
-            ss_store_dead = NULL;
-            ss_pinned = 0;
-            ss_phase = 1;
+            L.ss_op_base = op_base;
+            L.ss_op_store = op_store;
+            L.ss_op_reload = op_reload;
+            L.ss_op_cacheread = op_cacheread;
+            L.ss_store_dead = NULL;
+            L.ss_pinned = 0;
+            L.ss_phase = 1;
             rc = lower_func_render(scratch, f, 0, NULL, bb_hl_out,
                                    bb_lowered, bb_pending_out, bb_pred_cnt,
                                    bb_preds, bb_alias);
-            ss_phase = 0;
+            L.ss_phase = 0;
             fclose(scratch);
             /* Restore the operands pass 1 swapped in place (see snapshot
                above) so pass 2 lowers the same IR a single pass would. */
@@ -1846,17 +1803,17 @@ int ir_lower_func(FILE *out, Func *f)
                 /* Backward slot-liveness → which spill stores are dead.
                    ss_pinned (an op with >2 distinct reloads — never seen
                    in practice) bails to no elision, which is correct. */
-                signed char *store_dead = ss_pinned ? NULL
+                signed char *store_dead = L.ss_pinned ? NULL
                     : ss_compute_dead(f, op_base, total_ops, op_store,
                                       op_reload, op_cacheread);
                 /* Pass 2: skip the dead stores. */
-                ss_store_dead = store_dead;
-                ss_phase = store_dead ? 2 : 0;
+                L.ss_store_dead = store_dead;
+                L.ss_phase = store_dead ? 2 : 0;
                 rc = lower_func_render(out, f, 1, bb_hl_out_p1, bb_hl_out,
                                        bb_lowered, bb_pending_out,
                                        bb_pred_cnt, bb_preds, bb_alias);
-                ss_phase = 0;
-                ss_store_dead = NULL;
+                L.ss_phase = 0;
+                L.ss_store_dead = NULL;
                 free(store_dead);
             }
             free(src_snap);
@@ -1865,17 +1822,17 @@ int ir_lower_func(FILE *out, Func *f)
         free(op_store);
         free(op_reload);
         free(op_cacheread);
-        ss_op_base = NULL;
-        ss_op_store = NULL;
-        ss_op_reload = NULL;
-        ss_op_cacheread = NULL;
+        L.ss_op_base = NULL;
+        L.ss_op_store = NULL;
+        L.ss_op_reload = NULL;
+        L.ss_op_cacheread = NULL;
     }
     free(bb_hl_out_p1);
 
     free(bb_alias);
     free(bb_hl_out);
     free(bb_pending_out);
-    free(bb_byte_out); bb_byte_out = NULL;
+    free(L.bb_byte_out); L.bb_byte_out = NULL;
     free(bb_lowered);
     free(bb_pred_cnt);
     for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
@@ -1897,20 +1854,20 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
     if (!lower_verify_on) return;
     const char *bad = NULL;
     /* Consumed-inline load flags: reset by their consumer, so 0 at a boundary. */
-    if (cur_load_to_dehl_no_bc)
+    if (L.cur_load_to_dehl_no_bc)
         bad = "cur_load_to_dehl_no_bc set at op entry (leaked past a load_to_dehl)";
-    else if (cur_load_to_dehl_no_hl)
+    else if (L.cur_load_to_dehl_no_hl)
         bad = "cur_load_to_dehl_no_hl set at op entry (leaked past a load_to_dehl)";
     /* NB: cur_dehl_dst_no_bc_stash / cur_store_dehl_bc_dead are recomputed
        (reset) at op-top, not consumed-inline, so they legitimately carry the
        previous op's value into an entry — NOT assertable here. */
-    else if (cur_dehl_push_to_stack)
+    else if (L.cur_dehl_push_to_stack)
         bad = "cur_dehl_push_to_stack set at op entry (leaked)";
     /* HL address-cache and value-cache are mutually exclusive. */
-    else if (cur_hl_addr_off >= 0 && rs.hl >= 0)
+    else if (L.cur_hl_addr_off >= 0 && L.rs.hl >= 0)
         bad = "HL address-cache and value-cache both live";
     /* Lazy-spill I1: a deferred spill rides in HL until flushed. */
-    else if (pending_spill_v >= 0 && rs.hl != pending_spill_v)
+    else if (L.pending_spill_v >= 0 && L.rs.hl != L.pending_spill_v)
         bad = "pending_spill_v set but rs.hl doesn't hold it (I1 violated)";
     /* Rejected (empirically false-positive on correct code, kept as a record):
        - `cur_sp_adjust == 0`: sp is legitimately nonzero across ops beyond the
@@ -1924,7 +1881,7 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
          slot" abort. */
     if (bad) {
         fprintf(stderr, "ir_lower_verify: f%d bb%d op%d: %s\n",
-                func_emit_idx, bb_id, op_idx, bad);
+                L.func_emit_idx, bb_id, op_idx, bad);
         if (getenv("IR_VERIFY_ABORT")) abort();
     }
 }
@@ -1938,39 +1895,39 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 {
     /* Per-pass state reset (everything that was at function entry except
        func_emit_idx, which the caller bumps once for both passes). */
-    cmp_label_counter = 0;
-    lazy_spill_on = lazy;
-    pending_spill_v = -1;
+    L.cmp_label_counter = 0;
+    L.lazy_spill_on = lazy;
+    L.pending_spill_v = -1;
     cur_lazy_out = out;
     cur_lazy_func = f;
     cur_op_idx = 0;
     invalidate_hl_bc();
-    cur_byte_home_vreg = -1;   /* byte home: no resident at function entry */
-    cur_byte_home_dirty = 0;
-    cur_func_ehome = -1;
-    cur_home_is_word = 0;
-    cur_func_whome = -1;
+    L.cur_byte_home_vreg = -1;   /* byte home: no resident at function entry */
+    L.cur_byte_home_dirty = 0;
+    L.cur_func_ehome = -1;
+    L.cur_home_is_word = 0;
+    L.cur_func_whome = -1;
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vreg_to_phys
-            && byte_home_slotbacked(f->vreg_to_phys[v])) { cur_func_ehome = v; break; }
+            && byte_home_slotbacked(f->vreg_to_phys[v])) { L.cur_func_ehome = v; break; }
     /* Word DE-home (--word-resident): a width-2 loop accumulator homed in DE.
        Mutually exclusive with a byte E/D-home (allocator gives up the word home
        when DE's low half is taken), so it reuses the same residency machinery
        — cur_func_ehome names "the home" either way; cur_home_is_word selects the
        width-specific leaf ops (flush/rehome/accumulate/DE→HL read). */
-    if (cur_func_ehome < 0 && f->word_home_vreg >= 0 && f->vreg_to_phys
+    if (L.cur_func_ehome < 0 && f->word_home_vreg >= 0 && f->vreg_to_phys
         && f->vreg_to_phys[f->word_home_vreg] == IR_PR_DE) {
-        cur_func_whome = f->word_home_vreg;
-        cur_func_ehome = cur_func_whome;
-        cur_home_is_word = 1;
+        L.cur_func_whome = f->word_home_vreg;
+        L.cur_func_ehome = L.cur_func_whome;
+        L.cur_home_is_word = 1;
     }
     /* Home-resident loop: where the slot-backed home stays in E/D (or DE)
        across a loop, suppress per-iter spills + assert residency at the
        header. */
-    cur_home_region_lo = cur_home_region_hi = -1;
-    if (cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
-        compute_home_region(f, cur_func_ehome, bb_alias,
-                            &cur_home_region_lo, &cur_home_region_hi);
+    L.cur_home_region_lo = L.cur_home_region_hi = -1;
+    if (L.cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
+        compute_home_region(f, L.cur_func_ehome, bb_alias,
+                            &L.cur_home_region_lo, &L.cur_home_region_hi);
     /* Word DE-home exit-flush hoist: if the region leaves to exactly ONE target
        block that is reached ONLY from the region (every real edge into it comes
        from within [lo,hi]), flush the home once at that block's entry instead of
@@ -1978,18 +1935,18 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        there by the region proof (home rides DE, no leaving-edge redef). Gated on
        fp + a slot reachable by an ix-relative store. IR_NO_WH_EXIT_HOIST opts
        out. Byte-home path untouched. */
-    cur_home_exit_flush_bb = -1;
-    if (cur_home_is_word && cur_func_whome >= 0 && fp_active(f)
-        && cur_home_region_lo >= 0 && !getenv("IR_NO_WH_EXIT_HOIST")) {
+    L.cur_home_exit_flush_bb = -1;
+    if (L.cur_home_is_word && L.cur_func_whome >= 0 && fp_active(f)
+        && L.cur_home_region_lo >= 0 && !getenv("IR_NO_WH_EXIT_HOIST")) {
         int tgt = -1, ok = 1;
-        for (int b = cur_home_region_lo; b <= cur_home_region_hi && ok; b++) {
+        for (int b = L.cur_home_region_lo; b <= L.cur_home_region_hi && ok; b++) {
             const BB *sb = &f->bbs[b];
             int ns = ir_bb_n_succ(sb);
             for (int s = 0; s < ns; s++) {
                 int sid = ir_bb_succ_at(sb, s);
                 if (sid < 0 || sid >= f->n_bbs) continue;
                 if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
-                if (sid >= cur_home_region_lo && sid <= cur_home_region_hi)
+                if (sid >= L.cur_home_region_lo && sid <= L.cur_home_region_hi)
                     continue;                       /* in-region edge */
                 if (tgt < 0) tgt = sid;
                 else if (tgt != sid) { ok = 0; break; }  /* >1 distinct target */
@@ -2008,32 +1965,32 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     if (sid < 0 || sid >= f->n_bbs) continue;
                     if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
                     if (sid != tgt) continue;
-                    if (b < cur_home_region_lo || b > cur_home_region_hi) {
+                    if (b < L.cur_home_region_lo || b > L.cur_home_region_hi) {
                         all_in = 0; break;
                     }
                 }
             }
             /* the slot must be reachable by the ix-relative store the flush uses */
-            int off = slot_ix_off(f, cur_func_whome);
+            int off = slot_ix_off(f, L.cur_func_whome);
             if (all_in && fp_offset_fits(off) && fp_offset_fits(off + 1))
-                cur_home_exit_flush_bb = tgt;
+                L.cur_home_exit_flush_bb = tgt;
         }
     }
-    cur_func_uses_params = func_uses_params(f);   /* frame-pointer elision */
-    if (bb_byte_out)
-        for (int i = 0; i < f->n_bbs; i++) bb_byte_out[i] = -1;
-    cur_sp_adjust = 0;
+    L.cur_func_uses_params = func_uses_params(f);   /* frame-pointer elision */
+    if (L.bb_byte_out)
+        for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out[i] = -1;
+    L.cur_sp_adjust = 0;
     bc_args_save_depth = 0;
-    cur_stack_long_top = -1;
-    cur_dehl_inline_push = -1;
-    cur_dehl_inline_push_base_sp = 0;
-    cur_dehl_push_to_stack = 0;
+    L.cur_stack_long_top = -1;
+    L.cur_dehl_inline_push = -1;
+    L.cur_dehl_inline_push_base_sp = 0;
+    L.cur_dehl_push_to_stack = 0;
     cur_emitted_file = NULL;
     cur_emitted_line = 0;
-    shl_skip_n = 0;
+    L.shl_skip_n = 0;
     cur_bb = NULL;
     cur_bank_fn = NULL;   /* __addressmod: bank unknown at function entry */
-    ss_cur_g = -1;   /* no current op during prologue */
+    L.ss_cur_g = -1;   /* no current op during prologue */
     for (int i = 0; i < f->n_bbs; i++) {
         bb_hl_out[i] = -1;
         bb_pending_out[i] = -1;
@@ -2047,7 +2004,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         BB *bb = &f->bbs[i];
         if (bb_alias && bb_alias[i] >= 0) {
             fprintf(out, "defc L_f%d_bb_%d = L_f%d_bb_%d\n",
-                    func_emit_idx, bb->id, func_emit_idx, bb_alias[i]);
+                    L.func_emit_idx, bb->id, L.func_emit_idx, bb_alias[i]);
             /* The trampoline executes nothing, so it passes the HL
                carry straight through: its hl_out is its own carry-in
                (the agreement of its lowered preds). Leaving -1 here
@@ -2071,17 +2028,17 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                too (mirror of bb_hl_out) — else a region body reached via an
                alias (index_walk's bb2→bb3) loses the carry and needlessly
                rehomes. Byte-home left untouched (byte-identical gate). */
-            if (cur_home_is_word && cur_func_ehome >= 0 && bb_byte_out) {
+            if (L.cur_home_is_word && L.cur_func_ehome >= 0 && L.bb_byte_out) {
                 int bcarry = -2;
                 for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                     int pid = bb_preds[bb->id][p];
                     if (!bb_lowered[pid]) { bcarry = -1; break; }
-                    int v = bb_byte_out[pid];
+                    int v = L.bb_byte_out[pid];
                     if (v < 0) { bcarry = -1; break; }
                     if (bcarry == -2) bcarry = v;
                     else if (bcarry != v) { bcarry = -1; break; }
                 }
-                bb_byte_out[bb->id] =
+                L.bb_byte_out[bb->id] =
                     (bcarry >= 0 && bb->live_in
                      && ir_bitset_get((const BitSet *)bb->live_in, bcarry))
                     ? bcarry : -1;
@@ -2092,27 +2049,27 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         emit_bb_label(out, bb->id);
         /* The long data-stack is per-BB. Any push/pop imbalance at
            a BB boundary would shift sp for unrelated code. */
-        cur_sp_adjust = 0;
+        L.cur_sp_adjust = 0;
         bc_args_save_depth = 0;
-        cur_stack_long_top = -1;
-        cur_dehl_inline_push = -1;
-        cur_dehl_inline_push_base_sp = 0;
-        cur_dehl_push_to_stack = 0;
+        L.cur_stack_long_top = -1;
+        L.cur_dehl_inline_push = -1;
+        L.cur_dehl_inline_push_base_sp = 0;
+        L.cur_dehl_push_to_stack = 0;
         cur_bank_fn = NULL;   /* __addressmod: bank unknown at a BB merge */
         /* No pending spill crosses into a BB yet — the cross-BB inherit
            lands with the defer step. Clear it so nothing leaks. */
-        pending_spill_v = -1;
+        L.pending_spill_v = -1;
         /* Word DE-home exit-flush hoist: this block is the region's sole,
            dedicated exit — physical DE still holds the final accumulator (the
            region proof; nothing has emitted since the exit branch). Flush it to
            the slot ONCE here, then drop the belief. The per-iter header flush is
            suppressed below. Emitted before the cache-carry logic so no ex de,hl
            can clobber DE first (pending spill already cleared). */
-        if (cur_home_is_word && cur_home_exit_flush_bb >= 0
-            && bb->id == cur_home_exit_flush_bb) {
+        if (L.cur_home_is_word && L.cur_home_exit_flush_bb >= 0
+            && bb->id == L.cur_home_exit_flush_bb) {
             word_home_exit_flush(out, f);
-            cur_byte_home_dirty = 0;
-            cur_byte_home_vreg = -1;
+            L.cur_byte_home_dirty = 0;
+            L.cur_byte_home_vreg = -1;
         }
         /* Carry the HL cache across the BB boundary when ALL
            predecessors have already been lowered AND agree on
@@ -2147,38 +2104,38 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            first read reloads from the slot, which is coherent (preds flush at
            BB end / before clobbers / before back-edges). A slotless C/B home
            is left to persist (never clobbered in its envelope). */
-        if (cur_func_ehome >= 0) {
+        if (L.cur_func_ehome >= 0) {
             int bcarry = -2;
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { bcarry = -1; break; }
-                int v = bb_byte_out[pid];
+                int v = L.bb_byte_out[pid];
                 if (v < 0) { bcarry = -1; break; }
                 if (bcarry == -2) bcarry = v;
                 else if (bcarry != v) { bcarry = -1; break; }
             }
             if (bcarry >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, bcarry)) {
-                cur_byte_home_vreg = bcarry;
-                cur_byte_home_dirty = 0;   /* preds flushed → slot coherent */
+                L.cur_byte_home_vreg = bcarry;
+                L.cur_byte_home_dirty = 0;   /* preds flushed → slot coherent */
             } else {
-                cur_byte_home_vreg = -1;
+                L.cur_byte_home_vreg = -1;
             }
         }
-        int in_home_region = (cur_home_region_lo >= 0
-                              && bb->id >= cur_home_region_lo
-                              && bb->id <= cur_home_region_hi);
+        int in_home_region = (L.cur_home_region_lo >= 0
+                              && bb->id >= L.cur_home_region_lo
+                              && bb->id <= L.cur_home_region_hi);
         /* A preheader of the resident region: outside it, but with an edge
            (alias-resolved) into the header. Its exit re-homes the slot-backed
            home into E so the header can assert residency. */
         int is_region_preheader = 0;
-        if (cur_home_region_lo >= 0 && !in_home_region) {
+        if (L.cur_home_region_lo >= 0 && !in_home_region) {
             int ns = ir_bb_n_succ(bb);
             for (int s = 0; s < ns; s++) {
                 int sid = ir_bb_succ_at(bb, s);
                 if (sid < 0 || sid >= f->n_bbs) continue;
                 if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
-                if (sid == cur_home_region_lo) { is_region_preheader = 1; break; }
+                if (sid == L.cur_home_region_lo) { is_region_preheader = 1; break; }
             }
         }
         /* Resident-loop header: the forward pass can't carry E in over the
@@ -2192,22 +2149,22 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            the header. The region proof covers the whole span, so trusting the
            unlowered preds is sound wherever a lowered pred carries the home.
            Byte-home keeps the header-only assertion (byte codegen unchanged). */
-        if (cur_func_ehome >= 0 && cur_home_region_lo >= 0
-            && (bb->id == cur_home_region_lo
-                || (cur_home_is_word && bb->id >= cur_home_region_lo
-                    && bb->id <= cur_home_region_hi))
-            && cur_byte_home_vreg < 0
+        if (L.cur_func_ehome >= 0 && L.cur_home_region_lo >= 0
+            && (bb->id == L.cur_home_region_lo
+                || (L.cur_home_is_word && bb->id >= L.cur_home_region_lo
+                    && bb->id <= L.cur_home_region_hi))
+            && L.cur_byte_home_vreg < 0
             && bb->live_in
-            && ir_bitset_get((const BitSet *)bb->live_in, cur_func_ehome)) {
+            && ir_bitset_get((const BitSet *)bb->live_in, L.cur_func_ehome)) {
             int ok = 1, saw_lowered = 0;
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) continue;        /* back-edge: trust proof */
                 saw_lowered = 1;
-                if (bb_byte_out[pid] != cur_func_ehome) { ok = 0; break; }
+                if (L.bb_byte_out[pid] != L.cur_func_ehome) { ok = 0; break; }
             }
             if (ok && saw_lowered)
-                cur_byte_home_vreg = cur_func_ehome;
+                L.cur_byte_home_vreg = L.cur_func_ehome;
         }
         /* Correctness backstop: the resident region suppresses in-loop spills
            ONLY because the home is proven to ride E throughout. If residency
@@ -2215,16 +2172,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            that could not be emitted), disable the region for the rest of this
            render so the body uses the normal flush rules — else the body
            would update only E while in-loop reloads read a stale slot. */
-        if (bb->id == cur_home_region_lo && cur_home_region_lo >= 0
-            && cur_byte_home_vreg != cur_func_ehome) {
-            cur_home_region_lo = cur_home_region_hi = -1;
+        if (bb->id == L.cur_home_region_lo && L.cur_home_region_lo >= 0
+            && L.cur_byte_home_vreg != L.cur_func_ehome) {
+            L.cur_home_region_lo = L.cur_home_region_hi = -1;
             in_home_region = 0;
         }
         /* Inside the resident region the home rides E with no per-iteration
            spill, so the slot is stale: mark dirty so the one flush on the
            region-exit edge fires (a leaving consumer may reload it). */
-        if (in_home_region && cur_byte_home_vreg == cur_func_ehome)
-            cur_byte_home_dirty = 1;
+        if (in_home_region && L.cur_byte_home_vreg == L.cur_func_ehome)
+            L.cur_byte_home_dirty = 1;
         /* Does this BB need to spill a dirty home before exiting? Inside the
            resident region: only when an edge LEAVES the region (the out-of-
            region target may reload from the slot); all in-region edges keep
@@ -2260,17 +2217,17 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 int sid = ir_bb_succ_at(bb, s);
                 if (sid < 0 || sid >= f->n_bbs) continue;
                 if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
-                if (sid < cur_home_region_lo || sid > cur_home_region_hi) {
+                if (sid < L.cur_home_region_lo || sid > L.cur_home_region_hi) {
                     region_exit_here = 1; break;
                 }
             }
         }
         /* The exit-flush is hoisted to the dedicated exit block's entry (once),
            so suppress the per-iteration header flush when that hoist is active. */
-        if (region_exit_here && cur_byte_home_vreg == cur_func_ehome
-            && cur_byte_home_dirty
-            && home_is_slotbacked(f, cur_func_ehome)
-            && !(cur_home_is_word && cur_home_exit_flush_bb >= 0))
+        if (region_exit_here && L.cur_byte_home_vreg == L.cur_func_ehome
+            && L.cur_byte_home_dirty
+            && home_is_slotbacked(f, L.cur_func_ehome)
+            && !(L.cur_home_is_word && L.cur_home_exit_flush_bb >= 0))
             home_flush(out, f);   /* keep belief; slot now coherent */
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
@@ -2345,7 +2302,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                nxt_first_dehl_src() returns the actual first slot for
                recognised long-DEHL ops; we fall back to 0 otherwise so
                int / unrecognised ops keep the original src[0] semantics. */
-            cur_dst_dead = 0;
+            L.cur_dst_dead = 0;
             if (op->dst >= 0) {
                 int live_out_dst = bb->live_out
                     && ir_bitset_get((const BitSet *)bb->live_out, op->dst);
@@ -2426,7 +2383,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         }
                         if (redef) break;
                     }
-                    if (safe) cur_dst_dead = 1;
+                    if (safe) L.cur_dst_dead = 1;
                 }
             }
 
@@ -2435,15 +2392,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                cur_dst_dead is set, since that requires the next op's
                src[0]==dst pattern), publish the branch info for the
                op's fastpath to consume. */
-            cur_branch_test_kind = 0;
-            cur_branch_test_label = -1;
-            cur_skip_next_op = 0;
-            if (cur_dst_dead && j + 1 < bb->n_ops) {
+            L.cur_branch_test_kind = 0;
+            L.cur_branch_test_label = -1;
+            L.cur_skip_next_op = 0;
+            if (L.cur_dst_dead && j + 1 < bb->n_ops) {
                 const Op *nxt = &bb->ops[j + 1];
                 if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
                     && nxt->src[0] == op->dst) {
-                    cur_branch_test_kind = nxt->kind;
-                    cur_branch_test_label = nxt->label;
+                    L.cur_branch_test_kind = nxt->kind;
+                    L.cur_branch_test_label = nxt->label;
                 }
             }
 
@@ -2458,8 +2415,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                op returns 0. When dst sits in that position, the next
                op's load_to_dehl emits the 2-instruction cache-hit path
                (`ld l,c; ld h,b`) — no slot read, no register clobber. */
-            cur_dehl_dst_dead_safe = 0;
-            cur_dehl_dst_no_bc_stash = 0;
+            L.cur_dehl_dst_dead_safe = 0;
+            L.cur_dehl_dst_no_bc_stash = 0;
             /* FP-mode: the trailing `ld bc,hl` DEHL-cache maintenance in a
                width-4 store is dead when, scanning forward in the BB, the
                value's BC=low invariant is clobbered before any op reads it
@@ -2468,7 +2425,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                own `ld bc,hl` overwrites BC), not a read. Eliding is always
                correct: store_dehl_cached drops the cache claim, so a later
                read reloads via (ix+d) rather than a stale cache hit. */
-            cur_store_dehl_bc_dead = 0;
+            L.cur_store_dehl_bc_dead = 0;
             if (fp_active(f) && op->dst >= 0
                 && f->vregs[op->dst].width == 4) {
                 int V = op->dst;
@@ -2485,7 +2442,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         || ko->kind == IR_ASM
                         || (ko->dst >= 0 && ko->dst < f->n_vregs
                             && f->vregs[ko->dst].width == 4)) {
-                        cur_store_dehl_bc_dead = 1;   /* clobbered before read */
+                        L.cur_store_dehl_bc_dead = 1;   /* clobbered before read */
                         break;
                     }
                 }
@@ -2511,9 +2468,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     && f->vregs[nxt2->src[1]].width == 4
                     && (nxt2->src[0] == op->dst
                         || nxt2->src[1] == op->dst))
-                    cur_dehl_dst_no_bc_stash = 1;
+                    L.cur_dehl_dst_no_bc_stash = 1;
             }
-            if (cur_dst_dead && op->dst >= 0
+            if (L.cur_dst_dead && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && j + 1 < bb->n_ops) {
                 const Op *nxt = &bb->ops[j + 1];
@@ -2525,22 +2482,22 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (nxt->kind == IR_HCALL && nxt->hcall
                     && nxt->hcall->n_args == 1 && nxt->hcall->args
                     && nxt->hcall->args[0] == op->dst) {
-                    cur_dehl_dst_dead_safe = 1;
+                    L.cur_dehl_dst_dead_safe = 1;
                 }
                 int pos = nxt_first_dehl_src(nxt);
-                if (!cur_dehl_dst_dead_safe && pos >= 0 && nxt->src[pos] == op->dst) {
+                if (!L.cur_dehl_dst_dead_safe && pos >= 0 && nxt->src[pos] == op->dst) {
                     switch (nxt->kind) {
                     case IR_ST_MEM:
                     case IR_NEG: case IR_NOT:
                     case IR_PUSH_DEHL_LONG:
-                        cur_dehl_dst_dead_safe = 1;
+                        L.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_MOV:
                         /* Copy of a dying width-4 producer: skip the
                            producer's slot store; the MOV reads it from the
                            DEHL cache and does the one store (kills the
                            `acc += x` compound-assign double-store). */
-                        cur_dehl_dst_dead_safe = 1;
+                        L.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_ADD:
                     case IR_SUB:
@@ -2548,7 +2505,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         /* Both const-RHS (pos=0, no DEHL load of src[1])
                            and variable-RHS (pos matches first load)
                            are safe — load_to_dehl(dst) hits the cache. */
-                        cur_dehl_dst_dead_safe = 1;
+                        L.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_SHL: case IR_SHR:
                         /* Both const-count and var-count fire — A.1
@@ -2556,12 +2513,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                            helpers, DEHL = value). load_to_dehl(dst)
                            on the helper side hits the cache when dst
                            is already there. */
-                        cur_dehl_dst_dead_safe = 1;
+                        L.cur_dehl_dst_dead_safe = 1;
                         break;
                     case IR_ROTL:
                         /* gen_rotl consumes src[0] via load_to_dehl
                            first — cache hit, no slot read. */
-                        cur_dehl_dst_dead_safe = 1;
+                        L.cur_dehl_dst_dead_safe = 1;
                         break;
                     default: break;
                     }
@@ -2580,7 +2537,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                above. Excluded: ADDR_TAKEN/PARAM (slot readable
                behind the IR's back) and dst doubling as the other
                src (its second read may take the slot path). */
-            if (!cur_dehl_dst_dead_safe
+            if (!L.cur_dehl_dst_dead_safe
                 && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && !(f->vregs[op->dst].flags
@@ -2597,7 +2554,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     case IR_ADD: case IR_SUB:
                     case IR_AND: case IR_OR: case IR_XOR:
                     case IR_SHL: case IR_SHR: case IR_ROTL:
-                        cur_dehl_dst_dead_safe = 1;
+                        L.cur_dehl_dst_dead_safe = 1;
                         break;
                     default: break;
                     }
@@ -2609,7 +2566,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                cache for that consumer, so the result's slot store is dead.
                The producer's dst lives in hcall->ret_vreg (not op->dst), so
                the cur_dst_dead paths above never reach it. */
-            if (!cur_dehl_dst_dead_safe
+            if (!L.cur_dehl_dst_dead_safe
                 && op->kind == IR_HCALL && op->hcall
                 && op->hcall->ret_vreg >= 0
                 && f->vregs[op->hcall->ret_vreg].width == 4
@@ -2632,7 +2589,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                         for (int u = 0; u < nu; u++)
                             if (uses[u] == rv) { used_later = 1; break; }
                     }
-                    if (!used_later) cur_dehl_dst_dead_safe = 1;
+                    if (!used_later) L.cur_dehl_dst_dead_safe = 1;
                 }
             }
 
@@ -2646,14 +2603,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                Guard: src[0] pre-swap == op->dst (swap at k-1 moves
                it to src[1]); other operand (src[1] pre-swap) must be
                produced at k-1 and die at k (guarantees swap fires). */
-            cur_dehl_push_to_stack = 0;
+            L.cur_dehl_push_to_stack = 0;
             if (!fp_active(f)
-                && !cur_dehl_dst_dead_safe
-                && !cur_dst_dead
+                && !L.cur_dehl_dst_dead_safe
+                && !L.cur_dst_dead
                 && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)
-                && cur_stack_long_top < 0) {
+                && L.cur_stack_long_top < 0) {
                 /* Note: cur_dehl_inline_push may be non-(-1) here (a
                    chained push is still pending); the runtime check in
                    store_dehl_finalize handles that case — the cleanup in
@@ -2709,7 +2666,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     }
                     if (is_bitop && w4 && dst_in_src0
                         && other_at_km1 && other_dies)
-                        cur_dehl_push_to_stack = 1;
+                        L.cur_dehl_push_to_stack = 1;
                 }
             }
 
@@ -2728,22 +2685,22 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                producing its result — e.g. `p = mul(a,b); s = add(p,c)`:
                the mul consumes a's push, then its result p is pushed for
                the add. Allow it when op is that consuming HCALL. */
-            int pending_ok = (cur_dehl_inline_push < 0);
+            int pending_ok = (L.cur_dehl_inline_push < 0);
             if (!pending_ok && op->kind == IR_HCALL && op->hcall
                 && op->hcall->args)
                 for (int a = 0; a < op->hcall->n_stacked; a++)
-                    if (op->hcall->args[a] == cur_dehl_inline_push) {
+                    if (op->hcall->args[a] == L.cur_dehl_inline_push) {
                         pending_ok = 1; break;
                     }
             if (f32_stack_arg_on
-                && !cur_dehl_push_to_stack
+                && !L.cur_dehl_push_to_stack
                 && !fp_active(f)
                 && !func_has_pr_bc(f)
-                && !cur_dehl_dst_dead_safe
+                && !L.cur_dehl_dst_dead_safe
                 && op->dst >= 0
                 && f->vregs[op->dst].width == 4
                 && !vreg_is_pr_dehl(f, op->dst)
-                && cur_stack_long_top < 0
+                && L.cur_stack_long_top < 0
                 && pending_ok
                 && !(bb->live_out
                      && ir_bitset_get((const BitSet *)bb->live_out, op->dst))) {
@@ -2777,7 +2734,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              a < ko->hcall->n_args; a++)
                             if (ko->hcall->args[a] == op->dst) also_reg = 1;
                         if (!also_reg)
-                            cur_dehl_push_to_stack = 1;
+                            L.cur_dehl_push_to_stack = 1;
                     }
                 }
             }
@@ -2806,16 +2763,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     /* Preheader fall-through into a resident loop: re-home
                        the slot-backed home into E here too (this elided BR is
                        the entry edge). */
-                    if (is_region_preheader && cur_func_ehome >= 0)
+                    if (is_region_preheader && L.cur_func_ehome >= 0)
                         home_rehome(out, f);
                     /* HL state unchanged — bb_hl_out captures
                        rs.hl. But an elided fall-through still crosses
                        a BB boundary: spill a dirty slot-backed home (keeping
                        the belief) so the merge/back-edge successor can reload
                        a coherent slot if it doesn't carry. */
-                    if (cur_func_ehome >= 0 && bb_exit_flush_needed
-                        && cur_byte_home_dirty && cur_byte_home_vreg >= 0
-                        && home_is_slotbacked(f, cur_byte_home_vreg))
+                    if (L.cur_func_ehome >= 0 && bb_exit_flush_needed
+                        && L.cur_byte_home_dirty && L.cur_byte_home_vreg >= 0
+                        && home_is_slotbacked(f, L.cur_byte_home_vreg))
                         home_flush(out, f);
                     continue;
                 }
@@ -2828,15 +2785,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                fused emit; set cur_skip_shl_add_hl so the SHL lowerer
                drops the redundant `add hl,hl` but still runs its
                spill / cache tail to publish HL to the dst vreg. */
-            ss_cur_g = ss_op_base ? ss_op_base[bb->id] + j : -1;
-            for (int s = 0; s < shl_skip_n; s++) {
+            L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
+            for (int s = 0; s < L.shl_skip_n; s++) {
                 if (shl_skip[s].bb_id == bb->id
                     && shl_skip[s].op_idx == j) {
                     if (shl_skip[s].is_byte) {
                         /* Byte fuse: `sla <home>` in the test BB already did
                            the shift; gen_shl's byte path emits nothing (in-
                            place) or just republishes the home reg to A. */
-                        cur_skip_shl_byte = 1;
+                        L.cur_skip_shl_byte = 1;
                         break;
                     }
                     hl_about_to_change(shl_skip[s].cache_vreg);
@@ -2845,7 +2802,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                        cache hit with no loader call, so record it so the
                        dead-store analysis doesn't treat it as a reload. */
                     ss_note_cache_read(f, shl_skip[s].cache_vreg);
-                    cur_skip_shl_add_hl = 1;
+                    L.cur_skip_shl_add_hl = 1;
                     break;
                 }
             }
@@ -2861,15 +2818,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                E before the entry branch, so the header's residency assertion
                holds on the first iteration (the home may only be in its slot
                here — clobbered by post-init DE work like `end = base+len`). */
-            if (is_region_preheader && cur_func_ehome >= 0
+            if (is_region_preheader && L.cur_func_ehome >= 0
                 && (op->kind == IR_BR || op->kind == IR_BR_COND
                     || op->kind == IR_BR_ZERO))
                 home_rehome(out, f);
-            if (cur_byte_home_vreg >= 0
-                && home_is_slotbacked(f, cur_byte_home_vreg)) {
+            if (L.cur_byte_home_vreg >= 0
+                && home_is_slotbacked(f, L.cur_byte_home_vreg)) {
                 if (!op_de_clean(f, op)) {
                     home_clobber(out, f);
-                } else if (cur_byte_home_dirty && bb_exit_flush_needed
+                } else if (L.cur_byte_home_dirty && bb_exit_flush_needed
                            && (op->kind == IR_BR || op->kind == IR_BR_COND
                                || op->kind == IR_BR_ZERO)) {
                     home_flush(out, f);   /* keep belief */
@@ -2878,15 +2835,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             /* Static lazy-spill: tag the store/reload hooks with this op's
                global index so pass 1 records against it and pass 2's
                verdict (ss_store_dead) is read for it. */
-            ss_cur_g = ss_op_base ? ss_op_base[bb->id] + j : -1;
+            L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
             if (op->kind == IR_RET) {
                 rc = lower_ret(out, f, op);
             } else {
                 rc = lower_op(out, f, op);
             }
-            ss_cur_g = -1;
+            L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
-            if (cur_skip_next_op) {
+            if (L.cur_skip_next_op) {
                 j++;  /* the fastpath consumed op[i+1] (the branch) */
             }
         }
@@ -2895,9 +2852,9 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            and the home is dirty, spill it now (after the last op, before the
            implicit edge). Branch-ending BBs already flushed before the
            branch in the dispatch above. */
-        if (cur_func_ehome >= 0 && bb_exit_flush_needed && cur_byte_home_dirty
-            && cur_byte_home_vreg >= 0
-            && home_is_slotbacked(f, cur_byte_home_vreg)) {
+        if (L.cur_func_ehome >= 0 && bb_exit_flush_needed && L.cur_byte_home_dirty
+            && L.cur_byte_home_vreg >= 0
+            && home_is_slotbacked(f, L.cur_byte_home_vreg)) {
             int lastk = bb->n_ops ? bb->ops[bb->n_ops - 1].kind : IR_NOP;
             if (lastk != IR_BR && lastk != IR_BR_COND
                 && lastk != IR_BR_ZERO && lastk != IR_RET
@@ -2906,11 +2863,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         }
         /* Record the home's exit residency for successors' carry decision:
            the slot-backed home is in E/D here iff the belief still holds it. */
-        bb_byte_out[bb->id] =
-            (cur_func_ehome >= 0 && cur_byte_home_vreg == cur_func_ehome)
-            ? cur_byte_home_vreg : -1;
-        bb_hl_out[bb->id] = rs.hl;
-        bb_pending_out[bb->id] = pending_spill_v;
+        L.bb_byte_out[bb->id] =
+            (L.cur_func_ehome >= 0 && L.cur_byte_home_vreg == L.cur_func_ehome)
+            ? L.cur_byte_home_vreg : -1;
+        bb_hl_out[bb->id] = L.rs.hl;
+        bb_pending_out[bb->id] = L.pending_spill_v;
         bb_lowered[bb->id] = 1;
     }
 
