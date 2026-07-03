@@ -859,6 +859,22 @@ static void partial_load_long_shl(FILE *out, const Func *f, int v,
     }
 }
 
+/* Publish the DEHL cache after a long load that left the high half in DE and
+   the low half in HL. The cache invariant is "BC = low half when rs.dehl is
+   set", so normally stash BC=HL and claim dehl=vreg_id: a later load_to_dehl
+   hit recovers HL via `ld hl,bc`. When the caller signalled no_bc (a
+   byte-direct unary chain — IR_NOT/IR_NEG — that walks H/L/E/D through A and
+   never reads BC), skip the stash AND don't publish the BC-implying claim, or
+   that later `ld hl,bc` would read stale BC. */
+static void publish_dehl_from_hl(FILE *out, int vreg_id, int no_bc)
+{
+    if (!no_bc)
+        emit(out, "ld\tbc,hl");
+    hl_about_to_change(vreg_id);
+    if (no_bc) L.rs.dehl = -1;
+    else       cache_dehl(vreg_id);
+}
+
 static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     int no_hl = L.la.cur_load_to_dehl_no_hl;
@@ -905,17 +921,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
             emit(out, "push\tde");
             emit(out, "push\thl");
-            {
-                int nb = no_bc;
-                if (!nb)
-                    emit(out, "ld\tbc,hl"); /* BC = low half (cache invariant) */
-                hl_about_to_change(vreg_id);
-                /* When the BC=low stash is skipped, BC does NOT back the DEHL
-                   cache — so don't publish the (BC-implying) dehl claim, or a
-                   later cache-hit `ld hl,bc` reads stale BC. */
-                if (nb) L.rs.dehl = -1;
-                else    cache_dehl(vreg_id);
-            }
+            publish_dehl_from_hl(out, vreg_id, no_bc);
             return;
         }
         int ix_off = slot_ix_off(f, vreg_id);
@@ -930,19 +936,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
                when the caller signals it won't read BC — typically a
                byte-direct unary chain (IR_NOT/IR_NEG) that walks
                H/L/E/D through A. */
-            {
-                int nb = no_bc;
-                if (!nb)
-                    emit(out, "ld\tbc,hl");
-                /* HL really does hold the low half here — advertise it
-                   so downstream byte-direct chains can read from L/H
-                   directly instead of going through BC. */
-                hl_about_to_change(vreg_id);
-                /* BC=low stash skipped ⇒ don't assert the BC-backed dehl
-                   claim (a later cache-hit would `ld hl,bc` stale BC). */
-                if (nb) L.rs.dehl = -1;
-                else    cache_dehl(vreg_id);
-            }
+            publish_dehl_from_hl(out, vreg_id, no_bc);
             return;
         }
     }
@@ -959,15 +953,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
         emit(out, "push\tde");
         emit(out, "push\thl");
-        {
-            int nb = no_bc;
-            if (!nb)
-                emit(out, "ld\tbc,hl"); /* BC = low half (cache invariant) */
-            hl_about_to_change(vreg_id);
-            /* BC=low stash skipped ⇒ don't assert the BC-backed dehl claim. */
-            if (nb) L.rs.dehl = -1;
-            else    cache_dehl(vreg_id);
-        }
+        publish_dehl_from_hl(out, vreg_id, no_bc);
         return;
     }
     /* Rabbit/kc160 native sp-relative long load. DE=high half (native

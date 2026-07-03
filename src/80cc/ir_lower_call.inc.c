@@ -709,6 +709,18 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Store the working accumulator to dst's slot and record it resident.
+   The i64 store wants the slot address in BC (acc_store_bc); the float
+   store wants it in HL — emit_acc_slot_addr leaves it in HL either way. */
+static void store_acc_to_slot(FILE *out, const Func *f, int dst, const HelperInfo *hi)
+{
+    emit_acc_slot_addr(out, f, dst, 0);
+    if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+    emit(out, "call\t%s", hi->acc_store);
+    invalidate_hl_bc();
+    *wide_acc_cell(f, dst) = dst;
+}
+
 /* Wide memory-accumulator unary op (IR_ACC_UNOP): int→acc conversion,
    acc→int conversion, or acc→acc move. Reuses the FA-residency cache so
    a value already in the accumulator isn't reloaded. */
@@ -726,11 +738,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         if (f->vregs[src].width == 4) load_to_dehl(out, f, src);
         else                          load_to_hl(out, f, src);
         emit(out, "call\t%s", hi->name);
-        emit_acc_slot_addr(out, f, dst, 0);
-        if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
-        emit(out, "call\t%s", hi->acc_store);
-        invalidate_hl_bc();
-        *wide_acc_cell(f, dst) = dst;
+        store_acc_to_slot(out, f, dst, hi);
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC2INT) {
@@ -757,11 +765,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         emit_acc_slot_addr(out, f, src, 0);
         emit(out, "call\t%s", hi->acc_load);
         emit(out, "call\t%s", hi->name);
-        emit_acc_slot_addr(out, f, dst, 0);
-        if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
-        emit(out, "call\t%s", hi->acc_store);
-        invalidate_hl_bc();
-        *wide_acc_cell(f, dst) = dst;
+        store_acc_to_slot(out, f, dst, hi);
         return 0;
     }
     if (hi->acc_subkind == ACC_SUB_ACC_UNARY) {
@@ -774,11 +778,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
             emit(out, "call\t%s", hi->acc_load);
         }
         emit(out, "call\t%s", hi->name);
-        emit_acc_slot_addr(out, f, dst, 0);
-        if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
-        emit(out, "call\t%s", hi->acc_store);
-        invalidate_hl_bc();
-        *wide_acc_cell(f, dst) = dst;
+        store_acc_to_slot(out, f, dst, hi);
         return 0;
     }
     /* acc → acc move */
@@ -786,11 +786,7 @@ static int gen_acc_unop(FILE *out, Func *f, const Op *op)
         emit_acc_slot_addr(out, f, src, 0);
         emit(out, "call\t%s", hi->acc_load);
     }
-    emit_acc_slot_addr(out, f, dst, 0);
-    if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
-    emit(out, "call\t%s", hi->acc_store);
-    invalidate_hl_bc();
-    *wide_acc_cell(f, dst) = dst;
+    store_acc_to_slot(out, f, dst, hi);
     return 0;
 }
 
