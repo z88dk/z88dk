@@ -275,6 +275,55 @@ static void test_var_long_shift(void)
     Assert(gap_vshl(0x00000001UL, 20) == 0x00100000UL, "var-count long << keeps the count");
 }
 
+/* ---- Constant store folded to an immediate (arr[i]=K) --------------
+ * const_fold rewrites a constant MEM_VREG store to `ld (hl),imm` (byte) /
+ * `ld (hl),lo;inc hl;ld (hl),hi` (word) with src[0]=-1 — no value register.
+ * The word case regressed: a `&sym+const` base folds the store MEM_VREG ->
+ * MEM_SYM, and the MEM_SYM path defaulted the width to 2 and loaded the
+ * (now folded-away) value vreg's dead slot, storing garbage. Covers both
+ * MEM_VREG (variable index) and MEM_SYM (constant index) for byte + word. */
+int csf_w[8];
+unsigned char csf_b[8];
+long csf_l[8];
+static int const_store_fold(void)
+{
+    int i, sum = 0, lok = 1;
+    for (i = 0; i < 8; i++) { csf_w[i] = 1000; csf_b[i] = 0xAB; csf_l[i] = 0x11223344L; }  /* MEM_VREG byte/word/long */
+    csf_w[2] = 2000; csf_b[2] = 0xCD; csf_l[2] = 0x55667788L;    /* const index → MEM_SYM after fold */
+    for (i = 0; i < 8; i++) { sum += csf_w[i]; sum += csf_b[i]; }
+    for (i = 0; i < 8; i++) {
+        long e = (i == 2) ? 0x55667788L : 0x11223344L;
+        if (csf_l[i] != e) lok = 0;
+    }
+    return lok ? sum : -1;
+}
+
+static void test_const_store_fold(void)
+{
+    /* 7*1000 + 2000 = 9000 ; 7*0xAB + 0xCD = 1402 ; total 10402 = 0x28A2.
+       The long stores (0x11223344 / [2]=0x55667788) must round-trip too. */
+    Assert(const_store_fold() == 10402,
+           "const store fold byte+word+long, MEM_VREG + MEM_SYM");
+}
+
+/* IV range-narrowing: a counter proven to fit [0,256) is retyped to a byte
+   (step becomes inc/dec, int uses zero-extend). Must stay value-exact for
+   up-counters, down-counters, post-loop use, and — critically — must NOT
+   narrow a counter that exceeds 255 (would wrap in a byte). */
+static int iv_arr[20];
+static int iv_up(void)   { int s=0,i; for(i=0;i<16;i++) s+=iv_arr[i]; return s; }
+static int iv_down(void) { int s=0,i; for(i=16;i>0;i--) s+=iv_arr[i-1]; return s; }
+static int iv_post(void) { int i; for(i=0;i<16;i++) {} return i; }        /* post = 16 */
+static long iv_big(void) { long s=0; int i; for(i=0;i<300;i++) s+=(i&15); return s; }
+static void test_iv_narrow(void)
+{
+    int i; for (i=0;i<16;i++) iv_arr[i]=i;      /* 0..15, sum 120 */
+    Assert(iv_up()   == 120, "iv narrow: up-counter [0,16)");
+    Assert(iv_down() == 120, "iv narrow: down-counter (16..1]");
+    Assert(iv_post() == 16,  "iv narrow: post-loop counter value");
+    Assert(iv_big()  == 2226, "iv NOT narrowed at >255 (no byte wrap)");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -292,5 +341,7 @@ int main(int argc, char *argv[])
     suite_add_test(test_postinc_init);
     suite_add_test(test_ptr_post_inc);
     suite_add_test(test_or_long_zero);
+    suite_add_test(test_const_store_fold);
+    suite_add_test(test_iv_narrow);
     return suite_run();
 }

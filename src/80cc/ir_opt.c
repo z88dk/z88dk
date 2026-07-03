@@ -8,6 +8,11 @@
 #include "ir_opt.h"
 #include "ir_analysis.h"
 
+/* Defined in ir_lower.c (the CPU-lowering layer). Target predicate for the
+   const-store fold — no ccdefs.h dependency, so the decoupling above holds.
+   `width` = store size in bytes (byte folds everywhere; word is gated). */
+extern int ir_cpu_const_store_ok(int width);
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -500,8 +505,14 @@ static int licm_pre_header(const Func *f, const int *in_loop, int header)
    address), LEA (local frame address). */
 static int licm_eligible_kind(OpKind k)
 {
-    return k == IR_LD_IMM || k == IR_LD_SYM
-        || k == IR_LD_STR || k == IR_LEA;
+    /* LD_IMM (a true constant) is trivially rematerialisable — a 3-byte
+       immediate at each use. Hoisting it only makes the allocator spill it to
+       a slot and reload per iteration (the greedy allocator can't hold it in a
+       register across a body that clobbers HL/DE/BC), which is strictly worse.
+       Leave literals at the use site. LD_SYM (&global) STAYS eligible: hoisting
+       the invariant base is what lets IVSR strength-reduce `base + i` into a
+       register pointer walk (`inc bc`), a real win we must not forgo. */
+    return k == IR_LD_SYM || k == IR_LD_STR || k == IR_LEA;
 }
 
 /* Insert `src_op` into `dst_bb` just BEFORE its last op (the
@@ -881,8 +892,28 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     for (int t = 0; t < n_cand; t++)
         if (cand[t].iv == iv && cand[t].D > 0 && cand[t].K >= 0) { c = t; break; }
     if (c < 0) return 0;
-    int64_t N;
-    if (!ivsr_const_bound(f, cmp, lo, hi, &N)) return 0;
+    /* The exit bound. Two cases:
+       - a proven-nonnegative COMPILE-TIME CONSTANT: p_end = base + N*scale, a
+         single pre-header ADD (the original, cheapest path);
+       - a loop-invariant VARIABLE bound `n` (e.g. a signed int param, the
+         index_walk shape): the unsigned pointer compare `p < p_end` would turn
+         a 0-trip signed loop (`n <= 0`) into a huge wrapped one if p_end fell
+         below base. Guard it by clamping the bound to max(0,n) when building
+         p_end — branchless, no CFG surgery: p_end = base + max(0,n)*scale >=
+         base always (0-trip when n<=0, no wrap). IR_NO_LFTR_SIGNED opts out. */
+    int64_t N = 0;
+    int bound_v = -1;
+    if (!ivsr_const_bound(f, cmp, lo, hi, &N)) {
+        if (getenv("IR_NO_LFTR_SIGNED")) return 0;
+        int bv = cmp->src[1];
+        if (bv < 0 || bv >= f->n_vregs) return 0;   /* immediate handled above */
+        if (f->vregs[bv].width != 2) return 0;       /* int bound only */
+        if (f->vregs[bv].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+        int bni, bib, bii, bno, bob, boi;
+        ivsr_def_sites(f, bv, lo, hi, &bni, &bib, &bii, &bno, &bob, &boi);
+        if (bni != 0) return 0;                       /* must be loop-invariant */
+        bound_v = bv;
+    }
     /* iv used only by its step + this test, not live-out. */
     if (ivsr_uses_in_loop(f, iv, lo, hi) != 2) return 0;
     if (ivsr_used_outside(f, iv, lo, hi)) return 0;
@@ -890,22 +921,64 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     ivsr_def_sites(f, iv, lo, hi, &s_ni, &s_ib, &s_ii, &s_no, &s_ob, &s_oi);
     if (s_ni != 1 || s_no != 1 || s_ob != ph) return 0;
 
-    int64_t end_off = N * cand[c].scale;
+    int64_t scale = cand[c].scale;
     int base = cand[c].base, p = cand[c].p;
+    /* log2(scale) — scale is 1 or a power of two (from ivsr_iv_term). */
+    int sh = 0; { int64_t sc = scale; while (sc > 1) { sc >>= 1; sh++; } }
+
+    /* Create all vregs up front (ir_vreg_new may realloc f->vregs / f->bbs
+       op arrays — re-fetch the compare op by index afterwards). */
     int pend = ir_vreg_new(f, f->vregs[p].kind, NULL, 0);
     f->vregs[pend].width = f->vregs[p].width;
-    /* Rewrite the test (re-fetch by index — ir_vreg_new may realloc). */
+    int v_b = -1, v_m = -1, v_neff = -1, v_scaled = -1;
+    if (bound_v >= 0) {
+        v_b = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_b].width = 2;
+        v_m = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_m].width = 2;
+        v_neff = ir_vreg_new(f, KIND_INT, NULL, 0); f->vregs[v_neff].width = 2;
+        if (sh > 0) {
+            v_scaled = ir_vreg_new(f, KIND_INT, NULL, 0);
+            f->vregs[v_scaled].width = 2;
+        } else {
+            v_scaled = v_neff;
+        }
+    }
+
+    /* Rewrite the test to the unsigned pointer compare. */
     Op *c2 = &f->bbs[cmp_bb].ops[cmp_idx];
     c2->kind = IR_CMP_ULT;
     c2->src[0] = p; c2->src[1] = pend; c2->imm = 0;
     /* Kill the now-dead basic IV (step + init). */
     f->bbs[s_ib].ops[s_ii].kind = IR_NOP;
     f->bbs[s_ob].ops[s_oi].kind = IR_NOP;
-    /* p_end = base + N*scale in the pre-header. */
+
     Op o;
-    if (end_off == 0) { ivsr_init_op(&o, IR_MOV); o.dst = pend; o.src[0] = base; }
-    else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
-    licm_insert_before_terminator(&f->bbs[ph], &o);
+    if (bound_v < 0) {
+        /* p_end = base + N*scale (constant). */
+        int64_t end_off = N * scale;
+        if (end_off == 0) { ivsr_init_op(&o, IR_MOV); o.dst = pend; o.src[0] = base; }
+        else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+    } else {
+        /* neff = max(0, n), branchlessly and with only reliable ops (80cc has
+           no arithmetic >> — IR_SHR is logical, #289 — and a standalone
+           compare-to-value mis-lowers here):
+             sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
+             mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
+             neff = n & mask            (n if n>=0, 0 if n<0) */
+        ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+        ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+        ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+        if (sh > 0) {
+            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = v_neff; o.imm = sh;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+        }
+        /* p_end = base + neff*scale. */
+        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_scaled;
+        licm_insert_before_terminator(&f->bbs[ph], &o);
+    }
     return 1;
 }
 
@@ -1266,6 +1339,169 @@ int ir_opt_dce(Func *f)
         removed += pass_changed;
     } while (pass_changed);
     return removed;
+}
+
+/* ---- Induction-variable range narrowing (ir_opt_narrow_iv) ----------
+   A loop counter whose value range provably fits [0,256) is retyped to a
+   byte (width 1, KIND_CHAR): the step becomes a byte inc/dec and its slot is
+   one byte, while every int use auto-widens (load_to_hl zero-extends a
+   width-1 vreg). Sound because zero-extending a value proven in [0,256)
+   reproduces its exact int value. Two shapes, both off a single-latch
+   natural loop whose header holds the guard:
+     up:   c=c0 (0..255); header CMP_LT/ULT c,B (B<=255) or LE/ULE (B<=254);
+           exactly one INC c, no DEC.               range [c0, max] <= 255
+     down: c=c0 (0..255); header CMP_GT/GE/NE c,0(/1); exactly one DEC c, no
+           INC (dec runs after the guard, so c stays >= 0). range [0, c0]
+   IR_NO_IV_NARROW opts out. Retype only (no op insertion): the lowerer's
+   width-1 paths do the rest. */
+
+/* Classify every vreg's defs in one function-wide scan (mirrors the idx2
+   counter scan in ir_alloc.c). */
+typedef struct {
+    int n_ldimm, n_inc, n_dec, n_other, is_base;
+    int64_t initval;
+} IvClass;
+
+static int niv_classify(Func *f, IvClass *cl)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_VREG && o->mem.base >= 0
+                && o->mem.base < f->n_vregs)
+                cl[o->mem.base].is_base = 1;
+            if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                && o->src[0] < f->n_vregs)
+                cl[o->src[0]].is_base = 1;
+            int d = o->dst;
+            if (d < 0 || d >= f->n_vregs) continue;
+            if (o->kind == IR_LD_IMM)              { cl[d].n_ldimm++; cl[d].initval = o->imm; }
+            else if (o->kind == IR_INC && o->src[0] == d) cl[d].n_inc++;
+            else if (o->kind == IR_DEC && o->src[0] == d) cl[d].n_dec++;
+            else                                    cl[d].n_other++;
+        }
+    }
+    return 1;
+}
+
+/* Is `v` a clean counter (single const init in [0,255], only ±1 self-steps
+   in one direction, no other def, no aliasing) narrowable to a byte? */
+static int niv_counter_ok(Func *f, const IvClass *cl, int v, int *is_down)
+{
+    const VReg *vr = &f->vregs[v];
+    if (vr->width != 2 || !kind_is_integer((int)vr->kind)) return 0;
+    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    const IvClass *c = &cl[v];
+    if (c->is_base || c->n_other != 0 || c->n_ldimm != 1) return 0;
+    if (c->initval < 0 || c->initval > 255) return 0;
+    if (c->n_inc == 1 && c->n_dec == 0) { *is_down = 0; return 1; }
+    if (c->n_dec == 1 && c->n_inc == 0) { *is_down = 1; return 1; }
+    return 0;
+}
+
+/* Header-guard bound: find a CMP in header `h` that tests counter `c`
+   against a constant and bounds it. Returns 1 and sets *maxval (the largest
+   value c can hold) for the up-counter; for a down-counter it only checks
+   the exit test stops at >= 0 (range [0,c0], caller uses initval). */
+static int niv_up_bound_ok(Func *f, int h, int c, int64_t *maxval)
+{
+    BB *hb = &f->bbs[h];
+    for (int j = 0; j < hb->n_ops; j++) {
+        const Op *o = &hb->ops[j];
+        if (o->src[0] != c || o->src[1] != -1) continue;
+        /* c < B: max value c reaches is B; c <= B: max is B+1. */
+        if (o->kind == IR_CMP_LT || o->kind == IR_CMP_ULT) {
+            if (o->imm >= 0 && o->imm <= 255) { *maxval = o->imm; return 1; }
+        } else if (o->kind == IR_CMP_LE || o->kind == IR_CMP_ULE) {
+            if (o->imm >= 0 && o->imm <= 254) { *maxval = o->imm + 1; return 1; }
+        }
+    }
+    return 0;
+}
+
+static int niv_down_exit_ok(Func *f, int h, int c)
+{
+    BB *hb = &f->bbs[h];
+    for (int j = 0; j < hb->n_ops; j++) {
+        const Op *o = &hb->ops[j];
+        /* while (c) / while (c != 0) / while (c > 0): stops at 0, never neg. */
+        if (o->kind == IR_BR_ZERO && o->src[0] == c) return 1;
+        if (o->src[0] != c || o->src[1] != -1) continue;
+        if ((o->kind == IR_CMP_NE || o->kind == IR_CMP_GT
+             || o->kind == IR_CMP_UGT) && o->imm == 0) return 1;
+        if ((o->kind == IR_CMP_GE || o->kind == IR_CMP_UGE) && o->imm == 1) return 1;
+    }
+    return 0;
+}
+
+int ir_opt_narrow_iv(Func *f)
+{
+    if (!f || f->n_bbs <= 0 || getenv("IR_NO_IV_NARROW")) return 0;
+
+    IvClass *cl = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(IvClass));
+    if (!cl) return 0;
+    niv_classify(f, cl);
+
+    /* Reachability (unreachable back-edges aren't real loops). */
+    int *reach = calloc((size_t)f->n_bbs, sizeof(int));
+    int *stack = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!reach || !stack) { free(cl); free(reach); free(stack); return 0; }
+    int sp = 0; reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *cbb = &f->bbs[stack[--sp]];
+        int ns = ir_bb_n_succ(cbb);
+        for (int s = 0; s < ns; s++) {
+            int sid = ir_bb_succ_at(cbb, s);
+            if (sid >= 0 && sid < f->n_bbs && !reach[sid]) { reach[sid] = 1; stack[sp++] = sid; }
+        }
+    }
+    free(stack);
+
+    int narrowed = 0;
+    for (int h = 0; h < f->n_bbs; h++) {
+        if (!reach[h]) continue;
+        /* Single-latch natural loop (mirror ir_opt_ivsr's scan). */
+        int n_entry = 0, n_back = 0;
+        for (int b = 0; b < f->n_bbs; b++) {
+            BB *bb = &f->bbs[b];
+            int ns = ir_bb_n_succ(bb), targets_h = 0;
+            for (int s = 0; s < ns; s++)
+                if (ir_bb_succ_at(bb, s) == h) { targets_h = 1; break; }
+            if (!targets_h) continue;
+            if (b < h) n_entry++;
+            else if (b >= h && reach[b] && licm_reaches(f, h, b)) n_back++;
+        }
+        if (n_entry != 1 || n_back != 1) continue;
+
+        /* Look in the header for a counter-vs-constant guard. */
+        BB *hb = &f->bbs[h];
+        for (int j = 0; j < hb->n_ops; j++) {
+            const Op *o = &hb->ops[j];
+            int c = -1;
+            if ((o->kind >= IR_CMP_EQ && o->kind <= IR_CMP_UGE)
+                && o->src[0] >= 0 && o->src[1] == -1) c = o->src[0];
+            else if (o->kind == IR_BR_ZERO && o->src[0] >= 0) c = o->src[0];
+            if (c < 0 || c >= f->n_vregs) continue;
+            int is_down = 0;
+            if (!niv_counter_ok(f, cl, c, &is_down)) continue;
+            int ok = 0;
+            if (!is_down) {
+                int64_t maxv = 0;
+                ok = niv_up_bound_ok(f, h, c, &maxv) && maxv <= 255;
+            } else {
+                ok = niv_down_exit_ok(f, h, c) && cl[c].initval <= 255;
+            }
+            if (!ok) continue;
+            f->vregs[c].width = 1;
+            f->vregs[c].kind  = KIND_CHAR;
+            narrowed++;
+        }
+    }
+    free(reach);
+    free(cl);
+    return narrowed;
 }
 
 /* ---- Byte-width narrowing (ir_opt_narrow_byte) ----------------------
@@ -1737,6 +1973,34 @@ int ir_opt_const_fold(Func *f)
             }
             if (folded) { op->imm = (op->kind == IR_LD_IMM) ? op->imm : 0; changed++; }
 
+            /* Constant value into an indirect store: fold it into op->imm
+               (src[0]=-1) so the lowerer stores the immediate directly — no
+               value register, no A/E clobber, no DE-cache invalidation (word
+               leaves PR_DE free). Byte and word; require the element-width hint
+               to agree (the lowerer recovers the store width from mem.elem once
+               src[0] is gone — incl. after a &sym+const base folds this into a
+               MEM_SYM store). Byte folds everywhere, word is CPU-gated. Skip
+               volatile / __addressmod (special lowering). */
+            if (op->kind == IR_ST_MEM && op->mem.kind == IR_MEM_VREG
+                && s0 >= 0 && s0 < nv && known[s0]
+                && !op->mem.volatile_ && !op->mem.bank_fn) {
+                int sw = f->vregs[s0].width;
+                /* byte/word: any integer elem of that width (known[] tracks only
+                   integer LD_IMM, so a float const never reaches here). width 4:
+                   KIND_LONG ONLY — NOT KIND_CPTR (3 bytes in memory), nor
+                   KIND_DOUBLE (4-byte float in math32/mbf32, format-dependent
+                   bits, not an integer constant). */
+                int ok = (sw == 1 || sw == 2) ? (kind_scalar_width(op->mem.elem) == sw)
+                       : (sw == 4)            ? (op->mem.elem == KIND_LONG)
+                       : 0;
+                if (ok && ir_cpu_const_store_ok(sw)) {
+                    op->imm = val[s0] & (sw == 1 ? 0xffULL
+                                       : sw == 2 ? 0xffffULL : 0xffffffffULL);
+                    op->src[0] = -1;
+                    changed++;
+                }
+            }
+
             /* Update constant tracking for the (possibly rewritten) op. */
             if (op->kind == IR_POSTSTEP && s0 >= 0 && s0 < nv)
                 known[s0] = 0;          /* steps src[0] in place */
@@ -1747,6 +2011,13 @@ int ir_opt_const_fold(Func *f)
                 } else if (op->kind == IR_MOV && op->src[0] >= 0
                            && op->src[0] < nv && known[op->src[0]]) {
                     known[d] = 1; val[d] = val[op->src[0]];
+                } else if (op->kind == IR_CONV_TRUNC && op->src[0] >= 0
+                           && op->src[0] < nv && known[op->src[0]]) {
+                    /* Narrowing a known constant stays constant (masked to the
+                       dst width) — lets a `(unsigned char)K` store fold to an
+                       immediate (sieve's flags[k]=1). */
+                    known[d] = 1;
+                    val[d] = have_mask ? (val[op->src[0]] & mask) : val[op->src[0]];
                 } else {
                     known[d] = 0;
                 }
