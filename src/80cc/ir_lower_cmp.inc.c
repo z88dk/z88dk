@@ -534,6 +534,26 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
         commit_hl_word(out, f, op->dst);
         return 0;
     }
+    /* Byte == 0 / != 0 (e.g. `!flags[k]`): test the byte with `or a` (via
+       emit_test_zero's width-1 path) rather than widening to 16 bits and
+       doing `sbc hl,de`. Only the zero-const RHS shape reaches this. */
+    if (src0w == 1 && op->src[1] == -1 && op->imm == 0) {
+        int z_true_b = (op->kind == IR_CMP_EQ);
+        emit_test_zero(out, f, op->src[0]);
+        if (L.la.cur_branch_test_kind != 0) {
+            int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+            const char *cc = (z_true_b == br_true) ? "z" : "nz";
+            emit(out, "jp\t%s,L_f%d_bb_%d",
+                 cc, L.func_emit_idx, L.la.cur_branch_test_label);
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
+        emit(out, "ld\thl,0");
+        emit_skip(out, f, z_true_b ? "nz" : "z", 1);
+        emit(out, "inc\tl");
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
     /* Equality is sign-independent. Real-ALU CPUs: `or a; sbc hl,de` sets
        Z = equal. gbz80/808x: `sbc hl,de` is an emulated helper call, so XOR
        the halves instead (Z = equal, no helper, no DE load for const RHS). */

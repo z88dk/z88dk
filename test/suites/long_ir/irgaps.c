@@ -324,6 +324,30 @@ static void test_iv_narrow(void)
     Assert(iv_big()  == 2226, "iv NOT narrowed at >255 (no byte wrap)");
 }
 
+/* Byte logical-not / byte==0: `!c` and `!bytearr[i]` must test the byte with
+   `or a` (no 16-bit widen) and yield an exact int 0/1 — both as a value used
+   in arithmetic (the sieve `count -= !flags[k]` shape) and branch-fused in an
+   `if`. Runtime-written so nothing const-folds. */
+static unsigned char bn_flags[8];
+static int bn_not_sum(void)
+{
+    int i, n = 0;
+    for (i = 0; i < 8; i++) n += !bn_flags[i];   /* count the zero bytes */
+    return n;
+}
+static void test_byte_not(void)
+{
+    unsigned char c = 0; signed char s = 5; int r, i;
+    r = !c; Assert(r == 1, "!byte zero -> 1");
+    r = !s; Assert(r == 0, "!byte nonzero -> 0");
+    r = (c == 0); Assert(r == 1, "byte ==0 true");
+    for (i = 0; i < 8; i++) bn_flags[i] = (unsigned char)(i & 1);  /* 4 zeros */
+    Assert(bn_not_sum() == 4, "!bytearr[i] used in arithmetic (sieve shape)");
+    c = 3;
+    if (!c) Assert(0, "if(!byte) must not fire for nonzero");
+    else    Assert(1, "if(!byte) correctly skipped for nonzero");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -343,5 +367,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_or_long_zero);
     suite_add_test(test_const_store_fold);
     suite_add_test(test_iv_narrow);
+    suite_add_test(test_byte_not);
     return suite_run();
 }

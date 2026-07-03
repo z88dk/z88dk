@@ -3639,7 +3639,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
         int dst = new_temp_kind(b, KIND_INT);
-        if (b->f->vregs[v].width == 4) {
+        /* Width 4 (long/far-ptr, byte-wise XOR-OR chain) and width 1 (byte,
+           tested with `or a` — no 16-bit widen) both use the const-RHS EQ-0
+           fold; only the plain int case needs a materialised 0 vreg. */
+        if (b->f->vregs[v].width == 4 || b->f->vregs[v].width == 1) {
             Op *op = ir_op_emit(cur_bb(b), IR_CMP_EQ);
             op->dst = dst; op->src[0] = v; op->src[1] = -1; op->imm = 0;
             return dst;
