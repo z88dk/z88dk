@@ -2386,6 +2386,73 @@ static int try_word_accumulate(FILE *out, Func *f, const Op *op)
     return 1;                          /* handled */
 }
 
+/* Publish the DEHL cache after a byte-direct long op wrote its 4 result bytes.
+   When dst was dead the bytes went to BC (low) + E/D — no slot store — so claim
+   DEHL=dst but with DE INVALID: only the low half is register-backed here, and a
+   downstream load_to_dehl hit recovers HL itself. When dst was live the result
+   is in its slot, so flush the HL/BC caches. */
+static void publish_bytewise_long_dst(int dst, int dst_dead)
+{
+    if (dst_dead) {
+        hl_about_to_change(-1);
+        L.rs.de = -1;
+        L.rs.dehl = dst;
+    } else {
+        invalidate_hl_bc();
+    }
+}
+
+/* FP-mode byte-direct long op for a COMMUTATIVE ALU (ADD / AND / OR / XOR):
+   one src comes from the DEHL cache (BC=low, DE=high — or HL=low when the
+   producer advertised rs.hl), the other from (ix+d); walk the 4 bytes through
+   A. op0/opN are the byte-0 / remaining-byte mnemonics: "add"/"adc" for ADD
+   (the carry chain), or mnem/mnem for the logicals (no carry-in). ld a,/ld r,a
+   preserve flags so the ADD carry survives across bytes. Returns 1 if it
+   emitted the fastpath, 0 if the operands didn't fit (caller falls through). */
+static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
+                                       const char *op0, const char *opN)
+{
+    int from_dehl = -1, from_slot = -1;
+    if (dehl_has(op->src[0]) && !dehl_has(op->src[1])) {
+        from_dehl = op->src[0]; from_slot = op->src[1];
+    } else if (dehl_has(op->src[1]) && !dehl_has(op->src[0])) {
+        from_dehl = op->src[1]; from_slot = op->src[0];
+    } else if (!dehl_has(op->src[0]) && !dehl_has(op->src[1])) {
+        from_slot = op->src[1];
+    }
+    if (from_slot < 0) return 0;
+    int s1 = slot_ix_off(f, from_slot);
+    int s0 = (from_dehl < 0) ? slot_ix_off(f, op->src[0]) : 0;
+    int dd = L.la.cur_dst_dead ? 0 : slot_ix_off(f, op->dst);
+    int srcs_ok = fp_offset_fits(s1) && fp_offset_fits(s1 + 3)
+               && (from_dehl >= 0
+                   || (fp_offset_fits(s0) && fp_offset_fits(s0 + 3)));
+    int dst_ok = L.la.cur_dst_dead ? 1
+               : (fp_offset_fits(dd) && fp_offset_fits(dd + 3));
+    if (!(srcs_ok && dst_ok)) return 0;
+    /* Prefer H/L for the low half when HL is advertised as holding from_dehl
+       (the producer's cache_dehl_no_spill set rs.hl and skipped the `ld bc,hl`
+       stash via cur_dehl_dst_no_bc_stash). Fall back to B/C for mid-chain
+       consumers where rs.hl got reset by the previous byte-direct emit. */
+    int use_hl = (from_dehl >= 0 && L.rs.hl == from_dehl);
+    static const char *bc_byte[4] = { "c", "b", "e", "d" };
+    static const char *hl_byte[4] = { "l", "h", "e", "d" };
+    const char **sb = use_hl ? hl_byte : bc_byte;
+    for (int i = 0; i < 4; i++) {
+        if (from_dehl >= 0)
+            emit(out, "ld\ta,%s", sb[i]);
+        else
+            emit(out, "ld\ta,(%s%+d)", frame_reg(), s0 + i);
+        emit(out, "%s\ta,(%s%+d)", i == 0 ? op0 : opN, frame_reg(), s1 + i);
+        if (L.la.cur_dst_dead)
+            emit(out, "ld\t%s,a", bc_byte[i]);
+        else
+            emit(out, "ld\t(%s%+d),a", frame_reg(), dd + i);
+    }
+    publish_bytewise_long_dst(op->dst, L.la.cur_dst_dead);
+    return 1;
+}
+
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
     if (try_word_accumulate(out, f, op))
@@ -2542,87 +2609,14 @@ static int gen_add(FILE *out, Func *f, const Op *op)
             return 0;
         }
         }
-        /* FP-mode byte-direct long ADD. One src comes from the DEHL
-           cache (BC=low, DE=high), the other from (ix+d). add/adc
-           via A; ld a,(...) and ld <reg>,a preserve flags so the
-           carry chain survives across bytes. */
+        /* FP-mode byte-direct long ADD (commutative): one src from the DEHL
+           cache, the other from (ix+d); add/adc through A (ld a,/ld r,a
+           preserve flags so the carry chain survives across bytes). */
         if (fp_active(f)
             && op->src[0] >= 0 && op->src[1] >= 0
             && op->dst >= 0) {
-            int from_dehl = -1, from_slot = -1;
-            if (dehl_has(op->src[0]) && !dehl_has(op->src[1])) {
-                from_dehl = op->src[0]; from_slot = op->src[1];
-            } else if (dehl_has(op->src[1])
-                       && !dehl_has(op->src[0])) {
-                from_dehl = op->src[1]; from_slot = op->src[0];
-            } else if (!dehl_has(op->src[0])
-                       && !dehl_has(op->src[1])) {
-                from_slot = op->src[1];
-            }
-            if (from_slot >= 0) {
-                int s1 = slot_ix_off(f, from_slot);
-                int s0 = (from_dehl < 0)
-                       ? slot_ix_off(f, op->src[0]) : 0;
-                int dd = L.la.cur_dst_dead
-                       ? 0 : slot_ix_off(f, op->dst);
-                int srcs_ok = fp_offset_fits(s1)
-                           && fp_offset_fits(s1 + 3)
-                           && (from_dehl >= 0
-                               || (fp_offset_fits(s0)
-                                   && fp_offset_fits(s0 + 3)));
-                int dst_ok = L.la.cur_dst_dead
-                    ? 1
-                    : (fp_offset_fits(dd)
-                       && fp_offset_fits(dd + 3));
-                if (srcs_ok && dst_ok) {
-                    /* Prefer H/L for the low half when HL is
-                       advertised as holding from_dehl (the
-                       producer's cache_dehl_no_spill set
-                       rs.hl). The `ld bc,hl` stash in the
-                       producer is then dead and was skipped via
-                       cur_dehl_dst_no_bc_stash. Falls back to
-                       B/C for mid-chain consumers where
-                       rs.hl got reset by the previous
-                       byte-direct emit. */
-                    int use_hl = (from_dehl >= 0
-                                  && L.rs.hl == from_dehl);
-                    static const char *bc_byte[4] =
-                        { "c", "b", "e", "d" };
-                    static const char *hl_byte[4] =
-                        { "l", "h", "e", "d" };
-                    const char **sb = use_hl ? hl_byte : bc_byte;
-                    for (int i = 0; i < 4; i++) {
-                        if (from_dehl >= 0)
-                            emit(out, "ld\ta,%s", sb[i]);
-                        else
-                            emit(out, "ld\ta,(%s%+d)",
-                                 frame_reg(), s0 + i);
-                        emit(out, "%s\ta,(%s%+d)",
-                             i == 0 ? "add" : "adc",
-                             frame_reg(), s1 + i);
-                        if (L.la.cur_dst_dead)
-                            emit(out, "ld\t%s,a",
-                                 bc_byte[i]);
-                        else
-                            emit(out, "ld\t(%s%+d),a",
-                                 frame_reg(), dd + i);
-                    }
-                    if (L.la.cur_dst_dead) {
-                        /* Skip eager `ld hl,bc` — DEHL cache
-                           invariant is BC=low + DE=high + (HL may
-                           or may not have low). Downstream
-                           load_to_dehl on cache hit emits the
-                           recover itself; downstream byte-direct
-                           or byte-A ops never need HL. */
-                        hl_about_to_change(-1);
-                        L.rs.de = -1;
-                        L.rs.dehl = op->dst;
-                    } else {
-                        invalidate_hl_bc();
-                    }
-                    return 0;
-                }
-            }
+            if (try_fp_bytewise_commutative(out, f, op, "add", "adc"))
+                return 0;
         }
         /* Fused load+add: point HL at the RHS slot, do `add (hl)` /
            `adc (hl)` byte-wise with LHS bytes read from D/E (HIGH)
@@ -2951,15 +2945,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                             emit(out, "ld\t(%s%+d),a",
                                  frame_reg(), dd + i);
                     }
-                    if (L.la.cur_dst_dead) {
-                        /* See ADD fastpath comment on the cache
-                           state we leave behind. */
-                        hl_about_to_change(-1);
-                        L.rs.de = -1;
-                        L.rs.dehl = op->dst;
-                    } else {
-                        invalidate_hl_bc();
-                    }
+                    publish_bytewise_long_dst(op->dst, L.la.cur_dst_dead);
                     return 0;
                 }
             }
@@ -3433,70 +3419,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 || op->kind == IR_XOR)
             && op->src[0] >= 0 && op->src[1] >= 0
             && op->dst >= 0) {
-            /* Pick which src to source from DEHL cache (if any)
-               and which to walk via (ix+d). */
-            int from_dehl = -1, from_slot = -1;
-            if (dehl_has(op->src[0]) && !dehl_has(op->src[1])) {
-                from_dehl = op->src[0]; from_slot = op->src[1];
-            } else if (dehl_has(op->src[1])
-                       && !dehl_has(op->src[0])) {
-                from_dehl = op->src[1]; from_slot = op->src[0];
-            } else if (!dehl_has(op->src[0])
-                       && !dehl_has(op->src[1])) {
-                from_slot = op->src[1];  /* both in slot — pick
-                                             src[1] for ix walk;
-                                             src[0] also via ix */
-            }
-            if (from_slot >= 0) {
-                int s1 = slot_ix_off(f, from_slot);
-                int s0 = (from_dehl < 0)
-                       ? slot_ix_off(f, op->src[0]) : 0;
-                int dd = L.la.cur_dst_dead
-                       ? 0 : slot_ix_off(f, op->dst);
-                int srcs_ok = fp_offset_fits(s1)
-                           && fp_offset_fits(s1 + 3)
-                           && (from_dehl >= 0
-                               || (fp_offset_fits(s0)
-                                   && fp_offset_fits(s0 + 3)));
-                int dst_ok = L.la.cur_dst_dead
-                    ? 1
-                    : (fp_offset_fits(dd)
-                       && fp_offset_fits(dd + 3));
-                if (srcs_ok && dst_ok) {
-                    /* See ADD fastpath: prefer H/L for low half
-                       when rs.hl matches from_dehl. */
-                    int use_hl = (from_dehl >= 0
-                                  && L.rs.hl == from_dehl);
-                    static const char *bc_byte[4] =
-                        { "c", "b", "e", "d" };
-                    static const char *hl_byte[4] =
-                        { "l", "h", "e", "d" };
-                    const char **sb = use_hl ? hl_byte : bc_byte;
-                    for (int i = 0; i < 4; i++) {
-                        if (from_dehl >= 0)
-                            emit(out, "ld\ta,%s", sb[i]);
-                        else
-                            emit(out, "ld\ta,(%s%+d)",
-                                 frame_reg(), s0 + i);
-                        emit(out, "%s\ta,(%s%+d)",
-                             mnem, frame_reg(), s1 + i);
-                        if (L.la.cur_dst_dead)
-                            emit(out, "ld\t%s,a",
-                                 bc_byte[i]);
-                        else
-                            emit(out, "ld\t(%s%+d),a",
-                                 frame_reg(), dd + i);
-                    }
-                    if (L.la.cur_dst_dead) {
-                        hl_about_to_change(-1);
-                        L.rs.de = -1;
-                        L.rs.dehl = op->dst;
-                    } else {
-                        invalidate_hl_bc();
-                    }
-                    return 0;
-                }
-            }
+            if (try_fp_bytewise_commutative(out, f, op, mnem, mnem))
+                return 0;
         }
         /* Variable RHS. The cache-hit path (dehl_has(src[0]))
            can skip load_to_dehl's HL recovery if we stage the
