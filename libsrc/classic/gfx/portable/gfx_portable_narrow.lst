@@ -1,0 +1,15 @@
+@classic/gfx/common/gfx_common.lst
+classic/gfx/portable/obj/${TYPE}/__gfx_coords
+classic/gfx/portable/obj/${TYPE}/boxdraw
+classic/gfx/portable/obj/${TYPE}/circle
+classic/gfx/portable/obj/${TYPE}/circledraw
+classic/gfx/portable/obj/${TYPE}/commonbox
+classic/gfx/portable/obj/${TYPE}/commoncircle
+classic/gfx/portable/obj/${TYPE}/commondraw
+classic/gfx/portable/obj/${TYPE}/commondrawr
+classic/gfx/portable/obj/${TYPE}/commondrawto
+classic/gfx/portable/obj/${TYPE}/linedraw
+classic/gfx/portable/obj/${TYPE}/point
+classic/gfx/portable/obj/${TYPE}/setpos
+classic/gfx/portable/obj/${TYPE}/uncircle
+classic/gfx/portable/obj/${TYPE}/xorcircle
