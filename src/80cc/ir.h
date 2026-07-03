@@ -7,9 +7,6 @@
  * Data shape only — VReg, Op, BB, Func, plus the operation enum,
  * physical-register pool, and call-info / memory-operand descriptors.
  * No logic; constructors and basic dumpers live in ir.c.
- *
- * The legacy walker (ast_codegen2.c) remains the default codegen path;
- * the IR pipeline is gated behind a build flag.
  */
 
 #ifndef IR_H
@@ -257,7 +254,7 @@ typedef enum {
     IR_POP_DEHL_LONG,
 
     /* Call-argument push, emitted by ir_build immediately after the
-       arg's producer (walker-style push-at-producer). The value is
+       arg's producer (push-at-producer). The value is
        consumed at the very next op, so the dead-spill analysis gives
        arg temps PR_HL / PR_DEHL — no frame slot, no store. Width 2:
        `push hl`; width 4: `push de; push hl`. The matching IR_CALL

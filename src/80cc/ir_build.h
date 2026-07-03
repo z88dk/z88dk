@@ -1,12 +1,10 @@
 /*
  * ir_build.h — AST → IR translator.
  *
- * Entry point from declparse.c when --use-ir is set. Walks the
- * per-function AST into a Func* that ir_lower turns into z80 asm.
- * Behind a feature flag; the legacy walker (ast_codegen2.c) stays
- * the default until cutover.
+ * Entry point from declparse.c: walks the per-function AST into a Func*
+ * that ir_lower turns into z80 asm. The IR is the sole codegen path.
  *
- * Incomplete: unhandled C constructs abort with a diagnostic.
+ * Unhandled C constructs abort with a diagnostic.
  */
 
 #ifndef IR_BUILD_H

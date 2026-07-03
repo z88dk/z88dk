@@ -5,13 +5,11 @@ static void compute_home_region(const Func *f, int home,
     *out_lo = -1; *out_hi = -1;
     if (home < 0 || home >= f->n_vregs || f->n_bbs <= 0) return;
 
-    /* Examine each back-edge's loop span [header..latch] INDEPENDENTLY (not a
-       union — that would merge disjoint loops and pull in unrelated dirty
-       blocks). The latch's target is alias-resolved so a trampoline header
-       (`defc bb_h = bb_h'`) maps to the real header. Pick the WIDEST span
-       that is all-DE-clean with the home live-in at its header — spans that
-       over-reach into a dirty block (e.g. the return) fail validation and are
-       skipped. */
+    /* Examine each back-edge's loop span [header..latch] INDEPENDENTLY (a
+       union would merge disjoint loops and pull in unrelated dirty blocks).
+       The latch's target is alias-resolved so a trampoline header maps to the
+       real header. Pick the WIDEST all-DE-clean span with the home live-in at
+       its header; spans over-reaching into a dirty block fail validation. */
     int best_lo = -1, best_hi = -1, best_w = -1;
     for (int i = 0; i < f->n_bbs; i++) {
         const BB *bb = &f->bbs[i];
@@ -26,9 +24,8 @@ static void compute_home_region(const Func *f, int home,
             if (hi - lo <= best_w) continue;       /* not wider than best */
             if (!home_span_valid(f, home, lo, hi))
                 continue;
-            /* The slot is made coherent for a leaving edge by an entry-flush
-               at the edge's source BB — which captures the exit value only if
-               that BB does not redefine the home before the exit branch.
+            /* The leaving-edge entry-flush captures the exit value only if the
+               source BB doesn't redefine the home before the exit branch.
                Reject the span if any region-leaving-edge source writes it. */
             int exit_bad = 0;
             for (int b = lo; b <= hi && !exit_bad; b++) {
@@ -60,21 +57,18 @@ static void compute_home_region(const Func *f, int home,
    Caller can then emit a binary op on HL,DE.
 
    Four cases:
-   1. src[1] == -1: literal-fold — RHS is op->imm. Emit `ld de, K`
-      (no slot load, doesn't touch HL). Load src[0] to HL if needed.
-   2. cache hit on src[0]: use preserve-HL load for src[1]'s slot.
-   3. cache hit on src[1] (and not src[0]): swap into DE with `ex de,hl`
-      (1 instr) then frame-load src[0] into HL. Saves the 6-instruction
-      frame load that load_to_de would have done. Common case: a
-      previous binop's result (in HL via cache) becomes the RHS of the
-      next binop — e.g. `crc ^= shifted` where `shifted` was just
-      computed.
+   1. src[1] == -1: literal-fold — RHS is op->imm, emit `ld de,K`.
+   2. cache hit on src[0]: preserve-HL load for src[1]'s slot.
+   3. cache hit on src[1] (and not src[0]): swap into DE via `ex de,hl`
+      (1 instr) then frame-load src[0], saving load_to_de's 6-instr frame
+      load. Common case: a prior binop's result (HL-cached) is the next
+      binop's RHS (e.g. `crc ^= shifted`).
    4. default: load_to_de(src[1]) (clobbers HL), then load_to_hl(src[0]).
 */
 static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 {
     if (op->src[1] < 0) {
-        /* Literal RHS — emit directly. Doesn't touch HL. */
+        /* Literal RHS — doesn't touch HL. */
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
         emit(out, "ld\tde,%lld", (long long)op->imm);
         invalidate_de_cache();
@@ -96,9 +90,8 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
             load_to_hl(out, f, op->src[0]);
             return;
         }
-        /* Swap into DE. Cache: HL ↔ DE swap. After: DE has src[1], HL
-           has whatever DE held — invalidate HL since the caller wants
-           src[0] there. */
+        /* Swap into DE (HL↔DE). After: DE has src[1], HL has whatever DE
+           held — caller wants src[0] in HL, so reload it. */
         emit(out, "ex\tde,hl");
         swap_hl_de_caches();
         load_to_hl(out, f, op->src[0]);
@@ -122,11 +115,9 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
             load_to_hl(out, f, op->src[0]);
             return;
         }
-        /* DE has src[0] but we want it in HL. ex de,hl moves it; then
-           we need src[1] loaded into DE. After ex de,hl: HL has src[0]
-           (good), DE has whatever HL had (junk, but we're about to
-           overwrite). load_to_de uses HL as scratch — will clobber HL.
-           So we need to preserve HL via the push/pop variant. */
+        /* DE has src[0], want it in HL: ex de,hl moves it, then load src[1]
+           into DE. load_to_de uses HL as scratch, so use the HL-preserving
+           push/pop variant. */
         emit(out, "ex\tde,hl");
         swap_hl_de_caches();
         load_to_de_preserve_hl(out, f, op->src[1]);
@@ -145,12 +136,11 @@ static void cache_hl(int vreg)
     hl_about_to_change(vreg);
 }
 
-/* Sole choke point for an HL clobber/load: see the forward-decl comment
-   near the cache-helper forward declarations. When a width-2 spill is
-   pending in HL and HL is about to take a different tenant, resolve it
-   (flush if still live, discard if dead) BEFORE the physical clobber.
-   The `!= v_new` guard lets a def re-advertise its own dst (cache_hl) or
-   a carry re-assert the same vreg without spuriously flushing. */
+/* Sole choke point for an HL clobber/load. When a width-2 spill is pending
+   in HL and HL is about to take a different tenant, resolve it (flush if
+   live, discard if dead) BEFORE the physical clobber. The `!= v_new` guard
+   lets a def re-advertise its own dst, or a carry re-assert the same vreg,
+   without spuriously flushing. */
 static void hl_about_to_change(int v_new)
 {
     if (L.lazy_spill_on && L.pending_spill_v >= 0 && L.pending_spill_v != v_new)
@@ -199,11 +189,10 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v)
     cache_hl_slot_addr(f, v);
 }
 
-/* Spill a dirty slot-backed byte home (E/D) to its slot, leaving the
-   register itself unchanged (the value is now in BOTH the register and the
-   slot → clean). No-op for a clean home, a slotless home (C/B), or no
-   home. Clobbers HL in sp-mode (slot-address math). Called before any
-   DE-clobbering op and at every BB end so the slot is coherent. */
+/* Spill a dirty slot-backed byte home (E/D) to its slot, leaving the register
+   unchanged (value now in both → clean). No-op for a clean/slotless/absent
+   home. Clobbers HL in sp-mode. Called before any DE-clobbering op and at
+   every BB end so the slot is coherent. */
 static void byte_home_flush(FILE *out, const Func *f)
 {
     int v = L.cur_byte_home_vreg;
@@ -219,12 +208,10 @@ static void byte_home_flush(FILE *out, const Func *f)
             return;
         }
     }
-    /* sp-mode: the slot-address math clobbers HL. Resolve any pending HL
-       lazy-spill and drop the HL value cache first (the value in `r` is
-       unaffected — it's E/D, not HL). PRESERVE the A-cache: the flush emits
-       only `ld (hl),e` + address math (never touches A), and the dirty op
-       that triggered this flush may still consume its operand from A (a
-       cache_a'd temp). invalidate_hl_cache clears A, so save/restore it. */
+    /* sp-mode: slot-address math clobbers HL (not E/D, so `r` survives).
+       Resolve pending HL spill + drop HL value cache. PRESERVE the A-cache:
+       the flush never touches A, but the triggering dirty op may still read a
+       cache_a'd temp; invalidate_hl_cache clears A, so save/restore it. */
     pending_spill_resolve();
     invalidate_hl_keep_a();
     emit_byte_slot_addr(out, f, v);
@@ -234,13 +221,11 @@ static void byte_home_flush(FILE *out, const Func *f)
 
 
 /* Load the slot-backed home into its register (E/D) at a resident-loop
-   preheader exit so the header can assert residency: the preheader's own home
-   def may have been clobbered (e.g. an `end = base+len` `add hl,de` after the
-   init), leaving the home only in its (coherent) slot. Reads it back into the
-   register from that slot. Returns 1 on success (belief now holds the home),
-   0 if it could not be done without clobbering a live carry (then the caller
-   leaves residency unasserted — the loop falls back to per-iteration reload,
-   still correct). */
+   preheader exit so the header can assert residency: the preheader's home def
+   may have been clobbered (e.g. an `end = base+len` add hl,de after init),
+   leaving the home only in its coherent slot. Returns 1 on success, 0 if it
+   couldn't be done without clobbering a live carry (caller then leaves
+   residency unasserted → per-iteration reload, still correct). */
 static int rehome_byte_home(FILE *out, const Func *f)
 {
     int v = L.cur_func_ehome;
@@ -255,9 +240,8 @@ static int rehome_byte_home(FILE *out, const Func *f)
         emit(out, "ld\t%s,(%s%+d)", r, frame_reg(), off);  /* ld e,(ix+d) */
     } else {
         /* sp-mode needs HL for the slot address. Preserve HL with push/pop —
-           it may carry a value into the loop, and this runs once per loop
-           entry. The offset adds 2 for the push lowering sp; the pop restores
-           HL bit-for-bit, so every HL/pending-spill cache belief stays valid. */
+           it may carry a value into the loop. Offset adds 2 for the push
+           lowering sp; the pop restores HL exactly, so cache beliefs hold. */
         emit(out, "push\thl");
         emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust + 2);
         emit(out, "add\thl,sp");
@@ -285,9 +269,9 @@ static void word_home_flush(FILE *out, const Func *f)
             return;
         }
     }
-    /* sp-mode: the slot-address math clobbers HL (DE, the value, is untouched).
-       Preserve the A-cache (the triggering op may still read a cache_a'd byte
-       temp); invalidate_hl_cache clears A, so save/restore it. */
+    /* sp-mode: slot-address math clobbers HL (DE, the value, is untouched).
+       Preserve the A-cache — the triggering op may still read a cache_a'd
+       temp; invalidate_hl_cache clears A. */
     pending_spill_resolve();
     invalidate_hl_keep_a();
     emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
@@ -298,13 +282,12 @@ static void word_home_flush(FILE *out, const Func *f)
     L.cur_byte_home_dirty = 0;
 }
 
-/* Word DE-home region-exit flush — emitted ONCE at the entry of a dedicated
-   loop-exit block (a block reached ONLY from the resident region). Replaces the
-   per-iteration entry flush the region header would otherwise emit. Correct
-   without a reload: compute_home_region proves the home rides physical DE across
-   the whole region and no leaving-edge source redefines it before the branch, so
-   on every region-leaving edge DE = the final accumulator — and a dedicated exit
-   is reached only via those edges. fp-only (the word DE-home forms only in fp). */
+/* Word DE-home region-exit flush — emitted ONCE at a dedicated loop-exit
+   block (reached ONLY from the resident region), replacing the header's
+   per-iteration entry flush. Correct without a reload: compute_home_region
+   proves the home rides physical DE across the region and no leaving-edge
+   source redefines it before the branch, so DE = the final accumulator on
+   every region-leaving edge. fp-only (the word DE-home forms only in fp). */
 static void word_home_exit_flush(FILE *out, const Func *f)
 {
     int v = L.cur_func_whome;
@@ -371,10 +354,9 @@ static int home_rehome(FILE *out, const Func *f)
     return rehome_byte_home(out, f);
 }
 
-/* Sole choke point for the `ex de,hl` cache swap: HL and DE trade
-   tenants. The value leaving HL survives in DE, so this is distinct
-   from hl_about_to_change (a clobber). Callers emit the `ex de,hl`
-   themselves, then call this to keep the caches in sync. */
+/* Sole choke point for the `ex de,hl` cache swap: HL and DE trade tenants.
+   The value leaving HL survives in DE, so this is distinct from
+   hl_about_to_change (a clobber). Callers emit the `ex de,hl` themselves. */
 static void swap_hl_de_caches(void)
 {
     int tmp = L.rs.hl;
@@ -382,15 +364,11 @@ static void swap_hl_de_caches(void)
     L.rs.de = tmp;
 }
 
-/* Invalidate the HL cache. Use before/after any op that clobbers HL
-   in a way the cache can't reason about: calls, ret, branches, the
-   variable shift loop, indirect mem loads through HL, etc.
-
-   Also invalidates the DE cache by default — almost every HL-
-   invalidating emit also writes DE (long arith stages through DE,
-   literal-fold's `ld de,K`, calls clobber both). Specific sites
-   that *do* preserve DE (CMP fastpaths, etc.) save+restore
-   rs.de around this call. */
+/* Invalidate the HL cache. Use around any op that clobbers HL opaquely:
+   calls, ret, branches, the variable shift loop, indirect mem loads, etc.
+   Also invalidates DE by default — almost every HL-invalidating emit also
+   writes DE (long arith stages through DE, literal-fold's `ld de,K`, calls).
+   Sites that DO preserve DE save+restore rs.de around this call. */
 static void invalidate_hl_cache(void)
 {
     hl_about_to_change(-1);
@@ -421,10 +399,8 @@ static void invalidate_hl_keep_a(void) {
     L.rs.a = saved_a;
 }
 
-/* Apply an emit_c clobber mask by dispatching to the legacy invalidate_*
-   routines, faithfully: CLOB_HL alone == invalidate_hl_cache(), and
-   CLOB_HL|CLOB_BC == invalidate_hl_bc() (HL set first, then BC). The non-HL
-   bits are pure field clears (order-independent); only CLOB_HL can emit (its
+/* Apply an emit_c clobber mask via the invalidate_* routines. Non-HL bits
+   are pure field clears (order-independent); only CLOB_HL can emit (its
    pending-spill flush), and it runs first. */
 static void apply_clobbers(Clobber c)
 {
@@ -434,47 +410,17 @@ static void apply_clobbers(Clobber c)
     if (c & CLOB_BC) invalidate_bc_cache();
 }
 
-/* Dead-store elimination: set per-op by lower_func before calling
-   lower_op. When 1, the dst's value won't be re-read from its frame
-   slot (no live-out, no later in-BB use), so the spill can be skipped.
-   The cache_hl flag is still set so adjacent cache-served reads work,
-   though if dst really has no users that doesn't matter. */
-
-/* cur_dehl_dst_dead_safe forward-declared earlier (used by
-   store_dehl_finalize); the actual definition lives there. Documented
-   here near cur_dst_dead because it's the same family of lookahead
-   state set per-op by lower_func.
-
-   Stronger variant for width-4 dsts: cur_dst_dead is true AND the very
-   next op's emit pattern is known to load dst via load_to_dehl as its
-   first DEHL-touching step, with no prior load_to_dehl(other_vreg)
-   that would reset the DEHL cache before the dst hit. The long-binop
-   lowerer uses this to skip store_dehl entirely and just publish the
-   DEHL cache (DE=high, BC=low, cache_dehl(dst)) — saves ~11 inst per
-   dead-dst long result. */
-
-/* If the op being lowered has its dst consumed by an immediately-
-   following IR_BR_ZERO or IR_BR_COND in the same BB (and dst is
-   dead-after-branch), `cur_branch_test_kind` is set to the branch
-   op kind and `cur_branch_test_label` to its target. When the lowerer
-   fastpaths the combined op, it sets `cur_skip_next_op = 1` so the
-   dispatcher skips the now-consumed branch. */
-
-/* Current BB being lowered (the per-BB loop in lower_func sets this
-   before each op). Read by the AND-mask + shift-test peephole to
-   inspect successor BBs' first ops. */
+/* Current BB being lowered (set per-op by lower_func). Read by the AND-mask +
+   shift-test peephole to inspect successor BBs' first ops. */
 static const BB *cur_bb;
 
 /* ---- Lazy spill (store-on-clobber) helpers -------------------------
-   Dormant until the deferral step wires `pending_spill_v` at the
-   spill sites; `pending_spill_v` is -1 here, so flush/resolve never run
-   and codegen is unchanged. Defined here (not at the cache helpers)
-   because the flush needs store_hl, the de-cache invalidator, cur_bb
-   and the per-op liveness — all visible by this point. */
+   Defined here (not at the cache helpers) because the flush needs store_hl,
+   the de-cache invalidator, cur_bb and the per-op liveness. */
 
-/* Is the pending vreg still live entering the op currently being
-   lowered? Conservative default (assume live → flush) when liveness
-   context is unavailable, so an unknown state never drops a live store. */
+/* Is the pending vreg still live entering the op being lowered? Conservative
+   default (assume live → flush) when liveness context is unavailable, so an
+   unknown state never drops a live store. */
 static int pending_spill_live(void)
 {
     if (L.pending_spill_v < 0) return 0;
@@ -484,11 +430,10 @@ static int pending_spill_live(void)
     return ir_bitset_get(li, L.pending_spill_v);
 }
 
-/* Emit the deferred slot store. Precondition (I1): HL physically holds
-   pending_spill_v. After: slot written, HL is junk (store_hl clobbers
-   it), DE cache dropped, nothing pending. Clears `pending_spill_v`
-   before emitting so a re-entrant choke-point call can't double-flush
-   (store_hl itself emits no cache-mutating calls). */
+/* Emit the deferred slot store. Precondition: HL holds pending_spill_v.
+   After: slot written, HL junk, DE cache dropped, nothing pending. Clears
+   pending_spill_v before emitting so a re-entrant choke-point call can't
+   double-flush. */
 static void pending_spill_flush(void)
 {
     if (L.pending_spill_v < 0) return;
@@ -511,51 +456,13 @@ static void pending_spill_resolve(void)
         L.pending_spill_v = -1;
 }
 
-/* Skip-and-cache list for the AND 0x8000 + BR + SHL-in-both-succs
-   fastpath. When the fastpath fires, both succs' leading IR_SHL ops
-   would re-shift a value the fused `add hl,hl` already produced.
-   Record their (bb_id, op_idx) here; the per-op loop checks before
-   emitting and elides the SHL while advertising rs.hl to the
-   SHL's dst vreg. Per-function; small cap (the unrolled CRC loop has
-   2 entries per iter × 8 = 16 max). */
+/* Skip-and-cache list for the AND 0x8000 + BR + SHL-in-both-succs fastpath.
+   Both succs' leading IR_SHL ops would re-shift a value the fused `add hl,hl`
+   already produced. Record their (bb_id, op_idx); the per-op loop elides the
+   SHL and advertises rs.hl to its dst. Small cap (unrolled CRC loop: 2/iter ×
+   8 = 16 max). */
 #define SHL_SKIP_CAP 32
 static struct { int bb_id, op_idx, cache_vreg, is_byte; } shl_skip[SHL_SKIP_CAP];
-
-/* When set before IR_SHL imm=N is lowered, the int-SHL fastpath drops
-   the first `add hl,hl` emit (HL already holds the shifted value
-   produced by a fused fastpath such as the shift+test peephole).
-   The spill / cache_hl tail still runs so the dst's slot and HL
-   cache are correctly published. Cleared by the SHL lowerer. */
-/* Byte analog: the BYTE shift+test fuse (`sla e` did `home<<=1` AND the
-   bit-7 test in the test BB) — the leading per-arm SHL is already done.
-   gen_shl's byte path then emits nothing for an in-place home SHL, or just
-   `ld a,<home>` to republish the shifted value for a fresh-temp SHL. */
-
-/* Per-op lookahead: when the producer's dst is consumed by an
-   FP-mode byte-direct binop next (the consumer reads bytes via
-   the (ix+d) chain from H/L/E/D rather than from B/C/E/D), the
-   producer's `ld bc,hl` stash in cache_dehl_no_spill is wasted —
-   the chain doesn't read BC. Set by lower_func's lookahead; read
-   by cache_dehl_no_spill to skip the stash. The chain itself
-   checks `rs.hl == from_dehl` to know when to read from
-   H/L instead of C/B. */
-
-/* Caller-side one-shot: when set before a load_to_dehl call, the
-   load's FP-mode `ld bc,hl` stash is skipped. The caller must not
-   read BC between this load and the next BC stamp. Cleared by
-   load_to_dehl_adj after use. */
-
-/* Long data-stack: the z80 stack doubles as an operand stack with DEHL
-   as the implicit top register. When a long's live range crosses
-   DEHL-clobbering ops, ir_opt inserts IR_PUSH_DEHL_LONG /
-   IR_POP_DEHL_LONG markers and the lowerer emits the `push de; push
-   hl` / `pop hl; pop de` pairs. cur_sp_adjust tracks outstanding push
-   depth (each long push = +4) so sp-relative slot reads compensate;
-   reset at each BB boundary (stack must rebalance per BB).
-
-   Stack-consuming helpers (sccz80's `l_long_or` / `l_long_add` family)
-   pop their RHS without a separate IR_POP_DEHL_LONG. gen_hcall reads
-   the flag on HelperInfo and decrements cur_sp_adjust on emit. */
 
 /* True iff v lives in the spare index register (the idx2 loop-invariant
    resident). f->idx2_reg is IR_PR_IX / IR_PR_IY / IR_PR_NONE. */
@@ -607,32 +514,26 @@ static void commit_a_byte(FILE *out, const Func *f, int v)
 }
 
 /* ---- Static lazy spill — reaching-reloads dead-store elimination -------
-   Behind IR_LAZY_SPILL. Pass 1 (record) lowers eagerly and
-   observes, per op, the deferrable-vreg slot accesses the lowerer makes —
-   ground truth, since deferral changes only stores, never which loads
-   cache-hit. A backward slot-liveness dataflow then marks a spill store
-   DEAD iff no reload of its slot is reachable before the next store. Pass
-   2 (elide) skips the dead stores; the value rides to its readers in HL
-   via the existing bb_hl_out carry. Keys on the lowerer's OWN behaviour,
-   not an IR-level deadness guess, so it survives the fused-add-hl-hl
-   artifact.
+   Behind IR_LAZY_SPILL. Pass 1 lowers eagerly and records, per op, the
+   deferrable-vreg slot accesses the lowerer makes — ground truth, since
+   deferral changes only stores, never which loads cache-hit. A backward
+   slot-liveness dataflow marks a spill store DEAD iff no reload of its slot
+   is reachable before the next store. Pass 2 elides dead stores; the value
+   rides to its readers in HL via bb_hl_out. Keys on the lowerer's OWN
+   behaviour, not an IR-level deadness guess, so it survives the fused-add-
+   hl-hl artifact.
 
-   SOUND-BY-CONSTRUCTION reload model: the per-op reload (GEN) set is
-   computed in ss_compute_dead as
+   SOUND-BY-CONSTRUCTION reload (GEN) set, computed in ss_compute_dead:
 
        { deferrable v in uses(op) : v NOT proven cache-served } ∪ explicit
 
-   i.e. EVERY deferrable source vreg is assumed reloaded from its slot
-   UNLESS pass 1 recorded a genuine register-cache hit for it (ss_op_cacheread,
-   set only at the loaders' cache-hit returns). So a MISSED hook can only
-   leave a store un-elided (lost optimization) — never elide a live store
-   (miscompile). Discipline is therefore INVERTED between the two arrays:
-     - cacheread MUST be precise (only at true cache hits) — over-recording
-       it is the unsafe direction (would hide a real reload);
-     - reload/store hooks may be incomplete — they are a belt-and-suspenders
-       backstop (e.g. the rare cache-hit-then-slot-reload of the same vreg
-       within one op), not the safety mechanism.
-   uses(op) comes from the IR (ir_op_uses), which is reliable. */
+   EVERY deferrable source is assumed reloaded UNLESS pass 1 recorded a
+   genuine cache hit (ss_op_cacheread). So a missed hook only leaves a store
+   un-elided (lost opt) — never elides a live store. Discipline is INVERTED:
+     - cacheread MUST be precise (over-recording would hide a real reload);
+     - reload/store hooks may be incomplete — a belt-and-suspenders backstop,
+       not the safety mechanism.
+   uses(op) comes from the reliable ir_op_uses. */
 
 /* A width-2 local with a real slot whose spill store may be elided
    (I4 exclusions: never ADDR_TAKEN / VOLATILE / PARAM / register-pool). */
@@ -663,10 +564,10 @@ static void ss_note_store(const Func *f, int v)
     if (L.ss_phase != 1 || L.ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
     L.ss_op_store[L.ss_cur_g] = v;
 }
-/* Pass-1 hook at a GENUINE register-cache hit (the loaders' early returns
-   that serve v from HL/DE/BC/A with no slot read). MUST be precise — this
-   is the proof that a use is NOT a reload, so a false positive would hide
-   a real reload. Under-recording only forgoes optimisation. */
+/* Pass-1 hook at a GENUINE cache hit (loader early returns serving v from
+   HL/DE/BC/A with no slot read). MUST be precise — this proves a use is NOT a
+   reload, so a false positive would hide a real reload. Under-recording only
+   forgoes optimisation. */
 static void ss_note_cache_read(const Func *f, int v)
 {
     if (L.ss_phase != 1 || L.ss_cur_g < 0 || !vreg_slot_deferrable(f, v)) return;
@@ -684,11 +585,10 @@ static int ss_store_dead_here(void)
         && L.ss_store_dead[L.ss_cur_g];
 }
 
-/* Set the GEN (reload) bits for op (b,j) into `work`. The sound-by-
-   construction set: every deferrable source vreg of the op is a reload
-   UNLESS pass 1 proved it register-served (in op_cacheread), plus the
-   explicit slot reloads as a backstop. Conservative: an unrecorded
-   cache-hit just leaves the vreg in GEN (store kept). */
+/* Set the GEN (reload) bits for op (b,j) into `work`: every deferrable source
+   is a reload UNLESS pass 1 proved it cache-served (op_cacheread), plus the
+   explicit slot reloads. An unrecorded cache-hit just leaves the vreg in GEN
+   (store kept). */
 static void ss_gen_op(Func *f, int b, int j, int g, int nv,
                       const int *op_reload, const int *op_cacheread,
                       char *work)
@@ -708,13 +608,11 @@ static void ss_gen_op(Func *f, int b, int j, int g, int nv,
     }
 }
 
-/* Backward slot-liveness over the CFG. Returns a [total_ops] verdict
-   array: dead[g]==1 iff the spill store recorded at op g writes a slot
-   that no reload reads before the next store overwrites it — so the
-   store is dead and the value reaches its readers in HL. Standard
-   backward dataflow: per op, the store KILLs its vreg and the GEN set
-   (see ss_gen_op) re-adds reloaded vregs; a store is dead iff its vreg is
-   not slot-live immediately after. Caller owns the result (free). */
+/* Backward slot-liveness over the CFG. Returns a [total_ops] array:
+   dead[g]==1 iff the spill store at op g writes a slot no reload reads before
+   the next store — so the store is dead and the value reaches readers in HL.
+   Per op the store KILLs its vreg and the GEN set (ss_gen_op) re-adds
+   reloaded vregs; dead iff not slot-live immediately after. Caller frees. */
 static signed char *ss_compute_dead(Func *f, const int *op_base,
                                     int total_ops, const int *op_store,
                                     const int *op_reload,
@@ -740,9 +638,9 @@ static signed char *ss_compute_dead(Func *f, const int *op_base,
         for (int b = f->n_bbs - 1; b >= 0; b--) {
             BB *bb = &f->bbs[b];
             memset(work, 0, (size_t)nv);
-            /* All successors, incl. IR_SWITCH's targets + default — NOT the
-               raw succ[0..1] pair (which omits them, so a value read only on
-               the default arm looks slot-dead and its store gets elided). */
+            /* All successors incl. IR_SWITCH targets + default — NOT the raw
+               succ[0..1] pair (omitting them would make a default-arm-only
+               read look slot-dead and elide its store). */
             int ns = ir_bb_n_succ(bb);
             for (int s = 0; s < ns; s++) {
                 int sb = ir_bb_succ_at(bb, s);
@@ -800,17 +698,15 @@ static int vreg_is_pr_dehl(const Func *f, int v)
         && f->vreg_to_phys[v] == IR_PR_DEHL;
 }
 
-/* Skip store_hl + trailing `ex de,hl` (the swap-back after spill) when
-   dst is dead. Used by the binop / LD_IMM pattern
-   `<compute leaves value in HL>; store_hl; ex de,hl; cache_hl` — on
-   dead-dst we emit nothing and HL already holds the value. Also fires
-   for vregs in a register pool: nothing to spill. */
+/* Skip store_hl + trailing swap-back `ex de,hl` when dst is dead. Used by the
+   binop/LD_IMM pattern `<value in HL>; store_hl; ex de,hl; cache_hl` — on
+   dead-dst emit nothing (HL already holds the value). Also fires for
+   register-pool vregs: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
     if (L.la.cur_dst_dead) return;
-    /* Pooled vreg: value lives in a phys reg, no slot. PR_HL is the
-       caller's responsibility (cache_hl(dst) tops it up). PR_BC needs
-       an HL→BC copy so subsequent loads hit the BC short-circuit;
+    /* Pooled vreg: no slot. PR_HL is the caller's job (cache_hl tops it up).
+       PR_BC needs an HL→BC copy so later loads hit the BC short-circuit;
        nothing in the no-call envelope clobbers BC. */
     if (vreg_in_register_pool(f, vreg)) {
         if (f->vreg_to_phys[vreg] == IR_PR_BC) {
@@ -821,17 +717,14 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
     }
     ss_note_store(f, vreg);
     if (ss_store_dead_here()) {
-        /* Dead spill (no reload reaches it before the next store): skip
-           the store AND the swap-back — HL already holds the value, the
-           caller's cache_hl(dst) keeps it advertised, and it reaches its
-           readers via the HL carry. */
+        /* Dead spill: skip store AND swap-back — HL holds the value, caller's
+           cache_hl(dst) advertises it, reaches readers via the HL carry. */
         return;
     }
-    /* Word DE-home resident (fp): store HL straight to the slot with NO
-       `ex de,hl` staging — preserves DE (the running sum) so an int deref's
-       live-result spill is DE-clean, keeping the home resident across the
-       body. HL keeps the value (caller's cache_hl advertises it). sp-mode
-       needs HL for the slot address, so it falls through to store_hl. */
+    /* Word DE-home resident (fp): store HL straight to slot with NO `ex de,hl`
+       staging — preserves DE (the running sum) so the spill is DE-clean and
+       the home stays resident across the body. sp-mode needs HL for the slot
+       address, so it falls through to store_hl. */
     if (L.cur_home_is_word && byte_home_holds(L.cur_func_whome) && fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
@@ -840,10 +733,9 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
         }
     }
     store_hl(out, f, vreg);
-    /* store_hl leaves DE=value, HL=dead slot address; recover HL=value.
-       Only gbz80 emulates `ex de,hl` (808x has native XCHG) — there a
-       one-way DE->HL copy is equivalent (old HL is dead) and far cheaper
-       (2 ops vs push/pop x4). */
+    /* store_hl leaves DE=value, HL=dead slot address; recover HL=value. Only
+       gbz80 emulates `ex de,hl` — there a one-way DE->HL copy is equivalent
+       (old HL dead) and far cheaper (2 ops vs push/pop x4). */
     if (!IS_GBZ80()) {
         emit(out, "ex\tde,hl");
     } else {
@@ -878,11 +770,10 @@ static void commit_hl_result(FILE *out, const Func *f, int v)
     else                     commit_hl_word(out, f, v);
 }
 
-/* DE-staged spill: value is already in DE, write it to vreg's frame
-   slot and leave HL holding the value (via ex de,hl). Used by the
-   IR_LD_IMM `ld de,K` fastpath: skips the initial `ex de,hl` in
-   store_hl by staging the value directly in DE up front, saving 1
-   byte / 4 T-states vs `ld hl,K + store_hl + ex de,hl`. */
+/* DE-staged spill: value is already in DE — write it to vreg's slot and leave
+   HL holding it (via ex de,hl). Used by the IR_LD_IMM `ld de,K` fastpath:
+   staging in DE up front skips store_hl's initial `ex de,hl`, saving 1B/4T vs
+   `ld hl,K + store_hl + ex de,hl`. */
 static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 {
     if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
@@ -899,9 +790,9 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         return;
     }
     int off = slot_off(f, vreg) + L.cur_sp_adjust;
-    /* Deepest slot at TOS: discard the old word (inc sp x2) and push the
-       value straight from DE, then ex de,hl to honour the contract (HL =
-       value). 4 ops vs the 6-op byte walk, and no address compute. */
+    /* Deepest slot at TOS: discard the old word (inc sp x2), push from DE,
+       then ex de,hl for the HL=value contract. 4 ops vs the 6-op byte walk,
+       no address compute. */
     if (fp_tos_slot(f, vreg)
         || (off == 0 && !fp_active(f) && tos_pushpop_ok(f))) {
         emit(out, "inc\tsp");
@@ -935,9 +826,8 @@ static void emit_skip(FILE *out, const Func *f, const char *cc, int skip_bytes)
         emit(out, "jp\t%s,ASMPC+%d", cc, 3 + skip_bytes);
 }
 
-/* Materialise carry flag to HL = 0 or 1. `polarity_nc` chooses whether
-   HL=1 means carry-clear (true) or carry-set (true). After this, HL is
-   the boolean result. */
+/* Materialise carry flag to HL = 0 or 1. hl_one_when_carry chooses whether
+   HL=1 means carry-set or carry-clear. */
 static void carry_to_bool(FILE *out, const Func *f, int hl_one_when_carry)
 {
     emit(out, "ld\thl,0");
@@ -945,13 +835,10 @@ static void carry_to_bool(FILE *out, const Func *f, int hl_one_when_carry)
     emit(out, "inc\tl");
 }
 
-/* After `sbc hl,de` for a signed compare: HL holds (src0-src1) and
-   bit 7 of H plus the V flag together encode the signed-ordered result.
-   This helper rotates the *correct* sign bit into the carry flag so
-   carry_to_bool() can materialise 0/1.
-   Pattern: PO (no overflow) → sign bit of H is correct.
-            PE (overflow) → sign bit of H is inverted; XOR 0x80.
-   Then RLA moves bit 7 into CF. */
+/* After `sbc hl,de` for a signed compare: bit 7 of H plus the V flag encode
+   the signed-ordered result. Rotate the correct sign bit into CF for
+   carry_to_bool. PO (no overflow) → sign of H is correct; PE (overflow) →
+   inverted, so XOR 0x80. Then RLA moves bit 7 into CF. */
 static void signed_result_to_carry(FILE *out)
 {
     int n = L.cmp_label_counter++;
@@ -963,11 +850,10 @@ static void signed_result_to_carry(FILE *out)
     /* CF=1 means src0-src1 < 0 (signed) → src0 < src1. */
 }
 
-/* gbz80/808x have no usable overflow flag, so the S^V correction can't
-   run. For a signed compare, flip both operands' sign bits first: the
-   unsigned borrow of (a^0x8000) vs (b^0x8000) then equals signed a<b.
-   Emits before the `sbc hl,de`; returns 1 when it flipped (so the caller
-   skips signed_result_to_carry). Clobbers A and D → invalidate DE. */
+/* gbz80/808x lack a usable overflow flag, so the S^V correction can't run.
+   Flip both operands' sign bits first: the unsigned borrow of (a^0x8000) vs
+   (b^0x8000) equals signed a<b. Emits before `sbc hl,de`; returns 1 when it
+   flipped (caller skips signed_result_to_carry). Clobbers A and D. */
 static int signed_cmp_signflip(FILE *out, const Func *f, int is_signed)
 {
     if (!is_signed || (!(IS_808x() || IS_GBZ80()))) return 0;
@@ -976,12 +862,4 @@ static int signed_cmp_signflip(FILE *out, const Func *f, int is_signed)
     invalidate_de_cache();
     return 1;
 }
-
-/* ---- Per-op gen_* emitters (called from lower_op's dispatch) -----
-   Each function corresponds to one IR opcode (or a small fused
-   family — IR_AND/OR/XOR share gen_and_or_xor, the comparison
-   shapes share their own emitter). They take the same args as
-   lower_op (FILE*, Func*, const Op*) and return the same rc.
-   Splitting these out keeps lower_op's dispatch readable; the
-   bodies are unchanged from the previous inline switch. */
 
