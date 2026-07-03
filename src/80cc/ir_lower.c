@@ -1848,6 +1848,16 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
     /* Lazy-spill I1: a deferred spill rides in HL until flushed. */
     else if (pending_spill_v >= 0 && rs.hl != pending_spill_v)
         bad = "pending_spill_v set but rs.hl doesn't hold it (I1 violated)";
+    /* Rejected (empirically false-positive on correct code, kept as a record):
+       - `cur_sp_adjust == 0`: sp is legitimately nonzero across ops beyond the
+         inline-push mechanisms (832 hits).
+       - `cur_byte_home_dirty ⇒ vreg>=0`: dirty can harmlessly persist with no
+         vreg (a no-op flush; 8 hits).
+       - residency ("register-homed live vreg must be in some rs cache"): the
+         emission cache legitimately diverges from the allocator's homing
+         mid-BB (400 hits); the register-lost class (8085 DSUB) is already
+         caught by the allocator's read-time "no live register and no stack
+         slot" abort. */
     if (bad) {
         fprintf(stderr, "ir_lower_verify: f%d bb%d op%d: %s\n",
                 func_emit_idx, bb_id, op_idx, bad);
