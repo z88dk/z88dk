@@ -86,9 +86,11 @@ int cpp_close(FILE *fp)
     int status = PCLOSE(fp);
     /* On POSIX pclose returns the wait(2)-style status; normalise. */
 #ifndef _WIN32
+#ifndef __MINT__
     if (status == -1)        return -1;
     if (WIFEXITED(status))   return WEXITSTATUS(status);
     if (WIFSIGNALED(status)) return 128 + WTERMSIG(status);
+#endif
 #endif
     return status;
 }
