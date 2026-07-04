@@ -447,6 +447,26 @@ static void test_byte_cmp(void)
     Assert(r == 3, "byte==const summed over array");
 }
 
+/* A width-1 loop counter read across basic blocks (the `i < n` test and the
+   `i == t` compare live in different BBs) with BC free — the byte-home pick
+   would have parked it in slotless PR_C, but the lowerer's byte read paths are
+   BB-local, so a cross-BB read fell to a nonexistent slot and aborted. The
+   pick now confines slotless PR_C to single-BB bytes; a cross-BB byte gets the
+   slot-backed PR_E home instead. */
+static int cbc_count(unsigned char n, unsigned char t)
+{
+    unsigned char i;
+    int c = 0;
+    for (i = 0; i < n; i++) { if (i == t) c++; else c--; }
+    return c;
+}
+static void test_xbb_byte_counter(void)
+{
+    Assert(cbc_count(5, 2) == -3, "cross-BB byte counter (5,2)");
+    Assert(cbc_count(8, 0) == -6, "cross-BB byte counter (8,0)");
+    Assert(cbc_count(0, 0) == 0,  "cross-BB byte counter zero-trip");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -471,5 +491,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_uninit_accum);
     suite_add_test(test_short_circuit);
     suite_add_test(test_byte_cmp);
+    suite_add_test(test_xbb_byte_counter);
     return suite_run();
 }

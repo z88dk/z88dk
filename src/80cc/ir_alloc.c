@@ -832,9 +832,17 @@ void ir_alloc(Func *f)
             size_t nvr = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
             int *first_def  = calloc(nvr, sizeof(int));
             int *first_read = calloc(nvr, sizeof(int));
-            if (!has_call && first_def && first_read) {
+            /* only_bb[v]: the single BB v is defined/read in, -1 once it spans
+               more than one, -2 = unseen. A slotless PR_C home is sound only
+               when v is confined to one BB — the lowerer's byte read paths are
+               BB-local, so a cross-BB read of a slotless byte falls to a
+               nonexistent slot (abort or stale read). Cross-BB (loop-carried)
+               bytes are routed to slot-backed PR_E instead. */
+            int *only_bb    = calloc(nvr, sizeof(int));
+            if (!has_call && first_def && first_read && only_bb) {
                 for (int v = 0; v < f->n_vregs; v++) {
                     first_def[v] = INT_MAX; first_read[v] = INT_MAX;
+                    only_bb[v] = -2;
                 }
                 int g = 0;
                 for (int i = 0; i < f->n_bbs; i++) {
@@ -844,16 +852,22 @@ void ir_alloc(Func *f)
                         int u[16];
                         int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
                         for (int k = 0; k < nu; k++)
-                            if (u[k] >= 0 && u[k] < f->n_vregs
-                                && g < first_read[u[k]])
-                                first_read[u[k]] = g;
-                        if (o->dst >= 0 && o->dst < f->n_vregs
-                            && g < first_def[o->dst])
-                            first_def[o->dst] = g;
+                            if (u[k] >= 0 && u[k] < f->n_vregs) {
+                                if (g < first_read[u[k]]) first_read[u[k]] = g;
+                                if (only_bb[u[k]] == -2) only_bb[u[k]] = i;
+                                else if (only_bb[u[k]] != i) only_bb[u[k]] = -1;
+                            }
+                        if (o->dst >= 0 && o->dst < f->n_vregs) {
+                            if (g < first_def[o->dst]) first_def[o->dst] = g;
+                            if (only_bb[o->dst] == -2) only_bb[o->dst] = i;
+                            else if (only_bb[o->dst] != i) only_bb[o->dst] = -1;
+                        }
                         if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                            && o->src[0] < f->n_vregs
-                            && g < first_def[o->src[0]])
-                            first_def[o->src[0]] = g;
+                            && o->src[0] < f->n_vregs) {
+                            if (g < first_def[o->src[0]]) first_def[o->src[0]] = g;
+                            if (only_bb[o->src[0]] == -2) only_bb[o->src[0]] = i;
+                            else if (only_bb[o->src[0]] != i) only_bb[o->src[0]] = -1;
+                        }
                     }
                 }
                 int best = -1;
@@ -880,16 +894,22 @@ void ir_alloc(Func *f)
                     if (first_def[v] >= first_read[v]) continue;  /* def-first */
                     if (best < 0 || use_count[v] > use_count[best]) best = v;
                 }
-                /* C-home (slotless TRUE residency) when BC is free; else
-                   E-home (low half of DE, slot-backed lazy-spill — Plan B
-                   Phase 2) where DE-scratch ops clobber it across the loop
-                   test, so it carries a backing slot and the lowerer spills
-                   E→slot before any DE-clobbering op. */
-                if (best >= 0)
-                    f->vreg_to_phys[best] = bc_taken ? IR_PR_E : IR_PR_C;
+                /* C-home (slotless TRUE residency) only when BC is free AND
+                   the byte is confined to a single BB — slotless PR_C has no
+                   slot to fall back to, and the lowerer's byte read paths are
+                   BB-local, so a cross-BB read reads garbage. Otherwise take
+                   the E-home (low half of DE, slot-backed lazy-spill): a
+                   DE-clobber or cross-BB read reloads from its backing slot,
+                   which the lowerer keeps coherent at BB boundaries. */
+                if (best >= 0) {
+                    int single_bb = only_bb[best] >= 0;
+                    f->vreg_to_phys[best] =
+                        (bc_taken || !single_bb) ? IR_PR_E : IR_PR_C;
+                }
             }
             free(first_def);
             free(first_read);
+            free(only_bb);
         }
         /* Word (int) accumulator residency (DE-home) — word analog of the
            byte E-home above, INDEPENDENT of c_byte_resident. Keep a hot
