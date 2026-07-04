@@ -388,6 +388,45 @@ static void test_uninit_accum(void)
     Assert(uninit_loop(5) == 10, "read-before-def loop accum compiles (no abort)");
 }
 
+/* Short-circuit control-context lowering (build_cond): compound &&/||/! in
+   if/while conditions must branch correctly AND must not evaluate a
+   short-circuited operand's side effects. */
+static int sc_calls;
+static int sc_bump(int r) { sc_calls++; return r; }
+static unsigned char sc_buf[8];
+static int sc_run(void)              /* RLE-shape compound loop condition */
+{
+    int i = 0, n = 0;
+    while (i < 8 && sc_buf[i] == sc_buf[0] && n < 100) { n++; i++; }
+    return n;
+}
+static void test_short_circuit(void)
+{
+    int a, taken, k;
+
+    sc_calls = 0; taken = 0;
+    a = 0;
+    if (a && sc_bump(1)) taken = 1;
+    Assert(taken == 0 && sc_calls == 0, "&& short-circuits: false LHS skips RHS");
+
+    sc_calls = 0; taken = 0;
+    if (1 || sc_bump(1)) taken = 1;
+    Assert(taken == 1 && sc_calls == 0, "|| short-circuits: true LHS skips RHS");
+
+    sc_calls = 0; taken = 0;
+    if (1 && sc_bump(1)) taken = 1;
+    Assert(taken == 1 && sc_calls == 1, "&& evaluates RHS when LHS true");
+
+    Assert((1 && (0 || 1)) == 1, "|| nested in && (value-leaf fallback)");
+    a = 5;
+    Assert((!(a > 3)) == 0, "! of a true compare");
+    Assert((!a) == 0 && (!0) == 1, "! of a value");
+
+    for (k = 0; k < 8; k++) sc_buf[k] = 5;
+    sc_buf[3] = 9;                   /* run of 5s stops at index 3 */
+    Assert(sc_run() == 3, "compound && loop condition (RLE shape)");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -410,5 +449,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_byte_not);
     suite_add_test(test_nested_residency);
     suite_add_test(test_uninit_accum);
+    suite_add_test(test_short_circuit);
     return suite_run();
 }

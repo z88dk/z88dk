@@ -390,10 +390,14 @@ Op *ir_emit_unop(BB *bb, OpKind kind, int dst, int src)
 }
 
 /* Fill the first free succ slot. Lets a BB ending `BR_ZERO X; BR Y`
-   register both targets. A third succ is silently dropped — never
-   happens for well-formed IR (max two succs per BB). */
+   register both targets. Deduplicates: a short-circuit condition emits
+   several `BR_ZERO <same false target>` before the final `BR <true target>`
+   (build_cond), which must register as the two distinct successors, not fill
+   both slots with the false target. A third distinct succ is silently dropped
+   — never happens for well-formed IR (max two succs per BB). */
 static void bb_add_succ(BB *bb, int target)
 {
+    if (bb->succ[0] == target || bb->succ[1] == target) return;
     if (bb->succ[0] < 0)      bb->succ[0] = target;
     else if (bb->succ[1] < 0) bb->succ[1] = target;
 }
