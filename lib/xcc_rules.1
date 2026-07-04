@@ -1,0 +1,11 @@
+%title Rename xcc __divsint call to xcc-specific alias (avoid stack-based sdcc symbol clash)
+	call	__divsint
+=
+	EXTERN	__xcc_divsint
+	call	__xcc_divsint
+
+%title Rename xcc __divuint call to xcc-specific alias
+	call	__divuint
+=
+	EXTERN	__xcc_divuint
+	call	__xcc_divuint
