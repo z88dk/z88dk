@@ -348,6 +348,27 @@ static void test_byte_not(void)
     else    Assert(1, "if(!byte) correctly skipped for nonzero");
 }
 
+/* Nested-loop residency: with loop-depth-weighted register-tenant selection,
+   the INNER-loop reduction accumulator wins the scarce register over an
+   outer-loop value. It must stay value-exact across the back-edge (the sieve
+   `count += flags[k]` shape). Runtime-written so nothing const-folds. */
+static unsigned char nr_flags[16];
+static int nested_accum(void)
+{
+    int i, count = 0;
+    for (i = 0; i < 4; i++) {
+        int k;
+        for (k = 0; k < 16; k++)
+            count += nr_flags[k];      /* inner accumulator (depth-2 hot) */
+    }
+    return count;
+}
+static void test_nested_residency(void)
+{
+    int i; for (i = 0; i < 16; i++) nr_flags[i] = (unsigned char)(i & 1); /* 8 ones */
+    Assert(nested_accum() == 32, "nested inner accumulator resident + exact");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -368,5 +389,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_const_store_fold);
     suite_add_test(test_iv_narrow);
     suite_add_test(test_byte_not);
+    suite_add_test(test_nested_residency);
     return suite_run();
 }

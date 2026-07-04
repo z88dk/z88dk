@@ -435,14 +435,21 @@ void ir_alloc(Func *f)
         int *bb_loop_hi  = calloc((size_t)f->n_bbs, sizeof(int));
         int *bb_first_op = calloc((size_t)f->n_bbs, sizeof(int));
         int *bb_last_op  = calloc((size_t)f->n_bbs, sizeof(int));
+        /* Loop-nesting depth per BB: how many back-edge loop bodies contain
+           it. Weights hot-use counting so a use in a deeper loop (which runs
+           per-inner × per-outer iterations) outranks one in an outer loop —
+           picks the innermost accumulator/counter for the scarce register
+           pairs. */
+        int *bb_loop_depth = calloc((size_t)f->n_bbs, sizeof(int));
         if (!write_count || !use_count || !first_use || !last_use
             || !bb_in_loop || !def_kind || !bb_loop_lo || !bb_loop_hi
-            || !bb_first_op || !bb_last_op) {
+            || !bb_first_op || !bb_last_op || !bb_loop_depth) {
             free(write_count); free(use_count);
             free(first_use); free(last_use);
             free(bb_in_loop); free(def_kind);
             free(bb_loop_lo); free(bb_loop_hi);
             free(bb_first_op); free(bb_last_op);
+            free(bb_loop_depth);
             return;
         }
         for (int v = 0; v < f->n_vregs; v++) {
@@ -469,6 +476,7 @@ void ir_alloc(Func *f)
                 if (hi >= f->n_bbs) hi = f->n_bbs - 1;
                 for (int k = lo; k <= hi; k++) {
                     bb_in_loop[k] = 1;
+                    bb_loop_depth[k]++;   /* one more enclosing loop body */
                     if (lo < bb_loop_lo[k]) bb_loop_lo[k] = lo;
                     if (hi > bb_loop_hi[k]) bb_loop_hi[k] = hi;
                 }
@@ -484,14 +492,22 @@ void ir_alloc(Func *f)
                 bb_last_op[i]  = g - 1;
             }
         }
+        /* Weight hot uses by loop-nesting depth (~4× per level): a use in a
+           doubly-nested inner loop runs inner×outer iterations, so it must
+           outrank an outer-loop use for the scarce DE/BC/idx2 homes — else the
+           allocator can leave the hot inner accumulator spilled while a colder
+           outer value sits in a register (sieve: count spilled, i_sq in DE).
+           depth 0 → 1, depth 1 → 4 (identical to the old flat in-loop×4, so
+           functions with no nesting deeper than one loop stay byte-identical);
+           depth n → 4^n, capped. IR_NO_DEPTH_WEIGHT restores the flat weight. */
+        int depth_flat = getenv("IR_NO_DEPTH_WEIGHT") != NULL;
         int global = 0;
         for (int i = 0; i < f->n_bbs; i++) {
             BB *bb = &f->bbs[i];
-            /* Hot uses (inside a loop body) count as 4 to clear the
-               break-even threshold on single-static-use-in-loop
-               patterns. The exact factor doesn't matter much — 1 use
-               × N iterations dominates any static-use coldness. */
-            int weight = bb_in_loop[i] ? 4 : 1;
+            int depth = bb_loop_depth[i];
+            if (depth_flat && depth > 1) depth = 1;
+            int weight = 1;
+            for (int dw = 0; dw < depth && dw < 8; dw++) weight *= 4;
             /* In-loop uses/defs must hold BC across every iteration,
                so their interval is the whole loop body; straight-line
                ops use the per-op `global` index. */
@@ -986,6 +1002,7 @@ void ir_alloc(Func *f)
         free(bb_loop_hi);
         free(bb_first_op);
         free(bb_last_op);
+        free(bb_loop_depth);
     }
 
     /* PR_DEHL pool: long (width=4) vregs whose slot write is dead —
