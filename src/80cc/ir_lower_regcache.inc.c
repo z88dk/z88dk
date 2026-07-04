@@ -354,17 +354,19 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
     /* FP-relative direct-to-DE: 6 bytes (synthetic `ld de,(ix+d)`) but
        preserves HL — worth the 1-byte difference vs the byte-walk form
        (which clobbers HL and invalidates downstream cache hits).
-       Only when the vreg has a spill slot — a register-only vreg has
-       vreg_spill_slot == -1, and slot_ix_off would synthesise a bogus
-       below-frame offset (`ld de,(ix-9)`). Also skip when the value is
-       live in HL: the ex de,hl path below is cheaper and HL-preservation
-       is then moot. */
+       Gate on an ix-addressable frame location: slot_off >= 0 covers both a
+       real local slot AND a PARAM_IN_PLACE param (at param_caller_off, above
+       IX) — a register-only vreg has slot_off == -1 and slot_ix_off would
+       synthesise a bogus below-frame offset. Also skip when the value is live
+       in HL: the ex de,hl path below is cheaper. */
     if (fp_active(f) && f->vregs[vreg_id].width == 2
         && L.rs.hl != vreg_id
-        && f->vreg_spill_slot && f->vreg_spill_slot[vreg_id] >= 0) {
+        && slot_off(f, vreg_id) >= 0) {
         /* Deepest slot at TOS: pop de;push de beats synthetic ld de,(ix+d)
-           and likewise preserves HL. By-coincidence only. */
-        if (fp_tos_slot(f, vreg_id)) {
+           and likewise preserves HL. Real local slots only (params sit above
+           IX, never at TOS). */
+        if (f->vreg_spill_slot && f->vreg_spill_slot[vreg_id] >= 0
+            && fp_tos_slot(f, vreg_id)) {
             ss_note_reload(f, vreg_id);
             emit(out, "pop\tde");
             emit(out, "push\tde");
