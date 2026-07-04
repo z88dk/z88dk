@@ -1,4 +1,14 @@
 /* ir_lower_cmp.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
+
+/* CPUs whose assembler accepts index-half register access (ld a,iyl / ld a,iyh
+   etc.): plain z80, z80n, ez80. NOT z180 (undoc index-half opcodes trap), NOT
+   kc160 (z80asm rejects `iyl`/`iyh` as illegal identifiers), Rabbit (no index
+   halves), 808x/gbz80 (no index registers). */
+static int cpu_has_index_halves(void)
+{
+    return c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80();
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
     int is_signed = (op->kind == IR_CMP_LT || op->kind == IR_CMP_GE);
@@ -212,6 +222,43 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         L.rs.a = -1;                         /* A clobbered; HL=n, DE=home kept */
         L.la.cur_skip_next_op = 1;
         return 0;
+    }
+    /* Signed byte-wise compare, LHS in an index register (idx2-resident
+       counter), RHS in ix-addressable memory (a slot or PARAM_IN_PLACE param),
+       branch-fused. Reads the index halves through A —
+       `ld a,iyl; sub (ix+d); ld a,iyh; sbc a,(ix+d+1)` + the S^V correction —
+       A-only, so HL/DE/BC and the index reg all survive, replacing the
+       `push iy; pop hl; sbc hl,de` materialize-then-subtract (the queen `safe`
+       `i < col` shape). z80/z80n/ez80/kc160 only (index halves) + fp mode. */
+    if (is_signed && !long_signflip && L.la.cur_branch_test_kind != 0
+        && fp_active(f) && cpu_has_index_halves()
+        && op->src[0] >= 0 && op->src[1] >= 0
+        && f->vregs[op->src[0]].width == 2 && f->vregs[op->src[1]].width == 2
+        && vreg_in_idx2(f, op->src[0])
+        && f->vreg_to_phys && f->vreg_to_phys[op->src[1]] == IR_PR_SPILL
+        && slot_off(f, op->src[1]) >= 0
+        && !hl_has(op->src[1]) && !de_has(op->src[1]) && !bc_has(op->src[1])) {
+        int ix = slot_ix_off(f, op->src[1]);
+        if (fp_offset_fits(ix) && fp_offset_fits(ix + 1)) {
+            const char *il = (f->idx2_reg == IR_PR_IX) ? "ixl" : "iyl";
+            const char *ih = (f->idx2_reg == IR_PR_IX) ? "ixh" : "iyh";
+            emit(out, "ld\ta,%s", il);
+            emit(out, "sub\t(%s%+d)", frame_reg(), ix);
+            emit(out, "ld\ta,%s", ih);
+            emit(out, "sbc\ta,(%s%+d)", frame_reg(), ix + 1);
+            int lbl = L.cmp_label_counter++;
+            emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+            emit(out, "xor\t0x80");
+            fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+            emit(out, "rla");                    /* CF = signed (src0 < src1) */
+            int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+            int want_carry = (cf_true_long == br_true);
+            emit(out, "jp\t%s,L_f%d_bb_%d", want_carry ? "c" : "nc",
+                 L.func_emit_idx, L.la.cur_branch_test_label);
+            L.rs.a = -1;                 /* A clobbered; HL/DE/BC/idx untouched */
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
     }
     load_binop_operands(out, f, op);   /* HL=src0, DE=src1 */
     /* 8085 DSUB + jp k/nk: fuse the compare into the branch. `sub hl,bc`
