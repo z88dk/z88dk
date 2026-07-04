@@ -1,4 +1,47 @@
 /* ir_lower_analysis.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
+
+/* Max BB id in the natural loop of back-edge latch->header: the header plus
+   every block that can reach the latch without passing through the header
+   (backward reachability over preds). Returns latch's id if any body block is
+   numbered below the header (that block would sit outside a [header..hi] span
+   — reject by not widening, leaving the caller's conservative latch-id hi).
+   Used to widen a residency span past a diamond arm numbered above the latch. */
+static int natural_loop_max_id(const Func *f, int header, int latch,
+                               const int *bb_alias)
+{
+    int n = f->n_bbs;
+    if (n <= 0 || header < 0 || latch < 0) return latch;
+    char *body = calloc((size_t)n, 1);
+    int *stk = malloc((size_t)n * sizeof(int));
+    if (!body || !stk) { free(body); free(stk); return latch; }
+    int sp = 0;
+    body[header] = 1;
+    if (latch != header) { body[latch] = 1; stk[sp++] = latch; }
+    while (sp > 0) {
+        int x = stk[--sp];
+        for (int p = 0; p < n; p++) {              /* preds of x */
+            if (body[p]) continue;
+            const BB *pb = &f->bbs[p];
+            int pns = ir_bb_n_succ(pb), is_pred = 0;
+            for (int s = 0; s < pns; s++) {
+                int sid = ir_bb_succ_at(pb, s);
+                if (sid < 0 || sid >= n) continue;
+                if (bb_alias && bb_alias[sid] >= 0) sid = bb_alias[sid];
+                if (sid == x) { is_pred = 1; break; }
+            }
+            if (is_pred) { body[p] = 1; stk[sp++] = p; }
+        }
+    }
+    int hi = latch, bad = 0;
+    for (int b = 0; b < n; b++) {
+        if (!body[b]) continue;
+        if (b < header) { bad = 1; break; }        /* body below header — bail */
+        if (b > hi) hi = b;
+    }
+    free(body); free(stk);
+    return bad ? latch : hi;
+}
+
 static void compute_home_region(const Func *f, int home,
                                 const int *bb_alias, int *out_lo, int *out_hi)
 {
@@ -21,6 +64,15 @@ static void compute_home_region(const Func *f, int home,
             if (sid > i) continue;                 /* forward edge */
             int lo = sid, hi = i;
             if (lo < 0 || hi >= f->n_bbs || lo > hi) continue;
+            /* Extend hi to cover the whole natural-loop body: a diamond's
+               else-arm (or any body block) can be numbered ABOVE the latch
+               (merge/latch id < arm id), so the contiguous [sid..latch] span
+               would exclude it and residency would break at the merge. Widen
+               to the max id of blocks that reach the latch without passing the
+               header; home_span_valid then vets every block in [lo,hi] (incl.
+               any non-loop interloper, which must be DE-clean too). */
+            int nat_hi = natural_loop_max_id(f, lo, i, bb_alias);
+            if (nat_hi > hi) hi = nat_hi;
             if (hi - lo <= best_w) continue;       /* not wider than best */
             if (!home_span_valid(f, home, lo, hi))
                 continue;
@@ -296,6 +348,34 @@ static void word_home_exit_flush(FILE *out, const Func *f)
     if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return;
     emit(out, "ld\t(%s%+d),e", frame_reg(), off);
     emit(out, "ld\t(%s%+d),d", frame_reg(), off + 1);
+}
+
+/* Byte E/D-home region-exit flush — emitted ONCE at a dedicated loop-exit
+   block (reached ONLY from the resident region), replacing the header's
+   per-iteration entry flush. The region proof keeps the home in its register
+   across every leaving edge (no leaving-edge redef before the branch), so the
+   register = the final value here. Runs at the exit block's entry, where the
+   pending spill is already cleared and the cache-carry has not yet applied. */
+static void byte_home_exit_flush(FILE *out, const Func *f)
+{
+    int v = L.cur_func_ehome;
+    if (v < 0) return;
+    PhysReg pr = byte_home_phys(f, v);
+    if (!byte_home_slotbacked(pr)) return;
+    const char *r = byte_home_reg(pr);
+    if (fp_active(f)) {
+        int off = slot_ix_off(f, v);
+        if (!fp_offset_fits(off)) return;
+        emit(out, "ld\t(%s%+d),%s", frame_reg(), off, r);
+        return;
+    }
+    /* sp-mode: address the slot via HL (the byte reg E/D is untouched by the
+       HL math). Free to clobber HL here — the cache-carry below re-establishes
+       it. */
+    emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
+    emit(out, "add\thl,sp");
+    emit(out, "ld\t(hl),%s", r);
+    invalidate_hl_cache();
 }
 
 /* Reload the word DE-home into DE from its (coherent) slot, preserving HL —

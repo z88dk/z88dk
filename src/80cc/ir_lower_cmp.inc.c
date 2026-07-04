@@ -7,6 +7,32 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
        the operands instead. (808x lacks the overflow flag but has jp po, which
        works for these compares, so it stays on the jp-po path.) */
     int long_signflip = is_signed && IS_GBZ80();
+    /* Signed X REL 0 (branch-fused): the result is X's sign bit alone — no
+       subtraction needed. Load X's top byte and `add a,a` → CF = top bit =
+       (X < 0). Replaces the 16-bit sbc + S^V correction (and, for a byte
+       promoted via CONV_SX, the whole sign-extend-then-compare) with a 2-instr
+       sign test. Chiefly `signed char b < 0` / `>= 0`. Any width. */
+    if (is_signed && op->src[0] >= 0 && op->src[1] == -1 && op->imm == 0
+        && L.la.cur_branch_test_kind != 0) {
+        int w = f->vregs[op->src[0]].width;
+        if (w == 1) {
+            load_byte_to_a(out, f, op->src[0]);
+        } else if (w == 4) {
+            load_to_dehl(out, f, op->src[0]);
+            emit(out, "ld\ta,d");
+        } else {
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,h");
+        }
+        emit(out, "add\ta,a");            /* CF = top bit = (X < 0) */
+        int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+        int want_carry = (cf_true_long == br_true);
+        emit(out, "jp\t%s,L_f%d_bb_%d",
+             want_carry ? "c" : "nc", L.func_emit_idx, L.la.cur_branch_test_label);
+        L.rs.a = -1;                      /* A clobbered; HL/DE/BC untouched */
+        L.la.cur_skip_next_op = 1;
+        return 0;
+    }
     /* Byte compare vs small const: a width-1 operand loads zero-extended, so
        the widen+16-bit compare is really UNSIGNED [0,255] vs [0,255] — identical
        to a single `cp K`. Emit that directly for the branch-fused `c REL K`

@@ -1362,6 +1362,16 @@ static int op_de_clean(const Func *f, const Op *o)
     case IR_CMP_ULT: case IR_CMP_UGE:
         /* byte-wise loop test: A-only, DE-clean — BC-vs-slot or slot-vs-slot */
         return cmp_bytewise_ok(f, o) || cmp_bytewise_mem_ok(f, o);
+    case IR_CMP_LT: case IR_CMP_GE:
+        /* Signed X REL 0 sign-bit test (gen_cmp_lt_ge fastpath): branch-fused,
+           loads the top byte + `add a,a` — A/HL only for width<=2, so DE (the
+           byte home) survives. width4 uses load_to_dehl (DE scratch) → dirty. */
+        if (o->src[1] == -1 && o->imm == 0 && L.la.cur_branch_test_kind != 0) {
+            int sw = (o->src[0] >= 0 && o->src[0] < f->n_vregs)
+                   ? f->vregs[o->src[0]].width : 4;
+            return sw <= 2;
+        }
+        return 0;
     default:
         return 0;                     /* assume DE-clobbering */
     }
@@ -1394,6 +1404,18 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
             && word_dehome_signed_test_shape_ok(f, o))
             return 1;
     }
+    /* Signed `X REL 0` sign-bit test (CMP_LT/GE vs imm 0 + its branch): the
+       fastpath emits `<load top byte>; add a,a; jp` — A/HL only for width<=2,
+       so DE survives. Matches the branch-fused shape structurally. */
+    if ((o->kind == IR_CMP_LT || o->kind == IR_CMP_GE)
+        && o->src[1] == -1 && o->imm == 0 && j + 1 < bb->n_ops) {
+        const Op *nxt = &bb->ops[j + 1];
+        int sw = (o->src[0] >= 0 && o->src[0] < f->n_vregs)
+               ? f->vregs[o->src[0]].width : 4;
+        if (sw <= 2 && (nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
+            && nxt->src[0] == o->dst)
+            return 1;
+    }
     if ((o->kind == IR_BR_ZERO || o->kind == IR_BR_COND) && j > 0) {
         const Op *prv = &bb->ops[j - 1];
         if ((prv->kind == IR_CMP_ULT || prv->kind == IR_CMP_UGE)
@@ -1404,6 +1426,14 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
             && prv->dst == o->src[0]
             && word_dehome_signed_test_shape_ok(f, prv))
             return 1;
+        /* Branch consumed by a fused signed `X REL 0` sign-test (see above):
+           the compare emitted the jp and this branch renders nothing. */
+        if ((prv->kind == IR_CMP_LT || prv->kind == IR_CMP_GE)
+            && prv->src[1] == -1 && prv->imm == 0 && prv->dst == o->src[0]) {
+            int sw = (prv->src[0] >= 0 && prv->src[0] < f->n_vregs)
+                   ? f->vregs[prv->src[0]].width : 4;
+            if (sw <= 2) return 1;
+        }
     }
     return op_de_clean(f, o);
 }

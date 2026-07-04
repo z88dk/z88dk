@@ -1844,14 +1844,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     if (L.cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
         compute_home_region(f, L.cur_func_ehome, bb_alias,
                             &L.cur_home_region_lo, &L.cur_home_region_hi);
-    /* Word DE-home exit-flush hoist: if the region leaves to exactly ONE target
-       block reached ONLY from the region, flush the home once at that block's
-       entry instead of every iteration at the header. DE = the final
-       accumulator there by the region proof (no leaving-edge redef). Gated on
-       fp + a slot reachable by an ix-relative store. IR_NO_WH_EXIT_HOIST opts
-       out. Byte-home path untouched. */
+    /* Home exit-flush hoist: if the region leaves to exactly ONE target block
+       reached ONLY from the region, flush the home once at that block's entry
+       instead of every iteration at the header. The home register = the final
+       value there by the region proof (no leaving-edge redef). Applies to both
+       the word DE-home (fp, flush E+D via ix) and the byte E/D-home (fp via ix
+       or sp via HL, flush the one byte). IR_NO_WH_EXIT_HOIST opts out. */
     L.cur_home_exit_flush_bb = -1;
-    if (L.cur_home_is_word && L.cur_func_whome >= 0 && fp_active(f)
+    if (L.cur_func_ehome >= 0
         && L.cur_home_region_lo >= 0 && !getenv("IR_NO_WH_EXIT_HOIST")) {
         int tgt = -1, ok = 1;
         for (int b = L.cur_home_region_lo; b <= L.cur_home_region_hi && ok; b++) {
@@ -1885,9 +1885,19 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     }
                 }
             }
-            /* the slot must be reachable by the ix-relative store the flush uses */
-            int off = slot_ix_off(f, L.cur_func_whome);
-            if (all_in && fp_offset_fits(off) && fp_offset_fits(off + 1))
+            /* fp: the flush store is ix-relative, so its offset(s) must fit
+               (word home writes 2 bytes: off and off+1; byte home just off).
+               sp: the flush addresses via HL, which reaches any slot — but the
+               word DE-home's exit flush is fp-only, so gate sp to byte homes. */
+            int slot_ok;
+            if (fp_active(f)) {
+                int off = slot_ix_off(f, L.cur_func_ehome);
+                slot_ok = fp_offset_fits(off)
+                    && (!L.cur_home_is_word || fp_offset_fits(off + 1));
+            } else {
+                slot_ok = !L.cur_home_is_word;
+            }
+            if (all_in && slot_ok)
                 L.cur_home_exit_flush_bb = tgt;
         }
     }
@@ -1982,9 +1992,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            the slot ONCE here, then drop the belief. The per-iter header flush is
            suppressed below. Emitted before the cache-carry logic so no ex de,hl
            can clobber DE first (pending spill already cleared). */
-        if (L.cur_home_is_word && L.cur_home_exit_flush_bb >= 0
+        if (L.cur_home_exit_flush_bb >= 0
             && bb->id == L.cur_home_exit_flush_bb) {
-            word_home_exit_flush(out, f);
+            if (L.cur_home_is_word) word_home_exit_flush(out, f);
+            else                    byte_home_exit_flush(out, f);
             L.cur_byte_home_dirty = 0;
             L.cur_byte_home_vreg = -1;
         }
@@ -2066,15 +2077,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            keeps the home in E. Assert residency when every already-lowered
            pred (the preheader entries) carries it — the unlowered back-edge
            preds are covered by the proof. */
-        /* For the word DE-home, assert at ANY in-region BB whose belief was
-           dropped by an unlowered back-edge pred (a diamond/multi-latch body
-           is itself a back-edge target, not just the header). The region proof
-           covers the whole span, so trusting the unlowered preds is sound
-           wherever a lowered pred carries the home. Byte-home stays header-only. */
+        /* Assert at ANY in-region BB whose belief was dropped by an unlowered
+           back-edge pred (a diamond/multi-latch body is itself a back-edge
+           target, not just the header — e.g. an if/else-in-loop byte
+           accumulator whose merge block is lowered before its higher-id else
+           arm). The region proof covers the whole span, so trusting the
+           unlowered preds is sound wherever a lowered pred carries the home.
+           Applies to both the word DE-home and the byte E/D-home. */
         if (L.cur_func_ehome >= 0 && L.cur_home_region_lo >= 0
-            && (bb->id == L.cur_home_region_lo
-                || (L.cur_home_is_word && bb->id >= L.cur_home_region_lo
-                    && bb->id <= L.cur_home_region_hi))
+            && bb->id >= L.cur_home_region_lo
+            && bb->id <= L.cur_home_region_hi
             && L.cur_byte_home_vreg < 0
             && bb->live_in
             && ir_bitset_get((const BitSet *)bb->live_in, L.cur_func_ehome)) {
@@ -2156,7 +2168,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         if (region_exit_here && L.cur_byte_home_vreg == L.cur_func_ehome
             && L.cur_byte_home_dirty
             && home_is_slotbacked(f, L.cur_func_ehome)
-            && !(L.cur_home_is_word && L.cur_home_exit_flush_bb >= 0))
+            && L.cur_home_exit_flush_bb < 0)
             home_flush(out, f);   /* keep belief; slot now coherent */
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];

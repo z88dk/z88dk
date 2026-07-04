@@ -1667,6 +1667,29 @@ static int v_fits_byte(const Func *f, int v)
     return seen;
 }
 
+/* True if EVERY def of v is a sign-extend of a byte source — so v's value
+   provably fits a signed byte [-128,127] and its sign bit is bit 7 (not
+   bit 15). A signed `v < 0` / `v >= 0` on the narrowed byte then tests the
+   correct bit. (CONV_ZX would NOT qualify: an unsigned byte 0x80 is +128,
+   yet bit 7 is set — narrowing would flip the sign test.) */
+static int v_is_sx_of_byte(const Func *f, int v)
+{
+    int seen = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            if (op->dst != v) continue;
+            seen = 1;
+            if (op->kind != IR_CONV_SX
+                || op->src[0] < 0 || op->src[0] >= f->n_vregs
+                || f->vregs[op->src[0]].width != 1)
+                return 0;
+        }
+    }
+    return seen;
+}
+
 /* Every use of vreg v demands only its low 8 bits? True when each using
    op is either a CONV_TRUNC to a byte, or a narrowable op already at
    width 1 with v in a value (not shift-count) position. A BR_ZERO/BR_COND
@@ -1697,6 +1720,14 @@ static int demands_low_byte_only(const Func *f, int v)
                 continue;
             }
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
+                continue;
+            /* Signed `v REL 0` reads only v's sign bit; when v provably fits a
+               signed byte (all defs sign-extend a byte) that bit is bit 7 of
+               the low byte, so the compare survives narrowing. Lets the whole
+               CONV_SX collapse to a byte copy (then copy-prop + DCE). */
+            if ((u->kind == IR_CMP_LT || u->kind == IR_CMP_GE)
+                && u->src[1] == -1 && u->imm == 0
+                && v_is_sx_of_byte(f, v))
                 continue;
             return 0;
         }
