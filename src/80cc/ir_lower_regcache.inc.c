@@ -126,6 +126,29 @@ static int fp_tos_slot(const Func *f, int vreg_id)
    byte E/D-home already claimed DE's low half), so state is shared, not
    duplicated. Width-specific leaf ops dispatch on cur_home_is_word. */
 
+/* Rematerialize a width-2 constant vreg (LD_IMM / LD_SYM) into register pair
+   `rp` ("hl"/"de"/"bc"), re-emitting the constant instead of a slot reload.
+   Returns 1 if emitted, 0 if vreg isn't rematerializable. Caller updates the
+   cache belief for `rp`. */
+static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp)
+{
+    if (!L.remat_def || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
+    const Op *o = L.remat_def[vreg_id];
+    if (!o) return 0;
+    if (o->kind == IR_LD_IMM) {
+        emit(out, "ld\t%s,%lld", rp, (long long)o->imm);
+        return 1;
+    }
+    /* LD_SYM: &sym (+offset) — mirror gen_ld_sym's symbol formatting. */
+    const char *pfx = ir_sym_prefix(o->mem.sym);
+    if (o->mem.offset)
+        emit(out, "ld\t%s,%s%s+%d", rp, pfx, ir_sym_name(o->mem.sym),
+             o->mem.offset);
+    else
+        emit(out, "ld\t%s,%s%s", rp, pfx, ir_sym_name(o->mem.sym));
+    return 1;
+}
+
 static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     /* HL cache hit: no-op. Some callers call us unconditionally, and for
@@ -178,6 +201,14 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (width == 1 && a_has(vreg_id)) {
         emit(out, "ld\tl,a");
         emit(out, "ld\th,0");
+        hl_about_to_change(vreg_id);
+        return;
+    }
+    /* Rematerialize a constant/address instead of reloading its slot: a
+       loop-invariant `ld hl,<const>` (10T) beats `ld hl,(ix+d)` (19T) and
+       spills nothing. Cache-miss only (every register hit was checked above).
+       sp_adj is irrelevant — the constant is position-independent. */
+    if (width == 2 && emit_remat_word(out, f, vreg_id, "hl")) {
         hl_about_to_change(vreg_id);
         return;
     }
@@ -309,6 +340,14 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         emit_bc_reload(out, f, vreg_id, 0);
         emit(out, "ld\te,c");
         emit(out, "ld\td,b");
+        cache_de(vreg_id);
+        return;
+    }
+    /* Rematerialize a constant/address into DE instead of a slot read (cache
+       miss; not in DE/BC above). Skip when live in HL — the ex de,hl path
+       below is cheaper. */
+    if (f->vregs[vreg_id].width == 2 && L.rs.hl != vreg_id
+        && emit_remat_word(out, f, vreg_id, "de")) {
         cache_de(vreg_id);
         return;
     }

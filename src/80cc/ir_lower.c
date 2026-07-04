@@ -107,6 +107,12 @@ typedef struct {
        home in must inherit this dirtiness — else its back-edge/merge flush is
        wrongly suppressed and a slot reload reads a stale value. */
     int *bb_byte_out_dirty;
+    /* Rematerialization: for a width-2 vreg defined exactly once by LD_IMM or
+       LD_SYM (a compile-time constant / static address), remat_def[v] points at
+       that defining op. On a cache-miss load the lowerer re-emits `ld rp,<const>`
+       instead of a slot reload (cheaper, and the value is loop-invariant so it
+       never needs spilling). NULL = not rematerializable. */
+    const Op **remat_def;
     int lazy_spill_on, pending_spill_v;
     int ss_phase, *ss_op_store, *ss_op_reload, *ss_op_cacheread;
     const signed char *ss_store_dead; const int *ss_op_base;
@@ -1543,6 +1549,43 @@ int ir_lower_func(FILE *out, Func *f)
     if (L.bb_byte_out)
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out[i] = -1;
     L.bb_byte_out_dirty = calloc((size_t)f->n_bbs, sizeof(int));
+    /* Rematerialization table: a width-2 vreg with EXACTLY ONE def that is
+       LD_IMM or LD_SYM (non-bailing, non-addr-taken, non-volatile) is a
+       loop-invariant constant — remember its defining op so cache-miss loads
+       re-emit the constant instead of reloading a slot. */
+    L.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                         sizeof(const Op *));
+    if (L.remat_def && !getenv("IR_NO_REMAT")) {
+        int *ndef = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+        if (ndef) {
+            /* Count via ir_op_defs — some ops define through a non-dst field
+               (e.g. IR_POSTSTEP self-steps src[0]); counting op->dst alone
+               undercounts and would mis-tag a loop-carried counter as a
+               single-def constant. */
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    int defs[8];
+                    int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
+                    for (int k = 0; k < nd; k++)
+                        if (defs[k] >= 0 && defs[k] < f->n_vregs) ndef[defs[k]]++;
+                }
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    int d = o->dst;
+                    if (d < 0 || d >= f->n_vregs || ndef[d] != 1) continue;
+                    if (f->vregs[d].width != 2) continue;
+                    if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                        continue;
+                    if (o->kind == IR_LD_IMM)
+                        L.remat_def[d] = o;
+                    else if (o->kind == IR_LD_SYM && o->mem.sym
+                             && !ns_sym_bails(o->mem.sym))
+                        L.remat_def[d] = o;
+                }
+            free(ndef);
+        }
+    }
     /* Predecessor table: bb_preds[bb] = list of pred bb ids,
        bb_pred_cnt[bb] = length. Derived from succ[] of every BB. */
     int *bb_pred_cnt = calloc((size_t)f->n_bbs, sizeof(int));
@@ -1752,6 +1795,7 @@ int ir_lower_func(FILE *out, Func *f)
     free(bb_pending_out);
     free(L.bb_byte_out); L.bb_byte_out = NULL;
     free(L.bb_byte_out_dirty); L.bb_byte_out_dirty = NULL;
+    free(L.remat_def); L.remat_def = NULL;
     free(bb_lowered);
     free(bb_pred_cnt);
     for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
