@@ -567,6 +567,14 @@ void ir_alloc(Func *f)
                can be hooked to also write BC). Catches the common
                "compute X once, read X many times" shape in loop
                headers (e.g. crc16_ccitt's `end = data + len`). */
+        /* A non-param vreg live at function entry is read before any def
+           (uninitialised — UB in the source). It has no reaching def to load
+           into a register, so promoting it to a slotless register home makes
+           the lowerer read a nonexistent source and abort. Keep it spilled.
+           (The word DE-home pick already guards this via wd_def>=wd_read.) */
+        const BitSet *entry_live =
+            (f->n_bbs > 0 && f->bbs[0].n_ops > 0)
+            ? ir_op_live_in(&f->bbs[0], 0) : NULL;
         int cap = 0;
         for (int v = 0; v < f->n_vregs; v++) {
             const VReg *vr = &f->vregs[v];
@@ -580,6 +588,7 @@ void ir_alloc(Func *f)
             /* Slotless (non-PARAM) candidate + a pre-pushed-arg call =
                unreloadable across that call (emit_bc_reload reads -1). */
             if (!is_param && has_prepushed_call) continue;
+            if (!is_param && entry_live && ir_bitset_get(entry_live, v)) continue;
             if (is_param) {
                 if (write_count[v] > 0) continue;
             } else if (is_induct) {
@@ -631,6 +640,7 @@ void ir_alloc(Func *f)
                     int is_param = (vr->flags & IR_VREG_PARAM) != 0;
                     int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
                     if (!is_param && has_prepushed_call) continue;
+                    if (!is_param && entry_live && ir_bitset_get(entry_live, v)) continue;
                     if (is_param) {
                         if (write_count[v] > 0) continue;
                     } else if (is_induct) {

@@ -369,6 +369,25 @@ static void test_nested_residency(void)
     Assert(nested_accum() == 32, "nested inner accumulator resident + exact");
 }
 
+/* Read-before-def loop accumulator (uninitialised — UB) must NOT be promoted
+   to a slotless register home: it has no reaching def to load, so the lowerer
+   would read a nonexistent source and abort (physics.c `wait()` shape). It must
+   still COMPILE; its value is UB so we don't assert it — only that the function
+   builds/runs and a defined sibling (`s`) is exact. `a` escapes to a global so
+   it stays live (isn't DCE'd) and actually reaches the residency pick. */
+static int uninit_sink;
+static int uninit_loop(int n)
+{
+    int a; int s = 0; int i;
+    for (i = 0; i < n; i++) { a += i; s += 2; }   /* a: read-before-def */
+    uninit_sink = a;                               /* keep `a` live */
+    return s;
+}
+static void test_uninit_accum(void)
+{
+    Assert(uninit_loop(5) == 10, "read-before-def loop accum compiles (no abort)");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -390,5 +409,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_iv_narrow);
     suite_add_test(test_byte_not);
     suite_add_test(test_nested_residency);
+    suite_add_test(test_uninit_accum);
     return suite_run();
 }
