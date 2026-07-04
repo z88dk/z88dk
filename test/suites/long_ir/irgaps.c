@@ -427,6 +427,26 @@ static void test_short_circuit(void)
     Assert(sc_run() == 3, "compound && loop condition (RLE shape)");
 }
 
+/* Byte == byte / byte == const compared in A with `cp` (not widened to 16
+   bits). Covers value context, `!=`, and a high-half const (>127) where a
+   naive signed widen would give the wrong answer — EQ/NE compare the
+   zero-extended bytes, so `cp` must match. */
+static unsigned char bc_arr[4];
+static void test_byte_cmp(void)
+{
+    unsigned char x = 200, y = 200, z = 5;
+    int r, i;
+    Assert((x == y) == 1, "byte==byte equal (high-half 200)");
+    Assert((x == z) == 0, "byte==byte unequal");
+    Assert((x != z) == 1, "byte!=byte");
+    Assert((x == 200) == 1, "byte==const >127");
+    Assert((z == 5) == 1,   "byte==const small");
+    Assert((x == 5) == 0,   "byte==const unequal");
+    bc_arr[0] = 200; bc_arr[1] = 200; bc_arr[2] = 7; bc_arr[3] = 200;
+    r = 0; for (i = 0; i < 4; i++) r += (bc_arr[i] == 200);
+    Assert(r == 3, "byte==const summed over array");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -450,5 +470,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_nested_residency);
     suite_add_test(test_uninit_accum);
     suite_add_test(test_short_circuit);
+    suite_add_test(test_byte_cmp);
     return suite_run();
 }

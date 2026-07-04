@@ -554,6 +554,37 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
         commit_hl_word(out, f, op->dst);
         return 0;
     }
+    /* Byte == byte / byte == const(0..255): compare in A with `cp`, no 16-bit
+       widen. EQ/NE compare the ZERO-extended bytes (the width-2 path below
+       widens both with `ld h,0`), so a raw-byte `cp` is exactly equivalent —
+       at a fraction of the size/cycles. A byte can't equal a const outside
+       [0,255], so those fall through to the (correct) widened path. */
+    if (src0w == 1
+        && ((op->src[1] == -1 && op->imm >= 0 && op->imm <= 255)
+            || (op->src[1] >= 0 && op->src[1] < f->n_vregs
+                && f->vregs[op->src[1]].width == 1))) {
+        int z_true_b = (op->kind == IR_CMP_EQ);
+        int s0 = op->src[0], s1 = op->src[1];
+        /* Equality is symmetric — put whichever operand already sits in A
+           there, so we don't evict it and reload. */
+        if (s1 >= 0 && !a_has(s0) && a_has(s1)) { int t = s0; s0 = s1; s1 = t; }
+        load_byte_to_a(out, f, s0);
+        if (s1 == -1) emit(out, "cp\t%d", (int)(op->imm & 0xff));
+        else          byte_alu_operand(out, f, "cp\t", s1);
+        if (L.la.cur_branch_test_kind != 0) {
+            int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+            const char *cc = (z_true_b == br_true) ? "z" : "nz";
+            emit(out, "jp\t%s,L_f%d_bb_%d",
+                 cc, L.func_emit_idx, L.la.cur_branch_test_label);
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
+        emit(out, "ld\thl,0");
+        emit_skip(out, f, z_true_b ? "nz" : "z", 1);
+        emit(out, "inc\tl");
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
     /* Equality is sign-independent. Real-ALU CPUs: `or a; sbc hl,de` sets
        Z = equal. gbz80/808x: `sbc hl,de` is an emulated helper call, so XOR
        the halves instead (Z = equal, no helper, no DE load for const RHS). */
