@@ -29,7 +29,7 @@
 #else
 
 /* Temporary fix to turn off features not supported by sdcc */
-#if __SDCC | __clang__
+#if __SDCC | __clang__ | __XCC
 #define __LIB__
 #define __SAVEFRAME__
 #define __SMALLC
@@ -49,7 +49,7 @@
 #endif
 
 // Make intellisense run easier..
-#if __clang__ | __CLANG
+#if __clang__ | __CLANG | __XCC
 #define __STDC_ABI_ONLY
 #define __smallc
 #define __z88dk_callee
