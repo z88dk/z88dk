@@ -2799,13 +2799,17 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
                           elem_w);
     int loaded = new_temp(b, elem_w);
     b->f->vregs[loaded].width = elem_w;
+    /* Keep the element kind in a local: the `ld` Op* points into the BB's
+       ops array, which the emits below (binop, store) can realloc — reading
+       ld->mem.elem afterwards would be a use-after-free. */
+    Kind elem_k = (elem_w == 1) ? KIND_CHAR
+                : (elem_w == 2) ? KIND_INT
+                :                 KIND_LONG;
     Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
     ld->dst       = loaded;
     ld->mem.kind  = IR_MEM_VREG;
     ld->mem.base  = ptr_v;
-    ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
-                  : (elem_w == 2) ? KIND_INT
-                  :                 KIND_LONG;
+    ld->mem.elem  = elem_k;
     ld->mem.bank_fn = bf;
     int dst = new_temp(b, elem_w);
     b->f->vregs[dst].width = elem_w;
@@ -2824,7 +2828,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     st->src[0]    = dst;
     st->mem.kind  = IR_MEM_VREG;
     st->mem.base  = ptr_v;
-    st->mem.elem  = ld->mem.elem;
+    st->mem.elem  = elem_k;   /* NOT ld->mem.elem — `ld` may be realloc-stale */
     st->mem.bank_fn = bf;
     return dst;
 }
