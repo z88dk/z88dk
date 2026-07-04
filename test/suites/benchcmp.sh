@@ -29,7 +29,10 @@ done
 
 # bench dir : source file (relative to the bench dir)
 default_benches="charbench:charbench.c crcbench:crcbench.c intbench:intbench.c \
-md5:md5sum.c ptrbench:ptrbench.c sieve:sieve.c rle:rle_encode.c"
+md5:md5sum.c ptrbench:ptrbench.c sieve:sieve.c rle:rle_encode.c \
+sortbench:sortbench.c queenbench:queenbench.c \
+searchbench:searchbench.c \
+switchbench:switchbench.c"
 
 if [ $# -gt 0 ]; then
     sel=""
