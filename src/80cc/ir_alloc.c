@@ -84,6 +84,33 @@ static int op_dst_spill_is_dead(const BB *bb, int op_idx)
     return 1;
 }
 
+/* Enumerate ALL of a BB's CFG successors into out[] (up to max), from its
+   branch/switch OPS — not the fixed succ[2] pair, which a short-circuit
+   &&/|| lowering (>2 branch ops in one BB) silently truncates. Returns the
+   count. Used to build the predecessor adjacency for natural-loop nesting. */
+static int alloc_bb_succ(const BB *bb, int *out, int max)
+{
+    int n = 0;
+    for (int j = 0; j < bb->n_ops && n < max; j++) {
+        const Op *o = &bb->ops[j];
+        if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO) {
+            if (o->label >= 0) out[n++] = o->label;
+        } else if (o->kind == IR_SWITCH && o->sw) {
+            for (int c = 0; c < o->sw->n_cases && n < max; c++)
+                if (o->sw->target_bb[c] >= 0) out[n++] = o->sw->target_bb[c];
+            if (n < max && o->sw->default_bb >= 0) out[n++] = o->sw->default_bb;
+        }
+    }
+    /* Fall-through successors carried only in succ[] (defensive). */
+    for (int s = 0; s < 2 && n < max; s++)
+        if (bb->succ[s] >= 0) {
+            int dup = 0;
+            for (int k = 0; k < n; k++) if (out[k] == bb->succ[s]) { dup = 1; break; }
+            if (!dup) out[n++] = bb->succ[s];
+        }
+    return n;
+}
+
 void ir_alloc(Func *f)
 {
     if (!f) return;
@@ -461,26 +488,78 @@ void ir_alloc(Func *f)
             bb_loop_lo[i] = i;
             bb_loop_hi[i] = i;
         }
-        for (int i = 0; i < f->n_bbs; i++) {
-            BB *bb = &f->bbs[i];
-            /* succ via accessor (covers IR_SWITCH) — pred[] isn't
-               built. A successor with id ≤ ours is a back-edge: mark
-               [header..tail] in-loop. */
-            int ns = ir_bb_n_succ(bb);
-            for (int s = 0; s < ns; s++) {
-                int sid = ir_bb_succ_at(bb, s);
-                if (sid < 0) continue;
-                if (sid > i) continue;
-                int lo = sid, hi = i;
-                if (lo < 0) lo = 0;
-                if (hi >= f->n_bbs) hi = f->n_bbs - 1;
-                for (int k = lo; k <= hi; k++) {
-                    bb_in_loop[k] = 1;
-                    bb_loop_depth[k]++;   /* one more enclosing loop body */
-                    if (lo < bb_loop_lo[k]) bb_loop_lo[k] = lo;
-                    if (hi > bb_loop_hi[k]) bb_loop_hi[k] = hi;
-                }
+        /* Loop membership + nesting depth via NATURAL LOOPS, not id-ranges.
+           For each back-edge p->h (a successor h with id <= source p), the
+           loop body is h plus every BB that reaches p without passing through
+           h. The old [h..p] id-range method mis-handled a nested inner loop
+           whose BBs are numbered AFTER the outer latch (it looked like a
+           sibling, so its body got the wrong depth) — exactly what the
+           unreachable-BB prune's renumbering exposes. A backward walk over the
+           full op-level predecessor adjacency gets nesting right regardless of
+           block numbering. bb_loop_lo/hi keep the [min,max] id span of the
+           body (a conservative over-approx of the op-index interval used to
+           extend in-loop PR_BC lifetimes — safe if a gap BB creeps in). */
+        {
+            /* Predecessor adjacency (CSR) from complete op-level successors. */
+            int *pred_cnt = calloc((size_t)f->n_bbs + 1, sizeof(int));
+            int  scratch[64];
+            for (int i = 0; pred_cnt && i < f->n_bbs; i++) {
+                int ns = alloc_bb_succ(&f->bbs[i], scratch,
+                                       (int)(sizeof scratch / sizeof scratch[0]));
+                for (int s = 0; s < ns; s++)
+                    if (scratch[s] >= 0 && scratch[s] < f->n_bbs)
+                        pred_cnt[scratch[s]]++;
             }
+            int *pred_off = calloc((size_t)f->n_bbs + 1, sizeof(int));
+            if (pred_cnt && pred_off) {
+                for (int i = 0; i < f->n_bbs; i++)
+                    pred_off[i + 1] = pred_off[i] + pred_cnt[i];
+                int total = pred_off[f->n_bbs];
+                int *pred_list = calloc((size_t)(total > 0 ? total : 1), sizeof(int));
+                int *fill = calloc((size_t)f->n_bbs, sizeof(int));
+                int *inloop = calloc((size_t)f->n_bbs, sizeof(int));
+                int *wl = calloc((size_t)f->n_bbs, sizeof(int));
+                if (pred_list && fill && inloop && wl) {
+                    for (int i = 0; i < f->n_bbs; i++) {
+                        int ns = alloc_bb_succ(&f->bbs[i], scratch,
+                                    (int)(sizeof scratch / sizeof scratch[0]));
+                        for (int s = 0; s < ns; s++) {
+                            int t = scratch[s];
+                            if (t >= 0 && t < f->n_bbs)
+                                pred_list[pred_off[t] + fill[t]++] = i;
+                        }
+                    }
+                    /* One natural loop per back-edge p->h. */
+                    for (int p = 0; p < f->n_bbs; p++) {
+                        int ns = alloc_bb_succ(&f->bbs[p], scratch,
+                                    (int)(sizeof scratch / sizeof scratch[0]));
+                        for (int s = 0; s < ns; s++) {
+                            int h = scratch[s];
+                            if (h < 0 || h >= f->n_bbs || h > p) continue; /* back-edge */
+                            memset(inloop, 0, (size_t)f->n_bbs * sizeof(int));
+                            int wn = 0;
+                            inloop[h] = 1;
+                            if (!inloop[p]) { inloop[p] = 1; wl[wn++] = p; }
+                            while (wn > 0) {
+                                int x = wl[--wn];
+                                for (int k = pred_off[x]; k < pred_off[x + 1]; k++) {
+                                    int y = pred_list[k];
+                                    if (!inloop[y]) { inloop[y] = 1; wl[wn++] = y; }
+                                }
+                            }
+                            for (int b = 0; b < f->n_bbs; b++) {
+                                if (!inloop[b]) continue;
+                                bb_in_loop[b] = 1;
+                                bb_loop_depth[b]++;
+                                if (h < bb_loop_lo[b]) bb_loop_lo[b] = h;
+                                if (p > bb_loop_hi[b]) bb_loop_hi[b] = p;
+                            }
+                        }
+                    }
+                }
+                free(pred_list); free(fill); free(inloop); free(wl);
+            }
+            free(pred_cnt); free(pred_off);
         }
         /* Per-BB global op-index range (bb_last_op inclusive). Empty
            BBs get first == last + 1 — never matches, harmless. */
@@ -978,8 +1057,12 @@ void ir_alloc(Func *f)
                         switch (o->kind) {
                         case IR_ADD: case IR_SUB: case IR_RSUB:
                         case IR_AND: case IR_OR:  case IR_XOR:
+                            /* Only an accumulate INSIDE a loop earns a DE-home
+                               (the per-iteration slot round-trip is what DE
+                               residency saves). A straight-line `v=v OP w`
+                               gains nothing and shouldn't evict DE tenants. */
                             if (o->dst >= 0 && o->dst < f->n_vregs
-                                && o->src[1] >= 0
+                                && o->src[1] >= 0 && bb_in_loop[i]
                                 && (o->src[0] == o->dst || o->src[1] == o->dst))
                                 wd_acc[o->dst] = 1;
                             break;
@@ -995,8 +1078,16 @@ void ir_alloc(Func *f)
                                      | IR_VREG_PARAM)) continue;
                     if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
                     if (wd_base[v]) continue;             /* not a deref'd ptr */
-                    if (!wd_acc[v]) continue;             /* reduction acc, not IV */
-                    if (use_count[v] < 8) continue;       /* hot, in a loop */
+                    if (!wd_acc[v]) continue;             /* in-loop reduction acc */
+                    /* wd_acc already requires the accumulate be inside a loop,
+                       so one depth-1 in-loop read (weight 4) is the minimum a
+                       genuine accumulator scores. Gate at 4 — accepting that
+                       single-in-loop-use accumulator. (Was 8, which needed two
+                       in-loop uses; pre-prune that was reachable only because
+                       dead forwarding BBs inflated the count with phantom
+                       copies — an honest CFG scores a real reduction lower.
+                       wbest still picks the hottest candidate.) */
+                    if (use_count[v] < 4) continue;
                     if (write_count[v] < 2) continue;     /* init + per-iter redef */
                     if (wd_def[v] >= f->bbs[0].n_ops) continue;  /* def in entry bb0 */
                     if (wd_def[v] >= wd_read[v]) continue;       /* def-first */

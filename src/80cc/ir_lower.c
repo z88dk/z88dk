@@ -102,6 +102,11 @@ typedef struct {
     int cur_byte_home_vreg, cur_byte_home_dirty, cur_func_ehome;
     int cur_home_region_lo, cur_home_region_hi, cur_home_exit_flush_bb;
     int *bb_byte_out;
+    /* Parallel to bb_byte_out: was the slot-backed byte home DIRTY (E holds
+       the value, slot stale) at this BB's exit? A successor that carries the
+       home in must inherit this dirtiness — else its back-edge/merge flush is
+       wrongly suppressed and a slot reload reads a stale value. */
+    int *bb_byte_out_dirty;
     int lazy_spill_on, pending_spill_v;
     int ss_phase, *ss_op_store, *ss_op_reload, *ss_op_cacheread;
     const signed char *ss_store_dead; const int *ss_op_base;
@@ -1381,6 +1386,12 @@ int ir_lower_func(FILE *out, Func *f)
        passes (which run within the pre-header where the hoisted op
        lands). Each returns the number of ops changed (IR_OPT_VERBOSE). */
     {
+        /* Prune blocks unreachable from the entry first: ir_build leaves
+           dead split/forwarding BBs whose ids can forge spurious back-edges,
+           corrupting the loop/depth scans LICM and ir_alloc's residency picks
+           rely on. Every later pass then sees a clean, contiguously-numbered
+           CFG. */
+        int pruned  = ir_opt_prune_unreachable(f);
         int hoisted = ir_opt_licm(f);
         /* Strength-reduce indexed-array address recomputes to stepped
            pointers right after LICM (loops found, base invariants
@@ -1457,14 +1468,15 @@ int ir_lower_func(FILE *out, Func *f)
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
-             || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0)
+             || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
+             || pruned > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
-                    "ir_opt: %d licm, %d ivsr, %d early, %d st2ld, %d cfold, "
-                    "%d reassoc, %d match, %d cse, "
+                    "ir_opt: %d prune, %d licm, %d ivsr, %d early, %d st2ld, "
+                    "%d cfold, %d reassoc, %d match, %d cse, "
                     "%d packs, %d late, %d pushes, %d deadret, "
                     "%d dce, %d narrow, %d ivnarrow in func\n",
-                    hoisted, ivsr, early, fwd, cfold, reassoc, match,
+                    pruned, hoisted, ivsr, early, fwd, cfold, reassoc, match,
                     cse, packs, late, pushes, deadret, dce, narrow, ivnarrow);
     }
 
@@ -1530,6 +1542,7 @@ int ir_lower_func(FILE *out, Func *f)
     L.bb_byte_out = malloc((size_t)f->n_bbs * sizeof(int));
     if (L.bb_byte_out)
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out[i] = -1;
+    L.bb_byte_out_dirty = calloc((size_t)f->n_bbs, sizeof(int));
     /* Predecessor table: bb_preds[bb] = list of pred bb ids,
        bb_pred_cnt[bb] = length. Derived from succ[] of every BB. */
     int *bb_pred_cnt = calloc((size_t)f->n_bbs, sizeof(int));
@@ -1738,6 +1751,7 @@ int ir_lower_func(FILE *out, Func *f)
     free(bb_hl_out);
     free(bb_pending_out);
     free(L.bb_byte_out); L.bb_byte_out = NULL;
+    free(L.bb_byte_out_dirty); L.bb_byte_out_dirty = NULL;
     free(bb_lowered);
     free(bb_pred_cnt);
     for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
@@ -1880,6 +1894,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.cur_func_uses_params = func_uses_params(f);   /* frame-pointer elision */
     if (L.bb_byte_out)
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out[i] = -1;
+    if (L.bb_byte_out_dirty)
+        for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out_dirty[i] = 0;
     L.cur_sp_adjust = 0;
     bc_args_save_depth = 0;
     L.la.cur_stack_long_top = -1;
@@ -2002,11 +2018,16 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         /* Byte-home carry (slot-backed E/D only): keep the home resident in
            its register across the boundary iff every lowered pred exits with
            it there (bb_byte_out) and it's live-in. Else drop the belief — the
-           first read reloads from the slot, which is coherent (preds flush at
-           BB end / before clobbers / before back-edges). A slotless C/B home
-           is left to persist (never clobbered in its envelope). */
+           first read reloads from the slot. A slotless C/B home is left to
+           persist (never clobbered in its envelope).
+           INHERIT the pred dirtiness: a pred that fell through carrying E
+           without flushing (its successor was neither a back-edge nor a merge)
+           leaves the slot STALE, so this BB must know the home is dirty — else
+           its own back-edge/merge exit flush is wrongly suppressed and a later
+           slot reload reads a stale value. Dirty if ANY carrying pred was dirty
+           (conservative: an extra flush at worst). */
         if (L.cur_func_ehome >= 0) {
-            int bcarry = -2;
+            int bcarry = -2, bdirty = 0;
             for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
                 int pid = bb_preds[bb->id][p];
                 if (!bb_lowered[pid]) { bcarry = -1; break; }
@@ -2014,11 +2035,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 if (v < 0) { bcarry = -1; break; }
                 if (bcarry == -2) bcarry = v;
                 else if (bcarry != v) { bcarry = -1; break; }
+                if (L.bb_byte_out_dirty[pid]) bdirty = 1;
             }
             if (bcarry >= 0 && bb->live_in
                 && ir_bitset_get((const BitSet *)bb->live_in, bcarry)) {
                 L.cur_byte_home_vreg = bcarry;
-                L.cur_byte_home_dirty = 0;   /* preds flushed → slot coherent */
+                L.cur_byte_home_dirty = bdirty;
             } else {
                 L.cur_byte_home_vreg = -1;
             }
@@ -2100,6 +2122,13 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                    (the fused byte-wise compare emits its exit jump inline, so
                    a post-test flush would miss the exit path). */
                 if (in_home_region) break;
+                /* Resolve an empty forwarding successor to its target: an
+                   aliased block emits nothing (`defc bb_k = bb_j`), so a
+                   back-edge hidden behind it (bb7→bb1, bb7 numbered high but
+                   aliasing the low header) would otherwise escape the id-based
+                   back-edge test and the flush would never fire. */
+                if (bb_alias && sid < f->n_bbs && bb_alias[sid] >= 0)
+                    sid = bb_alias[sid];
                 if (sid <= bb->id || bb_pred_cnt[sid] > 1) {
                     bb_exit_flush_needed = 1; break;
                 }
@@ -2722,10 +2751,14 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 home_flush(out, f);
         }
         /* Record the home's exit residency for successors' carry decision:
-           the slot-backed home is in E/D here iff the belief still holds it. */
+           the slot-backed home is in E/D here iff the belief still holds it,
+           plus whether its slot is stale (dirty) so successors inherit it. */
         L.bb_byte_out[bb->id] =
             (L.cur_func_ehome >= 0 && L.cur_byte_home_vreg == L.cur_func_ehome)
             ? L.cur_byte_home_vreg : -1;
+        if (L.bb_byte_out_dirty)
+            L.bb_byte_out_dirty[bb->id] =
+                (L.bb_byte_out[bb->id] >= 0 && L.cur_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
         bb_pending_out[bb->id] = L.pending_spill_v;
         bb_lowered[bb->id] = 1;

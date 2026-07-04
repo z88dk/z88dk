@@ -467,6 +467,33 @@ static void test_xbb_byte_counter(void)
     Assert(cbc_count(0, 0) == 0,  "cross-BB byte counter zero-trip");
 }
 
+/* A byte loop counter in a do-while whose back-edge is reached through an
+   empty forwarding block (`--e` latch, early `return` from the body). The
+   slot-backed byte home (E) must be flushed to its slot before the back-edge,
+   but the back-edge hides behind an alias block and the latch falls through to
+   it — so the flush is driven by the latch's exit test. With the unreachable-BB
+   prune removing the incidental merge that used to force the flush, this
+   exercises the alias-resolved back-edge flush + the dirty-carry across BBs.
+   A dropped flush reads a stale counter → wrong iteration count. */
+static unsigned char dwb_a[4] = { 1, 2, 3, 4 };
+static unsigned char dwb_b[4] = { 1, 2, 3, 9 };
+static int dowhile_byte_cmp(const unsigned char *p, const unsigned char *q)
+{
+    unsigned char e = 4;
+    int seen = 0;
+    do {
+        seen++;
+        if (*p != *q) return seen;   /* index+1 of first mismatch */
+        p++; q++;
+    } while (--e);
+    return 0;                        /* all four equal */
+}
+static void test_dowhile_byte_counter(void)
+{
+    Assert(dowhile_byte_cmp(dwb_a, dwb_a) == 0, "do-while byte counter: full run");
+    Assert(dowhile_byte_cmp(dwb_a, dwb_b) == 4, "do-while byte counter: mismatch at 4");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -492,5 +519,6 @@ int main(int argc, char *argv[])
     suite_add_test(test_short_circuit);
     suite_add_test(test_byte_cmp);
     suite_add_test(test_xbb_byte_counter);
+    suite_add_test(test_dowhile_byte_counter);
     return suite_run();
 }

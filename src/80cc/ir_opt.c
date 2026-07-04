@@ -541,6 +541,112 @@ static int licm_insert_before_terminator(BB *dst_bb, const Op *src_op)
     return 0;
 }
 
+/* Free a BB's op payloads + owned arrays (mirror of ir_func_free's per-BB
+   cleanup). Used when pruning a dead block. live_in/out are not yet built
+   at prune time (this runs before ir_analysis), so nothing to free there. */
+static void prune_free_bb(BB *bb)
+{
+    for (int j = 0; j < bb->n_ops; j++) {
+        Op *o = &bb->ops[j];
+        if (o->call)  { free(o->call->args);  free(o->call); }
+        if (o->hcall) { free(o->hcall->args); free(o->hcall); }
+        if (o->sw)    { free(o->sw->values); free(o->sw->target_bb); free(o->sw); }
+        if (o->mem.port) free(o->mem.port);
+    }
+    free(bb->ops);
+    free(bb->pred);
+}
+
+int ir_opt_prune_unreachable(Func *f)
+{
+    if (!f || f->n_bbs <= 0) return 0;
+    if (getenv("IR_NO_PRUNE")) return 0;
+    int n = f->n_bbs;
+    int *reach = calloc((size_t)n, sizeof(int));
+    int *stack = calloc((size_t)n, sizeof(int));
+    int *remap = malloc((size_t)n * sizeof(int));
+    if (!reach || !stack || !remap) {
+        free(reach); free(stack); free(remap);
+        return 0;
+    }
+    /* DFS reachability from the entry. Enumerate successors from the BB's
+       branch OPS, not succ[] — a short-circuit && / || lowering leaves >2
+       branch ops (BR_COND + BR_ZERO + BR) in one BB, and the fixed succ[2]
+       pair silently drops the 3rd target. Missing it here would prune a live
+       block and leave a dangling `jp`. IR_SWITCH targets come from its
+       SwitchInfo. */
+    int sp = 0;
+    reach[0] = 1; stack[sp++] = 0;
+    while (sp > 0) {
+        BB *bb = &f->bbs[stack[--sp]];
+        #define PRUNE_VISIT(sid) do {                                      \
+            int _s = (sid);                                                \
+            if (_s >= 0 && _s < n && !reach[_s]) {                         \
+                reach[_s] = 1; stack[sp++] = _s;                           \
+            }                                                              \
+        } while (0)
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND
+                || o->kind == IR_BR_ZERO) {
+                PRUNE_VISIT(o->label);
+            } else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++)
+                    PRUNE_VISIT(o->sw->target_bb[c]);
+                PRUNE_VISIT(o->sw->default_bb);
+            }
+        }
+        /* succ[] too, in case a BB carries a fall-through successor with no
+           explicit terminator op (defensive — normal BBs end in a branch). */
+        PRUNE_VISIT(bb->succ[0]);
+        PRUNE_VISIT(bb->succ[1]);
+        #undef PRUNE_VISIT
+    }
+    int next = 0;
+    for (int i = 0; i < n; i++) remap[i] = reach[i] ? next++ : -1;
+    int removed = n - next;
+    if (removed == 0) {
+        free(reach); free(stack); free(remap);
+        return 0;
+    }
+    /* Compact survivors down (new id <= old id, so a forward copy in
+       increasing order never clobbers a not-yet-moved survivor); free the
+       dead blocks in place. */
+    for (int i = 0; i < n; i++) {
+        if (reach[i]) {
+            if (remap[i] != i) f->bbs[remap[i]] = f->bbs[i];
+        } else {
+            prune_free_bb(&f->bbs[i]);
+        }
+    }
+    f->n_bbs = next;
+    /* Renumber ids to the compacted index and remap every stored BB-id
+       reference. A survivor's successors are themselves reachable (BFS
+       invariant), so remap[...] is always a valid new id here. */
+    for (int i = 0; i < next; i++) {
+        BB *bb = &f->bbs[i];
+        bb->id = i;
+        for (int s = 0; s < 2; s++)
+            if (bb->succ[s] >= 0 && bb->succ[s] < n)
+                bb->succ[s] = remap[bb->succ[s]];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *o = &bb->ops[j];
+            if (o->kind == IR_BR || o->kind == IR_BR_COND
+                || o->kind == IR_BR_ZERO) {
+                if (o->label >= 0 && o->label < n) o->label = remap[o->label];
+            } else if (o->kind == IR_SWITCH && o->sw) {
+                for (int c = 0; c < o->sw->n_cases; c++)
+                    if (o->sw->target_bb[c] >= 0 && o->sw->target_bb[c] < n)
+                        o->sw->target_bb[c] = remap[o->sw->target_bb[c]];
+                if (o->sw->default_bb >= 0 && o->sw->default_bb < n)
+                    o->sw->default_bb = remap[o->sw->default_bb];
+            }
+        }
+    }
+    free(reach); free(stack); free(remap);
+    return removed;
+}
+
 int ir_opt_licm(Func *f)
 {
     if (!f || f->n_bbs <= 0) return 0;
