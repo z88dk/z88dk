@@ -1,7 +1,9 @@
-z80asm File formats (v18)
-=========================
+## z80asm File formats (v19)
+[[Top](Tool---z80asm)]
 
 This document describes the object and libary formats used by *z80asm*. 
+
+*NOTE:* v18 is the version used in production; v19 is the version for the new z80asm v2 in development.
 
 The object and library files are stored in binary form as a set of 
 contiguous sections, i.e. each section follows the previous one. 
@@ -82,7 +84,7 @@ The format of the object file is as follows:
 |&nbsp; | long  | *index*, index of first character of this string in the end blob of all strings |
 |...|...|...|
 |...|...| Blob of strings: |
-|&nbsp; | char[] | Characters of the string followed by '\0' terminator |
+|&nbsp; | char[] | Characters of the strings followed by '\0' terminator |
 
 Library file format
 -------------------
@@ -93,22 +95,29 @@ structures.
 |Addr  |Type   |Object|
 |---   |---    |---   |
 |&nbsp;|&nbsp; |**File header**
-|   0  |8 chars|'Z80LMF18' - file signature and version
-|   8  | long  | File pointer to *String Table*                         |
+|   0  |8 chars|'Z80LMF18' - file signature and version |
+|   8  | long  | File pointer to *Symbol Index Table* (new in v19) |
+|  12  | long  | File pointer to *String Table*                         |
 |&nbsp;|&nbsp; |**Object Modules**<br>object files in the library
-|mod+0 | long  |*next*: contains the file pointer of the next object file in the library, or<br>*-1* if this object file is the last in the library
+|mod+0 | long  |*next*: contains the file pointer of the next object file in the library, or<br>*0* as end marker (v19)<br>*-1* if this object file is the last in the library (v18)
 |&nbsp;| long  |*length*: contains the length of this object file, or<br>*0* if this object files has been marked "deleted" and will not be used
 |&nbsp;|byte[length]|contains the object module
 |...|...|...|
-|&nbsp; |&nbsp; | **String Table**<br>contains the array of PUBLIC symbols defined in any of the object files |
-|table+0| long  | *count*, number of symbols in the table |
-|&nbsp; | long  | *size*, total size of blob of all the symbols rounded up to the next aligned address |
+|&nbsp; |&nbsp; | **Symbol Index Table**<br>contains the index of all PUBLIC symbols defined in any of the object files with the link to the object file |
+|table+0| strid | *symbol* name index in string table, or<br>*0* to mark end |
+|table+4| long  | *object-ptr*: file pointer of the object file that defines this symbol |
+|table+8| long  | *length*: the length of the object file that defines this symbol |
+|...|...|...|
+|&nbsp; |&nbsp; | **String Table**<br>contains the array of strings used in the library file |
+|table+0| long  | *count*, number of strings in the table |
+|&nbsp; | long  | *size*, total size of blob of all the strings rounded up to the next aligned address |
 |...|...|...|
 |...|...| Table of indices: |
-|&nbsp; | long  | *index*, index of first character of this symbol in the end blob of all strings |
+|&nbsp; | long  | *index*, index of first character of this string in the end blob of all strings |
 |...|...|...|
 |...|...| Blob of strings: |
-|&nbsp; | char[] | Characters of the symbol followed by '\0' terminator |
+|&nbsp; | char[] | Characters of the strings followed by '\0' terminator |
+
 History
 -------
 
@@ -132,4 +141,5 @@ History
 |*16*   |convert all *string* to *lstring* in the object file to allow for very large symbol names, needed for C debugging symbols
 |*17*   |add size of opcode so that DJNZ emulation on Intel and ALD DJNZ on Rabbit compute the right offset
 |*18*   |add CPU and -IXIY option to disallow linking of objects built for a different architecture; add a string table to remove duplicate strings and speed up linking
+|*19*   |(not yet in production) add symbol index in the library to speed up linking - only the modules that will be needed are parsed; add end marker in the library instead of -1 file pointer in the last module (easier parsing).
 

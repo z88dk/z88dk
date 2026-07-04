@@ -1,0 +1,5 @@
+z80asm File formats (v02)
+=========================
+
+This document describes the object and libary formats used by *z80asm* 
+from version *2.0.0* up to version *2.1.8*.

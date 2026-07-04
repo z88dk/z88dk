@@ -1472,4 +1472,34 @@ sub unpack {
 	}
 }
 
+#------------------------------------------------------------------------------
+# Make documentation
+#------------------------------------------------------------------------------
+my @versions_text = (
+	[],
+	# v01
+	["up to version *1.2.10*"],
+	# v02
+	["from version *2.0.0* up to version *2.1.8*"],
+	# v03
+	["versions *2.2.x*"],
+);
+
+sub make_docs {
+	my($class, $dir) = @_;
+	
+	for my $v ($min_version .. $cur_version) {
+		my $version = sprintf "%02d", $v;
+
+		open my $fh, ">", "$dir/obj_v$version.txt" or die "cannot open file: $!";
+		print $fh <<END;
+z80asm File formats (v$version)
+=========================
+
+This document describes the object and libary formats used by *z80asm* 
+$versions_text[$v][0].
+END
+	}	
+}
+
 1;

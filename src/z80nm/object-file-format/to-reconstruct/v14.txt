@@ -1,5 +1,5 @@
-## z80asm File formats (v14)
-[[Top](Tool---z80asm)]
+z80asm File formats (v14)
+=========================
 
 This document describes the object and libary formats used by *z80asm*. 
 
