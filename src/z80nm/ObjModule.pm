@@ -1503,7 +1503,12 @@ sub unpack {
         # align
         if ( $version >= 10 ) {
             my $align = $bin->unpack_dword;
-            $self->align($align);
+            if ( $align < 1 ) {
+                $self->align(1);
+            }
+            else {
+                $self->align($align);
+            }
         }
 
         # bytes

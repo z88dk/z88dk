@@ -66,6 +66,9 @@ The format of the object file is as follows:
 |    |       | 'H'  : unsigned 8-bit value, offset to 0xFF00 
 |    |       | '='  : DEFC expression computed at link time and assigning
 |    |       |        a symbol 
+|    |       | 'j'  : signed 16-bit value, JRE-offset
+|    |       | 'v'  : unsigned byte extended to 24 bits
+|    |       | 't'  : signed byte sign-extended to 24 bits
 |    |lstring| Source file name where expression was defined,
 |    |       | empty string to reuse the previous expression source file
 |    | dword | Line number in source file where expression was defined
@@ -80,6 +83,19 @@ The format of the object file is as follows:
 |    |       |                 type '=' expressions, empty string for the 
 |    |       |                 other types
 |    |lstring| *expression* : expression text as parsed from the source file
+|    |       |
+|... | ...   | ...
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **Sections**
+|    |       | Contains the binary code of each section of the module
+|    | dword | *length*: defines the total code length, -1 to signal the end
+|    |string | *section*: source file section name
+|    | bytes | *code*: contains the binary code
+|    |       |
+|... | ...   | ...
+|    |       |
 |    |       |
 
 

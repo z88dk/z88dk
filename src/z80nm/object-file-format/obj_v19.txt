@@ -125,6 +125,8 @@ The format of the object file is as follows:
 |    |       |                 other types
 |    | strid | *expression* : expression text as parsed from the source file
 |    |       |
+|... | ...   | ...
+|    |       |
 |    |       | **Relocations**
 |    |       | List of simple relocations defined in this module:
 |    | dword | Relocation type (subset of Expression type): 
@@ -148,6 +150,43 @@ The format of the object file is as follows:
 |    |       |              the result of evaluating the relocation
 |    | strid | *symbol* : base symbol for relocation
 |    | dword | *addend* : addend to add to symbol
+|    |       |
+|... | ...   | ...
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **Sections**
+|    |       | Contains the binary code of each section of the module
+|    | dword | *length*: defines the total code length, -1 to signal the end
+|    | strid | *section*: source file section name
+|    | dword | *ORG Address*: contains the user defined ORG address for the
+|    |       |                start of this section, or
+|    |       |                -1 for no ORG address was defined, or
+|    |       |                -2 to split section to a different binary file
+|    |       |                If multiple sections are given with an ORG
+|    |       |                address each, the assembler generates one
+|    |       |                binary file for each section with a defined
+|    |       |                ORG, followed by all sections without one
+|    | dword | *ALIGN*: defines the address alignment of this section, or
+|    |       |                -1 if not defined
+|    |       |                The previous section is padded to align the
+|    |       |                start address of this section
+|    | bytes | *code*: contains the binary code
+|    | bytes | possible padding to align file on 4-byte boundary
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **String Table**
+|    |       | Contains the array of strings used in the object file
+|    | dword | *count* : number of strings in the table
+|    | dword | *size*  : total size of blob of all the strings rounded up
+|    |       |           to the next aligned address
+|    |       | Table of indices:
+|    | dword | *index* : index of first character of this string in the
+|    |       |           blob of all strings
+|... | ...   | ...
+|    | chars |Blob of strings : Characters of each string followed
+|    |       |                  by '\0' terminator and padded to align 4
 |    |       |
 
 

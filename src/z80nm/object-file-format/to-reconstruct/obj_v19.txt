@@ -37,6 +37,7 @@ The format of the object file is as follows:
 |----|----   | ------
 |    |       | **File header**
 |   0|8 chars| 'Z80RMF19' - file signature and version
+|    |       |
 |   8| dword | CPU id: 
 |    |       | 0 :  none
 |    |       | 1 :  z80
@@ -75,41 +76,81 @@ The format of the object file is as follows:
 |    |       | 34 : ti83_strict
 |    |       | 35 : ti83plus
 |    |       | 36 : ti83plus_strict
+|    |       |
 |  12| dword | -IXIY option used in the assembly:
 |    |       | 0 : no -IXIY option used
 |    |       | 1 : -IXIY option used
+|    |       |
 |  16| dword | File pointer to *Module Name*
 |  20| dword | File pointer to *Expressions*, may be -1
-|  24| dword | File pointer to *Defined Symbols*, may be -1
-|  28| dword | File pointer to *External Symbols*, may be -1
-|  32| dword | File pointer to *Sections*, may be -1
-|  36| dword | File pointer to *String Table*
-|     |      | **Expressions**
-         expressions defined in this module
-|expr+0| dword  | Expression type: 
-         0 : end marker 
-         1 : signed 8-bit value, JR-offset 
-         2 : unsigned 8-bit value 
-         3 : signed 8-bit value 
-         4 : 16-bit value 
-         5 : 16-bit value, big-endian 
-         6 : 32-bit value 
-         7 : unsigned 8-bit value, extended to 16 bits (appending a 0) 
-         8 : signed 8-bit value, sign-extended to 16 bits (appending a 0xff if negative or 0 otherwise) 
-         9 : 24-bit value 
-         10 : unsigned 8-bit value, offset to 0xFF00 
-         11 : DEFC expression copmputed at link time and assigning a symbol 
-         12 : signed 16-bit value, JRE-offset
-         13 : unsigned byte extended to 24 bits
-         14 : signed byte sign-extended to 24 bits		 |
-|     | strid | Source file name where expression was defined |
-|     | dword  | Line number in source file where expression was defined |
-|     | strid | Section name where expression was defined |
-|     | dword  | *ASMPC*: relative module code address of the start of the assembly instruction to be used as *ASMPC* during expression evaluation |
-|     | dword  | *patchptr*: relative module code patch pointer to store the result of evaluating the expression |
-|     | dword  | *opcode_size*: size of the instruction using this expression, needed to compute relative jumps |
-|     | strid | *target_name*: name of the symbol that receives the result of evaluating the expression, only used for type 11 expressions, empty string for the other types |
-|     | strid | *expression*: expression text as parsed from the source file |
+|  24| dword | File pointer to *Relocations*, may be -1
+|  28| dword | File pointer to *Defined Symbols*, may be -1
+|  32| dword | File pointer to *External Symbols*, may be -1
+|  36| dword | File pointer to *Sections*, may be -1
+|  40| dword | File pointer to *String Table*
+|    |       |
+|    |       | **Expressions**
+|    |       | List of expressions defined in this module:
+|    | dword | Expression type: 
+|    |       | 0 :  end marker 
+|    |       | 1 :  signed 8-bit value, JR-offset 
+|    |       | 2 :  unsigned 8-bit value 
+|    |       | 3 :  signed 8-bit value 
+|    |       | 4 :  16-bit value 
+|    |       | 5 :  16-bit value, big-endian 
+|    |       | 6 :  32-bit value 
+|    |       | 7 :  unsigned 8-bit value, extended to 16 bits (appending a 0) 
+|    |       | 8 :  signed 8-bit value, sign-extended to 16 bits
+|    |       |      (appending a 0xff if negative or 0 otherwise) 
+|    |       | 9 :  24-bit value 
+|    |       | 10 : unsigned 8-bit value, offset to 0xFF00 
+|    |       | 11 : DEFC expression computed at link time and assigning
+|    |       |      a symbol 
+|    |       | 12 : signed 16-bit value, JRE-offset
+|    |       | 13 : unsigned byte extended to 24 bits
+|    |       | 14 : signed byte sign-extended to 24 bits
+|    | strid | Source file name where expression was defined
+|    | dword | Line number in source file where expression was defined
+|    | strid | Section name where expression was defined
+|    | dword | *ASMPC* : relative module code address of the start of the
+|    |       |           assembly instruction to be used as *ASMPC* during
+|    |       |           expression evaluation
+|    | dword | *patchptr* : relative module code patch pointer to store 
+|    |       |              the result of evaluating the expression
+|    | dword | *opcode_size* : size of the instruction using this expression, 
+|    |       |                 needed to compute relative jumps
+|    | strid | *target_name* : name of the symbol that receives the result
+|    |       |                 of evaluating the expression, only used for
+|    |       |                 type 11 expressions, empty string for the 
+|    |       |                 other types
+|    | strid | *expression* : expression text as parsed from the source file
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **Relocations**
+|    |       | List of simple relocations defined in this module:
+|    | dword | Relocation type (subset of Expression type): 
+|    |       | 0 :  end marker 
+|    |       | 2 :  unsigned 8-bit value 
+|    |       | 3 :  signed 8-bit value 
+|    |       | 4 :  16-bit value 
+|    |       | 5 :  16-bit value, big-endian 
+|    |       | 6 :  32-bit value 
+|    |       | 7 :  unsigned 8-bit value, extended to 16 bits (appending a 0) 
+|    |       | 8 :  signed 8-bit value, sign-extended to 16 bits
+|    |       |      (appending a 0xff if negative or 0 otherwise) 
+|    |       | 9 :  24-bit value 
+|    |       | 10 : unsigned 8-bit value, offset to 0xFF00 
+|    |       | 13 : unsigned byte extended to 24 bits
+|    |       | 14 : signed byte sign-extended to 24 bits
+|    | strid | Source file name where relocation was defined
+|    | dword | Line number in source file where relocation was defined
+|    | strid | Section name where relocation was defined
+|    | dword | *patchptr* : relative module code patch pointer to store 
+|    |       |              the result of evaluating the relocation
+|    | strid | *symbol* : base symbol for relocation
+|    | dword | *addend* : addend to add to symbol
+|    |       |
 |...|...|...|
 |      |      | **Defined Symbols**
         symbols defined in this module |
@@ -134,30 +175,41 @@ The format of the object file is as follows:
 |      |      | **Module Name** 
          module name
 |name+0 | strid | *name*: module name
-|...|...|...|
-|      |      | **Sections**
-        contains the binary code of each section of the module |
-|code+0 | dword  | *length*: defines the total code length, -1 to signal the end |
-|      | strid | *section*: source file section name
-|      | dword  | *ORG Address*: contains the user defined ORG address for the start of this section,
-        -1 for no ORG address was defined, or
-        -2 to split section to a different binary file
-        If multiple sections are given with an ORG address each, the assembler generates one binary file for each section with a defined ORG, followed by all sections without one |
-|      | dword  | *ALIGN*: defines the address alignment of this section,
-        -1 if not defined
-        The previous section is padded to align the start address of this section |
-|      |byte[length]| *code*: contains the binary code |
-|...|...|...|
-|      |      | **String Table**
-        contains the array of strings used in the object file |
-|table+0| dword  | *count*, number of strings in the table |
-|      | dword  | *size*, total size of blob of all the strings rounded up to the next aligned address |
-|...|...|...|
-|...|...| Table of indices: |
-|      | dword  | *index*, index of first character of this string in the end blob of all strings |
-|...|...|...|
-|...|...| Blob of strings: |
-|      | char[] | Characters of the strings followed by '\0' terminator |
+|    |       |
+|    |       | **Sections**
+|    |       | Contains the binary code of each section of the module
+|    | dword | *length*: defines the total code length, -1 to signal the end
+|    | strid | *section*: source file section name
+|    | dword | *ORG Address*: contains the user defined ORG address for the
+|    |       |                start of this section, or
+|    |       |                -1 for no ORG address was defined, or
+|    |       |                -2 to split section to a different binary file
+|    |       |                If multiple sections are given with an ORG
+|    |       |                address each, the assembler generates one
+|    |       |                binary file for each section with a defined
+|    |       |                ORG, followed by all sections without one
+|    | dword | *ALIGN*: defines the address alignment of this section, or
+|    |       |                -1 if not defined
+|    |       |                The previous section is padded to align the
+|    |       |                start address of this section
+|    | bytes | *code*: contains the binary code
+|    | bytes | possible padding to align file on 4-byte boundary
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **String Table**
+|    |       | Contains the array of strings used in the object file
+|    | dword | *count* : number of strings in the table
+|    | dword | *size*  : total size of blob of all the strings rounded up
+|    |       |           to the next aligned address
+|    |       | Table of indices:
+|    | dword | *index* : index of first character of this string in the
+|    |       |           blob of all strings
+|... | ...   | ...
+|    | chars |Blob of strings : Characters of each string followed
+|    |       |                  by '\0' terminator and padded to align 4
+|    |       |
+
 
 Library file format
 -------------------

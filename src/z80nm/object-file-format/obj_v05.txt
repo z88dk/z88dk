@@ -75,6 +75,19 @@ The format of the object file is as follows:
 |    |       |              the result of evaluating the expression
 |    |lstring| *expression* : expression text as parsed from the source file
 |    |       |
+|... | ...   | ...
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **Sections**
+|    |       | Contains the binary code of each section of the module
+|    | dword | *length*: defines the total code length, -1 to signal the end
+|    |string | *section*: source file section name
+|    | bytes | *code*: contains the binary code
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       |
 
 
 History

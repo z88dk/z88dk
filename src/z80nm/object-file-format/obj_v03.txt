@@ -43,6 +43,7 @@ The format of the object file is as follows:
 |   8| word  | ORG Address:
 |    |       | contains the ORG address for the linked machine code
 |    |       | or *0xFFFF* for no ORG address defined
+|    |       | 
 |  10| dword | File pointer to *Module Name*
 |  14| dword | File pointer to *Expressions*, may be -1
 |  18| dword | File pointer to *Defined Symbols*, may be -1
@@ -78,8 +79,11 @@ The format of the object file is as follows:
 |    |       |
 |    |       | *Module Name*
 |    |       | 
-|    |       | *Machine Code*
-|    |       | 
+|    |       | **Machine Code**
+|    |       | Contains the binary code
+|    | word  | *length*: defines the total code length, 0x0000 for 64K
+|    | bytes | *code*: contains the binary code
+|    |       |
 
 
 History

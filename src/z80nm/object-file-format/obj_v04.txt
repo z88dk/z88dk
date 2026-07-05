@@ -74,6 +74,15 @@ The format of the object file is as follows:
 |    |       |              the result of evaluating the expression
 |    |lstring| *expression* : expression text as parsed from the source file
 |    |       |
+|... | ...   | ...
+|    |       |
+|... | ...   | ...
+|    |       |
+|    |       | **Machine Code**
+|    |       | Contains the binary code
+|    | word  | *length*: defines the total code length, 0x0000 for 64K
+|    | bytes | *code*: contains the binary code
+|    |       |
 
 
 History
