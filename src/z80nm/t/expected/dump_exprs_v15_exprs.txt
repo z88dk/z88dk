@@ -1,0 +1,18 @@
+Object  file test_t_dump_exprs_t.o at $0000: Z80RMF15
+  Name: module1
+  Section section1: 0 bytes
+  Expressions:
+    E J $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E U $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E S $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E W $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E B $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E L $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E u $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E s $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E P $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E H $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E = $1234 $0000: x := label1+123 (section section1) (file file1.asm:123)
+    E j $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E v $1234 $1235: label1+123 (section section1) (file file1.asm:123)
+    E t $1234 $1235: label1+123 (section section1) (file file1.asm:123)

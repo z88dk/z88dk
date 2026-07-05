@@ -9,11 +9,10 @@ use Path::Tiny;
 use lib '.';
 use ObjModule;
 
-for my $v (Obj->min_version+1 .. Obj->cur_version) {
-    my $old = sprintf "%02d", $v-1;
+for my $v ( Obj->min_version + 1 .. Obj->cur_version ) {
+    my $old = sprintf "%02d", $v - 1;
     my $new = sprintf "%02d", $v;
-    system( "start \"\" WinMergeU.exe " . 
-            path($0)->parent->child("obj_v$old.txt") . " " .
-            path($0)->parent->child("obj_v$new.txt")
-    );
+    system(   "start \"\" WinMergeU.exe "
+            . path($0)->parent->child("obj_v$old.txt") . " "
+            . path($0)->parent->child("obj_v$new.txt") );
 }

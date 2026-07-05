@@ -83,10 +83,11 @@ The format of the object file is as follows:
 |    |       |
 |  16| dword | File pointer to *Module Name*
 |  20| dword | File pointer to *Expressions*, may be -1
-|  24| dword | File pointer to *Defined Symbols*, may be -1
-|  28| dword | File pointer to *External Symbols*, may be -1
-|  32| dword | File pointer to *Sections*, may be -1
-|  36| dword | File pointer to *String Table*
+|  24| dword | File pointer to *Relocations*, may be -1
+|  28| dword | File pointer to *Defined Symbols*, may be -1
+|  32| dword | File pointer to *External Symbols*, may be -1
+|  36| dword | File pointer to *Sections*, may be -1
+|  40| dword | File pointer to *String Table*
 |    |       |
 |    |       | **Expressions**
 |    |       | List of expressions defined in this module:
@@ -123,6 +124,30 @@ The format of the object file is as follows:
 |    |       |                 type 11 expressions, empty string for the 
 |    |       |                 other types
 |    | strid | *expression* : expression text as parsed from the source file
+|    |       |
+|    |       | **Relocations**
+|    |       | List of simple relocations defined in this module:
+|    | dword | Relocation type (subset of Expression type): 
+|    |       | 0 :  end marker 
+|    |       | 2 :  unsigned 8-bit value 
+|    |       | 3 :  signed 8-bit value 
+|    |       | 4 :  16-bit value 
+|    |       | 5 :  16-bit value, big-endian 
+|    |       | 6 :  32-bit value 
+|    |       | 7 :  unsigned 8-bit value, extended to 16 bits (appending a 0) 
+|    |       | 8 :  signed 8-bit value, sign-extended to 16 bits
+|    |       |      (appending a 0xff if negative or 0 otherwise) 
+|    |       | 9 :  24-bit value 
+|    |       | 10 : unsigned 8-bit value, offset to 0xFF00 
+|    |       | 13 : unsigned byte extended to 24 bits
+|    |       | 14 : signed byte sign-extended to 24 bits
+|    | strid | Source file name where relocation was defined
+|    | dword | Line number in source file where relocation was defined
+|    | strid | Section name where relocation was defined
+|    | dword | *patchptr* : relative module code patch pointer to store 
+|    |       |              the result of evaluating the relocation
+|    | strid | *symbol* : base symbol for relocation
+|    | dword | *addend* : addend to add to symbol
 |    |       |
 
 
@@ -178,7 +203,9 @@ History
          for a different architecture; add a string table to remove
          duplicate strings and speed up linking
 
-* *19* : (not yet in production) add symbol index in the library to
-         speed up linking - only the modules that will be needed are
-         parsed; add end marker in the library instead of -1 file 
-         pointer in the last module (easier parsing).
+* *19* : (not yet in production) 
+         add symbol index in the library to speed up linking; 
+		 add Relocations section for simple relocations of symbol + addend 
+		 to speed up linking; 
+		 add end marker in the library instead of -1 file pointer 
+		 in the last module

@@ -82,26 +82,26 @@ $mod->externs->add("func3");
 
 my $section = ObjSection->new;
 $section->name("code");
-push @{$section->bytes}, 0..0xFF;
+push @{ $section->bytes }, 0 .. 0xFF;
 
 $mod->sections->add($section);
 
 $section = ObjSection->new;
 $section->name("data");
 $section->org(0x1000);
-push @{$section->bytes}, 0..0xFF;
+push @{ $section->bytes }, 0 .. 0xFF;
 
 $mod->sections->add($section);
 
 $section = ObjSection->new;
 $section->name("bss");
 $section->split(1);
-push @{$section->bytes}, 0..0xFF;
+push @{ $section->bytes }, 0 .. 0xFF;
 
 $mod->sections->add($section);
 
 # save to file
-open(my $fh, ">", "module.def") or die "open module.def: $!";
+open( my $fh, ">", "module.def" ) or die "open module.def: $!";
 my $ctx = ContextDumper->new($fh);
 $mod->dump($ctx);
 close($fh);
@@ -112,13 +112,13 @@ $scanner->scan_file("module.def");
 $mod = ObjModule->parse($scanner);
 
 # write to second file
-open($fh, ">", "module2.def") or die "open module2.def: $!";
+open( $fh, ">", "module2.def" ) or die "open module2.def: $!";
 $ctx = ContextDumper->new($fh);
 $mod->dump($ctx);
 close($fh);
 
 # compare
-say diff("module.def", "module2.def");
+say diff( "module.def", "module2.def" );
 
 # build library
 my $lib = ObjLibrary->new;
@@ -129,7 +129,7 @@ $ctx = ContextDumper->new();
 $lib->dump($ctx);
 
 # save to file
-open($fh, ">", "library.def") or die "open library.def: $!";
+open( $fh, ">", "library.def" ) or die "open library.def: $!";
 $ctx = ContextDumper->new($fh);
 $lib->dump($ctx);
 close($fh);
@@ -140,23 +140,22 @@ $scanner->scan_file("library.def");
 $lib = ObjLibrary->parse($scanner);
 
 # write to second file
-open($fh, ">", "library2.def") or die "open library2.def: $!";
+open( $fh, ">", "library2.def" ) or die "open library2.def: $!";
 $ctx = ContextDumper->new($fh);
 $lib->dump($ctx);
 close($fh);
 
 # compare
-say diff("library.def", "library2.def");
+say diff( "library.def", "library2.def" );
 
 my $bin = BinData->new;
 $mod->pack($bin);
-path("module.o")->spew_raw($bin->data);
+path("module.o")->spew_raw( $bin->data );
 
 my $raw = path("module.o")->slurp_raw;
 $bin->data($raw);
 my $obj = Obj->unpack($bin);
 say dump($obj);
-
 
 __END__
 

@@ -138,17 +138,19 @@ sub check_obj {
     close $fh;
 
     check_text_file( "$test.2.def", $exp_def );
-    
+
     ( Test::More->builder->is_passing ) or die;
 
     # write binary file
     my $bin = BinData->new;
     $obj->pack($bin);
-    path("$test.o")->spew_raw( $bin->data );
+    my $raw = $bin->data;
+    path("$test.o")->spew_raw($raw);
 
     # read binary file and check that it matches the original object
     my $bin3 = BinData->new;
-    $bin3->data( path("$test.o")->slurp_raw );
+    $raw = path("$test.o")->slurp_raw;
+    $bin3->data($raw);
     my $obj3 = Obj->unpack($bin3);
 
     open $fh, '>', "$test.3.def" or die "Can't open output file: $!";

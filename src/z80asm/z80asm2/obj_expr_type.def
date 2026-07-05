@@ -16,8 +16,8 @@ X(8,  ByteToWordSigned,		's')	// signed byte sign-extended to 16 bits
 X(9,  Ptr24,				'P')	// 24-bit pointer
 X(10, HighOffset,			'H')	// byte offset to 0xFF00
 X(11, Assignment,			'=')	// DEFC expression assigning a symbol
-X(12, JreOffset,			0)      // 16-bit relative offset for JRE
-X(13, ByteToPtrUnsigned, 	0)    	// unsigned byte extended to 24 bits
-X(14, ByteToPtrSigned, 		0)		// signed byte sign-extended to 24 bits
+X(12, JreOffset,			'j')    // 16-bit relative offset for JRE
+X(13, ByteToPtrUnsigned, 	'v')   	// unsigned byte extended to 24 bits
+X(14, ByteToPtrSigned, 		't')	// signed byte sign-extended to 24 bits
 
 #undef X

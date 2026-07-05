@@ -1,0 +1,16 @@
+Object  file test_t_dump_exprs_t.o at $0000: Z80RMF01
+  Name: module1
+  Expressions:
+    E J $1235: label1+123
+    E U $1235: label1+123
+    E S $1235: label1+123
+    E W $1235: label1+123
+    E B $1235: label1+123
+    E L $1235: label1+123
+    E u $1235: label1+123
+    E s $1235: label1+123
+    E P $1235: label1+123
+    E H $1235: label1+123
+    E j $1235: label1+123
+    E v $1235: label1+123
+    E t $1235: label1+123
