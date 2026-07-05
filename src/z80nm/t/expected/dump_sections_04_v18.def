@@ -1,0 +1,25 @@
+begin module
+    name                      = module1
+    version                   = 18
+    cpu                       = z80 ; (1)
+    swap_ixiy                 = 0
+    begin sections
+        begin section
+            name              = "section1"
+            org               = 0x1000
+            align             = 256
+            split             = 0
+            begin bytes
+                00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F ; 0x0000
+            end bytes
+        end section
+        begin section
+            name              = "section2"
+            align             = 1
+            split             = 1
+            begin bytes
+                00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F ; 0x0000
+            end bytes
+        end section
+    end sections
+end module

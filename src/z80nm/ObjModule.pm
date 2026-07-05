@@ -1629,14 +1629,17 @@ sub pack {
 }
 
 sub unpack {
-    my ( $class, $bin, $strings, $version, $limit_pos ) = @_;
+    my ( $class, $bin, $strings, $version ) = @_;
     my $self = $class->new;
-    while ( $bin->read_pos < $limit_pos ) {
-        if ( my $section = ObjSection->unpack( $bin, $strings, $version ) ) {
+
+    if ( $version >= 5 ) {
+        while ( my $section = ObjSection->unpack( $bin, $strings, $version ) ) {
             push @{ $self->sections }, $section;
         }
-        else {
-            last;    # end marker
+    }
+    else {
+        if ( my $section = ObjSection->unpack( $bin, $strings, $version ) ) {
+            push @{ $self->sections }, $section;
         }
     }
     return $self;
@@ -1805,9 +1808,6 @@ sub pack {
     my $symbols_pos = -1;    #$bin->size;
     my $externs_pos = -1;    #$bin->size;
 
-    my $sections_pos =
-        $self->sections->pack( $bin, $self->strings, $self->version );
-
     # write module name
     my $modname_pos = $bin->size;
     if ( $self->version >= 18 ) {
@@ -1820,6 +1820,10 @@ sub pack {
     else {
         $bin->pack_cstring( $self->name );
     }
+
+    # write sections
+    my $sections_pos =
+        $self->sections->pack( $bin, $self->strings, $self->version );
 
     # write string table
     if ( $self->version >= 18 ) {
@@ -1932,9 +1936,8 @@ sub unpack {
     # sections
     if ( $sections_pos >= 0 ) {
         $bin->read_pos($sections_pos);
-        my $limit_pos = $bin->size;
-        my $sections  = ObjSections->unpack( $bin, $self->strings,
-            $self->version, $limit_pos );
+        my $sections =
+            ObjSections->unpack( $bin, $self->strings, $self->version );
         $self->sections($sections);
     }
 
