@@ -216,6 +216,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint);
 static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint);
 static int build_assign(Builder *b, Node *n);
 static int build_cast(Builder *b, Node *n);
+static int build_cond(Builder *b, Node *n, int true_bb, int false_bb);
 static int build_muldiv_integer(Builder *b, Node *n);
 static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k);
 static int init_typed_region(Builder *b, int base, int off,
@@ -2798,13 +2799,17 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
                           elem_w);
     int loaded = new_temp(b, elem_w);
     b->f->vregs[loaded].width = elem_w;
+    /* Keep the element kind in a local: the `ld` Op* points into the BB's
+       ops array, which the emits below (binop, store) can realloc — reading
+       ld->mem.elem afterwards would be a use-after-free. */
+    Kind elem_k = (elem_w == 1) ? KIND_CHAR
+                : (elem_w == 2) ? KIND_INT
+                :                 KIND_LONG;
     Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
     ld->dst       = loaded;
     ld->mem.kind  = IR_MEM_VREG;
     ld->mem.base  = ptr_v;
-    ld->mem.elem  = (elem_w == 1) ? KIND_CHAR
-                  : (elem_w == 2) ? KIND_INT
-                  :                 KIND_LONG;
+    ld->mem.elem  = elem_k;
     ld->mem.bank_fn = bf;
     int dst = new_temp(b, elem_w);
     b->f->vregs[dst].width = elem_w;
@@ -2823,7 +2828,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     st->src[0]    = dst;
     st->mem.kind  = IR_MEM_VREG;
     st->mem.base  = ptr_v;
-    st->mem.elem  = ld->mem.elem;
+    st->mem.elem  = elem_k;   /* NOT ld->mem.elem — `ld` may be realloc-stale */
     st->mem.bank_fn = bf;
     return dst;
 }
@@ -3639,7 +3644,10 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
         int dst = new_temp_kind(b, KIND_INT);
-        if (b->f->vregs[v].width == 4) {
+        /* Width 4 (long/far-ptr, byte-wise XOR-OR chain) and width 1 (byte,
+           tested with `or a` — no 16-bit widen) both use the const-RHS EQ-0
+           fold; only the plain int case needs a materialised 0 vreg. */
+        if (b->f->vregs[v].width == 4 || b->f->vregs[v].width == 1) {
             Op *op = ir_op_emit(cur_bb(b), IR_CMP_EQ);
             op->dst = dst; op->src[0] = v; op->src[1] = -1; op->imm = 0;
             return dst;
@@ -4387,9 +4395,6 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         if (!n->cond || !n->then || !n->els)
             return build_fail("AST_TERNARY expr with missing arm");
 
-        int cond_v = build_expr(b, n->cond);
-        if (cond_v < 0) return -1;
-
         int then_bb = ir_bb_new(b->f);
         int els_bb  = ir_bb_new(b->f);
         int exit_bb = ir_bb_new(b->f);
@@ -4404,13 +4409,9 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         b->f->vregs[result].width = (int16_t)rw;
         if (n->type) b->f->vregs[result].kind = n->type->kind;
 
-        /* current bb: BR_ZERO to els, then explicit BR to then.
-           Conditional jumps are not terminators in our IR — the BB
-           always ends with an unconditional terminator so fall-through
-           doesn't depend on BB array order. ir_emit_br_zero records
-           els_bb as a succ; ir_emit_br fills in the second succ slot. */
-        ir_emit_br_zero(cur_bb(b), cond_v, els_bb);
-        ir_emit_br(cur_bb(b), then_bb);
+        /* Short-circuit the condition (arms produce the value). Targets are
+           pre-created above so their ids stay above the test block. */
+        if (build_cond(b, n->cond, then_bb, els_bb) != 0) return -1;
 
         b->cur_bb_id = then_bb;
         int t = build_expr_hinted(b, n->then, result);
@@ -6296,6 +6297,95 @@ static int naked_body_is_asm_only(const Node *n)
     return 0;
 }
 
+/* ---- Control-context (short-circuit) condition lowering ----------------
+   `build_cond(cond, true_bb, false_bb)` lowers a boolean condition feeding a
+   branch into direct short-circuit jumps to true_bb / false_bb, instead of the
+   value-context path (`build_expr` → 0/1 vreg → BR_ZERO), which materialises a
+   boolean per operand of every `&&`/`||`. Control-context lowering emits one
+   conditional branch per comparison (the lowerer then fuses CMP+branch) — the
+   standard "jumping code" for booleans.
+
+   These emit NO new BBs — every conditional branch targets the caller's
+   pre-created true_bb/false_bb and the block ends with one BR, so the builder's
+   BB-id order (forward edges → higher ids) is preserved. In an &&-chain every
+   conditional exit goes to false_bb (dedup'd into one CFG successor by
+   bb_add_succ); the final BR goes to true_bb — two distinct successors. `||`
+   is the mirror. A polarity-flipped nested logical (`||` under `&&`, or vice
+   versa) can't fall through in one block; it's handled as a value leaf
+   (build_expr + branch), still short-circuiting the enclosing chain. */
+
+static int emit_cond_false_exit(Builder *b, Node *n, int false_bb);
+static int emit_cond_true_exit(Builder *b, Node *n, int true_bb);
+
+/* Branch to false_bb when `n` is FALSE, else fall through — an && operand. */
+static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
+{
+    if (!n) return build_fail("build_cond: null && operand");
+    switch (n->ast_type) {
+    case OP_ANDAND:
+        if (!n->left || !n->right)
+            return build_fail("OP_ANDAND with missing operand");
+        if (emit_cond_false_exit(b, n->left, false_bb) != 0) return -1;
+        return emit_cond_false_exit(b, n->right, false_bb);
+    case OP_LNEG:   /* !x is false ⟺ x is true → x-true exits to false_bb */
+        if (!n->operand) return build_fail("OP_LNEG with missing operand");
+        return emit_cond_true_exit(b, n->operand, false_bb);
+    default: {
+        int v = build_expr(b, n);
+        if (v < 0) return -1;
+        ir_emit_br_zero(cur_bb(b), v, false_bb);
+        return 0;
+    }
+    }
+}
+
+/* Branch to true_bb when `n` is TRUE, else fall through — an || operand. */
+static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
+{
+    if (!n) return build_fail("build_cond: null || operand");
+    switch (n->ast_type) {
+    case OP_OROR:
+        if (!n->left || !n->right)
+            return build_fail("OP_OROR with missing operand");
+        if (emit_cond_true_exit(b, n->left, true_bb) != 0) return -1;
+        return emit_cond_true_exit(b, n->right, true_bb);
+    case OP_LNEG:   /* !x is true ⟺ x is false → x-false exits to true_bb */
+        if (!n->operand) return build_fail("OP_LNEG with missing operand");
+        return emit_cond_false_exit(b, n->operand, true_bb);
+    default: {
+        int v = build_expr(b, n);
+        if (v < 0) return -1;
+        ir_emit_br_cond(cur_bb(b), v, true_bb);
+        return 0;
+    }
+    }
+}
+
+static int build_cond(Builder *b, Node *n, int true_bb, int false_bb)
+{
+    if (!n) return build_fail("build_cond: null condition");
+    switch (n->ast_type) {
+    case OP_ANDAND:
+        if (emit_cond_false_exit(b, n, false_bb) != 0) return -1;
+        ir_emit_br(cur_bb(b), true_bb);
+        return 0;
+    case OP_OROR:
+        if (emit_cond_true_exit(b, n, true_bb) != 0) return -1;
+        ir_emit_br(cur_bb(b), false_bb);
+        return 0;
+    case OP_LNEG:   /* !cond → branch with the targets swapped */
+        if (!n->operand) return build_fail("OP_LNEG with missing operand");
+        return build_cond(b, n->operand, false_bb, true_bb);
+    default: {
+        int v = build_expr(b, n);
+        if (v < 0) return -1;
+        ir_emit_br_zero(cur_bb(b), v, false_bb);
+        ir_emit_br(cur_bb(b), true_bb);
+        return 0;
+    }
+    }
+}
+
 static int build_stmt(Builder *b, Node *n)
 {
     if (!n) return 0;
@@ -6656,18 +6746,14 @@ static int build_stmt(Builder *b, Node *n)
             if (n->then && build_stmt(b, n->then) != 0) return -1;
             return 0;
         }
-        int cond_v = build_expr(b, n->cond);
-        if (cond_v < 0) return -1;
-
         int then_bb = ir_bb_new(b->f);
         int exit_bb = ir_bb_new(b->f);
         int els_bb  = n->els ? ir_bb_new(b->f) : exit_bb;
 
-        /* BR_ZERO is non-terminator; add explicit BR to then for the
-           cond-true case. Avoids relying on BB array-emit order
-           matching the desired fall-through. */
-        ir_emit_br_zero(cur_bb(b), cond_v, els_bb);
-        ir_emit_br(cur_bb(b), then_bb);
+        /* Short-circuit control-context lowering: compound `&&`/`||` become
+           direct branches to then_bb/els_bb (targets pre-created so their ids
+           stay above the test block). build_cond creates no BBs. */
+        if (build_cond(b, n->cond, then_bb, els_bb) != 0) return -1;
 
         b->cur_bb_id = then_bb;
         if (n->then && build_stmt(b, n->then) != 0) return -1;

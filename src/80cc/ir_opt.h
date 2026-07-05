@@ -129,6 +129,18 @@ int ir_opt_ivsr(Func *f);
  * function-wide uses, iterated to a fixed point. Returns removals. */
 int ir_opt_dce(Func *f);
 
+/* Remove basic blocks unreachable from the entry (bb 0). ir_build leaves
+ * dead split/forwarding BBs behind; a dead BB whose id sits below its
+ * successor forges a spurious back-edge, inflating the loop-depth /
+ * back-edge scans that LICM and ir_alloc's residency picks depend on.
+ * BFS from bb 0 over CFG successors (covers IR_SWITCH), free the dead BBs,
+ * compact the array, and remap every stored BB id (succ[], branch
+ * op->label, switch targets) + renumber bb->id to the new array index
+ * (an invariant every id-indexed lowerer array relies on). Runs first so
+ * every later pass sees a clean CFG. IR_NO_PRUNE opts out. Returns the
+ * number of blocks removed. */
+int ir_opt_prune_unreachable(Func *f);
+
 /* Byte-width narrowing: a promoted int binop (add/sub/and/or/xor/shl)
  * whose result is only truncated back to a byte is re-typed width-1 so
  * ir_lower emits the 8-bit-in-A form. IR_NO_NARROW_BYTE opts out.

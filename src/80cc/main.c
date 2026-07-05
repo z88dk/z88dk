@@ -45,10 +45,8 @@ int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
 int c_params_offset = 2;
 int c_old_diagnostic_fmt = 0;
-/* The legacy emit-while-parsing path was removed in Phase H step 2.
-   AST codegen via ast_codegen2.c is the only code generation mode.
-   The shell ships the previous binary as the escape hatch if
-   someone needs the old behaviour. */
+/* Function codegen runs through the IR pipeline (ir_build → ir_lower);
+   the legacy emit-while-parsing path and the AST walker are both gone. */
 int c_ast_print = 0;         /* 1 = print the AST per function and skip codegen */
 int c_ast_print_types = 0;   /* 1 = decorate print_ast output with type info */
 int c_use_ir = 0;            /* 1 = route function codegen through ir_build → ir_lower */

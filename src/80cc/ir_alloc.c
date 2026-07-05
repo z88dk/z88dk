@@ -84,6 +84,635 @@ static int op_dst_spill_is_dead(const BB *bb, int op_idx)
     return 1;
 }
 
+/* Enumerate ALL of a BB's CFG successors into out[] (up to max), from its
+   branch/switch OPS — not the fixed succ[2] pair, which a short-circuit
+   &&/|| lowering (>2 branch ops in one BB) silently truncates. Returns the
+   count. Used to build the predecessor adjacency for natural-loop nesting. */
+static int alloc_bb_succ(const BB *bb, int *out, int max)
+{
+    int n = 0;
+    for (int j = 0; j < bb->n_ops && n < max; j++) {
+        const Op *o = &bb->ops[j];
+        if (o->kind == IR_BR || o->kind == IR_BR_COND || o->kind == IR_BR_ZERO) {
+            if (o->label >= 0) out[n++] = o->label;
+        } else if (o->kind == IR_SWITCH && o->sw) {
+            for (int c = 0; c < o->sw->n_cases && n < max; c++)
+                if (o->sw->target_bb[c] >= 0) out[n++] = o->sw->target_bb[c];
+            if (n < max && o->sw->default_bb >= 0) out[n++] = o->sw->default_bb;
+        }
+    }
+    /* Fall-through successors carried only in succ[] (defensive). */
+    for (int s = 0; s < 2 && n < max; s++)
+        if (bb->succ[s] >= 0) {
+            int dup = 0;
+            for (int k = 0; k < n; k++) if (out[k] == bb->succ[s]) { dup = 1; break; }
+            if (!dup) out[n++] = bb->succ[s];
+        }
+    return n;
+}
+
+/* ---- Register-residency orchestrator (Phase 0: PR_BC only) ---------------
+   A proposer emits Candidates; an arbiter assigns physical registers. Phase 0
+   converts the PR_BC picker to this shape byte-identically (single proposer,
+   single register class); later phases add proposers + cross-class arbitration.
+   See src/80cc/LOOP_ALLOC_PLAN.md. */
+/* Register-class masks a candidate may be assigned to. Grows as pickers
+   convert; the Phase-0 arbiters key off these + the flags below. */
+enum {
+    RC_BC     = 1u << 0,   /* the BC pair */
+    RC_IDX2   = 1u << 1,   /* the spare index register f->idx2_reg (IX or IY) */
+    RC_DE_ACC = 1u << 2,   /* the DE pair, as a loop reduction accumulator */
+    RC_BYTE   = 1u << 3,   /* a byte home (C slotless, or E slot-backed) */
+};
+/* Per-candidate discriminators the arbiters need for byte-identical priority. */
+enum {
+    CF_IDX2_COUNTER   = 1u << 0,   /* idx2: a stepping counter (beats a param) */
+    CF_IDX2_PARAM     = 1u << 1,   /* idx2: a read-only invariant param */
+    CF_BYTE_SINGLE_BB = 1u << 2,   /* byte: confined to one BB → slotless PR_C ok */
+    CF_SPECULATIVE    = 1u << 3,   /* IV-residency candidate (Phase 2) */
+};
+/* Cost-model per-access weights (relative T-state savings of reg vs slot; the
+   orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
+   in a register avoids a full pointer reload → worth most; a value read is a
+   reg-copy vs a slot load; a write is a reg-stamp vs a slot store. Tuned so a
+   hot deref base out-ranks a merely-frequent write-heavy IV. */
+#define COST_DEREF_W  3
+#define COST_READ_W   2
+#define COST_WRITE_W  1
+typedef struct {
+    int      vreg;
+    long     benefit;   /* higher = more valuable (Phase 0 = depth-weighted use_count) */
+    int      lo, hi;    /* live interval [first_use, last_use] */
+    unsigned allowed;   /* RC_* mask */
+    unsigned flags;     /* CF_* */
+} Cand;
+
+/* Op-kinds whose width-2 lowering STAMPS a PR_BC dst into BC (end in
+   spill_and_swap_unless_dead / commit_hl_word → `ld bc,hl`). A write-many int
+   IV lives in BC only if EVERY def is such a kind (else a def elsewhere leaves
+   BC stale). Phase 2 IV-residency proposer. */
+static int bc_safe_producer(int k)
+{
+    switch (k) {
+    case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
+    case IR_LD_MEM: case IR_LEA: case IR_MOV:
+    case IR_ADD: case IR_SUB: case IR_RSUB:
+    case IR_AND: case IR_OR: case IR_XOR:
+    case IR_SHL: case IR_SHR:
+    case IR_INC: case IR_DEC:
+    case IR_NEG: case IR_NOT:
+    case IR_CONV_ZX: case IR_CONV_SX:
+    case IR_CONV_BYTE_TO_HIGH:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* PR_BC proposer: the width-2 vregs eligible for a BC home (read-free PARAM,
+   IVSR write-twice pointer, or write-once LOCAL with a BC-stamping producer).
+   Fills out[] (caller sizes it f->n_vregs) and returns the count. This is the
+   former collection-loop gate verbatim — the effective selector; the old
+   separate cap-count loop (a looser gate used only for sizing) is dropped. */
+static int pr_bc_propose(const Func *f,
+                         const int *use_count, const int *write_count,
+                         const int *def_kind, int has_prepushed_call,
+                         const BitSet *entry_live,
+                         const int *first_use, const int *last_use,
+                         Cand *out)
+{
+    int n = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        const VReg *vr = &f->vregs[v];
+        if (vr->width != 2) continue;
+        if (vr->flags & IR_VREG_ADDR_TAKEN) continue;
+        if (vr->flags & IR_VREG_VOLATILE) continue;
+        if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (use_count[v] < 2) continue;
+        int is_param  = (vr->flags & IR_VREG_PARAM) != 0;
+        int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
+        if (!is_param && has_prepushed_call) continue;
+        if (!is_param && entry_live && ir_bitset_get(entry_live, v)) continue;
+        if (is_param) {
+            if (write_count[v] > 0) continue;
+        } else if (is_induct) {
+            if (write_count[v] != 2) continue;   /* init + step */
+        } else {
+            if (write_count[v] != 1) continue;
+            int k = def_kind[v];
+            int prod_ok = 0;
+            switch (k) {
+            case IR_LD_IMM: case IR_LD_SYM: case IR_LD_MEM:
+            case IR_MOV:
+            case IR_ADD: case IR_SUB: case IR_RSUB:
+            case IR_AND: case IR_OR: case IR_XOR:
+            case IR_SHL: case IR_SHR:
+            case IR_INC: case IR_DEC:
+            case IR_NEG: case IR_NOT:
+            case IR_CONV_ZX: case IR_CONV_SX:
+            case IR_CONV_BYTE_TO_HIGH:
+                prod_ok = 1;
+                break;
+            default:
+                break;
+            }
+            if (!prod_ok) continue;
+        }
+        out[n].vreg = v;
+        out[n].benefit = use_count[v];
+        out[n].lo = first_use[v];
+        out[n].hi = last_use[v];
+        out[n].allowed = RC_BC;
+        out[n].flags = 0;
+        n++;
+    }
+    return n;
+}
+
+/* idx2 proposer: the two candidate classes for the spare index register
+   (f->idx2_reg) — a hot stepping COUNTER (LD_IMM init + INC/DEC self-steps,
+   never a deref/step base) and a hot read-only PARAM bound. Both need the
+   call/asm/acc-free envelope (a call clobbers the spare index reg). Fills out[]
+   (caller sizes it f->n_vregs) and returns the count. Byte-identical to the two
+   former inline pickers; the counter-beats-param priority lives in the arbiter. */
+static int idx2_propose(const Func *f, const int *use_count,
+                        const int *write_count, const int *first_use,
+                        const int *last_use, Cand *out)
+{
+    if (f->idx2_reg == IR_PR_NONE || f->uses_acc || f->is_interrupt) return 0;
+    /* Envelope: a CALL/HCALL/ASM clobbers the spare index reg (the frame reg
+       survives via its prologue push, the spare one does not). Same scan the
+       former cnt_safe / idx2_safe used. */
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+        }
+    /* Base map: LD_MEM/ST_MEM MEM_VREG base + POSTSTEP src[0] = a deref'd/
+       stepped pointer, never an idx2 counter/bound. (Was cbase / is_base —
+       identical.) */
+    size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+    int *is_base = calloc(nv, sizeof(int));
+    int *cstep   = calloc(nv, sizeof(int));
+    int *cinit   = calloc(nv, sizeof(int));
+    int *cother  = calloc(nv, sizeof(int));
+    int n = 0;
+    if (is_base && cstep && cinit && cother) {
+        for (int i = 0; i < f->n_bbs; i++)
+            for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                const Op *o = &f->bbs[i].ops[j];
+                if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                    && o->mem.kind == IR_MEM_VREG
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                    is_base[o->mem.base] = 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs)
+                    is_base[o->src[0]] = 1;
+                int d = o->dst;
+                if (d < 0 || d >= f->n_vregs) continue;
+                if ((o->kind == IR_INC || o->kind == IR_DEC) && o->src[0] == d)
+                    cstep[d]++;
+                else if (o->kind == IR_LD_IMM) cinit[d]++;
+                else cother[d]++;
+            }
+        int counter_off = getenv("IR_NO_IDX2_COUNTER") != NULL;
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            if (is_base[v]) continue;
+            if (use_count[v] < 4) continue;
+            unsigned fl = 0;
+            /* Stepping counter: only-init(<=1) + steps write it. */
+            if (!counter_off && cstep[v] >= 1 && cother[v] == 0 && cinit[v] <= 1)
+                fl = CF_IDX2_COUNTER;
+            /* Read-only invariant param. */
+            else if ((vr->flags & IR_VREG_PARAM) && write_count[v] == 0)
+                fl = CF_IDX2_PARAM;
+            else continue;
+            out[n].vreg = v;
+            out[n].benefit = use_count[v];
+            out[n].lo = first_use[v];
+            out[n].hi = last_use[v];
+            out[n].allowed = RC_IDX2;
+            out[n].flags = fl;
+            n++;
+        }
+    }
+    free(is_base); free(cstep); free(cinit); free(cother);
+    return n;
+}
+
+/* idx2 arbiter: single occupant. A stepping counter beats a param (it's
+   stepped every iteration); within a class, highest benefit wins, first on a
+   tie (vreg order). Byte-identical to the former counter-then-param sequence. */
+static void arbitrate_idx2(Func *f, const Cand *cand, int n)
+{
+    int best_counter = -1, best_param = -1;
+    for (int i = 0; i < n; i++) {
+        if (!(cand[i].allowed & RC_IDX2)) continue;
+        if (cand[i].flags & CF_IDX2_COUNTER) {
+            if (best_counter < 0 || cand[i].benefit > cand[best_counter].benefit)
+                best_counter = i;
+        } else if (cand[i].flags & CF_IDX2_PARAM) {
+            if (best_param < 0 || cand[i].benefit > cand[best_param].benefit)
+                best_param = i;
+        }
+    }
+    int pick = best_counter >= 0 ? best_counter : best_param;
+    if (pick >= 0) f->vreg_to_phys[cand[pick].vreg] = f->idx2_reg;
+}
+
+/* Word DE-home accumulator proposer: a hot loop-carried width-2 REDUCTION
+   accumulator (`v = v OP w`, w a vreg, inside a loop) with a def that dominates
+   its reads. Gated NO-calls (DE survives by construction) and DE's low half not
+   already a byte E/D home. Fills out[] (sized f->n_vregs), returns the count.
+   Byte-identical to the former inline picker; the OWNS-DE side effects live in
+   the arbiter. */
+static int word_acc_propose(const Func *f, const int *use_count,
+                            const int *write_count, const int *bb_in_loop,
+                            const int *first_use, const int *last_use,
+                            Cand *out)
+{
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+        }
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vreg_to_phys[v] == IR_PR_E || f->vreg_to_phys[v] == IR_PR_D)
+            return 0;   /* DE low half already a byte E/D home */
+    size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+    int *wd_def  = calloc(nv, sizeof(int));
+    int *wd_read = calloc(nv, sizeof(int));
+    int *wd_base = calloc(nv, sizeof(int));
+    int *wd_acc  = calloc(nv, sizeof(int));
+    int n = 0;
+    if (wd_def && wd_read && wd_base && wd_acc) {
+        for (int v = 0; v < f->n_vregs; v++) { wd_def[v] = INT_MAX; wd_read[v] = INT_MAX; }
+        int g = 0;
+        for (int i = 0; i < f->n_bbs; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++, g++) {
+                const Op *o = &bb->ops[j];
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                for (int k = 0; k < nu; k++)
+                    if (u[k] >= 0 && u[k] < f->n_vregs && g < wd_read[u[k]])
+                        wd_read[u[k]] = g;
+                if (o->dst >= 0 && o->dst < f->n_vregs && g < wd_def[o->dst])
+                    wd_def[o->dst] = g;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs && g < wd_def[o->src[0]])
+                    wd_def[o->src[0]] = g;
+                if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                    && o->mem.kind == IR_MEM_VREG
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                    wd_base[o->mem.base] = 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs)
+                    wd_base[o->src[0]] = 1;
+                switch (o->kind) {
+                case IR_ADD: case IR_SUB: case IR_RSUB:
+                case IR_AND: case IR_OR:  case IR_XOR:
+                    if (o->dst >= 0 && o->dst < f->n_vregs
+                        && o->src[1] >= 0 && bb_in_loop[i]
+                        && (o->src[0] == o->dst || o->src[1] == o->dst))
+                        wd_acc[o->dst] = 1;
+                    break;
+                default: break;
+                }
+            }
+        }
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                             | IR_VREG_PARAM)) continue;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            if (wd_base[v]) continue;
+            if (!wd_acc[v]) continue;
+            if (use_count[v] < 4) continue;
+            if (write_count[v] < 2) continue;
+            if (wd_def[v] >= f->bbs[0].n_ops) continue;   /* def in entry bb0 */
+            if (wd_def[v] >= wd_read[v]) continue;        /* def-first */
+            out[n].vreg = v;
+            out[n].benefit = use_count[v];
+            out[n].lo = first_use[v];
+            out[n].hi = last_use[v];
+            out[n].allowed = RC_DE_ACC;
+            out[n].flags = 0;
+            n++;
+        }
+    }
+    free(wd_def); free(wd_read); free(wd_base); free(wd_acc);
+    return n;
+}
+
+/* Word DE-home arbiter: single occupant, highest benefit (first on tie). The
+   winner OWNS DE — every other PR_DE tenant is demoted to SPILL (its def can't
+   clobber the home; it reloads through HL at the accumulate). Saves the pre-pick
+   allocation so the lowerer can revert if no resident region forms. */
+static void arbitrate_word_acc(Func *f, const Cand *cand, int n)
+{
+    int wbest = -1;
+    for (int i = 0; i < n; i++) {
+        if (!(cand[i].allowed & RC_DE_ACC)) continue;
+        if (wbest < 0 || cand[i].benefit > cand[wbest].benefit) wbest = i;
+    }
+    if (wbest < 0) return;
+    int v = cand[wbest].vreg;
+    free(word_home_prepick);
+    word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
+    if (word_home_prepick)
+        memcpy(word_home_prepick, f->vreg_to_phys,
+               (size_t)f->n_vregs * sizeof(int));
+    for (int j = 0; j < f->n_vregs; j++)
+        if (j != v && f->vreg_to_phys[j] == IR_PR_DE)
+            f->vreg_to_phys[j] = IR_PR_SPILL;
+    f->vreg_to_phys[v] = IR_PR_DE;
+    f->word_home_vreg = v;
+}
+
+/* Byte-home proposer: a hot loop-carried width-1 accumulator/counter whose def
+   dominates its reads (first def in bb0, before first read). Gated NO-calls
+   (BC/DE preserved). Each candidate is tagged CF_BYTE_SINGLE_BB iff confined to
+   one BB (slotless PR_C is only sound then — cross-BB byte reads are BB-local).
+   Fills out[] (sized f->n_vregs), returns the count. Byte-identical to the
+   former inline picker; the C-vs-E choice lives in the arbiter. */
+static int byte_home_propose(const Func *f, const int *use_count,
+                             const int *write_count, const int *first_use,
+                             const int *last_use, Cand *out)
+{
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+        }
+    size_t nvr = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+    int *first_def  = calloc(nvr, sizeof(int));
+    int *first_read = calloc(nvr, sizeof(int));
+    int *only_bb    = calloc(nvr, sizeof(int));
+    int n = 0;
+    if (first_def && first_read && only_bb) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            first_def[v] = INT_MAX; first_read[v] = INT_MAX; only_bb[v] = -2;
+        }
+        int g = 0;
+        for (int i = 0; i < f->n_bbs; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++, g++) {
+                const Op *o = &bb->ops[j];
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                for (int k = 0; k < nu; k++)
+                    if (u[k] >= 0 && u[k] < f->n_vregs) {
+                        if (g < first_read[u[k]]) first_read[u[k]] = g;
+                        if (only_bb[u[k]] == -2) only_bb[u[k]] = i;
+                        else if (only_bb[u[k]] != i) only_bb[u[k]] = -1;
+                    }
+                if (o->dst >= 0 && o->dst < f->n_vregs) {
+                    if (g < first_def[o->dst]) first_def[o->dst] = g;
+                    if (only_bb[o->dst] == -2) only_bb[o->dst] = i;
+                    else if (only_bb[o->dst] != i) only_bb[o->dst] = -1;
+                }
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs) {
+                    if (g < first_def[o->src[0]]) first_def[o->src[0]] = g;
+                    if (only_bb[o->src[0]] == -2) only_bb[o->src[0]] = i;
+                    else if (only_bb[o->src[0]] != i) only_bb[o->src[0]] = -1;
+                }
+            }
+        }
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 1) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            if (use_count[v] < 8) continue;
+            if (write_count[v] < 1) continue;
+            if (first_def[v] >= f->bbs[0].n_ops) continue;   /* def in entry bb0 */
+            if (first_def[v] >= first_read[v]) continue;     /* def-first */
+            out[n].vreg = v;
+            out[n].benefit = use_count[v];
+            out[n].lo = first_use[v];
+            out[n].hi = last_use[v];
+            out[n].allowed = RC_BYTE;
+            out[n].flags = (only_bb[v] >= 0) ? CF_BYTE_SINGLE_BB : 0;
+            n++;
+        }
+    }
+    free(first_def); free(first_read); free(only_bb);
+    return n;
+}
+
+/* Byte-home arbiter: single occupant, highest benefit (first on tie). Slotless
+   PR_C only when BC is free AND the byte is single-BB confined (cross-BB byte
+   reads are BB-local, and PR_C has no slot fallback); otherwise slot-backed
+   PR_E. Byte-identical to the former inline choice. */
+static void arbitrate_byte_home(Func *f, const Cand *cand, int n)
+{
+    int bc_taken = 0;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vreg_to_phys[v] == IR_PR_BC) { bc_taken = 1; break; }
+    int best = -1;
+    for (int i = 0; i < n; i++) {
+        if (!(cand[i].allowed & RC_BYTE)) continue;
+        if (best < 0 || cand[i].benefit > cand[best].benefit) best = i;
+    }
+    if (best < 0) return;
+    int single_bb = (cand[best].flags & CF_BYTE_SINGLE_BB) != 0;
+    f->vreg_to_phys[cand[best].vreg] =
+        (bc_taken || !single_bb) ? IR_PR_E : IR_PR_C;
+}
+
+/* IV-residency proposer (Phase 2): a hot loop-carried WRITE-MANY int IV whose
+   EVERY def is a BC-stamping producer (all_defs_ok) — BC always holds the
+   current value, copy-from-BC reads are sound cross-BB. Emits RC_BC candidates;
+   the arbiter ranks by the COST-MODEL benefit (so a deref base out-scores this
+   even if this has more raw uses) and a loser falls back to a slot. Only
+   collected under IR_ORCHESTRATOR. */
+static int iv_propose(const Func *f, const int *use_count,
+                      const int *write_count, const int *all_defs_ok,
+                      int has_prepushed_call, const BitSet *entry_live,
+                      const int *first_use, const int *last_use, Cand *out)
+{
+    int n = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        const VReg *vr = &f->vregs[v];
+        if (vr->width != 2) continue;
+        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                         | IR_VREG_PARAM | IR_VREG_INDUCTION)) continue;
+        if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (has_prepushed_call) continue;
+        if (entry_live && ir_bitset_get(entry_live, v)) continue;  /* read-before-def */
+        if (write_count[v] < 2) continue;   /* write-many */
+        if (!all_defs_ok[v]) continue;      /* every def stamps BC */
+        if (use_count[v] < 8) continue;     /* hot → in a loop */
+        out[n].vreg = v;
+        out[n].benefit = use_count[v];      /* remapped to cost in the orch branch */
+        out[n].lo = first_use[v];
+        out[n].hi = last_use[v];
+        out[n].allowed = RC_BC;
+        out[n].flags = CF_SPECULATIVE;
+        n++;
+    }
+    return n;
+}
+
+/* ---- Phase 1: single cross-class arbiter (gated IR_ORCHESTRATOR) ----------
+   One benefit-ranked pass over the combined candidate pool of ALL proposers.
+   The classes mostly own independent registers (BC / idx2 / DE / a byte); the
+   only cross-class contention is ALIASING — a byte in C shares BC's low byte,
+   a byte in E shares DE's low byte. The arbiter resolves those by BENEFIT
+   instead of the fixed picker order, and any candidate that can't get a
+   register falls back to its slot (never displaces). Sound-by-construction:
+   a vreg is assigned only once (skip if already placed), and C/E vs BC/DE
+   mutual exclusion is enforced whole-function (conservative).
+
+   Behavioural deltas vs the sequential pickers (all benefit-resolved now):
+   BC-vs-byteC, DE-acc-vs-byteE, and idx2-vs-BC for a shared read-only param
+   (the param keeps its BC preference via stable tie-break: BC candidates are
+   collected first, so on an equal-benefit tie they win over idx2). */
+static int cand_more_important(const Cand *a, const Cand *b)
+{
+    if (a->benefit != b->benefit) return a->benefit > b->benefit;
+    /* most-constrained-first: fewer allowed classes wins the tie */
+    unsigned pa = a->allowed, pb = b->allowed;
+    int na = 0, nb = 0;
+    while (pa) { na += pa & 1; pa >>= 1; }
+    while (pb) { nb += pb & 1; pb >>= 1; }
+    return na < nb;
+}
+
+static void unified_arbitrate(Func *f, Cand *pool, int n)
+{
+    /* Stable insertion sort by importance (equal keys keep pool order — which
+       is proposer order: BC, idx2, word-acc, byte). */
+    for (int i = 1; i < n; i++) {
+        Cand c = pool[i];
+        int j = i;
+        while (j > 0 && cand_more_important(&c, &pool[j - 1])) {
+            pool[j] = pool[j - 1];
+            j--;
+        }
+        pool[j] = c;
+    }
+    int idx2_taken = 0, byte_reg = 0;    /* 0 / 'C' / 'E' */
+    int de_acc_vreg = -1;                /* DE-acc winner, APPLIED after the loop */
+    /* Whole-function occupancy predicates, recomputed cheaply from
+       vreg_to_phys as assignments land. */
+    for (int i = 0; i < n; i++) {
+        const Cand *c = &pool[i];
+        int v = c->vreg;
+        if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;   /* already placed */
+        /* Reserved for the (deferred) DE-acc — don't let another candidate for
+           the SAME vreg (e.g. its IV/BC candidate) grab a register first. A
+           reduction accumulator that also looks like an IV must stay DE-bound. */
+        if (v == de_acc_vreg) continue;
+
+        if (c->allowed & RC_IDX2) {
+            /* idx2 sub-priority: a stepping counter beats a param. Only take
+               idx2 for a param if no counter candidate is still assignable. */
+            if (idx2_taken || f->idx2_reg == IR_PR_NONE) continue;
+            if (c->flags & CF_IDX2_PARAM) {
+                int counter_waiting = 0;
+                for (int k = 0; k < n; k++)
+                    if ((pool[k].allowed & RC_IDX2)
+                        && (pool[k].flags & CF_IDX2_COUNTER)
+                        && f->vreg_to_phys[pool[k].vreg] == IR_PR_SPILL) {
+                        counter_waiting = 1; break;
+                    }
+                if (counter_waiting) continue;
+            }
+            f->vreg_to_phys[v] = f->idx2_reg;
+            idx2_taken = 1;
+            continue;
+        }
+
+        if (c->allowed & RC_DE_ACC) {
+            /* RESERVE DE (E aliases it, so a later byte can't take E); the
+               eviction + prepick snapshot + assign happen AFTER the loop, so
+               the prepick captures the full BC/idx2/byte baseline the lowerer
+               reverts to — matching the sequential picker (word-acc runs last). */
+            if (de_acc_vreg < 0 && byte_reg != 'E') de_acc_vreg = v;
+            continue;
+        }
+
+        if (c->allowed & RC_BYTE) {
+            if (byte_reg) continue;                 /* one byte home per fn */
+            int single_bb = (c->flags & CF_BYTE_SINGLE_BB) != 0;
+            int bc_used = 0;
+            for (int j = 0; j < f->n_vregs; j++)
+                if (f->vreg_to_phys[j] == IR_PR_BC) { bc_used = 1; break; }
+            if (single_bb && !bc_used) { f->vreg_to_phys[v] = IR_PR_C; byte_reg = 'C'; }
+            else if (de_acc_vreg < 0)  { f->vreg_to_phys[v] = IR_PR_E; byte_reg = 'E'; }
+            /* else: no byte register free (DE reserved) → slot fallback */
+            continue;
+        }
+
+        if (c->allowed & RC_BC) {
+            if (byte_reg == 'C') continue;          /* C owned by a byte */
+            /* Interval overlap against already-assigned BC vregs, using the
+               [lo,hi] each carries in the pool (BC is multi-occupant). */
+            int ok = 1;
+            for (int j = 0; j < n && ok; j++) {
+                if (pool[j].vreg == v) continue;
+                if (f->vreg_to_phys[pool[j].vreg] != IR_PR_BC) continue;
+                int s = c->lo > pool[j].lo ? c->lo : pool[j].lo;
+                int e = c->hi < pool[j].hi ? c->hi : pool[j].hi;
+                if (s <= e) ok = 0;
+            }
+            if (ok) f->vreg_to_phys[v] = IR_PR_BC;
+            continue;
+        }
+    }
+    /* Apply the reserved DE-acc now that BC/idx2/byte are all placed, so the
+       prepick snapshot is the full baseline (matches the sequential picker). */
+    if (de_acc_vreg >= 0 && f->vreg_to_phys[de_acc_vreg] == IR_PR_SPILL) {
+        free(word_home_prepick);
+        word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
+        if (word_home_prepick)
+            memcpy(word_home_prepick, f->vreg_to_phys,
+                   (size_t)f->n_vregs * sizeof(int));
+        for (int j = 0; j < f->n_vregs; j++)
+            if (j != de_acc_vreg && f->vreg_to_phys[j] == IR_PR_DE)
+                f->vreg_to_phys[j] = IR_PR_SPILL;
+        f->vreg_to_phys[de_acc_vreg] = IR_PR_DE;
+        f->word_home_vreg = de_acc_vreg;
+    }
+}
+
+/* Arbiter (Phase 0): sort candidates by benefit desc (stable on ties — insertion
+   sort, preserving vreg order), then greedily assign PR_BC to each whose live
+   interval doesn't overlap an already-assigned PR_BC vreg. Byte-identical to the
+   former inline sort+greedy. */
+static void arbitrate_to_bc(Func *f, Cand *cand, int n,
+                            const int *first_use, const int *last_use)
+{
+    for (int i = 1; i < n; i++) {
+        Cand c = cand[i];
+        int j = i;
+        while (j > 0 && cand[j - 1].benefit < c.benefit) {
+            cand[j] = cand[j - 1];
+            j--;
+        }
+        cand[j] = c;
+    }
+    for (int i = 0; i < n; i++) {
+        int v = cand[i].vreg;
+        int ok = 1;
+        for (int j = 0; j < f->n_vregs && ok; j++) {
+            if (f->vreg_to_phys[j] != IR_PR_BC) continue;
+            int s = first_use[v] > first_use[j] ? first_use[v] : first_use[j];
+            int e = last_use[v]  < last_use[j]  ? last_use[v]  : last_use[j];
+            if (s <= e) ok = 0;
+        }
+        if (ok) f->vreg_to_phys[v] = IR_PR_BC;
+    }
+}
+
 void ir_alloc(Func *f)
 {
     if (!f) return;
@@ -408,6 +1037,19 @@ void ir_alloc(Func *f)
            updates (post-inc / compound-assign) doesn't. */
         int *write_count = calloc((size_t)f->n_vregs, sizeof(int));
         int *use_count   = calloc((size_t)f->n_vregs, sizeof(int));
+        /* cost_benefit[v]: the ORCHESTRATOR's residency benefit (T-state model),
+           distinct from the flat use_count the Phase-0 pickers keep. Each access
+           is classified: a DEREF (v is a mem base — `ld a,(bc)` in a reg vs a
+           full pointer reload from a slot) is worth much more than a plain
+           value read (reg copy vs slot load), and a write earns the store→stamp
+           saving. So a hot deref base out-scores a merely-frequent write-heavy
+           IV — the discriminator the flat count missed. Depth-weighted. */
+        long *cost_benefit = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                    sizeof(long));
+        /* all_defs_ok[v]: every def is a BC-stamping producer + not POSTSTEP-
+           stepped — precondition for the write-many IV proposer. */
+        int *all_defs_ok = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                  sizeof(int));
         /* Use intervals [first_use, last_use] in linear op order —
            when the value actually has to sit in BC. Needed because
            PARAMs are live-from-entry, making ir_live_ranges_overlap
@@ -435,44 +1077,106 @@ void ir_alloc(Func *f)
         int *bb_loop_hi  = calloc((size_t)f->n_bbs, sizeof(int));
         int *bb_first_op = calloc((size_t)f->n_bbs, sizeof(int));
         int *bb_last_op  = calloc((size_t)f->n_bbs, sizeof(int));
+        /* Loop-nesting depth per BB: how many back-edge loop bodies contain
+           it. Weights hot-use counting so a use in a deeper loop (which runs
+           per-inner × per-outer iterations) outranks one in an outer loop —
+           picks the innermost accumulator/counter for the scarce register
+           pairs. */
+        int *bb_loop_depth = calloc((size_t)f->n_bbs, sizeof(int));
         if (!write_count || !use_count || !first_use || !last_use
             || !bb_in_loop || !def_kind || !bb_loop_lo || !bb_loop_hi
-            || !bb_first_op || !bb_last_op) {
+            || !bb_first_op || !bb_last_op || !bb_loop_depth
+            || !cost_benefit || !all_defs_ok) {
             free(write_count); free(use_count);
             free(first_use); free(last_use);
             free(bb_in_loop); free(def_kind);
             free(bb_loop_lo); free(bb_loop_hi);
             free(bb_first_op); free(bb_last_op);
+            free(bb_loop_depth); free(cost_benefit); free(all_defs_ok);
             return;
         }
         for (int v = 0; v < f->n_vregs; v++) {
             first_use[v] = -1;
             last_use[v]  = -1;
             def_kind[v]  = -1;
+            all_defs_ok[v] = 1;   /* cleared by any non-stamping def */
         }
         for (int i = 0; i < f->n_bbs; i++) {
             bb_loop_lo[i] = i;
             bb_loop_hi[i] = i;
         }
-        for (int i = 0; i < f->n_bbs; i++) {
-            BB *bb = &f->bbs[i];
-            /* succ via accessor (covers IR_SWITCH) — pred[] isn't
-               built. A successor with id ≤ ours is a back-edge: mark
-               [header..tail] in-loop. */
-            int ns = ir_bb_n_succ(bb);
-            for (int s = 0; s < ns; s++) {
-                int sid = ir_bb_succ_at(bb, s);
-                if (sid < 0) continue;
-                if (sid > i) continue;
-                int lo = sid, hi = i;
-                if (lo < 0) lo = 0;
-                if (hi >= f->n_bbs) hi = f->n_bbs - 1;
-                for (int k = lo; k <= hi; k++) {
-                    bb_in_loop[k] = 1;
-                    if (lo < bb_loop_lo[k]) bb_loop_lo[k] = lo;
-                    if (hi > bb_loop_hi[k]) bb_loop_hi[k] = hi;
-                }
+        /* Loop membership + nesting depth via NATURAL LOOPS, not id-ranges.
+           For each back-edge p->h (a successor h with id <= source p), the
+           loop body is h plus every BB that reaches p without passing through
+           h. The old [h..p] id-range method mis-handled a nested inner loop
+           whose BBs are numbered AFTER the outer latch (it looked like a
+           sibling, so its body got the wrong depth) — exactly what the
+           unreachable-BB prune's renumbering exposes. A backward walk over the
+           full op-level predecessor adjacency gets nesting right regardless of
+           block numbering. bb_loop_lo/hi keep the [min,max] id span of the
+           body (a conservative over-approx of the op-index interval used to
+           extend in-loop PR_BC lifetimes — safe if a gap BB creeps in). */
+        {
+            /* Predecessor adjacency (CSR) from complete op-level successors. */
+            int *pred_cnt = calloc((size_t)f->n_bbs + 1, sizeof(int));
+            int  scratch[64];
+            for (int i = 0; pred_cnt && i < f->n_bbs; i++) {
+                int ns = alloc_bb_succ(&f->bbs[i], scratch,
+                                       (int)(sizeof scratch / sizeof scratch[0]));
+                for (int s = 0; s < ns; s++)
+                    if (scratch[s] >= 0 && scratch[s] < f->n_bbs)
+                        pred_cnt[scratch[s]]++;
             }
+            int *pred_off = calloc((size_t)f->n_bbs + 1, sizeof(int));
+            if (pred_cnt && pred_off) {
+                for (int i = 0; i < f->n_bbs; i++)
+                    pred_off[i + 1] = pred_off[i] + pred_cnt[i];
+                int total = pred_off[f->n_bbs];
+                int *pred_list = calloc((size_t)(total > 0 ? total : 1), sizeof(int));
+                int *fill = calloc((size_t)f->n_bbs, sizeof(int));
+                int *inloop = calloc((size_t)f->n_bbs, sizeof(int));
+                int *wl = calloc((size_t)f->n_bbs, sizeof(int));
+                if (pred_list && fill && inloop && wl) {
+                    for (int i = 0; i < f->n_bbs; i++) {
+                        int ns = alloc_bb_succ(&f->bbs[i], scratch,
+                                    (int)(sizeof scratch / sizeof scratch[0]));
+                        for (int s = 0; s < ns; s++) {
+                            int t = scratch[s];
+                            if (t >= 0 && t < f->n_bbs)
+                                pred_list[pred_off[t] + fill[t]++] = i;
+                        }
+                    }
+                    /* One natural loop per back-edge p->h. */
+                    for (int p = 0; p < f->n_bbs; p++) {
+                        int ns = alloc_bb_succ(&f->bbs[p], scratch,
+                                    (int)(sizeof scratch / sizeof scratch[0]));
+                        for (int s = 0; s < ns; s++) {
+                            int h = scratch[s];
+                            if (h < 0 || h >= f->n_bbs || h > p) continue; /* back-edge */
+                            memset(inloop, 0, (size_t)f->n_bbs * sizeof(int));
+                            int wn = 0;
+                            inloop[h] = 1;
+                            if (!inloop[p]) { inloop[p] = 1; wl[wn++] = p; }
+                            while (wn > 0) {
+                                int x = wl[--wn];
+                                for (int k = pred_off[x]; k < pred_off[x + 1]; k++) {
+                                    int y = pred_list[k];
+                                    if (!inloop[y]) { inloop[y] = 1; wl[wn++] = y; }
+                                }
+                            }
+                            for (int b = 0; b < f->n_bbs; b++) {
+                                if (!inloop[b]) continue;
+                                bb_in_loop[b] = 1;
+                                bb_loop_depth[b]++;
+                                if (h < bb_loop_lo[b]) bb_loop_lo[b] = h;
+                                if (p > bb_loop_hi[b]) bb_loop_hi[b] = p;
+                            }
+                        }
+                    }
+                }
+                free(pred_list); free(fill); free(inloop); free(wl);
+            }
+            free(pred_cnt); free(pred_off);
         }
         /* Per-BB global op-index range (bb_last_op inclusive). Empty
            BBs get first == last + 1 — never matches, harmless. */
@@ -484,14 +1188,22 @@ void ir_alloc(Func *f)
                 bb_last_op[i]  = g - 1;
             }
         }
+        /* Weight hot uses by loop-nesting depth (~4× per level): a use in a
+           doubly-nested inner loop runs inner×outer iterations, so it must
+           outrank an outer-loop use for the scarce DE/BC/idx2 homes — else the
+           allocator can leave the hot inner accumulator spilled while a colder
+           outer value sits in a register (sieve: count spilled, i_sq in DE).
+           depth 0 → 1, depth 1 → 4 (identical to the old flat in-loop×4, so
+           functions with no nesting deeper than one loop stay byte-identical);
+           depth n → 4^n, capped. IR_NO_DEPTH_WEIGHT restores the flat weight. */
+        int depth_flat = getenv("IR_NO_DEPTH_WEIGHT") != NULL;
         int global = 0;
         for (int i = 0; i < f->n_bbs; i++) {
             BB *bb = &f->bbs[i];
-            /* Hot uses (inside a loop body) count as 4 to clear the
-               break-even threshold on single-static-use-in-loop
-               patterns. The exact factor doesn't matter much — 1 use
-               × N iterations dominates any static-use coldness. */
-            int weight = bb_in_loop[i] ? 4 : 1;
+            int depth = bb_loop_depth[i];
+            if (depth_flat && depth > 1) depth = 1;
+            int weight = 1;
+            for (int dw = 0; dw < depth && dw < 8; dw++) weight *= 4;
             /* In-loop uses/defs must hold BC across every iteration,
                so their interval is the whole loop body; straight-line
                ops use the per-op `global` index. */
@@ -502,13 +1214,17 @@ void ir_alloc(Func *f)
             for (int j = 0; j < bb->n_ops; j++, global++) {
                 int eff_first = bb_in_loop[i] ? loop_first : global;
                 int eff_last  = bb_in_loop[i] ? loop_last  : global;
-                int d = bb->ops[j].dst;
+                const Op *op = &bb->ops[j];
+                int d = op->dst;
                 if (d >= 0 && d < f->n_vregs) {
                     write_count[d]++;
                     /* Anchor the interval at the def (BC ownership
                        starts there) and record the producer kind for
                        the PR_BC LOCAL eligibility check. */
-                    if (def_kind[d] < 0) def_kind[d] = (int)bb->ops[j].kind;
+                    if (def_kind[d] < 0) def_kind[d] = (int)op->kind;
+                    if (!bc_safe_producer((int)op->kind)) all_defs_ok[d] = 0;
+                    /* Cost model: a write earns the store→stamp saving. */
+                    cost_benefit[d] += (long)weight * COST_WRITE_W;
                     if (first_use[d] < 0 || eff_first < first_use[d])
                         first_use[d] = eff_first;
                     if (eff_last > last_use[d]) last_use[d] = eff_last;
@@ -519,17 +1235,28 @@ void ir_alloc(Func *f)
                    in PR_BC, where the in-place slot step doesn't update
                    BC and later reads see the stale register (while(k--)
                    read 4 every iteration). */
-                if (bb->ops[j].kind == IR_POSTSTEP) {
-                    int sv = bb->ops[j].src[0];
-                    if (sv >= 0 && sv < f->n_vregs) write_count[sv]++;
+                if (op->kind == IR_POSTSTEP) {
+                    int sv = op->src[0];
+                    if (sv >= 0 && sv < f->n_vregs) {
+                        write_count[sv]++;
+                        all_defs_ok[sv] = 0;   /* in-place step: BC not stamped */
+                    }
                 }
+                int mem_base = ((op->kind == IR_LD_MEM || op->kind == IR_ST_MEM)
+                                && op->mem.kind == IR_MEM_VREG)
+                             ? op->mem.base : -1;
                 int u[16];
-                int nu = ir_op_uses(&bb->ops[j], u,
-                                    (int)(sizeof u / sizeof u[0]));
+                int nu = ir_op_uses(op, u, (int)(sizeof u / sizeof u[0]));
                 for (int k = 0; k < nu; k++) {
                     int v = u[k];
                     if (v < 0 || v >= f->n_vregs) continue;
                     use_count[v] += weight;
+                    /* Cost model: a DEREF (v is this op's mem base) is worth far
+                       more than a plain value read — a base in BC deref's for
+                       free (`ld a,(bc)`) whereas from a slot it needs a full
+                       pointer reload first. */
+                    cost_benefit[v] += (long)weight *
+                        (v == mem_base ? COST_DEREF_W : COST_READ_W);
                     if (first_use[v] < 0 || eff_first < first_use[v])
                         first_use[v] = eff_first;
                     if (eff_last > last_use[v]) last_use[v] = eff_last;
@@ -551,227 +1278,71 @@ void ir_alloc(Func *f)
                can be hooked to also write BC). Catches the common
                "compute X once, read X many times" shape in loop
                headers (e.g. crc16_ccitt's `end = data + len`). */
-        int cap = 0;
-        for (int v = 0; v < f->n_vregs; v++) {
-            const VReg *vr = &f->vregs[v];
-            if (vr->width != 2) continue;
-            if (vr->flags & IR_VREG_ADDR_TAKEN) continue;
-            if (vr->flags & IR_VREG_VOLATILE) continue;
-            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-            if (use_count[v] < 2) continue;
-            int is_param  = (vr->flags & IR_VREG_PARAM) != 0;
-            int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
-            /* Slotless (non-PARAM) candidate + a pre-pushed-arg call =
-               unreloadable across that call (emit_bc_reload reads -1). */
-            if (!is_param && has_prepushed_call) continue;
-            if (is_param) {
-                if (write_count[v] > 0) continue;
-            } else if (is_induct) {
-                /* IVSR stepped pointer: a pre-header init + exactly one
-                   in-loop self-step, both lowered through the BC-stamping
-                   producer path (MOV / ADD-imm). write_count==2 — the
-                   only twice-written PR_BC case, admitted solely on the
-                   IVSR-set INDUCTION flag. Held in BC, the deref reads it
-                   for free and the step is `ld l,c;ld h,b; add hl,de; ld
-                   bc,hl` — no slot round-trip per iteration. */
-                if (write_count[v] != 2) continue;
-            } else {
-                if (write_count[v] != 1) continue;
-                /* Producer must be a kind whose lowerer ends in
-                   spill_and_swap_unless_dead — that's how BC gets
-                   stamped with the value for PR_BC LOCAL dst. */
-                int k = def_kind[v];
-                int prod_ok = 0;
-                switch (k) {
-                case IR_LD_IMM: case IR_LD_SYM: case IR_LD_STR:
-                case IR_LD_MEM: case IR_LEA: case IR_MOV:
-                case IR_ADD: case IR_SUB: case IR_RSUB:
-                case IR_AND: case IR_OR: case IR_XOR:
-                case IR_SHL: case IR_SHR:
-                case IR_INC: case IR_DEC:
-                case IR_NEG: case IR_NOT:
-                case IR_CONV_ZX: case IR_CONV_SX:
-                case IR_CONV_BYTE_TO_HIGH:
-                    prod_ok = 1;
-                    break;
-                default:
-                    break;
-                }
-                if (!prod_ok) continue;
+        /* A non-param vreg live at function entry is read before any def
+           (uninitialised — UB in the source). It has no reaching def to load
+           into a register, so promoting it to a slotless register home makes
+           the lowerer read a nonexistent source and abort. Keep it spilled.
+           (The word DE-home pick already guards this via wd_def>=wd_read.) */
+        const BitSet *entry_live =
+            (f->n_bbs > 0 && f->bbs[0].n_ops > 0)
+            ? ir_op_live_in(&f->bbs[0], 0) : NULL;
+        /* Register-residency ORCHESTRATOR (default ON as of Phase 2; validated
+           no-regression across the CPU matrix — sieve -16.5%fp/-4.9%sp/-7.5%r2ka,
+           else neutral). Collects ALL proposers into one pool and assigns via the
+           single cost-model-ranked cross-class arbiter. IR_NO_ORCHESTRATOR falls
+           back to the per-class proposer/arbiter pairs run in sequence. */
+        int orch = getenv("IR_NO_ORCHESTRATOR") == NULL;
+        if (orch) {
+            Cand *pool = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 5,
+                                sizeof(Cand));
+            if (pool) {
+                int np = 0;
+                np += pr_bc_propose(f, use_count, write_count, def_kind,
+                                    has_prepushed_call, entry_live,
+                                    first_use, last_use, pool + np);
+                np += idx2_propose(f, use_count, write_count,
+                                   first_use, last_use, pool + np);
+                if (c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT"))
+                    np += byte_home_propose(f, use_count, write_count,
+                                            first_use, last_use, pool + np);
+                if (c_word_resident && !getenv("IR_NO_WORD_RESIDENT"))
+                    np += word_acc_propose(f, use_count, write_count, bb_in_loop,
+                                           first_use, last_use, pool + np);
+                /* Phase 2: hot loop-carried int IVs. IR_NO_IV_RESIDENT opts out. */
+                if (!getenv("IR_NO_IV_RESIDENT"))
+                    np += iv_propose(f, use_count, write_count, all_defs_ok,
+                                     has_prepushed_call, entry_live,
+                                     first_use, last_use, pool + np);
+                /* Phase 2-cost: rank by the T-state cost model, not flat
+                   use_count (the Phase-0 pickers, else-branch, keep use_count so
+                   the default build stays byte-identical). */
+                for (int i = 0; i < np; i++)
+                    pool[i].benefit = cost_benefit[pool[i].vreg];
+                unified_arbitrate(f, pool, np);
+                free(pool);
             }
-            cap++;
-        }
-        if (cap > 0) {
-            int *cand = calloc((size_t)cap, sizeof(int));
+        } else {
+            /* PR_BC allocation via the Phase-0 proposer/arbiter. */
+            Cand *cand = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                sizeof(Cand));
             if (cand) {
-                int n = 0;
-                for (int v = 0; v < f->n_vregs; v++) {
-                    const VReg *vr = &f->vregs[v];
-                    if (vr->width != 2) continue;
-                    if (vr->flags & IR_VREG_ADDR_TAKEN) continue;
-                    if (vr->flags & IR_VREG_VOLATILE) continue;
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    if (use_count[v] < 2) continue;
-                    int is_param = (vr->flags & IR_VREG_PARAM) != 0;
-                    int is_induct = (vr->flags & IR_VREG_INDUCTION) != 0;
-                    if (!is_param && has_prepushed_call) continue;
-                    if (is_param) {
-                        if (write_count[v] > 0) continue;
-                    } else if (is_induct) {
-                        if (write_count[v] != 2) continue;   /* init + step */
-                    } else {
-                        if (write_count[v] != 1) continue;
-                        int k = def_kind[v];
-                        int prod_ok = 0;
-                        switch (k) {
-                        case IR_LD_IMM: case IR_LD_SYM: case IR_LD_MEM:
-                        case IR_MOV:
-                        case IR_ADD: case IR_SUB: case IR_RSUB:
-                        case IR_AND: case IR_OR: case IR_XOR:
-                        case IR_SHL: case IR_SHR:
-                        case IR_INC: case IR_DEC:
-                        case IR_NEG: case IR_NOT:
-                        case IR_CONV_ZX: case IR_CONV_SX:
-                        case IR_CONV_BYTE_TO_HIGH:
-                            prod_ok = 1;
-                            break;
-                        default:
-                            break;
-                        }
-                        if (!prod_ok) continue;
-                    }
-                    cand[n++] = v;
-                }
-                /* Insertion sort by use count descending. n is small
-                   (rarely >4 in practice). */
-                for (int i = 1; i < n; i++) {
-                    int v = cand[i];
-                    int j = i;
-                    while (j > 0 && use_count[cand[j - 1]] < use_count[v]) {
-                        cand[j] = cand[j - 1];
-                        j--;
-                    }
-                    cand[j] = v;
-                }
-                /* Greedy: a candidate takes BC if its use interval
-                   doesn't overlap any already-allocated PR_BC vreg's. */
-                for (int i = 0; i < n; i++) {
-                    int v = cand[i];
-                    int ok = 1;
-                    for (int j = 0; j < f->n_vregs && ok; j++) {
-                        if (f->vreg_to_phys[j] != IR_PR_BC) continue;
-                        int s = first_use[v] > first_use[j]
-                              ? first_use[v] : first_use[j];
-                        int e = last_use[v]  < last_use[j]
-                              ? last_use[v]  : last_use[j];
-                        if (s <= e) ok = 0;
-                    }
-                    if (ok) f->vreg_to_phys[v] = IR_PR_BC;
-                }
+                int n = pr_bc_propose(f, use_count, write_count, def_kind,
+                                      has_prepushed_call, entry_live,
+                                      first_use, last_use, cand);
+                arbitrate_to_bc(f, cand, n, first_use, last_use);
                 free(cand);
             }
         }
-        /* idx2 STEPPING COUNTER (register-residency phase A): a monotonic
-           width-2 loop counter whose only writes are one LD_IMM init + INC/DEC
-           self-steps, never a deref/step base — held in the spare index reg and
-           stepped with `inc/dec <idx>` (2 bytes, no memory) instead of the TOS
-           `ex(sp),hl;inc;ex(sp),hl` dance. Preferred over the invariant bound
-           for idx2 because it's stepped every iteration. Same call/asm/acc-free
-           gate. IR_NO_IDX2_COUNTER opts out. */
-        int idx2_taken = 0;
-        if (f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt
-            && !getenv("IR_NO_IDX2_COUNTER")) {
-            int cnt_safe = 1;
-            for (int i = 0; i < f->n_bbs && cnt_safe; i++)
-                for (int j = 0; j < f->bbs[i].n_ops; j++) {
-                    OpKind k = f->bbs[i].ops[j].kind;
-                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { cnt_safe = 0; break; }
-                }
-            size_t nvc = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
-            int *cbase = calloc(nvc, sizeof(int));   /* deref/step base → not a counter */
-            int *cstep = calloc(nvc, sizeof(int));   /* INC/DEC self-step defs */
-            int *cinit = calloc(nvc, sizeof(int));   /* LD_IMM init defs */
-            int *cother = calloc(nvc, sizeof(int));  /* any other def → disqualify */
-            if (cnt_safe && cbase && cstep && cinit && cother) {
-                for (int i = 0; i < f->n_bbs; i++)
-                    for (int j = 0; j < f->bbs[i].n_ops; j++) {
-                        const Op *o = &f->bbs[i].ops[j];
-                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
-                            && o->mem.kind == IR_MEM_VREG
-                            && o->mem.base >= 0 && o->mem.base < f->n_vregs)
-                            cbase[o->mem.base] = 1;
-                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                            && o->src[0] < f->n_vregs) { cbase[o->src[0]] = 1; }
-                        int d = o->dst;
-                        if (d < 0 || d >= f->n_vregs) continue;
-                        if ((o->kind == IR_INC || o->kind == IR_DEC)
-                            && o->src[0] == d) cstep[d]++;
-                        else if (o->kind == IR_LD_IMM) cinit[d]++;
-                        else cother[d]++;
-                    }
-                int cbest = -1;
-                for (int v = 0; v < f->n_vregs; v++) {
-                    const VReg *vr = &f->vregs[v];
-                    if (vr->width != 2) continue;
-                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    if (cbase[v]) continue;                 /* deref/step base */
-                    if (cstep[v] < 1) continue;             /* actually stepped */
-                    if (cother[v] != 0) continue;           /* only init + steps write it */
-                    if (cinit[v] > 1) continue;             /* one init */
-                    if (use_count[v] < 4) continue;         /* hot, in a loop */
-                    if (cbest < 0 || use_count[v] > use_count[cbest]) cbest = v;
-                }
-                if (cbest >= 0) { f->vreg_to_phys[cbest] = f->idx2_reg; idx2_taken = 1; }
-            }
-            free(cbase); free(cstep); free(cinit); free(cother);
-        }
-        /* idx2: ONE width-2 read-only PARAM read inside a loop and still
-           spilled — held in the spare index register (f->idx2_reg, opposite
-           the frame pointer), read via `push <idx>;pop de` at the compare.
-           Gated call/asm/acc-free: those clobber the spare reg (the frame
-           reg survives via the prologue push, the spare one doesn't). */
-        if (!idx2_taken && f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt) {
-            int idx2_safe = 1;
-            for (int i = 0; i < f->n_bbs && idx2_safe; i++)
-                for (int j = 0; j < f->bbs[i].n_ops; j++) {
-                    OpKind k = f->bbs[i].ops[j].kind;
-                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) {
-                        idx2_safe = 0;
-                        break;
-                    }
-                }
-            /* Exclude deref'd/stepped pointers: a fused `*p++` writes its
-               base via LD_MEM/ST_MEM post_step (invisible to write_count),
-               so it looks invariant yet would advance the slot, not the reg.
-               An idx2 bound is only ever compared. */
-            int *is_base = calloc((size_t)f->n_vregs, sizeof(int));
-            if (is_base) {
-                for (int i = 0; i < f->n_bbs; i++)
-                    for (int j = 0; j < f->bbs[i].n_ops; j++) {
-                        const Op *o = &f->bbs[i].ops[j];
-                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
-                            && o->mem.kind == IR_MEM_VREG
-                            && o->mem.base >= 0 && o->mem.base < f->n_vregs)
-                            is_base[o->mem.base] = 1;
-                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                            && o->src[0] < f->n_vregs)
-                            is_base[o->src[0]] = 1;
-                    }
-                int best = -1;
-                for (int v = 0; idx2_safe && v < f->n_vregs; v++) {
-                    const VReg *vr = &f->vregs[v];
-                    if (vr->width != 2) continue;
-                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
-                    if (!(vr->flags & IR_VREG_PARAM)) continue;
-                    if (write_count[v] != 0) continue;        /* invariant */
-                    if (is_base[v]) continue;                 /* not a deref'd ptr */
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    if (use_count[v] < 4) continue;           /* used in a loop */
-                    if (best < 0 || use_count[v] > use_count[best]) best = v;
-                }
-                if (best >= 0) f->vreg_to_phys[best] = f->idx2_reg;
-                free(is_base);
+        /* idx2 spare-index-register allocation via the Phase-0 proposer/
+           arbiter (skipped when the Phase-1 unified arbiter ran above). */
+        if (!orch) {
+            Cand *icand = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                 sizeof(Cand));
+            if (icand) {
+                int in = idx2_propose(f, use_count, write_count,
+                                      first_use, last_use, icand);
+                arbitrate_idx2(f, icand, in);
+                free(icand);
             }
         }
         /* Byte-register residency (Plan B, Phase 1 — C-home only).
@@ -789,81 +1360,17 @@ void ir_alloc(Func *f)
            read would consult an unestablished home). Unlike PR_BC this
            admits a WRITE-MANY vreg (the accumulator is the point). One
            occupant. */
-        if (c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT")) {
-            int has_call = 0, bc_taken = 0;
-            for (int i = 0; i < f->n_bbs && !has_call; i++)
-                for (int j = 0; j < f->bbs[i].n_ops; j++) {
-                    OpKind k = f->bbs[i].ops[j].kind;
-                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) {
-                        has_call = 1; break;
-                    }
-                }
-            for (int v = 0; v < f->n_vregs && !bc_taken; v++)
-                if (f->vreg_to_phys[v] == IR_PR_BC) bc_taken = 1;
-            /* first_def/first_read in global op order (def-before-use).
-               clamp the count so the int->size_t cast is provably non-negative
-               (-Walloc-size-larger-than). */
-            size_t nvr = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
-            int *first_def  = calloc(nvr, sizeof(int));
-            int *first_read = calloc(nvr, sizeof(int));
-            if (!has_call && first_def && first_read) {
-                for (int v = 0; v < f->n_vregs; v++) {
-                    first_def[v] = INT_MAX; first_read[v] = INT_MAX;
-                }
-                int g = 0;
-                for (int i = 0; i < f->n_bbs; i++) {
-                    BB *bb = &f->bbs[i];
-                    for (int j = 0; j < bb->n_ops; j++, g++) {
-                        const Op *o = &bb->ops[j];
-                        int u[16];
-                        int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
-                        for (int k = 0; k < nu; k++)
-                            if (u[k] >= 0 && u[k] < f->n_vregs
-                                && g < first_read[u[k]])
-                                first_read[u[k]] = g;
-                        if (o->dst >= 0 && o->dst < f->n_vregs
-                            && g < first_def[o->dst])
-                            first_def[o->dst] = g;
-                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                            && o->src[0] < f->n_vregs
-                            && g < first_def[o->src[0]])
-                            first_def[o->src[0]] = g;
-                    }
-                }
-                int best = -1;
-                for (int v = 0; v < f->n_vregs; v++) {
-                    const VReg *vr = &f->vregs[v];
-                    if (vr->width != 1) continue;
-                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
-                        continue;
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    /* Must actually be touched in a loop body — the
-                       use-count weighting (×4 in-loop) clears this when the
-                       vreg is loop-carried. Cold byte locals stay in slots. */
-                    if (use_count[v] < 8) continue;
-                    if (write_count[v] < 1) continue;
-                    /* Def must DOMINATE every read so the home is always
-                       established first. Sufficient + cheap: the first def
-                       lands in the entry block (bb0, global index <
-                       bb0.n_ops — global indices number bb0 first) AND
-                       strictly precedes the first read. bb0 dominates all
-                       blocks, so a read can never run before this def.
-                       (Rejects conditionally-initialised bytes — they keep
-                       their slot.) */
-                    if (first_def[v] >= f->bbs[0].n_ops) continue;
-                    if (first_def[v] >= first_read[v]) continue;  /* def-first */
-                    if (best < 0 || use_count[v] > use_count[best]) best = v;
-                }
-                /* C-home (slotless TRUE residency) when BC is free; else
-                   E-home (low half of DE, slot-backed lazy-spill — Plan B
-                   Phase 2) where DE-scratch ops clobber it across the loop
-                   test, so it carries a backing slot and the lowerer spills
-                   E→slot before any DE-clobbering op. */
-                if (best >= 0)
-                    f->vreg_to_phys[best] = bc_taken ? IR_PR_E : IR_PR_C;
+        if (!orch && c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT")) {
+            /* Byte-home (C/E) residency via the Phase-0 proposer/arbiter
+               (skipped when the Phase-1 unified arbiter ran above). */
+            Cand *bcand = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                 sizeof(Cand));
+            if (bcand) {
+                int bn = byte_home_propose(f, use_count, write_count,
+                                           first_use, last_use, bcand);
+                arbitrate_byte_home(f, bcand, bn);
+                free(bcand);
             }
-            free(first_def);
-            free(first_read);
         }
         /* Word (int) accumulator residency (DE-home) — word analog of the
            byte E-home above, INDEPENDENT of c_byte_resident. Keep a hot
@@ -877,104 +1384,17 @@ void ir_alloc(Func *f)
            DE) is demoted to SPILL so its def can't clobber the home — it
            reloads through HL at the accumulate. Skipped when a byte E/D-home
            already claimed DE's low half. One occupant. */
-        if (c_word_resident && !getenv("IR_NO_WORD_RESIDENT")) {
-            int wd_call = 0, de_half_taken = 0;
-            for (int i = 0; i < f->n_bbs && !wd_call; i++)
-                for (int j = 0; j < f->bbs[i].n_ops; j++) {
-                    OpKind k = f->bbs[i].ops[j].kind;
-                    if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) {
-                        wd_call = 1; break;
-                    }
-                }
-            for (int v = 0; v < f->n_vregs && !de_half_taken; v++)
-                if (f->vreg_to_phys[v] == IR_PR_E || f->vreg_to_phys[v] == IR_PR_D)
-                    de_half_taken = 1;
-            /* clamp to a provably non-negative size_t so GCC's value-range
-               analysis doesn't flag the int->size_t cast (-Walloc-size-larger-than) */
-            size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
-            int *wd_def  = calloc(nv, sizeof(int));
-            int *wd_read = calloc(nv, sizeof(int));
-            int *wd_base = calloc(nv, sizeof(int));
-            int *wd_acc  = calloc(nv, sizeof(int));
-            if (!wd_call && !de_half_taken && wd_def && wd_read && wd_base && wd_acc) {
-                for (int v = 0; v < f->n_vregs; v++) {
-                    wd_def[v] = INT_MAX; wd_read[v] = INT_MAX;
-                }
-                int g = 0;
-                for (int i = 0; i < f->n_bbs; i++) {
-                    BB *bb = &f->bbs[i];
-                    for (int j = 0; j < bb->n_ops; j++, g++) {
-                        const Op *o = &bb->ops[j];
-                        int u[16];
-                        int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
-                        for (int k = 0; k < nu; k++)
-                            if (u[k] >= 0 && u[k] < f->n_vregs && g < wd_read[u[k]])
-                                wd_read[u[k]] = g;
-                        if (o->dst >= 0 && o->dst < f->n_vregs && g < wd_def[o->dst])
-                            wd_def[o->dst] = g;
-                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                            && o->src[0] < f->n_vregs && g < wd_def[o->src[0]])
-                            wd_def[o->src[0]] = g;
-                        /* deref'd / stepped pointers are not accumulators */
-                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
-                            && o->mem.kind == IR_MEM_VREG
-                            && o->mem.base >= 0 && o->mem.base < f->n_vregs)
-                            wd_base[o->mem.base] = 1;
-                        if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                            && o->src[0] < f->n_vregs)
-                            wd_base[o->src[0]] = 1;
-                        /* A true reduction accumulator is redefined as
-                           `v = v OP w` with w a VREG (sum += a[i]) — not an
-                           induction variable (`i = i + const` / INC, whose
-                           other operand is an immediate). Distinguishes the
-                           accumulator from the loop counter (both are hot,
-                           multi-def width-2). */
-                        switch (o->kind) {
-                        case IR_ADD: case IR_SUB: case IR_RSUB:
-                        case IR_AND: case IR_OR:  case IR_XOR:
-                            if (o->dst >= 0 && o->dst < f->n_vregs
-                                && o->src[1] >= 0
-                                && (o->src[0] == o->dst || o->src[1] == o->dst))
-                                wd_acc[o->dst] = 1;
-                            break;
-                        default: break;
-                        }
-                    }
-                }
-                int wbest = -1;
-                for (int v = 0; v < f->n_vregs; v++) {
-                    const VReg *vr = &f->vregs[v];
-                    if (vr->width != 2) continue;
-                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                                     | IR_VREG_PARAM)) continue;
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    if (wd_base[v]) continue;             /* not a deref'd ptr */
-                    if (!wd_acc[v]) continue;             /* reduction acc, not IV */
-                    if (use_count[v] < 8) continue;       /* hot, in a loop */
-                    if (write_count[v] < 2) continue;     /* init + per-iter redef */
-                    if (wd_def[v] >= f->bbs[0].n_ops) continue;  /* def in entry bb0 */
-                    if (wd_def[v] >= wd_read[v]) continue;       /* def-first */
-                    if (wbest < 0 || use_count[v] > use_count[wbest]) wbest = v;
-                }
-                if (wbest >= 0) {
-                    /* Save the pre-pick allocation so the lowerer can revert
-                       this function to baseline if no resident region forms. */
-                    free(word_home_prepick);
-                    word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
-                    if (word_home_prepick)
-                        memcpy(word_home_prepick, f->vreg_to_phys,
-                               (size_t)f->n_vregs * sizeof(int));
-                    for (int v = 0; v < f->n_vregs; v++)
-                        if (v != wbest && f->vreg_to_phys[v] == IR_PR_DE)
-                            f->vreg_to_phys[v] = IR_PR_SPILL;
-                    f->vreg_to_phys[wbest] = IR_PR_DE;
-                    f->word_home_vreg = wbest;
-                }
+        if (!orch && c_word_resident && !getenv("IR_NO_WORD_RESIDENT")) {
+            /* Word DE-home accumulator via the Phase-0 proposer/arbiter
+               (skipped when the Phase-1 unified arbiter ran above). */
+            Cand *wcand = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                 sizeof(Cand));
+            if (wcand) {
+                int wn = word_acc_propose(f, use_count, write_count, bb_in_loop,
+                                          first_use, last_use, wcand);
+                arbitrate_word_acc(f, wcand, wn);
+                free(wcand);
             }
-            free(wd_def);
-            free(wd_read);
-            free(wd_base);
-            free(wd_acc);
         }
         free(write_count);
         free(use_count);
@@ -986,6 +1406,9 @@ void ir_alloc(Func *f)
         free(bb_loop_hi);
         free(bb_first_op);
         free(bb_last_op);
+        free(bb_loop_depth);
+        free(cost_benefit);
+        free(all_defs_ok);
     }
 
     /* PR_DEHL pool: long (width=4) vregs whose slot write is dead —

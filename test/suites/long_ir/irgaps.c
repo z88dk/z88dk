@@ -324,6 +324,176 @@ static void test_iv_narrow(void)
     Assert(iv_big()  == 2226, "iv NOT narrowed at >255 (no byte wrap)");
 }
 
+/* Byte logical-not / byte==0: `!c` and `!bytearr[i]` must test the byte with
+   `or a` (no 16-bit widen) and yield an exact int 0/1 — both as a value used
+   in arithmetic (the sieve `count -= !flags[k]` shape) and branch-fused in an
+   `if`. Runtime-written so nothing const-folds. */
+static unsigned char bn_flags[8];
+static int bn_not_sum(void)
+{
+    int i, n = 0;
+    for (i = 0; i < 8; i++) n += !bn_flags[i];   /* count the zero bytes */
+    return n;
+}
+static void test_byte_not(void)
+{
+    unsigned char c = 0; signed char s = 5; int r, i;
+    r = !c; Assert(r == 1, "!byte zero -> 1");
+    r = !s; Assert(r == 0, "!byte nonzero -> 0");
+    r = (c == 0); Assert(r == 1, "byte ==0 true");
+    for (i = 0; i < 8; i++) bn_flags[i] = (unsigned char)(i & 1);  /* 4 zeros */
+    Assert(bn_not_sum() == 4, "!bytearr[i] used in arithmetic (sieve shape)");
+    c = 3;
+    if (!c) Assert(0, "if(!byte) must not fire for nonzero");
+    else    Assert(1, "if(!byte) correctly skipped for nonzero");
+}
+
+/* Nested-loop residency: with loop-depth-weighted register-tenant selection,
+   the INNER-loop reduction accumulator wins the scarce register over an
+   outer-loop value. It must stay value-exact across the back-edge (the sieve
+   `count += flags[k]` shape). Runtime-written so nothing const-folds. */
+static unsigned char nr_flags[16];
+static int nested_accum(void)
+{
+    int i, count = 0;
+    for (i = 0; i < 4; i++) {
+        int k;
+        for (k = 0; k < 16; k++)
+            count += nr_flags[k];      /* inner accumulator (depth-2 hot) */
+    }
+    return count;
+}
+static void test_nested_residency(void)
+{
+    int i; for (i = 0; i < 16; i++) nr_flags[i] = (unsigned char)(i & 1); /* 8 ones */
+    Assert(nested_accum() == 32, "nested inner accumulator resident + exact");
+}
+
+/* Read-before-def loop accumulator (uninitialised — UB) must NOT be promoted
+   to a slotless register home: it has no reaching def to load, so the lowerer
+   would read a nonexistent source and abort (physics.c `wait()` shape). It must
+   still COMPILE; its value is UB so we don't assert it — only that the function
+   builds/runs and a defined sibling (`s`) is exact. `a` escapes to a global so
+   it stays live (isn't DCE'd) and actually reaches the residency pick. */
+static int uninit_sink;
+static int uninit_loop(int n)
+{
+    int a; int s = 0; int i;
+    for (i = 0; i < n; i++) { a += i; s += 2; }   /* a: read-before-def */
+    uninit_sink = a;                               /* keep `a` live */
+    return s;
+}
+static void test_uninit_accum(void)
+{
+    Assert(uninit_loop(5) == 10, "read-before-def loop accum compiles (no abort)");
+}
+
+/* Short-circuit control-context lowering (build_cond): compound &&/||/! in
+   if/while conditions must branch correctly AND must not evaluate a
+   short-circuited operand's side effects. */
+static int sc_calls;
+static int sc_bump(int r) { sc_calls++; return r; }
+static unsigned char sc_buf[8];
+static int sc_run(void)              /* RLE-shape compound loop condition */
+{
+    int i = 0, n = 0;
+    while (i < 8 && sc_buf[i] == sc_buf[0] && n < 100) { n++; i++; }
+    return n;
+}
+static void test_short_circuit(void)
+{
+    int a, taken, k;
+
+    sc_calls = 0; taken = 0;
+    a = 0;
+    if (a && sc_bump(1)) taken = 1;
+    Assert(taken == 0 && sc_calls == 0, "&& short-circuits: false LHS skips RHS");
+
+    sc_calls = 0; taken = 0;
+    if (1 || sc_bump(1)) taken = 1;
+    Assert(taken == 1 && sc_calls == 0, "|| short-circuits: true LHS skips RHS");
+
+    sc_calls = 0; taken = 0;
+    if (1 && sc_bump(1)) taken = 1;
+    Assert(taken == 1 && sc_calls == 1, "&& evaluates RHS when LHS true");
+
+    Assert((1 && (0 || 1)) == 1, "|| nested in && (value-leaf fallback)");
+    a = 5;
+    Assert((!(a > 3)) == 0, "! of a true compare");
+    Assert((!a) == 0 && (!0) == 1, "! of a value");
+
+    for (k = 0; k < 8; k++) sc_buf[k] = 5;
+    sc_buf[3] = 9;                   /* run of 5s stops at index 3 */
+    Assert(sc_run() == 3, "compound && loop condition (RLE shape)");
+}
+
+/* Byte == byte / byte == const compared in A with `cp` (not widened to 16
+   bits). Covers value context, `!=`, and a high-half const (>127) where a
+   naive signed widen would give the wrong answer — EQ/NE compare the
+   zero-extended bytes, so `cp` must match. */
+static unsigned char bc_arr[4];
+static void test_byte_cmp(void)
+{
+    unsigned char x = 200, y = 200, z = 5;
+    int r, i;
+    Assert((x == y) == 1, "byte==byte equal (high-half 200)");
+    Assert((x == z) == 0, "byte==byte unequal");
+    Assert((x != z) == 1, "byte!=byte");
+    Assert((x == 200) == 1, "byte==const >127");
+    Assert((z == 5) == 1,   "byte==const small");
+    Assert((x == 5) == 0,   "byte==const unequal");
+    bc_arr[0] = 200; bc_arr[1] = 200; bc_arr[2] = 7; bc_arr[3] = 200;
+    r = 0; for (i = 0; i < 4; i++) r += (bc_arr[i] == 200);
+    Assert(r == 3, "byte==const summed over array");
+}
+
+/* A width-1 loop counter read across basic blocks (the `i < n` test and the
+   `i == t` compare live in different BBs) with BC free — the byte-home pick
+   would have parked it in slotless PR_C, but the lowerer's byte read paths are
+   BB-local, so a cross-BB read fell to a nonexistent slot and aborted. The
+   pick now confines slotless PR_C to single-BB bytes; a cross-BB byte gets the
+   slot-backed PR_E home instead. */
+static int cbc_count(unsigned char n, unsigned char t)
+{
+    unsigned char i;
+    int c = 0;
+    for (i = 0; i < n; i++) { if (i == t) c++; else c--; }
+    return c;
+}
+static void test_xbb_byte_counter(void)
+{
+    Assert(cbc_count(5, 2) == -3, "cross-BB byte counter (5,2)");
+    Assert(cbc_count(8, 0) == -6, "cross-BB byte counter (8,0)");
+    Assert(cbc_count(0, 0) == 0,  "cross-BB byte counter zero-trip");
+}
+
+/* A byte loop counter in a do-while whose back-edge is reached through an
+   empty forwarding block (`--e` latch, early `return` from the body). The
+   slot-backed byte home (E) must be flushed to its slot before the back-edge,
+   but the back-edge hides behind an alias block and the latch falls through to
+   it — so the flush is driven by the latch's exit test. With the unreachable-BB
+   prune removing the incidental merge that used to force the flush, this
+   exercises the alias-resolved back-edge flush + the dirty-carry across BBs.
+   A dropped flush reads a stale counter → wrong iteration count. */
+static unsigned char dwb_a[4] = { 1, 2, 3, 4 };
+static unsigned char dwb_b[4] = { 1, 2, 3, 9 };
+static int dowhile_byte_cmp(const unsigned char *p, const unsigned char *q)
+{
+    unsigned char e = 4;
+    int seen = 0;
+    do {
+        seen++;
+        if (*p != *q) return seen;   /* index+1 of first mismatch */
+        p++; q++;
+    } while (--e);
+    return 0;                        /* all four equal */
+}
+static void test_dowhile_byte_counter(void)
+{
+    Assert(dowhile_byte_cmp(dwb_a, dwb_a) == 0, "do-while byte counter: full run");
+    Assert(dowhile_byte_cmp(dwb_a, dwb_b) == 4, "do-while byte counter: mismatch at 4");
+}
+
 int main(int argc, char *argv[])
 {
     (void)argc; (void)argv;
@@ -343,5 +513,12 @@ int main(int argc, char *argv[])
     suite_add_test(test_or_long_zero);
     suite_add_test(test_const_store_fold);
     suite_add_test(test_iv_narrow);
+    suite_add_test(test_byte_not);
+    suite_add_test(test_nested_residency);
+    suite_add_test(test_uninit_accum);
+    suite_add_test(test_short_circuit);
+    suite_add_test(test_byte_cmp);
+    suite_add_test(test_xbb_byte_counter);
+    suite_add_test(test_dowhile_byte_counter);
     return suite_run();
 }
