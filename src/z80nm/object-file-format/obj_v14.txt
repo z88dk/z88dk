@@ -1,5 +1,120 @@
 z80asm File formats (v14)
 =========================
 
-This document describes the object and libary formats used by *z80asm* 
-.
+This document describes the object and library formats used by *z80asm*.
+
+The object and library files are stored in binary form as a set of 
+contiguous sections, i.e. each section follows the previous one. 
+
+The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.
+
+A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain *0xFFFFFFFF* 
+(-1) if that section does not exist.
+
+The following object types exist in the file:
+
+* *char* : one signed 8-bit value containing an ASCII character;
+
+* *byte* : one unsigned 8-bit value;
+
+* *word* : one 16-bit value, stored in low byte - high byte order;
+
+* *dword* :	one signed 32-bit value, stored in low byte - high byte order;
+
+* *string* : one byte containing the string length followed by the 
+             characters of the string.
+
+* *lstring* : one word containing the string length followed by the
+              characters of the string.
+
+
+Object file format
+------------------
+
+The format of the object file is as follows:
+
+|Addr|Type   | Object
+|----|----   | ------
+|    |       | **File header**
+|   0|8 chars| 'Z80RMF14' - file signature and version
+|   8| dword | File pointer to *Module Name*
+|  12| dword | File pointer to *Expressions*, may be -1
+|  16| dword | File pointer to *Defined Symbols*, may be -1
+|  20| dword | File pointer to *External Symbols*, may be -1
+|  24| dword | File pointer to *Sections*, may be -1
+|    |       |
+|    |       | **Expressions**
+|    |       | List of expressions defined in this module:
+|    | char  | Expression type: 
+|    |       | '\0' : end marker 
+|    |       | 'J'  : signed 8-bit value, JR-offset 
+|    |       | 'U'  : unsigned 8-bit value 
+|    |       | 'S'  : signed 8-bit value 
+|    |       | 'C'  : 16-bit value 
+|    |       | 'B'  : 16-bit value, big-endian 
+|    |       | 'L'  : 32-bit value 
+|    |       | 'u'  : unsigned 8-bit value, extended to 16 bits (appending a 0) 
+|    |       | 's'  : signed 8-bit value, sign-extended to 16 bits
+|    |       |        (appending a 0xff if negative or 0 otherwise) 
+|    |       | 'P'  : 24-bit value 
+|    |       | 'H'  : unsigned 8-bit value, offset to 0xFF00 
+|    |       | '='  : DEFC expression computed at link time and assigning
+|    |       |        a symbol 
+|    |lstring| Source file name where expression was defined,
+|    |       | empty string to reuse the previous expression source file
+|    | dword | Line number in source file where expression was defined
+|    |string | Section name where expression was defined
+|    | word  | *ASMPC* : relative module code address of the start of the
+|    |       |           assembly instruction to be used as *ASMPC* during
+|    |       |           expression evaluation
+|    | word  | *patchptr* : relative module code patch pointer to store 
+|    |       |              the result of evaluating the expression
+|    |string | *target_name* : name of the symbol that receives the result
+|    |       |                 of evaluating the expression, only used for
+|    |       |                 type '=' expressions, empty string for the 
+|    |       |                 other types
+|    |lstring| *expression* : expression text as parsed from the source file
+|    |       |
+
+
+History
+-------
+
+* *01* : original z80asm version
+
+* *02* : allow expressions to use standard C operators instead of the
+         original (legacy) z80asm specific syntax
+
+* *03* : include the address of the start of the assembly instruction
+         in the object file, so that expressions with ASMPC are
+         correctly computed at link time;
+         remove type 'X' symbols (global library), no longer used
+
+* *04* : include the source file location of expressions in order
+         to give meaningful link-time error messages
+
+* *05* : include source code sections
+
+* *06* : incomplete implementation, fixed in version *07*
+
+* *07* : include *DEFC* symbols that are defined as an expression using
+         other symbols and are computed at link time, after all
+         addresses are allocated
+
+* *08* : include a user defined ORG address per section
+
+* *09* : include the file and line number where each symbol was defined
+
+* *10* : allow a section alignment to be defined
+
+* *11* : allow big-endian 16-bit expressions to be patched;
+         these big-endian values are used in the ZXN coper unit
+
+* *12* : allow the target expression of relative jumps to be computed
+         in the link phase
+
+* *13* : add 8-bit signed and unsigned values extended to 16-bits
+
+* *14* : add 24-bit pointers

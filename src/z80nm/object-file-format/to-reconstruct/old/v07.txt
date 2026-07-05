@@ -24,7 +24,7 @@ The following object types exist in the file:
 * *word* :	one 16-bit value, stored in low byte - high byte order 
   (Little endian format - Z80/Intel notation);
 
-* *long* :	one 32-bit value, stored in low byte - high byte order, 
+* *dword* :	one 32-bit value, stored in low byte - high byte order, 
 containing the file position where the corresponding 
 section starts; the value is *0xFFFFFFFF* (-1) if the section 
 does not exist;
@@ -44,12 +44,12 @@ The format of the object file is as follows:
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
     |   0 | char[8]| 'Z80RMF07' (file signature and version)                |  
-    |   8 | long   | *ORG Address*                                          |  
-    |  12 | long   | File pointer to *Module Name*, always the last section |  
-    |  16 | long   | File pointer to *Expressions*, may be -1               |  
-    |  20 | long   | File pointer to *Module Names*, may be -1              |  
-    |  24 | long   | File pointer to *External Names*, may be -1            |  
-    |  28 | long   | File pointer to *Machine Code*, may be -1              |  
+    |   8 | dword   | *ORG Address*                                          |  
+    |  12 | dword   | File pointer to *Module Name*, always the last section |  
+    |  16 | dword   | File pointer to *Expressions*, may be -1               |  
+    |  20 | dword   | File pointer to *Module Names*, may be -1              |  
+    |  24 | dword   | File pointer to *External Names*, may be -1            |  
+    |  28 | dword   | File pointer to *Machine Code*, may be -1              |  
     |  32 |        | *Expressions*                                          |  
     |     |        | ...                                                    |  
     |     |        | *Module Names*                                         |  
@@ -78,7 +78,7 @@ format:
   to be used in error messages. May be an empty string, signalling that
   the previous *sourcefile* of the previous expression should be used.
 
-  * *line_number* (long) : line number in source file where 
+  * *line_number* (dword) : line number in source file where 
   expression was defined, to be used in error messages.
 
   * *section* (string) : source file section name where expression 
@@ -115,7 +115,7 @@ up to the next existing section. Each name has the following format:
   * *section* (string) : source file section name where name 
   was defined. 
 
-  * *value* (long) : contains the absolute value for a constant, or the
+  * *value* (dword) : contains the absolute value for a constant, or the
   relative address to the start of the code block for a relocatable
   address.
 	
@@ -133,7 +133,7 @@ up to the next existing section. Each name has the following format:
 * *Machine Code* : contains the binary code of the module with the 
 following format:
 
-  * *length* (long) : defines the total code lenght, and contains -1
+  * *length* (dword) : defines the total code lenght, and contains -1
   to signal the end.
 
   * *section* (string) : source file section name. 
@@ -155,10 +155,10 @@ structures.
 
 * *Object File Block* : contains the following format: 
 
-  * *next* (long) : contains the file pointer of the next object file 
+  * *next* (dword) : contains the file pointer of the next object file 
   in the library, or *-1* if this object file is the last in the library.
 
-  * *length* (long) : contains the length of this object file, 
+  * *length* (dword) : contains the length of this object file, 
   or *0* if this object files has been marked "deleted" and will not be used.
 
 

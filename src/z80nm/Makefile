@@ -38,8 +38,6 @@ OBJS	:= $(CXXSRCS:.cpp=.o) $(CSRCS:.c=.o) \
 
 DEPENDS	:= $(CXXSRCS:.cpp=.d) $(CSRCS:.c=.d)
 
-DOCS	:= object-file-format
-
 # Use these flags both in Windows_NT and in a MinGW build in Unix
 ifeq ($(EXESUFFIX),.exe)
 CFLAGS		+= -std=gnu11 $(COMMON_FLAGS)
@@ -69,14 +67,6 @@ endef
 
 #------------------------------------------------------------------------------
 $(eval $(call MAKE_EXE,$(PROJ),$(OBJS),0))
-
-#------------------------------------------------------------------------------
-all: docs
-
-docs: $(DOCS)/obj_v01.txt
-
-$(DOCS)/obj_v01.txt : $(DOCS)/make_docs.pl ObjModule.pm
-	perl $(DOCS)/make_docs.pl
 
 #------------------------------------------------------------------------------
 test:: $(PROJ)$(EXESUFFIX)

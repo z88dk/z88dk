@@ -1,8 +1,7 @@
-z80asm File formats (v05)
+z80asm File formats (v13)
 =========================
 
-This document describes the object and libary formats used by *z80asm*
-versions *2.4.x*. 
+This document describes the object and library formats used by *z80asm*.
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -24,7 +23,7 @@ The following object types exist in the file:
 * *word* :	one 16-bit value, stored in low byte - high byte order 
   (Little endian format - Z80/Intel notation);
 
-* *long* :	one 32-bit value, stored in low byte - high byte order, 
+* *dword* :	one 32-bit value, stored in low byte - high byte order, 
 containing the file position where the corresponding 
 section starts; the value is *0xFFFFFFFF* (-1) if the section 
 does not exist;
@@ -43,14 +42,13 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF05' (file signature and version)                |  
-    |   8 | long   | *ORG Address*                                          |  
-    |  12 | long   | File pointer to *Module Name*, always the last section |  
-    |  16 | long   | File pointer to *Expressions*, may be -1               |  
-    |  20 | long   | File pointer to *Module Names*, may be -1              |  
-    |  24 | long   | File pointer to *External Names*, may be -1            |  
-    |  28 | long   | File pointer to *Machine Code*, may be -1              |  
-    |  32 |        | *Expressions*                                          |  
+    |   0 | char[8]| 'Z80RMF13' (file signature and version)                |  
+    |   8 | dword   | File pointer to *Module Name*, always the last section |  
+    |  12 | dword   | File pointer to *Expressions*, may be -1               |  
+    |  16 | dword   | File pointer to *Module Names*, may be -1              |  
+    |  20 | dword   | File pointer to *External Names*, may be -1            |  
+    |  24 | dword   | File pointer to *Machine Code*, may be -1              |  
+    |  28 |        | *Expressions*                                          |  
     |     |        | ...                                                    |  
     |     |        | *Module Names*                                         |  
     |     |        | ...                                                    |  
@@ -60,9 +58,6 @@ The format of the object file is as follows:
     |     |        | *Machine Code*                                         |  
 
 
-* *ORG Address* : contains the ORG address for the linked machine code 
-or -1 for no ORG address defined. 
-
 * *Expressions* : contains a set of expressions up to an end marker (*type* = 0). Each expression has the following
 format:
 
@@ -70,14 +65,19 @@ format:
      *  0  : end marker 
      * 'U' : 8-bit integer (0 to 255)  
      * 'S' : 8-bit signed integer (-128 to 127)  
-     * 'C' : 16-bit integer (-32768 to 65535)  
+     * 'u' : 8-bit integer (0 to 255) extended to 16 bits (appending a 0)  
+     * 's' : 8-bit signed integer (-128 to 127) sign-extended to 16 bits (appending a 0xff if negative or 0 otherwise)  
+     * 'C' : 16-bit integer, little-endian (-32768 to 65535)  
+     * 'B' : 16-bit integer, big-endian (-32768 to 65535)  
      * 'L' : 32-bit signed integer     
+     * 'J' : 8-bit jump relative offset
+     * '=' : computed name at link time
 
   * *sourcefile* (lstring) : source file name where expression was defined,
   to be used in error messages. May be an empty string, signalling that
   the previous *sourcefile* of the previous expression should be used.
 
-  * *line_number* (long) : line number in source file where 
+  * *line_number* (dword) : line number in source file where 
   expression was defined, to be used in error messages.
 
   * *section* (string) : source file section name where expression 
@@ -90,6 +90,10 @@ format:
   * *patchptr* (word) : defines the relative module code patch pointer to 
   store the result of evaluating the expression.
 
+  * *target_name* (string) : contains the name of the symbol that receives
+  the result of evaluating the expression, only used for '=' type expressions,
+  empty string for the other types.
+	
   * *expression* (lstring) : contains the expression text as parsed from the 
   source file, in the standard C-like expression syntax.
 
@@ -104,15 +108,21 @@ up to the next existing section. Each name has the following format:
   * *type (char) : defines whether it is a: 
      * 'A' relocatable address,   
      * 'C' a constant.
+     * '=' a symbol computed at link time, the corresponding
+     expression is in the *Expressions* section.
 
   * *section* (string) : source file section name where name 
   was defined. 
 
-  * *value* (long) : contains the absolute value for a constant, or the
+  * *value* (dword) : contains the absolute value for a constant, or the
   relative address to the start of the code block for a relocatable
   address.
 	
-	* *name* (string) : contains the name.
+  * *name* (string) : contains the name.
+
+  * *filename* (string) : contains the source file name where the symbol was defined.
+
+  * *line_nr* (dword) : contains the source line number where the symbols was defined.
 
 
 * *External Names* : contains a set of external names referred 
@@ -126,32 +136,41 @@ up to the next existing section. Each name has the following format:
 * *Machine Code* : contains the binary code of the module with the 
 following format:
 
-  * *length* (long) : defines the total code lenght, and contains -1
+  * *length* (dword) : defines the total code lenght, and contains -1
   to signal the end.
 
   * *section* (string) : source file section name. 
  
+  * *ORG Address* (dword) : contains the user defined ORG address for 
+  the start of this section, -1 for no ORG address was defined, or 
+  -2 to split section to a different binary file. 
+  If multiple setions are given with an ORG address each, the 
+  assembler generates one binary file for each section with a defined 
+  ORG, followed by all sections without one.
+
+  * *ALIGN* (dword) : defines the address alignment of this section, -1 if not defined. The previous section is padded to align the start address of this section.
+
   * *code* (byte[length]) : contains the binary code.
 
 
 Library file format
 -------------------
 
-The library file format is a sequense of object files with additional
+The library file format is a sequence of object files with additional
 structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF05' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF13' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
 * *Object File Block* : contains the following format: 
 
-  * *next* (long) : contains the file pointer of the next object file 
+  * *next* (dword) : contains the file pointer of the next object file 
   in the library, or *-1* if this object file is the last in the library.
 
-  * *length* (long) : contains the length of this object file, 
+  * *length* (dword) : contains the length of this object file, 
   or *0* if this object files has been marked "deleted" and will not be used.
 
 
@@ -167,3 +186,12 @@ no longer used.
 * version *04* : include the source file location of expressions in order to give meaningful link-time 
 error messages.
 * version *05* : include source code sections.
+* version *06* : incomplete implementation, fixed in version *07*
+* version *07* : include *DEFC* symbols that are defined as an expression using other symbols and are computed 
+at link time, after all addresses are allocated.
+* version *08* : include a user defined ORG address per section.
+* version *09* : include the file and line number where each symbol was defined.
+* version *10* : allow a section alignment to be defined.
+* version *11* : allow big-endian 16-bit expressions to be patched; these big-endian values are used in the ZXN coper unit.
+* version *12* : allow the target expression of relative jumps to be computed in the link phase
+* version *13* : add 8-bit signed and unsigned values extended to 16-bits

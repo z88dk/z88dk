@@ -1,5 +1,75 @@
 z80asm File formats (v01)
 =========================
 
-This document describes the object and libary formats used by *z80asm* 
+This document describes the object and library formats used by *z80asm*
 up to version *1.2.10*.
+
+The object and library files are stored in binary form as a set of 
+contiguous sections, i.e. each section follows the previous one. 
+
+The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.
+
+A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain *0xFFFFFFFF* 
+(-1) if that section does not exist.
+
+The following object types exist in the file:
+
+* *char* : one signed 8-bit value containing an ASCII character;
+
+* *byte* : one unsigned 8-bit value;
+
+* *word* : one 16-bit value, stored in low byte - high byte order;
+
+* *dword* :	one signed 32-bit value, stored in low byte - high byte order;
+
+* *string* : one byte containing the string length followed by the 
+             characters of the string.
+
+
+Object file format
+------------------
+
+The format of the object file is as follows:
+
+|Addr|Type   | Object
+|----|----   | ------
+|    |       | **File header**
+|   0|8 chars| 'Z80RMF01' - file signature and version
+|   8| word  | ORG Address:
+|    |       | contains the ORG address for the linked machine code
+|    |       | or *0xFFFF* for no ORG address defined
+|    |       | 
+|  10| dword | File pointer to *Module Name*
+|  14| dword | File pointer to *Expressions*, may be -1
+|  18| dword | File pointer to *Defined Symbols*, may be -1
+|  22| dword | File pointer to *External Symbols*, may be -1
+|  26| dword | File pointer to *Machine Code*, may be -1
+|    |       |
+|    |       | **Expressions**
+|    |       | List of expressions defined in this module:
+|    | char  | Expression type: 
+|    |       | 'U'  : unsigned 8-bit value 
+|    |       | 'S'  : signed 8-bit value 
+|    |       | 'C'  : 16-bit value 
+|    |       | 'L'  : 32-bit value 
+|    | word  | *patchptr* : relative module code patch pointer to store 
+|    |       |              the result of evaluating the expression
+|    | string| *expression* : expression text as parsed from the source file
+|    | byte  | *0* : terminator
+|    |       | 
+|    |       | *Defined Symbols*
+|    |       |
+|    |       | *External Symbols*
+|    |       |
+|    |       | *Module Name*
+|    |       | 
+|    |       | *Machine Code*
+|    |       | 
+
+
+History
+-------
+
+* *01* : original z80asm version

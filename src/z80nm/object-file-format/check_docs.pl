@@ -9,14 +9,11 @@ use Path::Tiny;
 use lib '.';
 use ObjModule;
 
-Obj->make_docs(path($0)->parent);
-
-if ($ENV{DEBUG}) {
-    for my $v (Obj->min_version .. Obj->cur_version) {
-        my $version = sprintf "%02d", $v;
-        system( "start \"\" WinMergeU.exe " . 
-                path($0)->parent->child("to-reconstruct")->child("v$version.txt") . " " .
-                path($0)->parent->child("obj_v$version.txt")
-        );
-    }
+for my $v (Obj->min_version+1 .. Obj->cur_version) {
+    my $old = sprintf "%02d", $v-1;
+    my $new = sprintf "%02d", $v;
+    system( "start \"\" WinMergeU.exe " . 
+            path($0)->parent->child("obj_v$old.txt") . " " .
+            path($0)->parent->child("obj_v$new.txt")
+    );
 }

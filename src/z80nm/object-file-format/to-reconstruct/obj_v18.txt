@@ -1,7 +1,11 @@
-## z80asm File formats (v18)
-[[Top](Tool---z80asm)]
+z80asm File formats (v18)
+=========================
 
-This document describes the object and libary formats used by *z80asm*. 
+This document describes the object and library formats used by
+*z80asm*.
+
+*NOTE:* v18 is the version used in production; v19 is the version
+for the new z80asm v2 in development.
 
 The object and library files are stored in binary form as a set of 
 contiguous sections, i.e. each section follows the previous one. 
@@ -15,14 +19,14 @@ start of each section existing the in the file, or contain *0xFFFFFFFF*
 
 The following object types exist in the file:
 
-* *char* :	one signed 8-bit value containing an ASCII character;
+* *char* : one signed 8-bit value containing an ASCII character;
 
-* *byte* :	one unsigned 8-bit value;
+* *byte* : one unsigned 8-bit value;
 
 * *dword* :	one signed 32-bit value, stored in low byte - high byte order;
 
 * *strid* : one signed 32-bit value indicating the string index in the 
-string table; index 0 allways points to an empty string;
+string table; index 0 always points to an empty string;
 
 Object file format
 ------------------

@@ -692,6 +692,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
         if (show_expr)
             printf(": ");
 
+        // target name
         if (obj->version >= 6) {
             if (obj->version >= 18)
                 objfile_read_strid(obj, fp, expr->target_name);
@@ -704,6 +705,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
                 printf("%s := ", utstring_body(expr->target_name));
         }
 
+        // text
         if (obj->version >= 18)
             objfile_read_strid(obj, fp, expr->text);
         else if (obj->version >= 4)

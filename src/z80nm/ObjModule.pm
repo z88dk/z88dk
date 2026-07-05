@@ -435,8 +435,8 @@ sub parse {
 	my($file) = @_;
 	my @types;
 	for (path($file)->lines({chomp=>1})) {
-		next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)/;
-		push @types, [$1, $2];
+		next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)\s*,\s*(?:'(.)'|0)/;
+		push @types, [$1, $2, $3];
 	}
 	return @types;
 }
@@ -444,13 +444,16 @@ sub parse {
 sub lookup_ {
 	my($key) = @_;
 	for (@EXPR_TYPES) {
-		my($id, $name) = @$_;
+		my($id, $name, $char) = @$_;
 	
 		if ($key =~ /^\d+$/) {
-			return [$id, $name] if $id == $key;
+			return [$id, $name, $char] if $id == $key;
+		}
+		elsif ($key =~ /^(\D)$/) {
+			return [$id, $name, $char] if $char eq $1;
 		}
 		else {
-			return [$id, $name] if $name eq $key;
+			return [$id, $name, $char] if $name eq $key;
 		}
 	}
 	return undef;
@@ -466,6 +469,12 @@ sub lookup_name {
 	my($key) = @_;
 	my $found = lookup_($key);
 	return $found ? $found->[1] : undef;
+}
+
+sub lookup_char {
+	my($key) = @_;
+	my $found = lookup_($key);
+	return $found ? $found->[2] : undef;
 }
 
 #------------------------------------------------------------------------------
@@ -584,6 +593,249 @@ sub parse {
 	$scanner->error("expected end expr");
 }
 
+sub pack {
+	my($self, $bin, $strings, $last_file_ref, $version) = @_;
+
+	# pack type
+	if ($version >= 18) {
+		my $id = ObjExprType::lookup_id($self->type);
+		$bin->pack_dword($id);
+	}
+	else {
+		my $char = ObjExprType::lookup_char($self->type);
+		$bin->pack_byte($char);
+	}
+
+	# pack filename and line number
+	if ($version >= 18) {
+		my $id = $strings->add($self->file);
+		$bin->pack_dword($id);
+		$bin->pack_dword($self->line);
+	}
+	elsif ($version >= 4) {
+		if ($self->file eq $$last_file_ref) {
+			$bin->pack_lstring("");
+		}
+		else {
+			$bin->pack_lstring($self->file);
+		}
+		$$last_file_ref = $self->file;
+		$bin->pack_dword($self->line);
+	}
+	else {
+		# no file/line
+	}
+
+	# pack section
+	if ($version >= 18) {
+		my $id = $strings->add($self->section);
+		$bin->pack_dword($id);
+	}
+	elsif ($version >= 16) {
+		$bin->pack_lstring($self->section);
+	}
+	elsif ($version >= 5) {
+		$bin->pack_cstring($self->section);
+	}
+	else {
+		# no section
+	}
+
+	# pack ASMPC
+	if ($version >= 17) {
+		$bin->pack_dword($self->asmpc);
+	}
+	elsif ($version >= 3) {
+		$bin->pack_word($self->asmpc);
+	}
+	else {
+		# no ASMPC
+	}
+
+	# pack patch_ptr
+	if ($version >= 17) {
+		$bin->pack_dword($self->patch_ptr);
+	}
+	else {
+		$bin->pack_word($self->patch_ptr);
+	}
+
+	# pack opcode_size
+	if ($version >= 17) {
+		$bin->pack_dword($self->opcode_size);
+	}
+	else {
+		# no opcode_size
+	}
+
+	# pack target_name
+	if ($version >= 18) {
+		my $id = $strings->add($self->target_name);
+		$bin->pack_dword($id);
+	}
+	elsif ($version >= 16) {
+		$bin->pack_lstring($self->target_name);
+	}
+	elsif ($version >= 6) {
+		$bin->pack_cstring($self->target_name);
+	}
+	else {
+		# no target_name
+	}
+
+	# pack text
+	if ($version >= 18) {
+		my $id = $strings->add($self->text);
+		$bin->pack_dword($id);
+	}
+	elsif ($version >= 4) {
+		$bin->pack_lstring($self->text);
+	}
+	else {
+		$bin->pack_cstring($self->text);
+		$bin->pack_byte(0);	# terminator
+	}
+}
+
+sub unpack {
+	my($class, $bin, $strings, $last_file_ref, $version) = @_;
+	my $self = $class->new;
+
+	# unpack type or end marker
+	if ($version >= 18) {
+		my $id = $bin->unpack_dword;
+		if ($id == 0) {
+			return undef;	# end marker
+		}
+		my $type = ObjExprType::lookup_name($id);
+		$type or die "invalid expression type id: $id";
+		$self->type($type);
+	}
+	else {
+		my $byte = $bin->unpack_byte;
+		if ($byte == 0) {
+			return undef;	# end marker
+		}
+		my $char = chr($byte);
+		my $type = ObjExprType::lookup_name($char);
+		$type or die "invalid expression type char: '$char'";
+		$self->type($type);
+	}
+
+	# unpack filename and line number
+	if ($version >= 18) {
+		my $id = $bin->unpack_dword;
+		my $file = $strings->get($id);
+		$self->file($file);
+
+		my $line = $bin->unpack_dword;
+		$self->line($line);
+	}
+	elsif ($version >= 4) {
+		my $file = $bin->unpack_lstring;
+		if ($file eq "") {
+			$file = $$last_file_ref;
+		}
+		else {
+			$$last_file_ref = $file;
+		}
+		$self->file($file);
+
+		my $line = $bin->unpack_dword;
+		$self->line($line);
+	}
+	else {
+		# no file/line
+	}
+
+	# unpack section
+	if ($version >= 18) {
+		my $id = $bin->unpack_dword;
+		my $section = $strings->get($id);
+		$self->section($section);
+	}
+	elsif ($version >= 16) {
+		my $section = $bin->unpack_lstring;
+		$self->section($section);
+	}
+	elsif ($version >= 5) {
+		my $section = $bin->unpack_cstring;
+		$self->section($section);
+	}
+	else {
+		# no section
+	}
+
+	# unpack ASMPC
+	if ($version >= 17) {
+		my $asmpc = $bin->unpack_dword;
+		$self->asmpc($asmpc);
+	}
+	elsif ($version >= 3) {
+		my $asmpc = $bin->unpack_word;
+		$self->asmpc($asmpc);
+	}
+	else {
+		# no ASMPC
+	}
+
+	# unpack patch_ptr
+	if ($version >= 17) {
+		my $patch_ptr = $bin->unpack_dword;
+		$self->patch_ptr($patch_ptr);
+	}
+	else {
+		my $patch_ptr = $bin->unpack_word;
+		$self->patch_ptr($patch_ptr);
+	}
+
+	# unpack opcode_size
+	if ($version >= 17) {
+		my $opcode_size = $bin->unpack_dword;
+		$self->opcode_size($opcode_size);
+	}
+	else {
+		# no opcode_size
+	}
+
+	# unpack target_name
+	if ($version >= 18) {
+		my $id = $bin->unpack_dword;
+		my $target_name = $strings->get($id);
+		$self->target_name($target_name);
+	}
+	elsif ($version >= 16) {
+		my $target_name = $bin->unpack_lstring;
+		$self->target_name($target_name);
+	}
+	elsif ($version >= 6) {
+		my $target_name = $bin->unpack_cstring;
+		$self->target_name($target_name);
+	}
+	else {
+		# no target_name
+	}
+
+	# unpack text
+	if ($version >= 18) {
+		my $id = $bin->unpack_dword;
+		my $text = $strings->get($id);
+		$self->text($text);
+	}
+	elsif ($version >= 4) {
+		my $text = $bin->unpack_lstring;
+		$self->text($text);
+	}
+	else {
+		my $text = $bin->unpack_cstring;
+		$self->text($text);
+		my $terminator = $bin->unpack_byte;
+		$terminator == 0 or die "invalid expression text terminator: $terminator";
+	}
+
+	return $self;
+}
+
 #------------------------------------------------------------------------------
 package ObjExprs;
 
@@ -634,6 +886,45 @@ sub parse {
 		}
 	}
 	$scanner->error("expected end exprs");
+}
+
+sub pack {
+	my($self, $bin, $strings, $version) = @_;
+	if (@{$self->exprs}) {
+		my $pos = $bin->size;
+		my $last_file = "";
+
+		# pack expressions
+		for my $expr (@{$self->exprs}) {
+			$expr->pack($bin, $strings, \$last_file, $version);
+		}
+
+		# pack end terminator
+		if ($version >= 18) {
+			$bin->pack_dword(0);
+		}
+		elsif ($version >= 4) {
+			$bin->pack_byte(0);
+		}
+		else {
+			# no end marker
+		}
+
+		return $pos;
+	}
+	else {
+		return -1;
+	}
+}
+
+sub unpack {
+	my($self, $bin, $strings, $version, $limit_pos) = @_;
+	my $last_file = "";
+	while ($bin->read_pos < $limit_pos) {
+		if (my $expr = ObjExpr->unpack($bin, $strings, \$last_file, $version)) {
+			push @{$self->exprs}, $expr;
+		}
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -1246,9 +1537,11 @@ sub pack {
 		$bin->pack_dword(-1);
 	}	
 	
+	# write expressions
+	my $exprs_pos = $self->exprs->pack( $bin, $self->strings, $self->version );
+
 	# ... TODO ...
 
-	my $exprs_pos = -1; #$bin->size;
 	my $symbols_pos = -1; #$bin->size;
 	my $externs_pos = -1; #$bin->size;
     my $sections_pos = -1;    #$bin->size;
@@ -1355,6 +1648,18 @@ sub unpack {
 	else {
 		my $name = $bin->unpack_cstring;
 		$self->name($name);
+	}
+
+	# expressions
+	if ($exprs_pos >= 0) {
+		$bin->read_pos($exprs_pos);
+		my $limit_pos =
+			$symbols_pos >= 0  ? $symbols_pos
+			: $externs_pos >= 0  ? $externs_pos
+			: $sections_pos >= 0 ? $sections_pos
+			:                      $modname_pos;
+		my $exprs = ObjExprs::unpack($bin, $self->strings, $self->version, $limit_pos);
+		$self->exprs($exprs);
 	}
 
 	# ... TODO ...
@@ -1470,36 +1775,6 @@ sub unpack {
 	else {
 		die "invalid signature: $signature";
 	}
-}
-
-#------------------------------------------------------------------------------
-# Make documentation
-#------------------------------------------------------------------------------
-my @versions_text = (
-	[],
-	# v01
-	["up to version *1.2.10*"],
-	# v02
-	["from version *2.0.0* up to version *2.1.8*"],
-	# v03
-	["versions *2.2.x*"],
-);
-
-sub make_docs {
-	my($class, $dir) = @_;
-	
-	for my $v ($min_version .. $cur_version) {
-		my $version = sprintf "%02d", $v;
-
-		open my $fh, ">", "$dir/obj_v$version.txt" or die "cannot open file: $!";
-		print $fh <<END;
-z80asm File formats (v$version)
-=========================
-
-This document describes the object and libary formats used by *z80asm* 
-$versions_text[$v][0].
-END
-	}	
 }
 
 1;
