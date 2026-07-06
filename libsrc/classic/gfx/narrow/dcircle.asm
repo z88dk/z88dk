@@ -178,7 +178,7 @@ draw_circle:
     ld      a,e
     ld      (scale),a
 	
-    ld      (func), hl
+;    ld      (func), hl
 
 
     call    l9900
@@ -399,7 +399,8 @@ doplot:
 
     ret     c
 
-    ld      hl,(func)
+    EXTERN  __plot_ADDR
+    ld      hl,(__plot_ADDR)
     push    hl
     ret
 
@@ -427,7 +428,8 @@ scale:
 asave:
     defb    0
 
-func:
-    defw    0
+;func:
+;    defw    0
 
 ENDIF
+
