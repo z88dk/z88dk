@@ -21,8 +21,14 @@ static int cpu_has_index_halves(void)
 static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
 {
     if (getenv("IR_NO_IXD_FOLD")) return 0;
-    if (!fp_active(f) || L.la.cur_branch_test_kind == 0) return 0;
+    if (L.la.cur_branch_test_kind == 0) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    /* Fires in BOTH fp and sp mode. In sp there are no (ix+d) slot operands
+       (op_is_ixd_slot is fp-gated → cmp_byte_src yields only reg-half / idx-half /
+       none), so the fold applies to a compare whose operands are the value/counter
+       in idx2 (IX, z80/z80n — z180 excluded by idxhalf_ok) or a gp-pair half:
+       `ld a,l; sub ixl; ld a,h; sbc a,ixh` instead of push ix;pop de;sbc hl,de —
+       cheaper and DE-clean. A slot operand yields class 0 → the fold defers. */
     /* Reduction word-home (cur_de_home<0) region: word_dehome_signed_test
        handles the i-in-SLOT loop test. For a loop test whose operands are NOT
        the home (e.g. the counter in idx2 / BC vs a slot bound), let the fold
