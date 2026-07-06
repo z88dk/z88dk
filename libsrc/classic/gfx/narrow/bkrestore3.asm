@@ -6,7 +6,6 @@
 ;    $Id: bkrestore3.asm $
 ;
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_clib
 
 
@@ -30,8 +29,9 @@ _bkrestore_fastcall:
 
     ; __FASTCALL__ !!   HL = sprite address
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
-
+ENDIF
     inc     hl                          ; skip first X xs
     inc     hl                          ; skip first Y ys
 
@@ -40,28 +40,47 @@ _bkrestore_fastcall:
     ld      e, (hl)                     ; Y pos
     inc     hl
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    hl                          ; sprite addr
     pop     ix
 
-;    ld    h,a    ; X
-;    ld    l,e    ; Y
-
-    ld      h, d
-    ld      l, e
+    ld      h, d  ; X
+    ld      l, e  ; Y
 
     ld      a, (ix+0)                   ; Width
     ld      b, (ix+1)                   ; Height
+ELSE
+    ld      a, (hl)                     ; Width
+    inc     hl
+    push    af
+    ld      a, (hl)                     ; Height
+    ld      b, a
+    inc     hl
+    pop     af
+    push    hl                          ; sprite data addr
+
+    ld      h, d  ; X
+    ld      l, e  ; Y
+ENDIF
+
 oloopx:
+IF  __CPU_INTEL__|__CPU_GBZ80__
+    ex      (sp),hl
+ENDIF
     push    bc                          ;Save # of rows
     push    af
 
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      c, (ix+2)                   ;Load one line of image
+ELSE
+    ld      a, (hl)                   ;Load one line of image
+    ld      c,a
+ENDIF
 
-iloopx:                                 ;sla    c    ;Test leftmost pixel
-    ;jr    nc,noplotx    ;See if a plot is needed
+iloopx:
 
     push    hl
     ;push    bc    ; this should be done by the called routine
@@ -69,7 +88,12 @@ iloopx:                                 ;sla    c    ;Test leftmost pixel
     ld      a, h
     add     a, b
     ld      h, a
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     c                           ;Test leftmost pixel
+ELSE
+    ld      a,c
+    rla
+ENDIF
     push    af
     call    nc, respixel
     pop     af
@@ -77,8 +101,6 @@ iloopx:                                 ;sla    c    ;Test leftmost pixel
     pop     de
     ;pop    bc
     pop     hl
-
-;.noplotx
 
     inc     b                           ; witdh counter
 
@@ -89,8 +111,17 @@ iloopx:                                 ;sla    c    ;Test leftmost pixel
 
     jr      nz, noblkx
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
+ELSE
+    inc     hl
+ENDIF
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      c, (ix+2)                   ;Load next byte of image
+ELSE
+    ld      a, (hl)
+    ld      c,a
+ENDIF
 
     jr      noblockx
 
@@ -105,20 +136,36 @@ noblkx:
     jr      nz, iloopx
 
 blockx:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
+ELSE
+    inc     hl
+ENDIF
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      c, (ix+2)                   ;Load next byte of image
+ELSE
+    ld      a, (hl)
+    ld      c,a
+ENDIF
     jr      iloopx
 
 noblockx:
 
-    inc     l
-
     pop     af
     pop     bc                          ;Restore data
+
+IF  __CPU_INTEL__|__CPU_GBZ80__
+    ex      (sp),hl
+ENDIF
+    inc     l
     djnz    oloopx
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+ELSE
+    pop     hl
+ENDIF
+
     ret
 
 
-ENDIF
