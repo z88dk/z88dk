@@ -3,8 +3,8 @@
     PUBLIC  draw_circle
     INCLUDE "classic/gfx/grafix.inc"
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     DEFVARS 0
     {
@@ -29,10 +29,23 @@ draw_circle:
     ld      ix, x0                      ;create buffer on stack
     ;add     ix, sp
     ;ld      sp, ix
+
+;IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      (ix+i_x0), b
     ld      (ix+i_y0), c
     ld      (ix+i_radius), d
     ld      (ix+i_scale), e               ;step factor - usually 1
+;ELSE
+    ;ld      a,b
+    ;ld      (x0),a
+    ;ld      a,c
+    ;ld      (y0),a
+    ;ld      a,d
+    ;ld      (radius),a
+    ;ld      a,e
+    ;ld      (scale),a
+;ENDIF
+
     ld      (func), hl
 
 ;   call    l9900
@@ -410,14 +423,15 @@ y0:
 radius:
     defb    0
 
+scale:
+    defb    0
+
 cx:
     defb    0
 
 da:
     defb    0
 
-scale:
-    defb    0
 
 
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
