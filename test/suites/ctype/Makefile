@@ -8,7 +8,11 @@ SOURCE1 = $(SOURCES) test_isalpha.c test_isupper.c  main.c
 CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
+ifeq ($(COMPILER),xcc)
+all: test1.bin test2.bin test3.bin test4.bin test5.bin test6.bin test7.bin 
+else
 all: test1.bin test2.bin test3.bin test4.bin test5.bin test6.bin test7.bin test1_r2ka.bin test2_r2ka.bin test3_r2ka.bin test4_r2ka.bin test5_r2ka.bin test6_r2ka.bin test7_r2ka.bin
+endif
 
 
 

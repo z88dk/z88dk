@@ -17,7 +17,11 @@ TARGET_KC160 = test_kc160_bitfields.bin test_kc160_rshift.bin test_kc160_lshift.
 CFILES = $(wildcard *.c)
 TARGET_Z80 := $(foreach test,$(CFILES:.c=),test_$(test).bin)
 
+ifeq ($(COMPILER),xcc)
+all: $(TARGET_Z80)
+else
 all: $(TARGET_Z80) $(TARGET_8080) $(TARGET_8085) $(TARGET_GBZ80) $(TARGET_Z80N) $(TARGET_R2KA) $(TARGET_RC2014) $(TARGET_R4K) $(TARGET_KC160)
+endif
 
 
 

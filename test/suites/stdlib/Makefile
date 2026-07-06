@@ -6,7 +6,11 @@ SOURCES += $(wildcard *.c)
 
 CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
+ifeq ($(COMPILER),xcc)
+all:	test.bin 
+else
 all:	test.bin test_r2ka.bin test_8080.bin test_ez80_z80.bin
+endif
 
 
 %.opt: %.c
