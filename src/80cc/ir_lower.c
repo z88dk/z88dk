@@ -101,6 +101,12 @@ typedef struct {
     int cur_func_uses_params;
     int cur_home_is_word, cur_func_whome;
     int cur_byte_home_vreg, cur_byte_home_dirty, cur_func_ehome;
+    /* DE-home co-design: the general (non-accumulate) width-2 vreg the
+       orchestrator elected to keep in DE across a loop (e.g. searchbench `hi`),
+       or -1. Set by the orchestrator's residency decision; while it's live, the
+       binop/compare folds keep DE clean (read operands in place, no pair stage)
+       and the deref push/pop's DE, so the home survives the whole region. */
+    int cur_de_home;
     int cur_home_region_lo, cur_home_region_hi, cur_home_exit_flush_bb;
     int *bb_byte_out;
     /* Parallel to bb_byte_out: was the slot-backed byte home DIRTY (E holds
@@ -137,6 +143,7 @@ static LowerState L = {
     .rs = { .fa = -1, .i64_acc = -1 },
     .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
     .cur_func_whome = -1, .cur_byte_home_vreg = -1, .cur_func_ehome = -1,
+    .cur_de_home = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
 };
@@ -502,6 +509,9 @@ static void home_flush(FILE *out, const Func *f);
 static void home_clobber(FILE *out, const Func *f);
 static int  home_rehome(FILE *out, const Func *f);
 static int  home_is_slotbacked(const Func *f, int v);
+static const Op *find_unique_def(const Func *f, int v);
+static const Op *find_unique_use(const Func *f, int v);
+static int  de_home_indexed_add_ok(const Func *f, const Op *o);
 static void cache_de(int v);
 static void cache_bc(int v);
 static void cache_dehl(int v);
@@ -1810,13 +1820,18 @@ int ir_lower_func(FILE *out, Func *f)
             L.cur_home_is_word = 1;
             L.cur_func_whome = f->word_home_vreg;
             L.la.cur_branch_test_kind = 0;
+            /* Same DE-home fold arming as the render, so op_de_clean's region
+               proof here matches what the render will actually emit. */
+            if (f->de_home_general) L.cur_de_home = f->word_home_vreg;
             compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
             L.cur_home_is_word = 0;
             L.cur_func_whome = -1;
+            L.cur_de_home = -1;
             if (wlo < 0) {
                 memcpy(f->vreg_to_phys, wh_prepick,
                        (size_t)f->n_vregs * sizeof(int));
                 f->word_home_vreg = -1;
+                f->de_home_general = 0;
                 ir_assign_slots(f);
             }
         }
@@ -2020,6 +2035,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.cur_func_ehome = -1;
     L.cur_home_is_word = 0;
     L.cur_func_whome = -1;
+    L.cur_de_home = -1;          /* set by the orchestrator's DE-home decision */
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vreg_to_phys
             && byte_home_slotbacked(f->vreg_to_phys[v])) { L.cur_func_ehome = v; break; }
@@ -2033,6 +2049,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         L.cur_func_whome = f->word_home_vreg;
         L.cur_func_ehome = L.cur_func_whome;
         L.cur_home_is_word = 1;
+        /* General (non-accumulate) DE-home: arm the (ix+d) compare/ALU folds so
+           the region stays DE-clean. -1 for a reduction accumulator (the
+           try_word_accumulate path already keeps DE = home). */
+        if (f->de_home_general) L.cur_de_home = f->word_home_vreg;
     }
     /* Home-resident loop: where the slot-backed home stays in E/D (or DE)
        across a loop, suppress per-iter spills + assert residency at the

@@ -130,6 +130,7 @@ enum {
     CF_IDX2_PARAM     = 1u << 1,   /* idx2: a read-only invariant param */
     CF_BYTE_SINGLE_BB = 1u << 2,   /* byte: confined to one BB → slotless PR_C ok */
     CF_SPECULATIVE    = 1u << 3,   /* IV-residency candidate (Phase 2) */
+    CF_DE_GENERAL     = 1u << 4,   /* DE-home: a general (non-accumulate) home */
 };
 /* Cost-model per-access weights (relative T-state savings of reg vs slot; the
    orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
@@ -410,6 +411,101 @@ static int word_acc_propose(const Func *f, const int *use_count,
     return n;
 }
 
+/* DE-home GENERAL proposer (default-on; IR_NO_DE_HOME opts out): a hot loop-
+   carried width-2 vreg that is NOT a reduction accumulator — searchbench's `hi`
+   (init in bb0, updated `hi = mid - 1` in-loop). It rides DE across the loop; the
+   (ix+d) compare/ALU folds keep the region DE-clean and the indexed deref recomputes
+   from BC. Distinct from word_acc_propose (which requires `v = v OP w`). Same
+   domination + hotness gates; additionally the vreg must be DEFINED inside a loop
+   (loop-carried) and not be a memory base. Tagged CF_DE_GENERAL so the arbiter sets
+   f->de_home_general. The pick is speculative (the lowerer reverts to the baseline
+   allocation if no DE-clean region forms), so a false candidate never regresses.
+   Fills out[] (sized f->n_vregs), returns the count. */
+static int de_home_general_propose(const Func *f, const int *use_count,
+                                   const int *write_count, const int *bb_in_loop,
+                                   const int *first_use, const int *last_use,
+                                   Cand *out)
+{
+    if (getenv("IR_NO_DE_HOME")) return 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+        }
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vreg_to_phys[v] == IR_PR_E || f->vreg_to_phys[v] == IR_PR_D)
+            return 0;   /* DE low half already a byte E/D home */
+    size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+    int *wd_def  = calloc(nv, sizeof(int));
+    int *wd_read = calloc(nv, sizeof(int));
+    int *wd_base = calloc(nv, sizeof(int));
+    int *wd_acc  = calloc(nv, sizeof(int));   /* exclude reduction accumulators */
+    int *wd_ldef = calloc(nv, sizeof(int));   /* defined inside a loop bb */
+    int n = 0;
+    if (wd_def && wd_read && wd_base && wd_acc && wd_ldef) {
+        for (int v = 0; v < f->n_vregs; v++) { wd_def[v] = INT_MAX; wd_read[v] = INT_MAX; }
+        int g = 0;
+        for (int i = 0; i < f->n_bbs; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++, g++) {
+                const Op *o = &bb->ops[j];
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                for (int k = 0; k < nu; k++)
+                    if (u[k] >= 0 && u[k] < f->n_vregs && g < wd_read[u[k]])
+                        wd_read[u[k]] = g;
+                if (o->dst >= 0 && o->dst < f->n_vregs) {
+                    if (g < wd_def[o->dst]) wd_def[o->dst] = g;
+                    if (bb_in_loop[i]) wd_ldef[o->dst] = 1;
+                }
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs && g < wd_def[o->src[0]])
+                    wd_def[o->src[0]] = g;
+                if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                    && o->mem.kind == IR_MEM_VREG
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                    wd_base[o->mem.base] = 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs)
+                    wd_base[o->src[0]] = 1;
+                switch (o->kind) {
+                case IR_ADD: case IR_SUB: case IR_RSUB:
+                case IR_AND: case IR_OR:  case IR_XOR:
+                    if (o->dst >= 0 && o->dst < f->n_vregs
+                        && o->src[1] >= 0 && bb_in_loop[i]
+                        && (o->src[0] == o->dst || o->src[1] == o->dst))
+                        wd_acc[o->dst] = 1;
+                    break;
+                default: break;
+                }
+            }
+        }
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                             | IR_VREG_PARAM)) continue;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            if (wd_base[v]) continue;                     /* not a deref base */
+            if (wd_acc[v]) continue;                      /* accumulators → word_acc */
+            if (!wd_ldef[v]) continue;                    /* must be loop-carried */
+            if (use_count[v] < 4) continue;
+            if (write_count[v] < 2) continue;
+            if (wd_def[v] >= f->bbs[0].n_ops) continue;   /* init def in entry bb0 */
+            if (wd_def[v] >= wd_read[v]) continue;        /* def-first */
+            out[n].vreg = v;
+            out[n].benefit = use_count[v];
+            out[n].lo = first_use[v];
+            out[n].hi = last_use[v];
+            out[n].allowed = RC_DE_ACC;
+            out[n].flags = CF_DE_GENERAL;
+            n++;
+        }
+    }
+    free(wd_def); free(wd_read); free(wd_base); free(wd_acc); free(wd_ldef);
+    return n;
+}
+
 /* Word DE-home arbiter: single occupant, highest benefit (first on tie). The
    winner OWNS DE — every other PR_DE tenant is demoted to SPILL (its def can't
    clobber the home; it reloads through HL at the accumulate). Saves the pre-pick
@@ -601,6 +697,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
     }
     int idx2_taken = 0, byte_reg = 0;    /* 0 / 'C' / 'E' */
     int de_acc_vreg = -1;                /* DE-acc winner, APPLIED after the loop */
+    int de_acc_general = 0;              /* winner is a general (non-acc) home */
     /* Whole-function occupancy predicates, recomputed cheaply from
        vreg_to_phys as assignments land. */
     for (int i = 0; i < n; i++) {
@@ -632,11 +729,22 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
         }
 
         if (c->allowed & RC_DE_ACC) {
+            /* GENERAL DE-home candidates are handled in a SEPARATE phase after
+               this loop (see below): they are speculative (revert if no region
+               forms), so they must be overlaid on the finished BC/idx2/byte
+               baseline — reserving DE here would let an inferior vreg grab the
+               BC the home vacated, and a revert would restore THAT perturbed
+               state, not the true baseline. The reduction word-acc (non-general)
+               keeps the in-loop reservation (present in every build). */
+            if (c->flags & CF_DE_GENERAL) continue;
             /* RESERVE DE (E aliases it, so a later byte can't take E); the
                eviction + prepick snapshot + assign happen AFTER the loop, so
                the prepick captures the full BC/idx2/byte baseline the lowerer
                reverts to — matching the sequential picker (word-acc runs last). */
-            if (de_acc_vreg < 0 && byte_reg != 'E') de_acc_vreg = v;
+            if (de_acc_vreg < 0 && byte_reg != 'E') {
+                de_acc_vreg = v;
+                de_acc_general = 0;
+            }
             continue;
         }
 
@@ -681,6 +789,45 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
                 f->vreg_to_phys[j] = IR_PR_SPILL;
         f->vreg_to_phys[de_acc_vreg] = IR_PR_DE;
         f->word_home_vreg = de_acc_vreg;
+        f->de_home_general = de_acc_general;
+    }
+
+    /* GENERAL DE-home phase (opt-in, speculative). Only if no reduction word-acc
+       claimed DE and no byte E/D-home took DE's low half. The pick is OVERLAID on
+       the finished BC/idx2/byte/word-acc baseline: snapshot that baseline as the
+       revert target FIRST, then promote the winner to DE (from BC or spill),
+       evicting any other DE tenant. Because the snapshot is the true baseline,
+       a revert (no region forms) restores codegen exactly — no BC perturbation. */
+    if (f->word_home_vreg < 0) {
+        int gbest = -1;
+        for (int i = 0; i < n; i++) {
+            const Cand *c = &pool[i];
+            if (!(c->allowed & RC_DE_ACC) || !(c->flags & CF_DE_GENERAL)) continue;
+            int v = c->vreg;
+            int ph = f->vreg_to_phys[v];
+            if (ph != IR_PR_SPILL && ph != IR_PR_BC) continue;  /* promotable only */
+            if (gbest < 0 || c->benefit > pool[gbest].benefit) gbest = i;
+        }
+        /* A byte home in E/D forbids a word DE-home (shared low half). */
+        int e_taken = 0;
+        for (int j = 0; j < f->n_vregs; j++)
+            if (f->vreg_to_phys[j] == IR_PR_E || f->vreg_to_phys[j] == IR_PR_D) {
+                e_taken = 1; break;
+            }
+        if (gbest >= 0 && !e_taken) {
+            int v = pool[gbest].vreg;
+            free(word_home_prepick);
+            word_home_prepick = malloc((size_t)f->n_vregs * sizeof(int));
+            if (word_home_prepick)
+                memcpy(word_home_prepick, f->vreg_to_phys,
+                       (size_t)f->n_vregs * sizeof(int));
+            for (int j = 0; j < f->n_vregs; j++)
+                if (j != v && f->vreg_to_phys[j] == IR_PR_DE)
+                    f->vreg_to_phys[j] = IR_PR_SPILL;
+            f->vreg_to_phys[v] = IR_PR_DE;   /* promote (from BC or spill) to DE */
+            f->word_home_vreg = v;
+            f->de_home_general = 1;
+        }
     }
 }
 
@@ -1308,6 +1455,12 @@ void ir_alloc(Func *f)
                 if (c_word_resident && !getenv("IR_NO_WORD_RESIDENT"))
                     np += word_acc_propose(f, use_count, write_count, bb_in_loop,
                                            first_use, last_use, pool + np);
+                /* DE-home co-design: a general loop-carried width-2 vreg (opt-in
+                   IR_DE_HOME). Same RC_DE_ACC class → the arbiter's DE reservation
+                   + prepick revert apply; tagged CF_DE_GENERAL so the lowerer uses
+                   the general home-def path, not try_word_accumulate. */
+                np += de_home_general_propose(f, use_count, write_count, bb_in_loop,
+                                              first_use, last_use, pool + np);
                 /* Phase 2: hot loop-carried int IVs. IR_NO_IV_RESIDENT opts out. */
                 if (!getenv("IR_NO_IV_RESIDENT"))
                     np += iv_propose(f, use_count, write_count, all_defs_ok,

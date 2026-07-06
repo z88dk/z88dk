@@ -9,8 +9,102 @@ static int cpu_has_index_halves(void)
     return c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80();
 }
 
+/* Byte-wise operand fold for an int compare (branch-fused). Reads BOTH operands
+   where they already live — register halves, (ix+d) slots, or idx2 halves — and
+   subtracts byte-wise through A, so no operand is staged into a pair (`ld
+   de,(ix+d); sbc hl,de`) or push/pop'd (idx2). Fires only when at least one
+   operand is memory/index (else `sbc hl,de` on two gp pairs is shorter). Gated to
+   the 2-op-`ld hl,(ix+d)` CPUs (z80/z80n/z180); ez80/kc160/rabbit load a slot word
+   in one instr so gain nothing. idx2-half operands (`sub iyl`) are z80/z80n only
+   (z180 traps undocumented index-half ops). Covers LT/LE/GT/GE (all reduced to one
+   byte-wise subtract + CF) and EQ/NE. Default-on; IR_NO_IXD_FOLD opts out. */
+static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
+{
+    if (getenv("IR_NO_IXD_FOLD")) return 0;
+    if (!fp_active(f) || L.la.cur_branch_test_kind == 0) return 0;
+    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    /* Reduction word-home (cur_de_home<0) region: word_dehome_signed_test
+       handles the DE-clean loop test. The GENERAL DE-home (cur_de_home>=0)
+       relies on THIS fold to keep its compares DE-clean — the home reads from
+       e/d in place — so let it fire there. */
+    if (L.cur_home_is_word && L.cur_de_home < 0) return 0;
+    int idxhalf_ok = (c_cpu == CPU_Z80 || IS_Z80N());   /* z180 traps index halves */
+    OpKind k = op->kind;
+    int s0 = op->src[0], s1 = op->src[1];
+    if (s0 < 0 || s1 < 0 || s0 == s1) return 0;
+    if (s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
+    switch (k) {
+    case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+    case IR_CMP_EQ: case IR_CMP_NE: break;
+    default: return 0;
+    }
+    char s0lo[16], s0hi[16], s1lo[16], s1hi[16];
+    int c0 = cmp_byte_src(f, s0, idxhalf_ok, s0lo, s0hi, sizeof s0lo);
+    int c1 = cmp_byte_src(f, s1, idxhalf_ok, s1lo, s1hi, sizeof s1lo);
+    if (c0 == 0 || c1 == 0) return 0;          /* an operand not readable in place */
+    if (c0 == 1 && c1 == 1) return 0;          /* both gp pairs → sbc hl,de is shorter */
+
+    /* Lazy-spill bookkeeping (mirror the load path we replace). Key on how
+       cmp_byte_src ACTUALLY read the operand, not on whether it could be a slot:
+       a spilled vreg that was cache-served from HL/DE/BC (class 1) is a cacheread,
+       NOT a reload — recording it as a reload would keep its (now dead) feeding
+       store alive. Only class 2 via a real (ix+d) slot is a genuine reload (idx2
+       halves are registers). */
+    if (c0 == 2 && op_is_ixd_slot(f, s0)) ss_note_reload(f, s0); else ss_note_cache_read(f, s0);
+    if (c1 == 2 && op_is_ixd_slot(f, s1)) ss_note_reload(f, s1); else ss_note_cache_read(f, s1);
+
+    int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+
+    if (k == IR_CMP_EQ || k == IR_CMP_NE) {
+        int lbl = L.cmp_label_counter++;
+        emit(out, "ld\ta,%s", s0lo);
+        emit(out, "sub\t%s", s1lo);
+        emit(out, "jr\tnz,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);   /* low bytes differ */
+        emit(out, "ld\ta,%s", s0hi);
+        emit(out, "sub\t%s", s1hi);
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+        /* Z set iff both bytes equal. */
+        int jump_when_eq = (k == IR_CMP_EQ) ? br_true : !br_true;
+        emit(out, "jp\t%s,L_f%d_bb_%d", jump_when_eq ? "z" : "nz",
+             L.func_emit_idx, L.la.cur_branch_test_label);
+        L.rs.a = -1;
+        L.la.cur_skip_next_op = 1;
+        return 1;
+    }
+
+    /* Ordered: reduce all four to one byte-wise subtract M - N; CF = (M < N).
+       LT/GE compute src0-src1; GT/LE compute src1-src0 (the `> / <=` forms are
+       the strict-less / not-strict-less of the reversed operands). */
+    int is_signed  = (k==IR_CMP_LT || k==IR_CMP_LE || k==IR_CMP_GT || k==IR_CMP_GE);
+    int swap       = (k==IR_CMP_GT || k==IR_CMP_LE || k==IR_CMP_UGT || k==IR_CMP_ULE);
+    int true_on_cf = (k==IR_CMP_LT || k==IR_CMP_GT || k==IR_CMP_ULT || k==IR_CMP_UGT);
+    const char *Mlo, *Mhi, *Nlo, *Nhi;
+    if (!swap) { Mlo=s0lo; Mhi=s0hi; Nlo=s1lo; Nhi=s1hi; }   /* src0 - src1 */
+    else       { Mlo=s1lo; Mhi=s1hi; Nlo=s0lo; Nhi=s0hi; }   /* src1 - src0 */
+    emit(out, "ld\ta,%s", Mlo);
+    emit(out, "sub\t%s", Nlo);
+    emit(out, "ld\ta,%s", Mhi);
+    emit(out, "sbc\ta,%s", Nhi);
+    if (is_signed) {                            /* S^V → CF = signed (M < N) */
+        int lbl = L.cmp_label_counter++;
+        emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+        emit(out, "xor\t0x80");
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+        emit(out, "rla");
+    }
+    int want_cf = (true_on_cf == br_true);
+    emit(out, "jp\t%s,L_f%d_bb_%d", want_cf ? "c" : "nc",
+         L.func_emit_idx, L.la.cur_branch_test_label);
+    L.rs.a = -1;
+    L.la.cur_skip_next_op = 1;
+    return 1;
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
+    if (try_cmp_ixd_fold(out, f, op)) return 0;
     int is_signed = (op->kind == IR_CMP_LT || op->kind == IR_CMP_GE);
     int cf_true_long = (op->kind == IR_CMP_ULT || op->kind == IR_CMP_LT);
     /* gbz80 lacks jp po/pe so the inline S^V correction can't run — sign-flip
@@ -382,6 +476,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
 
 static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
 {
+    if (try_cmp_ixd_fold(out, f, op)) return 0;
     int is_signed = (op->kind == IR_CMP_GT || op->kind == IR_CMP_LE);
     /* After swap-load, CF=true means src1 < src0 = src0 > src1 → GT/UGT. */
     int cf_true_gt = (op->kind == IR_CMP_UGT || op->kind == IR_CMP_GT);
@@ -511,6 +606,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
 
 static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
 {
+    if (try_cmp_ixd_fold(out, f, op)) return 0;
     /* Long compare: byte-wise XOR-then-OR chain, Z iff all 4 bytes match. */
     int src0w = (op->src[0] >= 0) ? f->vregs[op->src[0]].width : 0;
     if (src0w == 4) {

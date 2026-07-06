@@ -1322,6 +1322,53 @@ static int word_dehome_signed_test_shape_ok(const Func *f, const Op *o)
     return 1;
 }
 
+/* A width-2 vreg in a frame slot reachable via (ix+d) in fp mode — a byte at
+   (ix+d)/(ix+d+1) can be folded straight into an ALU/compare op instead of
+   reloading the whole word into a pair. Ordinary spilled locals + PARAM_IN_PLACE. */
+static int op_is_ixd_slot(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (!fp_active(f)) return 0;
+    if (f->vregs[v].width != 2) return 0;
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
+    if (slot_off(f, v) < 0) return 0;
+    int ix = slot_ix_off(f, v);
+    return fp_offset_fits(ix) && fp_offset_fits(ix + 1);
+}
+
+/* Fill lo[]/hi[] with the 8-bit ALU operand for each byte of vreg v, read IN
+   PLACE — a register-pair half (c/b, l/h, e/d), an (ix+d) slot, or an idx2 half
+   (iyl/iyh). Returns 2 if v is memory/index (folding it saves a pair load/push),
+   1 if it's a gp-register pair (cheap either way), 0 if unreadable in place.
+   Shared by the compare fold (ir_lower_cmp) and the ALU fold (ir_lower_ops). */
+static int cmp_byte_src(const Func *f, int v, int idxhalf_ok,
+                        char *lo, char *hi, size_t n)
+{
+    if (bc_has(v)) { snprintf(lo,n,"c"); snprintf(hi,n,"b"); return 1; }
+    if (hl_has(v)) { snprintf(lo,n,"l"); snprintf(hi,n,"h"); return 1; }
+    if (de_has(v)) { snprintf(lo,n,"e"); snprintf(hi,n,"d"); return 1; }
+    /* Resident word DE-home: the DE regcache belief may be dropped at a region
+       header (residency is asserted via byte_home_holds, not cache_de), so
+       consult residency directly — the home rides e/d by the region proof. */
+    if (L.cur_home_is_word && v == L.cur_func_whome && v >= 0
+        && byte_home_holds(v) && f->vregs[v].width == 2) {
+        snprintf(lo, n, "e"); snprintf(hi, n, "d"); return 1;
+    }
+    if (op_is_ixd_slot(f, v)) {
+        int ix = slot_ix_off(f, v);
+        snprintf(lo, n, "(%s%+d)", frame_reg(), ix);
+        snprintf(hi, n, "(%s%+d)", frame_reg(), ix + 1);
+        return 2;
+    }
+    if (idxhalf_ok && vreg_in_idx2(f, v) && f->vregs[v].width == 2) {
+        const char *r = (f->idx2_reg == IR_PR_IX) ? "ix" : "iy";
+        snprintf(lo, n, "%sl", r); snprintf(hi, n, "%sh", r);
+        return 2;
+    }
+    return 0;
+}
+
 static int cmp_bytewise_ok(const Func *f, const Op *o)
 {
     if (L.la.cur_branch_test_kind == 0) return 0;
@@ -1372,6 +1419,75 @@ static int is_word_accumulate(const Func *f, const Op *o)
     if (o->src[0] != o->dst && o->src[1] != o->dst) return 0;
     if (o->dst >= f->n_vregs || f->vregs[o->dst].width != 2) return 0;
     return 1;
+}
+
+/* General DE-home (cur_de_home>=0): allocation-based class of a compare operand
+   for the (ix+d) fold — 1 = read cheaply from a register half (home e/d, or a
+   BC/DE/HL tenant), 2 = read in place from an (ix+d) slot or an idx2 half, 0 =
+   not foldable. Keyed on the FIXED physical assignment (the static region proof
+   runs before the regcache is populated, so runtime caches are unknown here). */
+static int cmp_fold_static_class(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
+    if (v == L.cur_func_whome) return 1;              /* home rides DE (e/d) */
+    if (!f->vreg_to_phys) return 0;
+    int phys = f->vreg_to_phys[v];
+    if (phys == IR_PR_BC || phys == IR_PR_DE || phys == IR_PR_HL) return 1;
+    if (op_is_ixd_slot(f, v)) return 2;
+    if ((c_cpu == CPU_Z80 || IS_Z80N()) && vreg_in_idx2(f, v)) return 2;
+    return 0;
+}
+
+/* An int compare inside the general DE-home region that try_cmp_ixd_fold will
+   lower DE-clean (reads both operands in place through A, never staging one into
+   DE). Requires >=1 operand mem/idx (else the fold defers to `sbc hl,de`, which
+   here PRESERVES DE only when the home is the DE operand — handled separately).
+   Mirrors try_cmp_ixd_fold's structural gates so the region proof agrees with
+   the emitter. Branch-fusion is checked by the callers. */
+static int cmp_ixd_fold_de_clean_ok(const Func *f, const Op *o)
+{
+    if (L.cur_de_home < 0 || getenv("IR_NO_IXD_FOLD")) return 0;
+    if (!fp_active(f)) return 0;
+    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    switch (o->kind) {
+    case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+    case IR_CMP_EQ: case IR_CMP_NE: break;
+    default: return 0;
+    }
+    int s0 = o->src[0], s1 = o->src[1];
+    if (s0 < 0 || s1 < 0 || s0 == s1) return 0;
+    int c0 = cmp_fold_static_class(f, s0);
+    int c1 = cmp_fold_static_class(f, s1);
+    if (c0 == 0 || c1 == 0) return 0;
+    if (c0 == 1 && c1 == 1) return 0;    /* both gp pairs → sbc hl,de path */
+    return 1;
+}
+
+/* General DE-home indexed word deref address: `dst = base + (idx << k)` (k in
+   1..2) with idx riding BC and base rematerializable (LD_IMM/LD_SYM). Lowered
+   `ld hl,base; add hl,bc` (2^k times) — HL + BC only, so the home in DE survives.
+   Shared by try_de_home_indexed_add (emitter) and op_de_clean (region proof). */
+static int de_home_indexed_add_ok(const Func *f, const Op *o)
+{
+    if (L.cur_de_home < 0 || !L.cur_home_is_word) return 0;
+    if (o->kind != IR_ADD) return 0;
+    if (o->dst < 0 || o->dst >= f->n_vregs || f->vregs[o->dst].width != 2) return 0;
+    if (o->src[0] < 0 || o->src[1] < 0) return 0;
+    if (!f->vreg_to_phys) return 0;
+    for (int which = 0; which < 2; which++) {
+        int sidx = o->src[which], sbase = o->src[which ^ 1];
+        const Op *d = find_unique_def(f, sidx);
+        if (!d || d->kind != IR_SHL || d->src[1] >= 0) continue;
+        if (d->imm < 1 || d->imm > 2) continue;
+        int idx = d->src[0];
+        if (idx < 0 || idx >= f->n_vregs) continue;
+        if (f->vreg_to_phys[idx] != IR_PR_BC) continue;
+        if (!L.remat_def || sbase < 0 || sbase >= f->n_vregs
+            || !L.remat_def[sbase]) continue;
+        return 1;
+    }
+    return 0;
 }
 
 /* Is op `o`'s lowering proven DE-clean — does the slot-backed byte home (in
@@ -1427,6 +1543,39 @@ static int op_de_clean(const Func *f, const Op *o)
             && L.la.cur_branch_test_kind != 0
             && word_dehome_signed_test_shape_ok(f, o))
             return 1;
+        /* --- General (non-accumulate) DE-home region ops (cur_de_home>=0) --- */
+        if (L.cur_de_home >= 0) {
+            /* Branch-fused int compare lowered by try_cmp_ixd_fold: reads both
+               operands in place through A, never staging one into DE. */
+            if (L.la.cur_branch_test_kind != 0 && cmp_ixd_fold_de_clean_ok(f, o))
+                return 1;
+            /* RET of a width<=2 value: the return sits in HL, DE untouched, then
+               the function leaves — the home need not survive past it. */
+            if (o->kind == IR_RET) {
+                int rw = (o->src[0] >= 0 && o->src[0] < f->n_vregs)
+                       ? f->vregs[o->src[0]].width : 0;
+                return rw <= 2;
+            }
+            /* Word const shift (mid=(lo+hi)>>1): srl h;rr l — HL only, DE clean. */
+            if ((o->kind == IR_SHL || o->kind == IR_SHR) && dw == 2
+                && o->src[1] < 0 && o->dst != L.cur_func_whome)
+                return 1;
+            /* `dst = other + home` (dst != home): try_de_home_operand_add loads
+               other→HL and `add hl,de` — the home in DE survives. */
+            if (o->kind == IR_ADD && dw == 2 && o->dst != L.cur_func_whome
+                && o->src[0] >= 0 && o->src[1] >= 0
+                && (o->src[0] == L.cur_func_whome || o->src[1] == L.cur_func_whome))
+                return 1;
+            /* Indexed word deref address `base + (idx<<k)` via ld hl,base;add hl,bc. */
+            if (de_home_indexed_add_ok(f, o))
+                return 1;
+            /* Home-def `home = src0 +/- imm` (try_de_home_def): computes in HL
+               then ex de,hl → re-establishes DE = home. */
+            if ((o->kind == IR_ADD || o->kind == IR_SUB)
+                && o->dst == L.cur_func_whome && o->src[0] >= 0 && o->src[1] < 0
+                && o->imm >= 0 && o->imm <= 4)
+                return 1;
+        }
     }
     switch (o->kind) {
     case IR_NOP: case IR_BR:
@@ -1529,6 +1678,19 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
                    ? f->vregs[prv->src[0]].width : 4;
             if (sw <= 2) return 1;
         }
+        /* Branch consumed by a general DE-home folded int compare. */
+        if (L.cur_de_home >= 0 && prv->dst == o->src[0]
+            && cmp_ixd_fold_de_clean_ok(f, prv))
+            return 1;
+    }
+    /* General DE-home: a branch-fused int compare lowered by try_cmp_ixd_fold
+       (recognised structurally — the compare feeds the next branch). */
+    if (L.cur_de_home >= 0 && j + 1 < bb->n_ops
+        && cmp_ixd_fold_de_clean_ok(f, o)) {
+        const Op *nxt = &bb->ops[j + 1];
+        if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)
+            && nxt->src[0] == o->dst)
+            return 1;
     }
     return op_de_clean(f, o);
 }

@@ -546,6 +546,14 @@ typedef struct {
        IR_PR_DE). Set by ir_alloc, read by ir_lower. */
     int        word_home_vreg;
 
+    /* DE-home co-design (opt-in IR_DE_HOME): set when word_home_vreg is a
+       GENERAL (non-reduction) loop-carried width-2 vreg (e.g. searchbench
+       `hi`) rather than a reduction accumulator. The lowerer keeps DE clean
+       across the region via the (ix+d) compare/ALU folds + a push/pop-de deref,
+       and commits a general home-def to DE. 0 = reduction accumulator (the
+       existing try_word_accumulate path). */
+    int        de_home_general;
+
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
     IrAbi      abi;
