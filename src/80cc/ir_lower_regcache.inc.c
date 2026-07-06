@@ -195,6 +195,18 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         return;
     }
     int width = f->vregs[vreg_id].width;
+    /* Index-half home widened to HL: read the half via A (ld l,iyl is illegal —
+       DD reinterprets both operands), zero-extend. Always valid; no slot. */
+    if (width == 1) {
+        PhysReg ih = idxhalf_phys(f, vreg_id);
+        if (ih != IR_PR_NONE) {
+            emit(out, "ld\ta,%s", idxhalf_reg(ih));
+            emit(out, "ld\tl,a");
+            emit(out, "ld\th,0");
+            hl_about_to_change(vreg_id);
+            return;
+        }
+    }
     /* A-cache hit for byte vregs: a dead-skipped byte producer left the
        value ONLY in A (no slot store), so the slot read below would return
        garbage. */
@@ -604,6 +616,13 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
 static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
 {
     if (a_has(vreg_id)) return;
+    /* Index-half home: always valid (slotless, never clobbered) — read direct. */
+    PhysReg ih = idxhalf_phys(f, vreg_id);
+    if (ih != IR_PR_NONE) {
+        emit(out, "ld\ta,%s", idxhalf_reg(ih));
+        cache_a(vreg_id);
+        return;
+    }
     /* Byte home (PR_C/E/D/B): when the register currently holds this vreg,
        read it directly (C-home: always; E/D-home: when not clobbered). */
     PhysReg bh = byte_home_phys(f, vreg_id);
@@ -641,6 +660,14 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
 /* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. */
 static void store_a_byte(FILE *out, const Func *f, int vreg_id)
 {
+    /* Index-half home: write the half, keep A cached. Slotless + clobber-free
+       so no slot store, no dirty tracking — the value simply rides the half. */
+    PhysReg ih = idxhalf_phys(f, vreg_id);
+    if (ih != IR_PR_NONE) {
+        emit(out, "ld\t%s,a", idxhalf_reg(ih));
+        cache_a(vreg_id);
+        return;
+    }
     /* Byte home: keep the value in the home register, elide the slot store.
        - C/B (slotless): rides the register for the whole function.
        - E/D (slot-backed): mark DIRTY — spilled to the slot before a
@@ -1211,6 +1238,33 @@ static const char *byte_home_reg(PhysReg pr)
 }
 static int  byte_home_holds(int v) { return v >= 0 && L.cur_byte_home_vreg == v; }
 static void byte_home_note(int v)  { L.cur_byte_home_vreg = v; }
+
+/* Index-half byte home (PR_IXL/IXH/IYL/IYH): a SEPARATE, simpler mechanism from
+   the E/D/C/B home above. Slotless and clobber-free in the no-call region the
+   proposer requires, so the value is ALWAYS in its half from its def — no belief
+   variable, no lazy-spill, no cross-BB carry. Recognised purely by vreg_to_phys;
+   every byte read/write/ALU path consults this and routes through A (ld a,iyl /
+   ld iyl,a) or uses the half as an ALU source (add a,iyl / sub iyl / cp iyl).
+   z80/z80n/ez80 only (see cpu_has_index_halves). */
+static PhysReg idxhalf_phys(const Func *f, int v)
+{
+    if (v < 0 || !f || !f->vreg_to_phys) return IR_PR_NONE;
+    PhysReg pr = f->vreg_to_phys[v];
+    if (pr == IR_PR_IXL || pr == IR_PR_IXH
+        || pr == IR_PR_IYL || pr == IR_PR_IYH)
+        return pr;
+    return IR_PR_NONE;
+}
+static const char *idxhalf_reg(PhysReg pr)
+{
+    switch (pr) {
+    case IR_PR_IXL: return "ixl";
+    case IR_PR_IXH: return "ixh";
+    case IR_PR_IYL: return "iyl";
+    case IR_PR_IYH: return "iyh";
+    default:        return NULL;
+    }
+}
 /* Is v homed in a clobberable slot-backed byte register (PR_E/PR_D)? */
 static int byte_home_is_slotbacked(const Func *f, int v)
 {

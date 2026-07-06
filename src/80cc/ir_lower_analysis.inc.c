@@ -580,6 +580,12 @@ static int vreg_in_register_pool(const Func *f, int v)
 static int byte_dst_cache_ok(const Func *f, int v)
 {
     if (byte_home_is_slotbacked(f, v)) return 0;
+    /* Index-half home (IXL/IXH/IYL/IYH): reads go through the half register
+       (`ld a,iyl`), NOT the A-cache — so the value MUST be written to the half
+       at every def. Leaving it only in A (cur_dst_dead byte immediately
+       consumed by a WIDENING read, which reloads the half) reads a never-written
+       home. Force the store, same as a slot-backed home. */
+    if (idxhalf_phys(f, v) != IR_PR_NONE) return 0;
     return L.la.cur_dst_dead || vreg_in_register_pool(f, v);
 }
 

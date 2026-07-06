@@ -67,6 +67,12 @@ typedef enum {
     IR_PR_B,           /* width-1 byte home: high half of BC (headroom) */
     IR_PR_IX,
     IR_PR_IY,
+    /* width-1 byte homes in index-register halves (z80/z80n/ez80 only —
+       ld a,iyl / ld iyl,a / add a,iyl etc.). SLOTLESS and clobber-free in a
+       no-call region (the operand loader never stages in an index reg), so
+       unlike PR_E/PR_D they need no backing slot, lazy-spill, or cross-BB carry:
+       the value rides the half from its def for the whole region. */
+    IR_PR_IXL, IR_PR_IXH, IR_PR_IYL, IR_PR_IYH,
     IR_PR_DEHL,        /* 32-bit pair occupying DE and HL together */
     IR_PR_AF_ALT,
     IR_PR_HL_ALT,

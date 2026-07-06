@@ -1365,6 +1365,23 @@ static void byte_alu_operand(FILE *out, const Func *f,
                              const char *prefix, int m)
 {
     if (a_has(m))  { emit(out, "%sa", prefix); return; }
+    /* Index-half home as an ALU source (add a,iyl / sub iyl / cp iyl …): the
+       half is always valid and A is always the other operand, so no prefix
+       reinterpretation issue. Must precede the slot read — an index home has
+       no slot. */
+    PhysReg ih = idxhalf_phys(f, m);
+    if (ih != IR_PR_NONE) { emit(out, "%s%s", prefix, idxhalf_reg(ih)); return; }
+    /* Byte home (PR_C/E/D/B) currently live in its register: read it directly
+       (`xor e`, `add a,c` …). Must precede the slot read — a slot-backed E/D
+       home may be DIRTY (the live value is in the register, the slot stale), and
+       a slotless C/B home has no slot at all. (Latent before index halves: the
+       commutative-operand order always loaded the byte home to A via
+       load_byte_to_a; a home value only reaches here as the 2nd operand once
+       another home occupies A.) */
+    if (byte_home_holds(m)) {
+        PhysReg bh = byte_home_phys(f, m);
+        if (bh != IR_PR_NONE) { emit(out, "%s%s", prefix, byte_home_reg(bh)); return; }
+    }
     if (hl_has(m)) { ss_note_cache_read(f, m); emit(out, "%sl", prefix); return; }
     if (de_has(m)) { ss_note_cache_read(f, m); emit(out, "%se", prefix); return; }
     if (bc_has(m)) { ss_note_cache_read(f, m); emit(out, "%sc", prefix); return; }
