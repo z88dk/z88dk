@@ -230,6 +230,51 @@ static int pr_bc_propose(const Func *f,
     return n;
 }
 
+/* z80/z80n/z180: a stepping counter homed in idx2 (IX/IY) is only cheap if its
+   reads are index-half-friendly — its own step (`inc iy`) and, on z80/z80n only,
+   branch-fused int compares (`ld a,iyl; sub …` — the (ix+d) fold reads the halves
+   in place). Any OTHER read (address arithmetic `arr[i]`, general ALU `n - i`, a
+   move to a gp pair) needs a `push iy; pop hl` every iteration, which usually
+   costs more than the frame slot the idx2 home saved. Returns 1 if v has such a
+   "hostile" use → the caller skips the idx2 counter home, letting v fall to BC/a
+   slot.
+   z180 has NO usable index halves (`sub iyl` traps the undocumented opcode), so
+   there the compare exemption does NOT apply — a counter's exit test would itself
+   push/pop, so any counter with a compare use is hostile (effectively disabling
+   the idx2 counter home on z180, which is right). ez80/kc160/rabbit read index
+   registers cheaply (lea / native ops), so they keep the counter — gate is
+   z80/z80n/z180 only. */
+static int idx2_counter_hostile_use(const Func *f, int v)
+{
+    int halves_ok = (c_cpu == CPU_Z80 || IS_Z80N());   /* NOT z180 */
+    if (!(halves_ok || c_cpu == CPU_Z180)) return 0;
+    int hostile = 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            const Op *o = &f->bbs[i].ops[j];
+            int u[16];
+            int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+            int uses_v = 0;
+            for (int k = 0; k < nu; k++) if (u[k] == v) { uses_v = 1; break; }
+            if (!uses_v) continue;
+            /* The counter's own self-step (inc/dec iy, or add iy,rr) — fine. */
+            if (o->dst == v && (o->kind == IR_INC || o->kind == IR_DEC
+                                || o->kind == IR_ADD || o->kind == IR_SUB))
+                continue;
+            /* Branch-fused int compare reads iyl/iyh in place — z80/z80n only
+               (z180 traps the index-half opcodes, so its compare push/pops too). */
+            if (halves_ok
+                && (o->kind == IR_CMP_LT || o->kind == IR_CMP_LE
+                 || o->kind == IR_CMP_GT || o->kind == IR_CMP_GE
+                 || o->kind == IR_CMP_ULT || o->kind == IR_CMP_ULE
+                 || o->kind == IR_CMP_UGT || o->kind == IR_CMP_UGE
+                 || o->kind == IR_CMP_EQ || o->kind == IR_CMP_NE))
+                continue;
+            hostile++;   /* address/ALU/move (or any z180 non-step) use */
+        }
+    return hostile;
+}
+
 /* idx2 proposer: the two candidate classes for the spare index register
    (f->idx2_reg) — a hot stepping COUNTER (LD_IMM init + INC/DEC self-steps,
    never a deref/step base) and a hot read-only PARAM bound. Both need the
@@ -285,8 +330,11 @@ static int idx2_propose(const Func *f, const int *use_count,
             if (is_base[v]) continue;
             if (use_count[v] < 4) continue;
             unsigned fl = 0;
-            /* Stepping counter: only-init(<=1) + steps write it. */
-            if (!counter_off && cstep[v] >= 1 && cother[v] == 0 && cinit[v] <= 1)
+            /* Stepping counter: only-init(<=1) + steps write it. On z80/z80n/z180
+               skip the idx2 home when the counter feeds address/ALU work that
+               would push iy;pop hl every iteration (idx2_counter_hostile_use). */
+            if (!counter_off && cstep[v] >= 1 && cother[v] == 0 && cinit[v] <= 1
+                && idx2_counter_hostile_use(f, v) == 0)
                 fl = CF_IDX2_COUNTER;
             /* Read-only invariant param. */
             else if ((vr->flags & IR_VREG_PARAM) && write_count[v] == 0)

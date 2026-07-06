@@ -5,6 +5,7 @@
  * compiler internals (no ccdefs.h) so ir_selftest can link standalone.
  */
 
+#include "ccdefs.h"
 #include "ir_opt.h"
 #include "ir_analysis.h"
 
@@ -831,6 +832,38 @@ static int ivsr_uses_in_loop(Func *f, int v, int lo, int hi)
     return c;
 }
 
+/* Count uses of `v` in a single op. */
+static int ivsr_uses_in_op(const Op *o, int v)
+{
+    int uses[8];
+    int nu = ir_op_uses(o, uses, 8);
+    int c = 0;
+    for (int k = 0; k < nu; k++) if (uses[k] == v) c++;
+    return c;
+}
+
+/* True if `base`'s reaching def is an IR_LD_SYM (a compile-time-constant
+   address, e.g. a static array). Such a base makes recomputing the indexed
+   address `base + iv*scale` cheap (ld hl,SYM; add hl,de) — no persistent
+   pointer register needed. Scans out-of-loop defs (base is loop-invariant). */
+static int ivsr_base_is_const_sym(Func *f, int base, int lo, int hi)
+{
+    if (base < 0 || base >= f->n_vregs) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (b >= lo && b <= hi) continue;
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            int defs[8];
+            int nd = ir_op_defs(o, defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == base)
+                    return o->kind == IR_LD_SYM;   /* only LD_SYM counts */
+        }
+    }
+    return 0;
+}
+
 /* Recognise a basic IV `v`: exactly one in-loop self-step def
    (v = v ± c via INC/DEC/ADD-imm/SUB-imm) and exactly one out-of-loop
    def that is an LD_IMM init in the pre-header `ph`. Returns 1 and fills
@@ -1125,6 +1158,34 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                 if (ni != 1 || ib != b || ii != j) continue;
                 if (ivsr_used_outside(f, d, lo, hi)) continue;
                 if (!ivsr_d_rewritable(f, d, lo, hi, b, j)) continue;
+
+                /* Redundant-pointer gate: when the base is a constant address
+                   (LD_SYM) AND the index `iv` is independently live — it has
+                   in-loop uses beyond this derived address, so it survives LFTR
+                   and must stay resident anyway — a stepped pointer is a SECOND
+                   loop-carried value competing for the one BC home. It loses,
+                   spills to a slot, and the per-iteration slot RMW costs more
+                   than recomputing `base + iv*scale` from the resident index
+                   (sdcc's strategy; queenbench's `safe`). Suppress here.
+                   Detect "survives LFTR": after this reduction removes iv's use
+                   in the address derivation (the SHL, or the ADD when scale==1),
+                   iv still has >2 in-loop uses (LFTR needs exactly 2 = step +
+                   exit test). A pure array-walk (ptrbench) has exactly 2 left →
+                   not suppressed, IVSR still fires. IR_NO_IVSR_SUPPRESS opts out.
+                   Gated to z80/z80n/z180 — the CPUs where a slot-homed pointer's
+                   `ld hl,(ix+d)` is 2 ops, so maintaining a spilled pointer costs
+                   more than recomputing. ez80/kc160/rabbit have a 1-op word slot
+                   load (+ native indexing), so the walking pointer stays cheaper
+                   there (measured: ez80 +8% if suppressed) — leave IVSR on. */
+                if (!getenv("IR_NO_IVSR_SUPPRESS")
+                    && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)
+                    && ivsr_base_is_const_sym(f, base, lo, hi)) {
+                    int addr_uses = ivsr_uses_in_op(&f->bbs[b].ops[j], iv);
+                    if (sb >= 0)
+                        addr_uses += ivsr_uses_in_op(&f->bbs[sb].ops[si], iv);
+                    int remaining = ivsr_uses_in_loop(f, iv, lo, hi) - addr_uses;
+                    if (remaining > 2) continue;   /* iv survives → pointer redundant */
+                }
 
                 cand[n_cand].d = d;     cand[n_cand].base = base;
                 cand[n_cand].iv = iv;
