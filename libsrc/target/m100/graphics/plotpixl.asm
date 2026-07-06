@@ -1,14 +1,12 @@
 ;
-;       Jupiter ACE pseudo graphics routines
-;	Version for the 2x3 graphics symbols (UDG redefined)
-;
-;       Stefano Bodrato 2014
+;       Tandy M100 ROM based graphics routines
+;       Written by Stefano Bodrato 2020
 ;
 ;
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm $
+;   $Id: plotpixl.asm $
 ;
 
 
@@ -21,10 +19,12 @@
     EXTERN  base_graphics
     INCLUDE "target/m100/def/romcalls.def"
 plotpixel:
+    push    bc
     ld      d, h
     ld      e, l
     ld      (__gfx_coords), hl
     ROMCALL
     defw    LCDSET
+    pop     bc
     ret
 
