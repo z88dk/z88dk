@@ -6,16 +6,15 @@
 
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
-
     DEFVARS 0
     {
-        x0              ds.b 1
-        y0              ds.b 1
-        radius          ds.b 1
-        scale           ds.b 1
-        cx              ds.b 1
-        da              ds.b 1
-        func            ds.w 1
+        i_x0              ds.b 1
+        i_y0              ds.b 1
+        i_radius          ds.b 1
+        i_scale           ds.b 1
+        i_cx              ds.b 1
+        i_da              ds.b 1
+        i_func            ds.w 1
     }
 
 
@@ -27,113 +26,126 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ;     ix=plot routine
 
 draw_circle:
-    ld      ix, -8                      ;create buffer on stack
-    add     ix, sp
-    ld      sp, ix
-    ld      (ix+x0), b
-    ld      (ix+y0), c
-    ld      (ix+radius), d
-    ld      (ix+scale), e               ;step factor - usually 1
-    ld      (ix+func), l
-    ld      (ix+func+1), h
-    call    l9900
-    ld      hl, 8
-    add     hl, sp
-    ld      sp, hl
-    ret
+    ld      ix, x0                      ;create buffer on stack
+    ;add     ix, sp
+    ;ld      sp, ix
+
+;IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    ld      (ix+i_x0), b
+    ld      (ix+i_y0), c
+    ld      (ix+i_radius), d
+    ld      (ix+i_scale), e               ;step factor - usually 1
+;ELSE
+    ;ld      a,b
+    ;ld      (x0),a
+    ;ld      a,c
+    ;ld      (y0),a
+    ;ld      a,d
+    ;ld      (radius),a
+    ;ld      a,e
+    ;ld      (scale),a
+;ENDIF
+
+    ld      (func), hl
+
+;   call    l9900
+;   ld      hl, 8
+;   add     hl, sp
+;   ld      sp, hl
+;   ret
 
 ;Line 9900
 l9900:
-    ld      (ix+cx), 0
+    ld      (ix+i_cx), 0
     srl     d
-    ld      (ix+da), d
+    ld      (ix+i_da), d
 ;Line 9905
 l9905:
-    ld      a, (ix+cx)
-    cp      (ix+radius)
+    ld      a, (ix+i_cx)
+    cp      (ix+i_radius)
     ret     nc
 ;Line 9910
-    ld      a, (ix+da)
+    ld      a, (ix+i_da)
     and     a
     jp      p, l9915
-    add     a, (ix+radius)
-    ld      (ix+da), a
-    ld      a, (ix+radius)
-    sub     (ix+scale)
-    ld      (ix+radius), a
+    add     a, (ix+i_radius)
+    ld      (ix+i_da), a
+    ld      a, (ix+i_radius)
+    sub     (ix+i_scale)
+    ld      (ix+i_radius), a
 ;Line 9915
 l9915:
-    ld      a, (ix+da)
+    ld      a, (ix+i_da)
     dec     a
-    sub     (ix+cx)
-    ld      (ix+da), a
+    sub     (ix+i_cx)
+    ld      (ix+i_da), a
 
 l9920:
-    ld      a, (ix+y0)
-    add     a, (ix+radius)
+    ld      a, (ix+i_y0)
+    add     a, (ix+i_radius)
     ld      l, a
     ex      af, af'
-    ld      a, (ix+x0)
-    add     a, (ix+cx)
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_cx)
     ld      h, a
     call    doplot
     ex      af, af'
     ld      l, a
-    ld      a, (ix+x0)
-    sub     (ix+cx)
+    ld      a, (ix+i_x0)
+    sub     (ix+i_cx)
     ld      h, a
     call    doplot
 
-    ld      a, (ix+y0)
-    sub     (ix+radius)
+    ld      a, (ix+i_y0)
+    sub     (ix+i_radius)
     ld      l, a
     ex      af, af'
-    ld      a, (ix+x0)
-    add     a, (ix+cx)
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_cx)
     ld      h, a
     call    doplot
     ex      af, af'
     ld      l, a
-    ld      a, (ix+x0)
-    sub     (ix+cx)
+    ld      a, (ix+i_x0)
+    sub     (ix+i_cx)
     ld      h, a
     call    doplot
 
 ;Line 9925
 
-    ld      a, (ix+y0)
-    add     a, (ix+cx)
+    ld      a, (ix+i_y0)
+    add     a, (ix+i_cx)
     ld      l, a
     ex      af, af'
-    ld      a, (ix+x0)
-    add     a, (ix+radius)
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_radius)
     ld      h, a
     call    doplot
     ex      af, af'
     ld      l, a
-    ld      a, (ix+x0)
-    sub     (ix+radius)
+    ld      a, (ix+i_x0)
+    sub     (ix+i_radius)
     ld      h, a
     call    doplot
 
-    ld      a, (ix+y0)
-    sub     (ix+cx)
+    ld      a, (ix+i_y0)
+    sub     (ix+i_cx)
     ld      l, a
     ex      af, af'
-    ld      a, (ix+x0)
-    add     a, (ix+radius)
+    ld      a, (ix+i_x0)
+    add     a, (ix+i_radius)
     ld      h, a
     call    doplot
     ex      af, af'
     ld      l, a
-    ld      a, (ix+x0)
-    sub     (ix+radius)
+    ld      a, (ix+i_x0)
+    sub     (ix+i_radius)
     ld      h, a
     call    doplot
 ;Line 9930
-    ld      a, (ix+cx)
-    add     a, (ix+scale)
-    ld      (ix+cx), a
+    ld      a, (ix+i_cx)
+    add     a, (ix+i_scale)
+    ld      (ix+i_cx), a
     jp      l9905
 
 ;Entry to my plot is the same as for the z88 plot - very convenient!
@@ -141,16 +153,9 @@ l9920:
 doplot:
     ret     c
     push    ix
-    ld      e, (ix+func)
-    ld      d, (ix+func+1)
-    push    de
-    pop     ix
-    ; h, l = coordinates
-    call    jpix
-    pop     ix
-    ret
-jpix:
-    jp      (ix)
+	ld      ix, (func)
+	ex      (sp),ix
+	ret
 
 ELSE
 
@@ -178,7 +183,7 @@ draw_circle:
     ld      a,e
     ld      (scale),a
 	
-    ld      (func), hl
+;    ld      (func), hl
 
 
     call    l9900
@@ -399,10 +404,13 @@ doplot:
 
     ret     c
 
-    ld      hl,(func)
+    EXTERN  __plot_ADDR
+    ld      hl,(__plot_ADDR)
     push    hl
     ret
 
+
+ENDIF
 
 SECTION bss_graphics
 
@@ -415,19 +423,21 @@ y0:
 radius:
     defb    0
 
+scale:
+    defb    0
+
 cx:
     defb    0
 
 da:
     defb    0
 
-scale:
-    defb    0
 
-asave:
-    defb    0
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
 func:
     defw    0
-
+ELSE
+asave:
+    defb    0
 ENDIF
