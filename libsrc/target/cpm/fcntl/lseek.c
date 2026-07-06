@@ -20,9 +20,6 @@ long lseek(int fd,long posn, int whence)
     char    buffer[SECSIZE];
 
     switch(whence) {
-    case 0:
-        pos = fc->rwptr + posn;
-        break;
     case 1:
         pos = fc->rwptr + posn;
         break;
