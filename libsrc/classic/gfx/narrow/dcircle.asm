@@ -153,9 +153,9 @@ l9920:
 doplot:
     ret     c
     push    ix
-	ld      ix, (func)
-	ex      (sp),ix
-	ret
+    ld      ix, (func)
+    ex      (sp),ix
+    ret
 
 ELSE
 
@@ -182,7 +182,7 @@ draw_circle:
 
     ld      a,e
     ld      (scale),a
-	
+    
 ;    ld      (func), hl
 
 
@@ -405,8 +405,9 @@ doplot:
     ret     c
 
     EXTERN  __plot_ADDR
-    ld      hl,(__plot_ADDR)
     push    hl
+    ld      hl,(__plot_ADDR)
+    ex      (sp),hl
     ret
 
 
