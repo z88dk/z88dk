@@ -896,10 +896,46 @@ static int ivsr_basic_iv(Func *f, int v, int lo, int hi, int ph,
     return 1;
 }
 
+/* Affine-multiple recogniser: is `x` a pure constant multiple `C*iv` of a single
+   basic IV, built from single-use in-loop shifts/adds/subs (the shift-and-add
+   form the const-mult strength reducer emits for a non-power-of-2 scale, e.g. a
+   struct-array stride `i*6 = (i<<2)+(i<<1)`)? Recurses the def tree; every
+   interior node must be a single-use in-loop temp so folding the whole term away
+   is safe (the now-dead sub-ops are removed by DCE). All leaves must be the SAME
+   basic IV. Returns 1 with *iv_out (the basic IV) and *C (the coefficient). */
+static int ivsr_affine_coeff(Func *f, int x, int lo, int hi, int ph,
+                             int *iv_out, int64_t *C, int depth)
+{
+    int64_t k, d;
+    if (ivsr_basic_iv(f, x, lo, hi, ph, &k, &d)) { *iv_out = x; *C = 1; return 1; }
+    if (depth >= 6) return 0;
+    int n_in, ib, ii, n_out, ob, oi;
+    ivsr_def_sites(f, x, lo, hi, &n_in, &ib, &ii, &n_out, &ob, &oi);
+    if (n_in != 1 || n_out != 0) return 0;
+    if (ivsr_uses_in_loop(f, x, lo, hi) != 1) return 0;   /* single-use ⇒ DCE-safe */
+    if (ivsr_used_outside(f, x, lo, hi)) return 0;
+    Op *o = &f->bbs[ib].ops[ii];
+    if (o->kind == IR_SHL && o->src[1] == -1 && o->imm >= 0 && o->imm < 16) {
+        int iva; int64_t ca;
+        if (!ivsr_affine_coeff(f, o->src[0], lo, hi, ph, &iva, &ca, depth + 1)) return 0;
+        *iv_out = iva; *C = ca << o->imm; return 1;
+    }
+    if ((o->kind == IR_ADD || o->kind == IR_SUB) && o->src[1] >= 0) {
+        int iva, ivb; int64_t ca, cb;
+        if (!ivsr_affine_coeff(f, o->src[0], lo, hi, ph, &iva, &ca, depth + 1)) return 0;
+        if (!ivsr_affine_coeff(f, o->src[1], lo, hi, ph, &ivb, &cb, depth + 1)) return 0;
+        if (iva != ivb) return 0;                          /* one basic IV only */
+        *iv_out = iva; *C = (o->kind == IR_ADD) ? ca + cb : ca - cb; return 1;
+    }
+    return 0;
+}
+
 /* Is `x` a derived-IV scaling term off a basic IV in loop [lo,hi]?
    Either x is itself a basic IV (scale 1, *shl_bb = -1) or x is a
    single-use `SHL x <- iv, s` whose iv is a basic IV (scale 2^s, *shl_bb
-   points at the SHL). Fills *iv / *scale / *K / *D. */
+   points at the SHL). Fills *iv / *scale / *K / *D. As a fallback, x may be a
+   NON-power-of-2 affine multiple `C*iv` (shift-and-add form, struct-array
+   stride) — then *shl_bb = -1 and the dead term sub-ops are cleaned by DCE. */
 static int ivsr_iv_term(Func *f, int x, int lo, int hi, int ph,
                         int *iv_out, int64_t *scale, int64_t *K, int64_t *D,
                         int *shl_bb, int *shl_idx)
@@ -914,18 +950,32 @@ static int ivsr_iv_term(Func *f, int x, int lo, int hi, int ph,
     ivsr_def_sites(f, x, lo, hi, &n_in, &in_bb, &in_idx,
                    &n_out, &out_bb, &out_idx);
     if (n_in != 1 || n_out != 0) return 0;
-    Op *sh = &f->bbs[in_bb].ops[in_idx];
-    if (sh->kind != IR_SHL || sh->src[1] != -1) return 0;
-    if (sh->imm < 0 || sh->imm >= 16) return 0;
-    if (!ivsr_basic_iv(f, sh->src[0], lo, hi, ph, &k, &d)) return 0;
-    /* The SHL must feed only this loop (its sole consumer is the ADD we
-       are about to fold away), else NOPing it drops a live value. */
+    /* The term must feed only this loop (its sole consumer is the ADD we are
+       about to fold away), else folding it drops a live value. */
     if (ivsr_uses_in_loop(f, x, lo, hi) != 1) return 0;
     if (ivsr_used_outside(f, x, lo, hi)) return 0;
-    *iv_out = sh->src[0]; *scale = (int64_t)1 << sh->imm;
-    *K = k; *D = d;
-    *shl_bb = in_bb; *shl_idx = in_idx;
-    return 1;
+    Op *sh = &f->bbs[in_bb].ops[in_idx];
+    if (sh->kind == IR_SHL && sh->src[1] == -1
+        && sh->imm >= 0 && sh->imm < 16
+        && ivsr_basic_iv(f, sh->src[0], lo, hi, ph, &k, &d)) {
+        *iv_out = sh->src[0]; *scale = (int64_t)1 << sh->imm;
+        *K = k; *D = d;
+        *shl_bb = in_bb; *shl_idx = in_idx;
+        return 1;
+    }
+    /* Non-power-of-2 affine multiple `C*iv` (struct-array stride). Fold the
+       whole shift-and-add term away (DCE removes the dead sub-ops) and step the
+       pointer by C. IR_NO_IVSR_AFFINE opts out. */
+    if (!getenv("IR_NO_IVSR_AFFINE")) {
+        int iva; int64_t C;
+        if (ivsr_affine_coeff(f, x, lo, hi, ph, &iva, &C, 0) && C >= 2
+            && ivsr_basic_iv(f, iva, lo, hi, ph, &k, &d)) {
+            *iv_out = iva; *scale = C; *K = k; *D = d;
+            *shl_bb = -1; *shl_idx = -1;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /* Every in-loop use of `d` must be redirectable by ivsr_rewrite_use
@@ -1031,6 +1081,11 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     for (int t = 0; t < n_cand; t++)
         if (cand[t].iv == iv && cand[t].D > 0 && cand[t].K >= 0) { c = t; break; }
     if (c < 0) return 0;
+    /* LFTR scales the bound by `<< sh` (below), which is only valid for a
+       power-of-2 scale. A non-power-of-2 stride (struct-array walking pointer)
+       keeps its basic IV for the exit test — the strength reduction still
+       applies, just without counter elimination. */
+    if ((cand[c].scale & (cand[c].scale - 1)) != 0) return 0;
     /* The exit bound. Two cases:
        - a proven-nonnegative COMPILE-TIME CONSTANT: p_end = base + N*scale, a
          single pre-header ADD (the original, cheapest path);
@@ -1179,7 +1234,15 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                    there (measured: ez80 +8% if suppressed) — leave IVSR on. */
                 if (!getenv("IR_NO_IVSR_SUPPRESS")
                     && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)
+                    && (scale & (scale - 1)) == 0    /* power-of-2 scale only */
                     && ivsr_base_is_const_sym(f, base, lo, hi)) {
+                    /* Power-of-2 scale: recomputing `base + iv*2^k` from the
+                       resident index is cheap (`add hl,hl`), so a walking pointer
+                       is a redundant 2nd loop-carried value — suppress it (queen).
+                       A NON-power-of-2 scale (struct-array stride, e.g. i*6) has
+                       an expensive multi-op recompute THROUGH DE, which also
+                       blocks a DE-resident accumulator; there the walking pointer
+                       is the win (structbench -32%), so this gate is skipped. */
                     int addr_uses = ivsr_uses_in_op(&f->bbs[b].ops[j], iv);
                     if (sb >= 0)
                         addr_uses += ivsr_uses_in_op(&f->bbs[sb].ops[si], iv);
@@ -1263,17 +1326,17 @@ int ir_opt_ivsr(Func *f)
        per-iteration slot RMW costs more than the SHL;ADD removed). The
        allocator's PR_BC envelope is function-wide and barred by any
        width-4 vreg (long ops stage through BC) or BC-clobbering op
-       (IR_ST_MEM vreg+offset, non-char IR_SWITCH, IR_ASM). Mirror that
-       gate here so IVSR fires only where BC residency is reachable — md5
-       (full of UINT4) would otherwise regress 13%. */
+       (non-char IR_SWITCH, IR_ASM). Mirror that gate here so IVSR fires only
+       where BC residency is reachable — md5 (full of UINT4) would otherwise
+       regress 13%. (Offset stores USED to bar it too — `ld bc,N; add hl,bc`
+       for the offset add — but gen_st_mem now emits that BC-clean, so an
+       array-of-struct write no longer blocks the walking pointer.) */
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vregs[v].width == 4) return 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *o = &bb->ops[j];
-            if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
-                && o->mem.offset != 0) return 0;
             if (o->kind == IR_SWITCH && !(o->sw && o->sw->is_char)) return 0;
             if (o->kind == IR_ASM) return 0;
         }
@@ -2247,6 +2310,113 @@ int ir_opt_const_fold(Func *f)
 extern int c_word_resident;
 
 #define RR_MAX_CHAIN 16
+
+/* Reduction-chain coalescing. A left-leaning fold into a loop-carried word —
+   `s = ((s + a) + b) + c` — lowers to a chain of ADDs through single-use temps:
+       t0 = s + a;  t1 = t0 + b;  s = t1 + c
+   so `s` is read only at the innermost add and written only at the outermost,
+   and word_acc (which wants `s = s OP w`) never sees it → s spills to a slot/TOS.
+   This renames the single-use spine temps (t0,t1) back to `s`, giving the
+   in-place form
+       s = s + a;  s = s + b;  s = s + c
+   which word_acc then homes in DE (`add hl,de; ex de,hl` per step — sdcc's
+   shape). The IR is already load/add-interleaved, so no op moves; the rename is
+   sound because each spine temp is single-use (only the next add's src0) and `s`
+   is not otherwise referenced across the chain span. IR_NO_REDUCE_COALESCE opts
+   out. */
+int ir_opt_reduce_coalesce(Func *f)
+{
+    if (!f) return 0;
+    if (!c_word_resident || getenv("IR_NO_WORD_RESIDENT")) return 0;
+    if (getenv("IR_NO_REDUCE_COALESCE")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+
+    /* Function-wide use counts + single-def sites (mirror reassoc). */
+    int *use_cnt = calloc((size_t)nv, sizeof(int));
+    int *def_bb  = calloc((size_t)nv, sizeof(int));
+    int *def_idx = calloc((size_t)nv, sizeof(int));
+    int *def_cnt = calloc((size_t)nv, sizeof(int));
+    if (!use_cnt || !def_bb || !def_idx || !def_cnt) {
+        free(use_cnt); free(def_bb); free(def_idx); free(def_cnt); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            int u[16];
+            int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+            for (int k = 0; k < nu; k++)
+                if (u[k] >= 0 && u[k] < nv) use_cnt[u[k]]++;
+            if (o->dst >= 0 && o->dst < nv)
+                if (def_cnt[o->dst]++ == 0) { def_bb[o->dst] = b; def_idx[o->dst] = j; }
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int h = 0; h < bb->n_ops; h++) {
+            Op *top = &bb->ops[h];
+            if (top->kind != IR_ADD) continue;
+            int acc = top->dst;
+            if (acc < 0 || acc >= nv || f->vregs[acc].width != 2) continue;
+            if (f->vregs[acc].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                continue;
+            if (top->src[0] == acc || top->src[1] < 0) continue; /* not left-leaning */
+
+            /* Walk the src[0] spine of single-use ADD temps; it must bottom out
+               with an add whose src[0] IS acc (the innermost `s + a`). */
+            int spine[RR_MAX_CHAIN];   /* op indices, spine[0]=h (top) */
+            int sn = 0, ok = 1, bottom = -1;
+            spine[sn++] = h;
+            int cur = top->src[0];
+            while (1) {
+                if (cur < 0 || cur >= nv) { ok = 0; break; }
+                if (use_cnt[cur] != 1) { ok = 0; break; }          /* temp: single-use */
+                if (def_cnt[cur] != 1 || def_bb[cur] != b) { ok = 0; break; }
+                if (f->vregs[cur].width != 2) { ok = 0; break; }
+                int di = def_idx[cur];
+                Op *da = &bb->ops[di];
+                if (da->kind != IR_ADD || da->src[0] < 0 || da->src[1] < 0) { ok = 0; break; }
+                if (sn >= RR_MAX_CHAIN) { ok = 0; break; }
+                spine[sn++] = di;
+                if (da->src[0] == acc) { bottom = di; break; }     /* fold closes on acc */
+                cur = da->src[0];
+            }
+            if (!ok || bottom < 0 || sn < 2) continue;
+
+            /* Span the chain occupies; acc must not be referenced inside it
+               except as the bottom's src[0] and the top's dst (no partial-sum
+               reader between the rewritten steps). */
+            int lo = h, hi = h;
+            for (int i = 0; i < sn; i++) { if (spine[i] < lo) lo = spine[i]; if (spine[i] > hi) hi = spine[i]; }
+            int acc_refs = 0;
+            for (int q = lo; q <= hi; q++) {
+                Op *o = &bb->ops[q];
+                if (o->dst == acc) acc_refs++;
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+                for (int k = 0; k < nu; k++) if (u[k] == acc) acc_refs++;
+            }
+            if (acc_refs != 2) continue;   /* dst@top + src0@bottom only */
+
+            /* Rename every spine temp (all but the top, whose dst is already
+               acc) to acc: set its def's dst and its single use (the next
+               spine op's src0) to acc. */
+            for (int i = 1; i < sn; i++) {
+                Op *sp = &bb->ops[spine[i]];
+                int t = sp->dst;
+                sp->dst = acc;                       /* def now writes acc */
+                Op *parent = &bb->ops[spine[i - 1]]; /* consumes t as src[0] */
+                if (parent->src[0] == t) parent->src[0] = acc;
+                else if (parent->src[1] == t) parent->src[1] = acc;
+            }
+            changed++;
+        }
+    }
+    free(use_cnt); free(def_bb); free(def_idx); free(def_cnt);
+    return changed;
+}
+
 int ir_opt_reassoc_reduction(Func *f)
 {
     if (!f) return 0;

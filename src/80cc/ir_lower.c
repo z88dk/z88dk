@@ -1592,6 +1592,7 @@ int ir_lower_func(FILE *out, Func *f)
            clean the NOPs it leaves. Gated on c_word_resident ⇒ inert
            (byte-identical) when off. */
         int reassoc = ir_opt_reassoc_reduction(f);
+        int rcoal   = ir_opt_reduce_coalesce(f);
         int cse     = ir_opt_cse(f);
         /* After cse so duplicate per-lane address ADDs have been
            merged; before the long-push inserter. */
@@ -1637,7 +1638,7 @@ int ir_lower_func(FILE *out, Func *f)
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
              || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
-             || pruned > 0)
+             || rcoal > 0 || pruned > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
                     "ir_opt: %d prune, %d licm, %d ivsr, %d early, %d st2ld, "

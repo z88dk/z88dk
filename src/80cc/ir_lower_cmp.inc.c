@@ -24,10 +24,15 @@ static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
     if (!fp_active(f) || L.la.cur_branch_test_kind == 0) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     /* Reduction word-home (cur_de_home<0) region: word_dehome_signed_test
-       handles the DE-clean loop test. The GENERAL DE-home (cur_de_home>=0)
-       relies on THIS fold to keep its compares DE-clean — the home reads from
-       e/d in place — so let it fire there. */
-    if (L.cur_home_is_word && L.cur_de_home < 0) return 0;
+       handles the i-in-SLOT loop test. For a loop test whose operands are NOT
+       the home (e.g. the counter in idx2 / BC vs a slot bound), let the fold
+       fire — it reads iyl/iyh/(ix+d)/reg-half through A, never touching DE, so
+       the DE-resident accumulator survives. (An operand that IS the home would
+       be read from e/d, also DE-clean, but that path is the general DE-home's.) */
+    if (L.cur_home_is_word && L.cur_de_home < 0) {
+        int hs0 = op->src[0], hs1 = op->src[1];
+        if (hs0 == L.cur_func_whome || hs1 == L.cur_func_whome) return 0;
+    }
     int idxhalf_ok = (c_cpu == CPU_Z80 || IS_Z80N());   /* z180 traps index halves */
     OpKind k = op->kind;
     int s0 = op->src[0], s1 = op->src[1];

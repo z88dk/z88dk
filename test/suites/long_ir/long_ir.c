@@ -1955,9 +1955,31 @@ static void test_struct(void)
     Assert(aw_l(-3)  == -2, "negative int arg sign-extended to long param");
 }
 
+/* Reduction-chain coalescing: a left-leaning multi-term reduction
+   `s = ((s + a[i]) + K1) + K2` lowers through single-use spine temps, which
+   ir_opt_reduce_coalesce renames back to the accumulator so word_acc can DE-home
+   it (`add hl,de; ex de,hl` per term). This checks the coalesced chain computes
+   the same result as the host — a miscompile in the rename would corrupt it. */
+static int rchain_a[50];
+static unsigned int rchain(int n)
+{
+    unsigned int s = 0;
+    int i;
+    for (i = 0; i < n; i++)
+        s = (s + (unsigned int)rchain_a[i] + 11u + 5u) & 0xffffu;
+    return s;
+}
+static void test_reduce_chain(void)
+{
+    int i;
+    for (i = 0; i < 50; i++) rchain_a[i] = i * 3 - 20;
+    Assert(rchain(50) == 3475u, "reduction-chain accumulator (coalesced, host-verified)");
+}
+
 int suite_long_ir(void)
 {
     suite_setup("long IR ops");
+    suite_add_test(test_reduce_chain);
     suite_add_test(test_struct);
     suite_add_test(test_add);
     suite_add_test(test_sub);

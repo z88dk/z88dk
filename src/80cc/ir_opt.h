@@ -180,6 +180,11 @@ int ir_opt_const_fold(Func *f);
    (inert when off ⇒ byte-identical). Returns chains reassociated. */
 int ir_opt_reassoc_reduction(Func *f);
 
+/* Coalesce a left-leaning reduction chain `s=((s+a)+b)+c` (through single-use
+   spine temps) back into in-place `s=s+a; s=s+b; s=s+c`, so word_acc can DE-home
+   the accumulator. Gated on c_word_resident; IR_NO_REDUCE_COALESCE opts out. */
+int ir_opt_reduce_coalesce(Func *f);
+
 /* long_inc_mhl (the long (*p)++ triple → HCALL l_long_inc_mhl) lives
    in the ir_match table as `incmhl`; --opt-disable=pattern:incmhl. */
 

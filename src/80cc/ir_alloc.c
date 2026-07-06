@@ -1173,16 +1173,24 @@ void ir_alloc(Func *f)
         BB *bb = &f->bbs[i];
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *o = &bb->ops[j];
-            /* IR_ST_MEM byte/int with IR_MEM_VREG base + nonzero offset
-               emits `ld bc,N; add hl,bc` for the offset add (DE holds
-               the value being stored, so can't be used for the add).
-               Conservative: any IR_ST_MEM IR_MEM_VREG with offset is a
-               BC clobber. Stores with offset==0 don't emit the add and
-               are safe. */
-            if (o->kind == IR_ST_MEM
-                && o->mem.kind == IR_MEM_VREG
-                && o->mem.offset != 0)
-                has_bc_clobber = 1;
+            /* (Offset stores used to clobber BC via `ld bc,N; add hl,bc` for
+               the offset add and disqualified the whole function from BC
+               residency. gen_st_mem now emits that add BC-clean, avoid_bc=1
+               — inc/dec chain or an A-through add — so an offset store keeps a
+               BC-homed base/value alive and is no longer a clobber.) */
+            /* A WIDE (double / long long, width>4) LD_MEM/ST_MEM lowers to a
+               dload/dstore helper CALL that clobbers BC with no save/restore
+               point (unlike IR_CALL/IR_HCALL), so a BC-resident base can't
+               survive it. (width==4 long is already covered by has_long.) */
+            if (o->kind == IR_LD_MEM || o->kind == IR_ST_MEM) {
+                int vw = 0;
+                if (o->dst >= 0 && o->dst < f->n_vregs)
+                    vw = f->vregs[o->dst].width;
+                if (o->src[0] >= 0 && o->src[0] < f->n_vregs
+                    && f->vregs[o->src[0]].width > vw)
+                    vw = f->vregs[o->src[0]].width;
+                if (vw > 4) has_bc_clobber = 1;
+            }
             /* l_case / l_long_case walk the table through BC, so a
                PR_BC value can't survive a table-dispatch IR_SWITCH
                (and the helper jumps away — no save/restore point).

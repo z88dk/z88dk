@@ -1446,7 +1446,13 @@ static int cmp_fold_static_class(const Func *f, int v)
    the emitter. Branch-fusion is checked by the callers. */
 static int cmp_ixd_fold_de_clean_ok(const Func *f, const Op *o)
 {
-    if (L.cur_de_home < 0 || getenv("IR_NO_IXD_FOLD")) return 0;
+    /* Fires for the GENERAL DE-home (cur_de_home>=0) and the word-ACCUMULATOR
+       home (cur_home_is_word, cur_de_home<0). In the word-acc case the fold is
+       only DE-clean when NEITHER operand is the home (a bare loop test on the
+       counter etc.) — mirrors try_cmp_ixd_fold's word-acc gate. */
+    int word_acc = (L.cur_de_home < 0 && L.cur_home_is_word);
+    if (L.cur_de_home < 0 && !word_acc) return 0;
+    if (getenv("IR_NO_IXD_FOLD")) return 0;
     if (!fp_active(f)) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     switch (o->kind) {
@@ -1457,10 +1463,41 @@ static int cmp_ixd_fold_de_clean_ok(const Func *f, const Op *o)
     }
     int s0 = o->src[0], s1 = o->src[1];
     if (s0 < 0 || s1 < 0 || s0 == s1) return 0;
+    if (word_acc && (s0 == L.cur_func_whome || s1 == L.cur_func_whome)) return 0;
     int c0 = cmp_fold_static_class(f, s0);
     int c1 = cmp_fold_static_class(f, s1);
     if (c0 == 0 || c1 == 0) return 0;
     if (c0 == 1 && c1 == 1) return 0;    /* both gp pairs → sbc hl,de path */
+    return 1;
+}
+
+/* General DE-home ALU fold: a width-2 ADD/SUB/AND/OR/XOR that try_binop_ixd_fold
+   lowers byte-wise through A (`ld a,<lo>; <op> <lo'>; ld l,a; …`) reading both
+   operands in place — never staging one into DE — with the result committed to a
+   non-home spill slot (DE-preserving in fp). DE-clean, so a general DE-home
+   survives it. Mirrors try_binop_ixd_fold's gates so the region proof agrees with
+   the emitter. (ADD also has the home-operand / indexed-deref paths handled
+   separately; this covers the both-operands-foldable, neither-is-home case, and
+   is the ONLY path for AND/OR/XOR.) */
+static int binop_ixd_fold_de_clean_ok(const Func *f, const Op *o)
+{
+    if (getenv("IR_NO_ALU_FOLD")) return 0;
+    if (L.cur_de_home < 0 || getenv("IR_NO_IXD_FOLD")) return 0;
+    if (!fp_active(f)) return 0;
+    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
+    switch (o->kind) {
+    case IR_ADD: case IR_SUB: case IR_AND: case IR_OR: case IR_XOR: break;
+    default: return 0;
+    }
+    if (o->dst < 0 || o->dst >= f->n_vregs || f->vregs[o->dst].width != 2) return 0;
+    if (o->dst == L.cur_func_whome) return 0;          /* home-def uses ex de,hl */
+    if (!f->vreg_to_phys || f->vreg_to_phys[o->dst] == IR_PR_DE) return 0; /* dst not DE */
+    int s0 = o->src[0], s1 = o->src[1];
+    if (s0 < 0 || s1 < 0) return 0;
+    int c0 = cmp_fold_static_class(f, s0);
+    int c1 = cmp_fold_static_class(f, s1);
+    if (c0 == 0 || c1 == 0) return 0;
+    if (c0 != 2 && c1 != 2) return 0;    /* need >=1 mem/idx (else add hl,de path) */
     return 1;
 }
 
@@ -1543,6 +1580,11 @@ static int op_de_clean(const Func *f, const Op *o)
             && L.la.cur_branch_test_kind != 0
             && word_dehome_signed_test_shape_ok(f, o))
             return 1;
+        /* Branch-fused int loop test (counter in idx2/BC vs slot, operands not
+           the home) lowered by the (ix+d)/idx-half compare fold — A-only, DE
+           survives. Covers the word-acc home's i-in-idx2 test. */
+        if (L.la.cur_branch_test_kind != 0 && cmp_ixd_fold_de_clean_ok(f, o))
+            return 1;
         /* --- General (non-accumulate) DE-home region ops (cur_de_home>=0) --- */
         if (L.cur_de_home >= 0) {
             /* Branch-fused int compare lowered by try_cmp_ixd_fold: reads both
@@ -1574,6 +1616,10 @@ static int op_de_clean(const Func *f, const Op *o)
             if ((o->kind == IR_ADD || o->kind == IR_SUB)
                 && o->dst == L.cur_func_whome && o->src[0] >= 0 && o->src[1] < 0
                 && o->imm >= 0 && o->imm <= 4)
+                return 1;
+            /* Byte-wise ALU fold (ADD/SUB/AND/OR/XOR of foldable operands): reads
+               in place through A, result to a non-home spill — DE-clean. */
+            if (binop_ixd_fold_de_clean_ok(f, o))
                 return 1;
         }
     }
@@ -1679,13 +1725,13 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
             if (sw <= 2) return 1;
         }
         /* Branch consumed by a general DE-home folded int compare. */
-        if (L.cur_de_home >= 0 && prv->dst == o->src[0]
+        if ((L.cur_de_home >= 0 || L.cur_home_is_word) && prv->dst == o->src[0]
             && cmp_ixd_fold_de_clean_ok(f, prv))
             return 1;
     }
     /* General DE-home: a branch-fused int compare lowered by try_cmp_ixd_fold
        (recognised structurally — the compare feeds the next branch). */
-    if (L.cur_de_home >= 0 && j + 1 < bb->n_ops
+    if ((L.cur_de_home >= 0 || L.cur_home_is_word) && j + 1 < bb->n_ops
         && cmp_ixd_fold_de_clean_ok(f, o)) {
         const Op *nxt = &bb->ops[j + 1];
         if ((nxt->kind == IR_BR_ZERO || nxt->kind == IR_BR_COND)

@@ -1719,7 +1719,17 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
 /* Add a small constant to HL. |off| <= 3 uses inc/dec hl (1 byte /
    6T each); larger offsets load the scratch pair (BC when DE must be
    preserved, e.g. long loads). */
-static void emit_hl_add_offset(FILE *out, int off, int use_bc)
+static void emit_pair_add_de_clean(FILE *out, const char *pair, const char *lo,
+                                   const char *hi, int k, int a_free);
+
+/* Add `off` to HL. `use_bc` picks BC vs DE as the `ld rp,off; add hl,rp` scratch
+   (a caller with a live DE value passes use_bc=1, and vice-versa). `avoid_bc`
+   is stronger: keep BOTH BC and DE intact (e.g. an offset store where DE holds
+   the value AND a BC-resident base/value must survive) — small offsets use an
+   inc/dec chain, larger ones an A-through add (emit_pair_add_de_clean). This is
+   what lets a struct-field STORE preserve a BC-homed base, so offset stores no
+   longer disqualify the function from register residency. */
+static void emit_hl_add_offset(FILE *out, int off, int use_bc, int avoid_bc)
 {
     if (off == 0) return;
     if (off > 0 && off <= 3) {
@@ -1728,6 +1738,12 @@ static void emit_hl_add_offset(FILE *out, int off, int use_bc)
     }
     if (off < 0 && off >= -3) {
         for (int i = 0; i < -off; i++) emit(out, "dec\thl");
+        return;
+    }
+    if (avoid_bc) {
+        /* BC- and DE-clean: inc/dec chain (small) or A-through add (larger,
+           when A is free). Never touches BC, so a BC-homed base survives. */
+        emit_pair_add_de_clean(out, "hl", "l", "h", off, L.rs.a < 0);
         return;
     }
     emit(out, "ld\t%s,%d", use_bc ? "bc" : "de", off);
@@ -1783,7 +1799,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
         } else {
             load_to_hl(out, f, op->mem.base);
-            emit_hl_add_offset(out, op->mem.offset, 0);  /* base+off (DE free) */
+            emit_hl_add_offset(out, op->mem.offset, 0, 0);  /* base+off (DE free) */
         }
         emit(out, "call\t%s", acc_prim(f, op->dst, "load"));
         if (!wide_acc_result_dead_in_acc(f, op->dst)) {
@@ -1941,7 +1957,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             emit(out, "ld\te,(hl)");
             emit(out, "inc\thl");
             emit(out, "ld\td,(hl)");                   /* DE = *p, HL = p+1 */
-            emit_hl_add_offset(out, op->mem.post_step - 1, 0);  /* HL = p+step */
+            emit_hl_add_offset(out, op->mem.post_step - 1, 0, 0);  /* HL = p+step */
             if (vreg_in_pr_bc(f, base)) {
                 emit(out, "ld\tc,l");
                 emit(out, "ld\tb,h");                  /* BC home = p+step */
@@ -2005,7 +2021,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             /* Width 4 can't clobber DE (needed for the high half) —
                scratch through BC; widths 1/2 use DE. Small offsets
                become inc/dec hl chains. */
-            emit_hl_add_offset(out, op->mem.offset, dst_w == 4);
+            emit_hl_add_offset(out, op->mem.offset, dst_w == 4, 0);
         }
         if (dst_w == 1) {
             /* Byte load into A. If dst is dead-after-next (the
@@ -2132,7 +2148,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "ld\thl,_%s", ir_sym_name(op->mem.sym));
         } else {
             load_to_hl(out, f, op->mem.base);
-            emit_hl_add_offset(out, op->mem.offset, 0);  /* base+off (DE free) */
+            emit_hl_add_offset(out, op->mem.offset, 0, 0);  /* base+off (DE free) */
         }
         emit_acc_store_hl(out, f, op->src[0]);
         invalidate_hl_bc();          /* clears both wide-acc cells */
@@ -2204,7 +2220,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         if (op->src[0] < 0) {
             int w = kind_scalar_width(op->mem.elem);
             load_to_hl(out, f, op->mem.base);
-            emit_hl_add_offset(out, op->mem.offset, 1);  /* use BC scratch → keep DE */
+            emit_hl_add_offset(out, op->mem.offset, 1, 1);  /* use BC scratch → keep DE */
             emit_folded_imm_store(out, w, (uint32_t)op->imm);
             if (w > 1 || op->mem.offset != 0)
                 invalidate_hl_cache();
@@ -2221,7 +2237,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                vreg picks up the store value. */
             invalidate_de_cache();
             load_to_hl(out, f, op->mem.base);
-            emit_hl_add_offset(out, op->mem.offset, 1);
+            emit_hl_add_offset(out, op->mem.offset, 1, 1);
             emit(out, "ld\t(hl),e");
             /* HL walked to base+offset — the cache claim on base is
                stale for offset != 0 (a following [base+k] store would
@@ -2242,7 +2258,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                    would clobber DE or BC.) */
                 if (!hl_has(op->mem.base))
                     load_to_hl(out, f, op->mem.base);
-                emit_hl_add_offset(out, op->mem.offset, 0); /* inc/dec only */
+                emit_hl_add_offset(out, op->mem.offset, 0, 0); /* inc/dec only */
                 store_byte_adv(out, "c", 0);
                 store_byte_adv(out, "b", 0);
                 store_byte_adv(out, "e", 0);
@@ -2290,7 +2306,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 emit(out, "push\tde");          /* save HIGH half */
                 emit(out, "push\thl");          /* save LOW half */
                 load_to_hl_adj(out, f, op->mem.base, 4);
-                emit_hl_add_offset(out, op->mem.offset, 1);
+                emit_hl_add_offset(out, op->mem.offset, 1, 1);
                 emit(out, "pop\tbc");           /* BC = LOW */
                 if (IS_EZ80()) {
                     emit(out, "ld\t(hl),bc");   /* ez80: *HL = BC (HL preserved) */
@@ -2314,7 +2330,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
             load_to_hl(out, f, op->src[0]);
             emit(out, "ex\tde,hl");         /* DE = value */
             load_to_hl(out, f, op->mem.base);
-            emit_hl_add_offset(out, op->mem.offset, 1);
+            emit_hl_add_offset(out, op->mem.offset, 1, 1);
             if (IS_EZ80()) {
                 emit(out, "ld\t(hl),de");   /* ez80: *HL = DE */
             } else {
@@ -2438,6 +2454,7 @@ static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
 static int try_binop_ixd_fold(FILE *out, Func *f, const Op *op,
                               const char *lo_op, const char *hi_op)
 {
+    if (getenv("IR_NO_ALU_FOLD")) return 0;
     if (L.cur_de_home < 0) return 0;           /* only inside a DE-home region */
     if (!fp_active(f)) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
