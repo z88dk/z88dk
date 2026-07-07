@@ -22,7 +22,7 @@
     EXTERN  draw_circle
     EXTERN  stencil_add_pixel
 
-	; No paging required on the 'stencil' structures !
+    ; No paging required on the 'stencil' structures !
         ;EXTERN    __gfx_vram_page_in
         ;EXTERN    __gfx_vram_page_out
 
@@ -60,6 +60,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ret
 
 ELSE
+
+    EXTERN  __plot_ADDR
+    ld      hl,stencil_add_pixel
+    ld      (__plot_ADDR),hl
 
     pop     af
     pop     hl
