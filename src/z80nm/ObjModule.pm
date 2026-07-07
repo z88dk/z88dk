@@ -261,7 +261,7 @@ package CPU;
 use Modern::Perl;
 use Path::Tiny;
 
-my @CPUS = parse("../z80asm/z80asm2/cpu.def");
+my @CPUS = parse("../z80asm/cpu.def");
 
 sub parse {
     my ($file) = @_;
@@ -445,12 +445,12 @@ sub out_kv {
 #------------------------------------------------------------------------------
 # ObjExprs
 #------------------------------------------------------------------------------
-package ObjExprType;
+package ObjRangeType;
 
 use Modern::Perl;
 use Path::Tiny;
 
-my @EXPR_TYPES = parse("../z80asm/z80asm2/obj_expr_type.def");
+my @RANGE_TYPES = parse("../z80asm/obj_range_type.def");
 
 sub parse {
     my ($file) = @_;
@@ -464,7 +464,7 @@ sub parse {
 
 sub lookup_ {
     my ($key) = @_;
-    for (@EXPR_TYPES) {
+    for (@RANGE_TYPES) {
         my ( $id, $name, $char ) = @$_;
 
         if ( $key =~ /^\d+$/ ) {
@@ -499,16 +499,16 @@ sub lookup_char {
 }
 
 sub min_id {
-    my $id = $EXPR_TYPES[0]->[0];
-    for (@EXPR_TYPES) {
+    my $id = $RANGE_TYPES[0]->[0];
+    for (@RANGE_TYPES) {
         $id = $_->[0] if $_->[0] < $id;
     }
     return $id;
 }
 
 sub max_id {
-    my $id = $EXPR_TYPES[0]->[0];
-    for (@EXPR_TYPES) {
+    my $id = $RANGE_TYPES[0]->[0];
+    for (@RANGE_TYPES) {
         $id = $_->[0] if $_->[0] > $id;
     }
     return $id;
@@ -542,7 +542,7 @@ sub dump {
     my $child = $ctx->child;
     $child->out_kv( "text", "\"" . $self->text . "\"" );
     $child->out_kv( "type",
-        $self->type . " ; (" . ObjExprType::lookup_id( $self->type ) . ")" );
+        $self->type . " ; (" . ObjRangeType::lookup_id( $self->type ) . ")" );
     $child->out_kv( "section",     "\"" . $self->section . "\"" );
     $child->out_kv( "asmpc",       sprintf( "0x%04X", $self->asmpc ) );
     $child->out_kv( "patch_ptr",   sprintf( "0x%04X", $self->patch_ptr ) );
@@ -571,7 +571,7 @@ sub parse {
         elsif ( $scanner->text =~ /type\s*=\s*(.*?)\s*$/ ) {
             my $type = $1;
             $type =~ /^\w+$/ or $scanner->error("invalid type: $type");
-            my $type_id = ObjExprType::lookup_id($type)
+            my $type_id = ObjRangeType::lookup_id($type)
                 or $scanner->error("invalid type: $type");
             $self->type($type);
             $scanner->advance;
@@ -637,11 +637,11 @@ sub pack {
 
     # pack type
     if ( $version >= 18 ) {
-        my $id = ObjExprType::lookup_id( $self->type );
+        my $id = ObjRangeType::lookup_id( $self->type );
         $bin->pack_dword($id);
     }
     else {
-        my $char = ObjExprType::lookup_char( $self->type );
+        my $char = ObjRangeType::lookup_char( $self->type );
         die "invalid expression type: " . $self->type unless defined $char;
         my $byte = ord($char);
         $bin->pack_byte($byte);
@@ -748,7 +748,7 @@ sub unpack {
         if ( $id == 0 ) {
             return undef;    # end marker
         }
-        my $type = ObjExprType::lookup_name($id);
+        my $type = ObjRangeType::lookup_name($id);
         $type or die "invalid expression type id: $id";
         $self->type($type);
     }
@@ -758,7 +758,7 @@ sub unpack {
             return undef;    # end marker
         }
         my $char = chr($byte);
-        my $type = ObjExprType::lookup_name($char);
+        my $type = ObjRangeType::lookup_name($char);
         $type or die "invalid expression type char: '$char'";
         $self->type($type);
     }
@@ -984,14 +984,14 @@ package ObjSymbolScope;
 use Modern::Perl;
 use Path::Tiny;
 
-my @SYMBOL_SCOPES = parse("../z80asm/z80asm2/obj_symbol_scope.def");
+my @SYMBOL_SCOPES = parse("../z80asm/obj_symbol_scope.def");
 
 sub parse {
     my ($file) = @_;
     my @scopes;
     for ( path($file)->lines( { chomp => 1 } ) ) {
-        next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)/;
-        push @scopes, [ $1, $2 ];
+        next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)\s*,\s*(?:'(.)'|0)/;
+        push @scopes, [ $1, $2, $3 ];
     }
     return @scopes;
 }
@@ -999,13 +999,16 @@ sub parse {
 sub lookup_ {
     my ($key) = @_;
     for (@SYMBOL_SCOPES) {
-        my ( $id, $name ) = @$_;
+        my ( $id, $name, $char ) = @$_;
 
         if ( $key =~ /^\d+$/ ) {
-            return [ $id, $name ] if $id == $key;
+            return [ $id, $name, $char ] if $id == $key;
+        }
+        elsif ( $key =~ /^(\D)$/ ) {
+            return [ $id, $name, $char ] if defined($char) && $char eq $1;
         }
         else {
-            return [ $id, $name ] if $name eq $key;
+            return [ $id, $name, $char ] if $name eq $key;
         }
     }
     return undef;
@@ -1021,6 +1024,28 @@ sub lookup_name {
     my ($key) = @_;
     my $found = lookup_($key);
     return $found ? $found->[1] : undef;
+}
+
+sub lookup_char {
+    my ($key) = @_;
+    my $found = lookup_($key);
+    return $found ? $found->[2] : undef;
+}
+
+sub min_id {
+    my $id = $SYMBOL_SCOPES[0]->[0];
+    for (@SYMBOL_SCOPES) {
+        $id = $_->[0] if $_->[0] < $id;
+    }
+    return $id;
+}
+
+sub max_id {
+    my $id = $SYMBOL_SCOPES[0]->[0];
+    for (@SYMBOL_SCOPES) {
+        $id = $_->[0] if $_->[0] > $id;
+    }
+    return $id;
 }
 
 #------------------------------------------------------------------------------
@@ -1029,14 +1054,14 @@ package ObjSymbolType;
 use Modern::Perl;
 use Path::Tiny;
 
-my @SYMBOL_TYPES = parse("../z80asm/z80asm2/obj_symbol_type.def");
+my @SYMBOL_TYPES = parse("../z80asm/obj_symbol_type.def");
 
 sub parse {
     my ($file) = @_;
     my @types;
     for ( path($file)->lines( { chomp => 1 } ) ) {
-        next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)/;
-        push @types, [ $1, $2 ];
+        next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)\s*,\s*(?:'(.)'|0)/;
+        push @types, [ $1, $2, $3 ];
     }
     return @types;
 }
@@ -1044,13 +1069,16 @@ sub parse {
 sub lookup_ {
     my ($key) = @_;
     for (@SYMBOL_TYPES) {
-        my ( $id, $name ) = @$_;
+        my ( $id, $name, $char ) = @$_;
 
         if ( $key =~ /^\d+$/ ) {
-            return [ $id, $name ] if $id == $key;
+            return [ $id, $name, $char ] if $id == $key;
+        }
+        elsif ( $key =~ /^(\D)$/ ) {
+            return [ $id, $name, $char ] if defined($char) && $char eq $1;
         }
         else {
-            return [ $id, $name ] if $name eq $key;
+            return [ $id, $name, $char ] if $name eq $key;
         }
     }
     return undef;
@@ -1066,6 +1094,28 @@ sub lookup_name {
     my ($key) = @_;
     my $found = lookup_($key);
     return $found ? $found->[1] : undef;
+}
+
+sub lookup_char {
+    my ($key) = @_;
+    my $found = lookup_($key);
+    return $found ? $found->[2] : undef;
+}
+
+sub min_id {
+    my $id = $SYMBOL_TYPES[0]->[0];
+    for (@SYMBOL_TYPES) {
+        $id = $_->[0] if $_->[0] < $id;
+    }
+    return $id;
+}
+
+sub max_id {
+    my $id = $SYMBOL_TYPES[0]->[0];
+    for (@SYMBOL_TYPES) {
+        $id = $_->[0] if $_->[0] > $id;
+    }
+    return $id;
 }
 
 #------------------------------------------------------------------------------
@@ -1171,6 +1221,187 @@ sub parse {
     $scanner->error("expected end symbol");
 }
 
+sub pack {
+    my ( $self, $bin, $strings, $version ) = @_;
+
+    # scope
+    if ( $version >= 18 ) {
+        my $scope_id = ObjSymbolScope::lookup_id( $self->scope );
+        $bin->pack_dword($scope_id);
+    }
+    else {
+        my $char = ObjSymbolScope::lookup_char( $self->scope );
+        my $byte = ord($char);
+        $bin->pack_byte($byte);
+    }
+
+    # type
+    if ( $version >= 18 ) {
+        my $type_id = ObjSymbolType::lookup_id( $self->type );
+        $bin->pack_dword($type_id);
+    }
+    else {
+        my $char = ObjSymbolType::lookup_char( $self->type );
+        my $byte = ord($char);
+        $bin->pack_byte($byte);
+    }
+
+    # section
+    if ( $version >= 18 ) {
+        my $id = $strings->add( $self->section );
+        $bin->pack_dword($id);
+    }
+    elsif ( $version >= 16 ) {
+        $bin->pack_lstring( $self->section );
+    }
+    elsif ( $version >= 5 ) {
+        $bin->pack_cstring( $self->section );
+    }
+    else {
+        # no section
+    }
+
+    # value
+    $bin->pack_dword( $self->value );
+
+    # name
+    if ( $version >= 18 ) {
+        my $id = $strings->add( $self->name );
+        $bin->pack_dword($id);
+    }
+    elsif ( $version >= 16 ) {
+        $bin->pack_lstring( $self->name );
+    }
+    else {
+        $bin->pack_cstring( $self->name );
+    }
+
+    # definition location
+    if ( $version >= 18 ) {
+        my $id = $strings->add( $self->file );
+        $bin->pack_dword($id);
+        $bin->pack_dword( $self->line );
+    }
+    elsif ( $version >= 16 ) {
+        $bin->pack_lstring( $self->file );
+        $bin->pack_dword( $self->line );
+    }
+    elsif ( $version >= 9 ) {
+        $bin->pack_cstring( $self->file );
+        $bin->pack_dword( $self->line );
+    }
+    else {
+        # no file, line
+    }
+}
+
+sub unpack {
+    my ( $class, $bin, $strings, $version ) = @_;
+    my $self = $class->new;
+
+    # scope
+    if ( $version >= 18 ) {
+        my $scope_id = $bin->unpack_dword;
+        if ( $scope_id == 0 ) {
+            return undef;    # end marker
+        }
+        my $scope = ObjSymbolScope::lookup_name($scope_id)
+            or die "invalid scope: $scope_id";
+        $self->scope($scope);
+    }
+    else {
+        my $byte = $bin->unpack_byte;
+        if ( $byte == 0 ) {
+            return undef;    # end marker
+        }
+        my $char  = chr($byte);
+        my $scope = ObjSymbolScope::lookup_name($char)
+            or die "invalid scope: $char";
+        $self->scope($scope);
+    }
+
+    # type
+    if ( $version >= 18 ) {
+        my $type_id = $bin->unpack_dword;
+        my $type    = ObjSymbolType::lookup_name($type_id)
+            or die "invalid type: $type_id";
+        $self->type($type);
+    }
+    else {
+        my $byte = $bin->unpack_byte;
+        my $char = chr($byte);
+        my $type = ObjSymbolType::lookup_name($char)
+            or die "invalid type: $char";
+        $self->type($type);
+    }
+
+    # section
+    if ( $version >= 18 ) {
+        my $id      = $bin->unpack_dword;
+        my $section = $strings->get($id);
+        $self->section($section);
+    }
+    elsif ( $version >= 16 ) {
+        my $section = $bin->unpack_lstring;
+        $self->section($section);
+    }
+    elsif ( $version >= 5 ) {
+        my $section = $bin->unpack_cstring;
+        $self->section($section);
+    }
+    else {
+        # no section
+    }
+
+    # value
+    my $value = $bin->unpack_dword;
+    $self->value($value);
+
+    # name
+    if ( $version >= 18 ) {
+        my $id   = $bin->unpack_dword;
+        my $name = $strings->get($id);
+        $self->name($name);
+    }
+    elsif ( $version >= 16 ) {
+        my $name = $bin->unpack_lstring;
+        $self->name($name);
+    }
+    else {
+        my $name = $bin->unpack_cstring;
+        $self->name($name);
+    }
+
+    # definition location
+    if ( $version >= 18 ) {
+        my $id   = $bin->unpack_dword;
+        my $file = $strings->get($id);
+        $self->file($file);
+
+        my $line = $bin->unpack_dword;
+        $self->line($line);
+    }
+    elsif ( $version >= 16 ) {
+        my $file = $bin->unpack_lstring;
+        $self->file($file);
+
+        my $line = $bin->unpack_dword;
+        $self->line($line);
+    }
+    elsif ( $version >= 9 ) {
+        my $file = $bin->unpack_cstring;
+        $self->file($file);
+
+        my $line = $bin->unpack_dword;
+        $self->line($line);
+    }
+    else {
+        # no file, line
+    }
+
+    return $self;
+}
+
 #------------------------------------------------------------------------------
 package ObjSymbols;
 
@@ -1221,6 +1452,48 @@ sub parse {
         }
     }
     $scanner->error("expected end symbols");
+}
+
+sub pack {
+    my ( $self, $bin, $strings, $version ) = @_;
+    if ( @{ $self->symbols } ) {
+        my $pos = $bin->size;
+
+        # pack symbols
+        for my $symbol ( @{ $self->symbols } ) {
+            $symbol->pack( $bin, $strings, $version );
+        }
+
+        # pack end terminator
+        if ( $version >= 18 ) {
+            $bin->pack_dword(0);
+        }
+        elsif ( $version >= 5 ) {
+            $bin->pack_byte(0);
+        }
+        else {
+            # no end marker
+        }
+
+        return $pos;
+    }
+    else {
+        return -1;
+    }
+}
+
+sub unpack {
+    my ( $class, $bin, $strings, $version, $limit_pos ) = @_;
+    my $self = $class->new;
+    while ( $bin->read_pos < $limit_pos ) {
+        if ( my $symbol = ObjSymbol->unpack( $bin, $strings, $version ) ) {
+            push @{ $self->symbols }, $symbol;
+        }
+        else {
+            last;    # end marker
+        }
+    }
+    return $self;
 }
 
 #------------------------------------------------------------------------------
@@ -1278,6 +1551,60 @@ sub parse {
         }
     }
     $scanner->error("expected end externs");
+}
+
+sub pack {
+    my ( $self, $bin, $strings, $version ) = @_;
+
+    if ( @{ $self->externs } ) {
+        my $pos = $bin->size;
+
+        for my $name ( @{ $self->externs } ) {
+            if ( $version >= 18 ) {
+                my $id = $strings->add($name);
+                $bin->pack_dword($id);
+            }
+            elsif ( $version >= 16 ) {
+                $bin->pack_lstring($name);
+            }
+            else {
+                $bin->pack_cstring($name);
+            }
+        }
+
+        if ( $version >= 18 ) {
+            $bin->pack_dword(0);    # end marker
+        }
+
+        return $pos;
+    }
+    else {
+        return -1;
+    }
+}
+
+sub unpack {
+    my ( $class, $bin, $strings, $version, $limit_pos ) = @_;
+    my $self = $class->new;
+    while ( $bin->read_pos < $limit_pos ) {
+        if ( $version >= 18 ) {
+            my $id = $bin->unpack_dword;
+            if ( $id == 0 ) {
+                last;    # end marker
+            }
+            my $name = $strings->get($id);
+            $self->add($name);
+        }
+        elsif ( $version >= 16 ) {
+            my $name = $bin->unpack_lstring;
+            $self->add($name);
+        }
+        else {
+            my $name = $bin->unpack_cstring;
+            $self->add($name);
+        }
+    }
+    return $self;
 }
 
 #------------------------------------------------------------------------------
@@ -1803,10 +2130,13 @@ sub pack {
     # write expressions
     my $exprs_pos = $self->exprs->pack( $bin, $self->strings, $self->version );
 
-    # ... TODO ...
+    # write symbols
+    my $symbols_pos =
+        $self->symbols->pack( $bin, $self->strings, $self->version );
 
-    my $symbols_pos = -1;    #$bin->size;
-    my $externs_pos = -1;    #$bin->size;
+    # write externs
+    my $externs_pos =
+        $self->externs->pack( $bin, $self->strings, $self->version );
 
     # write module name
     my $modname_pos = $bin->size;
@@ -1833,11 +2163,12 @@ sub pack {
     }
 
     # write pointers
-    $bin->patch_dword( $header_pos + 0 * 4, $modname_pos );
-    $bin->patch_dword( $header_pos + 1 * 4, $exprs_pos );
-    $bin->patch_dword( $header_pos + 2 * 4, $symbols_pos );
-    $bin->patch_dword( $header_pos + 3 * 4, $externs_pos );
-    $bin->patch_dword( $header_pos + 4 * 4, $sections_pos );
+    my $pos_f = sub { my ($pos) = @_; return $pos < 0 ? $pos : $pos - $pos0; };
+    $bin->patch_dword( $header_pos + 0 * 4, $pos_f->($modname_pos) );
+    $bin->patch_dword( $header_pos + 1 * 4, $pos_f->($exprs_pos) );
+    $bin->patch_dword( $header_pos + 2 * 4, $pos_f->($symbols_pos) );
+    $bin->patch_dword( $header_pos + 3 * 4, $pos_f->($externs_pos) );
+    $bin->patch_dword( $header_pos + 4 * 4, $pos_f->($sections_pos) );
 
     return $bin;
 }
@@ -1897,13 +2228,13 @@ sub unpack {
     # string table
     if ( $self->version >= 18 ) {
         my $strings_pos = $bin->unpack_dword;
-        $bin->read_pos($strings_pos);
+        $bin->read_pos( $strings_pos + $pos0 );
         my $strings = StringTable->unpack($bin);
         $self->strings($strings);
     }
 
     # module name
-    $bin->read_pos($modname_pos);
+    $bin->read_pos( $modname_pos + $pos0 );
     if ( $self->version >= 18 ) {
         my $id   = $bin->unpack_dword;
         my $name = $self->strings->get($id);
@@ -1920,22 +2251,44 @@ sub unpack {
 
     # expressions
     if ( $exprs_pos >= 0 ) {
-        $bin->read_pos($exprs_pos);
-        my $limit_pos =
-              $symbols_pos >= 0  ? $symbols_pos
-            : $externs_pos >= 0  ? $externs_pos
-            : $sections_pos >= 0 ? $sections_pos
-            :                      $modname_pos;
+        $bin->read_pos( $exprs_pos + $pos0 );
+        my $limit_pos = (
+              $symbols_pos >= 0 ? $symbols_pos
+            : $externs_pos >= 0 ? $externs_pos
+            :                     $modname_pos
+            ) +
+            $pos0;
         my $exprs = ObjExprs->unpack( $bin, $self->strings,
             $self->version, $limit_pos );
         $self->exprs($exprs);
     }
 
-    # ... TODO ...
+    # symbols
+    if ( $symbols_pos >= 0 ) {
+        $bin->read_pos( $symbols_pos + $pos0 );
+        my $limit_pos = (
+              $externs_pos >= 0
+            ? $externs_pos
+            : $modname_pos
+            ) +
+            $pos0;
+        my $symbols = ObjSymbols->unpack( $bin, $self->strings,
+            $self->version, $limit_pos );
+        $self->symbols($symbols);
+    }
+
+    # externs
+    if ( $externs_pos >= 0 ) {
+        $bin->read_pos( $externs_pos + $pos0 );
+        my $limit_pos = $modname_pos + $pos0;
+        my $externs   = ObjExterns->unpack( $bin, $self->strings,
+            $self->version, $limit_pos );
+        $self->externs($externs);
+    }
 
     # sections
     if ( $sections_pos >= 0 ) {
-        $bin->read_pos($sections_pos);
+        $bin->read_pos( $sections_pos + $pos0 );
         my $sections =
             ObjSections->unpack( $bin, $self->strings, $self->version );
         $self->sections($sections);
@@ -1950,13 +2303,14 @@ sub unpack {
 package ObjLibrary;
 
 use Modern::Perl;
-use Object::Tiny::RW qw( version modules );
+use Object::Tiny::RW qw( version modules strings );
 
 sub new {
     my ($class) = @_;
     return bless {
         version => $cur_version,
         modules => [],
+        strings => StringTable->new,
     }, $class;
 }
 
@@ -2006,6 +2360,118 @@ sub parse {
         }
     }
     $scanner->error("expected end library");
+}
+
+sub pack {
+    my ( $self, $bin ) = @_;
+
+    $self->strings( StringTable->new );    # new string table
+
+    # signature
+    $bin->pack_signature( $library_signature, $self->version );
+
+    # pointers
+    my $header_pos = $bin->size;
+    if ( $self->version >= 18 ) {
+        $bin->pack_dword(-1);    # placeholder for string table
+    }
+
+    # list of modules
+    if ( @{ $self->modules } == 0 ) {    # empty module list
+        $bin->pack_dword(-1);            # signal this is the last module
+        $bin->pack_dword( 0);            # signal this is deleted
+    }
+    else {
+        my $next_module_pos;
+        for my $module ( @{ $self->modules } ) {
+            $next_module_pos = $bin->size;
+            $bin->pack_dword(0);    # placeholder for next module
+            $bin->pack_dword(0);    # placeholder for this module size
+
+            my $module_start = $bin->size;
+            $module->pack($bin);
+            my $module_end = $bin->size;
+
+            my $module_size = $module_end - $module_start;
+
+            # patch placeholders
+            $bin->patch_dword( $next_module_pos + 0 * 4, $bin->size );
+            $bin->patch_dword( $next_module_pos + 1 * 4, $module_size );
+        }
+
+        # mark end of list
+        $next_module_pos or die;
+        $bin->patch_dword( $next_module_pos, -1 );    # end marker
+    }
+
+    # library index
+    if ( $self->version >= 18 ) {
+
+        # list of all public symbols of all modules
+        for my $module ( @{ $self->modules } ) {
+            for my $symbol ( @{ $module->symbols->symbols } ) {
+                if ( $symbol->scope eq "Public" ) {
+                    $self->strings->add( $symbol->name );
+                }
+            }
+        }
+    }
+
+    # string table
+    if ( $self->version >= 18 ) {
+        my $strings_pos = $bin->size;
+        $self->strings->pack($bin);
+        $bin->patch_dword( $header_pos + 0 * 4, $strings_pos );
+    }
+}
+
+sub unpack {
+    my ( $class, $bin ) = @_;
+
+    my $self = $class->new;
+
+    # signature
+    my ( $signature, $version ) = $bin->unpack_signature;
+
+    if ( $signature ne $library_signature ) {
+        die "invalid signature: $signature";
+    }
+
+    if ( $version < $min_version || $version > $cur_version ) {
+        die "invalid version: $version";
+    }
+
+    $self->version($version);
+
+    # get string table
+    if ( $self->version >= 18 ) {
+        my $strings_pos = $bin->unpack_dword;
+        my $save_pos    = $bin->read_pos;
+        $bin->read_pos($strings_pos);
+        my $strings = StringTable->unpack($bin);
+        $self->strings($strings);
+        $bin->read_pos($save_pos);
+    }
+
+    # get modules
+    my $next_module_pos = $bin->read_pos;
+    while ( $next_module_pos >= 0 ) {
+        $next_module_pos = $bin->unpack_dword;
+        my $size = $bin->unpack_dword;
+        if ( $size > 0 ) {    # not deleted
+            my $module = ObjModule->unpack($bin);
+            $self->add($module);
+        }
+
+        if ( $next_module_pos < 0 ) {
+            last;             # end marker
+        }
+        else {
+            $bin->read_pos($next_module_pos);
+        }
+    }
+
+    return $self;
 }
 
 #------------------------------------------------------------------------------

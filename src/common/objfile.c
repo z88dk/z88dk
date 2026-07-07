@@ -504,7 +504,10 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 		else
 			symbol->section = obj->sections;			// the first section
 
+		// value
 		symbol->value = xfread_dword(fp);
+		
+		// name
         if (obj->version >= 18)
             objfile_read_strid(obj, fp, symbol->name);
 		else if (obj->version >= 16)
@@ -512,8 +515,8 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 		else
 			xfread_bcount_str(symbol->name, fp);
 
-
-		if (obj->version >= 9) {			// add definition location
+		// definition location
+		if (obj->version >= 9) {
             if (obj->version >= 18)
                 objfile_read_strid(obj, fp, symbol->filename);
             else if (obj->version >= 16)
@@ -630,7 +633,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
                 printf("\nError expression range %d\n", range);
                 exit(EXIT_FAILURE);
             }
-            printf("    E %s", range_str);
+            printf("    E %-5s", range_str);
         }
 
 		// create a new expression
@@ -824,6 +827,17 @@ void objfile_read(objfile_t* obj, FILE* fp)
 		objfile_read_exprs(obj, fp,
 			fpos0 + fpos_exprs,
 			fpos0 + END(fpos_symbols, END(fpos_externs, fpos_modname)));
+			
+	// string table
+    if (opt_obj_list && obj->version >= 18) {
+		uint_t st_size = strtable_size(obj->st);
+		if (st_size > 1) {		// dont show string 0=""
+			printf("  Strings:\n");
+			for (uint_t i = 1; i < st_size; i++) {
+				printf("    S %3d = \"%s\"\n", (int)i, strtable_lookup(obj->st, i));
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1047,9 +1061,18 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
     UT_string* obj_signature;
     utstring_new(obj_signature);
 
+	// goto start of header
 	int next = SIGNATURE_SIZE;
+	xfseek(fp, next, SEEK_SET);
+	
+	// string table
+	strtable_t* st = NULL;
     if (file->version >= 18) {
-        next += sizeof(int32_t);                // skip string table pointer
+        long fpos_st = xfread_dword(fp);
+        next = ftell(fp);
+        xfseek(fp, fpos_st, SEEK_SET);
+        st = strtable_fread(fp);
+        xfseek(fp, next, SEEK_SET);
     }
 
 	int length = 0;
@@ -1080,7 +1103,19 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 			printf("\n");
 	} while (next != -1);
 
-    // no need to read string table, it is created while writing
+	// string table
+    if (st != NULL && opt_obj_list && file->version >= 18) {
+		uint_t st_size = strtable_size(st);
+		if (st_size > 1) {		// dont show string 0=""
+			printf("Library public symbols:\n");
+			for (uint_t i = 1; i < st_size; i++) {
+				printf("  S %3d = \"%s\"\n", (int)i, strtable_lookup(st, i));
+			}
+		}
+	}
+	if (st) {
+		strtable_free(st);
+	}
 
 	utstring_free(obj_signature);
 }

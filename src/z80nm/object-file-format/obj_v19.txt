@@ -246,5 +246,3 @@ History
          add symbol index in the library to speed up linking; 
 		 add Relocations section for simple relocations of symbol + addend 
 		 to speed up linking; 
-		 add end marker in the library instead of -1 file pointer 
-		 in the last module

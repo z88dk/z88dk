@@ -23,8 +23,8 @@ for my $version ( Obj::min_version .. Obj::cur_version ) {
         $obj->sections->add($section);
     }
 
-    for my $expr_type_id ( ObjExprType::min_id .. ObjExprType::max_id ) {
-        my $expr_type_name = ObjExprType::lookup_name($expr_type_id);
+    for my $expr_type_id ( ObjRangeType::min_id .. ObjRangeType::max_id ) {
+        my $expr_type_name = ObjRangeType::lookup_name($expr_type_id);
         next if $expr_type_name eq "Undefined";    # end marker, not a real type
         next if $expr_type_name eq "Assignment" && $version < 7;
 

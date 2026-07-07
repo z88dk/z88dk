@@ -18,7 +18,7 @@ for my $version ( Obj::min_version .. Obj::cur_version ) {
     $obj->version($version);
 
     # empty section
-    if ($version >= 5) {
+    if ( $version >= 5 ) {
         my $section = ObjSection->new;
         $obj->sections->add($section);
     }

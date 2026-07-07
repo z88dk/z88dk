@@ -4,8 +4,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(0, Undefined)         // end marker
-X(1, Local)             // local symbol
-X(2, Public)			// public symbol
+X(0, Undefined,         0)      // end marker
+X(1, Constant,          'C')    // constant symbol
+X(2, AddressRelative,   'A')    // offset to base address
+X(3, Computed,          '=')    // expression needs to be evaluated
 
 #undef X

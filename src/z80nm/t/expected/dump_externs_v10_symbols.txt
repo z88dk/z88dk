@@ -1,0 +1,6 @@
+Object  file test_t_dump_externs_t.o at $0000: Z80RMF10
+  Name: module1
+  Externs:
+    U         x1
+    U         x2
+    U         x3

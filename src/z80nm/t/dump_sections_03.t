@@ -20,13 +20,13 @@ for my $version ( Obj::min_version .. Obj::cur_version ) {
     # two sections
     my $section1 = ObjSection->new;
     $section1->name("section1") if $version >= 5;
-    $section1->bytes( [ 0..15 ] );
+    $section1->bytes( [ 0 .. 15 ] );
     $obj->sections->add($section1);
 
-    if ($version >= 5) {
+    if ( $version >= 5 ) {
         my $section2 = ObjSection->new;
         $section2->name("section2");
-        $section2->bytes( [ 0..15 ] );
+        $section2->bytes( [ 0 .. 15 ] );
         $obj->sections->add($section2);
     }
 

@@ -308,21 +308,21 @@ sym_type_t sym_type_ofile_code(int code) {
 //-----------------------------------------------------------------------------
 
 static range_lookup_t range_lu[] = {
-    { INT_MAX,  "?",    -1 },     // RANGE_UNDEFINED
-    { 'J',      "J",    1 },      // RANGE_JR_OFFSET
-    { 'U',      "U",    1 },      // RANGE_BYTE_UNSIGNED
-    { 'S',      "S",    1 },      // RANGE_BYTE_SIGNED
-    { 'C',      "W",    2 },      // RANGE_WORD
-    { 'B',      "B",    2 },      // RANGE_WORD_BE
-    { 'L',      "L",    4 },      // RANGE_DWORD
-    { 'u',      "u",    2 },      // RANGE_BYTE_TO_WORD_UNSIGNED
-    { 's',      "s",    2 },      // RANGE_BYTE_TO_WORD_SIGNED
-    { 'P',      "P",    3 },      // RANGE_PTR24
-    { 'H',      "H",    1 },      // RANGE_HIGH_OFFSET
-    { '=',      "=",    2 },      // RANGE_ASSIGNMENT
-    { 'j',      "j",    2 },      // RANGE_JRE_OFFSET
-    { 'v',      "v",    3 },      // RANGE_BYTE_TO_PTR_UNSIGNED
-    { 't',      "t",    3 },      // RANGE_BYTE_TO_PTR_SIGNED
+    { INT_MAX,  "?",        -1 },     // RANGE_UNDEFINED
+    { 'J',      "J8",       1 },      // RANGE_JR_OFFSET
+    { 'U',      "U8",       1 },      // RANGE_BYTE_UNSIGNED
+    { 'S',      "S8",       1 },      // RANGE_BYTE_SIGNED
+    { 'C',      "U16",      2 },      // RANGE_WORD
+    { 'B',      "U16BE",    2 },      // RANGE_WORD_BE
+    { 'L',      "S32",      4 },      // RANGE_DWORD
+    { 'u',      "U8-16",    2 },      // RANGE_BYTE_TO_WORD_UNSIGNED
+    { 's',      "S8-16",    2 },      // RANGE_BYTE_TO_WORD_SIGNED
+    { 'P',      "U24",      3 },      // RANGE_PTR24
+    { 'H',      "H8",       1 },      // RANGE_HIGH_OFFSET
+    { '=',      "=",        2 },      // RANGE_ASSIGNMENT
+    { 'j',      "J16",      2 },      // RANGE_JRE_OFFSET
+    { 'v',      "U8-24",    3 },      // RANGE_BYTE_TO_PTR_UNSIGNED
+    { 't',      "S8-24",    3 },      // RANGE_BYTE_TO_PTR_SIGNED
 };
 
 // size of each range in object file
