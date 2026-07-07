@@ -28,7 +28,6 @@
         ;EXTERN    __gfx_vram_page_out
 
     EXTERN  stencil_ptr
-    ;EXTERN    __graphics_end
     INCLUDE "classic/gfx/grafix.inc"
 
 stencil_add_lineto:
@@ -59,14 +58,18 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 ELSE
 
+    EXTERN  __plot_ADDR
+    ld      hl,stencil_add_pixel
+    ld      (__plot_ADDR),hl
+
     pop     af
     pop     hl
     ld      (stencil_ptr), hl
 
     pop     de                          ; y
     pop     hl                          ; x
-	ld      d,l
-	
+    ld      d,l
+    
     ld      hl, (__gfx_coords)
 
     push    hl
