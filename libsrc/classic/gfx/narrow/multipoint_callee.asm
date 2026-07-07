@@ -8,7 +8,6 @@
 ;
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- bool  multipoint(int hv, int length, int x, int y)
 
@@ -40,7 +39,9 @@ _multipoint_callee:
     ld      c, e                        ; h/v
     push    af                          ; ret addr
 asm_multipoint:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+	ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -82,10 +83,9 @@ exit:
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_out
   ENDIF
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+	ENDIF
     ld      h, d
     ld      l, e
     ret
-
-
-ENDIF
