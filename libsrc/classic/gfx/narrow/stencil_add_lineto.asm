@@ -8,13 +8,12 @@
 ;     Stefano Bodrato - 08/10/2009
 ;
 ;
-;    $Id: stencil_add_lineto.asm,v 1.8 2016-07-02 09:01:35 dom Exp $
+;    $Id: stencil_add_lineto.asm, $
 ;
 
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  stencil_add_lineto
     PUBLIC  _stencil_add_lineto
@@ -24,14 +23,19 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
     EXTERN  __gfx_coords
 
+    ; No paging required on the 'stencil' structures !
         ;EXTERN    __gfx_vram_page_in
         ;EXTERN    __gfx_vram_page_out
 
     EXTERN  stencil_ptr
     ;EXTERN    __graphics_end
+    INCLUDE "classic/gfx/grafix.inc"
 
 stencil_add_lineto:
 _stencil_add_lineto:
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
     push    ix
     ld      ix, 2
     add     ix, sp
@@ -52,4 +56,26 @@ _stencil_add_lineto:
         ;jp    __graphics_end
     pop     ix
     ret
+
+ELSE
+
+    pop     af
+    pop     hl
+    ld      (stencil_ptr), hl
+
+    pop     de                          ; y
+    pop     hl                          ; x
+	ld      d,l
+	
+    ld      hl, (__gfx_coords)
+
+    push    hl
+    push    de
+
+    push    hl
+    push    af
+
+    jp      Line
+
 ENDIF
+
