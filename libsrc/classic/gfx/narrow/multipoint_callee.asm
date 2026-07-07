@@ -41,16 +41,33 @@ _multipoint_callee:
 asm_multipoint:
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
-	ENDIF
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
     ld      de, 0
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rr      c
     jr      nc, horizontal
 vertical:
     sla     e
     rl      d
+ELSE
+    ld      a,c
+    rra
+    ld      c,a
+    jr      nc, horizontal
+vertical:
+    ld      a,e
+    or      a
+    rla
+    ld      e,a
+    ld      a,d
+    rla
+    ld      d,a
+ENDIF
+
     push    de
     push    hl
     push    bc
@@ -65,8 +82,18 @@ jv:
     djnz    vertical
     jr      exit
 horizontal:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     sla     e
     rl      d
+ELSE
+    ld      a,e
+    or      a
+    rla
+    ld      e,a
+    ld      a,d
+    rla
+    ld      d,a
+ENDIF
     push    de
     push    hl
     push    bc
@@ -85,7 +112,7 @@ exit:
   ENDIF
     IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-	ENDIF
+    ENDIF
     ld      h, d
     ld      l, e
     ret
