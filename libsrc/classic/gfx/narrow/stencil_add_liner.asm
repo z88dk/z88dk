@@ -56,6 +56,10 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 ELSE
 
+    EXTERN  __plot_ADDR
+    ld      hl,stencil_add_pixel
+    ld      (__plot_ADDR),hl
+
     pop     af
     pop     hl
     ld      (stencil_ptr), hl
