@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* Global FRAMEPTR opt-in: -1 disabled, 1 IX, 0 IY. Owned by the
    compiler (data.c) but consulted directly here so the lowerer stays
@@ -100,6 +101,12 @@ typedef struct {
     int cur_func_uses_params;
     int cur_home_is_word, cur_func_whome;
     int cur_byte_home_vreg, cur_byte_home_dirty, cur_func_ehome;
+    /* DE-home co-design: the general (non-accumulate) width-2 vreg the
+       orchestrator elected to keep in DE across a loop (e.g. searchbench `hi`),
+       or -1. Set by the orchestrator's residency decision; while it's live, the
+       binop/compare folds keep DE clean (read operands in place, no pair stage)
+       and the deref push/pop's DE, so the home survives the whole region. */
+    int cur_de_home;
     int cur_home_region_lo, cur_home_region_hi, cur_home_exit_flush_bb;
     int *bb_byte_out;
     /* Parallel to bb_byte_out: was the slot-backed byte home DIRTY (E holds
@@ -136,6 +143,7 @@ static LowerState L = {
     .rs = { .fa = -1, .i64_acc = -1 },
     .cur_hl_addr_off = -1, .cur_func_uses_params = 1,
     .cur_func_whome = -1, .cur_byte_home_vreg = -1, .cur_func_ehome = -1,
+    .cur_de_home = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
 };
@@ -487,6 +495,8 @@ static PhysReg byte_home_phys(const Func *f, int v);
 static int  byte_home_slotbacked(PhysReg pr);
 static const char *byte_home_reg(PhysReg pr);
 static int  byte_home_holds(int v);
+static PhysReg idxhalf_phys(const Func *f, int v);
+static const char *idxhalf_reg(PhysReg pr);
 static void byte_home_note(int v);
 static void byte_home_flush(FILE *out, const Func *f);
 /* Word (int) DE-home — width-aware siblings of the byte-home helpers; the
@@ -499,6 +509,9 @@ static void home_flush(FILE *out, const Func *f);
 static void home_clobber(FILE *out, const Func *f);
 static int  home_rehome(FILE *out, const Func *f);
 static int  home_is_slotbacked(const Func *f, int v);
+static const Op *find_unique_def(const Func *f, int v);
+static const Op *find_unique_use(const Func *f, int v);
+static int  de_home_indexed_add_ok(const Func *f, const Op *o);
 static void cache_de(int v);
 static void cache_bc(int v);
 static void cache_dehl(int v);
@@ -1365,6 +1378,155 @@ static int op_is_commutative(OpKind kind)
         || kind == IR_OR  || kind == IR_XOR;
 }
 
+/* Promote hot, currently-spilled SINGLE-DEF width-1 vregs to free index-register
+   halves (PR_IYL/IYH/IXL/IXH) — a slotless, clobber-free extra byte home. Purely
+   additive: only takes vregs the allocator left in a slot (IR_PR_SPILL), so it
+   never displaces a register home; a value that can't be placed simply stays in
+   its slot. Safe because:
+   - SINGLE-DEF ⇒ the def dominates every use (SSA), so the half is always valid
+     at a read (no belief/carry machinery needed);
+   - NO calls/asm in the function ⇒ the index reg is never clobbered (the operand
+     loader never stages there either);
+   - index halves only reach BASE-page ops (ld/add/sub/and/or/xor/cp a,iyl) —
+     the CB-page in-place shift paths gate on byte_home_phys, which excludes
+     index halves, so `sla iyl` (which doesn't exist) is never emitted.
+   z80/z80n/ez80 only (index-half ALU). Runs after ir_alloc, before
+   ir_assign_slots (so promoted vregs get needs_slot=0).
+
+   OPT-IN (IR_IDXHALF): DISABLED by default. Homing a byte in an index-register
+   half CLOBBERS the whole index register (IX/IY), but IY is callee-saved in the
+   z88dk ABI — e.g. l_qsort/l_bsearch hold the comparator function pointer in IY
+   across every comparator call (l_setiy + asm_l_qsort). A leaf comparator that
+   homes a byte in IYL/IYH corrupts that pointer → crash (was: stdlib bsearch
+   suite). Making this sound needs the function to push/pop the index register it
+   uses (with the matching param/frame-offset compensation across every calling
+   convention + teardown path); until that lands, the feature is off by default.
+   Set IR_IDXHALF to re-enable for measurement. */
+static void assign_idxhalf_homes(Func *f)
+{
+    if (!getenv("IR_IDXHALF")) return;   /* opt-in: unsound re callee-saved IX/IY */
+    if (!(c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80())) return;
+    if (!f || f->n_vregs <= 0 || !f->vreg_to_phys) return;
+    /* No calls/asm — else IX/IY would be trashed mid-live-range. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            OpKind k = f->bbs[b].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return;
+        }
+    /* Candidate halves — never offer halves of the FRAME register (it's used as
+       a pair by every (ix+d)/(iy+d) access, and the frame isn't a vreg so the
+       interval check can't see it). The frame reg is fixed globally by the
+       -frameix/-frameiy option: c_framepointer_is_ix == 1 → IX is the frame,
+       == 0 → IY is the frame, == -1 → sp-mode, neither. (fp_active is per-
+       function but unreliable here — frame_size isn't set until ir_assign_slots
+       runs after this pass; the global choice is the safe, stable gate.) A
+       non-frame index reg's own tenant (an idx2 counter/param) IS a vreg, so its
+       half availability is decided per byte by live-interval overlap below. */
+    PhysReg halves[4]; int nhalves = 0;
+    if (c_framepointer_is_ix != 0) {   /* IY is not the frame */
+        halves[nhalves++] = IR_PR_IYL; halves[nhalves++] = IR_PR_IYH;
+    }
+    if (c_framepointer_is_ix != 1) {   /* IX is not the frame */
+        halves[nhalves++] = IR_PR_IXL; halves[nhalves++] = IR_PR_IXH;
+    }
+    if (nhalves == 0) { return; }
+    /* Per-vreg def count, a DEPTH-WEIGHTED use score (a use in a loop body is
+       worth far more than a straight-line one — a byte compared each inner
+       iteration appears only ONCE statically but runs many times), and a
+       conservative live interval [first,last] in linear op order. Params are
+       live from entry (first=0). ir_op_defs is used so a self-stepped op
+       (defines src[0], not dst) is counted correctly. */
+    int nv = f->n_vregs;
+    int *ndef = calloc((size_t)nv, sizeof(int));
+    long *wuse = calloc((size_t)nv, sizeof(long));   /* depth-weighted use score */
+    int *first = malloc((size_t)nv * sizeof(int));
+    int *last  = malloc((size_t)nv * sizeof(int));
+    if (!ndef || !wuse || !first || !last) {
+        free(ndef); free(wuse); free(first); free(last); return;
+    }
+    for (int v = 0; v < nv; v++) { first[v] = INT_MAX; last[v] = -1; }
+    /* Cheap loop-nesting depth per BB (selection ranking only — never affects
+       correctness): count the back-edge spans [target..source] (id-based,
+       contiguous approximation) each BB falls in. f->bbs[].loop_depth is not
+       populated at this stage. */
+    int *bdep = calloc((size_t)f->n_bbs, sizeof(int));
+    if (bdep)
+        for (int i = 0; i < f->n_bbs; i++)
+            for (int s = 0; s < ir_bb_n_succ(&f->bbs[i]); s++) {
+                int t = ir_bb_succ_at(&f->bbs[i], s);
+                if (t < 0 || t > i) continue;             /* back-edge: t <= i */
+                for (int b = t; b <= i && b < f->n_bbs; b++) bdep[b]++;
+            }
+    int g = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        int dep = bdep ? bdep[b] : 0;
+        if (dep > 4) dep = 4;
+        long w = 1L << (3 * dep);            /* depth 0→1, 1→8, 2→64, … (~8×/level) */
+        for (int j = 0; j < f->bbs[b].n_ops; j++, g++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int d[8], u[16];
+            int nd = ir_op_defs(o, d, 8);
+            for (int k = 0; k < nd; k++) if (d[k] >= 0 && d[k] < nv) {
+                ndef[d[k]]++;
+                if (g < first[d[k]]) first[d[k]] = g;
+                if (g > last[d[k]])  last[d[k]]  = g;
+            }
+            int un = ir_op_uses(o, u, 16);
+            for (int k = 0; k < un; k++) if (u[k] >= 0 && u[k] < nv) {
+                wuse[u[k]] += w;
+                if (g < first[u[k]]) first[u[k]] = g;
+                if (g > last[u[k]])  last[u[k]]  = g;
+            }
+        }
+    }
+    for (int v = 0; v < nv; v++)
+        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+            first[v] = 0;                                   /* live from entry */
+    /* Greedily place the hottest eligible bytes; each into the first candidate
+       half free over its interval (no overlapping vreg on the same half or on
+       the whole pair). Multiple bytes can share a pair (IYL + IYH) or reuse a
+       half's pair across disjoint ranges. */
+    for (;;) {
+        int best = -1;
+        for (int v = 0; v < nv; v++) {
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;   /* additive only */
+            if (f->vregs[v].width != 1) continue;
+            /* PARAMs are live-in from the caller with NO def op that writes the
+               half — the incoming value would never reach a slotless index home
+               (and ndef counts only its in-body redefs, hiding this). Exclude. */
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))
+                continue;
+            if (ndef[v] != 1) continue;                        /* SSA dominance */
+            if (wuse[v] < 8) continue;                         /* hot: ≥1 loop use */
+            if (last[v] < 0) continue;                         /* dead */
+            if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                continue;
+            if (best < 0 || wuse[v] > wuse[best]) best = v;
+        }
+        if (best < 0) break;
+        int placed = 0;
+        for (int h = 0; h < nhalves && !placed; h++) {
+            PhysReg H = halves[h];
+            PhysReg pair = (H == IR_PR_IYL || H == IR_PR_IYH) ? IR_PR_IY : IR_PR_IX;
+            int conflict = 0;
+            for (int u = 0; u < nv && !conflict; u++) {
+                PhysReg pu = f->vreg_to_phys[u];
+                if (pu != H && pu != pair) continue;   /* same half, or full-pair tenant */
+                int s = first[best] > first[u] ? first[best] : first[u];
+                int e = last[best]  < last[u]  ? last[best]  : last[u];
+                if (s <= e) conflict = 1;              /* intervals overlap */
+            }
+            if (!conflict) { f->vreg_to_phys[best] = H; placed = 1; }
+        }
+        if (!placed) {
+            /* No half free over its range — mark ineligible so the scan
+               advances (keep it spilled). */
+            ndef[best] = 0;
+        }
+    }
+    free(ndef); free(wuse); free(first); free(last); free(bdep);
+}
+
 int ir_lower_func(FILE *out, Func *f)
 {
     if (!f) {
@@ -1430,6 +1592,7 @@ int ir_lower_func(FILE *out, Func *f)
            clean the NOPs it leaves. Gated on c_word_resident ⇒ inert
            (byte-identical) when off. */
         int reassoc = ir_opt_reassoc_reduction(f);
+        int rcoal   = ir_opt_reduce_coalesce(f);
         int cse     = ir_opt_cse(f);
         /* After cse so duplicate per-lane address ADDs have been
            merged; before the long-push inserter. */
@@ -1475,7 +1638,7 @@ int ir_lower_func(FILE *out, Func *f)
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
              || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
-             || pruned > 0)
+             || rcoal > 0 || pruned > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
                     "ir_opt: %d prune, %d licm, %d ivsr, %d early, %d st2ld, "
@@ -1496,6 +1659,7 @@ int ir_lower_func(FILE *out, Func *f)
     ir_compute_op_liveness(f);
     ir_compute_live_ranges(f);
     ir_alloc(f);
+    assign_idxhalf_homes(f);
     ir_assign_slots(f);
     /* IR_DUMP_ALLOC prints the IR with phys-reg assignments and live ranges
        (distinct from the pre-lower IR_DUMP — reflects the allocator's view). */
@@ -1657,13 +1821,18 @@ int ir_lower_func(FILE *out, Func *f)
             L.cur_home_is_word = 1;
             L.cur_func_whome = f->word_home_vreg;
             L.la.cur_branch_test_kind = 0;
+            /* Same DE-home fold arming as the render, so op_de_clean's region
+               proof here matches what the render will actually emit. */
+            if (f->de_home_general) L.cur_de_home = f->word_home_vreg;
             compute_home_region(f, f->word_home_vreg, bb_alias, &wlo, &whi);
             L.cur_home_is_word = 0;
             L.cur_func_whome = -1;
+            L.cur_de_home = -1;
             if (wlo < 0) {
                 memcpy(f->vreg_to_phys, wh_prepick,
                        (size_t)f->n_vregs * sizeof(int));
                 f->word_home_vreg = -1;
+                f->de_home_general = 0;
                 ir_assign_slots(f);
             }
         }
@@ -1867,6 +2036,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.cur_func_ehome = -1;
     L.cur_home_is_word = 0;
     L.cur_func_whome = -1;
+    L.cur_de_home = -1;          /* set by the orchestrator's DE-home decision */
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vreg_to_phys
             && byte_home_slotbacked(f->vreg_to_phys[v])) { L.cur_func_ehome = v; break; }
@@ -1880,6 +2050,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         L.cur_func_whome = f->word_home_vreg;
         L.cur_func_ehome = L.cur_func_whome;
         L.cur_home_is_word = 1;
+        /* General (non-accumulate) DE-home: arm the (ix+d) compare/ALU folds so
+           the region stays DE-clean. -1 for a reduction accumulator (the
+           try_word_accumulate path already keeps DE = home). */
+        if (f->de_home_general) L.cur_de_home = f->word_home_vreg;
     }
     /* Home-resident loop: where the slot-backed home stays in E/D (or DE)
        across a loop, suppress per-iter spills + assert residency at the

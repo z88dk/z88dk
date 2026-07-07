@@ -187,6 +187,10 @@ const char *ir_phys_name(PhysReg pr)
     case IR_PR_BC:     return "BC";
     case IR_PR_IX:     return "IX";
     case IR_PR_IY:     return "IY";
+    case IR_PR_IXL:    return "IXL";
+    case IR_PR_IXH:    return "IXH";
+    case IR_PR_IYL:    return "IYL";
+    case IR_PR_IYH:    return "IYH";
     case IR_PR_DEHL:   return "DEHL";
     case IR_PR_AF_ALT: return "AF'";
     case IR_PR_HL_ALT: return "HL'";
@@ -236,6 +240,7 @@ Func *ir_func_new(SYMBOL *fn)
     f->has_setjmp = 0;
     f->ns = NULL;
     f->word_home_vreg = -1;
+    f->de_home_general = 0;
     f->vreg_to_phys = NULL;
     f->vreg_spill_slot = NULL;
     f->live_ranges = NULL;

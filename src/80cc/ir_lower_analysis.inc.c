@@ -1,5 +1,48 @@
 /* ir_lower_analysis.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
 
+/* The single op that USES vreg v, or NULL if v has zero or multiple uses.
+   Whole-function scan (uses via ir_op_uses). */
+static const Op *find_unique_use(const Func *f, int v)
+{
+    const Op *found = NULL;
+    if (v < 0 || v >= f->n_vregs) return NULL;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int u[16];
+            int nu = ir_op_uses(&bb->ops[j], u, (int)(sizeof u / sizeof u[0]));
+            for (int k = 0; k < nu; k++)
+                if (u[k] == v) {
+                    if (found && found != &bb->ops[j]) return NULL;
+                    found = &bb->ops[j];
+                }
+        }
+    }
+    return found;
+}
+
+/* The single op that defines vreg v, or NULL if v has zero or multiple defs.
+   Whole-function scan (defs counted via ir_op_defs, POSTSTEP included). Used by
+   the general DE-home indexed-deref fold to inspect a shift's shape. */
+static const Op *find_unique_def(const Func *f, int v)
+{
+    const Op *found = NULL;
+    if (v < 0 || v >= f->n_vregs) return NULL;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&bb->ops[j], defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] == v) {
+                    if (found) return NULL;   /* multiple defs */
+                    found = &bb->ops[j];
+                }
+        }
+    }
+    return found;
+}
+
 /* Max BB id in the natural loop of back-edge latch->header: the header plus
    every block that can reach the latch without passing through the header
    (backward reachability over preds). Returns latch's id if any body block is
@@ -580,6 +623,12 @@ static int vreg_in_register_pool(const Func *f, int v)
 static int byte_dst_cache_ok(const Func *f, int v)
 {
     if (byte_home_is_slotbacked(f, v)) return 0;
+    /* Index-half home (IXL/IXH/IYL/IYH): reads go through the half register
+       (`ld a,iyl`), NOT the A-cache — so the value MUST be written to the half
+       at every def. Leaving it only in A (cur_dst_dead byte immediately
+       consumed by a WIDENING read, which reloads the half) reads a never-written
+       home. Force the store, same as a slot-backed home. */
+    if (idxhalf_phys(f, v) != IR_PR_NONE) return 0;
     return L.la.cur_dst_dead || vreg_in_register_pool(f, v);
 }
 
