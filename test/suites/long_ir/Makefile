@@ -10,7 +10,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -109,6 +109,43 @@ remat.bin: $(SOURCES) remat.c
 
 idxcmp.bin: $(SOURCES) idxcmp.c
 	$(compile)
+	$(runtest)
+
+# Byte-wise (ix+d) int compare fold. sp build (fold fp-gated → inert) validates
+# the ordinary compare path; ixdcmp_fp below exercises the fold itself.
+ixdcmp.bin: $(SOURCES) ixdcmp.c
+	$(compile)
+	$(runtest)
+
+# fp-mode: params are (ix+d) slots, so every relation folds byte-wise in place.
+ixdcmp_fp.bin: $(SOURCES) ixdcmp.c
+	$(call compile,-Cc-frameix)
+	$(runtest)
+
+# General DE-home co-design. sp build: feature inert (fp-only) → validates the
+# ordinary path. fp build (-Cc-frameix): the inlined binary searches home lo/hi
+# in DE across the loop — exercises the compare fold, add hl,de, indexed deref,
+# and ex-de-hl home-def.
+dehome.bin: $(SOURCES) dehome.c
+	$(compile)
+	$(runtest)
+
+dehome_fp.bin: $(SOURCES) dehome.c
+	$(call compile,-Cc-frameix)
+	$(runtest)
+
+# Index-half BYTE HOME (second byte home in IYL/IXL). sp-mode (the default
+# compile) has IY free, so this build exercises the index-half home on z80;
+# the assert is width-independent so gbz80/8080/8085 validate the slot fallback.
+idxhome.bin: $(SOURCES) idxhome.c
+	$(compile)
+	$(runtest)
+
+# fp-mode: exercises INTERVAL REUSE of the index reg — mix2's `len` param owns IY
+# only at entry (end = data+len), then `b` reuses IYL for the loop. The sp build
+# above has IY free outright; this one proves the live-interval overlap path.
+idxhome_fp.bin: $(SOURCES) idxhome.c
+	$(call compile,-Cc-frameix)
 	$(runtest)
 
 # Same test in FRAME-POINTER mode: the index-half signed compare

@@ -67,6 +67,12 @@ typedef enum {
     IR_PR_B,           /* width-1 byte home: high half of BC (headroom) */
     IR_PR_IX,
     IR_PR_IY,
+    /* width-1 byte homes in index-register halves (z80/z80n/ez80 only —
+       ld a,iyl / ld iyl,a / add a,iyl etc.). SLOTLESS and clobber-free in a
+       no-call region (the operand loader never stages in an index reg), so
+       unlike PR_E/PR_D they need no backing slot, lazy-spill, or cross-BB carry:
+       the value rides the half from its def for the whole region. */
+    IR_PR_IXL, IR_PR_IXH, IR_PR_IYL, IR_PR_IYH,
     IR_PR_DEHL,        /* 32-bit pair occupying DE and HL together */
     IR_PR_AF_ALT,
     IR_PR_HL_ALT,
@@ -539,6 +545,14 @@ typedef struct {
        home from ordinary single-def IR_PR_DE transients (both carry phys
        IR_PR_DE). Set by ir_alloc, read by ir_lower. */
     int        word_home_vreg;
+
+    /* DE-home co-design (opt-in IR_DE_HOME): set when word_home_vreg is a
+       GENERAL (non-reduction) loop-carried width-2 vreg (e.g. searchbench
+       `hi`) rather than a reduction accumulator. The lowerer keeps DE clean
+       across the region via the (ix+d) compare/ALU folds + a push/pop-de deref,
+       and commits a general home-def to DE. 0 = reduction accumulator (the
+       existing try_word_accumulate path). */
+    int        de_home_general;
 
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
