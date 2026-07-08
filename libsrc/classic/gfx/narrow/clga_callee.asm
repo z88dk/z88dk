@@ -1,7 +1,6 @@
+
 ;Usage: clga(int tlx, int tly, int tlx2, int tly2)
 
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  clga_callee
@@ -18,6 +17,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 
 clga_callee:
 _clga_callee:
+
     pop     af                          ; ret addr
     pop     bc                          ; y2
     pop     hl
@@ -28,16 +28,20 @@ _clga_callee:
     push    af                          ; ret addr
 
 asm_clga:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
+
     call    cleararea
+
   IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
+    ENDIF
     ret
   ENDIF
-
-ENDIF
