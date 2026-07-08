@@ -9,17 +9,17 @@
 ;    Since some platform (expecially the TI83) has very little stack space,
 ;    we undersize it; this will cause a crash if a big area is filled.
 ;
-;    GENERIC VERSION
-;   IT DOESN'T MAKE USE OF ALTERNATE REGISTERS
-;   IT IS BASED ON "pointxy" and "plotpixel"
-;   (dfill at the moment is Z80 only and uses pixeladdress)
+;
+;   GENERIC VERSION
+;
+;   ZX81 friendly (DOESN'T USE ALTERNATE REGISTERS)
+;   8080 compatibility (not much optimized but it works)
+;
+;   BASED ON "pointxy" and "plotpixel"
+;
 ;
 ;    $Id: dfill2.asm $
 ;
-
-
-; TODO: the Intel 8080 version is still broken
-;       it completes the picture but misses the buffer terminator and overflows (crashing)
 
 
     SECTION code_graphics
@@ -81,12 +81,17 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ELSE
     push    hl
     SWAP_FILLPTR
+    push    hl
 ENDIF
+
     call    cfill
+
 IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
     pop     hl
 ELSE
+    pop     hl                    ; prev ptr
+    SWAP_FILLPTR
     pop     hl                    ; prev ptr
     SWAP_FILLPTR
 ENDIF
