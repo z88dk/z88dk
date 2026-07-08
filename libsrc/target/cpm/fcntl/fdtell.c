@@ -9,7 +9,7 @@
 #include <cpm.h>
 
 
-long fdtell(int fd)
+long fdtell(int fd) 
 {
     struct fcb *fc = (struct fcb *)fd;
 

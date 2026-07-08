@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <cpm.h>
 
-long lseek(int fd,long posn, int whence)
+long lseek(int fd,long posn, int whence) __z88dk_saveframe
 {
     struct fcb *fc = (struct fcb *)fd;
     unsigned long    pos;

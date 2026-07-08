@@ -14,7 +14,7 @@
 #include <cpm.h>
 
 
-ssize_t write(int fd, void *buf, size_t len)
+ssize_t write(int fd, void *buf, size_t len) __z88dk_saveframe
 {
     unsigned char uid;
     size_t cnt,size,offset;

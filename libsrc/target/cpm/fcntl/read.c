@@ -16,7 +16,7 @@
 extern void *_CPM_READ_CACHE_ALWAYS;
 #define CPM_READ_CACHE_ALWAYS (int)&_CPM_READ_CACHE_ALWAYS
 
-ssize_t read(int fd, void *buf, size_t len)
+ssize_t read(int fd, void *buf, size_t len) __z88dk_saveframe
 {
 #ifdef DEVICES
     unsigned char buffer[SECSIZE+2];

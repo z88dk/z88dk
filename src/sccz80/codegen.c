@@ -1500,8 +1500,8 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
-        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & SAVEFRAME )) &&
-            (currfn->ctype->flags & NAKED) == 0) {
+        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+            (currfn->flags & NAKED) == 0) {
             gen_pop_frame();
             Zsp += 2;
         }
@@ -5369,8 +5369,8 @@ void OutIndex(int val)
 
 void gen_push_frame(void)
 {
-    if ( (currfn->ctype->flags & NAKED) == 0) {
-        if ( (currfn->ctype->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+    if ( (currfn->flags & NAKED) == 0) {
+        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
                 ot("push\t");
                 outstr(FRAME_REGISTER);
@@ -5394,8 +5394,8 @@ void gen_push_frame(void)
 
 void gen_pop_frame(void)
 {
-    if ( (currfn->ctype->flags & NAKED) == 0) {
-        if ( (currfn->ctype->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+    if ( (currfn->flags & NAKED) == 0) {
+        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
                 ot("pop\t");
                 outstr(FRAME_REGISTER);

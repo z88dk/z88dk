@@ -11,7 +11,7 @@
 
 #if defined(__SDCC) || defined(__SDCC_IX) || defined(__SDCC_IY)
 
-void _putoffset(unsigned char *where,long offset)
+void _putoffset(unsigned char *where,long offset) __smallc
 {
     unsigned char *offset_bytes = (unsigned char *)&offset;
 

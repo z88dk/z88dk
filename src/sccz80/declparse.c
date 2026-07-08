@@ -1880,8 +1880,9 @@ static void declfunc(Type *functype, enum storage_type storage)
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function
         */
-    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & SAVEFRAME )) &&
-            (currfn->ctype->flags & NAKED) == 0)
+
+    if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+            (currfn->flags & NAKED) == 0)
         where += 2;
 
     if ( functype->flags & INTERRUPT ) {
