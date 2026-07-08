@@ -3133,7 +3133,7 @@ static void configure_compiler(void)
         preprocarg = " -D__XCC";
         BuildOptions(&cpparg, preprocarg);
         c_compiler = "xcc";
-        add_option_to_compiler("-S -O2 --sdcccall 0 --c1mode");
+        add_option_to_compiler("-S -Os --sdcccall 0 --c1mode");
         c_cpp_exe = c_sdcc_preproc_exe;
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__XCC");
