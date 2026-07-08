@@ -30,7 +30,6 @@
     EXTERN  pointxy
     EXTERN  plotpixel
 
-defc __CPU_INTEL__ = 1
 
 IF  __CPU_INTEL__|__CPU_GBZ80__
 
@@ -54,7 +53,7 @@ ENDIF
 ;     e=x0 d=y0
 
 do_fill:
-	ld      (spsave),sp
+    ld      (spsave),sp
     ld      hl, -_GFX_MAXY*3      ; create buffer 1 on stack
     add     hl, sp                ; The stack size depends on the display height.
     ld      sp, hl                ; The worst case is when we paint a blank
@@ -103,9 +102,9 @@ ENDIF
     jr      nz, loop
 
 
-	ld      hl,(spsave)
+    ld      hl,(spsave)
     ld      sp, hl
-	ret
+    ret
 
 ;    ld      hl, _GFX_MAXY*6       ; restore the stack pointer (parm*2)
 ;    add     hl, sp
