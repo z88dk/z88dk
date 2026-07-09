@@ -4,20 +4,20 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(0,  Undefined,         0,   "",      -1)  // end marker
-X(1,  JrOffset,          'J', "J8",    1)   // 8-bit relative offset for JR
-X(2,  ByteUnsigned,      'U', "U8",    1)   // 8-bit unsigned
-X(3,  ByteSigned,        'S', "S8",    1)   // 8-bit signed
-X(4,  Word,              'C', "U16",   2)   // 16-bit value little-endian
-X(5,  WordBE,            'B', "U16BE", 2)   // 16-bit value big-endian
-X(6,  DWord,             'L', "S32",   4)   // 32-bit signed
-X(7,  ByteToWordUnsigned,'u', "U8-16", 2)   // unsigned byte extended to 16 bits
-X(8,  ByteToWordSigned,  's', "S8-16", 2)   // signed byte sign-extended to 16 bits
-X(9,  Ptr24,             'P', "U24",   3)   // 24-bit pointer
-X(10, HighOffset,        'H', "H8",    1)   // byte offset to 0xFF00
-X(11, Assignment,        '=', "=",     2)   // DEFC expression assigning a symbol
-X(12, JreOffset,         'j', "J16",   2)   // 16-bit relative offset for JRE
-X(13, ByteToPtrUnsigned, 'v', "U8-24", 3)   // unsigned byte extended to 24 bits
-X(14, ByteToPtrSigned,   't', "S8-24", 3)   // signed byte sign-extended to 24 bits
+X(0,  Undefined,         0,   "",      -1,	"end marker")
+X(1,  JrOffset,          'J', "J8",    1,	"8-bit relative offset for JR")
+X(2,  ByteUnsigned,      'U', "U8",    1,	"8-bit unsigned")
+X(3,  ByteSigned,        'S', "S8",    1,	"8-bit signed")
+X(4,  Word,              'C', "U16",   2,	"16-bit value little-endian")
+X(5,  WordBE,            'B', "U16BE", 2,	"16-bit value big-endian")
+X(6,  DWord,             'L', "S32",   4,	"32-bit signed")
+X(7,  ByteToWordUnsigned,'u', "U8-16", 2,	"unsigned byte extended to 16 bits")
+X(8,  ByteToWordSigned,  's', "S8-16", 2,	"signed byte sign-extended to 16 bits")
+X(9,  Ptr24,             'P', "U24",   3,	"24-bit pointer")
+X(10, HighOffset,        'H', "H8",    1,	"byte offset to 0xFF00")
+X(11, Assignment,        '=', "=",     2,	"DEFC expression assigning a symbol")
+X(12, JreOffset,         'j', "J16",   2,	"16-bit relative offset for JRE")
+X(13, ByteToPtrUnsigned, 'v', "U8-24", 3,	"unsigned byte extended to 24 bits")
+X(14, ByteToPtrSigned,   't', "S8-24", 3,	"signed byte sign-extended to 24 bits")
 
 #undef X

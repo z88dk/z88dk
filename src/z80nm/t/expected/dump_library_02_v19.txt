@@ -14,7 +14,7 @@ Object  file test_t_dump_library_02_t.o at $0014: Z80RMF19
     S   4 = "public2"
     S   5 = "module1"
 
-Object  file test_t_dump_library_02_t.o at $0104: Z80RMF19
+Object  file test_t_dump_library_02_t.o at $0108: Z80RMF19
   Name: module2
   CPU:  z80 
   Symbols:

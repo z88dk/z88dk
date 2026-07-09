@@ -967,11 +967,263 @@ sub unpack {
         if ( my $expr =
             ObjExpr->unpack( $bin, $strings, \$last_file, $version ) )
         {
-            push @{ $self->exprs }, $expr;
+            $self->add($expr);
         }
         else {
             last;    # end marker
         }
+    }
+    return $self;
+}
+
+#------------------------------------------------------------------------------
+# ObjRelocs
+#------------------------------------------------------------------------------
+package ObjReloc;
+
+use Modern::Perl;
+use Object::Tiny::RW qw( type symbol addend section patch_ptr file line );
+
+sub new {
+    my ($class) = @_;
+    return bless {
+        type      => "Undefined",
+        symbol    => "",
+        addend    => 0,
+        section   => "",
+        patch_ptr => 0,
+        file      => "",
+        line      => 0,
+    }, $class;
+}
+
+sub dump {
+    my ( $self, $ctx ) = @_;
+    $ctx->out("begin reloc");
+    my $child = $ctx->child;
+    $child->out_kv( "type",
+        $self->type . " ; (" . ObjRangeType::lookup_id( $self->type ) . ")" );
+    $child->out_kv( "symbol",    $self->symbol );
+    $child->out_kv( "addend",    sprintf( "0x%04X", $self->addend ) );
+    $child->out_kv( "section",   "\"" . $self->section . "\"" );
+    $child->out_kv( "patch_ptr", sprintf( "0x%04X", $self->patch_ptr ) );
+    $child->out_kv( "file",      "\"" . $self->file . "\"" ) if $self->file;
+    $child->out_kv( "line",      $self->line )               if $self->line;
+    $ctx->out("end reloc");
+}
+
+sub parse {
+    my ( $class, $scanner ) = @_;
+
+    if ( $scanner->text !~ /^begin\s+reloc$/ ) {
+        return undef;
+    }
+
+    $scanner->advance;
+    my $self = $class->new;
+    while ( !$scanner->end ) {
+        if ( $scanner->text =~ /^end\s+reloc$/ ) {
+            $scanner->advance;
+            return $self;
+        }
+        elsif ( $scanner->text =~ /type\s*=\s*(.*?)\s*$/ ) {
+            my $type = $1;
+            $type =~ /^\w+$/ or $scanner->error("invalid type: $type");
+            my $type_id = ObjRangeType::lookup_id($type)
+                or $scanner->error("invalid type: $type");
+            $self->type($type);
+            $scanner->advance;
+        }
+        elsif ( $scanner->text =~ /symbol\s*=\s*(.*?)\s*$/ ) {
+            my $symbol = $1;
+            $symbol =~ /^\w+$/ or $scanner->error("invalid symbol: $symbol");
+            $self->symbol($symbol);
+            $scanner->advance;
+        }
+        elsif ( $scanner->text =~ /addend\s*=\s*(.*?)\s*$/ ) {
+            my $addend = eval("($1)+0");
+            $@ and $scanner->error("invalid addend: $addend");
+            $addend >= 0 or $scanner->error("invalid addend: $addend");
+            $self->addend($addend);
+            $scanner->advance;
+        }
+        elsif ( $scanner->text =~ /section\s*=\s*\"(.*?)\"\s*$/ ) {
+            my $section = $1;
+            $self->section($section);
+            $scanner->advance;
+        }
+        elsif ( $scanner->text =~ /patch_ptr\s*=\s*(.*?)\s*$/ ) {
+            my $patch_ptr = eval("($1)+0");
+            $@ and $scanner->error("invalid patch_ptr: $patch_ptr");
+            $patch_ptr >= 0 or $scanner->error("invalid patch_ptr: $patch_ptr");
+            $self->patch_ptr($patch_ptr);
+            $scanner->advance;
+        }
+        elsif ( $scanner->text =~ /file\s*=\s*\"(.*?)\"\s*$/ ) {
+            my $file = $1;
+            $self->file($file);
+            $scanner->advance;
+        }
+        elsif ( $scanner->text =~ /line\s*=\s*(.*?)\s*$/ ) {
+            my $line = eval("($1)+0");
+            $@ and $scanner->error("invalid line: $line");
+            $line > 0 or $scanner->error("invalid line: $line");
+            $self->line($line);
+            $scanner->advance;
+        }
+        else {
+            $scanner->error("cannot parse");
+        }
+    }
+    $scanner->error("expected end reloc");
+}
+
+sub pack {
+    my ( $self, $bin, $strings, $version ) = @_;
+
+    # pack type
+    my $id = ObjRangeType::lookup_id( $self->type );
+    $bin->pack_dword($id);
+
+    # pack filename and line number
+    $id = $strings->add( $self->file );
+    $bin->pack_dword($id);
+    $bin->pack_dword( $self->line );
+
+    # pack section
+    $id = $strings->add( $self->section );
+    $bin->pack_dword($id);
+
+    # pack patch_ptr
+    $bin->pack_dword( $self->patch_ptr );
+
+    # pack symbol
+    $id = $strings->add( $self->symbol );
+    $bin->pack_dword($id);
+
+    # pack addend
+    $bin->pack_dword( $self->addend );
+}
+
+sub unpack {
+    my ( $class, $bin, $strings, $version ) = @_;
+    my $self = $class->new;
+
+    # unpack type or end marker
+    my $id = $bin->unpack_dword;
+    if ( $id == 0 ) {
+        return undef;    # end marker
+    }
+    my $type = ObjRangeType::lookup_name($id);
+    $type or die "invalid reloc type id: $id";
+    $self->type($type);
+
+    # unpack filename and line number
+    $id = $bin->unpack_dword;
+    my $file = $strings->get($id);
+    $self->file($file);
+
+    my $line = $bin->unpack_dword;
+    $self->line($line);
+
+    # unpack section
+    $id = $bin->unpack_dword;
+    my $section = $strings->get($id);
+    $self->section($section);
+
+    # unpack patch_ptr
+    my $patch_ptr = $bin->unpack_dword;
+    $self->patch_ptr($patch_ptr);
+
+    # unpack symbol
+    $id = $bin->unpack_dword;
+    my $symbol = $strings->get($id);
+    $self->symbol($symbol);
+
+    # unpack addend
+    my $addend = $bin->unpack_dword;
+    $self->addend($addend);
+
+    return $self;
+}
+
+#------------------------------------------------------------------------------
+package ObjRelocs;
+
+use Modern::Perl;
+use Object::Tiny::RW qw( relocs );
+
+sub new {
+    my ($class) = @_;
+    return bless { relocs => [] }, $class;
+}
+
+sub add {
+    my ( $self, $reloc ) = @_;
+    push @{ $self->relocs }, $reloc;
+}
+
+sub dump {
+    my ( $self, $ctx ) = @_;
+    if ( @{ $self->relocs } ) {
+        $ctx->out("begin relocs");
+        my $child = $ctx->child;
+        for my $reloc ( @{ $self->relocs } ) {
+            $reloc->dump($child);
+        }
+        $ctx->out("end relocs");
+    }
+}
+
+sub parse {
+    my ( $class, $scanner ) = @_;
+
+    if ( $scanner->text !~ /^begin\s+relocs$/ ) {
+        return undef;
+    }
+
+    $scanner->advance;
+    my $self = $class->new;
+    while ( !$scanner->end ) {
+        if ( $scanner->text =~ /^end\s+relocs$/ ) {
+            $scanner->advance;
+            return $self;
+        }
+        elsif ( my $reloc = ObjReloc->parse($scanner) ) {
+            $self->add($reloc);
+        }
+        else {
+            $scanner->error("cannot parse");
+        }
+    }
+    $scanner->error("expected end relocs");
+}
+
+sub pack {
+    my ( $self, $bin, $strings, $version ) = @_;
+    if ( @{ $self->relocs } ) {
+        my $pos = $bin->size;
+
+        # pack relocations
+        for my $reloc ( @{ $self->relocs } ) {
+            $reloc->pack( $bin, $strings, $version );
+        }
+
+        # pack end terminator
+        $bin->pack_dword(0);
+
+        return $pos;
+    }
+    else {
+        return -1;
+    }
+}
+
+sub unpack {
+    my ( $class, $bin, $strings, $version ) = @_;
+    my $self = $class->new;
+    while ( my $reloc = ObjReloc->unpack( $bin, $strings, $version ) ) {
+        $self->add($reloc);
     }
     return $self;
 }
@@ -1978,9 +2230,11 @@ sub unpack {
 package ObjModule;
 
 use Modern::Perl;
-use Object::Tiny::RW qw( version name cpu swap_ixiy org
-    exprs symbols externs sections
-    strings );
+use Object::Tiny::RW qw(
+    version name cpu swap_ixiy org
+    exprs relocs symbols externs sections
+    strings
+);
 
 sub new {
     my ($class) = @_;
@@ -1991,6 +2245,7 @@ sub new {
         swap_ixiy => 0,
         org       => undef,
         exprs     => ObjExprs->new,
+        relocs    => ObjRelocs->new,
         symbols   => ObjSymbols->new,
         externs   => ObjExterns->new,
         sections  => ObjSections->new,
@@ -2014,6 +2269,9 @@ sub dump {
             if defined $self->org;
     }
     $self->exprs->dump($child);
+    if ( $self->version >= 19 ) {
+        $self->relocs->dump($child);
+    }
     $self->symbols->dump($child);
     $self->externs->dump($child);
     $self->sections->dump($child);
@@ -2075,6 +2333,9 @@ sub parse {
         elsif ( my $exprs = ObjExprs->parse($scanner) ) {
             $self->exprs($exprs);
         }
+        elsif ( my $relocs = ObjRelocs->parse($scanner) ) {
+            $self->relocs($relocs);
+        }
         elsif ( my $symbols = ObjSymbols->parse($scanner) ) {
             $self->symbols($symbols);
         }
@@ -2123,12 +2384,21 @@ sub pack {
     for ( 1 .. 5 ) {
         $bin->pack_dword(-1);
     }
+
+    if ( $self->version >= 19 ) {
+        $bin->pack_dword(-1);    # relocs
+    }
+
     if ( $self->version >= 18 ) {
-        $bin->pack_dword(-1);
+        $bin->pack_dword(-1);    # string table
     }
 
     # write expressions
     my $exprs_pos = $self->exprs->pack( $bin, $self->strings, $self->version );
+
+    # write relocs
+    my $relocs_pos =
+        $self->relocs->pack( $bin, $self->strings, $self->version );
 
     # write symbols
     my $symbols_pos =
@@ -2156,19 +2426,40 @@ sub pack {
         $self->sections->pack( $bin, $self->strings, $self->version );
 
     # write string table
+    my $strings_pos = -1;
     if ( $self->version >= 18 ) {
-        my $strings_pos = $bin->size;
+        $strings_pos = $bin->size;
         $self->strings->pack($bin);
-        $bin->patch_dword( $header_pos + 5 * 4, $strings_pos - $pos0 );
     }
 
     # write pointers
     my $pos_f = sub { my ($pos) = @_; return $pos < 0 ? $pos : $pos - $pos0; };
-    $bin->patch_dword( $header_pos + 0 * 4, $pos_f->($modname_pos) );
-    $bin->patch_dword( $header_pos + 1 * 4, $pos_f->($exprs_pos) );
-    $bin->patch_dword( $header_pos + 2 * 4, $pos_f->($symbols_pos) );
-    $bin->patch_dword( $header_pos + 3 * 4, $pos_f->($externs_pos) );
-    $bin->patch_dword( $header_pos + 4 * 4, $pos_f->($sections_pos) );
+    my $patch_pos = $header_pos;
+
+    $bin->patch_dword( $patch_pos, $pos_f->($modname_pos) );
+    $patch_pos += 4;
+
+    $bin->patch_dword( $patch_pos, $pos_f->($exprs_pos) );
+    $patch_pos += 4;
+
+    if ( $self->version >= 19 ) {
+        $bin->patch_dword( $patch_pos, $pos_f->($relocs_pos) );
+        $patch_pos += 4;
+    }
+
+    $bin->patch_dword( $patch_pos, $pos_f->($symbols_pos) );
+    $patch_pos += 4;
+
+    $bin->patch_dword( $patch_pos, $pos_f->($externs_pos) );
+    $patch_pos += 4;
+
+    $bin->patch_dword( $patch_pos, $pos_f->($sections_pos) );
+    $patch_pos += 4;
+
+    if ( $self->version >= 18 ) {
+        $bin->patch_dword( $patch_pos, $pos_f->($strings_pos) );
+        $patch_pos += 4;
+    }
 
     return $bin;
 }
@@ -2219,8 +2510,14 @@ sub unpack {
     }
 
     # read section pointers
-    my $modname_pos  = $bin->unpack_dword;
-    my $exprs_pos    = $bin->unpack_dword;
+    my $modname_pos = $bin->unpack_dword;
+    my $exprs_pos   = $bin->unpack_dword;
+
+    my $relocs_pos = -1;
+    if ( $self->version >= 19 ) {
+        $relocs_pos = $bin->unpack_dword;
+    }
+
     my $symbols_pos  = $bin->unpack_dword;
     my $externs_pos  = $bin->unpack_dword;
     my $sections_pos = $bin->unpack_dword;
@@ -2261,6 +2558,13 @@ sub unpack {
         my $exprs = ObjExprs->unpack( $bin, $self->strings,
             $self->version, $limit_pos );
         $self->exprs($exprs);
+    }
+
+    # relocations
+    if ( $relocs_pos >= 0 ) {
+        $bin->read_pos( $relocs_pos + $pos0 );
+        my $relocs = ObjRelocs->unpack( $bin, $self->strings, $self->version );
+        $self->relocs($relocs);
     }
 
     # symbols

@@ -30,6 +30,22 @@ bool opt_obj_hide_code = false;
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str);
 
 //-----------------------------------------------------------------------------
+// CPU name for the future version 19 object file format
+//-----------------------------------------------------------------------------
+
+static const char* cpu_name_v19(cpu_t id) {
+	if ((int)id == 0)
+		return NULL;
+	
+	switch ((int)id) {
+#define X(id_, name_, name_str_, defines_)	case id_: return name_str_;
+#include "../z80asm/cpu.def"
+	default:;
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------
 
@@ -385,11 +401,13 @@ static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start) {
             utstring_printf(section->name, "%s", utstring_body(name));
 			utstring_free(name);
 
+			// read section ORG
 			if (obj->version >= 8)
 				section->org = xfread_dword(fp);
 			else
 				section->org = ORG_NOT_DEFINED;
 
+			// read section ALIGN
 			if (obj->version >= 10)
 				section->align = xfread_dword(fp);
 			else
@@ -738,6 +756,63 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 	}
 }
 
+// relocations: only read and displayed, not supported in objfile_t
+static void objfile_read_relocs(objfile_t* obj, FILE* fp, long fpos_start)
+{
+	bool show_reloc = opt_obj_list && !opt_obj_hide_expr;
+	if (!show_reloc)
+		return;								// no need to read
+
+	printf("  Relocations:\n");
+
+	UT_string* filename;
+	UT_string* section;
+	UT_string* symbol;
+	
+	utstring_new(filename);
+	utstring_new(section);
+	utstring_new(symbol);
+
+	xfseek(fp, fpos_start, SEEK_SET);
+    while (true) {
+        range_t range = xfread_dword(fp);
+		if (range == RANGE_UNDEFINED)             // end marker
+			break;
+
+		const char* range_str = range_str_short(range);
+		if (range_str == NULL) {
+			printf("\nError relocation range %d\n", range);
+			exit(EXIT_FAILURE);
+		}
+		printf("    R %-5s", range_str);
+
+        // filename and line number
+		objfile_read_strid(obj, fp, filename);
+		int line_num = xfread_dword(fp);
+		
+		// section
+		objfile_read_strid(obj, fp, section);
+		
+		// patch pointer
+		int patch_ptr = xfread_dword(fp);
+
+		// symbol
+		objfile_read_strid(obj, fp, symbol);
+		
+		// addend
+		int addend = xfread_dword(fp);	
+		
+		printf(" $%04X: %s+$%04X", patch_ptr, utstring_body(symbol), addend);
+		print_section(section);
+		print_filename_line_nr(filename, line_num);
+		printf("\n");
+	}
+
+	utstring_free(filename);
+	utstring_free(section);
+	utstring_free(symbol);
+}
+
 void objfile_read(objfile_t* obj, FILE* fp)
 {
 	long fpos0 = ftell(fp) - SIGNATURE_SIZE;	// before signature
@@ -762,6 +837,13 @@ void objfile_read(objfile_t* obj, FILE* fp)
 	// file pointers
 	long fpos_modname = xfread_dword(fp);
 	long fpos_exprs = xfread_dword(fp);
+	
+	// relocs is only on version 19 and onwards
+	long fpos_relocs = -1;
+	if (obj->version >= 19) {
+		fpos_relocs = xfread_dword(fp);
+	}
+	
 	long fpos_symbols = xfread_dword(fp);
 	long fpos_externs = xfread_dword(fp);
 	long fpos_sections = xfread_dword(fp);
@@ -794,7 +876,12 @@ void objfile_read(objfile_t* obj, FILE* fp)
 
     // cpu
     if (opt_obj_list && obj->version >= 18) {
-        const char* cpu_str = cpu_name(obj->cpu_id);
+        const char* cpu_str = NULL;
+		if (obj->version >= 19) 
+			cpu_str = cpu_name_v19(obj->cpu_id);
+		else
+			cpu_str = cpu_name(obj->cpu_id);
+		
         if (cpu_str)
             printf("  CPU:  %s ", cpu_str);
         else
@@ -827,7 +914,11 @@ void objfile_read(objfile_t* obj, FILE* fp)
 		objfile_read_exprs(obj, fp,
 			fpos0 + fpos_exprs,
 			fpos0 + END(fpos_symbols, END(fpos_externs, fpos_modname)));
-			
+	
+	// relocations - only screen output, not used in current version 18
+	if (fpos_relocs >= 0)
+		objfile_read_relocs(obj, fp, fpos0 + fpos_relocs);
+	
 	// string table
     if (opt_obj_list && obj->version >= 18) {
 		uint_t st_size = strtable_size(obj->st);

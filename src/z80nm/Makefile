@@ -78,6 +78,12 @@ endef
 $(eval $(call MAKE_EXE,$(PROJ),$(OBJS),0))
 
 #------------------------------------------------------------------------------
+all: object-file-format/obj_v01.txt
+
+object-file-format/obj_v01.txt: object-file-format/make_docs.pl
+	perl object-file-format/make_docs.pl
+
+#------------------------------------------------------------------------------
 test:: $(PROJ)$(EXESUFFIX)
 	perl -S prove -j9 --state=slow,save t/*.t
 

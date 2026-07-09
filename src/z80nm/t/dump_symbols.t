@@ -56,8 +56,8 @@ for my $version ( Obj::min_version .. Obj::cur_version ) {
 
     check_obj(
         $obj,
-        "$dir/expected/${self}_v${version_str}_symbols.def",
-        "$dir/expected/${self}_v${version_str}_symbols.txt"
+        "$dir/expected/${self}_v${version_str}.def",
+        "$dir/expected/${self}_v${version_str}.txt"
     );
 }
 

@@ -1,5 +1,5 @@
 Object  file test_t_dump_cpu_t.o at $0000: Z80RMF19
   Name: module1
-  CPU:  (invalid 33) 
+  CPU:  ti83 
   Strings:
     S   1 = "module1"
