@@ -36,6 +36,7 @@ ELSE
     pop     hl
     push    hl
     push    de
+    push    af
 ENDIF
 
   IFDEF _GFX_PAGE_VRAM
