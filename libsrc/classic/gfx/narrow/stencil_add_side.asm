@@ -60,26 +60,20 @@ ELSE
     ld      hl,stencil_add_pixel
     ld      (__plot_ADDR),hl
 
-    pop     af
+    pop     af                          ; ret addr
+    pop     de                          ; y2
     pop     hl
-    ld      (stencil_ptr), hl
-
-    pop     de                          ; y1
+    ld      d, l                        ; x2
+    pop     hl                          ; y
     pop     bc
-    ld      d, c                        ; x1
-
-    pop     hl                          ; y0
-    pop     de                          ; x0
-
-    push    de
-    push    hl
-    ld      h, e                        ; x0
 
     push    bc
-    push    de                          ; foo value, the original value is gone
-
     push    hl
-    push    af
+    ld      h, c                        ; x
+    push    hl                          ; foo value, the original value is gone
+    push    de
+    
+    push    af                          ; ret addr
 
     jp      Line
 
