@@ -42,6 +42,19 @@
         defc    CRT_ORG_CODE  = $100
     ENDIF
 
+    ; Keep uninitialised BSS out of the flat .COM image.  By default the
+    ; classic BSS section is contiguous with code+data and z80asm therefore
+    ; writes its (zero) bytes into the binary -- e.g. a program with an 8 KB
+    ; uninitialised array produces an 8 KB-larger .COM for no benefit.  The CRT
+    ; already zeroes BSS at startup (crt/classic/crt_initialise_bss.inc), so the
+    ; bytes in the file are pure dead weight.  Setting __crt_org_bss = -1 keeps
+    ; BSS contiguous in memory (org -1 == follow data) but makes z80asm emit it
+    ; as a SEPARATE binary that appmake does not fold into the .COM.
+    IF !DEFINED_CRT_ORG_BSS
+        defc    CRT_ORG_BSS = -1
+    ENDIF
+    defc    __crt_org_bss = CRT_ORG_BSS
+
     IF !DEFINED_CPM_BASE_ADDRESS
         defc    __cpm_base_address = CRT_ORG_CODE - $100
 	ELSE
