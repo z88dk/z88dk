@@ -2180,7 +2180,7 @@ mikro80_clib.lib: $(TARGET_CLIB_DEPS) $(MIKRO80_TARGETS)
 	@echo ''
 	@echo '--- Building Mikro80 Library ---'
 	@echo ''
-	$(call buildgeneric,mikro80,"gencon portable narrow")
+	$(call buildgeneric,mikro80,"gencon narrow")
 	$(MAKE) -C classic/games TARGET=mikro80
 	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(TARGET_DIRECTORY)/mikro80/mikro80.lst
 
@@ -2195,7 +2195,7 @@ m100_clib.lib: $(TARGET_CLIB_DEPS)
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
-	$(call buildgeneric,m100,"portable narrow")
+	$(call buildgeneric,m100,"narrow")
 	$(MAKE) -C classic/games TARGET=m100
 	TARGET=m100 TYPE=8085 $(LIBLINKER) -m8085 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(TARGET_DIRECTORY)/m100/m100.lst
 
