@@ -267,22 +267,33 @@ sub parse {
     my ($file) = @_;
     my @cpus;
     for ( path($file)->lines( { chomp => 1 } ) ) {
-        next unless /^\s*X\(\s*(\d+)\s*,\s*\w+\s*,\s*"(\w+)"/;
-        push @cpus, [ $1, $2 ];
+        next unless /^ \s* X\( \s* (\d+) \s*,\s* (\w+) \s*,\s* "(\w+)" \s*,\s* 
+                       (\w+) \s*,\s* (\w+) /x;
+        my $cpu = {
+            id         => $1,
+            name       => $2,
+            name_str   => $3,
+            non_strict => $4,
+            ancestor   => $5,
+        };
+
+        # computed fields
+        $cpu->{level}     = 0;
+        $cpu->{is_strict} = $cpu->{non_strict} eq $cpu->{name} ? 0 : 1;
+
+        push @cpus, $cpu;
     }
     return @cpus;
 }
 
 sub lookup_ {
     my ($key) = @_;
-    for (@CPUS) {
-        my ( $id, $name ) = @$_;
-
+    for my $cpu (@CPUS) {
         if ( $key =~ /^\d+$/ && $key != 8080 && $key != 8085 ) {
-            return [ $id, $name ] if $id == $key;
+            return $cpu if $cpu->{id} == $key;
         }
         else {
-            return [ $id, $name ] if $name eq $key;
+            return $cpu if $cpu->{name} eq $key || $cpu->{name_str} eq $key;
         }
     }
     return undef;
@@ -291,29 +302,85 @@ sub lookup_ {
 sub lookup_id {
     my ($key) = @_;
     my $found = lookup_($key);
-    return $found ? $found->[0] : undef;
+    return $found ? $found->{id} : undef;
 }
 
 sub lookup_name {
     my ($key) = @_;
     my $found = lookup_($key);
-    return $found ? $found->[1] : undef;
+    return $found ? $found->{name_str} : undef;
 }
 
 sub min_id {
-    my $id = $CPUS[0]->[0];
+    my $id = $CPUS[0]->{id};
     for (@CPUS) {
-        $id = $_->[0] if $_->[0] < $id;
+        $id = $_->{id} if $_->{id} < $id;
     }
     return $id;
 }
 
 sub max_id {
-    my $id = $CPUS[0]->[0];
+    my $id = $CPUS[0]->{id};
     for (@CPUS) {
-        $id = $_->[0] if $_->[0] > $id;
+        $id = $_->{id} if $_->{id} > $id;
     }
     return $id;
+}
+
+sub non_strict {
+    my ($key) = @_;
+    my $found = lookup_($key);
+    return $found ? $found->{non_strict} : undef;
+}
+
+sub ancestor {
+    my ($key) = @_;
+    my $found = lookup_($key);
+    return $found ? $found->{ancestor} : undef;
+}
+
+sub compatible {
+    my ( $target_cpu, $lib_cpu ) = @_;
+    $target_cpu = non_strict($target_cpu);
+    $lib_cpu    = non_strict($lib_cpu);
+
+    my $current_cpu = $target_cpu;
+    while ( $current_cpu ne 'none' ) {
+        return 1 if $current_cpu eq $lib_cpu;
+        $current_cpu = ancestor($current_cpu);
+    }
+    return 0;
+}
+
+# get all non-strict cpu ids from more specific to less specific (topological order)
+sub all_cpus_topological {
+
+    # compute topological levels
+    my $max_level = 0;
+    for my $cpu (@CPUS) {
+        next if $cpu->{is_strict};
+        my $level    = 0;
+        my $ancestor = $cpu->{ancestor};
+        while ( $ancestor ne "none" ) {
+            $level++;
+            my $found = lookup_($ancestor);
+            die "invalid ancestor: $ancestor" unless defined $found;
+            $ancestor = $found->{ancestor};
+        }
+        $cpu->{level} = $level;
+        $max_level = $level if $level > $max_level;
+    }
+
+    # prepare list reverse ordered by topological level
+    my @topo;
+    for my $level ( reverse 0 .. $max_level ) {
+        for my $cpu (@CPUS) {
+            next if $cpu->{name} eq "none";
+            next if $cpu->{is_strict};
+            push @topo, $cpu->{id} if $cpu->{level} == $level;
+        }
+    }
+    return @topo;
 }
 
 #------------------------------------------------------------------------------
@@ -2233,6 +2300,7 @@ use Modern::Perl;
 use Object::Tiny::RW qw(
     version name cpu swap_ixiy org
     exprs relocs symbols externs sections
+    file_pos
     strings
 );
 
@@ -2249,6 +2317,7 @@ sub new {
         symbols   => ObjSymbols->new,
         externs   => ObjExterns->new,
         sections  => ObjSections->new,
+        file_pos  => 0,
         strings   => StringTable->new,
     }, $class;
 }
@@ -2676,6 +2745,9 @@ sub pack {
 
     # pointers
     my $header_pos = $bin->size;
+    if ( $self->version >= 19 ) {
+        $bin->pack_dword(-1);    # placeholder for symbol index
+    }
     if ( $self->version >= 18 ) {
         $bin->pack_dword(-1);    # placeholder for string table
     }
@@ -2689,10 +2761,12 @@ sub pack {
         my $next_module_pos;
         for my $module ( @{ $self->modules } ) {
             $next_module_pos = $bin->size;
+
             $bin->pack_dword(0);    # placeholder for next module
             $bin->pack_dword(0);    # placeholder for this module size
 
             my $module_start = $bin->size;
+            $module->file_pos($module_start);
             $module->pack($bin);
             my $module_end = $bin->size;
 
@@ -2709,23 +2783,28 @@ sub pack {
     }
 
     # library index
+    my $index_pos = -1;
     if ( $self->version >= 18 ) {
-
-        # list of all public symbols of all modules
-        for my $module ( @{ $self->modules } ) {
-            for my $symbol ( @{ $module->symbols->symbols } ) {
-                if ( $symbol->scope eq "Public" ) {
-                    $self->strings->add( $symbol->name );
-                }
-            }
-        }
+        $index_pos = $self->build_index($bin);
     }
 
     # string table
+    my $strings_pos = -1;
     if ( $self->version >= 18 ) {
-        my $strings_pos = $bin->size;
+        $strings_pos = $bin->size;
         $self->strings->pack($bin);
         $bin->patch_dword( $header_pos + 0 * 4, $strings_pos );
+    }
+
+    # patch pointers
+    my $pos = $header_pos;
+    if ( $self->version >= 19 ) {
+        $bin->patch_dword( $pos, $index_pos );
+        $pos += 4;
+    }
+    if ( $self->version >= 18 ) {
+        $bin->patch_dword( $pos, $strings_pos );
+        $pos += 4;
     }
 }
 
@@ -2746,6 +2825,12 @@ sub unpack {
     }
 
     $self->version($version);
+
+    # get library index
+    my $index_pos = -1;
+    if ( $self->version >= 19 ) {
+        $index_pos = $bin->unpack_dword;
+    }
 
     # get string table
     if ( $self->version >= 18 ) {
@@ -2776,6 +2861,111 @@ sub unpack {
     }
 
     return $self;
+}
+
+sub build_index {
+    my ( $self, $bin ) = @_;
+
+    if ( $self->version >= 19 ) {
+        my $index_pos = $bin->size;
+
+        # build index per cpu/ixiy
+        my @index;
+        for my $cpu ( CPU::min_id .. CPU::max_id ) {
+            for my $swap_ixiy ( 0 .. 1 ) {
+
+                # get public symbols valid for this CPU/swap_ixiy
+                my %table;
+                for my $module ( @{ $self->modules } ) {
+
+                    # for this module
+                    if ( CPU::compatible( $cpu, $module->cpu ) ) {
+                        if ( !!$swap_ixiy == !!$module->swap_ixiy ) {
+
+                            # CPU and swap_ixiy are compatible
+                            for my $symbol ( @{ $module->symbols->symbols } ) {
+                                if ( $symbol->scope eq "Public" ) {
+                                    my $symbol = $symbol->name;
+                                    if ( !exists $table{$symbol} ) {
+
+                                        # only take the first reference
+                                        # of each symbol
+                                        $table{$symbol} = $module->file_pos;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                # save symbol table if not empty
+                if (%table) {
+                    $index[$cpu][$swap_ixiy] = \%table;
+                }
+            }
+        }
+
+        if ( !@index ) {
+            return -1;    # no public symbols
+        }
+
+        # serialize index
+        my @placeholders;
+        for my $cpu ( CPU::min_id .. CPU::max_id ) {
+            for my $swap_ixiy ( 0 .. 1 ) {
+                if ( $index[$cpu][$swap_ixiy] ) {
+
+                    # there are symbols for this CPU/swap_ixiy
+                    my %table = %{ $index[$cpu][$swap_ixiy] };
+                    $bin->pack_dword($cpu);
+                    $bin->pack_dword($swap_ixiy);
+
+                    $placeholders[$cpu][$swap_ixiy] = $bin->size;
+                    $bin->pack_dword(0);                     # placeholder
+                    $bin->pack_dword( scalar keys %table );  # number of symbols
+                }
+            }
+        }
+        $bin->pack_dword(0);    # table terminator CPU=0
+
+        # serialize lists of symbols
+        for my $cpu ( CPU::min_id .. CPU::max_id ) {
+            for my $swap_ixiy ( 0 .. 1 ) {
+                if ( $index[$cpu][$swap_ixiy] ) {
+
+                    # there are symbols for this CPU/swap_ixiy
+                    my %table    = %{ $index[$cpu][$swap_ixiy] };
+                    my $list_pos = $bin->size;
+                    $bin->patch_dword( $placeholders[$cpu][$swap_ixiy],
+                        $list_pos );
+
+                    for my $symbol_name ( sort keys %table ) {
+                        my $id = $self->strings->add($symbol_name);
+                        $bin->pack_dword($id);            # symbol name
+                        my $module_pos = $table{$symbol_name};
+                        $bin->pack_dword($module_pos);    # object file index
+                    }
+                }
+            }
+        }
+
+        return $index_pos;
+    }
+    elsif ( $self->version >= 18 ) {
+
+        # symbol index is just list of all public symbols of all modules
+        for my $module ( @{ $self->modules } ) {
+            for my $symbol ( @{ $module->symbols->symbols } ) {
+                if ( $symbol->scope eq "Public" ) {
+                    $self->strings->add( $symbol->name );
+                }
+            }
+        }
+        return -1;    # did not write to bin
+    }
+    else {
+        return -1;    # did not write to bin
+    }
 }
 
 #------------------------------------------------------------------------------

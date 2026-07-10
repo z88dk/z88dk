@@ -38,7 +38,8 @@ static const char* cpu_name_v19(cpu_t id) {
 		return NULL;
 	
 	switch ((int)id) {
-#define X(id_, name_, name_str_, defines_)	case id_: return name_str_;
+#define X(id_, name_, name_str_, non_strict_, ancestor_, defines_)	\
+    case id_: return name_str_;
 #include "../z80asm/cpu.def"
 	default:;
 	}
@@ -1153,21 +1154,27 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
     utstring_new(obj_signature);
 
 	// goto start of header
-	int next = SIGNATURE_SIZE;
-	xfseek(fp, next, SEEK_SET);
+	xfseek(fp, SIGNATURE_SIZE, SEEK_SET);
+	
+	// symbol index table
+	long index_pos = -1;
+	if (file->version >= 19) {
+		index_pos = xfread_dword(fp);
+	}
 	
 	// string table
 	strtable_t* st = NULL;
     if (file->version >= 18) {
         long fpos_st = xfread_dword(fp);
-        next = ftell(fp);
+        long save_pos = ftell(fp);
         xfseek(fp, fpos_st, SEEK_SET);
         st = strtable_fread(fp);
-        xfseek(fp, next, SEEK_SET);
+        xfseek(fp, save_pos, SEEK_SET);
     }
 
 	int length = 0;
 	int obj_version = -1;
+	long next = ftell(fp);
 
 	do {
 		xfseek(fp, next, SEEK_SET);		        // next object file
@@ -1194,8 +1201,46 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 			printf("\n");
 	} while (next != -1);
 
+	// symbol index table
+	if (index_pos >= 0 && file->version >= 18) {
+		xfseek(fp, index_pos, SEEK_SET);
+		printf("Symbol Index Table:\n");
+		while (true) {
+			cpu_t cpu_id = xfread_dword(fp);
+			if (cpu_id == 0)
+				break;			// end of list
+			bool swap_ixiy = !!xfread_dword(fp);
+			long list_pos = xfread_dword(fp);
+			int size = xfread_dword(fp);
+			index_pos = ftell(fp);
+			
+			if (list_pos >= 0 && size > 0) {
+				const char* cpu_str = cpu_name_v19(cpu_id);
+				const char* swap_ixiy_str = swap_ixiy ? " (-IXIY)" : "";
+				
+				xfseek(fp, list_pos, SEEK_SET);
+				for (int i = 0; i < size; i++) {
+					int id = xfread_dword(fp);
+					const char* symbol_name = strtable_lookup(st, id);
+					long object_pos = xfread_dword(fp);
+					
+					printf("  P %s %s %s -> $%04X\n", 
+						   cpu_str, swap_ixiy_str, symbol_name, (uint_t)object_pos);
+				}
+				xfseek(fp, index_pos, SEEK_SET);
+			}
+		}
+		
+		uint_t st_size = strtable_size(st);
+		if (st_size > 1) {		// dont show string 0=""
+			printf("Strings:\n");
+			for (uint_t i = 1; i < st_size; i++) {
+				printf("  S %3d = \"%s\"\n", (int)i, strtable_lookup(st, i));
+			}
+		}
+	}
 	// string table
-    if (st != NULL && opt_obj_list && file->version >= 18) {
+    else if (st != NULL && opt_obj_list && file->version >= 18) {
 		uint_t st_size = strtable_size(st);
 		if (st_size > 1) {		// dont show string 0=""
 			printf("Library public symbols:\n");

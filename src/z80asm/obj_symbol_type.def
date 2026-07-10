@@ -4,9 +4,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(0, Undefined,         0)      // end marker
-X(1, Constant,          'C')    // constant symbol
-X(2, AddressRelative,   'A')    // offset to base address
-X(3, Computed,          '=')    // expression needs to be evaluated
+X(0, Undefined,         0, 		"end marker")
+X(1, Constant,          'C',	"constant symbol")
+X(2, AddressRelative,   'A',	"offset to base address")
+X(3, Computed,          '=',	"computed at link time with defined expression")
 
 #undef X

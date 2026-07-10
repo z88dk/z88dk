@@ -1,5 +1,5 @@
 Library file test_t_dump_library_02_t.o at $0000: Z80LMF19
-Object  file test_t_dump_library_02_t.o at $0014: Z80RMF19
+Object  file test_t_dump_library_02_t.o at $0018: Z80RMF19
   Name: module1
   CPU:  z80 
   Symbols:
@@ -14,7 +14,7 @@ Object  file test_t_dump_library_02_t.o at $0014: Z80RMF19
     S   4 = "public2"
     S   5 = "module1"
 
-Object  file test_t_dump_library_02_t.o at $0108: Z80RMF19
+Object  file test_t_dump_library_02_t.o at $010C: Z80RMF19
   Name: module2
   CPU:  z80 
   Symbols:
@@ -29,6 +29,23 @@ Object  file test_t_dump_library_02_t.o at $0108: Z80RMF19
     S   4 = "public2"
     S   5 = "module2"
 
-Library public symbols:
+Symbol Index Table:
+  P z80  public1 -> $0018
+  P z80  public2 -> $0018
+  P z80_strict  public1 -> $0018
+  P z80_strict  public2 -> $0018
+  P z80n  public1 -> $0018
+  P z80n  public2 -> $0018
+  P z80n_strict  public1 -> $0018
+  P z80n_strict  public2 -> $0018
+  P ti83  public1 -> $0018
+  P ti83  public2 -> $0018
+  P ti83_strict  public1 -> $0018
+  P ti83_strict  public2 -> $0018
+  P ti83plus  public1 -> $0018
+  P ti83plus  public2 -> $0018
+  P ti83plus_strict  public1 -> $0018
+  P ti83plus_strict  public2 -> $0018
+Strings:
   S   1 = "public1"
   S   2 = "public2"

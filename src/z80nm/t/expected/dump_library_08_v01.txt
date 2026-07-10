@@ -1,1 +1,0 @@
-Library file test_t_dump_library_08_t.o at $0000: Z80LMF01

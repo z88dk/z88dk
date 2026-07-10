@@ -80,7 +80,12 @@ $(eval $(call MAKE_EXE,$(PROJ),$(OBJS),0))
 #------------------------------------------------------------------------------
 all: object-file-format/obj_v01.txt
 
-object-file-format/obj_v01.txt: object-file-format/make_docs.pl
+object-file-format/obj_v01.txt: \
+		object-file-format/make_docs.pl \
+		../z80asm/cpu.def \
+		../z80asm/obj_range_type.def \
+		../z80asm/obj_symbol_scope.def \
+		../z80asm/obj_symbol_type.def
 	perl object-file-format/make_docs.pl
 
 #------------------------------------------------------------------------------
@@ -99,7 +104,7 @@ tidy:
 
 #------------------------------------------------------------------------------
 clean::
-	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak core
+	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak object-file-format/*.bak core
 
 #------------------------------------------------------------------------------
 install:  $(PROJ)$(EXESUFFIX)

@@ -1,0 +1,2595 @@
+begin library
+    version                   = 18
+    begin module
+        name                  = module_z80_no_ixiy
+        version               = 18
+        cpu                   = z80 ; (1)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80_ixiy
+        version               = 18
+        cpu                   = z80 ; (1)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80_strict_no_ixiy
+        version               = 18
+        cpu                   = z80_strict ; (2)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80_strict_ixiy
+        version               = 18
+        cpu                   = z80_strict ; (2)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_no_ixiy
+        version               = 18
+        cpu                   = z180 ; (3)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_ixiy
+        version               = 18
+        cpu                   = z180 ; (3)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_no_ixiy
+        version               = 18
+        cpu                   = ez80_z80 ; (4)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_ixiy
+        version               = 18
+        cpu                   = ez80_z80 ; (4)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_no_ixiy
+        version               = 18
+        cpu                   = ez80 ; (5)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_ixiy
+        version               = 18
+        cpu                   = ez80 ; (5)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_no_ixiy
+        version               = 18
+        cpu                   = z80n ; (6)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_ixiy
+        version               = 18
+        cpu                   = z80n ; (6)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_no_ixiy
+        version               = 18
+        cpu                   = r2ka ; (7)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_ixiy
+        version               = 18
+        cpu                   = r2ka ; (7)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_no_ixiy
+        version               = 18
+        cpu                   = r3k ; (8)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_ixiy
+        version               = 18
+        cpu                   = r3k ; (8)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_no_ixiy
+        version               = 18
+        cpu                   = gbz80 ; (9)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_ixiy
+        version               = 18
+        cpu                   = gbz80 ; (9)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_no_ixiy
+        version               = 18
+        cpu                   = 8080 ; (10)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_ixiy
+        version               = 18
+        cpu                   = 8080 ; (10)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_no_ixiy
+        version               = 18
+        cpu                   = 8085 ; (11)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_ixiy
+        version               = 18
+        cpu                   = 8085 ; (11)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_no_ixiy
+        version               = 18
+        cpu                   = r800 ; (12)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_ixiy
+        version               = 18
+        cpu                   = r800 ; (12)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_no_ixiy
+        version               = 18
+        cpu                   = r4k ; (13)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_ixiy
+        version               = 18
+        cpu                   = r4k ; (13)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_no_ixiy
+        version               = 18
+        cpu                   = r5k ; (14)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_ixiy
+        version               = 18
+        cpu                   = r5k ; (14)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_no_ixiy
+        version               = 18
+        cpu                   = kc160 ; (15)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_ixiy
+        version               = 18
+        cpu                   = kc160 ; (15)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_no_ixiy
+        version               = 18
+        cpu                   = kc160_z80 ; (16)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_ixiy
+        version               = 18
+        cpu                   = kc160_z80 ; (16)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_strict_no_ixiy
+        version               = 18
+        cpu                   = 8080_strict ; (17)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_strict_ixiy
+        version               = 18
+        cpu                   = 8080_strict ; (17)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_strict_no_ixiy
+        version               = 18
+        cpu                   = 8085_strict ; (18)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_strict_ixiy
+        version               = 18
+        cpu                   = 8085_strict ; (18)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_strict_no_ixiy
+        version               = 18
+        cpu                   = gbz80_strict ; (19)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_strict_ixiy
+        version               = 18
+        cpu                   = gbz80_strict ; (19)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_strict_no_ixiy
+        version               = 18
+        cpu                   = z180_strict ; (20)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_strict_ixiy
+        version               = 18
+        cpu                   = z180_strict ; (20)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_strict_no_ixiy
+        version               = 18
+        cpu                   = z80n_strict ; (21)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_strict_ixiy
+        version               = 18
+        cpu                   = z80n_strict ; (21)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_strict_no_ixiy
+        version               = 18
+        cpu                   = ez80_z80_strict ; (22)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_strict_ixiy
+        version               = 18
+        cpu                   = ez80_z80_strict ; (22)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_strict_no_ixiy
+        version               = 18
+        cpu                   = ez80_strict ; (23)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_strict_ixiy
+        version               = 18
+        cpu                   = ez80_strict ; (23)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_strict_no_ixiy
+        version               = 18
+        cpu                   = r800_strict ; (24)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_strict_ixiy
+        version               = 18
+        cpu                   = r800_strict ; (24)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_strict_no_ixiy
+        version               = 18
+        cpu                   = kc160_strict ; (25)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_strict_ixiy
+        version               = 18
+        cpu                   = kc160_strict ; (25)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_strict_no_ixiy
+        version               = 18
+        cpu                   = kc160_z80_strict ; (26)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_strict_ixiy
+        version               = 18
+        cpu                   = kc160_z80_strict ; (26)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_strict_no_ixiy
+        version               = 18
+        cpu                   = r2ka_strict ; (27)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_strict_ixiy
+        version               = 18
+        cpu                   = r2ka_strict ; (27)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_strict_no_ixiy
+        version               = 18
+        cpu                   = r3k_strict ; (28)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_strict_ixiy
+        version               = 18
+        cpu                   = r3k_strict ; (28)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_strict_no_ixiy
+        version               = 18
+        cpu                   = r4k_strict ; (29)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_strict_ixiy
+        version               = 18
+        cpu                   = r4k_strict ; (29)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_strict_no_ixiy
+        version               = 18
+        cpu                   = r5k_strict ; (30)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_strict_ixiy
+        version               = 18
+        cpu                   = r5k_strict ; (30)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_no_ixiy
+        version               = 18
+        cpu                   = r6k ; (31)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_ixiy
+        version               = 18
+        cpu                   = r6k ; (31)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_strict_no_ixiy
+        version               = 18
+        cpu                   = r6k_strict ; (32)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_strict_ixiy
+        version               = 18
+        cpu                   = r6k_strict ; (32)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_no_ixiy
+        version               = 18
+        cpu                   = ti83 ; (33)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_ixiy
+        version               = 18
+        cpu                   = ti83 ; (33)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_strict_no_ixiy
+        version               = 18
+        cpu                   = ti83_strict ; (34)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_strict_ixiy
+        version               = 18
+        cpu                   = ti83_strict ; (34)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_no_ixiy
+        version               = 18
+        cpu                   = ti83plus ; (35)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_ixiy
+        version               = 18
+        cpu                   = ti83plus ; (35)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_strict_no_ixiy
+        version               = 18
+        cpu                   = ti83plus_strict ; (36)
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_strict_ixiy
+        version               = 18
+        cpu                   = ti83plus_strict ; (36)
+        swap_ixiy             = 1
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+end library

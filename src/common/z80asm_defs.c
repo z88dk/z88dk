@@ -113,7 +113,7 @@ static void init_cpus() {
         // init dependency level
         for (size_t i = 0; i < NUM_ELEMS(cpu_lut); i++) {
             if (cpu_lut[i].compat_parent == CPU_UNDEF || cpu_lut[i].is_strict)
-                cpu_lut[i].level = 0;            // no comaptibility
+                cpu_lut[i].level = 0;            // no compatibility
             else
                 cpu_lut[i].level = -1;           // still to check
         }
