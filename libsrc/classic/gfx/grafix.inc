@@ -343,6 +343,8 @@ IF FORmc1000
 ENDIF
 
 IF FORmikro80
+    defc    _GFX_MAXX = 128
+    defc    _GFX_MAXY = 64
     defc    _GFX_GENCON_USEPLOTC = 1
 ENDIF
 
