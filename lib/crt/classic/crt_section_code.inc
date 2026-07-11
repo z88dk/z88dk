@@ -69,6 +69,7 @@ ENDIF
     SECTION code_temp_sp1
     SECTION code_splib2
     SECTION code_sound_bit
+    SECTION code_setjmp
 IF !__crt_org_graphics
     SECTION code_graphics
 ENDIF
