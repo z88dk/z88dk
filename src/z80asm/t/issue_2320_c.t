@@ -382,6 +382,11 @@ Object  file test_t_issue_2320_c_t.lib at $0014: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $00EC: Z80RMF18
   Name: b
@@ -391,6 +396,10 @@ Object  file test_t_issue_2320_c_t.lib at $00EC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $01A4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -400,6 +409,11 @@ Object  file test_t_issue_2320_c_t.lib at $01A4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $027C: Z80RMF18
   Name: b
@@ -409,6 +423,10 @@ Object  file test_t_issue_2320_c_t.lib at $027C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0334: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -418,6 +436,11 @@ Object  file test_t_issue_2320_c_t.lib at $0334: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $040C: Z80RMF18
   Name: b
@@ -427,6 +450,10 @@ Object  file test_t_issue_2320_c_t.lib at $040C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $04C4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -436,6 +463,11 @@ Object  file test_t_issue_2320_c_t.lib at $04C4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $059C: Z80RMF18
   Name: b
@@ -445,6 +477,10 @@ Object  file test_t_issue_2320_c_t.lib at $059C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0654: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -454,6 +490,11 @@ Object  file test_t_issue_2320_c_t.lib at $0654: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $072C: Z80RMF18
   Name: b
@@ -463,6 +504,10 @@ Object  file test_t_issue_2320_c_t.lib at $072C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $07E4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -472,6 +517,11 @@ Object  file test_t_issue_2320_c_t.lib at $07E4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $08BC: Z80RMF18
   Name: b
@@ -481,6 +531,10 @@ Object  file test_t_issue_2320_c_t.lib at $08BC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0974: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -490,6 +544,11 @@ Object  file test_t_issue_2320_c_t.lib at $0974: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $0A4C: Z80RMF18
   Name: b
@@ -499,6 +558,10 @@ Object  file test_t_issue_2320_c_t.lib at $0A4C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0B04: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -508,6 +571,11 @@ Object  file test_t_issue_2320_c_t.lib at $0B04: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $0BDC: Z80RMF18
   Name: b
@@ -517,6 +585,10 @@ Object  file test_t_issue_2320_c_t.lib at $0BDC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0C94: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -526,6 +598,11 @@ Object  file test_t_issue_2320_c_t.lib at $0C94: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $0D6C: Z80RMF18
   Name: b
@@ -535,6 +612,10 @@ Object  file test_t_issue_2320_c_t.lib at $0D6C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0E24: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -544,6 +625,11 @@ Object  file test_t_issue_2320_c_t.lib at $0E24: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $0EFC: Z80RMF18
   Name: b
@@ -553,6 +639,10 @@ Object  file test_t_issue_2320_c_t.lib at $0EFC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $0FB4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -562,6 +652,11 @@ Object  file test_t_issue_2320_c_t.lib at $0FB4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $108C: Z80RMF18
   Name: b
@@ -571,6 +666,10 @@ Object  file test_t_issue_2320_c_t.lib at $108C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1144: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -580,6 +679,11 @@ Object  file test_t_issue_2320_c_t.lib at $1144: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $121C: Z80RMF18
   Name: b
@@ -589,6 +693,10 @@ Object  file test_t_issue_2320_c_t.lib at $121C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $12D4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -598,6 +706,11 @@ Object  file test_t_issue_2320_c_t.lib at $12D4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $13AC: Z80RMF18
   Name: b
@@ -607,6 +720,10 @@ Object  file test_t_issue_2320_c_t.lib at $13AC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1464: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -616,6 +733,11 @@ Object  file test_t_issue_2320_c_t.lib at $1464: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $153C: Z80RMF18
   Name: b
@@ -625,6 +747,10 @@ Object  file test_t_issue_2320_c_t.lib at $153C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $15F4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -634,6 +760,11 @@ Object  file test_t_issue_2320_c_t.lib at $15F4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $16CC: Z80RMF18
   Name: b
@@ -643,6 +774,10 @@ Object  file test_t_issue_2320_c_t.lib at $16CC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1784: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -652,6 +787,11 @@ Object  file test_t_issue_2320_c_t.lib at $1784: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $185C: Z80RMF18
   Name: b
@@ -661,6 +801,10 @@ Object  file test_t_issue_2320_c_t.lib at $185C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1914: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -670,6 +814,11 @@ Object  file test_t_issue_2320_c_t.lib at $1914: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $19EC: Z80RMF18
   Name: b
@@ -679,6 +828,10 @@ Object  file test_t_issue_2320_c_t.lib at $19EC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1AA4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -688,6 +841,11 @@ Object  file test_t_issue_2320_c_t.lib at $1AA4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $1B7C: Z80RMF18
   Name: b
@@ -697,6 +855,10 @@ Object  file test_t_issue_2320_c_t.lib at $1B7C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1C34: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -706,6 +868,11 @@ Object  file test_t_issue_2320_c_t.lib at $1C34: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $1D0C: Z80RMF18
   Name: b
@@ -715,6 +882,10 @@ Object  file test_t_issue_2320_c_t.lib at $1D0C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1DC4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -724,6 +895,11 @@ Object  file test_t_issue_2320_c_t.lib at $1DC4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $1E9C: Z80RMF18
   Name: b
@@ -733,6 +909,10 @@ Object  file test_t_issue_2320_c_t.lib at $1E9C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $1F54: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -742,6 +922,11 @@ Object  file test_t_issue_2320_c_t.lib at $1F54: Z80RMF18
     C $0000: 21 00 40 00
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $202C: Z80RMF18
   Name: b
@@ -751,6 +936,10 @@ Object  file test_t_issue_2320_c_t.lib at $202C: Z80RMF18
     C $0000: 21 00 80 00
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $20E4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -760,6 +949,11 @@ Object  file test_t_issue_2320_c_t.lib at $20E4: Z80RMF18
     C $0000: 21 00 40 00
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $21BC: Z80RMF18
   Name: b
@@ -769,6 +963,10 @@ Object  file test_t_issue_2320_c_t.lib at $21BC: Z80RMF18
     C $0000: 21 00 80 00
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2274: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -778,6 +976,11 @@ Object  file test_t_issue_2320_c_t.lib at $2274: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $234C: Z80RMF18
   Name: b
@@ -787,6 +990,10 @@ Object  file test_t_issue_2320_c_t.lib at $234C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2404: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -796,6 +1003,11 @@ Object  file test_t_issue_2320_c_t.lib at $2404: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $24DC: Z80RMF18
   Name: b
@@ -805,6 +1017,10 @@ Object  file test_t_issue_2320_c_t.lib at $24DC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2594: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -814,6 +1030,11 @@ Object  file test_t_issue_2320_c_t.lib at $2594: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $266C: Z80RMF18
   Name: b
@@ -823,6 +1044,10 @@ Object  file test_t_issue_2320_c_t.lib at $266C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2724: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -832,6 +1057,11 @@ Object  file test_t_issue_2320_c_t.lib at $2724: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $27FC: Z80RMF18
   Name: b
@@ -841,6 +1071,10 @@ Object  file test_t_issue_2320_c_t.lib at $27FC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $28B4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -850,6 +1084,11 @@ Object  file test_t_issue_2320_c_t.lib at $28B4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $298C: Z80RMF18
   Name: b
@@ -859,6 +1098,10 @@ Object  file test_t_issue_2320_c_t.lib at $298C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2A44: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -868,6 +1111,11 @@ Object  file test_t_issue_2320_c_t.lib at $2A44: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $2B1C: Z80RMF18
   Name: b
@@ -877,6 +1125,10 @@ Object  file test_t_issue_2320_c_t.lib at $2B1C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2BD4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -886,6 +1138,11 @@ Object  file test_t_issue_2320_c_t.lib at $2BD4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $2CAC: Z80RMF18
   Name: b
@@ -895,6 +1152,10 @@ Object  file test_t_issue_2320_c_t.lib at $2CAC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2D64: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -904,6 +1165,11 @@ Object  file test_t_issue_2320_c_t.lib at $2D64: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $2E3C: Z80RMF18
   Name: b
@@ -913,6 +1179,10 @@ Object  file test_t_issue_2320_c_t.lib at $2E3C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $2EF4: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -922,6 +1192,11 @@ Object  file test_t_issue_2320_c_t.lib at $2EF4: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $2FCC: Z80RMF18
   Name: b
@@ -931,6 +1206,10 @@ Object  file test_t_issue_2320_c_t.lib at $2FCC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 Object  file test_t_issue_2320_c_t.lib at $3084: Z80RMF18
   Name: test_t_issue_2320_c_t.a
@@ -940,6 +1219,11 @@ Object  file test_t_issue_2320_c_t.lib at $3084: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_c_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_c_t.a.asm"
+    S   4 = "test_t_issue_2320_c_t.a"
 
 Object  file test_t_issue_2320_c_t.lib at $315C: Z80RMF18
   Name: b
@@ -949,6 +1233,10 @@ Object  file test_t_issue_2320_c_t.lib at $315C: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_c_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_c_t.b.asm"
 
 END
 

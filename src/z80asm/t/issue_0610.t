@@ -19,12 +19,14 @@ spew("${test}.def",		"test");
 
 capture_ok("z88dk-z80asm ${test}", "");
 
-capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF18
-  Name: ${test}
+capture_ok("z88dk-z80nm -a ${test}.o", <<'END');
+Object  file test_t_issue_0610_t.o at $0000: Z80RMF18
+  Name: test_t_issue_0610_t
   CPU:  z80 
   Section "": 1 bytes
-    C \$0000: 00
+    C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_0610_t"
 END
 
 check_text_file("${test}.lis",		"test");

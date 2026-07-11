@@ -143,10 +143,14 @@ Object  file test_t_jumps_t.o at $0000: Z80RMF18
   Externs:
     U         j1
   Expressions:
-    E j $0000 $0002 4: j1 (section "") (file test_t_jumps_t.asm:2)
-    E j $0004 $0006 4: j1 (section "") (file test_t_jumps_t.asm:3)
-    E j $0008 $000A 4: j1 (section "") (file test_t_jumps_t.asm:4)
-    E j $000C $000E 4: j1 (section "") (file test_t_jumps_t.asm:5)
+    E J16   $0000 $0002 4: j1 (section "") (file test_t_jumps_t.asm:2)
+    E J16   $0004 $0006 4: j1 (section "") (file test_t_jumps_t.asm:3)
+    E J16   $0008 $000A 4: j1 (section "") (file test_t_jumps_t.asm:4)
+    E J16   $000C $000E 4: j1 (section "") (file test_t_jumps_t.asm:5)
+  Strings:
+    S   1 = "test_t_jumps_t.asm"
+    S   2 = "j1"
+    S   3 = "test_t_jumps_t"
 Object  file test_t_jumps_t.1.o at $0000: Z80RMF18
   Name: test_t_jumps_t.1
   CPU:  r4k 
@@ -2201,6 +2205,10 @@ Object  file test_t_jumps_t.1.o at $0000: Z80RMF18
     C $7FF0: 00 00 00
   Symbols:
     G A $7FF3: j1 (section "") (file test_t_jumps_t.1.asm:3)
+  Strings:
+    S   1 = "j1"
+    S   2 = "test_t_jumps_t.1.asm"
+    S   3 = "test_t_jumps_t.1"
 END
 
 z80asm_nok("-b -mr4k", "", <<END, <<END);
