@@ -30,5 +30,5 @@ Object  file test_t_dump_library_02_t.o at $0104: Z80RMF18
     S   5 = "module2"
 
 Library public symbols:
-  S   1 = "public1"
-  S   2 = "public2"
+  P   1 = "public1"
+  P   2 = "public2"

@@ -1080,5 +1080,5 @@ Object  file test_t_dump_library_03_t.o at $46BC: Z80RMF18
     S   5 = "module_ti83plus_strict_ixiy"
 
 Library public symbols:
-  S   1 = "public1"
-  S   2 = "public2"
+  P   1 = "public1"
+  P   2 = "public2"

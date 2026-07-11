@@ -527,7 +527,7 @@ Object  file test_t_issue_2320_p_t.1.lib at $20EC: Z80RMF18
     S   5 = "test_t_issue_2320_p_t.1"
 
 Library public symbols:
-  S   1 = "the_answer"
+  P   1 = "the_answer"
 END
 
 	for my $code_ixiy ("", "-IXIY") {

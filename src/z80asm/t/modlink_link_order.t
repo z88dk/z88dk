@@ -46,7 +46,7 @@ Object  file test_t_modlink_link_order_tplat1.lib at $0090: Z80RMF18
     S   3 = "test_t_modlink_link_order_tgen"
 
 Library public symbols:
-  S   1 = "putpixel"
+  P   1 = "putpixel"
 END
 
 
@@ -84,7 +84,7 @@ Object  file test_t_modlink_link_order_tplat1.lib at $0090: Z80RMF18
     S   3 = "test_t_modlink_link_order_tgen"
 
 Library public symbols:
-  S   1 = "putpixel"
+  P   1 = "putpixel"
 END
 
 

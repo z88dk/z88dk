@@ -4541,8 +4541,8 @@ Object  file test_t_objfile_t.lib at $00C8: Z80RMF18
     S   3 = "test_t_objfile_t2"
 
 Library public symbols:
-  S   1 = "mult"
-  S   2 = "div"
+  P   1 = "mult"
+  P   2 = "div"
 END
 
 

@@ -1202,7 +1202,7 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 	} while (next != -1);
 
 	// symbol index table
-	if (index_pos >= 0 && file->version >= 18) {
+	if (index_pos >= 0 && file->version >= 19) {
 		xfseek(fp, index_pos, SEEK_SET);
 		printf("Symbol Index Table:\n");
 		while (true) {
@@ -1245,7 +1245,7 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 		if (st_size > 1) {		// dont show string 0=""
 			printf("Library public symbols:\n");
 			for (uint_t i = 1; i < st_size; i++) {
-				printf("  S %3d = \"%s\"\n", (int)i, strtable_lookup(st, i));
+				printf("  P %3d = \"%s\"\n", (int)i, strtable_lookup(st, i));
 			}
 		}
 	}

@@ -60,7 +60,7 @@ Object  file $test.1.lib at \$0014: Z80RMF18
     S   3 = "$test.1"
 
 Library public symbols:
-  S   1 = "the_answer"
+  P   1 = "the_answer"
 END
 
 		# link with object and library
