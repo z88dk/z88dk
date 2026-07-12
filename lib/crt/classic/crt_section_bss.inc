@@ -3,9 +3,14 @@ IF __crt_org_bss
     org     __crt_org_bss
     defb    0   ; control name of bss binary
 ELSE
+  ;; By default the final binary embeds the bss, use
+  ;; a pragma to disable it
+  IF CRT_TRIM_BSS
     org -1
+  ENDIF
 ENDIF
     SECTION bss_fp
+    SECTION bss_fp_bbc
     SECTION bss_fp_math32
     SECTION bss_fp_math16
     SECTION bss_fp_mbf32

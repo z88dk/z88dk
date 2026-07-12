@@ -30,6 +30,7 @@ ENDIF
     SECTION code_ctype
     SECTION code_esxdos
     SECTION code_fp
+    SECTION code_fp_bbc
     SECTION code_fp_math48
     SECTION code_fp_math32
     SECTION code_fp_math16
