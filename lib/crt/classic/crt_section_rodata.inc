@@ -12,6 +12,7 @@
     SECTION rodata_arch
     SECTION rodata_compiler
     SECTION rodata_clib
+    SECTION rodata_stdlib
     SECTION rodata_psg
     SECTION rodata_sound_ay
 IF !__crt_org_graphics

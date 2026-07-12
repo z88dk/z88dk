@@ -11,11 +11,13 @@
     SECTION code_l_sdcc
     SECTION code_l_sccz80
     SECTION code_l_clang
+    SECTION code_l_xcc
 IF !__crt_org_far
     SECTION code_l_sccz80_far
     SECTION code_far
 ENDIF
     SECTION code_z80
+    SECTION code_z180
     SECTION rodata_driver       ;Keep it in low memoey
     SECTION code_home
     SECTION code_compiler
@@ -36,7 +38,13 @@ ENDIF
     SECTION code_fp_am9511
     SECTION code_fp_dai32
     SECTION code_math
+    SECTION code_env
     SECTION code_error
+    SECTION code_fcntl
+    SECTION code_im2
+    SECTION code_lib
+    SECTION code_locale
+    SECTION code_network
     SECTION code_stdlib
     SECTION code_string
     SECTION code_adt_b_array
@@ -57,6 +65,7 @@ ENDIF
     SECTION code_adt_wv_priority_queue
     SECTION code_adt_wv_stack
     SECTION code_alloc_balloc
+    SECTION code_alloc_malloc
     SECTION code_alloc_obstack
     SECTION code_arch
     SECTION code_font
@@ -75,6 +84,10 @@ IF !__crt_org_graphics
 ENDIF
     SECTION code_video_vdp
     SECTION code_bifrost2
+    SECTION code_bifrost_h
+    SECTION code_bifrost_l
+    SECTION code_nivrvanm
+    SECTION code_nivrvanp
     SECTION code_SMSlib
     SECTION code_user
     SECTION CODE_END

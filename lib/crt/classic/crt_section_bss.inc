@@ -2,6 +2,8 @@
 IF __crt_org_bss
     org     __crt_org_bss
     defb    0   ; control name of bss binary
+ELSE
+    org -1
 ENDIF
     SECTION bss_fp
     SECTION bss_fp_math32
@@ -27,6 +29,7 @@ ENDIF
     SECTION bss_driver
     SECTION bss_arch
     SECTION bss_clib
+    SECTION bss_input
     SECTION bss_string
     SECTION bss_alloc_balloc
 IF !__crt_org_graphics
@@ -34,7 +37,7 @@ IF !__crt_org_graphics
 ENDIF
     SECTION bss_psg
     SECTION bss_sound_ay
-    SECTION	bss_PSGlib
+    SECTION bss_PSGlib
     SECTION bss_SMSlib
     SECTION bss_video_vdp
     SECTION bss_splib2
