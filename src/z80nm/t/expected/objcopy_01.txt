@@ -1,0 +1,31 @@
+Usage: z88dk-z80objcopy.pl [options] <input-file|-> [<output-file|->]
+
+Read a Z80 object file or text dump and display its contents. If an
+output file is supplied, write the object or dump to that file. This
+can be used to convert between versions or formats, or to extract to
+a text dump, edit it, and convert back.
+
+Input format detection:
+  If --in-format is not specified, the format is inferred from the
+  file extension or magic bytes. If the input is '-', the format is
+  assumed to be 'dump'.
+
+Output format detection:
+  If --out-format is not specified, the format is inferred from the
+  output file extension. If the output is '-', the format is assumed
+  to be 'dump'.
+
+Formats:
+  obj   - Z80 object file (binary .o or .lib)
+  dump  - text dump (ASCII .def)
+
+Options:
+  --in-format F     Set input format (obj|dump|auto)
+  --out-format F    Set output format (obj|dump|auto)
+  -v N, --version N Set output object file version 1..19 (default 18)
+  -h, --help        Show this help message
+
+Notes:
+  - Binary 'obj' format cannot be read from stdin or written to stdout.
+  - Use '-' for stdin/stdout only with the 'dump' format.
+

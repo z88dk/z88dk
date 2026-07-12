@@ -56,7 +56,7 @@ for ( path("../z80asm/obj_symbol_type.def")->lines ) {
     }
 }
 
-for my $version ( Obj::min_version .. Obj::cur_version ) {
+for my $version ( Obj::min_version .. Obj::max_version ) {
     my $vv = sprintf "%02d", $version;
 
     # build templating code

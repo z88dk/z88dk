@@ -5,7 +5,6 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 use Modern::Perl;
 use lib '.';
 use ObjModule;
-use Data::Dump 'dump';
 
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
@@ -13,15 +12,10 @@ my $self = path($0)->basename(".t");
 for my $version ( Obj::min_version .. Obj::max_version ) {
     my $version_str = sprintf "%02d", $version;
 
-    # empty library
-    my $lib = ObjLibrary->new;
-    $lib->version($version);
-
-    check_obj(
-        $lib,
-        "$dir/expected/${self}_v${version_str}.def",
-        "$dir/expected/${self}_v${version_str}.txt"
-    );
+    run_ok("perl z88dk-z80objcopy.pl $dir/input/$self.def $test.1.o");
+    run_ok("perl z88dk-z80objcopy.pl -v $version $test.1.o $test.2.o");
+    capture_ok( "z88dk-z80nm -a $test.2.o",
+        "$dir/expected/${self}_v$version_str.txt" );
 }
 
 unlink_testfiles;

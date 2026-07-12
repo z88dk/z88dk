@@ -109,5 +109,7 @@ clean::
 #------------------------------------------------------------------------------
 install:  $(PROJ)$(EXESUFFIX)
 	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
+	$(INSTALL) ObjModule.pm $(PREFIX)/bin/ObjModule.pm
+	$(INSTALL) z88dk-z80objcopy.pl $(PREFIX)/bin/z88dk-z80objcopy.pl
 
 -include $(DEPENDS)

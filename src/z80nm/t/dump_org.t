@@ -10,7 +10,7 @@ use Data::Dump 'dump';
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
 
-for my $version ( Obj::min_version .. Obj::cur_version ) {
+for my $version ( Obj::min_version .. Obj::max_version ) {
     my $version_str = sprintf "%02d", $version;
 
     for my $org ( undef, 0, 0x1000 ) {

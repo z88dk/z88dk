@@ -8,8 +8,9 @@
 # Manipulate z80asm object files
 #------------------------------------------------------------------------------
 
-my $cur_version       = 19;
+my $cur_version       = 18;
 my $min_version       = 1;
+my $max_version       = 19;
 my $module_signature  = "Z80RMF";
 my $library_signature = "Z80LMF";
 my $org_not_defined   = -1;
@@ -412,17 +413,32 @@ sub new {
 sub scan_file {
     my ( $self, $file ) = @_;
     my @lines = path($file)->lines( { chomp => 1 } );
+    $self->_scan_lines( \@lines, $file );
+}
+
+sub scan_fh {
+    my ( $self, $fh ) = @_;
+    $fh //= \*STDIN;
+    my @lines = <$fh>;
+    chomp @lines;
+    $self->_scan_lines( \@lines, "<stdin>" );
+}
+
+sub _scan_lines {
+    my ( $self, $lines_ref, $source ) = @_;
+    my @lines = @{$lines_ref};
+
     for ( 0 .. $#lines ) {
         my $text = $lines[$_];
         $text =~ s/;.*//;
         $text =~ s/^\s+|\s+$//g;
-        $lines[$_] = Line->new( $text, $file, $_ + 1 );
+        $lines[$_] = Line->new( $text, $source, $_ + 1 );
     }
     @lines = grep { $_->text =~ /\S/ } @lines;
 
     $self->lines( \@lines );
     $self->pos(0);
-    $self->file_($file);
+    $self->file_($source);
 }
 
 sub end {
@@ -2364,7 +2380,7 @@ sub parse {
         elsif ( $scanner->text =~ /version\s*=\s*(.*?)\s*$/ ) {
             my $version = $1;
             $version =~ /^\d+$/ or $scanner->error("invalid version: $version");
-            $version >= $min_version && $version <= $cur_version
+            $version >= $min_version && $version <= $max_version
                 or $scanner->error("invalid version: $version");
             $self->version($version);
             $scanner->advance;
@@ -2546,7 +2562,7 @@ sub unpack {
         die "invalid signature: $signature";
     }
 
-    if ( $version < $min_version || $version > $cur_version ) {
+    if ( $version < $min_version || $version > $max_version ) {
         die "invalid version: $version";
     }
 
@@ -2720,7 +2736,7 @@ sub parse {
         elsif ( $scanner->text =~ /version\s*=\s*(.*?)\s*$/ ) {
             my $version = $1;
             $version =~ /^\d+$/ or $scanner->error("invalid version: $version");
-            $version >= $min_version && $version <= $cur_version
+            $version >= $min_version && $version <= $max_version
                 or $scanner->error("invalid version: $version");
             $self->version($version);
             $scanner->advance;
@@ -2820,7 +2836,7 @@ sub unpack {
         die "invalid signature: $signature";
     }
 
-    if ( $version < $min_version || $version > $cur_version ) {
+    if ( $version < $min_version || $version > $max_version ) {
         die "invalid version: $version";
     }
 
@@ -2977,6 +2993,7 @@ use Modern::Perl;
 
 sub min_version { return $min_version; }
 sub cur_version { return $cur_version; }
+sub max_version { return $max_version; }
 
 sub parse {
     my ( $class, $scanner ) = @_;
@@ -2999,7 +3016,7 @@ sub unpack {
     my ( $signature, $version ) = $bin->unpack_signature;
     $bin->read_pos($pos0);
 
-    if ( $version < $min_version || $version > $cur_version ) {
+    if ( $version < $min_version || $version > $max_version ) {
         die "invalid version: $version";
     }
 
@@ -3011,6 +3028,26 @@ sub unpack {
     }
     else {
         die "invalid signature: $signature";
+    }
+}
+
+# return 'obj', 'lib', or undef after reading the first bytes of the file
+sub peek_magic {
+    my ( $class, $file ) = @_;
+    my $fh    = path($file)->openr;
+    my $magic = do {
+        local $/;
+        read( $fh, my $buf, length($module_signature) );
+        $buf;
+    };
+    if ( $magic eq $module_signature ) {
+        return 'obj';
+    }
+    elsif ( $magic eq $library_signature ) {
+        return 'lib';
+    }
+    else {
+        return undef;
     }
 }
 

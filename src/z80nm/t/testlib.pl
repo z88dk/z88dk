@@ -46,6 +46,7 @@ sub check_bin_file {
 sub check_text_file {
     my ( $got_file, $exp_file ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    say "check_text_file: got_file=$got_file, exp_file=$exp_file";
 
     ( my $got_text = path($got_file)->slurp ) =~ s/\r\n/\n/g;
     ( my $exp_text = path($exp_file)->slurp ) =~ s/\r\n/\n/g;
@@ -117,6 +118,9 @@ sub check_obj {
     my ( $obj, $exp_def, $exp_txt ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
+    # get version
+    my $version = $obj->version;
+
     # write def file
     open my $fh, '>', "$test.def" or die "Can't open output file: $!";
     my $ctx = ContextDumper->new($fh);
@@ -147,6 +151,11 @@ sub check_obj {
     my $raw = $bin->data;
     path("$test.o")->spew_raw($raw);
 
+    # check output of z80nm
+    capture_ok( "z88dk-z80nm -a $test.o", $exp_txt );
+
+    ( Test::More->builder->is_passing ) or die;
+
     # read binary file and check that it matches the original object
     my $bin3 = BinData->new;
     $raw = path("$test.o")->slurp_raw;
@@ -164,6 +173,30 @@ sub check_obj {
 
     # check output of z80nm
     capture_ok( "z88dk-z80nm -a $test.o", $exp_txt );
+
+    ( Test::More->builder->is_passing ) or die;
+
+    # check z88dk-z80objcopy.pl def->obj
+    unlink("$test.o");
+    run_ok("perl z88dk-z80objcopy.pl -v $version $test.def $test.o");
+    capture_ok( "z88dk-z80nm -a $test.o", $exp_txt );
+
+    ( Test::More->builder->is_passing ) or die;
+
+    # check z88dk-z80objcopy.pl def->stdout
+    capture_ok( "perl z88dk-z80objcopy.pl -v $version $test.def", $exp_def );
+
+    ( Test::More->builder->is_passing ) or die;
+
+    # check z88dk-z80objcopy.pl obj->def
+    unlink("$test.def");
+    run_ok("perl z88dk-z80objcopy.pl -v $version $test.o $test.def");
+    check_text_file( "$test.def", $exp_def );
+
+    ( Test::More->builder->is_passing ) or die;
+
+    # check z88dk-z80objcopy.pl obj->stdout
+    capture_ok( "perl z88dk-z80objcopy.pl -v $version $test.o", $exp_def );
 
     ( Test::More->builder->is_passing ) or die;
 }
