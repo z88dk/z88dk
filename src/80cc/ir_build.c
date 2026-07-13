@@ -6263,13 +6263,52 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
     int is_shift = (k == IR_SHL || k == IR_SHR);
     int is_ptrish = (n->type && n->type->kind == KIND_PTR)
                  || (lhs->type && lhs->type->kind == KIND_PTR);
+    /* Byte compare against a byte-range constant: an unsigned char compared to a
+       constant in [0,255] (`c == ' '`, `c >= 'a'`, `c <= 'z'`) stays a byte `cp`
+       instead of widening c to int for a 16-bit compare — the C-promotion is
+       value-preserving here, and a widened compare reloads/extends c per test
+       (lexbench classify: ~7 instrs/test vs 2). All EQ/NE and unsigned relations:
+       ULE/UGT are canonicalised below to `<K+1`/`>=K+1` at the kept byte width, so
+       K<=254 folds to a byte ULT/UGE and K==255 constant-folds (`eff>=tmax`) — both
+       correct. Unsigned LHS so the zero-extended value is exactly the byte. */
+    int keep_byte_cmp = 0;
+    if (is_cmp && width == 1 && rhs && rhs->ast_type == AST_LITERAL
+        && lhs->type) {
+        int64_t C = (int64_t)rhs->zval;
+        if (lhs->type->isunsigned
+            && C >= 0 && C <= 255
+            && (k == IR_CMP_EQ  || k == IR_CMP_NE
+                || k == IR_CMP_ULT || k == IR_CMP_UGE
+                || k == IR_CMP_ULE || k == IR_CMP_UGT))
+            keep_byte_cmp = 1;
+        /* Signed char EQ/NE: byte-pattern equality is bias-free (a `cp K` sets Z
+           iff the bytes match, sign-independent). Restrict to a printable-range
+           constant [0,127] — a signed byte genuinely holds those values, and the
+           existing byte-`cp` lowering already accepts [0,255], so no relational
+           +128 bias path is needed. (Signed relational — `c < 0` — would need
+           that bias; left widened.) Covers `char c == 'x'` for plain (signed by
+           default) char, the common text-scan form. */
+        else if (!lhs->type->isunsigned
+                 && (k == IR_CMP_EQ || k == IR_CMP_NE)
+                 && C >= 0 && C <= 127)
+            keep_byte_cmp = 1;
+        /* Signed char relational (`c < ' '`, `c >= '0'`): kept a byte and lowered
+           with the +128 bias (`xor 0x80; cp K^0x80` → unsigned cp) instead of
+           sign-extend + 16-bit compare. Const in the signed-char range [-128,127];
+           `c REL 0` is taken by the sign-test path in the lowerer. */
+        else if (!lhs->type->isunsigned
+                 && (k == IR_CMP_LT || k == IR_CMP_GE
+                     || k == IR_CMP_LE || k == IR_CMP_GT)
+                 && C >= -128 && C <= 127)
+            keep_byte_cmp = 1;
+    }
     /* Widen the LHS to the RESULT width when the literal RHS or
        the expression type is wider than the LHS vreg. The
        commutative swap above moves literals to the RHS, so
        `0x01000100UL + i` arrives with l = i (width 2) and a LONG
        literal — else the add runs at 16 bits, truncating the
        constant to its low word. */
-    if (!is_shift && !is_ptrish
+    if (!is_shift && !is_ptrish && !keep_byte_cmp
         && rhs && rhs->ast_type == AST_LITERAL) {
         int tw = width;
         if (rhs->type && is_register_int_kind(rhs->type->kind)
@@ -6479,6 +6518,19 @@ static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
             return build_fail("OP_ANDAND with missing operand");
         if (emit_cond_false_exit(b, n->left, false_bb) != 0) return -1;
         return emit_cond_false_exit(b, n->right, false_bb);
+    case OP_OROR: {
+        /* Polarity-flipped nest (`||` under `&&`): `A || B` is FALSE iff both are
+           false. Branch-lower via a "n is true" continuation so the leaves stay
+           branch-fused (byte cp) rather than materialising boolean values. */
+        if (!n->left || !n->right)
+            return build_fail("OP_OROR with missing operand");
+        int ft = ir_bb_new(b->f);
+        if (emit_cond_true_exit(b, n->left, ft) != 0) return -1;      /* A true → ft */
+        if (emit_cond_false_exit(b, n->right, false_bb) != 0) return -1; /* B false → false_bb */
+        ir_emit_br(cur_bb(b), ft);                                    /* B true → ft */
+        b->cur_bb_id = ft;
+        return 0;
+    }
     case OP_LNEG:   /* !x is false ⟺ x is true → x-true exits to false_bb */
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_true_exit(b, n->operand, false_bb);
@@ -6501,6 +6553,20 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
             return build_fail("OP_OROR with missing operand");
         if (emit_cond_true_exit(b, n->left, true_bb) != 0) return -1;
         return emit_cond_true_exit(b, n->right, true_bb);
+    case OP_ANDAND: {
+        /* Polarity-flipped nest (`&&` under `||`, e.g. classify's
+           `(c>='a'&&c<='z') || …`): `A && B` is TRUE iff both are true.
+           Branch-lower via a "n is false" continuation so the leaves stay
+           branch-fused (byte cp) rather than materialising boolean values. */
+        if (!n->left || !n->right)
+            return build_fail("OP_ANDAND with missing operand");
+        int ft = ir_bb_new(b->f);
+        if (emit_cond_false_exit(b, n->left, ft) != 0) return -1;     /* A false → ft */
+        if (emit_cond_true_exit(b, n->right, true_bb) != 0) return -1;/* B true → true_bb */
+        ir_emit_br(cur_bb(b), ft);                                    /* B false → ft */
+        b->cur_bb_id = ft;
+        return 0;
+    }
     case OP_LNEG:   /* !x is true ⟺ x is false → x-false exits to true_bb */
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_false_exit(b, n->operand, true_bb);

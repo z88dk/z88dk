@@ -292,6 +292,34 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         L.la.cur_skip_next_op = 1;
         return 0;
     }
+    /* Signed byte vs const: bias both operands by 0x80 to map [-128,127] onto
+       [0,255] order-preservingly, then an unsigned `cp`. `c < K` (signed) iff
+       (c^0x80) < (K^0x80) (unsigned). Keeps a signed-char relational as
+       `xor 0x80; cp K'` instead of sign-extend + 16-bit sbc. Placed before the
+       unsigned byte-const path so a signed operand isn't misread as unsigned
+       (imm==0 is already handled by the sign test above). */
+    if (is_signed && op->src[0] >= 0 && op->src[1] == -1
+        && f->vregs[op->src[0]].width == 1
+        && op->imm >= -128 && op->imm <= 127) {
+        load_byte_to_a(out, f, op->src[0]);
+        emit(out, "xor\t0x80");
+        emit(out, "cp\t%u", (unsigned)((op->imm ^ 0x80) & 0xff));
+        if (L.la.cur_branch_test_kind != 0) {
+            int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+            int want_carry = (cf_true_long == br_true);   /* LT → carry */
+            emit(out, "jp\t%s,L_f%d_bb_%d",
+                 want_carry ? "c" : "nc", L.func_emit_idx, L.la.cur_branch_test_label);
+            L.rs.a = -1;
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
+        emit(out, "ld\thl,0");
+        emit_skip(out, f, cf_true_long ? "nc" : "c", 1);  /* skip inc when result is 0 */
+        emit(out, "inc\tl");
+        commit_hl_word(out, f, op->dst);
+        L.rs.a = -1;
+        return 0;
+    }
     /* Byte compare vs small const: a width-1 operand loads zero-extended, so
        the widen+16-bit compare is really UNSIGNED [0,255] vs [0,255] — identical
        to a single `cp K`. Emit that directly for the branch-fused `c REL K`
