@@ -24,5 +24,9 @@ Object  file t/55-obj-library//input/obj_jr_relaxation_05.o at $0014: Z80RMF18
     L A $0103: func1 (section "") (file t/55-obj-library/input/obj_jr_relaxation_05.asm:3)
   Externs:
   Expressions:
-    E W $0000 $0001 3: func1 (section "") (file t/55-obj-library/input/obj_jr_relaxation_05.asm:1)
+    E U16   $0000 $0001 3: func1 (section "") (file t/55-obj-library/input/obj_jr_relaxation_05.asm:1)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_jr_relaxation_05.asm"
+    S   2 = "func1"
+    S   3 = "obj_jr_relaxation_05"
 
