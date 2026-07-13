@@ -40,6 +40,17 @@ static void lp_copycall(char *d, const char *s)
     *d = 0;
 }
 
+/* Index-byte fill: the induction var i rides BC, and `i & 15` extracts its low
+   byte — regression for the BC-resident-word byte-read bug (load_byte_to_a used
+   to read a stale slot for a BC-homed word → all-'a' fill). */
+static void lp_fill(char *d, int n)
+{
+    int i;
+    for (i = 0; i < n; i++)
+        *d++ = (char)('a' + (i & 15));
+    *d = 0;
+}
+
 static char lp_buf[40];
 static char lp_buf2[40];
 
@@ -72,7 +83,12 @@ static void test_loop_ptr(void)
     chk = (unsigned)((chk * 31u + (unsigned)lp_acc) & 0xffffu);
     chk = (unsigned)((chk * 31u + (unsigned)lp_strcmp(lp_buf2, "TheQuickBrownFox")) & 0xffffu);
 
-    Assert(chk == 0xD088u, "loop-regalloc walking-pointer checksum (host-verified)");
+    /* index-byte fill (BC-resident i, i&15 low-byte extract). */
+    lp_fill(lp_buf, 33);
+    for (i = 0; lp_buf[i]; i++)
+        chk = (unsigned)((chk * 31u + (unsigned char)lp_buf[i]) & 0xffffu);
+
+    Assert(chk == 0xD0C9u, "loop-regalloc walking-pointer checksum (host-verified)");
 }
 
 int main(int argc, char *argv[])

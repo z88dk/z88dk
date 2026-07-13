@@ -20,6 +20,14 @@ int skim(TokenKind tk_op, int (*heir)(LVALUE* lval), LVALUE* lval)
     int is_or = (tk_op == TK_LOR);
 
     hits = 0;
+    /* `first` = we have not yet captured an operand IN THIS skim. It must NOT be
+       derived from the incoming lval->node: when skim() is invoked NESTED (an
+       inner `&&` chain parsed as one operand of an outer `||`, via plnge1), the
+       entry lval->node still holds the OUTER chain's operand. Testing `left !=
+       NULL` then wrongly folds that outer operand into this chain — turning
+       `A || (B && C)` into `A || ((A && B) && C)` (the isalpha idiom miscompile).
+       Track the first operand explicitly instead. */
+    int first = 1;
     while (1) {
         left = lval->node;
         k = plnge1(heir, lval);
@@ -37,13 +45,13 @@ int skim(TokenKind tk_op, int (*heir)(LVALUE* lval), LVALUE* lval)
                matching what legacy emits. */
             dropout(k, is_or, droplab, lval);
             right = lval->node;
-            if (left != NULL) {
-                /* Combine with the previous chain. On the very first
-                   iteration `left` was the lval->node at skim entry
-                   (NULL or unrelated); skip the binop until we have a
-                   real prior operand to chain. */
+            if (!first) {
+                /* Combine with the prior operand of THIS chain (carried in
+                   lval->node from the previous iteration). The first operand
+                   has no prior to chain with — just keep it. */
                 lval->node = ast_binop(is_or ? OP_OROR : OP_ANDAND, left, right);
             }
+            first = 0;
         } else if (hits) {
             dropout(k, is_or, droplab, lval);
             right = lval->node;

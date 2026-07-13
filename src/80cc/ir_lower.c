@@ -1535,14 +1535,42 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
     return 0;
 }
 
+/* A NO_SLOT byte rides A from its def straight to its consumer and is never
+   written back. That is only sound when the consumer READS the byte from A and
+   can never need to spill it to a slot. Terminal A-readers qualify: a memory
+   store of the byte (ST_MEM) and a branch test (BR_ZERO/BR_COND) — the exact
+   shapes the copy-loop / `while (*s)` / `*d = *s` idioms produce.
+
+   Byte ALU / MOV / widening consumers do NOT qualify: their operand staging
+   can `store_a_byte` an A-resident operand to a slot (e.g. gen_sub spills the
+   subtrahend to free A; a def that clobbers A spills a still-live A byte), and
+   with no slot that lands below-frame / aborts. Those keep their slot. This
+   was the umaxd.c:49 abort — a byte `o[p+16]` deref whose value flowed to a
+   MOV kept in A, then got spilled during a neighbouring op's A staging. */
+static int no_slot_consumer_safe(const Func *f, const BB *bb, int j)
+{
+    int v = bb->ops[j].dst;
+    if (j + 1 >= bb->n_ops) return 0;
+    const Op *use = &bb->ops[j + 1];
+    switch (use->kind) {
+    case IR_ST_MEM:                       /* store the byte to memory */
+        return use->src[0] == v && use->mem.base != v;
+    case IR_BR_ZERO:                      /* test the byte, branch */
+    case IR_BR_COND:
+        return use->src[0] == v;
+    default:
+        return 0;
+    }
+    (void)f;
+}
+
 /* Dead-slot pruning: flag byte SPILL vregs that never touch a frame slot, so
    ir_assign_slots reserves none (shrinking frame_size, often to 0). A byte vreg
-   is A-only iff EVERY def is dst-dead — then lowering keeps each result in A and
-   serves every use from the cache (def_dst_dead proved both), so it is neither
-   stored nor reloaded. Uses the SAME def_dst_dead the render consults, so the
-   two never disagree on whether the slot is live. Runs after ir_alloc (needs
-   phys) and before ir_assign_slots. Word/wider temps keep the ss dead-store
-   pass; this is the byte analogue the ss machinery doesn't cover. */
+   is A-only iff EVERY def is dst-dead AND feeds a terminal A-reader
+   (no_slot_consumer_safe) — then lowering keeps each result in A, serves the use
+   from the cache, and never spills it. Runs after ir_alloc (needs phys) and
+   before ir_assign_slots. Word/wider temps keep the ss dead-store pass; this is
+   the byte analogue the ss machinery doesn't cover. */
 static void compute_no_slot_bytes(Func *f)
 {
     if (getenv("IR_NO_SLOT_PRUNE")) return;
@@ -1564,8 +1592,10 @@ static void compute_no_slot_bytes(Func *f)
                 n_defs++;
                 /* Only a plain single-dst def can be an A-only byte: a POSTSTEP
                    or post-step LD_MEM redefines its base too (multi-def) — never
-                   the A-cached shape. def_dst_dead vets the value flow. */
-                if (bb->ops[j].dst != v || !def_dst_dead(f, bb, j)) {
+                   the A-cached shape. def_dst_dead vets the value flow; the
+                   consumer must be a terminal A-reader that never spills it. */
+                if (bb->ops[j].dst != v || !def_dst_dead(f, bb, j)
+                    || !no_slot_consumer_safe(f, bb, j)) {
                     all_dead = 0; break;
                 }
             }

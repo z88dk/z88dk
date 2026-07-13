@@ -4877,8 +4877,31 @@ static int build_assign(Builder *b, Node *n)
            scaling in the AST_LITERAL handler. */
         int rhs_v = build_expr_hinted(b, n->right, dst_v);
         if (rhs_v < 0) return -1;
-        if (rhs_v != dst_v)
-            ir_emit_mov(cur_bb(b), dst_v, rhs_v);
+        if (rhs_v != dst_v) {
+            /* Converge width before the copy: build_expr_hinted may return a
+               vreg NARROWER than the integer local (a plain int variable, or a
+               const-multiply strength-reduce result, assigned to a `long`). A
+               bare MOV would leave the high bytes unset — garbage, or a
+               register-only source aborting in load_to_dehl. Sign/zero-extend
+               (long long via the accumulator) — mirrors the global store path. */
+            int rhs_w = b->f->vregs[rhs_v].width;
+            if (rhs_w != ldst_w && is_acc_int_kind(lk)) {
+                rhs_v = promote_to_acc_int(b, rhs_v,
+                            n->right && n->right->type
+                            && n->right->type->isunsigned);
+                if (rhs_v < 0) return -1;
+            } else if (rhs_w != ldst_w && (ldst_w == 2 || ldst_w == 4)) {
+                OpKind cv = (rhs_w > ldst_w)
+                    ? IR_CONV_TRUNC
+                    : (n->right->type && n->right->type->isunsigned
+                       ? IR_CONV_ZX : IR_CONV_SX);
+                Op *op = ir_op_emit(cur_bb(b), cv);
+                op->dst = dst_v; op->src[0] = rhs_v;
+                return dst_v;
+            }
+            if (rhs_v != dst_v)
+                ir_emit_mov(cur_bb(b), dst_v, rhs_v);
+        }
         return dst_v;
     }
     /* Non-local LHS: for a float-literal RHS heading into an
@@ -5879,6 +5902,13 @@ static int build_muldiv_integer(Builder *b, Node *n)
     if (r < 0) return -1;
     int width = b->f->vregs[l].width;
     if (b->f->vregs[r].width > width) width = b->f->vregs[r].width;
+    /* C integer promotion: mul/div/mod have no byte-width helper, so a
+       char operand must widen to int (>=2) BEFORE the HCALL. Without this
+       floor two char operands share width 1, skip the conversion below,
+       and reach l_div/l_mult as bytes — gen_hcall then zero-extends each
+       (`ld h,0`), silently dropping the sign of a signed char (`-100/7`
+       became 156/7). */
+    if (width < 2) width = 2;
     /* Converge mixed-width operands to the helper width BEFORE
        the HCALL: gen_hcall marshals each arg by its vreg width,
        so a narrower operand hands the helper a garbage high half

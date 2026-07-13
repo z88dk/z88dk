@@ -664,6 +664,11 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
        byte in HL (no spill) is still readable. */
     if (hl_has(vreg_id)) { ss_note_cache_read(f, vreg_id); emit(out, "ld\ta,l"); return; }
     if (de_has(vreg_id)) { ss_note_cache_read(f, vreg_id); emit(out, "ld\ta,e"); return; }
+    /* A word resident in BC keeps its low byte in C — read it directly.
+       Without this a byte-extract of a BC-homed value (e.g. `i & 15` where the
+       induction var i rides BC) fell to a SLOT read of a slot the BC home never
+       writes → stale value (all-'a' fill bug). Mirrors the DE case. */
+    if (bc_has(vreg_id)) { ss_note_cache_read(f, vreg_id); emit(out, "ld\ta,c"); return; }
     /* Past the register-cache hits: a slot read follows (fp or sp). */
     ss_note_reload(f, vreg_id);
     if (fp_active(f)) {
