@@ -1025,6 +1025,143 @@ static const PatternDef pat_derefpp = {
     .check = derefpp_check, .apply = derefpp_apply,
 };
 
+/* stpp — store post-step (`*p++ = v`), the store-side mirror of derefpp.
+   After the poststep pass fuses `MOV t<-p; INC p` into `POSTSTEP t<-p`, the
+   pre-increment store idiom reads:
+       POSTSTEP t <- p (imm=±1)      ; t = old p, p += 1
+       ST_MEM  [t], v                ; *old_p = v
+   which is `*p++ = v`. Fuse to `ST_MEM [p], v (post_step=±1)`: store through
+   p, then step p — one register pointer instead of a slot round-trip for the
+   copy. The POSTSTEP (satellite) is dropped; ir_op_defs reports the store's
+   base redef so liveness keeps p live. Requires t used ONLY by the store
+   (single-use) so dropping the POSTSTEP is safe. Byte stores, offset 0,
+   non-volatile, non-banked only — matching what gen_st_mem's post-step
+   lowering handles. Gated behind IR_LOOP_RA: it changes `*p++=v` codegen
+   corpus-wide, so it stays opt-in with the loop register allocator that
+   motivates it (a walking dst pointer homed in BC/DE → `ld (de),a; inc de`). */
+enum { SPV_P = 1, SPV_T };
+
+static int stpp_check(Func *f, BB *bb, const int idx[],
+                      const int64_t imm[], const int bind[], const int uc[])
+{
+    (void)imm;
+    const Op *ps = &bb->ops[idx[0]];   /* POSTSTEP (satellite) */
+    const Op *st = &bb->ops[idx[1]];   /* ST_MEM   (anchor)    */
+    int p = bind[SPV_P];
+    int t = bind[SPV_T];
+    if (ps->kind != IR_POSTSTEP) return 0;
+    if (ps->imm != 1 && ps->imm != -1) return 0;   /* byte ±1 step only */
+    if (st->kind != IR_ST_MEM) return 0;
+    if (st->mem.kind != IR_MEM_VREG) return 0;
+    if (st->mem.base != t) return 0;               /* store through the copy */
+    if (st->mem.offset != 0) return 0;
+    if (st->mem.volatile_ || st->mem.bank_fn || st->mem.elem == KIND_CPTR)
+        return 0;
+    if (st->mem.post_step != 0) return 0;
+    if (t < 0 || p < 0 || t == p) return 0;
+    if (t >= f->n_vregs || uc[t] != 1) return 0;   /* t used only by the store */
+    if (f->vregs[p].flags & IR_VREG_VOLATILE) return 0;
+    if (st->src[0] < 0) return 0;                  /* real value (not folded imm) */
+    if (st->src[0] == t || st->src[0] == p) return 0;
+    if (f->vregs[st->src[0]].width != 1) return 0; /* byte store */
+    return 1;
+}
+
+static void stpp_apply(Func *f, BB *bb, const int idx[],
+                       const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm;
+    const Op *ps = &bb->ops[idx[0]];
+    Op *st = &bb->ops[idx[1]];             /* anchor = ST_MEM */
+    st->mem.base = bind[SPV_P];            /* store through p directly */
+    st->mem.post_step = (int)ps->imm;      /* then p += imm */
+}
+
+static const PatternDef pat_stpp = {
+    .name = "stpp", .n_ops = 2, .anchor = 2,   /* anchor = ST_MEM (index 1) */
+    .flags = IR_PAT_NO_AUTO_TEMPS,
+    .ops = {
+        { .kind = IR_POSTSTEP, .dst = SPV_T, .src0 = SPV_P,
+          .imm_pred = IR_IMM_ANY },
+        { .kind = IR_ST_MEM, .dst = IR_MS_NONE,
+          .src0 = IR_MS_ANY, .src1 = IR_MS_NONE },
+    },
+    .check = stpp_check, .apply = stpp_apply,
+};
+
+/* copystep — the byte copy-loop `while ((*d++ = *s++))` (strcpy/strcat). After
+   derefpp + stpp the loop body is the adjacent triple
+       LD_MEM  t <- [s] (post_step ±1)     ; t = *s, s += step
+       ST_MEM  [d], t   (post_step ±1)     ; *d = t, d += step
+       BR_ZERO t, exit                     ; if t == 0 goto exit
+   with t used ONLY by the store + branch (dead after). Fuse to one
+   IR_COPY_STEP_BRZ carrying (s=src[0], d=src[1], step=imm, label): it lowers to
+   `ld a,(de); ld (bc),a; inc de; inc bc; or a; jp z`. The byte temp t vanishes
+   as a vreg — so nothing spills, and a function that was frameless-but-for-t's
+   slot drops frame_size to 0. Anchors on the BR_ZERO (the others NOP); the BB's
+   loop-back BR is untouched, so successors are unchanged. */
+enum { CSV_T = 1 };
+
+static int copystep_check(Func *f, BB *bb, const int idx[],
+                          const int64_t imm[], const int bind[], const int uc[])
+{
+    (void)imm;
+    const Op *ld = &bb->ops[idx[0]];
+    const Op *st = &bb->ops[idx[1]];
+    const Op *br = &bb->ops[idx[2]];
+    int t = bind[CSV_T];
+    if (ld->kind != IR_LD_MEM || st->kind != IR_ST_MEM
+        || br->kind != IR_BR_ZERO) return 0;
+    if (ld->mem.kind != IR_MEM_VREG || st->mem.kind != IR_MEM_VREG) return 0;
+    /* both post-step ±1, same step, byte, offset 0, plain (not far/volatile). */
+    int step = ld->mem.post_step;
+    if (step != 1 && step != -1) return 0;
+    if (st->mem.post_step != step) return 0;
+    if (ld->mem.offset || st->mem.offset) return 0;
+    if (ld->mem.volatile_ || st->mem.volatile_) return 0;
+    if (ld->mem.bank_fn || st->mem.bank_fn) return 0;
+    if (ld->mem.elem == KIND_CPTR || st->mem.elem == KIND_CPTR) return 0;
+    if (t < 0 || t >= f->n_vregs || f->vregs[t].width != 1) return 0;
+    if (st->src[0] != t || br->src[0] != t) return 0;   /* t is stored + tested */
+    if (uc[t] != 2) return 0;                            /* used ONLY here (dead after) */
+    int s = ld->mem.base, d = st->mem.base;
+    if (s < 0 || d < 0 || s == d || s == t || d == t) return 0;
+    if (f->vregs[s].flags & IR_VREG_VOLATILE) return 0;
+    if (f->vregs[d].flags & IR_VREG_VOLATILE) return 0;
+    return 1;
+}
+
+static void copystep_apply(Func *f, BB *bb, const int idx[],
+                           const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm; (void)bind;
+    const Op *ld = &bb->ops[idx[0]];
+    const Op *st = &bb->ops[idx[1]];
+    Op *br = &bb->ops[idx[2]];             /* anchor = BR_ZERO */
+    int s = ld->mem.base, d = st->mem.base, step = ld->mem.post_step;
+    int label = br->label;
+    br->kind = IR_COPY_STEP_BRZ;
+    br->src[0] = s;
+    br->src[1] = d;
+    br->imm = step;
+    br->label = label;
+    br->mem.base = -1;
+}
+
+static const PatternDef pat_copystep = {
+    .name = "copystep", .n_ops = 3, .anchor = 3,  /* anchor = BR_ZERO (index 2) */
+    .flags = IR_PAT_NO_AUTO_TEMPS,
+    .ops = {
+        { .kind = IR_LD_MEM, .dst = CSV_T,
+          .src0 = IR_MS_NONE, .src1 = IR_MS_NONE },
+        { .kind = IR_ST_MEM, .dst = IR_MS_NONE,
+          .src0 = CSV_T, .src1 = IR_MS_NONE },
+        { .kind = IR_BR_ZERO, .dst = IR_MS_NONE,
+          .src0 = CSV_T, .src1 = IR_MS_NONE },
+    },
+    .check = copystep_check, .apply = copystep_apply,
+};
+
 /* movfuse — producer + single-use MOV (migrated from
    ir_opt_fuse_mov): `<producer> t <- ...; MOV d <- t` with t
    function-wide single-use and same width as d redirects the
@@ -1097,6 +1234,14 @@ int ir_match_run_early(Func *f)
 {
     int n = ir_match_run_table(f, &pat_poststep, 1);
     n += ir_match_run_table(f, &pat_derefpp, 1);
+    /* stpp needs the POSTSTEP that poststep just produced. Default-on with
+       the loop register allocator (IR_NO_LOOP_RA opts out) — it feeds the
+       DE/BC walking-pointer home (`*d++` → `ld (de),a; inc de`). */
+    if (!getenv("IR_NO_LOOP_RA")) {
+        n += ir_match_run_table(f, &pat_stpp, 1);
+        /* copystep needs the post-step LD_MEM (derefpp) + ST_MEM (stpp). */
+        n += ir_match_run_table(f, &pat_copystep, 1);
+    }
     n += ir_match_run_table(f, &pat_movfuse, 1);
     return n;
 }

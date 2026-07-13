@@ -6807,6 +6807,8 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     if (!f) return build_fail("ir_func_new returned NULL");
     f->cpu = (uint32_t)c_cpu;   /* one-hot CPU id; ir_match gates patterns on it */
     f->idx2_reg = ir_idx2_reg();
+    f->idx3_reg = ir_idx3_reg();
+    f->exx_reg  = ir_exx_reg();
     /* Wide memory-accumulator primitive names for the active maths mode —
        the lowerer's generic MOV/LD_MEM/ST_MEM/RET/CALL paths read these
        (keeps ir_lower decoupled from c_fp_size / the maths table). */

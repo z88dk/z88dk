@@ -1,7 +1,7 @@
 /* ir_lower_regcache.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
-    if (fp_active(f)) {
+    if (fp_active(f) && !L.cur_frameless) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
             emit(out, "ld\tbc,(%s%+d)", frame_reg(), ix_off);
@@ -35,6 +35,13 @@ static int vreg_in_pr_bc(const Func *f, int vreg_id)
     if (!f || !f->vreg_to_phys) return 0;
     if (vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
     return f->vreg_to_phys[vreg_id] == IR_PR_BC;
+}
+
+static int vreg_in_pr_de(const Func *f, int vreg_id)
+{
+    if (!f || !f->vreg_to_phys) return 0;
+    if (vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
+    return f->vreg_to_phys[vreg_id] == IR_PR_DE;
 }
 
 /* Width-4 byte-arithmetic fastpath gate. True for integer kinds
@@ -179,9 +186,21 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         return;
     }
     /* idx2 resident in the spare index register: `push <idx>;pop hl`. */
+    /* Alt-bank invariant materialize (rare — a non-branch-fused compare read):
+       `exx; push <altpair>; exx; pop hl` brings it into HL without disturbing
+       the alt home (push in the alt bank, pop in the main). */
+    if (vreg_in_exx(f, vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
+        emit(out, "exx");
+        emit(out, "push\t%s", exx_pair(f));
+        emit(out, "exx");
+        emit(out, "pop\thl");
+        hl_about_to_change(vreg_id);
+        return;
+    }
     if (vreg_in_idx2(f, vreg_id) && f->vregs[vreg_id].width == 2) {
         ss_note_cache_read(f, vreg_id);
-        emit(out, "push\t%s", idx2_reg_name(f));
+        emit(out, "push\t%s", vreg_idx_name(f, vreg_id));
         emit(out, "pop\thl");
         hl_about_to_change(vreg_id);
         return;
@@ -330,9 +349,18 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
     }
     /* idx2 resident: `push <idx>;pop de` recovers it (HL untouched) —
        cheaper than the per-iteration slot reload. */
+    if (vreg_in_exx(f, vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
+        emit(out, "exx");
+        emit(out, "push\t%s", exx_pair(f));
+        emit(out, "exx");
+        emit(out, "pop\tde");
+        cache_de(vreg_id);
+        return;
+    }
     if (vreg_in_idx2(f, vreg_id) && f->vregs[vreg_id].width == 2) {
         ss_note_cache_read(f, vreg_id);
-        emit(out, "push\t%s", idx2_reg_name(f));
+        emit(out, "push\t%s", vreg_idx_name(f, vreg_id));
         emit(out, "pop\tde");
         cache_de(vreg_id);
         return;
@@ -1362,7 +1390,7 @@ static int cmp_byte_src(const Func *f, int v, int idxhalf_ok,
         return 2;
     }
     if (idxhalf_ok && vreg_in_idx2(f, v) && f->vregs[v].width == 2) {
-        const char *r = (f->idx2_reg == IR_PR_IX) ? "ix" : "iy";
+        const char *r = vreg_idx_name(f, v);
         snprintf(lo, n, "%sl", r); snprintf(hi, n, "%sh", r);
         return 2;
     }
@@ -1587,6 +1615,57 @@ static int op_de_clean(const Func *f, const Op *o)
             return 1;
         /* --- General (non-accumulate) DE-home region ops (cur_de_home>=0) --- */
         if (L.cur_de_home >= 0) {
+            /* Loop-regalloc walking-pointer home (IR_LOOP_RA): the home is a
+               byte pointer in DE. Its own deref (ld a,(de)), store (ld (de),a),
+               and step (inc/dec de / POSTSTEP) keep DE = the (stepped) pointer —
+               all DE-clean via the gp (de) lowering. A byte deref of ANOTHER
+               pointer stays clean via the general switch below (dw==1 → A). */
+            if (f->de_home_is_ptr) {
+                if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                    && o->mem.kind == IR_MEM_VREG
+                    && o->mem.base == L.cur_func_whome
+                    && o->mem.offset == 0)
+                    return 1;
+                /* Fused byte copy-loop (COPY_STEP_BRZ): the DE home is one of
+                   the two stepped pointers (src[0]=source, src[1]=dest). It
+                   reads/writes/steps that pointer in DE (`ld a,(de); inc de` or
+                   `ld (de),a; inc de`) and the OTHER through BC, byte via A —
+                   DE stays = the (stepped) home. Clean only when the home IS one
+                   of the pointers (else a slot-backed pointer would use DE as
+                   HL/DE scratch). */
+                if (o->kind == IR_COPY_STEP_BRZ
+                    && (o->src[0] == L.cur_func_whome
+                        || o->src[1] == L.cur_func_whome))
+                    return 1;
+                /* A SECOND walking pointer homed in BC alongside the DE home
+                   (strcpy: dst `*d++` in BC, src the DE home). A post-step byte
+                   store through it takes the gp `ld (bc),a; inc bc` path
+                   (guaranteed for st_step in gen_st_mem) — A + BC only, so DE
+                   survives. Restricted to post_step: a plain BC store may take
+                   the E-stashing fallback, which would clobber the home. */
+                if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
+                    && o->mem.offset == 0 && o->mem.post_step != 0
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs
+                    && f->vreg_to_phys
+                    && f->vreg_to_phys[o->mem.base] == IR_PR_BC
+                    && o->src[0] >= 0 && o->src[0] < f->n_vregs
+                    && f->vregs[o->src[0]].width == 1)
+                    return 1;
+                if ((o->kind == IR_INC || o->kind == IR_DEC)
+                    && o->dst == L.cur_func_whome)
+                    return 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] == L.cur_func_whome)
+                    return 1;
+                /* Byte compare (`*a == *b`, `*a < *b`): operands reach A via
+                   `cp`/slot, never staged into DE. Byte operands only. */
+                if (o->kind == IR_CMP_EQ || o->kind == IR_CMP_LT
+                    || o->kind == IR_CMP_ULT) {
+                    int s0 = o->src[0], s1 = o->src[1];
+                    int w0 = (s0 >= 0 && s0 < f->n_vregs) ? f->vregs[s0].width : 2;
+                    int w1 = (s1 >= 0 && s1 < f->n_vregs) ? f->vregs[s1].width : 1;
+                    if (w0 <= 1 && w1 <= 1) return 1;
+                }
+            }
             /* Branch-fused int compare lowered by try_cmp_ixd_fold: reads both
                operands in place through A, never staging one into DE. */
             if (L.la.cur_branch_test_kind != 0 && cmp_ixd_fold_de_clean_ok(f, o))
@@ -1727,6 +1806,16 @@ static int op_de_clean_static(const Func *f, const BB *bb, int j)
         /* Branch consumed by a general DE-home folded int compare. */
         if ((L.cur_de_home >= 0 || L.cur_home_is_word) && prv->dst == o->src[0]
             && cmp_ixd_fold_de_clean_ok(f, prv))
+            return 1;
+        /* Loop-regalloc pointer DE-home: a branch consuming a byte compare
+           (`*a == *b`) that op_de_clean proved clean. The compare/branch
+           fuse to `cp`/`sub` + `jp cc` — flags-only, so DE (the resident
+           pointer) survives even though the compare's result vreg is a
+           width-2 int (which would fail the generic BR width<=1 case). */
+        if (L.cur_de_home >= 0 && f->de_home_is_ptr
+            && (prv->kind == IR_CMP_EQ || prv->kind == IR_CMP_NE
+                || prv->kind == IR_CMP_LT || prv->kind == IR_CMP_ULT)
+            && prv->dst == o->src[0] && op_de_clean(f, prv))
             return 1;
     }
     /* General DE-home: a branch-fused int compare lowered by try_cmp_ixd_fold

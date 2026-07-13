@@ -101,6 +101,19 @@ int c_framepointer_is_ix;
    invariant); IR_NO_IDX2 in the environment forces off. Resolved per-CPU to
    a concrete register by ir_idx2_reg(). */
 int c_idx2_invariant = 1;
+/* Second index-register residency (sp-mode only): keep a hot loop-carried
+   width-2 word in IY (the free index reg when IX is the idx2 spare), read/
+   written via index halves. Opt-in (--idx3, off by default) — targets that
+   reserve IY or the exx/shadow set must not enable it. z80/z80n only (index
+   halves; z180 traps them). Resolved by ir_idx3_reg(). */
+int c_idx3_residency = 0;
+/* exx-bank residency (sp-mode only): keep a hot loop-INVARIANT word in the
+   alternate register set (accessed via `exx`, read-only so it persists across
+   the swap; the compare bridges through A, which `exx` does not swap). This
+   frees an index register for a writable loop var — the exx co-design. Opt-in
+   (--exx, off by default) — targets that use the exx/shadow set for their own
+   purposes must not enable it. z80/z80n only. Resolved by ir_exx_reg(). */
+int c_exx_residency = 0;
 /* Width-1 byte-register residency: keep a hot loop-carried char accumulator
    in a byte register (C in the no-call BC-clean envelope) instead of a frame
    slot. IR_NO_BYTE_RESIDENT in the environment forces off. */

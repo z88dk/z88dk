@@ -113,9 +113,93 @@ static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
     return 1;
 }
 
+/* Read an operand byte into A. An alt-bank byte needs `exx` around the read (A
+   and the flags survive exx); a main byte (HL half) reads directly. */
+static void exx_read_to_a(FILE *out, int is_alt, const char *half)
+{
+    if (is_alt) { emit(out, "exx"); emit(out, "ld\ta,%s", half); emit(out, "exx"); }
+    else        { emit(out, "ld\ta,%s", half); }
+}
+/* Apply `sub `/`sbc a,` against an operand byte, exx-wrapped if it is alt. */
+static void exx_alu_a(FILE *out, int is_alt, const char *mn, const char *half)
+{
+    if (is_alt) { emit(out, "exx"); emit(out, "%s%s", mn, half); emit(out, "exx"); }
+    else        { emit(out, "%s%s", mn, half); }
+}
+
+/* Branch-fused compare with exactly ONE operand in the exx/alt bank (a read-only
+   loop-invariant). Bridges through A: read one operand's byte into A (exx-wrapped
+   if it is the alt operand), subtract the other's byte (likewise). A and the
+   flags survive `exx`, so no operand is materialised and DE/HL/BC stay free.
+   Reduces to the (ix+d) fold's M-N model (CF = M<N, S^V for signed). Returns 1
+   if it emitted the fused compare + branch. */
+static int try_exx_compare(FILE *out, Func *f, const Op *op)
+{
+    if (L.la.cur_branch_test_kind == 0 || f->exx_reg == IR_PR_NONE) return 0;
+    OpKind k = op->kind;
+    switch (k) {
+    case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+    case IR_CMP_EQ: case IR_CMP_NE: break;
+    default: return 0;
+    }
+    int s0 = op->src[0], s1 = op->src[1];
+    if (s0 < 0 || s1 < 0 || s0 == s1) return 0;
+    if (s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2 || f->vregs[s1].width != 2) return 0;
+    int a0 = vreg_in_exx(f, s0), a1 = vreg_in_exx(f, s1);
+    if (a0 == a1) return 0;                     /* exactly one operand in the alt bank */
+    int mainv = a0 ? s1 : s0;
+    load_to_hl(out, f, mainv);                  /* main operand → HL (l/h) */
+    const char *altlo = exx_half_lo(f), *althi = exx_half_hi(f);
+    const char *s0lo = a0 ? altlo : "l", *s0hi = a0 ? althi : "h";
+    const char *s1lo = a1 ? altlo : "l", *s1hi = a1 ? althi : "h";
+    int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+
+    if (k == IR_CMP_EQ || k == IR_CMP_NE) {
+        int lbl = L.cmp_label_counter++;
+        exx_read_to_a(out, a0, s0lo);
+        exx_alu_a(out, a1, "sub\t", s1lo);
+        emit(out, "jr\tnz,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+        exx_read_to_a(out, a0, s0hi);
+        exx_alu_a(out, a1, "sub\t", s1hi);
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+        int jump_when_eq = (k == IR_CMP_EQ) ? br_true : !br_true;
+        emit(out, "jp\t%s,L_f%d_bb_%d", jump_when_eq ? "z" : "nz",
+             L.func_emit_idx, L.la.cur_branch_test_label);
+        L.rs.a = -1;
+        L.la.cur_skip_next_op = 1;
+        return 1;
+    }
+    int is_signed  = (k==IR_CMP_LT || k==IR_CMP_LE || k==IR_CMP_GT || k==IR_CMP_GE);
+    int swap       = (k==IR_CMP_GT || k==IR_CMP_LE || k==IR_CMP_UGT || k==IR_CMP_ULE);
+    int true_on_cf = (k==IR_CMP_LT || k==IR_CMP_GT || k==IR_CMP_ULT || k==IR_CMP_UGT);
+    int mAlt, nAlt; const char *Mlo,*Mhi,*Nlo,*Nhi;
+    if (!swap) { mAlt=a0; Mlo=s0lo; Mhi=s0hi; nAlt=a1; Nlo=s1lo; Nhi=s1hi; }
+    else       { mAlt=a1; Mlo=s1lo; Mhi=s1hi; nAlt=a0; Nlo=s0lo; Nhi=s0hi; }
+    exx_read_to_a(out, mAlt, Mlo);
+    exx_alu_a(out, nAlt, "sub\t", Nlo);
+    exx_read_to_a(out, mAlt, Mhi);
+    exx_alu_a(out, nAlt, "sbc\ta,", Nhi);
+    if (is_signed) {
+        int lbl = L.cmp_label_counter++;
+        emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+        emit(out, "xor\t0x80");
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+        emit(out, "rla");
+    }
+    int want_cf = (true_on_cf == br_true);
+    emit(out, "jp\t%s,L_f%d_bb_%d", want_cf ? "c" : "nc",
+         L.func_emit_idx, L.la.cur_branch_test_label);
+    L.rs.a = -1;
+    L.la.cur_skip_next_op = 1;
+    return 1;
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
     if (try_cmp_ixd_fold(out, f, op)) return 0;
+    if (try_exx_compare(out, f, op)) return 0;
     int is_signed = (op->kind == IR_CMP_LT || op->kind == IR_CMP_GE);
     int cf_true_long = (op->kind == IR_CMP_ULT || op->kind == IR_CMP_LT);
     /* gbz80 lacks jp po/pe so the inline S^V correction can't run — sign-flip
@@ -345,8 +429,10 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         && !hl_has(op->src[1]) && !de_has(op->src[1]) && !bc_has(op->src[1])) {
         int ix = slot_ix_off(f, op->src[1]);
         if (fp_offset_fits(ix) && fp_offset_fits(ix + 1)) {
-            const char *il = (f->idx2_reg == IR_PR_IX) ? "ixl" : "iyl";
-            const char *ih = (f->idx2_reg == IR_PR_IX) ? "ixh" : "iyh";
+            const char *ir = vreg_idx_name(f, op->src[0]);
+            char il[8], ih[8];
+            snprintf(il, sizeof il, "%sl", ir);
+            snprintf(ih, sizeof ih, "%sh", ir);
             emit(out, "ld\ta,%s", il);
             emit(out, "sub\t(%s%+d)", frame_reg(), ix);
             emit(out, "ld\ta,%s", ih);
@@ -488,6 +574,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
 static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
 {
     if (try_cmp_ixd_fold(out, f, op)) return 0;
+    if (try_exx_compare(out, f, op)) return 0;
     int is_signed = (op->kind == IR_CMP_GT || op->kind == IR_CMP_LE);
     /* After swap-load, CF=true means src1 < src0 = src0 > src1 → GT/UGT. */
     int cf_true_gt = (op->kind == IR_CMP_UGT || op->kind == IR_CMP_GT);
@@ -618,6 +705,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
 static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
 {
     if (try_cmp_ixd_fold(out, f, op)) return 0;
+    if (try_exx_compare(out, f, op)) return 0;
     /* Long compare: byte-wise XOR-then-OR chain, Z iff all 4 bytes match. */
     int src0w = (op->src[0] >= 0) ? f->vregs[op->src[0]].width : 0;
     if (src0w == 4) {

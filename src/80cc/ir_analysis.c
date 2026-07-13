@@ -141,7 +141,6 @@ int ir_op_defs(const Op *op, int *out, int max)
     case IR_BR_ZERO:
     case IR_SWITCH:
     case IR_RET:
-    case IR_ST_MEM:
     case IR_OUT:
     case IR_CRITICAL_ENTER:
     case IR_CRITICAL_LEAVE:
@@ -184,6 +183,19 @@ int ir_op_defs(const Op *op, int *out, int max)
         if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG
             && op->mem.base >= 0)
             n = add_unique(out, n, max, op->mem.base);
+        return n;
+    case IR_ST_MEM:
+        /* A post-step store (`*p++ = v`, fused by ir_match stpp) REDEFINES
+           the base pointer (base += step) — same as the post-step load
+           above; the fused-away POSTSTEP's def now lives here. */
+        if (op->mem.post_step != 0 && op->mem.kind == IR_MEM_VREG
+            && op->mem.base >= 0)
+            n = add_unique(out, n, max, op->mem.base);
+        return n;
+    case IR_COPY_STEP_BRZ:
+        /* Steps (defines) BOTH pointers: src[0]=source, src[1]=dest. */
+        n = add_unique(out, n, max, op->src[0]);
+        n = add_unique(out, n, max, op->src[1]);
         return n;
     default:
         /* All other ops define op->dst. */
@@ -234,6 +246,10 @@ int ir_op_uses(const Op *op, int *out, int max)
     case IR_SWITCH:
     case IR_POSTSTEP:
         n = add_unique(out, n, max, op->src[0]);
+        return n;
+    case IR_COPY_STEP_BRZ:
+        n = add_unique(out, n, max, op->src[0]);   /* source ptr */
+        n = add_unique(out, n, max, op->src[1]);   /* dest ptr */
         return n;
     case IR_RET:
         if (op->src[0] >= 0)

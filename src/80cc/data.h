@@ -63,6 +63,8 @@ extern int debuglevel;
 extern int c_assembler_type;
 extern int c_framepointer_is_ix;
 extern int c_idx2_invariant;
+extern int c_idx3_residency;
+extern int c_exx_residency;
 extern int c_byte_resident;
 extern int c_word_resident;
 extern int c_standard_escapecodes;  /* inert — see main.c */
