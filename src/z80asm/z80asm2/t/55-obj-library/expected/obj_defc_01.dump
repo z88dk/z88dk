@@ -8,5 +8,9 @@ Object  file t/55-obj-library//input/obj_defc_01.o at $0014: Z80RMF18
     L A $0003: x (section "") (file t/55-obj-library/input/obj_defc_01.asm:2)
   Externs:
   Expressions:
-    E W $0003 $0003 2: x (section "") (file t/55-obj-library/input/obj_defc_01.asm:3)
+    E U16   $0003 $0003 2: x (section "") (file t/55-obj-library/input/obj_defc_01.asm:3)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_defc_01.asm"
+    S   2 = "x"
+    S   3 = "obj_defc_01"
 

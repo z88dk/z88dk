@@ -15,11 +15,25 @@ Object  file t/55-obj-library//input/obj_expr_01.o at $0014: Z80RMF18
     L A $0000: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:2)
   Externs:
   Expressions:
-    E W $0000 $0000 2: $ (section code) (file t/55-obj-library/input/obj_expr_01.asm:3)
-    E W $0004 $0004 2: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:5)
-    E W $0006 $0006 2: start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:6)
-    E W $0008 $0008 2: 2+start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:7)
-    E W $000A $000A 2: 2+start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:8)
-    E W $000E $000E 2: start_data-end_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:10)
-    E W $0000 $0000 2: $ (section data) (file t/55-obj-library/input/obj_expr_01.asm:16)
+    E U16   $0000 $0000 2: $ (section code) (file t/55-obj-library/input/obj_expr_01.asm:3)
+    E U16   $0004 $0004 2: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:5)
+    E U16   $0006 $0006 2: start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:6)
+    E U16   $0008 $0008 2: 2+start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:7)
+    E U16   $000A $000A 2: 2+start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:8)
+    E U16   $000E $000E 2: start_data-end_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:10)
+    E U16   $0000 $0000 2: $ (section data) (file t/55-obj-library/input/obj_expr_01.asm:16)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_expr_01.asm"
+    S   2 = "code"
+    S   3 = "$"
+    S   4 = "start_code"
+    S   5 = "start_code+2"
+    S   6 = "2+start_code"
+    S   7 = "2+start_code+2"
+    S   8 = "start_data-end_code"
+    S   9 = "data"
+    S  10 = "end_data"
+    S  11 = "start_data"
+    S  12 = "end_code"
+    S  13 = "obj_expr_01"
 

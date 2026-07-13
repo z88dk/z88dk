@@ -7,10 +7,14 @@ Object  file t/55-obj-library//input/obj_phase_01.o at $0014: Z80RMF18
   Symbols:
   Externs:
   Expressions:
-    E W $0000 $0000 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:1)
-    E W $0002 $0002 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:2)
-    E W $1000 $0004 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:4)
-    E W $1002 $0006 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:5)
-    E W $0008 $0008 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:7)
-    E W $000A $000A 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:8)
+    E U16   $0000 $0000 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:1)
+    E U16   $0002 $0002 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:2)
+    E U16   $1000 $0004 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:4)
+    E U16   $1002 $0006 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:5)
+    E U16   $0008 $0008 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:7)
+    E U16   $000A $000A 2: $ (section "") (file t/55-obj-library/input/obj_phase_01.asm:8)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_phase_01.asm"
+    S   2 = "$"
+    S   3 = "obj_phase_01"
 
