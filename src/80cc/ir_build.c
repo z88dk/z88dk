@@ -1340,6 +1340,31 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
         ir_emit_binop(cur_bb(b), IR_SUB, dst, hi, lo);
         return dst;
     }
+
+    /* General constant (>=3 non-run terms, e.g. an LCG's *181 or a hash's *31):
+       the Horner binary shift-add chain — acc = v (the top set bit), then for
+       each lower bit MSB->LSB: acc <<= 1 (double), and acc += v when the bit is
+       set. Cost = hi_bit doublings (each `add hl,hl`) + (pop-1) adds — the same
+       decomposition sdcc emits. Replaces the l_mult CALL with straight-line
+       code. Cost-gated by `hi_bit + pop` (the op count): l_mult is a slow
+       bit-serial 16x16, so for a WORD (each chain op is a single add hl,hl /
+       add hl,de) the inline chain wins across the whole range — inline any int
+       constant (max hi_bit+pop is 31). A LONG chain doubles/adds 32 bits per
+       step (several ops each) and competes with l_long_mult, so keep the
+       tighter bound there. (An LCG's *25173 = 14+7 = 21 was just over the old
+       flat 20 and fell to l_mult → histbench -41%.) */
+    if (hi_bit + pop <= (w == 2 ? 32 : 20)) {
+        int acc = v;                            /* coefficient for 2^hi_bit */
+        for (int bit = hi_bit - 1; bit >= 0; bit--) {
+            acc = sr_shift_left(b, acc, 1, w);  /* double */
+            if ((u >> bit) & 1u) {
+                int dst = new_temp_kind(b, kw);
+                ir_emit_binop(cur_bb(b), IR_ADD, dst, acc, v);
+                acc = dst;
+            }
+        }
+        return acc;
+    }
     return -1;
 }
 
