@@ -30,6 +30,23 @@ bool opt_obj_hide_code = false;
 static void objfile_read_strid(objfile_t* obj, FILE* fp, UT_string* str);
 
 //-----------------------------------------------------------------------------
+// CPU name for the future version 19 object file format
+//-----------------------------------------------------------------------------
+
+static const char* cpu_name_v19(cpu_t id) {
+	if ((int)id == 0)
+		return NULL;
+	
+	switch ((int)id) {
+#define X(id_, name_, name_str_, non_strict_, ancestor_, defines_)	\
+    case id_: return name_str_;
+#include "../z80asm/cpu.def"
+	default:;
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
 // string table
 //-----------------------------------------------------------------------------
 
@@ -385,11 +402,13 @@ static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start) {
             utstring_printf(section->name, "%s", utstring_body(name));
 			utstring_free(name);
 
+			// read section ORG
 			if (obj->version >= 8)
 				section->org = xfread_dword(fp);
 			else
 				section->org = ORG_NOT_DEFINED;
 
+			// read section ALIGN
 			if (obj->version >= 10)
 				section->align = xfread_dword(fp);
 			else
@@ -504,7 +523,10 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 		else
 			symbol->section = obj->sections;			// the first section
 
+		// value
 		symbol->value = xfread_dword(fp);
+		
+		// name
         if (obj->version >= 18)
             objfile_read_strid(obj, fp, symbol->name);
 		else if (obj->version >= 16)
@@ -512,8 +534,8 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 		else
 			xfread_bcount_str(symbol->name, fp);
 
-
-		if (obj->version >= 9) {			// add definition location
+		// definition location
+		if (obj->version >= 9) {
             if (obj->version >= 18)
                 objfile_read_strid(obj, fp, symbol->filename);
             else if (obj->version >= 16)
@@ -630,7 +652,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
                 printf("\nError expression range %d\n", range);
                 exit(EXIT_FAILURE);
             }
-            printf("    E %s", range_str);
+            printf("    E %-5s", range_str);
         }
 
 		// create a new expression
@@ -692,6 +714,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
         if (show_expr)
             printf(": ");
 
+        // target name
         if (obj->version >= 6) {
             if (obj->version >= 18)
                 objfile_read_strid(obj, fp, expr->target_name);
@@ -704,6 +727,7 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
                 printf("%s := ", utstring_body(expr->target_name));
         }
 
+        // text
         if (obj->version >= 18)
             objfile_read_strid(obj, fp, expr->text);
         else if (obj->version >= 4)
@@ -733,6 +757,63 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 	}
 }
 
+// relocations: only read and displayed, not supported in objfile_t
+static void objfile_read_relocs(objfile_t* obj, FILE* fp, long fpos_start)
+{
+	bool show_reloc = opt_obj_list && !opt_obj_hide_expr;
+	if (!show_reloc)
+		return;								// no need to read
+
+	printf("  Relocations:\n");
+
+	UT_string* filename;
+	UT_string* section;
+	UT_string* symbol;
+	
+	utstring_new(filename);
+	utstring_new(section);
+	utstring_new(symbol);
+
+	xfseek(fp, fpos_start, SEEK_SET);
+    while (true) {
+        range_t range = xfread_dword(fp);
+		if (range == RANGE_UNDEFINED)             // end marker
+			break;
+
+		const char* range_str = range_str_short(range);
+		if (range_str == NULL) {
+			printf("\nError relocation range %d\n", range);
+			exit(EXIT_FAILURE);
+		}
+		printf("    R %-5s", range_str);
+
+        // filename and line number
+		objfile_read_strid(obj, fp, filename);
+		int line_num = xfread_dword(fp);
+		
+		// section
+		objfile_read_strid(obj, fp, section);
+		
+		// patch pointer
+		int patch_ptr = xfread_dword(fp);
+
+		// symbol
+		objfile_read_strid(obj, fp, symbol);
+		
+		// addend
+		int addend = xfread_dword(fp);	
+		
+		printf(" $%04X: %s+$%04X", patch_ptr, utstring_body(symbol), addend);
+		print_section(section);
+		print_filename_line_nr(filename, line_num);
+		printf("\n");
+	}
+
+	utstring_free(filename);
+	utstring_free(section);
+	utstring_free(symbol);
+}
+
 void objfile_read(objfile_t* obj, FILE* fp)
 {
 	long fpos0 = ftell(fp) - SIGNATURE_SIZE;	// before signature
@@ -757,6 +838,13 @@ void objfile_read(objfile_t* obj, FILE* fp)
 	// file pointers
 	long fpos_modname = xfread_dword(fp);
 	long fpos_exprs = xfread_dword(fp);
+	
+	// relocs is only on version 19 and onwards
+	long fpos_relocs = -1;
+	if (obj->version >= 19) {
+		fpos_relocs = xfread_dword(fp);
+	}
+	
 	long fpos_symbols = xfread_dword(fp);
 	long fpos_externs = xfread_dword(fp);
 	long fpos_sections = xfread_dword(fp);
@@ -789,7 +877,12 @@ void objfile_read(objfile_t* obj, FILE* fp)
 
     // cpu
     if (opt_obj_list && obj->version >= 18) {
-        const char* cpu_str = cpu_name(obj->cpu_id);
+        const char* cpu_str = NULL;
+		if (obj->version >= 19) 
+			cpu_str = cpu_name_v19(obj->cpu_id);
+		else
+			cpu_str = cpu_name(obj->cpu_id);
+		
         if (cpu_str)
             printf("  CPU:  %s ", cpu_str);
         else
@@ -822,6 +915,21 @@ void objfile_read(objfile_t* obj, FILE* fp)
 		objfile_read_exprs(obj, fp,
 			fpos0 + fpos_exprs,
 			fpos0 + END(fpos_symbols, END(fpos_externs, fpos_modname)));
+	
+	// relocations - only screen output, not used in current version 18
+	if (fpos_relocs >= 0)
+		objfile_read_relocs(obj, fp, fpos0 + fpos_relocs);
+	
+	// string table
+    if (opt_obj_list && obj->version >= 18) {
+		uint_t st_size = strtable_size(obj->st);
+		if (st_size > 1) {		// dont show string 0=""
+			printf("  Strings:\n");
+			for (uint_t i = 1; i < st_size; i++) {
+				printf("    S %3d = \"%s\"\n", (int)i, strtable_lookup(obj->st, i));
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1045,13 +1153,28 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
     UT_string* obj_signature;
     utstring_new(obj_signature);
 
-	int next = SIGNATURE_SIZE;
+	// goto start of header
+	xfseek(fp, SIGNATURE_SIZE, SEEK_SET);
+	
+	// symbol index table
+	long index_pos = -1;
+	if (file->version >= 19) {
+		index_pos = xfread_dword(fp);
+	}
+	
+	// string table
+	strtable_t* st = NULL;
     if (file->version >= 18) {
-        next += sizeof(int32_t);                // skip string table pointer
+        long fpos_st = xfread_dword(fp);
+        long save_pos = ftell(fp);
+        xfseek(fp, fpos_st, SEEK_SET);
+        st = strtable_fread(fp);
+        xfseek(fp, save_pos, SEEK_SET);
     }
 
 	int length = 0;
 	int obj_version = -1;
+	long next = ftell(fp);
 
 	do {
 		xfseek(fp, next, SEEK_SET);		        // next object file
@@ -1078,7 +1201,57 @@ static void file_read_library(file_t* file, FILE* fp, UT_string* signature, int 
 			printf("\n");
 	} while (next != -1);
 
-    // no need to read string table, it is created while writing
+	// symbol index table
+	if (index_pos >= 0 && file->version >= 19) {
+		xfseek(fp, index_pos, SEEK_SET);
+		printf("Symbol Index Table:\n");
+		while (true) {
+			cpu_t cpu_id = xfread_dword(fp);
+			if (cpu_id == 0)
+				break;			// end of list
+			bool swap_ixiy = !!xfread_dword(fp);
+			long list_pos = xfread_dword(fp);
+			int size = xfread_dword(fp);
+			index_pos = ftell(fp);
+			
+			if (list_pos >= 0 && size > 0) {
+				const char* cpu_str = cpu_name_v19(cpu_id);
+				const char* swap_ixiy_str = swap_ixiy ? " (-IXIY)" : "";
+				
+				xfseek(fp, list_pos, SEEK_SET);
+				for (int i = 0; i < size; i++) {
+					int id = xfread_dword(fp);
+					const char* symbol_name = strtable_lookup(st, id);
+					long object_pos = xfread_dword(fp);
+					
+					printf("  P %s %s %s -> $%04X\n", 
+						   cpu_str, swap_ixiy_str, symbol_name, (uint_t)object_pos);
+				}
+				xfseek(fp, index_pos, SEEK_SET);
+			}
+		}
+		
+		uint_t st_size = strtable_size(st);
+		if (st_size > 1) {		// dont show string 0=""
+			printf("Strings:\n");
+			for (uint_t i = 1; i < st_size; i++) {
+				printf("  S %3d = \"%s\"\n", (int)i, strtable_lookup(st, i));
+			}
+		}
+	}
+	// string table
+    else if (st != NULL && opt_obj_list && file->version >= 18) {
+		uint_t st_size = strtable_size(st);
+		if (st_size > 1) {		// dont show string 0=""
+			printf("Library public symbols:\n");
+			for (uint_t i = 1; i < st_size; i++) {
+				printf("  P %3d = \"%s\"\n", (int)i, strtable_lookup(st, i));
+			}
+		}
+	}
+	if (st) {
+		strtable_free(st);
+	}
 
 	utstring_free(obj_signature);
 }

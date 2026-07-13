@@ -24,21 +24,29 @@ END
 # make platform 1 library
 capture_ok("z88dk-z80asm -x${test}plat1.lib ${test}plat1.asm ${test}gen.asm", "");
 
-capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF18
-Object  file ${test}plat1.lib at \$0014: Z80RMF18
-  Name: ${test}plat1
+capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<'END');
+Library file test_t_modlink_link_order_tplat1.lib at $0000: Z80LMF18
+Object  file test_t_modlink_link_order_tplat1.lib at $0014: Z80RMF18
+  Name: test_t_modlink_link_order_tplat1
   CPU:  z80 
   Section "": 0 bytes
+  Strings:
+    S   1 = "test_t_modlink_link_order_tplat1"
 
-Object  file ${test}plat1.lib at \$0090: Z80RMF18
-  Name: ${test}gen
+Object  file test_t_modlink_link_order_tplat1.lib at $0090: Z80RMF18
+  Name: test_t_modlink_link_order_tgen
   CPU:  z80 
   Section "": 3 bytes
-    C \$0000: 3E 01 C9
+    C $0000: 3E 01 C9
   Symbols:
-    G A \$0000: putpixel (section "") (file ${test}gen.asm:3)
+    G A $0000: putpixel (section "") (file test_t_modlink_link_order_tgen.asm:3)
+  Strings:
+    S   1 = "putpixel"
+    S   2 = "test_t_modlink_link_order_tgen.asm"
+    S   3 = "test_t_modlink_link_order_tgen"
 
+Library public symbols:
+  P   1 = "putpixel"
 END
 
 
@@ -54,21 +62,29 @@ END
 # make platform 2 library
 capture_ok("z88dk-z80asm -x${test}plat2.lib ${test}plat2.asm ${test}gen.asm", "");
 
-capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<END);
-Library file ${test}plat1.lib at \$0000: Z80LMF18
-Object  file ${test}plat1.lib at \$0014: Z80RMF18
-  Name: ${test}plat1
+capture_ok("z88dk-z80nm -a ${test}plat1.lib", <<'END');
+Library file test_t_modlink_link_order_tplat1.lib at $0000: Z80LMF18
+Object  file test_t_modlink_link_order_tplat1.lib at $0014: Z80RMF18
+  Name: test_t_modlink_link_order_tplat1
   CPU:  z80 
   Section "": 0 bytes
+  Strings:
+    S   1 = "test_t_modlink_link_order_tplat1"
 
-Object  file ${test}plat1.lib at \$0090: Z80RMF18
-  Name: ${test}gen
+Object  file test_t_modlink_link_order_tplat1.lib at $0090: Z80RMF18
+  Name: test_t_modlink_link_order_tgen
   CPU:  z80 
   Section "": 3 bytes
-    C \$0000: 3E 01 C9
+    C $0000: 3E 01 C9
   Symbols:
-    G A \$0000: putpixel (section "") (file ${test}gen.asm:3)
+    G A $0000: putpixel (section "") (file test_t_modlink_link_order_tgen.asm:3)
+  Strings:
+    S   1 = "putpixel"
+    S   2 = "test_t_modlink_link_order_tgen.asm"
+    S   3 = "test_t_modlink_link_order_tgen"
 
+Library public symbols:
+  P   1 = "putpixel"
 END
 
 

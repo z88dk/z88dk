@@ -20,6 +20,8 @@ capture_ok("z88dk-z80nm -a $test.o", <<'END');
 Object  file test_t_issue_2320_0_t.o at $0000: Z80RMF18
   Name: test
   CPU:  (invalid -1) 
+  Strings:
+    S   1 = "test"
 END
 
 capture_nok("z88dk-z80asm -b $test.o", <<'END');

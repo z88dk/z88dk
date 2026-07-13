@@ -1,0 +1,12 @@
+Object  file test_t_dump_externs_t.o at $0000: Z80RMF18
+  Name: module1
+  CPU:  z80 
+  Externs:
+    U         x1
+    U         x2
+    U         x3
+  Strings:
+    S   1 = "x1"
+    S   2 = "x2"
+    S   3 = "x3"
+    S   4 = "module1"

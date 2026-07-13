@@ -22,17 +22,22 @@ __size                          = \$0004 ; const, public, def, , ,
 __tail                          = \$0004 ; const, public, def, , ,
 END
 
-capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF18
-  Name: $test
+capture_ok("z88dk-z80nm -a $test.o", <<'END');
+Object  file test_t_option_ucase_t.o at $0000: Z80RMF18
+  Name: test_t_option_ucase_t
   CPU:  z80 
   Section "": 4 bytes
-    C \$0000: C9 CD 00 00
+    C $0000: C9 CD 00 00
   Symbols:
-    L A \$0001: Main (section "") (file $test.asm:2)
-    L A \$0000: SubRoutine (section "") (file $test.asm:1)
+    L A $0001: Main (section "") (file test_t_option_ucase_t.asm:2)
+    L A $0000: SubRoutine (section "") (file test_t_option_ucase_t.asm:1)
   Expressions:
-    E W \$0001 \$0002 3: SubRoutine (section "") (file $test.asm:2)
+    E U16   $0001 $0002 3: SubRoutine (section "") (file test_t_option_ucase_t.asm:2)
+  Strings:
+    S   1 = "test_t_option_ucase_t.asm"
+    S   2 = "SubRoutine"
+    S   3 = "Main"
+    S   4 = "test_t_option_ucase_t"
 END
 
 # with -ucase
@@ -48,17 +53,22 @@ __size                          = \$0004 ; const, public, def, , ,
 __tail                          = \$0004 ; const, public, def, , ,
 END
 
-capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF18
-  Name: $test
+capture_ok("z88dk-z80nm -a $test.o", <<'END');
+Object  file test_t_option_ucase_t.o at $0000: Z80RMF18
+  Name: test_t_option_ucase_t
   CPU:  z80 
   Section "": 4 bytes
-    C \$0000: C9 CD 00 00
+    C $0000: C9 CD 00 00
   Symbols:
-    L A \$0001: MAIN (section "") (file $test.asm:2)
-    L A \$0000: SUBROUTINE (section "") (file $test.asm:1)
+    L A $0001: MAIN (section "") (file test_t_option_ucase_t.asm:2)
+    L A $0000: SUBROUTINE (section "") (file test_t_option_ucase_t.asm:1)
   Expressions:
-    E W \$0001 \$0002 3: SUBROUTINE (section "") (file $test.asm:2)
+    E U16   $0001 $0002 3: SUBROUTINE (section "") (file test_t_option_ucase_t.asm:2)
+  Strings:
+    S   1 = "test_t_option_ucase_t.asm"
+    S   2 = "SUBROUTINE"
+    S   3 = "MAIN"
+    S   4 = "test_t_option_ucase_t"
 END
 
 unlink_testfiles;

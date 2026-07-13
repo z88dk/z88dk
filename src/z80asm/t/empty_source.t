@@ -12,6 +12,8 @@ Object  file ${test}.o at \$0000: Z80RMF18
   Name: ${test}
   CPU:  z80 
   Section "": 0 bytes
+  Strings:
+    S   1 = "test_t_empty_source_t"
 END
 
 # empty section

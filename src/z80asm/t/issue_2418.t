@@ -134,8 +134,15 @@ Object  file test_t_issue_2418_t.o at $0000: Z80RMF18
     L A $0006: i_11 (section code_compiler) (file test_t_issue_2418_t.asm:11)
     L A $0006: i_9 (section code_compiler) (file test_t_issue_2418_t.asm:7)
   Expressions:
-    E W $0000 $0001 3: i_9 (section code_compiler) (file test_t_issue_2418_t.asm:5)
-    E W $0003 $0004 3: i_11 (section code_compiler) (file test_t_issue_2418_t.asm:6)
+    E U16   $0000 $0001 3: i_9 (section code_compiler) (file test_t_issue_2418_t.asm:5)
+    E U16   $0003 $0004 3: i_11 (section code_compiler) (file test_t_issue_2418_t.asm:6)
+  Strings:
+    S   1 = "test_t_issue_2418_t.asm"
+    S   2 = "code_compiler"
+    S   3 = "i_9"
+    S   4 = "i_11"
+    S   5 = "test_t_issue_2418_t"
+    S   6 = "code_crt_exit"
 END
 
 }

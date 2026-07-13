@@ -1,0 +1,689 @@
+Library file test_t_dump_library_04_t.o at $0000: Z80LMF19
+Object  file test_t_dump_library_04_t.o at $0018: Z80RMF19
+  Name: module_z80n_no_ixiy
+  CPU:  z80n 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_z80n_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0118: Z80RMF19
+  Name: module_z80n_ixiy
+  CPU:  z80n (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_z80n_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0214: Z80RMF19
+  Name: module_r6k_no_ixiy
+  CPU:  r6k 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r6k_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0314: Z80RMF19
+  Name: module_r6k_ixiy
+  CPU:  r6k (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r6k_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0410: Z80RMF19
+  Name: module_ti83_no_ixiy
+  CPU:  ti83 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ti83_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0510: Z80RMF19
+  Name: module_ti83_ixiy
+  CPU:  ti83 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ti83_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $060C: Z80RMF19
+  Name: module_ti83plus_no_ixiy
+  CPU:  ti83plus 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ti83plus_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0710: Z80RMF19
+  Name: module_ti83plus_ixiy
+  CPU:  ti83plus (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ti83plus_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0810: Z80RMF19
+  Name: module_z80_no_ixiy
+  CPU:  z80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_z80_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0910: Z80RMF19
+  Name: module_z80_ixiy
+  CPU:  z80 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_z80_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0A0C: Z80RMF19
+  Name: module_z180_no_ixiy
+  CPU:  z180 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_z180_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0B0C: Z80RMF19
+  Name: module_z180_ixiy
+  CPU:  z180 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_z180_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0C08: Z80RMF19
+  Name: module_r3k_no_ixiy
+  CPU:  r3k 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r3k_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0D08: Z80RMF19
+  Name: module_r3k_ixiy
+  CPU:  r3k (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r3k_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0E04: Z80RMF19
+  Name: module_8085_no_ixiy
+  CPU:  8085 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_8085_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $0F04: Z80RMF19
+  Name: module_8085_ixiy
+  CPU:  8085 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_8085_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1000: Z80RMF19
+  Name: module_r800_no_ixiy
+  CPU:  r800 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r800_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1100: Z80RMF19
+  Name: module_r800_ixiy
+  CPU:  r800 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r800_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $11FC: Z80RMF19
+  Name: module_r5k_no_ixiy
+  CPU:  r5k 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r5k_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $12FC: Z80RMF19
+  Name: module_r5k_ixiy
+  CPU:  r5k (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r5k_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $13F8: Z80RMF19
+  Name: module_kc160_z80_no_ixiy
+  CPU:  kc160_z80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_kc160_z80_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $14FC: Z80RMF19
+  Name: module_kc160_z80_ixiy
+  CPU:  kc160_z80 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_kc160_z80_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1600: Z80RMF19
+  Name: module_ez80_z80_no_ixiy
+  CPU:  ez80_z80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ez80_z80_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1704: Z80RMF19
+  Name: module_ez80_z80_ixiy
+  CPU:  ez80_z80 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ez80_z80_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1804: Z80RMF19
+  Name: module_ez80_no_ixiy
+  CPU:  ez80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ez80_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1904: Z80RMF19
+  Name: module_ez80_ixiy
+  CPU:  ez80 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_ez80_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1A00: Z80RMF19
+  Name: module_r2ka_no_ixiy
+  CPU:  r2ka 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r2ka_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1B00: Z80RMF19
+  Name: module_r2ka_ixiy
+  CPU:  r2ka (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r2ka_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1BFC: Z80RMF19
+  Name: module_gbz80_no_ixiy
+  CPU:  gbz80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_gbz80_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1CFC: Z80RMF19
+  Name: module_gbz80_ixiy
+  CPU:  gbz80 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_gbz80_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1DFC: Z80RMF19
+  Name: module_8080_no_ixiy
+  CPU:  8080 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_8080_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1EFC: Z80RMF19
+  Name: module_8080_ixiy
+  CPU:  8080 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_8080_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $1FF8: Z80RMF19
+  Name: module_r4k_no_ixiy
+  CPU:  r4k 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r4k_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $20F8: Z80RMF19
+  Name: module_r4k_ixiy
+  CPU:  r4k (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_r4k_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $21F4: Z80RMF19
+  Name: module_kc160_no_ixiy
+  CPU:  kc160 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_kc160_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $22F4: Z80RMF19
+  Name: module_kc160_ixiy
+  CPU:  kc160 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_kc160_ixiy"
+
+Symbol Index Table:
+  P z80  public1 -> $0810
+  P z80  public2 -> $0810
+  P z80  (-IXIY) public1 -> $0910
+  P z80  (-IXIY) public2 -> $0910
+  P z80_strict  public1 -> $0810
+  P z80_strict  public2 -> $0810
+  P z80_strict  (-IXIY) public1 -> $0910
+  P z80_strict  (-IXIY) public2 -> $0910
+  P z180  public1 -> $0A0C
+  P z180  public2 -> $0A0C
+  P z180  (-IXIY) public1 -> $0B0C
+  P z180  (-IXIY) public2 -> $0B0C
+  P ez80_z80  public1 -> $1600
+  P ez80_z80  public2 -> $1600
+  P ez80_z80  (-IXIY) public1 -> $1704
+  P ez80_z80  (-IXIY) public2 -> $1704
+  P ez80  public1 -> $1804
+  P ez80  public2 -> $1804
+  P ez80  (-IXIY) public1 -> $1904
+  P ez80  (-IXIY) public2 -> $1904
+  P z80n  public1 -> $0018
+  P z80n  public2 -> $0018
+  P z80n  (-IXIY) public1 -> $0118
+  P z80n  (-IXIY) public2 -> $0118
+  P r2ka  public1 -> $1A00
+  P r2ka  public2 -> $1A00
+  P r2ka  (-IXIY) public1 -> $1B00
+  P r2ka  (-IXIY) public2 -> $1B00
+  P r3k  public1 -> $0C08
+  P r3k  public2 -> $0C08
+  P r3k  (-IXIY) public1 -> $0D08
+  P r3k  (-IXIY) public2 -> $0D08
+  P gbz80  public1 -> $1BFC
+  P gbz80  public2 -> $1BFC
+  P gbz80  (-IXIY) public1 -> $1CFC
+  P gbz80  (-IXIY) public2 -> $1CFC
+  P 8080  public1 -> $1DFC
+  P 8080  public2 -> $1DFC
+  P 8080  (-IXIY) public1 -> $1EFC
+  P 8080  (-IXIY) public2 -> $1EFC
+  P 8085  public1 -> $0E04
+  P 8085  public2 -> $0E04
+  P 8085  (-IXIY) public1 -> $0F04
+  P 8085  (-IXIY) public2 -> $0F04
+  P r800  public1 -> $1000
+  P r800  public2 -> $1000
+  P r800  (-IXIY) public1 -> $1100
+  P r800  (-IXIY) public2 -> $1100
+  P r4k  public1 -> $1FF8
+  P r4k  public2 -> $1FF8
+  P r4k  (-IXIY) public1 -> $20F8
+  P r4k  (-IXIY) public2 -> $20F8
+  P r5k  public1 -> $11FC
+  P r5k  public2 -> $11FC
+  P r5k  (-IXIY) public1 -> $12FC
+  P r5k  (-IXIY) public2 -> $12FC
+  P kc160  public1 -> $21F4
+  P kc160  public2 -> $21F4
+  P kc160  (-IXIY) public1 -> $22F4
+  P kc160  (-IXIY) public2 -> $22F4
+  P kc160_z80  public1 -> $13F8
+  P kc160_z80  public2 -> $13F8
+  P kc160_z80  (-IXIY) public1 -> $14FC
+  P kc160_z80  (-IXIY) public2 -> $14FC
+  P 8080_strict  public1 -> $1DFC
+  P 8080_strict  public2 -> $1DFC
+  P 8080_strict  (-IXIY) public1 -> $1EFC
+  P 8080_strict  (-IXIY) public2 -> $1EFC
+  P 8085_strict  public1 -> $0E04
+  P 8085_strict  public2 -> $0E04
+  P 8085_strict  (-IXIY) public1 -> $0F04
+  P 8085_strict  (-IXIY) public2 -> $0F04
+  P gbz80_strict  public1 -> $1BFC
+  P gbz80_strict  public2 -> $1BFC
+  P gbz80_strict  (-IXIY) public1 -> $1CFC
+  P gbz80_strict  (-IXIY) public2 -> $1CFC
+  P z180_strict  public1 -> $0A0C
+  P z180_strict  public2 -> $0A0C
+  P z180_strict  (-IXIY) public1 -> $0B0C
+  P z180_strict  (-IXIY) public2 -> $0B0C
+  P z80n_strict  public1 -> $0018
+  P z80n_strict  public2 -> $0018
+  P z80n_strict  (-IXIY) public1 -> $0118
+  P z80n_strict  (-IXIY) public2 -> $0118
+  P ez80_z80_strict  public1 -> $1600
+  P ez80_z80_strict  public2 -> $1600
+  P ez80_z80_strict  (-IXIY) public1 -> $1704
+  P ez80_z80_strict  (-IXIY) public2 -> $1704
+  P ez80_strict  public1 -> $1804
+  P ez80_strict  public2 -> $1804
+  P ez80_strict  (-IXIY) public1 -> $1904
+  P ez80_strict  (-IXIY) public2 -> $1904
+  P r800_strict  public1 -> $1000
+  P r800_strict  public2 -> $1000
+  P r800_strict  (-IXIY) public1 -> $1100
+  P r800_strict  (-IXIY) public2 -> $1100
+  P kc160_strict  public1 -> $21F4
+  P kc160_strict  public2 -> $21F4
+  P kc160_strict  (-IXIY) public1 -> $22F4
+  P kc160_strict  (-IXIY) public2 -> $22F4
+  P kc160_z80_strict  public1 -> $13F8
+  P kc160_z80_strict  public2 -> $13F8
+  P kc160_z80_strict  (-IXIY) public1 -> $14FC
+  P kc160_z80_strict  (-IXIY) public2 -> $14FC
+  P r2ka_strict  public1 -> $1A00
+  P r2ka_strict  public2 -> $1A00
+  P r2ka_strict  (-IXIY) public1 -> $1B00
+  P r2ka_strict  (-IXIY) public2 -> $1B00
+  P r3k_strict  public1 -> $0C08
+  P r3k_strict  public2 -> $0C08
+  P r3k_strict  (-IXIY) public1 -> $0D08
+  P r3k_strict  (-IXIY) public2 -> $0D08
+  P r4k_strict  public1 -> $1FF8
+  P r4k_strict  public2 -> $1FF8
+  P r4k_strict  (-IXIY) public1 -> $20F8
+  P r4k_strict  (-IXIY) public2 -> $20F8
+  P r5k_strict  public1 -> $11FC
+  P r5k_strict  public2 -> $11FC
+  P r5k_strict  (-IXIY) public1 -> $12FC
+  P r5k_strict  (-IXIY) public2 -> $12FC
+  P r6k  public1 -> $0214
+  P r6k  public2 -> $0214
+  P r6k  (-IXIY) public1 -> $0314
+  P r6k  (-IXIY) public2 -> $0314
+  P r6k_strict  public1 -> $0214
+  P r6k_strict  public2 -> $0214
+  P r6k_strict  (-IXIY) public1 -> $0314
+  P r6k_strict  (-IXIY) public2 -> $0314
+  P ti83  public1 -> $0410
+  P ti83  public2 -> $0410
+  P ti83  (-IXIY) public1 -> $0510
+  P ti83  (-IXIY) public2 -> $0510
+  P ti83_strict  public1 -> $0410
+  P ti83_strict  public2 -> $0410
+  P ti83_strict  (-IXIY) public1 -> $0510
+  P ti83_strict  (-IXIY) public2 -> $0510
+  P ti83plus  public1 -> $060C
+  P ti83plus  public2 -> $060C
+  P ti83plus  (-IXIY) public1 -> $0710
+  P ti83plus  (-IXIY) public2 -> $0710
+  P ti83plus_strict  public1 -> $060C
+  P ti83plus_strict  public2 -> $060C
+  P ti83plus_strict  (-IXIY) public1 -> $0710
+  P ti83plus_strict  (-IXIY) public2 -> $0710
+Strings:
+  S   1 = "public1"
+  S   2 = "public2"

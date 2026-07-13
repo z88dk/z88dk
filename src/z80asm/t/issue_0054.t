@@ -60,21 +60,31 @@ DEFC asm_BIFROST2_stop               = \$C9B2
 DEFC program                         = \$FDE8
 END
 
-capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF18
-  Name: ${test}
+capture_ok("z88dk-z80nm -a ${test}.o", <<'END');
+Object  file test_t_issue_0054_t.o at $0000: Z80RMF18
+  Name: test_t_issue_0054_t
   CPU:  z80 
-  Section "": 1 bytes, ORG \$FDE8
-    C \$0000: C9
+  Section "": 1 bytes, ORG $FDE8
+    C $0000: C9
   Symbols:
-    L A \$0000: here (section "") (file ${test}.asm:20)
-    L A \$0000: there (section "") (file ${test}.asm:21)
-    G C \$C9C2: asm_BIFROST2_showNext2Tiles (section "") (file ${test}.asm:11)
-    G C \$C9A9: asm_BIFROST2_start (section "") (file ${test}.asm:9)
-    G = \$0000: asm_BIFROST2_stop (section "") (file ${test}.asm:10)
-    G A \$0000: program (section "") (file ${test}.asm:19)
+    L A $0000: here (section "") (file test_t_issue_0054_t.asm:20)
+    L A $0000: there (section "") (file test_t_issue_0054_t.asm:21)
+    G C $C9C2: asm_BIFROST2_showNext2Tiles (section "") (file test_t_issue_0054_t.asm:11)
+    G C $C9A9: asm_BIFROST2_start (section "") (file test_t_issue_0054_t.asm:9)
+    G = $0000: asm_BIFROST2_stop (section "") (file test_t_issue_0054_t.asm:10)
+    G A $0000: program (section "") (file test_t_issue_0054_t.asm:19)
   Expressions:
-    E = \$0000 \$0000 0: asm_BIFROST2_stop := 51634+here-there (section "") (file ${test}.asm:10)
+    E =     $0000 $0000 0: asm_BIFROST2_stop := 51634+here-there (section "") (file test_t_issue_0054_t.asm:10)
+  Strings:
+    S   1 = "test_t_issue_0054_t.asm"
+    S   2 = "asm_BIFROST2_stop"
+    S   3 = "51634+here-there"
+    S   4 = "here"
+    S   5 = "there"
+    S   6 = "asm_BIFROST2_showNext2Tiles"
+    S   7 = "asm_BIFROST2_start"
+    S   8 = "program"
+    S   9 = "test_t_issue_0054_t"
 END
 
 unlink_testfiles;

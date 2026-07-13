@@ -1,0 +1,48 @@
+begin module
+    name                      = module1
+    version                   = 3
+    begin symbols
+        begin symbol
+            name              = x1
+            scope             = Local ; (1)
+            type              = Constant ; (1)
+            section           = ""
+            value             = 0x1234
+        end symbol
+        begin symbol
+            name              = x2
+            scope             = Local ; (1)
+            type              = AddressRelative ; (2)
+            section           = ""
+            value             = 0x1234
+        end symbol
+        begin symbol
+            name              = x3
+            scope             = Local ; (1)
+            type              = Computed ; (3)
+            section           = ""
+            value             = 0x1234
+        end symbol
+        begin symbol
+            name              = x4
+            scope             = Public ; (2)
+            type              = Constant ; (1)
+            section           = ""
+            value             = 0x1234
+        end symbol
+        begin symbol
+            name              = x5
+            scope             = Public ; (2)
+            type              = AddressRelative ; (2)
+            section           = ""
+            value             = 0x1234
+        end symbol
+        begin symbol
+            name              = x6
+            scope             = Public ; (2)
+            type              = Computed ; (3)
+            section           = ""
+            value             = 0x1234
+        end symbol
+    end symbols
+end module

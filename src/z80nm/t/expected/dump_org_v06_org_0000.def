@@ -1,0 +1,5 @@
+begin module
+    name                      = module1
+    version                   = 6
+    org                       = 0x0000
+end module

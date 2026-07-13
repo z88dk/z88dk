@@ -37,18 +37,23 @@ z80asm_ok("", "", "",
           'defc     c1 = 4'     => "",
           'dc       c2 = 5'     => "");
 
-capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF18
-  Name: ${test}
+capture_ok("z88dk-z80nm -a ${test}.o", <<'END');
+Object  file test_t_issue_1221_t.o at $0000: Z80RMF18
+  Name: test_t_issue_1221_t
   CPU:  z80 
   Section "": 50 bytes
-    C \$0000: 01 02 03 04 05 68 65 6C 6C 6F 77 6F 72 6C 64 34
-    C \$0010: 12 34 12 34 12 56 78 56 78 56 34 12 56 34 12 56
-    C \$0020: 34 12 78 56 34 12 78 56 34 12 78 56 34 12 55 55
-    C \$0030: AA AA
+    C $0000: 01 02 03 04 05 68 65 6C 6C 6F 77 6F 72 6C 64 34
+    C $0010: 12 34 12 34 12 56 78 56 78 56 34 12 56 34 12 56
+    C $0020: 34 12 78 56 34 12 78 56 34 12 78 56 34 12 55 55
+    C $0030: AA AA
   Symbols:
-    L C \$0004: c1 (section "") (file ${test}.asm:20)
-    L C \$0005: c2 (section "") (file ${test}.asm:21)
+    L C $0004: c1 (section "") (file test_t_issue_1221_t.asm:20)
+    L C $0005: c2 (section "") (file test_t_issue_1221_t.asm:21)
+  Strings:
+    S   1 = "c1"
+    S   2 = "test_t_issue_1221_t.asm"
+    S   3 = "c2"
+    S   4 = "test_t_issue_1221_t"
 END
 
 unlink_testfiles;

@@ -1,0 +1,141 @@
+z80asm File formats (v03)
+=========================
+
+This document describes the object and library formats used by *z80asm*.
+
+The object and library files are stored in binary form as a set of 
+contiguous sections, i.e. each section follows the previous one. 
+
+The files start with a signature that includes a version number and is 
+verified by the assembler before trying to parse the file.
+
+A set of file pointers at the start of the object file point to the 
+start of each section existing the in the file, or contain *0xFFFFFFFF* 
+(-1) if that section does not exist.
+
+
+Data types
+----------
+
+The following object types exist in the file:
+
+* *char* : one signed 8-bit value containing an ASCII character;
+
+* *byte* : one unsigned 8-bit value;
+
+* *word* : one 16-bit value, stored in low byte - high byte order;
+
+* *dword* :	one signed 32-bit value, stored in low byte - high byte order;
+
+* *string* : one byte containing the string length followed by the 
+  characters of the string.
+
+
+Object file format
+------------------
+
+The format of the object file is as follows:
+
+|Addr|Type   | Object
+|----|----   | ------
+|    |       | **File header**
+|   0|8 chars| 'Z80RMF03' - file signature and version
+|    |       |
+|    | word  | * ORG Address:
+|    |       |   contains the ORG address for the linked machine code
+|    |       |   or *0xFFFF* for no ORG address defined
+|    |       |
+|    | dword | File pointer to *Module Name*
+|    | dword | File pointer to *Expressions*, may be -1
+|    | dword | File pointer to *Defined Symbols*, may be -1
+|    | dword | File pointer to *External Symbols*, may be -1
+|    | dword | File pointer to *Machine Code*, may be -1
+|    |       |
+|    |       | **Expressions**
+|    |       | List of expressions used in this module:
+|    | char  | * *range* Range type: 
+|    |       |   'J' : 8-bit relative offset for JR
+|    |       |   'U' : 8-bit unsigned
+|    |       |   'S' : 8-bit signed
+|    |       |   'C' : 16-bit value little-endian
+|    |       |   'B' : 16-bit value big-endian
+|    |       |   'L' : 32-bit signed
+|    |       |   'u' : unsigned byte extended to 16 bits
+|    |       |   's' : signed byte sign-extended to 16 bits
+|    |       |   'P' : 24-bit pointer
+|    | word  | * *ASMPC* : relative module code address of the start of the
+|    |       |   assembly instruction to be used as *ASMPC* during
+|    |       |   expression evaluation
+|    | word  | * *patchptr* : relative module code patch pointer to store 
+|    |       |   the result of evaluating the expression
+|    | string| * *text* : expression text as parsed from the source file
+|    | byte  | * 0 : terminator
+|... |  ...  |   ...
+|    |       |
+|    |       | **Defined Symbols**
+|    |       | List of symbols defined in this module:
+|    | char  | * *scope* : Scope of the symbol:
+|    |       |   'L' : local symbol
+|    |       |   'G' : public symbol
+|    | char  | * *type* : Type of symbol:
+|    |       |   'C' : constant symbol
+|    |       |   'A' : offset to base address
+|    | dword | * *value* : Absolute value for a constant, or the relative 
+|    |       |   address to the start of the section for a relocatable address
+|    | string| * *name* : Symbol name
+|... |  ...  |   ...
+|    |       |
+|    |       | ** External Symbols **
+|    |       | List of external symbol names referred by this module:
+|    | string| * *name* : external symbol name, empty string to signal last
+|... | ...   | ...
+|    |       |
+|    |       | ** Module Name **
+|    |       | Base name of the object file
+|    | string| * *name* : module name
+|    |       |
+|    |       | **Machine Code**
+|    |       | Contains the binary code of the module
+|    | word  | * *size* : defines the total code size, 0 for a 64K size
+|    | bytes | * *code* : contains the binary code
+|    |       |
+
+
+Library file format
+-------------------
+
+The library file format is a sequence of object files with additional
+structures.
+
+|Addr|Type   | Object
+|----|----   | ------
+|    |       | **File header**
+|   0|8 chars| 'Z80LMF03' - file signature and version
+|    |       |
+|    |       | **Object Modules**
+|    |       | List of object modules in the library:
+| hN | dword | * *next* : contains the file pointer of the next object file
+|    |       |   in the library *hN*, or
+|    |       |   *-1* if this is the last object in the library
+|    | dword | * *size* : contains the size of this object file, or
+|    |       |   *0* if this object files has been marked "deleted"
+|    |       |   and will not be used
+|    |       |   An empty library has next=-1 and size=0
+| oN | bytes | * Object module binary data (already aligned on 4-byte boundary)
+|... | ...   | ...
+|    |       |
+
+
+History
+-------
+
+* *v01* : original z80asm version
+
+* *v02* : allow expressions to use standard C operators instead of the
+  original (legacy) z80asm specific syntax
+
+* *v03* : include the address of the start of the assembly instruction
+  in the object file, so that expressions with ASMPC are correctly computed
+  at link time;
+  remove type 'X' symbols (global library), no longer used
+

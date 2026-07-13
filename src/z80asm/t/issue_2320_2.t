@@ -36,6 +36,8 @@ Object  file test_t_issue_2320_2_t.lib at $0014: Z80RMF18
   CPU:  z80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_2_t"
 
 END
 
@@ -61,6 +63,8 @@ Object  file test_t_issue_2320_2_t.lib at $0014: Z80RMF18
   CPU:  z80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_2_t"
 
 END
 

@@ -1,0 +1,58 @@
+begin library
+    version                   = 1
+    begin module
+        version               = 1
+        name                  = module1
+        cpu                   = z180
+        swap_ixiy             = 0
+        begin exprs
+            begin expr
+                text          = "label1+123"
+                type          = ByteUnsigned
+                section       = "section1"
+                asmpc         = 0x1234
+                file          = "file1.asm"
+                line          = 123
+                patch_ptr     = 0x1235
+                opcode_size   = 3
+            end expr
+        end exprs
+        begin relocs
+            begin reloc
+                type          = ByteUnsigned
+                symbol        = x1
+                addend        = 0x1234
+                section       = "section1"
+                patch_ptr     = 0x1234
+                file          = "file1.asm"
+                line          = 123
+            end reloc
+        end relocs
+        begin symbols
+            begin symbol
+                name          = label1
+                scope         = Public
+                type          = Constant
+                section       = "section1"
+                value         = 0x1234
+                file          = "file1.asm"
+                line          = 123
+            end symbol
+        end symbols
+        begin externs
+            name              = x1
+            name              = x2
+            name              = x3
+        end externs
+        begin sections
+            begin section
+                name          = "section1"
+                align         = 1
+                split         = 0
+                begin bytes
+                    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+                end bytes
+            end section
+        end sections
+    end module
+end library

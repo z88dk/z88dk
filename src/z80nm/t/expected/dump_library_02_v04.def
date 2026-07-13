@@ -1,0 +1,71 @@
+begin library
+    version                   = 4
+    begin module
+        name                  = module1
+        version               = 4
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module2
+        version               = 4
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+end library

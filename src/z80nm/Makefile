@@ -1,8 +1,9 @@
-#-----------------------------------------------------------------------------
-# z80nm - dump z80asm object files
+#------------------------------------------------------------------------------
+# Z80 assembler
 # Copyright (C) Paulo Custodio, 2011-2026
-# License: http://www.perlfoundation.org/artistic_license_2_0
-#-----------------------------------------------------------------------------
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+#------------------------------------------------------------------------------
+
 PROJ		:= z88dk-z80nm
 
 include ../Make.common
@@ -45,6 +46,14 @@ CXXFLAGS	+= -I../../ext/getopt
 OBJS		+= ../../ext/getopt/getopt.o
 endif
 
+STYLE_WIDTH = 80
+ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
+		  --break-closing-braces --add-braces --attach-return-type \
+		  --max-code-length=$(STYLE_WIDTH) --lineend=linux --formatted 
+PERLTIDY = perltidy --indent-columns=4 --continuation-indentation=4 \
+		  --maximum-line-length=$(STYLE_WIDTH) -b
+TIDY_STAMP = .tidy-stamp
+
 
 #------------------------------------------------------------------------------
 .PHONY: all clean test install
@@ -69,15 +78,38 @@ endef
 $(eval $(call MAKE_EXE,$(PROJ),$(OBJS),0))
 
 #------------------------------------------------------------------------------
+all: object-file-format/obj_v01.txt
+
+object-file-format/obj_v01.txt: \
+		object-file-format/make_docs.pl \
+		../z80asm/cpu.def \
+		../z80asm/obj_range_type.def \
+		../z80asm/obj_symbol_scope.def \
+		../z80asm/obj_symbol_type.def
+	perl object-file-format/make_docs.pl
+
+#------------------------------------------------------------------------------
 test:: $(PROJ)$(EXESUFFIX)
-	perl -S prove t/*.t
+	perl -S prove -j9 --state=slow,save t/*.t
+
+#------------------------------------------------------------------------------
+tidy:
+	@[ -f $(TIDY_STAMP) ] || touch -t 197001010000 $(TIDY_STAMP)
+	find . \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.re' \) \
+		-newer $(TIDY_STAMP) -exec $(ASTYLE) {} +
+	find . \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) \
+		-newer $(TIDY_STAMP) -exec $(PERLTIDY) {} +
+	touch $(TIDY_STAMP)
+
 
 #------------------------------------------------------------------------------
 clean::
-	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak core
+	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak object-file-format/*.bak core
 
 #------------------------------------------------------------------------------
 install:  $(PROJ)$(EXESUFFIX)
 	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
+	$(INSTALL) ObjModule.pm $(PREFIX)/bin/ObjModule.pm
+	$(INSTALL) z88dk-z80objcopy.pl $(PREFIX)/bin/z88dk-z80objcopy.pl
 
 -include $(DEPENDS)

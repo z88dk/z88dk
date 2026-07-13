@@ -57,6 +57,11 @@ Object  file test_t_issue_2320_h_t.lib at $0014: Z80RMF18
     C $0000: 21 00 40
   Symbols:
     L A $0000: a (section code2) (file test_t_issue_2320_h_t.a.asm:2)
+  Strings:
+    S   1 = "code2"
+    S   2 = "a"
+    S   3 = "test_t_issue_2320_h_t.a.asm"
+    S   4 = "test_t_issue_2320_h_t.a"
 
 Object  file test_t_issue_2320_h_t.lib at $00EC: Z80RMF18
   Name: b
@@ -66,6 +71,10 @@ Object  file test_t_issue_2320_h_t.lib at $00EC: Z80RMF18
     C $0000: 21 00 80
   Symbols:
     L A $0000: b (section code) (file test_t_issue_2320_h_t.b.asm:3)
+  Strings:
+    S   1 = "code"
+    S   2 = "b"
+    S   3 = "test_t_issue_2320_h_t.b.asm"
 
 END
 

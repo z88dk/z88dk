@@ -154,47 +154,71 @@ sub bincode {
 capture_ok("z88dk-z80asm -s -o${test}.o ".
 		   "${test}1.asm ${test}2.asm ${test}3.asm ${test}4.asm", "");
 
-capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF18
-  Name: ${test}
+capture_ok("z88dk-z80nm -a ${test}.o", <<'END');
+Object  file test_t_modlink_consolobj_t.o at $0000: Z80RMF18
+  Name: test_t_modlink_consolobj_t
   CPU:  z80 
   Section "": 0 bytes
   Section code: 37 bytes
-    C \$0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
-    C \$0010: D7 23 CD 00 00 C3 00 00 06 00 05 C2 00 00 C9 E5
-    C \$0020: CD 00 00 E1 C9
+    C $0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
+    C $0010: D7 23 CD 00 00 C3 00 00 06 00 05 C2 00 00 C9 E5
+    C $0020: CD 00 00 E1 C9
   Section data: 15 bytes
-    C \$0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
+    C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
   Symbols:
-    L = \$0000: ${test}2_printa1 (section "") (file ${test}2.asm:4)
-    G = \$0000: print (section "") (file ${test}2.asm:3)
-    L A \$0018: ${test}2__delay (section code) (file ${test}2.asm:16)
-    L A \$001A: ${test}2__delay_1 (section code) (file ${test}2.asm:18)
-    G A \$0025: code_end (section code) (file ${test}4.asm:4)
-    G A \$0000: main (section code) (file ${test}1.asm:4)
-    G = \$0000: main1 (section code) (file ${test}1.asm:14)
-    G A \$001F: print1 (section code) (file ${test}3.asm:4)
-    G A \$000D: printa (section code) (file ${test}2.asm:7)
-    L A \$0000: ${test}1_mess (section data) (file ${test}1.asm:12)
-    L A \$0006: ${test}2_mess (section data) (file ${test}2.asm:24)
-    L A \$000D: ${test}3_dollar (section data) (file ${test}3.asm:12)
-    L A \$000B: ${test}3_mess (section data) (file ${test}3.asm:11)
+    L = $0000: test_t_modlink_consolobj_t2_printa1 (section "") (file test_t_modlink_consolobj_t2.asm:4)
+    G = $0000: print (section "") (file test_t_modlink_consolobj_t2.asm:3)
+    L A $0018: test_t_modlink_consolobj_t2__delay (section code) (file test_t_modlink_consolobj_t2.asm:16)
+    L A $001A: test_t_modlink_consolobj_t2__delay_1 (section code) (file test_t_modlink_consolobj_t2.asm:18)
+    G A $0025: code_end (section code) (file test_t_modlink_consolobj_t4.asm:4)
+    G A $0000: main (section code) (file test_t_modlink_consolobj_t1.asm:4)
+    G = $0000: main1 (section code) (file test_t_modlink_consolobj_t1.asm:14)
+    G A $001F: print1 (section code) (file test_t_modlink_consolobj_t3.asm:4)
+    G A $000D: printa (section code) (file test_t_modlink_consolobj_t2.asm:7)
+    L A $0000: test_t_modlink_consolobj_t1_mess (section data) (file test_t_modlink_consolobj_t1.asm:12)
+    L A $0006: test_t_modlink_consolobj_t2_mess (section data) (file test_t_modlink_consolobj_t2.asm:24)
+    L A $000D: test_t_modlink_consolobj_t3_dollar (section data) (file test_t_modlink_consolobj_t3.asm:12)
+    L A $000B: test_t_modlink_consolobj_t3_mess (section data) (file test_t_modlink_consolobj_t3.asm:11)
   Externs:
     U         lib_end
     U         lib_start
   Expressions:
-    E = \$0000 \$0000 0: ${test}2_printa1 := printa (section "") (file ${test}2.asm:4)
-    E = \$0000 \$0000 0: print := print1 (section "") (file ${test}2.asm:3)
-    E W \$0000 \$0001 3: lib_start (section code) (file ${test}1.asm:5)
-    E W \$0003 \$0004 3: ${test}1_mess (section code) (file ${test}1.asm:6)
-    E W \$0006 \$0007 3: print (section code) (file ${test}1.asm:7)
-    E W \$0009 \$000A 3: lib_end (section code) (file ${test}1.asm:8)
-    E = \$0006 \$0006 0: main1 := main (section code) (file ${test}1.asm:14)
-    E W \$001B \$001C 3: ${test}2__delay_1 (section code) (file ${test}2.asm:20)
-    E W \$0015 \$0016 3: ${test}2_printa1 (section code) (file ${test}2.asm:14)
-    E W \$0012 \$0013 3: ${test}2__delay (section code) (file ${test}2.asm:13)
-    E W \$0020 \$0021 3: printa (section code) (file ${test}3.asm:6)
-    E W \$000D \$000D 2: \$ (section data) (file ${test}3.asm:12)
+    E =     $0000 $0000 0: test_t_modlink_consolobj_t2_printa1 := printa (section "") (file test_t_modlink_consolobj_t2.asm:4)
+    E =     $0000 $0000 0: print := print1 (section "") (file test_t_modlink_consolobj_t2.asm:3)
+    E U16   $0000 $0001 3: lib_start (section code) (file test_t_modlink_consolobj_t1.asm:5)
+    E U16   $0003 $0004 3: test_t_modlink_consolobj_t1_mess (section code) (file test_t_modlink_consolobj_t1.asm:6)
+    E U16   $0006 $0007 3: print (section code) (file test_t_modlink_consolobj_t1.asm:7)
+    E U16   $0009 $000A 3: lib_end (section code) (file test_t_modlink_consolobj_t1.asm:8)
+    E =     $0006 $0006 0: main1 := main (section code) (file test_t_modlink_consolobj_t1.asm:14)
+    E U16   $001B $001C 3: test_t_modlink_consolobj_t2__delay_1 (section code) (file test_t_modlink_consolobj_t2.asm:20)
+    E U16   $0015 $0016 3: test_t_modlink_consolobj_t2_printa1 (section code) (file test_t_modlink_consolobj_t2.asm:14)
+    E U16   $0012 $0013 3: test_t_modlink_consolobj_t2__delay (section code) (file test_t_modlink_consolobj_t2.asm:13)
+    E U16   $0020 $0021 3: printa (section code) (file test_t_modlink_consolobj_t3.asm:6)
+    E U16   $000D $000D 2: $ (section data) (file test_t_modlink_consolobj_t3.asm:12)
+  Strings:
+    S   1 = "test_t_modlink_consolobj_t2.asm"
+    S   2 = "test_t_modlink_consolobj_t2_printa1"
+    S   3 = "printa"
+    S   4 = "print"
+    S   5 = "print1"
+    S   6 = "test_t_modlink_consolobj_t1.asm"
+    S   7 = "code"
+    S   8 = "lib_start"
+    S   9 = "test_t_modlink_consolobj_t1_mess"
+    S  10 = "lib_end"
+    S  11 = "main1"
+    S  12 = "main"
+    S  13 = "test_t_modlink_consolobj_t2__delay_1"
+    S  14 = "test_t_modlink_consolobj_t2__delay"
+    S  15 = "test_t_modlink_consolobj_t3.asm"
+    S  16 = "data"
+    S  17 = "$"
+    S  18 = "code_end"
+    S  19 = "test_t_modlink_consolobj_t4.asm"
+    S  20 = "test_t_modlink_consolobj_t2_mess"
+    S  21 = "test_t_modlink_consolobj_t3_dollar"
+    S  22 = "test_t_modlink_consolobj_t3_mess"
+    S  23 = "test_t_modlink_consolobj_t"
 END
 
 check_text_file("${test}.sym", <<'END');

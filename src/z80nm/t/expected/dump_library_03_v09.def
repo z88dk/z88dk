@@ -1,0 +1,2451 @@
+begin library
+    version                   = 9
+    begin module
+        name                  = module_z80_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8080_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_8085_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_gbz80_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z180_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_z80n_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_z80_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ez80_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r800_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_kc160_z80_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r2ka_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r3k_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r4k_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r5k_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_r6k_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_strict_no_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+    begin module
+        name                  = module_ti83plus_strict_ixiy
+        version               = 9
+        begin symbols
+            begin symbol
+                name          = local1
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = local2
+                scope         = Local ; (1)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Public ; (2)
+                type          = Constant ; (1)
+                section       = ""
+                value         = 0x0000
+            end symbol
+        end symbols
+    end module
+end library
