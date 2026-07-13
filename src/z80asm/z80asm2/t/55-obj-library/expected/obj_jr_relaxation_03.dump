@@ -7,5 +7,9 @@ Object  file t/55-obj-library//input/obj_jr_relaxation_03.o at $0014: Z80RMF18
   Symbols:
   Externs:
   Expressions:
-    E J $0000 $0001 2: func1 (section "") (file t/55-obj-library/input/obj_jr_relaxation_03.asm:2)
+    E J8    $0000 $0001 2: func1 (section "") (file t/55-obj-library/input/obj_jr_relaxation_03.asm:2)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_jr_relaxation_03.asm"
+    S   2 = "func1"
+    S   3 = "obj_jr_relaxation_03"
 

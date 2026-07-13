@@ -9,5 +9,10 @@ Object  file t/55-obj-library//input/obj_opcodes_01.o at $0014: Z80RMF18
     L A $0000: start (section "") (file t/55-obj-library/input/obj_opcodes_01.asm:1)
   Externs:
   Expressions:
-    E W $0005 $0006 3: end (section "") (file t/55-obj-library/input/obj_opcodes_01.asm:5)
+    E U16   $0005 $0006 3: end (section "") (file t/55-obj-library/input/obj_opcodes_01.asm:5)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_opcodes_01.asm"
+    S   2 = "end"
+    S   3 = "start"
+    S   4 = "obj_opcodes_01"
 

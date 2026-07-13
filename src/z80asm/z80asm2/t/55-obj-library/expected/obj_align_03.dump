@@ -8,4 +8,7 @@ Object  file t/55-obj-library//input/obj_align_03.o at $0014: Z80RMF18
   Symbols:
   Externs:
   Expressions:
+  Strings:
+    S   1 = "obj_align_03"
+    S   2 = "code"
 
