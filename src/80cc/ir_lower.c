@@ -833,6 +833,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_CONV_BYTE_TO_HIGH: return gen_conv_byte_to_high(out, f, op);
     case IR_SHL:               return gen_shl(out, f, op);
     case IR_SHR:               return gen_shr(out, f, op);
+    case IR_MUL:               return gen_mul(out, f, op);
     case IR_CMP_ULT: case IR_CMP_UGE:
     case IR_CMP_LT:  case IR_CMP_GE:  return gen_cmp_lt_ge(out, f, op);
     case IR_CMP_UGT: case IR_CMP_ULE:

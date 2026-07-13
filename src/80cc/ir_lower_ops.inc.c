@@ -3402,6 +3402,52 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Native hardware multiply (IR_MUL). Only emitted (by build_muldiv_integer)
+   for CPUs with a hardware multiply and the corresponding operand widths:
+     - kc160 word (src width 2): `mul de,hl` — DEHL = DE*HL, low 16 in HL.
+       (Low 16 is sign-agnostic, so the unsigned form serves both.)
+     - char (src width 1) 8x8 -> 16, result in HL:
+         kc160  : mul hl / muls hl   (H*L, signed picks muls)
+         z180/ez80: mlt hl           (unsigned 8x8)
+         z80n   : mul de             (unsigned 8x8; round-trip via ex de,hl)
+   The char path stages H=src0, L=src1 WITHOUT touching DE: src0 rides in A
+   across the (HL-clobbering) load of src1, then flips into H. This keeps a
+   DE-resident value (e.g. a reduction accumulator) intact. */
+static int gen_mul(FILE *out, Func *f, const Op *op)
+{
+    int uns = (op->imm != 0);
+
+    if (f->vregs[op->src[0]].width == 2) {
+        /* kc160 16x16 -> low 16. */
+        load_binop_operands(out, f, op);        /* HL = src0, DE = src1 */
+        emit(out, "mul\tde,hl");
+        invalidate_de_cache();                  /* DE now holds the high 16 */
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
+
+    /* 8x8 -> 16. Stage H=src0, L=src1 (src0 rides in A over src1's load). */
+    load_byte_to_a(out, f, op->src[0]);         /* A = src0 */
+    load_to_hl(out, f, op->src[1]);             /* L = src1 (A preserved) */
+    emit(out, "ld\th,a");                       /* H = src0 -> HL = src0:src1 */
+    invalidate_a_cache();
+
+    if (IS_Z80N()) {
+        /* z80n has only `mul de`. The paired ex de,hl restores any cached
+           DE value (ex; mul de clobbers DE; ex puts the product in HL and
+           the original DE back). */
+        emit(out, "ex\tde,hl");
+        emit(out, "mul\tde");                   /* DE = D*E */
+        emit(out, "ex\tde,hl");                 /* HL = product, DE restored */
+    } else if (IS_KC160()) {
+        emit(out, uns ? "mul\thl" : "muls\thl");/* HL = H*L */
+    } else {
+        emit(out, "mlt\thl");                   /* z180/ez80: HL = H*L */
+    }
+    commit_hl_result(out, f, op->dst);
+    return 0;
+}
+
 /* dst = imm - src[0]  (reverse subtract; `const - var`). Loads only the
    variable — the constant is the immediate, so no const-in-HL and no
    push/pop to preserve it across the var load. Width 2. */

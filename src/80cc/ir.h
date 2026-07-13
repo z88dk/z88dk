@@ -179,6 +179,12 @@ typedef enum {
     IR_XOR,
     IR_SHL,
     IR_SHR,             /* unsigned shift right; SAR variant via Kind+sign */
+    IR_MUL,             /* dst = src[0] * src[1] via native hardware multiply.
+                           Emitted only by build_muldiv_integer for CPUs with a
+                           hardware multiply: kc160 (mul/muls hl 8x8, mul de,hl
+                           16x16), z180/ez80 (mlt, unsigned 8x8), z80n (mul de,
+                           unsigned 8x8). imm=1 unsigned / 0 signed; operand
+                           width selects 8x8 (byte) vs 16x16 (word). */
 
     /* unary */
     IR_NEG,

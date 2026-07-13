@@ -43,6 +43,7 @@ static const OpInfo op_table[] = {
     [IR_XOR]                = { "XOR",                  1, 0 },
     [IR_SHL]                = { "SHL",                  1, 0 },
     [IR_SHR]                = { "SHR",                  1, 0 },
+    [IR_MUL]                = { "MUL",                  0, 0 },
 
     /* unary */
     [IR_NEG]                = { "NEG",                  1, 0 },

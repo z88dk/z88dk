@@ -5887,6 +5887,50 @@ static int build_cast(Builder *b, Node *n)
     return build_fail("OP_CAST %d→%d not yet supported", src_w, dst_w);
 }
 
+/* Emit a native hardware multiply op: dst(width) = l * r. imm carries the
+   unsigned flag (1=unsigned, 0=signed); the lowerer selects 8x8 vs 16x16 from
+   the operand vreg width. Only called under the CPU/width guards below. */
+static int emit_ir_mul(Builder *b, int l, int r, int width, int unsigned_op)
+{
+    int dst = new_temp(b, width);
+    b->f->vregs[dst].width = (int16_t)width;
+    Op *op = ir_op_emit(cur_bb(b), IR_MUL);
+    op->dst = dst; op->src[0] = l; op->src[1] = r;
+    op->imm = unsigned_op ? 1 : 0;
+    return dst;
+}
+
+/* Narrowing-multiply source: if `nd` is an unsigned value that fits in 16 bits
+   (possibly widened to a long by explicit casts, e.g. `(unsigned long)a`), return
+   the ≤16-bit unsigned sub-expression to build in its place; else NULL. Peels
+   widening unsigned casts (cast source lives in ->operand). A signed source is
+   rejected — `(unsigned long)(int x)` for x<0 is a large 32-bit value, not a u16;
+   a truncating cast (`(unsigned short)long_expr`) stops the peel and its u16 result
+   is itself a valid narrow operand. */
+static Node *mul_u16_narrow_src(Node *nd)
+{
+    Node *cur = nd;
+    while (cur && cur->ast_type == OP_CAST && cur->operand && cur->operand->type
+           && cur->type && cur->type->isunsigned
+           && type_width(cur->type) >= type_width(cur->operand->type))
+        cur = cur->operand;
+    if (cur && cur->type && cur->type->isunsigned && type_width(cur->type) <= 2)
+        return cur;
+    return NULL;
+}
+
+/* Zero-extend a ≤16-bit unsigned operand vreg to exactly width 2 (a char u8
+   widens to u16 for the 16x16 helper's HL/DE arg). */
+static int widen_u16_to_int(Builder *b, int v)
+{
+    if (v < 0 || b->f->vregs[v].width >= 2) return v;
+    int t = new_temp(b, 2);
+    b->f->vregs[t].width = 2;
+    Op *cv = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+    cv->dst = t; cv->src[0] = v;
+    return t;
+}
+
 static int build_muldiv_integer(Builder *b, Node *n)
 {
     Kind lk = n->left  && n->left->type  ? n->left->type->kind  : KIND_NONE;
@@ -5896,10 +5940,59 @@ static int build_muldiv_integer(Builder *b, Node *n)
     Kind flt_k   = lk;
     int is_flt   = kind_is_floating(lk) || kind_is_floating(rk)
                 || (n->type && kind_is_floating(n->type->kind));
+    /* Narrowing multiply: `(unsigned long)u16 * u16` → the 16x16→32 helper
+       l_mulu_32_16x16 (dehl = hl * de) instead of widening both operands to 32
+       bits for l_long_mult_u. The canonical helper dispatches to native hardware
+       multiply on z180/ez80/z80n/kc160/rabbit and the size/speed loop on z80.
+       Unsigned only (no signed 16x16→32 helper). Checked before building the
+       operands so the wide casts are never emitted (no double-evaluation).
+       IR_NO_NARROW_MUL opts out. */
+    if (n->ast_type == OP_MULT && !is_flt && !is_fix16 && !is_fix32
+        && n->type && type_width(n->type) == 4
+        && !IS_808x() && !IS_GBZ80()   /* l_mulu_32_16x16 undefined there */
+        && !getenv("IR_NO_NARROW_MUL")) {
+        Node *ln = mul_u16_narrow_src(n->left);   /* type width <= 2, unsigned */
+        Node *rn = mul_u16_narrow_src(n->right);
+        if (ln && rn) {
+            int lv = build_expr(b, ln);
+            if (lv < 0) return -1;
+            int rv = build_expr(b, rn);
+            if (rv < 0) return -1;
+            lv = widen_u16_to_int(b, lv);         /* u8 -> u16 for HL/DE */
+            rv = widen_u16_to_int(b, rv);
+            int dst = new_temp(b, 4);
+            b->f->vregs[dst].width = 4;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            int *args = calloc(2, sizeof(int));
+            args[0] = lv; args[1] = rv;   /* HL, DE (multiply is commutative) */
+            hi->name = "l_mulu_32_16x16";
+            hi->args = args; hi->n_args = 2; hi->n_stacked = 0;
+            hi->ret_vreg = dst; hi->ret_in_de = 0;
+            op->hcall = hi;
+            return dst;
+        }
+    }
     int l = build_expr(b, n->left);
     if (l < 0) return -1;
     int r = build_expr(b, n->right);
     if (r < 0) return -1;
+    /* Hardware char*char multiply — matched BEFORE the int promotion so the
+       operands stay bytes for the 8x8 hardware multiply. kc160 has signed and
+       unsigned 8x8 (mul/muls hl), so it takes any same-signedness char pair;
+       z180/ez80/z80n have unsigned-only 8x8 (mlt / mul de), so unsigned char
+       only (signed char falls through to the promotion + helper path). Mixed
+       signedness falls through too (promotes each operand by its own sign). */
+    if (n->ast_type == OP_MULT
+        && b->f->vregs[l].width == 1 && b->f->vregs[r].width == 1) {
+        int lu = n->left  && n->left->type  && n->left->type->isunsigned;
+        int ru = n->right && n->right->type && n->right->type->isunsigned;
+        if (IS_KC160() && lu == ru)
+            return emit_ir_mul(b, l, r, 2, lu);
+        if ((c_cpu == CPU_Z180 || IS_EZ80() || IS_Z80N()) && lu && ru)
+            return emit_ir_mul(b, l, r, 2, 1);
+    }
     int width = b->f->vregs[l].width;
     if (b->f->vregs[r].width > width) width = b->f->vregs[r].width;
     /* C integer promotion: mul/div/mod have no byte-width helper, so a
@@ -5957,6 +6050,10 @@ static int build_muldiv_integer(Builder *b, Node *n)
     int unsigned_op = (n->type && n->type->isunsigned)
         || (n->left  && n->left->type  && n->left->type->isunsigned)
         || (n->right && n->right->type && n->right->type->isunsigned);
+    /* kc160: 16x16 int multiply is a single `mul de,hl` (low 16 bits are
+       sign-agnostic, so the unsigned form serves signed and unsigned alike). */
+    if (n->ast_type == OP_MULT && IS_KC160() && width == 2)
+        return emit_ir_mul(b, l, r, 2, 1);
     const char *helper;
     int n_stacked = 0;
     int ret_in_de = 0;

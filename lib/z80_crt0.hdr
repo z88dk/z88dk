@@ -187,6 +187,7 @@
 	EXTERN	l_long_mod_u
 	EXTERN	l_long_mult
 	EXTERN	l_long_mult_u
+	EXTERN	l_mulu_32_16x16	;Unsigned 16x16->32 (dehl = hl * de)
 	EXTERN	l_long_asr_u	;Long unsigned >>
 	EXTERN	l_long_asr_uo	;Long unsigned >> shift in c
 	EXTERN	l_long_case
