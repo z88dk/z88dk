@@ -9,4 +9,7 @@ Object  file t/55-obj-library//input/obj_defs_string_01.o at $0014: Z80RMF18
   Symbols:
   Externs:
   Expressions:
+  Strings:
+    S   1 = "obj_defs_string_01"
+    S   2 = "code"
 
