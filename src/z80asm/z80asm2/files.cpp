@@ -474,7 +474,7 @@ bool read_binary_file(const std::filesystem::path& path,
         return false;
     }
 
-    bytes.resize(size);
+    bytes.resize(static_cast<size_t>(size));
 
     if (size > 0) {
         in.read(
