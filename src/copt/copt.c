@@ -28,7 +28,7 @@ static struct lnode* opt(struct lnode* r);
 int rpn_eval(const char* expr, char** vars);
 
 #define HSIZE 107
-#define MAXLINE 256
+#define MAXLINE 512
 #define MAXFIRECOUNT 65535L
 #define MAX_PASS 16
 
