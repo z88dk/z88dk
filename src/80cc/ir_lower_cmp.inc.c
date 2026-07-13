@@ -196,8 +196,68 @@ static int try_exx_compare(FILE *out, Func *f, const Op *op)
     return 1;
 }
 
+/* sp reduction loop test `counter REL bound` where the counter is an index-half
+   / BC register and the bound is an sp spill slot (see sp_dehome_loop_cmp_ok).
+   Address the bound via HL (`ld hl,off; add hl,sp`) and subtract byte-wise
+   through A — HL holds the bound address, A does the arithmetic, IX/BC hold the
+   counter — so DE (the reduction sum) survives. Reduces to try_cmp_ixd_fold's
+   M-N model (CF = M<N, S^V for signed). Returns 1 if emitted. */
+static int try_sp_dehome_loop_cmp(FILE *out, Func *f, const Op *op)
+{
+    if (L.la.cur_branch_test_kind == 0) return 0;
+    if (!sp_dehome_loop_cmp_ok(f, op)) return 0;
+    int s0 = op->src[0], s1 = op->src[1];
+    char r_lo[16], r_hi[16];
+    int regv, slotv;
+    if (sp_cmp_reghalf(f, s0, r_lo, r_hi, sizeof r_lo) && sp_cmp_slot(f, s1)) {
+        regv = s0; slotv = s1;
+    } else {
+        sp_cmp_reghalf(f, s1, r_lo, r_hi, sizeof r_lo);
+        regv = s1; slotv = s0;
+    }
+    OpKind k = op->kind;
+    int is_signed  = (k==IR_CMP_LT || k==IR_CMP_LE || k==IR_CMP_GT || k==IR_CMP_GE);
+    int swap       = (k==IR_CMP_GT || k==IR_CMP_LE || k==IR_CMP_UGT || k==IR_CMP_ULE);
+    int true_on_cf = (k==IR_CMP_LT || k==IR_CMP_GT || k==IR_CMP_ULT || k==IR_CMP_UGT);
+    /* M-N: !swap → M=src0,N=src1; swap → M=src1,N=src0. Which side is the reg. */
+    int m_is_reg = swap ? (regv == s1) : (regv == s0);
+    ss_note_reload(f, slotv);          /* bound read from its slot via (hl) */
+    ss_note_cache_read(f, regv);
+    emit(out, "ld\thl,%d", slot_off(f, slotv) + L.cur_sp_adjust);
+    emit(out, "add\thl,sp");           /* HL = &bound (DE preserved) */
+    if (m_is_reg) {                    /* M = counter reg, N = bound slot */
+        emit(out, "ld\ta,%s", r_lo);
+        emit(out, "sub\t(hl)");
+        emit(out, "inc\thl");
+        emit(out, "ld\ta,%s", r_hi);
+        emit(out, "sbc\ta,(hl)");
+    } else {                           /* M = bound slot, N = counter reg */
+        emit(out, "ld\ta,(hl)");
+        emit(out, "sub\t%s", r_lo);
+        emit(out, "inc\thl");
+        emit(out, "ld\ta,(hl)");
+        emit(out, "sbc\ta,%s", r_hi);
+    }
+    if (is_signed) {                   /* S^V → CF = signed (M < N) */
+        int lbl = L.cmp_label_counter++;
+        emit(out, "jp\tpo,L_f%d_cmp_ok_%d", L.func_emit_idx, lbl);
+        emit(out, "xor\t0x80");
+        fprintf(out, "L_f%d_cmp_ok_%d:\n", L.func_emit_idx, lbl);
+        emit(out, "rla");
+    }
+    int br_true = (L.la.cur_branch_test_kind == IR_BR_COND);
+    int want_cf = (true_on_cf == br_true);
+    emit(out, "jp\t%s,L_f%d_bb_%d", want_cf ? "c" : "nc",
+         L.func_emit_idx, L.la.cur_branch_test_label);
+    invalidate_hl_cache();             /* HL walked to &bound+1 */
+    L.rs.a = -1;
+    L.la.cur_skip_next_op = 1;
+    return 1;
+}
+
 static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
 {
+    if (try_sp_dehome_loop_cmp(out, f, op)) return 0;
     if (try_cmp_ixd_fold(out, f, op)) return 0;
     if (try_exx_compare(out, f, op)) return 0;
     int is_signed = (op->kind == IR_CMP_LT || op->kind == IR_CMP_GE);
@@ -573,6 +633,7 @@ static void load_cmp_swap_operands(FILE *out, const Func *f, const Op *op)
 
 static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
 {
+    if (try_sp_dehome_loop_cmp(out, f, op)) return 0;
     if (try_cmp_ixd_fold(out, f, op)) return 0;
     if (try_exx_compare(out, f, op)) return 0;
     int is_signed = (op->kind == IR_CMP_GT || op->kind == IR_CMP_LE);

@@ -2218,9 +2218,92 @@ int ir_cpu_const_store_ok(int width)
     return !IS_RABBIT() && !IS_EZ80() && !IS_KC160() && !IS_8085();
 }
 
+/* DE-clean write-back store for an in-place array transform inside a word
+   DE-home loop (`a[i] = f(s)`): the address goes to HL (BC-resident or
+   rematerialised base + const offset, computed DE/BC-clean), and the value is
+   written from the home (E/D) or its coherent spill slot (via A) — never staged
+   through DE. Keeps the running sum resident across the write-back. Guarded by
+   de_home_clean_store_ok (mirrors this exactly for op_de_clean). Returns 1 when
+   emitted. */
+static int try_de_home_clean_store(FILE *out, Func *f, const Op *op)
+{
+    if (!de_home_clean_store_ok(f, op)) return 0;
+    int v = op->src[0];
+    int base = op->mem.base;
+    /* Address → HL, DE- and BC-clean. */
+    if (f->vreg_to_phys[base] == IR_PR_BC)
+        emit(out, "ld\thl,bc");
+    else if (!emit_remat_word(out, f, base, "hl"))
+        return 0;                                  /* remat failed — leave to generic */
+    emit_hl_add_offset(out, op->mem.offset, 0, 1);  /* avoid_bc → keeps DE and BC */
+    /* Value bytes → (hl), (hl+1). */
+    if (v == L.cur_func_whome) {
+        emit(out, "ld\t(hl),e");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),d");
+    } else {
+        int ix = slot_ix_off(f, v);
+        ss_note_reload(f, v);                       /* force the producer's slot store */
+        emit(out, "ld\ta,(%s%+d)", frame_reg(), ix);
+        emit(out, "ld\t(hl),a");
+        emit(out, "inc\thl");
+        emit(out, "ld\ta,(%s%+d)", frame_reg(), ix + 1);
+        emit(out, "ld\t(hl),a");
+        invalidate_a_cache();
+    }
+    invalidate_hl_cache();                          /* HL walked past the base */
+    return 1;
+}
+
+/* Fused masked write-back: `v = home <op> K; a[i] = v` collapsed into a single
+   DE-clean store that reads the home from E/D, applies the constant op byte-wise
+   through A, and stores to a BC/remat base + const offset — the masked value
+   never rides HL. The preceding mask op emitted nothing (gen_bitop's fused-mask
+   guard). Guarded by fused_mask_store_mask. Returns 1 when emitted. */
+static int try_de_home_mask_store(FILE *out, Func *f, const Op *op)
+{
+    const Op *m = fused_mask_store_mask(f, op);
+    if (!m) return 0;
+    int base = op->mem.base;
+    if (f->vreg_to_phys[base] == IR_PR_BC)
+        emit(out, "ld\thl,bc");
+    else if (!emit_remat_word(out, f, base, "hl"))
+        return 0;
+    emit_hl_add_offset(out, op->mem.offset, 0, 1);   /* avoid_bc → keeps DE and BC */
+    const char *mn = (m->kind == IR_AND) ? "and" : (m->kind == IR_OR) ? "or" : "xor";
+    uint16_t K = (uint16_t)m->imm;
+    uint8_t lo = (uint8_t)(K & 0xff), hi = (uint8_t)(K >> 8);
+    uint8_t ident = (m->kind == IR_AND) ? 0xff : 0x00;
+    int used_a = 0;
+    if (lo == ident) {                               /* op is a no-op on this byte */
+        emit(out, "ld\t(hl),e");
+    } else {
+        emit(out, "ld\ta,e");
+        emit(out, "%s\t%u", mn, (unsigned)lo);
+        emit(out, "ld\t(hl),a");
+        used_a = 1;
+    }
+    emit(out, "inc\thl");
+    if (hi == ident) {
+        emit(out, "ld\t(hl),d");
+    } else {
+        emit(out, "ld\ta,d");
+        emit(out, "%s\t%u", mn, (unsigned)hi);
+        emit(out, "ld\t(hl),a");
+        used_a = 1;
+    }
+    if (used_a) invalidate_a_cache();
+    invalidate_hl_cache();
+    return 1;
+}
+
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
+    if (try_de_home_mask_store(out, f, op))
+        return 0;
+    if (try_de_home_clean_store(out, f, op))
+        return 0;
     if (op->src[0] >= 0 && f->vregs[op->src[0]].width > 4) {
         /* Wide double store: dload(src)→FA, address into HL, dstore. */
         if (*wide_acc_cell(f, op->src[0]) != op->src[0]) {
@@ -3416,6 +3499,13 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
     const char *mnem = (op->kind == IR_AND) ? "and"
                      : (op->kind == IR_OR)  ? "or"
                      :                        "xor";
+
+    /* Mask half of a fused masked write-back (`v = s & K; a[i] = v`): emit
+       nothing — the immediately-following store synthesises the masked value
+       from the home (E/D) and stores it DE-cleanly. The mask result (single-use,
+       HL-homed) is never materialised. */
+    if (op_is_fused_mask(f, op))
+        return 0;
 
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         /* Byte bitwise in A — no widening, no high-byte work.

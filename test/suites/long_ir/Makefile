@@ -10,7 +10,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin fp_to_int.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -144,6 +144,22 @@ looppr.bin: $(SOURCES) looppr.c
 looppr_fp.bin: $(SOURCES) looppr.c
 	$(call compile,-Cc-frameix)
 	$(runtest)
+
+# Reduction write-back DE-home (in-place `a[i]=f(sum)`; fp-only feature,
+# IR_NO_DECLEAN opts out): plain / masked / OR / XOR / struct-field write-backs
+# that keep the running sum in DE across the store. fp build exercises the
+# feature; sp build validates the inert (ordinary) path. Host-verified checksum.
+redwb.bin: $(SOURCES) redwb.c
+	$(call compile,-DREDWB_CHK=34070u)
+	$(runtest)
+
+redwb_fp.bin: $(SOURCES) redwb.c
+	$(call compile,-Cc-frameix -DREDWB_CHK=34070u)
+	$(runtest)
+
+redwb_8080.bin: $(SOURCES) redwb.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -DREDWB_CHK=34070u -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 # Index-half BYTE HOME (second byte home in IYL/IXL). sp-mode (the default
 # compile) has IY free, so this build exercises the index-half home on z80;

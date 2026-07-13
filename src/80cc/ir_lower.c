@@ -546,6 +546,7 @@ static PhysReg byte_home_phys(const Func *f, int v);
 static int  byte_home_slotbacked(PhysReg pr);
 static const char *byte_home_reg(PhysReg pr);
 static int  byte_home_holds(int v);
+static int  vreg_is_pr_de(const Func *f, int v);
 static PhysReg idxhalf_phys(const Func *f, int v);
 static const char *idxhalf_reg(PhysReg pr);
 static void byte_home_note(int v);
