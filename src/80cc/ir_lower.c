@@ -1767,6 +1767,13 @@ int ir_lower_func(FILE *out, Func *f)
            CFG. */
         int pruned  = ir_opt_prune_unreachable(f);
         int hoisted = ir_opt_licm(f);
+        /* Spatial address CSE: clustered accesses (stencil a[k]/a[k±1], neighbour
+           sums) share one anchor address + a folded byte offset. BEFORE ivsr so
+           the shared base+index structure is still visible (ivsr would otherwise
+           strength-reduce each clustered access into an independent stepped IV,
+           hiding the common index); ivsr then reduces just the anchor and the
+           offset loads ride it. IR_NO_ADDR_CSE opts out. */
+        int addrcse = ir_opt_addr_cse(f);
         /* Strength-reduce indexed-array address recomputes to stepped
            pointers right after LICM (loops found, base invariants
            hoisted) and before the matcher/CSE/DCE that dedup the inits
@@ -1843,16 +1850,16 @@ int ir_lower_func(FILE *out, Func *f)
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
-             || cse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
+             || cse > 0 || addrcse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
              || rcoal > 0 || pruned > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
                     "ir_opt: %d prune, %d licm, %d ivsr, %d early, %d st2ld, "
-                    "%d cfold, %d reassoc, %d match, %d cse, "
+                    "%d cfold, %d reassoc, %d match, %d cse, %d addrcse, "
                     "%d packs, %d late, %d pushes, %d deadret, "
                     "%d dce, %d narrow, %d ivnarrow in func\n",
                     pruned, hoisted, ivsr, early, fwd, cfold, reassoc, match,
-                    cse, packs, late, pushes, deadret, dce, narrow, ivnarrow);
+                    cse, addrcse, packs, late, pushes, deadret, dce, narrow, ivnarrow);
     }
 
     /* Drop orphan vregs (abandoned builder temps — in no op slot) before the

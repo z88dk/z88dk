@@ -1485,6 +1485,198 @@ int ir_opt_cse(Func *f)
     return rewritten;
 }
 
+/* ---- Spatial address CSE (ir_opt_addr_cse) ------------------------------
+   Clustered array accesses whose byte addresses are the same base+index
+   expression differing only by a compile-time constant (a stencil's a[k],
+   a[k-1], a[k+1]; neighbour sums; any fixed-offset cluster) share ONE computed
+   anchor address, with the constant byte delta folded into each access's
+   mem.offset. The redundant address chains die in DCE. Within a BB only;
+   accesses stay in place (no reordering) so no aliasing hazard. */
+
+#define ADDR_CSE_MAX_TERMS 8
+
+typedef struct { int vreg, sign; } AddrTerm;   /* a signed leaf of the index sum */
+
+/* Decompose an index vreg into a signed sum of leaf vregs + a constant, walking
+   ADD / SUB(±imm) / MOV chains via the function-wide def map. Returns 0 on
+   overflow / a var-var subtraction depth blowout. */
+static int addr_decomp(Op **defmap, int nv, int v, int sign,
+                       AddrTerm *terms, int *nterms, long *konst, int depth)
+{
+    if (depth > 24 || v < 0 || v >= nv) return 0;
+    Op *d = defmap[v];
+    if (d) {
+        if (d->kind == IR_MOV && d->src[1] < 0)
+            return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1);
+        if (d->kind == IR_ADD) {
+            if (d->src[1] < 0) { *konst += sign * (long)d->imm;
+                return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1); }
+            return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1)
+                && addr_decomp(defmap, nv, d->src[1], sign, terms, nterms, konst, depth+1);
+        }
+        if (d->kind == IR_SUB) {
+            if (d->src[1] < 0) { *konst -= sign * (long)d->imm;
+                return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1); }
+            return addr_decomp(defmap, nv, d->src[0], sign, terms, nterms, konst, depth+1)
+                && addr_decomp(defmap, nv, d->src[1], -sign, terms, nterms, konst, depth+1);
+        }
+    }
+    if (*nterms >= ADDR_CSE_MAX_TERMS) return 0;
+    terms[*nterms].vreg = v; terms[*nterms].sign = sign; (*nterms)++;
+    return 1;
+}
+
+static int addr_term_cmp(const void *a, const void *b)
+{
+    const AddrTerm *x = a, *y = b;
+    if (x->vreg != y->vreg) return x->vreg - y->vreg;
+    return x->sign - y->sign;
+}
+
+typedef struct {
+    int   opidx;       /* position of the mem op in the BB */
+    int   addr_def;    /* position of the address ADD (mem.base's def) in the BB */
+    int   gbase;       /* the non-index (grid base) operand vreg */
+    int   shift;       /* SHL scale k */
+    long  konst;       /* index constant (elements) */
+    int   nterms;
+    AddrTerm terms[ADDR_CSE_MAX_TERMS];
+    int   addr_vreg;   /* mem.base (the computed byte address) */
+} MemDesc;
+
+/* Build a MemDesc for a mem op at bb position j: require mem.base = ADD(G, SHL(I,k))
+   with offset 0, then decompose I. Returns 0 if the shape doesn't match. */
+static int addr_desc_build(Func *f, Op **defmap, const int *defpos,
+                           BB *bb, int j, MemDesc *out)
+{
+    Op *op = &bb->ops[j];
+    if (op->kind != IR_LD_MEM && op->kind != IR_ST_MEM) return 0;
+    if (op->mem.kind != IR_MEM_VREG || op->mem.offset != 0) return 0;
+    if (op->mem.post_step != 0 || op->mem.bank_fn) return 0;
+    int p = op->mem.base;
+    if (p < 0 || p >= f->n_vregs) return 0;
+    Op *pd = defmap[p];
+    if (!pd || pd->kind != IR_ADD || pd->src[0] < 0 || pd->src[1] < 0) return 0;
+    /* One operand is SHL(I,k) (the scaled index), the other is the grid base. */
+    int scaled = -1, gbase = -1, k = -1;
+    for (int s = 0; s < 2; s++) {
+        Op *sd = defmap[pd->src[s]];
+        if (sd && sd->kind == IR_SHL && sd->src[1] < 0
+            && sd->imm >= 1 && sd->imm <= 3) {
+            scaled = pd->src[s]; gbase = pd->src[s ^ 1]; k = (int)sd->imm; break;
+        }
+    }
+    if (scaled < 0) return 0;
+    int idx = defmap[scaled]->src[0];
+    out->nterms = 0; out->konst = 0;
+    if (!addr_decomp(defmap, f->n_vregs, idx, 1, out->terms, &out->nterms, &out->konst, 0))
+        return 0;
+    if (out->nterms == 0) return 0;
+    qsort(out->terms, out->nterms, sizeof out->terms[0], addr_term_cmp);
+    out->opidx = j;
+    out->addr_def = (p < f->n_vregs) ? defpos[p] : -1;
+    out->gbase = gbase; out->shift = k; out->addr_vreg = p;
+    return 1;
+}
+
+static int addr_desc_same_group(const MemDesc *a, const MemDesc *b)
+{
+    if (a->gbase != b->gbase || a->shift != b->shift) return 0;
+    if (a->nterms != b->nterms) return 0;
+    for (int i = 0; i < a->nterms; i++)
+        if (a->terms[i].vreg != b->terms[i].vreg
+            || a->terms[i].sign != b->terms[i].sign) return 0;
+    return 1;
+}
+
+int ir_opt_addr_cse(Func *f)
+{
+    if (!f || getenv("IR_NO_ADDR_CSE")) return 0;
+    int nv = f->n_vregs;
+    Op **defmap = calloc((size_t)(nv > 0 ? nv : 1), sizeof(Op *));
+    int *defpos = malloc((size_t)(nv > 0 ? nv : 1) * sizeof(int));
+    if (!defmap || !defpos) { free(defmap); free(defpos); return 0; }
+    for (int i = 0; i < nv; i++) defpos[i] = -1;
+    /* Function-wide single-def map (index terms may live in other BBs — the
+       hoisted row bases). Multi-def vregs are dropped (defmap stays for the
+       first; addresses never derive from those). */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst >= 0 && o->dst < nv) defmap[o->dst] = o;
+        }
+
+    int repointed = 0;
+    MemDesc descs[64];
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        /* BB-local def positions (for anchor availability ordering). */
+        for (int i = 0; i < nv; i++) defpos[i] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            int dd = bb->ops[j].dst;
+            if (dd >= 0 && dd < nv) defpos[dd] = j;
+        }
+        int nd = 0;
+        for (int j = 0; j < bb->n_ops && nd < 64; j++) {
+            MemDesc d;
+            if (addr_desc_build(f, defmap, defpos, bb, j, &d)) descs[nd++] = d;
+        }
+        /* Group and repoint. Anchor = earliest addr-def in the group (so its
+           address vreg is available at every member's deref). */
+        char used[64]; for (int i = 0; i < nd; i++) used[i] = 0;
+        for (int a = 0; a < nd; a++) {
+            if (used[a]) continue;
+            int anchor = a;
+            for (int c = a + 1; c < nd; c++) {
+                if (used[c] || !addr_desc_same_group(&descs[a], &descs[c])) continue;
+                if (descs[c].addr_def >= 0
+                    && (descs[anchor].addr_def < 0
+                        || descs[c].addr_def < descs[anchor].addr_def))
+                    anchor = c;
+            }
+            int members = 0;
+            for (int c = 0; c < nd; c++)
+                if (!used[c] && addr_desc_same_group(&descs[a], &descs[c])) members++;
+            if (members < 2) { used[a] = 1; continue; }
+            for (int c = 0; c < nd; c++) {
+                if (used[c] || c == anchor
+                    || !addr_desc_same_group(&descs[anchor], &descs[c])) continue;
+                /* Availability: anchor's address must be defined before c's deref. */
+                if (descs[anchor].addr_def < 0
+                    || descs[anchor].addr_def > descs[c].opidx) continue;
+                /* SOUNDNESS: member addr = anchor addr + const holds ONLY if every
+                   shared index vreg has the SAME value at both points. So no group
+                   term vreg (nor the anchor's address vreg) may be redefined
+                   between the anchor's address def and c's access — else e.g.
+                   `rdst[o++]=a; rdst[o++]=b` (o stepped between) would wrongly
+                   collapse to one base. Scan the intervening ops. */
+                int unsafe = 0;
+                for (int jj = descs[anchor].addr_def + 1;
+                     jj <= descs[c].opidx && !unsafe; jj++) {
+                    int defs[4];
+                    int ndf = ir_op_defs(&bb->ops[jj], defs, 4);
+                    for (int di = 0; di < ndf && !unsafe; di++) {
+                        if (defs[di] < 0) continue;
+                        if (defs[di] == descs[anchor].addr_vreg) unsafe = 1;
+                        for (int t = 0; t < descs[anchor].nterms && !unsafe; t++)
+                            if (descs[anchor].terms[t].vreg == defs[di]) unsafe = 1;
+                    }
+                }
+                if (unsafe) continue;
+                long delta = (descs[c].konst - descs[anchor].konst) << descs[anchor].shift;
+                Op *cop = &bb->ops[descs[c].opidx];
+                cop->mem.base   = descs[anchor].addr_vreg;
+                cop->mem.offset = (int)delta;
+                used[c] = 1;
+                repointed++;
+            }
+            used[anchor] = 1;
+        }
+    }
+    free(defmap); free(defpos);
+    return repointed;
+}
+
 /* sym_offset_fold and vreg_offset_fold migrated to the ir_match
    table as symoff / vregoff_sym / vregoff_imm / vregoff_idx — see
    ir_match.c. */
