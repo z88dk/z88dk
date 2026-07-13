@@ -224,6 +224,15 @@ typedef enum {
                            spills. Conditional (falls through like BR_ZERO); the
                            BB's loop-back BR follows. Built by ir_match copystep
                            from LD_MEM(post)+ST_MEM(post)+BR_ZERO. */
+    IR_DEREF_CMP_BR,    /* fused byte-deref compare-and-branch (memcmp/strcmp idiom
+                           `if (a[i] != b[i])`): compare *src[0] vs *src[1] (byte)
+                           and branch to `label` when equal (imm bit 0 = 1) or when
+                           not-equal (imm bit 0 = 0). Lowers to `ld a,(pa);
+                           <pb→hl>; cp (hl); jp z/nz`, so the two byte derefs never
+                           materialise to slots. src[0]/src[1] are the two pointer
+                           vregs (offset-0, no post-step; stepping stays separate).
+                           Conditional (falls through like BR_ZERO). Built by
+                           ir_match derefcmp from LD_MEM+LD_MEM+CMP_EQ/NE+BR. */
     IR_SWITCH,          /* multi-way dispatch on src[0] — SwitchInfo.
                            Lowers to the l_case / l_long_case inline
                            table (char: inline cp chain). Terminator;

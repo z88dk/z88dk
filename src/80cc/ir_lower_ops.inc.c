@@ -399,6 +399,54 @@ static int gen_copy_step_brz(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* Fused byte-deref compare-and-branch (memcmp/strcmp `if (a[i] != b[i])`):
+   A = *pa; then `cp (hl)` with HL = pb; branch to label on equal (imm bit0=1)
+   or not-equal (imm bit0=0). Neither deref byte touches a slot — the whole
+   compare is `ld a,(pa); ld hl,pb; cp (hl); jp cc`. Built by ir_match derefcmp. */
+static int gen_deref_cmp_br(FILE *out, Func *f, const Op *op)
+{
+    int pa = op->src[0], pb = op->src[1];
+    int fire_on_equal = (int)(op->imm & 1);
+    /* We need one pointer's byte in A and the other's addressable via (hl) for
+       `cp (hl)`.  The pointer *address* loads can clobber A (in sp mode a slot
+       load walks the value through A: `ld a,(hl+); ld h,(hl); ld l,a`), so *pa
+       must be read into A AFTER every address load — never before.  Equality is
+       symmetric, so we are free to read whichever pointer is register-resident
+       via (bc)/(de) and put the other in HL. */
+    if (vreg_in_pr_bc(f, pa) || vreg_in_pr_de(f, pa)) {
+        /* pa resident: HL = pb first (address load clobbers A harmlessly),
+           then read *pa via its register last. */
+        const char *reg = vreg_in_pr_bc(f, pa) ? "bc" : "de";
+        load_to_hl(out, f, pb);
+        emit(out, "ld\ta,(%s)", reg);   /* A = *pa */
+        emit(out, "cp\t(hl)");          /* vs *pb */
+    } else if (vreg_in_pr_bc(f, pb) || vreg_in_pr_de(f, pb)) {
+        /* pb resident: symmetric — HL = pa, read *pb via its register. */
+        const char *reg = vreg_in_pr_bc(f, pb) ? "bc" : "de";
+        load_to_hl(out, f, pa);
+        emit(out, "ld\ta,(%s)", reg);   /* A = *pb */
+        emit(out, "cp\t(hl)");          /* vs *pa */
+    } else {
+        /* Neither resident: both addresses come via HL, so load pb, stack it,
+           load pa, read *pa, restore pb.  Uses only HL/A/stack — BC and DE (which
+           may hold other loop-resident values) are left untouched. */
+        load_to_hl(out, f, pb);
+        emit(out, "push\thl");
+        L.cur_sp_adjust += 2;           /* keep pa's slot offset correct below */
+        load_to_hl(out, f, pa);
+        emit(out, "ld\ta,(hl)");        /* A = *pa */
+        emit(out, "pop\thl");           /* HL = pb */
+        L.cur_sp_adjust -= 2;
+        emit(out, "cp\t(hl)");          /* vs *pb */
+    }
+    invalidate_a_cache();
+    invalidate_hl_cache();
+    /* Z set iff *pa == *pb. */
+    emit(out, "jp\t%s,L_f%d_bb_%d", fire_on_equal ? "z" : "nz",
+         L.func_emit_idx, op->label);
+    return 0;
+}
+
 static int gen_extract_byte(FILE *out, Func *f, const Op *op)
 {
     /* dst = byte k of width-4 src[0] (k = imm, 0..3). DEHL cache hit:

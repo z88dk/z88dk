@@ -808,6 +808,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
     case IR_BR:                return gen_br(out, f, op);
     case IR_BR_ZERO:           return gen_br_zero(out, f, op);
     case IR_COPY_STEP_BRZ:     return gen_copy_step_brz(out, f, op);
+    case IR_DEREF_CMP_BR:      return gen_deref_cmp_br(out, f, op);
     case IR_BR_COND:           return gen_br_cond(out, f, op);
     case IR_SWITCH:            return gen_switch(out, f, op);
     case IR_RET:               return gen_ret_misdispatched(out, f, op);

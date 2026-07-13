@@ -1162,6 +1162,83 @@ static const PatternDef pat_copystep = {
     .check = copystep_check, .apply = copystep_apply,
 };
 
+/* derefcmp — byte-deref compare-and-branch (memcmp/strcmp/strncmp idiom
+   `if (a[i] != b[i]) ...`). The body is the adjacent quad
+       LD_MEM  va <- [pa]          ; a[i]   (byte, plain deref, offset 0)
+       LD_MEM  vb <- [pb]          ; b[i]
+       CMP_EQ/NE vc <- va, vb
+       BR_ZERO/COND vc, label
+   with va/vb used only by the compare and vc only by the branch (the engine's
+   auto-temp check enforces uc==1 on each). Fuse to IR_DEREF_CMP_BR (anchor = the
+   BR): lowers to `ld a,(pa); <pb→hl>; cp (hl); jp cc`, so neither deref byte
+   materialises to a frame slot (the byte-residency default spills both). The
+   pointers pa/pb stay live vregs — their stepping is separate INC/POSTSTEP ops.
+   IR_NO_DEREF_CMP opts out. */
+enum { DCV_A = 1, DCV_B, DCV_C };
+
+static int derefcmp_check(Func *f, BB *bb, const int idx[],
+                          const int64_t imm[], const int bind[], const int uc[])
+{
+    (void)imm; (void)uc; (void)bind;
+    if (getenv("IR_NO_DEREF_CMP")) return 0;
+    const Op *lda = &bb->ops[idx[0]];
+    const Op *ldb = &bb->ops[idx[1]];
+    const Op *cmp = &bb->ops[idx[2]];
+    const Op *br  = &bb->ops[idx[3]];
+    if (lda->kind != IR_LD_MEM || ldb->kind != IR_LD_MEM) return 0;
+    if (cmp->kind != IR_CMP_EQ && cmp->kind != IR_CMP_NE) return 0;
+    if (br->kind != IR_BR_ZERO && br->kind != IR_BR_COND) return 0;
+    const Op *lds[2]; lds[0] = lda; lds[1] = ldb;
+    for (int i = 0; i < 2; i++) {
+        const Op *ld = lds[i];
+        if (ld->mem.kind != IR_MEM_VREG) return 0;
+        if (ld->mem.offset != 0 || ld->mem.post_step != 0) return 0;
+        if (ld->mem.volatile_ || ld->mem.bank_fn) return 0;
+        if (ld->mem.elem == KIND_CPTR) return 0;   /* far byte via a 3-byte ptr */
+        if (ld->dst < 0 || ld->dst >= f->n_vregs
+            || f->vregs[ld->dst].width != 1) return 0;
+        if (ld->mem.base < 0 || ld->mem.base >= f->n_vregs) return 0;
+        if (f->vregs[ld->mem.base].flags & IR_VREG_VOLATILE) return 0;
+    }
+    return 1;
+}
+
+static void derefcmp_apply(Func *f, BB *bb, const int idx[],
+                           const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm; (void)bind;
+    const Op *lda = &bb->ops[idx[0]];
+    const Op *ldb = &bb->ops[idx[1]];
+    const Op *cmp = &bb->ops[idx[2]];
+    Op *br = &bb->ops[idx[3]];             /* anchor */
+    int pa = lda->mem.base, pb = ldb->mem.base;
+    int cmp_ne  = (cmp->kind == IR_CMP_NE);
+    int br_cond = (br->kind == IR_BR_COND);
+    /* Branch fires on a==b for CMP_NE→BR_ZERO and CMP_EQ→BR_COND; on a!=b for
+       CMP_NE→BR_COND and CMP_EQ→BR_ZERO. So fire-on-equal iff cmp_ne != br_cond. */
+    int fire_on_equal = (cmp_ne != br_cond);
+    int label = br->label;
+    br->kind   = IR_DEREF_CMP_BR;
+    br->src[0] = pa;
+    br->src[1] = pb;
+    br->imm    = fire_on_equal ? 1 : 0;
+    br->label  = label;
+    br->mem.base = -1;
+}
+
+static const PatternDef pat_derefcmp = {
+    .name = "derefcmp", .n_ops = 4, .anchor = 4,   /* anchor = BR (last op) */
+    .ops = {
+        { .kind = IR_LD_MEM, .dst = DCV_A, .src0 = IR_MS_ANY, .src1 = IR_MS_ANY },
+        { .kind = IR_LD_MEM, .dst = DCV_B, .src0 = IR_MS_ANY, .src1 = IR_MS_ANY },
+        { .kind = IR_CMP_EQ, .kind_alt = 1 + IR_CMP_NE,
+          .dst = DCV_C, .src0 = DCV_A, .src1 = DCV_B },
+        { .kind = IR_BR_ZERO, .kind_alt = 1 + IR_BR_COND,
+          .dst = IR_MS_NONE, .src0 = DCV_C, .src1 = IR_MS_NONE },
+    },
+    .check = derefcmp_check, .apply = derefcmp_apply,
+};
+
 /* movfuse — producer + single-use MOV (migrated from
    ir_opt_fuse_mov): `<producer> t <- ...; MOV d <- t` with t
    function-wide single-use and same width as d redirects the
@@ -1243,6 +1320,9 @@ int ir_match_run_early(Func *f)
         n += ir_match_run_table(f, &pat_copystep, 1);
     }
     n += ir_match_run_table(f, &pat_movfuse, 1);
+    /* derefcmp: two byte derefs + CMP_EQ/NE + branch → IR_DEREF_CMP_BR
+       (memcmp/strcmp idiom). IR_NO_DEREF_CMP opts out. */
+    n += ir_match_run_table(f, &pat_derefcmp, 1);
     return n;
 }
 

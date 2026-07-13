@@ -86,6 +86,7 @@ static const OpInfo op_table[] = {
     [IR_BR_COND]            = { "BR_COND",              0, 0 },
     [IR_BR_ZERO]            = { "BR_ZERO",              0, 0 },
     [IR_COPY_STEP_BRZ]      = { "COPY_STEP_BRZ",        0, 0 },
+    [IR_DEREF_CMP_BR]       = { "DEREF_CMP_BR",         0, 0 },
     [IR_SWITCH]             = { "SWITCH",               0, 1 },
     [IR_RET]                = { "RET",                  0, 1 },
 
@@ -535,6 +536,12 @@ void ir_dump_op(FILE *out, const Func *f, const Op *op)
         fputs("*", out); ir_dump_vreg(out, f, op->src[1]);      /* dest */
         fputs("=*", out); ir_dump_vreg(out, f, op->src[0]);     /* src  */
         fprintf(out, " step=%lld, BB%d", (long long)op->imm, op->label);
+        break;
+    case IR_DEREF_CMP_BR:
+        fputs("*", out); ir_dump_vreg(out, f, op->src[0]);
+        fprintf(out, (op->imm & 1) ? " == *" : " != *");
+        ir_dump_vreg(out, f, op->src[1]);
+        fprintf(out, " -> BB%d", op->label);
         break;
     case IR_RET:
         ir_dump_vreg(out, f, op->src[0]);

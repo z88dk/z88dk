@@ -139,6 +139,7 @@ int ir_op_defs(const Op *op, int *out, int max)
     case IR_BR:
     case IR_BR_COND:
     case IR_BR_ZERO:
+    case IR_DEREF_CMP_BR:   /* compare-and-branch: reads two ptrs, defines nothing */
     case IR_SWITCH:
     case IR_RET:
     case IR_OUT:
@@ -250,6 +251,10 @@ int ir_op_uses(const Op *op, int *out, int max)
     case IR_COPY_STEP_BRZ:
         n = add_unique(out, n, max, op->src[0]);   /* source ptr */
         n = add_unique(out, n, max, op->src[1]);   /* dest ptr */
+        return n;
+    case IR_DEREF_CMP_BR:
+        n = add_unique(out, n, max, op->src[0]);   /* ptr a (uses only) */
+        n = add_unique(out, n, max, op->src[1]);   /* ptr b */
         return n;
     case IR_RET:
         if (op->src[0] >= 0)
