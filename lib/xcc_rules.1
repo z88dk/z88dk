@@ -9,3 +9,15 @@
 =
 	EXTERN	__xcc_divuint
 	call	__xcc_divuint
+
+%title Rename enter_ix
+	%1	__sdcc_enter_ix
+=
+	%1	___sdcc_enter_ix
+
+%title Inline leave ix
+	jp	__sdcc_leave_ix
+=
+	ld	sp,ix
+	pop	ix
+	ret

@@ -37,6 +37,12 @@ static void test_unsigned_const_mult(void)
     cm_u = 13000u;
     assertEqual((int)(cm_u * 5u), (int)65000u);   /* 52000+13000, no overflow trap */
     assertEqual((int)(cm_u * 3u), (int)39000u);
+    /* Dense high constant (an LCG multiplier): hi_bit+pop = 21, inlined as the
+       Horner shift-add chain for width-2 (was l_mult below the old flat gate). */
+    cm_u = 7u;
+    assertEqual((int)(cm_u * 25173u & 0xffffu), (int)(176211u & 0xffffu));
+    cm_u = 123u;
+    assertEqual((int)(cm_u * 25173u & 0xffffu), (int)(3096279u & 0xffffu));
 }
 
 static void test_long_const_mult(void)

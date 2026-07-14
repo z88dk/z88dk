@@ -351,7 +351,6 @@ void kc160_divs_hl_a(uint8_t opcode)
     h = (hl % (int8_t)a) & 0xff;
 
     st += 12;
-    UNIMPLEMENTED(0xed00|opcode,"divs hl,a");
 }
 
 void kc160_div_dehl_bc(uint8_t opcode)
@@ -457,7 +456,7 @@ void kc160_tra(uint8_t opcode)
 
 void kc160_im3(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"ret3");
+    UNIMPLEMENTED(0xed00|opcode,"im 3");
 }
 
 
@@ -531,30 +530,30 @@ void kc160_inir_x(uint8_t opcode)
 
 void kc160_ind_x(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"ini x");
+    UNIMPLEMENTED(0xed00|opcode,"ind x");
 }
 
 void kc160_indr_x(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"inir x");
+    UNIMPLEMENTED(0xed00|opcode,"indr x");
 }
 
 void kc160_outi_x(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"ini x");
+    UNIMPLEMENTED(0xed00|opcode,"outi x");
 }
 
 void kc160_otir_x(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"inir x");
+    UNIMPLEMENTED(0xed00|opcode,"otir x");
 }
 
 void kc160_outd_x(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"ini x");
+    UNIMPLEMENTED(0xed00|opcode,"outd x");
 }
 
 void kc160_otdr_x(uint8_t opcode)
 {
-    UNIMPLEMENTED(0xed00|opcode,"inir x");
+    UNIMPLEMENTED(0xed00|opcode,"otdr x");
 }

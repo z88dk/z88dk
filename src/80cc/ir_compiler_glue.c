@@ -66,6 +66,38 @@ int ir_idx2_reg(void)
     return IR_PR_IX;                                  /* frame IY, or sp-mode → IX */
 }
 
+/* Second index-register home = IY, available ONLY in true sp-mode (no frame
+   pointer): there IX is the idx2 spare and IY is otherwise free. In fp-modes
+   one index is the frame and the other is idx2, so no third index exists.
+   Needs index-half read/write/compare (ld iyl,c / sub iyl) → z80/z80n only
+   (z180 traps the undocumented index-half opcodes). Opt-in via c_idx3_residency
+   because some targets reserve IY. IY is callee-saved → the lowerer must
+   push/pop it in the prologue when a value is homed here. */
+int ir_idx3_reg(void)
+{
+    if (!c_idx3_residency) return IR_PR_NONE;
+    if (getenv("IR_NO_IDX3")) return IR_PR_NONE;
+    if (ir_idx2_reg() != IR_PR_IX) return IR_PR_NONE;  /* need IX as idx2 */
+    if (c_framepointer_is_ix != -1) return IR_PR_NONE; /* IY is the frame */
+    if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
+    return IR_PR_IY;
+}
+
+/* exx/alt-bank home for a loop-invariant word — sp-mode only, z80/z80n (the
+   A-bridge compare uses `exx` + A/flags surviving the swap). Opt-in via
+   c_exx_residency (targets may reserve the shadow set). Per-function gates
+   (float/FA using the alt bank, far-helper calls that exx) are applied in the
+   allocator where the Func is available. Uses BC' — HL'/DE' stay free as exx
+   scratch / for a second invariant later. */
+int ir_exx_reg(void)
+{
+    if (!c_exx_residency) return IR_PR_NONE;
+    if (getenv("IR_NO_EXX")) return IR_PR_NONE;
+    if (c_framepointer_is_ix != -1) return IR_PR_NONE;   /* sp-mode only */
+    if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
+    return IR_PR_BC_ALT;
+}
+
 /* Bridge the lowerer's FILE* interface to the compiler's global
    `output` stream, so ir_build.c needn't drag <stdio.h> globals
    through its API. */

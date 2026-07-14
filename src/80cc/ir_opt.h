@@ -65,6 +65,14 @@ int ir_opt_st2ld(Func *f);
  */
 int ir_opt_cse(Func *f);
 
+/* Spatial address CSE (clustered array access, e.g. a stencil's a[k], a[k-1],
+ * a[k+1]). Within a BB, memory accesses whose byte address is the same
+ * base+index expression differing only by a compile-time constant are made to
+ * share ONE computed anchor address, with the constant byte delta folded into
+ * each access's mem.offset. The redundant address chains die in DCE. Gated by
+ * IR_NO_ADDR_CSE; returns the number of accesses repointed. */
+int ir_opt_addr_cse(Func *f);
+
 /* Loop-invariant code motion (roadmap #3e).
  *
  * Detects loops via back-edge scan (a successor with id ≤ current BB

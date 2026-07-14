@@ -1340,6 +1340,31 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
         ir_emit_binop(cur_bb(b), IR_SUB, dst, hi, lo);
         return dst;
     }
+
+    /* General constant (>=3 non-run terms, e.g. an LCG's *181 or a hash's *31):
+       the Horner binary shift-add chain — acc = v (the top set bit), then for
+       each lower bit MSB->LSB: acc <<= 1 (double), and acc += v when the bit is
+       set. Cost = hi_bit doublings (each `add hl,hl`) + (pop-1) adds — the same
+       decomposition sdcc emits. Replaces the l_mult CALL with straight-line
+       code. Cost-gated by `hi_bit + pop` (the op count): l_mult is a slow
+       bit-serial 16x16, so for a WORD (each chain op is a single add hl,hl /
+       add hl,de) the inline chain wins across the whole range — inline any int
+       constant (max hi_bit+pop is 31). A LONG chain doubles/adds 32 bits per
+       step (several ops each) and competes with l_long_mult, so keep the
+       tighter bound there. (An LCG's *25173 = 14+7 = 21 was just over the old
+       flat 20 and fell to l_mult → histbench -41%.) */
+    if (hi_bit + pop <= (w == 2 ? 32 : 20)) {
+        int acc = v;                            /* coefficient for 2^hi_bit */
+        for (int bit = hi_bit - 1; bit >= 0; bit--) {
+            acc = sr_shift_left(b, acc, 1, w);  /* double */
+            if ((u >> bit) & 1u) {
+                int dst = new_temp_kind(b, kw);
+                ir_emit_binop(cur_bb(b), IR_ADD, dst, acc, v);
+                acc = dst;
+            }
+        }
+        return acc;
+    }
     return -1;
 }
 
@@ -4852,8 +4877,31 @@ static int build_assign(Builder *b, Node *n)
            scaling in the AST_LITERAL handler. */
         int rhs_v = build_expr_hinted(b, n->right, dst_v);
         if (rhs_v < 0) return -1;
-        if (rhs_v != dst_v)
-            ir_emit_mov(cur_bb(b), dst_v, rhs_v);
+        if (rhs_v != dst_v) {
+            /* Converge width before the copy: build_expr_hinted may return a
+               vreg NARROWER than the integer local (a plain int variable, or a
+               const-multiply strength-reduce result, assigned to a `long`). A
+               bare MOV would leave the high bytes unset — garbage, or a
+               register-only source aborting in load_to_dehl. Sign/zero-extend
+               (long long via the accumulator) — mirrors the global store path. */
+            int rhs_w = b->f->vregs[rhs_v].width;
+            if (rhs_w != ldst_w && is_acc_int_kind(lk)) {
+                rhs_v = promote_to_acc_int(b, rhs_v,
+                            n->right && n->right->type
+                            && n->right->type->isunsigned);
+                if (rhs_v < 0) return -1;
+            } else if (rhs_w != ldst_w && (ldst_w == 2 || ldst_w == 4)) {
+                OpKind cv = (rhs_w > ldst_w)
+                    ? IR_CONV_TRUNC
+                    : (n->right->type && n->right->type->isunsigned
+                       ? IR_CONV_ZX : IR_CONV_SX);
+                Op *op = ir_op_emit(cur_bb(b), cv);
+                op->dst = dst_v; op->src[0] = rhs_v;
+                return dst_v;
+            }
+            if (rhs_v != dst_v)
+                ir_emit_mov(cur_bb(b), dst_v, rhs_v);
+        }
         return dst_v;
     }
     /* Non-local LHS: for a float-literal RHS heading into an
@@ -5839,6 +5887,50 @@ static int build_cast(Builder *b, Node *n)
     return build_fail("OP_CAST %d→%d not yet supported", src_w, dst_w);
 }
 
+/* Emit a native hardware multiply op: dst(width) = l * r. imm carries the
+   unsigned flag (1=unsigned, 0=signed); the lowerer selects 8x8 vs 16x16 from
+   the operand vreg width. Only called under the CPU/width guards below. */
+static int emit_ir_mul(Builder *b, int l, int r, int width, int unsigned_op)
+{
+    int dst = new_temp(b, width);
+    b->f->vregs[dst].width = (int16_t)width;
+    Op *op = ir_op_emit(cur_bb(b), IR_MUL);
+    op->dst = dst; op->src[0] = l; op->src[1] = r;
+    op->imm = unsigned_op ? 1 : 0;
+    return dst;
+}
+
+/* Narrowing-multiply source: if `nd` is an unsigned value that fits in 16 bits
+   (possibly widened to a long by explicit casts, e.g. `(unsigned long)a`), return
+   the ≤16-bit unsigned sub-expression to build in its place; else NULL. Peels
+   widening unsigned casts (cast source lives in ->operand). A signed source is
+   rejected — `(unsigned long)(int x)` for x<0 is a large 32-bit value, not a u16;
+   a truncating cast (`(unsigned short)long_expr`) stops the peel and its u16 result
+   is itself a valid narrow operand. */
+static Node *mul_u16_narrow_src(Node *nd)
+{
+    Node *cur = nd;
+    while (cur && cur->ast_type == OP_CAST && cur->operand && cur->operand->type
+           && cur->type && cur->type->isunsigned
+           && type_width(cur->type) >= type_width(cur->operand->type))
+        cur = cur->operand;
+    if (cur && cur->type && cur->type->isunsigned && type_width(cur->type) <= 2)
+        return cur;
+    return NULL;
+}
+
+/* Zero-extend a ≤16-bit unsigned operand vreg to exactly width 2 (a char u8
+   widens to u16 for the 16x16 helper's HL/DE arg). */
+static int widen_u16_to_int(Builder *b, int v)
+{
+    if (v < 0 || b->f->vregs[v].width >= 2) return v;
+    int t = new_temp(b, 2);
+    b->f->vregs[t].width = 2;
+    Op *cv = ir_op_emit(cur_bb(b), IR_CONV_ZX);
+    cv->dst = t; cv->src[0] = v;
+    return t;
+}
+
 static int build_muldiv_integer(Builder *b, Node *n)
 {
     Kind lk = n->left  && n->left->type  ? n->left->type->kind  : KIND_NONE;
@@ -5848,12 +5940,68 @@ static int build_muldiv_integer(Builder *b, Node *n)
     Kind flt_k   = lk;
     int is_flt   = kind_is_floating(lk) || kind_is_floating(rk)
                 || (n->type && kind_is_floating(n->type->kind));
+    /* Narrowing multiply: `(unsigned long)u16 * u16` → the 16x16→32 helper
+       l_mulu_32_16x16 (dehl = hl * de) instead of widening both operands to 32
+       bits for l_long_mult_u. The canonical helper dispatches to native hardware
+       multiply on z180/ez80/z80n/kc160/rabbit and the size/speed loop on z80.
+       Unsigned only (no signed 16x16→32 helper). Checked before building the
+       operands so the wide casts are never emitted (no double-evaluation).
+       IR_NO_NARROW_MUL opts out. */
+    if (n->ast_type == OP_MULT && !is_flt && !is_fix16 && !is_fix32
+        && n->type && type_width(n->type) == 4
+        && !IS_808x() && !IS_GBZ80()   /* l_mulu_32_16x16 undefined there */
+        && !getenv("IR_NO_NARROW_MUL")) {
+        Node *ln = mul_u16_narrow_src(n->left);   /* type width <= 2, unsigned */
+        Node *rn = mul_u16_narrow_src(n->right);
+        if (ln && rn) {
+            int lv = build_expr(b, ln);
+            if (lv < 0) return -1;
+            int rv = build_expr(b, rn);
+            if (rv < 0) return -1;
+            lv = widen_u16_to_int(b, lv);         /* u8 -> u16 for HL/DE */
+            rv = widen_u16_to_int(b, rv);
+            int dst = new_temp(b, 4);
+            b->f->vregs[dst].width = 4;
+            Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+            op->dst = dst;
+            HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+            int *args = calloc(2, sizeof(int));
+            args[0] = lv; args[1] = rv;   /* HL, DE (multiply is commutative) */
+            hi->name = "l_mulu_32_16x16";
+            hi->args = args; hi->n_args = 2; hi->n_stacked = 0;
+            hi->ret_vreg = dst; hi->ret_in_de = 0;
+            op->hcall = hi;
+            return dst;
+        }
+    }
     int l = build_expr(b, n->left);
     if (l < 0) return -1;
     int r = build_expr(b, n->right);
     if (r < 0) return -1;
+    /* Hardware char*char multiply — matched BEFORE the int promotion so the
+       operands stay bytes for the 8x8 hardware multiply. kc160 has signed and
+       unsigned 8x8 (mul/muls hl), so it takes any same-signedness char pair;
+       z180/ez80/z80n have unsigned-only 8x8 (mlt / mul de), so unsigned char
+       only (signed char falls through to the promotion + helper path). Mixed
+       signedness falls through too (promotes each operand by its own sign). */
+    if (n->ast_type == OP_MULT
+        && b->f->vregs[l].width == 1 && b->f->vregs[r].width == 1) {
+        int lu = n->left  && n->left->type  && n->left->type->isunsigned;
+        int ru = n->right && n->right->type && n->right->type->isunsigned;
+        if (IS_KC160() && lu == ru)
+            return emit_ir_mul(b, l, r, 2, lu);
+        if ((c_cpu == CPU_Z180 || IS_EZ80() || IS_Z80N()) && lu && ru)
+            return emit_ir_mul(b, l, r, 2, 1);
+    }
     int width = b->f->vregs[l].width;
     if (b->f->vregs[r].width > width) width = b->f->vregs[r].width;
+    /* C integer promotion: mul/div/mod have no byte-width helper, so a
+       char operand must widen to int (>=2) BEFORE the HCALL. Without this
+       floor two char operands share width 1, skip the conversion below,
+       and reach l_div/l_mult as bytes — gen_hcall then zero-extends each
+       (`ld h,0`), silently dropping the sign of a signed char (`-100/7`
+       became 156/7). */
+    if (width < 2) width = 2;
     /* Converge mixed-width operands to the helper width BEFORE
        the HCALL: gen_hcall marshals each arg by its vreg width,
        so a narrower operand hands the helper a garbage high half
@@ -5902,6 +6050,10 @@ static int build_muldiv_integer(Builder *b, Node *n)
     int unsigned_op = (n->type && n->type->isunsigned)
         || (n->left  && n->left->type  && n->left->type->isunsigned)
         || (n->right && n->right->type && n->right->type->isunsigned);
+    /* kc160: 16x16 int multiply is a single `mul de,hl` (low 16 bits are
+       sign-agnostic, so the unsigned form serves signed and unsigned alike). */
+    if (n->ast_type == OP_MULT && IS_KC160() && width == 2)
+        return emit_ir_mul(b, l, r, 2, 1);
     const char *helper;
     int n_stacked = 0;
     int ret_in_de = 0;
@@ -6111,13 +6263,52 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
     int is_shift = (k == IR_SHL || k == IR_SHR);
     int is_ptrish = (n->type && n->type->kind == KIND_PTR)
                  || (lhs->type && lhs->type->kind == KIND_PTR);
+    /* Byte compare against a byte-range constant: an unsigned char compared to a
+       constant in [0,255] (`c == ' '`, `c >= 'a'`, `c <= 'z'`) stays a byte `cp`
+       instead of widening c to int for a 16-bit compare — the C-promotion is
+       value-preserving here, and a widened compare reloads/extends c per test
+       (lexbench classify: ~7 instrs/test vs 2). All EQ/NE and unsigned relations:
+       ULE/UGT are canonicalised below to `<K+1`/`>=K+1` at the kept byte width, so
+       K<=254 folds to a byte ULT/UGE and K==255 constant-folds (`eff>=tmax`) — both
+       correct. Unsigned LHS so the zero-extended value is exactly the byte. */
+    int keep_byte_cmp = 0;
+    if (is_cmp && width == 1 && rhs && rhs->ast_type == AST_LITERAL
+        && lhs->type) {
+        int64_t C = (int64_t)rhs->zval;
+        if (lhs->type->isunsigned
+            && C >= 0 && C <= 255
+            && (k == IR_CMP_EQ  || k == IR_CMP_NE
+                || k == IR_CMP_ULT || k == IR_CMP_UGE
+                || k == IR_CMP_ULE || k == IR_CMP_UGT))
+            keep_byte_cmp = 1;
+        /* Signed char EQ/NE: byte-pattern equality is bias-free (a `cp K` sets Z
+           iff the bytes match, sign-independent). Restrict to a printable-range
+           constant [0,127] — a signed byte genuinely holds those values, and the
+           existing byte-`cp` lowering already accepts [0,255], so no relational
+           +128 bias path is needed. (Signed relational — `c < 0` — would need
+           that bias; left widened.) Covers `char c == 'x'` for plain (signed by
+           default) char, the common text-scan form. */
+        else if (!lhs->type->isunsigned
+                 && (k == IR_CMP_EQ || k == IR_CMP_NE)
+                 && C >= 0 && C <= 127)
+            keep_byte_cmp = 1;
+        /* Signed char relational (`c < ' '`, `c >= '0'`): kept a byte and lowered
+           with the +128 bias (`xor 0x80; cp K^0x80` → unsigned cp) instead of
+           sign-extend + 16-bit compare. Const in the signed-char range [-128,127];
+           `c REL 0` is taken by the sign-test path in the lowerer. */
+        else if (!lhs->type->isunsigned
+                 && (k == IR_CMP_LT || k == IR_CMP_GE
+                     || k == IR_CMP_LE || k == IR_CMP_GT)
+                 && C >= -128 && C <= 127)
+            keep_byte_cmp = 1;
+    }
     /* Widen the LHS to the RESULT width when the literal RHS or
        the expression type is wider than the LHS vreg. The
        commutative swap above moves literals to the RHS, so
        `0x01000100UL + i` arrives with l = i (width 2) and a LONG
        literal — else the add runs at 16 bits, truncating the
        constant to its low word. */
-    if (!is_shift && !is_ptrish
+    if (!is_shift && !is_ptrish && !keep_byte_cmp
         && rhs && rhs->ast_type == AST_LITERAL) {
         int tw = width;
         if (rhs->type && is_register_int_kind(rhs->type->kind)
@@ -6327,6 +6518,19 @@ static int emit_cond_false_exit(Builder *b, Node *n, int false_bb)
             return build_fail("OP_ANDAND with missing operand");
         if (emit_cond_false_exit(b, n->left, false_bb) != 0) return -1;
         return emit_cond_false_exit(b, n->right, false_bb);
+    case OP_OROR: {
+        /* Polarity-flipped nest (`||` under `&&`): `A || B` is FALSE iff both are
+           false. Branch-lower via a "n is true" continuation so the leaves stay
+           branch-fused (byte cp) rather than materialising boolean values. */
+        if (!n->left || !n->right)
+            return build_fail("OP_OROR with missing operand");
+        int ft = ir_bb_new(b->f);
+        if (emit_cond_true_exit(b, n->left, ft) != 0) return -1;      /* A true → ft */
+        if (emit_cond_false_exit(b, n->right, false_bb) != 0) return -1; /* B false → false_bb */
+        ir_emit_br(cur_bb(b), ft);                                    /* B true → ft */
+        b->cur_bb_id = ft;
+        return 0;
+    }
     case OP_LNEG:   /* !x is false ⟺ x is true → x-true exits to false_bb */
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_true_exit(b, n->operand, false_bb);
@@ -6349,6 +6553,20 @@ static int emit_cond_true_exit(Builder *b, Node *n, int true_bb)
             return build_fail("OP_OROR with missing operand");
         if (emit_cond_true_exit(b, n->left, true_bb) != 0) return -1;
         return emit_cond_true_exit(b, n->right, true_bb);
+    case OP_ANDAND: {
+        /* Polarity-flipped nest (`&&` under `||`, e.g. classify's
+           `(c>='a'&&c<='z') || …`): `A && B` is TRUE iff both are true.
+           Branch-lower via a "n is false" continuation so the leaves stay
+           branch-fused (byte cp) rather than materialising boolean values. */
+        if (!n->left || !n->right)
+            return build_fail("OP_ANDAND with missing operand");
+        int ft = ir_bb_new(b->f);
+        if (emit_cond_false_exit(b, n->left, ft) != 0) return -1;     /* A false → ft */
+        if (emit_cond_true_exit(b, n->right, true_bb) != 0) return -1;/* B true → true_bb */
+        ir_emit_br(cur_bb(b), ft);                                    /* B false → ft */
+        b->cur_bb_id = ft;
+        return 0;
+    }
     case OP_LNEG:   /* !x is true ⟺ x is false → x-false exits to true_bb */
         if (!n->operand) return build_fail("OP_LNEG with missing operand");
         return emit_cond_false_exit(b, n->operand, true_bb);
@@ -6807,6 +7025,8 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     if (!f) return build_fail("ir_func_new returned NULL");
     f->cpu = (uint32_t)c_cpu;   /* one-hot CPU id; ir_match gates patterns on it */
     f->idx2_reg = ir_idx2_reg();
+    f->idx3_reg = ir_idx3_reg();
+    f->exx_reg  = ir_exx_reg();
     /* Wide memory-accumulator primitive names for the active maths mode —
        the lowerer's generic MOV/LD_MEM/ST_MEM/RET/CALL paths read these
        (keeps ir_lower decoupled from c_fp_size / the maths table). */

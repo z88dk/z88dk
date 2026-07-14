@@ -121,23 +121,39 @@ static void compute_home_region(const Func *f, int home,
                 continue;
             /* The leaving-edge entry-flush captures the exit value only if the
                source BB doesn't redefine the home before the exit branch.
-               Reject the span if any region-leaving-edge source writes it. */
+               Reject the span if any region-leaving-edge source writes it AND
+               the home is still LIVE at the leaving target — if it's dead
+               there (e.g. strcpy's `*d++`/`*s++` pointers, dead after the
+               loop), the flushed value is never read, so a mid-block redef is
+               harmless and the region is admissible. */
             int exit_bad = 0;
             for (int b = lo; b <= hi && !exit_bad; b++) {
                 const BB *eb = &f->bbs[b];
-                int leaves = 0, ns2 = ir_bb_n_succ(eb);
-                for (int s2 = 0; s2 < ns2; s2++) {
-                    int t = ir_bb_succ_at(eb, s2);
-                    if (t < 0 || t >= f->n_bbs) continue;
-                    if (bb_alias && bb_alias[t] >= 0) t = bb_alias[t];
-                    if (t < lo || t > hi) { leaves = 1; break; }
-                }
-                if (!leaves) continue;
-                for (int j = 0; j < eb->n_ops && !exit_bad; j++) {
+                int redefs_home = 0;
+                for (int j = 0; j < eb->n_ops && !redefs_home; j++) {
                     int defs[8];
                     int nd = ir_op_defs(&eb->ops[j], defs, 8);
                     for (int k = 0; k < nd; k++)
-                        if (defs[k] == home) { exit_bad = 1; break; }
+                        if (defs[k] == home) { redefs_home = 1; break; }
+                }
+                if (!redefs_home) continue;
+                int ns2 = ir_bb_n_succ(eb);
+                for (int s2 = 0; s2 < ns2 && !exit_bad; s2++) {
+                    int t = ir_bb_succ_at(eb, s2);
+                    if (t < 0 || t >= f->n_bbs) continue;
+                    if (bb_alias && bb_alias[t] >= 0) t = bb_alias[t];
+                    if (t >= lo && t <= hi) continue;        /* stays in region */
+                    /* Leaving edge whose source redefined the home. The
+                       dead-at-target relaxation is scoped to the loop-regalloc
+                       pointer home (de_home_is_ptr) so the default-on general
+                       DE-home keeps its exact prior (strict) admission — a
+                       redef on a leaving edge always rejects there, preserving
+                       gate-off byte-identity. */
+                    const BB *tb = &f->bbs[t];
+                    if (!f->de_home_is_ptr
+                        || (tb->live_in
+                            && ir_bitset_get((const BitSet *)tb->live_in, home)))
+                        exit_bad = 1;
                 }
             }
             if (exit_bad)
@@ -386,11 +402,23 @@ static void word_home_flush(FILE *out, const Func *f)
 static void word_home_exit_flush(FILE *out, const Func *f)
 {
     int v = L.cur_func_whome;
-    if (v < 0 || !fp_active(f)) return;
-    int off = slot_ix_off(f, v);
-    if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return;
-    emit(out, "ld\t(%s%+d),e", frame_reg(), off);
-    emit(out, "ld\t(%s%+d),d", frame_reg(), off + 1);
+    if (v < 0) return;
+    if (fp_active(f) && !L.cur_frameless) {
+        int off = slot_ix_off(f, v);
+        if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return;
+        emit(out, "ld\t(%s%+d),e", frame_reg(), off);
+        emit(out, "ld\t(%s%+d),d", frame_reg(), off + 1);
+        return;
+    }
+    /* Frameless: flush the DE home to its (caller) param slot via HL. */
+    if (L.cur_frameless) {
+        emit(out, "ld\thl,%d", slot_off(f, v) + L.cur_sp_adjust);
+        emit(out, "add\thl,sp");
+        emit(out, "ld\t(hl),e");
+        emit(out, "inc\thl");
+        emit(out, "ld\t(hl),d");
+        invalidate_hl_cache();
+    }
 }
 
 /* Byte E/D-home region-exit flush — emitted ONCE at a dedicated loop-exit
@@ -429,7 +457,7 @@ static int rehome_word_home(FILE *out, const Func *f)
     int v = L.cur_func_whome;
     if (v < 0 || v >= f->n_vregs) return 0;
     if (L.cur_byte_home_vreg == v) return 1;          /* already resident */
-    if (fp_active(f)) {
+    if (fp_active(f) && !L.cur_frameless) {
         int off = slot_ix_off(f, v);
         if (!fp_offset_fits(off) || !fp_offset_fits(off + 1)) return 0;
         emit(out, "ld\te,(%s%+d)", frame_reg(), off);
@@ -587,21 +615,76 @@ static void pending_spill_resolve(void)
 #define SHL_SKIP_CAP 32
 static struct { int bb_id, op_idx, cache_vreg, is_byte; } shl_skip[SHL_SKIP_CAP];
 
-/* True iff v lives in the spare index register (the idx2 loop-invariant
-   resident). f->idx2_reg is IR_PR_IX / IR_PR_IY / IR_PR_NONE. */
-static int vreg_in_idx2(const Func *f, int v)
+/* The index register (IR_PR_IX/IR_PR_IY) a vreg is homed in, or IR_PR_NONE.
+   Covers BOTH the idx2 spare and the optional second index home (idx3_reg, IY
+   in sp-mode). The two are symmetric full-pair index homes — the lowerer uses
+   the register the vreg actually lives in, not a fixed one. */
+static int vreg_idx_home(const Func *f, int v)
 {
-    if (v < 0 || !f || !f->vreg_to_phys || f->idx2_reg == IR_PR_NONE)
-        return 0;
-    return f->vreg_to_phys[v] == f->idx2_reg;
+    if (v < 0 || !f || !f->vreg_to_phys) return IR_PR_NONE;
+    int pr = f->vreg_to_phys[v];
+    if (f->idx2_reg != IR_PR_NONE && pr == f->idx2_reg) return pr;
+    if (f->idx3_reg != IR_PR_NONE && pr == f->idx3_reg) return pr;
+    return IR_PR_NONE;
 }
 
-/* The spare index register's assembler name ("ix"/"iy"), or NULL if none. */
-static const char *idx2_reg_name(const Func *f)
+/* True iff v lives in one of the spare index registers (idx2 or idx3). */
+static int vreg_in_idx2(const Func *f, int v)
 {
-    if (!f || f->idx2_reg == IR_PR_IX) return "ix";
-    if (f->idx2_reg == IR_PR_IY) return "iy";
+    return vreg_idx_home(f, v) != IR_PR_NONE;
+}
+
+/* True iff v is homed in the exx/alt bank (f->exx_reg). Read-only loop-invariant;
+   read via the A-bridge (exx; op alt-half; exx). */
+static int vreg_in_exx(const Func *f, int v)
+{
+    if (v < 0 || !f || !f->vreg_to_phys || f->exx_reg == IR_PR_NONE) return 0;
+    return f->vreg_to_phys[v] == f->exx_reg;
+}
+
+/* Low/high assembler half-names of the alt-bank pair (after `exx` it is named
+   normally): BC' → c/b, DE' → e/d, HL' → l/h. */
+static const char *exx_half_lo(const Func *f)
+{
+    switch (f ? f->exx_reg : IR_PR_NONE) {
+    case IR_PR_BC_ALT: return "c";
+    case IR_PR_DE_ALT: return "e";
+    case IR_PR_HL_ALT: return "l";
+    default: return NULL;
+    }
+}
+static const char *exx_half_hi(const Func *f)
+{
+    switch (f ? f->exx_reg : IR_PR_NONE) {
+    case IR_PR_BC_ALT: return "b";
+    case IR_PR_DE_ALT: return "d";
+    case IR_PR_HL_ALT: return "h";
+    default: return NULL;
+    }
+}
+static const char *exx_pair(const Func *f)
+{
+    switch (f ? f->exx_reg : IR_PR_NONE) {
+    case IR_PR_BC_ALT: return "bc";
+    case IR_PR_DE_ALT: return "de";
+    case IR_PR_HL_ALT: return "hl";
+    default: return NULL;
+    }
+}
+
+/* Assembler name ("ix"/"iy") of an index PhysReg, or NULL. */
+static const char *idx_pr_name(int pr)
+{
+    if (pr == IR_PR_IX) return "ix";
+    if (pr == IR_PR_IY) return "iy";
     return NULL;
+}
+
+/* Assembler name of the index register a specific vreg is homed in — the
+   generalized replacement for the former idx2-only idx2_reg_name. */
+static const char *vreg_idx_name(const Func *f, int v)
+{
+    return idx_pr_name(vreg_idx_home(f, v));
 }
 
 /* True iff v is allocator-pinned to a register pool (PR_HL/DE/BC/DEHL or
@@ -612,7 +695,8 @@ static int vreg_in_register_pool(const Func *f, int v)
     PhysReg pr = f->vreg_to_phys[v];
     return pr == IR_PR_HL || pr == IR_PR_DE
         || pr == IR_PR_BC || pr == IR_PR_DEHL
-        || vreg_in_idx2(f, v);
+        || vreg_in_idx2(f, v)
+        || vreg_in_exx(f, v);
 }
 
 /* Can a byte result for vreg `v` stay only in A (cache_a) instead of being
@@ -841,6 +925,13 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
         if (f->vreg_to_phys[vreg] == IR_PR_BC) {
             emit(out, "ld\tbc,hl");
             cache_bc(vreg);
+        } else if (vreg_idx_home(f, vreg) != IR_PR_NONE) {
+            /* Word result → an index home (idx2/idx3): the value in HL is
+               moved into IX/IY. `push hl; pop <idx>` preserves HL (so the
+               caller's cache_hl advertises it) and needs no scratch. Used by
+               the idx3 loop-carried word update (e.g. `lo = mid + 1`). */
+            emit(out, "push\thl");
+            emit(out, "pop\t%s", vreg_idx_name(f, vreg));
         }
         return;
     }

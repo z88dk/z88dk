@@ -72,6 +72,10 @@ void ir_assign_slots(Func *f)
            slot_off returns that caller offset directly. */
         if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
             needs_slot[v] = 0;
+        /* A-only byte temp (compute_no_slot_bytes): every def is dst-dead, so
+           the value rides A and never touches a slot — reserve none. */
+        if (f->vregs[v].flags & IR_VREG_NO_SLOT)
+            needs_slot[v] = 0;
     }
 
     /* Spill-slot coalescing: per-op interference. Walk each BB

@@ -403,6 +403,8 @@ int c_intermix_ccode = 0;
 int c_cline_directive = 0;
 int lineno = 0;
 int ir_idx2_reg(void) { return 0; }   /* glue lives in ir_compiler_glue.c */
+int ir_idx3_reg(void) { return 0; }   /* glue lives in ir_compiler_glue.c */
+int ir_exx_reg(void)  { return 0; }   /* glue lives in ir_compiler_glue.c */
 void gen_emit_line(int line) { (void)line; }
 void gen_comment(const char *message) { (void)message; }
 const char *get_source_line(const char *filename, int n)

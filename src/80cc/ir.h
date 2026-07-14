@@ -93,6 +93,12 @@ typedef enum {
                                         caller's pushed-arg slot — no
                                         prologue copy, no local frame
                                         slot */
+    IR_VREG_NO_SLOT        = 1 << 6, /* A-only byte temp: every def is
+                                        dst-dead (kept in A, never spilled) and
+                                        every use is cache-served, so the value
+                                        never touches a frame slot. ir_assign_slots
+                                        reserves none — shrinking frame_size.
+                                        Set by compute_no_slot_bytes. */
 } VRegFlags;
 
 typedef struct {
@@ -173,6 +179,12 @@ typedef enum {
     IR_XOR,
     IR_SHL,
     IR_SHR,             /* unsigned shift right; SAR variant via Kind+sign */
+    IR_MUL,             /* dst = src[0] * src[1] via native hardware multiply.
+                           Emitted only by build_muldiv_integer for CPUs with a
+                           hardware multiply: kc160 (mul/muls hl 8x8, mul de,hl
+                           16x16), z180/ez80 (mlt, unsigned 8x8), z80n (mul de,
+                           unsigned 8x8). imm=1 unsigned / 0 signed; operand
+                           width selects 8x8 (byte) vs 16x16 (word). */
 
     /* unary */
     IR_NEG,
@@ -204,6 +216,23 @@ typedef enum {
     IR_BR,              /* unconditional jump to mem.label (BB id in .imm) */
     IR_BR_COND,         /* if src[0] != 0: jump */
     IR_BR_ZERO,         /* if src[0] == 0: jump (fastpath for cmp→branch fusion) */
+    IR_COPY_STEP_BRZ,   /* fused byte copy-loop step (`while ((*d++ = *s++))`):
+                           a = *src[0]; *src[1] = a; src[0] += imm; src[1] += imm;
+                           if a == 0 jump to label. src[0]=source ptr, src[1]=dest
+                           ptr, imm=±1 step. Defines src[0] and src[1] (both
+                           stepped) — no separate byte-temp vreg, so nothing
+                           spills. Conditional (falls through like BR_ZERO); the
+                           BB's loop-back BR follows. Built by ir_match copystep
+                           from LD_MEM(post)+ST_MEM(post)+BR_ZERO. */
+    IR_DEREF_CMP_BR,    /* fused byte-deref compare-and-branch (memcmp/strcmp idiom
+                           `if (a[i] != b[i])`): compare *src[0] vs *src[1] (byte)
+                           and branch to `label` when equal (imm bit 0 = 1) or when
+                           not-equal (imm bit 0 = 0). Lowers to `ld a,(pa);
+                           <pb→hl>; cp (hl); jp z/nz`, so the two byte derefs never
+                           materialise to slots. src[0]/src[1] are the two pointer
+                           vregs (offset-0, no post-step; stepping stays separate).
+                           Conditional (falls through like BR_ZERO). Built by
+                           ir_match derefcmp from LD_MEM+LD_MEM+CMP_EQ/NE+BR. */
     IR_SWITCH,          /* multi-way dispatch on src[0] — SwitchInfo.
                            Lowers to the l_case / l_long_case inline
                            table (char: inline cp chain). Terminator;
@@ -539,6 +568,19 @@ typedef struct {
        `push <idx>;pop de`. */
     int        idx2_reg;
 
+    /* Second spare index register (IY) for a loop-carried word resident in
+       true sp-mode (idx2_reg == IX, IY free), or IR_PR_NONE. Stamped by
+       ir_build from ir_idx3_reg(). Read/written via index halves; the lowerer
+       treats it as a second idx2-style home and push/pop's IY in the prologue
+       (IY callee-saved). */
+    int        idx3_reg;
+
+    /* exx/alt-bank home for a loop-INVARIANT word (IR_PR_BC_ALT), or
+       IR_PR_NONE. Stamped by ir_build from ir_exx_reg(). Read-only in-loop so it
+       persists across `exx`; the compare bridges through A. Frees an index
+       register for a writable loop var (the exx co-design). sp-mode, z80/z80n. */
+    int        exx_reg;
+
     /* Word (int) accumulator residency: the one width-2 vreg the allocator
        elected to keep in the DE pair across its loop (slot-backed lazy-spill,
        the word analog of the byte E-home), or -1. Distinguishes the resident
@@ -553,6 +595,13 @@ typedef struct {
        and commits a general home-def to DE. 0 = reduction accumulator (the
        existing try_word_accumulate path). */
     int        de_home_general;
+
+    /* Loop regalloc (opt-in IR_LOOP_RA): word_home_vreg is a walking BYTE
+       pointer homed in DE across its loop (Phase A first client). op_de_clean
+       treats deref/store/step THROUGH the home (ld a,(de)/ld (de),a/inc de) as
+       DE-clean; distinct from the word-accumulate semantics. Reverts to slot if
+       no DE-clean region forms. See LOOP_REGALLOC_PLAN.md. */
+    int        de_home_is_ptr;
 
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
@@ -703,5 +752,7 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name);
    for a loop-invariant resident: IR_PR_IY/IR_PR_IX, or IR_PR_NONE if
    disabled/unavailable. See ir_compiler_glue.c. */
 int ir_idx2_reg(void);
+int ir_idx3_reg(void);
+int ir_exx_reg(void);
 
 #endif /* IR_H */

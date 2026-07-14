@@ -123,6 +123,8 @@ enum {
     RC_IDX2   = 1u << 1,   /* the spare index register f->idx2_reg (IX or IY) */
     RC_DE_ACC = 1u << 2,   /* the DE pair, as a loop reduction accumulator */
     RC_BYTE   = 1u << 3,   /* a byte home (C slotless, or E slot-backed) */
+    RC_IDX3   = 1u << 4,   /* the second spare index register f->idx3_reg (IY, sp-mode) */
+    RC_EXX    = 1u << 5,   /* a loop-invariant homed in the exx/alt bank f->exx_reg */
 };
 /* Per-candidate discriminators the arbiters need for byte-identical priority. */
 enum {
@@ -131,6 +133,7 @@ enum {
     CF_BYTE_SINGLE_BB = 1u << 2,   /* byte: confined to one BB → slotless PR_C ok */
     CF_SPECULATIVE    = 1u << 3,   /* IV-residency candidate (Phase 2) */
     CF_DE_GENERAL     = 1u << 4,   /* DE-home: a general (non-accumulate) home */
+    CF_DE_PTR         = 1u << 5,   /* DE-home: a walking byte pointer (loop regalloc) */
 };
 /* Cost-model per-access weights (relative T-state savings of reg vs slot; the
    orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
@@ -183,6 +186,20 @@ static int pr_bc_propose(const Func *f,
                          Cand *out)
 {
     int n = 0;
+    /* §3a″ (opt-in IR_BC_STEP_PARAM): allow a stepped-pointer PARAM in BC. A
+       call would evict BC → emit_bc_reload restores it from the caller slot,
+       which is STALE once the pointer stepped; so gate hard on a call-free
+       function (no op can evict BC). Phase-1 `inc bc` keeps BC coherent on the
+       step. Residual (non-call) eviction would still read stale, but the bench
+       checksum self-checks; keep opt-in until proven. */
+    int allow_step_param = getenv("IR_BC_STEP_PARAM") != NULL;
+    int fn_has_call = 0;
+    if (allow_step_param)
+        for (int i = 0; i < f->n_bbs && !fn_has_call; i++)
+            for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                OpKind k = f->bbs[i].ops[j].kind;
+                if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { fn_has_call = 1; break; }
+            }
     for (int v = 0; v < f->n_vregs; v++) {
         const VReg *vr = &f->vregs[v];
         if (vr->width != 2) continue;
@@ -195,7 +212,16 @@ static int pr_bc_propose(const Func *f,
         if (!is_param && has_prepushed_call) continue;
         if (!is_param && entry_live && ir_bitset_get(entry_live, v)) continue;
         if (is_param) {
-            if (write_count[v] > 0) continue;
+            if (write_count[v] > 0) {
+                /* Stepped pointer param (walking char ptr): single in-place
+                   INC/DEC step, call-free function, gated. Otherwise a written
+                   param is rejected (BC would go stale). */
+                int step_ok = allow_step_param && !fn_has_call
+                    && write_count[v] == 1
+                    && (def_kind[v] == IR_INC || def_kind[v] == IR_DEC)
+                    && (vr->kind == KIND_PTR || vr->kind == KIND_CPTR);
+                if (!step_ok) continue;
+            }
         } else if (is_induct) {
             if (write_count[v] != 2) continue;   /* init + step */
         } else {
@@ -314,6 +340,12 @@ static int idx2_propose(const Func *f, const int *use_count,
                 if (o->kind == IR_POSTSTEP && o->src[0] >= 0
                     && o->src[0] < f->n_vregs)
                     is_base[o->src[0]] = 1;
+                /* Fused byte copy-loop pointers are stepped deref bases —
+                   never an idx2 counter/invariant-param. */
+                if (o->kind == IR_COPY_STEP_BRZ)
+                    for (int q = 0; q < 2; q++)
+                        if (o->src[q] >= 0 && o->src[q] < f->n_vregs)
+                            is_base[o->src[q]] = 1;
                 int d = o->dst;
                 if (d < 0 || d >= f->n_vregs) continue;
                 if ((o->kind == IR_INC || o->kind == IR_DEC) && o->src[0] == d)
@@ -422,6 +454,12 @@ static int word_acc_propose(const Func *f, const int *use_count,
                 if (o->kind == IR_POSTSTEP && o->src[0] >= 0
                     && o->src[0] < f->n_vregs)
                     wd_base[o->src[0]] = 1;
+                /* Fused byte copy-loop pointers are deref bases (exclude from
+                   idx/word homes; they want a BC/DE gp pointer, not push/pop). */
+                if (o->kind == IR_COPY_STEP_BRZ)
+                    for (int q = 0; q < 2; q++)
+                        if (o->src[q] >= 0 && o->src[q] < f->n_vregs)
+                            wd_base[o->src[q]] = 1;
                 switch (o->kind) {
                 case IR_ADD: case IR_SUB: case IR_RSUB:
                 case IR_AND: case IR_OR:  case IR_XOR:
@@ -511,11 +549,35 @@ static int de_home_general_propose(const Func *f, const int *use_count,
                     wd_def[o->src[0]] = g;
                 if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
                     && o->mem.kind == IR_MEM_VREG
-                    && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs) {
                     wd_base[o->mem.base] = 1;
+                    /* A post-step mem op (`*p++` load or the fused `*p++ = v`
+                       store) steps its base in-place — mark it loop-defined so
+                       the walking pointer qualifies as loop-carried even though
+                       the base is not a plain dst. */
+                    if (o->mem.post_step != 0 && bb_in_loop[i])
+                        wd_ldef[o->mem.base] = 1;
+                }
                 if (o->kind == IR_POSTSTEP && o->src[0] >= 0
-                    && o->src[0] < f->n_vregs)
+                    && o->src[0] < f->n_vregs) {
                     wd_base[o->src[0]] = 1;
+                    /* POSTSTEP steps (defines) its src[0] pointer in-place,
+                       not just its dst — mark it loop-defined so a `*d++` walking
+                       pointer (strcpy dest) qualifies as loop-carried. */
+                    if (bb_in_loop[i]) wd_ldef[o->src[0]] = 1;
+                }
+                /* Fused byte copy-loop: both pointers (src[0]=source,
+                   src[1]=dest) are stepped deref bases — home both (BC + DE). */
+                if (o->kind == IR_COPY_STEP_BRZ) {
+                    for (int q = 0; q < 2; q++) {
+                        int p = o->src[q];
+                        if (p >= 0 && p < f->n_vregs) {
+                            wd_base[p] = 1;
+                            if (bb_in_loop[i]) wd_ldef[p] = 1;
+                            if (g < wd_def[p]) wd_def[p] = g;
+                        }
+                    }
+                }
                 switch (o->kind) {
                 case IR_ADD: case IR_SUB: case IR_RSUB:
                 case IR_AND: case IR_OR:  case IR_XOR:
@@ -549,8 +611,313 @@ static int de_home_general_propose(const Func *f, const int *use_count,
             out[n].flags = CF_DE_GENERAL;
             n++;
         }
+        /* Loop regalloc Phase A (default-on; IR_NO_LOOP_RA opts out): a walking
+           BYTE pointer to home in DE across its loop — a deref base that is
+           stepped in the loop (the strcmp/strcpy/memcpy second pointer). Unlike
+           the word-acc filter this REQUIRES a deref base, ALLOWS a param (loaded
+           once at region entry from the caller slot, spilled back at exit), and
+           needs only one step. op_de_clean (de_home_is_ptr) proves the region
+           DE-clean; a non-clean loop reverts to slot (speculative pick). */
+        if (!getenv("IR_NO_LOOP_RA")) {
+            for (int v = 0; v < f->n_vregs; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (vr->width != 2) continue;
+                if (!(vr->kind == KIND_PTR || vr->kind == KIND_CPTR)) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                /* PARAM only (first cut): the caller slot is a coherent entry
+                   source for the region rehome. A local-init pointer (p = s)
+                   writes DE directly and leaves its own slot unwritten, so the
+                   rehome would read garbage — and such locals are already served
+                   by the induction BC picker. */
+                if (!(vr->flags & IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (!wd_base[v]) continue;        /* MUST be a deref base */
+                if (!wd_ldef[v]) continue;        /* stepped inside the loop */
+                /* A stepped loop pointer benefits even with a single use: the
+                   `*d++` store idiom (strcpy) reads d once (POSTSTEP), but that
+                   one op expands to a load+inc+store slot round-trip when
+                   spilled. wd_ldef already proves it is stepped in the loop —
+                   write_count doesn't count post_step base redefs, so don't
+                   gate on it. */
+                if (use_count[v] < 1) continue;
+                out[n].vreg = v;
+                out[n].benefit = use_count[v];
+                out[n].lo = first_use[v];
+                out[n].hi = last_use[v];
+                out[n].allowed = RC_DE_ACC;
+                out[n].flags = CF_DE_GENERAL | CF_DE_PTR;
+                n++;
+            }
+        }
     }
     free(wd_def); free(wd_read); free(wd_base); free(wd_acc); free(wd_ldef);
+    return n;
+}
+
+/* idx3 proposer (opt-in c_idx3_residency / f->idx3_reg != NONE): a hot
+   loop-carried width-2 word to home in the SECOND spare index register (IY in
+   sp-mode). Unlike the DE-home this needs NO region proof — an index register
+   is a dedicated home never used as codegen scratch, so the value rides it for
+   the whole function (call-gated via idx3_reg being NONE when calls could
+   clobber it — same envelope as idx2). Eligibility mirrors de_home_general
+   (loop-carried, not a deref base / accumulator / addr-taken / volatile /
+   param). Read/written via index halves (z80/z80n gate in ir_idx3_reg).
+   Fills out[], returns count. */
+static int idx3_propose(const Func *f, const int *use_count,
+                        const int *write_count, const int *bb_in_loop,
+                        const int *first_use, const int *last_use, Cand *out)
+{
+    if (f->idx3_reg == IR_PR_NONE || f->is_interrupt || f->is_naked) return 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+        }
+    size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+    int *wd_def  = calloc(nv, sizeof(int));
+    int *wd_read = calloc(nv, sizeof(int));
+    int *wd_base = calloc(nv, sizeof(int));
+    int *wd_acc  = calloc(nv, sizeof(int));
+    int *wd_ldef = calloc(nv, sizeof(int));
+    int *wd_addr = calloc(nv, sizeof(int));   /* transitively feeds a deref address */
+    int n = 0;
+    if (wd_def && wd_read && wd_base && wd_acc && wd_ldef && wd_addr) {
+        for (int v = 0; v < f->n_vregs; v++) { wd_def[v] = INT_MAX; wd_read[v] = INT_MAX; }
+        int g = 0;
+        for (int i = 0; i < f->n_bbs; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++, g++) {
+                const Op *o = &bb->ops[j];
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                for (int k = 0; k < nu; k++)
+                    if (u[k] >= 0 && u[k] < f->n_vregs && g < wd_read[u[k]])
+                        wd_read[u[k]] = g;
+                if (o->dst >= 0 && o->dst < f->n_vregs) {
+                    if (g < wd_def[o->dst]) wd_def[o->dst] = g;
+                    if (bb_in_loop[i]) wd_ldef[o->dst] = 1;
+                }
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs && g < wd_def[o->src[0]])
+                    wd_def[o->src[0]] = g;
+                if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                    && o->mem.kind == IR_MEM_VREG
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                    wd_base[o->mem.base] = 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs)
+                    wd_base[o->src[0]] = 1;
+                /* Fused byte copy-loop pointers are deref bases (exclude from
+                   idx/word homes; they want a BC/DE gp pointer, not push/pop). */
+                if (o->kind == IR_COPY_STEP_BRZ)
+                    for (int q = 0; q < 2; q++)
+                        if (o->src[q] >= 0 && o->src[q] < f->n_vregs)
+                            wd_base[o->src[q]] = 1;
+                switch (o->kind) {
+                case IR_ADD: case IR_SUB: case IR_RSUB:
+                case IR_AND: case IR_OR:  case IR_XOR:
+                    if (o->dst >= 0 && o->dst < f->n_vregs
+                        && o->src[1] >= 0 && bb_in_loop[i]
+                        && (o->src[0] == o->dst || o->src[1] == o->dst))
+                        wd_acc[o->dst] = 1;
+                    break;
+                default: break;
+                }
+            }
+        }
+        /* Hostility = v is an ARRAY INDEX (materialised every iteration by
+           `arr[v]`). Precisely: v (or v<<k) is a DIRECT operand of an ADD/SUB
+           whose dst is a deref base. Two levels only — NOT a transitive closure
+           through plain ALU: searchbench `mid = lo + hi` makes MID the index
+           (mid<<1 + base), so mid is hostile but lo/hi (mere ALU inputs to mid)
+           must stay eligible. wd_addr[v]=1 iff v is such an index.
+           Step 1: into_base[x] — x is directly added to a deref base. */
+        int *into_base = wd_addr;   /* reuse the buffer for the intermediate set */
+        for (int i = 0; i < f->n_bbs; i++)
+            for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                const Op *o = &f->bbs[i].ops[j];
+                if (o->kind != IR_ADD && o->kind != IR_SUB) continue;
+                if (o->dst < 0 || o->dst >= f->n_vregs || !wd_base[o->dst]) continue;
+                for (int s = 0; s < 2; s++)
+                    if (o->src[s] >= 0 && o->src[s] < f->n_vregs)
+                        into_base[o->src[s]] = 1;
+            }
+        /* Step 2: v is hostile if it is into_base, or feeds a SHL/SHR (index
+           scaling) whose result is into_base. Compute the scaled contribution
+           into a set disjoint from into_base, then union. */
+        int *scaled = calloc(nv, sizeof(int));
+        if (scaled) {
+            for (int i = 0; i < f->n_bbs; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    const Op *o = &f->bbs[i].ops[j];
+                    if (o->kind != IR_SHL && o->kind != IR_SHR) continue;
+                    if (o->dst < 0 || o->dst >= f->n_vregs || !into_base[o->dst]) continue;
+                    if (o->src[0] >= 0 && o->src[0] < f->n_vregs)
+                        scaled[o->src[0]] = 1;
+                }
+            for (int v = 0; v < f->n_vregs; v++) if (scaled[v]) wd_addr[v] = 1;
+            free(scaled);
+        }
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                             | IR_VREG_PARAM)) continue;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            if (wd_base[v]) continue;                     /* not a deref base */
+            if (wd_acc[v]) continue;                      /* accumulators → word_acc */
+            if (!wd_ldef[v]) continue;                    /* must be loop-carried */
+            if (use_count[v] < 4) continue;
+            if (write_count[v] < 2) continue;
+            if (wd_def[v] >= f->bbs[0].n_ops) continue;   /* init def in entry bb0 */
+            if (wd_def[v] >= wd_read[v]) continue;        /* def-first */
+            /* Hostile: v feeds a deref address (array index `arr[v]`) — an index
+               home materialises it (`push iy; pop hl; add hl,..`) every iteration,
+               whereas a gp reg (BC) indexes cheaply. wd_addr is the transitive
+               closure (covers i → i<<k → base+idx, e.g. queen's board[i]); a
+               plain ALU source whose result is NOT an address (searchbench
+               mid=lo+hi) is fine. */
+            if (wd_addr[v]) continue;
+            out[n].vreg = v;
+            out[n].benefit = use_count[v];
+            out[n].lo = first_use[v];
+            out[n].hi = last_use[v];
+            out[n].allowed = RC_IDX3;
+            out[n].flags = 0;
+            n++;
+        }
+    }
+    free(wd_def); free(wd_read); free(wd_base); free(wd_acc); free(wd_ldef);
+    free(wd_addr);
+    return n;
+}
+
+/* exx co-design proposer (opt-in c_exx_residency / f->exx_reg != NONE): a hot
+   loop-INVARIANT word (read in the loop, NEVER written in the loop — e.g. the
+   compare RHS `key`) homed in the exx/alt bank. Read-only means it persists
+   across `exx` with no write-back; the compare bridges through A. The POINT is
+   to displace the invariant OUT of the spare index register (idx2/IX) so that
+   register frees up for a WRITABLE loop var — so this only fires when there are
+   >= 2 idx3-eligible writable loop words competing for the two index registers
+   (IX+IY). Gated no-calls (a call clobbers the alt bank) and no-FA (float uses
+   the alt regs). Fills out[], returns count. */
+static int exx_propose(const Func *f, const int *use_count,
+                       const int *write_count, const int *bb_in_loop,
+                       const int *first_use, const int *last_use, Cand *out)
+{
+    if (f->exx_reg == IR_PR_NONE || f->is_interrupt || f->is_naked) return 0;
+    if (f->uses_acc) return 0;                     /* float/FA owns the alt bank */
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            OpKind k = f->bbs[i].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return 0;
+        }
+    size_t nv = f->n_vregs > 0 ? (size_t)f->n_vregs : 0;
+    int *wd_ldef  = calloc(nv, sizeof(int));   /* defined inside a loop bb */
+    int *wd_lread = calloc(nv, sizeof(int));   /* read inside a loop bb */
+    int *wd_base  = calloc(nv, sizeof(int));
+    int *wd_acc   = calloc(nv, sizeof(int));
+    int n = 0;
+    if (wd_ldef && wd_lread && wd_base && wd_acc) {
+        for (int i = 0; i < f->n_bbs; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int u[16];
+                int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                for (int k = 0; k < nu; k++)
+                    if (u[k] >= 0 && u[k] < f->n_vregs && bb_in_loop[i])
+                        wd_lread[u[k]] = 1;
+                if (o->dst >= 0 && o->dst < f->n_vregs && bb_in_loop[i])
+                    wd_ldef[o->dst] = 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs && bb_in_loop[i])
+                    wd_ldef[o->src[0]] = 1;
+                if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                    && o->mem.kind == IR_MEM_VREG
+                    && o->mem.base >= 0 && o->mem.base < f->n_vregs)
+                    wd_base[o->mem.base] = 1;
+                if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                    && o->src[0] < f->n_vregs)
+                    wd_base[o->src[0]] = 1;
+                /* Fused byte copy-loop pointers are deref bases (exclude from
+                   idx/word homes; they want a BC/DE gp pointer, not push/pop). */
+                if (o->kind == IR_COPY_STEP_BRZ)
+                    for (int q = 0; q < 2; q++)
+                        if (o->src[q] >= 0 && o->src[q] < f->n_vregs)
+                            wd_base[o->src[q]] = 1;
+                switch (o->kind) {
+                case IR_ADD: case IR_SUB: case IR_RSUB:
+                case IR_AND: case IR_OR:  case IR_XOR:
+                    if (o->dst >= 0 && o->dst < f->n_vregs && o->src[1] >= 0
+                        && bb_in_loop[i]
+                        && (o->src[0] == o->dst || o->src[1] == o->dst))
+                        wd_acc[o->dst] = 1;
+                    break;
+                default: break;
+                }
+            }
+        }
+        /* Count idx3-eligible writable loop words (loop-defined, not base/acc). */
+        int writables = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+                continue;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+            if (wd_base[v] || wd_acc[v] || !wd_ldef[v]) continue;
+            if (use_count[v] < 4 || write_count[v] < 2) continue;
+            writables++;
+        }
+        if (writables >= 2) {
+            /* Propose loop-invariant words: read in-loop, never written in-loop,
+               not a deref base. Params (e.g. `key`) qualify. */
+            for (int v = 0; v < f->n_vregs; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (vr->width != 2) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (!wd_lread[v] || wd_ldef[v]) continue;   /* read in loop, never written */
+                if (wd_base[v]) continue;                    /* deref base wants a gp reg */
+                if (use_count[v] < 4) continue;
+                /* The alt-bank home only pays off through the A-bridge COMPARE
+                   (`exx; sub half; exx`). An invariant used in address arithmetic
+                   / general ALU (`base + v`) gains nothing and would need an
+                   expensive materialize — home it in a gp reg instead. Require
+                   EVERY use to be an ordered/equality compare operand. */
+                {
+                    int all_cmp = 1;
+                    for (int bi = 0; bi < f->n_bbs && all_cmp; bi++)
+                        for (int bj = 0; bj < f->bbs[bi].n_ops; bj++) {
+                            const Op *o = &f->bbs[bi].ops[bj];
+                            int u[16];
+                            int nu = ir_op_uses(o, u, (int)(sizeof u/sizeof u[0]));
+                            int uses_v = 0;
+                            for (int k = 0; k < nu; k++) if (u[k] == v) { uses_v = 1; break; }
+                            if (!uses_v) continue;
+                            switch (o->kind) {
+                            case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT:
+                            case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+                            case IR_CMP_UGT: case IR_CMP_UGE: case IR_CMP_EQ:
+                            case IR_CMP_NE: break;
+                            default: all_cmp = 0; break;
+                            }
+                            if (!all_cmp) break;
+                        }
+                    if (!all_cmp) continue;
+                }
+                out[n].vreg = v;
+                out[n].benefit = use_count[v];
+                out[n].lo = first_use[v];
+                out[n].hi = last_use[v];
+                out[n].allowed = RC_EXX;
+                out[n].flags = 0;
+                n++;
+            }
+        }
+    }
+    free(wd_ldef); free(wd_lread); free(wd_base); free(wd_acc);
     return n;
 }
 
@@ -744,8 +1111,28 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
         pool[j] = c;
     }
     int idx2_taken = 0, byte_reg = 0;    /* 0 / 'C' / 'E' */
+    int idx3_taken = 0;                  /* the second index (IY) home */
+    int exx_taken = 0;                   /* alt-bank invariant claimed → IX freed */
     int de_acc_vreg = -1;                /* DE-acc winner, APPLIED after the loop */
     int de_acc_general = 0;              /* winner is a general (non-acc) home */
+    /* exx co-design PRE-PASS: the invariant→alt decision must precede the index
+       assignments so exx_taken is set when idx3 fills IX+IY. The benefit-first
+       sort would otherwise process the higher-benefit writables first (with
+       exx_taken still 0). exx_propose only emits candidates when >=2 writable
+       loop words compete for the index regs, so claiming the best invariant for
+       the alt bank here is always the co-design win. */
+    if (f->exx_reg != IR_PR_NONE) {
+        int eb = -1;
+        for (int i = 0; i < n; i++) {
+            if (!(pool[i].allowed & RC_EXX)) continue;
+            if (f->vreg_to_phys[pool[i].vreg] != IR_PR_SPILL) continue;
+            if (eb < 0 || pool[i].benefit > pool[eb].benefit) eb = i;
+        }
+        if (eb >= 0) {
+            f->vreg_to_phys[pool[eb].vreg] = f->exx_reg;
+            exx_taken = 1;
+        }
+    }
     /* Whole-function occupancy predicates, recomputed cheaply from
        vreg_to_phys as assignments land. */
     for (int i = 0; i < n; i++) {
@@ -756,6 +1143,16 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
            the SAME vreg (e.g. its IV/BC candidate) grab a register first. A
            reduction accumulator that also looks like an IV must stay DE-bound. */
         if (v == de_acc_vreg) continue;
+
+        if (c->allowed & RC_EXX) {
+            /* Loop-invariant → alt bank (single occupant). Displaces the idx2
+               invariant from IX; sets exx_taken so idx3 may use IX for a second
+               writable loop var. */
+            if (exx_taken || f->exx_reg == IR_PR_NONE) continue;
+            f->vreg_to_phys[v] = f->exx_reg;
+            exx_taken = 1;
+            continue;
+        }
 
         if (c->allowed & RC_IDX2) {
             /* idx2 sub-priority: a stepping counter beats a param. Only take
@@ -773,6 +1170,23 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
             }
             f->vreg_to_phys[v] = f->idx2_reg;
             idx2_taken = 1;
+            continue;
+        }
+
+        if (c->allowed & RC_IDX3) {
+            /* Writable loop var in an index register. First → IY (idx3_reg).
+               A SECOND writable → IX (idx2_reg) ONLY when the exx co-design
+               moved the invariant to the alt bank (exx_taken) and idx2 didn't
+               claim IX — that's the search layout (lo→IX, hi→IY, key→alt). The
+               lowering recognises IR_PR_IX as an index home via vreg_idx_home. */
+            if (f->idx3_reg == IR_PR_NONE) continue;
+            if (!idx3_taken) {
+                f->vreg_to_phys[v] = f->idx3_reg;
+                idx3_taken = 1;
+            } else if (exx_taken && !idx2_taken && f->idx2_reg != IR_PR_NONE) {
+                f->vreg_to_phys[v] = f->idx2_reg;   /* IX freed by exx */
+                idx2_taken = 1;
+            }
             continue;
         }
 
@@ -854,7 +1268,22 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
             int v = c->vreg;
             int ph = f->vreg_to_phys[v];
             if (ph != IR_PR_SPILL && ph != IR_PR_BC) continue;  /* promotable only */
-            if (gbest < 0 || c->benefit > pool[gbest].benefit) gbest = i;
+            if (gbest < 0) { gbest = i; continue; }
+            /* Loop-regalloc (CF_DE_PTR): with two walking-pointer candidates —
+               one already in BC, one spilled — prefer promoting the SPILLED one
+               to DE. That keeps the BC tenant resident too, so BOTH pointers ride
+               registers (a→BC, b→DE). Promoting the BC one instead would merely
+               move it and leave the second pointer in a slot. Off-gate no
+               candidate carries CF_DE_PTR, so this reduces to the benefit sort. */
+            int best_ph = f->vreg_to_phys[pool[gbest].vreg];
+            int cur_ptr_spill  = (c->flags & CF_DE_PTR) && ph == IR_PR_SPILL;
+            int best_ptr_spill = (pool[gbest].flags & CF_DE_PTR)
+                                 && best_ph == IR_PR_SPILL;
+            if (cur_ptr_spill != best_ptr_spill) {
+                if (cur_ptr_spill) gbest = i;
+                continue;
+            }
+            if (c->benefit > pool[gbest].benefit) gbest = i;
         }
         /* A byte home in E/D forbids a word DE-home (shared low half). */
         int e_taken = 0;
@@ -875,6 +1304,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n)
             f->vreg_to_phys[v] = IR_PR_DE;   /* promote (from BC or spill) to DE */
             f->word_home_vreg = v;
             f->de_home_general = 1;
+            f->de_home_is_ptr = (pool[gbest].flags & CF_DE_PTR) != 0;
         }
     }
 }
@@ -1496,13 +1926,19 @@ void ir_alloc(Func *f)
            back to the per-class proposer/arbiter pairs run in sequence. */
         int orch = getenv("IR_NO_ORCHESTRATOR") == NULL;
         if (orch) {
-            Cand *pool = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 5,
+            Cand *pool = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 6,
                                 sizeof(Cand));
             if (pool) {
                 int np = 0;
                 np += pr_bc_propose(f, use_count, write_count, def_kind,
                                     has_prepushed_call, entry_live,
                                     first_use, last_use, pool + np);
+                /* exx co-design FIRST: an invariant claimed for the alt bank
+                   displaces idx2 from IX, freeing it for a writable loop var.
+                   Must precede idx2_propose so the arbiter (stable on ties)
+                   grabs the invariant for the alt bank before idx2 takes IX. */
+                np += exx_propose(f, use_count, write_count, bb_in_loop,
+                                  first_use, last_use, pool + np);
                 np += idx2_propose(f, use_count, write_count,
                                    first_use, last_use, pool + np);
                 if (c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT"))
@@ -1517,6 +1953,10 @@ void ir_alloc(Func *f)
                    the general home-def path, not try_word_accumulate. */
                 np += de_home_general_propose(f, use_count, write_count, bb_in_loop,
                                               first_use, last_use, pool + np);
+                /* idx3: a second loop-carried word homed in IY (sp-mode, opt-in).
+                   Dedicated index register → no region proof, assigned directly. */
+                np += idx3_propose(f, use_count, write_count, bb_in_loop,
+                                   first_use, last_use, pool + np);
                 /* Phase 2: hot loop-carried int IVs. IR_NO_IV_RESIDENT opts out. */
                 if (!getenv("IR_NO_IV_RESIDENT"))
                     np += iv_propose(f, use_count, write_count, all_defs_ok,
