@@ -80,8 +80,11 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     int bc_saved = 0;
     int bc_vreg_at_call_entry = L.rs.bc;
     if (!pre) {
+        /* IR_VREG_BC_PACK tenants are call-free by construction (never live
+           across this call), so they add no BC-save — Part 1. */
         for (int i = 0; i < f->n_vregs; i++) {
-            if (f->vreg_to_phys[i] == IR_PR_BC) { bc_saved = 1; break; }
+            if (f->vreg_to_phys[i] == IR_PR_BC
+                && !(f->vregs[i].flags & IR_VREG_BC_PACK)) { bc_saved = 1; break; }
         }
     }
     if (bc_saved) {
@@ -815,7 +818,8 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
        must be saved. */
     int hc_bc_saved = 0;
     for (int i = 0; i < f->n_vregs; i++) {
-        if (f->vreg_to_phys[i] == IR_PR_BC) { hc_bc_saved = 1; break; }
+        if (f->vreg_to_phys[i] == IR_PR_BC
+            && !(f->vregs[i].flags & IR_VREG_BC_PACK)) { hc_bc_saved = 1; break; }
     }
     if (hc_bc_saved) {
         emit(out, "push\tbc");

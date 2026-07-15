@@ -99,6 +99,14 @@ typedef enum {
                                         never touches a frame slot. ir_assign_slots
                                         reserves none — shrinking frame_size.
                                         Set by compute_no_slot_bytes. */
+    IR_VREG_BC_PACK        = 1 << 7, /* Call-free-interval word temp packed into
+                                        BC by ir_bc_pack (IR_NO_BC_PACK opts out). Its
+                                        live range is single-BB, iteration-local
+                                        (never carried across the back-edge) and
+                                        BC-clean, so it is never live across a
+                                        call — gen_call's whole-function BC-save
+                                        must ignore it (Part 1). Slotless like any
+                                        PR_BC vreg (stamped `ld bc,hl` at its def). */
 } VRegFlags;
 
 typedef struct {
