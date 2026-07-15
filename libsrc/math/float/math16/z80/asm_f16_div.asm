@@ -42,8 +42,6 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_inf
-EXTERN asm_f24_zero
-EXTERN asm_f24_nan
 
 EXTERN asm_f24_mul_f24
 
@@ -112,9 +110,6 @@ PUBLIC asm_f24_div_callee
     ld a,d
     or a
     jp Z,asm_f24_inf            ; 1/0 → ±Inf (sign in e)
-    ; half Inf expands to d=143; rare, not on finite Newton path
-    cp 127-15+31
-    jr NC,inv_hi
 
     push de                     ; save sign and exponent
 
@@ -202,15 +197,4 @@ PUBLIC asm_f24_div_callee
     add a,07eh   
     ld d,a                      ; new exponent to d
     ret                         ; return f24 in DEHL
-
-.inv_hi
-    ; d >= 143: Inf (mant == hidden only) → ±0; else NaN
-    ld a,h
-    and 07fh
-    or l
-    jr NZ,inv_hi_nan
-    jp asm_f24_zero
-
-.inv_hi_nan
-    jp asm_f24_nan
 
