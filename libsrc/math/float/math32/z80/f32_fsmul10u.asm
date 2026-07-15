@@ -22,6 +22,10 @@ PUBLIC _m32_mul10uf
     rl d
     jr Z,zero_legal             ; return IEEE zero
 
+    ld a,d
+    inc a
+    jr Z,exp_max                ; Inf/NaN: force non-negative, keep payload
+
     scf                         ; set hidden bit
     rr e                        ; return mantissa to ehl
 
@@ -67,10 +71,13 @@ PUBLIC _m32_mul10uf
     rr d                        ; restore the sign
     ret                         ; return IEEE signed ZERO in DEHL
 
+.exp_max
+    rr de
+    res 7,d                     ; mul10u is non-negative
+    ret
+
 .infinity
-    ld de,0
-    ld hl,de
-    dec d                       ; 0xff
-    rr de                       ; restore the sign
+    ld de,$7f80                 ; +Inf (sign was lost by hidden-bit scf)
+    ld hl,0
     scf
     ret                         ; return IEEE signed INFINITY in DEHL

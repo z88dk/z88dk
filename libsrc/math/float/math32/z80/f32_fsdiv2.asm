@@ -26,11 +26,19 @@ PUBLIC _m32_div2f
     rl d                        ; put sign in C
     jr Z,zero_legal             ; return IEEE zero
 
+    ld a,d
+    inc a
+    jr Z,exp_max                ; Inf/NaN: unchanged
+
     dec d                       ; divide by 2
     jr Z,zero_underflow         ; capture underflow zero
 
     rr de                       ; return sign and exponent
     ret                         ; return IEEE DEHL
+
+.exp_max
+    rr de
+    ret
 
 .zero_legal
     ld e,d                      ; use 0
