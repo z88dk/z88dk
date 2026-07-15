@@ -19,6 +19,13 @@ EXTERN asm_f16_inf
 PUBLIC asm_f16_mul10
 
 .asm_f16_mul10
+    ld a,$7c                    ; isolate packed exponent
+    and h
+    jr Z,mul10_expand           ; zero (signed via expand)
+    cp $7c
+    ret Z                       ; Inf/NaN: leave unchanged
+
+.mul10_expand
     call asm_f24_f16            ; convert to expanded format
 
     ld a,d                      ; get the exponent
@@ -42,8 +49,9 @@ PUBLIC asm_f16_mul10
 
 .no_carry
     add a,d                     ; resulting exponent
-    ld d,a                      ; return the exponent
-    inc a                       ; ensure not infinity
-    jp Z,asm_f16_inf
-    jp asm_f16_f24              ; return IEEE HL
+    jr C,mul10_oflow            ; f24 exponent overflow → Inf
+    ld d,a
+    jp asm_f16_f24              ; pack (half-range oflow → Inf)
 
+.mul10_oflow
+    jp asm_f16_inf              ; signed Inf from e[7]
