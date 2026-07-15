@@ -78,6 +78,13 @@ typedef enum {
     IR_PR_HL_ALT,
     IR_PR_DE_ALT,
     IR_PR_BC_ALT,
+    /* Stack-transient spill: a width-2 value with a single def and single use in
+       one straight-line span, spilled NOT to a frame slot but to the stack —
+       `push hl` at the def (value kept in HL), `pop` at the use. No frame slot,
+       and push/pop (1 byte each) beat the slot store+reload. cur_sp_adjust is
+       held +2 across the span so intervening sp-relative slot accesses stay
+       correct. See ir_stack_spill (ir_alloc). */
+    IR_PR_STACK,
     IR_PR_SPILL = 0xFE /* not in any register — frame slot */
 } PhysReg;
 

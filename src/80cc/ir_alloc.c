@@ -1564,6 +1564,142 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     free(cand); free(itloc); free(itlo); free(ithi); free(itbb); free(itdop);
 }
 
+/* Ops that manipulate the stack or transfer control — forbidden between a
+   stack-transient's def and its use (they'd break the push/pop TOS discipline
+   or the LIFO balance). ALU/compare/load/store/conv are all fine: the value
+   rides the stack across them untouched. */
+static int stack_spill_span_hazard(OpKind k)
+{
+    switch (k) {
+    case IR_CALL: case IR_HCALL: case IR_ASM:
+    case IR_LD_FAR: case IR_ST_FAR: case IR_LD_FARSYM:
+    case IR_PUSH_ARG: case IR_PUSH_STRUCT:
+    case IR_PUSH_DEHL_LONG: case IR_POP_DEHL_LONG:
+    case IR_SWITCH:
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO: case IR_RET:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out). A leftover spilled width-2
+   temp (after all register allocation incl. ir_bc_pack) with a SINGLE def and
+   SINGLE use in one straight-line span goes on the STACK — `push hl` at the
+   def, `pop` at the use — instead of a frame slot. push/pop (1 byte each) beat
+   the slot store+reload, and the frame slot is freed. This is the register-
+   pressure fallback below ir_bc_pack: it takes the transients no register could.
+
+   Admitted only when it is provably safe as a 1-deep stack park:
+     - width-2, still SPILL, not param/addr-taken/volatile;
+     - write-once with a bc_safe_producer def (leaves HL=value, routes through
+       commit_hl_word so the def-store becomes `push hl`);
+     - exactly ONE static use; all refs in ONE bb; FIRST ref is the def; not
+       live-in and not live-out → born, parked, consumed, dead — each execution;
+     - the def's spill is genuinely live (op_dst_spill_is_dead false), else the
+       value would just ride HL and the push/pop is pure overhead;
+     - NO stack/control hazard between def and use (stack_spill_span_hazard);
+     - DISJOINT from every other stack-transient (greedy) — at most one parked
+       at a time, so a single TOS slot and LIFO are trivially safe. */
+static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
+                           const int *write_count)
+{
+    if (getenv("IR_NO_STACK_SPILL")) return;   /* default ON; opts out */
+    if (f->n_vregs <= 0) return;
+    /* Gate: z80/z80n/z180/8080/8085/gbz80, sp AND fp — every CPU with expensive
+       word slot access (fp: 2× ld (ix+d) ~38T; sp: ld hl,N;add hl,sp;…) vs
+       push/pop 21T, so parking pays. Correctness rests on: copt strips pointless
+       adjacent parks (push %1/pop %1); the commutative-addend reject (above) stops
+       parking values that ride HL into a reduction (the sp structbench +29%
+       cause); and NO slot-store path emits the -1 sentinel for a PR_STACK vreg —
+       spill_and_swap/store_hl/store_a_byte/spill_de_unless_dead all park, and the
+       load_to_* pop is checked before any cache hit (else a stale cache_hl/de
+       skips the balancing pop → sp-1 write / stack leak; 8085's LD_IMM `ld de,K`
+       fastpath via spill_de_unless_dead was the crash). EXCLUDED: ez80/kc160/
+       rabbit (cheap native sp-relative slots — parking doesn't pay). Wins
+       matrixbench: z80 sp -12.9%, 8080 -12.4%, gbz80 -9.5%, 8085 -8.5%. */
+    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+          || IS_8080() || IS_8085() || IS_GBZ80())) return;
+
+    typedef struct { int vreg, flo, fhi; } SCand;
+    SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
+    if (!cand) return;
+    int nc = 0;
+
+    for (int v = 0; v < f->n_vregs; v++) {
+        const VReg *vr = &f->vregs[v];
+        if (vr->width != 2) continue;
+        if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (vr->flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+            continue;
+        if (write_count[v] != 1) continue;
+        if (!bc_safe_producer(def_kind[v])) continue;
+
+        /* Single BB, tight [lo,hi], first ref is the def, exactly one use. */
+        int bb_of = -1, lo = INT_MAX, hi = -1, first_is_def = 0, multi = 0, uses = 0;
+        for (int i = 0; i < f->n_bbs && !multi; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int is_def = (o->dst == v);
+                int u[16]; int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+                int is_use = 0;
+                for (int k = 0; k < nu; k++) if (u[k] == v) { is_use = 1; uses++; }
+                if (!is_def && !is_use) continue;
+                if (bb_of == -1) { bb_of = i; first_is_def = is_def; }
+                else if (bb_of != i) { multi = 1; break; }
+                if (j < lo) lo = j;
+                if (j > hi) hi = j;
+            }
+        }
+        if (multi || bb_of < 0 || hi < 0 || !first_is_def || uses != 1) continue;
+
+        const BB *bb = &f->bbs[bb_of];
+        if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)) continue;
+        if (bb->live_in  && ir_bitset_get((const BitSet *)bb->live_in,  v)) continue;
+        if (op_dst_spill_is_dead(bb, lo)) continue;   /* value rides HL — no win */
+        /* A value consumed by an IMMEDIATELY-following COMMUTATIVE binop rides a
+           register straight into it (the lowering swaps it into the HL operand
+           position), so it never needs a slot — parking is pure overhead.
+           op_dst_spill_is_dead only catches the src[0] case; a commutative op's
+           src[1] (the classic reduction addend `acc += *p`) slips through and was
+           being parked (structbench sp addends → +29% clock). Reject it. */
+        if (hi == lo + 1) {
+            OpKind uk = bb->ops[hi].kind;
+            if (uk == IR_ADD || uk == IR_AND || uk == IR_OR || uk == IR_XOR)
+                continue;
+        }
+
+        int span_ok = 1;
+        for (int j = lo + 1; j <= hi && span_ok; j++)
+            if (stack_spill_span_hazard(bb->ops[j].kind)) span_ok = 0;
+        if (!span_ok) continue;
+
+        cand[nc].vreg = v;
+        cand[nc].flo  = bb_first_op[bb_of] + lo;
+        cand[nc].fhi  = bb_first_op[bb_of] + hi;
+        nc++;
+    }
+
+    /* Sort by flo; greedy DISJOINT (one parked at a time → single TOS slot). */
+    for (int i = 1; i < nc; i++) {
+        SCand c = cand[i];
+        int j = i;
+        while (j > 0 && cand[j - 1].flo > c.flo) { cand[j] = cand[j - 1]; j--; }
+        cand[j] = c;
+    }
+    int placed = 0, last_fhi = -1;
+    for (int i = 0; i < nc; i++) {
+        if (cand[i].flo <= last_fhi) continue;   /* overlaps a parked sibling */
+        f->vreg_to_phys[cand[i].vreg] = IR_PR_STACK;
+        last_fhi = cand[i].fhi;
+        placed++;
+    }
+    if (getenv("IR_ALLOC_PROBE"))
+        fprintf(stderr, "STACK_SPILL placed=%d of candidates=%d\n", placed, nc);
+    free(cand);
+}
+
 /* Diagnostic probe (IR_ALLOC_PROBE): count spilled width-2 temps whose whole
    live range sits in ONE bb with no call between first def and last use — the
    reachable subset for call-free-interval word residency (option A). This is an
@@ -1573,6 +1709,20 @@ static void alloc_probe(const Func *f)
 {
     if (!getenv("IR_ALLOC_PROBE")) return;
     int eligible = 0, passable = 0, bc_clean = 0, spilled_words = 0, total_uses = 0;
+    /* DE reachability (runs AFTER ir_bc_pack, so PR_BC winners are already
+       excluded from `eligible` — these are the LEFTOVER spilled word temps).
+       de_clean = DE-clean span; de_reach = de_clean AND the function's DE pair
+       is free (no PR_DE/PR_E/PR_D tenant, no word-home) → the reachable set a
+       DE-pack pass could still take. bc_taken tells us whether a loop-home is
+       what pushed these off BC. */
+    int de_clean = 0, de_reach = 0;
+    int de_free = (f->word_home_vreg < 0);
+    int bc_taken = 0;
+    for (int v = 0; v < f->n_vregs && de_free; v++)
+        if (f->vreg_to_phys[v] == IR_PR_DE || f->vreg_to_phys[v] == IR_PR_E
+            || f->vreg_to_phys[v] == IR_PR_D) de_free = 0;
+    for (int v = 0; v < f->n_vregs; v++)
+        if (f->vreg_to_phys[v] == IR_PR_BC) { bc_taken = 1; break; }
     for (int v = 0; v < f->n_vregs; v++) {
         if (f->vregs[v].width != 2) continue;
         if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
@@ -1631,12 +1781,15 @@ static void alloc_probe(const Func *f)
             if (w4) de_dirty = 1;
         }
         if (!bc_dirty) bc_clean++;
+        if (!de_dirty) { de_clean++; if (de_free) de_reach++; }
         if (!bc_dirty || !de_dirty) passable++;
     }
     if (spilled_words)
         fprintf(stderr, "ALLOC_PROBE eligible=%d passable=%d bc_clean=%d "
+                "de_clean=%d de_reach=%d de_free=%d bc_taken=%d "
                 "spilled_words=%d uses=%d\n",
-                eligible, passable, bc_clean, spilled_words, total_uses);
+                eligible, passable, bc_clean, de_clean, de_reach, de_free,
+                bc_taken, spilled_words, total_uses);
 }
 
 void ir_alloc(Func *f)
@@ -2352,6 +2505,10 @@ void ir_alloc(Func *f)
            it only claims BC where no loop home owns it. */
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
                    write_count, use_count);
+        /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
+           fallback below BC-pack — a single-def/single-use word transient with
+           no register free goes on the stack (push/pop) instead of a slot. */
+        ir_stack_spill(f, bb_first_op, def_kind, write_count);
         free(write_count);
         free(use_count);
         free(first_use);

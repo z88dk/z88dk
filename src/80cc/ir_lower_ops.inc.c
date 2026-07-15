@@ -60,6 +60,10 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
         spill_de_unless_dead(out, f, op->dst);
+        /* PR_STACK parked the value on the stack (not HL) — advertising HL would
+           let a reader skip the balancing pop. Its use pops. */
+        if (f->vreg_to_phys && f->vreg_to_phys[op->dst] == IR_PR_STACK)
+            return 0;
     }
     cache_hl(op->dst);
     return 0;

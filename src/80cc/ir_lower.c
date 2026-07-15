@@ -97,6 +97,27 @@ typedef struct {
        slot reads add this to compensate. Reset per BB. Stack-consuming helpers
        (l_long_or/add) pop their RHS with no IR_POP — gen_hcall decrements it. */
     int cur_sp_adjust;
+    /* Stack-transient spill (IR_PR_STACK): the vreg whose value is currently
+       push-parked at TOS (via `push hl` at its def), or -1. Its single use pops
+       it. cur_sp_adjust is held +2 while it's parked so intervening sp-relative
+       slot accesses stay correct. Allocator guarantees these ranges are disjoint
+       within a BB (one parked at a time), so a single slot suffices. Reset per
+       BB alongside cur_sp_adjust. */
+    int cur_stack_resident;
+    /* cur_sp_adjust captured right after the park's `push hl`. The pop is valid
+       only while the parked word is still at TOS — cur_sp_adjust unchanged since
+       (nothing else pushed on top). stack_parked() checks this; on mismatch the
+       read falls through to require_slot (a loud abort, never a silent wrong
+       pop). */
+    int cur_stack_resident_spadj;
+    /* NO_SLOT byte emergency spill via AF (replaces the old below-sp `ld
+       (ix-(frame+1)),a` / sp-1 write). When a slotless byte in A must survive an
+       A-clobber (e.g. a store whose address load uses `ld a,(hl+)`), it is parked
+       with `push af` and reloaded with `pop af` — a real, interrupt-safe stack
+       slot. LIFO stack (nesting: a byte parked inside another's span). Each entry
+       records cur_sp_adjust at park so the pop only fires while still TOS. Reset
+       per BB. */
+    int af_park_vreg[4], af_park_spadj[4], af_park_depth;
     int func_emit_idx, cmp_label_counter, fc_ret_label_counter;
     /* Phase-0 live-range measurement (IR_SPILL_STATS): a slot-traffic proxy
        counted at the vemit chokepoint. spill_ix = fp frame-slot accesses
@@ -153,6 +174,7 @@ static LowerState L = {
     .cur_de_home = -1,
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
+    .cur_stack_resident = -1,
 };
 
 
@@ -2400,6 +2422,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     if (L.bb_byte_out_dirty)
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out_dirty[i] = 0;
     L.cur_sp_adjust = 0;
+    L.cur_stack_resident = -1;
+    L.af_park_depth = 0;
     bc_args_save_depth = 0;
     L.la.cur_stack_long_top = -1;
     L.la.cur_dehl_inline_push = -1;
@@ -2470,6 +2494,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         /* The long data-stack is per-BB. Any push/pop imbalance at
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
+        L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
+        L.af_park_depth = 0;         /* AF byte-park never crosses a BB */
         bc_args_save_depth = 0;
         L.la.cur_stack_long_top = -1;
         L.la.cur_dehl_inline_push = -1;
