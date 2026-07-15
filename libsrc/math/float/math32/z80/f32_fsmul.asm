@@ -111,13 +111,23 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     exx
 
-    add a,h
+    ld b,a
+    ld a,h                      ; first exponent
+    or a
+    jr Z,mulzero                ; 0 * y -> signed zero
+    ld a,b
+    add a,h                     ; sum of exponents
     jp C,mulovl
     jr fmnouf
 
 .fmchkuf
     exx
 
+    ld b,a
+    ld a,h                      ; first exponent
+    or a
+    jr Z,mulzero                ; 0 * y -> signed zero
+    ld a,b
     add a,h                     ; add the exponents
     jr NC,mulzero
 
