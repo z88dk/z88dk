@@ -160,7 +160,10 @@ ENDIF
 
 .fm2
     inc b
-    jr Z,mulovl
+    jr Z,mulovl_bc              ; wrapped 0xff → 0
+    ld a,b
+    inc a
+    jr Z,mulovl_bc              ; b == 0xff (was 0xfe): not finite d=0xff
 
 .fm3
     ex de,hl                    ; put 16 bit mantissa in place, de into hl
@@ -171,9 +174,16 @@ ENDIF
     set 0,l
 
 .fm4
+    ld a,b
+    inc a
+    jr Z,mulovl_bc              ; exp sum == 0xff without inc: true oflow
     ld d,b                      ; put exponent in d
     ld e,c                      ; put sign into e[7]
     ret                         ; return half float f24
+
+.mulovl_bc
+    ld e,c                      ; sign in e[7] (from push af flags)
+    jp asm_f24_inf
 
 .mul_y_zero
     ; y == 0: NaN if x is Inf/NaN, else signed zero

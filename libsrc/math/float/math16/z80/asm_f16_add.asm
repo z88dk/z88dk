@@ -205,7 +205,10 @@ PUBLIC asm_f24_add_f24
     set 0,l
 .doadd0
     inc d                       ; test exponent overflow
-    jp Z,asm_f24_inf
+    jp Z,asm_f24_inf            ; wrapped 0xff → 0
+    ld a,d
+    inc a
+    jp Z,asm_f24_inf            ; d == 0xff (was 0xfe): true Inf, not residual
 .doadd1
     ret                         ; return f24 in DEHL
 
