@@ -8,4 +8,5 @@ target/m100/stdio/generic_console
 target/m100/graphics/clg
 target/m100/graphics/plotpixl
 target/m100/graphics/respixl
+target/m100/graphics/xorpixl
 @classic/gfx/narrow/gfx_narrow.lst
