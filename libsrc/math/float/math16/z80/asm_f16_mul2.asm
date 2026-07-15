@@ -22,24 +22,27 @@ PUBLIC asm_f16_mul2
     and h                       ; get exponent in a
     jr Z,zero_legal             ; return IEEE zero
 
+    cp $7c                      ; Inf/NaN: leave unchanged
+    ret Z
+
     ld a,h                      ; load exponent
     add 00000100b               ; multiply by 2
     ld h,a
     cpl
     and $7c
-    jr Z,infinity               ; capture overflow
-    ret                         ; return IEEE DEHL
+    jr Z,infinity               ; capture overflow from max finite
+    ret                         ; return IEEE HL
 
 .zero_legal
     rl h                        ; put sign in C
     ld h,a                      ; use 0
     ld l,a       
     rr h                        ; restore the sign
-    ret                         ; return IEEE signed ZERO in DEHL
+    ret                         ; return IEEE signed ZERO in HL
 
 .infinity
     rl h                        ; put sign in C
     ld hl,$f800                 ; use infinity $7c<<1
     rr h                        ; restore the sign
     scf
-    ret                         ; return IEEE signed INFINITY in DEHL
+    ret                         ; return IEEE signed INFINITY in HL
