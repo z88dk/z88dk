@@ -47,6 +47,7 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_inf
+EXTERN asm_f24_nan
 
 EXTERN asm_f24_normalize
 
@@ -209,6 +210,9 @@ PUBLIC asm_f24_add_f24
     ret                         ; return f24 in DEHL
 
 .alignzero
+    ld a,d
+    inc a
+    jr Z,add_both_maxexp        ; both d == 0xff (Inf/NaN)
     ex af,af
     jp P,doadd
 ;   jr dosub
@@ -241,4 +245,20 @@ PUBLIC asm_f24_add_f24
 ; exponent of result in e sign of result in d
 ; now do normalize
     jp asm_f24_normalize        ; now begin to normalize with dehl
+
+.add_both_maxexp
+    ; main = x, ' = y  (equal exp 0xff)
+    ld a,h
+    or l
+    jr NZ,addnan                ; x NaN
+    exx                         ; main = y
+    ld a,h
+    or l
+    jr NZ,addnan                ; y NaN
+    ex af,af                    ; sign xor (from entry)
+    jp M,addnan                 ; Inf + (-Inf)
+    ret                         ; same-sign Inf (y)
+
+.addnan
+    jp asm_f24_nan
 
