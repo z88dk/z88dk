@@ -24,11 +24,12 @@ PUBLIC asm_f24_nan
 PUBLIC asm_f16_nan
 
 .asm_f24_nan
-    ld de,0FF00h
-    ld hl,00000h
+    ld de,0FF00h                ; d=0xff exp, e=0 (+), hl nonzero payload
+    ld hl,04000h                ; must be nonzero (else would be Inf)
     ret
 
 .asm_f16_nan
-    ld hl,07C80h
+    ld hl,07C80h                ; +qNaN
     ret
+
 

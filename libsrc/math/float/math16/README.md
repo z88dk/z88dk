@@ -80,13 +80,14 @@ This format is provided for both the multiply and add intrinsic internal 16-bit 
   Conversion from packed half (bias 15):
     half_exp 0      -> f24 zero
     half_exp 1..30  -> d = half_exp + (127-15)   ; 113 .. 142  (finite)
-    half_exp 31     -> d = 31 + 112 = 143        ; Inf/NaN from pack expand
-  Overflow Inf produced inside f24 arithmetic uses d = 0xff (asm_f24_inf).
+    half_exp 31     -> d = 0xff, hl = 0 (Inf) or hl != 0 (NaN); sign in e[7]
+  Overflow Inf from f24 arithmetic also uses d = 0xff (asm_f24_inf).
 
   Conversion back to half (asm_f16_f24):
-    d < 113  -> ±0
-    d 113..142 -> finite half_exp 1..30
-    d >= 143 -> ±Inf
+    d < 113     -> ±0
+    d 113..142  -> finite half_exp 1..30
+    d >= 143 and d != 0xff -> ±Inf (overflow)
+    d == 0xff   -> ±Inf if hl==0, else ±NaN
 ```
 
 ## Calling Convention
