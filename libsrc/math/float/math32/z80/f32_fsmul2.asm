@@ -8,11 +8,12 @@
 ;-------------------------------------------------------------------------
 ; m32_fsmul2 - z80, z180, z80n floating point multiply by 2
 ;-------------------------------------------------------------------------
-; 
+;
 ; Multiplication by 2 is incrementing the exponent. An easy optimisation.
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC m32_fsmul2_fastcall

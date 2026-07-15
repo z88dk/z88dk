@@ -104,16 +104,13 @@ Both results are free of bias with IEEE method having a slight edge with roundin
     1 1 1  +.001
 -------------------------------------------------------------------------
 
--------------------------------------------------------------------------
-    This z88dk math32 library rounds the number using a single sticky bit
-    which uses the lsb[7] of the of the 32-bit result from any
-    intrinsic calculation:
+    z88dk math32 (feilipu sticky):
 
-    b s  (b=lsb[7] s=sticky)
-    0 0		exact
-    0 1		+.01
-    1 0		exact
-    1 1		-.01
+    After a 24- or 32-bit mantissa product/align, the bits below the
+    kept mantissa are tested with `and 0c0h` (top two residual bits).
+    If either is set, the mantissa LSB is forced on (`set 0,l`).
+    This is not IEEE round-to-nearest-even; it is a cheap sticky-LSB
+    rule used by mul, sqr, invsqrt, and related pack paths.
 -------------------------------------------------------------------------
 ```
 
