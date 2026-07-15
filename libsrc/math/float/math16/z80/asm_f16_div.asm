@@ -42,6 +42,8 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_inf
+EXTERN asm_f24_zero
+EXTERN asm_f24_nan
 
 EXTERN asm_f24_mul_f24
 
@@ -86,9 +88,11 @@ PUBLIC asm_f24_div_callee
 
 ; enter here for floating asm_f24_inv, 1/y, y in dehl, result in dehl
 .asm_f24_inv
-    inc d
-    dec d
-    jp Z,asm_f24_inf            ; check for zero, infinite result
+    ld a,d
+    or a
+    jp Z,asm_f24_inf            ; 1/0 → ±Inf (sign in e)
+    inc a
+    jr Z,inv_max                ; d was 0xff (Inf/NaN)
 
     push de                     ; save sign and exponent
 
@@ -176,4 +180,13 @@ PUBLIC asm_f24_div_callee
     add a,07eh   
     ld d,a                      ; new exponent to d
     ret                         ; return f24 in DEHL
+
+.inv_max
+    ld a,h
+    or l
+    jr NZ,inv_nan               ; 1/NaN → NaN
+    jp asm_f24_zero             ; 1/Inf → ±0 (sign in e)
+
+.inv_nan
+    jp asm_f24_nan
 
