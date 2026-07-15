@@ -29,13 +29,27 @@ PUBLIC asm_f16_frexp
     ;
     ; uses  : af, bc, de, hl
 
+    ld a,$7c                    ; isolate packed exponent
+    and h
+    jr Z,frexp_expand           ; zero / finite
+    cp $7c
+    jr NZ,frexp_expand
+
+    ; Inf/NaN: *pw2 = 0, return x unchanged
+    xor a
+    ld (bc),a
+    inc bc
+    ld (bc),a
+    ret                         ; HL = x, NC
+
+.frexp_expand
     call asm_f24_f16            ; convert HL to expanded format
 
     ld a,d                      ; get the exponent
     and a
     jr Z,zero
-    ld d,$7e                    ; remove exponent excess (bias-1)
-    sub d                       ; mantissa between 0.5 and 1
+    ld d,$7e                    ; fraction in [0.5,1) (f24 bias-1)
+    sub d                       ; *pw2 = exp - 0x7e
 
 .zero
     ld (bc),a                   ; and store in pw2
@@ -45,4 +59,3 @@ PUBLIC asm_f16_frexp
     ld  (bc),a
 
     jp asm_f16_f24              ; return IEEE HL half_t fraction
-
