@@ -22,19 +22,22 @@ PUBLIC asm_f16_div2
     and h                       ; get exponent in a
     jr Z,zero_legal             ; return IEEE zero
 
+    cp $7c                      ; Inf/NaN: leave unchanged
+    ret Z
+
     ld a,h                      ; load exponent
     sub 00000100b               ; divide by 2
     ld h,a
     and $7c
     jr Z,zero_underflow         ; capture underflow zero
-    ret                         ; return IEEE DEHL
+    ret                         ; return IEEE HL
 
 .zero_legal
     rl h                        ; put sign in C
     ld h,a                      ; use 0
     ld l,a       
     rr h                        ; restore the sign
-    ret                         ; return IEEE signed ZERO in DEHL
+    ret                         ; return IEEE signed ZERO in HL
 
 .zero_underflow
     rl h                        ; put sign in C
@@ -42,4 +45,4 @@ PUBLIC asm_f16_div2
     ld l,a
     rr h                        ; restore the sign
     scf
-    ret                         ; return IEEE signed ZERO in DEHL
+    ret                         ; return IEEE signed ZERO in HL
