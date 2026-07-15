@@ -212,7 +212,7 @@
 	C_LINE	11,"am9511_fmod.c"
 	SECTION	code_compiler
 
-; Function am9511_fmod flags 0x00000000 __stdc 
+; Function am9511_fmod flags 0x00000000 __stdc
 ; double am9511_fmod(double x, double y)
 ; parameter 'double x' at 2 size(4)
 ; parameter 'double y' at 6 size(4)
@@ -232,9 +232,8 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
+	ld	hl,0xffff	;const
+	ld	de,0x7fff
 	pop	bc
 	pop	bc
 	pop	bc
