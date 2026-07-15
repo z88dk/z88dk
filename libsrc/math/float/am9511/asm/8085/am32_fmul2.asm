@@ -27,11 +27,11 @@ PUBLIC asm_am9511_fmul2_fastcall
     dec d
     jp Z,zero_legal             ; return IEEE zero
 
-    inc d                       ; multiply by 2
-    jr Z,infinity               ; capture NaN
-    inc d
-    jr Z,infinity               ; capture overflow
-    dec d
+    inc d                       ; *2
+    jr Z,exp_max                ; was 0xff: Inf/NaN, restore
+    ld a,d
+    inc a
+    jr Z,overflow               ; was 0xfe: d is 0xff
 
     ld a,d
     rra                         ; return sign and exponent
@@ -41,6 +41,16 @@ PUBLIC asm_am9511_fmul2_fastcall
     ld e,a
 
     ret                         ; return IEEE DEHL
+
+.exp_max
+    dec d                       ; restore exp 0xff
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ret
 
 .zero_legal
     ld e,d                      ; use 0
@@ -52,11 +62,10 @@ PUBLIC asm_am9511_fmul2_fastcall
 
     ret                         ; return IEEE signed ZERO in DEHL
 
-.infinity
-    ld e,d                      ; use 0
-    ld hl,de
-
-    dec d                       ; 0xff
+.overflow
+    ld e,0                      ; d is already 0xff
+    ld h,e
+    ld l,e
 
     ld a,d
     rra                         ; restore the sign and exponent
@@ -67,4 +76,3 @@ PUBLIC asm_am9511_fmul2_fastcall
 
     scf
     ret                         ; return IEEE signed INFINITY in DEHL
-
