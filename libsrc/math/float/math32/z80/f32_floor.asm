@@ -15,14 +15,13 @@ PUBLIC _m32_floorf
 ; Entry: dehl = floating point number
 .m32_floor_fastcall
     call m32_discardfraction
+    ret NC                      ; already integer
     bit 7,d
-    ret Z
+    ret Z                       ; positive -> trunc is floor
 
-.was_negative
-    ; And subtract 1
+    ; negative with fraction: trunc - 1
     push de
     push hl
     ld de,$3f80
     ld hl,$0000
-    call m32_fssub_callee
-    ret
+    jp m32_fssub_callee

@@ -15,15 +15,13 @@ PUBLIC _m32_ceilf
 ; Entry: dehl = floating point number
 .m32_ceil_fastcall
     call m32_discardfraction
+    ret NC                      ; already integer
     bit 7,d
-    ret NZ
+    ret NZ                      ; negative -> trunc is ceil
 
-.was_positive
-    ; Add 1
+    ; positive with fraction: trunc + 1
     push de
     push hl
     ld de,$3f80
     ld hl,$0000
-    call m32_fsadd_callee
-    ret
-
+    jp m32_fsadd_callee

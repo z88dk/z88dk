@@ -298,10 +298,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .foverflow
     ld a,b
     and 080h
-    or 07fh
+    or 07fh                     ; max exponent, preserve sign
     ld d,a
-    ld e,0ffh
-    ld hl,0ffffh                ; max number
+    ld e,080h                   ; IEEE infinity (zero mantissa)
+    ld hl,0
     scf                         ; error
     ret
 
