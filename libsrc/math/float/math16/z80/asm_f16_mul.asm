@@ -43,6 +43,7 @@ EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
+EXTERN asm_f24_nan
 
 PUBLIC asm_f16_mul_callee
 
@@ -75,28 +76,48 @@ PUBLIC asm_f24_mul_f24
     push bc                     ; return address on stack
 
 .asm_f24_mul_f24
-    ld a,e                      ; place op1.s in a[7]
-    exx                         ; x     d' = eeeeeeee e' = s------- hl' = 1mmmmmmm mmmmmmmm
+    ; On entry (from f16_mul_callee): x in DEHL, y in DEHL'.
+    ; After sign setup: main = y, ' = x; product sign in af'.
+    ld a,e                      ; x.s
+    exx                         ; main = y, ' = x
 
-    xor a,e                     ; xor sign flags
-    ex af,af                    ; save sign flag in a[7]' and f' reg
+    xor a,e                     ; product sign
+    ex af,af                    ; save sign in f'
 
-    ld a,d                      ; calculate the exponent
-    or a                        ; second exponent zero then result is zero
-    jr Z,mulzero
+    ld a,d                      ; y.exp
+    or a
+    jr Z,mul_y_zero
+
+    inc a
+    jr Z,mul_y_special          ; y.exp was 0xff (Inf/NaN)
+    dec a                       ; restore y.exp
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
 
-    exx
+    exx                         ; main = x
 
+    ld b,a
+    ld a,d                      ; x.exp
+    or a
+    jr Z,mulzero                ; x == 0, y finite nonzero
+    inc a
+    jr Z,mul_x_special          ; x Inf/NaN, y finite nonzero
+    ld a,b
     add a,d
     jr C,mulovl
     jr fmnouf
 
 .fmchkuf
-    exx
+    exx                         ; main = x
 
+    ld b,a
+    ld a,d                      ; x.exp
+    or a
+    jr Z,mulzero
+    inc a
+    jr Z,mul_x_special
+    ld a,b
     add a,d                     ; add the exponents
     jr NC,mulzero
 
@@ -153,6 +174,44 @@ ENDIF
     ld d,b                      ; put exponent in d
     ld e,c                      ; put sign into e[7]
     ret                         ; return half float f24
+
+.mul_y_zero
+    ; y == 0: NaN if x is Inf/NaN, else signed zero
+    exx                         ; main = x
+    ld a,d
+    inc a
+    jr Z,mulnan                 ; x special * 0
+    jr mulzero
+
+.mul_y_special
+    ; y Inf/NaN (d still 0xff)
+    ld a,h
+    or l
+    jr NZ,mulnan                ; y is NaN
+    exx                         ; main = x; y is Inf
+    ld a,d
+    or a
+    jr Z,mulnan                 ; Inf * 0
+    inc a
+    jr Z,mul_xy_special         ; x also special
+    jr mulovl                   ; Inf * finite -> signed Inf
+
+.mul_x_special
+    ; x Inf/NaN, y finite nonzero (main = x)
+    ld a,h
+    or l
+    jr NZ,mulnan
+    jr mulovl                   ; Inf * finite
+
+.mul_xy_special
+    ; x special, y Inf (main = x)
+    ld a,h
+    or l
+    jr NZ,mulnan                ; x NaN
+    jr mulovl                   ; Inf * Inf
+
+.mulnan
+    jp asm_f24_nan
 
 .mulovl
     ex af,af                    ; get sign
