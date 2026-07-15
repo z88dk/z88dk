@@ -51,7 +51,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsconst_nzero, m32_fsconst_pzero
-EXTERN m32_fsconst_ninf, m32_fsconst_pinf
+EXTERN m32_fsconst_ninf, m32_fsconst_pinf, m32_fsconst_pnan
 EXTERN m32_mulu_32h_24x24
 
 PUBLIC m32_fsmul, m32_fsmul_callee
@@ -148,7 +148,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fm2
     inc b
-    jr Z,mulovl
+    jp Z,m32_fsconst_pnan       ; capture overflow from NaN
+    inc b
+    jr Z,mulovl                 ; capture overflow into Inf
+    dec b
 
 .fm3
     ld a,e
