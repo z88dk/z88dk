@@ -69,10 +69,6 @@ PUBLIC asm_f32_f16
 
 ; convert f24 to f16
 .asm_f16_f24
-    ld a,d
-    inc a
-    jr Z,f16_f24_maxexp         ; d == 0xff: f24 Inf or NaN
-
     ld a,l                      ; rounding using 3 lost bits
     and 00eh
     ld a,l
@@ -109,18 +105,6 @@ PUBLIC asm_f32_f16
     ld h,a
     ret
 
-.f16_f24_maxexp
-    ; d = 0xff: Inf if mant==0, else NaN (preserve sign in e[7])
-    ld a,h
-    or l
-    jp Z,asm_f16_inf
-    ld a,e
-    and 080h
-    or 07ch                     ; max exp, sign
-    ld h,a
-    ld l,080h                   ; quiet NaN payload (nonzero mant)
-    ret
-
 ; convert f32 to f16
 .asm_f16_f32
     call asm_f24_f32
@@ -137,23 +121,9 @@ PUBLIC asm_f32_f16
     rr hl
     and 01Fh                    ; separate exponent
     jp Z,asm_f24_zero           ; zero if number was zero
-    cp 31
-    jr Z,f24_f16_maxexp         ; half Inf / NaN
     add a,127-15                ; convert bias to 8 bits
     ld d,a
     scf                         ; set implicit bit
     rr hl                       ; align mantissa to hl
-    ret
-
-.f24_f16_maxexp
-    ; half exp == 31: Inf if mant==0, else NaN. Use d=0xff (asm_f24_inf class).
-    ld a,e
-    and 080h                    ; sign only in e[7]
-    ld e,a
-    ld d,0ffh
-    ld a,h
-    or l
-    ret NZ                      ; NaN: keep mantissa payload, d=0xff
-    ; Inf: mantissa already zero
     ret
 

@@ -24,8 +24,10 @@ PUBLIC asm_f24_nan
 PUBLIC asm_f16_nan
 
 .asm_f24_nan
-    ld de,0FF00h                ; d=0xff exp, e=0 (+), hl nonzero payload
-    ld hl,04000h                ; must be nonzero (else would be Inf)
+    ; Same exp class as asm_f24_inf (143); nonzero mant → half Inf via pack
+    ; (master pack has no separate f24 NaN path; use packed asm_f16_nan for half).
+    ld de,08F00h                ; d=143, e=0
+    ld hl,04000h
     ret
 
 .asm_f16_nan

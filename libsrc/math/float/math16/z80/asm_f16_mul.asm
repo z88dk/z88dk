@@ -43,7 +43,6 @@ EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
-EXTERN asm_f24_nan
 
 PUBLIC asm_f16_mul_callee
 
@@ -76,23 +75,20 @@ PUBLIC asm_f24_mul_f24
     push bc                     ; return address on stack
 
 .asm_f24_mul_f24
-    ; On entry (from f16_mul_callee): x in DEHL, y in DEHL'.
-    ; After sign setup: main = y, ' = x; product sign in af'.
-    ld a,e                      ; x.s
-    exx                         ; main = y, ' = x
+    ; Low-tax finite path (master + one-sided zero like math32).
+    ; Inf/NaN algebra is not done here; half specials are handled at
+    ; pack/expand (exp→half) and packed helpers (mul2/ldexp/…).
+    ld a,e                      ; place op1.s in a[7]
+    exx                         ; y in main, x in '
 
-    xor a,e                     ; product sign
+    xor a,e                     ; xor sign flags
     ex af,af                    ; save sign in f'
 
     ld a,d                      ; y.exp
     or a
-    jr Z,mul_y_zero
+    jr Z,mulzero                ; y == 0 → signed zero
 
-    inc a
-    jr Z,mul_y_special          ; y.exp was 0xff (Inf/NaN)
-    dec a                       ; restore y.exp
-
-    sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
+    sub a,07fh                  ; subtract bias
     jr C,fmchkuf
 
     exx                         ; main = x
@@ -100,11 +96,9 @@ PUBLIC asm_f24_mul_f24
     ld b,a
     ld a,d                      ; x.exp
     or a
-    jr Z,mulzero                ; x == 0, y finite nonzero
-    inc a
-    jr Z,mul_x_special          ; x Inf/NaN, y finite nonzero
+    jr Z,mulzero                ; 0 * finite → signed zero
     ld a,b
-    add a,d
+    add a,d                     ; sum of exponents
     jr C,mulovl
     jr fmnouf
 
@@ -115,8 +109,6 @@ PUBLIC asm_f24_mul_f24
     ld a,d                      ; x.exp
     or a
     jr Z,mulzero
-    inc a
-    jr Z,mul_x_special
     ld a,b
     add a,d                     ; add the exponents
     jr NC,mulzero
@@ -160,10 +152,7 @@ ENDIF
 
 .fm2
     inc b
-    jr Z,mulovl_bc              ; wrapped 0xff → 0
-    ld a,b
-    inc a
-    jr Z,mulovl_bc              ; b == 0xff (was 0xfe): not finite d=0xff
+    jr Z,mulovl
 
 .fm3
     ex de,hl                    ; put 16 bit mantissa in place, de into hl
@@ -174,54 +163,9 @@ ENDIF
     set 0,l
 
 .fm4
-    ld a,b
-    inc a
-    jr Z,mulovl_bc              ; exp sum == 0xff without inc: true oflow
     ld d,b                      ; put exponent in d
     ld e,c                      ; put sign into e[7]
-    ret                         ; return half float f24
-
-.mulovl_bc
-    ld e,c                      ; sign in e[7] (from push af flags)
-    jp asm_f24_inf
-
-.mul_y_zero
-    ; y == 0: NaN if x is Inf/NaN, else signed zero
-    exx                         ; main = x
-    ld a,d
-    inc a
-    jr Z,mulnan                 ; x special * 0
-    jr mulzero
-
-.mul_y_special
-    ; y Inf/NaN (d still 0xff)
-    ld a,h
-    or l
-    jr NZ,mulnan                ; y is NaN
-    exx                         ; main = x; y is Inf
-    ld a,d
-    or a
-    jr Z,mulnan                 ; Inf * 0
-    inc a
-    jr Z,mul_xy_special         ; x also special
-    jr mulovl                   ; Inf * finite -> signed Inf
-
-.mul_x_special
-    ; x Inf/NaN, y finite nonzero (main = x)
-    ld a,h
-    or l
-    jr NZ,mulnan
-    jr mulovl                   ; Inf * finite
-
-.mul_xy_special
-    ; x special, y Inf (main = x)
-    ld a,h
-    or l
-    jr NZ,mulnan                ; x NaN
-    jr mulovl                   ; Inf * Inf
-
-.mulnan
-    jp asm_f24_nan
+    ret                         ; return f24 in DEHL
 
 .mulovl
     ex af,af                    ; get sign

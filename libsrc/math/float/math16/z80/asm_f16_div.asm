@@ -81,9 +81,30 @@ PUBLIC asm_f24_div_callee
 
 ; enter here for floating asm_f16_inv, 1/y, y in hl, result in hl
 .asm_f16_inv
+    ld a,$7c                    ; packed half specials at boundary only
+    and h
+    cp $7c
+    jr Z,inv_half_max
+
     call asm_f24_f16
     call asm_f24_inv
     jp asm_f16_f24
+
+.inv_half_max
+    ld a,h                      ; Inf → ±0, NaN → qNaN
+    and 003h
+    or l
+    jr NZ,inv_half_nan
+    and a                       ; clear
+    ld a,h
+    and 080h
+    ld h,a
+    ld l,0
+    ret                         ; signed zero
+
+.inv_half_nan
+    ld hl,07C80h                ; +qNaN
+    ret
 
 
 ; enter here for floating asm_f24_inv, 1/y, y in dehl, result in dehl
@@ -91,8 +112,9 @@ PUBLIC asm_f24_div_callee
     ld a,d
     or a
     jp Z,asm_f24_inf            ; 1/0 → ±Inf (sign in e)
-    inc a
-    jr Z,inv_max                ; d was 0xff (Inf/NaN)
+    ; half Inf expands to d=143; rare, not on finite Newton path
+    cp 127-15+31
+    jr NC,inv_hi
 
     push de                     ; save sign and exponent
 
@@ -181,12 +203,14 @@ PUBLIC asm_f24_div_callee
     ld d,a                      ; new exponent to d
     ret                         ; return f24 in DEHL
 
-.inv_max
+.inv_hi
+    ; d >= 143: Inf (mant == hidden only) → ±0; else NaN
     ld a,h
+    and 07fh
     or l
-    jr NZ,inv_nan               ; 1/NaN → NaN
-    jp asm_f24_zero             ; 1/Inf → ±0 (sign in e)
+    jr NZ,inv_hi_nan
+    jp asm_f24_zero
 
-.inv_nan
+.inv_hi_nan
     jp asm_f24_nan
 
