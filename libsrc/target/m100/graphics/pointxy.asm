@@ -21,26 +21,26 @@
 
 
 
-;LABEL				M100	KC85	M10
+;LABEL              M100    KC85    M10
 ;----------------------------------------
-;SHAPE				$FFEC	$FFAD	$FF90
-;SETINT_1D			$765C	$730A	$7376
-;SET_LCD_ADDR		$753B	$71E9	$7255
-;SET_LCD			$74F5	$71A3	$720F
-;GET_LCD			$74F6	$71A4	$7210
-;SET_CLOCK_HL_16	$743C	$70EA	$7146
-;PLOT_TBL			$7643	$72F1	$735D
-;PLOT_TBL2			$764D	$72FB	$7367
+;SHAPE              $FFEC   $FFAD   $FF90
+;SETINT_1D          $765C   $730A   $7376
+;SET_LCD_ADDR       $753B   $71E9   $7255
+;SET_LCD            $74F5   $71A3   $720F
+;GET_LCD            $74F6   $71A4   $7210
+;SET_CLOCK_HL_16    $743C   $70EA   $7146
+;PLOT_TBL           $7643   $72F1   $735D
+;PLOT_TBL2          $764D   $72FB   $7367
 
 
-defc SHAPE				= $FFEC
-defc SETINT_1D			= $765C
-defc SET_LCD_ADDR		= $753B
-defc SET_LCD			= $74F5
-defc GET_LCD			= $74F6
-defc SET_CLOCK_HL_16	= $743C
-defc PLOT_TBL			= $7643
-defc PLOT_TBL2			= $764D
+defc SHAPE              = $FFEC
+defc SETINT_1D          = $765C
+defc SET_LCD_ADDR       = $753B
+defc SET_LCD            = $74F5
+defc GET_LCD            = $74F6
+defc SET_CLOCK_HL_16    = $743C
+defc PLOT_TBL           = $7643
+defc PLOT_TBL2          = $764D
 
 
 pointxy:
