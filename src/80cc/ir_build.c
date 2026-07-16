@@ -4430,9 +4430,26 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            word via the arm MOVs. */
         int rw = n->type ? width_for_kind(n->type->kind) : 2;
         if (rw <= 0) rw = 2;
-        int result  = get_dest_vreg(b, hint, rw);
-        b->f->vregs[result].width = (int16_t)rw;
-        if (n->type) b->f->vregs[result].kind = n->type->kind;
+        Kind rk = n->type ? (Kind)n->type->kind : KIND_INT;
+        /* Reuse the caller's hint only when it ALREADY has the ternary's type.
+           Stamping the hint's kind/width to the ternary type corrupts a live
+           variable of a different type: `long v = c ? i-j : 0` passes v (long)
+           as the hint, and re-typing it to the int ternary makes the arms store
+           2 bytes into the 4-byte local — a later consistency pass restores v to
+           long/width-4 while the arm binop keeps int operands, so the widened
+           read aborts (register-only) or silently reads garbage. Fresh temp of
+           the ternary's own type otherwise; the caller (build_assign) converges
+           the width with a CONV. */
+        int result;
+        if (hint >= 0
+            && b->f->vregs[hint].width == (int16_t)rw
+            && (Kind)b->f->vregs[hint].kind == rk) {
+            result = hint;
+        } else {
+            result = new_temp(b, rw);
+            b->f->vregs[result].width = (int16_t)rw;
+            b->f->vregs[result].kind  = rk;
+        }
 
         /* Short-circuit the condition (arms produce the value). Targets are
            pre-created above so their ids stay above the test block. */
@@ -6261,8 +6278,10 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        count is an imm / width-2 vreg, not an arithmetic operand);
        pointer results keep 16-bit address math. */
     int is_shift = (k == IR_SHL || k == IR_SHR);
-    int is_ptrish = (n->type && n->type->kind == KIND_PTR)
-                 || (lhs->type && lhs->type->kind == KIND_PTR);
+    int is_ptrish = (n->type && (n->type->kind == KIND_PTR
+                                 || n->type->kind == KIND_ARRAY))
+                 || (lhs->type && (lhs->type->kind == KIND_PTR
+                                   || lhs->type->kind == KIND_ARRAY));
     /* Byte compare against a byte-range constant: an unsigned char compared to a
        constant in [0,255] (`c == ' '`, `c >= 'a'`, `c <= 'z'`) stays a byte `cp`
        instead of widening c to int for a 16-bit compare — the C-promotion is
@@ -6402,6 +6421,27 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        BOTH operands at the binop width, so a narrower vreg would
        contribute a garbage high half. Shifts keep their width-2
        count; pointer math stays 16-bit. */
+    /* Pointer/array + integer: the address stays 16-bit, so the index is
+       converged to the BASE width — a WIDER index (`arr[longvar]`) is TRUNCATED
+       (not widened into the base, which would sign-extend the base pointer to a
+       bogus 4-byte "address" then read a register-only DEHL as a 16-bit address:
+       sp masks it, fp aborts), and a NARROWER index (`arr[char_c]`) is extended
+       as before. CPTR is a genuine 4-byte far pointer, so its arithmetic keeps
+       width 4 (excluded from is_ptrish). */
+    if (is_ptrish && !is_shift && !is_cmp
+        && b->f->vregs[r].width != width) {
+        OpKind cvk;
+        if (b->f->vregs[r].width > width)
+            cvk = IR_CONV_TRUNC;
+        else
+            cvk = (!rhs->type || rhs->type->isunsigned)
+                ? IR_CONV_ZX : IR_CONV_SX;
+        int wtmp = new_temp(b, width);
+        b->f->vregs[wtmp].width = (int16_t)width;
+        Op *cv = ir_op_emit(cur_bb(b), cvk);
+        cv->dst = wtmp; cv->src[0] = r;
+        r = wtmp;
+    }
     if (!is_shift && !is_ptrish
         && b->f->vregs[r].width != width) {
         if (b->f->vregs[r].width > width) {

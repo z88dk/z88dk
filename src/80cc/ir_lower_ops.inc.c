@@ -1072,6 +1072,17 @@ static int gen_asm(FILE *out, Func *f, const Op *op)
 
 static int gen_neg(FILE *out, Func *f, const Op *op)
 {
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
+        /* Byte NEG: A = -src[0], stored as ONE byte. Without this the width-2
+           fallback below (commit_hl_word) writes two bytes into a one-byte slot
+           — the extra byte clobbers the neighbouring slot (e.g. a byte-narrowed
+           `r` overwriting the low byte of an adjacent long). `cpl;add a,1` is the
+           two's-complement (~x+1), the same portable idiom as the width-4 path. */
+        load_byte_to_a(out, f, op->src[0]);
+        emit(out, "cpl");
+        emit(out, "add\ta,1");
+        return finalize_byte_result(out, f, op, 1);
+    }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Long NEG: DEHL = 0 - src[0], done as ~x + 1 byte-wise to
            avoid l_long_sub for a trivial constant LHS. */

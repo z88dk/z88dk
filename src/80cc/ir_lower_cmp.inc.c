@@ -388,6 +388,26 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             emit(out, "inc\thl");
             emit(out, "ld\ta,d");
             emit(out, "sbc\ta,(hl)");
+        } else if (slot_off(f, op->src[0]) < 0) {
+            /* src[0] is register-only (no backing slot — e.g. a CONV_SX result
+               that rides DEHL): it can't be reloaded, so load and PUSH it FIRST,
+               then bring in src[1]. Computes LHS(stack) - RHS(DEHL) — same A and
+               flags as the fallback (which loads src[1] first then reloads
+               src[0], evicting the unreloadable operand). */
+            load_to_dehl(out, f, op->src[0]);   /* LHS → DEHL (cache hit) */
+            emit(out, "push\tde");
+            emit(out, "push\thl");
+            load_to_dehl_adj(out, f, op->src[1], 4);   /* RHS → DEHL (src[1] has a slot) */
+            emit(out, "pop\tbc");        /* BC = LHS low */
+            emit(out, "ld\ta,c");
+            emit(out, "sub\tl");
+            emit(out, "ld\ta,b");
+            emit(out, "sbc\ta,h");
+            emit(out, "pop\tbc");        /* BC = LHS high */
+            emit(out, "ld\ta,c");
+            emit(out, "sbc\ta,e");
+            emit(out, "ld\ta,b");
+            emit(out, "sbc\ta,d");
         } else {
             /* Fallback: stage both via push/pop. */
             load_to_dehl(out, f, op->src[1]);

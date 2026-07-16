@@ -947,6 +947,43 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         if (!no_hl) hl_about_to_change(vreg_id);
         return;
     }
+    /* Narrower-than-long vreg read AS a long: load it at its OWN width and
+       sign-extend into DEHL — the C integer widening (char/int → long) — rather
+       than reading `width` valid bytes plus (4-width) garbage bytes past its
+       (narrower) slot. This makes a kind/width-split vreg (kind LONG but width 2,
+       e.g. a long-typed `x+r` whose int operands leave it width-2) read back
+       correctly wherever it is later used as a long, instead of pulling a
+       neighbouring slot's bytes in as the high half. */
+    if (f->vregs[vreg_id].width == 2) {
+        int save = L.cur_sp_adjust;
+        L.cur_sp_adjust += sp_adj;              /* sp-rel slot at sp+sp_adj (fp: ignored) */
+        load_to_hl(out, f, vreg_id);            /* HL = the 2 valid bytes */
+        L.cur_sp_adjust = save;
+        emit(out, "push\taf");                  /* preserve caller's A/flags */
+        emit(out, "ld\ta,h");
+        emit(out, "rlca");
+        emit(out, "sbc\ta,a");                  /* A = 0x00 / 0xFF (sign of HL) */
+        emit(out, "ld\te,a");
+        emit(out, "ld\td,a");                   /* DE = sign extension */
+        emit(out, "pop\taf");
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
+    if (f->vregs[vreg_id].width == 1) {
+        int save = L.cur_sp_adjust;
+        L.cur_sp_adjust += sp_adj;
+        load_byte_to_a(out, f, vreg_id);        /* A = the byte */
+        L.cur_sp_adjust = save;
+        emit(out, "ld\tl,a");
+        emit(out, "rlca");
+        emit(out, "sbc\ta,a");
+        emit(out, "ld\th,a");
+        emit(out, "ld\te,a");
+        emit(out, "ld\td,a");                   /* DEHL = sign-extended byte */
+        invalidate_a_cache();
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
     /* FP-relative long load. sp_adj is irrelevant for the IX-addressed
        path below, but NOT for the TOS pop/push trick (sp-relative): with
        sp_adj>0 the slot is at sp+sp_adj, so the trick would pop the
