@@ -1,3 +1,8 @@
+%title #AF adjacent push/pop of the same reg is a no-op (stack park, no clobber between) (-2b)
+	push	%1
+	pop	%1
+=
+
 %title #269 elide char store-then-reload of same FP slot (-3b, -19t)
 	ld	(ix%1),a
 	ld	a,(ix%1)
@@ -236,8 +241,8 @@
 	ld	a,(ix%2)
 	xor	(ix%1)
 	ld	l,a
-	ld	a,(ix%eval(%2 1 +))
-	xor	(ix%eval(%1 1 +))
+	ld	a,(ix+%eval(%2 1 +))
+	xor	(ix+%eval(%1 1 +))
 	ld	h,a
 
 %title #285r-and 16-bit slot AND via byte-direct and (ix+d) (z80, -4b, -16t)
@@ -259,8 +264,8 @@
 	ld	a,(ix%2)
 	and	(ix%1)
 	ld	l,a
-	ld	a,(ix%eval(%2 1 +))
-	and	(ix%eval(%1 1 +))
+	ld	a,(ix+%eval(%2 1 +))
+	and	(ix+%eval(%1 1 +))
 	ld	h,a
 
 %title #286 IR gbz80 fuse slot-addr ld hl,N + add hl,sp -> ld hl,sp+N (-2b, -7t)
@@ -356,3 +361,53 @@
 =
 	ld	de,%1
 	ld	hl,%2
+
+%title #290 post-increment: dec instead of reloading the pre-inc value saved in a frame slot (-2b)
+	ld	(ix%1),hl
+	inc	hl
+	%"ld	\((_[A-Za-z0-9_]*)\),hl"2
+	ld	hl,(ix%1)
+=
+	ld	(ix%1),hl
+	inc	hl
+	ld	(%2),hl
+	dec	hl
+
+%title #290 iy variant
+	ld	(iy%1),hl
+	inc	hl
+	%"ld	\((_[A-Za-z0-9_]*)\),hl"2
+	ld	hl,(iy%1)
+=
+	ld	(iy%1),hl
+	inc	hl
+	ld	(%2),hl
+	dec	hl
+
+%title #291 const/sym returned via DE across an sp-adjust: reload in HL, drop ex de,hl (-1b,-4t)
+	%"ld	de,([_0-9][_0-9a-zA-Z+]*)"1
+	ld	hl,%2
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl
+=
+	ld	hl,%2
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%1
+
+%title #292 drop redundant reload of an ix-slot value still in HL (ld hl,(ix);ld (ix),hl;ld hl,(ix)) (-3b)
+	ld	hl,(ix%1)
+	ld	(ix%2),hl
+	ld	hl,(ix%1)
+=
+	ld	hl,(ix%1)
+	ld	(ix%2),hl
+
+%title #292 iy variant
+	ld	hl,(iy%1)
+	ld	(iy%2),hl
+	ld	hl,(iy%1)
+=
+	ld	hl,(iy%1)
+	ld	(iy%2),hl
