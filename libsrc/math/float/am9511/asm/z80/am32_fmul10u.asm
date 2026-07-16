@@ -21,6 +21,10 @@ PUBLIC asm_am9511_fmul10u_fastcall
     rl d
     jr Z,zero_legal             ; return IEEE zero
 
+    ld a,d
+    inc a
+    jr Z,exp_max                ; Inf/NaN: force non-negative, keep payload
+
     scf                         ; set hidden bit
     rr e                        ; return mantissa to ehl
 
@@ -73,12 +77,14 @@ PUBLIC asm_am9511_fmul10u_fastcall
 
     ret                         ; return IEEE signed ZERO in DEHL
 
-.infinity
-    ld de,0
-    ld hl,de
-
-    dec d                       ; 0xff
-    rr d                        ; restore the sign and exponent
+.exp_max
+    rr d
     rr e
+    res 7,d                     ; mul10u is non-negative (Z80; asm/z80 only)
+    ret
+
+.infinity
+    ld de,$7f80                 ; +Inf
+    ld hl,0
     scf
     ret                         ; return IEEE signed INFINITY in DEHL

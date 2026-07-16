@@ -75,28 +75,41 @@ PUBLIC asm_f24_mul_f24
     push bc                     ; return address on stack
 
 .asm_f24_mul_f24
+    ; Low-tax finite path (master + one-sided zero like math32).
+    ; Inf/NaN algebra is not done here; half specials are handled at
+    ; pack/expand (exp→half) and packed helpers (mul2/ldexp/…).
     ld a,e                      ; place op1.s in a[7]
-    exx                         ; x     d' = eeeeeeee e' = s------- hl' = 1mmmmmmm mmmmmmmm
+    exx                         ; y in main, x in '
 
     xor a,e                     ; xor sign flags
-    ex af,af                    ; save sign flag in a[7]' and f' reg
+    ex af,af                    ; save sign in f'
 
-    ld a,d                      ; calculate the exponent
-    or a                        ; second exponent zero then result is zero
-    jr Z,mulzero
+    ld a,d                      ; y.exp
+    or a
+    jr Z,mulzero                ; y == 0 → signed zero
 
-    sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
+    sub a,07fh                  ; subtract bias
     jr C,fmchkuf
 
-    exx
+    exx                         ; main = x
 
-    add a,d
+    ld b,a
+    ld a,d                      ; x.exp
+    or a
+    jr Z,mulzero                ; 0 * finite → signed zero
+    ld a,b
+    add a,d                     ; sum of exponents
     jr C,mulovl
     jr fmnouf
 
 .fmchkuf
-    exx
+    exx                         ; main = x
 
+    ld b,a
+    ld a,d                      ; x.exp
+    or a
+    jr Z,mulzero
+    ld a,b
     add a,d                     ; add the exponents
     jr NC,mulzero
 
@@ -152,7 +165,7 @@ ENDIF
 .fm4
     ld d,b                      ; put exponent in d
     ld e,c                      ; put sign into e[7]
-    ret                         ; return half float f24
+    ret                         ; return f24 in DEHL
 
 .mulovl
     ex af,af                    ; get sign

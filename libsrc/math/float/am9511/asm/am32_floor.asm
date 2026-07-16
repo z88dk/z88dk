@@ -27,12 +27,14 @@ PUBLIC asm_am9511_floor_fastcall
 ; Entry: dehl = floating point number
 .asm_am9511_floor_fastcall
     call asm_am9511_discardfraction
+    ret NC                          ; already integer (8080-safe)
+
     ld a,d
-    rla
-    ret NC
+    rla                             ; sign -> C
+    ret NC                          ; positive with fraction: trunc is floor
 
 .was_negative
-    ; And subtract 1
+    ; negative with fraction: trunc - 1
     call asm_am9511_pushf_fastcall  ; x
     ld de,$3f80
     ld hl,$0000

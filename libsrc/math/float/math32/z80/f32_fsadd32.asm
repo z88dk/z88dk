@@ -258,9 +258,9 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ret
 
 .foverflow
-    ld b,07fh
-    ld de,0ffffh
-    ld hl,0ffffh                ; max number
+    ld b,0ffh                   ; IEEE Inf exponent
+    ld de,08000h                ; mantissa 0x80000000
+    ld hl,0
     scf                         ; error
     ret
 

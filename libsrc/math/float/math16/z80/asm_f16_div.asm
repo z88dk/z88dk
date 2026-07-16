@@ -79,16 +79,37 @@ PUBLIC asm_f24_div_callee
 
 ; enter here for floating asm_f16_inv, 1/y, y in hl, result in hl
 .asm_f16_inv
+    ld a,$7c                    ; packed half specials at boundary only
+    and h
+    cp $7c
+    jr Z,inv_half_max
+
     call asm_f24_f16
     call asm_f24_inv
     jp asm_f16_f24
 
+.inv_half_max
+    ld a,h                      ; Inf → ±0, NaN → qNaN
+    and 003h
+    or l
+    jr NZ,inv_half_nan
+    and a                       ; clear
+    ld a,h
+    and 080h
+    ld h,a
+    ld l,0
+    ret                         ; signed zero
+
+.inv_half_nan
+    ld hl,07C80h                ; +qNaN
+    ret
+
 
 ; enter here for floating asm_f24_inv, 1/y, y in dehl, result in dehl
 .asm_f24_inv
-    inc d
-    dec d
-    jp Z,asm_f24_inf            ; check for zero, infinite result
+    ld a,d
+    or a
+    jp Z,asm_f24_inf            ; 1/0 → ±Inf (sign in e)
 
     push de                     ; save sign and exponent
 

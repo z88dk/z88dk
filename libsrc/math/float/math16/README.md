@@ -71,10 +71,23 @@ An expanded 16-bit internal mantissa is used to calculate all functions. 16-bit 
 This format is provided for both the multiply and add intrinsic internal 16-bit mantissa functions, from which other functions are derived, and is referred to as `_f24` in the library.
 
 ```
-  unpacked floating point format: exponent right justified in d, sign in e[7],  mantissa in hl
+  unpacked floating point format: exponent in d, sign in e[7], mantissa in hl
 
-  dehl = eeeeeeeee s....... 1mmmmmmm mmmmmmmm (e-exponent, s-sign, m-mantissa)
+  d    = eeeeeeee     8-bit exponent, bias 127 (same scale as binary32)
+  e    = s.......     sign in bit 7
+  hl   = 1mmmmmmm mmmmmmmm   16-bit mantissa with explicit leading 1
 
+  Conversion from packed half (bias 15):
+    half_exp 0      -> f24 zero
+    half_exp 1..30  -> d = half_exp + (127-15)   ; 113 .. 142  (finite)
+    half_exp 31     -> d = 0xff, hl = 0 (Inf) or hl != 0 (NaN); sign in e[7]
+  Overflow Inf from f24 arithmetic also uses d = 0xff (asm_f24_inf).
+
+  Conversion back to half (asm_f16_f24):
+    d < 113     -> ±0
+    d 113..142  -> finite half_exp 1..30
+    d >= 143 and d != 0xff -> ±Inf (overflow)
+    d == 0xff   -> ±Inf if hl==0, else ±NaN
 ```
 
 ## Calling Convention

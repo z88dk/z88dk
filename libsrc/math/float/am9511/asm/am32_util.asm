@@ -31,11 +31,7 @@ PUBLIC asm_am9511_eexit
 ; here to return a legal zero of sign h in hlde
 .asm_am9511_zero_hlde
     ex de,hl
-
-
-; here to change underflow to a error floating zero
-.asm_am9511_min
-
+    ; fall through to asm_am9511_zero (not min)
 
 ; here to return a legal zero of sign d in dehl
 .asm_am9511_zero
@@ -44,6 +40,12 @@ PUBLIC asm_am9511_eexit
     ld d,a
     ld hl,0
     ld e,h
+    ret
+
+; here to change underflow to a error floating zero
+.asm_am9511_min
+    call asm_am9511_zero        ; signed zero in dehl (8080-safe)
+    scf                         ; C set for error (match m32_fsmin)
     ret
 
 

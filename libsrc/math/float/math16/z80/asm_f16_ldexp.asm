@@ -29,16 +29,21 @@ PUBLIC asm_f16_ldexp
     ; exit  :    hl = 16-bit result
     ;            carry reset
     ;
-    ;
     ; uses  : af, bc, de, hl
 
+    ld a,$7c                    ; isolate packed exponent
+    and h
+    jr Z,ldexp_expand           ; zero exp
+    cp $7c
+    ret Z                       ; Inf/NaN: HL unchanged
+
+.ldexp_expand
     call asm_f24_f16            ; convert to expanded format
 
     ld a,d                      ; get the exponent
     and a
     jp Z,asm_f16_zero           ; return IEEE signed zero
 
-    add c                       ; pw2
+    add a,c                     ; exp + pw2 (low byte; same as master add c)
     ld d,a                      ; exponent returned
-    jp asm_f16_f24              ; return IEEE HL half_t
-
+    jp asm_f16_f24              ; pack: under → 0, over → Inf

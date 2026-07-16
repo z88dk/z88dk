@@ -85,7 +85,7 @@ PUBLIC asm_f32_f16
     ld l,a                      ; mantissa lsb to l
 
     ld a,d                      ; exponent to a
-    sub a,127-15                ; convert to f24 bias
+    sub a,127-15                ; convert from f24 bias to half exp
     jp M,asm_f16_zero           ; zero if number too small
     cp 31
     jp NC,asm_f16_inf           ; infinity if number too large

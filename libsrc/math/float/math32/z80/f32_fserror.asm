@@ -2,8 +2,6 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fsmax
-
 EXTERN m32_fsconst_pzero
 EXTERN m32_fsconst_one
 EXTERN m32_fsconst_pinf
@@ -16,6 +14,7 @@ PUBLIC m32_derror_znc
 PUBLIC m32_derror_nanc
 PUBLIC m32_derror_nannc
 PUBLIC m32_derror_infnc
+PUBLIC m32_derror_ninfnc
 PUBLIC m32_derror_pinfnc
 PUBLIC m32_derror_edom_zc
 PUBLIC m32_derror_edom_infc
@@ -66,8 +65,9 @@ PUBLIC m32_derror_erange_pinfc
 
 .m32_derror_infnc
     exx
-    call m32_fsmax
+    call m32_fsconst_pinf
     exx
+    scf
     ccf
     ret
 
@@ -89,7 +89,7 @@ PUBLIC m32_derror_erange_pinfc
 
 .m32_derror_edom_infc
     exx
-    call m32_fsmax
+    call m32_fsconst_pinf
     exx
     ret
 

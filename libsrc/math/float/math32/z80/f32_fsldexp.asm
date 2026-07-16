@@ -84,18 +84,47 @@ PUBLIC _m32_ldexpf
     sla e                       ; get the exponent
     rl d
     jr Z,zero_legal             ; return IEEE signed zero
-    rr e                        ; save the sign in e[7]
+    rr e                        ; sign in e[7]
 
     ld a,d
-    add c                       ; pw2
-    ld d,a                      ; exponent returned
+    inc a
+    jr Z,ldexp_pack             ; Inf/NaN: unchanged
 
-    sla e                       ; restore sign to C
+    ld a,d
+    add a,c                     ; new_exp = exp + pw2
+    jr C,ldexp_wrap             ; unsigned wrap: over or under
+
+    or a
+    jr Z,ldexp_uflow
+    ld d,a
+    inc a
+    jr Z,ldexp_oflow            ; new_exp == 0xff -> Inf
+
+.ldexp_pack
+    sla e
     rr de
+    or a                        ; NC = success / passthrough
+    ret
 
-    and a                       ; check for zero exponent
-    ret NZ                      ; return IEEE DEHL
-    jp m32_fsmin                ; otherwise return IEEE underflow zero
+.ldexp_wrap
+    bit 7,c
+    jr NZ,ldexp_uflow           ; negative pw2 wrap -> under
+
+.ldexp_oflow
+    ld a,e
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
+    scf
+    ret
+
+.ldexp_uflow
+    sla e                       ; sign to C
+    ld d,0
+    rr d                        ; signed zero in d
+    jp m32_fsmin
 
 .zero_legal
     ld e,d                      ; use 0
