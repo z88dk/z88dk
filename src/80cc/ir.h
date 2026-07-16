@@ -534,7 +534,8 @@ typedef struct {
     /* LRA Phase 4: stage src[1] into BC (`add hl,bc`/`sbc hl,bc`) rather than
        DE, so a DE-packed value (IR_VREG_DE_PACK) survives this op untouched.
        Set by ir_bc_pack when it commits a DE placement whose span covers this
-       ADD/SUB/CMP; honored by load_binop_operands + gen_add/sub/cmp (IR_LRA). */
+       ADD/SUB/CMP; honored by load_binop_operands + gen_add/sub/cmp. Only the
+       experimental IR_LRA_DEPACK path sets this (the default-on LRA never does). */
     uint8_t     lra_stage_src1_bc;
 
     /* Source location for debug / -gcline output. */

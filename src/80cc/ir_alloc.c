@@ -30,6 +30,8 @@
 
 /* -1 = sp mode (no IX/IY frame pointer); else the frame register is live. */
 extern int c_framepointer_is_ix;
+/* When set the platform reserves IY — no IY residency (LRA-IY, idx2/idx3). */
+extern int c_reserve_iy;
 
 /* Word DE-home tentative-pick undo: the picker evicts other PR_DE tenants to
    give the home exclusive DE, which is a net loss if the home's loop doesn't
@@ -1426,22 +1428,21 @@ static int lra_bc_emittable(const Func *f, const Op *o)
 }
 
 /* LRA Phase 2c: is IY available as a reduction-chain home in this function?
-   Needs a CPU with IY + `add iy,de` (excludes gbz80/808x), sp-mode (IY free;
-   -frameiy uses it as the frame ptr — widen to -frameix later), IY not already
-   claimed by idx2/idx3/exx, and not an interrupt/naked function. */
+   Needs a CPU with IY + `add iy,de` (excludes gbz80/808x), IY not reserved by
+   the platform (--reserve-regs-iy) nor claimed by idx2/idx3/exx, and not an
+   interrupt/naked function. IY is free in both sp-mode (-1) and fp-mode (1, IX
+   is the frame). */
 static int lra_iy_available(const Func *f)
 {
     if (f->is_interrupt || f->is_naked) return 0;
+    if (c_reserve_iy) return 0;                 /* IY reserved by the platform */
     /* CPU must have IY + `add iy,de` (excludes gbz80/8080/8085). z180/ez80/rabbit
        support the full-word add iy,rr (only the index-HALF ops trap on z180). */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
           || IS_EZ80() || IS_RABBIT())) return 0;
-    /* IY is free in sp-mode (-1) and -frameix (1, IX is the frame); NOT under
-       -frameiy (0, IY is the frame). The fp epilogue frame fix + IY-occupancy
-       arbitration (below) + the FULL-live-range IY-clean check (rejects an
-       accumulator live across an IY-clobbering call — the remat.c fp miscompile,
-       now fixed) make fp sound. */
-    if (c_framepointer_is_ix == 0) return 0;
+    /* fp soundness: the fp epilogue frame fix + IY-occupancy arbitration (below)
+       + the FULL-live-range IY-clean check (rejects an accumulator live across an
+       IY-clobbering call — the remat.c fp miscompile, now fixed). */
     return 1;   /* IY occupancy handled (with benefit arbitration) in the pass */
 }
 
@@ -1457,7 +1458,7 @@ static int lra_iy_chain_ok(const Func *f, int v)
     return 1;
 }
 
-/* LRA Phase 2c (IR_LRA-gated): home a DE-dirty straight-line reduction chain in
+/* LRA Phase 2c: home a DE-dirty straight-line reduction chain in
    IY. A chain is a run of width-2 ADDs c0=x+y, c1=c0+z, c2=c1+w… where each
    partial feeds the NEXT add as an operand and is otherwise dead (single use),
    all spilling in one loop-body BB. The addends' address computation owns HL+DE
@@ -1466,11 +1467,12 @@ static int lra_iy_chain_ok(const Func *f, int v)
    IY register: c0 inits it (`push hl; pop iy` via commit_hl_result), c1.. via
    `add iy,de` (Phase 2b emitter). Sets f->idx3_reg=IY so vreg_idx_home sees the
    members and the prologue saves IY (frame_has_saved_iy). Runs AFTER ir_bc_pack
-   (takes the SPILL losers) and before ir_stack_spill. Gated; byte-identical off. */
+   (takes the SPILL losers) and before ir_stack_spill. DEFAULT ON; IR_NO_LRA
+   opts out (--reserve-regs-iy also disables it via lra_iy_available). */
 static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
                                  const int *use_count)
 {
-    if (!getenv("IR_LRA")) return;
+    if (getenv("IR_NO_LRA")) return;
     if (!lra_iy_available(f)) return;
 
     /* RAW use counts (the passed use_count is depth-weighted — no good for a
@@ -1828,7 +1830,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         last_fhi = cand[i].fhi;
         packed++;
     }
-    /* ---- DE as a SECOND local home (IR_LRA) -------------------------------
+    /* ---- DE as a SECOND local home (experimental: IR_LRA_DEPACK) ----------
        For the itloc candidates BC couldn't take (BC held by a loop home →
        clash), try DE: place a candidate in DE when its span is DE-CLEAN under
        the RELAXED model (op_clobbers_relaxed — ADD/SUB/CMP stage src[1] into BC
@@ -1842,10 +1844,13 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
        loader structurally blocks — freeing DE needs BC-staging, but BC is
        exactly what's contended in the loops that would benefit, so placements
        come out empty. Kept as the mechanism + measurement; IY is the workaround
-       that actually pays (ir_iy_reduction_pack). See ADR 0003. */
+       that actually pays (ir_iy_reduction_pack). See ADR 0003. Stays behind an
+       explicit opt-in (IR_LRA_DEPACK), NOT the default-on IR_NO_LRA gate: the
+       BC-form emitter is incomplete, so a placement that DID fire would trip the
+       load_binop_operands fail-loud backstop. */
     int de_packed = 0, de_rej_dirty = 0, de_rej_clash = 0, de_avail = 0;
     int de_rej_bc_busy = 0, de_marks = 0, de_rej_noop = 0;
-    if (getenv("IR_LRA")) {
+    if (getenv("IR_LRA_DEPACK")) {
         int de_last = -1;
         for (int i = 0; i < nc; i++) {
             int v = cand[i].vreg;
@@ -2870,8 +2875,8 @@ void ir_alloc(Func *f)
            it only claims BC where no loop home owns it. */
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
                    write_count, use_count);
-        /* LRA Phase 2c (IR_LRA): home a DE-dirty reduction chain in IY (add iy,de),
-           taking the spill losers BC couldn't. Byte-identical off. */
+        /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
+           reduction chain in IY (add iy,de), taking the spill losers BC couldn't. */
         ir_iy_reduction_pack(f, bb_in_loop, use_count);
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
            fallback below BC-pack — a single-def/single-use word transient with

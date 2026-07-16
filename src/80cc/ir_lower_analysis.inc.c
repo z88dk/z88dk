@@ -183,7 +183,8 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
        gen_add/gen_sub, which emit the `add hl,bc` / `sbc hl,bc` form. If a marked
        op reaches the generic DE-staging loader instead, that path would clobber
        the DE resident (silent wrong value), so fail LOUD rather than fall through.
-       Only reachable under IR_LRA (marks are set only there); byte-identical off. */
+       Only reachable under IR_LRA_DEPACK (marks are set only there); the
+       default-on LRA (IY reduction) never sets them. */
     if (op->lra_stage_src1_bc) {
         ir_lower_loc();
         fprintf(stderr, "ir_lower: BC-staged op reached the DE-staging loader "

@@ -7,8 +7,7 @@
 # loadargc() convention. Also locks in the LIBRARY-symbol
 # no-underscore call form.
 #
-# All tests pass `--use-ir`. Without it the IR pipeline isn't
-# engaged and the test is irrelevant.
+# The IR pipeline is the sole codegen path, so every test exercises it.
 
 set -u
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -40,8 +39,8 @@ run_ir_test() {
     local asm="$WORK/$name.asm"
 
     printf '%s\n' "$src" > "$cfile"
-    if ! ( cd "$WORK" && "$COMPILER" --use-ir "$name.c" 2>/dev/null ); then
-        fail=$((fail+1)); failures+=("$name: 80cc --use-ir failed"); return
+    if ! ( cd "$WORK" && "$COMPILER" "$name.c" 2>/dev/null ); then
+        fail=$((fail+1)); failures+=("$name: 80cc failed"); return
     fi
     local slurped
     slurped=$(asm_slurp "$asm")

@@ -29,6 +29,8 @@
    compiler (data.c) but consulted directly here so the lowerer stays
    decoupled from ccdefs.h. */
 extern int c_framepointer_is_ix;
+extern int c_reserve_iy;   /* platform reserves IY — no IY residency */
+extern int c_reserve_ix;   /* platform reserves IX (sp-mode) — no IX residency */
 
 /* Per-TU string-literal queue label number. String literal addresses
    emit as `ld hl,i_<litlab>+<offset>` (IR_LD_STR). */
@@ -2111,19 +2113,19 @@ static void assign_idxhalf_homes(Func *f)
             if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) return;
         }
     /* Candidate halves — never offer halves of the FRAME register (it's used as
-       a pair by every (ix+d)/(iy+d) access, and the frame isn't a vreg so the
-       interval check can't see it). The frame reg is fixed globally by the
-       -frameix/-frameiy option: c_framepointer_is_ix == 1 → IX is the frame,
-       == 0 → IY is the frame, == -1 → sp-mode, neither. (fp_active is per-
-       function but unreliable here — frame_size isn't set until ir_assign_slots
-       runs after this pass; the global choice is the safe, stable gate.) A
-       non-frame index reg's own tenant (an idx2 counter/param) IS a vreg, so its
-       half availability is decided per byte by live-interval overlap below. */
+       a pair by every (ix+d) access, and the frame isn't a vreg so the interval
+       check can't see it), nor of a platform-reserved index register
+       (--reserve-regs-ix/-iy). c_framepointer_is_ix == 1 → IX is the frame,
+       == -1 → sp-mode (no frame). (fp_active is per-function but unreliable here
+       — frame_size isn't set until ir_assign_slots runs after this pass; the
+       global choice is the safe, stable gate.) A non-frame index reg's own
+       tenant (an idx2 counter/param) IS a vreg, so its half availability is
+       decided per byte by live-interval overlap below. */
     PhysReg halves[4]; int nhalves = 0;
-    if (c_framepointer_is_ix != 0) {   /* IY is not the frame */
+    if (!c_reserve_iy) {               /* IY never the frame; offer unless reserved */
         halves[nhalves++] = IR_PR_IYL; halves[nhalves++] = IR_PR_IYH;
     }
-    if (c_framepointer_is_ix != 1) {   /* IX is not the frame */
+    if (c_framepointer_is_ix != 1 && !c_reserve_ix) {   /* IX not the frame nor reserved */
         halves[nhalves++] = IR_PR_IXL; halves[nhalves++] = IR_PR_IXH;
     }
     if (nhalves == 0) { return; }

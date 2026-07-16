@@ -3705,7 +3705,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            and uses an overlapping-`ldir` fill for larger ones. Any const
            count (1..65536, ldir's BC limit) inlines; non-const falls
            through to the library memset (redirected below). */
-        if (strcmp(n->sym->name, "__builtin_memset") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_memset") == 0
             && n_args == 3) {
             Node *cnt = array_get_byindex(n->args, 2);
             if (cnt && cnt->ast_type == AST_LITERAL
@@ -3728,7 +3729,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            tiny counts unroll, larger ones use `ldir`, any const count
            (1..65536) inlines; non-const falls back to the library
            memcpy. memcpy returns dst (the dst vreg still holds it). */
-        if (strcmp(n->sym->name, "__builtin_memcpy") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_memcpy") == 0
             && n_args == 3) {
             Node *cnt = array_get_byindex(n->args, 2);
             if (cnt && cnt->ast_type == AST_LITERAL
@@ -3749,7 +3751,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* Inline __builtin_strcpy (always — variable length, no const
            needed): IR_STRCPY (dst, src), lowered to a NUL-terminated
            copy loop. strcpy returns dst. */
-        if (strcmp(n->sym->name, "__builtin_strcpy") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_strcpy") == 0
             && n_args == 2 && ir_inline_block_ops_ok()) {
             int dst_v = build_expr(b, array_get_byindex(n->args, 0));
             if (dst_v < 0) return -1;
@@ -3765,7 +3768,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            string, src[1] = char vreg (or -1 + imm for a literal char),
            lowered to a scan loop leaving the match pointer / NULL in the
            result vreg. */
-        if (strcmp(n->sym->name, "__builtin_strchr") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_strchr") == 0
             && n_args == 2 && ir_inline_block_ops_ok()) {
             Node *c_node = array_get_byindex(n->args, 1);
             int str_v = build_expr(b, array_get_byindex(n->args, 0));
