@@ -178,17 +178,17 @@ static void compute_home_region(const Func *f, int home,
 */
 static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 {
-    /* LRA Phase 4: this op was marked (ir_bc_pack) to stage src[1] into BC so a
-       DE-packed value in its span survives. The BC-form staging + `hl,bc`
-       emitter are Phase-4 steps 3-4 — not yet implemented. Fail LOUD rather than
-       fall through to the DE-staging path (which would clobber the DE resident →
-       silent wrong value). Only reachable under IR_LRA (marks are set only
-       there); byte-identical off. Step 3 replaces this with the BC-stage load. */
+    /* BACKSTOP: an op marked to stage src[1] into BC (so a DE resident in its
+       span survives — see ir_bc_pack / ADR 0003) is meant to be intercepted by
+       gen_add/gen_sub, which emit the `add hl,bc` / `sbc hl,bc` form. If a marked
+       op reaches the generic DE-staging loader instead, that path would clobber
+       the DE resident (silent wrong value), so fail LOUD rather than fall through.
+       Only reachable under IR_LRA (marks are set only there); byte-identical off. */
     if (op->lra_stage_src1_bc) {
         ir_lower_loc();
-        fprintf(stderr, "ir_lower: LRA Phase-4 BC-staging not yet implemented "
-                "(op marked lra_stage_src1_bc; steps 3-4 pending). Aborting "
-                "rather than emit a DE-clobbering staging load.\n");
+        fprintf(stderr, "ir_lower: BC-staged op reached the DE-staging loader "
+                "(unhandled lra_stage_src1_bc — gen_add/gen_sub should intercept). "
+                "Aborting rather than emit a DE-clobbering staging load.\n");
         exit(1);
     }
     if (op->src[1] < 0) {

@@ -1828,20 +1828,21 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         last_fhi = cand[i].fhi;
         packed++;
     }
-    /* ---- LRA Phase 4 step 2 (IR_LRA): DE as a SECOND local home -----------
+    /* ---- DE as a SECOND local home (IR_LRA) -------------------------------
        For the itloc candidates BC couldn't take (BC held by a loop home →
        clash), try DE: place a candidate in DE when its span is DE-CLEAN under
        the RELAXED model (op_clobbers_relaxed — ADD/SUB/CMP stage src[1] into BC
        not DE) AND DE is otherwise idle over the span (no PR_DE/E/D tenant). On
-       commit, MARK each relaxed op (`lra_stage_src1_bc`) so steps 3-4's loader +
+       commit, MARK each relaxed op (`lra_stage_src1_bc`) so the loader +
        `hl,bc` emitter route its src[1] through BC, keeping the DE resident live.
        Relaxing an op needs BC free across it (staging clobbers BC), so a span
        crossing a live BC tenant stays DE-dirty (rejected `bc_busy`).
 
-       NOTE: gated IR_LRA (byte-identical OFF). With IR_LRA on this is WIP until
-       step 4 lands — the marks are set but not yet honored by the emitter, so a
-       placed value is clobbered by its span's DE-staging (silent wrong value,
-       IR_LRA-only). Steps 3-4 complete the mechanism; step 5 validates on. */
+       DORMANT in practice: this is the "persistent DE second home" the operand
+       loader structurally blocks — freeing DE needs BC-staging, but BC is
+       exactly what's contended in the loops that would benefit, so placements
+       come out empty. Kept as the mechanism + measurement; IY is the workaround
+       that actually pays (ir_iy_reduction_pack). See ADR 0003. */
     int de_packed = 0, de_rej_dirty = 0, de_rej_clash = 0, de_avail = 0;
     int de_rej_bc_busy = 0, de_marks = 0, de_rej_noop = 0;
     if (getenv("IR_LRA")) {
@@ -1996,8 +1997,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
        load_to_* pop is checked before any cache hit (else a stale cache_hl/de
        skips the balancing pop → sp-1 write / stack leak; 8085's LD_IMM `ld de,K`
        fastpath via spill_de_unless_dead was the crash). EXCLUDED: ez80/kc160/
-       rabbit (cheap native sp-relative slots — parking doesn't pay). Wins
-       matrixbench: z80 sp -12.9%, 8080 -12.4%, gbz80 -9.5%, 8085 -8.5%. */
+       rabbit (cheap native sp-relative slots — parking doesn't pay). */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
           || IS_8080() || IS_8085() || IS_GBZ80())) return;
 
