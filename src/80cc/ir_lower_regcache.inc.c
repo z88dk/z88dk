@@ -185,6 +185,16 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         hl_about_to_change(vreg_id);
         return;
     }
+    /* DE hit: copy DE→HL non-destructively (`ld l,e; ld h,d`, DE preserved —
+       mirrors the BC path). Without this a DE-resident value needed in HL fell
+       through to a slot reload (e.g. a call result cached in DE by gen_call). */
+    if (de_has(vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
+        emit(out, "ld\tl,e");
+        emit(out, "ld\th,d");
+        hl_about_to_change(vreg_id);
+        return;
+    }
     /* idx2 resident in the spare index register: `push <idx>;pop hl`. */
     /* Alt-bank invariant materialize (rare — a non-branch-fused compare read):
        `exx; push <altpair>; exx; pop hl` brings it into HL without disturbing
@@ -2015,7 +2025,19 @@ static int op_de_clean(const Func *f, const Op *o)
     case IR_BR_ZERO: case IR_BR_COND: {
         int s  = o->src[0];
         int sw = (s >= 0 && s < f->n_vregs) ? f->vregs[s].width : 2;
-        return sw <= 1;               /* byte test → `or a`; wider uses HL/DE */
+        if (sw <= 1) return 1;        /* byte → `or a`, DE-clean on all CPUs */
+        if (getenv("IR_NO_WORD_ZTEST")) return 0;   /* opt-out → baseline */
+        /* word → emit_test_zero's `load_to_hl; ld a,h; or l` (or Rabbit4k
+           `test`) — HL+A only, DE untouched. This lets a pointer-chase loop
+           (`while (p) { acc += p->f; p = p->next; }`) keep its accumulator in
+           DE across the null test. FP ONLY: in sp mode a sibling width-2
+           counter op (`while (n--)`) loads the counter into DE (`ld e,(hl);
+           ld d,(hl); dec de; … ex de,hl`), clobbering the home — and the
+           accumulate's `ex de,hl` (`xchg` on 808x) isn't available on gbz80.
+           fp keeps such counter ops in (ix+d) (HL-only), so DE survives. */
+        return sw == 2 && fp_active(f)
+            && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+                || IS_EZ80() || IS_808x());
     }
     case IR_AND: case IR_OR: case IR_XOR: case IR_ADD: case IR_SUB:
     case IR_RSUB: case IR_INC: case IR_DEC: case IR_NOT: case IR_NEG:
