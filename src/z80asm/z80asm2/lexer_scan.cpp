@@ -280,7 +280,8 @@ void tokenize_scan_line(const ScanLine& line,
             std::string literal_text =
             line.text.substr(start, p - line.text.c_str() - start);
             SourceLoc here_loc = current_loc();
-            here_loc.column = static_cast<uint16_t>(p - line.text.c_str() + 1);
+            uint new_column = static_cast<uint>(p - line.text.c_str() + 1);
+            here_loc = SourceLoc(here_loc.filename_id(), here_loc.line(), new_column);
             g_diag.error(here_loc,
                          "Invalid character '" + std::string(1, *p) +
                          "' after literal: '" + literal_text + "'");
@@ -304,8 +305,8 @@ void tokenize_scan_line(const ScanLine& line,
         }
 
         // check for -IXIY
-        if (g_args.options.swap_ix_iy ) {
-            swap_ix_iy(ident_s, keyword);
+        if (g_args.options.swap_ixiy ) {
+            swap_ixiy(ident_s, keyword);
         }
 
         // check for ASMPC

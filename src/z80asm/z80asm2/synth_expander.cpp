@@ -16,7 +16,7 @@
 #include "parser.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include "synth_expander.h"
 #include <algorithm>
@@ -199,8 +199,9 @@ void SynthExpander::interpret_synth_bytecode(const SynthMatch& match,
         }
         else {
             loc = cur.tokens.back().loc;
-            loc.column += static_cast<uint16_t>(g_strings.view(
-                                                    cur.tokens.back().text_id).size());
+            uint new_column = loc.column() + static_cast<uint>(g_strings.view(
+                                  cur.tokens.back().text_id).size());
+            loc = SourceLoc(loc.filename_id(), loc.line(), new_column);
         }
         return loc;
     };

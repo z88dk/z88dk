@@ -31,3 +31,6 @@ private:
 };
 
 extern Diagnostics g_diag;
+
+[[noreturn]]
+void fatal_error(std::string_view msg);

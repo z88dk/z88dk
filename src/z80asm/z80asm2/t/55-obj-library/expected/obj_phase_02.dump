@@ -1,0 +1,32 @@
+Library file t/55-obj-library//input/obj_phase_02.o at $0000: Z80LMF19
+Object  file t/55-obj-library//input/obj_phase_02.o at $0018: Z80RMF19
+  Name: obj_phase_02
+  CPU:  z80 
+  Section "": 16 bytes
+    C $0000: 00 00 00 00 00 10 08 10 00 00 00 00 00 10 08 10
+  Symbols:
+    L C $1000: in1 (section "") (file t/55-obj-library/input/obj_phase_02.asm:9)
+    L C $1008: in2 (section "") (file t/55-obj-library/input/obj_phase_02.asm:11)
+    L A $0000: out1 (section "") (file t/55-obj-library/input/obj_phase_02.asm:5)
+    L A $0010: out2 (section "") (file t/55-obj-library/input/obj_phase_02.asm:13)
+    L A $0000: x1 (section "") (file t/55-obj-library/input/obj_phase_02.asm:1)
+    L A $0010: x2 (section "") (file t/55-obj-library/input/obj_phase_02.asm:2)
+    L C $1000: y1 (section "") (file t/55-obj-library/input/obj_phase_02.asm:3)
+    L C $1008: y2 (section "") (file t/55-obj-library/input/obj_phase_02.asm:4)
+  Relocations:
+    R U16   $0000: ""+$0000 (section "") (file t/55-obj-library/input/obj_phase_02.asm:6)
+    R U16   $0002: ""+$0010 (section "") (file t/55-obj-library/input/obj_phase_02.asm:6)
+    R U16   $0008: ""+$0000 (section "") (file t/55-obj-library/input/obj_phase_02.asm:10)
+    R U16   $000A: ""+$0010 (section "") (file t/55-obj-library/input/obj_phase_02.asm:10)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_phase_02.asm"
+    S   2 = "in1"
+    S   3 = "in2"
+    S   4 = "out1"
+    S   5 = "out2"
+    S   6 = "x1"
+    S   7 = "x2"
+    S   8 = "y1"
+    S   9 = "y2"
+    S  10 = "obj_phase_02"
+

@@ -22,4 +22,3 @@ X(mbf64)        // zcc -fp-mode=mbf64, 64 bit Microsoft double precision
 
 X(am9511)       // zcc -fp-mode=am9511, AM9511 math processor format
 
-#undef X

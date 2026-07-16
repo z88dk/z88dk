@@ -49,4 +49,3 @@ X(DUMP_AFTER_LAYOUT, "-dump-after-layout", false, "", "Dump the AST after layout
 X(DUMP_AFTER_ASSEMBLY, "-dump-after-assembly", false, "", "Dump the object library after assembly and exit")
 X(DUMP_AFTER_LINK_COLLECTION, "-dump-after-link-collection", false, "", "Dump the modules after link collection and exit")
 
-#undef X

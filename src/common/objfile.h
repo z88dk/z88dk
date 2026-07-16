@@ -78,7 +78,7 @@ typedef struct expr_s {
 	UT_string* text;
     range_t	 range;
 	int		 asmpc;
-	int		 code_pos;
+	int		 patch_ptr;
 	int		 opcode_size;
 
 	struct section_s* section;		// weak

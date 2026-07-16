@@ -64,4 +64,3 @@ X(ASMPC,        "ASMPC")
 // Delimiters
 X(EndOfLine,    "\n")
 
-#undef X

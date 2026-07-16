@@ -291,11 +291,12 @@ The format of the object file is as follows:
 @@     }
 |    | strid | * *file* : Source file name where relocation was used
 |    | dword | * *line* : Line number in source file where relocation was used
-|    | strid | * *section* : Section name where relocation was used
+|    | strid | * *section_use* : Section name where relocation was used
 |    | dword | * *patchptr* : Relative module code patch pointer to store 
 |    |       |   the result of evaluating the relocation
-|    | string| * *symbol* : Name of the symbol base of the relocation
-|    | dword | * *addend* : Value to add the the symbol to obtain the relocation
+|    | string| * *section_value* : Name of the section base of the relocation
+|    | dword | * *offset* : Value to add the the section base to obtain 
+|    |       |   the relocation
 |... |  ...  |   ...
 |    |       |
 @@ }

@@ -1,0 +1,49 @@
+Library file t/55-obj-library//input/obj_public_01.o at $0000: Z80LMF19
+Object  file t/55-obj-library//input/obj_public_01.o at $0018: Z80RMF19
+  Name: obj_public_01
+  CPU:  z80 
+  Section "": 6 bytes
+    C $0000: 01 00 00 00 00 00
+  Symbols:
+    G C $0001: p1 (section "") (file t/55-obj-library/input/obj_public_01.asm:4)
+    G A $0000: p2 (section "") (file t/55-obj-library/input/obj_public_01.asm:5)
+    G A $0006: p3 (section "") (file t/55-obj-library/input/obj_public_01.asm:6)
+  Relocations:
+    R U16   $0002: ""+$0000 (section "") (file t/55-obj-library/input/obj_public_01.asm:5)
+    R U16   $0004: ""+$0006 (section "") (file t/55-obj-library/input/obj_public_01.asm:5)
+  Strings:
+    S   1 = "t/55-obj-library/input/obj_public_01.asm"
+    S   2 = "p1"
+    S   3 = "p2"
+    S   4 = "p3"
+    S   5 = "obj_public_01"
+
+Symbol Index Table:
+  P z80n  p1 -> $0018
+  P z80n  p2 -> $0018
+  P z80n  p3 -> $0018
+  P z80n_strict  p1 -> $0018
+  P z80n_strict  p2 -> $0018
+  P z80n_strict  p3 -> $0018
+  P ti83  p1 -> $0018
+  P ti83  p2 -> $0018
+  P ti83  p3 -> $0018
+  P ti83_strict  p1 -> $0018
+  P ti83_strict  p2 -> $0018
+  P ti83_strict  p3 -> $0018
+  P ti83plus  p1 -> $0018
+  P ti83plus  p2 -> $0018
+  P ti83plus  p3 -> $0018
+  P ti83plus_strict  p1 -> $0018
+  P ti83plus_strict  p2 -> $0018
+  P ti83plus_strict  p3 -> $0018
+  P z80  p1 -> $0018
+  P z80  p2 -> $0018
+  P z80  p3 -> $0018
+  P z80_strict  p1 -> $0018
+  P z80_strict  p2 -> $0018
+  P z80_strict  p3 -> $0018
+Strings:
+  S   1 = "p1"
+  S   2 = "p2"
+  S   3 = "p3"

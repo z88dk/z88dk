@@ -6,10 +6,11 @@
 
 #pragma once
 
+#include "dump_context.h"
 #include "lexer_keywords.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -24,18 +25,6 @@ using uint = unsigned int;
 struct Section;
 struct Stmt;
 struct SymbolInfo;
-
-//-----------------------------------------------------------------------------
-// helper for dumping AST in a readable format
-//-----------------------------------------------------------------------------
-struct DumpContext {
-    std::ostream& os;
-    int indent{0};
-
-    DumpContext(std::ostream& os_, int indent_ = 0);
-    void line(std::string_view text);
-    DumpContext child() const;
-};
 
 //-----------------------------------------------------------------------------
 // class for evaluated expressions
@@ -59,14 +48,6 @@ struct ExprValue {
 
     // valid when Computed
     std::vector<Token> tokens;
-};
-
-//-----------------------------------------------------------------------------
-// base class for all tree nodes
-//-----------------------------------------------------------------------------
-struct TreeNode {
-    virtual ~TreeNode() = default;
-    virtual void dump(DumpContext ctx) const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -102,20 +83,20 @@ struct ExprLiteralAsmpc : public Expr {
 };
 
 struct ExprSymbol : public Expr {
-    StringInterner::Id name_id;
+    StringId name_id;
     SymbolInfo* symbol = nullptr;  // pointer to the symbol info
 
-    ExprSymbol(StringInterner::Id name_id_, const SourceLoc& loc) : Expr(loc),
+    ExprSymbol(StringId name_id_, const SourceLoc& loc) : Expr(loc),
         name_id(name_id_) {}
     void dump(DumpContext ctx) const override;
 };
 
 struct ExprLocalLabel : public Expr {
-    StringInterner::Id name_id;
+    StringId name_id;
     size_t at_pos;  // position of '@' in the original identifier
     SymbolInfo* symbol = nullptr;  // pointer to the symbol info
 
-    ExprLocalLabel(StringInterner::Id name_id_, size_t at_pos_,
+    ExprLocalLabel(StringId name_id_, size_t at_pos_,
                    const SourceLoc& loc)
         : Expr(loc), name_id(name_id_), at_pos(at_pos_) {}
     void dump(DumpContext ctx) const override;
@@ -234,6 +215,7 @@ struct Stmt : public TreeNode {
     SourceLoc loc;
     Section* section = nullptr;     // section where located
     uint address = 0;               // address of statement
+    bool in_phase = false;          // true if in PHASE block
 
     Stmt(const SourceLoc& loc_) : loc(loc_) {}
     virtual ~Stmt() = default;
@@ -252,12 +234,12 @@ struct OpcodeStmt : Stmt {
 };
 
 struct LabelStmt : Stmt {
-    StringInterner::Id name_id;
+    StringId name_id;
     bool is_local = false;  // whether this is a local label (has '@')
     size_t at_pos = 0;      // position of '@' in the original identifier, if local
     SymbolInfo* symbol = nullptr; // symbol info for this label
 
-    LabelStmt(StringInterner::Id name_id_, const SourceLoc& loc_);
+    LabelStmt(StringId name_id_, const SourceLoc& loc_);
     virtual ~LabelStmt() = default;
     void dump(DumpContext ctx) const override;
 };
@@ -274,11 +256,11 @@ struct OrgStmt : Stmt {
 };
 
 struct DefcStmt : Stmt {
-    StringInterner::Id name_id;
+    StringId name_id;
     std::unique_ptr<Expr> expr;
     SymbolInfo* symbol = nullptr;   // symbol info for this defc
 
-    DefcStmt(StringInterner::Id name_id_,
+    DefcStmt(StringId name_id_,
              std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_), expr(std::move(e)) {}
     virtual ~DefcStmt() = default;
@@ -286,18 +268,18 @@ struct DefcStmt : Stmt {
 };
 
 struct ModuleStmt : Stmt {
-    StringInterner::Id name_id;
+    StringId name_id;
 
-    ModuleStmt(StringInterner::Id name_id_, const SourceLoc& loc)
+    ModuleStmt(StringId name_id_, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~ModuleStmt() = default;
     void dump(DumpContext ctx) const override;
 };
 
 struct SectionStmt : Stmt {
-    StringInterner::Id name_id;
+    StringId name_id;
 
-    SectionStmt(StringInterner::Id name_id_, const SourceLoc& loc)
+    SectionStmt(StringId name_id_, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~SectionStmt() = default;
     void dump(DumpContext ctx) const override;
@@ -333,13 +315,13 @@ struct DefsNumericStmt : Stmt {
 
 struct DefsStringStmt : Stmt {
     std::unique_ptr<Expr> size_expr;
-    StringInterner::Id string_id;    // string literal to fill with
+    StringId string_id;         // string literal to fill with
     uint8_t filler_byte;
-    uint padding_size = 0;          // number of bytes to pad to reach new address
+    uint padding_size = 0;      // number of bytes to pad to reach new address
     std::vector<uint8_t> bytes;
 
     DefsStringStmt(std::unique_ptr<Expr> size_expr_,
-                   StringInterner::Id string_id_, uint8_t filler_byte_, const SourceLoc& loc)
+                   StringId string_id_, uint8_t filler_byte_, const SourceLoc& loc)
         : Stmt(loc), size_expr(std::move(size_expr_)), string_id(string_id_),
           filler_byte(filler_byte_) {}
     virtual ~DefsStringStmt() = default;
@@ -351,7 +333,7 @@ enum class SymbolDeclareType : uint8_t {
 };
 
 struct SymbolRef {
-    StringInterner::Id id;
+    StringId id;
     SourceLoc loc;
 };
 
@@ -396,15 +378,15 @@ struct DephaseStmt : Stmt {
 // symbols
 //-----------------------------------------------------------------------------
 struct SymbolDeclare {
-    StringInterner::Id name_id = 0;         // name of symbol
+    StringId name_id;           // name of symbol
     SymbolDeclareType type = SymbolDeclareType::Extern; // type of declaration
-    SourceLoc loc;                          // location where declared
+    SourceLoc loc;              // location where declared
     bool saw_extern = false;
     bool saw_public = false;
     bool saw_global = false;
 
     SymbolDeclare() = default;
-    SymbolDeclare(StringInterner::Id name_id_, SymbolDeclareType type_,
+    SymbolDeclare(StringId name_id_, SymbolDeclareType type_,
                   const SourceLoc& loc_) :
         name_id(name_id_), type(type_), loc(loc_) {}
 };
@@ -414,13 +396,13 @@ struct SymbolInfo : public TreeNode {
         Undefined, Label, Defc,
     };
 
-    StringInterner::Id name_id = 0;         // name of symbol
+    StringId name_id;           // name of symbol
     DefType def_type = DefType::Undefined;  // type of definition
-    SourceLoc loc;                          // location where defined
-    Stmt* stmt = nullptr;                   // for Label
-    Expr* defc_expr = nullptr;              // for Defc
+    SourceLoc loc;              // location where defined
+    Stmt* stmt = nullptr;       // for Label
+    Expr* defc_expr = nullptr;  // for Defc
 
-    SymbolInfo(StringInterner::Id name_id_, DefType def_type_,
+    SymbolInfo(StringId name_id_, DefType def_type_,
                const SourceLoc& loc_)
         : name_id(name_id_), def_type(def_type_), loc(loc_) {}
     virtual ~SymbolInfo() = default;
@@ -433,18 +415,18 @@ struct SymbolInfo : public TreeNode {
 static constexpr std::string_view DEFAULT_SECTION = "";
 
 struct Section : public TreeNode {
-    StringInterner::Id name_id = 0;         // name of section
-    std::vector<Stmt*> stmts;               // point to statemens of section
-    uint size = 0;                          // total size of section
-    bool has_opcodes = false;               // to signal if a section has code
-    OrgStmt* org_stmt = nullptr;            // set if section has ORG
-    bool org_defined = false;               // true if section has ORG defined
-    uint base_address = 0;                  // section level ORG
-    bool section_split = false;             // true after ORG -1
-    AlignStmt* align_stmt = nullptr;        // set if section has ALIGN
-    uint align = 1;                         // section level ALIGN
+    StringId name_id;               // name of section
+    std::vector<Stmt*> stmts;       // point to statemens of section
+    uint size = 0;                  // total size of section
+    bool has_opcodes = false;       // to signal if a section has code
+    OrgStmt* org_stmt = nullptr;    // set if section has ORG
+    bool org_defined = false;       // true if section has ORG defined
+    uint base_address = 0;          // section level ORG
+    bool section_split = false;     // true after ORG -1
+    AlignStmt* align_stmt = nullptr;// set if section has ALIGN
+    uint align = 1;                 // section level ALIGN
 
-    Section(StringInterner::Id name_id_);
+    Section(StringId name_id_);
     virtual ~Section() = default;
     void dump(DumpContext ctx) const override;
     void dump(DumpContext ctx, const Section* current) const;
@@ -454,15 +436,15 @@ struct Section : public TreeNode {
 // modules
 //-----------------------------------------------------------------------------
 struct Module : public TreeNode {
-    StringInterner::Id name_id = 0;         // name of module
+    StringId name_id;           // name of module
 
-    std::unordered_map<StringInterner::Id, std::unique_ptr<SymbolInfo>>
-            symbols;                            // symbol table
+    std::unordered_map<StringId, std::unique_ptr<SymbolInfo>>
+            symbols; // symbol table
     std::vector<std::unique_ptr<Section>> sections;
     Section* cur_section = nullptr;
 
-    Module(StringInterner::Id name_id_);
-    Section* set_section(StringInterner::Id sec_name_id);
+    Module(StringId name_id_);
+    Section* set_section(StringId sec_name_id);
     virtual ~Module() = default;
     void dump(DumpContext ctx) const override;
     void dump(DumpContext ctx, const Module* current) const;
@@ -472,16 +454,16 @@ struct Module : public TreeNode {
 // root of the AST and Intermediate Representation
 //-----------------------------------------------------------------------------
 struct Program : public TreeNode {
-    StringInterner::Id name_id = 0;         // name of program
+    StringId name_id;           // name of program
     std::vector<std::unique_ptr<Stmt>> stmts;
 
-    std::unordered_map<StringInterner::Id, std::unique_ptr<SymbolDeclare>>
+    std::unordered_map<StringId, std::unique_ptr<SymbolDeclare>>
             declarations;
     std::vector<std::unique_ptr<Module>> modules;
     Module* cur_module = nullptr;
 
-    Program(StringInterner::Id name_id_);
-    Module* set_module(StringInterner::Id mod_name_id);
+    Program(StringId name_id_);
+    Module* set_module(StringId mod_name_id);
     virtual ~Program() = default;
     void dump(DumpContext ctx) const override;
 };

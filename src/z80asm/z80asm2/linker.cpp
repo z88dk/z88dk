@@ -9,20 +9,21 @@
 #include "linker.h"
 #include "obj_file.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#if 0
 static bool load_input_modules(LinkContext& context,
                                const std::vector<std::string>& filenames,
                                std::string_view output_dir) {
     for (auto& filename : filenames) {
         std::string o_filename = get_o_filename(filename, output_dir);
 
-        auto obj_lib = std::make_unique<ObjectLibrary>();
+        auto obj_lib = std::make_unique<ObjLibrary>();
         if (!read_object_library(*obj_lib, o_filename)) {
             return false;   // error already reported
         }
@@ -71,7 +72,7 @@ static bool load_input_libraries(LinkContext& context,
             return false;
         }
 
-        auto obj_lib = std::make_unique<ObjectLibrary>();
+        auto obj_lib = std::make_unique<ObjLibrary>();
         if (!read_object_library(*obj_lib, resolved_path)) {
             return false;   // error already reported
         }
@@ -85,11 +86,11 @@ static bool load_input_libraries(LinkContext& context,
 static void build_library_index(LinkContext& context) {
     for (auto& lib : context.libraries) {
         for (auto& mod : lib->modules) {
-            for (auto& sym : mod->symbols) {
-                if (sym->scope == ObjSymbolScope::Public) {
-                    StringInterner::Id sym_id = sym->name_id;
+            for (auto& sym : mod.symbols) {
+                if (sym.scope == ObjSymbolScope::Public) {
+                    uint sym_id = g_strings.intern(sym.name());
                     if (context.symbol_to_module.count(sym_id) == 0) {
-                        context.symbol_to_module[sym_id] = mod.get();
+                        context.symbol_to_module[sym_id] = &mod;
                     }
                 }
             }
@@ -117,3 +118,4 @@ void link_files(const std::vector<std::string>& filenames,
     build_library_index(*context);
 
 }
+#endif

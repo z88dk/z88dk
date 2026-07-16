@@ -7,13 +7,13 @@ t/55-obj-library/input/obj_align_03.asm:5:10: warning: Integer range: $100
     align 4, 256
              ^
 Writing object file: t/55-obj-library/input/obj_align_03.o
-ObjectLibrary
+ObjLibrary:
     Modules (1):
-        ObjectModule: obj_align_03
+        ObjModule: obj_align_03
             CPU: z80
             Sections:
                 ObjSection: ""
                     Align: 1
                 ObjSection: code
                     Align: 1
-                    Bytes (11): 1 2 3 0 4 5 6 0 7 8 9
+                        C $0000: 01 02 03 00 04 05 06 00 07 08 09
