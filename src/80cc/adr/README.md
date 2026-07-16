@@ -22,6 +22,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0009](0009-wide-value-accumulator.md) | Wide (6/8-byte) value handling via a memory accumulator (`__i64_acc` / FA) |
 | [0010](0010-ast-vs-ir-optimisation-layering.md) | AST-level and IR-level optimisation: a deliberate two-level split |
 | [0011](0011-index-register-allocation.md) | Index-register (IX/IY) allocation by frame mode, and reservation |
+| [0012](0012-frame-pointer-default-by-cpu.md) | Per-CPU default for the frame pointer (fp on z80/z80n/z180/ez80) |
 
 Derived from the `*_PLAN.md` working notes: 0006 ← MULTICPU_IR, 0007 ← KIND_WIDTH,
 0008 ← IVSR, 0009 ← the long-long/double accumulator design. Transient
