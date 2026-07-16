@@ -135,13 +135,16 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\asm_expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\asm_layout.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\asm_symbols.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\binary_file.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\files.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\ir.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\const_symbols.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\cpu.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\diag.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_features.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_file.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_format.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser_directives.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\hla.cpp" />
@@ -179,6 +182,7 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\asm_expr.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\asm_layout.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\asm_symbols.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\binary_file.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\files.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\ir.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\const_symbols.h" />
@@ -195,7 +199,9 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_scan.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_tokens.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_features.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_file.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_format.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_parse_trie.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes_synth_trie.h" />
@@ -218,6 +224,7 @@
     <None Include="..\..\src\z80asm\z80asm2\cpu.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re" />
+    <None Include="..\..\src\z80asm\z80asm2\obj_features.def" />
     <None Include="..\..\src\z80asm\z80asm2\options.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_tokens.def" />
     <None Include="..\..\src\z80asm\z80asm2\zfloat.def" />

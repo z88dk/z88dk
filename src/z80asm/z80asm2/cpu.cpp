@@ -21,8 +21,9 @@
 std::string to_string(CPU cpu_id) {
     // CPU ids may not be sequencial
     static const std::unordered_map<CPU, std::string> lu_table = {
-#define X(code, id, name, defines)   { CPU::id, name },
-#include "cpu.def"
+#define X(id, name, name_str, non_strict, ancestor, defines)   { CPU::name, name_str },
+#include "../cpu.def"
+#undef X
     };
 
     auto it = lu_table.find(cpu_id);
@@ -37,8 +38,9 @@ std::string to_string(CPU cpu_id) {
 
 bool cpu_lookup(std::string_view name, CPU& out_cpu_id) {
     static const std::unordered_map<std::string, CPU> lu_table = {
-#define X(code, id, name, defines)   { name, CPU::id },
-#include "cpu.def"
+#define X(id, name, name_str, non_strict, ancestor, defines)	{ name_str, CPU::name },
+#include "../cpu.def"
+#undef X
     };
 
     std::string name_s(name);
@@ -55,8 +57,9 @@ bool cpu_lookup(std::string_view name, CPU& out_cpu_id) {
 std::vector<StringInterner::Id> cpu_names() {
     static const std::vector<StringInterner::Id> names = []() {
         static const std::vector<std::string_view> storage = {
-#define X(code, id, name, defines)   name,
-#include "cpu.def"
+#define X(id, name, name_str, non_strict, ancestor, defines)	name_str,
+#include "../cpu.def"
+#undef X
         };
         std::vector<StringInterner::Id> v;
         v.reserve(storage.size());
@@ -83,8 +86,9 @@ std::unordered_map<CPU, std::vector<StringInterner::Id>>& cpu_defines_table() {
             const char* defines;
         };
         static constexpr Entry entries[] = {
-#define X(code, id, name, defines)   { CPU::id, defines },
-#include "cpu.def"
+#define X(id, name, name_str, non_strict, ancestor, defines)	{ CPU::name, defines },
+#include "../cpu.def"
+#undef X
         };
         for (const auto& e : entries) {
             std::istringstream ss(e.defines);

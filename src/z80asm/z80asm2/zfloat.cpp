@@ -26,6 +26,7 @@
 static constexpr std::string_view float_formats_lu_table[] = {
 #define X(type)		# type,
 #include "zfloat.def"
+#undef X
 };
 
 std::string to_string(FloatFormat fmt) {
@@ -36,6 +37,7 @@ bool float_format_lookup(std::string_view str, FloatFormat& out_fmt) {
     static const std::unordered_map<std::string_view, FloatFormat> lu_table = {
 #define X(type)		{ # type, FloatFormat::type },
 #include "zfloat.def"
+#undef X
     };
 
     auto it = lu_table.find(str);
@@ -835,6 +837,7 @@ std::vector<uint8_t> encode_float(double value, FloatFormat fmt) {
     switch (fmt) {
 #define X(type)	case FloatFormat::type: return float_to_##type(value);
 #include "zfloat.def"
+#undef X
     default:
         release_assert(0);
         return std::vector<uint8_t>();

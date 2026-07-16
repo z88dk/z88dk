@@ -7,7 +7,6 @@
 #pragma once
 
 #include "lexer_keywords.h"
-#include "lexer_tokens.h"
 #include "source_loc.h"
 #include "string_interner.h"
 #include <cstdint>
@@ -18,6 +17,7 @@
 enum class TokenType : uint8_t {
 #define X(id, text) id,
 #include "lexer_tokens.def"
+#undef X
 };
 
 // convert a text to identifier, replacing invalid chars by '_'

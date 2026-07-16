@@ -20,6 +20,7 @@ void dump_token(const Token& token) {
     static constexpr std::string_view token_type_names[] = {
 #define X(id, text) #id,
 #include "lexer_tokens.def"
+#undef X
     };
 
     std::cout << token_type_names[static_cast<size_t>(token.type)] << "\t"

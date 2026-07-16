@@ -15,11 +15,11 @@ static constexpr int IS_X_REGISTER = 1 << 1;
 static constexpr int IS_HLA_DJNZ_REGISTER = 1 << 2;
 static constexpr int IS_FLAG = 1 << 3;
 
-#define X(id, text, flags) id,
 enum class Keyword : uint16_t {
+#define X(id, text, flags) id,
 #include "lexer_keywords.def"
-};
 #undef X
+};
 
 // Convert string to Keyword enum, returns Keyword::None if not found
 Keyword keyword_lookup(std::string_view s);

@@ -141,6 +141,15 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\binary_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_features.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_format.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
@@ -257,6 +266,15 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\binary_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_features.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_format.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def">
@@ -275,6 +293,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\src\z80asm\z80asm2\zfloat.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\obj_features.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

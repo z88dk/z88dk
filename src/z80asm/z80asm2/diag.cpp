@@ -107,3 +107,8 @@ void Diagnostics::print_source_line(std::string_view text, size_t column) {
     marker += '^';
     std::cerr << "    " << marker << std::endl;
 }
+
+void fatal_error(std::string_view message) {
+    std::cerr << "error: " << message << std::endl;
+    exit(EXIT_FAILURE);
+}

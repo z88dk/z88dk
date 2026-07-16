@@ -19,6 +19,7 @@
 enum class OptionType {
 #define X(name, str, takes_arg, arg_text, usage) name,
 #include "options.def"
+#undef X
 };
 
 // defaults

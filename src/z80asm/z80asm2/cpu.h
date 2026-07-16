@@ -15,8 +15,9 @@
 #include <vector>
 
 enum class CPU {
-#define X(code, id, name, defines)   id = code,
-#include "cpu.def"
+#define X(id, name, name_str, non_strict, ancestor, defines)	name = id,
+#include "../cpu.def"
+#undef X
 };
 
 std::string to_string(CPU cpu_id);

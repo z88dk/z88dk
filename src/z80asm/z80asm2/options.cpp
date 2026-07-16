@@ -39,6 +39,7 @@ static constexpr OptionSpec g_option_specs[] = {
 #define X(name, str, takes_arg, arg_text, usage) \
         { str, OptionType::name, takes_arg, arg_text, usage },
 #include "options.def"
+#undef X
 };
 
 // options usage grouping for presentation in usage screen

@@ -1,0 +1,20 @@
+//-----------------------------------------------------------------------------
+// Z80 assembler
+// Copyright (C) Paulo Custodio, 2011-2026
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+X(has_expr_file_line,       v >= 4 )
+X(has_expr_opcode_size,     v >= 17)
+X(has_global_cpu,           v >= 18)
+X(has_global_org_dword,     v >= 5  && v < 8)
+X(has_global_org_word,      v >= 1  && v < 5)
+X(has_relocations,          v >= 19)
+X(has_section_align,        v >= 10)
+X(has_section_org,          v >= 8 )
+X(has_sections,             v >= 5 )
+X(has_string_table,         v >= 18)
+X(has_symbol_file_line,     v >= 9 )
+X(has_symbol_index,         v >= 19)
+X(has_word_strings,         v >= 16)
+

@@ -11,9 +11,6 @@
 #include "source_loc.h"
 #include "string_interner.h"
 #include "string_utils.h"
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <string_view>
 
@@ -21,6 +18,7 @@ std::string to_string(TokenType token_type) {
     static constexpr std::string_view lut[] = {
 #define X(id, text) text,
 #include "lexer_tokens.def"
+#undef X
     };
     return std::string(lut[static_cast<size_t>(token_type)]);
 }

@@ -17,6 +17,7 @@
 enum class FloatFormat : uint8_t {
 #define X(type)		type,
 #include "zfloat.def"
+#undef X
 };
 
 std::string to_string(FloatFormat fmt);

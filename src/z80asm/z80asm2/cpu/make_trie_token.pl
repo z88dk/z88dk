@@ -32,7 +32,7 @@ say $out_cpp "";
 
 # read CPUs
 my @cpus;
-open( my $fh, "<", "../cpu.def" ) or die "open ../cpu.def: $!";
+open( my $fh, "<", "../../cpu.def" ) or die "open ../../cpu.def: $!";
 while (<$fh>) {
     /^\s* X \( \s* (\d+) \s* , \s* (\w+)/x or next;
     my ( $id, $cpu ) = ( $1, $2 );
