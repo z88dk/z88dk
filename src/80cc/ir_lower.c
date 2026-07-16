@@ -98,6 +98,12 @@ typedef struct {
        (l_long_or/add) pop their RHS with no IR_POP — gen_hcall decrements it. */
     int cur_sp_adjust;
     int func_emit_idx, cmp_label_counter, fc_ret_label_counter;
+    /* Phase-0 live-range measurement (IR_SPILL_STATS): a slot-traffic proxy
+       counted at the vemit chokepoint. spill_ix = fp frame-slot accesses
+       (`(ix`/`(iy` operands); spill_sp = sp-relative slot-address computations
+       (`add hl,sp`). Reset per function, reported at function-render end. Pure
+       measurement — no codegen effect; output stays byte-identical. */
+    int spill_ix, spill_sp;
     int cur_func_uses_params;
     int cur_frameless;   /* fp-eligible but no IX frame (params read off sp) */
     int cur_home_is_word, cur_func_whome;
@@ -238,8 +244,22 @@ typedef enum {
 static void apply_clobbers(Clobber c);
 static int wide_acc_result_dead_in_acc(const Func *f, int v);
 
+/* IR_SPILL_STATS (Phase-0 measurement): -1 = not yet probed, else 0/1. */
+static int spill_stats_on = -1;
+
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
+    if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
+    if (spill_stats_on) {
+        /* Count a slot-traffic proxy from the fully-expanded instruction text.
+           Buffer here only when stats are on; the emitted bytes are unchanged. */
+        char buf[256];
+        va_list ap2; va_copy(ap2, ap);
+        vsnprintf(buf, sizeof buf, fmt, ap2);
+        va_end(ap2);
+        if (strstr(buf, "(ix") || strstr(buf, "(iy")) L.spill_ix++;
+        if (strstr(buf, "add\thl,sp")) L.spill_sp++;
+    }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
     fputc('\n', out);
@@ -1771,6 +1791,7 @@ int ir_lower_func(FILE *out, Func *f)
         fputs("ir_lower: null Func\n", stderr);
         return -1;
     }
+    L.spill_ix = L.spill_sp = 0;   /* IR_SPILL_STATS: per-function reset */
 
     /* __naked: emit the body asm verbatim — no prologue, no epilogue, no
        frame, no BB labels, no trailing `ret` (the asm owns the entire
@@ -2221,6 +2242,9 @@ int ir_lower_func(FILE *out, Func *f)
     for (int i = 0; i < f->n_bbs; i++) free(bb_preds[i]);
     free(bb_preds);
     ir_free_liveness(f);
+    if (spill_stats_on > 0)
+        fprintf(stderr, "SPILL %-24s ix=%-5d sp=%-5d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", L.spill_ix, L.spill_sp);
     return rc;
 }
 

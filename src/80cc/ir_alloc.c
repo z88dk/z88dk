@@ -1338,6 +1338,81 @@ static void arbitrate_to_bc(Func *f, Cand *cand, int n,
     }
 }
 
+/* Diagnostic probe (IR_ALLOC_PROBE): count spilled width-2 temps whose whole
+   live range sits in ONE bb with no call between first def and last use — the
+   reachable subset for call-free-interval word residency (option A). This is an
+   UPPER BOUND: it ignores whether the codegen clobbers a register inside the
+   span (layer 2), so real A wins are a subset of this. */
+static void alloc_probe(const Func *f)
+{
+    if (!getenv("IR_ALLOC_PROBE")) return;
+    int eligible = 0, passable = 0, bc_clean = 0, spilled_words = 0, total_uses = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (f->vregs[v].width != 2) continue;
+        if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_ADDR_TAKEN)) continue;
+        spilled_words++;
+        int bb_of = -1, lo = INT_MAX, hi = -1, multi = 0, uses = 0;
+        for (int i = 0; i < f->n_bbs && !multi; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int refs = (o->dst == v);
+                int u[16]; int nu = ir_op_uses(o, u, 16);
+                for (int k = 0; k < nu; k++) if (u[k] == v) { refs = 1; uses++; }
+                if (!refs) continue;
+                if (bb_of == -1) bb_of = i;
+                else if (bb_of != i) { multi = 1; break; }
+                if (j < lo) lo = j;
+                if (j > hi) hi = j;
+            }
+        }
+        if (multi || bb_of < 0) continue;
+        int callfree = 1;
+        const BB *bb = &f->bbs[bb_of];
+        for (int j = lo; j <= hi; j++) {
+            OpKind k = bb->ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { callfree = 0; break; }
+        }
+        if (!callfree) continue;
+        eligible++;
+        total_uses += uses;
+        /* Layer-2 estimate: is a register clobber-free across the span?
+           In a call-free span the operand loaders stage through HL/DE, never
+           BC, so BC is clobbered only by IR_MUL and width-4 (DEHL) ops. DE is
+           clobbered by word binops/compares/conv, offset/indirect mem, and
+           width-4 ops. A temp is layer-2-passable if BC or DE stays clean. */
+        int bc_dirty = 0, de_dirty = 0;
+        for (int j = lo; j <= hi; j++) {
+            const Op *o = &bb->ops[j];
+            int w4 = (o->dst >= 0 && o->dst < f->n_vregs
+                      && f->vregs[o->dst].width == 4);
+            if (o->kind == IR_MUL || w4) bc_dirty = 1;
+            switch (o->kind) {
+            case IR_ADD: case IR_SUB: case IR_RSUB:
+            case IR_AND: case IR_OR: case IR_XOR: case IR_MUL:
+            case IR_CMP_EQ: case IR_CMP_NE: case IR_CMP_LT: case IR_CMP_LE:
+            case IR_CMP_GT: case IR_CMP_GE: case IR_CMP_ULT: case IR_CMP_ULE:
+            case IR_CMP_UGT: case IR_CMP_UGE:
+            case IR_CONV_SX: case IR_CONV_ZX: case IR_CONV_TRUNC:
+            case IR_CONV_BYTE_TO_HIGH:
+                de_dirty = 1; break;
+            case IR_LD_MEM: case IR_ST_MEM:
+                if (o->mem.kind == IR_MEM_VREG || o->mem.offset != 0) de_dirty = 1;
+                break;
+            default: break;
+            }
+            if (w4) de_dirty = 1;
+        }
+        if (!bc_dirty) bc_clean++;
+        if (!bc_dirty || !de_dirty) passable++;
+    }
+    if (spilled_words)
+        fprintf(stderr, "ALLOC_PROBE eligible=%d passable=%d bc_clean=%d "
+                "spilled_words=%d uses=%d\n",
+                eligible, passable, bc_clean, spilled_words, total_uses);
+}
+
 void ir_alloc(Func *f)
 {
     if (!f) return;
@@ -2113,4 +2188,6 @@ void ir_alloc(Func *f)
         }
         free(dehl_ok);
     }
+
+    alloc_probe(f);
 }
