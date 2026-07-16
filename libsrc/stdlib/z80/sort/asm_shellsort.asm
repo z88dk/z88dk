@@ -15,7 +15,13 @@ SECTION code_stdlib
 
 PUBLIC asm_shellsort
 
-EXTERN l_mulu_16_16x16, asm0_memswap, l_compare_de_hl
+EXTERN l_mulu_16_16x16, asm0_memswap
+
+IF __CLASSIC
+   EXTERN l_jpix               ; classic: comparator reached via ix closure (see asm_quicksort.asm)
+ELSE
+   EXTERN l_compare_de_hl
+ENDIF
 
 asm_shellsort:
 
@@ -132,7 +138,11 @@ asm_shellsort:
 
         ; if ((*compar)(base+j, jd+j) <=0) break;
 
+        IF __CLASSIC
+        call l_jpix            ; compare(de = jd+j, hl = base+j) via closure thunk
+        ELSE
         call l_compare_de_hl   ; compare(de = jd+j, hl = base+j)
+        ENDIF
         jp p, shs_i6              ; if *(jd+j) >= *(base+j)
 
         ; de = jd + j (2nd arg)

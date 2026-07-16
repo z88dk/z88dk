@@ -187,36 +187,16 @@ extern   int optreset;
 //
 // void *cmp == char (*cmp)(void *key, void *datum);
 
-extern void __LIB__  *l_bsearch(void *key, void *base, unsigned int n, void *cmp) __smallc;
-extern void __LIB__  *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp) __smallc __z88dk_callee;
-extern void __LIB__  l_qsort(void *base, unsigned int size, void *cmp) __smallc;
-extern void __LIB__  l_qsort_callee(void *base, unsigned int size, void *cmp) __smallc __z88dk_callee;
+// One shared search/sort core.  sccz80 links the bare names (__LIB__), sdcc the
+// _-prefixed ones; each entry embeds its own comparator thunk, so a single
+// classic library serves both compilers (see classic/stdlib/{qsort,bsearch}.asm).
+extern void __LIB__   qsort(void *base, unsigned int nmemb, unsigned int size, int (*compar)(const void *, const void *)) __smallc;
+extern void __LIB__  *bsearch(void *key, void *base, unsigned int nmemb, unsigned int size, int (*compar)(const void *, const void *)) __smallc;
 
-#define l_bsearch(a,b,c,d) l_bsearch_callee(a,b,c,d)
-
-extern void __LIB__  qsort_sccz80(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
-extern void __LIB__  qsort_sccz80_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
-
-extern void __LIB__  qsort_sdcc(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
-extern void __LIB__  qsort_sdcc_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
-
-#ifdef __Z88DK_R2L_CALLING_CONVENTION
-
-#define qsort                  qsort_sdcc
-#define qsort_sdcc(a,b,c,d)    qsort_sdcc_callee(a,b,c,d)
-
-#else
-
-#define qsort                  qsort_sccz80
-#define qsort_sccz80(a,b,c,d)  qsort_sccz80_callee(a,b,c,d)
-
-#endif
-
-#ifdef __ZX81__
-#define l_qsort(a,b,c) qsort(a,b,2,c)
-#else
-#define l_qsort(a,b,c) l_qsort_callee(a,b,c)
-#endif
+// l_qsort()/l_bsearch() operate on arrays of 2-byte items (pointers/ints),
+// sharing the one core rather than a separate little implementation.
+#define l_qsort(a,b,c)     qsort(a,b,2,c)
+#define l_bsearch(a,b,c,d) bsearch(a,b,c,2,d)
 
 
 //////////////////////////

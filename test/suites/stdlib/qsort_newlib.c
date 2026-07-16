@@ -54,13 +54,19 @@ static void dummy()
    INCLUDE "../../../libsrc/stdlib/z80/sort/asm_shellsort.asm"
    INCLUDE "../../../libsrc/stdlib/z80/sort/asm_quicksort.asm"
 
-   #define read_qsort_small_c_args \
-         pop af \ pop ix \ pop de \ pop hl \ pop bc \ \
-         push bc \ push hl \ push de \ push ix \ push af \ \
-         ; enter : ix = int (*compar)(de=const void *, hl=const void *) \
-         ;         bc = void *base \
-         ;         hl = size_t nmemb \
-         ;         de = size_t size
+   ; Enter a newlib sort preserving the caller IX. The sort cores take the
+   ; comparator in IX and clobber it, so a caller using IX as a frame pointer
+   ; (80cc -frameix) must save and restore it. Args are read by sp-offset (not
+   ; popped) so the __smallc caller-cleanup contract is preserved. After push ix:
+   ;   ret@sp+2 compar@sp+4 size@sp+6 nmemb@sp+8 base@sp+10
+   ; (the caller then does: call asm_*sort / pop ix / ret)
+   #define newlib_sort_enter \
+         push ix \ \
+         ld hl,6 \ add hl,sp \ ld e,(hl) \ inc hl \ ld d,(hl) \ \
+         ld hl,10 \ add hl,sp \ ld c,(hl) \ inc hl \ ld b,(hl) \ \
+         ld hl,4 \ add hl,sp \ ld a,(hl) \ inc hl \ ld h,(hl) \ ld l,a \ \
+         push hl \ pop ix \ \
+         ld hl,8 \ add hl,sp \ ld a,(hl) \ inc hl \ ld h,(hl) \ ld l,a
 
 #endasm
 }
@@ -69,8 +75,9 @@ static void dummy()
 static void exec_newlib_isort(void *base,size_t nmemb,size_t size,void *compar) __smallc __naked
 {
 #asm
-   read_qsort_small_c_args
+   newlib_sort_enter
    call asm_insertion_sort
+   pop ix
    ret
 #endasm
 }
@@ -79,8 +86,9 @@ static void exec_newlib_isort(void *base,size_t nmemb,size_t size,void *compar) 
 static void exec_newlib_ssort(void *base,size_t nmemb,size_t size,void *compar) __smallc __naked
 {
 #asm
-   read_qsort_small_c_args
+   newlib_sort_enter
    call asm_shellsort
+   pop ix
    ret
 #endasm
 }
@@ -89,8 +97,9 @@ static void exec_newlib_ssort(void *base,size_t nmemb,size_t size,void *compar) 
 static void exec_newlib_qsort(void *base,size_t nmemb,size_t size,void *compar) __smallc __naked
 {
 #asm
-   read_qsort_small_c_args
+   newlib_sort_enter
    call asm_quicksort
+   pop ix
    ret
 #endasm
 }
