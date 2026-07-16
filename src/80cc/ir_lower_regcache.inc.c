@@ -37,6 +37,22 @@ static int vreg_in_pr_bc(const Func *f, int vreg_id)
     return f->vreg_to_phys[vreg_id] == IR_PR_BC;
 }
 
+/* True if vreg_id is a stack-transient spill (IR_PR_STACK): pushed at its def,
+   popped at its single use — no frame slot. See ir_stack_spill (ir_alloc). */
+static int vreg_is_pr_stack(const Func *f, int vreg_id)
+{
+    if (!f || !f->vreg_to_phys) return 0;
+    if (vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
+    return f->vreg_to_phys[vreg_id] == IR_PR_STACK;
+}
+/* True if vreg_id's value is currently push-parked AND still at TOS (nothing
+   pushed on top since the park — cur_sp_adjust unchanged). */
+static int stack_parked(int vreg_id)
+{
+    return vreg_id >= 0 && L.cur_stack_resident == vreg_id
+        && L.cur_sp_adjust == L.cur_stack_resident_spadj;
+}
+
 static int vreg_in_pr_de(const Func *f, int vreg_id)
 {
     if (!f || !f->vreg_to_phys) return 0;
@@ -111,6 +127,19 @@ int tos_pushpop_ok(const Func *f)
     return !(IS_RABBIT() || IS_GBZ80() || IS_KC160());
 }
 
+/* Same sp+0 trick for the LONG (32-bit) ex-free paths — additionally allowed on
+   gbz80. gbz80's push/pop are dear (16T/12T), so for a 16-bit slot the pop/push
+   load can lose in a hot loop (measured: intbench +6.8%), which is why the word
+   paths keep tos_pushpop_ok. But a 32-bit slot's byte-walk is twice as long
+   (`pop hl;pop de` vs an 8-instruction walk), the pop/push is a clear size win,
+   and long slots rarely sit in the hottest int loops. rabbit/kc160 keep their
+   native sp-relative access. */
+int tos_pushpop_noex_ok(const Func *f)
+{
+    (void)f;
+    return !(IS_RABBIT() || IS_KC160());
+}
+
 /* True when even in fp-mode the pop/push trick beats the IX access for
    the DEEPEST local (slot_off==0). With cur_sp_adjust==0, SP == that
    slot's address, so `pop hl;push hl` reads it. On z80/z180/z80n
@@ -158,6 +187,20 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
 
 static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
+    /* Stack-transient spill (IR_PR_STACK): the value was parked at TOS by a
+       `push` at its def; pop it here (its single use). Checked FIRST — before the
+       HL-cache hit — so a stale cache_hl(dst) left by a direct-store producer
+       can't skip the balancing pop (which would leak the pushed word). Valid only
+       when it is actually TOS: sp_adj==0 and it's the resident park (the allocator
+       forbids calls / other stack ops between def and use). */
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id) && sp_adj == 0) {
+        ss_note_reload(f, vreg_id);
+        emit(out, "pop\thl");
+        L.cur_sp_adjust -= 2;
+        L.cur_stack_resident = -1;
+        hl_about_to_change(vreg_id);
+        return;
+    }
     /* HL cache hit: no-op. Some callers call us unconditionally, and for
        PR_HL vregs (no slot) the slot read at the bottom would land at sp-1
        and read garbage below the frame — so return early here. */
@@ -182,6 +225,16 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
         ss_note_cache_read(f, vreg_id);
         emit(out, "ld\thl,bc");
+        hl_about_to_change(vreg_id);
+        return;
+    }
+    /* DE hit: copy DE→HL non-destructively (`ld l,e; ld h,d`, DE preserved —
+       mirrors the BC path). Without this a DE-resident value needed in HL fell
+       through to a slot reload (e.g. a call result cached in DE by gen_call). */
+    if (de_has(vreg_id) && f->vregs[vreg_id].width == 2) {
+        ss_note_cache_read(f, vreg_id);
+        emit(out, "ld\tl,e");
+        emit(out, "ld\th,d");
         hl_about_to_change(vreg_id);
         return;
     }
@@ -343,6 +396,17 @@ static void load_to_hl(FILE *out, const Func *f, int vreg_id)
    After: rs.de = vreg_id; HL holds whatever DE was (junk). */
 static void load_to_de(FILE *out, const Func *f, int vreg_id)
 {
+    /* Stack-transient spill parked at TOS: pop straight into DE (its single use).
+       Checked FIRST — before the DE-cache hit — so a stale cache_de(dst) can't
+       skip the balancing pop. Doesn't disturb HL. See load_to_hl_adj. */
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+        ss_note_reload(f, vreg_id);
+        emit(out, "pop\tde");
+        L.cur_sp_adjust -= 2;
+        L.cur_stack_resident = -1;
+        cache_de(vreg_id);
+        return;
+    }
     if (L.rs.de == vreg_id && vreg_id >= 0) {
         ss_note_cache_read(f, vreg_id);
         return;
@@ -514,6 +578,18 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
    (2 extra bytes), letting the caller keep a cached value in HL. */
 static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
 {
+    /* Stack-transient parked at TOS: `pop de` takes it, leaving HL untouched —
+       exactly this function's contract. Checked FIRST (before the DE-cache hit)
+       so a stale cache_de(dst) can't skip the balancing pop. (The generic push-hl
+       path below would shove HL on top of the park and pop the wrong word.) */
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+        ss_note_reload(f, vreg_id);
+        emit(out, "pop\tde");
+        L.cur_sp_adjust -= 2;
+        L.cur_stack_resident = -1;
+        cache_de(vreg_id);
+        return;
+    }
     if (L.rs.de == vreg_id && vreg_id >= 0) return;
     /* PR_BC hit: BC→DE doesn't touch HL, so the push/pop is pointless. */
     if (bc_has(vreg_id) && f->vregs[vreg_id].width == 2) {
@@ -570,6 +646,19 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
 /* Store HL to a vreg's frame slot. */
 static void store_hl(FILE *out, const Func *f, int vreg_id)
 {
+    /* Stack-transient (IR_PR_STACK): park HL on the stack, don't slot-store to
+       the -1 sentinel (which the sp fallback turns into a write at sp-1).
+       Defensive catch-all for producers that reach store_hl directly rather than
+       commit_hl_word/spill_and_swap (which already park). The single use pops it;
+       load_to_* check the park before any cache, so a caller's later cache_hl(v)
+       can't skip the pop. */
+    if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
+        emit(out, "push\thl");
+        L.cur_sp_adjust += 2;
+        L.cur_stack_resident = vreg_id;
+        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        return;
+    }
     if (fp_active(f)) {
         /* Deepest slot at TOS: discard the word (inc sp x2) and push the
            value — cheaper than synthetic ld (ix+d),hl, same contract
@@ -643,6 +732,29 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
    if A already holds the wanted vreg, skip the slot read. */
 static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
 {
+    /* AF-parked NO_SLOT byte (store_a_byte pushed it): pop it back. LIFO — only
+       the top entry, and only while still at TOS (cur_sp_adjust unchanged since
+       the park). Checked before the A-cache so the push always balances. */
+    if (L.af_park_depth > 0
+        && L.af_park_vreg[L.af_park_depth - 1] == vreg_id
+        && L.cur_sp_adjust == L.af_park_spadj[L.af_park_depth - 1]) {
+        emit(out, "pop\taf");
+        L.cur_sp_adjust -= 2;
+        L.af_park_depth--;
+        cache_a(vreg_id);
+        return;
+    }
+    /* Stack-transient word parked at TOS: pop into HL, low byte → A. Before the
+       A-cache hit so a stale a_has can't skip the pop. */
+    if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+        ss_note_reload(f, vreg_id);
+        emit(out, "pop\thl");
+        L.cur_sp_adjust -= 2;
+        L.cur_stack_resident = -1;
+        emit(out, "ld\ta,l");
+        cache_a(vreg_id);
+        return;
+    }
     if (a_has(vreg_id)) return;
     /* Index-half home: always valid (slotless, never clobbered) — read direct. */
     PhysReg ih = idxhalf_phys(f, vreg_id);
@@ -711,6 +823,21 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
         byte_home_note(vreg_id);
         if (byte_home_slotbacked(bh)) L.cur_byte_home_dirty = 1;
         cache_a(vreg_id);   /* A still holds the value — next read elides */
+        return;
+    }
+    /* No real slot (NO_SLOT byte, slot_off == -1): the value in A must survive
+       whatever clobbers A before its use (e.g. a store whose address load uses
+       `ld a,(hl+)`). Park it with `push af` — a real, interrupt-safe stack slot —
+       NOT the old `ld (ix-(frame+1)),a` / sp-1 write below sp. load_byte_to_a's
+       AF-park path pops it. cur_sp_adjust holds +2 so sp-relative slot reads in
+       between stay correct (fp ix-relative reads are unaffected). LIFO-nested. */
+    if (slot_off(f, vreg_id) < 0 && L.af_park_depth < 4) {
+        emit(out, "push\taf");
+        L.cur_sp_adjust += 2;
+        L.af_park_vreg[L.af_park_depth]  = vreg_id;
+        L.af_park_spadj[L.af_park_depth] = L.cur_sp_adjust;
+        L.af_park_depth++;
+        L.rs.a = -1;   /* value now lives at TOS; readers must go through the pop */
         return;
     }
     if (fp_active(f)) {
@@ -947,6 +1074,43 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         if (!no_hl) hl_about_to_change(vreg_id);
         return;
     }
+    /* Narrower-than-long vreg read AS a long: load it at its OWN width and
+       sign-extend into DEHL — the C integer widening (char/int → long) — rather
+       than reading `width` valid bytes plus (4-width) garbage bytes past its
+       (narrower) slot. This makes a kind/width-split vreg (kind LONG but width 2,
+       e.g. a long-typed `x+r` whose int operands leave it width-2) read back
+       correctly wherever it is later used as a long, instead of pulling a
+       neighbouring slot's bytes in as the high half. */
+    if (f->vregs[vreg_id].width == 2) {
+        int save = L.cur_sp_adjust;
+        L.cur_sp_adjust += sp_adj;              /* sp-rel slot at sp+sp_adj (fp: ignored) */
+        load_to_hl(out, f, vreg_id);            /* HL = the 2 valid bytes */
+        L.cur_sp_adjust = save;
+        emit(out, "push\taf");                  /* preserve caller's A/flags */
+        emit(out, "ld\ta,h");
+        emit(out, "rlca");
+        emit(out, "sbc\ta,a");                  /* A = 0x00 / 0xFF (sign of HL) */
+        emit(out, "ld\te,a");
+        emit(out, "ld\td,a");                   /* DE = sign extension */
+        emit(out, "pop\taf");
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
+    if (f->vregs[vreg_id].width == 1) {
+        int save = L.cur_sp_adjust;
+        L.cur_sp_adjust += sp_adj;
+        load_byte_to_a(out, f, vreg_id);        /* A = the byte */
+        L.cur_sp_adjust = save;
+        emit(out, "ld\tl,a");
+        emit(out, "rlca");
+        emit(out, "sbc\ta,a");
+        emit(out, "ld\th,a");
+        emit(out, "ld\te,a");
+        emit(out, "ld\td,a");                   /* DEHL = sign-extended byte */
+        invalidate_a_cache();
+        publish_dehl_from_hl(out, vreg_id, no_bc);
+        return;
+    }
     /* FP-relative long load. sp_adj is irrelevant for the IX-addressed
        path below, but NOT for the TOS pop/push trick (sp-relative): with
        sp_adj>0 the slot is at sp+sp_adj, so the trick would pop the
@@ -981,7 +1145,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     /* Top-of-stack long load: a slot at sp+0 read whole with `pop hl;
        pop de` (HL=low, DE=high), the two pushes put it back — no address
        compute, no 4-byte walk. sp-mode + tos_pushpop_ok only. */
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         emit(out, "pop\thl");           /* HL = low half (bytes 0-1) */
         emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
         emit(out, "push\tde");
@@ -1070,7 +1234,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        its 4 bytes (`pop bc; pop bc`, BC clobbered by contract) and re-push
        DEHL. No address compute, no 4-byte walk, and HL stays valid (low
        half) afterwards. sp-mode + tos_pushpop_ok only. */
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         emit(out, "pop\tbc");           /* drop old low half */
         emit(out, "pop\tbc");           /* drop old high half */
         emit(out, "push\tde");          /* write high half (bytes 2-3) */
@@ -1978,7 +2142,19 @@ static int op_de_clean(const Func *f, const Op *o)
     case IR_BR_ZERO: case IR_BR_COND: {
         int s  = o->src[0];
         int sw = (s >= 0 && s < f->n_vregs) ? f->vregs[s].width : 2;
-        return sw <= 1;               /* byte test → `or a`; wider uses HL/DE */
+        if (sw <= 1) return 1;        /* byte → `or a`, DE-clean on all CPUs */
+        if (getenv("IR_NO_WORD_ZTEST")) return 0;   /* opt-out → baseline */
+        /* word → emit_test_zero's `load_to_hl; ld a,h; or l` (or Rabbit4k
+           `test`) — HL+A only, DE untouched. This lets a pointer-chase loop
+           (`while (p) { acc += p->f; p = p->next; }`) keep its accumulator in
+           DE across the null test. FP ONLY: in sp mode a sibling width-2
+           counter op (`while (n--)`) loads the counter into DE (`ld e,(hl);
+           ld d,(hl); dec de; … ex de,hl`), clobbering the home — and the
+           accumulate's `ex de,hl` (`xchg` on 808x) isn't available on gbz80.
+           fp keeps such counter ops in (ix+d) (HL-only), so DE survives. */
+        return sw == 2 && fp_active(f)
+            && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+                || IS_EZ80() || IS_808x());
     }
     case IR_AND: case IR_OR: case IR_XOR: case IR_ADD: case IR_SUB:
     case IR_RSUB: case IR_INC: case IR_DEC: case IR_NOT: case IR_NEG:

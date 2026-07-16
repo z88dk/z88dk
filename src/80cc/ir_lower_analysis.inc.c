@@ -917,6 +917,24 @@ static int vreg_is_pr_dehl(const Func *f, int v)
    register-pool vregs: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
+    /* Stack-transient spill (IR_PR_STACK): park the value at TOS with `push hl`
+       instead of a frame slot store. HL keeps the value (no swap-back); the
+       single use pops it (load_to_*). Held +2 in cur_sp_adjust until then so
+       intervening sp-relative slot reads stay correct. Handled before the
+       cur_dst_dead early-out so the push/pop always balances. */
+    if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
+        emit(out, "push\thl");
+        L.cur_sp_adjust += 2;
+        L.cur_stack_resident = vreg;
+        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        /* The value now lives at TOS, not in HL. Forget any HL belief: it must
+           NOT be re-advertised (commit_hl_word skips cache_hl for us) — a reader
+           that trusted HL would use the wrong value AND skip the balancing pop.
+           The producer's own def (e.g. `ld hl,bc; add hl,de`) left HL's cache
+           claiming a STALE source, so clear it. */
+        hl_about_to_change(-1);
+        return;
+    }
     if (L.la.cur_dst_dead) return;
     /* Pooled vreg: no slot. PR_HL is the caller's job (cache_hl tops it up).
        PR_BC needs an HL→BC copy so later loads hit the BC short-circuit;
@@ -970,6 +988,10 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 static void commit_hl_word(FILE *out, const Func *f, int v)
 {
     spill_and_swap_unless_dead(out, f, v);
+    /* A stack-transient's value now lives at TOS, NOT in HL — advertising HL
+       would let a reader skip the pop and leak the pushed word. Its use always
+       pops. */
+    if (v >= 0 && vreg_is_pr_stack(f, v)) return;
     cache_hl(v);
 }
 
@@ -996,6 +1018,19 @@ static void commit_hl_result(FILE *out, const Func *f, int v)
    `ld hl,K + store_hl + ex de,hl`. */
 static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 {
+    /* Stack-transient (IR_PR_STACK): value is in DE — park it (`push de`) instead
+       of storing to the (nonexistent, -1) slot. Else the slot path below emits
+       `ld hl,-1; add hl,sp; ld (hl),e…` = a write at sp-1 (the 8085 crash: the
+       `ld de,K` LD_IMM fastpath reaches here, and PR_STACK is neither dst-dead
+       nor register-pool). Its single use pops it; the caller must NOT cache_hl. */
+    if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
+        emit(out, "push\tde");
+        L.cur_sp_adjust += 2;
+        L.cur_stack_resident = vreg;
+        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        invalidate_de_cache();
+        return;
+    }
     if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
         emit(out, "ex\tde,hl");
         invalidate_de_cache();

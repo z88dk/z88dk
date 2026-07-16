@@ -2276,7 +2276,13 @@ int ir_opt_coalesce_copies(Func *f)
                 if (d < 0 || d >= f->n_vregs || t < 0 || t >= f->n_vregs
                     || d == t)
                     continue;
-                if (f->vregs[d].width != 1 || f->vregs[t].width != 1) continue;
+                /* Pure copy only: equal widths.  A differing-width CONV
+                   (TRUNC/ZX/SX) does real work and must NOT be renamed away.
+                   Byte and word (int/pointer) copies both coalesce — the
+                   word case folds a `var = call()` temp into the variable,
+                   killing the MOV + the store/reload/shuffle around it. */
+                if (f->vregs[d].width != f->vregs[t].width) continue;
+                if (f->vregs[d].width != 1 && f->vregs[d].width != 2) continue;
                 /* t must be a plain temp (renaming its defs to d must not
                    alias memory or a param's entry-live range); d must not be
                    pinned to memory. */

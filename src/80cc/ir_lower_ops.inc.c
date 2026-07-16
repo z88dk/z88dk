@@ -60,6 +60,10 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
         spill_de_unless_dead(out, f, op->dst);
+        /* PR_STACK parked the value on the stack (not HL) — advertising HL would
+           let a reader skip the balancing pop. Its use pops. */
+        if (f->vreg_to_phys && f->vreg_to_phys[op->dst] == IR_PR_STACK)
+            return 0;
     }
     cache_hl(op->dst);
     return 0;
@@ -938,7 +942,8 @@ static int func_has_pr_bc(const Func *f)
 {
     if (!f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == IR_PR_BC) return 1;
+        if (f->vreg_to_phys[i] == IR_PR_BC
+            && !(f->vregs[i].flags & IR_VREG_BC_PACK)) return 1;
     return 0;
 }
 
@@ -1072,6 +1077,17 @@ static int gen_asm(FILE *out, Func *f, const Op *op)
 
 static int gen_neg(FILE *out, Func *f, const Op *op)
 {
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
+        /* Byte NEG: A = -src[0], stored as ONE byte. Without this the width-2
+           fallback below (commit_hl_word) writes two bytes into a one-byte slot
+           — the extra byte clobbers the neighbouring slot (e.g. a byte-narrowed
+           `r` overwriting the low byte of an adjacent long). `cpl;add a,1` is the
+           two's-complement (~x+1), the same portable idiom as the width-4 path. */
+        load_byte_to_a(out, f, op->src[0]);
+        emit(out, "cpl");
+        emit(out, "add\ta,1");
+        return finalize_byte_result(out, f, op, 1);
+    }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Long NEG: DEHL = 0 - src[0], done as ~x + 1 byte-wise to
            avoid l_long_sub for a trivial constant LHS. */
@@ -1443,8 +1459,30 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             }
         }
     }
-    /* Residual bit-shift (1..7) via the helper bit-loop. */
-    if (bit_shift) {
+    /* Residual bit-shift (1..7). 8085 has native 16-bit shift ops the CB-less
+       808x path otherwise can't use: `rl de` (RDEL) and `add hl,hl` chain a
+       32-bit left shift in 2 ops/bit; a right shift has no native DE rotate so
+       it falls to an `or a` + `rra` byte-chain MSB→LSB. The left chain is lean
+       (2 ops/bit) so inline small counts; the right chain is 13 ops/bit so
+       inline ONLY a single bit (the CRC `>>1` hot case) — multi-bit right
+       shifts bloat with no real gain and keep the helper call. */
+    int inline_8085 = IS_8085()
+        && (is_shr ? (bit_shift == 1) : (bit_shift <= 3));
+    if (bit_shift && inline_8085) {
+        for (int i = 0; i < bit_shift; i++) {
+            if (is_shr) {
+                emit(out, "or\ta");            /* CY=0 → logical 0 into MSB */
+                emit(out, "ld\ta,d"); emit(out, "rra"); emit(out, "ld\td,a");
+                emit(out, "ld\ta,e"); emit(out, "rra"); emit(out, "ld\te,a");
+                emit(out, "ld\ta,h"); emit(out, "rra"); emit(out, "ld\th,a");
+                emit(out, "ld\ta,l"); emit(out, "rra"); emit(out, "ld\tl,a");
+            } else {
+                emit(out, "add\thl,hl");        /* low16<<1, bit15 -> CY */
+                emit(out, "rl\tde");            /* RDEL: high16<<1 through CY */
+            }
+        }
+        if (is_shr) invalidate_a_cache();
+    } else if (bit_shift) {
         emit(out, "ld\ta,%d", bit_shift);
         emit(out, is_shr ? "call\tl_lsr_dehl" : "call\tl_lsl_dehl");
     }
@@ -1878,6 +1916,16 @@ static void emit_pair_add_de_clean(FILE *out, const char *pair, const char *lo,
         emit(out, "adc\ta,%d", (k >> 8) & 0xff);
         emit(out, "ld\t%s,a", hi);
         invalidate_a_cache();
+        return;
+    }
+    /* A not free and past the inc range: a stack-scratched `add pair,de` is
+       O(1) bytes and preserves DE, BC and A — vastly better than an inc/dec
+       chain of length |k| (a +40 struct-field offset was 40 `inc hl`). */
+    if (k > 4 || k < -4) {
+        emit(out, "push\tde");
+        emit(out, "ld\tde,%d", k);
+        emit(out, "add\t%s,de", pair);
+        emit(out, "pop\tde");
         return;
     }
     const char *op = k > 0 ? "inc" : "dec";

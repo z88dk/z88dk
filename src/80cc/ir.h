@@ -78,6 +78,13 @@ typedef enum {
     IR_PR_HL_ALT,
     IR_PR_DE_ALT,
     IR_PR_BC_ALT,
+    /* Stack-transient spill: a width-2 value with a single def and single use in
+       one straight-line span, spilled NOT to a frame slot but to the stack —
+       `push hl` at the def (value kept in HL), `pop` at the use. No frame slot,
+       and push/pop (1 byte each) beat the slot store+reload. cur_sp_adjust is
+       held +2 across the span so intervening sp-relative slot accesses stay
+       correct. See ir_stack_spill (ir_alloc). */
+    IR_PR_STACK,
     IR_PR_SPILL = 0xFE /* not in any register — frame slot */
 } PhysReg;
 
@@ -99,6 +106,14 @@ typedef enum {
                                         never touches a frame slot. ir_assign_slots
                                         reserves none — shrinking frame_size.
                                         Set by compute_no_slot_bytes. */
+    IR_VREG_BC_PACK        = 1 << 7, /* Call-free-interval word temp packed into
+                                        BC by ir_bc_pack (IR_NO_BC_PACK opts out). Its
+                                        live range is single-BB, iteration-local
+                                        (never carried across the back-edge) and
+                                        BC-clean, so it is never live across a
+                                        call — gen_call's whole-function BC-save
+                                        must ignore it (Part 1). Slotless like any
+                                        PR_BC vreg (stamped `ld bc,hl` at its def). */
 } VRegFlags;
 
 typedef struct {
@@ -178,7 +193,11 @@ typedef enum {
     IR_OR,
     IR_XOR,
     IR_SHL,
-    IR_SHR,             /* unsigned shift right; SAR variant via Kind+sign */
+    IR_SHR,             /* shift right. Logical by default; the ARITHMETIC
+                           (signed) variant sets IR_SHR_ARITH in `imm` — see
+                           below. Register shape is identical either way, so
+                           every analysis/alloc/opt site treats them the same;
+                           only the lowerer (gen_shr) reads the bit. */
     IR_MUL,             /* dst = src[0] * src[1] via native hardware multiply.
                            Emitted only by build_muldiv_integer for CPUs with a
                            hardware multiply: kc160 (mul/muls hl 8x8, mul de,hl
@@ -360,6 +379,13 @@ typedef enum {
 
     IR_OP_COUNT
 } OpKind;
+
+/* IR_SHR arithmetic (signed) marker, carried in the high bits of Op.imm so it
+   rides along every op-copy for free and stays invisible to the count reads
+   (which mask `& 0x1f`) and the width-mask folds (widths ≤4 → bit ≤31). A
+   dedicated bit rather than a new opcode keeps IR_SHR's register shape single
+   across analysis/alloc/opt. */
+#define IR_SHR_ARITH ((int64_t)1 << 40)
 
 /* ----- ABI / call descriptors ------------------------------------------ */
 
