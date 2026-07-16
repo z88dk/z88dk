@@ -243,6 +243,65 @@ int check_eval(char* pat, char** vars)
     return expected == rpn_eval(expr, vars);
 }
 
+/* parse a "%n" variable reference at *pp (skipping leading whitespace),
+   advance *pp past it and return the variable's value (or 0 on error).
+   Aborts if the referenced variable was never set. */
+static char* parse_var(char** pp, char** vars, const char* who)
+{
+    char* p = *pp;
+    char* v;
+    while (*p && isspace((unsigned char)*p))
+        p++;
+    if (p[0] != '%' || !isdigit((unsigned char)p[1])) {
+        fprintf(stderr, "warning: invalid use of '%s': expected %%n in \"%s\"\n", who, *pp);
+        *pp = p;
+        return 0;
+    }
+    *pp = p + 2;
+    v = vars[p[1] - '0'];
+    if (v == 0)
+        error("variable is not set\n");
+    return v;
+}
+
+/* %is  %n tok tok ...   active if %n equals one of the tokens
+   %not %n tok tok ...   active if %n equals none of the tokens
+   'want' is 1 for %is, 0 for %not. Square brackets around the token
+   list are optional and ignored. */
+int check_member(char* pat, char** vars, int want)
+{
+    char buf[1024];
+    char* val;
+    char* tok;
+    int found = 0;
+
+    val = parse_var(&pat, vars, want ? "%is" : "%not");
+    if (val == 0)
+        return 0;
+    snprintf(buf, sizeof(buf), "%s", pat);
+    for (tok = strtok(buf, " \t\n[]"); tok; tok = strtok(NULL, " \t\n[]")) {
+        if (strcmp(tok, val) == 0) {
+            found = 1;
+            break;
+        }
+    }
+    return want ? found : !found;
+}
+
+/* %notSame %n %m   active if the two variables differ */
+int check_notsame(char* pat, char** vars)
+{
+    char *a, *b;
+
+    a = parse_var(&pat, vars, "%notSame");
+    if (a == 0)
+        return 0;
+    b = parse_var(&pat, vars, "%notSame");
+    if (b == 0)
+        return 0;
+    return strcmp(a, b) != 0;
+}
+
 /* match - match ins against pat and set vars */
 int match(char* ins, char* pat, char** vars)
 {
@@ -576,6 +635,17 @@ static struct lnode* opt(struct lnode* r)
                     break;
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))
+                    break;
+            } else if ( strncmp(p->l_text, "%notSame", 8) == 0 ) {
+                if (!check_notsame(p->l_text + 8, vars))
+                    break;
+            } else if ( strncmp(p->l_text, "%not", 4) == 0 &&
+                        (p->l_text[4] == ' ' || p->l_text[4] == '\t') ) {
+                if (!check_member(p->l_text + 4, vars, 0))
+                    break;
+            } else if ( strncmp(p->l_text, "%is", 3) == 0 &&
+                        (p->l_text[3] == ' ' || p->l_text[3] == '\t') ) {
+                if (!check_member(p->l_text + 3, vars, 1))
                     break;
             } else if ( strncmp(p->l_text, "%title",6) == 0 ) {
                 snprintf(titlebuf,sizeof(titlebuf),"%s",p->l_text + 7);

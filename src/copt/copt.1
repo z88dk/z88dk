@@ -163,6 +163,34 @@ better readability.
 ;; this is a comment
 
 .LP
+A rule may carry \fIpreconditions\fP: directive lines that further restrict
+when the rule fires. They are written at the \fItop\fP of the match part of a
+rule (before the instruction patterns) so that they are evaluated \fIafter\fP
+all the pattern variables have been bound. If any precondition fails the rule
+does not fire. The available preconditions are:
+.TP
+.B %check \fImin\fP <= %\fIn\fP <= \fImax\fP
+active if the numeric value of variable %\fIn\fP lies within the range.
+.TP
+.B %eval \fIresult\fP = \fIexpr\fP
+active if the reverse-polish expression \fIexpr\fP (over the variables)
+evaluates to \fIresult\fP.
+.TP
+.B %is %\fIn\fP \fItok tok ...\fP
+active if the text of variable %\fIn\fP equals one of the listed tokens.
+Square brackets around the token list are optional and ignored, e.g.
+\fI%is %1 [hl de bc]\fP.
+.TP
+.B %not %\fIn\fP \fItok tok ...\fP
+active if the text of variable %\fIn\fP equals none of the listed tokens
+(the complement of \fI%is\fP).
+.TP
+.B %notSame %\fIn\fP %\fIm\fP
+active if the two variables have different text.
+.TP
+.B %cpu \fInames\fP / %notcpu \fInames\fP
+active if (respectively is not) the target cpu.
+.LP
 \fIcopt\fP compares each run of input patterns
 with the current input instruction and its predecessors.
 If no match is found, it advances to the next input instruction and tries again.
