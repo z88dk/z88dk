@@ -2909,6 +2909,35 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         commit_hl_result(out, f, op->dst);
         return 0;
     }
+    /* LRA Phase 2b: accumulate directly in an index home. When dst is IX/IY-homed
+       (idx2/idx3) and one src shares that exact home — the running chain value is
+       already resident in the index reg — load the OTHER operand into DE and
+       `add <idx>,de` (or `add <idx>,<idx>` for x+x), keeping the result in the
+       index reg. Avoids the push/pop round-trip (load acc, add hl,de, store acc)
+       the generic path would emit. The FIRST add of a chain (no src in the home
+       yet) falls through and commit_hl_result inits the reg via `push hl;pop iy`.
+       Byte-identical by default (no index homes unless --idx3 / idx2). */
+    if (op->dst >= 0 && op->dst < f->n_vregs && f->vregs[op->dst].width == 2
+        && vreg_idx_home(f, op->dst) != IR_PR_NONE) {
+        PhysReg home = f->vreg_to_phys[op->dst];
+        const char *ir = idx_pr_name(home);
+        int acc = -1, other = -1;
+        if (op->src[0] >= 0 && f->vreg_to_phys[op->src[0]] == home)
+            { acc = op->src[0]; other = op->src[1]; }
+        else if (op->src[1] >= 0 && f->vreg_to_phys[op->src[1]] == home)
+            { acc = op->src[1]; other = op->src[0]; }
+        if (acc >= 0 && ir) {
+            if (other >= 0 && f->vreg_to_phys[other] == home) {
+                emit(out, "add\t%s,%s", ir, ir);      /* x + x (both in reg) */
+            } else {
+                if (other < 0) emit(out, "ld\tde,%lld", (long long)op->imm);
+                else           load_to_de(out, f, other);  /* HL scratch; reg preserved */
+                emit(out, "add\t%s,de", ir);
+                invalidate_de_cache();
+            }
+            return 0;                                  /* result stays in the index reg */
+        }
+    }
     if (try_word_accumulate(out, f, op))
         return 0;
     if (try_de_home_def(out, f, op))

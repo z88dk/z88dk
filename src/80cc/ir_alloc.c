@@ -1425,6 +1425,279 @@ static int lra_bc_emittable(const Func *f, const Op *o)
     return o->dst >= 0 && o->dst < f->n_vregs && f->vregs[o->dst].width == 2;
 }
 
+/* LRA Phase 2c: is IY available as a reduction-chain home in this function?
+   Needs a CPU with IY + `add iy,de` (excludes gbz80/808x), sp-mode (IY free;
+   -frameiy uses it as the frame ptr — widen to -frameix later), IY not already
+   claimed by idx2/idx3/exx, and not an interrupt/naked function. */
+static int lra_iy_available(const Func *f)
+{
+    if (f->is_interrupt || f->is_naked) return 0;
+    /* CPU must have IY + `add iy,de` (excludes gbz80/8080/8085). z180/ez80/rabbit
+       support the full-word add iy,rr (only the index-HALF ops trap on z180). */
+    if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
+          || IS_EZ80() || IS_RABBIT())) return 0;
+    /* IY is free in sp-mode (-1) and -frameix (1, IX is the frame); NOT under
+       -frameiy (0, IY is the frame). The fp epilogue frame fix + IY-occupancy
+       arbitration (below) + the FULL-live-range IY-clean check (rejects an
+       accumulator live across an IY-clobbering call — the remat.c fp miscompile,
+       now fixed) make fp sound. */
+    if (c_framepointer_is_ix == 0) return 0;
+    return 1;   /* IY occupancy handled (with benefit arbitration) in the pass */
+}
+
+/* A vreg that can be a reduction-chain member homed in IY: a plain width-2
+   spill temp (no address-taken/volatile/param). */
+static int lra_iy_chain_ok(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs) return 0;
+    if (f->vregs[v].width != 2) return 0;
+    if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;      /* free / not already placed */
+    if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+        return 0;
+    return 1;
+}
+
+/* LRA Phase 2c (IR_LRA-gated): home a DE-dirty straight-line reduction chain in
+   IY. A chain is a run of width-2 ADDs c0=x+y, c1=c0+z, c2=c1+w… where each
+   partial feeds the NEXT add as an operand and is otherwise dead (single use),
+   all spilling in one loop-body BB. The addends' address computation owns HL+DE
+   (and BC holds the loop ptr/IV), so the partials can't home in BC/DE and spill
+   to slots. IY is immune to that clobbering, so the whole chain time-shares ONE
+   IY register: c0 inits it (`push hl; pop iy` via commit_hl_result), c1.. via
+   `add iy,de` (Phase 2b emitter). Sets f->idx3_reg=IY so vreg_idx_home sees the
+   members and the prologue saves IY (frame_has_saved_iy). Runs AFTER ir_bc_pack
+   (takes the SPILL losers) and before ir_stack_spill. Gated; byte-identical off. */
+static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
+                                 const int *use_count)
+{
+    if (!getenv("IR_LRA")) return;
+    if (!lra_iy_available(f)) return;
+
+    /* RAW use counts (the passed use_count is depth-weighted — no good for a
+       single-use test). raw_uses[v] = number of ops that read v. Also mark
+       deref bases: a value used as a MEM_VREG base (or POSTSTEP subject) is a
+       POINTER — it must stay addressable (`ld a,(hl)` etc.), NOT get homed in IY
+       via add-iy-de (its deref would need (iy+d) / a separate path). The
+       accumulator detector otherwise matches a walking pointer `p = p + stride`
+       (same `s = s OP x` shape); excluding bases prevents that (test_remat_counter). */
+    int *raw_uses = calloc((size_t)f->n_vregs, sizeof(int));
+    int *is_base  = calloc((size_t)f->n_vregs, sizeof(int));
+    if (!raw_uses || !is_base) { free(raw_uses); free(is_base); return; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int u[16], nu = ir_op_uses(o, u, 16);
+            for (int k = 0; k < nu; k++)
+                if (u[k] >= 0 && u[k] < f->n_vregs) raw_uses[u[k]]++;
+            if (o->mem.kind == IR_MEM_VREG && o->mem.base >= 0
+                && o->mem.base < f->n_vregs) is_base[o->mem.base] = 1;
+            if (o->kind == IR_POSTSTEP && o->src[0] >= 0
+                && o->src[0] < f->n_vregs) is_base[o->src[0]] = 1;
+        }
+
+    /* Loop-carried accumulator (checked FIRST — it is live the whole loop, so
+       homing it saves per-iteration slot traffic word_acc/DE-home couldn't). A
+       width-2 spill s self-updated `s = s OP x` (ADD/SUB) in a loop, live across
+       the back-edge (live-in AND live-out of the update's BB). word_acc left it
+       spilling because DE is dirtied by the addend's address calc or a call; IY
+       survives both (op_clobbers respects the helper table — l_mult etc. preserve
+       IY), so s rides IY the whole loop: init `ld iy,K`/push;pop, updates
+       `add iy,de` (Phase 2b aliased path), read at exit. Requires the ENTIRE loop
+       region IY-clean. Scored by depth-weighted use_count (hotness) and compared
+       against the best chain below — one IY user per function, take the hotter.
+       (matrixbench has a COLD outer checksum accumulator AND the HOT inner
+       stencil chain; the score picks the chain.) */
+    int acc = -1, acc_bb = -1; long acc_score = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (!lra_iy_chain_ok(f, v) || is_base[v]) continue;   /* not a deref-base pointer */
+        int ub = -1;
+        for (int b = 0; b < f->n_bbs && ub < 0; b++) {
+            if (!bb_in_loop[b]) continue;
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *o = &f->bbs[b].ops[j];
+                if ((o->kind == IR_ADD || o->kind == IR_SUB)
+                    && o->dst == v && (o->src[0] == v || o->src[1] == v)) { ub = b; break; }
+            }
+        }
+        if (ub < 0) continue;
+        const BB *ubb = &f->bbs[ub];
+        if (!ubb->live_in || !ubb->live_out) continue;
+        if (!ir_bitset_get((const BitSet *)ubb->live_in, v)
+            || !ir_bitset_get((const BitSet *)ubb->live_out, v)) continue;   /* loop-carried */
+        /* IY-clean over the accumulator's FULL span — anywhere it is LIVE, not
+           just the loop. An IY-clobbering op is a problem iff it isn't v's own
+           write (an `add iy,de` / `ld iy` legitimately sets IY=v) AND v is
+           live-OUT of it (needed afterwards). This catches a call BEFORE the loop
+           that v is carried across (`chk=0; o=encode_pairs(); for(...)chk+=...` —
+           the remat.c:48 fp miscompile) while allowing the last-use op (RET /
+           the exit compare reads v then IY is free) and v's own updates. */
+        int clean = 1;
+        for (int b = 0; b < f->n_bbs && clean; b++) {
+            const BB *cb = &f->bbs[b];
+            if (!cb->live_in_per_op) continue;
+            for (int k = 0; k < cb->n_ops; k++) {
+                const Op *o = &cb->ops[k];
+                if (o->dst == v) continue;                    /* v's own write */
+                if (!(op_clobbers(f, o) & IR_R_IY)) continue;
+                const BitSet *lo = (k + 1 < cb->n_ops)
+                    ? (const BitSet *)cb->live_in_per_op[k + 1]
+                    : (const BitSet *)cb->live_out;
+                if (lo && ir_bitset_get(lo, v)) { clean = 0; break; }  /* v survives an IY clobber */
+            }
+        }
+        if (!clean) continue;
+        if ((long)use_count[v] > acc_score) { acc = v; acc_bb = ub; acc_score = use_count[v]; }
+    }
+
+    /* Find the single BEST (longest = most spill traffic saved) reduction chain
+       in the function. ONE chain per function: the members of one chain have
+       disjoint consecutive ranges and safely time-share IY, but two chains in
+       different BBs can be simultaneously live (matrixbench: a row-offset chain
+       lives across the neighbour-sum chain) and would collide in the one IY
+       register. Proper inter-chain interference needs live ranges (not built
+       here) — that's Phase 2d. */
+    int best[32], best_nm = 0, best_bb = -1; long best_score = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (!bb_in_loop[b]) continue;
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            if (bb->ops[j].kind != IR_ADD) continue;
+            int d0 = bb->ops[j].dst;
+            if (!lra_iy_chain_ok(f, d0) || is_base[d0]) continue;  /* fresh spill, not a ptr */
+            /* Grow the chain within this BB: follow the single-use partial into
+               the next ADD that consumes it. Each partial (incl. the head) must
+               be consumed ONLY by that add (raw single use) so the members'
+               ranges are disjoint and can share one IY register. */
+            int members[32]; int nm = 0; members[nm++] = d0;
+            int cur = d0, ci = j;
+            while (nm < 32 && raw_uses[cur] == 1) {
+                int nb = -1, nd = -1;
+                for (int k = ci + 1; k < bb->n_ops; k++) {
+                    const Op *p = &bb->ops[k];
+                    if (p->kind == IR_ADD && (p->src[0] == cur || p->src[1] == cur)) {
+                        nb = k; nd = p->dst; break;
+                    }
+                }
+                if (nb < 0 || !lra_iy_chain_ok(f, nd) || is_base[nd]) break;
+                members[nm++] = nd; cur = nd; ci = nb;
+            }
+            if (nm < 2) continue;                          /* need >=1 accumulate add */
+            /* IY must stay clean across the whole chain span [j..ci] (no CALL/
+               ASM / non-preserving HCALL — op_clobbers respects the helper table). */
+            int clean = 1;
+            for (int k = j; k <= ci && clean; k++)
+                if (op_clobbers(f, &bb->ops[k]) & IR_R_IY) clean = 0;
+            if (!clean) continue;
+            /* Score by depth-weighted hotness (sum of members' weighted uses) so
+               a hot inner-loop chain outranks a cold one. */
+            long score = 0;
+            for (int m = 0; m < nm; m++) score += use_count[members[m]];
+            if (score > best_score) {
+                best_score = score; best_nm = nm; best_bb = b;
+                for (int m = 0; m < nm; m++) best[m] = members[m];
+            }
+        }
+    }
+    /* One IY user per function: the higher-scoring of {accumulator, chain}. */
+    int win_acc = (acc >= 0 && acc_score >= best_score);
+    long win_score = win_acc ? acc_score : best_score;
+    if (!win_acc && best_nm < 2) { free(raw_uses); free(is_base); return; }   /* no candidate */
+
+    /* IY-occupancy ARBITRATION (2d). If idx2/idxhalf already homed value(s) in
+       IY, our candidate must OUTSCORE them (depth-weighted uses) to claim it.
+       fp-mode: idx2's index-home is ~a wash there (`push iy;pop hl` costs the
+       same as an `(ix+d)` slot read), while our `add iy,de` accumulate is a real
+       win — and idx2 in fp doesn't even save the caller's IY, whereas taking IY
+       for the reduction does (frame_has_saved_iy) — so eviction is a strict
+       improvement when we outscore it. sp-mode: idx2's IY-home is genuinely
+       cheaper than a slot, so DON'T evict (keep the current free-IY-only rule);
+       occ_score is set to LONG_MAX to force a bail. */
+    long occ_score = 0; int occ_n = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        PhysReg p = f->vreg_to_phys[v];
+        if (p == IR_PR_IY || p == IR_PR_IYL || p == IR_PR_IYH) {
+            occ_score += use_count[v]; occ_n++;
+        }
+    }
+    if (occ_n > 0) {
+        /* fp-mode: idx2's index-home is a WASH (`push iy;pop hl` == `(ix+d)`
+           slot read), so ANY real reduction candidate (its `add iy,de` saves the
+           accumulator RMW) is a net win over it — evict unconditionally. A
+           use_count comparison would wrongly keep idx2 (it counts the base ptr's
+           many reads but not that each costs the same in a slot). sp-mode: idx2's
+           IY-home genuinely beats an expensive sp slot, so never evict — bail and
+           leave IY to idx2 (matches the pre-arbitration free-IY-only rule). */
+        if (c_framepointer_is_ix != 1) { free(raw_uses); free(is_base); return; }
+        for (int v = 0; v < f->n_vregs; v++) {
+            PhysReg p = f->vreg_to_phys[v];
+            if (p == IR_PR_IY || p == IR_PR_IYL || p == IR_PR_IYH)
+                f->vreg_to_phys[v] = IR_PR_SPILL;   /* revert-to-slot */
+        }
+        if (getenv("IR_ALLOC_PROBE"))
+            fprintf(stderr, "IY_EVICT %d idx2 occupant(s) (fp wash) for candidate score=%ld\n",
+                    occ_n, win_score);
+    }
+    (void)occ_score;
+
+    if (win_acc) {
+        f->vreg_to_phys[acc] = IR_PR_IY;
+        f->idx3_reg = IR_PR_IY;
+        if (getenv("IR_ALLOC_PROBE"))
+            fprintf(stderr, "IY_ACC v%d bb%d score=%ld (loop-carried accumulator)\n",
+                    acc, acc_bb, acc_score);
+    } else {
+        for (int m = 0; m < best_nm; m++) f->vreg_to_phys[best[m]] = IR_PR_IY;
+        f->idx3_reg = IR_PR_IY;
+        if (getenv("IR_ALLOC_PROBE")) {
+            fprintf(stderr, "IY_REDUCE bb%d members=%d score=%ld:", best_bb, best_nm, best_score);
+            for (int m = 0; m < best_nm; m++) fprintf(stderr, " v%d", best[m]);
+            fprintf(stderr, "\n");
+        }
+    }
+    free(raw_uses); free(is_base);
+}
+
+/* Single-BB tight-interval SHAPE of a spill temp — the analysis both ir_bc_pack
+   and ir_stack_spill need. A width-2 vreg is `local` iff all its refs are in one
+   BB, the first ref is its def, and it is neither live-in nor live-out of that BB
+   (born-and-killed each execution). [lo,hi] is its tight op interval (local op
+   indices in bb_of); `uses` is its raw use count. Placement policy (BC-clean
+   span / call-free / single-use / stack hazards) stays in each pass — this is
+   just the shared shape, computed once. */
+typedef struct { int local, bb_of, lo, hi, uses; } SpillShape;
+
+static SpillShape *compute_spill_shapes(const Func *f)
+{
+    SpillShape *sh = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof *sh);
+    if (!sh) return NULL;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (f->vregs[v].width != 2) continue;
+        int bb_of = -1, lo = INT_MAX, hi = -1, first_is_def = 0, multi = 0, uses = 0;
+        for (int i = 0; i < f->n_bbs && !multi; i++) {
+            const BB *bb = &f->bbs[i];
+            for (int j = 0; j < bb->n_ops; j++) {
+                const Op *o = &bb->ops[j];
+                int is_def = (o->dst == v);
+                int u[16]; int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+                int is_use = 0;
+                for (int k = 0; k < nu; k++) if (u[k] == v) { is_use = 1; uses++; }
+                if (!is_def && !is_use) continue;
+                if (bb_of == -1) { bb_of = i; first_is_def = is_def; }
+                else if (bb_of != i) { multi = 1; break; }
+                if (j < lo) lo = j;
+                if (j > hi) hi = j;
+            }
+        }
+        if (multi || bb_of < 0 || hi < 0 || !first_is_def) continue;
+        const BB *bb = &f->bbs[bb_of];
+        if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)) continue;
+        if (bb->live_in  && ir_bitset_get((const BitSet *)bb->live_in,  v)) continue;
+        sh[v].local = 1; sh[v].bb_of = bb_of; sh[v].lo = lo; sh[v].hi = hi;
+        sh[v].uses = uses;
+    }
+    return sh;
+}
+
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count)
@@ -1448,35 +1721,18 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     int *ithi  = calloc((size_t)f->n_vregs, sizeof(int));
     int *itbb  = calloc((size_t)f->n_vregs, sizeof(int));
     int *itdop = calloc((size_t)f->n_vregs, sizeof(int));   /* def op idx in itbb */
-    if (!itloc || !itlo || !ithi || !itbb || !itdop) {
-        free(itloc); free(itlo); free(ithi); free(itbb); free(itdop); return;
+    SpillShape *sh = compute_spill_shapes(f);
+    if (!itloc || !itlo || !ithi || !itbb || !itdop || !sh) {
+        free(itloc); free(itlo); free(ithi); free(itbb); free(itdop); free(sh); return;
     }
 
+    /* itloc = single-BB-local (shared shape) AND the BC-specific span admission:
+       every op after the def must be call-free + BC-preserving + width-4-free. */
     for (int v = 0; v < f->n_vregs; v++) {
-        if (f->vregs[v].width != 2) continue;
-        int bb_of = -1, lo = INT_MAX, hi = -1, first_is_def = 0, multi = 0;
-        for (int i = 0; i < f->n_bbs && !multi; i++) {
-            const BB *bb = &f->bbs[i];
-            for (int j = 0; j < bb->n_ops; j++) {
-                const Op *o = &bb->ops[j];
-                int is_def = (o->dst == v);
-                int is_use = 0;
-                int u[16];
-                int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
-                for (int k = 0; k < nu; k++) if (u[k] == v) { is_use = 1; break; }
-                if (!is_def && !is_use) continue;
-                if (bb_of == -1) { bb_of = i; first_is_def = is_def; }
-                else if (bb_of != i) { multi = 1; break; }
-                if (j < lo) lo = j;
-                if (j > hi) hi = j;
-            }
-        }
-        if (multi || bb_of < 0 || hi < 0 || !first_is_def) continue;
-        const BB *bb = &f->bbs[bb_of];
-        if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)) continue;
-        if (bb->live_in  && ir_bitset_get((const BitSet *)bb->live_in,  v)) continue;
+        if (!sh[v].local) continue;
+        const BB *bb = &f->bbs[sh[v].bb_of];
         int span_ok = 1;
-        for (int j = lo + 1; j <= hi && span_ok; j++) {
+        for (int j = sh[v].lo + 1; j <= sh[v].hi && span_ok; j++) {
             const Op *o = &bb->ops[j];
             if (o->kind == IR_CALL || o->kind == IR_HCALL || o->kind == IR_ASM
                 || !bc_pack_span_kind_ok(o->kind)
@@ -1485,11 +1741,12 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         }
         if (!span_ok) continue;
         itloc[v] = 1;
-        itlo[v]  = bb_first_op[bb_of] + lo;
-        ithi[v]  = bb_first_op[bb_of] + hi;
-        itbb[v]  = bb_of;
-        itdop[v] = lo;                 /* first_is_def ⇒ def is at op index lo */
+        itlo[v]  = bb_first_op[sh[v].bb_of] + sh[v].lo;
+        ithi[v]  = bb_first_op[sh[v].bb_of] + sh[v].hi;
+        itbb[v]  = sh[v].bb_of;
+        itdop[v] = sh[v].lo;           /* first_is_def ⇒ def is at op index lo */
     }
+    free(sh);
 
     /* Candidate flat interval [flo,fhi], sorted by flo for greedy scheduling. */
     typedef struct { int vreg, flo, fhi; } PackCand;
@@ -1746,7 +2003,8 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
 
     typedef struct { int vreg, flo, fhi; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
-    if (!cand) return;
+    SpillShape *sh = compute_spill_shapes(f);
+    if (!cand || !sh) { free(cand); free(sh); return; }
     int nc = 0;
 
     for (int v = 0; v < f->n_vregs; v++) {
@@ -1758,28 +2016,12 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
         if (write_count[v] != 1) continue;
         if (!bc_safe_producer(def_kind[v])) continue;
 
-        /* Single BB, tight [lo,hi], first ref is the def, exactly one use. */
-        int bb_of = -1, lo = INT_MAX, hi = -1, first_is_def = 0, multi = 0, uses = 0;
-        for (int i = 0; i < f->n_bbs && !multi; i++) {
-            const BB *bb = &f->bbs[i];
-            for (int j = 0; j < bb->n_ops; j++) {
-                const Op *o = &bb->ops[j];
-                int is_def = (o->dst == v);
-                int u[16]; int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
-                int is_use = 0;
-                for (int k = 0; k < nu; k++) if (u[k] == v) { is_use = 1; uses++; }
-                if (!is_def && !is_use) continue;
-                if (bb_of == -1) { bb_of = i; first_is_def = is_def; }
-                else if (bb_of != i) { multi = 1; break; }
-                if (j < lo) lo = j;
-                if (j > hi) hi = j;
-            }
-        }
-        if (multi || bb_of < 0 || hi < 0 || !first_is_def || uses != 1) continue;
+        /* Shared shape: single-BB, first-ref-is-def, not live across the BB, tight
+           [lo,hi]; plus stack_spill's own "exactly one use". */
+        if (!sh[v].local || sh[v].uses != 1) continue;
+        int bb_of = sh[v].bb_of, lo = sh[v].lo, hi = sh[v].hi;
 
         const BB *bb = &f->bbs[bb_of];
-        if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)) continue;
-        if (bb->live_in  && ir_bitset_get((const BitSet *)bb->live_in,  v)) continue;
         if (op_dst_spill_is_dead(bb, lo)) continue;   /* value rides HL — no win */
         /* A value consumed by an IMMEDIATELY-following COMMUTATIVE binop rides a
            register straight into it (the lowering swaps it into the HL operand
@@ -1820,7 +2062,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
     }
     if (getenv("IR_ALLOC_PROBE"))
         fprintf(stderr, "STACK_SPILL placed=%d of candidates=%d\n", placed, nc);
-    free(cand);
+    free(cand); free(sh);
 }
 
 /* Diagnostic probe (IR_ALLOC_PROBE): count spilled width-2 temps whose whole
@@ -2628,6 +2870,9 @@ void ir_alloc(Func *f)
            it only claims BC where no loop home owns it. */
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
                    write_count, use_count);
+        /* LRA Phase 2c (IR_LRA): home a DE-dirty reduction chain in IY (add iy,de),
+           taking the spill losers BC couldn't. Byte-identical off. */
+        ir_iy_reduction_pack(f, bb_in_loop, use_count);
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
            fallback below BC-pack — a single-def/single-use word transient with
            no register free goes on the stack (push/pop) instead of a slot. */

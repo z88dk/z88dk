@@ -1346,9 +1346,13 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
     if (fp_active(f) && !L.cur_frameless) {
         /* FP teardown: IX holds the saved-IX address (frame_top). `ld sp,ix`
            drops the locals, then `pop ix` restores caller's IX. Both preserve
-           DEHL (and HL alone), so int-return and long-return converge here. */
+           DEHL (and HL alone), so int-return and long-return converge here.
+           idx3/IY-home in fp mode: the prologue pushed ix THEN iy, so after
+           `ld sp,ix` (ix == &saved_iy) the saved IY is on top — pop it BEFORE
+           the frame ptr, or `pop ix` would read the IY slot. */
         const char *fr = frame_reg();
         emit(out, "ld\tsp,%s", fr);
+        if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
         emit(out, "pop\t%s", fr);
     } else if (!L.cur_frameless && f->frame_size > 0) {
         if (use_add_sp(f, f->frame_size, is_acc ? 0 : 2)) {
@@ -1383,15 +1387,16 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
     if (!fp_active(f) && frame_has_saved_fp(f)) {
         /* Acc-tier function under -frameix: body addressed sp-relative, but
            entry pushed IX (gen_push_frame). The locals (if any) were dropped
-           above, so sp now points at the saved IX — restore the caller's
-           frame pointer so `ret` reads the return address. Touches only
-           IX/SP, leaving the return value in HL/DEHL/FA intact. */
+           above, so sp now points at the saved regs — pop the saved IY first
+           (pushed last, on top) then restore the caller's IX (frame ptr) so
+           `ret` reads the return address. Touches only IX/IY/SP, leaving the
+           return value in HL/DEHL/FA intact. (fp_active handled IY in its own
+           teardown above; this branch is the !fp_active acc-tier case only.) */
+        if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
         emit(out, "pop\t%s", frame_reg());
-    }
-    if (frame_has_saved_iy(f)) {
-        /* Restore caller's IY (idx3). The locals were dropped above, so sp now
-           points at the saved IY; pop it before the return address is read.
-           Touches only IY/SP — the return value in HL/DEHL is preserved. */
+    } else if (!fp_active(f) && frame_has_saved_iy(f)) {
+        /* Pure sp-mode idx3 (no saved IX): sp now points at the saved IY; pop it
+           before the return address is read. Touches only IY/SP. */
         emit(out, "pop\tiy");
     }
     if (f->is_interrupt) {
