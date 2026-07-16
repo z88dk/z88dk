@@ -11,9 +11,9 @@
 ; ROMCALL; DEFW ROM_ADDR
 ; ...and be conditionally compiled depending on the subtype we use.
 
-	EXTERN	ROMCALL_OP ; it's defined in m100_crt0.asm
+    EXTERN  ROMCALL_OP ; it's defined in m100_crt0.asm
 #define ROMCALL defb ROMCALL_OP
-	
+    
 ; ROM calls:
 
 #define OPTROM_SIG "TC"
@@ -22,15 +22,23 @@ defc    CONSOLE_ROWS = 8
 defc    POPAFRET = $26C8
 defc    OPTROMSIG = $FAA4
 
-defc	KYREAD	= $12CB	; wait for key from the keyboard
-defc	KYPEND	= $13DB	; check keyboard queue for pending characters
+defc    KYREAD  = $12CB ; wait for key from the keyboard
+defc    KYPEND  = $13DB ; check keyboard queue for pending characters
 
-defc	CLS	= $4231	; clear screen
-defc	CHROUT	= $4B44	; print character in reg. A to LCD/printer
-defc	CURPOS	= $427C	; position cursor; H=column (1-40), L=row(1-8)
-defc	CURSON	= $4249	; turn cursor on
-defc	CURSOFF	= $424E	; ...and off
-defc	BEEP	= $4229	; sound the beeper
+defc    CLS     = $4231 ; clear screen
+defc    CHROUT  = $4B44 ; print character in reg. A to LCD/printer
+defc    CURPOS  = $427C ; position cursor; H=column (1-40), L=row(1-8)
+defc    CURSON  = $4249 ; turn cursor on
+defc    CURSOFF = $424E ; ...and off
+defc    BEEP    = $4229 ; sound the beeper
 
-defc	LCDSET	= $744C ; LCD set pixel (D, E)
-defc	LCDRES	= $744D ; LCD reset pixel (D, E)
+;defc   LCDSET  = $744C ; LCD set pixel (D, E)
+;defc   LCDRES  = $744D ; LCD reset pixel (D, E)
+
+defc    SHAPE              = $FFEC
+defc    SETINT_1D          = $765C
+defc    SET_LCD_ADDR       = $753B
+defc    SET_LCD            = $74F5
+defc    PLOT_TBL           = $7643
+defc    PLOT_TBL2          = $764D
+defc    LCDSET_TAIL        = $7498   ; SET_LCD-$5D
