@@ -2687,6 +2687,12 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
    combine in place with op k, store back. */
 static int build_compound_int(Builder *b, Node *n, OpKind k)
 {
+    /* Arithmetic-vs-logical `>>=`: signed LHS → arithmetic (IR_SHR_ARITH),
+       mirrored from the expression path. Stamped onto every IR_SHR this
+       function emits (const + variable forms). */
+    Type *cmp_lvt = n->left ? node_value_type(n->left) : NULL;
+    int64_t shr_arith_bit = (k == IR_SHR && !(cmp_lvt && cmp_lvt->isunsigned))
+                          ? IR_SHR_ARITH : 0;
     /* Bitfield compound assign: `bf op= rhs` == `bf = extract(bf) op rhs`,
        then a read-modify-write store. The generic paths below treat the
        LHS as the whole storage unit, which operates on the wrong bits
@@ -2715,7 +2721,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             c->dst = t; c->src[0] = rhs; rhs = t;
         }
         int res = new_temp(b, 2); b->f->vregs[res].width = 2;
-        ir_emit_binop(cur_bb(b), k, res, cur, rhs);
+        { Op *o = ir_emit_binop(cur_bb(b), k, res, cur, rhs); o->imm |= shr_arith_bit; }
         return emit_bitfield_store(b, n->left->operand, bft, res,
                                    bft->isunsigned);
     }
@@ -2740,11 +2746,11 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             if (n->right && n->right->ast_type == AST_LITERAL) {
                 Op *op = ir_op_emit(cur_bb(b), k);
                 op->dst = tmp; op->src[0] = lhs_v;
-                op->src[1] = -1; op->imm = (int64_t)n->right->zval;
+                op->src[1] = -1; op->imm = (int64_t)n->right->zval | shr_arith_bit;
             } else {
                 int rhs_v = build_expr(b, n->right);
                 if (rhs_v < 0) return -1;
-                ir_emit_binop(cur_bb(b), k, tmp, lhs_v, rhs_v);
+                { Op *o = ir_emit_binop(cur_bb(b), k, tmp, lhs_v, rhs_v); o->imm |= shr_arith_bit; }
             }
             Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
             tr->dst = lhs_v; tr->src[0] = tmp;
@@ -2756,7 +2762,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             op->dst    = lhs_v;
             op->src[0] = lhs_v;
             op->src[1] = -1;
-            op->imm    = (int64_t)n->right->zval;
+            op->imm    = (int64_t)n->right->zval | shr_arith_bit;
             return lhs_v;
         }
         int rhs_v = build_expr(b, n->right);
@@ -2774,7 +2780,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             cv->dst = tmp; cv->src[0] = rhs_v;
             rhs_v = tmp;
         }
-        ir_emit_binop(cur_bb(b), k, lhs_v, lhs_v, rhs_v);  /* aliased */
+        { Op *o = ir_emit_binop(cur_bb(b), k, lhs_v, lhs_v, rhs_v); o->imm |= shr_arith_bit; }  /* aliased */
         return lhs_v;
     }
 
@@ -2797,11 +2803,11 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         if (n->right && n->right->ast_type == AST_LITERAL) {
             Op *op = ir_op_emit(cur_bb(b), k);
             op->dst = dst_g; op->src[0] = loaded_g;
-            op->src[1] = -1; op->imm = (int64_t)n->right->zval;
+            op->src[1] = -1; op->imm = (int64_t)n->right->zval | shr_arith_bit;
         } else {
             int rhs_v = build_expr(b, n->right);
             if (rhs_v < 0) return -1;
-            ir_emit_binop(cur_bb(b), k, dst_g, loaded_g, rhs_v);
+            { Op *o = ir_emit_binop(cur_bb(b), k, dst_g, loaded_g, rhs_v); o->imm |= shr_arith_bit; }
         }
         Op *st_g = ir_op_emit(cur_bb(b), IR_ST_MEM);
         st_g->src[0] = dst_g; st_g->mem.kind = IR_MEM_SYM;
@@ -2843,11 +2849,11 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         op->dst    = dst;
         op->src[0] = loaded;
         op->src[1] = -1;
-        op->imm    = (int64_t)n->right->zval;
+        op->imm    = (int64_t)n->right->zval | shr_arith_bit;
     } else {
         int rhs_v = build_expr(b, n->right);
         if (rhs_v < 0) return -1;
-        ir_emit_binop(cur_bb(b), k, dst, loaded, rhs_v);
+        { Op *o = ir_emit_binop(cur_bb(b), k, dst, loaded, rhs_v); o->imm |= shr_arith_bit; }
     }
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
     st->src[0]    = dst;
@@ -6289,6 +6295,13 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        count is an imm / width-2 vreg, not an arithmetic operand);
        pointer results keep 16-bit address math. */
     int is_shift = (k == IR_SHL || k == IR_SHR);
+    /* Arithmetic (signed) right shift marker for the emitted IR_SHR. A `>>`
+       is arithmetic iff the shifted (left) operand is signed — the parser's
+       OP_USHR/OP_SSHR split is unreliable across casts (#289), so read the
+       LHS value type's signedness directly, exactly as the i64 path does. */
+    Type *shift_lvt = node_value_type(n->left);
+    int64_t shr_arith_bit = (k == IR_SHR && !(shift_lvt && shift_lvt->isunsigned))
+                          ? IR_SHR_ARITH : 0;
     int is_ptrish = (n->type && (n->type->kind == KIND_PTR
                                  || n->type->kind == KIND_ARRAY))
                  || (lhs->type && (lhs->type->kind == KIND_PTR
@@ -6411,7 +6424,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         op->dst    = dst;
         op->src[0] = l;
         op->src[1] = -1;
-        op->imm    = imm;
+        op->imm    = imm | shr_arith_bit;
         b->f->vregs[dst].width = (int16_t)dst_w;
         return dst;
     }
@@ -6477,7 +6490,8 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
         }
     }
     int dst = get_dest_vreg(b, hint, dst_w);
-    ir_emit_binop(cur_bb(b), k, dst, l, r);
+    Op *bop = ir_emit_binop(cur_bb(b), k, dst, l, r);
+    if (shr_arith_bit) bop->imm |= shr_arith_bit;   /* variable-count signed >> */
     b->f->vregs[dst].width = (int16_t)dst_w;
     /* Pointer DIFFERENCE: `p - q` yields the element COUNT, not the
        byte difference — divide the IR_SUB result by sizeof(*p) when

@@ -1024,9 +1024,51 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+static int gen_sar16(FILE *out, Func *f, const Op *op);
+
+/* A = (unsigned char)A >> r, r in 1..7. After a `>>8`-class byte move only one
+   byte has data; rotate its surviving bits into place with the SHORTER of
+   `rrca`×r / `rlca`×(8-r) (both land the bits identically) then mask off the
+   rotated-in wrap-around. Beats r zero-filling shifts once r grows, and every
+   CPU has rrca/rlca/and-immediate. */
+static void emit_byte_lsr_a(FILE *out, int r)
+{
+    if (r <= 4)
+        for (int i = 0; i < r; i++)     emit(out, "rrca");
+    else
+        for (int i = 0; i < 8 - r; i++) emit(out, "rlca");
+    emit(out, "and\t%d", 0xff >> r);
+}
+
 static int gen_shr(FILE *out, Func *f, const Op *op)
 {
+    /* Arithmetic (signed) right shift — ir_build sets IR_SHR_ARITH on a `>>`
+       whose shifted operand is signed (#289 fix). sra sign-extends where the
+       logical srl/l_lsr zero-fills. */
+    int arith = (op->imm & IR_SHR_ARITH) != 0;
+
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
+        if (arith) {
+            /* Arithmetic long `>>` → l_asr_dehl (count in A, value in DEHL,
+               same ABI as the logical l_lsr_dehl). One correct path for const
+               and variable counts; the inline byte-move fast paths below are
+               logical-only. */
+            if (op->src[1] >= 0) {
+                if (!hl_has(op->src[1]))
+                    load_to_hl(out, f, op->src[1]);
+                emit(out, "ld\ta,l");
+                cache_a(op->src[1]);
+                load_to_dehl(out, f, op->src[0]);
+            } else {
+                load_to_dehl(out, f, op->src[0]);
+                emit(out, "ld\ta,%d", (int)op->imm & 0x1f);
+            }
+            emit(out, "call\tl_asr_dehl");
+            invalidate_a_cache();
+            invalidate_hl_bc();
+            store_dehl_finalize(out, f, op->dst);
+            return 0;
+        }
         if (op->src[1] >= 0) {
             /* Variable-count long shift → l_lsr_dehl helper (logical;
                IR_SHR is always logical). Same staging as IR_SHL. */
@@ -1166,9 +1208,61 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         store_dehl_finalize(out, f, op->dst);
         return 0;
     }
+    /* Arithmetic 16-bit `>>` has its own path (sra sign-extends); the logical
+       paths below stay byte-identical. */
+    if (arith)
+        return gen_sar16(out, f, op);
     /* 8080/8085: no CB shifts — route 16-bit logical `>>` to l_asr_u
        (DE=value, HL=count, result HL), const and variable counts. */
     if (IS_808x()) {
+        /* 8080/8085 have no CB shifts. Const counts inline: `>>8..15` is a byte
+           move (high byte → low, zero high) plus a small logical tail on the
+           surviving byte; 8085 also inlines `>>1..7` with the native `sra hl`
+           (ARHL) + one final mask (what l_asr_u does per bit, but masking once
+           and without the call). Everything else → l_asr_u. */
+        if (op->src[1] < 0) {
+            int count = (int)op->imm & 0x1f;
+            int handled = 1;
+            if (count == 0) {
+                load_to_hl(out, f, op->src[0]);
+            } else if (count >= 16) {
+                emit(out, "ld\thl,0");               /* unsigned >>16 == 0 */
+                invalidate_hl_cache();
+            } else if (count == 8) {
+                load_to_hl(out, f, op->src[0]);
+                emit(out, "ld\tl,h");                /* pure byte move */
+                emit(out, "ld\th,0");
+                invalidate_hl_cache();
+            } else if (count >= 8) {                 /* >>9..15: byte + residual */
+                load_to_hl(out, f, op->src[0]);
+                emit(out, "ld\ta,h");                /* surviving byte (no L hop) */
+                emit_byte_lsr_a(out, count - 8);
+                emit(out, "ld\tl,a");
+                emit(out, "ld\th,0");
+                invalidate_a_cache();
+                invalidate_hl_cache();
+            } else if (IS_8085()) {                  /* count 1..7 */
+                load_to_hl(out, f, op->src[0]);
+                for (int i = 0; i < count; i++)
+                    emit(out, "sra\thl");            /* ARHL: arith >>1 */
+                emit(out, "ld\ta,%d", 0xff >> count);/* clear the top `count` */
+                emit(out, "and\th");                 /* fill bits → logical */
+                emit(out, "ld\th,a");
+                invalidate_a_cache();
+                invalidate_hl_cache();
+            } else {
+                handled = 0;                         /* 8080 count 1..7 → helper */
+            }
+            if (handled) {
+                if (vreg_is_pr_de(f, op->dst)) {
+                    emit(out, "ex\tde,hl");
+                    cache_de(op->dst);
+                    return 0;
+                }
+                commit_hl_word(out, f, op->dst);
+                return 0;
+            }
+        }
         load_binop_operands(out, f, op);   /* HL=value, DE=count */
         emit(out, "ex\tde,hl");            /* DE=value, HL=count */
         emit_c(out, CLOB_HL, "call\tl_asr_u");
@@ -1226,8 +1320,18 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tl,h");
             emit(out, "ld\th,0");
         shr_int_bit_remainder:
-            for (int k = 8; k < count; k++)
-                emit(out, "srl\tl");
+            /* Data is now in L (h=0). Small residual: `srl l` in place. Large
+               residual: rotate+mask via A is fewer ops/T (the ld a,l/ld l,a
+               round-trip is amortised once r≥5). */
+            if (count - 8 >= 5) {
+                emit(out, "ld\ta,l");
+                emit_byte_lsr_a(out, count - 8);
+                emit(out, "ld\tl,a");
+                invalidate_a_cache();
+            } else {
+                for (int k = 8; k < count; k++)
+                    emit(out, "srl\tl");
+            }
         } else {
             for (int k = 0; k < count; k++) {
                 if (IS_RABBIT()) {
@@ -1280,6 +1384,109 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
     emit(out, "jr\tnz,L_f%d_shift_loop_%d", L.func_emit_idx, n);
     fprintf(out, "L_f%d_shift_end_%d:\n", L.func_emit_idx, n);
     commit_hl_result(out, f, op->dst);
+    return 0;
+}
+
+/* Arithmetic (signed) 16-bit `>>` — split out so gen_shr's logical paths stay
+   byte-identical. `sra` sign-extends; every z80-family CPU (incl rabbit) has
+   `sra h`/`rr l`, 8085 has the native `sra hl` (ARHL); only 8080/gbz80 lack a
+   shift-right and use the l_asr helper. #289 fix. */
+static int gen_sar16(FILE *out, Func *f, const Op *op)
+{
+    int has_sra = !(IS_8080() || IS_GBZ80());
+
+    if (op->src[1] < 0) {                        /* constant count */
+        int count = (int)op->imm & 0x1f;
+        if (count == 0) {
+            load_to_hl(out, f, op->src[0]);
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
+        if (count > 15) count = 15;              /* >>N (N>=16) == full sign fill */
+        if (has_sra && count >= 8) {
+            /* `>>8` is a byte move: low = high byte, high = sign extension.
+               Any residual (>>9..15) shifts the surviving bytes. */
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,h");                /* a = high byte (sign source) */
+            emit(out, "ld\tl,a");                /* low = high byte */
+            emit(out, "add\ta,a");               /* CY = sign bit */
+            emit(out, "sbc\ta,a");               /* a = 0xFF if neg else 0x00 */
+            emit(out, "ld\th,a");                /* high = sign extension */
+            /* Residual shifts act on L only — H stays the sign, and `sra l`
+               keeps L's own sign, so H remains a valid extension. CB machines
+               do the byte directly; 8085's ARHL has no byte form (sra hl, but
+               H=sign is preserved through it). */
+            for (int i = 0; i < count - 8; i++)
+                emit(out, IS_8085() ? "sra\thl" : "sra\tl");
+            invalidate_a_cache();
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
+        if (has_sra) {
+            load_to_hl(out, f, op->src[0]);
+            for (int i = 0; i < count; i++) {
+                if (IS_8085()) {
+                    emit(out, "sra\thl");        /* ARHL (native) */
+                } else {
+                    emit(out, "sra\th");
+                    emit(out, "rr\tl");
+                }
+            }
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
+        /* 8080/gbz80: l_asr with a clean small count (never load the raw imm —
+           it carries the IR_SHR_ARITH marker bit). */
+        load_to_de(out, f, op->src[0]);          /* value -> DE */
+        emit(out, "ld\thl,%d", count);           /* count -> HL */
+        emit_c(out, CLOB_HL, "call\tl_asr");
+        invalidate_de_cache();
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
+
+    /* variable count */
+    if (IS_Z80N()) {                             /* arithmetic barrel */
+        load_binop_operands(out, f, op);         /* HL=value, DE=count */
+        int bc_live = (L.rs.bc >= 0);
+        if (bc_live) emit(out, "push\tbc");
+        emit(out, "ld\tb,e");
+        emit(out, "ex\tde,hl");                  /* DE=value */
+        emit(out, "bsra\tde,b");
+        if (bc_live) emit(out, "pop\tbc");
+        invalidate_hl_cache();
+        invalidate_de_cache();
+        if (!bc_live) invalidate_bc_cache();
+        if (vreg_is_pr_de(f, op->dst)) { cache_de(op->dst); return 0; }
+        emit(out, "ex\tde,hl");
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
+    if (has_sra) {                               /* inline sra/rr loop (incl 8085) */
+        int n = L.cmp_label_counter++;
+        load_binop_operands(out, f, op);         /* HL=value, DE=count */
+        emit(out, "ld\ta,e");
+        emit(out, "or\ta");
+        emit(out, "jr\tz,L_f%d_sar_end_%d", L.func_emit_idx, n);
+        fprintf(out, "L_f%d_sar_loop_%d:\n", L.func_emit_idx, n);
+        if (IS_8085()) {
+            emit(out, "sra\thl");
+        } else {
+            emit(out, "sra\th");
+            emit(out, "rr\tl");
+        }
+        emit(out, "dec\ta");
+        emit(out, "jr\tnz,L_f%d_sar_loop_%d", L.func_emit_idx, n);
+        fprintf(out, "L_f%d_sar_end_%d:\n", L.func_emit_idx, n);
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
+    /* 8080/gbz80 variable → l_asr */
+    load_binop_operands(out, f, op);             /* HL=value, DE=count */
+    emit(out, "ex\tde,hl");                      /* DE=value, HL=count */
+    emit_c(out, CLOB_HL, "call\tl_asr");
+    invalidate_de_cache();
+    commit_hl_word(out, f, op->dst);
     return 0;
 }
 

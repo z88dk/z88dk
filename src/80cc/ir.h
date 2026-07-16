@@ -193,7 +193,11 @@ typedef enum {
     IR_OR,
     IR_XOR,
     IR_SHL,
-    IR_SHR,             /* unsigned shift right; SAR variant via Kind+sign */
+    IR_SHR,             /* shift right. Logical by default; the ARITHMETIC
+                           (signed) variant sets IR_SHR_ARITH in `imm` — see
+                           below. Register shape is identical either way, so
+                           every analysis/alloc/opt site treats them the same;
+                           only the lowerer (gen_shr) reads the bit. */
     IR_MUL,             /* dst = src[0] * src[1] via native hardware multiply.
                            Emitted only by build_muldiv_integer for CPUs with a
                            hardware multiply: kc160 (mul/muls hl 8x8, mul de,hl
@@ -375,6 +379,13 @@ typedef enum {
 
     IR_OP_COUNT
 } OpKind;
+
+/* IR_SHR arithmetic (signed) marker, carried in the high bits of Op.imm so it
+   rides along every op-copy for free and stays invisible to the count reads
+   (which mask `& 0x1f`) and the width-mask folds (widths ≤4 → bit ≤31). A
+   dedicated bit rather than a new opcode keeps IR_SHR's register shape single
+   across analysis/alloc/opt. */
+#define IR_SHR_ARITH ((int64_t)1 << 40)
 
 /* ----- ABI / call descriptors ------------------------------------------ */
 

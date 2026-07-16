@@ -1459,8 +1459,30 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             }
         }
     }
-    /* Residual bit-shift (1..7) via the helper bit-loop. */
-    if (bit_shift) {
+    /* Residual bit-shift (1..7). 8085 has native 16-bit shift ops the CB-less
+       808x path otherwise can't use: `rl de` (RDEL) and `add hl,hl` chain a
+       32-bit left shift in 2 ops/bit; a right shift has no native DE rotate so
+       it falls to an `or a` + `rra` byte-chain MSB→LSB. The left chain is lean
+       (2 ops/bit) so inline small counts; the right chain is 13 ops/bit so
+       inline ONLY a single bit (the CRC `>>1` hot case) — multi-bit right
+       shifts bloat with no real gain and keep the helper call. */
+    int inline_8085 = IS_8085()
+        && (is_shr ? (bit_shift == 1) : (bit_shift <= 3));
+    if (bit_shift && inline_8085) {
+        for (int i = 0; i < bit_shift; i++) {
+            if (is_shr) {
+                emit(out, "or\ta");            /* CY=0 → logical 0 into MSB */
+                emit(out, "ld\ta,d"); emit(out, "rra"); emit(out, "ld\td,a");
+                emit(out, "ld\ta,e"); emit(out, "rra"); emit(out, "ld\te,a");
+                emit(out, "ld\ta,h"); emit(out, "rra"); emit(out, "ld\th,a");
+                emit(out, "ld\ta,l"); emit(out, "rra"); emit(out, "ld\tl,a");
+            } else {
+                emit(out, "add\thl,hl");        /* low16<<1, bit15 -> CY */
+                emit(out, "rl\tde");            /* RDEL: high16<<1 through CY */
+            }
+        }
+        if (is_shr) invalidate_a_cache();
+    } else if (bit_shift) {
         emit(out, "ld\ta,%d", bit_shift);
         emit(out, is_shr ? "call\tl_lsr_dehl" : "call\tl_lsl_dehl");
     }

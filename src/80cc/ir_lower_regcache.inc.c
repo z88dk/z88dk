@@ -127,6 +127,19 @@ int tos_pushpop_ok(const Func *f)
     return !(IS_RABBIT() || IS_GBZ80() || IS_KC160());
 }
 
+/* Same sp+0 trick for the LONG (32-bit) ex-free paths — additionally allowed on
+   gbz80. gbz80's push/pop are dear (16T/12T), so for a 16-bit slot the pop/push
+   load can lose in a hot loop (measured: intbench +6.8%), which is why the word
+   paths keep tos_pushpop_ok. But a 32-bit slot's byte-walk is twice as long
+   (`pop hl;pop de` vs an 8-instruction walk), the pop/push is a clear size win,
+   and long slots rarely sit in the hottest int loops. rabbit/kc160 keep their
+   native sp-relative access. */
+int tos_pushpop_noex_ok(const Func *f)
+{
+    (void)f;
+    return !(IS_RABBIT() || IS_KC160());
+}
+
 /* True when even in fp-mode the pop/push trick beats the IX access for
    the DEEPEST local (slot_off==0). With cur_sp_adjust==0, SP == that
    slot's address, so `pop hl;push hl` reads it. On z80/z180/z80n
@@ -1132,7 +1145,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     /* Top-of-stack long load: a slot at sp+0 read whole with `pop hl;
        pop de` (HL=low, DE=high), the two pushes put it back — no address
        compute, no 4-byte walk. sp-mode + tos_pushpop_ok only. */
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         emit(out, "pop\thl");           /* HL = low half (bytes 0-1) */
         emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
         emit(out, "push\tde");
@@ -1221,7 +1234,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        its 4 bytes (`pop bc; pop bc`, BC clobbered by contract) and re-push
        DEHL. No address compute, no 4-byte walk, and HL stays valid (low
        half) afterwards. sp-mode + tos_pushpop_ok only. */
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         emit(out, "pop\tbc");           /* drop old low half */
         emit(out, "pop\tbc");           /* drop old high half */
         emit(out, "push\tde");          /* write high half (bytes 2-3) */
