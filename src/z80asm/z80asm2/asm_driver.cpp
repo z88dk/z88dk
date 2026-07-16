@@ -15,11 +15,16 @@
 #include "lexer_dump.h"
 #include "lexer_tokens.h"
 #include "obj_file.h"
+#include "obj_symbol_scope.h"
+#include "obj_symbol_type.h"
 #include "options.h"
 #include "parser.h"
 #include "preproc.h"
 #include "release_assert.h"
+#include "source_loc.h"
+#include "strings.h"
 #include "synth_expander.h"
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -31,7 +36,7 @@
 static constexpr uint MAX_PASSES = 100;
 
 static bool split_modules_sections(Program& prog);
-static ObjectLibrary build_object_library(const Program& prog);
+static ObjLibrary build_object_library(const Program& prog);
 
 void assemble_files(const std::vector<std::string>& filenames,
                     std::string_view output_dir) {
@@ -164,11 +169,8 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
     }
 
     // write object library
-    ObjectLibrary obj_lib = build_object_library(*prog);
-    if (!write_object_library(obj_lib, o_filename)) {
-        g_diag.error(SourceLoc(), "Failed to write object file");
-        return; // error already reported
-    }
+    ObjLibrary obj_lib = build_object_library(*prog);
+    write_object_library(obj_lib, o_filename);
 
     if (g_args.options.dump_after_assembly) {
         dump_obj_lib_and_exit(obj_lib);
@@ -222,8 +224,8 @@ static bool split_modules_sections(Program& prog) {
         }
 
         if (auto mod_stmt = dynamic_cast<ModuleStmt*>(stmt.get())) {
-            std::string mod_name = g_strings.to_string(prog.name_id) + "_" +
-                                   g_strings.to_string(mod_stmt->name_id);
+            std::string mod_name = std::string(g_strings.view(prog.name_id)) + "_" +
+                                   std::string(g_strings.view(mod_stmt->name_id));
             cur_module = prog.set_module(g_strings.intern(mod_name));
             cur_section = cur_module->cur_section;
             continue;
@@ -283,20 +285,98 @@ static bool split_modules_sections(Program& prog) {
     return !failed;
 }
 
-static std::unique_ptr<ObjectModule> build_object_module(const Program& prog,
-        const Module& mod) {
-    auto obj_mod = std::make_unique<ObjectModule>();
+static ObjRangeType patch_type_to_obj_range_type(PatchType type, size_t size) {
+    switch (type) {
+    case PatchType::None:
+        return ObjRangeType::Undefined;
+
+    case PatchType::Unsigned:
+        if (size == 1) {
+            return ObjRangeType::ByteUnsigned;
+        }
+        else if (size == 2) {
+            return ObjRangeType::Word;
+        }
+        else if (size == 3) {
+            return ObjRangeType::Ptr24;
+        }
+        else if (size == 4) {
+            return ObjRangeType::DWord;
+        }
+        else {
+            release_assert(0); // should not happen
+        }
+        break;
+
+    case PatchType::Signed:
+        if (size == 1) {
+            return ObjRangeType::ByteSigned;
+        }
+        else if (size == 2) {
+            return ObjRangeType::Word;
+        }
+        else if (size == 3) {
+            return ObjRangeType::Ptr24;
+        }
+        else if (size == 4) {
+            return ObjRangeType::DWord;
+        }
+        else {
+            release_assert(0); // should not happen
+        }
+        break;
+
+    case PatchType::HighByte:
+        release_assert(size == 1);
+        return ObjRangeType::HighOffset;
+
+    case PatchType::BigEndian:
+        release_assert(size == 2);
+        return ObjRangeType::WordBE;
+
+    case PatchType::PCrelative:
+        if (size == 1) {
+            return ObjRangeType::JrOffset;
+        }
+        else if (size == 2) {
+            return ObjRangeType::JreOffset;
+        }
+        else {
+            release_assert(0); // should not happen
+        }
+        break;
+    }
+
+    release_assert(0); // should not reach here
+    return ObjRangeType::Undefined;
+}
+
+static ObjModule build_object_module(const Program& prog, const Module& mod) {
+    ObjModule obj_mod;
 
     // global information for the module
-    obj_mod->module_name_id = mod.name_id;
-    obj_mod->cpu_id = g_args.options.cpu_id;
-    obj_mod->swap_ix_iy = g_args.options.swap_ix_iy;
+    obj_mod.modname.set_name(g_strings.view(mod.name_id));
+    obj_mod.cpu_id = g_args.options.cpu_id;
+    obj_mod.swap_ixiy = g_args.options.swap_ixiy;
 
-    // symbol table
+    // symbol table - process in alphabetical order for deterministic output
+    std::vector<StringId> sorted_name_ids;
+    sorted_name_ids.reserve(mod.symbols.size());
     for (const auto& [name_id, sym_info] : mod.symbols) {
-        auto obj_sym = std::make_unique<ObjSymbol>();
-        obj_sym->name_id = name_id;
-        obj_sym->loc = sym_info->loc;
+        sorted_name_ids.push_back(name_id);
+    }
+    std::sort(sorted_name_ids.begin(), sorted_name_ids.end(),
+    [](const StringId & a, const StringId & b) {
+        return g_strings.view(a) < g_strings.view(b);
+    });
+
+    for (const auto& name_id : sorted_name_ids) {
+        const auto& sym_info = mod.symbols.at(name_id);
+
+        ObjSymbol obj_sym;
+        obj_sym.set_symbol_name(g_strings.view(name_id));
+        obj_sym.set_filename(sym_info->loc.filename());
+        obj_sym.line = sym_info->loc.line();
 
         // check scope
         auto it_decl = prog.declarations.find(name_id);
@@ -304,74 +384,85 @@ static std::unique_ptr<ObjectModule> build_object_module(const Program& prog,
             const SymbolDeclare* decl = it_decl->second.get();
             if (decl->type == SymbolDeclareType::Public ||
                     decl->type == SymbolDeclareType::Global) {
-                obj_sym->scope = ObjSymbolScope::Public;
+                obj_sym.scope = ObjSymbolScope::Public;
             }
             else if (decl->type == SymbolDeclareType::Extern) {
-                continue; // skip external symbols
+                ObjExtern extern_;
+                extern_.set_symbol_name(g_strings.view(name_id));
+                obj_mod.externs.push_back(std::move(extern_));
+                continue;
             }
         }
         else {
-            obj_sym->scope = ObjSymbolScope::Local;
+            obj_sym.scope = ObjSymbolScope::Local;
         }
 
         switch (sym_info->def_type) {
         case SymbolInfo::DefType::Label:
             release_assert(sym_info->stmt != nullptr);
             release_assert(sym_info->stmt->section != nullptr);
-            obj_sym->type = ObjSymbolType::AddressRelative;
-            obj_sym->value = sym_info->stmt->address;
-            obj_sym->section_name_id = sym_info->stmt->section->name_id;
+            if (sym_info->stmt->in_phase) {
+                obj_sym.type = ObjSymbolType::Constant;
+                obj_sym.value = sym_info->stmt->address;
+            }
+            else {
+                obj_sym.type = ObjSymbolType::AddressRelative;
+                obj_sym.value = sym_info->stmt->address;
+                obj_sym.set_section_name(g_strings.view(sym_info->stmt->section->name_id));
+            }
 
-            obj_mod->symbols.push_back(std::move(obj_sym));
+            obj_mod.symbols.push_back(std::move(obj_sym));
             break;
 
         case SymbolInfo::DefType::Defc:
             release_assert(sym_info->defc_expr != nullptr);
-            release_assert(sym_info->defc_expr->value.section != nullptr);
 
             switch (sym_info->defc_expr->value.type) {
             case ExprType::Constant:
-                obj_sym->type = ObjSymbolType::Constant;
-                obj_sym->value = sym_info->defc_expr->value.const_value;
-                obj_sym->section_name_id =
-                    sym_info->defc_expr->value.section->name_id;
+                obj_sym.type = ObjSymbolType::Constant;
+                obj_sym.value = sym_info->defc_expr->value.const_value;
                 break;
 
             case ExprType::AddressRelative:
-                obj_sym->type = ObjSymbolType::AddressRelative;
-                obj_sym->value = sym_info->defc_expr->value.offset;
-                obj_sym->section_name_id =
-                    sym_info->defc_expr->value.section->name_id;
+                release_assert(sym_info->defc_expr->value.section != nullptr);
+                obj_sym.type = ObjSymbolType::AddressRelative;
+                obj_sym.value = sym_info->defc_expr->value.offset;
+                obj_sym.set_section_name(g_strings.view(
+                                             sym_info->defc_expr->value.section->name_id));
                 break;
 
             case ExprType::Computed: {
-                obj_sym->type = ObjSymbolType::Computed;
-                obj_sym->value = 0;
-                obj_sym->section_name_id =
-                    sym_info->defc_expr->value.section->name_id;
+                release_assert(sym_info->defc_expr->value.section != nullptr);
+                obj_sym.type = ObjSymbolType::Computed;
+                obj_sym.value = 0;
+                obj_sym.set_section_name(g_strings.view(
+                                             sym_info->defc_expr->value.section->name_id));
 
                 // create expression to define symbol value at link time
-                auto obj_expr = std::make_unique<ObjExpr>();
-                obj_expr->text_id = g_strings.intern(to_string(sym_info->defc_expr->tokens));
-                obj_expr->range = ObjExprRange::Assignment;
-                obj_expr->section_name_id =
-                    sym_info->defc_expr->value.section->name_id;
-                obj_expr->target_name_id = sym_info->name_id;
-                obj_expr->loc = sym_info->defc_expr->loc;
-                obj_mod->exprs.push_back(std::move(obj_expr));
+                ObjExpr obj_expr;
+                obj_expr.set_text(to_string(sym_info->defc_expr->tokens));
+                obj_expr.range = ObjRangeType::Assignment;
+                obj_expr.set_section_name(g_strings.view(
+                                              sym_info->defc_expr->value.section->name_id));
+                obj_expr.set_target_name(g_strings.view(sym_info->name_id));
+                obj_expr.set_filename(sym_info->defc_expr->loc.filename());
+                obj_expr.line = sym_info->defc_expr->loc.line();
+                obj_mod.exprs.push_back(std::move(obj_expr));
                 break;
             }
             default:
                 release_assert(0); // should not happen
             }
 
-            obj_mod->symbols.push_back(std::move(obj_sym));
+            obj_mod.symbols.push_back(std::move(obj_sym));
             break;
 
         case SymbolInfo::DefType::Undefined: {
             release_assert(sym_info->def_type == SymbolInfo::DefType::Undefined);
 
-            obj_mod->externs.push_back(sym_info->name_id);
+            ObjExtern extern_;
+            extern_.set_symbol_name(g_strings.view(sym_info->name_id));
+            obj_mod.externs.push_back(std::move(extern_));
             break;
         }
         default:
@@ -381,146 +472,116 @@ static std::unique_ptr<ObjectModule> build_object_module(const Program& prog,
 
     // sections
     for (const auto& sec : mod.sections) {
-        auto obj_sec = std::make_unique<ObjSection>();
-        obj_sec->name_id = sec->name_id;
-        obj_sec->org_defined = sec->org_defined;
-        obj_sec->base_address = sec->base_address;
-        obj_sec->section_split = sec->section_split;
-        obj_sec->align = sec->align;
+        ObjSection obj_sec;
+        obj_sec.set_section_name(g_strings.view(sec->name_id));
+        if (sec->section_split) {
+            obj_sec.base_address = OrgSectionSplit;
+        }
+        else if (sec->org_defined) {
+            obj_sec.base_address = sec->base_address;
+        }
+        else {
+            obj_sec.base_address = OrgNotDefined;
+        }
+        obj_sec.align = sec->align;
 
         // statements
         for (auto& stmt : sec->stmts) {
             if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
+                // look for patches that can be stored as relocations in the object file
                 for (auto& patch : opc_stmt->patches) {
-                    auto obj_expr = std::make_unique<ObjExpr>();
-                    obj_expr->text_id = g_strings.intern(to_string(patch->inner->tokens));
+                    ObjReloc obj_reloc;
 
                     // patch range is determined by the patch type and size
-                    switch (patch->type) {
-                    case PatchType::None:
-                        continue; // already patched, no further action needed
-
-                    case PatchType::Unsigned:
-                        if (patch->size == 1) {
-                            obj_expr->range = ObjExprRange::ByteUnsigned;
-                        }
-                        else if (patch->size == 2) {
-                            obj_expr->range = ObjExprRange::Word;
-                        }
-                        else if (patch->size == 3) {
-                            obj_expr->range = ObjExprRange::Ptr24;
-                        }
-                        else if (patch->size == 4) {
-                            obj_expr->range = ObjExprRange::DWord;
-                        }
-                        else {
-                            release_assert(0); // should not happen
-                        }
-                        break;
-
-                    case PatchType::Signed:
-                        if (patch->size == 1) {
-                            obj_expr->range = ObjExprRange::ByteSigned;
-                        }
-                        else if (patch->size == 2) {
-                            obj_expr->range = ObjExprRange::Word;
-                        }
-                        else if (patch->size == 3) {
-                            obj_expr->range = ObjExprRange::Ptr24;
-                        }
-                        else if (patch->size == 4) {
-                            obj_expr->range = ObjExprRange::DWord;
-                        }
-                        else {
-                            release_assert(0); // should not happen
-                        }
-                        break;
-
-                    case PatchType::HighByte:
-                        release_assert(patch->size == 1);
-                        obj_expr->range = ObjExprRange::HighOffset;
-                        break;
-
-                    case PatchType::BigEndian:
-                        release_assert(patch->size == 2);
-                        obj_expr->range = ObjExprRange::WordBE;
-                        break;
-
-                    case PatchType::PCrelative:
-                        if (patch->size == 1) {
-                            obj_expr->range = ObjExprRange::JrOffset;
-                        }
-                        else if (patch->size == 2) {
-                            obj_expr->range = ObjExprRange::JreOffset;
-                        }
-                        else {
-                            release_assert(0); // should not happen
-                        }
-                        break;
+                    obj_reloc.range = patch_type_to_obj_range_type(patch->type, patch->size);
+                    if (obj_reloc.range == ObjRangeType::Undefined) {
+                        continue; // PatchType::None - already patched, no further action needed
                     }
 
-                    obj_expr->asmpc = stmt->address;
-                    obj_expr->code_pos = static_cast<uint>(obj_sec->bytes.size() + patch->offset);
-                    obj_expr->opcode_size = static_cast<uint>(opc_stmt->bytes.size());
-                    obj_expr->section_name_id = sec->name_id;
-                    obj_expr->target_name_id = 0; // not used for opcode patches
-                    obj_expr->loc = patch->loc;
-                    obj_mod->exprs.push_back(std::move(obj_expr));
+                    // check if the patch is a section + offset, which can be stored as
+                    // a relocation in the object file
+                    if (patch->inner->value.type == ExprType::AddressRelative) {
+                        obj_reloc.set_filename(patch->inner->loc.filename());
+                        obj_reloc.line = patch->inner->loc.line();
+                        obj_reloc.set_patch_section_name(g_strings.view(sec->name_id));
+                        obj_reloc.patch_ptr =
+                            static_cast<uint>(obj_sec.bytes.size() + patch->offset);
+                        obj_reloc.set_value_section_name(g_strings.view(
+                                                             patch->inner->value.section->name_id));
+                        obj_reloc.offset = patch->inner->value.offset;
+
+                        obj_mod.relocs.push_back(std::move(obj_reloc));
+                        patch->type =
+                            PatchType::None; // mark as already patched, no further action needed
+                    }
                 }
-                obj_sec->bytes.insert(obj_sec->bytes.end(),
-                                      opc_stmt->bytes.begin(),
-                                      opc_stmt->bytes.end());
+
+                // the remaining patches are stored as expressions in the object file,
+                // to be evaluated at link time
+                for (auto& patch : opc_stmt->patches) {
+                    ObjExpr obj_expr;
+                    obj_expr.set_text(to_string(patch->inner->tokens));
+
+                    // patch range is determined by the patch type and size
+                    obj_expr.range = patch_type_to_obj_range_type(patch->type, patch->size);
+                    if (obj_expr.range == ObjRangeType::Undefined) {
+                        continue; // PatchType::None - already patched, no further action needed
+                    }
+
+                    obj_expr.asmpc = stmt->address;
+                    obj_expr.patch_ptr =
+                        static_cast<uint>(obj_sec.bytes.size() + patch->offset);
+                    obj_expr.opcode_size = static_cast<uint>(opc_stmt->bytes.size());
+                    obj_expr.set_section_name(g_strings.view(sec->name_id));
+                    obj_expr.set_target_name(""); // not used for opcode patches
+                    obj_expr.set_filename(patch->loc.filename());
+                    obj_expr.line = patch->loc.line();
+
+                    obj_mod.exprs.push_back(std::move(obj_expr));
+                    patch->type =
+                        PatchType::None; // mark as already patched, no further action needed
+                }
+                obj_sec.bytes.insert(obj_sec.bytes.end(), opc_stmt->bytes.begin(),
+                                     opc_stmt->bytes.end());
                 continue;
             }
 
             if (auto org_stmt = dynamic_cast<OrgStmt*>(stmt)) {
-                obj_sec->bytes.insert(obj_sec->bytes.end(),
-                                      org_stmt->bytes.begin(),
-                                      org_stmt->bytes.end());
+                obj_sec.bytes.insert(obj_sec.bytes.end(), org_stmt->bytes.begin(),
+                                     org_stmt->bytes.end());
                 continue;
             }
 
             if (auto align_stmt = dynamic_cast<AlignStmt*>(stmt)) {
-                obj_sec->bytes.insert(obj_sec->bytes.end(),
-                                      align_stmt->bytes.begin(),
-                                      align_stmt->bytes.end());
+                obj_sec.bytes.insert(obj_sec.bytes.end(), align_stmt->bytes.begin(),
+                                     align_stmt->bytes.end());
                 continue;
             }
 
             if (auto defs_num_stmt = dynamic_cast<DefsNumericStmt*>(stmt)) {
-                obj_sec->bytes.insert(obj_sec->bytes.end(),
-                                      defs_num_stmt->bytes.begin(),
-                                      defs_num_stmt->bytes.end());
+                obj_sec.bytes.insert(obj_sec.bytes.end(), defs_num_stmt->bytes.begin(),
+                                     defs_num_stmt->bytes.end());
                 continue;
             }
 
             if (auto defs_str_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
-                obj_sec->bytes.insert(obj_sec->bytes.end(),
-                                      defs_str_stmt->bytes.begin(),
-                                      defs_str_stmt->bytes.end());
+                obj_sec.bytes.insert(obj_sec.bytes.end(), defs_str_stmt->bytes.begin(),
+                                     defs_str_stmt->bytes.end());
                 continue;
             }
         }
 
-        obj_mod->sections.push_back(std::move(obj_sec));
+        obj_mod.sections.push_back(std::move(obj_sec));
     }
 
     return obj_mod;
 }
 
-ObjectLibrary build_object_library(const Program& prog) {
-    ObjectLibrary obj_lib;
+ObjLibrary build_object_library(const Program& prog) {
+    ObjLibrary obj_lib;
     for (auto& mod : prog.modules) {
         // convert the module
         auto obj_mod = build_object_module(prog, *mod);
-
-        // get list of public symbols
-        for (const auto& sym : obj_mod->symbols) {
-            if (sym->scope == ObjSymbolScope::Public) {
-                obj_lib.public_symbols.insert(sym->name_id);
-            }
-        }
-
         obj_lib.modules.push_back(std::move(obj_mod));
     }
 

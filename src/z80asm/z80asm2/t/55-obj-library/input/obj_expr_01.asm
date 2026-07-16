@@ -15,4 +15,6 @@ section data
 start_data:
     defw $
     defw 1+2*3
+	defw start_code, end_code
+	defw start_data, end_data
 end_data:

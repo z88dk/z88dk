@@ -9,11 +9,8 @@
 #include "lexer_scan.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <string_view>
 
@@ -21,6 +18,7 @@ std::string to_string(TokenType token_type) {
     static constexpr std::string_view lut[] = {
 #define X(id, text) text,
 #include "lexer_tokens.def"
+#undef X
     };
     return std::string(lut[static_cast<size_t>(token_type)]);
 }
@@ -108,7 +106,7 @@ Token Token::end_of_line(const SourceLoc& loc) {
     return t;
 }
 
-bool Token::operator==(const Token& other) const noexcept {
+bool Token::operator==(const Token& other) const  {
     // Compare type, keyword, and text_id
     if (type != other.type || keyword != other.keyword
             || text_id != other.text_id) {
@@ -131,14 +129,14 @@ bool Token::operator==(const Token& other) const noexcept {
     }
 }
 
-bool Token::operator!=(const Token& other) const noexcept {
+bool Token::operator!=(const Token& other) const  {
     return !(*this == other);
 }
 
 std::string to_string(Token token) {
     switch (token.type) {
     case TokenType::Identifier:
-        return g_strings.to_string(token.text_id);
+        return std::string(g_strings.view(token.text_id));
     case TokenType::Integer:
         return int_to_hex(token.value.int_value);
     case TokenType::Float:
@@ -222,8 +220,10 @@ const Token& ParseLine::peek(size_t offset) const {
     else {
         // point to after last token for better error messages when the expression is exhausted
         eol_token.loc = tokens.back().loc;
-        eol_token.loc.column += static_cast<uint16_t>(g_strings.view(
-                                    tokens.back().text_id).size());
+        uint new_column = eol_token.loc.column() + static_cast<uint>(g_strings.view(
+                              tokens.back().text_id).size());
+        eol_token.loc = SourceLoc(eol_token.loc.filename_id(), eol_token.loc.line(),
+                                  new_column);
     }
 
     return eol_token;
@@ -252,7 +252,7 @@ bool ParseLine::check_end_of_line() {
     if (pos < tokens.size()) {
         g_diag.error(peek().loc,
                      "Unexpected token: " +
-                     escape_string(g_strings.to_string(peek().text_id)));
+                     escape_string(g_strings.view(peek().text_id)));
         return false;
     }
 

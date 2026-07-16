@@ -96,12 +96,14 @@ int main(int argc, char* argv[]) {
     assemble_files(g_args.input_files, g_args.options.output_dir);
 
     // link if requested
+#if 0
     if (g_args.options.do_link) {
         link_files(g_args.input_files,
                    g_args.options.libs,
                    g_args.options.library_paths,
                    g_args.options.output_dir);
     }
+#endif
 
     if (g_args.options.verbose) {
         auto errors = g_diag.get_error_count();

@@ -5,30 +5,28 @@
 //-----------------------------------------------------------------------------
 
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 
-SourceLoc::SourceLoc(StringInterner::Id file, size_t ln, size_t col)
-    : line(static_cast<uint32_t>(ln)),
-      file_id(static_cast<uint16_t>(file)),
-      column(static_cast<uint16_t>(col)) {
+SourceLoc::SourceLoc(StringId filename_id, uint line, uint column)
+    : filename_id_(filename_id),
+      line_(line),
+      column_(column) {
 }
 
-SourceLoc::SourceLoc(std::string_view file, size_t ln, size_t col)
-    : line(static_cast<uint32_t>(ln)),
-      file_id(static_cast<uint16_t>(g_strings.intern(file))),
-      column(static_cast<uint16_t>(col)) {
+SourceLoc::SourceLoc(std::string_view filename, uint line, uint column)
+    : SourceLoc(g_strings.intern(filename), line, column) {
 }
 
 void SourceLoc::clear() {
-    file_id = 0;
-    line = 0;
-    column = 0;
+    filename_id_.clear();
+    line_ = 0;
+    column_ = 0;
 }
 
 bool SourceLoc::empty() const {
-    return file_id == 0 && line == 0 && column == 0;
+    return filename_id_.empty() && line_ == 0 && column_ == 0;
 }
 
 std::string SourceLoc::to_string() const {
@@ -36,36 +34,35 @@ std::string SourceLoc::to_string() const {
         return "";
     }
 
-    return g_strings.to_string(file_id) + ":" +
-           std::to_string(line) + ":" + std::to_string(column);
+    return std::string(g_strings.view(filename_id_)) + ":" +
+           std::to_string(line_) + ":" + std::to_string(column_);
 }
 
-SourceLine::SourceLine(StringInterner::Id file, size_t ln)
-    : line(static_cast<uint32_t>(ln)),
-      file_id(static_cast<uint16_t>(file)) {
+SourceLine::SourceLine(StringId filename_id, uint line)
+    : line_(line),
+      filename_id_(filename_id) {
 }
 
-SourceLine::SourceLine(std::string_view file, size_t ln)
-    : line(static_cast<uint32_t>(ln)),
-      file_id(static_cast<uint16_t>(g_strings.intern(file))) {
+SourceLine::SourceLine(std::string_view filename, uint line)
+    : SourceLine(g_strings.intern(filename), line) {
 }
 
 SourceLine::SourceLine(const SourceLoc& loc)
-    : line(loc.line),
-      file_id(loc.file_id) {
+    : line_(loc.line()),
+      filename_id_(loc.filename_id()) {
 }
 
-bool SourceLine::operator==(const SourceLine& other) const noexcept {
-    return line == other.line && file_id == other.file_id;
+bool SourceLine::operator==(const SourceLine& other) const  {
+    return line_ == other.line_ && filename_id_ == other.filename_id_;
 }
 
-bool SourceLine::operator!=(const SourceLine& other) const noexcept {
+bool SourceLine::operator!=(const SourceLine& other) const  {
     return !(*this == other);
 }
 
-size_t SourceLineHash::operator()(const SourceLine& s) const noexcept {
-    // Combine file_id and line into a single 64-bit value
-    uint64_t v = (uint64_t(s.file_id) << 32) | s.line;
+size_t SourceLineHash::operator()(const SourceLine& s) const  {
+    // Combine filename_id and line into a single 64-bit value
+    uint64_t v = (uint64_t(s.filename_id().id()) << 32) | s.line();
     return std::hash<uint64_t> {}(v);
 }
 

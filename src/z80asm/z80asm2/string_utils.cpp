@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 static constexpr std::string_view blanks = " \t\r\n\v\f";
 
@@ -102,19 +103,28 @@ std::string escape_string(std::string_view s) {
     return result;
 }
 
-// receive a int64_t to be the same width as size_t
-std::string int_to_hex(int64_t value) {
-    std::ostringstream oss;
-    if (abs(value) < 10) {
-        oss << value;
+std::vector<std::string_view> split_spaces(std::string_view s) {
+    std::vector<std::string_view> out;
+
+    while (!s.empty()) {
+        // Trim leading spaces
+        size_t start = s.find_first_not_of(' ');
+        if (start == std::string_view::npos) {
+            break;
+        }
+
+        s.remove_prefix(start);
+
+        // Find next space
+        size_t end = s.find(' ');
+        if (end == std::string_view::npos) {
+            out.push_back(s);
+            break;
+        }
+
+        out.push_back(s.substr(0, end));
+        s.remove_prefix(end + 1);
     }
-    else if (value < 0) {
-        oss << "-$" << std::hex << std::setw(2) << std::setfill('0')
-            << std::uppercase << (-value);
-    }
-    else {
-        oss << "$" << std::hex << std::setw(2) << std::setfill('0')
-            << std::uppercase << value;
-    }
-    return oss.str();
+
+    return out;
 }

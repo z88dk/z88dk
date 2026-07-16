@@ -750,12 +750,12 @@ static void objfile_read_relocs(objfile_t* obj, FILE* fp, long fpos_start)
 	printf("  Relocations:\n");
 
 	UT_string* filename;
-	UT_string* section;
-	UT_string* symbol;
+	UT_string* patch_section;
+	UT_string* value_section;
 	
 	utstring_new(filename);
-	utstring_new(section);
-	utstring_new(symbol);
+	utstring_new(patch_section);
+	utstring_new(value_section);
 
 	xfseek(fp, fpos_start, SEEK_SET);
     while (true) {
@@ -774,27 +774,30 @@ static void objfile_read_relocs(objfile_t* obj, FILE* fp, long fpos_start)
 		objfile_read_strid(obj, fp, filename);
 		int line_num = xfread_dword(fp);
 		
-		// section
-		objfile_read_strid(obj, fp, section);
+		// patch section
+		objfile_read_strid(obj, fp, patch_section);
 		
 		// patch pointer
 		int patch_ptr = xfread_dword(fp);
 
-		// symbol
-		objfile_read_strid(obj, fp, symbol);
+		// value section
+		objfile_read_strid(obj, fp, value_section);
 		
-		// addend
-		int addend = xfread_dword(fp);	
+		// offset
+		int offset = xfread_dword(fp);	
 		
-		printf(" $%04X: %s+$%04X", patch_ptr, utstring_body(symbol), addend);
-		print_section(section);
+        printf(" $%04X: %s+$%04X",
+            patch_ptr,
+            utstring_len(value_section) > 0 ? utstring_body(value_section) : "\"\"",
+            offset);
+		print_section(patch_section);
 		print_filename_line_nr(filename, line_num);
 		printf("\n");
 	}
 
 	utstring_free(filename);
-	utstring_free(section);
-	utstring_free(symbol);
+	utstring_free(patch_section);
+	utstring_free(value_section);
 }
 
 void objfile_read(objfile_t* obj, FILE* fp)

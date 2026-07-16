@@ -6,41 +6,71 @@
 
 #pragma once
 
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 #include <string_view>
 
-// field order for efficient packing into 8 bytes (64 bits):
-struct SourceLoc {
-    uint32_t line = 0;      // 4 bytes
-    uint16_t file_id = 0;   // 2 bytes
-    uint16_t column = 0;    // 2 bytes
+using uint = unsigned int;
 
+class SourceLoc {
+public:
     SourceLoc() = default;
-    SourceLoc(StringInterner::Id file, size_t ln, size_t col);
-    SourceLoc(std::string_view file, size_t ln, size_t col);
+    SourceLoc(StringId filename_id, uint line, uint column);
+    SourceLoc(std::string_view filename, uint line, uint column);
 
     void clear();
     bool empty() const;
     std::string to_string() const;
+
+    StringId filename_id() const {
+        return filename_id_;
+    }
+    std::string_view filename() const {
+        return g_strings.view(filename_id_);
+    }
+    uint line() const {
+        return line_;
+    }
+    uint column() const {
+        return column_;
+    }
+
+private:
+    StringId filename_id_;       // 4 bytes
+    uint line_ = 0;              // 4 bytes
+    uint column_ = 0;            // 4 bytes
 };
 
 // used to map physical to logical lines
-struct SourceLine {
-    uint32_t line = 0;      // 4 bytes
-    uint16_t file_id = 0;   // 2 bytes
-
+class SourceLine {
+public:
     SourceLine() = default;
-    SourceLine(StringInterner::Id file, size_t ln);
-    SourceLine(std::string_view file, size_t ln);
+    SourceLine(StringId filename_id, uint line);
+    SourceLine(std::string_view filename, uint line);
     SourceLine(const SourceLoc& loc);
 
-    bool operator==(const SourceLine& other) const noexcept;
-    bool operator!=(const SourceLine& other) const noexcept;
+    StringId filename_id() const {
+        return filename_id_;
+    }
+    std::string_view filename() const {
+        return g_strings.view(filename_id_);
+    }
+    uint line() const {
+        return line_;
+    }
+
+    bool operator==(const SourceLine& other) const;
+    bool operator!=(const SourceLine& other) const;
+
+private:
+    uint line_ = 0;              // 4 bytes
+    StringId filename_id_;       // 4 bytes
+
+
 };
 
 struct SourceLineHash {
-    size_t operator()(const SourceLine& s) const noexcept;
+    size_t operator()(const SourceLine& s) const ;
 };
 

@@ -1,5 +1,6 @@
 % z88dk-z80asm -v -mti83_strict -dump-after-cmdline t/05-cli//input/empty.asm
 Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80_STRICT__ = 1
 Define constant: __CPU_TI83_STRICT__ = 1
 Define constant: __FLOAT_GENMATH__ = 1
 verbose	1
@@ -8,7 +9,7 @@ ucase_symbols	0
 float_format	genmath
 preprocess_only	0
 generate_dependencies	0
-swap_ix_iy	0
+swap_ixiy	0
 date_stamp	0
 filler_byte	0
 dump_after_cmdline	1
@@ -28,6 +29,7 @@ perl_options
 cpp_options	
 output_dir	
 global_def	__CPU_TI83_STRICT__	1
+global_def	__CPU_Z80_STRICT__	1
 global_def	__CPU_ZILOG__	1
 global_def	__FLOAT_GENMATH__	1
 input_file	t/05-cli/input/empty.asm

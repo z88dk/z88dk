@@ -12,7 +12,7 @@
 #include "options.h"
 #include "parser.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <memory>
 #include <string_view>

@@ -249,7 +249,8 @@ static void emit_cmp(const HLA_CompareExpr& cmp, const SourceLoc& loc,
             const Token& last = cmp.left.back();
             std::string_view text = g_strings.view(last.text_id);
             eol_loc = last.loc;
-            eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+            uint new_column = static_cast<uint>(last.loc.column() + text.size());
+            eol_loc = SourceLoc(eol_loc.filename_id(), eol_loc.line(), new_column);
         }
 
         ll.tokens.push_back(Token::end_of_line(eol_loc));
@@ -273,7 +274,8 @@ static void emit_cmp(const HLA_CompareExpr& cmp, const SourceLoc& loc,
         const Token& last = cmp.right.back();
         std::string_view text = g_strings.view(last.text_id);
         eol_loc = last.loc;
-        eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+        uint new_column = static_cast<uint>(last.loc.column() + text.size());
+        eol_loc = SourceLoc(eol_loc.filename_id(), eol_loc.line(), new_column);
     }
 
     ll.tokens.push_back(Token::end_of_line(eol_loc));

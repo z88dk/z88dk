@@ -9,7 +9,7 @@ ucase_symbols	0
 float_format	genmath
 preprocess_only	0
 generate_dependencies	0
-swap_ix_iy	0
+swap_ixiy	0
 date_stamp	0
 filler_byte	0
 dump_after_cmdline	1

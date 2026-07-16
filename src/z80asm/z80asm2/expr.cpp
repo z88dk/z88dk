@@ -11,7 +11,7 @@
 #include "lexer_tokens.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <memory>
 #include <string>
@@ -263,8 +263,8 @@ bool ConstEvalSem::symbol(const Token& tok) {
     }
     else {
         if (!silent) {
-            g_diag.error(tok.loc, "Undefined constant: " +
-                         g_strings.to_string(tok.text_id));
+            g_diag.error(tok.loc, std::string("Undefined constant: ") +
+                         std::string(g_strings.view(tok.text_id)));
         }
         push(0);
         return false;
@@ -325,29 +325,29 @@ static void error_expected_operand(const ParseLine& pline) {
 }
 
 static void error_missing_lparen(const ParseLine& pline) {
-    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                        pline.tokens[pline.pos - 1] : Token{};
+    Token prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                 pline.tokens[pline.pos - 1] : Token::end_of_line(SourceLoc());
     g_diag.error(prev.loc, "Missing '(' after token "
                  + escape_string(g_strings.view(prev.text_id)));
 }
 
 static void error_missing_rparen(const ParseLine& pline) {
-    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                        pline.tokens[pline.pos - 1] : Token{};
+    Token prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                 pline.tokens[pline.pos - 1] : Token::end_of_line(SourceLoc());
     g_diag.error(prev.loc, "Missing ')' after token "
                  + escape_string(g_strings.view(prev.text_id)));
 }
 
 static void error_missing_rbracket(const ParseLine& pline) {
-    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                        pline.tokens[pline.pos - 1] : Token{};
+    Token prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                 pline.tokens[pline.pos - 1] : Token::end_of_line(SourceLoc());
     g_diag.error(prev.loc, "Missing ']' after token "
                  + escape_string(g_strings.view(prev.text_id)));
 }
 
 static void error_missing_colon(const ParseLine& pline) {
-    const Token& prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
-                        pline.tokens[pline.pos - 1] : Token{};
+    Token prev = pline.pos > 0 && pline.pos - 1 < pline.tokens.size() ?
+                 pline.tokens[pline.pos - 1] : Token::end_of_line(SourceLoc());
     g_diag.error(prev.loc, "Missing ':' after token "
                  + escape_string(g_strings.view(prev.text_id)));
 }

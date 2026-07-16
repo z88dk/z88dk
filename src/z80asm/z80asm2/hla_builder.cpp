@@ -458,7 +458,7 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_primary(ParseLine& line) {
     }
 
     line.error("Unexpected token in condition: " +
-               escape_string(g_strings.to_string(line.peek().text_id)));
+               escape_string(g_strings.view(line.peek().text_id)));
     return nullptr;
 }
 
@@ -478,8 +478,8 @@ std::unique_ptr<HLA_Expr> HLA_ProgramBuilder::parse_comparison(
     const Token& op_tok = line.peek();
 
     auto invalid_op = [&]() -> std::unique_ptr<HLA_Expr> {
-        line.error("Invalid comparison operator: " +
-                   g_strings.to_string(op_tok.text_id));
+        line.error(std::string("Invalid comparison operator: ") +
+                   std::string(g_strings.view(op_tok.text_id)));
         return nullptr;
     };
 

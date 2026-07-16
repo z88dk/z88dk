@@ -7,7 +7,7 @@
 #pragma once
 
 #include "obj_file.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -16,36 +16,35 @@
 #include <unordered_set>
 #include <vector>
 
-using uint = unsigned int;
-
+#if 0
 struct LinkedSymbol {
-    ObjSymbol* def = nullptr;       // where it was defined
-    ObjectModule* module = nullptr;
+    ObjSymbolView* def = nullptr;       // where it was defined
+    ObjModuleView* module = nullptr;
     bool resolved = false;
     int value = 0;                  // final linked value
 };
 
 struct LinkedSection {
-    StringInterner::Id name_id;
+    StringId name_id;
     uint start_address;
     uint size;
     std::vector<uint8_t> data;
-    std::vector<ObjExpr*> relocations;
+    std::vector<ObjExpr*> relocs;
 };
 
 struct LinkContext {
-    // Input object libraries and modules; they own the ObjectLibrary's and ObjectModule's
-    std::vector<std::unique_ptr<ObjectLibrary>> input_modules;
-    std::vector<std::unique_ptr<ObjectLibrary>> libraries;
+    // Input object libraries and modules; they own the ObjLibrary's and ObjModule's
+    std::vector<std::unique_ptr<ObjLibrary>> input_modules;
+    std::vector<std::unique_ptr<ObjLibrary>> libraries;
 
     // Library index
-    std::unordered_map<StringInterner::Id, ObjectModule*> symbol_to_module;
+    std::unordered_map<StringId, ObjModuleView*> symbol_to_module;
 
     // Linking state
-    std::unordered_map<StringInterner::Id, LinkedSymbol> global_symbols;
-    std::unordered_set<StringInterner::Id> unresolved_symbols;
-    std::unordered_set<ObjectModule*> selected_modules;
-    std::vector<ObjectModule*> final_modules;
+    std::unordered_map<StringId, LinkedSymbol> global_symbols;
+    std::unordered_set<uint> unresolved_symbols;
+    std::unordered_set<ObjModuleView*> selected_modules;
+    std::vector<ObjModuleView*> final_modules;
 
     // Output sections
     std::vector<LinkedSection> linked_sections;
@@ -55,3 +54,4 @@ void link_files(const std::vector<std::string>& filenames,
                 const std::vector<std::string>& libraries,
                 const std::vector<std::string>& library_paths,
                 std::string_view output_dir);
+#endif

@@ -6,7 +6,7 @@
 
 #include "options.h"
 #include "options_dump.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -27,8 +27,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.preprocess_only << "\n"
             << "generate_dependencies\t"
             << g_args.options.generate_dependencies << "\n"
-            << "swap_ix_iy\t"
-            << g_args.options.swap_ix_iy << "\n"
+            << "swap_ixiy\t"
+            << g_args.options.swap_ixiy << "\n"
             << "date_stamp\t"
             << g_args.options.date_stamp << "\n"
             << "filler_byte\t"

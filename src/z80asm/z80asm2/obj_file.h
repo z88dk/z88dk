@@ -6,141 +6,488 @@
 
 #pragma once
 
+#include "binary_data.h"
+#include "binary_file.h"
 #include "cpu.h"
-#include "ir.h"
+#include "dump_context.h"
+#include "obj_range_type.h"
+#include "obj_symbol_scope.h"
+#include "obj_symbol_type.h"
+#include "options.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <memory>
-#include <set>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 
-using uint = unsigned int;
+//-----------------------------------------------------------------------------
+// object file version
+//-----------------------------------------------------------------------------
 
-#define OBJ_FILE_VERSION 18
+inline constexpr int MinObjVersion = 1;
+inline constexpr int CurObjVersion = 19;
 
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
+inline constexpr std::string_view ObjFileSignaturePrefix = "Z80RMF";
+inline constexpr std::string_view LibFileSignaturePrefix = "Z80LMF";
 
-static constexpr std::string_view OBJ_FILE_SIGNATURE = "Z80RMF" STR(
-            OBJ_FILE_VERSION);
-static constexpr std::string_view LIB_FILE_SIGNATURE = "Z80LMF" STR(
-            OBJ_FILE_VERSION);
+inline constexpr size_t SignatureSize = 8;
 
-enum class ObjExprRange {
-    Undefined = 0,              // end marker
-    JrOffset = 1,               // 8-bit relative offset for JR
-    ByteUnsigned = 2,           // 8-bit unsigned
-    ByteSigned = 3,             // 8-bit signed
-    Word = 4,                   // 16-bit value little-endian
-    WordBE = 5,                 // 16-bit value big-endian
-    DWord = 6,                  // 32-bit signed
-    ByteToWordUnsigned = 7,     // unsigned byte extended to 16 bits
-    ByteToWordSigned = 8,       // signed byte sign-extended to 16 bits
-    Ptr24 = 9,                  // 24-bit pointer
-    HighOffset = 10,            // byte offset to 0xFF00
-    Assignment = 11,            // DEFC expression assigning a symbol
-    JreOffset = 12,             // 16-bit relative offset for JRE
-    ByteToPtrUnsigned = 13,     // unsigned byte extended to 24 bits
-    ByteToPtrSigned = 14,       // signed byte sign-extended to 24 bits
+inline constexpr uint32_t OffsetNotPresent = static_cast<uint32_t>(-1);
+inline constexpr uint32_t OrgNotDefined = static_cast<uint32_t>(-1);
+inline constexpr uint32_t OrgSectionSplit = static_cast<uint32_t>(-2);
+
+enum class ObjFileType { None, Object, Library };
+
+std::string_view obj_file_signature();
+std::string_view lib_file_signature();
+
+bool parse_signature(std::string_view signature, ObjFileType& type,
+                     int& version);
+
+//-----------------------------------------------------------------------------
+// Section info
+//-----------------------------------------------------------------------------
+
+struct SectionInfo {
+    size_t offset = OffsetNotPresent;   // file offset of section
+    size_t size = 0;                    // optional, depending on section
+    bool present = false;               // section is present in file
+    bool loaded = false;                // section has been loaded into memory
+
+    SectionInfo() = default;
+    SectionInfo(size_t offset_, size_t size_ = 0, bool present_ = true)
+        : offset(offset_), size(size_), present(present_) {}
 };
 
-struct ObjExpr : public TreeNode {
-    StringInterner::Id text_id = 0; // expression text
-    ObjExprRange range = ObjExprRange::Undefined; // range of patch
-    uint asmpc = 0;             // offset of ASMPC for the instruction
-    uint code_pos = 0;          // offset of patch position
-    uint opcode_size = 0;       // size of opcode
-    StringInterner::Id section_name_id = 0; // section
-    StringInterner::Id target_name_id = 0;  // name for Assignment
-    SourceLoc loc;              // location of expression
+//-----------------------------------------------------------------------------
+// Object and library file schema
+//-----------------------------------------------------------------------------
 
-    virtual ~ObjExpr() = default;
-    void dump(DumpContext ctx) const override;
+struct CommonSchema {
+    std::shared_ptr<const BinaryFile> file;
+    size_t base_offset = 0;
+    size_t size = 0;
+    ObjFileType type = ObjFileType::None;
+    int version = 0;
+
+    explicit CommonSchema(std::shared_ptr<const BinaryFile> file_,
+                          size_t base_offset_, size_t size_);
+
+    size_t offset_after_signature() const {
+        return base_offset + SignatureSize;
+    }
+    size_t end_offset() const {
+        return base_offset + size;
+    }
+    std::string_view filename() const {
+        return file->filename();
+    }
+
+    [[noreturn]]
+    void invalid_file_error(std::string_view message) const;
+
+protected:
+    SectionInfo load_offset(size_t& ptr, std::string_view pointer_name) const;
+    static size_t calc_end_offset(const SectionInfo& info, size_t next_offset) {
+        return info.present ? info.offset : next_offset;
+    };
 };
 
-enum class ObjSymbolScope {
-    Undefined = 0,              // end marker
-    Local = 1,                  // local
-    Public = 2,                 // public
+//-----------------------------------------------------------------------------
+
+struct ObjSchema : public CommonSchema {
+    uint base_address = OrgNotDefined;
+    CPU cpu_id = DEFAULT_CPU;
+    bool swap_ixiy = false;
+
+    SectionInfo exprs;
+    SectionInfo relocs;
+    SectionInfo symbols;
+    SectionInfo externs;
+    SectionInfo modname;
+    SectionInfo sections;
+    SectionInfo strings;
+
+    explicit ObjSchema(std::shared_ptr<const BinaryFile> file_,
+                       size_t base_offset_, size_t size_);
 };
 
-enum class ObjSymbolType {
-    Undefined = 0,              // not used
-    Constant = 1,               // constant
-    AddressRelative = 2,        // offset to base address
-    Computed = 3,               // expression needs to be evaluated
+//-----------------------------------------------------------------------------
+
+struct LibSchema : public CommonSchema {
+    std::vector<SectionInfo> modules;
+    std::unordered_map<size_t, size_t> offset_to_index;
+    SectionInfo strings;
+    SectionInfo symbol_index;
+
+    explicit LibSchema(std::shared_ptr<const BinaryFile> file_);
 };
 
-struct ObjSymbol : public TreeNode {
-    StringInterner::Id name_id = 0; // symbol name
-    SourceLoc loc;              // location of definition
-    ObjSymbolScope scope = ObjSymbolScope::Undefined; // scope
-    ObjSymbolType type = ObjSymbolType::Undefined;    // type
-    int value;                  // constant value of offset to base address
-    StringInterner::Id section_name_id = 0; // section
+//-----------------------------------------------------------------------------
+// Module name
+//-----------------------------------------------------------------------------
 
-    virtual ~ObjSymbol() = default;
-    void dump(DumpContext ctx) const override;
+struct ObjModname {
+    StringId name_id;       // module name
+
+    std::string_view name() const {
+        return g_strings.view(name_id);
+    }
+    void set_name(std::string_view name) {
+        name_id = g_strings.intern(name);
+    }
+
+    void dump(DumpContext ctx) const;
+    void dump_short() const;
+    size_t pack(BinaryData& bin_data, StringTable& strings) const;
+    void unpack(std::shared_ptr<const BinaryFile> file, int version,
+                const StringTable& strings, size_t ptr);
 };
 
-struct ObjSection : public TreeNode {
-    static constexpr int OrgNotDefined = -1;
-    static constexpr int OrgSectionSplit = -2;
+//-----------------------------------------------------------------------------
+// Expression
+//-----------------------------------------------------------------------------
 
-    StringInterner::Id name_id = 0; // section name
-    bool org_defined = false;   // true if ORG defined
-    uint base_address = 0;      // ORG if defined
-    bool section_split = false; // true if section needs splitting
-    uint align = 1;             // alignment address
-    std::vector<uint8_t> bytes; // binary data
+struct ObjExpr {
+    ObjRangeType range = ObjRangeType::Undefined;
+    StringId filename_id;
+    uint line = 0;
 
-    virtual ~ObjSection() = default;
-    void dump(DumpContext ctx) const override;
+    StringId section_name_id;
+    uint asmpc = 0;
+    uint patch_ptr = 0;
+    uint opcode_size = 0;
+
+    StringId target_name_id;
+    StringId text_id;
+
+    std::string_view filename() const {
+        return g_strings.view(filename_id);
+    }
+    std::string_view filename_str() const {
+        return filename_id.empty() ? "\"\"" : g_strings.view(filename_id);
+    }
+    void set_filename(std::string_view filename) {
+        filename_id = g_strings.intern(filename);
+    }
+    std::string_view section_name() const {
+        return g_strings.view(section_name_id);
+    }
+    std::string_view section_name_str() const {
+        return section_name_id.empty() ? "\"\"" : g_strings.view(section_name_id);
+    }
+    void set_section_name(std::string_view section_name) {
+        section_name_id = g_strings.intern(section_name);
+    }
+    std::string_view target_name() const {
+        return g_strings.view(target_name_id);
+    }
+    void set_target_name(std::string_view target_name) {
+        target_name_id = g_strings.intern(target_name);
+    }
+    std::string_view text() const {
+        return g_strings.view(text_id);
+    }
+    void set_text(std::string_view text) {
+        text_id = g_strings.intern(text);
+    }
+
+    void dump(DumpContext ctx) const;
+    static void dump_exprs(DumpContext ctx,
+                           const std::vector<ObjExpr>& exprs);
+    void dump_short() const;
+    static void dump_exprs_short(const std::vector<ObjExpr>& exprs);
+
+    void pack(BinaryData& bin_data, StringTable& strings) const;
+    static size_t pack_exprs(BinaryData& bin_data, StringTable& strings,
+                             const std::vector<ObjExpr>& exprs);
+    bool unpack(std::shared_ptr<const BinaryFile> file, int version,
+                const StringTable& strings, size_t& ptr, StringId& last_filename_id);
+    static void unpack_exprs(std::shared_ptr<const BinaryFile> file, int version,
+                             const StringTable& strings, size_t ptr, size_t end_ptr,
+                             std::vector<ObjExpr>& exprs);
 };
 
-struct ObjectModule : public TreeNode {
-    StringInterner::Id module_name_id = 0;
-    CPU cpu_id = CPU::z80;
-    bool swap_ix_iy = false;
+//-----------------------------------------------------------------------------
+// Relocation
+//-----------------------------------------------------------------------------
 
-    std::vector<std::unique_ptr<ObjExpr>> exprs;
-    std::vector<std::unique_ptr<ObjSymbol>> symbols;
-    std::vector<StringInterner::Id> externs;
-    std::vector<std::unique_ptr<ObjSection>> sections;
+struct ObjReloc {
+    ObjRangeType range = ObjRangeType::Undefined;
+    StringId filename_id;
+    uint line = 0;
 
-    ObjectModule() = default;
-    ObjectModule(const ObjectModule&) = delete;
-    ObjectModule& operator=(const ObjectModule&) = delete;
-    ObjectModule(ObjectModule&&) = default;
-    ObjectModule& operator=(ObjectModule&&) = default;
+    StringId patch_section_name_id;
+    uint patch_ptr = 0;             // offset to patch_section_name_id
 
-    virtual ~ObjectModule() = default;
-    void dump(DumpContext ctx) const override;
-    void clear();
+    StringId value_section_name_id;
+    uint offset = 0;                // offset to value_section_name_id
+
+    std::string_view filename() const {
+        return g_strings.view(filename_id);
+    }
+    std::string_view filename_str() const {
+        return filename_id.empty() ? "\"\"" : g_strings.view(filename_id);
+    }
+    void set_filename(std::string_view filename) {
+        filename_id = g_strings.intern(filename);
+    }
+    std::string_view patch_section_name() const {
+        return g_strings.view(patch_section_name_id);
+    }
+    std::string_view patch_section_name_str() const {
+        return patch_section_name_id.empty() ? "\"\"" : g_strings.view(
+                   patch_section_name_id);
+    }
+    void set_patch_section_name(std::string_view section_name) {
+        patch_section_name_id = g_strings.intern(section_name);
+    }
+    std::string_view value_section_name() const {
+        return g_strings.view(value_section_name_id);
+    }
+    std::string_view value_section_name_str() const {
+        return value_section_name_id.empty() ? "\"\"" : g_strings.view(
+                   value_section_name_id);
+    }
+    void set_value_section_name(std::string_view section_name) {
+        value_section_name_id = g_strings.intern(section_name);
+    }
+
+    void dump(DumpContext ctx) const;
+    static void dump_relocs(DumpContext ctx,
+                            const std::vector<ObjReloc>& relocs);
+    void dump_short() const;
+    static void dump_relocs_short(const std::vector<ObjReloc>& relocs);
+
+    void pack(BinaryData& bin_data, StringTable& strings) const;
+    static size_t pack_relocs(BinaryData& bin_data, StringTable& strings,
+                              const std::vector<ObjReloc>& relocs);
+    bool unpack(std::shared_ptr<const BinaryFile> file, int version,
+                const StringTable& strings, size_t& ptr);
+    static void unpack_relocs(std::shared_ptr<const BinaryFile> file, int version,
+                              const StringTable& strings, size_t ptr, size_t end_ptr,
+                              std::vector<ObjReloc>& relocs);
 };
 
-struct ObjectLibrary : public TreeNode {
-    std::vector<std::unique_ptr<ObjectModule>> modules;
-    std::set<StringInterner::Id> public_symbols;
+//-----------------------------------------------------------------------------
+// Symbol
+//-----------------------------------------------------------------------------
 
-    ObjectLibrary() = default;
-    ObjectLibrary(const ObjectLibrary&) = delete;
-    ObjectLibrary& operator=(const ObjectLibrary&) = delete;
-    ObjectLibrary(ObjectLibrary&&) = default;
-    ObjectLibrary& operator=(ObjectLibrary&&) = default;
+struct ObjSymbol {
+    StringId symbol_name_id;
+    StringId filename_id;
+    uint line = 0;
 
-    virtual ~ObjectLibrary() = default;
-    void dump(DumpContext ctx) const override;
-    void clear();
+    ObjSymbolScope scope = ObjSymbolScope::Undefined;
+    ObjSymbolType type = ObjSymbolType::Undefined;
+
+    int value;
+    StringId section_name_id;
+
+    std::string_view symbol_name() const {
+        return g_strings.view(symbol_name_id);
+    }
+    void set_symbol_name(std::string_view symbol_name) {
+        symbol_name_id = g_strings.intern(symbol_name);
+    }
+    std::string_view filename() const {
+        return g_strings.view(filename_id);
+    }
+    std::string_view filename_str() const {
+        return filename_id.empty() ? "\"\"" : g_strings.view(filename_id);
+    }
+    void set_filename(std::string_view filename) {
+        filename_id = g_strings.intern(filename);
+    }
+    std::string_view section_name() const {
+        return g_strings.view(section_name_id);
+    }
+    std::string_view section_name_str() const {
+        return section_name_id.empty() ? "\"\"" : g_strings.view(section_name_id);
+    }
+    void set_section_name(std::string_view section_name) {
+        section_name_id = g_strings.intern(section_name);
+    }
+
+    void dump(DumpContext ctx) const;
+    static void dump_symbols(DumpContext ctx,
+                             const std::vector<ObjSymbol>& symbols);
+    void dump_short() const;
+    static void dump_symbols_short(const std::vector<ObjSymbol>& symbols);
+
+    void pack(BinaryData& bin_data, StringTable& strings) const;
+    static size_t pack_symbols(BinaryData& bin_data, StringTable& strings,
+                               const std::vector<ObjSymbol>& symbols);
+    bool unpack(std::shared_ptr<const BinaryFile> file, int version,
+                const StringTable& strings, size_t& ptr);
+    static void unpack_symbols(std::shared_ptr<const BinaryFile> file, int version,
+                               const StringTable& strings, size_t ptr, size_t end_ptr,
+                               std::vector<ObjSymbol>& symbols);
 };
 
-bool write_object_library(const ObjectLibrary& obj_lib,
-                          std::string_view filename);
-bool read_object_library(ObjectLibrary& obj_lib,
-                         std::string_view filename);
+//-----------------------------------------------------------------------------
+// Extern
+//-----------------------------------------------------------------------------
+
+struct ObjExtern {
+    StringId symbol_name_id;
+
+    std::string_view symbol_name() const {
+        return g_strings.view(symbol_name_id);
+    }
+
+    void set_symbol_name(std::string_view symbol_name) {
+        symbol_name_id = g_strings.intern(symbol_name);
+    }
+
+    void dump(DumpContext ctx) const;
+    static void dump_externs(DumpContext ctx,
+                             const std::vector<ObjExtern>& externs);
+    void dump_short() const;
+    static void dump_externs_short(const std::vector<ObjExtern>& externs);
+
+    void pack(BinaryData& bin_data, StringTable& strings) const;
+    static size_t pack_externs(BinaryData& bin_data, StringTable& strings,
+                               const std::vector<ObjExtern>& externs);
+    bool unpack(std::shared_ptr<const BinaryFile> file, int version,
+                const StringTable& strings, size_t& ptr);
+    static void unpack_externs(std::shared_ptr<const BinaryFile> file, int version,
+                               const StringTable& strings, size_t ptr, size_t end_ptr,
+                               std::vector<ObjExtern>& externs);
+};
+
+//-----------------------------------------------------------------------------
+// Section
+//-----------------------------------------------------------------------------
+
+struct ObjSection {
+    StringId section_name_id;
+    uint base_address = OrgNotDefined;
+    uint align = 1;
+    std::vector<uint8_t> bytes;
+
+    std::string_view section_name() const {
+        return g_strings.view(section_name_id);
+    }
+    std::string_view  section_name_str() const {
+        return section_name_id.empty() ? "\"\"" : g_strings.view(section_name_id);
+    }
+    void set_section_name(std::string_view section_name) {
+        section_name_id = g_strings.intern(section_name);
+    }
+
+    void dump(DumpContext ctx) const;
+    static void dump_sections(DumpContext ctx,
+                              const std::vector<ObjSection>& sections);
+    void dump_short() const;
+    static void dump_sections_short(const std::vector<ObjSection>& sections);
+
+    void pack(BinaryData& bin_data, StringTable& strings) const;
+    static size_t pack_sections(BinaryData& bin_data, StringTable& strings,
+                                const std::vector<ObjSection>& sections);
+    bool unpack(std::shared_ptr<const BinaryFile> file, int version,
+                const StringTable& strings, size_t& ptr);
+    static void unpack_sections(std::shared_ptr<const BinaryFile> file, int version,
+                                const StringTable& strings, size_t ptr, size_t end_ptr,
+                                std::vector<ObjSection>& sections);
+
+private:
+    void print_bytes(DumpContext ctx) const;
+};
+
+//-----------------------------------------------------------------------------
+// Module
+//-----------------------------------------------------------------------------
+
+struct ObjModule {
+    StringId filename_id;       // filename from which the module was created
+    size_t base_offset = 0;     // offset in the binary file
+
+    CPU cpu_id = DEFAULT_CPU;
+    bool swap_ixiy = false;
+    uint base_address = OrgNotDefined;
+    ObjModname modname;
+    std::vector<ObjExpr> exprs;
+    std::vector<ObjReloc> relocs;
+    std::vector<ObjSymbol> symbols;
+    std::vector<ObjExtern> externs;
+    std::vector<ObjSection> sections;
+    StringTable strings;
+
+    std::string_view filename() const {
+        return g_strings.view(filename_id);
+    }
+    void set_filename(std::string_view filename) {
+        filename_id = g_strings.intern(filename);
+    }
+
+    void dump(DumpContext ctx) const;
+    void dump_short() const;
+
+    void pack(BinaryData& bin_data);
+    void unpack(std::shared_ptr<const BinaryFile> file, size_t ptr);
+};
+
+//-----------------------------------------------------------------------------
+// Library
+//-----------------------------------------------------------------------------
+
+// symbol index key
+struct CpuKey {
+    CPU cpu_id;
+    bool swap_ixiy;
+
+    CpuKey(CPU cpu_id_, bool swap_ixiy_) : cpu_id(cpu_id_), swap_ixiy(swap_ixiy_) {}
+
+    bool operator==(const CpuKey& other) const {
+        return cpu_id == other.cpu_id && swap_ixiy == other.swap_ixiy;
+    }
+};
+
+// Hash function for CpuKey to enable use as unordered_map key
+namespace std {
+template <>
+struct hash<CpuKey> {
+    std::size_t operator()(const CpuKey& k) const noexcept {
+        return (static_cast<size_t>(k.cpu_id) << 1) | static_cast<size_t>(k.swap_ixiy);
+    }
+};
+}
+
+struct ObjLibrary {
+    StringId filename_id;       // filename from which the module was created
+    size_t base_offset = 0;     // offset in the binary file
+
+    std::vector<ObjModule> modules;
+    StringTable strings;
+    std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>> symbol_index;
+
+    std::string_view filename() const {
+        return g_strings.view(filename_id);
+    }
+    void set_filename(std::string_view filename) {
+        filename_id = g_strings.intern(filename);
+    }
+
+    void dump(DumpContext ctx) const;
+    void dump_short() const;
+
+    void pack(BinaryData& bin_data);
+    void unpack(std::shared_ptr<const BinaryFile> file);
+
+private:
+    void build_symbol_index();
+    size_t pack_symbol_index(BinaryData& bin_data);
+};
+
+//-----------------------------------------------------------------------------
+// Drivers
+//-----------------------------------------------------------------------------
+
+void write_object_library(ObjLibrary& obj_lib, std::string_view filename);
+void read_object_library(ObjLibrary& obj_lib, std::string_view filename);
 
 [[noreturn]]
-void dump_obj_lib_and_exit(const ObjectLibrary& obj_lib);
+void dump_obj_lib_and_exit(const ObjLibrary& obj_lib);

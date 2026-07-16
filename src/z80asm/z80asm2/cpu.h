@@ -8,28 +8,41 @@
 
 #include "lexer_keywords.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 enum class CPU {
-#define X(code, id, name, defines)   id = code,
-#include "cpu.def"
+#define X(id, name, name_str, non_strict, ancestor, defines)	    \
+    name = id,
+#include "../cpu.def"
+#undef X
 };
 
 std::string to_string(CPU cpu_id);
+std::string_view to_view(CPU cpu_id);
 bool cpu_lookup(std::string_view name, CPU& out_cpu_id);
-std::vector<StringInterner::Id> cpu_names();
+std::vector<std::string_view> cpu_names();
 
-std::vector<StringInterner::Id> cpu_all_defines();
-std::vector<StringInterner::Id> cpu_defines(CPU cpu_id);
+std::vector<std::string_view> cpu_all_defines();
+std::vector<std::string_view> cpu_defines(CPU cpu_id);
+
+bool cpu_is_strict(CPU cpu_id);
+CPU cpu_unstrictify(CPU cpu_id);
+
+// return list of CPUs from the most specific to the most general,
+// based on the ancestor relationship
+std::vector<CPU> cpus_specific_to_general();
+
+// check if a code cpu is compatible with a library cpu
+bool cpu_compatible(CPU code_cpu_id, CPU lib_cpu_id);
 
 bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl);
 
 Keyword cpu_invert_flag_condition(Keyword kw);
-void swap_ix_iy(std::string& inout_text, Keyword& inout_kw);
+void swap_ixiy(std::string& inout_text, Keyword& inout_kw);
 
 // Z88
 bool compute_z88_call_oz(std::vector<std::pair<Keyword, int>>& out_def_val_data,

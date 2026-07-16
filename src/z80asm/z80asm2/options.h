@@ -19,6 +19,7 @@
 enum class OptionType {
 #define X(name, str, takes_arg, arg_text, usage) name,
 #include "options.def"
+#undef X
 };
 
 // defaults
@@ -41,7 +42,7 @@ struct Options {
     bool preprocess_only = false;
     bool generate_dependencies = false;
     CPU  cpu_id{ DEFAULT_CPU }; // immutable, from -m
-    bool swap_ix_iy = false;
+    bool swap_ixiy = false;
     bool date_stamp = false;
     uint8_t filler_byte = DEFAULT_FILLER_BYTE;
     FloatFormat float_format = DEFAULT_FLOAT_FORMAT;
