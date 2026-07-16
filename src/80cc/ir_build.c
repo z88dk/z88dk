@@ -3764,16 +3764,27 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             Node *c_node = array_get_byindex(n->args, 1);
             int str_v = build_expr(b, array_get_byindex(n->args, 0));
             if (str_v < 0) return -1;
+            /* Evaluate the search-char operand BEFORE emitting IR_STRCHR
+               (mirrors the strcpy builder above).  Emitting the op first and
+               then build_expr()ing the char appended the char's loads AFTER
+               the op that consumes them — a use-before-def that reached the
+               lowerer with the operand in no register and no slot (abort). */
+            int c_v = -1, c_imm = 0, c_is_literal = 0;
+            if (c_node && c_node->ast_type == AST_LITERAL) {
+                c_is_literal = 1;
+                c_imm = (int)c_node->zval;   /* literal search char */
+            } else {
+                c_v = build_expr(b, c_node);
+                if (c_v < 0) return -1;
+            }
             int dst = new_temp_kind(b, KIND_INT);
             Op *op = ir_op_emit(cur_bb(b), IR_STRCHR);
             op->dst    = dst;
             op->src[0] = str_v;          /* string pointer */
-            if (c_node && c_node->ast_type == AST_LITERAL) {
+            if (c_is_literal) {
                 op->src[1] = -1;
-                op->imm    = (int)c_node->zval;   /* literal search char */
+                op->imm    = c_imm;
             } else {
-                int c_v = build_expr(b, c_node);
-                if (c_v < 0) return -1;
                 op->src[1] = c_v;        /* search char value */
             }
             return dst;

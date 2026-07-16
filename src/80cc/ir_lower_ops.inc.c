@@ -1891,6 +1891,16 @@ static void emit_pair_add_de_clean(FILE *out, const char *pair, const char *lo,
         invalidate_a_cache();
         return;
     }
+    /* A not free and past the inc range: a stack-scratched `add pair,de` is
+       O(1) bytes and preserves DE, BC and A — vastly better than an inc/dec
+       chain of length |k| (a +40 struct-field offset was 40 `inc hl`). */
+    if (k > 4 || k < -4) {
+        emit(out, "push\tde");
+        emit(out, "ld\tde,%d", k);
+        emit(out, "add\t%s,de", pair);
+        emit(out, "pop\tde");
+        return;
+    }
     const char *op = k > 0 ? "inc" : "dec";
     int n = k > 0 ? k : -k;
     for (int i = 0; i < n; i++) emit(out, "%s\t%s", op, pair);
