@@ -20,22 +20,31 @@ bool compute_layout(Program& prog, bool& changed) {
     SourceLoc phase_loc;
 
     // update the address set changed to true if any address is updated
-    auto update = [&](uint & old_address, uint new_address) {
+    auto update_address = [&](uint & old_address, uint new_address) {
         if (old_address != new_address) {
             old_address = new_address;
             changed = true;
         }
     };
 
+    auto update_phase = [&](bool & old_phase, bool new_phase) {
+        if (old_phase != new_phase) {
+            old_phase = new_phase;
+            changed = true;
+        }
+    };
+
     // layout either with real_pc or phased_pc depending on in_phase
-    auto layout = [&](uint & old_address, uint size) {
+    auto layout = [&](uint & old_address, bool & old_phase, uint size) {
         if (in_phase) {
-            update(old_address, phase_pc);
+            update_address(old_address, phase_pc);
+            update_phase(old_phase, true);
             real_pc += size;
             phase_pc += size;
         }
         else {
-            update(old_address, real_pc);
+            update_address(old_address, real_pc);
+            update_phase(old_phase, false);
             real_pc += size;
         }
     };
@@ -77,7 +86,7 @@ bool compute_layout(Program& prog, bool& changed) {
                 }
                 else {
                     g_diag.error(sec->org_stmt->expr->loc,
-                                 "Interger range: " + int_to_hex(value));
+                                 "Integer range: " + int_to_hex(value));
                     failed = true;
                 }
             }
@@ -101,20 +110,20 @@ bool compute_layout(Program& prog, bool& changed) {
             for (auto& stmt : sec->stmts) {
                 if (auto opc_stmt = dynamic_cast<OpcodeStmt*>(stmt)) {
                     opc_stmt->section = sec.get();
-                    layout(opc_stmt->address,
+                    layout(opc_stmt->address, opc_stmt->in_phase,
                            static_cast<uint>(opc_stmt->bytes.size()));
                     continue;
                 }
 
                 if (auto lbl_stmt = dynamic_cast<LabelStmt*>(stmt)) {
                     lbl_stmt->section = sec.get();
-                    layout(lbl_stmt->address, 0);
+                    layout(lbl_stmt->address, lbl_stmt->in_phase, 0);
                     continue;
                 }
 
                 if (auto org_stmt = dynamic_cast<OrgStmt*>(stmt)) {
                     org_stmt->section = sec.get();
-                    layout(org_stmt->address, 0);
+                    layout(org_stmt->address, org_stmt->in_phase, 0);
 
                     uint new_address = org_stmt->address;
                     if (!get_const_expr_value(org_stmt->expr.get(),
@@ -132,7 +141,7 @@ bool compute_layout(Program& prog, bool& changed) {
                     }
                     else {
                         org_stmt->padding_size = new_offset - org_stmt->address;
-                        layout(org_stmt->address, org_stmt->padding_size);
+                        layout(org_stmt->address, org_stmt->in_phase, org_stmt->padding_size);
                     }
 
                     continue;
@@ -140,13 +149,13 @@ bool compute_layout(Program& prog, bool& changed) {
 
                 if (auto defc_stmt = dynamic_cast<DefcStmt*>(stmt)) {
                     defc_stmt->section = sec.get();
-                    layout(defc_stmt->address, 0);
+                    layout(defc_stmt->address, defc_stmt->in_phase, 0);
                     continue;
                 }
 
                 if (auto align_stmt = dynamic_cast<AlignStmt*>(stmt)) {
                     align_stmt->section = sec.get();
-                    layout(align_stmt->address, 0);
+                    layout(align_stmt->address, align_stmt->in_phase, 0);
 
                     align_value = 1;
                     if (!get_const_expr_value(align_stmt->align_expr.get(),
@@ -161,13 +170,13 @@ bool compute_layout(Program& prog, bool& changed) {
                     uint new_address =
                         (align_stmt->address + (align_value - 1)) & ~(align_value - 1);
                     align_stmt->padding_size = new_address - align_stmt->address;
-                    layout(align_stmt->address, align_stmt->padding_size);
+                    layout(align_stmt->address, align_stmt->in_phase, align_stmt->padding_size);
                     continue;
                 }
 
                 if (auto defs_stmt = dynamic_cast<DefsNumericStmt*>(stmt)) {
                     defs_stmt->section = sec.get();
-                    layout(defs_stmt->address, 0);
+                    layout(defs_stmt->address, defs_stmt->in_phase, 0);
 
                     uint size_value = 0;
                     if (!get_const_expr_value(defs_stmt->size_expr.get(),
@@ -176,13 +185,13 @@ bool compute_layout(Program& prog, bool& changed) {
                     }
 
                     defs_stmt->padding_size = size_value;
-                    layout(defs_stmt->address, defs_stmt->padding_size);
+                    layout(defs_stmt->address, defs_stmt->in_phase, defs_stmt->padding_size);
                     continue;
                 }
 
                 if (auto defs_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
                     defs_stmt->section = sec.get();
-                    layout(defs_stmt->address, 0);
+                    layout(defs_stmt->address, defs_stmt->in_phase, 0);
 
                     std::string_view str_value = g_strings.view(defs_stmt->string_id);
                     uint size_value = static_cast<uint>(str_value.size());
@@ -201,7 +210,7 @@ bool compute_layout(Program& prog, bool& changed) {
                     }
 
                     defs_stmt->padding_size = size_value;
-                    layout(defs_stmt->address, defs_stmt->padding_size);
+                    layout(defs_stmt->address, defs_stmt->in_phase, defs_stmt->padding_size);
                     continue;
                 }
 
@@ -225,7 +234,7 @@ bool compute_layout(Program& prog, bool& changed) {
                         }
 
                         phase_pc = phase_value;
-                        layout(phase_stmt->address, 0);
+                        layout(phase_stmt->address, phase_stmt->in_phase, 0);
                     }
                     continue;
                 }
@@ -239,7 +248,7 @@ bool compute_layout(Program& prog, bool& changed) {
                     else {
                         in_phase = false;
                         dephase_stmt->section = sec.get();
-                        layout(dephase_stmt->address, 0);
+                        layout(dephase_stmt->address, dephase_stmt->in_phase, 0);
                     }
                     continue;
                 }

@@ -7,7 +7,7 @@
 #include "diag.h"
 #include "file_mgr.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <iostream>
 
@@ -47,7 +47,7 @@ void Diagnostics::print_message(const SourceLoc& loc,
         return;
     }
 
-    std::string_view filename = g_strings.view(loc.file_id);
+    std::string_view filename = loc.filename();
     if (filename.empty() || filename[0] == '<') {
         // no filename or special filename (e.g. <command line>)
         return;
@@ -56,9 +56,9 @@ void Diagnostics::print_message(const SourceLoc& loc,
     // Try to get the source line text for the given location.
     // If the file is not cached, or the line number is out of range,
     // this will return an empty string, and we won't print the source line.
-    std::string line_text = g_file_mgr.get_source_line(filename, loc.line);
+    std::string line_text = g_file_mgr.get_source_line(filename, loc.line());
     if (!line_text.empty()) {
-        print_source_line(line_text, loc.column);
+        print_source_line(line_text, loc.column());
     }
 
     // print the physical location if different from the logical location
@@ -73,13 +73,13 @@ void Diagnostics::print_message(const SourceLoc& loc,
         return;
     }
 
-    std::string_view physical_filename = g_strings.view(physical_loc.file_id);
+    std::string_view physical_filename = physical_loc.filename();
     std::cerr << "    (physical location: "
               << physical_filename << ":"
-              << physical_loc.line << ")" << std::endl;
+              << physical_loc.line() << ")" << std::endl;
 
     line_text = g_file_mgr.get_source_line(physical_filename,
-                                           physical_loc.line);
+                                           physical_loc.line());
     if (!line_text.empty()) {
         print_source_line(line_text, 0);
     }
@@ -106,4 +106,9 @@ void Diagnostics::print_source_line(std::string_view text, size_t column) {
 
     marker += '^';
     std::cerr << "    " << marker << std::endl;
+}
+
+void fatal_error(std::string_view message) {
+    std::cerr << "error: " << message << std::endl;
+    exit(EXIT_FAILURE);
 }

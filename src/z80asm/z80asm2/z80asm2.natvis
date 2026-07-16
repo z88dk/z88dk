@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Z80 assembler Natvis file for Visual Studio debugger
+  This file provides custom visualizations for z80asm2 types
+-->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <!-- StringId visualization: shows the actual string value from g_strings -->
+  <Type Name="StringId">
+    <DisplayString Condition="id_ == 0">(empty)</DisplayString>
+    <DisplayString Condition="id_ != 0 &amp;&amp; id_ &lt; g_strings.pool_.size()">{g_strings.pool_[id_],sb}</DisplayString>
+    <DisplayString Condition="id_ != 0">(invalid id={id_})</DisplayString>
+    <Expand>
+      <Item Name="[id]">id_</Item>
+      <Item Name="[string]" Condition="id_ != 0 &amp;&amp; id_ &lt; g_strings.pool_.size()">g_strings.pool_[id_],sb</Item>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>

@@ -179,8 +179,8 @@ sub dump_obj {
     # get header
     my $cpu = $bin->get_int32();
     out("CPU: $cpu ($CPU[$cpu])");
-    my $swap_ix_iy = $bin->get_int32();
-    out("Swap IX/IY: $swap_ix_iy");
+    my $swap_ixiy = $bin->get_int32();
+    out("Swap IX/IY: $swap_ixiy");
 
     # File pointer to Module Name
     my $modname_pos = $bin->get_int32();
@@ -227,8 +227,8 @@ sub dump_obj {
                 out("Expression:");
                 indent();
                 out("Type: $type ($EXPR_TYPE[$type])");
-                my $file_id = $bin->get_int32();
-                out("File: $strings[$file_id]");
+                my $filename_id = $bin->get_int32();
+                out("File: $strings[$filename_id]");
                 my $line = $bin->get_int32();
                 out("Line: $line");
                 my $section_id = $bin->get_int32();
@@ -269,8 +269,8 @@ sub dump_obj {
                 out("Value: $value");
                 my $name_id = $bin->get_int32();
                 out("Name: $strings[$name_id]");
-                my $file_id = $bin->get_int32();
-                out("File: $strings[$file_id]");
+                my $filename_id = $bin->get_int32();
+                out("File: $strings[$filename_id]");
                 my $line = $bin->get_int32();
                 out("Line: $line");
                 outdent();

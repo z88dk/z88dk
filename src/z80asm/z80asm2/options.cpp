@@ -13,7 +13,7 @@
 #include "options.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cstdint>
@@ -39,6 +39,7 @@ static constexpr OptionSpec g_option_specs[] = {
 #define X(name, str, takes_arg, arg_text, usage) \
         { str, OptionType::name, takes_arg, arg_text, usage },
 #include "options.def"
+#undef X
 };
 
 // options usage grouping for presentation in usage screen
@@ -133,7 +134,7 @@ static void show_option_usage(const OptionSpec& spec) {
 [[noreturn]]
 void exit_show_usage(int exit_code) {
     // check that usage_layout covers all options
-    std::set<OptionType> covered_options;
+    std::unordered_set<OptionType> covered_options;
     for (auto& group : usage_layout) {
         for (auto& option_type : group.options) {
             covered_options.insert(option_type);
@@ -181,12 +182,13 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
     }
 
     std::string_view rest = arg.substr(opt_name.size());
-    loc.column += static_cast<uint16_t>(opt_name.size());
+    loc = SourceLoc(loc.filename_id(), loc.line(),
+                    loc.column() + static_cast<uint>(opt_name.size()));
 
     // Optional '=' after -D
     if (starts_with(rest, "=")) {
         rest.remove_prefix(1);
-        loc.column++;
+        loc = SourceLoc(loc.filename_id(), loc.line(), loc.column() + 1);
     }
 
     // check if empty after stripping prefix and optional '='
@@ -205,9 +207,11 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
     }
     else {
         name = rest.substr(0, eq);
-        loc.column += static_cast<uint16_t>(name.size());
+        loc = SourceLoc(loc.filename_id(), loc.line(),
+                        loc.column() + static_cast<uint>(name.size()));
         expr = rest.substr(eq + 1);
-        loc.column++; // for the '=' character
+        loc = SourceLoc(loc.filename_id(), loc.line(),
+                        loc.column() + 1); // for the '=' character
         if (expr.empty()) {
             g_diag.error(loc, "Expression missing in option: " + std::string(arg));
             return;
@@ -216,7 +220,7 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
 
     // Convert to std::string for symbol table
     std::string name_s(name);
-    StringInterner::Id name_id = g_strings.intern(name_s);
+    StringId name_id = g_strings.intern(name_s);
     std::string expr_s(expr);
 
     // evaluate the expression as a constant expression
@@ -240,12 +244,13 @@ void Args::parse_filler_byte(std::string_view arg, std::string_view opt_name,
     }
 
     std::string_view expr = arg.substr(opt_name.size());
-    loc.column += static_cast<uint16_t>(opt_name.size());
+    loc = SourceLoc(loc.filename_id(), loc.line(),
+                    loc.column() + static_cast<uint>(opt_name.size()));
 
     // Optional '=' after -f
     if (starts_with(expr, "=")) {
         expr.remove_prefix(1);
-        loc.column++;
+        loc = SourceLoc(loc.filename_id(), loc.line(), loc.column() + 1);
     }
 
     // check if empty after stripping prefix and optional '='
@@ -420,7 +425,7 @@ void Args::parse_arg(std::string_view arg,
             return;
 
         case OptionType::IXIY:
-            options.swap_ix_iy = true;
+            options.swap_ixiy = true;
             return;
 
         case OptionType::UCASE:
@@ -448,11 +453,11 @@ void Args::parse_arg(std::string_view arg,
             if (!cpu_lookup(opt_arg, cpu_id)) {
                 g_diag.error(loc, "Invalid cpu: " + opt_arg);
                 std::string valid_cpus;
-                for (const auto& name_id : cpu_names()) {
+                for (const auto& name : cpu_names()) {
                     if (!valid_cpus.empty()) {
                         valid_cpus += ", ";
                     }
-                    valid_cpus += g_strings.view(name_id);
+                    valid_cpus += name;
                 }
                 g_diag.note(loc, "Valid CPUs are: " + valid_cpus);
                 return;
@@ -711,7 +716,8 @@ bool Args::parse_filename_entry(std::string_view line_,
     bool has_at = false;
     if (*p == '@') {
         has_at = true;
-        in_out_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+        in_out_loc = SourceLoc(in_out_loc.filename_id(), in_out_loc.line(),
+                               static_cast<uint>(p - line.c_str() + 1));
         ++p;
         while (*p && is_space(*p)) {
             ++p;
@@ -719,13 +725,14 @@ bool Args::parse_filename_entry(std::string_view line_,
     }
 
     if (has_at && (*p == '\0' || *p == ';' || *p == '#')) {
-        SourceLoc here_loc = in_out_loc;
-        here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+        SourceLoc here_loc(in_out_loc.filename_id(), in_out_loc.line(),
+                           static_cast<uint>(p - line.c_str() + 1));
         g_diag.error(here_loc, "Expected filename after '@'");
         return false;
     }
 
-    in_out_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+    in_out_loc = SourceLoc(in_out_loc.filename_id(), in_out_loc.line(),
+                           static_cast<uint>(p - line.c_str() + 1));
     const char* start = p;
     while (*p && !is_space(*p)) {
         ++p;
@@ -740,8 +747,8 @@ bool Args::parse_filename_entry(std::string_view line_,
     }
 
     if (*p != '\0' && *p != ';' && *p != '#') {
-        SourceLoc here_loc = in_out_loc;
-        here_loc.column = static_cast<uint16_t>(p - line.c_str() + 1);
+        SourceLoc here_loc(in_out_loc.filename_id(), in_out_loc.line(),
+                           static_cast<uint>(p - line.c_str() + 1));
         g_diag.error(here_loc, "Unexpected text after filename: " +
                      escape_string(std::string(p)));
         return false;
@@ -756,7 +763,7 @@ void Args::search_list_file(std::string_view list_filename,
                             const SourceLoc& loc,
                             std::vector<SourceLoc>& loc_stack) {
     // read list file
-    StringInterner::Id file_id =
+    StringId filename_id =
         g_file_mgr.register_virtual_file(list_filename);
     std::string content;
     if (!g_file_mgr.read_file_to_string(list_filename, loc, content)) {
@@ -765,7 +772,7 @@ void Args::search_list_file(std::string_view list_filename,
 
     // process each line
     std::vector<RawLine> lines =
-        g_file_mgr.split_into_lines(content, file_id, 1);
+        g_file_mgr.split_into_lines(content, filename_id, 1);
     for (auto& line : lines) {
         // column will be updated by parse_filename_entry
         SourceLoc inc_loc = line.loc;
@@ -820,7 +827,7 @@ void Args::search_source_file(std::string_view filename_,
         }
 
         // Deduplicate and sort to make test results predictable
-        std::set<std::string> seen;
+        std::unordered_set<std::string> seen;
         std::vector<std::string> unique_matches;
         unique_matches.reserve(matches.size());
         for (const auto& m : matches) {
@@ -856,12 +863,12 @@ void Args::search_source_file(std::string_view filename_,
             g_diag.error(loc, "File not found: " + list_filename);
             return;
         }
-        StringInterner::Id file_id =
+        StringId filename_id =
             g_file_mgr.register_virtual_file(list_full_path);
 
         // check for recursive inclusion of list files
         for (const SourceLoc& l : loc_stack) {
-            if (l.file_id == file_id) {
+            if (l.filename_id() == filename_id) {
                 g_diag.error(loc, "Recursive inclusion of list file: " + list_filename);
                 return;
             }
@@ -1003,26 +1010,26 @@ void Args::search_source_file(std::string_view filename_,
 
 void Args::define_constants_from_options() {
     // define constants for CPU
-    for (auto var_id : cpu_all_defines()) {
-        options.global_defs.erase(var_id);
+    for (auto& var : cpu_all_defines()) {
+        options.global_defs.erase(g_strings.intern(var));
     }
 
-    for (auto var_id : cpu_defines(options.cpu_id)) {
-        options.global_defs.set(var_id, 1, SourceLoc("<builtin>", 1, 1));
+    for (auto var : cpu_defines(options.cpu_id)) {
+        options.global_defs.set(g_strings.intern(var), 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
-    StringInterner::Id swap_id = g_strings.intern("__SWAP_IX_IY__");
+    StringId swap_id = g_strings.intern("__SWAP_IX_IY__");
     options.global_defs.erase(swap_id);
-    if (options.swap_ix_iy) {
+    if (options.swap_ixiy) {
         options.global_defs.set(swap_id, 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // define constants for float format
-    for (auto var_id : float_format_all_defines()) {
-        options.global_defs.erase(var_id);
+    for (auto& var : float_format_all_defines()) {
+        options.global_defs.erase(g_strings.intern(var));
     }
-    auto float_format_define_id = float_format_define(options.float_format);
-    options.global_defs.set(float_format_define_id, 1, SourceLoc("<builtin>", 1,
-                            1));
+    auto var = float_format_define(options.float_format);
+    options.global_defs.set(g_strings.intern(var), 1,
+                            SourceLoc("<builtin>", 1, 1));
 }

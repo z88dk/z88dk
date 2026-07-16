@@ -8,9 +8,10 @@
 #include "diag.h"
 #include "expr.h"
 #include "ir.h"
+#include "lexer_tokens.h"
 #include "options.h"
 #include "release_assert.h"
-#include "string_utils.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -173,11 +174,17 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
     if (auto asmpc_expr = dynamic_cast<ExprLiteralAsmpc*>(expr)) {
         release_assert(asmpc_expr->stmt != nullptr);
         release_assert(asmpc_expr->stmt->section != nullptr);
-        update_if_changed(asmpc_expr->value.type, ExprType::AddressRelative, changed);
-        update_if_changed(asmpc_expr->value.section,
-                          asmpc_expr->stmt->section, changed);
-        update_if_changed(asmpc_expr->value.offset,
-                          asmpc_expr->stmt->address, changed);
+        if (asmpc_expr->stmt->in_phase) {
+            update_if_changed(asmpc_expr->value.type, ExprType::Constant, changed);
+            update_if_changed(asmpc_expr->value.const_value,
+                              static_cast<int>(asmpc_expr->stmt->address), changed);
+        }
+        else {
+            update_if_changed(asmpc_expr->value.type, ExprType::AddressRelative, changed);
+            update_if_changed(asmpc_expr->value.section, asmpc_expr->stmt->section,
+                              changed);
+            update_if_changed(asmpc_expr->value.offset, asmpc_expr->stmt->address, changed);
+        }
         return true;
     }
 
@@ -190,11 +197,18 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
 
         case SymbolInfo::DefType::Label:
             release_assert(sym_expr->symbol->stmt != nullptr);
-            update_if_changed(sym_expr->value.type, ExprType::AddressRelative, changed);
-            update_if_changed(sym_expr->value.section,
-                              sym_expr->symbol->stmt->section, changed);
-            update_if_changed(sym_expr->value.offset,
-                              sym_expr->symbol->stmt->address, changed);
+            if (sym_expr->symbol->stmt->in_phase) {
+                update_if_changed(sym_expr->value.type, ExprType::Constant, changed);
+                update_if_changed(sym_expr->value.const_value,
+                                  static_cast<int>(sym_expr->symbol->stmt->address), changed);
+            }
+            else {
+                update_if_changed(sym_expr->value.type, ExprType::AddressRelative, changed);
+                update_if_changed(sym_expr->value.section,
+                                  sym_expr->symbol->stmt->section, changed);
+                update_if_changed(sym_expr->value.offset,
+                                  sym_expr->symbol->stmt->address, changed);
+            }
             return true;
 
         case SymbolInfo::DefType::Defc:
@@ -209,6 +223,7 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
                                   sym_expr->symbol->defc_expr->value.const_value, changed);
                 break;
             case ExprType::AddressRelative:
+                release_assert(sym_expr->symbol->defc_expr->value.section != nullptr);
                 update_if_changed(sym_expr->value.type, ExprType::AddressRelative, changed);
                 update_if_changed(sym_expr->value.section,
                                   sym_expr->symbol->defc_expr->value.section, changed);
@@ -235,11 +250,18 @@ static bool eval_expr(Expr* expr, bool& changed, bool silent) {
     if (auto llbl_expr = dynamic_cast<ExprLocalLabel*>(expr)) {
         release_assert(llbl_expr->symbol != nullptr);
         release_assert(llbl_expr->symbol->stmt != nullptr);
-        update_if_changed(llbl_expr->value.type, ExprType::AddressRelative, changed);
-        update_if_changed(llbl_expr->value.section,
-                          llbl_expr->symbol->stmt->section, changed);
-        update_if_changed(llbl_expr->value.offset,
-                          llbl_expr->symbol->stmt->address, changed);
+        if (llbl_expr->symbol->stmt->in_phase) {
+            update_if_changed(llbl_expr->value.type, ExprType::Constant, changed);
+            update_if_changed(llbl_expr->value.const_value,
+                              static_cast<int>(llbl_expr->symbol->stmt->address), changed);
+        }
+        else {
+            update_if_changed(llbl_expr->value.type, ExprType::AddressRelative, changed);
+            update_if_changed(llbl_expr->value.section,
+                              llbl_expr->symbol->stmt->section, changed);
+            update_if_changed(llbl_expr->value.offset,
+                              llbl_expr->symbol->stmt->address, changed);
+        }
         return true;
     }
 
@@ -541,7 +563,7 @@ bool apply_patches(Program& prog) {
 
                 if (auto defs_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
                     defs_stmt->bytes.clear();
-                    std::string str_value = g_strings.to_string(defs_stmt->string_id);
+                    std::string_view str_value = g_strings.view(defs_stmt->string_id);
                     uint i;
                     for (i = 0; i < str_value.size() && i < defs_stmt->padding_size; i++) {
                         defs_stmt->bytes.push_back(static_cast<uint8_t>(str_value[i]));

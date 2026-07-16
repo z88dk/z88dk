@@ -15,6 +15,7 @@ Keyword keyword_lookup(std::string_view s) {
     static const std::unordered_map<std::string, Keyword> keyword_map = {
 #define X(id, text, flags) { text, Keyword::id },
 #include "lexer_keywords.def"
+#undef X
     };
     auto it = keyword_map.find(to_upper(s));
     return it != keyword_map.end() ? it->second : Keyword::None;
@@ -24,6 +25,7 @@ std::string to_string(Keyword kw) {
     static const char* keyword_strings[] = {
 #define X(id, text, flags) text,
 #include "lexer_keywords.def"
+#undef X
     };
     return keyword_strings[static_cast<size_t>(kw)];
 }
@@ -31,6 +33,7 @@ std::string to_string(Keyword kw) {
 static constexpr int keyword_flags[] = {
 #define X(id, text, flags) flags,
 #include "lexer_keywords.def"
+#undef X
 };
 
 bool keyword_directive_has_file_arg(Keyword kw) {

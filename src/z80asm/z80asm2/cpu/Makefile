@@ -27,7 +27,7 @@ synthetic.dat: opcodes.dat make_synthetic.pl validate_synthetic.pl Makefile
 
 ../opcodes_trie_token.h ../opcodes_trie_token.cpp &: \
 		make_trie_token.pl Makefile \
-		../cpu.def ../lexer_tokens.def ../lexer_keywords.def
+		../../cpu.def ../lexer_tokens.def ../lexer_keywords.def
 	perl make_trie_token.pl opcodes_trie_token
 	dos2unix ../opcodes_trie_token.h ../opcodes_trie_token.cpp
 

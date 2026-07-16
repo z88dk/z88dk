@@ -72,48 +72,44 @@ Program: layout_phase_01
                             Location: t/50-layout/input/layout_phase_01.asm:4:1
                             Section: ""
                             Address: $1000
-                            Bytes: 0 0
+                            Bytes: 0 $10
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:4:6
-                                    Value type: AddressRelative
-                                    Value section: ""
-                                    Value offset: $1000
+                                    Value type: Constant
+                                    Value const: $1000
                                     Expr: $
                                     Offset: 0, Size: 2
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:4:6
-                                            Value type: AddressRelative
-                                            Value section: ""
-                                            Value offset: $1000
+                                            Value type: Constant
+                                            Value const: $1000
                                             Expr: $
                                             Address: $1000
                         OpcodeStmt
                             Location: t/50-layout/input/layout_phase_01.asm:5:1
                             Section: ""
                             Address: $1002
-                            Bytes: 0 0
+                            Bytes: 2 $10
                             Patches:
                                 Patch
                                     Location: t/50-layout/input/layout_phase_01.asm:5:6
-                                    Value type: AddressRelative
-                                    Value section: ""
-                                    Value offset: $1002
+                                    Value type: Constant
+                                    Value const: $1002
                                     Expr: $
                                     Offset: 0, Size: 2
-                                    Type: Unsigned
+                                    Type: None
                                     Validation: Any
                                     Formula: None
                                     Inner expression:
                                         ExprLiteralAsmpc
                                             Location: t/50-layout/input/layout_phase_01.asm:5:6
-                                            Value type: AddressRelative
-                                            Value section: ""
-                                            Value offset: $1002
+                                            Value type: Constant
+                                            Value const: $1002
                                             Expr: $
                                             Address: $1002
                         DephaseStmt
@@ -231,48 +227,44 @@ Program: layout_phase_01
             Location: t/50-layout/input/layout_phase_01.asm:4:1
             Section: ""
             Address: $1000
-            Bytes: 0 0
+            Bytes: 0 $10
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:4:6
-                    Value type: AddressRelative
-                    Value section: ""
-                    Value offset: $1000
+                    Value type: Constant
+                    Value const: $1000
                     Expr: $
                     Offset: 0, Size: 2
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:4:6
-                            Value type: AddressRelative
-                            Value section: ""
-                            Value offset: $1000
+                            Value type: Constant
+                            Value const: $1000
                             Expr: $
                             Address: $1000
         OpcodeStmt
             Location: t/50-layout/input/layout_phase_01.asm:5:1
             Section: ""
             Address: $1002
-            Bytes: 0 0
+            Bytes: 2 $10
             Patches:
                 Patch
                     Location: t/50-layout/input/layout_phase_01.asm:5:6
-                    Value type: AddressRelative
-                    Value section: ""
-                    Value offset: $1002
+                    Value type: Constant
+                    Value const: $1002
                     Expr: $
                     Offset: 0, Size: 2
-                    Type: Unsigned
+                    Type: None
                     Validation: Any
                     Formula: None
                     Inner expression:
                         ExprLiteralAsmpc
                             Location: t/50-layout/input/layout_phase_01.asm:5:6
-                            Value type: AddressRelative
-                            Value section: ""
-                            Value offset: $1002
+                            Value type: Constant
+                            Value const: $1002
                             Expr: $
                             Address: $1002
         DephaseStmt

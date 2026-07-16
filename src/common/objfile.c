@@ -252,7 +252,7 @@ expr_t* expr_new() {
 
     utstring_new(self->text);
     self->range = RANGE_UNDEFINED;
-    self->asmpc = self->code_pos = 0;
+    self->asmpc = self->patch_ptr = 0;
     self->opcode_size = 2;      // default for normal JR
 	self->section = NULL;
     utstring_new(self->target_name);
@@ -696,12 +696,12 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 
         // code position
 		if (obj->version >= 17)
-			expr->code_pos = xfread_dword(fp);
+			expr->patch_ptr = xfread_dword(fp);
 		else
-			expr->code_pos = xfread_word(fp);
+			expr->patch_ptr = xfread_word(fp);
 
 		if (show_expr)
-			printf(" $%04X", expr->code_pos);
+			printf(" $%04X", expr->patch_ptr);
 
         // opcode size
 		if (obj->version >= 17) {
@@ -767,12 +767,12 @@ static void objfile_read_relocs(objfile_t* obj, FILE* fp, long fpos_start)
 	printf("  Relocations:\n");
 
 	UT_string* filename;
-	UT_string* section;
-	UT_string* symbol;
+	UT_string* patch_section;
+	UT_string* value_section;
 	
 	utstring_new(filename);
-	utstring_new(section);
-	utstring_new(symbol);
+	utstring_new(patch_section);
+	utstring_new(value_section);
 
 	xfseek(fp, fpos_start, SEEK_SET);
     while (true) {
@@ -791,27 +791,30 @@ static void objfile_read_relocs(objfile_t* obj, FILE* fp, long fpos_start)
 		objfile_read_strid(obj, fp, filename);
 		int line_num = xfread_dword(fp);
 		
-		// section
-		objfile_read_strid(obj, fp, section);
+		// patch section
+		objfile_read_strid(obj, fp, patch_section);
 		
 		// patch pointer
 		int patch_ptr = xfread_dword(fp);
 
-		// symbol
-		objfile_read_strid(obj, fp, symbol);
+		// value section
+		objfile_read_strid(obj, fp, value_section);
 		
-		// addend
-		int addend = xfread_dword(fp);	
+		// offset
+		int offset = xfread_dword(fp);	
 		
-		printf(" $%04X: %s+$%04X", patch_ptr, utstring_body(symbol), addend);
-		print_section(section);
+        printf(" $%04X: %s+$%04X",
+            patch_ptr,
+            utstring_len(value_section) > 0 ? utstring_body(value_section) : "\"\"",
+            offset);
+		print_section(patch_section);
 		print_filename_line_nr(filename, line_num);
 		printf("\n");
 	}
 
 	utstring_free(filename);
-	utstring_free(section);
-	utstring_free(symbol);
+	utstring_free(patch_section);
+	utstring_free(value_section);
 }
 
 void objfile_read(objfile_t* obj, FILE* fp)
@@ -962,7 +965,7 @@ static long objfile_write_exprs(objfile_t* obj, FILE* fp)
             objfile_write_strid(obj, fp, utstring_body(expr->section->name));
 
 			xfwrite_dword(expr->asmpc, fp);					// ASMPC
-			xfwrite_dword(expr->code_pos, fp);				// code position
+			xfwrite_dword(expr->patch_ptr, fp);				// code position
 			xfwrite_dword(expr->opcode_size, fp);			// opcode size
 
             // target symbol for expression
@@ -1417,7 +1420,7 @@ static bool delete_merged_section(objfile_t* obj, section_t** p_merged_section,
 		DL_FOREACH_SAFE(section->exprs, expr, tmp_expr) {
 			// compute changed patch address
 			expr->asmpc += merged_base;
-			expr->code_pos += merged_base;
+			expr->patch_ptr += merged_base;
 
 			// move to merged_section
 			expr->section = merged_section;

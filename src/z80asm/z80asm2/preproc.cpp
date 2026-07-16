@@ -11,7 +11,7 @@
 #include "parser.h"
 #include "preproc.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -35,7 +35,7 @@ bool Preproc::is_cond_active() const {
     return true;
 }
 
-void Preproc::push_macro_expansion(StringInterner::Id name_id,
+void Preproc::push_macro_expansion(StringId name_id,
                                    std::deque<LogicalLine> lines) {
     MacroExpansionFrame frame;
     frame.name_id = name_id;
@@ -112,7 +112,7 @@ void Preproc::set_const_symbols(const ConstSymbols& defs) {
 
 std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // used for dumping tokens after tokenization, if requested
-    StringInterner::Id cur_file_id = 0;
+    StringId cur_filename_id;
 
     // reset per-run registries and state
     preproc_cpu_id = g_args.options.cpu_id;
@@ -140,14 +140,14 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // Push initial include frame
     include_stack.push_back({
         file,
-        file->file_id,              // logical_file_id
+        file->filename_id,          // logical_filename_id
         0,                          // current_line
         false,                      // logical_line_fixed
         0                           // logical_line_offset
     });
 
     // add to dependency files for generation of .d file
-    dependency_files.push_back(file->file_id);
+    dependency_files.push_back(file->filename_id);
 
     // -------------------------------------------------------------------------
     // 2. Unified input loop (files + macro-generated lines)
@@ -197,7 +197,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         }
 
         if (g_args.options.dump_after_directives) {
-            dump_logical_line(processed, cur_file_id);
+            dump_logical_line(processed, cur_filename_id);
         }
 
         // ---------------------------------------------------------------------
@@ -227,7 +227,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
                 ParseLine check_pl(expanded);
                 Keyword kw;
                 SourceLoc kw_loc;
-                StringInterner::Id name_id;
+                StringId name_id;
                 SourceLoc name_loc;
 
                 if (is_directive(check_pl, kw, kw_loc, name_id, name_loc)) {
@@ -239,7 +239,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
 
                     std::deque<LogicalLine> feedback_lines;
                     feedback_lines.push_back(std::move(feedback));
-                    push_macro_expansion(0, std::move(feedback_lines));
+                    push_macro_expansion(StringId(), std::move(feedback_lines));
 
                     // Skip normal processing - the line will be re-processed
                     continue;
@@ -248,7 +248,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         }
 
         if (g_args.options.dump_after_macro_expansion) {
-            dump_tokens(expanded, cur_file_id);
+            dump_tokens(expanded, cur_filename_id);
         }
 
         // Append expanded tokens to final output (skip empty lines
@@ -286,7 +286,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     }
 
     if (g_args.options.dump_after_preprocessing) {
-        dump_logical_lines(final_lines, cur_file_id);
+        dump_logical_lines(final_lines, cur_filename_id);
         dump_symbols();
         exit(EXIT_SUCCESS);
     }
@@ -330,8 +330,8 @@ void Preproc::split_lines(const std::vector<Token>& tokens,
         else if (current_statement.back().type != TokenType::EndOfLine) {
             const Token& last = current_statement.back();
             std::string_view text = g_strings.view(last.text_id);
-            SourceLoc eol_loc = last.loc;
-            eol_loc.column = static_cast<uint16_t>(last.loc.column + text.size());
+            SourceLoc eol_loc(last.loc.filename_id(), last.loc.line(),
+                              last.loc.column() + static_cast<uint>(text.size()));
             current_statement.push_back(Token::end_of_line(eol_loc));
         }
 
@@ -392,28 +392,28 @@ void output_preproc_output(std::string_view filename,
     SourceLoc loc;
     for (auto& line : lines) {
         // write # line "file" - if needed
-        if (line.loc.file_id != loc.file_id) {
-            ofs << "# " << line.loc.line << " \"" << g_strings.view(
-                    line.loc.file_id) << "\"" << std::endl;
-            loc = SourceLoc(line.loc.file_id, line.loc.line, 1);
+        if (line.loc.filename_id() != loc.filename_id()) {
+            ofs << "# " << line.loc.line() << " \"" << g_strings.view(
+                    line.loc.filename_id()) << "\"" << std::endl;
+            loc = SourceLoc(line.loc.filename_id(), line.loc.line(), 1);
         }
-        else if (loc.line > line.loc.line) {
-            ofs << "# " << line.loc.line << std::endl;
-            loc.line = line.loc.line;
+        else if (loc.line() > line.loc.line()) {
+            ofs << "# " << line.loc.line() << std::endl;
+            loc = SourceLoc(loc.filename_id(), line.loc.line(), 1);
         }
 
         // advance to current line
-        while (loc.line < line.loc.line) {
+        while (loc.line() < line.loc.line()) {
             ofs << std::endl;
-            loc.line++;
+            loc = SourceLoc(loc.filename_id(), loc.line() + 1, 1);
         }
 
         // write line tokens
-        if (!line.tokens.empty() && line.tokens.front().loc.column > 1) {
+        if (!line.tokens.empty() && line.tokens.front().loc.column() > 1) {
             ofs << " ";
         }
         ofs << to_string(line.tokens);
-        loc.line++;
+        loc = SourceLoc(loc.filename_id(), loc.line() + 1, 1);
     }
 }
 
@@ -435,7 +435,7 @@ void Preproc::output_dependencies(std::string_view output_filename,
     int col = static_cast<int>(o_filename.size() + 2);
 
     // collect all referenced filenames
-    std::set<StringInterner::Id> seen_files;
+    std::unordered_set<StringId> seen_files;
 
     // lambda to add a filename to the output, handling line wrapping
     auto add_file = [&](std::string_view filename) {
@@ -449,10 +449,10 @@ void Preproc::output_dependencies(std::string_view output_filename,
     };
 
     // add all referenced files
-    for (const auto& file_id : dependency_files) {
-        if (file_id != 0 && seen_files.find(file_id) == seen_files.end()) {
-            seen_files.insert(file_id);
-            add_file(g_strings.view(file_id));
+    for (const auto& filename_id : dependency_files) {
+        if (!filename_id.empty() && seen_files.find(filename_id) == seen_files.end()) {
+            seen_files.insert(filename_id);
+            add_file(g_strings.view(filename_id));
         }
     }
 

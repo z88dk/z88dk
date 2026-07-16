@@ -1,39 +1,39 @@
-Library file t/55-obj-library//input/obj_expr_01.o at $0000: Z80LMF18
-Object  file t/55-obj-library//input/obj_expr_01.o at $0014: Z80RMF18
+Library file t/55-obj-library//input/obj_expr_01.o at $0000: Z80LMF19
+Object  file t/55-obj-library//input/obj_expr_01.o at $0018: Z80RMF19
   Name: obj_expr_01
   CPU:  z80 
   Section "": 0 bytes
   Section code: 18 bytes
     C $0000: 00 00 07 00 00 00 00 00 00 00 00 00 12 00 00 00
-    C $0010: 04 00
-  Section data: 4 bytes
-    C $0000: 00 00 07 00
+    C $0010: 0C 00
+  Section data: 12 bytes
+    C $0000: 00 00 07 00 00 00 00 00 00 00 00 00
   Symbols:
-    L A $0004: end_data (section data) (file t/55-obj-library/input/obj_expr_01.asm:18)
-    L A $0000: start_data (section data) (file t/55-obj-library/input/obj_expr_01.asm:15)
     L A $0012: end_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:12)
+    L A $000C: end_data (section data) (file t/55-obj-library/input/obj_expr_01.asm:20)
     L A $0000: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:2)
-  Externs:
+    L A $0000: start_data (section data) (file t/55-obj-library/input/obj_expr_01.asm:15)
   Expressions:
-    E U16   $0000 $0000 2: $ (section code) (file t/55-obj-library/input/obj_expr_01.asm:3)
-    E U16   $0004 $0004 2: start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:5)
-    E U16   $0006 $0006 2: start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:6)
-    E U16   $0008 $0008 2: 2+start_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:7)
-    E U16   $000A $000A 2: 2+start_code+2 (section code) (file t/55-obj-library/input/obj_expr_01.asm:8)
     E U16   $000E $000E 2: start_data-end_code (section code) (file t/55-obj-library/input/obj_expr_01.asm:10)
-    E U16   $0000 $0000 2: $ (section data) (file t/55-obj-library/input/obj_expr_01.asm:16)
+  Relocations:
+    R U16   $0000: code+$0000 (section code) (file t/55-obj-library/input/obj_expr_01.asm:3)
+    R U16   $0004: code+$0000 (section code) (file t/55-obj-library/input/obj_expr_01.asm:5)
+    R U16   $0006: code+$0002 (section code) (file t/55-obj-library/input/obj_expr_01.asm:6)
+    R U16   $0008: code+$0002 (section code) (file t/55-obj-library/input/obj_expr_01.asm:7)
+    R U16   $000A: code+$0004 (section code) (file t/55-obj-library/input/obj_expr_01.asm:8)
+    R U16   $0000: data+$0000 (section data) (file t/55-obj-library/input/obj_expr_01.asm:16)
+    R U16   $0004: code+$0000 (section data) (file t/55-obj-library/input/obj_expr_01.asm:18)
+    R U16   $0006: code+$0012 (section data) (file t/55-obj-library/input/obj_expr_01.asm:18)
+    R U16   $0008: data+$0000 (section data) (file t/55-obj-library/input/obj_expr_01.asm:19)
+    R U16   $000A: data+$000C (section data) (file t/55-obj-library/input/obj_expr_01.asm:19)
   Strings:
     S   1 = "t/55-obj-library/input/obj_expr_01.asm"
     S   2 = "code"
-    S   3 = "$"
-    S   4 = "start_code"
-    S   5 = "start_code+2"
-    S   6 = "2+start_code"
-    S   7 = "2+start_code+2"
-    S   8 = "start_data-end_code"
-    S   9 = "data"
-    S  10 = "end_data"
-    S  11 = "start_data"
-    S  12 = "end_code"
-    S  13 = "obj_expr_01"
+    S   3 = "start_data-end_code"
+    S   4 = "data"
+    S   5 = "end_code"
+    S   6 = "end_data"
+    S   7 = "start_code"
+    S   8 = "start_data"
+    S   9 = "obj_expr_01"
 

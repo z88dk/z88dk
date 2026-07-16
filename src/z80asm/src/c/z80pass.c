@@ -83,7 +83,7 @@ void Z80pass2(int start_errors, const char* obj_filename)
                 if (value < -128 || value > 127)
                     error_hex2(ErrIntRange, value);
                 else
-                    patch_byte(expr->code_pos, (byte_t)value);
+                    patch_byte(expr->patch_ptr, (byte_t)value);
                 break;
 
 			case RANGE_JRE_OFFSET:
@@ -93,21 +93,21 @@ void Z80pass2(int start_errors, const char* obj_filename)
                 if (value < -0x8000 || value > 0x7FFF)
                     error_hex4(ErrIntRange, value);
                 else
-                    patch_word(expr->code_pos, value);
+                    patch_word(expr->patch_ptr, value);
                 break;
 
 			case RANGE_BYTE_UNSIGNED:
 				if (value < -128 || value > 255)
                     warning_hex2(ErrIntRange, value);
 
-				patch_byte(expr->code_pos, (byte_t)value);
+				patch_byte(expr->patch_ptr, (byte_t)value);
 				break;
 
 			case RANGE_BYTE_SIGNED:
 				if (value < -128 || value > 127)
                     warning_hex2(ErrIntRange, value);
 
-				patch_byte(expr->code_pos, (byte_t)value);
+				patch_byte(expr->patch_ptr, (byte_t)value);
 				break;
 
 			case RANGE_HIGH_OFFSET:
@@ -116,59 +116,59 @@ void Z80pass2(int start_errors, const char* obj_filename)
                         warning_hex2(ErrIntRange, value);
 				}
 
-				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
+				patch_byte(expr->patch_ptr, (byte_t)(value & 0xff));
 				break;
 
 			case RANGE_WORD:
-				patch_word(expr->code_pos, (int)value);
+				patch_word(expr->patch_ptr, (int)value);
 				break;
 
 			case RANGE_BYTE_TO_WORD_UNSIGNED:
 				if (value < 0 || value > 255)
                     warning_hex2(ErrIntRange, value);
 
-				patch_byte(expr->code_pos, (byte_t)value);
-				patch_byte(expr->code_pos + 1, 0);
+				patch_byte(expr->patch_ptr, (byte_t)value);
+				patch_byte(expr->patch_ptr + 1, 0);
 				break;
 
             case RANGE_BYTE_TO_PTR_UNSIGNED:
                 if (value < 0 || value > 255)
                     warning_hex2(ErrIntRange, value);
 
-                patch_byte(expr->code_pos, (byte_t)value);
-                patch_byte(expr->code_pos + 1, 0);
-                patch_byte(expr->code_pos + 2, 0);
+                patch_byte(expr->patch_ptr, (byte_t)value);
+                patch_byte(expr->patch_ptr + 1, 0);
+                patch_byte(expr->patch_ptr + 2, 0);
                 break;
 
 			case RANGE_BYTE_TO_WORD_SIGNED:
 				if (value < -128 || value > 127)
                     warning_hex2(ErrIntRange, value);
 
-				patch_byte(expr->code_pos, (byte_t)value);
-				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
+				patch_byte(expr->patch_ptr, (byte_t)value);
+				patch_byte(expr->patch_ptr + 1, value < 0 || value > 127 ? 0xff : 0);
 				break;
 
             case RANGE_BYTE_TO_PTR_SIGNED:
                 if (value < -128 || value > 127)
                     warning_hex2(ErrIntRange, value);
 
-                patch_byte(expr->code_pos, (byte_t)value);
-                patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
-                patch_byte(expr->code_pos + 2, value < 0 || value > 127 ? 0xff : 0);
+                patch_byte(expr->patch_ptr, (byte_t)value);
+                patch_byte(expr->patch_ptr + 1, value < 0 || value > 127 ? 0xff : 0);
+                patch_byte(expr->patch_ptr + 2, value < 0 || value > 127 ? 0xff : 0);
                 break;
 
 			case RANGE_PTR24:
-				patch_byte(expr->code_pos + 0, (byte_t)((value >> 0) & 0xff));
-				patch_byte(expr->code_pos + 1, (byte_t)((value >> 8) & 0xff));
-				patch_byte(expr->code_pos + 2, (byte_t)((value >> 16) & 0xff));
+				patch_byte(expr->patch_ptr + 0, (byte_t)((value >> 0) & 0xff));
+				patch_byte(expr->patch_ptr + 1, (byte_t)((value >> 8) & 0xff));
+				patch_byte(expr->patch_ptr + 2, (byte_t)((value >> 16) & 0xff));
 				break;
 
 			case RANGE_WORD_BE:
-				patch_word_be(expr->code_pos, (int)value);
+				patch_word_be(expr->patch_ptr, (int)value);
 				break;
 
 			case RANGE_DWORD:
-				patch_long(expr->code_pos, value);
+				patch_long(expr->patch_ptr, value);
 				break;
 
 			default:
@@ -223,11 +223,11 @@ bool Pass2infoExpr(range_t range, Expr1* expr)
 	if (expr != NULL)
 	{
 		expr->range = range;
-		expr->code_pos = get_cur_module_size();			/* update expression location */
+		expr->patch_ptr = get_cur_module_size();			/* update expression location */
 		expr->opcode_size = get_cur_opcode_size() + range_size(range);
 
 		if (list_is_on())
-			expr->listpos = expr->code_pos;
+			expr->listpos = expr->patch_ptr;
 		else
 			expr->listpos = -1;
 

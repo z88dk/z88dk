@@ -9,7 +9,7 @@
 #include "lexer.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -17,12 +17,12 @@
 #include <vector>
 
 struct RawLine {
-    SourceLoc loc;   // physical line + file_id
+    SourceLoc loc;   // physical line + filename_id
     std::string text;
 };
 
 struct SourceFile {
-    StringInterner::Id file_id = 0;
+    StringId filename_id;
     std::vector<size_t> line_offsets;   // byte offset of each line start
     std::vector<size_t> line_lengths;   // length of each line (excluding EOL)
     std::vector<LogicalLine> lines;     // tokens per line
@@ -32,12 +32,12 @@ class FileManager {
 public:
     // get a unique ID for a virtual file path
     // (e.g. for included files or generated content)
-    StringInterner::Id register_virtual_file(std::string_view path);
+    StringId register_virtual_file(std::string_view path);
 
     // read source file and return normalized path and lines
     // caches file contents for later retrieval
     // returns nullptr and outputs error if the file could not be opened
-    SourceFile* get_source_file(std::string_view file, const SourceLoc& loc);
+    SourceFile* get_source_file(std::string_view filename, const SourceLoc& loc);
 
     // get a source line by filename and 1-based line number
     // tries the cached SourceFile first; if unavailable
@@ -55,7 +55,7 @@ public:
     // split content into lines and return vector of RawLine
     // with text_id and SourceLoc
     std::vector<RawLine> split_into_lines(std::string_view content,
-                                          StringInterner::Id file_id,
+                                          StringId filename_id,
                                           size_t starting_line);
 
     // read whole binary file to a vector, caching the result
@@ -65,14 +65,14 @@ public:
             const SourceLoc& loc);
 
 private:
-    // Global cache: file_id -> SourceFile
-    std::unordered_map<StringInterner::Id, SourceFile> source_cache;
+    // Global cache: filename_id -> SourceFile
+    std::unordered_map<StringId, SourceFile> source_cache;
 
     // Guard against re-entrant get_source_file during tokenization
-    std::unordered_set<StringInterner::Id> source_loading;
+    std::unordered_set<StringId> source_loading;
 
-    // Cache: file_id -> binary file contents
-    std::unordered_map<StringInterner::Id, std::vector<uint8_t>> binary_cache;
+    // Cache: filename_id -> binary file contents
+    std::unordered_map<StringId, std::vector<uint8_t>> binary_cache;
 
     // read one line of a file
     // return an error string if file cannot be opened or line number
