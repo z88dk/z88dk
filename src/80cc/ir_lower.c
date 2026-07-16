@@ -269,18 +269,31 @@ static int wide_acc_result_dead_in_acc(const Func *f, int v);
 /* IR_SPILL_STATS (Phase-0 measurement): -1 = not yet probed, else 0/1. */
 static int spill_stats_on = -1;
 
+/* IR_VERIFY (LRA Phase-0): per-op capture of emitted instruction text so the
+   op_clobbers model can be cross-checked against what the emitter actually
+   writes. Inert (no codegen change); only active under IR_VERIFY. */
+static int  verify_on = -1;
+static char verify_buf[8192];
+static int  verify_len;
+
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
     if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
-    if (spill_stats_on) {
-        /* Count a slot-traffic proxy from the fully-expanded instruction text.
-           Buffer here only when stats are on; the emitted bytes are unchanged. */
+    if (verify_on < 0)      verify_on      = getenv("IR_VERIFY") ? 1 : 0;
+    if (spill_stats_on || verify_on) {
+        /* Fully-expanded instruction text. Buffer only when a probe is on; the
+           emitted bytes are unchanged. */
         char buf[256];
         va_list ap2; va_copy(ap2, ap);
         vsnprintf(buf, sizeof buf, fmt, ap2);
         va_end(ap2);
-        if (strstr(buf, "(ix") || strstr(buf, "(iy")) L.spill_ix++;
-        if (strstr(buf, "add\thl,sp")) L.spill_sp++;
+        if (spill_stats_on) {
+            if (strstr(buf, "(ix") || strstr(buf, "(iy")) L.spill_ix++;
+            if (strstr(buf, "add\thl,sp")) L.spill_sp++;
+        }
+        if (verify_on && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
+            verify_len += snprintf(verify_buf + verify_len,
+                                   sizeof verify_buf - verify_len, "%s\n", buf);
     }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
@@ -830,6 +843,405 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
 #include "ir_lower_ops.inc.c"
 #include "ir_lower_call.inc.c"
 #include "ir_lower_cmp.inc.c"
+
+/* ===== LRA Phase 0: op_clobbers model + IR_VERIFY cross-check =============
+   Read-only classification of which physical value-registers an op's lowering
+   writes, plus a verifier that parses the emitted asm and asserts the actual
+   writes are a subset of the model. Inert (IR_VERIFY only); the substrate the
+   live-range allocator's soundness rests on (a value in register r survives an
+   op iff r is NOT in op_clobbers(op)). */
+
+/* A register-name token (as emitted, lowercase) → value-register mask. */
+static RegMask lra_reg_of(const char *t)
+{
+    if (!t[0]) return 0;
+    if (t[0] == '(') return IR_R_MEM;                 /* (hl) (de) (nn) (ix+d) */
+    if (!strcmp(t,"a"))  return IR_R_A;
+    if (!strcmp(t,"f")||!strcmp(t,"af")) return IR_R_F | (t[1]=='f'?IR_R_A:0);
+    if (!strcmp(t,"h")||!strcmp(t,"l")||!strcmp(t,"hl")) return IR_R_HL;
+    if (!strcmp(t,"d")||!strcmp(t,"e")||!strcmp(t,"de")) return IR_R_DE;
+    if (!strcmp(t,"b")||!strcmp(t,"c")||!strcmp(t,"bc")) return IR_R_BC;
+    if (!strncmp(t,"ix",2)) return IR_R_IX;           /* ix ixl ixh */
+    if (!strncmp(t,"iy",2)) return IR_R_IY;
+    if (!strcmp(t,"sp")) return IR_R_SP;
+    return 0;                                         /* immediate / label / cc */
+}
+
+/* One emitted instruction line → the value-registers it WRITES. Sets *unknown
+   if the mnemonic isn't modelled (so the verifier can report it rather than
+   silently trust). */
+static RegMask lra_line_writes(const char *line, int *unknown)
+{
+    char m[16] = {0}, o0[64] = {0}, o1[64] = {0};
+    const char *p = line;
+    int i = 0;
+    while (*p && *p != ' ' && *p != '\t' && i < 15) m[i++] = *p++;
+    while (*p == ' ' || *p == '\t') p++;
+    /* operands: split on first comma */
+    const char *comma = strchr(p, ',');
+    if (comma) {
+        int n = (int)(comma - p); if (n > 63) n = 63;
+        memcpy(o0, p, (size_t)n);
+        const char *q = comma + 1; while (*q == ' ') q++;
+        i = 0; while (*q && *q!='\n' && *q!=';' && i < 63) o1[i++] = *q++;
+    } else {
+        i = 0; while (*p && *p!='\n' && *p!=';' && i < 63) o0[i++] = *p++;
+    }
+    RegMask w = 0;
+    /* gbz80 auto-step pointer forms: ld a,(hl+) / ld (hl-),a step HL */
+    if (strstr(line,"hl+")||strstr(line,"hl-")) w |= IR_R_HL;
+    if (strstr(line,"de+")||strstr(line,"de-")) w |= IR_R_DE;
+
+    if (!strcmp(m,"ld"))                                 w |= lra_reg_of(o0);
+    else if (!strcmp(m,"add")||!strcmp(m,"adc")||!strcmp(m,"sbc"))
+                                                         w |= lra_reg_of(o0)|IR_R_F;
+    else if (!strcmp(m,"sub")||!strcmp(m,"and")||!strcmp(m,"or")||!strcmp(m,"xor"))
+                                                         w |= IR_R_A|IR_R_F;
+    else if (!strcmp(m,"cp"))                            w |= IR_R_F;
+    else if (!strcmp(m,"inc")||!strcmp(m,"dec"))         w |= lra_reg_of(o0)|IR_R_F;
+    else if (!strcmp(m,"sla")||!strcmp(m,"sra")||!strcmp(m,"srl")||!strcmp(m,"rl")
+          || !strcmp(m,"rr")||!strcmp(m,"rlc")||!strcmp(m,"rrc")||!strcmp(m,"swap"))
+                                                         w |= lra_reg_of(o0)|IR_R_F;
+    else if (!strcmp(m,"rlca")||!strcmp(m,"rrca")||!strcmp(m,"rla")||!strcmp(m,"rra"))
+                                                         w |= IR_R_A|IR_R_F;
+    else if (!strcmp(m,"neg")||!strcmp(m,"cpl"))         w |= IR_R_A|IR_R_F;
+    else if (!strcmp(m,"bit")||!strcmp(m,"set")||!strcmp(m,"res")) w |= (m[0]=='b'?IR_R_F:lra_reg_of(o1));
+    else if (!strcmp(m,"ex"))                            w |= lra_reg_of(o0)|lra_reg_of(o1);
+    else if (!strcmp(m,"exx"))                           w |= IR_R_HL|IR_R_DE|IR_R_BC;
+    else if (!strcmp(m,"push"))                          w |= IR_R_SP|IR_R_MEM;
+    else if (!strcmp(m,"pop"))                           w |= lra_reg_of(o0)|IR_R_SP;
+    else if (!strcmp(m,"call")||!strcmp(m,"rst")) {
+        /* The shift helpers (l_asr/l_lsr/l_lsl + _u / _dehl) are BC-clean by
+           contract (see gen_shr) — don't attribute BC to them, else a 16-bit
+           shift would spuriously look like it clobbers a BC resident. */
+        int bc_clean = (strstr(o0,"l_asr")||strstr(o0,"l_lsr")||strstr(o0,"l_lsl"));
+        w |= IR_R_A|IR_R_HL|IR_R_DE|IR_R_F|IR_R_MEM | (bc_clean ? 0 : IR_R_BC);
+    }
+    else if (!strcmp(m,"djnz"))                          w |= IR_R_BC|IR_R_F;
+    else if (!strcmp(m,"mlt"))                           w |= lra_reg_of(o0);              /* z180 */
+    else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|IR_R_F;        /* z80n/kc160 */
+    else if (!strcmp(m,"div")||!strcmp(m,"divu")||!strcmp(m,"divs"))
+                                                         w |= lra_reg_of(o0)|IR_R_A|IR_R_F; /* kc160 */
+    else if (!strcmp(m,"ldi")||!strcmp(m,"ldd")||!strcmp(m,"ldir")||!strcmp(m,"lddr"))
+                                                         w |= IR_R_HL|IR_R_DE|IR_R_BC|IR_R_MEM|IR_R_F;
+    else if (!strcmp(m,"scf")||!strcmp(m,"ccf"))         w |= IR_R_F;
+    else if (!strcmp(m,"ret")||!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"nop")
+          || !strcmp(m,"di")||!strcmp(m,"ei")||!strcmp(m,"halt")||!strcmp(m,"reti")
+          || !strcmp(m,"retn")) { /* control/none */ }
+    else if (m[0])                                       *unknown = 1;
+    return w;
+}
+
+/* A vreg's physical register as a mask (its result-home). Byte halves map to
+   their pair; SPILL/none → 0 (the value's home is memory, written via HL/MEM). */
+RegMask phys_regmask(const Func *f, int v)
+{
+    if (v < 0 || !f->vreg_to_phys) return 0;
+    switch (f->vreg_to_phys[v]) {
+    case IR_PR_A:                 return IR_R_A;
+    case IR_PR_HL:                return IR_R_HL;
+    case IR_PR_DE: case IR_PR_E: case IR_PR_D: return IR_R_DE;
+    case IR_PR_BC: case IR_PR_C: case IR_PR_B: return IR_R_BC;
+    case IR_PR_DEHL:              return IR_R_HL|IR_R_DE;
+    case IR_PR_IX: case IR_PR_IXL: case IR_PR_IXH: return IR_R_IX;
+    case IR_PR_IY: case IR_PR_IYL: case IR_PR_IYH: return IR_R_IY;
+    default:                      return 0;
+    }
+}
+
+/* Helper clobber table (PRESERVE_REGS Track B). Names here are the `l_` runtime
+   helpers AUDITED (grep of libsrc/l + libsrc/math asm) to use neither IX/IY nor
+   the alt/shadow bank (exx) — so a value homed in IX/IY/BC'/DE'/HL' survives the
+   call. CONSERVATIVE by construction: an unknown or unaudited helper is NOT
+   listed and falls through to IR_R_ALL, so a mis-omission costs residency, never
+   correctness. A mis-INCLUSION would be a silent miscompile, so only add a name
+   after confirming its asm (all CPU variants) is index+alt clean. Long/i64/float/
+   far/fnptr helpers (l_long_*, l_i64_*, l_f*, lp_*, l_setix/iy, l_jpix/iy) DO use
+   the index regs and must never be listed. */
+static int helper_preserves_index_alt(const char *name)
+{
+    static const char *const clean[] = {
+        /* multiplies (16x16, narrowing 16x16->32) */
+        "l_mult", "l_mult_u", "l_mulu_32_16x16",
+        /* divides / modulo (16-bit) */
+        "l_div", "l_div_u",
+        /* shifts (BC-clean-by-contract shift family; asr verified, lsr/lsl same) */
+        "l_asr", "l_lsr", "l_lsl",
+        /* unary */
+        "l_neg", "l_abs",
+    };
+    for (size_t i = 0; i < sizeof clean / sizeof clean[0]; i++)
+        if (!strcmp(name, clean[i])) return 1;
+    return 0;
+}
+
+/* The model: registers op's lowering may clobber (value regs only; SP/MEM are
+   stack/memory bookkeeping, checked separately). First cut — refined against
+   the IR_VERIFY log. Under-approx is caught by the verifier; over-approx is
+   sound but costs residency. */
+RegMask op_clobbers(const Func *f, const Op *op)
+{
+    int dw = (op->dst >= 0 && op->dst < f->n_vregs) ? f->vregs[op->dst].width : 0;
+    /* Width of the WIDEST operand, not just the dst: a 32-bit compare/store has
+       a width-2 (bool) dst but width-4 operands, and its lowering uses the DEHL
+       helpers + BC (and cleans a pushed long via `pop bc`). */
+    int ow = dw;
+    for (int s = 0; s < 2; s++)
+        if (op->src[s] >= 0 && op->src[s] < f->n_vregs
+            && f->vregs[op->src[s]].width > ow) ow = f->vregs[op->src[s]].width;
+    RegMask wide = (ow >= 4) ? (IR_R_HL|IR_R_DE|IR_R_BC) : 0;   /* DEHL/i64 helpers use BC */
+    RegMask dst  = phys_regmask(f, op->dst);                    /* result home */
+    /* An operand's register can itself be written: an aliased two-address ALU
+       (dst=src0) and — crucially — a `*p++` deref that steps its pointer
+       operand (`inc bc` when p is BC-homed). Folding operand homes in keeps the
+       model precise there without blanket-pessimising BC on plain loads. */
+    RegMask ops = phys_regmask(f, op->src[0]) | phys_regmask(f, op->src[1])
+                | (op->mem.kind == IR_MEM_VREG ? phys_regmask(f, op->mem.base) : 0);
+    switch (op->kind) {
+    case IR_NOP: case IR_BR: case IR_PHI:
+        return 0;
+    case IR_HCALL:
+        /* Helper clobber table (PRESERVE_REGS Track B): the audited integer
+           word/byte arithmetic helpers touch neither the index registers nor
+           the alt bank (verified against libsrc/l asm), so they PRESERVE IX/IY/
+           BC'/DE'/HL' — only the main bank + flags + memory are clobbered. That
+           lets an IX/IY/alt-bank home survive the call. Unknown/long/float/i64/
+           far helpers stay conservative (IR_R_ALL). */
+        if (op->hcall && op->hcall->name && helper_preserves_index_alt(op->hcall->name))
+            return IR_R_HL | IR_R_DE | IR_R_BC | IR_R_A | IR_R_F | IR_R_MEM;
+        return IR_R_ALL;
+    case IR_CALL: case IR_ASM: case IR_PUSH_ARG:
+    case IR_PUSH_STRUCT: case IR_SWITCH: case IR_RET: case IR_MEMSET:
+    case IR_MEMCPY: case IR_ACC_UNOP: case IR_ACC_BINOP: case IR_ACC_CMP:
+        return IR_R_ALL;               /* opaque: helper call / whole-reg-set */
+    case IR_MUL:
+        return IR_R_HL|IR_R_DE|IR_R_BC|IR_R_A|IR_R_F;
+    case IR_SHL: case IR_SHR:
+        /* z80n stages the shift count into B for `bsrl/bsra de,b`. */
+        return IR_R_HL|IR_R_DE|IR_R_A|IR_R_F|wide|dst|ops
+             | (IS_Z80N() ? IR_R_BC : 0);
+    case IR_CMP_EQ: case IR_CMP_NE:
+    case IR_CMP_LT: case IR_CMP_LE: case IR_CMP_GT: case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        /* 8085 word compares stage an operand into BC (`ld c,e; ld b,d`). */
+        return IR_R_HL|IR_R_DE|IR_R_A|IR_R_F|wide|dst|ops
+             | (IS_8085() ? IR_R_BC : 0);
+    default:
+        /* Everything else — loads/materialise/MOV/ALU/compare/conv/shift/store:
+           HL workhorse + A scratch + DE (operand staging / `ex de,hl` word
+           commit) + flags + result home + operand homes; wide (DEHL) uses BC. */
+        return IR_R_HL|IR_R_DE|IR_R_A|IR_R_F|wide|dst|ops;
+    }
+}
+
+/* The relaxed model (LRA Phase-4 step 1). ADD/SUB and the word compares stage
+   src[1] into DE today purely so a `add hl,de`/`sbc hl,de` can fire; the same
+   op has a `add hl,bc`/`sbc hl,bc` form that stages into BC instead, leaving DE
+   untouched. Model that alternate: drop the staging-DE bit and add BC. DE is
+   kept if the op still needs it as its result home or an operand home (a value
+   already resident in DE), and the whole relaxation is skipped for wide
+   (width>=4) ops, whose DEHL/i64 helpers have no BC-only form. */
+RegMask op_clobbers_relaxed(const Func *f, const Op *op)
+{
+    RegMask m = op_clobbers(f, op);
+    int has_bc_form = (op->kind == IR_ADD || op->kind == IR_SUB
+        || (op->kind >= IR_CMP_EQ && op->kind <= IR_CMP_UGE));
+    if (!has_bc_form) return m;
+    /* Widest operand/dst width — the DEHL helpers (>=4) genuinely need DE. */
+    int ow = (op->dst >= 0 && op->dst < f->n_vregs) ? f->vregs[op->dst].width : 0;
+    for (int s = 0; s < 2; s++)
+        if (op->src[s] >= 0 && op->src[s] < f->n_vregs
+            && f->vregs[op->src[s]].width > ow) ow = f->vregs[op->src[s]].width;
+    if (ow >= 4) return m;
+    /* DE required independently of staging: result home or an operand home. */
+    RegMask need_de = (phys_regmask(f, op->dst)
+        | phys_regmask(f, op->src[0]) | phys_regmask(f, op->src[1])
+        | (op->mem.kind == IR_MEM_VREG ? phys_regmask(f, op->mem.base) : 0))
+        & IR_R_DE;
+    if (!need_de) m &= ~IR_R_DE;   /* staging routed off DE */
+    m |= IR_R_BC;                  /* ...and into BC (the `hl,bc` form) */
+    return m;
+}
+
+/* Cross-check the just-lowered op's emitted instructions against op_clobbers.
+   Logs (does not abort) so a full corpus run reveals every model gap. */
+static void ir_verify_op(const Func *f, const Op *op, const char *buf)
+{
+    RegMask actual = 0, pushed = 0; int unknown = 0;
+    char line[256]; const char *p = buf;
+    while (*p) {
+        int i = 0; while (*p && *p != '\n' && i < 255) line[i++] = *p++;
+        line[i] = 0; if (*p == '\n') p++;
+        if (!line[0]) continue;
+        /* A push R / pop R pair PRESERVES R (net not clobbered), even if R is
+           used as scratch in between: record what's saved, and on a matching
+           pop clear that reg from the accumulated writes. */
+        if (!strncmp(line, "push", 4)) {
+            RegMask r = lra_reg_of(line + 5);
+            pushed |= r;
+        } else if (!strncmp(line, "pop", 3)) {
+            RegMask r = lra_reg_of(line + 4);
+            if (pushed & r) { actual &= ~r; pushed &= ~r; continue; }  /* restore */
+        }
+        actual |= lra_line_writes(line, &unknown);
+    }
+    RegMask model = op_clobbers(f, op);
+    /* SP (stack-spill push/pop, ret) and MEM are stack/memory bookkeeping, not
+       value-register residency — not part of the clobber soundness check. */
+    RegMask leak = actual & ~model & ~IR_R_MEM & ~IR_R_SP;
+    if (leak) {
+        fprintf(stderr, "IR_VERIFY: %s writes %#x not in clobbers %#x | asm:",
+                ir_op_name(op->kind), (unsigned)leak, (unsigned)model);
+        const char *q = buf; char ln[256];
+        while (*q) { int k=0; while (*q && *q!='\n' && k<255) ln[k++]=*q++; ln[k]=0; if(*q=='\n')q++;
+            int u2=0; if (ln[0] && (lra_line_writes(ln,&u2) & leak)) fprintf(stderr, " [%s]", ln); }
+        fprintf(stderr, "\n");
+    }
+    if (unknown)
+        fprintf(stderr, "IR_VERIFY: %s emitted an unmodelled mnemonic\n",
+                ir_op_name(op->kind));
+}
+
+/* LRA Phase-1 opportunity probe (IR_LRA_PROBE): for each single-BB, call-free,
+   slot-resident word temp, does BC / DE stay op_clobbers-CLEAN across its span?
+   That is exactly "could a local allocator keep it in that register." Measures
+   the Phase-1 prize with the verified clobber model before building the pass. */
+static void lra_phase1_probe(const Func *f)
+{
+    if (!getenv("IR_LRA_PROBE")) return;
+    int elig = 0, bc_clean = 0, de_clean = 0, either = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (f->vregs[v].width != 2) continue;
+        if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        if (f->vregs[v].flags & (IR_VREG_PARAM|IR_VREG_ADDR_TAKEN|IR_VREG_VOLATILE))
+            continue;
+        int bb = -1, lo = 1<<30, hi = -1, multi = 0, firstdef = 0;
+        for (int i = 0; i < f->n_bbs && !multi; i++) {
+            const BB *b = &f->bbs[i];
+            for (int j = 0; j < b->n_ops; j++) {
+                const Op *o = &b->ops[j];
+                int isdef = (o->dst == v), isuse = 0, u[16];
+                int nu = ir_op_uses(o, u, 16);
+                for (int k = 0; k < nu; k++) if (u[k] == v) { isuse = 1; break; }
+                if (!isdef && !isuse) continue;
+                if (bb < 0) { bb = i; firstdef = isdef; }
+                else if (bb != i) { multi = 1; break; }
+                if (j < lo) lo = j;
+                if (j > hi) hi = j;
+            }
+        }
+        if (multi || bb < 0 || hi < 0 || !firstdef) continue;
+        const BB *b = &f->bbs[bb];
+        int callfree = 1;
+        for (int j = lo; j <= hi; j++) {
+            OpKind k = b->ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL || k == IR_ASM) { callfree = 0; break; }
+        }
+        if (!callfree) continue;
+        elig++;
+        int bcc = 1, dec = 1;
+        for (int j = lo + 1; j <= hi; j++) {
+            RegMask c = op_clobbers(f, &b->ops[j]);
+            if (c & IR_R_BC) bcc = 0;
+            if (c & IR_R_DE) dec = 0;
+        }
+        bc_clean += bcc; de_clean += dec; either += (bcc || dec);
+    }
+    if (elig)
+        fprintf(stderr, "LRA_P1: eligible=%d bc_clean=%d de_clean=%d either=%d\n",
+                elig, bc_clean, de_clean, either);
+}
+
+/* Phase-2a prize probe (IR_SPLIT_PROBE, inert). Runs AFTER ir_alloc (phys known)
+   and ir_compute_live_ranges (liveness known). Per function, over innermost loop
+   bodies, reports: max simultaneous live width-2 vregs (register PRESSURE), the
+   count of SPILLED width-2 vregs live in a loop, and how many of those an IY home
+   would CAPTURE (range op_clobbers-IY-clean — no CALL/HCALL/ASM = IR_R_ALL — and
+   IY otherwise free). Quantifies the splitting-allocator + IY prize before the
+   emitter/allocator get built. Read-only; no codegen change (byte-identical). */
+static void lra_split_probe(const Func *f)
+{
+    static int fidx = 0;
+    int myidx = fidx++;
+    if (!getenv("IR_SPLIT_PROBE")) return;
+    if (f->n_bbs <= 0 || f->n_vregs <= 0) return;
+
+    int total = 0;
+    for (int b = 0; b < f->n_bbs; b++) total += f->bbs[b].n_ops;
+    if (total <= 0) return;
+
+    /* Loop membership (id-range back-edge approximation — f->bbs[].loop_depth is
+       never populated; exact natural-loop nesting is overkill for a probe): for
+       each back-edge p->h (successor h with id <= p), mark [h..p] as in-loop. */
+    int *bb_loop = calloc((size_t)f->n_bbs, sizeof *bb_loop);
+    if (!bb_loop) return;
+    for (int p = 0; p < f->n_bbs; p++) {
+        int ns = ir_bb_n_succ(&f->bbs[p]);
+        for (int s = 0; s < ns; s++) {
+            int h = ir_bb_succ_at(&f->bbs[p], s);
+            if (h < 0 || h > p) continue;                 /* not a back-edge */
+            for (int b = h; b <= p; b++) bb_loop[b] = 1;
+        }
+    }
+
+    const Op **flat = calloc((size_t)total, sizeof *flat);
+    int *in_loop = calloc((size_t)total, sizeof *in_loop);
+    if (!flat || !in_loop) { free(flat); free(in_loop); free(bb_loop); return; }
+    int gi = 0, any_loop = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        any_loop |= bb_loop[b];
+        for (int j = 0; j < f->bbs[b].n_ops; j++, gi++) {
+            flat[gi] = &f->bbs[b].ops[j];
+            in_loop[gi] = bb_loop[b];
+        }
+    }
+    if (!any_loop) { free(flat); free(in_loop); free(bb_loop); return; }
+
+    /* Register pressure: max over loop-body ops of |live width-2 vregs|. */
+    int pressure = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        if (!bb_loop[b] || !bb->live_in_per_op) continue;
+        for (int k = 0; k < bb->n_ops; k++) {
+            const BitSet *ls = (const BitSet *)bb->live_in_per_op[k];
+            if (!ls) continue;
+            int cnt = 0;
+            for (int v = 0; v < f->n_vregs; v++)
+                if (f->vregs[v].width == 2 && ir_bitset_get(ls, v)) cnt++;
+            if (cnt > pressure) pressure = cnt;
+        }
+    }
+
+    int spilled = 0, iy_cap = 0;
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (f->vregs[v].width != 2) continue;
+        if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+        const LiveRange *lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) continue;
+        int loopy = 0;
+        for (int k = lr->start; k <= lr->end && k < total; k++)
+            if (in_loop[k]) { loopy = 1; break; }
+        if (!loopy) continue;
+        spilled++;
+        int iy_clean = 1;
+        for (int k = lr->start; k <= lr->end && k < total; k++)
+            if (op_clobbers(f, flat[k]) & IR_R_IY) { iy_clean = 0; break; }
+        int iy_free = 1;
+        for (int u = 0; u < f->n_vregs && iy_free; u++) {
+            PhysReg pu = f->vreg_to_phys ? f->vreg_to_phys[u] : IR_PR_NONE;
+            if (pu != IR_PR_IY && pu != IR_PR_IYL && pu != IR_PR_IYH) continue;
+            if (ir_live_ranges_overlap(f, v, u)) iy_free = 0;
+        }
+        if (iy_clean && iy_free) iy_cap++;
+    }
+
+    if (spilled || pressure)
+        fprintf(stderr, "SPLIT_PROBE fn#%d: loop_word_pressure=%d "
+                "spilled_loop_words=%d iy_capturable=%d\n",
+                myidx, pressure, spilled, iy_cap);
+    free(flat); free(in_loop); free(bb_loop);
+}
+
 static int lower_op(FILE *out, Func *f, const Op *op)
 {
     /* Track the op's source location (independent of C_LINE emit mode) so
@@ -1947,6 +2359,7 @@ int ir_lower_func(FILE *out, Func *f)
     ir_compute_op_liveness(f);
     ir_compute_live_ranges(f);
     ir_alloc(f);
+    lra_split_probe(f);          /* Phase-2a prize probe (IR_SPLIT_PROBE, inert) */
     assign_idxhalf_homes(f);
     compute_no_slot_bytes(f);
     ir_assign_slots(f);
@@ -2322,6 +2735,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     /* Per-pass state reset (everything that was at function entry except
        func_emit_idx, which the caller bumps once for both passes). */
     L.cmp_label_counter = 0;
+    if (!lazy) lra_phase1_probe(f);   /* once per function (non-lazy pass) */
     L.lazy_spill_on = lazy;
     L.pending_spill_v = -1;
     cur_lazy_out = out;
@@ -3191,11 +3605,13 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                global index so pass 1 records against it and pass 2's
                verdict (ss_store_dead) is read for it. */
             L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
+            if (verify_on > 0) verify_len = 0;   /* capture this op's emitted asm */
             if (op->kind == IR_RET) {
                 rc = lower_ret(out, f, op);
             } else {
                 rc = lower_op(out, f, op);
             }
+            if (verify_on > 0) { verify_buf[verify_len] = 0; ir_verify_op(f, op, verify_buf); }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
             if (L.la.cur_skip_next_op) {

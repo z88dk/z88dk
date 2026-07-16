@@ -114,6 +114,10 @@ typedef enum {
                                         call — gen_call's whole-function BC-save
                                         must ignore it (Part 1). Slotless like any
                                         PR_BC vreg (stamped `ld bc,hl` at its def). */
+    IR_VREG_DE_PACK        = 1 << 8, /* LRA Phase 1: single-BB call-free word temp
+                                        locally allocated to DE (op_clobbers-clean
+                                        span, DE otherwise idle). DE sibling of
+                                        BC_PACK; call-free so gen_call ignores it. */
 } VRegFlags;
 
 typedef struct {
@@ -123,7 +127,7 @@ typedef struct {
                            locals, overloaded as the slot byte count
                            (int16_t fits arrays up to ~32KB). */
     SYMBOL  *sym;       /* backing sym (NULL = compiler temp) */
-    uint8_t  flags;     /* VRegFlags bitset */
+    uint16_t flags;     /* VRegFlags bitset (>8 bits: IR_VREG_DE_PACK=1<<8) */
 } VReg;
 
 /* ----- Memory operand --------------------------------------------------- */
@@ -527,6 +531,12 @@ typedef struct {
     SwitchInfo *sw;         /* IR_SWITCH only — heap allocated */
     const char *asm_text;   /* IR_ASM raw asm payload */
 
+    /* LRA Phase 4: stage src[1] into BC (`add hl,bc`/`sbc hl,bc`) rather than
+       DE, so a DE-packed value (IR_VREG_DE_PACK) survives this op untouched.
+       Set by ir_bc_pack when it commits a DE placement whose span covers this
+       ADD/SUB/CMP; honored by load_binop_operands + gen_add/sub/cmp (IR_LRA). */
+    uint8_t     lra_stage_src1_bc;
+
     /* Source location for debug / -gcline output. */
     const char *file;
     int         line;
@@ -756,6 +766,19 @@ int ir_bb_succ_at(const BB *bb, int i);   /* -1 if out of range */
 const char *ir_op_name(OpKind kind);
 
 const char *ir_phys_name(PhysReg pr);
+
+/* LRA (ir_lower.c): the verified per-op value-register clobber model + a vreg's
+   physical-register mask. Shared with the allocator (ir_alloc.c) so the DE-local
+   pack proves clean spans against the SAME model IR_VERIFY checks. */
+RegMask op_clobbers(const Func *f, const Op *op);
+/* Like op_clobbers, but models the relaxed lowering of the ops with a `hl,bc`
+   alternate form (ADD/SUB and word compares): src[1] is staged into BC instead
+   of DE, so DE is dropped from the clobber set (unless DE is the op's result or
+   operand home) and BC is added. Wide (DEHL/i64) forms have no BC-only variant
+   and are returned unchanged. LRA Phase-4 step 1: the DE-clean-modulo-staging
+   model the DE-pack is measured against. */
+RegMask op_clobbers_relaxed(const Func *f, const Op *op);
+RegMask phys_regmask(const Func *f, int vreg);
 
 /* ----- Compiler-internal accessors ------------------------------------- */
 

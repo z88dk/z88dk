@@ -1413,6 +1413,18 @@ static int bc_pack_op_touches_w4(const Func *f, const Op *o)
    IR_VREG_BC_PACK so gen_call's whole-function BC-save ignores them.
 
    Default ON; IR_NO_BC_PACK opts out (restores the pre-pack codegen exactly). */
+
+/* LRA Phase-4: is op j one whose src[1]→BC staging the emitter (steps 3-4)
+   actually implements? Only width-2 ADD/SUB have the `add hl,bc` / `sbc hl,bc`
+   form wired in gen_add/gen_sub. Any other op that (per op_clobbers) may touch
+   DE — CMP, byte ops, MUL, etc. — must BLOCK the DE placement rather than be
+   marked, so the loud-abort backstop in load_binop_operands can never fire. */
+static int lra_bc_emittable(const Func *f, const Op *o)
+{
+    if (o->kind != IR_ADD && o->kind != IR_SUB) return 0;
+    return o->dst >= 0 && o->dst < f->n_vregs && f->vregs[o->dst].width == 2;
+}
+
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count)
@@ -1559,8 +1571,119 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         last_fhi = cand[i].fhi;
         packed++;
     }
+    /* ---- LRA Phase 4 step 2 (IR_LRA): DE as a SECOND local home -----------
+       For the itloc candidates BC couldn't take (BC held by a loop home →
+       clash), try DE: place a candidate in DE when its span is DE-CLEAN under
+       the RELAXED model (op_clobbers_relaxed — ADD/SUB/CMP stage src[1] into BC
+       not DE) AND DE is otherwise idle over the span (no PR_DE/E/D tenant). On
+       commit, MARK each relaxed op (`lra_stage_src1_bc`) so steps 3-4's loader +
+       `hl,bc` emitter route its src[1] through BC, keeping the DE resident live.
+       Relaxing an op needs BC free across it (staging clobbers BC), so a span
+       crossing a live BC tenant stays DE-dirty (rejected `bc_busy`).
+
+       NOTE: gated IR_LRA (byte-identical OFF). With IR_LRA on this is WIP until
+       step 4 lands — the marks are set but not yet honored by the emitter, so a
+       placed value is clobbered by its span's DE-staging (silent wrong value,
+       IR_LRA-only). Steps 3-4 complete the mechanism; step 5 validates on. */
+    int de_packed = 0, de_rej_dirty = 0, de_rej_clash = 0, de_avail = 0;
+    int de_rej_bc_busy = 0, de_marks = 0, de_rej_noop = 0;
+    if (getenv("IR_LRA")) {
+        int de_last = -1;
+        for (int i = 0; i < nc; i++) {
+            int v = cand[i].vreg;
+            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;   /* BC already took it */
+            de_avail++;
+            BB *bb = &f->bbs[itbb[v]];
+            int base = bb_first_op[itbb[v]];
+            int llo = itdop[v];                                /* def op (local) */
+            int lhi = ithi[v] - base;                          /* last ref (local) */
+            int relax_ok = 1, relax_bc_blocked = 0;
+            for (int j = llo + 1; j <= lhi && relax_ok; j++) {
+                RegMask cs = op_clobbers(f, &bb->ops[j]);
+                if (op_clobbers_relaxed(f, &bb->ops[j]) & IR_R_DE) {
+                    relax_ok = 0;                              /* non-relaxable DE clobber */
+                    continue;
+                }
+                /* This op was relaxed (strict-DE, relaxed-clean) → its BC-staging
+                   needs BC free at this flat index. An op whose src[1] IS the
+                   packed value reads it straight from DE (`add hl,de`) — no
+                   staging, no BC needed, so it never blocks. */
+                if ((cs & IR_R_DE) && bb->ops[j].src[1] != v) {
+                    /* The emitter only BC-stages width-2 ADD/SUB; a DE-staging
+                       op it can't rewrite (CMP / byte / etc.) blocks placement. */
+                    if (!lra_bc_emittable(f, &bb->ops[j])) { relax_ok = 0; continue; }
+                    int fidx = base + j, bc_busy = 0;
+                    for (int k = 0; k < f->n_vregs && !bc_busy; k++) {
+                        PhysReg pk = f->vreg_to_phys[k];
+                        if (pk != IR_PR_BC && pk != IR_PR_C && pk != IR_PR_B) continue;
+                        /* Check the tenant's live interval (tight for an itloc
+                           BC_PACK tenant, extended for a loop-home) against this
+                           op — a BC_PACK value live ACROSS the marked op (its
+                           tight span covers fidx) genuinely holds BC and blocks
+                           the BC-staging; only skip it where fidx is outside. */
+                        int klo = itloc[k] ? itlo[k] : first_use[k];
+                        int khi = itloc[k] ? ithi[k] : last_use[k];
+                        if (fidx >= klo && fidx <= khi) bc_busy = 1;
+                    }
+                    if (bc_busy) { relax_ok = 0; relax_bc_blocked = 1; }
+                }
+            }
+            if (!relax_ok) {
+                if (relax_bc_blocked) de_rej_bc_busy++; else de_rej_dirty++;
+                continue;
+            }
+            if (cand[i].flo <= de_last) continue;              /* overlaps a DE sibling */
+            /* DE-tenant overlap (a value already resident in DE across the span). */
+            int clash = 0;
+            for (int j = 0; j < f->n_vregs && !clash; j++) {
+                PhysReg pj = f->vreg_to_phys[j];
+                if (pj != IR_PR_DE && pj != IR_PR_E && pj != IR_PR_D) continue;
+                if (f->vregs[j].flags & IR_VREG_DE_PACK) continue;   /* our own */
+                int jlo = itloc[j] ? itlo[j] : first_use[j];
+                int jhi = itloc[j] ? ithi[j] : last_use[j];
+                int s = cand[i].flo > jlo ? cand[i].flo : jlo;
+                int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
+                if (s <= e) clash = 1;
+            }
+            if (clash) { de_rej_clash++; continue; }
+            /* --- Identify the ops to mark. Evaluate with v still SPILL so
+               op_clobbers isolates the STAGING-DE bit (once v is PR_DE an op
+               using v carries DE as an operand home and the `!relaxed-DE` test
+               would wrongly fail). Skip src[1]==v (v is consumed from DE,
+               nothing staged). A mark = a DE-clobbering staging op the peephole
+               cannot carry the resident across → the traffic the home saves. */
+            int nm = 0;
+            for (int j = llo + 1; j <= lhi; j++) {
+                if (bb->ops[j].src[1] == v || !lra_bc_emittable(f, &bb->ops[j])) continue;
+                if ((op_clobbers(f, &bb->ops[j]) & IR_R_DE)
+                    && !(op_clobbers_relaxed(f, &bb->ops[j]) & IR_R_DE))
+                    nm++;
+            }
+            /* marks==0 ⇒ every use is adjacent / src[1]-consumed, so the
+               existing peephole DE-cache already carries v across its whole
+               span (the `ex de,hl` operand-swap keeps it there). A PR_DE home
+               would be byte-identical — a no-op placement. Only place (and pay
+               the BC-staging of steps 3-4) when it rescues real slot traffic. */
+            if (nm == 0) { de_rej_noop++; continue; }
+            for (int j = llo + 1; j <= lhi; j++) {
+                if (bb->ops[j].src[1] == v || !lra_bc_emittable(f, &bb->ops[j])) continue;
+                if ((op_clobbers(f, &bb->ops[j]) & IR_R_DE)
+                    && !(op_clobbers_relaxed(f, &bb->ops[j]) & IR_R_DE))
+                    bb->ops[j].lra_stage_src1_bc = 1;
+            }
+            de_marks += nm;
+            /* --- COMMIT: place v in DE. */
+            f->vreg_to_phys[v] = IR_PR_DE;
+            f->vregs[v].flags |= IR_VREG_DE_PACK;
+            de_last = cand[i].fhi;
+            de_packed++;
+        }
+    }
     if (getenv("IR_ALLOC_PROBE"))
-        fprintf(stderr, "BC_PACK packed=%d of candidates=%d\n", packed, nc);
+        fprintf(stderr, "BC_PACK packed=%d of candidates=%d  DE_PACK placed=%d "
+                "(avail=%d dirty=%d bc_busy=%d clash=%d noop=%d marks=%d)\n",
+                packed, nc, de_packed, de_avail, de_rej_dirty, de_rej_bc_busy,
+                de_rej_clash, de_rej_noop, de_marks);
     free(cand); free(itloc); free(itlo); free(ithi); free(itbb); free(itdop);
 }
 

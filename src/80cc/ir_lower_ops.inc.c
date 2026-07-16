@@ -2900,6 +2900,15 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
+    /* LRA Phase 4: marked (ir_bc_pack) to stage src[1] into BC so a DE-packed
+       resident in this op's span survives — `add hl,bc`. Pre-empts every
+       DE-using path below. */
+    if (op->lra_stage_src1_bc) {
+        load_binop_operands_bc(out, f, op);
+        emit(out, "add\thl,bc");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     if (try_word_accumulate(out, f, op))
         return 0;
     if (try_de_home_def(out, f, op))
@@ -3204,6 +3213,16 @@ static int gen_add(FILE *out, Func *f, const Op *op)
 
 static int gen_sub(FILE *out, Func *f, const Op *op)
 {
+    /* LRA Phase 4: marked to stage src[1] into BC — `or a; sbc hl,bc` — so a
+       DE-packed resident in this op's span survives. Word only (marking
+       restricts to width-2 ADD/SUB); pre-empts the DE-using paths below. */
+    if (op->lra_stage_src1_bc) {
+        load_binop_operands_bc(out, f, op);
+        emit(out, "or\ta");
+        emit(out, "sbc\thl,bc");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     if (try_de_home_def(out, f, op))
         return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
