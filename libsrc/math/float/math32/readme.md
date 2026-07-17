@@ -160,19 +160,29 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 ```
 ## Directory Structure
 
-The library is laid out in these directories.
+The library is laid out in these directories, following the same hierarchical pattern as the `am9511` maths library.
 
-### z80
+### asm
 
-Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic `math32` functions.
+Contains **8080-compatible** shared assembly: coefficient tables, float constants, and other routines that need no Z80-only or 8085-only instructions. Both the Z80-family and (future) 8085 builds assemble this tree.
+
+### asm/z80
+
+Contains the Z80-specific intrinsic implementation of the maths library. This includes the maths functions expected by the C11 standard and various low-level functions necessary to implement a complete float package accessible from assembly language. These functions are the intrinsic `math32` functions and freely use the alternate register set and other Z80 facilities.
+
+CPU-specific mantissa multiply and square helpers also live here (`f32_z80_*`, `f32_z180_*`, `f32_z80n_*`, `f32_r2ka_*`, `f32_kc160_*`) and are selected by the classic `newlibfiles_*.lst` / hierarchical `math32_*_asm.lst` lists when building each `math32_*.lib` variant.
+
+### asm/8085
+
+Reserved for 8085-specific intrinsic implementations (extended opcodes, stack-based locals, no alternate registers). Not populated until the 8085 software IEEE port; the directory layout matches `am9511/asm/8085`.
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required (Z80 codegen). An 8085 precompile tree (`c/8085`) will follow the same pattern as `am9511` when that CPU path is enabled.
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm` / `asm/z80` directories. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
 ### lm32
 
