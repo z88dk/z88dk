@@ -1486,9 +1486,9 @@ int main(int argc, char **argv)
             } else if (compiler_type == CC_XCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
-                rules[num_rules++] = c_sdccopt1;
-                rules[num_rules++] = c_sdccopt9;
+    
                 rules[num_rules++] = c_xcc_opt;
+                rules[num_rules++] = c_sdccopt9;
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
@@ -3137,7 +3137,7 @@ static void configure_compiler(void)
         preprocarg = " -D__XCC";
         BuildOptions(&cpparg, preprocarg);
         c_compiler = "xcc";
-        add_option_to_compiler("-S --sdcccall 0 --c1mode");
+        add_option_to_compiler("-S -Of --sdcccall 0 --c1mode");
         c_cpp_exe = c_sdcc_preproc_exe;
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__XCC");
