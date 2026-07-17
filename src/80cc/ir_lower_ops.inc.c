@@ -3640,7 +3640,6 @@ static int gen_rsub(FILE *out, Func *f, const Op *op)
    fired (the AND op and its branch are then fully emitted). */
 static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
 {
-    if (IS_808x()) return 0;
     if (!byte_home_holds(op->src[0])) return 0;
     PhysReg pr = byte_home_phys(f, op->src[0]);
     if (pr == IR_PR_NONE) return 0;
@@ -3666,7 +3665,18 @@ static int try_byte_shift_test_fuse(FILE *out, const Func *f, const Op *op)
           && p->imm == 1))
         return 0;
 
-    emit(out, "sla\t%s", byte_home_reg(pr));        /* home<<=1, CF=old bit7 */
+    /* home <<= 1, CF = old bit7. z80-family: `sla home` shifts in place.
+       808x has no CB shifts, so shift through A and commit back — still ONE
+       shift, vs the generic path that computes crc<<1 only for the test then
+       makes both arms recompute it. */
+    if (IS_808x()) {
+        const char *hr = byte_home_reg(pr);
+        emit(out, "ld\ta,%s", hr);
+        emit(out, "add\ta,a");
+        emit(out, "ld\t%s,a", hr);
+    } else {
+        emit(out, "sla\t%s", byte_home_reg(pr));
+    }
     if (byte_home_slotbacked(pr)) L.cur_byte_home_dirty = 1;
     invalidate_a_cache();
     const char *cc = (L.la.cur_branch_test_kind == IR_BR_ZERO) ? "nc" : "c";
