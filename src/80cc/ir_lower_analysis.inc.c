@@ -679,6 +679,39 @@ static void pending_spill_resolve(void)
 #define SHL_SKIP_CAP 32
 static struct { int bb_id, op_idx, cache_vreg, is_byte; } shl_skip[SHL_SKIP_CAP];
 
+/* True if `bb` will lower to ZERO emitted bytes and hand control to `tgt` —
+   the empty "skip" arm of a byte shift+test fuse (the else of
+   `crc = (crc&0x80) ? (crc<<1)^P : crc<<1`). After try_byte_shift_test_fuse
+   hoists the common `sla <home>` before the branch, this arm's only real op is
+   its in-place SHL (recorded in shl_skip, emits nothing) and it ends in an
+   unconditional BR to the join. Such a BB sits in the layout but produces no
+   code, so a preceding arm's `jp <join>` is really a jump to the next
+   instruction — the fall-through elision skips over it. Requires the fuse to
+   have already fired (shl_skip populated, which happens at the test BB, emitted
+   before both arms). */
+static int bb_is_empty_shl_arm_to(const Func *f, const BB *bb, int tgt)
+{
+    if (!bb || bb->n_ops == 0) return 0;
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *o = &bb->ops[j];
+        if (o->kind == IR_NOP || o->kind == IR_PHI) continue;
+        if (j == bb->n_ops - 1 && o->kind == IR_BR) {
+            if (o->label != tgt) return 0;   /* diverts, not a pass-through */
+            continue;
+        }
+        if (o->kind == IR_SHL) {
+            int fused = 0;
+            for (int s = 0; s < L.la.shl_skip_n; s++)
+                if (shl_skip[s].bb_id == bb->id && shl_skip[s].op_idx == j) {
+                    fused = 1; break;
+                }
+            if (fused) continue;
+        }
+        return 0;   /* this op emits code */
+    }
+    return 1;
+}
+
 /* The index register (IR_PR_IX/IR_PR_IY) a vreg is homed in, or IR_PR_NONE.
    Covers BOTH the idx2 spare and the optional second index home (idx3_reg, IY
    in sp-mode). The two are symmetric full-pair index homes — the lowerer uses

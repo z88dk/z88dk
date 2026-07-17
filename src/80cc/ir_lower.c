@@ -3521,21 +3521,25 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                unconditional IR_BR at end of BB targeting the next
                BB in lowering order. */
             if (op->kind == IR_BR && j == bb->n_ops - 1) {
-                /* Skip against the next BB that actually EMITS code —
-                   alias-elided trampolines produce no bytes, so
-                   falling through lands on the BB after them. Resolve
-                   the jp target through the alias map too. */
-                int next_emitted = -1;
-                for (int k = i + 1; k < f->n_bbs; k++) {
-                    if (!bb_alias || bb_alias[k] < 0) {
-                        next_emitted = k;
-                        break;
-                    }
-                }
                 int tgt = op->label;
                 if (bb_alias && tgt >= 0 && tgt < f->n_bbs
                     && bb_alias[tgt] >= 0)
                     tgt = bb_alias[tgt];
+                /* Skip against the next BB that actually EMITS code —
+                   alias-elided trampolines produce no bytes, and an empty
+                   byte-shift-fuse "skip" arm (its SHL hoisted before the
+                   branch) also produces none, so falling through lands on the
+                   BB after them. */
+                int next_emitted = -1;
+                for (int k = i + 1; k < f->n_bbs; k++) {
+                    if (bb_alias && bb_alias[k] >= 0)
+                        continue;
+                    if (f->bbs[k].id != tgt
+                        && bb_is_empty_shl_arm_to(f, &f->bbs[k], tgt))
+                        continue;
+                    next_emitted = k;
+                    break;
+                }
                 if (next_emitted >= 0 && tgt == next_emitted) {
                     /* Preheader fall-through into a resident loop: re-home
                        the slot-backed home into E here too (this elided BR is
