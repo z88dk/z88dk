@@ -22,6 +22,15 @@
 =
 	ld	%1,a
 
+;; #R2 safe: volatile slot stores are stamped ;volatile (won't match), and byte
+;; deref stores emit (de)/(bc) not (hl),a — so this only fires on a non-volatile
+;; local slot.
+%title #R2 elide store-then-reload of same (hl) slot (-1b, -7t)
+	ld	(hl),a
+	ld	a,(hl)
+=
+	ld	(hl),a
+
 %title #G1 gbz80 elide store-then-reload of same sp-rel int slot (-5b, -24t)
 %cpu gbz80
 	ld	hl,sp+%1
