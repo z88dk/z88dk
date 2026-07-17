@@ -9,8 +9,12 @@
 ;-------------------------------------------------------------------------
 ; m32_fsdiv / m32_fsinv - 8085 IEEE single divide / reciprocal
 ;-------------------------------------------------------------------------
-; 24-bit restoring division of mantissas (no expanded-float Newton).
-; Slot layout matches f32_fsadd: +0 MSB, +1 pad, +2 LSB, +3 mid, +4 exp, +5 sign
+; Stack only (no BSS). Restoring 24-bit div + IEEE RNE.
+;
+; Setup: +0 N(6) +6 D(6) +12 flag +14 ret [+16 left]
+; Slot: +0 msb +1 n3 +2 lsb +3 mid +4 exp +5 sign
+;
+; With Q work: +0 ret +2 q0 +3 q1 +4 q2 +5 g +6 N +12 D +18 flag
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -32,24 +36,21 @@ PUBLIC _m32_invf
     ld a,1
 
 .fd_start
-    push af                         ; drop flag
-    call unpack_push                ; D (divisor) from DEHL
+    push af
+    call unpack_push
     ld de,sp+10
     call load_ieee
-    call unpack_push                ; N (dividend)
-    ; +0 N, +6 D, +12 flag, +14 ret
+    call unpack_push
     call div_core
     jp epi
 
 
 ._m32_invf
 .m32_fsinv_fastcall
-    ; 1.0 / DEHL
     xor a
-    push af                         ; flag 0
-    call unpack_push                ; D
-    ; N = 1.0 unpacked
-    ld bc,0x007f                    ; B=sign0 C=exp127
+    push af
+    call unpack_push
+    ld bc,0x007f
     push bc
     ld de,0
     push de
@@ -59,12 +60,8 @@ PUBLIC _m32_invf
     jp epi
 
 
-;------------------------------------------------------------------------------
-; div_core: N at SP+2, D at SP+8 (ret at +0). Result IEEE in DEHL.
-; Uses static div_* workspace.
-
 .div_core
-    ; sign
+    ; SP: ret, N@2, D@8, flag@14
     ld de,sp+7
     ld a,(de)
     ld b,a
@@ -72,138 +69,187 @@ PUBLIC _m32_invf
     ld a,(de)
     xor b
     and 080h
-    ld (div_sign),a
+    ld de,sp+7
+    ld (de),a                       ; result sign
 
-    ; D.exp == 0 → inf
     ld de,sp+12
     ld a,(de)
     or a
     jp Z,div_inf
 
-    ; N.exp == 0 → zero
     ld de,sp+6
     ld a,(de)
     or a
     jp Z,div_zero
 
-    ; exp = N.exp - D.exp + 127
     ld b,a
     ld de,sp+12
     ld a,(de)
     ld c,a
     ld a,b
     sub c
-    ld b,a                          ; signed raw diff in B (two's)
-    ld a,127
-    add a,b
-    ; if raw diff negative and add underflows → zero
-    ; check: if B positive (N.exp>=D.exp): add 127, overflow→inf
-    ; if B negative: add 127, no carry→underflow zero
-    ld a,b
+    ld b,a
     rla
-    jp C,exp_was_neg
-    ; non-negative diff
+    jp C,exp_neg
     ld a,127
     add a,b
     jp C,div_inf
     or a
     jp Z,div_zero
-    ld (div_exp),a
-    jp exp_ready
-.exp_was_neg
+    ld de,sp+6
+    ld (de),a
+    jp exp_ok
+.exp_neg
     ld a,127
-    add a,b                         ; B negative
+    add a,b
     jp NC,div_zero
-    ld (div_exp),a
-.exp_ready
-
-    ; load mantissas: N → div_n (32-bit, high=0), D → div_d (24-bit)
-    ld de,sp+2
-    ld a,(de)
-    ld (div_n2),a
-    ld de,sp+5
-    ld a,(de)
-    ld (div_n1),a
-    ld de,sp+4
-    ld a,(de)
-    ld (div_n0),a
+    ld de,sp+6
+    ld (de),a
+.exp_ok
+    ld de,sp+3
     xor a
-    ld (div_n3),a
+    ld (de),a                       ; n3=0 (N.pad)
 
-    ld de,sp+8
-    ld a,(de)
-    ld (div_d2),a
-    ld de,sp+11
-    ld a,(de)
-    ld (div_d1),a
+    ; Q work 4 bytes
+    pop hl
+    ld de,0
+    push de
+    push de
+    push hl
+    ; SP: ret, q0,q1, q2,g, N@6, D@12, flag@18
+
+    call cmp_nd
+    jp NC,aligned
+    call shl_n
     ld de,sp+10
     ld a,(de)
-    ld (div_d0),a
-
-    ; if N < D: N <<= 1, exp--
-    call n_lt_d
-    jp NC,n_ge_d
-    call n_shl1
-    ld a,(div_exp)
     dec a
-    jp Z,div_zero
-    ld (div_exp),a
-.n_ge_d
-
-    ; 24-bit restoring division → quot in div_q
-    xor a
-    ld (div_q0),a
-    ld (div_q1),a
-    ld (div_q2),a
+    jp Z,zero_dropq
+    ld (de),a
+.aligned
     ld b,24
-.dloop
-    ; q <<= 1
-    ld a,(div_q0)
-    add a,a
-    ld (div_q0),a
-    ld a,(div_q1)
-    rla
-    ld (div_q1),a
-    ld a,(div_q2)
-    rla
-    ld (div_q2),a
-    ; if N >= D: N -= D, q |= 1
-    call n_lt_d
-    jp C,d_noshift
-    call n_sub_d
-    ld a,(div_q0)
+.loop
+    call shl_q
+    call cmp_nd
+    jp C,no_sub
+    call sub_nd
+    ld de,sp+2
+    ld a,(de)
     or 01h
-    ld (div_q0),a
-.d_noshift
-    ; N <<= 1
-    call n_shl1
+    ld (de),a
+.no_sub
+    call shl_n
     dec b
-    jp NZ,dloop
+    jp NZ,loop
 
-    ; sticky: if N remainder nonzero, set lsb
-    ld a,(div_n0)
-    ld hl,div_n1
-    or (hl)
-    inc hl
-    or (hl)
-    inc hl
-    or (hl)
+    ; guard
+    ld de,sp+5
+    xor a
+    ld (de),a
+    call shl_n
+    call cmp_nd
+    jp C,g_done
+    call sub_nd
+    ld de,sp+5
+    ld a,1
+    ld (de),a
+.g_done
+    ld de,sp+6
+    ld a,(de)
+    ld h,a
+    ld de,sp+7
+    ld a,(de)
+    or h
+    ld h,a
+    ld de,sp+8
+    ld a,(de)
+    or h
+    ld h,a
+    ld de,sp+9
+    ld a,(de)
+    or h
+    ld c,a                          ; sticky
+
+    ld de,sp+5
+    ld a,(de)
+    or a
     jp Z,pack
-    ld a,(div_q0)
-    or 01h
-    ld (div_q0),a
+    ld a,c
+    or a
+    jp NZ,qinc
+    ld de,sp+2
+    ld a,(de)
+    and 01h
+    jp Z,pack
+.qinc
+    ld de,sp+2
+    ld a,(de)
+    inc a
+    ld (de),a
+    jp NZ,pack
+    inc de
+    ld a,(de)
+    inc a
+    ld (de),a
+    jp NZ,pack
+    inc de
+    ld a,(de)
+    inc a
+    ld (de),a
+    jp NZ,pack
+    ld a,080h
+    ld (de),a
+    dec de
+    xor a
+    ld (de),a
+    dec de
+    ld (de),a
+    ld de,sp+10
+    ld a,(de)
+    inc a
+    ld (de),a
+    jp Z,inf_dropq
 
 .pack
-    ld a,(div_q2)
-    ld l,a
-    ld a,(div_q1)
+    ; q → N mant; free Q; pack N → DEHL
+    ; Q@+2: q0,q1,q2; N@+6: msb,n3,lsb,mid,exp,sign
+    ld de,sp+2
+    ld a,(de)                       ; q0
+    ld de,sp+8
+    ld (de),a                       ; N.lsb
+    ld de,sp+3
+    ld a,(de)                       ; q1
+    ld de,sp+9
+    ld (de),a                       ; N.mid
+    ld de,sp+4
+    ld a,(de)                       ; q2
+    ld de,sp+6
+    ld (de),a                       ; N.msb
+    ; free Q (4 bytes under ret)
+    pop hl
+    pop af
+    pop af
+    push hl
+    ; SP: ret, N, D, flag
+    ; N: +2 msb +3 n3 +4 lsb +5 mid +6 exp +7 sign
+    ld de,sp+2
+    ld a,(de)
+    ld l,a                          ; msb
+    ld de,sp+4
+    ld a,(de)
+    ld c,a                          ; lsb
+    ld de,sp+5
+    ld a,(de)
     ld d,a
-    ld a,(div_q0)
-    ld e,a
-    ld a,(div_exp)
+    ld e,c                          ; DE = mid,lsb
+    push de
+    ld de,sp+8                      ; exp (+6+2)
+    ld a,(de)
     ld c,a
-    ld a,(div_sign)
-    ld b,a
+    ld de,sp+9
+    ld a,(de)
+    ld b,a                          ; sign
+    pop de
     ld h,0
     ld a,l
     rla
@@ -220,37 +266,46 @@ PUBLIC _m32_invf
     ret
 
 
+.inf_dropq
+    pop hl
+    pop af
+    pop af
+    push hl
+    jp div_inf
+
+.zero_dropq
+    pop hl
+    pop af
+    pop af
+    push hl
+    jp div_zero
+
+
 .div_inf
-    ld a,(div_sign)
+    ld de,sp+7
+    ld a,(de)
     rla
     jp C,di_n
-    call scrub_to_ret
+    call scrub
     jp m32_fsconst_pinf
 .di_n
-    call scrub_to_ret
+    call scrub
     jp m32_fsconst_ninf
 
 .div_zero
-    ld a,(div_sign)
+    ld de,sp+7
+    ld a,(de)
     rla
     jp C,dz_n
-    call scrub_to_ret
+    call scrub
     jp m32_fsconst_pzero
 .dz_n
-    call scrub_to_ret
+    call scrub
     jp m32_fsconst_nzero
 
 
-; scrub stack of N+D+flag and ret to caller's epi-less path via constants
-; On entry from div_core via CALL? No — jp to div_inf from div_core which was CALLed.
-; Stack: ret_to_fd_start/inv, N, D, flag, ret_user, ...
-; div_core was called, so +0 = return into fd_start after call div_core.
-; We need to discard that and do full epi.
-
-.scrub_to_ret
-    ; pop div_core ret
+.scrub
     pop hl
-    ; now same as epi without result
     ld de,sp+12
     ld a,(de)
     ld c,a
@@ -264,7 +319,7 @@ PUBLIC _m32_invf
     ld a,c
     or a
     ret Z
-    pop de                          ; user ret
+    pop de
     pop af
     pop af
     push de
@@ -298,6 +353,121 @@ PUBLIC _m32_invf
 
 
 ;------------------------------------------------------------------------------
+; Helpers with Q allocated. After CALL:
+; +0 ret_h +2 ret_div +4 q0 +5 q1 +6 q2 +7 g +8 N +14 D
+; N: +8 msb +9 n3 +10 lsb +11 mid +12 exp +13 sign
+; D: +14 msb +15 pad +16 lsb +17 mid
+
+.cmp_nd
+    ld de,sp+9
+    ld a,(de)
+    or a
+    ret NZ
+    ld de,sp+8
+    ld a,(de)
+    ld de,sp+14
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    cp h
+    ret C
+    ret NZ
+    ld de,sp+11
+    ld a,(de)
+    ld de,sp+17
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    cp h
+    ret C
+    ret NZ
+    ld de,sp+10
+    ld a,(de)
+    ld de,sp+16
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    cp h
+    ret
+
+
+.sub_nd
+    ld de,sp+10
+    ld a,(de)
+    ld de,sp+16
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sub h
+    ld de,sp+10
+    ld (de),a
+    ld de,sp+11
+    ld a,(de)
+    ld de,sp+17
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    ld de,sp+11
+    ld (de),a
+    ld de,sp+8
+    ld a,(de)
+    ld de,sp+14
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    ld de,sp+8
+    ld (de),a
+    ld de,sp+9
+    ld a,(de)
+    sbc a,0
+    ld (de),a
+    ret
+
+
+.shl_n
+    ld de,sp+10
+    ld a,(de)
+    add a,a
+    ld (de),a
+    ld de,sp+11
+    ld a,(de)
+    rla
+    ld (de),a
+    ld de,sp+8
+    ld a,(de)
+    rla
+    ld (de),a
+    ld de,sp+9
+    ld a,(de)
+    rla
+    ld (de),a
+    ret
+
+
+.shl_q
+    ld de,sp+4
+    ld a,(de)
+    add a,a
+    ld (de),a
+    inc de
+    ld a,(de)
+    rla
+    ld (de),a
+    inc de
+    ld a,(de)
+    rla
+    ld (de),a
+    ret
+
+
 .unpack_push
     call unpack_dehl
     ld a,l
@@ -342,72 +512,3 @@ PUBLIC _m32_invf
     ld h,b
     ld l,c
     ret
-
-
-; N < D ? C if N < D (32-bit N vs 24-bit D, N high byte div_n3)
-.n_lt_d
-    ld a,(div_n3)
-    or a
-    ret NZ                          ; N >= 2^24 > D → NC and NZ, not less
-    ld a,(div_n2)
-    ld hl,div_d2
-    cp (hl)
-    ret C
-    ret NZ
-    ld a,(div_n1)
-    ld hl,div_d1
-    cp (hl)
-    ret C
-    ret NZ
-    ld a,(div_n0)
-    ld hl,div_d0
-    cp (hl)
-    ret
-
-.n_sub_d
-    ld a,(div_n0)
-    ld hl,div_d0
-    sub (hl)
-    ld (div_n0),a
-    ld a,(div_n1)
-    ld hl,div_d1
-    sbc a,(hl)
-    ld (div_n1),a
-    ld a,(div_n2)
-    ld hl,div_d2
-    sbc a,(hl)
-    ld (div_n2),a
-    ld a,(div_n3)
-    sbc a,0
-    ld (div_n3),a
-    ret
-
-.n_shl1
-    ld a,(div_n0)
-    add a,a
-    ld (div_n0),a
-    ld a,(div_n1)
-    rla
-    ld (div_n1),a
-    ld a,(div_n2)
-    rla
-    ld (div_n2),a
-    ld a,(div_n3)
-    rla
-    ld (div_n3),a
-    ret
-
-
-SECTION bss_fp_math32
-div_sign: defs 1
-div_exp:  defs 1
-div_n0:   defs 1
-div_n1:   defs 1
-div_n2:   defs 1
-div_n3:   defs 1
-div_d0:   defs 1
-div_d1:   defs 1
-div_d2:   defs 1
-div_q0:   defs 1
-div_q1:   defs 1
-div_q2:   defs 1

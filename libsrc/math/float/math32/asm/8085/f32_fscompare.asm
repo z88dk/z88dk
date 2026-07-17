@@ -9,15 +9,8 @@
 ;-------------------------------------------------------------------------
 ; m32_compare / m32_compare_callee - 8085 IEEE float compare
 ;-------------------------------------------------------------------------
-; Total order via sign-magnitude → biased int transform.
-; IEEE zero if exponent is zero (±0 compare equal).
-;
-; Exit:
-;   Z  = equal (including ±0)
-;   NZ = not equal
-;   C  = left < right
-;   NC = left >= right
-;   HL = 1
+; Stack only (no BSS).
+; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -26,135 +19,248 @@ SECTION code_fp_math32
 PUBLIC m32_compare, m32_compare_callee
 
 
+; SP: rt, rr, ll, lh, rl, rh
 .m32_compare
-    ; stack: ret_this, ret_real, left, right
-    pop hl
-    ld (cmp_rt),hl
-    pop hl
-    ld (cmp_rr),hl
-    pop hl
-    pop de
-    ld (cmp_ll),hl
-    ld (cmp_lh),de
-    pop hl
-    pop de
-    ld (cmp_rl),hl
-    ld (cmp_rh),de
-    ; restore right, left, rets
-    push de
-    push hl
-    ld de,(cmp_lh)
-    ld hl,(cmp_ll)
-    push de
-    push hl
-    ld hl,(cmp_rr)
-    push hl
-    ld hl,(cmp_rt)
-    push hl
-    jp cmp_body
+    ld de,sp+8
+    call push_float_at
+    ld de,sp+8
+    call push_float_at
+    call cmp_lr
+    push af
+    pop bc
+    pop af
+    pop af
+    pop af
+    pop af
+    push bc
+    pop af
+    ld hl,1
+    ret
 
 
+; DEHL=right; SP: rt, rr, ll, lh
 .m32_compare_callee
-    ; DEHL = right; stack: ret_this, ret_real, left  (left is dropped)
-    ld (cmp_rl),hl
-    ld (cmp_rh),de
-    pop hl
-    ld (cmp_rt),hl
-    pop hl
-    ld (cmp_rr),hl
-    pop hl
-    pop de
-    ld (cmp_ll),hl
-    ld (cmp_lh),de
-    ; restore rets only
-    ld hl,(cmp_rr)
+    push de
     push hl
-    ld hl,(cmp_rt)
-    push hl
-
-.cmp_body
-    ; right zero? (exp == 0). Note: 8085 rla does NOT update Z.
-    ld de,(cmp_rh)
-    call exp_zero
-    jp Z,right_zero
-
-    ; left zero?
-    ld de,(cmp_lh)
-    call exp_zero
-    jp Z,left_zero_right_nz
-
-    ; both non-zero: transform and subtract left - right
-    ld de,(cmp_rh)
-    ld hl,(cmp_rl)
-    call xform
-    ld (cmp_rh),de
-    ld (cmp_rl),hl
-
-    ld de,(cmp_lh)
-    ld hl,(cmp_ll)
-    call xform
-    ld (cmp_ll),hl
-    ld (cmp_lh),de
-
-    ld hl,(cmp_ll)
-    ld de,(cmp_rl)
-    ld a,l
-    sub e
+    ; SP: right L,H,E,D, rt, rr, ll, lh
+    ld de,sp+8
+    ld a,(de)
     ld c,a
-    ld a,h
-    sbc a,d
+    inc de
+    ld a,(de)
     ld b,a
-    ld hl,(cmp_lh)
-    ld de,(cmp_rh)
-    ld a,l
-    sbc a,e
+    inc de
+    ld a,(de)
     ld l,a
-    ld a,h
-    sbc a,d
-    jp C,ret_neg
+    inc de
+    ld a,(de)
+    ld h,a
+    push hl
+    push bc
+    ; SP: left, right, rt, rr, ll, lh
+    call cmp_lr
+    push af
+    pop bc
+    pop af
+    pop af
+    pop af
+    pop af
+    pop de
+    pop hl
+    pop af
+    pop af
+    push hl
+    push de
+    push bc
+    pop af
+    ld hl,1
+    ret
 
+
+.push_float_at
+    pop hl
+    ld a,(de)
+    ld c,a
+    inc de
+    ld a,(de)
+    ld b,a
+    inc de
+    ld a,(de)
+    push hl
+    ld l,a
+    inc de
+    ld a,(de)
+    ld h,a
+    pop de
+    push hl
+    push bc
+    push de
+    ret
+
+
+; SP: ret, left L,H,E,D, right L,H,E,D
+.cmp_lr
+    ld de,sp+8
+    ld a,(de)
+    ld c,a
+    ld de,sp+9
+    ld a,(de)
+    ld d,a
+    ld e,c
+    call exp_zero
+    jp Z,lr_rz
+
+    ld de,sp+4
+    ld a,(de)
+    ld c,a
+    ld de,sp+5
+    ld a,(de)
+    ld d,a
+    ld e,c
+    call exp_zero
+    jp Z,lr_lz
+
+    ; xform right at +6..+9
+    ld de,sp+6
+    ld a,(de)
+    ld l,a
+    inc de
+    ld a,(de)
+    ld h,a
+    inc de
+    ld a,(de)
+    ld c,a
+    inc de
+    ld a,(de)
+    ld d,a
+    ld e,c
+    call xform
+    ld c,e
+    ld b,d
+    ld a,l
+    ld de,sp+6
+    ld (de),a
+    ld a,h
+    ld de,sp+7
+    ld (de),a
+    ld a,c
+    ld de,sp+8
+    ld (de),a
+    ld a,b
+    ld de,sp+9
+    ld (de),a
+
+    ; xform left at +2..+5
+    ld de,sp+2
+    ld a,(de)
+    ld l,a
+    inc de
+    ld a,(de)
+    ld h,a
+    inc de
+    ld a,(de)
+    ld c,a
+    inc de
+    ld a,(de)
+    ld d,a
+    ld e,c
+    call xform
+    ld c,e
+    ld b,d
+    ld a,l
+    ld de,sp+2
+    ld (de),a
+    ld a,h
+    ld de,sp+3
+    ld (de),a
+    ld a,c
+    ld de,sp+4
+    ld (de),a
+    ld a,b
+    ld de,sp+5
+    ld (de),a
+
+    ; left - right
+    ld de,sp+2
+    ld a,(de)
+    ld de,sp+6
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sub h
+    ld c,a
+    ld de,sp+3
+    ld a,(de)
+    ld de,sp+7
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    ld b,a
+    ld de,sp+4
+    ld a,(de)
+    ld de,sp+8
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    ld l,a
+    ld de,sp+5
+    ld a,(de)
+    ld de,sp+9
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    jp C,lr_neg
     or l
     or b
     or c
-    ld hl,1
-    ret                             ; Z if equal, NC
+    ret
 
-.right_zero
-    ld de,(cmp_lh)
+.lr_rz
+    ld de,sp+4
+    ld a,(de)
+    ld c,a
+    ld de,sp+5
+    ld a,(de)
+    ld d,a
+    ld e,c
     call exp_zero
-    jp Z,ret_eq
-    ; C = sign of left from exp_zero side path — reload sign
-    ld a,(cmp_lh+1)
+    jp Z,lr_eq
+    ld de,sp+5
+    ld a,(de)
     rla
-    jp NC,ret_pos
-    jp ret_neg
+    jp NC,lr_pos
+    jp lr_neg
 
-.left_zero_right_nz
-    ld a,(cmp_rh+1)
-    rla                             ; C = sign of right
-    jp NC,ret_neg
-    jp ret_pos
+.lr_lz
+    ld de,sp+9
+    ld a,(de)
+    rla
+    jp NC,lr_neg
+    jp lr_pos
 
-.ret_eq
-    ld hl,1
+.lr_eq
     xor a
     ret
 
-.ret_pos
-    ld hl,1
+.lr_pos
     ld a,1
     or a
     ret
 
-.ret_neg
-    ld hl,1
+.lr_neg
     ld a,1
     or a
     scf
     ret
 
 
-; Z if exp==0 for float in DE.. (only D and E used)
 .exp_zero
     ld a,d
     and 07fh
@@ -164,17 +270,15 @@ PUBLIC m32_compare, m32_compare_callee
     ret
 
 
-; DEHL IEEE → total-order uint32 (nonzero exp)
-
 .xform
     ld a,e
     add a,a
     ld e,a
     ld a,d
     rla
-    ld d,a                          ; C = original sign
+    ld d,a
     ccf
-    jp C,xf_pos                     ; original positive
+    jp C,xf_pos
     ld a,l
     cpl
     ld l,a
@@ -198,12 +302,3 @@ PUBLIC m32_compare, m32_compare_callee
     and 0feh
     ld l,a
     ret
-
-
-SECTION bss_fp_math32
-cmp_rt: defs 2
-cmp_rr: defs 2
-cmp_ll: defs 2
-cmp_lh: defs 2
-cmp_rl: defs 2
-cmp_rh: defs 2

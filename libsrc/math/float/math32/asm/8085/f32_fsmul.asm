@@ -6,6 +6,11 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ; 8085 m32_fsmul / m32_fsmul_callee
+;
+; Rounding: IEEE RNE.  Residual = low 8 of high-32 product (in E after mul).
+;   G = residual.7, S = residual[6:0]!=0, B = mant LSB
+;   round_up = G && (S || B); then 24-bit mant++ (overflow → >>1, exp++).
+;
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -174,16 +179,35 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp Z,pk_ovl
     dec b
 .pk_round
-    ld a,e
+    ; Product HLDE: HLD = top 24, E = residual 8.  Form EHL mant.
+    ld a,e                          ; A = residual
     ld e,h
     ld h,l
-    ld l,d
-    and 0c0h
-    jp Z,pk_nr
+    ld l,d                          ; EHL = 24-bit mant, A = residual
+    ; IEEE RNE: G=res.7, S=res[6:0], B=L.0
+    ld d,a                          ; D = residual (E is mant MSB)
+    and 080h
+    jp Z,pk_pack                    ; G=0
+    ld a,d
+    and 07fh
+    jp NZ,pk_up                     ; G=1 S=1 → up
     ld a,l
-    or 01h
-    ld l,a
-.pk_nr
+    and 01h
+    jp Z,pk_pack                    ; tie, already even
+.pk_up
+    inc l
+    jp NZ,pk_pack
+    inc h
+    jp NZ,pk_pack
+    inc e
+    jp NZ,pk_pack
+    ; mant overflow → 0x800000, exp++
+    ld e,080h
+    ld h,0
+    ld l,h
+    inc b
+    jp Z,pk_ovl
+.pk_pack
     ld a,e
     add a,a
     ld e,a
