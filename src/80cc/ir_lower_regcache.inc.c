@@ -1666,7 +1666,7 @@ static int cmp_ixd_fold_de_clean_ok(const Func *f, const Op *o)
        counter etc.) — mirrors try_cmp_ixd_fold's word-acc gate. */
     int word_acc = (L.cur_de_home < 0 && L.cur_home_is_word);
     if (L.cur_de_home < 0 && !word_acc) return 0;
-    if (getenv("IR_NO_IXD_FOLD")) return 0;
+    if (opt_disabled("ixd-fold")) return 0;
     if (!fp_active(f)) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     switch (o->kind) {
@@ -1695,8 +1695,8 @@ static int cmp_ixd_fold_de_clean_ok(const Func *f, const Op *o)
    is the ONLY path for AND/OR/XOR.) */
 static int binop_ixd_fold_de_clean_ok(const Func *f, const Op *o)
 {
-    if (getenv("IR_NO_ALU_FOLD")) return 0;
-    if (L.cur_de_home < 0 || getenv("IR_NO_IXD_FOLD")) return 0;
+    if (opt_disabled("alu-fold")) return 0;
+    if (L.cur_de_home < 0 || opt_disabled("ixd-fold")) return 0;
     if (!fp_active(f)) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     switch (o->kind) {
@@ -1759,7 +1759,7 @@ static int de_home_indexed_add_ok(const Func *f, const Op *o)
    so the region proof and codegen agree. */
 static int de_home_clean_bitop_ok(const Func *f, const Op *o)
 {
-    if (getenv("IR_NO_DECLEAN")) return 0;
+    if (opt_disabled("declean")) return 0;
     if (!L.cur_home_is_word || L.cur_func_whome < 0) return 0;
     if (!fp_active(f)) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
@@ -1805,7 +1805,7 @@ static int de_clean_store_base_ok(const Func *f, int base)
 
 static int de_home_clean_store_ok(const Func *f, const Op *o)
 {
-    if (getenv("IR_NO_DECLEAN")) return 0;
+    if (opt_disabled("declean")) return 0;
     if (!L.cur_home_is_word || L.cur_func_whome < 0) return 0;
     /* sp only for the reduction ACCUMULATOR home (general DE-home's sp block);
        the value class further restricts sp to the home value (E/D). */
@@ -1834,7 +1834,7 @@ static int de_home_clean_store_ok(const Func *f, const Op *o)
    and the AND-side region proof exactly. */
 static const Op *fused_mask_store_mask(const Func *f, const Op *store_op)
 {
-    if (getenv("IR_NO_DECLEAN")) return NULL;
+    if (opt_disabled("declean")) return NULL;
     if (!L.cur_home_is_word || L.cur_func_whome < 0) return NULL;
     /* sp only for the reduction accumulator home (reads home E/D, masks via A,
        address ld hl,bc / remat — all DE-clean in sp). */
@@ -1891,7 +1891,7 @@ static int op_is_fused_mask(const Func *f, const Op *o)
 static int sp_accum_deref_hl_carried(const Func *f, const Op *o)
 {
     if (fp_active(f)) return 0;
-    if (getenv("IR_NO_DECLEAN")) return 0;
+    if (opt_disabled("declean")) return 0;
     /* Only where the sp reduction region can actually form (a DE-clean loop
        compare exists) — else this partial clean-rule perturbs codegen on CPUs
        that never complete the region (regressed Rabbit ptrbench +11%). Matches
@@ -1952,7 +1952,7 @@ static int sp_cmp_slot(const Func *f, int v)
    has no (ix+d) so the bound is read via HL. Mirrors try_sp_dehome_loop_cmp. */
 static int sp_dehome_loop_cmp_ok(const Func *f, const Op *o)
 {
-    if (getenv("IR_NO_DECLEAN")) return 0;
+    if (opt_disabled("declean")) return 0;
     if (fp_active(f)) return 0;
     if (!L.cur_home_is_word || L.cur_func_whome < 0 || L.cur_de_home >= 0) return 0;
     /* z80/z80n: counter in an index half or BC. z180/808x: no usable index half
@@ -2013,7 +2013,7 @@ static int op_de_clean(const Func *f, const Op *o)
         if ((o->kind == IR_INC || o->kind == IR_DEC) && dw == 2
             && o->dst != L.cur_func_whome
             && (fp_active(f)
-                || (!getenv("IR_NO_DECLEAN") && L.cur_de_home < 0 && f->vreg_to_phys
+                || (!opt_disabled("declean") && L.cur_de_home < 0 && f->vreg_to_phys
                     && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())
                     && (f->vreg_to_phys[o->dst] == IR_PR_BC
                         || vreg_in_idx2(f, o->dst)))))
@@ -2160,7 +2160,7 @@ static int op_de_clean(const Func *f, const Op *o)
         int s  = o->src[0];
         int sw = (s >= 0 && s < f->n_vregs) ? f->vregs[s].width : 2;
         if (sw <= 1) return 1;        /* byte → `or a`, DE-clean on all CPUs */
-        if (getenv("IR_NO_WORD_ZTEST")) return 0;   /* opt-out → baseline */
+        if (opt_disabled("word-ztest")) return 0;   /* opt-out → baseline */
         /* word → emit_test_zero's `load_to_hl; ld a,h; or l` (or Rabbit4k
            `test`) — HL+A only, DE untouched. This lets a pointer-chase loop
            (`while (p) { acc += p->f; p = p->next; }`) keep its accumulator in

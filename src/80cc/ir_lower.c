@@ -582,7 +582,7 @@ static int fastcall_arg_vreg(const Func *f);
 static int frame_has_saved_iy(const Func *f);
 static int frameless_ok(const Func *f)
 {
-    if (getenv("IR_NO_FRAMELESS")) return 0;
+    if (opt_disabled("frameless")) return 0;
     if (c_framepointer_is_ix == -1) return 0;    /* sp-mode is already frameless */
     if (f->is_naked || f->is_interrupt || f->uses_acc) return 0;
     if (f->frame_size != 0) return 0;
@@ -2160,7 +2160,7 @@ static int no_slot_consumer_safe(const Func *f, const BB *bb, int j)
    the byte analogue the ss machinery doesn't cover. */
 static void compute_no_slot_bytes(Func *f)
 {
-    if (getenv("IR_NO_SLOT_PRUNE")) return;
+    if (opt_disabled("slot-prune")) return;
     for (int v = 0; v < f->n_vregs; v++) {
         VReg *vr = &f->vregs[v];
         if (vr->width != 1) continue;
@@ -2525,9 +2525,9 @@ int ir_lower_func(FILE *out, Func *f)
     /* Lazy-spill config (per-pass deferral state lives in
        lower_func_render). Default ON (sound static reaching-reloads model);
        IR_NO_LAZY_SPILL opts out to the single-pass lowering for A/B. */
-    L.lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
+    L.lazy_spill_on = !opt_disabled("lazy-spill");
     int want_lazy = L.lazy_spill_on;
-    f32_stack_arg_on = getenv("IR_NO_F32_STACK_ARG") == NULL;
+    f32_stack_arg_on = !opt_disabled("f32-stack-arg");
 
     /* No function label here — the surrounding legacy scaffolding
        (declparse.c + codegen.c) already emits `._<name>`. The render
@@ -2556,7 +2556,7 @@ int ir_lower_func(FILE *out, Func *f)
        re-emit the constant instead of reloading a slot. */
     L.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                          sizeof(const Op *));
-    if (L.remat_def && !getenv("IR_NO_REMAT")) {
+    if (L.remat_def && !opt_disabled("remat")) {
         int *ndef = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
         if (ndef) {
             /* Count via ir_op_defs — some ops define through a non-dst field
@@ -2687,7 +2687,7 @@ int ir_lower_func(FILE *out, Func *f)
     /* Render the function body to a scratch file, then copy to `out` dropping
        dead BB labels (emit_dropping_dead_bb_labels). IR_NO_LABEL_ELIDE opts out
        to writing `out` directly. */
-    int elide_labels = !getenv("IR_NO_LABEL_ELIDE");
+    int elide_labels = !opt_disabled("label-elide");
     int max_bb = -1;
     for (int i = 0; i < f->n_bbs; i++)
         if (f->bbs[i].id > max_bb) max_bb = f->bbs[i].id;
@@ -2916,7 +2916,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        across a loop, suppress per-iter spills + assert residency at the
        header. */
     L.cur_home_region_lo = L.cur_home_region_hi = -1;
-    if (L.cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
+    if (L.cur_func_ehome >= 0 && !opt_disabled("home-resident"))
         compute_home_region(f, L.cur_func_ehome, bb_alias,
                             &L.cur_home_region_lo, &L.cur_home_region_hi);
     /* Home exit-flush hoist: if the region leaves to exactly ONE target block
@@ -2927,7 +2927,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        or sp via HL, flush the one byte). IR_NO_WH_EXIT_HOIST opts out. */
     L.cur_home_exit_flush_bb = -1;
     if (L.cur_func_ehome >= 0
-        && L.cur_home_region_lo >= 0 && !getenv("IR_NO_WH_EXIT_HOIST")) {
+        && L.cur_home_region_lo >= 0 && !opt_disabled("wh-exit-hoist")) {
         int tgt = -1, ok = 1;
         for (int b = L.cur_home_region_lo; b <= L.cur_home_region_hi && ok; b++) {
             const BB *sb = &f->bbs[b];

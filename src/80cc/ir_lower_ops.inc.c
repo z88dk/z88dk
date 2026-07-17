@@ -244,7 +244,7 @@ static int gen_inc(FILE *out, Func *f, const Op *op)
        in place with `inc bc`/`inc de` instead of the ld hl,bc / inc hl /
        ld bc,hl copy-out-and-back. Mirror of the idx2 counter case above.
        IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref). */
-    if (op->dst == op->src[0] && !getenv("IR_NO_GPDEREF")
+    if (op->dst == op->src[0] && !opt_disabled("gpderef")
         && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
         emit(out, vreg_in_pr_bc(f, op->dst) ? "inc\tbc" : "inc\tde");
         if (hl_has(op->dst)) invalidate_hl_cache();
@@ -2074,7 +2074,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                with no HL round-trip. Keeps DE = the stepped pointer, so a
                DE-homed src pointer (strcpy `*s++`) stays resident and DE-clean.
                IR_NO_GPDEREF opts out. */
-            if (vreg_in_pr_de(f, base) && !getenv("IR_NO_GPDEREF")
+            if (vreg_in_pr_de(f, base) && !opt_disabled("gpderef")
                 && (op->mem.post_step == 1 || op->mem.post_step == -1)) {
                 emit(out, "ld\ta,(de)");               /* A = *p */
                 emit(out, op->mem.post_step > 0 ? "inc\tde" : "dec\tde");
@@ -2173,7 +2173,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            (bc)/(de) load touches neither. IR_NO_GPDEREF opts out. */
         if (op->dst >= 0 && f->vregs[op->dst].width == 1
             && op->mem.offset == 0 && !hl_has(op->mem.base)
-            && !getenv("IR_NO_GPDEREF")) {
+            && !opt_disabled("gpderef")) {
             if (vreg_in_pr_bc(f, op->mem.base)) {
                 emit(out, "ld\ta,(bc)");
                 commit_a_byte(out, f, op->dst);
@@ -2512,7 +2512,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                register keeps the pointer coherent. This is what makes the store
                DE-clean, so op_de_clean can admit the region. */
             if (op->mem.offset == 0 && (!hl_has(op->mem.base) || st_step)
-                && !getenv("IR_NO_GPDEREF")
+                && !opt_disabled("gpderef")
                 && (vreg_in_pr_bc(f, op->mem.base) || vreg_in_pr_de(f, op->mem.base))) {
                 int in_bc = vreg_in_pr_bc(f, op->mem.base);
                 int hl_had_base = hl_has(op->mem.base);
@@ -2758,7 +2758,7 @@ static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
 static int try_binop_ixd_fold(FILE *out, Func *f, const Op *op,
                               const char *lo_op, const char *hi_op)
 {
-    if (getenv("IR_NO_ALU_FOLD")) return 0;
+    if (opt_disabled("alu-fold")) return 0;
     if (L.cur_de_home < 0) return 0;           /* only inside a DE-home region */
     if (!fp_active(f)) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
@@ -2869,7 +2869,7 @@ static int try_de_home_def(FILE *out, Func *f, const Op *op)
    z80/z80n (index halves). Returns 1 if emitted. */
 static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 {
-    if (getenv("IR_NO_IXD_FOLD")) return 0;
+    if (opt_disabled("ixd-fold")) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N())) return 0;
     /* Co-design helper for the sp-mode idx3/exx layout (writable loop words in
        index regs). Off in fp mode and in default sp builds so codegen there is

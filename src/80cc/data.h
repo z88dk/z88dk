@@ -99,6 +99,11 @@ extern uint32_t c_opt_disable;
 #define OPT_DISABLE_DEMOTE_POSTSTEP (1u << 12)
 #define OPT_DISABLE_LOOP_REVERSE    (1u << 13)
 #define OPT_DISABLE_ALL             (~0u)
+/* IR/lowering optimisation gates are named (not bits — there are >32) and
+   disabled via `--opt-disable=<name>` (e.g. de-home, bc-pack, label-elide).
+   opt_disabled() returns non-zero when a named IR opt is disabled (or when
+   `--opt-disable=all` was given). Replaces the old IR_NO_* environment vars. */
+int opt_disabled(const char *name);
 extern int c_fp_size;
 extern int c_fp_fudge_offset;
 extern enum maths_mode c_maths_mode;

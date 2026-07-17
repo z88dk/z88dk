@@ -76,7 +76,7 @@ label then drops via the elision above.
 - Anything added to the filter or to copt must preserve the `;volatile` stamp
   (ADR 0014) and must not assume sccz80-style jump-only trampolines — 80cc joins
   fall through.
-- The filter is gated (`IR_NO_LABEL_ELIDE` opts out to a verbatim copy), keeping
+- The filter is gated (`--opt-disable=label-elide` opts out to a verbatim copy), keeping
   the byte-identical-off discipline of ADR 0004 available for bisection.
 - copt cannot express whole-CFG analysis (dead-label removal, general threading),
   which is precisely why those live in the compiler filter rather than as rules.

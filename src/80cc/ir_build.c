@@ -1919,7 +1919,7 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
        Acc tier (FA model) keeps lhs-first — it doesn't use the DEHL stack. */
     int fc_commutative = !is_acc
         && (!strcmp(stem, "add") || !strcmp(stem, "mul"))
-        && getenv("IR_NO_F32_STACK_ARG") == NULL;
+        && !opt_disabled("f32-stack-arg");
     #define COMPOUND_ARITH(LV) (is_acc \
         ? emit_acc_binop(b, stem, (LV), rv) \
         : fc_commutative ? emit_float_arith(b, fk, stem, rv, (LV)) \
@@ -6015,7 +6015,7 @@ static int build_muldiv_integer(Builder *b, Node *n)
     if (n->ast_type == OP_MULT && !is_flt && !is_fix16 && !is_fix32
         && n->type && type_width(n->type) == 4
         && !IS_808x() && !IS_GBZ80()   /* l_mulu_32_16x16 undefined there */
-        && !getenv("IR_NO_NARROW_MUL")) {
+        && !opt_disabled("narrow-mul")) {
         Node *ln = mul_u16_narrow_src(n->left);   /* type width <= 2, unsigned */
         Node *rn = mul_u16_narrow_src(n->right);
         if (ln && rn) {

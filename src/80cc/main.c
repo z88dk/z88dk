@@ -136,7 +136,7 @@ static option  sccz80_opts[] = {
     { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the data section name", &c_data_section, NULL, 0 },
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
-    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named AST optimiser passes (comma-separated). Names: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse; pattern:<name> disables one IR pattern-matcher entry. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
+    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named optimiser passes (comma-separated). AST passes: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse. IR/lowering gates by name, e.g. lra, bc-pack, de-home, orchestrator, ivsr, lftr, addr-cse, label-elide, lazy-spill, remat, idx2, idx3, gpderef, declean (see opt_disabled call sites). pattern:<name> disables one IR pattern-matcher entry. `all` disables every optimisation. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "(inert) Accepted for --math16 alias / sccz80-family CLI compatibility; no effect in the IR back end", NULL, opt_code_speed_inert, 0 },
     { 0, "ast-print", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Build the AST per function, print it to stderr, and skip code generation", &c_ast_print, NULL, 0 },
     { 0, "ast-print-types", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Decorate the AST print with type/qualifier/attribute info; implies --ast-print", &c_ast_print_types, NULL, 0 },
@@ -931,6 +931,34 @@ static void opt_code_speed_inert(option *arg, char *val)
     (void)val;
 }
 
+/* Named IR/lowering optimisation gates disabled via --opt-disable=<name>.
+   There are >32, so they are a name-set rather than bits in c_opt_disable. */
+static char *ir_opt_disabled_names[80];
+static int   n_ir_opt_disabled;
+static int   ir_opt_disable_all;
+
+/* Non-zero if the named IR/lowering optimisation was disabled on the command
+   line (or `--opt-disable=all`). Called from the IR passes / lowerer. */
+int opt_disabled(const char *name)
+{
+    if (ir_opt_disable_all) return 1;
+    for (int i = 0; i < n_ir_opt_disabled; i++)
+        if (strcmp(ir_opt_disabled_names[i], name) == 0) return 1;
+    return 0;
+}
+
+static void ir_opt_disable_add(const char *name, size_t len)
+{
+    if (n_ir_opt_disabled >= (int)(sizeof ir_opt_disabled_names
+                                   / sizeof ir_opt_disabled_names[0]))
+        return;
+    char *s = malloc(len + 1);
+    if (!s) return;
+    memcpy(s, name, len);
+    s[len] = 0;
+    ir_opt_disabled_names[n_ir_opt_disabled++] = s;
+}
+
 static void opt_disable(option *arg, char *val)
 {
     (void)arg;
@@ -960,13 +988,19 @@ static void opt_disable(option *arg, char *val)
             if (strncmp(ptr, opt_disable_names[i].name, n) == 0
                 && (ptr[n] == 0 || ptr[n] == ',' || ptr[n] == ' ')) {
                 c_opt_disable |= opt_disable_names[i].bit;
+                if (opt_disable_names[i].bit == OPT_DISABLE_ALL)
+                    ir_opt_disable_all = 1;   /* `all` also disables IR opts */
                 matched = n;
                 break;
             }
         }
         if (matched == 0) {
-            /* Unknown — advance to next separator. */
-            while (*ptr && *ptr != ',' && *ptr != ' ') ptr++;
+            /* Not an AST-pass name: treat as a named IR/lowering opt
+               (opt_disabled()); genuine typos simply never match a gate. */
+            size_t n = 0;
+            while (ptr[n] && ptr[n] != ',' && ptr[n] != ' ') n++;
+            ir_opt_disable_add(ptr, n);
+            ptr += n;
         } else {
             ptr += matched;
         }

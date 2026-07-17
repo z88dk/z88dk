@@ -216,7 +216,7 @@ looppr_fp.bin: $(SOURCES) looppr.c
 	$(runtest)
 
 # Reduction write-back DE-home (in-place `a[i]=f(sum)`; fp-only feature,
-# IR_NO_DECLEAN opts out): plain / masked / OR / XOR / struct-field write-backs
+# --opt-disable=declean opts out): plain / masked / OR / XOR / struct-field write-backs
 # that keep the running sum in DE across the store. fp build exercises the
 # feature; sp build validates the inert (ordinary) path. Host-verified checksum.
 redwb.bin: $(SOURCES) redwb.c

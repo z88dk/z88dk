@@ -48,13 +48,16 @@ helper table's job, ADR 0005.)
 
 ### Byte-identical-off gating
 
-Every residency feature is behind a gate (`IR_NO_*` to opt a default-on feature
-out; `IR_LRA` to opt an in-progress one in). The invariant: **with the feature
-off, codegen is byte-identical** to before it existed, verified by an asm diff
-across the CPU matrix (normalising only the compile-timestamp / temp-filename
-header noise). A new feature is landed *inert* first, proven byte-identical, then
-turned on. This makes every change bisectable and makes "does this feature cause
-regression X" answerable by flipping one env var.
+Every residency feature is behind a gate: a default-on feature is opted *out* by
+name via `--opt-disable=<name>` (e.g. `--opt-disable=de-home`; see the
+`opt_disabled()` mechanism, and `--opt-disable=all` for the fully-unoptimised
+baseline), and an in-progress feature is opted *in* by an env var (e.g.
+`IR_IDXHALF`). The invariant: **with the feature off, codegen is byte-identical**
+to before it existed, verified by an asm diff across the CPU matrix (normalising
+only the compile-timestamp / temp-filename header noise). A new feature is landed
+*inert* first, proven byte-identical, then turned on. This makes every change
+bisectable and makes "does this feature cause regression X" answerable by
+disabling one named pass.
 
 ## Consequences
 

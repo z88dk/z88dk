@@ -561,7 +561,7 @@ static void prune_free_bb(BB *bb)
 int ir_opt_prune_unreachable(Func *f)
 {
     if (!f || f->n_bbs <= 0) return 0;
-    if (getenv("IR_NO_PRUNE")) return 0;
+    if (opt_disabled("prune")) return 0;
     int n = f->n_bbs;
     int *reach = calloc((size_t)n, sizeof(int));
     int *stack = calloc((size_t)n, sizeof(int));
@@ -966,7 +966,7 @@ static int ivsr_iv_term(Func *f, int x, int lo, int hi, int ph,
     /* Non-power-of-2 affine multiple `C*iv` (struct-array stride). Fold the
        whole shift-and-add term away (DCE removes the dead sub-ops) and step the
        pointer by C. IR_NO_IVSR_AFFINE opts out. */
-    if (!getenv("IR_NO_IVSR_AFFINE")) {
+    if (!opt_disabled("ivsr-affine")) {
         int iva; int64_t C;
         if (ivsr_affine_coeff(f, x, lo, hi, ph, &iva, &C, 0) && C >= 2
             && ivsr_basic_iv(f, iva, lo, hi, ph, &k, &d)) {
@@ -1062,7 +1062,7 @@ static int ivsr_const_bound(Func *f, const Op *cmp, int lo, int hi,
 static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
                          IvsrCand *cand, int n_cand)
 {
-    if (getenv("IR_NO_LFTR")) return 0;
+    if (opt_disabled("lftr")) return 0;
     BB *hb = &f->bbs[lo];
     int cond = -1;
     for (int j = 0; j < hb->n_ops; j++) {
@@ -1098,7 +1098,7 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     int64_t N = 0;
     int bound_v = -1;
     if (!ivsr_const_bound(f, cmp, lo, hi, &N)) {
-        if (getenv("IR_NO_LFTR_SIGNED")) return 0;
+        if (opt_disabled("lftr-signed")) return 0;
         int bv = cmp->src[1];
         if (bv < 0 || bv >= f->n_vregs) return 0;   /* immediate handled above */
         if (f->vregs[bv].width != 2) return 0;       /* int bound only */
@@ -1232,7 +1232,7 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                    more than recomputing. ez80/kc160/rabbit have a 1-op word slot
                    load (+ native indexing), so the walking pointer stays cheaper
                    there (measured: ez80 +8% if suppressed) — leave IVSR on. */
-                if (!getenv("IR_NO_IVSR_SUPPRESS")
+                if (!opt_disabled("ivsr-suppress")
                     && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)
                     && (scale & (scale - 1)) == 0    /* power-of-2 scale only */
                     && ivsr_base_is_const_sym(f, base, lo, hi)) {
@@ -1319,7 +1319,7 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
 int ir_opt_ivsr(Func *f)
 {
     if (!f || f->n_bbs <= 0) return 0;
-    if (getenv("IR_NO_IVSR")) return 0;
+    if (opt_disabled("ivsr")) return 0;
 
     /* The stepped pointer only pays off if it can live in BC across the
        back-edge (else it is a second spilled loop-carried var and the
@@ -1591,7 +1591,7 @@ static int addr_desc_same_group(const MemDesc *a, const MemDesc *b)
 
 int ir_opt_addr_cse(Func *f)
 {
-    if (!f || getenv("IR_NO_ADDR_CSE")) return 0;
+    if (!f || opt_disabled("addr-cse")) return 0;
     int nv = f->n_vregs;
     Op **defmap = calloc((size_t)(nv > 0 ? nv : 1), sizeof(Op *));
     int *defpos = malloc((size_t)(nv > 0 ? nv : 1) * sizeof(int));
@@ -1724,7 +1724,7 @@ static int dce_pure_kind(const Op *op)
 int ir_opt_dce(Func *f)
 {
     if (!f) return 0;
-    if (getenv("IR_NO_DCE")) return 0;
+    if (opt_disabled("dce")) return 0;
     int removed = 0;
     int pass_changed;
     do {
@@ -1860,7 +1860,7 @@ static int niv_down_exit_ok(Func *f, int h, int c)
 
 int ir_opt_narrow_iv(Func *f)
 {
-    if (!f || f->n_bbs <= 0 || getenv("IR_NO_IV_NARROW")) return 0;
+    if (!f || f->n_bbs <= 0 || opt_disabled("iv-narrow")) return 0;
 
     IvClass *cl = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(IvClass));
     if (!cl) return 0;
@@ -2054,7 +2054,7 @@ static int demands_low_byte_only(const Func *f, int v)
 int ir_opt_narrow_byte(Func *f)
 {
     if (!f) return 0;
-    if (getenv("IR_NO_NARROW_BYTE")) return 0;
+    if (opt_disabled("narrow-byte")) return 0;
     /* A vreg is a candidate iff it has ≥1 def and EVERY def is a
        narrowable op (so each def has an 8-bit lowering). Multi-def is
        allowed — the diamond `if(c&m) c=(c<<1)^p; else c<<=1;` defines
@@ -2255,7 +2255,7 @@ static void op_rename_vreg(Op *op, int from, int to)
 int ir_opt_coalesce_copies(Func *f)
 {
     if (!f) return 0;
-    if (getenv("IR_NO_COALESCE_COPIES")) return 0;
+    if (opt_disabled("coalesce-copies")) return 0;
 
     int total = 0, round_changed;
     do {
@@ -2341,7 +2341,7 @@ static int cf_width_mask(int w, int64_t *mask)
 int ir_opt_const_fold(Func *f)
 {
     if (!f) return 0;
-    if (getenv("IR_NO_CONST_FOLD")) return 0;
+    if (opt_disabled("const-fold")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
     int8_t  *known = calloc((size_t)nv, 1);
@@ -2525,8 +2525,8 @@ extern int c_word_resident;
 int ir_opt_reduce_coalesce(Func *f)
 {
     if (!f) return 0;
-    if (!c_word_resident || getenv("IR_NO_WORD_RESIDENT")) return 0;
-    if (getenv("IR_NO_REDUCE_COALESCE")) return 0;
+    if (!c_word_resident || opt_disabled("word-resident")) return 0;
+    if (opt_disabled("reduce-coalesce")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
 
@@ -2618,8 +2618,8 @@ int ir_opt_reduce_coalesce(Func *f)
 int ir_opt_reassoc_reduction(Func *f)
 {
     if (!f) return 0;
-    if (!c_word_resident || getenv("IR_NO_WORD_RESIDENT")) return 0;
-    if (getenv("IR_NO_REASSOC")) return 0;
+    if (!c_word_resident || opt_disabled("word-resident")) return 0;
+    if (opt_disabled("reassoc")) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
 

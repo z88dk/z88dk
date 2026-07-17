@@ -585,7 +585,7 @@ static int acc_op_pushes_from_acc(const HelperInfo *h, int v)
    keeps the store. */
 static int wide_acc_result_dead_in_acc(const Func *f, int v)
 {
-    if (getenv("IR_NO_ACC_DROP") || !cur_bb || v < 0) return 0;
+    if (opt_disabled("acc-drop") || !cur_bb || v < 0) return 0;
     int j = cur_op_idx + 1;
     while (j < cur_bb->n_ops && cur_bb->ops[j].kind == IR_NOP) j++;
     if (j >= cur_bb->n_ops) return 0;

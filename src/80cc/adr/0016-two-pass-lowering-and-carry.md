@@ -46,13 +46,13 @@ Three cooperating mechanisms, all in `ir_lower`:
   (text discarded) with deferral **off**, purely to compute the complete
   `bb_hl_out` tenant map and record the spill store/reload sites; pass 2 renders
   for real with deferral **on**, its cross-BB defer decisions consulting that
-  complete map and skipping the dead stores. `IR_NO_LAZY_SPILL` collapses this to
+  complete map and skipping the dead stores. `--opt-disable=lazy-spill` collapses this to
   a single deferral-off pass — correct, just without the lazy win — preserving
   the byte-identical-off discipline of ADR 0004.
 
 A companion reload-avoider shares this area: **rematerialisation** — a width-2
 vreg with exactly one `LD_IMM`/`LD_SYM` def (a loop-invariant constant) is
-re-emitted on a cache miss instead of reloaded from its slot (`IR_NO_REMAT`).
+re-emitted on a cache miss instead of reloaded from its slot (`--opt-disable=remat`).
 
 ## Consequences
 

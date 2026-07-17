@@ -12,7 +12,7 @@ HL/DE). A stepped pointer that just advances by the element stride is far cheape
 
 ## Decision
 
-`ir_opt_ivsr` (`ir_opt.c`, gated `IR_NO_IVSR`) rewrites derived induction
+`ir_opt_ivsr` (`ir_opt.c`, gated `--opt-disable=ivsr`) rewrites derived induction
 variables into **stepped pointers**:
 
 - Detect a derived IV `d = base + iv*scale (+K)` inside a loop where `base` is

@@ -61,7 +61,7 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
 int ir_idx2_reg(void)
 {
     if (!c_idx2_invariant) return IR_PR_NONE;
-    if (getenv("IR_NO_IDX2")) return IR_PR_NONE;
+    if (opt_disabled("idx2")) return IR_PR_NONE;
     if (IS_808x() || IS_GBZ80()) return IR_PR_NONE;
     if (c_framepointer_is_ix == 1)                    /* frame IX → spare IY */
         return c_reserve_iy ? IR_PR_NONE : IR_PR_IY;
@@ -78,7 +78,7 @@ int ir_idx2_reg(void)
 int ir_idx3_reg(void)
 {
     if (!c_idx3_residency) return IR_PR_NONE;
-    if (getenv("IR_NO_IDX3")) return IR_PR_NONE;
+    if (opt_disabled("idx3")) return IR_PR_NONE;
     if (c_reserve_iy) return IR_PR_NONE;               /* IY reserved by platform */
     if (ir_idx2_reg() != IR_PR_IX) return IR_PR_NONE;  /* need IX as idx2 */
     if (c_framepointer_is_ix != -1) return IR_PR_NONE; /* IY is the frame */
@@ -95,7 +95,7 @@ int ir_idx3_reg(void)
 int ir_exx_reg(void)
 {
     if (!c_exx_residency) return IR_PR_NONE;
-    if (getenv("IR_NO_EXX")) return IR_PR_NONE;
+    if (opt_disabled("exx")) return IR_PR_NONE;
     if (c_framepointer_is_ix != -1) return IR_PR_NONE;   /* sp-mode only */
     if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
     return IR_PR_BC_ALT;
