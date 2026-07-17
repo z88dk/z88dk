@@ -1,4 +1,2 @@
-; 8085 mantissa mul/sqr — added in Phase 1C
-; math/float/math32/asm/8085/f32_8085_mulu_32h_24x24
-; math/float/math32/asm/8085/f32_8085_mulu_32h_32x32
-; math/float/math32/asm/8085/f32_8085_sqr_32h_24x24
+math/float/math32/asm/8085/f32_8085_mulu_32h_24x24
+math/float/math32/asm/8085/f32_8085_mulu_32h_32x32

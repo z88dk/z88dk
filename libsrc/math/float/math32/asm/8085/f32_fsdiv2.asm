@@ -1,6 +1,12 @@
 ;
-; 8085 m32_fsdiv2 — divide by 2 (decrement exponent)
+;  feilipu, 2026 July
 ;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+; 8085 m32_fsdiv2 — divide by 2 (decrement exponent)
+
 SECTION code_clib
 SECTION code_fp_math32
 

@@ -6,7 +6,7 @@
 ../../../math/float/math32/asm/h32_coeff_expf.asm
 ../../../math/float/math32/asm/h32_coeff_logf.asm
 ../../../math/float/math32/asm/h32_coeff_sinf.asm
-../../../math/float/math32/asm/8085/d32_fsutil.asm
+../../../math/float/math32/asm/8085/f32_fsutil.asm
 ../../../math/float/math32/asm/8085/f32_discardfraction.asm
 ../../../math/float/math32/asm/8085/f32_fabs.asm
 ../../../math/float/math32/asm/8085/f32_floor.asm
@@ -17,6 +17,10 @@
 ../../../math/float/math32/asm/8085/f32_fsload.asm
 ../../../math/float/math32/asm/8085/f32_fsmul10u.asm
 ../../../math/float/math32/asm/8085/f32_fsmul2.asm
+../../../math/float/math32/asm/8085/f32_fsmul.asm
+../../../math/float/math32/asm/8085/f32_fsnormalize.asm
+../../../math/float/math32/asm/8085/f32_8085_mulu_32h_24x24.asm
+../../../math/float/math32/asm/8085/f32_8085_mulu_32h_32x32.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_acos.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_acosh.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_asin.asm

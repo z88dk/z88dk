@@ -6,7 +6,7 @@ math/float/math32/asm/h32_coeff_exp2f
 math/float/math32/asm/h32_coeff_exp10f
 math/float/math32/asm/h32_coeff_logf
 math/float/math32/asm/h32_coeff_sinf
-math/float/math32/asm/8085/d32_fsutil
+math/float/math32/asm/8085/f32_fsutil
 math/float/math32/asm/8085/f32_discardfraction
 math/float/math32/asm/8085/f32_fabs
 math/float/math32/asm/8085/f32_floor
@@ -17,3 +17,7 @@ math/float/math32/asm/8085/f32_fsfrexp
 math/float/math32/asm/8085/f32_fsload
 math/float/math32/asm/8085/f32_fsmul10u
 math/float/math32/asm/8085/f32_fsmul2
+math/float/math32/asm/8085/f32_fsmul
+math/float/math32/asm/8085/f32_fsnormalize
+math/float/math32/asm/8085/f32_8085_mulu_32h_24x24
+math/float/math32/asm/8085/f32_8085_mulu_32h_32x32
