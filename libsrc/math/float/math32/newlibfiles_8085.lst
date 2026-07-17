@@ -18,6 +18,10 @@
 ../../../math/float/math32/asm/8085/f32_fsmul10u.asm
 ../../../math/float/math32/asm/8085/f32_fsmul2.asm
 ../../../math/float/math32/asm/8085/f32_fsmul.asm
+../../../math/float/math32/asm/8085/f32_fsadd.asm
+../../../math/float/math32/asm/8085/f32_fsdiv.asm
+../../../math/float/math32/asm/8085/f32_fsconv.asm
+../../../math/float/math32/asm/8085/f32_fscompare.asm
 ../../../math/float/math32/asm/8085/f32_fsnormalize.asm
 ../../../math/float/math32/asm/8085/f32_8085_mulu_32h_24x24.asm
 ../../../math/float/math32/asm/8085/f32_8085_mulu_32h_32x32.asm

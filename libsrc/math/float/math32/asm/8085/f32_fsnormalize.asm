@@ -189,27 +189,26 @@ PUBLIC m32_fsnormalize
 .normdone
     add a,c                     ; exponent of result
     jr NC,normzero              ; if underflow return zero
-.normdone0                      ; case of zero shift
+.normdone0                      ; case of zero shift; A = exponent
+    ld h,a                      ; save exponent
     ld a,l
-    rla
+    rla                         ; eject hidden mantissa bit → C
     ld l,a
     ld a,b
-    rla
-    ld b,a
-    rra
+    rla                         ; sign → C
+    ld a,h                      ; exponent
+    rra                         ; sign into A[7], exp[0] → C
+    ld h,a
     ld a,l
-    rra
+    rra                         ; exp[0] into L[7]
     ld l,a
-    ld h,a                      ; exponent
-    ex de,hl                    ; return DEHL
-    ; ex af,af' omitted on 8085
+    ex de,hl                    ; return DEHL IEEE
     ret
 
 .normzero                       ; return zero
     ld hl,0
     ld d,h
     ld e,l
-    ; ex af,af' omitted on 8085
     ret
 
 ; all bits in lower 4 bits of e (bits 0-3 of mantissa)

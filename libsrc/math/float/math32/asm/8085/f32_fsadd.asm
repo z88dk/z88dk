@@ -9,7 +9,22 @@
 ;-------------------------------------------------------------------------
 ; m32_fsadd / m32_fssub - 8085 IEEE single add/sub
 ;-------------------------------------------------------------------------
-; Slot: +0 L=MSB +1 H=0 +2 E=LSB +3 D=mid +4 exp +5 sign
+; Slot (6 bytes) after unpack:
+;   +0 L = mant MSB (hidden 1 if exp!=0)
+;   +1     0
+;   +2 E = mant LSB
+;   +3 D = mant mid
+;   +4     exp
+;   +5     sign (bit 7)
+;
+; Frame after both unpacks:
+;   +0  X slot (6)
+;   +6  Y slot (6)
+;  +12  drop_flag (2)
+;  +14  ret (2)
+;  +16  left IEEE if callee (4)
+;
+; X is kept as the larger-or-equal exponent operand.
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -38,21 +53,22 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .fa_start
-    push af
-    call unpack_push
+    push af                         ; drop flag (0=non-callee, 1=callee)
+    call unpack_push                ; Y from DEHL
     ld de,sp+10
-    call load_ieee
-    call unpack_push
+    call load_ieee                  ; left IEEE → DEHL
+    call unpack_push                ; X from left
+
+    ; If Y.exp >= X.exp, swap so X has larger-or-equal exp
     ld de,sp+4
-    ld a,(de)
+    ld a,(de)                       ; X.exp
     ld b,a
     ld de,sp+10
-    ld a,(de)
-    ld c,a
-    ld a,c
+    ld a,(de)                       ; Y.exp
     cp b
     call NC,swap6
 
+    ; expdiff = X.exp - Y.exp
     ld de,sp+4
     ld a,(de)
     ld b,a
@@ -60,16 +76,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,(de)
     ld c,a
     ld a,b
-    sub c
-    ; before align dump X exp
-    ld de,sp+4
-    ld a,(de)
-    call align_y
-    ld de,sp+4
-    ld a,(de)
-    ld de,sp+6
-    ld a,(de)
+    sub c                           ; A = expdiff
+    cp 24
+    jp NC,pack_x                    ; Y negligible
 
+    call align_y                    ; right-shift Y by A (sticky LSB)
+
+    ; same sign → add; different → sub
     ld de,sp+5
     ld a,(de)
     ld b,a
@@ -79,7 +92,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     and 080h
     jp NZ,do_sub
 
-    call mant_add
+    call mant_add                   ; X += Y; A = carry out
     or a
     jp Z,pack_x
     call mant_shr1
@@ -91,27 +104,28 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp pack_x
 
 .do_sub
-    call mant_sub
+    call mant_sub                   ; |X| - |Y| (or reverse + flip sign)
     call mant_zero
     jp Z,ret0
-    call load_x_regs
-    call m32_fsnormalize
+    call load_x_regs                ; B=sign C=exp H=0 LDE=mant
+    call m32_fsnormalize            ; packed DEHL
     jp epi
 
 .pack_x
     call load_x_regs
-    ld h,0
-    add hl,hl
-    ld h,c
+    ; pack: h=0, lde=mant with hidden 1, c=exp, b=sign
+    ld a,l
+    rla                             ; eject hidden → C
+    ld l,a
     ld a,b
-    rla
-    ld a,h
-    rra
+    rla                             ; sign → C
+    ld a,c                          ; exp
+    rra                             ; sign into A[7]
     ld h,a
     ld a,l
     rra
     ld l,a
-    ex de,hl
+    ex de,hl                        ; DEHL IEEE
     jp epi
 
 .ovf
@@ -126,77 +140,75 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp epi
 
 .ret0
-    ld de,sp+5
-    ld a,(de)
-    and 080h
-    ld d,a
-    ld e,0
-    ld h,e
-    ld l,e
+    ; exact cancel → +0 (match Z80 m32_fsnormalize normzero)
+    ld de,0
+    ld hl,0
 
 .epi
+    ; DEHL = result; discard X(6)+Y(6)+flag(2)=14 bytes; callee also drops left
     push de
     push hl
     ld de,sp+16
-    ld a,(de)
+    ld a,(de)                       ; flag
     pop hl
     pop de
     ld c,a
+    pop af                          ; X
     pop af
     pop af
+    pop af                          ; Y
     pop af
     pop af
-    pop af
-    pop af
-    pop af
+    pop af                          ; flag
     ld a,c
     or a
     jp Z,done
-    pop bc
-    pop af
-    pop af
+    pop bc                          ; ret
+    pop af                          ; left L/H
+    pop af                          ; left E/D
     push bc
 .done
     ret
 
 
 ;------------------------------------------------------------------------------
+; unpack DEHL → push 6-byte slot (ret under slot restored)
 
 .unpack_push
     call unpack_dehl
-    ld a,l
-    pop hl
-    push bc
-    push de
+    ld a,l                          ; mant MSB
+    pop hl                          ; return address
+    push bc                         ; exp, sign
+    push de                         ; lsb, mid
     ld b,h
     ld c,l
     ld l,a
     ld h,0
-    push hl
-    push bc
+    push hl                         ; msb, 0
+    push bc                         ; ret
     ret
 
 
 .unpack_dehl
-    ex de,hl
+    ex de,hl                        ; HLDE = IEEE
     ld a,h
-    ld b,a
-    add hl,hl
-    ld c,h
+    ld b,a                          ; B = sign (bit7) + exp hi
+    add hl,hl                       ; exp → H, mant high → L
+    ld c,h                          ; C = exp
     ld a,h
     or a
-    jp Z,un0
+    jp Z,un0                        ; no hidden bit if exp==0
     scf
 .un0
     ld a,l
-    rra
+    rra                             ; rotate in hidden bit
     ld l,a
     ld h,0
-    ret
-
+    ret                             ; L=msb H=0 DE=mid/lsb B=sign C=exp
 
 
 .swap6
+    ; swap X(+0..5) with Y(+6..11); called so ret is on stack
     pop hl
     ld (swap_ret),hl
     pop hl
@@ -228,99 +240,82 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ret
 
 
-; Align Y at +6 by A right shifts
+; Align Y mant right by A shifts.
+; On entry A=count; after CALL: ret, X(6), Y(6)
+; Y: +8 MSB, +9 pad, +10 LSB, +11 mid
 
 .align_y
     or a
     ret Z
-    cp 24
-    jp C,aygo
-    ld hl,0
-    add hl,sp
-    ld de,6
-    add hl,de
-    ld a,(hl)
-    push hl
-    inc hl
-    inc hl
-    or (hl)
-    inc hl
-    or (hl)
-    pop hl
-    push af
-    xor a
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    pop af
-    ret Z
-    dec hl
-    dec hl
-    ld a,1
-    ld (hl),a
-    ret
-
-
-.aygo
     ld b,a
 .aylp
-    ; align_y called via CALL so ret is on stack; X at +2, Y at +8.
-    ; After push bc: Y at +10.
     push bc
-    ld hl,0
-    add hl,sp
-    ld de,10
-    add hl,de
-    ld a,(hl)
-    ld e,a                      ; MSB
-    inc hl
-    inc hl
-    ld a,(hl)
-    ld d,a                      ; LSB
-    inc hl
-    ld a,(hl)
-    ld c,a                      ; mid
-    ld a,d
+    ; after push bc: Y at +10
+    ld de,sp+10
+    ld a,(de)
+    ld l,a                          ; MSB
+    inc de
+    inc de
+    ld a,(de)
+    ld c,a                          ; LSB
+    inc de
+    ld a,(de)
+    ld h,a                          ; mid
+    ld a,c
     and 01h
-    ld b,a
-    ld a,e
+    ld b,a                          ; sticky bit shifted out
+    ld a,l
     or a
     rra
-    ld e,a
-    ld a,c
+    ld l,a
+    ld a,h
     rra
-    ld c,a
-    ld a,d
+    ld h,a
+    ld a,c
     rra
     or b
-    ld d,a                      ; E=MSB D=LSB C=mid after next fix
-    ; Actually E=MSB, D=LSB shifted, C=mid shifted
-    ld a,e                      ; MSB to A
-    ld hl,0
-    add hl,sp
-    push de
-    push bc
-    ld de,10
-    add hl,de
-    pop bc
-    pop de
-    ld (hl),a                   ; MSB
-    inc hl
-    inc hl
-    ld a,d
-    ld (hl),a                   ; LSB
-    inc hl
+    ld c,a
+    ld de,sp+10
+    ld a,l
+    ld (de),a
+    inc de
+    inc de
     ld a,c
-    ld (hl),a                   ; mid
+    ld (de),a
+    inc de
+    ld a,h
+    ld (de),a
     pop bc
     dec b
     jp NZ,aylp
     ret
 
 
+; After CALL into these helpers: ret at +0, X at +2, Y at +8
+; X: +2 MSB, +3 pad, +4 LSB, +5 mid, +6 exp, +7 sign
+; Y: +8 MSB, +9 pad, +10 LSB, +11 mid, +12 exp, +13 sign
+
 .mant_add
+    ld de,sp+4
+    ld a,(de)
+    ld de,sp+10
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    add a,h
+    ld de,sp+4
+    ld (de),a
+    ld de,sp+5
+    ld a,(de)
+    ld de,sp+11
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    adc a,h
+    ld de,sp+5
+    ld (de),a
     ld de,sp+2
     ld a,(de)
     ld de,sp+8
@@ -328,28 +323,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,(de)
     ld h,a
     pop af
-    add a,h
+    adc a,h
     ld de,sp+2
-    ld (de),a
-    ld de,sp+3
-    ld a,(de)
-    ld de,sp+9
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    adc a,h
-    ld de,sp+3
-    ld (de),a
-    ld de,sp+0
-    ld a,(de)
-    ld de,sp+6
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    adc a,h
-    ld de,sp+0
     ld (de),a
     ld a,0
     rla
@@ -357,30 +332,29 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .mant_sub
-    ; compare x vs y MSB first
-    ld de,sp+0
-    ld a,(de)
-    ld de,sp+6
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    cp h
-    jp C,ms_rev
-    jp NZ,ms_do
-    ld de,sp+3
-    ld a,(de)
-    ld de,sp+9
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    cp h
-    jp C,ms_rev
-    jp NZ,ms_do
     ld de,sp+2
     ld a,(de)
     ld de,sp+8
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    cp h
+    jp C,ms_rev
+    jp NZ,ms_do
+    ld de,sp+5
+    ld a,(de)
+    ld de,sp+11
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    cp h
+    jp C,ms_rev
+    jp NZ,ms_do
+    ld de,sp+4
+    ld a,(de)
+    ld de,sp+10
     push af
     ld a,(de)
     ld h,a
@@ -388,6 +362,26 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     cp h
     jp C,ms_rev
 .ms_do
+    ld de,sp+4
+    ld a,(de)
+    ld de,sp+10
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sub h
+    ld de,sp+4
+    ld (de),a
+    ld de,sp+5
+    ld a,(de)
+    ld de,sp+11
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    ld de,sp+5
+    ld (de),a
     ld de,sp+2
     ld a,(de)
     ld de,sp+8
@@ -395,31 +389,31 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,(de)
     ld h,a
     pop af
-    sub h
+    sbc a,h
     ld de,sp+2
-    ld (de),a
-    ld de,sp+3
-    ld a,(de)
-    ld de,sp+9
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sbc a,h
-    ld de,sp+3
-    ld (de),a
-    ld de,sp+0
-    ld a,(de)
-    ld de,sp+6
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sbc a,h
-    ld de,sp+0
     ld (de),a
     ret
 .ms_rev
+    ld de,sp+10
+    ld a,(de)
+    ld de,sp+4
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sub h
+    ld de,sp+4
+    ld (de),a
+    ld de,sp+11
+    ld a,(de)
+    ld de,sp+5
+    push af
+    ld a,(de)
+    ld h,a
+    pop af
+    sbc a,h
+    ld de,sp+5
+    ld (de),a
     ld de,sp+8
     ld a,(de)
     ld de,sp+2
@@ -427,30 +421,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,(de)
     ld h,a
     pop af
-    sub h
+    sbc a,h
     ld de,sp+2
     ld (de),a
-    ld de,sp+9
-    ld a,(de)
-    ld de,sp+3
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sbc a,h
-    ld de,sp+3
-    ld (de),a
-    ld de,sp+6
-    ld a,(de)
-    ld de,sp+0
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sbc a,h
-    ld de,sp+0
-    ld (de),a
-    ld de,sp+5
+    ld de,sp+7
     ld a,(de)
     xor 080h
     ld (de),a
@@ -458,34 +432,34 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .mant_zero
-    ld de,sp+0
+    ld de,sp+2
     ld a,(de)
     ld h,a
-    ld de,sp+2
+    ld de,sp+4
     ld a,(de)
     or h
     ld h,a
-    ld de,sp+3
+    ld de,sp+5
     ld a,(de)
     or h
     ret
 
 
 .mant_shr1
-    ld de,sp+2
+    ld de,sp+4
     ld a,(de)
     and 01h
     ld h,a
-    ld de,sp+0
+    ld de,sp+2
     ld a,(de)
     or a
     rra
     ld (de),a
-    ld de,sp+3
+    ld de,sp+5
     ld a,(de)
     rra
     ld (de),a
-    ld de,sp+2
+    ld de,sp+4
     ld a,(de)
     rra
     or h
@@ -493,22 +467,27 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ret
 
 
+; Load X into B=sign, C=exp, H=0, L=MSB, D=mid, E=LSB
+; On entry SP: ret, X(6), ...
+
 .load_x_regs
-    ld de,sp+5
+    ld de,sp+7
     ld a,(de)
-    ld b,a
-    ld de,sp+4
+    ld b,a                          ; sign
+    ld de,sp+6
     ld a,(de)
-    ld c,a
-    ld de,sp+0
-    ld a,(de)
-    ld l,a
-    ld de,sp+3
-    ld a,(de)
-    ld d,a
+    ld c,a                          ; exp
     ld de,sp+2
     ld a,(de)
+    ld l,a                          ; MSB
+    ld de,sp+5
+    ld a,(de)
+    push af                         ; mid on stack
+    ld de,sp+6                      ; after push: LSB was +4 → +6
+    ld a,(de)
     ld e,a
+    pop af
+    ld d,a
     ld h,0
     ret
 
@@ -528,12 +507,11 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ret
 
 
-
 SECTION bss_fp_math32
 swap_ret: defs 2
-swap_x0: defs 2
-swap_x1: defs 2
-swap_x2: defs 2
-swap_y0: defs 2
-swap_y1: defs 2
-swap_y2: defs 2
+swap_x0:  defs 2
+swap_x1:  defs 2
+swap_x2:  defs 2
+swap_y0:  defs 2
+swap_y1:  defs 2
+swap_y2:  defs 2

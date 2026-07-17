@@ -1,0 +1,82 @@
+    org 0
+    di
+    ld sp,0x8000
+    ; 1/2 = 0.5
+    ld de,0x3f80
+    ld hl,0
+    push de
+    push hl
+    ld de,0x4000
+    ld hl,0
+    call m32_fsdiv_callee
+    ld a,d
+    ld (0x7000),a
+    ld a,e
+    ld (0x7001),a
+    ld a,h
+    ld (0x7002),a
+    ld a,l
+    ld (0x7003),a
+    ; 6/2 = 3
+    ld de,0x40c0
+    ld hl,0
+    push de
+    push hl
+    ld de,0x4000
+    ld hl,0
+    call m32_fsdiv_callee
+    ld a,d
+    ld (0x7004),a
+    ld a,e
+    ld (0x7005),a
+    ld a,h
+    ld (0x7006),a
+    ld a,l
+    ld (0x7007),a
+    ; 1/1 = 1
+    ld de,0x3f80
+    ld hl,0
+    push de
+    push hl
+    ld de,0x3f80
+    ld hl,0
+    call m32_fsdiv_callee
+    ld a,d
+    ld (0x7008),a
+    ld a,e
+    ld (0x7009),a
+    ld a,h
+    ld (0x700A),a
+    ld a,l
+    ld (0x700B),a
+    ; inv(2) = 0.5
+    ld de,0x4000
+    ld hl,0
+    call m32_fsinv_fastcall
+    ld a,d
+    ld (0x700C),a
+    ld a,e
+    ld (0x700D),a
+    ld a,h
+    ld (0x700E),a
+    ld a,l
+    ld (0x700F),a
+    ; 1/3 ≈ 0x3eaaaaab (or close sticky)
+    ld de,0x3f80
+    ld hl,0
+    push de
+    push hl
+    ld de,0x4040
+    ld hl,0
+    call m32_fsdiv_callee
+    ld a,d
+    ld (0x7010),a
+    ld a,e
+    ld (0x7011),a
+    ld a,h
+    ld (0x7012),a
+    ld a,l
+    ld (0x7013),a
+    halt
+    include "../asm/8085/f32_fsdiv.asm"
+    include "../asm/f32_fsconst.asm"

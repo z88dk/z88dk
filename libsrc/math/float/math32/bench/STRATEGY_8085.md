@@ -61,7 +61,13 @@ z88dk-ticks -m8085 bench.bin -x bench.map -start start -end end
 | `asm/8085/f32_fsmul.asm` | `m32_fsmul`, `m32_fsmul_callee` |
 
 
-## Addition (Phase 1C in progress)
+## Addition / div / conv / compare (Phase 1C)
 
-`f32_fsadd.asm` 8085 port is **WIP**: unpack/swap work; align/add/pack still failing golden vectors.
-Do not ship until `bench/test_fsadd.asm` goldens pass.
+| Op | File | Status |
+|----|------|--------|
+| add/sub | `f32_fsadd.asm` | **Goldens pass** (`bench/test_fsadd.asm`) |
+| div/inv | `f32_fsdiv.asm` | **Goldens pass** — 24-bit restoring (not Newton) |
+| conv | `f32_fsconv.asm` | **Goldens pass** |
+| compare | `f32_fscompare.asm` | **Goldens pass** — watch 8085 `rla` not setting Z |
+
+Normalize pack (`normdone0`) was fixed: must place exp in H before sign merge.
