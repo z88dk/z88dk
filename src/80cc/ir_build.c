@@ -395,6 +395,28 @@ static const SYMBOL *deref_bank_fn(const Node *n)
     return ns ? ir_namespace_bank_fn(ns) : NULL;
 }
 
+/* True if a type is volatile-qualified, or (for a pointer type) points to a
+   volatile object. */
+static int type_or_pointee_volatile(const Type *t)
+{
+    if (!t) return 0;
+    if (t->isvolatile) return 1;
+    if (t->ptr && t->ptr->isvolatile) return 1;
+    return 0;
+}
+/* True if an indirect access through deref/index node `n` touches a volatile
+   object: the value type (n->type) carries it, or it lives on the pointer
+   operand's pointee type. Mirrors deref_bank_fn's navigation. Marks
+   op->mem.volatile_ so ir_match/ir_opt won't fuse the access and the lowerer
+   stamps it (copt won't elide a volatile load/store). */
+static int deref_is_volatile(const Node *n)
+{
+    if (!n) return 0;
+    if (type_or_pointee_volatile(n->type)) return 1;
+    if (n->operand && type_or_pointee_volatile(n->operand->type)) return 1;
+    return 0;
+}
+
 /* A __far pointer (KIND_CPTR): every access through it routes via an
    lp_* runtime helper (paging the bank in/out). Detected on the pointer
    node's own type. */
@@ -2841,6 +2863,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     ld->mem.kind  = IR_MEM_VREG;
     ld->mem.base  = ptr_v;
     ld->mem.elem  = elem_k;
+    ld->mem.volatile_ = deref_is_volatile(n->left);
     ld->mem.bank_fn = bf;
     int dst = new_temp(b, elem_w);
     b->f->vregs[dst].width = elem_w;
@@ -2860,6 +2883,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     st->mem.kind  = IR_MEM_VREG;
     st->mem.base  = ptr_v;
     st->mem.elem  = elem_k;   /* NOT ld->mem.elem — `ld` may be realloc-stale */
+    st->mem.volatile_ = deref_is_volatile(n->left);
     st->mem.bank_fn = bf;
     return dst;
 }
@@ -3350,6 +3374,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.elem = (elem_w == 1) ? KIND_CHAR
                          : (elem_w == 2) ? KIND_INT
                          :                 KIND_LONG;
+            ld->mem.volatile_ = deref_is_volatile(n);
             ld->mem.bank_fn = (SYMBOL *)deref_bank_fn(n);  /* `*p++` into a space */
             if (!is_pre) EMIT_BUMP();
             #undef EMIT_BUMP
@@ -5271,6 +5296,7 @@ static int build_assign(Builder *b, Node *n)
         op->mem.elem = (elem_w == 1) ? KIND_CHAR
                      : (elem_w == 2) ? KIND_INT
                      :                 KIND_LONG;
+        op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
     }
@@ -5426,6 +5452,7 @@ static int build_assign(Builder *b, Node *n)
         op->mem.elem = (elem_w == 1) ? KIND_CHAR
                      : (elem_w == 2) ? KIND_INT
                      :                 KIND_LONG;
+        op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
     }

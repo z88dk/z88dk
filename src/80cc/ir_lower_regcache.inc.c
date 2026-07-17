@@ -1,4 +1,18 @@
 /* ir_lower_regcache.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
+
+/* Trailing comment marking a memory access to a volatile object. copt matches
+   whole lines (copt.c: `return *pat == *ins`), so a stamped line never matches a
+   store-then-reload peephole — a volatile load/store must not be optimised away.
+   Empty for non-volatile so ordinary accesses stay copt-matchable. Covers
+   volatile LOCALS (VREG_VOLATILE, slot-homed); volatile-pointee derefs are
+   marked op->mem.volatile_ (handled by ir_match/ir_opt guards + mem_vol_stamp). */
+static const char *vol_stamp(const Func *f, int vreg_id)
+{
+    return (vreg_id >= 0 && vreg_id < f->n_vregs
+            && (f->vregs[vreg_id].flags & IR_VREG_VOLATILE))
+           ? "\t;volatile" : "";
+}
+
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     if (fp_active(f) && !L.cur_frameless) {
@@ -674,7 +688,8 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
             /* Honour the store_hl contract (DE=value, HL=junk after) —
                many sites end with `store_hl; ex de,hl` to restore HL. */
-            emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off);
+            emit(out, "ld\t(%s%+d),hl%s", frame_reg(), ix_off,
+                 vol_stamp(f, vreg_id));
             emit(out, "ex\tde,hl");
             return;
         }
@@ -683,7 +698,7 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
     /* Rabbit/kc160 native sp-relative store: ld (sp+N),hl then the
        contract ex de,hl (DE=value, HL=junk) — mirrors the fp path. */
     if (off >= 0 && off <= sp_rel_max(f)) {
-        emit(out, "ld\t(sp+%d),hl", off);
+        emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));
         emit(out, "ex\tde,hl");
         return;
     }
@@ -710,7 +725,7 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
     emit(out, "ex\tde,hl");        /* DE = value */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\t(hl),e");
+    emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
     emit(out, "inc\thl");
     emit(out, "ld\t(hl),d");
 }
@@ -727,19 +742,6 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
    resident region) at whose entry the home is flushed ONCE — hoisting the
    flush off the per-iteration header path. -1 = not applicable → fall back to
    the per-iter header flush. */
-
-/* Trailing comment marking a memory access to a volatile object. copt matches
-   whole lines (copt.c: `return *pat == *ins`), so a stamped line never matches a
-   store-then-reload peephole — a volatile load/store must not be optimised away.
-   Empty for non-volatile so ordinary accesses stay copt-matchable. Covers
-   volatile LOCALS (VREG_VOLATILE, slot-homed); volatile-pointee derefs are
-   stamped via op->mem.volatile_ (see mem_vol_stamp). */
-static const char *vol_stamp(const Func *f, int vreg_id)
-{
-    return (vreg_id >= 0 && vreg_id < f->n_vregs
-            && (f->vregs[vreg_id].flags & IR_VREG_VOLATILE))
-           ? "\t;volatile" : "";
-}
 
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
    if A already holds the wanted vreg, skip the slot read. */
