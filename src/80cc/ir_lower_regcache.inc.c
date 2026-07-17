@@ -728,6 +728,19 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
    flush off the per-iteration header path. -1 = not applicable → fall back to
    the per-iter header flush. */
 
+/* Trailing comment marking a memory access to a volatile object. copt matches
+   whole lines (copt.c: `return *pat == *ins`), so a stamped line never matches a
+   store-then-reload peephole — a volatile load/store must not be optimised away.
+   Empty for non-volatile so ordinary accesses stay copt-matchable. Covers
+   volatile LOCALS (VREG_VOLATILE, slot-homed); volatile-pointee derefs are
+   stamped via op->mem.volatile_ (see mem_vol_stamp). */
+static const char *vol_stamp(const Func *f, int vreg_id)
+{
+    return (vreg_id >= 0 && vreg_id < f->n_vregs
+            && (f->vregs[vreg_id].flags & IR_VREG_VOLATILE))
+           ? "\t;volatile" : "";
+}
+
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
    if A already holds the wanted vreg, skip the slot read. */
 static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
@@ -786,7 +799,8 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {
-            emit(out, "ld\ta,(%s%+d)", frame_reg(), ix_off);
+            emit(out, "ld\ta,(%s%+d)%s", frame_reg(), ix_off,
+                 vol_stamp(f, vreg_id));
             return;
         }
     }
@@ -799,7 +813,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
        reads it (e.g. `a + *p` promoted to `add hl,de`), corrupting E. */
     pending_spill_resolve();
     emit_byte_slot_addr(out, f, vreg_id);
-    emit(out, "ld\ta,(hl)");
+    emit(out, "ld\ta,(hl)%s", vol_stamp(f, vreg_id));
 }
 
 /* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. */
@@ -843,7 +857,8 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {
-            emit(out, "ld\t(%s%+d),a", frame_reg(), ix_off);
+            emit(out, "ld\t(%s%+d),a%s", frame_reg(), ix_off,
+                 vol_stamp(f, vreg_id));
             return;
         }
     }
@@ -852,7 +867,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
        emit_byte_slot_addr, no E-stash. */
     if (L.cur_hl_addr_off >= 0 && L.cur_hl_addr_spadj == L.cur_sp_adjust) {
         emit_byte_slot_addr(out, f, vreg_id);
-        emit(out, "ld\t(hl),a");
+        emit(out, "ld\t(hl),a%s", vol_stamp(f, vreg_id));
         return;
     }
     /* No address cache: flush any pending spill (while HL still holds it),
@@ -862,7 +877,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
     int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
-    emit(out, "ld\t(hl),a");
+    emit(out, "ld\t(hl),a%s", vol_stamp(f, vreg_id));
     /* HL clobbered with the slot address — drop stale cache claims (a
        caller may have cached the deref base in HL), then advertise HL as
        this slot's address for the next same-slot access. */
