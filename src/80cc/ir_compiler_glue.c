@@ -54,16 +54,18 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
 }
 
 /* Spare index register for a loop-invariant resident — the one opposite the
-   frame pointer. c_framepointer_is_ix: 1=IX frame→spare IY, 0=IY frame→spare
-   IX, -1=sp-mode→IX (both free, pick IX). 808x/gbz80 have no index regs →
-   gate on CPU. */
+   frame pointer. c_framepointer_is_ix: 1=IX frame→spare IY, -1=sp-mode→IX (both
+   free, pick IX). 808x/gbz80 have no index regs → gate on CPU. A platform can
+   remove the spare from play: --reserve-regs-iy (the fp-mode spare) or, in
+   sp-mode, --reserve-regs-ix. */
 int ir_idx2_reg(void)
 {
     if (!c_idx2_invariant) return IR_PR_NONE;
     if (getenv("IR_NO_IDX2")) return IR_PR_NONE;
     if (IS_808x() || IS_GBZ80()) return IR_PR_NONE;
-    if (c_framepointer_is_ix == 1) return IR_PR_IY;   /* frame IX → spare IY */
-    return IR_PR_IX;                                  /* frame IY, or sp-mode → IX */
+    if (c_framepointer_is_ix == 1)                    /* frame IX → spare IY */
+        return c_reserve_iy ? IR_PR_NONE : IR_PR_IY;
+    return c_reserve_ix ? IR_PR_NONE : IR_PR_IX;      /* sp-mode → IX */
 }
 
 /* Second index-register home = IY, available ONLY in true sp-mode (no frame
@@ -77,6 +79,7 @@ int ir_idx3_reg(void)
 {
     if (!c_idx3_residency) return IR_PR_NONE;
     if (getenv("IR_NO_IDX3")) return IR_PR_NONE;
+    if (c_reserve_iy) return IR_PR_NONE;               /* IY reserved by platform */
     if (ir_idx2_reg() != IR_PR_IX) return IR_PR_NONE;  /* need IX as idx2 */
     if (c_framepointer_is_ix != -1) return IR_PR_NONE; /* IY is the frame */
     if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;

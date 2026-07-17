@@ -178,6 +178,20 @@ static void compute_home_region(const Func *f, int home,
 */
 static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 {
+    /* BACKSTOP: an op marked to stage src[1] into BC (so a DE resident in its
+       span survives — see ir_bc_pack / ADR 0003) is meant to be intercepted by
+       gen_add/gen_sub, which emit the `add hl,bc` / `sbc hl,bc` form. If a marked
+       op reaches the generic DE-staging loader instead, that path would clobber
+       the DE resident (silent wrong value), so fail LOUD rather than fall through.
+       Only reachable under IR_LRA_DEPACK (marks are set only there); the
+       default-on LRA (IY reduction) never sets them. */
+    if (op->lra_stage_src1_bc) {
+        ir_lower_loc();
+        fprintf(stderr, "ir_lower: BC-staged op reached the DE-staging loader "
+                "(unhandled lra_stage_src1_bc — gen_add/gen_sub should intercept). "
+                "Aborting rather than emit a DE-clobbering staging load.\n");
+        exit(1);
+    }
     if (op->src[1] < 0) {
         /* Literal RHS — doesn't touch HL. */
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
@@ -245,6 +259,56 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 static void cache_hl(int vreg)
 {
     hl_about_to_change(vreg);
+}
+
+static int  bc_has(int v);
+static void cache_bc(int v);
+static void invalidate_bc_cache(void);
+
+/* LRA Phase 4 (steps 3-4): load operands for a MARKED binop —
+   src[0]→HL, src[1]→BC (NOT DE), leaving DE untouched so a DE-packed resident
+   in this op's span survives. The consumer then emits the `hl,bc` form
+   (`add hl,bc` / `or a; sbc hl,bc`). Sound because ir_bc_pack marks the op only
+   when BC is free across it (no live BC tenant) and src[1] is not the resident.
+   src[0] MAY be the resident (in DE): copy DE→HL (never `ex de,hl`, which would
+   evict it). src[1] is staged via HL as scratch, then src[0] (re)loaded into HL
+   — both DE-clean, and src[0]'s load leaves BC intact. */
+static void load_binop_operands_bc(FILE *out, const Func *f, const Op *op)
+{
+    int s0 = op->src[0], s1 = op->src[1];
+    /* 1. src[0] → HL. If it is the DE resident, copy DE→HL (never `ex de,hl`,
+       which would evict it); otherwise load_to_hl (DE-clean for width-2). */
+    if (s0 >= 0 && de_has(s0)) {
+        cache_hl(s0);                  /* resolve any pending HL spill first */
+        emit(out, "ld\tl,e");
+        emit(out, "ld\th,d");
+    } else {
+        load_to_hl(out, f, s0);
+    }
+    /* 2. src[1] → BC without disturbing HL(src0) or DE(resident). Cheap hits
+       first; else stage via HL under a push/pop so src[0] survives even when it
+       is an unhomed HL-only transient. */
+    if (s1 < 0) {
+        emit(out, "ld\tbc,%lld", (long long)op->imm);
+        invalidate_bc_cache();
+        return;
+    }
+    if (bc_has(s1)) return;
+    if (de_has(s1)) {                  /* not the resident (marking excludes it) */
+        emit(out, "ld\tc,e");
+        emit(out, "ld\tb,d");
+        cache_bc(s1);
+        return;
+    }
+    emit(out, "push\thl");             /* save src[0] */
+    L.cur_sp_adjust += 2;
+    load_to_hl(out, f, s1);            /* HL = src1 (DE-clean; sp-adj tracked) */
+    emit(out, "ld\tc,l");
+    emit(out, "ld\tb,h");
+    cache_bc(s1);
+    emit(out, "pop\thl");              /* HL = src[0] restored */
+    L.cur_sp_adjust -= 2;
+    cache_hl(s0);
 }
 
 /* Sole choke point for an HL clobber/load. When a width-2 spill is pending

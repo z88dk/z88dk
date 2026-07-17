@@ -4,6 +4,9 @@ include ../make.config
 
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
+# --opt-code-speed is an sccz80-only knob; 80cc (and other compilers) reject it.
+OPT_CODE_SPEED := $(if $(filter sccz80,$(COMPILER)),-Cc--opt-code-speed=all)
+
 TARGET_Z80N = test_z80n_rshift.bin test_z80n_lshift.bin
 TARGET_8080 = test_8080_bitfields.bin test_8080_rshift.bin test_8080_lshift.bin test_8080_compare.bin test_8080_compare0.bin test_8080_compare_const.bin test_8080_compare_mconst.bin test_8080_mult.bin test_8080_division.bin test_8080_bitwise.bin
 TARGET_8085 = test_8085_bitfields.bin test_8085_rshift.bin test_8085_lshift.bin test_8085_compare.bin test_8085_compare0.bin test_8085_compare_const.bin test_8085_compare_mconst.bin test_8085_mult.bin test_8085_division.bin test_8085_bitwise.bin
@@ -34,7 +37,7 @@ test_callee.bin: $(SOURCES) callee.c
 	$(runtest)
 
 test_compare.bin: $(SOURCES) compare.c
-	$(call compile, -Cc--opt-code-speed=all,)
+	$(call compile, $(OPT_CODE_SPEED),)
 	$(runtest)
 
 

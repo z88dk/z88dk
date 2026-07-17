@@ -42,7 +42,7 @@ BUILDS=(
   "sdcc default|zcc +test -compiler=sdcc -vn"
   "ez80clang default|zcc +test -compiler=ez80clang -vn"
   "80cc default|zcc +test -compiler=80cc -vn"
-  "80cc -frameiy|zcc +test -compiler=80cc -Cc-frameiy -vn"
+  "80cc -fframe-pointer|zcc +test -compiler=80cc -Cc-fframe-pointer -vn"
   "80cc --opt-disable=cse-synth|zcc +test -compiler=80cc -Cc--opt-disable=cse-synth -vn"
   "80cc --opt-disable=all|zcc +test -compiler=80cc -Cc--opt-disable=all -vn"
 )

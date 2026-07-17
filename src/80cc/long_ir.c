@@ -1,10 +1,9 @@
 /* IR long-arithmetic isolation test.
  *
- * Each `long_*_*` function does ONE long op and returns the result.
- * `main` collects them and asserts every result. Compiled with
- * -Cc--use-ir so each `long_*_*` function exercises the IR's long
- * lowering. main is on legacy (variadic printf, l_longjmp from
- * Assert all bail) but reads the IR-produced longs via cross-call.
+ * Each `long_*_*` function does ONE long op and returns the result,
+ * exercising the IR's long lowering. `main` collects them and asserts
+ * every result; it uses variadic printf + l_longjmp (from Assert) and
+ * reads the IR-produced longs via cross-call.
  *
  * The _Float16 / double tests (test_float16 / test_double) need the
  * float libraries linked — run this suite with `--math32 --math16`
