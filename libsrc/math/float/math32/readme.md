@@ -174,7 +174,7 @@ CPU-specific mantissa multiply and square helpers also live here (`f32_z80_*`, `
 
 ### asm/8085
 
-Reserved for 8085-specific intrinsic implementations (extended opcodes, stack-based locals, no alternate registers). Not populated until the 8085 software IEEE port; the directory layout matches `am9511/asm/8085`.
+8085-specific intrinsic implementations (extended opcodes, stack-based locals, no alternate registers). Not populated until the 8085 software IEEE port; the directory layout matches `am9511/asm/8085`.
 
 ### c
 
@@ -189,6 +189,8 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line as `-lmath32`.
 
 An alias is provided to simplify usage of the library. `--math32` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1`.
+
+For Intel 8085 (`-clib=8085` / `-m8085`), `--math32` links `math32_8085.lib` via `@{ZCC_LIBCPU}`. Higher-level C helpers for 8085 are built with **sccz80 only** (zsdcc is Z80-only).
 
 ## Function Discussion
 
