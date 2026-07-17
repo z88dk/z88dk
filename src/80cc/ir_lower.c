@@ -332,6 +332,64 @@ static void emit_bb_label(FILE *out, int bb_id)
     fprintf(out, "L_f%d_bb_%d:\n", L.func_emit_idx, bb_id);
 }
 
+/* Copy a rendered function from `rout` to `out`, dropping dead BB-label
+   definitions — an `L_fN_bb_M:` line no jump / defc / switch-table operand
+   names. Correct by construction (a label with zero textual references is
+   unreachable by name); also lets copt peepholes match across the former label
+   boundary. Only exact `L_f<d>_bb_<d>:` lines are candidates; other labels
+   (func entry `._name`, `_shl_loop_`, defc aliases) pass through untouched.
+   `max_bb` bounds the reference bitset. */
+static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
+{
+    char line[1024];
+    char *ref = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
+    if (!ref) {                                  /* OOM: copy verbatim */
+        rewind(rout);
+        while (fgets(line, sizeof line, rout)) fputs(line, out);
+        return;
+    }
+    /* Pass 1: mark every BB number that appears as a REFERENCE (any `_bb_N`
+       token that is NOT this line's own leading `L_f..._bb_N:` definition). */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) {
+        for (char *p = strstr(line, "_bb_"); p; p = strstr(p, "_bb_")) {
+            char *q = p + 4;
+            if (*q < '0' || *q > '9') { p = q; continue; }
+            int n = 0;
+            while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+            int own_def = (line[0] == 'L' && *q == ':' && p == strstr(line, "_bb_"));
+            if (!own_def && n <= max_bb) ref[n] = 1;
+            p = q;
+        }
+    }
+    /* Pass 2: emit, dropping `L_f<d>_bb_<n>:` lines whose n is unreferenced, and
+       DEFERRING `defc L_f..._bb_...` alias lines. The defc's are 0-byte symbol
+       definitions emitted inline at the alias BBs' layout slots; moving them out
+       of the instruction stream makes the real (defc-are-nothing) adjacency
+       visible to copt without changing the binary. */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) {
+        if (strncmp(line, "defc L_f", 8) == 0) continue;   /* defer to pass 3 */
+        if (line[0] == 'L') {
+            char *p = strstr(line, "_bb_");
+            if (p) {
+                char *q = p + 4;
+                int has = (*q >= '0' && *q <= '9'), n = 0;
+                while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+                if (has && *q == ':' && (q[1] == '\n' || q[1] == '\0')
+                    && (n > max_bb || !ref[n]))
+                    continue;                    /* drop dead label */
+            }
+        }
+        fputs(line, out);
+    }
+    /* Pass 3: the deferred alias defc's, at the end of the function. */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout))
+        if (strncmp(line, "defc L_f", 8) == 0) fputs(line, out);
+    free(ref);
+}
+
 /* HL value cache. Reset at each BB boundary and at any op that
    clobbers HL the cache can't reason about (calls, branches, shifts
    that loop on HL). When the next op reads rs.hl as src[0] we
@@ -2560,6 +2618,15 @@ int ir_lower_func(FILE *out, Func *f)
        a BB end), then pass 2 renders for real with deferral on, its cross-BB
        defer decision consulting that complete map. */
     int rc;
+    /* Render the function body to a scratch file, then copy to `out` dropping
+       dead BB labels (emit_dropping_dead_bb_labels). IR_NO_LABEL_ELIDE opts out
+       to writing `out` directly. */
+    int elide_labels = !getenv("IR_NO_LABEL_ELIDE");
+    int max_bb = -1;
+    for (int i = 0; i < f->n_bbs; i++)
+        if (f->bbs[i].id > max_bb) max_bb = f->bbs[i].id;
+    FILE *rout = elide_labels ? tmpfile() : NULL;
+    if (!rout) { rout = out; elide_labels = 0; }
     int *bb_hl_out_p1 = NULL;
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
@@ -2571,7 +2638,7 @@ int ir_lower_func(FILE *out, Func *f)
     L.ss_cur_g = -1;
     L.ss_pinned = 0;
     if (!want_lazy) {
-        rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
+        rc = lower_func_render(rout, f, 0, NULL, bb_hl_out, bb_lowered,
                                bb_pending_out, bb_pred_cnt, bb_preds,
                                bb_alias);
     } else {
@@ -2615,7 +2682,7 @@ int ir_lower_func(FILE *out, Func *f)
         if (!scratch) {
             /* Degraded (OOM / no memstream): single deferral-off pass.
                Correct, just forgoes the lazy win. */
-            rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
+            rc = lower_func_render(rout, f, 0, NULL, bb_hl_out, bb_lowered,
                                    bb_pending_out, bb_pred_cnt, bb_preds,
                                    bb_alias);
             free(src_snap);
@@ -2653,7 +2720,7 @@ int ir_lower_func(FILE *out, Func *f)
                 /* Pass 2: skip the dead stores. */
                 L.ss_store_dead = store_dead;
                 L.ss_phase = store_dead ? 2 : 0;
-                rc = lower_func_render(out, f, 1, bb_hl_out_p1, bb_hl_out,
+                rc = lower_func_render(rout, f, 1, bb_hl_out_p1, bb_hl_out,
                                        bb_lowered, bb_pending_out,
                                        bb_pred_cnt, bb_preds, bb_alias);
                 L.ss_phase = 0;
@@ -2670,6 +2737,12 @@ int ir_lower_func(FILE *out, Func *f)
         L.ss_op_store = NULL;
         L.ss_op_reload = NULL;
         L.ss_op_cacheread = NULL;
+    }
+    if (elide_labels) {
+        if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb);
+        else { rewind(rout); char buf[1024];   /* error path: copy verbatim */
+               while (fgets(buf, sizeof buf, rout)) fputs(buf, out); }
+        fclose(rout);
     }
     free(bb_hl_out_p1);
 
