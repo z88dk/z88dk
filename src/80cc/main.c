@@ -16,8 +16,7 @@ extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. 
 
 static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
-static char    c_debug_adb_file = 0;
-static char    c_debug_adb_defc = 0;
+       char    c_debug_adb_defc = 0;
        char    c_debug_entry_points = 0;
 int     c_banked_style = BANKED_STYLE_REGULAR;
 
@@ -26,7 +25,6 @@ static int      gargc; /* global copies of command line args */
 static char   **gargv;
 static int      filenum; /* next argument to be used */
 
-UT_string       *debug_utstr;
 UT_string       *debug2_utstr;
 
 static Type *type_double4 = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
@@ -73,7 +71,6 @@ char *c_home_section = "code_home";
 
 
 static void dumpsymdebug(void);
-static void dumpdebug(void);
 static void dumpfns(void);
 static void dumpvars(void);
 static void parse(void);
@@ -167,8 +164,7 @@ static option  sccz80_opts[] = {
 #endif
     { 0, "W", OPT_FUNCTION, "<type> Enable a class of warnings", NULL,  SetWarning, 0 },
     { 0, "", OPT_HEADER, "Debugging options", NULL, NULL, 0 },
-    { 0, "debug-sect", OPT_BOOL, "Create adb/cdb debug section", &c_debug_adb_file, NULL, 0 },
-    { 0, "debug-defc", OPT_BOOL, "Create adb/cdb debug defc", &c_debug_adb_defc, NULL, 0 },
+    { 0, "debug-defc", OPT_BOOL, "Create sdcc-compatible cdb debug info (defc __CDBINFO__)", &c_debug_adb_defc, NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, NULL, 0 },
     { 0, "intlog", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
@@ -298,10 +294,20 @@ int main(int argc, char** argv)
         c_fp_size = 4;
     }
 
-    if ( c_debug_adb_file || c_debug_adb_defc ) {
+    if ( c_debug_adb_defc ) {
         c_cline_directive = 1;
+        /* cdb stack-local records (,B,1,d) are only meaningful against a stable
+           frame base. sp mode has none (sp moves), so under -debug establish a
+           frame pointer. On CPUs with IX, force a real IX frame: the prologue's
+           `push ix / ld ix,0 / add ix,sp` gives every slot a fixed ix-relative
+           offset. On CPUs without IX (8080/8085/gbz80, forced to sp below),
+           c_debug_entry_points makes the prologue maintain a software frame
+           pointer in the global __debug_framepointer (l_debug_push_frame); the
+           saved 2 bytes are accounted for in the frame layout. Either way the
+           records resolve against the same frame base. */
+        c_debug_entry_points = 1;
         if ( c_framepointer_is_ix == -1 ) {
-            c_debug_entry_points = 1;
+            c_framepointer_is_ix = 1;
         }
     }
 
@@ -324,7 +330,6 @@ int main(int argc, char** argv)
         WriteDefined("CPU_GBZ80", 1);
     }
 
-    utstring_new(debug_utstr);
     utstring_new(debug2_utstr);
 
     litlab = getlabel(); /* Get labels for function lits*/
@@ -348,9 +353,6 @@ int main(int argc, char** argv)
 
     if ( c_debug_adb_defc ) {
         dumpsymdebug();
-    }
-    if ( c_debug_adb_file ) {
-        dumpdebug();
     }
 
     gen_file_footer(); /* follow-up code */
@@ -476,19 +478,6 @@ void info(void)
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
-
-static void dumpdebug(void)
-{
-    const char *debug = utstring_body(debug_utstr);
-    const char *end = NULL;
-
-    gen_switch_section("__ADBDEBUG");
-    while ( ( end = strchr(debug,'\n')) != NULL ) {
-        defmesg();
-        outfmt("%.*s\\n\"\n", end - debug, debug);
-        debug = end+1;        
-    }
-}
 
 static void dumpsymdebug(void)
 {

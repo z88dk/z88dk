@@ -1,3 +1,6 @@
+${NEWLIB_ROOT}l/sccz80/8-gbz80/__debug_framepointer
+${NEWLIB_ROOT}l/sccz80/8-gbz80/l_debug_push_frame
+${NEWLIB_ROOT}l/sccz80/8-gbz80/l_debug_pop_frame
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/int2long_s
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_asl
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_asr

@@ -10,7 +10,7 @@ SUBDIRS += charbench crcbench intbench ptrbench sieve rle \
            hashbench fixedbench histbench lexbench
 
 ifeq ($(COMPILER),80cc)
-SUBDIRS += long_ir
+SUBDIRS += long_ir debuginfo
 endif
 
 

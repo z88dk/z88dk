@@ -126,6 +126,28 @@ int ir_lower_to_output(Func *f)
             fwrite(chunk, 1, n, output);
     }
     fclose(mem);
+
+    /* -debug: emit the cdb stack local/param records now that slot assignment
+       is final. Locals get their real frame-base offset (vreg_spill_slot -
+       frame_size == slot_ix_off); params keep the frame-independent front-end
+       offset (they sit above the frame base, so it stays correct as the frame
+       grows). Register-resident locals with no slot are skipped (best-effort).
+       Parse-time STKLOC emission is deferred here (cdbfile.c). */
+    if (rc == 0 && c_debug_adb_defc && f->fn) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            SYMBOL *s = f->vregs[v].sym;
+            if (!s || s->storage != STKLOC) continue;
+            int off;
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) {
+                off = s->offset.i;
+            } else {
+                int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
+                if (slot < 0) continue;
+                off = slot - f->frame_size;
+            }
+            debug_write_local_at(f->fn->name, s, off);
+        }
+    }
     return rc;
 }
 

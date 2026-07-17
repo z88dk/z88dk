@@ -31,6 +31,9 @@
 extern int c_framepointer_is_ix;
 extern int c_reserve_iy;   /* platform reserves IY — no IY residency */
 extern int c_reserve_ix;   /* platform reserves IX (sp-mode) — no IX residency */
+extern char c_debug_entry_points; /* -debug on a no-IX CPU: maintain a global
+                                     __debug_framepointer via l_debug_push_frame
+                                     so cdb frame offsets are walkable */
 
 /* Per-TU string-literal queue label number. String literal addresses
    emit as `ld hl,i_<litlab>+<offset>` (IR_LD_STR). */
@@ -545,6 +548,22 @@ static int frame_has_saved_fp(const Func *f)
     return 1;
 }
 
+/* True iff entry maintains the software frame pointer for -debug on a CPU with
+   no IX (8080/8085/gbz80). `call l_debug_push_frame` saves the caller's
+   __debug_framepointer on the stack (2 bytes, between the locals and the return
+   address — same slot a saved IX would occupy) and points __debug_framepointer
+   at that save, so the debugger can walk frames and resolve `,B,1,d` cdb records.
+   The body still addresses locals/params via sp; this save is purely for the
+   debugger. Excludes naked (no frame) and interrupt (its push-all frames it). */
+static int frame_has_debug_fp(const Func *f)
+{
+    if (!f) return 0;
+    if (c_framepointer_is_ix != -1) return 0;   /* real IX frame handles it */
+    if (!c_debug_entry_points) return 0;
+    if (f->is_naked || f->is_interrupt) return 0;
+    return 1;
+}
+
 /* True iff entry saved IY for an idx3 (second-index) residency home. IY is
    callee-saved, so a function parking a loop-carried word there push/pop's it
    in the prologue/epilogue; the saved IY sits between the locals and the return
@@ -633,6 +652,7 @@ static int param_caller_off(const Func *f, int vreg_id)
        make room for the saved IX. So caller_off becomes
        frame_size + 4 + args_total instead of frame_size + 2 + args_total. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
+                    + (frame_has_debug_fp(f) ? 2 : 0)   /* l_debug_push_frame save */
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
@@ -1525,6 +1545,13 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            before the return address is read. Touches only IY/SP. */
         emit(out, "pop\tiy");
     }
+    if (frame_has_debug_fp(f)) {
+        /* no-IX -debug teardown: the frame drop above left sp at the saved
+           __debug_framepointer. l_debug_pop_frame restores it and removes the
+           2-byte save, preserving the return value in HL/DEHL (clobbers BC).
+           Sits below any critical l_pop_ei, matching the prologue push order. */
+        emit(out, "call\tl_debug_pop_frame");
+    }
     if (f->is_interrupt) {
         /* Interrupt epilogue: restore the prologue-saved registers (in
            reverse) and return. Return form by critical / vector combination:
@@ -1739,6 +1766,11 @@ static void emit_prologue(FILE *out, Func *f)
     if (frame_has_saved_iy(f))      /* idx3: preserve caller's IY (callee-saved),
                                        below the return address / above the frame */
         emit(out, "push\tiy");
+    if (frame_has_debug_fp(f))      /* no-IX -debug: chain __debug_framepointer.
+                                       Pushes 2 bytes, preserves HL (fastcall arg),
+                                       clobbers BC — must precede the fastcall/sc1
+                                       register stash below and the frame alloc. */
+        emit(out, "call\tl_debug_push_frame");
 
     /* FRAMEPTR setup. Point IX at entry-sp when FP addressing is active;
        must be set BEFORE the frame alloc so it captures sp between locals

@@ -696,6 +696,15 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
     } else {
         int w = width_for_kind(k);
         b->f->vregs[v].width = (int16_t)(w ? w : 2);
+        /* -debug: home every scalar local in memory so a breakpoint can read
+           it. Mark it address-taken (escaped): unlike a plain — or even
+           volatile — never-escaped local (which 80cc legitimately keeps in a
+           register / folds away), an escaped local must stay coherent in its
+           frame slot across every statement, since it could be aliased. Its
+           ,B,1,d cdb record is emitted post-lowering from the real slot
+           (debug_write_local_at). Aggregates already get ADDR_TAKEN above. */
+        if (c_debug_adb_defc)
+            b->f->vregs[v].flags |= IR_VREG_ADDR_TAKEN;
     }
     /* volatile local: force a memory slot so every access is a real
        load/store (no register residency, const-prop or store-forward). */
