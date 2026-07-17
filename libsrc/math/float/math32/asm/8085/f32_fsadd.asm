@@ -58,9 +58,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .fa_start
-    push af                         ; drop flag
-    ld hl,0
-    push hl                         ; GS: guard=0, sticky=0
+    ; Explicit flag word L=0/1 (not push af — F may be 0)
+    ; BC free at entry; DEHL = Y preserved
+    ld b,0
+    ld c,a
+    push bc                         ; drop flag
+    ld bc,0
+    push bc                         ; GS: guard=0, sticky=0
 
     call unpack_push                ; Y from DEHL
     ; +0 Y +6 GS +8 flag +10 ret +12 left

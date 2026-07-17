@@ -71,3 +71,25 @@ z88dk-ticks -m8085 bench.bin -x bench.map -start start -end end
 | compare | `f32_fscompare.asm` | **Goldens pass** — watch 8085 `rla` not setting Z |
 
 Normalize pack (`normdone0`) was fixed: must place exp in H before sign merge.
+
+## Phase 2 — sqr / ldexp / sqrt / poly
+
+| Op | File | Status |
+|----|------|--------|
+| sqr | `f32_fssqr.asm` | **Goldens pass** (RNE, save exp across mul) |
+| ldexp | `f32_fsldexp.asm` | Ported (stack-only) |
+| invsqrt/sqrt | `f32_fssqrt.asm` | **Goldens pass** — Quake + 3×NR via fsmul/fsadd/fsdiv2 |
+| poly | `f32_fspoly.asm` | **Goldens pass** — Horner with fsmul/fsadd |
+
+### Div strategy gate (6.0 / 3.0, z88dk-ticks -m8085)
+
+| Path | Cycles | Result |
+|------|-------:|--------|
+| **Restoring `fsdiv_callee`** | **12021** | 2.0 |
+| `fsinv` (restoring) + `fsmul` | 17310 | 2.0 |
+
+**Decision:** keep **restoring `fsdiv`**. Inv+mul only wins if inv is a true NR-class reciprocal (not another restoring divide). Revisit when/if a Newton `fsinv` is added.
+
+### Callee flag pitfall (mul/add/div)
+
+Do **not** `push af` for the callee drop flag and then read the **F** byte: when F==0 (common after bit-hack / `or a`), left is not dropped and the stack corrupts. Store an explicit word `L=0/1` via `push bc` after `ld b,0; ld c,a`.

@@ -36,7 +36,11 @@ PUBLIC _m32_invf
     ld a,1
 
 .fd_start
-    push af
+    ; Explicit flag word L=0/1 (not push af — F may be 0)
+    ; BC free at entry; DEHL = right float preserved
+    ld b,0
+    ld c,a
+    push bc
     call unpack_push
     ld de,sp+10
     call load_ieee
@@ -47,8 +51,8 @@ PUBLIC _m32_invf
 
 ._m32_invf
 .m32_fsinv_fastcall
-    xor a
-    push af
+    ld bc,0
+    push bc                         ; non-callee flag (clean word)
     call unpack_push
     ld bc,0x007f
     push bc

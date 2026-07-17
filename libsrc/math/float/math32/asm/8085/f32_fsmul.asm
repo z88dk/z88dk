@@ -30,7 +30,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld a,1
 
 .fm_start
-    push af
+    ; Explicit flag word L=0/1 (not push af — F may be 0, breaking callee drop)
+    ; BC free at entry; DEHL = right float preserved
+    ld b,0
+    ld c,a
+    push bc
     call unpack_dehl
     push de
     push hl
