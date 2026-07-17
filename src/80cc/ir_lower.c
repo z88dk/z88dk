@@ -339,26 +339,91 @@ static void emit_bb_label(FILE *out, int bb_id)
    boundary. Only exact `L_f<d>_bb_<d>:` lines are candidates; other labels
    (func entry `._name`, `_shl_loop_`, defc aliases) pass through untouched.
    `max_bb` bounds the reference bitset. */
+/* Rewrite a `\tjp\t[cc,]L_f<idx>_bb_<n>` line's target number in place per thr[]
+   (jump threading). Only touches unconditional/conditional `jp` lines; the label
+   prefix `L_f<idx>_bb_` and any condition/comment are preserved. */
+static void thread_jp_line(FILE *out, const char *line, const int *thr, int max_bb)
+{
+    if (strncmp(line, "\tjp\t", 4) != 0) { fputs(line, out); return; }
+    char *p = strstr(line, "_bb_");
+    if (!p || p[4] < '0' || p[4] > '9') { fputs(line, out); return; }
+    int n = 0; const char *q = p + 4;
+    while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+    if (n > max_bb || thr[n] < 0 || thr[n] == n) { fputs(line, out); return; }
+    fwrite(line, 1, (size_t)(p + 4 - line), out);   /* up to and incl `_bb_` */
+    fprintf(out, "%d", thr[n]);                      /* threaded target */
+    fputs(q, out);                                   /* rest (`:`... no — operand tail/comment) */
+}
+
 static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
 {
     char line[1024];
     char *ref = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
-    if (!ref) {                                  /* OOM: copy verbatim */
+    int *thr = (max_bb >= 0) ? malloc(((size_t)max_bb + 1) * sizeof(int)) : NULL;
+    if (!ref || !thr) {                          /* OOM: copy verbatim */
+        free(ref); free(thr);
         rewind(rout);
         while (fgets(line, sizeof line, rout)) fputs(line, out);
         return;
     }
-    /* Pass 1: mark every BB number that appears as a REFERENCE (any `_bb_N`
-       token that is NOT this line's own leading `L_f..._bb_N:` definition). */
+    for (int i = 0; i <= max_bb; i++) thr[i] = -1;
+    /* Pass 0: jump-threading map. A run of one or more bare labels
+       `L_f..._bb_<n>:` whose first following instruction is an UNCONDITIONAL
+       `jp L_f..._bb_<m>` (no `,`) are jp-only trampolines: thread every n->m.
+       Operand rewrite only — the trampoline body stays (its fall-through
+       predecessors still need it), so this is sound even when a label is reached
+       by fall-through (unlike a defc alias). No-op directive/blank/comment lines
+       between the labels and the `jp` are skipped (C_LINE markers etc.). */
+    rewind(rout);
+    int pend[64], npend = 0;
+    while (fgets(line, sizeof line, rout)) {
+        if (strncmp(line, "\tC_LINE", 7) == 0 || line[0] == '\n'
+            || line[0] == '\r' || line[0] == ';')
+            continue;
+        if (line[0] == 'L') {                     /* a bb label def? keep collecting */
+            char *p = strstr(line, "_bb_");
+            if (p && p[4] >= '0' && p[4] <= '9') {
+                int n = 0; char *q = p + 4;
+                while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+                if (*q == ':' && (q[1] == '\n' || q[1] == '\0') && n <= max_bb
+                    && npend < 64)
+                    pend[npend++] = n;
+            }
+            continue;
+        }
+        /* first real instruction after the label run */
+        if (npend > 0 && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ',')) {
+            char *p = strstr(line, "_bb_");
+            if (p && p[4] >= '0' && p[4] <= '9') {
+                int m = 0; char *q = p + 4;
+                while (*q >= '0' && *q <= '9') m = m * 10 + (*q++ - '0');
+                for (int k = 0; k < npend; k++) thr[pend[k]] = m;
+            }
+        }
+        npend = 0;
+    }
+    for (int i = 0; i <= max_bb; i++) {           /* resolve transitively */
+        int t = thr[i], hops = 0;
+        while (t >= 0 && t <= max_bb && thr[t] >= 0 && thr[t] != t
+               && hops <= max_bb) { t = thr[t]; hops++; }
+        if (hops > max_bb) thr[i] = -1;           /* cycle → don't thread */
+        else if (t >= 0) thr[i] = t;
+    }
+    /* Pass 1: mark every BB number that appears as a REFERENCE — using the
+       THREADED target for jp operands, since pass 2 rewrites them. */
     rewind(rout);
     while (fgets(line, sizeof line, rout)) {
+        int is_jp = (strncmp(line, "\tjp\t", 4) == 0);
         for (char *p = strstr(line, "_bb_"); p; p = strstr(p, "_bb_")) {
             char *q = p + 4;
             if (*q < '0' || *q > '9') { p = q; continue; }
             int n = 0;
             while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
             int own_def = (line[0] == 'L' && *q == ':' && p == strstr(line, "_bb_"));
-            if (!own_def && n <= max_bb) ref[n] = 1;
+            if (!own_def && n <= max_bb) {
+                int tgt = (is_jp && thr[n] >= 0) ? thr[n] : n;
+                if (tgt <= max_bb) ref[tgt] = 1;
+            }
             p = q;
         }
     }
@@ -381,13 +446,14 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
                     continue;                    /* drop dead label */
             }
         }
-        fputs(line, out);
+        thread_jp_line(out, line, thr, max_bb);  /* rewrites jp targets; else fputs */
     }
     /* Pass 3: the deferred alias defc's, at the end of the function. */
     rewind(rout);
     while (fgets(line, sizeof line, rout))
         if (strncmp(line, "defc L_f", 8) == 0) fputs(line, out);
     free(ref);
+    free(thr);
 }
 
 /* HL value cache. Reset at each BB boundary and at any op that
