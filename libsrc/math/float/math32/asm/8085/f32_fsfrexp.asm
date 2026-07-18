@@ -5,8 +5,16 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-; 8085 frexpf — fraction and exponent (mirror Z80 f32_fsfrexp).
-; Never park return addresses in AF (8080/8085 F is not a full byte latch).
+; 8085 frexpf — fraction and exponent (core ABI matches am9511 / Z80).
+;
+; Core m32_fsfrexp_callee:
+;   enter : stack = float *pw2, float x, ret
+;         : SP = ret, x.HL, x.DE, ptr
+;
+; _m32_frexpf (sccz80 higher C / public bridge):
+;   enter : SP = ret, ptr, x.HL, x.DE  — reverse then core
+;
+; Uses ld de,sp+d and ld hl,(de). Never parks ret in AF.
 ;
 
 SECTION code_clib
@@ -16,66 +24,63 @@ PUBLIC m32_fsfrexp_callee
 PUBLIC _m32_frexpf
 
 
-; float frexpf (float x, int *pw2);
-; enter : stack = float *pw2, float x, ret
-; exit  : DEHL = fraction in [0.5, 1); *pw2 = frexp exponent
+; sccz80 left-to-right entry → core order (same as cam32_sccz80_frexp_callee)
 ._m32_frexpf
+    pop hl                          ; ret
+    pop bc                          ; ptr
+    pop de                          ; x.HL
+    ex (sp),hl                      ; HL = x.DE; (sp) = ret
+    push bc                         ; ptr
+    push hl                         ; x.DE
+    push de                         ; x.HL : SP = x.HL, x.DE, ptr, ret
+    call m32_fsfrexp_callee
+    ret
+
+
+; float frexpf (float x, int *pw2) — core (SDCC / am9511 order)
+; enter : SP = ret, x.HL, x.DE, ptr
+; exit  : DEHL = fraction in [0.5, 1); *pw2 = frexp exponent
 .m32_fsfrexp_callee
-    ; Entry SP: ret, x.HL, x.DE, pw2
-    pop bc                          ; BC = ret
-    pop hl                          ; x.HL
-    pop de                          ; x.DE  → DEHL = x
-    ; SP: pw2
-    push bc                         ; SP: ret, pw2
-    push de
-    push hl                         ; SP: x.HL, x.DE, ret, pw2
-    ld hl,0
-    add hl,sp
-    ld de,6
-    add hl,de
-    ld c,(hl)
-    inc hl
-    ld b,(hl)                       ; BC = pw2
-    pop hl
-    pop de                          ; DEHL = x
-    ; SP: ret, pw2
-    push de
-    push hl                         ; SP: x.HL, x.DE, ret, pw2
-    pop hl
-    pop de                          ; DEHL = x
-    pop hl                          ; HL = ret
-    ; SP: pw2
-    inc sp
-    inc sp                          ; drop leftover pw2
-    push hl                         ; SP: ret
-    ; BC = pw2, DEHL = x
+    ; SP+0 ret, SP+2 x.HL, SP+4 x.DE, SP+6 ptr
+    ld de,sp+4
+    ld hl,(de)                      ; HL = x.DE
 
-    rl de                           ; exp in D, sign → CF
-    ld a,e
-    rra
-    ld e,a                          ; sign in E[7]
-
-    ld a,d
-    ld d,0
-    and a
+    add hl,hl                       ; exp → H, mant bits → L, sign → C
+    ld a,h
+    or a
     jp Z,frexp_zero
-    ld d,07eh
-    sub d
+    ld h,07eh                       ; bias-1 → fraction in [0.5, 1)
+    sub h                           ; A = unbiased frexp exponent
 
 .frexp_zero
+    ld de,sp+6                      ; address of ptr on stack
+    ex de,hl                        ; DE = work; HL → ptr slot
+    ld c,(hl)
+    inc hl
+    ld b,(hl)                       ; BC = *pw2 pointer
+    ex de,hl                        ; HL = work again
+
     ld (bc),a
     inc bc
     rlca
     sbc a,a
-    ld (bc),a
+    ld (bc),a                       ; *pw2 = sign-extended exp
 
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
+    ld de,sp+5                      ; original D (sign + exp of x)
+    ld a,(de)
+    rla                             ; sign → C
+    ld a,h                          ; 0 or 0x7e
     rra
     ld d,a
-    ld a,e
+    ld a,l
     rra
-    ld e,a
+    ld e,a                          ; DE = fraction high word
+
+    pop bc                          ; ret
+    pop hl                          ; HL = x.HL (mant LSW)
+    inc sp
+    inc sp                          ; drop x.DE
+    inc sp
+    inc sp                          ; drop ptr
+    push bc                         ; ret
     ret
