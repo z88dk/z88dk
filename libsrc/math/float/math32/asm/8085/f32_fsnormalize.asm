@@ -295,14 +295,16 @@ PUBLIC m32_fsnormalize
     ld a,d
     rla
     ld d,a
-    jp M,S16L4                  ; complete at 4
+    and 080h                    ; 8085 rla does not set S — test bit7
+    jp NZ,S16L4                 ; complete at 4
     ld a,e
     add a,a
     ld e,a
     ld a,d
     rla
     ld d,a
-    jp M,S16L5                  ; complete at 5
+    and 080h
+    jp NZ,S16L5                 ; complete at 5
     rl de                       ; 6 shifts, case of 7 already taken care of must be good
     ld l,d
     ld d,e
@@ -344,15 +346,17 @@ PUBLIC m32_fsnormalize
     ld a,d
     rla
     ld d,a
-    jr C,S16H1                   ; if zero
-    jp M,S16H2                   ; if 1 shift
+    jr C,S16H1                   ; overshift
+    and 080h                     ; 8085 rla does not set S
+    jp NZ,S16H2                  ; if 1 shift
     ld a,e
     add a,a
     ld e,a
     ld a,d
     rla
     ld d,a
-    jp M,S16H3                   ; if 2 ok
+    and 080h
+    jp NZ,S16H3                  ; if 2 ok
 ; must be 3
     rl de
     ld l,d

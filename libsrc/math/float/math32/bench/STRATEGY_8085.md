@@ -21,13 +21,34 @@ Golden: `HLDE = (x*y) >> 16` for 24-bit unsigned x,y (top 32 of 48-bit product).
 |----|--------|--------------------------:|-------|
 | **B1** | 4× **16×16** (Runer112) + mid carries | **4074** | **Shipped** as `f32_8085_mulu_32h_32x32.asm` |
 
-**Decision:** **B1** for `m32_mulu_32h_32x32`. Required for poly accuracy (`m32_fsmul24x32` / `m32_fsmul32x32` later).
+**Decision:** **B1** for `m32_mulu_32h_32x32`. Used by expanded float mul.
 
 Golden: `DEHL = (x*y) >> 32`.
 
 ABI: enter `DEHL=x`; stack `ret, y.HL=y0, y.DE=y1` (caller `push de; push hl` of y); exit high 32, y removed.
 
 **Note:** Runer112 `mulu_32_16x16` bit0 path must use multiplicand bit0 in CF (not product overflow) — see Z80 original `rr e` / `ld e,a` sequence. 8085 emulates without `rr e` / `rl b`.
+
+## Expanded mantissa mul (NR / accurate poly path) — **shipped**
+
+| Symbol | File | Status |
+|--------|------|--------|
+| `m32_fsmul32x32` | `asm/8085/f32_fsmul32.asm` | **PASS** 3.0×2.0 → 6.0 expanded |
+| `m32_fsmul24x32` | same | **PASS** IEEE 3.0 × exp 2.0 → 6.0 |
+| `m32_fsadd32x32` / `24x32` | `asm/8085/f32_fsadd32.asm` | **PASS** 1+2, 2+2, 3+(−1), 1+(−1) |
+| `m32_fsnormalize32` | `asm/8085/f32_fsnormalize32.asm` | **PASS** wide probe `tadd32c` |
+| `m32_fsnormalize` (24-bit) | `asm/8085/f32_fsnormalize.asm` | **PASS** wide probe `tnorm24c`; fix: no `jp M` after `rla` |
+
+Unpacked expanded: B=exp, C[7]=sign, DEHL=32-bit mant.  
+24-bit unpack: H=0, mant L:D:E, B=sign, C=exp → IEEE DEHL.
+
+Wide probes (bench, unstaged):
+```bash
+zcc +test -vn -clib=8085 -compiler=sccz80 -D__MATH_MATH32 -fp-mode=ieee --math32 \
+  tnorm24c.c tnorm24c_a.asm -o tnorm24c.bin && z88dk-ticks -m8085 tnorm24c.bin
+zcc +test -vn -clib=8085 -compiler=sccz80 -D__MATH_MATH32 -fp-mode=ieee --math32 \
+  tadd32c.c tadd32c_a.asm -o tadd32c.bin && z88dk-ticks -m8085 tadd32c.bin
+```
 
 ## Full `m32_fsmul_callee` (pack + mul + unpack)
 

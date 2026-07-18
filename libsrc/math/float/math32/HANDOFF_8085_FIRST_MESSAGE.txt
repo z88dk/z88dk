@@ -1,7 +1,7 @@
-Continue math32 8085 in /home/phillip/Z80/z88dk on branch math32-8085. Read libsrc/math/float/math32/HANDOFF_8085.md end-to-end.
+Continue math32 8085 in /home/phillip/Z80/z88dk on branch math32-8085. Read libsrc/math/float/math32/HANDOFF_8085.md end-to-end. Skills: /home/phillip/Z80/8085-skills (opcode-reference, extended-usage).
 
-Status: Phase 1E suite green (test_math32_8085 16/16, ~1.2M ticks). log/exp/pow fixed and verified (log(4)~1.386294, exp(1)~2.718282, general pow via exp(log*y) works). Uncommitted: frexp/ldexp sccz80 ABI + bridge pass-through on Intel.
+Status: Phase 1E suite green (16/16). log/exp/pow OK. Expanded path staged: fsmul*x32, fsadd*x32, fsnormalize32 (probes PASS).
 
-Rules: f32_ prefix + feilipu/MPL on new 8085 only; stack-only no BSS; never AF for data/returns; never clobber mant LSW (HL) with ret; sccz80 only for higher C (make -C c 8085); do not touch Digi headers on Z80. Leave bench/t* and ext/regex unstaged.
+Rules: f32_ prefix + feilipu/MPL on new 8085 only; stack-only no BSS; never AF for data/returns; never clobber mant LSW (HL) with ret; overlapping stack copy = high→low; sccz80 only for higher C (make -C c 8085); do not touch Digi headers on Z80. Leave bench/t* and ext/regex unstaged.
 
-Next: commit frexp/ldexp + sccz80 bridge fixes if appropriate. Verify with: make -C test/suites/math test_math32_8085.bin
+Next: commit expanded mul+add+norm; then NR m32_fsinv/fsdiv (mirror Z80 f32_fsdiv.asm). Verify: make -C test/suites/math test_math32_8085.bin
