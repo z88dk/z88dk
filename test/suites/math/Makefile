@@ -103,9 +103,8 @@ test_math32_kc160.bin: $(FPSOURCES)
 	$(call compile_kc160, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_kc160)
 	$(runtest_kc160)
 
-# Requires complete 8085 math32 cores (add/sub/div/conv/sqrt). Not in 'all' until then.
 test_math32_8085.bin: $(FPSOURCES)
-	$(call compile_8085, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-8085\\\"\"", --math32)
+	$(call compile_8085, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-8085\\\"\"", -lmath32_8085)
 	$(runtest_8085)
 
 test_math48_rc2014_CODE.bin: $(FPSOURCES)
