@@ -21,73 +21,70 @@ SECTION code_fp_math32
 
 PUBLIC m32_fsnormalize
 
-; enter here with af' carry clear for float functions m32_float32, m32_float32u
+; Mantissa LDE (L = high); normalized when L bit7 (hidden) set.
 .m32_fsnormalize
+    ; C1: already normalized (0) or single left shift (1)
+    ld a,l
+    and 080h
+    jp NZ,normdone0_c
+    ld a,l
+    and 040h
+    jp Z,norm_tree
+    rl de
+    ld a,l
+    rla
+    ld l,a
+    ld a,-1
+    jp normdone
+
+.normdone0_c
+    ld a,c
+    jp normdone0
+
+;-----------------------------------------------------------------------
+; C2 tree: nibble dispatch; shared restore/promote tails.
+; After C1, S24H only needs 2 or 3 shifts (0/1 handled above).
+;-----------------------------------------------------------------------
+.norm_tree
     xor a
     or a,l
     jr Z,fa8a
     and 0f0h
-    jr Z,S24L                   ; shift 24 bits, most significant in low nibble   
-    jr S24H                     ; shift 24 bits in high
+    jr Z,S24L
+    jr S24H
 .fa8a
     or a,d
     jr Z,fa8b
     and 0f0h
-    jp Z,S16L                   ; shift 16 bits, most significant in low nibble
-    jp S16H                     ; shift 16 bits in high
+    jp Z,S16L
+    jp S16H
 .fa8b
     or a,e
-    jp Z,normzero               ;  all zeros
+    jp Z,normzero
     and 0f0h
-    jp Z,S8L                    ; shift 8 bits, most significant in low nibble 
-    jp S8H                      ; shift 8 bits in high
+    jp Z,S8L
+    jp S8H
 
-.S24H                           ; shift 24 bits 0 to 3 left, count in c
+;-----------------------------------------------------------------------
+; L high nibble live, bits 7–6 clear → 2 or 3 shifts
+.S24H
     rl de
     ld a,l
     rla
     ld l,a
-    jr C,S24H1
     rl de
     ld a,l
     rla
     ld l,a
-    jr C,S24H2
     rl de
     ld a,l
     rla
     ld l,a
-    jr C,S24H3
-    ld a,-3                     ; count
-    jr normdone                ; from normalize
-
-.S24H1
-    ld a,l
-    rra
-    ld l,a
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,c                      ; zero adjust
-    jr 	normdone0
-
-.S24H2
-    ld a,l
-    rra
-    ld l,a
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,-1
+    jr C,S24H_u2                ; 3rd shift overshot → total 2
+    ld a,-3
     jr normdone
 
-.S24H3
+.S24H_u2
     ld a,l
     rra
     ld l,a
@@ -100,7 +97,9 @@ PUBLIC m32_fsnormalize
     ld a,-2
     jr normdone
 
-.S24L                           ; shift 24 bits 4-7 left, count in C
+;-----------------------------------------------------------------------
+; L low nibble only → 4–7 shifts
+.S24L
     rl de
     ld a,l
     rla
@@ -115,23 +114,21 @@ PUBLIC m32_fsnormalize
     ld l,a
     ld a,0f0h
     and a,l
-    jp Z,S24L4more               ; if still no bits in high nibble, total of 7 shifts
+    jp Z,S24L4more
     rl de
     ld a,l
     rla
     ld l,a
-; 0, 1 or 2 shifts possible here
     rl de
     ld a,l
     rla
     ld l,a
-    jr C,S24Lover1
+    jr C,S24L_u4
     rl de
     ld a,l
     rla
     ld l,a
-    jr C,S24Lover2
-; 6 shift case
+    jr C,S24L_u5
     ld a,-6
     jr normdone
 
@@ -155,7 +152,7 @@ PUBLIC m32_fsnormalize
     ld a,-7
     jr normdone
 
-.S24Lover1                      ; total of 4 shifts
+.S24L_u4
     ld a,l
     rra
     ld l,a
@@ -168,7 +165,7 @@ PUBLIC m32_fsnormalize
     ld a,-4
     jr normdone
 
-.S24Lover2                      ; total of 5 shifts
+.S24L_u5
     ld a,l
     rra
     ld l,a
@@ -178,41 +175,49 @@ PUBLIC m32_fsnormalize
     ld a,e
     rra
     ld e,a
-    ld a,-5                     ; this is the very worst case
-                                ; drop through to .normdone
+    ld a,-5
+    ; fall through
 
-; enter here to continue after normalize
-; this path only on subtraction
-; a has left shift count, lde has mantissa, c has exponent before shift
-; b has original sign of larger number
-;
+; A = left-shift count (negative); LDE mant; C exp; B sign
 .normdone
-    add a,c                     ; exponent of result
-    jr NC,normzero              ; if underflow return zero
-.normdone0                      ; case of zero shift; A = exponent
-    ld h,a                      ; save exponent
-    ld a,l
-    rla                         ; eject hidden mantissa bit → C
-    ld l,a
-    ld a,b
-    rla                         ; sign → C
-    ld a,h                      ; exponent
-    rra                         ; sign into A[7], exp[0] → C
+    add a,c
+    jr NC,normzero
+.normdone0
     ld h,a
     ld a,l
-    rra                         ; exp[0] into L[7]
+    rla
     ld l,a
-    ex de,hl                    ; return DEHL IEEE
+    ld a,b
+    rla
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ex de,hl
     ret
 
-.normzero                       ; return zero
+.normzero
     ld hl,0
     ld de,hl
     ret
 
-; all bits in lower 4 bits of e (bits 0-3 of mantissa)
-; shift 8 bits 4-7 bits left
-; e, l, d=zero
+; Promote DE → LDE; A = shift adjust
+.prom_de
+    ld l,d
+    ld d,e
+    ld e,0
+    jp normdone
+
+; Promote E → L (D is zero); A = shift adjust
+.prom_e
+    ld l,e
+    ld e,d
+    jp normdone
+
+;-----------------------------------------------------------------------
+; Bits only in E low nibble → 20–23 shifts
 .S8L
     ld a,e
     add a,a
@@ -225,41 +230,34 @@ PUBLIC m32_fsnormalize
     ld e,a
     ld a,0f0h
     and a,e
-    jp Z,S8L4more               ; if total is 7
+    jp Z,S8L4more
     ld a,e
     add a,a
     ld e,a
     ld a,e
     add a,a
     ld e,a
-    jr C,S8Lover1               ; if overshift
+    jr C,S8L_u4
     ld a,e
     add a,a
     ld e,a
-    jr C,S8Lover2
-; total of 6, case 7 already handled
-    ld l,e
-    ld e,d                      ; zero
+    jr C,S8L_u5
     ld a,-22
-    jr normdone
+    jr prom_e
 
-.S8Lover1                       ; total of 4
+.S8L_u4
     ld a,e
     rra
     ld e,a
-    ld l,e
-    ld e,d                      ; zero
     ld a,-20
-    jr normdone
+    jr prom_e
 
-.S8Lover2                       ; total of 5
+.S8L_u5
     ld a,e
     rra
     ld e,a
-    ld l,e
-    ld e,d                      ; zero
     ld a,-21
-    jr normdone
+    jr prom_e
 
 .S8L4more
     ld a,e
@@ -274,28 +272,18 @@ PUBLIC m32_fsnormalize
     ld a,e
     add a,a
     ld e,a
-    ld l,e
-    ld e,d                      ; zero
     ld a,-23
-    jr normdone
+    jr prom_e
 
-; shift 16 bit fraction by 4-7
-; l is zero, 16 bits number in de
+;-----------------------------------------------------------------------
+; L=0; DE high nibble empty → 12–15 shifts
 .S16L
     rl de
     rl de
-    rl de                       ; 3 shifts
+    rl de
     ld a,0f0h
     and a,d
-    jp Z,S16L4more              ; if still not bits n upper after 3
-    ld a,e
-    add a,a
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
-    and 080h                    ; 8085 rla does not set S — test bit7
-    jp NZ,S16L4                 ; complete at 4
+    jp Z,S16L4more
     ld a,e
     add a,a
     ld e,a
@@ -303,41 +291,37 @@ PUBLIC m32_fsnormalize
     rla
     ld d,a
     and 080h
-    jp NZ,S16L5                 ; complete at 5
-    rl de                       ; 6 shifts, case of 7 already taken care of must be good
-    ld l,d
-    ld d,e
-    ld e,0
+    jp NZ,S16L4
+    ld a,e
+    add a,a
+    ld e,a
+    ld a,d
+    rla
+    ld d,a
+    and 080h
+    jp NZ,S16L5
+    rl de
     ld a,-14
-    jp normdone
+    jp prom_de
 
 .S16L4
-    ld l,d
-    ld d,e
-    ld e,0
     ld a,-12
-    jp normdone
+    jp prom_de
 
-.S16L5                          ; for total of 5 shifts left
-    ld l,d
-    ld d,e
-    ld e,0
+.S16L5
     ld a,-13
-    jp normdone
+    jp prom_de
 
 .S16L4more
     rl de
     rl de
     rl de
     rl de
-    ld l,d
-    ld d,e
-    ld e,0
     ld a,-15
-    jp normdone
+    jp prom_de
 
-; shift 0-3, l is zero
-; 16 bits in de
+;-----------------------------------------------------------------------
+; L=0; DE high nibble live → 8–11 shifts
 .S16H
     ld a,e
     add a,a
@@ -345,9 +329,9 @@ PUBLIC m32_fsnormalize
     ld a,d
     rla
     ld d,a
-    jr C,S16H1                   ; overshift
-    and 080h                     ; 8085 rla does not set S
-    jp NZ,S16H2                  ; if 1 shift
+    jr C,S16H_u0
+    and 080h
+    jp NZ,S16H1
     ld a,e
     add a,a
     ld e,a
@@ -355,87 +339,64 @@ PUBLIC m32_fsnormalize
     rla
     ld d,a
     and 080h
-    jp NZ,S16H3                  ; if 2 ok
-; must be 3
+    jp NZ,S16H2
     rl de
-    ld l,d
-    ld d,e
-    ld e,0
     ld a,-11
-    jp normdone
+    jp prom_de
 
-.S16H1                          ; overshift
+.S16H_u0
     ld a,d
     rra
     ld d,a
     ld a,e
     rra
     ld e,a
-    ld l,d
-    ld d,e
-    ld e,0
     ld a,-8
-    jp normdone
+    jp prom_de
 
-.S16H2                          ; one shift
-    ld l,d
-    ld d,e
-    ld e,0
+.S16H1
     ld a,-9
-    jp normdone
+    jp prom_de
 
-.S16H3
-    ld l,d
-    ld d,e
-    ld e,0
+.S16H2
     ld a,-10
-    jp normdone
+    jp prom_de
 
-; shift 8 left 0-3
-; number in e, l, d==zero
+;-----------------------------------------------------------------------
+; Bits only in E high nibble → 16–19 shifts
 .S8H
     ld a,e
     add a,a
     ld e,a
-    jr C,S8H1                   ; jump if bit found in data
+    jr C,S8H_u0
+    ld a,e
+    add a,a
+    ld e,a
+    jr C,S8H1
     ld a,e
     add a,a
     ld e,a
     jr C,S8H2
-    ld a,e
-    add a,a
-    ld e,a
-    jr C,S8H3
-; 3 good shifts, number in a shifted left 3 ok
-    ld l,e
-    ld e,d                      ; zero
     ld a,-19
-    jp normdone
+    jr prom_e
+
+.S8H_u0
+    ld a,e
+    rra
+    ld e,a
+    ld a,-16
+    jr prom_e
 
 .S8H1
     ld a,e
     rra
     ld e,a
-    ld l,e
-    ld e,d
-    ld a,-16                    ; zero shifts
-    jp normdone
+    ld a,-17
+    jr prom_e
 
 .S8H2
     ld a,e
     rra
     ld e,a
-    ld l,e
-    ld e,d
-    ld a,-17                    ; one shift
-    jp normdone
-
-.S8H3
-    ld a,e
-    rra
-    ld e,a
-    ld l,e
-    ld e,d
     ld a,-18
-    jp normdone                ; worst case S8H
-
+    jr prom_e

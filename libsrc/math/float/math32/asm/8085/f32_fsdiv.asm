@@ -11,11 +11,12 @@
 ; R = N/D = N * 1/D
 ; D' := D / 2^(e+1)   ∈ [0.5, 1)   (stored as −D' IEEE for NR)
 ; X  := 140/33 + (−64/11 + 256/99 × D') × D'
-; X  := X + X × (1 − D' × X)   (×3)
+; X  := X + X × (1 − D' × X)   (×2; seed + residual pack)
 ; 1/D packed: exp = X.exp − oexp + 126 + feilipu residual round
 ;
 ; One reserved −D' under the frame; each NR step pushes a working copy
-; (same discipline as invsqrt — avoids consume-from-under-ret bugs).
+; (same discipline as invsqrt). B3: expand −D' + push expanded 1.0,
+; then mul32/add32 only (no fsmul24x32/fsadd24x32 frame rebuild).
 ;
 
 SECTION code_clib
@@ -111,8 +112,7 @@ PUBLIC _m32_invf
     pop af
     pop af                          ; drop spare; SP: −D' es
 
-    ; ---- NR ×3 ----
-    call nr_step
+    ; ---- NR ×2 (B1 count; B3 fused step) ----
     call nr_step
     call nr_step
     ; SP: −D' es ; BCDEHL = X
@@ -185,8 +185,12 @@ PUBLIC _m32_invf
 
 
 ;-----------------------------------------------------------------------
-; NR step. IN: BC DEHL=X; SP: ret, −D'_reserved(4), …
-; OUT: BC DEHL=X; reserved −D' NOT consumed (copy pushed for mul24)
+; B3 fused NR step. IN: BC DEHL=X; SP: ret, −D' IEEE(4), …
+; OUT: BC DEHL=X; reserved −D' NOT consumed
+;
+; Expand −D' and push expanded 1.0, then only mul32/add32.
+; Avoids fsmul24x32 / fsadd24x32 frame rebuild.
+; Layout after setup: −D'ex | 1.0ex | Xm | Xk | ret | −D'res
 ;-----------------------------------------------------------------------
 .nr_step
     push bc
@@ -195,22 +199,33 @@ PUBLIC _m32_invf
     push bc
     push de
     push hl                         ; X for mul32
-    ld de,03f80h
+
+    ; expanded 1.0: B=0x7F C=0 DEHL=0x80000000
+    ld b,07fh
+    ld c,0
+    ld de,08000h
     ld hl,0
+    push bc
     push de
-    push hl                         ; 1.0 IEEE
-    ; reserved −D' at SP+18 (1.0_4 + X6 + X6 + ret_2)
-    ; copy with push de; push hl order
+    push hl                         ; 1.0ex
+
+    ; reserved −D' IEEE @ SP+20 (1.0_6 + Xm_6 + Xk_6 + ret_2)
     ld de,sp+20
-    ld hl,(de)                      ; DE word
+    ld hl,(de)                      ; −D'.HL
     push hl
-    ld de,sp+20
-    ld hl,(de)                      ; HL word
-    push hl                         ; −D' copy
-    ld de,sp+8
+    ld de,sp+24
+    ld hl,(de)
+    ex de,hl
+    pop hl                          ; DEHL = −D' IEEE
+    call unpack                     ; BCDEHL = expanded −D'
+    push bc
+    push de
+    push hl                         ; −D'ex as mul X
+
+    ld de,sp+12                     ; Xm under −D'ex(6)+1.0(6)
     call load_expanded              ; Y = X
-    call m32_fsmul24x32             ; −D' × X  (consumes copy)
-    call m32_fsadd24x32             ; 1 − D' × X
+    call m32_fsmul32x32             ; −D' × X  (consumes −D'ex)
+    call m32_fsadd32x32             ; 1 − D' × X  (consumes 1.0ex)
     call m32_fsmul32x32             ; X × (1 − D' × X)
     call m32_fsadd32x32             ; X + …
     ; reserved −D' still under ret

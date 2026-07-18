@@ -19,12 +19,32 @@ PUBLIC m32_fsnormalize32
 
 
 .m32_fsnormalize32
+    ; C1: already normalized (bit31) or single left shift
+    ld a,d
+    and 080h
+    ret NZ
+    ld a,d
+    and 040h
+    jp Z,norm_tree
+    add hl,hl
+    rl de
+    ld a,-1
+    add a,b
+    jp NC,normzero
+    ld b,a
+    ret
+
+;-----------------------------------------------------------------------
+; C2 tree: nibble dispatch; shared promote tails.
+; After C1, S32H only needs 2 or 3 shifts.
+;-----------------------------------------------------------------------
+.norm_tree
     ld a,d
     or a
     jp Z,fa8a
     and 0f0h
-    jp Z,S32L                   ; msb nibble empty → 4–7 shifts
-    jp S32H                     ; msb nibble has bits → 0–3 shifts
+    jp Z,S32L
+    jp S32H
 
 .fa8a
     ld a,e
@@ -42,14 +62,13 @@ PUBLIC m32_fsnormalize32
     jp Z,S16L
     jp S16H
 
-; Only L nonzero (bits 7..0) — Z80 f32_fsnormalize32 omitted this path;
-; required when cancellation leaves a low-byte residual.
+; Only L nonzero — low-byte residual after cancellation
 .fa8c
     ld a,l
     or a
     jp Z,normzero
-    push bc                         ; save exp/sign
-    ld c,0                          ; shift count
+    push bc
+    ld c,0
 .s8lp
     ld a,d
     and 080h
@@ -63,40 +82,41 @@ PUBLIC m32_fsnormalize32
     pop bc
     jp normzero
 .s8done
-    pop de                          ; D=exp E=sign (from push bc)
+    pop de                          ; D=exp E=sign
     ld a,d
-    sub c                           ; exp - shifts
+    sub c
     jp C,normzero
     jp Z,normzero
     ld b,a
-    ld c,e                          ; restore sign
+    ld c,e
     ret
 
 ;-----------------------------------------------------------------------
-.S32H                           ; 0–3 left shifts (bits already in D high nibble)
+; D high nibble live, bits 7–6 clear → 2 or 3 shifts
+.S32H
     add hl,hl
     rl de
-    jp C,S32H1
     add hl,hl
     rl de
-    jp C,S32H2
     add hl,hl
     rl de
-    jp C,S32H3
+    jp C,S32H_u2
     ld a,-3
     jp normdone
 
-.S32H1
-    call rr_dehl                ; undo overshift
-    ret                         ; already normalized
-
-.S32H2
-    call rr_dehl
-    ld a,-1
-    jp normdone
-
-.S32H3
-    call rr_dehl
+.S32H_u2
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
     ld a,-2
     jp normdone
 
@@ -115,10 +135,10 @@ PUBLIC m32_fsnormalize32
     rl de
     add hl,hl
     rl de
-    jp C,S32Lover1
+    jp C,S32L_u4
     add hl,hl
     rl de
-    jp C,S32Lover2
+    jp C,S32L_u5
     ld a,-6
     jp normdone
 
@@ -134,13 +154,35 @@ PUBLIC m32_fsnormalize32
     ld a,-7
     jp normdone
 
-.S32Lover1
-    call rr_dehl
+.S32L_u4
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
     ld a,-4
     jp normdone
 
-.S32Lover2
-    call rr_dehl
+.S32L_u5
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
     ld a,-5
     ; fall through
 
@@ -159,8 +201,21 @@ PUBLIC m32_fsnormalize32
     ld l,a
     ret
 
+; Promote E:H:L → D:E:H:L with L=0; A = shift adjust
+.prom_ehl
+    ld d,e
+    ld e,h
+    ld h,l
+    ld l,0
+    jp normdone
+
+; Promote HL → DE, clear HL; A = shift adjust
+.prom_hl
+    ex de,hl
+    ld hl,0
+    jp normdone
+
 ;-----------------------------------------------------------------------
-; 16-bit significant in HL only (D=E=0 path leads here with bits in H)
 .S16L
     add hl,hl
     add hl,hl
@@ -170,40 +225,31 @@ PUBLIC m32_fsnormalize32
     jp Z,S16L4more
     add hl,hl
     add hl,hl
-    jp C,S16Lover1
+    jp C,S16L_u4
     add hl,hl
-    jp C,S16Lover2
-    ex de,hl
-    ld hl,0
+    jp C,S16L_u5
     ld a,-22
-    jp normdone
+    jp prom_hl
 
-.S16Lover1
+.S16L_u4
     call rr_hl
-    ex de,hl
-    ld hl,0
     ld a,-20
-    jp normdone
+    jp prom_hl
 
-.S16Lover2
+.S16L_u5
     call rr_hl
-    ex de,hl
-    ld hl,0
     ld a,-21
-    jp normdone
+    jp prom_hl
 
 .S16L4more
     add hl,hl
     add hl,hl
     add hl,hl
     add hl,hl
-    ex de,hl
-    ld hl,0
     ld a,-23
-    jp normdone
+    jp prom_hl
 
 ;-----------------------------------------------------------------------
-; 24-bit in L:E (D was 0); shift into DEHL
 .S24L
     add hl,hl
     ld a,e
@@ -238,28 +284,16 @@ PUBLIC m32_fsnormalize32
     ld a,e
     rla
     ld e,a
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-14
-    jp normdone
+    jp prom_ehl
 
 .S24L4
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-12
-    jp normdone
+    jp prom_ehl
 
 .S24L5
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-13
-    jp normdone
+    jp prom_ehl
 
 .S24L4more
     add hl,hl
@@ -278,12 +312,8 @@ PUBLIC m32_fsnormalize32
     ld a,e
     rla
     ld e,a
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-15
-    jp normdone
+    jp prom_ehl
 
 ;-----------------------------------------------------------------------
 .S24H
@@ -291,7 +321,14 @@ PUBLIC m32_fsnormalize32
     ld a,e
     rla
     ld e,a
-    jp C,S24H1
+    jp C,S24H_u0
+    ld a,e
+    or a
+    jp M,S24H1
+    add hl,hl
+    ld a,e
+    rla
+    ld e,a
     ld a,e
     or a
     jp M,S24H2
@@ -299,81 +336,50 @@ PUBLIC m32_fsnormalize32
     ld a,e
     rla
     ld e,a
-    ld a,e
-    or a
-    jp M,S24H3
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-11
-    jp normdone
+    jp prom_ehl
 
-.S24H1
+.S24H_u0
     ld a,e
     rra
     ld e,a
     call rr_hl
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-8
-    jp normdone
+    jp prom_ehl
+
+.S24H1
+    ld a,-9
+    jp prom_ehl
 
 .S24H2
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
-    ld a,-9
-    jp normdone
-
-.S24H3
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
     ld a,-10
-    jp normdone
+    jp prom_ehl
 
 ;-----------------------------------------------------------------------
 .S16H
     add hl,hl
+    jp C,S16H_u0
+    add hl,hl
     jp C,S16H1
     add hl,hl
     jp C,S16H2
-    add hl,hl
-    jp C,S16H3
-    ex de,hl
-    ld hl,0
     ld a,-19
-    jp normdone
+    jp prom_hl
+
+.S16H_u0
+    call rr_hl
+    ld a,-16
+    jp prom_hl
 
 .S16H1
     call rr_hl
-    ex de,hl
-    ld hl,0
-    ld a,-16
-    jp normdone
+    ld a,-17
+    jp prom_hl
 
 .S16H2
     call rr_hl
-    ex de,hl
-    ld hl,0
-    ld a,-17
-    jp normdone
-
-.S16H3
-    call rr_hl
-    ex de,hl
-    ld hl,0
     ld a,-18
-    jp normdone
+    jp prom_hl
 
 ;-----------------------------------------------------------------------
 ; Logical right 1 of DEHL through C (8085: no rr de)
