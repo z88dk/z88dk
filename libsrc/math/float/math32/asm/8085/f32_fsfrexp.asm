@@ -55,9 +55,8 @@ PUBLIC _m32_frexpf
 .frexp_zero
     ld de,sp+6                      ; address of ptr on stack
     ex de,hl                        ; DE = work; HL → ptr slot
-    ld c,(hl)
-    inc hl
-    ld b,(hl)                       ; BC = *pw2 pointer
+    ld c,(hl+)
+    ld b,(hl)
     ex de,hl                        ; HL = work again
 
     ld (bc),a

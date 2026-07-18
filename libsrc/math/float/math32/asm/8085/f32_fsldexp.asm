@@ -30,8 +30,7 @@ PUBLIC _m32_ldexpf
 
 ; HL = signed power; DEHL = float x
 .m32_dmulpow2
-    ld b,h
-    ld c,l
+    ld bc,hl
     jp pow2
 
 

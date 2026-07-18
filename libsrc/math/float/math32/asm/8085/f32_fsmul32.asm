@@ -120,8 +120,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ; Copy 14-byte frame up by 12 (dest overlaps src by 2 — copy high→low).
     ld hl,13
     add hl,sp
-    ld d,h
-    ld e,l                          ; DE → last byte of frame
+    ld de,hl
     ld hl,12+13
     add hl,sp                       ; HL → last byte of dest
     ld b,14

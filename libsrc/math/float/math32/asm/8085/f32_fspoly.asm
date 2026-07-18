@@ -188,15 +188,9 @@ PUBLIC _m32_polyf
 ;   exit: B=exp, C[7]=sign, DEHL=32-bit mant
 ;-----------------------------------------------------------------------
 .load_expand_ieee
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
+    ld de,(hl+)
     push de
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
+    ld de,(hl+)
     pop hl                          ; DEHL IEEE
     ld a,d
     and 080h
@@ -227,14 +221,9 @@ PUBLIC _m32_polyf
 ;-----------------------------------------------------------------------
 .load_ieee_push
     pop bc                          ; ret
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
+    ld de,(hl+)
     push de                         ; LSW temp
-    ld e,(hl)
-    inc hl
-    ld d,(hl)                       ; MSW
+    ld de,(hl+)                     ; MSW (HL discarded below)
     pop hl                          ; LSW
     push de                         ; MSW  → X.DE
     push hl                         ; LSW  → X.HL

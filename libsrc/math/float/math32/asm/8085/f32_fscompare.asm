@@ -135,8 +135,7 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,a
     ld e,c
     call xform
-    ld c,e
-    ld b,d
+    ld bc,de
     ld a,l
     ld de,sp+6
     ld (de),a
@@ -165,8 +164,7 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,a
     ld e,c
     call xform
-    ld c,e
-    ld b,d
+    ld bc,de
     ld a,l
     ld de,sp+2
     ld (de),a

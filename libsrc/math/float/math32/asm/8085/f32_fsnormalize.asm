@@ -207,8 +207,7 @@ PUBLIC m32_fsnormalize
 
 .normzero                       ; return zero
     ld hl,0
-    ld d,h
-    ld e,l
+    ld de,hl
     ret
 
 ; all bits in lower 4 bits of e (bits 0-3 of mantissa)

@@ -74,8 +74,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push hl                         ; Y | ret | X | junk
     ld hl,13
     add hl,sp
-    ld d,h
-    ld e,l
+    ld de,hl
     ld hl,12+13
     add hl,sp
     ld b,14
@@ -114,8 +113,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jp Z,sorted
     ld hl,0
     add hl,sp
-    ld d,h
-    ld e,l
+    ld de,hl
     ld hl,8
     add hl,sp
     ld b,6
@@ -208,8 +206,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld b,a                          ; BC = Y.de
     ; large DEHL: DE=Y.de=BC, HL=Y.hl
     push hl
-    ld d,b
-    ld e,c
+    ld de,bc
     pop hl                          ; DEHL = large
     ; sub flag at sp+7 — do not clobber DE
     push de

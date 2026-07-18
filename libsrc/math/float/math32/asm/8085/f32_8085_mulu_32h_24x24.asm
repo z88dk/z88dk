@@ -126,8 +126,7 @@ PUBLIC m32_sqr_32h_24x24
 
     ld b,a
     ld a,c
-    ld h,d
-    ld l,e
+    ld hl,de
 
     push af
     ld a,b

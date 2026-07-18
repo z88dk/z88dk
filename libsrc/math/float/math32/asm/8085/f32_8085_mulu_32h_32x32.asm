@@ -111,8 +111,7 @@ PUBLIC m32_mulu_32h_32x32
 .ld_hl
     push de
     pop hl
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ex de,hl
     ret
@@ -128,8 +127,7 @@ PUBLIC m32_mulu_32h_32x32
 .mulu_32_16x16
     ld a,d
     ld d,0
-    ld b,h
-    ld c,l
+    ld bc,hl
     add a,a
     jp C,b14
     add a,a
@@ -165,8 +163,7 @@ PUBLIC m32_mulu_32h_32x32
     ld a,e
     rra
     ret C
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
 .b14
     add hl,hl

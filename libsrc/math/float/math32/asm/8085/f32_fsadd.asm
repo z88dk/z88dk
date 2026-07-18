@@ -265,8 +265,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     pop hl
     push bc
     push de
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld l,a
     ld h,0
     push hl
@@ -673,13 +672,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .load_ieee
     push de
     pop hl
-    ld c,(hl)
-    inc hl
-    ld b,(hl)
-    inc hl
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    ld h,b
-    ld l,c
+    ld bc,(hl+)
+    ld de,(hl+)
+    ld hl,bc
     ret
