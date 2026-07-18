@@ -616,7 +616,6 @@ struct nodepair {
     } while (0)
 
 
-extern UT_string *debug_utstr;
 extern UT_string *debug2_utstr;
 extern int        scope_block;
 extern char       c_debug_entry_points;

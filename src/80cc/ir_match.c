@@ -1180,7 +1180,7 @@ static int derefcmp_check(Func *f, BB *bb, const int idx[],
                           const int64_t imm[], const int bind[], const int uc[])
 {
     (void)imm; (void)uc; (void)bind;
-    if (getenv("IR_NO_DEREF_CMP")) return 0;
+    if (opt_disabled("deref-cmp")) return 0;
     const Op *lda = &bb->ops[idx[0]];
     const Op *ldb = &bb->ops[idx[1]];
     const Op *cmp = &bb->ops[idx[2]];
@@ -1314,7 +1314,7 @@ int ir_match_run_early(Func *f)
     /* stpp needs the POSTSTEP that poststep just produced. Default-on with
        the loop register allocator (IR_NO_LOOP_RA opts out) — it feeds the
        DE/BC walking-pointer home (`*d++` → `ld (de),a; inc de`). */
-    if (!getenv("IR_NO_LOOP_RA")) {
+    if (!opt_disabled("loop-ra")) {
         n += ir_match_run_table(f, &pat_stpp, 1);
         /* copystep needs the post-step LD_MEM (derefpp) + ST_MEM (stpp). */
         n += ir_match_run_table(f, &pat_copystep, 1);

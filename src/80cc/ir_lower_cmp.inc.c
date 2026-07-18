@@ -20,7 +20,7 @@ static int cpu_has_index_halves(void)
    byte-wise subtract + CF) and EQ/NE. Default-on; IR_NO_IXD_FOLD opts out. */
 static int try_cmp_ixd_fold(FILE *out, const Func *f, const Op *op)
 {
-    if (getenv("IR_NO_IXD_FOLD")) return 0;
+    if (opt_disabled("ixd-fold")) return 0;
     if (L.la.cur_branch_test_kind == 0) return 0;
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)) return 0;
     /* Fires in BOTH fp and sp mode. In sp there are no (ix+d) slot operands

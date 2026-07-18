@@ -4,12 +4,6 @@
 static void write_cdb_type(UT_string *output, Type *type,int comma);
 
 
-void debug_write_module(void)
-{
-    utstring_printf(debug_utstr,"M:%.*s\n",(int)strlen(Filename)-2,Filename+1);
-}
-
-
 static void encode_cdbstring(UT_string *dest, const char *toencode)
 {
     char c;
@@ -20,7 +14,33 @@ static void encode_cdbstring(UT_string *dest, const char *toencode)
         } else {
             utstring_printf(dest, "_%02x",c);
         }
-    }    
+    }
+}
+
+
+/* Emit one cdb record into the defc stream as an encoded __CDBINFO__ symbol.
+ * The linker map carries these through to the debugger, which decodes them
+ * back into the .cdb (see ticks/syms.c). */
+static void emit_cdb_defc(const char *record)
+{
+    utstring_printf(debug2_utstr, "; %s\n", record);
+    utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
+    encode_cdbstring(debug2_utstr, record);
+    utstring_printf(debug2_utstr,"\n");
+    utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
+    encode_cdbstring(debug2_utstr, record);
+    utstring_printf(debug2_utstr," = 1\n");
+}
+
+
+void debug_write_module(void)
+{
+    UT_string *temp;
+
+    utstring_new(temp);
+    utstring_printf(temp,"M:%.*s",(int)strlen(Filename)-2,Filename+1);
+    emit_cdb_defc(utstring_body(temp));
+    utstring_free(temp);
 }
 
 
@@ -66,29 +86,43 @@ void debug_write_symbol(SYMBOL *sym)
             utstring_printf(temp,",C,0,%d,0,0,0",sym->ctype->funcattrs.params_offset);
         }
     } else if ( sym->storage == STKLOC ) {
-        utstring_printf(temp,"S:L%.*s.%s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,currfn->name,sym->name,sym->level);
-        utstring_printf(temp,"%d", sym->scope_block); // Scope block
-        utstring_printf(temp,"(");
-        utstring_printf(temp,"{%d}", sym->ctype->size);
-        write_cdb_type(temp, sym->ctype, 0);
-        utstring_printf(temp,")");
-        utstring_printf(temp,",B,1,%d",sym->offset.i);
+        /* Stack local/param location is deferred to post-lowering
+           (debug_write_local_at), where the ,B,1,d offset reflects the
+           backend's real slot placement rather than the front-end nominal
+           sym->offset.i. */
+        utstring_free(temp);
+        return;
     } else {
+        utstring_free(temp);
         return;
     }
 
     // Encode the cdbstring and output it as a defc
-    utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
-    utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
-    encode_cdbstring(debug2_utstr, utstring_body(temp));
-    utstring_printf(debug2_utstr,"\n");
-    utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
-    encode_cdbstring(debug2_utstr, utstring_body(temp));
-    utstring_printf(debug2_utstr," = 1\n");
+    emit_cdb_defc(utstring_body(temp));
 
-    utstring_concat(debug_utstr, temp);
     utstring_free(temp);
-    utstring_printf(debug_utstr,"\n");
+}
+
+/* Post-lowering emission of a stack local/param, with the frame-base-relative
+   offset supplied by the caller (the IR lowerer, which knows the real slot). */
+void debug_write_local_at(const char *fn_name, SYMBOL *sym, int offset)
+{
+    UT_string *temp;
+
+    if ( sym->storage != STKLOC )
+        return;
+
+    utstring_new(temp);
+    utstring_printf(temp,"S:L%.*s.%s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,fn_name,sym->name,sym->level);
+    utstring_printf(temp,"%d", sym->scope_block); // Scope block
+    utstring_printf(temp,"(");
+    utstring_printf(temp,"{%d}", sym->ctype->size);
+    write_cdb_type(temp, sym->ctype, 0);
+    utstring_printf(temp,")");
+    utstring_printf(temp,",B,1,%d",offset);
+
+    emit_cdb_defc(utstring_body(temp));
+    utstring_free(temp);
 }
 
 void debug_write_type(Type *type)
@@ -113,19 +147,10 @@ void debug_write_type(Type *type)
 
     if ( utstring_len(temp) > 0 ) {
         // Encode the cdbstring and output it as a defc
-        utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
-        utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
-        encode_cdbstring(debug2_utstr, utstring_body(temp));
-        utstring_printf(debug2_utstr,"\n");
-        utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
-        encode_cdbstring(debug2_utstr, utstring_body(temp));
-        utstring_printf(debug2_utstr," = 1\n");
-
-        utstring_concat(debug_utstr, temp);
-        utstring_free(temp);
-        utstring_printf(debug_utstr,"\n");
+        emit_cdb_defc(utstring_body(temp));
     }
-} 
+    utstring_free(temp);
+}
 
 void write_cdb_type(UT_string *output, Type *type,int comma)
 {

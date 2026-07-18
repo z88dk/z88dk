@@ -61,7 +61,7 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
 int ir_idx2_reg(void)
 {
     if (!c_idx2_invariant) return IR_PR_NONE;
-    if (getenv("IR_NO_IDX2")) return IR_PR_NONE;
+    if (opt_disabled("idx2")) return IR_PR_NONE;
     if (IS_808x() || IS_GBZ80()) return IR_PR_NONE;
     if (c_framepointer_is_ix == 1)                    /* frame IX → spare IY */
         return c_reserve_iy ? IR_PR_NONE : IR_PR_IY;
@@ -78,7 +78,7 @@ int ir_idx2_reg(void)
 int ir_idx3_reg(void)
 {
     if (!c_idx3_residency) return IR_PR_NONE;
-    if (getenv("IR_NO_IDX3")) return IR_PR_NONE;
+    if (opt_disabled("idx3")) return IR_PR_NONE;
     if (c_reserve_iy) return IR_PR_NONE;               /* IY reserved by platform */
     if (ir_idx2_reg() != IR_PR_IX) return IR_PR_NONE;  /* need IX as idx2 */
     if (c_framepointer_is_ix != -1) return IR_PR_NONE; /* IY is the frame */
@@ -95,7 +95,7 @@ int ir_idx3_reg(void)
 int ir_exx_reg(void)
 {
     if (!c_exx_residency) return IR_PR_NONE;
-    if (getenv("IR_NO_EXX")) return IR_PR_NONE;
+    if (opt_disabled("exx")) return IR_PR_NONE;
     if (c_framepointer_is_ix != -1) return IR_PR_NONE;   /* sp-mode only */
     if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
     return IR_PR_BC_ALT;
@@ -126,6 +126,28 @@ int ir_lower_to_output(Func *f)
             fwrite(chunk, 1, n, output);
     }
     fclose(mem);
+
+    /* -debug: emit the cdb stack local/param records now that slot assignment
+       is final. Locals get their real frame-base offset (vreg_spill_slot -
+       frame_size == slot_ix_off); params keep the frame-independent front-end
+       offset (they sit above the frame base, so it stays correct as the frame
+       grows). Register-resident locals with no slot are skipped (best-effort).
+       Parse-time STKLOC emission is deferred here (cdbfile.c). */
+    if (rc == 0 && c_debug_adb_defc && f->fn) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            SYMBOL *s = f->vregs[v].sym;
+            if (!s || s->storage != STKLOC) continue;
+            int off;
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) {
+                off = s->offset.i;
+            } else {
+                int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
+                if (slot < 0) continue;
+                off = slot - f->frame_size;
+            }
+            debug_write_local_at(f->fn->name, s, off);
+        }
+    }
     return rc;
 }
 

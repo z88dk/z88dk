@@ -395,6 +395,28 @@ static const SYMBOL *deref_bank_fn(const Node *n)
     return ns ? ir_namespace_bank_fn(ns) : NULL;
 }
 
+/* True if a type is volatile-qualified, or (for a pointer type) points to a
+   volatile object. */
+static int type_or_pointee_volatile(const Type *t)
+{
+    if (!t) return 0;
+    if (t->isvolatile) return 1;
+    if (t->ptr && t->ptr->isvolatile) return 1;
+    return 0;
+}
+/* True if an indirect access through deref/index node `n` touches a volatile
+   object: the value type (n->type) carries it, or it lives on the pointer
+   operand's pointee type. Mirrors deref_bank_fn's navigation. Marks
+   op->mem.volatile_ so ir_match/ir_opt won't fuse the access and the lowerer
+   stamps it (copt won't elide a volatile load/store). */
+static int deref_is_volatile(const Node *n)
+{
+    if (!n) return 0;
+    if (type_or_pointee_volatile(n->type)) return 1;
+    if (n->operand && type_or_pointee_volatile(n->operand->type)) return 1;
+    return 0;
+}
+
 /* A __far pointer (KIND_CPTR): every access through it routes via an
    lp_* runtime helper (paging the bank in/out). Detected on the pointer
    node's own type. */
@@ -674,6 +696,15 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
     } else {
         int w = width_for_kind(k);
         b->f->vregs[v].width = (int16_t)(w ? w : 2);
+        /* -debug: home every scalar local in memory so a breakpoint can read
+           it. Mark it address-taken (escaped): unlike a plain — or even
+           volatile — never-escaped local (which 80cc legitimately keeps in a
+           register / folds away), an escaped local must stay coherent in its
+           frame slot across every statement, since it could be aliased. Its
+           ,B,1,d cdb record is emitted post-lowering from the real slot
+           (debug_write_local_at). Aggregates already get ADDR_TAKEN above. */
+        if (c_debug_adb_defc)
+            b->f->vregs[v].flags |= IR_VREG_ADDR_TAKEN;
     }
     /* volatile local: force a memory slot so every access is a real
        load/store (no register residency, const-prop or store-forward). */
@@ -1897,7 +1928,7 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
        Acc tier (FA model) keeps lhs-first — it doesn't use the DEHL stack. */
     int fc_commutative = !is_acc
         && (!strcmp(stem, "add") || !strcmp(stem, "mul"))
-        && getenv("IR_NO_F32_STACK_ARG") == NULL;
+        && !opt_disabled("f32-stack-arg");
     #define COMPOUND_ARITH(LV) (is_acc \
         ? emit_acc_binop(b, stem, (LV), rv) \
         : fc_commutative ? emit_float_arith(b, fk, stem, rv, (LV)) \
@@ -2841,6 +2872,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     ld->mem.kind  = IR_MEM_VREG;
     ld->mem.base  = ptr_v;
     ld->mem.elem  = elem_k;
+    ld->mem.volatile_ = deref_is_volatile(n->left);
     ld->mem.bank_fn = bf;
     int dst = new_temp(b, elem_w);
     b->f->vregs[dst].width = elem_w;
@@ -2860,6 +2892,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     st->mem.kind  = IR_MEM_VREG;
     st->mem.base  = ptr_v;
     st->mem.elem  = elem_k;   /* NOT ld->mem.elem — `ld` may be realloc-stale */
+    st->mem.volatile_ = deref_is_volatile(n->left);
     st->mem.bank_fn = bf;
     return dst;
 }
@@ -3350,6 +3383,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.elem = (elem_w == 1) ? KIND_CHAR
                          : (elem_w == 2) ? KIND_INT
                          :                 KIND_LONG;
+            ld->mem.volatile_ = deref_is_volatile(n);
             ld->mem.bank_fn = (SYMBOL *)deref_bank_fn(n);  /* `*p++` into a space */
             if (!is_pre) EMIT_BUMP();
             #undef EMIT_BUMP
@@ -5271,6 +5305,7 @@ static int build_assign(Builder *b, Node *n)
         op->mem.elem = (elem_w == 1) ? KIND_CHAR
                      : (elem_w == 2) ? KIND_INT
                      :                 KIND_LONG;
+        op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
     }
@@ -5426,6 +5461,7 @@ static int build_assign(Builder *b, Node *n)
         op->mem.elem = (elem_w == 1) ? KIND_CHAR
                      : (elem_w == 2) ? KIND_INT
                      :                 KIND_LONG;
+        op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
     }
@@ -5988,7 +6024,7 @@ static int build_muldiv_integer(Builder *b, Node *n)
     if (n->ast_type == OP_MULT && !is_flt && !is_fix16 && !is_fix32
         && n->type && type_width(n->type) == 4
         && !IS_808x() && !IS_GBZ80()   /* l_mulu_32_16x16 undefined there */
-        && !getenv("IR_NO_NARROW_MUL")) {
+        && !opt_disabled("narrow-mul")) {
         Node *ln = mul_u16_narrow_src(n->left);   /* type width <= 2, unsigned */
         Node *rn = mul_u16_narrow_src(n->right);
         if (ln && rn) {

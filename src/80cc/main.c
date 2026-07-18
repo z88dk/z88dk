@@ -16,8 +16,7 @@ extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. 
 
 static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
-static char    c_debug_adb_file = 0;
-static char    c_debug_adb_defc = 0;
+       char    c_debug_adb_defc = 0;
        char    c_debug_entry_points = 0;
 int     c_banked_style = BANKED_STYLE_REGULAR;
 
@@ -26,7 +25,6 @@ static int      gargc; /* global copies of command line args */
 static char   **gargv;
 static int      filenum; /* next argument to be used */
 
-UT_string       *debug_utstr;
 UT_string       *debug2_utstr;
 
 static Type *type_double4 = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
@@ -73,7 +71,6 @@ char *c_home_section = "code_home";
 
 
 static void dumpsymdebug(void);
-static void dumpdebug(void);
 static void dumpfns(void);
 static void dumpvars(void);
 static void parse(void);
@@ -136,7 +133,7 @@ static option  sccz80_opts[] = {
     { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the data section name", &c_data_section, NULL, 0 },
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
-    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named AST optimiser passes (comma-separated). Names: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse; pattern:<name> disables one IR pattern-matcher entry. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
+    { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named optimiser passes (comma-separated). AST passes: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse. IR/lowering gates by name, e.g. lra, bc-pack, de-home, orchestrator, ivsr, lftr, addr-cse, label-elide, lazy-spill, remat, idx2, idx3, gpderef, declean (see opt_disabled call sites). pattern:<name> disables one IR pattern-matcher entry. `all` disables every optimisation. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "(inert) Accepted for --math16 alias / sccz80-family CLI compatibility; no effect in the IR back end", NULL, opt_code_speed_inert, 0 },
     { 0, "ast-print", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Build the AST per function, print it to stderr, and skip code generation", &c_ast_print, NULL, 0 },
     { 0, "ast-print-types", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Decorate the AST print with type/qualifier/attribute info; implies --ast-print", &c_ast_print_types, NULL, 0 },
@@ -167,8 +164,7 @@ static option  sccz80_opts[] = {
 #endif
     { 0, "W", OPT_FUNCTION, "<type> Enable a class of warnings", NULL,  SetWarning, 0 },
     { 0, "", OPT_HEADER, "Debugging options", NULL, NULL, 0 },
-    { 0, "debug-sect", OPT_BOOL, "Create adb/cdb debug section", &c_debug_adb_file, NULL, 0 },
-    { 0, "debug-defc", OPT_BOOL, "Create adb/cdb debug defc", &c_debug_adb_defc, NULL, 0 },
+    { 0, "debug-defc", OPT_BOOL, "Create sdcc-compatible cdb debug info (defc __CDBINFO__)", &c_debug_adb_defc, NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, NULL, 0 },
     { 0, "intlog", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
@@ -298,10 +294,20 @@ int main(int argc, char** argv)
         c_fp_size = 4;
     }
 
-    if ( c_debug_adb_file || c_debug_adb_defc ) {
+    if ( c_debug_adb_defc ) {
         c_cline_directive = 1;
+        /* cdb stack-local records (,B,1,d) are only meaningful against a stable
+           frame base. sp mode has none (sp moves), so under -debug establish a
+           frame pointer. On CPUs with IX, force a real IX frame: the prologue's
+           `push ix / ld ix,0 / add ix,sp` gives every slot a fixed ix-relative
+           offset. On CPUs without IX (8080/8085/gbz80, forced to sp below),
+           c_debug_entry_points makes the prologue maintain a software frame
+           pointer in the global __debug_framepointer (l_debug_push_frame); the
+           saved 2 bytes are accounted for in the frame layout. Either way the
+           records resolve against the same frame base. */
+        c_debug_entry_points = 1;
         if ( c_framepointer_is_ix == -1 ) {
-            c_debug_entry_points = 1;
+            c_framepointer_is_ix = 1;
         }
     }
 
@@ -324,7 +330,6 @@ int main(int argc, char** argv)
         WriteDefined("CPU_GBZ80", 1);
     }
 
-    utstring_new(debug_utstr);
     utstring_new(debug2_utstr);
 
     litlab = getlabel(); /* Get labels for function lits*/
@@ -348,9 +353,6 @@ int main(int argc, char** argv)
 
     if ( c_debug_adb_defc ) {
         dumpsymdebug();
-    }
-    if ( c_debug_adb_file ) {
-        dumpdebug();
     }
 
     gen_file_footer(); /* follow-up code */
@@ -476,19 +478,6 @@ void info(void)
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
-
-static void dumpdebug(void)
-{
-    const char *debug = utstring_body(debug_utstr);
-    const char *end = NULL;
-
-    gen_switch_section("__ADBDEBUG");
-    while ( ( end = strchr(debug,'\n')) != NULL ) {
-        defmesg();
-        outfmt("%.*s\\n\"\n", end - debug, debug);
-        debug = end+1;        
-    }
-}
 
 static void dumpsymdebug(void)
 {
@@ -931,6 +920,34 @@ static void opt_code_speed_inert(option *arg, char *val)
     (void)val;
 }
 
+/* Named IR/lowering optimisation gates disabled via --opt-disable=<name>.
+   There are >32, so they are a name-set rather than bits in c_opt_disable. */
+static char *ir_opt_disabled_names[80];
+static int   n_ir_opt_disabled;
+static int   ir_opt_disable_all;
+
+/* Non-zero if the named IR/lowering optimisation was disabled on the command
+   line (or `--opt-disable=all`). Called from the IR passes / lowerer. */
+int opt_disabled(const char *name)
+{
+    if (ir_opt_disable_all) return 1;
+    for (int i = 0; i < n_ir_opt_disabled; i++)
+        if (strcmp(ir_opt_disabled_names[i], name) == 0) return 1;
+    return 0;
+}
+
+static void ir_opt_disable_add(const char *name, size_t len)
+{
+    if (n_ir_opt_disabled >= (int)(sizeof ir_opt_disabled_names
+                                   / sizeof ir_opt_disabled_names[0]))
+        return;
+    char *s = malloc(len + 1);
+    if (!s) return;
+    memcpy(s, name, len);
+    s[len] = 0;
+    ir_opt_disabled_names[n_ir_opt_disabled++] = s;
+}
+
 static void opt_disable(option *arg, char *val)
 {
     (void)arg;
@@ -960,13 +977,19 @@ static void opt_disable(option *arg, char *val)
             if (strncmp(ptr, opt_disable_names[i].name, n) == 0
                 && (ptr[n] == 0 || ptr[n] == ',' || ptr[n] == ' ')) {
                 c_opt_disable |= opt_disable_names[i].bit;
+                if (opt_disable_names[i].bit == OPT_DISABLE_ALL)
+                    ir_opt_disable_all = 1;   /* `all` also disables IR opts */
                 matched = n;
                 break;
             }
         }
         if (matched == 0) {
-            /* Unknown — advance to next separator. */
-            while (*ptr && *ptr != ',' && *ptr != ' ') ptr++;
+            /* Not an AST-pass name: treat as a named IR/lowering opt
+               (opt_disabled()); genuine typos simply never match a gate. */
+            size_t n = 0;
+            while (ptr[n] && ptr[n] != ',' && ptr[n] != ' ') n++;
+            ir_opt_disable_add(ptr, n);
+            ptr += n;
         } else {
             ptr += matched;
         }

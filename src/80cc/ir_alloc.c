@@ -358,7 +358,7 @@ static int idx2_propose(const Func *f, const int *use_count,
                 else if (o->kind == IR_LD_IMM) cinit[d]++;
                 else cother[d]++;
             }
-        int counter_off = getenv("IR_NO_IDX2_COUNTER") != NULL;
+        int counter_off = opt_disabled("idx2-counter");
         for (int v = 0; v < f->n_vregs; v++) {
             const VReg *vr = &f->vregs[v];
             if (vr->width != 2) continue;
@@ -517,7 +517,7 @@ static int de_home_general_propose(const Func *f, const int *use_count,
                                    const int *first_use, const int *last_use,
                                    Cand *out)
 {
-    if (getenv("IR_NO_DE_HOME")) return 0;
+    if (opt_disabled("de-home")) return 0;
     for (int i = 0; i < f->n_bbs; i++)
         for (int j = 0; j < f->bbs[i].n_ops; j++) {
             OpKind k = f->bbs[i].ops[j].kind;
@@ -623,7 +623,7 @@ static int de_home_general_propose(const Func *f, const int *use_count,
            once at region entry from the caller slot, spilled back at exit), and
            needs only one step. op_de_clean (de_home_is_ptr) proves the region
            DE-clean; a non-clean loop reverts to slot (speculative pick). */
-        if (!getenv("IR_NO_LOOP_RA")) {
+        if (!opt_disabled("loop-ra")) {
             for (int v = 0; v < f->n_vregs; v++) {
                 const VReg *vr = &f->vregs[v];
                 if (vr->width != 2) continue;
@@ -1472,7 +1472,7 @@ static int lra_iy_chain_ok(const Func *f, int v)
 static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
                                  const int *use_count)
 {
-    if (getenv("IR_NO_LRA")) return;
+    if (opt_disabled("lra")) return;
     if (!lra_iy_available(f)) return;
 
     /* RAW use counts (the passed use_count is depth-weighted — no good for a
@@ -1704,7 +1704,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count)
 {
-    if (getenv("IR_NO_BC_PACK")) return;
+    if (opt_disabled("bc-pack")) return;
     if (f->n_vregs <= 0) return;
 
     /* Per-vreg iteration-local SHAPE, computed for EVERY vreg (not just SPILL
@@ -1990,7 +1990,7 @@ static int stack_spill_span_hazard(OpKind k)
 static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                            const int *write_count)
 {
-    if (getenv("IR_NO_STACK_SPILL")) return;   /* default ON; opts out */
+    if (opt_disabled("stack-spill")) return;   /* default ON; opts out */
     if (f->n_vregs <= 0) return;
     /* Gate: z80/z80n/z180/8080/8085/gbz80, sp AND fp — every CPU with expensive
        word slot access (fp: 2× ld (ix+d) ~38T; sp: ld hl,N;add hl,sp;…) vs
@@ -2653,7 +2653,7 @@ void ir_alloc(Func *f)
            depth 0 → 1, depth 1 → 4 (identical to the old flat in-loop×4, so
            functions with no nesting deeper than one loop stay byte-identical);
            depth n → 4^n, capped. IR_NO_DEPTH_WEIGHT restores the flat weight. */
-        int depth_flat = getenv("IR_NO_DEPTH_WEIGHT") != NULL;
+        int depth_flat = opt_disabled("depth-weight");
         int global = 0;
         for (int i = 0; i < f->n_bbs; i++) {
             BB *bb = &f->bbs[i];
@@ -2748,7 +2748,7 @@ void ir_alloc(Func *f)
            else neutral). Collects ALL proposers into one pool and assigns via the
            single cost-model-ranked cross-class arbiter. IR_NO_ORCHESTRATOR falls
            back to the per-class proposer/arbiter pairs run in sequence. */
-        int orch = getenv("IR_NO_ORCHESTRATOR") == NULL;
+        int orch = !opt_disabled("orchestrator");
         if (orch) {
             Cand *pool = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 6,
                                 sizeof(Cand));
@@ -2765,10 +2765,10 @@ void ir_alloc(Func *f)
                                   first_use, last_use, pool + np);
                 np += idx2_propose(f, use_count, write_count,
                                    first_use, last_use, pool + np);
-                if (c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT"))
+                if (c_byte_resident && !opt_disabled("byte-resident"))
                     np += byte_home_propose(f, use_count, write_count,
                                             first_use, last_use, pool + np);
-                if (c_word_resident && !getenv("IR_NO_WORD_RESIDENT"))
+                if (c_word_resident && !opt_disabled("word-resident"))
                     np += word_acc_propose(f, use_count, write_count, bb_in_loop,
                                            first_use, last_use, pool + np);
                 /* DE-home co-design: a general loop-carried width-2 vreg (opt-in
@@ -2782,7 +2782,7 @@ void ir_alloc(Func *f)
                 np += idx3_propose(f, use_count, write_count, bb_in_loop,
                                    first_use, last_use, pool + np);
                 /* Phase 2: hot loop-carried int IVs. IR_NO_IV_RESIDENT opts out. */
-                if (!getenv("IR_NO_IV_RESIDENT"))
+                if (!opt_disabled("iv-resident"))
                     np += iv_propose(f, use_count, write_count, all_defs_ok,
                                      has_prepushed_call, entry_live,
                                      first_use, last_use, pool + np);
@@ -2833,7 +2833,7 @@ void ir_alloc(Func *f)
            read would consult an unestablished home). Unlike PR_BC this
            admits a WRITE-MANY vreg (the accumulator is the point). One
            occupant. */
-        if (!orch && c_byte_resident && !getenv("IR_NO_BYTE_RESIDENT")) {
+        if (!orch && c_byte_resident && !opt_disabled("byte-resident")) {
             /* Byte-home (C/E) residency via the Phase-0 proposer/arbiter
                (skipped when the Phase-1 unified arbiter ran above). */
             Cand *bcand = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
@@ -2857,7 +2857,7 @@ void ir_alloc(Func *f)
            DE) is demoted to SPILL so its def can't clobber the home — it
            reloads through HL at the accumulate. Skipped when a byte E/D-home
            already claimed DE's low half. One occupant. */
-        if (!orch && c_word_resident && !getenv("IR_NO_WORD_RESIDENT")) {
+        if (!orch && c_word_resident && !opt_disabled("word-resident")) {
             /* Word DE-home accumulator via the Phase-0 proposer/arbiter
                (skipped when the Phase-1 unified arbiter ran above). */
             Cand *wcand = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),

@@ -31,6 +31,9 @@
 extern int c_framepointer_is_ix;
 extern int c_reserve_iy;   /* platform reserves IY — no IY residency */
 extern int c_reserve_ix;   /* platform reserves IX (sp-mode) — no IX residency */
+extern char c_debug_entry_points; /* -debug on a no-IX CPU: maintain a global
+                                     __debug_framepointer via l_debug_push_frame
+                                     so cdb frame offsets are walkable */
 
 /* Per-TU string-literal queue label number. String literal addresses
    emit as `ld hl,i_<litlab>+<offset>` (IR_LD_STR). */
@@ -332,6 +335,130 @@ static void emit_bb_label(FILE *out, int bb_id)
     fprintf(out, "L_f%d_bb_%d:\n", L.func_emit_idx, bb_id);
 }
 
+/* Copy a rendered function from `rout` to `out`, dropping dead BB-label
+   definitions — an `L_fN_bb_M:` line no jump / defc / switch-table operand
+   names. Correct by construction (a label with zero textual references is
+   unreachable by name); also lets copt peepholes match across the former label
+   boundary. Only exact `L_f<d>_bb_<d>:` lines are candidates; other labels
+   (func entry `._name`, `_shl_loop_`, defc aliases) pass through untouched.
+   `max_bb` bounds the reference bitset. */
+/* Rewrite a `\tjp\t[cc,]L_f<idx>_bb_<n>` line's target number in place per thr[]
+   (jump threading). Only touches unconditional/conditional `jp` lines; the label
+   prefix `L_f<idx>_bb_` and any condition/comment are preserved. */
+static void thread_jp_line(FILE *out, const char *line, const int *thr, int max_bb)
+{
+    if (strncmp(line, "\tjp\t", 4) != 0) { fputs(line, out); return; }
+    char *p = strstr(line, "_bb_");
+    if (!p || p[4] < '0' || p[4] > '9') { fputs(line, out); return; }
+    int n = 0; const char *q = p + 4;
+    while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+    if (n > max_bb || thr[n] < 0 || thr[n] == n) { fputs(line, out); return; }
+    fwrite(line, 1, (size_t)(p + 4 - line), out);   /* up to and incl `_bb_` */
+    fprintf(out, "%d", thr[n]);                      /* threaded target */
+    fputs(q, out);                                   /* rest (`:`... no — operand tail/comment) */
+}
+
+static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
+{
+    char line[1024];
+    char *ref = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
+    int *thr = (max_bb >= 0) ? malloc(((size_t)max_bb + 1) * sizeof(int)) : NULL;
+    if (!ref || !thr) {                          /* OOM: copy verbatim */
+        free(ref); free(thr);
+        rewind(rout);
+        while (fgets(line, sizeof line, rout)) fputs(line, out);
+        return;
+    }
+    for (int i = 0; i <= max_bb; i++) thr[i] = -1;
+    /* Pass 0: jump-threading map. A run of one or more bare labels
+       `L_f..._bb_<n>:` whose first following instruction is an UNCONDITIONAL
+       `jp L_f..._bb_<m>` (no `,`) are jp-only trampolines: thread every n->m.
+       Operand rewrite only — the trampoline body stays (its fall-through
+       predecessors still need it), so this is sound even when a label is reached
+       by fall-through (unlike a defc alias). No-op directive/blank/comment lines
+       between the labels and the `jp` are skipped (C_LINE markers etc.). */
+    rewind(rout);
+    int pend[64], npend = 0;
+    while (fgets(line, sizeof line, rout)) {
+        if (strncmp(line, "\tC_LINE", 7) == 0 || line[0] == '\n'
+            || line[0] == '\r' || line[0] == ';')
+            continue;
+        if (line[0] == 'L') {                     /* a bb label def? keep collecting */
+            char *p = strstr(line, "_bb_");
+            if (p && p[4] >= '0' && p[4] <= '9') {
+                int n = 0; char *q = p + 4;
+                while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+                if (*q == ':' && (q[1] == '\n' || q[1] == '\0') && n <= max_bb
+                    && npend < 64)
+                    pend[npend++] = n;
+            }
+            continue;
+        }
+        /* first real instruction after the label run */
+        if (npend > 0 && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ',')) {
+            char *p = strstr(line, "_bb_");
+            if (p && p[4] >= '0' && p[4] <= '9') {
+                int m = 0; char *q = p + 4;
+                while (*q >= '0' && *q <= '9') m = m * 10 + (*q++ - '0');
+                for (int k = 0; k < npend; k++) thr[pend[k]] = m;
+            }
+        }
+        npend = 0;
+    }
+    for (int i = 0; i <= max_bb; i++) {           /* resolve transitively */
+        int t = thr[i], hops = 0;
+        while (t >= 0 && t <= max_bb && thr[t] >= 0 && thr[t] != t
+               && hops <= max_bb) { t = thr[t]; hops++; }
+        if (hops > max_bb) thr[i] = -1;           /* cycle → don't thread */
+        else if (t >= 0) thr[i] = t;
+    }
+    /* Pass 1: mark every BB number that appears as a REFERENCE — using the
+       THREADED target for jp operands, since pass 2 rewrites them. */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) {
+        int is_jp = (strncmp(line, "\tjp\t", 4) == 0);
+        for (char *p = strstr(line, "_bb_"); p; p = strstr(p, "_bb_")) {
+            char *q = p + 4;
+            if (*q < '0' || *q > '9') { p = q; continue; }
+            int n = 0;
+            while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+            int own_def = (line[0] == 'L' && *q == ':' && p == strstr(line, "_bb_"));
+            if (!own_def && n <= max_bb) {
+                int tgt = (is_jp && thr[n] >= 0) ? thr[n] : n;
+                if (tgt <= max_bb) ref[tgt] = 1;
+            }
+            p = q;
+        }
+    }
+    /* Pass 2: emit, dropping `L_f<d>_bb_<n>:` lines whose n is unreferenced, and
+       DEFERRING `defc L_f..._bb_...` alias lines. The defc's are 0-byte symbol
+       definitions emitted inline at the alias BBs' layout slots; moving them out
+       of the instruction stream makes the real (defc-are-nothing) adjacency
+       visible to copt without changing the binary. */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) {
+        if (strncmp(line, "defc L_f", 8) == 0) continue;   /* defer to pass 3 */
+        if (line[0] == 'L') {
+            char *p = strstr(line, "_bb_");
+            if (p) {
+                char *q = p + 4;
+                int has = (*q >= '0' && *q <= '9'), n = 0;
+                while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+                if (has && *q == ':' && (q[1] == '\n' || q[1] == '\0')
+                    && (n > max_bb || !ref[n]))
+                    continue;                    /* drop dead label */
+            }
+        }
+        thread_jp_line(out, line, thr, max_bb);  /* rewrites jp targets; else fputs */
+    }
+    /* Pass 3: the deferred alias defc's, at the end of the function. */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout))
+        if (strncmp(line, "defc L_f", 8) == 0) fputs(line, out);
+    free(ref);
+    free(thr);
+}
+
 /* HL value cache. Reset at each BB boundary and at any op that
    clobbers HL the cache can't reason about (calls, branches, shifts
    that loop on HL). When the next op reads rs.hl as src[0] we
@@ -421,6 +548,22 @@ static int frame_has_saved_fp(const Func *f)
     return 1;
 }
 
+/* True iff entry maintains the software frame pointer for -debug on a CPU with
+   no IX (8080/8085/gbz80). `call l_debug_push_frame` saves the caller's
+   __debug_framepointer on the stack (2 bytes, between the locals and the return
+   address — same slot a saved IX would occupy) and points __debug_framepointer
+   at that save, so the debugger can walk frames and resolve `,B,1,d` cdb records.
+   The body still addresses locals/params via sp; this save is purely for the
+   debugger. Excludes naked (no frame) and interrupt (its push-all frames it). */
+static int frame_has_debug_fp(const Func *f)
+{
+    if (!f) return 0;
+    if (c_framepointer_is_ix != -1) return 0;   /* real IX frame handles it */
+    if (!c_debug_entry_points) return 0;
+    if (f->is_naked || f->is_interrupt) return 0;
+    return 1;
+}
+
 /* True iff entry saved IY for an idx3 (second-index) residency home. IY is
    callee-saved, so a function parking a loop-carried word there push/pop's it
    in the prologue/epilogue; the saved IY sits between the locals and the return
@@ -458,7 +601,7 @@ static int fastcall_arg_vreg(const Func *f);
 static int frame_has_saved_iy(const Func *f);
 static int frameless_ok(const Func *f)
 {
-    if (getenv("IR_NO_FRAMELESS")) return 0;
+    if (opt_disabled("frameless")) return 0;
     if (c_framepointer_is_ix == -1) return 0;    /* sp-mode is already frameless */
     if (f->is_naked || f->is_interrupt || f->uses_acc) return 0;
     if (f->frame_size != 0) return 0;
@@ -509,6 +652,7 @@ static int param_caller_off(const Func *f, int vreg_id)
        make room for the saved IX. So caller_off becomes
        frame_size + 4 + args_total instead of frame_size + 2 + args_total. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
+                    + (frame_has_debug_fp(f) ? 2 : 0)   /* l_debug_push_frame save */
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
@@ -1401,6 +1545,13 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            before the return address is read. Touches only IY/SP. */
         emit(out, "pop\tiy");
     }
+    if (frame_has_debug_fp(f)) {
+        /* no-IX -debug teardown: the frame drop above left sp at the saved
+           __debug_framepointer. l_debug_pop_frame restores it and removes the
+           2-byte save, preserving the return value in HL/DEHL (clobbers BC).
+           Sits below any critical l_pop_ei, matching the prologue push order. */
+        emit(out, "call\tl_debug_pop_frame");
+    }
     if (f->is_interrupt) {
         /* Interrupt epilogue: restore the prologue-saved registers (in
            reverse) and return. Return form by critical / vector combination:
@@ -1615,6 +1766,11 @@ static void emit_prologue(FILE *out, Func *f)
     if (frame_has_saved_iy(f))      /* idx3: preserve caller's IY (callee-saved),
                                        below the return address / above the frame */
         emit(out, "push\tiy");
+    if (frame_has_debug_fp(f))      /* no-IX -debug: chain __debug_framepointer.
+                                       Pushes 2 bytes, preserves HL (fastcall arg),
+                                       clobbers BC — must precede the fastcall/sc1
+                                       register stash below and the frame alloc. */
+        emit(out, "call\tl_debug_push_frame");
 
     /* FRAMEPTR setup. Point IX at entry-sp when FP addressing is active;
        must be set BEFORE the frame alloc so it captures sp between locals
@@ -2036,7 +2192,7 @@ static int no_slot_consumer_safe(const Func *f, const BB *bb, int j)
    the byte analogue the ss machinery doesn't cover. */
 static void compute_no_slot_bytes(Func *f)
 {
-    if (getenv("IR_NO_SLOT_PRUNE")) return;
+    if (opt_disabled("slot-prune")) return;
     for (int v = 0; v < f->n_vregs; v++) {
         VReg *vr = &f->vregs[v];
         if (vr->width != 1) continue;
@@ -2401,9 +2557,9 @@ int ir_lower_func(FILE *out, Func *f)
     /* Lazy-spill config (per-pass deferral state lives in
        lower_func_render). Default ON (sound static reaching-reloads model);
        IR_NO_LAZY_SPILL opts out to the single-pass lowering for A/B. */
-    L.lazy_spill_on = getenv("IR_NO_LAZY_SPILL") == NULL;
+    L.lazy_spill_on = !opt_disabled("lazy-spill");
     int want_lazy = L.lazy_spill_on;
-    f32_stack_arg_on = getenv("IR_NO_F32_STACK_ARG") == NULL;
+    f32_stack_arg_on = !opt_disabled("f32-stack-arg");
 
     /* No function label here — the surrounding legacy scaffolding
        (declparse.c + codegen.c) already emits `._<name>`. The render
@@ -2432,7 +2588,7 @@ int ir_lower_func(FILE *out, Func *f)
        re-emit the constant instead of reloading a slot. */
     L.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                          sizeof(const Op *));
-    if (L.remat_def && !getenv("IR_NO_REMAT")) {
+    if (L.remat_def && !opt_disabled("remat")) {
         int *ndef = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
         if (ndef) {
             /* Count via ir_op_defs — some ops define through a non-dst field
@@ -2560,6 +2716,15 @@ int ir_lower_func(FILE *out, Func *f)
        a BB end), then pass 2 renders for real with deferral on, its cross-BB
        defer decision consulting that complete map. */
     int rc;
+    /* Render the function body to a scratch file, then copy to `out` dropping
+       dead BB labels (emit_dropping_dead_bb_labels). IR_NO_LABEL_ELIDE opts out
+       to writing `out` directly. */
+    int elide_labels = !opt_disabled("label-elide");
+    int max_bb = -1;
+    for (int i = 0; i < f->n_bbs; i++)
+        if (f->bbs[i].id > max_bb) max_bb = f->bbs[i].id;
+    FILE *rout = elide_labels ? tmpfile() : NULL;
+    if (!rout) { rout = out; elide_labels = 0; }
     int *bb_hl_out_p1 = NULL;
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
@@ -2571,7 +2736,7 @@ int ir_lower_func(FILE *out, Func *f)
     L.ss_cur_g = -1;
     L.ss_pinned = 0;
     if (!want_lazy) {
-        rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
+        rc = lower_func_render(rout, f, 0, NULL, bb_hl_out, bb_lowered,
                                bb_pending_out, bb_pred_cnt, bb_preds,
                                bb_alias);
     } else {
@@ -2615,7 +2780,7 @@ int ir_lower_func(FILE *out, Func *f)
         if (!scratch) {
             /* Degraded (OOM / no memstream): single deferral-off pass.
                Correct, just forgoes the lazy win. */
-            rc = lower_func_render(out, f, 0, NULL, bb_hl_out, bb_lowered,
+            rc = lower_func_render(rout, f, 0, NULL, bb_hl_out, bb_lowered,
                                    bb_pending_out, bb_pred_cnt, bb_preds,
                                    bb_alias);
             free(src_snap);
@@ -2653,7 +2818,7 @@ int ir_lower_func(FILE *out, Func *f)
                 /* Pass 2: skip the dead stores. */
                 L.ss_store_dead = store_dead;
                 L.ss_phase = store_dead ? 2 : 0;
-                rc = lower_func_render(out, f, 1, bb_hl_out_p1, bb_hl_out,
+                rc = lower_func_render(rout, f, 1, bb_hl_out_p1, bb_hl_out,
                                        bb_lowered, bb_pending_out,
                                        bb_pred_cnt, bb_preds, bb_alias);
                 L.ss_phase = 0;
@@ -2670,6 +2835,12 @@ int ir_lower_func(FILE *out, Func *f)
         L.ss_op_store = NULL;
         L.ss_op_reload = NULL;
         L.ss_op_cacheread = NULL;
+    }
+    if (elide_labels) {
+        if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb);
+        else { rewind(rout); char buf[1024];   /* error path: copy verbatim */
+               while (fgets(buf, sizeof buf, rout)) fputs(buf, out); }
+        fclose(rout);
     }
     free(bb_hl_out_p1);
 
@@ -2777,7 +2948,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        across a loop, suppress per-iter spills + assert residency at the
        header. */
     L.cur_home_region_lo = L.cur_home_region_hi = -1;
-    if (L.cur_func_ehome >= 0 && !getenv("IR_NO_HOME_RESIDENT"))
+    if (L.cur_func_ehome >= 0 && !opt_disabled("home-resident"))
         compute_home_region(f, L.cur_func_ehome, bb_alias,
                             &L.cur_home_region_lo, &L.cur_home_region_hi);
     /* Home exit-flush hoist: if the region leaves to exactly ONE target block
@@ -2788,7 +2959,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        or sp via HL, flush the one byte). IR_NO_WH_EXIT_HOIST opts out. */
     L.cur_home_exit_flush_bb = -1;
     if (L.cur_func_ehome >= 0
-        && L.cur_home_region_lo >= 0 && !getenv("IR_NO_WH_EXIT_HOIST")) {
+        && L.cur_home_region_lo >= 0 && !opt_disabled("wh-exit-hoist")) {
         int tgt = -1, ok = 1;
         for (int b = L.cur_home_region_lo; b <= L.cur_home_region_hi && ok; b++) {
             const BB *sb = &f->bbs[b];
@@ -3521,21 +3692,25 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                unconditional IR_BR at end of BB targeting the next
                BB in lowering order. */
             if (op->kind == IR_BR && j == bb->n_ops - 1) {
-                /* Skip against the next BB that actually EMITS code —
-                   alias-elided trampolines produce no bytes, so
-                   falling through lands on the BB after them. Resolve
-                   the jp target through the alias map too. */
-                int next_emitted = -1;
-                for (int k = i + 1; k < f->n_bbs; k++) {
-                    if (!bb_alias || bb_alias[k] < 0) {
-                        next_emitted = k;
-                        break;
-                    }
-                }
                 int tgt = op->label;
                 if (bb_alias && tgt >= 0 && tgt < f->n_bbs
                     && bb_alias[tgt] >= 0)
                     tgt = bb_alias[tgt];
+                /* Skip against the next BB that actually EMITS code —
+                   alias-elided trampolines produce no bytes, and an empty
+                   byte-shift-fuse "skip" arm (its SHL hoisted before the
+                   branch) also produces none, so falling through lands on the
+                   BB after them. */
+                int next_emitted = -1;
+                for (int k = i + 1; k < f->n_bbs; k++) {
+                    if (bb_alias && bb_alias[k] >= 0)
+                        continue;
+                    if (f->bbs[k].id != tgt
+                        && bb_is_empty_shl_arm_to(f, &f->bbs[k], tgt))
+                        continue;
+                    next_emitted = k;
+                    break;
+                }
                 if (next_emitted >= 0 && tgt == next_emitted) {
                     /* Preheader fall-through into a resident loop: re-home
                        the slot-backed home into E here too (this elided BR is

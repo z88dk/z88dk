@@ -11,6 +11,8 @@
 #include "ir_lower.h"
 #include "ir_analysis.h"
 
+extern char c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -299,7 +301,12 @@ void ir_assign_slots(Func *f)
             }
             VReg *vr = &f->vregs[v];
             int is_pinned = (vr->flags & IR_VREG_PARAM)
-                         || (vr->flags & IR_VREG_ADDR_TAKEN);
+                         || (vr->flags & IR_VREG_ADDR_TAKEN)
+                         /* -debug: give every named local its own dedicated
+                            slot (no first-fit sharing) so its ,B,1,d cdb
+                            record is a stable, unambiguous frame offset across
+                            its whole scope. */
+                         || (c_debug_adb_defc && vr->sym != NULL);
             if ((pass == 0) != is_pinned) continue;
 
             int width = (vr->width > 0) ? vr->width : 2;

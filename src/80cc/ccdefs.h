@@ -53,9 +53,14 @@ extern Node    *callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 
 /* cdbfile.c */
+extern char     c_debug_adb_defc;   /* -debug: emit sdcc-compatible cdb */
 extern void     debug_write_module(void);
 extern void     debug_write_symbol(SYMBOL *sym);
 extern void     debug_write_type(Type *type);
+/* Emit a stack local/param cdb record with an explicit frame-base offset.
+   Used post-lowering (ir_lower_to_output) so the ,B,1,d offset reflects the
+   backend's real slot placement, not the front-end nominal offset. */
+extern void     debug_write_local_at(const char *fn_name, SYMBOL *sym, int offset);
 
 #include "codegen.h"
 

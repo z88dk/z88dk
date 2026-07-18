@@ -15,6 +15,35 @@
 =
 	ld	(iy%1),a
 
+%title #R1 elide store-then-reload of same register (-1b, -4t)
+%is %1 e d b c
+	ld	%1,a
+	ld	a,%1
+=
+	ld	%1,a
+
+;; #R2 safe: volatile slot stores are stamped ;volatile (won't match), and byte
+;; deref stores emit (de)/(bc) not (hl),a — so this only fires on a non-volatile
+;; local slot.
+%title #R2 elide store-then-reload of same (hl) slot (-1b, -7t)
+	ld	(hl),a
+	ld	a,(hl)
+=
+	ld	(hl),a
+
+;; #R3 reg reload across a conditional jump: after `ld r,a` A==r, and jp
+;; preserves A, so on the fall-through (the only way to reach `ld a,r` — dead BB
+;; labels are elided, nothing else targets it) the reload is a no-op. On the
+;; taken path it isn't executed. %2 captures any jp condition.
+%title #R3 elide reg reload across a conditional jump (-1b, -4t)
+%is %1 e d b c
+	ld	%1,a
+	jp	%2,%3
+	ld	a,%1
+=
+	ld	%1,a
+	jp	%2,%3
+
 %title #G1 gbz80 elide store-then-reload of same sp-rel int slot (-5b, -24t)
 %cpu gbz80
 	ld	hl,sp+%1
