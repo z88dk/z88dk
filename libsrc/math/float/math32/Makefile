@@ -6,6 +6,9 @@ vpath %.c $(Z88DK_LIBSRC)/math/float/math32/c
 vpath %.c ../cimpl
 
 
+# Shared dtoa helpers only (same idea as am9511).
+# 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
+# Z80 higher funcs: SDCC via `make -C c` → c/asm/*.asm in newlibfiles_z80.lst
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 

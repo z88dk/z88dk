@@ -29,3 +29,8 @@ math/float/math32/asm/8085/f32_fssqr
 math/float/math32/asm/8085/f32_fsldexp
 math/float/math32/asm/8085/f32_fssqrt
 math/float/math32/asm/8085/f32_fspoly
+math/float/math32/asm/8085/f32_fserror
+math/float/math32/asm/8085/f32_fshypot
+math/float/math32/asm/8085/f32_f2long
+math/float/math32/asm/8085/f32_l_ldexp
+math/float/math32/asm/8085/f32_l_swap
