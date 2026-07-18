@@ -6,6 +6,14 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fmax_callee
 
+IFDEF __CPU_INTEL__
+
+; 8085: C helper is already callee and AF-safe for the return path
+EXTERN _m32_fmaxf
+defc cm32_sccz80_fmax_callee = _m32_fmaxf
+
+ELSE
+
 EXTERN  m32_compare
 
     ; maximum of two sccz80 floats
@@ -16,22 +24,24 @@ EXTERN  m32_compare
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm32_sccz80_fmax_callee 
+.cm32_sccz80_fmax_callee
     call m32_compare        ; compare two floats on the stack
     jr C,left
-    pop af                  ; ret
-    pop hl                  ; pop right
+    pop bc                  ; ret
+    pop hl                  ; right
     pop de
-    pop bc                  ; pop left
-    pop bc
-    push af
-    ret                     ; return DEHL = sccz80_float min
+    pop af                  ; discard left
+    pop af
+    push bc                 ; ret
+    ret                     ; DEHL = max (right)
 
 .left
-    pop af                  ; ret
-    pop bc                  ; pop right
-    pop bc
-    pop hl                  ; pop left
+    pop bc                  ; ret
+    pop af                  ; discard right
+    pop af
+    pop hl                  ; left
     pop de
-    push af
-    ret                     ; return DEHL = sccz80_float max
+    push bc                 ; ret
+    ret                     ; DEHL = max (left)
+
+ENDIF

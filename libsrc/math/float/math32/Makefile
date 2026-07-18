@@ -6,6 +6,9 @@ vpath %.c $(Z88DK_LIBSRC)/math/float/math32/c
 vpath %.c ../cimpl
 
 
+# Shared dtoa helpers only (same idea as am9511).
+# 8085 higher funcs: sccz80 via `make -C c 8085` → c/8085/*.asm in newlibfiles_8085.lst
+# Z80 higher funcs: SDCC via `make -C c` → c/asm/*.asm in newlibfiles_z80.lst
 CFILES  = $(notdir $(wildcard ../../math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 CFILES  = atof.c ftoa.c ftoe.c tofix16.c fromfix16.c
 OBJECTS = $(CFILES:.c=.o) 
@@ -19,7 +22,8 @@ all: dirs $(OUTPUT_DIRECTORY)/math32.lib \
 	$(OUTPUT_DIRECTORY)/math32_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/math32_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/math32_r4k.lib \
-	$(OUTPUT_DIRECTORY)/math32_kc160.lib
+	$(OUTPUT_DIRECTORY)/math32_kc160.lib \
+	$(OUTPUT_DIRECTORY)/math32_8085.lib
 
 $(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS)) 
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
@@ -53,8 +57,12 @@ $(OUTPUT_DIRECTORY)/math32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_kc160.lst
 	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math32_kc160 @math32.lst
 
+$(OUTPUT_DIRECTORY)/math32_8085.lib: $(addprefix obj/8085/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
+	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/math32_8085 @math32.lst
+
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c
+	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

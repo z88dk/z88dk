@@ -12,6 +12,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin \
 	test_math32.bin test_math32_z180.bin test_math32_z80n.bin \
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_kc160.bin \
+	test_math32_8085.bin \
 	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
 	test_mbf32_r2ka.bin test_mbf32_r4k.bin test_mbf32_ez80_z80.bin test_mbf32_kc160.bin \
@@ -101,6 +102,10 @@ test_math32_r4k.bin: $(FPSOURCES)
 test_math32_kc160.bin: $(FPSOURCES)
 	$(call compile_kc160, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_kc160)
 	$(runtest_kc160)
+
+test_math32_8085.bin: $(FPSOURCES)
+	$(call compile_8085, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-8085\\\"\"", -lmath32_8085)
+	$(runtest_8085)
 
 test_math48_rc2014_CODE.bin: $(FPSOURCES)
 	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)

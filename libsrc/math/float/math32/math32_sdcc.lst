@@ -10,6 +10,8 @@ math/float/math32/c/sdcc/cm32_sdcc_cos
 math/float/math32/c/sdcc/cm32_sdcc_cosh
 math/float/math32/c/sdcc/cm32_sdcc_dload
 math/float/math32/c/sdcc/cm32_sdcc_exp
+math/float/math32/c/sdcc/cm32_sdcc_exp2
+math/float/math32/c/sdcc/cm32_sdcc_exp10
 math/float/math32/c/sdcc/cm32_sdcc_fabs
 math/float/math32/c/sdcc/cm32_sdcc_floor
 math/float/math32/c/sdcc/cm32_sdcc_fpclassify
@@ -61,6 +63,7 @@ math/float/math32/c/sdcc/cm32_sdcc_fssub
 math/float/math32/c/sdcc/cm32_sdcc_fssub_callee
 math/float/math32/c/sdcc/cm32_sdcc_fszero
 math/float/math32/c/sdcc/cm32_sdcc_log
+math/float/math32/c/sdcc/cm32_sdcc_log2
 math/float/math32/c/sdcc/cm32_sdcc_log10
 math/float/math32/c/sdcc/cm32_sdcc_pow_callee
 math/float/math32/c/sdcc/cm32_sdcc_round

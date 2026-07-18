@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.5.0 #15242 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -395,14 +395,14 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
 ; absolute external ram data
 ;--------------------------------------------------------
@@ -426,15 +426,23 @@ _m32_fmodf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
+	push	af
+	push	af
 	ld	a,(ix+11)
 	and	a,0x7f
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
 	jr	NZ,l_m32_fmodf_00102
-	; domain error: match m32_fsconst_pnan (0x7fffffff)
-	ld	hl,0xffff
-	ld	de,0x7fff
+	ld	a,0xff
+	ld	(ix-4),a
+	ld	(ix-3),a
+	ld	(ix-2),a
+	ld	(ix-1),0x7f
+	pop	hl
+	push	hl
+	ld	e,(ix-2)
+	ld	d,(ix-1)
 	jp	l_m32_fmodf_00103
 l_m32_fmodf_00102:
 	ld	l,(ix+10)
@@ -501,6 +509,7 @@ l_m32_fmodf_00102:
 	call	___fssub_callee
 l_m32_fmodf_00105:
 l_m32_fmodf_00103:
+	ld	sp, ix
 	pop	ix
 	ret
 	SECTION IGNORE

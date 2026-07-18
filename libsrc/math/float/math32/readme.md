@@ -160,25 +160,37 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 ```
 ## Directory Structure
 
-The library is laid out in these directories.
+The library is laid out in these directories: shared assembly, CPU-specific cores, C sources, and compiler bridges.
 
-### z80
+### asm
 
-Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic `math32` functions.
+Contains **8080-compatible** shared assembly: coefficient tables, float constants, and other routines that need no Z80-only or 8085-only instructions. Both the Z80-family and 8085 builds assemble this tree.
+
+### asm/z80
+
+Contains the Z80-specific intrinsic implementation of the maths library. This includes the maths functions expected by the C11 standard and various low-level functions necessary to implement a complete float package accessible from assembly language. These functions are the intrinsic `math32` functions and freely use the alternate register set and other Z80 facilities.
+
+CPU-specific mantissa multiply and square helpers also live here (`f32_z80_*`, `f32_z180_*`, `f32_z80n_*`, `f32_r2ka_*`, `f32_kc160_*`) and are selected by the classic `newlibfiles_*.lst` / hierarchical `math32_*_asm.lst` lists when building each `math32_*.lib` variant.
+
+### asm/8085
+
+8085-specific intrinsic implementations (extended opcodes, stack-based locals, no alternate registers). Selected when building `math32_8085.lib`.
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/asm` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math32_8085.lib`.
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm` / `asm/z80` (and for 8085, `asm/8085`) directories. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
 ### lm32
 
 Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line as `-lmath32`.
 
 An alias is provided to simplify usage of the library. `--math32` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1`.
+
+For Intel 8085 (`-clib=8085` / `-m8085`), `--math32` links `math32_8085.lib` via `@{ZCC_LIBCPU}`. Higher-level C helpers for 8085 are built with **sccz80 only** (zsdcc is Z80-only).
 
 ## Function Discussion
 

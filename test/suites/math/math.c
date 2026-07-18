@@ -198,8 +198,12 @@ static void run_sqrt(FLOAT x, FLOAT e)
     static char   buf[100];
 
     FLOAT r = SQRT(x);
+    /* Compare before snprintf: multi-float varargs can clobber sccz80
+     * stack params on 8085 (and is wasteful on success everywhere). */
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",(float)x,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_sqrt()
@@ -216,8 +220,10 @@ static void run_pow(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = POW(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_pow()
@@ -235,8 +241,10 @@ static void run_fmod(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = FMOD(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"fmod(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_fmod()
@@ -250,8 +258,10 @@ static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = FMIN(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"fmin(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_fmin()
@@ -267,8 +277,10 @@ static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = FMAX(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"fmax(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_fmax()
@@ -319,6 +331,65 @@ void test_reciprocal()
     Assert(approx_equal(1.0 / recip_den[1], 0.125, EPSILON), "1/int8 = 0.125");
 }
 
+/* Binary float arithmetic beyond integer-valued cases. Covers mantissa mul,
+   signed products, zero, and basic add/sub — the paths exercised by IEEE
+   math32 / 8085 ports (sticky-round mul, unpack/pack). Prefer exact == for
+   values that are binary-exact; approx_equal only where needed. */
+static FLOAT fa_ops[8];
+void test_float_arithmetic()
+{
+    FLOAT a, c;
+
+    /* exact binary products */
+    fa_ops[0] = 1.5; fa_ops[1] = 1.5;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)2.25, "1.5*1.5 == 2.25");
+    fa_ops[0] = 0.5; fa_ops[1] = 0.5;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)0.25, "0.5*0.5 == 0.25");
+    fa_ops[0] = 2.0; fa_ops[1] = 3.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)6.0, "2*3 == 6");
+
+    /* signs */
+    fa_ops[0] = -3.0; fa_ops[1] = 4.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)(-12.0), "(-3)*4 == -12");
+    fa_ops[0] = 3.0; fa_ops[1] = -4.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)(-12.0), "3*(-4) == -12");
+    fa_ops[0] = -2.0; fa_ops[1] = -3.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)6.0, "(-2)*(-3) == 6");
+
+    /* zero */
+    fa_ops[0] = 0.0; fa_ops[1] = 5.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)0.0, "0*5 == 0");
+    fa_ops[0] = 5.0; fa_ops[1] = 0.0;
+    Assert(fa_ops[0] * fa_ops[1] == (FLOAT)0.0, "5*0 == 0");
+
+    /* add / sub */
+    fa_ops[0] = 1.0; fa_ops[1] = 2.0;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)3.0, "1+2 == 3");
+    fa_ops[0] = 1.5; fa_ops[1] = 1.5;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)3.0, "1.5+1.5 == 3");
+    fa_ops[0] = 1.0; fa_ops[1] = -1.0;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)0.0, "1+(-1) == 0");
+    fa_ops[0] = 5.0; fa_ops[1] = 3.0;
+    Assert(fa_ops[0] - fa_ops[1] == (FLOAT)2.0, "5-3 == 2");
+    fa_ops[0] = -1.0; fa_ops[1] = -2.0;
+    Assert(fa_ops[0] + fa_ops[1] == (FLOAT)(-3.0), "(-1)+(-2) == -3");
+
+    /* chained: (a*b)+c and a*(b+c) with runtime-written inputs */
+    fa_ops[0] = 1.5; fa_ops[1] = 2.0; fa_ops[2] = 0.5;
+    a = fa_ops[0] * fa_ops[1] + fa_ops[2];
+    Assert(a == (FLOAT)3.5, "1.5*2+0.5 == 3.5");
+    a = fa_ops[0] * (fa_ops[1] + fa_ops[2]);
+    Assert(a == (FLOAT)3.75, "1.5*(2+0.5) == 3.75");
+
+    /* non-exact binary: still within library epsilon */
+    fa_ops[0] = 0.1; fa_ops[1] = 0.2;
+    c = fa_ops[0] + fa_ops[1];
+    Assert(approx_equal(c, (FLOAT)0.3, EPSILON), "0.1+0.2 ~ 0.3");
+    fa_ops[0] = 1.0; fa_ops[1] = 3.0;
+    c = fa_ops[0] / fa_ops[1];
+    Assert(approx_equal(c, (FLOAT)0.333333333, EPSILON), "1/3 ~ 0.333...");
+}
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -332,6 +403,7 @@ int suite_math()
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
     suite_add_test(test_int_to_float_store);
+    suite_add_test(test_float_arithmetic);
     suite_add_test(test_reciprocal);
     suite_add_test(test_sqrt);
     suite_add_test(test_pow);

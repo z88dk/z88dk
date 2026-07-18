@@ -6,6 +6,14 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fmin_callee
 
+IFDEF __CPU_INTEL__
+
+; 8085: C helper is already callee and AF-safe for the return path
+EXTERN _m32_fminf
+defc cm32_sccz80_fmin_callee = _m32_fminf
+
+ELSE
+
 EXTERN  m32_compare
 
     ; minimum of two sccz80 floats
@@ -16,22 +24,24 @@ EXTERN  m32_compare
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm32_sccz80_fmin_callee 
+.cm32_sccz80_fmin_callee
     call m32_compare        ; compare two floats on the stack
     jr NC,left
-    pop af                  ; ret
-    pop hl                  ; pop right
+    pop bc                  ; ret
+    pop hl                  ; right
     pop de
-    pop bc                  ; pop left
-    pop bc
-    push af
-    ret                     ; return DEHL = sccz80_float min
+    pop af                  ; discard left
+    pop af
+    push bc                 ; ret
+    ret                     ; DEHL = min (right)
 
 .left
-    pop af                  ; ret
-    pop bc                  ; pop right
-    pop bc
-    pop hl                  ; pop left
+    pop bc                  ; ret
+    pop af                  ; discard right
+    pop af
+    pop hl                  ; left
     pop de
-    push af
-    ret                     ; return DEHL = sccz80_float min
+    push bc                 ; ret
+    ret                     ; DEHL = min (left)
+
+ENDIF
