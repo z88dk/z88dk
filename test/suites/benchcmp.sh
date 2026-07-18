@@ -1,7 +1,7 @@
 #!/bin/sh
 # benchcmp.sh — cross-compiler benchmark comparison for the z88dk bench suites.
 #
-# Compiles each benchmark with sccz80, sdcc, 80cc (fp = -frameix) and 80cc (sp)
+# Compiles each benchmark with sccz80, sdcc, 80cc (fp = -fframe-pointer) and 80cc (sp)
 # via the +test framework, runs it under z88dk-ticks, and prints a table of
 # ticks / binary size / pass-fail. Each bench is built and run from its OWN
 # directory so file-reading tests (md5 reads md5test.bin) find their inputs.
@@ -48,7 +48,7 @@ fi
 
 # config label : extra zcc flags
 configs="sccz80:-compiler=sccz80 sdcc:-compiler=sdcc \
-80cc-fp:-compiler=80cc_-Cc-frameix 80cc-sp:-compiler=80cc"
+80cc-fp:-compiler=80cc_-Cc-fframe-pointer 80cc-sp:-compiler=80cc"
 
 CFLAGS="-I../../framework -DNO_LOG_RUNNING -DNO_LOG_PASSED"
 tmp=$(mktemp -d)

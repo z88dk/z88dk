@@ -275,6 +275,33 @@ static void test_var_long_shift(void)
     Assert(gap_vshl(0x00000001UL, 20) == 0x00100000UL, "var-count long << keeps the count");
 }
 
+/* ---- Signed `>>` must be ARITHMETIC, not logical (#289) -----------
+ * ir_build once collapsed OP_SSHR to a logical IR_SHR, so `(-16)>>2`
+ * came out 0x3FFC instead of -4 for a RUNTIME value (constants fold at
+ * compile time and hid it). Now a signed shift sets IR_SHR_ARITH and
+ * lowers via `sra` (z80 fam), ARHL (8085) or l_asr / l_asr_dehl (8080/
+ * gbz80). Args are runtime so the count/value never constant-fold. */
+int           gap_iasr(int x, int n)            { return x >> n; }
+long          gap_lasr(long x, int n)           { return x >> n; }
+unsigned      gap_iusr(unsigned x, int n)       { return x >> n; }
+unsigned long gap_lusr(unsigned long x, int n)  { return x >> n; }
+
+static void test_signed_shift_arith(void)
+{
+    /* 16-bit signed → sign-propagating */
+    Assert(gap_iasr(-16, 2)   == -4,   "int >>2 arithmetic (neg)");
+    Assert(gap_iasr(-1, 5)    == -1,   "int >>5 of -1 stays -1");
+    Assert(gap_iasr(-1000, 3) == -125, "int >>3 arithmetic (neg)");
+    Assert(gap_iasr(1000, 3)  == 125,  "int >>3 arithmetic (pos)");
+    /* 32-bit signed → sign-propagating */
+    Assert(gap_lasr(-1600000L, 3) == -200000L, "long >>3 arithmetic (neg)");
+    Assert(gap_lasr(-1L, 9)       == -1L,      "long >>9 of -1 stays -1");
+    Assert(gap_lasr(1600000L, 4)  == 100000L,  "long >>4 arithmetic (pos)");
+    /* unsigned counterparts stay LOGICAL (zero-fill) */
+    Assert(gap_iusr(0xFFF0u, 2)      == 0x3FFCu,      "unsigned int >> logical");
+    Assert(gap_lusr(0xFFFF0000UL, 4) == 0x0FFFF000UL, "unsigned long >> logical");
+}
+
 /* ---- Constant store folded to an immediate (arr[i]=K) --------------
  * const_fold rewrites a constant MEM_VREG store to `ld (hl),imm` (byte) /
  * `ld (hl),lo;inc hl;ld (hl),hi` (word) with src[0]=-1 — no value register.
@@ -501,6 +528,7 @@ int main(int argc, char *argv[])
     suite_add_test(test_deref_step_long);
     suite_add_test(test_addr_alias_read);
     suite_add_test(test_var_long_shift);
+    suite_add_test(test_signed_shift_arith);
     suite_add_test(test_const_bitop_fuse);
     suite_add_test(test_expr_stmt);
     suite_add_test(test_cse_global_dest);

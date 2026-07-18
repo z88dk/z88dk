@@ -60,6 +60,10 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
         spill_de_unless_dead(out, f, op->dst);
+        /* PR_STACK parked the value on the stack (not HL) — advertising HL would
+           let a reader skip the balancing pop. Its use pops. */
+        if (f->vreg_to_phys && f->vreg_to_phys[op->dst] == IR_PR_STACK)
+            return 0;
     }
     cache_hl(op->dst);
     return 0;
@@ -938,7 +942,8 @@ static int func_has_pr_bc(const Func *f)
 {
     if (!f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == IR_PR_BC) return 1;
+        if (f->vreg_to_phys[i] == IR_PR_BC
+            && !(f->vregs[i].flags & IR_VREG_BC_PACK)) return 1;
     return 0;
 }
 
@@ -1072,6 +1077,17 @@ static int gen_asm(FILE *out, Func *f, const Op *op)
 
 static int gen_neg(FILE *out, Func *f, const Op *op)
 {
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
+        /* Byte NEG: A = -src[0], stored as ONE byte. Without this the width-2
+           fallback below (commit_hl_word) writes two bytes into a one-byte slot
+           — the extra byte clobbers the neighbouring slot (e.g. a byte-narrowed
+           `r` overwriting the low byte of an adjacent long). `cpl;add a,1` is the
+           two's-complement (~x+1), the same portable idiom as the width-4 path. */
+        load_byte_to_a(out, f, op->src[0]);
+        emit(out, "cpl");
+        emit(out, "add\ta,1");
+        return finalize_byte_result(out, f, op, 1);
+    }
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         /* Long NEG: DEHL = 0 - src[0], done as ~x + 1 byte-wise to
            avoid l_long_sub for a trivial constant LHS. */
@@ -1443,8 +1459,30 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             }
         }
     }
-    /* Residual bit-shift (1..7) via the helper bit-loop. */
-    if (bit_shift) {
+    /* Residual bit-shift (1..7). 8085 has native 16-bit shift ops the CB-less
+       808x path otherwise can't use: `rl de` (RDEL) and `add hl,hl` chain a
+       32-bit left shift in 2 ops/bit; a right shift has no native DE rotate so
+       it falls to an `or a` + `rra` byte-chain MSB→LSB. The left chain is lean
+       (2 ops/bit) so inline small counts; the right chain is 13 ops/bit so
+       inline ONLY a single bit (the CRC `>>1` hot case) — multi-bit right
+       shifts bloat with no real gain and keep the helper call. */
+    int inline_8085 = IS_8085()
+        && (is_shr ? (bit_shift == 1) : (bit_shift <= 3));
+    if (bit_shift && inline_8085) {
+        for (int i = 0; i < bit_shift; i++) {
+            if (is_shr) {
+                emit(out, "or\ta");            /* CY=0 → logical 0 into MSB */
+                emit(out, "ld\ta,d"); emit(out, "rra"); emit(out, "ld\td,a");
+                emit(out, "ld\ta,e"); emit(out, "rra"); emit(out, "ld\te,a");
+                emit(out, "ld\ta,h"); emit(out, "rra"); emit(out, "ld\th,a");
+                emit(out, "ld\ta,l"); emit(out, "rra"); emit(out, "ld\tl,a");
+            } else {
+                emit(out, "add\thl,hl");        /* low16<<1, bit15 -> CY */
+                emit(out, "rl\tde");            /* RDEL: high16<<1 through CY */
+            }
+        }
+        if (is_shr) invalidate_a_cache();
+    } else if (bit_shift) {
         emit(out, "ld\ta,%d", bit_shift);
         emit(out, is_shr ? "call\tl_lsr_dehl" : "call\tl_lsl_dehl");
     }
@@ -1878,6 +1916,16 @@ static void emit_pair_add_de_clean(FILE *out, const char *pair, const char *lo,
         emit(out, "adc\ta,%d", (k >> 8) & 0xff);
         emit(out, "ld\t%s,a", hi);
         invalidate_a_cache();
+        return;
+    }
+    /* A not free and past the inc range: a stack-scratched `add pair,de` is
+       O(1) bytes and preserves DE, BC and A — vastly better than an inc/dec
+       chain of length |k| (a +40 struct-field offset was 40 `inc hl`). */
+    if (k > 4 || k < -4) {
+        emit(out, "push\tde");
+        emit(out, "ld\tde,%d", k);
+        emit(out, "add\t%s,de", pair);
+        emit(out, "pop\tde");
         return;
     }
     const char *op = k > 0 ? "inc" : "dec";
@@ -2852,6 +2900,44 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
+    /* LRA Phase 4: marked (ir_bc_pack) to stage src[1] into BC so a DE-packed
+       resident in this op's span survives — `add hl,bc`. Pre-empts every
+       DE-using path below. */
+    if (op->lra_stage_src1_bc) {
+        load_binop_operands_bc(out, f, op);
+        emit(out, "add\thl,bc");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
+    /* LRA Phase 2b: accumulate directly in an index home. When dst is IX/IY-homed
+       (idx2/idx3) and one src shares that exact home — the running chain value is
+       already resident in the index reg — load the OTHER operand into DE and
+       `add <idx>,de` (or `add <idx>,<idx>` for x+x), keeping the result in the
+       index reg. Avoids the push/pop round-trip (load acc, add hl,de, store acc)
+       the generic path would emit. The FIRST add of a chain (no src in the home
+       yet) falls through and commit_hl_result inits the reg via `push hl;pop iy`.
+       Byte-identical by default (no index homes unless --idx3 / idx2). */
+    if (op->dst >= 0 && op->dst < f->n_vregs && f->vregs[op->dst].width == 2
+        && vreg_idx_home(f, op->dst) != IR_PR_NONE) {
+        PhysReg home = f->vreg_to_phys[op->dst];
+        const char *ir = idx_pr_name(home);
+        int acc = -1, other = -1;
+        if (op->src[0] >= 0 && f->vreg_to_phys[op->src[0]] == home)
+            { acc = op->src[0]; other = op->src[1]; }
+        else if (op->src[1] >= 0 && f->vreg_to_phys[op->src[1]] == home)
+            { acc = op->src[1]; other = op->src[0]; }
+        if (acc >= 0 && ir) {
+            if (other >= 0 && f->vreg_to_phys[other] == home) {
+                emit(out, "add\t%s,%s", ir, ir);      /* x + x (both in reg) */
+            } else {
+                if (other < 0) emit(out, "ld\tde,%lld", (long long)op->imm);
+                else           load_to_de(out, f, other);  /* HL scratch; reg preserved */
+                emit(out, "add\t%s,de", ir);
+                invalidate_de_cache();
+            }
+            return 0;                                  /* result stays in the index reg */
+        }
+    }
     if (try_word_accumulate(out, f, op))
         return 0;
     if (try_de_home_def(out, f, op))
@@ -3156,6 +3242,16 @@ static int gen_add(FILE *out, Func *f, const Op *op)
 
 static int gen_sub(FILE *out, Func *f, const Op *op)
 {
+    /* LRA Phase 4: marked to stage src[1] into BC — `or a; sbc hl,bc` — so a
+       DE-packed resident in this op's span survives. Word only (marking
+       restricts to width-2 ADD/SUB); pre-empts the DE-using paths below. */
+    if (op->lra_stage_src1_bc) {
+        load_binop_operands_bc(out, f, op);
+        emit(out, "or\ta");
+        emit(out, "sbc\thl,bc");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     if (try_de_home_def(out, f, op))
         return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {

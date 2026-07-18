@@ -49,7 +49,6 @@ int c_old_diagnostic_fmt = 0;
    the legacy emit-while-parsing path and the AST walker are both gone. */
 int c_ast_print = 0;         /* 1 = print the AST per function and skip codegen */
 int c_ast_print_types = 0;   /* 1 = decorate print_ast output with type info */
-int c_use_ir = 0;            /* 1 = route function codegen through ir_build → ir_lower */
 char *c_zcc_opt = "zcc_opt.def";
 
 /* Settings for genmath + math48 */
@@ -60,7 +59,6 @@ int c_fp_size = 6;
 
 enum maths_mode c_maths_mode = MATHS_Z80;
 
-uint32_t c_speed_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 uint32_t c_opt_disable = 0;
 
 char *c_rodata_section = "rodata_compiler";
@@ -90,8 +88,8 @@ static void SetDefine(option *arg, char *val);
 static void SetUndefine(option *arg, char *val);
 static void SetIncludePath(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
-static void opt_code_speed(option *arg, char* val);
 static void opt_disable(option *arg, char *val);
+static void opt_code_speed_inert(option *arg, char *val);
 static void atexit_deallocate(void);
 
 
@@ -130,7 +128,6 @@ static option  sccz80_opts[] = {
     { 0, "fp-mode=z88", OPT_ASSIGN|OPT_INT, "Use 40 bit z88 doubles", &c_maths_mode, NULL, MATHS_Z88 },
     { 0, "fp-mode=am9511", OPT_ASSIGN|OPT_INT, "Use 32 bit AM9511 doubles", &c_maths_mode, NULL, MATHS_AM9511 },
     
-    { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, NULL, 0 },
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n (inert — escapes are always standard)", &c_standard_escapecodes, NULL, 0},
     { 0, "set-r2l-by-default", OPT_BOOL, "Use r->l calling convention by default", &c_use_r2l_calling_convention, NULL, 0 },
     { 0, "constseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the const section name", &c_rodata_section, NULL, 0 },
@@ -139,19 +136,20 @@ static option  sccz80_opts[] = {
     { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the data section name", &c_data_section, NULL, 0 },
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
-    { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "Optimise for speed not size", NULL, opt_code_speed, 0},
     { 0, "opt-disable", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "=<list> Disable named AST optimiser passes (comma-separated). Names: all, fold, prop, simplify, typecheck, compoundify, strength-reduce, cse, cse-synth, licm, dse, dead-code, thread-jumps, demote-poststep, loop-reverse; pattern:<name> disables one IR pattern-matcher entry. Useful for bisecting miscompiles.", NULL, opt_disable, 0 },
+    { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "(inert) Accepted for --math16 alias / sccz80-family CLI compatibility; no effect in the IR back end", NULL, opt_code_speed_inert, 0 },
     { 0, "ast-print", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Build the AST per function, print it to stderr, and skip code generation", &c_ast_print, NULL, 0 },
     { 0, "ast-print-types", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Decorate the AST print with type/qualifier/attribute info; implies --ast-print", &c_ast_print_types, NULL, 0 },
-    { 0, "use-ir", OPT_BOOL|OPT_DOUBLE_DASH, "(experimental) Route function codegen through the new IR pipeline (ir_build → ir_lower). Phase 1 — most C constructs unsupported", &c_use_ir, NULL, 0 },
-    { 0, "", OPT_HEADER, "Framepointer configuration (for debugging):", NULL, NULL, 0 },
-    { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, NULL, 1},
-    { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, NULL, 0},
-    { 0, "idx2-invariant", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Hold a loop-invariant in the spare index register (opposite the frame pointer)", &c_idx2_invariant, NULL, 1},
-    { 0, "no-idx2-invariant", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable the spare-index-register loop-invariant resident", &c_idx2_invariant, NULL, 0},
-    { 0, "idx3", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Hold a second loop-carried word in IY (sp-mode, z80/z80n only)", &c_idx3_residency, NULL, 1},
-    { 0, "no-idx3", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable the second index-register (IY) residency", &c_idx3_residency, NULL, 0},
-    { 0, "exx", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Hold a loop-invariant in the exx/alt register set (sp-mode, z80/z80n)", &c_exx_residency, NULL, 1},
+    { 0, "", OPT_HEADER, "Frame pointer / index-register reservation:", NULL, NULL, 0 },
+    { 0, "fframe-pointer", OPT_ASSIGN|OPT_INT, "Use IX as a frame pointer (address locals via ix+d)", &c_framepointer_is_ix, NULL, 1},
+    { 0, "fomit-frame-pointer", OPT_ASSIGN|OPT_INT, "Omit the frame pointer; address locals via sp (default)", &c_framepointer_is_ix, NULL, -1},
+    { 0, "reserve-regs-iy", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Reserve IY: never use it for residency (leaves at most one index register)", &c_reserve_iy, NULL, 1},
+    { 0, "reserve-regs-ix", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Reserve IX (sp-mode): do not use it as the spare index register", &c_reserve_ix, NULL, 1},
+    { 0, "reg-index-invariant", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Hold a loop-invariant in the spare index register (IX in sp-mode, IY in fp-mode)", &c_idx2_invariant, NULL, 1},
+    { 0, "no-reg-index-invariant", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable the spare-index-register loop-invariant resident", &c_idx2_invariant, NULL, 0},
+    { 0, "reg-iy-half", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "(experimental) Hold a second loop-carried word in IY via index-half ops (ld iyl,c / sub iyl); sp-mode, z80/z80n only — undocumented opcodes, IY is callee-saved", &c_idx3_residency, NULL, 1},
+    { 0, "no-reg-iy-half", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable the index-half IY residency", &c_idx3_residency, NULL, 0},
+    { 0, "exx", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "(experimental) Hold a loop-invariant in the exx/alt register set (sp-mode, z80/z80n)", &c_exx_residency, NULL, 1},
     { 0, "no-exx", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable exx/alt register-set residency", &c_exx_residency, NULL, 0},
     { 0, "byte-resident", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Keep a hot loop-carried char accumulator in a byte register", &c_byte_resident, NULL, 1},
     { 0, "no-byte-resident", OPT_ASSIGN|OPT_INT|OPT_DOUBLE_DASH, "Disable byte-register residency for char accumulators", &c_byte_resident, NULL, 0},
@@ -267,10 +265,6 @@ int main(int argc, char** argv)
         info();
         exit(1);
     }
-
-    /* The IR is the only codegen path — the AST walker has been removed.
-       An IR translation failure is fatal (no fallback); see declparse. */
-    c_use_ir = 1;
 
     if ( c_maths_mode == MATHS_IEEE ) {
         c_fp_size = 4;
@@ -902,44 +896,6 @@ void closeout(void)
 
 
 
-
-static void opt_code_speed(option *arg, char* val)
-{
-    char   *ptr = val - 1;
-
-    c_speed_optimisation = 0;
-
-    do {
-        ptr++;
-        if ( strncmp(ptr,"all",3) == 0 ) {
-            c_speed_optimisation = ~0;
-            break;
-        } else if ( strncmp(ptr, "lshift32", 8) == 0 ) {
-            c_speed_optimisation |= OPT_LSHIFT32;
-        } else if ( strncmp(ptr, "rshift32", 8) == 0 ) {
-            c_speed_optimisation |= OPT_RSHIFT32;
-        } else if ( strncmp(ptr, "add32", 5) == 0 ) {
-            c_speed_optimisation |= OPT_ADD32;
-        } else if ( strncmp(ptr, "sub32", 5) == 0 ) {
-            c_speed_optimisation |= OPT_SUB32;
-        } else if ( strncmp(ptr, "sub16", 5) == 0 ) {
-            c_speed_optimisation |= OPT_SUB16;
-        } else if ( strncmp(ptr, "intcompare", 10) == 0 ) {
-            c_speed_optimisation |= OPT_INT_COMPARE;
-        } else if ( strncmp(ptr, "charcompare", 10) == 0 ) {
-            c_speed_optimisation |= OPT_CHAR_COMPARE;
-        } else if ( strncmp(ptr, "longcompare", 11) == 0 ) {
-            c_speed_optimisation |= OPT_LONG_COMPARE;
-        } else if ( strncmp(ptr, "ucharmult", 9) == 0 ) {
-            c_speed_optimisation |= OPT_UCHAR_MULT;
-        } else if ( strncmp(ptr, "floatconst", 10) == 0 ) {
-            c_speed_optimisation |= OPT_DOUBLE_CONST;
-        }
-    } while ( (ptr = strchr(ptr, ',')) != NULL );
-}
-
-
-
 /* Parse --opt-disable=<csv> into the c_opt_disable bitmask. Each name
    in the list flips one bit; the special name "all" sets all bits.
    Unknown names are silently ignored — preserves forward compatibility
@@ -963,6 +919,17 @@ static const struct { const char *name; uint32_t bit; } opt_disable_names[] = {
     { "demote-poststep", OPT_DISABLE_DEMOTE_POSTSTEP },
     { "loop-reverse",    OPT_DISABLE_LOOP_REVERSE },
 };
+
+/* --opt-code-speed is an sccz80/sdcc speed-optimisation knob. zcc forwards it to
+   the shared sccz80-family arg channel (e.g. --math16 expands to
+   --opt-code-speed=inlineints), so 80cc must ACCEPT it — but the IR back end does
+   not act on it (only the retired AST codegen consulted c_speed_optimisation).
+   Parse and ignore. */
+static void opt_code_speed_inert(option *arg, char *val)
+{
+    (void)arg;
+    (void)val;
+}
 
 static void opt_disable(option *arg, char *val)
 {

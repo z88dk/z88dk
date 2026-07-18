@@ -62,6 +62,8 @@ extern SYMBOL *currfn;
 extern int debuglevel;
 extern int c_assembler_type;
 extern int c_framepointer_is_ix;
+extern int c_reserve_iy;
+extern int c_reserve_ix;
 extern int c_idx2_invariant;
 extern int c_idx3_residency;
 extern int c_exx_residency;
@@ -78,14 +80,10 @@ extern char *c_bss_section;
 extern char *c_data_section;
 extern char *c_rodata_section;
 extern int c_disable_builtins;
-extern uint32_t c_speed_optimisation;
 /* AST optimiser pass disable bitmask — set via --opt-disable=<name,...>
    (handler in main.c). Bits are checked in ast_opt_run; setting a bit
    makes that pass become a no-op. Useful for bisecting miscompiles. */
 extern uint32_t c_opt_disable;
-/* Function codegen goes through the IR pipeline (ir_build → ir_lower),
-   now the sole codegen path (forced on at startup). */
-extern int      c_use_ir;
 #define OPT_DISABLE_FOLD            (1u << 0)
 #define OPT_DISABLE_PROP            (1u << 1)
 #define OPT_DISABLE_SIMPLIFY        (1u << 2)

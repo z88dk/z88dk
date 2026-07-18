@@ -17,7 +17,13 @@ SECTION code_stdlib
 PUBLIC asm_bsearch
 PUBLIC asm0_bsearch
 
-EXTERN error_zc, l_mulu_16_16x16, l_compare_de_hl, l_inc_sp
+EXTERN error_zc, l_mulu_16_16x16, l_inc_sp
+
+IF __CLASSIC
+   EXTERN l_jpix               ; classic: comparator reached via ix closure (see qsort.asm)
+ELSE
+   EXTERN l_compare_de_hl
+ENDIF
 
 asm_bsearch:
 
@@ -79,7 +85,11 @@ bsearch_loop:
    add hl,de                   ; hl = p = base + (lim >> 1) * size
    pop de                      ; de = key
 
+   IF __CLASSIC
+   call l_jpix                 ; (compar)(de = key, hl = p) via closure thunk
+   ELSE
    call l_compare_de_hl        ; (compar)(de = void *key, hl = void *p)
+   ENDIF
 
    ; hl = p
    ; de = key

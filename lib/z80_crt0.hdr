@@ -138,6 +138,7 @@
 
 
     EXTERN  l_lsr_dehl  ;Shift dehl by a
+    EXTERN  l_asr_dehl  ;Arithmetic (signed) shift dehl by a
     EXTERN  l_lsl_dehl  ;Shift dehl by a
 
 ;------------------

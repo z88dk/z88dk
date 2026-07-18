@@ -178,6 +178,20 @@ static void compute_home_region(const Func *f, int home,
 */
 static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 {
+    /* BACKSTOP: an op marked to stage src[1] into BC (so a DE resident in its
+       span survives — see ir_bc_pack / ADR 0003) is meant to be intercepted by
+       gen_add/gen_sub, which emit the `add hl,bc` / `sbc hl,bc` form. If a marked
+       op reaches the generic DE-staging loader instead, that path would clobber
+       the DE resident (silent wrong value), so fail LOUD rather than fall through.
+       Only reachable under IR_LRA_DEPACK (marks are set only there); the
+       default-on LRA (IY reduction) never sets them. */
+    if (op->lra_stage_src1_bc) {
+        ir_lower_loc();
+        fprintf(stderr, "ir_lower: BC-staged op reached the DE-staging loader "
+                "(unhandled lra_stage_src1_bc — gen_add/gen_sub should intercept). "
+                "Aborting rather than emit a DE-clobbering staging load.\n");
+        exit(1);
+    }
     if (op->src[1] < 0) {
         /* Literal RHS — doesn't touch HL. */
         load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
@@ -245,6 +259,56 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
 static void cache_hl(int vreg)
 {
     hl_about_to_change(vreg);
+}
+
+static int  bc_has(int v);
+static void cache_bc(int v);
+static void invalidate_bc_cache(void);
+
+/* LRA Phase 4 (steps 3-4): load operands for a MARKED binop —
+   src[0]→HL, src[1]→BC (NOT DE), leaving DE untouched so a DE-packed resident
+   in this op's span survives. The consumer then emits the `hl,bc` form
+   (`add hl,bc` / `or a; sbc hl,bc`). Sound because ir_bc_pack marks the op only
+   when BC is free across it (no live BC tenant) and src[1] is not the resident.
+   src[0] MAY be the resident (in DE): copy DE→HL (never `ex de,hl`, which would
+   evict it). src[1] is staged via HL as scratch, then src[0] (re)loaded into HL
+   — both DE-clean, and src[0]'s load leaves BC intact. */
+static void load_binop_operands_bc(FILE *out, const Func *f, const Op *op)
+{
+    int s0 = op->src[0], s1 = op->src[1];
+    /* 1. src[0] → HL. If it is the DE resident, copy DE→HL (never `ex de,hl`,
+       which would evict it); otherwise load_to_hl (DE-clean for width-2). */
+    if (s0 >= 0 && de_has(s0)) {
+        cache_hl(s0);                  /* resolve any pending HL spill first */
+        emit(out, "ld\tl,e");
+        emit(out, "ld\th,d");
+    } else {
+        load_to_hl(out, f, s0);
+    }
+    /* 2. src[1] → BC without disturbing HL(src0) or DE(resident). Cheap hits
+       first; else stage via HL under a push/pop so src[0] survives even when it
+       is an unhomed HL-only transient. */
+    if (s1 < 0) {
+        emit(out, "ld\tbc,%lld", (long long)op->imm);
+        invalidate_bc_cache();
+        return;
+    }
+    if (bc_has(s1)) return;
+    if (de_has(s1)) {                  /* not the resident (marking excludes it) */
+        emit(out, "ld\tc,e");
+        emit(out, "ld\tb,d");
+        cache_bc(s1);
+        return;
+    }
+    emit(out, "push\thl");             /* save src[0] */
+    L.cur_sp_adjust += 2;
+    load_to_hl(out, f, s1);            /* HL = src1 (DE-clean; sp-adj tracked) */
+    emit(out, "ld\tc,l");
+    emit(out, "ld\tb,h");
+    cache_bc(s1);
+    emit(out, "pop\thl");              /* HL = src[0] restored */
+    L.cur_sp_adjust -= 2;
+    cache_hl(s0);
 }
 
 /* Sole choke point for an HL clobber/load. When a width-2 spill is pending
@@ -917,6 +981,24 @@ static int vreg_is_pr_dehl(const Func *f, int v)
    register-pool vregs: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
+    /* Stack-transient spill (IR_PR_STACK): park the value at TOS with `push hl`
+       instead of a frame slot store. HL keeps the value (no swap-back); the
+       single use pops it (load_to_*). Held +2 in cur_sp_adjust until then so
+       intervening sp-relative slot reads stay correct. Handled before the
+       cur_dst_dead early-out so the push/pop always balances. */
+    if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
+        emit(out, "push\thl");
+        L.cur_sp_adjust += 2;
+        L.cur_stack_resident = vreg;
+        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        /* The value now lives at TOS, not in HL. Forget any HL belief: it must
+           NOT be re-advertised (commit_hl_word skips cache_hl for us) — a reader
+           that trusted HL would use the wrong value AND skip the balancing pop.
+           The producer's own def (e.g. `ld hl,bc; add hl,de`) left HL's cache
+           claiming a STALE source, so clear it. */
+        hl_about_to_change(-1);
+        return;
+    }
     if (L.la.cur_dst_dead) return;
     /* Pooled vreg: no slot. PR_HL is the caller's job (cache_hl tops it up).
        PR_BC needs an HL→BC copy so later loads hit the BC short-circuit;
@@ -970,6 +1052,10 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 static void commit_hl_word(FILE *out, const Func *f, int v)
 {
     spill_and_swap_unless_dead(out, f, v);
+    /* A stack-transient's value now lives at TOS, NOT in HL — advertising HL
+       would let a reader skip the pop and leak the pushed word. Its use always
+       pops. */
+    if (v >= 0 && vreg_is_pr_stack(f, v)) return;
     cache_hl(v);
 }
 
@@ -996,6 +1082,19 @@ static void commit_hl_result(FILE *out, const Func *f, int v)
    `ld hl,K + store_hl + ex de,hl`. */
 static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
 {
+    /* Stack-transient (IR_PR_STACK): value is in DE — park it (`push de`) instead
+       of storing to the (nonexistent, -1) slot. Else the slot path below emits
+       `ld hl,-1; add hl,sp; ld (hl),e…` = a write at sp-1 (the 8085 crash: the
+       `ld de,K` LD_IMM fastpath reaches here, and PR_STACK is neither dst-dead
+       nor register-pool). Its single use pops it; the caller must NOT cache_hl. */
+    if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
+        emit(out, "push\tde");
+        L.cur_sp_adjust += 2;
+        L.cur_stack_resident = vreg;
+        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        invalidate_de_cache();
+        return;
+    }
     if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
         emit(out, "ex\tde,hl");
         invalidate_de_cache();

@@ -4,6 +4,8 @@
 #define TEST_H
 
 
+#include <stdlib.h>   /* exit() — else a suite's exit(res) warns implicit-int */
+
 #ifndef MAX_TESTS
 #define MAX_TESTS 50
 #endif

@@ -21,7 +21,8 @@ static void dummy()
 static void evaluate(int a, int m)  __naked
 {
 #asm
-    ld     ix,2
+    push   ix
+    ld     ix,4
     add    ix,sp
     ld     e,(ix+0)
     ld     d,0
@@ -37,7 +38,7 @@ static void evaluate(int a, int m)  __naked
     push   af
     pop    hl
     ld     (_old_regs+6),hl
-    ld     ix,2
+    ld     ix,4
     add    ix,sp
     ld     e,(ix+0)
     ld     d,0
@@ -53,6 +54,7 @@ static void evaluate(int a, int m)  __naked
     push   af
     pop    hl
     ld     (_new_regs+6),hl
+    pop    ix
     ret
 #endasm
 }

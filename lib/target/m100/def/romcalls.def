@@ -13,7 +13,7 @@
 
     EXTERN  ROMCALL_OP ; it's defined in m100_crt0.asm
 #define ROMCALL defb ROMCALL_OP
-	
+    
 ; ROM calls (defined in -subtype specific file)
     EXTERN  KYREAD
     EXTERN  KYPEND
@@ -24,5 +24,12 @@
     EXTERN  CURSON
     EXTERN  CURSOFF
     EXTERN  BEEP
-    EXTERN  LCDSET
-    EXTERN  LCDRES
+;    EXTERN  LCDSET
+;    EXTERN  LCDRES
+    EXTERN  SHAPE
+    EXTERN  SETINT_1D
+    EXTERN  SET_LCD_ADDR
+    EXTERN  SET_LCD
+    EXTERN  PLOT_TBL
+    EXTERN  PLOT_TBL2
+    EXTERN  LCDSET_TAIL
