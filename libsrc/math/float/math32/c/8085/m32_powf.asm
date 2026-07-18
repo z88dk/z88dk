@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 18 08:39:35 2026
+;	Module compile time: Sat Jul 18 10:28:17 2026
 
 
 	C_LINE	0,"m32_powf.c"
@@ -396,54 +396,109 @@
 .i_9
 	ld	de,sp+2
 	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16448
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_10	;
-	ld	de,sp+6
-	ex	de,hl
 	call	l_glong
-	call	_m32_sqrf
+	call	l_f32_f2sint
+	push	hl
+	call	l_f32_sint2f
 	push	de
 	push	hl
-	ld	de,sp+10
+	ld	de,sp+8
 	ex	de,hl
 	call	l_glong
-	call	l_f32_mul
-	ret
-
-
-.i_10
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16512
 	call	l_f32_eq
 	ld	a,h
 	or	l
 	jp	z,i_11	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_sqrf
-	push	de
+	pop	hl
 	push	hl
+	ld	bc,hl
+	ld	hl,65520
+	call	l_ge_hlbc	;bc>=hl
+	jp	nc,i_11	;
+	pop	hl
+	push	hl
+	ld	bc,hl
+	ld	hl,16
+	call	l_le_hlbc	;bc<=hl
+	jp	nc,i_11	;
+	pop	hl
+	push	hl
+	ld	a,h
+	or	l
+	jp	z,ASMPC+4
+	scf
+	jp	nc,i_11	;
+.i_12_i_11
+	ld	hl,0	;const
+	ld	de,16256
 	push	de
 	push	hl
 	ld	de,sp+4
+	ld	hl,(de)	;l_gint
+	push	hl
+	ld	a,h
+	rla
+	jp	nc,i_13	;
+	pop	hl
+	push	hl
+	ld	a,l		;l_neg
+	cpl
+	ld	l,a
+	ld	a,h
+	cpl
+	ld	h,a
+	inc	hl
+	pop	bc
+	push	hl
+.i_13
+	pop	hl
+	dec	hl
+	push	hl
+	inc	hl
+	ld	a,h
+	or	l
+	jp	z,i_15	;
+	ld	de,sp+2
+	ex	de,hl
+	push	hl
+	call	l_glong2sp
+	ld	de,sp+20
 	ex	de,hl
 	call	l_glong
 	call	l_f32_mul
+	pop	bc
+	call	l_plong
+	jp	i_14	;EOS
+.i_15
+	ld	de,sp+6
+	ld	hl,(de)	;l_gint
+	ld	a,h
+	rla
+	jp	nc,i_16	;
+	ld	de,sp+2
+	ex	de,hl
+	call	l_glong
+	call	_m32_invf
+	pop	bc
+	pop	bc
 	pop	bc
 	pop	bc
 	ret
 
 
-.i_11
+.i_16
+	ld	de,sp+2
+	ex	de,hl
+	call	l_glong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_10
+	pop	bc
 	ld	de,sp+6
 	ex	de,hl
 	call	l_glong
@@ -461,6 +516,8 @@
 	SECTION	bss_compiler
 	SECTION	code_compiler
 ; --- Start of Optimiser additions ---
+	defc	i_11 = i_10
+	defc	i_14 = i_13
 
 
 ; --- Start of Static Variables ---
