@@ -302,7 +302,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 .load_ieee_dehl
     push de
     pop hl
-    ld bc,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)
     ld de,(hl+)
     ld hl,bc
     ret

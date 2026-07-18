@@ -249,7 +249,8 @@ PUBLIC _m32_invf
     inc hl
     inc hl
     ld de,(hl+)
-    ld bc,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)
     pop hl
     pop af
     ret

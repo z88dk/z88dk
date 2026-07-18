@@ -13,7 +13,8 @@ SECTION code_fp_math32
 PUBLIC m32_fsload
 
 .m32_fsload
-    ld bc,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)
     ld de,(hl+)
     ld hl,bc
     ret

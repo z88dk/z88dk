@@ -221,7 +221,8 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     inc hl
     inc hl
     ld de,(hl+)
-    ld bc,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)
     pop hl
     pop af
     ret

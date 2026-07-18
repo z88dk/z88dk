@@ -672,7 +672,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .load_ieee
     push de
     pop hl
-    ld bc,(hl+)
+    ld c,(hl+)
+    ld b,(hl+)
     ld de,(hl+)
     ld hl,bc
     ret
