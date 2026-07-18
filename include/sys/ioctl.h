@@ -14,6 +14,9 @@ __ZPROTO2(int,,console_ioctl,uint16_t,cmd,void *,arg)
 #define IOCTL_GENCON_SET_MODE     6  /* Set the display mode (int *) */
 #define IOCTL_GENCON_GET_CAPS	  7  /* Get capabilities (int *) */
 #define IOCTL_GENCON_SET_FONT_H   8  /* Set the font height in gfx modes (int *) */
+#define IOCTL_GENCON_CURSOR_XY    9  /* Position + show hw cursor (int *) = (row<<8|col) */
+#define IOCTL_GENCON_CURSOR_ON   10  /* Show hw cursor at current console position */
+#define IOCTL_GENCON_CURSOR_OFF  11  /* Hide the hw cursor */
 
 
 // Capabilities for the gencon

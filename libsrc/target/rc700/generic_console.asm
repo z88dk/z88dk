@@ -43,7 +43,8 @@
     defc    GFXMODE = 132 ; GFXMODE toggle
 
 generic_console_ioctl:
-    ld      c, (hl)                     ;bc = where we point to
+    ex      de, hl                      ;a = ioctl cmd, de = arg ptr -> hl = arg ptr
+    ld      c, (hl)                     ;bc = *arg (low, high)
     inc     hl
     ld      b, (hl)
     cp      IOCTL_GENCON_SET_FONT32
@@ -70,7 +71,7 @@ setup_font:
 
 check_mode:
     cp      IOCTL_GENCON_SET_MODE
-    jr      nz, ioctl_failure
+    jr      nz, check_cursor
 set_mode:
     ld      a, c
     ld      (rc700_mode), a
@@ -83,6 +84,37 @@ set_mode_val:
     call    setgfx
     and     a
     ret
+
+; Hardware cursor control (Intel 8275 CRTC).
+; The 8275 has no cursor-disable bit, so "hide" positions it off-screen
+; (col=row=255), exactly as crt_init does at startup.  bc on entry to
+; rc700_set_hw_cursor holds c=column(X), b=row(Y).
+check_cursor:
+    cp      IOCTL_GENCON_CURSOR_XY
+    jr      z, cursor_xy
+    cp      IOCTL_GENCON_CURSOR_ON
+    jr      z, cursor_on
+    cp      IOCTL_GENCON_CURSOR_OFF
+    jr      nz, ioctl_failure
+cursor_off:
+    ld      bc, $FFFF                   ;off-screen = hidden
+    jr      rc700_set_hw_cursor
+cursor_on:
+    ld      bc, (__console_x)           ;c=col(x), b=row(y) of console
+    jr      rc700_set_hw_cursor
+cursor_xy:
+    ;; bc already = *arg = (row<<8 | col): c=col, b=row
+rc700_set_hw_cursor:
+    ld      a, DSPLC_CURSOR             ;load-cursor-position command
+    out     (DSPLC), a
+    ld      a, c
+    out     (DSPLD), a                  ;X = column
+    ld      a, b
+    out     (DSPLD), a                  ;Y = row
+    and     a                           ;clear carry = success
+    ret
+
+    defc    DSPLC_CURSOR = $80          ; 8275 "load cursor position" command
     
 ioctl_failure: 
     scf
