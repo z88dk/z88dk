@@ -55,9 +55,9 @@ Key commits:
 | **2** sqr / ldexp / sqrt / poly | **Done** (IEEE poly; expanded path next) |
 | **1E** Full suite green | **Done** — `test_math32_8085` **16/16** |
 | **log/exp/pow** | **Done** — frexp/ldexp ABI + no HL clobber |
-| **Expanded mul** | **Done (staged)** — `m32_fsmul24x32` / `m32_fsmul32x32` |
-| **Expanded add + normalize32** | **Done (uncommitted)** — `m32_fsadd24x32` / `m32_fsadd32x32` / `m32_fsnormalize32` |
-| **NR inv/div** | **Next** |
+| **Expanded mul** | **Done** — `m32_fsmul24x32` / `m32_fsmul32x32` |
+| **Expanded add + normalize32** | **Done** — `m32_fsadd24x32` / `m32_fsadd32x32` / `m32_fsnormalize32` |
+| **NR inv/div/sqrt** | **Done** — suite **16/16**; wide bench `bench/twide_nr` 34/34 |
 
 ## Verify (green light)
 
@@ -185,10 +185,9 @@ Cores previously assumed SDCC/Z80 order (`ret, x, second_arg`) and/or clobbered 
 
 | Item | Notes |
 |------|--------|
-| **NR inv accuracy** | Suite **12/16** — 4 fails: exact `a/=b` and recip ~1e-6 (EPSILON). Asm inv(2)≈`3f00000a`; C path sometimes `3effff0b`. Mul high-32 precision / sticky may be low by ~1–2 ulp in NR. |
 | Expanded poly path | Optional; wire `fsmul24x32` / `fsadd24x32` like Z80 `f32_fspoly.asm` |
-| `bench/` probe junk | Remove on port completion |
-| Commit | Stage expanded mul/add/norm + NR inv/sqrt when ready |
+| `bench/` probe junk | Remove on port completion (keep `twide_nr` as regression) |
+| Commit | NR accuracy fix + sqrt pack if not yet committed |
 
 ## 8085 pitfalls (keep)
 
@@ -216,17 +215,26 @@ math32/c/8085/       # sccz80-generated higher funcs (make -C c 8085)
 math32/c/sccz80/     # sccz80 bridges (some need 8085-safe rewrites)
 ```
 
-## NR inv / sqrt (landed)
+## NR inv / sqrt (landed, accurate)
 
 | Symbol | File | Notes |
 |--------|------|--------|
-| `m32_fsinv_fastcall` / `m32_fsdiv` | `asm/8085/f32_fsdiv.asm` | Seed `140/33+(−64/11+256/99×D')×D'`; 3× `X+=X×(1−D'×X)`; pack `X.exp−oexp+126` |
-| `m32_fsinvsqrt` / `m32_fssqrt` | `asm/8085/f32_fssqrt.asm` | Quake `0x5f375a86`; 3× NR; one reserved `−y`; Z80 operand order `w,3,−y,w` |
+| `m32_fsinv_fastcall` / `m32_fsdiv` | `asm/8085/f32_fsdiv.asm` | Seed poly; **one reserved `−D'`** (copy each NR step); 3× NR; pack `X.exp−oexp+126` + residual round |
+| `m32_fsinvsqrt` / `m32_fssqrt` | `asm/8085/f32_fssqrt.asm` | Quake; one reserved `−y`; 3× NR; residual round pack |
 
-Smoke (high words): `1/2≈3f00`, `1/3≈3eaa`, `6/2≈4040`, `sqrt(2)≈3fb5`, `sqrt(4)≈3fff`, `isqrt(4)≈3eff`.
+**Accuracy fix:** do **not** consume stacked `−D'`/`−y` under ret each step — push a working copy (same as keeping one reserved). Consuming under-ret copies broke later NR iterations.
+
+Verify:
+```bash
+make -C test/suites/math test_math32_8085.bin   # 16/16
+# wide bench
+cd libsrc/math/float/math32/bench
+zcc +test -vn -clib=8085 -compiler=sccz80 -D__MATH_MATH32 -fp-mode=ieee --math32 \
+  twide_nr.c twide_nr_a.asm -o twide_nr.bin && z88dk-ticks -m8085 twide_nr.bin
+# expect: ALL 34 PASSED
+```
 
 ## Next priorities
 
-1. **Tighten NR accuracy** so suite is 16/16 (mulu_32h rounding / expand mul sticky).
-2. Commit expanded mul+add+norm + NR inv/sqrt.
-3. Optional: expanded poly; clean `bench/`.
+1. Optional: expanded poly; clean old `bench/t*` junk (keep `twide_nr`).
+2. Commit if not on HEAD.

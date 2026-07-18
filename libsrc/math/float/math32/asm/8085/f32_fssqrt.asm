@@ -117,20 +117,35 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     pop af
     pop af                          ; drop reserved −y
 
+    ; pack expanded → IEEE (positive); feilipu residual round (same as inv)
     ld a,l
     ld l,h
     ld h,e
-    ld e,d
-    and 0c0h
+    ld e,d                          ; A=residual, EHL=top24
+    or a
     jp Z,sq0
+    inc l
+    jp NZ,sq0
+    inc h
+    jp NZ,sq0
+    inc e
+    jp NZ,sq0
+    or a
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
     ld a,l
-    or 1
+    rra
     ld l,a
+    inc b
 .sq0
     ld a,e
-    add a,a
+    add a,a                         ; eject hidden
     ld e,a
-    xor a
+    xor a                           ; sign +
     ld a,b
     rra
     ld d,a

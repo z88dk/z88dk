@@ -12,7 +12,10 @@
 ; D' := D / 2^(e+1)   ∈ [0.5, 1)   (stored as −D' IEEE for NR)
 ; X  := 140/33 + (−64/11 + 256/99 × D') × D'
 ; X  := X + X × (1 − D' × X)   (×3)
-; 1/D packed from X mant + exp(X.exp − oexp + 126)
+; 1/D packed: exp = X.exp − oexp + 126 + feilipu residual round
+;
+; One reserved −D' under the frame; each NR step pushes a working copy
+; (same discipline as invsqrt — avoids consume-from-under-ret bugs).
 ;
 
 SECTION code_clib
@@ -59,24 +62,19 @@ PUBLIC _m32_invf
     or a
     jp Z,divovl
 
-    ; ---- scale to −D' IEEE: exp := 0xBF, mant unchanged ----
-    ; DEHL still original IEEE
-    ex de,hl                        ; HL = MSW, DE = LSW
-    add hl,hl                       ; eject sign; H=oexp L=mant_top<<1|…
-    ld h,0bfh                       ; force −D' exponent field
+    ; ---- scale to −D' IEEE ----
+    ex de,hl
+    add hl,hl
+    ld h,0bfh
     ld a,l
     or a
-    rra                             ; srl L (logical)
+    rra
     ld l,a
     ex de,hl                        ; DEHL = −D' IEEE
 
-    ; three −D' copies for three NR steps
+    ; one reserved −D' for all NR steps
     push de
-    push hl
-    push de
-    push hl
-    push de
-    push hl                         ; SP: d1 d2 d3 es
+    push hl                         ; SP: −D' es
 
     ; ---- unpack −D' → expanded, force positive for seed ----
     call unpack
@@ -111,15 +109,19 @@ PUBLIC _m32_invf
     call m32_fsadd24x32             ; 140/33 + …
     pop af
     pop af
-    pop af                          ; drop spare D'; SP: d1 d2 d3 es
+    pop af                          ; drop spare; SP: −D' es
 
-    ; ---- NR ×3: X := X + X × (1 − D' × X) ----
+    ; ---- NR ×3 ----
     call nr_step
     call nr_step
     call nr_step
-    ; SP: es ; BCDEHL = X
+    ; SP: −D' es ; BCDEHL = X
 
-    ; ---- pack: result_exp = X.exp − oexp + 126; mant from X ----
+    pop af
+    pop af                          ; drop reserved −D'
+    ; SP: es
+
+    ; ---- pack: B = X.exp − oexp + 126; residual round ----
     push bc
     push de
     push hl                         ; SP: Xhl Xde Xbc es
@@ -153,6 +155,8 @@ PUBLIC _m32_invf
     jp NZ,pk0
     inc e
     jp NZ,pk0
+    ; mant overflow from round: >>1, exp++
+    or a                            ; clear CF for logical shifts
     ld a,e
     rra
     ld e,a
@@ -170,10 +174,10 @@ PUBLIC _m32_invf
     ld a,c
     add a,a                         ; sign → CF
     ld a,b
-    rra                             ; sign|exp[7:1] → A
+    rra
     ld d,a
     ld a,e
-    rra                             ; exp[0]|mant
+    rra
     ld e,a
     pop af                          ; drop es
     or a
@@ -181,9 +185,8 @@ PUBLIC _m32_invf
 
 
 ;-----------------------------------------------------------------------
-; NR step. IN: BC DEHL=X; SP: ret, −D'(4), …
-; OUT: BC DEHL=X'; −D' removed
-; X := X + X × (1 − D' × X)   using −D' IEEE × X
+; NR step. IN: BC DEHL=X; SP: ret, −D'_reserved(4), …
+; OUT: BC DEHL=X; reserved −D' NOT consumed (copy pushed for mul24)
 ;-----------------------------------------------------------------------
 .nr_step
     push bc
@@ -196,31 +199,24 @@ PUBLIC _m32_invf
     ld hl,0
     push de
     push hl                         ; 1.0 IEEE
-    ; −D' at SP+18 (X6 + X6 + 1.0_4 + ret_2 = 18): words HL @+0, DE @+2
-    ; Recreate push de; push hl order (DE word first, then HL).
+    ; reserved −D' at SP+18 (1.0_4 + X6 + X6 + ret_2)
+    ; copy with push de; push hl order
     ld de,sp+20
-    ld hl,(de)                      ; DE word of −D'
+    ld hl,(de)                      ; DE word
     push hl
     ld de,sp+20
-    ld hl,(de)                      ; HL word of −D' (shifted +2 after push)
-    push hl                         ; −D' IEEE
+    ld hl,(de)                      ; HL word
+    push hl                         ; −D' copy
     ld de,sp+8
-    call load_expanded              ; Y = X (under −D' + 1.0)
-    call m32_fsmul24x32             ; −D' × X
+    call load_expanded              ; Y = X
+    call m32_fsmul24x32             ; −D' × X  (consumes copy)
     call m32_fsadd24x32             ; 1 − D' × X
     call m32_fsmul32x32             ; X × (1 − D' × X)
     call m32_fsadd32x32             ; X + …
-    ; SP: ret, −D'
-    pop hl                          ; ret
-    pop af
-    pop af                          ; drop −D'
-    push hl
+    ; reserved −D' still under ret
     ret
 
 
-;-----------------------------------------------------------------------
-; unpack IEEE DEHL → B=exp C=sign80 DEHL=mant<<8 (hidden 1)
-;-----------------------------------------------------------------------
 .unpack
     ld a,d
     and 080h
@@ -244,10 +240,6 @@ PUBLIC _m32_invf
     ret
 
 
-;-----------------------------------------------------------------------
-; load expanded from [DE]: hl,de,bc words (hl @ de+0, de @ de+2, bc @ de+4)
-; OUT: BC DEHL; DE pointer clobbered
-;-----------------------------------------------------------------------
 .load_expanded
     push de
     ld hl,(de)
