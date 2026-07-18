@@ -1,8 +1,0 @@
-Continue math32 8085 in /home/phillip/Z80/z88dk on branch math32-8085. Read libsrc/math/float/math32/HANDOFF_8085.md end-to-end. Skills: /home/phillip/Z80/8085-skills (opcode-reference, extended-usage).
-
-Status: Expanded mul/add/norm + NR inv/div/sqrt done. Suite 16/16. Wide bench bench/twide_nr 34/34 (tiny/huge + near/far dividends).
-
-Rules: f32_ prefix + feilipu/MPL; stack-only; never AF for data/returns; NR uses one reserved −D'/−y with per-step copies (do not consume under-ret slots). Leave most bench/t* unstaged; twide_nr is the regression harness.
-
-Next: optional expanded poly; clean bench junk; commit accuracy fix if needed.
-Verify: make -C test/suites/math test_math32_8085.bin
