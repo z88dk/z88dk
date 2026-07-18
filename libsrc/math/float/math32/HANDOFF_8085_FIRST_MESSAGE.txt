@@ -1,7 +1,7 @@
 Continue math32 8085 in /home/phillip/Z80/z88dk on branch math32-8085. Read libsrc/math/float/math32/HANDOFF_8085.md end-to-end. Skills: /home/phillip/Z80/8085-skills (opcode-reference, extended-usage).
 
-Status: Phase 1E suite green (16/16). log/exp/pow OK. Expanded path staged: fsmul*x32, fsadd*x32, fsnormalize32 (probes PASS).
+Status: Expanded mul/add/normalize32 done. NR m32_fsinv/fsdiv + invsqrt/sqrt on 32-bit paths landed (f32_fsdiv.asm, f32_fssqrt.asm). Suite 12/16 — 4 fails are inv/div ulp (~1e-6 vs EPSILON 1e-6; exact integer /=).
 
-Rules: f32_ prefix + feilipu/MPL on new 8085 only; stack-only no BSS; never AF for data/returns; never clobber mant LSW (HL) with ret; overlapping stack copy = high→low; sccz80 only for higher C (make -C c 8085); do not touch Digi headers on Z80. Leave bench/t* and ext/regex unstaged.
+Rules: f32_ prefix + feilipu/MPL on new 8085 only; stack-only no BSS; never AF for data/returns; never clobber mant LSW (HL) with ret; IEEE stack copies = push de then push hl; overlapping stack copy = high→low; sccz80 only for higher C. Leave bench/t* unstaged.
 
-Next: commit expanded mul+add+norm; then NR m32_fsinv/fsdiv (mirror Z80 f32_fsdiv.asm). Verify: make -C test/suites/math test_math32_8085.bin
+Next: improve expand-mul / NR accuracy for suite 16/16; then commit. Verify: make -C test/suites/math test_math32_8085.bin

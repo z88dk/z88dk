@@ -5,23 +5,22 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-
-;-------------------------------------------------------------------------
-; m32_fsdiv / m32_fsinv - 8085 IEEE single divide / reciprocal
-;-------------------------------------------------------------------------
-; Stack only (no BSS). Restoring 24-bit div + IEEE RNE.
+; 8085 m32_fsdiv / m32_fsinv — Newton–Raphson reciprocal (Z80 algorithm).
+; Expanded 32-bit mul/add. Stack only; never AF for ret/data.
 ;
-; Setup: +0 N(6) +6 D(6) +12 flag +14 ret [+16 left]
-; Slot: +0 msb +1 n3 +2 lsb +3 mid +4 exp +5 sign
+; R = N/D = N * 1/D
+; D' := D / 2^(e+1)   ∈ [0.5, 1)   (stored as −D' IEEE for NR)
+; X  := 140/33 + (−64/11 + 256/99 × D') × D'
+; X  := X + X × (1 − D' × X)   (×3)
+; 1/D packed from X mant + exp(X.exp − oexp + 126)
 ;
-; With Q work: +0 ret +2 q0 +3 q1 +4 q2 +5 g +6 N +12 D +18 flag
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
 
+EXTERN m32_fsmul, m32_fsmul_callee
+EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
 EXTERN m32_fsconst_ninf, m32_fsconst_pinf
-EXTERN m32_fsconst_nzero, m32_fsconst_pzero
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 PUBLIC m32_fsinv_fastcall
@@ -29,495 +28,241 @@ PUBLIC _m32_invf
 
 
 .m32_fsdiv
-    xor a
-    jp fd_start
+    call m32_fsinv_fastcall
+    jp m32_fsmul
 
 .m32_fsdiv_callee
-    ld a,1
+    call m32_fsinv_fastcall
+    jp m32_fsmul_callee
 
-.fd_start
-    ; Explicit flag word L=0/1 (not push af — F may be 0)
-    ; BC free at entry; DEHL = right float preserved
-    ld b,0
-    ld c,a
-    push bc
-    call unpack_push
-    ld de,sp+10
-    call load_ieee
-    call unpack_push
-    call div_core
-    jp epi
+
+.divovl
+    pop bc                          ; es: B=exp C=sign80
+    ld a,c
+    or a
+    jp NZ,m32_fsconst_ninf
+    jp m32_fsconst_pinf
 
 
 ._m32_invf
 .m32_fsinv_fastcall
-    ld bc,0
-    push bc                         ; non-callee flag (clean word)
-    call unpack_push
-    ld bc,0x007f
-    push bc
-    ld de,0
-    push de
-    ld hl,0x0080
-    push hl
-    call div_core
-    jp epi
-
-
-.div_core
-    ; SP: ret, N@2, D@8, flag@14
-    ld de,sp+7
-    ld a,(de)
-    ld b,a
-    ld de,sp+13
-    ld a,(de)
-    xor b
+    ; ---- capture original exp/sign; check /0 ----
+    ld a,d
     and 080h
-    ld de,sp+7
-    ld (de),a                       ; result sign
-
-    ld de,sp+12
-    ld a,(de)
+    ld c,a                          ; sign80
+    ld a,e
+    add a,a
+    ld a,d
+    rla
+    ld b,a                          ; oexp
+    push bc                         ; es
     or a
-    jp Z,div_inf
+    jp Z,divovl
 
-    ld de,sp+6
-    ld a,(de)
+    ; ---- scale to −D' IEEE: exp := 0xBF, mant unchanged ----
+    ; DEHL still original IEEE
+    ex de,hl                        ; HL = MSW, DE = LSW
+    add hl,hl                       ; eject sign; H=oexp L=mant_top<<1|…
+    ld h,0bfh                       ; force −D' exponent field
+    ld a,l
     or a
-    jp Z,div_zero
+    rra                             ; srl L (logical)
+    ld l,a
+    ex de,hl                        ; DEHL = −D' IEEE
 
+    ; three −D' copies for three NR steps
+    push de
+    push hl
+    push de
+    push hl
+    push de
+    push hl                         ; SP: d1 d2 d3 es
+
+    ; ---- unpack −D' → expanded, force positive for seed ----
+    call unpack
+    ld c,0                          ; positive D'
+
+    ; ---- seed: X = 140/33 + (−64/11 + 256/99 × D') × D' ----
+    push bc
+    push de
+    push hl                         ; spare D' expanded
+    ld de,04087h
+    ld hl,0c1f0h
+    push de
+    push hl                         ; 140/33 IEEE
+    ld de,sp+4
+    call load_expanded              ; Y = D'
+    push bc
+    push de
+    push hl                         ; D' for mul32x32
+    ld de,0c0bah
+    ld hl,02e8ch
+    push de
+    push hl                         ; −64/11 IEEE
+    ld de,04025h
+    ld hl,07eb5h
+    push de
+    push hl                         ; 256/99 IEEE
+    ld de,sp+8
+    call load_expanded              ; Y = D'
+    call m32_fsmul24x32             ; 256/99 × D'
+    call m32_fsadd24x32             ; −64/11 + …
+    call m32_fsmul32x32             ; (…) × D'
+    call m32_fsadd24x32             ; 140/33 + …
+    pop af
+    pop af
+    pop af                          ; drop spare D'; SP: d1 d2 d3 es
+
+    ; ---- NR ×3: X := X + X × (1 − D' × X) ----
+    call nr_step
+    call nr_step
+    call nr_step
+    ; SP: es ; BCDEHL = X
+
+    ; ---- pack: result_exp = X.exp − oexp + 126; mant from X ----
+    push bc
+    push de
+    push hl                         ; SP: Xhl Xde Xbc es
+    ; 0:Xhl 2:Xde 4:Xc 5:Xexp 6:sign80 7:oexp
+    ld de,sp+5
+    ld a,(de)                       ; X.exp
     ld b,a
-    ld de,sp+12
-    ld a,(de)
+    ld de,sp+7
+    ld a,(de)                       ; oexp
     ld c,a
     ld a,b
     sub c
-    ld b,a
-    rla
-    jp C,exp_neg
-    ld a,127
-    add a,b
-    jp C,div_inf
-    or a
-    jp Z,div_zero
+    add a,126
+    ld b,a                          ; new exp
     ld de,sp+6
-    ld (de),a
-    jp exp_ok
-.exp_neg
-    ld a,127
-    add a,b
-    jp NC,div_zero
-    ld de,sp+6
-    ld (de),a
-.exp_ok
-    ld de,sp+3
-    xor a
-    ld (de),a                       ; n3=0 (N.pad)
-
-    ; Q work 4 bytes
+    ld a,(de)
+    ld c,a                          ; sign80
     pop hl
-    ld de,0
-    push de
-    push de
-    push hl
-    ; SP: ret, q0,q1, q2,g, N@6, D@12, flag@18
-
-    call cmp_nd
-    jp NC,aligned
-    call shl_n
-    ld de,sp+10
-    ld a,(de)
-    dec a
-    jp Z,zero_dropq
-    ld (de),a
-.aligned
-    ld b,24
-.loop
-    call shl_q
-    call cmp_nd
-    jp C,no_sub
-    call sub_nd
-    ld de,sp+2
-    ld a,(de)
-    or 01h
-    ld (de),a
-.no_sub
-    call shl_n
-    dec b
-    jp NZ,loop
-
-    ; guard
-    ld de,sp+5
-    xor a
-    ld (de),a
-    call shl_n
-    call cmp_nd
-    jp C,g_done
-    call sub_nd
-    ld de,sp+5
-    ld a,1
-    ld (de),a
-.g_done
-    ld de,sp+6
-    ld a,(de)
-    ld h,a
-    ld de,sp+7
-    ld a,(de)
-    or h
-    ld h,a
-    ld de,sp+8
-    ld a,(de)
-    or h
-    ld h,a
-    ld de,sp+9
-    ld a,(de)
-    or h
-    ld c,a                          ; sticky
-
-    ld de,sp+5
-    ld a,(de)
-    or a
-    jp Z,pack
-    ld a,c
-    or a
-    jp NZ,qinc
-    ld de,sp+2
-    ld a,(de)
-    and 01h
-    jp Z,pack
-.qinc
-    ld de,sp+2
-    ld a,(de)
-    inc a
-    ld (de),a
-    jp NZ,pack
-    inc de
-    ld a,(de)
-    inc a
-    ld (de),a
-    jp NZ,pack
-    inc de
-    ld a,(de)
-    inc a
-    ld (de),a
-    jp NZ,pack
-    ld a,080h
-    ld (de),a
-    dec de
-    xor a
-    ld (de),a
-    dec de
-    ld (de),a
-    ld de,sp+10
-    ld a,(de)
-    inc a
-    ld (de),a
-    jp Z,inf_dropq
-
-.pack
-    ; q → N mant; free Q; pack N → DEHL
-    ; Q@+2: q0,q1,q2; N@+6: msb,n3,lsb,mid,exp,sign
-    ld de,sp+2
-    ld a,(de)                       ; q0
-    ld de,sp+8
-    ld (de),a                       ; N.lsb
-    ld de,sp+3
-    ld a,(de)                       ; q1
-    ld de,sp+9
-    ld (de),a                       ; N.mid
-    ld de,sp+4
-    ld a,(de)                       ; q2
-    ld de,sp+6
-    ld (de),a                       ; N.msb
-    ; free Q (4 bytes under ret)
-    pop hl
-    pop af
-    pop af
-    push hl
-    ; SP: ret, N, D, flag
-    ; N: +2 msb +3 n3 +4 lsb +5 mid +6 exp +7 sign
-    ld de,sp+2
-    ld a,(de)
-    ld l,a                          ; msb
-    ld de,sp+4
-    ld a,(de)
-    ld c,a                          ; lsb
-    ld de,sp+5
-    ld a,(de)
-    ld d,a
-    ld e,c                          ; DE = mid,lsb
-    push de
-    ld de,sp+8                      ; exp (+6+2)
-    ld a,(de)
-    ld c,a
-    ld de,sp+9
-    ld a,(de)
-    ld b,a                          ; sign
     pop de
-    ld h,0
+    pop af                          ; drop X.bc
+    ; align 32→24: A=residual, EHL=top24
     ld a,l
-    rla
+    ld l,h
+    ld h,e
+    ld e,d
+    or a
+    jp Z,pk0
+    inc l
+    jp NZ,pk0
+    inc h
+    jp NZ,pk0
+    inc e
+    jp NZ,pk0
+    ld a,e
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
     ld l,a
+    inc b
+.pk0
+    ld a,e
+    add a,a                         ; eject hidden 1
+    ld e,a
+    ld a,c
+    add a,a                         ; sign → CF
     ld a,b
-    rla
-    ld a,c
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ex de,hl
-    ret
-
-
-.inf_dropq
-    pop hl
-    pop af
-    pop af
-    push hl
-    jp div_inf
-
-.zero_dropq
-    pop hl
-    pop af
-    pop af
-    push hl
-    jp div_zero
-
-
-.div_inf
-    ld de,sp+7
-    ld a,(de)
-    rla
-    jp C,di_n
-    call scrub
-    jp m32_fsconst_pinf
-.di_n
-    call scrub
-    jp m32_fsconst_ninf
-
-.div_zero
-    ld de,sp+7
-    ld a,(de)
-    rla
-    jp C,dz_n
-    call scrub
-    jp m32_fsconst_pzero
-.dz_n
-    call scrub
-    jp m32_fsconst_nzero
-
-
-; Stack at call scrub (from div_zero/div_inf via call):
-;   +0 ret_scrub  +2 ret_after_divcore  +4 N(6)  +10 D(6)  +16 flag  +18 ret_C  [+20 left if callee]
-; Epi (normal path) sees stack without ret_after_divcore (div_core already returned).
-; Scrub must also drop ret_after_divcore + N + D + flag, then callee-drop left,
-; and return to div_zero/div_inf with SP → ret_C only.
-.scrub
-    pop hl                          ; HL = return to div_zero/div_inf
-    pop af                          ; drop ret_after_divcore
-    pop af                          ; drop N (3 words)
-    pop af
-    pop af
-    pop af                          ; drop D (3 words)
-    pop af
-    pop af
-    pop bc                          ; BC = flag word (C = 0/1)
-    ld a,c
+    rra                             ; sign|exp[7:1] → A
+    ld d,a
+    ld a,e
+    rra                             ; exp[0]|mant
+    ld e,a
+    pop af                          ; drop es
     or a
-    jp Z,scrub_ret
-    pop de                          ; DE = ret_C
-    pop af                          ; drop left
-    pop af
-    push de                         ; ret_C only
-.scrub_ret
-    push hl                         ; back to div_zero/div_inf
     ret
 
 
-.epi
+;-----------------------------------------------------------------------
+; NR step. IN: BC DEHL=X; SP: ret, −D'(4), …
+; OUT: BC DEHL=X'; −D' removed
+; X := X + X × (1 − D' × X)   using −D' IEEE × X
+;-----------------------------------------------------------------------
+.nr_step
+    push bc
     push de
+    push hl                         ; X keep
+    push bc
+    push de
+    push hl                         ; X for mul32
+    ld de,03f80h
+    ld hl,0
+    push de
+    push hl                         ; 1.0 IEEE
+    ; −D' at SP+18 (X6 + X6 + 1.0_4 + ret_2 = 18): words HL @+0, DE @+2
+    ; Recreate push de; push hl order (DE word first, then HL).
+    ld de,sp+20
+    ld hl,(de)                      ; DE word of −D'
     push hl
-    ld de,sp+16
-    ld a,(de)
-    pop hl
-    pop de
+    ld de,sp+20
+    ld hl,(de)                      ; HL word of −D' (shifted +2 after push)
+    push hl                         ; −D' IEEE
+    ld de,sp+8
+    call load_expanded              ; Y = X (under −D' + 1.0)
+    call m32_fsmul24x32             ; −D' × X
+    call m32_fsadd24x32             ; 1 − D' × X
+    call m32_fsmul32x32             ; X × (1 − D' × X)
+    call m32_fsadd32x32             ; X + …
+    ; SP: ret, −D'
+    pop hl                          ; ret
+    pop af
+    pop af                          ; drop −D'
+    push hl
+    ret
+
+
+;-----------------------------------------------------------------------
+; unpack IEEE DEHL → B=exp C=sign80 DEHL=mant<<8 (hidden 1)
+;-----------------------------------------------------------------------
+.unpack
+    ld a,d
+    and 080h
     ld c,a
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    ld a,c
-    or a
-    jp Z,done
-    pop bc
-    pop af
-    pop af
-    push bc
-.done
-    ret
-
-
-;------------------------------------------------------------------------------
-; Helpers with Q allocated. After CALL:
-; +0 ret_h +2 ret_div +4 q0 +5 q1 +6 q2 +7 g +8 N +14 D
-; N: +8 msb +9 n3 +10 lsb +11 mid +12 exp +13 sign
-; D: +14 msb +15 pad +16 lsb +17 mid
-
-.cmp_nd
-    ld de,sp+9
-    ld a,(de)
-    or a
-    ret NZ
-    ld de,sp+8
-    ld a,(de)
-    ld de,sp+14
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    cp h
-    ret C
-    ret NZ
-    ld de,sp+11
-    ld a,(de)
-    ld de,sp+17
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    cp h
-    ret C
-    ret NZ
-    ld de,sp+10
-    ld a,(de)
-    ld de,sp+16
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    cp h
-    ret
-
-
-.sub_nd
-    ld de,sp+10
-    ld a,(de)
-    ld de,sp+16
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sub h
-    ld de,sp+10
-    ld (de),a
-    ld de,sp+11
-    ld a,(de)
-    ld de,sp+17
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sbc a,h
-    ld de,sp+11
-    ld (de),a
-    ld de,sp+8
-    ld a,(de)
-    ld de,sp+14
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
-    sbc a,h
-    ld de,sp+8
-    ld (de),a
-    ld de,sp+9
-    ld a,(de)
-    sbc a,0
-    ld (de),a
-    ret
-
-
-.shl_n
-    ld de,sp+10
-    ld a,(de)
+    ld a,e
     add a,a
-    ld (de),a
-    ld de,sp+11
-    ld a,(de)
+    ld e,a
+    ld a,d
     rla
-    ld (de),a
-    ld de,sp+8
-    ld a,(de)
-    rla
-    ld (de),a
-    ld de,sp+9
-    ld a,(de)
-    rla
-    ld (de),a
-    ret
-
-
-.shl_q
-    ld de,sp+4
-    ld a,(de)
-    add a,a
-    ld (de),a
-    inc de
-    ld a,(de)
-    rla
-    ld (de),a
-    inc de
-    ld a,(de)
-    rla
-    ld (de),a
-    ret
-
-
-.unpack_push
-    call unpack_dehl
-    ld a,l
-    pop hl
-    push bc
-    push de
-    ld b,h
-    ld c,l
-    ld l,a
-    ld h,0
-    push hl
-    push bc
-    ret
-
-.unpack_dehl
-    ex de,hl
-    ld a,h
     ld b,a
-    add hl,hl
-    ld c,h
-    ld a,h
     or a
+    ld a,e
     jp Z,un0
     scf
 .un0
-    ld a,l
     rra
-    ld l,a
-    ld h,0
+    ld d,a
+    ld e,h
+    ld h,l
+    ld l,0
     ret
 
-.load_ieee
+
+;-----------------------------------------------------------------------
+; load expanded from [DE]: hl,de,bc words (hl @ de+0, de @ de+2, bc @ de+4)
+; OUT: BC DEHL; DE pointer clobbered
+;-----------------------------------------------------------------------
+.load_expanded
+    push de
+    ld hl,(de)
+    push hl
     push de
     pop hl
-    ld c,(hl)
     inc hl
-    ld b,(hl)
     inc hl
     ld e,(hl)
     inc hl
     ld d,(hl)
-    ld h,b
-    ld l,c
+    inc hl
+    ld c,(hl)
+    inc hl
+    ld b,(hl)
+    pop hl
+    pop af
     ret

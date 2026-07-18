@@ -185,10 +185,10 @@ Cores previously assumed SDCC/Z80 order (`ret, x, second_arg`) and/or clobbered 
 
 | Item | Notes |
 |------|--------|
-| **NR `m32_fsinv` / `m32_fsdiv`** | **Next** — use expand mul+add; re-open div accuracy gate |
+| **NR inv accuracy** | Suite **12/16** — 4 fails: exact `a/=b` and recip ~1e-6 (EPSILON). Asm inv(2)≈`3f00000a`; C path sometimes `3effff0b`. Mul high-32 precision / sticky may be low by ~1–2 ulp in NR. |
 | Expanded poly path | Optional; wire `fsmul24x32` / `fsadd24x32` like Z80 `f32_fspoly.asm` |
 | `bench/` probe junk | Remove on port completion |
-| Commit expanded mul | Stage `f32_fsmul32.asm` + list files only |
+| Commit | Stage expanded mul/add/norm + NR inv/sqrt when ready |
 
 ## 8085 pitfalls (keep)
 
@@ -200,7 +200,7 @@ Cores previously assumed SDCC/Z80 order (`ret, x, second_arg`) and/or clobbered 
 6. **sccz80 left-to-right** float args: often `ret, right, left` or for poly `ret, n, dptr, x`; frexp/ldexp `ret, arg2, x`.
 7. **Stack-only** — no BSS in 8085 cores.
 8. No `exx` / IX/IY / `djnz` / Z80 bit ops. Prefer `ld de,sp+*`, `rl de`, `ex de,hl`, `ex (sp),hl`, `ld hl,(de)`.
-9. Restoring div kept (~12k vs inv+mul ~17k) until NR path lands.
+9. **NR inv/div landed** (`f32_fsdiv.asm`): seed poly + 3×NR via expand mul/add; `fsdiv` = inv×mul. **IEEE push order** for stack copies: DE word then HL (`push de; push hl`).
 10. **Do not clobber HL (mant LSW) with ret** when scrubbing frexp/ldexp frames.
 11. **Overlapping stack memmove:** copy high→low when dest > src and ranges overlap.
 12. **Multi-word push order:** verify top-of-stack word with a depth diagram.
@@ -216,8 +216,17 @@ math32/c/8085/       # sccz80-generated higher funcs (make -C c 8085)
 math32/c/sccz80/     # sccz80 bridges (some need 8085-safe rewrites)
 ```
 
+## NR inv / sqrt (landed)
+
+| Symbol | File | Notes |
+|--------|------|--------|
+| `m32_fsinv_fastcall` / `m32_fsdiv` | `asm/8085/f32_fsdiv.asm` | Seed `140/33+(−64/11+256/99×D')×D'`; 3× `X+=X×(1−D'×X)`; pack `X.exp−oexp+126` |
+| `m32_fsinvsqrt` / `m32_fssqrt` | `asm/8085/f32_fssqrt.asm` | Quake `0x5f375a86`; 3× NR; one reserved `−y`; Z80 operand order `w,3,−y,w` |
+
+Smoke (high words): `1/2≈3f00`, `1/3≈3eaa`, `6/2≈4040`, `sqrt(2)≈3fb5`, `sqrt(4)≈3fff`, `isqrt(4)≈3eff`.
+
 ## Next priorities
 
-1. **Commit** expanded mul + add + normalize32 when ready.
-2. Port **NR `m32_fsinv` / `m32_fsdiv`** using expand mul+add (mirror Z80 `f32_fsdiv.asm`).
-3. Optional: expanded poly; clean `bench/`; full `./build.sh -t`.
+1. **Tighten NR accuracy** so suite is 16/16 (mulu_32h rounding / expand mul sticky).
+2. Commit expanded mul+add+norm + NR inv/sqrt.
+3. Optional: expanded poly; clean `bench/`.
