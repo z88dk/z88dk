@@ -46,5 +46,9 @@ float m32_powf (float x, float y)
     if(y == 2.0) return m32_sqrf(x);
     if(y == -2.0) return m32_invf(m32_sqrf(x));
 
+    /* Small integer powers: avoid log/exp (suite + faster). */
+    if(y == 3.0) return m32_sqrf(x) * x;
+    if(y == 4.0) { float s = m32_sqrf(x); return s * s; }
+
     return m32_expf( m32_logf(x) * y);
 }

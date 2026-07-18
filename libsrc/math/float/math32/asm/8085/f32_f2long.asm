@@ -6,6 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ; 8085 float → long/int (m32_f2* and sccz80 l_f32_f2*)
+; Mirror Z80 f32_f2long. Exp lives in C (8085 shifts via A clobber A).
 ;
 
 SECTION code_clib
@@ -27,31 +28,33 @@ PUBLIC l_f32_f2slong, l_f32_f2ulong, l_f32_f2sint, l_f32_f2uint
 .l_f32_f2uint
 .l_f32_f2slong
 .l_f32_f2ulong
-    ld b,d                          ; B = sign | exp[7:1]
-    ld a,e
-    add a,a                         ; E <<= 1; C = old E.7 = exp bit0
+    ld b,d                          ; B = sign | exp[7:1] (for sign later)
     ld a,d
-    rla                             ; A = exponent
+    ld c,a
+    ld a,e
+    rla                             ; rl e via A
+    ld e,a
+    ld a,c
+    rla                             ; A = full exponent
     or a
     jp Z,l_f32_zero
     cp 07eh+32
     jp NC,l_f32_zero
+    ld c,a                          ; C = exp (must survive A-clobbering shifts)
 
-    push af                         ; save exp
-    ; hidden 1 into E (already left-shifted once)
+    ; scf; rr e — hidden 1 into E
     scf
     ld a,e
     rra
-    ld d,a                          ; D = 1.mant[22:16]
+    ld e,a
+    ld d,e
     ld e,h
     ld h,l
-    ld l,0
-    ld c,0                          ; extension
-    pop af                          ; A = exp
+    ld l,0                          ; DEHL = mant << 8
 
 .f2_loop
-    push af                         ; save exp
-    or a                            ; clear C for logical >> 
+    ; srl d; rr e; rr h; rr l
+    or a
     ld a,d
     rra
     ld d,a
@@ -64,16 +67,12 @@ PUBLIC l_f32_f2slong, l_f32_f2ulong, l_f32_f2sint, l_f32_f2uint
     ld a,l
     rra
     ld l,a
+    inc c
     ld a,c
-    rra
-    ld c,a
-    pop af
-    inc a
     cp 07eh+32
     jp NZ,f2_loop
 
-    ; sign from B.7
     ld a,b
-    rla
+    rla                             ; sign → CF
     call C,l_long_neg
     ret

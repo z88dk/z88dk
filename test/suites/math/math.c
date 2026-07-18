@@ -198,8 +198,12 @@ static void run_sqrt(FLOAT x, FLOAT e)
     static char   buf[100];
 
     FLOAT r = SQRT(x);
+    /* Compare before snprintf: multi-float varargs can clobber sccz80
+     * stack params on 8085 (and is wasteful on success everywhere). */
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",(float)x,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_sqrt()
@@ -216,8 +220,10 @@ static void run_pow(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = POW(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_pow()
@@ -235,8 +241,10 @@ static void run_fmod(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = FMOD(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"fmod(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_fmod()
@@ -250,8 +258,10 @@ static void run_fmin(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = FMIN(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"fmin(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_fmin()
@@ -267,8 +277,10 @@ static void run_fmax(FLOAT x, FLOAT y, FLOAT e)
     static char   buf[100];
 
     FLOAT r = FMAX(x,y);
+    if (approx_equal(e,r,EPSILON))
+        return;
     snprintf(buf,sizeof(buf),"fmax(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
-    Assert( approx_equal(e,r,EPSILON), buf);
+    Assert(0, buf);
 }
 
 void test_fmax()

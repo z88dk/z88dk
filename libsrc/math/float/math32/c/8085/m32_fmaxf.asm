@@ -3,12 +3,12 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 18 08:39:35 2026
+;	Module compile time: Sat Jul 18 08:34:36 2026
 
 
-	C_LINE	0,"m32_powf.c"
+	C_LINE	0,"m32_fmaxf.c"
 
-	MODULE	m32_powf_c
+	MODULE	m32_fmaxf_c
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -249,212 +249,48 @@
 	C_LINE	89,"m32_math.h"
 	C_LINE	90,"m32_math.h"
 	C_LINE	91,"m32_math.h"
-	C_LINE	32,"m32_powf.c"
-	C_LINE	34,"m32_powf.c"
+	C_LINE	3,"m32_fmaxf.c"
+	C_LINE	5,"m32_fmaxf.c"
 	SECTION	code_compiler
 
-; Function m32_powf flags 0x00000200 __smallc 
-; double m32_powf(double x, double y)
+; Function m32_fmaxf flags 0x00000240 __smallc __z88dk_callee 
+; double m32_fmaxf(double x, double y)
 ; parameter 'double y' at sp+2 size(4)
 ; parameter 'double x' at sp+6 size(4)
-	C_LINE	35,"m32_powf.c::m32_powf::0::0"
-._m32_powf
-	ld	de,sp+2
+	C_LINE	6,"m32_fmaxf.c::m32_fmaxf::0::0"
+._m32_fmaxf
+	ld	de,sp+6
 	ex	de,hl
 	call	l_glong2sp
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	call	l_f32_eq
+	ld	de,sp+6
+	ex	de,hl
+	call	l_glong
+	call	l_f32_gt
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	hl,0	;const
-	ld	de,16256
+	ld	de,sp+6
+	ex	de,hl
+	call	l_glong
+	pop	bc
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
 	ret
 
 
 .i_2
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	call	l_f32_le
-	ld	a,h
-	or	l
-	jp	z,i_3	;
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	ret
-
-
-.i_3
 	ld	de,sp+2
 	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16256
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_4	;
-	ld	de,sp+6
-	ex	de,hl
 	call	l_glong
-	ret
-
-
-.i_4
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,49024
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_5	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_invf
-	ret
-
-
-.i_5
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16128
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_6	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_sqrtf
-	ret
-
-
-.i_6
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,48896
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_7	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_invsqrtf
-	ret
-
-
-.i_7
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16384
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_8	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_sqrf
-	ret
-
-
-.i_8
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,49152
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_9	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_sqrf
-	call	_m32_invf
-	ret
-
-
-.i_9
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16448
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_10	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_sqrf
-	push	de
-	push	hl
-	ld	de,sp+10
-	ex	de,hl
-	call	l_glong
-	call	l_f32_mul
-	ret
-
-
-.i_10
-	ld	de,sp+2
-	ex	de,hl
-	call	l_glong2sp
-	ld	hl,0	;const
-	ld	de,16512
-	call	l_f32_eq
-	ld	a,h
-	or	l
-	jp	z,i_11	;
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_sqrf
-	push	de
-	push	hl
-	push	de
-	push	hl
-	ld	de,sp+4
-	ex	de,hl
-	call	l_glong
-	call	l_f32_mul
 	pop	bc
-	pop	bc
-	ret
-
-
-.i_11
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	_m32_logf
-	push	de
-	push	hl
-	ld	de,sp+6
-	ex	de,hl
-	call	l_glong
-	call	l_f32_mul
-	call	_m32_expf
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	push	bc
 	ret
 
 
@@ -634,6 +470,7 @@
 	GLOBAL	_m32_ldexpf
 	GLOBAL	_m32_hypotf
 	GLOBAL	_m32_polyf
+	GLOBAL	_m32_fmaxf
 
 
 ; --- End of Scope Defns ---

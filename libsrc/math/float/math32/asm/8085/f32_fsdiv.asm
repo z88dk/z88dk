@@ -308,25 +308,30 @@ PUBLIC _m32_invf
     jp m32_fsconst_nzero
 
 
+; Stack at call scrub (from div_zero/div_inf via call):
+;   +0 ret_scrub  +2 ret_after_divcore  +4 N(6)  +10 D(6)  +16 flag  +18 ret_C  [+20 left if callee]
+; Epi (normal path) sees stack without ret_after_divcore (div_core already returned).
+; Scrub must also drop ret_after_divcore + N + D + flag, then callee-drop left,
+; and return to div_zero/div_inf with SP → ret_C only.
 .scrub
-    pop hl
-    ld de,sp+12
-    ld a,(de)
-    ld c,a
+    pop hl                          ; HL = return to div_zero/div_inf
+    pop af                          ; drop ret_after_divcore
+    pop af                          ; drop N (3 words)
     pop af
     pop af
+    pop af                          ; drop D (3 words)
     pop af
     pop af
-    pop af
-    pop af
-    pop af
+    pop bc                          ; BC = flag word (C = 0/1)
     ld a,c
     or a
-    ret Z
-    pop de
+    jp Z,scrub_ret
+    pop de                          ; DE = ret_C
+    pop af                          ; drop left
     pop af
-    pop af
-    push de
+    push de                         ; ret_C only
+.scrub_ret
+    push hl                         ; back to div_zero/div_inf
     ret
 
 

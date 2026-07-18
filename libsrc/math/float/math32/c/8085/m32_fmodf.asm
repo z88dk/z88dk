@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 18 07:37:45 2026
+;	Module compile time: Sat Jul 18 08:39:35 2026
 
 
 	C_LINE	0,"m32_fmodf.c"

@@ -43,6 +43,8 @@
 ../../../math/float/math32/c/8085/m32_exp10f.asm
 ../../../math/float/math32/c/8085/m32_exp2f.asm
 ../../../math/float/math32/c/8085/m32_expf.asm
+../../../math/float/math32/c/8085/m32_fmaxf.asm
+../../../math/float/math32/c/8085/m32_fminf.asm
 ../../../math/float/math32/c/8085/m32_fmodf.asm
 ../../../math/float/math32/c/8085/m32_log10f.asm
 ../../../math/float/math32/c/8085/m32_log2f.asm
