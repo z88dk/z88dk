@@ -145,11 +145,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     or a
     jp Z,fm_done
 
-    ; callee: drop left; preserve DEHL result
-    push de
-    push hl
-    pop hl
-    pop de
+    ; callee: drop left; DEHL result already in registers
     pop bc                      ; ret
     pop af                      ; Lh
     pop af                      ; Ld
@@ -304,6 +300,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     pop hl
     ld c,(hl+)
     ld b,(hl+)
-    ld de,(hl+)
+    ld e,(hl+)
+    ld d,(hl)                   ; last byte: no post-inc (HL → bc next)
     ld hl,bc
     ret

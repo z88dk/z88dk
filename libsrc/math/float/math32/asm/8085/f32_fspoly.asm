@@ -190,7 +190,8 @@ PUBLIC _m32_polyf
 .load_expand_ieee
     ld de,(hl+)
     push de
-    ld de,(hl+)
+    ld e,(hl+)
+    ld d,(hl)                       ; last word: no trailing post-inc (HL discarded)
     pop hl                          ; DEHL IEEE
     ld a,d
     and 080h
@@ -223,7 +224,8 @@ PUBLIC _m32_polyf
     pop bc                          ; ret
     ld de,(hl+)
     push de                         ; LSW temp
-    ld de,(hl+)                     ; MSW (HL discarded below)
+    ld e,(hl+)
+    ld d,(hl)                       ; MSW; no trailing post-inc (HL discarded)
     pop hl                          ; LSW
     push de                         ; MSW  → X.DE
     push hl                         ; LSW  → X.HL

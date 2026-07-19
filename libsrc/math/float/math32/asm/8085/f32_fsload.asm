@@ -15,6 +15,7 @@ PUBLIC m32_fsload
 .m32_fsload
     ld c,(hl+)
     ld b,(hl+)
-    ld de,(hl+)
+    ld e,(hl+)
+    ld d,(hl)                   ; last byte: no post-inc (HL → bc next)
     ld hl,bc
     ret
