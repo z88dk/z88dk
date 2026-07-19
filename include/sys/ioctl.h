@@ -30,6 +30,14 @@ __ZPROTO2(int,,console_ioctl,uint16_t,cmd,void *,arg)
 #define RC700_CRT_PAR1           0x98  /* 25 rows/frame */
 #define RC700_CRT_PAR2           0x7A  /* underline on line 7 + lines/char */
 #define RC700_CRT_PAR3_BASE      0x4D  /* par[3] with cursor-format bits cleared */
+#define RC700_CRT_PAR3           0x6D  /* full default: steady reverse block cursor */
+
+/* Default parameter block for an unsigned char par[4] initializer:
+ *   unsigned char par[4] = RC700_CRT_PAR_DEFAULTS;
+ * then override individual fields, e.g. par[3] for a different cursor format
+ * or par[2] via RC700_CRT_UNDERLINE(line). */
+#define RC700_CRT_PAR_DEFAULTS \
+    { RC700_CRT_PAR0, RC700_CRT_PAR1, RC700_CRT_PAR2, RC700_CRT_PAR3 }
 
 /* Underline placement = par[2] bits 7:4 (scan line the underline sits on).
  * par2 = RC700_CRT_PAR2_BASE | (line << 4), or use RC700_CRT_UNDERLINE(line).
