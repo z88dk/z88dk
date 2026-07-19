@@ -1,21 +1,10 @@
 ;
-;  feilipu, 2021 Apr
+;  feilipu, 2021 Apr / 2026 Jul
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;------------------------------------------------------------------------------
-
-IF __CPU_Z80__ | __CPU_KC160__
-
-SECTION code_clib
-SECTION code_fp_math32
-
-EXTERN m32_l0_mulu_32h_24x24
-
-PUBLIC m32_sqr_32h_24x24
-
 ;------------------------------------------------------------------------------
 ;
 ; square of two 24-bit numbers into a 32-bit product
@@ -28,21 +17,96 @@ PUBLIC m32_sqr_32h_24x24
 ;
 ; enter : abc = lde  = 24-bit multiplier  = x
 ;
+; abc * abc
+;
+; = (a*a)*2^32 +
+;   (2*a*b)*2^24 +
+;   (b*b + 2*a*c)*2^16 +
+;   (2*b*c)*2^8
+;
+;   NOT CALCULATED
+;   (c*c)*2^0
+;
+; 5 8*8 multiplies in total (via l_mulu_de; same layout as Z80n mul de)
+;
 ; exit  : hlde  = 32-bit product
 ;
-; uses  : af, bc, de, hl, bc', de', hl'
+; uses  : af, bc, de, hl
+;
+;------------------------------------------------------------------------------
+
+IF __CPU_Z80__
+
+SECTION code_clib
+SECTION code_fp_math32
+
+EXTERN l_mulu_de
+
+PUBLIC m32_sqr_32h_24x24
 
 
 .m32_sqr_32h_24x24
 
-    push hl                     ; preserve multiplicand
-    push de
+    ld h,l                      ; aa:bc
+    push hl                     ; aa on stack
+    ld l,d                      ; ab:bc
+    push hl                     ; ab on stack
+    ld d,h                      ; ab:ac
+    ld h,l                      ; bb:ac
+    push hl                     ; bb on stack
+    push de                     ; ac on stack
+    ld l,e                      ; bc:ac
 
-    push hl                     ; preserve multiplier
-    push de
+    ex de,hl                    ; ac:bc
+    call l_mulu_de              ; b*c 2^8
+    ex de,hl
 
-    ld a,e                      ; set up first multiplier from e
+    xor a
+    add hl,hl                   ; 2*b*c 2^8
+    adc a,a
 
-    jp m32_l0_mulu_32h_24x24    ; exit  : HLDE  = 32-bit product
+    ld c,h                      ; put 2^8 in bc
+    ld b,a
+
+    pop de                      ; ac
+    pop hl                      ; bb
+    call l_mulu_de              ; a*c 2^16
+    ex de,hl
+    call l_mulu_de              ; b*b 2^16
+
+    xor a
+    add hl,hl                   ; 2*a*c 2^16
+    adc a,a
+    add hl,de
+    adc a,0
+    add hl,bc
+    adc a,0
+
+    ld c,h                      ; put 2^16 in bc
+    ld b,a
+
+    pop de                      ; ab
+    call l_mulu_de              ; a*b 2^24
+
+    ex de,hl                    ; l into e
+
+    xor a
+    add hl,hl                   ; 2*a*b 2^24
+    adc a,a
+    add hl,bc
+    adc a,0
+
+    ld c,e                      ; l into c
+    ld b,l
+    ld l,h
+    ld h,a
+
+    pop de                      ; aa
+    call l_mulu_de              ; a*a 2^32
+
+    add hl,de
+    ld d,b
+    ld e,c                      ; exit  : HLDE  = 32-bit product
+    ret
 
 ENDIF
