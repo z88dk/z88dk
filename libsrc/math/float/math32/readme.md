@@ -402,13 +402,14 @@ Careful use of the intrinsic functions can result in significant performance imp
 And we get about a __24–26%__ improvement for the n-body benchmark across the math32 CPU builds.
 Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
 
-Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000). Math32 rows remeasured Jul 2026; non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). Math32 and mbf32 rows remeasured Jul 2026; other non-math32 rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
 correct values              | -->      | -0.169075164  | -0.169087605
 math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_856_525
-mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_939_334_701
+mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_835_079_611
+mbf32_8085                  | sccz80   | -0.1699168    | -0.1699168    | 1_849_800_062
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
 math32                      | sccz80   | -0.1690752    | -0.1690864    | _1_000_372_169_
 math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_764_001_899__
@@ -443,13 +444,15 @@ math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690869    | __1_461
 ```
 For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–13%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks.
 
-Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60). Math32 rows remeasured Jul 2026; non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). Math32 and mbf32 rows remeasured Jul 2026; other non-math32 rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
 genmath                     | sccz80   | 3_596_657_568
 math48                      | zsdcc    | 3_766_086_833
 math48                      | sccz80   | 3_266_168_305
+mbf32                       | sccz80   | 1_798_158_288
+mbf32_8085                  | sccz80   | 1_805_825_674
 math32                      | zsdcc    | 1_414_728_459
 math32                      | sccz80   | _1_152_093_641_
 math32                 (opt)| sccz80   | __1_137_807_104__
