@@ -386,7 +386,7 @@ The rest of the derived power and trigonometric functions rely on the polynomial
 
 ### Execution speed
 
-Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80n "Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 most benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
+Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80n "Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 most benchmarks are faster than alternatives, but others are worse.
 
 Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement. See `(opt)` results in the tables below.
 
@@ -399,8 +399,10 @@ Careful use of the intrinsic functions can result in significant performance imp
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
 #endif
 ```
-And we get about a __25%__ improvement for the n-body benchmark.
+And we get about a __24–26%__ improvement for the n-body benchmark across the math32 CPU builds.
 Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
+
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000). Math32 rows remeasured Jul 2026; non-math32 rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
@@ -408,12 +410,14 @@ correct values              | -->      | -0.169075164  | -0.169087605
 math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_856_525
 mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_939_334_701
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32                      | sccz80   | -0.1690752    | -0.1690867    | _1_006_879_853_
-math32                 (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_761_138_938__
-math32_z80n                 | sccz80   | -0.1690752    | -0.1690867    | _0_576_942_516_
-math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_441_400_426__
-math32_z180                 | sccz80   | -0.1690752    | -0.1690867    | _0_563_700_933_
-math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428_973_481__
+math32                      | sccz80   | -0.1690752    | -0.1690864    | _1_000_372_169_
+math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_764_001_899__
+math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_521_986_846_
+math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_396_603_258__
+math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_500_336_363_
+math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_380_149_278__
+math32_8085                 | sccz80   | -0.1690752    | -0.1690864    | _1_986_100_862_
+math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690869    | __1_461_194_864__
 
 
 #### mandelbrot
@@ -437,7 +441,9 @@ math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428
             }
 #endif
 ```
-And for the z180 and z80n, we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply. The same five-product square expansion is used on z80 (via `l_mulu_de`) and 8085, so mandelbrot-style `sqr()` loops benefit on those builds as well.
+For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–13%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks.
+
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60). Math32 rows remeasured Jul 2026; non-math32 rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
@@ -445,10 +451,13 @@ genmath                     | sccz80   | 3_596_657_568
 math48                      | zsdcc    | 3_766_086_833
 math48                      | sccz80   | 3_266_168_305
 math32                      | zsdcc    | 1_414_728_459
-math32                      | sccz80   | __1_137_834_777__
-math32_z80n                 | sccz80   | _0_922_658_537_
-math32_z80n            (opt)| sccz80   | __0_861_039_210__
-math32_z180                 | sccz80   | _0_892_842_610_
-math32_z180            (opt)| sccz80   | __0_825_674_427__
+math32                      | sccz80   | _1_152_093_641_
+math32                 (opt)| sccz80   | __1_137_807_104__
+math32_z80n                 | sccz80   | _0_789_862_938_
+math32_z80n            (opt)| sccz80   | __0_694_488_693__
+math32_z180                 | sccz80   | _0_740_954_524_
+math32_z180            (opt)| sccz80   | __0_642_181_961__
+math32_8085                 | sccz80   | _1_403_401_196_
+math32_8085            (opt)| sccz80   | __1_247_706_419__
 
 ---
