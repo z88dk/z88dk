@@ -24,10 +24,9 @@
  ;      MAME.  A bare emulator such as z88dk-ticks does NOT run the CRT ISR,
  ;      so the counter stays put unless a test writes 0FFFCH by hand.
  ;
- ;      clock() reads the 32-bit counter and divides it by 50 (the tick
- ;      rate).  With CLOCKS_PER_SEC == 1 on this target (<time.h>, __CPM__),
- ;      the return value is whole seconds; sub-second resolution is lost in
- ;      the /50.
+ ;      Like the other platforms (see target/shared/clock.asm) clock() returns
+ ;      the raw counter; convert to seconds with CLOCKS_PER_SEC, which is 50
+ ;      for this target (the 50 Hz tick rate, see <time.h>, __RC700__).
  ;
  ; --------
  ;
@@ -38,18 +37,9 @@ SECTION code_clib
 PUBLIC  clock
 PUBLIC  _clock
 
-EXTERN  l_long_div_u
-
 clock:
 _clock:
-    ld     hl,(0FFFCH)		; REAL TIME CLOCK
-    ld     de,(0FFFEH)
-    push   de      ; number MSW
-    push   hl      ; number LSW
-    ld     l,50
-    ld     h,0
-    ld     d,h
-    ld     e,h
-    call   l_long_div_u     ; Don't mess the stack: DO NOT just jump to l_long_div_u !
-	ret
+    ld     hl,(0FFFCH)		; REAL TIME CLOCK, low word
+    ld     de,(0FFFEH)		; high word -> return 32-bit in DEHL
+    ret
 
