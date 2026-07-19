@@ -20,7 +20,13 @@
 
 /* CTC time constant per RS_BAUD_* code; baud = 38400 / TC.  0 = the rate
  * is not generatable (TC would be non-integer or exceed 256).  TC 256 is
- * written to the CTC as 0 (the CTC treats a 0 constant as 256). */
+ * written to the CTC as 0 (the CTC treats a 0 constant as 256).
+ *
+ * 38400 (TC=1) is the ceiling: the SIO runs the x16 divider (WR4), so
+ * baud = CTC_clock/16 = 614400/16/TC.  Going faster would need the SIO's
+ * x1 divider, which has NOT been verified on the real Z80-SIO here, so
+ * 57600/115200/230400 are reported RS_ERR_BAUD_TOO_FAST rather than
+ * silently mis-clocked.  Lift the ceiling only once x1 is proven. */
 static const uint16_t baud_tc[16] = {
     0,      /* RS_BAUD_50     */  0,      /* RS_BAUD_75     */
     0,      /* RS_BAUD_110    */  0,      /* RS_BAUD_134_5  */
