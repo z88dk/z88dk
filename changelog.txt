@@ -14,6 +14,7 @@ More detailed, but still incomplete changelist:
 - [classic] +sms now has access to newlib libraries
 - [classic] +x07 Support much improved
 - [classic] +z88 Support for 512z64 graphics
+- [all] math32 floating point support for Intel 8085 (MIT licence)
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
 - [z80asm] #define now supported as alias for defc
