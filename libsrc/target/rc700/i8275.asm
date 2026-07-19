@@ -4,6 +4,9 @@
 ; Declared in <video/i8275.h>.  The RC700 wires the 8275 command/status
 ; port at $01 and the parameter/data port at $00.
 ;
+; Datasheet: https://bitsavers.org/components/intel/8275/1984_8275.pdf
+; RC700 issue: https://github.com/z88dk/z88dk/issues/3011
+;
 
     SECTION code_clib
 

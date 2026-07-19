@@ -3,6 +3,12 @@
  *
  * Command encodings and screen-composition parameter builders straight from
  * the 1984 datasheet, plus an RC700 preset and easy init helpers.
+ *
+ * Datasheet: Intel 8275 Programmable CRT Controller (1984)
+ *   https://bitsavers.org/components/intel/8275/1984_8275.pdf
+ * Application note (AP-62, 8275 in an 8085 system):
+ *   https://bitsavers.org/components/intel/8275/1984_AP-62.pdf
+ * RC700 issue: https://github.com/z88dk/z88dk/issues/3011
  */
 
 #ifndef __VIDEO_I8275_H__
