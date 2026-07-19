@@ -129,12 +129,9 @@ crt_reset:
     dec     hl                          ;hl -> par[0]
     xor     a
     out     (DSPLC), a                  ;8275 Reset command (0x00)
-    ld      b, 4
-crt_reset_param:
-    ld      a, (hl)
-    out     (DSPLD), a                  ;write par[0..3]
-    inc     hl
-    djnz    crt_reset_param
+    ld      b, 4                        ;4 parameter bytes
+    ld      c, DSPLD                    ;output port ($00, data)
+    otir                                ;write par[0..3] from (hl) to port $00
     ;; Reset blanks the display; re-enable it in firmware init order.
     ld      bc, (__console_x)           ;c=col(x), b=row(y)
     call    rc700_set_hw_cursor         ;load cursor position + X,Y
