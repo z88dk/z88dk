@@ -29,7 +29,7 @@ This library is also designed to be as fast as possible on the z80 processor, us
 
   *  Made for the Spectrum Next (z80n) and Agon Lite (ez80). The z80n `mul de` and the z180 (ez80) `mlt nn`, and r2ka `mul` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm.
+  *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm. The dedicated square kernel is separate: five `16_8x8` products via `l_mulu_de`, matching the z80n/z180 square layout.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -215,7 +215,7 @@ For the z80 to calculate the 24-bit mantissa a special `mulu_32h_24x24` function
 
 For the z180 and z80n to calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z180 and z80n to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function.
 
-By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version `sqr()`. This means that for the z180 and z80n the inverse `_fsinvsqrt` function uses `_fssqr` for 5 multiplies in its `mulu_32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
+By providing a dedicated square kernel `sqr_32h_24x24` (see `_mul()` / `_sqr()` below), all squaring used by square root, inverse square root, hypotenuse, and the transcendental C helpers goes through `_fssqr` / `sqr()` rather than a full `_fsmul`. That path uses five `16_8x8` products instead of a general 24×24 multiply (eight `16_8x8` terms on z180/z80n, or the z80 multi-pass `32_24x8` route), and the 5×8×8 kernels need only the main register set.
 
 #### mulu_32h_32x32
 
@@ -241,7 +241,29 @@ The mantissa multiplication is not a "correct" multiply, as not all carry bits a
 
 A simple rounding method is used, but a more sophisticated method IEEE compliant method could be applied as needed.
 
-The square function is related to the multiply function, but is simplified by ignoring the sign bit, and reducing the number of `16_8x8` multiplies from 8 down to 5. A simplified mantissa calculation function is used for this purpose. As the square is used in the tangent, hypotenuse, and inverse square root calculation, having it available is a good optimisation.
+The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, and the 8085 `m32_sqr_32h_24x24`).
+
+For the 8×8-oriented CPUs the square uses the same high-32-of-48 algebraic expansion (and the same truncation / rounding-byte layout as the general 24×24 high product):
+
+```
+abc * abc  (a,b,c = 24-bit mantissa bytes, a = msb)
+
+  (a*a)<<32 + (2*a*b)<<24 + (b*b + 2*a*c)<<16 + (2*b*c)<<8
+  ; (c*c)<<0 is not calculated — it only affects bits below the kept 32
+```
+
+That is **five** `16_8x8` multiplies (`b*c`, `a*c`, `b*b`, `a*b`, `a*a`) rather than eight for a general product. The product-assembly / shift structure is shared; only the 8×8 primitive differs:
+
+| Build | `sqr_32h_24x24` 8×8 primitive |
+|-------|-------------------------------|
+| **z80** | `call l_mulu_de` (clib 8×8→16; small shift-add or fast table) |
+| **z80n** | hardware `mul de` |
+| **z180 / ez80** | hardware `mlt` |
+| **8085** | local `mulu_de` (same algorithm as `l_small_mulu_de`) |
+
+Rabbit (**r2ka**) and **kc160** also expose `m32_sqr_32h_24x24` for the same `_fssqr` entry, but implement the square via their wider multiply helpers (`l_mulu_64_32x32`) rather than the five-term 8×8 expansion.
+
+Because square appears in inverse square root, hypotenuse, and many transcendental polynomials, the dedicated kernel is a useful optimisation on every target that can avoid a full multiply.
 
 ### Derived Floating Point Functions
 
@@ -415,7 +437,7 @@ math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428
             }
 #endif
 ```
-And for the z180 and z80n, we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply.
+And for the z180 and z80n, we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply. The same five-product square expansion is used on z80 (via `l_mulu_de`) and 8085, so mandelbrot-style `sqr()` loops benefit on those builds as well.
 
 Library                     | Compiler | Ticks
 -|-|-
