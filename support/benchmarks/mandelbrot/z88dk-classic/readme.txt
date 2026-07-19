@@ -14,8 +14,17 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 mandelbrot.c -o mandelbrot.bin -lm 
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
 
+classic/sccz80/8085/math32
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+
+classic/80cc/math32
+zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+
+classic/80cc/8085/math32
+zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+
 classic/sccz80/8085/MBF32
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=all mandelbrot.c -o mandelbrot.bin --math-mbf32_8085 -lndos -m
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=all mandelbrot.c -o mandelbrot.bin --math-mbf32 -lndos -m
 
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 mandelbrot.c -o mandelbrot.bin -lmath48 -lndos -m
@@ -36,7 +45,9 @@ measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks mandelbrot.bin -x mandelbrot.map -start TIMER_START -end TIMER_END -counter 999999999999 -output verify.bin
+z88dk-ticks mandelbrot.bin -x mandelbrot.map -start TIMER_START -end TIMER_STOP -counter 999999999999 -output verify.bin
+
+For 8085 binaries add -m8085.
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -82,17 +93,41 @@ cycle count  = 3596657568
 time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 
-Z88DK April 30, 2021
+Z88DK July 19, 2026
 sccz80 / classic / math32
-4559 bytes less page zero
+4717 bytes less page zero
 
-cycle count  = 1142045217
-time @ 4MHz  = 1142045217 / 4*10^6 =  4 min 45 sec
+cycle count  = 1152093641
+time @ 4MHz  = 1152093641 / 4*10^6 =  4 min 48 sec
 
 
-Z88DK January 5, 2022
+Z88DK July 19, 2026
+sccz80 / classic / 8085 / math32
+6325 bytes less page zero
+
+cycle count  = 1403401196
+time @ 4MHz  = 1403401196 / 4*10^6 =  5 min 51 sec
+
+
+Z88DK July 19, 2026
+80cc / classic / math32
+5484 bytes less page zero
+
+cycle count  = 1290753256
+time @ 4MHz  = 1290753256 / 4*10^6 =  5 min 23 sec
+
+
+Z88DK July 19, 2026
+80cc / classic / 8085 / math32
+7001 bytes less page zero
+
+cycle count  = 2752818536
+time @ 4MHz  = 2752818536 / 4*10^6 = 11 min 28 sec
+
+
+Z88DK July 19, 2026
 sccz80 / classic / 8085 / MBF32
-3457 bytes less page zero
+3397 bytes less page zero
 
-cycle count  = 1806589346
-time @ 4MHz  = 1806589346 / 4*10^6 =  7 min 32 sec
+cycle count  = 1805825674
+time @ 4MHz  = 1805825674 / 4*10^6 =  7 min 31 sec

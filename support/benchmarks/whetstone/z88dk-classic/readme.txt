@@ -10,7 +10,7 @@ To verify correct results, compile for the zx spectrum target and
 run in a spectrum emulator.
 
 classic/sccz80/8085/MBF32
-zcc +cpm -clib=8085 -vn -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone --math-mbf32_8085 -lndos -create-app
+zcc +cpm -clib=8085 -vn -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone --math-mbf32 -lndos -create-app
 
 classic/sccz80/genmath : 40 bit mantissa
 zcc +zx -vn -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone -lm -lndos -create-app
@@ -31,7 +31,7 @@ possible so that a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80/8085/MBF32
-zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math-mbf32_8085 -lndos -m
+zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math-mbf32 -lndos -m
 
 classic/sccz80/genmath : 40 bit mantissa
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin -lm -lndos -m
@@ -59,15 +59,15 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK December 12, 2022
+Z88DK July 19, 2026
 classic/sccz80/8085/MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-6078 bytes less page zero
+5959 bytes less page zero
 
-cycle count  = 549312725
-time @ 4MHz  = 549312725 / 4x10^6 = 137.3281 seconds
-KWIPS        = 100*10*1 / 137.3281 = 7.2818
-MWIPS        = 7.2818 / 1000 = 0.0072818
+cycle count  = 548321291
+time @ 4MHz  = 548321291 / 4x10^6 = 137.0803 seconds
+KWIPS        = 100*10*1 / 137.0803 = 7.2950
+MWIPS        = 7.2950 / 1000 = 0.0072950
 
 
 Z88DK January 3, 2022
@@ -92,15 +92,15 @@ KWIPS        = 100*10*1 / 230.1954 = 4.3585
 MWIPS        = 4.3585 / 1000 = 0.0043585
 
 
-Z88DK January 3, 2022
+Z88DK July 19, 2026
 classic/sccz80/MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-6237 bytes less page zero
+6206 bytes less page zero
 
-cycle count  = 547041311
-time @ 4MHz  = 547041311 / 4x10^6 = 136.7603 seconds
-KWIPS        = 100*10*1 / 136.7603 = 7.3121
-MWIPS        = 7.3121 / 1000 = 0.0073121
+cycle count  = 544395320
+time @ 4MHz  = 544395320 / 4x10^6 = 136.0988 seconds
+KWIPS        = 100*10*1 / 136.0988 = 7.3476
+MWIPS        = 7.3476 / 1000 = 0.0073476
 
-8085+MBF32 -> 78.2 Seconds.
-8085+AM9511 ->30.4 Seconds.
+8085+MBF32 -> 78.2 Seconds. (historical host measurement)
+8085+AM9511 ->30.4 Seconds. (historical host measurement)

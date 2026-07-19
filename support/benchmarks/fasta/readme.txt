@@ -89,26 +89,56 @@ time @ 4MHz  = 373202979 / 4*10^6 = 93.30 sec
 Large size & slow speed largely due to float implementation in C.
 
 6.
-Z88DK January 3, 2022
+Z88DK July 19, 2026
 sccz80 / classic c library / MBF32
-4823 bytes less page zero
+4796 bytes less page zero
 
-cycle count  = 165102454
-time @ 4MHz  = 165102454 / 4*10^6 = 41.27 sec
+cycle count  = 165734164
+time @ 4MHz  = 165734164 / 4*10^6 = 41.43 sec
 
 Microsoft 32-bit float implementation.
 
 7.
-Z88DK April 20, 2020
+Z88DK July 19, 2026
 sccz80 / classic c library / math32
-3978 bytes less page zero
+4582 bytes less page zero
 
-cycle count  = 136057474
-time @ 4MHz  = 136057474 / 4*10^6 = 34.01 sec
+cycle count  = 122328869
+time @ 4MHz  = 122328869 / 4*10^6 = 30.58 sec
 
 IEEE 32-bit float implementation.
 
 8.
+Z88DK July 19, 2026
+sccz80 / classic c library / 8085 / math32
+5655 bytes less page zero
+
+cycle count  = 216105363
+time @ 4MHz  = 216105363 / 4*10^6 = 54.03 sec
+
+IEEE 32-bit float implementation (math32_8085).
+
+9.
+Z88DK July 19, 2026
+80cc / classic c library / math32
+6715 bytes less page zero
+
+cycle count  = 274747974
+time @ 4MHz  = 274747974 / 4*10^6 = 68.69 sec
+
+IEEE 32-bit float implementation.
+
+10.
+Z88DK July 19, 2026
+80cc / classic c library / 8085 / math32
+8292 bytes less page zero
+
+cycle count  = 568417916
+time @ 4MHz  = 568417916 / 4*10^6 = 142.10 sec
+
+IEEE 32-bit float implementation (math32_8085).
+
+11.
 Z88DK April 20, 2020
 sccz80 / new c library
 2998 bytes less page zero
@@ -118,7 +148,7 @@ time @ 4MHz  = 204281085 / 4*10^6 = 51.07 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
-9.
+12.
 Z88DK April 20, 2020
 sccz80 / new c library / math32
 3729 bytes less page zero
@@ -128,13 +158,13 @@ time @ 4MHz  = 136057141 / 4*10^6 = 34.01 sec
 
 IEEE 32-bit float implementation.
 
-10.
-Z88DK December 12, 2022
+13.
+Z88DK July 19, 2026
 sccz80 / classic c library / 8085 / MBF32
-4869 bytes less page zero
+4708 bytes less page zero
 
-cycle count  = 206325540
-time @ 4MHz  = 206325540 / 4*10^6 = 51.58 sec
+cycle count  = 205137817
+time @ 4MHz  = 205137817 / 4*10^6 = 51.28 sec
 
 Microsoft 32-bit float implementation.
 

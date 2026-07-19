@@ -10,7 +10,7 @@ To verify the correct result, compile for the zx target
 and run on a spectrum emulator.
 
 classic/sccz80/8085
-zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 --opt-code-speed binary-trees.c -o bt --math-mbf32_8085 -lndos -create-app -pragma-define:CRT_HEAP_AMALLOC=1
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 --opt-code-speed binary-trees.c -o bt --math-mbf32 -lndos -create-app -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 binary-trees.c -o bt --math-mbf32 -lndos -create-app -pragma-define:CRT_HEAP_AMALLOC=1
@@ -27,7 +27,7 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80/8085
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32_8085 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1

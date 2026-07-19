@@ -137,19 +137,32 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK January 3, 2022
+Z88DK July 19, 2026
 sccz80 / classic / math32
-6052 bytes less page zero
+6012 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 995097719
-time @ 4MHz  = 995097719 / 4*10^6 =  4 min 9 sec
+cycle count  = 1000372169
+time @ 4MHz  = 1000372169 / 4*10^6 =  4 min 10 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
 9.
+Z88DK July 19, 2026
+sccz80 / classic / 8085 / math32
+7461 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1986100862
+time @ 4MHz  = 1986100862 / 4*10^6 =  8 min 17 sec
+
+IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits.
+
+10.
 Z88DK April 30, 2021
 sccz80 / new c library / math32
 5149 bytes less page zero
@@ -162,7 +175,7 @@ time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
-10.
+11.
 Z88DK May 3, 2021
 sccz80 / new / math16
 3309 bytes less page zero
@@ -175,33 +188,33 @@ time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
 
-11.
-Z88DK January 3, 2022
-sccz80 / classic / MBF32
-4989 bytes less page zero
-
-first number error : 1 * 10^(-7)
-second number error: 1 * 10^(-4)
-
-cycle count  = 1848679330
-time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
-
-Microsoft 32-bit float implementation, accurate to 7 significant digits.
-
 12.
-Z88DK December 12, 2022
-sccz80 / classic / 8085 / MBF32
-4868 bytes less page zero
+Z88DK July 19, 2026
+sccz80 / classic / MBF32
+4956 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1851095771
-time @ 4MHz  = 1851095771 / 4*10^6 =  7 min 43 sec
+cycle count  = 1835079611
+time @ 4MHz  = 1835079611 / 4*10^6 =  7 min 39 sec
 
 Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
 13.
+Z88DK July 19, 2026
+sccz80 / classic / 8085 / MBF32
+4729 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1849800062
+time @ 4MHz  = 1849800062 / 4*10^6 =  7 min 42 sec
+
+Microsoft 32-bit float implementation, accurate to 7 significant digits.
+
+14.
 HITECH C MSDOS V780pl2
 3736 bytes exact
 
@@ -211,7 +224,7 @@ second number error: 1 * 10^(-4)
 cycle count  = 1600543903
 time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
 
-14.
+15.
 HITECH C CPM V309-15
 5633 bytes exact
 

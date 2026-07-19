@@ -144,26 +144,66 @@ time @ 4MHz  = 15739496039 / 4*10^6 = 65 min 35 sec
 Slow speed & large size due to float implementation in C.
 
 10.
-Z88DK January 3, 2022
-sccz80 / classic c library / MBF32
-4703 bytes less page zero
+Z88DK July 19, 2026
+sccz80 / classic c library / math32
+5882 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 6306469660
-time @ 4MHz  = 6306469660 / 4*10^6 = 26 min 16 sec
+cycle count  = 9805013165
+time @ 4MHz  = 9805013165 / 4*10^6 = 40 min 51 sec
 
 11.
-Z88DK December 12, 2022
-sccz80 / classic c library / 8085 / MBF32
-4604 bytes less page zero
+Z88DK July 19, 2026
+sccz80 / classic c library / 8085 / math32
+7277 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 6237494435
-time @ 4MHz  = 6237494435 / 4*10^6 = 25 min 59 sec
+cycle count  = 19330977133
+time @ 4MHz  = 19330977133 / 4*10^6 = 80 min 33 sec
 
 12.
+Z88DK July 19, 2026
+80cc / classic c library / math32
+6393 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 10312576631
+time @ 4MHz  = 10312576631 / 4*10^6 = 42 min 58 sec
+
+13.
+Z88DK July 19, 2026
+80cc / classic c library / 8085 / math32
+7738 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 20146695596
+time @ 4MHz  = 20146695596 / 4*10^6 = 83 min 57 sec
+
+14.
+Z88DK July 19, 2026
+sccz80 / classic c library / MBF32
+4705 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6346228466
+time @ 4MHz  = 6346228466 / 4*10^6 = 26 min 27 sec
+
+15.
+Z88DK July 19, 2026
+sccz80 / classic c library / 8085 / MBF32
+4480 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6227757878
+time @ 4MHz  = 6227757878 / 4*10^6 = 25 min 57 sec
+
+16.
 HITECH C MSDOS V780pl2
 3780 bytes exact
 

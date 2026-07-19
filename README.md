@@ -26,6 +26,7 @@ generally omits the prefix when referring to them.
 
 * `zcc` is the toolchain's front end.  zcc can generate an output binary out of any set of input source files.
 * `z88dk-sccz80` is z88dk's native c compiler.  sccz80 is derived from small c but has seen much development to the point that it is nearly c90 compliant.
+* `z88dk-80cc` is an alternate small-C compiler front end (select with `-compiler=80cc`).  It shares classic library linkage with sccz80 and is included in some floating-point benchmark results under `support/benchmarks`.
 * `z88dk-zsdcc` is z88dk's customization of the [sdcc compiler](https://sdcc.sourceforge.net/).  [Our patch](https://github.com/z88dk/z88dk/tree/master/src/zsdcc) makes sdcc compatible with the z88dk toolchain, gives it access to z88dk's extensive assembly language libraries and ready-made crts, addresses code generation bugs where present and improves on sdcc's generated code.
 * `z88dk-z80asm` (not to be confused with several external projects called z80asm) is a fully featured assembler / linker / librarian implementing sections.
 * `z88dk-z80nm` is z80asm's companion archiver.  It can provide a listing of functions or data encoded in an object or library file.
@@ -48,10 +49,15 @@ These tools are not normally directly invoked by the user:
 
 The assembly language libraries supplied by z88dk give it performance advantages over other z80 compilers. For details please look at the [Benchmarks](https://github.com/z88dk/z88dk/wiki/Benchmarks) section in the Wiki.
 
+Sources, compile recipes, and recorded cycle counts live under [`support/benchmarks`](https://github.com/z88dk/z88dk/tree/master/support/benchmarks).  Each program directory has a top-level `readme.txt` with a numbered result list, plus toolchain-specific notes (for example `z88dk-classic/`).  Timing is typically done with classic `+test` binaries and `z88dk-ticks` between `TIMER_START` / `TIMER_STOP` labels (use `-m8085` for 8085 images).
+
+Floating-point comparisons cover classic libraries such as genmath, math48, **mbf32** / **mbf32_8085**, and IEEE **math32** / **math32_8085** (see also [Classic Maths Libraries](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) and `libsrc/math/float/math32/readme.md`).  sccz80 results are recorded for z80 and 8085 where applicable; zsdcc is z80-only.  Selected float benches also include **80cc** + math32 on z80 and 8085 when the run produces valid output.
+
 * **Dhrystone 2.1**  Dhrystone was a common synthetic benchmark for measuring the integer performance of compilers in the 1980s until more modern benchmarks replaced it.  It attempts to simulate typical programs by executing a set of statements statistically determined from common programs.
 * **Pi**  Mainly measures 32-bit integer performance.
 * **Sieve of Eratosthenes**  Popular benchmark for small machine compilers because just about everything is able to compile it.  As a benchmark it doesn't reveal much more than loop overhead.
-* **Whetstone 1.2**  Whetstone is a common synthetic floating point benchmark.
+* **Whetstone 1.2**  Whetstone is a common synthetic floating point benchmark (includes mbf32 / mbf32_8085 timings).
+* **n-body, mandelbrot, fasta, spectral-norm**  Computer Language Benchmarks Game–style float workloads used to compare math32, mbf32, and related libraries on z80 and 8085.
 * **Program Size**  Program size has great importance for small machines.  A collection of test programs were compiled for the common cp/m target and resulting binary sizes were compared.
 
 ## Using cmake to build z88dk projects
