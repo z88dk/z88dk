@@ -95,7 +95,7 @@ check_cursor:
     cp      IOCTL_GENCON_CURSOR_ON
     jr      z, cursor_on
     cp      IOCTL_GENCON_CURSOR_OFF
-    jr      nz, ioctl_failure
+    jr      nz, check_reset
 cursor_off:
     ld      bc, $FFFF                   ;off-screen = hidden
     jr      rc700_set_hw_cursor
@@ -115,6 +115,39 @@ rc700_set_hw_cursor:
     ret
 
     defc    DSPLC_CURSOR = $80          ; 8275 "load cursor position" command
+
+; Full 8275 CRTC reset: reprogram all screen-composition parameters.
+; arg -> unsigned char par[4].  The reset command blanks the display, so we
+; re-issue the mandatory re-enable tail (load cursor at current console pos,
+; preset counters, start display) exactly as the RC700 firmware does.
+; On entry the dispatch pre-read par[0],par[1] into c,b and advanced hl once,
+; so hl points at par[1]; dec it back to par[0].
+check_reset:
+    cp      IOCTL_GENCON_CRT_RESET
+    jr      nz, ioctl_failure
+crt_reset:
+    dec     hl                          ;hl -> par[0]
+    xor     a
+    out     (DSPLC), a                  ;8275 Reset command (0x00)
+    ld      b, 4
+crt_reset_param:
+    ld      a, (hl)
+    out     (DSPLD), a                  ;write par[0..3]
+    inc     hl
+    djnz    crt_reset_param
+    ld      a, DSPLC_CURSOR             ;load cursor position (0x80)
+    out     (DSPLC), a
+    ld      bc, (__console_x)           ;c=col(x), b=row(y)
+    ld      a, c
+    out     (DSPLD), a
+    ld      a, b
+    out     (DSPLD), a
+    ld      a, $E0                      ;preset counters
+    out     (DSPLC), a
+    ld      a, $23                      ;start display: burst=8, space=0
+    out     (DSPLC), a
+    and     a                           ;clear carry = success
+    ret
     
 ioctl_failure: 
     scf
