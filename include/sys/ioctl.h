@@ -28,8 +28,14 @@ __ZPROTO2(int,,console_ioctl,uint16_t,cmd,void *,arg)
  * The driver re-enables the display after reset, so the screen stays live. */
 #define RC700_CRT_PAR0           0x4F  /* 80 chars/row */
 #define RC700_CRT_PAR1           0x98  /* 25 rows/frame */
-#define RC700_CRT_PAR2           0x7A  /* underline + lines/char */
+#define RC700_CRT_PAR2           0x7A  /* underline on line 7 + lines/char */
 #define RC700_CRT_PAR3_BASE      0x4D  /* par[3] with cursor-format bits cleared */
+
+/* Underline placement = par[2] bits 7:4 (scan line the underline sits on).
+ * par2 = RC700_CRT_PAR2_BASE | (line << 4), or use RC700_CRT_UNDERLINE(line).
+ * line is 0..15; line > 7 additionally blanks the top and bottom scan lines. */
+#define RC700_CRT_PAR2_BASE      0x0A  /* lines/char nibble, underline line cleared */
+#define RC700_CRT_UNDERLINE(line) (RC700_CRT_PAR2_BASE | (((line) & 0x0F) << 4))
 
 /* 8275 cursor format = par[3] bits 5:4.  par3 = RC700_CRT_PAR3_BASE | (fmt << 4) */
 #define CURSOR_FMT_BLINK_BLOCK       0  /* blinking reverse-video block */
