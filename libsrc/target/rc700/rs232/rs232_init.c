@@ -3,20 +3,15 @@
  *
  *	uint8_t rs232_init(void)
  *
- *	Initialise SIO-A for 8N1, Rx+Tx enabled, polled (no interrupts).
- *	Baud rate is set by the RC700 firmware's CTC ch0 timer.
+ *	Following the Classic-Serial model (cf. +svi), the full SIO-A setup
+ *	is done by rs232_params(); this call just reports success.  On the
+ *	RC700, SIO-A is already configured (8N1) by the firmware at boot, so
+ *	programs that only call rs232_init()/put/get work at the default rate.
  */
 
-#include <arch/z80.h>
 #include <rs232.h>
-#include "rc700_sio.h"
 
 uint8_t rs232_init(void)
 {
-    z80_outp(SIO_A_CTRL, SIO_WR0_RESET);
-    z80_outp(SIO_A_CTRL, SIO_WR4_PTR);   z80_outp(SIO_A_CTRL, SIO_WR4_8N1_X16);
-    z80_outp(SIO_A_CTRL, SIO_WR3_PTR);   z80_outp(SIO_A_CTRL, SIO_WR3_RX8_EN);
-    z80_outp(SIO_A_CTRL, SIO_WR5_PTR);   z80_outp(SIO_A_CTRL, SIO_WR5_TX8_EN_RTS);
-    z80_outp(SIO_A_CTRL, SIO_WR1_PTR);   z80_outp(SIO_A_CTRL, SIO_WR1_NO_INT);
     return RS_ERR_OK;
 }
