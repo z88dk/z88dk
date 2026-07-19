@@ -9,7 +9,7 @@ RC700_GLOBS_ex := \
 	target/rc700/time/*.asm 
 
 
-RC700_CFILES = $(wildcard target/rc700/*.c)
+RC700_CFILES = $(wildcard target/rc700/*.c) $(wildcard target/rc700/rs232/*.c)
 RC700_OFILES = $(addprefix target/rc700/obj/rc700/, $(RC700_CFILES:.c=.o))
 
 RC700_TARGETS := target/rc700/obj/target-rc700-rc700 $(RC700_OFILES)
