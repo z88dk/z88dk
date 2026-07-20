@@ -69,12 +69,12 @@ cycle count  = 4769143
 time @ 4MHz  = 4769143 / 4*10^6 = 1.1923 sec
 
 
-Z88DK January 5, 2022
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085
-9278 bytes less page zero
+9151 bytes less page zero
 
-cycle count  = 5129695
-time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+cycle count  = 4674469
+time @ 4MHz  = 4674469 / 4*10^6 = 1.1686 sec
 
 
 Z88DK July 20, 2026

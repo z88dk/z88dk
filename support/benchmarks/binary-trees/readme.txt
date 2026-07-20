@@ -79,7 +79,7 @@ z88dk-classic/readme.txt.
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|-------------
 sccz80   | z80  | mbf32   | 145_563_150
-sccz80   | 8085 | mbf32   | 137_783_936
+sccz80   | 8085 | mbf32   | 127_055_600  (Jul 2026)
 zsdcc    | z80  | math48  | 150_118_736
 80cc     | z80/8085 | mbf32 | builds; TIMER completes but cycle
          |      |         | counts ~50x below sccz80 — not published
@@ -157,12 +157,12 @@ IAR is likely implementing a heap similar to z88dk's new c library
 where an emphasis is placed on the speed of realloc().
 
 8.
-Z88DK January 31, 2023
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085 CPU
-3775 bytes less page zero
+3609 bytes less page zero
 
-cycle count  = 137783936
-time @ 4MHz  = 137783936 / 4*10^6 = 34.45 sec
+cycle count  = 127055600
+time @ 4MHz  = 127055600 / 4*10^6 = 31.76 sec
 
 9.
 HITECH C CPM V309-15

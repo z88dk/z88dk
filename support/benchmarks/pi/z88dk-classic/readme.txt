@@ -62,12 +62,12 @@ RESULT
 PI.C
 
 
-Z88DK December 12, 2022
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085 CPU
-7335 bytes less page zero
+7295 bytes less page zero
 
-cycle count  = 7824146079
-time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
+cycle count  = 7380146447
+time @ 4MHz  = 7380146447 / 4*10^6 = 30 min 45 sec
 
 
 Z88DK April 4, 2022
@@ -88,10 +88,10 @@ time @ 4MHz  = 4197516586 / 4*10^6 = 17 min 29 sec
 
 Z88DK July 20, 2026
 80cc / classic c library / 8085 CPU
-7642 bytes less page zero
+7745 bytes less page zero
 
-cycle count  = 8011487245
-time @ 4MHz  = 8011487245 / 4*10^6 = 33 min 23 sec
+cycle count  = 7569463213
+time @ 4MHz  = 7569463213 / 4*10^6 = 31 min 32 sec
 
 
 Z88DK April 4, 2022

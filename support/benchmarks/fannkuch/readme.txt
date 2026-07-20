@@ -60,7 +60,7 @@ z88dk-classic/readme.txt and sibling directories.
 Compiler | CPU  | Ticks
 ---------|------|-------------
 sccz80   | z80  | 75_381_296
-sccz80   | 8085 | 64_389_094
+sccz80   | 8085 | 67_749_895  (Jul 2026)
 80cc     | z80  | 88_892_408  (Jul 2026, -O2 --opt-code-speed)
 80cc     | 8085 | 77_390_398  (Jul 2026)
 zsdcc    | z80  | 59_756_269
@@ -130,12 +130,12 @@ cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 9.
-Z88DK January 31, 2023
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085 CPU
-1782 bytes less page zero
+1719 bytes less page zero
 
-cycle count  = 64389094
-time @ 4MHz  = 64389094 / 4*10^6 = 16.10 sec
+cycle count  = 67749895
+time @ 4MHz  = 67749895 / 4*10^6 = 16.94 sec
 
 10.
 Z88DK July 20, 2026
