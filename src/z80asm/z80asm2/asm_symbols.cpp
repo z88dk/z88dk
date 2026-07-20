@@ -9,7 +9,7 @@
 #include "ir.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <string>
 #include <string_view>
 
@@ -23,16 +23,16 @@ static bool collect_used_symbols_in_expr(Program& prog, Module& mod,
         Stmt* stmt, Expr* expr);
 static bool compare_declarations_definitions(Program& prog);
 static bool declare_symbol(Program& prog,
-                           StringInterner::Id name_id, SymbolDeclareType type,
+                           uint name_id, SymbolDeclareType type,
                            const SourceLoc& loc);
 static SymbolInfo* define_label(Program& prog, Module& mod,
-                                StringInterner::Id name_id,
+                                uint name_id,
                                 LabelStmt& lbl_stmt);
 static SymbolInfo* define_defc(Program& prog, Module& mod,
-                               StringInterner::Id name_id,
+                               uint name_id,
                                DefcStmt& defc_stmt);
 static SymbolInfo* define_used_symbol(Program& prog, Module& mod,
-                                      StringInterner::Id name_id,
+                                      uint name_id,
                                       const SourceLoc& loc);
 
 bool collect_symbols(Program& prog) {
@@ -66,7 +66,7 @@ static bool resolve_local_labels(Program& prog) {
                 if (auto label_stmt = dynamic_cast<LabelStmt*>(stmt)) {
                     if (label_stmt->is_local) {         // has @
                         if (label_stmt->at_pos == 0) {  // @l1
-                            std::string label = g_strings.to_string(label_stmt->name_id);
+                            std::string label = g_strings.string(label_stmt->name_id);
                             if (parent_label.empty()) {
                                 g_diag.error(label_stmt->loc,
                                              "Local label without a parent label: " + label);
@@ -74,7 +74,7 @@ static bool resolve_local_labels(Program& prog) {
                             }
                             else {
                                 std::string global_label = parent_label + label;
-                                StringInterner::Id global_label_id =
+                                uint global_label_id =
                                     g_strings.intern(global_label);
                                 label_stmt->name_id = global_label_id;
                                 label_stmt->at_pos = parent_label.size();
@@ -83,12 +83,12 @@ static bool resolve_local_labels(Program& prog) {
                         else {                          // g1@l1
                             g_diag.error(label_stmt->loc,
                                          "Local label cannot have a parent label: " +
-                                         g_strings.to_string(label_stmt->name_id));
+                                         g_strings.string(label_stmt->name_id));
                             failed = true;
                         }
                     }
                     else {                              // g1
-                        parent_label = g_strings.to_string(label_stmt->name_id);
+                        parent_label = g_strings.string(label_stmt->name_id);
                     }
                     continue;
                 }
@@ -170,11 +170,11 @@ bool resolve_local_labels_in_expr(std::string_view parent_label, Expr* expr) {
             if (parent_label.empty()) {
                 g_diag.error(loc_label_expr->loc,
                              "Local label without a parent label: " +
-                             g_strings.to_string(loc_label_expr->name_id));
+                             g_strings.string(loc_label_expr->name_id));
                 return false;
             }
             else {
-                std::string local_label = g_strings.to_string(loc_label_expr->name_id);
+                std::string local_label = g_strings.string(loc_label_expr->name_id);
                 std::string global_label = std::string(parent_label) + local_label;
                 loc_label_expr->name_id = g_strings.intern(global_label);
                 loc_label_expr->at_pos = parent_label.size();
@@ -430,7 +430,7 @@ static bool compare_declarations_definitions(Program& prog) {
 
     // check if there is more than one definition for PUBLIC/GLOBAL symbols
     // check if are 0 definitions for PUBLIC symbols
-    std::unordered_map<StringInterner::Id, std::vector<SourceLoc>> definitions;
+    std::unordered_map<uint, std::vector<SourceLoc>> definitions;
 
     // collect all modules' symbol definitions
     for (auto& mod : prog.modules) {
@@ -452,7 +452,7 @@ static bool compare_declarations_definitions(Program& prog) {
         if (it == definitions.end()) { // 0 definitions
             if (decl->type == SymbolDeclareType::Public) {
                 g_diag.error(decl->loc,
-                             "Undefined symbol: " + g_strings.to_string(name_id));
+                             "Undefined symbol: " + g_strings.string(name_id));
                 failed = true;
             }
             continue;
@@ -464,7 +464,7 @@ static bool compare_declarations_definitions(Program& prog) {
                 it->second.size() > 1) { // more than 1 definition
             for (auto& loc : it->second) {
                 g_diag.error(loc,
-                             "Duplicate symbol: " + g_strings.to_string(name_id));
+                             "Duplicate symbol: " + g_strings.string(name_id));
             }
             g_diag.note(decl->loc, "Declaration here");
             failed = true;
@@ -475,7 +475,7 @@ static bool compare_declarations_definitions(Program& prog) {
 }
 
 static bool declare_symbol(Program& prog,
-                           StringInterner::Id name_id, SymbolDeclareType type,
+                           uint name_id, SymbolDeclareType type,
                            const SourceLoc& loc) {
 
     // Lambda to update saw_* flags
@@ -546,13 +546,13 @@ static bool declare_symbol(Program& prog,
     }
 
     // checks failed, error message
-    g_diag.error(loc, "Symbol redeclaration: " + g_strings.to_string(name_id));
+    g_diag.error(loc, "Symbol redeclaration: " + g_strings.string(name_id));
     g_diag.note(old_decl->loc, "Previous declaration");
     return false;
 }
 
 static bool can_define_symbol(Program& prog, Module& mod,
-                              StringInterner::Id name_id, const SourceLoc& loc) {
+                              uint name_id, const SourceLoc& loc) {
     // Check previous declaration
     auto it_decl = prog.declarations.find(name_id);
     if (it_decl != prog.declarations.end()) {
@@ -586,13 +586,13 @@ static bool can_define_symbol(Program& prog, Module& mod,
 
     // Redefinition error
     auto& old_def = it_def->second;
-    g_diag.error(loc, "Duplicate definition: " + g_strings.to_string(name_id));
+    g_diag.error(loc, "Duplicate definition: " + g_strings.string(name_id));
     g_diag.note(old_def->loc, "Previous definition");
     return false;
 }
 
 static SymbolInfo* define_label(Program& prog, Module& mod,
-                                StringInterner::Id name_id,
+                                uint name_id,
                                 LabelStmt& lbl_stmt) {
     if (!can_define_symbol(prog, mod, name_id, lbl_stmt.loc)) {
         return nullptr;
@@ -608,7 +608,7 @@ static SymbolInfo* define_label(Program& prog, Module& mod,
 }
 
 static SymbolInfo* define_defc(Program& prog, Module& mod,
-                               StringInterner::Id name_id,
+                               uint name_id,
                                DefcStmt& defc_stmt) {
     if (!can_define_symbol(prog, mod, name_id, defc_stmt.loc)) {
         return nullptr;
@@ -625,7 +625,7 @@ static SymbolInfo* define_defc(Program& prog, Module& mod,
 }
 
 static SymbolInfo* define_used_symbol(Program& prog, Module& mod,
-                                      StringInterner::Id name_id,
+                                      uint name_id,
                                       const SourceLoc& loc) {
     // if symbol defined, return pointer
     auto it_def = mod.symbols.find(name_id);
@@ -641,7 +641,7 @@ static SymbolInfo* define_used_symbol(Program& prog, Module& mod,
         if (decl->type == SymbolDeclareType::Public) {
             // should be defined
             g_diag.error(loc, "Undefined symbol: " +
-                         g_strings.to_string(name_id));
+                         g_strings.string(name_id));
             return nullptr;
         }
 
@@ -654,6 +654,6 @@ static SymbolInfo* define_used_symbol(Program& prog, Module& mod,
         return ret;
     }
 
-    g_diag.error(loc, "Undefined symbol: " + g_strings.to_string(name_id));
+    g_diag.error(loc, "Undefined symbol: " + g_strings.string(name_id));
     return nullptr;
 }

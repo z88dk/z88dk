@@ -7,7 +7,7 @@
 #include "ir.h"
 #include "lexer_tokens.h"
 #include "release_assert.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cstdlib>
@@ -18,18 +18,6 @@
 #include <vector>
 
 Patch::~Patch() = default;
-
-DumpContext::DumpContext(std::ostream& os_, int indent_)
-    : os(os_), indent(indent_) {
-}
-
-void DumpContext::line(std::string_view text) {
-    os << std::string(indent * 4, ' ') << text << std::endl;
-}
-
-DumpContext DumpContext::child() const {
-    return DumpContext(os, indent + 1);
-}
 
 static std::string to_string(ExprType type) {
     switch (type) {
@@ -51,7 +39,7 @@ static std::string section_name_or_empty(const Section* section) {
     if (!section) {
         return "";
     }
-    std::string name = g_strings.to_string(section->name_id);
+    std::string name = g_strings.string(section->name_id);
     return name.empty() ? "\"\"" : name;
 }
 
@@ -137,7 +125,7 @@ void OpcodeStmt::dump(DumpContext ctx) const {
     }
 }
 
-LabelStmt::LabelStmt(StringInterner::Id name_id_, const SourceLoc& loc_)
+LabelStmt::LabelStmt(uint name_id_, const SourceLoc& loc_)
     : Stmt(loc_), name_id(name_id_) {
 }
 
@@ -145,7 +133,7 @@ void LabelStmt::dump(DumpContext ctx) const {
     ctx.line("LabelStmt");
     auto c = ctx.child();
     c.line("Location: " + loc.to_string());
-    std::string ident_str = g_strings.to_string(name_id);
+    std::string ident_str = g_strings.string(name_id);
     c.line("Label: " + ident_str);
     if (is_local) {
         c.line("Local part: " + ident_str.substr(at_pos));
@@ -182,7 +170,7 @@ void ExprLiteralAsmpc::dump(DumpContext ctx) const {
 }
 
 void ExprSymbol::dump(DumpContext ctx) const {
-    ctx.line("ExprSymbol: " + g_strings.to_string(name_id));
+    ctx.line("ExprSymbol: " + g_strings.string(name_id));
     auto c = ctx.child();
     dump_expr_common(*this, c);
     if (symbol) {
@@ -192,7 +180,7 @@ void ExprSymbol::dump(DumpContext ctx) const {
 }
 
 void ExprLocalLabel::dump(DumpContext ctx) const {
-    ctx.line("ExprLocalLabel: " + g_strings.to_string(name_id) + " at " +
+    ctx.line("ExprLocalLabel: " + g_strings.string(name_id) + " at " +
              std::to_string(at_pos));
     auto c = ctx.child();
     dump_expr_common(*this, c);
@@ -391,7 +379,7 @@ void DefcStmt::dump(DumpContext ctx) const {
     ctx.line("DefcStmt");
     auto c = ctx.child();
     c.line("Location: " + loc.to_string());
-    c.line("Name: " + g_strings.to_string(name_id));
+    c.line("Name: " + g_strings.string(name_id));
     if (section) {
         c.line("Section: " + section_name_or_empty(section));
     }
@@ -408,12 +396,12 @@ void DefcStmt::dump(DumpContext ctx) const {
 
 // Helper for dumping statements with a single name_id
 static void dump_named_stmt(const std::string& stmt_type,
-                            StringInterner::Id name_id,
+                            uint name_id,
                             const SourceLoc& loc, DumpContext ctx) {
     ctx.line(stmt_type);
     auto c = ctx.child();
     c.line("Location: " + loc.to_string());
-    c.line("Name: " + g_strings.to_string(name_id));
+    c.line("Name: " + g_strings.string(name_id));
 }
 
 void ModuleStmt::dump(DumpContext ctx) const {
@@ -480,7 +468,7 @@ void DefsStringStmt::dump(DumpContext ctx) const {
         c.line("Size:");
         size_expr->dump(c.child());
     }
-    c.line("String literal: " + escape_string(g_strings.to_string(string_id)));
+    c.line("String literal: " + escape_string(g_strings.string(string_id)));
     c.line("Filler byte: " + int_to_hex(filler_byte));
     c.line("Padding size: " + int_to_hex(padding_size));
     if (!bytes.empty()) {
@@ -516,7 +504,7 @@ void SymbolDeclareStmt::dump(DumpContext ctx) const {
         c.line("Symbols:");
         auto sc = c.child();
         for (const auto& name : names) {
-            sc.line(g_strings.to_string(name.id) + " at " + name.loc.to_string());
+            sc.line(g_strings.string(name.id) + " at " + name.loc.to_string());
         }
     }
 }
@@ -567,7 +555,7 @@ static std::string to_string(SymbolDeclareType type) {
 
 
 void SymbolInfo::dump(DumpContext ctx) const {
-    std::string sym_str = g_strings.to_string(name_id) + ": ";
+    std::string sym_str = g_strings.string(name_id) + ": ";
 
     switch (def_type) {
     case SymbolInfo::DefType::Undefined:
@@ -604,7 +592,7 @@ void SymbolInfo::dump(DumpContext ctx) const {
     }
 }
 
-Section::Section(StringInterner::Id name_id_)
+Section::Section(uint name_id_)
     : name_id(name_id_) {
 }
 
@@ -643,12 +631,12 @@ void Section::dump(DumpContext ctx, const Section* current) const {
 }
 
 
-Module::Module(StringInterner::Id name_id_)
+Module::Module(uint name_id_)
     : name_id(name_id_) {
     set_section(g_strings.intern(DEFAULT_SECTION));
 }
 
-Section* Module::set_section(StringInterner::Id sec_name_id) {
+Section* Module::set_section(uint sec_name_id) {
     for (auto& sec : sections) {
         if (sec_name_id == sec->name_id) {
             // section already present
@@ -669,7 +657,7 @@ void Module::dump(DumpContext ctx) const {
 }
 
 void Module::dump(DumpContext ctx, const Module* current) const {
-    std::string module_name = "Module: " + g_strings.to_string(name_id);
+    std::string module_name = "Module: " + g_strings.string(name_id);
     if (this == current) {
         module_name += " (current)";
     }
@@ -684,7 +672,7 @@ void Module::dump(DumpContext ctx, const Module* current) const {
         // Collect and sort symbols by name string
         std::vector<std::pair<std::string, const SymbolInfo*>> sorted_symbols;
         for (const auto& [sym_name_id, sym] : symbols) {
-            sorted_symbols.emplace_back(g_strings.to_string(sym_name_id), sym.get());
+            sorted_symbols.emplace_back(g_strings.string(sym_name_id), sym.get());
         }
         std::sort(sorted_symbols.begin(), sorted_symbols.end(),
         [](const auto & a, const auto & b) {
@@ -707,12 +695,12 @@ void Module::dump(DumpContext ctx, const Module* current) const {
 }
 
 
-Program::Program(StringInterner::Id name_id_)
+Program::Program(uint name_id_)
     : name_id(name_id_) {
     set_module(name_id_);
 }
 
-Module* Program::set_module(StringInterner::Id mod_name_id) {
+Module* Program::set_module(uint mod_name_id) {
     for (auto& mod : modules) {
         if (mod_name_id == mod->name_id) {
             // module already present
@@ -729,7 +717,7 @@ Module* Program::set_module(StringInterner::Id mod_name_id) {
 }
 
 void Program::dump(DumpContext ctx) const {
-    ctx.line("Program: " + g_strings.to_string(name_id));
+    ctx.line("Program: " + g_strings.string(name_id));
     auto c = ctx.child();
 
     // Dump declarations sorted by name
@@ -740,7 +728,7 @@ void Program::dump(DumpContext ctx) const {
         // Collect and sort declarations by name string
         std::vector<std::pair<std::string, const SymbolDeclare*>> sorted_decls;
         for (const auto& [decl_name_id, decl] : declarations) {
-            sorted_decls.emplace_back(g_strings.to_string(decl_name_id), decl.get());
+            sorted_decls.emplace_back(g_strings.string(decl_name_id), decl.get());
         }
         std::sort(sorted_decls.begin(), sorted_decls.end(),
         [](const auto & a, const auto & b) {

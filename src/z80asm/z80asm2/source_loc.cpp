@@ -5,13 +5,13 @@
 //-----------------------------------------------------------------------------
 
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 
-SourceLoc::SourceLoc(StringInterner::Id file, size_t ln, size_t col)
+SourceLoc::SourceLoc(uint file_id, size_t ln, size_t col)
     : line(static_cast<uint32_t>(ln)),
-      file_id(static_cast<uint16_t>(file)),
+      file_id(static_cast<uint16_t>(file_id)),
       column(static_cast<uint16_t>(col)) {
 }
 
@@ -36,13 +36,13 @@ std::string SourceLoc::to_string() const {
         return "";
     }
 
-    return g_strings.to_string(file_id) + ":" +
+    return g_strings.string(file_id) + ":" +
            std::to_string(line) + ":" + std::to_string(column);
 }
 
-SourceLine::SourceLine(StringInterner::Id file, size_t ln)
+SourceLine::SourceLine(uint file_id, size_t ln)
     : line(static_cast<uint32_t>(ln)),
-      file_id(static_cast<uint16_t>(file)) {
+      file_id(static_cast<uint16_t>(file_id)) {
 }
 
 SourceLine::SourceLine(std::string_view file, size_t ln)
@@ -55,15 +55,15 @@ SourceLine::SourceLine(const SourceLoc& loc)
       file_id(loc.file_id) {
 }
 
-bool SourceLine::operator==(const SourceLine& other) const noexcept {
+bool SourceLine::operator==(const SourceLine& other) const  {
     return line == other.line && file_id == other.file_id;
 }
 
-bool SourceLine::operator!=(const SourceLine& other) const noexcept {
+bool SourceLine::operator!=(const SourceLine& other) const  {
     return !(*this == other);
 }
 
-size_t SourceLineHash::operator()(const SourceLine& s) const noexcept {
+size_t SourceLineHash::operator()(const SourceLine& s) const  {
     // Combine file_id and line into a single 64-bit value
     uint64_t v = (uint64_t(s.file_id) << 32) | s.line;
     return std::hash<uint64_t> {}(v);

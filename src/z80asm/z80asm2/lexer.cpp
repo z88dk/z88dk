@@ -11,7 +11,7 @@
 #include "lexer_tokens.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <string>
 #include <string_view>
 #include <utility>
@@ -53,7 +53,7 @@ static std::vector<Token> tokenize_line(TokenizeState& state,
         end_loc.file_id = last.loc.file_id;
         end_loc.line = last.loc.line;
         end_loc.column = last.loc.column +
-                         static_cast<uint16_t>(g_strings.to_string(last.text_id).size());
+                         static_cast<uint16_t>(g_strings.string(last.text_id).size());
     }
     else {
         end_loc = SourceLoc(loc.file_id, loc.line, loc.column);
@@ -151,7 +151,7 @@ void tokenize(SourceFile& sf, std::string_view content) {
                 end_loc.file_id = last.loc.file_id;
                 end_loc.line = last.loc.line;
                 end_loc.column = last.loc.column +
-                                 static_cast<uint16_t>(g_strings.to_string(last.text_id).size());
+                                 static_cast<uint16_t>(g_strings.string(last.text_id).size());
             }
             else {
                 end_loc = sf.lines[i].loc;

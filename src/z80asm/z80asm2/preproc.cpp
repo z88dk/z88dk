@@ -11,7 +11,7 @@
 #include "parser.h"
 #include "preproc.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -35,7 +35,7 @@ bool Preproc::is_cond_active() const {
     return true;
 }
 
-void Preproc::push_macro_expansion(StringInterner::Id name_id,
+void Preproc::push_macro_expansion(uint name_id,
                                    std::deque<LogicalLine> lines) {
     MacroExpansionFrame frame;
     frame.name_id = name_id;
@@ -112,7 +112,7 @@ void Preproc::set_const_symbols(const ConstSymbols& defs) {
 
 std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // used for dumping tokens after tokenization, if requested
-    StringInterner::Id cur_file_id = 0;
+    uint cur_file_id = 0;
 
     // reset per-run registries and state
     preproc_cpu_id = g_args.options.cpu_id;
@@ -227,7 +227,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
                 ParseLine check_pl(expanded);
                 Keyword kw;
                 SourceLoc kw_loc;
-                StringInterner::Id name_id;
+                uint name_id;
                 SourceLoc name_loc;
 
                 if (is_directive(check_pl, kw, kw_loc, name_id, name_loc)) {
@@ -435,7 +435,7 @@ void Preproc::output_dependencies(std::string_view output_filename,
     int col = static_cast<int>(o_filename.size() + 2);
 
     // collect all referenced filenames
-    std::set<StringInterner::Id> seen_files;
+    std::set<uint> seen_files;
 
     // lambda to add a filename to the output, handling line wrapping
     auto add_file = [&](std::string_view filename) {

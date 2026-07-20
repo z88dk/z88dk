@@ -10,12 +10,12 @@
 #include <vector>
 
 void Preproc::dump_logical_line(const LogicalLine& line,
-                                StringInterner::Id& cur_file_id) {
+                                uint& cur_file_id) {
     dump_tokens(line.tokens, cur_file_id);
 }
 
 void Preproc::dump_macro(const Macro& macro,
-                         StringInterner::Id& cur_file_id) {
+                         uint& cur_file_id) {
     if (macro.is_multiline) {
         std::vector<Token> header_tokens;
         header_tokens.push_back(Token::identifier("MACRO", macro.loc));
@@ -92,7 +92,7 @@ void Preproc::dump_macros() {
     // Dump each macro
     for (const Macro* m : sorted) {
         // force a visual separator between macros
-        StringInterner::Id cur_file_id = 0;
+        uint cur_file_id = 0;
 
         dump_macro(*m, cur_file_id);
     }

@@ -13,7 +13,7 @@
 #include "lexer_tokens.h"
 #include "options.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "zfloat.h"
 #include <deque>
 #include <string_view>
@@ -25,12 +25,12 @@
 static constexpr int MAX_EXPANSION_DEPTH = 10000;
 
 struct Macro {
-    StringInterner::Id name_id;                 // interned identifier
+    uint name_id;                 // interned identifier
     SourceLoc loc;                              // where it was defined
     std::vector<Token> tokens;                  // object/function-like
     std::vector<LogicalLine> lines;             // classical multi-line
-    std::vector<StringInterner::Id> params;     // interned identifiers
-    std::vector<StringInterner::Id> locals;     // LOCAL label names
+    std::vector<uint> params;     // interned identifiers
+    std::vector<uint> locals;     // LOCAL label names
     bool is_function_like = false;
     bool is_multiline = false;
     bool has_parenthesized_params = false;      // defined with (p1,p2) vs p1,p2
@@ -38,7 +38,7 @@ struct Macro {
 
 class Preproc {
 public:
-    Preproc();
+    explicit Preproc();
 
     // copy defines from options, command line, or global scope
     void set_const_symbols(const ConstSymbols& defs);
@@ -64,7 +64,7 @@ private:
     // ---------------------------------------------------------------------
     struct IncludeFrame {
         const SourceFile* file = nullptr;
-        StringInterner::Id logical_file_id = 0;
+        uint logical_file_id = 0;
         size_t current_line = 0;
         bool logical_line_fixed = false;        // for C_LINE
         ptrdiff_t logical_line_offset = 0;      // for LINE, C_LINE
@@ -87,7 +87,7 @@ private:
     // ---------------------------------------------------------------------
     // Macro table: object-like, function-like, classical multi-line
     // ---------------------------------------------------------------------
-    std::unordered_map<StringInterner::Id, Macro> macros;
+    std::unordered_map<uint, Macro> macros;
 
     // ---------------------------------------------------------------------
     // Preprocessor symbols: -DNAME=expr, EQU, IF expressions
@@ -120,7 +120,7 @@ private:
     // non-conditional lines without aborting directive processing.
     // ---------------------------------------------------------------------
     struct MacroExpansionFrame {
-        StringInterner::Id name_id = 0; // 0 = directive, != 0 = macro
+        uint name_id = 0; // 0 = directive, != 0 = macro
         bool exited = false;            // set by EXITM
         std::deque<LogicalLine> lines;
     };
@@ -128,7 +128,7 @@ private:
     std::vector<MacroExpansionFrame> macro_expansion_stack;
 
     // Helper: push lines into a new frame on the expansion stack
-    void push_macro_expansion(StringInterner::Id name_id,
+    void push_macro_expansion(uint name_id,
                               std::deque<LogicalLine> lines);
 
     // ---------------------------------------------------------------------
@@ -143,12 +143,12 @@ private:
     // Dependency genration: set of logical file IDs encountered
     // during preprocessing
     // ---------------------------------------------------------------------
-    std::vector<StringInterner::Id> dependency_files;
+    std::vector<uint> dependency_files;
 
     // ---------------------------------------------------------------------
     // PRAGMA ONCE tracking: file_ids that already requested one-time include
     // ---------------------------------------------------------------------
-    std::vector<StringInterner::Id> pragma_once_files;
+    std::vector<uint> pragma_once_files;
 
     // ---------------------------------------------------------------------
     // DEFVARS tracking
@@ -198,7 +198,7 @@ private:
 
     using NameDirectiveHandler =
         void (Preproc::*)(Keyword kw, const SourceLoc& kw_loc,
-                          StringInterner::Id name_id, const SourceLoc& name_loc,
+                          uint name_id, const SourceLoc& name_loc,
                           ParseLine& pline);
     static std::unordered_map<Keyword, NameDirectiveHandler>
     name_directive_handlers;
@@ -220,7 +220,7 @@ private:
     bool is_directive(ParseLine& pline,
                       Keyword& out_kw,
                       SourceLoc& out_kw_loc,
-                      StringInterner::Id& out_name_id,
+                      uint& out_name_id,
                       SourceLoc& out_name_loc);
     bool parse_filename(ParseLine& pline,
                         Keyword kw,
@@ -235,12 +235,12 @@ private:
                          Keyword kw,
                          size_t& out_linenum, std::string& out_filename);
     bool parse_params(ParseLine& pline,
-                      std::vector<StringInterner::Id>& out_params,
+                      std::vector<uint>& out_params,
                       bool& out_has_parens);
     bool read_macro_body(Keyword start_kw,
                          const SourceLoc& macro_loc,
                          std::vector<LogicalLine>& out_lines,
-                         std::vector<StringInterner::Id>& out_locals);
+                         std::vector<uint>& out_locals);
     std::vector<Token> collect_and_expand_line(ParseLine& pline,
             Keyword kw,
             std::string_view what);
@@ -276,27 +276,27 @@ private:
     void process_DEFINE(Keyword kw, const SourceLoc& kw_loc,
                         ParseLine& pline);
     void process_name_DEFINE(Keyword kw, const SourceLoc& kw_loc,
-                             StringInterner::Id name_id, const SourceLoc& name_loc,
+                             uint name_id, const SourceLoc& name_loc,
                              ParseLine& pline);
     void do_DEFINE(const Macro& macro,
                    ParseLine& pline);
     void process_UNDEF(Keyword kw, const SourceLoc& kw_loc,
                        ParseLine& pline);
     void process_name_UNDEF(Keyword kw, const SourceLoc& kw_loc,
-                            StringInterner::Id name_id, const SourceLoc& name_loc,
+                            uint name_id, const SourceLoc& name_loc,
                             ParseLine& pline);
-    void do_UNDEF(StringInterner::Id name_id);
+    void do_UNDEF(uint name_id);
     void process_DEFL(Keyword kw, const SourceLoc& kw_loc,
                       ParseLine& pline);
     void process_name_DEFL(Keyword kw, const SourceLoc& kw_loc,
-                           StringInterner::Id name_id, const SourceLoc& name_loc,
+                           uint name_id, const SourceLoc& name_loc,
                            ParseLine& pline);
     void do_DEFL(const Macro& macro,
                  ParseLine& pline);
     void process_MACRO(Keyword kw, const SourceLoc& kw_loc,
                        ParseLine& pline);
     void process_name_MACRO(Keyword kw, const SourceLoc& kw_loc,
-                            StringInterner::Id name_id, const SourceLoc& name_loc,
+                            uint name_id, const SourceLoc& name_loc,
                             ParseLine& pline);
     void do_MACRO(Keyword kw, const SourceLoc& kw_loc,
                   const Macro& macro);
@@ -309,26 +309,26 @@ private:
     void process_REPTI(Keyword kw, const SourceLoc& kw_loc,
                        ParseLine& pline);
     void process_name_REPTI(Keyword kw, const SourceLoc& kw_loc,
-                            StringInterner::Id name_id, const SourceLoc& name_loc,
+                            uint name_id, const SourceLoc& name_loc,
                             ParseLine& pline);
     void do_REPTI(Keyword kw, const SourceLoc& kw_loc,
-                  StringInterner::Id name_id, const SourceLoc& name_loc,
+                  uint name_id, const SourceLoc& name_loc,
                   ParseLine& pline);
     void process_REPTC(Keyword kw, const SourceLoc& kw_loc,
                        ParseLine& pline);
     void process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
-                            StringInterner::Id name_id, const SourceLoc& name_loc,
+                            uint name_id, const SourceLoc& name_loc,
                             ParseLine& pline);
     void process_name_DEFC(Keyword kw, const SourceLoc& kw_loc,
-                           StringInterner::Id name_id, const SourceLoc& name_loc,
+                           uint name_id, const SourceLoc& name_loc,
                            ParseLine& pline);
     void do_REPTC(Keyword kw, const SourceLoc& kw_loc,
-                  StringInterner::Id name_id, const SourceLoc& name_loc,
+                  uint name_id, const SourceLoc& name_loc,
                   ParseLine& pline);
     void process_LOCAL(Keyword kw, const SourceLoc& kw_loc,
                        ParseLine& pline);
     void process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
-                            StringInterner::Id name_id, const SourceLoc& name_loc,
+                            uint name_id, const SourceLoc& name_loc,
                             ParseLine& pline);
     void process_EXITM(Keyword kw, const SourceLoc& kw_loc,
                        ParseLine& pline);
@@ -406,25 +406,25 @@ private:
     bool collect_bare_args(const std::vector<Token>& tokens, size_t& pos,
                            std::vector<std::vector<Token>>& args);
     std::vector<Token> substitute_params(const std::vector<Token>& body,
-                                         const std::vector<StringInterner::Id>&
+                                         const std::vector<uint>&
                                          params,
                                          const std::vector<std::vector<Token>>&
                                          expanded_args,
                                          const std::vector<std::vector<Token>>&
                                          unexpanded_args,
                                          const SourceLoc& call_loc,
-                                         const std::vector<StringInterner::Id>&
+                                         const std::vector<uint>&
                                          locals);
 
     // macro expansion: recursively expand a single macro argument with hide-set tracking
     std::vector<Token> expand_argument(const std::vector<Token>& arg_tokens,
-                                       const std::vector<StringInterner::Id>& hide_set,
+                                       const std::vector<uint>& hide_set,
                                        const SourceLoc& call_loc);
 
     // helper to identify which macro parameters appear adjacent to # or ## operators
-    std::unordered_set<StringInterner::Id> find_params_adjacent_to_operators(
+    std::unordered_set<uint> find_params_adjacent_to_operators(
         const std::vector<Token>& body,
-        const std::vector<StringInterner::Id>& params);
+        const std::vector<uint>& params);
 
     // macro expansion: takes a logical line with macro invocation tokens and
     // expands it
@@ -439,9 +439,9 @@ private:
     // ---------------------------------------------------------------------
 
     void dump_logical_line(const LogicalLine& line,
-                           StringInterner::Id& cur_file_id);
+                           uint& cur_file_id);
     void dump_macro(const Macro& macro,
-                    StringInterner::Id& cur_file_id);
+                    uint& cur_file_id);
     void dump_macros();
     void dump_symbols();
 };

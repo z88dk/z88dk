@@ -7,7 +7,7 @@
 #pragma once
 
 #include "lexer_tokens.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -22,11 +22,11 @@ enum class FloatFormat : uint8_t {
 
 std::string to_string(FloatFormat fmt);
 bool float_format_lookup(std::string_view str, FloatFormat& out_fmt);
-std::vector<StringInterner::Id> float_formats();
+std::vector<uint> float_formats();
 std::string float_formats_message();
 
-std::vector<StringInterner::Id> float_format_all_defines();
-StringInterner::Id float_format_define(FloatFormat float_id);
+std::vector<uint> float_format_all_defines();
+uint float_format_define(FloatFormat float_id);
 
 bool parse_float_expr(double& out_value, ParseLine& pline);
 bool parse_float_expr_list(std::vector<double>& out_list, ParseLine& pline);

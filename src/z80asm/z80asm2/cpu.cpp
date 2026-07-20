@@ -8,7 +8,7 @@
 #include "diag.h"
 #include "lexer_keywords.h"
 #include "release_assert.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <sstream>
@@ -54,20 +54,20 @@ bool cpu_lookup(std::string_view name, CPU& out_cpu_id) {
     }
 }
 
-std::vector<StringInterner::Id> cpu_names() {
-    static const std::vector<StringInterner::Id> names = []() {
+std::vector<uint> cpu_names() {
+    static const std::vector<uint> names = []() {
         static const std::vector<std::string_view> storage = {
 #define X(id, name, name_str, non_strict, ancestor, defines)	name_str,
 #include "../cpu.def"
 #undef X
         };
-        std::vector<StringInterner::Id> v;
+        std::vector<uint> v;
         v.reserve(storage.size());
         for (auto s : storage) {
             v.push_back(g_strings.intern(s));
         }
         std::sort(v.begin(), v.end(),
-        [](StringInterner::Id a, StringInterner::Id b) {
+        [](uint a, uint b) {
             return g_strings.view(a) < g_strings.view(b);
         });
         return v;
@@ -77,10 +77,10 @@ std::vector<StringInterner::Id> cpu_names() {
 }
 
 static const
-std::unordered_map<CPU, std::vector<StringInterner::Id>>& cpu_defines_table() {
-    static const std::unordered_map<CPU, std::vector<StringInterner::Id>> table
+std::unordered_map<CPU, std::vector<uint>>& cpu_defines_table() {
+    static const std::unordered_map<CPU, std::vector<uint>> table
     = []() {
-        std::unordered_map<CPU, std::vector<StringInterner::Id>> t;
+        std::unordered_map<CPU, std::vector<uint>> t;
         struct Entry {
             CPU id;
             const char* defines;
@@ -103,14 +103,14 @@ std::unordered_map<CPU, std::vector<StringInterner::Id>>& cpu_defines_table() {
     return table;
 }
 
-std::vector<StringInterner::Id> cpu_all_defines() {
-    static const std::vector<StringInterner::Id> all = []() {
-        std::vector<StringInterner::Id> result;
+std::vector<uint> cpu_all_defines() {
+    static const std::vector<uint> all = []() {
+        std::vector<uint> result;
         for (const auto& [id, words] : cpu_defines_table()) {
             result.insert(result.end(), words.begin(), words.end());
         }
         std::sort(result.begin(), result.end(),
-        [](StringInterner::Id a, StringInterner::Id b) {
+        [](uint a, uint b) {
             return g_strings.view(a) < g_strings.view(b);
         });
         result.erase(std::unique(result.begin(), result.end()), result.end());
@@ -120,7 +120,7 @@ std::vector<StringInterner::Id> cpu_all_defines() {
     return all;
 }
 
-std::vector<StringInterner::Id> cpu_defines(CPU cpu_id) {
+std::vector<uint> cpu_defines(CPU cpu_id) {
     const auto& table = cpu_defines_table();
     auto it = table.find(cpu_id);
     if (it == table.end())

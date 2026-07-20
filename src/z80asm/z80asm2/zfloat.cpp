@@ -7,7 +7,7 @@
 #include "diag.h"
 #include "lexer_tokens.h"
 #include "release_assert.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include "zfloat.h"
 #include <algorithm>
@@ -50,15 +50,15 @@ bool float_format_lookup(std::string_view str, FloatFormat& out_fmt) {
     }
 }
 
-std::vector<StringInterner::Id> float_formats() {
-    static const std::vector<StringInterner::Id> formats = []() {
-        std::vector<StringInterner::Id> v;
+std::vector<uint> float_formats() {
+    static const std::vector<uint> formats = []() {
+        std::vector<uint> v;
         v.reserve(std::size(float_formats_lu_table));
         for (auto s : float_formats_lu_table) {
             v.push_back(g_strings.intern(s));
         }
         std::sort(v.begin(), v.end(),
-        [](StringInterner::Id a, StringInterner::Id b) {
+        [](uint a, uint b) {
             return g_strings.view(a) < g_strings.view(b);
         });
         return v;
@@ -80,20 +80,20 @@ std::string float_formats_message() {
     return message;
 }
 
-std::vector<StringInterner::Id> float_format_all_defines() {
-    std::vector<StringInterner::Id> defines;
+std::vector<uint> float_format_all_defines() {
+    std::vector<uint> defines;
     defines.reserve(std::size(float_formats_lu_table));
 
     for (const auto& fmt : float_formats_lu_table) {
         FloatFormat float_id = static_cast<FloatFormat>(
                                    std::distance(float_formats_lu_table, &fmt));
-        StringInterner::Id id = float_format_define(float_id);
+        uint id = float_format_define(float_id);
         defines.push_back(id);
     }
     return defines;
 }
 
-StringInterner::Id float_format_define(FloatFormat float_id) {
+uint float_format_define(FloatFormat float_id) {
     std::string define_name = to_upper("__FLOAT_" + to_string(float_id) + "__");
     return g_strings.intern(define_name);
 }
@@ -357,7 +357,7 @@ static double parse_primary(ParseState& ps) {
         default:
             g_diag.error(ps.pline.peek().loc,
                          "Unknown identifier in float expression: " +
-                         g_strings.to_string(ps.pline.peek().text_id));
+                         g_strings.string(ps.pline.peek().text_id));
             ps.error = true;
             return 0.0;
         }

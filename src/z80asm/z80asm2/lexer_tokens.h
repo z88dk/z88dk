@@ -8,7 +8,7 @@
 
 #include "lexer_keywords.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -28,12 +28,12 @@ std::string to_string(TokenType token_type);
 struct Token {
     TokenType type = TokenType::EndOfLine;  // 1 byte
     Keyword keyword = Keyword::None;        // 2 bytes
-    StringInterner::Id text_id = 0;         // 4 bytes
+    uint text_id = 0;         // 4 bytes
 
     union {                                 // 8 bytes
         int int_value;
         double float_value;
-        StringInterner::Id str_value_id;
+        uint str_value_id;
         size_t label_at_pos;                // position of '@' in text_id
     } value = {};
 
@@ -54,8 +54,8 @@ struct Token {
     static Token end_of_line(const SourceLoc& loc);
 
     // Compare tokens for semantic equality (ignoring location)
-    bool operator==(const Token& other) const noexcept;
-    bool operator!=(const Token& other) const noexcept;
+    bool operator==(const Token& other) const ;
+    bool operator!=(const Token& other) const ;
 };
 
 std::string to_string(Token token);

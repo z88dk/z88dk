@@ -13,7 +13,7 @@
 #include "options.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <cstdint>
@@ -217,7 +217,7 @@ void Args::parse_define(std::string_view arg, std::string_view opt_name,
 
     // Convert to std::string for symbol table
     std::string name_s(name);
-    StringInterner::Id name_id = g_strings.intern(name_s);
+    uint name_id = g_strings.intern(name_s);
     std::string expr_s(expr);
 
     // evaluate the expression as a constant expression
@@ -757,7 +757,7 @@ void Args::search_list_file(std::string_view list_filename,
                             const SourceLoc& loc,
                             std::vector<SourceLoc>& loc_stack) {
     // read list file
-    StringInterner::Id file_id =
+    uint file_id =
         g_file_mgr.register_virtual_file(list_filename);
     std::string content;
     if (!g_file_mgr.read_file_to_string(list_filename, loc, content)) {
@@ -857,7 +857,7 @@ void Args::search_source_file(std::string_view filename_,
             g_diag.error(loc, "File not found: " + list_filename);
             return;
         }
-        StringInterner::Id file_id =
+        uint file_id =
             g_file_mgr.register_virtual_file(list_full_path);
 
         // check for recursive inclusion of list files
@@ -1013,7 +1013,7 @@ void Args::define_constants_from_options() {
     }
 
     // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
-    StringInterner::Id swap_id = g_strings.intern("__SWAP_IX_IY__");
+    uint swap_id = g_strings.intern("__SWAP_IX_IY__");
     options.global_defs.erase(swap_id);
     if (options.swap_ix_iy) {
         options.global_defs.set(swap_id, 1, SourceLoc("<builtin>", 1, 1));

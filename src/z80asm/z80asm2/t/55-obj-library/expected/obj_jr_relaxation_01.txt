@@ -14,7 +14,7 @@ ObjectLibrary
                     Text: "func1"
                     Range: JrOffset
                     ASMPC: 0
-                    Code pos: 1
+                    Patch ptr: 1
                     Opcode size: 2
                     Section: code1
             Defined symbols:

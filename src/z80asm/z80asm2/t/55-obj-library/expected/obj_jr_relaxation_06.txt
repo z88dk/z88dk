@@ -14,7 +14,7 @@ ObjectLibrary
                     Text: "func1"
                     Range: Word
                     ASMPC: 0
-                    Code pos: 2
+                    Patch ptr: 2
                     Opcode size: 4
             Defined symbols:
                 ObjSymbol: func1

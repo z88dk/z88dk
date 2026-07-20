@@ -46,7 +46,7 @@
 
 #endif
 
-BinaryFile::BinaryFile(const std::string& filename)
+BinaryFile::BinaryFile(std::string_view filename)
     : filename_(filename) {
 #if defined(_WIN32) || defined(__unix__) || defined(__APPLE__)
     open_mapped(filename);
@@ -61,11 +61,11 @@ BinaryFile::~BinaryFile() {
 #endif
 }
 
-BinaryFile::BinaryFile(BinaryFile&& other) noexcept {
+BinaryFile::BinaryFile(BinaryFile&& other)  {
     move_from(std::move(other));
 }
 
-BinaryFile& BinaryFile::operator=(BinaryFile&& other) noexcept {
+BinaryFile& BinaryFile::operator=(BinaryFile&& other)  {
     if (this != &other) {
 #if defined(_WIN32) || defined(__unix__) || defined(__APPLE__)
         close_mapped();
@@ -77,9 +77,10 @@ BinaryFile& BinaryFile::operator=(BinaryFile&& other) noexcept {
 }
 
 #if defined(_WIN32)
-void BinaryFile::open_mapped(const std::string& filename) {
+void BinaryFile::open_mapped(std::string_view filename) {
+    std::string filename_s(filename);
     file_ = CreateFileA(
-                filename.c_str(),
+                filename_s.c_str(),
                 GENERIC_READ,
                 FILE_SHARE_READ,
                 nullptr,
@@ -88,7 +89,7 @@ void BinaryFile::open_mapped(const std::string& filename) {
                 nullptr);
 
     if (static_cast<HANDLE>(file_) == INVALID_HANDLE_VALUE) {
-        fatal_error("failed to open file '" + filename +
+        fatal_error("failed to open file '" + filename_s +
                     "': " + std::strerror(errno));
     }
 
@@ -96,10 +97,10 @@ void BinaryFile::open_mapped(const std::string& filename) {
     if (!GetFileSizeEx(static_cast<HANDLE>(file_), &file_size)) {
         CloseHandle(static_cast<HANDLE>(file_));
         file_ = INVALID_HANDLE_VALUE;
-        fatal_error("failed to get file size of '" + filename + "'");
+        fatal_error("failed to get file size of '" + filename_s + "'");
     }
 
-    size_ = static_cast<std::size_t>(file_size.QuadPart);
+    size_ = static_cast<size_t>(file_size.QuadPart);
 
     if (size_ == 0) {
         return;
@@ -117,7 +118,7 @@ void BinaryFile::open_mapped(const std::string& filename) {
         CloseHandle(static_cast<HANDLE>(file_));
         file_ = INVALID_HANDLE_VALUE;
         size_ = 0;
-        fatal_error("failed to create file mapping for '" + filename + "'");
+        fatal_error("failed to create file mapping for '" + filename_s + "'");
     }
 
     data_ = static_cast<const uint8_t*>(
@@ -135,7 +136,7 @@ void BinaryFile::open_mapped(const std::string& filename) {
         mapping_ = nullptr;
         file_ = INVALID_HANDLE_VALUE;
         size_ = 0;
-        fatal_error("failed to map file for '" + filename + "'");
+        fatal_error("failed to map file for '" + filename_s + "'");
     }
 }
 
@@ -160,10 +161,11 @@ void BinaryFile::close_mapped() {
 
 #elif defined(__unix__) || defined(__APPLE__)
 
-void BinaryFile::open_mapped(const std::string& filename) {
-    fd_ = ::open(filename.c_str(), O_RDONLY);
+void BinaryFile::open_mapped(std::string_view filename) {
+    std::string filename_s(filename);
+    fd_ = ::open(filename_s.c_str(), O_RDONLY);
     if (fd_ < 0) {
-        fatal_error("failed to open file '" + filename +
+        fatal_error("failed to open file '" + filename_s +
                     "': " + std::strerror(errno));
     }
 
@@ -171,10 +173,10 @@ void BinaryFile::open_mapped(const std::string& filename) {
     if (::fstat(fd_, &st) != 0) {
         ::close(fd_);
         fd_ = -1;
-        fatal_error("failed to stat file '" + filename + "'");
+        fatal_error("failed to stat file '" + filename_s + "'");
     }
 
-    size_ = static_cast<std::size_t>(st.st_size);
+    size_ = static_cast<size_t>(st.st_size);
 
     if (size_ == 0) {
         return;
@@ -192,7 +194,7 @@ void BinaryFile::open_mapped(const std::string& filename) {
         ::close(fd_);
         fd_ = -1;
         size_ = 0;
-        fatal_error("failed to mmap file '" + filename + "'");
+        fatal_error("failed to mmap file '" + filename_s + "'");
     }
 
     data_ = static_cast<const uint8_t*>(p);
@@ -214,10 +216,11 @@ void BinaryFile::close_mapped() {
 
 #else
 
-void BinaryFile::open_vector(const std::string& filename) {
-    FILE* f = std::fopen(filename.c_str(), "rb");
+void BinaryFile::open_vector(std::string_view filename) {
+    std::string filename_s(filename);
+    FILE* f = std::fopen(filename_s.c_str(), "rb");
     if (!f) {
-        fatal_error("failed to open file '" + filename +
+        fatal_error("failed to open file '" + filename_s +
                     "': " + std::strerror(errno));
     }
 
@@ -226,20 +229,20 @@ void BinaryFile::open_vector(const std::string& filename) {
     long file_size = std::ftell(f);
     if (file_size < 0) {
         std::fclose(f);
-        fatal_error("failed to get file size of '" + filename + "'");
+        fatal_error("failed to get file size of '" + filename_s + "'");
     }
 
     std::rewind(f);
 
-    storage_.resize(static_cast<std::size_t>(file_size));
+    storage_.resize(static_cast<size_t>(file_size));
 
     if (!storage_.empty()) {
-        std::size_t nread =
+        size_t nread =
             std::fread(storage_.data(), 1, storage_.size(), f);
 
         if (nread != storage_.size()) {
             std::fclose(f);
-            fatal_error("failed to read file '" + filename + "'");
+            fatal_error("failed to read file '" + filename_s + "'");
         }
     }
 
@@ -251,7 +254,7 @@ void BinaryFile::open_vector(const std::string& filename) {
 
 #endif
 
-void BinaryFile::move_from(BinaryFile&& other) noexcept {
+void BinaryFile::move_from(BinaryFile&& other)  {
     data_ = other.data_;
     size_ = other.size_;
 
@@ -288,10 +291,6 @@ const uint8_t* BinaryFile::get_data(size_t& ptr, size_t elem_size) const {
     const uint8_t* base = data_ + ptr;
     ptr += elem_size;
     return base;
-}
-
-static size_t align_up(size_t value, size_t alignment) {
-    return (value + alignment - 1) & ~(alignment - 1);
 }
 
 void BinaryFile::align_ptr(size_t& ptr) const {

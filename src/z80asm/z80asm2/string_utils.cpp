@@ -109,12 +109,14 @@ std::string int_to_hex(int64_t value) {
         oss << value;
     }
     else if (value < 0) {
-        oss << "-$" << std::hex << std::setw(2) << std::setfill('0')
-            << std::uppercase << (-value);
+        oss << "-$" << std::uppercase << std::hex
+            << std::setfill('0') << std::setw(2)
+            << (-value);
     }
     else {
-        oss << "$" << std::hex << std::setw(2) << std::setfill('0')
-            << std::uppercase << value;
+        oss << "$" << std::uppercase << std::hex
+            << std::setfill('0') << std::setw(2)
+            << value;
     }
     return oss.str();
 }

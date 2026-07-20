@@ -6,7 +6,7 @@
 
 #include "options.h"
 #include "options_dump.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <algorithm>
 #include <iostream>
 #include <vector>

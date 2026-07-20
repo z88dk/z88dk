@@ -8,18 +8,18 @@
 #include "diag.h"
 #include "options.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <iostream>
 
-void ConstSymbols::set(StringInterner::Id name_id, int value,
+void ConstSymbols::set(uint name_id, int value,
                        const SourceLoc& loc) {
     const ConstSymbol* existing = get(name_id);
     if (existing != nullptr && existing->value != value) {
-        g_diag.error(loc, "Constant already defined: " + g_strings.to_string(name_id));
+        g_diag.error(loc, "Constant already defined: " + g_strings.string(name_id));
         g_diag.note(existing->loc,
-                    "Previous definition of constant: " + g_strings.to_string(name_id));
+                    "Previous definition of constant: " + g_strings.string(name_id));
         return;
     }
 
@@ -30,12 +30,12 @@ void ConstSymbols::set(StringInterner::Id name_id, int value,
     symbols[sym.name_id] = sym;
 
     if (g_args.options.verbose) {
-        std::cout << "Define constant: " << g_strings.to_string(name_id)
+        std::cout << "Define constant: " << g_strings.string(name_id)
                   << " = " << int_to_hex(value) << std::endl;
     }
 }
 
-const ConstSymbol* ConstSymbols::get(StringInterner::Id name_id) const {
+const ConstSymbol* ConstSymbols::get(uint name_id) const {
     auto it = symbols.find(name_id);
     if (it != symbols.end()) {
         return &it->second;
@@ -43,9 +43,9 @@ const ConstSymbol* ConstSymbols::get(StringInterner::Id name_id) const {
     return nullptr;
 }
 
-void ConstSymbols::erase(StringInterner::Id name_id) {
+void ConstSymbols::erase(uint name_id) {
     if (g_args.options.verbose && get(name_id) != nullptr) {
-        std::cout << "Undefine constant: " << g_strings.to_string(name_id) << std::endl;
+        std::cout << "Undefine constant: " << g_strings.string(name_id) << std::endl;
     }
     symbols.erase(name_id);
 }

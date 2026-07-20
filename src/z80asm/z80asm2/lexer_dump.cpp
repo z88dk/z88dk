@@ -50,7 +50,7 @@ void dump_token(const Token& token) {
 }
 
 void dump_tokens(const std::vector<Token>& tokens,
-                 StringInterner::Id& cur_file_id) {
+                 uint& cur_file_id) {
     for (const Token& token : tokens) {
         if (token.loc.file_id != cur_file_id) {
             cur_file_id = token.loc.file_id;
@@ -62,7 +62,7 @@ void dump_tokens(const std::vector<Token>& tokens,
 }
 
 void dump_logical_line(const LogicalLine& line,
-                       StringInterner::Id& cur_file_id) {
+                       uint& cur_file_id) {
     if (line.loc.file_id != cur_file_id) {
         cur_file_id = line.loc.file_id;
         std::cout << "# file: " <<
@@ -72,7 +72,7 @@ void dump_logical_line(const LogicalLine& line,
 }
 
 void dump_logical_lines(const std::vector<LogicalLine>& lines,
-                        StringInterner::Id& cur_file_id) {
+                        uint& cur_file_id) {
     for (const auto& line : lines) {
         dump_logical_line(line, cur_file_id);
     }
@@ -88,14 +88,14 @@ void dump_after_tokenization_and_exit(std::string_view filename) {
     }
 
     // serialize tokens from all lines into a single vector for dumping
-    StringInterner::Id cur_file_id = 0;
+    uint cur_file_id = 0;
     dump_logical_lines(sf->lines, cur_file_id);
     exit(EXIT_SUCCESS);
 }
 
 [[noreturn]]
 void dump_logical_lines_and_exit(const std::vector<LogicalLine>& lines) {
-    StringInterner::Id cur_file_id = 0;
+    uint cur_file_id = 0;
     dump_logical_lines(lines, cur_file_id);
     exit(EXIT_SUCCESS);
 }

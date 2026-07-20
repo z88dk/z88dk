@@ -11,7 +11,7 @@
 #include "lexer_tokens.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <memory>
 #include <string>
@@ -264,7 +264,7 @@ bool ConstEvalSem::symbol(const Token& tok) {
     else {
         if (!silent) {
             g_diag.error(tok.loc, "Undefined constant: " +
-                         g_strings.to_string(tok.text_id));
+                         g_strings.string(tok.text_id));
         }
         push(0);
         return false;

@@ -14,7 +14,7 @@ ObjectLibrary
                     Text: "x"
                     Range: Word
                     ASMPC: 3
-                    Code pos: 3
+                    Patch ptr: 3
                     Opcode size: 2
             Defined symbols:
                 ObjSymbol: x

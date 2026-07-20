@@ -16,7 +16,7 @@
 #include "parser.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include "synth_expander.h"
 #include <algorithm>

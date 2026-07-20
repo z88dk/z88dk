@@ -9,7 +9,7 @@
 #include "lexer_scan.h"
 #include "lexer_tokens.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <string>
 #include <string_view>
@@ -106,7 +106,7 @@ Token Token::end_of_line(const SourceLoc& loc) {
     return t;
 }
 
-bool Token::operator==(const Token& other) const noexcept {
+bool Token::operator==(const Token& other) const  {
     // Compare type, keyword, and text_id
     if (type != other.type || keyword != other.keyword
             || text_id != other.text_id) {
@@ -129,14 +129,14 @@ bool Token::operator==(const Token& other) const noexcept {
     }
 }
 
-bool Token::operator!=(const Token& other) const noexcept {
+bool Token::operator!=(const Token& other) const  {
     return !(*this == other);
 }
 
 std::string to_string(Token token) {
     switch (token.type) {
     case TokenType::Identifier:
-        return g_strings.to_string(token.text_id);
+        return g_strings.string(token.text_id);
     case TokenType::Integer:
         return int_to_hex(token.value.int_value);
     case TokenType::Float:
@@ -250,7 +250,7 @@ bool ParseLine::check_end_of_line() {
     if (pos < tokens.size()) {
         g_diag.error(peek().loc,
                      "Unexpected token: " +
-                     escape_string(g_strings.to_string(peek().text_id)));
+                     escape_string(g_strings.string(peek().text_id)));
         return false;
     }
 

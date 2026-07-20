@@ -9,7 +9,7 @@
 #include "files.h"
 #include "lexer.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -88,7 +88,7 @@ static inline size_t skip_line_ending(std::string_view content, size_t end) {
     return end;
 }
 
-StringInterner::Id FileManager::register_virtual_file(std::string_view path) {
+uint FileManager::register_virtual_file(std::string_view path) {
     return g_strings.intern(normalize_path(path));
 }
 
@@ -96,7 +96,7 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
         const SourceLoc& loc) {
     // Normalize and intern the filename
     std::string norm = normalize_path(filename);
-    StringInterner::Id file_id = g_strings.intern(norm);
+    uint file_id = g_strings.intern(norm);
 
     // Already loaded?
     auto it = source_cache.find(file_id);
@@ -198,7 +198,7 @@ bool FileManager::read_file_to_string(std::string_view filename,
 }
 
 std::vector<RawLine> FileManager::split_into_lines(std::string_view content,
-        StringInterner::Id file_id,
+        uint file_id,
         size_t starting_line) {
     std::vector<RawLine> out;
 
@@ -249,7 +249,7 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     std::string_view filename,
     const SourceLoc& loc) {
     std::string norm = normalize_path(filename);
-    StringInterner::Id file_id = g_strings.intern(norm);
+    uint file_id = g_strings.intern(norm);
 
     // Return from cache if already loaded
     auto it = binary_cache.find(file_id);

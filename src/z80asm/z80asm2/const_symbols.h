@@ -7,21 +7,21 @@
 #pragma once
 
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <unordered_map>
 
 struct ConstSymbol {
-    StringInterner::Id name_id = 0; // interned string
+    uint name_id = 0; // interned string
     int value = 0;
     SourceLoc loc;                  // where it was defined
 };
 
 struct ConstSymbols {
-    std::unordered_map<StringInterner::Id, ConstSymbol> symbols;
+    std::unordered_map<uint, ConstSymbol> symbols;
 
-    void set(StringInterner::Id name_id, int value, const SourceLoc& loc);
-    const ConstSymbol* get(StringInterner::Id name_id) const;
-    void erase(StringInterner::Id name_id);
+    void set(uint name_id, int value, const SourceLoc& loc);
+    const ConstSymbol* get(uint name_id) const;
+    void erase(uint name_id);
 
     void dump_symbols() const;
 };

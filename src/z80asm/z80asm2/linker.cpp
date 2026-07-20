@@ -9,7 +9,7 @@
 #include "linker.h"
 #include "obj_file.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -87,7 +87,7 @@ static void build_library_index(LinkContext& context) {
         for (auto& mod : lib->modules) {
             for (auto& sym : mod->symbols) {
                 if (sym->scope == ObjSymbolScope::Public) {
-                    StringInterner::Id sym_id = sym->name_id;
+                    uint sym_id = g_strings.intern(sym->name_view());
                     if (context.symbol_to_module.count(sym_id) == 0) {
                         context.symbol_to_module[sym_id] = mod.get();
                     }

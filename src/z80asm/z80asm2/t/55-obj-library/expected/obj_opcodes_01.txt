@@ -14,7 +14,7 @@ ObjectLibrary
                     Text: "end"
                     Range: Word
                     ASMPC: 5
-                    Code pos: 6
+                    Patch ptr: 6
                     Opcode size: 3
             Defined symbols:
                 ObjSymbol: end

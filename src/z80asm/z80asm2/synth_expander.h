@@ -15,7 +15,7 @@
 // state of the Synthetic Expander
 class SynthExpander {
 public:
-    SynthExpander(const std::vector<LogicalLine>& lines);
+    explicit SynthExpander(const std::vector<LogicalLine>& lines);
 
     std::vector<LogicalLine> expand();
 

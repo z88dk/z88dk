@@ -62,7 +62,7 @@ static void copy_objfile_exprs(objfile_t* obj, Section1* in_section, section_t* 
                 utstring_printf(out_expr->target_name, "%s", in_expr->target_name);
         
             out_expr->asmpc = in_expr->asmpc;
-            out_expr->code_pos = in_expr->code_pos;
+            out_expr->patch_ptr = in_expr->patch_ptr;
             out_expr->opcode_size = in_expr->opcode_size;
 
             out_expr->section = out_section;        // weak pointer

@@ -14,42 +14,42 @@ ObjectLibrary
                     Text: "$"
                     Range: Word
                     ASMPC: 0
-                    Code pos: 0
+                    Patch ptr: 0
                     Opcode size: 2
                 ObjExpr
                     Location: t/55-obj-library/input/obj_phase_01.asm:2:1
                     Text: "$"
                     Range: Word
                     ASMPC: 2
-                    Code pos: 2
+                    Patch ptr: 2
                     Opcode size: 2
                 ObjExpr
                     Location: t/55-obj-library/input/obj_phase_01.asm:4:1
                     Text: "$"
                     Range: Word
                     ASMPC: $1000
-                    Code pos: 4
+                    Patch ptr: 4
                     Opcode size: 2
                 ObjExpr
                     Location: t/55-obj-library/input/obj_phase_01.asm:5:1
                     Text: "$"
                     Range: Word
                     ASMPC: $1002
-                    Code pos: 6
+                    Patch ptr: 6
                     Opcode size: 2
                 ObjExpr
                     Location: t/55-obj-library/input/obj_phase_01.asm:7:1
                     Text: "$"
                     Range: Word
                     ASMPC: 8
-                    Code pos: 8
+                    Patch ptr: 8
                     Opcode size: 2
                 ObjExpr
                     Location: t/55-obj-library/input/obj_phase_01.asm:8:1
                     Text: "$"
                     Range: Word
                     ASMPC: $0A
-                    Code pos: $0A
+                    Patch ptr: $0A
                     Opcode size: 2
             Sections:
                 ObjSection: ""

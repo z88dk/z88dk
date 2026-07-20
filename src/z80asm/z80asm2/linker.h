@@ -7,7 +7,7 @@
 #pragma once
 
 #include "obj_file.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -15,8 +15,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-using uint = unsigned int;
 
 struct LinkedSymbol {
     ObjSymbol* def = nullptr;       // where it was defined
@@ -26,11 +24,11 @@ struct LinkedSymbol {
 };
 
 struct LinkedSection {
-    StringInterner::Id name_id;
+    uint name_id;
     uint start_address;
     uint size;
     std::vector<uint8_t> data;
-    std::vector<ObjExpr*> relocations;
+    std::vector<ObjExpr*> relocs;
 };
 
 struct LinkContext {
@@ -39,11 +37,11 @@ struct LinkContext {
     std::vector<std::unique_ptr<ObjectLibrary>> libraries;
 
     // Library index
-    std::unordered_map<StringInterner::Id, ObjectModule*> symbol_to_module;
+    std::unordered_map<uint, ObjectModule*> symbol_to_module;
 
     // Linking state
-    std::unordered_map<StringInterner::Id, LinkedSymbol> global_symbols;
-    std::unordered_set<StringInterner::Id> unresolved_symbols;
+    std::unordered_map<uint, LinkedSymbol> global_symbols;
+    std::unordered_set<uint> unresolved_symbols;
     std::unordered_set<ObjectModule*> selected_modules;
     std::vector<ObjectModule*> final_modules;
 

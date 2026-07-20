@@ -4,8 +4,6 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-X(0, Undefined, 0, 		"end marker")
-X(1, Local,     'L',	"local symbol")
-X(2, Public,    'G',	"public symbol")
-
-#undef X
+X(0, Undefined, 0,   "end marker")
+X(1, Local,     'L',	 "local symbol")
+X(2, Public,    'G',	 "public symbol")

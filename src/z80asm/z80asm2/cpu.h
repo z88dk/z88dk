@@ -8,7 +8,7 @@
 
 #include "lexer_keywords.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include <string>
 #include <string_view>
 #include <utility>
@@ -22,10 +22,10 @@ enum class CPU {
 
 std::string to_string(CPU cpu_id);
 bool cpu_lookup(std::string_view name, CPU& out_cpu_id);
-std::vector<StringInterner::Id> cpu_names();
+std::vector<uint> cpu_names();
 
-std::vector<StringInterner::Id> cpu_all_defines();
-std::vector<StringInterner::Id> cpu_defines(CPU cpu_id);
+std::vector<uint> cpu_all_defines();
+std::vector<uint> cpu_defines(CPU cpu_id);
 
 bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl);
 

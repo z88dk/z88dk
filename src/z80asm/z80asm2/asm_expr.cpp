@@ -541,7 +541,7 @@ bool apply_patches(Program& prog) {
 
                 if (auto defs_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
                     defs_stmt->bytes.clear();
-                    std::string str_value = g_strings.to_string(defs_stmt->string_id);
+                    std::string str_value = g_strings.string(defs_stmt->string_id);
                     uint i;
                     for (i = 0; i < str_value.size() && i < defs_stmt->padding_size; i++) {
                         defs_stmt->bytes.push_back(static_cast<uint8_t>(str_value[i]));

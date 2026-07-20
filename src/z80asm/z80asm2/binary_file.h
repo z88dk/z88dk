@@ -8,35 +8,33 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
+#include <string_view>
 
 // Memory mapped binary file open for read-only access
 // NOTE: user is responsible for checking bounds
 class BinaryFile {
 public:
-    explicit BinaryFile(const std::string& filename);
+    explicit BinaryFile(std::string_view filename);
     ~BinaryFile();
     BinaryFile(const BinaryFile&) = delete;
     BinaryFile& operator=(const BinaryFile&) = delete;
-    BinaryFile(BinaryFile&& other) noexcept;
-    BinaryFile& operator=(BinaryFile&& other) noexcept;
+    BinaryFile(BinaryFile&& other) ;
+    BinaryFile& operator=(BinaryFile&& other) ;
 
-    const uint8_t* data() const noexcept {
+    const uint8_t* data() const  {
         return data_;
     }
-
-    std::size_t size() const noexcept {
+    size_t size() const  {
         return size_;
     }
-
-    const std::string& filename() const noexcept {
+    std::string_view filename() const  {
         return filename_;
     }
 
     // pointer movement
     void align_ptr(size_t& ptr) const;
     void skip(size_t& ptr, size_t amount) const;
-    size_t tell(size_t ptr) const noexcept {
+    size_t tell(size_t ptr) const  {
         return ptr;
     }
     void seek(size_t& ptr, size_t new_pos) const;
@@ -62,7 +60,7 @@ public:
 private:
     std::string filename_;					// name of file
     const uint8_t* data_ = nullptr;			// point to data
-    std::size_t size_ = 0;					// data size
+    size_t size_ = 0;					    // data size
 #if defined(_WIN32)
     void* file_ = nullptr;					// HANDLE (opaque pointer)
     void* mapping_ = nullptr;				// HANDLE (opaque pointer)
@@ -73,11 +71,11 @@ private:
 #endif
 
 #if defined(_WIN32) || defined(__unix__) || defined(__APPLE__)
-    void open_mapped(const std::string& filename);
+    void open_mapped(std::string_view filename);
     void close_mapped();
 #else
-    void open_vector(const std::string& filename);
+    void open_vector(std::string_view filename);
 #endif
 
-    void move_from(BinaryFile&& other) noexcept;
+    void move_from(BinaryFile&& other) ;
 };

@@ -8,7 +8,7 @@
 #include "lexer.h"
 #include "options.h"
 #include "semantic_rewrite.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@ void apply_alt_registers(std::vector<Token>& tokens) {
         if (t.keyword != Keyword::None &&
                 next.type == TokenType::Tick) {
             // Build candidate alternate name: e.g. "A" + "'" -> "A'"
-            std::string base = g_strings.to_string(t.text_id);
+            std::string base = g_strings.string(t.text_id);
             std::string alt = base + '\'';
 
             Keyword alt_kw = keyword_lookup(alt);
@@ -57,7 +57,7 @@ void apply_dot_directive_merge(std::vector<Token>& tokens) {
         if (dot.type == TokenType::Dot &&
                 next.keyword == Keyword::ASSUME) {
             // Merge into ".ASSUME"
-            std::string merged = "." + g_strings.to_string(next.text_id);
+            std::string merged = "." + g_strings.string(next.text_id);
 
             next.text_id = g_strings.intern(merged);
             next.keyword = Keyword::ASSUME; // already correct

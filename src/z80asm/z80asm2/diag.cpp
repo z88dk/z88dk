@@ -7,7 +7,7 @@
 #include "diag.h"
 #include "file_mgr.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <iostream>
 

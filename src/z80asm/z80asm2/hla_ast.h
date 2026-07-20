@@ -15,8 +15,8 @@
 
 class HLA_Label {
 public:
-    HLA_Label();
-    HLA_Label(int id_);
+    explicit HLA_Label();
+    explicit HLA_Label(int id_);
     std::string to_string() const;
     bool is_valid() const;
 

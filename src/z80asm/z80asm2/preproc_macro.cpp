@@ -8,7 +8,7 @@
 #include "lexer.h"
 #include "lexer_tokens.h"
 #include "preproc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include <algorithm>
 #include <string>
@@ -113,22 +113,22 @@ bool Preproc::collect_bare_args(const std::vector<Token>& tokens, size_t& pos,
 // name_N where N is a unique counter incremented per invocation.
 std::vector<Token> Preproc::substitute_params(
     const std::vector<Token>& body,
-    const std::vector<StringInterner::Id>& params,
+    const std::vector<uint>& params,
     const std::vector<std::vector<Token>>& expanded_args,
     const std::vector<std::vector<Token>>& unexpanded_args,
     const SourceLoc& call_loc,
-    const std::vector<StringInterner::Id>& locals) {
+    const std::vector<uint>& locals) {
 
     // Build local label replacement map: name -> name_N
     // The counter is static so that each expansion site gets a unique suffix
     static int local_counter = 0;
 
-    std::unordered_map<StringInterner::Id, StringInterner::Id> local_map;
+    std::unordered_map<uint, uint> local_map;
     if (!locals.empty()) {
         ++local_counter;
         std::string suffix = "_" + std::to_string(local_counter);
-        for (StringInterner::Id id : locals) {
-            std::string replacement = g_strings.to_string(id) + suffix;
+        for (uint id : locals) {
+            std::string replacement = g_strings.string(id) + suffix;
             local_map[id] = g_strings.intern(replacement);
         }
     }
@@ -159,7 +159,7 @@ std::vector<Token> Preproc::substitute_params(
                         if (!text.empty()) {
                             text += ' ';
                         }
-                        text += g_strings.to_string(at.text_id);
+                        text += g_strings.string(at.text_id);
                     }
                 }
 
@@ -196,21 +196,21 @@ std::vector<Token> Preproc::substitute_params(
                     if (param_idx < expanded_args.size()) {
                         for (const Token& at : expanded_args[param_idx]) {
                             rhs_text +=
-                                g_strings.to_string(at.text_id);
+                                g_strings.string(at.text_id);
                         }
                     }
                 }
                 else {
-                    rhs_text = g_strings.to_string(rhs_tok.text_id);
+                    rhs_text = g_strings.string(rhs_tok.text_id);
                 }
             }
             else {
-                rhs_text = g_strings.to_string(rhs_tok.text_id);
+                rhs_text = g_strings.string(rhs_tok.text_id);
             }
 
             // Concatenate with LHS
             std::string lhs_text =
-                g_strings.to_string(result.back().text_id);
+                g_strings.string(result.back().text_id);
             std::string pasted = lhs_text + rhs_text;
 
             // Re-tokenize the pasted text to get proper token type
@@ -277,14 +277,14 @@ std::vector<Token> Preproc::substitute_params(
 // this argument (inherited from the calling macro invocation).
 std::vector<Token> Preproc::expand_argument(
     const std::vector<Token>& arg_tokens,
-    const std::vector<StringInterner::Id>& hide_set,
+    const std::vector<uint>& hide_set,
     const SourceLoc& call_loc) {
 
     // Start with the input tokens
     std::vector<Token> work = arg_tokens;
 
     // Per-token hide sets: initialize all with the inherited hide set
-    std::vector<std::vector<StringInterner::Id>> hide_sets(work.size(), hide_set);
+    std::vector<std::vector<uint>> hide_sets(work.size(), hide_set);
 
     // Expansion iteration tracking
     int expansion_depth = 0;
@@ -308,7 +308,7 @@ std::vector<Token> Preproc::expand_argument(
                 continue;
             }
 
-            StringInterner::Id name_id = tok.text_id;
+            uint name_id = tok.text_id;
 
             // Is this a defined macro?
             auto it = macros.find(name_id);
@@ -329,7 +329,7 @@ std::vector<Token> Preproc::expand_argument(
             if (macro.is_multiline) {
                 g_diag.error(tok.loc,
                              "Multi-line macro '" +
-                             g_strings.to_string(name_id) +
+                             g_strings.string(name_id) +
                              "' cannot be invoked in macro argument");
                 continue;
             }
@@ -360,7 +360,7 @@ std::vector<Token> Preproc::expand_argument(
                 if (args.size() != macro.params.size()) {
                     g_diag.error(tok.loc,
                                  "Macro '" +
-                                 g_strings.to_string(name_id) +
+                                 g_strings.string(name_id) +
                                  "' expects " +
                                  std::to_string(macro.params.size()) +
                                  " arguments, got " +
@@ -380,7 +380,7 @@ std::vector<Token> Preproc::expand_argument(
                                       expanded_args, args, tok.loc, macro.locals);
 
                 // Build new hide set
-                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                std::vector<uint> new_hide = hide_sets[i];
                 new_hide.push_back(name_id);
 
                 // Replace tokens
@@ -395,7 +395,7 @@ std::vector<Token> Preproc::expand_argument(
                                 work.begin() + paren_pos, work.end());
 
                 // Rebuild hide sets
-                std::vector<std::vector<StringInterner::Id>> new_hides;
+                std::vector<std::vector<uint>> new_hides;
                 new_hides.reserve(new_work.size());
                 new_hides.insert(new_hides.end(),
                                  hide_sets.begin(), hide_sets.begin() + i);
@@ -412,7 +412,7 @@ std::vector<Token> Preproc::expand_argument(
 
             // Object-like macro
             {
-                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                std::vector<uint> new_hide = hide_sets[i];
                 new_hide.push_back(name_id);
 
                 size_t new_count = macro.tokens.size();
@@ -426,7 +426,7 @@ std::vector<Token> Preproc::expand_argument(
                 new_work.insert(new_work.end(),
                                 work.begin() + i + 1, work.end());
 
-                std::vector<std::vector<StringInterner::Id>> new_hides;
+                std::vector<std::vector<uint>> new_hides;
                 new_hides.reserve(new_work.size());
                 new_hides.insert(new_hides.end(),
                                  hide_sets.begin(), hide_sets.begin() + i);
@@ -448,11 +448,11 @@ std::vector<Token> Preproc::expand_argument(
 
 // Scan a macro body to find which parameters appear adjacent to # or ##.
 // These parameters should NOT be pre-expanded before substitution.
-std::unordered_set<StringInterner::Id> Preproc::find_params_adjacent_to_operators(
+std::unordered_set<uint> Preproc::find_params_adjacent_to_operators(
     const std::vector<Token>& body,
-    const std::vector<StringInterner::Id>& params) {
+    const std::vector<uint>& params) {
 
-    std::unordered_set<StringInterner::Id> adjacent_params;
+    std::unordered_set<uint> adjacent_params;
 
     for (size_t i = 0; i < body.size(); ++i) {
         const Token& tok = body[i];
@@ -506,7 +506,7 @@ void Preproc::expand_line(const LogicalLine& in,
     // produce this token. Prevents re-expansion of the same macro in
     // its own output, while allowing the same macro to appear
     // independently elsewhere on the line (e.g. "DEFB X, X").
-    std::vector<std::vector<StringInterner::Id>> hide_sets(work.size());
+    std::vector<std::vector<uint>> hide_sets(work.size());
 
     // Expansion iteration tracking
     int expansion_depth = 0;
@@ -534,7 +534,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 continue;
             }
 
-            StringInterner::Id name_id = tok.text_id;
+            uint name_id = tok.text_id;
 
             // Is this a defined macro?
             auto it = macros.find(name_id);
@@ -577,7 +577,7 @@ void Preproc::expand_line(const LogicalLine& in,
                             work[arg_pos].type != TokenType::LeftParen) {
                         g_diag.error(tok.loc,
                                      "Expected '(' after macro '" +
-                                     g_strings.to_string(name_id) + "'");
+                                     g_strings.string(name_id) + "'");
                         out_tokens.clear();
                         return;
                     }
@@ -586,7 +586,7 @@ void Preproc::expand_line(const LogicalLine& in,
                     if (!collect_parens_args(work, arg_pos, args)) {
                         g_diag.error(tok.loc,
                                      "Missing ')' in macro invocation: " +
-                                     g_strings.to_string(name_id));
+                                     g_strings.string(name_id));
                         out_tokens.clear();
                         return;
                     }
@@ -603,7 +603,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 if (args.size() != macro.params.size()) {
                     g_diag.error(tok.loc,
                                  "Macro '" +
-                                 g_strings.to_string(name_id) +
+                                 g_strings.string(name_id) +
                                  "' expects " +
                                  std::to_string(macro.params.size()) +
                                  " arguments, got " +
@@ -621,7 +621,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 for (const auto& arg : args) {
                     // For multi-line macros, we don't have a hide_set context here
                     // Use an empty hide set
-                    std::vector<StringInterner::Id> empty_hide;
+                    std::vector<uint> empty_hide;
                     expanded_args.push_back(expand_argument(arg, empty_hide, tok.loc));
                 }
 
@@ -698,7 +698,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 if (!collect_parens_args(work, paren_pos, args)) {
                     g_diag.error(work[paren_pos].loc,
                                  "Missing ')' in macro invocation: " +
-                                 g_strings.to_string(name_id));
+                                 g_strings.string(name_id));
                     continue;
                 }
 
@@ -706,7 +706,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 if (args.size() != macro.params.size()) {
                     g_diag.error(tok.loc,
                                  "Macro '" +
-                                 g_strings.to_string(name_id) +
+                                 g_strings.string(name_id) +
                                  "' expects " +
                                  std::to_string(macro.params.size()) +
                                  " arguments, got " +
@@ -731,7 +731,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 // Build the new hide set for replacement tokens:
                 // inherit the hide set of the invocation token + add
                 // the macro we just expanded
-                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                std::vector<uint> new_hide = hide_sets[i];
                 new_hide.push_back(name_id);
 
                 // Replace tokens[i..paren_pos) with substituted
@@ -749,7 +749,7 @@ void Preproc::expand_line(const LogicalLine& in,
                                 work.end());
 
                 // Rebuild hide sets
-                std::vector<std::vector<StringInterner::Id>> new_hides;
+                std::vector<std::vector<uint>> new_hides;
                 new_hides.reserve(new_work.size());
                 new_hides.insert(new_hides.end(),
                                  hide_sets.begin(),
@@ -773,7 +773,7 @@ void Preproc::expand_line(const LogicalLine& in,
                 // Build the new hide set for replacement tokens:
                 // inherit the hide set of the invocation token + add
                 // the macro we just expanded
-                std::vector<StringInterner::Id> new_hide = hide_sets[i];
+                std::vector<uint> new_hide = hide_sets[i];
                 new_hide.push_back(name_id);
 
                 size_t new_count = macro.tokens.size();
@@ -791,7 +791,7 @@ void Preproc::expand_line(const LogicalLine& in,
                                 work.end());
 
                 // Rebuild hide sets
-                std::vector<std::vector<StringInterner::Id>> new_hides;
+                std::vector<std::vector<uint>> new_hides;
                 new_hides.reserve(new_work.size());
                 new_hides.insert(new_hides.end(),
                                  hide_sets.begin(),
@@ -823,7 +823,7 @@ void Preproc::expand_line(const LogicalLine& in,
         if (!out_tokens.empty()) {
             end_loc = out_tokens.back().loc;
             end_loc.column += static_cast<uint16_t>(
-                                  g_strings.to_string(out_tokens.back().text_id).size());
+                                  g_strings.string(out_tokens.back().text_id).size());
         }
         out_tokens.push_back(Token::end_of_line(end_loc));
     }

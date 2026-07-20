@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "string_interner.h"
+#include "strings.h"
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -18,7 +18,7 @@ struct SourceLoc {
     uint16_t column = 0;    // 2 bytes
 
     SourceLoc() = default;
-    SourceLoc(StringInterner::Id file, size_t ln, size_t col);
+    SourceLoc(uint file_id, size_t ln, size_t col);
     SourceLoc(std::string_view file, size_t ln, size_t col);
 
     void clear();
@@ -32,15 +32,15 @@ struct SourceLine {
     uint16_t file_id = 0;   // 2 bytes
 
     SourceLine() = default;
-    SourceLine(StringInterner::Id file, size_t ln);
+    SourceLine(uint file_id, size_t ln);
     SourceLine(std::string_view file, size_t ln);
     SourceLine(const SourceLoc& loc);
 
-    bool operator==(const SourceLine& other) const noexcept;
-    bool operator!=(const SourceLine& other) const noexcept;
+    bool operator==(const SourceLine& other) const ;
+    bool operator!=(const SourceLine& other) const ;
 };
 
 struct SourceLineHash {
-    size_t operator()(const SourceLine& s) const noexcept;
+    size_t operator()(const SourceLine& s) const ;
 };
 

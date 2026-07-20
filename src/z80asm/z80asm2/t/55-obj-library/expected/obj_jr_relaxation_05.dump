@@ -1,5 +1,5 @@
-Library file t/55-obj-library//input/obj_jr_relaxation_05.o at $0000: Z80LMF18
-Object  file t/55-obj-library//input/obj_jr_relaxation_05.o at $0014: Z80RMF18
+Library file t/55-obj-library//input/obj_jr_relaxation_05.o at $0000: Z80LMF19
+Object  file t/55-obj-library//input/obj_jr_relaxation_05.o at $0018: Z80RMF19
   Name: obj_jr_relaxation_05
   CPU:  z80 
   Section "": 259 bytes

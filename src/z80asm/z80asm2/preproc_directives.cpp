@@ -17,7 +17,7 @@
 #include "preproc.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "string_interner.h"
+#include "strings.h"
 #include "string_utils.h"
 #include "zfloat.h"
 #include <algorithm>
@@ -135,7 +135,7 @@ bool Preproc::is_name_directive_keyword(Keyword kw) {
 bool Preproc::is_directive(ParseLine& pline,
                            Keyword& out_kw,
                            SourceLoc& out_kw_loc,
-                           StringInterner::Id& out_name_id,
+                           uint& out_name_id,
                            SourceLoc& out_name_loc) {
     out_kw = Keyword::None;
     out_kw_loc.clear();
@@ -408,7 +408,7 @@ bool Preproc::parse_LINE_args(ParseLine& pline,
 }
 
 bool Preproc::parse_params(ParseLine& pline,
-                           std::vector<StringInterner::Id>& out_params,
+                           std::vector<uint>& out_params,
                            bool& out_has_parens) {
     out_params.clear();
     out_has_parens = false;
@@ -422,11 +422,11 @@ bool Preproc::parse_params(ParseLine& pline,
 
     // Helper: add a parameter name ensuring duplicates inside the same
     // list are rejected
-    auto add_param = [&](StringInterner::Id name_id) -> bool {
+    auto add_param = [&](uint name_id) -> bool {
         if (std::find(out_params.begin(), out_params.end(), name_id) !=
                 out_params.end()) {
             return fail("Parameter redefined: " +
-                        g_strings.to_string(name_id));
+                        g_strings.string(name_id));
         }
         out_params.push_back(name_id);
         return true;
@@ -500,7 +500,7 @@ bool Preproc::parse_params(ParseLine& pline,
 bool Preproc::read_macro_body(Keyword start_kw,
                               const SourceLoc& start_kw_loc,
                               std::vector<LogicalLine>& out_lines,
-                              std::vector<StringInterner::Id>& out_locals) {
+                              std::vector<uint>& out_locals) {
     out_lines.clear();
     out_locals.clear();
 
@@ -514,7 +514,7 @@ bool Preproc::read_macro_body(Keyword start_kw,
     while (next_logical_line(line)) {
         Keyword kw;
         SourceLoc kw_loc;
-        StringInterner::Id name_id;
+        uint name_id;
         SourceLoc name_loc;
         ParseLine pl(line.tokens);
 
@@ -582,13 +582,13 @@ bool Preproc::read_macro_body(Keyword start_kw,
                 }
 
                 // "LOCAL label1, label2, ..." syntax: parse identifier list
-                std::vector<StringInterner::Id> params;
+                std::vector<uint> params;
                 bool has_parens = false;
                 if (!parse_params(pl, params, has_parens)) {
                     return false; // error already reported
                 }
 
-                for (StringInterner::Id id : params) {
+                for (uint id : params) {
                     if (std::find(out_locals.begin(), out_locals.end(), id) ==
                             out_locals.end()) {
                         out_locals.push_back(id);
@@ -842,7 +842,7 @@ bool Preproc::eval_ifdef_name(ParseLine& pline,
         return false;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     pline.advance();
 
     if (!pline.check_end_of_line()) {
@@ -1003,7 +1003,7 @@ void Preproc::expand_args_multiline(Keyword kw, const SourceLoc& kw_loc,
 
 void Preproc::parse_asm_definitions(const std::vector<Token>& tokens) {
     bool have_definition = false;
-    StringInterner::Id name_id = 0;
+    uint name_id = 0;
     SourceLoc name_loc;
     size_t pos = 0;
 
@@ -1111,7 +1111,7 @@ void Preproc::process_INCLUDE(Keyword kw, const SourceLoc&,
     }
 
     // check for recursive inclusion
-    StringInterner::Id resolved_id =
+    uint resolved_id =
         g_file_mgr.register_virtual_file(resolved);
     for (const auto& frame : include_stack) {
         if (frame.file->file_id == resolved_id) {
@@ -1186,7 +1186,7 @@ void Preproc::process_BINARY(Keyword kw, const SourceLoc&,
     push_macro_expansion(0, std::move(binary_lines));
 
     // generate dependency for included file
-    StringInterner::Id resolved_id =
+    uint resolved_id =
         g_file_mgr.register_virtual_file(resolved);
     dependency_files.push_back(resolved_id);
 }
@@ -1213,7 +1213,7 @@ void Preproc::process_LINE(Keyword kw, const SourceLoc& kw_loc,
         static_cast<ptrdiff_t>(frame.current_line + 1);
 
     if (!filename.empty()) {
-        StringInterner::Id filename_id =
+        uint filename_id =
             g_file_mgr.register_virtual_file(filename);
         frame.logical_file_id = filename_id;
     }
@@ -1239,7 +1239,7 @@ void Preproc::process_C_LINE(Keyword kw, const SourceLoc& kw_loc,
     frame.logical_line_offset = static_cast<ptrdiff_t>(line);
 
     if (!filename.empty()) {
-        StringInterner::Id filename_id =
+        uint filename_id =
             g_file_mgr.register_virtual_file(filename);
         frame.logical_file_id = filename_id;
     }
@@ -1253,7 +1253,7 @@ void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
         return;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     SourceLoc name_loc = pline.peek().loc;
     pline.advance();
 
@@ -1261,7 +1261,7 @@ void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
     // without space
     bool is_function_like = false;
     bool has_parens = false;
-    std::vector<StringInterner::Id> params;
+    std::vector<uint> params;
     if (pline.peek().type == TokenType::LeftParen &&
             pline.peek().loc.column ==
             name_loc.column + g_strings.view(name_id).size()) {
@@ -1284,7 +1284,7 @@ void Preproc::process_DEFINE(Keyword kw, const SourceLoc&,
 }
 
 void Preproc::process_name_DEFINE(Keyword, const SourceLoc&,
-                                  StringInterner::Id name_id, const SourceLoc& name_loc,
+                                  uint name_id, const SourceLoc& name_loc,
                                   ParseLine& pline) {
     // create the macro and delegate to do_DEFINE
     Macro macro;
@@ -1304,7 +1304,7 @@ void Preproc::do_DEFINE(const Macro& macro,
     if (it != macros.end()) {
         g_diag.error(macro.loc,
                      "Macro redefinition: " +
-                     g_strings.to_string(macro.name_id));
+                     g_strings.string(macro.name_id));
         g_diag.note(it->second.loc, "Previous definition");
         return;
     }
@@ -1348,7 +1348,7 @@ void Preproc::do_DEFINE(const Macro& macro,
                 expanded[expr_pline.pos].type == TokenType::EndOfLine) {
             std::string defc_str =
                 "DEFC " +
-                g_strings.to_string(macro.name_id) + " = " +
+                g_strings.string(macro.name_id) + " = " +
                 std::to_string(result);
             std::vector<Token> defc_tokens = tokenize_text(defc_str, line.loc);
             LogicalLine defc_line(line.loc);
@@ -1373,7 +1373,7 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
         return;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     pline.advance();
 
     if (!pline.check_end_of_line()) {
@@ -1384,7 +1384,7 @@ void Preproc::process_UNDEF(Keyword kw, const SourceLoc&,
 }
 
 void Preproc::process_name_UNDEF(Keyword, const SourceLoc&,
-                                 StringInterner::Id name_id, const SourceLoc&,
+                                 uint name_id, const SourceLoc&,
                                  ParseLine& pline) {
     if (!pline.check_end_of_line()) {
         return; // error already reported
@@ -1393,7 +1393,7 @@ void Preproc::process_name_UNDEF(Keyword, const SourceLoc&,
     do_UNDEF(name_id);
 }
 
-void Preproc::do_UNDEF(StringInterner::Id name_id) {
+void Preproc::do_UNDEF(uint name_id) {
     // remove from macro table
     macros.erase(name_id);
 }
@@ -1406,7 +1406,7 @@ void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
         return;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     SourceLoc name_loc = pline.peek().loc;
     pline.advance();
 
@@ -1433,7 +1433,7 @@ void Preproc::process_DEFL(Keyword kw, const SourceLoc&,
 }
 
 void Preproc::process_name_DEFL(Keyword, const SourceLoc&,
-                                StringInterner::Id name_id, const SourceLoc& name_loc,
+                                uint name_id, const SourceLoc& name_loc,
                                 ParseLine& pline) {
     Macro macro;
     macro.name_id = name_id;
@@ -1463,7 +1463,7 @@ void Preproc::do_DEFL(const Macro& macro,
     if (it != macros.end() && it->second.is_function_like) {
         g_diag.error(macro.loc,
                      "DEFL cannot redefine function-like macro: " +
-                     g_strings.to_string(macro.name_id));
+                     g_strings.string(macro.name_id));
         g_diag.note(it->second.loc, "Previous definition");
         return;
     }
@@ -1527,12 +1527,12 @@ void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     SourceLoc name_loc = pline.peek().loc;
     pline.advance();
 
     // parse optional parameters
-    std::vector<StringInterner::Id> params;
+    std::vector<uint> params;
     bool has_parens = false;
     if (!parse_params(pline, params, has_parens)) {
         return; // error already emitted by parse_params()
@@ -1556,10 +1556,10 @@ void Preproc::process_MACRO(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_name_MACRO(Keyword kw, const SourceLoc& kw_loc,
-                                 StringInterner::Id name_id, const SourceLoc& name_loc,
+                                 uint name_id, const SourceLoc& name_loc,
                                  ParseLine& pline) {
     // parse optional parameters
-    std::vector<StringInterner::Id> params;
+    std::vector<uint> params;
     bool has_parens = false;
     if (!parse_params(pline, params, has_parens)) {
         return; // error already emitted by parse_params()
@@ -1589,14 +1589,14 @@ void Preproc::do_MACRO(Keyword kw, const SourceLoc& kw_loc,
     if (it != macros.end()) {
         g_diag.error(macro.loc,
                      "Macro redefinition: " +
-                     g_strings.to_string(macro.name_id));
+                     g_strings.string(macro.name_id));
         g_diag.note(it->second.loc, "Previous definition");
         return;
     }
 
     // read lines until ENDM
     std::vector<LogicalLine> lines;
-    std::vector<StringInterner::Id> locals;
+    std::vector<uint> locals;
     if (!read_macro_body(kw, kw_loc, lines, locals)) {
         return; // error already emitted by read_macro_body()
     }
@@ -1640,19 +1640,19 @@ void Preproc::process_REPT(Keyword kw, const SourceLoc& kw_loc,
                      "Unexpected token after " +
                      to_string(kw) +
                      " count: " +
-                     escape_string(g_strings.to_string(expanded[expr_pline.pos].text_id)));
+                     escape_string(g_strings.string(expanded[expr_pline.pos].text_id)));
         return;
     }
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
-    std::vector<StringInterner::Id> locals;
+    std::vector<uint> locals;
     if (!read_macro_body(kw, kw_loc, body, locals)) {
         return;  // error already emitted by read_macro_body()
     }
 
     // Push the body lines repeated repeat_count times to the work queue
-    std::vector<StringInterner::Id> no_params;
+    std::vector<uint> no_params;
     std::vector<std::vector<Token>> no_args;
     std::deque<LogicalLine> rept_lines;
     for (int i = 0; i < repeat_count; ++i) {
@@ -1690,7 +1690,7 @@ void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     SourceLoc name_loc = pline.peek().loc;
     pline.advance();
 
@@ -1706,14 +1706,14 @@ void Preproc::process_REPTI(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_name_REPTI(Keyword kw, const SourceLoc& kw_loc,
-                                 StringInterner::Id name_id, const SourceLoc& name_loc,
+                                 uint name_id, const SourceLoc& name_loc,
                                  ParseLine& pline) {
 
     do_REPTI(kw, kw_loc, name_id, name_loc, pline);
 }
 
 void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
-                       StringInterner::Id name_id, const SourceLoc&,
+                       uint name_id, const SourceLoc&,
                        ParseLine& pline) {
     SourceLoc args_loc = pline.peek().loc;
 
@@ -1737,13 +1737,13 @@ void Preproc::do_REPTI(Keyword kw, const SourceLoc& kw_loc,
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
-    std::vector<StringInterner::Id> locals;
+    std::vector<uint> locals;
     if (!read_macro_body(kw, kw_loc, body, locals)) {
         return; // error already emitted by read_macro_body()
     }
 
     // The iteration variable is the single parameter for substitution
-    std::vector<StringInterner::Id> params = { name_id };
+    std::vector<uint> params = { name_id };
 
     // Expand the body once per argument
     std::deque<LogicalLine> repti_lines;
@@ -1777,7 +1777,7 @@ void Preproc::process_REPTC(Keyword kw, const SourceLoc& kw_loc,
         return;
     }
 
-    StringInterner::Id name_id = pline.peek().text_id;
+    uint name_id = pline.peek().text_id;
     SourceLoc name_loc = pline.peek().loc;
     pline.advance();
 
@@ -1792,16 +1792,16 @@ void Preproc::process_REPTC(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_name_REPTC(Keyword kw, const SourceLoc& kw_loc,
-                                 StringInterner::Id name_id, const SourceLoc& name_loc,
+                                 uint name_id, const SourceLoc& name_loc,
                                  ParseLine& pline) {
     do_REPTC(kw, kw_loc, name_id, name_loc, pline);
 }
 
 void Preproc::process_name_DEFC(Keyword, const SourceLoc& kw_loc,
-                                StringInterner::Id name_id,
+                                uint name_id,
                                 const SourceLoc&, ParseLine& pline) {
     // create DEFC <name> = <rest of line> and push to output queue
-    std::string defc_str = "DEFC " + g_strings.to_string(name_id) + " = ";
+    std::string defc_str = "DEFC " + g_strings.string(name_id) + " = ";
     std::vector<Token> defc_tokens = tokenize_text(defc_str, kw_loc);
 
     // skip optional '='
@@ -1826,7 +1826,7 @@ void Preproc::process_name_DEFC(Keyword, const SourceLoc& kw_loc,
 }
 
 void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
-                       StringInterner::Id name_id, const SourceLoc&,
+                       uint name_id, const SourceLoc&,
                        ParseLine& pline) {
     // Collect and expand the text expression
     std::vector<Token> expanded =
@@ -1838,7 +1838,7 @@ void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
 
     // Read the body lines until ENDR
     std::vector<LogicalLine> body;
-    std::vector<StringInterner::Id> locals;
+    std::vector<uint> locals;
     if (!read_macro_body(kw, kw_loc, body, locals)) {
         return;  // error already emitted by read_macro_body()
     }
@@ -1868,7 +1868,7 @@ void Preproc::do_REPTC(Keyword kw, const SourceLoc& kw_loc,
     }
 
     // The iteration variable is the single parameter for substitution
-    std::vector<StringInterner::Id> params = { name_id };
+    std::vector<uint> params = { name_id };
 
     // Iterate over each character
     std::deque<LogicalLine> reptc_lines;
@@ -1904,7 +1904,7 @@ void Preproc::process_LOCAL(Keyword kw, const SourceLoc& kw_loc,
 }
 
 void Preproc::process_name_LOCAL(Keyword kw, const SourceLoc& kw_loc,
-                                 StringInterner::Id, const SourceLoc&,
+                                 uint, const SourceLoc&,
                                  ParseLine&) {
     g_diag.error(kw_loc,
                  "Unexpected " + to_string(kw) + " directive");
@@ -2087,7 +2087,7 @@ void Preproc::process_PRAGMA(Keyword, const SourceLoc&,
         return;
     }
 
-    StringInterner::Id file_id = include_stack.back().file->file_id;
+    uint file_id = include_stack.back().file->file_id;
     auto it = std::find(pragma_once_files.begin(), pragma_once_files.end(),
                         file_id);
 
@@ -2137,7 +2137,7 @@ void Preproc::process_ASSERT(Keyword kw, const SourceLoc&,
             return;
         }
 
-        message = g_strings.to_string(expanded[expr_pline.pos].value.str_value_id);
+        message = g_strings.string(expanded[expr_pline.pos].value.str_value_id);
         ++expr_pline.pos;
     }
 
@@ -2165,7 +2165,7 @@ void Preproc::process_ERROR(Keyword, const SourceLoc&,
     SourceLoc err_loc = pline.peek().loc;
 
     if (pline.peek().type == TokenType::String) {
-        message = g_strings.to_string(pline.peek().value.str_value_id);
+        message = g_strings.string(pline.peek().value.str_value_id);
         err_loc = pline.peek().loc;
         ++pline.pos;
     }
@@ -2424,7 +2424,7 @@ void Preproc::process_DEFGROUP(Keyword kw, const SourceLoc& kw_loc,
             expline.error("Expected identifier in " + to_string(kw) + " directive");
             return;
         }
-        std::string name = g_strings.to_string(expline.peek().text_id);
+        std::string name = g_strings.string(expline.peek().text_id);
         SourceLoc name_loc = expline.peek().loc;
         expline.advance();
 
@@ -2572,7 +2572,7 @@ void Preproc::parse_DEFVARS_block(Keyword kw, const SourceLoc& kw_loc,
         }
 
         // optional identifier for the name
-        StringInterner::Id name_id = 0;
+        uint name_id = 0;
         SourceLoc name_loc;
         if (expline.peek().keyword != Keyword::DS) {
             name_id = expline.peek().text_id;
@@ -2630,7 +2630,7 @@ void Preproc::parse_DEFVARS_block(Keyword kw, const SourceLoc& kw_loc,
 
         // emit DEFC for each given name in the definition, with the appropriate offset
         if (name_id != 0) {
-            std::string var_name = g_strings.to_string(name_id);
+            std::string var_name = g_strings.string(name_id);
             std::string defc_str = "DEFC " + var_name + " = " +
                                    std::to_string(defvars_state.current_offset);
             std::vector<Token> defc_tokens = tokenize_text(defc_str, name_loc);
@@ -2782,7 +2782,7 @@ void Preproc::process_SETFLOAT(Keyword kw, const SourceLoc&, ParseLine& pline) {
                      "Expected float format identifier in " + to_string(kw) + " directive");
         return;
     }
-    StringInterner::Id float_type_id = exp_pline.peek().text_id;
+    uint float_type_id = exp_pline.peek().text_id;
     SourceLoc float_type_loc = exp_pline.peek().loc;
     exp_pline.advance();
 
@@ -2794,7 +2794,7 @@ void Preproc::process_SETFLOAT(Keyword kw, const SourceLoc&, ParseLine& pline) {
     FloatFormat fmt = DEFAULT_FLOAT_FORMAT;
     if (!float_format_lookup(g_strings.view(float_type_id), fmt)) {
         g_diag.error(float_type_loc,
-                     "Invalid float format: " + g_strings.to_string(float_type_id));
+                     "Invalid float format: " + g_strings.string(float_type_id));
         g_diag.note(float_type_loc, float_formats_message());
         return;
     }
@@ -2881,7 +2881,7 @@ Preproc::LineType Preproc::process_directive_line(
     // ---------------------------------------------------------------------
     Keyword kw = Keyword::None;
     SourceLoc kw_loc;
-    StringInterner::Id name_id = 0;
+    uint name_id = 0;
     SourceLoc name_loc;
 
     if (!is_directive(pl, kw, kw_loc, name_id, name_loc)) {

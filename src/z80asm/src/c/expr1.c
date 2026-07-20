@@ -357,7 +357,7 @@ void Expr1_init(Expr1* self)
 	self->module = CURRENTMODULE;
 	self->section = CURRENTSECTION;
 	self->asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();	/* BUG_0048 */
-	self->code_pos = get_cur_module_size();	/* BUG_0015 */
+	self->patch_ptr = get_cur_module_size();	/* BUG_0015 */
 	self->opcode_size = 0;
 
 	self->filename = spool_add(sfile_filename());
