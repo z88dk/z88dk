@@ -51,8 +51,23 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, the benchmark runs with N=7.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt and sibling directories.
+
+Compiler | CPU  | Ticks
+---------|------|-------------
+sccz80   | z80  | 75_381_296
+sccz80   | 8085 | 64_389_094
+80cc     | z80  | 88_892_408  (Jul 2026, -O2 --opt-code-speed)
+80cc     | 8085 | 77_390_398  (Jul 2026)
+zsdcc    | z80  | 59_756_269
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 HITECH C MSDOS V780pl2
@@ -121,6 +136,22 @@ sccz80 / classic c library / 8085 CPU
 
 cycle count  = 64389094
 time @ 4MHz  = 64389094 / 4*10^6 = 16.10 sec
+
+10.
+Z88DK July 20, 2026
+80cc / classic c library
+2345 bytes less page zero
+
+cycle count  = 88892408
+time @ 4MHz  = 88892408 / 4*10^6 = 22.22 sec
+
+11.
+Z88DK July 20, 2026
+80cc / classic c library / 8085 CPU
+1984 bytes less page zero
+
+cycle count  = 77390398
+time @ 4MHz  = 77390398 / 4*10^6 = 19.35 sec
 
 
 Background

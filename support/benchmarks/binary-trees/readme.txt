@@ -70,8 +70,24 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, N=8.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|-------------
+sccz80   | z80  | mbf32   | 145_563_150
+sccz80   | 8085 | mbf32   | 137_783_936
+zsdcc    | z80  | math48  | 150_118_736
+80cc     | z80/8085 | mbf32 | builds; TIMER completes but cycle
+         |      |         | counts ~50x below sccz80 — not published
+         |      |         | until correctness verified
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 
 1.

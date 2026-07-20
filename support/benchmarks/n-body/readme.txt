@@ -48,8 +48,23 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, N=1000.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt. N=1000.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|----------------
+sccz80   | z80  | math32  | 1_000_372_169  (Jul 2026)
+sccz80   | 8085 | math32  | 1_986_100_862  (Jul 2026)
+sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
+sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
+80cc     | *    | math32  | builds; INVALID 2nd energy — omitted
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 Z88DK April 28, 2021

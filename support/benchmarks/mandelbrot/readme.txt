@@ -62,8 +62,23 @@ mandelbrot set is produced.  This maps to a ceil(60/8)*60 = 480 byte
 block of memory to hold the result.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt. w=h=60.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|----------------
+sccz80   | z80  | math32  | 1_152_093_641  (Jul 2026)
+sccz80   | 8085 | math32  | 1_403_401_196  (Jul 2026)
+80cc     | z80  | math32  | 1_290_571_216  (Jul 2026 remeasure)
+80cc     | 8085 | math32  | 2_752_742_816  (Jul 2026 remeasure)
+sccz80   | 8085 | mbf32   | 1_805_825_674  (Jul 2026)
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 HITECH C CPM V309-15
@@ -167,22 +182,22 @@ time @ 4MHz  = 1403401196 / 4*10^6 =  5 min 51 sec
 IEEE 32-bit float implementation (math32_8085).
 
 12.
-Z88DK July 19, 2026
+Z88DK July 20, 2026
 80cc / classic c library / math32
-5484 bytes less page zero
+5458 bytes less page zero
 
-cycle count  = 1290753256
-time @ 4MHz  = 1290753256 / 4*10^6 =  5 min 23 sec
+cycle count  = 1290571216
+time @ 4MHz  = 1290571216 / 4*10^6 =  5 min 23 sec
 
 IEEE 32-bit float implementation.
 
 13.
-Z88DK July 19, 2026
+Z88DK July 20, 2026
 80cc / classic c library / 8085 / math32
-7001 bytes less page zero
+6990 bytes less page zero
 
-cycle count  = 2752818536
-time @ 4MHz  = 2752818536 / 4*10^6 = 11 min 28 sec
+cycle count  = 2752742816
+time @ 4MHz  = 2752742816 / 4*10^6 = 11 min 28 sec
 
 IEEE 32-bit float implementation (math32_8085).
 

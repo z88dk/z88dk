@@ -32,6 +32,12 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuc
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
 
+classic/80cc
+zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
+
+classic/80cc/8085
+zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
+
 classic/zsdcc
 zcc +test -vn -DSTATIC -DINLINE -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 fannkuch.c -o fannkuch.bin -lndos -m
 
@@ -40,7 +46,9 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks fannkuch.bin -x fannkuch.map -start TIMER_START -end TIMER_END -counter 999999999999
+z88dk-ticks fannkuch.bin -x fannkuch.map -start TIMER_START -end TIMER_STOP -counter 999999999999
+
+For 8085 binaries add -m8085.
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -66,6 +74,22 @@ classic/sccz80
 
 cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
+
+
+Z88DK July 20, 2026
+classic/80cc
+2345 bytes less page zero
+
+cycle count  = 88892408
+time @ 4MHz  = 88892408 / 4*10^6 = 22.22 sec
+
+
+Z88DK July 20, 2026
+classic/80cc/8085
+1984 bytes less page zero
+
+cycle count  = 77390398
+time @ 4MHz  = 77390398 / 4*10^6 = 19.35 sec
 
 
 Z88DK April 20, 2020

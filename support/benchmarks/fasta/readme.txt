@@ -42,8 +42,24 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, N=1000.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt. N=1000.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|-------------
+sccz80   | z80  | math32  | 122_328_869  (Jul 2026)
+sccz80   | 8085 | math32  | 216_105_363  (Jul 2026)
+80cc     | z80  | math32  | 273_699_521  (Jul 2026 remeasure)
+80cc     | 8085 | math32  | 560_041_296  (Jul 2026 remeasure)
+sccz80   | z80  | mbf32   | 165_734_164  (Jul 2026)
+sccz80   | 8085 | mbf32   | 205_137_817  (Jul 2026)
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 HITECH C CPM V309-15
@@ -119,22 +135,22 @@ time @ 4MHz  = 216105363 / 4*10^6 = 54.03 sec
 IEEE 32-bit float implementation (math32_8085).
 
 9.
-Z88DK July 19, 2026
+Z88DK July 20, 2026
 80cc / classic c library / math32
-6715 bytes less page zero
+6664 bytes less page zero
 
-cycle count  = 274747974
-time @ 4MHz  = 274747974 / 4*10^6 = 68.69 sec
+cycle count  = 273699521
+time @ 4MHz  = 273699521 / 4*10^6 = 68.42 sec
 
 IEEE 32-bit float implementation.
 
 10.
-Z88DK July 19, 2026
+Z88DK July 20, 2026
 80cc / classic c library / 8085 / math32
-8292 bytes less page zero
+8193 bytes less page zero
 
-cycle count  = 568417916
-time @ 4MHz  = 568417916 / 4*10^6 = 142.10 sec
+cycle count  = 560041296
+time @ 4MHz  = 560041296 / 4*10^6 = 140.01 sec
 
 IEEE 32-bit float implementation (math32_8085).
 

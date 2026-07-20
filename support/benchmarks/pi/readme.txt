@@ -56,6 +56,20 @@ Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
 
 
+CLASSIC Z80 / 8085 SUMMARY — PI.C (no ldiv)
+===========================================
+
+Timer-bounded classic +test. Full archive: z88dk-classic/readme.txt.
+
+Compiler | CPU  | Ticks
+---------|------|----------------
+sccz80   | z80  | 4_028_061_102
+sccz80   | 8085 | 7_824_146_079
+80cc     | z80  | 4_197_516_586  (Jul 2026)
+80cc     | 8085 | 8_011_487_245  (Jul 2026)
+zsdcc    | z80  | 4_013_954_322
+
+
 RESULTS - PI.C (NO LDIV)
 ========================
 
@@ -146,6 +160,20 @@ sccz80 / classic c library / 8085 CPU
 
 cycle count  = 7824146079
 time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
+
+Z88DK July 20, 2026
+80cc / classic c library
+7575 bytes less page zero
+
+cycle count  = 4197516586
+time @ 4MHz  = 4197516586 / 4*10^6 = 17 min 29 sec
+
+Z88DK July 20, 2026
+80cc / classic c library / 8085 CPU
+7642 bytes less page zero
+
+cycle count  = 8011487245
+time @ 4MHz  = 8011487245 / 4*10^6 = 33 min 23 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================

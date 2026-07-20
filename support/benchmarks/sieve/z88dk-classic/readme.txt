@@ -31,6 +31,12 @@ zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
 sccz80/classic/8085
 zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
 
+80cc/classic
+zcc +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
+80cc/classic/8085
+zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
 zsdcc/classic
 zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
 
@@ -40,6 +46,10 @@ These address bounds were given to TICKS to measure execution time.
 A typical invocation of TICKS looked like this:
 
 z88dk-ticks sieve.bin -x sieve.map -start TIMER_START -end TIMER_STOP -counter 9999999999
+
+For 8085 binaries add -m8085:
+
+z88dk-ticks -m8085 sieve.bin -x sieve.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -65,6 +75,22 @@ sccz80 / classic c library / 8085
 
 cycle count  = 5129695
 time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+
+
+Z88DK July 20, 2026
+80cc / classic c library
+9295 bytes less page zero
+
+cycle count  = 6560973
+time @ 4MHz  = 6560973 / 4*10^6 = 1.6402 sec
+
+
+Z88DK July 20, 2026
+80cc / classic c library / 8085
+9221 bytes less page zero
+
+cycle count  = 5607379
+time @ 4MHz  = 5607379 / 4*10^6 = 1.4018 sec
 
 
 Z88DK January 5, 2022

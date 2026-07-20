@@ -42,8 +42,24 @@ TIMER is defined for Z88DK compiles so that assembly labels are inserted
 into the code at time begin and time stop points.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt. N=100.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|-----------------
+sccz80   | z80  | math32  | 9_805_013_165   (Jul 2026)
+sccz80   | 8085 | math32  | 19_330_977_133  (Jul 2026)
+80cc     | z80  | math32  | 10_312_576_631  (Jul 2026)
+80cc     | 8085 | math32  | 20_146_695_596  (Jul 2026)
+sccz80   | z80  | mbf32   | 6_346_228_466   (Jul 2026)
+sccz80   | 8085 | mbf32   | 6_227_757_878   (Jul 2026)
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 HITECH C CPM V309-15

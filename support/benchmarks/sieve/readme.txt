@@ -63,8 +63,23 @@ Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks and other
+toolchains: z88dk-classic/readme.txt and sibling directories.
+
+Compiler | CPU  | Ticks
+---------|------|------------
+sccz80   | z80  | 4_769_143
+sccz80   | 8085 | 5_129_695
+80cc     | z80  | 6_560_973   (Jul 2026)
+80cc     | 8085 | 5_607_379   (Jul 2026)
+zsdcc    | z80  | 4_110_873
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 Z88DK April 20, 2020
@@ -133,4 +148,20 @@ sccz80 / classic c library / 8085
 
 cycle count  = 5129695
 time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+
+9.
+Z88DK July 20, 2026
+80cc / classic c library
+9295 bytes less page zero
+
+cycle count  = 6560973
+time @ 4MHz  = 6560973 / 4*10^6 = 1.6402 sec
+
+10.
+Z88DK July 20, 2026
+80cc / classic c library / 8085
+9221 bytes less page zero
+
+cycle count  = 5607379
+time @ 4MHz  = 5607379 / 4*10^6 = 1.4018 sec
 

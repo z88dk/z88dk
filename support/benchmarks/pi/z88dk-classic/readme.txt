@@ -32,6 +32,12 @@ zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 sccz80/classic
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 
+80cc/classic
+zcc +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
+
+80cc/classic/8085
+zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
+
 zsdcc/classic
 zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 
@@ -42,6 +48,8 @@ execution time.
 A typical invocation of TICKS looked like this:
 
 z88dk-ticks pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
+
+For 8085 binaries add -m8085.
 
 counter = High value to ensure completion
 
@@ -68,6 +76,22 @@ sccz80 / classic c library
 
 cycle count  = 4028061102
 time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
+
+
+Z88DK July 20, 2026
+80cc / classic c library
+7575 bytes less page zero
+
+cycle count  = 4197516586
+time @ 4MHz  = 4197516586 / 4*10^6 = 17 min 29 sec
+
+
+Z88DK July 20, 2026
+80cc / classic c library / 8085 CPU
+7642 bytes less page zero
+
+cycle count  = 8011487245
+time @ 4MHz  = 8011487245 / 4*10^6 = 33 min 23 sec
 
 
 Z88DK April 4, 2022
