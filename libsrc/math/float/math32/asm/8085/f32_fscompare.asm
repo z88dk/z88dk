@@ -9,18 +9,7 @@
 ;-------------------------------------------------------------------------
 ; m32_compare / m32_compare_callee - 8085 IEEE float compare
 ;-------------------------------------------------------------------------
-; Stack only (no BSS).
-;
-; IEEE float is considered zero if exponent is zero.
-;
-; To compare floating point numbers across the whole number range,
-; we define the following rules (same strategy as the Z80 core):
-;       - Always flip the sign bit.
-;       - If the sign bit was set (negative), flip the other bits too.
-;       http://stereopsis.com/radix.html, et al.
-;
-; After that transform, a plain unsigned magnitude subtract/compare
-; yields total order: smaller transformed value ⇔ smaller float.
+; Sign/magnitude + high-word first early-out + no left-copy on callee.
 ;
 ; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
 ;-------------------------------------------------------------------------
@@ -31,13 +20,12 @@ SECTION code_fp_math32
 PUBLIC m32_compare, m32_compare_callee
 
 
-; SP: rt, rr, ll, lh, rl, rh
 .m32_compare
     ld de,sp+8
     call push_float_at
     ld de,sp+8
     call push_float_at
-    call cmp_lr
+    call cmp_lr_copies
     push af
     pop bc
     pop af
@@ -50,31 +38,12 @@ PUBLIC m32_compare, m32_compare_callee
     ret
 
 
-; DEHL=right; SP: rt, rr, ll, lh
 .m32_compare_callee
     push de
     push hl
-    ; SP: right L,H,E,D, rt, rr, ll, lh
-    ld de,sp+8
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld b,a
-    inc de
-    ld a,(de)
-    ld l,a
-    inc de
-    ld a,(de)
-    ld h,a
-    push hl
-    push bc
-    ; SP: left, right, rt, rr, ll, lh
-    call cmp_lr
+    call cmp_lr_callee
     push af
     pop bc
-    pop af
-    pop af
     pop af
     pop af
     pop de
@@ -90,156 +59,215 @@ PUBLIC m32_compare, m32_compare_callee
 
 
 .push_float_at
-    pop hl
-    ld a,(de)
-    ld c,a
+    pop bc
+    ld hl,(de)
     inc de
-    ld a,(de)
-    ld b,a
     inc de
-    ld a,(de)
     push hl
-    ld l,a
-    inc de
-    ld a,(de)
-    ld h,a
-    pop de
+    ld hl,(de)
+    ex de,hl
+    pop hl
+    push de
     push hl
     push bc
-    push de
     ret
 
 
-; SP: ret, left L,H,E,D, right L,H,E,D
-.cmp_lr
+; SP: ret, L.L, L.H, R.L, R.H
+.cmp_lr_copies
     ld de,sp+8
-    ld a,(de)
-    ld c,a
-    ld de,sp+9
-    ld a,(de)
-    ld d,a
-    ld e,c
+    ld hl,(de)
+    ex de,hl
     call exp_zero
-    jp Z,lr_rz
+    jp Z,cp_rz
 
     ld de,sp+4
-    ld a,(de)
-    ld c,a
-    ld de,sp+5
-    ld a,(de)
-    ld d,a
-    ld e,c
+    ld hl,(de)
+    ex de,hl
     call exp_zero
-    jp Z,lr_lz
+    jp Z,cp_lz
 
-    ; xform right at +6..+9
-    ld de,sp+6
-    ld a,(de)
-    ld l,a
-    inc de
-    ld a,(de)
-    ld h,a
-    inc de
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld d,a
-    ld e,c
-    call xform
-    ld bc,de
-    ld a,l
-    ld de,sp+6
-    ld (de),a
-    ld a,h
-    ld de,sp+7
-    ld (de),a
-    ld a,c
-    ld de,sp+8
-    ld (de),a
-    ld a,b
-    ld de,sp+9
-    ld (de),a
-
-    ; xform left at +2..+5
-    ld de,sp+2
-    ld a,(de)
-    ld l,a
-    inc de
-    ld a,(de)
-    ld h,a
-    inc de
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld d,a
-    ld e,c
-    call xform
-    ld bc,de
-    ld a,l
-    ld de,sp+2
-    ld (de),a
-    ld a,h
-    ld de,sp+3
-    ld (de),a
-    ld a,c
-    ld de,sp+4
-    ld (de),a
-    ld a,b
     ld de,sp+5
-    ld (de),a
-
-    ; left - right
-    ld de,sp+2
     ld a,(de)
-    ld de,sp+6
-    push af
+    ld b,a
+    ld de,sp+9
     ld a,(de)
-    ld h,a
-    pop af
-    sub h
     ld c,a
-    ld de,sp+3
-    ld a,(de)
-    ld de,sp+7
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
+    xor b
+    and 080h
+    jp NZ,cp_dsign
+
+    ld a,b
+    rla
+    jp C,cp_neg
+    ; both +: high first L.H - R.H
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+8
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
+    sbc a,h
+    jp NZ,hi_fin                        ; high differs
+    or c
+    jp NZ,hi_fin
+    ; high equal — compare low L.L - R.L
+    ld de,sp+2
+    ld hl,(de)
+    ld de,sp+6
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
     sbc a,h
     ld b,a
-    ld de,sp+4
-    ld a,(de)
+    or c
+    ret                                 ; C from sbc; Z if equal
+
+.cp_neg
+    ; both -: high first R.H - L.H
     ld de,sp+8
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
+    ld hl,(de)
+    ld de,sp+4
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
     sbc a,h
-    ld l,a
-    ld de,sp+5
-    ld a,(de)
-    ld de,sp+9
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
+    jp NZ,hi_fin
+    or c
+    jp NZ,hi_fin
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+2
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
     sbc a,h
-    jp C,lr_neg
-    or l
-    or b
+    ld b,a
     or c
     ret
 
-.lr_rz
+.cp_dsign
+    ld a,b
+    rla
+    jp C,lr_neg
+    jp lr_pos
+
+
+; SP: ret, R.L, R.H, rt, rr, L.L, L.H
+.cmp_lr_callee
     ld de,sp+4
+    ld hl,(de)
+    ex de,hl
+    call exp_zero
+    jp Z,cc_rz
+
+    ld de,sp+12
+    ld hl,(de)
+    ex de,hl
+    call exp_zero
+    jp Z,cc_lz
+
+    ld de,sp+13
     ld a,(de)
-    ld c,a
+    ld b,a
     ld de,sp+5
     ld a,(de)
-    ld d,a
-    ld e,c
+    ld c,a
+    xor b
+    and 080h
+    jp NZ,cc_dsign
+
+    ld a,b
+    rla
+    jp C,cc_neg
+    ; both +: L.H@12 - R.H@4
+    ld de,sp+12
+    ld hl,(de)
+    ld de,sp+4
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
+    sbc a,h
+    jp NZ,hi_fin
+    or c
+    jp NZ,hi_fin
+    ; low L@10 - R@2
+    ld de,sp+10
+    ld hl,(de)
+    ld de,sp+2
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
+    sbc a,h
+    ld b,a
+    or c
+    ret
+
+.cc_neg
+    ; both -: R.H@4 - L.H@12
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+12
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
+    sbc a,h
+    jp NZ,hi_fin
+    or c
+    jp NZ,hi_fin
+    ld de,sp+2
+    ld hl,(de)
+    ld de,sp+10
+    ld a,l
+    ld b,h
+    ld hl,(de)
+    sub l
+    ld c,a
+    ld a,b
+    sbc a,h
+    ld b,a
+    or c
+    ret
+
+.cc_dsign
+    ld a,b
+    rla
+    jp C,lr_neg
+    jp lr_pos
+
+
+; A = high byte of high-word diff, C = low byte, flags from sbc of high
+.hi_fin
+    jp C,lr_neg
+    or c                                ; NZ (high differed); OR clears C → NC
+    ret
+
+
+.cp_rz
+    ld de,sp+4
+    ld hl,(de)
+    ex de,hl
     call exp_zero
     jp Z,lr_eq
     ld de,sp+5
@@ -248,8 +276,27 @@ PUBLIC m32_compare, m32_compare_callee
     jp NC,lr_pos
     jp lr_neg
 
-.lr_lz
+.cp_lz
     ld de,sp+9
+    ld a,(de)
+    rla
+    jp NC,lr_neg
+    jp lr_pos
+
+.cc_rz
+    ld de,sp+12
+    ld hl,(de)
+    ex de,hl
+    call exp_zero
+    jp Z,lr_eq
+    ld de,sp+13
+    ld a,(de)
+    rla
+    jp NC,lr_pos
+    jp lr_neg
+
+.cc_lz
+    ld de,sp+5
     ld a,(de)
     rla
     jp NC,lr_neg
@@ -270,45 +317,10 @@ PUBLIC m32_compare, m32_compare_callee
     scf
     ret
 
-
 .exp_zero
     ld a,d
     and 07fh
     ret NZ
     ld a,e
     and 080h
-    ret
-
-
-.xform
-    ld a,e
-    add a,a
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
-    ccf
-    jp C,xf_pos
-    ld a,l
-    cpl
-    ld l,a
-    ld a,h
-    cpl
-    ld h,a
-    ld a,e
-    cpl
-    ld e,a
-    ld a,d
-    cpl
-    ld d,a
-.xf_pos
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,l
-    and 0feh
-    ld l,a
     ret
