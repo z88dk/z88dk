@@ -51,9 +51,9 @@ z88dk-classic/readme.txt. N=1000.
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|-------------
 sccz80   | z80  | math32  | 122_328_869  (Jul 2026)
-sccz80   | 8085 | math32  | 205_273_363  (Jul 2026)
+sccz80   | 8085 | math32  | 186_704_695  (Jul 2026)
 80cc     | z80  | math32  | 273_699_521  (Jul 2026 remeasure)
-80cc     | 8085 | math32  | 549_209_296  (Jul 2026)
+80cc     | 8085 | math32  | 530_674_851  (Jul 2026)
 sccz80   | z80  | mbf32   | 165_734_164  (Jul 2026)
 sccz80   | 8085 | mbf32   | 194_305_817  (Jul 2026)
 
@@ -127,10 +127,10 @@ IEEE 32-bit float implementation.
 8.
 Z88DK July 20, 2026
 sccz80 / classic c library / 8085 / math32
-5758 bytes less page zero
+5639 bytes less page zero
 
-cycle count  = 205273363
-time @ 4MHz  = 205273363 / 4*10^6 = 51.32 sec
+cycle count  = 186704695
+time @ 4MHz  = 186704695 / 4*10^6 = 46.68 sec
 
 IEEE 32-bit float implementation (math32_8085).
 
@@ -147,10 +147,10 @@ IEEE 32-bit float implementation.
 10.
 Z88DK July 20, 2026
 80cc / classic c library / 8085 / math32
-8296 bytes less page zero
+8177 bytes less page zero
 
-cycle count  = 549209296
-time @ 4MHz  = 549209296 / 4*10^6 = 137.30 sec
+cycle count  = 530674851
+time @ 4MHz  = 530674851 / 4*10^6 = 132.67 sec
 
 IEEE 32-bit float implementation (math32_8085).
 

@@ -103,10 +103,10 @@ time @ 4MHz  = 1152093641 / 4*10^6 =  4 min 48 sec
 
 Z88DK July 19, 2026
 sccz80 / classic / 8085 / math32
-6325 bytes less page zero
+6208 bytes less page zero
 
-cycle count  = 1403401196
-time @ 4MHz  = 1403401196 / 4*10^6 =  5 min 51 sec
+cycle count  = 1362047666
+time @ 4MHz  = 1362047666 / 4*10^6 =  5 min 41 sec
 
 
 Z88DK July 20, 2026
@@ -119,10 +119,10 @@ time @ 4MHz  = 1290571216 / 4*10^6 =  5 min 23 sec
 
 Z88DK July 20, 2026
 80cc / classic / 8085 / math32
-6990 bytes less page zero
+6873 bytes less page zero
 
-cycle count  = 2752742816
-time @ 4MHz  = 2752742816 / 4*10^6 = 11 min 28 sec
+cycle count  = 2672568097
+time @ 4MHz  = 2672568097 / 4*10^6 = 11 min 8 sec
 
 
 Z88DK July 19, 2026

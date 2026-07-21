@@ -120,7 +120,7 @@ time @ 4MHz  = 9805013165 / 4*10^6 = 40 min 51 sec
 
 Z88DK July 19, 2026
 sccz80 / classic c library / 8085 / math32
-7277 bytes less page zero
+7106 bytes less page zero
 
 error: 2 * 10^(-7)
 
@@ -140,7 +140,7 @@ time @ 4MHz  = 10312576631 / 4*10^6 = 42 min 58 sec
 
 Z88DK July 19, 2026
 80cc / classic c library / 8085 / math32
-7738 bytes less page zero
+7567 bytes less page zero
 
 error: 2 * 10^(-7)
 

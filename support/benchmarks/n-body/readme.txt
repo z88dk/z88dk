@@ -167,7 +167,7 @@ IEEE 32-bit float implementation, accurate to 7 significant digits.
 9.
 Z88DK July 19, 2026
 sccz80 / classic / 8085 / math32
-7461 bytes less page zero
+7290 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)

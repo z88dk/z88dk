@@ -130,7 +130,7 @@ time @ 4MHz  = 1000372169 / 4*10^6 =  4 min 10 sec
 
 Z88DK July 19, 2026
 sccz80 / classic / 8085 / math32
-7461 bytes less page zero
+7290 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
