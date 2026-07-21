@@ -10,6 +10,18 @@
 ; m32_compare / m32_compare_callee - 8085 IEEE float compare
 ;-------------------------------------------------------------------------
 ; Stack only (no BSS).
+;
+; IEEE float is considered zero if exponent is zero.
+;
+; To compare floating point numbers across the whole number range,
+; we define the following rules (same strategy as the Z80 core):
+;       - Always flip the sign bit.
+;       - If the sign bit was set (negative), flip the other bits too.
+;       http://stereopsis.com/radix.html, et al.
+;
+; After that transform, a plain unsigned magnitude subtract/compare
+; yields total order: smaller transformed value ⇔ smaller float.
+;
 ; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
 ;-------------------------------------------------------------------------
 

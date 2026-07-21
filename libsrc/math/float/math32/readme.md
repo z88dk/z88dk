@@ -174,7 +174,7 @@ CPU-specific mantissa multiply and square helpers also live here (`f32_z80_*`, `
 
 ### asm/8085
 
-8085-specific intrinsic implementations (extended opcodes, stack-based locals, no alternate registers). Selected when building `math32_8085.lib`.
+8085-specific intrinsic implementations (extended opcodes, stack-based locals, no alternate registers). Selected when building `math32_8085.lib`. CPU-specific mantissa helpers are `f32_8085_mulu_32h_24x24`, `f32_8085_mulu_32h_32x32`, and `f32_8085_sqr_32h_24x24` (listed in `newlibfiles_8085.lst`, `math32_8085_asm.lst`, `math32_8085_common_asm.lst`, and classic `z80_crt0s/newlib-8085.lst`).
 
 ### c
 
@@ -241,7 +241,7 @@ The mantissa multiplication is not a "correct" multiply, as not all carry bits a
 
 A simple rounding method is used, but a more sophisticated method IEEE compliant method could be applied as needed.
 
-The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, and the 8085 `m32_sqr_32h_24x24`).
+The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, `f32_8085_sqr_*`).
 
 For the 8×8-oriented CPUs the square uses the same high-32-of-48 algebraic expansion (and the same truncation / rounding-byte layout as the general 24×24 high product):
 

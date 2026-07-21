@@ -25,6 +25,7 @@ math/float/math32/asm/8085/f32_fscompare
 math/float/math32/asm/8085/f32_fsnormalize
 math/float/math32/asm/8085/f32_8085_mulu_32h_24x24
 math/float/math32/asm/8085/f32_8085_mulu_32h_32x32
+math/float/math32/asm/8085/f32_8085_sqr_32h_24x24
 math/float/math32/asm/8085/f32_fsmul32
 math/float/math32/asm/8085/f32_fsnormalize32
 math/float/math32/asm/8085/f32_fsadd32
