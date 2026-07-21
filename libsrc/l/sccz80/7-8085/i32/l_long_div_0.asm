@@ -29,7 +29,6 @@ PUBLIC  l_long_div_0
     ld      c,a
     ld      a,(de)
     ld      b,a                 ; BC = div MSW
-    ld      a,b
     or      c
     ld      e,16                ; E = 16 if MSW half, else 0
     jp      nz,half_ready
@@ -38,7 +37,6 @@ PUBLIC  l_long_div_0
     ld      c,a
     ld      a,(de)
     ld      b,a                 ; BC = div LSW
-    ld      a,b
     or      c
     jp      z,full_32           ; div 0 → full width
     ld      e,0
