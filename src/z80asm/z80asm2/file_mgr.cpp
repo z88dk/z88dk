@@ -96,10 +96,10 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
         const SourceLoc& loc) {
     // Normalize and intern the filename
     std::string norm = normalize_path(filename);
-    uint file_id = g_strings.intern(norm);
+    uint filename_id = g_strings.intern(norm);
 
     // Already loaded?
-    auto it = source_cache.find(file_id);
+    auto it = source_cache.find(filename_id);
     if (it != source_cache.end()) {
         return &it->second;
     }
@@ -108,22 +108,22 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
     // error reporting during tokenization), return nullptr to break the
     // recursion.  The caller (print_message) will simply skip showing
     // the source line context.
-    if (source_loading.count(file_id)) {
+    if (source_loading.count(filename_id)) {
         return nullptr;
     }
-    source_loading.insert(file_id);
+    source_loading.insert(filename_id);
 
     // Read entire file into memory
     std::string content;
     if (!read_file_to_string(norm, loc, content)) {
         // read_file_to_string() already emitted an error
-        source_loading.erase(file_id);
+        source_loading.erase(filename_id);
         return nullptr;
     }
 
     // Build a new SourceFile
     SourceFile sf;
-    sf.file_id = file_id;
+    sf.filename_id = filename_id;
 
     // Split into line offsets + lengths
     split_source_lines(sf, content);
@@ -132,10 +132,10 @@ SourceFile* FileManager::get_source_file(std::string_view filename,
     tokenize(sf, content);
 
     // Remove loading guard before inserting into cache
-    source_loading.erase(file_id);
+    source_loading.erase(filename_id);
 
     // Insert into cache and return pointer
-    auto [pos, inserted] = source_cache.emplace(file_id, std::move(sf));
+    auto [pos, inserted] = source_cache.emplace(filename_id, std::move(sf));
     return &pos->second;
 }
 
@@ -198,7 +198,7 @@ bool FileManager::read_file_to_string(std::string_view filename,
 }
 
 std::vector<RawLine> FileManager::split_into_lines(std::string_view content,
-        uint file_id,
+        uint filename_id,
         size_t starting_line) {
     std::vector<RawLine> out;
 
@@ -210,7 +210,7 @@ std::vector<RawLine> FileManager::split_into_lines(std::string_view content,
 
         RawLine rl;
         rl.text = content.substr(pos, end - pos);
-        rl.loc = SourceLoc(file_id, line, 1);
+        rl.loc = SourceLoc(filename_id, line, 1);
         out.push_back(std::move(rl));
 
         pos = skip_line_ending(content, end);
@@ -224,7 +224,7 @@ std::string FileManager::read_line(const SourceFile& sf, size_t line,
                                    const SourceLoc& loc) {
     // If line is within bounds, read normally
     if (line < sf.line_offsets.size()) {
-        std::string_view filename = g_strings.view(sf.file_id);
+        std::string_view filename = g_strings.view(sf.filename_id);
         std::ifstream* in = g_file_handle_cache.get(filename, loc);
 
         if (!in) {
@@ -249,10 +249,10 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     std::string_view filename,
     const SourceLoc& loc) {
     std::string norm = normalize_path(filename);
-    uint file_id = g_strings.intern(norm);
+    uint filename_id = g_strings.intern(norm);
 
     // Return from cache if already loaded
-    auto it = binary_cache.find(file_id);
+    auto it = binary_cache.find(filename_id);
     if (it != binary_cache.end()) {
         return &it->second;
     }
@@ -275,7 +275,7 @@ const std::vector<uint8_t>* FileManager::read_binary_file(
     }
 
     // Insert into cache and return pointer
-    auto result = binary_cache.emplace(file_id, std::move(data));
+    auto result = binary_cache.emplace(filename_id, std::move(data));
     return &result.first->second;
 }
 

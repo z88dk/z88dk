@@ -77,7 +77,7 @@ bool compute_layout(Program& prog, bool& changed) {
                 }
                 else {
                     g_diag.error(sec->org_stmt->expr->loc,
-                                 "Interger range: " + int_to_hex(value));
+                                 "Integer range: " + int_to_hex(value));
                     failed = true;
                 }
             }

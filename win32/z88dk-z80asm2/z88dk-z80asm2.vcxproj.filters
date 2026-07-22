@@ -144,9 +144,6 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_features.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_format.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -169,6 +166,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_symbol_type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_schema.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -290,9 +290,6 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_features.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_format.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -326,6 +323,21 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_extern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_modname.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_section.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_schema.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def">
@@ -357,12 +369,6 @@
     </None>
     <None Include="..\..\src\z80asm\obj_symbol_type.def">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\src\z80asm\z80asm2\obj_reader.cpp.bak">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\..\src\z80asm\z80asm2\string_utils.cpp.bak">
-      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
 </Project>

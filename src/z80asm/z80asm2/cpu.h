@@ -30,7 +30,7 @@ std::vector<uint> cpu_defines(CPU cpu_id);
 bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl);
 
 Keyword cpu_invert_flag_condition(Keyword kw);
-void swap_ix_iy(std::string& inout_text, Keyword& inout_kw);
+void swap_ixiy(std::string& inout_text, Keyword& inout_kw);
 
 // Z88
 bool compute_z88_call_oz(std::vector<std::pair<Keyword, int>>& out_def_val_data,

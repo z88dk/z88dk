@@ -58,12 +58,12 @@ size_t Strings::size() const {
     return pool.size();
 }
 
-void Strings::pack(BinaryData& bytes) const {
+void Strings::pack(BinaryData& bin_data) const {
     // header has number of strings and total size of blob with all strings
     size_t num_strings = size();
-    bytes.put_dword(static_cast<uint32_t>(num_strings));
-    size_t strings_size_pos = bytes.size();
-    bytes.put_dword(0);
+    bin_data.put_dword(static_cast<uint32_t>(num_strings));
+    size_t strings_size_pos = bin_data.size();
+    bin_data.put_dword(0);
 
     // write index of each string into blob of strings concatenated separated by '\0'
     size_t str_table_pos = 0;
@@ -72,23 +72,23 @@ void Strings::pack(BinaryData& bytes) const {
         size_t pos = str_table_pos;
         str_table_pos += str.size() + 1;        // chars + null char
 
-        bytes.put_dword(static_cast<uint32_t>(pos));  // index into strings
+        bin_data.put_dword(static_cast<uint32_t>(pos));  // index into strings
     }
 
     // write all strings together
     for (size_t id = 0; id < num_strings; id++) {
         std::string_view str = view(static_cast<uint>(id));
-        bytes.put_string(str);              // string
-        bytes.put_byte(0);                  // null terminator
+        bin_data.put_string(str);              // string
+        bin_data.put_byte(0);                  // null terminator
     }
 
     // align to 32-bit size
-    size_t size_before_align = bytes.size();
-    bytes.align(4);
-    str_table_pos += bytes.size() - size_before_align;
+    size_t size_before_align = bin_data.size();
+    bin_data.align(4);
+    str_table_pos += bin_data.size() - size_before_align;
 
     // write the blob length (str_table_pos)
-    bytes.patch_dword(strings_size_pos, static_cast<uint32_t>(str_table_pos));
+    bin_data.patch_dword(strings_size_pos, static_cast<uint32_t>(str_table_pos));
 }
 
 //-----------------------------------------------------------------------------

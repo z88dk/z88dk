@@ -339,7 +339,7 @@ bool Preproc::parse_and_resolve_file(ParseLine& pline,
 
     std::string_view including_filename =
         include_stack.empty() ? "" :
-        g_strings.view(include_stack.back().file->file_id);
+        g_strings.view(include_stack.back().file->filename_id);
     out_resolved =
         resolve_include_candidate(filename,
                                   including_filename,
@@ -392,7 +392,7 @@ bool Preproc::parse_LINE_args(ParseLine& pline,
         // try to resolve the filename against include paths
         std::string_view including_filename =
             include_stack.empty() ? "" :
-            g_strings.view(include_stack.back().file->file_id);
+            g_strings.view(include_stack.back().file->filename_id);
         std::string resolved = resolve_include_candidate(
                                    out_filename,
                                    including_filename,
@@ -1082,7 +1082,7 @@ void Preproc::rewrite_logical_line(LogicalLine& line) {
         else {
             line.loc.line += static_cast<uint32_t>(frame.logical_line_offset);
         }
-        line.loc.file_id = static_cast<uint16_t>(frame.logical_file_id);
+        line.loc.filename_id = static_cast<uint16_t>(frame.logical_file_id);
         SourceLine logical_loc(line.loc);
         g_diag.add_mapping(logical_loc, physical_loc);
     }
@@ -1095,7 +1095,7 @@ void Preproc::rewrite_logical_line(LogicalLine& line) {
         else {
             tok.loc.line += static_cast<uint32_t>(frame.logical_line_offset);
         }
-        tok.loc.file_id = static_cast<uint16_t>(frame.logical_file_id);
+        tok.loc.filename_id = static_cast<uint16_t>(frame.logical_file_id);
         SourceLine logical_loc(tok.loc);
         g_diag.add_mapping(logical_loc, physical_loc);
     }
@@ -1114,7 +1114,7 @@ void Preproc::process_INCLUDE(Keyword kw, const SourceLoc&,
     uint resolved_id =
         g_file_mgr.register_virtual_file(resolved);
     for (const auto& frame : include_stack) {
-        if (frame.file->file_id == resolved_id) {
+        if (frame.file->filename_id == resolved_id) {
             g_diag.error(filename_loc,
                          "Recursive inclusion of file: " + resolved);
             return;
@@ -1130,14 +1130,14 @@ void Preproc::process_INCLUDE(Keyword kw, const SourceLoc&,
 
     include_stack.push_back({
         included_file,
-        included_file->file_id, // logical_file_id
+        included_file->filename_id, // logical_file_id
         0,                  // current_line
         false,              // logical_line_fixed
         0                   // logical_line_offset
     });
 
     // add to dependency files for generation of .d file
-    dependency_files.push_back(included_file->file_id);
+    dependency_files.push_back(included_file->filename_id);
 }
 
 void Preproc::process_BINARY(Keyword kw, const SourceLoc&,
@@ -2087,9 +2087,9 @@ void Preproc::process_PRAGMA(Keyword, const SourceLoc&,
         return;
     }
 
-    uint file_id = include_stack.back().file->file_id;
+    uint filename_id = include_stack.back().file->filename_id;
     auto it = std::find(pragma_once_files.begin(), pragma_once_files.end(),
-                        file_id);
+                        filename_id);
 
     if (it != pragma_once_files.end()) {
         // file already marked once -> skip remaining lines of this file
@@ -2097,7 +2097,7 @@ void Preproc::process_PRAGMA(Keyword, const SourceLoc&,
     }
     else {
         // first time this file requests PRAGMA ONCE
-        pragma_once_files.push_back(file_id);
+        pragma_once_files.push_back(filename_id);
     }
 }
 

@@ -14,12 +14,12 @@
 // field order for efficient packing into 8 bytes (64 bits):
 struct SourceLoc {
     uint32_t line = 0;      // 4 bytes
-    uint16_t file_id = 0;   // 2 bytes
+    uint16_t filename_id = 0;   // 2 bytes
     uint16_t column = 0;    // 2 bytes
 
     SourceLoc() = default;
-    SourceLoc(uint file_id, size_t ln, size_t col);
-    SourceLoc(std::string_view file, size_t ln, size_t col);
+    SourceLoc(uint filename_id, size_t ln, size_t col);
+    SourceLoc(std::string_view filename, size_t ln, size_t col);
 
     void clear();
     bool empty() const;
@@ -29,11 +29,11 @@ struct SourceLoc {
 // used to map physical to logical lines
 struct SourceLine {
     uint32_t line = 0;      // 4 bytes
-    uint16_t file_id = 0;   // 2 bytes
+    uint16_t filename_id = 0;   // 2 bytes
 
     SourceLine() = default;
-    SourceLine(uint file_id, size_t ln);
-    SourceLine(std::string_view file, size_t ln);
+    SourceLine(uint filename_id, size_t ln);
+    SourceLine(std::string_view filename, size_t ln);
     SourceLine(const SourceLoc& loc);
 
     bool operator==(const SourceLine& other) const ;

@@ -11,8 +11,8 @@
 #include "diag.h"
 #include "dump_context.h"
 #include "obj_features.h"
-#include "obj_format.h"
 #include "obj_range_type.h"
+#include "obj_schema.h"
 #include "source_loc.h"
 #include "strings.h"
 #include <cstdint>
@@ -34,7 +34,7 @@ struct ObjRelocBase : public TreeNode {
 
     // attributes
     ObjRangeType range = ObjRangeType::Undefined;
-    Str file_;
+    Str filename_;
     uint line = 0;
 
     Str section_name_;
@@ -51,7 +51,7 @@ struct ObjRelocBase : public TreeNode {
     template <typename S = Storage, typename = EnableInterned<S>> ObjRelocBase(
         const ObjRelocBase<ViewStorage>& v)
         : range(v.range),
-          file_(g_strings.intern(v.file_)),
+          filename_(g_strings.intern(v.filename_)),
           line(v.line),
           section_name_(g_strings.intern(v.section_name_)),
           patch_ptr(v.patch_ptr),
@@ -60,15 +60,15 @@ struct ObjRelocBase : public TreeNode {
     }
 
     // accessors
-    std::string_view file_view() const {
-        return Storage::to_view(file_);
+    std::string_view filename() const {
+        return Storage::to_view(filename_);
     }
 
-    void set_file(std::string_view s) {
-        file_ = Storage::from_view(s);
+    void set_filename(std::string_view s) {
+        filename_ = Storage::from_view(s);
     }
 
-    std::string_view section_name_view() const {
+    std::string_view section_name() const {
         return Storage::to_view(section_name_);
     }
 
@@ -76,7 +76,7 @@ struct ObjRelocBase : public TreeNode {
         section_name_ = Storage::from_view(s);
     }
 
-    std::string_view symbol_view() const {
+    std::string_view symbol() const {
         return Storage::to_view(symbol_);
     }
 
@@ -88,24 +88,24 @@ struct ObjRelocBase : public TreeNode {
     void dump(DumpContext ctx) const override {
         ctx.line("ObjReloc:");
         DumpContext child_ctx = ctx.child();
-        SourceLoc loc(file_view(), line, 1);
+        SourceLoc loc(filename(), line, 1);
         child_ctx.line("Location: " + loc.to_string());
-        if (!section_name_view().empty()) {
-            child_ctx.line("Section: " + std::string(section_name_view()));
+        if (!section_name().empty()) {
+            child_ctx.line("Section: " + std::string(section_name()));
         }
         child_ctx.line("Patch ptr: " + int_to_hex(patch_ptr));
         child_ctx.line("Range: " + to_string(range));
-        child_ctx.line("Symbol: " + std::string(symbol_view()));
+        child_ctx.line("Symbol: " + std::string(symbol()));
         child_ctx.line("Addend: " + int_to_hex(addend));
     }
 
     static void dump_relocs(DumpContext ctx,
-                            const std::vector<std::unique_ptr<ObjRelocBase>>& relocs) {
+                            const std::vector<ObjRelocBase>& relocs) {
         if (!relocs.empty()) {
             ctx.line("Relocations:");
             DumpContext child_ctx = ctx.child();
             for (auto& reloc : relocs) {
-                reloc->dump(child_ctx);
+                reloc.dump(child_ctx);
             }
         }
     }
@@ -115,67 +115,66 @@ struct ObjRelocBase : public TreeNode {
                   << std::left << std::setw(5) << to_short_string(range)
                   << std::right
                   << " " << int_to_hex(patch_ptr)
-                  << ": " << symbol_view() << "+" << int_to_hex(addend);
+                  << ": " << symbol() << "+" << int_to_hex(addend);
         std::cout << " (section ";
-        if (section_name_view().empty()) {
+        if (section_name().empty()) {
             std::cout << "\"\"";
         }
         else {
-            std::cout << section_name_view();
+            std::cout << section_name();
         }
         std::cout << ")"
                   << " (file ";
-        if (file_view().empty()) {
+        if (filename().empty()) {
             std::cout << "\"\"";
         }
         else {
-            std::cout << file_view();
+            std::cout << filename();
         }
         std::cout << ":" << line << ")" << std::endl;
     }
 
-    static void dump_relocs_short(const std::vector<std::unique_ptr<ObjRelocBase>>&
-                                  relocs) {
+    static void dump_relocs_short(const std::vector<ObjRelocBase>& relocs) {
         if (!relocs.empty()) {
             std::cout << "  Relocations:" << std::endl;
             for (auto& reloc : relocs) {
-                reloc->dump_short();
+                reloc.dump_short();
             }
         }
     }
 
     // pack/unpack to/from binary data
-    void pack(BinaryData& bytes, Strings& strings) const {
-        bytes.put_dword(static_cast<uint32_t>(range));
+    void pack(BinaryData& bin_data, Strings& strings) const {
+        bin_data.put_dword(static_cast<uint32_t>(range));
 
-        uint file_id = strings.intern(file_view());
-        bytes.put_dword(static_cast<uint32_t>(file_id));
-        bytes.put_dword(static_cast<uint32_t>(line));
+        uint filename_id = strings.intern(filename());
+        bin_data.put_dword(static_cast<uint32_t>(filename_id));
+        bin_data.put_dword(static_cast<uint32_t>(line));
 
-        uint section_name_id = strings.intern(section_name_view());
-        bytes.put_dword(static_cast<uint32_t>(section_name_id));
+        uint section_name_id = strings.intern(section_name());
+        bin_data.put_dword(static_cast<uint32_t>(section_name_id));
 
-        bytes.put_dword(static_cast<uint32_t>(patch_ptr));
+        bin_data.put_dword(static_cast<uint32_t>(patch_ptr));
 
-        uint symbol_id = strings.intern(symbol_view());
-        bytes.put_dword(static_cast<uint32_t>(symbol_id));
+        uint symbol_id = strings.intern(symbol());
+        bin_data.put_dword(static_cast<uint32_t>(symbol_id));
 
-        bytes.put_dword(static_cast<uint32_t>(addend));
+        bin_data.put_dword(static_cast<uint32_t>(addend));
     }
 
-    static size_t pack_relocs(BinaryData& bytes, Strings& strings,
-                              const std::vector<std::unique_ptr<ObjRelocBase>>& relocs) {
+    static size_t pack_relocs(BinaryData& bin_data, Strings& strings,
+                              const std::vector<ObjRelocBase>& relocs) {
         if (relocs.empty()) {
             return OffsetNotPresent;
         }
 
-        size_t start_offset = bytes.size();
+        size_t start_offset = bin_data.size();
         for (auto& reloc : relocs) {
-            reloc->pack(bytes, strings);
+            reloc.pack(bin_data, strings);
         }
 
         // end marker
-        bytes.put_dword(0);
+        bin_data.put_dword(0);
 
         return start_offset;
     }
@@ -190,7 +189,7 @@ struct ObjRelocBase : public TreeNode {
 
         // filename and line number
         uint filename_id = file->get_dword(ptr);
-        set_file(strings.view(filename_id));
+        set_filename(strings.view(filename_id));
         line = file->get_dword(ptr);
 
         // section

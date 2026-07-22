@@ -421,7 +421,7 @@ void Args::parse_arg(std::string_view arg,
             return;
 
         case OptionType::IXIY:
-            options.swap_ix_iy = true;
+            options.swap_ixiy = true;
             return;
 
         case OptionType::UCASE:
@@ -757,7 +757,7 @@ void Args::search_list_file(std::string_view list_filename,
                             const SourceLoc& loc,
                             std::vector<SourceLoc>& loc_stack) {
     // read list file
-    uint file_id =
+    uint filename_id =
         g_file_mgr.register_virtual_file(list_filename);
     std::string content;
     if (!g_file_mgr.read_file_to_string(list_filename, loc, content)) {
@@ -766,7 +766,7 @@ void Args::search_list_file(std::string_view list_filename,
 
     // process each line
     std::vector<RawLine> lines =
-        g_file_mgr.split_into_lines(content, file_id, 1);
+        g_file_mgr.split_into_lines(content, filename_id, 1);
     for (auto& line : lines) {
         // column will be updated by parse_filename_entry
         SourceLoc inc_loc = line.loc;
@@ -857,12 +857,12 @@ void Args::search_source_file(std::string_view filename_,
             g_diag.error(loc, "File not found: " + list_filename);
             return;
         }
-        uint file_id =
+        uint filename_id =
             g_file_mgr.register_virtual_file(list_full_path);
 
         // check for recursive inclusion of list files
         for (const SourceLoc& l : loc_stack) {
-            if (l.file_id == file_id) {
+            if (l.filename_id == filename_id) {
                 g_diag.error(loc, "Recursive inclusion of list file: " + list_filename);
                 return;
             }
@@ -1015,7 +1015,7 @@ void Args::define_constants_from_options() {
     // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
     uint swap_id = g_strings.intern("__SWAP_IX_IY__");
     options.global_defs.erase(swap_id);
-    if (options.swap_ix_iy) {
+    if (options.swap_ixiy) {
         options.global_defs.set(swap_id, 1, SourceLoc("<builtin>", 1, 1));
     }
 

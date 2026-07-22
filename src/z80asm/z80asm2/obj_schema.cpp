@@ -4,11 +4,11 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "obj_format.h"
 #include "binary_file.h"
 #include "cpu.h"
 #include "diag.h"
 #include "obj_features.h"
+#include "obj_schema.h"
 #include "options.h"
 #include "string_utils.h"
 #include <algorithm>
@@ -121,12 +121,12 @@ static size_t calc_end_offset(const SectionInfo& info, size_t end_offset) {
     }
 }
 
-ObjFormat::ObjFormat(std::shared_ptr<const BinaryFile> file_,
-                     size_t base_offset_, size_t object_size)
-    : file(std::move(file_)), base_offset(base_offset_) {
+ObjSchema::ObjSchema(std::shared_ptr<const BinaryFile> file_,
+                     size_t base_offset_, size_t size_)
+    : file(std::move(file_)), base_offset(base_offset_), size(size_) {
 
     // check size
-    size_t end_offset = base_offset + object_size;
+    size_t end_offset = base_offset + size;
     if (end_offset >= file->size()) {
         fatal_error("invalid object file '" + std::string(file->filename()) +
                     "' offset " + int_to_hex(base_offset));
@@ -155,23 +155,23 @@ ObjFormat::ObjFormat(std::shared_ptr<const BinaryFile> file_,
 
     // get ORG (older versions)
     if (obj_features(version).has_global_org_word) {
-        org = file->get_word(ptr);
-        if (org == 0xFFFF) {
-            org = OrgNotDefined;
+        base_address = file->get_word(ptr);
+        if (base_address == 0xFFFF) {
+            base_address = OrgNotDefined;
         }
     }
     else if (obj_features(version).has_global_org_dword) {
-        org = file->get_dword(ptr);
+        base_address = file->get_dword(ptr);
     }
     else {
-        org = OrgNotDefined;
+        base_address = OrgNotDefined;
     }
 
     // get file pointers
 
     // module name pointer
-    module_name = load_offset(file, ptr, base_offset_, end_offset, "module name");
-    if (!module_name.present) {
+    modname = load_offset(file, ptr, base_offset_, end_offset, "module name");
+    if (!modname.present) {
         fatal_error("missing module name pointer in '" + std::string(file->filename()) +
                     "' offset " + int_to_hex(base_offset_));
     }
@@ -191,11 +191,11 @@ ObjFormat::ObjFormat(std::shared_ptr<const BinaryFile> file_,
 
     // defined symbols pointer
     symbols = load_offset(file, ptr, base_offset_, end_offset,
-                                  "defined symbols");
+                          "defined symbols");
 
     // extern symbols pointer
     externs = load_offset(file, ptr, base_offset_, end_offset,
-                                 "extern symbols");
+                          "extern symbols");
 
     // sections pointer
     sections = load_offset(file, ptr, base_offset_, end_offset, "sections");
@@ -217,7 +217,7 @@ ObjFormat::ObjFormat(std::shared_ptr<const BinaryFile> file_,
             calc_end_offset(relocs, end_offset),
             calc_end_offset(symbols, end_offset),
             calc_end_offset(externs, end_offset),
-            module_name.offset });
+            modname.offset });
         exprs.size = next_offset - exprs.offset;
     }
 
@@ -225,19 +225,19 @@ ObjFormat::ObjFormat(std::shared_ptr<const BinaryFile> file_,
         size_t next_offset = std::min( {
             calc_end_offset(symbols, end_offset),
             calc_end_offset(externs, end_offset),
-            module_name.offset });
+            modname.offset });
         relocs.size = next_offset - relocs.offset;
     }
 
     if (symbols.present) {
         size_t next_offset = std::min( {
             calc_end_offset(externs, end_offset),
-            module_name.offset });
+            modname.offset });
         symbols.size = next_offset - symbols.offset;
     }
 
     if (externs.present) {
-        size_t next_offset = module_name.offset;
+        size_t next_offset = modname.offset;
         externs.size = next_offset - externs.offset;
     }
 
@@ -258,11 +258,10 @@ ObjFormat::ObjFormat(std::shared_ptr<const BinaryFile> file_,
 // Library file format
 //-----------------------------------------------------------------------------
 
-LibFormat::LibFormat(std::shared_ptr<const BinaryFile> file_)
-    : file(std::move(file_)) {
+LibSchema::LibSchema(std::shared_ptr<const BinaryFile> file_)
+    : file(std::move(file_)), base_offset(0), size(file->size()) {
 
-    size_t base_offset = 0;
-    size_t end_offset = file->size();
+    size_t end_offset = base_offset + size;
     size_t ptr = base_offset;
 
     // get signature, type and version
@@ -347,4 +346,3 @@ LibFormat::LibFormat(std::shared_ptr<const BinaryFile> file_)
         }
     }
 }
-

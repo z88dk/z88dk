@@ -11,8 +11,8 @@
 #include "diag.h"
 #include "dump_context.h"
 #include "obj_features.h"
-#include "obj_format.h"
 #include "obj_range_type.h"
+#include "obj_schema.h"
 #include "source_loc.h"
 #include "string_utils.h"
 #include "strings.h"
@@ -35,7 +35,7 @@ struct ObjExprBase : public TreeNode {
 
     // attributes
     ObjRangeType range = ObjRangeType::Undefined;
-    Str file_;
+    Str filename_;
     uint line = 0;
 
     Str section_name_;
@@ -54,7 +54,7 @@ struct ObjExprBase : public TreeNode {
     template <typename S = Storage, typename = EnableInterned<S>> ObjExprBase(
         const ObjExprBase<ViewStorage>& v)
         : range(v.range),
-          file_(g_strings.intern(v.file_)),
+          filename_(g_strings.intern(v.filename_)),
           line(v.line),
           section_name_(g_strings.intern(v.section_name_)),
           target_name_(g_strings.intern(v.target_name_)),
@@ -65,15 +65,15 @@ struct ObjExprBase : public TreeNode {
     }
 
     // accessors
-    std::string_view file_view() const {
-        return Storage::to_view(file_);
+    std::string_view filename() const {
+        return Storage::to_view(filename_);
     }
 
-    void set_file(std::string_view s) {
-        file_ = Storage::from_view(s);
+    void set_filename(std::string_view s) {
+        filename_ = Storage::from_view(s);
     }
 
-    std::string_view section_name_view() const {
+    std::string_view section_name() const {
         return Storage::to_view(section_name_);
     }
 
@@ -81,7 +81,7 @@ struct ObjExprBase : public TreeNode {
         section_name_ = Storage::from_view(s);
     }
 
-    std::string_view target_name_view() const {
+    std::string_view target_name() const {
         return Storage::to_view(target_name_);
     }
 
@@ -89,7 +89,7 @@ struct ObjExprBase : public TreeNode {
         target_name_ = Storage::from_view(s);
     }
 
-    std::string_view text_view() const {
+    std::string_view text() const {
         return Storage::to_view(text_);
     }
 
@@ -101,28 +101,28 @@ struct ObjExprBase : public TreeNode {
     void dump(DumpContext ctx) const override {
         ctx.line("ObjExpr:");
         DumpContext child_ctx = ctx.child();
-        SourceLoc loc(file_view(), line, 1);
+        SourceLoc loc(filename(), line, 1);
         child_ctx.line("Location: " + loc.to_string());
-        child_ctx.line("Text: " + escape_string(text_view()));
+        child_ctx.line("Text: " + escape_string(text()));
         child_ctx.line("Range: " + to_string(range));
         child_ctx.line("ASMPC: " + int_to_hex(asmpc));
         child_ctx.line("Patch ptr: " + int_to_hex(patch_ptr));
         child_ctx.line("Opcode size: " + int_to_hex(opcode_size));
-        if (!section_name_view().empty()) {
-            child_ctx.line("Section: " + std::string(section_name_view()));
+        if (!section_name().empty()) {
+            child_ctx.line("Section: " + std::string(section_name()));
         }
-        if (!target_name_view().empty()) {
-            child_ctx.line("Target: " + std::string(target_name_view()));
+        if (!target_name().empty()) {
+            child_ctx.line("Target: " + std::string(target_name()));
         }
     }
 
     static void dump_exprs(DumpContext ctx,
-                           const std::vector<std::unique_ptr<ObjExprBase>>& exprs) {
+                           const std::vector<ObjExprBase>& exprs) {
         if (!exprs.empty()) {
             ctx.line("Expressions:");
             DumpContext child_ctx = ctx.child();
             for (auto& expr : exprs) {
-                expr->dump(child_ctx);
+                expr.dump(child_ctx);
             }
         }
     }
@@ -135,73 +135,72 @@ struct ObjExprBase : public TreeNode {
                   << " " << int_to_hex(patch_ptr)
                   << " " << opcode_size
                   << ": ";
-        if (!target_name_view().empty()) {
-            std::cout << target_name_view() << " := ";
+        if (!target_name().empty()) {
+            std::cout << target_name() << " := ";
         }
-        std::cout << text_view()
+        std::cout << text()
                   << " (section ";
-        if (section_name_view().empty()) {
+        if (section_name().empty()) {
             std::cout << "\"\"";
         }
         else {
-            std::cout << section_name_view();
+            std::cout << section_name();
         }
         std::cout << ")"
                   << " (file ";
-        if (file_view().empty()) {
+        if (filename().empty()) {
             std::cout << "\"\"";
         }
         else {
-            std::cout << file_view();
+            std::cout << filename();
         }
         std::cout << ":" << line << ")" << std::endl;
     }
 
-    static void dump_exprs_short(const std::vector<std::unique_ptr<ObjExprBase>>&
-                                 exprs) {
+    static void dump_exprs_short(const std::vector<ObjExprBase>& exprs) {
         if (!exprs.empty()) {
             std::cout << "  Expressions:" << std::endl;
             for (auto& expr : exprs) {
-                expr->dump_short();
+                expr.dump_short();
             }
         }
     }
 
     // pack/unpack to/from binary data
-    void pack(BinaryData& bytes, Strings& strings) const {
-        bytes.put_dword(static_cast<uint32_t>(range));
+    void pack(BinaryData& bin_data, Strings& strings) const {
+        bin_data.put_dword(static_cast<uint32_t>(range));
 
-        uint file_id = strings.intern(file_view());
-        bytes.put_dword(static_cast<uint32_t>(file_id));
-        bytes.put_dword(static_cast<uint32_t>(line));
+        uint filename_id = strings.intern(filename());
+        bin_data.put_dword(static_cast<uint32_t>(filename_id));
+        bin_data.put_dword(static_cast<uint32_t>(line));
 
-        uint section_name_id = strings.intern(section_name_view());
-        bytes.put_dword(static_cast<uint32_t>(section_name_id));
+        uint section_name_id = strings.intern(section_name());
+        bin_data.put_dword(static_cast<uint32_t>(section_name_id));
 
-        bytes.put_dword(static_cast<uint32_t>(asmpc));
-        bytes.put_dword(static_cast<uint32_t>(patch_ptr));
-        bytes.put_dword(static_cast<uint32_t>(opcode_size));
+        bin_data.put_dword(static_cast<uint32_t>(asmpc));
+        bin_data.put_dword(static_cast<uint32_t>(patch_ptr));
+        bin_data.put_dword(static_cast<uint32_t>(opcode_size));
 
-        uint target_name_id = strings.intern(target_name_view());
-        bytes.put_dword(static_cast<uint32_t>(target_name_id));
+        uint target_name_id = strings.intern(target_name());
+        bin_data.put_dword(static_cast<uint32_t>(target_name_id));
 
-        uint text_id = strings.intern(text_view());
-        bytes.put_dword(static_cast<uint32_t>(text_id));
+        uint text_id = strings.intern(text());
+        bin_data.put_dword(static_cast<uint32_t>(text_id));
     }
 
-    static size_t pack_exprs(BinaryData& bytes, Strings& strings,
-                             const std::vector<std::unique_ptr<ObjExprBase>>& exprs) {
+    static size_t pack_exprs(BinaryData& bin_data, Strings& strings,
+                             const std::vector<ObjExprBase>& exprs) {
         if (exprs.empty()) {
             return OffsetNotPresent;
         }
 
-        size_t start_offset = bytes.size();
+        size_t start_offset = bin_data.size();
         for (auto& expr : exprs) {
-            expr->pack(bytes, strings);
+            expr.pack(bin_data, strings);
         }
 
         // end marker
-        bytes.put_dword(0);
+        bin_data.put_dword(0);
 
         return start_offset;
     }
@@ -224,12 +223,12 @@ struct ObjExprBase : public TreeNode {
         // filename and line number
         if (obj_features(version).has_string_table) {
             uint filename_id = file->get_dword(ptr);
-            set_file(strings.view(filename_id));
+            set_filename(strings.view(filename_id));
             line = file->get_dword(ptr);
         }
         else if (obj_features(version).has_expr_file_line) {
             std::string_view filename = file->get_word_string_view(ptr);
-            set_file(filename);
+            set_filename(filename);
             line = file->get_dword(ptr);
 
             if (filename.empty()) {

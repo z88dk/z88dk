@@ -47,7 +47,7 @@ void Diagnostics::print_message(const SourceLoc& loc,
         return;
     }
 
-    std::string_view filename = g_strings.view(loc.file_id);
+    std::string_view filename = g_strings.view(loc.filename_id);
     if (filename.empty() || filename[0] == '<') {
         // no filename or special filename (e.g. <command line>)
         return;
@@ -73,7 +73,7 @@ void Diagnostics::print_message(const SourceLoc& loc,
         return;
     }
 
-    std::string_view physical_filename = g_strings.view(physical_loc.file_id);
+    std::string_view physical_filename = g_strings.view(physical_loc.filename_id);
     std::cerr << "    (physical location: "
               << physical_filename << ":"
               << physical_loc.line << ")" << std::endl;

@@ -11,7 +11,7 @@
 #include "diag.h"
 #include "dump_context.h"
 #include "obj_features.h"
-#include "obj_format.h"
+#include "obj_schema.h"
 #include "obj_symbol_scope.h"
 #include "obj_symbol_type.h"
 #include "source_loc.h"
@@ -36,7 +36,7 @@ struct ObjSymbolBase : public TreeNode {
 
     // attributes
     Str name_;
-    Str file_;
+    Str filename_;
     uint line = 0;
 
     ObjSymbolScope scope = ObjSymbolScope::Undefined;
@@ -51,16 +51,17 @@ struct ObjSymbolBase : public TreeNode {
 
     // Conversion constructor: only enabled when Storage == InternedStorage
     template <typename S = Storage, typename = EnableInterned<S>> ObjSymbolBase(
-        const ObjSymbolBase<S>& other)
-        : name_(other.name_),
-          file_(g_strings.intern(other.file_)),
-          line(other.line),
+        const ObjSymbolBase<ViewStorage>& other)
+        : line(other.line),
           scope(other.scope),
           type(other.type),
-          value(other.value),
-          section_name_(g_strings.intern(other.section_name_)) {}
+          value(other.value) {
+        set_name(other.name());
+        set_filename(other.filename());
+        set_section_name(other.section_name());
+    }
 
-    std::string_view name_view() const {
+    std::string_view name() const {
         return Storage::to_view(name_);
     }
 
@@ -68,15 +69,15 @@ struct ObjSymbolBase : public TreeNode {
         name_ = Storage::from_view(s);
     }
 
-    std::string_view file_view() const {
-        return Storage::to_view(file_);
+    std::string_view filename() const {
+        return Storage::to_view(filename_);
     }
 
-    void set_file(std::string_view s) {
-        file_ = Storage::from_view(s);
+    void set_filename(std::string_view s) {
+        filename_ = Storage::from_view(s);
     }
 
-    std::string_view section_name_view() const {
+    std::string_view section_name() const {
         return Storage::to_view(section_name_);
     }
 
@@ -86,99 +87,100 @@ struct ObjSymbolBase : public TreeNode {
 
     // dump method
     void dump(DumpContext ctx) const override {
-        ctx.line("ObjSymbol: " + std::string(name_view()));
+        ctx.line("ObjSymbol: " + std::string(name()));
         DumpContext child_ctx = ctx.child();
-        child_ctx.line("Name: " + escape_string(name_view()));
-        SourceLoc loc(file_view(), line, 1);
+        child_ctx.line("Name: " + escape_string(name()));
+        SourceLoc loc(filename(), line, 1);
         child_ctx.line("Location: " + loc.to_string());
         child_ctx.line("Scope: " + to_string(scope));
         child_ctx.line("Type: " + to_string(type));
         child_ctx.line("Value: " + int_to_hex(value));
-        if (!section_name_view().empty()) {
-            child_ctx.line("Section: " + std::string(section_name_view()));
+        if (!section_name().empty()) {
+            child_ctx.line("Section: " + std::string(section_name()));
         }
     }
 
     static void dump_symbols(DumpContext ctx,
-        const std::vector<std::unique_ptr<ObjSymbolBase>>& symbols) {
+                             const std::vector<ObjSymbolBase>& symbols) {
         if (!symbols.empty()) {
             ctx.line("Symbols:");
             DumpContext child_ctx = ctx.child();
             for (auto& symbol : symbols) {
-                symbol->dump(child_ctx);
+                symbol.dump(child_ctx);
             }
         }
     }
 
     void dump_short() const {
         std::cout << "    " << to_short_string(scope)
-            << " " << to_short_string(type)
-            << " " << int_to_hex(value)
-            << ": " << name_view()
-            << " (section ";
-        if (section_name_view().empty()) {
+                  << " " << to_short_string(type)
+                  << " " << int_to_hex(value)
+                  << ": " << name()
+                  << " (section ";
+        if (section_name().empty()) {
             std::cout << "\"\"";
         }
         else {
-            std::cout << section_name_view();
+            std::cout << section_name();
         }
         std::cout << ")"
-            << " (file ";
-        if (file_view().empty()) {
+                  << " (file ";
+        if (filename().empty()) {
             std::cout << "\"\"";
         }
         else {
-            std::cout << file_view();
+            std::cout << filename();
         }
         std::cout << ":" << line << ")" << std::endl;
     }
 
-    static void dump_symbols_short(const std::vector<std::unique_ptr<ObjSymbolBase>>& symbols) {
+    static void dump_symbols_short(const
+                                   std::vector<ObjSymbolBase>& symbols) {
         if (!symbols.empty()) {
             std::cout << "  Symbols:" << std::endl;
             for (auto& symbol : symbols) {
-                symbol->dump_short();
+                symbol.dump_short();
             }
         }
     }
 
     // pack/unpack to/from binary data
-    void pack(BinaryData& bytes, Strings& strings) const {
-        bytes.put_dword(static_cast<uint32_t>(scope));
-        bytes.put_dword(static_cast<uint32_t>(type));
+    void pack(BinaryData& bin_data, Strings& strings) const {
+        bin_data.put_dword(static_cast<uint32_t>(scope));
+        bin_data.put_dword(static_cast<uint32_t>(type));
 
-        uint section_name_id = strings.intern(section_name_view());
-        bytes.put_dword(static_cast<uint32_t>(section_name_id));
+        uint section_name_id = strings.intern(section_name());
+        bin_data.put_dword(static_cast<uint32_t>(section_name_id));
 
-        bytes.put_dword(static_cast<uint32_t>(value));
+        bin_data.put_dword(static_cast<uint32_t>(value));
 
-        uint name_id = strings.intern(name_view());
-        bytes.put_dword(static_cast<uint32_t>(name_id));
+        uint name_id = strings.intern(name());
+        bin_data.put_dword(static_cast<uint32_t>(name_id));
 
-        uint file_id = strings.intern(file_view());
-        bytes.put_dword(static_cast<uint32_t>(file_id));
-        bytes.put_dword(static_cast<uint32_t>(line));
+        uint filename_id = strings.intern(filename());
+        bin_data.put_dword(static_cast<uint32_t>(filename_id));
+        bin_data.put_dword(static_cast<uint32_t>(line));
     }
 
-    static size_t pack_symbols(BinaryData& bytes, Strings& strings,
-        const std::vector<std::unique_ptr<ObjSymbolBase>>& symbols) {
+    static size_t pack_symbols(BinaryData& bin_data, Strings& strings,
+                               const std::vector<ObjSymbolBase>& symbols) {
         if (symbols.empty()) {
             return OffsetNotPresent;
         }
 
-        size_t start_offset = bytes.size();
+        size_t start_offset = bin_data.size();
         for (auto& sym : symbols) {
-            sym->pack(bytes, strings);
+            sym.pack(bin_data, strings);
         }
 
         // end marker
-        bytes.put_dword(0);
+        bin_data.put_dword(0);
 
         return start_offset;
     }
 
     bool unpack(std::shared_ptr<const BinaryFile> file, int version,
-        const StringsView& strings, size_t& ptr) {
+                const StringsView& strings, size_t& ptr) {
 
         // scope
         scope = ObjSymbolScope::Undefined;
@@ -204,7 +206,7 @@ struct ObjSymbolBase : public TreeNode {
         }
         if (type == ObjSymbolType::Undefined) {
             fatal_error("invalid symbol type: " +
-                std::to_string(static_cast<int>(type)));
+                        std::to_string(static_cast<int>(type)));
         }
 
         // section
@@ -243,16 +245,16 @@ struct ObjSymbolBase : public TreeNode {
         // definition location
         if (obj_features(version).has_symbol_file_line) {
             if (obj_features(version).has_string_table) {
-                uint file_id = file->get_dword(ptr);
-                set_file(strings.view(file_id));
+                uint filename_id = file->get_dword(ptr);
+                set_filename(strings.view(filename_id));
             }
             else if (obj_features(version).has_word_strings) {
                 std::string_view filename = file->get_word_string_view(ptr);
-                set_file(filename);
+                set_filename(filename);
             }
             else {
                 std::string_view filename = file->get_byte_string_view(ptr);
-                set_file(filename);
+                set_filename(filename);
             }
 
             line = file->get_dword(ptr);
@@ -262,8 +264,8 @@ struct ObjSymbolBase : public TreeNode {
     }
 
     static void unpack_symbols(std::shared_ptr<const BinaryFile> file, int version,
-        const StringsView& strings, size_t& ptr, size_t end_ptr,
-        std::vector<ObjSymbolBase>& symbols) {
+                               const StringsView& strings, size_t& ptr, size_t end_ptr,
+                               std::vector<ObjSymbolBase>& symbols) {
         symbols.clear();
         while (ptr < end_ptr) {
             ObjSymbolBase symbol;

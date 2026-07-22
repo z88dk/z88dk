@@ -225,7 +225,7 @@ static void swap_x_y(std::string& inout_text) {
     }
 }
 
-void swap_ix_iy(std::string& inout_text, Keyword& inout_kw) {
+void swap_ixiy(std::string& inout_text, Keyword& inout_kw) {
     if (keyword_is_x_register(inout_kw)) {
         swap_x_y(inout_text);
         inout_kw = keyword_lookup(inout_text);

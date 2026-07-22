@@ -112,7 +112,7 @@ void Preproc::set_const_symbols(const ConstSymbols& defs) {
 
 std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // used for dumping tokens after tokenization, if requested
-    uint cur_file_id = 0;
+    uint cur_filename_id = 0;
 
     // reset per-run registries and state
     preproc_cpu_id = g_args.options.cpu_id;
@@ -140,14 +140,14 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     // Push initial include frame
     include_stack.push_back({
         file,
-        file->file_id,              // logical_file_id
+        file->filename_id,          // logical_filename_id
         0,                          // current_line
         false,                      // logical_line_fixed
         0                           // logical_line_offset
     });
 
     // add to dependency files for generation of .d file
-    dependency_files.push_back(file->file_id);
+    dependency_files.push_back(file->filename_id);
 
     // -------------------------------------------------------------------------
     // 2. Unified input loop (files + macro-generated lines)
@@ -197,7 +197,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         }
 
         if (g_args.options.dump_after_directives) {
-            dump_logical_line(processed, cur_file_id);
+            dump_logical_line(processed, cur_filename_id);
         }
 
         // ---------------------------------------------------------------------
@@ -248,7 +248,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         }
 
         if (g_args.options.dump_after_macro_expansion) {
-            dump_tokens(expanded, cur_file_id);
+            dump_tokens(expanded, cur_filename_id);
         }
 
         // Append expanded tokens to final output (skip empty lines
@@ -286,7 +286,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     }
 
     if (g_args.options.dump_after_preprocessing) {
-        dump_logical_lines(final_lines, cur_file_id);
+        dump_logical_lines(final_lines, cur_filename_id);
         dump_symbols();
         exit(EXIT_SUCCESS);
     }
@@ -392,10 +392,10 @@ void output_preproc_output(std::string_view filename,
     SourceLoc loc;
     for (auto& line : lines) {
         // write # line "file" - if needed
-        if (line.loc.file_id != loc.file_id) {
+        if (line.loc.filename_id != loc.filename_id) {
             ofs << "# " << line.loc.line << " \"" << g_strings.view(
-                    line.loc.file_id) << "\"" << std::endl;
-            loc = SourceLoc(line.loc.file_id, line.loc.line, 1);
+                    line.loc.filename_id) << "\"" << std::endl;
+            loc = SourceLoc(line.loc.filename_id, line.loc.line, 1);
         }
         else if (loc.line > line.loc.line) {
             ofs << "# " << line.loc.line << std::endl;
@@ -449,10 +449,10 @@ void Preproc::output_dependencies(std::string_view output_filename,
     };
 
     // add all referenced files
-    for (const auto& file_id : dependency_files) {
-        if (file_id != 0 && seen_files.find(file_id) == seen_files.end()) {
-            seen_files.insert(file_id);
-            add_file(g_strings.view(file_id));
+    for (const auto& filename_id : dependency_files) {
+        if (filename_id != 0 && seen_files.find(filename_id) == seen_files.end()) {
+            seen_files.insert(filename_id);
+            add_file(g_strings.view(filename_id));
         }
     }
 

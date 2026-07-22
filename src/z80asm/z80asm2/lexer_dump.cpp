@@ -50,31 +50,31 @@ void dump_token(const Token& token) {
 }
 
 void dump_tokens(const std::vector<Token>& tokens,
-                 uint& cur_file_id) {
+                 uint& cur_filename_id) {
     for (const Token& token : tokens) {
-        if (token.loc.file_id != cur_file_id) {
-            cur_file_id = token.loc.file_id;
+        if (token.loc.filename_id != cur_filename_id) {
+            cur_filename_id = token.loc.filename_id;
             std::cout << "# file: " <<
-                      g_strings.view(cur_file_id) << std::endl;
+                      g_strings.view(cur_filename_id) << std::endl;
         }
         dump_token(token);
     }
 }
 
 void dump_logical_line(const LogicalLine& line,
-                       uint& cur_file_id) {
-    if (line.loc.file_id != cur_file_id) {
-        cur_file_id = line.loc.file_id;
+                       uint& cur_filename_id) {
+    if (line.loc.filename_id != cur_filename_id) {
+        cur_filename_id = line.loc.filename_id;
         std::cout << "# file: " <<
-                  g_strings.view(cur_file_id) << std::endl;
+                  g_strings.view(cur_filename_id) << std::endl;
     }
-    dump_tokens(line.tokens, cur_file_id);
+    dump_tokens(line.tokens, cur_filename_id);
 }
 
 void dump_logical_lines(const std::vector<LogicalLine>& lines,
-                        uint& cur_file_id) {
+                        uint& cur_filename_id) {
     for (const auto& line : lines) {
-        dump_logical_line(line, cur_file_id);
+        dump_logical_line(line, cur_filename_id);
     }
 }
 
@@ -88,14 +88,14 @@ void dump_after_tokenization_and_exit(std::string_view filename) {
     }
 
     // serialize tokens from all lines into a single vector for dumping
-    uint cur_file_id = 0;
-    dump_logical_lines(sf->lines, cur_file_id);
+    uint cur_filename_id = 0;
+    dump_logical_lines(sf->lines, cur_filename_id);
     exit(EXIT_SUCCESS);
 }
 
 [[noreturn]]
 void dump_logical_lines_and_exit(const std::vector<LogicalLine>& lines) {
-    uint cur_file_id = 0;
-    dump_logical_lines(lines, cur_file_id);
+    uint cur_filename_id = 0;
+    dump_logical_lines(lines, cur_filename_id);
     exit(EXIT_SUCCESS);
 }

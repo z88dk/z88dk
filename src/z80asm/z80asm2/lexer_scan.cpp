@@ -304,8 +304,8 @@ void tokenize_scan_line(const ScanLine& line,
         }
 
         // check for -IXIY
-        if (g_args.options.swap_ix_iy ) {
-            swap_ix_iy(ident_s, keyword);
+        if (g_args.options.swap_ixiy ) {
+            swap_ixiy(ident_s, keyword);
         }
 
         // check for ASMPC

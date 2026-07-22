@@ -439,9 +439,9 @@ private:
     // ---------------------------------------------------------------------
 
     void dump_logical_line(const LogicalLine& line,
-                           uint& cur_file_id);
+                           uint& cur_filename_id);
     void dump_macro(const Macro& macro,
-                    uint& cur_file_id);
+                    uint& cur_filename_id);
     void dump_macros();
     void dump_symbols();
 };

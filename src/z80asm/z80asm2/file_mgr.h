@@ -17,12 +17,12 @@
 #include <vector>
 
 struct RawLine {
-    SourceLoc loc;   // physical line + file_id
+    SourceLoc loc;   // physical line + filename_id
     std::string text;
 };
 
 struct SourceFile {
-    uint file_id = 0;
+    uint filename_id = 0;
     std::vector<size_t> line_offsets;   // byte offset of each line start
     std::vector<size_t> line_lengths;   // length of each line (excluding EOL)
     std::vector<LogicalLine> lines;     // tokens per line
@@ -37,7 +37,7 @@ public:
     // read source file and return normalized path and lines
     // caches file contents for later retrieval
     // returns nullptr and outputs error if the file could not be opened
-    SourceFile* get_source_file(std::string_view file, const SourceLoc& loc);
+    SourceFile* get_source_file(std::string_view filename, const SourceLoc& loc);
 
     // get a source line by filename and 1-based line number
     // tries the cached SourceFile first; if unavailable
@@ -55,7 +55,7 @@ public:
     // split content into lines and return vector of RawLine
     // with text_id and SourceLoc
     std::vector<RawLine> split_into_lines(std::string_view content,
-                                          uint file_id,
+                                          uint filename_id,
                                           size_t starting_line);
 
     // read whole binary file to a vector, caching the result
@@ -65,13 +65,13 @@ public:
             const SourceLoc& loc);
 
 private:
-    // Global cache: file_id -> SourceFile
+    // Global cache: filename_id -> SourceFile
     std::unordered_map<uint, SourceFile> source_cache;
 
     // Guard against re-entrant get_source_file during tokenization
     std::unordered_set<uint> source_loading;
 
-    // Cache: file_id -> binary file contents
+    // Cache: filename_id -> binary file contents
     std::unordered_map<uint, std::vector<uint8_t>> binary_cache;
 
     // read one line of a file

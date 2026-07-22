@@ -146,9 +146,9 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\linker.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_features.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_file.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_format.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_range_type.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_reader.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_schema.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_symbol_scope.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_symbol_type.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_writer.cpp" />
@@ -209,12 +209,16 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\lexer_tokens.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\linker.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_expr.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_extern.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_features.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_file.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_format.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_modname.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_module.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_range_type.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_reader.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_reloc.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_schema.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_section.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol_scope.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol_type.h" />
@@ -245,10 +249,8 @@
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_scan.re" />
     <None Include="..\..\src\z80asm\z80asm2\obj_features.def" />
-    <None Include="..\..\src\z80asm\z80asm2\obj_reader.cpp.bak" />
     <None Include="..\..\src\z80asm\z80asm2\options.def" />
     <None Include="..\..\src\z80asm\z80asm2\lexer_tokens.def" />
-    <None Include="..\..\src\z80asm\z80asm2\string_utils.cpp.bak" />
     <None Include="..\..\src\z80asm\z80asm2\zfloat.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

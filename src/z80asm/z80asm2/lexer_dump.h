@@ -12,11 +12,11 @@
 
 void dump_token(const Token& token);
 void dump_tokens(const std::vector<Token>& tokens,
-                 uint& cur_file_id);
+                 uint& cur_filename_id);
 void dump_logical_line(const LogicalLine& line,
-                       uint& cur_file_id);
+                       uint& cur_filename_id);
 void dump_logical_lines(const std::vector<LogicalLine>& lines,
-                        uint& cur_file_id);
+                        uint& cur_filename_id);
 
 [[noreturn]]
 void dump_after_tokenization_and_exit(std::string_view filename);

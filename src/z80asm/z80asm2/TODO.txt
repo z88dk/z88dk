@@ -17,7 +17,7 @@ No nesting
 No ambiguity
 
 Inside each module:
-.cpu, .swap_ix_iy, .symbol, .extern, .section, .expr, etc.
+.cpu, .swap_ixiy, .symbol, .extern, .section, .expr, etc.
 
 .bytes / .endbytes for large data
 

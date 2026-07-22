@@ -35,12 +35,12 @@ static std::vector<Token> tokenize_line(TokenizeState& state,
 
     int col = loc.column;
     for ([[maybe_unused]] char c : text) {
-        line.locmap.emplace_back(loc.file_id, loc.line, col++);
+        line.locmap.emplace_back(loc.filename_id, loc.line, col++);
     }
 
     // Sentinel: one past the last character, for error reporting
     // at end-of-line
-    line.locmap.emplace_back(loc.file_id, loc.line, col);
+    line.locmap.emplace_back(loc.filename_id, loc.line, col);
 
     // Tokenize
     std::vector<Token> tokens;
@@ -50,13 +50,13 @@ static std::vector<Token> tokenize_line(TokenizeState& state,
     SourceLoc end_loc;
     if (!tokens.empty()) {
         const Token& last = tokens.back();
-        end_loc.file_id = last.loc.file_id;
+        end_loc.filename_id = last.loc.filename_id;
         end_loc.line = last.loc.line;
         end_loc.column = last.loc.column +
                          static_cast<uint16_t>(g_strings.string(last.text_id).size());
     }
     else {
-        end_loc = SourceLoc(loc.file_id, loc.line, loc.column);
+        end_loc = SourceLoc(loc.filename_id, loc.line, loc.column);
     }
 
     tokens.push_back(Token::end_of_line(end_loc));
@@ -77,7 +77,7 @@ void tokenize(SourceFile& sf, std::string_view content) {
     // as a backslash at the end of a line is not a continuation if it's inside
     // a comment
     for (size_t i = 0; i < num_lines; ++i) {
-        SourceLoc loc(sf.file_id, i + 1, 1);
+        SourceLoc loc(sf.filename_id, i + 1, 1);
         std::string_view text = get_line_view(sf, content, i);
 
         // Record whether we are inside a comment before scanning
@@ -148,7 +148,7 @@ void tokenize(SourceFile& sf, std::string_view content) {
             SourceLoc end_loc;
             if (!tokens.empty()) {
                 const Token& last = tokens.back();
-                end_loc.file_id = last.loc.file_id;
+                end_loc.filename_id = last.loc.filename_id;
                 end_loc.line = last.loc.line;
                 end_loc.column = last.loc.column +
                                  static_cast<uint16_t>(g_strings.string(last.text_id).size());

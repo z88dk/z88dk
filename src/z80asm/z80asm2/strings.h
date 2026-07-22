@@ -30,7 +30,7 @@ public:
     size_t size() const;
 
     // pack to a binary data
-    void pack(BinaryData& bytes) const;
+    void pack(BinaryData& bin_data) const;
 
 private:
     std::vector<std::string> pool;

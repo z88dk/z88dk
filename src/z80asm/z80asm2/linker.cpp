@@ -16,6 +16,7 @@
 #include <string_view>
 #include <vector>
 
+#if 0
 static bool load_input_modules(LinkContext& context,
                                const std::vector<std::string>& filenames,
                                std::string_view output_dir) {
@@ -85,11 +86,11 @@ static bool load_input_libraries(LinkContext& context,
 static void build_library_index(LinkContext& context) {
     for (auto& lib : context.libraries) {
         for (auto& mod : lib->modules) {
-            for (auto& sym : mod->symbols) {
-                if (sym->scope == ObjSymbolScope::Public) {
-                    uint sym_id = g_strings.intern(sym->name_view());
+            for (auto& sym : mod.symbols) {
+                if (sym.scope == ObjSymbolScope::Public) {
+                    uint sym_id = g_strings.intern(sym.name());
                     if (context.symbol_to_module.count(sym_id) == 0) {
-                        context.symbol_to_module[sym_id] = mod.get();
+                        context.symbol_to_module[sym_id] = &mod;
                     }
                 }
             }
@@ -117,3 +118,4 @@ void link_files(const std::vector<std::string>& filenames,
     build_library_index(*context);
 
 }
+#endif

@@ -9,6 +9,7 @@
 #include "diag.h"
 #include "files.h"
 #include "obj_expr.h"
+#include "obj_extern.h"
 #include "obj_file.h"
 #include "obj_reloc.h"
 #include "options.h"
@@ -25,85 +26,7 @@
 #include "obj_symbol_scope.h"
 #include "obj_symbol_type.h"
 
-// Helper to format a vector of bytes as a hex string
-static std::string format_bytes(const std::vector<uint8_t>& bytes) {
-    std::string result;
-    for (size_t i = 0; i < bytes.size(); ++i) {
-        if (i > 0) {
-            result += " ";
-        }
-        result += int_to_hex(bytes[i]);
-    }
-    return result;
-}
-
-void ObjSection::dump(DumpContext ctx) const {
-    std::string section_name = "ObjSection: ";
-    if (name_id != 0) {
-        section_name += g_strings.string(name_id);
-    }
-    else {
-        section_name += "\"\"";
-    }
-    ctx.line(section_name);
-    auto c = ctx.child();
-
-    if (org_defined) {
-        c.line("ORG: " + int_to_hex(base_address));
-    }
-    if (section_split) {
-        c.line("Section split: true");
-    }
-    c.line("Align: " + int_to_hex(align));
-    if (!bytes.empty()) {
-        c.line("Bytes (" + std::to_string(bytes.size()) + "): " + format_bytes(bytes));
-    }
-}
-
-void ObjectModule::dump(DumpContext ctx) const {
-    ctx.line("ObjectModule: " + g_strings.string(module_name_id));
-    auto c = ctx.child();
-    c.line("CPU: " + to_string(cpu_id));
-    if (swap_ix_iy) {
-        c.line("Swap IX/IY: true");
-    }
-
-    ObjExpr::dump_exprs(c, exprs);
-
-    if (!symbols.empty()) {
-        c.line("Defined symbols:");
-        auto sc = c.child();
-        for (const auto& symbol : symbols) {
-            symbol->dump(sc);
-        }
-    }
-
-    if (!externs.empty()) {
-        c.line("External symbols:");
-        auto xc = c.child();
-        for (const auto& ext_id : externs) {
-            xc.line(g_strings.string(ext_id));
-        }
-    }
-
-    if (!sections.empty()) {
-        c.line("Sections:");
-        auto sec_c = c.child();
-        for (const auto& section : sections) {
-            section->dump(sec_c);
-        }
-    }
-}
-
-void ObjectModule::clear() {
-    cpu_id = CPU::z80;
-    swap_ix_iy = false;
-    exprs.clear();
-    symbols.clear();
-    externs.clear();
-    sections.clear();
-}
-
+#if 0
 void ObjectLibrary::dump(DumpContext ctx) const {
     ctx.line("ObjectLibrary");
     auto c = ctx.child();
@@ -211,100 +134,38 @@ static bool read_string_table(const std::vector<uint8_t> bytes, size_t pos,
     return true;
 }
 
-static size_t pack_object_externs(BinaryData& bytes,
-                                  Strings& strings,
-                                  const std::vector<uint>& externs) {
-    if (externs.empty()) {
-        return OffsetNotPresent;
-    }
-
-    size_t start_offset = bytes.size();
-    for (auto& sym : externs) {
-        bytes.put_dword(static_cast<uint32_t>(strings.intern(g_strings.view(sym))));
-    }
-
-    // end marker
-    bytes.put_dword(0);
-
-    return start_offset;
-}
-
-static size_t pack_object_modname(BinaryData& bytes,
-                                  Strings& strings,
-                                  std::string_view modname) {
-    size_t start_offset = bytes.size();
-    bytes.put_dword(static_cast<uint32_t>(strings.intern(modname)));
-    return start_offset;
-}
-
-static size_t pack_object_sections(BinaryData& bytes,
-                                   Strings& strings,
-                                   const std::vector<std::unique_ptr<ObjSection>>& sections) {
-    if (sections.empty()) {
-        return OffsetNotPresent;
-    }
-
-    size_t start_offset = bytes.size();
-    for (auto& section : sections) {
-        bytes.put_dword(static_cast<uint32_t>(section->bytes.size()));
-        bytes.put_dword(static_cast<uint32_t>(strings.intern(g_strings.view(
-                section->name_id))));
-
-        if (!section->org_defined) {
-            bytes.put_dword(static_cast<uint32_t>(ObjSection::OrgNotDefined));
-        }
-        else if (section->section_split) {
-            bytes.put_dword(static_cast<uint32_t>(ObjSection::OrgSectionSplit));
-        }
-        else {
-            bytes.put_dword(static_cast<uint32_t>(section->base_address));
-        }
-
-        bytes.put_dword(static_cast<uint32_t>(section->align));
-
-        // append the binary data
-        bytes.put_data(section->bytes.data(), section->bytes.size());
-
-        // align
-        bytes.align(4);
-    }
-
-    // end marker
-    bytes.put_dword(OffsetNotPresent);
-
-    return start_offset;
-}
-
-static void pack_object_module(BinaryData& bytes,
-                               const ObjectModule& obj_mod) {
+static void pack_object_module(BinaryData& bin_data,
+                               const ObjModule& obj_mod) {
     Strings strings;
 
     // mark the start for the relative pointers
-    size_t base = bytes.size();
+    size_t base = bin_data.size();
 
     // add signature
-    bytes.put_string(obj_file_signature());
+    bin_data.put_string(obj_file_signature());
 
     // add CPU and IXIY
-    bytes.put_dword(static_cast<uint32_t>(g_args.options.cpu_id));
-    bytes.put_dword(static_cast<uint32_t>(g_args.options.swap_ix_iy));
+    bin_data.put_dword(static_cast<uint32_t>(g_args.options.cpu_id));
+    bin_data.put_dword(static_cast<uint32_t>(g_args.options.swap_ixiy));
 
     // append placeholders for 6 pointers to file sections
-    size_t header_ptr = bytes.size();
+    size_t header_ptr = bin_data.size();
     for (int i = 0; i < 7; i++) {
-        bytes.put_dword(OffsetNotPresent);
+        bin_data.put_dword(OffsetNotPresent);
     }
 
     // write each of the sections and collect the addresses
-    size_t expr_ptr = ObjExpr::pack_exprs(bytes, strings, obj_mod.exprs);
-    size_t relocs_ptr = ObjReloc::pack_relocs(bytes, strings, obj_mod.relocs);
-    size_t symbols_ptr = ObjSymbol::pack_symbols(bytes, strings, obj_mod.symbols);
-    size_t externs_ptr = pack_object_externs(bytes, strings, obj_mod.externs);
-    size_t modname_ptr = pack_object_modname(bytes, strings,
-                         g_strings.view(obj_mod.module_name_id));
-    size_t sections_ptr = pack_object_sections(bytes, strings, obj_mod.sections);
-    size_t st_ptr = bytes.size();
-    strings.pack(bytes);
+    size_t expr_ptr = ObjExpr::pack_exprs(bin_data, strings, obj_mod.exprs);
+    size_t relocs_ptr = ObjReloc::pack_relocs(bin_data, strings, obj_mod.relocs);
+    size_t symbols_ptr = ObjSymbol::pack_symbols(bin_data, strings,
+                         obj_mod.symbols);
+    size_t externs_ptr = ObjExtern::pack_externs(bin_data, strings,
+                         obj_mod.externs);
+    size_t modname_ptr = obj_mod.modname.pack(bin_data, strings);
+    size_t sections_ptr = ObjSection::pack_sections(bin_data, strings,
+                          obj_mod.sections);
+    size_t strings_ptr = bin_data.size();
+    strings.pack(bin_data);
 
     // write pointers to areas
     auto calc_offset = [](size_t offset, size_t base) -> size_t {
@@ -316,64 +177,73 @@ static void pack_object_module(BinaryData& bytes,
         }
     };
     size_t ptr = header_ptr;
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(modname_ptr,  base)));
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(expr_ptr,     base)));
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(relocs_ptr,   base)));
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(symbols_ptr,  base)));
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(externs_ptr,  base)));
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(sections_ptr, base)));
-    bytes.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(st_ptr,       base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(modname_ptr,
+                          base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(expr_ptr,
+                          base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(relocs_ptr,
+                          base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(symbols_ptr,
+                          base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(externs_ptr,
+                          base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(sections_ptr,
+                          base)));
+    bin_data.put_dword_at(ptr, static_cast<uint32_t>(calc_offset(strings_ptr,
+                          base)));
 }
 
-static void pack_object_library(BinaryData& bytes,
+static void pack_object_library(BinaryData& bin_data,
                                 const ObjectLibrary& obj_lib) {
     // add signature
-    bytes.put_string(lib_file_signature());
+    bin_data.put_string(lib_file_signature());
 
     // add symbol index placeholder
-    //size_t symbol_index_ptr = bytes.size();
-    bytes.put_dword(OffsetNotPresent);   // symbol index pointer
+    //size_t symbol_index_ptr = bin_data.size();
+    bin_data.put_dword(OffsetNotPresent);   // symbol index pointer
 
     // add string table pointer placeholder
-    size_t string_table_ptr = bytes.size();
-    bytes.put_dword(OffsetNotPresent);   // string table pointer
+    size_t string_table_ptr = bin_data.size();
+    bin_data.put_dword(OffsetNotPresent);   // string table pointer
 
     // add each module
     size_t prev_ptr = 0;
     for (auto& obj_mod : obj_lib.modules) {
         // append header
-        prev_ptr = bytes.size();
-        bytes.put_dword(OffsetNotPresent);   // next module
-        size_t len_ptr = bytes.size();
-        bytes.put_dword(0);     // length of this module
+        prev_ptr = bin_data.size();
+        bin_data.put_dword(OffsetNotPresent);   // next module
+        size_t len_ptr = bin_data.size();
+        bin_data.put_dword(0);     // length of this module
 
         // append module
-        size_t mod_pos = bytes.size();
-        pack_object_module(bytes, *obj_mod);
-        size_t next_ptr = bytes.size();
+        size_t mod_pos = bin_data.size();
+        pack_object_module(bin_data, *obj_mod);
+        size_t next_ptr = bin_data.size();
         size_t mod_size = next_ptr - mod_pos;
 
         // patch values
-        bytes.patch_dword(prev_ptr, static_cast<uint32_t>(next_ptr));     // next module
-        bytes.patch_dword(len_ptr,
-                          static_cast<uint32_t>(mod_size));      // length of this module
+        bin_data.patch_dword(prev_ptr,
+                             static_cast<uint32_t>(next_ptr));     // next module
+        bin_data.patch_dword(len_ptr,
+                             static_cast<uint32_t>(mod_size));      // length of this module
     }
 
     // mark the end of the chain
     if (prev_ptr != 0) {        // any module written
-        bytes.patch_dword(prev_ptr, OffsetNotPresent);   // next module
+        bin_data.patch_dword(prev_ptr, OffsetNotPresent);   // next module
     }
 
     // patch the string pointer
-    size_t string_table_offset = bytes.size();
-    bytes.patch_dword(string_table_ptr, static_cast<uint32_t>(string_table_offset));
+    size_t string_table_offset = bin_data.size();
+    bin_data.patch_dword(string_table_ptr,
+                         static_cast<uint32_t>(string_table_offset));
 
     // write the string table
     Strings public_symbols;
     for (auto name_id : obj_lib.public_symbols) {
         public_symbols.intern(g_strings.view(name_id));
     }
-    public_symbols.pack(bytes);
+    public_symbols.pack(bin_data);
 }
 
 bool write_object_library(const ObjectLibrary& obj_lib,
@@ -383,12 +253,12 @@ bool write_object_library(const ObjectLibrary& obj_lib,
     }
 
     // pack
-    BinaryData bytes;
-    pack_object_library(bytes, obj_lib);
+    BinaryData bin_data;
+    pack_object_library(bin_data, obj_lib);
 
     // write file
     std::string filename_s(filename);
-    if (!write_binary_file(filename, bytes.bytes)) {
+    if (!write_binary_file(filename, bin_data.bytes)) {
         g_diag.error(SourceLoc(), "Cannot create file: " + filename_s);
         return false;
     }
@@ -398,7 +268,7 @@ bool write_object_library(const ObjectLibrary& obj_lib,
 
 static bool unpack_object_exprs(const std::vector<uint8_t> bytes,
                                 size_t base_pos,
-                                ObjectModule& obj_mod,
+                                ObjModule& obj_mod,
                                 Strings& strings) {
     size_t pos = base_pos;
 
@@ -415,18 +285,18 @@ static bool unpack_object_exprs(const std::vector<uint8_t> bytes,
         }
 
         // read location
-        uint file_id = 0;
-        if (!read_int32(bytes, pos, file_id)) {
+        uint filename_id = 0;
+        if (!read_int32(bytes, pos, filename_id)) {
             return false;
         }
-        std::string_view file_name = strings.view(file_id);
+        std::string_view filename = strings.view(filename_id);
 
         uint line = 0;
         if (!read_int32(bytes, pos, line)) {
             return false;
         }
 
-        expr->set_file(file_name);
+        expr->set_filename(filename);
         expr->line = line;
 
         // read section name
@@ -473,7 +343,7 @@ static bool unpack_object_exprs(const std::vector<uint8_t> bytes,
 
 static bool unpack_object_symbols(const std::vector<uint8_t> bytes,
                                   size_t base_pos,
-                                  ObjectModule& obj_mod,
+                                  ObjModule& obj_mod,
                                   Strings& strings) {
     size_t pos = base_pos;
 
@@ -510,11 +380,11 @@ static bool unpack_object_symbols(const std::vector<uint8_t> bytes,
         }
         sym->set_name(strings.view(name_id));
 
-        uint file_id = 0;
-        if (!read_int32(bytes, pos, file_id)) {
+        uint filename_id = 0;
+        if (!read_int32(bytes, pos, filename_id)) {
             return false;
         }
-        sym->set_file(strings.view(file_id));
+        sym->set_filename(strings.view(filename_id));
 
         if (!read_int32(bytes, pos, sym->line)) {
             return false;
@@ -527,7 +397,7 @@ static bool unpack_object_symbols(const std::vector<uint8_t> bytes,
 
 static bool unpack_object_externs(const std::vector<uint8_t> bytes,
                                   size_t base_pos,
-                                  ObjectModule& obj_mod,
+                                  ObjModule& obj_mod,
                                   Strings& strings) {
     size_t pos = base_pos;
 
@@ -542,7 +412,9 @@ static bool unpack_object_externs(const std::vector<uint8_t> bytes,
             break;      // end of externs
         }
 
-        obj_mod.externs.push_back(g_strings.intern(strings.view(name_id)));
+        auto extern_ = std::make_unique<ObjExtern>();
+        extern_->set_name(strings.view(name_id));
+        obj_mod.externs.push_back(std::move(extern_));
     }
 
     return true;
@@ -550,7 +422,7 @@ static bool unpack_object_externs(const std::vector<uint8_t> bytes,
 
 static bool unpack_object_sections(const std::vector<uint8_t> bytes,
                                    size_t base_pos,
-                                   ObjectModule& obj_mod,
+                                   ObjModule& obj_mod,
                                    Strings& strings) {
     size_t pos = base_pos;
 
@@ -570,27 +442,10 @@ static bool unpack_object_sections(const std::vector<uint8_t> bytes,
         if (!read_int32(bytes, pos, name_id)) {
             return false;
         }
-        section->name_id = g_strings.intern(strings.view(name_id));
+        section->set_name(strings.view(name_id));
 
-        int org_value = 0;
-        if (!read_int32(bytes, pos, org_value)) {
+        if (!read_int32(bytes, pos, section->base_address)) {
             return false;
-        }
-
-        if (org_value == ObjSection::OrgNotDefined) {
-            section->org_defined = false;
-            section->section_split = false;
-            section->base_address = 0;
-        }
-        else if (org_value == ObjSection::OrgSectionSplit) {
-            section->org_defined = false;
-            section->section_split = true;
-            section->base_address = 0;
-        }
-        else {
-            section->org_defined = true;
-            section->section_split = false;
-            section->base_address = static_cast<uint>(org_value);
         }
 
         if (!read_int32(bytes, pos, section->align)) {
@@ -598,13 +453,14 @@ static bool unpack_object_sections(const std::vector<uint8_t> bytes,
         }
 
         // read the binary data
-        section->bytes.reserve(section_size);
+        std::vector<uint8_t> data;
+        data.reserve(section_size);
         for (size_t i = 0; i < section_size; i++) {
             uint8_t c = 0;
             if (!read_int32(bytes, pos, c)) {
                 return false;
             }
-            section->bytes.push_back(c);
+            data.push_back(c);
         }
 
         // align to 4 bytes
@@ -616,6 +472,8 @@ static bool unpack_object_sections(const std::vector<uint8_t> bytes,
             release_assert(c == 0);
         }
 
+        section->set_bytes(BytesView(data.data(), data.size()));
+
         obj_mod.sections.push_back(std::move(section));
     }
 
@@ -624,7 +482,7 @@ static bool unpack_object_sections(const std::vector<uint8_t> bytes,
 
 static bool unpack_object_module(const std::vector<uint8_t> bytes,
                                  size_t base_pos,
-                                 ObjectModule& obj_mod) {
+                                 ObjModule& obj_mod) {
     size_t pos = base_pos + SignatureSize;  // signature already read
 
     // read CPU and swap IX/IY
@@ -633,8 +491,8 @@ static bool unpack_object_module(const std::vector<uint8_t> bytes,
         return false;
     }
 
-    obj_mod.swap_ix_iy = false;
-    if (!read_int32(bytes, pos, obj_mod.swap_ix_iy)) {
+    obj_mod.swap_ixiy = false;
+    if (!read_int32(bytes, pos, obj_mod.swap_ixiy)) {
         return false;
     }
 
@@ -682,7 +540,7 @@ static bool unpack_object_module(const std::vector<uint8_t> bytes,
     if (!read_int32(bytes, pos, modname_id)) {
         return false;
     }
-    obj_mod.module_name_id = g_strings.intern(strings.view(modname_id));
+    obj_mod.modname.set_name(strings.view(modname_id));
 
     // read expressions
     pos = base_pos + expr_pos;
@@ -725,7 +583,7 @@ static bool unpack_object_library(const std::vector<uint8_t> bytes,
     // check signature
     if (signature == obj_file_signature()) {
         // create a new module and unpack it
-        auto module = std::make_unique<ObjectModule>();
+        auto module = std::make_unique<ObjModule>();
         if (!unpack_object_module(bytes, base_pos, *module)) {
             return false;
         }
@@ -764,7 +622,7 @@ static bool unpack_object_library(const std::vector<uint8_t> bytes,
 
             if (module_size > 0) {  // not "deleted"
                 // create a new module and unpack it
-                auto module = std::make_unique<ObjectModule>();
+                auto module = std::make_unique<ObjModule>();
                 if (!unpack_object_module(bytes, pos, *module)) {
                     return false;
                 }
@@ -812,3 +670,4 @@ void dump_obj_lib_and_exit(const ObjectLibrary& obj_lib) {
     obj_lib.dump(ctx);
     std::exit(EXIT_SUCCESS);
 }
+#endif

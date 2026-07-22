@@ -10,12 +10,12 @@
 #include <vector>
 
 void Preproc::dump_logical_line(const LogicalLine& line,
-                                uint& cur_file_id) {
-    dump_tokens(line.tokens, cur_file_id);
+                                uint& cur_filename_id) {
+    dump_tokens(line.tokens, cur_filename_id);
 }
 
 void Preproc::dump_macro(const Macro& macro,
-                         uint& cur_file_id) {
+                         uint& cur_filename_id) {
     if (macro.is_multiline) {
         std::vector<Token> header_tokens;
         header_tokens.push_back(Token::identifier("MACRO", macro.loc));
@@ -37,15 +37,15 @@ void Preproc::dump_macro(const Macro& macro,
         }
         header_tokens.push_back(Token::end_of_line(macro.loc));
 
-        dump_tokens(header_tokens, cur_file_id);
+        dump_tokens(header_tokens, cur_filename_id);
 
         for (const auto& line : macro.lines) {
-            dump_logical_line(line, cur_file_id);
+            dump_logical_line(line, cur_filename_id);
         }
 
         std::vector<Token> endm_tokens;
         endm_tokens.push_back(Token::identifier("ENDM", macro.loc));
-        dump_tokens(endm_tokens, cur_file_id);
+        dump_tokens(endm_tokens, cur_filename_id);
     }
     else {
         std::vector<Token> define_tokens;
@@ -70,7 +70,7 @@ void Preproc::dump_macro(const Macro& macro,
                                     TokenType::EQ, "=", macro.loc));
         define_tokens.insert(define_tokens.end(),
                              macro.tokens.begin(), macro.tokens.end());
-        dump_tokens(define_tokens, cur_file_id);
+        dump_tokens(define_tokens, cur_filename_id);
     }
 }
 
@@ -92,9 +92,9 @@ void Preproc::dump_macros() {
     // Dump each macro
     for (const Macro* m : sorted) {
         // force a visual separator between macros
-        uint cur_file_id = 0;
+        uint cur_filename_id = 0;
 
-        dump_macro(*m, cur_file_id);
+        dump_macro(*m, cur_filename_id);
     }
 }
 
