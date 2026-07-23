@@ -449,11 +449,11 @@ void Args::parse_arg(std::string_view arg,
             if (!cpu_lookup(opt_arg, cpu_id)) {
                 g_diag.error(loc, "Invalid cpu: " + opt_arg);
                 std::string valid_cpus;
-                for (const auto& name_id : cpu_names()) {
+                for (const auto& name : cpu_names()) {
                     if (!valid_cpus.empty()) {
                         valid_cpus += ", ";
                     }
-                    valid_cpus += g_strings.view(name_id);
+                    valid_cpus += name;
                 }
                 g_diag.note(loc, "Valid CPUs are: " + valid_cpus);
                 return;
@@ -1004,12 +1004,12 @@ void Args::search_source_file(std::string_view filename_,
 
 void Args::define_constants_from_options() {
     // define constants for CPU
-    for (auto var_id : cpu_all_defines()) {
-        options.global_defs.erase(var_id);
+    for (auto& var : cpu_all_defines()) {
+        options.global_defs.erase(g_strings.intern(var));
     }
 
-    for (auto var_id : cpu_defines(options.cpu_id)) {
-        options.global_defs.set(var_id, 1, SourceLoc("<builtin>", 1, 1));
+    for (auto var : cpu_defines(options.cpu_id)) {
+        options.global_defs.set(g_strings.intern(var), 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // if -IXIY is specified, define __SWAP_IX_IY__ to 1 for conditional assembly
@@ -1020,10 +1020,10 @@ void Args::define_constants_from_options() {
     }
 
     // define constants for float format
-    for (auto var_id : float_format_all_defines()) {
-        options.global_defs.erase(var_id);
+    for (auto& var : float_format_all_defines()) {
+        options.global_defs.erase(g_strings.intern(var));
     }
-    auto float_format_define_id = float_format_define(options.float_format);
-    options.global_defs.set(float_format_define_id, 1, SourceLoc("<builtin>", 1,
-                            1));
+    auto var = float_format_define(options.float_format);
+    options.global_defs.set(g_strings.intern(var), 1,
+                            SourceLoc("<builtin>", 1, 1));
 }

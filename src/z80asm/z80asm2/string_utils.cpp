@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 static constexpr std::string_view blanks = " \t\r\n\v\f";
 
@@ -119,4 +120,30 @@ std::string int_to_hex(int64_t value) {
             << value;
     }
     return oss.str();
+}
+
+std::vector<std::string_view> split_spaces(std::string_view s) {
+    std::vector<std::string_view> out;
+
+    while (!s.empty()) {
+        // Trim leading spaces
+        size_t start = s.find_first_not_of(' ');
+        if (start == std::string_view::npos) {
+            break;
+        }
+
+        s.remove_prefix(start);
+
+        // Find next space
+        size_t end = s.find(' ');
+        if (end == std::string_view::npos) {
+            out.push_back(s);
+            break;
+        }
+
+        out.push_back(s.substr(0, end));
+        s.remove_prefix(end + 1);
+    }
+
+    return out;
 }

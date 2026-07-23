@@ -2216,11 +2216,11 @@ void Preproc::do_ASSUME(bool adl_value, const SourceLoc& kw_loc) {
     }
 
     // change constants for CPU
-    for (auto var_id : cpu_all_defines()) {
-        const_symbols.erase(var_id);
+    for (auto& var : cpu_all_defines()) {
+        const_symbols.erase(g_strings.intern(var));
     }
-    for (auto var_id : cpu_defines(preproc_cpu_id)) {
-        const_symbols.set(var_id, 1, SourceLoc("<builtin>", 1, 1));
+    for (auto& var : cpu_defines(preproc_cpu_id)) {
+        const_symbols.set(g_strings.intern(var), 1, SourceLoc("<builtin>", 1, 1));
     }
 
     // create PRAGMA CPU_ADL 0/1 and push to output queue
@@ -2801,11 +2801,11 @@ void Preproc::process_SETFLOAT(Keyword kw, const SourceLoc&, ParseLine& pline) {
 
     // set the float format and change defines
     preproc_float_format = fmt;
-    for (auto var_id : float_format_all_defines()) {
-        const_symbols.erase(var_id);
+    for (auto& var : float_format_all_defines()) {
+        const_symbols.erase(g_strings.intern(var));
     }
-    auto float_format_define_id = float_format_define(preproc_float_format);
-    const_symbols.set(float_format_define_id, 1, SourceLoc("<builtin>", 1, 1));
+    auto var = float_format_define(preproc_float_format);
+    const_symbols.set(g_strings.intern(var), 1, SourceLoc("<builtin>", 1, 1));
 }
 
 void Preproc::process_FLOAT(Keyword kw, const SourceLoc& kw_loc,

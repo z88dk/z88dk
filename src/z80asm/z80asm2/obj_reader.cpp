@@ -61,32 +61,16 @@ std::unique_ptr<ModuleReader> read_module_file(std::string_view filename) {
 
 ObjReader::ObjReader(std::shared_ptr<const BinaryFile> file,
                      size_t base_offset, size_t object_size)
-    : file_(std::move(file)), obj_schema_(file_, base_offset, object_size) {
+    : obj_schema_(file, base_offset, object_size) {
     module_.cpu_id = obj_schema_.cpu_id;
     module_.swap_ixiy = obj_schema_.swap_ixiy;
     module_.base_address = obj_schema_.base_address;
 }
 
-ObjFileType ObjReader::type() const {
-    return ObjFileType::Object;
-}
-
-std::shared_ptr<const BinaryFile> ObjReader::file() const {
-    return file_;
-}
-
-const ObjSchema& ObjReader::obj_schema() const {
-    return obj_schema_;
-}
-
-int ObjReader::version() const {
-    return obj_schema_.version;
-}
-
 const StringsView& ObjReader::strings() {
     if (!strings_loaded_) {
         if (obj_features(version()).has_string_table) {
-            strings_.unpack(file_, obj_schema_.strings.offset);
+            strings_.unpack(file(), obj_schema_.strings.offset);
         }
         strings_loaded_ = true;
     }
@@ -101,7 +85,7 @@ const ObjModuleView& ObjReader::module() {
 const ObjModnameView& ObjReader::modname() {
     if (!module_.modname.loaded) {
         size_t ptr = obj_schema_.modname.offset;
-        module_.modname.value.unpack(file_, version(), strings(), ptr);
+        module_.modname.value.unpack(file(), version(), strings(), ptr);
         module_.modname.loaded = true;
     }
 
@@ -114,7 +98,7 @@ const std::vector<ObjExprView>& ObjReader::exprs() {
             size_t ptr = obj_schema_.exprs.offset;
             size_t end_offset = obj_schema_.exprs.offset +
                                 obj_schema_.exprs.size;
-            ObjExprView::unpack_exprs(file_, version(), strings(),
+            ObjExprView::unpack_exprs(file(), version(), strings(),
                                       ptr, end_offset,
                                       module_.exprs.value);
         }
@@ -130,7 +114,7 @@ const std::vector<ObjRelocView>& ObjReader::relocs() {
             size_t ptr = obj_schema_.relocs.offset;
             size_t end_offset = obj_schema_.relocs.offset +
                                 obj_schema_.relocs.size;
-            ObjRelocView::unpack_relocs(file_, version(), strings(),
+            ObjRelocView::unpack_relocs(file(), version(), strings(),
                                         ptr, end_offset,
                                         module_.relocs.value);
         }
@@ -146,7 +130,7 @@ const std::vector<ObjSymbolView>& ObjReader::symbols() {
             size_t ptr = obj_schema_.symbols.offset;
             size_t end_offset = obj_schema_.symbols.offset +
                                 obj_schema_.symbols.size;
-            ObjSymbolView::unpack_symbols(file_, version(), strings(),
+            ObjSymbolView::unpack_symbols(file(), version(), strings(),
                                           ptr, end_offset,
                                           module_.symbols.value);
         }
@@ -162,7 +146,7 @@ const std::vector<ObjExternView>& ObjReader::externs() {
             size_t ptr = obj_schema_.externs.offset;
             size_t end_offset = obj_schema_.externs.offset +
                                 obj_schema_.externs.size;
-            ObjExternView::unpack_externs(file_, version(), strings(),
+            ObjExternView::unpack_externs(file(), version(), strings(),
                                           ptr, end_offset,
                                           module_.externs.value);
         }
@@ -178,7 +162,7 @@ const std::vector<ObjSectionView>& ObjReader::sections() {
             size_t ptr = obj_schema_.sections.offset;
             size_t end_offset = obj_schema_.sections.offset +
                                 obj_schema_.sections.size;
-            ObjSectionView::unpack_sections(file_, version(), strings(),
+            ObjSectionView::unpack_sections(file(), version(), strings(),
                                             ptr, end_offset,
                                             module_.sections.value);
         }
@@ -290,7 +274,8 @@ void pack_module(BinaryData& bin_data, const ObjModule& mod) {
     size_t symbols_ptr = ObjSymbol::pack_symbols(bin_data, strings, mod.symbols);
     size_t externs_ptr = ObjExtern::pack_externs(bin_data, strings, mod.externs);
     size_t modname_ptr = mod.modname.pack(bin_data, strings);
-    size_t sections_ptr = ObjSection::pack_sections(bin_data, strings, mod.sections);
+    size_t sections_ptr = ObjSection::pack_sections(bin_data, strings,
+                          mod.sections);
     size_t strings_ptr = bin_data.size();
     strings.pack(bin_data);
 
@@ -302,23 +287,23 @@ void pack_module(BinaryData& bin_data, const ObjModule& mod) {
         else {
             return offset - base;
         }
-        };
+    };
 
     size_t ptr = header_ptr;
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(modname_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(modname_ptr, base)));
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(exprs_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(exprs_ptr, base)));
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(relocs_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(relocs_ptr, base)));
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(symbols_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(symbols_ptr, base)));
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(externs_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(externs_ptr, base)));
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(sections_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(sections_ptr, base)));
     bin_data.put_dword_at(ptr,
-        static_cast<uint32_t>(calc_offset(strings_ptr, base)));
+                          static_cast<uint32_t>(calc_offset(strings_ptr, base)));
 }
 
 //-----------------------------------------------------------------------------
@@ -326,31 +311,14 @@ void pack_module(BinaryData& bin_data, const ObjModule& mod) {
 //-----------------------------------------------------------------------------
 
 LibReader::LibReader(std::shared_ptr<const BinaryFile> file)
-    : file_(std::move(file)), lib_schema_(file_) {
+    : lib_schema_(file) {
 }
-
-ObjFileType LibReader::type() const {
-	return ObjFileType::Library;
-}
-
-std::shared_ptr<const BinaryFile> LibReader::file() const {
-	return file_;
-}
-
-const LibSchema& LibReader::lib_schema() const {
-	return lib_schema_;
-}
-
-int LibReader::version() const {
-	return lib_schema_.version;
-}
-
-
 
 const StringsView& LibReader::strings() {
     if (!strings_loaded_) {
         if (obj_features(version()).has_string_table) {
-            strings_.unpack(file_, lib_schema_.strings.offset);
+            release_assert(lib_schema_.strings.present);
+            strings_.unpack(file(), lib_schema_.strings.offset);
         }
         strings_loaded_ = true;
     }
@@ -358,3 +326,55 @@ const StringsView& LibReader::strings() {
     return strings_;
 }
 
+const SymbolIndex& LibReader::symbol_index() {
+    if (!symbol_index_loaded_) {
+        load_symbol_index();
+        symbol_index_loaded_ = true;
+    }
+
+    return symbol_index_;
+}
+
+void LibReader::load_symbol_index() {
+    symbol_index_.clear();
+
+    if (obj_features(version()).has_symbol_index) {
+        release_assert(lib_schema_.symbol_index.present);
+        size_t cpu_ptr = lib_schema_.symbol_index.offset;
+        auto f = file();
+        auto st = strings();
+        while (true) {
+            // get next CPU
+            CPU cpu_id = static_cast<CPU>(f->get_dword(cpu_ptr));
+            if (cpu_id == CPU::none) {
+                break;		// terminator
+            }
+            bool swap_ixiy = !!f->get_dword(cpu_ptr);
+
+            size_t table_ptr = f->get_dword(cpu_ptr);
+            size_t table_size = f->get_dword(cpu_ptr);
+
+            CpuKey cpu_key = {cpu_id, swap_ixiy};
+            auto cpu_table = symbol_index_[cpu_key];
+
+            // read table
+            for (size_t i = 0; i < table_size; i++) {
+                uint id = f->get_dword(table_ptr);
+                std::string_view symbol = st.view(id);
+                uint symbol_id = g_strings.intern(symbol);
+                size_t module_offset = f->get_dword(table_ptr);
+
+                auto it = cpu_table.find(symbol_id);
+                if (it == cpu_table.end()) {	// only register the first entry
+                    cpu_table[symbol_id] = module_offset;
+                }
+            }
+        }
+    }
+    else {
+        build_symbol_index();
+    }
+}
+
+void LibReader::build_symbol_index() {
+}

@@ -135,25 +135,53 @@ struct SectionInfo {
     size_t offset = OffsetNotPresent;   // file offset of section
     size_t size = 0;                    // optional, depending on section
     bool present = false;               // convenience
+
+    SectionInfo() = default;
+    SectionInfo(size_t offset_, size_t size_ = 0, bool present_ = true)
+        : offset(offset_), size(size_), present(present_) {}
 };
 
 //-----------------------------------------------------------------------------
-// Object file format
+// Object file schema
 //-----------------------------------------------------------------------------
 
-struct ObjSchema {
-    explicit ObjSchema(std::shared_ptr<const BinaryFile> file_,
-                       size_t base_offset_, size_t size_);
+struct CommonSchema {
+    explicit CommonSchema(std::shared_ptr<const BinaryFile> file_,
+                          size_t base_offset_, size_t size_);
 
     std::shared_ptr<const BinaryFile> file;
     size_t base_offset = 0;
-	size_t size = 0;
+    size_t size = 0;
+    ObjFileType type = ObjFileType::None;
     int version = 0;
-	
+
+    size_t start_offset() const {
+        return base_offset + SignatureSize;
+    }
+    size_t end_offset() const {
+        return base_offset + size;
+    }
+
+    [[noreturn]]
+    void invalid_file_error(std::string_view message) const;
+
+protected:
+    SectionInfo load_offset(size_t& ptr, std::string_view pointer_name);
+    static size_t calc_end_offset(const SectionInfo& info, size_t next_offset) {
+        return info.present ? info.offset : next_offset;
+    };
+};
+
+//-----------------------------------------------------------------------------
+
+struct ObjSchema : public CommonSchema {
+    explicit ObjSchema(std::shared_ptr<const BinaryFile> file_,
+                       size_t base_offset_, size_t size_);
+
     uint base_address = OrgNotDefined;
     CPU cpu_id = DEFAULT_CPU;
     bool swap_ixiy = false;
-	
+
     SectionInfo exprs;
     SectionInfo relocs;
     SectionInfo symbols;
@@ -164,18 +192,12 @@ struct ObjSchema {
 };
 
 //-----------------------------------------------------------------------------
-// Library file format
-//-----------------------------------------------------------------------------
 
-struct LibSchema {
+struct LibSchema : public CommonSchema {
     explicit LibSchema(std::shared_ptr<const BinaryFile> file_);
 
-    std::shared_ptr<const BinaryFile> file;
-    size_t base_offset = 0;
-	size_t size = 0;
-    int version = 0;
-	
     std::vector<SectionInfo> modules;
+    std::unordered_map<size_t, size_t> offset_to_index;
     SectionInfo strings;
     SectionInfo symbol_index;
 };

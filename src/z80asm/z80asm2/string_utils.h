@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <vector>
 
 // Convert string to upper case
 std::string to_lower(std::string_view s);
@@ -34,6 +35,9 @@ std::string escape_string(std::string_view s);
 
 // Helper function to format integer as hex string
 std::string int_to_hex(int64_t value);
+
+// split string view by spaces
+std::vector<std::string_view> split_spaces(std::string_view s);
 
 // safe ctype functions that work with signed char values
 inline bool is_space(char c) {

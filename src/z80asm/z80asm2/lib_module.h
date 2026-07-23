@@ -34,40 +34,23 @@
 #include <vector>
 
 //-----------------------------------------------------------------------------
-// Module type
+// Library type
 //-----------------------------------------------------------------------------
 
-// ObjModuleBase is pure data; dumping, packing and unpacking is done
-// by free functions
 template <typename Storage, template <typename> class Container>
-struct ObjModuleBase {
-    using Expr = ObjExprBase<Storage>;
-    using Reloc = ObjRelocBase<Storage>;
-    using Symbol = ObjSymbolBase<Storage>;
-    using Extern = ObjExternBase<Storage>;
-    using Section = ObjSectionBase<Storage>;
-    using Modname = ObjModnameBase<Storage>;
+struct LibModuleBase {
+    using Module = ObjModuleBase<Storage, Container>;
 
-    // attributes
-    CPU cpu_id = DEFAULT_CPU;
-    bool swap_ixiy = false;
-    uint base_address = OrgNotDefined;
-
-    Container<Modname> modname;
-    Container<std::vector<Expr>>    exprs;
-    Container<std::vector<Reloc>>   relocs;
-    Container<std::vector<Symbol>>  symbols;
-    Container<std::vector<Extern>>  externs;
-    Container<std::vector<Section>> sections;
+    std::vector<Module> modules;
 
     // constructors
-    ObjModuleBase() = default;
-    virtual ~ObjModuleBase() = default;
+    LibModuleBase() = default;
+    virtual ~LibModuleBase() = default;
 };
 
 // Assembler: owning, eager
-using ObjModule = ObjModuleBase<InternedStorage, Eager>;
+using LibModule = LibModuleBase<InternedStorage, Eager>;
 
 // Linker: non-owning, lazy
-using ObjModuleView = ObjModuleBase<ViewStorage, Lazy>;
+using LibModuleView = LibModuleBase<ViewStorage, Lazy>;
 

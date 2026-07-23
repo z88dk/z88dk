@@ -57,11 +57,11 @@ struct ObjExprBase : public TreeNode {
           filename_(g_strings.intern(v.filename_)),
           line(v.line),
           section_name_(g_strings.intern(v.section_name_)),
-          target_name_(g_strings.intern(v.target_name_)),
-          text_(g_strings.intern(v.text_)),
           asmpc(v.asmpc),
           patch_ptr(v.patch_ptr),
-          opcode_size(v.opcode_size) {
+          opcode_size(v.opcode_size),
+          target_name_(g_strings.intern(v.target_name_)),
+          text_(g_strings.intern(v.text_)) {
     }
 
     // accessors

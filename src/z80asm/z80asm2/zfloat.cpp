@@ -7,15 +7,16 @@
 #include "diag.h"
 #include "lexer_tokens.h"
 #include "release_assert.h"
-#include "strings.h"
 #include "string_utils.h"
+#include "strings.h"
 #include "zfloat.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <iterator>
-#include <string.h>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -31,6 +32,10 @@ static constexpr std::string_view float_formats_lu_table[] = {
 
 std::string to_string(FloatFormat fmt) {
     return std::string(float_formats_lu_table[static_cast<size_t>(fmt)]);
+}
+
+std::string_view to_view(FloatFormat fmt) {
+    return float_formats_lu_table[static_cast<size_t>(fmt)];
 }
 
 bool float_format_lookup(std::string_view str, FloatFormat& out_fmt) {
@@ -50,17 +55,14 @@ bool float_format_lookup(std::string_view str, FloatFormat& out_fmt) {
     }
 }
 
-std::vector<uint> float_formats() {
-    static const std::vector<uint> formats = []() {
-        std::vector<uint> v;
+std::vector<std::string_view> float_formats() {
+    static const std::vector<std::string_view> formats = []() {
+        std::vector<std::string_view> v;
         v.reserve(std::size(float_formats_lu_table));
         for (auto s : float_formats_lu_table) {
-            v.push_back(g_strings.intern(s));
+            v.push_back(s);
         }
-        std::sort(v.begin(), v.end(),
-        [](uint a, uint b) {
-            return g_strings.view(a) < g_strings.view(b);
-        });
+        std::sort(v.begin(), v.end());
         return v;
     }
     ();
@@ -69,33 +71,33 @@ std::vector<uint> float_formats() {
 
 std::string float_formats_message() {
     std::string valid_formats;
-    for (const auto& name_id : float_formats()) {
+    for (const auto& name : float_formats()) {
         if (!valid_formats.empty()) {
             valid_formats += ", ";
         }
-        valid_formats += g_strings.view(name_id);
+        valid_formats += std::string(name);
     }
 
     std::string message = "Valid float formats are: " + valid_formats;
     return message;
 }
 
-std::vector<uint> float_format_all_defines() {
-    std::vector<uint> defines;
+std::vector<std::string> float_format_all_defines() {
+    std::vector<std::string> defines;
     defines.reserve(std::size(float_formats_lu_table));
 
     for (const auto& fmt : float_formats_lu_table) {
         FloatFormat float_id = static_cast<FloatFormat>(
                                    std::distance(float_formats_lu_table, &fmt));
-        uint id = float_format_define(float_id);
-        defines.push_back(id);
+        std::string define_name = float_format_define(float_id);
+        defines.push_back(define_name);
     }
     return defines;
 }
 
-uint float_format_define(FloatFormat float_id) {
+std::string float_format_define(FloatFormat float_id) {
     std::string define_name = to_upper("__FLOAT_" + to_string(float_id) + "__");
-    return g_strings.intern(define_name);
+    return define_name;
 }
 
 //-----------------------------------------------------------------------------

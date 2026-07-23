@@ -8,124 +8,227 @@
 #include "diag.h"
 #include "lexer_keywords.h"
 #include "release_assert.h"
-#include "strings.h"
 #include "string_utils.h"
+#include "strings.h"
 #include <algorithm>
-#include <sstream>
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
-std::string to_string(CPU cpu_id) {
-    // CPU ids may not be sequencial
-    static const std::unordered_map<CPU, std::string> lu_table = {
-#define X(id, name, name_str, non_strict, ancestor, defines)   { CPU::name, name_str },
+// CPU description
+struct CpuLookup {
+    uint id;                    // numeric value of CPU id
+    CPU cpu_id;                 // cpu id
+    std::string_view name_str;  // cpu name
+    CPU non_strict;             // cpu id of non-strict version
+    CPU compat_parent;          // cpu id of compatible parent
+    std::string_view defines;   // space separated list of defines
+};
+
+// CPU description table, generated from cpu.def
+static constexpr CpuLookup cpu_lookup_table[] = {
+#define X(id, name, name_str, non_strict, ancestor, defines)	    \
+    { id, CPU::name, name_str, CPU::non_strict, CPU::ancestor, defines },
 #include "../cpu.def"
 #undef X
-    };
+};
 
-    auto it = lu_table.find(cpu_id);
-    if (it == lu_table.end()) {
-        release_assert(0);
-        return "unknown";
+// map CPU id to CPU description
+static const std::unordered_map<CPU, const CpuLookup*> cpu_id_map = []() {
+    std::unordered_map<CPU, const CpuLookup*> m;
+    for (const auto& entry : cpu_lookup_table) {
+        m[entry.cpu_id] = &entry;
+    }
+    return m;
+}
+();
+
+// map CPU name to CPU description
+static const std::unordered_map<std::string_view, const CpuLookup*> cpu_name_map
+= []() {
+    std::unordered_map<std::string_view, const CpuLookup*> m;
+    for (const auto& entry : cpu_lookup_table) {
+        m[entry.name_str] = &entry;
+    }
+    return m;
+}
+();
+
+// get CPU name from CPU id
+std::string to_string(CPU cpu_id) {
+    return std::string(to_view(cpu_id));
+}
+
+std::string_view to_view(CPU cpu_id) {
+    auto it = cpu_id_map.find(cpu_id);
+    if (it == cpu_id_map.end()) {
+        fatal_error("Unknown CPU id: " + std::to_string(static_cast<uint>(cpu_id)));
+    }
+    else {
+        return it->second->name_str;
+    }
+}
+
+// lookup CPU id from CPU name
+bool cpu_lookup(std::string_view name, CPU& out_cpu_id) {
+    auto it = cpu_name_map.find(name);
+    if (it == cpu_name_map.end()) {
+        return false;
+    }
+    else {
+        out_cpu_id = it->second->cpu_id;
+        return true;
+    }
+}
+
+// return sorted list of CPU names
+std::vector<std::string_view> cpu_names() {
+    static const std::vector<std::string_view> names = []() {
+        std::vector<std::string_view> m;
+        for (auto& entry : cpu_lookup_table) {
+            m.push_back(entry.name_str);
+        }
+        std::sort(m.begin(), m.end());
+        return m;
+    }
+    ();
+    return names;
+}
+
+// list of all unique defines for all CPUs
+std::vector<std::string_view> cpu_all_defines() {
+    static const std::vector<std::string_view> cpu_all_defines = []() {
+        std::vector<std::string_view> m;
+        for (const auto& entry : cpu_lookup_table) {
+            for (auto& define : split_spaces(entry.defines)) {
+                m.push_back(define);
+            }
+        }
+        std::sort(m.begin(), m.end());
+        m.erase(std::unique(m.begin(), m.end()), m.end());
+        return m;
+    }
+    ();
+    return cpu_all_defines;
+}
+
+// list of defines for each CPU
+std::vector<std::string_view> cpu_defines(CPU cpu_id) {
+    static const std::unordered_map<CPU, std::vector<std::string_view>>
+    cpu_defines_table = []() {
+        std::unordered_map<CPU, std::vector<std::string_view>> m;
+        for (const auto& entry : cpu_lookup_table) {
+            for (auto& define : split_spaces(entry.defines)) {
+                m[entry.cpu_id].push_back(define);
+            }
+        }
+        return m;
+    }
+    ();
+
+    auto it = cpu_defines_table.find(cpu_id);
+    if (it == cpu_defines_table.end()) {
+        return {};
     }
     else {
         return it->second;
     }
 }
 
-bool cpu_lookup(std::string_view name, CPU& out_cpu_id) {
-    static const std::unordered_map<std::string, CPU> lu_table = {
-#define X(id, name, name_str, non_strict, ancestor, defines)	{ name_str, CPU::name },
-#include "../cpu.def"
-#undef X
-    };
-
-    std::string name_s(name);
-    auto it = lu_table.find(to_lower(name_s));
-    if (it == lu_table.end()) {
-        return false;
+// check if CPU is strict version
+bool cpu_is_strict(CPU cpu_id) {
+    auto it = cpu_id_map.find(cpu_id);
+    if (it != cpu_id_map.end()) {
+        return it->second->cpu_id == it->second->non_strict;
     }
-    else {
-        out_cpu_id = it->second;
-        return true;
-    }
+    return false;
 }
 
-std::vector<uint> cpu_names() {
-    static const std::vector<uint> names = []() {
-        static const std::vector<std::string_view> storage = {
-#define X(id, name, name_str, non_strict, ancestor, defines)	name_str,
-#include "../cpu.def"
-#undef X
-        };
-        std::vector<uint> v;
-        v.reserve(storage.size());
-        for (auto s : storage) {
-            v.push_back(g_strings.intern(s));
+// return non-strict version of CPU id
+CPU cpu_unstrictify(CPU cpu_id) {
+    auto it = cpu_id_map.find(cpu_id);
+    if (it != cpu_id_map.end()) {
+        return it->second->non_strict;
+    }
+    return cpu_id;
+}
+
+// DFS post-order (children first -> parent last)
+static void dfs_cpu(CPU cpu,
+                    std::vector<CPU>& out,
+                    std::unordered_set<CPU>& visited,
+                    const std::unordered_map<CPU, std::vector<CPU>>& children) {
+    if (visited.count(cpu)) {
+        return;
+    }
+
+    visited.insert(cpu);
+
+    auto it = children.find(cpu);
+    if (it != children.end()) {
+        for (CPU child : it->second) {
+            dfs_cpu(child, out, visited, children);
         }
-        std::sort(v.begin(), v.end(),
-        [](uint a, uint b) {
-            return g_strings.view(a) < g_strings.view(b);
-        });
-        return v;
     }
-    ();
-    return names;
+
+    out.push_back(cpu);   // post-order: children first
 }
 
-static const
-std::unordered_map<CPU, std::vector<uint>>& cpu_defines_table() {
-    static const std::unordered_map<CPU, std::vector<uint>> table
-    = []() {
-        std::unordered_map<CPU, std::vector<uint>> t;
-        struct Entry {
-            CPU id;
-            const char* defines;
-        };
-        static constexpr Entry entries[] = {
-#define X(id, name, name_str, non_strict, ancestor, defines)	{ CPU::name, defines },
-#include "../cpu.def"
-#undef X
-        };
-        for (const auto& e : entries) {
-            std::istringstream ss(e.defines);
-            std::string word;
-            while (ss >> word) {
-                t[e.id].push_back(g_strings.intern(word));
-            }
+std::vector<CPU> cpus_specific_to_general() {
+    // Cache the result in a static variable
+    static std::vector<CPU> cached_result;
+
+    if (!cached_result.empty()) {
+        return cached_result;
+    }
+
+    // build the list of children for each CPU
+    std::unordered_map<CPU, std::vector<CPU>> children;
+    for (const auto& entry : cpu_lookup_table) {
+        CPU parent = entry.compat_parent;
+        if (parent != CPU::none) {
+            children[parent].push_back(entry.cpu_id);
         }
-        return t;
     }
-    ();
-    return table;
+
+    // Sort siblings by CPU ID to guarantee stable ordering
+    for (auto& [parent, child_list] : children) {
+        std::sort(child_list.begin(), child_list.end());
+    }
+
+    // run DFS from every CPU to get the post-order (children first -> parent last)
+    cached_result.reserve(std::size(cpu_lookup_table));
+
+    std::unordered_set<CPU> visited;
+
+    // Run DFS from every CPU (forest)
+    for (const auto& entry : cpu_lookup_table) {
+        dfs_cpu(entry.cpu_id, cached_result, visited, children);
+    }
+
+    return cached_result;
 }
 
-std::vector<uint> cpu_all_defines() {
-    static const std::vector<uint> all = []() {
-        std::vector<uint> result;
-        for (const auto& [id, words] : cpu_defines_table()) {
-            result.insert(result.end(), words.begin(), words.end());
+bool cpu_compatible(CPU code_cpu_id, CPU lib_cpu_id) {
+    code_cpu_id = cpu_unstrictify(code_cpu_id);
+    lib_cpu_id = cpu_unstrictify(lib_cpu_id);
+
+    CPU id = code_cpu_id;
+    while (id != CPU::none) {
+        if (id == lib_cpu_id) {
+            return true;
         }
-        std::sort(result.begin(), result.end(),
-        [](uint a, uint b) {
-            return g_strings.view(a) < g_strings.view(b);
-        });
-        result.erase(std::unique(result.begin(), result.end()), result.end());
-        return result;
+        else {
+            auto it = cpu_id_map.find(id);
+            release_assert(it != cpu_id_map.end());
+            id = it->second->compat_parent;
+        }
     }
-    ();
-    return all;
-}
-
-std::vector<uint> cpu_defines(CPU cpu_id) {
-    const auto& table = cpu_defines_table();
-    auto it = table.find(cpu_id);
-    if (it == table.end())
-        return {};
-    return it->second;
+    return false;
 }
 
 bool cpu_set_adl_mode(CPU& in_out_cpu_id, bool adl) {

@@ -297,7 +297,7 @@ static bool split_modules_sections(Program& prog) {
 
 #if 0
 static ObjModule build_object_module(const Program& prog,
-        const Module& mod) {
+                                     const Module& mod) {
     ObjModule obj_mod;
 
     // global information for the module
@@ -348,28 +348,28 @@ static ObjModule build_object_module(const Program& prog,
                 obj_sym.type = ObjSymbolType::Constant;
                 obj_sym.value = sym_info->defc_expr->value.const_value;
                 obj_sym.set_section_name(g_strings.view(
-                                              sym_info->defc_expr->value.section->name_id));
+                                             sym_info->defc_expr->value.section->name_id));
                 break;
 
             case ExprType::AddressRelative:
                 obj_sym.type = ObjSymbolType::AddressRelative;
                 obj_sym.value = sym_info->defc_expr->value.offset;
                 obj_sym.set_section_name(g_strings.view(
-                                              sym_info->defc_expr->value.section->name_id));
+                                             sym_info->defc_expr->value.section->name_id));
                 break;
 
             case ExprType::Computed: {
                 obj_sym.type = ObjSymbolType::Computed;
                 obj_sym.value = 0;
                 obj_sym.set_section_name(g_strings.view(
-                                              sym_info->defc_expr->value.section->name_id));
+                                             sym_info->defc_expr->value.section->name_id));
 
                 // create expression to define symbol value at link time
                 ObjExpr obj_expr;
                 obj_expr.set_text(to_string(sym_info->defc_expr->tokens));
                 obj_expr.range = ObjRangeType::Assignment;
                 obj_expr.set_section_name(g_strings.view(
-                                               sym_info->defc_expr->value.section->name_id));
+                                              sym_info->defc_expr->value.section->name_id));
                 obj_expr.set_target_name(g_strings.view(sym_info->name_id));
                 obj_expr.set_filename(g_strings.view(sym_info->defc_expr->loc.filename_id));
                 obj_expr.line = sym_info->defc_expr->loc.line;
@@ -484,7 +484,7 @@ static ObjModule build_object_module(const Program& prog,
 
                     obj_expr.asmpc = stmt->address;
                     obj_expr.patch_ptr = static_cast<uint>(obj_sec.bytes().size() +
-                                                            patch->offset);
+                                                           patch->offset);
                     obj_expr.opcode_size = static_cast<uint>(opc_stmt->bytes.size());
                     obj_expr.set_section_name(g_strings.view(sec->name_id));
                     obj_expr.set_target_name(""); // not used for opcode patches
@@ -493,31 +493,31 @@ static ObjModule build_object_module(const Program& prog,
                     obj_mod.exprs.push_back(std::move(obj_expr));
                 }
                 obj_sec.set_bytes(BytesView(opc_stmt->bytes.data(),
-                                             opc_stmt->bytes.size()));
+                                            opc_stmt->bytes.size()));
                 continue;
             }
 
             if (auto org_stmt = dynamic_cast<OrgStmt*>(stmt)) {
                 obj_sec.set_bytes(BytesView(org_stmt->bytes.data(),
-                                             org_stmt->bytes.size()));
+                                            org_stmt->bytes.size()));
                 continue;
             }
 
             if (auto align_stmt = dynamic_cast<AlignStmt*>(stmt)) {
                 obj_sec.set_bytes(BytesView(align_stmt->bytes.data(),
-                                             align_stmt->bytes.size()));
+                                            align_stmt->bytes.size()));
                 continue;
             }
 
             if (auto defs_num_stmt = dynamic_cast<DefsNumericStmt*>(stmt)) {
                 obj_sec.set_bytes(BytesView(defs_num_stmt->bytes.data(),
-                                             defs_num_stmt->bytes.size()));
+                                            defs_num_stmt->bytes.size()));
                 continue;
             }
 
             if (auto defs_str_stmt = dynamic_cast<DefsStringStmt*>(stmt)) {
                 obj_sec.set_bytes(BytesView(defs_str_stmt->bytes.data(),
-                                             defs_str_stmt->bytes.size()));
+                                            defs_str_stmt->bytes.size()));
                 continue;
             }
         }

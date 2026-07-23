@@ -85,65 +85,61 @@ bool parse_signature(std::string_view signature, ObjFileType& type,
 // Object file format
 //-----------------------------------------------------------------------------
 
-static SectionInfo load_offset(std::shared_ptr<const BinaryFile> file,
-                               size_t& ptr,
-                               size_t base_offset, size_t end_offset,
-                               std::string_view pointer_name) {
-    size_t offset = file->get_dword(ptr);
-    if (offset == OffsetNotPresent) {
-        SectionInfo info;
-        info.offset = offset;
-        info.size = 0;
-        info.present = false;
-        return info;
-    }
-    else {
-        size_t start_offset = base_offset + offset;
-        if (start_offset > end_offset) {
-            fatal_error("invalid " + std::string(pointer_name) +
-                        " pointer in '" + std::string(file->filename()) +
-                        "' offset " + int_to_hex(base_offset));
-        }
-        SectionInfo info;
-        info.offset = start_offset;
-        info.size = 0;
-        info.present = true;
-        return info;
-    }
-}
-
-static size_t calc_end_offset(const SectionInfo& info, size_t end_offset) {
-    if (info.present) {
-        return info.offset;
-    }
-    else {
-        return end_offset;
-    }
-}
-
-ObjSchema::ObjSchema(std::shared_ptr<const BinaryFile> file_,
-                     size_t base_offset_, size_t size_)
+CommonSchema::CommonSchema(std::shared_ptr<const BinaryFile> file_,
+                           size_t base_offset_, size_t size_)
     : file(std::move(file_)), base_offset(base_offset_), size(size_) {
 
     // check size
-    size_t end_offset = base_offset + size;
-    if (end_offset >= file->size()) {
-        fatal_error("invalid object file '" + std::string(file->filename()) +
-                    "' offset " + int_to_hex(base_offset));
+    if (end_offset() >= file->size()) {
+        invalid_file_error("invalid object or library file");
     }
 
     // get signature, type and version
     std::string_view signature = file->peek_string_view(base_offset,
                                  SignatureSize);
-    ObjFileType type = ObjFileType::None;
+    type = ObjFileType::None;
     if (!parse_signature(signature, type, version) ||
-            type != ObjFileType::Object) {
-        fatal_error("invalid object file '" + std::string(file->filename()) +
-                    "' offset " + int_to_hex(base_offset));
+            type == ObjFileType::None) {
+        invalid_file_error("invalid object or library file");
+    }
+}
+
+[[noreturn]]
+void CommonSchema::invalid_file_error(std::string_view message) const {
+    fatal_error(std::string(message) + " in '" +
+                std::string(file->filename()) +
+                "' offset " + int_to_hex(base_offset));
+}
+
+SectionInfo CommonSchema::load_offset(size_t& ptr,
+                                      std::string_view pointer_name) {
+    size_t offset = file->get_dword(ptr);
+    if (offset == OffsetNotPresent) {
+        return SectionInfo();
+    }
+    else {
+        size_t start_offset = base_offset + offset;
+        if (start_offset > base_offset + size) {
+            invalid_file_error("invalid " + std::string(pointer_name) +
+                               " pointer");
+        }
+        return SectionInfo(start_offset);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+ObjSchema::ObjSchema(std::shared_ptr<const BinaryFile> file_,
+                     size_t base_offset_, size_t size_)
+    : CommonSchema(file_, base_offset_, size_) {
+
+    if (type != ObjFileType::Object) {
+        invalid_file_error("invalid object file");
     }
 
+    size_t ptr = start_offset();
+
     // get CPU
-    size_t ptr = base_offset + SignatureSize;
     if (obj_features(version).has_global_cpu) {
         cpu_id = static_cast<CPU>(file->get_dword(ptr));
         swap_ixiy = !!file->get_dword(ptr);
@@ -170,68 +166,60 @@ ObjSchema::ObjSchema(std::shared_ptr<const BinaryFile> file_,
     // get file pointers
 
     // module name pointer
-    modname = load_offset(file, ptr, base_offset_, end_offset, "module name");
+    modname = load_offset(ptr, "module name");
     if (!modname.present) {
-        fatal_error("missing module name pointer in '" + std::string(file->filename()) +
-                    "' offset " + int_to_hex(base_offset_));
+        invalid_file_error("missing module name pointer");
     }
 
     // expressions pointer
-    exprs = load_offset(file, ptr, base_offset_, end_offset, "expressions");
+    exprs = load_offset(ptr, "expressions");
 
     // relocations pointer
     if (obj_features(version).has_relocs) {
-        relocs = load_offset(file, ptr, base_offset_, end_offset, "relocs");
+        relocs = load_offset(ptr, "relocs");
     }
     else {
-        relocs.offset = OffsetNotPresent;
-        relocs.size = 0;
-        relocs.present = false;
+        relocs = SectionInfo();
     }
 
     // defined symbols pointer
-    symbols = load_offset(file, ptr, base_offset_, end_offset,
-                          "defined symbols");
+    symbols = load_offset(ptr, "defined symbols");
 
     // extern symbols pointer
-    externs = load_offset(file, ptr, base_offset_, end_offset,
-                          "extern symbols");
+    externs = load_offset(ptr, "extern symbols");
 
     // sections pointer
-    sections = load_offset(file, ptr, base_offset_, end_offset, "sections");
+    sections = load_offset(ptr, "sections");
 
     // string table pointer
     if (obj_features(version).has_string_table) {
-        strings = load_offset(file, ptr, base_offset_, end_offset,
-                              "string table");
+        strings = load_offset(ptr, "string table");
     }
     else {
-        strings.offset = OffsetNotPresent;
-        strings.size = 0;
-        strings.present = false;
+        strings = SectionInfo();
     }
 
     // compute sizes of sections
     if (exprs.present) {
         size_t next_offset = std::min( {
-            calc_end_offset(relocs, end_offset),
-            calc_end_offset(symbols, end_offset),
-            calc_end_offset(externs, end_offset),
+            calc_end_offset(relocs, end_offset()),
+            calc_end_offset(symbols, end_offset()),
+            calc_end_offset(externs, end_offset()),
             modname.offset });
         exprs.size = next_offset - exprs.offset;
     }
 
     if (relocs.present) {
         size_t next_offset = std::min( {
-            calc_end_offset(symbols, end_offset),
-            calc_end_offset(externs, end_offset),
+            calc_end_offset(symbols, end_offset()),
+            calc_end_offset(externs, end_offset()),
             modname.offset });
         relocs.size = next_offset - relocs.offset;
     }
 
     if (symbols.present) {
         size_t next_offset = std::min( {
-            calc_end_offset(externs, end_offset),
+            calc_end_offset(externs, end_offset()),
             modname.offset });
         symbols.size = next_offset - symbols.offset;
     }
@@ -243,69 +231,54 @@ ObjSchema::ObjSchema(std::shared_ptr<const BinaryFile> file_,
 
     if (sections.present) {
         size_t next_offset = std::min( {
-            calc_end_offset(strings, end_offset),
-            end_offset });
+            calc_end_offset(strings, end_offset()),
+            end_offset() });
         sections.size = next_offset - sections.offset;
     }
 
     if (strings.present) {
-        size_t next_offset = end_offset;
+        size_t next_offset = end_offset();
         strings.size = next_offset - strings.offset;
     }
 }
 
 //-----------------------------------------------------------------------------
-// Library file format
-//-----------------------------------------------------------------------------
 
 LibSchema::LibSchema(std::shared_ptr<const BinaryFile> file_)
-    : file(std::move(file_)), base_offset(0), size(file->size()) {
+    : CommonSchema(file_, 0, file_->size()) {
 
-    size_t end_offset = base_offset + size;
-    size_t ptr = base_offset;
-
-    // get signature, type and version
-    std::string_view signature = file->get_string_view(ptr, SignatureSize);
-    ObjFileType type = ObjFileType::None;
-    if (!parse_signature(signature, type, version) ||
-            type != ObjFileType::Library) {
-        fatal_error("invalid library file '" + std::string(file->filename()) + "'");
+    if (type != ObjFileType::Library) {
+        invalid_file_error("invalid library file");
     }
 
-    // get file pointers
+    size_t ptr = start_offset();
 
     // symbol index
     if (obj_features(version).has_symbol_index) {
-        symbol_index = load_offset(file, ptr, base_offset, end_offset,
-                                   "symbol index");
+        symbol_index = load_offset(ptr, "symbol index");
     }
     else {
-        symbol_index.offset = OffsetNotPresent;
-        symbol_index.size = 0;
-        symbol_index.present = false;
+        symbol_index = SectionInfo();
     }
 
     // string table pointer
     if (obj_features(version).has_string_table) {
-        strings = load_offset(file, ptr, base_offset, end_offset,
-                              "string table");
+        strings = load_offset(ptr, "string table");
     }
     else {
-        strings.offset = OffsetNotPresent;
-        strings.size = 0;
-        strings.present = false;
+        strings = SectionInfo();
     }
 
     // compute sizes of sections
     if (symbol_index.present) {
         size_t next_offset = std::min( {
-            calc_end_offset(strings, end_offset),
-            end_offset });
+            calc_end_offset(strings, end_offset()),
+            end_offset() });
         symbol_index.size = next_offset - symbol_index.offset;
     }
 
     if (strings.present) {
-        size_t next_offset = end_offset;
+        size_t next_offset = end_offset();
         strings.size = next_offset - strings.offset;
     }
 
@@ -314,28 +287,26 @@ LibSchema::LibSchema(std::shared_ptr<const BinaryFile> file_)
         size_t next_module = file->get_dword(ptr);
         size_t module_size = file->get_dword(ptr);
 
-        if (next_module != OffsetNotPresent && module_size > end_offset) {
-            fatal_error("invalid module pointer in '" + std::string(file->filename()) +
-                        "' offset " + int_to_hex(base_offset));
+        if (next_module != OffsetNotPresent && next_module > end_offset()) {
+            invalid_file_error("invalid module pointer");
         }
 
-        if (ptr + module_size > end_offset) {
-            fatal_error("invalid module size in '" + std::string(file->filename()) +
-                        "' offset " + int_to_hex(base_offset));
+        if (ptr + module_size > end_offset()) {
+            fatal_error("invalid module size");
         }
 
         if (module_size > 0) {		// not deleted
             size_t end_module = std::min( {
                 ptr + module_size,
-                symbol_index.present ? symbol_index.offset : end_offset,
-                strings.present ? strings.offset : end_offset,
-                end_offset });
+                calc_end_offset(symbol_index, end_offset()),
+                calc_end_offset(strings, end_offset()),
+                end_offset() });
 
-            SectionInfo info;
-            info.offset = ptr;
-            info.size = end_module - ptr;
-            info.present = true;
+            // store information on module
+            SectionInfo info(ptr, end_module - ptr);
+            size_t index = modules.size();
             modules.push_back(info);
+            offset_to_index[info.offset] = index;
         }
 
         if (next_module == OffsetNotPresent) {
