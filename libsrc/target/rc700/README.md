@@ -61,6 +61,12 @@ zcc +cpm -subtype=rc700 -create-app -o clock examples/graphics/clock.c
 
 ## Caveats / not-yet
 
+- **The emitted `.imd` is not a bootable RC702 diskette yet.** appmake's
+  `rc700_spec` models only the uniform tracks-1–35 region (9x512 MFM); it does
+  not model the RC702 mixed-density Track 0 (FM 128 on side 0 + MFM 256 on
+  side 1), and there is no 8" format at all. So the image round-trips as data but
+  is a different floppy format from what the RC702 actually boots. See ravn/z88dk
+  **#36**.
 - No rc700-specific example programs ship in `examples/` yet.
 - Graphics is semigraphics only (no hires bitmap).
 - The subtype defaults to the classic clib; it is not wired as a dedicated
