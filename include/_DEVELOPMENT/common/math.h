@@ -122,9 +122,26 @@ typedef _Float16 half_t;
 #define MAXL2_F32               (+63.0)
 #define MINL2_F32               (-64.0)
 #define MAXLOG_F32              (+43.6657)
-#define MINLOG_F32              (−45.0)
+#define MINLOG_F32              (-45.0)
 #define MAXL10_F32              (+18.9638)
-#define MINL10_F32              (−19.5686)
+#define MINL10_F32              (-19.5686)
+
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
+
+#endif
+
+#ifdef __MATH_MBF32
+
+/* Microsoft Binary Format single (same limits as classic math/math_mbf32.h) */
+
+#define HUGE_POS_F32            (+8.507059e+37)
+#define TINY_POS_F32            (+1.175494e-38)
+#define HUGE_NEG_F32            (-8.507059e+37)
+#define TINY_NEG_F32            (-1.175494e-38)
 
 #define HUGE_VAL_F32            ((unsigned long)0x7F800000)
 #define INFINITY_POS_F32        ((unsigned long)0x7F800000)
@@ -137,16 +154,16 @@ typedef _Float16 half_t;
 #ifdef __MATH_MATH32
 
 #define HUGE_POS_F32            (+3.4028234664E+38)
-#define TINY_POS_F32            (+1.1754943508E−38)
+#define TINY_POS_F32            (+1.1754943508E-38)
 #define HUGE_NEG_F32            (-1.7014118346E+38)
 #define TINY_NEG_F32            (-1.1754943508E-38)
 
 #define MAXL2_F32               (+127.999999914)
 #define MINL2_F32               (-126.0)
 #define MAXLOG_F32              (+88.722839052)
-#define MINLOG_F32              (−87.336544751)
+#define MINLOG_F32              (-87.336544751)
 #define MAXL10_F32              (+38.230809449)
-#define MINL10_F32              (−37.929779454)
+#define MINL10_F32              (-37.929779454)
 
 #define HUGE_VAL_F32            ((unsigned long)0x7F800000)
 #define INFINITY_POS_F32        ((unsigned long)0x7F800000)
@@ -1355,6 +1372,16 @@ extern int __LIB__ isunorderedf16_callee(half_t x,half_t y) __SMALLC __z88dk_cal
 #define mul2f        mul2
 #define mul10uf      mul10u
 #define exp10f       exp10
+
+#endif
+
+#ifdef __MATH_MBF32
+
+/* classic mbf32.lib provides non-callee multi-arg entry points only */
+#undef pow
+#undef fmod
+#undef fmax
+#undef fmin
 
 #endif
 

@@ -1,7 +1,0 @@
-target/yaz180/driver/apu/c/sdcc/apu_init
-target/yaz180/driver/apu/c/sdcc/apu_reset
-target/yaz180/driver/apu/c/sdcc/apu_check_idle
-target/yaz180/driver/apu/c/sdcc/apu_command
-target/yaz180/driver/apu/c/sdcc/apu_command_fastcall
-target/yaz180/driver/apu/c/sdcc/apu_operand
-target/yaz180/driver/apu/c/sdcc/apu_operand_callee
