@@ -33,8 +33,8 @@
 6. **Verification (correctness + linkage)**  
    After structural/serial/migration work, validate with **`z88dk-ticks`** (not only “it links”):
    - **rc2014 Z80** and **rc2014 8085** across the full optional math matrix (§7).  
-   - **newlib `+cpm`** extensively for the same class of math linkage and benchmark correctness (cpm is **test/regression scope** even if not migrated in this project).  
-   - Float **suite** (`test/suites/math`) where targets already have recipes, plus **benchmarks** under `support/benchmarks` with TIMER + ticks for pass/result sanity.
+   - Float **suite** (`test/suites/math`) where targets already have recipes, plus **benchmarks** under `support/benchmarks` with TIMER + ticks for pass/result sanity.  
+   - **newlib `+cpm` is out of scope** for this project (conflicts with classic/cpm); do not extend regression gates to cpm until a later effort.
 
 This document is both **discovery report** (current state) and **implementation plan** (phased work).
 
@@ -679,9 +679,9 @@ zcc +hbios -clib=new app.c -o app
 
 ### 5.3 Build system changes required for migration
 
-1. **`libsrc/newlib/Makefile`**  
-   - Either build these four from `../target/<name>/` or add a bridge; update `ALLTARGETS` paths, `config.m4` location, `-I` and `@library/*.lst` roots.  
-   - Prefer: library lists and CRT live under `libsrc/target/<name>/`, while the newlib makefile still produces `libsrc/newlib/lib/*/name.lib` **or** libs move to a unified location (decide in Phase 0 — recommendation: **keep output libs in `libsrc/newlib/lib/`** initially to minimise cfg churn, only rewrite source paths).
+1. **`libsrc/newlib/Makefile`** (and/or classic-aligned install)  
+   - Build these four from `libsrc/target/<name>/`; update `ALLTARGETS` paths, `config.m4` location, `-I` and `@library/*.lst` roots.  
+   - **Library output:** relocate to the **same arrangement as classic targets** (decision §11.1) — e.g. classic-style `libsrc` / `lib/clibs` install paths — not leave permanently only under `libsrc/newlib/lib/`.
 
 2. **`libsrc/Makefile`** (rc2014-8085)  
    - Point m4 and lst at `target/rc2014/...` only (no `newlib/target`).
@@ -729,9 +729,10 @@ libsrc/target/hbios/    # API + input + newlib CRT/drivers merged
 - Freeze naming: device API, `character_00` vs `rc_01_*`, 8085 hybrid rules.  
 - Record **dual-tree policy** (§2.8 hard rules): no aggressive newlib↔classic directory merge.  
 - Decide library **output** location policy (recommend: keep `libsrc/newlib/lib/`).  
-- Capture **pre-change baselines** for §7.3–7.5 (math suite + key benches on rc2014 z80/8085 and cpm newlib) into context files.
+- Keep **`context.md` at repo root** (project context; not a session paste).  
+- Capture **pre-change baselines** for §7.3–7.4 (math suite + key benches on rc2014 z80/8085 only) into context or adjacent notes.
 
-**Exit criteria:** context files present; policy decisions recorded (including classic safety); baseline table started or complete.
+**Exit criteria:** `context.md` present at repo root; policy decisions recorded (including classic safety); baseline table started or complete.
 
 ### Phase 1 — Step 1: Master the m4 CRT0 + config generation (blocking)
 
@@ -814,7 +815,7 @@ Complete the matrix of newlib packages vs classic alternatives for systems the f
 7. Extend pattern to UART (and SIO/ASCI as needed).  
 8. Smoke Z80 newlib + 8085 hybrid; regression: multi-port subtype + stderr dup + optional custom instantiation (§3.2 checks).
 
-**Exit criteria:** simplified serial path works; multi-port + `m4_file_dup` (stderr/stdout overload) still work; user driver instantiation still works; 8085 hybrid still works via shared device + classic stdio; no classic fcntl/stdio core edits; **§7.3–7.4 math/ticks gate green** (rc2014 z80 + 8085 math matrices) and at least a smoke **cpm** math link (§7.5).
+**Exit criteria:** simplified serial path works; multi-port + `m4_file_dup` (stderr/stdout overload) still work; user driver instantiation still works; 8085 hybrid still works via shared device + classic stdio; no classic fcntl/stdio core edits unless proven regression-free on classic targets; **§7.3–7.4 math/ticks gate green** (rc2014 z80 + 8085 math matrices).
 
 ### Phase 4 — CRT0 light cleanup (after understanding)
 
@@ -826,6 +827,8 @@ Complete the matrix of newlib packages vs classic alternatives for systems the f
 **Exit criteria:** CRT map accurate for all subtypes in context doc and file headers.
 
 ### Phase 5 — Migrate hbios (smallest newlib surface; classic already partial)
+
+**After move:** de-duplicate any shared HBIOS terminal/API pieces **before** Phase 6.
 
 1. Move newlib hbios CRT/driver/config into `libsrc/target/hbios/`.  
 2. Update hbios library lists, cfg, arch.h, newlib Makefile.  
@@ -861,7 +864,7 @@ Complete the matrix of newlib packages vs classic alternatives for systems the f
 
 - `rg 'newlib/target/(rc2014|scz180|yaz180|hbios)'` must be empty (except historical docs if any).  
 - Context/report updated with final layout, CRT/config pipeline notes, and dual-tree matrix.  
-- **Full verification gate §7.3–7.5:** rc2014 Z80 math matrix, rc2014 8085 math matrix, newlib cpm math matrix — all via **`z88dk-ticks`** with correctness (suite and/or printed RESULT), plus agreed benchmarks.  
+- **Full verification gate §7.3–7.4:** rc2014 Z80 math matrix, rc2014 8085 math matrix — via **`z88dk-ticks`** with correctness (suite and/or printed RESULT), plus agreed benchmarks. (cpm out of scope.)  
 - Optional PR split: **m4/CRT docs** → dual-tree inventory → serial abstraction → hbios → scz180 → yaz180 → rc2014.
 
 ---
@@ -910,7 +913,7 @@ Link and **run under `z88dk-ticks`** (suite and/or float-heavy bench). Flags as 
 
 | Math | Link flags (canonical) | Notes |
 |------|------------------------|-------|
-| **math48 (`-lm`)** | `-lm` (newlib default float) | Existing suite: `test_math48_rc2014` via `compile_rc2014 … -lm` |
+| **math48 (`-lm`)** | `-lm` → **math48** on Z80 rc2014 newlib | Existing suite: `test_math48_rc2014` via `compile_rc2014 … -lm` |
 | **mbf32** | `--math-mbf32` | Confirm alias resolves `mbf32` + 32-bit float pragmas |
 | **math32** | `--math32` or `-lmath32` | Suite recipe `test_math32_rc2014` exists (ensure in `all` if needed) |
 | **am9511** | `--math-am9511` / `--am9511` / `-lam9511` | Suite: `test_9511_rc2014` |
@@ -934,7 +937,7 @@ make -C test/suites/math test_math32_rc2014_CODE.bin    # add to all: if missing
 
 | Math | Link flags | Notes |
 |------|------------|-------|
-| **default / `-lm`** | `-lm` (classic genmath or target default — record exact resolve) | User-required; document which lib `@{ZCC_LIBCPU}` selects on 8085 |
+| **default / `-lm`** | `-lm` → **genmath** on rc2014-8085 | Confirmed project decision |
 | **mbf32** | `--math-mbf32` | Suite: `test_mbf32_8085` on `+test -clib=8085`; also build **`+rc2014 -subtype=acia85`** (or uart85/basic85) with `--math-mbf32` and ticks `-m8085` |
 | **math32** | `--math32` / `-lmath32_8085` | Suite: `test_math32_8085`; plus rc2014-8085 subtype link |
 | **am9511** | `--math-am9511` | Suite: `test_9511_8085`; plus rc2014-8085 subtype link |
@@ -953,38 +956,18 @@ z88dk-ticks -m8085 probe.bin -x probe.map -start TIMER_START -end TIMER_STOP -co
 
 Use a small **float probe** (or suite `math.c`) that prints/checks known values so ticks run is not only “did not crash” but **correct results**.
 
-### 7.5 Math + benchmarks — **newlib `+cpm`** (regression scope)
+### 7.5 Math + benchmarks — **newlib `+cpm`** (**out of scope**)
 
-`libsrc/newlib/target/cpm` is **not** necessarily migrated in this project, but it shares stdio/fcntl/drivers/math link patterns with rc2014/scz180/yaz180. **Extensive** cpm testing is required so target moves do not break CPM newlib math linkage.
-
-| Math | Flags | Validate |
-|------|-------|----------|
-| math48 / `-lm` | `-lm` | suite-style float test or paranoia/whetstone |
-| mbf32 | `--math-mbf32` | link + ticks (or host-comparable RESULT) |
-| math32 | `--math32` | n-body / mandelbrot / spectral-norm style |
-| am9511 | `--math-am9511` | link + run |
-| math16 | `--math16` | where applicable with z80 newlib cpm |
-
-```bash
-# Example shape (adjust subtype/startup to cpm.cfg defaults)
-zcc +cpm -clib=new -vn -DSTATIC -DTIMER -D__Z88DK -O2 \
-  support/benchmarks/n-body/z88dk-new/n-body.c -o n-body.bin -m --math32
-z88dk-ticks n-body.bin -x n-body.map -start TIMER_START -end TIMER_STOP -counter 999999999999
-# Repeat for -lm, --math-mbf32, --math-am9511, --math16 as supported
-```
-
-Also re-run or extend **`test/suites/math`** entries that exercise cpm if present; otherwise add temporary compile recipes during the project for `+cpm -clib=new` × math matrix.
-
-**Correctness bar for cpm:** known bench RESULT lines / printed checksums match pre-change baselines (record baselines in context files before migration). Large tick deltas without RESULT change should be explained; RESULT mismatches are **failures**.
+**Decision:** newlib `cpm` is **out of scope** for migration and for project regression gates (would conflict with classic/cpm work). Do not block this project on `+cpm` math/bench matrices. A later effort may revisit.
 
 ### 7.6 When to run which gate
 
-| Milestone | Structural §7.2 | Math suite (rc2014/8085/cpm) | Benchmarks + ticks |
-|-----------|-----------------|------------------------------|--------------------|
+| Milestone | Structural §7.2 | Math suite (rc2014 z80 + 8085) | Benchmarks + ticks |
+|-----------|-----------------|--------------------------------|--------------------|
 | Phase 1–2 (docs only) | optional | optional baseline capture | baseline optional |
 | Phase 3 serial / device share | yes (rc2014 z80+8085) | **yes** full §7.3–7.4 | at least n-body or mandelbrot one math each CPU |
-| Each target migrate (5–8) | yes that target + cpm link smoke | **yes** cpm math matrix; rc2014 if touched | cpm benches; rc2014 if touched |
-| Phase 9 close-out | full | **full §7.3–7.5** | full agreed bench set |
+| Each target migrate (5–8) | yes that target | rc2014 if touched | rc2014 if touched |
+| Phase 9 close-out | full | **full §7.3–7.4** | full agreed bench set |
 
 ### 7.7 Baseline discipline
 
@@ -1009,7 +992,7 @@ Before first code change that can affect codegen/link:
 | Losing multi-port or stderr-dup when simplifying | Explicit §3.2 retain list; m4 instantiators re-entrant; smoke sio/dual-port + `m4_file_dup` |
 | **Aggressive newlib↔classic merge** | Forbidden by policy; bridges only at device layer; dual-tree matrix in Phase 2 |
 | Accidental newlib fcntl/stdio into hybrid lst | Keep hybrid lst comments; link smoke for `acia85` after every rc2014 edit |
-| Math lib fails to link on rc2014/cpm after path moves | Full §7.3–7.5 matrix; fix lst/cfg `@{ZCC_LIBCPU}` / lib search paths |
+| Math lib fails to link on rc2014 after path moves | Full §7.3–7.4 matrix; fix lst/cfg `@{ZCC_LIBCPU}` / lib search paths |
 | Silent numeric regression | Suite assert + bench RESULT vs baselines under ticks — not link-only |
 | Public/private config drift (wrong ports/sizes) | Rebuild lib after any `config/*.m4` edit; compare public vs private symbol sets |
 | Config header install / arch.h | Update both common and proto arch.h |
@@ -1025,14 +1008,14 @@ Phase 1  ★ m4 CRT0 + config public/private understanding (blocking)
 Phase 2  ★ Dual-tree inventory (alloc/fcntl/threads/stdio/… vs classic)
 Phase 3  Serial abstraction (device share + character_00; multi-port + file_dup retained; classic cons thin wrap only)
 Phase 4  CRT0 documentation cleanup / light regularisation
-Phase 5  Migrate hbios
-Phase 6  Migrate scz180
-Phase 7  Migrate yaz180
+Phase 5  Migrate hbios → then de-dupe shared drivers before continuing
+Phase 6  Migrate scz180 → de-dupe vs hbios/asci as applicable before continuing
+Phase 7  Migrate yaz180 → de-dupe vs scz180/asci before continuing
 Phase 8  Migrate rc2014 (+ 8085 hybrid + dual config masters; classic stack preserved)
-Phase 9  Grep-clean + full z88dk-ticks math/bench gate (rc2014 z80+8085, cpm newlib)
+Phase 9  Grep-clean + full z88dk-ticks math/bench gate (rc2014 z80+8085 only)
 ```
 
-**rc2014 must not move before** path strategy is proven on a smaller target **and** Phase 1 CRT/config matrix is complete. **Classic cores must not be rewritten** as part of migration. **Math/bench ticks gates** (§7) are required at serial work and close-out, not optional.
+**rc2014 must not move before** path strategy is proven on a smaller target **and** Phase 1 CRT/config matrix is complete. **Classic cores:** no change unless proven not to regress classic targets. **De-duplication:** after each move (or after a related cluster of moves), **before** continuing to the next target. **Math/bench ticks gates** (§7.3–7.4) required at serial work and close-out. **cpm** out of scope.
 
 ---
 
@@ -1048,20 +1031,30 @@ Phase 9  Grep-clean + full z88dk-ticks math/bench gate (rc2014 z80+8085, cpm new
 8. Driver/system inventory for migration vs shared newlib vs classic-only hybrid deps  
 9. Build process (today and after)  
 10. Phased implementation plan with verification and risks  
-11. **Verification matrix:** `z88dk-ticks` + math libs for rc2014 Z80/8085 and newlib cpm; benchmark RESULT baselines  
+11. **Verification matrix:** `z88dk-ticks` + math libs for rc2014 Z80/8085; benchmark RESULT baselines  
 
 ---
 
-## 11. Open decisions (for user confirmation during execution)
+## 11. Decisions (resolved)
 
-1. **Library output location:** keep `libsrc/newlib/lib/{sccz80,sdcc_ix}/<target>.lib` vs relocate under `libsrc/target/` / `lib/clibs`.  
-2. **Simple serial rollout:** new `-startup` values vs replace existing terminal startups vs pragma/feature flag.  
-3. **ASCI/HBIOS driver de-duplication:** same phase as move, or strictly later.  
-4. **Whether `cpm` newlib target** is in a later migration (out of scope here but similar pattern).  
-5. **Context file location:** repo-root `CONTEXT*.md` vs `doc/newlib-target-migration/` (recommend under `doc/` or untracked project notes until ready to commit).  
-6. **Any classic core change beyond thin `f*cons` → device wrap:** default **no**; require explicit approval per package (malloc, fcntl, threads, printf).  
-7. **Multi-port / dup policy:** retained as today (**not** optional); any simplified CRT defaults must still support extra interfaces and stderr→stdout style overload.  
-8. **cpm:** full **test/regression** scope for math+ticks+benches; migration of `newlib/target/cpm` remains optional/later unless decided otherwise.  
-9. **8085 `-lm` identity:** confirm whether classic default `-lm` is genmath vs another package on rc2014-8085 and record in baselines.
+| # | Topic | Decision |
+|---|--------|----------|
+| **1** | Library **output** location | **Relocate to same arrangement as classic targets** (not leave forever under `libsrc/newlib/lib/…` only). Align install/link paths with classic `libsrc/target` / `lib/clibs` practice as part of migration. |
+| **2** | Simple serial rollout | Still open if needed at implementation: prefer **additive** (new startup or instantiation option); defaults keep current terminal behaviour unless agreed otherwise. Multi-port + `m4_file_dup` always retained. |
+| **3** | ASCI / HBIOS (and similar) **de-duplication** | **After each move, before continuing** to the next target (not deferred to end-of-project). |
+| **4** | **cpm** newlib target | **Out of scope** for now (conflicts with classic/cpm). Neither migration nor project regression gates. |
+| **5** | Context file location | **`context.md` at repo root**. |
+| **6** | Classic core changes | **No change** to classic core (stdio/fcntl/malloc/threads/printf, etc.) **unless proven not to cause regression on classic targets**. Thin `f*cons` → device wrap only if that proof bar is met. |
+| **7** | Multi-port / FILE dup | **Required** (not optional); see §3.2. |
+| **8** | cpm regression testing | **In line with (4): out of scope** for now. |
+| **9** | **`-lm` identity** | **rc2014-8085:** `-lm` → **genmath**. **rc2014 Z80 (newlib):** `-lm` → **math48**. |
 
-Defaults if unstated: (1) keep lib output paths; (2) additive simple serial, defaults unchanged, **with multi-port + file_dup retained**; (3) de-dupe later; (4) cpm **not** migrated but **yes** extensively tested; (5) untracked context at repo root or `doc/` as preferred when implementing Phase 0; (6) **no** aggressive classic integration; (7) multi-port + dup required; (8)–(9) as above.
+### Defaults going forward
+
+- Library artefacts: classic-like target layout (§11.1).  
+- Serial: additive simplified path; multi-port + file_dup retained.  
+- De-dupe: post-move, pre-next-target.  
+- cpm: out of scope (migrate + regress).  
+- Context: `context.md` repo root.  
+- Classic core: no change without classic regression proof.  
+- Math gates: rc2014 z80 + 8085 only; `-lm` as above.
