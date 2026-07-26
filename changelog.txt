@@ -15,6 +15,7 @@ More detailed, but still incomplete changelist:
 - [classic] +x07 Support much improved
 - [classic] +z88 Support for 512z64 graphics
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
+- [newlib] library products install under lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/ (classic clibs layout)
 - [all] math32 floating point support for Intel 8085 (MIT licence)
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
