@@ -235,13 +235,13 @@ ENDIF
 
 IF CRT_ENABLE_STDIO = 1
 
-    ; Setup std* streams
+    ; Setup std* streams (match classic crt_section.inc: no _IOUNGETC at start)
     ld hl,__sgoioblk+2
-    ld (hl),19                  ; stdin
+    ld (hl),18                  ; stdin  = _IOSYSTEM|_IOREAD
     ld hl,__sgoioblk+12
-    ld (hl),21                  ; stdout
+    ld (hl),20                  ; stdout = _IOSYSTEM|_IOWRITE
     ld hl,__sgoioblk+22
-    ld (hl),21                  ; stderr
+    ld (hl),20                  ; stderr = _IOSYSTEM|_IOWRITE
 
 ENDIF
 
