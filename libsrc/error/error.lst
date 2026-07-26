@@ -14,6 +14,7 @@ error/z80/error_edom_mc
 error/z80/error_edom_zc
 error/z80/error_efbig_mc
 error/z80/error_efbig_zc
+error/z80/error_einval_lmc
 error/z80/error_einval_mc
 error/z80/error_einval_zc
 error/z80/error_einval_znc

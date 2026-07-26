@@ -1,5 +1,6 @@
 
     MODULE  __scanf_consume_whitespace
+    SECTION code_clib
     PUBLIC  __scanf_consume_whitespace
 
     EXTERN  __scanf_getchar

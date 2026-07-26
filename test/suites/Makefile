@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = string ctype stdio stdlib math md5 regex sccz80 zx far
+SUBDIRS = string ctype stdio stdlib target_io math md5 regex sccz80 zx far
 # benchmark suites (also self-checking via host-verified assertEqual)
 SUBDIRS += charbench crcbench intbench ptrbench sieve rle \
            sortbench queenbench searchbench switchbench \

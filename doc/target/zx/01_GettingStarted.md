@@ -174,15 +174,17 @@ Another question which might be asked of this tiny example is, where does the `z
 Another peek at the output of zcc with the `-v` argument shows a `-L` argument being passed into an embedded `z88dk-z80asm` command. Again, details are beyond the scope of this document, but the value for that argument tells us that the library code is coming from:
 
 ```txt
-libsrc/newlib/lib/sdcc_iy
+lib/clibs/sdcc_ix
 ```
+
+(`-clib=sdcc_iy` reserves IY for the compiler but still links the newlib libraries from the `sdcc_ix` tree; target libraries such as `zx.lib` live there after the build.)
 
 The contents of this directory are built during the Z88DK build, so you can't browse it online.
 
-On your local machine you'll find there are several library files in there which together make up the entire sdcc_iy library. Any of those files can supply code for a zsdcc compiled program. The important one for Spectrum programmers is zx.lib. That library file is full of optimised Z80 machine code routines which provide the sorts of features Spectrum programs need. If you're interested you can inspect the contents of the library with the `z88dk-z80nm` command:
+On your local machine you'll find there are several library files in there which together make up the newlib/sdcc library set. Any of those files can supply code for a zsdcc compiled program. The important one for Spectrum programmers is zx.lib. That library file is full of optimised Z80 machine code routines which provide the sorts of features Spectrum programs need. If you're interested you can inspect the contents of the library with the `z88dk-z80nm` command:
 
 ```sh
- >z88dk-z80nm zx.lib | less
+ >z88dk-z80nm $ZCCCFG/../clibs/sdcc_ix/zx.lib | less
 ```
 
 Do a search and you'll find the `zx_border()` function listed in there.
