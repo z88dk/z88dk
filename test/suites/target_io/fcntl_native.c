@@ -4,6 +4,7 @@
 
 #include "io_port.h"
 #include <fcntl.h>
+#include <unistd.h>
 
 int tio_open(const char *name, int flags, int mode)
 {

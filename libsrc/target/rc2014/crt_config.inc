@@ -404,12 +404,15 @@ IF __CRTCFG = 7
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 256
+   ; Static stdin/out/err/rdr/pun/lst plus room for several FCB file FDSTRUCTs
+   ; (~192 bytes each including sector buffer).
+   defc TAR__clib_stdio_heap_size      = 1024
    
    defc TAR__clib_balloc_table_size    = 0
    
    defc TAR__clib_fopen_max            = 0
-   defc TAR__clib_open_max             = 0
+   ; 6 static fds (stdin..stdlst) + space for dynamic open() files
+   defc TAR__clib_open_max             = 16
 
 ENDIF
 

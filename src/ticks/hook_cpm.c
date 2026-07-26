@@ -377,17 +377,25 @@ void hook_cpm(void)
         }
         break;
     case 0x06:  // C_RAWIO
-        /* E=0FF Return a character without echoing if one is waiting; zero if none is available. */
+        /* E=0FFh: input; E=0FEh: status; else: output char in E. */
         if ( e == 0xff ) {
             int val;
             if (isatty(fileno(stdin)))
-                val = getch();          // read one character at a time if connected to a tty
+                val = getch();
             else
-                val = getchar();        // read in cooked mode if redirected from a file
+                val = getchar();
             if ( val == EOF ) val = 0;
             else if ( val == 10 ) val = 13;
             else if ( val == 13 ) val = 10;
             a = l = val;
+        } else if ( e == 0xfe ) {
+            int val = kbhit();
+            a = l = (val == EOF || val == 0) ? 0 : 0xff;
+        } else {
+            if ( e != 12 ) {
+                fputc(e, stdout);
+                fflush(stdout);
+            }
         }
         break;
     case 0x09:  // C_WRITESTR

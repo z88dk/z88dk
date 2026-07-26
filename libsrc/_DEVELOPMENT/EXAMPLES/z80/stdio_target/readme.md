@@ -277,3 +277,70 @@ Both use the same primitives: driver m4 instantiators, `m4_file_dup`,
 - Live CRTs: `libsrc/target/hbios/startup/`, `…/rc2014/startup/`, `…/yaz180/startup/`  
 - Config examples: `lib/config/hbios.cfg`, `lib/config/rc2014.cfg`  
 - Product paths: `lib/clibs/sccz80/`, `lib/clibs/sdcc_ix/` (and third-party `lib/<target>/` under those)
+
+---
+
+## 9. Dual-stack disk on `subtype=cpm` (FCB + FatFs)
+
+On **rc2014 / yaz180 / scz180** with **`-subtype=cpm`**, console is already BDOS.
+Unprefixed fcntl talks to **CP/M FCB** via the shared newlib driver
+`libsrc/newlib/target/cpm/driver/file/cpm_01_file.asm`. ChaN **`f_*`** remains
+**FatFs only** on a separate volume stack (raw IDE/SD/HBIOS media).
+
+| API | Meaning |
+|-----|---------|
+| `open` / `creat` / `read` / `write` / `lseek` / `close` | Host CP/M filesystem (FCB + BDOS) |
+| `f_mount` / `f_open` / `f_read` / … | FatFs on block device (`diskio` + `ff`) |
+| `fopen` / `FILE*` | stdio over whatever `open` can open — not FatFs |
+
+**hbios** has no `subtype=cpm` dual-stack: use HBIOS / `diskio_hbios` + `ff` only.
+
+### Install FatFs packages (`z88dk-lib`)
+
+```bash
+# diskio in-tree for rc2014 (IDE) and yaz180 (PPIDE)
+z88dk-lib +rc2014 ff time
+z88dk-lib +yaz180  ff time
+
+# scz180 / hbios need package diskio as well
+z88dk-lib +scz180 diskio_sd ff time
+z88dk-lib +hbios  diskio_hbios ff time
+```
+
+### App link examples
+
+```bash
+# FCB only
+zcc +rc2014 -subtype=cpm -clib=new app.c -o app -m
+
+# Dual-stack (FCB + FatFs)
+zcc +rc2014 -subtype=cpm -clib=new app.c \
+  -llib/rc2014/ff -llib/rc2014/time -o app -m
+
+zcc +scz180 -subtype=cpm -clib=new app.c \
+  -llib/scz180/ff -llib/scz180/diskio_sd -llib/scz180/time -o app -m
+
+# hbios FatFs (no FCB bridge)
+zcc +hbios -clib=new app.c \
+  -llib/hbios/ff -llib/hbios/diskio_hbios -llib/hbios/time -o app -m
+```
+
+Headers: `#include <lib/<target>/ff.h>` (and `diskio_sd.h` / `diskio_hbios.h` when using those packages).
+
+### Firmware vs application
+
+| Kind | Typical command | Disk |
+|------|-----------------|------|
+| CP/M-IDE / bare ROM firmware | `+rc2014 -subtype=acia\|sio\|uart\|…` (+ optional `ff` / `ff_ro`) | **`f_*` only** — no BDOS FCB `open` |
+| CP/M application `.com` | `+rc2014\|yaz180\|scz180 -subtype=cpm` | FCB `open` + optional `f_*` |
+
+Do not mix classic `libsrc/target/cpm/fcntl` objects with the newlib FCB driver
+in one link (two `open` definitions).
+
+### Test gate
+
+```bash
+make -C test/suites/target_io    # classic +cpm, rc2014 basic, rc2014 -subtype=cpm
+```
+
+Driver notes: `libsrc/newlib/target/cpm/driver/file/README.md`.

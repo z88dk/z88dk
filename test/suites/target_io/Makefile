@@ -26,7 +26,8 @@ all: \
 	test_cpm_z80.com \
 	test_cpm_8085.com \
 	test_rc2014_z80_CODE.bin \
-	test_rc2014_8085_CODE.bin
+	test_rc2014_8085_CODE.bin \
+	test_rc2014_cpm.com
 
 # ---------------------------------------------------------------------------
 # CP/M classic — native fcntl via BDOS; output must be *.com for ticks
@@ -67,6 +68,20 @@ test_rc2014_8085_CODE.bin: $(COMMON_HOST)
 	@echo "$(GREEN)" `date +%H:%M:%S` " rc2014/8085 target_io completed $(RESET)"
 
 # ---------------------------------------------------------------------------
+# RC2014 CP/M subtype — native FCB fcntl via BDOS (newlib bridge)
+# Output is CODE.bin @ 0x100; copy to .com for ticks CP/M mode.
+# ---------------------------------------------------------------------------
+
+test_rc2014_cpm.com: $(COMMON_NATIVE)
+	zcc +rc2014 -subtype=cpm -clib=new -vn $(CFLAGS) $(call LABEL,RC2014-CPM) \
+		$^ -o $(@:.com=) -m
+	cp $(@:.com=_CODE.bin) $@
+	@echo "$(GREEN)" `date +%H:%M:%S` " Starting rc2014/cpm target_io $(RESET)"
+	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) $@ \
+		|| { echo "$(RED)" `date +%H:%M:%S` " rc2014/cpm target_io failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " rc2014/cpm target_io completed $(RESET)"
+
+# ---------------------------------------------------------------------------
 # Example: +test host fcntl (commented — enable when wanted)
 # test_plus_test_z80.bin: $(COMMON_HOST)
 #	zcc +test -vn $(CFLAGS) -DTIO_USE_HOST_FCNTL $(call LABEL,TEST) \
@@ -77,4 +92,4 @@ test_rc2014_8085_CODE.bin: $(COMMON_HOST)
 clean:
 	rm -f *.com *.bin *.map *.o *.def zcc_opt.def *~ \
 		suite.dat a.dat b.dat \
-		test_cpm_* test_rc2014_* TEST_CPM_*
+		test_cpm_* test_rc2014_* TEST_CPM_* TEST.DAT test.dat
