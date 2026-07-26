@@ -17,6 +17,7 @@ static char  *c_memory_model = "standard";
 
 
 int    c_rc2014_mode = 0;
+int    c_cpm_mode = 0;
 int    c_rom_size = 0;
 int    c_ioport = -1;
 int    c_autolabel = 0;
@@ -391,6 +392,7 @@ int main (int argc, char **argv){
         *get_memory_addr(13, MEM_TYPE_INST) = 0xC9;
 
         pc = 256;
+        c_cpm_mode = 1;
         // CP/M emulator
         if (256 + size > 0x10000) { fclose(fh); exit_log(1, "Binary too large: %d bytes at 0x0100 exceeds 64K\n", size); }
         if (1 != fread(get_memory_addr(256, MEM_TYPE_INST), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
@@ -416,9 +418,13 @@ int main (int argc, char **argv){
 
   if ( alarmtime != 0 ) {
      if ( c_rc2014_mode ) exit(l);
+     /* CP/M 2.2 CRT stores the process exit value at base+0x80 before warm boot
+      * (jp 0).  Hitting -end 0 is the normal completion path for .com files. */
+     if ( c_cpm_mode ) exit(get_memory_data(0x80));
       /* We running as a test, we should never reach the end, so exit with error */
       exit(1);
   }
 
   write_output();
+  if ( c_cpm_mode ) exit(get_memory_data(0x80));
 }

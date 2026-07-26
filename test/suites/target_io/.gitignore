@@ -1,0 +1,10 @@
+*.com
+*.COM
+*.bin
+*.map
+*.o
+*.def
+zcc_opt.def
+suite.dat
+a.dat
+b.dat

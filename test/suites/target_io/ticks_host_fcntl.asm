@@ -1,6 +1,6 @@
 ; Host file I/O via z88dk-ticks SYSCALL (ED FE).
-; Used by the RC2014 suite so create/write/lseek/read/close can be
-; exercised under ticks without a real CF/IDE image.
+; Backend for target_io/fcntl_host.c when a target has no host-visible
+; disk under ticks (e.g. RC2014 basic — real CF/IDE is not emulated).
 ;
 ; Calling convention: sccz80/newlib __stdc (left-to-right):
 ;   first arg pushed first, so the *last* arg is at sp+2 on entry.
