@@ -134,7 +134,7 @@ You should keep this file open. It is currently sparsely documented, but it's st
 The SP1 library code we're using is in the 'iy' version of the standard C library, as described [here](01_GettingStarted.md#library-files). On Linux you can confirm this with a command such as:
 
 ```sh
- >z88dk-z80nm $ZCCCFG/../../libsrc/newlib/lib/sdcc_iy/zx.lib | less
+ >z88dk-z80nm $ZCCCFG/../clibs/sdcc_ix/zx.lib | less
 ```
 
 and search for 'sp1' in the output.

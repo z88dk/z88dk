@@ -213,6 +213,49 @@ char get_response(char *s)
     return r;
 }
 
+// Create parent directories for a destination file path (best-effort).
+
+static void ensure_parent_dir(char *filepath)
+{
+    char tmp[PATHSIZE];
+    char *p;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp), "%s", filepath);
+    len = strlen(tmp);
+    if (len == 0)
+        return;
+
+    /* strip filename */
+    p = tmp + len - 1;
+    while (p > tmp && *p != '/' && *p != '\\')
+        --p;
+    if (p <= tmp)
+        return;
+    *p = 0;
+
+    /* mkdir each component */
+    for (p = tmp + 1; *p; ++p)
+    {
+        if (*p == '/' || *p == '\\')
+        {
+            char sep = *p;
+            *p = 0;
+#ifdef WIN32
+            mkdir(tmp);
+#else
+            mkdir(tmp, 0755);
+#endif
+            *p = sep;
+        }
+    }
+#ifdef WIN32
+    mkdir(tmp);
+#else
+    mkdir(tmp, 0755);
+#endif
+}
+
 //
 
 int copy(char *dst, char *src)
@@ -222,6 +265,8 @@ int copy(char *dst, char *src)
 
     if ((in = fopen(src, "rb")) == NULL)
         return 1;
+
+    ensure_parent_dir(dst);
 
     if ((out = fopen(dst, "wb")) == NULL)
     {
