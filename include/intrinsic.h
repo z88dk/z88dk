@@ -60,6 +60,9 @@ extern unsigned long intrinsic_swap_word_32(unsigned long n) __preserves_regs(a,
 extern unsigned long intrinsic_swap_word_32_fastcall(unsigned long n) __preserves_regs(a,b,c) __z88dk_fastcall;
 #define intrinsic_swap_word_32(a) intrinsic_swap_word_32_fastcall(a)
 
+#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); intrinsic_emit_##arg(); }
+#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
+
 #ifdef __Z180
 extern void intrinsic_slp(void) __preserves_regs(a,b,c,d,e,h,l);
 #endif
@@ -86,41 +89,31 @@ extern void intrinsic_ini(void*) __z88dk_fastcall;
 #define intrinsic_ini_helper(dst,port,num)  { intrinsic_ini(dst); intrinsic_ini_port_##port(); intrinsic_ini_num_##num(); }
 #define intrinsic_ini(dst,port,num)  intrinsic_ini_helper(dst,port,num)
 
-extern void __LIB__ intrinsic_stub(void) __smallc;
+extern void __LIB__ intrinsic_stub(void) __smallc __preserves_regs(a,b,c,d,e,h,l);
 
-extern void __LIB__ intrinsic_di(void) __smallc;
-extern void __LIB__ intrinsic_ei(void) __smallc;
-extern void __LIB__ intrinsic_halt(void) __smallc;
-extern void __LIB__ intrinsic_reti(void) __smallc;
-extern void __LIB__ intrinsic_retn(void) __smallc;
-extern void __LIB__ intrinsic_im_0(void) __smallc;
-extern void __LIB__ intrinsic_im_1(void) __smallc;
-extern void __LIB__ intrinsic_im_2(void) __smallc;
-extern void __LIB__ intrinsic_nop(void) __smallc;
+extern void intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_ei(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_halt(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_reti(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_retn(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_im_0(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_im_1(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_im_2(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_nop(void) __preserves_regs(a,b,c,d,e,h,l);
 
-extern void __LIB__ intrinsic_ex_de_hl(void) __smallc;
-extern void __LIB__ intrinsic_exx(void) __smallc;
+extern void __LIB__ intrinsic_ex_de_hl(void) __smallc __preserves_regs(a,b,c);
+extern void __LIB__ intrinsic_exx(void) __smallc __preserves_regs(a);
 
-extern void __LIB__ *intrinsic_return_bc(void) __smallc;
-extern void __LIB__ *intrinsic_return_de(void) __smallc;
+extern void __LIB__ *intrinsic_return_bc(void) __smallc __preserves_regs(a,b,c,d,e);
+extern void __LIB__ *intrinsic_return_de(void) __smallc __preserves_regs(a,b,c,d,e);
 
-extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __smallc __z88dk_fastcall;
-extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __smallc __z88dk_fastcall;
-extern unsigned long __LIB__ intrinsic_swap_word_32(unsigned long n) __smallc __z88dk_fastcall;
+extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __smallc __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __smallc __z88dk_fastcall __preserves_regs(b,c);
+extern unsigned long __LIB__ intrinsic_swap_word_32(unsigned long n) __smallc __z88dk_fastcall __preserves_regs(a,b,c);
 
-#ifdef __SDCC
-
-#define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); intrinsic_emit_##arg(); }
-#define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
-
-#endif
-
-#ifdef __SCCZ80
 
 #define intrinsic_emit_helper(arg)  { extern void intrinsic_emit_##arg(void); intrinsic_emit_##arg(); }
 #define intrinsic_emit(arg)  intrinsic_emit_helper(arg)
-
-#endif
 
 #ifdef __Z180
 extern void __LIB__ intrinsic_slp(void) __smallc;

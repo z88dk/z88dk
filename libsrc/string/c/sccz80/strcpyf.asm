@@ -23,9 +23,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .strcpyf
 ._strcpyf
-    push    ix 
-    ld      ix,4
-    add     ix,sp  
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    push    iy              ; preserve caller's IY (used as char scratch below)
+    ld      ix,6            ; +2 pushed IX +2 pushed IY +2 return address
+    add     ix,sp
     ld      c,(ix+4)
     ld      b,(ix+5)
     ld      e,(ix+6)        ; E'B'C'=s1
@@ -53,6 +54,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      l,(ix+4)
     ld      h,(ix+5)
     ld      e,(ix+6)        ; EHL=s1
-    pop     ix
+    pop     iy              ; restore caller's IY
+    pop     ix              ; restore caller's IX
     ret
 ENDIF

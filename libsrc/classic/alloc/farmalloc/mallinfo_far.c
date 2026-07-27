@@ -5,7 +5,7 @@
 
 
 
-void mallinfo_far(unsigned long *total, unsigned long *largest)
+void mallinfo_far(unsigned long *total, unsigned long *largest) __z88dk_saveframe
 {
     unsigned long tot = 0;
     unsigned long biggest = 0;
