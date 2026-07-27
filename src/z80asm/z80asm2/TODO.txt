@@ -6,6 +6,16 @@
 - add import/export to ASCII to z80nm
 - add version 19: public symbol index
 
+## Future evolution
+- Memory maps for loading
+- Parallel assembly
+- Parallel symbol resolution during linking
+- Lazy write-back (write only modified sections)
+- Module "touch map" (track accessed/modified sections)
+- Lazy symbol hydration (hydrate symbol bodies only when needed)
+- Module deduplication via hashing
+
+
 ASCII format structure
 Top-level:
 A sequence of .module blocks

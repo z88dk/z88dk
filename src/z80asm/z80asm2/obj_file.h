@@ -71,6 +71,8 @@ struct CommonSchema {
     size_t size = 0;
     ObjFileType type = ObjFileType::None;
     int version = 0;
+    CPU cur_cpu_id = DEFAULT_CPU;
+    bool cur_swap_ixiy = false;
 
     explicit CommonSchema(std::shared_ptr<const BinaryFile> file_,
                           size_t base_offset_, size_t size_);
@@ -119,6 +121,7 @@ struct ObjSchema : public CommonSchema {
 struct LibSchema : public CommonSchema {
     std::vector<SectionInfo> modules;
     std::unordered_map<size_t, size_t> offset_to_index;
+    bool modules_loaded = false;
     SectionInfo strings;
     SectionInfo symbol_index;
 
@@ -401,33 +404,74 @@ private:
 // Module
 //-----------------------------------------------------------------------------
 
-struct ObjModule {
-    StringId filename_id;       // filename from which the module was created
-    size_t base_offset = 0;     // offset in the binary file
-
-    CPU cpu_id = DEFAULT_CPU;
-    bool swap_ixiy = false;
-    uint base_address = OrgNotDefined;
-    ObjModname modname;
-    std::vector<ObjExpr> exprs;
-    std::vector<ObjReloc> relocs;
-    std::vector<ObjSymbol> symbols;
-    std::vector<ObjExtern> externs;
-    std::vector<ObjSection> sections;
-    StringTable strings;
-
+class ObjModule {
+public:
+    StringId filename_id() const {
+        return filename_id_;
+    }
+    void set_filename_id(StringId id) {
+        filename_id_ = id;
+    }
     std::string_view filename() const {
-        return g_strings.view(filename_id);
+        return g_strings.view(filename_id_);
     }
     void set_filename(std::string_view filename) {
-        filename_id = g_strings.intern(filename);
+        filename_id_ = g_strings.intern(filename);
+    }
+    size_t base_offset() const {
+        return base_offset_;
+    }
+    void set_base_offset(size_t offset) {
+        base_offset_ = offset;
+    }
+    CPU cpu_id() const {
+        return cpu_id_;
+    }
+    void set_cpu_id(CPU id) {
+        cpu_id_ = id;
+    }
+    bool swap_ixiy() const {
+        return swap_ixiy_;
+    }
+    void set_swap_ixiy(bool swap) {
+        swap_ixiy_ = swap;
+    }
+    uint base_address() const {
+        return base_address_;
+    }
+    void set_base_address(uint address) {
+        base_address_ = address;
     }
 
-    void dump(DumpContext ctx) const;
-    void dump_short() const;
+    // accessors load sections on demand, if not already loaded
+    StringTable* strings();
+    ObjModname* modname();
+    std::vector<ObjExpr>* exprs();
+    std::vector<ObjReloc>* relocs();
+    std::vector<ObjSymbol>* symbols();
+    std::vector<ObjExtern>* externs();
+    std::vector<ObjSection>* sections();
+
+    void dump(DumpContext ctx);
+    void dump_short();
 
     void pack(BinaryData& bin_data);
     void unpack(std::shared_ptr<const BinaryFile> file, size_t ptr);
+
+private:
+    StringId filename_id_;       // filename from which the module was created
+    size_t base_offset_ = 0;     // offset in the binary file
+    CPU cpu_id_ = DEFAULT_CPU;
+    bool swap_ixiy_ = false;
+    uint base_address_ = OrgNotDefined;
+    std::unique_ptr<ObjSchema> obj_schema_ = nullptr;
+    std::unique_ptr<StringTable> strings_ = nullptr;
+    std::unique_ptr<ObjModname> modname_ = nullptr;
+    std::unique_ptr<std::vector<ObjExpr>> exprs_ = nullptr;
+    std::unique_ptr<std::vector<ObjReloc>> relocs_ = nullptr;
+    std::unique_ptr<std::vector<ObjSymbol>> symbols_ = nullptr;
+    std::unique_ptr<std::vector<ObjExtern>> externs_ = nullptr;
+    std::unique_ptr<std::vector<ObjSection>> sections_ = nullptr;
 };
 
 //-----------------------------------------------------------------------------
@@ -456,30 +500,60 @@ struct hash<CpuKey> {
 };
 }
 
-struct ObjLibrary {
-    StringId filename_id;       // filename from which the module was created
-    size_t base_offset = 0;     // offset in the binary file
-
-    std::vector<ObjModule> modules;
-    StringTable strings;
-    std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>> symbol_index;
-
+class ObjLibrary {
+public:
+    StringId filename_id() const {
+        return filename_id_;
+    }
+    void set_filename_id(StringId id) {
+        filename_id_ = id;
+    }
     std::string_view filename() const {
-        return g_strings.view(filename_id);
+        return g_strings.view(filename_id_);
     }
     void set_filename(std::string_view filename) {
-        filename_id = g_strings.intern(filename);
+        filename_id_ = g_strings.intern(filename);
+    }
+    size_t base_offset() const {
+        return base_offset_;
+    }
+    void set_base_offset(size_t offset) {
+        base_offset_ = offset;
     }
 
-    void dump(DumpContext ctx) const;
-    void dump_short() const;
+    // accessors load sections on demand, if not already loaded
+    StringTable* strings();
+    std::vector<ObjModule>* modules();
+    std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>*
+            symbol_index();
+
+    // lookup public symbol in library, returns ObjModule defining it
+    // for current CPU and swap_ixiy, or nullptr if not found
+    // current CPU and swap_ixiy are copied from options anf stored in LibSchema
+    // when the library is unpacked, and can be changed with set_cpu_id() and set_swap_ixiy()
+    ObjModule* lookup_public_symbol(StringId sym_name_id);
+
+    void dump(DumpContext ctx);
+    void dump_short();
 
     void pack(BinaryData& bin_data);
     void unpack(std::shared_ptr<const BinaryFile> file);
 
 private:
+    StringId filename_id_;       // filename from which the module was created
+    size_t base_offset_ = 0;     // offset in the binary file
+    std::unique_ptr<LibSchema> lib_schema_ = nullptr;
+    std::unique_ptr<StringTable> strings_ = nullptr;
+    std::unique_ptr<std::vector<ObjModule>> modules_ = nullptr;
+    std::unique_ptr<std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>>
+    symbol_index_ = nullptr;
+    std::unique_ptr<std::unordered_map<StringId, ObjModule*>> symbol_to_module_ =
+                nullptr;
+
     void build_symbol_index();
     size_t pack_symbol_index(BinaryData& bin_data);
+    void build_symbol_to_module_map_v19();
+    void build_symbol_to_module_map_older();
 };
 
 //-----------------------------------------------------------------------------
@@ -490,4 +564,4 @@ void write_object_library(ObjLibrary& obj_lib, std::string_view filename);
 void read_object_library(ObjLibrary& obj_lib, std::string_view filename);
 
 [[noreturn]]
-void dump_obj_lib_and_exit(const ObjLibrary& obj_lib);
+void dump_obj_lib_and_exit(ObjLibrary& obj_lib);

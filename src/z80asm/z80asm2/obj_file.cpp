@@ -101,7 +101,9 @@ bool parse_signature(std::string_view signature, ObjFileType& type,
 
 CommonSchema::CommonSchema(std::shared_ptr<const BinaryFile> file_,
                            size_t base_offset_, size_t size_)
-    : file(std::move(file_)), base_offset(base_offset_), size(size_) {
+    : file(std::move(file_)), base_offset(base_offset_), size(size_),
+      cur_cpu_id(g_args.options.cpu_id),
+      cur_swap_ixiy(g_args.options.swap_ixiy) {
 
     // check size
     if (end_offset() >= file->size()) {
@@ -1196,64 +1198,193 @@ void ObjSection::print_bytes(DumpContext ctx) const {
 // Module
 //-----------------------------------------------------------------------------
 
-void ObjModule::dump(DumpContext ctx) const {
-    ctx.line("ObjModule: " + std::string(modname.name()));
-    auto c = ctx.child();
-    c.line("CPU: " + to_string(cpu_id));
-    if (swap_ixiy) {
-        c.line("Swap IX/IY: true");
-    }
-    if (base_address == OrgSectionSplit) {
-        c.line("Base address: section split");
-    }
-    else if (base_address != OrgNotDefined) {
-        c.line("Base address: " + int_to_hex(base_address));
+StringTable* ObjModule::strings() {
+    if (!strings_) {
+        strings_ = std::make_unique<StringTable>();
     }
 
-    ObjExpr::dump_exprs(c, exprs);
-    ObjReloc::dump_relocs(c, relocs);
-    ObjSymbol::dump_symbols(c, symbols);
-    ObjExtern::dump_externs(c, externs);
-    ObjSection::dump_sections(c, sections);
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->strings.present &&
+            !obj_schema_->strings.loaded) {
+        strings_->unpack(obj_schema_->file, obj_schema_->strings.offset);
+        obj_schema_->strings.loaded = true;
+    }
+    return strings_.get();
 }
 
-void ObjModule::dump_short() const {
-    std::cout << "Object  file " << filename()
-              << " at " << int_to_hex(base_offset) << std::endl;
-    std::cout << "  Name: " << modname.name() << std::endl;
-    if (base_address != OrgNotDefined && base_address != OrgSectionSplit) {
-        std::cout << "  ORG:  " << int_to_hex(base_address) << std::endl;
+ObjModname* ObjModule::modname() {
+    if (!modname_) {
+        modname_ = std::make_unique<ObjModname>();
     }
-    std::cout << "  CPU:  " << to_string(cpu_id) << " ";
-    if (swap_ixiy) {
+
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->modname.present &&
+            !obj_schema_->modname.loaded) {
+        modname_->unpack(obj_schema_->file, obj_schema_->version,
+                         *strings(), obj_schema_->modname.offset);
+        obj_schema_->modname.loaded = true;
+    }
+    return modname_.get();
+}
+
+std::vector<ObjExpr>* ObjModule::exprs() {
+    if (!exprs_) {
+        exprs_ = std::make_unique<std::vector<ObjExpr>>();
+    }
+
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->exprs.present &&
+            !obj_schema_->exprs.loaded) {
+        ObjExpr::unpack_exprs(obj_schema_->file, obj_schema_->version,
+                              *strings(),
+                              obj_schema_->exprs.offset,
+                              obj_schema_->exprs.offset + obj_schema_->exprs.size,
+                              *exprs_);
+        obj_schema_->exprs.loaded = true;
+    }
+    return exprs_.get();
+}
+
+std::vector<ObjReloc>* ObjModule::relocs() {
+    if (!relocs_) {
+        relocs_ = std::make_unique<std::vector<ObjReloc>>();
+    }
+
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->relocs.present &&
+            !obj_schema_->relocs.loaded) {
+        ObjReloc::unpack_relocs(obj_schema_->file, obj_schema_->version,
+                                *strings(),
+                                obj_schema_->relocs.offset,
+                                obj_schema_->relocs.offset + obj_schema_->relocs.size,
+                                *relocs_);
+        obj_schema_->relocs.loaded = true;
+    }
+    return relocs_.get();
+}
+
+std::vector<ObjSymbol>* ObjModule::symbols() {
+    if (!symbols_) {
+        symbols_ = std::make_unique<std::vector<ObjSymbol>>();
+    }
+
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->symbols.present &&
+            !obj_schema_->symbols.loaded) {
+        ObjSymbol::unpack_symbols(obj_schema_->file, obj_schema_->version,
+                                  *strings(),
+                                  obj_schema_->symbols.offset,
+                                  obj_schema_->symbols.offset + obj_schema_->symbols.size,
+                                  *symbols_);
+        obj_schema_->symbols.loaded = true;
+    }
+
+    return symbols_.get();
+}
+
+std::vector<ObjExtern>* ObjModule::externs() {
+    if (!externs_) {
+        externs_ = std::make_unique<std::vector<ObjExtern>>();
+    }
+
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->externs.present &&
+            !obj_schema_->externs.loaded) {
+        ObjExtern::unpack_externs(obj_schema_->file, obj_schema_->version,
+                                  *strings(),
+                                  obj_schema_->externs.offset,
+                                  obj_schema_->externs.offset + obj_schema_->externs.size,
+                                  *externs_);
+        obj_schema_->externs.loaded = true;
+    }
+
+    return externs_.get();
+}
+
+std::vector<ObjSection>* ObjModule::sections() {
+    if (!sections_) {
+        sections_ = std::make_unique<std::vector<ObjSection>>();
+    }
+
+    // check if unpack was called
+    if (obj_schema_ &&
+            obj_schema_->sections.present &&
+            !obj_schema_->sections.loaded) {
+        ObjSection::unpack_sections(obj_schema_->file, obj_schema_->version,
+                                    *strings(),
+                                    obj_schema_->sections.offset,
+                                    obj_schema_->sections.offset + obj_schema_->sections.size,
+                                    *sections_);
+        obj_schema_->sections.loaded = true;
+    }
+
+    return sections_.get();
+}
+
+void ObjModule::dump(DumpContext ctx) {
+    ctx.line("ObjModule: " + std::string(modname()->name()));
+    auto c = ctx.child();
+    c.line("CPU: " + to_string(cpu_id()));
+    if (swap_ixiy()) {
+        c.line("Swap IX/IY: true");
+    }
+    if (base_address() == OrgSectionSplit) {
+        c.line("Base address: section split");
+    }
+    else if (base_address() != OrgNotDefined) {
+        c.line("Base address: " + int_to_hex(base_address()));
+    }
+
+    ObjExpr::dump_exprs(c, *exprs());
+    ObjReloc::dump_relocs(c, *relocs());
+    ObjSymbol::dump_symbols(c, *symbols());
+    ObjExtern::dump_externs(c, *externs());
+    ObjSection::dump_sections(c, *sections());
+}
+
+void ObjModule::dump_short() {
+    std::cout << "Object  file " << filename()
+              << " at " << int_to_hex(base_offset()) << std::endl;
+    std::cout << "  Name: " << modname()->name() << std::endl;
+    if (base_address() != OrgNotDefined && base_address() != OrgSectionSplit) {
+        std::cout << "  ORG:  " << int_to_hex(base_address()) << std::endl;
+    }
+    std::cout << "  CPU:  " << to_string(cpu_id()) << " ";
+    if (swap_ixiy()) {
         std::cout << "(-IXIY)";
     }
     std::cout << std::endl;
-    ObjSection::dump_sections_short(sections);
-    ObjSymbol::dump_symbols_short(symbols);
-    ObjExtern::dump_externs_short(externs);
-    ObjExpr::dump_exprs_short(exprs);
-    ObjReloc::dump_relocs_short(relocs);
-    if (strings.size() > 1) {
-        std::cout << "  Strings: " << strings.size() << std::endl;
-        for (uint i = 1; i < strings.size(); i++) {
+    ObjSection::dump_sections_short(*sections());
+    ObjSymbol::dump_symbols_short(*symbols());
+    ObjExtern::dump_externs_short(*externs());
+    ObjExpr::dump_exprs_short(*exprs());
+    ObjReloc::dump_relocs_short(*relocs());
+    if (strings()->size() > 1) {
+        std::cout << "  Strings: " << strings()->size() << std::endl;
+        for (uint i = 1; i < strings()->size(); i++) {
             std::cout << "    S "
                       << std::setw(3) << i << " = \""
-                      << strings.view(StringId(i)) << "\"" << std::endl;
+                      << strings()->view(StringId(i)) << "\"" << std::endl;
         }
     }
 }
 
 void ObjModule::pack(BinaryData& bin_data) {
     // mark the start for the relative pointers
-    base_offset = bin_data.size();
+    set_base_offset(bin_data.size());
 
     // add signature
     bin_data.put_string(obj_file_signature());
 
     // add CPU and IXIY
-    bin_data.put_dword(static_cast<uint32_t>(cpu_id));
-    bin_data.put_dword(static_cast<uint32_t>(swap_ixiy));
+    bin_data.put_dword(static_cast<uint32_t>(cpu_id()));
+    bin_data.put_dword(static_cast<uint32_t>(swap_ixiy()));
 
     // append placeholders for 6 pointers to file sections
     size_t header_ptr = bin_data.size();
@@ -1262,15 +1393,16 @@ void ObjModule::pack(BinaryData& bin_data) {
     }
 
     // write each of the sections and collect the addresses
-    strings.clear();
-    size_t exprs_ptr = ObjExpr::pack_exprs(bin_data, strings, exprs);
-    size_t relocs_ptr = ObjReloc::pack_relocs(bin_data, strings, relocs);
-    size_t symbols_ptr = ObjSymbol::pack_symbols(bin_data, strings, symbols);
-    size_t externs_ptr = ObjExtern::pack_externs(bin_data, strings, externs);
-    size_t modname_ptr = modname.pack(bin_data, strings);
-    size_t sections_ptr = ObjSection::pack_sections(bin_data, strings, sections);
+    strings()->clear();
+    size_t exprs_ptr = ObjExpr::pack_exprs(bin_data, *strings(), *exprs());
+    size_t relocs_ptr = ObjReloc::pack_relocs(bin_data, *strings(), *relocs());
+    size_t symbols_ptr = ObjSymbol::pack_symbols(bin_data, *strings(), *symbols());
+    size_t externs_ptr = ObjExtern::pack_externs(bin_data, *strings(), *externs());
+    size_t modname_ptr = modname()->pack(bin_data, *strings());
+    size_t sections_ptr = ObjSection::pack_sections(bin_data, *strings(),
+                          *sections());
     size_t strings_ptr = bin_data.size();
-    strings.pack(bin_data);
+    strings()->pack(bin_data);
 
     // write pointers to areas
     auto calc_offset = [](size_t offset, size_t base) -> size_t {
@@ -1284,92 +1416,149 @@ void ObjModule::pack(BinaryData& bin_data) {
 
     size_t ptr = header_ptr;
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(modname_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(modname_ptr, base_offset())));
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(exprs_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(exprs_ptr, base_offset())));
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(relocs_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(relocs_ptr, base_offset())));
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(symbols_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(symbols_ptr, base_offset())));
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(externs_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(externs_ptr, base_offset())));
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(sections_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(sections_ptr, base_offset())));
     bin_data.put_dword_at(ptr,
-                          static_cast<uint32_t>(calc_offset(strings_ptr, base_offset)));
+                          static_cast<uint32_t>(calc_offset(strings_ptr, base_offset())));
 }
 
 void ObjModule::unpack(std::shared_ptr<const BinaryFile> file, size_t ptr) {
     // get schema
-    ObjSchema obj_schema(file, ptr, file->size() - ptr);
-    set_filename(obj_schema.filename());
-    base_offset = obj_schema.base_offset;
-    int version = obj_schema.version;
+    obj_schema_ = std::make_unique<ObjSchema>(file, ptr, file->size() - ptr);
+    set_filename(obj_schema_->filename());
+    set_base_offset(obj_schema_->base_offset);
 
     // get global attributes
-    cpu_id = obj_schema.cpu_id;
-    swap_ixiy = obj_schema.swap_ixiy;
-    base_address = obj_schema.base_address;
+    set_cpu_id(obj_schema_->cpu_id);
+    set_swap_ixiy(obj_schema_->swap_ixiy);
+    set_base_address(obj_schema_->base_address);
 
-    // get string table
-    strings.clear();
-    if (obj_schema.strings.present) {
-        strings.unpack(file, obj_schema.strings.offset);
-    }
-
-    // get each section
-    if (obj_schema.modname.present) {
-        modname.unpack(file, version, strings, obj_schema.modname.offset);
-    }
-    if (obj_schema.exprs.present) {
-        ObjExpr::unpack_exprs(file, version, strings,
-                              obj_schema.exprs.offset, obj_schema.exprs.offset + obj_schema.exprs.size,
-                              exprs);
-    }
-    if (obj_schema.relocs.present) {
-        ObjReloc::unpack_relocs(file, version, strings,
-                                obj_schema.relocs.offset, obj_schema.relocs.offset + obj_schema.relocs.size,
-                                relocs);
-    }
-    if (obj_schema.symbols.present) {
-        ObjSymbol::unpack_symbols(file, version, strings,
-                                  obj_schema.symbols.offset, obj_schema.symbols.offset + obj_schema.symbols.size,
-                                  symbols);
-    }
-    if (obj_schema.externs.present) {
-        ObjExtern::unpack_externs(file, version, strings,
-                                  obj_schema.externs.offset, obj_schema.externs.offset + obj_schema.externs.size,
-                                  externs);
-    }
-    if (obj_schema.sections.present) {
-        ObjSection::unpack_sections(file, version, strings,
-                                    obj_schema.sections.offset,
-                                    obj_schema.sections.offset + obj_schema.sections.size,
-                                    sections);
-    }
+    // the sections are loaded on demand
 }
 
 //-----------------------------------------------------------------------------
 // Library
 //-----------------------------------------------------------------------------
 
-void ObjLibrary::dump(DumpContext ctx) const {
+StringTable* ObjLibrary::strings() {
+    if (!strings_) {
+        strings_ = std::make_unique<StringTable>();
+    }
+
+    // check if unpack was called
+    if (lib_schema_ &&
+            lib_schema_->strings.present &&
+            !lib_schema_->strings.loaded) {
+        strings_->unpack(lib_schema_->file, lib_schema_->strings.offset);
+        lib_schema_->strings.loaded = true;
+    }
+    return strings_.get();
+}
+
+std::vector<ObjModule>* ObjLibrary::modules() {
+    if (!modules_) {
+        modules_ = std::make_unique<std::vector<ObjModule>>();
+    }
+
+    // check if unpack was called
+    if (lib_schema_ &&
+            !lib_schema_->modules.empty() &&
+            !lib_schema_->modules_loaded) {
+        modules_->clear();
+        for (auto& info : lib_schema_->modules) {
+            ObjModule mod;
+            mod.unpack(lib_schema_->file, info.offset);
+            modules_->push_back(std::move(mod));
+        }
+        lib_schema_->modules_loaded = true;
+    }
+    return modules_.get();
+}
+
+std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>* ObjLibrary::symbol_index() {
+    if (!symbol_index_) {
+        symbol_index_ =
+            std::make_unique<std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>>();
+    }
+
+    // check if unpack was called
+    if (lib_schema_ &&
+            lib_schema_->symbol_index.present &&
+            !lib_schema_->symbol_index.loaded) {
+
+        symbol_index_->clear();
+        size_t header_ptr = lib_schema_->symbol_index.offset;
+        while (true) {
+            // get each CPU-swap_ixiy entry
+            CPU cpu_id = static_cast<CPU>(lib_schema_->file->get_dword(header_ptr));
+            if (cpu_id == CPU::none) {
+                break;  // terminator
+            }
+            bool swap_ixiy = !!lib_schema_->file->get_dword(header_ptr);
+            size_t list_ptr = lib_schema_->file->get_dword(header_ptr);
+            size_t list_size = lib_schema_->file->get_dword(header_ptr);
+
+            CpuKey cpu_key(cpu_id, swap_ixiy);
+            for (size_t i = 0; i < list_size; i++) {
+                StringId symbol_name_id = StringId(lib_schema_->file->get_dword(list_ptr));
+                size_t mod_base_offset = lib_schema_->file->get_dword(header_ptr);
+                (*symbol_index_)[cpu_key][symbol_name_id] = mod_base_offset;
+            }
+        }
+
+        lib_schema_->symbol_index.loaded = true;
+    }
+
+    return symbol_index_.get();
+}
+
+ObjModule* ObjLibrary::lookup_public_symbol(StringId sym_name_id) {
+    // build/lookup the symbol-to-module map
+    if (!symbol_to_module_) {
+        if (lib_schema_ && lib_schema_->symbol_index.present) {
+            build_symbol_to_module_map_v19();
+        }
+        else {
+            build_symbol_to_module_map_older();
+        }
+    }
+
+    // lookup the index for the current CPU and swap_ixiy
+    auto it = symbol_to_module_->find(sym_name_id);
+    if (it == symbol_to_module_->end()) {
+        return nullptr;     // not found
+    }
+    else {
+        return it->second;    // return the module pointer
+    }
+}
+
+void ObjLibrary::dump(DumpContext ctx) {
     ctx.line("ObjLibrary:");
     auto c = ctx.child();
-    if (!modules.empty()) {
-        c.line("Modules (" + std::to_string(modules.size()) + "):");
+    if (!modules()->empty()) {
+        c.line("Modules (" + std::to_string(modules()->size()) + "):");
         auto mc = c.child();
-        for (const auto& module : modules) {
-            module.dump(mc);
+        for (auto& module_ : *modules()) {
+            module_.dump(mc);
         }
     }
 }
 
-void ObjLibrary::dump_short() const {
+void ObjLibrary::dump_short() {
     std::cout << "Library file " << filename()
-              << " at " << int_to_hex(base_offset) << std::endl;
-    for (const auto& module : modules) {
-        module.dump_short();
+              << " at " << int_to_hex(base_offset()) << std::endl;
+    for (auto& module_ : *modules()) {
+        module_.dump_short();
     }
 }
 
@@ -1385,7 +1574,7 @@ void ObjLibrary::pack(BinaryData& bin_data) {
 
     // add each module
     size_t prev_ptr = 0;
-    for (auto& mod : modules) {
+    for (auto& mod : *modules()) {
         // append header
         prev_ptr = bin_data.size();
         bin_data.put_dword(OffsetNotPresent);   // next module
@@ -1424,69 +1613,35 @@ void ObjLibrary::pack(BinaryData& bin_data) {
     size_t string_table_offset = bin_data.size();
     bin_data.patch_dword(string_table_ptr,
                          static_cast<uint32_t>(string_table_offset));
-    strings.pack(bin_data);
+    strings()->pack(bin_data);
 }
 
 void ObjLibrary::unpack(std::shared_ptr<const BinaryFile> file) {
     // get schema
-    LibSchema lib_schema(file);
-    set_filename(lib_schema.filename());
-    base_offset = lib_schema.base_offset;
+    lib_schema_ = std::make_unique<LibSchema>(file);
+    set_filename(lib_schema_->filename());
+    set_base_offset(lib_schema_->base_offset);
 
-    // get string table
-    strings.clear();
-    if (lib_schema.strings.present) {
-        strings.unpack(file, lib_schema.strings.offset);
-    }
-
-    // get symbol index
-    symbol_index.clear();
-    if (lib_schema.symbol_index.present) {
-        size_t header_ptr = lib_schema.symbol_index.offset;
-        while (true) {
-            // get each CPU-swap_ixiy entry
-            CPU cpu_id = static_cast<CPU>(file->get_dword(header_ptr));
-            if (cpu_id == CPU::none) {
-                break;  // terminator
-            }
-            bool swap_ixiy = !!file->get_dword(header_ptr);
-            size_t list_ptr = file->get_dword(header_ptr);
-            size_t list_size = file->get_dword(header_ptr);
-
-            CpuKey cpu_key(cpu_id, swap_ixiy);
-            for (size_t i = 0; i < list_size; i++) {
-                StringId symbol_name_id = StringId(file->get_dword(list_ptr));
-                size_t mod_base_offset = file->get_dword(header_ptr);
-                symbol_index[cpu_key][symbol_name_id] = mod_base_offset;
-            }
-        }
-    }
-
-    // get all modules
-    modules.clear();
-    for (auto& info : lib_schema.modules) {
-        ObjModule mod;
-        mod.unpack(file, info.offset);
-        modules.push_back(std::move(mod));
-    }
+    // the sections are loaded on demand
 }
 
 void ObjLibrary::build_symbol_index() {
-    strings.clear();
-    symbol_index.clear();
+    strings()->clear();
+    symbol_index()->clear();
 
     for (auto code_cpu_id : cpus_specific_to_general()) {
-        for (auto swap_ixiy : {
+        for (auto code_swap_ixiy : {
                     false, true
                 }) {
             std::unordered_map<StringId, size_t> symbol_map;
-            for (auto& mod : modules) {
-                size_t mod_base_offset = mod.base_offset;
-                if (cpu_compatible(code_cpu_id, mod.cpu_id) && swap_ixiy == mod.swap_ixiy) {
-                    for (auto& sym : mod.symbols) {
+            for (auto& mod : *modules()) {
+                size_t mod_base_offset = mod.base_offset();
+                if (cpu_compatible(code_cpu_id, mod.cpu_id())
+                        && code_swap_ixiy == mod.swap_ixiy()) {
+                    for (auto& sym : *mod.symbols()) {
                         if (sym.scope == ObjSymbolScope::Public) {
                             std::string_view sym_name = sym.symbol_name();
-                            StringId sym_name_id = strings.intern(sym_name);
+                            StringId sym_name_id = strings()->intern(sym_name);
                             auto it = symbol_map.find(sym_name_id);
                             if (it == symbol_map.end()) {
                                 symbol_map[sym_name_id] = mod_base_offset;
@@ -1499,15 +1654,15 @@ void ObjLibrary::build_symbol_index() {
                 }
             }
             if (!symbol_map.empty()) {
-                CpuKey cpu_key(code_cpu_id, swap_ixiy);
-                symbol_index[cpu_key] = std::move(symbol_map);
+                CpuKey cpu_key(code_cpu_id, code_swap_ixiy);
+                (*symbol_index())[cpu_key] = std::move(symbol_map);
             }
         }
     }
 }
 
 size_t ObjLibrary::pack_symbol_index(BinaryData& bin_data) {
-    if (symbol_index.empty()) {
+    if (symbol_index()->empty()) {
         return OffsetNotPresent;
     }
 
@@ -1520,8 +1675,8 @@ size_t ObjLibrary::pack_symbol_index(BinaryData& bin_data) {
                     false, true
                 }) {
             CpuKey cpu_key(code_cpu_id, swap_ixiy);
-            if (symbol_index.count(cpu_key)) {
-                const auto& symbol_map = symbol_index[cpu_key];
+            if (symbol_index()->count(cpu_key)) {
+                const auto& symbol_map = (*symbol_index())[cpu_key];
                 bin_data.put_dword(static_cast<uint32_t>(code_cpu_id));
                 bin_data.put_dword(static_cast<uint32_t>(swap_ixiy));
                 symbol_map_offsets_ptrs.push_back(bin_data.size());
@@ -1540,10 +1695,10 @@ size_t ObjLibrary::pack_symbol_index(BinaryData& bin_data) {
                     false, true
                 }) {
             CpuKey cpu_key(code_cpu_id, swap_ixiy);
-            if (symbol_index.count(cpu_key)) {
+            if (symbol_index()->count(cpu_key)) {
                 symbol_map_offsets.push_back(
                     bin_data.size());      // save offset for this symbol map
-                const auto& symbol_map = symbol_index[cpu_key];
+                const auto& symbol_map = (*symbol_index())[cpu_key];
 
                 // sort symbols alphabetically for deterministic output
                 std::vector<StringId> sorted_sym_name_ids;
@@ -1573,6 +1728,36 @@ size_t ObjLibrary::pack_symbol_index(BinaryData& bin_data) {
     }
 
     return start_offset;
+}
+
+void ObjLibrary::build_symbol_to_module_map_v19() {
+    symbol_to_module_ =
+        std::make_unique<std::unordered_map<StringId, ObjModule*>>();
+    CpuKey cpu_key(lib_schema_->cur_cpu_id, lib_schema_->cur_swap_ixiy);
+    std::unordered_map<StringId, size_t> symbol_map = (*symbol_index())[cpu_key];
+    for (auto& [sym_name_id, mod_base_offset] : symbol_map) {
+        auto it = lib_schema_->offset_to_index.find(mod_base_offset);
+        if (it == lib_schema_->offset_to_index.end()) {
+            lib_schema_->invalid_file_error("Invalid module base offset in symbol index: " +
+                                            std::to_string(mod_base_offset));
+        }
+        else {
+            size_t mod_index = it->second;
+            if (mod_index >= modules()->size()) {
+                lib_schema_->invalid_file_error("Invalid module index in symbol index: " +
+                                                std::to_string(mod_index));
+            }
+            else {
+                ObjModule* mod = &(*modules())[mod_index];
+                (*symbol_to_module_)[sym_name_id] = mod;
+            }
+        }
+    }
+}
+
+void ObjLibrary::build_symbol_to_module_map_older() {
+    build_symbol_index();               // build the symbol index for older versions
+    build_symbol_to_module_map_v19();   // then build the symbol to module map
 }
 
 //-----------------------------------------------------------------------------
@@ -1605,7 +1790,7 @@ void read_object_library(ObjLibrary& obj_lib, std::string_view filename) {
     obj_lib.unpack(file);
 }
 
-void dump_obj_lib_and_exit(const ObjLibrary& obj_lib) {
+void dump_obj_lib_and_exit(ObjLibrary& obj_lib) {
     DumpContext ctx(std::cout);
     obj_lib.dump(ctx);
     std::exit(EXIT_SUCCESS);

@@ -355,9 +355,9 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
     ObjModule obj_mod;
 
     // global information for the module
-    obj_mod.modname.set_name(g_strings.view(mod.name_id));
-    obj_mod.cpu_id = g_args.options.cpu_id;
-    obj_mod.swap_ixiy = g_args.options.swap_ixiy;
+    obj_mod.modname()->set_name(g_strings.view(mod.name_id));
+    obj_mod.set_cpu_id(g_args.options.cpu_id);
+    obj_mod.set_swap_ixiy(g_args.options.swap_ixiy);
 
     // symbol table - process in alphabetical order for deterministic output
     std::vector<StringId> sorted_name_ids;
@@ -389,7 +389,7 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
             else if (decl->type == SymbolDeclareType::Extern) {
                 ObjExtern extern_;
                 extern_.set_symbol_name(g_strings.view(name_id));
-                obj_mod.externs.push_back(std::move(extern_));
+                obj_mod.externs()->push_back(std::move(extern_));
                 continue;
             }
         }
@@ -411,7 +411,7 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
                 obj_sym.set_section_name(g_strings.view(sym_info->stmt->section->name_id));
             }
 
-            obj_mod.symbols.push_back(std::move(obj_sym));
+            obj_mod.symbols()->push_back(std::move(obj_sym));
             break;
 
         case SymbolInfo::DefType::Defc:
@@ -447,14 +447,14 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
                 obj_expr.set_target_name(g_strings.view(sym_info->name_id));
                 obj_expr.set_filename(sym_info->defc_expr->loc.filename());
                 obj_expr.line = sym_info->defc_expr->loc.line();
-                obj_mod.exprs.push_back(std::move(obj_expr));
+                obj_mod.exprs()->push_back(std::move(obj_expr));
                 break;
             }
             default:
                 release_assert(0); // should not happen
             }
 
-            obj_mod.symbols.push_back(std::move(obj_sym));
+            obj_mod.symbols()->push_back(std::move(obj_sym));
             break;
 
         case SymbolInfo::DefType::Undefined: {
@@ -462,7 +462,7 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
 
             ObjExtern extern_;
             extern_.set_symbol_name(g_strings.view(sym_info->name_id));
-            obj_mod.externs.push_back(std::move(extern_));
+            obj_mod.externs()->push_back(std::move(extern_));
             break;
         }
         default:
@@ -510,7 +510,7 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
                                                              patch->inner->value.section->name_id));
                         obj_reloc.offset = patch->inner->value.offset;
 
-                        obj_mod.relocs.push_back(std::move(obj_reloc));
+                        obj_mod.relocs()->push_back(std::move(obj_reloc));
                         patch->type =
                             PatchType::None; // mark as already patched, no further action needed
                     }
@@ -537,7 +537,7 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
                     obj_expr.set_filename(patch->loc.filename());
                     obj_expr.line = patch->loc.line();
 
-                    obj_mod.exprs.push_back(std::move(obj_expr));
+                    obj_mod.exprs()->push_back(std::move(obj_expr));
                     patch->type =
                         PatchType::None; // mark as already patched, no further action needed
                 }
@@ -571,7 +571,7 @@ static ObjModule build_object_module(const Program& prog, const Module& mod) {
             }
         }
 
-        obj_mod.sections.push_back(std::move(obj_sec));
+        obj_mod.sections()->push_back(std::move(obj_sec));
     }
 
     return obj_mod;
@@ -582,7 +582,7 @@ ObjLibrary build_object_library(const Program& prog) {
     for (auto& mod : prog.modules) {
         // convert the module
         auto obj_mod = build_object_module(prog, *mod);
-        obj_lib.modules.push_back(std::move(obj_mod));
+        obj_lib.modules()->push_back(std::move(obj_mod));
     }
 
     return obj_lib;
