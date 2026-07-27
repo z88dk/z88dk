@@ -418,15 +418,28 @@ static bool Expr_parse_factor(Expr1* self)
 
 	switch (sym.tok)
 	{
-	case TK_ASMPC:				/* BUG_0047 */
-		ExprOp_init_asmpc(ExprOpArray_push(self->rpn_ops));
-		self->type = MAX(self->type, TYPE_ADDRESS);
+    case TK_ASMPC: {
+        int asmpc_phase = get_cur_section()->asmpc_phase;
+        if (asmpc_phase != ORG_NOT_DEFINED) {
+            // PHASE in effect, ASMPC is a constant
+            ExprOp_init_number(ExprOpArray_push(self->rpn_ops), asmpc_phase);
+            self->type = MAX(self->type, TYPE_CONSTANT);
 
-		Str_append_n(self->text, sym.tstart, sym.tlen);
+            Str_append_sprintf(self->text, "%ld", asmpc_phase);
 
-		GetSym();
-		break;
+            GetSym();
+        }
+        else {
+            // ASMPC is resolved at link time
+            ExprOp_init_asmpc(ExprOpArray_push(self->rpn_ops));
+            self->type = MAX(self->type, TYPE_ADDRESS);
 
+            Str_append_n(self->text, sym.tstart, sym.tlen);
+
+            GetSym();
+        }
+        break;
+    }
 	case TK_NAME:
         short_name = spool_add(sym_text(&sym));
         long_name = local_labels_use_label(short_name);
