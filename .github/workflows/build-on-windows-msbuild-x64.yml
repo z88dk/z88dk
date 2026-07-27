@@ -52,7 +52,8 @@ jobs:
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
         :: Newlib target libs live under lib/clibs/{sccz80,sdcc_ix}/ (cfg -L paths).
-        :: Nightlies still ship them under libsrc/newlib/lib/... until rebuilds catch up — copy both ways.
+        :: Older nightlies also ship under libsrc/newlib/lib/... — copy if present only
+        :: (Windows `copy *.lib` fails the step when the wildcard matches nothing).
         mkdir lib\clibs\sccz80 2>nul
         mkdir lib\clibs\sdcc_ix 2>nul
         mkdir libsrc\newlib\lib\sccz80 2>nul
@@ -60,12 +61,17 @@ jobs:
         if exist win32-latest\z88dk\lib\clibs\sccz80\ (
           copy /y win32-latest\z88dk\lib\clibs\sccz80\*.lib lib\clibs\sccz80\
           copy /y win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib lib\clibs\sdcc_ix\
-        ) else (
+        ) else if exist win32-latest\z88dk\libsrc\newlib\lib\sccz80\ (
           copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib lib\clibs\sccz80\
           copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib lib\clibs\sdcc_ix\
         )
-        copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
-        copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        if exist win32-latest\z88dk\libsrc\newlib\lib\sccz80\ (
+          copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
+          copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        ) else if exist win32-latest\z88dk\lib\clibs\sccz80\ (
+          copy /y win32-latest\z88dk\lib\clibs\sccz80\*.lib libsrc\newlib\lib\sccz80\
+          copy /y win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        )
     - name: Run z80asm tests
       run: |
         cd src\z80asm
