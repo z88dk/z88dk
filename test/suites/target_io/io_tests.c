@@ -170,6 +170,11 @@ static void test_file_multi(void)
     tio_close(fd2);
 }
 
+/*
+ * fopen needs a CRT with dynamic FILE slots (fopen_max) and a working open()
+ * backend. Host-fcntl basic CRTs often have open_max/fopen_max = 0 — skip.
+ */
+#ifndef TIO_USE_HOST_FCNTL
 static void test_file_fopen(void)
 {
     FILE *fp;
@@ -191,23 +196,33 @@ static void test_file_fopen(void)
     Assert(memcmp(buf, payload, strlen(payload)) == 0, "fopen round-trip");
     Assert(fclose(fp) == 0, "fclose after read");
 }
+#endif
 
-#ifdef __Z88DK_NEWLIB
+/*
+ * CP/M character devices (stdrdr/stdpun/stdlst + cpm_device_file) exist on
+ * +cpm -clib=new and hardware -subtype=cpm CRTs only — not on +rc2014 basic.
+ * Enable with -DTIO_CPM_DEVICES from the Makefile recipes that have them.
+ */
+#ifdef TIO_CPM_DEVICES
 #include <arch/cpm.h>
+/* stdio.h only declares these under __CPM; hardware -subtype=cpm is __RC2014 */
+extern FILE *stdrdr;
+extern FILE *stdpun;
+extern FILE *stdlst;
 
-static void test_newlib_devices(void)
+static void test_newlib_cpm_devices(void)
 {
     FILE *f;
 
-    /* Logical names → FILE* (stdio character units) */
+    /* Logical names -> FILE* (stdio character units) */
     f = (FILE *)cpm_device_file("CRT:");
-    Assert((void *)f == (void *)stdout, "CRT: → stdout");
+    Assert((void *)f == (void *)stdout, "CRT: maps to stdout");
     f = (FILE *)cpm_device_file("LPT:");
-    Assert((void *)f == (void *)stdlst, "LPT: → stdlst");
+    Assert((void *)f == (void *)stdlst, "LPT: maps to stdlst");
     f = (FILE *)cpm_device_file("PTR:");
-    Assert((void *)f == (void *)stdrdr, "PTR: → stdrdr");
+    Assert((void *)f == (void *)stdrdr, "PTR: maps to stdrdr");
     f = (FILE *)cpm_device_file("PTP:");
-    Assert((void *)f == (void *)stdpun, "PTP: → stdpun");
+    Assert((void *)f == (void *)stdpun, "PTP: maps to stdpun");
 
     /* Physical streams exist */
     Assert(stdrdr != 0 && stdpun != 0 && stdlst != 0, "stdrdr/stdpun/stdlst");
@@ -228,9 +243,11 @@ int main(void)
     suite_add_test(test_file_read_verify);
     suite_add_test(test_file_lseek);
     suite_add_test(test_file_multi);
+#ifndef TIO_USE_HOST_FCNTL
     suite_add_test(test_file_fopen);
-#ifdef __Z88DK_NEWLIB
-    suite_add_test(test_newlib_devices);
+#endif
+#ifdef TIO_CPM_DEVICES
+    suite_add_test(test_newlib_cpm_devices);
 #endif
 
     return suite_run();
