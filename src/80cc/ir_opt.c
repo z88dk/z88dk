@@ -1221,7 +1221,7 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                    loop-carried value competing for the one BC home. It loses,
                    spills to a slot, and the per-iteration slot RMW costs more
                    than recomputing `base + iv*scale` from the resident index
-                   (sdcc's strategy; queenbench's `safe`). Suppress here.
+                   (queenbench's `safe`). Suppress here.
                    Detect "survives LFTR": after this reduction removes iv's use
                    in the address derivation (the SHL, or the ADD when scale==1),
                    iv still has >2 in-loop uses (LFTR needs exactly 2 = step +
@@ -1763,6 +1763,131 @@ int ir_opt_dce(Func *f)
     return removed;
 }
 
+/* ---- Fold a &symbol RHS of an EQ/NE compare into a symbol immediate ------
+   A symbol address is a link-time constant, so `if (p == &g)` should lower to
+   `ld hl,(p); ld de,g; sbc hl,de` exactly like `if (p == 5)` folds `5` into the
+   compare's immediate. Without this, `&g` is a separate IR_LD_SYM vreg: the
+   lowerer loads p into HL, must free HL to materialise the symbol, and spills p
+   to a fresh frame slot (forcing a whole frame) then reloads it — an
+   anti-pattern (bigger AND slower). We rewrite `CMP_EQ/NE lhs, (LD_SYM &g)`
+   to the immediate form (src[1] = -1, imm_sym = &g, imm = offset); the now-dead
+   LD_SYM is removed by the following DCE. Per-BB (the LD_SYM and the compare are
+   in the same block for the `if (p == &g)` idiom); width-2 operands only.
+   --opt-disable=sym-cmp-fold opts out. */
+int ir_opt_sym_cmp_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("sym-cmp-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    SYMBOL **sym = calloc((size_t)nv, sizeof(SYMBOL *));
+    int     *off = calloc((size_t)nv, sizeof(int));
+    if (!sym || !off) { free(sym); free(off); return 0; }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int v = 0; v < nv; v++) sym[v] = NULL;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            /* Record a plain &symbol producer (no namespaced/addressmod bank). */
+            if (op->kind == IR_LD_SYM && op->dst >= 0 && op->dst < nv
+                && op->mem.sym && !op->mem.bank_fn) {
+                sym[op->dst] = op->mem.sym;
+                off[op->dst] = op->mem.offset;
+                continue;
+            }
+            int did = 0;
+            /* EQ/NE are commutative; the unsigned relations (pointer compares)
+               fold too but flip the relation when the operands are swapped. */
+            int comm = (op->kind == IR_CMP_EQ || op->kind == IR_CMP_NE);
+            int urel = (op->kind == IR_CMP_ULT || op->kind == IR_CMP_ULE
+                     || op->kind == IR_CMP_UGT || op->kind == IR_CMP_UGE);
+            if (comm || urel) {
+                int s0 = op->src[0], s1 = op->src[1];
+                int s0sym = (s0 >= 0 && s0 < nv && sym[s0]);
+                int s1sym = (s1 >= 0 && s1 < nv && sym[s1]);
+                int symv = -1, valv = -1, swap = 0;
+                if (s1sym && s0 >= 0 && !s0sym)      { symv = s1; valv = s0; swap = 0; }
+                else if (s0sym && s1 >= 0 && !s1sym) { symv = s0; valv = s1; swap = 1; }
+                if (symv >= 0 && valv >= 0 && valv < nv
+                    && f->vregs[valv].width == 2) {   /* 16-bit operands only */
+                    op->src[0]  = valv;               /* value rides HL */
+                    op->imm_sym = sym[symv];
+                    op->imm     = off[symv];
+                    op->src[1]  = -1;
+                    /* &sym on the LHS: `&s < v` == `v > &s`, so swap+flip. */
+                    if (swap && urel) {
+                        switch (op->kind) {
+                        case IR_CMP_ULT: op->kind = IR_CMP_UGT; break;
+                        case IR_CMP_UGT: op->kind = IR_CMP_ULT; break;
+                        case IR_CMP_ULE: op->kind = IR_CMP_UGE; break;
+                        case IR_CMP_UGE: op->kind = IR_CMP_ULE; break;
+                        default: break;
+                        }
+                    }
+                    changed++;
+                    did = 1;
+                }
+            }
+            if (did) continue;
+            /* Any other op that redefines a tracked vreg invalidates it. */
+            int d[8];
+            int nd = ir_op_defs(op, d, 8);
+            for (int k = 0; k < nd; k++)
+                if (d[k] >= 0 && d[k] < nv) sym[d[k]] = NULL;
+        }
+    }
+    free(sym); free(off);
+    return changed;
+}
+
+/* ---- Sign-extend masked to zero-extend (ir_opt_conv_mask_fold) -------
+   `AND(CONV_SX(x), m)` where m keeps exactly the source-width bytes and
+   clears the sign-extended high bits (m == full source-width mask) is just
+   `CONV_ZX(x)` — the mask makes sign- and zero-extend identical. Rewriting
+   the AND to a zero-extend kills the dead `rlca; sbc a,a; ld h,a` widen the
+   sign-extend would emit; the classic `(*(uchar*)p & 0377)` / `(c<<8)+c`
+   two-byte-load idiom (regexp's NEXT()) is all this shape. Per-BB; the
+   orphaned CONV_SX falls to DCE. */
+int ir_opt_conv_mask_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("conv-mask-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    int *cx = malloc((size_t)nv * sizeof(int));   /* cx[v] = src of CONV_SX v, else -1 */
+    if (!cx) return 0;
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int v = 0; v < nv; v++) cx[v] = -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind == IR_AND && op->src[1] == -1
+                && op->src[0] >= 0 && op->src[0] < nv
+                && cx[op->src[0]] >= 0) {
+                int x  = cx[op->src[0]];
+                int sw = f->vregs[x].width;
+                uint64_t full = (sw >= 8) ? ~0ull
+                                          : (((uint64_t)1 << (sw * 8)) - 1);
+                if ((uint64_t)op->imm == full) {
+                    op->kind   = IR_CONV_ZX;   /* dst width unchanged */
+                    op->src[0] = x;
+                    op->src[1] = -1;
+                    op->imm    = 0;
+                    changed++;
+                }
+            }
+            int d = op->dst;
+            if (d >= 0 && d < nv)
+                cx[d] = (op->kind == IR_CONV_SX && op->src[0] >= 0)
+                        ? op->src[0] : -1;
+        }
+    }
+    free(cx);
+    return changed;
+}
+
 /* ---- Induction-variable range narrowing (ir_opt_narrow_iv) ----------
    A loop counter whose value range provably fits [0,256) is retyped to a
    byte (width 1, KIND_CHAR): the step becomes a byte inc/dec and its slot is
@@ -2036,6 +2161,34 @@ static int demands_low_byte_only(const Func *f, int v)
                 continue;
             }
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
+                continue;
+            /* Switch index: the dispatch reads v then widens it to full width
+               for the jump-table / case comparisons, so a byte-producing v is
+               fine — PROVIDED v provably fits a byte (byte_val), else narrowing
+               would discard a high byte the switch still distinguishes. Kills
+               the promoting CONV on `switch (b & 0x0f)`-style selectors. */
+            if (byte_val && u->kind == IR_SWITCH)
+                continue;
+            /* Byte equality/inequality: `cp` compares the ZERO-extended bytes,
+               so when BOTH operands provably fit a byte (both high bytes 0) the
+               low-byte compare is exact. Narrow v (its high byte is then dead).
+               Requires v byte-fitting AND the other operand byte-fitting (a var
+               masked <=0xFF, or a const in [0,255]) — else a nonzero high byte
+               would distinguish values the byte compare would alias. */
+            if ((u->kind == IR_CMP_EQ || u->kind == IR_CMP_NE) && byte_val) {
+                int other = (u->src[0] == v) ? u->src[1] : u->src[0];
+                if (other == -1) {
+                    if ((u->imm & ~0xFFLL) == 0) continue;   /* const fits a byte */
+                } else if (v_fits_byte(f, other)) {
+                    continue;
+                }
+            }
+            /* Returned by a byte-declared function: the return truncates to
+               the declared width, so only v's low byte is delivered (char
+               return ABI hands back the low byte). Narrowing v to width-1 is
+               exact — collapses the promoting CONV feeding the final `return`
+               expression of a `char foo(...)`. */
+            if (u->kind == IR_RET && f->ret_width == 1)
                 continue;
             /* Signed `v REL 0` reads only v's sign bit; when v provably fits a
                signed byte (all defs sign-extend a byte) that bit is bit 7 of

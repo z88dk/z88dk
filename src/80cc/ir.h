@@ -118,6 +118,12 @@ typedef enum {
                                         locally allocated to DE (op_clobbers-clean
                                         span, DE otherwise idle). DE sibling of
                                         BC_PACK; call-free so gen_call ignores it. */
+    IR_VREG_AUTOPUSH       = 1 << 9, /* fastcall register param that spills: materialise
+                                        it by a `push` at entry (sccz80-style) instead of
+                                        stash+alloc+store. ir_assign_slots places it at the
+                                        TOP frame offset (where the push lands, just below
+                                        the return address / saved IX); emit_prologue pushes
+                                        instead of storing. Opt-in IR_AUTOPUSH_PARAM. */
 } VRegFlags;
 
 typedef struct {
@@ -323,8 +329,8 @@ typedef enum {
     /* Struct/union by-value argument push: src[0] = vreg holding the
        struct's address, imm = byte count (type->size). Allocates `size`
        bytes on the data stack and block-copies the struct in, so byte i
-       lands at sp+i (natural order, exact size — matches sccz80 and SDCC
-       sdcccall(0)). The copy reuses emit_block_copy (ldir on z80, the
+       lands at sp+i (natural order, exact size — the sdcccall(0) stacked
+       layout). The copy reuses emit_block_copy (ldir on z80, the
        __z80asm__ldir lib helper on 808x/gbz80). Like IR_PUSH_ARG it is a
        pre-pushed arg; the matching IR_CALL's caller-cleanup pops it. */
     IR_PUSH_STRUCT,
@@ -445,6 +451,11 @@ typedef struct {
                                emits the cleanup pops). 0 = legacy slot
                                path. */
     RegMask  clobbers;      /* derived from target attrs + ABI */
+    RegMask  preserved;     /* __preserves_regs(...): register PAIRS the callee
+                               guarantees to preserve (BC/DE/HL/A/IX/IY).
+                               op_clobbers subtracts this from a direct call's
+                               clobber set so a value may stay resident across
+                               the call. 0 for indirect / unannotated calls. */
 } CallInfo;
 
 /* IR_ACC_UNOP shape — selects how gen_acc_unop wires the accumulator
@@ -524,19 +535,16 @@ typedef struct {
     int      dst;           /* dst vreg id; -1 if no dst */
     int      src[2];        /* src vreg ids; -1 if unused */
     int64_t  imm;           /* immediate value (LD_IMM, ROTL imm count, etc.) */
+    SYMBOL  *imm_sym;       /* folded &symbol immediate RHS: when src[1]==-1 and
+                               imm_sym!=NULL the RHS operand is the link-time
+                               constant address `imm_sym + imm` (imm is the byte
+                               offset). Set by ir_opt_sym_cmp_fold for EQ/NE. */
     MemOp    mem;           /* LD_MEM / ST_MEM / LD_SYM / IR_IN / IR_OUT */
     int      label;         /* target BB id for IR_BR / IR_BR_COND / IR_BR_ZERO */
     CallInfo *call;         /* IR_CALL only — heap allocated */
     HelperInfo *hcall;      /* IR_HCALL only — heap allocated */
     SwitchInfo *sw;         /* IR_SWITCH only — heap allocated */
     const char *asm_text;   /* IR_ASM raw asm payload */
-
-    /* LRA Phase 4: stage src[1] into BC (`add hl,bc`/`sbc hl,bc`) rather than
-       DE, so a DE-packed value (IR_VREG_DE_PACK) survives this op untouched.
-       Set by ir_bc_pack when it commits a DE placement whose span covers this
-       ADD/SUB/CMP; honored by load_binop_operands + gen_add/sub/cmp. Only the
-       experimental IR_LRA_DEPACK path sets this (the default-on LRA never does). */
-    uint8_t     lra_stage_src1_bc;
 
     /* Source location for debug / -gcline output. */
     const char *file;
@@ -640,6 +648,15 @@ typedef struct {
        no DE-clean region forms. See LOOP_REGALLOC_PLAN.md. */
     int        de_home_is_ptr;
 
+    /* Home residency region (ADR 0017 step 3b): the validated BB-id span
+       [home_region_lo, home_region_hi] over which the DE/byte home stays
+       register-resident — the OUTPUT of the cleanliness proof (compute_home_region),
+       stored in the table so the lowerer READS it rather than re-deriving. -1/-1 =
+       no region. Immutable proof output; the lowerer keeps a mutable working copy
+       (L.cur_home_region_*) initialised from this (it may disable the region mid-
+       render as a residency backstop). */
+    int        home_region_lo, home_region_hi;
+
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
     IrAbi      abi;
@@ -693,6 +710,16 @@ typedef struct {
     /* Allocation results — filled by ir_alloc.c. */
     PhysReg   *vreg_to_phys;    /* by vreg id; PR_SPILL means stack-only */
     int       *vreg_spill_slot; /* by vreg id; valid when vreg_to_phys == PR_SPILL */
+
+    /* Ranged residency (ADR 0017 Step 4): the flat op-index interval over which
+       vreg_to_phys[v] actually holds v. home_at() returns the register only when
+       the current lowering point falls inside [home_lo, home_hi]; outside it, v
+       reads from its slot. NULL until ir_alloc; the default fill is a whole-
+       function interval (INT_MIN..INT_MAX) so home_at == vreg_to_phys everywhere
+       (byte-identical). The ranged pack narrows these to disjoint sub-ranges so a
+       register time-shares across non-overlapping vregs. */
+    int       *home_lo;         /* by vreg id */
+    int       *home_hi;         /* by vreg id */
 
     /* Per-vreg [start, end] intervals in flattened BB-order op-index
        space. Filled by ir_compute_live_ranges; NULL until then. The
@@ -772,13 +799,6 @@ const char *ir_phys_name(PhysReg pr);
    physical-register mask. Shared with the allocator (ir_alloc.c) so the DE-local
    pack proves clean spans against the SAME model IR_VERIFY checks. */
 RegMask op_clobbers(const Func *f, const Op *op);
-/* Like op_clobbers, but models the relaxed lowering of the ops with a `hl,bc`
-   alternate form (ADD/SUB and word compares): src[1] is staged into BC instead
-   of DE, so DE is dropped from the clobber set (unless DE is the op's result or
-   operand home) and BC is added. Wide (DEHL/i64) forms have no BC-only variant
-   and are returned unchanged. LRA Phase-4 step 1: the DE-clean-modulo-staging
-   model the DE-pack is measured against. */
-RegMask op_clobbers_relaxed(const Func *f, const Op *op);
 RegMask phys_regmask(const Func *f, int vreg);
 
 /* ----- Compiler-internal accessors ------------------------------------- */

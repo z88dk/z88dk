@@ -2034,6 +2034,18 @@ static Node *cse_walk_lvalue(Node *lhs, cse_env *env, SYMBOL **lhs_local, int *u
         *lhs_local = lhs->sym;
         return lhs;
     }
+    /* A call as an lvalue base (e.g. `*foo()`-shaped targets the frontend
+       leaves as a bare call here). Its union stores `args` (an array*) in the
+       `left` slot and `callee` in `right`, so the generic left/right/operand
+       walk below would deref an array struct as a Node* and read off its end.
+       Walk it with the full cse_walk (which dispatches on ast_type and iterates
+       args correctly), then treat the destination as opaque. */
+    if (lhs->ast_type == AST_FUNC_CALL || lhs->ast_type == AST_FUNCPTR_CALL) {
+        int dummy_hb = 0;
+        lhs = cse_walk(lhs, env, &dummy_hb);
+        *unknown = 1;
+        return lhs;
+    }
     /* Defensive: if some earlier pass corrupted the LHS into a leaf
        form (literal etc.), don't crash trying to walk it as a binary
        expression — the union overlap would deref bit patterns. Just
@@ -2433,13 +2445,20 @@ static void collect_sef_subtrees(Node *node, array *bag)
         return;
     case AST_IF:
     case AST_TERNARY:
+        /* Only the (unconditional) cond feeds cross-occurrence synthesis. Do NOT
+           descend into the mutually-exclusive then/els arms: hoisting a subexpr
+           out of an arm to before the branch computes it on paths that don't use
+           it AND extends its live range across the branch (→ spill / a frame).
+           Repeats WITHIN one arm are still synthesised when synthesize_walk
+           recurses into that arm's compound. */
         collect_sef_subtrees(node->cond, bag);
-        collect_sef_subtrees(node->then, bag);
-        collect_sef_subtrees(node->els,  bag);
         return;
     case AST_SWITCH:
+        /* sw_expr only — not sw_body (the case arms are mutually exclusive; see
+           the IF note above). This is the condition() pessimisation: a subexpr in
+           2/16 arms was hoisted before the switch, computed on all 16 paths and
+           slotted across the dispatch. */
         collect_sef_subtrees(node->sw_expr, bag);
-        collect_sef_subtrees(node->sw_body, bag);
         return;
     case AST_SWITCH_CASE:
         collect_sef_subtrees(node->sw_value, bag);
