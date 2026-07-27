@@ -1496,7 +1496,20 @@ int main(int argc, char **argv)
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
 
+                rules[num_rules++] = c_coptrules9;
                 rules[num_rules++] = c_80cc_opt;
+
+                if (c_coptrules_target) {
+                    rules[num_rules++] = c_coptrules_target;
+                }
+
+                if (coptrules_cpu) {
+                    rules[num_rules++] = coptrules_cpu;
+                }
+
+                if (c_coptrules_user) {
+                    rules[num_rules++] = c_coptrules_user;
+                }
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
