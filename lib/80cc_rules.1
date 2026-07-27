@@ -9,14 +9,40 @@
 =
 	ld	(ix%1),a
 
-%title #269 elide char store-then-reload of same FP slot (iy variant)
-	ld	(iy%1),a
-	ld	a,(iy%1)
+;; #269b: the byte just stored is still in A (the store doesn't touch A, and the
+;; reload is the very next line, so nothing clobbers A between) — reload the
+;; register from A instead of the slot. Adjacent-only, so it never relies on the
+;; A-cache surviving arbitrary scratch use (which it doesn't). Reload-into-A is
+;; #269 above; here the destination is any other 8-bit reg (typically the low
+;; half of a byte->int widen: `ld l,(ix+d); ld h,0`).
+%title #269b elide store-then-reload-into-reg of same FP slot — value still in A (-2b)
+%is %1 l h e d b c
+	ld	(ix%2),a
+	ld	%1,(ix%2)
 =
-	ld	(iy%1),a
+	ld	(ix%2),a
+	ld	%1,a
+
+;; #269c: the byte tested-for-zero idiom `if ((c = *p)) ...` stores c to a slot,
+;; tests it (`or a; jp z/nz`), then widens/uses it on the fall-through. `or a`
+;; and the conditional `jp` both preserve A, and the reload line is reached ONLY
+;; by fall-through (a label between would break the 4-line match), so A still
+;; holds c there — reload the register from A, not the slot. Mirror of #R3 for
+;; the store-to-slot + byte-reload shape.
+%title #269c byte-slot reload across or-a/jp still in A (-2b)
+%is %2 l h e d b c
+	ld	(ix%1),a
+	or	a
+	jp	%3,%4
+	ld	%2,(ix%1)
+=
+	ld	(ix%1),a
+	or	a
+	jp	%3,%4
+	ld	%2,a
 
 %title #R1 elide store-then-reload of same register (-1b, -4t)
-%is %1 e d b c
+%is %1 e d b c l h
 	ld	%1,a
 	ld	a,%1
 =
@@ -73,16 +99,167 @@
 =
 	ld	bc,%1
 
+;; NOT on ez80: there `ld hl,%1` can be `ld hl,(hl)` (native word deref,
+;; ed 27) which READS hl, so dropping the `ld hl,bc` that set the pointer
+;; miscompiles. No other CPU emits `ld hl,(hl)`, so the rule is safe there.
 %title #285b HL recovery overwritten by immediate ld hl (-2b, -8t)
-; NOT on ez80: there `ld hl,%1` can be `ld hl,(hl)` (native word deref,
-; ed 27) which READS hl, so dropping the `ld hl,bc` that set the pointer
-; miscompiles. No other CPU emits `ld hl,(hl)`, so the rule is safe there.
 %notcpu ez80
 %notcpu ez80_z80
 	ld	hl,bc
 	ld	hl,%1
 =
 	ld	hl,%1
+
+;; #285b2: a dead `ld hl,X` immediately overwritten by another `ld hl,Y` — drop
+;; the first (HL not read between). `%not %2 (hl)`: ez80's `ld hl,(hl)` READS HL,
+;; so keep the setup load there. Fires after a const/label store stops consuming
+;; the value it left in HL (gbz80 absolute global stores).
+%title #285b2 drop dead ld hl before ld hl (-3b)
+%not %2 (hl)
+	ld	hl,%1
+	ld	hl,%2
+=
+	ld	hl,%2
+
+;; #285p: byte-swapped word load `ld a,(hl+); ld h,(hl); ld l,a; ld l,h; ld h,a`
+;; (reads b0,b1; arranges H=b0,L=b1) — load b1 straight into L instead of the
+;; H-then-copy detour, dropping the dead `ld l,a`. Net H=b0/L=b1 unchanged; the
+;; `ld a,(hl+)` pointer post-increment is preserved. 
+%title #285p byte-swap word load: load L direct from (hl) (-2b)
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ld	l,h
+	ld	h,a
+=
+	ld	a,(hl+)
+	ld	l,(hl)
+	ld	h,a
+
+;; #285q: a `ld rr,hl` (the DE:BC low-word park pseudo) immediately overwritten by
+;; `pop rr` — the park is dead (pop supplies rr; HL untouched by both). Restricted
+;; to bc/de (the pairs that get the park + are poppable).
+%title #285q drop dead ld rr,hl before pop rr (-2b)
+%is %1 bc de
+	ld	%1,hl
+	pop	%1
+=
+	pop	%1
+
+;; #285r: the swap_endian_32 intrinsic (z80rules.9) byte-reverses DEHL via
+;; `ld a,l; ld l,d; ld d,a; ld a,h; ld h,e; ld e,a` (swaps D<->L, E<->H through A).
+;; 80cc parks the pre-swap low word with `ld bc,hl` just before it — dead: the
+;; rearrange reads only L/D/H/E/A (never B/C) and produces a fresh DEHL, so the
+;; park is never consumed. Drop it.
+%title #285r drop dead ld bc,hl before swap_endian_32 rearrange (-2b)
+	ld	bc,hl
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+
+;; #285s: a register-pointer big-endian long read — read_l(p) = swap_endian_32(
+;; *(type32*)p) — lowers to a little-endian 4-byte load into DEHL (`ld e,(hl);
+;; inc; ld d,(hl); inc; ld a,(hl+); ld h,(hl); ld l,a; ex de,hl`) followed by the
+;; byte-reverse (#285r already dropped its dead `ld bc,hl`). The whole thing just
+;; wants bytes m0,m1,m2,m3 (address order) in D,E,H,L — load them there directly,
+;; deleting the ex + 6-insn swap tail. HL ends at +3 in both (from `ld a,(hl+)`),
+;; so a live pointer is unaffected. 14 insns -> 7.
+%title #285s big-endian long read: load bytes direct into DEHL (-7 insns)
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ex	de,hl
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl+)
+	ld	l,(hl)
+	ld	h,a
+
+;; #285t: a DOUBLE byte-reverse — the big-endian direct load (#285s output:
+;; D=m0,E=m1,H=m2,L=m3) followed by another swap rearrange (-> D=m3,E=m2,H=m1,
+;; L=m0) is just the plain LITTLE-endian load. Arises from a source double swap
+;; that cancels (e.g. swap_endian(read_l(p)) / a write_l-of-read_l roundtrip).
+;; Collapse the 13 insns to the ordinary 8-insn little-endian load; HL ends +3 in
+;; both. (#285r/#285s run first, exposing this big-endian-load + lone swap.)
+%title #285t double byte-reverse collapses to a little-endian load (-5 insns)
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl+)
+	ld	l,(hl)
+	ld	h,a
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ex	de,hl
+
+;; #285u: swap_endian_32 into HL then `ld bc,hl` park (DE:BC long home), where
+;; the swapped HL is immediately reloaded (`ld hl,..`) — so only the DE:BC copy
+;; is consumed. Produce DE:BC directly: `ld c,d; ld b,e; ld e,h; ld d,l` reads
+;; the four source bytes (H,E,D,L untouched by earlier lines) into B=e C=d D=l
+;; E=h — the same DE:BC the swap+park yields — without touching A or HL. The
+;; trailing `ld hl,%1` proves the swapped HL is dead. 8 insns -> 5.
+%title #285u swap_endian_32 + BC-park, swapped HL dead -> straight into DE:BC (-3 insns)
+%not %1 (hl)
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+	ld	bc,hl
+	ld	hl,%1
+=
+	ld	c,d
+	ld	b,e
+	ld	e,h
+	ld	d,l
+	ld	hl,%1
+
+;; #285v: any `ld bc,` immediately overwritten by another `ld bc,` — the first
+;; is dead (BC reloaded before any read, and no `ld bc,` form reads BC or has a
+;; side effect). Drop it. Catches a speculative DE:BC park (`ld bc,hl`) whose
+;; next op reloads BC (e.g. `ld bc,<const>` for a long add).
+%title #285v dead ld bc overwritten by the next ld bc (-2b)
+	ld	bc,%2
+	ld	bc,%1
+=
+	ld	bc,%1
 
 %title #285c BC<->HL round trip cancellation, HL->BC->HL (-2b, -8t)
 	ld	bc,hl
@@ -95,6 +272,21 @@
 	ld	bc,hl
 =
 	ld	hl,bc
+
+;; #285e: the fastcall/long prologue writes the BC stash as two byte moves
+;; (`ld b,h; ld c,l` == `ld bc,hl`) not the pseudo, so #285c misses it — but the
+;; `ld hl,bc` that follows still recovers HL with what it already holds (the two
+;; byte moves leave HL untouched), so it is redundant. Drop it. HL is provably
+;; unchanged across the three adjacent lines, so this is context-free safe; BC
+;; stays = low for any later consumer. (A frameless fastcall long param stored to
+;; a global collapses to `ld b,h; ld c,l; ld (g),hl; ld (g+2),de`.)
+%title #285e byte-wise BC stash then redundant HL recovery (-2b, -8t)
+	ld	b,h
+	ld	c,l
+	ld	hl,bc
+=
+	ld	b,h
+	ld	c,l
 
 %title #286a SHL byte_shift=1 shuffle through BC (skip cache-hit HL recovery, -2b)
 	ld	hl,bc
@@ -305,8 +497,14 @@
 =
 	ld	hl,sp+%1
 
-%title #G6 IR gbz80 word-load + ex de,hl -> load straight into DE (HL reloaded)
-%cpu gbz80
+;; word-load through (hl) into HL, then ex de,hl relocates it to DE and ld hl,%1
+;; overwrites HL — build the word straight into DE, drop the ex. `ld a,(hl+)` is
+;; the z88dk-z80asm post-inc macro, emitted across the z80 family (not just
+;; gbz80). The only unsafe reload is ez80's `ld hl,(hl)` (native word deref, ED
+;; 27) which READS HL, so the relocated value would differ — excluded precisely
+;; via %notSame rather than gating out all of ez80.
+%title #G6 word-load + ex de,hl -> straight into DE (HL reloaded next)
+%not %1 (hl)
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
@@ -351,6 +549,20 @@
 	ld	a,l
 =
 	ld	l,a
+	ld	h,0
+
+;; A byte global load zero-extended into HL (`ld a,(_g); ld l,a; ld h,0`) folds to
+;; a word load `ld hl,(_g); ld h,0`: HL ends identical (H re-zeroed), the `ld l,a`
+;; is gone (-1b) and A is left untouched. `(_%1)` restricts to a symbol address —
+;; register/index indirects (`ld a,(hl)`, `ld a,(ix-2)`) have no `ld hl,(...)` form
+;; and must not match. The extra read of _g+1 is harmless (discarded); a volatile
+;; load carries a `;volatile` stamp so this bare line never matches it.
+%title #IR byte global load widened to HL: fold ld l,a into the word load (-1b)
+	ld	a,(_%1)
+	ld	l,a
+	ld	h,0
+=
+	ld	hl,(_%1)
 	ld	h,0
 
 %title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). NOT ez80: ld de,(hl)/ld hl,(hl) READ the reg there, so the ex may be a live deref
@@ -440,3 +652,494 @@
 =
 	ld	hl,(iy%1)
 	ld	(iy%2),hl
+
+;; #DE-target family: a value produced in HL then immediately swapped to DE via
+;; `ex de,hl`, where the value the swap leaves in HL is dead (next line is an
+;; `ld hl,` overwriting it) — produce it in DE directly, dropping the ex.
+;; #402 above handles symbol/immediate operands (all-CPU). These two cover the
+;; memory forms with the correct per-form guard. The sp-relative form
+;; (ld hl,(sp+n)) is deliberately NOT matched — the Rabbit family has no
+;; ld de,(sp+n) counterpart.
+;; every CPU with the ld hl,(ix+d) macro also has ld de,(ix+d) (incl Rabbit)
+%title #DE-ix produce (ix) ld-hl value in DE not HL+ex when HL dead next (-1b, -4t)
+	ld	hl,(ix%1)
+	ex	de,hl
+	ld	hl,%2
+=
+	ld	de,(ix%1)
+	ld	hl,%2
+
+%title #DE-glob produce (_sym) ld-hl value in DE (no ld de,(nn) on 808x/gbz80) (-1b, -4t)
+%notcpu 8080
+%notcpu 8085
+%notcpu gbz80
+	%"ld	hl,\((_[A-Za-z0-9_+]*)\)"1
+	ex	de,hl
+	ld	hl,%2
+=
+	ld	de,(%1)
+	ld	hl,%2
+
+%title #DE2 peek TOS into DE not HL+ex when HL dead next (-1b, -4t)
+	pop	hl
+	push	hl
+	ex	de,hl
+	ld	hl,%1
+=
+	pop	de
+	push	de
+	ld	hl,%1
+
+%title #DE3 16-bit or/and/xor result into DE not HL+ex when HL dead next (-1b, -4t)
+	ld	a,l
+	%"or|and|xor"1	e
+	ld	l,a
+	ld	a,h
+	%"or|and|xor"3	d
+	ld	h,a
+	ex	de,hl
+	ld	hl,%2
+=
+	ld	a,l
+	%1	e
+	ld	e,a
+	ld	a,h
+	%3	d
+	ld	d,a
+	ld	hl,%2
+
+;; ld a,l;or h;jp nz falls through ONLY when l|h==0, i.e. HL==0 already — the
+;; following ld hl,0 is redundant. (No label on it: copt won't match across one.)
+%title #Z1 drop redundant ld hl,0 on the zero fall-through of a HL-nonzero test (-3b)
+	ld	a,l
+	or	h
+	jp	nz,%1
+	ld	hl,0
+=
+	ld	a,l
+	or	h
+	jp	nz,%1
+
+;; ld d,0 then (d untouched) ld a,h;or d;ld d,a computes d = h|0 = h — replace
+;; with ld d,h and drop the now-dead ld d,0. Matches the DE = HL | zext(A) shape.
+%title #Z2 16-bit OR with a zero-extended byte: high OR-with-0 is a copy (-4b)
+	ld	e,a
+	ld	d,0
+	pop	hl
+	ld	a,l
+	or	e
+	ld	e,a
+	ld	a,h
+	or	d
+	ld	d,a
+=
+	ld	e,a
+	pop	hl
+	ld	a,l
+	or	e
+	ld	e,a
+	ld	d,h
+
+;; ex (sp),hl;dec hl;ex (sp),hl decrements the counter on TOS and restores HL,
+;; then pop hl;push hl peeks it straight back — the restore is dead (the pop
+;; reloads HL). Decrement via pop/dec/push directly.
+%title #TOS1 sp TOS counter dec in place: fold the ex-(sp) round-trip + peek (-3b)
+	ex	(sp),hl
+	dec	hl
+	ex	(sp),hl
+	pop	hl
+	push	hl
+=
+	pop	hl
+	dec	hl
+	push	hl
+
+;; peek (pop/push), inc, then discard-old (inc sp;inc sp) and re-push via a DE
+;; shuttle. The two ex de,hl cancel (DE restored net), so this just increments
+;; the TOS counter and leaves it in HL — a plain pop/inc/push.
+%title #TOS2 ix TOS counter inc in place: collapse the DE-shuttle dance (-5 lines)
+	pop	hl
+	push	hl
+	inc	hl
+	ex	de,hl
+	inc	sp
+	inc	sp
+	push	de
+	ex	de,hl
+=
+	pop	hl
+	inc	hl
+	push	hl
+
+;; ld a,%1;ld (ix%2),a spills reg %1 to a slot but leaves %1 in A (the store
+;; doesn't touch A). or/and/xor commute, so `op (ix%3)` gives A op slot3 =
+;; slot3 op %1 straight away — dropping the `ld a,(ix%3)` reload entirely.
+;; Keeps the store (the slot may be live elsewhere).
+%title #X1 byte or/and/xor from the live register, not its fresh spill slot (-3b, -19t)
+%is %1 l h e d b c
+	ld	a,%1
+	ld	(ix%2),a
+	ld	a,(ix%3)
+	%"or|and|xor"4	(ix%2)
+	ld	(ix%3),a
+=
+	ld	a,%1
+	ld	(ix%2),a
+	%4	(ix%3)
+	ld	(ix%3),a
+
+;; ld l,a;ld h,0 makes HL=zext(A); ex de,hl relocates it to DE and pop hl then
+;; overwrites HL (the old DE it swapped in is dead) — build the zext into DE.
+%title #DE4 byte zext built into DE not HL+ex when HL dies at the next pop (-1b, -4t)
+	ld	l,a
+	ld	h,0
+	ex	de,hl
+	pop	hl
+=
+	ld	e,a
+	ld	d,0
+	pop	hl
+
+;; ld (hl),a stores A at sp+%1; push %2 drops sp by 2, so sp+%3 (with %3=%1+2) is
+;; the SAME cell and A is untouched by the push — skip the reload and rebuild the
+;; widened value straight from A. The ld l,a;ld h,0 tail proves HL is dead, so
+;; the whole address-compute + reload goes.
+%title #SP1 drop A-reload from a slot a push shifted to a new sp offset (-5b)
+%eval 0 = %3 %1 2 + -
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),a
+	push	%2
+	ld	hl,%3
+	add	hl,sp
+	ld	a,(hl)
+	ld	l,a
+	ld	h,0
+=
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),a
+	push	%2
+	ld	l,a
+	ld	h,0
+
+;; *p|=bit reads the whole word, sets one low-byte bit, writes it back through a
+;; re-materialised pointer. set n,(hl) does the RMW in memory directly; DE is
+;; reloaded from the now-updated word in case it is used next. p homed in BC.
+;; Applies to every CPU with CB bit ops; 8080/8085 emit `or` not `set` so never
+;; match, but are guarded out for clarity (set n,(hl) is not encodable there).
+%title #RMW1 single-bit set on a word via set n,(hl) — kill the word round-trip
+%notcpu 8080
+%notcpu 8085
+	ld	hl,bc
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	set	%1,l
+	ex	de,hl
+	ld	hl,bc
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+=
+	ld	hl,bc
+	set	%1,(hl)
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+
+;; ex de,hl; ld hl,K; ex de,hl loads K into DE and restores HL — just `ld de,K`.
+;; The regex restricts K to a const/symbol (no parens), so every memory form is
+;; excluded: (hl) (ez80 deref that reads HL), (nn) and (sp+n) — `ld de,(sp+n)`
+;; is absent on rabbit, `ld de,(nn)` on 808x/gbz80. gbz80 also has a paren-less
+;; `ld hl,sp+n` the regex WOULD match, so 808x/gbz80 stay gated out.
+%title #DE6 const/sym into DE via ex/ld/ex -> ld de directly (-4b, -8t)
+%notcpu 8080
+%notcpu 8085
+%notcpu gbz80
+	ex	de,hl
+	%"ld	hl,([_a-zA-Z0-9][_a-zA-Z0-9+]*)"1
+	ex	de,hl
+=
+	ld	de,%1
+
+;; ld (nn),hl stores HL without changing it, so an immediately-following reload
+;; of the SAME value into HL is redundant (back-reference %1). %not excludes the
+;; ez80 `ld hl,(hl)` deref (reads HL, could differ).
+%title #R4 drop redundant ld hl,K reload after a store that leaves HL intact (-3b)
+%not %1 (hl)
+	ld	hl,%1
+	ld	(%2),hl
+	ld	hl,%1
+	ld	(%3),hl
+=
+	ld	hl,%1
+	ld	(%2),hl
+	ld	(%3),hl
+
+;; the value round-trips HL->DE->HL (ex de,hl … ld l,e;ld h,d) only to push it
+;; via DE across inc sp/inc sp — but the sp bump never touches HL, so push HL
+;; directly. DE is left holding its prior (dead) value, not the staged HL: the
+;; ld l,e/ld h,d restore shows HL, not DE, is the live output.
+%title #DE7 drop dead DE-staging of an HL value across a stack-bump push (-4b)
+	ex	de,hl
+	inc	sp
+	inc	sp
+	push	de
+	ld	l,e
+	ld	h,d
+=
+	inc	sp
+	inc	sp
+	push	hl
+
+;; ex-restore variant of #DE7: the value is staged in DE, pushed across the sp
+;; bump, then swapped back with a second ex de,hl. The two ex de,hl cancel (DE
+;; ends = its prior value), so push HL directly. Unconditionally safe — no DE
+;; liveness question, unlike the ld l,e/ld h,d form.
+%title #DE8 drop dead DE-staging (ex-restore) across a stack-bump push (-3b)
+	ex	de,hl
+	inc	sp
+	inc	sp
+	push	de
+	ex	de,hl
+=
+	inc	sp
+	inc	sp
+	push	hl
+
+;; ld de,K; ex de,hl loads K into HL (K into DE, then swap), leaving the old HL
+;; in DE — which the following pop de immediately overwrites (dead). Load HL
+;; directly. K is whatever ld de accepted, so ld hl,K is equally valid.
+%title #DE9 const/mem into HL via ld-de/ex when DE is popped next (-1b, -4t)
+	ld	de,%1
+	ex	de,hl
+	pop	de
+=
+	ld	hl,%1
+	pop	de
+
+;; `or h` after ld h,0 is a no-op: h is 0, so (A|0)==A and the Z flag is
+;; unchanged. Arises from a byte-wise EQ/NE compare of a zero-extended byte
+;; (high half known 0) — the high-byte OR is redundant. General over the const.
+%title #HZ drop `or h` when h was just zeroed (redundant high-byte test) (-1b)
+	ld	h,0
+	sub	%1
+	or	h
+=
+	ld	h,0
+	sub	%1
+
+;; consecutive word stores to sp+N, sp+N+2, ...: after `ld hl,N;add hl,sp;
+;; ld (hl),e;inc hl;ld (hl),d` HL = sp+N+1, and the ld de,K between doesn't
+;; touch HL, so the next store's `ld hl,N+2;add hl,sp` is just `inc hl` (N+2 ==
+;; (N+1)+1). %eval asserts the offset delta. Catches alternate stores (the
+;; rewritten store no longer starts with ld hl;add hl,sp).
+%title #SP2 chained sp+N word store: reuse HL via inc, not ld hl;add hl,sp (-3b)
+%eval 0 = %3 %1 2 + -
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ld	de,%2
+	ld	hl,%3
+	add	hl,sp
+=
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ld	de,%2
+	inc	hl
+
+;; #GB1: `ld bc,hl` immediately after `ld l,c; ld h,b` is a no-op — those two set
+;; HL=BC, so ld bc,hl writes BC=HL=BC (unchanged). From the DEHL/long-value
+;; staging. Consecutive-only: a label before ld bc,hl breaks the 3-line match.
+%title #GB1 drop no-op ld bc,hl after ld l,c;ld h,b (-1b)
+	ld	l,c
+	ld	h,b
+	ld	bc,hl
+=
+	ld	l,c
+	ld	h,b
+
+;; #GB2: BC->HL copy (ld l,c;ld h,b) before a FULL HL reload is dead (HL
+;; overwritten before use; BC unchanged). %not %1 (hl): ez80 `ld hl,(hl)` READS HL.
+%title #GB2 drop dead ld l,c;ld h,b before a full HL reload (-2b)
+%not %1 (hl)
+	ld	l,c
+	ld	h,b
+	ld	hl,%1
+=
+	ld	hl,%1
+
+;; #GB3: DE->HL variant of #GB2 (ld h,d;ld l,e = HL=DE). Reverse ld d,h;ld e,l is
+;; NOT dead (DE holds the result) — excluded. %not %1 (hl) for ez80 ld hl,(hl).
+%title #GB3 drop dead ld h,d;ld l,e before a full HL reload (-2b)
+%not %1 (hl)
+	ld	h,d
+	ld	l,e
+	ld	hl,%1
+=
+	ld	hl,%1
+
+;; #GB4: BC->HL copy whose only consumer is `push hl` (then HL reloaded, dead) —
+;; push bc directly (push hl==push bc when HL=BC). push de is the DEHL high half.
+%title #GB4 push bc instead of bc->hl copy for a dead push hl (-2b)
+%not %1 (hl)
+	ld	l,c
+	ld	h,b
+	push	de
+	push	hl
+	ld	hl,%1
+=
+	push	de
+	push	bc
+	ld	hl,%1
+
+;; #GB5: #GB3 across an intervening `ld de,%1`. TWO guards: on ez80 either
+;; `ld de,(hl)` (%1) or `ld hl,(hl)` (%2) reads HL, keeping the copy live.
+%title #GB5 drop dead ld h,d;ld l,e before ld de,X;ld hl,Y (-2b)
+%not %1 (hl)
+%not %2 (hl)
+	ld	h,d
+	ld	l,e
+	ld	de,%1
+	ld	hl,%2
+=
+	ld	de,%1
+	ld	hl,%2
+
+;; #GB6: DE->HL then the reverse HL->DE is a no-op (ld h,d;ld l,e sets HL=DE, then
+;; ld d,h;ld e,l sets DE=HL=DE, unchanged). Drop the reverse pair; #GB3 then
+;; collapses the remaining ld h,d;ld l,e before its HL reload. Unconditional
+;; (no ld hl here; #GB3 carries the (hl) guard).
+%title #GB6 drop no-op ld d,h;ld e,l after ld h,d;ld l,e (-2b)
+	ld	h,d
+	ld	l,e
+	ld	d,h
+	ld	e,l
+=
+	ld	h,d
+	ld	l,e
+
+;; #GB7: fold two consecutive `add sp,N; add sp,M` into one. gbz80/z80 `add sp,d`
+;; is a signed byte [-128,127]; %check can only bound ONE var, so bound EACH
+;; addend to [-64,63] => sum in [-128,126], provably in range (correctly rejects
+;; md5's add sp,-128 / add sp,127 overflow pairs). Misses folds where an addend
+;; exceeds 63, but catches the common small frame adjusts (add sp,8; add sp,2).
+%title #GB7 fold add sp,N;add sp,M -> add sp,N+M (-2b)
+%check -64 <= %1 <= 63
+%check -64 <= %2 <= 63
+	add	sp,%1
+	add	sp,%2
+=
+	add	sp,%eval(%1 %2 +)
+
+;; #GB8: gbz80 mem->mem word copy. A word loaded via the `ld a,(hl+)` walk then
+;; byte-stored to a global forms the word in HL only for the store, which reads
+;; A (low) and H (high) — L is dead and HL is reloaded next (`ld hl,%3` proves
+;; H/L dead). Drop forming the word: store b0 straight from the (hl+) read, read
+;; b1 from (hl) at store time. Sound: the dest is a symbol distinct from the
+;; register-indirect source, so writing the dest can't clobber the 2nd source
+;; byte (distinct objects never overlap by one byte).
+%title #GB8 gbz80 mem->mem word copy: skip forming HL (-2b)
+%cpu gbz80
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ld	(%1),a
+	ld	a,h
+	ld	(%2),a
+	ld	hl,%3
+=
+	ld	a,(hl+)
+	ld	(%1),a
+	ld	a,(hl)
+	ld	(%2),a
+	ld	hl,%3
+
+;; #DEBC swap_endian_32 under DE:BC residency. z80rules.9 inlines
+;; intrinsic_swap_endian_32 to a DEHL byte-reversal; when the value is resident
+;; in DE:BC (IR_LONG_DEBC) the 80cc lowerer brackets it with the DE:BC<->DEHL
+;; fastcall marshalling `ld hl,bc` (recover the low word) ... `ld bc,hl` (park
+;; the reversed result back). Reverse the bytes in place across D/E/B/C instead,
+;; dropping both — HL is dead after the park (the value moved to BC). Only the
+;; DE:BC form has the `ld hl,bc`/`ld bc,hl` bracket, so this is byte-identical
+;; for sccz80 and for 80cc with the gate off.
+%title #DEBC swap_endian_32 in DE:BC, no HL round-trip (-2b)
+	ld	hl,bc
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+	ld	bc,hl
+=
+	ld	a,c
+	ld	c,d
+	ld	d,a
+	ld	a,b
+	ld	b,e
+	ld	e,a
+
+;; #FP1 a `pop bc` immediately before an `ld sp,ix` frame teardown is dead: the
+;; `ld sp,ix` resets SP wholesale, so the pop's SP+2 is discarded and the value
+;; loaded into BC is a throwaway (the caller-cleanup discard-pop idiom — BC is
+;; dead across an fp epilogue / post-call stack-equalise). Applied iteratively
+;; copt clears a whole run of equalise pops after a call down to the bare teardown.
+%title #FP1 drop dead pop bc before ld sp,ix frame teardown (-1b, -10t)
+	pop	bc
+	ld	sp,ix
+=
+	ld	sp,ix
+
+;; #MV1 `push hl; pop de` copies HL into DE preserving HL, but the byte-move pair
+;; does it in 2 bytes / 8t vs the stack round-trip's ~21t (and frees the memory
+;; traffic). Same net effect (DE=HL, HL and flags unchanged), context-free safe.
+;; Harvests the `... push hl; pop de` tail the byte-deref-to-DE lowering leaves.
+%title #MV1 HL->DE via byte moves not a stack round-trip (-11t)
+	push	hl
+	pop	de
+=
+	ld	e,l
+	ld	d,h
+
+;; #W1 repeat-widening of a byte global masked to a byte: `ld hl,(g); ld h,0`
+;; zero-extends the byte, then `ld a,l; <alu a,imm>; ld l,a; ld h,0` re-widens the
+;; masked result. The FIRST `ld h,0` is dead (h is rewritten by the trailing one,
+;; and nothing reads h between), and the word load's high byte is discarded — so
+;; read the byte straight into A. HL is fully re-established at the tail, so this
+;; is context-free safe. Collapses the flag-mask idiom (`zflag & 1` etc.).
+;; %"and|or|xor"3 captures the mnemonic (group 3) — see z80rules.1, which 80cc
+;; does not thread, so the equivalent fold there never reaches 80cc output.
+%title #W1 byte-global mask re-widen: byte load, drop dead ld h,0 (-3b)
+	ld	hl,(%1)
+	ld	h,0
+	ld	a,l
+	%"and|or|xor"3	%2
+	ld	l,a
+	ld	h,0
+=
+	ld	a,(%1)
+	%3	%2
+	ld	l,a
+	ld	h,0
+
+;; #W2 the same dead-first-`ld h,0` when the widened value did NOT come from a
+;; global load (any prior producer left it in HL): drop the redundant zero-extend
+;; ahead of the mask-and-re-widen. h is rewritten by the trailing `ld h,0`.
+%title #W2 drop dead ld h,0 before a byte mask re-widen (-2b)
+	ld	h,0
+	ld	a,l
+	%"and|or|xor"3	%2
+	ld	l,a
+	ld	h,0
+=
+	ld	a,l
+	%3	%2
+	ld	l,a
+	ld	h,0

@@ -264,40 +264,106 @@ static char* parse_var(char** pp, char** vars, const char* who)
     return v;
 }
 
+/* Does one token match the value? A `"regex"` token (double-quoted; `%` is
+   reserved for variables) is matched as an anchored POSIX ERE — the whole value
+   must match; any other token is compared literally. */
+static int member_tok_matches(const char* tok, const char* val)
+{
+#ifdef USE_REGEXP
+    if (tok[0] == '"') {
+        char re[MAXLINE], anchored[MAXLINE + 8];
+        regex_t reg;
+        size_t n = strlen(tok);
+        size_t inner = (n >= 2 && tok[n - 1] == '"') ? n - 2 : n - 1;
+        int ok = 0;
+        if (inner >= sizeof re) inner = sizeof re - 1;
+        memcpy(re, tok + 1, inner);
+        re[inner] = 0;
+        snprintf(anchored, sizeof anchored, "^(%s)$", re);
+        if (regcomp(&reg, anchored, REG_EXTENDED) == 0) {
+            ok = (regexec(&reg, val, 0, NULL, 0) == 0);
+            regfree(&reg);
+        }
+        return ok;
+    }
+#endif
+    return strcmp(tok, val) == 0;
+}
+
 /* %is  %n tok tok ...   active if %n equals one of the tokens
    %not %n tok tok ...   active if %n equals none of the tokens
-   'want' is 1 for %is, 0 for %not. Square brackets around the token
-   list are optional and ignored. */
+   'want' is 1 for %is, 0 for %not. A token may be a literal or a `"regex"`
+   (anchored full-match). Square brackets around the list are optional/ignored. */
 int check_member(char* pat, char** vars, int want)
 {
-    char buf[1024];
     char* val;
-    char* tok;
+    char* p;
     int found = 0;
 
     val = parse_var(&pat, vars, want ? "%is" : "%not");
     if (val == 0)
         return 0;
-    snprintf(buf, sizeof(buf), "%s", pat);
-    for (tok = strtok(buf, " \t\n[]"); tok; tok = strtok(NULL, " \t\n[]")) {
-        if (strcmp(tok, val) == 0) {
-            found = 1;
+    p = pat;
+    while (*p && !found) {
+        char tok[MAXLINE];
+        size_t i = 0;
+        while (*p && (isspace((unsigned char)*p) || *p == '[' || *p == ']'))
+            p++;
+        if (!*p)
             break;
+        if (p[0] == '"') {
+            /* keep the whole "..." quoted form as one token (its regex may
+               contain spaces / [] that the plain tokenizer would split). */
+            tok[i++] = *p++;                                  /* " */
+            while (*p && (*p != '"' || p[-1] == '\\') && i + 1 < sizeof tok)
+                tok[i++] = *p++;
+            if (*p == '"' && i + 1 < sizeof tok)
+                tok[i++] = *p++;                              /* closing " */
+        } else {
+            while (*p && !isspace((unsigned char)*p) && *p != '[' && *p != ']'
+                   && i + 1 < sizeof tok)
+                tok[i++] = *p++;
         }
+        tok[i] = 0;
+        if (member_tok_matches(tok, val))
+            found = 1;
     }
     return want ? found : !found;
 }
 
-/* %notSame %n %m   active if the two variables differ */
+/* parse a "%n" variable reference (resolving to its value) OR a literal token
+   at *pp; advance *pp past it. A %n reference returns the variable's value; any
+   other token is returned verbatim (copied into buf). Skips leading whitespace. */
+static char* parse_var_or_token(char** pp, char** vars, char* buf, size_t bufsz)
+{
+    char* p = *pp;
+    while (*p && isspace((unsigned char)*p))
+        p++;
+    if (p[0] == '%' && isdigit((unsigned char)p[1])) {
+        char* v = vars[p[1] - '0'];
+        if (v == 0)
+            error("variable is not set\n");
+        *pp = p + 2;
+        return v;
+    }
+    size_t i = 0;
+    while (*p && !isspace((unsigned char)*p) && i + 1 < bufsz)
+        buf[i++] = *p++;
+    buf[i] = 0;
+    *pp = p;
+    return buf;
+}
+
+/* %notSame a b   active if the two operands differ. Each operand is a "%n"
+   variable reference or a literal token (so `%notSame %1 (hl)` works). */
 int check_notsame(char* pat, char** vars)
 {
+    char abuf[256], bbuf[256];
     char *a, *b;
 
-    a = parse_var(&pat, vars, "%notSame");
-    if (a == 0)
-        return 0;
-    b = parse_var(&pat, vars, "%notSame");
-    if (b == 0)
+    a = parse_var_or_token(&pat, vars, abuf, sizeof abuf);
+    b = parse_var_or_token(&pat, vars, bbuf, sizeof bbuf);
+    if (a == 0 || b == 0)
         return 0;
     return strcmp(a, b) != 0;
 }
