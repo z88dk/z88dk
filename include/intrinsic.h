@@ -91,15 +91,15 @@ extern void intrinsic_ini(void*) __z88dk_fastcall;
 
 extern void __LIB__ intrinsic_stub(void) __smallc __preserves_regs(a,b,c,d,e,h,l);
 
-extern void intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_ei(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_halt(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_reti(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_retn(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_im_0(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_im_1(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_im_2(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_nop(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_ei(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_halt(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_reti(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_retn(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_im_0(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_im_1(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_im_2(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void __LIB__ intrinsic_nop(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void __LIB__ intrinsic_ex_de_hl(void) __smallc __preserves_regs(a,b,c);
 extern void __LIB__ intrinsic_exx(void) __smallc __preserves_regs(a);
