@@ -147,7 +147,6 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_features.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_file.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_range_type.cpp" />
-    <ClCompile Include="..\..\src\z80asm\z80asm2\obj_reader.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_symbol_scope.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_symbol_type.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\parser_directives.cpp" />
@@ -209,7 +208,6 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_features.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_file.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_range_type.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm2\obj_reader.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol_scope.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol_type.h" />
     <ClInclude Include="..\..\src\z80asm\z80asm2\opcodes.h" />
