@@ -9,7 +9,7 @@ include(__link__.m4)
 // target configuration goes here
 
 #ifdef __CPM
-#include <../../../libsrc/newlib/target/cpm/config_cpm.h>
+#include <../../../libsrc/target/cpm/config_cpm.h>
 #endif
 
 #ifdef __HBIOS

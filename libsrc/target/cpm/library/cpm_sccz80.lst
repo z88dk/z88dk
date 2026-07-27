@@ -22,7 +22,7 @@
 @../newlib/stdio/stdio_sccz80.lst
 @../stdlib/stdlib_sccz80.lst
 @../string/string_sccz80.lst
-@target//cpm/driver/driver.lst
+@../target/cpm/driver/driver.lst
 @../newlib/threads/threads_sccz80.lst
 @../time/time_sccz80.lst
 @../arch/z80/z80_sccz80.lst

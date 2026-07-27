@@ -170,6 +170,53 @@ static void test_file_multi(void)
     tio_close(fd2);
 }
 
+static void test_file_fopen(void)
+{
+    FILE *fp;
+    char buf[32];
+    int n;
+    static char payload[] = "FOPEN-OK!";
+
+    /* fputs + fread: fgets without newline is flaky on some stdio paths */
+    fp = fopen("fopen.dat", "w");
+    Assert(fp != 0, "fopen write");
+    Assert(fputs(payload, fp) >= 0, "fputs");
+    Assert(fclose(fp) == 0, "fclose after write");
+
+    fp = fopen("fopen.dat", "r");
+    Assert(fp != 0, "fopen read");
+    memset(buf, 0, sizeof(buf));
+    n = (int)fread(buf, 1, strlen(payload), fp);
+    Assert(n == (int)strlen(payload), "fread length");
+    Assert(memcmp(buf, payload, strlen(payload)) == 0, "fopen round-trip");
+    Assert(fclose(fp) == 0, "fclose after read");
+}
+
+#ifdef __Z88DK_NEWLIB
+#include <arch/cpm.h>
+
+static void test_newlib_devices(void)
+{
+    FILE *f;
+
+    /* Logical names → FILE* (stdio character units) */
+    f = (FILE *)cpm_device_file("CRT:");
+    Assert((void *)f == (void *)stdout, "CRT: → stdout");
+    f = (FILE *)cpm_device_file("LPT:");
+    Assert((void *)f == (void *)stdlst, "LPT: → stdlst");
+    f = (FILE *)cpm_device_file("PTR:");
+    Assert((void *)f == (void *)stdrdr, "PTR: → stdrdr");
+    f = (FILE *)cpm_device_file("PTP:");
+    Assert((void *)f == (void *)stdpun, "PTP: → stdpun");
+
+    /* Physical streams exist */
+    Assert(stdrdr != 0 && stdpun != 0 && stdlst != 0, "stdrdr/stdpun/stdlst");
+
+    /* IOBYTE macros expand to BDOS 7/8 — compile-time surface only here */
+    Assert(CPM_DEV_LPT == 2 && CPM_IOBYTE_LST_SHIFT == 6, "iobyte constants");
+}
+#endif
+
 int main(void)
 {
     suite_setup(TIO_LABEL " serial+disk I/O");
@@ -181,6 +228,10 @@ int main(void)
     suite_add_test(test_file_read_verify);
     suite_add_test(test_file_lseek);
     suite_add_test(test_file_multi);
+    suite_add_test(test_file_fopen);
+#ifdef __Z88DK_NEWLIB
+    suite_add_test(test_newlib_devices);
+#endif
 
     return suite_run();
 }

@@ -161,7 +161,8 @@ IF __CRTCFG = 2
    
    defc TAR__clib_balloc_table_size    = 0
    
-   defc TAR__clib_fopen_max            = 0
+   ; Extra FILE* beyond static streams so fopen() works (#3022)
+   defc TAR__clib_fopen_max            = 10
    ; static fds + dynamic open() files
    defc TAR__clib_open_max             = 16
 

@@ -48,7 +48,7 @@ include(`target/rc2014/config/config_cide.m4')
 include(`target/rc2014/config/config_ppide.m4')
 include(`target/rc2014/config/config_ram.m4')
 
-include(`newlib/target/cpm/config/config_cpm.m4')
+include(`target/cpm/config/config_cpm.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

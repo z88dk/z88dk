@@ -26,7 +26,7 @@
 @../target/yaz180/default/default.lst
 @../target/yaz180/device/device_sdcc.lst
 @../target/yaz180/driver/driver_sdcc.lst
-@target//cpm/driver/driver.lst
+@../target/cpm/driver/driver.lst
 @../newlib/threads/threads_sdcc_ix.lst
 @../time/time_sdcc.lst
 @../arch/z180/z180_sdcc.lst
