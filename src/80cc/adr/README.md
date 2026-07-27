@@ -23,6 +23,7 @@ ez80, rabbit, gbz80, 8080, 8085, kc160).
 | [0010](0010-ast-vs-ir-optimisation-layering.md) | AST-level and IR-level optimisation: a deliberate two-level split |
 | [0011](0011-index-register-allocation.md) | Index-register (IX/IY) allocation by frame mode, and reservation |
 | [0012](0012-frame-pointer-default-by-cpu.md) | Per-CPU default for the frame pointer (fp on z80/z80n/z180/ez80) |
+| [0017](0017-ranged-residency-ssot.md) | Ranged residency: a home-per-interval table as the single source of truth (amends 0003) |
 | [0013](0013-peephole-text-layer.md) | The peephole / assembly-text layer: copt (80cc_rules.1 only) + the post-render text filter (dead-label elision, defc relocation, operand-rewrite jump threading) |
 | [0014](0014-volatile-behaviour.md) | Volatile behaviour: VREG_VOLATILE locals, `mem.volatile_` derefs, the `;volatile` copt stamp |
 | [0015](0015-ir-pattern-matcher.md) | The IR pattern-matcher engine: declarative production table (templates + check/apply + exclude_cpus), side conditions written once |
