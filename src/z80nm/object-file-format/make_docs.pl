@@ -7,7 +7,8 @@
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
-use lib '.';
+use FindBin;
+use lib "$FindBin::Bin/../../z80asm/z80asm2/tools";
 use ObjModule;
 use Preproc::Tiny;
 use Path::Tiny;

@@ -65,21 +65,27 @@ struct ExprLiteralInt : public Expr {
     int int_value = 0;
 
     ExprLiteralInt(int v, const SourceLoc& loc) : Expr(loc), int_value(v) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprLiteralFloat : public Expr {
     double float_value = 0.0;
 
     ExprLiteralFloat(double v, const SourceLoc& loc) : Expr(loc), float_value(v) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprLiteralAsmpc : public Expr {
     ExprLiteralAsmpc(const SourceLoc& loc) : Expr(loc) {}
     Stmt* stmt = nullptr;  // pointer to the statement that generated this asmpc
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprSymbol : public Expr {
@@ -88,7 +94,9 @@ struct ExprSymbol : public Expr {
 
     ExprSymbol(StringId name_id_, const SourceLoc& loc) : Expr(loc),
         name_id(name_id_) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprLocalLabel : public Expr {
@@ -99,7 +107,9 @@ struct ExprLocalLabel : public Expr {
     ExprLocalLabel(StringId name_id_, size_t at_pos_,
                    const SourceLoc& loc)
         : Expr(loc), name_id(name_id_), at_pos(at_pos_) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprUnary : public Expr {
@@ -108,7 +118,9 @@ struct ExprUnary : public Expr {
 
     ExprUnary(TokenType op_, std::unique_ptr<Expr> rhs_, const SourceLoc& loc)
         : Expr(loc), op(op_), rhs(std::move(rhs_)) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprBinary : public Expr {
@@ -119,7 +131,9 @@ struct ExprBinary : public Expr {
                std::unique_ptr<Expr> rhs_,
                const SourceLoc& loc)
         : Expr(loc), op(op_), lhs(std::move(lhs_)), rhs(std::move(rhs_)) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprTernary : public Expr {
@@ -130,7 +144,9 @@ struct ExprTernary : public Expr {
                 const SourceLoc& loc)
         : Expr(loc), cond(std::move(c)), then_expr(std::move(t)),
           else_expr(std::move(e)) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ExprCallUnary : public Expr {
@@ -140,7 +156,9 @@ struct ExprCallUnary : public Expr {
     ExprCallUnary(Keyword keyword_, std::unique_ptr<Expr> arg_,
                   const SourceLoc& loc)
         : Expr(loc), keyword(keyword_), arg(std::move(arg_)) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 // check range of contant expression
@@ -205,7 +223,9 @@ struct Patch : public Expr {
 
     Patch(std::unique_ptr<Expr> expr, const SourceLoc& loc)
         : Expr(loc), inner(std::move(expr)) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -219,7 +239,9 @@ struct Stmt : public TreeNode {
 
     Stmt(const SourceLoc& loc_) : loc(loc_) {}
     virtual ~Stmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct OpcodeStmt : Stmt {
@@ -230,7 +252,9 @@ struct OpcodeStmt : Stmt {
     std::vector<std::unique_ptr<Patch>> patches;    // instruction patches
 
     OpcodeStmt(const SourceLoc& loc) : Stmt(loc) {}
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct LabelStmt : Stmt {
@@ -241,7 +265,9 @@ struct LabelStmt : Stmt {
 
     LabelStmt(StringId name_id_, const SourceLoc& loc_);
     virtual ~LabelStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct OrgStmt : Stmt {
@@ -252,7 +278,9 @@ struct OrgStmt : Stmt {
     OrgStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
     virtual ~OrgStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct DefcStmt : Stmt {
@@ -264,7 +292,9 @@ struct DefcStmt : Stmt {
              std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_), expr(std::move(e)) {}
     virtual ~DefcStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ModuleStmt : Stmt {
@@ -273,7 +303,9 @@ struct ModuleStmt : Stmt {
     ModuleStmt(StringId name_id_, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~ModuleStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct SectionStmt : Stmt {
@@ -282,7 +314,9 @@ struct SectionStmt : Stmt {
     SectionStmt(StringId name_id_, const SourceLoc& loc)
         : Stmt(loc), name_id(name_id_) {}
     virtual ~SectionStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct AlignStmt : Stmt {
@@ -296,7 +330,9 @@ struct AlignStmt : Stmt {
         : Stmt(loc), align_expr(std::move(align_expr_)),
           filler_expr(std::move(filler_expr_)) {}
     virtual ~AlignStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct DefsNumericStmt : Stmt {
@@ -310,7 +346,9 @@ struct DefsNumericStmt : Stmt {
         : Stmt(loc), size_expr(std::move(size_expr_)),
           filler_expr(std::move(filler_expr_)) {}
     virtual ~DefsNumericStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct DefsStringStmt : Stmt {
@@ -325,7 +363,9 @@ struct DefsStringStmt : Stmt {
         : Stmt(loc), size_expr(std::move(size_expr_)), string_id(string_id_),
           filler_byte(filler_byte_) {}
     virtual ~DefsStringStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 enum class SymbolDeclareType : uint8_t {
@@ -346,7 +386,9 @@ struct SymbolDeclareStmt : Stmt {
                       const SourceLoc& loc)
         : Stmt(loc), type(type_), names(names_) {}
     virtual ~SymbolDeclareStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct ListStmt : Stmt {
@@ -355,7 +397,9 @@ struct ListStmt : Stmt {
     ListStmt(bool enable_, const SourceLoc& loc)
         : Stmt(loc), enable(enable_) {}
     virtual ~ListStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct PhaseStmt : Stmt {
@@ -364,14 +408,18 @@ struct PhaseStmt : Stmt {
     PhaseStmt(std::unique_ptr<Expr> e, const SourceLoc& loc)
         : Stmt(loc), expr(std::move(e)) {}
     virtual ~PhaseStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 struct DephaseStmt : Stmt {
     DephaseStmt(const SourceLoc& loc)
         : Stmt(loc) {}
     virtual ~DephaseStmt() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -406,7 +454,9 @@ struct SymbolInfo : public TreeNode {
                const SourceLoc& loc_)
         : name_id(name_id_), def_type(def_type_), loc(loc_) {}
     virtual ~SymbolInfo() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -428,8 +478,10 @@ struct Section : public TreeNode {
 
     Section(StringId name_id_);
     virtual ~Section() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
     void dump(DumpContext ctx, const Section* current) const;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -446,8 +498,10 @@ struct Module : public TreeNode {
     Module(StringId name_id_);
     Section* set_section(StringId sec_name_id);
     virtual ~Module() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
     void dump(DumpContext ctx, const Module* current) const;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -465,7 +519,11 @@ struct Program : public TreeNode {
     Program(StringId name_id_);
     Module* set_module(StringId mod_name_id);
     virtual ~Program() = default;
+#ifdef _DEBUG
     void dump(DumpContext ctx) const override;
+#endif
 };
 
+#ifdef _DEBUG
 [[noreturn]] void dump_ast_and_exit(const std::unique_ptr<Program>& prog);
+#endif

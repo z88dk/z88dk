@@ -8,7 +8,8 @@
 
 use Modern::Perl;
 use Path::Tiny;
-use lib path($0)->parent->stringify;
+use FindBin;
+use lib "$FindBin::Bin";
 use ObjModule;
 use Getopt::Long;
 

@@ -26,5 +26,8 @@ struct DumpContext {
 //-----------------------------------------------------------------------------
 struct TreeNode {
     virtual ~TreeNode() = default;
+
+#ifdef _DEBUG
     virtual void dump(DumpContext ctx) const = 0;
+#endif
 };

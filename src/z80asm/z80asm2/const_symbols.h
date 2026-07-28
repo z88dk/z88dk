@@ -23,5 +23,7 @@ struct ConstSymbols {
     const ConstSymbol* get(StringId name_id) const;
     void erase(StringId name_id);
 
+#ifdef _DEBUG
     void dump_symbols() const;
+#endif
 };

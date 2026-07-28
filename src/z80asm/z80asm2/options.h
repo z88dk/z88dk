@@ -47,6 +47,7 @@ struct Options {
     uint8_t filler_byte = DEFAULT_FILLER_BYTE;
     FloatFormat float_format = DEFAULT_FLOAT_FORMAT;
     bool do_link = false;
+#ifdef _DEBUG
     bool dump_after_cmdline = false;
     bool dump_after_tokenization = false;
     bool dump_after_directives = false;
@@ -59,6 +60,7 @@ struct Options {
     bool dump_after_layout = false;
     bool dump_after_assembly = false;
     bool dump_after_link_collection = false;
+#endif
     std::string m4_options;
     std::string perl_options;
     std::string cpp_options;

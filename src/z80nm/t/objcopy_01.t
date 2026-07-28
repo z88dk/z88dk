@@ -7,7 +7,7 @@ use Modern::Perl;
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
 
-capture_ok( "perl z80objcopy.pl -h", "$dir/expected/${self}.txt" );
+capture_ok( "perl ../z80asm/z80asm2/tools/z88dk-z80objcopy.pl -h", "$dir/expected/${self}.txt" );
 
 unlink_testfiles;
 done_testing;

@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #include "file_mgr.h"
 #include "lexer.h"
 #include "lexer_dump.h"
@@ -99,3 +101,5 @@ void dump_logical_lines_and_exit(const std::vector<LogicalLine>& lines) {
     dump_logical_lines(lines, cur_filename_id);
     exit(EXIT_SUCCESS);
 }
+
+#endif
