@@ -27,7 +27,7 @@
 @../target/scz180/default/default.lst
 @../target/scz180/device/device_sccz80.lst
 @../target/scz180/driver/driver_sccz80.lst
-@target//cpm/driver/driver.lst
+@../target/cpm/driver/driver.lst
 @../newlib/threads/threads_sccz80.lst
 @../time/time_sccz80.lst
 @../arch/z180/z180_sccz80.lst

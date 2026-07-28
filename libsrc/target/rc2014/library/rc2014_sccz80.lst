@@ -25,7 +25,7 @@
 @../target/rc2014/default/default.lst
 @../target/rc2014/device/device_sccz80.lst
 @../target/rc2014/driver/driver_sccz80.lst
-@target//cpm/driver/driver.lst
+@../target/cpm/driver/driver.lst
 @../newlib/threads/threads_sccz80.lst
 @../time/time_sccz80.lst
 @../arch/z80/z80_sccz80.lst

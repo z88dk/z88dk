@@ -3,8 +3,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; Provides asm_target_open_p1 / asm_target_open_p2 so unprefixed
-; open/creat/read/write/lseek/close use BDOS FCB I/O on
-; subtype=cpm.  FatFs (f_*) stays a separate stack.
+; open/creat/read/write/lseek/close use BDOS FCB I/O on:
+;   +cpm -clib=new|sdcc_ix|sdcc_iy
+;   +rc2014|+yaz180|+scz180 -subtype=cpm
+; No FatFs or physical disk drivers here — host CP/M BDOS only.
 ;
 ; FDSTRUCT layout (base = FDSTRUCT *, JP = base+3):
 ;

@@ -52,12 +52,19 @@ IF __CRTCFG = 0
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 256
+   ; Static stdin/out/err/rdr/pun/lst plus room for several FCB file
+   ; FDSTRUCTs (~192 bytes each including sector buffer). Same sizing
+   ; as +rc2014/+yaz180/+scz180 -subtype=cpm so open/read/write/lseek/close
+   ; work via cpm_01_file (BDOS FCB). No FatFs on +cpm.
+   defc TAR__clib_stdio_heap_size      = 1024
    
    defc TAR__clib_balloc_table_size    = 0
    
-   defc TAR__clib_fopen_max            = 0
-   defc TAR__clib_open_max             = 0
+   ; Extra FILE* beyond the 6 static streams so fopen/fclose work
+   ; (issue #3022). Must be > static FILE count or freelist stays empty.
+   defc TAR__clib_fopen_max            = 10
+   ; 6 static fds (stdin..stdlst) + space for dynamic open() files
+   defc TAR__clib_open_max             = 16
 
 ENDIF
 
