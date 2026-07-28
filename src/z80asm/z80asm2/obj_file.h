@@ -142,7 +142,9 @@ struct ObjModname {
         name_id = g_strings.intern(name);
     }
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const;
+#endif
     void dump_short() const;
     size_t pack(BinaryData& bin_data, StringTable& strings) const;
     void unpack(std::shared_ptr<const BinaryFile> file, int version,
@@ -197,9 +199,11 @@ struct ObjExpr {
         text_id = g_strings.intern(text);
     }
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const;
     static void dump_exprs(DumpContext ctx,
                            const std::vector<ObjExpr>& exprs);
+#endif
     void dump_short() const;
     static void dump_exprs_short(const std::vector<ObjExpr>& exprs);
 
@@ -258,9 +262,11 @@ struct ObjReloc {
         value_section_name_id = g_strings.intern(section_name);
     }
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const;
     static void dump_relocs(DumpContext ctx,
                             const std::vector<ObjReloc>& relocs);
+#endif
     void dump_short() const;
     static void dump_relocs_short(const std::vector<ObjReloc>& relocs);
 
@@ -314,9 +320,11 @@ struct ObjSymbol {
         section_name_id = g_strings.intern(section_name);
     }
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const;
     static void dump_symbols(DumpContext ctx,
                              const std::vector<ObjSymbol>& symbols);
+#endif
     void dump_short() const;
     static void dump_symbols_short(const std::vector<ObjSymbol>& symbols);
 
@@ -345,9 +353,11 @@ struct ObjExtern {
         symbol_name_id = g_strings.intern(symbol_name);
     }
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const;
     static void dump_externs(DumpContext ctx,
                              const std::vector<ObjExtern>& externs);
+#endif
     void dump_short() const;
     static void dump_externs_short(const std::vector<ObjExtern>& externs);
 
@@ -381,9 +391,11 @@ struct ObjSection {
         section_name_id = g_strings.intern(section_name);
     }
 
+#ifdef _DEBUG
     void dump(DumpContext ctx) const;
     static void dump_sections(DumpContext ctx,
                               const std::vector<ObjSection>& sections);
+#endif
     void dump_short() const;
     static void dump_sections_short(const std::vector<ObjSection>& sections);
 
@@ -452,7 +464,9 @@ public:
     std::vector<ObjExtern>* externs();
     std::vector<ObjSection>* sections();
 
+#ifdef _DEBUG
     void dump(DumpContext ctx);
+#endif
     void dump_short();
 
     void pack(BinaryData& bin_data);
@@ -533,7 +547,9 @@ public:
     // when the library is unpacked, and can be changed with set_cpu_id() and set_swap_ixiy()
     ObjModule* lookup_public_symbol(StringId sym_name_id);
 
+#ifdef _DEBUG
     void dump(DumpContext ctx);
+#endif
     void dump_short();
 
     void pack(BinaryData& bin_data);
@@ -563,5 +579,7 @@ private:
 void write_object_library(ObjLibrary& obj_lib, std::string_view filename);
 void read_object_library(ObjLibrary& obj_lib, std::string_view filename);
 
+#ifdef _DEBUG
 [[noreturn]]
 void dump_obj_lib_and_exit(ObjLibrary& obj_lib);
+#endif

@@ -1,10 +1,9 @@
 ## Pending issues
-- Add BASIC { ... } to assemble BASIC tokens for zx81, zx
-- z80nm must show list of public symbols defined in library
-- when generating object files sort the symbols by name so that output is stable
-- deprecate z80objcopy
+X z80nm must show list of public symbols defined in library
+X when generating object files sort the symbols by name so that output is stable
 - add import/export to ASCII to z80nm
-- add version 19: public symbol index
+X add version 19: public symbol index
+- add git hash to copyright screen
 
 ## Future evolution
 - Memory maps for loading
@@ -14,6 +13,7 @@
 - Module "touch map" (track accessed/modified sections)
 - Lazy symbol hydration (hydrate symbol bodies only when needed)
 - Module deduplication via hashing
+- Add BASIC { ... } to assemble BASIC tokens for zx81, zx
 
 
 ASCII format structure

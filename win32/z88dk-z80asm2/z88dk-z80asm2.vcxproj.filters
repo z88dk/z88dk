@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\test">
+      <UniqueIdentifier>{18710beb-b268-4124-b340-3e9eea7b077d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\test">
+      <UniqueIdentifier>{0f281ae1-1bba-49d1-b11a-ae80722a8f07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\test">
+      <UniqueIdentifier>{00ae3c17-d14e-484e-865a-f0cdac46d7af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp">
@@ -162,6 +171,12 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\obj_symbol_type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\test\template.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\test\test_driver.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
@@ -299,6 +314,9 @@
     <ClInclude Include="..\..\src\z80asm\z80asm2\obj_symbol_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\z80asm2\test\test_driver.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\z80asm2\lexer_keywords.def">
@@ -330,6 +348,9 @@
     </None>
     <None Include="..\..\src\z80asm\obj_symbol_type.def">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\z80asm2\test\test_driver.def">
+      <Filter>Resource Files\test</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

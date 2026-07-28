@@ -51,6 +51,7 @@ void ConstSymbols::erase(StringId name_id) {
     symbols.erase(name_id);
 }
 
+#ifdef _DEBUG
 void ConstSymbols::dump_symbols() const {
     // collect entries and sort by name
     std::vector<const ConstSymbol*> sorted;
@@ -71,3 +72,4 @@ void ConstSymbols::dump_symbols() const {
                   << std::endl;
     }
 }
+#endif

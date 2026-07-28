@@ -1,5 +1,5 @@
 Unknown option: x
-Usage: z80objcopy.pl [options] <input-file|-> [<output-file|->]
+Usage: z88dk-z80objcopy.pl [options] <input-file|-> [<output-file|->]
 
 Read a Z80 object file or text dump and display its contents. If an
 output file is supplied, write the object or dump to that file. This

@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #pragma once
 
 #include "lexer_tokens.h"
@@ -13,8 +15,10 @@
 void dump_token(const Token& token);
 void dump_tokens(const std::vector<Token>& tokens,
                  StringId& cur_filename_id);
+
 void dump_logical_line(const LogicalLine& line,
                        StringId& cur_filename_id);
+
 void dump_logical_lines(const std::vector<LogicalLine>& lines,
                         StringId& cur_filename_id);
 
@@ -24,3 +28,4 @@ void dump_after_tokenization_and_exit(std::string_view filename);
 [[noreturn]]
 void dump_logical_lines_and_exit(const std::vector<LogicalLine>& lines);
 
+#endif

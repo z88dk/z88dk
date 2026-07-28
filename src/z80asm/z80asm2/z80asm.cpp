@@ -77,10 +77,12 @@ int main(int argc, char* argv[]) {
     // define global defines from command line options
     g_args.define_constants_from_options();
 
+#ifdef _DEBUG
     if (g_args.options.dump_after_cmdline) {
         dump_after_cmdline_and_exit();
         // not reached
     }
+#endif
 
     // detect errors from argument processing
     if (g_diag.get_error_count()) {

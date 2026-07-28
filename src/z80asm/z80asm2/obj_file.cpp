@@ -338,9 +338,11 @@ LibSchema::LibSchema(std::shared_ptr<const BinaryFile> file_)
 // Module name
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
 void ObjModname::dump(DumpContext ctx) const {
     ctx.line("ObjModname: " + std::string(name()));
 }
+#endif
 
 void ObjModname::dump_short() const {
     std::cout << "  Name: " << name() << std::endl;
@@ -374,6 +376,7 @@ void ObjModname::unpack(std::shared_ptr<const BinaryFile> file, int version,
 // Expression
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
 void ObjExpr::dump(DumpContext ctx) const {
     ctx.line("ObjExpr:");
     DumpContext child_ctx = ctx.child();
@@ -401,6 +404,7 @@ void ObjExpr::dump_exprs(DumpContext ctx, const std::vector<ObjExpr>& exprs) {
         }
     }
 }
+#endif
 
 void ObjExpr::dump_short() const {
     std::cout << "    E "
@@ -596,6 +600,7 @@ void ObjExpr::unpack_exprs(std::shared_ptr<const BinaryFile> file, int version,
 // Relocation
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
 void ObjReloc::dump(DumpContext ctx) const {
     ctx.line("ObjReloc:");
     DumpContext child_ctx = ctx.child();
@@ -618,6 +623,7 @@ void ObjReloc::dump_relocs(DumpContext ctx,
         }
     }
 }
+#endif
 
 void ObjReloc::dump_short() const {
     std::cout << "    R "
@@ -722,6 +728,7 @@ void ObjReloc::unpack_relocs(std::shared_ptr<const BinaryFile> file,
 // Symbol
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
 void ObjSymbol::dump(DumpContext ctx) const {
     ctx.line("ObjSymbol: " + std::string(symbol_name()));
     DumpContext child_ctx = ctx.child();
@@ -743,6 +750,7 @@ void ObjSymbol::dump_symbols(DumpContext ctx,
         }
     }
 }
+#endif
 
 void ObjSymbol::dump_short() const {
     std::cout << "    " << to_short_string(scope)
@@ -897,6 +905,7 @@ void ObjSymbol::unpack_symbols(std::shared_ptr<const BinaryFile> file,
 // Extern
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
 void ObjExtern::dump(DumpContext ctx) const {
     ctx.line("Symbol: " + std::string(symbol_name()));
 }
@@ -911,6 +920,7 @@ void ObjExtern::dump_externs(DumpContext ctx,
         }
     }
 }
+#endif
 
 void ObjExtern::dump_short() const {
     std::cout << "    U         " << symbol_name() << std::endl;
@@ -993,6 +1003,7 @@ void ObjExtern::unpack_externs(std::shared_ptr<const BinaryFile> file,
 // Section
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
 void ObjSection::dump(DumpContext ctx) const {
     ctx.line("ObjSection: " + std::string(section_name_str()));
     DumpContext child_ctx = ctx.child();
@@ -1017,6 +1028,7 @@ void ObjSection::dump_sections(DumpContext ctx,
         }
     }
 }
+#endif
 
 void ObjSection::dump_short() const {
     std::cout << "  Section ";
@@ -1327,6 +1339,7 @@ std::vector<ObjSection>* ObjModule::sections() {
     return sections_.get();
 }
 
+#ifdef _DEBUG
 void ObjModule::dump(DumpContext ctx) {
     ctx.line("ObjModule: " + std::string(modname()->name()));
     auto c = ctx.child();
@@ -1347,6 +1360,7 @@ void ObjModule::dump(DumpContext ctx) {
     ObjExtern::dump_externs(c, *externs());
     ObjSection::dump_sections(c, *sections());
 }
+#endif
 
 void ObjModule::dump_short() {
     std::cout << "Object  file " << filename()
@@ -1484,7 +1498,8 @@ std::vector<ObjModule>* ObjLibrary::modules() {
     return modules_.get();
 }
 
-std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>* ObjLibrary::symbol_index() {
+std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>*
+ObjLibrary::symbol_index() {
     if (!symbol_index_) {
         symbol_index_ =
             std::make_unique<std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>>();
@@ -1542,6 +1557,7 @@ ObjModule* ObjLibrary::lookup_public_symbol(StringId sym_name_id) {
     }
 }
 
+#ifdef _DEBUG
 void ObjLibrary::dump(DumpContext ctx) {
     ctx.line("ObjLibrary:");
     auto c = ctx.child();
@@ -1553,6 +1569,7 @@ void ObjLibrary::dump(DumpContext ctx) {
         }
     }
 }
+#endif
 
 void ObjLibrary::dump_short() {
     std::cout << "Library file " << filename()
@@ -1790,8 +1807,10 @@ void read_object_library(ObjLibrary& obj_lib, std::string_view filename) {
     obj_lib.unpack(file);
 }
 
+#ifdef _DEBUG
 void dump_obj_lib_and_exit(ObjLibrary& obj_lib) {
     DumpContext ctx(std::cout);
     obj_lib.dump(ctx);
     std::exit(EXIT_SUCCESS);
 }
+#endif

@@ -19,6 +19,7 @@
 
 Patch::~Patch() = default;
 
+#ifdef _DEBUG
 static std::string to_string(ExprType type) {
     switch (type) {
     case ExprType::Unknown:
@@ -124,11 +125,13 @@ void OpcodeStmt::dump(DumpContext ctx) const {
         }
     }
 }
+#endif
 
 LabelStmt::LabelStmt(StringId name_id_, const SourceLoc& loc_)
     : Stmt(loc_), name_id(name_id_) {
 }
 
+#ifdef _DEBUG
 void LabelStmt::dump(DumpContext ctx) const {
     ctx.line("LabelStmt");
     auto c = ctx.child();
@@ -553,7 +556,6 @@ static std::string to_string(SymbolDeclareType type) {
     }
 }
 
-
 void SymbolInfo::dump(DumpContext ctx) const {
     std::string sym_str = std::string(g_strings.view(name_id)) + ": ";
 
@@ -591,11 +593,13 @@ void SymbolInfo::dump(DumpContext ctx) const {
         defc_expr->dump(c.child());
     }
 }
+#endif
 
 Section::Section(StringId name_id_)
     : name_id(name_id_) {
 }
 
+#ifdef _DEBUG
 void Section::dump(DumpContext ctx) const {
     dump(ctx, nullptr);
 }
@@ -629,7 +633,7 @@ void Section::dump(DumpContext ctx, const Section* current) const {
         }
     }
 }
-
+#endif
 
 Module::Module(StringId name_id_)
     : name_id(name_id_) {
@@ -652,6 +656,7 @@ Section* Module::set_section(StringId sec_name_id) {
     return cur_section;
 }
 
+#ifdef _DEBUG
 void Module::dump(DumpContext ctx) const {
     dump(ctx, nullptr);
 }
@@ -694,6 +699,7 @@ void Module::dump(DumpContext ctx, const Module* current) const {
         }
     }
 }
+#endif
 
 Program::Program(StringId name_id_)
     : name_id(name_id_) {
@@ -716,6 +722,7 @@ Module* Program::set_module(StringId mod_name_id) {
     return cur_module;
 }
 
+#ifdef _DEBUG
 void Program::dump(DumpContext ctx) const {
     ctx.line("Program: " + std::string(g_strings.view(name_id)));
     auto c = ctx.child();
@@ -768,4 +775,4 @@ void dump_ast_and_exit(const std::unique_ptr<Program>& prog) {
     prog->dump(ctx);
     exit(EXIT_SUCCESS);
 }
-
+#endif

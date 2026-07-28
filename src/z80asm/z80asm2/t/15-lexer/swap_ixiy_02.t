@@ -4,7 +4,7 @@ use Modern::Perl;
 
 my $self = path($0)->basename(".t");
 capture_ok(
-    "z88dk-z80asm -v -IXIY -dump-after-tokenization t/15-lexer/input/$self.asm",
+"build/Debug/z88dk-z80asm -v -IXIY -dump-after-tokenization t/15-lexer/input/$self.asm",
     "t/15-lexer/expected/$self.txt"
 );
 

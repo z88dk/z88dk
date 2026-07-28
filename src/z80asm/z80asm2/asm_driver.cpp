@@ -60,11 +60,13 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
         std::cout << "Assembling " << filename << "..." << std::endl;
     }
 
+#ifdef _DEBUG
     // run tokenizer and cache tokens in SourceFile
     if (g_args.options.dump_after_tokenization) {
         dump_after_tokenization_and_exit(filename);
         // not reached
     }
+#endif
 
     // run preprocessor and get final token stream
     Preproc preproc;
@@ -79,19 +81,23 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
 
     // process High-Level-Assembly instructions
     std::vector<LogicalLine> hla_lines = hla_process(preprocessed_tokens);
+#ifdef _DEBUG
     if (g_args.options.dump_after_hla_expansion) {
         dump_logical_lines_and_exit(hla_lines);
         // not reached
     }
+#endif
 
     // process synthetic instructions and rewrite tokens
     // to their final form for the assembler
     SynthExpander synth_expander(hla_lines);
     std::vector<LogicalLine> asm_lines = synth_expander.expand();
+#ifdef _DEBUG
     if (g_args.options.dump_after_synth_expansion) {
         dump_logical_lines_and_exit(asm_lines);
         // not reached
     }
+#endif
 
     // generate -E output and terminate assembly, if requested
     if (g_args.options.preprocess_only) {
@@ -106,10 +112,12 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
     Parser parser(asm_lines);
     std::unique_ptr<Program> prog = parser.parse(prog_name);
 
+#ifdef _DEBUG
     if (g_args.options.dump_after_parse) {
         dump_ast_and_exit(prog);
         // not reached
     }
+#endif
 
     // split into modules and sections
     if (!split_modules_sections(*prog)) {
@@ -121,10 +129,12 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
         return; // error already reported
     }
 
+#ifdef _DEBUG
     if (g_args.options.dump_after_symbol_collection) {
         dump_ast_and_exit(prog);
         // not reached
     }
+#endif
 
     // fixpoint loop for layout and address resolution
     bool changed = true;
@@ -163,19 +173,23 @@ void assemble_file(std::string_view filename, std::string_view output_dir) {
         return; // error already reported
     }
 
+#ifdef _DEBUG
     if (g_args.options.dump_after_layout) {
         dump_ast_and_exit(prog);
         // not reached
     }
+#endif
 
     // write object library
     ObjLibrary obj_lib = build_object_library(*prog);
     write_object_library(obj_lib, o_filename);
 
+#ifdef _DEBUG
     if (g_args.options.dump_after_assembly) {
         dump_obj_lib_and_exit(obj_lib);
         // not reached
     }
+#endif
 }
 
 static bool split_modules_sections(Program& prog) {

@@ -196,9 +196,11 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
             continue;
         }
 
+#ifdef _DEBUG
         if (g_args.options.dump_after_directives) {
             dump_logical_line(processed, cur_filename_id);
         }
+#endif
 
         // ---------------------------------------------------------------------
         // 4. Macro expansion
@@ -247,9 +249,11 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
             }
         }
 
+#ifdef _DEBUG
         if (g_args.options.dump_after_macro_expansion) {
             dump_tokens(expanded, cur_filename_id);
         }
+#endif
 
         // Append expanded tokens to final output (skip empty lines
         // produced by multi-line macro invocations that were fully
@@ -285,6 +289,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
         g_diag.error(cond_stack.back().if_loc, "Unterminated IF block");
     }
 
+#ifdef _DEBUG
     if (g_args.options.dump_after_preprocessing) {
         dump_logical_lines(final_lines, cur_filename_id);
         dump_symbols();
@@ -300,6 +305,7 @@ std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
     if (g_args.options.dump_after_directives) {
         exit(EXIT_SUCCESS);
     }
+#endif
 
     return final_lines;
 }
