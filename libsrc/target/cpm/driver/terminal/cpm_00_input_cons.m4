@@ -83,10 +83,11 @@ define(`m4_cpm_00_input_cons',dnl
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
-      ; heap header
+      ; heap header (next/committed/prev = 6 bytes)
+      ; committed size must be $3+27 (was wrongly $3+29)
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw `eval($3 + 29)'
+      defw `eval($3 + 27)'
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
    
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
@@ -136,7 +137,7 @@ define(`m4_cpm_00_input_cons',dnl
       defs `eval($3 + 1)'
 
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
-   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $3 + 29))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $3 + 27))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
