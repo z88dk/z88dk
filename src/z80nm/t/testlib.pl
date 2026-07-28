@@ -13,6 +13,9 @@ use Config;
 use Capture::Tiny 'capture_merged';
 use Path::Tiny;
 use Text::Diff;
+use FindBin;
+use lib "$FindBin::Bin/../../z80asm/z80asm2/tools";
+use ObjModule;
 
 $ENV{PATH} = join( $Config{path_sep}, ".", "../../../bin", $ENV{PATH} );
 
@@ -178,25 +181,25 @@ sub check_obj {
 
     # check z88dk-z80objcopy.pl def->obj
     unlink("$test.o");
-    run_ok("perl z88dk-z80objcopy.pl -v $version $test.def $test.o");
+    run_ok("perl ../z80asm/z80asm2/tools/z88dk-z80objcopy.pl -v $version $test.def $test.o");
     capture_ok( "z88dk-z80nm -a $test.o", $exp_txt );
 
     ( Test::More->builder->is_passing ) or die;
 
     # check z88dk-z80objcopy.pl def->stdout
-    capture_ok( "perl z88dk-z80objcopy.pl -v $version $test.def", $exp_def );
+    capture_ok( "perl ../z80asm/z80asm2/tools/z88dk-z80objcopy.pl -v $version $test.def", $exp_def );
 
     ( Test::More->builder->is_passing ) or die;
 
     # check z88dk-z80objcopy.pl obj->def
     unlink("$test.def");
-    run_ok("perl z88dk-z80objcopy.pl -v $version $test.o $test.def");
+    run_ok("perl ../z80asm/z80asm2/tools/z88dk-z80objcopy.pl -v $version $test.o $test.def");
     check_text_file( "$test.def", $exp_def );
 
     ( Test::More->builder->is_passing ) or die;
 
     # check z88dk-z80objcopy.pl obj->stdout
-    capture_ok( "perl z88dk-z80objcopy.pl -v $version $test.o", $exp_def );
+    capture_ok( "perl ../z80asm/z80asm2/tools/z88dk-z80objcopy.pl -v $version $test.o", $exp_def );
 
     ( Test::More->builder->is_passing ) or die;
 }

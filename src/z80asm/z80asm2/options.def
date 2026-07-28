@@ -35,7 +35,9 @@ X(LIBRARY,  "-l",       true, "=LIB", "Link with library")
 X(LIBRARY_PATH, "-L",   true, "=DIR", "Add directory to search for libraries")
 X(DO_LINK,  "-b",       false, "", "Link object files into executable")
 
+#ifdef _DEBUG
 // Diagnostic options
+X(RUN_TEST, "-run-test", true, "=test", "Run the specified test and exit, use :all for all tests")
 X(DUMP_AFTER_CMDLINE, "-dump-after-cmdline", false, "", "Dump the command line arguments and exit")
 X(DUMP_AFTER_TOKENIZATION, "-dump-after-tokenization", false, "", "Dump the lexer token stream and exit")
 X(DUMP_AFTER_DIRECTIVES, "-dump-after-directives", false, "", "Dump the token stream after directive processing and exit")
@@ -48,4 +50,4 @@ X(DUMP_AFTER_SYMBOL_COLLECTION, "-dump-after-symbol-collection", false, "", "Dum
 X(DUMP_AFTER_LAYOUT, "-dump-after-layout", false, "", "Dump the AST after layout processing and exit")
 X(DUMP_AFTER_ASSEMBLY, "-dump-after-assembly", false, "", "Dump the object library after assembly and exit")
 X(DUMP_AFTER_LINK_COLLECTION, "-dump-after-link-collection", false, "", "Dump the modules after link collection and exit")
-
+#endif

@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #include "options.h"
 #include "options_dump.h"
 #include "strings.h"
@@ -101,3 +103,5 @@ void dump_after_cmdline_and_exit() {
 
     exit(EXIT_SUCCESS);
 }
+
+#endif

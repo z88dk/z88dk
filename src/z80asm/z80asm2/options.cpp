@@ -13,18 +13,20 @@
 #include "options.h"
 #include "release_assert.h"
 #include "source_loc.h"
-#include "strings.h"
 #include "string_utils.h"
+#include "strings.h"
+#include "test_driver.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
 #include <initializer_list>
 #include <iomanip>
+#include <ios>
 #include <iostream>
-#include <set>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 Args g_args;
@@ -91,9 +93,11 @@ static constexpr UsageGroup usage_layout[] = {
             OptionType::DO_LINK,
         }
     },
+#ifdef _DEBUG
     {
         "Diagnostic Options",
         {
+            OptionType::RUN_TEST,
             OptionType::DUMP_AFTER_CMDLINE,
             OptionType::DUMP_AFTER_TOKENIZATION,
             OptionType::DUMP_AFTER_DIRECTIVES,
@@ -107,7 +111,8 @@ static constexpr UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_ASSEMBLY,
             OptionType::DUMP_AFTER_LINK_COLLECTION,
         }
-    }
+    },
+#endif
 };
 
 [[noreturn]]
@@ -120,7 +125,7 @@ static void show_option_usage(const OptionSpec& spec) {
     std::string option_text = std::string(spec.name) +
                               (spec.takes_arg ? spec.arg_text : "");
 
-    if (option_text.size() > option_col_width) {
+    if (option_text.size() >= option_col_width) {
         std::cout << "  " << option_text << "\n";
         option_text = "";
     }
@@ -491,6 +496,25 @@ void Args::parse_arg(std::string_view arg,
             options.do_link = true;
             return;
 
+#ifdef _DEBUG
+        case OptionType::RUN_TEST: {
+            if (!split_option_arg(arg, spec->name, opt_arg)) {
+                g_diag.error(loc, "Invalid option: " + std::string(arg));
+                return;
+            }
+            if (!run_test(opt_arg)) {
+                std::string tests_str;
+                for (auto& test : test_names()) {
+                    if (!tests_str.empty()) {
+                        tests_str += ", ";
+                    }
+                    tests_str += test;
+                }
+                g_diag.error(loc, "Invalid test name: " + opt_arg);
+                g_diag.note(loc, "Valid test names: " + tests_str);
+            }
+            exit(g_diag.get_error_count() ? EXIT_FAILURE : EXIT_SUCCESS);
+        }
         case OptionType::DUMP_AFTER_CMDLINE:
             options.dump_after_cmdline = true;
             return;
@@ -538,6 +562,7 @@ void Args::parse_arg(std::string_view arg,
         case OptionType::DUMP_AFTER_LINK_COLLECTION:
             options.dump_after_link_collection = true;
             return;
+#endif
 
         default:
             release_assert(0);

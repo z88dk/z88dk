@@ -434,6 +434,7 @@ private:
     void split_lines(const std::vector<Token>& tokens, const SourceLoc& loc,
                      std::vector<LogicalLine>& out_lines);
 
+#ifdef _DEBUG
     // ---------------------------------------------------------------------
     // helpers for dumping state
     // ---------------------------------------------------------------------
@@ -444,6 +445,7 @@ private:
                     StringId& cur_filename_id);
     void dump_macros();
     void dump_symbols();
+#endif
 };
 
 void output_preproc_output(std::string_view filename,

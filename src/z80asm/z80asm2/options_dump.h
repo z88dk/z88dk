@@ -4,6 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #pragma once
 
 [[noreturn]] void dump_after_cmdline_and_exit();
+
+#endif

@@ -12,12 +12,13 @@ endif
 PROJ = z88dk-z80asm
 
 CXX = g++
-CXXFLAGS_BASE = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror 
+CXXFLAGS_BASE = -std=gnu++17 -Itest -MMD -Wall -Wextra -Wpedantic -Werror
 ifeq ($(COVERAGE),1)
-  CXXFLAGS = $(CXXFLAGS_BASE) --coverage -O0 -g
+  CXXFLAGS_DEBUG = $(CXXFLAGS_BASE) -D_DEBUG --coverage -O0 -g
 else
-  CXXFLAGS = $(CXXFLAGS_BASE) -O3
+  CXXFLAGS_DEBUG = $(CXXFLAGS_BASE) -D_DEBUG -O0 -g
 endif
+CXXFLAGS_RELEASE = $(CXXFLAGS_BASE) -DNDEBUG -O3
 
 # re2c: generate C/C++ sources from .re files
 RE2C ?= re2c
@@ -25,14 +26,20 @@ RE2CFLAGS ?= -W --no-debug-info --no-generation-date --tags
 
 INSTALL ?= install
 
-OBJ_DIR = obj
+DEBUG_DIR   = build/Debug
+RELEASE_DIR = build/Release
 
 SRCS := $(wildcard *.cpp)
-OBJS := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRCS))
-DEFS := $(wildcard *.def)
+DEBUG_SRCS := $(wildcard test/*.cpp)
+DEFS := $(wildcard *.def test/*.def)
 
-# Dependency files
-DEPENDS := $(OBJS:.o=.d)
+DEBUG_OBJS    := $(patsubst %.cpp,$(DEBUG_DIR)/%.o,$(SRCS) $(DEBUG_SRCS))
+RELEASE_OBJS  := $(patsubst %.cpp,$(RELEASE_DIR)/%.o,$(SRCS))
+DEBUG_DEPENDS   := $(DEBUG_OBJS:.o=.d)
+RELEASE_DEPENDS := $(RELEASE_OBJS:.o=.d)
+
+DEBUG_EXE   = $(DEBUG_DIR)/$(PROJ)$(EXE)
+RELEASE_EXE = $(RELEASE_DIR)/$(PROJ)$(EXE)
 
 STYLE_WIDTH = 80
 ASTYLE	= astyle --style=attach --pad-oper --align-pointer=type \
@@ -42,28 +49,32 @@ PERLTIDY = perltidy --indent-columns=4 --continuation-indentation=4 \
 		  --maximum-line-length=$(STYLE_WIDTH) -b
 TIDY_STAMP = .tidy-stamp
 
-all: $(PROJ)$(EXE)
+all: $(DEBUG_EXE) $(RELEASE_EXE)
 
-$(PROJ)$(EXE): $(OBJS) $(DEFS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(PROJ)$(EXE)
+$(DEBUG_EXE): $(DEBUG_OBJS) $(DEFS)
+	$(CXX) $(CXXFLAGS_DEBUG) $(DEBUG_OBJS) -o $@
 
-$(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@ 
+$(RELEASE_EXE): $(RELEASE_OBJS) $(DEFS)
+	$(CXX) $(CXXFLAGS_RELEASE) $(RELEASE_OBJS) -o $@
+	strip $@
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+$(DEBUG_DIR)/%.o: %.cpp | $(DEBUG_DIR) $(DEBUG_DIR)/test
+	$(CXX) $(CXXFLAGS_DEBUG) -c $< -o $@
+
+$(RELEASE_DIR)/%.o: %.cpp | $(RELEASE_DIR)
+	$(CXX) $(CXXFLAGS_RELEASE) -c $< -o $@
+
+$(DEBUG_DIR) $(DEBUG_DIR)/test $(RELEASE_DIR):
+	mkdir -p $@
 
 # Rule to produce .cpp from .re using re2c
-$(PROJ)$(EXE): $(OBJ_DIR)/lexer_scan.o
-
 lexer_scan.cpp: lexer_scan.re Makefile
 	$(RE2C) $(RE2CFLAGS) lexer_scan.re -o lexer_scan.cpp
 	dos2unix lexer_scan.cpp
 
 # Rules to generate opcodes tables
-$(PROJ)$(EXE): $(OBJ_DIR)/opcodes.o $(OBJ_DIR)/opcodes_trie_token.o
-$(OBJ_DIR)/opcodes.o: opcodes_trie_token.h
-$(OBJ_DIR)/opcodes_trie_token.o: opcodes_trie_token.cpp opcodes_trie_token.h
+$(DEBUG_DIR)/opcodes.o $(RELEASE_DIR)/opcodes.o: opcodes_trie_token.h
+$(DEBUG_DIR)/opcodes_trie_token.o $(RELEASE_DIR)/opcodes_trie_token.o: opcodes_trie_token.cpp opcodes_trie_token.h
 
 opcodes_trie_token.h opcodes_trie_token.cpp \
 opcodes_synth_trie.h opcodes_synth_trie.cpp \
@@ -73,7 +84,14 @@ opcodes_parse_trie.h opcodes_parse_trie.cpp &: \
 		Makefile cpu/Makefile 
 	$(MAKE) -C cpu
 
-test:: $(PROJ)$(EXE)
+# test
+$(DEBUG_DIR)/test/test_driver.o : test/test_driver.def
+
+test/test_driver.def : $(wildcard test/*.cpp) tools/make_tests.pl Makefile
+	perl tools/make_tests.pl test $@
+	dos2unix $@
+
+test: $(DEBUG_EXE) $(RELEASE_EXE)
 	perl -S prove -j9 --state=slow,save t/*.t t/*/*.t
 
 tidy:
@@ -91,7 +109,7 @@ cloc:
 coverage:
 	$(MAKE) clean tidy
 	$(MAKE) COVERAGE=1 test
-	gcov $(OBJ_DIR)/*.gcno | perl tools/parse_gcov.pl | tee tools/coverage.txt
+	gcov $(DEBUG_DIR)/*.gcno | perl tools/parse_gcov.pl | tee tools/coverage.txt
 
 CLEAN_PATTERNS = *.o *.gcov *.exe *.orig *.core *.bak *.new *~
 CLEAN_DIRS = . t t/* t/*/*
@@ -103,10 +121,12 @@ CLEAN_FILES = \
   )
 
 clean:
-	$(RM) $(PROJ) $(PROJ)$(EXE) $(CLEAN_FILES) $(TIDY_STAMP) $(OBJS) $(DEPENDS)
-	$(RM) -r $(OBJ_DIR)
+	$(RM) $(CLEAN_FILES) $(TIDY_STAMP)
+	$(RM) -r build
 
-install:  $(PROJ)$(EXESUFFIX)
-	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
+install: $(RELEASE_EXE)
+	$(INSTALL) $(RELEASE_EXE) $(PREFIX)/bin/$(PROJ)$(EXE)
+	$(INSTALL) tools/ObjModule.pm $(PREFIX)/bin/ObjModule.pm
+	$(INSTALL) tools/z88dk-z80objcopy.pl $(PREFIX)/bin/z88dk-z80objcopy.pl
 
--include $(DEPENDS)
+-include $(DEBUG_DEPENDS) $(RELEASE_DEPENDS)

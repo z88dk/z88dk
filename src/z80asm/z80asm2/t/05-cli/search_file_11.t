@@ -11,7 +11,7 @@ unlink("$test.dir/$test.o");
 
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
-capture_ok( "z88dk-z80asm -v -O$test.dir -dump-after-cmdline $test",
+capture_ok( "build/Debug/z88dk-z80asm -v -O$test.dir -dump-after-cmdline $test",
     "$dir/expected/$self.txt" );
 
 path("$test.dir")->remove_tree;

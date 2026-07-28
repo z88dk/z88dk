@@ -21,7 +21,8 @@ Preprocessor Options:
   -IXIY         Swap IX and IY registers
   -ucase        Uppercase symbols
   -float=FMT    Set float format (e.g. genmath)
-  -D=NAME[=EXPR]Define symbol
+  -D=NAME[=EXPR]
+                Define symbol
   -E            Preprocess only
   -MD           Generate dependencies file
 
@@ -35,6 +36,8 @@ Linker Options:
   -b            Link object files into executable
 
 Diagnostic Options:
+  -run-test=test
+                Run the specified test and exit, use :all for all tests
   -dump-after-cmdline
                 Dump the command line arguments and exit
   -dump-after-tokenization

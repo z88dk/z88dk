@@ -1,0 +1,36 @@
+Usage: z88dk-z80asm [options] files...
+Copyright (C) Paulo Custodio, 2011-2026
+
+Assembles Z80 assembly source files into binary output.
+
+Help Options:
+  -h            Show this screen
+  -v            Verbose output
+
+File and Directory Options:
+  -I=DIR        Add directory to search for source/include files
+  -L=DIR        Add directory to search for libraries
+  -O=DIR        Set directory to store output files
+
+External Preprocessor Options:
+  -cpp=OPTS     Pass options to cpp
+  -m4=OPTS      Pass options to m4
+  -perl=OPTS    Pass options to perl
+
+Preprocessor Options:
+  -IXIY         Swap IX and IY registers
+  -ucase        Uppercase symbols
+  -float=FMT    Set float format (e.g. genmath)
+  -D=NAME[=EXPR]
+                Define symbol
+  -E            Preprocess only
+  -MD           Generate dependencies file
+
+Assembly Options:
+  -m=CPU        Set target CPU (e.g. z80, z180)
+  -d            Assemble only if newer
+  -f=BYTE       Set filler byte for uninitialized data (default: 0)
+
+Linker Options:
+  -l=LIB        Link with library
+  -b            Link object files into executable
