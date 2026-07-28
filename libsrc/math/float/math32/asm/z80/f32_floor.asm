@@ -2,7 +2,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fssub_callee
+EXTERN m32_fsadd_callee
 EXTERN m32_discardfraction
 
 PUBLIC m32_floor_fastcall
