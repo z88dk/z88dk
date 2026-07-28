@@ -22,6 +22,6 @@ PUBLIC _m32_floorf
     ; negative with fraction: trunc - 1
     push de
     push hl
-    ld de,$3f80
+    ld de,$bf80
     ld hl,$0000
-    jp m32_fssub_callee
+    jp m32_fsadd_callee         ; add -1
