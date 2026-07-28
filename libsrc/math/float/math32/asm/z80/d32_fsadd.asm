@@ -71,26 +71,20 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     add hl,hl                   ; unpack op1
     ld c,h                      ; save op1.e in c
 
-    ld a,h
-    or a
-    jr Z,faunp1                 ; add implicit bit if op1.e!=0
-    scf
-
-.faunp1
+    ld a,255
+    add a,h                     ; CF = (op1.e != 0) to add implicit bit
     rr l                        ; rotate in op1.m's implicit bit
     ld a,b                      ; place op1.s in a[7]
 
     exx
 
-    ld hl,002h                  ; get second operand off of the stack
-    add hl,sp
-    ld e,(hl+)
-    ld d,(hl+)
-    ld c,(hl+)
-    ld h,(hl)
-    ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+    pop bc                      ; get second operand off of the stack (preserve stack)
+    pop de
+    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+    push hl
+    push de
+    push bc
     jp farejoin
-
 
 ; enter here for floating subtract callee, x-y x on stack, y in dehl, result in dehl
 .m32_fssub_callee
@@ -107,21 +101,16 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     add hl,hl                   ; unpack op1
     ld c,h                      ; save op1.e in c
 
-    ld a,h
-    or a
-    jr Z,faunp1_callee          ; add implicit bit if op1.e!=0
-    scf
-
-.faunp1_callee
+    ld a,255
+    add a,h                     ; CF = (op1.e != 0) to add implicit bit
     rr l                        ; rotate in op1.m's implicit bit
     ld a,b                      ; place op1.s in a[7]
 
     exx
 
-    pop bc                      ; pop return address
+    pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm, return address to stack
 
 .farejoin
     ld b,h                      ; save op2.s in b[7]
@@ -132,12 +121,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     xor b                       ; check if op1.s==op2.s
     ex af,af                    ; save results sign in f' (C clear in af')
 
-    ld a,h
-    or a
-    jr Z,faunp2                 ; add implicit bit if op2.e!=0
-    scf
-
-.faunp2
+    ld a,255
+    add a,h                     ; CF = (op2.e != 0) to add implicit bit
     rr l                        ; rotate in op2.m's implicit bit
     xor a
     ld h,a                      ; op2 mantissa: h = 00000000, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
@@ -297,7 +282,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .foverflow
     ld a,b
-    and 080h
     or 07fh                     ; max exponent, preserve sign
     ld d,a
     ld e,080h                   ; IEEE infinity (zero mantissa)
