@@ -79,7 +79,21 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        containing IR_PUSH_ARG. */
     int bc_saved = 0;
     int bc_vreg_at_call_entry = L.rs.bc;
-    if (!pre) {
+    /* __preserves_regs(b,c): the callee keeps BC, so a PR_BC home survives the
+       call with NO push/pop — PROVIDED arg setup won't clobber BC either. That
+       holds only when no argument is BC-homed (a BC-tenant arg emit_bc_reloads)
+       and none is width-4 (load_to_dehl stashes the low half in BC). */
+    int bc_preserved = (ci->preserved & IR_R_BC) != 0;
+    if (bc_preserved && !pre) {
+        for (int i = 0; i < ci->n_args; i++) {
+            int av = ci->args[i];
+            if (av < 0) continue;
+            if (f->vregs[av].width > 2 || f->vreg_to_phys[av] == IR_PR_BC) {
+                bc_preserved = 0; break;
+            }
+        }
+    }
+    if (!pre && !bc_preserved) {
         /* IR_VREG_BC_PACK tenants are call-free by construction (never live
            across this call), so they add no BC-save — Part 1. */
         for (int i = 0; i < f->n_vregs; i++) {
@@ -150,8 +164,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                    && (ci->flags & (SDCCDECL | SDCCCALL1))
                    && k + 1 < n_to_push
                    && f->vregs[ci->args[start + (k + 1) * push_step]].width == 1) {
-            /* Two adjacent stacked chars → one `push de` (matches SDCC
-               sc1/sdccdecl R→L char push): higher-index char → D, lower → E,
+            /* Two adjacent stacked chars → one `push de` (the sc1/sdccdecl
+               R→L char push): higher-index char → D, lower → E,
                matching two 1-byte pushes at half the cost. push_step==-1
                keeps that D/E mapping valid. */
             int j   = start + (k + 1) * push_step;
@@ -203,32 +217,39 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        `ret` (the arg still rides HL/DEHL/acc). */
     int fc_ret = (idx_dispatch && !fc_idx);
     int fnptr_pushed = 0;
-    int sc1_fcret_lbl = -1;
+    int fcret_lbl = -1;
     if (fc_idx) {
         load_to_hl_adj(out, f, ci->fnptr_vreg,
                        pre ? 0 : pushed_bytes + sp_adj_extra);
         emit(out, "push\thl");
         emit(out, "pop\t%s", fc_idx);   /* fnptr → ix/iy (HL freed for the arg) */
         invalidate_hl_cache();
-    } else if (fc_ret && sc1) {
-        /* The fastcall `pop af` fnptr shuttle would clobber A (an sc1 char
-           arg), so sc1 diverges: HL is still free here (before the args
-           load), so push [retlabel][fnptr] now and `ret` at dispatch — the
-           callee's ret lands on retlabel. fnptr_pushed shifts sc1_adj below. */
-        sc1_fcret_lbl = L.fc_ret_label_counter++;
+    } else if (fc_ret) {
+        /* No spare index reg for the fnptr (an sc1 char arg would be clobbered
+           by a `pop af` shuttle; 808x/gbz80/reserved-idx targets have no free
+           ix/iy). HL is still free here (before the arg load), so push
+           [&__i64_acc?][retlabel][fnptr] NOW and `ret` at dispatch — the
+           callee's own `ret` lands on retlabel. Pushing everything up front
+           (rather than a `pop`/`push` shuttle after the arg load) keeps A/DE/HL
+           free for the arg: gbz80/8080/8085 `pop af` corrupts a word's low byte
+           and a long arg (DE:HL) would clobber DE. fnptr_pushed shifts the
+           reg-arg/sc1 slot offsets below; &__i64_acc rides pushed_bytes so the
+           caller-cleanup pops it. */
+        fcret_lbl = L.fc_ret_label_counter++;
         load_to_hl_adj(out, f, ci->fnptr_vreg,
                        pre ? 0 : pushed_bytes + sp_adj_extra);
-        emit(out, "ld\tbc,L_f%d_fcret_%d", L.func_emit_idx, sc1_fcret_lbl);
+        if (ci->ret_longlong) {
+            /* hidden &__i64_acc must sit just above the return address */
+            emit(out, "ld\tbc,__i64_acc");
+            emit(out, "push\tbc");
+            pushed_bytes += 2;
+            if (pre) L.cur_sp_adjust += 2;
+        }
+        emit(out, "ld\tbc,L_f%d_fcret_%d", L.func_emit_idx, fcret_lbl);
         emit(out, "push\tbc");          /* return address (below the fnptr) */
         emit(out, "push\thl");          /* fnptr on TOS — `ret` jumps to it */
         fnptr_pushed = 4;
-        invalidate_hl_cache();
-    } else if (fc_ret) {
-        load_to_hl_adj(out, f, ci->fnptr_vreg,
-                       pre ? 0 : pushed_bytes + sp_adj_extra);
-        emit(out, "push\thl");          /* fnptr on TOS; `pop af` reclaims it */
-        fnptr_pushed = 2;
-        if (pre) L.cur_sp_adjust += 2;
+        if (pre) L.cur_sp_adjust += 4;
         invalidate_hl_cache();
     }
 
@@ -248,6 +269,15 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit_c(out, CLOB_HL, "call\t%s", acc_prim(f, ci->args[last], "load"));
         } else if (width == 4) {
             load_to_dehl_adj(out, f, ci->args[last], adj);
+        } else if (width == 1 && adj == 0) {
+            /* Byte fastcall arg: the callee reads its byte param from L only
+               (the h-half is dead — sccz80 over-promotes it with a caller-side
+               `ld h,0`). Load just the low byte, skipping the zero-extend.
+               Restricted to adj==0 so load_byte_to_a's own sp/cur_sp_adjust
+               accounting is exact — a nonzero push adjustment would need the
+               width-2 adj path, so fall through to it. */
+            load_byte_to_a(out, f, ci->args[last]);
+            emit(out, "ld\tl,a");
         } else {
             load_to_hl_adj(out, f, ci->args[last], adj);
         }
@@ -325,30 +355,12 @@ static int gen_call(FILE *out, Func *f, const Op *op)
            before the args took A/HL/DE); dispatch via the jp(ix)/jp(iy) thunk
            (l_jpix/l_jpiy are pure `jp (ix)`, no A/HL/DE clobber). */
         emit(out, "call\tl_jp%s", fc_idx);
-    } else if (is_indirect && fc_ret && sc1) {
-        /* [retlabel][fnptr] already pushed above (before the args); just
-           `ret` into the fnptr — its own `ret` returns to our label. */
-        emit(out, "ret");
-        fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, sc1_fcret_lbl);
     } else if (is_indirect && fc_ret) {
-        /* No spare index reg (idx2 off / target reserves one / 808x / gbz80):
-           the fnptr is on TOS and the arg rides HL/DEHL/acc. Reclaim the fnptr
-           into AF, push a return label then the fnptr, and `ret` into it — the
-           callee's own `ret` lands back at the label. */
-        int lbl = L.fc_ret_label_counter++;
-        emit(out, "pop\taf");           /* fnptr → AF */
-        if (pre) L.cur_sp_adjust -= 2;
-        if (ci->ret_longlong) {
-            /* hidden &__i64_acc must sit just above the return address */
-            emit(out, "ld\tbc,__i64_acc");
-            emit(out, "push\tbc");
-            pushed_bytes += 2;
-        }
-        emit(out, "ld\tbc,L_f%d_fcret_%d", L.func_emit_idx, lbl);
-        emit(out, "push\tbc");          /* return address */
-        emit(out, "push\taf");          /* fnptr */
-        emit(out, "ret");               /* jump to fnptr; its ret → our label */
-        fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, lbl);
+        /* [&__i64_acc?][retlabel][fnptr] already pushed above (before the
+           args); just `ret` into the fnptr — its own `ret` returns to our
+           label. */
+        emit(out, "ret");
+        fprintf(out, "L_f%d_fcret_%d:\n", L.func_emit_idx, fcret_lbl);
     } else if (is_indirect) {
         /* Load funcptr into HL, `call l_jphl` (the `jp (hl)` thunk): the call
            pushes the return address, l_jphl jumps to HL, the target's `ret`
@@ -442,7 +454,9 @@ static int gen_call(FILE *out, Func *f, const Op *op)
        cache is already accurate; if not pushed (no PR_BC vregs), the cache may
        advertise HL-mirror contents the call destroyed — invalidate then. */
     invalidate_hl_cache();
-    if (!bc_saved)
+    /* Invalidate the BC cache unless BC was pushed/popped (restored) or the
+       callee preserved it (bc_preserved: cache belief still valid). */
+    if (!bc_saved && !bc_preserved)
         invalidate_bc_cache();
     /* The callee may have paged a different __addressmod bank — re-page on
        the next namespaced access. (The page-in call is emitted inline, not
@@ -822,8 +836,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
             && !(f->vregs[i].flags & IR_VREG_BC_PACK)) { hc_bc_saved = 1; break; }
     }
     if (hc_bc_saved) {
-        emit(out, "push\tbc");
-        L.cur_sp_adjust += 2;
+        emit_sp(out, 2, "push\tbc");
     }
     int popped_bytes = 0;
     for (int i = 0; i < n_stacked; i++) {
@@ -853,8 +866,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
             popped_bytes += 4;
         } else {
             load_to_hl(out, f, v);
-            emit(out, "push\thl");
-            L.cur_sp_adjust += 2;
+            emit_sp(out, 2, "push\thl");
             popped_bytes += 2;
         }
     }
@@ -876,8 +888,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     emit(out, "call\t%s", hi->name);
     L.cur_sp_adjust -= popped_bytes;
     if (hc_bc_saved) {
-        emit(out, "pop\tbc");
-        L.cur_sp_adjust -= 2;
+        emit_sp(out, -2, "pop\tbc");
     }
     invalidate_hl_cache();
     if (!hc_bc_saved)

@@ -19,17 +19,18 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .strncmpf
 ._strncmpf
-    ld      ix,2
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    ld      ix,4            ; +2 for the pushed IX
     add     ix,sp  
     ld      c,(ix+2)
     ld      b,(ix+3)
-    ld      e,(ix+4)    ; E'B'C'=s2
+    ld      e,(ix+4)        ; E'B'C'=s2
     exx
     ld      c,(ix+6)
     ld      b,(ix+7)
-    ld      e,(ix+8)    ; EBC=s1
+    ld      e,(ix+8)        ; EBC=s1
     call    __far_start
-    ex      af,af'      ; save seg 1 binding
+    ex      af,af'          ; save seg 1 binding
     ld      l,(ix+0)
     ld      h,(ix+1)
     push    hl
@@ -45,9 +46,9 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     jr      nz,different
     and     a
     jr      z,equal
-    call    l_far_incptrs  ;inc s2
+    call    l_far_incptrs   ;inc s2
     exx
-    call    l_far_incptrs  ;inc s1
+    call    l_far_incptrs   ;inc s1
     dec     ix
     ld      a,ixl
     or      ixh
@@ -57,6 +58,7 @@ equal:
 return:
     ex      af,af'
     call    __far_end
+    pop     ix              ; restore caller's IX
     ret
 
 different:

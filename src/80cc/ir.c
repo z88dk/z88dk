@@ -246,6 +246,8 @@ Func *ir_func_new(SYMBOL *fn)
     f->de_home_general = 0;
     f->vreg_to_phys = NULL;
     f->vreg_spill_slot = NULL;
+    f->home_lo = NULL;
+    f->home_hi = NULL;
     f->live_ranges = NULL;
     return f;
 }
@@ -282,6 +284,8 @@ void ir_func_free(Func *f)
     free(f->slot_offsets);
     free(f->vreg_to_phys);
     free(f->vreg_spill_slot);
+    free(f->home_lo);
+    free(f->home_hi);
     free(f->live_ranges);
     free(f);
 }

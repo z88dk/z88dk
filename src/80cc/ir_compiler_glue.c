@@ -31,7 +31,7 @@ const char *ir_sym_prefix(const SYMBOL *sym)
 
 /* For a symbol in a named address space (__addressmod), return the page-in
    "bank function" that maps its bank into the address window. The lowerer
-   must `call` it before accessing the symbol. Contract (matching sdcc):
+   must `call` it before accessing the symbol. Contract:
    the bank function preserves ALL registers, so the access is transparent —
    no register/cache clobber. Returns NULL for the default address space. */
 const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym)

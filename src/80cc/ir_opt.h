@@ -137,6 +137,14 @@ int ir_opt_ivsr(Func *f);
  * function-wide uses, iterated to a fixed point. Returns removals. */
 int ir_opt_dce(Func *f);
 
+/* Fold a &symbol RHS of an EQ/NE compare into a symbol-immediate operand
+ * (Op.imm_sym), removing the LD_SYM materialisation. Run before DCE (which
+ * reclaims the now-dead LD_SYM). Returns folds made. */
+int ir_opt_sym_cmp_fold(Func *f);
+/* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
+ * sign-extended bits, so the sign-extend is dead. Run before DCE. */
+int ir_opt_conv_mask_fold(Func *f);
+
 /* Remove basic blocks unreachable from the entry (bb 0). ir_build leaves
  * dead split/forwarding BBs behind; a dead BB whose id sits below its
  * successor forges a spurious back-edge, inflating the loop-depth /

@@ -39,7 +39,7 @@
 
 #if 1
 // Just replaces the block.
-void *__far realloc_far(void * __far ptr, size_t size)
+void *__far realloc_far(void * __far ptr, size_t size) __z88dk_saveframe
 {
     header_t * __far h;
     size_t oldblocksize;

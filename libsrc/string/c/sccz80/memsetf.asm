@@ -17,8 +17,9 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .memsetf
 ._memsetf
-    ld      ix,2
-    add     ix,sp  
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    ld      ix,4            ; +2 pushed IX +2 return address
+    add     ix,sp
     ld      c,(ix+4)
     ld      b,(ix+5)
     ld      e,(ix+6)    ; E'B'C'=s1
@@ -49,5 +50,6 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      l,(ix+4)
     ld      h,(ix+5)
     ld      e,(ix+6)        ; EHL=s1
+    pop     ix              ; restore caller's IX
     ret
 ENDIF

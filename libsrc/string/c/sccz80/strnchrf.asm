@@ -19,7 +19,9 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .strnchrf
 ._strnchrf
-    ld      ix,2
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    push    iy              ; preserve caller's IY (used to hold the search char)
+    ld      ix,6            ; +2 pushed IX +2 pushed IY +2 return address
     add     ix,sp
     ld      l,(ix+0)    ;IYl = char
     ld      h,0
@@ -59,5 +61,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      l,c		; EHL=pointer to character, or NULL
     ex      af,af'
     call    __far_end
+    pop     iy              ; restore caller's IY
+    pop     ix              ; restore caller's IX
     ret
 ENDIF

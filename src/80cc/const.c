@@ -193,7 +193,7 @@ int number(LVALUE *lval)
        (x86 yields the integer-indefinite 0x8000…, ARM saturates to 0), which
        made the typing — and any signed-vs-logical const-fold keyed off it —
        host-dependent. Exclude KIND_LONGLONG: a full-width 64-bit constant
-       stays signed unless U-suffixed, matching sccz80 (so e.g.
+       stays signed unless U-suffixed (so e.g.
        `0x8000000000000000LL >> 1` arithmetic-shifts like the signed runtime). */
     if (!isunsigned && tok_base != 10 && minus >= 0
         && lval->val_type != KIND_LONGLONG) {

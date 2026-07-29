@@ -157,7 +157,7 @@ static const char *unquote_file(const char *file, char *buf, size_t n)
     return buf;
 }
 
-/* Echo the offending source line (gcc-style), indented, to stderr. The
+/* Echo the offending source line, indented, to stderr. The
    node filenames are the original sources (same as C_LINE), so this opens
    the real .c — best-effort, silent on any error. */
 static void build_fail_show_src(const char *file, int line)
@@ -186,7 +186,7 @@ static int build_fail(const char *fmt, ...)
     const char *file = unquote_file(cur_node_file, path, sizeof path);
     va_list ap;
     va_start(ap, fmt);
-    /* Lead with `file:line:` (gcc-style) so editors / make output scanners
+    /* Lead with `file:line:` so editors / make output scanners
        pick it up; the ir_build tag + function follow the `error:` keyword. */
     if (file && cur_node_line > 0)
         fprintf(stderr, "%s:%d: error: ir_build: [%s] ",
@@ -368,7 +368,7 @@ static int is_acc_float_kind(Kind k)
    array index (`arr[i]`) and pointer deref (`*p`) — by recovering the
    namespace from the pointee/element type and stamping the page-in fn onto
    MemOp.bank_fn, which the lowerer pages on at the IR_MEM_VREG access
-   (matching sccz80, which pages for all of these). Only taking the ADDRESS
+   (all of these page a value in). Only taking the ADDRESS
    of a namespaced symbol (`&g`) still bails — the namespace escapes into a
    plain pointer whose later deref site can't recover it. */
 static int sym_is_namespaced(const SYMBOL *sym)
@@ -387,10 +387,35 @@ static const char *type_or_pointee_ns(const Type *t)
 /* Page-in (bank) function for an indirect access through a deref/index
    node `n`: the value type (n->type) carries the namespace, or it lives on
    the pointer operand's pointee type. NULL for the default space. */
+/* True iff `operand` is the live union member for this node kind — i.e. it is
+   a deref whose pointer operand we may follow. `operand` aliases left/args/
+   label/zval in node_s's union, so reading it on a non-deref node (e.g. an
+   AST_FUNC_CALL lvalue like `reg_align(p,0)[0] = x`, where the slot holds
+   `args`) yields a bogus Node* — dereferencing it crashes. */
+static int node_is_deref(const Node *n)
+{
+    return n && (n->ast_type == OP_DEREF || n->ast_type == AST_DEREF);
+}
+
+/* Translate a __preserves_regs PRESERVE_* set into an IR RegMask. A 16-bit
+   home register (BC/DE/HL) is treated as preserved only when BOTH halves are
+   listed — a half-preserved pair can't safely hold a whole value across the
+   call. A/IX/IY map directly. F is not a value-residency register. */
+static RegMask preserve_to_regmask(uint16_t p)
+{
+    RegMask m = 0;
+    if (p & PRESERVE_A) m |= IR_R_A;
+    if ((p & PRESERVE_B) && (p & PRESERVE_C)) m |= IR_R_BC;
+    if ((p & PRESERVE_D) && (p & PRESERVE_E)) m |= IR_R_DE;
+    if ((p & PRESERVE_H) && (p & PRESERVE_L)) m |= IR_R_HL;
+    if (p & PRESERVE_IX) m |= IR_R_IX;
+    if (p & PRESERVE_IY) m |= IR_R_IY;
+    return m;
+}
 static const SYMBOL *deref_bank_fn(const Node *n)
 {
     const char *ns = n ? type_or_pointee_ns(n->type) : NULL;
-    if (!ns && n && n->operand)
+    if (!ns && node_is_deref(n) && n->operand)
         ns = type_or_pointee_ns(n->operand->type);
     return ns ? ir_namespace_bank_fn(ns) : NULL;
 }
@@ -413,7 +438,8 @@ static int deref_is_volatile(const Node *n)
 {
     if (!n) return 0;
     if (type_or_pointee_volatile(n->type)) return 1;
-    if (n->operand && type_or_pointee_volatile(n->operand->type)) return 1;
+    if (node_is_deref(n) && n->operand
+        && type_or_pointee_volatile(n->operand->type)) return 1;
     return 0;
 }
 
@@ -1258,7 +1284,7 @@ static int widen_arg_to_param(Builder *b, int v, Node *a, Type *pt)
     if (kind_is_floating(pt->kind))
         return coerce_int_to_float_kind(b, v, a, pt->kind);
     /* _Accum / fixed param: a numeric LITERAL arg (e.g. EPSILON=0.1) scales to
-       Q-format at compile time — matching sccz80, which never calls the
+       Q-format at compile time — which never calls the
        runtime double→_Accum helper. Without this the double literal is pushed
        at its wide size and the callee's narrow _Accum param misaligns (the
        built `v` double is discarded). A non-literal _Accum arg is left as-is. */
@@ -1809,7 +1835,7 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     int uns = src && src->type && src->type->isunsigned;
     /* Constant int → register/acc float: fold the conversion at compile time
        (store the float bit pattern) rather than emit a runtime l_f32_sint2f /
-       int→acc call. `Au[i] = 0` becomes a direct 0.0 store, matching sdcc. */
+       int→acc call. `Au[i] = 0` becomes a direct 0.0 store. */
     if (src && src->ast_type == AST_LITERAL && kind_is_integer(sk)
         && (is_register_float_kind(dst_k) || is_acc_float_kind(dst_k))) {
         int c = emit_float_const(b, (double)src->zval, dst_k);
@@ -2838,6 +2864,21 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         } else {
             int rhs_v = build_expr(b, n->right);
             if (rhs_v < 0) return -1;
+            /* Widen (or truncate) the RHS to the lvalue width before the op:
+               `g op= x` applies the usual arithmetic conversions, so a narrower
+               memory/register operand (e.g. `long_g += short_g`) must be sign- or
+               zero-extended to the result width — else the binop mixes widths and
+               the wide high bytes read stale storage. Signedness from the RHS
+               type (a `(short)` cast makes it signed → CONV_SX). */
+            if ((int)b->f->vregs[rhs_v].width != gv_w) {
+                int t = new_temp(b, gv_w);
+                b->f->vregs[t].width = (int16_t)gv_w;
+                OpKind cv = ((int)b->f->vregs[rhs_v].width > gv_w) ? IR_CONV_TRUNC
+                          : (n->right->type && n->right->type->isunsigned
+                             ? IR_CONV_ZX : IR_CONV_SX);
+                Op *c = ir_op_emit(cur_bb(b), cv);
+                c->dst = t; c->src[0] = rhs_v; rhs_v = t;
+            }
             { Op *o = ir_emit_binop(cur_bb(b), k, dst_g, loaded_g, rhs_v); o->imm |= shr_arith_bit; }
         }
         Op *st_g = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2885,6 +2926,18 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     } else {
         int rhs_v = build_expr(b, n->right);
         if (rhs_v < 0) return -1;
+        /* Widen/truncate the RHS to the element width before the op (usual
+           arithmetic conversions) — else `*(long*)p += (short)x` mixes widths
+           and the wide high bytes read stale storage. See the global path. */
+        if ((int)b->f->vregs[rhs_v].width != elem_w) {
+            int t = new_temp(b, elem_w);
+            b->f->vregs[t].width = (int16_t)elem_w;
+            OpKind cv = ((int)b->f->vregs[rhs_v].width > elem_w) ? IR_CONV_TRUNC
+                      : (n->right->type && n->right->type->isunsigned
+                         ? IR_CONV_ZX : IR_CONV_SX);
+            Op *c = ir_op_emit(cur_bb(b), cv);
+            c->dst = t; c->src[0] = rhs_v; rhs_v = t;
+        }
         { Op *o = ir_emit_binop(cur_bb(b), k, dst, loaded, rhs_v); o->imm |= shr_arith_bit; }
     }
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2931,7 +2984,7 @@ static int build_compound_muldiv(Builder *b, Node *n)
     if (!is_local && !is_global) {
         /* `arr[i] *= x` into a named address space: page the bank on
            both the load and the store (the helper call between them
-           resets the dedup, so both re-page — matching sccz80). */
+           resets the dedup, so both re-page). */
         bf_md = (SYMBOL *)deref_bank_fn(n->left);
         ptr_v = build_expr(b, n->left->operand);
         if (ptr_v < 0) return -1;
@@ -3706,6 +3759,25 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            uses the IR_CMP_EQ const-RHS fold (lowerer's byte-wise
            XOR-OR chain); int form goes through a fresh 0 vreg. */
         if (!n->operand) return build_fail("OP_LNEG with no operand");
+        /* !!x → (x != 0): both `!` are the same 0/1 coercion, so fold the
+           double negation to ONE normalize instead of `(x==0)==0` (two
+           IR_CMP_EQ). (!!! is already collapsed to ! by the AST optimiser,
+           so operand->operand is the coerced value.) */
+        if (n->operand->ast_type == OP_LNEG && n->operand->operand
+            && !getenv("IR_NO_NOTNOT_FOLD")) {
+            int xv = build_expr(b, n->operand->operand);
+            if (xv < 0) return -1;
+            int dst = new_temp_kind(b, KIND_INT);
+            if (b->f->vregs[xv].width == 4 || b->f->vregs[xv].width == 1) {
+                Op *op = ir_op_emit(cur_bb(b), IR_CMP_NE);
+                op->dst = dst; op->src[0] = xv; op->src[1] = -1; op->imm = 0;
+                return dst;
+            }
+            int zv = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), zv, 0);
+            ir_emit_binop(cur_bb(b), IR_CMP_NE, dst, xv, zv);
+            return dst;
+        }
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
         int dst = new_temp_kind(b, KIND_INT);
@@ -4064,6 +4136,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            rst/module/address operands aren't in the flags, so carry them
            as values. */
         ci->flags = flags;
+        /* __preserves_regs(...): the callee promises not to clobber these
+           register pairs, so op_clobbers(IR_CALL) will keep them out of the
+           call's clobber set (a value can stay resident across the call). */
+        if (n->sym->ctype)
+            ci->preserved = preserve_to_regmask(n->sym->ctype->funcattrs.preserved_regs);
         if (flags & SHORTCALL) {
             ci->shortcall_rst   = n->sym->ctype->funcattrs.shortcall_rst;
             ci->shortcall_value = n->sym->ctype->funcattrs.shortcall_value;
@@ -4745,7 +4822,7 @@ static int build_assign(Builder *b, Node *n)
        and the storage unit's address as n->left — a global/local lvalue
        or, for a field in a byte beyond the first, the folded address
        expression `(+ (gv) K)`. The unit is byte-wide when the field
-       fits in one byte (matches sccz80's byte rmw), word-wide otherwise;
+       fits in one byte (a byte rmw), word-wide otherwise;
        a byte store is essential for a non-zero byte offset, where a word
        store would run past the struct into the next object. */
     {
@@ -6744,6 +6821,32 @@ static int build_stmt(Builder *b, Node *n)
         if (rv && rv->ast_type == AST_COMPOUND_STMT
             && (!rv->stmts || array_len(rv->stmts) == 0))
             rv = NULL;
+        /* Lever 1: `return <a && b>` / `return <a || b>` — a value-context
+           boolean returned directly. Lower it as short-circuit branches to
+           two RET-const tails (`ld hl,1; ret` / `ld hl,0; ret`) instead of
+           materialising a 0/1 that crosses the &&/|| merge as a spilled slot
+           (which forces a frame + store/reload on every predicate function).
+           The standard jumping-code lowering for a boolean value. Small-int
+           returns only — the value of a boolean expression is `int`. */
+        if (rv && (rv->ast_type == OP_OROR || rv->ast_type == OP_ANDAND)
+            && b->ret_type && kind_is_integer(b->ret_type->kind)
+            && type_width(b->ret_type) <= 2
+            && !getenv("IR_NO_BOOL_RET_BRANCH")) {
+            int true_bb  = ir_bb_new(b->f);
+            int false_bb = ir_bb_new(b->f);
+            if (build_cond(b, rv, true_bb, false_bb) != 0) return -1;
+            b->cur_bb_id = true_bb;
+            int one = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), one, 1);
+            ir_emit_ret(cur_bb(b), one);
+            b->cur_bb_id = false_bb;
+            int zero = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), zero, 0);
+            ir_emit_ret(cur_bb(b), zero);
+            /* trailing statements after a return are dead — park them. */
+            b->cur_bb_id = ir_bb_new(b->f);
+            return 0;
+        }
         if (rv) {
             v = build_expr(b, rv);
             if (v < 0) return -1;

@@ -295,6 +295,7 @@ void ir_assign_slots(Func *f)
     for (int pass = 0; pass < 2; pass++) {
         for (int v = 0; v < n_vregs; v++) {
             if (v == hot) continue;   /* already seeded at offset 0 */
+            if (f->vregs[v].flags & IR_VREG_AUTOPUSH) continue;  /* placed at top below */
             if (!needs_slot[v]) {
                 if (pass == 0) f->vreg_spill_slot[v] = -1;
                 continue;
@@ -367,6 +368,22 @@ void ir_assign_slots(Func *f)
                v's interference row). */
             SLOT_ROW(chosen)[v >> 5] |= (uint32_t)1 << (v & 31);
         }
+    }
+
+    /* Auto-push params (IR_AUTOPUSH_PARAM) sit at the TOP of the frame: the
+       prologue materialises them with a `push` before the frame alloc, so they
+       land just below the return address / saved IX. Assign them the highest
+       offsets, after every other slot, each its own exclusive slot — offset
+       `frame_size - width` maps to ix-2/ix-4 (fp) or SP+(frame_size-width) (sp),
+       exactly where the push puts them. */
+    for (int v = 0; v < n_vregs; v++) {
+        if (!(f->vregs[v].flags & IR_VREG_AUTOPUSH)) continue;
+        /* A width-1 autopush param is materialised by `push hl` (byte in L), so
+           it occupies 2 stack bytes; its value sits at the slot base (low byte). */
+        int w = f->vregs[v].width;
+        int width = (w == 1) ? 2 : (w > 0 ? w : 2);
+        f->vreg_spill_slot[v] = offset;
+        offset += width;
     }
     f->frame_size = offset;
 

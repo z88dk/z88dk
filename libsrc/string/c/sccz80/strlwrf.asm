@@ -10,10 +10,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
     SECTION   code_clib
     SECTION   code_far
-    EXTERN __far_start    ;Get the initial bindings
-    EXTERN __far_end   ;Reset to initial bindings
-    EXTERN __far_page    ;Page in the far segment
-    EXTERN l_far_incptrs  ;Increment a far pointer (returning near address)
+    EXTERN __far_start      ; Get the initial bindings
+    EXTERN __far_end        ; Reset to initial bindings
+    EXTERN __far_page       ; Page in the far segment
+    EXTERN l_far_incptrs    ; Increment a far pointer (returning near address)
     PUBLIC strlwrf
     PUBLIC _strlwrf
 
@@ -24,7 +24,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 ._strlwrf
     pop     hl
     pop     bc
-    pop     de      ; EBC=far pointer
+    pop     de          ; EBC=far pointer
     push    de
     push    bc
     push    hl
@@ -49,8 +49,8 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     call    __far_end
     pop     hl
     pop     bc
-    pop     de      ; get EBC=pointer again
+    pop     de          ; get EBC=pointer again
     push    de
     push    bc
-    jp      (hl)    ; save 1 byte returning!
+    jp      (hl)        ; save 1 byte returning!
 ENDIF
