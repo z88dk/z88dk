@@ -1,6 +1,7 @@
 
 ; half_t __fma (half_t left, half_t middle, half_t right)
 
+SECTION code_clib
 SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_fma

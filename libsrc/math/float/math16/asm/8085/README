@@ -1,0 +1,8 @@
+8085 math16 cores (CPU-specific). Built with -m8085; no exx/IX/IY.
+Stack-only second operands; f24 layout d=exp, e=sign, hl=mant.
+
+Shared portable pieces live in parent asm/:
+  asm_f16_{zero,inf,nan,neg,sigdig}.asm  — specials (8080-safe)
+  coeff_f16_*.asm                 — polynomial tables (DEFQ rodata)
+
+Product: math16_8085.lib via newlibfiles_8085.lst

@@ -1,0 +1,5 @@
+SECTION code_clib
+SECTION code_fp_math16
+PUBLIC cm16_sccz80_add_callee
+EXTERN asm_f16_add_callee
+defc cm16_sccz80_add_callee = asm_f16_add_callee

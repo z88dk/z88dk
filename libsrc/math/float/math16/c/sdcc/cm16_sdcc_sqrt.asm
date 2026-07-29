@@ -1,6 +1,7 @@
 
 ; half __sqrt (half number)
 
+SECTION code_clib
 SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_sqrt
