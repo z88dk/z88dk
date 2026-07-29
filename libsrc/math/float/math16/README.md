@@ -3,11 +3,11 @@
 
 This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point maths package, designed to work with the SCCZ80 IEEE-754 half precision 16-bit interfaces.
   
-This library is designed for z80, z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation. This library is also designed to be as fast as possible on the z80 processor.
+This library is designed for z80, z180, z80n, and **Intel 8085** processors. On z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n, hardware `16_8x8` multiply accelerates mantissa work. On 8085, CPU-specific cores live under `asm/8085/` (shared specials/coeffs under `asm/`) (no `exx`/IX/IY; stack frames for the second operand) and link as **`math16_8085.lib`** via `--math16` with `-clib=8085`.
 
-The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. Either the math48 (`-lm`) or the math32 (`--math32`) libraries must be used in conjunction with math16 (`--math16`) to provide stdio input and output capabilities.
+The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only.
 
-*@feilipu, May 2020*
+*@feilipu, May 2020 / 8085 July 2026*
 
 ---
 
@@ -17,7 +17,8 @@ The specialised nature of 16-bit floating point implies that this is an adjunct 
 
   *  All the code is re-entrant.
 
-  *  Register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
+  *  Z80 family: register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
+  *  **8085:** no alternate register set; second f24 operand and temps on the **stack** only (`ld de,sp+*`, `ld hl,(de)`). Extended 8085 ops preferred. Library asm is not copt’d.
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
@@ -292,4 +293,23 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+---
+
+## Intel 8085 product (`math16_8085.lib`)
+
+| Item | Detail |
+|------|--------|
+| Build | `make -C libsrc/math/float/math16` → `math16_8085.lib` (also `make -C c 8085` for higher C) |
+| Install | `make -C libsrc install` → `lib/clibs/math16_8085.lib` |
+| Link | `zcc +… -clib=8085 --math16 …` → `-lmath16_8085` via `@{ZCC_LIBCPU}` |
+| Layout | Cores `asm/8085/` + shared `asm/` (specials, coeffs); higher sccz80 C in `c/8085/`; lists `newlibfiles_8085.lst` |
+| Compilers | **sccz80** primary (`l_f16_*`); **80cc** shares `l_f16_*`; **sdcc** explicit half surface as on Z80 (no native half codegen) |
+| Tests | `test/suites/math` recipe `test_math16_8085.bin` (`-m8085` ticks) |
+| Adjunct | No printf/scanf/dtoa in this library |
+
+**Correctness (2026-07):** Z80 `test_math16.bin` **13/13**. 8085 `test_math16_8085.bin` **13/13** (`-m8085`). Higher C via `c/8085/` + `--math16`.
+
+Internal **f24** ABI (d/e/hl) matches the Z80 documentation above; only implementation differs. Cores use stack frames (no `exx`); sccz80 callee entry is **`[uret][x]`**, HL=y. `asm_f24_f16` uses **B** as temp — frexp/ldexp-style helpers must preserve BC across expand.
 

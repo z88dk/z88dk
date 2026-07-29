@@ -1,7 +1,8 @@
 CHANGES TO SOURCE CODE
 ======================
 
-None.
+When built with --math16 (__MATH_MATH16), floating types use _Float16,
+invf16, and sqrtf16. Matrix elements and intermediate norms stay in half range.
 
 VERIFY CORRECT RESULT
 =====================
@@ -48,6 +49,12 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectra
 
 sccz80/classic/8085/math32
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
+
+sccz80/classic/math16
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math16 -lndos -m
+
+sccz80/classic/8085/math16
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math16 -lmath32_8085 -lndos -m
 
 80cc/classic/math32
 zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
@@ -166,3 +173,23 @@ error: 2 * 10^(-7)
 
 cycle count  = 6227757878
 time @ 4MHz  = 6227757878 / 4*10^6 = 25 min 57 sec
+
+
+Z88DK July 29, 2026
+sccz80 / classic c library / math16
+3635 bytes less page zero
+
+cycle count  = 4951503496
+time @ 4MHz  = 4951503496 / 4*10^6 = 20 min 38 sec
+
+IEEE 16-bit half-float implementation (math16).
+
+
+Z88DK July 29, 2026
+sccz80 / classic c library / 8085 / math16
+3608 bytes less page zero
+
+cycle count  = 6108745067
+time @ 4MHz  = 6108745067 / 4*10^6 = 25 min 27 sec
+
+IEEE 16-bit half-float implementation (math16_8085).

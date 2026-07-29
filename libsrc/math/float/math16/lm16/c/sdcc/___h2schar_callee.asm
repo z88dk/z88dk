@@ -1,4 +1,5 @@
 
+    SECTION code_clib
     SECTION code_fp_math16
     PUBLIC ___h2schar_callee
     EXTERN cm16_sdcc___h2schar_callee

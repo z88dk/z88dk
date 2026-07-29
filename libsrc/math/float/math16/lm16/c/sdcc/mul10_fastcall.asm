@@ -1,4 +1,5 @@
 
+    SECTION code_clib
     SECTION code_fp_math16
     PUBLIC  _mul10f16_fastcall
     EXTERN  asm_f16_mul10

@@ -56,6 +56,8 @@ z88dk-classic/readme.txt. N=1000.
 
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
+sccz80   | z80  | math16  |   363_824_289  (Jul 2026; DT=1e-1)
+sccz80   | 8085 | math16  |   428_771_307  (Jul 2026; DT=1e-1)
 sccz80   | z80  | math32  | 1_000_372_169  (Jul 2026)
 sccz80   | 8085 | math32  | 1_986_100_862  (Jul 2026)
 sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)

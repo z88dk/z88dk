@@ -3,6 +3,9 @@ CHANGES TO SOURCE CODE
 
 For the sccz80 compile, variable "limit" in main() cannot be made static.
 
+When built with --math16 (__MATH_MATH16), floating types use _Float16.
+Mandelbrot coordinates stay well within the half exponent range.
+
 COMPILATION
 ===========
 
@@ -14,8 +17,14 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 mandelbrot.c -o mandelbrot.bin -lm 
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
 
+classic/sccz80/math16
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math16 -lndos -m
+
 classic/sccz80/8085/math32
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+
+classic/sccz80/8085/math16
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math16 -lmath32_8085 -lndos -m
 
 classic/80cc/math32
 zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
@@ -131,3 +140,23 @@ sccz80 / classic / 8085 / MBF32
 
 cycle count  = 1805825674
 time @ 4MHz  = 1805825674 / 4*10^6 =  7 min 31 sec
+
+
+Z88DK July 29, 2026
+sccz80 / classic / math16
+3040 bytes less page zero
+
+cycle count  = 924216002
+time @ 4MHz  = 924216002 / 4*10^6 =  3 min 51 sec
+
+IEEE 16-bit half-float implementation (math16).
+
+
+Z88DK July 29, 2026
+sccz80 / classic / 8085 / math16
+2988 bytes less page zero
+
+cycle count  = 1142010284
+time @ 4MHz  = 1142010284 / 4*10^6 =  4 min 46 sec
+
+IEEE 16-bit half-float implementation (math16_8085).

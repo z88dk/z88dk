@@ -1,4 +1,5 @@
 
+    SECTION code_clib
     SECTION code_fp_math16
     PUBLIC  _floorf16
     EXTERN  cm16_sdcc_floor

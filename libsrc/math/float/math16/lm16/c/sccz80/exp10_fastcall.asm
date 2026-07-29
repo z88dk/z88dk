@@ -1,4 +1,5 @@
 
+	SECTION code_clib
 	SECTION	code_fp_math16
 	PUBLIC	exp10f16_fastcall
 	EXTERN	_m16_exp10f

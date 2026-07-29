@@ -1,4 +1,5 @@
 
+    SECTION code_clib
     SECTION code_fp_math16
     PUBLIC  _invsqrtf16_fastcall
     EXTERN  asm_f16_invsqrt

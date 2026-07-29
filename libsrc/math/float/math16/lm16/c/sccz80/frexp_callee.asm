@@ -1,4 +1,5 @@
 
+	SECTION code_clib
 	SECTION	code_fp_math16
 	PUBLIC	frexpf16_callee
 	EXTERN	cm16_sccz80_frexp_callee
