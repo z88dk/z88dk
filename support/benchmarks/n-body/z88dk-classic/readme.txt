@@ -1,7 +1,8 @@
 CHANGES TO SOURCE CODE
 ======================
 
-None.
+When built with --math16 (__MATH_MATH16), floating types use _Float16,
+invsqrtf16/sqrtf16, and DT=1e-1 so intermediate values stay in half range.
 
 VERIFY CORRECT RESULT
 =====================
@@ -20,6 +21,12 @@ zcc +zx -vn -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math32 -lndos -create-app
 
 classic/sccz80/8085/math32
 zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math32 -lndos -create-app
+
+classic/sccz80/math16
+zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints n-body.c -o n-body --math16 -lndos -create-app
+
+classic/sccz80/8085/math16
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints n-body.c -o n-body --math16 -lmath32_8085 -lndos -create-app
 
 classic/zsdcc
 zcc +zx -vn -DSTATIC -DPRINTF -compiler=sdcc -SO3 --max-allocs-per-node200000 n-body.c -o n-body -lmath48 -lndos -create-app
@@ -46,8 +53,14 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin -
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
 
+classic/sccz80/math16
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints n-body.c -o n-body.bin --math16 -m -lndos
+
 classic/sccz80/8085/math32
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
+
+classic/sccz80/8085/math16
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints n-body.c -o n-body.bin --math16 -lmath32_8085 -m -lndos
 
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 n-body.c -o n-body.bin -lmath48 -m -lndos
@@ -137,3 +150,23 @@ second number error: 1 * 10^(-4)
 
 cycle count  = 1986100862
 time @ 4MHz  = 1986100862 / 4*10^6 =  8 min 17 sec
+
+
+Z88DK July 29, 2026
+sccz80 / classic / math16
+4054 bytes less page zero
+
+cycle count  = 363824289
+time @ 4MHz  = 363824289 / 4*10^6 =  1 min 31 sec
+
+IEEE 16-bit half-float (math16). DT=1e-1 for half range.
+
+
+Z88DK July 29, 2026
+sccz80 / classic / 8085 / math16
+3834 bytes less page zero
+
+cycle count  = 428771307
+time @ 4MHz  = 428771307 / 4*10^6 =  1 min 47 sec
+
+IEEE 16-bit half-float (math16_8085). DT=1e-1 for half range.

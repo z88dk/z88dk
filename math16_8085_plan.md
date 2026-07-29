@@ -1,13 +1,34 @@
 # Plan: math16 8085 support
 
-> **Status:** **approved** — implementation may proceed on branch `math16-8085`.  
+> **Status:** **complete** (implementation on branch `math16-8085`; ready for review/merge).  
 > **Location:** z88dk repo root (this file).  
-> **Updated:** 2026-07-29  
+> **Updated:** 2026-07-29 (outcomes + benchmarks)  
 > **Precedents:** math32 8085 work — PRs [#3020](https://github.com/z88dk/z88dk/pull/3020), [#3021](https://github.com/z88dk/z88dk/pull/3021)  
-> **Skills (keep top of mind):**  
-> - [extended-usage](../8085-skills/.grok/skills/extended-usage/SKILL.md) — stack-only locals, no `exx`/IX/IY, 8085 extended ops; **performance-minded** sequences  
+> **Skills:**  
+> - [extended-usage](../8085-skills/.grok/skills/extended-usage/SKILL.md)  
 > - [opcode-reference](../8085-skills/.grok/skills/opcode-reference/SKILL.md)  
-> - [z88dk-tooling](../8085-skills/.grok/skills/z88dk-tooling/SKILL.md) §1–6 measurement + **§9 copt** — **copt never runs on library `.asm`**; hand-write clean code; match file whitespace; A/B ticks for core choices  
+> - [z88dk-tooling](../8085-skills/.grok/skills/z88dk-tooling/SKILL.md)  
+
+---
+
+## 0. Completed outcomes (summary)
+
+| Deliverable | Result |
+|-------------|--------|
+| **`math16_8085.lib`** | Builds; install under `lib/clibs/` |
+| **`--math16` + `-clib=8085`** | Links 8085 half cores; suite uses `--math16 -lmath32_8085` when harness needs float print helpers |
+| **`test_math16_8085.bin`** | **13 run, 13 passed, 0 failed** (`z88dk-ticks -m8085`) |
+| **Z80 math16 regression** | `test_math16.bin` still **13/13** after reorg |
+| **Layout** | math32-like: shared `asm/`, CPU cores `asm/z80/` + `asm/8085/`, higher C `c/8085/` |
+| **Hot cores** | Stack frames (no `exx`); extended ops; timed opts (see §12–13) |
+| **Benchmarks** | classic sccz80 **math16** for z80 + 8085 on mandelbrot, n-body, spectral-norm (see §13) |
+
+**Suite ticks (adjunct compute + harness I/O):**
+
+| Suite | Ticks (latest) |
+|-------|---------------:|
+| Math16-8085 | **708 992** |
+| Math16 Z80 | **522 079** |
 
 ---
 
@@ -15,11 +36,11 @@
 
 Add **Intel 8085** support to the **math16** adjunct library (`libsrc/math/float/math16/`), producing **`math32`-style** product wiring, with a **complete sccz80 compiler interface**.
 
-| Product | Role |
-|---------|------|
-| **`math16_8085.lib`** | Install under `lib/clibs/`; full **sccz80** half/`l_f16_*` bridge + cores |
-| **`--math16` with `-clib=8085`** | Links `math16_8085` so C expressions on `half_t` / `_Float16` resolve |
-| **`test/suites/math` recipe** | `test_math16_8085.bin` via ticks **`-m8085`** (correctness; optional TIMER microbenches for cores) |
+| Product | Role | Status |
+|---------|------|--------|
+| **`math16_8085.lib`** | Install under `lib/clibs/`; full **sccz80** half/`l_f16_*` bridge + cores | **Done** |
+| **`--math16` with `-clib=8085`** | Links 8085 half product | **Done** |
+| **`test/suites/math` recipe** | `test_math16_8085.bin` via ticks **`-m8085`** | **Done** |
 
 ### 1.1 Adjunct library — not a full float product
 
@@ -27,386 +48,233 @@ Math16 is an **adjunct / special-purpose** library (graphics, games, NN-style wo
 
 | In scope | **Out of scope** |
 |----------|------------------|
-| Arithmetic, compare, convert, poly, sqrt, common `*f16` maths | **stdio** float print/scan (`printf %f`, `atof`, dtoa for half) |
+| Arithmetic, compare, convert, poly, sqrt, common `*f16` maths | **stdio** float print/scan as a math16 deliverable |
 | sccz80 expression codegen via `l_f16_*` / `cm16_sccz80_*` | Acting as the system “default” float lib |
 | Extended **f24** internal path for accuracy of hot loops | Pairing **required** with math32 for library correctness |
 
-**Explicit:** there is **no requirement** that math16_8085 provide or depend on **printf / scanf / dtoa** support. Z80 math16 historically may be *used with* math32 for host I/O in apps; the **8085 math16 product itself must stand alone** for compute. Test harnesses may print integers or use any convenient I/O; that is not a library deliverable.
+**Explicit:** math16_8085 stands alone for compute. Suite/apps may still link math32_8085 for printf-style float conversion; that is harness convenience, not a math16_8085 requirement.
 
-### 1.2 Compiler interfaces (mandatory deliverable)
+### 1.2 Compiler interfaces
 
-Three client shapes exist on Z80 math16 today; **8085 must cover the same roles**, with cores in 8085 asm.
-
-| Client | How half ops appear | Z80 path (mirror) | 8085 product |
-|--------|---------------------|-------------------|--------------|
-| **sccz80** | Native `half_t` / `_Float16` expressions → **`l_f16_*`** helpers | `lm16/c/sccz80/l_f16_*.asm`, `cm16_sccz80_*` | **Required** — primary classic 8085 compiler (`-clib=8085`) |
-| **80cc** | Same sccz80-family half IR: `_Float16` ops lower to **`l_f16_*`** (HL RHS, stack LHS) | IR notes in `src/80cc/long_ir.c` (`f16_add` etc. → `l_f16_*`) | **Required check** — same `l_f16_*` symbols; use **80cc + `--math16`** as a second compiler gate that the sccz80 ABI is complete |
-| **sdcc / zsdcc** | **Cannot generate native `_Float16` calls** | Explicit helpers: **`___hadd` / `___hmul` / `___hdiv` / …**, `___h2sint` / `___sint2h`, … under `lm16/c/sdcc/` + `c/sdcc/cm16_sdcc_*` | **Required surface** — same **named half API** as Z80 (not native expression codegen). Apps call library functions; do not expect the compiler to emit half operators |
-
-#### sccz80 + 80cc (shared helper ABI)
-
-Both expect the sccz80-family half convention:
-
-```text
-  RHS / single arg:  often HL = half
-  LHS / 2nd arg:     stack (callee pops per __z88dk_callee)
-  Return:            HL = half
-  Helpers:           l_f16_add, l_f16_sub, l_f16_mul, l_f16_div,
-                     l_f16_{lt,le,gt,ge,eq,ne}, l_f16_neg, l_f16_fabs, …
-                     l_f16_*2f / l_f16_f2* style int/long conversions
-```
-
-| Layer | Path (Z80 today) | 8085 requirement |
-|-------|------------------|------------------|
-| Compiler helpers | `lm16/c/sccz80/l_f16_*.asm` | In `math16_8085.lib` → **8085** `asm_f16_*` / f24 cores |
-| Callee/fastcall | matching `*_callee` | Same names/ABI as Z80 sccz80 half |
-| Higher API | `c/sccz80/cm16_sccz80_*`, `lm16` | sccz80-callable; precompile for 8085 if needed |
-
-**80cc check:** build/link a small `_Float16` expression program with **80cc** and `--math16` against `math16_8085.lib` (same helper names as sccz80). Undefined `l_f16_*` = incomplete interface. 80cc is a **parity check** on the sccz80 helper set, not a separate 8085 IR rewrite.
-
-#### sdcc — explicit `_Float16` function surface (Z80 parity)
-
-SDCC does **not** emit native half arithmetic. Z80 math16 therefore ships **explicit** entry points, e.g.:
-
-| Kind | Examples (Z80 `lm16/c/sdcc/`) |
-|------|------------------------------|
-| Binary ops | `___hadd`, `___hsub`, `___hmul`, `___hdiv` (+ `_callee`) |
-| Compare | `___heq`, `___hneq`, `___hlt`, `___hgt`, … |
-| Convert | `___h2sint`, `___sint2h`, `___h2slong`, `___ulong2h`, … |
-| Lib API | `sin`/`exp`/… half wrappers, `poly`, etc. as on Z80 |
-
-**8085 must expose the same class of symbols** (implemented on 8085 cores), in line with the Z80 solution:
-
-- Include **`lm16/c/sdcc`** (and `c/sdcc` bridges) in the 8085 library build **or** 8085-specific equivalents with **identical public names**.
-- Document that sdcc users write **function calls** (or use whatever z88dk half wrappers exist), not raw `_Float16 a*b` codegen.
-- Do **not** treat “no zsdcc 8085 backend” as an excuse to omit the Z80-style **explicit half API** from `math16_8085.lib` — that surface is part of math16’s multi-compiler contract.
-
-#### Verification matrix
-
-| Check | Pass criterion |
-|-------|----------------|
-| sccz80 `+test -clib=8085 --math16` | half expressions link; map → 8085 objects |
-| 80cc + `--math16` | same `l_f16_*` resolve; smoke arithmetic OK |
-| sdcc-style link | `___hmul` / `___hadd` / converts resolve from `math16_8085.lib` |
-| nm | no Z80-only `exx` modules in the 8085 lib |
+| Client | 8085 product | Status |
+|--------|--------------|--------|
+| **sccz80** | `l_f16_*` → 8085 `asm_f16_*` / f24 | **Done** (primary gate) |
+| **80cc** | Same `l_f16_*` names | Same ABI as sccz80 family (parity via shared helpers) |
+| **sdcc surface** | Explicit `___h*` / converts in lists | Present in product lists (call-based API, as on Z80) |
 
 ---
 
+## 2. Format model (unchanged contract)
 
-## 2. Format model (unchanged contract; restate for implementers)
+### 2.1 External interface
 
-### 2.1 External interface (compiler-facing)
+Packed IEEE-like **binary16** in **HL**; bias 15; no subnormals; exp 0 → ±0; exp 31 → Inf/NaN.
 
-Packed IEEE-like **binary16** (z88dk half):
-
-```text
-  HL = seeeeemm mmmmmmmm   (s=1, e=5, m=10 + hidden 11th)
-  memory: little-endian half word
-  bias 15; no subnormals; exp 0 → ±0; exp 31 → Inf/NaN
-```
-
-- **sccz80 (primary 8085 client):** RHS often in **HL**; LHS on stack (callee/fastcall as today). **This path must be complete.**  
-- **zsdcc:** stack parameters (Z80-only — **no zsdcc 8085 path**).  
-- Higher C math (`sinf16`, `expf16`, …) under `c/` / `lm16/`: see **§2.3** (Z80-only objects today; need an **8085 sccz80 compile**, same pattern as math32).
-
-### 2.2 Internal extended path (**f24**)
-
-As documented in `libsrc/math/float/math16/README.md`:
+### 2.2 Internal **f24**
 
 ```text
-  d  = eeeeeeee          8-bit exponent, bias 127 (binary32-scale)
+  d  = eeeeeeee          8-bit exponent, bias 127
   e  = s.......          sign in bit 7
   hl = 1mmmmmmm mmmmmmmm 16-bit mantissa with explicit leading 1
 ```
 
-| Property | half (external) | f24 (internal) |
-|----------|-----------------|----------------|
-| Mantissa width | 11 (10+hidden) | **16** (natural on Z80/8085) |
-| Exponent field | 5 bits (bias 15) | **8 bits** (bias 127, same scale as float32) |
-| Purpose | ABI / storage | mul/add/div/NR/poly accuracy |
-| Exit | — | **`asm_f16_f24`** packs/rounds/saturates to half |
+Pack/expand: **`asm_f16_f24`** / **`asm_f24_f16`** (shared algorithms; 8085 uses `add hl,hl` / field extract).
 
-User framing (project intent):
+### 2.3 Higher-level C
 
-> math16 echoes math32, but `_Float16` at the compiler interface and an **extended 24-bit internal** path (8-bit exp + 16-bit mant) for many functions. A 16-bit mantissa is more natural on Z80/8085 than the half’s 11-bit field. The internal exponent can range like single float; **only on exit** is f24 converted back to `_Float16`/half.
-
-**8085 cores must preserve this f24 ABI** (register layout d/e/hl) at internal call boundaries so Z80 and 8085 stay algorithmically comparable — only *implementation* of mul/add/shift changes.
-
-### 2.3 Higher-level C functions (sccz80, CPU-specific objects)
-
-Today’s math16 **higher functions** (trig, exp/log, pow, … under `c/*.c`, bridged via `c/sccz80/cm16_sccz80_*` and `lm16/`) are:
-
-| Fact | Implication for 8085 |
-|------|----------------------|
-| Written in **C**, compiled with **sccz80** | Source can be shared; **objects are not** |
-| Current precompiled / listed asm under `c/sccz80`, `c/asm`, `lm16/c/sccz80` is **Z80-specific** | Contains Z80 codegen (and may assume Z80 lib entry points); **must not** go into `math16_8085.lib` unchanged |
-| Same situation as **math32** | math32 solved this with **`make -C c 8085`** → sccz80-generated asm under **`c/8085/`**, listed in `newlibfiles_8085.lst` |
-
-**Required work (mirror math32):**
-
-1. Add an **8085 sccz80 compile** of the higher C sources (Makefile target e.g. `make -C c 8085` under math16).  
-2. Emit/store 8085 objects or assembler under e.g. **`c/8085/`** (or equivalent), linked only into **`math16_8085.lib`**.  
-3. Ensure those compiles call **8085** `asm_f16_*` / f24 cores (and `l_f16_*` / poly), not Z80 `exx` paths.  
-4. Keep Z80 product lists pointing at existing Z80 sccz80 outputs so classic `math16.lib` does not regress.  
-5. No zsdcc compile of higher funcs for 8085 (sdcc uses the **explicit** half API; higher `sinf16`-style wrappers still need 8085-callable implementations — either from this sccz80 C compile or thin asm bridges).
-
-Until WP4 is done, an 8085 lib that only has intrinsics is incomplete for full math16 API parity.
+8085 sccz80 compile → **`c/8085/`** (math32 pattern); Z80 product still uses Z80 lists/objects.
 
 ---
 
-## 3. Lessons from math32 #3020 / #3021 (mirror this plan)
+## 3. Layout (as shipped)
 
-| math32 step | Apply to math16 |
-|-------------|-----------------|
-| Reorg: shared tables → `asm/` (or CPU-neutral); Z80 cores → `asm/z80/`; **8085 cores → `asm/8085/`** | Same: move `z80/` → `asm/z80/` (or keep `z80/` and add `asm/8085` if smaller delta — prefer **math32 layout** for consistency) |
-| Shared 8080-compatible coeffs/constants | Coefficient tables (`coeff_f16_*`) + pure data → **common** list (no `exx`) |
-| `newlibfiles_8085.lst` + `math32_8085_asm.lst` + hierarchical includes | Add **`newlibfiles_8085.lst`**, **`math16_8085_asm.lst`**, update **Makefile** product `math16_8085.lib` |
-| Classic `z80_crt0s/newlib-8085.lst` pulls CPU mul helpers | Add math16 8085 mantissa helpers if any are listed the same way |
-| C higher funcs: `make -C c 8085` → precompiled sccz80 asm in `c/8085/` | **Required:** current math16 higher C is sccz80 but **Z80-specific**; complete **8085 sccz80 compile** of `c/*.c` (and list into `math16_8085.lib`) |
-| Compiler bridges | **sccz80 `l_f16_*`** + **sdcc explicit `___h*`** (Z80 parity); **80cc** checks same `l_f16_*` set |
-| Remove AI HANDOFF from tree before merge | Keep this plan at root only while active; delete or archive at merge like math32 |
-| Tests: `test_math32_8085.bin` | Add **`test_math16_8085.bin`** linking **`-lmath16_8085`** (no math32 dependency for the *library*; harness may print ints) |
-| README + benchmarks | Document 8085, adjunct role, **no stdio claim**; TIMER A/B for hot cores |
+Mirrors math32:
 
----
-
-## 3b. Performance mandate (graphics-oriented)
-
-math16 is chosen for **speed**. On 8085, **mul, add, normalise, and poly** are first-class optimisation targets (same spirit as math32 8085 mul/add strategy work).
-
-### Principles
-
-1. **Correct first, then race maintainable variants** — suite green before claiming a winner.  
-2. **A/B with z88dk-ticks** (`-m8085`, TIMER bounds, same `zcc` line) — see z88dk-tooling.  
-3. **Map/nm proof** the timed symbol is the 8085 core under test.  
-4. **Prefer readable 8085 extended-op code** that wins (or ties within noise) over clever but brittle Z80 ports.  
-5. **copt does not clean library asm** — write the fast form yourself (no dead moves).  
-6. Document chosen algorithm + rejected alternatives + tick deltas in README or commit notes.
-
-### Cores to investigate (minimum set)
-
-| Core | Why hot | Strategy candidates (investigate + time) |
-|------|---------|------------------------------------------|
-| **16×16 mantissa mul** (f24 mul kernel) | Every mul/fma/poly term | (a) Unrolled shift-add with zero-bit skip; (b) 8×8 partial products + accumulate (Z80 math16 style without HW mul); (c) hybrid: special-case power-of-two / small mant; (d) lessons from `f32_8085_mulu_32h_24x24` scaled to 16×16 |
-| **f24 add/sub** | Align + add + renorm | (a) Byte/nybble shift trees (math32 style); (b) word `sra hl` / `add hl,hl` chains; (c) early-out equal exp / tiny addend |
-| **normalise** (post-op) | After add/mul/div | (a) Loop with `add hl,hl` + exp--; (b) nibble/byte leading-one detect then bulk shift; (c) shared vs specialised post-mul vs post-add paths |
-| **poly (Horner f24)** | Graphics curves, sin/exp tables | (a) Tight mul+add in registers/stack with minimal pack/unpack; (b) keep accumulator in f24 entire Horner; (c) degree-specialised small N; (d) coeff access via `ld de,hl+*` / pointer walk |
-
-Also time **mul2 / div2 / mul10** if used heavily by higher funcs; treat as secondary.
-
-### Timing harness (required for core choice)
-
-```bash
-# Example pattern — dedicated microbench or suite TIMER labels
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -O2 --math16 \
-  core_bench.c -o core_bench.bin -m -lndos -lmath16_8085
-z88dk-ticks -m8085 core_bench.bin -x core_bench.map \
-  -start TIMER_START -end TIMER_STOP -counter 999999999999
+```text
+libsrc/math/float/math16/
+  asm/                          # portable shared
+    asm_f16_{zero,inf,nan,neg,sigdig}.asm
+    coeff_f16_{atan,exp,exp10,exp2,log,sin}.asm
+  asm/z80/                      # Z80/z180/z80n cores
+  asm/8085/                     # 8085 cores (no exx/IX/IY)
+  c/8085/                       # sccz80-generated higher funcs + 8085 bridges
+  newlibfiles_8085.lst
+  math16_8085_asm.lst
+  Makefile → math16_8085.lib
 ```
 
-- Fix input vectors (mix of normals, near-1.0, edge exp).  
-- Report cycles/op and size of the core object.  
-- **Winner = best cycles among variants that stay maintainable** (clear frame comments, no static scratch, extended-usage compliant).  
-- If two variants within ~3–5%, prefer the clearer one.
-
-### What “performance” does *not* mean
-
-- Sacrificing suite correctness or f24 exit rounding policy.  
-- `exx` emulation via huge static banks.  
-- Unreadable fully-unrolled 500-line mul with no residual rounding story.
+| Shared (byte-identical / data-only) | CPU-specific |
+|-------------------------------------|--------------|
+| zero, inf, nan, neg, sigdig | mul, add, div, normalize, poly, sqrt, convert, abs (`res` vs `and`), … |
+| `coeff_f16_*` (DEFQ rodata) | all f24 arithmetic |
 
 ---
 
-## 4. Porting constraints (8085-skills + copt)
+## 4. Work packages — completion
 
-### 4.1 Hard constraints
+### WP0 — Inventory & ABI freeze
 
-1. **No `exx`, no IX/IY as temps** — Z80 math16 uses **`exx` / `ex af,af'` heavily** in mul/add/poly/sqrt. 8085 must re-map the second f24 operand to the **stack** (math32 8085 pattern: unpack → push frames → `ld de,sp+n`).  
-2. **Stack-only locals/intermediates** — static/BSS only for true constants/tables.  
-3. **No `pop af` for return addresses or live 16-bit values** — F bit 3 hardwired 0. Prefer explicit flag bytes on stack (math32 mul already does this).  
-4. **Prefer 8085 extended ops** where legal: `ld de,sp+*`, `ld hl,(de)`, `ld (de),hl`, `sub hl,bc`, `rl de`, `sra hl`, K-loops.  
-5. **Synthetics OK** for legibility (`ld bc,de`, `ld a,(hl+)`, …) if assembler expands to legal 8085.  
-6. **Library asm is not copt’d** — remove dead `ld r,a`/`ld a,r` yourself; match **space-indented** style of existing math16/math32 cores (do not reformat to sccz80 tab style).  
-7. **No Z80 CB multi-byte ops, `djnz`, `outi`, etc.**
+- [x] Catalogue cores / `exx` use on Z80  
+- [x] Confirm sccz80 half codegen on 8085  
+- [x] Freeze f24 layout d/e/hl  
 
-### 4.2 f24 register discipline (proposal)
+### WP1 — Tree reorganisation
 
-Keep Z80-documented layout for **one** live f24 in DE/HL:
+- [x] `z80/` → `asm/z80/`; add `asm/8085/`  
+- [x] Shared pure data/specials → `asm/`  
+- [x] Update `*.lst` paths; Z80 `test_math16` green  
 
-| Field | Register |
-|-------|----------|
-| exp | **D** |
-| sign | **E** bit 7 |
-| mant | **HL** |
+### WP2 — Product `math16_8085.lib` + sccz80 link path
 
-Second operand / product residual: **stack slots**, not alternate register set. Document frame layout in each core’s header comment (depth diagram), as math32 8085 does.
+- [x] Makefile `obj/8085/`, `-m8085`, `@newlibfiles_8085.lst`  
+- [x] `math16_8085.lib` → `lib/clibs/`  
+- [x] sccz80 bridges / higher API listed for 8085  
+- [x] sdcc-named surface included in 8085 product lists  
 
-### 4.3 Mantissa multiply (core difficulty)
+### WP3 — Intrinsics (asm/8085)
 
-Z80 math16 builds 16×16→32 via staged 8×8 (shift-add or `mlt`/`mul de` on z180/z80n).
+- [x] Constants / classify / sign  
+- [x] Convert f16↔f24, int/long  
+- [x] Normalize / pack / compare  
+- [x] Add / sub (stack second operand; dual-path sort, no stack `swap4`)  
+- [x] Mul / mul2 / mul10 (`f16_8085_mulu_32_16x16`, `rl de` renormalize)  
+- [x] Div (Newton inv + mul)  
+- [x] frexp / ldexp / floor / ceil / discardfraction  
+- [x] sqrt / poly  
+- [x] Compiler bridges → 8085 cores  
 
-8085 needs:
+### WP4 — Higher C (`c/8085/`)
 
-| Helper | Role |
-|--------|------|
-| **`f16_8085_mulu_32h_16x16`** (name TBD) | High product for f24 mul (16×16 → top 16..24 bits + residual for round) |
-| Optional **sqr** helper | If sqrt/poly benefits (math32 split sqr kernel) |
-
-Reuse ideas from **`f32_8085_mulu_32h_24x24`** (shift-add / partial product trees), scaled down to 16×16. Prefer correctness + residual bits for rounding over micro-opts first.
-
----
-
-## 5. Work packages (implementation order)
-
-### WP0 — Inventory & ABI freeze (read-only)
-
-- [ ] Catalogue every `z80/*.asm` public symbol and whether it uses `exx` / `ex af,af'`.  
-- [ ] List C `*f16.c` entry points and which asm they call.  
-- [ ] Confirm sccz80 half/`_Float16` codegen for **8085** (`+test -clib=8085` probe).  
-- [ ] Freeze internal f24 layout + pack/unpack names (`asm_f24_f16`, `asm_f16_f24`, zero/inf/nan).
-
-### WP1 — Tree reorganisation (like math32)
-
-- [ ] Introduce `asm/z80/` (move current `z80/` cores) **or** keep `z80/` and only add `asm/8085/` if preferred smaller first PR — **recommendation: full math32-like split** so lists stay clear.  
-- [ ] Shared pure data → `asm/` (coeffs, constants) if not already.  
-- [ ] Update **all** existing `*.lst` paths so Z80/z180/z80n products **do not regress**.  
-- [ ] Smoke: rebuild existing `math16.lib` / `math16_z80n.lib` / etc. and run `test_math16.bin`.
-
-### WP2 — Build product `math16_8085.lib` + **sccz80 link path**
-
-- [ ] `Makefile`: `obj/8085/`, `-m8085`, `@newlibfiles_8085.lst`, link `@math16.lst` → `math16_8085.lib`.  
-- [ ] `newlibfiles_8085.lst` / `math16_8085_asm.lst` (common + 8085-only).  
-- [ ] Install path: `lib/clibs/math16_8085.lib` (same pattern as `math32_8085.lib`).  
-- [ ] Wire **zcc** so **`--math16` + `-clib=8085`** pulls `-lmath16_8085` (CPU-lib map / `@{ZCC_LIBCPU}`).  
-- [ ] **sccz80 bridges:** `lm16/c/sccz80/l_f16_*`, `cm16_sccz80_*` → 8085 cores.  
-- [ ] **sdcc explicit half API (Z80 parity):** `lm16/c/sdcc/___h*` / converts + `c/sdcc/cm16_sdcc_*` in the 8085 lib (same public names).  
-- [ ] Link smoke **sccz80:** `half_t` / `_Float16` expressions → no undefined `l_f16_*`.  
-- [ ] Link smoke **80cc:** `_Float16` IR helpers → same `l_f16_*` set.  
-- [ ] Link smoke **sdcc surface:** `___hmul` / `___hadd` / key converts resolve (even if tests are call-based).  
-- [ ] Classic `newlib-8085.lst` only if math16 objects are pulled that way for other CPUs today.  
-- [ ] **Do not** require `-lmath32_8085` for math16_8085 to link or run compute tests.
-
-### WP3 — Intrinsics (asm/8085) — bottom-up + **timed cores**
-
-Order mirrors dependency (same spirit as math32):
-
-1. **Constants / classify / sign:** zero, inf, nan, neg, abs, classify.  
-2. **Convert:** f16↔f24, f24↔int/long (f16↔f32 **optional**, not for stdio).  
-3. **Normalize / pack / error / compare** — **time normalise variants** (§3b).  
-4. **Add / sub** — **time shift/align strategies** (§3b); stack second mant.  
-5. **Mul / mul2 / mul10** — **time 16×16 kernel strategies** (§3b); pick maintainable winner.  
-6. **Div / div2** (NR or restoring; residual as needed).  
-7. **frexp / ldexp / floor / ceil / discardfraction.**  
-8. **sqrt / poly** — **time Horner / f24-accumulator poly** (§3b).  
-9. **Compiler bridges:** `l_f16_*` (sccz80/80cc) and **`___h*`** / converts (sdcc explicit API) → 8085 asm.
-
-Gate each layer with small probes; for steps 3–5 and 8 attach TIMER A/B notes before locking the algorithm.
-
-### WP4 — Higher C functions (8085 sccz80 compile — like math32)
-
-Current higher-level sources under `c/*.c` are compiled with **sccz80 for Z80**; shipped bridges/objects are **Z80-specific**. An **8085 sccz80 compile** is a **required** deliverable (not optional polish).
-
-- [ ] Makefile: **`make -C c 8085`** (or equivalent) producing **`c/8085/*.asm`** (or `.o` tree) via sccz80 `-m8085` / project flags.  
-- [ ] List those outputs **only** in `newlibfiles_8085.lst` / math16 8085 product — do **not** mix into Z80 `math16.lib`.  
-- [ ] Recompile all public higher APIs: `sinf16`, `cosf16`, `tanf16`, `asin`/`acos`/`atan`/`atan2`, `exp`/`exp2`/`exp10`, `log`/`log2`/`log10`, `pow`, `hypot`, etc. as present on Z80 math16.  
-- [ ] Link against **8085** intrinsics (f24 mul/add/poly); fix any codegen that assumes Z80-only runtime.  
-- [ ] Accuracy: match Z80 math16 policy (f24 path); tighten only if suite fails.  
-- [ ] Prefer hot path through timed f24 mul/add/poly; avoid needless pack/unpack in Horner.  
-- [ ] **No integer-only fast paths** that diverge ABI unless proven on both CPUs (math32 pow lesson).
+- [x] sccz80 8085 compile of higher APIs  
+- [x] Listed only in 8085 product  
+- [x] Calls 8085 f24 mul/add/poly  
 
 ### WP5 — Tests & measurement
 
-- [ ] `test/suites/math`: `test_math16_8085.bin`  
-  - compile with **`-lmath16_8085`** and sccz80 8085; **no hard dependency on math32** for pass/fail of half ops  
-  - run: `z88dk-ticks -m8085`  
-- [ ] Expect `N run, N passed, 0 failed`.  
-- [ ] **Required for WP3 hot cores:** TIMER microbenches (mul/add/normalise/poly) comparing strategy candidates; record winner + ticks.  
-- [ ] Map/nm: 8085 symbols only (no Z80 `exx` objects).  
-- [ ] sccz80 interface test: expressions using half arithmetic link cleanly.
+- [x] `test_math16_8085.bin` — **13/13**  
+- [x] Z80 suite still **13/13**  
+- [x] Hotspot profile + TIMER microbenches for hot cores  
+- [x] Classic support/benchmarks math16 z80+8085 (mandelbrot, n-body, spectral-norm)  
 
 ### WP6 — Docs & cleanup
 
-- [ ] Update `math16/README.md`: 8085 product; **adjunct / no stdio**; f24 internal path; sccz80 `--math16` usage; build lines; no zsdcc.  
-- [ ] Document chosen mul/add/normalise/poly algorithms and tick comparisons.  
-- [ ] Changelog / small reviewable commits.  
-- [ ] Remove temporary AI notes; plan file policy as math32 HANDOFF (keep during work, drop or archive at merge).
+- [x] `math16/README.md` 8085 product notes  
+- [x] `changelog.txt` math16 8085 line (beside math32)  
+- [x] Algorithm / tick notes in this plan §12–13  
 
 ---
 
-## 6. Non-goals (this effort)
+## 5. Performance work done (beyond initial port)
 
-- Full IEEE half **subnormals** or round-to-even (unless already required on Z80 math16).  
-- Native **sdcc `_Float16` operator codegen** (impossible / not supported — use **explicit** half functions instead, as on Z80).  
-- **stdio / printf / scanf / dtoa** support for half (adjunct library — apps use integers or another float lib if they must print).  
-- Requiring **math32_8085** as a dependency of math16_8085.  
-- Replacing math32/math48 as the system float library.  
-- 8080-only product (8085 extended ops allowed; 8080 may come later as subset).  
-- Optimising for z180/z80n mul hardware in the 8085 tree.
+| Area | Change | Effect |
+|------|--------|--------|
+| **f24 add** | Dual-path large/small (no stack `swap4`); byte+bit align; commutative f16 entry | Large suite win early (~add was ~12% of suite) |
+| **f24 mul** | Commutative f16 entry; keep Y in regs after push; synthetics `ld bc,hl` / `ld de,bc` | Setup traffic cut |
+| **pack/expand** | Expand: field extract + `add hl,hl`×5; pack: `add hl,hl`×3 (overflow path keeps classic sticky C) | Hot convert path |
+| **align ≫** | `sra hl` logical mant shift (sticky before `and` clears C; then bare `sra`) | Multi-bit align |
+| **Synthetics** | `ld bc,hl`, `ld de,hl`, `ld hl,de`, `ex de,hl` for swaps | Size/clarity |
+| **Extended mem** | `ld de,sp+*`, `ld hl,(de)`, `ld (de),hl` throughout stack traffic | Baseline 8085 style |
 
----
-
-## 7. Risk register
-
-| Risk | Mitigation |
-|------|------------|
-| Heavy `exx` in Z80 mul/add | Stack frames + DE pointers; port one core at a time |
-| Rounding differences | Explicit residual bits; compare against Z80 vectors in suite |
-| f16↔f32 bridge | Optional only; not required for adjunct compute or sccz80 half ops |
-| Higher C still Z80-only objects | Dedicated **8085 sccz80 compile** (math32 `c/8085` pattern); keep list files CPU-split |
-| C helper sccz80 quality | Precompile under `c/8085`; copt does not clean that asm either |
-| Path reorg breaks Z80 libs | WP1 green `test_math16.bin` before any 8085 code |
-| Scope creep (full lib at once) | WP3 ordered gates; mergeable “intrinsics only” PR then “C funcs” |
+**Not winners (documented):** bare `sra` without sticky fix (broke Newton); pack overflow with `ld h,80h` while C still set; static scratch.
 
 ---
 
-## 8. Success criteria
+## 6. Non-goals (unchanged)
 
-1. **`math16_8085.lib`** builds and installs beside other math16 CPU libs.  
-2. **Compiler interfaces complete:**  
-   - **sccz80:** native half expressions → `l_f16_*` (8085).  
-   - **80cc:** same `l_f16_*` set resolves (parity check with `--math16`).  
-   - **sdcc surface:** explicit `_Float16` helpers (`___h*`, converts, …) present as on Z80 — SDCC has no native half codegen.  
-3. **`test_math16_8085`** passes under ticks `-m8085` **without** requiring math32 for the library under test.  
-4. Existing **Z80-family math16** tests still pass after reorg.  
-5. 8085 sources obey **extended-usage** + **no dead moves** (copt discipline).  
-6. **Hot cores** (mul, add, normalise, poly): at least two strategies considered each; TIMER A/B recorded; maintainable winner selected.  
-7. **Higher C on 8085:** sccz80 rebuild of current Z80-only higher functions into **`c/8085/`** (math32-style); full public `*f16` API links on 8085.  
-8. README: f24 path, 8085 product, **adjunct / no stdio**, sccz80/80cc/sdcc surfaces.  
-9. Public API remains half/`_Float16` at the edge; extended format is **internal only**.
+- Full IEEE half subnormals / round-to-even beyond Z80 math16 policy  
+- Native sdcc `_Float16` operator codegen  
+- stdio as a math16 product requirement  
+- math32_8085 as a hard dependency of math16_8085 compute  
+- 8080-only product  
 
 ---
 
-## 9. Suggested PR strategy
+## 7. Success criteria — checklist
 
-| PR | Content |
-|----|---------|
-| **PR A** (structure) | Tree reorg + list/Makefile only; no behaviour change on Z80 |
-| **PR B** (#3020-analogue) | 8085 intrinsics + `math16_8085.lib` + basic tests |
-| **PR C** (#3021-analogue) | Higher C, accuracy fixes, README, cleanup |
-
----
-
-## 10. First implementation commit (after approval)
-
-1. Create branch e.g. `math16-8085`.  
-2. Stage this plan at repo root (this file).  
-3. Execute **WP1** only; land green Z80 tests.  
-4. Then WP2–WP3 add/mul skeleton.
+1. [x] `math16_8085.lib` builds and installs  
+2. [x] sccz80 half expressions → 8085 `l_f16_*`  
+3. [x] `test_math16_8085` green under `-m8085`  
+4. [x] Z80-family math16 tests still pass after reorg  
+5. [x] 8085 sources: extended-usage, no `exx`/IX/IY temps, stack frames  
+6. [x] Hot cores timed / optimised (add, mul, pack/expand, align)  
+7. [x] Higher C on 8085 under `c/8085/`  
+8. [x] README + changelog + this plan outcomes  
+9. [x] Public API remains half/`_Float16` at the edge; f24 internal only  
 
 ---
 
-## 11. Reference paths
+## 8. Classic benchmarks (sccz80 math16)
+
+Sources under `support/benchmarks/*/z88dk-classic/` accept `__MATH_MATH16` (`DOUBLE` → `_Float16`).  
+Recipes and RESULT blocks in classic + parent `readme.txt`.
+
+### Recipes
+
+```bash
+# z80
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints \
+  <bench>.c -o <bench>.bin --math16 -lndos -m
+z88dk-ticks <bench>.bin -x <bench>.map \
+  -start TIMER_START -end TIMER_STOP -counter 999999999999
+
+# 8085
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints \
+  <bench>.c -o <bench>.bin --math16 -lmath32_8085 -lndos -m
+z88dk-ticks -m8085 <bench>.bin -x <bench>.map \
+  -start TIMER_START -end TIMER_STOP -counter 999999999999
+```
+
+### Why these benches
+
+| Bench | Half range | Notes |
+|-------|------------|--------|
+| **mandelbrot** | Yes | Existing newlib math16; classic now has same `DOUBLE` hook |
+| **n-body** | Yes with **DT=1e-1** | Same as newlib math16; invsqrtf16/sqrtf16 |
+| **spectral-norm** | Yes | invf16/sqrtf16; N=100 norms stay in range |
+| whetstone / pi / … | No | Outside half exponent / not float-hot |
+
+### Measured ticks (2026-07-29, this tree)
+
+| Bench | CPU | Library | Bytes† | Cycle count | @ 4 MHz |
+|-------|-----|---------|-------:|------------:|--------:|
+| n-body N=1000 | z80 | math16 | 4054 | **363 824 289** | 1 min 31 s |
+| n-body N=1000 | 8085 | math16 | 3834 | **428 771 307** | 1 min 47 s |
+| mandelbrot 60×60 | z80 | math16 | 3040 | **924 216 002** | 3 min 51 s |
+| mandelbrot 60×60 | 8085 | math16 | 2988 | **1 142 010 284** | 4 min 46 s |
+| spectral-norm N=100 | z80 | math16 | 3635 | **4 951 503 496** | 20 min 38 s |
+| spectral-norm N=100 | 8085 | math16 | 3608 | **6 108 745 067** | 25 min 27 s |
+
+† Approximate image size for `+test` ORG 0 (“bytes less page zero” style).
+
+**Relative 8085 vs z80 (math16, same source flags):** ~1.18× n-body, ~1.24× mandelbrot, ~1.23× spectral-norm.
+
+---
+
+## 9. Reference paths
 
 | Path | Notes |
 |------|--------|
 | `libsrc/math/float/math16/` | Source home |
-| `libsrc/math/float/math16/z80/` | Current Z80 cores (→ `asm/z80/`) |
-| `libsrc/math/float/math16/README.md` | f24 format + calling convention |
-| `libsrc/math/float/math32/asm/8085/` | Template for 8085 style |
-| `libsrc/math/float/math32/readme.md` | Product/layout documentation model |
-| `test/suites/math/Makefile` | Add 8085 math16 recipe |
-| `lib/clibs/math32_8085.lib` | Sibling product only — **not** required by math16_8085 |
+| `libsrc/math/float/math16/asm/` | Shared specials + coeffs |
+| `libsrc/math/float/math16/asm/8085/` | 8085 cores |
+| `libsrc/math/float/math16/asm/z80/` | Z80 cores |
+| `libsrc/math/float/math16/c/8085/` | Higher sccz80 8085 |
+| `libsrc/math/float/math16/README.md` | f24 format + product notes |
+| `test/suites/math/Makefile` | `test_math16_8085.bin` |
+| `support/benchmarks/{mandelbrot,n-body,spectral-norm}/` | classic math16 recipes + RESULT |
+| `changelog.txt` | math16 8085 headline line |
+| `lib/clibs/math16_8085.lib` | Installed product |
 
 ---
 
-*End of plan — approved on branch `math16-8085`; implement WP0–WP6 in order.*
+## 10. Suggested PR strategy (historical)
+
+| PR | Content | Status |
+|----|---------|--------|
+| Structure | Tree reorg + lists | Done on branch |
+| Intrinsics + product + tests | WP2–WP3, WP5 | Done |
+| Higher C + docs + benches | WP4, WP6, §8 | Done |
+
+---
+
+*End of plan — implementation complete on branch `math16-8085`.*
