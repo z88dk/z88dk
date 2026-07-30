@@ -13,6 +13,8 @@ use Config;
 use Capture::Tiny 'capture_merged';
 use Path::Tiny;
 use Text::Diff;
+use File::Spec;
+use Text::ParseWords qw(shellwords);
 
 $ENV{PATH} = join( $Config{path_sep}, ".", "../../../bin", $ENV{PATH} );
 
@@ -92,6 +94,7 @@ sub run_ok {
     my ($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
+    $cmd = normalize_command($cmd);
     ok 1,                 "Running: $cmd";
     ok 0 == system($cmd), $cmd;
 }
@@ -101,6 +104,7 @@ sub run_nok {
     my ($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
+    $cmd = normalize_command($cmd);
     ok 1,                 "Running: $cmd";
     ok 0 != system($cmd), $cmd;
 }
@@ -112,4 +116,23 @@ sub unlink_testfiles {
         if Test::More->builder->is_passing;
 }
 
+#------------------------------------------------------------------------------
+# need to normalize slashes in the command only, not in the arguments,
+# so that Strawberry Perl is able to start build/Debug/z88dk-z80asm.exe
+sub normalize_command {
+    my ($cmd) = @_;
+
+    # Split command into tokens safely
+    my @tokens = shellwords($cmd);
+
+    # Normalize only the executable path
+    if ( $^O eq 'MSWin32' ) {
+        my @parts = split( '/', $tokens[0] );
+        $tokens[0] = File::Spec->catfile(@parts);
+    }
+
+    # Reassemble command
+    my $fixed_cmd = join( ' ', @tokens );
+    return $fixed_cmd;
+}
 1;
