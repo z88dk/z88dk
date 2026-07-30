@@ -134,7 +134,7 @@ time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 7.
 Z88DK July 30, 2026
 zsdcc / classic c library / math32
-5910 bytes less page zero
+6040 bytes less page zero
 
 error: 2 * 10^(-7)
 
@@ -165,7 +165,7 @@ Slow speed & large size due to float implementation in C.
 10.
 Z88DK July 30, 2026
 sccz80 / classic c library / math32
-5882 bytes less page zero
+5886 bytes less page zero
 
 error: 2 * 10^(-7)
 
@@ -185,7 +185,7 @@ time @ 4MHz  = 19330977133 / 4*10^6 = 80 min 33 sec
 12.
 Z88DK July 30, 2026
 80cc / classic c library / math32
-6393 bytes less page zero
+6383 bytes less page zero
 
 error: 2 * 10^(-7)
 

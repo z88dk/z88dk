@@ -157,7 +157,7 @@ time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 8.
 Z88DK July 30, 2026
 sccz80 / classic / math32
-6012 bytes less page zero
+6016 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
@@ -171,6 +171,7 @@ IEEE 32-bit float implementation, accurate to 7 significant digits.
 8b.
 Z88DK July 30, 2026
 zsdcc / classic / math32
+6949 bytes less page zero
 
 cycle count  = 980391839
 time @ 4MHz  = 980391839 / 4*10^6 =  4 min 5 sec
@@ -193,7 +194,7 @@ IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits
 10.
 Z88DK July 30, 2026
 sccz80 / new c library / math32
-5149 bytes less page zero
+5168 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)

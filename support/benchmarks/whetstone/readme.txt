@@ -234,7 +234,7 @@ SDCC implements its float library in C.
 Z88DK April 30, 2021
 zsdcc #12250 / new c library / math32
 24 bit mantissa + 8 bit exponent
-10113 bytes less page zero
+9894 bytes less page zero
 
 cycle count  = 576187434
 time @ 4MHz  = 576187434 / 4x10^6 = 144.0468 seconds
@@ -245,7 +245,7 @@ MWIPS        = 6.9421 / 1000 = 0.0069421
 Z88DK January 3, 2022
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8861 bytes less page zero
+9092 bytes less page zero
 
 cycle count  = 568209557
 time @ 4MHz  = 568209557 / 4x10^6 = 142.0524 seconds
@@ -256,6 +256,7 @@ MWIPS        = 7.0396 / 1000 = 0.0070396
 Z88DK July 30, 2026
 sccz80 / classic c library / math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+9930 bytes less page zero
 
 cycle count  = 518821237
 time @ 4MHz  = 518821237 / 4x10^6 = 129.7053 seconds
@@ -268,6 +269,7 @@ MWIPS        = 7.7098 / 1000 = 0.0077098
 Z88DK July 30, 2026
 zsdcc / classic c library / math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+10711 bytes less page zero
 
 cycle count  = 526621262
 time @ 4MHz  = 526621262 / 4x10^6 = 131.6553 seconds
@@ -278,6 +280,7 @@ MWIPS        = 7.5956 / 1000 = 0.0075956
 Z88DK July 30, 2026
 sccz80 / classic c library / 8085 / math32
 IEEE 32-bit float (math32_8085)
+11776 bytes less page zero
 
 cycle count  = 1151203352
 time @ 4MHz  = 1151203352 / 4x10^6 = 287.8008 seconds

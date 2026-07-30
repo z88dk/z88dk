@@ -120,7 +120,7 @@ Internal 48-bit float implementation causes relative slowdown.
 5.
 Z88DK July 30, 2026
 zsdcc / classic c library / math32
-4804 bytes less page zero
+4801 bytes less page zero
 
 cycle count  = 1399389032
 time @ 4MHz  = 1399389032 / 4*10^6 = 5 min 50 sec
@@ -169,7 +169,7 @@ Slow speed largely due to float implementation in C.
 10.
 Z88DK July 30, 2026
 sccz80 / classic c library / math32
-4717 bytes less page zero
+4721 bytes less page zero
 
 cycle count  = 1133085641
 time @ 4MHz  = 1133085641 / 4*10^6 =  4 min 43 sec
@@ -190,7 +190,7 @@ IEEE 32-bit float implementation (math32_8085).
 12.
 Z88DK July 30, 2026
 80cc / classic c library / math32
-5458 bytes less page zero
+5460 bytes less page zero
 
 cycle count  = 1270862832
 time @ 4MHz  = 1270862832 / 4*10^6 =  5 min 18 sec
