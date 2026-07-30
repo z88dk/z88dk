@@ -151,9 +151,25 @@ PUBLIC _m32_polyf
     ld h,e
     ld e,d
 
-    and 080h                    ; round using feilipu method
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
+    ld d,a
+    and 080h
     jr Z,fep2
-    set 0,l
+    ld a,d
+    and 07fh
+    jr NZ,fep_up
+    bit 0,l
+    jr Z,fep2
+.fep_up
+    inc l
+    jr NZ,fep2
+    inc h
+    jr NZ,fep2
+    inc e
+    jr NZ,fep2
+    ld e,080h
+    ld hl,0
+    inc b
 
 .fep2
     sla e

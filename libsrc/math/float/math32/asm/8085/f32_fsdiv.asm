@@ -12,7 +12,7 @@
 ; D' := D / 2^(e+1)   ∈ [0.5, 1)   (stored as −D' IEEE for NR)
 ; X  := 140/33 + (−64/11 + 256/99 × D') × D'
 ; X  := X + X × (1 − D' × X)   (×2; seed + residual pack)
-; 1/D packed: exp = X.exp − oexp + 126 + feilipu residual round
+; 1/D packed: exp = X.exp − oexp + 126 + IEEE RNE on residual
 ;
 ; One reserved −D' under the frame; each NR step pushes a working copy
 ; (same discipline as invsqrt). B3: expand −D' + push expanded 1.0,
@@ -142,30 +142,30 @@ PUBLIC _m32_invf
     pop hl
     pop de
     pop af                          ; drop X.bc
-    ; align 32→24: A=residual, EHL=top24
+    ; align 32→24: A=residual, EHL=top24; IEEE RNE
     ld a,l
     ld l,h
     ld h,e
     ld e,d
-    or a
-    jp Z,pk0
+    ld d,a
+    and 080h
+    jp Z,pk0                        ; G=0
+    ld a,d
+    and 07fh
+    jp NZ,pk_up                     ; G=1 S=1 → up
+    ld a,l
+    and 01h
+    jp Z,pk0                        ; tie, even
+.pk_up
     inc l
     jp NZ,pk0
     inc h
     jp NZ,pk0
     inc e
     jp NZ,pk0
-    ; mant overflow from round: >>1, exp++
-    or a                            ; clear CF for logical shifts
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
+    ld e,080h                       ; mant overflow → 1.0, exp++
+    ld h,0
+    ld l,h
     inc b
 .pk0
     ld a,e

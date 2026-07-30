@@ -27,8 +27,9 @@ PUBLIC m32_mulu_32h_32x32
 ; uses  : af, bc, de, hl, bc', de', hl'
 ;
 ; Opt: y1*x1 uses bit15-specialised 16×16 (normalised mants set bit 31).
-; Truncated high-half: omit y0*x0 (z80n-style); suite green + n-body win.
-; Zero-limb skip / p00 sticky / 2 NR invsqrt rejected earlier.
+; Truncated high-half: omit y0*x0; suite green + n-body win.
+; Mid-low sticky: after z1 += low(y0*x1), if bit15(z1) set → set 0,L on
+; final high half (OR).  Max|err|=1; mean bias ~0 (bare trunc ~−0.25).
 ;
 ;------------------------------------------------------------------------------
 
@@ -76,16 +77,19 @@ PUBLIC m32_mulu_32h_32x32
     exx
 
     pop hl
-    add hl,bc                   ; z1 capture carry and abandon
+    add hl,bc                   ; z1 += low(y0*x1)
+    ld a,h                      ; mid-low sticky probe (bit15)
 
     pop hl
     adc hl,de                   ; z2 (partial)
     ex de,hl
 
     ld bc,0
-    rl c                        ; z3 (partial)
+    rl c                        ; c = z3
+    and 080h
+    ld b,a                      ; b7 = sticky, c = z3
 
-    exx                         ; z3z2 (partial) bc'de'
+    exx                         ; bc'de' = sticky:z3 , z2
 
     pop de                      ; y1
     pop hl                      ; x1
@@ -102,12 +106,19 @@ PUBLIC m32_mulu_32h_32x32
     ex de,hl                    ; z2
 
     pop hl
+    ld a,b                      ; sticky
+    ld b,0                      ; bc = z3 only
     adc hl,bc                   ; z3
 
     ex de,hl                    ; z3z2 dehl
 
-    ret                         ; exit  : DEHL = 32-bit product
+    and 080h
+    jr Z,z80_h32_done
+    set 0,l                     ; mid-low sticky → LSB of high half
 
+.z80_h32_done
+    or a                        ; NC
+    ret
 
 ; Made by Runer112 / Analysed by Zeda / Tested by jacobly
 ; https://raw.githubusercontent.com/Zeda/z80float/master/common/mul16.z80

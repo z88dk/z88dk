@@ -31,7 +31,7 @@ This library is also designed to be as fast as possible on the z80 processor, us
 
   *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm. The dedicated square kernel is separate: five `16_8x8` products via `l_mulu_de`, matching the z80n/z180 square layout.
 
-  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
+  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Pack paths use IEEE-754 round-to-nearest-even (RNE) on the residual byte (guard + sticky + LSB tie-to-even).
 
   *  Derived functions are calculated with a 32-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required. This is equivalent to a fused multiply-add process.
 
@@ -71,7 +71,7 @@ Examples of numbers:
     x   11111111     000... infinity  (sign positive or negative, mantissa zero)
     x   11111111     xxx... not a number (sign positive or negative, mantissa non zero)
 ```
-This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support denormal numbers or the round to even convention.  Both of these features could be added in the future with some performance penalty.
+This floating point package is loosely based on IEEE-754. We maintain the packed format and use round-to-nearest-even when packing results from a residual byte, but we do not support denormal numbers.
 
 ```
   IEEE floating point format: 	seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
@@ -85,32 +85,30 @@ Where s is the sign, e is the exponent and m is bits 22-0 of the mantissa. z88dk
 
 IEEE-754 assumes bit 23 of the mantissa is 1 except where the exponent is zero.
 
-IEEE-754 specifies rounding the result by a process of round to even. z88dk math32 uses one guard bit and a sticky bit to round a result per the following tables.
-
-Both results are free of bias with IEEE method having a slight edge with rounding error.
+IEEE-754 specifies rounding the result by a process of round to nearest, ties to even. z88dk math32 applies that rule when packing a 24-bit mantissa from a 32-bit product or expanded intermediate, using the residual low byte:
 
 ```
 -------------------------------------------------------------------------
-    IEEE round to nearest:
+    IEEE round to nearest, ties to even (math32 pack):
 
-    b g s  (b=lsbit g=guard s=sticky)
-    0 0 0  exact
-    0 0 1  -.001
-    0 1 0  -.01
-    0 1 1  +.001
-    1 0 0  exact
-    1 0 1  -.001
-    1 1 0  +.01
-    1 1 1  +.001
--------------------------------------------------------------------------
+    After product/align, residual byte R is the bits below the kept
+    24-bit mantissa.  G = R.7 (guard), S = R[6:0] (sticky), B = mant LSB.
 
-    z88dk math32 (feilipu sticky):
+    round_up = G && (S || B); then 24-bit mant++ (overflow → 1.0, exp++).
 
-    After a 24- or 32-bit mantissa product/align, the bits below the
-    kept mantissa are tested with `and 0c0h` (top two residual bits).
-    If either is set, the mantissa LSB is forced on (`set 0,l`).
-    This is not IEEE round-to-nearest-even; it is a cheap sticky-LSB
-    rule used by mul, sqr, invsqrt, and related pack paths.
+    b g s  (b=lsbit g=guard s=sticky)   action
+    0 0 0  exact                        stay
+    0 0 1  -.001                        stay (truncate)
+    0 1 0  tie, even                    stay
+    0 1 1  +.001                        up
+    1 0 0  exact                        stay
+    1 0 1  -.001                        stay
+    1 1 0  tie, odd                     up
+    1 1 1  +.001                        up
+
+    Used on mul, sqr, div, poly, and invsqrt/sqrt pack paths.
+    Mid-low sticky inside truncated high-half multiplies is separate:
+    it only ORs product bits for the high half and is not a pack RNE step.
 -------------------------------------------------------------------------
 ```
 
@@ -239,7 +237,7 @@ The multiply function is implemented with a `mulu_32h_24x24` mantissa calculatio
 
 The mantissa multiplication is not a "correct" multiply, as not all carry bits are passed into the returned bytes. The low order mantissa term is not calculated and the low order bytes are simply truncated. The lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa. This method minimises the number of `16_8x8` multiplies required to generate a correct 24-bit mantissa.
 
-A simple rounding method is used, but a more sophisticated method IEEE compliant method could be applied as needed.
+IEEE RNE on the residual byte is applied in `_fsmul` / `_fssqr` when packing the 24-bit mantissa.
 
 The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, `f32_8085_sqr_*`).
 

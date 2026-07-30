@@ -145,16 +145,31 @@ PUBLIC _m32_polyf
     jp fep0
 
 .fep1
-    ; pack expanded → IEEE DEHL
+    ; pack expanded → IEEE DEHL (IEEE RNE on residual)
     ld a,l
     ld l,h
     ld h,e
-    ld e,d
+    ld e,d                          ; A=residual, EHL=top24
+    ld d,a
     and 080h
-    jp Z,fep2
+    jp Z,fep2                       ; G=0
+    ld a,d
+    and 07fh
+    jp NZ,fep_up                    ; G=1 S=1 → up
     ld a,l
-    or 1
-    ld l,a
+    and 01h
+    jp Z,fep2                       ; tie, even
+.fep_up
+    inc l
+    jp NZ,fep2
+    inc h
+    jp NZ,fep2
+    inc e
+    jp NZ,fep2
+    ld e,080h
+    ld h,0
+    ld l,h
+    inc b
 .fep2
     ld a,e
     add a,a

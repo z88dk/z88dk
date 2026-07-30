@@ -117,29 +117,30 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     pop af
     pop af                          ; drop reserved −y
 
-    ; pack expanded → IEEE (positive); feilipu residual round (same as inv)
+    ; pack expanded → IEEE (positive); IEEE RNE on residual
     ld a,l
     ld l,h
     ld h,e
     ld e,d                          ; A=residual, EHL=top24
-    or a
-    jp Z,sq0
+    ld d,a
+    and 080h
+    jp Z,sq0                        ; G=0
+    ld a,d
+    and 07fh
+    jp NZ,sq_up                     ; G=1 S=1 → up
+    ld a,l
+    and 01h
+    jp Z,sq0                        ; tie, even
+.sq_up
     inc l
     jp NZ,sq0
     inc h
     jp NZ,sq0
     inc e
     jp NZ,sq0
-    or a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
+    ld e,080h
+    ld h,0
+    ld l,h
     inc b
 .sq0
     ld a,e

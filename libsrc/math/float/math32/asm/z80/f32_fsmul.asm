@@ -104,7 +104,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld a,h                      ; calculate the exponent
     or a                        ; second exponent zero then result is zero
-    jr Z,mulzero
+    jp Z,mulzero                ; jp: RNE pack lengthens tail past jr range (r4k)
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
@@ -114,7 +114,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld b,a
     ld a,h                      ; first exponent
     or a
-    jr Z,mulzero                ; 0 * y -> signed zero
+    jp Z,mulzero                ; 0 * y -> signed zero
     ld a,b
     add a,h                     ; sum of exponents
     jp C,mulovl
@@ -126,15 +126,15 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld b,a
     ld a,h                      ; first exponent
     or a
-    jr Z,mulzero                ; 0 * y -> signed zero
+    jp Z,mulzero                ; 0 * y -> signed zero
     ld a,b
     add a,h                     ; add the exponents
-    jr NC,mulzero
+    jp NC,mulzero
 
 .fmnouf
     ld b,a
     or a
-    jr Z,mulzero                ; check sum of exponents for zero
+    jp Z,mulzero                ; check sum of exponents for zero
 
     ex af,af
     ld a,b
@@ -160,7 +160,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     inc b
     jp Z,m32_fsconst_pnan       ; capture overflow from NaN
     inc b
-    jr Z,mulovl                 ; capture overflow into Inf
+    jp Z,mulovl                 ; capture overflow into Inf
     dec b
 
 .fm3
@@ -169,9 +169,26 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld h,l
     ld l,d
 
-    and 0c0h                    ; round using feilipu method
-    jr Z,fm4
-    set 0,l
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
+    ld d,a
+    and 080h
+    jr Z,fm4                    ; G=0 → truncate
+    ld a,d
+    and 07fh
+    jr NZ,fm_up                 ; G=1 S=1 → up
+    bit 0,l
+    jr Z,fm4                    ; tie, already even
+.fm_up
+    inc l
+    jr NZ,fm4
+    inc h
+    jr NZ,fm4
+    inc e
+    jr NZ,fm4
+    ld e,080h                   ; mant overflow → 1.0, exp++
+    ld hl,0
+    inc b
+    jr Z,fm_rnovl
 
 .fm4
     sla e                       ; adjust mantissa for exponent
@@ -180,6 +197,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     rr de                       ; put sign and 7 exp bits into place
                                 ; put last exp bit into place
     ret                         ; return IEEE DEHL
+
+.fm_rnovl
+    sla c
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf
 
 .mulovl
     ex af,af                    ; get sign

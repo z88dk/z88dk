@@ -115,9 +115,26 @@ PUBLIC _m32_sqrf
     ld h,l
     ld l,d
 
-    and 0c0h                    ; round using feilipu method
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
+    ld d,a
+    and 080h
     jr Z,fs3
-    set 0,l
+    ld a,d
+    and 07fh
+    jr NZ,fs_up
+    bit 0,l
+    jr Z,fs3
+.fs_up
+    inc l
+    jr NZ,fs3
+    inc h
+    jr NZ,fs3
+    inc e
+    jr NZ,fs3
+    ld e,080h
+    ld hl,0
+    inc b
+    jp Z,m32_fsconst_pinf
 
 .fs3
     sla e                       ; adjust mantissa for exponent

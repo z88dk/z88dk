@@ -183,16 +183,24 @@ PUBLIC _m32_invf
     ld h,e
     ld e,d
 
-    or a                        ; round using feilipu method
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
+    ld d,a
+    and 080h
     jr Z,fd0
+    ld a,d
+    and 07fh
+    jr NZ,fd_up
+    bit 0,l
+    jr Z,fd0
+.fd_up
     inc l
     jr NZ,fd0
     inc h
     jr NZ,fd0
     inc e
     jr NZ,fd0
-    rr e
-    rr hl
+    ld e,080h                   ; mant overflow → 1.0, exp++
+    ld hl,0
     inc b
 
 .fd0
