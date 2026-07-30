@@ -3,6 +3,9 @@
 ;-------------------------------------------------------------------------
 ;  asm_f16_mul — 8085 half mul (stack-balanced)
 ;-------------------------------------------------------------------------
+; Half×half (asm_f16_mul_callee): packed field extract + 11×11 + pack.
+; f24_mul: stack frame for poly/inv/div (left-aligned 16-bit mants).
+;
 ; f24_mul_f24 after CALL: [cret][X.hl][X.de]
 ; Frame after setup: [cret][Y.hl][Y.de][X.hl][X.de]
 ;   Y.hl +2 (mant), Y.de +4 (E=sign,D=exp), X.hl +6, X.de +8
@@ -11,8 +14,9 @@
 SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f24_f16
 EXTERN asm_f16_f24
+EXTERN asm_f16_zero
+EXTERN asm_f16_inf
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
 
@@ -21,20 +25,233 @@ PUBLIC asm_f24_mul_callee
 PUBLIC asm_f24_mul_f24
 PUBLIC f16_8085_mulu_32_16x16
 
+;-------------------------------------------------------------------------
+; Packed half×half mul (8085-native: no exx / ex af,af / srl / bit / set).
+; Half: S EEEEE MMMMMMMMMM.  mant11 = (hl & 0x3ff) | 0x400.
+; Product p in [2^20, ~2^22) fits in EHL (D=0).
+;   p <  2^21: mant = p >> 5
+;   p >= 2^21: mant = p >> 6, exp++
+; then asm_f16_f24.
+;-------------------------------------------------------------------------
+
+; enter: HL=y, stack=[uret][x] → half product in HL
 .asm_f16_mul_callee
-    ; HL=y, stack=[uret][x]
-    ; Mul is commutative: leave y on stack as f24_mul's X, x in DEHL as Y.
-    call asm_f24_f16            ; y → f24
-    push de
-    push hl                     ; [y.hl][y.de][uret][x]
-    ld de,sp+6
-    ld hl,(de)                  ; x half
-    call asm_f24_f16            ; x → f24 in DEHL
-    call asm_f24_mul_f24        ; drops y; leaves [uret][x]
-    pop bc                      ; uret
-    pop af                      ; consume x
-    push bc
+    pop bc                      ; uret (never pop af for return)
+    pop de                      ; x half
+    push bc                     ; [uret]
+
+    ld a,d
+    xor h
+    and 080h
+    push af                     ; [sign][uret]  sign in A[7]
+
+    ; ---- y: exp + mant11 ----
+    ld a,h
+    and 07ch
+    jp Z,hmul_uzero
+    rrca
+    rrca
+    ld b,a                      ; B = y.exp
+    ld a,h
+    and 003h
+    or 004h
+    ld h,a                      ; HL = y mant11
+    push hl                     ; [ym][sign][uret]
+
+    ; ---- x: exp + mant11 ----
+    ld a,d
+    and 07ch
+    jr Z,hmul_xzero_pop
+    rrca
+    rrca
+    ld c,a                      ; C = x.exp
+    ld a,d
+    and 003h
+    or 004h
+    ld d,a                      ; D:E = x mant11
+    ld h,d
+    ld l,e                      ; HL = x mant11
+    pop de                      ; DE = y mant11
+
+    ; ---- half exp → f24-biased ----
+    ld a,b
+    add a,c
+    sub 15
+    jp Z,hmul_uzero_s           ; under (sign still on stack)
+    jp C,hmul_uzero_s
+    cp 31
+    jp NC,hmul_uinf_s
+
+    add a,127-15
+    ld b,a                      ; B = f24 exp
+    push bc                     ; [f24exp][sign][uret]  (C free)
+
+    call f16_8085_mulu_32_16x16 ; DE * HL → DEHL (11×11, early-out)
+
+    pop bc                      ; B = f24 exp
+    ; D = 0 for 11×11; bit21 of p is E[5]
+    ld a,e
+    and 020h
+    jr NZ,hmul_ge2
+
+    ; mant = p >> 5  (logical: clear C, then rra E→H→L ×5)
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    jr Z,hmul_pack
+    ld a,l
+    or 001h
+    ld l,a
+    jr hmul_pack
+
+.hmul_ge2
+    inc b
+    jr Z,hmul_uinf_pop
+    ; mant = p >> 6
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    rra
+    ld e,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,l
+    rra
+    ld l,a
+    ld a,e
+    or a
+    jr Z,hmul_pack
+    ld a,l
+    or 001h
+    ld l,a
+
+.hmul_pack
+    pop af                      ; sign
+    ld e,a
+    ld d,b                      ; f24 exp
     jp asm_f16_f24
+
+.hmul_xzero_pop
+    pop hl                      ; drop y mant11
+.hmul_uzero
+    pop af                      ; sign
+    ld e,a
+    jp asm_f16_zero
+
+.hmul_uzero_s
+    pop af                      ; sign (ym already popped)
+    ld e,a
+    jp asm_f16_zero
+
+.hmul_uinf_s
+    pop af
+    ld e,a
+    jp asm_f16_inf
+
+.hmul_uinf_pop
+    pop af                      ; sign (f24 exp already popped)
+    ld e,a
+    jp asm_f16_inf
+
 
 .asm_f24_mul_callee
 .asm_f24_mul_f24

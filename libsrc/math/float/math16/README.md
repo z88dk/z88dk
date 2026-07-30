@@ -3,7 +3,7 @@
 
 This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point maths package, designed to work with the SCCZ80 IEEE-754 half precision 16-bit interfaces.
   
-This library is designed for z80, z180, z80n, and **Intel 8085** processors. On z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n, hardware `16_8x8` multiply accelerates mantissa work. On 8085, CPU-specific cores live under `asm/8085/` (shared specials/coeffs under `asm/`) (no `exx`/IX/IY; stack frames for the second operand) and link as **`math16_8085.lib`** via `--math16` with `-clib=8085`.
+This library is designed for z80, z180, z80n, and Intel 8085 processors. On z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n, hardware `16_8x8` multiply accelerates mantissa work. On 8085, CPU-specific cores live under `asm/8085/` (shared specials/coeffs under `asm/`) (no `exx`/IX/IY; stack frames for the second operand) and link as **`math16_8085.lib`** via `--math16` with `-clib=8085`.
 
 The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only.
 
@@ -18,7 +18,8 @@ The specialised nature of 16-bit floating point implies that this is an adjunct 
   *  All the code is re-entrant.
 
   *  Z80 family: register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
-  *  **8085:** no alternate register set; second f24 operand and temps on the **stack** only (`ld de,sp+*`, `ld hl,(de)`). Extended 8085 ops preferred. Library asm is not copt’d.
+
+ *  8085: no alternate register set; second f24 operand and temps on the **stack** only (`ld de,sp+*`, `ld hl,(de)`). Extended 8085 ops preferred. Library asm is not copt’d.
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
@@ -157,23 +158,45 @@ Normal functions `f16_`, assume the calling convention of sccz80 or sdcc dependi
 
 The library is laid out in these directories.
 
-### z80
+### asm/
 
-Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the IEEE-754 standard and various low level functions necessary to implement a float package accessible from assembly language.  These functions are the intrinsic `math16` functions.
+Shared portable pieces used by every CPU product: specials (`zero` / `inf` / `nan` / `neg` / `sigdig`) and polynomial coefficient tables (`coeff_f16_*`).
+
+### asm/z80/
+
+Z80-family cores (also assembled for z180 / z80n / r2ka / … where the same sources apply). Intrinsic half and f24 operations, expand/pack, poly, sqrt, compare, etc.
+
+### asm/8085/
+
+Intel 8085 cores only (`math16_8085.lib`). Same public entry names as the Z80 tree where the API matches; implementation is stack-based (no `exx` / IX / IY). See **CPU implementation strategies** below and `asm/8085/README`.
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required. Higher-level 8085-only C lives under `c/8085/` when present.
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm/z80` (or `asm/8085`) directory. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
 ### lm16
 
 Glue that connects the compilers and standard assembly interface to the `math16` library.  The purpose is to define aliases that connect the standard names to the math16 specific names.  These functions make up the complete z88dk math16 library that is linked against on the compile line as `-lmath16`.
 
 An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple command line alternative to `-lmath16 -Cc-D__MATH_MATH16 -D__MATH_MATH16`.
+
+## CPU implementation strategies
+
+Half and f24 **semantics** (bias, rounding sticky rules, specials at pack/expand) are shared. **Code paths are CPU-specific** — there is no single cross-CPU source for hot cores.
+
+| Area | Shared strategy | Z80-family | 8085 |
+|------|-----------------|------------|------|
+| **Half×half mul** (`asm_f16_mul_callee`) | Packed field extract; 11-bit mants; integer product; place (`>>5` / `>>6`+inc exp); pack via `asm_f16_f24` | `ex af,af` for sign; `srl`/`bit`/`set`; local Runer112 mulu with early-out entry for 11-bit and bit15-specialised entry for f24 | Sign on stack; open-coded logical EHL `>>`; one early-out `f16_8085_mulu_32_16x16` for both packed and f24 |
+| **f24 mul** (poly / inv / div / sqrt) | Left-aligned 16-bit mants; exp sum with bias 127; renorm + sticky | Alternate register set for second operand | Stack frame for second f24 (`ld de,sp+*`) |
+| **Expand** (`asm_f24_f16`) | Half → f24 | `rr hl` / `rra` path (cheaper on Z80) | Field extract + `add hl,hl` ×5 + implicit bit (no cheap 16-bit `rr`) |
+| **Pack** (`asm_f16_f24`) | f24 → half with low-bit rounding | `add hl,hl` for mant positioning | Same idea (`add hl,hl` ×3 + sign via A) |
+| **Add / compare / …** | Same algorithms | `exx`, native CB shifts | Stack second operand; open-coded shifts |
+
+Deliberate non-goals: one shared mul body for both CPUs; forcing Z80 expand into the 8085 field form (or the reverse) — each form is the cheaper expand on that ISA.
 
 ## Function Discussion
 
@@ -293,23 +316,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
----
-
-## Intel 8085 product (`math16_8085.lib`)
-
-| Item | Detail |
-|------|--------|
-| Build | `make -C libsrc/math/float/math16` → `math16_8085.lib` (also `make -C c 8085` for higher C) |
-| Install | `make -C libsrc install` → `lib/clibs/math16_8085.lib` |
-| Link | `zcc +… -clib=8085 --math16 …` → `-lmath16_8085` via `@{ZCC_LIBCPU}` |
-| Layout | Cores `asm/8085/` + shared `asm/` (specials, coeffs); higher sccz80 C in `c/8085/`; lists `newlibfiles_8085.lst` |
-| Compilers | **sccz80** primary (`l_f16_*`); **80cc** shares `l_f16_*`; **sdcc** explicit half surface as on Z80 (no native half codegen) |
-| Tests | `test/suites/math` recipe `test_math16_8085.bin` (`-m8085` ticks) |
-| Adjunct | No printf/scanf/dtoa in this library |
-
-**Correctness (2026-07):** Z80 `test_math16.bin` **13/13**. 8085 `test_math16_8085.bin` **13/13** (`-m8085`). Higher C via `c/8085/` + `--math16`.
-
-Internal **f24** ABI (d/e/hl) matches the Z80 documentation above; only implementation differs. Cores use stack frames (no `exx`); sccz80 callee entry is **`[uret][x]`**, HL=y. `asm_f24_f16` uses **B** as temp — frexp/ldexp-style helpers must preserve BC across expand.
-

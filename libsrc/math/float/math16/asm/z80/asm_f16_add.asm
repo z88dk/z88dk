@@ -108,7 +108,7 @@ PUBLIC asm_f24_add_f24
                                 ; x mantissa: hl  = 1mmmmmmm mmmmmmmm
 
     cp a,d                      ; nc if a>=b
-    jp Z,alignzero              ; no alignment needed, exponents equal
+    jr Z,alignzero              ; no alignment needed, exponents equal
     jr NC,sort                  ; if a larger than b
     ld a,d
     exx
@@ -116,7 +116,7 @@ PUBLIC asm_f24_add_f24
 .sort
     sub a,d                     ; positive difference in a
     cp  a,1                     ; if one difference, special case
-    jp Z,alignone               ; smaller mantissa on top
+    jr Z,alignone               ; smaller mantissa on top
 
     cp a,16                     ; check for too many shifts
     jr C,align                  ; if 15 or fewer shifts

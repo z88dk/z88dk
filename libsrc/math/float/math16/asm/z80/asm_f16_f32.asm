@@ -91,17 +91,16 @@ PUBLIC asm_f32_f16
     cp 31
     jp NC,asm_f16_inf           ; infinity if number too large
 
-    sla l                       ; position mantissa
-    rl h                        ; remove implicit bit
-    sla l
-    rl h
-    rla                         ; move mantissa into a
-    sla l
-    rl h
+    ; Position mantissa into half layout (bit-identical to sla l/rl h ×3).
+    ; add hl,hl is 11T vs sla l+rl h = 16T per double — ~15T saved here.
+    add hl,hl                   ; shift out implicit 1 (discarded by next)
+    add hl,hl                   ; first explicit mant bit → C
+    rla                         ; mix into exp field
+    add hl,hl
     rla
-    rla                         ; set a ready for sign
-    sla e                       ; move sign to carry
-    rra                         ; place it in a, with exponent and mantissa
+    rla                         ; room for sign at bit 7
+    sla e                       ; sign → C
+    rra                         ; place sign with exp+mant
     ld l,h                      ; position f16 in hl
     ld h,a
     ret
