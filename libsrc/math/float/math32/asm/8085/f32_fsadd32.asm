@@ -41,11 +41,10 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld a,d
     rla
     ld b,a
-    or a
+    ; Implicit 1: CF=(exp!=0). 255+exp carries iff exp!=0 (subnormals/zero keep CF=0).
+    ld a,255
+    add a,b
     ld a,e
-    jp Z,a24z
-    scf
-.a24z
     rra
     ld d,a
     ld e,h

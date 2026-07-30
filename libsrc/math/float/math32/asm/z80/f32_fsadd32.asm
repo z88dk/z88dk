@@ -94,10 +94,9 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     xor c                       ; check if op1.s==op2.s
     ex af,af                    ; save results sign in f' (C clear in af')
 
-    ld a,h
-    or a
-    jr Z,faunp2                 ; add implicit bit if op2.e!=0
-    scf
+    ; Implicit 1: CF=(exp!=0). 255+exp carries iff exp!=0 (subnormals/zero keep CF=0).
+    ld a,255
+    add a,h
 
 .faunp2
     rr l                        ; rotate in op2.m's implicit bit

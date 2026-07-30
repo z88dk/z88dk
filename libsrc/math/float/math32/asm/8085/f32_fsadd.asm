@@ -232,11 +232,9 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld b,a
     add hl,hl
     ld c,h
-    ld a,h
-    or a
-    jp Z,un0
-    scf
-.un0
+    ; Implicit 1: CF=(exp!=0). 255+exp carries iff exp!=0 (subnormals/zero keep CF=0).
+    ld a,255
+    add a,h
     ld a,l
     rra
     ld l,a
