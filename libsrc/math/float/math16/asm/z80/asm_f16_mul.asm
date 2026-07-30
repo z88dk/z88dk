@@ -42,6 +42,8 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
+EXTERN asm_f16_zero
+EXTERN asm_f16_inf
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
 
@@ -51,19 +53,147 @@ PUBLIC asm_f24_mul_callee
 
 PUBLIC asm_f24_mul_f24
 
-; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
+;-------------------------------------------------------------------------
+; Half×half mul (packed): field extract + 11×11 product + pack.
+; Keeps f24_mul for poly/inv/div intermediates (left-aligned 16-bit mants).
+;
+; Half: S EEEEE MMMMMMMMMM.  Finite mant11 = (hl & 0x3ff) | 0x400.
+; Product p of two mant11 is in [2^20, ~2^22) and fits in EHL (D=0).
+; Build f24-compatible left-aligned 16-bit mant:
+;   p <  2^21:  mant = p >> 5
+;   p >= 2^21:  mant = p >> 6, exp++
+; then pack with asm_f16_f24.
+;-------------------------------------------------------------------------
+
+; enter: y in HL, x on stack → half product in HL
 .asm_f16_mul_callee
-    call asm_f24_f16            ; expand to dehl
-    exx                         ; y    d'  = eeeeeeee e = s-------
-                                ;      hl' = 1mmmmmmm mmmmmmmm
-    pop hl                      ; pop return address
-    ex (sp),hl                  ; get second operand off of the stack,
-                                ; return address on stack
-    call asm_f24_f16            ; expand to dehl
-                                ; x     d  = eeeeeeee e = s-------
-                                ;       hl = 1mmmmmmm mmmmmmmm
-    call asm_f24_mul_f24
+    pop bc                      ; return
+    pop de                      ; x half
+    push bc                     ; return back
+
+    ld a,d
+    xor h
+    ex af,af                    ; result sign in A'[7]
+
+    ; ---- y: exp + mant11 ----
+    ld a,h
+    and 07ch
+    jp Z,hmul_uzero
+    rrca
+    rrca
+    ld b,a                      ; B = y.exp
+    ld a,h
+    and 003h
+    or 004h
+    ld h,a                      ; HL = y mant11
+    push hl
+
+    ; ---- x: exp + mant11 ----
+    ld a,d
+    and 07ch
+    jp Z,hmul_xzero_pop         ; jp: far labels (r4k/r2ka encoding can exceed jr)
+    rrca
+    rrca
+    ld c,a                      ; C = x.exp
+    ld a,d
+    and 003h
+    or 004h
+    ld d,a                      ; D:E = x mant11 (E = original half low)
+    ld h,d
+    ld l,e                      ; HL = x mant11
+    pop de                      ; DE = y mant11
+
+    ; ---- result half exp, then f24-biased for pack ----
+    ld a,b
+    add a,c
+    sub 15
+    jp Z,hmul_uzero
+    jp C,hmul_uzero
+    cp 31
+    jp NC,hmul_uinf
+
+    add a,127-15
+    push af                     ; B gets f24 exp on pop (push af → pop bc: B=A)
+
+    ; ---- 11×11 product (small high byte → early-out mulu) ----
+IF __CPU_Z80__
+    call mulu_32_16x16_gen
+ELSE
+    EXTERN l_mulu_32_16x16
+    call l_mulu_32_16x16
+ENDIF
+    ; DEHL = p, D = 0 always for 11×11
+
+    pop bc                      ; B = f24 exp
+
+    bit 5,e                     ; bit21 of p?
+    jr NZ,hmul_ge2
+
+    ; mant = p >> 5  (EHL >> 5 → HL)
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    ld a,e
+    or a
+    jr Z,hmul_pack
+    set 0,l
+    jr hmul_pack
+
+.hmul_ge2
+    inc b
+    jp Z,hmul_uinf
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    srl e
+    rr h
+    rr l
+    ld a,e
+    or a
+    jr Z,hmul_pack
+    set 0,l
+
+.hmul_pack
+    ex af,af                    ; A = result sign
+    ld e,a
+    ld d,b                      ; f24 exp
     jp asm_f16_f24
+
+.hmul_xzero_pop
+    pop hl                      ; drop y mant11
+.hmul_uzero
+    ex af,af
+    ld e,a
+    jp asm_f16_zero
+
+.hmul_uinf
+    ex af,af
+    ld e,a
+    jp asm_f16_inf
 
 
 ; enter here for floating asm_f24_mul_callee, x+y, x on stack, y in dehl, result in dehl
@@ -101,18 +231,7 @@ PUBLIC asm_f24_mul_f24
     ld a,b
     add a,d                     ; sum of exponents
     jr C,mulovl
-    jr fmnouf
-
-.fmchkuf
-    exx                         ; main = x
-
-    ld b,a
-    ld a,d                      ; x.exp
-    or a
-    jr Z,mulzero
-    ld a,b
-    add a,d                     ; add the exponents
-    jr NC,mulzero
+    ; fall through to fmnouf (common finite path)
 
 .fmnouf
     ld b,a
@@ -168,6 +287,18 @@ ENDIF
     ld e,c                      ; put sign into e[7]
     ret                         ; return f24 in DEHL
 
+.fmchkuf
+    exx                         ; main = x
+
+    ld b,a
+    ld a,d                      ; x.exp
+    or a
+    jr Z,mulzero
+    ld a,b
+    add a,d                     ; add the exponents
+    jr NC,mulzero
+    jr fmnouf
+
 .mulovl
     ex af,af                    ; get sign
     ld e,a
@@ -181,21 +312,18 @@ ENDIF
 
 IF __CPU_Z80__
 
-; Made by Runer112
-; Analysed by Zeda
+; Made by Runer112 / Analysed by Zeda / Tested by jacobly
 ; https://raw.githubusercontent.com/Zeda/z80float/master/common/mul16.z80
-; Tested by jacobly
+;
+; Two entries, one unrolled body:
+;   mulu_32_16x16     — f24 path: bit15 set, skip leading-zero scan
+;   mulu_32_16x16_gen — packed half: 11-bit mants, full early-out
 ;
 ; DE*HL --> DEHL
-;
-; enter : de   = 16-bit multiplicand  = x
-;         hl   = 16-bit multiplier = y
-;
-; exit  : dehl = 32-bit product
-;
 ; uses  : af, bc, de, hl
 
-.mulu_32_16x16
+; Packed-half entry first: early-out jumps forward into shared body
+.mulu_32_16x16_gen
 
     ld a,d
     ld d,0
@@ -241,6 +369,16 @@ IF __CPU_Z80__
     ld h,d
     ld l,e
     ret
+
+; f24 entry: bit15 set → fall into shared chain
+.mulu_32_16x16
+
+    ld b,h
+    ld c,l
+    ld a,d
+    ld d,0
+    add a,a                     ; D7 always 1; C set
+                                ; fall through to .bit14
 
 .bit14
     add hl,hl

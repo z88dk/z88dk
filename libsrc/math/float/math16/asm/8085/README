@@ -1,8 +1,32 @@
-8085 math16 cores (CPU-specific). Built with -m8085; no exx/IX/IY.
-Stack-only second operands; f24 layout d=exp, e=sign, hl=mant.
+# 8085 math16 cores
 
-Shared portable pieces live in parent asm/:
-  asm_f16_{zero,inf,nan,neg,sigdig}.asm  — specials (8080-safe)
-  coeff_f16_*.asm                 — polynomial tables (DEFQ rodata)
+CPU-specific half / f24 implementation. Assembled with `-m8085` into **`math16_8085.lib`** (`newlibfiles_8085.lst`).
 
-Product: math16_8085.lib via newlibfiles_8085.lst
+## Rules
+
+- No `exx`, IX, or IY. Second f24 operand and temps on the **stack** only (`ld de,sp+*`, `ld hl,(de)`, `ld (de),hl`).
+- Prefer 8085 extended ops (`rl de`, `sra hl`, `sub hl,bc`, …) where they help.
+- **Never** `pop af` a return address (F bit 3 hardwired 0). Use BC/DE/HL for return words; `pop af` only to discard unused stack words.
+- Library asm is not run through copt.
+
+## Shared with Z80 product
+
+Portable specials and coeffs live in parent `asm/`:
+
+- `asm_f16_{zero,inf,nan,neg,sigdig}.asm`
+- `coeff_f16_*.asm`
+
+Public entry **names** match the Z80 cores where the API is the same (`asm_f16_mul_callee`, `asm_f24_add_f24`, …).
+
+## Strategy vs Z80 (summary)
+
+Full table: parent **`README.md` → CPU implementation strategies**.
+
+| Topic | 8085 choice |
+|-------|-------------|
+| Half×half mul | Packed 11×11 (same algorithm as Z80; stack/sign/shift encoding differs) |
+| f24 mul | Stack frame; single early-out 16×16 helper |
+| Expand | Field extract + `add hl,hl` (no cheap `rr hl`) |
+| Pack | `add hl,hl` mant positioning |
+
+No cross-CPU single source for these hot paths — each tree is optimised for its ISA.
