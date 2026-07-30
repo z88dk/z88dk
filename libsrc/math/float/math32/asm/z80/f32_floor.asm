@@ -20,8 +20,10 @@ PUBLIC _m32_floorf
     ret Z                       ; positive -> trunc is floor
 
     ; negative with fraction: trunc - 1
+    ; Must CALL callee (not JP): fssub_callee pops return address then left operand.
     push de
     push hl
     ld de,$3f80
     ld hl,$0000
-    jp m32_fssub_callee
+    call m32_fssub_callee
+    ret

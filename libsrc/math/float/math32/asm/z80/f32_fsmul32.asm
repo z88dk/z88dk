@@ -98,13 +98,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     add a,b
     jp C,mulovl
-    jr fmnouf
-
-.fmchkuf
-    exx
-
-    add a,b                     ; add the exponents
-    jp NC,mulzero
+    ; fall through to fmnouf (common finite path)
 
 .fmnouf
     ld b,a
@@ -126,14 +120,14 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     bit 7,d                     ; need to shift result left if msb!=1
     jr NZ,fm0
-    add hl,hl    
+    add hl,hl
     rl de
     ret                         ; return BC DEHL
 
 .fm0
     inc b
     ret NZ                      ; return BC DEHL
-                                ; othewise overflow
+                                ; otherwise overflow → mulovl
 .mulovl
     ex af,af                    ; get sign
     ld c,a
@@ -141,8 +135,15 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld d,0
     ld e,d
     ld h,d
-    ld h,d
+    ld l,d
     ret                         ; done overflow
+
+.fmchkuf
+    exx
+
+    add a,b                     ; add the exponents
+    jp NC,mulzero
+    jp fmnouf
 
 .mulzero
     ex af,af                    ; get sign

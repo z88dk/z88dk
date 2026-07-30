@@ -90,10 +90,20 @@ PUBLIC _m32_ldexpf
     inc a
     jr Z,ldexp_pack             ; Inf/NaN: unchanged
 
+    ; exp in D (1..254), pw2 low byte in C as int8_t.
+    ; 8-bit ADD of unsigned exp + two's-complement pw2:
+    ;   pw2 >= 0, NC: A = exp+pw2; check 0 / 0xff
+    ;   pw2 >= 0,  C: overflow
+    ;   pw2 <  0,  C: A = exp+pw2 (in range); 0 => underflow
+    ;   pw2 <  0, NC: exp+pw2 < 0 => underflow
     ld a,d
-    add a,c                     ; new_exp = exp + pw2
-    jr C,ldexp_wrap             ; unsigned wrap: over or under
+    add a,c                     ; new_exp mod 256, CF = unsigned carry
+    jr C,ldexp_wrap
 
+    bit 7,c
+    jr NZ,ldexp_uflow           ; negative pw2, no carry => below 0
+
+.ldexp_result
     or a
     jr Z,ldexp_uflow
     ld d,a
@@ -108,7 +118,8 @@ PUBLIC _m32_ldexpf
 
 .ldexp_wrap
     bit 7,c
-    jr NZ,ldexp_uflow           ; negative pw2 wrap -> under
+    jr Z,ldexp_oflow            ; non-negative pw2 + carry => overflow
+    jr ldexp_result             ; negative pw2 + carry => A is new exp
 
 .ldexp_oflow
     ld a,e

@@ -239,6 +239,7 @@
 ../../../math/float/math32/lm32/c/sccz80/l_f32_swap.asm
 ../../../math/float/math32/lm32/c/sccz80/l_f32_zero.asm
 ../../../math/float/math32/lm32/c/sccz80/ldexp.asm
+../../../math/float/math32/lm32/c/sccz80/ldexp_callee.asm
 ../../../math/float/math32/lm32/c/sccz80/log.asm
 ../../../math/float/math32/lm32/c/sccz80/log_fastcall.asm
 ../../../math/float/math32/lm32/c/sccz80/log10.asm
