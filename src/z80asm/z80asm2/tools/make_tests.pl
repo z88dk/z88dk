@@ -24,7 +24,7 @@ sub collect_tests {
     my @tests;
     for my $cpp_file ( path($dir)->children(qr/\.cpp$/) ) {
         for my $line ( $cpp_file->lines ) {
-            if ( $line =~ /^ \s* void \s+ (test_\w+) \s* \( \s* \) /x ) {
+            if ( $line =~ /^ \s* void \s+ (test_\w+) \s* \( /x ) {
                 push @tests, $1;
             }
         }

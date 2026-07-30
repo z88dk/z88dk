@@ -177,6 +177,9 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\test\test_driver.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\z80asm2\test\test_obj.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\z80asm2\environment.h">
