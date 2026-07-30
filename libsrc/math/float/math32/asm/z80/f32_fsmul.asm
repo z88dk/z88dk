@@ -87,10 +87,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     exx                         ; first h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
 
-    pop bc                      ; pop return address
+    pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret → stack
 
 .fmrejoin
     xor a,h                     ; xor sign flags
@@ -107,29 +106,19 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp Z,mulzero                ; jp: RNE pack lengthens tail past jr range (r4k)
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
+    exx
+    ld b,a                      ; bias-adjusted second exp
     jr C,fmchkuf
 
-    exx
-
-    ld b,a
-    ld a,h                      ; first exponent
-    or a
-    jp Z,mulzero                ; 0 * y -> signed zero
-    ld a,b
     add a,h                     ; sum of exponents
-    jp C,mulovl
+    jp C,mulovl                 ; only if h != 0
+    cp b                        ; a == b ⇒ first exp was 0
+    jp Z,mulzero                ; 0 * y -> signed zero
     jr fmnouf
 
 .fmchkuf
-    exx
-
-    ld b,a
-    ld a,h                      ; first exponent
-    or a
-    jp Z,mulzero                ; 0 * y -> signed zero
-    ld a,b
     add a,h                     ; add the exponents
-    jp NC,mulzero
+    jp NC,mulzero               ; underflow or first exp == 0 (add 0 never carries)
 
 .fmnouf
     ld b,a
@@ -169,13 +158,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld h,l
     ld l,d
 
-    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
-    ld d,a
-    and 080h
-    jr Z,fm4                    ; G=0 → truncate
-    ld a,d
-    and 07fh
-    jr NZ,fm_up                 ; G=1 S=1 → up
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jr NC,fm4                   ; G=0 → truncate
+    jr NZ,fm_up                 ; G=1 S≠0 → up
     bit 0,l
     jr Z,fm4                    ; tie, already even
 .fm_up
@@ -185,8 +171,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jr NZ,fm4
     inc e
     jr NZ,fm4
-    ld e,080h                   ; mant overflow → 1.0, exp++
-    ld hl,0
+    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    ld e,l
     inc b
     jr Z,fm_rnovl
 

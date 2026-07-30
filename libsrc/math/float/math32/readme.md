@@ -411,7 +411,7 @@ Careful use of the intrinsic functions can result in significant performance imp
 And we get about a __24–27%__ improvement for the n-body benchmark across the math32 CPU builds.
 Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
 
-Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). Math32 and mbf32 rows remeasured Jul 2026; other non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). Math32 non-opt rows remeasured Jul 31, 2026; mbf32 and (opt) rows earlier Jul 2026; other non-math32 rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
@@ -420,14 +420,14 @@ math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_8
 mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_835_079_611
 mbf32_8085                  | sccz80   | -0.1699168    | -0.1699168    | 1_849_800_062
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_915_543_008_
-math32                      | zsdcc    | -0.1690752    | -0.1690864    | _0_980_391_839_
+math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_920_041_872_
+math32                      | zsdcc    | -0.1690752    | -0.1690864    | _0_984_851_361_
 math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_764_001_899__
-math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_521_986_846_
-math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_396_603_258__
-math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_500_336_363_
-math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_380_149_278__
-math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_950_732_364_
+math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_519_025_592_
+math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_396_603_258_
+math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_494_347_688_
+math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_380_149_278_
+math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_944_264_587_
 math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_425_652_079__
 
 
@@ -456,7 +456,7 @@ math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_425
 ```
 For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–13%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks.
 
-Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). Math32 and mbf32 rows remeasured Jul 2026; other non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). Math32 non-opt rows remeasured Jul 31, 2026; mbf32 and (opt) rows earlier Jul 2026; other non-math32 rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
@@ -465,14 +465,14 @@ math48                      | zsdcc    | 3_766_086_833
 math48                      | sccz80   | 3_266_168_305
 mbf32                       | sccz80   | 1_798_158_288
 mbf32_8085                  | sccz80   | 1_805_825_674
-math32                      | zsdcc    | 1_399_389_032
-math32                      | sccz80   | _1_133_085_641_
-math32                 (opt)| sccz80   | __1_137_807_104__
-math32_z80n                 | sccz80   | _0_789_862_938_
-math32_z80n            (opt)| sccz80   | __0_694_488_693__
-math32_z180                 | sccz80   | _0_740_954_524_
-math32_z180            (opt)| sccz80   | __0_642_181_961__
-math32_8085                 | sccz80   | _1_323_750_318_
+math32                      | zsdcc    | _1_384_979_312_
+math32                      | sccz80   | __1_118_985_198__
+math32                 (opt)| sccz80   | _1_137_807_104_
+math32_z80n                 | sccz80   | _0_777_474_379_
+math32_z80n            (opt)| sccz80   | _0_694_488_693_
+math32_z180                 | sccz80   | _0_723_374_585_
+math32_z180            (opt)| sccz80   | _0_642_181_961_
+math32_8085                 | sccz80   | _1_317_864_784_
 math32_8085            (opt)| sccz80   | __1_167_758_008__
 
 ---

@@ -222,15 +222,12 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     ld h,e
     ld e,d
 
-    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
-    ld d,a
-    and 080h
-    jr Z,fd0
-    ld a,d
-    and 07fh
-    jr NZ,fd_up
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jr NC,fd0                   ; G=0
+    jr NZ,fd_up                 ; G=1 S≠0
     bit 0,l
-    jr Z,fd0
+    jr Z,fd0                    ; tie, already even
 .fd_up
     inc l
     jr NZ,fd0
@@ -238,8 +235,8 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     jr NZ,fd0
     inc e
     jr NZ,fd0
-    ld e,080h
-    ld hl,0
+    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    ld e,l
     inc b
     ; exp oflow unlikely on invsqrt pack path
 

@@ -68,11 +68,10 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     exx                         ; first b' = eeeeeeee c' = s-------
                                 ;   de'hl' = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
 
-    pop bc                      ; pop return address
+    pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
-    
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret → stack
+
     xor a,h                     ; xor sign flags
     ex af,af                    ; save sign flag in a[7]' and f' reg
 

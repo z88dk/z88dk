@@ -115,15 +115,12 @@ PUBLIC _m32_sqrf
     ld h,l
     ld l,d
 
-    ; IEEE RNE: residual A → G=bit7, S=bits6..0, B=L.0
-    ld d,a
-    and 080h
-    jr Z,fs3
-    ld a,d
-    and 07fh
-    jr NZ,fs_up
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jr NC,fs3                   ; G=0
+    jr NZ,fs_up                 ; G=1 S≠0
     bit 0,l
-    jr Z,fs3
+    jr Z,fs3                    ; tie, already even
 .fs_up
     inc l
     jr NZ,fs3
@@ -131,8 +128,8 @@ PUBLIC _m32_sqrf
     jr NZ,fs3
     inc e
     jr NZ,fs3
-    ld e,080h
-    ld hl,0
+    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    ld e,l
     inc b
     jp Z,m32_fsconst_pinf
 

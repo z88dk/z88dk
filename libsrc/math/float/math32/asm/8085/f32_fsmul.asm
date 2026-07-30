@@ -60,25 +60,20 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     or a
     jp Z,fm_zero
     sub 07fh
+    ld c,a                          ; bias-adjusted second exp
+    ld de,sp+1
+    ld a,(de)                       ; first exp
     jp C,fm_uf
 
-    ld c,a
-    ld de,sp+1
-    ld a,(de)
-    or a
+    add a,c                         ; sum of exponents
+    jp C,fm_ovl                     ; only if first exp != 0
+    cp c                            ; a == c ⇒ first exp was 0
     jp Z,fm_zero
-    add a,c
-    jp C,fm_ovl
     jp fm_exp_done
 
 .fm_uf
-    ld c,a
-    ld de,sp+1
-    ld a,(de)
-    or a
-    jp Z,fm_zero
-    add a,c
-    jp NC,fm_zero
+    add a,c                         ; add the exponents
+    jp NC,fm_zero                   ; underflow or first exp == 0
 
 .fm_exp_done
     or a
@@ -184,13 +179,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld e,h
     ld h,l
     ld l,d                          ; EHL = 24-bit mant, A = residual
-    ; IEEE RNE: G=res.7, S=res[6:0], B=L.0
-    ld d,a                          ; D = residual (E is mant MSB)
-    and 080h
-    jp Z,pk_pack                    ; G=0
-    ld a,d
-    and 07fh
-    jp NZ,pk_up                     ; G=1 S=1 → up
+    ; IEEE RNE: G=res.7, S=res[6:0] (via add a,a), B=L.0
+    add a,a
+    jp NC,pk_pack                   ; G=0
+    jp NZ,pk_up                     ; G=1 S≠0 → up
     ld a,l
     and 01h
     jp Z,pk_pack                    ; tie, already even
@@ -201,10 +193,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp NZ,pk_pack
     inc e
     jp NZ,pk_pack
-    ; mant overflow → 0x800000, exp++
-    ld e,080h
+    ; mant overflow → 1.0, exp++ (E=0; pack left-shift discards implicit 1)
     ld h,0
     ld l,h
+    ld e,l
     inc b
     jp Z,pk_ovl
 .pk_pack

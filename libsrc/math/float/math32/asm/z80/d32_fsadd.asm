@@ -111,10 +111,9 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
     exx
 
-    pop bc                      ; pop return address
+    pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret → stack
 
 .farejoin
     ld b,h                      ; save op2.s in b[7]

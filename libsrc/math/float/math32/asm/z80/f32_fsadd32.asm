@@ -81,10 +81,9 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     exx                         ; first b' = eeeeeeee c' = s-------
                                 ;   hl'de' = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
 
-    pop bc                      ; pop return address
+    pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret → stack
 
     ld c,h                      ; save op2.s in c[7]
 
@@ -182,8 +181,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d
     ld a,d                      ; lost bits in a, keep only 8 most significant
-    ld e,l
-    ld d,h
+    ex de,hl                    ; DE ← high half (old HL)
     ld hl,0                     ; hl zero
 
 ; here no 8 or 16 shift, lost bits in a-reg bits 6,5,4, other bits zero's
