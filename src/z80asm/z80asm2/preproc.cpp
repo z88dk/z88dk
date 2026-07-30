@@ -111,8 +111,10 @@ void Preproc::set_const_symbols(const ConstSymbols& defs) {
 }
 
 std::vector<LogicalLine> Preproc::preprocess(std::string_view filename) {
+#ifdef _DEBUG
     // used for dumping tokens after tokenization, if requested
     StringId cur_filename_id;
+#endif
 
     // reset per-run registries and state
     preproc_cpu_id = g_args.options.cpu_id;

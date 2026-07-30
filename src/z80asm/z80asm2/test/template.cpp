@@ -4,12 +4,14 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#ifdef _DEBUG
-
 #include <iostream>
+#include <string>
+#include <vector>
 
-void test_template() {
-    std::cout << "ok" << std::endl;
+void test_template(const std::vector<std::string>& args) {
+    std::cout << "test_template";
+    for (auto& arg : args) {
+        std::cout << " " << arg;
+    }
+    std::cout << std::endl;
 }
-
-#endif

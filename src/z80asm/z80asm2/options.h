@@ -48,6 +48,7 @@ struct Options {
     FloatFormat float_format = DEFAULT_FLOAT_FORMAT;
     bool do_link = false;
 #ifdef _DEBUG
+    std::string run_test_name;
     bool dump_after_cmdline = false;
     bool dump_after_tokenization = false;
     bool dump_after_directives = false;

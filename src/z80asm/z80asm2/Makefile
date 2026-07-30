@@ -127,7 +127,5 @@ clean:
 
 install: $(RELEASE_EXE)
 	$(INSTALL) $(RELEASE_EXE) $(PREFIX)/bin/$(PROJ)$(EXE)
-	$(INSTALL) tools/ObjModule.pm $(PREFIX)/bin/ObjModule.pm
-	$(INSTALL) tools/z88dk-z80objcopy.pl $(PREFIX)/bin/z88dk-z80objcopy.pl
 
 -include $(DEBUG_DEPENDS) $(RELEASE_DEPENDS)
