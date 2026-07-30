@@ -1864,9 +1864,92 @@ static disc_spec rc700_spec = {
     .directory_entries = 112,
     .extent_size = 2048,
     .byte_size_extents = 1,
-    .first_sector_offset = 0,
+    .first_sector_offset = 0,   // jbox emulator uses 0-based sector IDs; real HW/MAME use 1
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+// RC-700 data-only formats: uniform MFM/FM throughout (no mixed-density track 0),
+// boottracks=0, first_sector_offset=1 (MAME/real-HW 1-based sector IDs).
+
+// 5.25" DS/DD data disk — 36 cylinders, 9 sectors x 512 B, MFM 250 kbps, 2:1 skew
+static disc_spec rc700_5dd_spec = {
+    .name = "RC-700 5\" DS/DD data",
+    .disk_mode = MFM250,
+    .sectors_per_track = 9,
+    .tracks = 36,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .alternate_sides = 1,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
+
+// 8" DS/DD data disk — 77 cylinders, 15 sectors x 512 B, MFM 500 kbps, 4:1 skew
+static disc_spec rc700_8dd_spec = {
+    .name = "RC-700 8\" DS/DD data",
+    .disk_mode = MFM500,
+    .sectors_per_track = 15,
+    .tracks = 77,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .alternate_sides = 1,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11 }
+};
+
+// 8" SS/SD exchange (IBM 3740-compatible) — 77 tracks, 26 sectors x 128 B, FM 500 kbps, 6:1 skew
+static disc_spec rc700_8sd_spec = {
+    .name = "RC-700 8\" SS/SD exchange",
+    .disk_mode = FM500,
+    .sectors_per_track = 26,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .alternate_sides = 0,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 6, 12, 18, 24, 4, 10, 16, 22, 2, 8, 14, 20, 1, 7, 13, 19, 25, 5, 11, 17, 23, 3, 9, 15, 21 }
+};
+
+// RC-703 5.25" DS/QD data disk — 80 cylinders, 10 sectors x 512 B, MFM 250 kbps, 2:1 skew
+static disc_spec rc703_qd_spec = {
+    .name = "RC-703 5\" DS/QD data",
+    .disk_mode = MFM250,
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .alternate_sides = 1,
+    .directory_entries = 256,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 }
 };
 
 
@@ -2501,7 +2584,11 @@ static struct formats {
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "qc10m1",    "Epson QC-10, QX-10",    &qc10m1_spec, 0, NULL, 1 },
     { "rainbow",   "DEC Rainbow/DECmate",   &rainbow_spec, 0, NULL, 1 },
-    { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
+    { "rc700-jbox","RC-700 (jbox, 0-based sectors)",&rc700_spec, 0, NULL, 1 },
+    { "rc700-5dd", "RC-700 5\" DS/DD data",       &rc700_5dd_spec, 0, NULL, 1 },
+    { "rc700-8dd", "RC-700 8\" DS/DD data",       &rc700_8dd_spec, 0, NULL, 1 },
+    { "rc700-8sd", "RC-700 8\" SS/SD exchange",   &rc700_8sd_spec, 0, NULL, 1 },
+    { "rc703-qd",  "RC-703 5\" DS/QD data",       &rc703_qd_spec,  0, NULL, 1 },
     { "sagafox",   "SAGA FOX OS",           &sagafox_spec, 0, NULL, 1 },
     { "seequa",    "Seequa Chameleon (SS)", &seequa_spec, 0, NULL, 1 },
     { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
