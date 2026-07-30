@@ -137,13 +137,16 @@ CLASSIC Z80 / 8085 SUMMARY
 Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
 z88dk-classic/readme.txt.
 
-Compiler | CPU  | Library | Ticks
----------|------|---------|-------------
-sccz80   | z80  | mbf32   | 544_395_320   (Jul 2026)
-sccz80   | 8085 | mbf32   | 548_321_291   (Jul 2026)
-80cc     | z80  | mbf32   | 558_782_473   (Jul 2026)
-80cc     | 8085 | mbf32   | 561_486_320   (Jul 2026)
-sccz80   | z80  | genmath | 1_284_172_870
+Compiler | CPU  | Library | Ticks           | KWIPS @ 4 MHz
+---------|------|---------|-----------------|----------------
+sccz80   | z80  | math32  | 518_821_237     | 7.7098  (Jul 2026)
+zsdcc    | z80  | math32  | 526_621_262     | 7.5956  (Jul 2026)
+sccz80   | 8085 | math32  | 1_151_203_352   | 3.4746  (Jul 2026)
+sccz80   | z80  | mbf32   | 544_395_320     | 7.3476  (Jul 2026)
+sccz80   | 8085 | mbf32   | 548_321_291     | 7.2950  (Jul 2026)
+80cc     | z80  | mbf32   | 558_782_473     | 7.1584  (Jul 2026)
+80cc     | 8085 | mbf32   | 561_486_320     | 7.1240  (Jul 2026)
+sccz80   | z80  | genmath | 1_284_172_870   | 3.1148
 80cc     | *    | math32  | SKIP — does not reach TIMER_STOP
 
 
@@ -250,6 +253,38 @@ KWIPS        = 100*10*1 / 142.0524 = 7.0396
 MWIPS        = 7.0396 / 1000 = 0.0070396
 
 10.
+Z88DK July 30, 2026
+sccz80 / classic c library / math32
+IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+
+cycle count  = 518821237
+time @ 4MHz  = 518821237 / 4x10^6 = 129.7053 seconds
+KWIPS        = 100*10*1 / 129.7053 = 7.7098
+MWIPS        = 7.7098 / 1000 = 0.0077098
+
+(After floor/ceil call fix and ldexp negative-pw2 fix; exp path correct.)
+
+10b.
+Z88DK July 30, 2026
+zsdcc / classic c library / math32
+IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+
+cycle count  = 526621262
+time @ 4MHz  = 526621262 / 4x10^6 = 131.6553 seconds
+KWIPS        = 100*10*1 / 131.6553 = 7.5956
+MWIPS        = 7.5956 / 1000 = 0.0075956
+
+11.
+Z88DK July 30, 2026
+sccz80 / classic c library / 8085 / math32
+IEEE 32-bit float (math32_8085)
+
+cycle count  = 1151203352
+time @ 4MHz  = 1151203352 / 4x10^6 = 287.8008 seconds
+KWIPS        = 100*10*1 / 287.8008 = 3.4746
+MWIPS        = 3.4746 / 1000 = 0.0034746
+
+12.
 Z88DK July 19, 2026
 sccz80 / classic c library / MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
@@ -260,7 +295,7 @@ time @ 4MHz  = 544395320 / 4x10^6 = 136.0988 seconds
 KWIPS        = 100*10*1 / 136.0988 = 7.3476
 MWIPS        = 7.3476 / 1000 = 0.0073476
 
-11.
+13.
 Z88DK July 20, 2026
 80cc / classic c library / MBF32
 10122 bytes less page zero
@@ -289,7 +324,7 @@ time @ 4MHz  = 548321291 / 4x10^6 = 137.0803 seconds
 KWIPS        = 100*10*1 / 137.0803 = 7.2950
 MWIPS        = 7.2950 / 1000 = 0.0072950
 
-12.
+14.
 HITECH C MSDOS V780pl2
 24 bit mantissa + 8 bit exponent
 6919 bytes exact

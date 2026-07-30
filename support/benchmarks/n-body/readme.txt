@@ -58,7 +58,8 @@ Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
 sccz80   | z80  | math16  |   363_824_289  (Jul 2026; DT=1e-1)
 sccz80   | 8085 | math16  |   428_771_307  (Jul 2026; DT=1e-1)
-sccz80   | z80  | math32  | 1_000_372_169  (Jul 2026)
+sccz80   | z80  | math32  |   915_543_008  (Jul 2026)
+zsdcc    | z80  | math32  |   980_391_839  (Jul 2026)
 sccz80   | 8085 | math32  | 1_986_100_862  (Jul 2026)
 sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
 sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
@@ -154,17 +155,27 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK July 19, 2026
+Z88DK July 30, 2026
 sccz80 / classic / math32
 6012 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1000372169
-time @ 4MHz  = 1000372169 / 4*10^6 =  4 min 10 sec
+cycle count  = 915543008
+time @ 4MHz  = 915543008 / 4*10^6 =  3 min 49 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
+(Truncated high-half 32×32 mantissa mul; suite 16/16.)
+
+8b.
+Z88DK July 30, 2026
+zsdcc / classic / math32
+
+cycle count  = 980391839
+time @ 4MHz  = 980391839 / 4*10^6 =  4 min 5 sec
+
+IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 
 9.
 Z88DK July 19, 2026
@@ -180,17 +191,18 @@ time @ 4MHz  = 1986100862 / 4*10^6 =  8 min 17 sec
 IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits.
 
 10.
-Z88DK April 30, 2021
+Z88DK July 30, 2026
 sccz80 / new c library / math32
 5149 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 754266702
-time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
+cycle count  = 711903319
+time @ 4MHz  = 711903319 / 4*10^6 = 2 min 58 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
+(After rebuild newlib math32.lib + z80.lib with truncated 32×32.)
 
 11.
 Z88DK May 3, 2021
