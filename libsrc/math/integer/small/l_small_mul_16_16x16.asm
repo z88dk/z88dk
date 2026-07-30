@@ -15,29 +15,24 @@ l_small_mul_16_16x16:
    ;         hl = 16-bit multiplicand
    ;
    ; exit  : hl = 16-bit product
-   ;         carry reset
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, b, de, hl
+   ld b, l
+   ld a, h
 
-   inc h
-   dec h
-   jr z, eight_bit_1
-   
-   inc d
-   dec d
-   jr z, eight_bit_0
+   ld hl, 0
+   REPT 8
+       add hl, hl \ add a, a
+       jr nc, $+3 \ add hl, de
+   endr
 
-   ld c,l
-   ld a,h
-   ld b,16
+   ld a, b
+   REPT 8
+       add hl, hl \ add a, a
+       jr nc, $+3 \ add hl, de
+   endr
+   ret
 
-   jr rejoin
-
-eight_bit_0:
-
-   ex de,hl
-
-eight_bit_1:
 
 l_small_mul_16_16x8:
 
@@ -47,34 +42,15 @@ l_small_mul_16_16x8:
    ;         de = 16-bit multiplicand
    ;
    ; exit  : hl = 16-bit product
-   ;         carry reset
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, b, hl
 
-   ld a,l
-   ld b,8
+   ld a, l
+   ld hl, 0
 
-rejoin:
+   REPT 8
+       add hl, hl \ add a, a
+       jr nc, $+3 \ add hl, de
+   endr
 
-   ld hl,0
-
-loop_0:
-
-   ; ac = 16-bit multiplicand
-   ; de = 16-bit multiplicand
-   ;  b = iterations
-
-   add hl,hl
-   
-   rl c
-   rla
-
-   jr nc, loop_1
-   add hl,de
-
-loop_1:
-
-   djnz loop_0
-   
-   or a
    ret
