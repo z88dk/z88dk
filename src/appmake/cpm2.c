@@ -1869,12 +1869,15 @@ static disc_spec rc700_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
 };
 
-// RC-700 data-only formats: uniform MFM/FM throughout (no mixed-density track 0),
-// boottracks=0, first_sector_offset=1 (MAME/real-HW 1-based sector IDs).
+// RC-700 blank system-disk formats: uniform MFM/FM throughout, boot tracks reserved
+// (0xe5-filled), first_sector_offset=1 (MAME/real-HW 1-based sector IDs).
+// See rcbios/SYSTEM_DISK_CREATION.md for how to install CCP+BDOS after creation.
+// NOTE: 5.25" track 0 is written as uniform MFM here; that track must be replaced
+// with the required mixed-density (FM side0 / MFM side1) format using bin2imd.py.
 
-// 5.25" DS/DD data disk — 36 cylinders, 9 sectors x 512 B, MFM 250 kbps, 2:1 skew
+// 5.25" DS/DD blank system disk — 36 cylinders, 9 sectors x 512 B, MFM 250 kbps, 2:1 skew
 static disc_spec rc700_5dd_spec = {
-    .name = "RC-700 5\" DS/DD data",
+    .name = "RC-700 5\" DS/DD system",
     .disk_mode = MFM250,
     .sectors_per_track = 9,
     .tracks = 36,
@@ -1882,7 +1885,7 @@ static disc_spec rc700_5dd_spec = {
     .sector_size = 512,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 0,
+    .boottracks = 4,
     .alternate_sides = 1,
     .directory_entries = 128,
     .extent_size = 2048,
@@ -1892,9 +1895,9 @@ static disc_spec rc700_5dd_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
 };
 
-// 8" DS/DD data disk — 77 cylinders, 15 sectors x 512 B, MFM 500 kbps, 4:1 skew
+// 8" DS/DD blank system disk — 77 cylinders, 15 sectors x 512 B, MFM 500 kbps, 4:1 skew
 static disc_spec rc700_8dd_spec = {
-    .name = "RC-700 8\" DS/DD data",
+    .name = "RC-700 8\" DS/DD system",
     .disk_mode = MFM500,
     .sectors_per_track = 15,
     .tracks = 77,
@@ -1902,7 +1905,7 @@ static disc_spec rc700_8dd_spec = {
     .sector_size = 512,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 0,
+    .boottracks = 4,
     .alternate_sides = 1,
     .directory_entries = 128,
     .extent_size = 2048,
@@ -1912,9 +1915,9 @@ static disc_spec rc700_8dd_spec = {
     .skew_tab = { 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11 }
 };
 
-// 8" SS/SD exchange (IBM 3740-compatible) — 77 tracks, 26 sectors x 128 B, FM 500 kbps, 6:1 skew
+// 8" SS/SD blank system disk (IBM 3740-compatible) — 77 tracks, 26 sectors x 128 B, FM 500 kbps, 6:1 skew
 static disc_spec rc700_8sd_spec = {
-    .name = "RC-700 8\" SS/SD exchange",
+    .name = "RC-700 8\" SS/SD system",
     .disk_mode = FM500,
     .sectors_per_track = 26,
     .tracks = 77,
@@ -1922,7 +1925,7 @@ static disc_spec rc700_8sd_spec = {
     .sector_size = 128,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 0,
+    .boottracks = 2,
     .alternate_sides = 0,
     .directory_entries = 64,
     .extent_size = 1024,
@@ -1932,9 +1935,9 @@ static disc_spec rc700_8sd_spec = {
     .skew_tab = { 0, 6, 12, 18, 24, 4, 10, 16, 22, 2, 8, 14, 20, 1, 7, 13, 19, 25, 5, 11, 17, 23, 3, 9, 15, 21 }
 };
 
-// RC-703 5.25" DS/QD data disk — 80 cylinders, 10 sectors x 512 B, MFM 250 kbps, 2:1 skew
+// RC-703 5.25" DS/QD blank system disk — 80 cylinders, 10 sectors x 512 B, MFM 250 kbps, 2:1 skew
 static disc_spec rc703_qd_spec = {
-    .name = "RC-703 5\" DS/QD data",
+    .name = "RC-703 5\" DS/QD system",
     .disk_mode = MFM250,
     .sectors_per_track = 10,
     .tracks = 80,
@@ -1942,7 +1945,7 @@ static disc_spec rc703_qd_spec = {
     .sector_size = 512,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 0,
+    .boottracks = 4,
     .alternate_sides = 1,
     .directory_entries = 256,
     .extent_size = 2048,
