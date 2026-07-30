@@ -91,7 +91,7 @@ PUBLIC asm_f24_mul_f24
     ; ---- x: exp + mant11 ----
     ld a,d
     and 07ch
-    jr Z,hmul_xzero_pop
+    jp Z,hmul_xzero_pop         ; jp: far labels (r4k/r2ka encoding can exceed jr)
     rrca
     rrca
     ld c,a                      ; C = x.exp
@@ -153,7 +153,7 @@ ENDIF
 
 .hmul_ge2
     inc b
-    jr Z,hmul_uinf
+    jp Z,hmul_uinf
     srl e
     rr h
     rr l
