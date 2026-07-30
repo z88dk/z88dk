@@ -184,6 +184,7 @@
     <ClCompile Include="..\..\src\z80asm\z80asm2\synth_expander.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\test\template.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\test\test_driver.cpp" />
+    <ClCompile Include="..\..\src\z80asm\z80asm2\test\test_obj.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\z80asm.cpp" />
     <ClCompile Include="..\..\src\z80asm\z80asm2\zfloat.cpp" />
   </ItemGroup>

@@ -4,11 +4,13 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#pragma once
-
-#include <string>
-#include <string_view>
 #include <vector>
+#include <string>
+#include <iostream>
 
-bool run_test(std::string_view test_name, const std::vector<std::string>& args);
-const std::vector<std::string_view>& test_names();
+void test_obj_wb_001(const std::vector<std::string>& args) {
+    if (args.size() != 1) {
+        std::cerr << "Usage: test_obj_wb_001 <obj_file>" << std::endl;
+        return;
+    }
+}

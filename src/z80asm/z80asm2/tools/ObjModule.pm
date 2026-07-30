@@ -4,11 +4,14 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
+use Modern::Perl;
+use FindBin;
+
 #------------------------------------------------------------------------------
 # Manipulate z80asm object files
 #------------------------------------------------------------------------------
 
-my $cur_version       = 18;
+my $cur_version       = 19;
 my $min_version       = 1;
 my $max_version       = 19;
 my $module_signature  = "Z80RMF";
@@ -262,7 +265,7 @@ package CPU;
 use Modern::Perl;
 use Path::Tiny;
 
-my @CPUS = parse("../z80asm/cpu.def");
+my @CPUS = parse("$FindBin::Bin/../../cpu.def");
 
 sub parse {
     my ($file) = @_;
@@ -533,7 +536,7 @@ package ObjRangeType;
 use Modern::Perl;
 use Path::Tiny;
 
-my @RANGE_TYPES = parse("../z80asm/obj_range_type.def");
+my @RANGE_TYPES = parse("$FindBin::Bin/../../obj_range_type.def");
 
 sub parse {
     my ($file) = @_;
@@ -1319,7 +1322,7 @@ package ObjSymbolScope;
 use Modern::Perl;
 use Path::Tiny;
 
-my @SYMBOL_SCOPES = parse("../z80asm/obj_symbol_scope.def");
+my @SYMBOL_SCOPES = parse("$FindBin::Bin/../../obj_symbol_scope.def");
 
 sub parse {
     my ($file) = @_;
@@ -1389,7 +1392,7 @@ package ObjSymbolType;
 use Modern::Perl;
 use Path::Tiny;
 
-my @SYMBOL_TYPES = parse("../z80asm/obj_symbol_type.def");
+my @SYMBOL_TYPES = parse("$FindBin::Bin/../../obj_symbol_type.def");
 
 sub parse {
     my ($file) = @_;

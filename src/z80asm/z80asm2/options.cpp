@@ -15,7 +15,7 @@
 #include "source_loc.h"
 #include "string_utils.h"
 #include "strings.h"
-#include "test_driver.h"
+#include "zfloat.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
@@ -502,18 +502,8 @@ void Args::parse_arg(std::string_view arg,
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            if (!run_test(opt_arg)) {
-                std::string tests_str;
-                for (auto& test : test_names()) {
-                    if (!tests_str.empty()) {
-                        tests_str += ", ";
-                    }
-                    tests_str += test;
-                }
-                g_diag.error(loc, "Invalid test name: " + opt_arg);
-                g_diag.note(loc, "Valid test names: " + tests_str);
-            }
-            exit(g_diag.get_error_count() ? EXIT_FAILURE : EXIT_SUCCESS);
+            options.run_test_name = opt_arg;
+            return;
         }
         case OptionType::DUMP_AFTER_CMDLINE:
             options.dump_after_cmdline = true;

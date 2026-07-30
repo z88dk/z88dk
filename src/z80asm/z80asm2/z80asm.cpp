@@ -11,6 +11,7 @@
 #include "options.h"
 #include "options_dump.h"
 #include "source_loc.h"
+#include "test_driver.h"
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -74,10 +75,31 @@ int main(int argc, char* argv[]) {
         g_args.parse_arg(argv[i], found_dash_dash, loc);
     }
 
+#ifdef _DEBUG
+    // run test if requested
+    if (!g_args.options.run_test_name.empty()) {
+        if (!run_test(g_args.options.run_test_name, g_args.input_files)) {
+            SourceLoc loc("<command-line>", 0, 0);
+            std::string tests_str;
+            for (auto& test : test_names()) {
+                if (!tests_str.empty()) {
+                    tests_str += ", ";
+                }
+                tests_str += test;
+            }
+            g_diag.error(loc, "Invalid test name: " + g_args.options.run_test_name);
+            g_diag.note(loc, "Valid test names: " + tests_str);
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
+    }
+#endif
+
     // define global defines from command line options
     g_args.define_constants_from_options();
 
 #ifdef _DEBUG
+    // dump after command line if requested
     if (g_args.options.dump_after_cmdline) {
         dump_after_cmdline_and_exit();
         // not reached
