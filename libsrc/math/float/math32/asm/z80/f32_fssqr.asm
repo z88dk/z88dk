@@ -115,9 +115,23 @@ PUBLIC _m32_sqrf
     ld h,l
     ld l,d
 
-    and 0c0h                    ; round using feilipu method
-    jr Z,fs3
-    set 0,l
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jr NC,fs3                   ; G=0
+    jr NZ,fs_up                 ; G=1 S≠0
+    bit 0,l
+    jr Z,fs3                    ; tie, already even
+.fs_up
+    inc l
+    jr NZ,fs3
+    inc h
+    jr NZ,fs3
+    inc e
+    jr NZ,fs3
+    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    ld e,l
+    inc b
+    jp Z,m32_fsconst_pinf
 
 .fs3
     sla e                       ; adjust mantissa for exponent

@@ -20,16 +20,15 @@
 ; Frame after both unpacks (all stack, no BSS scratch):
 ;   +0   X slot (6)
 ;   +6   Y slot (6)
-;  +12   GS (2): +12 = guard, +13 = sticky
-;  +14   drop_flag (2)
-;  +16   ret (2)
-;  +18   left IEEE if callee (4)
+;  +12   drop_flag (2)
+;  +14   ret (2)
+;  +16   left IEEE if callee (4)
 ;
 ; X is kept as the larger-or-equal exponent operand.
 ;
-; Rounding: IEEE RNE on pack paths that do not call m32_fsnormalize.
-;   round_up = G && (S || B); 24-bit mant++ with overflow → >>1, exp++.
-; Sub + normalize: G/S ignored (normalize packs as-is).
+; Rounding: Digi jam-sticky (match z80 d32_fsadd). Lost bits from align
+; or sum>>1 OR into the mant LSB. Pack has no residual RNE.
+; Sub + normalize: packs as-is via m32_fsnormalize.
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -63,15 +62,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld b,0
     ld c,a
     push bc                         ; drop flag
-    ld bc,0
-    push bc                         ; GS: guard=0, sticky=0
 
     call unpack_push                ; Y from DEHL
-    ; +0 Y +6 GS +8 flag +10 ret +12 left
-    ld de,sp+12
+    ; +0 Y +6 flag +8 ret +10 left
+    ld de,sp+10
     call load_ieee
     call unpack_push                ; X
-    ; +0 X +6 Y +12 GS +14 flag +16 ret +18 left
+    ; +0 X +6 Y +12 flag +14 ret +16 left
 
     ; If Y.exp >= X.exp, swap X/Y slots (stack only)
     ld de,sp+4
@@ -135,9 +132,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp epi
 
 
-; IEEE RNE then pack X → DEHL
-; SP: ret, X(6), Y(6), GS(2), ...
+; Pack X → IEEE DEHL (jam already in mant LSB)
+; SP: ret, X(6), Y(6), flag(2), ...
 .pack_x_rne
+    ; Digi jam: residual already in mant LSB; pack only
     ld de,sp+7
     ld a,(de)
     ld b,a                          ; sign
@@ -156,41 +154,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     pop af
     ld d,a
     ld h,0
-
-    ; GS at sp+14; preserve DE (mid/LSB) while reading GS
-    push de
-    ld de,sp+16                     ; +14 +2 for push
-    ld a,(de)                       ; guard
-    or a
-    jp Z,px_gs0
-    inc de
-    ld a,(de)                       ; sticky
-    or a
-    jp NZ,px_gs_up
-    pop de
-    ld a,e
-    and 01h
-    jp Z,px_pack
-    jp px_up
-.px_gs_up
-    pop de
-    jp px_up
-.px_gs0
-    pop de
-    jp px_pack
-.px_up
-    inc e
-    jp NZ,px_pack
-    inc d
-    jp NZ,px_pack
-    inc l
-    jp NZ,px_pack
-    ld l,080h
-    ld d,0
-    ld e,d
-    inc c
-    jp Z,px_ovf
-.px_pack
     ld a,l
     rla
     ld l,a
@@ -203,15 +166,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     rra
     ld l,a
     ex de,hl
-    ret
-.px_ovf
-    ld a,b
-    and 080h
-    or 07fh
-    ld d,a
-    ld e,080h
-    ld hl,0
-    scf
     ret
 
 
@@ -231,10 +185,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld hl,0
 
 .epi
-    ; discard X(6)+Y(6)+GS(2)+flag(2)=16 bytes
+    ; discard X(6)+Y(6)+flag(2)=14 bytes
     push de
     push hl
-    ld de,sp+18                     ; flag was +14, +4 for pushes → +18
+    ld de,sp+16                     ; flag at +12 after X/Y; +4 for pushes → +16
     ld a,(de)
     pop hl
     pop de
@@ -245,7 +199,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     pop af                          ; Y
     pop af
     pop af
-    pop af                          ; GS
     pop af                          ; flag
     ld a,c
     or a
@@ -279,11 +232,9 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld b,a
     add hl,hl
     ld c,h
-    ld a,h
-    or a
-    jp Z,un0
-    scf
-.un0
+    ; Implicit 1: CF=(exp!=0). 255+exp carries iff exp!=0 (subnormals/zero keep CF=0).
+    ld a,255
+    add a,h
     ld a,l
     rra
     ld l,a
@@ -317,9 +268,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ret
 
 
-; Align Y by A right shifts; update GS on stack (not mant LSB).
-; SP: ret, X(6), Y(6), GS(2), ...
-; GS: +14 guard, +15 sticky
+; Align Y by A right shifts; jam sticky into Y mant LSB if bits lost.
+; SP: ret, X(6), Y(6), flag(2), ...
 
 .align_y
     or a
@@ -338,17 +288,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,(de)
     or c
     ld c,a                          ; lost mid|lsb
-    ld de,sp+14
-    ld a,(de)                       ; old guard
-    or c
-    ld c,a
-    inc de
-    ld a,(de)                       ; sticky
-    or c
+    or a
+    jp Z,ay16_njam
+    ld de,sp+10                     ; Y.E (SP: ret, X, Y)
+    ld a,(de)
+    or 1
     ld (de),a
-    dec de
-    xor a
-    ld (de),a                       ; guard = 0
+.ay16_njam
     ld de,sp+8
     ld a,(de)
     ld l,a
@@ -371,22 +317,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld de,sp+10
     ld a,(de)
     ld c,a                          ; lost LSB byte
-    ld de,sp+14
-    ld a,(de)                       ; old guard
-    ld l,a
-    ld a,c
     or a
-    rra                             ; C>>1
-    or l
-    ld l,a
-    inc de
+    jp Z,ay8_njam
+    ld de,sp+10                     ; Y.E
     ld a,(de)
-    or l
-    ld (de),a                       ; sticky
-    dec de
-    ld a,c
-    and 01h
-    ld (de),a                       ; guard = lost&1
+    or 1
+    ld (de),a
+.ay8_njam
     ld de,sp+10
     inc de
     ld a,(de)
@@ -410,7 +347,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ret Z
 .aylp
     push bc
-    ; after push: Y at +10, GS at +16
+    ; after push: Y at +10
     ld de,sp+10
     ld a,(de)
     ld l,a
@@ -424,18 +361,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,c
     and 01h
     ld b,a                          ; bit out
-    ld de,sp+16
-    ld a,(de)                       ; guard
-    ld de,sp+17
-    push hl
-    ld h,a
+    or a
+    jp Z,ay_njam
+    ld de,sp+12                     ; Y.E (SP: bc, ret, X, Y)
     ld a,(de)
-    or h                            ; sticky |= guard
+    or 1
     ld (de),a
-    dec de
-    ld a,b
-    ld (de),a                       ; guard = bit out
-    pop hl
+.ay_njam
     ld a,l
     or a
     rra
@@ -462,7 +394,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ret
 
 
-; After CALL: ret, X(6), Y(6), GS(2)
+; After CALL: ret, X(6), Y(6), flag(2)
 ; X: +2 MSB … +7 sign; Y: +8 …
 
 .mant_add
@@ -616,21 +548,11 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .mant_shr1
-    ; SP: ret, X, Y, GS — GS at +14
+    ; SP: ret, X, Y, flag — jam bit out into X.E after >>1
     ld de,sp+4
     ld a,(de)
     and 01h
     ld c,a                          ; C = bit out
-    ld de,sp+14
-    ld a,(de)
-    ld b,a                          ; B = old guard
-    ld de,sp+15
-    ld a,(de)
-    or b                            ; sticky |= guard
-    ld (de),a
-    ld de,sp+14
-    ld a,c
-    ld (de),a                       ; guard = bit out
     ld de,sp+2
     ld a,(de)
     or a
@@ -643,6 +565,13 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld de,sp+4
     ld a,(de)
     rra
+    ld (de),a
+    ld a,c
+    or a
+    ret Z
+    ld de,sp+4
+    ld a,(de)
+    or 1
     ld (de),a
     ret
 

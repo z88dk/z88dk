@@ -31,7 +31,7 @@ This library is also designed to be as fast as possible on the z80 processor, us
 
   *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm. The dedicated square kernel is separate: five `16_8x8` products via `l_mulu_de`, matching the z80n/z180 square layout.
 
-  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
+  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Product/pack paths (mul, sqr, div, poly, invsqrt/sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. Add/sub use Digi jam-sticky on lost bits.
 
   *  Derived functions are calculated with a 32-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required. This is equivalent to a fused multiply-add process.
 
@@ -71,7 +71,7 @@ Examples of numbers:
     x   11111111     000... infinity  (sign positive or negative, mantissa zero)
     x   11111111     xxx... not a number (sign positive or negative, mantissa non zero)
 ```
-This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support denormal numbers or the round to even convention.  Both of these features could be added in the future with some performance penalty.
+This floating point package is loosely based on IEEE-754. We maintain the packed format; product results are packed with round-to-nearest-even on a residual byte, while add/sub use jam-sticky alignment. Denormal numbers are not supported.
 
 ```
   IEEE floating point format: 	seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
@@ -85,32 +85,39 @@ Where s is the sign, e is the exponent and m is bits 22-0 of the mantissa. z88dk
 
 IEEE-754 assumes bit 23 of the mantissa is 1 except where the exponent is zero.
 
-IEEE-754 specifies rounding the result by a process of round to even. z88dk math32 uses one guard bit and a sticky bit to round a result per the following tables.
-
-Both results are free of bias with IEEE method having a slight edge with rounding error.
+IEEE-754 specifies round to nearest, ties to even. math32 uses that for **product** packing, and a cheaper sticky rule for **add/sub**:
 
 ```
 -------------------------------------------------------------------------
-    IEEE round to nearest:
+    IEEE round to nearest, ties to even (product / residual pack):
 
-    b g s  (b=lsbit g=guard s=sticky)
-    0 0 0  exact
-    0 0 1  -.001
-    0 1 0  -.01
-    0 1 1  +.001
-    1 0 0  exact
-    1 0 1  -.001
-    1 1 0  +.01
-    1 1 1  +.001
+    After a 24- or 32-bit product (or expanded intermediate align),
+    residual byte R is the bits below the kept 24-bit mantissa.
+    G = R.7 (guard), S = R[6:0] (sticky), B = mant LSB.
+
+    round_up = G && (S || B); then 24-bit mant++ (overflow → 1.0, exp++).
+
+    b g s  (b=lsbit g=guard s=sticky)   action
+    0 0 0  exact                        stay
+    0 0 1  -.001                        stay (truncate)
+    0 1 0  tie, even                    stay
+    0 1 1  +.001                        up
+    1 0 0  exact                        stay
+    1 0 1  -.001                        stay
+    1 1 0  tie, odd                     up
+    1 1 1  +.001                        up
+
+    Used on mul, sqr, div, poly, and invsqrt/sqrt pack paths.
+    Mid-low sticky inside truncated high-half multiplies is separate:
+    it only ORs product bits for the high half and is not a pack RNE step.
 -------------------------------------------------------------------------
 
-    z88dk math32 (feilipu sticky):
+    Digi jam-sticky (add / sub):
 
-    After a 24- or 32-bit mantissa product/align, the bits below the
-    kept mantissa are tested with `and 0c0h` (top two residual bits).
-    If either is set, the mantissa LSB is forced on (`set 0,l`).
-    This is not IEEE round-to-nearest-even; it is a cheap sticky-LSB
-    rule used by mul, sqr, invsqrt, and related pack paths.
+    When aligning the smaller mantissa (or right-shifting a sum
+    overflow), any bits shifted out set the kept mant LSB (`OR 1`).
+    There is no separate guard/sticky RNE at pack. Fast and good for
+    long add chains (e.g. n-body energy); not full IEEE RNE on add.
 -------------------------------------------------------------------------
 ```
 
@@ -233,13 +240,15 @@ These functions are closely related to the original Digi International functions
 
 As add and subtract rely heavily on bit shifting across the mantissa, these functions establish a tree of byte and nybble shifting, to provide the best performance. Nybble shifting is intrinsic to the Rabbit processor, but this nybble based algorithm also works effectively for the z80 processor with little overhead.
 
+Lost bits from alignment (and from a one-bit right shift when the sum overflows) use **jam-sticky**: OR 1 into the mantissa LSB. Pack does not apply residual RNE.
+
 #### _mul()_ and _sqr()_
 
 The multiply function is implemented with a `mulu_32h_24x24` mantissa calculation, that optimises (minimises) the number of `16_8x8` multiplies required, using either hardware instructions from the z180 and z80n, or the z80 equivalent function.
 
 The mantissa multiplication is not a "correct" multiply, as not all carry bits are passed into the returned bytes. The low order mantissa term is not calculated and the low order bytes are simply truncated. The lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa. This method minimises the number of `16_8x8` multiplies required to generate a correct 24-bit mantissa.
 
-A simple rounding method is used, but a more sophisticated method IEEE compliant method could be applied as needed.
+IEEE RNE on the residual byte is applied in `_fsmul` / `_fssqr` when packing the 24-bit mantissa.
 
 The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, `f32_8085_sqr_*`).
 
@@ -376,7 +385,7 @@ Generally the intrinsic functions are accurate within 1-2 counts of the floating
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
 
-The addition / subtraction process is "correct", and this result should be identical to m48 within the significant digits of IEEE-754.
+Addition / subtraction use jam-sticky on lost bits (not full IEEE RNE). Results are typically within 1–2 ULP of a correctly rounded IEEE sum for ordinary cases; long add-heavy chains can accumulate small differences versus pure RNE or versus m48.
 
 The division process relies on N-R estimation. There is an analysis of the number iterations, based on the convergence of N-R estimation, required to derive sufficent significant bits for a correct IEEE 24-bit mantissa and I believe that using 3 iterations and the 32-bit internal mantissa calculation this outcome is achieved.
 
@@ -399,10 +408,10 @@ Careful use of the intrinsic functions can result in significant performance imp
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
 #endif
 ```
-And we get about a __24–26%__ improvement for the n-body benchmark across the math32 CPU builds.
+And we get about a __24–27%__ improvement for the n-body benchmark across the math32 CPU builds.
 Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
 
-Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). Math32 and mbf32 rows remeasured Jul 2026; other non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). Math32 non-opt rows remeasured Jul 31, 2026; mbf32 and (opt) rows earlier Jul 2026; other non-math32 rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
@@ -411,14 +420,17 @@ math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_8
 mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_835_079_611
 mbf32_8085                  | sccz80   | -0.1699168    | -0.1699168    | 1_849_800_062
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32                      | sccz80   | -0.1690752    | -0.1690864    | _1_000_372_169_
+math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_920_041_872_
+math32                      | zsdcc    | -0.1690752    | -0.1690864    | _0_984_851_361_
 math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_764_001_899__
-math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_521_986_846_
-math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_396_603_258__
-math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_500_336_363_
-math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_380_149_278__
-math32_8085                 | sccz80   | -0.1690752    | -0.1690864    | _1_986_100_862_
-math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690869    | __1_461_194_864__
+math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_519_025_592_
+math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_396_603_258_
+math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_494_347_688_
+math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_380_149_278_
+math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_944_264_587_
+math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_425_652_079__
+
+
 
 
 #### mandelbrot
@@ -444,7 +456,7 @@ math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690869    | __1_461
 ```
 For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–13%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks.
 
-Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). Math32 and mbf32 rows remeasured Jul 2026; other non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). Math32 non-opt rows remeasured Jul 31, 2026; mbf32 and (opt) rows earlier Jul 2026; other non-math32 rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
@@ -453,14 +465,14 @@ math48                      | zsdcc    | 3_766_086_833
 math48                      | sccz80   | 3_266_168_305
 mbf32                       | sccz80   | 1_798_158_288
 mbf32_8085                  | sccz80   | 1_805_825_674
-math32                      | zsdcc    | 1_414_728_459
-math32                      | sccz80   | _1_152_093_641_
-math32                 (opt)| sccz80   | __1_137_807_104__
-math32_z80n                 | sccz80   | _0_789_862_938_
-math32_z80n            (opt)| sccz80   | __0_694_488_693__
-math32_z180                 | sccz80   | _0_740_954_524_
-math32_z180            (opt)| sccz80   | __0_642_181_961__
-math32_8085                 | sccz80   | _1_362_047_666_
-math32_8085            (opt)| sccz80   | __1_247_706_419__
+math32                      | zsdcc    | _1_384_979_312_
+math32                      | sccz80   | __1_118_985_198__
+math32                 (opt)| sccz80   | _1_137_807_104_
+math32_z80n                 | sccz80   | _0_777_474_379_
+math32_z80n            (opt)| sccz80   | _0_694_488_693_
+math32_z180                 | sccz80   | _0_723_374_585_
+math32_z180            (opt)| sccz80   | _0_642_181_961_
+math32_8085                 | sccz80   | _1_317_864_784_
+math32_8085            (opt)| sccz80   | __1_167_758_008__
 
 ---

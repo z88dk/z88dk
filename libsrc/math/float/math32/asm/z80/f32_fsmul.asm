@@ -87,10 +87,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     exx                         ; first h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
 
-    pop bc                      ; pop return address
+    pop hl                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
+    ex (sp),hl                  ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm; ret → stack
 
 .fmrejoin
     xor a,h                     ; xor sign flags
@@ -104,37 +103,27 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld a,h                      ; calculate the exponent
     or a                        ; second exponent zero then result is zero
-    jr Z,mulzero
+    jp Z,mulzero                ; jp: RNE pack lengthens tail past jr range (r4k)
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
+    exx
+    ld b,a                      ; bias-adjusted second exp
     jr C,fmchkuf
 
-    exx
-
-    ld b,a
-    ld a,h                      ; first exponent
-    or a
-    jr Z,mulzero                ; 0 * y -> signed zero
-    ld a,b
     add a,h                     ; sum of exponents
-    jp C,mulovl
+    jp C,mulovl                 ; only if h != 0
+    cp b                        ; a == b ⇒ first exp was 0
+    jp Z,mulzero                ; 0 * y -> signed zero
     jr fmnouf
 
 .fmchkuf
-    exx
-
-    ld b,a
-    ld a,h                      ; first exponent
-    or a
-    jr Z,mulzero                ; 0 * y -> signed zero
-    ld a,b
     add a,h                     ; add the exponents
-    jr NC,mulzero
+    jp NC,mulzero               ; underflow or first exp == 0 (add 0 never carries)
 
 .fmnouf
     ld b,a
     or a
-    jr Z,mulzero                ; check sum of exponents for zero
+    jp Z,mulzero                ; check sum of exponents for zero
 
     ex af,af
     ld a,b
@@ -160,7 +149,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     inc b
     jp Z,m32_fsconst_pnan       ; capture overflow from NaN
     inc b
-    jr Z,mulovl                 ; capture overflow into Inf
+    jp Z,mulovl                 ; capture overflow into Inf
     dec b
 
 .fm3
@@ -169,9 +158,23 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld h,l
     ld l,d
 
-    and 0c0h                    ; round using feilipu method
-    jr Z,fm4
-    set 0,l
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jr NC,fm4                   ; G=0 → truncate
+    jr NZ,fm_up                 ; G=1 S≠0 → up
+    bit 0,l
+    jr Z,fm4                    ; tie, already even
+.fm_up
+    inc l
+    jr NZ,fm4
+    inc h
+    jr NZ,fm4
+    inc e
+    jr NZ,fm4
+    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    ld e,l
+    inc b
+    jr Z,fm_rnovl
 
 .fm4
     sla e                       ; adjust mantissa for exponent
@@ -180,6 +183,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     rr de                       ; put sign and 7 exp bits into place
                                 ; put last exp bit into place
     ret                         ; return IEEE DEHL
+
+.fm_rnovl
+    sla c
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf
 
 .mulovl
     ex af,af                    ; get sign

@@ -151,9 +151,22 @@ PUBLIC _m32_polyf
     ld h,e
     ld e,d
 
-    and 080h                    ; round using feilipu method
-    jr Z,fep2
-    set 0,l
+    ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jr NC,fep2                  ; G=0
+    jr NZ,fep_up                ; G=1 S≠0
+    bit 0,l
+    jr Z,fep2                   ; tie, already even
+.fep_up
+    inc l
+    jr NZ,fep2
+    inc h
+    jr NZ,fep2
+    inc e
+    jr NZ,fep2
+    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    ld e,l
+    inc b
 
 .fep2
     sla e
