@@ -123,8 +123,6 @@ static int gen_call(FILE *out, Func *f, const Op *op)
     }
     for (int k = 0; k < n_to_push; k++) {
         int i = start + k * push_step;
-        int slot = slot_off(f, ci->args[i]);
-        int adj  = slot + pushed_bytes + sp_adj_extra + L.cur_sp_adjust;
         int width = f->vregs[ci->args[i]].width;
         if (width > 4) {
             /* Wide double arg: load slot into acc and push — combined (dldpsh)
@@ -173,9 +171,11 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             emit(out, "inc\tsp");
             pushed_bytes += 1;
         } else if (width == 1) {
-            emit(out, "ld\thl,%d", adj);
-            emit(out, "add\thl,sp");
-            emit(out, "ld\ta,(hl)");
+            /* Byte arg pushed as a word. Read the byte via push_arg_byte_to_a so
+               fp mode uses `ld a,(ix+d)` (3 B, no HL clobber) instead of the
+               sp-relative `ld hl,adj; add hl,sp; ld a,(hl)` (an ix frame slot is
+               fixed across the arg pushes; the sp form is only needed frameless). */
+            push_arg_byte_to_a(out, f, ci->args[i], pushed_bytes + sp_adj_extra);
             emit(out, "ld\tl,a");
             emit(out, "ld\th,0");
             emit(out, "push\thl");

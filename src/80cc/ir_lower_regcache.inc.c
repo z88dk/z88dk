@@ -739,8 +739,17 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     /* HL is restored to its prior value — cache stands. */
 }
 
-/* Store HL to a vreg's frame slot. */
+/* Store HL to a vreg's frame slot. Wrapper sets the [IR_DEADSTORE] write context
+   (save/restore — nests via pending_spill_resolve) so every slot_off it makes is
+   attributed to the write count. */
+static void store_hl_impl(FILE *out, const Func *f, int vreg_id);
 static void store_hl(FILE *out, const Func *f, int vreg_id)
+{
+    int save = slot_write_ctx; slot_write_ctx = 1;
+    store_hl_impl(out, f, vreg_id);
+    slot_write_ctx = save;
+}
+static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
     /* Stack-transient (IR_PR_STACK): park HL on the stack, don't slot-store to
        the -1 sentinel (which the sp fallback turns into a write at sp-1).
@@ -1021,9 +1030,28 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
                 && a_cache_carry_safe(f, vreg_id)) cache_a(vreg_id);
 }
 
-/* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. */
+/* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. Wrapper sets the
+   [IR_DEADSTORE] write context (save/restore — nests via pending_spill_resolve)
+   so every slot_off it makes counts as a write, not a read. */
+static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
 static void store_a_byte(FILE *out, const Func *f, int vreg_id)
 {
+    int save = slot_write_ctx; slot_write_ctx = 1;
+    store_a_byte_impl(out, f, vreg_id);
+    slot_write_ctx = save;
+}
+static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
+{
+    /* [IR_DEADSTORE] Dead spill: the slot is written but never read (proven by
+       the read/write split, coalescing-checked). Skip the store entirely — A
+       already holds the value; cache it so every use (same BB, or the next via
+       bb_a_out) reads it from A. ir_assign_slots dropped the slot, so there is
+       nothing to write; the frame shrinks and deadframe may go frameless. Set
+       only on the re-lower (first render never has it), width-1 only. */
+    if (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL) {
+        cache_a(vreg_id);
+        return;
+    }
     /* Index-half home: write the half, keep A cached. Slotless + clobber-free
        so no slot store, no dirty tracking — the value simply rides the half. */
     PhysReg ih = idxhalf_phys(f, vreg_id);

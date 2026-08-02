@@ -4825,6 +4825,11 @@ static Sc1Reg sdcccall1_ret_reg(int w)
    dance (sp_adj = bytes pushed so far + the bc-save). */
 static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
 {
+    /* A already holds the byte (e.g. just produced/stored, with the store's A
+       cached and no A-clobber since — the default-on A tracker guarantees rs.a
+       is dropped on any real A change): skip the reload. Mirrors load_byte_to_a's
+       a_has fast path, which this helper otherwise reimplements without. */
+    if (a_has(vreg)) return;
     if (fp_active(f)) {
         int ixoff = slot_ix_off(f, vreg);
         if (fp_offset_fits(ixoff)) {

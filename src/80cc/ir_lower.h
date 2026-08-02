@@ -22,6 +22,7 @@
    diagnostic to stderr; the partial output to `out` is left as-is).
    The caller is responsible for opening / closing `out`. */
 int ir_lower_func(FILE *out, Func *f);
+int ir_lower_func_flip(FILE *out, Func *f);
 
 /* Assign frame slots to all vregs. Sets f->frame_size and
    f->vreg_spill_slot. The dumb lowerer puts every vreg in a slot

@@ -1080,6 +1080,19 @@ static int frame_has_saved_iy(const Func *f)
     return 0;
 }
 
+/* [#13] A function FLIPPED fp→sp that homes a value in IX (sp-mode idx2) must
+   save IX on entry: its fp CALLERS use IX as their frame pointer (callee-saved).
+   IY (idx3) is already covered by frame_has_saved_iy. Mirror that shape so the
+   prologue/epilogue push/pop it and the param-offset calc shifts by its 2 bytes. */
+static int frame_has_saved_ix_flip(const Func *f)
+{
+    if (!f || !f->flipped_from_fp || f->is_naked || f->is_interrupt) return 0;
+    if (f->idx2_reg != IR_PR_IX || !f->vreg_to_phys) return 0;
+    for (int i = 0; i < f->n_vregs; i++)
+        if (f->vreg_to_phys[i] == f->idx2_reg) return 1;
+    return 0;
+}
+
 static int fp_active(const Func *f)
 {
     /* Wide-accumulator functions can't keep their frame pointer in IX: the
@@ -1185,6 +1198,7 @@ static int param_caller_off(const Func *f, int vreg_id)
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
                     + (frame_has_debug_fp(f) ? 2 : 0)   /* l_debug_push_frame save */
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
+                    + (frame_has_saved_ix_flip(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
                        between the locals and the return address. Rabbit's
@@ -1225,6 +1239,21 @@ static int param_caller_off(const Func *f, int vreg_id)
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
 static void note_slot_use(int v);   /* IR_DEADSLOT: fwd (defined with rec state) */
+/* [IR_DEADSTORE] write-context depth: >0 while lowering a store function body,
+   so note_slot_use attributes its slot_off calls (store + guard checks) to the
+   write count. Save/restore (not set/clear) because stores nest via
+   pending_spill_resolve. */
+static int slot_write_ctx;
+/* [#13 frameless probe] per-render count of (ix+-d) DATA accesses (every one
+   computes its offset through slot_ix_off). rec_counting==0 ⇒ don't count (pass
+   1 / no instrumentation). A framed function with ds_ixaccess==0 emitted its IX
+   apparatus (push ix;ld ix,0;add ix,sp;ld sp,ix;pop ix) for NOTHING — the frame
+   is serviced entirely sp-relative (sp-parking / add hl,sp), so IX is dead
+   overhead and a sp-mode flip is ~zero-cost. rec_counting is defined below with
+   the rest of the rec state (tentative fwd here so slot_ix_off can bump it). */
+static int rec_counting;
+static int ds_ixaccess;
+static int ds_last_framed;   /* [#13] frame_has_saved_fp of last-rendered fn */
 
 static int slot_off(const Func *f, int vreg_id)
 {
@@ -1275,6 +1304,7 @@ static void require_slot(const Func *f, int vreg_id)
    PARAM_IN_PLACE slots come out positive (above IX). */
 static int slot_ix_off(const Func *f, int vreg_id)
 {
+    if (rec_counting) ds_ixaccess++;     /* [#13] an (ix+-d) data access */
     return slot_off(f, vreg_id) - f->frame_size;
 }
 
@@ -1815,6 +1845,21 @@ static int   rec_counting;        /* 1 while a final render is instrumented */
    falsely dead), so a reported dead-slot really is dead. */
 static int   ds_on = -1;
 static int  *rec_slotuse;
+/* [IR_DEADSTORE, inert] rec_slotwrite[v] counts frame-slot WRITES of v — the
+   subset of rec_slotuse[v] emitted by the store functions (store_a_byte/
+   store_hl, via note_slot_write). Then reads = rec_slotuse - rec_slotwrite. A
+   spill vreg WRITTEN but never READ (rec_slotwrite>0, reads==0) is a dead store:
+   its value is served from a register for every use, so the store is redundant.
+   Discipline (like the lazy-spill hooks): note_slot_write must be PRECISE — a
+   missed write site only over-counts reads → a live-looking slot → conservative
+   (store kept). Never over-count writes. */
+static int  *rec_slotwrite;
+static int   dsx_on = -1;
+/* [IR_DEADSTORE] dead-spill vreg ids found by the last render's read/write split
+   (populated in rec_end, consumed by the driver to mark IR_VREG_DEAD_SPILL and
+   re-lower). Per-function; reset at the top of rec_end. */
+static int   ds_dead[512];
+static int   ds_ndead;
 
 static int rec_enabled(void)
 {
@@ -1834,10 +1879,36 @@ static int ds_enabled(void)
     return ds_on;
 }
 
+/* IR_DEADSTORE dead byte-spill elision (DEFAULT-ON). The render's read/write
+   split (rec_end) lists byte spills written but never read; the driver marks
+   them, drops the slots, and re-lowers (the value rides A to its readers).
+   Pure win both axes (bytes and ticks fall together — dead memory traffic
+   removed). Opt out with IR_DEADSTORE=0 (reproduces pre-flip codegen);
+   IR_DEADSTORE=2 adds the per-slot report. */
+static int dsx_enabled(void)
+{
+    if (dsx_on < 0) {
+        const char *e = getenv("IR_DEADSTORE");
+        dsx_on = !e ? 1 : (e[0] == '0' ? 0 : (e[0] == '2' ? 2 : 1));
+    }
+    return dsx_on;
+}
+
+/* [#13] IR_FLIPCOST report gate (inert): print the frameless-via-sp cost model
+   per framed function — ds_ixaccess (ix+-d accesses = N), the ~11B IX-apparatus
+   save, and the flip verdict. ds_ixaccess==0 = IX dead overhead (zero-cost flip). */
+static int ff_on = -1;
+static int ff_enabled(void)
+{
+    if (ff_on < 0) { const char *e = getenv("IR_FLIPCOST"); ff_on = (e && e[0]) ? 1 : 0; }
+    return ff_on;
+}
+
 static void rec_reset(void)
 {
     free(rec_reg); free(rec_slot); free(rec_remat); free(rec_slotuse);
-    rec_reg = rec_slot = rec_remat = rec_slotuse = NULL;
+    free(rec_slotwrite);
+    rec_reg = rec_slot = rec_remat = rec_slotuse = rec_slotwrite = NULL;
     rec_nv = 0; rec_counting = 0;
 }
 
@@ -1846,7 +1917,9 @@ static void rec_reset(void)
 static void rec_begin(const Func *f)
 {
     rec_reset();
-    if ((!rec_enabled() && !ds_enabled() && !deadframe_on())
+    ds_ixaccess = 0;                  /* [#13] per-render (ix+-d)-access count */
+    if ((!rec_enabled() && !ds_enabled() && !deadframe_on() && !dsx_enabled()
+         && !ff_enabled())
         || L.ss_phase == 1 || f->n_vregs <= 0)
         return;
     rec_nv = f->n_vregs;
@@ -1854,16 +1927,23 @@ static void rec_begin(const Func *f)
     rec_slot  = calloc((size_t)rec_nv, sizeof(int));
     rec_remat = calloc((size_t)rec_nv, sizeof(int));
     rec_slotuse = calloc((size_t)rec_nv, sizeof(int));
-    if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse) { rec_reset(); return; }
+    rec_slotwrite = calloc((size_t)rec_nv, sizeof(int));
+    if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite) {
+        rec_reset(); return; }
     rec_counting = 1;
 }
 
 /* Record a genuine frame-slot access emitted for v (called from slot_off /
-   slot_ix_off). Guarded by rec_counting so only the final render counts. */
+   slot_ix_off). Guarded by rec_counting so only the final render counts. When
+   the WRITE context is active (slot_write_ctx, set for the whole body of a store
+   function) the access is ALSO a write — so every slot_off inside a store (the
+   actual store AND its non-emit guard checks like `slot_off()<0`) is attributed
+   to the write, leaving rec_slotuse - rec_slotwrite = the true READ count. */
 static void note_slot_use(int v)
 {
     if (!rec_counting || v < 0 || v >= rec_nv || !rec_slotuse) return;
     rec_slotuse[v]++;
+    if (slot_write_ctx && rec_slotwrite) rec_slotwrite[v]++;
 }
 
 static void rec_note(int bucket, int v)
@@ -1897,6 +1977,8 @@ static void rec_note_violation(const Func *f, int v)
 static void rec_end(const Func *f)
 {
     L.frame_fully_dead = 0;
+    ds_ndead = 0;                    /* [IR_DEADSTORE] per-fn dead-spill list reset */
+    ds_last_framed = frame_has_saved_fp(f);   /* [#13] */
     if (!rec_counting) { rec_reset(); return; }
     /* Stop counting BEFORE the reports: our own slot_off() calls below must not
        self-increment rec_slotuse. */
@@ -1930,7 +2012,8 @@ static void rec_end(const Func *f)
        spans p. dead = covered & !live — the exact droppable frame shrink. This
        is also increment-2's drop rule: only drop a slot whose members are ALL
        dead. */
-    if ((ds_enabled() || deadframe_on()) && f->frame_size > 0 && f->vreg_spill_slot) {
+    if ((ds_enabled() || deadframe_on() || dsx_enabled())
+        && f->frame_size > 0 && f->vreg_spill_slot) {
         int fs = f->frame_size;
         char *covered = calloc((size_t)fs, 1);
         char *live    = calloc((size_t)fs, 1);
@@ -1968,7 +2051,78 @@ static void rec_end(const Func *f)
                         f->fn ? ir_sym_name(f->fn) : "?", deadbytes, fs,
                         deadbytes == fs ? "  FRAMELESS" : "");
         }
+        /* [IR_DEADSTORE, INERT] Write-only (dead-store) byte-slot report. Uses
+           the read/write split: reads[v] = rec_slotuse[v] - rec_slotwrite[v].
+           Coalescing-aware: readb[p]=1 iff SOME spill covering byte p was read,
+           so a shared slot read via a different vreg keeps the store live (the
+           set_arg1 protection). A trustable scalar spill written but with reads==0
+           and NONE of its bytes read-by-others is a genuine dead store. No
+           codegen change — this only prints; validates the model before elision. */
+        char *readb = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
+        if (readb && rec_slotwrite) {
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                int is_spill = !f->vreg_to_phys || f->vreg_to_phys[v] == IR_PR_SPILL;
+                int off = is_spill ? f->vreg_spill_slot[v] : -1;
+                if (off < 0 || off >= fs) continue;
+                if (rec_slotuse[v] - rec_slotwrite[v] <= 0) continue;   /* not read */
+                int w = f->vregs[v].width > 0 ? f->vregs[v].width : 2;
+                for (int p = off; p < off + w && p < fs; p++) readb[p] = 1;
+            }
+            int nfn = 0;
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                if (!f->vreg_to_phys || f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                const VReg *vr = &f->vregs[v];
+                int off = f->vreg_spill_slot[v];
+                if (off < 0 || off >= fs) continue;
+                if (rec_slotwrite[v] == 0) continue;                   /* not written */
+                if (rec_slotuse[v] - rec_slotwrite[v] != 0) continue;  /* is read */
+                Kind vk = vr->kind;
+                int scalar = vk == KIND_CHAR || vk == KIND_SHORT || vk == KIND_INT
+                          || vk == KIND_LONG || vk == KIND_PTR || vk == KIND_ENUM
+                          || vk == KIND_CARRY;
+                int w = vr->width > 0 ? vr->width : 2;
+                if (!scalar || w > 4
+                    || (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                     | IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE
+                                     | IR_VREG_NO_SLOT)))
+                    continue;
+                int shared_read = 0;                    /* coalesced-with-a-reader? */
+                for (int p = off; p < off + w && p < fs; p++)
+                    if (readb[p]) { shared_read = 1; break; }
+                if (shared_read) {
+                    if (dsx_on >= 2)
+                        fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d write-only "
+                                "but slot COALESCED-READ — keep\n", v, w, off);
+                    continue;
+                }
+                nfn++;
+                if (ds_ndead < (int)(sizeof ds_dead / sizeof ds_dead[0]))
+                    ds_dead[ds_ndead++] = v;
+                if (dsx_on >= 2)
+                    fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d wr=%d rd=0 "
+                            "DEAD-STORE\n", v, w, off, rec_slotwrite[v]);
+            }
+            if (nfn)
+                fprintf(stderr, "IR_DEADSTORE: %s dead-stores=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", nfn);
+        }
+        free(readb);
         free(covered); free(live);
+    }
+    /* [#13, INERT] frameless-via-sp cost model. A function that emitted the IX
+       apparatus (frame_has_saved_fp) but made ZERO (ix+-d) data accesses
+       (ds_ixaccess==0) wastes the whole ~11B apparatus — its frame is serviced
+       sp-relative (sp-parking / add hl,sp), so a genuine-sp flip is ~zero-cost.
+       With ds_ixaccess>0 the flip costs ~+2B per access (sp vs ix), so flip iff
+       2*N < save. Reports only; no codegen change. */
+    if (ff_enabled() && frame_has_saved_fp(f)) {
+        int N = ds_ixaccess;
+        int save = 11;                       /* push ix;ld ix,0;add ix,sp;ld sp,ix;pop ix */
+        int cost = 2 * N;
+        fprintf(stderr, "IR_FLIPCOST: %-24s ixacc=%-3d frame=%-3d save=%d cost=%d %s\n",
+                f->fn ? ir_sym_name(f->fn) : "?", N, f->frame_size, save, cost,
+                N == 0 ? "ZERO-COST-FLIP"
+                       : (cost < save ? "FLIP" : "keep"));
     }
     rec_reset();
 }
@@ -2292,10 +2446,12 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            teardown above; this branch is the !fp_active acc-tier case only.) */
         if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
         emit(out, "pop\t%s", frame_reg());
-    } else if (!fp_active(f) && frame_has_saved_iy(f)) {
-        /* Pure sp-mode idx3 (no saved IX): sp now points at the saved IY; pop it
-           before the return address is read. Touches only IY/SP. */
-        emit(out, "pop\tiy");
+    } else if (!fp_active(f) && (frame_has_saved_iy(f) || frame_has_saved_ix_flip(f))) {
+        /* Pure sp-mode: restore the saved index regs before the return address is
+           read. Prologue pushed IY (idx3) THEN IX (flipped idx2), so IX is on top
+           — pop it first. Touches only IX/IY/SP. */
+        if (frame_has_saved_ix_flip(f)) emit(out, "pop\tix");
+        if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
     }
     if (frame_has_debug_fp(f)) {
         /* no-IX -debug teardown: the frame drop above left sp at the saved
@@ -2518,6 +2674,9 @@ static void emit_prologue(FILE *out, Func *f)
     if (frame_has_saved_iy(f))      /* idx3: preserve caller's IY (callee-saved),
                                        below the return address / above the frame */
         emit(out, "push\tiy");
+    if (frame_has_saved_ix_flip(f)) /* [#13] flipped fn: preserve the fp caller's
+                                       frame pointer (IX), used here as sp idx2 */
+        emit(out, "push\tix");
     if (frame_has_debug_fp(f))      /* no-IX -debug: chain __debug_framepointer.
                                        Pushes 2 bytes, preserves HL (fastcall arg),
                                        clobbers BC — must precede the fastcall/sc1
@@ -2722,6 +2881,7 @@ static void emit_prologue(FILE *out, Func *f)
        address, shifting args up another 2. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 2 : 0)
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
+                    + (frame_has_saved_ix_flip(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2). */
                     + (f->is_interrupt ? 12 : ((f->flags & CRITICAL) ? 2 : 0));
@@ -3735,6 +3895,7 @@ int ir_lower_func(FILE *out, Func *f)
     int *bb_hl_out_p1 = NULL;
     FILE *rout;
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
+    int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
  deadframe_retry:
     rout = elide_labels ? tmpfile() : NULL;
     if (!rout) { rout = out; elide_labels = 0; }
@@ -3848,6 +4009,33 @@ int ir_lower_func(FILE *out, Func *f)
         L.ss_op_reload = NULL;
         L.ss_op_cacheread = NULL;
     }
+    /* [IR_DEADSTORE] Dead byte-spill elision: the render's read/write split
+       (rec_end) listed byte spills WRITTEN but never READ (ds_dead), coalescing-
+       checked. Mark them IR_VREG_DEAD_SPILL, recompute slots (ir_assign_slots
+       drops them → frame shrinks), and re-lower — store_a_byte skips the store
+       and the value rides A to its readers (in-BB, or the next BB via bb_a_out).
+       Composes with the dead-FRAME retry below: a frame emptied by this goes
+       frameless. Opt-in; width-1 only (words handled by ss_compute_dead) and
+       needs the A-carry (the bb_a_out reader path). Runs before deadframe. */
+    if (dsx_enabled() && !ds_retry_done && rc == 0 && ds_ndead > 0
+        && a_carry_enabled()) {
+        int marked = 0;
+        for (int i = 0; i < ds_ndead; i++) {
+            int v = ds_dead[i];
+            if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 1) continue;
+            if (f->vregs[v].flags & IR_VREG_DEAD_SPILL) continue;
+            f->vregs[v].flags |= IR_VREG_DEAD_SPILL;
+            marked++;
+        }
+        if (marked) {
+            ds_retry_done = 1;
+            ir_assign_slots(f);                 /* drop dead slots, recompact */
+            L.cur_frameless = frameless_ok(f);
+            free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
+            if (rout != out) fclose(rout);
+            goto deadframe_retry;
+        }
+    }
     /* Dead-frame elision (IR_DEADFRAME): the render just proved (rec_end) that
        every spill slot is dead — the whole frame is unused. Re-lower the
        function once with frame_size=0: the spill vregs shed their (dead) slots
@@ -3892,6 +4080,106 @@ int ir_lower_func(FILE *out, Func *f)
     if (spill_stats_on > 0)
         fprintf(stderr, "SPILL %-24s ix=%-5d sp=%-5d\n",
                 f->fn ? ir_sym_name(f->fn) : "?", L.spill_ix, L.spill_sp);
+    return rc;
+}
+
+/* [#13 frameless-via-sp flip, opt-in IR_SPFLIP] Lower f fp for real (buffered),
+   read ds_ixaccess/ds_last_framed; for an ix-frame-dead fn re-lower a pristine
+   sp CLONE and emit that. Excludes `main` + IR_SPEXCL (bisect). */
+static int spflip_enabled(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_SPFLIP"); v = (e && e[0]) ? 1 : 0; }
+    return v;
+}
+
+int ir_lower_func_flip(FILE *out, Func *f)
+{
+    extern int c_framepointer_is_ix;
+    if (!spflip_enabled() || c_framepointer_is_ix != 1 || !f)
+        return ir_lower_func(out, f);
+    const char *nm = f->fn ? ir_sym_name(f->fn) : "";
+    int excluded = (strcmp(nm, "main") == 0);
+    /* IR_SPINC (comma list): if set, flip ONLY names containing a listed token. */
+    const char *inc = getenv("IR_SPINC");
+    if (!excluded && inc && inc[0]) {
+        int hit = 0; char buf[512]; strncpy(buf, inc, sizeof buf - 1); buf[sizeof buf-1]=0;
+        for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
+            if (strstr(nm, t)) { hit = 1; break; }
+        if (!hit) excluded = 1;
+    }
+    /* IR_SPEXCL (comma list): exclude names containing any listed token. */
+    if (!excluded) { const char *ex = getenv("IR_SPEXCL");
+        if (ex && ex[0]) { char buf[512]; strncpy(buf, ex, sizeof buf-1); buf[sizeof buf-1]=0;
+            for (char *t = strtok(buf, ","); t; t = strtok(NULL, ","))
+                if (strstr(nm, t)) { excluded = 1; break; } } }
+    if (excluded) return ir_lower_func(out, f);
+    Func *spc = ir_clone_func(f);
+    FILE *fpbuf = tmpfile();
+    if (!spc || !fpbuf) {
+        if (spc) ir_free_cloned_func(spc);
+        if (fpbuf) fclose(fpbuf);
+        return ir_lower_func(out, f);
+    }
+    int rc = ir_lower_func(fpbuf, f);
+    /* ►► Exclude uses_acc (float/longlong): fp_active is already false for them
+       (they address sp-relative) and they save IX because the acc/float HELPERS
+       clobber it — flipping drops that push ix, so the helper trashes the fp
+       caller's frame pointer → hang. Their IX save isn't a vreg home (idx2), so
+       frame_has_saved_ix_flip can't catch it; exclude outright. */
+    /* Also exclude the register-arg entry conventions (mirror frameless_ok):
+       fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
+       juggle the register arg assuming the fp frame — flipping mishandles it. */
+    int candidate = (rc == 0 && ds_last_framed && ds_ixaccess == 0 && !f->uses_acc
+                     && fastcall_arg_vreg(f) < 0 && !(f->flags & SDCCCALL1));
+    if (candidate) {
+        extern int ir_idx2_reg(void); extern int ir_idx3_reg(void); extern int ir_exx_reg(void);
+        int save = c_framepointer_is_ix;
+        c_framepointer_is_ix = -1;
+        spc->idx2_reg = ir_idx2_reg();     /* sp idx2=IX/idx3=IY: keep the opt */
+        spc->idx3_reg = ir_idx3_reg();
+        spc->exx_reg  = ir_exx_reg();
+        spc->flipped_from_fp = 1;          /* ►► save IX/IY it uses (fp callers need
+                                              them callee-saved) — see emit_prologue */
+        FILE *spbuf = tmpfile();
+        int rc2 = spbuf ? ir_lower_func(spbuf, spc) : -1;
+        c_framepointer_is_ix = save;
+        ir_free_cloned_func(spc);
+        /* ►► ABI safety net (general): if the sp output TOUCHES IX/IY as a
+           register (`\tix`/`,ix`/`(ix`) WITHOUT a matching `push ix` save, the
+           flipped fn would clobber the fp caller's callee-saved IX/IY — e.g. an
+           fnptr call via l_jpix emits `pop ix; call l_jpix` (unsaved). An idx2=IX
+           home IS saved (frame_has_saved_ix_flip → push ix) so it passes. A
+           uses_acc callee clobbers IX INVISIBLY (inside the helper) — hence the
+           separate uses_acc exclusion above; this scan only sees the fn's own
+           text. On reject, emit the fp buffer (no flip). */
+        int ok = (rc2 == 0);
+        if (ok && spbuf) {
+            int uix = 0, uiy = 0, six = 0, siy = 0; char ln[1024]; rewind(spbuf);
+            while (fgets(ln, sizeof ln, spbuf)) {
+                if (strstr(ln, "\tix") || strstr(ln, ",ix") || strstr(ln, "(ix")) uix = 1;
+                if (strstr(ln, "\tiy") || strstr(ln, ",iy") || strstr(ln, "(iy")) uiy = 1;
+                if (strstr(ln, "push\tix")) six = 1;
+                if (strstr(ln, "push\tiy")) siy = 1;
+            }
+            if ((uix && !six) || (uiy && !siy)) ok = 0;
+        }
+        if (ok && getenv("IR_SPFLIP_LOG"))
+            fprintf(stderr, "SPFLIP: %s flipped to sp\n", nm);
+        if (ok) { rewind(spbuf); char ch[4096]; size_t n;
+                  while ((n = fread(ch, 1, sizeof ch, spbuf)) > 0) fwrite(ch, 1, n, out); }
+        else if (rc == 0) { rewind(fpbuf); char ch[4096]; size_t n;
+                  while ((n = fread(ch, 1, sizeof ch, fpbuf)) > 0) fwrite(ch, 1, n, out); }
+        if (spbuf) fclose(spbuf);
+        fclose(fpbuf);
+        return ok ? rc2 : rc;
+    }
+    ir_free_cloned_func(spc);
+    if (rc == 0) {
+        rewind(fpbuf); char ch[4096]; size_t n;
+        while ((n = fread(ch, 1, sizeof ch, fpbuf)) > 0) fwrite(ch, 1, n, out);
+    }
+    fclose(fpbuf);
     return rc;
 }
 

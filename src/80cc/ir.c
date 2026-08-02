@@ -702,3 +702,126 @@ int ir_validate(const Func *f)
     }
     return 0;
 }
+
+/* ---- ir_clone_func: deep clone of the pre-backend IR ---------------------
+   A pristine deep copy: vregs, BBs, ops (incl. the heap-allocated CallInfo /
+   HelperInfo / SwitchInfo and their id arrays). All LEAF pointers are SHARED
+   read-only (SYMBOL*, MemOp.port PortInfo*, interned label/name/asm/file
+   strings) — the clone never frees them. Backend outputs (vreg_to_phys /
+   vreg_spill_slot / slot_offsets / frame_size / analysis BitSets) are NOT
+   copied: the clone is lowered from scratch so the backend recomputes them.
+   Motivation: lowering MUTATES the tree in place (ir_alloc → vreg_to_phys,
+   ir_assign_slots → spill_slot, the lowerer sets IR_VREG_NO_SLOT/DEAD_SPILL,
+   deadframe zeroes slots, operand-swaps), so re-lowering the same tree in a
+   different frame mode is unsound. Lower a pristine clone instead. First
+   client: the frameless-via-sp flip; reusable for inlining a callee's IR. */
+static int *ir_dup_ints(const int *a, int n)
+{
+    if (!a || n <= 0) return NULL;
+    int *r = malloc((size_t)n * sizeof(int));
+    if (r) memcpy(r, a, (size_t)n * sizeof(int));
+    return r;
+}
+static int64_t *ir_dup_i64s(const int64_t *a, int n)
+{
+    if (!a || n <= 0) return NULL;
+    int64_t *r = malloc((size_t)n * sizeof(int64_t));
+    if (r) memcpy(r, a, (size_t)n * sizeof(int64_t));
+    return r;
+}
+
+Func *ir_clone_func(const Func *s)
+{
+    if (!s) return NULL;
+    Func *d = calloc(1, sizeof *d);
+    if (!d) return NULL;
+    *d = *s;                          /* scalars + shared leaves (fn, cpu, idx regs) */
+    /* Backend outputs are recomputed by the clone's own lowering — never alias
+       the source's (which are NULL pre-backend anyway). */
+    d->vreg_to_phys = NULL;
+    d->vreg_spill_slot = NULL;
+    d->slot_offsets = NULL;
+    d->n_slots = 0;
+    d->frame_size = 0;
+    d->vregs = NULL; d->cap_vregs = 0;
+    d->bbs = NULL; d->cap_bbs = 0;
+    if (s->n_vregs > 0) {             /* VReg is POD (sym shared) */
+        d->vregs = malloc((size_t)s->n_vregs * sizeof(VReg));
+        if (!d->vregs) { free(d); return NULL; }
+        memcpy(d->vregs, s->vregs, (size_t)s->n_vregs * sizeof(VReg));
+        d->cap_vregs = s->n_vregs;
+    }
+    if (s->n_bbs > 0) {
+        d->bbs = calloc((size_t)s->n_bbs, sizeof(BB));
+        if (!d->bbs) { free(d->vregs); free(d); return NULL; }
+        d->cap_bbs = s->n_bbs;
+        for (int b = 0; b < s->n_bbs; b++) {
+            const BB *sb = &s->bbs[b];
+            BB *db = &d->bbs[b];
+            *db = *sb;                /* id, label(shared), succ[], loop_*, counts */
+            db->live_in = db->live_out = NULL;   /* analysis — recomputed */
+            db->live_in_per_op = NULL;
+            db->pred = ir_dup_ints(sb->pred, sb->n_pred);
+            db->ops = NULL; db->cap_ops = 0;
+            if (sb->n_ops > 0) {
+                db->ops = malloc((size_t)sb->n_ops * sizeof(Op));
+                memcpy(db->ops, sb->ops, (size_t)sb->n_ops * sizeof(Op));
+                db->cap_ops = sb->n_ops;
+                for (int o = 0; o < sb->n_ops; o++) {
+                    Op *op = &db->ops[o];    /* shares call/hcall/sw ptrs — deep-copy */
+                    if (op->call) {
+                        CallInfo *c = malloc(sizeof *c);
+                        if (c) { *c = *op->call;
+                                 c->args = ir_dup_ints(op->call->args, op->call->n_args);
+                                 c->arg_pushed_bytes =
+                                     ir_dup_ints(op->call->arg_pushed_bytes, op->call->n_args);
+                                 op->call = c; }
+                    }
+                    if (op->hcall) {
+                        HelperInfo *h = malloc(sizeof *h);
+                        if (h) { *h = *op->hcall;
+                                 h->args = ir_dup_ints(op->hcall->args, op->hcall->n_args);
+                                 op->hcall = h; }
+                    }
+                    if (op->sw) {
+                        SwitchInfo *w = malloc(sizeof *w);
+                        if (w) { *w = *op->sw;
+                                 w->values = ir_dup_i64s(op->sw->values, op->sw->n_cases);
+                                 w->target_bb = ir_dup_ints(op->sw->target_bb, op->sw->n_cases);
+                                 op->sw = w; }
+                    }
+                    /* op->mem (incl. port/sym/bank_fn), imm_sym, asm_text, file:
+                       shared leaves, never freed by the clone. */
+                }
+            }
+        }
+    }
+    return d;
+}
+
+/* Free a clone from ir_clone_func: only the deep-allocated arrays/structs and
+   the backend outputs the clone's own lowering produced. Shared leaves (SYMBOL,
+   PortInfo, interned strings) are NOT freed. Analysis BitSets were already freed
+   by the clone's ir_free_liveness at the end of its lowering. */
+void ir_free_cloned_func(Func *d)
+{
+    if (!d) return;
+    for (int b = 0; b < d->n_bbs; b++) {
+        BB *db = &d->bbs[b];
+        for (int o = 0; o < db->n_ops; o++) {
+            Op *op = &db->ops[o];
+            if (op->call)  { free(op->call->args); free(op->call->arg_pushed_bytes);
+                             free(op->call); }
+            if (op->hcall) { free(op->hcall->args); free(op->hcall); }
+            if (op->sw)    { free(op->sw->values); free(op->sw->target_bb); free(op->sw); }
+        }
+        free(db->ops);
+        free(db->pred);
+    }
+    free(d->bbs);
+    free(d->vregs);
+    free(d->vreg_to_phys);
+    free(d->vreg_spill_slot);
+    free(d->slot_offsets);
+    free(d);
+}

@@ -117,7 +117,27 @@ int ir_lower_to_output(Func *f)
     FILE *mem = tmpfile();
     if (!mem)
         return ir_lower_func(output, f);   /* degraded: direct emit */
-    int rc = ir_lower_func(mem, f);
+    /* [clone self-test, IR_CLONE_TEST] Lower a pristine deep CLONE instead of f.
+       If ir_clone_func is faithful the emitted asm is byte-identical to lowering
+       f directly (proven over the corpus) — the verifier gate before the clone
+       drives the frameless-via-sp flip. Skips f's own lowering, so f's backend
+       fields stay unset (the -debug cdb block below then emits nothing; run the
+       byte-identical check without -debug). */
+    if (getenv("IR_CLONE_TEST")) {
+        Func *fc = ir_clone_func(f);
+        if (fc) {
+            int rcx = ir_lower_func(mem, fc);
+            ir_free_cloned_func(fc);
+            if (rcx == 0) {
+                rewind(mem); char ch[4096]; size_t nn;
+                while ((nn = fread(ch, 1, sizeof ch, mem)) > 0)
+                    fwrite(ch, 1, nn, output);
+            }
+            fclose(mem);
+            return rcx;
+        }
+    }
+    int rc = ir_lower_func_flip(mem, f);
     if (rc == 0) {
         rewind(mem);
         char chunk[4096];
