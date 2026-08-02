@@ -208,6 +208,19 @@ static int func_is_call_free(const Func *f)
     return 1;
 }
 
+static int func_idx2_self_use(const Func *f)
+{
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            const Op *o = &f->bbs[i].ops[j];
+            if (o->kind == IR_LD_FAR || o->kind == IR_ST_FAR
+                || o->kind == IR_LD_FARSYM) return 1;
+            if (o->kind == IR_CALL && o->call
+                && (o->call->fnptr_vreg >= 0 || o->call->far_fnptr)) return 1;
+        }
+    return 0;
+}
+
 /* 5b HOOK — which callee-saved registers do THIS function's calls clobber?
    IX/IY are callee-saved: every 80cc-compiled function preserves them, so a value
    kept in IX/IY survives a call with no spill/reload (unlike BC/DE, caller-clobbered).
@@ -853,8 +866,25 @@ typedef struct {
    agree. */
 static int idx2_home_available(const Func *f)
 {
-    return f->idx2_reg != IR_PR_NONE && !f->uses_acc && !f->is_interrupt
-        && func_is_call_free(f);
+    if (f->idx2_reg == IR_PR_NONE || f->uses_acc || f->is_interrupt) return 0;
+    if (func_is_call_free(f)) return 1;
+    /* [Part C] idx2 home ACROSS CALLS — SP MODE, DEAR-SLOT TARGETS ONLY. The win
+       is replacing sp's dear `ld hl,N; add hl,sp` local-slot walk with a value
+       resident in idx2=IX across the call (searchbench −28B/−0.72%t, vecbench
+       +16B/−4.31%t = the good byte-for-cycle trade on z80). Two exclusions:
+        - fp mode (idx2=IY, cheap (ix+d) slots): lose/lose — the push/pop access
+          + the caller-IX save beat nothing. Keep the blunt call-free gate.
+        - cheap-sp-slot CPUs: ez80 (native `ld hl,(ix+d)`), rabbit and kc160 all
+          address sp locals cheaply, so the dear-slot premise doesn't hold and
+          the idx2 home doesn't pay (same class the g0 dear-slot cost gates use).
+          Only the z80 family (z80/z180/z80n) has the dear `add hl,sp` walk.
+       IX is callee-saved (Part A saves it via frame_has_saved_ix; the library is
+       IX-safe); reject when the function uses IX itself (fnptr dispatch/far). */
+    if (c_framepointer_is_ix != -1) return 0;          /* sp mode only */
+    if (IS_EZ80() || IS_RABBIT() || IS_KC160()) return 0;   /* cheap sp slots */
+    if (func_call_clobbers(f) & CLOB_IX) return 0;     /* sp idx2 = IX */
+    if (func_idx2_self_use(f)) return 0;
+    return 1;
 }
 static int idx3_home_available(const Func *f)
 {

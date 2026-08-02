@@ -1073,23 +1073,87 @@ static int frame_has_debug_fp(const Func *f)
    sp-mode only (idx3_reg == IY); interrupts save IY via their own push-all. */
 static int frame_has_saved_iy(const Func *f)
 {
-    if (!f || f->is_naked || f->is_interrupt) return 0;
-    if (f->idx3_reg == IR_PR_NONE || !f->vreg_to_phys) return 0;
-    for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == f->idx3_reg) return 1;
+    if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
+    for (int i = 0; i < f->n_vregs; i++) {
+        int p = f->vreg_to_phys[i];
+        /* IY word home (idx3) — the original case, gated on idx3_reg==IY. */
+        if (f->idx3_reg != IR_PR_NONE && p == f->idx3_reg) return 1;
+        /* IY byte-half home (assign_idxhalf_homes): also occupies IY, which is
+           callee-saved — a leaf that homes a byte in IYL/IYH must push/pop IY to
+           preserve a caller's IY (e.g. qsort holds the comparator fnptr there).
+           Mirrors frame_has_saved_ix's IXL/IXH cover. idxhalf is sp-mode only, so
+           no fp (ix+d) param-offset interaction. Inert when idxhalf is disabled
+           (--opt-disable=idxhalf → no half homes exist). */
+        if (p == IR_PR_IYL || p == IR_PR_IYH) return 1;
+    }
     return 0;
 }
 
-/* [#13] A function FLIPPED fp→sp that homes a value in IX (sp-mode idx2) must
-   save IX on entry: its fp CALLERS use IX as their frame pointer (callee-saved).
-   IY (idx3) is already covered by frame_has_saved_iy. Mirror that shape so the
-   prologue/epilogue push/pop it and the param-offset calc shifts by its 2 bytes. */
-static int frame_has_saved_ix_flip(const Func *f)
+/* True iff the function contains an indirect (function-pointer) call. In sp
+   mode the fnptr dispatch loads the pointer into idx2 = IX (`push hl; pop ix;
+   jp (ix)` via l_jpix), clobbering IX. */
+static int func_has_indirect_call(const Func *f)
 {
-    if (!f || !f->flipped_from_fp || f->is_naked || f->is_interrupt) return 0;
-    if (f->idx2_reg != IR_PR_IX || !f->vreg_to_phys) return 0;
-    for (int i = 0; i < f->n_vregs; i++)
-        if (f->vreg_to_phys[i] == f->idx2_reg) return 1;
+    if (!f) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_CALL && o->call && o->call->fnptr_vreg >= 0)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+/* True iff the function makes a __far access or far call. The far helpers
+   (l_farcall / lp_* far load-store) use IX. */
+static int func_uses_far(const Func *f)
+{
+    if (!f) return 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->kind == IR_LD_FAR || o->kind == IR_ST_FAR
+                || o->kind == IR_LD_FARSYM)
+                return 1;
+            if (o->kind == IR_CALL && o->call && o->call->far_fnptr)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+/* True iff entry must save the caller's IX because this sp-mode function itself
+   USES IX. IX is callee-saved in the z88dk ABI — it is the frame pointer for
+   fp-mode / sdcc-ix callers (and for #13-flipped functions' fp callers), and
+   the std library preserves it (qsort/bsearch push/pop it around their own
+   internal IX use). So an sp-mode function that touches IX must push/pop it;
+   the saved IX sits between the locals and the return address (like the idx3
+   IY save via frame_has_saved_iy), shifting caller-arg offsets up by 2.
+   IX is used in sp mode by:
+     - a word residency home (idx2 = IX) or a byte-half home (IXL/IXH);
+     - the accumulator helpers (uses_acc: float-in-FA / long long — their
+       dcallee `pop ix` retaddr stash clobbers IX);
+     - __far accesses / far calls (l_farcall / lp_* use IX);
+     - an indirect (fnptr) call, whose sp dispatch loads the fnptr into idx2=IX.
+   fp-mode saves IX via frame_has_saved_fp instead (return 0 here); 808x/gbz80
+   have no index registers. Covers native sp AND the #13 fp->sp flip (lowered
+   with c_framepointer_is_ix == -1). Generalises the former frame_has_saved_ix_flip. */
+static int frame_has_saved_ix(const Func *f)
+{
+    if (!f || f->is_naked || f->is_interrupt) return 0;
+    if (c_framepointer_is_ix == 1) return 0;   /* fp: IX is the frame pointer */
+    if (IS_808x() || IS_GBZ80()) return 0;     /* no index registers */
+    if (f->uses_acc) return 1;                 /* acc/float/i64 helpers clobber IX */
+    if (func_uses_far(f)) return 1;            /* l_farcall / lp_* clobber IX */
+    if (func_has_indirect_call(f)) return 1;   /* fnptr dispatch via idx2 = IX */
+    if (f->vreg_to_phys)
+        for (int i = 0; i < f->n_vregs; i++) {
+            int p = f->vreg_to_phys[i];
+            if (p == IR_PR_IX || p == IR_PR_IXL || p == IR_PR_IXH) return 1;
+        }
     return 0;
 }
 
@@ -1198,7 +1262,7 @@ static int param_caller_off(const Func *f, int vreg_id)
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
                     + (frame_has_debug_fp(f) ? 2 : 0)   /* l_debug_push_frame save */
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
-                    + (frame_has_saved_ix_flip(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
+                    + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
                        between the locals and the return address. Rabbit's
@@ -1238,7 +1302,7 @@ static int param_caller_off(const Func *f, int vreg_id)
    lowerer addresses slots via the `ld hl,N; add hl,sp; ld _,(hl)...`
    byte-pair sequence. PARAM_IN_PLACE vregs return their caller-pushed-arg
    offset directly. */
-static void note_slot_use(int v);   /* IR_DEADSLOT: fwd (defined with rec state) */
+static void note_slot_use(int v);   /* frame-slot use accounting: fwd (defined with rec state) */
 /* [IR_DEADSTORE] write-context depth: >0 while lowering a store function body,
    so note_slot_use attributes its slot_off calls (store + guard checks) to the
    write count. Save/restore (not set/clear) because stores nest via
@@ -1787,22 +1851,21 @@ RegMask op_clobbers(const Func *f, const Op *op)
         return IR_R_ALL;
     case IR_CALL:
         /* 5b: IX/IY are callee-saved. A DIRECT call to a known function preserves
-           IY — every 80cc function does, and the callable library is IY-safe on
-           non-ZX targets (audited: far mem/str routines save it; qsort/bsearch use
-           IX; the mainstream float libs save/restore it). The only callable IY
-           clobberers are ZX-Spectrum-specific (zxmath ftoa, sp1 sprites, wyz sound)
-           and run under --reserve-regs-iy anyway (the ROM interrupt owns IY), so no
-           value is IY-homed there. So a value in IY survives a direct call with no
-           spill/reload. INDIRECT (function-pointer) calls have an unknown target →
-           stay conservative. IX stays clobbered (qsort etc. use it; idx2/IX is
-           call-free-gated separately). Under --reserve-regs-iy this is moot (nothing
-           is IY-homed). */
+           BOTH — every 80cc function does (fp mode: IX is the frame pointer, saved
+           via frame_has_saved_fp; sp mode: frame_has_saved_ix push/pop's it when
+           the function uses IX; IY likewise via frame_has_saved_iy), and the
+           callable library saves them: far mem/str routines, the float libs, and
+           qsort/bsearch (which push/pop IX around their own comparator dispatch).
+           The only callable IY clobberers are ZX-Spectrum-specific (zxmath ftoa,
+           sp1 sprites, wyz sound) and run under --reserve-regs-iy anyway. So a
+           value in IX or IY survives a direct call with no spill/reload. INDIRECT
+           (function-pointer) calls have an unknown target → stay conservative. */
         /* __preserves_regs(...) on the callee removes those register pairs
            from the clobber set (op->call->preserved; 0 when unannotated), so
            a value stays resident across the call — e.g. a pointer kept in BC
            across intrinsic_swap_endian (declared __preserves_regs(b,c)). */
         if (op->call && op->call->fnptr_vreg < 0)
-            return (IR_R_ALL & ~IR_R_IY) & ~op->call->preserved;
+            return (IR_R_ALL & ~IR_R_IY & ~IR_R_IX) & ~op->call->preserved;
         return IR_R_ALL;
     case IR_ASM: case IR_PUSH_ARG:
     case IR_PUSH_STRUCT: case IR_SWITCH: case IR_RET: case IR_MEMSET:
@@ -1836,14 +1899,13 @@ static int  *rec_remat;           /* per-vreg: uses rematerialised */
 static int   rec_nv;              /* size of the above (this function) */
 static int   rec_counting;        /* 1 while a final render is instrumented */
 
-/* Dead frame-slot detector (IR_DEADSLOT, inert). rec_slotuse[v] counts genuine
-   frame-slot accesses emitted for v (hooked in slot_off/slot_ix_off — the two
-   chokepoints every frame-slot load/store passes through; stack transients and
-   cache hits don't). A SPILL vreg with a slot but rec_slotuse==0 is a DEAD slot
-   (its value is served entirely from registers/push-pop/remat) → droppable, the
-   frame shrinks. Sound (over-counts from non-emit slot_off checks → never
-   falsely dead), so a reported dead-slot really is dead. */
-static int   ds_on = -1;
+/* Frame-slot use accounting (shared by IR_DEADSTORE and IR_DEADFRAME).
+   rec_slotuse[v] counts genuine frame-slot accesses emitted for v (hooked in
+   slot_off/slot_ix_off — the two chokepoints every frame-slot load/store passes
+   through; stack transients and cache hits don't). A SPILL vreg with a slot but
+   rec_slotuse==0 is a DEAD slot (served entirely from registers/push-pop/remat);
+   an all-dead frame is dropped frameless (IR_DEADFRAME). Sound: over-counts from
+   non-emit slot_off checks → never falsely dead. */
 static int  *rec_slotuse;
 /* [IR_DEADSTORE, inert] rec_slotwrite[v] counts frame-slot WRITES of v — the
    subset of rec_slotuse[v] emitted by the store functions (store_a_byte/
@@ -1868,15 +1930,6 @@ static int rec_enabled(void)
         rec_on = e ? (e[0] == '2' ? 2 : (e[0] ? 1 : 0)) : 0;
     }
     return rec_on;
-}
-
-static int ds_enabled(void)
-{
-    if (ds_on < 0) {
-        const char *e = getenv("IR_DEADSLOT");
-        ds_on = e ? (e[0] == '2' ? 2 : (e[0] ? 1 : 0)) : 0;
-    }
-    return ds_on;
 }
 
 /* IR_DEADSTORE dead byte-spill elision (DEFAULT-ON). The render's read/write
@@ -1918,7 +1971,7 @@ static void rec_begin(const Func *f)
 {
     rec_reset();
     ds_ixaccess = 0;                  /* [#13] per-render (ix+-d)-access count */
-    if ((!rec_enabled() && !ds_enabled() && !deadframe_on() && !dsx_enabled()
+    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled()
          && !ff_enabled())
         || L.ss_phase == 1 || f->n_vregs <= 0)
         return;
@@ -2012,7 +2065,7 @@ static void rec_end(const Func *f)
        spans p. dead = covered & !live — the exact droppable frame shrink. This
        is also increment-2's drop rule: only drop a slot whose members are ALL
        dead. */
-    if ((ds_enabled() || deadframe_on() || dsx_enabled())
+    if ((deadframe_on() || dsx_enabled())
         && f->frame_size > 0 && f->vreg_spill_slot) {
         int fs = f->frame_size;
         char *covered = calloc((size_t)fs, 1);
@@ -2036,9 +2089,6 @@ static void rec_end(const Func *f)
                     covered[p] = 1;
                     if (rec_slotuse[v] != 0 || !trustable) live[p] = 1;
                 }
-                if (ds_on >= 2 && rec_slotuse[v] == 0)
-                    fprintf(stderr, "IR_DEADSLOT:   v%d width=%d slot=%d NEVER-EMITTED\n",
-                            v, f->vregs[v].width, off);
             }
             int deadbytes = 0;
             for (int p = 0; p < fs; p++) if (covered[p] && !live[p]) deadbytes++;
@@ -2046,10 +2096,6 @@ static void rec_end(const Func *f)
                frameless (frame_size=0). Only every-byte-dead qualifies: a
                partial shrink would move live slot offsets. */
             L.frame_fully_dead = (deadbytes == fs);
-            if (ds_enabled() && deadbytes)
-                fprintf(stderr, "IR_DEADSLOT: %s dead-bytes=%d frame=%d%s\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", deadbytes, fs,
-                        deadbytes == fs ? "  FRAMELESS" : "");
         }
         /* [IR_DEADSTORE, INERT] Write-only (dead-store) byte-slot report. Uses
            the read/write split: reads[v] = rec_slotuse[v] - rec_slotwrite[v].
@@ -2102,7 +2148,8 @@ static void rec_end(const Func *f)
                     fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d wr=%d rd=0 "
                             "DEAD-STORE\n", v, w, off, rec_slotwrite[v]);
             }
-            if (nfn)
+            if (nfn && dsx_on >= 2)   /* report only at IR_DEADSTORE=2 — default-on
+                                         must be SILENT (was printing every compile) */
                 fprintf(stderr, "IR_DEADSTORE: %s dead-stores=%d\n",
                         f->fn ? ir_sym_name(f->fn) : "?", nfn);
         }
@@ -2446,11 +2493,11 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            teardown above; this branch is the !fp_active acc-tier case only.) */
         if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
         emit(out, "pop\t%s", frame_reg());
-    } else if (!fp_active(f) && (frame_has_saved_iy(f) || frame_has_saved_ix_flip(f))) {
+    } else if (!fp_active(f) && (frame_has_saved_iy(f) || frame_has_saved_ix(f))) {
         /* Pure sp-mode: restore the saved index regs before the return address is
            read. Prologue pushed IY (idx3) THEN IX (flipped idx2), so IX is on top
            — pop it first. Touches only IX/IY/SP. */
-        if (frame_has_saved_ix_flip(f)) emit(out, "pop\tix");
+        if (frame_has_saved_ix(f)) emit(out, "pop\tix");
         if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
     }
     if (frame_has_debug_fp(f)) {
@@ -2674,8 +2721,9 @@ static void emit_prologue(FILE *out, Func *f)
     if (frame_has_saved_iy(f))      /* idx3: preserve caller's IY (callee-saved),
                                        below the return address / above the frame */
         emit(out, "push\tiy");
-    if (frame_has_saved_ix_flip(f)) /* [#13] flipped fn: preserve the fp caller's
-                                       frame pointer (IX), used here as sp idx2 */
+    if (frame_has_saved_ix(f)) /* sp-mode fn that uses IX: preserve the caller's
+                                       IX (callee-saved — frame ptr for fp/sdcc
+                                       callers, #13-flip's fp caller) */
         emit(out, "push\tix");
     if (frame_has_debug_fp(f))      /* no-IX -debug: chain __debug_framepointer.
                                        Pushes 2 bytes, preserves HL (fastcall arg),
@@ -2881,7 +2929,7 @@ static void emit_prologue(FILE *out, Func *f)
        address, shifting args up another 2. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 2 : 0)
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
-                    + (frame_has_saved_ix_flip(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
+                    + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2). */
                     + (f->is_interrupt ? 12 : ((f->flags & CRITICAL) ? 2 : 0));
@@ -3266,18 +3314,28 @@ static int op_is_commutative(OpKind kind)
    z80/z80n/ez80 only (index-half ALU). Runs after ir_alloc, before
    ir_assign_slots (so promoted vregs get needs_slot=0).
 
-   OPT-IN (IR_IDXHALF): DISABLED by default. Homing a byte in an index-register
-   half CLOBBERS the whole index register (IX/IY), but IY is callee-saved in the
-   z88dk ABI — e.g. l_qsort/l_bsearch hold the comparator function pointer in IY
-   across every comparator call (l_setiy + asm_l_qsort). A leaf comparator that
-   homes a byte in IYL/IYH corrupts that pointer → crash (was: stdlib bsearch
-   suite). Making this sound needs the function to push/pop the index register it
-   uses (with the matching param/frame-offset compensation across every calling
-   convention + teardown path); until that lands, the feature is off by default.
-   Set IR_IDXHALF to re-enable for measurement. */
+   DEFAULT-ON, SP-MODE ONLY (--opt-disable=idxhalf opts out). Homing a byte in an index
+   half CLOBBERS the whole IX/IY, both callee-saved in the z88dk ABI — e.g.
+   l_qsort/l_bsearch hold the comparator fnptr in IY across the comparator call,
+   so a leaf that homes a byte in IYL/IYH must preserve the caller's IY. That is
+   now handled: frame_has_saved_ix / frame_has_saved_iy push/pop the index reg
+   whenever a byte-half home occupies it (sp idx2=IX, idx3=IY). SP MODE ONLY for
+   two reasons: (1) fp barely benefits (idx read ≈ cheap (ix+d) slot); (2) the
+   frame_has_saved_iy +2 param-offset compensation is sp-relative — fp params are
+   (ix+d) and would need separate handling. So we never idxhalf in fp: the value
+   isn't there AND the fp offset path never runs. NET-BYTE gate below: only home
+   when it saves code (in sp the dear `ld hl,N;add hl,sp` slot access makes byte
+   and cycle savings correlate, so net-bytes>0 ⇒ a balanced win — charbench
+   −8B/−8.72%t; the gate rejects break-even shapes like strbench that only pay
+   the +4B IY-save). */
+static int idxhalf_enabled(void)
+{
+    return !opt_disabled("idxhalf");   /* default on; --opt-disable=idxhalf opts out */
+}
 static void assign_idxhalf_homes(Func *f)
 {
-    if (!getenv("IR_IDXHALF")) return;   /* opt-in: unsound re callee-saved IX/IY */
+    if (!idxhalf_enabled()) return;                 /* default on; --opt-disable=idxhalf opts out */
+    if (c_framepointer_is_ix != -1) return;         /* SP MODE ONLY (see above) */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80())) return;
     if (!f || f->n_vregs <= 0 || !f->vreg_to_phys) return;
     /* No calls/asm — else IX/IY would be trashed mid-live-range. */
@@ -3311,11 +3369,12 @@ static void assign_idxhalf_homes(Func *f)
        (defines src[0], not dst) is counted correctly. */
     int nv = f->n_vregs;
     int *ndef = calloc((size_t)nv, sizeof(int));
-    long *wuse = calloc((size_t)nv, sizeof(long));   /* depth-weighted use score */
+    long *wuse = calloc((size_t)nv, sizeof(long));   /* depth-weighted use score (ticks) */
+    int *ruse = calloc((size_t)nv, sizeof(int));     /* RAW use count (code-size / net-byte) */
     int *first = malloc((size_t)nv * sizeof(int));
     int *last  = malloc((size_t)nv * sizeof(int));
-    if (!ndef || !wuse || !first || !last) {
-        free(ndef); free(wuse); free(first); free(last); return;
+    if (!ndef || !wuse || !ruse || !first || !last) {
+        free(ndef); free(wuse); free(ruse); free(first); free(last); return;
     }
     for (int v = 0; v < nv; v++) { first[v] = INT_MAX; last[v] = -1; }
     /* Cheap loop-nesting depth per BB (selection ranking only — never affects
@@ -3347,6 +3406,7 @@ static void assign_idxhalf_homes(Func *f)
             int un = ir_op_uses(o, u, 16);
             for (int k = 0; k < un; k++) if (u[k] >= 0 && u[k] < nv) {
                 wuse[u[k]] += w;
+                ruse[u[k]]++;                        /* raw (unweighted) use site count */
                 if (g < first[u[k]]) first[u[k]] = g;
                 if (g > last[u[k]])  last[u[k]]  = g;
             }
@@ -3372,6 +3432,22 @@ static void assign_idxhalf_homes(Func *f)
             if (ndef[v] != 1) continue;                        /* SSA dominance */
             if (wuse[v] < 8) continue;                         /* hot: ≥1 loop use */
             if (last[v] < 0) continue;                         /* dead */
+            /* NET-BYTE gate (sp): home only when the index-half saves code.
+               `save_per` (3) ≈ a dear sp slot byte access (`ld hl,N; add hl,sp;
+               ld a,(hl)` ≈ 5B) − `ld a,iyl` (2B). `ovh` (10) folds the one-time
+               push/pop index-reg save (~4B, frame_has_saved_*) PLUS the setup /
+               move slop a low-access half-home incurs (a byte needing a CB-page
+               shift or an HL transit can't stay in a half — the op-shape term
+               the model lacks). RAW (unweighted) access sites — code size is
+               static, not per-iteration. In sp the byte and cycle savings
+               correlate, so net-bytes>0 tracks the balanced win. Calibrated by
+               sweep: home iff RAW accesses ≥ 4 — keeps charbench (−16B/−11.9%t,
+               hot crc8 accumulator), rejects break-even shapes (intbench/
+               strbench/hashbench) that only pay the save. */
+            {
+                long acc = (long)ndef[v] + ruse[v];
+                if (acc * 3 - 10 <= 0) continue;
+            }
             if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
                 continue;
             if (best < 0 || wuse[v] > wuse[best]) best = v;
@@ -3397,7 +3473,7 @@ static void assign_idxhalf_homes(Func *f)
             ndef[best] = 0;
         }
     }
-    free(ndef); free(wuse); free(first); free(last); free(bdep);
+    free(ndef); free(wuse); free(ruse); free(first); free(last); free(bdep);
 }
 
 int ir_lower_func(FILE *out, Func *f)
@@ -4055,6 +4131,29 @@ int ir_lower_func(FILE *out, Func *f)
         if (rout != out) fclose(rout);
         goto deadframe_retry;
     }
+    /* [IR_IX_VERIFY] sp-mode IX-preservation completeness check (debug-gated):
+       if the render touched IX but frame_has_saved_ix decided NOT to save it,
+       the caller's IX is clobbered — a hole in the save predicate. Scans the
+       rendered body (tmpfile only). 1 = warn, 2 = abort. Prove-completeness
+       harness for Part A: run it across long_ir/corpus/emu; expect zero hits. */
+    if (rc == 0 && elide_labels && rout != out
+        && c_framepointer_is_ix != 1 && !frame_has_saved_ix(f)) {
+        const char *v = getenv("IR_IX_VERIFY");
+        if (v && v[0]) {
+            rewind(rout);
+            char ln[1024]; int touched = 0;
+            while (fgets(ln, sizeof ln, rout))
+                if (strstr(ln, "\tix") || strstr(ln, ",ix") || strstr(ln, "(ix")) {
+                    touched = 1; break;
+                }
+            if (touched) {
+                fprintf(stderr, "IR_IX_VERIFY: %s touches IX in sp mode with NO "
+                        "save (frame_has_saved_ix missed it)\n",
+                        f->fn ? ir_sym_name(f->fn) : "?");
+                if (v[0] == '2') abort();
+            }
+        }
+    }
     if (elide_labels) {
         if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb);
         else { rewind(rout); char buf[1024];   /* error path: copy verbatim */
@@ -4126,7 +4225,7 @@ int ir_lower_func_flip(FILE *out, Func *f)
        (they address sp-relative) and they save IX because the acc/float HELPERS
        clobber it — flipping drops that push ix, so the helper trashes the fp
        caller's frame pointer → hang. Their IX save isn't a vreg home (idx2), so
-       frame_has_saved_ix_flip can't catch it; exclude outright. */
+       frame_has_saved_ix can't catch it; exclude outright. */
     /* Also exclude the register-arg entry conventions (mirror frameless_ok):
        fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
        juggle the register arg assuming the fp frame — flipping mishandles it. */
@@ -4149,7 +4248,7 @@ int ir_lower_func_flip(FILE *out, Func *f)
            register (`\tix`/`,ix`/`(ix`) WITHOUT a matching `push ix` save, the
            flipped fn would clobber the fp caller's callee-saved IX/IY — e.g. an
            fnptr call via l_jpix emits `pop ix; call l_jpix` (unsaved). An idx2=IX
-           home IS saved (frame_has_saved_ix_flip → push ix) so it passes. A
+           home IS saved (frame_has_saved_ix → push ix) so it passes. A
            uses_acc callee clobbers IX INVISIBLY (inside the helper) — hence the
            separate uses_acc exclusion above; this scan only sees the fn's own
            text. On reject, emit the fp buffer (no flip). */

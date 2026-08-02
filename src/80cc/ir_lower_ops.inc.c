@@ -3355,6 +3355,18 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 emit(out, "add\t%s,de", ir);
                 invalidate_de_cache();
             }
+            /* dst's value now lives ONLY in the index register — it just
+               changed. Any register cache still naming dst is stale: reads of
+               an idx-homed vreg go through the home (push iy;pop hl), but a
+               lingering hl/de/bc/a belief would cache-hit the pre-add value.
+               (enigma fp: `ch = rotor[..]` inits IY and leaves HL=ch, then
+               `ch += rings[i]` does add iy,de — the following `if(ch>'Z')`
+               compared the STALE HL.) There is no index-reg cache field, so
+               just drop the stale scalar beliefs. */
+            if (L.rs.hl == op->dst) invalidate_hl_cache();
+            if (L.rs.de == op->dst) invalidate_de_cache();
+            if (L.rs.bc == op->dst) invalidate_bc_cache();
+            if (L.rs.a  == op->dst) invalidate_a_cache();
             return 0;                                  /* result stays in the index reg */
         }
     }
