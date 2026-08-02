@@ -3030,15 +3030,38 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 invalidate_hl_bc();
             }
         } else {
-            load_to_hl(out, f, op->src[0]);
-            emit(out, "ex\tde,hl");         /* DE = value */
-            /* ex de,hl physically swaps HL<->DE, so the regcache beliefs must
-               swap too. Without this the stale rs.de (e.g. the base pointer,
-               when it arrived in DE — a call result) misleads the load_to_hl
-               below into `ld l,e; ld h,d`, copying the VALUE now in DE into HL
-               instead of the base — storing to a wild address. */
-            { int t = L.rs.hl; L.rs.hl = L.rs.de; L.rs.de = t; L.rs.dehl = -1; }
-            load_to_hl(out, f, op->mem.base);
+            /* [IR_HL_CARRY inc1] Base already resident in HL: load the value
+               STRAIGHT to DE (load_to_de preserves HL on the common fp/native
+               paths) instead of load_to_hl(value)+ex de,hl (which clobbers the
+               base in HL, forcing a reload). The following load_to_hl(base) then
+               cache-hits and the redundant base reload is elided AT SOURCE — what
+               copt's `ld hl,(slot);ex de,hl`→`ld de,(slot)` fold + #R4 recover
+               post-hoc (and beyond copt's 3-line window). Self-correcting: if
+               load_to_de DID clobber HL, the inc0 vemit tracker drops rs.hl (base
+               is slot-backed = hlde_belief_droppable) and load_to_hl reloads it.
+               Gated: needs the tracker active, and base recoverable. */
+            if (hl_carry_enabled() && hl_has(op->mem.base)
+                && hlde_belief_droppable(op->mem.base)
+                /* The VALUE must also be recoverable to DE without HL: base owns HL
+                   here, so load_to_de(value) can't lean on an HL belief. If the
+                   value is only reachable via HL (NO_SLOT, non-remat, not in DE/BC),
+                   fall to the original path (load value to HL first) — else
+                   load_to_de strands it (adv_a SH_SETV: GVARS[PARAM1]=nParam2). */
+                && (hlde_belief_droppable(op->src[0])
+                    || de_has(op->src[0]) || bc_has(op->src[0]))) {
+                load_to_de(out, f, op->src[0]);        /* DE = value; base kept in HL */
+                load_to_hl(out, f, op->mem.base);      /* elided if HL still = base */
+            } else {
+                load_to_hl(out, f, op->src[0]);
+                emit(out, "ex\tde,hl");         /* DE = value */
+                /* ex de,hl physically swaps HL<->DE, so the regcache beliefs must
+                   swap too. Without this the stale rs.de (e.g. the base pointer,
+                   when it arrived in DE — a call result) misleads the load_to_hl
+                   below into `ld l,e; ld h,d`, copying the VALUE now in DE into HL
+                   instead of the base — storing to a wild address. */
+                { int t = L.rs.hl; L.rs.hl = L.rs.de; L.rs.de = t; L.rs.dehl = -1; }
+                load_to_hl(out, f, op->mem.base);
+            }
             emit_hl_add_offset(out, op->mem.offset, 1, 1);
             if (IS_EZ80()) {
                 emit(out, "ld\t(hl),de");   /* ez80: *HL = DE */

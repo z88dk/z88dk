@@ -897,18 +897,24 @@ static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
    and the A cache is reset at every BB entry, so within-BB read-only suffices. */
 static int a_cache_carry_safe(const Func *f, int vreg_id)
 {
-    /* CORRECTNESS: only the conservative whole-function `wc<=1` gate is sound.
-       The read-only-to-BB-end relaxation (checking the VREG is not rewritten)
-       was UNSOUND — it ignores PHYSICAL A being clobbered between the cache_a
-       and the later reuse. The lowerer has a class of direct `ld a,...` inline
-       emits that clobber A without invalidating the A-cache, so a widened carry
-       window trips them: emu.c (magnetic interpreter) dropped output characters
-       (the space char) — bisected to 49a00d89a6, which long_ir/matrix/
-       IR_HOME_VERIFY all MISSED (real-file-only). Re-enable the window only once
-       A-clobber tracking is complete at the vemit chokepoint (RESIDENCY_HANDOVER
-       "vemit tracker, Design C" — whitelist preservers, invalidate-by-default). */
     (void)f;
-    return L.vreg_wc && L.vreg_wc[vreg_id] <= 1;          /* never rewritten */
+    if (L.vreg_wc && L.vreg_wc[vreg_id] <= 1) return 1;   /* never rewritten */
+    /* Widened window (IR_A_CARRY): also safe when the VREG is READ-ONLY for the
+       rest of this BB (no later dst==v / POSTSTEP on v). Historically this alone
+       was UNSOUND — it ignores PHYSICAL A being clobbered between the cache_a and
+       the reuse (a class of direct `ld a,…` inline emits that dropped output chars
+       in emu.c, bisected to 49a00d89a6). It is sound ONLY paired with the vemit
+       invalidate-by-default A tracker (also gated on IR_A_CARRY), which drops rs.a
+       across any A-value-changing line. Cross-BB carry stays gated by bb_a_out;
+       the A-cache resets at every BB entry, so within-BB read-only suffices. */
+    if (!a_carry_enabled()) return 0;
+    if (!cur_bb) return 0;                                /* no context → refuse */
+    for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
+        const Op *o = &cur_bb->ops[j];
+        if (o->dst == vreg_id) return 0;
+        if (o->kind == IR_POSTSTEP && o->src[0] == vreg_id) return 0;
+    }
+    return 1;
 }
 
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
@@ -1052,11 +1058,21 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
         L.rs.a = -1;   /* value now lives at TOS; readers must go through the pop */
         return;
     }
+    /* A still physically holds the stored byte after any of the slot-store paths
+       below (none clobbers A). Advertise it so an immediately-following
+       load_byte_to_a(v) elides the reload AT SOURCE — the byte analog of inc1
+       (what copt #269/#R2 recover post-hoc). Slot-backed here ⇒ recoverable, and
+       the default-on A-invalidator drops rs.a if a later op value-changes A, so
+       the belief can't go stale. Gated on a_carry_enabled() (IR_A_CARRY=0 =
+       pre-tracker, byte-identical) and !VOLATILE (a volatile must reload). */
+    int a_stays = a_carry_enabled()
+                  && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE);
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {
             emit(out, "ld\t(%s%+d),a%s", frame_reg(), ix_off,
                  vol_stamp(f, vreg_id));
+            if (a_stays) cache_a(vreg_id);
             return;
         }
     }
@@ -1067,6 +1083,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
     if (L.cur_hl_addr_off >= 0) {
         emit_byte_slot_addr(out, f, vreg_id);
         emit(out, "ld\t(hl),a%s", vol_stamp(f, vreg_id));
+        if (a_stays) cache_a(vreg_id);
         return;
     }
     /* No address cache: flush any pending spill (while HL still holds it),
@@ -1082,6 +1099,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
        this slot's address for the next same-slot access. */
     invalidate_hl_cache();
     cache_hl_slot_addr(f, vreg_id);
+    if (a_stays) cache_a(vreg_id);
 }
 
 /* Load 4-byte (long) value from a vreg's frame slot into DEHL.

@@ -341,6 +341,101 @@ static int  verify_len;
 static int  clob_verify_on = -1;
 static long clob_verify_count;
 static int  clob_snap_hl, clob_snap_de, clob_snap_bc, clob_snap_a;
+
+/* Unified instruction-effects query (P0 Step 2 — decomposer consolidation).
+   ONE query every consumer uses (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's
+   park sweep, the IR_A_CARRY A-invalidator in vemit), COMPOSING the two
+   single-responsibility kernels — lra_line_writes (whole-reg WRITE mask) and
+   bc_line_effect (sub-register B/C reads/writes + park/control) — plus the
+   value-change refinements. So an asm line is decomposed in one place; the
+   kernels are its private implementation. Declared here (above vemit) so the
+   A-carry invalidator can query the just-emitted line's effect on A. */
+typedef struct {
+    RegMask writes;     /* whole-reg writes (lra_line_writes) */
+    RegMask self_pres;  /* subset of writes whose VALUE is preserved (`or a`,`and a`) */
+    RegMask stepped;    /* subset of writes that are an in-place inc/dec */
+    RegMask swapped;    /* subset of writes that are a reg-reg exchange */
+    int unknown;
+    /* sub-register B/C (the park-liveness sweep needs B and C tracked separately) */
+    int b_read, c_read, b_write, c_write;
+    int park;           /* the exact `ld bc,hl` low-half stash */
+    int is_boundary;    /* ret/reti/retn — BC dead at exit (result ABI is DE:HL) */
+    int is_call;        /* jp/jr/djnz/call/rst — a successor may read BC */
+} InstrEffects;
+static InstrEffects instr_effects(const char *line);
+
+/* Windowed byte A-carry: widen the A-cache carry window (a_cache_carry_safe)
+   AND, as its correctness partner, invalidate the A-cache at the vemit chokepoint
+   on any emitted line that VALUE-CHANGES A. Invalidate-by-default (Design C): A
+   survives only across lines instr_effects PROVES preserve A's value — an
+   unrecognised (unknown) or A-writing line drops rs.a. An incomplete recogniser
+   therefore loses BYTES, never CORRECTNESS.
+
+   DEFAULT-ON (2026-07-30, d72ac2e261 shipped it opt-in; flipped after the ticks
+   matrix). Opt out with IR_A_CARRY=0 — that reproduces the pre-flip codegen
+   byte-for-byte (emu.c 25263 vs 25169 on) and is the regression-test path.
+
+   ►► REVISIT / TUNE LATER: default-on costs +4 B on md5 (8 corpus cells) with a
+   FLAT tick delta (the sites are cold). Root: caching A holding a pointer low byte
+   flips a `ptr+K` lowering from `push de;ld de,K;add hl,de;pop de` (6 B) to an
+   A-based `add a,K;ld l,a;ld a,h;adc a,0;ld h,a` (7 B) — +1 B/−16 T per site, a
+   cold-path byte-for-tick trade the size push doesn't want. The clean fix (deferred,
+   not blocking): gate that A-based +K pointer lowering to fire only when it does
+   NOT grow bytes, then this is a pure win. Tracked in HANDOVER_2026-07-30.md §1b.A. */
+static int  a_carry_on = -1;
+static int  a_carry_enabled(void)
+{
+    if (a_carry_on < 0) {
+        const char *e = getenv("IR_A_CARRY");
+        a_carry_on = (e && e[0] == '0') ? 0 : 1;      /* default ON; IR_A_CARRY=0 opts out */
+    }
+    return a_carry_on;
+}
+
+/* IR_HL_CARRY (opt-in, WIP): the same invalidate-by-default tracker extended to
+   HL and DE — the vehicle for HL/DE operand-residency carry (the #2 size bucket).
+   Increment 0 = the inert safety net: rs.hl/rs.de survive across raw emits and are
+   dropped only when the emitted line VALUE-CHANGES the reg. Two HL-specific
+   guards vs the A tracker: (1) do NOT drop rs.hl while a lazy word spill is
+   pending (pending_spill_v>=0) — the hl_about_to_change choke owns HL then and
+   flushes before the clobber; (2) do NOT treat `ex de,hl` (swapped) as a clobber —
+   the lowerer's swap_hl_de_caches already permutes the beliefs.
+
+   DEFAULT-ON (2026-07-30): the full 9-CPU-subset ticks matrix (valid-tick CPUs,
+   force-clean, off vs on) is a PURE WIN — corpus −3763 B / 274 cells / 0 byte
+   regressions AND 144 tick cells all faster / 0 slower (it removes reload memory
+   traffic, so bytes and ticks drop together). Opt out with IR_HL_CARRY=0 —
+   reproduces the pre-flip codegen byte-for-byte (the regression-test path). */
+static int  hl_carry_on = -1;
+static int  hl_carry_enabled(void)
+{
+    if (hl_carry_on < 0) {
+        const char *e = getenv("IR_HL_CARRY");
+        hl_carry_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; IR_HL_CARRY=0 opts out */
+    }
+    return hl_carry_on;
+}
+
+/* The HL/DE tracker may only drop a belief whose value is RECOVERABLE without it
+   — i.e. the tenant has a spill slot. Unlike A (always transient, always slot-
+   backed), HL/DE can be a NO_SLOT register HOME (PR_HL/PR_DE): there the reg is
+   the value's sole home, and this per-LINE tracker cannot see multi-line
+   preservation (a `push hl;…;pop hl` reads as a clobber on the `pop`), so dropping
+   would STRAND the value (long_ir am_rd_idx: read with no register and no slot).
+   Register homes are the lowerer's to manage precisely; the tracker leaves them
+   and only governs RECOVERABLE values transiently resident in HL/DE: those with a
+   frame spill slot, OR rematerialisable ones (NO_SLOT symbol-address / LD_SYM whose
+   value load_to_* re-derives via `ld hl,_sym`). A plain global VALUE loaded into a
+   NO_SLOT non-remat vreg is NOT recoverable (load_to_hl would strand it) → excluded. */
+static const Func *cur_lazy_func;   /* fwd; defined below (the func being lowered) */
+static int  vreg_is_remat(const Func *f, int vreg);   /* fwd; def in analysis.inc.c */
+static int  hlde_belief_droppable(int v)
+{
+    const Func *f = cur_lazy_func;
+    if (!f || v < 0) return 0;
+    if (f->vreg_spill_slot && f->vreg_spill_slot[v] >= 0) return 1;
+    return vreg_is_remat(f, v);
+}
 static void clob_verify_report(void)
 {
     fprintf(stderr, "IR_CLOB_VERIFY: %ld cross-op stale-cache site(s)\n",
@@ -374,7 +469,9 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
     if (clob_verify_on < 0) { clob_verify_on = getenv("IR_CLOB_VERIFY") ? 1 : 0;
                               if (clob_verify_on) atexit(clob_verify_report); }
     if (emit_trace_on < 0)  emit_trace_on  = getenv("IR_EMIT_TRACE") ? 1 : 0;
-    if (spill_stats_on || verify_on || clob_verify_on || emit_trace_on) {
+    int acarry = a_carry_enabled();
+    int hlcarry = hl_carry_enabled();
+    if (spill_stats_on || verify_on || clob_verify_on || emit_trace_on || acarry || hlcarry) {
         /* Fully-expanded instruction text. Buffer only when a probe is on; the
            emitted bytes are unchanged. */
         char buf[256];
@@ -389,6 +486,36 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             verify_len += snprintf(verify_buf + verify_len,
                                    sizeof verify_buf - verify_len, "%s\n", buf);
         if (emit_trace_on) emit_trace_check(buf);
+        /* IR_A_CARRY partner: invalidate-by-default A tracker. Keep rs.a only if
+           this line PROVABLY preserves A's value (recognised AND either does not
+           write A or self-preserves it, e.g. `or a`/`and a` flag tests). An
+           unknown or A-writing line drops the belief — the sole codegen-affecting
+           branch here, gated so gate-off stays byte-identical. cache_a after an
+           establishing `ld a,…` re-sets rs.a, so being invalidated on that line
+           is harmless. */
+        if ((acarry && L.rs.a >= 0) || (hlcarry && (L.rs.hl >= 0 || L.rs.de >= 0))) {
+            InstrEffects e = instr_effects(buf);
+            if (acarry && L.rs.a >= 0
+                && (e.unknown || ((e.writes & IR_R_A) && !(e.self_pres & IR_R_A))))
+                L.rs.a = -1;
+            if (hlcarry) {
+                /* HL: respect the lazy word spill — while a spill is pending the
+                   choke owns HL and flushes before the physical clobber, so the
+                   belief there is the choke's to manage, not ours. */
+                if (L.rs.hl >= 0 && L.pending_spill_v < 0
+                    && hlde_belief_droppable(L.rs.hl)
+                    && (e.unknown || ((e.writes & IR_R_HL)
+                                      && !(e.self_pres & IR_R_HL)
+                                      && !(e.swapped & IR_R_HL))))
+                    L.rs.hl = -1;
+                if (L.rs.de >= 0
+                    && hlde_belief_droppable(L.rs.de)
+                    && (e.unknown || ((e.writes & IR_R_DE)
+                                      && !(e.self_pres & IR_R_DE)
+                                      && !(e.swapped & IR_R_DE))))
+                    L.rs.de = -1;
+            }
+        }
     }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
@@ -575,26 +702,6 @@ static int bc_tok(const char *ops, const char *reg)
     }
     return 0;
 }
-
-/* Unified instruction-effects query (P0 Step 2 — decomposer consolidation).
-   ONE query every consumer uses (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's
-   park sweep), COMPOSING the two single-responsibility kernels — lra_line_writes
-   (whole-reg WRITE mask) and bc_line_effect (sub-register B/C reads/writes +
-   park/control) — plus the value-change refinements. So an asm line is decomposed
-   in one place; the kernels are its private implementation. */
-typedef struct {
-    RegMask writes;     /* whole-reg writes (lra_line_writes) */
-    RegMask self_pres;  /* subset of writes whose VALUE is preserved (`or a`,`and a`) */
-    RegMask stepped;    /* subset of writes that are an in-place inc/dec */
-    RegMask swapped;    /* subset of writes that are a reg-reg exchange */
-    int unknown;
-    /* sub-register B/C (the park-liveness sweep needs B and C tracked separately) */
-    int b_read, c_read, b_write, c_write;
-    int park;           /* the exact `ld bc,hl` low-half stash */
-    int is_boundary;    /* ret/reti/retn — BC dead at exit (result ABI is DE:HL) */
-    int is_call;        /* jp/jr/djnz/call/rst — a successor may read BC */
-} InstrEffects;
-static InstrEffects instr_effects(const char *line);
 
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
