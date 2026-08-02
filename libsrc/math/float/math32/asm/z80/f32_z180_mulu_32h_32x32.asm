@@ -32,8 +32,7 @@ PUBLIC m32_mulu_32h_32x32
 
 .m32_mulu_32h_32x32
 
-    ld c,l
-    ld b,h
+    ld bc,hl
     push de
     exx
     pop bc

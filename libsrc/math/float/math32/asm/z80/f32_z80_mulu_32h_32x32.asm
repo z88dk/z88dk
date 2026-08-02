@@ -48,8 +48,7 @@ PUBLIC m32_mulu_32h_32x32
 
     exx
     ; hl = x0; stack top = y1; no y0*x0 term
-    ld d,h
-    ld e,l                      ; de = x0
+    ld de,hl                    ; de = x0
     ld hl,0                     ; z1 partial = 0
     ex (sp),hl                  ; y1, z1=0 on stack
 
@@ -58,8 +57,7 @@ PUBLIC m32_mulu_32h_32x32
 
     pop bc
     add hl,bc                   ; z1 (partial)
-    ld b,h
-    ld c,l
+    ld bc,hl
 
     ld hl,0
     adc hl,de                   ; z2 (partial)
@@ -134,8 +132,7 @@ PUBLIC m32_mulu_32h_32x32
 
     ld a,d
     ld d,0
-    ld b,h
-    ld c,l
+    ld bc,hl
 
     add a,a
     jr C,bit14
@@ -173,14 +170,12 @@ PUBLIC m32_mulu_32h_32x32
     rr e
     ret C
 
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
 
 .mulu_32_16x16_msb
 
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld a,d
     ld d,0
     add a,a                     ; D7 always 1 → C set; fall into bit14

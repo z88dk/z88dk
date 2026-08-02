@@ -105,8 +105,7 @@ PUBLIC m32_sqr_32h_24x24
     call l_mulu_de              ; a*a 2^32
 
     add hl,de
-    ld d,b
-    ld e,c                      ; exit  : HLDE  = 32-bit product
+    ld de,bc                    ; exit  : HLDE  = 32-bit product
     ret
 
 ENDIF

@@ -66,8 +66,7 @@ PUBLIC asm_f24_add_f24
     ; Y.de @+4 (L=sign,H=exp), X.de @+8
     ld de,sp+4
     ld hl,(de)
-    ld b,h                      ; Y.exp
-    ld c,l                      ; Y.sign
+    ld bc,hl                    ; Y.exp
     ld de,sp+8
     ld hl,(de)
     ld a,h                      ; X.exp

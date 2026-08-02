@@ -32,8 +32,7 @@ PUBLIC m32_mulu_32h_32x32
 
 .m32_mulu_32h_32x32
 
-    ld c,l
-    ld b,h
+    ld bc,hl
     push de
     exx
     pop bc
@@ -97,8 +96,7 @@ PUBLIC m32_mulu_32h_32x32
     xor a                       ; zero A
     add hl,de                   ; p4 p3
     adc a,a                     ; p5
-    ld b,h
-    ld c,l
+    ld bc,hl
     ex af,af
 
     pop hl                      ; x3 x2
@@ -182,8 +180,7 @@ PUBLIC m32_mulu_32h_32x32
 
     add hl,de                   ; p7 p6
     ex de,hl                    ; p7 p6
-    ld h,b                      ; p5
-    ld l,c                      ; p4
+    ld hl,bc                    ; p5
     ret                         ; exit  : DEHL = 32-bit product
 
 ENDIF

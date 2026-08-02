@@ -56,8 +56,7 @@ PUBLIC m32_mulu_32h_32x32
     push de                     ; y1 → z1 slot
 
     exx
-    ld d,h
-    ld e,l                      ; de = x0
+    ld de,hl                    ; de = x0
     ld hl,0
     ex (sp),hl                  ; hl = y1, (sp) = z1 = 0
 
@@ -66,8 +65,7 @@ PUBLIC m32_mulu_32h_32x32
 
     pop bc                      ; z1 = 0
     add hl,bc
-    ld b,h
-    ld c,l
+    ld bc,hl
 
     ld hl,0
     adc hl,de

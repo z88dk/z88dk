@@ -154,8 +154,7 @@ PUBLIC asm_f16_poly
     push hl                     ; push d[--n] msw to stack
     push de                     ; push d[--n] lsw to stack
 
-    ld d,b                      ; (f24) x msw
-    ld e,c
+    ld de,bc                    ; (f24) x msw
     push af                     ; (f24) x lsw
     pop hl
     jp poly0

@@ -99,8 +99,7 @@ PUBLIC asm_f24_mul_f24
     and 003h
     or 004h
     ld d,a                      ; D:E = x mant11 (E = original half low)
-    ld h,d
-    ld l,e                      ; HL = x mant11
+    ld hl,de                    ; HL = x mant11
     pop de                      ; DE = y mant11
 
     ; ---- result half exp, then f24-biased for pack ----
@@ -283,8 +282,7 @@ ENDIF
     set 0,l
 
 .fm4
-    ld d,b                      ; put exponent in d
-    ld e,c                      ; put sign into e[7]
+    ld de,bc                    ; put exponent in d
     ret                         ; return f24 in DEHL
 
 .fmchkuf
@@ -327,8 +325,7 @@ IF __CPU_Z80__
 
     ld a,d
     ld d,0
-    ld b,h
-    ld c,l
+    ld bc,hl
 
     add a,a
     jr C,bit14
@@ -366,15 +363,13 @@ IF __CPU_Z80__
     rr e
     ret C
 
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
 
 ; f24 entry: bit15 set → fall into shared chain
 .mulu_32_16x16
 
-    ld b,h
-    ld c,l
+    ld bc,hl
     ld a,d
     ld d,0
     add a,a                     ; D7 always 1; C set

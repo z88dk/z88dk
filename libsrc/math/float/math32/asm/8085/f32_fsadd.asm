@@ -274,7 +274,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     or a
     ret Z
     ld b,a
-    cp 16                       ; A still holds shift count (copt: drop ld a,b)
+    cp 16                           ; A still holds shift count (copt: drop ld a,b)
     jp C,ay_byte8
     sub 16
     ld b,a
@@ -342,25 +342,22 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,b
     or a
     ret Z
+    ; B = bit count. No push/pop per bit (Y at sp+8: ret,X,Y).
 .aylp
-    push bc
-    ; after push: Y at +10
-    ld de,sp+10
+    ld de,sp+8
     ld a,(de)
-    ld l,a
+    ld l,a                          ; MSB
     inc de
     inc de
     ld a,(de)
-    ld c,a
+    ld c,a                          ; mid
     inc de
     ld a,(de)
-    ld h,a
+    ld h,a                          ; LSB side in H packing (matches prior layout)
     ld a,c
     and 01h
-    ld b,a                          ; bit out
-    or a
     jp Z,ay_njam
-    ld de,sp+12                     ; Y.E (SP: bc, ret, X, Y)
+    ld de,sp+10                     ; Y.E jam sticky
     ld a,(de)
     or 1
     ld (de),a
@@ -375,7 +372,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,c
     rra
     ld c,a
-    ld de,sp+10
+    ld de,sp+8
     ld a,l
     ld (de),a
     inc de
@@ -385,7 +382,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     inc de
     ld a,h
     ld (de),a
-    pop bc
     dec b
     jp NZ,aylp
     ret
@@ -395,35 +391,27 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; X: +2 MSB … +7 sign; Y: +8 …
 
 .mant_add
-    ld de,sp+4
-    ld a,(de)
+    ; X.E + Y.E → X (H = Y byte temp; no push af)
     ld de,sp+10
-    push af
     ld a,(de)
     ld h,a
-    pop af
-    add a,h
     ld de,sp+4
-    ld (de),a
-    ld de,sp+5
     ld a,(de)
+    add a,h
+    ld (de),a
     ld de,sp+11
-    push af
     ld a,(de)
     ld h,a
-    pop af
-    adc a,h
     ld de,sp+5
-    ld (de),a
-    ld de,sp+2
     ld a,(de)
+    adc a,h
+    ld (de),a
     ld de,sp+8
-    push af
     ld a,(de)
     ld h,a
-    pop af
-    adc a,h
     ld de,sp+2
+    ld a,(de)
+    adc a,h
     ld (de),a
     ld a,0
     rla
@@ -431,95 +419,75 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .mant_sub
+    ld de,sp+8
+    ld a,(de)
+    ld h,a
     ld de,sp+2
     ld a,(de)
-    ld de,sp+8
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
     cp h
     jp C,ms_rev
     jp NZ,ms_do
+    ld de,sp+11
+    ld a,(de)
+    ld h,a
     ld de,sp+5
     ld a,(de)
-    ld de,sp+11
-    push af
-    ld a,(de)
-    ld h,a
-    pop af
     cp h
     jp C,ms_rev
     jp NZ,ms_do
-    ld de,sp+4
-    ld a,(de)
     ld de,sp+10
-    push af
     ld a,(de)
     ld h,a
-    pop af
+    ld de,sp+4
+    ld a,(de)
     cp h
     jp C,ms_rev
 .ms_do
-    ld de,sp+4
-    ld a,(de)
     ld de,sp+10
-    push af
     ld a,(de)
     ld h,a
-    pop af
-    sub h
     ld de,sp+4
-    ld (de),a
-    ld de,sp+5
     ld a,(de)
+    sub h
+    ld (de),a
     ld de,sp+11
-    push af
     ld a,(de)
     ld h,a
-    pop af
-    sbc a,h
     ld de,sp+5
-    ld (de),a
-    ld de,sp+2
     ld a,(de)
+    sbc a,h
+    ld (de),a
     ld de,sp+8
-    push af
     ld a,(de)
     ld h,a
-    pop af
-    sbc a,h
     ld de,sp+2
+    ld a,(de)
+    sbc a,h
     ld (de),a
     ret
 .ms_rev
-    ld de,sp+10
-    ld a,(de)
+    ; Y - X → X, flip X.sign
     ld de,sp+4
-    push af
     ld a,(de)
     ld h,a
-    pop af
+    ld de,sp+10
+    ld a,(de)
     sub h
     ld de,sp+4
     ld (de),a
-    ld de,sp+11
-    ld a,(de)
     ld de,sp+5
-    push af
     ld a,(de)
     ld h,a
-    pop af
+    ld de,sp+11
+    ld a,(de)
     sbc a,h
     ld de,sp+5
     ld (de),a
-    ld de,sp+8
-    ld a,(de)
     ld de,sp+2
-    push af
     ld a,(de)
     ld h,a
-    pop af
+    ld de,sp+8
+    ld a,(de)
     sbc a,h
     ld de,sp+2
     ld (de),a
@@ -600,6 +568,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld c,(hl+)
     ld b,(hl+)
     ld e,(hl+)
-    ld d,(hl)                   ; last byte: no post-inc (HL → bc next)
+    ld d,(hl)                       ; last byte: no post-inc (HL → bc next)
     ld hl,bc
     ret

@@ -35,8 +35,7 @@ PUBLIC asm_u32_f24
     jr Z,lzero                  ;exponent was 0, return 0
     cp $7e + 32
     jp NC,lmax                  ;number too large
-    ld d,h                      ;place mantissa in long
-    ld e,l
+    ld de,hl                    ;place mantissa in long
     ld h,0
     ld l,h
 .lloop

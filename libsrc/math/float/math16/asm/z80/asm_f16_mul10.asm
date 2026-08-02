@@ -33,8 +33,7 @@ PUBLIC asm_f16_mul10
     and a
     jp Z,asm_f16_zero
 
-    ld b,h                      ; 10*a = 2*(4*a + a)
-    ld c,l                      ; hl *= 10
+    ld bc,hl                    ; 10*a = 2*(4*a + a)
 
     srl b
     rr c

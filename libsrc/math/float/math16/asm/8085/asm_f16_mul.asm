@@ -69,8 +69,7 @@ PUBLIC f16_8085_mulu_32_16x16
     and 003h
     or 004h
     ld d,a                      ; D:E = x mant11
-    ld h,d
-    ld l,e                      ; HL = x mant11
+    ld hl,de                    ; HL = x mant11
     pop de                      ; DE = y mant11
 
     ; ---- half exp → f24-biased ----
@@ -262,8 +261,7 @@ PUBLIC f16_8085_mulu_32_16x16
     push hl
     push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
 
-    ld b,d                      ; Y.exp (still in D)
-    ld c,e                      ; Y.sign
+    ld bc,de                    ; Y.exp (still in D)
     ld de,sp+8
     ld hl,(de)                  ; L=X.sign H=X.exp
     ld a,l

@@ -21,6 +21,8 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
 
 ;=======================================================================
+; IEEE X → expand → body frame Y|ret|X (same in-place strategy as m32_fsmul24x32)
+;=======================================================================
 .m32_fsadd24x32
     push bc
     push de
@@ -49,43 +51,55 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld d,a
     ld e,h
     ld h,l
-    ld l,0
-    push bc
+    ld l,0                          ; BC DEHL = expanded X
+
+    ; ieee(4) → X.hl|X.de; push X.bc; rotate → Y|ret|X
     push de
-    push hl                         ; X | Y | ret | ieee
-    ld de,sp+12
+    ld de,sp+10
+    ld (de),hl                      ; X.hl
+    pop hl
+    ld de,sp+10
+    ld (de),hl                      ; X.de
+    push bc                         ; X.bc | Y | ret | X.hl | X.de
+
+    ld de,sp+0
     ld hl,(de)
-    push hl                         ; ret
+    ld bc,hl                        ; BC = old w0 (X.bc)
+
+    ld de,sp+2
+    ld hl,(de)
+    ld de,sp+0
+    ld (de),hl                      ; w0 = Yhl
+
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+2
+    ld (de),hl                      ; w1 = Yde
+
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+4
+    ld (de),hl                      ; w2 = Ybc
+
     ld de,sp+8
     ld hl,(de)
-    push hl
+    ld de,sp+6
+    ld (de),hl                      ; w3 = ret
+
+    ld de,sp+10
+    ld hl,(de)
+    ld de,sp+8
+    ld (de),hl                      ; w4 = X.hl
+
     ld de,sp+12
     ld hl,(de)
-    push hl
-    ld de,sp+16
-    ld hl,(de)
-    ld bc,hl                        ; last word → BC (no push/pop)
-    pop de
-    pop hl
-    push bc
-    push de
-    push hl                         ; Y | ret | X | junk
-    ld hl,13
-    add hl,sp
-    ld de,hl
-    ld hl,12+13
-    add hl,sp
-    ld b,14
-.a24c
-    ld a,(de)
-    ld (hl),a
-    dec de
-    dec hl
-    dec b
-    jp NZ,a24c
-    ld hl,12
-    add hl,sp
-    ld sp,hl
+    ld de,sp+10
+    ld (de),hl                      ; w5 = X.de
+
+    ld hl,bc
+    ld de,sp+12
+    ld (de),hl                      ; w6 = X.bc
+
     jp body
 
 
@@ -179,12 +193,46 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jp Z,al0
     cp 24
     jp NC,ret_y
+    ld b,a                          ; bit count in B (srl1 preserves B)
+    cp 16
+    jp C,al8
+    sub 16
+    ld b,a
+    ; DEHL >>= 16 with sticky into L
+    ld a,l
+    or h
+    ld hl,de
+    ld de,0
+    jp Z,al8
+    ld a,l
+    or 1
+    ld l,a
+.al8
+    ld a,b
+    or a
+    jp Z,al0
+    cp 8
+    jp C,alp
+    sub 8
+    ld b,a
+    ld a,l
+    or a
+    ld l,h
+    ld h,e
+    ld e,d
+    ld d,0
+    jp Z,alp
+    ld a,l
+    or 1
+    ld l,a
 .alp
-    push af
+    ld a,b
+    or a
+    jp Z,al0
+.alp1
     call srl1
-    pop af
-    dec a
-    jp NZ,alp
+    dec b
+    jp NZ,alp1
 .al0
     ; DEHL = small. Save small, load large, add.
     push de                         ; small.DE

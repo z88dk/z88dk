@@ -91,8 +91,7 @@ PUBLIC asm_f24_invsqrt
     push de                     ; -y msw on stack for w[1]
     push hl                     ; -y lsw on stack for w[1]
 
-    ld b,h                      ; original y to debc
-    ld c,l                      ; now calculate w[0]
+    ld bc,hl                    ; original y to debc
 
     sla b                       ; remove mantissa leading bit
 
