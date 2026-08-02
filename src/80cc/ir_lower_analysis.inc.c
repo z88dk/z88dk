@@ -200,8 +200,8 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
        each straight from its own remat def — HL=src0, DE=src1 — bypassing the
        hl_has/de_has cache logic below. Two distinct remat vregs can share a
        (colliding/unwritten) slot or a collapsed cache belief; a slot/cache read
-       then returns the WRONG operand (`&a - &b` lowering to `a - a`: sccz80
-       testFlexibleArray). Rematerialising is the same cost as a slot/cache read
+       then returns the WRONG operand (`&a - &b` lowering to `a - a`).
+       Rematerialising is the same cost as a slot/cache read
        for a constant, so no loss, and it is unconditionally correct. */
     if (g_hc.remat_def && op->src[0] >= 0 && op->src[1] >= 0
         && op->src[0] < f->n_vregs && op->src[1] < f->n_vregs
@@ -1023,7 +1023,7 @@ static int vreg_is_pr_dehl(const Func *f, int v)
 /* A rematerialisable constant (LD_IMM / LD_SYM, marked NO_SLOT): re-emitted at
    every read via emit_remat_word, so it is NEVER stored — it has no slot, and a
    spill would hit a bogus (ix - frame_size) offset and clobber other NO_SLOT
-   temps (the enigma `ld (ix-15),hl` miscompile). Its def leaves the value in HL/DE
+   temps. Its def leaves the value in HL/DE
    and the caller's cache_hl/cache_de advertises it for an immediate in-BB use. */
 static int vreg_is_remat(const Func *f, int vreg)
 {

@@ -610,8 +610,8 @@ static int de_ptr_realizable(const Func *f, int v, const int *use_count,
 /* OPRES operand-residency (opt-in IR_OPRES) — a reused deref/binop RESULT value.
    sdcc keeps these in DE so a later compare folds to `sbc hl,de` and the value
    survives the HL-clobber without a push-spill; 80cc funnels them through HL →
-   `push hl` + byte-wise compare (OPERAND_RESIDENCY_SPEC.md §1, the queenbench
-   safe() archetype). Eligible for a GENERAL DE-home (CF_DE_GENERAL: speculative
+   `push hl` + byte-wise compare (OPERAND_RESIDENCY_SPEC.md §1). Eligible for a
+   GENERAL DE-home (CF_DE_GENERAL: speculative
    — the lowerer reverts it to a spill if no DE-clean region forms, so a
    mis-proposal is byte-safe). Single-def (write_count<=1, distinguishes it from
    the loop-carried de_general/de_acc shapes), reused (use_count>=2), width-2,
@@ -664,11 +664,10 @@ static int de_fold_pays(const Func *f, int v)
                the DE cache serves it instead. NOTE: we deliberately do NOT also
                require DE to be clean def→use. That condition depends on the
                lowerer's precise DE belief, and op_clobbers (a conservative
-               superset) over-reports DE clobbers — gating on it zeroes every win
-               (matrixbench's HL-clobber op also "clobbers" DE per the mask).
-               Consequence: a rare false positive (recordbench +2B, where an
-               `ex de,hl` store already stages v to DE) survives. Net still a
-               win; the accurate fix lives in the lowerer, not here. */
+               superset) over-reports DE clobbers — gating on it zeroes every win.
+               Consequence: a rare false positive (an `ex de,hl` store that
+               already stages v to DE) survives. Net still a win; the accurate
+               fix lives in the lowerer, not here. */
             if (hl_clob) {
                 int u[16]; int nu = ir_op_uses(o, u, 16);
                 for (int q = 0; q < nu; q++) if (u[q] == v) return 1;
@@ -683,8 +682,8 @@ static int de_fold_pays(const Func *f, int v)
 /* idx3 array-index (hostility) closure, factored from idx3_propose so
    home_realizable can rebuild it. wd_addr[v]=1 iff v is an ARRAY INDEX: v (or
    v<<k) is a DIRECT operand of an ADD/SUB whose dst is a deref base. TWO levels
-   only — NOT a transitive closure through plain ALU (searchbench `mid=lo+hi`
-   makes MID the index, but lo/hi stay eligible). wd_addr sized f->n_vregs,
+   only — NOT a transitive closure through plain ALU (`mid=lo+hi` makes MID the
+   index, but lo/hi stay eligible). wd_addr sized f->n_vregs,
    caller-zeroed; wd_base already filled by scan_wd_props. */
 static void build_idx3_addr(const Func *f, const int *wd_base, int *wd_addr)
 {
@@ -870,8 +869,8 @@ static int idx2_home_available(const Func *f)
     if (func_is_call_free(f)) return 1;
     /* [Part C] idx2 home ACROSS CALLS — SP MODE, DEAR-SLOT TARGETS ONLY. The win
        is replacing sp's dear `ld hl,N; add hl,sp` local-slot walk with a value
-       resident in idx2=IX across the call (searchbench −28B/−0.72%t, vecbench
-       +16B/−4.31%t = the good byte-for-cycle trade on z80). Two exclusions:
+       resident in idx2=IX across the call (a good byte-for-cycle trade on z80).
+       Two exclusions:
         - fp mode (idx2=IY, cheap (ix+d) slots): lose/lose — the push/pop access
           + the caller-IX save beat nothing. Keep the blunt call-free gate.
         - cheap-sp-slot CPUs: ez80 (native `ld hl,(ix+d)`), rabbit and kc160 all
@@ -1051,8 +1050,8 @@ static int hr_residency_window(const Func *f, int v, int *lo, int *hi)
    - Restrict to the spillable pair / byte homes Phase 3 ranges (DE/BC + halves).
      The idx family (IX/IY + halves) is managed by dedicated in-place stepping
      that fuses a counter's step-temp into the same index register — there,
-     vreg_to_phys=IY does NOT mean two continuous occupants (sieve_count v1/v18),
-     so it is out of scope for this net. HL/DEHL are cache-only; SPILL/NONE are
+     vreg_to_phys=IY does NOT mean two continuous occupants, so it is out of
+     scope for this net. HL/DEHL are cache-only; SPILL/NONE are
      not register homes.
    - Half-register cross-conflicts (PR_BC vs PR_C/PR_B, PR_DE vs PR_E/PR_D) are a
      deliberate follow-up — a superset conflict model lands with ranging. */
@@ -1255,11 +1254,10 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
 /* A compared counter should give up BC/DE for its uncontended index home ONLY when a
    deref-base genuinely competes for BC — i.e. the same overlapping, localized
    deref-base contender the BC yield looks for. Without a contender the counter's
-   best home IS the cheap GP pair (kc160/rabbit rle: counter in BC, no deref-base →
-   must NOT be pushed to the dearer index). With one, parking the counter in the free
-   index frees BC for the deref-base AND keeps the counter cheap (ez80 histbench:
-   v1→IX, v26→BC = the picker layout). Requires: v is a compared counter, its index
-   is free + not cost-rejected, AND such a contender w exists. */
+   best home IS the cheap GP pair (must NOT be pushed to the dearer index). With one,
+   parking the counter in the free index frees BC for the deref-base AND keeps the
+   counter cheap. Requires: v is a compared counter, its index is free + not
+   cost-rejected, AND such a contender w exists. */
 static int is_compared_counter(const Func *f, int v);
 static int is_deref_base(const Func *f, int v);
 static int is_stepped(const Func *f, int v);
@@ -1270,11 +1268,11 @@ static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, in
     if (!is_compared_counter(f, v)) return 0;
     if (idx_ben && idx_ben[v] <= 0) return 0;
     /* Only redirect where the INDEX is a genuinely cheap home — its read is ~as cheap
-       as a GP pair (ez80 native `lea` = 3 ≈ DE 2). On dear-index CPUs (kc160 6 /
-       rabbit 19 / z80 26) the counter belongs in the cheap GP pair, NOT the index, so
-       redirecting there would lose the shipped rle/matrix BC wins. This is the CPU
-       distinction; the counter→BC yield (below, deref_gap≥15) still covers the dear-
-       slot z80 bucket by SPILLING the counter instead. */
+       as a GP pair (ez80 native `lea` = 3 ≈ DE 2). On dear-index CPUs (kc160/rabbit/
+       z80) the counter belongs in the cheap GP pair, NOT the index, so redirecting
+       there would lose the shipped BC wins. This is the CPU distinction; the
+       counter→BC yield (below, deref_gap≥15) still covers the dear-slot z80 bucket by
+       SPILLING the counter instead. */
     if (g0_word_cost(GR_IX, GK_READ) > g0_word_cost(GR_DE, GK_READ) + 1) return 0;
     int has_free_idx = 0;
     for (int k = 0; k < n && !has_free_idx; k++) {
@@ -1305,9 +1303,8 @@ static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, in
    idx_keep (G2, else NULL): overrides the reject. A stepped counter whose READS are
    no deeper than its STEP is kept in the index even at idx_ben ≤ 0 — the in-loop cost
    marginally favours the slot, but the cheap `ld ix,nn` init (vs slot init+frame) and
-   the `inc ix` step win over a short, frequently-entered loop (queen's safe(), called
-   ~15k× with trip ~3.5). When a counter is instead read in a DEEPER loop than its step
-   (sieve's i, read in the hot inner loop), the frequency-amplified index-read cost
+   the `inc ix` step win over a short, frequently-entered loop. When a counter is
+   instead read in a DEEPER loop than its step, the frequency-amplified index-read cost
    dominates → idx_keep is false → the grounded reject stands (slot wins). */
 static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                               const int *idx_keep, const int *bb_loop_depth)
@@ -1414,8 +1411,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                UNCONTENDED index (`inc ix`, `lea` read), NOT the `ex de,hl`-scratch
                DE. interval_benefit rates ib_de==ib_bc>ib_ix so the DE candidate is
                tried before the IX one, but DE's scratch contention makes it lose to
-               IX in practice (histbench_ez80_sp: DE 9.33M vs IX 8.98M — the picker's
-               IX home + the 2026-07-20 `lea` idx-read gain). Skip DE here so v's own
+               IX in practice (the `lea` idx-read gain). Skip DE here so v's own
                idx candidate (processed later) parks it in the free index. */
             if (counter_yields_bc_to_index(f, pool, n, v, idx_ben,
                                            idx2_taken, idx3_taken))
@@ -1456,9 +1452,8 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             /* An index-eligible compared COUNTER belongs in the uncontended
                index (`inc ix`), not a GP pair it will contend for and then get promoted
                out of (BC→DE via the general phase). Skip BC so its idx candidate parks
-               it in the free index — freeing BC for the deref-base (histbench_ez80_sp:
-               v1 counter→IX, v26 bins-base→BC = the picker layout + the lea gain). This
-               is the index-available generalisation of the counter→deref-base BC yield
+               it in the free index — freeing BC for the deref-base. This is the
+               index-available generalisation of the counter→deref-base BC yield
                below (which handles the no-index case, e.g. fp where IX is the frame
                pointer). Only when the index is genuinely free and not cost-rejected. */
             if (counter_yields_bc_to_index(f, pool, n, v, idx_ben,
@@ -1481,8 +1476,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                transient) spill baseline, the counter should yield: it spills to the
                cheap `pop;dec;push` transient while the contender (e.g. a `bins[idx]`
                deref-base, `ld a,(bc)`) takes BC. Gated on is_compared_counter so a
-               non-counter BC value (rle) never yields — that was the collapse in the
-               refuted unconditional yield. Unopposed, the counter keeps BC. */
+               non-counter BC value never yields. Unopposed, the counter keeps BC. */
             /* The yield only pays where a deref-base's BC-exclusive `ld a,(bc)`
                beats a DEAR slot deref: (slot−BC) deref gap ≈39 on the z80 bucket
                vs ≈2-5 on ez80/kc160/rabbit (cheap `(ix+d)`/`ld rr,(idx)`), where
@@ -1504,9 +1498,8 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                     /* Yield only when w is a LOCALIZED hot deref (a short window inside
                        the counter's broad life), not a value CO-EXTENSIVE with the
                        counter. When both span the whole loop the swap is a coin-flip on
-                       a thin margin (sortbench_z80/z180_fp: counter [1..16] vs w [2..16]
-                       → keep, +0.4% avoided); histbench's w26 [28..31] ⊂ v1 [0..36] is a
-                       genuine localized deref → yield. */
+                       a thin margin (keep); a deref window strictly inside the counter's
+                       life is a genuine localized deref → yield. */
                     {
                         const LiveRange *lv = ir_live_range(f, v);
                         const LiveRange *lw = ir_live_range(f, w);
@@ -1517,8 +1510,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                     /* Eviction hysteresis: yield only when the deref-base beats the
                        counter by a clear margin (≥1.4×). The counter's stack-transient
                        spill baseline is OPTIMISTIC (a multi-def counter may land in a
-                       dearer slot), so a thin win (sortbench/rle ratio ≈1.1-1.3) does
-                       not justify evicting it; histbench's real win is 1.50×. */
+                       dearer slot), so a thin win does not justify evicting it. */
                     if (5*wben > 7*vben) {
                         ok = 0; break;                         /* yield BC to w */
                     }
@@ -1661,8 +1653,8 @@ static int bc_pack_op_touches_w4(const Func *f, const Op *o)
      - all refs in ONE bb, the FIRST ref is the def (def-before-use), and the
        value is NOT live-in and NOT live-out of that bb → born-and-killed within
        each execution, never carried across the back-edge (this is what the
-       loop-extension in unified_arbitrate guards against — md5 #349 — and what
-       makes tight intervals safe here);
+       loop-extension in unified_arbitrate guards against, and what makes tight
+       intervals safe here);
      - call-free span, and every op strictly after the def is BC-preserving
        (bc_pack_span_kind_ok) with no width-4 operand.
    The admitted candidates share the single BC register by greedy interval
@@ -1751,9 +1743,9 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
        IY), so s rides IY the whole loop: init `ld iy,K`/push;pop, updates
        `add iy,de` (Phase 2b aliased path), read at exit. Requires the ENTIRE loop
        region IY-clean. Scored by depth-weighted use_count (hotness) and compared
-       against the best chain below — one IY user per function, take the hotter.
-       (matrixbench has a COLD outer checksum accumulator AND the HOT inner
-       stencil chain; the score picks the chain.) */
+       against the best chain below — one IY user per function, take the hotter
+       (e.g. a COLD outer checksum accumulator vs a HOT inner stencil chain; the
+       score picks the chain). */
     int acc = -1, acc_bb = -1; long acc_score = 0;
     for (int v = 0; v < f->n_vregs; v++) {
         if (!lra_iy_chain_ok(f, v) || is_base[v]) continue;   /* not a deref-base pointer */
@@ -1799,9 +1791,9 @@ static void ir_iy_reduction_pack(Func *f, const int *bb_in_loop,
     /* Find the single BEST (longest = most spill traffic saved) reduction chain
        in the function. ONE chain per function: the members of one chain have
        disjoint consecutive ranges and safely time-share IY, but two chains in
-       different BBs can be simultaneously live (matrixbench: a row-offset chain
-       lives across the neighbour-sum chain) and would collide in the one IY
-       register. Proper inter-chain interference needs live ranges (not built
+       different BBs can be simultaneously live (a row-offset chain living across
+       a neighbour-sum chain) and would collide in the one IY register. Proper
+       inter-chain interference needs live ranges (not built
        here) — that's Phase 2d. */
     int best[32], best_nm = 0, best_bb = -1; long best_score = 0;
     for (int b = 0; b < f->n_bbs; b++) {
@@ -2043,8 +2035,8 @@ static int collect_bc_temp_cands(const Func *f, const int *bb_first_op,
            `ld (hl),a`), not a spare pair/index: a home forces a copy at the def
            and the deref still uses HL, so the stamp is wasted — UNLESS slots are
            expensive (sp mode on a CPU without cheap sp-relative addressing),
-           where the home saves the pointer's slot reload and pays off
-           (hashbench/strbench sp). So reject a deref-base candidate only when
+           where the home saves the pointer's slot reload and pays off (sp mode).
+           So reject a deref-base candidate only when
            slots are cheap: fp mode, or kc160/rabbit (native ld rr,(sp+d)). The
            loop-home walking-pointer `ld a,(bc)` case is a separate proposer. */
         int cheap_slot = (c_framepointer_is_ix != -1) || IS_KC160() || IS_RABBIT();
@@ -2107,8 +2099,8 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     /* 5a: cost-benefit EVICTION, folded into the packer (default ON;
        --opt-disable=bc-evict opts out). The BC pickers give a picker-placed tenant
        absolute priority BY ORDER — it takes BC by running before this pack, not by
-       out-competing the denser born-killed temps that then all spill (the regexp
-       defect: candidates=10, all blocked by one param/IV in BC). Turn that fixed
+       out-competing the denser born-killed temps that then all spill (candidates
+       all blocked by one param/IV in BC). Turn that fixed
        order into a competition: a picker-placed tenant (param, IV or write-once
        local — NOT an IR_VREG_BC_PACK tenant, i.e. a temp this pass already
        packed) that BLOCKS a candidate is an EVICTION candidate. If freeing all such
@@ -2117,9 +2109,8 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
        freed BC. Reverting is sound for ANY tenant: this runs inside ir_alloc, so
        ir_assign_slots (which runs after) materialises a slot for every now-SPILL
        vreg (a param reads its caller slot in place). Benefit is the depth-weighted
-       cost model (unit-weighted, not T-state-grounded — hence a small hashbench
-       +0.39%; net win regex/sortbench −1.7/−1.6%, rest neutral — future cost
-       tuning tightens this). IR_ALLOC_PROBE prints the decision. */
+       cost model (unit-weighted, not T-state-grounded, which future cost tuning
+       tightens). IR_ALLOC_PROBE prints the decision. */
     if (!opt_disabled("bc-evict") && cost_benefit && nc > 0) {
         int *evictable = calloc((size_t)f->n_vregs, sizeof(int));
         if (evictable) {
@@ -2138,14 +2129,14 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                     }
                 }
                 /* Don't evict a WRITTEN loop-carried tenant (wc≥2 = an IV
-                   redefined each iteration, e.g. matrix_ez80_sp v38 uc=36) for a mere
-                   AGGREGATE of colder disjoint temps — the sum ignores the per-temp
+                   redefined each iteration) for a mere AGGREGATE of colder disjoint
+                   temps — the sum ignores the per-temp
                    BC-reload churn, and spilling a hot recomputed loop resident costs
                    more than the summed temps save. Evict it only when SOME single
                    blocking temp is at least as hot (a genuinely denser replacement).
                    A read-only PARAM (wc==0) or write-once local (wc<2) has no such
                    in-loop recompute cost — its caller/def slot is a cheap home — so it
-                   stays freely evictable (regex/sortbench param-eviction wins). */
+                   stays freely evictable. */
                 if (blocks && !itloc[j] && !hotter && write_count[j] >= 2)
                     continue;
                 if (blocks) { evictable[j] = 1; evict_ben += cost_benefit[j]; }
@@ -2260,8 +2251,8 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
        word slot access (fp: 2× ld (ix+d) ~38T; sp: ld hl,N;add hl,sp;…) vs
        push/pop 21T, so parking pays. Correctness rests on: copt strips pointless
        adjacent parks (push %1/pop %1); the commutative-addend reject (above) stops
-       parking values that ride HL into a reduction (the sp structbench +29%
-       cause); and NO slot-store path emits the -1 sentinel for a PR_STACK vreg —
+       parking values that ride HL into a reduction; and NO slot-store path emits
+       the -1 sentinel for a PR_STACK vreg —
        spill_and_swap/store_hl/store_a_byte/spill_de_unless_dead all park, and the
        load_to_* pop is checked before any cache hit (else a stale cache_hl/de
        skips the balancing pop → sp-1 write / stack leak; 8085's LD_IMM `ld de,K`
@@ -2291,7 +2282,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
            position), so it never needs a slot — parking is pure overhead.
            op_dst_spill_is_dead only catches the src[0] case; a commutative op's
            src[1] (the classic reduction addend `acc += *p`) slips through and was
-           being parked (structbench sp addends → +29% clock). Reject it. */
+           being parked. Reject it. */
         if (hi == lo + 1) {
             OpKind uk = bb->ops[hi].kind;
             if (uk == IR_ADD || uk == IR_AND || uk == IR_OR || uk == IR_XOR)
@@ -2448,12 +2439,11 @@ static int g0_word_cost(int reg, int kind)
     /* rabbit idx READ/WRITE now LOWER to `ld hl,<idx>` / `ld <idx>,hl` (4 cyc,
        HL only — emit_idx_word_to_reg / emit_hl_to_idx_word), so an EXISTING home
        is cheap. But the rd/wr cost here is DELIBERATELY kept at 19 (not the true
-       4): dropping it to 4 makes idx_ben OPEN new homes that regress (sieve
-       +13.4%, search +4.6%, mask +4.4%) — the g0 model lacks the loop-HL-pressure
-       / per-invocation-setup term, so it over-values homing a hot counter in an
-       index reg (the same gap G2's keep-rule patches for z80). Keep the reject
-       conservative until that term exists; the lowering wins on the homes the
-       reduction pack already makes (matrix -5.3%, struct -4.0%, queen -3.5%). */
+       4): dropping it to 4 makes idx_ben OPEN new homes that regress — the g0
+       model lacks the loop-HL-pressure / per-invocation-setup term, so it
+       over-values homing a hot counter in an index reg (the same gap G2's
+       keep-rule patches for z80). Keep the reject conservative until that term
+       exists; the lowering wins on the homes the reduction pack already makes. */
     static const int RABBIT[GR_N][GK_N] = {           /* measured: slot9.2 bc4.2 ld-hl-ix4.2 rmw20.2 incIx4.2 */
         /*SLOT*/{9,9,9,20}, /*BC*/{4,4,4,4}, /*DE*/{4,4,4,4}, /*IX*/{19,19,10,4}, /*IY*/{19,19,10,4} };
     static const int Z80[GR_N][GK_N] = {              /* measured: slot45.6 bc8.6 ix25.6; deref/step est */
@@ -2463,7 +2453,7 @@ static int g0_word_cost(int reg, int kind)
        16-bit `ld hl,(ix+d)` so an fp slot is CHEAP (fp-adjusted below), and its
        push/pop + `ld ix,nn` + `inc ix` index ops are FAST (not rabbit's dear 19). The
        old RABBIT bucket charged ez80 a dear idx read/write (19) → idx_ben ≤ 0 → G1b
-       wrongly rejected beneficial index homes (matrixbench-sp +2.84%). Measured
+       wrongly rejected beneficial index homes (sp mode). Measured
        z88dk-ticks -mez80_z80 (#asm microbench, empty-loop anchored, cyc): slot-sp
        rd/wr 8 drf 6 rmw~16; slot-fp 2; idx wr 5 drf 4 step 2; bc 2.
        idx READ is now `lea <rr>,<idx>` (3 cyc, one ED op — see emit_idx_word_to_reg)
@@ -2544,13 +2534,13 @@ static long g0_index_benefit(const long *tally_v)
    cost in every table): it fires on z80/z180/z80n (dear sp slot) and is ≤ 0 on
    cheap-slot rabbit/kc160 and marginal-slot ez80, which stay byte-identical.
 
-   The narrow winner (vecbench sp −1.75% / fp −1.12%; search/mask small) is a
-   straight-line-in-loop temp that is COMPUTED (not memory-loaded), then STORED
-   across an HL-clobbering gap — there the SPILL alternative pays a real
-   store+reload while an IY home survives the clobber. The four gates below
-   (in-loop, not a deref base, not LD_MEM-defined, HL-clobber gap) exclude the
-   losers: born-killed temps that transit HL naturally add only push/pop churn
-   in IY (structbench/ptrbench `sum += a->f` regressed +25% before the gates).
+   The narrow winner is a straight-line-in-loop temp that is COMPUTED (not
+   memory-loaded), then STORED across an HL-clobbering gap — there the SPILL
+   alternative pays a real store+reload while an IY home survives the clobber.
+   The four gates below (in-loop, not a deref base, not LD_MEM-defined,
+   HL-clobber gap) exclude the losers: born-killed temps that transit HL
+   naturally add only push/pop churn in IY (`sum += a->f` regressed before
+   the gates).
 
    Runs AFTER ir_iy_reduction_pack: a reduction accumulator/chain has first claim
    on IY (it is live the whole loop, saving more), and if it (or an idx2/idxhalf/
@@ -2600,8 +2590,8 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
            pop iy) that the isolated g0_index_benefit cannot see. It amortises
            only when the temp spills every loop iteration (the saved per-iter
            slot traffic × trip count ≫ the one-time save); a straight-line temp
-           in IY is a net loss (structbench/ptrbench regressed). Loop-only also
-           matches ir_iy_reduction_pack's scope. */
+           in IY is a net loss. Loop-only also matches ir_iy_reduction_pack's
+           scope. */
         if (!bb_in_loop[cand[i].bb]) continue;
         /* Never home a DEREF BASE in IY: unlike BC (where `ld a,(bc)` derefs
            directly) or a slot, an IY-resident pointer needs `push iy; pop hl`
@@ -2621,7 +2611,7 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
            value in HL and it is almost always consumed by an ADJACENT ALU op
            (`add acc,v`) that also wants it in HL. IY is not ALU-addressable, so
            the home forces `push hl;pop iy` then `push iy;pop hl` — a pure round
-           trip saving no slot traffic (structbench/ptrbench `sum += a->f`). The
+           trip saving no slot traffic (`sum += a->f`). The
            g0 GK_READ term treats IY like a directly-addressable (ix+d) slot and
            misses this. Register homes pay off for values that must otherwise be
            STORED and RELOADED across an HL-clobbering gap. */
@@ -2633,10 +2623,10 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
            alternative actually pay a store+reload (HL is needed for the
            intervening work — e.g. computing a store address — so a slotted v
            must be evicted from HL and reloaded). An IY home, immune to the HL
-           clobber, wins there (vecbench: `t = a+b; store [addr], t` with addr
-           computed in HL between). With no HL clobber the value simply stays in
-           HL from def to use and IY only adds a `push/pop` round trip
-           (structbench's adjacent `t = x+y; store [p+4], t`). */
+           clobber, wins there (`t = a+b; store [addr], t` with addr computed in
+           HL between). With no HL clobber the value simply stays in HL from def
+           to use and IY only adds a `push/pop` round trip (an adjacent
+           `t = x+y; store [p+4], t`). */
         {
             const BB *gb = &f->bbs[cand[i].bb];
             int glo = cand[i].flo - bb_first_op[cand[i].bb];
@@ -2670,19 +2660,19 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
 /* B1 (inert, IR_B1_PROBE): quantitative depth-graded + setup cost term — the
    ranking function the ranged-homing allocator needs. The shipped
    g0_index_benefit weights in-loop accesses BINARY (in_loop?4:1), so a depth-3
-   read scores like a depth-1 read — it CANNOT separate sieve's counter (dear idx
-   READS at depth 3 → REJECT idx) from queen's (all depth 1, cheap STEP → KEEP
-   idx): identical tallies, opposite optima (the G2 wall, refuted twice per-value).
-   B1 fixes it with (a) TRIP^depth depth-grading of the per-iteration term + (b) a
-   one-time SETUP benefit paid once at region entry (the `ld ix,nn` index init the
-   slot doesn't pay), which tips a SHALLOW-loop counter (queen) toward the index
-   even though its per-iter benefit is slightly negative.
+   read scores like a depth-1 read — it CANNOT separate a deep-loop counter with
+   dear idx READS (→ REJECT idx) from a shallow-loop counter with a cheap STEP
+   (→ KEEP idx): identical tallies, opposite optima (the G2 wall). B1 fixes it
+   with (a) TRIP^depth depth-grading of the per-iteration term + (b) a one-time
+   SETUP benefit paid once at region entry (the `ld ix,nn` index init the slot
+   doesn't pay), which tips a SHALLOW-loop counter toward the index even though
+   its per-iter benefit is slightly negative.
 
    Prints per width-2 REGISTER-homed value: g0(binary) benefit vs b1 benefit, the
    keep/reject each implies, the per-depth access split, and the value's
    LIVE-RANGE span [start..end] (the ranged dimension — a value resident only over
    a sub-range frees its register elsewhere). TRIP (IR_B1_TRIP, default 4) and
-   SETUP (IR_B1_SETUP, default 12) are tunable so the queen-KEEP / sieve-REJECT
+   SETUP (IR_B1_SETUP, default 12) are tunable so the shallow-KEEP / deep-REJECT
    separation can be calibrated before this is wired into unified_arbitrate. */
 static void b1_hotness_probe(const Func *f, const int *bb_loop_depth)
 {
@@ -2780,7 +2770,7 @@ static int idx_read_thru_hl(int opk)
    born-killed single-def word on the STACK TRANSIENT (`pop;dec;push` ≈27 z80 /
    8 ez80 / 6 kc160 / 20 rabbit), far below the frame-slot RMW (g0 GK_STEP ≈92).
    Used ONLY in the arbiter's pairwise BC-contention comparison — never as a
-   global rank/threshold (that demoted queen's UNOPPOSED counters, refuted 7×). */
+   global rank/threshold (that demoted UNOPPOSED counters). */
 static int g0_stack_step(void)
 {
     return IS_KC160() ? 6 : IS_EZ80() ? 8 : IS_RABBIT() ? 20 : 27;
@@ -2904,9 +2894,9 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
                        src[1]/other in DE (load_binop_operands). On rabbit reading an
                        idx-homed value INTO HL is the cheap `ld hl,ix` (4); into DE it
                        is the dear `push iy;pop de` (~table). So the src-position picks
-                       the cost — queen's counter (compared as src[0]→HL) stays cheap
-                       → keep; searchbench's `mid` (`base+mid`, src[1]→DE) is dear →
-                       its IY home loses to the cheap native `ld de,(ix+d)` fp slot.
+                       the cost — a counter compared as src[0]→HL stays cheap → keep;
+                       a `mid` index (`base+mid`, src[1]→DE) is dear → its IY home
+                       loses to the cheap native `ld de,(ix+d)` fp slot.
                        The contention penalty (HL held by a pointer walk) applies to
                        the HL-consumed reads. z80/z180 through-HL reads stay dear. */
                     int to_hl = (o->src[0] == v);
@@ -3025,7 +3015,7 @@ static void ir_spill_why_probe(const Func *f)
 }
 
 /* [inert, IR_LDSLOT_WHY=<substr>] TASK #6 FIX #1 probe — "deliver read_l(p)
-   straight to its slot, skip DEHL" (HL_ARITH_PLAN.md). The emu.c gap is
+   straight to its slot, skip DEHL" (HL_ARITH_PLAN.md). The gap is
    pointer-indirect long loads (`read_l(p)`, p=type8*) that 80cc materialises
    into DEHL then spills to a slot (push/park juggle), whereas sdcc writes the 4
    bytes straight to a fixed slot and does memory-operand arith. This probe
@@ -3103,7 +3093,7 @@ static void ir_ldslot_why_probe(const Func *f)
    materialises in HL then `push hl` to survive), reused (>=2 uses or a cross-BB use),
    and for which DE is FREE across V's live range (no IR_PR_DE-homed vreg overlaps).
    These are exactly the values sdcc keeps in DE (`sbc hl,de`) that 80cc spills.
-   Regime-B (DE busy — searchbench-class) counted separately: it must NOT be steered.
+   Regime-B (DE busy) counted separately: it must NOT be steered.
    Reports per-function + the ~2 B/value ceiling. IR_OPRES_WHY=2 prints per-vreg.
    Zero codegen effect. */
 static void ir_opres_why_probe(const Func *f)
@@ -3153,7 +3143,7 @@ static void ir_opres_why_probe(const Func *f)
             /* Regime B: could the blocker W relocate to BC (BC whole-range free
                for W)? Then the flip is a clean net win — V gets DE, W→BC, no
                spill. This is the rebalance-benefit estimate (increment 1b): the
-               73 DE-busy are mostly 80cc's own choice, not hard constraints. */
+               DE-busy cases are mostly 80cc's own choice, not hard constraints. */
             int bc_free = 1;
             for (int x = 0; x < nv && bc_free; x++) {
                 if (x == blocker) continue;
@@ -3166,7 +3156,7 @@ static void ir_opres_why_probe(const Func *f)
                of word (width-2) vregs competing for HL/DE/BC that are
                simultaneously live at any point in V's range (idx-homed excluded).
                <=3 ⇒ a feasible HL/DE/BC assignment gives V a pair (convertible,
-               even if whole-range "busy"); >3 ⇒ genuine pressure (searchbench). */
+               even if whole-range "busy"); >3 ⇒ genuine pressure. */
             const LiveRange *rV = ir_live_range(f, V);
             int convertible = 0;
             if (rV && rV->start >= 0) {
@@ -3581,8 +3571,7 @@ void ir_alloc(Func *f)
            extend the PR_BC interval to the whole loop body — else a
            single-static-use vreg in a loop looks like a one-op
            interval and a second tenant later in the same loop would
-           pass non-overlap yet clobber BC every iteration (md5
-           MDPrint, #349). */
+           pass non-overlap yet clobber BC every iteration. */
         int *bb_loop_lo  = calloc((size_t)f->n_bbs, sizeof(int));
         int *bb_loop_hi  = calloc((size_t)f->n_bbs, sizeof(int));
         int *bb_first_op = calloc((size_t)f->n_bbs, sizeof(int));
@@ -3702,7 +3691,7 @@ void ir_alloc(Func *f)
            doubly-nested inner loop runs inner×outer iterations, so it must
            outrank an outer-loop use for the scarce DE/BC/idx2 homes — else the
            allocator can leave the hot inner accumulator spilled while a colder
-           outer value sits in a register (sieve: count spilled, i_sq in DE).
+           outer value sits in a register.
            depth 0 → 1, depth 1 → 4 (identical to the old flat in-loop×4, so
            functions with no nesting deeper than one loop stay byte-identical);
            depth n → 4^n, capped. IR_NO_DEPTH_WEIGHT restores the flat weight. */
@@ -3892,6 +3881,86 @@ void ir_alloc(Func *f)
             }
         }
         b1_hotness_probe(f, bb_loop_depth);
+        /* [IR_OPRES_PROBE] INERT — size the operand-residency (address/word-temp)
+           lever on the CURRENT tree (refreshes OPERAND_RESIDENCY_SPEC's July
+           numbers). Population = reused deref/binop RESULT values the allocator
+           left SPILL (they funnel through HL then spill+reload). Tiers:
+             de_free       = no DE/BC GP-pair home overlaps V's whole range
+                             (Regime-A, buildable on the whole-range model);
+             de_or_bc_free = a DE or BC pair is whole-range-free (Tier-1 ceiling);
+             convertible   = POINT pressure <=2 GP-pair (HL/DE/BC) homes anywhere
+                             in V's range, so a 3rd pair is free for V at every
+                             point (Increment-1c sub-range ceiling — the meat that
+                             needs ranged/split homing). No codegen change. */
+        if (getenv("IR_OPRES_PROBE")) {
+            int nv = f->n_vregs;
+            int *wdb = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
+            if (wdb) scan_wd_props(f, bb_in_loop, wdb, NULL, NULL, NULL);
+            int cand = 0, de_free = 0, de_or_bc_free = 0, conv = 0;
+            for (int v = 0; v < nv; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (vr->width != 2) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                 | IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (wdb && wdb[v]) continue;                /* not a deref base */
+                if (write_count[v] > 1 || use_count[v] < 2) continue;
+                int dk = def_kind[v];
+                if (!(dk == IR_LD_MEM || dk == IR_ADD || dk == IR_SUB
+                      || dk == IR_AND || dk == IR_OR || dk == IR_XOR)) continue;
+                int lo = first_use[v], hi = last_use[v];
+                if (lo < 0 || hi < 0 || hi < lo) continue;
+                cand++;
+                /* whole-range interference vs DE/BC GP homes */
+                int de_busy = 0, bc_busy = 0;
+                for (int w = 0; w < nv; w++) {
+                    if (w == v) continue;
+                    int ph = f->vreg_to_phys[w];
+                    if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
+                    if (first_use[w] < 0 || last_use[w] < 0) continue;
+                    int s = lo > first_use[w] ? lo : first_use[w];
+                    int e = hi < last_use[w] ? hi : last_use[w];
+                    if (s <= e) { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                }
+                if (!de_busy) de_free++;
+                if (!de_busy || !bc_busy) de_or_bc_free++;
+                /* Sub-range ceiling (Increment-1c): peak simultaneous HL/DE/BC word
+                   homes over V's TRUE live range (ir_live_range, NOT the allocator's
+                   loop-extended first/last_use — loop extension overstates liveness
+                   and hides the sub-range room a split allocator could exploit).
+                   peak<=2 ⇒ a 3rd GP pair is free at every point ⇒ convertible. */
+                const LiveRange *lrv = ir_live_range(f, v);
+                if (lrv && lrv->start >= 0) {
+                    int tlo = lrv->start, thi = lrv->end;
+                    int span = thi - tlo + 1;
+                    int *cov = span > 0 ? calloc((size_t)span, sizeof(int)) : NULL;
+                    if (cov) {
+                        for (int w = 0; w < nv; w++) {
+                            if (w == v) continue;
+                            int ph = f->vreg_to_phys[w];
+                            if (ph != IR_PR_HL && ph != IR_PR_DE && ph != IR_PR_BC)
+                                continue;
+                            const LiveRange *lw = ir_live_range(f, w);
+                            if (!lw || lw->start < 0) continue;
+                            int a = lw->start > tlo ? lw->start : tlo;
+                            int b = lw->end   < thi ? lw->end   : thi;
+                            if (a > b) continue;
+                            cov[a - tlo]++;
+                            if (b - tlo + 1 < span) cov[b - tlo + 1]--;
+                        }
+                        int run = 0, peak = 0;
+                        for (int k = 0; k < span; k++) { run += cov[k]; if (run > peak) peak = run; }
+                        if (peak <= 2) conv++;
+                        free(cov);
+                    }
+                }
+            }
+            free(wdb);
+            if (cand > 0)
+                fprintf(stderr, "OPRESPROBE %s cand=%d de_free=%d de_or_bc_free=%d "
+                        "convertible=%d\n", f->fn ? ir_sym_name(f->fn) : "?",
+                        cand, de_free, de_or_bc_free, conv);
+        }
         free(write_count);
         free(use_count);
         free(first_use);

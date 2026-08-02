@@ -335,9 +335,8 @@ static int  verify_len;
    writes a physical reg (per lra_line_writes — the SAME decomposer ir_verify_op
    uses, so no new asm parser) yet the residency cache (rs.hl/de/bc/a) still
    claims the pre-op vreg — i.e. a stale cache the lowering forgot to invalidate.
-   Cross-op only (a prior op's belief surviving an op that writes the reg); that
-   was this session's memcpy / A-carry / BC-park class. Reuses the IR_VERIFY
-   per-op asm buffering + rs.* snapshot taken at op entry. */
+   Cross-op only (a prior op's belief surviving an op that writes the reg). Reuses
+   the IR_VERIFY per-op asm buffering + rs.* snapshot taken at op entry. */
 static int  clob_verify_on = -1;
 static long clob_verify_count;
 static int  clob_snap_hl, clob_snap_de, clob_snap_bc, clob_snap_a;
@@ -371,17 +370,16 @@ static InstrEffects instr_effects(const char *line);
    unrecognised (unknown) or A-writing line drops rs.a. An incomplete recogniser
    therefore loses BYTES, never CORRECTNESS.
 
-   DEFAULT-ON (2026-07-30, d72ac2e261 shipped it opt-in; flipped after the ticks
-   matrix). Opt out with IR_A_CARRY=0 — that reproduces the pre-flip codegen
-   byte-for-byte (emu.c 25263 vs 25169 on) and is the regression-test path.
+   DEFAULT-ON. Opt out with IR_A_CARRY=0 — that reproduces the pre-flip codegen
+   byte-for-byte and is the regression-test path.
 
-   ►► REVISIT / TUNE LATER: default-on costs +4 B on md5 (8 corpus cells) with a
-   FLAT tick delta (the sites are cold). Root: caching A holding a pointer low byte
-   flips a `ptr+K` lowering from `push de;ld de,K;add hl,de;pop de` (6 B) to an
-   A-based `add a,K;ld l,a;ld a,h;adc a,0;ld h,a` (7 B) — +1 B/−16 T per site, a
-   cold-path byte-for-tick trade the size push doesn't want. The clean fix (deferred,
-   not blocking): gate that A-based +K pointer lowering to fire only when it does
-   NOT grow bytes, then this is a pure win. Tracked in HANDOVER_2026-07-30.md §1b.A. */
+   ►► REVISIT / TUNE LATER: default-on costs a few bytes on cold sites with a FLAT
+   tick delta. Root: caching A holding a pointer low byte flips a `ptr+K` lowering
+   from `push de;ld de,K;add hl,de;pop de` (6 B) to an A-based
+   `add a,K;ld l,a;ld a,h;adc a,0;ld h,a` (7 B) — +1 B/−16 T per site, a cold-path
+   byte-for-tick trade the size push doesn't want. The clean fix (deferred, not
+   blocking): gate that A-based +K pointer lowering to fire only when it does NOT
+   grow bytes, then this is a pure win. */
 static int  a_carry_on = -1;
 static int  a_carry_enabled(void)
 {
@@ -401,10 +399,9 @@ static int  a_carry_enabled(void)
    flushes before the clobber; (2) do NOT treat `ex de,hl` (swapped) as a clobber —
    the lowerer's swap_hl_de_caches already permutes the beliefs.
 
-   DEFAULT-ON (2026-07-30): the full 9-CPU-subset ticks matrix (valid-tick CPUs,
-   force-clean, off vs on) is a PURE WIN — corpus −3763 B / 274 cells / 0 byte
-   regressions AND 144 tick cells all faster / 0 slower (it removes reload memory
-   traffic, so bytes and ticks drop together). Opt out with IR_HL_CARRY=0 —
+   DEFAULT-ON: the full valid-tick-CPU ticks matrix is a PURE WIN — fewer bytes,
+   0 byte regressions AND all tick cells faster / 0 slower (it removes reload
+   memory traffic, so bytes and ticks drop together). Opt out with IR_HL_CARRY=0 —
    reproduces the pre-flip codegen byte-for-byte (the regression-test path). */
 static int  hl_carry_on = -1;
 static int  hl_carry_enabled(void)
@@ -421,7 +418,7 @@ static int  hl_carry_enabled(void)
    backed), HL/DE can be a NO_SLOT register HOME (PR_HL/PR_DE): there the reg is
    the value's sole home, and this per-LINE tracker cannot see multi-line
    preservation (a `push hl;…;pop hl` reads as a clobber on the `pop`), so dropping
-   would STRAND the value (long_ir am_rd_idx: read with no register and no slot).
+   would STRAND the value (a read with no register and no slot).
    Register homes are the lowerer's to manage precisely; the tracker leaves them
    and only governs RECOVERABLE values transiently resident in HL/DE: those with a
    frame spill slot, OR rematerialisable ones (NO_SLOT symbol-address / LD_SYM whose
@@ -3325,9 +3322,8 @@ static int op_is_commutative(OpKind kind)
    (ix+d) and would need separate handling. So we never idxhalf in fp: the value
    isn't there AND the fp offset path never runs. NET-BYTE gate below: only home
    when it saves code (in sp the dear `ld hl,N;add hl,sp` slot access makes byte
-   and cycle savings correlate, so net-bytes>0 ⇒ a balanced win — charbench
-   −8B/−8.72%t; the gate rejects break-even shapes like strbench that only pay
-   the +4B IY-save). */
+   and cycle savings correlate, so net-bytes>0 ⇒ a balanced win; the gate rejects
+   break-even shapes that only pay the +4B IY-save). */
 static int idxhalf_enabled(void)
 {
     return !opt_disabled("idxhalf");   /* default on; --opt-disable=idxhalf opts out */
@@ -3441,9 +3437,8 @@ static void assign_idxhalf_homes(Func *f)
                the model lacks). RAW (unweighted) access sites — code size is
                static, not per-iteration. In sp the byte and cycle savings
                correlate, so net-bytes>0 tracks the balanced win. Calibrated by
-               sweep: home iff RAW accesses ≥ 4 — keeps charbench (−16B/−11.9%t,
-               hot crc8 accumulator), rejects break-even shapes (intbench/
-               strbench/hashbench) that only pay the save. */
+               sweep: home iff RAW accesses ≥ 4 — keeps hot-accumulator shapes,
+               rejects break-even shapes that only pay the save. */
             {
                 long acc = (long)ndef[v] + ruse[v];
                 if (acc * 3 - 10 <= 0) continue;
@@ -3777,8 +3772,8 @@ int ir_lower_func(FILE *out, Func *f)
                         /* A compile-time constant (integer immediate OR symbol
                            address) is rematerialisable at every use for the same
                            cost as a slot reload → needs NO slot. Skipping it drops
-                           the def's spill store (often DEAD: enigma main() spilled
-                           ~16 global addresses, 9/10 never read) AND the frame slot;
+                           the def's spill store (often DEAD: a spilled global address
+                           is frequently never read) AND the frame slot;
                            reads rematerialise via emit_remat_word (load_to_hl/de/bc).
                            EXCLUDE store bases: the pointer-store RMW holds the base
                            in a register across the value computation and does NOT
@@ -4131,27 +4126,39 @@ int ir_lower_func(FILE *out, Func *f)
         if (rout != out) fclose(rout);
         goto deadframe_retry;
     }
-    /* [IR_IX_VERIFY] sp-mode IX-preservation completeness check (debug-gated):
-       if the render touched IX but frame_has_saved_ix decided NOT to save it,
-       the caller's IX is clobbered — a hole in the save predicate. Scans the
-       rendered body (tmpfile only). 1 = warn, 2 = abort. Prove-completeness
-       harness for Part A: run it across long_ir/corpus/emu; expect zero hits. */
-    if (rc == 0 && elide_labels && rout != out
-        && c_framepointer_is_ix != 1 && !frame_has_saved_ix(f)) {
+    /* [IR_IX_VERIFY] sp-mode INDEX-preservation completeness check (debug-gated):
+       if the render touched IX/IY but frame_has_saved_ix/iy decided NOT to save
+       it, the caller's callee-saved index reg is clobbered — a hole in the save
+       predicate. Scans the rendered body (tmpfile only). 1 = warn, 2 = abort.
+       Prove-completeness harness for the IX-callee-saved arc + the #13 flip's
+       idx3=IY / idxhalf saves: run across the corpus; expect zero hits.
+       Covers BOTH index registers — the IY analog underpins guard #1
+       (frame_has_saved_iy) of the frameless-via-sp flip. */
+    if (rc == 0 && elide_labels && rout != out && c_framepointer_is_ix != 1) {
         const char *v = getenv("IR_IX_VERIFY");
-        if (v && v[0]) {
+        int chk_ix = (v && v[0]) ? !frame_has_saved_ix(f) : 0;
+        int chk_iy = (v && v[0]) ? !frame_has_saved_iy(f) : 0;
+        if (chk_ix || chk_iy) {
             rewind(rout);
-            char ln[1024]; int touched = 0;
-            while (fgets(ln, sizeof ln, rout))
-                if (strstr(ln, "\tix") || strstr(ln, ",ix") || strstr(ln, "(ix")) {
-                    touched = 1; break;
-                }
-            if (touched) {
+            char ln[1024]; int tix = 0, tiy = 0;
+            while (fgets(ln, sizeof ln, rout)) {
+                if (chk_ix && !tix
+                    && (strstr(ln, "\tix") || strstr(ln, ",ix") || strstr(ln, "(ix")))
+                    tix = 1;
+                if (chk_iy && !tiy
+                    && (strstr(ln, "\tiy") || strstr(ln, ",iy") || strstr(ln, "(iy")))
+                    tiy = 1;
+                if ((!chk_ix || tix) && (!chk_iy || tiy)) break;
+            }
+            if (tix)
                 fprintf(stderr, "IR_IX_VERIFY: %s touches IX in sp mode with NO "
                         "save (frame_has_saved_ix missed it)\n",
                         f->fn ? ir_sym_name(f->fn) : "?");
-                if (v[0] == '2') abort();
-            }
+            if (tiy)
+                fprintf(stderr, "IR_IX_VERIFY: %s touches IY in sp mode with NO "
+                        "save (frame_has_saved_iy missed it)\n",
+                        f->fn ? ir_sym_name(f->fn) : "?");
+            if ((tix || tiy) && v[0] == '2') abort();
         }
     }
     if (elide_labels) {
@@ -4188,8 +4195,28 @@ int ir_lower_func(FILE *out, Func *f)
 static int spflip_enabled(void)
 {
     static int v = -1;
-    if (v < 0) { const char *e = getenv("IR_SPFLIP"); v = (e && e[0]) ? 1 : 0; }
+    if (v < 0) {
+        const char *e = getenv("IR_SPFLIP");
+        /* DEFAULT-ON (frameless-via-sp costed flip, fp mode only). Opt out with
+           IR_SPFLIP=0 (matches the IR_DEADSTORE=0 convention). Inert unless
+           c_framepointer_is_ix==1, so default/sp builds are unaffected. */
+        v = (e && strcmp(e, "0") == 0) ? 0 : 1;
+    }
     return v;
+}
+
+/* [#13 costed flip] The flip is byte-beneficial when the saved IX apparatus
+   exceeds the sp-vs-ix data-access cost. The zero-cost case is ds_ixaccess==0
+   (always flip). The costed budget widens to framed fns with a FEW (ix±d)
+   accesses: flip iff 2*N < K (the IR_FLIPCOST model, ~2B/access sp-vs-ix on z80).
+   DEFAULT K=6 -> 2*N<6 -> N<=2: the near-clean knee measured across the corpus;
+   higher K widens the win but adds byte-growth outliers.
+   IR_SPCOST=K overrides (calibration / a per-CPU gate could set it per target). */
+static int flip_cost_budget(void)
+{
+    static int k = -2;
+    if (k == -2) { const char *e = getenv("IR_SPCOST"); k = (e && e[0]) ? atoi(e) : 6; }
+    return k;
 }
 
 int ir_lower_func_flip(FILE *out, Func *f)
@@ -4229,7 +4256,8 @@ int ir_lower_func_flip(FILE *out, Func *f)
     /* Also exclude the register-arg entry conventions (mirror frameless_ok):
        fastcall (arg in HL/DEHL) and __sdcccall(1) have special prologues that
        juggle the register arg assuming the fp frame — flipping mishandles it. */
-    int candidate = (rc == 0 && ds_last_framed && ds_ixaccess == 0 && !f->uses_acc
+    int candidate = (rc == 0 && ds_last_framed && 2 * ds_ixaccess < flip_cost_budget()
+                     && !f->uses_acc
                      && fastcall_arg_vreg(f) < 0 && !(f->flags & SDCCCALL1));
     if (candidate) {
         extern int ir_idx2_reg(void); extern int ir_idx3_reg(void); extern int ir_exx_reg(void);
@@ -4631,8 +4659,8 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            home from the proof, and the in-region dirty force (~line 3397) covers
            the dirty flag, so the loop-portion of the bb_byte_out carry would only
            re-derive what the region already knows. Skip it in-region and let the
-           assertion establish the belief (byte-identical over 540 triples: 9-CPU
-           bench + long_ir corpus × sp/fp). OUTSIDE the region the carry still
+           assertion establish the belief (byte-identical over the corpus × sp/fp).
+           OUTSIDE the region the carry still
            handles non-loop/diamond residency + dirty inheritance. */
         if (L.cur_func_ehome >= 0 && !in_home_region) {
             int bcarry = -2, bdirty = 0;

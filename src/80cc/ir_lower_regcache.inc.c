@@ -160,7 +160,7 @@ int tos_pushpop_ok(const Func *f)
 
 /* Same sp+0 trick for the LONG (32-bit) ex-free paths — additionally allowed on
    gbz80. gbz80's push/pop are dear (16T/12T), so for a 16-bit slot the pop/push
-   load can lose in a hot loop (measured: intbench +6.8%), which is why the word
+   load can lose in a hot loop, which is why the word
    paths keep tos_pushpop_ok. But a 32-bit slot's byte-walk is twice as long
    (`pop hl;pop de` vs an 8-instruction walk), the pop/push is a clear size win,
    and long slots rarely sit in the hottest int loops. rabbit/kc160 keep their
@@ -911,9 +911,9 @@ static int a_cache_carry_safe(const Func *f, int vreg_id)
     /* Widened window (IR_A_CARRY): also safe when the VREG is READ-ONLY for the
        rest of this BB (no later dst==v / POSTSTEP on v). Historically this alone
        was UNSOUND — it ignores PHYSICAL A being clobbered between the cache_a and
-       the reuse (a class of direct `ld a,…` inline emits that dropped output chars
-       in emu.c, bisected to 49a00d89a6). It is sound ONLY paired with the vemit
-       invalidate-by-default A tracker (also gated on IR_A_CARRY), which drops rs.a
+       the reuse (a class of direct `ld a,…` inline emits). It is sound ONLY paired
+       with the vemit invalidate-by-default A tracker (also gated on IR_A_CARRY),
+       which drops rs.a
        across any A-value-changing line. Cross-BB carry stays gated by bb_a_out;
        the A-cache resets at every BB entry, so within-BB read-only suffices. */
     if (!a_carry_enabled()) return 0;
@@ -1887,8 +1887,8 @@ static int op_is_ixd_slot(const Func *f, int v)
     /* A rematerialisable constant must be read by re-emitting the constant, not
        via an (ix+d) slot: two remat vregs can share a slot the allocator leaves
        unwritten, or collide onto one slot, so the read returns garbage / the
-       wrong operand (sccz80 test_uint_compare fp: `a<b` byte-walked
-       `ld a,(ix-3); sub (ix-3)` = self-compare). Mirror of load_binop_operands'
+       wrong operand (`a<b` byte-walked to `ld a,(ix-3); sub (ix-3)` =
+       self-compare). Mirror of load_binop_operands'
        both-remat handling; the load path rematerialises correctly. */
     if (g_hc.remat_def && g_hc.remat_def[v]) return 0;
     if (!vreg_is_spilled(f, v)) return 0;
@@ -2243,7 +2243,7 @@ static int sp_accum_deref_hl_carried(const Func *f, const Op *o)
     if (opt_disabled("declean")) return 0;
     /* Only where the sp reduction region can actually form (a DE-clean loop
        compare exists) — else this partial clean-rule perturbs codegen on CPUs
-       that never complete the region (regressed Rabbit ptrbench +11%). Matches
+       that never complete the region (a Rabbit regression). Matches
        sp_dehome_loop_cmp_ok's CPU set. */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
     if (g_hc.de_home >= 0) return 0;               /* accumulator home only */

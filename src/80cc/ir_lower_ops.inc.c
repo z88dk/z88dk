@@ -75,8 +75,8 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
        `ex de,hl` of store_hl. On dead-dst, falls back to the plain
        HL load (we need HL=K for any cache-served consumer).
        NB: do NOT extend this to remat consts — spill_de's `ld de,K; ex de,hl`
-       leaves the OLD HL in DE, which a consumer may use (lexbench: it becomes
-       the l_div_u dividend). Flattening to `ld hl,K` at the source drops that
+       leaves the OLD HL in DE, which a consumer may use. Flattening to
+       `ld hl,K` at the source drops that
        DE value; copt #DE9 does the flatten safely, only when `pop de` follows
        (proving DE dead). */
     if (L.la.cur_dst_dead) {
@@ -298,8 +298,8 @@ static int try_word_step_imm(FILE *out, Func *f, const Op *op, int is_sub)
     if (op->src[0] < 0 || op->src[1] >= 0) return 0;   /* src0 vreg + const imm */
     if (op->dst == op->src[0]) return 0;               /* in-place: cheaper via
         inc bc/de/<idx> (gpderef), gen_inc/dec, or B.1's TOS step — do NOT
-        load-to-HL + commit-back (the hashbench `inc bc` -> ld hl,bc;inc hl;
-        ld bc,hl regression). This fires for a FRESH dst (`x = y +/- K`). */
+        load-to-HL + commit-back (the `inc bc` -> ld hl,bc;inc hl;ld bc,hl
+        regression). This fires for a FRESH dst (`x = y +/- K`). */
     if (g_hc.branch_test_kind != 0) return 0;          /* inc/dec set no flags */
     long k = (long)op->imm;
     if (k < 1 || k > (is_sub ? 4 : 3)) return 0;
@@ -2572,9 +2572,8 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                instead of reloading it (`ld hl,(ix+d)` / `pop hl;push hl` re-peek).
                commit_a_byte below invalidates rs.hl if it clobbers HL (sp-mode
                byte store), and a later step of the base (p++) invalidates it via
-               the gpderef/poststep paths — so the stale-base hazard that reverted
-               an earlier attempt is covered. offset!=0 leaves HL=base+off, not the
-               base, so drop the belief. */
+               the gpderef/poststep paths — so the stale-base hazard is covered.
+               offset!=0 leaves HL=base+off, not the base, so drop the belief. */
             if (op->mem.offset == 0 && op->mem.base >= 0)
                 cache_hl(op->mem.base);
             else
@@ -3046,7 +3045,7 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                    here, so load_to_de(value) can't lean on an HL belief. If the
                    value is only reachable via HL (NO_SLOT, non-remat, not in DE/BC),
                    fall to the original path (load value to HL first) — else
-                   load_to_de strands it (adv_a SH_SETV: GVARS[PARAM1]=nParam2). */
+                   load_to_de strands it. */
                 && (hlde_belief_droppable(op->src[0])
                     || de_has(op->src[0]) || bc_has(op->src[0]))) {
                 load_to_de(out, f, op->src[0]);        /* DE = value; base kept in HL */
@@ -3359,10 +3358,9 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                changed. Any register cache still naming dst is stale: reads of
                an idx-homed vreg go through the home (push iy;pop hl), but a
                lingering hl/de/bc/a belief would cache-hit the pre-add value.
-               (enigma fp: `ch = rotor[..]` inits IY and leaves HL=ch, then
-               `ch += rings[i]` does add iy,de — the following `if(ch>'Z')`
-               compared the STALE HL.) There is no index-reg cache field, so
-               just drop the stale scalar beliefs. */
+               (E.g. a vreg homed in IY, left cached in HL, then updated via
+               add iy,de — a later compare must not read the STALE HL.) There is
+               no index-reg cache field, so just drop the stale scalar beliefs. */
             if (L.rs.hl == op->dst) invalidate_hl_cache();
             if (L.rs.de == op->dst) invalidate_de_cache();
             if (L.rs.bc == op->dst) invalidate_bc_cache();
@@ -4328,9 +4326,8 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 require_slot(f, op->dst);
                 int doff = slot_off(f, op->dst) + L.cur_sp_adjust;
                 /* The sp+0 TOS pop/push store beats the fused byte walk on
-                   the z80 family (measured: crc +0.2% if fused), but on
-                   808x its dearer push/pop loses to the fused walk
-                   (8080 crc -1.2%), so let 808x fuse even at sp+0. */
+                   the z80 family, but on 808x its dearer push/pop loses to the
+                   fused walk, so let 808x fuse even at sp+0. */
                 int tos  = (doff == 0 && tos_pushpop_ok(f) && !IS_808x());
                 int sprel = (doff >= 0 && doff + 2 <= sp_rel_max(f));
                 if (doff >= 0 && !tos && !sprel) {

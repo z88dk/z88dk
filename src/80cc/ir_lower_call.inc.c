@@ -524,8 +524,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                    from IX/IY. Physically commit HL -> the index home now
                    (push hl;pop <idx> preserves HL, so the cache_hl above stays
                    valid). Without this the call result never reaches the home
-                   across a block edge (enigma: `ch = toupper(..)` homed in IY,
-                   read by a later-BB `isalpha` via `push iy`). */
+                   across a block edge (a call result homed in an index reg and
+                   read by a later BB). */
                 if (!L.la.cur_dst_dead
                     && vreg_idx_home(f, ci->ret_vreg) != IR_PR_NONE)
                     emit_hl_to_idx_word(out, f, ci->ret_vreg);
