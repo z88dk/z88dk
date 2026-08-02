@@ -821,6 +821,7 @@ int main(int argc, char** argv)
     int i, pass;
     struct lnode head, *p, tail;
 
+    if (getenv("COPT_DEBUG")) debug = 1;   /* env gate so it works through zcc */
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
             debug = 1;

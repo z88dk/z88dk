@@ -196,6 +196,44 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         invalidate_de_cache();
         return;
     }
+    /* Both operands are rematerialisable constants (LD_IMM/LD_SYM): recompute
+       each straight from its own remat def — HL=src0, DE=src1 — bypassing the
+       hl_has/de_has cache logic below. Two distinct remat vregs can share a
+       (colliding/unwritten) slot or a collapsed cache belief; a slot/cache read
+       then returns the WRONG operand (`&a - &b` lowering to `a - a`).
+       Rematerialising is the same cost as a slot/cache read
+       for a constant, so no loss, and it is unconditionally correct. */
+    if (g_hc.remat_def && op->src[0] >= 0 && op->src[1] >= 0
+        && op->src[0] < f->n_vregs && op->src[1] < f->n_vregs
+        && g_hc.remat_def[op->src[0]] && g_hc.remat_def[op->src[1]]) {
+        emit_remat_word(out, f, op->src[1], "de");
+        cache_de(op->src[1]);
+        hl_about_to_change(op->src[0]);   /* HL about to be overwritten */
+        emit_remat_word(out, f, op->src[0], "hl");
+        return;
+    }
+    /* Commutative op whose NON-constant operand is already in HL and whose OTHER
+       operand is a rematerialisable constant (immediate / symbol address): put the
+       constant straight in DE (`ld de,K` / `ld de,&sym`). add/and/or/xor is
+       symmetric (src1+src0 == src0+src1), so this replaces `ex de,hl; ld hl,&arr;
+       add hl,de` with `ld de,&arr; add hl,de` — the base+index address math. Gated
+       on hl_has(other): only fires when the constant is NOT the HL operand (else
+       the existing paths, which keep HL and load the other into DE, are already
+       optimal — firing here would needlessly reload). */
+    if (op_is_commutative(op->kind) && g_hc.remat_def) {
+        int cst = -1;
+        if (hl_has(op->src[1]) && op->src[0] >= 0 && op->src[0] < f->n_vregs
+            && g_hc.remat_def[op->src[0]])
+            cst = op->src[0];
+        else if (hl_has(op->src[0]) && op->src[1] < f->n_vregs
+                 && g_hc.remat_def[op->src[1]])
+            cst = op->src[1];
+        if (cst >= 0) {
+            emit_remat_word(out, f, cst, "de");     /* constant straight into DE */
+            cache_de(cst);
+            return;
+        }
+    }
     if (hl_has(op->src[0])) {
         /* HL still holds src[0] from the previous op. Preserve it. */
         load_to_de_preserve_hl(out, f, op->src[1]);
@@ -590,9 +628,8 @@ static void apply_clobbers(Clobber c)
     if (c & CLOB_BC) invalidate_bc_cache();
 }
 
-/* Current BB being lowered (set per-op by lower_func). Read by the AND-mask +
-   shift-test peephole to inspect successor BBs' first ops. */
-static const BB *cur_bb;
+/* cur_bb is declared up in ir_lower.c (beside cur_op_idx) so the register-cache
+   helpers included before this file can read it (windowed A-carry safety scan). */
 
 /* ---- Lazy spill (store-on-clobber) helpers -------------------------
    Defined here (not at the cache helpers) because the flush needs store_hl,
@@ -983,12 +1020,26 @@ static int vreg_is_pr_dehl(const Func *f, int v)
 }
 
 
+/* A rematerialisable constant (LD_IMM / LD_SYM, marked NO_SLOT): re-emitted at
+   every read via emit_remat_word, so it is NEVER stored — it has no slot, and a
+   spill would hit a bogus (ix - frame_size) offset and clobber other NO_SLOT
+   temps. Its def leaves the value in HL/DE
+   and the caller's cache_hl/cache_de advertises it for an immediate in-BB use. */
+static int vreg_is_remat(const Func *f, int vreg)
+{
+    return vreg >= 0 && vreg < f->n_vregs
+        && g_hc.remat_def && g_hc.remat_def[vreg]
+        && (f->vregs[vreg].flags & IR_VREG_NO_SLOT);  /* skip-store only for NO_SLOT (LD_SYM) */
+}
+
 /* Skip store_hl + trailing swap-back `ex de,hl` when dst is dead. Used by the
    binop/LD_IMM pattern `<value in HL>; store_hl; ex de,hl; cache_hl` — on
    dead-dst emit nothing (HL already holds the value). Also fires for
    register-pool vregs: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
+    /* Rematerialisable constant: no slot, no store (value stays in HL). */
+    if (vreg_is_remat(f, vreg)) return;
     /* Stack-transient spill (IR_PR_STACK): park the value at TOS with `push hl`
        instead of a frame slot store. HL keeps the value (no swap-back); the
        single use pops it (load_to_*). Held +2 in cur_sp_adjust until then so
@@ -1040,12 +1091,30 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
             return;
         }
     }
-    store_hl(out, f, vreg);
-    /* store_hl leaves DE=value, HL=dead slot address; recover HL=value. Only
-       gbz80 emulates `ex de,hl` — there a one-way DE->HL copy is equivalent
-       (old HL dead) and far cheaper (2 ops vs push/pop x4). */
+    /* GENERAL fp in-place store: `ld (ix+d),hl` preserves HL (the value), so no
+       DE round-trip is needed. The store_hl path below emits its contract swap
+       (`ex de,hl`, DE=value/HL=junk) and this function's tail emits the recover
+       swap — the two cancel (copt #284) to exactly this instruction, but the
+       peephole misses them when a label/C_LINE intervenes. Emitting it direct
+       needs no copt AND leaves the DE cache intact. TOS slots keep store_hl's
+       inc-sp/push micro-opt. */
+    if (fp_active(f) && !fp_tos_slot(f, vreg)) {
+        int ix_off = slot_ix_off(f, vreg);
+        if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            emit(out, "ld\t(%s%+d),hl%s", frame_reg(), ix_off,
+                 vol_stamp(f, vreg));
+            return;
+        }
+    }
+    /* fp_tos / sp: store HL-native. store_hl_keep_hl leaves the value in HL
+       (returns 1) for every path except the z80 sp-mode byte walk, which needs
+       HL for the slot address and leaves the value in DE (returns 0) — only that
+       case needs the recover swap to HL. Eliminates the store_hl `ex de,hl`
+       contract-swap + the recover swap here (the copt-#284 pair) at the source. */
+    if (store_hl_keep_hl(out, f, vreg))
+        return;                                    /* value already in HL */
     if (!IS_GBZ80()) {
-        emit(out, "ex\tde,hl");
+        emit(out, "ex\tde,hl");                    /* byte-walk: DE -> HL */
     } else {
         emit(out, "ld\th,d");
         emit(out, "ld\tl,e");
@@ -1060,9 +1129,27 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
     spill_and_swap_unless_dead(out, f, v);
     /* A stack-transient's value now lives at TOS, NOT in HL — advertising HL
        would let a reader skip the pop and leak the pushed word. Its use always
-       pops. */
-    if (v >= 0 && vreg_is_pr_stack(f, v)) return;
+       pops. BUT the caller just physically clobbered HL with `ld hl,<value>`
+       (e.g. gen_ld_sym's `ld hl,_sym`), so the PRIOR HL tenant is now stale —
+       invalidate it. Leaving it stale miscompiled memcpy(sym,ptr,n) when the
+       destination symbol-address was pr_stack-homed: the dst's `ld hl,_sym`
+       clobbered HL holding the source, but the stale cache let the source load
+       cache-hit and skip its reload → a self-copy. */
+    if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
     cache_hl(v);
+    /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). A reused
+       deref/binop that stayed IR_PR_SPILL: leave a DE copy so a later read after
+       an intervening HL clobber prefers DE (`sbc hl,de` / e-d byte-wise) instead
+       of a slot reload. Byte-safe — store_hl already wrote the slot, so a DE
+       clobber (belief invalidated by the clobbering op) falls back to it.
+       Guards: HL must actually hold v; and skip when a word DE-home rides the
+       physical DE pair (the copy would corrupt the resident home). */
+    if (v >= 0 && f->de_fold_hint && f->de_fold_hint[v]
+        && hl_has(v) && !g_hc.home_is_word && g_hc.de_home < 0) {
+        emit(out, "ld\td,h");
+        emit(out, "ld\te,l");
+        cache_de(v);
+    }
 }
 
 /* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise
@@ -1100,7 +1187,10 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
+    /* Rematerialisable constant (NO_SLOT): no store — bring the value into HL
+       (it is in DE here) and let the caller's cache_hl advertise it. */
+    if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)
+        || vreg_is_remat(f, vreg)) {
         emit(out, "ex\tde,hl");
         invalidate_de_cache();
         return;
@@ -1114,13 +1204,14 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         return;
     }
     int off = slot_off(f, vreg) + L.cur_sp_adjust;
-    /* Deepest slot at TOS: discard the old word (inc sp x2), push from DE,
-       then ex de,hl for the HL=value contract. 4 ops vs the 6-op byte walk,
-       no address compute. */
+    /* Deepest slot at TOS: discard the old word, push the value from DE, then
+       ex de,hl for the HL=value contract. Discard via `pop hl` (1B/10T) not
+       `inc sp; inc sp` (2B/12T): the trailing ex de,hl overwrites HL, so the
+       word popped into HL is dead. (Mirror of store_hl_keep_hl's pop-discard;
+       these sites have no leading ex, so copt #DE8 never matched them.) */
     if (fp_tos_slot(f, vreg)
         || (off == 0 && !fp_active(f) && tos_pushpop_ok(f))) {
-        emit(out, "inc\tsp");
-        emit(out, "inc\tsp");
+        emit(out, "pop\thl");          /* discard old TOS word (HL dead: ex sets it) */
         emit(out, "push\tde");
         emit(out, "ex\tde,hl");
         invalidate_de_cache();

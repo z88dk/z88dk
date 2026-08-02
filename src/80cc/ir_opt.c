@@ -1220,29 +1220,29 @@ static int ivsr_process_loop(Func *f, int h, int latch, int ph)
                    and must stay resident anyway — a stepped pointer is a SECOND
                    loop-carried value competing for the one BC home. It loses,
                    spills to a slot, and the per-iteration slot RMW costs more
-                   than recomputing `base + iv*scale` from the resident index
-                   (queenbench's `safe`). Suppress here.
+                   than recomputing `base + iv*scale` from the resident index.
+                   Suppress here.
                    Detect "survives LFTR": after this reduction removes iv's use
                    in the address derivation (the SHL, or the ADD when scale==1),
                    iv still has >2 in-loop uses (LFTR needs exactly 2 = step +
-                   exit test). A pure array-walk (ptrbench) has exactly 2 left →
+                   exit test). A pure array-walk has exactly 2 left →
                    not suppressed, IVSR still fires. IR_NO_IVSR_SUPPRESS opts out.
                    Gated to z80/z80n/z180 — the CPUs where a slot-homed pointer's
                    `ld hl,(ix+d)` is 2 ops, so maintaining a spilled pointer costs
                    more than recomputing. ez80/kc160/rabbit have a 1-op word slot
                    load (+ native indexing), so the walking pointer stays cheaper
-                   there (measured: ez80 +8% if suppressed) — leave IVSR on. */
+                   there — leave IVSR on. */
                 if (!opt_disabled("ivsr-suppress")
                     && (c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180)
                     && (scale & (scale - 1)) == 0    /* power-of-2 scale only */
                     && ivsr_base_is_const_sym(f, base, lo, hi)) {
                     /* Power-of-2 scale: recomputing `base + iv*2^k` from the
                        resident index is cheap (`add hl,hl`), so a walking pointer
-                       is a redundant 2nd loop-carried value — suppress it (queen).
+                       is a redundant 2nd loop-carried value — suppress it.
                        A NON-power-of-2 scale (struct-array stride, e.g. i*6) has
                        an expensive multi-op recompute THROUGH DE, which also
                        blocks a DE-resident accumulator; there the walking pointer
-                       is the win (structbench -32%), so this gate is skipped. */
+                       is the win, so this gate is skipped. */
                     int addr_uses = ivsr_uses_in_op(&f->bbs[b].ops[j], iv);
                     if (sb >= 0)
                         addr_uses += ivsr_uses_in_op(&f->bbs[sb].ops[si], iv);
@@ -1327,10 +1327,10 @@ int ir_opt_ivsr(Func *f)
        allocator's PR_BC envelope is function-wide and barred by any
        width-4 vreg (long ops stage through BC) or BC-clobbering op
        (non-char IR_SWITCH, IR_ASM). Mirror that gate here so IVSR fires only
-       where BC residency is reachable — md5 (full of UINT4) would otherwise
-       regress 13%. (Offset stores USED to bar it too — `ld bc,N; add hl,bc`
-       for the offset add — but gen_st_mem now emits that BC-clean, so an
-       array-of-struct write no longer blocks the walking pointer.) */
+       where BC residency is reachable — a width-4-heavy function would
+       otherwise regress. (Offset stores USED to bar it too — `ld bc,N; add
+       hl,bc` for the offset add — but gen_st_mem now emits that BC-clean, so
+       an array-of-struct write no longer blocks the walking pointer.) */
     for (int v = 0; v < f->n_vregs; v++)
         if (f->vregs[v].width == 4) return 0;
     for (int b = 0; b < f->n_bbs; b++) {
@@ -2627,7 +2627,7 @@ int ir_opt_const_fold(Func *f)
                            && op->src[0] < nv && known[op->src[0]]) {
                     /* Narrowing a known constant stays constant (masked to the
                        dst width) — lets a `(unsigned char)K` store fold to an
-                       immediate (sieve's flags[k]=1). */
+                       immediate. */
                     known[d] = 1;
                     val[d] = have_mask ? (val[op->src[0]] & mask) : val[op->src[0]];
                 } else {

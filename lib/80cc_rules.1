@@ -3,43 +3,94 @@
 	pop	%1
 =
 
-%title #269 elide char store-then-reload of same FP slot (-3b, -19t)
-	ld	(ix%1),a
-	ld	a,(ix%1)
+;; #ADDR: base+index address math emits `ex de,hl; ld hl,_base; add hl,de` (index
+;; in HL, base ADDRESS loaded into HL, index shuffled to DE). add hl,de is
+;; symmetric, so load the base straight into DE: `ld de,_base; add hl,de` — kills
+;; the ex de,hl and is 1 byte shorter. LIMITED TO `_%1` (a symbol-address immediate,
+;; the array-base case): this EXCLUDES an indirect `ld hl,(_x)` memory load — that
+;; would become `ld de,(_x)`, which 8080/8085/gbz80 have no instruction for, and is
+;; a byte LARGER than `ld hl,(nn)` on z80 anyway (no saving). Safe on DE-liveness:
+;; the ex materialises the index in DE purely as the add's addend (old DE discarded
+;; by `ld hl,_%1`, old HL/index consumed by the add), so DE is dead after.
+%title #ADDR fold ex-de-hl + symbol-address load + add into a direct de-load (-1b)
+	ex	de,hl
+	ld	hl,_%1
+	add	hl,de
 =
-	ld	(ix%1),a
+	ld	de,_%1
+	add	hl,de
 
-;; #269b: the byte just stored is still in A (the store doesn't touch A, and the
-;; reload is the very next line, so nothing clobbers A between) — reload the
-;; register from A instead of the slot. Adjacent-only, so it never relies on the
-;; A-cache surviving arbitrary scratch use (which it doesn't). Reload-into-A is
-;; #269 above; here the destination is any other 8-bit reg (typically the low
-;; half of a byte->int widen: `ld l,(ix+d); ld h,0`).
-%title #269b elide store-then-reload-into-reg of same FP slot — value still in A (-2b)
-%is %1 l h e d b c
-	ld	(ix%2),a
-	ld	%1,(ix%2)
+;; #JI: `jp <cc>,L; jp M; L:` — the conditional jump targets the very NEXT label,
+;; so it only chooses "fall through to L" vs "go to M". Invert the condition and
+;; drop the jump-to-next: `jp <!cc>,M; L:` (−3b). L: stays (it may be a branch
+;; target from elsewhere). Pure control flow — no register/flag/liveness effect
+;; (the flags feeding cc are consumed identically). One rule per condition; the
+;; back-referenced `%1:` anchors the target to the immediately-following label.
+%title #JI invert nz-jump over jp-to-next-label (-3b)
+	jp	nz,%1
+	jp	%2
+%1:
 =
-	ld	(ix%2),a
-	ld	%1,a
+	jp	z,%2
+%1:
 
-;; #269c: the byte tested-for-zero idiom `if ((c = *p)) ...` stores c to a slot,
-;; tests it (`or a; jp z/nz`), then widens/uses it on the fall-through. `or a`
-;; and the conditional `jp` both preserve A, and the reload line is reached ONLY
-;; by fall-through (a label between would break the 4-line match), so A still
-;; holds c there — reload the register from A, not the slot. Mirror of #R3 for
-;; the store-to-slot + byte-reload shape.
-%title #269c byte-slot reload across or-a/jp still in A (-2b)
-%is %2 l h e d b c
-	ld	(ix%1),a
-	or	a
-	jp	%3,%4
-	ld	%2,(ix%1)
+%title #JI invert z-jump over jp-to-next-label (-3b)
+	jp	z,%1
+	jp	%2
+%1:
 =
-	ld	(ix%1),a
-	or	a
-	jp	%3,%4
-	ld	%2,a
+	jp	nz,%2
+%1:
+
+%title #JI invert c-jump over jp-to-next-label (-3b)
+	jp	c,%1
+	jp	%2
+%1:
+=
+	jp	nc,%2
+%1:
+
+%title #JI invert nc-jump over jp-to-next-label (-3b)
+	jp	nc,%1
+	jp	%2
+%1:
+=
+	jp	c,%2
+%1:
+
+;; #JI (jr form): same idiom with a relative conditional `jr <cc>,L` over the
+;; unconditional `jp M`. Invert to `jp <!cc>,M` (−2b: drops the 2-byte jr).
+%title #JI invert nz-jr over jp-to-next-label (-2b)
+	jr	nz,%1
+	jp	%2
+%1:
+=
+	jp	z,%2
+%1:
+
+%title #JI invert z-jr over jp-to-next-label (-2b)
+	jr	z,%1
+	jp	%2
+%1:
+=
+	jp	nz,%2
+%1:
+
+%title #JI invert c-jr over jp-to-next-label (-2b)
+	jr	c,%1
+	jp	%2
+%1:
+=
+	jp	nc,%2
+%1:
+
+%title #JI invert nc-jr over jp-to-next-label (-2b)
+	jr	nc,%1
+	jp	%2
+%1:
+=
+	jp	c,%2
+%1:
 
 %title #R1 elide store-then-reload of same register (-1b, -4t)
 %is %1 e d b c l h
@@ -61,6 +112,11 @@
 ;; preserves A, so on the fall-through (the only way to reach `ld a,r` — dead BB
 ;; labels are elided, nothing else targets it) the reload is a no-op. On the
 ;; taken path it isn't executed. %2 captures any jp condition.
+;; #R4: a word `ld hl,(ix+d)` reload of a slot just stored from HL, with an
+;; intervening `ld de,(ix+e)` — a slot load that does NOT touch HL — so HL still
+;; holds the value and the reload is dead (-3b). Volatile stores/loads carry a
+;; ;volatile stamp (won't match). %1==%2 is fine: the store wrote the value, the
+;; de-load reading it back leaves HL unchanged.
 %title #R3 elide reg reload across a conditional jump (-1b, -4t)
 %is %1 e d b c
 	ld	%1,a
@@ -1096,17 +1152,6 @@
 	ld	sp,ix
 =
 	ld	sp,ix
-
-;; #MV1 `push hl; pop de` copies HL into DE preserving HL, but the byte-move pair
-;; does it in 2 bytes / 8t vs the stack round-trip's ~21t (and frees the memory
-;; traffic). Same net effect (DE=HL, HL and flags unchanged), context-free safe.
-;; Harvests the `... push hl; pop de` tail the byte-deref-to-DE lowering leaves.
-%title #MV1 HL->DE via byte moves not a stack round-trip (-11t)
-	push	hl
-	pop	de
-=
-	ld	e,l
-	ld	d,h
 
 ;; #W1 repeat-widening of a byte global masked to a byte: `ld hl,(g); ld h,0`
 ;; zero-extends the byte, then `ld a,l; <alu a,imm>; ld l,a; ld h,0` re-widens the

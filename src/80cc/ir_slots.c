@@ -78,6 +78,11 @@ void ir_assign_slots(Func *f)
            the value rides A and never touches a slot — reserve none. */
         if (f->vregs[v].flags & IR_VREG_NO_SLOT)
             needs_slot[v] = 0;
+        /* [IR_DEADSTORE] A dead-spill byte (slot written but never read): the
+           store is skipped on the re-lower and the value rides A — drop its slot
+           so the frame shrinks (and, if it empties, deadframe goes frameless). */
+        if (f->vregs[v].flags & IR_VREG_DEAD_SPILL)
+            needs_slot[v] = 0;
     }
 
     /* Spill-slot coalescing: per-op interference. Walk each BB

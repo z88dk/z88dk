@@ -630,7 +630,7 @@ static void symoff_apply(Func *f, BB *bb, const int idx[],
                   → MEM [p, off±K] (`p + 3` struct-member access)
      vregoff_idx  ADD/SUB t1 <- i (imm=K); ADD t2 <- p,t1 (either
                   order); MEM [t2, off] → ADD t2 <- p,i; MEM [t2,
-                  off±K] — the md5 `b[ii+3]` byte-gather. The middle
+                  off±K] — the indexed byte-gather. The middle
                   ADD survives with t1 swapped for i (template keep
                   bit). */
 
@@ -898,12 +898,10 @@ int ir_match_run(Func *f)
 {
     int n = run_table_rounds(f, ir_patterns, ir_n_patterns,
                              IR_MATCH_MAX_ROUNDS);
-    /* Offset folds run to fixpoint (was single-round, mirroring the
-       old linear passes). vregoff_idx output (ADD t2 <- p,i ; MEM
-       [t2, off+K]) is itself a vregoff_imm candidate the single pass
-       never revisited — rounds re-fold it, dropping an md5 address
-       spill. symoff to fixpoint is a corpus no-op but folds chained
-       sym+K1+K2 correctly. */
+    /* Offset folds run to fixpoint. vregoff_idx output (ADD t2 <- p,i ;
+       MEM [t2, off+K]) is itself a vregoff_imm candidate a single pass
+       never revisited — rounds re-fold it, dropping an address spill.
+       symoff to fixpoint folds chained sym+K1+K2 correctly. */
     n += run_table_rounds(f, ir_patterns_symoff, 1, IR_MATCH_MAX_ROUNDS);
     n += run_table_rounds(f, ir_patterns_vregoff,
                           (int)(sizeof ir_patterns_vregoff
@@ -1243,8 +1241,8 @@ static const PatternDef pat_derefcmp = {
    ir_opt_fuse_mov): `<producer> t <- ...; MOV d <- t` with t
    function-wide single-use and same width as d redirects the
    producer's dst to d and drops the MOV — eliminating the producer's
-   slot store + MOV's reload + store (~14 bytes per pair; MD5
-   Transform's `UINT4 a = buf[0], ...` prologue is the canonical hit).
+   slot store + MOV's reload + store (~14 bytes per pair; a
+   `UINT4 a = buf[0], ...` prologue is the canonical hit).
    The producer template is IR_MK_ANY; check() filters against the
    allowed-kind list (a final "result" write — no CALL/HCALL, whose
    ret_vreg lives in their payload structs). NO_AUTO_TEMPS: the
@@ -1335,8 +1333,7 @@ int ir_match_run_early(Func *f)
      LD_MEM  b_j <- [t, off0+j]  (w1); CONV_ZX l_j <- b_j (w4);
      SHL s_j <- l_j (imm=8j) for j>0
    combined by a 3-node OR tree — which IS one width-4 load from
-   [t, off0] on a little-endian target. The md5 byte-gather is the
-   canonical hit (~28 ops → 1).
+   [t, off0] on a little-endian target (~28 ops → 1).
 
    Not template-shaped: it's a tree walk with backward def-chasing, so
    it's a 1-op anchor (the root OR) with the whole match in check()

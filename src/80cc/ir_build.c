@@ -1408,8 +1408,8 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
        add hl,de) the inline chain wins across the whole range — inline any int
        constant (max hi_bit+pop is 31). A LONG chain doubles/adds 32 bits per
        step (several ops each) and competes with l_long_mult, so keep the
-       tighter bound there. (An LCG's *25173 = 14+7 = 21 was just over the old
-       flat 20 and fell to l_mult → histbench -41%.) */
+       tighter bound there. (A flat bound near 20 wrongly fell back to l_mult
+       for constants like *25173 = 14+7 = 21, a large regression.) */
     if (hi_bit + pop <= (w == 2 ? 32 : 20)) {
         int acc = v;                            /* coefficient for 2^hi_bit */
         for (int bit = hi_bit - 1; bit >= 0; bit--) {
@@ -5400,9 +5400,9 @@ static int build_assign(Builder *b, Node *n)
        KIND_ARRAY long-element stores (`in[i] = long`) are gated
        off in sp mode only. With byte-pack + pointer-spill-skip +
        offset folds + the stack-free long store + post-step
-       fusion, fp mode is a net win on md5 so fp ungates; sp still
-       trails (the per-input-byte copy loop's slot walks), so sp
-       stays gated until that flips too. */
+       fusion, fp mode is a net win so fp ungates; sp still trails
+       (the per-input-byte copy loop's slot walks), so sp stays
+       gated until that flips too. */
     /* Address-yielding __far LHS (`fp[i] = v`, `*(fp+K) = v`): the
        parser folds the subscript-assign into a bare far-pointer
        expression (OP_ADD, type CPTR). Store through an lp_p* helper. */
@@ -5569,8 +5569,7 @@ static int build_cast(Builder *b, Node *n)
        steps the pointer, and zero-extends to long — bypassing the
        default 3-op IR sequence (IR_LD_MEM byte + IR_INC p +
        IR_CONV_ZX byte→long) which forces a byte spill across the
-       IR_INC. Hot inner pattern in crcbench's crc32 (per-byte
-       loop). */
+       IR_INC. Hot inner pattern in per-byte checksum loops. */
     if (dst_w == 4 && src_w == 1
         && n->operand
         && n->operand->ast_type == OP_DEREF
@@ -6427,7 +6426,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        constant in [0,255] (`c == ' '`, `c >= 'a'`, `c <= 'z'`) stays a byte `cp`
        instead of widening c to int for a 16-bit compare — the C-promotion is
        value-preserving here, and a widened compare reloads/extends c per test
-       (lexbench classify: ~7 instrs/test vs 2). All EQ/NE and unsigned relations:
+       (~7 instrs/test vs 2). All EQ/NE and unsigned relations:
        ULE/UGT are canonicalised below to `<K+1`/`>=K+1` at the kept byte width, so
        K<=254 folds to a byte ULT/UGE and K==255 constant-folds (`eff>=tmax`) — both
        correct. Unsigned LHS so the zero-extended value is exactly the byte. */

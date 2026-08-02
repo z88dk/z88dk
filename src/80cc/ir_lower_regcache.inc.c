@@ -15,6 +15,13 @@ static const char *vol_stamp(const Func *f, int vreg_id)
 
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
+    /* Rematerialisable constant (NO_SLOT, no slot to read): re-emit `ld bc,K` /
+       `ld bc,_sym` instead of a slot reload. Must precede the slot path — a
+       remat vreg has no slot, so require_slot would abort. */
+    if (emit_remat_word(out, f, vreg_id, "bc")) {
+        cache_bc(vreg_id);
+        return;
+    }
     if (fp_active(f) && !L.cur_frameless) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
@@ -153,7 +160,7 @@ int tos_pushpop_ok(const Func *f)
 
 /* Same sp+0 trick for the LONG (32-bit) ex-free paths — additionally allowed on
    gbz80. gbz80's push/pop are dear (16T/12T), so for a 16-bit slot the pop/push
-   load can lose in a hot loop (measured: intbench +6.8%), which is why the word
+   load can lose in a hot loop, which is why the word
    paths keep tos_pushpop_ok. But a 32-bit slot's byte-walk is twice as long
    (`pop hl;pop de` vs an 8-instruction walk), the pop/push is a clear size win,
    and long slots rarely sit in the hottest int loops. rabbit/kc160 keep their
@@ -732,8 +739,17 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
     /* HL is restored to its prior value — cache stands. */
 }
 
-/* Store HL to a vreg's frame slot. */
+/* Store HL to a vreg's frame slot. Wrapper sets the [IR_DEADSTORE] write context
+   (save/restore — nests via pending_spill_resolve) so every slot_off it makes is
+   attributed to the write count. */
+static void store_hl_impl(FILE *out, const Func *f, int vreg_id);
 static void store_hl(FILE *out, const Func *f, int vreg_id)
+{
+    int save = slot_write_ctx; slot_write_ctx = 1;
+    store_hl_impl(out, f, vreg_id);
+    slot_write_ctx = save;
+}
+static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
     /* Stack-transient (IR_PR_STACK): park HL on the stack, don't slot-store to
        the -1 sentinel (which the sp fallback turns into a write at sp-1).
@@ -804,6 +820,66 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
     emit(out, "ld\t(hl),d");
 }
 
+/* HL-native store: same slot write as store_hl but leaves the value in HL
+   (DE=junk), NOT DE. store_hl's "DE=value" contract forces a gratuitous
+   `ex de,hl` that HL-wanting callers undo with a second `ex de,hl` (the value
+   is ALREADY in HL and every slot write here preserves it) — a DE round-trip
+   copt then has to clean up. This is the store for callers that want HL after:
+   the value stays put, the ex de,hl pair never exists. The old-TOS discard uses
+   `pop de` (dead DE) not `inc sp; inc sp` (1B/2T cheaper). DE cache dropped. */
+static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
+{
+    if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
+        emit_sp(out, 2, "push\thl");            /* HL preserved by push */
+        L.cur_stack_resident = vreg_id;
+        L.cur_stack_resident_spadj = L.cur_sp_adjust;
+        return 1;
+    }
+    if (fp_active(f)) {
+        if (fp_tos_slot(f, vreg_id)) {
+            emit(out, "pop\tde");               /* discard old TOS word (DE dead) */
+            emit(out, "push\thl");              /* store; HL preserved */
+            invalidate_de_cache();
+            return 1;
+        }
+        int ix_off = slot_ix_off(f, vreg_id);
+        if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            emit(out, "ld\t(%s%+d),hl%s", frame_reg(), ix_off,
+                 vol_stamp(f, vreg_id));         /* HL preserved — no ex */
+            return 1;
+        }
+    }
+    int off = slot_off(f, vreg_id) + L.cur_sp_adjust;
+    if (off >= 0 && off <= sp_rel_max(f)) {
+        emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));  /* HL preserved */
+        return 1;
+    }
+    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+        emit(out, "pop\tde");                   /* discard old TOS (DE dead) */
+        emit(out, "push\thl");                  /* store; HL preserved */
+        invalidate_de_cache();
+        return 1;
+    }
+    if ((IS_8085()) && off >= 0 && off <= 255) {
+        emit(out, "ld\tde,sp+%d", off);         /* DE = &slot (dead after) */
+        emit(out, "ld\t(de),hl");               /* HL preserved */
+        invalidate_de_cache();
+        return 1;
+    }
+    /* z80 sp-mode large-offset byte walk: HL is needed for the slot address, so
+       stage the value in DE and LEAVE it there — forcing it back to HL would
+       cost the very `ex de,hl` we are eliminating. Return 0 so the caller caches
+       DE. Identical cost to store_hl's fallback. */
+    emit(out, "ex\tde,hl");        /* DE = value; HL scratch for the address */
+    emit(out, "ld\thl,%d", off);
+    emit(out, "add\thl,sp");
+    emit(out, "ld\t(hl),e%s", vol_stamp(f, vreg_id));
+    emit(out, "inc\thl");
+    emit(out, "ld\t(hl),d");
+    invalidate_hl_cache();         /* HL holds the slot address, not the value */
+    return 0;                      /* value left in DE */
+}
+
 /* Byte-home residency state. Defined here (ahead of the byte
    load/store emitters that read them); helper functions live further down. */
 /* Home-resident loop: the bb-id span [lo,hi] of a loop the slot-backed E/D
@@ -816,6 +892,39 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
    resident region) at whose entry the home is flushed ONCE — hoisting the
    flush off the per-iteration header path. -1 = not applicable → fall back to
    the per-iter header flush. */
+
+/* Windowed A-carry safety gate (RESIDENCY_HANDOVER first increment). Caching A
+   after a slot read (so a chained reader — same BB or, via bb_a_out, the next
+   compare-arm BB — elides the reload) is sound only while A's belief cannot go
+   stale. The whole-function `wc<=1` gate is the conservative superset. Relax it
+   to a per-op reaching check: it is ALSO safe to cache when the vreg is
+   READ-ONLY for the remainder of the current BB — i.e. no later op in this BB
+   rewrites it (dst==v or a POSTSTEP on v). Any such later write (e.g. an
+   `inc (ix+d)` loop-counter poststep that bypasses A) would leave the A cache
+   pointing at a stale value; the read-only-to-BB-end window forbids exactly
+   that. Cross-BB carry is separately gated by bb_a_out (consensus + live_in),
+   and the A cache is reset at every BB entry, so within-BB read-only suffices. */
+static int a_cache_carry_safe(const Func *f, int vreg_id)
+{
+    (void)f;
+    if (L.vreg_wc && L.vreg_wc[vreg_id] <= 1) return 1;   /* never rewritten */
+    /* Widened window (IR_A_CARRY): also safe when the VREG is READ-ONLY for the
+       rest of this BB (no later dst==v / POSTSTEP on v). Historically this alone
+       was UNSOUND — it ignores PHYSICAL A being clobbered between the cache_a and
+       the reuse (a class of direct `ld a,…` inline emits). It is sound ONLY paired
+       with the vemit invalidate-by-default A tracker (also gated on IR_A_CARRY),
+       which drops rs.a
+       across any A-value-changing line. Cross-BB carry stays gated by bb_a_out;
+       the A-cache resets at every BB entry, so within-BB read-only suffices. */
+    if (!a_carry_enabled()) return 0;
+    if (!cur_bb) return 0;                                /* no context → refuse */
+    for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
+        const Op *o = &cur_bb->ops[j];
+        if (o->dst == vreg_id) return 0;
+        if (o->kind == IR_POSTSTEP && o->src[0] == vreg_id) return 0;
+    }
+    return 1;
+}
 
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:
    if A already holds the wanted vreg, skip the slot read. */
@@ -903,7 +1012,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
                read (e.g. the same char tested in an if/switch chain, incl.
                across BBs via bb_a_out) reloads nothing. */
             if (!(f->vregs[vreg_id].flags & IR_VREG_VOLATILE)
-                && L.vreg_wc && L.vreg_wc[vreg_id] <= 1) cache_a(vreg_id);
+                && a_cache_carry_safe(f, vreg_id)) cache_a(vreg_id);
             return;
         }
     }
@@ -918,12 +1027,31 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     emit_byte_slot_addr(out, f, vreg_id);
     emit(out, "ld\ta,(hl)%s", vol_stamp(f, vreg_id));
     if (!(f->vregs[vreg_id].flags & IR_VREG_VOLATILE)
-                && L.vreg_wc && L.vreg_wc[vreg_id] <= 1) cache_a(vreg_id);
+                && a_cache_carry_safe(f, vreg_id)) cache_a(vreg_id);
 }
 
-/* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. */
+/* Store A to a vreg's 8-bit frame slot. Clobbers HL+E. Wrapper sets the
+   [IR_DEADSTORE] write context (save/restore — nests via pending_spill_resolve)
+   so every slot_off it makes counts as a write, not a read. */
+static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id);
 static void store_a_byte(FILE *out, const Func *f, int vreg_id)
 {
+    int save = slot_write_ctx; slot_write_ctx = 1;
+    store_a_byte_impl(out, f, vreg_id);
+    slot_write_ctx = save;
+}
+static void store_a_byte_impl(FILE *out, const Func *f, int vreg_id)
+{
+    /* [IR_DEADSTORE] Dead spill: the slot is written but never read (proven by
+       the read/write split, coalescing-checked). Skip the store entirely — A
+       already holds the value; cache it so every use (same BB, or the next via
+       bb_a_out) reads it from A. ir_assign_slots dropped the slot, so there is
+       nothing to write; the frame shrinks and deadframe may go frameless. Set
+       only on the re-lower (first render never has it), width-1 only. */
+    if (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL) {
+        cache_a(vreg_id);
+        return;
+    }
     /* Index-half home: write the half, keep A cached. Slotless + clobber-free
        so no slot store, no dirty tracking — the value simply rides the half. */
     PhysReg ih = idxhalf_phys(f, vreg_id);
@@ -958,11 +1086,21 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
         L.rs.a = -1;   /* value now lives at TOS; readers must go through the pop */
         return;
     }
+    /* A still physically holds the stored byte after any of the slot-store paths
+       below (none clobbers A). Advertise it so an immediately-following
+       load_byte_to_a(v) elides the reload AT SOURCE — the byte analog of inc1
+       (what copt #269/#R2 recover post-hoc). Slot-backed here ⇒ recoverable, and
+       the default-on A-invalidator drops rs.a if a later op value-changes A, so
+       the belief can't go stale. Gated on a_carry_enabled() (IR_A_CARRY=0 =
+       pre-tracker, byte-identical) and !VOLATILE (a volatile must reload). */
+    int a_stays = a_carry_enabled()
+                  && !(f->vregs[vreg_id].flags & IR_VREG_VOLATILE);
     if (fp_active(f)) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off)) {
             emit(out, "ld\t(%s%+d),a%s", frame_reg(), ix_off,
                  vol_stamp(f, vreg_id));
+            if (a_stays) cache_a(vreg_id);
             return;
         }
     }
@@ -973,6 +1111,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
     if (L.cur_hl_addr_off >= 0) {
         emit_byte_slot_addr(out, f, vreg_id);
         emit(out, "ld\t(hl),a%s", vol_stamp(f, vreg_id));
+        if (a_stays) cache_a(vreg_id);
         return;
     }
     /* No address cache: flush any pending spill (while HL still holds it),
@@ -988,6 +1127,7 @@ static void store_a_byte(FILE *out, const Func *f, int vreg_id)
        this slot's address for the next same-slot access. */
     invalidate_hl_cache();
     cache_hl_slot_addr(f, vreg_id);
+    if (a_stays) cache_a(vreg_id);
 }
 
 /* Load 4-byte (long) value from a vreg's frame slot into DEHL.
@@ -1152,6 +1292,76 @@ static void partial_load_long_shl(FILE *out, const Func *f, int v,
     }
 }
 
+/* ---- IR_TRANSIENT_WHY (inert probe, BYTEWISE_LONG_PLAN inc 0) ----------------
+   Sizes the stack-transient long churn (the `pop hl;pop de … push de;push hl`
+   whole-value materialise + re-park) that could instead be an in-place (ix±d)
+   byte-ALU. Logged at the four TOS pop/push sites in load_to_dehl_adj / store_dehl,
+   where cur_sp_adjust and the slot offset are EXACT (an IR-level probe can't know
+   cur_sp_adjust). "ix-range" = the transient's (ix+d..ix+d+3) fits ±128 ⇒ directly
+   addressable in place. IR_TRANSIENT_WHY=1 counts; =2 also logs each site. */
+static int  tw_on = -1;
+static long tw_L_fp, tw_L_fp_in, tw_L_sp, tw_S_fp, tw_S_fp_in, tw_S_sp;
+/* consumer(load)/producer(store) op-kind buckets via lower_cur_op. A load whose
+   consumer is an in-place ALU is the CONVERTIBLE win (the DEHL materialise could
+   be a byte-ALU at (ix+d)); push/ret/call/stmem are genuine whole-value uses. */
+enum { TWB_ALU, TWB_PUSH, TWB_RET, TWB_CALL, TWB_STMEM, TWB_OTHER, TWB_N };
+static const char *tw_bnames[TWB_N] = { "alu","push","ret","call","stmem","other" };
+static long tw_L_bkt[TWB_N], tw_S_bkt[TWB_N];
+/* store→reload round-trip: a transient store of V immediately followed (next
+   churn) by a transient load of V — the pop/push cycle a slot-resident in-place
+   op would have avoided entirely. */
+static int  tw_last_store_vreg = -1;
+static long tw_roundtrip;
+static int tw_bucket(int kind)
+{
+    switch (kind) {
+      case IR_ADD: case IR_SUB: case IR_AND: case IR_OR: case IR_XOR: return TWB_ALU;
+      case IR_PUSH_ARG: return TWB_PUSH;
+      case IR_RET:      return TWB_RET;
+      case IR_CALL: case IR_HCALL: return TWB_CALL;
+      case IR_ST_MEM:   return TWB_STMEM;
+      default:          return TWB_OTHER;
+    }
+}
+static void tw_report(void)
+{
+    fprintf(stderr,
+        "IR_TRANSIENT_WHY: load fp=%ld(ixr %ld) sp=%ld | store fp=%ld(ixr %ld) sp=%ld"
+        " | fp addressable=%ld/%ld | store->reload round-trips=%ld\n",
+        tw_L_fp, tw_L_fp_in, tw_L_sp, tw_S_fp, tw_S_fp_in, tw_S_sp,
+        tw_L_fp_in + tw_S_fp_in, tw_L_fp + tw_S_fp, tw_roundtrip);
+    fprintf(stderr, "  load-consumer :");
+    for (int i = 0; i < TWB_N; i++) fprintf(stderr, " %s=%ld", tw_bnames[i], tw_L_bkt[i]);
+    fprintf(stderr, "\n  store-producer:");
+    for (int i = 0; i < TWB_N; i++) fprintf(stderr, " %s=%ld", tw_bnames[i], tw_S_bkt[i]);
+    fprintf(stderr, "\n  ==> in-place-ALU convertible (load-consumer=alu, ix-range): "
+                    "see load-consumer alu vs fp-addressable\n");
+}
+static void tw_log(int vreg, int is_store, int is_fp, int off, int in_range)
+{
+    if (tw_on < 0) {
+        const char *e = getenv("IR_TRANSIENT_WHY");
+        tw_on = e ? atoi(e) : 0;
+        if (tw_on > 0) atexit(tw_report);
+    }
+    if (!tw_on) return;
+    int b = lower_cur_op ? tw_bucket(lower_cur_op->kind) : TWB_OTHER;
+    if (is_store) {
+        if (is_fp) { tw_S_fp++; if (in_range) tw_S_fp_in++; } else tw_S_sp++;
+        tw_S_bkt[b]++;
+        tw_last_store_vreg = vreg;
+    } else {
+        if (is_fp) { tw_L_fp++; if (in_range) tw_L_fp_in++; } else tw_L_sp++;
+        tw_L_bkt[b]++;
+        if (vreg == tw_last_store_vreg) tw_roundtrip++;
+        tw_last_store_vreg = -1;
+    }
+    if (tw_on >= 2)
+        fprintf(stderr, "  tw %s/%s v%d off=%d ixr=%d cons=%s\n",
+                is_store ? "S" : "L", is_fp ? "fp" : "sp", vreg, off, in_range,
+                lower_cur_op ? tw_bnames[b] : "?");
+}
+
 /* Publish the DEHL cache after a long load that left the high half in DE and
    the low half in HL. The cache invariant is "BC = low half when rs.dehl is
    set", so normally stash BC=HL and claim dehl=vreg_id: a later load_to_dehl
@@ -1244,6 +1454,9 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         /* Deepest slot at TOS: pop hl;pop de beats the synthetic long
            ld (4x ld r,(ix+d) = 12B/76t vs 6B/50t). By-coincidence only. */
         if (sp_adj == 0 && fp_tos_slot(f, vreg_id)) {
+            { int ixo = slot_ix_off(f, vreg_id);
+              tw_log(vreg_id, 0, 1, ixo,
+                     fp_offset_fits(ixo) && fp_offset_fits(ixo + 3)); }
             ss_note_reload(f, vreg_id);
             emit(out, "pop\thl");           /* HL = low half (bytes 0-1) */
             emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
@@ -1271,6 +1484,7 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        pop de` (HL=low, DE=high), the two pushes put it back — no address
        compute, no 4-byte walk. sp-mode + tos_pushpop_ok only. */
     if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
+        tw_log(vreg_id, 0, 0, off, off + 2 <= sp_rel_max(f));
         emit(out, "pop\thl");           /* HL = low half (bytes 0-1) */
         emit(out, "pop\tde");           /* DE = high half (bytes 2-3) */
         emit(out, "push\tde");
@@ -1335,6 +1549,9 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
            DEHL — beats the synthetic long store. HL+DE kept, BC=low
            (contract). By-coincidence only. */
         if (fp_tos_slot(f, vreg_id)) {
+            { int ixo = slot_ix_off(f, vreg_id);
+              tw_log(vreg_id, 1, 1, ixo,
+                     fp_offset_fits(ixo) && fp_offset_fits(ixo + 3)); }
             emit(out, "pop\tbc");
             emit(out, "pop\tbc");
             emit(out, "push\tde");
@@ -1360,6 +1577,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        DEHL. No address compute, no 4-byte walk, and HL stays valid (low
        half) afterwards. sp-mode + tos_pushpop_ok only. */
     if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
+        tw_log(vreg_id, 1, 0, off, off + 2 <= sp_rel_max(f));
         emit(out, "pop\tbc");           /* drop old low half */
         emit(out, "pop\tbc");           /* drop old high half */
         emit(out, "push\tde");          /* write high half (bytes 2-3) */
@@ -1666,6 +1884,13 @@ static int op_is_ixd_slot(const Func *f, int v)
     if (!fp_active(f)) return 0;
     if (f->vregs[v].width != 2) return 0;
     if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    /* A rematerialisable constant must be read by re-emitting the constant, not
+       via an (ix+d) slot: two remat vregs can share a slot the allocator leaves
+       unwritten, or collide onto one slot, so the read returns garbage / the
+       wrong operand (`a<b` byte-walked to `ld a,(ix-3); sub (ix-3)` =
+       self-compare). Mirror of load_binop_operands'
+       both-remat handling; the load path rematerialises correctly. */
+    if (g_hc.remat_def && g_hc.remat_def[v]) return 0;
     if (!vreg_is_spilled(f, v)) return 0;
     if (slot_off(f, v) < 0) return 0;
     int ix = slot_ix_off(f, v);
@@ -1728,6 +1953,9 @@ static int cmp_bytewise_mem_shape_ok(const Func *f, const Op *o)
     if (!vreg_is_spilled(f, s1)) return 0;
     if (f->vregs[s0].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     if (f->vregs[s1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
+    /* Remat constants have no reliable slot content — read via rematerialisation,
+       not a byte-walk. See op_is_ixd_slot / load_binop_operands. */
+    if (g_hc.remat_def && (g_hc.remat_def[s0] || g_hc.remat_def[s1])) return 0;
     int ix0 = slot_ix_off(f, s0), ix1 = slot_ix_off(f, s1);
     if (!fp_offset_fits(ix0) || !fp_offset_fits(ix0 + 1)) return 0;
     if (!fp_offset_fits(ix1) || !fp_offset_fits(ix1 + 1)) return 0;
@@ -2015,7 +2243,7 @@ static int sp_accum_deref_hl_carried(const Func *f, const Op *o)
     if (opt_disabled("declean")) return 0;
     /* Only where the sp reduction region can actually form (a DE-clean loop
        compare exists) — else this partial clean-rule perturbs codegen on CPUs
-       that never complete the region (regressed Rabbit ptrbench +11%). Matches
+       that never complete the region (a Rabbit regression). Matches
        sp_dehome_loop_cmp_ok's CPU set. */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180 || IS_EZ80() || IS_808x())) return 0;
     if (g_hc.de_home >= 0) return 0;               /* accumulator home only */
