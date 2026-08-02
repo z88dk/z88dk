@@ -34,6 +34,11 @@
    #include <intrinsic.h>
 #endif
 
+#ifdef __MATH_MATH16
+    #define DOUBLE          _Float16
+#else
+    #define DOUBLE          double
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,16 +46,18 @@
 
 #define NUM 100
 
-double eval_A(int i, int j)
+DOUBLE eval_A(int i, int j)
 {
-#ifdef __MATH_MATH32
+#ifdef __MATH_MATH16
+    return invf16((DOUBLE)((i+j)*(i+j+1)/2+i+1));
+#elif defined(__MATH_MATH32)
     return inv((i+j)*(i+j+1)/2+i+1);
 #else
     return 1.0/((i+j)*(i+j+1)/2+i+1);
 #endif
 }
 
-void eval_A_times_u(const double u[], double Au[])
+void eval_A_times_u(const DOUBLE u[], DOUBLE Au[])
 {
   STATIC int i,j;
   for(i=0;i<NUM;i++)
@@ -60,7 +67,7 @@ void eval_A_times_u(const double u[], double Au[])
     }
 }
 
-void eval_At_times_u(const double u[], double Au[])
+void eval_At_times_u(const DOUBLE u[], DOUBLE Au[])
 {
   STATIC int i,j;
   for(i=0;i<NUM;i++)
@@ -70,9 +77,9 @@ void eval_At_times_u(const double u[], double Au[])
     }
 }
 
-void eval_AtA_times_u(const double u[], double AtAu[])
+void eval_AtA_times_u(const DOUBLE u[], DOUBLE AtAu[])
 {
-    static double v[NUM];
+    static DOUBLE v[NUM];
 
     eval_A_times_u(u,v);
     eval_At_times_u(v,AtAu);
@@ -81,7 +88,7 @@ void eval_AtA_times_u(const double u[], double AtAu[])
 int main(void)
 {
   STATIC int i;
-  STATIC double u[NUM],v[NUM],vBv,vv;
+  STATIC DOUBLE u[NUM],v[NUM],vBv,vv;
 
 TIMER_START();
 
@@ -93,7 +100,11 @@ TIMER_START();
     }
   vBv=vv=0;
   for(i=0;i<NUM;i++) { vBv+=u[i]*v[i]; vv+=v[i]*v[i]; }
+#ifdef __MATH_MATH16
+  PRINTF2("%0.9f\n",sqrtf16(vBv/vv));
+#else
   PRINTF2("%0.9f\n",sqrt(vBv/vv));
+#endif
 
 TIMER_STOP();
 

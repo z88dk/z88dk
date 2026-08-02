@@ -117,29 +117,28 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     pop af
     pop af                          ; drop reserved −y
 
-    ; pack expanded → IEEE (positive); feilipu residual round (same as inv)
+    ; pack expanded → IEEE (positive); IEEE RNE on residual
     ld a,l
     ld l,h
     ld h,e
     ld e,d                          ; A=residual, EHL=top24
-    or a
-    jp Z,sq0
+    ; IEEE RNE: G=bit7, S=bits6..0 (via add a,a), B=L.0
+    add a,a
+    jp NC,sq0                       ; G=0
+    jp NZ,sq_up                     ; G=1 S≠0 → up
+    ld a,l
+    and 01h
+    jp Z,sq0                        ; tie, even
+.sq_up
     inc l
     jp NZ,sq0
     inc h
     jp NZ,sq0
     inc e
     jp NZ,sq0
-    or a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
+    ld h,0                          ; mant overflow → 1.0, exp++ (E=0; pack discards implicit 1)
+    ld l,h
+    ld e,l
     inc b
 .sq0
     ld a,e
@@ -216,8 +215,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push de
     ld hl,(de)
     push hl
-    push de
-    pop hl
+    ex de,hl                    ; HL = ptr (DE still held pointer)
     inc hl
     inc hl
     ld de,(hl+)

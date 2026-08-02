@@ -23,8 +23,10 @@ PUBLIC _m32_ceilf
     ld a,d
     and 080h
     ret NZ                      ; negative: trunc is ceil
+    ; Must CALL callee (not JP): fsadd_callee pops return address then left operand.
     push de
     push hl
     ld de,$3f80
     ld hl,$0000
-    jp m32_fsadd_callee
+    call m32_fsadd_callee
+    ret

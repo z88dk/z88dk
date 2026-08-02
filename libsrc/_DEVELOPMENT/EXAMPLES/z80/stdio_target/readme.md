@@ -280,17 +280,21 @@ Both use the same primitives: driver m4 instantiators, `m4_file_dup`,
 
 ---
 
-## 9. Dual-stack disk on `subtype=cpm` (FCB + FatFs)
+## 9. CP/M FCB file I/O (`cpm_01_file`) and optional FatFs dual-stack
 
-On **rc2014 / yaz180 / scz180** with **`-subtype=cpm`**, console is already BDOS.
 Unprefixed fcntl talks to **CP/M FCB** via the shared newlib driver
-`libsrc/newlib/target/cpm/driver/file/cpm_01_file.asm`. ChaN **`f_*`** remains
-**FatFs only** on a separate volume stack (raw IDE/SD/HBIOS media).
+`libsrc/target/cpm/driver/file/cpm_01_file.asm` whenever the CRT
+enables dynamic `open` (`open_max` / stdio heap) and links `cpm.lib`:
+
+| Target | File access |
+|--------|-------------|
+| **`+cpm -clib=new` / `sdcc_*`** | **BDOS FCB only** — full host CP/M files; no FatFs, no physical `diskio` |
+| **rc2014 / yaz180 / scz180 `-subtype=cpm`** | FCB by default; optional ChaN **`f_*`** dual-stack on raw media |
 
 | API | Meaning |
 |-----|---------|
 | `open` / `creat` / `read` / `write` / `lseek` / `close` | Host CP/M filesystem (FCB + BDOS) |
-| `f_mount` / `f_open` / `f_read` / … | FatFs on block device (`diskio` + `ff`) |
+| `f_mount` / `f_open` / `f_read` / … | FatFs on block device (`diskio` + `ff`) — **hardware dual-stack only** |
 | `fopen` / `FILE*` | stdio over whatever `open` can open — not FatFs |
 
 **hbios** has no `subtype=cpm` dual-stack: use HBIOS / `diskio_hbios` + `ff` only.
@@ -310,10 +314,13 @@ z88dk-lib +hbios  diskio_hbios ff time
 ### App link examples
 
 ```bash
-# FCB only
+# +cpm newlib — BDOS FCB only (no FatFs / diskio)
+zcc +cpm -clib=new app.c -o app -create-app -m
+
+# Hardware under host CP/M — FCB only
 zcc +rc2014 -subtype=cpm -clib=new app.c -o app -m
 
-# Dual-stack (FCB + FatFs)
+# Dual-stack (FCB + FatFs) — hardware targets only
 zcc +rc2014 -subtype=cpm -clib=new app.c \
   -llib/rc2014/ff -llib/rc2014/time -o app -m
 
@@ -331,8 +338,9 @@ Headers: `#include <lib/<target>/ff.h>` (and `diskio_sd.h` / `diskio_hbios.h` wh
 
 | Kind | Typical command | Disk |
 |------|-----------------|------|
+| Portable CP/M app (newlib) | `+cpm -clib=new` | **FCB `open` only** (BDOS) |
 | CP/M-IDE / bare ROM firmware | `+rc2014 -subtype=acia\|sio\|uart\|…` (+ optional `ff` / `ff_ro`) | **`f_*` only** — no BDOS FCB `open` |
-| CP/M application `.com` | `+rc2014\|yaz180\|scz180 -subtype=cpm` | FCB `open` + optional `f_*` |
+| Hardware CP/M application `.com` | `+rc2014\|yaz180\|scz180 -subtype=cpm` | FCB `open` + optional `f_*` |
 
 Do not mix classic `libsrc/target/cpm/fcntl` objects with the newlib FCB driver
 in one link (two `open` definitions).
@@ -343,4 +351,4 @@ in one link (two `open` definitions).
 make -C test/suites/target_io    # classic +cpm, rc2014 basic, rc2014 -subtype=cpm
 ```
 
-Driver notes: `libsrc/newlib/target/cpm/driver/file/README.md`.
+Driver notes: `libsrc/target/cpm/driver/file/README.md`.

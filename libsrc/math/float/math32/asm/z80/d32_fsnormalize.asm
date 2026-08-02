@@ -55,7 +55,7 @@ PUBLIC m32_fsnormalize
     rl l
     jr C,S24H3
     ld a,-3                     ; count
-    jr normdone                ; from normalize
+    jr normdone                 ; from normalize
 
 .S24H1
     rr l
@@ -84,7 +84,7 @@ PUBLIC m32_fsnormalize
     rl l
     ld a,0f0h
     and a,l
-    jp Z,S24L4more               ; if still no bits in high nibble, total of 7 shifts
+    jp Z,S24L4more              ; if still no bits in high nibble, total of 7 shifts
     rl de
     rl l
 ; 0, 1 or 2 shifts possible here
@@ -142,8 +142,7 @@ PUBLIC m32_fsnormalize
 
 .normzero                       ; return zero
     ld hl,0
-    ld d,h
-    ld e,l
+    ld de,hl
     ex af,af
     ret
 
@@ -244,11 +243,11 @@ PUBLIC m32_fsnormalize
 .S16H
     sla e
     rl d
-    jr C,S16H1                   ; if zero
-    jp M,S16H2                   ; if 1 shift
+    jr C,S16H1                  ; if zero
+    jp M,S16H2                  ; if 1 shift
     sla e
     rl d
-    jp M,S16H3                   ; if 2 ok
+    jp M,S16H3                  ; if 2 ok
 ; must be 3
     rl de
     ld l,d
@@ -313,5 +312,5 @@ PUBLIC m32_fsnormalize
     ld l,e
     ld e,d
     ld a,-18
-    jp normdone                ; worst case S8H
+    jp normdone                 ; worst case S8H
 

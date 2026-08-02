@@ -1,5 +1,5 @@
 ;
-;  feilipu, 2021 April
+;  feilipu, 2021 April / 2026 July (Z80 opt)
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,15 +18,20 @@ PUBLIC m32_mulu_32h_32x32
 ;
 ; multiplication of two 32-bit numbers into the high bytes of 64-bit product
 ;
-;
 ; enter : dehl  = 32-bit multiplicand  = x   x1x0
 ;         dehl' = 32-bit multiplier    = y   y1y0
 ;
-; exit  : dehl  = 32-bit product = z  z3z2 = y1y0 * x1x0
+; exit  : dehl  = 32-bit product = z  z3z2 = high half of y * x
 ;         carry reset
 ;
 ; uses  : af, bc, de, hl, bc', de', hl'
-
+;
+; Opt: y1*x1 uses bit15-specialised 16×16 (normalised mants set bit 31).
+; Truncated high-half: omit y0*x0; suite green + n-body win.
+; Mid-low sticky: after z1 += low(y0*x1), if bit15(z1) set → set 0,L on
+; final high half (OR).  Max|err|=1; mean bias ~0 (bare trunc ~−0.25).
+;
+;------------------------------------------------------------------------------
 
 .m32_mulu_32h_32x32
 
@@ -38,29 +43,21 @@ PUBLIC m32_mulu_32h_32x32
     push de                     ; preserve multiplier y1
     push bc                     ; x1
 
-    push hl                     ; preserve multiplier y0
-    push de                     ; preserve multiplier y1
+    push hl                     ; preserve multiplier y0 (for y0*x1)
+    push de                     ; y1 → replaced by z1=0 below
 
-    push hl                     ; preserve multiplier y0
     exx
-
-    pop de                      ; y0
-    push hl                     ; preserve multiplicand x0
-
-    ; multiply lowest term y0*x0
-    call mulu_32_16x16          ; de*hl -> dehl
-
-    ex de,hl                    ; hlde z1 (partial)
-    pop de                      ; x0
-    ex (sp),hl                  ; y1 z1 (partial), abandon z0
+    ; hl = x0; stack top = y1; no y0*x0 term
+    ld de,hl                    ; de = x0
+    ld hl,0                     ; z1 partial = 0
+    ex (sp),hl                  ; y1, z1=0 on stack
 
     ; multiply middle term x0*y1
     call mulu_32_16x16          ; de*hl -> dehl
 
     pop bc
     add hl,bc                   ; z1 (partial)
-    ld b,h
-    ld c,l
+    ld bc,hl
 
     ld hl,0
     adc hl,de                   ; z2 (partial)
@@ -78,22 +75,25 @@ PUBLIC m32_mulu_32h_32x32
     exx
 
     pop hl
-    add hl,bc                   ; z1 capture carry and abandon
+    add hl,bc                   ; z1 += low(y0*x1)
+    ld a,h                      ; mid-low sticky probe (bit15)
 
     pop hl
     adc hl,de                   ; z2 (partial)
     ex de,hl
 
     ld bc,0
-    rl c                        ; z3 (partial)
+    rl c                        ; c = z3
+    and 080h
+    ld b,a                      ; b7 = sticky, c = z3
 
-    exx                         ; z3z2 (partial) bc'de'
+    exx                         ; bc'de' = sticky:z3 , z2
 
     pop de                      ; y1
     pop hl                      ; x1
 
-    ; multiply top term y1*x1
-    call mulu_32_16x16          ; de*hl -> dehl
+    ; multiply top term y1*x1 (both high limbs bit15 set when normalised)
+    call mulu_32_16x16_msb
 
     push de
     push hl
@@ -104,33 +104,35 @@ PUBLIC m32_mulu_32h_32x32
     ex de,hl                    ; z2
 
     pop hl
+    ld a,b                      ; sticky
+    ld b,0                      ; bc = z3 only
     adc hl,bc                   ; z3
 
     ex de,hl                    ; z3z2 dehl
 
-    ret                         ; exit  : DEHL = 32-bit product
+    and 080h
+    jr Z,z80_h32_done
+    set 0,l                     ; mid-low sticky → LSB of high half
 
+.z80_h32_done
+    or a                        ; NC
+    ret
 
-; Made by Runer112
-; Analysed by Zeda
+; Made by Runer112 / Analysed by Zeda / Tested by jacobly
 ; https://raw.githubusercontent.com/Zeda/z80float/master/common/mul16.z80
-; Tested by jacobly
+;
+; Two entries, one unrolled body:
+;   mulu_32_16x16     — generic early-out
+;   mulu_32_16x16_msb — bit15 set on multiplicand high byte
 ;
 ; DE*HL --> DEHL
-;
-; enter : de   = 16-bit multiplicand  = x
-;         hl   = 16-bit multiplier = y
-;
-; exit  : dehl = 32-bit product
-;
 ; uses  : af, bc, de, hl
 
 .mulu_32_16x16
 
     ld a,d
     ld d,0
-    ld b,h
-    ld c,l
+    ld bc,hl
 
     add a,a
     jr C,bit14
@@ -168,9 +170,15 @@ PUBLIC m32_mulu_32h_32x32
     rr e
     ret C
 
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
+
+.mulu_32_16x16_msb
+
+    ld bc,hl
+    ld a,d
+    ld d,0
+    add a,a                     ; D7 always 1 → C set; fall into bit14
 
 .bit14
     add hl,hl

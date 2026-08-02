@@ -5,7 +5,7 @@ include ../../../Make.config
 vpath %.c ../cimpl
 
 CFILES = fromfix16.c tofix16.c
-AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*.asm)
+AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard asm/z80/*.asm)
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -D__MATH_MATH16 -DFLOAT_IS_16BITS
@@ -17,7 +17,8 @@ all: dirs $(OUTPUT_DIRECTORY)/math16.lib \
 	$(OUTPUT_DIRECTORY)/math16_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/math16_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/math16_r4k.lib \
-	$(OUTPUT_DIRECTORY)/math16_kc160.lib
+	$(OUTPUT_DIRECTORY)/math16_kc160.lib \
+	$(OUTPUT_DIRECTORY)/math16_8085.lib
 
 $(OUTPUT_DIRECTORY)/math16.lib: $(addprefix obj/z80/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
@@ -51,10 +52,16 @@ $(OUTPUT_DIRECTORY)/math16_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/kc160/x/x/x -I.. -mkc160 -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/math16_kc160 @math16.lst
 
+# 8085 adjunct half-float (asm/8085 cores; higher C in WP4)
+# Note: OBJECTS still list Z80 sccz80 bridges for other CPUs; 8085 assembly
+# is driven solely by newlibfiles_8085.lst (like math32_8085).
+$(OUTPUT_DIRECTORY)/math16_8085.lib:
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
+	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/math16_8085 @math16.lst
+
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c
+	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc
 	$(RM) -fr obj
-

@@ -44,8 +44,7 @@ PUBLIC m32__dtoa_base10
     add hl,hl
     push hl                     ; save 4*n
     add hl,hl
-    ld c,l
-    ld b,h                      ; bc = 8*n
+    ld bc,hl                    ; bc = 8*n
     add hl,hl
     add hl,hl
     add hl,hl                   ; hl = 64*n

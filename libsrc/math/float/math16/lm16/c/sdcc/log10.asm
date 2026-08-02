@@ -1,4 +1,5 @@
 
+	SECTION code_clib
 	SECTION	code_fp_math16
 	PUBLIC	_log10f16
 	EXTERN	cm16_sdcc_log10

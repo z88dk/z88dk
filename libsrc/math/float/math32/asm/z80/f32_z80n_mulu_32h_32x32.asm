@@ -10,8 +10,9 @@
 ; multiplication of two 32-bit numbers into the high bytes of 64-bit product
 ;
 ; NOTE THIS IS NOT A TRUE MULTIPLY.
-; Carry in from low bytes is not calculated.
-; Rounding is done at 2^16.
+; Carry in from low bytes (p0–p2) is not calculated.
+; Mid-low sticky: bit15 of the p3-stage 16-bit sum (H after p3 muls) → set
+; bit0 of p4.  Replaces older (p3 & 0xC0) sticky; better bias on float mants.
 ;
 ; enter : dehl  = 32-bit multiplier   = x
 ;         dehl' = 32-bit multiplicand = y
@@ -31,8 +32,7 @@ PUBLIC m32_mulu_32h_32x32
 
 .m32_mulu_32h_32x32
 
-    ld c,l
-    ld b,h
+    ld bc,hl
     push de
     exx
     pop bc
@@ -96,8 +96,7 @@ PUBLIC m32_mulu_32h_32x32
     xor a                       ; zero A
     add hl,de                   ; p4 p3
     adc a,a                     ; p5
-    ld b,h
-    ld c,l
+    ld bc,hl
     ex af,af
 
     pop hl                      ; x3 x2
@@ -116,7 +115,7 @@ PUBLIC m32_mulu_32h_32x32
     adc a,0                     ; p5
 
     ex af,af
-    ld a,l                      ; preserve p3 byte for rounding
+    ld a,h                      ; mid-low sticky: bit15 of p3-stage HL
     ex af,af
 
     ld c,h                      ; prepare BC for next cycle
@@ -151,8 +150,8 @@ PUBLIC m32_mulu_32h_32x32
     ld h,a                      ; promote HL p6 p5
 
     ex af,af
-    and 0c0h
-    jr Z,mul0                   ; use p3 to round p4
+    and 080h                    ; mid-low sticky (was p3 & 0c0h)
+    jr Z,mul0
     set 0,c
 
 .mul0
@@ -181,8 +180,7 @@ PUBLIC m32_mulu_32h_32x32
 
     add hl,de                   ; p7 p6
     ex de,hl                    ; p7 p6
-    ld h,b                      ; p5
-    ld l,c                      ; p4
+    ld hl,bc                    ; p5
     ret                         ; exit  : DEHL = 32-bit product
 
 ENDIF

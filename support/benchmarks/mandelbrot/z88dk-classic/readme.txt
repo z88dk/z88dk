@@ -3,6 +3,9 @@ CHANGES TO SOURCE CODE
 
 For the sccz80 compile, variable "limit" in main() cannot be made static.
 
+When built with --math16 (__MATH_MATH16), floating types use _Float16.
+Mandelbrot coordinates stay well within the half exponent range.
+
 COMPILATION
 ===========
 
@@ -14,8 +17,14 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 mandelbrot.c -o mandelbrot.bin -lm 
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
 
+classic/sccz80/math16
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math16 -lndos -m
+
 classic/sccz80/8085/math32
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+
+classic/sccz80/8085/math16
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math16 -lmath32_8085 -lndos -m
 
 classic/80cc/math32
 zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
@@ -77,12 +86,12 @@ cycle count  = 3766086833
 time @ 4MHz  = 3766086833 / 4*10^6 = 15 min 41 sec
 
 
-Z88DK April 30, 2021
+Z88DK July 31, 2026
 zsdcc #12070 / classic / math32
-4804 bytes less page zero
+4823 bytes less page zero
 
-cycle count  = 1410662416
-time @ 4MHz  = 1410662416 / 4*10^6 = 5 min 53 sec
+cycle count  = 1384979312
+time @ 4MHz  = 1384979312 / 4*10^6 =  5 min 46 sec
 
 
 Z88DK April 28, 2021
@@ -93,20 +102,22 @@ cycle count  = 3596657568
 time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 
-Z88DK July 19, 2026
+Z88DK July 31, 2026
 sccz80 / classic / math32
-4717 bytes less page zero
+4743 bytes less page zero
 
-cycle count  = 1152093641
-time @ 4MHz  = 1152093641 / 4*10^6 =  4 min 48 sec
+cycle count  = 1118985198
+time @ 4MHz  = 1118985198 / 4*10^6 =  4 min 40 sec
 
 
-Z88DK July 19, 2026
+Z88DK July 31, 2026
 sccz80 / classic / 8085 / math32
-6208 bytes less page zero
+6103 bytes less page zero
 
-cycle count  = 1362047666
-time @ 4MHz  = 1362047666 / 4*10^6 =  5 min 41 sec
+cycle count  = 1317864784
+time @ 4MHz  = 1317864784 / 4*10^6 =  5 min 29 sec
+
+(opt with sqr(): 1167758008 ticks, 6401 bytes.)
 
 
 Z88DK July 20, 2026
@@ -131,3 +142,23 @@ sccz80 / classic / 8085 / MBF32
 
 cycle count  = 1805825674
 time @ 4MHz  = 1805825674 / 4*10^6 =  7 min 31 sec
+
+
+Z88DK July 29, 2026
+sccz80 / classic / math16
+3040 bytes less page zero
+
+cycle count  = 924216002
+time @ 4MHz  = 924216002 / 4*10^6 =  3 min 51 sec
+
+IEEE 16-bit half-float implementation (math16).
+
+
+Z88DK July 29, 2026
+sccz80 / classic / 8085 / math16
+2988 bytes less page zero
+
+cycle count  = 1142010284
+time @ 4MHz  = 1142010284 / 4*10^6 =  4 min 46 sec
+
+IEEE 16-bit half-float implementation (math16_8085).

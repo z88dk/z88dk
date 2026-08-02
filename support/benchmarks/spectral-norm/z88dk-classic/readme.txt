@@ -1,7 +1,8 @@
 CHANGES TO SOURCE CODE
 ======================
 
-None.
+When built with --math16 (__MATH_MATH16), floating types use _Float16,
+invf16, and sqrtf16. Matrix elements and intermediate norms stay in half range.
 
 VERIFY CORRECT RESULT
 =====================
@@ -49,6 +50,12 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectra
 sccz80/classic/8085/math32
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
 
+sccz80/classic/math16
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math16 -lndos -m
+
+sccz80/classic/8085/math16
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math16 -lmath32_8085 -lndos -m
+
 80cc/classic/math32
 zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
 
@@ -88,14 +95,14 @@ cycle count  = 8617785182
 time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
 
-Z88DK January 3, 2022
+Z88DK July 31, 2026
 zsdcc #12555 / classic c library / math32
-5910 bytes less page zero
+6079 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9756176827
-time @ 4MHz  = 9756176827 / 4*10^6 = 40 min 39 sec
+cycle count  = 9010141260
+time @ 4MHz  = 9010141260 / 4*10^6 =  37 min 33 sec
 
 
 Z88DK April 20, 2020
@@ -108,24 +115,24 @@ cycle count  = 14688455657
 time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 
 
-Z88DK July 19, 2026
+Z88DK July 31, 2026
 sccz80 / classic c library / math32
-5882 bytes less page zero
+5925 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9805013165
-time @ 4MHz  = 9805013165 / 4*10^6 = 40 min 51 sec
+cycle count  = 8875542847
+time @ 4MHz  = 8875542847 / 4*10^6 =  36 min 59 sec
 
 
-Z88DK July 19, 2026
+Z88DK July 31, 2026
 sccz80 / classic c library / 8085 / math32
-7106 bytes less page zero
+7004 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 19330977133
-time @ 4MHz  = 19330977133 / 4*10^6 = 80 min 33 sec
+cycle count  = 19159891939
+time @ 4MHz  = 19159891939 / 4*10^6 =  79 min 50 sec
 
 
 Z88DK July 19, 2026
@@ -166,3 +173,23 @@ error: 2 * 10^(-7)
 
 cycle count  = 6227757878
 time @ 4MHz  = 6227757878 / 4*10^6 = 25 min 57 sec
+
+
+Z88DK July 29, 2026
+sccz80 / classic c library / math16
+3635 bytes less page zero
+
+cycle count  = 4951503496
+time @ 4MHz  = 4951503496 / 4*10^6 = 20 min 38 sec
+
+IEEE 16-bit half-float implementation (math16).
+
+
+Z88DK July 29, 2026
+sccz80 / classic c library / 8085 / math16
+3608 bytes less page zero
+
+cycle count  = 6108745067
+time @ 4MHz  = 6108745067 / 4*10^6 = 25 min 27 sec
+
+IEEE 16-bit half-float implementation (math16_8085).

@@ -263,21 +263,18 @@ PUBLIC m32_fsnormalize32
     ld a,e
     rla
     ld e,a
-    ld a,e
-    and 0f0h
+    and 0f0h                    ; A still holds result (copt: drop ld a,e)
     jp Z,S24L4more
     add hl,hl
     ld a,e
     rla
     ld e,a
-    ld a,e
-    or a
+    or a                        ; A still holds result
     jp M,S24L4
     add hl,hl
     ld a,e
     rla
     ld e,a
-    ld a,e
     or a
     jp M,S24L5
     add hl,hl
@@ -322,15 +319,13 @@ PUBLIC m32_fsnormalize32
     rla
     ld e,a
     jp C,S24H_u0
-    ld a,e
-    or a
+    or a                        ; A still holds result (copt: drop ld a,e)
     jp M,S24H1
     add hl,hl
     ld a,e
     rla
     ld e,a
-    ld a,e
-    or a
+    or a                        ; A still holds result (copt: drop ld a,e)
     jp M,S24H2
     add hl,hl
     ld a,e

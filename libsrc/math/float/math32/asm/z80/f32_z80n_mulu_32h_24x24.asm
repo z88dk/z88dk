@@ -58,8 +58,7 @@ PUBLIC m32_mulu_32h_24x24
 
     exx
     ld d,a                      ; dc in de
-    ld b,h
-    ld c,l
+    ld bc,hl
     ex (sp),hl                  ; ab on stack, ef in HL
     push de                     ; dc on stack
     push bc                     ; ab on stack (again)
@@ -123,7 +122,7 @@ PUBLIC m32_mulu_32h_24x24
     add hl,de
     adc a,0
 
-    pop bc                     ; l in b
+    pop bc                      ; l in b
     ld c,b
     ld b,l
     ld l,h
@@ -134,8 +133,7 @@ PUBLIC m32_mulu_32h_24x24
 
     add hl,de
 
-    ld d,b
-    ld e,c                      ; exit  : HLDE  = 32-bit product
+    ld de,bc                    ; exit  : HLDE  = 32-bit product
     ret
 
 ENDIF

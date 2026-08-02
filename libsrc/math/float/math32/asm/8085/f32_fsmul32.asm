@@ -43,10 +43,17 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
 
 ;=======================================================================
-; IEEE X on stack → expand in place → mul_body
+; IEEE X on stack → expand → mul_body frame Y|ret|X
 ;
-; Strategy: park Y, load+expand IEEE X, rebuild a clean
-; Y|ret|X frame on top of the old stack, then raise SP over junk.
+; Strategies considered (hot path — poly / NR inv):
+;   A) Tall push tower + 14-byte high→low slide (old m24_mv) — correct, costly
+;   B) Swap/slide mid-frame (prior attempt) — offset-fragile
+;   C) Word-unrolled slide of 14 — still O(N) stack traffic + tower
+;   D) In-place ieee→X expand + 7-word left rotate (chosen)
+;
+; D: after park Y, stack is Y|ret|ieee(4). Expanded X needs 6 bytes.
+; Write X.hl/X.de over ieee, push X.bc, rotate left 1 word → Y|ret|X.
+; No 14-byte memmove; no rebuild of Y/ret.
 ;=======================================================================
 .m32_fsmul24x32
     ; Y in BCDEHL; SP: ret, X.HL, X.DE
@@ -85,55 +92,57 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld h,l
     ld l,0                          ; BC DEHL = expanded X
 
-    ; ---- Build clean frame on top: push X, ret, Y ----
-    ; Depth tracking from entry push Y (12) + load temps that net 0:
-    ;   push X (18) + push ret (20) + push Y (26)
-    ; Top 14 bytes = Y|ret|X; junk = 12 (shadow Y + ret0 + ieee).
-    push bc
-    push de
-    push hl
-    ; SP: Xhl Xde Xbc Yhl Yde Ybc ret X.HL X.DE   (18)
+    ; ---- ieee(4) → X.hl|X.de; grow +2 with X.bc; rotate to Y|ret|X ----
+    ; SP: Yhl Yde Ybc ret ieee.HL ieee.DE   (12)
+    push de                         ; save X.de
+    ld de,sp+10                     ; ieee.HL after push
+    ld (de),hl                      ; X.hl
+    pop hl                          ; X.de
+    ld de,sp+10
+    ld (de),hl                      ; X.de
+    ; SP: Y ret X.hl X.de (12); BC = X.bc
 
-    ; ret @ SP+12 → push
-    ld de,sp+12
+    push bc                         ; SP: X.bc Yhl Yde Ybc ret X.hl X.de  (14)
+    ; Left-rotate 7 words by 1 → Yhl Yde Ybc ret X.hl X.de X.bc
+    ld de,sp+0
     ld hl,(de)
-    push hl
-    ; SP: ret Xhl Xde Xbc Yhl Yde Ybc ret0 ieee   (20)
+    ld bc,hl                        ; BC = old w0 (X.bc)
 
-    ; Y @ SP+8 → push then reverse to Yhl Yde Ybc
+    ld de,sp+2
+    ld hl,(de)
+    ld de,sp+0
+    ld (de),hl                      ; w0 = Yhl
+
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+2
+    ld (de),hl                      ; w1 = Yde
+
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+4
+    ld (de),hl                      ; w2 = Ybc
+
     ld de,sp+8
     ld hl,(de)
-    push hl                         ; Yhl
+    ld de,sp+6
+    ld (de),hl                      ; w3 = ret
+
+    ld de,sp+10
+    ld hl,(de)
+    ld de,sp+8
+    ld (de),hl                      ; w4 = X.hl
+
     ld de,sp+12
     ld hl,(de)
-    push hl                         ; Yde
-    ld de,sp+16
-    ld hl,(de)
-    push hl                         ; Ybc
-    pop bc                          ; Ybc
-    pop de                          ; Yde
-    pop hl                          ; Yhl
-    push bc
-    push de
-    push hl                         ; SP top→: Yhl Yde Ybc ret X...
-    ; SP: Yhl Yde Ybc ret Xhl Xde Xbc | Y0 ret0 ieee   (26)
-    ; Copy 14-byte frame up by 12 (dest overlaps src by 2 — copy high→low).
-    ld hl,13
-    add hl,sp
-    ld de,hl
-    ld hl,12+13
-    add hl,sp                       ; HL → last byte of dest
-    ld b,14
-.m24_mv
-    ld a,(de)
-    ld (hl),a
-    dec de
-    dec hl
-    dec b
-    jp NZ,m24_mv
-    ld hl,12
-    add hl,sp
-    ld sp,hl                        ; SP: Yhl Yde Ybc ret Xhl Xde Xbc
+    ld de,sp+10
+    ld (de),hl                      ; w5 = X.de
+
+    ld hl,bc
+    ld de,sp+12
+    ld (de),hl                      ; w6 = X.bc
+
+    ; SP: Yhl Yde Ybc ret Xhl Xde Xbc
     jp mul_body
 
 

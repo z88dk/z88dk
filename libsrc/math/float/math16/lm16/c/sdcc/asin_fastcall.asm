@@ -1,4 +1,5 @@
 
+	SECTION code_clib
 	SECTION	code_fp_math16
 	PUBLIC	_asinf16_fastcall
 	EXTERN	asinf16

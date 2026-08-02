@@ -25,12 +25,13 @@ LABEL = -DTIO_LABEL="\"\\\"$(1)\\\"\""
 all: \
 	test_cpm_z80.com \
 	test_cpm_8085.com \
+	test_cpm_new_z80.com \
 	test_rc2014_z80_CODE.bin \
 	test_rc2014_8085_CODE.bin \
 	test_rc2014_cpm.com
 
 # ---------------------------------------------------------------------------
-# CP/M classic — native fcntl via BDOS; output must be *.com for ticks
+# CP/M classic — native fcntl via BDOS; default subtype only (Z80 + 8085)
 # ---------------------------------------------------------------------------
 
 test_cpm_z80.com: $(COMMON_NATIVE)
@@ -46,6 +47,23 @@ test_cpm_8085.com: $(COMMON_NATIVE)
 	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) -m8085 $@ \
 		|| { echo "$(RED)" `date +%H:%M:%S` " cpm/8085 target_io failure $(RESET)" ; exit 1; }
 	@echo "$(GREEN)" `date +%H:%M:%S` " cpm/8085 target_io completed $(RESET)"
+
+# ---------------------------------------------------------------------------
+# CP/M newlib — BDOS FCB + character devices (+cpm -clib=new, Z80 only)
+# ---------------------------------------------------------------------------
+
+test_cpm_new_z80.com: $(COMMON_NATIVE)
+	@# -startup=4 = DCIO console (BDOS 6); startup 0 uses BDOS 10 which ticks lacks
+	@# -DTIO_CPM_DEVICES: CRT has stdrdr/stdpun/stdlst + cpm_device_file
+	zcc +cpm -clib=new -startup=4 -vn $(CFLAGS) -DTIO_CPM_DEVICES $(call LABEL,CPM-NEW) \
+		$^ -o $(@:.com=) -m -create-app
+	@# -create-app may emit APP.COM; normalise for ticks
+	@if [ -f APP.COM ]; then mv -f APP.COM $@; elif [ -f $(@:.com=_CODE.bin) ]; then cp $(@:.com=_CODE.bin) $@; fi
+	@test -f $@ || { echo "missing $@ after link"; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " Starting cpm/newlib z80 target_io $(RESET)"
+	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) $@ \
+		|| { echo "$(RED)" `date +%H:%M:%S` " cpm/newlib z80 target_io failure $(RESET)" ; exit 1; }
+	@echo "$(GREEN)" `date +%H:%M:%S` " cpm/newlib z80 target_io completed $(RESET)"
 
 # ---------------------------------------------------------------------------
 # RC2014 basic — host SYSCALL fcntl; CODE.bin @ 0x9000; name has "rc2014"
@@ -73,7 +91,8 @@ test_rc2014_8085_CODE.bin: $(COMMON_HOST)
 # ---------------------------------------------------------------------------
 
 test_rc2014_cpm.com: $(COMMON_NATIVE)
-	zcc +rc2014 -subtype=cpm -clib=new -vn $(CFLAGS) $(call LABEL,RC2014-CPM) \
+	@# -DTIO_CPM_DEVICES: subtype=cpm CRT instantiates stdrdr/stdpun/stdlst
+	zcc +rc2014 -subtype=cpm -clib=new -vn $(CFLAGS) -DTIO_CPM_DEVICES $(call LABEL,RC2014-CPM) \
 		$^ -o $(@:.com=) -m
 	cp $(@:.com=_CODE.bin) $@
 	@echo "$(GREEN)" `date +%H:%M:%S` " Starting rc2014/cpm target_io $(RESET)"
@@ -91,5 +110,5 @@ test_rc2014_cpm.com: $(COMMON_NATIVE)
 
 clean:
 	rm -f *.com *.bin *.map *.o *.def zcc_opt.def *~ \
-		suite.dat a.dat b.dat \
-		test_cpm_* test_rc2014_* TEST_CPM_* TEST.DAT test.dat
+		suite.dat a.dat b.dat fopen.dat \
+		test_cpm_* test_rc2014_* TEST_CPM_* TEST.DAT test.dat APP.COM app

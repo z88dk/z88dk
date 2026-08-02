@@ -222,10 +222,8 @@ PUBLIC m32_fsnormalize
     ld a,e
     add a,a
     ld e,a
-    ld a,e
-    add a,a
+    add a,a                     ; A still holds prior result (copt: drop ld a,e)
     ld e,a
-    ld a,e
     add a,a
     ld e,a
     ld a,0f0h
@@ -234,11 +232,9 @@ PUBLIC m32_fsnormalize
     ld a,e
     add a,a
     ld e,a
-    ld a,e
     add a,a
     ld e,a
     jr C,S8L_u4
-    ld a,e
     add a,a
     ld e,a
     jr C,S8L_u5
@@ -263,13 +259,10 @@ PUBLIC m32_fsnormalize
     ld a,e
     add a,a
     ld e,a
-    ld a,e
     add a,a
     ld e,a
-    ld a,e
     add a,a
     ld e,a
-    ld a,e
     add a,a
     ld e,a
     ld a,-23

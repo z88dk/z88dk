@@ -126,8 +126,7 @@ PUBLIC m32_mulu_32h_24x24, m32_l0_mulu_32h_24x24
     ld b,a
 
     ld a,c
-    ld h,d
-    ld l,e
+    ld hl,de
 
     ; eliminate leading zero bits
 

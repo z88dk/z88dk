@@ -11,7 +11,7 @@ ALLTARGETS = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 
 TARGET = $(ALLTARGETS)
 
 # Targets whose sources live under libsrc/target/ (classic-aligned), not newlib/target/
-MIGRATED_TARGETS = hbios scz180 yaz180 rc2014
+MIGRATED_TARGETS = hbios scz180 yaz180 rc2014 cpm
 
 Z88DK_LIB := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib/
 
@@ -37,7 +37,7 @@ clean: $(addsuffix -clean,$(TARGET))
 
 install-clean:
 	$(RM) -fr target/*/obj
-	$(RM) -fr ../target/hbios/obj ../target/scz180/obj ../target/yaz180/obj ../target/rc2014/obj
+	$(RM) -fr ../target/hbios/obj ../target/scz180/obj ../target/yaz180/obj ../target/rc2014/obj ../target/cpm/obj
 
 
 define config

@@ -25,7 +25,7 @@
 @../target/rc2014/default/default.lst
 @../target/rc2014/device/device_sdcc_ix.lst
 @../target/rc2014/driver/driver_sdcc_ix.lst
-@target//cpm/driver/driver.lst
+@../target/cpm/driver/driver.lst
 @../newlib/threads/threads_sdcc_ix.lst
 @../time/time_sdcc.lst
 @../arch/z80/z80_sdcc.lst

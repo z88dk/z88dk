@@ -66,10 +66,18 @@ PUBLIC _m32_ldexpf
 
     ld de,sp+6
     ld a,(de)                       ; (int8_t)pw2
-    ld b,a                          ; save for wrap sign test
-    add h                           ; new_exp = exp + pw2
+    ld b,a                          ; save for sign test
+    add h                           ; new_exp = exp + pw2 (int8)
+    ; See Z80 f32_fsldexp: CF + sign of pw2 select over/under vs result in A
     jp C,ldexp_wrap
 
+    ld c,a                          ; save sum
+    ld a,b
+    add a,a                         ; pw2 sign → C
+    jp C,ldexp_uflow                ; negative pw2, no carry => below 0
+    ld a,c
+
+.ldexp_result
     or a
     jp Z,ldexp_uflow
     ld c,a
@@ -99,9 +107,12 @@ PUBLIC _m32_ldexpf
     ret
 
 .ldexp_wrap
+    ld c,a                          ; A still holds sum from add
     ld a,b
-    rla                             ; pw2 sign → C
-    jp C,ldexp_uflow
+    add a,a                         ; pw2 sign → C
+    jp NC,ldexp_oflow               ; non-negative pw2 + carry => overflow
+    ld a,c
+    jp ldexp_result                 ; negative pw2 + carry => A is new exp
 
 .ldexp_oflow
     ld de,sp+5                      ; original D
@@ -126,8 +137,7 @@ PUBLIC _m32_ldexpf
     ld de,sp+5
     ld a,(de)
     add a,a                         ; sign → C
-    ld d,0
-    ld e,0
+    ld de,0
     ld hl,0
     rra
     ld d,a                          ; signed zero
@@ -186,9 +196,16 @@ PUBLIC _m32_ldexpf
     jp Z,ldexp_pack_reg
 
     ld a,d
-    add a,c
+    add a,c                         ; new_exp = exp + pw2 (int8 in c)
     jp C,ldexp_wrap_reg
 
+    ld b,a                          ; save sum
+    ld a,c
+    add a,a                         ; pw2 sign → C
+    jp C,ldexp_uflow_reg            ; negative pw2, no carry => under
+    ld a,b
+
+.ldexp_result_reg
     or a
     jp Z,ldexp_uflow_reg
     ld d,a
@@ -209,9 +226,12 @@ PUBLIC _m32_ldexpf
     ret
 
 .ldexp_wrap_reg
+    ld b,a                          ; A still holds sum
     ld a,c
-    rla
-    jp C,ldexp_uflow_reg
+    add a,a                         ; pw2 sign → C
+    jp NC,ldexp_oflow_reg           ; non-negative pw2 + carry => overflow
+    ld a,b
+    jp ldexp_result_reg             ; negative pw2 + carry => A is new exp
 
 .ldexp_oflow_reg
     ld a,e
