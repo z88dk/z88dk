@@ -319,6 +319,10 @@ static int wide_acc_result_dead_in_acc(const Func *f, int v);
 
 /* IR_SPILL_STATS (Phase-0 measurement): -1 = not yet probed, else 0/1. */
 static int spill_stats_on = -1;
+/* IR_EMIT_TRACE (copt-audit): log each HL-bus staging emit with the IR op-kind
+   being lowered, mapping copt staging-rule fires back to their gen_* path. */
+static int emit_trace_on = -1;
+static const Op *lower_cur_op;   /* the op currently being lowered */
 
 /* IR_VERIFY (LRA Phase-0): per-op capture of emitted instruction text so the
    op_clobbers model can be cross-checked against what the emitter actually
@@ -327,11 +331,32 @@ static int  verify_on = -1;
 static char verify_buf[8192];
 static int  verify_len;
 
+/* IR_EMIT_TRACE: when the lowerer emits an HL-centric-bus staging instruction
+   (ex de,hl / DEHL park / HL<->DE copy / push hl;pop de), log the IR op-kind
+   being lowered (-> which gen_* path) + source line. Maps each copt staging-rule
+   fire back to its emitting lowerer path. Inert unless IR_EMIT_TRACE is set. */
+static void emit_trace_check(const char *buf)
+{
+    static const char *const stg[] = {
+        "ex\tde,hl", "ld\tbc,hl", "ld\td,h", "ld\te,l",
+        "push\thl", "pop\tde", "ld\tl,c", "ld\th,b", 0 };
+    for (int i = 0; stg[i]; i++)
+        if (strcmp(buf, stg[i]) == 0) {
+            char path[256];
+            const char *file = lower_unquote(lower_cur_file, path, sizeof path);
+            fprintf(stderr, "EMIT_TRACE\t%s\t%s\t%s:%d\n",
+                    buf, lower_cur_op ? ir_op_name(lower_cur_op->kind) : "?",
+                    file ? file : "?", lower_cur_line);
+            return;
+        }
+}
+
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
     if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
     if (verify_on < 0)      verify_on      = getenv("IR_VERIFY") ? 1 : 0;
-    if (spill_stats_on || verify_on) {
+    if (emit_trace_on < 0)  emit_trace_on  = getenv("IR_EMIT_TRACE") ? 1 : 0;
+    if (spill_stats_on || verify_on || emit_trace_on) {
         /* Fully-expanded instruction text. Buffer only when a probe is on; the
            emitted bytes are unchanged. */
         char buf[256];
@@ -345,6 +370,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
         if (verify_on && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
             verify_len += snprintf(verify_buf + verify_len,
                                    sizeof verify_buf - verify_len, "%s\n", buf);
+        if (emit_trace_on) emit_trace_check(buf);
     }
     fputc('\t', out);
     vfprintf(out, fmt, ap);
@@ -1944,6 +1970,7 @@ static int lower_op(FILE *out, Func *f, const Op *op)
        a lowering abort can name file:line + echo the source line. */
     lower_cur_file = op->file;
     lower_cur_line = op->line;
+    lower_cur_op   = op;
     switch (op->kind) {
 
     case IR_NOP:               return gen_nop(out, f, op);

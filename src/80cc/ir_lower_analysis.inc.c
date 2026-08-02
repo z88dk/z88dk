@@ -1076,6 +1076,21 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
             return;
         }
     }
+    /* GENERAL fp in-place store: `ld (ix+d),hl` preserves HL (the value), so no
+       DE round-trip is needed. The store_hl path below emits its contract swap
+       (`ex de,hl`, DE=value/HL=junk) and this function's tail emits the recover
+       swap — the two cancel (copt #284) to exactly this instruction, but the
+       peephole misses them when a label/C_LINE intervenes. Emitting it direct
+       needs no copt AND leaves the DE cache intact. TOS slots keep store_hl's
+       inc-sp/push micro-opt. */
+    if (fp_active(f) && !fp_tos_slot(f, vreg)) {
+        int ix_off = slot_ix_off(f, vreg);
+        if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {
+            emit(out, "ld\t(%s%+d),hl%s", frame_reg(), ix_off,
+                 vol_stamp(f, vreg));
+            return;
+        }
+    }
     store_hl(out, f, vreg);
     /* store_hl leaves DE=value, HL=dead slot address; recover HL=value. Only
        gbz80 emulates `ex de,hl` — there a one-way DE->HL copy is equivalent

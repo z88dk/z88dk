@@ -1199,17 +1199,6 @@
 =
 	ld	sp,ix
 
-;; #MV1 `push hl; pop de` copies HL into DE preserving HL, but the byte-move pair
-;; does it in 2 bytes / 8t vs the stack round-trip's ~21t (and frees the memory
-;; traffic). Same net effect (DE=HL, HL and flags unchanged), context-free safe.
-;; Harvests the `... push hl; pop de` tail the byte-deref-to-DE lowering leaves.
-%title #MV1 HL->DE via byte moves not a stack round-trip (-11t)
-	push	hl
-	pop	de
-=
-	ld	e,l
-	ld	d,h
-
 ;; #W1 repeat-widening of a byte global masked to a byte: `ld hl,(g); ld h,0`
 ;; zero-extends the byte, then `ld a,l; <alu a,imm>; ld l,a; ld h,0` re-widens the
 ;; masked result. The FIRST `ld h,0` is dead (h is rewritten by the trailing one,
