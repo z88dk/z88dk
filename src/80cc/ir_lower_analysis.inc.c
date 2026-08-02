@@ -1129,8 +1129,13 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
     spill_and_swap_unless_dead(out, f, v);
     /* A stack-transient's value now lives at TOS, NOT in HL — advertising HL
        would let a reader skip the pop and leak the pushed word. Its use always
-       pops. */
-    if (v >= 0 && vreg_is_pr_stack(f, v)) return;
+       pops. BUT the caller just physically clobbered HL with `ld hl,<value>`
+       (e.g. gen_ld_sym's `ld hl,_sym`), so the PRIOR HL tenant is now stale —
+       invalidate it. Leaving it stale miscompiled memcpy(sym,ptr,n) when the
+       destination symbol-address was pr_stack-homed: the dst's `ld hl,_sym`
+       clobbered HL holding the source, but the stale cache let the source load
+       cache-hit and skip its reload → a self-copy. */
+    if (v >= 0 && vreg_is_pr_stack(f, v)) { invalidate_hl_cache(); return; }
     cache_hl(v);
     /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). A reused
        deref/binop that stayed IR_PR_SPILL: leave a DE copy so a later read after

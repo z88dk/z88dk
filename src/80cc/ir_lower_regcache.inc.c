@@ -897,14 +897,18 @@ static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
    and the A cache is reset at every BB entry, so within-BB read-only suffices. */
 static int a_cache_carry_safe(const Func *f, int vreg_id)
 {
-    if (L.vreg_wc && L.vreg_wc[vreg_id] <= 1) return 1;   /* never rewritten */
-    if (!cur_bb) return 0;                                /* no context → refuse */
-    for (int j = cur_op_idx + 1; j < cur_bb->n_ops; j++) {
-        const Op *o = &cur_bb->ops[j];
-        if (o->dst == vreg_id) return 0;
-        if (o->kind == IR_POSTSTEP && o->src[0] == vreg_id) return 0;
-    }
-    return 1;
+    /* CORRECTNESS: only the conservative whole-function `wc<=1` gate is sound.
+       The read-only-to-BB-end relaxation (checking the VREG is not rewritten)
+       was UNSOUND — it ignores PHYSICAL A being clobbered between the cache_a
+       and the later reuse. The lowerer has a class of direct `ld a,...` inline
+       emits that clobber A without invalidating the A-cache, so a widened carry
+       window trips them: emu.c (magnetic interpreter) dropped output characters
+       (the space char) — bisected to 49a00d89a6, which long_ir/matrix/
+       IR_HOME_VERIFY all MISSED (real-file-only). Re-enable the window only once
+       A-clobber tracking is complete at the vemit chokepoint (RESIDENCY_HANDOVER
+       "vemit tracker, Design C" — whitelist preservers, invalidate-by-default). */
+    (void)f;
+    return L.vreg_wc && L.vreg_wc[vreg_id] <= 1;          /* never rewritten */
 }
 
 /* Load 8-bit value from a vreg's frame slot into A. Cache-aware:

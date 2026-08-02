@@ -331,6 +331,22 @@ static int  verify_on = -1;
 static char verify_buf[8192];
 static int  verify_len;
 
+/* IR_CLOB_VERIFY (inert, log-only): flag where an op's emitted code ACTUALLY
+   writes a physical reg (per lra_line_writes — the SAME decomposer ir_verify_op
+   uses, so no new asm parser) yet the residency cache (rs.hl/de/bc/a) still
+   claims the pre-op vreg — i.e. a stale cache the lowering forgot to invalidate.
+   Cross-op only (a prior op's belief surviving an op that writes the reg); that
+   was this session's memcpy / A-carry / BC-park class. Reuses the IR_VERIFY
+   per-op asm buffering + rs.* snapshot taken at op entry. */
+static int  clob_verify_on = -1;
+static long clob_verify_count;
+static int  clob_snap_hl, clob_snap_de, clob_snap_bc, clob_snap_a;
+static void clob_verify_report(void)
+{
+    fprintf(stderr, "IR_CLOB_VERIFY: %ld cross-op stale-cache site(s)\n",
+            clob_verify_count);
+}
+
 /* IR_EMIT_TRACE: when the lowerer emits an HL-centric-bus staging instruction
    (ex de,hl / DEHL park / HL<->DE copy / push hl;pop de), log the IR op-kind
    being lowered (-> which gen_* path) + source line. Maps each copt staging-rule
@@ -355,8 +371,10 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
 {
     if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
     if (verify_on < 0)      verify_on      = getenv("IR_VERIFY") ? 1 : 0;
+    if (clob_verify_on < 0) { clob_verify_on = getenv("IR_CLOB_VERIFY") ? 1 : 0;
+                              if (clob_verify_on) atexit(clob_verify_report); }
     if (emit_trace_on < 0)  emit_trace_on  = getenv("IR_EMIT_TRACE") ? 1 : 0;
-    if (spill_stats_on || verify_on || emit_trace_on) {
+    if (spill_stats_on || verify_on || clob_verify_on || emit_trace_on) {
         /* Fully-expanded instruction text. Buffer only when a probe is on; the
            emitted bytes are unchanged. */
         char buf[256];
@@ -367,7 +385,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             if (strstr(buf, "(ix") || strstr(buf, "(iy")) L.spill_ix++;
             if (strstr(buf, "add\thl,sp")) L.spill_sp++;
         }
-        if (verify_on && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
+        if ((verify_on || clob_verify_on) && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
             verify_len += snprintf(verify_buf + verify_len,
                                    sizeof verify_buf - verify_len, "%s\n", buf);
         if (emit_trace_on) emit_trace_check(buf);
@@ -558,100 +576,25 @@ static int bc_tok(const char *ops, const char *reg)
     return 0;
 }
 
-/* Classify one asm line's effect on B/C. All out-params default to 0 (no
-   effect / transparent). *park set for the exact `ld bc,hl` low-half stash. */
-static void bc_line_effect(const char *line, int *rb, int *rc, int *wb, int *wc,
-                           int *park, int *boundary, int *call)
-{
-    *rb = *rc = *wb = *wc = *park = *boundary = *call = 0;
-    if (line[0] != '\t') return;                 /* label / directive: transparent */
-    const char *m = line + 1;
-    /* Mnemonic ends at the operand tab OR end-of-line — an operand-less insn
-       (`ret`, `exx`, `ldir`, ...) has no second tab, so stop at '\n'/'\0' too,
-       else the mnemonic would capture the trailing newline ("ret\n" != "ret")
-       and misclassify — a `ret` that isn't recognised leaks BC liveness across
-       the return. */
-    const char *mt = m;
-    while (*mt && *mt != '\t' && *mt != '\n' && *mt != '\r') mt++;
-    char mnem[8] = {0};
-    size_t ml = (size_t)(mt - m);
-    if (ml >= sizeof mnem) ml = sizeof mnem - 1;
-    for (size_t i = 0; i < ml; i++) mnem[i] = m[i];
-    /* operands: after the tab (if any), trimmed of trailing newline/comment */
-    char ops[64] = {0};
-    if (*mt == '\t') {
-        const char *o = mt + 1; size_t j = 0;
-        while (*o && *o != '\n' && *o != '\r' && *o != ';' && j < sizeof ops - 1)
-            ops[j++] = *o++;
-        while (j > 0 && (ops[j-1] == ' ' || ops[j-1] == '\t')) j--;
-        ops[j] = 0;
-    }
-    /* Assembler directives (debug line markers, inline data / symbols) carry
-       text operands, not registers, so they never touch BC — pass them through
-       transparently. Without this the default operand scan below would read a
-       path like "foo.c" (standalone `c`) as a register-C read and wrongly keep
-       a park across every C_LINE marker. */
-    if (strcmp(mnem, "C_LINE") == 0 || strncmp(mnem, "def", 3) == 0
-        || strcmp(mnem, "GLOBAL") == 0 || strcmp(mnem, "SECTION") == 0
-        || strcmp(mnem, "MODULE") == 0 || strcmp(mnem, "LSTON") == 0
-        || strcmp(mnem, "LSTOFF") == 0) return;
-    /* A function return (`ret`) leaves a long result in DE:HL — never BC (the
-       result ABI is DE:HL) — so BC is DEAD at exit: a `ld bc,hl` before `ret`
-       is a redundant park and may be dropped. `boundary` marks this. */
-    if (strcmp(mnem, "ret") == 0 || strcmp(mnem, "reti") == 0
-        || strcmp(mnem, "retn") == 0) { *boundary = 1; return; }
-    /* A branch or call, by contrast, has a successor that may read BC — treat
-       as BC-LIVE. Critically a conditional `jp cc,L` has TWO successors
-       (fall-through AND L) and a linear backward scan only sees the fall-through,
-       so a value carried to L in BC (e.g. an int `abs` stashing HL->BC across a
-       sign test) must not be dropped; a `call` may pass BC as an arg. */
-    if (strcmp(mnem, "jp") == 0 || strcmp(mnem, "jr") == 0
-        || strcmp(mnem, "djnz") == 0 || strcmp(mnem, "call") == 0
-        || strcmp(mnem, "rst") == 0) { *call = 1; return; }
-    if (strcmp(mnem, "exx") == 0) { *rb = *rc = 1; return; }   /* swaps BC */
-    if (strcmp(mnem, "ldir") == 0 || strcmp(mnem, "lddr") == 0
-        || strcmp(mnem, "ldi") == 0 || strcmp(mnem, "ldd") == 0
-        || strcmp(mnem, "cpir") == 0 || strcmp(mnem, "cpdr") == 0
-        || strcmp(mnem, "cpi") == 0 || strcmp(mnem, "cpd") == 0) {
-        *rb = *rc = 1; return;                   /* read BC count */
-    }
-    if (strcmp(mnem, "ld") == 0) {
-        char dst[16] = {0}; const char *comma = strchr(ops, ',');
-        size_t dl = comma ? (size_t)(comma - ops) : strlen(ops);
-        if (dl >= sizeof dst) dl = sizeof dst - 1;
-        for (size_t i = 0; i < dl; i++) dst[i] = ops[i];
-        const char *src = comma ? comma + 1 : "";
-        if (strcmp(dst, "bc") == 0) {
-            *wb = *wc = 1;
-            *rb = bc_tok(src, "b") || bc_tok(src, "bc");
-            *rc = bc_tok(src, "c") || bc_tok(src, "bc");
-            if (strcmp(src, "hl") == 0) *park = 1;
-            return;
-        }
-        if (strcmp(dst, "b") == 0) {
-            *wb = 1; *rb = bc_tok(src, "b") || bc_tok(src, "bc");
-            *rc = bc_tok(src, "c") || bc_tok(src, "bc"); return;
-        }
-        if (strcmp(dst, "c") == 0) {
-            *wc = 1; *rc = bc_tok(src, "c") || bc_tok(src, "bc");
-            *rb = bc_tok(src, "b") || bc_tok(src, "bc"); return;
-        }
-        /* dst is another reg / memory — only the source(s) can read B/C */
-        *rb = bc_tok(ops, "b") || bc_tok(ops, "bc");
-        *rc = bc_tok(ops, "c") || bc_tok(ops, "bc");
-        return;
-    }
-    if (strcmp(mnem, "pop") == 0) {
-        if (strcmp(ops, "bc") == 0) *wb = *wc = 1;   /* full write, reads none */
-        return;
-    }
-    /* Everything else (push / add / adc / sbc / and / or / xor / cp / sub /
-       inc / dec / rlc / rl / sla / srl / bit / res / set / ex / in / out …):
-       treat any standalone B/C mention as a READ (safe over-estimate; a
-       read-modify like `inc b` keeps B live, which is correct). */
-    *rb = bc_tok(ops, "b") || bc_tok(ops, "bc");
-    *rc = bc_tok(ops, "c") || bc_tok(ops, "bc");
-}
+/* Unified instruction-effects query (P0 Step 2 — decomposer consolidation).
+   ONE query every consumer uses (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's
+   park sweep), COMPOSING the two single-responsibility kernels — lra_line_writes
+   (whole-reg WRITE mask) and bc_line_effect (sub-register B/C reads/writes +
+   park/control) — plus the value-change refinements. So an asm line is decomposed
+   in one place; the kernels are its private implementation. */
+typedef struct {
+    RegMask writes;     /* whole-reg writes (lra_line_writes) */
+    RegMask self_pres;  /* subset of writes whose VALUE is preserved (`or a`,`and a`) */
+    RegMask stepped;    /* subset of writes that are an in-place inc/dec */
+    RegMask swapped;    /* subset of writes that are a reg-reg exchange */
+    int unknown;
+    /* sub-register B/C (the park-liveness sweep needs B and C tracked separately) */
+    int b_read, c_read, b_write, c_write;
+    int park;           /* the exact `ld bc,hl` low-half stash */
+    int is_boundary;    /* ret/reti/retn — BC dead at exit (result ABI is DE:HL) */
+    int is_call;        /* jp/jr/djnz/call/rst — a successor may read BC */
+} InstrEffects;
+static InstrEffects instr_effects(const char *line);
 
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -687,8 +630,9 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
         int b_live = 0, c_live = 0;
         for (int i = n - 1; i >= 0; i--) {
             if (drop[i]) continue;                 /* collapsed recover: gone */
-            int rb, rc, wb, wc, park, boundary, call;
-            bc_line_effect(lines[i], &rb, &rc, &wb, &wc, &park, &boundary, &call);
+            InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
+            int rb = e.b_read, rc = e.c_read, wb = e.b_write, wc = e.c_write;
+            int park = e.park, boundary = e.is_boundary, call = e.is_call;
             /* `ret` (boundary): BC is dead at exit (long result ABI is DE:HL),
                so a park before it is droppable. A branch/call (`call`): BC may
                be read by a successor — treat as LIVE so only a park overwritten
@@ -1512,40 +1456,47 @@ static RegMask lra_reg_of(const char *t)
     return 0;                                         /* immediate / label / cc */
 }
 
-/* One emitted instruction line → the value-registers it WRITES. Sets *unknown
-   if the mnemonic isn't modelled (so the verifier can report it rather than
-   silently trust). */
-static RegMask lra_line_writes(const char *line, int *unknown)
+/* THE asm-line decomposer — ONE parse, every effect. Replaces the former two
+   parsers (lra_line_writes for the whole-reg write mask, bc_line_effect for the
+   sub-register B/C liveness); only the pure token helpers lra_reg_of / bc_tok
+   remain. Every consumer (ir_verify_op, IR_CLOB_VERIFY, the re-renderer's park
+   sweep) goes through here. Input may be tab-prefixed (re-renderer) or
+   mnemonic-first (verify) — leading whitespace is skipped so both work. */
+static InstrEffects instr_effects(const char *line)
 {
-    char m[16] = {0}, o0[64] = {0}, o1[64] = {0};
+    InstrEffects e; memset(&e, 0, sizeof e);
     const char *p = line;
-    int i = 0;
-    while (*p && *p != ' ' && *p != '\t' && i < 15) m[i++] = *p++;
+    while (*p == ' ' || *p == '\t') p++;                 /* normalise both callers */
+    char m[16] = {0}; int mi = 0;
+    while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r' && *p != ';' && mi < 15)
+        m[mi++] = *p++;
+    if (!m[0]) return e;                                 /* blank/comment: transparent */
     while (*p == ' ' || *p == '\t') p++;
-    /* operands: split on first comma */
-    const char *comma = strchr(p, ',');
+    char ops[64] = {0}; int oi = 0;
+    while (*p && *p != '\n' && *p != '\r' && *p != ';' && oi < 63) ops[oi++] = *p++;
+    while (oi > 0 && (ops[oi-1] == ' ' || ops[oi-1] == '\t')) ops[--oi] = 0;
+    /* o0 = dest (before comma), o1 = src (after comma, ws-skipped for lra_reg_of),
+       src = raw comma+1 (bc_tok/park use the raw form, exactly as before). */
+    char o0[64] = {0}, o1[64] = {0};
+    const char *comma = strchr(ops, ',');
+    const char *src = comma ? comma + 1 : "";
     if (comma) {
-        int n = (int)(comma - p); if (n > 63) n = 63;
-        memcpy(o0, p, (size_t)n);
-        const char *q = comma + 1; while (*q == ' ') q++;
-        i = 0; while (*q && *q!='\n' && *q!=';' && i < 63) o1[i++] = *q++;
+        int n = (int)(comma - ops); if (n > 63) n = 63;
+        memcpy(o0, ops, (size_t)n);
+        const char *q = src; while (*q == ' ') q++;
+        int k = 0; while (*q && k < 63) o1[k++] = *q++;
     } else {
-        i = 0; while (*p && *p!='\n' && *p!=';' && i < 63) o0[i++] = *p++;
+        memcpy(o0, ops, (size_t)(oi < 64 ? oi : 63));
     }
-    RegMask w = 0;
-    /* gbz80 auto-step pointer forms: ld a,(hl+) / ld (hl-),a step HL */
-    if (strstr(line,"hl+")||strstr(line,"hl-")) w |= IR_R_HL;
-    if (strstr(line,"de+")||strstr(line,"de-")) w |= IR_R_DE;
 
+    /* ---- (A) whole-reg WRITE mask (was lra_line_writes) ---- */
+    RegMask w = 0;
+    if (strstr(line,"hl+") || strstr(line,"hl-")) w |= IR_R_HL;   /* gbz80 auto-step */
+    if (strstr(line,"de+") || strstr(line,"de-")) w |= IR_R_DE;
     if (!strcmp(m,"ld"))                                 w |= lra_reg_of(o0);
-    else if (!strcmp(m,"add")||!strcmp(m,"adc")||!strcmp(m,"sbc"))
-                                                         w |= lra_reg_of(o0)|IR_R_F;
-    else if (!strcmp(m,"sub"))
-        /* z80 `sub r` / `sub a,r` writes A; 8085 `sub hl,bc` (dsub) and Rabbit
-           `sub hl,de` write HL. Discriminate on the destination operand. */
-        w |= (!strcmp(o0,"hl") ? (IR_R_HL|IR_R_F) : (IR_R_A|IR_R_F));
-    else if (!strcmp(m,"and")||!strcmp(m,"or")||!strcmp(m,"xor"))
-                                                         w |= IR_R_A|IR_R_F;
+    else if (!strcmp(m,"add")||!strcmp(m,"adc")||!strcmp(m,"sbc")) w |= lra_reg_of(o0)|IR_R_F;
+    else if (!strcmp(m,"sub")) w |= (!strcmp(o0,"hl") ? (IR_R_HL|IR_R_F) : (IR_R_A|IR_R_F));
+    else if (!strcmp(m,"and")||!strcmp(m,"or")||!strcmp(m,"xor")) w |= IR_R_A|IR_R_F;
     else if (!strcmp(m,"cp"))                            w |= IR_R_F;
     else if (!strcmp(m,"inc")||!strcmp(m,"dec"))         w |= lra_reg_of(o0)|IR_R_F;
     else if (!strcmp(m,"sla")||!strcmp(m,"sra")||!strcmp(m,"srl")||!strcmp(m,"rl")
@@ -1560,25 +1511,63 @@ static RegMask lra_line_writes(const char *line, int *unknown)
     else if (!strcmp(m,"push"))                          w |= IR_R_SP|IR_R_MEM;
     else if (!strcmp(m,"pop"))                           w |= lra_reg_of(o0)|IR_R_SP;
     else if (!strcmp(m,"call")||!strcmp(m,"rst")) {
-        /* The shift helpers (l_asr/l_lsr/l_lsl + _u / _dehl) are BC-clean by
-           contract (see gen_shr) — don't attribute BC to them, else a 16-bit
-           shift would spuriously look like it clobbers a BC resident. */
         int bc_clean = (strstr(o0,"l_asr")||strstr(o0,"l_lsr")||strstr(o0,"l_lsl"));
         w |= IR_R_A|IR_R_HL|IR_R_DE|IR_R_F|IR_R_MEM | (bc_clean ? 0 : IR_R_BC);
     }
     else if (!strcmp(m,"djnz"))                          w |= IR_R_BC|IR_R_F;
-    else if (!strcmp(m,"mlt"))                           w |= lra_reg_of(o0);              /* z180 */
-    else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|IR_R_F;        /* z80n/kc160 */
-    else if (!strcmp(m,"div")||!strcmp(m,"divu")||!strcmp(m,"divs"))
-                                                         w |= lra_reg_of(o0)|IR_R_A|IR_R_F; /* kc160 */
+    else if (!strcmp(m,"mlt"))                           w |= lra_reg_of(o0);
+    else if (!strcmp(m,"mul")||!strcmp(m,"muls"))        w |= lra_reg_of(o0)|IR_R_F;
+    else if (!strcmp(m,"div")||!strcmp(m,"divu")||!strcmp(m,"divs")) w |= lra_reg_of(o0)|IR_R_A|IR_R_F;
     else if (!strcmp(m,"ldi")||!strcmp(m,"ldd")||!strcmp(m,"ldir")||!strcmp(m,"lddr"))
                                                          w |= IR_R_HL|IR_R_DE|IR_R_BC|IR_R_MEM|IR_R_F;
     else if (!strcmp(m,"scf")||!strcmp(m,"ccf"))         w |= IR_R_F;
     else if (!strcmp(m,"ret")||!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"nop")
           || !strcmp(m,"di")||!strcmp(m,"ei")||!strcmp(m,"halt")||!strcmp(m,"reti")
           || !strcmp(m,"retn")) { /* control/none */ }
-    else if (m[0])                                       *unknown = 1;
-    return w;
+    else                                                 e.unknown = 1;
+    e.writes = w;
+
+    /* ---- (B) value-change refinements ---- */
+    if ((!strcmp(m,"or")||!strcmp(m,"and")) && !strcmp(o0,"a")) e.self_pres |= IR_R_A;
+    if (!strcmp(m,"inc")||!strcmp(m,"dec"))                     e.stepped   |= lra_reg_of(o0);
+    if (!strcmp(m,"exx"))                                       e.swapped   |= IR_R_HL|IR_R_DE|IR_R_BC;
+    else if (!strcmp(m,"ex") && strstr(ops,"de") && strstr(ops,"hl") && !strstr(ops,"(sp)"))
+        e.swapped |= IR_R_HL|IR_R_DE;
+
+    /* ---- (C) sub-register B/C + park/boundary/call (was bc_line_effect) ---- */
+    /* Directives carry text operands (paths, symbols) — never registers; a bare
+       `c` in "foo.c" must NOT read as reg C (else a park stays live over C_LINE). */
+    if (!strcmp(m,"C_LINE") || !strncmp(m,"def",3) || !strcmp(m,"GLOBAL")
+        || !strcmp(m,"SECTION") || !strcmp(m,"MODULE") || !strcmp(m,"LSTON")
+        || !strcmp(m,"LSTOFF"))
+        return e;
+    if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) { e.is_boundary = 1; return e; }
+    if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) { e.is_call = 1; return e; }
+    if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; return e; }
+    if (!strcmp(m,"ldir")||!strcmp(m,"lddr")||!strcmp(m,"ldi")||!strcmp(m,"ldd")
+        ||!strcmp(m,"cpir")||!strcmp(m,"cpdr")||!strcmp(m,"cpi")||!strcmp(m,"cpd")) {
+        e.b_read = e.c_read = 1; return e;
+    }
+    if (!strcmp(m,"ld")) {
+        if (!strcmp(o0,"bc")) {
+            e.b_write = e.c_write = 1;
+            e.b_read = bc_tok(src,"b")||bc_tok(src,"bc");
+            e.c_read = bc_tok(src,"c")||bc_tok(src,"bc");
+            if (!strcmp(src,"hl")) e.park = 1;
+            return e;
+        }
+        if (!strcmp(o0,"b")) { e.b_write = 1; e.b_read = bc_tok(src,"b")||bc_tok(src,"bc");
+                               e.c_read = bc_tok(src,"c")||bc_tok(src,"bc"); return e; }
+        if (!strcmp(o0,"c")) { e.c_write = 1; e.c_read = bc_tok(src,"c")||bc_tok(src,"bc");
+                               e.b_read = bc_tok(src,"b")||bc_tok(src,"bc"); return e; }
+        e.b_read = bc_tok(ops,"b")||bc_tok(ops,"bc");
+        e.c_read = bc_tok(ops,"c")||bc_tok(ops,"bc");
+        return e;
+    }
+    if (!strcmp(m,"pop")) { if (!strcmp(ops,"bc")) e.b_write = e.c_write = 1; return e; }
+    e.b_read = bc_tok(ops,"b")||bc_tok(ops,"bc");
+    e.c_read = bc_tok(ops,"c")||bc_tok(ops,"bc");
+    return e;
 }
 
 /* A vreg's physical register as a mask (its result-home). Byte halves map to
@@ -1882,6 +1871,7 @@ static void rec_end(const Func *f)
 static void ir_verify_op(const Func *f, const Op *op, const char *buf)
 {
     RegMask actual = 0, pushed = 0; int unknown = 0;
+    RegMask self_pres = 0, swapped = 0;   /* value-change refinements (instr_effects) */
     char line[256]; const char *p = buf;
     while (*p) {
         int i = 0; while (*p && *p != '\n' && i < 255) line[i++] = *p++;
@@ -1897,8 +1887,56 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
             RegMask r = lra_reg_of(line + 4);
             if (pushed & r) { actual &= ~r; pushed &= ~r; continue; }  /* restore */
         }
-        actual |= lra_line_writes(line, &unknown);
+        { InstrEffects e = instr_effects(line);
+          actual |= e.writes; self_pres |= e.self_pres; swapped |= e.swapped;
+          if (e.unknown) unknown = 1; }
     }
+    /* IR_CLOB_VERIFY stale-cache check: the op's emitted code ACTUALLY wrote a
+       reg (in `actual`), yet rs.<reg> still equals the pre-op snapshot (a live
+       vreg) — the physical reg was clobbered but the residency cache still claims
+       the old owner. A later cache-hit on that vreg would serve a stale value.
+       Uses `actual` (from lra_line_writes, push/pop-restore aware) so an op that
+       net-preserves a reg via push/pop is NOT flagged. */
+    if (clob_verify_on > 0) {
+        /* A VALUE-CHANGING write is one the cache can't survive: drop the flag-test/
+           self-preserving writes (`or a`) and reg-reg swaps (`ex de,hl` — the cache
+           should follow the permutation, not go stale). */
+        RegMask vchg = actual & ~self_pres & ~swapped;
+        struct { RegMask m; int snap; int post; const char *nm; } ck[4] = {
+            { IR_R_HL, clob_snap_hl, L.rs.hl, "HL" },
+            { IR_R_DE, clob_snap_de, L.rs.de, "DE" },
+            { IR_R_BC, clob_snap_bc, L.rs.bc, "BC" },
+            { IR_R_A,  clob_snap_a,  L.rs.a,  "A"  },
+        };
+        for (int i = 0; i < 4; i++) {
+            if (!((vchg & ck[i].m) && ck[i].snap >= 0 && ck[i].post == ck[i].snap
+                  && op->dst != ck[i].snap))   /* not a re-def of its own claimed vreg */
+                continue;
+            /* Forward-liveness gate: a stale claim is only HARMFUL if the claimed
+               vreg is LIVE after the op — a dead claim is never read back, so the
+               stale cache can't miscompile. (Necessary-not-sufficient: a live vreg
+               might still reload from its slot rather than hit the stale reg-cache,
+               so this over-reports vs the true read-back count, but it removes the
+               benign-dead bulk.) Same liveness query the I2 check uses below. */
+            int live_out;
+            if (cur_bb && cur_op_idx + 1 < cur_bb->n_ops) {
+                const BitSet *lo = ir_op_live_in(cur_bb, cur_op_idx + 1);
+                live_out = lo && ir_bitset_get(lo, ck[i].snap);
+            } else if (cur_bb) {
+                live_out = cur_bb->live_out
+                    && ir_bitset_get((const BitSet *)cur_bb->live_out, ck[i].snap);
+            } else live_out = 1;
+            if (!live_out) continue;   /* dead claim → benign */
+            fprintf(stderr,
+                "IR_CLOB_VERIFY: %s (bb%d op%d dst=%d) wrote %s but rs.%s still "
+                "claims v%d (LIVE) — STALE CACHE\n",
+                ir_op_name(op->kind), cur_bb ? cur_bb->id : -1, cur_op_idx,
+                op->dst, ck[i].nm, ck[i].nm, ck[i].snap);
+            clob_verify_count++;
+        }
+    }
+
+    if (verify_on <= 0) return;   /* below is the IR_VERIFY op_clobbers leak check */
     RegMask model = op_clobbers(f, op);
     /* SP (stack-spill push/pop, ret) and MEM are stack/memory bookkeeping, not
        value-register residency — not part of the clobber soundness check. */
@@ -1908,7 +1946,7 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
                 ir_op_name(op->kind), (unsigned)leak, (unsigned)model);
         const char *q = buf; char ln[256];
         while (*q) { int k=0; while (*q && *q!='\n' && k<255) ln[k++]=*q++; ln[k]=0; if(*q=='\n')q++;
-            int u2=0; if (ln[0] && (lra_line_writes(ln,&u2) & leak)) fprintf(stderr, " [%s]", ln); }
+            if (ln[0] && (instr_effects(ln).writes & leak)) fprintf(stderr, " [%s]", ln); }
         fprintf(stderr, "\n");
     }
     if (unknown)
@@ -1946,7 +1984,10 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
             home_live_out = cur_bb->live_out
                 && ir_bitset_get((const BitSet *)cur_bb->live_out, L.cur_func_ehome);
         }
-        if (hm && (actual & hm) && home_live_out) {
+        /* A reg-reg swap (ex de,hl / exx) is a permutation, not a clobber of the
+           home's VALUE — exclude it (kills the DE-home `ex de,hl` park false-fire
+           noted below), now that instr_effects distinguishes it. */
+        if (hm && (actual & hm & ~swapped) && home_live_out) {
             int defs[8]; int nd = ir_op_defs(op, defs, 8);
             int home_def = 0;
             for (int k = 0; k < nd; k++)
@@ -4729,13 +4770,17 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                global index so pass 1 records against it and pass 2's
                verdict (ss_store_dead) is read for it. */
             L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
-            if (verify_on > 0) verify_len = 0;   /* capture this op's emitted asm */
+            if (verify_on > 0 || clob_verify_on > 0) {
+                verify_len = 0;   /* capture this op's emitted asm */
+                clob_snap_hl = L.rs.hl; clob_snap_de = L.rs.de;   /* rs.* at op entry */
+                clob_snap_bc = L.rs.bc; clob_snap_a  = L.rs.a;
+            }
             if (op->kind == IR_RET) {
                 rc = lower_ret(out, f, op);
             } else {
                 rc = lower_op(out, f, op);
             }
-            if (verify_on > 0) { verify_buf[verify_len] = 0; ir_verify_op(f, op, verify_buf); }
+            if (verify_on > 0 || clob_verify_on > 0) { verify_buf[verify_len] = 0; ir_verify_op(f, op, verify_buf); }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
             if (L.la.cur_skip_next_op) {
