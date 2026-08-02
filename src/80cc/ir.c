@@ -286,6 +286,7 @@ void ir_func_free(Func *f)
     free(f->vreg_spill_slot);
     free(f->home_lo);
     free(f->home_hi);
+    free(f->de_fold_hint);
     free(f->live_ranges);
     free(f);
 }

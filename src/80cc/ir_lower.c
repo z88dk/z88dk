@@ -178,6 +178,7 @@ typedef struct {
         int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
         int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
         int cur_dehl_dst_dead_safe, cur_dst_dead;
+        int cur_remat_def_dead;  /* remat NO_SLOT def with no same-BB reader → skip it */
         int cur_br_value_dead;   /* BR_ZERO/COND: tested value dead after → test in place */
         int cur_branch_test_label, cur_skip_next_op;
         int shl_skip_n, cur_skip_shl_add_hl, cur_skip_shl_byte;
@@ -731,6 +732,29 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
         }
         npend = 0;
     }
+    /* Also fold defc bb-aliases (`defc L_f<idx>_bb_<X> = L_f<idx>_bb_<Y>`) into the
+       threading map. The defc makes L_X and L_Y the SAME address, so rewriting a
+       `jp [cc,]L_X` operand to L_Y is binary-identical — but it exposes the real
+       target to copt, surfacing more jump-over-next-label inversions (#JI) and
+       cross-label peepholes that the alias would otherwise hide. Only when X has no
+       trampoline thread already. */
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) {
+        if (strncmp(line, "defc L_f", 8) != 0) continue;
+        char *lp = strstr(line, "_bb_");
+        if (!lp || lp[4] < '0' || lp[4] > '9') continue;
+        int X = 0; char *q = lp + 4;
+        while (*q >= '0' && *q <= '9') X = X * 10 + (*q++ - '0');
+        char *eq = strchr(q, '=');
+        if (!eq) continue;
+        char *rp = strstr(eq, "_bb_");
+        if (!rp || rp[4] < '0' || rp[4] > '9') continue;
+        int Y = 0; q = rp + 4;
+        while (*q >= '0' && *q <= '9') Y = Y * 10 + (*q++ - '0');
+        if (X >= 0 && X <= max_bb && Y >= 0 && Y <= max_bb && X != Y
+            && thr[X] < 0)
+            thr[X] = Y;
+    }
     for (int i = 0; i <= max_bb; i++) {           /* resolve transitively */
         int t = thr[i], hops = 0;
         while (t >= 0 && t <= max_bb && thr[t] >= 0 && thr[t] != t
@@ -743,13 +767,18 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
     rewind(rout);
     while (fgets(line, sizeof line, rout)) {
         int is_jp = (strncmp(line, "\tjp\t", 4) == 0);
+        int is_defc = (strncmp(line, "defc L_f", 8) == 0);
         for (char *p = strstr(line, "_bb_"); p; p = strstr(p, "_bb_")) {
             char *q = p + 4;
             if (*q < '0' || *q > '9') { p = q; continue; }
             int n = 0;
             while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
             int own_def = (line[0] == 'L' && *q == ':' && p == strstr(line, "_bb_"));
-            if (!own_def && n <= max_bb) {
+            /* The LHS of `defc L_X = L_Y` DEFINES alias X (like a label def), not
+               a reference — otherwise X always looks referenced and its now-dead
+               alias (every `jp L_X` threaded to L_Y) can never be dropped. */
+            int alias_def = (is_defc && p == strstr(line, "_bb_"));
+            if (!own_def && !alias_def && n <= max_bb) {
                 int tgt = (is_jp && thr[n] >= 0) ? thr[n] : n;
                 if (tgt <= max_bb) ref[tgt] = 1;
             }
@@ -784,10 +813,22 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
         }
         thread_jp_line(dst, line, thr, max_bb);  /* rewrites jp targets; else fputs */
     }
-    /* Pass 3: the deferred alias defc's, at the end of the function. */
+    /* Pass 3: the deferred alias defc's, at the end of the function — but only
+       those still referenced. Threading rewrote every `jp [cc,]L_X` to its real
+       target, so an alias whose X is now unreferenced (ref[X]==0) is dead output.
+       A still-referenced X (e.g. a switch-table `defw L_X`, or a reference the
+       threading pass did not rewrite) keeps its alias so the symbol resolves. */
     rewind(rout);
-    while (fgets(line, sizeof line, rout))
-        if (strncmp(line, "defc L_f", 8) == 0) fputs(line, dst);
+    while (fgets(line, sizeof line, rout)) {
+        if (strncmp(line, "defc L_f", 8) != 0) continue;
+        char *p = strstr(line, "_bb_");
+        if (p && p[4] >= '0' && p[4] <= '9') {
+            int n = 0; char *q = p + 4;
+            while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+            if (n <= max_bb && !ref[n]) continue;   /* orphaned alias → drop */
+        }
+        fputs(line, dst);
+    }
     if (peep) {
         rewind(peep);
         if (do_regcopy && do_bc_live) {
@@ -1159,6 +1200,8 @@ static int slot_ix_off(const Func *f, int vreg_id)
 /* Forward declarations for BC/DE cache helpers used by load_to_hl_adj
    and load_to_de. Definitions are with the rest of the cache state
    later in the file (kept together for readability). */
+static int  emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp);
+static int  op_is_commutative(OpKind kind);
 static int  bc_has(int v);
 static int  hl_has(int v);
 static int  de_has(int v);
@@ -2755,6 +2798,27 @@ static int def_dst_dead(const Func *f, const BB *bb, int j)
     return 0;
 }
 
+/* A rematerialisable NO_SLOT def (a global address `ld hl,_sym` or an immediate)
+   whose value is never read again IN ITS OWN BB. Its register materialisation is
+   then dead: every reader rematerialises (a same-cost `ld rp,_sym`/`ld rp,K`),
+   so emitting the def just to have its register clobbered before any same-BB read
+   is pure waste — the classic loop-preheader `ld hl,_sym` the body overwrites
+   before use. KEEP it when a same-BB reader exists (that reader can share the
+   register); cross-BB readers rematerialise regardless, so skipping is at worst
+   byte-neutral there and a win when the def is otherwise dead. */
+static int remat_def_materialization_dead(const Func *f, const BB *bb, int j)
+{
+    const Op *op = &bb->ops[j];
+    if (op->dst < 0 || !vreg_is_remat(f, op->dst)) return 0;
+    for (int k = j + 1; k < bb->n_ops; k++) {
+        int u[16];
+        int nu = ir_op_uses(&bb->ops[k], u, (int)(sizeof u / sizeof u[0]));
+        for (int i = 0; i < nu; i++)
+            if (u[i] == op->dst) return 0;   /* same-BB reader → keep the def */
+    }
+    return 1;
+}
+
 /* A NO_SLOT byte rides A from its def straight to its consumer and is never
    written back. That is only sound when the consumer READS the byte from A and
    can never need to spill it to a slot. Terminal A-readers qualify: a memory
@@ -3243,6 +3307,77 @@ int ir_lower_func(FILE *out, Func *f)
                 f->vregs[fc].flags |= IR_VREG_AUTOPUSH;
         }
     }
+    /* Rematerialization table: a width-2 vreg with EXACTLY ONE def that is
+       LD_IMM or LD_SYM (non-bailing, non-addr-taken, non-volatile) is a
+       loop-invariant constant — remember its defining op so cache-miss loads
+       re-emit the constant instead of reloading a slot. Built BEFORE
+       ir_assign_slots so the NO_SLOT tagging (constants need no slot — they
+       rematerialise) shrinks the frame and drops the def's spill store. */
+    g_hc.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                         sizeof(const Op *));
+    if (g_hc.remat_def && !opt_disabled("remat")) {
+        int *ndef = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+        /* A symbol address used as a STORE base (`ld (hl/bc),a` write-back) is NOT
+           NO_SLOT-eligible: the pointer-store RMW lowering holds the base in a
+           register across the value computation and does not compose with
+           just-in-time rematerialisation (the base in HL gets clobbered by the
+           value's `pop hl`; bitfield store miscompile). Keep those slotted — their
+           pre-change behaviour (read-remat + slot) is correct. */
+        int *store_base = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+        if (ndef && store_base) {
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *so = &f->bbs[b].ops[j];
+                    if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
+                        && so->mem.base >= 0 && so->mem.base < f->n_vregs)
+                        store_base[so->mem.base] = 1;
+                }
+            /* Count via ir_op_defs — some ops define through a non-dst field
+               (e.g. IR_POSTSTEP self-steps src[0]); counting op->dst alone
+               undercounts and would mis-tag a loop-carried counter as a
+               single-def constant. */
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    int defs[8];
+                    int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
+                    for (int k = 0; k < nd; k++)
+                        if (defs[k] >= 0 && defs[k] < f->n_vregs) ndef[defs[k]]++;
+                }
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    int d = o->dst;
+                    if (d < 0 || d >= f->n_vregs || ndef[d] != 1) continue;
+                    if (f->vregs[d].width != 2) continue;
+                    if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                        continue;
+                    const Op *rd = NULL;
+                    if (o->kind == IR_LD_IMM)
+                        rd = o;
+                    else if (o->kind == IR_LD_SYM && o->mem.sym
+                             && !ns_sym_bails(o->mem.sym))
+                        rd = o;
+                    if (rd) {
+                        g_hc.remat_def[d] = rd;
+                        /* A compile-time constant (integer immediate OR symbol
+                           address) is rematerialisable at every use for the same
+                           cost as a slot reload → needs NO slot. Skipping it drops
+                           the def's spill store (often DEAD: enigma main() spilled
+                           ~16 global addresses, 9/10 never read) AND the frame slot;
+                           reads rematerialise via emit_remat_word (load_to_hl/de/bc).
+                           EXCLUDE store bases: the pointer-store RMW holds the base
+                           in a register across the value computation and does NOT
+                           compose with just-in-time rematerialisation (the base in
+                           HL is clobbered by the value's `pop hl` — bitfield-on-
+                           global, MMIO `*(T*)K = v`); those keep their slot. */
+                        if (store_base[d]) continue;
+                        f->vregs[d].flags |= IR_VREG_NO_SLOT;
+                    }
+                }
+            free(ndef);
+        }
+        free(store_base);
+    }
     ir_assign_slots(f);
     /* Frameless (Tier-B): decided once frame_size + homes are known; must be set
        before any fp_active/frame_has_saved_fp use (prepick region proof, render).
@@ -3312,43 +3447,8 @@ int ir_lower_func(FILE *out, Func *f)
                 if (o->kind == IR_POSTSTEP && o->src[0] >= 0
                     && o->src[0] < f->n_vregs) L.vreg_wc[o->src[0]]++;
             }
-    /* Rematerialization table: a width-2 vreg with EXACTLY ONE def that is
-       LD_IMM or LD_SYM (non-bailing, non-addr-taken, non-volatile) is a
-       loop-invariant constant — remember its defining op so cache-miss loads
-       re-emit the constant instead of reloading a slot. */
-    g_hc.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
-                         sizeof(const Op *));
-    if (g_hc.remat_def && !opt_disabled("remat")) {
-        int *ndef = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
-        if (ndef) {
-            /* Count via ir_op_defs — some ops define through a non-dst field
-               (e.g. IR_POSTSTEP self-steps src[0]); counting op->dst alone
-               undercounts and would mis-tag a loop-carried counter as a
-               single-def constant. */
-            for (int b = 0; b < f->n_bbs; b++)
-                for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                    int defs[8];
-                    int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
-                    for (int k = 0; k < nd; k++)
-                        if (defs[k] >= 0 && defs[k] < f->n_vregs) ndef[defs[k]]++;
-                }
-            for (int b = 0; b < f->n_bbs; b++)
-                for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                    const Op *o = &f->bbs[b].ops[j];
-                    int d = o->dst;
-                    if (d < 0 || d >= f->n_vregs || ndef[d] != 1) continue;
-                    if (f->vregs[d].width != 2) continue;
-                    if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
-                        continue;
-                    if (o->kind == IR_LD_IMM)
-                        g_hc.remat_def[d] = o;
-                    else if (o->kind == IR_LD_SYM && o->mem.sym
-                             && !ns_sym_bails(o->mem.sym))
-                        g_hc.remat_def[d] = o;
-                }
-            free(ndef);
-        }
-    }
+    /* (remat_def table built earlier, BEFORE ir_assign_slots, so its NO_SLOT
+       tagging is seen by slot assignment — see the block above gen ir_assign_slots.) */
     /* Predecessor table: bb_preds[bb] = list of pred bb ids,
        bb_pred_cnt[bb] = length. Derived from succ[] of every BB. */
     int *bb_pred_cnt = calloc((size_t)f->n_bbs, sizeof(int));
@@ -4168,6 +4268,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                re-read from memory (all later in-BB uses are cache-served). The
                predicate is shared with the slot allocator's no-slot pruning. */
             L.la.cur_dst_dead = def_dst_dead(f, bb, j);
+            L.la.cur_remat_def_dead = remat_def_materialization_dead(f, bb, j);
             L.la.cur_br_value_dead = br_value_dead_after(f, bb, j);
 
             /* Branch-test lookahead: if op[i+1] is BR_ZERO/COND

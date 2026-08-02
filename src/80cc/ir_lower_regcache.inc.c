@@ -15,6 +15,13 @@ static const char *vol_stamp(const Func *f, int vreg_id)
 
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
+    /* Rematerialisable constant (NO_SLOT, no slot to read): re-emit `ld bc,K` /
+       `ld bc,_sym` instead of a slot reload. Must precede the slot path — a
+       remat vreg has no slot, so require_slot would abort. */
+    if (emit_remat_word(out, f, vreg_id, "bc")) {
+        cache_bc(vreg_id);
+        return;
+    }
     if (fp_active(f) && !L.cur_frameless) {
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 1)) {

@@ -139,6 +139,7 @@ enum {
     CF_SPECULATIVE    = 1u << 3,   /* IV-residency candidate (Phase 2) */
     CF_DE_GENERAL     = 1u << 4,   /* DE-home: a general (non-accumulate) home */
     CF_DE_PTR         = 1u << 5,   /* DE-home: a walking byte pointer (loop regalloc) */
+    CF_DE_OPERAND     = 1u << 6,   /* DE-fold hint: reused deref/binop (DENSITY §4) */
 };
 /* Cost-model per-access weights (relative T-state savings of reg vs slot; the
    orchestrator's benefit = Σ depth-weighted access weights). A DEREF of a base
@@ -593,6 +594,77 @@ static int de_ptr_realizable(const Func *f, int v, const int *use_count,
     if (use_count[v] < 1) return 0;
     return 1;
 }
+/* OPRES operand-residency (opt-in IR_OPRES) — a reused deref/binop RESULT value.
+   sdcc keeps these in DE so a later compare folds to `sbc hl,de` and the value
+   survives the HL-clobber without a push-spill; 80cc funnels them through HL →
+   `push hl` + byte-wise compare (OPERAND_RESIDENCY_SPEC.md §1, the queenbench
+   safe() archetype). Eligible for a GENERAL DE-home (CF_DE_GENERAL: speculative
+   — the lowerer reverts it to a spill if no DE-clean region forms, so a
+   mis-proposal is byte-safe). Single-def (write_count<=1, distinguishes it from
+   the loop-carried de_general/de_acc shapes), reused (use_count>=2), width-2,
+   not addr-taken/volatile/param, not a deref base (bases want pointer-like
+   homes), def is a deref (IR_LD_MEM) or an ALU binop. DE-freeness across the
+   range is the ARBITER's interference call (it competes for the one general
+   DE-home against the loop-carried words), NOT a proposer gate. */
+static int opres_on(void) { static int c = -1; if (c < 0) c = getenv("IR_OPRES") != NULL; return c; }
+/* IR_RANGED gate: the fail-safe DE-cache fold brick (DENSITY_HANDOVER §4). A
+   reused deref/binop that stays IR_PR_SPILL leaves a DE cache at its def so a
+   later in-range read prefers DE instead of re-materialising in HL + spilling.
+   Distinct from opres_on() (the reverting real-DE-home experiment). */
+static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED") != NULL; return c; }
+static int de_operand_realizable(const Func *f, int v,
+                                 const int *use_count, const int *write_count,
+                                 const int *def_kind, const int *wd_base)
+{
+    if (!opres_on() && !ranged_on()) return 0;
+    const VReg *vr = &f->vregs[v];
+    if (vr->width != 2) return 0;
+    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
+        return 0;
+    if (f->vreg_to_phys[v] != IR_PR_SPILL) return 0;
+    if (wd_base[v]) return 0;                          /* not a deref base */
+    if (write_count[v] > 1) return 0;                  /* single def */
+    if (use_count[v] < 2) return 0;                    /* reused */
+    int dk = def_kind[v];
+    int is_deref = (dk == IR_LD_MEM);
+    int is_binop = (dk == IR_ADD || dk == IR_SUB || dk == IR_AND
+                    || dk == IR_OR || dk == IR_XOR);
+    return is_deref || is_binop;
+}
+/* True when a DE cache for v can PAY (DENSITY §4). The def leaves v in HL and a
+   use BEFORE any HL clobber reads HL directly — so the DE copy is dead overhead
+   UNLESS a use follows an HL-clobbering op in the same BB (then that read would
+   otherwise reload the slot; the DE fallback replaces it). Measured (2026-07-28):
+   firing unconditionally is a net +36B corpus regression — the common case has
+   no in-BB HL gap, so this gate is what makes the brick net-positive. Cross-BB
+   reuse (safe()'s ri) resets the DE cache at the BB boundary → NOT captured here
+   (that is §5, the ranged DE home). */
+static int de_fold_pays(const Func *f, int v)
+{
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        int seen_def = 0, hl_clob = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (!seen_def) { if (o->dst == v) seen_def = 1; continue; }
+            /* A use after an in-BB HL clobber would otherwise reload the slot;
+               the DE cache serves it instead. NOTE: we deliberately do NOT also
+               require DE to be clean def→use. That condition depends on the
+               lowerer's precise DE belief, and op_clobbers (a conservative
+               superset) over-reports DE clobbers — gating on it zeroes every win
+               (matrixbench's HL-clobber op also "clobbers" DE per the mask).
+               Consequence: a rare false positive (recordbench +2B, where an
+               `ex de,hl` store already stages v to DE) survives. Net still a
+               win; the accurate fix lives in the lowerer, not here. */
+            if (hl_clob) {
+                int u[16]; int nu = ir_op_uses(o, u, 16);
+                for (int q = 0; q < nu; q++) if (u[q] == v) return 1;
+            }
+            if (op_clobbers(f, o) & IR_R_HL) hl_clob = 1;
+        }
+    }
+    return 0;
+}
 
 
 /* idx3 array-index (hostility) closure, factored from idx3_propose so
@@ -846,6 +918,10 @@ static int home_realizable(const Func *f, int v, unsigned R,
         if (!opt_disabled("de-home") && !opt_disabled("loop-ra")
             && de_ptr_realizable(f, v, c->use_count, c->wd_base, c->wd_ldef))
             return 1;
+        if (opres_on() && !opt_disabled("de-home")
+            && de_operand_realizable(f, v, c->use_count, c->write_count,
+                                     c->def_kind, c->wd_base))
+            return 1;
         return 0;
     default:
         return 0;
@@ -909,6 +985,77 @@ static void hr_agreement_check(const Func *f, const Cand *pool, int np,
     }
     free(is_base); free(cstep); free(cinit); free(cother);
     free(wd_base); free(wd_acc); free(wd_ldef); free(wd_lread); free(wd_addr);
+}
+
+/* Residency window of vreg v in its register home = live-range ∩ the ranged
+   home interval [home_lo,home_hi] (outside which ir_home_at returns SPILL, so
+   the register is free there). Returns 0 for an empty/invalid window. Today
+   home_lo/hi is whole-function (INT_MIN/MAX) so this equals the live range; it
+   narrows automatically once ranging (P3.2) makes home_lo/hi non-degenerate,
+   at which point disjoint windows in the same register are legal time-sharing. */
+static int hr_residency_window(const Func *f, int v, int *lo, int *hi)
+{
+    const LiveRange *lr = ir_live_range(f, v);
+    if (!lr || lr->start < 0) return 0;
+    int a = lr->start, b = lr->end;
+    if (f->home_lo && f->home_lo[v] > a) a = f->home_lo[v];
+    if (f->home_hi && f->home_hi[v] < b) b = f->home_hi[v];
+    if (a > b) return 0;   /* home interval disjoint from the live range */
+    *lo = a; *hi = b;
+    return 1;
+}
+
+/* Inert home-recoverability verifier (env IR_HOME_VERIFY) — Phase-3 keystone.
+   The invariant ranged sharing MUST preserve: two vregs committed to the SAME
+   register home must not be simultaneously resident. Running it inert now proves
+   the net has zero false positives on the shipping corpus before it gates
+   anything, and it becomes the gate that rejects an unrealisable ranged home
+   once home_lo/hi go non-degenerate (increment 4). Logs to stderr;
+   IR_HOME_VERIFY_ABORT makes it fatal.
+
+   Scope + predicate, learned from the inert corpus run (see RANGED_ALLOC_PLAN):
+   - STRICT (exclusive) overlap. Inclusive `ir_live_ranges_overlap` over-reports:
+     a touching endpoint (u's last-use == v's def) is register REUSE, not
+     interference — the standard def/last-use coincidence. A real conflict needs
+     an op where BOTH are live: max(starts) < min(ends).
+   - Restrict to the spillable pair / byte homes Phase 3 ranges (DE/BC + halves).
+     The idx family (IX/IY + halves) is managed by dedicated in-place stepping
+     that fuses a counter's step-temp into the same index register — there,
+     vreg_to_phys=IY does NOT mean two continuous occupants (sieve_count v1/v18),
+     so it is out of scope for this net. HL/DEHL are cache-only; SPILL/NONE are
+     not register homes.
+   - Half-register cross-conflicts (PR_BC vs PR_C/PR_B, PR_DE vs PR_E/PR_D) are a
+     deliberate follow-up — a superset conflict model lands with ranging. */
+static int hr_recoverability_verify(const Func *f)
+{
+    if (!getenv("IR_HOME_VERIFY") || !f || f->n_vregs <= 0
+        || !f->vreg_to_phys)
+        return 0;
+    int viol = 0;
+    const char *fn = f->fn ? ir_sym_name(f->fn) : "?";
+    for (int u = 0; u < f->n_vregs; u++) {
+        PhysReg pu = f->vreg_to_phys[u];
+        if (!(pu == IR_PR_DE || pu == IR_PR_BC || pu == IR_PR_C
+              || pu == IR_PR_E || pu == IR_PR_D || pu == IR_PR_B))
+            continue;
+        int ulo, uhi;
+        if (!hr_residency_window(f, u, &ulo, &uhi)) continue;
+        for (int v = u + 1; v < f->n_vregs; v++) {
+            if (f->vreg_to_phys[v] != pu) continue;
+            int vlo, vhi;
+            if (!hr_residency_window(f, v, &vlo, &vhi)) continue;
+            int s = ulo > vlo ? ulo : vlo;
+            int e = uhi < vhi ? uhi : vhi;
+            if (s >= e) continue;   /* strict: touching endpoints = reuse */
+            fprintf(stderr,
+                "IR_HOME_VERIFY: %s v%d res[%d,%d] & v%d res[%d,%d] both home %s "
+                "— OVERLAPPING residency, unrecoverable share\n",
+                fn, u, ulo, uhi, v, vlo, vhi, ir_phys_name(pu));
+            viol++;
+        }
+    }
+    if (viol && getenv("IR_HOME_VERIFY_ABORT")) abort();
+    return viol;
 }
 
 /* B4 increment 3 — the single candidate GENERATOR (retires the 7 proposers).
@@ -1007,6 +1154,16 @@ static int collect_home_candidates(const Func *f,
                 if (de_ptr_realizable(f, v, use_count, wd_base, wd_ldef))
                     add_cand(pool, &n, v, use_count[v], first_use[v],
                              last_use[v], RC_DE_ACC, CF_DE_GENERAL | CF_DE_PTR);
+        /* OPRES (opt-in IR_OPRES): reused deref/binop operand → general DE-home.
+           The IR_RANGED fail-safe brick does NOT enter this competition — it keeps
+           the value SPILL and only leaves a DE cache at its def (hint set in a
+           post-placement pass in ir_alloc). */
+        if (opres_on() && !opt_disabled("de-home"))
+            for (int v = 0; v < f->n_vregs; v++)
+                if (de_operand_realizable(f, v, use_count, write_count,
+                                          def_kind, wd_base))
+                    add_cand(pool, &n, v, use_count[v], first_use[v],
+                             last_use[v], RC_DE_ACC, CF_DE_GENERAL);
     }
     /* (6) idx3 — second spare index register (opt-in). */
     if (idx3_home_available(f))
@@ -2910,6 +3067,111 @@ static void ir_ldslot_why_probe(const Func *f)
                 deliver, c_alu, c_stmem, c_other, c_none, n_sym, n_sym_slot);
 }
 
+/* [inert, IR_OPRES_WHY] Phase-2 operand-residency probe (OPERAND_RESIDENCY_SPEC.md).
+   Quantifies the Regime-A population before any codegen: a width-2 vreg V whose def
+   is a deref (IR_LD_MEM) or a binop (ADD/SUB/AND/OR/XOR), which is SPILLED (so it
+   materialises in HL then `push hl` to survive), reused (>=2 uses or a cross-BB use),
+   and for which DE is FREE across V's live range (no IR_PR_DE-homed vreg overlaps).
+   These are exactly the values sdcc keeps in DE (`sbc hl,de`) that 80cc spills.
+   Regime-B (DE busy — searchbench-class) counted separately: it must NOT be steered.
+   Reports per-function + the ~2 B/value ceiling. IR_OPRES_WHY=2 prints per-vreg.
+   Zero codegen effect. */
+static void ir_opres_why_probe(const Func *f)
+{
+    const char *e = getenv("IR_OPRES_WHY");
+    if (!e) return;
+    int verbose = e[0] == '2';
+    int nv = f->n_vregs;
+    if (nv <= 0) return;
+    int pop = 0, regA = 0, regB = 0, regB_flip = 0, regB_conv = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        const BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *o = &bb->ops[j];
+            if (o->dst < 0) continue;
+            int V = o->dst;
+            if (f->vregs[V].width != 2) continue;
+            int is_deref = (o->kind == IR_LD_MEM);
+            int is_binop = (o->kind == IR_ADD || o->kind == IR_SUB
+                            || o->kind == IR_AND || o->kind == IR_OR
+                            || o->kind == IR_XOR);
+            if (!is_deref && !is_binop) continue;
+            if (f->vreg_to_phys[V] != IR_PR_SPILL) continue;
+            /* reused? (>=2 uses, or any cross-BB use) — else no preservation needed */
+            int uses = 0, cross = 0;
+            for (int b2 = 0; b2 < f->n_bbs; b2++)
+                for (int k = 0; k < f->bbs[b2].n_ops; k++) {
+                    int u[16]; int nu = ir_op_uses(&f->bbs[b2].ops[k], u, 16);
+                    for (int q = 0; q < nu; q++)
+                        if (u[q] == V) { uses++; if (b2 != b) cross = 1; }
+                }
+            if (uses < 2 && !cross) continue;
+            pop++;
+            /* DE free across V's range? find the blocking DE-homed vreg W. */
+            int de_free = 1, blocker = -1;
+            for (int w = 0; w < nv; w++) {
+                if (w == V) continue;
+                if (f->vreg_to_phys[w] != IR_PR_DE) continue;
+                if (ir_live_ranges_overlap(f, V, w)) { de_free = 0; blocker = w; break; }
+            }
+            if (de_free) { regA++;
+                if (verbose)
+                    fprintf(stderr, "  OPRES v%d %s uses=%d DE-FREE(A)\n", V,
+                            is_deref ? "deref" : "binop", uses);
+                continue;
+            }
+            /* Regime B: could the blocker W relocate to BC (BC whole-range free
+               for W)? Then the flip is a clean net win — V gets DE, W→BC, no
+               spill. This is the rebalance-benefit estimate (increment 1b): the
+               73 DE-busy are mostly 80cc's own choice, not hard constraints. */
+            int bc_free = 1;
+            for (int x = 0; x < nv && bc_free; x++) {
+                if (x == blocker) continue;
+                if (f->vreg_to_phys[x] != IR_PR_BC) continue;
+                if (ir_live_ranges_overlap(f, blocker, x)) bc_free = 0;
+            }
+            regB++;
+            if (bc_free) regB_flip++;
+            /* Increment 1c: SUB-RANGE pressure — the real feasibility test. Max #
+               of word (width-2) vregs competing for HL/DE/BC that are
+               simultaneously live at any point in V's range (idx-homed excluded).
+               <=3 ⇒ a feasible HL/DE/BC assignment gives V a pair (convertible,
+               even if whole-range "busy"); >3 ⇒ genuine pressure (searchbench). */
+            const LiveRange *rV = ir_live_range(f, V);
+            int convertible = 0;
+            if (rV && rV->start >= 0) {
+                int maxp = 0;
+                for (int p = rV->start; p <= rV->end; p++) {
+                    int live = 0;
+                    for (int w = 0; w < nv; w++) {
+                        if (f->vregs[w].width != 2) continue;
+                        PhysReg ph = f->vreg_to_phys[w];
+                        /* only HL/DE/BC-competing homes — frame-resident (spill)
+                           and idx (IX/IY) values don't occupy a GP pair */
+                        if (ph != IR_PR_HL && ph != IR_PR_DE && ph != IR_PR_BC)
+                            continue;
+                        const LiveRange *r = ir_live_range(f, w);
+                        if (!r || r->start < 0) continue;
+                        if (r->start <= p && p <= r->end) live++;
+                    }
+                    if (live > maxp) maxp = live;
+                }
+                convertible = (maxp <= 3);
+            }
+            if (convertible) regB_conv++;
+            if (verbose)
+                fprintf(stderr, "  OPRES v%d %s uses=%d DE-busy(B) blocker=v%d "
+                        "%s %s\n", V, is_deref ? "deref" : "binop", uses, blocker,
+                        bc_free ? "FLIP(BC-free)" : "hard(BC-busy)",
+                        convertible ? "CONVERTIBLE(pressure<=3)" : "pressured");
+        }
+    }
+    if (pop)
+        fprintf(stderr, "OPRES_WHY %-22s reused=%d A=%d B=%d flip=%d conv=%d "
+                "ceil: whole~%dB subrange~%dB\n",
+                f->fn ? ir_sym_name(f->fn) : "?", pop, regA, regB, regB_flip,
+                regB_conv, (regA + regB_flip) * 2, (regA + regB_conv) * 2);
+}
 
 
 
@@ -2920,11 +3182,13 @@ void ir_alloc(Func *f)
     f->vreg_to_phys = NULL;
     free(f->home_lo); f->home_lo = NULL;
     free(f->home_hi); f->home_hi = NULL;
+    free(f->de_fold_hint); f->de_fold_hint = NULL;
     if (f->n_vregs <= 0) return;
     f->vreg_to_phys = calloc((size_t)f->n_vregs, sizeof(*f->vreg_to_phys));
     f->home_lo = calloc((size_t)f->n_vregs, sizeof(*f->home_lo));
     f->home_hi = calloc((size_t)f->n_vregs, sizeof(*f->home_hi));
-    if (!f->vreg_to_phys || !f->home_lo || !f->home_hi) return;
+    f->de_fold_hint = calloc((size_t)f->n_vregs, sizeof(*f->de_fold_hint));
+    if (!f->vreg_to_phys || !f->home_lo || !f->home_hi || !f->de_fold_hint) return;
 
     /* Default: every vreg gets a slot, then narrow to the register
        pools below. Ranged-residency intervals default to whole-function
@@ -3573,6 +3837,30 @@ void ir_alloc(Func *f)
            fallback below BC-pack — a single-def/single-use word transient with
            no register free goes on the stack (push/pop) instead of a slot. */
         ir_stack_spill(f, bb_first_op, def_kind, write_count);
+        /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
+           ALL register placement so it fires ONLY on reused deref/binop values
+           that stayed IR_PR_SPILL. The lowerer reads f->de_fold_hint and leaves a
+           DE cache at the def; the value's slot stays coherent so any DE clobber
+           falls back to it (byte-safe by construction).
+           DEAR-SLOT COST GATE: the DE cache replaces a SLOT read, so it only pays
+           where the slot is DEAR relative to DE. On cheap-slot CPUs (ez80 native
+           `ld hl,(ix+d)`=2, kc160=4, rabbit `ld hl,ix`=9) the fixed `ld d,h;ld e,l`
+           copy is dead overhead → the whole-corpus split (ez80/rabbit/kc160
+           regressed +19..+48B, z80/z180/808x/gbz80 won −5..−29B). Same `≥15`
+           dear-slot threshold the BC counter→deref-base yield uses (deref_gap). */
+        if (ranged_on() && f->de_fold_hint
+            && g0_word_cost(GR_SLOT, GK_READ) - g0_word_cost(GR_DE, GK_READ) >= 15) {
+            int *wd_base_h = calloc((size_t)f->n_vregs, sizeof(int));
+            if (wd_base_h) {
+                scan_wd_props(f, bb_in_loop, wd_base_h, NULL, NULL, NULL);
+                for (int v = 0; v < f->n_vregs; v++)
+                    if (de_operand_realizable(f, v, use_count, write_count,
+                                              def_kind, wd_base_h)
+                        && de_fold_pays(f, v))
+                        f->de_fold_hint[v] = 1;
+                free(wd_base_h);
+            }
+        }
         b1_hotness_probe(f, bb_loop_depth);
         free(write_count);
         free(use_count);
@@ -3643,7 +3931,30 @@ void ir_alloc(Func *f)
         free(dehl_ok);
     }
 
+    /* P3.2 step 1 (opt-in IR_TIGHT_HOMES): narrow whole-function homes to the
+       tight live range. A vreg is only accessed WITHIN its live range, where
+       its home is unchanged, so this is byte-identical — it makes home_lo/hi
+       TRUTHFUL (the substrate for disjoint sub-range time-sharing) and gives the
+       range-aware verifier real residency windows. A byte-diff that is NOT clean
+       reveals a lowerer access outside the IR live range (the "invisible
+       residency" the plan warns about) — high-value to surface before ranging.
+       HL/DEHL (cache-only) and SPILL/NONE are skipped. */
+    if (getenv("IR_TIGHT_HOMES") && f->home_lo && f->home_hi) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            PhysReg pr = f->vreg_to_phys[v];
+            if (pr == IR_PR_SPILL || pr == IR_PR_NONE
+                || pr == IR_PR_HL || pr == IR_PR_DEHL)
+                continue;
+            const LiveRange *lr = ir_live_range(f, v);
+            if (!lr || lr->start < 0) continue;
+            f->home_lo[v] = lr->start;
+            f->home_hi[v] = lr->end;
+        }
+    }
+
     alloc_probe(f);
     ir_spill_why_probe(f);
     ir_ldslot_why_probe(f);
+    ir_opres_why_probe(f);
+    hr_recoverability_verify(f);
 }

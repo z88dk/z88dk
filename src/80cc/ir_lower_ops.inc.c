@@ -97,6 +97,12 @@ static int gen_ld_sym(FILE *out, Func *f, const Op *op)
     }
     if (ns_sym_bails(op->mem.sym))
         return -1;   /* __addressmod address-of: not yet supported */
+    /* Dead rematerialisable def: this NO_SLOT symbol address is reconstructed at
+       each reader (vreg_is_remat), and it has no same-BB register reader — so
+       `ld hl,_sym` + caching HL here is pure waste (a preheader load the loop
+       body clobbers before use). Skip it; readers rematerialise. */
+    if (L.la.cur_remat_def_dead && vreg_is_remat(f, op->dst))
+        return 0;
     /* A __LIB__ function decays to its address with NO leading underscore
        (classic lib symbols are unprefixed); ordinary globals (incl. arrays/
        structs) keep the `_`. ir_sym_prefix encodes that rule. */
@@ -2632,6 +2638,25 @@ static int try_de_home_mask_store(FILE *out, Func *f, const Op *op)
 
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    /* Store through a base that is a rematerialisable symbol-address constant
+       (`t = &sym; *t = v`): fold to the DIRECT absolute store `ld (sym+off),hl`
+       (the MEM_SYM path below), skipping the base-pointer load AND the HL→DE
+       value shuffle (`ex de,hl; ld hl,dst; ld (hl),e; inc hl; ld (hl),d` → one
+       `ld (sym),hl`). Excludes post-step (no pointer to step) and banked syms. */
+    if (op->mem.kind == IR_MEM_VREG && op->mem.base >= 0 && op->src[0] >= 0
+        && !op->mem.post_step
+        && g_hc.remat_def && op->mem.base < f->n_vregs
+        && g_hc.remat_def[op->mem.base]
+        && g_hc.remat_def[op->mem.base]->kind == IR_LD_SYM
+        && g_hc.remat_def[op->mem.base]->mem.sym
+        && !ns_sym_bails(g_hc.remat_def[op->mem.base]->mem.sym)) {
+        const Op *sd = g_hc.remat_def[op->mem.base];
+        Op syn = *op;
+        syn.mem.kind = IR_MEM_SYM;
+        syn.mem.sym = sd->mem.sym;
+        syn.mem.offset = sd->mem.offset + op->mem.offset;
+        return gen_st_mem(out, f, &syn);
+    }
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (try_de_home_mask_store(out, f, op))
         return 0;

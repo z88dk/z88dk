@@ -648,6 +648,16 @@ typedef struct {
        no DE-clean region forms. See LOOP_REGALLOC_PLAN.md. */
     int        de_home_is_ptr;
 
+    /* Operand-residency fold hint (opt-in IR_RANGED, DENSITY_HANDOVER §4):
+       a per-vreg flag on a reused deref/binop RESULT that stayed IR_PR_SPILL.
+       Its def path leaves a DE CACHE copy (`ld d,h; ld e,l` + cache_de) so a
+       later in-range read prefers DE (sbc hl,de / e-d byte-wise, DE-clean)
+       instead of re-materialising in HL and spilling. The value stays SPILL
+       (slot always coherent) → a DE clobber falls back to the slot; the hint
+       is byte-safe by construction (worst case = a wasted `ld d,h; ld e,l`).
+       NULL if not built. */
+    unsigned char *de_fold_hint;   /* by vreg id */
+
     /* Home residency region (ADR 0017 step 3b): the validated BB-id span
        [home_region_lo, home_region_hi] over which the DE/byte home stays
        register-resident — the OUTPUT of the cleanliness proof (compute_home_region),

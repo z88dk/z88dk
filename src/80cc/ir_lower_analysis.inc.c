@@ -196,6 +196,28 @@ static void load_binop_operands(FILE *out, const Func *f, const Op *op)
         invalidate_de_cache();
         return;
     }
+    /* Commutative op whose NON-constant operand is already in HL and whose OTHER
+       operand is a rematerialisable constant (immediate / symbol address): put the
+       constant straight in DE (`ld de,K` / `ld de,&sym`). add/and/or/xor is
+       symmetric (src1+src0 == src0+src1), so this replaces `ex de,hl; ld hl,&arr;
+       add hl,de` with `ld de,&arr; add hl,de` — the base+index address math. Gated
+       on hl_has(other): only fires when the constant is NOT the HL operand (else
+       the existing paths, which keep HL and load the other into DE, are already
+       optimal — firing here would needlessly reload). */
+    if (op_is_commutative(op->kind) && g_hc.remat_def) {
+        int cst = -1;
+        if (hl_has(op->src[1]) && op->src[0] >= 0 && op->src[0] < f->n_vregs
+            && g_hc.remat_def[op->src[0]])
+            cst = op->src[0];
+        else if (hl_has(op->src[0]) && op->src[1] < f->n_vregs
+                 && g_hc.remat_def[op->src[1]])
+            cst = op->src[1];
+        if (cst >= 0) {
+            emit_remat_word(out, f, cst, "de");     /* constant straight into DE */
+            cache_de(cst);
+            return;
+        }
+    }
     if (hl_has(op->src[0])) {
         /* HL still holds src[0] from the previous op. Preserve it. */
         load_to_de_preserve_hl(out, f, op->src[1]);
@@ -983,12 +1005,26 @@ static int vreg_is_pr_dehl(const Func *f, int v)
 }
 
 
+/* A rematerialisable constant (LD_IMM / LD_SYM, marked NO_SLOT): re-emitted at
+   every read via emit_remat_word, so it is NEVER stored — it has no slot, and a
+   spill would hit a bogus (ix - frame_size) offset and clobber other NO_SLOT
+   temps (the enigma `ld (ix-15),hl` miscompile). Its def leaves the value in HL/DE
+   and the caller's cache_hl/cache_de advertises it for an immediate in-BB use. */
+static int vreg_is_remat(const Func *f, int vreg)
+{
+    return vreg >= 0 && vreg < f->n_vregs
+        && g_hc.remat_def && g_hc.remat_def[vreg]
+        && (f->vregs[vreg].flags & IR_VREG_NO_SLOT);  /* skip-store only for NO_SLOT (LD_SYM) */
+}
+
 /* Skip store_hl + trailing swap-back `ex de,hl` when dst is dead. Used by the
    binop/LD_IMM pattern `<value in HL>; store_hl; ex de,hl; cache_hl` — on
    dead-dst emit nothing (HL already holds the value). Also fires for
    register-pool vregs: nothing to spill. */
 static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
 {
+    /* Rematerialisable constant: no slot, no store (value stays in HL). */
+    if (vreg_is_remat(f, vreg)) return;
     /* Stack-transient spill (IR_PR_STACK): park the value at TOS with `push hl`
        instead of a frame slot store. HL keeps the value (no swap-back); the
        single use pops it (load_to_*). Held +2 in cur_sp_adjust until then so
@@ -1063,6 +1099,19 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        pops. */
     if (v >= 0 && vreg_is_pr_stack(f, v)) return;
     cache_hl(v);
+    /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). A reused
+       deref/binop that stayed IR_PR_SPILL: leave a DE copy so a later read after
+       an intervening HL clobber prefers DE (`sbc hl,de` / e-d byte-wise) instead
+       of a slot reload. Byte-safe — store_hl already wrote the slot, so a DE
+       clobber (belief invalidated by the clobbering op) falls back to it.
+       Guards: HL must actually hold v; and skip when a word DE-home rides the
+       physical DE pair (the copy would corrupt the resident home). */
+    if (v >= 0 && f->de_fold_hint && f->de_fold_hint[v]
+        && hl_has(v) && !g_hc.home_is_word && g_hc.de_home < 0) {
+        emit(out, "ld\td,h");
+        emit(out, "ld\te,l");
+        cache_de(v);
+    }
 }
 
 /* Word result is in HL, dst v is a PR_DE-pool vreg: swap into DE and advertise
@@ -1100,7 +1149,10 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
         invalidate_de_cache();
         return;
     }
-    if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)) {
+    /* Rematerialisable constant (NO_SLOT): no store — bring the value into HL
+       (it is in DE here) and let the caller's cache_hl advertise it. */
+    if (L.la.cur_dst_dead || vreg_in_register_pool(f, vreg)
+        || vreg_is_remat(f, vreg)) {
         emit(out, "ex\tde,hl");
         invalidate_de_cache();
         return;
