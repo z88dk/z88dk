@@ -73,7 +73,12 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
     }
     /* Stage in DE when we're going to spill: skips the initial
        `ex de,hl` of store_hl. On dead-dst, falls back to the plain
-       HL load (we need HL=K for any cache-served consumer). */
+       HL load (we need HL=K for any cache-served consumer).
+       NB: do NOT extend this to remat consts — spill_de's `ld de,K; ex de,hl`
+       leaves the OLD HL in DE, which a consumer may use (lexbench: it becomes
+       the l_div_u dividend). Flattening to `ld hl,K` at the source drops that
+       DE value; copt #DE9 does the flatten safely, only when `pop de` follows
+       (proving DE dead). */
     if (L.la.cur_dst_dead) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
@@ -194,9 +199,21 @@ static int gen_mov(FILE *out, Func *f, const Op *op)
    HL round-trips through TOS (prior content restored), DE untouched — vs the
    generic pop/push + `inc sp;inc sp;push de` dance. Returns 1 if handled.
    Gated: real TOS slot, value not already in HL, no pending HL-carry spill. */
-static int try_tos_step_xthl(FILE *out, Func *f, const Op *op, int is_inc)
+/* In-place `dst = dst +/- imm` on a TOS-parked word: pop it into HL, step, push
+   it back — `pop hl; {inc|dec hl} x|delta|; push hl`. `delta` is the signed step
+   count (>0 add, <0 subtract). The value rides HL across the step, so the brief
+   window where it is off the stack (below sp) is safe: an interrupt scribbling
+   there cannot corrupt it (we re-push from HL), and net sp change is zero. This
+   supersedes the old `ex (sp),hl` (XTHL) form — XTHL's on-stack preservation is
+   only needed when HL itself must survive, which it need not here; pop/push is
+   cheaper (21t vs 38t) AND works on gbz80 (which lacks `ex (sp),hl`). Used for
+   both ++/-- (|delta|=1) and `p += K` small-immediate (gen_add/gen_sub),
+   replacing the peek(pop;push)+modify+discard(inc sp;inc sp)+push round-trip a
+   deepest-fp-slot RMW otherwise emits. Small |delta| only: beyond 4 the generic
+   `add hl,de` path is shorter. */
+static int try_tos_step_inplace(FILE *out, Func *f, const Op *op, int delta)
 {
-    if (IS_GBZ80()) return 0;   /* XTHL absent on gbz80 only */
+    if (delta == 0 || delta < -4 || delta > 4) return 0;
     int v = op->dst;
     if (v < 0 || op->src[0] != v) return 0;          /* in-place self-step */
     if (f->vregs[v].width != 2) return 0;
@@ -211,15 +228,85 @@ static int try_tos_step_xthl(FILE *out, Func *f, const Op *op, int is_inc)
        slot — flush it to its own slot first. */
     if (L.lazy_spill_on && L.pending_spill_v >= 0)
         pending_spill_resolve();
-    ss_note_reload(f, v);      /* reads the slot (first swap) */
-    ss_note_store(f, v);       /* writes it back (second swap) */
-    emit(out, "ex\t(sp),hl");
-    emit(out, is_inc ? "inc\thl" : "dec\thl");
-    emit(out, "ex\t(sp),hl");
-    /* HL physically restored to its pre-op content; the counter now lives
-       only at its TOS slot. Drop a stale DE claim on it; leave HL junk. */
+    ss_note_reload(f, v);      /* pop reads the slot */
+    ss_note_store(f, v);       /* push writes it back */
+    emit(out, "pop\thl");
+    int n = delta < 0 ? -delta : delta;
+    for (int i = 0; i < n; i++)
+        emit(out, delta > 0 ? "inc\thl" : "dec\thl");
+    emit(out, "push\thl");
+    /* Net sp unchanged; the value now lives only at its TOS slot. Drop a stale
+       DE claim on it; HL holds the new value but is left uncached (junk). */
     if (de_has(v)) invalidate_de_cache();
     invalidate_hl_cache();
+    return 1;
+}
+
+/* In-place `dst = dst OP src` (register src, word) on a TOS-parked word — the
+   register-operand generalisation of try_tos_step_inplace (imm). Load src into
+   DE (dst stays parked on the stack), pop dst into HL, apply the HL,DE op, push
+   HL back: `ld de,<src>; pop hl; {add|and a;sbc} hl,de; push hl`. This replaces
+   the peek(pop;push) + op + discard(inc sp;inc sp) + push round-trip the generic
+   load_binop_operands + commit_hl_result emits for a deepest-fp-slot RMW (the
+   value rides HL across the pop/push window — interrupt-safe as in B.1). is_sub
+   selects the subtract form. Standard `add hl,de` / `sbc hl,de` CPUs only —
+   808x/gbz80 (no sbc hl,de) and rabbit (its own sub) fall to the generic path.
+   Returns 1 if emitted. */
+static int try_tos_rmw_reg(FILE *out, Func *f, const Op *op, int is_sub)
+{
+    if (IS_808x() || IS_GBZ80() || IS_RABBIT()) return 0;
+    int v = op->dst;
+    if (v < 0 || op->src[0] != v) return 0;          /* in-place: dst == src[0] */
+    int s = op->src[1];
+    if (s < 0 || s == v || s >= f->n_vregs) return 0; /* distinct register src */
+    if (f->vregs[v].width != 2 || f->vregs[s].width != 2) return 0;
+    if (L.la.cur_dst_dead) return 0;
+    if (vreg_in_register_pool(f, v)) return 0;       /* dst must be a real slot */
+    if (hl_has(v)) return 0;                         /* dst in HL, not TOS */
+    /* src loaded to DE below must not move sp (else dst leaves TOS): a
+       stack-parked src would pop. Frame slots / registers / remat are sp-neutral. */
+    if (vreg_is_pr_stack(f, s) && stack_parked(s)) return 0;
+    int at_tos = fp_active(f) ? fp_tos_slot(f, v)
+               : (tos_pushpop_ok(f) && L.cur_sp_adjust == 0 && slot_off(f, v) == 0);
+    if (!at_tos) return 0;
+    if (L.lazy_spill_on && L.pending_spill_v >= 0)
+        pending_spill_resolve();
+    load_to_de(out, f, op->src[1]);   /* DE = src; dst still parked; HL scratched */
+    ss_note_reload(f, v);             /* pop reads the slot */
+    ss_note_store(f, v);              /* push writes it back */
+    emit(out, "pop\thl");             /* consume dst */
+    if (is_sub) { emit(out, "and\ta"); emit(out, "sbc\thl,de"); }
+    else        emit(out, "add\thl,de");
+    emit(out, "push\thl");
+    /* Net sp unchanged; dst lives only at its TOS slot; HL is junk. */
+    invalidate_de_cache();
+    invalidate_hl_cache();
+    return 1;
+}
+
+/* `dst = src0 +/- imm` (small const, width-2, NOT in-place): compute in HL with
+   an inc/dec chain instead of `ld de,K; [and a;] {add|sbc} hl,de`. Shorter and
+   faster for small imm (`x - 1` was `ld de,1; and a; sbc hl,de` = 5B/29T vs
+   `dec hl` = 1B/6T). inc/dec set NO flags, so only when the result is not
+   branch-tested (g_hc.branch_test_kind). Break-even: add<=3, sub<=4 (add's DE
+   path is 4B, sub's 5B). Returns 1 if emitted. The in-place / DE-home / idx
+   forms are handled by earlier paths; this is the generic `commit_hl_result`
+   store case. */
+static int try_word_step_imm(FILE *out, Func *f, const Op *op, int is_sub)
+{
+    if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
+    if (op->src[0] < 0 || op->src[1] >= 0) return 0;   /* src0 vreg + const imm */
+    if (op->dst == op->src[0]) return 0;               /* in-place: cheaper via
+        inc bc/de/<idx> (gpderef), gen_inc/dec, or B.1's TOS step — do NOT
+        load-to-HL + commit-back (the hashbench `inc bc` -> ld hl,bc;inc hl;
+        ld bc,hl regression). This fires for a FRESH dst (`x = y +/- K`). */
+    if (g_hc.branch_test_kind != 0) return 0;          /* inc/dec set no flags */
+    long k = (long)op->imm;
+    if (k < 1 || k > (is_sub ? 4 : 3)) return 0;
+    load_to_hl(out, f, op->src[0]);
+    for (long i = 0; i < k; i++)
+        emit(out, is_sub ? "dec\thl" : "inc\thl");
+    commit_hl_result(out, f, op->dst);
     return 1;
 }
 
@@ -276,7 +363,7 @@ static int gen_inc(FILE *out, Func *f, const Op *op)
         if (vreg_in_pr_bc(f, op->dst)) cache_bc(op->dst); else cache_de(op->dst);
         return 0;
     }
-    if (try_tos_step_xthl(out, f, op, 1)) return 0;
+    if (try_tos_step_inplace(out, f, op, 1)) return 0;   /* ++ */
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
     emit(out, "inc\thl");
@@ -299,7 +386,7 @@ static int gen_dec(FILE *out, Func *f, const Op *op)
         if (de_has(op->dst)) invalidate_de_cache();
         return 0;
     }
-    if (try_tos_step_xthl(out, f, op, 0)) return 0;
+    if (try_tos_step_inplace(out, f, op, -1)) return 0;  /* -- */
     if (!hl_has(op->src[0]))
         load_to_hl(out, f, op->src[0]);
     emit(out, "dec\thl");
@@ -2329,6 +2416,30 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 commit_a_byte(out, f, op->dst);
                 return 0;
             }
+            /* TOS-parked base + byte `*p++`/`*p--`: consume the base off TOS
+               (pop), deref, step, push the stepped pointer back — instead of the
+               peek (pop;push) + deref + step + store_hl discard(inc sp;inc sp)+
+               push. The store overwrites the same TOS slot, so the base needn't
+               stay parked; it rides HL across the pop/push window (interrupt-safe
+               as in the in-place TOS steps). fp deepest slot / sp TOS, HL not
+               already holding it, step ±1. */
+            if (!hl_has(base)
+                && (op->mem.post_step == 1 || op->mem.post_step == -1)
+                && !vreg_in_pr_bc(f, base) && !vreg_in_pr_de(f, base)
+                && ((fp_active(f) && fp_tos_slot(f, base))
+                    || (!fp_active(f) && tos_pushpop_ok(f)
+                        && L.cur_sp_adjust == 0 && slot_off(f, base) == 0))) {
+                ss_note_reload(f, base);
+                ss_note_store(f, base);
+                emit(out, "pop\thl");                  /* consume base off TOS */
+                emit(out, "ld\ta,(hl)");               /* A = *p */
+                emit(out, op->mem.post_step > 0 ? "inc\thl" : "dec\thl");
+                emit(out, "push\thl");                 /* re-park p±1 (HL = p±1) */
+                invalidate_de_cache();
+                cache_hl(base);
+                commit_a_byte(out, f, op->dst);
+                return 0;
+            }
             if (!hl_has(base))
                 load_to_hl(out, f, base);              /* HL = p */
             emit(out, "ld\ta,(hl)");                   /* A = *p */
@@ -2456,10 +2567,18 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                become a cache hit. cache_a is set; invalidate
                HL/DE since the address load clobbered them. */
             emit(out, "ld\ta,(hl)");
-            /* Caching the base here (HL intact when offset==0) looked like
-               a free win for a following p++ but regressed via a
-               cache-interaction chain; keep the plain invalidate. */
-            invalidate_hl_cache();
+            /* offset==0: HL still holds the base pointer. Keep that belief so a
+               deref-STORE to the same base (a byte RMW `*p op= k`) reuses HL
+               instead of reloading it (`ld hl,(ix+d)` / `pop hl;push hl` re-peek).
+               commit_a_byte below invalidates rs.hl if it clobbers HL (sp-mode
+               byte store), and a later step of the base (p++) invalidates it via
+               the gpderef/poststep paths — so the stale-base hazard that reverted
+               an earlier attempt is covered. offset!=0 leaves HL=base+off, not the
+               base, so drop the belief. */
+            if (op->mem.offset == 0 && op->mem.base >= 0)
+                cache_hl(op->mem.base);
+            else
+                invalidate_hl_cache();
             commit_a_byte(out, f, op->dst);
         } else if (dst_w == 4) {
             /* Long load: 4 bytes from (hl) into DEHL (DE=high, HL=low). */
@@ -3216,6 +3335,14 @@ static int gen_add(FILE *out, Func *f, const Op *op)
             return 0;                                  /* result stays in the index reg */
         }
     }
+    /* In-place `p += K` (small K) on a TOS-parked word: step it on the stack via
+       the XTHL wrapper instead of peek(pop;push)+inc*+discard(inc sp;inc sp)+push. */
+    if (op->src[1] < 0 && op->imm >= 1 && op->imm <= 4
+        && try_tos_step_inplace(out, f, op, (int)op->imm))
+        return 0;
+    /* In-place `p += q` (register q) on a TOS-parked word (B.2). */
+    if (op->src[1] >= 0 && try_tos_rmw_reg(out, f, op, 0))
+        return 0;
     if (try_word_accumulate(out, f, op))
         return 0;
     if (try_de_home_def(out, f, op))
@@ -3225,6 +3352,8 @@ static int gen_add(FILE *out, Func *f, const Op *op)
     if (try_de_home_indexed_add(out, f, op))
         return 0;
     if (try_index_half_word_add(out, f, op))
+        return 0;
+    if (try_word_step_imm(out, f, op, 0))   /* dst = src0 + small K via inc hl */
         return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         /* Byte add in A. Commutative — pick the A-resident operand as
@@ -3521,6 +3650,15 @@ static int gen_add(FILE *out, Func *f, const Op *op)
 static int gen_sub(FILE *out, Func *f, const Op *op)
 {
     if (try_de_home_def(out, f, op))
+        return 0;
+    /* In-place `p -= K` (small K) on a TOS-parked word: step it in place. */
+    if (op->src[1] < 0 && op->imm >= 1 && op->imm <= 4
+        && try_tos_step_inplace(out, f, op, -(int)op->imm))
+        return 0;
+    /* In-place `p -= q` (register q) on a TOS-parked word (B.2). */
+    if (op->src[1] >= 0 && try_tos_rmw_reg(out, f, op, 1))
+        return 0;
+    if (try_word_step_imm(out, f, op, 1))   /* dst = src0 - small K via dec hl */
         return 0;
     if (op->dst >= 0 && f->vregs[op->dst].width == 1) {
         /* Byte sub in A. Not commutative: A = src[0] - src[1]. If only

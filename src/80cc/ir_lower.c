@@ -898,6 +898,10 @@ static inline int *wide_acc_cell(const Func *f, int vreg)
 static FILE        *cur_lazy_out;
 static const Func  *cur_lazy_func;
 static int          cur_op_idx;
+/* Current BB being lowered (set per-op by lower_func). Read by the AND-mask +
+   shift-test peephole to inspect successor BBs' first ops, and by the windowed
+   A-carry safety scan in the register-cache helpers. */
+static const BB    *cur_bb;
 
 /* ir_home_at — the single I1 read path (ADR 0017): where is value `v` homed?
    Today homes are whole-function (a degenerate one-interval-per-vreg table), so

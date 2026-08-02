@@ -1,21 +1,8 @@
 /* ir_lower_call.inc.c — part of ir_lower.c, #included (single TU). Do not compile standalone. */
 
-/* After store_hl() of a used word CALL result (store_hl leaves the value in DE,
-   HL=junk): in fp mode restore HL and cache it, so consumers read HL directly
-   rather than reloading the slot / oscillating DE<->HL. store_hl's offset-fits
-   path is `ld (ix+d),hl; ex de,hl`, so the recover ex de,hl forms an adjacent
-   pair that copt (#284) cancels — the store keeps HL and the recover is free.
-   In sp mode store_hl's paths don't reliably end in ex de,hl (TOS push, byte
-   walk), so leave the value in DE (cache_de) as before. */
-static void store_call_result_recover(FILE *out, const Func *f, int vreg)
-{
-    if (fp_active(f)) {
-        emit(out, "ex\tde,hl");
-        cache_hl(vreg);
-    } else {
-        cache_de(vreg);
-    }
-}
+/* (store_call_result_recover retired: word CALL results now use
+   store_hl_keep_hl, which leaves the value in HL directly — no store_hl DE
+   round-trip + recover ex de,hl to undo.) */
 
 static int gen_call(FILE *out, Func *f, const Op *op)
 {
@@ -483,8 +470,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
                 if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                     cache_hl(ci->ret_vreg);   /* dead/reg-pool: keep in HL, no spill */
                 else {
-                    store_hl(out, f, ci->ret_vreg);
-                    store_call_result_recover(out, f, ci->ret_vreg);
+                    if (store_hl_keep_hl(out, f, ci->ret_vreg)) cache_hl(ci->ret_vreg);
+                    else                                        cache_de(ci->ret_vreg);
                 }
             }
         } else if (ret_w > 4) {
@@ -518,8 +505,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
             if (L.la.cur_dst_dead || vreg_in_register_pool(f, ci->ret_vreg))
                 cache_hl(ci->ret_vreg);    /* dead/reg-pool: keep in HL, no spill */
             else {
-                store_hl(out, f, ci->ret_vreg);
-                store_call_result_recover(out, f, ci->ret_vreg);
+                if (store_hl_keep_hl(out, f, ci->ret_vreg)) cache_hl(ci->ret_vreg);
+                else                                        cache_de(ci->ret_vreg);
             }
         }
     }
