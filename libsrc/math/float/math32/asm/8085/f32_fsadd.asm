@@ -247,8 +247,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .swap6
     pop bc                          ; ret
     ld de,sp+0
-    push de
-    pop hl                          ; HL = &X
+    ex de,hl                        ; HL = &X
     ld de,sp+6                      ; DE = &Y
     push bc                         ; keep ret off to side… need BC free
     ld b,6
@@ -275,9 +274,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     or a
     ret Z
     ld b,a
-
-    ld a,b
-    cp 16
+    cp 16                       ; A still holds shift count (copt: drop ld a,b)
     jp C,ay_byte8
     sub 16
     ld b,a
@@ -599,8 +596,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .load_ieee
-    push de
-    pop hl
+    ex de,hl
     ld c,(hl+)
     ld b,(hl+)
     ld e,(hl+)

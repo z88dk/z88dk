@@ -51,19 +51,16 @@ PUBLIC l_f32_ldexp
     ret
 
 .underflow
-    ld e,0
-    ld h,0
-    ld l,0
-    ld d,0
+    ld de,0
+    ld hl,0
     scf
     ret
 
 .zero_legal
     ; D=0 after unpack; C = sign
+    ld hl,0
     ld e,0
-    ld h,0
-    ld l,0
     ld a,0
-    rra                             ; sign into D
+    rra                             ; sign into D (must keep CF; not xor a)
     ld d,a
     ret

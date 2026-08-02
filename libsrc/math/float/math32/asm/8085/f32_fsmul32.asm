@@ -109,8 +109,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push hl                         ; Yde
     ld de,sp+16
     ld hl,(de)
-    push hl                         ; Ybc
-    pop bc                          ; Ybc
+    ld bc,hl                        ; Ybc (no push/pop)
     pop de                          ; Yde
     pop hl                          ; Yhl
     push bc

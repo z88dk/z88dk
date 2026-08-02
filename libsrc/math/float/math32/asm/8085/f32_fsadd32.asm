@@ -64,8 +64,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push hl
     ld de,sp+16
     ld hl,(de)
-    push hl
-    pop bc
+    ld bc,hl                        ; last word → BC (no push/pop)
     pop de
     pop hl
     push bc
@@ -325,8 +324,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 .zero
     pop bc
     pop bc
-    ld b,0
-    ld c,0
+    ld bc,0
     ld de,0
     ld hl,0
     jp ep_yx

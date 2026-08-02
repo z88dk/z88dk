@@ -33,8 +33,7 @@ PUBLIC asm_f16_mul2
 .zero_legal
     ld a,h
     add a,a                     ; sign in C
-    ld h,0
-    ld l,0
+    ld hl,0
     ld a,h
     rra                         ; restore sign
     ld h,a

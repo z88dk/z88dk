@@ -32,8 +32,7 @@ PUBLIC asm_f16_div2
 .zero_legal
     ld a,h
     add a,a
-    ld h,0
-    ld l,0
+    ld hl,0
     ld a,h
     rra
     ld h,a
@@ -42,8 +41,7 @@ PUBLIC asm_f16_div2
 .zero_underflow
     ld a,h
     add a,a
-    ld h,0
-    ld l,0
+    ld hl,0
     ld a,h
     rra
     ld h,a

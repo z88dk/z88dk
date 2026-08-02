@@ -137,8 +137,7 @@ PUBLIC _m32_ldexpf
     ld de,sp+5
     ld a,(de)
     add a,a                         ; sign → C
-    ld d,0
-    ld e,0
+    ld de,0
     ld hl,0
     rra
     ld d,a                          ; signed zero

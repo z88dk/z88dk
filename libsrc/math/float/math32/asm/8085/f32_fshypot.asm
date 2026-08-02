@@ -59,8 +59,7 @@ PUBLIC m32_fshypot_callee
 
 
 .load_float_de
-    push de
-    pop hl
+    ex de,hl
     ld c,(hl+)
     ld b,(hl+)
     ld e,(hl+)

@@ -257,8 +257,7 @@ PUBLIC _m32_invf
     push de
     ld hl,(de)
     push hl
-    push de
-    pop hl
+    ex de,hl                    ; HL = ptr (DE still held pointer)
     inc hl
     inc hl
     ld de,(hl+)

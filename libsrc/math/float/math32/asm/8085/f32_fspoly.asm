@@ -94,8 +94,7 @@ PUBLIC _m32_polyf
     push hl
     ld de,sp+12
     ld hl,(de)
-    push hl
-    pop bc
+    ld bc,hl                        ; last word → BC (no push/pop)
     pop de
     pop hl
 
@@ -133,8 +132,7 @@ PUBLIC _m32_polyf
     push hl
     ld de,sp+12
     ld hl,(de)
-    push hl
-    pop bc
+    ld bc,hl                        ; last word → BC (no push/pop)
     pop de
     pop hl
 
