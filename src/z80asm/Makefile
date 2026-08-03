@@ -129,10 +129,6 @@ else
 	$(MAKE) -C ../.. src/config.h
 endif
 
-# parser is too big to optimize with -O3
-src/c/parse1.o: src/c/parse1.c
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) $(PARSE1_CFLAGS) -O0 -c -o $@ $<
-
 #------------------------------------------------------------------------------
 # library
 #------------------------------------------------------------------------------

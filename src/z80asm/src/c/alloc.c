@@ -20,7 +20,7 @@ Repository: https://github.com/z88dk/z88dk
 *   Memory Block - allocated before the actual buffer requested by the user
 *   keeps linked list of all allocated blocks to be freed at exit
 *----------------------------------------------------------------------------*/
-#define FENCE_SIZE      MAX( sizeof(long), sizeof(void*) )
+#define FENCE_SIZE      MAX( sizeof(long long), sizeof(void*) )
 #define FENCE_SIGN      0xAA
 #define MEMBLOCK_SIGN   0x5A5A5A5A
 
@@ -39,10 +39,8 @@ typedef struct MemBlock {
 	const char *file;				/* source where allocated */
     int			lineno;				/* line number where allocated */
 
-    char		fence[FENCE_SIZE];	/* fence to detect underflow */
-
-    /* client data starts here with client_size bytes + FENCE_SIZE fence */
-
+    char fence[FENCE_SIZE];         /* underflow fence */
+    char client[];                  /* client data + overflow fence live here */
 } MemBlock;
 
 /*-----------------------------------------------------------------------------
@@ -59,12 +57,12 @@ static char g_fence[ FENCE_SIZE ];	/* keep signature */
 *----------------------------------------------------------------------------*/
 
 /* convert from MemBlock area to client area */
-#define CLIENT_PTR(block)   ((block)->fence + FENCE_SIZE)
+#define CLIENT_PTR(block)   ((block)->client)
 #define CLIENT_SIZE(block)  ((block)->client_size)
 
 /* convert client block and size to MemBlock and total size */
 #define BLOCK_PTR(ptr)      ((MemBlock *) (((char*) (ptr)) \
-							 - offsetof(struct MemBlock, fence) - FENCE_SIZE))
+							 - offsetof(struct MemBlock, client)))
 #define BLOCK_SIZE(size)    ((size) + sizeof(MemBlock) + FENCE_SIZE)
 
 /* address of both fences */
