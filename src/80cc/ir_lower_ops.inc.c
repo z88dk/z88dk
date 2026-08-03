@@ -3978,6 +3978,32 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         }
         return 0;
     }
+    /* Subtrahend already in BC, minuend in HL: subtract straight from BC, no
+       staging of src1 into DE (DE preserved — a DE-resident accumulator across
+       the sub survives). sub is NOT commutative, so ONLY this role mapping
+       (HL=minuend, BC=subtrahend) works — no swap. z80-family: `and a; sbc hl,bc`.
+       808x/gbz80 (sbc hl,de is emulated): the same byte-wise subtract off C/B
+       instead of E/D — into DE when that's the dst (mirrors the load_binop path
+       below). Rabbit has native `sub hl,de` but no BC form → falls through. */
+    if (op->src[1] >= 0 && bc_has(op->src[1]) && !IS_RABBIT()
+        && L.pending_spill_v < 0) {
+        load_to_hl(out, f, op->src[0]);       /* minuend → HL (preserves BC) */
+        if (IS_808x() || IS_GBZ80()) {
+            if (vreg_is_pr_de(f, op->dst)) {
+                emit(out, "ld\ta,l"); emit(out, "sub\tc"); emit(out, "ld\te,a");
+                emit(out, "ld\ta,h"); emit(out, "sbc\ta,b"); emit(out, "ld\td,a");
+                cache_de(op->dst);
+                return 0;
+            }
+            emit(out, "ld\ta,l"); emit(out, "sub\tc"); emit(out, "ld\tl,a");
+            emit(out, "ld\ta,h"); emit(out, "sbc\ta,b"); emit(out, "ld\th,a");
+        } else {
+            emit(out, "and\ta");
+            emit(out, "sbc\thl,bc");
+        }
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     if (try_binop_ixd_fold(out, f, op, "sub\t", "sbc\ta,")) return 0;
     load_binop_operands(out, f, op);
     if (IS_RABBIT()) {
