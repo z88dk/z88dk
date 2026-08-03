@@ -1,6 +1,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include "test.h"
 
 #pragma scanf "%2d %u %x %c %s %B %o %ld %lu %lx %lc %ls %lB %lo %i %li %n"
