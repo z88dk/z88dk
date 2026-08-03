@@ -1076,6 +1076,10 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     int cmp_bb = ib, cmp_idx = ii;
     Op *cmp = &f->bbs[cmp_bb].ops[cmp_idx];
     if (cmp->kind != IR_CMP_LT && cmp->kind != IR_CMP_ULT) return 0;
+    /* Original signedness of the exit test, captured before the rewrite to the
+       unsigned pointer compare below. An UNSIGNED bound is provably >= 0, so the
+       variable-bound max(0,n) clamp is dead — p_end = base + n*scale directly. */
+    int cmp_is_unsigned = (cmp->kind == IR_CMP_ULT);
     int iv = cmp->src[0];
     int c = -1;
     for (int t = 0; t < n_cand; t++)
@@ -1153,24 +1157,34 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
         else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
         licm_insert_before_terminator(&f->bbs[ph], &o);
     } else {
-        /* neff = max(0, n), branchlessly and with only reliable ops (80cc has
-           no arithmetic >> — IR_SHR is logical, #289 — and a standalone
-           compare-to-value mis-lowers here):
-             sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
-             mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
-             neff = n & mask            (n if n>=0, 0 if n<0) */
-        ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
-        licm_insert_before_terminator(&f->bbs[ph], &o);
-        ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
-        licm_insert_before_terminator(&f->bbs[ph], &o);
-        ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
-        licm_insert_before_terminator(&f->bbs[ph], &o);
-        if (sh > 0) {
-            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = v_neff; o.imm = sh;
+        /* neff = the effective (clamped) bound. For a SIGNED bound, n may be
+           negative and the unsigned pointer compare would run a 0-trip loop as a
+           huge wrapped one, so clamp to max(0, n). For an UNSIGNED bound n >= 0
+           already, so neff = n directly — the clamp (SHR;SUB;AND, ~18B) is dead. */
+        int neff = bound_v;
+        if (!cmp_is_unsigned) {
+            /* max(0, n), branchlessly with only reliable ops (80cc has no
+               arithmetic >> — IR_SHR is logical, #289 — and a standalone
+               compare-to-value mis-lowers here):
+                 sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
+                 mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
+                 neff = n & mask            (n if n>=0, 0 if n<0) */
+            ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
             licm_insert_before_terminator(&f->bbs[ph], &o);
+            ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            neff = v_neff;
+        }
+        int v_sc = neff;
+        if (sh > 0) {
+            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = neff; o.imm = sh;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            v_sc = v_scaled;
         }
         /* p_end = base + neff*scale. */
-        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_scaled;
+        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_sc;
         licm_insert_before_terminator(&f->bbs[ph], &o);
     }
     return 1;
