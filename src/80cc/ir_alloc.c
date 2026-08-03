@@ -4123,7 +4123,14 @@ void ir_alloc(Func *f)
                     if (use_count[v] < 2) continue;
                     int lo = first_use[v], hi = last_use[v];
                     if (lo < 0 || hi < 0 || hi < lo) continue;
-                    /* Must cross a call (else a whole-range home, not a split). */
+                    /* Must CROSS a call. A call-free value's reuse is already served
+                       by the HL/BC belief cache (no forced reload), so BC-homing it
+                       is a byte no-op (measured: ptrbench init_data, 8 reads, 0-byte
+                       delta, identical asm). The split only pays when a call
+                       INVALIDATES the cache and forces a slot reload — the win is
+                       inherently call-bounded, so the "10 whole-range call-free"
+                       Phase-4 values (RANGED_CALLSPLIT_PLAN §4) are NOT an
+                       opportunity. Whole-range homing is ir_bc_pack's job, not this. */
                     int crosses = 0;
                     for (int c = 0; c < ncall; c++)
                         if (callpos[c] >= lo && callpos[c] <= hi) { crosses = 1; break; }
