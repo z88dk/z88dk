@@ -4188,21 +4188,52 @@ void ir_alloc(Func *f)
                             }
                             if (span_unsafe) break;
                         }
-                    if (span_unsafe) continue;
-                    /* BC must be free over the span (no other BC-homed vreg's
-                       loop-extended interval overlaps) — else the split wouldn't
-                       win (correctness holds regardless: a BC clobber just forces
-                       a reload from the coherent slot). */
-                    int bc_busy = 0;
+                    const char *cslog = getenv("IR_CALLSPLIT_LOG");
+                    int cslog2 = cslog && cslog[0] == '2';
+                    if (span_unsafe) {
+                        if (cslog2) fprintf(stderr, "  cs-reject %s v%d span_unsafe "
+                            "span=[%d,%d]\n", f->fn?ir_sym_name(f->fn):"?", v,
+                            best_lo, best_hi);
+                        continue;
+                    }
+                    /* BC must be free over the span — no other BC-homed vreg is
+                       actually LIVE there. Use the TENANT's TRUE live range
+                       (ir_live_range), NOT the allocator's loop-extended
+                       first_use/last_use: a born-killed per-iteration BC temp
+                       (e.g. a 2-op multiply operand) has its interval blown up to
+                       the whole loop by loop-extension, which spuriously blocks a
+                       split whose span is disjoint from the temp's real use. The
+                       tight per-op BC packer (ir_bc_pack) already time-multiplexes
+                       BC across disjoint tight ranges within a loop, so true-range
+                       disjointness is the sound test. A loop-CARRIED BC value has a
+                       true range spanning the loop, so it still (correctly) blocks.
+                       Correctness holds regardless of the win: a stray BC clobber
+                       just forces a reload from the coherent slot. */
+                    int bc_busy = 0, bc_blocker = -1;
                     for (int w = 0; w < nv && !bc_busy; w++) {
                         if (w == v) continue;
                         if (f->vreg_to_phys[w] != IR_PR_BC) continue;
-                        if (first_use[w] < 0 || last_use[w] < 0) continue;
-                        int s = best_lo > first_use[w] ? best_lo : first_use[w];
-                        int e = best_hi < last_use[w] ? best_hi : last_use[w];
-                        if (s <= e) bc_busy = 1;
+                        const LiveRange *lw = ir_live_range(f, w);
+                        int wlo, whi;
+                        if (lw && lw->start >= 0) { wlo = lw->start; whi = lw->end; }
+                        else { wlo = first_use[w]; whi = last_use[w]; }  /* fallback */
+                        if (wlo < 0 || whi < 0) continue;
+                        int s = best_lo > wlo ? best_lo : wlo;
+                        int e = best_hi < whi ? best_hi : whi;
+                        if (s <= e) { bc_busy = 1; bc_blocker = w; }
                     }
-                    if (bc_busy) continue;
+                    if (bc_busy) {
+                        if (cslog2) {
+                            const LiveRange *blr = ir_live_range(f, bc_blocker);
+                            fprintf(stderr, "  cs-reject %s v%d bc_busy span=[%d,%d] "
+                                "blocker=v%d ext=[%d,%d] true=[%d,%d] uc=%d wc=%d\n",
+                                f->fn?ir_sym_name(f->fn):"?", v, best_lo, best_hi,
+                                bc_blocker, first_use[bc_blocker], last_use[bc_blocker],
+                                blr?blr->start:-1, blr?blr->end:-1,
+                                use_count[bc_blocker], write_count[bc_blocker]);
+                        }
+                        continue;
+                    }
                     /* Commit the split. */
                     f->vreg_to_phys[v] = IR_PR_BC;
                     if (f->home_lo && f->home_hi) {
