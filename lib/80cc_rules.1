@@ -964,17 +964,6 @@
 	inc	sp
 	push	hl
 
-;; ld de,K; ex de,hl loads K into HL (K into DE, then swap), leaving the old HL
-;; in DE — which the following pop de immediately overwrites (dead). Load HL
-;; directly. K is whatever ld de accepted, so ld hl,K is equally valid.
-%title #DE9 const/mem into HL via ld-de/ex when DE is popped next (-1b, -4t)
-	ld	de,%1
-	ex	de,hl
-	pop	de
-=
-	ld	hl,%1
-	pop	de
-
 ;; `or h` after ld h,0 is a no-op: h is 0, so (A|0)==A and the Z flag is
 ;; unchanged. Arises from a byte-wise EQ/NE compare of a zero-extended byte
 ;; (high half known 0) — the high-byte OR is redundant. General over the const.
