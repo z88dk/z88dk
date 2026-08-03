@@ -4191,22 +4191,20 @@ void ir_alloc(Func *f)
                             if (o->kind == IR_POSTSTEP && o->src[0] == v)
                                 unsafe_write = 1;
                             /* Direct-BC-read consumers: reject if V is a source.
-                               Includes plain compares (IR_CMP_*): Phase-2c tried
-                               admitting them on the theory that cmp_byte_src's slot
-                               fallback (fp class-2 / sp bail-to-reload) made a
-                               slot-backed split value safe — but long_ir fp
-                               MISCOMPILED test.bin + remat.bin (a warm-but-stale
-                               belief or an fp byte-compare path reads BC without
-                               reloading), and the 2 admitted candidates were
-                               byte-marginal (hashbench v46 +1B). So compares stay
-                               excluded, alongside the deref/step/branch/fused kinds
-                               that read BC inline with no fallback. */
+                               Plain compares (IR_CMP_*) are ADMITTED — cmp_byte_src
+                               is safe for a slot-backed split value: it reads BC
+                               halves only on a WARM belief (which holds v by the
+                               cache invariant), and on a COLD belief reads the
+                               coherent slot (fp `(ix+d)`, class 2) or returns 0 so
+                               the fused compare bails to the general load_to_*
+                               reload (sp). Phase-2c's fp miscompile was NOT the
+                               compare — it was the in-place `inc bc` (gpderef p++)
+                               skipping the write-both slot store, so the slot went
+                               stale and the out-of-span compare read it; fixed in
+                               gen_inc (exclude CALL_SPLIT from the in-place bump).
+                               Still excluded: deref/step/branch/fused kinds that
+                               read BC INLINE with no slot fallback. */
                             switch (o->kind) {
-                            case IR_CMP_EQ: case IR_CMP_NE:
-                            case IR_CMP_LT: case IR_CMP_LE:
-                            case IR_CMP_GT: case IR_CMP_GE:
-                            case IR_CMP_ULT: case IR_CMP_ULE:
-                            case IR_CMP_UGT: case IR_CMP_UGE:
                             case IR_BR_COND: case IR_BR_ZERO:
                             case IR_POSTSTEP: case IR_LEA:
                             case IR_DEREF_CMP_BR: case IR_ACC_CMP:

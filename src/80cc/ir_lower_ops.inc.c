@@ -367,8 +367,14 @@ static int gen_inc(FILE *out, Func *f, const Op *op)
     /* Walking pointer homed in BC/DE (e.g. a char* stepped `p++`): bump it
        in place with `inc bc`/`inc de` instead of the ld hl,bc / inc hl /
        ld bc,hl copy-out-and-back. Mirror of the idx2 counter case above.
-       IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref). */
+       IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref).
+       EXCLUDE a call-split value: it is BC-resident only inside its span and
+       its frame slot must stay coherent (write-both) — a bare `inc bc` updates
+       BC but NOT the slot, so a later out-of-span read (or a compare that reads
+       the slot on a cold belief) sees the stale pre-increment value. Falling
+       through to load_to_hl; inc hl; commit_hl_word does the write-both store. */
     if (op->dst == op->src[0] && !opt_disabled("gpderef")
+        && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
         && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
         emit(out, vreg_in_pr_bc(f, op->dst) ? "inc\tbc" : "inc\tde");
         if (hl_has(op->dst)) invalidate_hl_cache();
