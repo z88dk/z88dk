@@ -264,332 +264,36 @@ package CPU;
 use Modern::Perl;
 use Path::Tiny;
 
-my @CPUS = (
-    {
-        ancestor   => "i8080",
-        id         => 1,
-        is_strict  => 0,
-        level      => 0,
-        name       => "z80",
-        name_str   => "z80",
-        non_strict => "z80",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 2,
-        is_strict  => 1,
-        level      => 0,
-        name       => "z80_strict",
-        name_str   => "z80_strict",
-        non_strict => "z80",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 3,
-        is_strict  => 0,
-        level      => 0,
-        name       => "z180",
-        name_str   => "z180",
-        non_strict => "z180",
-    },
-    {
-        ancestor   => "none",
-        id         => 4,
-        is_strict  => 0,
-        level      => 0,
-        name       => "ez80_z80",
-        name_str   => "ez80_z80",
-        non_strict => "ez80_z80",
-    },
-    {
-        ancestor   => "none",
-        id         => 5,
-        is_strict  => 0,
-        level      => 0,
-        name       => "ez80",
-        name_str   => "ez80",
-        non_strict => "ez80",
-    },
-    {
-        ancestor   => "z80",
-        id         => 6,
-        is_strict  => 0,
-        level      => 0,
-        name       => "z80n",
-        name_str   => "z80n",
-        non_strict => "z80n",
-    },
-    {
-        ancestor   => "none",
-        id         => 7,
-        is_strict  => 0,
-        level      => 0,
-        name       => "r2ka",
-        name_str   => "r2ka",
-        non_strict => "r2ka",
-    },
-    {
-        ancestor   => "r2ka",
-        id         => 8,
-        is_strict  => 0,
-        level      => 0,
-        name       => "r3k",
-        name_str   => "r3k",
-        non_strict => "r3k",
-    },
-    {
-        ancestor   => "none",
-        id         => 9,
-        is_strict  => 0,
-        level      => 0,
-        name       => "gbz80",
-        name_str   => "gbz80",
-        non_strict => "gbz80",
-    },
-    {
-        ancestor   => "none",
-        id         => 10,
-        is_strict  => 0,
-        level      => 0,
-        name       => "i8080",
-        name_str   => 8080,
-        non_strict => "i8080",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 11,
-        is_strict  => 0,
-        level      => 0,
-        name       => "i8085",
-        name_str   => 8085,
-        non_strict => "i8085",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 12,
-        is_strict  => 0,
-        level      => 0,
-        name       => "r800",
-        name_str   => "r800",
-        non_strict => "r800",
-    },
-    {
-        ancestor   => "none",
-        id         => 13,
-        is_strict  => 0,
-        level      => 0,
-        name       => "r4k",
-        name_str   => "r4k",
-        non_strict => "r4k",
-    },
-    {
-        ancestor   => "r4k",
-        id         => 14,
-        is_strict  => 0,
-        level      => 0,
-        name       => "r5k",
-        name_str   => "r5k",
-        non_strict => "r5k",
-    },
-    {
-        ancestor   => "none",
-        id         => 15,
-        is_strict  => 0,
-        level      => 0,
-        name       => "kc160",
-        name_str   => "kc160",
-        non_strict => "kc160",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 16,
-        is_strict  => 0,
-        level      => 0,
-        name       => "kc160_z80",
-        name_str   => "kc160_z80",
-        non_strict => "kc160_z80",
-    },
-    {
-        ancestor   => "none",
-        id         => 17,
-        is_strict  => 1,
-        level      => 0,
-        name       => "i8080_strict",
-        name_str   => "8080_strict",
-        non_strict => "i8080",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 18,
-        is_strict  => 1,
-        level      => 0,
-        name       => "i8085_strict",
-        name_str   => "8085_strict",
-        non_strict => "i8085",
-    },
-    {
-        ancestor   => "none",
-        id         => 19,
-        is_strict  => 1,
-        level      => 0,
-        name       => "gbz80_strict",
-        name_str   => "gbz80_strict",
-        non_strict => "gbz80",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 20,
-        is_strict  => 1,
-        level      => 0,
-        name       => "z180_strict",
-        name_str   => "z180_strict",
-        non_strict => "z180",
-    },
-    {
-        ancestor   => "z80",
-        id         => 21,
-        is_strict  => 1,
-        level      => 0,
-        name       => "z80n_strict",
-        name_str   => "z80n_strict",
-        non_strict => "z80n",
-    },
-    {
-        ancestor   => "none",
-        id         => 22,
-        is_strict  => 1,
-        level      => 0,
-        name       => "ez80_z80_strict",
-        name_str   => "ez80_z80_strict",
-        non_strict => "ez80_z80",
-    },
-    {
-        ancestor   => "none",
-        id         => 23,
-        is_strict  => 1,
-        level      => 0,
-        name       => "ez80_strict",
-        name_str   => "ez80_strict",
-        non_strict => "ez80",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 24,
-        is_strict  => 1,
-        level      => 0,
-        name       => "r800_strict",
-        name_str   => "r800_strict",
-        non_strict => "r800",
-    },
-    {
-        ancestor   => "none",
-        id         => 25,
-        is_strict  => 1,
-        level      => 0,
-        name       => "kc160_strict",
-        name_str   => "kc160_strict",
-        non_strict => "kc160",
-    },
-    {
-        ancestor   => "i8080",
-        id         => 26,
-        is_strict  => 1,
-        level      => 0,
-        name       => "kc160_z80_strict",
-        name_str   => "kc160_z80_strict",
-        non_strict => "kc160_z80",
-    },
-    {
-        ancestor   => "none",
-        id         => 27,
-        is_strict  => 1,
-        level      => 0,
-        name       => "r2ka_strict",
-        name_str   => "r2ka_strict",
-        non_strict => "r2ka",
-    },
-    {
-        ancestor   => "r2ka",
-        id         => 28,
-        is_strict  => 1,
-        level      => 0,
-        name       => "r3k_strict",
-        name_str   => "r3k_strict",
-        non_strict => "r3k",
-    },
-    {
-        ancestor   => "none",
-        id         => 29,
-        is_strict  => 1,
-        level      => 0,
-        name       => "r4k_strict",
-        name_str   => "r4k_strict",
-        non_strict => "r4k",
-    },
-    {
-        ancestor   => "r4k",
-        id         => 30,
-        is_strict  => 1,
-        level      => 0,
-        name       => "r5k_strict",
-        name_str   => "r5k_strict",
-        non_strict => "r5k",
-    },
-    {
-        ancestor   => "r5k",
-        id         => 31,
-        is_strict  => 0,
-        level      => 0,
-        name       => "r6k",
-        name_str   => "r6k",
-        non_strict => "r6k",
-    },
-    {
-        ancestor   => "r5k",
-        id         => 32,
-        is_strict  => 1,
-        level      => 0,
-        name       => "r6k_strict",
-        name_str   => "r6k_strict",
-        non_strict => "r6k",
-    },
-    {
-        ancestor   => "z80",
-        id         => 33,
-        is_strict  => 0,
-        level      => 0,
-        name       => "ti83",
-        name_str   => "ti83",
-        non_strict => "ti83",
-    },
-    {
-        ancestor   => "z80",
-        id         => 34,
-        is_strict  => 1,
-        level      => 0,
-        name       => "ti83_strict",
-        name_str   => "ti83_strict",
-        non_strict => "ti83",
-    },
-    {
-        ancestor   => "z80",
-        id         => 35,
-        is_strict  => 0,
-        level      => 0,
-        name       => "ti83plus",
-        name_str   => "ti83plus",
-        non_strict => "ti83plus",
-    },
-    {
-        ancestor   => "z80",
-        id         => 36,
-        is_strict  => 1,
-        level      => 0,
-        name       => "ti83plus_strict",
-        name_str   => "ti83plus_strict",
-        non_strict => "ti83plus",
-    },
-);
+[@
+	use Data::Dump 'dump';
+	use Path::Tiny;
+
+	my @CPUS = parse_cpus("../cpu.def");
+	$OUT .= 'my @CPUS = '.dump(@CPUS).';';
+
+	sub parse_cpus {
+		my ($file) = @_;
+		my @cpus;
+		for ( path($file)->lines( { chomp => 1 } ) ) {
+			next unless /^ \s* X\( \s* (\d+) \s*,\s* (\w+) \s*,\s* "(\w+)" \s*,\s* 
+						   (\w+) \s*,\s* (\w+) /x;
+			my $cpu = {
+				id         => $1,
+				name       => $2,
+				name_str   => $3,
+				non_strict => $4,
+				ancestor   => $5,
+			};
+
+			# computed fields
+			$cpu->{level}     = 0;
+			$cpu->{is_strict} = $cpu->{non_strict} eq $cpu->{name} ? 0 : 1;
+
+			push @cpus, $cpu;
+		}
+		return @cpus;
+	}
+@]
 
 sub lookup_ {
     my ($key) = @_;
@@ -837,23 +541,20 @@ package ObjRangeType;
 use Modern::Perl;
 use Path::Tiny;
 
-my @RANGE_TYPES = (
-    [ 0,  "Undefined",          undef ],
-    [ 1,  "JrOffset",           "J" ],
-    [ 2,  "ByteUnsigned",       "U" ],
-    [ 3,  "ByteSigned",         "S" ],
-    [ 4,  "Word",               "C" ],
-    [ 5,  "WordBE",             "B" ],
-    [ 6,  "DWord",              "L" ],
-    [ 7,  "ByteToWordUnsigned", "u" ],
-    [ 8,  "ByteToWordSigned",   "s" ],
-    [ 9,  "Ptr24",              "P" ],
-    [ 10, "HighOffset",         "H" ],
-    [ 11, "Assignment",         "=" ],
-    [ 12, "JreOffset",          "j" ],
-    [ 13, "ByteToPtrUnsigned",  "v" ],
-    [ 14, "ByteToPtrSigned",    "t" ],
-);
+[@
+	my @RANGE_TYPES = parse_range_types("../obj_range_type.def");
+	$OUT .= 'my @RANGE_TYPES = '.dump(@RANGE_TYPES).';';
+
+	sub parse_range_types {
+		my ($file) = @_;
+		my @types;
+		for ( path($file)->lines( { chomp => 1 } ) ) {
+			next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)\s*,\s*(?:'(.)'|0)/;
+			push @types, [ $1, $2, $3 ];
+		}
+		return @types;
+	}
+@]
 
 sub lookup_ {
     my ($key) = @_;
@@ -1629,8 +1330,20 @@ package ObjSymbolScope;
 use Modern::Perl;
 use Path::Tiny;
 
-my @SYMBOL_SCOPES =
-    ( [ 0, "Undefined", undef ], [ 1, "Local", "L" ], [ 2, "Public", "G" ] );
+[@
+	my @SYMBOL_SCOPES = parse_symbol_scopes("../obj_symbol_scope.def");
+	$OUT .= 'my @SYMBOL_SCOPES = '.dump(@SYMBOL_SCOPES).';';
+
+	sub parse_symbol_scopes {
+		my ($file) = @_;
+		my @scopes;
+		for ( path($file)->lines( { chomp => 1 } ) ) {
+			next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)\s*,\s*(?:'(.)'|0)/;
+			push @scopes, [ $1, $2, $3 ];
+		}
+		return @scopes;
+	}
+@]
 
 sub lookup_ {
     my ($key) = @_;
@@ -1690,12 +1403,20 @@ package ObjSymbolType;
 use Modern::Perl;
 use Path::Tiny;
 
-my @SYMBOL_TYPES = (
-    [ 0, "Undefined",       undef ],
-    [ 1, "Constant",        "C" ],
-    [ 2, "AddressRelative", "A" ],
-    [ 3, "Computed",        "=" ],
-);
+[@
+	my @SYMBOL_TYPES = parse_symbol_types("../obj_symbol_type.def");
+	$OUT .= 'my @SYMBOL_TYPES = '.dump(@SYMBOL_TYPES).';';
+
+	sub parse_symbol_types {
+		my ($file) = @_;
+		my @types;
+		for ( path($file)->lines( { chomp => 1 } ) ) {
+			next unless /^\s*X\(\s*(\d+)\s*,\s*(\w+)\s*,\s*(?:'(.)'|0)/;
+			push @types, [ $1, $2, $3 ];
+		}
+		return @types;
+	}
+@]
 
 sub lookup_ {
     my ($key) = @_;

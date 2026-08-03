@@ -1498,8 +1498,7 @@ std::vector<ObjModule>* ObjLibrary::modules() {
     return modules_.get();
 }
 
-std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>*
-ObjLibrary::symbol_index() {
+std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>* ObjLibrary::symbol_index() {
     if (!symbol_index_) {
         symbol_index_ =
             std::make_unique<std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>>();
