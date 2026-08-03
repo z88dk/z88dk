@@ -79,7 +79,19 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
        `ld hl,K` at the source drops that
        DE value; copt #DE9 does the flatten safely, only when `pop de` follows
        (proving DE dead). */
-    if (L.la.cur_dst_dead) {
+    /* DE-direct copt-miss fix (#DE6/#DE-glob, real-file): when the dst takes NO
+       store — a remat const or a PR_HL home — the DE path degenerates to
+       `ld de,K; ex de,hl` (spill_de_unless_dead's bare-ex branch), where `ld hl,K`
+       is 1B shorter. The only value the `ex de,hl` preserves is the OLD HL (into
+       DE); flatten iff that tenant is DROPPABLE (dead / slot-backed / remat — a
+       reader recovers it without the DE copy), so a consumer never strands. copt
+       can't do this: it needs the HL-dead liveness and the pair often straddles a
+       label/BB edge (branch-const / return-const). */
+    int hl_free = (L.rs.hl < 0) || (L.rs.hl == op->dst)
+                  || hlde_belief_droppable(L.rs.hl);
+    int hl_dst  = vreg_is_remat(f, op->dst)
+                  || ir_home_at(f, op->dst) == IR_PR_HL;
+    if (L.la.cur_dst_dead || (hl_free && hl_dst)) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
