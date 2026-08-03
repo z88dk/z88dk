@@ -73,7 +73,7 @@ jobs:
         # to come first so the later steps can eval it.
         cpanm --local-lib=~/perl5 local::lib
         cpanm --local-lib=~/perl5 --notest Clone XML::Twig Spreadsheet::ParseXLSX
-        cpanm --local-lib=~/perl5 App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Test::PureASCII Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
+        cpanm --local-lib=~/perl5 App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Preproc::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Test::PureASCII Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
         # A cache that restores an empty tree is indistinguishable from a cold
         # one in the log -- print the size so a silent miss is visible.
         echo "perl5 tree: $(du -sh ~/perl5 2>/dev/null | cut -f1) in $(find ~/perl5 -type f 2>/dev/null | wc -l) files"

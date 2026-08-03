@@ -141,7 +141,7 @@ jobs:
         cpanm --local-lib=/cygdrive/c/perl5 local::lib
         eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)
         cpanm --notest Clone XML::Twig Spreadsheet::ParseXLSX
-        cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table YAML::Tiny
+        cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Preproc::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table YAML::Tiny
         echo "perl5 tree: $(du -sh /cygdrive/c/perl5 2>/dev/null | cut -f1) in $(find /cygdrive/c/perl5 -type f 2>/dev/null | wc -l) files"
         
     - name: Build binaries
