@@ -84,6 +84,13 @@ opcodes_parse_trie.h opcodes_parse_trie.cpp &: \
 		Makefile cpu/Makefile 
 	$(MAKE) -C cpu
 
+# z80objcopy.pl
+all: tools/ObjModule.pm
+test: tools/ObjModule.pm
+tools/ObjModule.pm: tools/ObjModule.pm.pp $(wildcard ../*.def) Makefile
+	perl -MPreproc::Tiny -e 'pp_files(shift)' $<
+	dos2unix $@
+
 # test
 $(DEBUG_DIR)/test/test_driver.o : test/test_driver.def
 
