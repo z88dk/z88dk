@@ -625,7 +625,12 @@ static int opres_on(void) { static int c = -1; if (c < 0) c = getenv("IR_OPRES")
    later in-range read prefers DE instead of re-materialising in HL + spilling.
    Distinct from opres_on() (the reverting real-DE-home experiment). */
 static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED") != NULL; return c; }
-static int callsplit_on(void) { static int c = -1; if (c < 0) c = getenv("IR_CALLSPLIT") != NULL; return c; }
+/* Call-bounded live-range splitting: DEFAULT-ON after the full byte+ticks
+   matrix (all 9 CPUs x candidate benches x sp/fp: 0 regressed cells, -1500B;
+   z80/gbz80/8085 ticks all faster-or-neutral). Opt out with IR_CALLSPLIT=0
+   (byte-identical to pre-flip). The dear-slot CPU gate (deref_gap>=15) inside
+   the selection keeps cheap-slot CPUs byte-identical regardless. */
+static int callsplit_on(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_CALLSPLIT"); c = !(e && e[0] == '0'); } return c; }
 static int de_operand_realizable(const Func *f, int v,
                                  const int *use_count, const int *write_count,
                                  const int *def_kind, const int *wd_base)
