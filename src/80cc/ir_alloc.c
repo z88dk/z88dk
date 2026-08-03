@@ -4179,7 +4179,7 @@ void ir_alloc(Func *f)
                        diverges — same safety as the read-only case, no exit spill.
                        unsafe_write is still tracked (diagnostics) but not a
                        rejection. */
-                    int unsafe_write = 0, unsafe_consumer = 0;
+                    int unsafe_write = 0, unsafe_consumer = 0, unsafe_kind = -1;
                     for (int b = 0; b < f->n_bbs; b++)
                         for (int j = 0; j < f->bbs[b].n_ops; j++) {
                             int g = bb_first_op[b] + j;
@@ -4190,7 +4190,17 @@ void ir_alloc(Func *f)
                                 if (dd[k] == v) unsafe_write = 1;
                             if (o->kind == IR_POSTSTEP && o->src[0] == v)
                                 unsafe_write = 1;
-                            /* Direct-BC-read consumers: reject if V is a source. */
+                            /* Direct-BC-read consumers: reject if V is a source.
+                               Includes plain compares (IR_CMP_*): Phase-2c tried
+                               admitting them on the theory that cmp_byte_src's slot
+                               fallback (fp class-2 / sp bail-to-reload) made a
+                               slot-backed split value safe — but long_ir fp
+                               MISCOMPILED test.bin + remat.bin (a warm-but-stale
+                               belief or an fp byte-compare path reads BC without
+                               reloading), and the 2 admitted candidates were
+                               byte-marginal (hashbench v46 +1B). So compares stay
+                               excluded, alongside the deref/step/branch/fused kinds
+                               that read BC inline with no fallback. */
                             switch (o->kind) {
                             case IR_CMP_EQ: case IR_CMP_NE:
                             case IR_CMP_LT: case IR_CMP_LE:
@@ -4203,7 +4213,10 @@ void ir_alloc(Func *f)
                             case IR_COPY_STEP_BRZ: {
                                 int uu[16]; int nu = ir_op_uses(o, uu, 16);
                                 for (int k = 0; k < nu; k++)
-                                    if (uu[k] == v) unsafe_consumer = 1;
+                                    if (uu[k] == v) {
+                                        unsafe_consumer = 1;
+                                        if (unsafe_kind < 0) unsafe_kind = (int)o->kind;
+                                    }
                                 break;
                             }
                             default: break;
@@ -4215,11 +4228,9 @@ void ir_alloc(Func *f)
                     int cslog2 = cslog && cslog[0] == '2';
                     if (span_unsafe) {
                         if (cslog2) fprintf(stderr, "  cs-reject %s v%d unsafe "
-                            "write=%d consumer=%d reads=%d span=[%d,%d]\n",
+                            "write=%d consumer=%d ckind=%d reads=%d span=[%d,%d]\n",
                             f->fn?ir_sym_name(f->fn):"?", v, unsafe_write,
-                            unsafe_consumer, best_reads, best_lo, best_hi);
-                        if (cslog2) fprintf(stderr, "  cs-reject %s v%d span_unsafe "
-                            "span=[%d,%d]\n", f->fn?ir_sym_name(f->fn):"?", v,
+                            unsafe_consumer, unsafe_kind, best_reads,
                             best_lo, best_hi);
                         continue;
                     }
