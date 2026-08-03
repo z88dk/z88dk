@@ -625,6 +625,7 @@ static int opres_on(void) { static int c = -1; if (c < 0) c = getenv("IR_OPRES")
    later in-range read prefers DE instead of re-materialising in HL + spilling.
    Distinct from opres_on() (the reverting real-DE-home experiment). */
 static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED") != NULL; return c; }
+static int callsplit_on(void) { static int c = -1; if (c < 0) c = getenv("IR_CALLSPLIT") != NULL; return c; }
 static int de_operand_realizable(const Func *f, int v,
                                  const int *use_count, const int *write_count,
                                  const int *def_kind, const int *wd_base)
@@ -4070,6 +4071,153 @@ void ir_alloc(Func *f)
                             call_crossing, span_ge2, span_ge3);
             }
             free(callpos);
+        }
+        /* [IR_CALLSPLIT] Phase-1 call-bounded live-range splitting (opt-in).
+           For a spilled reused width-2 value with a call-free span of >=3 READS
+           and NO write inside that span, make it BC-resident across the span:
+           set vreg_to_phys=IR_PR_BC + home_lo/hi (op-index) + IR_VREG_CALL_SPLIT.
+           ir_home_at then serves in-span reads from BC (entry reload via
+           emit_bc_reload on a cold belief) and out-of-span accesses from the
+           slot; ir_assign_slots keeps the slot. Read-only-in-span ⇒ the slot
+           never diverges ⇒ no exit spill, correct by construction (a WRITTEN-in-
+           span value would need def→BC + exit-spill machinery — Phase 2).
+           CPU cost gate (§2.1): only pays where a frame-slot read is DEAR
+           relative to BC (dear-slot z80/z180/808x); cheap-slot CPUs (ez80/kc160/
+           rabbit) self-suppress → byte-identical. */
+        if (callsplit_on()
+            && g0_word_cost(GR_SLOT, GK_READ) - g0_word_cost(GR_BC, GK_READ) >= 15) {
+            int nv = f->n_vregs;
+            /* Call positions in the allocator's global op-index space. */
+            int ncall = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    OpKind k = f->bbs[b].ops[j].kind;
+                    if (k == IR_CALL || k == IR_HCALL) ncall++;
+                }
+            int *callpos = ncall ? malloc((size_t)ncall * sizeof(int)) : NULL;
+            /* Deref-base map: a pointer used as a deref base is read straight out
+               of BC (`ld a,(bc)`) with no load_to_* reload, so an opportunistic
+               BC cache can't serve it — exclude (Phase-1 read-only-via-load class). */
+            int *wdb = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
+            if (wdb) scan_wd_props(f, bb_in_loop, wdb, NULL, NULL, NULL);
+            if (!(ncall && !callpos)) {
+                int ci = 0;
+                for (int b = 0; b < f->n_bbs; b++)
+                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                        OpKind k = f->bbs[b].ops[j].kind;
+                        if (k == IR_CALL || k == IR_HCALL)
+                            callpos[ci++] = bb_first_op[b] + j;
+                    }
+                for (int v = 0; v < nv; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 2) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                     | IR_VREG_PARAM)) continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (wdb && wdb[v]) continue;         /* deref base — direct (bc) */
+                    if (use_count[v] < 2) continue;
+                    int lo = first_use[v], hi = last_use[v];
+                    if (lo < 0 || hi < 0 || hi < lo) continue;
+                    /* Must cross a call (else a whole-range home, not a split). */
+                    int crosses = 0;
+                    for (int c = 0; c < ncall; c++)
+                        if (callpos[c] >= lo && callpos[c] <= hi) { crosses = 1; break; }
+                    if (!crosses) continue;
+                    /* Richest call-free span: max reads, [first_read,last_read]. */
+                    int best_reads = 0, best_lo = -1, best_hi = -1;
+                    int cur = 0, cfirst = -1, clast = -1;
+                    for (int b = 0; b < f->n_bbs; b++)
+                        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                            const Op *o = &f->bbs[b].ops[j];
+                            if (o->kind == IR_CALL || o->kind == IR_HCALL) {
+                                if (cur > best_reads) {
+                                    best_reads = cur; best_lo = cfirst; best_hi = clast;
+                                }
+                                cur = 0; cfirst = -1; clast = -1;
+                                continue;
+                            }
+                            int g = bb_first_op[b] + j;
+                            int u[16]; int nu = ir_op_uses(o, u, 16);
+                            for (int k = 0; k < nu; k++)
+                                if (u[k] == v) {
+                                    cur++;
+                                    if (cfirst < 0) cfirst = g;
+                                    clast = g;
+                                }
+                        }
+                    if (cur > best_reads) {
+                        best_reads = cur; best_lo = cfirst; best_hi = clast;
+                    }
+                    if (best_reads < 3 || best_lo < 0 || best_hi < best_lo) continue;
+                    /* Reject the span if, inside [best_lo,best_hi], V is either
+                       (a) WRITTEN — BC would diverge from the slot (Phase-1
+                       read-only requirement), or (b) consumed by an op that reads
+                       BC DIRECTLY (compare/branch-test/step/fused/deref) rather
+                       than through load_to_hl/load_to_de: those paths don't reload
+                       a cold BC belief, so they'd read stale/garbage BC. Only
+                       load-based binop/mov/store consumers reload on first access
+                       and are safe. */
+                    int span_unsafe = 0;
+                    for (int b = 0; b < f->n_bbs && !span_unsafe; b++)
+                        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                            int g = bb_first_op[b] + j;
+                            if (g < best_lo || g > best_hi) continue;
+                            const Op *o = &f->bbs[b].ops[j];
+                            int dd[8]; int nd = ir_op_defs(o, dd, 8);
+                            for (int k = 0; k < nd; k++)
+                                if (dd[k] == v) { span_unsafe = 1; break; }
+                            if (o->kind == IR_POSTSTEP && o->src[0] == v)
+                                span_unsafe = 1;
+                            /* Direct-BC-read consumers: reject if V is a source. */
+                            switch (o->kind) {
+                            case IR_CMP_EQ: case IR_CMP_NE:
+                            case IR_CMP_LT: case IR_CMP_LE:
+                            case IR_CMP_GT: case IR_CMP_GE:
+                            case IR_CMP_ULT: case IR_CMP_ULE:
+                            case IR_CMP_UGT: case IR_CMP_UGE:
+                            case IR_BR_COND: case IR_BR_ZERO:
+                            case IR_POSTSTEP: case IR_LEA:
+                            case IR_DEREF_CMP_BR: case IR_ACC_CMP:
+                            case IR_COPY_STEP_BRZ: {
+                                int uu[16]; int nu = ir_op_uses(o, uu, 16);
+                                for (int k = 0; k < nu; k++)
+                                    if (uu[k] == v) { span_unsafe = 1; break; }
+                                break;
+                            }
+                            default: break;
+                            }
+                            if (span_unsafe) break;
+                        }
+                    if (span_unsafe) continue;
+                    /* BC must be free over the span (no other BC-homed vreg's
+                       loop-extended interval overlaps) — else the split wouldn't
+                       win (correctness holds regardless: a BC clobber just forces
+                       a reload from the coherent slot). */
+                    int bc_busy = 0;
+                    for (int w = 0; w < nv && !bc_busy; w++) {
+                        if (w == v) continue;
+                        if (f->vreg_to_phys[w] != IR_PR_BC) continue;
+                        if (first_use[w] < 0 || last_use[w] < 0) continue;
+                        int s = best_lo > first_use[w] ? best_lo : first_use[w];
+                        int e = best_hi < last_use[w] ? best_hi : last_use[w];
+                        if (s <= e) bc_busy = 1;
+                    }
+                    if (bc_busy) continue;
+                    /* Commit the split. */
+                    f->vreg_to_phys[v] = IR_PR_BC;
+                    if (f->home_lo && f->home_hi) {
+                        f->home_lo[v] = best_lo;
+                        f->home_hi[v] = best_hi;
+                    }
+                    f->vregs[v].flags |= IR_VREG_CALL_SPLIT;
+                    if (getenv("IR_CALLSPLIT_LOG"))
+                        fprintf(stderr, "CALLSPLIT %s v%d reads=%d span=[%d,%d]\n",
+                                f->fn ? ir_sym_name(f->fn) : "?", v, best_reads,
+                                best_lo, best_hi);
+                }
+            }
+            free(callpos);
+            free(wdb);
         }
         free(write_count);
         free(use_count);

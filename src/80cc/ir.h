@@ -131,6 +131,16 @@ typedef enum {
                                         ir_assign_slots drops its slot → frame shrinks →
                                         deadframe frameless. Set on the re-lower once
                                         the read/write split proves it dead. */
+    IR_VREG_CALL_SPLIT     = 1 << 11, /* [IR_CALLSPLIT] call-bounded live-range split:
+                                        a spilled reused word value made BC-resident
+                                        (vreg_to_phys=IR_PR_BC) only inside a call-free
+                                        span [home_lo,home_hi] with >=3 reads and NO
+                                        in-span write, spilled (slot-homed) elsewhere.
+                                        Read-only-in-span so the slot stays coherent
+                                        by construction: BC is an opportunistic cache
+                                        (entry reload via emit_bc_reload on a cold
+                                        belief), no exit spill. ir_assign_slots keeps
+                                        its slot despite the PR_BC home. */
 } VRegFlags;
 
 typedef struct {

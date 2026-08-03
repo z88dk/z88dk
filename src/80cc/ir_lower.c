@@ -5303,6 +5303,23 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 rc = lower_op(out, f, op);
             }
             if (verify_on > 0 || clob_verify_on > 0) { verify_buf[verify_len] = 0; ir_verify_op(f, op, verify_buf); }
+            /* [IR_CALLSPLIT] A def of a call-split value OUTSIDE its BC span
+               writes the slot (its canonical home) but does NOT update BC, so a
+               BC belief left over from the span now LIES (holds the pre-def
+               value). Drop it so a later out-of-span read reloads from the
+               coherent slot. (In-span defs don't occur — selection requires the
+               span read-only — but the ir_home_at guard makes this a no-op there,
+               where BC legitimately holds the value.) */
+            {
+                int dd[8]; int nd = ir_op_defs(op, dd, 8);
+                for (int k = 0; k < nd; k++) {
+                    int dv = dd[k];
+                    if (dv >= 0 && dv < f->n_vregs
+                        && (f->vregs[dv].flags & IR_VREG_CALL_SPLIT)
+                        && L.rs.bc == dv && ir_home_at(f, dv) != IR_PR_BC)
+                        invalidate_bc_cache();
+                }
+            }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
             if (L.la.cur_skip_next_op) {

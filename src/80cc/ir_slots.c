@@ -70,6 +70,14 @@ void ir_assign_slots(Func *f)
         if (v == f->word_home_vreg && f->vreg_to_phys
             && f->vreg_to_phys[v] == IR_PR_DE)
             needs_slot[v] = 1;
+        /* [IR_CALLSPLIT] A call-bounded split value is PR_BC only inside its
+           call-free span; outside it (and to reload it on entry) it lives in a
+           frame slot, which stays its canonical home. So it needs a slot despite
+           the register-pool assignment above (same as PR_E/PR_D / the word
+           DE-home). Its span is read-only, so the slot is only ever WRITTEN by
+           an out-of-span def and READ back to reload BC — never diverges. */
+        if (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
+            needs_slot[v] = 1;
         /* Read-only param lives in the caller's pushed-arg slot;
            slot_off returns that caller offset directly. */
         if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)

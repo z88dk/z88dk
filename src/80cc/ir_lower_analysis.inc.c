@@ -863,6 +863,12 @@ static int vreg_slot_deferrable(const Func *f, int v)
     if (f->vregs[v].flags
         & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
         return 0;
+    /* [IR_CALLSPLIT] A call-split value is PR_BC only inside its span, SPILL
+       (slot-homed) at its def. Its slot store feeds the in-span reload, so it
+       must NEVER be deferred/elided — the point-aware register-pool check below
+       would wrongly suppress the in-span reload record (BC there) while the
+       out-of-span store IS recorded, making the store look dead. */
+    if (f->vregs[v].flags & IR_VREG_CALL_SPLIT) return 0;
     if (vreg_in_register_pool(f, v)) return 0;
     return 1;
 }
