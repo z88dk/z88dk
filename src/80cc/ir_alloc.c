@@ -3961,6 +3961,116 @@ void ir_alloc(Func *f)
                         "convertible=%d\n", f->fn ? ir_sym_name(f->fn) : "?",
                         cand, de_free, de_or_bc_free, conv);
         }
+        /* [IR_GPHOME_PROBE / IR_SPLIT_PROBE] INERT — size call-bounded live-range
+           SPLITTING (RANGED_CALLSPLIT_PLAN.md §7). Population = width-2 spilled
+           reused (use_count>=2) non-param/addr-taken/volatile locals — the values a
+           general (non-role-specialised) BC/DE proposer could home.
+             GPHOME: free_pair = no other BC/DE-homed vreg's [first_use,last_use]
+               overlaps V's [lo,hi]; call-free = no IR_CALL/IR_HCALL global index in
+               [lo,hi]. Reports spilled / free_pair / free_pair_callfree — showing
+               caller-clobber (not specialisation) is the whole-range limiter.
+             SPLIT: for the call-CROSSING free-pair values, walk V's refs and reset a
+               running count at each call → max refs in any call-free span; reports
+               call_crossing / span_ge2 / span_ge3 — the splittable residue. */
+        if (getenv("IR_GPHOME_PROBE") || getenv("IR_SPLIT_PROBE")) {
+            int nv = f->n_vregs;
+            /* Call positions in the allocator's global op-index space (same space
+               first_use/last_use live in: bb_first_op[b] + j). */
+            int ncall = 0;
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    OpKind k = f->bbs[b].ops[j].kind;
+                    if (k == IR_CALL || k == IR_HCALL) ncall++;
+                }
+            int *callpos = ncall ? malloc((size_t)ncall * sizeof(int)) : NULL;
+            if (!(ncall && !callpos)) {
+                int ci = 0;
+                for (int b = 0; b < f->n_bbs; b++)
+                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                        OpKind k = f->bbs[b].ops[j].kind;
+                        if (k == IR_CALL || k == IR_HCALL)
+                            callpos[ci++] = bb_first_op[b] + j;
+                    }
+                int spilled = 0, free_pair = 0, free_pair_callfree = 0;
+                int call_crossing = 0, span_ge2 = 0, span_ge3 = 0;
+                for (int v = 0; v < nv; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 2) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                     | IR_VREG_PARAM)) continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (use_count[v] < 2) continue;
+                    int lo = first_use[v], hi = last_use[v];
+                    if (lo < 0 || hi < 0 || hi < lo) continue;
+                    spilled++;
+                    /* whole-range interference vs DE/BC GP homes (tracked
+                       separately: "free pair" = at least ONE of BC/DE is free
+                       over V's whole range — the splittable-if-one-pair-free
+                       population the plan's §2 narrative counts). */
+                    int de_busy = 0, bc_busy = 0;
+                    for (int w = 0; w < nv; w++) {
+                        if (w == v) continue;
+                        int ph = f->vreg_to_phys[w];
+                        if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
+                        if (first_use[w] < 0 || last_use[w] < 0) continue;
+                        int s = lo > first_use[w] ? lo : first_use[w];
+                        int e = hi < last_use[w] ? hi : last_use[w];
+                        if (s <= e) { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                    }
+                    int pair_busy = de_busy && bc_busy;   /* NEITHER pair free */
+                    int callfree = 1;
+                    for (int c = 0; c < ncall; c++)
+                        if (callpos[c] >= lo && callpos[c] <= hi) { callfree = 0; break; }
+                    if (!pair_busy) {
+                        free_pair++;
+                        if (callfree) free_pair_callfree++;
+                        if (!callfree) {
+                            /* SPLIT: max USES (reads) in any call-free sub-span of
+                               [lo,hi]. Reads — not defs — are what the post-call
+                               reload amortises (a def writes the reg directly), so
+                               the ≥3-use gate counts ir_op_uses members only. */
+                            call_crossing++;
+                            int cur = 0, maxspan = 0;
+                            for (int b = 0; b < f->n_bbs; b++)
+                                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                                    int g = bb_first_op[b] + j;
+                                    if (g < lo || g > hi) continue;
+                                    const Op *o = &f->bbs[b].ops[j];
+                                    if (o->kind == IR_CALL || o->kind == IR_HCALL) {
+                                        cur = 0; continue;
+                                    }
+                                    int u[16]; int nu = ir_op_uses(o, u, 16);
+                                    for (int k = 0; k < nu; k++)
+                                        if (u[k] == v) cur++;
+                                    if (cur > maxspan) maxspan = cur;
+                                }
+                            if (maxspan >= 2) span_ge2++;
+                            if (maxspan >= 3) span_ge3++;
+                            /* IR_SPLIT_PROBE=2: per-candidate detail for picking a
+                               Phase-1 target — vreg, max uses in a call-free span,
+                               def kind, allocator interval, and whether V is DEF'd
+                               inside the richest span (no entry reload needed). */
+                            const char *sv = getenv("IR_SPLIT_PROBE");
+                            if (sv && sv[0] == '2' && maxspan >= 3)
+                                fprintf(stderr, "  splitcand %s v%d maxuses=%d "
+                                        "dk=%d lo=%d hi=%d wc=%d uc=%d\n",
+                                        f->fn ? ir_sym_name(f->fn) : "?", v, maxspan,
+                                        def_kind[v], lo, hi, write_count[v],
+                                        use_count[v]);
+                        }
+                    }
+                }
+                if (getenv("IR_GPHOME_PROBE") && spilled > 0)
+                    fprintf(stderr, "GPHOMEPROBE %s spilled=%d free_pair=%d "
+                            "free_pair_callfree=%d\n", f->fn ? ir_sym_name(f->fn) : "?",
+                            spilled, free_pair, free_pair_callfree);
+                if (getenv("IR_SPLIT_PROBE") && call_crossing > 0)
+                    fprintf(stderr, "SPLITPROBE %s call_crossing=%d span_ge2=%d "
+                            "span_ge3=%d\n", f->fn ? ir_sym_name(f->fn) : "?",
+                            call_crossing, span_ge2, span_ge3);
+            }
+            free(callpos);
+        }
         free(write_count);
         free(use_count);
         free(first_use);
