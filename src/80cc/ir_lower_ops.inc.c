@@ -3683,6 +3683,20 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         commit_hl_result(out, f, op->dst);
         return 0;
     }
+    /* One operand HL-resident, the OTHER already in BC: `add hl,bc` directly.
+       add is commutative, so this skips staging src1 into DE (the generic
+       `ex de,hl; ld hl,bc; add hl,de`) — 1 byte, and crucially leaves DE
+       untouched, so a DE-resident accumulator across the add isn't spilled to a
+       slot (the IVSR walking-pointer bound `base(BC) + idx(HL)` shape). BC holds
+       the value on entry AND after (add hl,bc doesn't write BC), so its cache
+       stays valid. */
+    if (op->src[1] >= 0
+        && ((hl_has(op->src[0]) && bc_has(op->src[1]))
+            || (hl_has(op->src[1]) && bc_has(op->src[0])))) {
+        emit(out, "add\thl,bc");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     if (try_binop_ixd_fold(out, f, op, "add\ta,", "adc\ta,")) return 0;
     load_binop_operands(out, f, op);
     emit(out, "add\thl,de");
