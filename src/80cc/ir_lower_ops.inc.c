@@ -1180,7 +1180,8 @@ static int func_has_pr_bc(const Func *f)
     if (!f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++)
         if (f->vreg_to_phys[i] == IR_PR_BC
-            && !(f->vregs[i].flags & IR_VREG_BC_PACK)) return 1;
+            && !(f->vregs[i].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT)))
+            return 1;
     return 0;
 }
 
