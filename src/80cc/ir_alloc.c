@@ -4148,26 +4148,36 @@ void ir_alloc(Func *f)
                     if (cur > best_reads) {
                         best_reads = cur; best_lo = cfirst; best_hi = clast;
                     }
+                    /* ≥3 reads is the BYTE-correct floor. The per-span CYCLE benefit
+                       (§2.1) turns positive at N≥2 on dear-slot CPUs, but a 2-read
+                       span REGRESSES bytes (sortbench +20/+32): the entry reload
+                       `ld bc,(slot); ld hl,bc` isn't amortised over only 2 reuses.
+                       Density is the primary metric, so keep ≥3; the ≥15 CPU gate
+                       above already byte-suppresses cheap-slot CPUs. */
                     if (best_reads < 3 || best_lo < 0 || best_hi < best_lo) continue;
-                    /* Reject the span if, inside [best_lo,best_hi], V is either
-                       (a) WRITTEN — BC would diverge from the slot (Phase-1
-                       read-only requirement), or (b) consumed by an op that reads
-                       BC DIRECTLY (compare/branch-test/step/fused/deref) rather
-                       than through load_to_hl/load_to_de: those paths don't reload
-                       a cold BC belief, so they'd read stale/garbage BC. Only
-                       load-based binop/mov/store consumers reload on first access
-                       and are safe. */
-                    int span_unsafe = 0;
-                    for (int b = 0; b < f->n_bbs && !span_unsafe; b++)
+                    /* Reject the span if, inside [best_lo,best_hi], V is consumed
+                       by an op that reads BC DIRECTLY (compare/branch-test/step/
+                       fused/deref) rather than through load_to_hl/load_to_de: those
+                       paths don't reload a cold BC belief, so they'd read
+                       stale/garbage BC. Only load-based binop/mov/store consumers
+                       reload on first access and are safe.
+                       In-span WRITES are now ALLOWED (Phase 2 write-both): an
+                       in-span def writes BOTH the slot (canonical home, kept
+                       coherent) and BC (cheap-read cache), so the slot never
+                       diverges — same safety as the read-only case, no exit spill.
+                       unsafe_write is still tracked (diagnostics) but not a
+                       rejection. */
+                    int unsafe_write = 0, unsafe_consumer = 0;
+                    for (int b = 0; b < f->n_bbs; b++)
                         for (int j = 0; j < f->bbs[b].n_ops; j++) {
                             int g = bb_first_op[b] + j;
                             if (g < best_lo || g > best_hi) continue;
                             const Op *o = &f->bbs[b].ops[j];
                             int dd[8]; int nd = ir_op_defs(o, dd, 8);
                             for (int k = 0; k < nd; k++)
-                                if (dd[k] == v) { span_unsafe = 1; break; }
+                                if (dd[k] == v) unsafe_write = 1;
                             if (o->kind == IR_POSTSTEP && o->src[0] == v)
-                                span_unsafe = 1;
+                                unsafe_write = 1;
                             /* Direct-BC-read consumers: reject if V is a source. */
                             switch (o->kind) {
                             case IR_CMP_EQ: case IR_CMP_NE:
@@ -4181,16 +4191,21 @@ void ir_alloc(Func *f)
                             case IR_COPY_STEP_BRZ: {
                                 int uu[16]; int nu = ir_op_uses(o, uu, 16);
                                 for (int k = 0; k < nu; k++)
-                                    if (uu[k] == v) { span_unsafe = 1; break; }
+                                    if (uu[k] == v) unsafe_consumer = 1;
                                 break;
                             }
                             default: break;
                             }
-                            if (span_unsafe) break;
                         }
+                    int span_unsafe = unsafe_consumer;   /* writes are write-both */
+                    (void)unsafe_write;                  /* tracked for diagnostics */
                     const char *cslog = getenv("IR_CALLSPLIT_LOG");
                     int cslog2 = cslog && cslog[0] == '2';
                     if (span_unsafe) {
+                        if (cslog2) fprintf(stderr, "  cs-reject %s v%d unsafe "
+                            "write=%d consumer=%d reads=%d span=[%d,%d]\n",
+                            f->fn?ir_sym_name(f->fn):"?", v, unsafe_write,
+                            unsafe_consumer, best_reads, best_lo, best_hi);
                         if (cslog2) fprintf(stderr, "  cs-reject %s v%d span_unsafe "
                             "span=[%d,%d]\n", f->fn?ir_sym_name(f->fn):"?", v,
                             best_lo, best_hi);
