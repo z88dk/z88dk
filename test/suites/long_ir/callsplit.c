@@ -20,6 +20,7 @@
  * the call boundary and the cross-call spill; NO printf (would perturb allocation
  * and mask the bug, like the enigma family). */
 #include "test.h"
+#include <string.h>
 
 static unsigned int g_acc;
 /* Opaque-enough callee: clobbers the caller-saved regs (BC/DE/HL) so the split
@@ -61,6 +62,32 @@ static unsigned int churn_readonly(int n)
     return chk;
 }
 
+/* FLAT-INVERTED INNER LOOP: a loop-carried word (isq) is BC-homed by the split
+ * over the outer body, but its update block is emitted in op order BEFORE the
+ * NESTED inner loop that marks the byte array — so the inner loop sits at flat
+ * indices past the split's span while running control-flow between the split's
+ * uses. The inner `fl[k]=1` store takes a BC temp for its address and clobbers
+ * the carried isq every iteration. The bc_busy interference check used flat
+ * op-index overlap, which missed this; the split coexisted with the inner temp
+ * in BC. Only bites CPUs with no index-register home for isq (8080/8085/gbz80 —
+ * z80/z180/z80n park it in IY); pre-fix returned 50, not 25. A small Sieve of
+ * Eratosthenes is the minimal shape (nested loop + strided byte store + a call,
+ * memset, to trigger the split). Host-verified: 25 primes in [2,99]. */
+static unsigned char fl[100];
+static unsigned int primes_nested(void)
+{
+    unsigned int i, isq, k, count;
+    memset(fl, 0, sizeof fl);
+    count = 100 - 2;
+    isq = 4;
+    for (i = 2; isq < 100; ++i) {
+        if (!fl[i])
+            for (k = isq; k < 100; k += i) { count -= !fl[k]; fl[k] = 1; }
+        isq += i + i + 1;                       /* isq carried across the k-loop */
+    }
+    return count;
+}
+
 static void test_callsplit(void)
 {
     g_acc = 0;
@@ -74,6 +101,8 @@ static void test_callsplit(void)
 
     assertEqual(churn_readonly(0),  0u);
     assertEqual(churn_readonly(10), 57909u);
+
+    assertEqual(primes_nested(), 25u);         /* flat-inverted inner-loop BC clobber */
 }
 
 int main(int argc, char *argv[])
