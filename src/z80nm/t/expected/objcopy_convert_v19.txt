@@ -12,12 +12,14 @@ Object  file test_t_objcopy_convert_t.2.o at $0018: Z80RMF19
     U         x3
   Expressions:
     E U8    $1234 $1235 3: label1+123 (section section1) (file file1.asm:123)
+  Relocations:
+    R U8    $1234: x1+$1234 (section section1) (file file1.asm:123)
   Strings:
     S   1 = "file1.asm"
     S   2 = "section1"
     S   3 = "label1+123"
-    S   4 = "label1"
-    S   5 = "x1"
+    S   4 = "x1"
+    S   5 = "label1"
     S   6 = "x2"
     S   7 = "x3"
     S   8 = "module1"

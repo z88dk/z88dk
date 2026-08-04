@@ -23,7 +23,7 @@ Formats:
 Options:
   --in-format F     Set input format (obj|dump|auto)
   --out-format F    Set output format (obj|dump|auto)
-  -v N, --version N Set output object file version 1..19 (default 18)
+  -v N, --version N Set output object file version 1..19 (default 19)
   -h, --help        Show this help message
 
 Notes:

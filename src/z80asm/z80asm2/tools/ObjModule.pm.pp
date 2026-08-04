@@ -2499,9 +2499,11 @@ sub pack {
     my $exprs_pos = $self->exprs->pack( $bin, $self->strings, $self->version );
 
     # write relocs
-    my $relocs_pos =
-        $self->relocs->pack( $bin, $self->strings, $self->version );
-
+    my $relocs_pos = -1;
+    if ( $self->version >= 19 ) {
+        $relocs_pos = $self->relocs->pack( $bin, $self->strings, $self->version );
+	}
+	
     # write symbols
     my $symbols_pos =
         $self->symbols->pack( $bin, $self->strings, $self->version );
