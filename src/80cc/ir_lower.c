@@ -3734,10 +3734,18 @@ int ir_lower_func(FILE *out, Func *f)
            value's `pop hl`; bitfield store miscompile). Keep those slotted — their
            pre-change behaviour (read-remat + slot) is correct. */
         int *store_base = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+        /* remat-LEA is gated to CALLLESS functions (see the [IR_REMAT_LEA] note):
+           recomputing a frame-slot address mid-call-argument-marshalling would need
+           cur_sp_adjust to reflect the already-pushed args, and a &local passed to a
+           call is the concrete failure (sortbench qsort_rec's cmp(&v[j],&pivot)). A
+           function with no IR_CALL has no such marshalling, so every remat point is
+           sp-adjust-safe. */
+        int func_has_call = 0;
         if (ndef && store_base) {
             for (int b = 0; b < f->n_bbs; b++)
                 for (int j = 0; j < f->bbs[b].n_ops; j++) {
                     const Op *so = &f->bbs[b].ops[j];
+                    if (so->kind == IR_CALL) func_has_call = 1;
                     if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
                         && so->mem.base >= 0 && so->mem.base < f->n_vregs)
                         store_base[so->mem.base] = 1;
@@ -3767,17 +3775,22 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
-                    /* [remat-LEA — NOT enabled] A frame-slot address (&local) is a
-                       real remat candidate (~50 corpus values, interpbench -117B sp
-                       / -45 fp) BUT the recompute has two correctness hazards that
-                       make it a careful build, not a drop-in (both proven by
-                       long_ir/irgaps miscompiles): (1) fp non-ez80 `push ix;pop hl;
-                       ld de,N;add hl,de` CLOBBERS DE — strands a register-homed
-                       value; (2) sp `ld hl,N;add hl,sp` depends on cur_sp_adjust
-                       being current at the remat point (it isn't, deep in an expr →
-                       wrong address). Correct impl must gate to no-clobber contexts
-                       (ez80 lea; sp with verified sp-adjust) or spill DE first.
-                       See VALUE_REDUCTION_PLAN.md. */
+                    /* [IR_REMAT_LEA] Frame-slot address (&local) rematerialises:
+                       recompute at each use instead of spilling+reloading. The offset
+                       is fixed per function, so the address recomputes anywhere the
+                       stack depth is known. emit_remat_word emits `lea rr,ix+d` on
+                       ez80-fp (1 op, no clobber) and `ld hl,slot_off+cur_sp_adjust;
+                       add hl,sp` everywhere else — clobbering only the target pair,
+                       fp==sp (the uniform sp-offset approach: no IX/DE gymnastics).
+                       EXCLUDE the byte-wise CPUs (808x/gbz80): they spill LEA values
+                       as data-stack transients (PR_STACK push/pop) rather than frame
+                       slots, so dropping the slot shifts the stack and the recomputed
+                       offsets go inconsistent (proven by irgaps miscompiles — the
+                       deferred "extend" step). Store-base LEAs keep their slot (below).
+                       Opt-in while validating. */
+                    else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
+                             && !(IS_808x() || IS_GBZ80()) && getenv("IR_REMAT_LEA"))
+                        rd = o;
                     if (rd) {
                         g_hc.remat_def[d] = rd;
                         /* A compile-time constant (integer immediate OR symbol
