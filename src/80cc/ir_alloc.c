@@ -4245,6 +4245,50 @@ void ir_alloc(Func *f)
                        true range spanning the loop, so it still (correctly) blocks.
                        Correctness holds regardless of the win: a stray BC clobber
                        just forces a reload from the coherent slot. */
+                    /* The candidate is live-CARRIED beyond its chosen call-free
+                       span iff its loop-extended interval [first_use,last_use]
+                       exceeds [best_lo,best_hi]. When it is, BC must survive a
+                       region that is flat-OUTSIDE the span but CONTROL-FLOW inside
+                       it — block layout can place a nested loop body at flat indices
+                       past best_hi while control flow runs it between the span's uses
+                       (sieve_count's i_sq carried across the inner `flags[k]=1` loop
+                       on index-less 808x/gbz80, where i_sq can't escape to IX/IY).
+                       A tenant living in that carried region clobbers BC yet a plain
+                       flat-overlap test against [best_lo,best_hi] misses it. Widen the
+                       occupancy to the loop-extended interval in that case. Gate on an
+                       in-span WRITE (unsafe_write): a loop-carried accumulator/IV is
+                       written each iteration and must hold BC across the whole loop
+                       body; a read-only reused temp dies at best_hi and needs no
+                       widening (widening it spuriously blocked matrixbench/hashbench
+                       call-splits). The widening ONLY applies under a real layout
+                       inversion: a BB placed flat-AFTER best_hi with a control-flow
+                       edge back INTO [best_lo,best_hi] (the inner loop whose body sits
+                       after the outer increment in op order — sieve). Without such a
+                       re-entry the flat span is control-flow-contiguous and the loop
+                       extension is spurious (matrixbench's carried split stays). */
+                    int occ_lo = best_lo, occ_hi = best_hi;
+                    if (unsafe_write) {
+                        int span_reentered = 0;
+                        for (int b = 0; b < f->n_bbs && !span_reentered; b++) {
+                            if (bb_first_op[b] <= best_hi) continue;   /* not flat-after */
+                            int sc[64];
+                            int ns = alloc_bb_succ(&f->bbs[b], sc,
+                                        (int)(sizeof sc / sizeof sc[0]));
+                            for (int s = 0; s < ns; s++) {
+                                int sb = sc[s];
+                                if (sb < 0 || sb >= f->n_bbs) continue;
+                                /* successor whose op range intersects the span */
+                                if (bb_first_op[sb] <= best_hi
+                                    && bb_last_op[sb] >= best_lo) {
+                                    span_reentered = 1; break;
+                                }
+                            }
+                        }
+                        if (span_reentered) {
+                            if (first_use[v] >= 0 && first_use[v] < occ_lo) occ_lo = first_use[v];
+                            if (last_use[v]  > occ_hi) occ_hi = last_use[v];
+                        }
+                    }
                     int bc_busy = 0, bc_blocker = -1;
                     for (int w = 0; w < nv && !bc_busy; w++) {
                         if (w == v) continue;
@@ -4254,8 +4298,8 @@ void ir_alloc(Func *f)
                         if (lw && lw->start >= 0) { wlo = lw->start; whi = lw->end; }
                         else { wlo = first_use[w]; whi = last_use[w]; }  /* fallback */
                         if (wlo < 0 || whi < 0) continue;
-                        int s = best_lo > wlo ? best_lo : wlo;
-                        int e = best_hi < whi ? best_hi : whi;
+                        int s = occ_lo > wlo ? occ_lo : wlo;
+                        int e = occ_hi < whi ? occ_hi : whi;
                         if (s <= e) { bc_busy = 1; bc_blocker = w; }
                     }
                     if (bc_busy) {
