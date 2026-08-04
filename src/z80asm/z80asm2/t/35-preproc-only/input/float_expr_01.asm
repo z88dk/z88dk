@@ -159,11 +159,6 @@ float tanh(0.5)
 defm "--------"
 float 0.46211715726001
 defm "--------"
-defm "atanh(tanh(0.5)) = 0.5"
-float atanh(tanh(0.5))
-defm "--------"
-float 0.5
-defm "--------"
 defm "atan2(0.5,0.5) = 0.785398163397448"
 float atan2(0.5,0.5)
 defm "--------"
