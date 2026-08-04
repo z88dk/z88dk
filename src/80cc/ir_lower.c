@@ -3767,6 +3767,17 @@ int ir_lower_func(FILE *out, Func *f)
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
+                    /* [remat-LEA — NOT enabled] A frame-slot address (&local) is a
+                       real remat candidate (~50 corpus values, interpbench -117B sp
+                       / -45 fp) BUT the recompute has two correctness hazards that
+                       make it a careful build, not a drop-in (both proven by
+                       long_ir/irgaps miscompiles): (1) fp non-ez80 `push ix;pop hl;
+                       ld de,N;add hl,de` CLOBBERS DE — strands a register-homed
+                       value; (2) sp `ld hl,N;add hl,sp` depends on cur_sp_adjust
+                       being current at the remat point (it isn't, deep in an expr →
+                       wrong address). Correct impl must gate to no-clobber contexts
+                       (ez80 lea; sp with verified sp-adjust) or spill DE first.
+                       See VALUE_REDUCTION_PLAN.md. */
                     if (rd) {
                         g_hc.remat_def[d] = rd;
                         /* A compile-time constant (integer immediate OR symbol

@@ -4441,15 +4441,29 @@ void ir_alloc(Func *f)
         if (getenv("IR_VRED")) {
             int nv = f->n_vregs;
             const Op **defop = calloc((size_t)(nv > 0 ? nv : 1), sizeof(Op *));
-            if (defop) {
+            int *ndef = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
+            int *stbase = calloc((size_t)(nv > 0 ? nv : 1), sizeof(int));
+            if (defop && ndef && stbase) {
                 for (int b = 0; b < f->n_bbs; b++)
                     for (int j = 0; j < f->bbs[b].n_ops; j++) {
                         const Op *o = &f->bbs[b].ops[j];
                         if (o->dst >= 0 && o->dst < nv && !defop[o->dst])
                             defop[o->dst] = o;
+                        int dd[8]; int ndd = ir_op_defs(o, dd, 8);
+                        for (int k = 0; k < ndd; k++)
+                            if (dd[k] >= 0 && dd[k] < nv) ndef[dd[k]]++;
+                        if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
+                            && o->mem.base >= 0 && o->mem.base < nv)
+                            stbase[o->mem.base] = 1;
                     }
                 int remat = 0, copy = 0, cse = 0, distinct = 0;
                 int remat_imm = 0, remat_sym = 0;
+                /* Actionable remat = SINGLE-def (ndef==1) width-2 LD_IMM/LD_SYM
+                   that's still spilled. Split: storebase (the known bitfield
+                   exclusion), else "clean" (a genuine gap). multidef / byte are
+                   NOT rematerializable (value changes / different machinery). */
+                int rm_storebase = 0, rm_clean = 0, rm_multidef = 0, rm_byte = 0;
+                int cse_lea = 0, cse_ldmem = 0, cse_rest = 0;
                 for (int v = 0; v < nv; v++) {
                     const VReg *vr = &f->vregs[v];
                     if (vr->width != 1 && vr->width != 2) continue;
@@ -4462,6 +4476,10 @@ void ir_alloc(Func *f)
                     if (d->kind == IR_LD_IMM || d->kind == IR_LD_SYM
                         || d->kind == IR_LD_STR) { remat++;
                         if (d->kind == IR_LD_IMM) remat_imm++; else remat_sym++;
+                        if (ndef[v] > 1) rm_multidef++;
+                        else if (vr->width == 1) rm_byte++;
+                        else if (stbase[v]) rm_storebase++;
+                        else rm_clean++;
                         continue; }
                     if (d->kind == IR_MOV) { copy++; continue; }
                     int dup = 0;
@@ -4478,7 +4496,15 @@ void ir_alloc(Func *f)
                             && d->src[0] >= 0)   /* has a real operand to share */
                             dup = 1;
                     }
-                    if (dup) { cse++; continue; }
+                    if (dup) { cse++;
+                        /* Break the CSE opportunity down by def kind: ADDRESSES
+                           (LEA=&frameslot, LD_MEM=*p deref) that broadening
+                           cse_eligible would newly catch, vs the rest (arith,
+                           already eligible → a scope/table/cross-BB miss). */
+                        if (d->kind == IR_LEA) cse_lea++;
+                        else if (d->kind == IR_LD_MEM) cse_ldmem++;
+                        else cse_rest++;
+                        continue; }
                     distinct++;
                     if (getenv("IR_VRED")[0] == '2')
                         fprintf(stderr, "  vred-distinct %s v%d defkind=%d uc=%d\n",
@@ -4486,11 +4512,13 @@ void ir_alloc(Func *f)
                                 use_count[v]);
                 }
                 if (remat + copy + cse + distinct > 0)
-                    fprintf(stderr, "VRED %-20s remat=%d(imm%d/sym%d) copy=%d "
-                            "cse=%d distinct=%d\n", f->fn?ir_sym_name(f->fn):"?",
-                            remat, remat_imm, remat_sym, copy, cse, distinct);
-                free(defop);
+                    fprintf(stderr, "VRED %-20s remat=%d[sb%d/clean%d/mdef%d/byte%d] "
+                            "copy=%d cse=%d[lea%d/ldmem%d/rest%d] distinct=%d\n",
+                            f->fn?ir_sym_name(f->fn):"?", remat, rm_storebase,
+                            rm_clean, rm_multidef, rm_byte, copy, cse,
+                            cse_lea, cse_ldmem, cse_rest, distinct);
             }
+            free(defop); free(ndef); free(stbase);
         }
         free(write_count);
         free(use_count);
