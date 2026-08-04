@@ -390,6 +390,21 @@ static int  a_carry_enabled(void)
     return a_carry_on;
 }
 
+/* IR_REMAT_LEA: rematerialise &local frame-slot addresses (see the remat table in
+   ir_lower_func). Default ON after the gauntlet — full byte matrix 0-regress all 9
+   CPUs sp+fp (−747B), ticks 0-slower (interpbench pure win, ez80-fp excluded as a
+   byte-for-tick), long_ir + run-matrix green, real files byte-identical. IR_REMAT_LEA=0
+   opts out (byte-identical to pre-flip). */
+static int  remat_lea_on = -1;
+static int  remat_lea_enabled(void)
+{
+    if (remat_lea_on < 0) {
+        const char *e = getenv("IR_REMAT_LEA");
+        remat_lea_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_REMAT_LEA=0 opts out */
+    }
+    return remat_lea_on;
+}
+
 /* IR_HL_CARRY (opt-in, WIP): the same invalidate-by-default tracker extended to
    HL and DE — the vehicle for HL/DE operand-residency carry (the #2 size bucket).
    Increment 0 = the inert safety net: rs.hl/rs.de survive across raw emits and are
@@ -3776,20 +3791,26 @@ int ir_lower_func(FILE *out, Func *f)
                              && !ns_sym_bails(o->mem.sym))
                         rd = o;
                     /* [IR_REMAT_LEA] Frame-slot address (&local) rematerialises:
-                       recompute at each use instead of spilling+reloading. The offset
-                       is fixed per function, so the address recomputes anywhere the
-                       stack depth is known. emit_remat_word emits `lea rr,ix+d` on
-                       ez80-fp (1 op, no clobber) and `ld hl,slot_off+cur_sp_adjust;
-                       add hl,sp` everywhere else — clobbering only the target pair,
-                       fp==sp (the uniform sp-offset approach: no IX/DE gymnastics).
-                       EXCLUDE the byte-wise CPUs (808x/gbz80): they spill LEA values
-                       as data-stack transients (PR_STACK push/pop) rather than frame
-                       slots, so dropping the slot shifts the stack and the recomputed
-                       offsets go inconsistent (proven by irgaps miscompiles — the
-                       deferred "extend" step). Store-base LEAs keep their slot (below).
-                       Opt-in while validating. */
+                       recompute at each use (emit_remat_word: `ld hl,slot_off+
+                       cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
+                       offset is fixed per function and cur_sp_adjust is tracked, so
+                       fp==sp with only the target pair clobbered (no IX/DE gymnastics).
+                       EXCLUSIONS, each a measured non-win:
+                       - byte-wise CPUs (808x/gbz80): spill LEA values as data-stack
+                         transients (PR_STACK push/pop) not frame slots, so dropping
+                         the slot shifts the stack and offsets go inconsistent (irgaps
+                         miscompiles — the deferred "extend" step);
+                       - ez80 in FP mode: its cheap `lea`/`ld hl,(ix+d)` addressing
+                         register-homes LEAs, so per-use recompute in a hot loop is a
+                         byte-for-tick LOSS (interpbench ez80-fp −27B but +4.6% ticks).
+                         ez80-SP keeps it: sp addressing is dear there, so it is a pure
+                         win (−117B, −6.6% ticks).
+                       Store-base LEAs keep their slot (below). Default-on;
+                       IR_REMAT_LEA=0 opts out. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
-                             && !(IS_808x() || IS_GBZ80()) && getenv("IR_REMAT_LEA"))
+                             && !(IS_808x() || IS_GBZ80())
+                             && !(IS_EZ80() && fp_active(f))
+                             && remat_lea_enabled())
                         rd = o;
                     if (rd) {
                         g_hc.remat_def[d] = rd;

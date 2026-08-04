@@ -207,22 +207,13 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
         return 1;
     }
     /* [remat-LEA] Frame-slot address (&local): recompute at the use instead of
-       spilling+reloading. Two forms, both clobbering ONLY the target pair (no
-       IX/DE gymnastics — the address is sp-relative and we track cur_sp_adjust,
-       so fp works the same as sp):
-         ez80 fp, ±128 offset:  `lea rr,ix+d`  — one op, targets hl/de/bc directly.
-         everything else:       `ld hl,slot_off+cur_sp_adjust; add hl,sp` then move
-                                to de/bc (portable `ld d,h;ld e,l` — gbz80 has no
-                                `ex de,hl`). Any offset, fp or sp. */
+       spilling+reloading, via `ld hl,slot_off+cur_sp_adjust; add hl,sp` then a move
+       to de/bc (portable `ld d,h;ld e,l` — gbz80 has no `ex de,hl`). Clobbers ONLY
+       the target pair; the address is sp-relative and cur_sp_adjust is tracked, so
+       fp works the same as sp. (An ez80-fp `lea rr,ix+d` form existed but was a
+       byte-for-tick loss — ez80-fp is excluded from remat marking; see ir_lower.c.) */
     if (o->kind == IR_LEA && o->src[0] >= 0 && o->src[0] < f->n_vregs) {
         int src = o->src[0];
-        if (IS_EZ80() && fp_active(f) && !L.cur_frameless) {
-            int ixoff = slot_ix_off(f, src);
-            if (ixoff >= -128 && ixoff <= 127) {
-                emit(out, "lea\t%s,%s%+d", rp, frame_reg(), ixoff);
-                return 1;   /* no HL/DE disturbance */
-            }
-        }
         emit(out, "ld\thl,%d", slot_off(f, src) + L.cur_sp_adjust);
         emit(out, "add\thl,sp");
         if (!strcmp(rp, "hl"))
