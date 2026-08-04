@@ -4123,14 +4123,14 @@ void ir_alloc(Func *f)
                     if (use_count[v] < 2) continue;
                     int lo = first_use[v], hi = last_use[v];
                     if (lo < 0 || hi < 0 || hi < lo) continue;
-                    /* Must CROSS a call. A call-free value's reuse is already served
-                       by the HL/BC belief cache (no forced reload), so BC-homing it
-                       is a byte no-op (measured: ptrbench init_data, 8 reads, 0-byte
-                       delta, identical asm). The split only pays when a call
-                       INVALIDATES the cache and forces a slot reload — the win is
-                       inherently call-bounded, so the "10 whole-range call-free"
-                       Phase-4 values (RANGED_CALLSPLIT_PLAN §4) are NOT an
-                       opportunity. Whole-range homing is ir_bc_pack's job, not this. */
+                    /* Must CROSS a call. Extending to loop-carried multi-BB
+                       values (GENERAL_LOOP_HOME_PLAN Phase 1a) was a NO-OP: the
+                       only new BC-free-safe admit was ptrbench init_data v1 —
+                       the same 0-byte Phase-4 mirage (multi-BB but cache-served).
+                       The tractable BC-free subset is exhausted; the rest of the
+                       A_loopMB=48 is DE-free (needs a DE-home path) or deref-base/
+                       stepped pointer groups (the hard, GEP-CSE / coloring case).
+                       The win is call-bounded, as measured. */
                     int crosses = 0;
                     for (int c = 0; c < ncall; c++)
                         if (callpos[c] >= lo && callpos[c] <= hi) { crosses = 1; break; }
@@ -4285,6 +4285,212 @@ void ir_alloc(Func *f)
             }
             free(callpos);
             free(wdb);
+        }
+        /* [IR_SPILLAUDIT] Phase-0 spill-cause audit (POINTER/general-allocation
+           arc). For every SPILLED width-1/2 non-param/addr-taken/volatile value
+           with >=3 raw refs (the ones that cost bytes), classify WHY it spilled,
+           to decide if "better general allocation" is a real lever:
+             pair_free = at least one of BC/DE has NO other homed vreg whose TRUE
+                         live range (ir_live_range — NOT the loop-extended
+                         first/last_use; the call-split lesson) overlaps V's true
+                         range. pair_free ⇒ role-specialisation left a register
+                         idle (bucket A). !pair_free ⇒ genuine pressure (B/C).
+             in_loop   = V is accessed inside a loop ⇒ reloaded per iteration
+                         (the back-edge invalidates the reg cache like a call) ⇒
+                         a REAL opportunity, same structure the call-split took.
+                         pair_free && !in_loop = straight-line cache-served reuse
+                         ⇒ the Phase-4 no-op.
+           So A_loop is the recoverable bucket; A_straight is a mirage; pressure
+           is the hard/floor case. Reports counts + Σrefs (byte-weight proxy). */
+        if (getenv("IR_SPILLAUDIT")) {
+            int nv = f->n_vregs;
+            int a_loop = 0, a_straight = 0, pressure = 0, a_loop_mb = 0;
+            long r_aloop = 0, r_astraight = 0, r_press = 0, r_aloop_mb = 0;
+            /* PEAK register pressure: max simultaneously-live GP-candidate values
+               (width-1/2, >=2 uses, non-addr/vol/param — all that compete for a
+               register HOME) over the function, via interval coverage on the true
+               live ranges. This is the decisive "would coloring help" number:
+               if peak <= cheap-reg capacity (BC/DE + their byte halves ~= 2-4) yet
+               values spill, the greedy allocator left registers idle → coloring
+               wins; if peak >> capacity it is genuine over-subscription → floor. */
+            int peak_gp = 0, max_end = -1;
+            for (int v = 0; v < nv; v++) {
+                const LiveRange *lr = ir_live_range(f, v);
+                if (lr && lr->end > max_end) max_end = lr->end;
+            }
+            if (max_end >= 0) {
+                int span = max_end + 2;
+                int *cov = calloc((size_t)span, sizeof(int));
+                if (cov) {
+                    for (int v = 0; v < nv; v++) {
+                        const VReg *vr = &f->vregs[v];
+                        if (vr->width != 1 && vr->width != 2) continue;
+                        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_PARAM)) continue;
+                        if (use_count[v] < 2) continue;
+                        const LiveRange *lr = ir_live_range(f, v);
+                        if (!lr || lr->start < 0) continue;
+                        cov[lr->start]++;
+                        if (lr->end + 1 < span) cov[lr->end + 1]--;
+                    }
+                    int run = 0;
+                    for (int k = 0; k < span; k++) {
+                        run += cov[k];
+                        if (run > peak_gp) peak_gp = run;
+                    }
+                    free(cov);
+                }
+            }
+            /* PRECISE peak: same count but from per-op liveness (live_in_per_op),
+               which has HOLES — a value dead between an early def and a late use
+               is NOT counted live in the gap. This is the pressure sdcc actually
+               allocates against; peak_gp (solid interval) overstates it. If
+               precise << peak_gp, the "hardware floor" is really 80cc's coarse
+               whole-interval liveness (no live-range splitting), NOT the z80. */
+            int peak_precise = 0;
+            for (int b = 0; b < f->n_bbs; b++) {
+                const BB *bb = &f->bbs[b];
+                if (!bb->live_in_per_op) continue;
+                for (int j = 0; j < bb->n_ops; j++) {
+                    const BitSet *lin = (const BitSet *)bb->live_in_per_op[j];
+                    if (!lin) continue;
+                    int cnt = 0;
+                    for (int v = 0; v < nv; v++) {
+                        const VReg *vr = &f->vregs[v];
+                        if (vr->width != 1 && vr->width != 2) continue;
+                        if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                         | IR_VREG_PARAM)) continue;
+                        if (use_count[v] < 2) continue;
+                        if (ir_bitset_get(lin, v)) cnt++;
+                    }
+                    if (cnt > peak_precise) peak_precise = cnt;
+                }
+            }
+            /* which BBs are in a loop (for the in_loop test) */
+            for (int v = 0; v < nv; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (vr->width != 1 && vr->width != 2) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                 | IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                const LiveRange *lv = ir_live_range(f, v);
+                if (!lv || lv->start < 0) continue;
+                /* raw refs + whether any ref is in a loop BB + how many DISTINCT
+                   BBs hold accesses (>1 ⇒ accesses span a belief-reset ⇒ actually
+                   reloaded per span; ==1 ⇒ single-BB, cache-served = Phase-4
+                   mirage). multi_bb is the "actually pays" refinement. */
+                int refs = 0, in_loop = 0, acc_bbs = 0;
+                for (int b = 0; b < f->n_bbs; b++) {
+                    int hit = 0;
+                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                        const Op *o = &f->bbs[b].ops[j];
+                        if (o->dst == v) { refs++; hit = 1; }
+                        int u[16]; int nu = ir_op_uses(o, u, 16);
+                        for (int k = 0; k < nu; k++)
+                            if (u[k] == v) { refs++; hit = 1; }
+                    }
+                    if (hit) acc_bbs++;
+                    if (hit && bb_in_loop[b]) in_loop = 1;
+                }
+                if (refs < 3) continue;
+                int multi_bb = acc_bbs > 1;
+                /* true-range-free BC/DE pair */
+                int bc_busy = 0, de_busy = 0;
+                for (int w = 0; w < nv; w++) {
+                    if (w == v) continue;
+                    int ph = f->vreg_to_phys[w];
+                    if (ph != IR_PR_BC && ph != IR_PR_DE) continue;
+                    const LiveRange *lw = ir_live_range(f, w);
+                    if (!lw || lw->start < 0) continue;
+                    if (lw->start <= lv->end && lv->start <= lw->end) {
+                        if (ph == IR_PR_BC) bc_busy = 1; else de_busy = 1;
+                    }
+                }
+                int pair_free = !bc_busy || !de_busy;
+                if (pair_free && in_loop) { a_loop++; r_aloop += refs;
+                                            if (multi_bb) { a_loop_mb++; r_aloop_mb += refs; } }
+                else if (pair_free)       { a_straight++; r_astraight += refs; }
+                else                      { pressure++; r_press += refs; }
+                if (getenv("IR_SPILLAUDIT")[0] == '2')
+                    fprintf(stderr, "  spv %s v%d refs=%d loop=%d mbb=%d bcfree=%d "
+                            "defree=%d -> %s\n", f->fn?ir_sym_name(f->fn):"?", v,
+                            refs, in_loop, multi_bb, !bc_busy, !de_busy,
+                            pair_free ? (in_loop?"A_loop":"A_straight") : "pressure");
+            }
+            if (a_loop + a_straight + pressure > 0)
+                fprintf(stderr, "SPILLAUDIT %-20s peakGP=%d peakPrec=%d A_loop=%d(r%ld) "
+                        "A_loopMB=%d(r%ld) A_straight=%d(r%ld) pressure=%d(r%ld)\n",
+                        f->fn?ir_sym_name(f->fn):"?", peak_gp, peak_precise, a_loop, r_aloop,
+                        a_loop_mb, r_aloop_mb,
+                        a_straight, r_astraight, pressure, r_press);
+        }
+        /* [IR_VRED] Value-reduction audit. sdcc "spills less" because its
+           middle-end has FEWER live values, not a better allocator (peak
+           pressure is similar). Classify each spilled GP-candidate by whether an
+           UPSTREAM optimisation would ELIMINATE it (dropping it from the live set)
+           rather than needing a register:
+             remat  = def is a constant / &sym / &string — recomputable at use
+                      (should not be kept live+spilled at all);
+             copy   = def is IR_MOV v=w — coalescable into w's home;
+             cse    = an IDENTICAL def op (same kind+srcs+imm+mem) exists on
+                      another vreg — a redundant computation CSE would merge;
+             distinct = a genuinely-distinct live value (the real floor).
+           If remat+copy+cse dominate, VALUE-REDUCTION (CSE/remat/coalesce) is the
+           lever, upstream of allocation; if distinct dominates, the pressure is
+           real. (Upper bound: no redef-between check on cse — sizing only.) */
+        if (getenv("IR_VRED")) {
+            int nv = f->n_vregs;
+            const Op **defop = calloc((size_t)(nv > 0 ? nv : 1), sizeof(Op *));
+            if (defop) {
+                for (int b = 0; b < f->n_bbs; b++)
+                    for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                        const Op *o = &f->bbs[b].ops[j];
+                        if (o->dst >= 0 && o->dst < nv && !defop[o->dst])
+                            defop[o->dst] = o;
+                    }
+                int remat = 0, copy = 0, cse = 0, distinct = 0;
+                int remat_imm = 0, remat_sym = 0;
+                for (int v = 0; v < nv; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != 1 && vr->width != 2) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                     | IR_VREG_PARAM | IR_VREG_NO_SLOT)) continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (use_count[v] < 2) continue;
+                    const Op *d = defop[v];
+                    if (!d) continue;
+                    if (d->kind == IR_LD_IMM || d->kind == IR_LD_SYM
+                        || d->kind == IR_LD_STR) { remat++;
+                        if (d->kind == IR_LD_IMM) remat_imm++; else remat_sym++;
+                        continue; }
+                    if (d->kind == IR_MOV) { copy++; continue; }
+                    int dup = 0;
+                    for (int w = 0; w < nv && !dup; w++) {
+                        if (w == v) continue;
+                        const Op *e = defop[w];
+                        if (!e || e->kind != d->kind) continue;
+                        if (e->src[0] == d->src[0] && e->src[1] == d->src[1]
+                            && e->imm == d->imm && e->imm_sym == d->imm_sym
+                            && e->mem.kind == d->mem.kind
+                            && e->mem.sym == d->mem.sym
+                            && e->mem.offset == d->mem.offset
+                            && e->mem.base == d->mem.base
+                            && d->src[0] >= 0)   /* has a real operand to share */
+                            dup = 1;
+                    }
+                    if (dup) { cse++; continue; }
+                    distinct++;
+                    if (getenv("IR_VRED")[0] == '2')
+                        fprintf(stderr, "  vred-distinct %s v%d defkind=%d uc=%d\n",
+                                f->fn?ir_sym_name(f->fn):"?", v, (int)d->kind,
+                                use_count[v]);
+                }
+                if (remat + copy + cse + distinct > 0)
+                    fprintf(stderr, "VRED %-20s remat=%d(imm%d/sym%d) copy=%d "
+                            "cse=%d distinct=%d\n", f->fn?ir_sym_name(f->fn):"?",
+                            remat, remat_imm, remat_sym, copy, cse, distinct);
+                free(defop);
+            }
         }
         free(write_count);
         free(use_count);
