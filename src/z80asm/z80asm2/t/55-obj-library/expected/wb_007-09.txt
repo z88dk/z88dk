@@ -1,0 +1,115 @@
+% z88dk-z80asm -v -run-test=test_obj_wb_show_obj_file t/55-obj-library//input/wb_007.09.o
+--------------------------------------------------------------------------------
+TEST test_obj_wb_show_obj_file
+--------------------------------------------------------------------------------
+Dumping object file: t/55-obj-library/input/wb_007.09.o
+    Loaded sections:
+        strings: not loaded
+        modules: not loaded
+        symbol_index: not loaded
+        symbol_to_module: not loaded
+    Number of modules: 2
+    Object file type: Library
+    Object file version: 9
+    Included modules:
+        Module 0: module1
+        Module 1: module2
+    Found module for public symbol 'public1': module1
+    Found module for public symbol 'public2': module1
+    Public symbol 'nonexistent' not found in any module.
+    ObjLibrary:
+        Modules (2):
+            ObjModule: module1
+                CPU: z80
+                Expressions:
+                    ObjExpr:
+                        Location: file1.asm:123:1
+                        Text: "label1+123"
+                        Range: ByteUnsigned
+                        ASMPC: $1234
+                        Patch ptr: $1235
+                        Opcode size: 0
+                        Section: section1
+                Symbols:
+                    ObjSymbol: label1
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: label2
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public1
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public2
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                ObjExterns:
+                    Symbol: x1
+                    Symbol: x2
+                    Symbol: x3
+                Sections:
+                    ObjSection: section1
+                        Align: 1
+                            C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            ObjModule: module2
+                CPU: z80
+                Expressions:
+                    ObjExpr:
+                        Location: file1.asm:123:1
+                        Text: "label1+123"
+                        Range: ByteUnsigned
+                        ASMPC: $1234
+                        Patch ptr: $1235
+                        Opcode size: 0
+                        Section: section1
+                Symbols:
+                    ObjSymbol: label1
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: label2
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public1
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public2
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                ObjExterns:
+                    Symbol: x1
+                    Symbol: x2
+                    Symbol: x3
+                Sections:
+                    ObjSection: section1
+                        Align: 1
+                            C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    Loaded sections:
+        strings: loaded
+        modules: loaded
+        symbol_index: loaded
+        symbol_to_module: loaded
+

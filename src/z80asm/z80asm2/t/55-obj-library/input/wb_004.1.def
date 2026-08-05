@@ -1,0 +1,46 @@
+; Multi-Module Public Symbols
+begin library
+    begin module
+        name                  = module1
+        cpu                   = z80
+        swap_ixiy             = 0
+        begin symbols
+            begin symbol
+                name          = label1
+                scope         = Local
+                type          = Constant
+                section       = "section1"
+                value         = 0x1234
+                file          = "file1.asm"
+                line          = 123
+            end symbol
+            begin symbol
+                name          = label2
+                scope         = Local
+                type          = Constant
+                section       = "section1"
+                value         = 0x1234
+                file          = "file1.asm"
+                line          = 123
+            end symbol
+            begin symbol
+                name          = public1
+                scope         = Public
+                type          = Constant
+                section       = "section1"
+                value         = 0x1234
+                file          = "file1.asm"
+                line          = 123
+            end symbol
+            begin symbol
+                name          = public2
+                scope         = Local
+                type          = Constant
+                section       = "section1"
+                value         = 0x1234
+                file          = "file1.asm"
+                line          = 123
+            end symbol
+        end symbols
+    end module
+end library
