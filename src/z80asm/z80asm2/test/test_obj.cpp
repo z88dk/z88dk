@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #include "../dump_context.h"
 #include "../obj_file.h"
 #include "../strings.h"
@@ -76,3 +78,5 @@ void test_obj_wb_lookup_symbols(const std::vector<std::string>& args) {
         }
     }
 }
+
+#endif

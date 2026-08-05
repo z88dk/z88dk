@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,3 +17,5 @@ void test_template(const std::vector<std::string>& args) {
     }
     std::cout << std::endl;
 }
+
+#endif
