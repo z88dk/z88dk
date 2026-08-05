@@ -13,6 +13,16 @@ static const char *vol_stamp(const Func *f, int vreg_id)
            ? "\t;volatile" : "";
 }
 
+/* As vol_stamp but keyed on a memory op's own volatile flag (op->mem.volatile_)
+   — for direct volatile-global (IR_MEM_SYM) and volatile-pointee-deref accesses,
+   whose volatility lives on the access, not the dst vreg. Prevents copt from
+   folding e.g. `ld a,(_g); ld l,a; ld h,0` → `ld hl,(_g)` (a 16-bit over-read
+   of a 1-byte volatile). */
+static const char *mem_vol_stamp(const Op *op)
+{
+    return op->mem.volatile_ ? "\t;volatile" : "";
+}
+
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     /* Rematerialisable constant (NO_SLOT, no slot to read): re-emit `ld bc,K` /

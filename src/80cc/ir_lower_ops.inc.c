@@ -2345,10 +2345,11 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                into a trailing 1-byte slot writes one past the frame and
                clobbers the return address. */
             if (op->mem.offset)
-                emit(out, "ld\ta,(_%s+%d)",
-                     ir_sym_name(op->mem.sym), op->mem.offset);
+                emit(out, "ld\ta,(_%s+%d)%s",
+                     ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
             else
-                emit(out, "ld\ta,(_%s)", ir_sym_name(op->mem.sym));
+                emit(out, "ld\ta,(_%s)%s", ir_sym_name(op->mem.sym),
+                     mem_vol_stamp(op));
             commit_a_byte(out, f, op->dst);
             return 0;
         }
@@ -2358,20 +2359,22 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit_gb_word_load_abs(out, ir_sym_name(op->mem.sym),
                                       op->mem.offset, "e", "d");
             else if (op->mem.offset)
-                emit(out, "ld\tde,(_%s+%d)",
-                     ir_sym_name(op->mem.sym), op->mem.offset);
+                emit(out, "ld\tde,(_%s+%d)%s",
+                     ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
             else
-                emit(out, "ld\tde,(_%s)", ir_sym_name(op->mem.sym));
+                emit(out, "ld\tde,(_%s)%s", ir_sym_name(op->mem.sym),
+                     mem_vol_stamp(op));
             cache_de(op->dst);
             return 0;
         }
         if (IS_GBZ80())
             emit_gb_word_load_hl(out, ir_sym_name(op->mem.sym), op->mem.offset);
         else if (op->mem.offset)
-            emit(out, "ld\thl,(_%s+%d)",
-                 ir_sym_name(op->mem.sym), op->mem.offset);
+            emit(out, "ld\thl,(_%s+%d)%s",
+                 ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
         else
-            emit(out, "ld\thl,(_%s)", ir_sym_name(op->mem.sym));
+            emit(out, "ld\thl,(_%s)%s", ir_sym_name(op->mem.sym),
+                 mem_vol_stamp(op));
         commit_hl_word(out, f, op->dst);
         return 0;
     }
