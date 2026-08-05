@@ -7051,8 +7051,19 @@ static int build_stmt(Builder *b, Node *n)
                       ? get_or_create_label_bb(b, n->loop_step_label)
                       : ir_bb_new(b->f);
 
-        /* Pre-test: if counter==0, skip the loop. */
-        ir_emit_br_zero(cur_bb(b), counter, exit_bb);
+        /* Pre-test: if counter==0, skip the loop. When the trip count is a
+           compile-time-constant NON-ZERO literal (`for (i=0;i<K;i++)`, K const)
+           the guard can never fire — mark it a PHANTOM (imm=1): the CFG edge to
+           exit is kept (so the allocator sees the same liveness as a real guard
+           and does not perturb the loop's allocation), but the lowerer emits no
+           code for it (gen_br_zero). Nets the dead `ld a,h; or l; jp z` bytes
+           with zero allocation change. */
+        {
+            Op *g = ir_emit_br_zero(cur_bb(b), counter, exit_bb);
+            if (g && n->loop_init->ast_type == AST_LITERAL
+                && n->loop_init->zval != 0)
+                g->imm = IR_BRZ_PHANTOM;
+        }
         ir_emit_br(cur_bb(b), header_bb);
 
         b->cur_bb_id = header_bb;

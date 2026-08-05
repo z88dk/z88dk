@@ -568,6 +568,15 @@ typedef struct {
     int         line;
 } Op;
 
+/* Phantom zero-trip guard: a BR_ZERO whose tested counter is a proven NONZERO
+   compile-time constant (constant-bound `for`), so it can never branch. Stored
+   in the otherwise-unused op->imm. Kept in the IR — every CFG/liveness/alloc
+   pass treats it as an ordinary BR_ZERO, so the pre-header→exit edge stays
+   visible and the loop's register allocation is unchanged (conservative,
+   analysis-only edge) — but the lowerer (gen_br_zero) emits NO code for it,
+   dropping the dead `ld a,h; or l; jp z`. Set in AST_LOOP_COUNTDOWN. */
+#define IR_BRZ_PHANTOM 1
+
 /* ----- Basic block ------------------------------------------------------ */
 
 typedef struct {

@@ -502,6 +502,10 @@ static void emit_test_zero(FILE *out, Func *f, int src)
 
 static int gen_br_zero(FILE *out, Func *f, const Op *op)
 {
+    /* Phantom zero-trip guard: kept in the IR for the allocator's CFG edge, but
+       provably never taken, so emit NO code — control falls through to the loop
+       header via the following IR_BR. See IR_BRZ_PHANTOM / AST_LOOP_COUNTDOWN. */
+    if (op->imm == IR_BRZ_PHANTOM) return 0;
     emit_test_zero(out, f, op->src[0]);
     emit(out, "jp\tz,L_f%d_bb_%d", L.func_emit_idx, op->label);
     /* For width<=2, HL still holds the tested value (`or l` doesn't touch
