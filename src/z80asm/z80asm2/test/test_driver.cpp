@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #include "test_driver.h"
 #include <iostream>
 #include <string>
@@ -58,3 +60,5 @@ bool run_test(std::string_view test_name,
 #undef X
     return found_test;
 }
+
+#endif
