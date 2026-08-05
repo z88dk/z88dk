@@ -2513,8 +2513,19 @@ int ir_opt_const_fold(Func *f)
     if (nv <= 0) return 0;
     int8_t  *known = calloc((size_t)nv, 1);
     int64_t *val   = calloc((size_t)nv, sizeof(int64_t));
-    if (!known || !val) { free(known); free(val); return 0; }
+    int     *usecnt = calloc((size_t)nv, sizeof(int));
+    if (!known || !val || !usecnt) { free(known); free(val); free(usecnt); return 0; }
     int changed = 0;
+    /* Function-wide use counts — gate the const-widen rewrite (below) to
+       SINGLE-USE sources so it only fires when it makes the source constant
+       dead (strictly a win); rewriting a multi-use source just duplicates the
+       constant and perturbs allocation (queenbench-fp +2). */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+        }
 
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -2634,16 +2645,35 @@ int ir_opt_const_fold(Func *f)
                 if (op->kind == IR_LD_IMM) {
                     known[d] = 1;
                     val[d] = have_mask ? (op->imm & mask) : op->imm;
-                } else if (op->kind == IR_MOV && op->src[0] >= 0
-                           && op->src[0] < nv && known[op->src[0]]) {
-                    known[d] = 1; val[d] = val[op->src[0]];
-                } else if (op->kind == IR_CONV_TRUNC && op->src[0] >= 0
-                           && op->src[0] < nv && known[op->src[0]]) {
-                    /* Narrowing a known constant stays constant (masked to the
-                       dst width) — lets a `(unsigned char)K` store fold to an
-                       immediate. */
-                    known[d] = 1;
-                    val[d] = have_mask ? (val[op->src[0]] & mask) : val[op->src[0]];
+                } else if (op->src[0] >= 0 && op->src[0] < nv
+                           && known[op->src[0]] && usecnt[op->src[0]] == 1
+                           && (op->kind == IR_CONV_ZX || op->kind == IR_CONV_SX
+                               || op->kind == IR_CONV_TRUNC
+                               || (op->kind == IR_MOV
+                                   && f->vregs[op->src[0]].width != w))) {
+                    /* [const-widen] A WIDTH-CHANGING copy/cast of a known constant
+                       is itself that constant (ZX = the value; TRUNC/dst-mask
+                       narrows; SX sign-extends from the source width; a width-
+                       changing MOV is the frontend's widen). REWRITE to a direct
+                       LD_IMM so the def lowers as `ld rr,K` and the source
+                       constant, if now unused, is DCE'd — kills the
+                       `ld a,K; ld l,a; ld h,0` byte-materialise-then-widen of a
+                       small constant loop bound (& friends). SAME-width const MOVs
+                       are left to copy-prop: rewriting them perturbs allocation
+                       (structbench-sp +12) for no materialise saving. */
+                    int64_t sv = val[op->src[0]];
+                    if (op->kind == IR_CONV_SX) {
+                        switch (f->vregs[op->src[0]].width) {
+                        case 1: sv = (int64_t)(int8_t)sv;  break;
+                        case 2: sv = (int64_t)(int16_t)sv; break;
+                        case 4: sv = (int64_t)(int32_t)sv; break;
+                        }
+                    }
+                    sv = have_mask ? (sv & mask) : sv;
+                    op->kind = IR_LD_IMM; op->imm = sv;
+                    op->src[0] = -1; op->src[1] = -1;
+                    changed++;
+                    known[d] = 1; val[d] = sv;
                 } else {
                     known[d] = 0;
                 }
@@ -2651,7 +2681,7 @@ int ir_opt_const_fold(Func *f)
             #undef KCONST
         }
     }
-    free(known); free(val);
+    free(known); free(val); free(usecnt);
     return changed;
 }
 
