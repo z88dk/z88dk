@@ -131,7 +131,9 @@ clean:
 	$(RM) $(CLEAN_FILES) $(TIDY_STAMP)
 	$(RM) -r build
 
-install: $(RELEASE_EXE)
+install: $(RELEASE_EXE) tools/ObjModule.pm
 	$(INSTALL) $(RELEASE_EXE) $(PREFIX)/bin/$(PROJ)$(EXE)
+	$(INSTALL) ObjModule.pm $(PREFIX)/bin/ObjModule.pm
+	$(INSTALL) z80objcopy.pl $(PREFIX)/bin/z80objcopy.pl
 
 -include $(DEBUG_DEPENDS) $(RELEASE_DEPENDS)
