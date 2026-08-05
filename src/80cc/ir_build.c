@@ -7488,6 +7488,22 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
         }
     }
 
+    /* Volatile correctness: a DIRECT access to a volatile global (IR_MEM_SYM)
+       must never be CSE'd or forwarded away — each read/write is an observable
+       side effect. The per-access builders stamp mem.volatile_ for pointer
+       derefs, but the direct-symbol paths did not, so ir_opt's st2ld/cse would
+       fold e.g. `vg + vg` to a single load. Normalise centrally here — after the
+       body is built, before ir_lower runs ir_opt — from the symbol's own type. */
+    for (int vb = 0; vb < f->n_bbs; vb++)
+        for (int vj = 0; vj < f->bbs[vb].n_ops; vj++) {
+            Op *o = &f->bbs[vb].ops[vj];
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_SYM && o->mem.sym
+                && o->mem.sym->ctype
+                && type_or_pointee_volatile(o->mem.sym->ctype))
+                o->mem.volatile_ = 1;
+        }
+
     rc = ir_lower_to_output(f);
     /* ir_lower has no build_fail of its own, so a lowering failure (nonzero
        return) would be a SILENT, undiagnosed fatal bail. Name it here.
