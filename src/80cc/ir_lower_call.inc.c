@@ -85,7 +85,8 @@ static int gen_call(FILE *out, Func *f, const Op *op)
            across this call), so they add no BC-save — Part 1. */
         for (int i = 0; i < f->n_vregs; i++) {
             if (f->vreg_to_phys[i] == IR_PR_BC
-                && !(f->vregs[i].flags & IR_VREG_BC_PACK)) { bc_saved = 1; break; }
+                && !(f->vregs[i].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT)))
+                { bc_saved = 1; break; }
         }
     }
     if (bc_saved) {
@@ -845,7 +846,8 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
     int hc_bc_saved = 0;
     for (int i = 0; i < f->n_vregs; i++) {
         if (f->vreg_to_phys[i] == IR_PR_BC
-            && !(f->vregs[i].flags & IR_VREG_BC_PACK)) { hc_bc_saved = 1; break; }
+            && !(f->vregs[i].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT)))
+            { hc_bc_saved = 1; break; }
     }
     if (hc_bc_saved) {
         emit_sp(out, 2, "push\tbc");

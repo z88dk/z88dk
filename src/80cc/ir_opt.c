@@ -1076,6 +1076,10 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
     int cmp_bb = ib, cmp_idx = ii;
     Op *cmp = &f->bbs[cmp_bb].ops[cmp_idx];
     if (cmp->kind != IR_CMP_LT && cmp->kind != IR_CMP_ULT) return 0;
+    /* Original signedness of the exit test, captured before the rewrite to the
+       unsigned pointer compare below. An UNSIGNED bound is provably >= 0, so the
+       variable-bound max(0,n) clamp is dead — p_end = base + n*scale directly. */
+    int cmp_is_unsigned = (cmp->kind == IR_CMP_ULT);
     int iv = cmp->src[0];
     int c = -1;
     for (int t = 0; t < n_cand; t++)
@@ -1153,24 +1157,34 @@ static int ivsr_try_lftr(Func *f, int lo, int hi, int ph,
         else { ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.imm = end_off; }
         licm_insert_before_terminator(&f->bbs[ph], &o);
     } else {
-        /* neff = max(0, n), branchlessly and with only reliable ops (80cc has
-           no arithmetic >> — IR_SHR is logical, #289 — and a standalone
-           compare-to-value mis-lowers here):
-             sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
-             mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
-             neff = n & mask            (n if n>=0, 0 if n<0) */
-        ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
-        licm_insert_before_terminator(&f->bbs[ph], &o);
-        ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
-        licm_insert_before_terminator(&f->bbs[ph], &o);
-        ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
-        licm_insert_before_terminator(&f->bbs[ph], &o);
-        if (sh > 0) {
-            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = v_neff; o.imm = sh;
+        /* neff = the effective (clamped) bound. For a SIGNED bound, n may be
+           negative and the unsigned pointer compare would run a 0-trip loop as a
+           huge wrapped one, so clamp to max(0, n). For an UNSIGNED bound n >= 0
+           already, so neff = n directly — the clamp (SHR;SUB;AND, ~18B) is dead. */
+        int neff = bound_v;
+        if (!cmp_is_unsigned) {
+            /* max(0, n), branchlessly with only reliable ops (80cc has no
+               arithmetic >> — IR_SHR is logical, #289 — and a standalone
+               compare-to-value mis-lowers here):
+                 sb   = (unsigned)n >> 15   (0 if n>=0, 1 if n<0)   [logical shift]
+                 mask = sb - 1              (0xFFFF if n>=0, 0 if n<0)
+                 neff = n & mask            (n if n>=0, 0 if n<0) */
+            ivsr_init_op(&o, IR_SHR); o.dst = v_b; o.src[0] = bound_v; o.imm = 15;
             licm_insert_before_terminator(&f->bbs[ph], &o);
+            ivsr_init_op(&o, IR_SUB); o.dst = v_m; o.src[0] = v_b; o.imm = 1;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            ivsr_init_op(&o, IR_AND); o.dst = v_neff; o.src[0] = bound_v; o.src[1] = v_m;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            neff = v_neff;
+        }
+        int v_sc = neff;
+        if (sh > 0) {
+            ivsr_init_op(&o, IR_SHL); o.dst = v_scaled; o.src[0] = neff; o.imm = sh;
+            licm_insert_before_terminator(&f->bbs[ph], &o);
+            v_sc = v_scaled;
         }
         /* p_end = base + neff*scale. */
-        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_scaled;
+        ivsr_init_op(&o, IR_ADD); o.dst = pend; o.src[0] = base; o.src[1] = v_sc;
         licm_insert_before_terminator(&f->bbs[ph], &o);
     }
     return 1;
@@ -2499,8 +2513,19 @@ int ir_opt_const_fold(Func *f)
     if (nv <= 0) return 0;
     int8_t  *known = calloc((size_t)nv, 1);
     int64_t *val   = calloc((size_t)nv, sizeof(int64_t));
-    if (!known || !val) { free(known); free(val); return 0; }
+    int     *usecnt = calloc((size_t)nv, sizeof(int));
+    if (!known || !val || !usecnt) { free(known); free(val); free(usecnt); return 0; }
     int changed = 0;
+    /* Function-wide use counts — gate the const-widen rewrite (below) to
+       SINGLE-USE sources so it only fires when it makes the source constant
+       dead (strictly a win); rewriting a multi-use source just duplicates the
+       constant and perturbs allocation (queenbench-fp +2). */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int u[16]; int nu = ir_op_uses(&f->bbs[b].ops[j], u, 16);
+            for (int t = 0; t < nu; t++)
+                if (u[t] >= 0 && u[t] < nv) usecnt[u[t]]++;
+        }
 
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -2620,16 +2645,35 @@ int ir_opt_const_fold(Func *f)
                 if (op->kind == IR_LD_IMM) {
                     known[d] = 1;
                     val[d] = have_mask ? (op->imm & mask) : op->imm;
-                } else if (op->kind == IR_MOV && op->src[0] >= 0
-                           && op->src[0] < nv && known[op->src[0]]) {
-                    known[d] = 1; val[d] = val[op->src[0]];
-                } else if (op->kind == IR_CONV_TRUNC && op->src[0] >= 0
-                           && op->src[0] < nv && known[op->src[0]]) {
-                    /* Narrowing a known constant stays constant (masked to the
-                       dst width) — lets a `(unsigned char)K` store fold to an
-                       immediate. */
-                    known[d] = 1;
-                    val[d] = have_mask ? (val[op->src[0]] & mask) : val[op->src[0]];
+                } else if (op->src[0] >= 0 && op->src[0] < nv
+                           && known[op->src[0]] && usecnt[op->src[0]] == 1
+                           && (op->kind == IR_CONV_ZX || op->kind == IR_CONV_SX
+                               || op->kind == IR_CONV_TRUNC
+                               || (op->kind == IR_MOV
+                                   && f->vregs[op->src[0]].width != w))) {
+                    /* [const-widen] A WIDTH-CHANGING copy/cast of a known constant
+                       is itself that constant (ZX = the value; TRUNC/dst-mask
+                       narrows; SX sign-extends from the source width; a width-
+                       changing MOV is the frontend's widen). REWRITE to a direct
+                       LD_IMM so the def lowers as `ld rr,K` and the source
+                       constant, if now unused, is DCE'd — kills the
+                       `ld a,K; ld l,a; ld h,0` byte-materialise-then-widen of a
+                       small constant loop bound (& friends). SAME-width const MOVs
+                       are left to copy-prop: rewriting them perturbs allocation
+                       (structbench-sp +12) for no materialise saving. */
+                    int64_t sv = val[op->src[0]];
+                    if (op->kind == IR_CONV_SX) {
+                        switch (f->vregs[op->src[0]].width) {
+                        case 1: sv = (int64_t)(int8_t)sv;  break;
+                        case 2: sv = (int64_t)(int16_t)sv; break;
+                        case 4: sv = (int64_t)(int32_t)sv; break;
+                        }
+                    }
+                    sv = have_mask ? (sv & mask) : sv;
+                    op->kind = IR_LD_IMM; op->imm = sv;
+                    op->src[0] = -1; op->src[1] = -1;
+                    changed++;
+                    known[d] = 1; val[d] = sv;
                 } else {
                     known[d] = 0;
                 }
@@ -2637,7 +2681,7 @@ int ir_opt_const_fold(Func *f)
             #undef KCONST
         }
     }
-    free(known); free(val);
+    free(known); free(val); free(usecnt);
     return changed;
 }
 

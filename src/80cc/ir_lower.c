@@ -390,6 +390,21 @@ static int  a_carry_enabled(void)
     return a_carry_on;
 }
 
+/* IR_REMAT_LEA: rematerialise &local frame-slot addresses (see the remat table in
+   ir_lower_func). Default ON after the gauntlet — full byte matrix 0-regress all 9
+   CPUs sp+fp (−747B), ticks 0-slower (interpbench pure win, ez80-fp excluded as a
+   byte-for-tick), long_ir + run-matrix green, real files byte-identical. IR_REMAT_LEA=0
+   opts out (byte-identical to pre-flip). */
+static int  remat_lea_on = -1;
+static int  remat_lea_enabled(void)
+{
+    if (remat_lea_on < 0) {
+        const char *e = getenv("IR_REMAT_LEA");
+        remat_lea_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_REMAT_LEA=0 opts out */
+    }
+    return remat_lea_on;
+}
+
 /* IR_HL_CARRY (opt-in, WIP): the same invalidate-by-default tracker extended to
    HL and DE — the vehicle for HL/DE operand-residency carry (the #2 size bucket).
    Increment 0 = the inert safety net: rs.hl/rs.de survive across raw emits and are
@@ -3734,10 +3749,18 @@ int ir_lower_func(FILE *out, Func *f)
            value's `pop hl`; bitfield store miscompile). Keep those slotted — their
            pre-change behaviour (read-remat + slot) is correct. */
         int *store_base = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+        /* remat-LEA is gated to CALLLESS functions (see the [IR_REMAT_LEA] note):
+           recomputing a frame-slot address mid-call-argument-marshalling would need
+           cur_sp_adjust to reflect the already-pushed args, and a &local passed to a
+           call is the concrete failure (sortbench qsort_rec's cmp(&v[j],&pivot)). A
+           function with no IR_CALL has no such marshalling, so every remat point is
+           sp-adjust-safe. */
+        int func_has_call = 0;
         if (ndef && store_base) {
             for (int b = 0; b < f->n_bbs; b++)
                 for (int j = 0; j < f->bbs[b].n_ops; j++) {
                     const Op *so = &f->bbs[b].ops[j];
+                    if (so->kind == IR_CALL) func_has_call = 1;
                     if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
                         && so->mem.base >= 0 && so->mem.base < f->n_vregs)
                         store_base[so->mem.base] = 1;
@@ -3766,6 +3789,28 @@ int ir_lower_func(FILE *out, Func *f)
                         rd = o;
                     else if (o->kind == IR_LD_SYM && o->mem.sym
                              && !ns_sym_bails(o->mem.sym))
+                        rd = o;
+                    /* [IR_REMAT_LEA] Frame-slot address (&local) rematerialises:
+                       recompute at each use (emit_remat_word: `ld hl,slot_off+
+                       cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
+                       offset is fixed per function and cur_sp_adjust is tracked, so
+                       fp==sp with only the target pair clobbered (no IX/DE gymnastics).
+                       EXCLUSIONS, each a measured non-win:
+                       - byte-wise CPUs (808x/gbz80): spill LEA values as data-stack
+                         transients (PR_STACK push/pop) not frame slots, so dropping
+                         the slot shifts the stack and offsets go inconsistent (irgaps
+                         miscompiles — the deferred "extend" step);
+                       - ez80 in FP mode: its cheap `lea`/`ld hl,(ix+d)` addressing
+                         register-homes LEAs, so per-use recompute in a hot loop is a
+                         byte-for-tick LOSS (interpbench ez80-fp −27B but +4.6% ticks).
+                         ez80-SP keeps it: sp addressing is dear there, so it is a pure
+                         win (−117B, −6.6% ticks).
+                       Store-base LEAs keep their slot (below). Default-on;
+                       IR_REMAT_LEA=0 opts out. */
+                    else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
+                             && !(IS_808x() || IS_GBZ80())
+                             && !(IS_EZ80() && fp_active(f))
+                             && remat_lea_enabled())
                         rd = o;
                     if (rd) {
                         g_hc.remat_def[d] = rd;
@@ -5303,6 +5348,23 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 rc = lower_op(out, f, op);
             }
             if (verify_on > 0 || clob_verify_on > 0) { verify_buf[verify_len] = 0; ir_verify_op(f, op, verify_buf); }
+            /* [IR_CALLSPLIT] A def of a call-split value OUTSIDE its BC span
+               writes the slot (its canonical home) but does NOT update BC, so a
+               BC belief left over from the span now LIES (holds the pre-def
+               value). Drop it so a later out-of-span read reloads from the
+               coherent slot. (In-span defs don't occur — selection requires the
+               span read-only — but the ir_home_at guard makes this a no-op there,
+               where BC legitimately holds the value.) */
+            {
+                int dd[8]; int nd = ir_op_defs(op, dd, 8);
+                for (int k = 0; k < nd; k++) {
+                    int dv = dd[k];
+                    if (dv >= 0 && dv < f->n_vregs
+                        && (f->vregs[dv].flags & IR_VREG_CALL_SPLIT)
+                        && L.rs.bc == dv && ir_home_at(f, dv) != IR_PR_BC)
+                        invalidate_bc_cache();
+                }
+            }
             L.ss_cur_g = -1;
             if (rc != 0) goto cleanup_err;
             if (L.la.cur_skip_next_op) {

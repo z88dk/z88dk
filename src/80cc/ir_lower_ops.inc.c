@@ -79,7 +79,19 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
        `ld hl,K` at the source drops that
        DE value; copt #DE9 does the flatten safely, only when `pop de` follows
        (proving DE dead). */
-    if (L.la.cur_dst_dead) {
+    /* DE-direct copt-miss fix (#DE6/#DE-glob, real-file): when the dst takes NO
+       store — a remat const or a PR_HL home — the DE path degenerates to
+       `ld de,K; ex de,hl` (spill_de_unless_dead's bare-ex branch), where `ld hl,K`
+       is 1B shorter. The only value the `ex de,hl` preserves is the OLD HL (into
+       DE); flatten iff that tenant is DROPPABLE (dead / slot-backed / remat — a
+       reader recovers it without the DE copy), so a consumer never strands. copt
+       can't do this: it needs the HL-dead liveness and the pair often straddles a
+       label/BB edge (branch-const / return-const). */
+    int hl_free = (L.rs.hl < 0) || (L.rs.hl == op->dst)
+                  || hlde_belief_droppable(L.rs.hl);
+    int hl_dst  = vreg_is_remat(f, op->dst)
+                  || ir_home_at(f, op->dst) == IR_PR_HL;
+    if (L.la.cur_dst_dead || (hl_free && hl_dst)) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
@@ -355,8 +367,14 @@ static int gen_inc(FILE *out, Func *f, const Op *op)
     /* Walking pointer homed in BC/DE (e.g. a char* stepped `p++`): bump it
        in place with `inc bc`/`inc de` instead of the ld hl,bc / inc hl /
        ld bc,hl copy-out-and-back. Mirror of the idx2 counter case above.
-       IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref). */
+       IR_NO_GPDEREF opts out (paired with the (bc)/(de) deref).
+       EXCLUDE a call-split value: it is BC-resident only inside its span and
+       its frame slot must stay coherent (write-both) — a bare `inc bc` updates
+       BC but NOT the slot, so a later out-of-span read (or a compare that reads
+       the slot on a cold belief) sees the stale pre-increment value. Falling
+       through to load_to_hl; inc hl; commit_hl_word does the write-both store. */
     if (op->dst == op->src[0] && !opt_disabled("gpderef")
+        && !(f->vregs[op->dst].flags & IR_VREG_CALL_SPLIT)
         && (vreg_in_pr_bc(f, op->dst) || vreg_in_pr_de(f, op->dst))) {
         emit(out, vreg_in_pr_bc(f, op->dst) ? "inc\tbc" : "inc\tde");
         if (hl_has(op->dst)) invalidate_hl_cache();
@@ -484,6 +502,10 @@ static void emit_test_zero(FILE *out, Func *f, int src)
 
 static int gen_br_zero(FILE *out, Func *f, const Op *op)
 {
+    /* Phantom zero-trip guard: kept in the IR for the allocator's CFG edge, but
+       provably never taken, so emit NO code — control falls through to the loop
+       header via the following IR_BR. See IR_BRZ_PHANTOM / AST_LOOP_COUNTDOWN. */
+    if (op->imm == IR_BRZ_PHANTOM) return 0;
     emit_test_zero(out, f, op->src[0]);
     emit(out, "jp\tz,L_f%d_bb_%d", L.func_emit_idx, op->label);
     /* For width<=2, HL still holds the tested value (`or l` doesn't touch
@@ -1168,7 +1190,8 @@ static int func_has_pr_bc(const Func *f)
     if (!f->vreg_to_phys) return 0;
     for (int i = 0; i < f->n_vregs; i++)
         if (f->vreg_to_phys[i] == IR_PR_BC
-            && !(f->vregs[i].flags & IR_VREG_BC_PACK)) return 1;
+            && !(f->vregs[i].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT)))
+            return 1;
     return 0;
 }
 
@@ -2322,10 +2345,11 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                into a trailing 1-byte slot writes one past the frame and
                clobbers the return address. */
             if (op->mem.offset)
-                emit(out, "ld\ta,(_%s+%d)",
-                     ir_sym_name(op->mem.sym), op->mem.offset);
+                emit(out, "ld\ta,(_%s+%d)%s",
+                     ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
             else
-                emit(out, "ld\ta,(_%s)", ir_sym_name(op->mem.sym));
+                emit(out, "ld\ta,(_%s)%s", ir_sym_name(op->mem.sym),
+                     mem_vol_stamp(op));
             commit_a_byte(out, f, op->dst);
             return 0;
         }
@@ -2335,20 +2359,22 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 emit_gb_word_load_abs(out, ir_sym_name(op->mem.sym),
                                       op->mem.offset, "e", "d");
             else if (op->mem.offset)
-                emit(out, "ld\tde,(_%s+%d)",
-                     ir_sym_name(op->mem.sym), op->mem.offset);
+                emit(out, "ld\tde,(_%s+%d)%s",
+                     ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
             else
-                emit(out, "ld\tde,(_%s)", ir_sym_name(op->mem.sym));
+                emit(out, "ld\tde,(_%s)%s", ir_sym_name(op->mem.sym),
+                     mem_vol_stamp(op));
             cache_de(op->dst);
             return 0;
         }
         if (IS_GBZ80())
             emit_gb_word_load_hl(out, ir_sym_name(op->mem.sym), op->mem.offset);
         else if (op->mem.offset)
-            emit(out, "ld\thl,(_%s+%d)",
-                 ir_sym_name(op->mem.sym), op->mem.offset);
+            emit(out, "ld\thl,(_%s+%d)%s",
+                 ir_sym_name(op->mem.sym), op->mem.offset, mem_vol_stamp(op));
         else
-            emit(out, "ld\thl,(_%s)", ir_sym_name(op->mem.sym));
+            emit(out, "ld\thl,(_%s)%s", ir_sym_name(op->mem.sym),
+                 mem_vol_stamp(op));
         commit_hl_word(out, f, op->dst);
         return 0;
     }
@@ -3671,6 +3697,20 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         commit_hl_result(out, f, op->dst);
         return 0;
     }
+    /* One operand HL-resident, the OTHER already in BC: `add hl,bc` directly.
+       add is commutative, so this skips staging src1 into DE (the generic
+       `ex de,hl; ld hl,bc; add hl,de`) — 1 byte, and crucially leaves DE
+       untouched, so a DE-resident accumulator across the add isn't spilled to a
+       slot (the IVSR walking-pointer bound `base(BC) + idx(HL)` shape). BC holds
+       the value on entry AND after (add hl,bc doesn't write BC), so its cache
+       stays valid. */
+    if (op->src[1] >= 0
+        && ((hl_has(op->src[0]) && bc_has(op->src[1]))
+            || (hl_has(op->src[1]) && bc_has(op->src[0])))) {
+        emit(out, "add\thl,bc");
+        commit_hl_result(out, f, op->dst);
+        return 0;
+    }
     if (try_binop_ixd_fold(out, f, op, "add\ta,", "adc\ta,")) return 0;
     load_binop_operands(out, f, op);
     emit(out, "add\thl,de");
@@ -3950,6 +3990,32 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
             emit(out, "ex\tde,hl");                 /* DEHL = result */
             store_dehl_finalize(out, f, op->dst);
         }
+        return 0;
+    }
+    /* Subtrahend already in BC, minuend in HL: subtract straight from BC, no
+       staging of src1 into DE (DE preserved — a DE-resident accumulator across
+       the sub survives). sub is NOT commutative, so ONLY this role mapping
+       (HL=minuend, BC=subtrahend) works — no swap. z80-family: `and a; sbc hl,bc`.
+       808x/gbz80 (sbc hl,de is emulated): the same byte-wise subtract off C/B
+       instead of E/D — into DE when that's the dst (mirrors the load_binop path
+       below). Rabbit has native `sub hl,de` but no BC form → falls through. */
+    if (op->src[1] >= 0 && bc_has(op->src[1]) && !IS_RABBIT()
+        && L.pending_spill_v < 0) {
+        load_to_hl(out, f, op->src[0]);       /* minuend → HL (preserves BC) */
+        if (IS_808x() || IS_GBZ80()) {
+            if (vreg_is_pr_de(f, op->dst)) {
+                emit(out, "ld\ta,l"); emit(out, "sub\tc"); emit(out, "ld\te,a");
+                emit(out, "ld\ta,h"); emit(out, "sbc\ta,b"); emit(out, "ld\td,a");
+                cache_de(op->dst);
+                return 0;
+            }
+            emit(out, "ld\ta,l"); emit(out, "sub\tc"); emit(out, "ld\tl,a");
+            emit(out, "ld\ta,h"); emit(out, "sbc\ta,b"); emit(out, "ld\th,a");
+        } else {
+            emit(out, "and\ta");
+            emit(out, "sbc\thl,bc");
+        }
+        commit_hl_result(out, f, op->dst);
         return 0;
     }
     if (try_binop_ixd_fold(out, f, op, "sub\t", "sbc\ta,")) return 0;

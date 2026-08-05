@@ -863,6 +863,12 @@ static int vreg_slot_deferrable(const Func *f, int v)
     if (f->vregs[v].flags
         & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE | IR_VREG_PARAM))
         return 0;
+    /* [IR_CALLSPLIT] A call-split value is PR_BC only inside its span, SPILL
+       (slot-homed) at its def. Its slot store feeds the in-span reload, so it
+       must NEVER be deferred/elided — the point-aware register-pool check below
+       would wrongly suppress the in-span reload record (BC there) while the
+       out-of-span store IS recorded, making the store look dead. */
+    if (f->vregs[v].flags & IR_VREG_CALL_SPLIT) return 0;
     if (vreg_in_register_pool(f, v)) return 0;
     return 1;
 }
@@ -1065,14 +1071,25 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
         if (f->vreg_to_phys[vreg] == IR_PR_BC) {
             emit(out, "ld\tbc,hl");
             cache_bc(vreg);
+            /* [IR_CALLSPLIT] A call-split value is BC-resident only inside its
+               span; its frame slot is the canonical home. An in-span DEF must
+               keep the slot COHERENT (out-of-span reads read it, and a mid-span
+               BC clobber falls back to it — the read-only safety net) so we write
+               BOTH: the BC copy above for cheap in-span reads, and the slot store
+               below. HL still holds the value here (ld bc,hl doesn't touch it), so
+               fall through to the ordinary slot store instead of returning. */
+            if (!(f->vregs[vreg].flags & IR_VREG_CALL_SPLIT))
+                return;
         } else if (vreg_idx_home(f, vreg) != IR_PR_NONE) {
             /* Word result → an index home (idx2/idx3): move HL into IX/IY.
                `push hl; pop <idx>` (or rabbit `ld <idx>,hl`) preserves HL so the
                caller's cache_hl still advertises it, and needs no scratch. Used
                by the idx3 loop-carried word update (e.g. `lo = mid + 1`). */
             emit_hl_to_idx_word(out, f, vreg);
+            return;
+        } else {
+            return;
         }
-        return;
     }
     ss_note_store(f, vreg);
     if (ss_store_dead_here()) {

@@ -7051,8 +7051,19 @@ static int build_stmt(Builder *b, Node *n)
                       ? get_or_create_label_bb(b, n->loop_step_label)
                       : ir_bb_new(b->f);
 
-        /* Pre-test: if counter==0, skip the loop. */
-        ir_emit_br_zero(cur_bb(b), counter, exit_bb);
+        /* Pre-test: if counter==0, skip the loop. When the trip count is a
+           compile-time-constant NON-ZERO literal (`for (i=0;i<K;i++)`, K const)
+           the guard can never fire — mark it a PHANTOM (imm=1): the CFG edge to
+           exit is kept (so the allocator sees the same liveness as a real guard
+           and does not perturb the loop's allocation), but the lowerer emits no
+           code for it (gen_br_zero). Nets the dead `ld a,h; or l; jp z` bytes
+           with zero allocation change. */
+        {
+            Op *g = ir_emit_br_zero(cur_bb(b), counter, exit_bb);
+            if (g && n->loop_init->ast_type == AST_LITERAL
+                && n->loop_init->zval != 0)
+                g->imm = IR_BRZ_PHANTOM;
+        }
         ir_emit_br(cur_bb(b), header_bb);
 
         b->cur_bb_id = header_bb;
@@ -7476,6 +7487,22 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
             }
         }
     }
+
+    /* Volatile correctness: a DIRECT access to a volatile global (IR_MEM_SYM)
+       must never be CSE'd or forwarded away — each read/write is an observable
+       side effect. The per-access builders stamp mem.volatile_ for pointer
+       derefs, but the direct-symbol paths did not, so ir_opt's st2ld/cse would
+       fold e.g. `vg + vg` to a single load. Normalise centrally here — after the
+       body is built, before ir_lower runs ir_opt — from the symbol's own type. */
+    for (int vb = 0; vb < f->n_bbs; vb++)
+        for (int vj = 0; vj < f->bbs[vb].n_ops; vj++) {
+            Op *o = &f->bbs[vb].ops[vj];
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_SYM && o->mem.sym
+                && o->mem.sym->ctype
+                && type_or_pointee_volatile(o->mem.sym->ctype))
+                o->mem.volatile_ = 1;
+        }
 
     rc = ir_lower_to_output(f);
     /* ir_lower has no build_fail of its own, so a lowering failure (nonzero

@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 
 #ifndef __CPU_GBZ80__
-#define CTYPE_PRESERVE __preserves_regs(b,c,d,e,ix,iy);
+#define CTYPE_PRESERVE __preserves_regs(b,c,d,e,iyl,iyh);
 #else
 #define CTYPE_PRESERVE __preserves_regs(b,c);
 #endif

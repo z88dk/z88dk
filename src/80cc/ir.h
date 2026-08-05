@@ -131,6 +131,16 @@ typedef enum {
                                         ir_assign_slots drops its slot → frame shrinks →
                                         deadframe frameless. Set on the re-lower once
                                         the read/write split proves it dead. */
+    IR_VREG_CALL_SPLIT     = 1 << 11, /* [IR_CALLSPLIT] call-bounded live-range split:
+                                        a spilled reused word value made BC-resident
+                                        (vreg_to_phys=IR_PR_BC) only inside a call-free
+                                        span [home_lo,home_hi] with >=3 reads and NO
+                                        in-span write, spilled (slot-homed) elsewhere.
+                                        Read-only-in-span so the slot stays coherent
+                                        by construction: BC is an opportunistic cache
+                                        (entry reload via emit_bc_reload on a cold
+                                        belief), no exit spill. ir_assign_slots keeps
+                                        its slot despite the PR_BC home. */
 } VRegFlags;
 
 typedef struct {
@@ -557,6 +567,15 @@ typedef struct {
     const char *file;
     int         line;
 } Op;
+
+/* Phantom zero-trip guard: a BR_ZERO whose tested counter is a proven NONZERO
+   compile-time constant (constant-bound `for`), so it can never branch. Stored
+   in the otherwise-unused op->imm. Kept in the IR — every CFG/liveness/alloc
+   pass treats it as an ordinary BR_ZERO, so the pre-header→exit edge stays
+   visible and the loop's register allocation is unchanged (conservative,
+   analysis-only edge) — but the lowerer (gen_br_zero) emits NO code for it,
+   dropping the dead `ld a,h; or l; jp z`. Set in AST_LOOP_COUNTDOWN. */
+#define IR_BRZ_PHANTOM 1
 
 /* ----- Basic block ------------------------------------------------------ */
 

@@ -13,6 +13,16 @@ static const char *vol_stamp(const Func *f, int vreg_id)
            ? "\t;volatile" : "";
 }
 
+/* As vol_stamp but keyed on a memory op's own volatile flag (op->mem.volatile_)
+   — for direct volatile-global (IR_MEM_SYM) and volatile-pointee-deref accesses,
+   whose volatility lives on the access, not the dst vreg. Prevents copt from
+   folding e.g. `ld a,(_g); ld l,a; ld h,0` → `ld hl,(_g)` (a 16-bit over-read
+   of a 1-byte volatile). */
+static const char *mem_vol_stamp(const Op *op)
+{
+    return op->mem.volatile_ ? "\t;volatile" : "";
+}
+
 static void emit_bc_reload(FILE *out, const Func *f, int vreg_id, int sp_adj)
 {
     /* Rematerialisable constant (NO_SLOT, no slot to read): re-emit `ld bc,K` /
@@ -204,6 +214,23 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
     if (!o) return 0;
     if (o->kind == IR_LD_IMM) {
         emit(out, "ld\t%s,%lld", rp, (long long)o->imm);
+        return 1;
+    }
+    /* [remat-LEA] Frame-slot address (&local): recompute at the use instead of
+       spilling+reloading, via `ld hl,slot_off+cur_sp_adjust; add hl,sp` then a move
+       to de/bc (portable `ld d,h;ld e,l` — gbz80 has no `ex de,hl`). Clobbers ONLY
+       the target pair; the address is sp-relative and cur_sp_adjust is tracked, so
+       fp works the same as sp. (An ez80-fp `lea rr,ix+d` form existed but was a
+       byte-for-tick loss — ez80-fp is excluded from remat marking; see ir_lower.c.) */
+    if (o->kind == IR_LEA && o->src[0] >= 0 && o->src[0] < f->n_vregs) {
+        int src = o->src[0];
+        emit(out, "ld\thl,%d", slot_off(f, src) + L.cur_sp_adjust);
+        emit(out, "add\thl,sp");
+        if (!strcmp(rp, "hl"))
+            return 1;                                /* HL = addr; caller cache_hl */
+        if (!strcmp(rp, "de")) { emit(out, "ld\td,h"); emit(out, "ld\te,l"); }
+        else                   { emit(out, "ld\tc,l"); emit(out, "ld\tb,h"); }
+        invalidate_hl_cache();                       /* HL overwritten by the recompute */
         return 1;
     }
     /* LD_SYM: &sym (+offset) — mirror gen_ld_sym's symbol formatting. */
