@@ -621,6 +621,17 @@
 	ld	hl,(_%1)
 	ld	h,0
 
+;; #IR: `ld a,l; ld l,a` is a redundant round-trip — after `ld a,l` we have A==L,
+;; so `ld l,a` writes L=L (a no-op on L), and A was already clobbered by `ld a,l`
+;; so dropping the write-back changes nothing. Drop the dead `ld l,a` (-1b).
+;; Arises when a byte value already in L is widened via A (`ld a,l; ld l,a; ld h,0`)
+;; — e.g. a char-return caller zero-extending the result. Unconditional/safe.
+%title #IR drop redundant ld l,a after ld a,l (a==l already, l unchanged) (-1b)
+	ld	a,l
+	ld	l,a
+=
+	ld	a,l
+
 %title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). NOT ez80: ld de,(hl)/ld hl,(hl) READ the reg there, so the ex may be a live deref
 %notcpu ez80
 %notcpu ez80_z80
