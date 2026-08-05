@@ -1,32 +1,28 @@
-% z88dk-z80asm -v -run-test=test_obj_wb_show_obj_file t/55-obj-library//input/wb_001.1.o
+% z88dk-z80asm -v -run-test=test_obj_wb_show_obj_file t/55-obj-library//input/wb_003.1.o
 --------------------------------------------------------------------------------
 TEST test_obj_wb_show_obj_file
 --------------------------------------------------------------------------------
-Dumping object file: t/55-obj-library/input/wb_001.1.o
+Dumping object file: t/55-obj-library/input/wb_003.1.o
     Loaded sections:
         strings: not loaded
-        modname: not loaded
-        exprs: not loaded
-        relocs: not loaded
-        symbols: not loaded
-        externs: not loaded
-        sections: not loaded
+        modules: not loaded
+        symbol_index: not loaded
+        symbol_to_module: not loaded
     Number of modules: 1
-    Object file type: Object
+    Object file type: Library
     Object file version: 19
     Included modules:
         Module 0: module1
     Public symbol 'public1' not found in any module.
     Public symbol 'public2' not found in any module.
     Public symbol 'nonexistent' not found in any module.
-    ObjModule: module1
-        CPU: z80
+    ObjLibrary:
+        Modules (1):
+            ObjModule: module1
+                CPU: z80
     Loaded sections:
         strings: loaded
-        modname: loaded
-        exprs: loaded
-        relocs: loaded
-        symbols: loaded
-        externs: loaded
-        sections: loaded
+        modules: loaded
+        symbol_index: loaded
+        symbol_to_module: loaded
 

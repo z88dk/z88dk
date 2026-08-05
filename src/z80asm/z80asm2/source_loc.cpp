@@ -26,7 +26,7 @@ void SourceLoc::clear() {
 }
 
 bool SourceLoc::empty() const {
-    return filename_id_.empty() && line_ == 0 && column_ == 0;
+    return filename_id_.empty() && line_ == 0;
 }
 
 std::string SourceLoc::to_string() const {

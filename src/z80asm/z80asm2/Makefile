@@ -12,7 +12,7 @@ endif
 PROJ = z88dk-z80asm
 
 CXX = g++
-CXXFLAGS_BASE = -std=gnu++17 -Itest -MMD -Wall -Wextra -Wpedantic -Werror
+CXXFLAGS_BASE = -std=gnu++17 -MMD -Wall -Wextra -Wpedantic -Werror
 ifeq ($(COVERAGE),1)
   CXXFLAGS_DEBUG = $(CXXFLAGS_BASE) -D_DEBUG --coverage -O0 -g
 else

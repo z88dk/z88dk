@@ -1,0 +1,110 @@
+% z88dk-z80asm -v -mz180 -IXIY -run-test=test_obj_wb_show_obj_file t/55-obj-library//input/wb_006.1.o
+--------------------------------------------------------------------------------
+TEST test_obj_wb_show_obj_file
+--------------------------------------------------------------------------------
+Dumping object file: t/55-obj-library/input/wb_006.1.o
+    Loaded sections:
+        strings: not loaded
+        modules: not loaded
+        symbol_index: not loaded
+        symbol_to_module: not loaded
+    Number of modules: 3
+    Object file type: Library
+    Object file version: 19
+    Included modules:
+        Module 0: module1
+        Module 1: module2
+        Module 2: module3
+    Public symbol 'public1' not found in any module.
+    Public symbol 'public2' not found in any module.
+    Public symbol 'nonexistent' not found in any module.
+    ObjLibrary:
+        Modules (3):
+            ObjModule: module1
+                CPU: z80
+                Symbols:
+                    ObjSymbol: label1
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: label2
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public1
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public2
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+            ObjModule: module2
+                CPU: gbz80
+                Symbols:
+                    ObjSymbol: label1
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: label2
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public1
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public2
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+            ObjModule: module3
+                CPU: z80
+                Swap IX/IY: true
+                Symbols:
+                    ObjSymbol: label1
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: label2
+                        Location: file1.asm:123:1
+                        Scope: Local
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public1
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+                    ObjSymbol: public2
+                        Location: file1.asm:123:1
+                        Scope: Public
+                        Type: Constant
+                        Section: section1
+                        Value: $1234
+    Loaded sections:
+        strings: loaded
+        modules: loaded
+        symbol_index: loaded
+        symbol_to_module: loaded
+

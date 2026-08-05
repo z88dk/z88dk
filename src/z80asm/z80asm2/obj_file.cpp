@@ -32,6 +32,7 @@
 #include <string_view>
 #include <system_error>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -106,7 +107,7 @@ CommonSchema::CommonSchema(std::shared_ptr<const BinaryFile> file_,
       cur_swap_ixiy(g_args.options.swap_ixiy) {
 
     // check size
-    if (end_offset() >= file->size()) {
+    if (end_offset() > file->size()) {
         invalid_file_error("invalid object or library file");
     }
 
@@ -1170,11 +1171,18 @@ void ObjSection::unpack_sections(std::shared_ptr<const BinaryFile> file,
                                  int version, const StringTable& strings, size_t ptr, size_t end_ptr,
                                  std::vector<ObjSection>& sections) {
     sections.clear();
-    while (ptr < end_ptr) {
-        ObjSection section;
-        if (!section.unpack(file, version, strings, ptr)) {
-            break; // end of sections
+    if (obj_features(version).has_sections) {
+        while (ptr < end_ptr) {
+            ObjSection section;
+            if (!section.unpack(file, version, strings, ptr)) {
+                break; // end of sections
+            }
+            sections.push_back(std::move(section));
         }
+    }
+    else {
+        ObjSection section;
+        section.unpack(file, version, strings, ptr);
         sections.push_back(std::move(section));
     }
 }
@@ -1209,6 +1217,26 @@ void ObjSection::print_bytes(DumpContext ctx) const {
 //-----------------------------------------------------------------------------
 // Module
 //-----------------------------------------------------------------------------
+
+StringId ObjModule::read_string_id(size_t& ptr) {
+    StringId id = StringId(obj_schema_->file->get_dword(ptr));
+    std::string_view str = strings()->view(id);
+    StringId result = g_strings.intern(str);
+    return result;
+}
+
+bool ObjModule::defines_public_symbol(StringId sym_name_id) {
+    if (!public_symbols_) {
+        public_symbols_ = std::make_unique<std::unordered_set<StringId>>();
+        for (auto& sym : *symbols()) {
+            if (sym.scope == ObjSymbolScope::Public) {
+                StringId id = g_strings.intern(sym.symbol_name());
+                public_symbols_->insert(id);
+            }
+        }
+    }
+    return public_symbols_->count(sym_name_id) > 0;
+}
 
 StringTable* ObjModule::strings() {
     if (!strings_) {
@@ -1340,6 +1368,19 @@ std::vector<ObjSection>* ObjModule::sections() {
 }
 
 #ifdef _DEBUG
+void ObjModule::dump_loaded_sections(DumpContext ctx) {
+    ctx.line("Loaded sections:");
+    auto c = ctx.child();
+
+    c.line(std::string("strings: ") + (strings_ ? "loaded" : "not loaded"));
+    c.line(std::string("modname: ") + (modname_ ? "loaded" : "not loaded"));
+    c.line(std::string("exprs: ") + (exprs_ ? "loaded" : "not loaded"));
+    c.line(std::string("relocs: ") + (relocs_ ? "loaded" : "not loaded"));
+    c.line(std::string("symbols: ") + (symbols_ ? "loaded" : "not loaded"));
+    c.line(std::string("externs: ") + (externs_ ? "loaded" : "not loaded"));
+    c.line(std::string("sections: ") + (sections_ ? "loaded" : "not loaded"));
+}
+
 void ObjModule::dump(DumpContext ctx) {
     ctx.line("ObjModule: " + std::string(modname()->name()));
     auto c = ctx.child();
@@ -1463,6 +1504,13 @@ void ObjModule::unpack(std::shared_ptr<const BinaryFile> file, size_t ptr) {
 // Library
 //-----------------------------------------------------------------------------
 
+StringId ObjLibrary::read_string_id(size_t& ptr) {
+    StringId id = StringId(lib_schema_->file->get_dword(ptr));
+    std::string_view str = strings()->view(id);
+    StringId result = g_strings.intern(str);
+    return result;
+}
+
 StringTable* ObjLibrary::strings() {
     if (!strings_) {
         strings_ = std::make_unique<StringTable>();
@@ -1498,7 +1546,8 @@ std::vector<ObjModule>* ObjLibrary::modules() {
     return modules_.get();
 }
 
-std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>* ObjLibrary::symbol_index() {
+std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>*
+ObjLibrary::symbol_index() {
     if (!symbol_index_) {
         symbol_index_ =
             std::make_unique<std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>>();
@@ -1523,8 +1572,8 @@ std::unordered_map<CpuKey, std::unordered_map<StringId, size_t>>* ObjLibrary::sy
 
             CpuKey cpu_key(cpu_id, swap_ixiy);
             for (size_t i = 0; i < list_size; i++) {
-                StringId symbol_name_id = StringId(lib_schema_->file->get_dword(list_ptr));
-                size_t mod_base_offset = lib_schema_->file->get_dword(header_ptr);
+                StringId symbol_name_id = read_string_id(list_ptr);
+                size_t mod_base_offset = lib_schema_->file->get_dword(list_ptr);
                 (*symbol_index_)[cpu_key][symbol_name_id] = mod_base_offset;
             }
         }
@@ -1557,6 +1606,18 @@ ObjModule* ObjLibrary::lookup_public_symbol(StringId sym_name_id) {
 }
 
 #ifdef _DEBUG
+void ObjLibrary::dump_loaded_sections(DumpContext ctx) {
+    ctx.line("Loaded sections:");
+    auto c = ctx.child();
+
+    c.line(std::string("strings: ") + (strings_ ? "loaded" : "not loaded"));
+    c.line(std::string("modules: ") + (modules_ ? "loaded" : "not loaded"));
+    c.line(std::string("symbol_index: ") + (symbol_index_ ? "loaded" :
+                                            "not loaded"));
+    c.line(std::string("symbol_to_module: ") + (symbol_to_module_ ? "loaded" :
+            "not loaded"));
+}
+
 void ObjLibrary::dump(DumpContext ctx) {
     ctx.line("ObjLibrary:");
     auto c = ctx.child();
@@ -1618,7 +1679,7 @@ void ObjLibrary::pack(BinaryData& bin_data) {
 
     // now that the modules have base_offset updated by their pack() methods,
     // we can build the symbol index and string table
-    build_symbol_index();
+    build_symbol_index(/*file_string_table=*/true);
 
     // write the symbol index to the file
     size_t symbol_index_offset = pack_symbol_index(bin_data);
@@ -1641,7 +1702,7 @@ void ObjLibrary::unpack(std::shared_ptr<const BinaryFile> file) {
     // the sections are loaded on demand
 }
 
-void ObjLibrary::build_symbol_index() {
+void ObjLibrary::build_symbol_index(bool file_string_table) {
     strings()->clear();
     symbol_index()->clear();
 
@@ -1657,7 +1718,10 @@ void ObjLibrary::build_symbol_index() {
                     for (auto& sym : *mod.symbols()) {
                         if (sym.scope == ObjSymbolScope::Public) {
                             std::string_view sym_name = sym.symbol_name();
-                            StringId sym_name_id = strings()->intern(sym_name);
+                            StringId sym_name_id =
+                                file_string_table ?
+                                strings()->intern(sym_name) :
+                                g_strings.intern(sym_name);
                             auto it = symbol_map.find(sym_name_id);
                             if (it == symbol_map.end()) {
                                 symbol_map[sym_name_id] = mod_base_offset;
@@ -1772,9 +1836,101 @@ void ObjLibrary::build_symbol_to_module_map_v19() {
 }
 
 void ObjLibrary::build_symbol_to_module_map_older() {
-    build_symbol_index();               // build the symbol index for older versions
+    // build the symbol index for older versions
+    build_symbol_index(/*file_string_table=*/false);
     build_symbol_to_module_map_v19();   // then build the symbol to module map
 }
+
+//-----------------------------------------------------------------------------
+// Interface for linker
+//-----------------------------------------------------------------------------
+
+ObjFile::ObjFile(std::string_view filename)
+    : file_(std::make_shared<BinaryFile>(filename)),
+      schema_(std::make_unique<CommonSchema>(file_, 0, file_->size())) {
+    if (type() == ObjFileType::Library) {
+        obj_library_ = std::make_unique<ObjLibrary>();
+        obj_library_->unpack(file_);
+    }
+    else if (type() == ObjFileType::Object) {
+        obj_module_ = std::make_unique<ObjModule>();
+        obj_module_->unpack(file_, 0);
+    }
+    else {
+        fatal_error("Invalid object file type: " + std::string(filename));
+    }
+}
+
+size_t ObjFile::num_modules() const {
+    if (obj_library_) {
+        return obj_library_->modules()->size();
+    }
+    else if (obj_module_) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+ObjModule* ObjFile::module(size_t index) const {
+    if (obj_library_) {
+        if (index < obj_library_->modules()->size()) {
+            return &(*obj_library_->modules())[index];
+        }
+        else {
+            return nullptr;
+        }
+    }
+    else if (obj_module_) {
+        if (index == 0) {
+            return obj_module_.get();
+        }
+        else {
+            return nullptr;
+        }
+    }
+    else {
+        return nullptr;
+    }
+}
+
+ObjModule* ObjFile::lookup_public_symbol(StringId sym_name_id) {
+    if (obj_library_) {
+        return obj_library_->lookup_public_symbol(sym_name_id);
+    }
+    else if (obj_module_) {
+        if (obj_module_->defines_public_symbol(sym_name_id)) {
+            return obj_module_.get();
+        }
+        else {
+            return nullptr;
+        }
+    }
+    else {
+        return nullptr;
+    }
+}
+
+#ifdef _DEBUG
+void ObjFile::dump_loaded_sections(DumpContext ctx) {
+    if (obj_library_) {
+        obj_library_->dump_loaded_sections(ctx);
+    }
+    else if (obj_module_) {
+        obj_module_->dump_loaded_sections(ctx);
+    }
+}
+
+void ObjFile::dump(DumpContext ctx) {
+    if (obj_library_) {
+        obj_library_->dump(ctx);
+    }
+    else if (obj_module_) {
+        obj_module_->dump(ctx);
+    }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Drivers
