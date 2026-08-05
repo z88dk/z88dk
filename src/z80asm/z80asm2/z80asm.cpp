@@ -11,7 +11,7 @@
 #include "options.h"
 #include "options_dump.h"
 #include "source_loc.h"
-#include "test_driver.h"
+#include "test/test_driver.h"
 #include <filesystem>
 #include <iostream>
 #include <sstream>

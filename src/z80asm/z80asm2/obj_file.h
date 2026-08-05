@@ -20,6 +20,7 @@
 #include <memory>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -454,6 +455,8 @@ public:
     void set_base_address(uint address) {
         base_address_ = address;
     }
+    StringId read_string_id(size_t& ptr);
+    bool defines_public_symbol(StringId sym_name_id);
 
     // accessors load sections on demand, if not already loaded
     StringTable* strings();
@@ -465,6 +468,7 @@ public:
     std::vector<ObjSection>* sections();
 
 #ifdef _DEBUG
+    void dump_loaded_sections(DumpContext ctx);
     void dump(DumpContext ctx);
 #endif
     void dump_short();
@@ -486,6 +490,7 @@ private:
     std::unique_ptr<std::vector<ObjSymbol>> symbols_ = nullptr;
     std::unique_ptr<std::vector<ObjExtern>> externs_ = nullptr;
     std::unique_ptr<std::vector<ObjSection>> sections_ = nullptr;
+    std::unique_ptr<std::unordered_set<StringId>> public_symbols_ = nullptr;
 };
 
 //-----------------------------------------------------------------------------
@@ -534,6 +539,7 @@ public:
     void set_base_offset(size_t offset) {
         base_offset_ = offset;
     }
+    StringId read_string_id(size_t& ptr);
 
     // accessors load sections on demand, if not already loaded
     StringTable* strings();
@@ -548,6 +554,7 @@ public:
     ObjModule* lookup_public_symbol(StringId sym_name_id);
 
 #ifdef _DEBUG
+    void dump_loaded_sections(DumpContext ctx);
     void dump(DumpContext ctx);
 #endif
     void dump_short();
@@ -566,10 +573,48 @@ private:
     std::unique_ptr<std::unordered_map<StringId, ObjModule*>> symbol_to_module_ =
                 nullptr;
 
-    void build_symbol_index();
+    void build_symbol_index(bool file_string_table);
     size_t pack_symbol_index(BinaryData& bin_data);
     void build_symbol_to_module_map_v19();
     void build_symbol_to_module_map_older();
+};
+
+//-----------------------------------------------------------------------------
+// Interface for linker
+//-----------------------------------------------------------------------------
+
+class ObjFile {
+public:
+    explicit ObjFile(std::string_view filename);
+    virtual ~ObjFile() = default;
+
+    std::string_view filename() const {
+        return schema_->filename();
+    }
+    ObjFileType type() const {
+        return schema_->type;
+    }
+    int version() const {
+        return schema_->version;
+    }
+    size_t num_modules() const;
+    ObjModule* module(size_t index) const;
+    ObjModule* lookup_public_symbol(StringId sym_name_id);
+
+#ifdef _DEBUG
+    void dump_loaded_sections(DumpContext ctx);
+    void dump(DumpContext ctx);
+#endif
+
+private:
+    std::shared_ptr<const BinaryFile> file_;
+    std::unique_ptr<CommonSchema> schema_ = nullptr;
+
+    // loads one of these, depending on file type
+    std::unique_ptr<ObjModule> obj_module_ = nullptr;
+    std::unique_ptr<std::unordered_set<StringId>> public_symbols_ = nullptr;
+
+    std::unique_ptr<ObjLibrary> obj_library_ = nullptr;
 };
 
 //-----------------------------------------------------------------------------

@@ -1,0 +1,6 @@
+; Minimal library
+begin library
+    begin module
+        name                  = module1
+    end module
+end library

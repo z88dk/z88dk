@@ -1,3 +1,4 @@
+; Minimal object
 begin module
     name    = module1
 end module
