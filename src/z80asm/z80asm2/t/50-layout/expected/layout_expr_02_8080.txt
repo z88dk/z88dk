@@ -1,0 +1,27 @@
+% z88dk-z80asm -v -m8080 -dump-after-layout t/50-layout//input/layout_expr_02.asm
+Define constant: __CPU_INTEL__ = 1
+Define constant: __CPU_8080__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembling t/50-layout/input/layout_expr_02.asm...
+t/50-layout/input/layout_expr_02.asm:5:7: error: Undefined symbol: ix
+    ld a,(ix-129)
+          ^
+t/50-layout/input/layout_expr_02.asm:6:7: error: Undefined symbol: ix
+    ld a,(ix-128)
+          ^
+t/50-layout/input/layout_expr_02.asm:7:7: error: Undefined symbol: ix
+    ld a,(ix-1)
+          ^
+t/50-layout/input/layout_expr_02.asm:8:7: error: Undefined symbol: ix
+    ld a,(ix+1)
+          ^
+t/50-layout/input/layout_expr_02.asm:9:7: error: Undefined symbol: ix
+    ld a,(ix+127)
+          ^
+t/50-layout/input/layout_expr_02.asm:10:7: error: Undefined symbol: ix
+    ld a,(ix+128)
+          ^
+t/50-layout/input/layout_expr_02.asm:11:7: error: Undefined symbol: ix
+    ld a,(ix+255)
+          ^
+Assembly completed with 7 errors
