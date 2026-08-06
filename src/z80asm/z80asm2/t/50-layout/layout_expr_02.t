@@ -1,10 +1,14 @@
 BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
+use lib 'tools';
+use ObjModule;
 
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
-for my $cpu ( 'z80', 'gbz80', 'r4k' ) {
+
+for my $cpu ( CPU::all_cpus() ) {
+    next if $cpu =~ /strict/;
     capture_nok(
 "build/Debug/z88dk-z80asm -v -m$cpu -dump-after-layout $dir/input/$self.asm",
         "$dir/expected/${self}_${cpu}.txt"
