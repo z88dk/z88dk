@@ -34,33 +34,6 @@ static bool load_input_modules(LinkContext& context,
     return true;
 }
 
-static std::string resolve_library_path(const std::string& libname,
-                                        const std::vector<std::string>& library_paths) {
-    // add .lib extrension if not present
-    std::string lib_filename;
-    if (is_lib_filename(libname)) {
-        lib_filename = libname;
-    }
-    else {
-        lib_filename = libname + std::string(lib_extension);
-    }
-
-    // search current directory first
-    if (std::filesystem::exists(lib_filename)) {
-        return lib_filename;
-    }
-
-    // search library paths
-    for (auto& path : library_paths) {
-        std::string candidate = path + "/" + lib_filename;
-        if (std::filesystem::exists(candidate)) {
-            return candidate;
-        }
-    }
-
-    return "";  // not found
-}
-
 static bool load_input_libraries(LinkContext& context,
                                  const std::vector<std::string>& libraries,
                                  const std::vector<std::string>& library_paths) {

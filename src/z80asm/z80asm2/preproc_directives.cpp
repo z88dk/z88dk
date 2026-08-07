@@ -347,6 +347,8 @@ bool Preproc::parse_and_resolve_file(ParseLine& pline,
                                   g_args.options.include_paths);
     if (out_resolved.empty()) {
         g_diag.error(out_filename_loc, "File not found: " + std::string(filename));
+        g_diag.note(out_filename_loc,
+                    searched_paths_string(g_args.options.include_paths));
         return false;
     }
 
