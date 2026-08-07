@@ -1765,6 +1765,7 @@ static const Op *find_unique_use(const Func *f, int v);
 static int  de_home_indexed_add_ok(const Func *f, const Op *o);
 static void cache_de(int v);
 static void cache_bc(int v);
+static void cache_hl(int vreg);
 static void cache_dehl(int v);
 static void invalidate_hl_cache(void);
 static void invalidate_de_cache(void);
@@ -2292,6 +2293,19 @@ static int rec_enabled(void)
    Pure win both axes (bytes and ticks fall together — dead memory traffic
    removed). Opt out with IR_DEADSTORE=0 (reproduces pre-flip codegen);
    IR_DEADSTORE=2 adds the per-slot report. */
+/* Width-2 half of IR_DEADSTORE (dead call-result / word slot stores).
+   Default-on; `IR_DSWORD=0` opts out, leaving the width-1 behaviour that
+   shipped with #10 — the bisect handle for this bug family. */
+static int dsw_on = -1;
+static int dsw_enabled(void)
+{
+    if (dsw_on < 0) {
+        const char *e = getenv("IR_DSWORD");
+        dsw_on = (e && e[0] == '0') ? 0 : 1;
+    }
+    return dsw_on;
+}
+
 static int dsx_enabled(void)
 {
     if (dsx_on < 0) {
@@ -4470,21 +4484,56 @@ int ir_lower_func(FILE *out, Func *f)
     /* [IR_DEADSTORE] Dead byte-spill elision: the render's read/write split
        (rec_end) listed byte spills WRITTEN but never READ (ds_dead), coalescing-
        checked. Mark them IR_VREG_DEAD_SPILL, recompute slots (ir_assign_slots
-       drops them → frame shrinks), and re-lower — store_a_byte skips the store
-       and the value rides A to its readers (in-BB, or the next BB via bb_a_out).
-       Composes with the dead-FRAME retry below: a frame emptied by this goes
-       frameless. Opt-in; width-1 only (words handled by ss_compute_dead) and
-       needs the A-carry (the bb_a_out reader path). Runs before deadframe. */
+       drops them → frame shrinks), and re-lower — the store helper skips the
+       store and the value rides its register to the readers (in-BB, or the next
+       BB via bb_a_out / bb_hl_out). Composes with the dead-FRAME retry below: a
+       frame emptied by this goes frameless.
+
+       WIDTH 1 (store_a_byte, rides A) needs the A-carry; WIDTH 2 (store_hl /
+       store_hl_keep_hl, rides HL) needs the HL-carry. The width-2 half exists
+       because ss_compute_dead — nominally the word path — does not see a CALL
+       RESULT store (it is committed via store_hl_keep_hl), which is the most
+       common word dead-store shape there is: 46 in the bench corpus, 15 in
+       emu.c. Runs before deadframe. */
     if (dsx_enabled() && !ds_retry_done && rc == 0 && ds_ndead > 0
-        && a_carry_enabled()) {
+        && (a_carry_enabled() || (hl_carry_enabled() && dsw_enabled()))) {
+        /* EXCLUDE STORE BASES (width-2 only — the pointer case). The read/write
+           counts come from render #1, where a store base is cache-served and so
+           shows zero slot reads; but the pointer-store RMW holds the base in a
+           register across the value computation, and dropping its slot makes the
+           re-lower need a reload that did not exist before — i.e. eliding can
+           CREATE the reader it was told did not exist. Same exclusion the
+           symbol-address remat makes, for the same reason (long_ir storecall.c:
+           `*(u16 *)ralign(p,1) = v`, a store through a call-returned pointer). */
+        char *st_base = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), 1);
+        if (st_base)
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *so = &f->bbs[b].ops[j];
+                    if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
+                        && so->mem.base >= 0 && so->mem.base < f->n_vregs)
+                        st_base[so->mem.base] = 1;
+                }
         int marked = 0;
         for (int i = 0; i < ds_ndead; i++) {
             int v = ds_dead[i];
-            if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 1) continue;
+            if (v < 0 || v >= f->n_vregs) continue;
+            int w = f->vregs[v].width;
+            if (w == 1 ? !a_carry_enabled()
+                       : (w != 2 || !hl_carry_enabled() || !dsw_enabled()))
+                continue;
+            if (w == 2 && (!st_base || st_base[v])) continue;
+            /* EXCLUDE gbz80 from the width-2 half: it has no `ex de,hl`, which
+               the store_hl skip path relies on to honour the DE=value contract,
+               and its word values ride different registers so the HL carry does
+               not reach the readers (long_ir/string strrev_empty aborts with a
+               slotless read). 8080/8085 keep it — they have `xchg`. */
+            if (w == 2 && IS_GBZ80()) continue;
             if (f->vregs[v].flags & IR_VREG_DEAD_SPILL) continue;
             f->vregs[v].flags |= IR_VREG_DEAD_SPILL;
             marked++;
         }
+        free(st_base);
         if (marked) {
             ds_retry_done = 1;
             ir_assign_slots(f);                 /* drop dead slots, recompact */

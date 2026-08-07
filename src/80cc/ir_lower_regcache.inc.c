@@ -778,6 +778,16 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
 }
 static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
+    /* [IR_DEADSTORE word] Dead slot store (see store_hl_keep_hl_impl). This
+       helper's contract is DE=value / HL=junk, so the store collapses to the
+       single `ex de,hl` that moves the value into place; cache DE for the
+       readers. A caller that wanted HL back emits its own `ex de,hl` and copt
+       #284 cancels the pair. */
+    if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
+        emit(out, "ex\tde,hl");
+        swap_hl_de_caches();
+        return;
+    }
     /* Stack-transient (IR_PR_STACK): park HL on the stack, don't slot-store to
        the -1 sentinel (which the sp fallback turns into a write at sp-1).
        Defensive catch-all for producers that reach store_hl directly rather than
@@ -854,8 +864,31 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
    copt then has to clean up. This is the store for callers that want HL after:
    the value stays put, the ex de,hl pair never exists. The old-TOS discard uses
    `pop de` (dead DE) not `inc sp; inc sp` (1B/2T cheaper). DE cache dropped. */
+/* Write-context wrapper, mirroring store_hl's: this helper IS a store, so every
+   slot_off/slot_ix_off it makes must be attributed to the WRITE count. Without
+   it a call-result spill (its main caller, ir_lower_call.inc.c) looked "never
+   written but read" to the IR_DEADSTORE read/write split, hiding every dead
+   call-result store. */
+static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id);
 static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
 {
+    int save = slot_write_ctx; slot_write_ctx = 1;
+    int r = store_hl_keep_hl_impl(out, f, vreg_id);
+    slot_write_ctx = save;
+    return r;
+}
+static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
+{
+    /* [IR_DEADSTORE word] Slot written but never read (read/write split,
+       coalescing-checked; ir_assign_slots dropped the slot on the re-lower).
+       The value is already in HL and this helper's contract is HL=value, so the
+       store simply disappears — cache HL so every reader is served from it
+       (same BB, or the next via bb_hl_out). Width-2 only; set only on the
+       re-lower. */
+    if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
+        cache_hl(vreg_id);
+        return 1;
+    }
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
         emit_sp(out, 2, "push\thl");            /* HL preserved by push */
         L.cur_stack_resident = vreg_id;
