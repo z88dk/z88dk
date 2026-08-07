@@ -633,6 +633,336 @@ static int hlde_full_reload(const char *s, const char *pair)
     return 0;
 }
 
+/* ---- branch relaxation: `jp` -> `jr` for in-range local targets ---------- */
+/* 80cc renders every CFG branch as a 3-byte `jp` because the displacement is
+   unknown at render time, and NOTHING downstream recovers it: copt has no
+   addresses, and z80asm only ever WIDENS (`-opt-speed` turns `jr` into `jp`;
+   an out-of-range `jr` is a hard "integer range" error, never auto-widened).
+   So every in-range branch costs a byte. This pass converts them, using an
+   UPPER BOUND on the span: an exact size model is impossible to maintain
+   (z88dk synthetics differ per CPU — `ld hl,(ix+d)` is synthetic on z80 but
+   native on ez80/kc160/rabbit — and r4k moves much of the main page behind a
+   0x7f prefix), but an upper bound only ever costs us a conversion, never
+   correctness. Getting it wrong is a LOUD assembler error, not a miscompile.
+
+   The bound is one table with no per-CPU branches: each entry is the worst
+   case over ALL targets, validated against real z80asm listings on
+   z80/z80n/z180/ez80/gbz80/rabbit/r4k/kc160. `call` is charged 8 rather than 3
+   because copt runs AFTER us and its only code-GROWING rules are call
+   substitutions (`z80rules.9`'s intrinsic inlining, the per-CPU `l_gint`/
+   `l_pint`/`l_long_aslo` helper inlining) — charging every call its worst case
+   makes the bound valid post-copt without modelling copt at all.
+
+   Ticks: `jr cc` is 12 T taken / 7 T not-taken vs `jp cc`'s flat 10 T, and an
+   unconditional `jr` is a flat +2 T. So the ONLY conversion that cannot pay for
+   itself is one that is always taken — and inside a loop that is exactly the
+   unconditional jump. Excluding those (and only those) is what makes this a win
+   on both axes; on z80 it takes the aggregate from −0.167 % to −0.458 % ticks
+   and cuts the slower cells from 10 to 4 (worst +0.18 %), for roughly half the
+   bytes. Two structural proxies were tried and REFUTED first — do not retry:
+     - forward-only (skip back edges): 13 slower cells instead of 15. A taken
+       FORWARD guard costs the same +2 T, so direction is not taken-ness.
+     - skip everything at max loop depth: no tick change at all (the hot branch
+       in a nested loop sits at depth 1, not max); and skipping every in-loop
+       branch leaves just −8 B corpus-wide — the bytes ARE in the loops, so
+       there is no free lunch to be had by excluding loops wholesale.
+
+   DEFAULT-ON; `IR_JR=0` opts out (byte-identical to the pre-relaxation
+   compiler). Regression: test/suites/long_ir/jrelax.c. */
+static int relax_uc = -1;
+static int relax_uncond_ok(void)     /* IR_JR_UNCOND=1: allow uncond-in-loop */
+{
+    if (relax_uc < 0) {
+        const char *e = getenv("IR_JR_UNCOND");
+        relax_uc = (e && e[0] == '1');
+    }
+    return relax_uc;
+}
+
+static int relax_on = -1;
+static int branch_relax_enabled(void)
+{
+    if (relax_on < 0) {
+        /* 8080/8085 have no `jr` at all. Every other supported CPU has both the
+           unconditional form and the nz/z/nc/c conditionals. */
+        const char *e = getenv("IR_JR");
+        relax_on = (e && e[0] == '0') ? 0 : !IS_808x();
+    }
+    return relax_on;
+}
+
+/* Upper bound, in bytes, on what `l` assembles to on ANY target. Data
+   directives return a blocker so no branch is measured across a table. */
+static int relax_line_size(const char *l)
+{
+    const char *s = l;
+    while (*s == '\t' || *s == ' ') s++;
+    if (*s == '\0' || *s == '\n' || *s == '\r' || *s == ';') return 0;
+    if (s == l) return 0;                       /* col-0: label def / defc */
+    /* Assembler directives emit nothing (EXTERN/GLOBAL/defc/C_LINE/...) except
+       the data ones, which we refuse to measure across. */
+    if (!strncmp(s, "def", 3)) {
+        if (!strncmp(s, "defc", 4)) return 0;
+        return 4096;                            /* defb/defw/defm/defs: blocker */
+    }
+    if (!strncmp(s, "EXTERN", 6) || !strncmp(s, "GLOBAL", 6)
+        || !strncmp(s, "PUBLIC", 6) || !strncmp(s, "C_LINE", 6)
+        || !strncmp(s, "SECTION", 7) || !strncmp(s, "MODULE", 6)
+        || !strncmp(s, "INCLUDE", 7))
+        return 0;
+    /* Mnemonic. */
+    const char *e = s;
+    while (*e && *e != '\t' && *e != ' ' && *e != '\n') e++;
+    size_t n = (size_t)(e - s);
+    const char *arg = e;
+    while (*arg == '\t' || *arg == ' ') arg++;
+    #define MN(x) (n == strlen(x) && !strncmp(s, x, n))
+    /* Index-register addressing: 6 (the z80 synthetic `ld rr,(ix+d)` pair). */
+    if (strstr(arg, "(ix") || strstr(arg, "(iy")) return 6;
+    /* Rabbit's 16-bit logical ops expand to 8. */
+    if ((MN("or") || MN("and") || MN("xor") || MN("bool"))
+        && (!strncmp(arg, "hl", 2))) return 8;
+    /* A 16-bit load from MEMORY is up to 6 (gbz80 has no `ld hl,(nn)` and the
+       arch rules expand it; ez80's `ld hl,(hl)` is 6). A plain `ld rr,imm` is
+       <= 4 everywhere (worst: z80n `ld ix,0`), so don't over-charge it. */
+    if (MN("ld") && strchr(arg, '(') != NULL) return 6;
+    /* `add hl,rr` is 1, but `add hl,<imm>` is a z80n synthetic at up to 6. */
+    if (MN("add") && !strncmp(arg, "hl,", 3)) {
+        const char *o = arg + 3;
+        if (strncmp(o, "de", 2) && strncmp(o, "bc", 2) && strncmp(o, "hl", 2)
+            && strncmp(o, "sp", 2))
+            return 6;
+        return 4;
+    }
+    /* copt may inline a call (see the header comment): charge its worst case. */
+    if (MN("call")) return 8;
+    /* Everything else in the emitted repertoire is <= 4 on every target; an
+       unrecognised mnemonic is charged 8 so a future lowering cannot silently
+       invalidate the bound. */
+    if (MN("ld") || MN("jp") || MN("jr") || MN("djnz") || MN("push")
+        || MN("pop") || MN("inc") || MN("dec") || MN("add") || MN("adc")
+        || MN("sub") || MN("sbc") || MN("and") || MN("or") || MN("xor")
+        || MN("cp") || MN("ex") || MN("exx") || MN("ret") || MN("reti")
+        || MN("retn") || MN("nop") || MN("halt") || MN("di") || MN("ei")
+        || MN("neg") || MN("cpl") || MN("scf") || MN("ccf") || MN("rst")
+        || MN("im") || MN("rlca") || MN("rrca") || MN("rla") || MN("rra")
+        || MN("sla") || MN("sra") || MN("srl") || MN("rl") || MN("rr")
+        || MN("rlc") || MN("rrc") || MN("bit") || MN("set") || MN("res")
+        || MN("in") || MN("out") || MN("lea") || MN("mlt") || MN("bool")
+        || MN("ldi") || MN("ldir") || MN("ldd") || MN("lddr") || MN("swap")
+        || MN("daa") || MN("slp"))
+        return 4;
+    #undef MN
+    return 8;
+}
+
+/* A label DEFINITION line (`L_f1_bb_3:` at column 0). `defc` aliases are NOT
+   definitions at this position — they name a label that lives elsewhere — and
+   are excluded by the column-0 identifier test below. */
+static int relax_label_name(const char *l, char *buf, size_t bufsz)
+{
+    if (l[0] == '\t' || l[0] == ' ' || l[0] == ';' || l[0] == '\n') return 0;
+    if (!((l[0] >= 'A' && l[0] <= 'Z') || (l[0] >= 'a' && l[0] <= 'z')
+          || l[0] == '_')) return 0;
+    const char *c = strchr(l, ':');
+    if (!c) return 0;
+    const char *t = c + 1;
+    while (*t == '\r') t++;
+    if (*t != '\n' && *t != '\0') return 0;      /* `L:` must end the line */
+    size_t n = (size_t)(c - l);
+    if (n == 0 || n >= bufsz) return 0;
+    memcpy(buf, l, n); buf[n] = '\0';
+    return 1;
+}
+
+/* `\tjp\t[cc,]TARGET\n` -> condition (or "" when unconditional) + target, but
+   only for conditions that HAVE a `jr` form (nz/z/nc/c — po/pe/p/m do not). */
+static int relax_jp_parts(const char *l, char *cc, size_t ccsz,
+                          char *tgt, size_t tgtsz)
+{
+    if (strncmp(l, "\tjp\t", 4) != 0) return 0;
+    const char *p = l + 4;
+    const char *comma = strchr(p, ',');
+    cc[0] = '\0';
+    if (comma) {
+        size_t n = (size_t)(comma - p);
+        if (n >= ccsz) return 0;
+        memcpy(cc, p, n); cc[n] = '\0';
+        if (strcmp(cc, "nz") && strcmp(cc, "z") && strcmp(cc, "nc")
+            && strcmp(cc, "c"))
+            return 0;                            /* po/pe/p/m: no jr form */
+        p = comma + 1;
+    }
+    size_t i = 0;
+    while (p[i] && p[i] != '\n' && p[i] != '\r' && p[i] != '\t'
+           && p[i] != ' ' && p[i] != ';') {
+        if (i + 1 >= tgtsz) return 0;
+        tgt[i] = p[i]; i++;
+    }
+    if (i == 0) return 0;
+    tgt[i] = '\0';
+    /* Anything trailing other than a comment means we don't understand it. */
+    while (p[i] == ' ' || p[i] == '\t') i++;
+    if (p[i] != '\n' && p[i] != '\0' && p[i] != '\r' && p[i] != ';') return 0;
+    return 1;
+}
+
+/* copt's #JI inverts `jp cc,L / jp M / L:` into `jp !cc,M / L:` (-3b). It needs
+   BOTH jumps to still be `jp`, and -3b beats the -2b we would get by relaxing
+   the pair, so leave that window alone and let copt have it. Returns 1 when
+   line `i` is either jump of such a window. (The `jr`-conditional variants of
+   #JI in 80cc_rules.1 still need their second line to be `jp`, so the test
+   covers a relaxed conditional too.) */
+static int relax_in_ji_window(char **lines, int n, int i)
+{
+    for (int base = (i > 0 ? i - 1 : 0); base <= i && base + 1 < n; base++) {
+        const char *a = lines[base], *b = lines[base + 1];
+        int a_cond = (!strncmp(a, "\tjp\t", 4) || !strncmp(a, "\tjr\t", 4))
+                     && strchr(a, ',');
+        if (!a_cond) continue;
+        if (strncmp(b, "\tjp\t", 4) != 0 || strchr(b, ',')) continue;
+        /* the conditional's target must be the label that follows the pair */
+        char tgt[256], lbl[256];
+        const char *p = strchr(a, ',');
+        if (!p) continue;
+        size_t k = 0;
+        p++;
+        while (p[k] && p[k] != '\n' && p[k] != '\r' && p[k] != '\t'
+               && p[k] != ' ' && p[k] != ';' && k + 1 < sizeof tgt) {
+            tgt[k] = p[k]; k++;
+        }
+        tgt[k] = '\0';
+        if (k == 0) continue;
+        int j = base + 2;
+        while (j < n && (lines[j][0] == '\n' || lines[j][0] == ';'
+                         || !strncmp(lines[j], "\tC_LINE", 7))) j++;
+        if (j < n && relax_label_name(lines[j], lbl, sizeof lbl)
+            && !strcmp(lbl, tgt))
+            return 1;
+    }
+    return 0;
+}
+
+/* Per-BB loop-nesting depth, the same cheap back-edge-span approximation the
+   selection code in this file already uses (`bdep`): count the [target..source]
+   spans of back edges containing each BB. Ranking only — never correctness. */
+static int *relax_bb_depth(const Func *f, int *out_max)
+{
+    *out_max = 0;
+    if (!f || f->n_bbs <= 0) return NULL;
+    int *d = calloc((size_t)f->n_bbs, sizeof(int));
+    if (!d) return NULL;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int s = 0; s < ir_bb_n_succ(&f->bbs[i]); s++) {
+            int t = ir_bb_succ_at(&f->bbs[i], s);
+            if (t < 0 || t > i) continue;                 /* back-edge: t <= i */
+            for (int b = t; b <= i && b < f->n_bbs; b++) d[b]++;
+        }
+    for (int i = 0; i < f->n_bbs; i++) if (d[i] > *out_max) *out_max = d[i];
+    return d;
+}
+
+/* `L_f<idx>_bb_<n>:` -> n, else -1. */
+static int relax_bb_of_label(const char *l)
+{
+    if (l[0] != 'L') return -1;
+    const char *p = strstr(l, "_bb_");
+    if (!p || p[4] < '0' || p[4] > '9') return -1;
+    int n = 0; const char *q = p + 4;
+    while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+    return (*q == ':') ? n : -1;
+}
+
+static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
+{
+    char buf[1024];
+    char **lines = NULL; int n = 0, cap = 0;
+    while (fgets(buf, sizeof buf, src)) {
+        if (n == cap) { cap = cap ? cap * 2 : 256;
+            char **nl = realloc(lines, (size_t)cap * sizeof *lines);
+            if (!nl) { free(lines); rewind(src);            /* OOM: verbatim */
+                while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
+            lines = nl; }
+        lines[n++] = strdup(buf);
+        if (!lines[n - 1]) { for (int i = 0; i < n - 1; i++) free(lines[i]);
+            free(lines); rewind(src);
+            while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
+    }
+    int *size = malloc((size_t)(n > 0 ? n : 1) * sizeof(int));
+    /* Innermost-loop exclusion. A branch in the hottest loop is taken on nearly
+       every iteration, where `jr` costs +2 T over `jp` with no not-taken saving
+       to offset it — that is where the whole measured tick cost lives (5 benches,
+       one dominant loop each). Loop DEPTH is the usable proxy: unlike branch
+       direction (tried, refuted — a taken forward guard costs the same), depth
+       actually tracks iteration count. Attribute each line to the BB label above
+       it and skip conversion at max depth. Ranking only: skipping merely forgoes
+       bytes. */
+    int maxdep = 0;
+    int *bdep = relax_bb_depth(f, &maxdep);
+    int *linedep = (bdep && n > 0) ? calloc((size_t)n, sizeof(int)) : NULL;
+    if (linedep) {
+        int cur = 0;                                 /* prologue: depth 0 */
+        for (int i = 0; i < n; i++) {
+            int b = relax_bb_of_label(lines[i]);
+            /* An elided (dead) BB label leaves its lines attributed to the
+               preceding BB — it fell through from there, so same loop. */
+            if (b >= 0 && b < f->n_bbs) cur = bdep[b];
+            linedep[i] = cur;
+        }
+    }
+    if (getenv("IR_JR_LOG"))
+        fprintf(stderr, "IR_JR: fn=%s n_bbs=%d maxdep=%d bdep=%s linedep=%s\n",
+                (f && f->fn) ? ir_sym_name(f->fn) : "?", f ? f->n_bbs : -1,
+                maxdep, bdep ? "y" : "n", linedep ? "y" : "n");
+    if (size) {
+        for (int i = 0; i < n; i++) size[i] = relax_line_size(lines[i]);
+        /* Converting shrinks the span, which can bring further branches into
+           range, so iterate to a fixpoint (bounded — each round converts at
+           least one line or stops). */
+        for (int round = 0; round < 4; round++) {
+            int changed = 0;
+            for (int i = 0; i < n; i++) {
+                char cc[8], tgt[256], lbl[256];
+                if (!relax_jp_parts(lines[i], cc, sizeof cc, tgt, sizeof tgt))
+                    continue;
+                if (relax_in_ji_window(lines, n, i)) continue;
+                /* Never relax an UNCONDITIONAL jump inside a loop: it is
+                   taken every iteration, so `jr` is a flat +2 T with nothing to
+                   pay for it, whereas a CONDITIONAL at the same spot still wins
+                   whenever it falls through (7 T vs `jp cc`'s flat 10 T). This
+                   one rule is what turns the tick picture around — see the
+                   header comment. `IR_JR_UNCOND=1` opts out (byte-max variant).
+                */
+                if (!cc[0] && linedep && linedep[i] >= 1 && !relax_uncond_ok())
+                    continue;
+                int t = -1;
+                for (int j = 0; j < n; j++)
+                    if (relax_label_name(lines[j], lbl, sizeof lbl)
+                        && !strcmp(lbl, tgt)) { t = j; break; }
+                if (t < 0) continue;             /* not a local label */
+                /* Span EXCLUDES the branch itself; `jr` measures from the byte
+                   after its 2-byte encoding, so both directions fit when the
+                   in-between bytes are <= 126. */
+                int lo = (t > i) ? i + 1 : t, hi = (t > i) ? t : i;
+                long span = 0;
+                for (int k = lo; k < hi && span <= 126; k++) span += size[k];
+                if (span > 126) continue;
+                char nl2[1024];
+                if (cc[0]) snprintf(nl2, sizeof nl2, "\tjr\t%s,%s\n", cc, tgt);
+                else       snprintf(nl2, sizeof nl2, "\tjr\t%s\n", tgt);
+                char *rep = strdup(nl2);
+                if (!rep) continue;
+                free(lines[i]); lines[i] = rep;
+                size[i] = 2;
+                changed = 1;
+            }
+            if (!changed) break;
+        }
+    }
+    for (int i = 0; i < n; i++) { fputs(lines[i], out); free(lines[i]); }
+    free(lines); free(size); free(bdep); free(linedep);
+}
+
 /* Post-render peephole: drop a dead one-way register copy `ld h,d; ld l,e`
    (HL:=DE) or `ld d,h; ld e,l` (DE:=HL) when the destination pair is FULLY
    reloaded before any use — the next real instruction (skipping labels /
@@ -774,7 +1104,8 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
     free(lines); free(drop);
 }
 
-static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
+static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
+                                         const Func *f)
 {
     char line[1024];
     char *ref = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
@@ -785,6 +1116,12 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
         while (fgets(line, sizeof line, rout)) fputs(line, out);
         return;
     }
+    /* Branch relaxation runs LAST: threading, dead-label elision and the
+       peepholes below all change the span a `jr` has to reach, so measuring
+       before them would be measuring the wrong function. `fout` is the real
+       destination for everything downstream of here. */
+    FILE *relax = branch_relax_enabled() ? tmpfile() : NULL;
+    FILE *fout = relax ? relax : out;
     for (int i = 0; i <= max_bb; i++) thr[i] = -1;
     /* Pass 0: jump-threading map. A run of one or more bare labels
        `L_f..._bb_<n>:` whose first following instruction is an UNCONDITIONAL
@@ -880,7 +1217,7 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
     int do_regcopy = !opt_disabled("dead-regcopy");
     int do_bc_live = !opt_disabled("bc-live");
     FILE *peep = (do_regcopy || do_bc_live) ? tmpfile() : NULL;
-    FILE *dst = peep ? peep : out;
+    FILE *dst = peep ? peep : fout;
     /* Pass 2: emit, dropping `L_f<d>_bb_<n>:` lines whose n is unreferenced, and
        DEFERRING `defc L_f..._bb_...` alias lines. The defc's are 0-byte symbol
        definitions emitted inline at the alias BBs' layout slots; moving them out
@@ -925,17 +1262,22 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb)
             if (scratch) {
                 filter_dead_reg_copies(scratch, peep);
                 rewind(scratch);
-                filter_dead_bc_parks(out, scratch);
+                filter_dead_bc_parks(fout, scratch);
                 fclose(scratch);
             } else {
-                filter_dead_reg_copies(out, peep);   /* OOM: skip bc stage */
+                filter_dead_reg_copies(fout, peep);  /* OOM: skip bc stage */
             }
         } else if (do_bc_live) {
-            filter_dead_bc_parks(out, peep);
+            filter_dead_bc_parks(fout, peep);
         } else {
-            filter_dead_reg_copies(out, peep);
+            filter_dead_reg_copies(fout, peep);
         }
         fclose(peep);
+    }
+    if (relax) {
+        rewind(relax);
+        filter_relax_branches(out, relax, f);
+        fclose(relax);
     }
     free(ref);
     free(thr);
@@ -4207,7 +4549,7 @@ int ir_lower_func(FILE *out, Func *f)
         }
     }
     if (elide_labels) {
-        if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb);
+        if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb, f);
         else { rewind(rout); char buf[1024];   /* error path: copy verbatim */
                while (fgets(buf, sizeof buf, rout)) fputs(buf, out); }
         fclose(rout);
