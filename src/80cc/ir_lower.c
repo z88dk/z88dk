@@ -1550,8 +1550,24 @@ static int frameless_ok(const Func *f)
         const VReg *vr = &f->vregs[v];
         if (!(vr->flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE))) continue;
         int ph = f->vreg_to_phys[v];
-        /* handled homes only: BC/DE (narrow). */
-        if (ph != IR_PR_BC && ph != IR_PR_DE) return 0;
+        /* The home must be one that CANNOT send the access back to memory: a
+           frameless function has no IX, and a PARAM_IN_PLACE's slot is the
+           CALLER's frame at (ix+d), so any reload of it reads through a
+           register that was never set up (see below — most ix-addressing sites
+           do not carry the !cur_frameless gate).
+           - DE is REJECTED: it is the lowerer's `ex de,hl` scratch, so a
+             DE-homed param is evicted and reloaded as a matter of course.
+             long_ir/looppr `lp_strcmp` did exactly that under
+             IR_BC_STEP_PARAM and ran away (231k -> 67.7M ticks, fp only; sp is
+             fine because the same reload is sp-relative).
+           - a RANGED home is REJECTED: outside its span the value is slotted by
+             definition, so it must reach memory.
+           Whole-function BC is what remains. This is the SHORT-TERM narrowing;
+           the real fix is to route every frame access to sp when frameless. */
+        if (ph != IR_PR_BC) return 0;
+        if (f->home_lo && f->home_hi
+            && (f->home_lo[v] != INT_MIN || f->home_hi[v] != INT_MAX))
+            return 0;
     }
     return 1;
 }
