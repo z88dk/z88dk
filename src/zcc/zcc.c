@@ -575,7 +575,7 @@ static option options[] = {
     { 0, "Cg", OPT_FUNCTION,  "Add an option to ez80-clang" , &clangarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Compiler (xcc) options:", NULL, NULL, 0 },
-    { 0, "Cx", OPT_FUNCTION,  "Add an option to ez80-clang" , &xccarg, AddToArgs, 0},
+    { 0, "Cx", OPT_FUNCTION,  "Add an option to xcc" , &xccarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
     { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
