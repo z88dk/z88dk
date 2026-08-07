@@ -389,14 +389,22 @@ void Args::parse_arg(std::string_view arg,
             options.library_paths.push_back(normalize_path(opt_arg));
             return;
 
-        case OptionType::LIBRARY:
+        case OptionType::LIBRARY: {
             if (!split_option_arg(arg, spec->name, opt_arg)) {
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
                 return;
             }
-            options.libs.push_back(normalize_path(opt_arg));
+            std::string lib_filename = resolve_library_path(opt_arg,
+                                       options.library_paths);
+            if (lib_filename.empty()) {
+                g_diag.error(loc, "Library not found: " + opt_arg);
+                g_diag.note(loc, searched_paths_string(options.library_paths));
+            }
+            else {
+                options.libs.push_back(normalize_path(lib_filename));
+            }
             return;
-
+        }
         case OptionType::OUTPUT:
             if (!split_option_arg(arg, spec->name, opt_arg)) {
                 g_diag.error(loc, "Invalid option: " + std::string(arg));
@@ -649,6 +657,7 @@ void Args::run_tool(std::string_view filename,
                                   options.include_paths);
     if (full_path.empty()) {
         g_diag.error(loc, "File not found: " + std::string(filename));
+        g_diag.note(loc, searched_paths_string(options.include_paths));
         return;
     }
 
@@ -876,6 +885,7 @@ void Args::search_source_file(std::string_view filename_,
                                       options.include_paths);
         if (list_full_path.empty()) {
             g_diag.error(loc, "File not found: " + list_filename);
+            g_diag.note(loc, searched_paths_string(options.include_paths));
             return;
         }
         StringId filename_id =
@@ -1020,6 +1030,7 @@ void Args::search_source_file(std::string_view filename_,
     // not found, avoid cascade of errors
     if (!g_diag.get_error_count()) {
         g_diag.error(loc, "File not found: " + filename);
+        g_diag.note(loc, searched_paths_string(options.include_paths));
     }
 }
 
