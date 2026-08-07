@@ -673,6 +673,26 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
        loops, no shift-temp spills, no 4-byte OR. */
     int w = (op->dst >= 0 && op->dst < f->n_vregs)
           ? f->vregs[op->dst].width : 2;
+    if (w == 2) {
+        /* Width-2 rotate by 8 = a byte swap of HL, which is three register
+           moves. This is what the big-endian byte-pack fold lowers to, so no
+           IR_BSWAP op is needed at this width (a width-4 byte REVERSE is not
+           any rotation, and does need one). Other width-2 counts have no
+           caller yet — the matcher only ever emits 8. */
+        if ((op->imm & 15) != 8) {
+            fprintf(stderr, "ir_lower: IR_ROTL width 2 count %d unsupported\n",
+                    (int)(op->imm & 15));
+            return -1;
+        }
+        load_to_hl(out, f, op->src[0]);
+        emit(out, "ld\ta,h");
+        emit(out, "ld\th,l");
+        emit(out, "ld\tl,a");
+        invalidate_a_cache();
+        hl_about_to_change(-1);
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
     if (w != 4) {
         fprintf(stderr, "ir_lower: IR_ROTL width %d unsupported\n", w);
         return -1;
