@@ -52,6 +52,10 @@ sub check_text_file {
     ( my $got_text = path($got_file)->slurp ) =~ s/\r\n/\n/g;
     ( my $exp_text = path($exp_file)->slurp ) =~ s/\r\n/\n/g;
 
+    # remove version
+    $got_text =~ s/Version: \S+//;
+    path($got_file)->spew_raw($got_text);
+
     note "text diff expected ($exp_file) got ($got_file)";
     my $diff = diff( \$exp_text, \$got_text, { STYLE => 'Unified' } );
     if ( $diff ne "" ) {
