@@ -4795,6 +4795,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                              const int *bb_pred_cnt, int *const *bb_preds,
                              const int *bb_alias)
 {
+    /* Per-render BC-tenant map, the mirror of bb_hl_out. Local to one render:
+       the carry is only consulted within a pass. NULL (OOM) degrades to "never
+       carry", which is the safe direction. */
+    int *bb_bc_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
+    if (bb_bc_out)
+        for (int i = 0; i < f->n_bbs; i++) bb_bc_out[i] = -1;
     /* Per-pass state reset (everything that was at function entry except
        func_emit_idx, which the caller bumps once for both passes). */
     L.cmp_label_counter = 0;
@@ -4984,6 +4990,39 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
         L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
+        /* BC carry across the BB boundary — the exact mirror of the HL carry
+           below. Previously the BC belief simply SURVIVED a boundary with no
+           check, which is unsound: BC may be taken by a transient deref base or
+           another tenant on some path in, and a ranged home (IR_VREG_CALL_SPLIT)
+           is only BC-resident inside its span. histbench is the case that
+           exposed it — `bins[]++` grabs BC after the multiply span, so every
+           iteration after the first read a STALE multiplicand across the back
+           edge. Carry only when every predecessor is already lowered, they all
+           agree on bc_out, and the value is live-in; otherwise go cold so the
+           span-entry `emit_bc_reload` fires. Keeping the proven carries is what
+           avoids paying for the reload where BC genuinely survived. */
+        {
+            int bcarry = -2;
+            for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                int pid = bb_preds[bb->id][p];
+                if (!bb_lowered[pid]) { bcarry = -1; break; }
+                int v = bb_bc_out ? bb_bc_out[pid] : -1;
+                if (v < 0) { bcarry = -1; break; }
+                if (bcarry == -2) bcarry = v;
+                else if (bcarry != v) { bcarry = -1; break; }
+            }
+            /* Only a RANGED home needs the proof. A whole-function BC home is
+               RESERVED by the allocator for the entire function, so its belief
+               legitimately survives any boundary — validating it there forces
+               pointless reloads (+224 B corpus when tried). A ranged home owns
+               BC only inside its span, so its carry must be proven. */
+            int need_proof = (L.rs.bc >= 0 && L.rs.bc < f->n_vregs
+                              && (f->vregs[L.rs.bc].flags & IR_VREG_CALL_SPLIT));
+            if (need_proof
+                && !(bcarry == L.rs.bc && bb->live_in
+                     && ir_bitset_get((const BitSet *)bb->live_in, bcarry)))
+                invalidate_bc_cache();
+        }
         L.af_park_depth = 0;         /* AF byte-park never crosses a BB */
         bc_args_save_depth = 0;
         L.la.cur_stack_long_top = -1;
@@ -5786,6 +5825,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             L.bb_byte_out_dirty[bb->id] =
                 (L.bb_byte_out[bb->id] >= 0 && L.cur_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
+        if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
         /* A holds a known byte here only if a byte compare (cp/or a) left it —
            word compares and calls clear rs.a. So rs.a captures A-preservation
            to the (branch) terminator; successors inherit it. */
@@ -5795,10 +5835,12 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     }
 
     rec_end(f);
+    free(bb_bc_out);
     return 0;
 
 cleanup_err:
     /* Caller (ir_lower_func) owns the bb_* arrays and ir_free_liveness. */
+    free(bb_bc_out);
     rec_reset();
     return -1;
 }

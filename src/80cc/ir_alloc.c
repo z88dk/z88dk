@@ -41,6 +41,59 @@ extern int c_reserve_iy;
    restores this and re-slots — reverting the function to baseline. */
 static int *word_home_prepick;
 
+/* Richest span for a ranged BC home: the longest run of reads of v containing
+   no call (BC is caller-clobbered) and, when `read_only`, no write of v either.
+   Returns the read count; reports the flat op indices of the first/last read.
+   `read_only` is what a PARAM needs — its home is backed by the caller's
+   in-place slot, which must stay the authoritative copy. */
+static int cs_best_span(const Func *f, int v, const int *bb_first_op,
+                        int read_only, int *out_lo, int *out_hi)
+{
+    int best = 0, blo = -1, bhi = -1;
+    int cur = 0, cfirst = -1, clast = -1;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            int boundary = (o->kind == IR_CALL || o->kind == IR_HCALL);
+            if (!boundary && read_only) {
+                int dfs[8]; int nd = ir_op_defs(o, dfs, 8);
+                for (int x = 0; x < nd; x++)
+                    if (dfs[x] == v) { boundary = 1; break; }
+                if (!boundary && o->kind == IR_POSTSTEP && o->src[0] == v)
+                    boundary = 1;
+            }
+            if (boundary) {
+                if (cur > best) { best = cur; blo = cfirst; bhi = clast; }
+                cur = 0; cfirst = -1; clast = -1;
+                continue;
+            }
+            int g = bb_first_op[b] + j;
+            int u[16]; int nu = ir_op_uses(o, u, 16);
+            for (int k = 0; k < nu; k++)
+                if (u[k] == v) {
+                    cur++;
+                    if (cfirst < 0) cfirst = g;
+                    clast = g;
+                }
+        }
+    if (cur > best) { best = cur; blo = cfirst; bhi = clast; }
+    *out_lo = blo; *out_hi = bhi;
+    return best;
+}
+
+/* Record a home decided AFTER the word-home pre-pick snapshot was taken. That
+   snapshot is what the lowerer restores when the speculative DE word-home fails
+   to form a region, and the restore is a WHOLE-ARRAY memcpy — so a decision made
+   later (the call-split's ranged BC home, ~2700 lines further down) was silently
+   wiped, leaving IR_VREG_CALL_SPLIT set with phys == SPILL. Mirror it into the
+   snapshot so it survives the revert. */
+static void alloc_note_late_home(Func *f, int v, PhysReg pr)
+{
+    f->vreg_to_phys[v] = pr;
+    if (word_home_prepick && v >= 0 && v < f->n_vregs)
+        word_home_prepick[v] = pr;
+}
+
 int *ir_alloc_take_word_home_prepick(void)
 {
     int *p = word_home_prepick;
@@ -4116,8 +4169,20 @@ void ir_alloc(Func *f)
                 for (int v = 0; v < nv; v++) {
                     const VReg *vr = &f->vregs[v];
                     if (vr->width != 2) continue;
-                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                                     | IR_VREG_PARAM)) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                        continue;
+                    /* ONE eligibility rule for the ranged BC home: a value earns
+                       it when it has a rich (>=3 read) span containing no call
+                       (BC is caller-clobbered). A PARAM qualifies on the same
+                       terms with one extra restriction — its span must also be
+                       WRITE-free, so the caller's in-place slot stays the
+                       authoritative copy and cannot go stale (the reason
+                       bc_home_realizable rejects written params does not reach a
+                       read-only span). A param need not CROSS a call either: a
+                       call-free function has no crossing yet can still reload the
+                       same slot eight times (histbench's const-multiply chain).
+                       Both differences ride on `is_param`. */
+                    int is_param = (vr->flags & IR_VREG_PARAM) != 0;
                     if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
                     if (wdb && wdb[v]) continue;         /* deref base — direct (bc) */
                     if (use_count[v] < 2) continue;
@@ -4134,32 +4199,10 @@ void ir_alloc(Func *f)
                     int crosses = 0;
                     for (int c = 0; c < ncall; c++)
                         if (callpos[c] >= lo && callpos[c] <= hi) { crosses = 1; break; }
-                    if (!crosses) continue;
-                    /* Richest call-free span: max reads, [first_read,last_read]. */
-                    int best_reads = 0, best_lo = -1, best_hi = -1;
-                    int cur = 0, cfirst = -1, clast = -1;
-                    for (int b = 0; b < f->n_bbs; b++)
-                        for (int j = 0; j < f->bbs[b].n_ops; j++) {
-                            const Op *o = &f->bbs[b].ops[j];
-                            if (o->kind == IR_CALL || o->kind == IR_HCALL) {
-                                if (cur > best_reads) {
-                                    best_reads = cur; best_lo = cfirst; best_hi = clast;
-                                }
-                                cur = 0; cfirst = -1; clast = -1;
-                                continue;
-                            }
-                            int g = bb_first_op[b] + j;
-                            int u[16]; int nu = ir_op_uses(o, u, 16);
-                            for (int k = 0; k < nu; k++)
-                                if (u[k] == v) {
-                                    cur++;
-                                    if (cfirst < 0) cfirst = g;
-                                    clast = g;
-                                }
-                        }
-                    if (cur > best_reads) {
-                        best_reads = cur; best_lo = cfirst; best_hi = clast;
-                    }
+                    if (!crosses && !is_param) continue;
+                    int best_lo = -1, best_hi = -1;
+                    int best_reads = cs_best_span(f, v, bb_first_op, is_param,
+                                                  &best_lo, &best_hi);
                     /* ≥3 reads is the BYTE-correct floor. The per-span CYCLE benefit
                        (§2.1) turns positive at N≥2 on dear-slot CPUs, but a 2-read
                        span REGRESSES bytes (sortbench +20/+32): the entry reload
@@ -4315,7 +4358,7 @@ void ir_alloc(Func *f)
                         continue;
                     }
                     /* Commit the split. */
-                    f->vreg_to_phys[v] = IR_PR_BC;
+                    alloc_note_late_home(f, v, IR_PR_BC);
                     if (f->home_lo && f->home_hi) {
                         f->home_lo[v] = best_lo;
                         f->home_hi[v] = best_hi;
