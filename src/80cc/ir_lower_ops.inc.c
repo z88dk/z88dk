@@ -719,14 +719,24 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
         emit(out, "inc\tl");
     }
     for (int i = 0; i < right; i++) {
-        /* 32-bit right rotate by 1: shift right, wrap bit0 into
-           bit31 (set 7,d is 2 bytes). */
-        emit(out, "srl\td");
+        /* 32-bit right rotate by 1. The bit that has to wrap into bit31
+           is bit0 of L, and it is known BEFORE the shift — so seed the
+           carry with it and let `rr d` shift it in, rather than shifting
+           it out of L and branching to put it back:
+
+               ld a,l / rrca      carry <- bit0 of L   (2 bytes)
+               rr d ...           wraps it into bit31
+
+           vs. srl d / ... / jr nc,+2 / set 7,d, which is 2 bytes longer
+           and branches once per rotated bit. `ld a,l` clobbers A; the
+           vemit A-tracker drops the belief on any line that writes A.
+           (rrca, not rlca: RRCA moves bit0 of A into carry.) */
+        emit(out, "ld\ta,l");
+        emit(out, "rrca");
+        emit(out, "rr\td");
         emit(out, "rr\te");
         emit(out, "rr\th");
         emit(out, "rr\tl");
-        emit_skip(out, f, "nc", 2);
-        emit(out, "set\t7,d");
     }
     /* DEHL physically permuted: every prior register claim is stale
        (incl. BC's low-half mirror). */
