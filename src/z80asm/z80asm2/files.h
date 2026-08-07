@@ -58,6 +58,11 @@ std::string resolve_include_candidate(std::string_view filename,
                                       std::string_view including_filename,
                                       bool is_angle,
                                       const std::vector<std::string>& include_paths);
+std::string searched_paths_string(const std::vector<std::string>& paths);
+
+// resolve a library path given the library stem or file name
+std::string resolve_library_path(std::string_view libname,
+                                 const std::vector<std::string>& library_paths);
 
 // Does the pattern contain any wildcard characters?
 bool has_wildcards(std::string_view pat);

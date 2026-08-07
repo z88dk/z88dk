@@ -216,6 +216,50 @@ std::string resolve_include_candidate(std::string_view filename,
     return std::string();
 }
 
+std::string searched_paths_string(const std::vector<std::string>& paths) {
+    std::string path_str;
+    for (auto& dir : paths) {
+        if (!path_str.empty()) {
+            path_str += ", ";
+        }
+        path_str += dir;
+    }
+    if (path_str.empty()) {
+        path_str = "Searched in: current directory";
+    }
+    else {
+        path_str = "Searched in: " + path_str;
+    }
+    return path_str;
+}
+
+std::string resolve_library_path(std::string_view libname,
+                                 const std::vector<std::string>& library_paths) {
+    // add .lib extrension if not present
+    std::string lib_filename;
+    if (is_lib_filename(libname)) {
+        lib_filename = libname;
+    }
+    else {
+        lib_filename = std::string(libname) + std::string(lib_extension);
+    }
+
+    // search current directory first
+    if (std::filesystem::exists(lib_filename)) {
+        return lib_filename;
+    }
+
+    // search library paths
+    for (auto& path : library_paths) {
+        std::string candidate = path + "/" + lib_filename;
+        if (std::filesystem::exists(candidate)) {
+            return candidate;
+        }
+    }
+
+    return "";  // not found
+}
+
 bool has_wildcards(std::string_view pat) {
     return pat.find('*') != std::string::npos ||
            pat.find('?') != std::string::npos;

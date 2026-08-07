@@ -1,6 +1,8 @@
 ## Pending issues
-- add import/export to ASCII to z80nm
 - add git hash to copyright screen
+- BINARY must search in include path - check tests
+- INCLUDE must search in include path - check tests
+- FileMgr binary file shall use BinaryFile (memory-mapped file)
 
 ## Future evolution
 - Memory maps for loading
@@ -11,6 +13,7 @@
 - Lazy symbol hydration (hydrate symbol bodies only when needed)
 - Module deduplication via hashing
 - Add BASIC { ... } to assemble BASIC tokens for zx81, zx
+- add import/export to ASCII to z80nm
 
 ## Linker Pipeline
 - [ ] Loading of input modules

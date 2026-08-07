@@ -1,0 +1,16 @@
+BEGIN { use lib 't'; require 'testlib.pl'; }
+
+use Modern::Perl;
+
+my $dir  = path($0)->dirname;
+my $self = path($0)->basename(".t");
+
+path("$test.lib")->spew("");
+capture_ok(
+"build/Debug/z88dk-z80asm -v -l$test.lib -dump-after-cmdline $dir/input/empty.asm",
+    "$dir/expected/$self.txt"
+);
+unlink("$test.lib");
+
+unlink_testfiles;
+done_testing;

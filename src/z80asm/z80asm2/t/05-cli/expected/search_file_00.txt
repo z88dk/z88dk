@@ -1,5 +1,6 @@
 % z88dk-z80asm -v -dump-after-cmdline file_does_not_exist
 <command-line>:3:1: error: File not found: file_does_not_exist
+<command-line>:3:1: note: Searched in: current directory
 Define constant: __CPU_ZILOG__ = 1
 Define constant: __CPU_Z80__ = 1
 Define constant: __FLOAT_GENMATH__ = 1
