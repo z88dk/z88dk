@@ -1,5 +1,6 @@
 Usage: z88dk-z80asm [options] files...
-Copyright (C) Paulo Custodio, 2011-2026
+Copyright (C) Gunther Strube, InterLogic 1993-1999, Paulo Custodio 2011-2026
+
 
 Assembles Z80 assembly source files into binary output.
 

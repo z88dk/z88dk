@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "../../config.h"
 #include "cpu.h"
 #include "diag.h"
 #include "environment.h"
@@ -35,7 +36,11 @@ static constexpr int option_col_width = 16 - 2;
 
 static constexpr std::string_view copyright =
     "Usage: z88dk-z80asm [options] files...\n"
-    "Copyright (C) Paulo Custodio, 2011-2026\n";
+    "Copyright (C) Gunther Strube, InterLogic 1993-1999, Paulo Custodio 2011-2026\n"
+#ifdef Z88DK_VERSION
+    "Version: " Z88DK_VERSION "\n"
+#endif
+    ;
 
 static constexpr OptionSpec g_option_specs[] = {
 #define X(name, str, takes_arg, arg_text, usage) \
