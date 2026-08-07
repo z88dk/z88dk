@@ -2465,6 +2465,22 @@ static void rec_end(const Func *f)
                partial shrink would move live slot offsets. */
             L.frame_fully_dead = (deadbytes == fs);
         }
+        /* [IR_PARAMRELOAD, INERT] Per-PARAM actual slot READ count from this
+           render — the honest mirage test. The allocator-side census counts raw
+           refs; this counts reloads the lowerer really emitted
+           (rec_slotuse - rec_slotwrite), so a value the belief cache serves
+           shows 0-1 and a genuinely reloaded one shows its true cost. */
+        if (getenv("IR_PARAMRELOAD")) {
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (!(vr->flags & IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                int reads = rec_slotuse[v] - (rec_slotwrite ? rec_slotwrite[v] : 0);
+                if (reads >= 2)
+                    fprintf(stderr, "PARAMRELOAD %s v%d w=%d reads=%d\n",
+                            f->fn ? ir_sym_name(f->fn) : "?", v, vr->width, reads);
+            }
+        }
         /* [IR_DEADSTORE, INERT] Write-only (dead-store) byte-slot report. Uses
            the read/write split: reads[v] = rec_slotuse[v] - rec_slotwrite[v].
            Coalescing-aware: readb[p]=1 iff SOME spill covering byte p was read,
