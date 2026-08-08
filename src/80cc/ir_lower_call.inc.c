@@ -879,6 +879,28 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
             L.cur_sp_adjust += 4;
             popped_bytes += 4;
         } else {
+            /* Loading this stacked arg into HL destroys whatever HL holds. If
+               that is a LATER operand — stacked OR the register operand at
+               args[n_stacked] — the repair is a slot reload, so a value that
+               never otherwise needed memory acquires a slot purely to survive
+               its own argument marshalling. Stash it in DE (free here) and let
+               the DE->HL recovery in load_to_hl serve it in turn.
+
+               libsrc tanf16, `sinf16(x)/cosf16(x)`: l_f16_div takes args[0]
+               stacked and args[1] in HL, and the cosf16 result IS args[1],
+               sitting in HL when args[0] is loaded. Scan to n_args, not to
+               n_stacked — the endangered operand is usually the register one. */
+            if (L.rs.hl >= 0 && L.rs.hl != v && L.rs.de < 0
+                && L.rs.hl < f->n_vregs && f->vregs[L.rs.hl].width == 2) {
+                for (int j = i + 1; j < hi->n_args; j++)
+                    if (hi->args[j] == L.rs.hl) {
+                        int keep = L.rs.hl;
+                        emit(out, "ld\te,l");
+                        emit(out, "ld\td,h");
+                        cache_de(keep);
+                        break;
+                    }
+            }
             load_to_hl(out, f, v);
             emit_sp(out, 2, "push\thl");
             popped_bytes += 2;

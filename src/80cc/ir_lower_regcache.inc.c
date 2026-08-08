@@ -296,8 +296,17 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     /* HL cache hit: no-op. Some callers call us unconditionally, and for
        PR_HL vregs (no slot) the slot read at the bottom would land at sp-1
-       and read garbage below the frame — so return early here. */
-    if (hl_has(vreg_id) && sp_adj == 0) { ss_note_cache_read(f, vreg_id); return; }
+       and read garbage below the frame — so return early here.
+
+       sp_adj is deliberately NOT tested. It only positions a SLOT read; a
+       register cache is a value cache, so if HL holds the vreg the stack
+       position is irrelevant. Requiring sp_adj==0 here (copied from the
+       IR_PR_STACK check above, where it IS required because the pop is only
+       valid at TOS) made a live HL cache fall through to a slot read. That was
+       invisible while the slot existed, and aborted once the dead-store pass
+       correctly elided it — libsrc fix16_atanh, a chain of fastcall results
+       where the value never needs memory at all. */
+    if (hl_has(vreg_id)) { ss_note_cache_read(f, vreg_id); return; }
     /* Every path below clobbers HL. If a width-2 spill is pending in HL,
        flush/discard it here while HL still holds it. */
     pending_spill_resolve();

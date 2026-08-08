@@ -2310,29 +2310,14 @@ static int rec_enabled(void)
    removed). Opt out with IR_DEADSTORE=0 (reproduces pre-flip codegen);
    IR_DEADSTORE=2 adds the per-slot report. */
 /* Width-2 half of IR_DEADSTORE (dead call-result / word slot stores).
-   OPT-IN (`IR_DSWORD=1`); the width-1 behaviour that shipped with #10 stays
-   default.
-
-   Turned back off after it aborted three libsrc files — fix16_atanh,
-   fix16_pow and tanf16 — with "value read with no live register and no stack
-   slot". Each is a chain of __z88dk_fastcall calls, `logk(mulk(divk(a,b),K))`,
-   where the dead vreg is a CALL RESULT feeding the next call. Render #1 keeps
-   it in a register between the two calls, so it shows zero slot reads and
-   looks dead; dropping the slot then makes the re-lower want a reload that did
-   not exist before. That is the same "eliding CREATES the reader" failure the
-   store-base exclusion above guards against, in a shape that exclusion does
-   not cover.
-
-   The width-1 half is unaffected and stays on, as does the write-attribution
-   fix that made store_hl_keep_hl mark its slot access — that part is a
-   correctness improvement to the analysis for both widths. Cost of having this
-   off: corpus code_compiler 16284 -> 16745 B. */
+   Default-on; `IR_DSWORD=0` opts out, leaving the width-1 behaviour that
+   shipped with #10 — the bisect handle for this bug family. */
 static int dsw_on = -1;
 static int dsw_enabled(void)
 {
     if (dsw_on < 0) {
         const char *e = getenv("IR_DSWORD");
-        dsw_on = (e && e[0] == '1') ? 1 : 0;
+        dsw_on = (e && e[0] == '0') ? 0 : 1;
     }
     return dsw_on;
 }
