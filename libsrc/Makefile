@@ -275,6 +275,7 @@ include target/pv1000/pv1000.mak
 include target/pv2000/pv2000.mak
 include target/radio86/radio86.mak
 include target/rc700/rc700.mak
+include target/rex/rex.mak
 include target/rx78/rx78.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
@@ -1072,12 +1073,11 @@ c7420_clib.lib: $(TARGET_CLIB_DEPS) $(C7420_TARGETS)
 	TARGET=c7420 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(TARGET_DIRECTORY)/c7420/c7420.lst
 
 # Xircom REX 6000 library - Dominic
-rex_clib.lib: $(TARGET_CLIB_DEPS)
+rex_clib.lib: $(TARGET_CLIB_DEPS) $(REX_TARGETS)
 	@echo ''
 	@echo '--- Building Xircom Rex Library ---'
 	@echo ''
 	$(call buildgeneric,rex)
-	$(MAKE) -C target/rex
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(TARGET_DIRECTORY)/rex/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
