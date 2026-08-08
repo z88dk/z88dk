@@ -795,6 +795,15 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
     if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
         emit(out, "ex\tde,hl");
         swap_hl_de_caches();
+        /* ASSERT the belief, do not merely swap it. This helper's contract is
+           that the value arrives in HL, but the CACHE need not already say so
+           — and after the swap the DE belief is then whatever rs.hl happened
+           to hold, which may be nothing. With the slot still present that did
+           not matter, because every reader could fall back to it. With the
+           slot elided the readers have nowhere to go and abort. The keep_hl
+           variant below always got this right because it calls cache_hl
+           outright. (libsrc asctime, regis/tek401x drawto.) */
+        cache_de(vreg_id);
         return;
     }
     /* Stack-transient (IR_PR_STACK): park HL on the stack, don't slot-store to
@@ -895,6 +904,22 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
        (same BB, or the next via bb_hl_out). Width-2 only; set only on the
        re-lower. */
     if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
+        /* The store is dead, but its REGISTER side effects are not. The real
+           path reaches the slot through HL, so it first moves the value to DE
+           (`ex de,hl`) and restores HL from there — leaving a SECOND copy in
+           DE that the code after it may be compiled against. Dropping the
+           store alone removes that copy, and a consumer needing the value
+           twice (asctime's `dayofweek(...)*3`, which is `add hl,hl` then
+           `add hl,de`) then has nowhere to get the second one: HL has been
+           consumed and the slot is gone.
+
+           So reproduce the register effects, not just the memory one. This is
+           2 bytes against the 6+ the store cost, and it keeps the elided
+           render's register state identical to the render the deadness was
+           measured on — which is what makes "rd=0 last time" still true. */
+        emit(out, "ld\te,l");
+        emit(out, "ld\td,h");
+        cache_de(vreg_id);
         cache_hl(vreg_id);
         return 1;
     }
