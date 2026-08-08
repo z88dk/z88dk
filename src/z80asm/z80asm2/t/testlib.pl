@@ -53,7 +53,7 @@ sub check_text_file {
     ( my $exp_text = path($exp_file)->slurp ) =~ s/\r\n/\n/g;
 
     # remove version
-    $got_text =~ s/Version: \S+//;
+    $got_text =~ s/Version: .*//;
     path($got_file)->spew_raw($got_text);
 
     note "text diff expected ($exp_file) got ($got_file)";

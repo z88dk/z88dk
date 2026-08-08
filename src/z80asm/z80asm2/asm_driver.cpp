@@ -43,7 +43,7 @@ void assemble_files(const std::vector<std::string>& filenames,
     for (auto& filename : filenames) {
         if (is_o_filename(filename)) {
             if (g_args.options.verbose) {
-                std::cout << "Skipping object file " << filename
+                std::cout << "Assembler: skipping object file " << filename
                           << "..." << std::endl;
             }
         }

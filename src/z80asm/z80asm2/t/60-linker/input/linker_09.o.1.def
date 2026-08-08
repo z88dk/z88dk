@@ -1,0 +1,8 @@
+begin library
+	begin module
+		name = M1
+		begin externs
+			name = A
+		end externs
+	end module
+end library

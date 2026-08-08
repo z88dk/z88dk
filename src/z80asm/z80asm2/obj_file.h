@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <string>
 
 //-----------------------------------------------------------------------------
 // object file version
@@ -475,6 +476,8 @@ public:
 
     void pack(BinaryData& bin_data);
     void unpack(std::shared_ptr<const BinaryFile> file, size_t ptr);
+
+    std::string module_name_string();
 
 private:
     StringId filename_id_;       // filename from which the module was created
