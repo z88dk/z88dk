@@ -119,6 +119,7 @@ struct _mapping {
         { "ftofix32s", "l_f48_ftofix32s", "l_f16_ftofix32s", "l_f32_ftofix32s", "l_f64_ftofix32s", "l_fix16_ftofix32s", NULL },
         { "ftofix32u", "l_f48_ftofix32u", "l_f16_ftofix32u", "l_f32_ftofix32u", "l_f64_ftofix32u", "l_fix16_ftofix32u", NULL },
         { "fix32tof", "l_f48_fix32tof", "l_f16_fix32tof", "l_f32_fix32tof", "l_f64_fix32tof", "l_fix16_fix32tof", NULL },
+        { "inversef", NULL, NULL, NULL,  NULL, "l_fix16_inv", "l_fix32_inv" }, 
         { NULL }
 };
 
@@ -2850,6 +2851,12 @@ void zdiv_const(LVALUE *lval, int64_t value64)
 
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
+    if ( isrhs == 0 && value == 1.0 &&
+        (lval->val_type == KIND_ACCUM16 || lval->val_type == KIND_ACCUM32)) {
+        dcallrts("inversef",lval->val_type);
+        return 1;
+    }
+
     return 0;
 }
 
