@@ -20,17 +20,17 @@ string: $(STRING_OBJS) $(STRING_TARGETS)
 
 .PHONY: string string-clean
 
-$(eval $(call buildnew,string,z80,-mz80,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,r2ka,-mr2ka,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,r4k,-mr4k,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,z80n,-mz80n,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,ixiy,-mz80 -IXIY,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,8080,-m8080,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,8085,-m8085,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,gbz80,-mgbz80,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,z180,-mz180,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,ez80_z80,-mez80_z80,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
-$(eval $(call buildnew,string,kc160,-mkc160,$(STRING_GLOBS),$(CTYPE_GLOBS_ex)))
+$(eval $(call buildnew,string,z80,-mz80,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,r2ka,-mr2ka,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,r4k,-mr4k,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,z80n,-mz80n,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,ixiy,-mz80 -IXIY,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,8080,-m8080,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,8085,-m8085,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,gbz80,-mgbz80,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,z180,-mz180,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,ez80_z80,-mez80_z80,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,kc160,-mkc160,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 
 
 string-clean:
