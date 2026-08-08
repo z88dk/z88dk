@@ -619,7 +619,7 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "ge"))       return f64 ? "l_f64_ge"  : "dge";
     if (!strcmp(stem, "eq"))       return f64 ? "l_f64_eq"  : "deq";
     if (!strcmp(stem, "ne"))       return f64 ? "l_f64_ne"  : "dne";
-    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_neg"    : "minusfa";
+    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_negate" : "minusfa";
     if (!strcmp(stem, "ftof16"))   return f64 ? "l_f64_ftof16" : "l_f48_ftof16";
     if (!strcmp(stem, "f16tof"))   return f64 ? "l_f64_f16tof" : "l_f48_f16tof";
     if (!strcmp(stem, "sint2f"))   return f64 ? "l_f64_sint2f"  : "l_int2long_s_float";
