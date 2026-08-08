@@ -4584,9 +4584,20 @@ int ir_lower_func(FILE *out, Func *f)
     if (deadframe_on() && !df_retry_done && rc == 0
         && L.frame_fully_dead && f->frame_size > 0) {
         df_retry_done = 1;
+        /* Clear EVERY slot, not just the PR_SPILL ones. A vreg with a RANGED
+           register home (home_lo/home_hi narrower than the whole function)
+           also owns a frame slot — that is where it lives outside its range —
+           yet its vreg_to_phys is the REGISTER, not PR_SPILL. Restricting the
+           sweep to PR_SPILL left such a vreg holding its old offset while the
+           frame it addressed was gone. Offset 0 then reads as a valid slot at
+           sp+0, which in a frameless function is the RETURN ADDRESS: the
+           width-2 store took the `pop de / push hl` top-of-stack path and
+           overwrote it (SMSlib menu loop: every iteration replaced the return
+           address with the joypad word). frame_fully_dead already proves no
+           slot is read, so dropping them all is safe; leaving one addressable
+           was not. */
         for (int v = 0; v < f->n_vregs; v++)
-            if ((!f->vreg_to_phys || f->vreg_to_phys[v] == IR_PR_SPILL)
-                && f->vreg_spill_slot && f->vreg_spill_slot[v] >= 0)
+            if (f->vreg_spill_slot && f->vreg_spill_slot[v] >= 0)
                 f->vreg_spill_slot[v] = -1;
         f->frame_size = 0;
         L.cur_frameless = frameless_ok(f);

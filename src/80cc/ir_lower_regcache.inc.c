@@ -633,7 +633,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         /* Top-of-stack: `pop de; push de` reads the whole word and
            leaves HL (and any pending spill) intact — better than the
            byte walk, which clobbers HL. sp-mode only. */
-        if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+        if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
             ss_note_reload(f, vreg_id);
             emit(out, "pop\tde");
             emit(out, "push\tde");
@@ -850,7 +850,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
     /* Top-of-stack: discard the slot word (inc sp x2) and push the value.
        Honours the contract (DE=value, HL=junk). sp-mode only, 4 ops vs the
        6-op byte walk. */
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
         emit(out, "ex\tde,hl");        /* DE = value */
         emit(out, "inc\tsp");
         emit(out, "inc\tsp");
@@ -923,6 +923,18 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         cache_hl(vreg_id);
         return 1;
     }
+    /* No frame slot to store into. Dead-frame elision drops every slot and
+       re-lowers, so a store can outlive its slot; the value is register-only
+       from here. Emitting the offset anyway would address sp+(-1) — below the
+       frame — or, when a stale offset survived as 0, the return address. The
+       elision only runs once frame_fully_dead proves no slot is read, so the
+       store is dead by construction and keeping the value in HL is complete.
+       Mirrors the IR_VREG_DEAD_SPILL case above. */
+    if (vreg_id >= 0 && slot_off(f, vreg_id) < 0
+        && !(f->vregs[vreg_id].flags & IR_VREG_PARAM_IN_PLACE)) {
+        cache_hl(vreg_id);
+        return 1;
+    }
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
         emit_sp(out, 2, "push\thl");            /* HL preserved by push */
         L.cur_stack_resident = vreg_id;
@@ -948,7 +960,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));  /* HL preserved */
         return 1;
     }
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
         emit(out, "pop\tde");                   /* discard old TOS (DE dead) */
         emit(out, "push\thl");                  /* store; HL preserved */
         invalidate_de_cache();
