@@ -6,14 +6,15 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize - 8085 normalisation
+; m32_fsnormalize - z80 / z180 / z80n normalisation
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked: h==0; mantissa=lde, sign in b, exponent in c
-;  result packed IEEE DEHL (no af')
 ;
 ;  ex de,hl → E:HL; byte scan; unrolled residual walk jumps into
 ;  reverse-label shift tree (add hl,hl / rl de); ex de,hl → pack.
+;
+;  af' unused for control flow.  Exit: ex af,af; ret (F' → public F).
 ;
 ;-------------------------------------------------------------------------
 
@@ -29,9 +30,13 @@ PUBLIC m32_fsnormalize
 
     ex de,hl                    ; E = high, HL = mid:low, D = 0
 
+    ; ---------------------------------------------------------------
+    ; Byte scan on E:HL
+    ; ---------------------------------------------------------------
+
     ld a,e
     or a
-    jp m,no_shift
+    jp m,no_shift               ; already normalised
     jr nz,bitwalk
 
     ld a,h
@@ -42,6 +47,7 @@ PUBLIC m32_fsnormalize
     or a
     jp z,normzero
 
+    ; leading in L → exp −16
     ld e,l
     ld hl,0
     ld a,c
@@ -64,6 +70,11 @@ PUBLIC m32_fsnormalize
     or a
     jp m,no_shift
     jp z,normzero
+
+    ; ---------------------------------------------------------------
+    ; Unrolled residual walk on A (copy of E); jump into shift tree
+    ; B = residual count (set here, only used after shifts)
+    ; ---------------------------------------------------------------
 
 .bitwalk
     ld b,1
@@ -89,6 +100,7 @@ PUBLIC m32_fsnormalize
     jp p,normzero               ; 7th trial still clear → zero
     ; fall through to s7
 
+    ; reverse-label residual shifts (more shifts enter higher)
 .s7
     add hl,hl
     rl de
@@ -114,32 +126,28 @@ PUBLIC m32_fsnormalize
     ld a,c
     sub b
     jp c,normzero
-    ld c,a
+    ld c,a                      ; final exp
 
 .no_shift
     ex de,hl                    ; E:HL → LDE
 
-    pop af
+    pop af                      ; sign
     ld b,a
     ld a,c
 
-    ld h,a
-    ld a,l
-    rla
-    ld l,a
-    ld a,b
-    rla
-    ld a,h
+    ; pack IEEE DEHL
+    rl l
+    rl b
     rra
+    rr l
     ld h,a
-    ld a,l
-    rra
-    ld l,a
     ex de,hl
+    ex af,af
     ret
 
 .normzero
-    pop af
+    pop af                      ; drop sign
     ld hl,0
     ld de,hl
+    ex af,af
     ret

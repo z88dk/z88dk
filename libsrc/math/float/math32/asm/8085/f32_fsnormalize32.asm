@@ -1,16 +1,20 @@
 ;
-;  feilipu, 2026 July
+;  feilipu, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-; 8085 m32_fsnormalize32 — expanded 32-bit mantissa normalize
+;-------------------------------------------------------------------------
+; m32_fsnormalize32 - 8085 unpacked 32-bit normalisation
+;-------------------------------------------------------------------------
 ;
-; Unpacked: B=exp, C[7]=sign, DEHL=32-bit mant (D=MSB). Same as Z80.
-; Left-shift until bit31 set; adjust B. Underflow/zero → zero (B=0, mant=0).
-; Sign C preserved except on zero (C left as-is / zero path clears mant+exp).
+;  unpacked: mantissa=dehl, exponent in b, sign in c[7]
+;  DEHL is already add hl,hl / rl de layout.
 ;
+;  Byte scan; unrolled residual walk jumps into reverse-label shift tree.
+;
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -19,377 +23,119 @@ PUBLIC m32_fsnormalize32
 
 
 .m32_fsnormalize32
-    ; C1: already normalized (bit31) or single left shift
-    ld a,d
-    and 080h
-    ret NZ
-    ld a,d
-    and 040h
-    jp Z,norm_tree
-    add hl,hl
-    rl de
-    ld a,-1
-    add a,b
-    jp NC,normzero
-    ld b,a
-    ret
-
-;-----------------------------------------------------------------------
-; C2 tree: nibble dispatch; shared promote tails.
-; After C1, S32H only needs 2 or 3 shifts.
-;-----------------------------------------------------------------------
-.norm_tree
     ld a,d
     or a
-    jp Z,fa8a
-    and 0f0h
-    jp Z,S32L
-    jp S32H
+    ret m
+    jr nz,bitwalk
 
-.fa8a
     ld a,e
     or a
-    jp Z,fa8b
-    and 0f0h
-    jp Z,S24L
-    jp S24H
+    jr nz,need8
 
-.fa8b
     ld a,h
     or a
-    jp Z,fa8c
-    and 0f0h
-    jp Z,S16L
-    jp S16H
+    jr nz,need16
 
-; Only L nonzero — low-byte residual after cancellation
-.fa8c
     ld a,l
     or a
-    jp Z,normzero
-    push bc
-    ld c,0
-.s8lp
+    jp z,normzero
+
+    ld d,l
+    ld e,0
+    ld hl,0
+    ld a,b
+    sub 24
+    ld b,a
+    jp c,normzero
+    jp got_lead
+
+.need16
+    ex de,hl
+    ld a,b
+    sub 16
+    ld b,a
+    jp c,normzero
+    jp got_lead
+
+.need8
+    ld d,e
+    ld e,h
+    ld h,l
+    ld l,0
+    ld a,b
+    sub 8
+    ld b,a
+    jp c,normzero
+
+.got_lead
     ld a,d
-    and 080h
-    jp NZ,s8done
+    or a
+    ret m
+    jp z,normzero
+
+.bitwalk
+    push bc                     ; exp + sign
+    ld b,1
+    add a,a
+    jp m,s1
+    inc b
+    add a,a
+    jp m,s2
+    inc b
+    add a,a
+    jp m,s3
+    inc b
+    add a,a
+    jp m,s4
+    inc b
+    add a,a
+    jp m,s5
+    inc b
+    add a,a
+    jp m,s6
+    inc b
+    add a,a
+    jp p,bitwalk_zero           ; 7th trial still clear → zero
+    ; fall through to s7
+
+.s7
     add hl,hl
     rl de
-    inc c
-    ld a,c
-    cp 32
-    jp C,s8lp
+.s6
+    add hl,hl
+    rl de
+.s5
+    add hl,hl
+    rl de
+.s4
+    add hl,hl
+    rl de
+.s3
+    add hl,hl
+    rl de
+.s2
+    add hl,hl
+    rl de
+.s1
+    add hl,hl
+    rl de
+
+    ld a,b
     pop bc
-    jp normzero
-.s8done
-    pop de                          ; D=exp E=sign
-    ld a,d
-    sub c
-    jp C,normzero
-    jp Z,normzero
-    ld b,a
-    ld c,e
-    ret
-
-;-----------------------------------------------------------------------
-; D high nibble live, bits 7–6 clear → 2 or 3 shifts
-.S32H
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    jp C,S32H_u2
-    ld a,-3
-    jp normdone
-
-.S32H_u2
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-2
-    jp normdone
-
-;-----------------------------------------------------------------------
-.S32L                           ; 4–7 left shifts
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    ld a,d
-    and 0f0h
-    jp Z,S32L4more
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    jp C,S32L_u4
-    add hl,hl
-    rl de
-    jp C,S32L_u5
-    ld a,-6
-    jp normdone
-
-.S32L4more
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    add hl,hl
-    rl de
-    ld a,-7
-    jp normdone
-
-.S32L_u4
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-4
-    jp normdone
-
-.S32L_u5
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-5
-    ; fall through
-
-.normdone
+    cpl
+    inc a
     add a,b
-    jp NC,normzero
+    jp nc,normzero
     ld b,a
     ret
 
+.bitwalk_zero
+    pop bc                      ; drop exp+sign
 .normzero
     xor a
     ld b,a
     ld d,a
     ld e,a
     ld h,a
-    ld l,a
-    ret
-
-; Promote E:H:L → D:E:H:L with L=0; A = shift adjust
-.prom_ehl
-    ld d,e
-    ld e,h
-    ld h,l
-    ld l,0
-    jp normdone
-
-; Promote HL → DE, clear HL; A = shift adjust
-.prom_hl
-    ex de,hl
-    ld hl,0
-    jp normdone
-
-;-----------------------------------------------------------------------
-.S16L
-    add hl,hl
-    add hl,hl
-    add hl,hl
-    ld a,h
-    and 0f0h
-    jp Z,S16L4more
-    add hl,hl
-    add hl,hl
-    jp C,S16L_u4
-    add hl,hl
-    jp C,S16L_u5
-    ld a,-22
-    jp prom_hl
-
-.S16L_u4
-    call rr_hl
-    ld a,-20
-    jp prom_hl
-
-.S16L_u5
-    call rr_hl
-    ld a,-21
-    jp prom_hl
-
-.S16L4more
-    add hl,hl
-    add hl,hl
-    add hl,hl
-    add hl,hl
-    ld a,-23
-    jp prom_hl
-
-;-----------------------------------------------------------------------
-.S24L
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    and 0f0h                    ; A still holds result (copt: drop ld a,e)
-    jp Z,S24L4more
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    or a                        ; A still holds result
-    jp M,S24L4
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    or a
-    jp M,S24L5
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,-14
-    jp prom_ehl
-
-.S24L4
-    ld a,-12
-    jp prom_ehl
-
-.S24L5
-    ld a,-13
-    jp prom_ehl
-
-.S24L4more
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,-15
-    jp prom_ehl
-
-;-----------------------------------------------------------------------
-.S24H
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    jp C,S24H_u0
-    or a                        ; A still holds result (copt: drop ld a,e)
-    jp M,S24H1
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    or a                        ; A still holds result (copt: drop ld a,e)
-    jp M,S24H2
-    add hl,hl
-    ld a,e
-    rla
-    ld e,a
-    ld a,-11
-    jp prom_ehl
-
-.S24H_u0
-    ld a,e
-    rra
-    ld e,a
-    call rr_hl
-    ld a,-8
-    jp prom_ehl
-
-.S24H1
-    ld a,-9
-    jp prom_ehl
-
-.S24H2
-    ld a,-10
-    jp prom_ehl
-
-;-----------------------------------------------------------------------
-.S16H
-    add hl,hl
-    jp C,S16H_u0
-    add hl,hl
-    jp C,S16H1
-    add hl,hl
-    jp C,S16H2
-    ld a,-19
-    jp prom_hl
-
-.S16H_u0
-    call rr_hl
-    ld a,-16
-    jp prom_hl
-
-.S16H1
-    call rr_hl
-    ld a,-17
-    jp prom_hl
-
-.S16H2
-    call rr_hl
-    ld a,-18
-    jp prom_hl
-
-;-----------------------------------------------------------------------
-; Logical right 1 of DEHL through C (8085: no rr de)
-.rr_dehl
-    ld a,d
-    rra
-    ld d,a
-    ld a,e
-    rra
-    ld e,a
-.rr_hl
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
     ld l,a
     ret

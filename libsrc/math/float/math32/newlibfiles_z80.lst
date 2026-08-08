@@ -357,7 +357,7 @@
 ../../../math/float/math32/lm32/z80/asm_zerof.asm
 ../../../math/float/math32/asm/z80/d32_fsadd.asm
 ../../../math/float/math32/asm/z80/d32_fsconv.asm
-../../../math/float/math32/asm/z80/d32_fsnormalize.asm
+../../../math/float/math32/asm/z80/f32_fsnormalize.asm
 ../../../math/float/math32/asm/z80/d32_fsutil.asm
 ../../../math/float/math32/asm/z80/f32_discardfraction.asm
 ../../../math/float/math32/asm/z80/f32_f2long.asm
