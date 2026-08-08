@@ -42,11 +42,7 @@
 
 double eval_A(int i, int j)
 {
-#ifdef __MATH_MATH32
-    return inv((i+j)*(i+j+1)/2+i+1);
-#else
     return 1.0/((i+j)*(i+j+1)/2+i+1);
-#endif
 }
 
 void eval_A_times_u(const double u[], double Au[])

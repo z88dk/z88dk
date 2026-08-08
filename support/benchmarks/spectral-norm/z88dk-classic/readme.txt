@@ -1,8 +1,8 @@
 CHANGES TO SOURCE CODE
 ======================
 
-When built with --math16 (__MATH_MATH16), floating types use _Float16,
-invf16, and sqrtf16. Matrix elements and intermediate norms stay in half range.
+When built with --math16 (__MATH_MATH16), floating types use _Float16
+and sqrtf16. Matrix elements and intermediate norms stay in half range.
 
 VERIFY CORRECT RESULT
 =====================

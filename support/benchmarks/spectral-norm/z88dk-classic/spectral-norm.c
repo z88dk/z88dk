@@ -48,13 +48,7 @@
 
 DOUBLE eval_A(int i, int j)
 {
-#ifdef __MATH_MATH16
-    return invf16((DOUBLE)((i+j)*(i+j+1)/2+i+1));
-#elif defined(__MATH_MATH32)
-    return inv((i+j)*(i+j+1)/2+i+1);
-#else
     return 1.0/((i+j)*(i+j+1)/2+i+1);
-#endif
 }
 
 void eval_A_times_u(const DOUBLE u[], DOUBLE Au[])
