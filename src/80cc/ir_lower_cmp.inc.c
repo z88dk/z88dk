@@ -292,6 +292,45 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         L.la.cur_skip_next_op = 1;
         return 0;
     }
+    /* UNSIGNED width-2 vs a constant whose LOW BYTE IS ZERO (branch-fused):
+       compare the HIGH BYTES only. For K = H*256 and i = ih*256 + il,
+
+           ih <  H  =>  i <= ih*256+255 < (ih+1)*256 <= K   so i < K
+           ih == H  =>  i  = H*256 + il >= K                so not i < K
+           ih >  H  =>  i > K
+
+       so `i < K` is exactly `ih < H`, and `cp H` leaves CF with the same
+       meaning the 16-bit form would. Replaces `ld hl,src / ld de,K / and a /
+       sbc hl,de` (4 instructions, 9 bytes) with `ld a,<hi> / cp H` (2
+       instructions, 3 bytes). Bound checks against a round constant are the
+       common case — rle_encode's `i < 1024` runs this every inner iteration.
+
+       Works in BOTH fp and sp: nothing here addresses a frame slot, and the
+       high byte is read from wherever the value already lives. Only `<` and
+       `>=` narrow — `i <= K` is `i < K+1`, whose low byte is not zero.
+       --opt-disable=cmp-hi. */
+    if ((op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGE)
+        && !opt_disabled("cmp-hi")
+        && op->src[0] >= 0 && op->src[1] == -1 && op->imm_sym == NULL
+        && g_hc.branch_test_kind != 0
+        && f->vregs[op->src[0]].width == 2
+        && (op->imm & 0xff) == 0
+        && op->imm >= 0x100 && op->imm <= 0xff00) {
+        int v0 = op->src[0];
+        if (vreg_in_pr_bc(f, v0))       emit(out, "ld\ta,b");
+        else if (vreg_is_pr_de(f, v0))  emit(out, "ld\ta,d");
+        else if (hl_has(v0))            emit(out, "ld\ta,h");
+        else { load_to_hl(out, f, v0);  emit(out, "ld\ta,h"); }
+        emit(out, "cp\t%u", (unsigned)((op->imm >> 8) & 0xff));
+        int br_true = (g_hc.branch_test_kind == IR_BR_COND);
+        int want_carry = (cf_true_long == br_true);
+        emit(out, "jp\t%s,L_f%d_bb_%d",
+             want_carry ? "c" : "nc", L.func_emit_idx,
+             L.la.cur_branch_test_label);
+        L.rs.a = -1;                      /* A clobbered; HL/DE/BC untouched */
+        L.la.cur_skip_next_op = 1;
+        return 0;
+    }
     /* Signed byte vs const: bias both operands by 0x80 to map [-128,127] onto
        [0,255] order-preservingly, then an unsigned `cp`. `c < K` (signed) iff
        (c^0x80) < (K^0x80) (unsigned). Keeps a signed-char relational as

@@ -295,9 +295,15 @@ Node *ast_fold_constants(Node *node)
            catches both `5/0` (folded directly) and `x/0` after
            const-prop turned `x = 0;` into a literal. Result is
            defined as zero to match legacy plnge2a behaviour. */
+        /* Compare the LITERAL VALUE, not a truncating cast of it. zval is a
+           zdouble, so `(int64_t)zval == 0` reads every float constant with
+           magnitude below 1 as zero — `x / (1.0/256.0)` (math_fix16.h's
+           FIX16_FROM_FLOAT) warned and then folded the whole division to a
+           literal zero. An integer literal 0 still has zval == 0.0, so the
+           direct comparison keeps the integer case exactly as it was. */
         if ((node->ast_type == OP_DIV || node->ast_type == OP_MOD)
             && R && R->ast_type == AST_LITERAL
-            && (int64_t)R->zval == 0) {
+            && R->zval == 0) {
             warningfmt_at("division-by-zero", node->filename, node->line,
                 "Division by zero, result set to be zero");
             Type *t = node->type ? node->type

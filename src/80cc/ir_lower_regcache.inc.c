@@ -296,8 +296,17 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
     }
     /* HL cache hit: no-op. Some callers call us unconditionally, and for
        PR_HL vregs (no slot) the slot read at the bottom would land at sp-1
-       and read garbage below the frame — so return early here. */
-    if (hl_has(vreg_id) && sp_adj == 0) { ss_note_cache_read(f, vreg_id); return; }
+       and read garbage below the frame — so return early here.
+
+       sp_adj is deliberately NOT tested. It only positions a SLOT read; a
+       register cache is a value cache, so if HL holds the vreg the stack
+       position is irrelevant. Requiring sp_adj==0 here (copied from the
+       IR_PR_STACK check above, where it IS required because the pop is only
+       valid at TOS) made a live HL cache fall through to a slot read. That was
+       invisible while the slot existed, and aborted once the dead-store pass
+       correctly elided it — libsrc fix16_atanh, a chain of fastcall results
+       where the value never needs memory at all. */
+    if (hl_has(vreg_id)) { ss_note_cache_read(f, vreg_id); return; }
     /* Every path below clobbers HL. If a width-2 spill is pending in HL,
        flush/discard it here while HL still holds it. */
     pending_spill_resolve();
@@ -624,7 +633,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
         /* Top-of-stack: `pop de; push de` reads the whole word and
            leaves HL (and any pending spill) intact — better than the
            byte walk, which clobbers HL. sp-mode only. */
-        if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+        if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
             ss_note_reload(f, vreg_id);
             emit(out, "pop\tde");
             emit(out, "push\tde");
@@ -778,6 +787,25 @@ static void store_hl(FILE *out, const Func *f, int vreg_id)
 }
 static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
 {
+    /* [IR_DEADSTORE word] Dead slot store (see store_hl_keep_hl_impl). This
+       helper's contract is DE=value / HL=junk, so the store collapses to the
+       single `ex de,hl` that moves the value into place; cache DE for the
+       readers. A caller that wanted HL back emits its own `ex de,hl` and copt
+       #284 cancels the pair. */
+    if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
+        emit(out, "ex\tde,hl");
+        swap_hl_de_caches();
+        /* ASSERT the belief, do not merely swap it. This helper's contract is
+           that the value arrives in HL, but the CACHE need not already say so
+           — and after the swap the DE belief is then whatever rs.hl happened
+           to hold, which may be nothing. With the slot still present that did
+           not matter, because every reader could fall back to it. With the
+           slot elided the readers have nowhere to go and abort. The keep_hl
+           variant below always got this right because it calls cache_hl
+           outright. (libsrc asctime, regis/tek401x drawto.) */
+        cache_de(vreg_id);
+        return;
+    }
     /* Stack-transient (IR_PR_STACK): park HL on the stack, don't slot-store to
        the -1 sentinel (which the sp fallback turns into a write at sp-1).
        Defensive catch-all for producers that reach store_hl directly rather than
@@ -822,7 +850,7 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
     /* Top-of-stack: discard the slot word (inc sp x2) and push the value.
        Honours the contract (DE=value, HL=junk). sp-mode only, 4 ops vs the
        6-op byte walk. */
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
         emit(out, "ex\tde,hl");        /* DE = value */
         emit(out, "inc\tsp");
         emit(out, "inc\tsp");
@@ -854,8 +882,59 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
    copt then has to clean up. This is the store for callers that want HL after:
    the value stays put, the ex de,hl pair never exists. The old-TOS discard uses
    `pop de` (dead DE) not `inc sp; inc sp` (1B/2T cheaper). DE cache dropped. */
+/* Write-context wrapper, mirroring store_hl's: this helper IS a store, so every
+   slot_off/slot_ix_off it makes must be attributed to the WRITE count. Without
+   it a call-result spill (its main caller, ir_lower_call.inc.c) looked "never
+   written but read" to the IR_DEADSTORE read/write split, hiding every dead
+   call-result store. */
+static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id);
 static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
 {
+    int save = slot_write_ctx; slot_write_ctx = 1;
+    int r = store_hl_keep_hl_impl(out, f, vreg_id);
+    slot_write_ctx = save;
+    return r;
+}
+static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
+{
+    /* [IR_DEADSTORE word] Slot written but never read (read/write split,
+       coalescing-checked; ir_assign_slots dropped the slot on the re-lower).
+       The value is already in HL and this helper's contract is HL=value, so the
+       store simply disappears — cache HL so every reader is served from it
+       (same BB, or the next via bb_hl_out). Width-2 only; set only on the
+       re-lower. */
+    if (vreg_id >= 0 && (f->vregs[vreg_id].flags & IR_VREG_DEAD_SPILL)) {
+        /* The store is dead, but its REGISTER side effects are not. The real
+           path reaches the slot through HL, so it first moves the value to DE
+           (`ex de,hl`) and restores HL from there — leaving a SECOND copy in
+           DE that the code after it may be compiled against. Dropping the
+           store alone removes that copy, and a consumer needing the value
+           twice (asctime's `dayofweek(...)*3`, which is `add hl,hl` then
+           `add hl,de`) then has nowhere to get the second one: HL has been
+           consumed and the slot is gone.
+
+           So reproduce the register effects, not just the memory one. This is
+           2 bytes against the 6+ the store cost, and it keeps the elided
+           render's register state identical to the render the deadness was
+           measured on — which is what makes "rd=0 last time" still true. */
+        emit(out, "ld\te,l");
+        emit(out, "ld\td,h");
+        cache_de(vreg_id);
+        cache_hl(vreg_id);
+        return 1;
+    }
+    /* No frame slot to store into. Dead-frame elision drops every slot and
+       re-lowers, so a store can outlive its slot; the value is register-only
+       from here. Emitting the offset anyway would address sp+(-1) — below the
+       frame — or, when a stale offset survived as 0, the return address. The
+       elision only runs once frame_fully_dead proves no slot is read, so the
+       store is dead by construction and keeping the value in HL is complete.
+       Mirrors the IR_VREG_DEAD_SPILL case above. */
+    if (vreg_id >= 0 && slot_off(f, vreg_id) < 0
+        && !(f->vregs[vreg_id].flags & IR_VREG_PARAM_IN_PLACE)) {
+        cache_hl(vreg_id);
+        return 1;
+    }
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
         emit_sp(out, 2, "push\thl");            /* HL preserved by push */
         L.cur_stack_resident = vreg_id;
@@ -881,7 +960,7 @@ static int store_hl_keep_hl(FILE *out, const Func *f, int vreg_id)
         emit(out, "ld\t(sp+%d),hl%s", off, vol_stamp(f, vreg_id));  /* HL preserved */
         return 1;
     }
-    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f)) {
+    if (off == 0 && !fp_active(f) && tos_pushpop_ok(f) && f->frame_size >= 2) {
         emit(out, "pop\tde");                   /* discard old TOS (DE dead) */
         emit(out, "push\thl");                  /* store; HL preserved */
         invalidate_de_cache();

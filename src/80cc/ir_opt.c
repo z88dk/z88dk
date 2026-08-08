@@ -1735,11 +1735,84 @@ static int dce_pure_kind(const Op *op)
     }
 }
 
+/* ---- Dead DEFS (per-BB) --------------------------------------------------
+   ir_opt_dce below is a per-VREG use count: it drops a def only when the vreg
+   is never used ANYWHERE. That cannot see a redundant def, because 80cc maps
+   one local to one vreg — a reassigned local keeps the same vreg, so an earlier
+   def stays "used" on account of a later read of the LATER def.
+
+   The classic producer is a short delegating function: `int r = 0; r += f();`.
+   const-fold rewrites `0 + f()` to a direct define of r by the CALL (which is
+   what lets the frame disappear) but leaves the `LD_IMM r <- 0` stranded, and
+   DCE keeps it because r is still read by the return/next call.
+
+   Removing it is sound WITHIN A BB with no dataflow: if a def's vreg is
+   redefined later in the same BB with no read in between, every later reader
+   sees the second def, and the first def already killed whatever preceded it —
+   so no path can observe the first. Cross-BB cases need real liveness and are
+   deliberately not attempted here.
+
+   Excludes address-taken/volatile vregs (memory may be observed elsewhere) and
+   reuses dce_pure_kind so an op with side effects is never dropped — a CALL
+   defining a dead dst still has to run. `--opt-disable=dead-def` opts out. */
+static int ir_opt_dead_defs(Func *f)
+{
+    if (opt_disabled("dead-def")) return 0;
+    int removed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int new_n = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            int d = op->dst, dead = 0;
+            if (d >= 0 && d < f->n_vregs && dce_pure_kind(op)
+                && !(f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                for (int k = j + 1; k < bb->n_ops; k++) {
+                    /* A BB here can hold a MID-BLOCK conditional branch (the
+                       `BR_COND …; BR …` tail), so a later op is NOT guaranteed
+                       to execute: control may leave first and a successor read
+                       the value. Stop at any control transfer — without this,
+                       umaxd's loop lost an IR_INC whose value the next block
+                       consumed on the taken path. */
+                    switch (bb->ops[k].kind) {
+                    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+                    case IR_SWITCH: case IR_RET:
+                    case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+                        k = bb->n_ops; continue;      /* end the scan */
+                    default: break;
+                    }
+                    int uses[16];
+                    int nu = ir_op_uses(&bb->ops[k], uses, 16), read = 0;
+                    for (int u = 0; u < nu && u < 16; u++)
+                        if (uses[u] == d) { read = 1; break; }
+                    if (read) break;                  /* observed — keep */
+                    int defs[8];
+                    int nd = ir_op_defs(&bb->ops[k], defs, 8), redef = 0;
+                    for (int x = 0; x < nd; x++)
+                        if (defs[x] == d) { redef = 1; break; }
+                    if (redef) { dead = 1; break; }   /* killed unread */
+                }
+            }
+            if (dead) {
+                if (getenv("IR_DEADDEF_LOG"))
+                    fprintf(stderr, "IR_DEADDEF: %s bb%d op%d kind=%d dst=v%d "
+                            "w=%d REMOVED\n", f->fn ? ir_sym_name(f->fn) : "?",
+                            b, j, (int)op->kind, d, f->vregs[d].width);
+                removed++; continue;
+            }
+            if (new_n != j) bb->ops[new_n] = bb->ops[j];
+            new_n++;
+        }
+        bb->n_ops = new_n;
+    }
+    return removed;
+}
+
 int ir_opt_dce(Func *f)
 {
     if (!f) return 0;
     if (opt_disabled("dce")) return 0;
-    int removed = 0;
+    int removed = ir_opt_dead_defs(f);
     int pass_changed;
     do {
         pass_changed = 0;

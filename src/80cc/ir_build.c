@@ -619,7 +619,7 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "ge"))       return f64 ? "l_f64_ge"  : "dge";
     if (!strcmp(stem, "eq"))       return f64 ? "l_f64_eq"  : "deq";
     if (!strcmp(stem, "ne"))       return f64 ? "l_f64_ne"  : "dne";
-    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_neg"    : "minusfa";
+    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_negate" : "minusfa";
     if (!strcmp(stem, "ftof16"))   return f64 ? "l_f64_ftof16" : "l_f48_ftof16";
     if (!strcmp(stem, "f16tof"))   return f64 ? "l_f64_f16tof" : "l_f48_f16tof";
     if (!strcmp(stem, "sint2f"))   return f64 ? "l_f64_sint2f"  : "l_int2long_s_float";
@@ -7497,6 +7497,27 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
     for (int vb = 0; vb < f->n_bbs; vb++)
         for (int vj = 0; vj < f->bbs[vb].n_ops; vj++) {
             Op *o = &f->bbs[vb].ops[vj];
+            /* __sfr I/O port: the symbol is a PORT NUMBER, not storage, so a
+               direct access must become IR_MEM_PORT and lower to in/out (or
+               the CPU's equivalent) rather than a load/store to address N.
+               Rewriting here covers every builder that reaches a global —
+               plain read/write, compound assign, ++/-- — from one place.
+               Ports are volatile by nature: each access is observable, so it
+               must survive CSE, store-forwarding and dead-store elision. */
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_SYM && o->mem.sym
+                && (o->mem.sym->type == KIND_PORT8
+                    || o->mem.sym->type == KIND_PORT16)) {
+                PortInfo *pi = calloc(1, sizeof *pi);
+                pi->kind = (o->mem.sym->type == KIND_PORT16)
+                         ? IR_PORT_KIND_16 : IR_PORT_KIND_8;
+                pi->sym       = o->mem.sym;
+                pi->port_vreg = -1;
+                o->mem.kind      = IR_MEM_PORT;
+                o->mem.port      = pi;
+                o->mem.volatile_ = 1;
+                continue;
+            }
             if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
                 && o->mem.kind == IR_MEM_SYM && o->mem.sym
                 && o->mem.sym->ctype

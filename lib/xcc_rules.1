@@ -146,6 +146,10 @@ C_LINE %2,"%1::x::%eval(%3 10000 * %4 +)::%5"
 =
 %0SECTION%1code_compiler
 
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_BSS
+=
+%0SECTION%1bss_compiler
+
 %"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_DATA
 =
 %0SECTION%1data_compiler
@@ -385,3 +389,9 @@ __xinit_%0
 	ld	sp,ix
 	pop	ix
 	ret
+
+%title undo the printf selection
+	call	___printf_sd
+=
+	EXTERN	_printf
+	call	_printf

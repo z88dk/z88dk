@@ -108,10 +108,13 @@
 =
 	ld	(hl),a
 
-;; #R3 reg reload across a conditional jump: after `ld r,a` A==r, and jp
+;; #R3 reg reload across a conditional jump: after `ld r,a` A==r, and jp/jr
 ;; preserves A, so on the fall-through (the only way to reach `ld a,r` — dead BB
 ;; labels are elided, nothing else targets it) the reload is a no-op. On the
-;; taken path it isn't executed. %2 captures any jp condition.
+;; taken path it isn't executed. %2 captures any jp condition; %4 captures the
+;; mnemonic so the rule fires on BOTH `jp` and `jr` — the backend's branch
+;; relaxation (IR_JR) turns in-range `jp`s into `jr`s before copt sees them,
+;; and a jp-only match would silently stop firing on those.
 ;; #R4: a word `ld hl,(ix+d)` reload of a slot just stored from HL, with an
 ;; intervening `ld de,(ix+e)` — a slot load that does NOT touch HL — so HL still
 ;; holds the value and the reload is dead (-3b). Volatile stores/loads carry a
@@ -120,11 +123,11 @@
 %title #R3 elide reg reload across a conditional jump (-1b, -4t)
 %is %1 e d b c
 	ld	%1,a
-	jp	%2,%3
+	j%"r|p"4	%2,%3
 	ld	a,%1
 =
 	ld	%1,a
-	jp	%2,%3
+	j%4	%2,%3
 
 %title #G1 gbz80 elide store-then-reload of same sp-rel int slot (-5b, -24t)
 %cpu gbz80
@@ -777,15 +780,17 @@
 
 ;; ld a,l;or h;jp nz falls through ONLY when l|h==0, i.e. HL==0 already — the
 ;; following ld hl,0 is redundant. (No label on it: copt won't match across one.)
+;; %2 captures the mnemonic so this fires on `jr nz` too — see #R3 on why
+;; (backend branch relaxation runs before copt).
 %title #Z1 drop redundant ld hl,0 on the zero fall-through of a HL-nonzero test (-3b)
 	ld	a,l
 	or	h
-	jp	nz,%1
+	j%"r|p"2	nz,%1
 	ld	hl,0
 =
 	ld	a,l
 	or	h
-	jp	nz,%1
+	j%2	nz,%1
 
 ;; ld d,0 then (d untouched) ld a,h;or d;ld d,a computes d = h|0 = h — replace
 ;; with ld d,h and drop the now-dead ld d,0. Matches the DE = HL | zext(A) shape.

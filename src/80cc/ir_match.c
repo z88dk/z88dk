@@ -570,6 +570,162 @@ static int rotl_check(Func *f, BB *bb, const int idx[],
     return nl >= 1 && nl <= 31 && nl + nr == 32;
 }
 
+/* mux — the bitwise SELECT identity.
+
+       (x & y) | (~x & z)   ==   z ^ (x & (y ^ z))
+
+   Both pick y where x has a 1 bit and z where it has a 0. The point is not
+   that the right side has one fewer operator (4 -> 3, and the NOT goes, which
+   at width 4 is a whole 12-instruction byte chain). The point is that the left
+   side is a TREE and the right side is a CHAIN:
+
+       AND a <- x,y   NOT t <- x   AND b <- t,z   OR d <- a,b     tree
+       XOR t1 <- y,z  AND t2 <- t1,x  XOR d <- t2,z               chain
+
+   In the tree, `a` and `b` are both live at the OR, so two 32-bit values need
+   registers at once. They do not fit, and the lowerer parks one with
+   `push de; push bc`, computes the other, then ORs the two back together
+   through an SP-derived pointer. In the chain each intermediate feeds straight
+   into the next, so only ONE is ever live and try_fp_bytewise_commutative
+   carries it in the DEHL cache. The whole park/reload/merge disappears.
+
+   Measured on md5 (F and G are both this shape, 32 of the 64 rounds), by
+   rewriting the macros at source level: -970 B fp, -616 B sp, -4.4 % ticks.
+   Note it pays in BOTH modes: tree-to-chain is about how many values are live,
+   not about how locals are addressed, so unlike the byte-fusion idea this is
+   independent of frame-pointer mode and of the frameless/sp-flip cost model.
+
+   The rewrite reads z twice where the original read x twice, so a VOLATILE
+   operand would change its access count — all three are excluded.
+
+   Idiomatic well beyond md5: SHA-1 and SHA-256's Ch(), and the masked blit
+   `(dst & ~m) | (src & m)` that sprite code is built from.
+
+   DEFAULT ON; `--opt-disable=pattern:mux` opts out. */
+
+enum { MV_X = 1, MV_Z, MV_A, MV_T, MV_B };   /* mux binding vars */
+
+/* The selector's partner in the un-complemented AND. That AND's operand SLOTS
+   carry no role information — md5's F has it as `x & y` (selector first) and G
+   as `x & z` (selector second) — and the engine binds slots left-to-right with
+   no backtracking, so a var in either slot picks the wrong operand half the
+   time and the match is silently lost. Bind only the structure in the
+   template (both srcs ANY) and read the role off the NOT, which is
+   unambiguous: whichever operand IS the selector, the other one is y. */
+static int mux_partner(const BB *bb, const int idx[], const int bind[])
+{
+    const Op *a = &bb->ops[idx[0]];
+    if (a->src[0] == bind[MV_X]) return a->src[1];
+    if (a->src[1] == bind[MV_X]) return a->src[0];
+    return -1;
+}
+
+static int mux_check(Func *f, BB *bb, const int idx[],
+                     const int64_t imm[], const int bind[],
+                     const int uc[])
+{
+    (void)imm;
+    int y = mux_partner(bb, idx, bind);
+    if (y < 0) return 0;
+    int w = f->vregs[bind[MV_X]].width;
+    if (w < 2) return 0;                 /* a byte mux is already 4 instrs */
+    const int all[6] = { bind[MV_X], y, bind[MV_Z],
+                         bind[MV_A], bind[MV_T], bind[MV_B] };
+    for (int i = 0; i < 6; i++) {
+        if (all[i] < 0 || all[i] >= f->n_vregs) return 0;
+        if (f->vregs[all[i]].width != w) return 0;
+        if (f->vregs[all[i]].flags & IR_VREG_VOLATILE) return 0;
+    }
+    /* The three intermediates must be dead outside the shape — two of them are
+       .keep templates, which the automatic single-use condition skips, so
+       assert it here for all three rather than relying on which is which. */
+    if (uc[bind[MV_A]] != 1 || uc[bind[MV_T]] != 1 || uc[bind[MV_B]] != 1)
+        return 0;
+    /* x is read twice by the original (the AND and the NOT); nothing else may
+       depend on the temps' identity, and a self-referential shape (e.g. the OR
+       writing back into x/y/z) would break the in-place rewrite's ordering. */
+    if (bind[MV_X] == y || bind[MV_X] == bind[MV_Z]) return 0;
+    return 1;
+}
+
+/* Rewrite in place. idx[] is by TEMPLATE index and is stable under
+   IR_PAT_EITHER_ORDER, so the two `.keep` templates are overwritten and the
+   NOT (not .keep) is NOPed by the generic satellite pass afterwards. The
+   surviving three keep their original BB positions and their relative order,
+   so the new chain's dataflow is valid wherever the pair was matched. */
+static void mux_apply(Func *f, BB *bb, const int idx[],
+                      const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm;
+    int y = mux_partner(bb, idx, bind);      /* check() proved this >= 0 */
+    Op *a = &bb->ops[idx[0]];       /* AND a <- x,y   ->  XOR a <- y,z   */
+    Op *b = &bb->ops[idx[2]];       /* AND b <- t,z   ->  AND b <- a,x   */
+    Op *o = &bb->ops[idx[3]];       /* OR  d <- a,b   ->  XOR d <- b,z   */
+
+    a->kind = IR_XOR; a->src[0] = y;          a->src[1] = bind[MV_Z];
+    a->imm  = 0;      a->imm_sym = NULL;
+    b->kind = IR_AND; b->src[0] = a->dst;     b->src[1] = bind[MV_X];
+    b->imm  = 0;      b->imm_sym = NULL;
+    o->kind = IR_XOR; o->src[0] = b->dst;     o->src[1] = bind[MV_Z];
+    o->imm  = 0;      o->imm_sym = NULL;
+}
+
+/* demorgan — the pair of complement-distribution identities:
+
+       (~x) & (~y)  ==  ~(x | y)
+       (~x) | (~y)  ==  ~(x & y)
+
+   Same structural payoff as mux, one step smaller. The left side is a TREE:
+   both complements are live at the combining op, so at width 4 two 32-bit
+   intermediates want registers at once and one gets parked. The right side is
+   a CHAIN — combine, then complement — so only one is ever live. On top of
+   that a whole NOT disappears, and at width 4 a NOT is a 12-instruction
+   byte walk, not one opcode.
+
+   3 ops -> 2, and like mux it is about how many values are LIVE rather than
+   how they are addressed, so it pays in both fp and sp and on every CPU.
+
+   The anchor takes AND or OR via kind_alt and the apply emits the dual, so
+   one PatternDef covers both directions.
+
+   DEFAULT ON; `--opt-disable=pattern:demorgan` opts out. */
+
+enum { DV_X = 1, DV_Y, DV_T1, DV_T2 };   /* demorgan binding vars */
+
+static int demorgan_check(Func *f, BB *bb, const int idx[],
+                          const int64_t imm[], const int bind[],
+                          const int uc[])
+{
+    (void)bb; (void)idx; (void)imm;
+    const int all[4] = { bind[DV_X], bind[DV_Y], bind[DV_T1], bind[DV_T2] };
+    int w = f->vregs[bind[DV_T1]].width;
+    for (int i = 0; i < 4; i++) {
+        if (all[i] < 0 || all[i] >= f->n_vregs) return 0;
+        if (f->vregs[all[i]].width != w) return 0;
+        if (f->vregs[all[i]].flags & IR_VREG_VOLATILE) return 0;
+    }
+    /* Both complements must die inside the shape. T1's template is .keep, so
+       the automatic single-use condition skips it — check both here. */
+    return uc[bind[DV_T1]] == 1 && uc[bind[DV_T2]] == 1;
+}
+
+static void demorgan_apply(Func *f, BB *bb, const int idx[],
+                           const int64_t imm[], const int bind[])
+{
+    (void)f; (void)imm;
+    Op *n1 = &bb->ops[idx[0]];      /* NOT t1 <- x   ->  OR/AND t1 <- x,y */
+    Op *rt = &bb->ops[idx[2]];      /* AND/OR d <- t1,t2  ->  NOT d <- t1 */
+    int dual = (rt->kind == IR_AND) ? IR_OR : IR_AND;   /* read before write */
+
+    n1->kind = dual;
+    n1->src[0] = bind[DV_X]; n1->src[1] = bind[DV_Y];
+    n1->imm = 0; n1->imm_sym = NULL;
+
+    rt->kind = IR_NOT;
+    rt->src[0] = n1->dst;    rt->src[1] = -1;
+    rt->imm = 0; rt->imm_sym = NULL;
+}
+
 /* symoff — LD_SYM + ADD/SUB imm fold (migrated from
    ir_opt_sym_offset_fold): `LD_SYM a <- sym+K1; ADD b <- a (imm=K2)`
    (a single-use) becomes `LD_SYM b <- sym+(K1±K2)`. The lowerer emits
@@ -764,6 +920,38 @@ static const PatternDef ir_patterns[] = {
       },
       .check = rotl_check,
       .new_kind = IR_ROTL, .new_src0 = RV_V, .imm_from = 1 },
+
+    /* (x & y) | (~x & z)  ->  z ^ (x & (y ^ z)) — tree becomes chain, so the
+       two live 32-bit intermediates become one and the push/pop/merge goes.
+       EITHER_ORDER because the AND and the NOT can be emitted in either order
+       depending on which side of the `|` the frontend walks first. */
+    { .name = "mux", .n_ops = 4,
+      .flags = IR_PAT_GAP_OK | IR_PAT_EITHER_ORDER | IR_PAT_COMMUTATIVE,
+      .ops = {
+          /* srcs ANY: the selector can sit in either slot (F has it first,
+             G second) and the engine does not backtrack over slot choice —
+             mux_partner reads the role off the NOT instead. */
+          { .kind = IR_AND, .dst = MV_A, .src0 = IR_MS_ANY,
+            .src1 = IR_MS_ANY, .keep = 1 },
+          { .kind = IR_NOT, .dst = MV_T, .src0 = MV_X },
+          { .kind = IR_AND, .dst = MV_B, .src0 = MV_T, .src1 = MV_Z,
+            .keep = 1 },
+          { .kind = IR_OR,  .dst = IR_MS_ANY, .src0 = MV_A, .src1 = MV_B },
+      },
+      .check = mux_check, .apply = mux_apply },
+
+    /* (~x)&(~y) -> ~(x|y) and (~x)|(~y) -> ~(x&y). Two live complements
+       become one chained value, and one NOT (a 12-instruction byte walk at
+       width 4) disappears. kind_alt on the anchor carries both directions. */
+    { .name = "demorgan", .n_ops = 3,
+      .flags = IR_PAT_GAP_OK | IR_PAT_COMMUTATIVE,
+      .ops = {
+          { .kind = IR_NOT, .dst = DV_T1, .src0 = DV_X, .keep = 1 },
+          { .kind = IR_NOT, .dst = DV_T2, .src0 = DV_Y },
+          { .kind = IR_AND, .kind_alt = 1 + IR_OR, .dst = IR_MS_ANY,
+            .src0 = DV_T1, .src1 = DV_T2 },
+      },
+      .check = demorgan_check, .apply = demorgan_apply },
 };
 static const int ir_n_patterns =
     (int)(sizeof ir_patterns / sizeof ir_patterns[0]);
@@ -1364,7 +1552,7 @@ static int pack_canon(Func *f, BB *bb, const int *def_idx, int v)
 /* Resolve single-use vreg v into a lane (SHL? / CONV_ZX / LD_MEM).
    Returns 0 ok, -1 no match. */
 static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
-                           const int *uc, int v, PackLane *out)
+                           const int *uc, int v, int w, PackLane *out)
 {
     if (v < 0 || v >= f->n_vregs || uc[v] != 1) return -1;
     int di = def_idx[v];
@@ -1373,7 +1561,7 @@ static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
 
     int shift = 0, shl_idx = -1;
     if (d->kind == IR_SHL && d->src[1] == -1
-        && (d->imm == 8 || d->imm == 16 || d->imm == 24)) {
+        && d->imm >= 8 && d->imm <= 8 * (w - 1) && (d->imm & 7) == 0) {
         shift = (int)d->imm; shl_idx = di;
         v = d->src[0];
         if (v < 0 || v >= f->n_vregs || uc[v] != 1) return -1;
@@ -1381,7 +1569,7 @@ static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
         if (di < 0) return -1;
         d = &bb->ops[di];
     }
-    if (d->kind != IR_CONV_ZX || f->vregs[d->dst].width != 4) return -1;
+    if (d->kind != IR_CONV_ZX || f->vregs[d->dst].width != w) return -1;
     int conv_idx = di;
     v = d->src[0];
     if (v < 0 || v >= f->n_vregs || uc[v] != 1) return -1;
@@ -1404,12 +1592,16 @@ static int pack_match_lane(Func *f, BB *bb, const int *def_idx,
    caller. Returns 0 ok (out_* and lanes/or_idx filled), -1 no match. */
 static int pack_analyze(Func *f, BB *bb, const int *def_idx,
                         const int *uc, int root_idx,
-                        int *out_base, int *out_off,
+                        int *out_base, int *out_off, int *out_be,
                         PackLane lanes[4], int or_idx[3])
 {
     const Op *root = &bb->ops[root_idx];
     if (root->kind != IR_OR) return -1;
-    if (root->dst < 0 || f->vregs[root->dst].width != 4) return -1;
+    if (root->dst < 0) return -1;
+    int w = f->vregs[root->dst].width;
+    if (w != 2 && w != 4) return -1;
+    /* w lanes joined by w-1 ORs, of which the root is one. */
+    const int want_lanes = w, want_ors = w - 2;
 
     int n_lanes = 0, n_ors = 0, sp = 0, stack[8], ok = 1;
     stack[sp++] = root->src[0];
@@ -1419,36 +1611,55 @@ static int pack_analyze(Func *f, BB *bb, const int *def_idx,
         if (v < 0 || v >= f->n_vregs) { ok = 0; break; }
         int di = (uc[v] == 1) ? def_idx[v] : -1;
         Op *d = (di >= 0) ? &bb->ops[di] : NULL;
-        if (d && d->kind == IR_OR && f->vregs[d->dst].width == 4) {
-            if (n_ors >= 3 || sp > 5) { ok = 0; break; }
+        if (d && d->kind == IR_OR && f->vregs[d->dst].width == w) {
+            if (n_ors >= want_ors || sp > 5) { ok = 0; break; }
             or_idx[n_ors++] = di;
             stack[sp++] = d->src[0];
             stack[sp++] = d->src[1];
         } else {
-            if (n_lanes >= 4
-                || pack_match_lane(f, bb, def_idx, uc, v,
+            if (n_lanes >= want_lanes
+                || pack_match_lane(f, bb, def_idx, uc, v, w,
                                    &lanes[n_lanes]) < 0) { ok = 0; break; }
             n_lanes++;
         }
     }
-    if (!ok || n_lanes != 4 || n_ors != 2) return -1;
+    if (!ok || n_lanes != want_lanes || n_ors != want_ors) return -1;
 
-    int seen = 0, base = lanes[0].base, base_off = INT32_MAX;
-    for (int i = 0; i < 4; i++) {
+    /* Endianness falls out of how each lane's byte offset relates to the
+       shift that places it. Lane j sits at byte offset off0+j; little-endian
+       puts it at shift 8j, big-endian at 8(w-1-j). So
+
+           little-endian:  offset - shift/8  is the SAME for every lane
+           big-endian:     offset + shift/8  is the SAME for every lane
+
+       and the base offset is that constant for LE, or constant-(w-1) for BE.
+       A single-lane-wide value would satisfy both; w >= 2 here, and the `seen`
+       mask below forces distinct shifts, so at most one test can hold. */
+    int seen = 0, base = lanes[0].base;
+    int le_off = INT32_MAX, be_end = INT32_MAX, le_ok = 1, be_ok = 1;
+    for (int i = 0; i < 4 && i < want_lanes; i++) {
         if (lanes[i].base != base) return -1;
-        int start = lanes[i].offset - lanes[i].shift / 8;
-        if (base_off == INT32_MAX) base_off = start;
-        else if (start != base_off) return -1;
+        int lo_i = lanes[i].offset - lanes[i].shift / 8;
+        int hi_i = lanes[i].offset + lanes[i].shift / 8;
+        if (le_off == INT32_MAX) le_off = lo_i; else if (lo_i != le_off) le_ok = 0;
+        if (be_end == INT32_MAX) be_end = hi_i; else if (hi_i != be_end) be_ok = 0;
         int bit = 1 << (lanes[i].shift / 8);
         if (seen & bit) return -1;
         seen |= bit;
     }
-    if (seen != 0xF) return -1;
+    if (seen != (1 << want_lanes) - 1) return -1;
+    int is_be, base_off;
+    if (le_ok)      { is_be = 0; base_off = le_off; }
+    else if (be_ok) { is_be = 1; base_off = be_end - (want_lanes - 1); }
+    else return -1;
+    /* A byte-reversed load is emitted as LD_MEM + a 16-bit ROTL by 8, which
+       only exists at width 2; width-4 reversal needs its own op (unbuilt). */
+    if (is_be && w != 2) return -1;
 
     /* Window safety: between the first matched load and the root OR,
        no stores / calls / asm / io and no redef of base. */
     int lo = root_idx;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < want_lanes; i++)
         if (lanes[i].load_idx < lo) lo = lanes[i].load_idx;
     for (int k = lo; k <= root_idx; k++) {
         OpKind kk = bb->ops[k].kind;
@@ -1456,7 +1667,7 @@ static int pack_analyze(Func *f, BB *bb, const int *def_idx,
             || kk == IR_ASM || kk == IR_IN || kk == IR_OUT) return -1;
         if (k > lo && bb->ops[k].dst == base) return -1;
     }
-    *out_base = base; *out_off = base_off;
+    *out_base = base; *out_off = base_off; *out_be = is_be;
     return 0;
 }
 
@@ -1480,12 +1691,21 @@ static int packbytes_check(Func *f, BB *bb, const int idx[],
     (void)imm; (void)bind;
     int *def_idx = pack_def_idx(f, bb);
     if (!def_idx) return 0;
-    int base, off;
+    int base, off, is_be;
     PackLane lanes[4]; int or_idx[3];
     int rc = pack_analyze(f, bb, def_idx, uc, idx[0],
-                          &base, &off, lanes, or_idx);
+                          &base, &off, &is_be, lanes, or_idx);
     free(def_idx);
-    return rc == 0;
+    if (rc != 0) return 0;
+    /* The width-2 arm gets its OWN disable name. It is not a pattern in its
+       own right (it is an arm of packbytes), so it goes through the plain
+       opt_disabled() registry -- `--opt-disable=pack16`, no `pattern:`
+       prefix -- and `--opt-disable=pattern:packbytes` would switch off the
+       long-standing width-4 little-endian fold too, which is not what someone
+       bisecting this arm wants. */
+    if (f->vregs[bb->ops[idx[0]].dst].width == 2 && opt_disabled("pack16"))
+        return 0;
+    return 1;
 }
 
 static void packbytes_apply(Func *f, BB *bb, const int idx[],
@@ -1498,44 +1718,93 @@ static void packbytes_apply(Func *f, BB *bb, const int idx[],
     int *def_idx = pack_def_idx(f, bb);
     if (!uc || !def_idx) { free(uc); free(def_idx); return; }
     compute_use_counts(f, uc);
-    int base, off;
+    int base, off, is_be;
     PackLane lanes[4]; int or_idx[3];
     int rc = pack_analyze(f, bb, def_idx, uc, idx[0],
-                          &base, &off, lanes, or_idx);
+                          &base, &off, &is_be, lanes, or_idx);
     free(def_idx);
     free(uc);
     if (rc != 0) return;
 
     Op *root = &bb->ops[idx[0]];
+    int w = f->vregs[root->dst].width;
+    int n_lanes = w, n_ors = w - 2;
     int dst = root->dst;
     const char *file = root->file;
     int line = root->line;
-    memset(root, 0, sizeof(*root));
-    root->kind       = IR_LD_MEM;
-    root->dst        = dst;
-    root->src[0]     = -1;
-    root->src[1]     = -1;
-    root->label      = -1;
-    root->mem.kind   = IR_MEM_VREG;
-    root->mem.base   = base;
-    root->mem.offset = off;
-    root->file       = file;
-    root->line       = line;
-    for (int i = 0; i < 4; i++) {
-        ir_match_mark_dead(lanes[i].load_idx);
-        ir_match_mark_dead(lanes[i].conv_idx);
-        if (lanes[i].shl_idx >= 0) ir_match_mark_dead(lanes[i].shl_idx);
+
+    /* Big-endian needs TWO ops: the wide load, then a byte reversal. The load
+       goes at the LAST of the ops being killed — all of them precede the root,
+       and the window check above already proved `base` is not redefined
+       anywhere in [lo, root], so the base is live there. The temp needs no
+       vreg-creation API: lane 0's CONV_ZX dst is a width-w vreg that is dying
+       anyway, so it is recycled as the load's destination and the reversal's
+       source (use counts are recomputed after apply). */
+    int load_idx = idx[0], load_dst = dst;
+    if (is_be) {
+        /* Latest of the ops being killed — they all precede the root. */
+        int cand[16], nc = 0;
+        for (int i = 0; i < n_lanes; i++) {
+            cand[nc++] = lanes[i].load_idx;
+            cand[nc++] = lanes[i].conv_idx;
+            if (lanes[i].shl_idx >= 0) cand[nc++] = lanes[i].shl_idx;
+        }
+        for (int k = 0; k < n_ors; k++) cand[nc++] = or_idx[k];
+        int best = -1;
+        for (int i = 0; i < nc; i++)
+            if (cand[i] >= 0 && cand[i] < idx[0] && cand[i] > best) best = cand[i];
+        if (best < 0) return;                        /* nowhere to put it */
+        load_idx = best;
+        /* Recycle lane 0's CONV_ZX dst — width w and dying anyway. */
+        load_dst = bb->ops[lanes[0].conv_idx].dst;
+        if (load_dst < 0 || load_dst >= f->n_vregs
+            || f->vregs[load_dst].width != w || load_dst == dst) return;
     }
-    ir_match_mark_dead(or_idx[0]);   /* the two inner ORs (n_ors==2) */
-    ir_match_mark_dead(or_idx[1]);
+
+    Op *ld = &bb->ops[load_idx];
+    memset(ld, 0, sizeof(*ld));
+    ld->kind       = IR_LD_MEM;
+    ld->dst        = load_dst;
+    ld->src[0]     = -1;
+    ld->src[1]     = -1;
+    ld->label      = -1;
+    ld->mem.kind   = IR_MEM_VREG;
+    ld->mem.base   = base;
+    ld->mem.offset = off;
+    ld->file       = file;
+    ld->line       = line;
+
+    if (is_be) {
+        /* A 16-bit byte swap IS a rotate by 8, so the existing ROTL lowering
+           does the work — no new IR op for the width-2 case. */
+        memset(root, 0, sizeof(*root));
+        root->kind   = IR_ROTL;
+        root->dst    = dst;
+        root->src[0] = load_dst;
+        root->src[1] = -1;
+        root->imm    = 8;
+        root->label  = -1;
+        root->file   = file;
+        root->line   = line;
+    }
+
+    for (int i = 0; i < n_lanes; i++) {
+        if (lanes[i].load_idx != load_idx) ir_match_mark_dead(lanes[i].load_idx);
+        if (lanes[i].conv_idx != load_idx) ir_match_mark_dead(lanes[i].conv_idx);
+        if (lanes[i].shl_idx >= 0 && lanes[i].shl_idx != load_idx)
+            ir_match_mark_dead(lanes[i].shl_idx);
+    }
+    for (int k = 0; k < n_ors; k++)
+        if (or_idx[k] != load_idx) ir_match_mark_dead(or_idx[k]);
     /* The base producer stays live — the wide load uses it. */
 }
 
 static const PatternDef ir_patterns_packbytes[] = {
     { .name = "packbytes", .n_ops = 1,
       .flags = IR_PAT_KEEP_SATELLITES | IR_PAT_APPLY_KILLS,
+      /* width is validated in check() (2 or 4) rather than pinned here. */
       .ops = { { .kind = IR_OR, .dst = IR_MS_ANY,
-                 .src0 = IR_MS_ANY, .src1 = IR_MS_ANY, .width = 4 } },
+                 .src0 = IR_MS_ANY, .src1 = IR_MS_ANY } },
       .check = packbytes_check, .apply = packbytes_apply },
 };
 

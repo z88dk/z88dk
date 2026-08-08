@@ -10,7 +10,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin jrelax.bin jrelax_fp.bin jrelax_8080.bin jrelax_gbz80.bin dsword.bin dsword_fp.bin dsword_8080.bin dsword_gbz80.bin deaddef.bin deaddef_fp.bin deaddef_8080.bin csparam.bin csparam_fp.bin csparam_8080.bin csparam_gbz80.bin rotl32.bin rotl32_fp.bin rotl32_8080.bin rotl32_gbz80.bin mux.bin mux_fp.bin mux_8080.bin mux_gbz80.bin demorgan.bin demorgan_fp.bin demorgan_8080.bin pack16.bin pack16_fp.bin pack16_8080.bin pack16_gbz80.bin cmphi.bin cmphi_fp.bin cmphi_8080.bin cmphi_gbz80.bin sfr.bin sfr_fp.bin sfr_8080.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -468,3 +468,195 @@ fnptr_fastcall_8080.bin: $(SOURCES) fnptr_fastcall.c
 fnptr_fastcall_8085.bin: $(SOURCES) fnptr_fastcall.c
 	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8085 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Branch relaxation (jp -> jr, IR_JR): conditional forms that have a jr, a
+# forward span too long to relax (must stay jp — also a build-time canary for
+# the size bound), nested loops with an in-loop unconditional jump, and copt's
+# #JI inversion window. z80 sp+fp plus 8080 (no jr at all — must be untouched)
+# and gbz80 (jr present, different encodings).
+jrelax.bin: $(SOURCES) jrelax.c
+	$(compile)
+	$(runtest)
+
+jrelax_fp.bin: $(SOURCES) jrelax.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+jrelax_8080.bin: $(SOURCES) jrelax.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+jrelax_gbz80.bin: $(SOURCES) jrelax.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Dead WORD spill elision (IR_DEADSTORE width-2 / IR_DSWORD): a dead call-result
+# slot store is elided and the value rides HL; the read-back, call-returned-
+# pointer store base, and two-live-results cases must keep their slots. z80
+# sp+fp, 8080 (has xchg, so in scope) and gbz80 (excluded from the width-2 half
+# — pins that the exclusion holds).
+dsword.bin: $(SOURCES) dsword.c
+	$(compile)
+	$(runtest)
+
+dsword_fp.bin: $(SOURCES) dsword.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+dsword_8080.bin: $(SOURCES) dsword.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+dsword_gbz80.bin: $(SOURCES) dsword.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Per-BB dead-def elimination (--opt-disable=dead-def): the `int r = 0; r += f()`
+# delegating shape whose init const-fold strands, plus the mid-block-branch
+# hazard (a def, a conditional exit, then a redefinition) that must NOT be
+# elided -- the first version of the pass got that wrong and umaxd caught it.
+deaddef.bin: $(SOURCES) deaddef.c
+	$(compile)
+	$(runtest)
+
+deaddef_fp.bin: $(SOURCES) deaddef.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+deaddef_8080.bin: $(SOURCES) deaddef.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Ranged BC home for a reassigned PARAM: the const-multiply chain reads the
+# multiplicand 7-8x in one write-free span, so the param earns BC over it. Pins
+# the back-edge hazard -- the param is reassigned outside the span and the loop
+# uses BC transiently as a deref base, so the belief must NOT survive the back
+# edge. z80 sp+fp plus 8080/gbz80.
+csparam.bin: $(SOURCES) csparam.c
+	$(compile)
+	$(runtest)
+
+csparam_fp.bin: $(SOURCES) csparam.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+csparam_8080.bin: $(SOURCES) csparam.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+csparam_gbz80.bin: $(SOURCES) csparam.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# 32-bit ROTATE_LEFT lowering (gen_rotl): byte permute + single-bit rotates.
+# The right-hand bit step seeds the carry with bit0 of L (ld a,l / rrca)
+# instead of shifting it out and branching it back, so the wrap bit is the
+# thing to pin -- every amount 1..31, both directions, three vectors.
+# 8080/8085 are excluded from the fusion (no CB shifts) and lower via the
+# shift helpers, so they cover the other path.
+rotl32.bin: $(SOURCES) rotl32.c
+	$(compile)
+	$(runtest)
+
+rotl32_fp.bin: $(SOURCES) rotl32.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+rotl32_8080.bin: $(SOURCES) rotl32.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+rotl32_gbz80.bin: $(SOURCES) rotl32.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Bitwise SELECT identity (ir_match "mux"): (x&y)|(~x&z) == z^(x&(y^z)).
+# Turns a TREE (two live 32-bit intermediates, parked with push/pop and merged
+# through an SP-derived pointer) into a CHAIN (one, carried in the register
+# cache). Pins the algebra in both selector-slot orders, the masked-blit
+# spelling, width 2, and the two non-firing guards (shared ~x, volatile).
+mux.bin: $(SOURCES) mux.c
+	$(compile)
+	$(runtest)
+
+mux_fp.bin: $(SOURCES) mux.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+mux_8080.bin: $(SOURCES) mux.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+mux_gbz80.bin: $(SOURCES) mux.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# De Morgan in the complement-REMOVING direction: (~x)&(~y) -> ~(x|y) and the
+# dual. Two live complements become one chained value and a NOT disappears
+# (12 instructions at width 4). Pins both directions (the apply must emit the
+# DUAL operator), width 2, and the non-firing shared-temp guard.
+demorgan.bin: $(SOURCES) demorgan.c
+	$(compile)
+	$(runtest)
+
+demorgan_fp.bin: $(SOURCES) demorgan.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+demorgan_8080.bin: $(SOURCES) demorgan.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# 16-bit byte-pack fold (packbytes width-2 arm, both endiannesses). Endianness
+# is one test: offset-shift/8 constant is little-endian, offset+shift/8 is big.
+# Big-endian needs a byte reversal, which at width 2 IS a rotate by 8, so it
+# reuses IR_ROTL -- no new IR op. Pins both spellings at even/odd offsets, that
+# width-4 big-endian still computes right via the UNFOLDED path, and volatile.
+pack16.bin: $(SOURCES) pack16.c
+	$(compile)
+	$(runtest)
+
+pack16_fp.bin: $(SOURCES) pack16.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+pack16_8080.bin: $(SOURCES) pack16.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+pack16_gbz80.bin: $(SOURCES) pack16.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+# Unsigned width-2 bound compare against a constant with a ZERO LOW BYTE:
+# `i < K` is exactly `hi(i) < hi(K)`, so the lowerer compares high bytes only
+# (ld a,h; cp H) instead of ld hl / ld de / and a / sbc hl,de. Pins the branch
+# POLARITY (< is carry, >= is no-carry) and the equality case at K-1/K/K+1, and
+# that a non-zero low byte does NOT narrow. Both modes plus 8080 and gbz80.
+cmphi.bin: $(SOURCES) cmphi.c
+	$(compile)
+	$(runtest)
+
+cmphi_fp.bin: $(SOURCES) cmphi.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+cmphi_8080.bin: $(SOURCES) cmphi.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+cmphi_gbz80.bin: $(SOURCES) cmphi.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=gbz80 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -mgbz80 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
+
+sfr.bin: $(SOURCES) sfr.c
+	$(compile)
+	$(runtest)
+
+sfr_fp.bin: $(SOURCES) sfr.c
+	$(call compile,-Cc-fframe-pointer)
+	$(runtest)
+
+sfr_8080.bin: $(SOURCES) sfr.c
+	zcc +test -vn $(if $(COMPILER),-compiler=$(COMPILER)) -clib=8080 --math-mbf32 -DNO_LOG_RUNNING -DNO_LOG_PASSED -I$(FRAMEWORK_DIR) $^ -o $@ -m
+	@$(MACHINE) -m8080 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }

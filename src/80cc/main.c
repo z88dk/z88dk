@@ -388,7 +388,19 @@ void ccabort(void)
 void parse(void)
 {
     while (c_eof == 0) { /* do until no more input */
-        if (swallow(KW_EXTERN)) {
+        /* `#asm` FIRST, before any keyword lookup. swallow() asks the
+           tokeniser for a token, and the tokeniser treats a `#` at start of
+           line as a preprocessor directive: it recognises `asm` and calls
+           lex_asm_block, which spans lines. In buffer mode the tokeniser holds
+           only the line preproc.c last fed it and has no refill callback
+           (main.c passes NULL), so the block can never terminate and the file
+           dies with "unterminated asm block". doasm() reads raw lines and does
+           not have that problem, which is why in-function `#asm` has always
+           worked — stmt.c tests TK_HASH before any keyword. Test it here too,
+           so file-scope asm reaches the same handler. */
+        if (match("#asm")) {
+            doasm(1);
+        } else if (swallow(KW_EXTERN)) {
             dodeclare(EXTERNAL);
         } else if (swallow(KW_STATIC)) {
             dodeclare(LSTATIC);
@@ -399,12 +411,8 @@ void parse(void)
         } else if ( swallow(KW_ADDRESSMOD)) {
             parse_addressmod();
         } else if (ch() == '#') {
-            if (match("#asm")) {
-                doasm();
-            } else {
-                clear();
-                blanks();
-            }
+            clear();
+            blanks();
         } else {
             declare_func_kr();
         }

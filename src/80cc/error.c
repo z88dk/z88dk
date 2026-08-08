@@ -28,7 +28,8 @@ static char   *c_default_categories[] = {
     "limited-range",
     "implicit-function-definition",
     "unsupported-feature",
-    "division-by-zero"
+    "division-by-zero",
+    "implicit-variable-definition"
 };
 static int     c_default_categories_num = sizeof(c_default_categories) / sizeof(c_default_categories[0]);
 

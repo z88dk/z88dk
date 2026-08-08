@@ -673,6 +673,26 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
        loops, no shift-temp spills, no 4-byte OR. */
     int w = (op->dst >= 0 && op->dst < f->n_vregs)
           ? f->vregs[op->dst].width : 2;
+    if (w == 2) {
+        /* Width-2 rotate by 8 = a byte swap of HL, which is three register
+           moves. This is what the big-endian byte-pack fold lowers to, so no
+           IR_BSWAP op is needed at this width (a width-4 byte REVERSE is not
+           any rotation, and does need one). Other width-2 counts have no
+           caller yet — the matcher only ever emits 8. */
+        if ((op->imm & 15) != 8) {
+            fprintf(stderr, "ir_lower: IR_ROTL width 2 count %d unsupported\n",
+                    (int)(op->imm & 15));
+            return -1;
+        }
+        load_to_hl(out, f, op->src[0]);
+        emit(out, "ld\ta,h");
+        emit(out, "ld\th,l");
+        emit(out, "ld\tl,a");
+        invalidate_a_cache();
+        hl_about_to_change(-1);
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
     if (w != 4) {
         fprintf(stderr, "ir_lower: IR_ROTL width %d unsupported\n", w);
         return -1;
@@ -719,14 +739,24 @@ static int gen_rotl(FILE *out, Func *f, const Op *op)
         emit(out, "inc\tl");
     }
     for (int i = 0; i < right; i++) {
-        /* 32-bit right rotate by 1: shift right, wrap bit0 into
-           bit31 (set 7,d is 2 bytes). */
-        emit(out, "srl\td");
+        /* 32-bit right rotate by 1. The bit that has to wrap into bit31
+           is bit0 of L, and it is known BEFORE the shift — so seed the
+           carry with it and let `rr d` shift it in, rather than shifting
+           it out of L and branching to put it back:
+
+               ld a,l / rrca      carry <- bit0 of L   (2 bytes)
+               rr d ...           wraps it into bit31
+
+           vs. srl d / ... / jr nc,+2 / set 7,d, which is 2 bytes longer
+           and branches once per rotated bit. `ld a,l` clobbers A; the
+           vemit A-tracker drops the belief on any line that writes A.
+           (rrca, not rlca: RRCA moves bit0 of A into carry.) */
+        emit(out, "ld\ta,l");
+        emit(out, "rrca");
+        emit(out, "rr\td");
         emit(out, "rr\te");
         emit(out, "rr\th");
         emit(out, "rr\tl");
-        emit_skip(out, f, "nc", 2);
-        emit(out, "set\t7,d");
     }
     /* DEHL physically permuted: every prior register claim is stale
        (incl. BC's low-half mirror). */
@@ -2276,8 +2306,93 @@ static int emit_gb_const_word_store(FILE *out, const Func *f, int src,
     return 1;
 }
 
+/* ----- __sfr I/O ports ---------------------------------------------------
+
+   A `__sfr __at N x;` symbol is a PORT NUMBER, not storage: `_x` resolves to
+   the literal N, so every form below references it as an immediate and never
+   as an address. These mirror sccz80's gen_intrinsic_in/out so both compilers
+   honour the same declaration identically.
+
+   Three CPU families need entirely different instructions:
+     - Rabbit has no in/out at all. The `ioi` prefix redirects the NEXT memory
+       access to internal I/O space, so the access looks like a load/store.
+       The R2000 needs a following `nop` (errata).
+     - gbz80 likewise has no in/out; `ldh` addresses the 0xFF00 page.
+     - Z180/eZ80 have in0/out0, which reach L directly and save the A shuffle.
+   The 16-bit (`__banked`) form puts the high byte in A, which Z80's `in a,(n)`
+   drives onto the high address bus, and uses BC for the write. */
+static void gen_port_in(FILE *out, const Op *op)
+{
+    const char *s = ir_sym_name(op->mem.sym);
+    if (IS_RABBIT()) {
+        emit(out, "ioi");
+        emit(out, "ld\thl,(_%s)", s);
+        if (c_cpu == CPU_R2KA) emit(out, "nop");
+        return;
+    }
+    if (IS_GBZ80()) {
+        emit(out, "ldh\ta,(_%s)", s);
+        emit(out, "ld\tl,a");
+        emit(out, "ld\th,0");
+        return;
+    }
+    if (op->mem.port->kind == IR_PORT_KIND_8) {
+        if (c_cpu == CPU_Z180 || IS_EZ80()) {
+            emit(out, "in0\tl,(_%s)", s);
+        } else {
+            emit(out, "in\ta,(_%s)", s);
+            emit(out, "ld\tl,a");
+        }
+        emit(out, "ld\th,0");
+        return;
+    }
+    emit(out, "ld\ta,_%s / 256", s);
+    emit(out, "in\ta,(_%s %% 256)", s);
+    emit(out, "ld\tl,a");
+    emit(out, "ld\th,0");
+}
+
+/* Value to write arrives in HL (the port is a byte, so only L is used). */
+static void gen_port_out(FILE *out, const Op *op)
+{
+    const char *s = ir_sym_name(op->mem.sym);
+    if (IS_RABBIT()) {
+        emit(out, "ld\ta,l");
+        emit(out, "ioi");
+        emit(out, "ld\t(_%s),a", s);
+        if (c_cpu == CPU_R2KA) emit(out, "nop");
+        return;
+    }
+    if (IS_GBZ80()) {
+        emit(out, "ld\ta,l");
+        emit(out, "ldh\t(_%s),a", s);
+        return;
+    }
+    if (op->mem.port->kind == IR_PORT_KIND_8) {
+        if (c_cpu == CPU_Z180 || IS_EZ80()) {
+            emit(out, "out0\t(_%s),l", s);
+        } else {
+            emit(out, "ld\ta,l");
+            emit(out, "out\t(_%s),a", s);
+        }
+        return;
+    }
+    emit(out, "ld\ta,l");
+    emit(out, "ld\tbc,_%s", s);       /* clobbers BC — caller invalidates */
+    emit(out, "out\t(c),a");
+}
+
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
+    /* Port read. Result is a zero-extended byte in HL, matching the width-2
+       vreg the frontend gives a port access. No ns switch: a port has no
+       address space to page in. */
+    if (op->mem.kind == IR_MEM_PORT) {
+        hl_about_to_change(-1);
+        gen_port_in(out, op);
+        commit_hl_word(out, f, op->dst);
+        return 0;
+    }
     emit_ns_switch(out, mem_bank_fn(&op->mem));   /* __addressmod: page in */
     if (op->dst >= 0 && f->vregs[op->dst].width > 4) {
         /* Wide load: address into HL, acc_load→accumulator, store→dst slot. */
@@ -2782,6 +2897,21 @@ static int try_de_home_mask_store(FILE *out, Func *f, const Op *op)
 
 static int gen_st_mem(FILE *out, Func *f, const Op *op)
 {
+    /* Port write. Must come before every fold below: those all assume the
+       destination is memory, and a port is not addressable. */
+    if (op->mem.kind == IR_MEM_PORT) {
+        if (op->src[0] < 0) {
+            hl_about_to_change(-1);
+            emit(out, "ld\thl,%d", (int)(op->imm & 0xffff));
+        } else {
+            load_to_hl(out, f, op->src[0]);
+        }
+        gen_port_out(out, op);
+        if (op->mem.port->kind == IR_PORT_KIND_16
+            && !IS_RABBIT() && !IS_GBZ80())
+            invalidate_bc_cache();       /* the 16-bit form loaded BC */
+        return 0;
+    }
     /* Store through a base that is a rematerialisable symbol-address constant
        (`t = &sym; *t = v`): fold to the DIRECT absolute store `ld (sym+off),hl`
        (the MEM_SYM path below), skipping the base-pointer load AND the HL→DE

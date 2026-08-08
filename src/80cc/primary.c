@@ -150,13 +150,26 @@ int primary(LVALUE* lval)
              * this way and it's safer... we're not GNU after all!
              */
             if (!rcmatch('(')) {
-
-                errorfmt("Unknown symbol: %s", 1, sname);
+                /* Undeclared identifier used as a value. sccz80 accepts this and
+                   emits a reference to the assembler symbol, which the shipped
+                   library relies on: libsrc's tms9918 driver reads
+                   `_tms9918_sprite_attribute`, a PUBLIC declared only in
+                   vdp_variables.asm and never in any C header. Treating it as
+                   fatal left 80cc unable to build that code at all, so warn and
+                   recover exactly as sccz80 does — an implicit `extern int`.
+                   Silence with -Wno-implicit-variable-definition. */
+                warningfmt("implicit-variable-definition",
+                           "Implicit declaration of '%s', assuming extern int", sname);
                 lval->symbol = addglb(sname, type_int, ID_VARIABLE, KIND_INT, 0, EXTERNAL);
                 lval->ltype = type_int;
                 lval->val_type = KIND_INT;
                 lval->ptr_type = KIND_NONE;
                 lval->indirect_kind = KIND_NONE;
+                /* 80cc builds an AST, so the recovered symbol needs a node too
+                   — sccz80's recovery stops at the lval fields. Without it
+                   ir_build sees an operand-less expression ("OP_DEREF without
+                   operand"). */
+                lval->node = ast_global_var(lval->symbol, sname);
 	            return(1);
             } else {
                 /* assume it's a function we haven't seen yet */
