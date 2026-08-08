@@ -226,15 +226,18 @@ include sound/saa1099/saa1099.mak
 # To be replaced with a wildcard include at some point
 include target/abc80/abc80.mak
 include target/abc800/abc800.mak
+include target/adam/adam.mak
 include target/agon/agon.mak
 include target/alphatp2/alphatp2.mak
 include target/altair8800/altair8800.mak
 include target/apple2/apple2.mak
 include target/attache/attache.mak
+include target/aussie/aussie.mak
 include target/bic/bic.mak
 include target/bondwell/bondwell.mak
 include target/bondwell2/bondwell2.mak
 include target/c7420/c7420.mak
+include target/coleco/coleco.mak
 include target/dai/dai.mak
 include target/einstein/einstein.mak
 include target/gal/gal.mak
@@ -247,6 +250,7 @@ include target/hgmc/hgmc.mak
 include target/homelab/homelab.mak
 include target/homelab2/homelab2.mak
 include target/kaypro83/kaypro83.mak
+include target/kaypro84/kaypro84.mak
 include target/kc/kc.mak
 include target/kramermc/kramermc.mak
 include target/krokha/krokha.mak
@@ -254,6 +258,8 @@ include target/laser500/laser500.mak
 include target/lm80c/lm80c.mak
 include target/lviv/lviv.mak
 include target/lynx/lynx.mak
+include target/m100/m100.mak
+include target/map1010/map1010.mak
 include target/mc1000/mc1000.mak
 include target/micro8085/micro8085.mak
 include target/mikro80/mikro80.mak
@@ -263,9 +269,14 @@ include target/myvision/myvision.mak
 include target/mz/mz.mak
 include target/mz2500/mz2500.mak
 include target/nanos/nanos.mak
+include target/northstar/northstar.mak
 include target/ondra/ondra.mak
+include target/osborne1/osborne1.mak
+include target/p2000/p2000.mak
+include target/pacman/pacman.mak
 include target/pc6001/pc6001.mak
 include target/pc88/pc88.mak
+include target/pcw/pcw.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pk8000/pk8000.mak
@@ -273,6 +284,8 @@ include target/pps/pps.mak
 include target/primo/primo.mak
 include target/pv1000/pv1000.mak
 include target/pv2000/pv2000.mak
+include target/px4/px4.mak
+include target/px8/px8.mak
 include target/radio86/radio86.mak
 include target/rc700/rc700.mak
 include target/rex/rex.mak
@@ -299,6 +312,7 @@ include target/z88/z88.mak
 include target/z9001/z9001.mak
 include target/zx/zx.mak
 include target/zxn/zxn.mak
+include target/zxvgs/zxvgs.mak
 
 # Targets depend on some common code + target specific (include stdio in here)
 TARGET_CLIB_DEPS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS) $(SOUND_SAA1099_TARGETS) $(SOUND_AY_TARGETS) $(SOUND_SN76489_TARGETS) $(TIME_TARGETS)
@@ -449,7 +463,7 @@ ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib $(TS2068_TARGETS)
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
 
 # ZXVGS - yarek
-zxvgs.lib:
+zxvgs.lib: $(ZXVGS_TARGETS)
 	@echo ''
 	@echo '--- Building ZXVGS Library ---'
 	@echo ''
@@ -476,7 +490,7 @@ m2068.lib:
 	$(MAKE) -C math/float/zxmath m2068
 
 # PacMan lib - Stefano
-pacman_clib.lib: $(TARGET_CLIB_DEPS)
+pacman_clib.lib: $(TARGET_CLIB_DEPS) $(PACMAN_TARGETS)
 	@echo ''
 	@echo '--- Building PacMan HW Library ---'
 	@echo ''
@@ -485,7 +499,7 @@ pacman_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(TARGET_DIRECTORY)/pacman/pacman.lst
 
 # Philips P2000 lib - Stefano
-p2000_clib.lib: $(TARGET_CLIB_DEPS)
+p2000_clib.lib: $(TARGET_CLIB_DEPS) $(P2000_TARGETS)
 	@echo ''
 	@echo '--- Building Philips P2000 Library ---'
 	@echo ''
@@ -530,7 +544,7 @@ apple2.lib: cpm_clib.lib $(APPLE2_TARGETS)
 	TARGET=apple2 TYPE=z80 $(LIBLINKER) -DFORapple2 -x$(OUTPUT_DIRECTORY)/apple2 @$(TARGET_DIRECTORY)/apple2/apple2.lst
 
 # Epson PX4 lib - Stefano
-px4.lib: cpm_clib.lib
+px4.lib: cpm_clib.lib $(PX4_TARGETS)
 	@echo ''
 	@echo '--- Building PX-4/HC-40 Library ---'
 	@echo ''
@@ -539,7 +553,7 @@ px4.lib: cpm_clib.lib
 	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(TARGET_DIRECTORY)/px4/px4.lst
 
 # Epson PX8 lib - Stefano
-px8.lib: cpm_clib.lib
+px8.lib: cpm_clib.lib $(PX8_TARGETS)
 	@echo ''
 	@echo '--- Building PX-8/Geneva Library ---'
 	@echo ''
@@ -792,7 +806,7 @@ ozansi_clib.lib: $(TARGET_CLIB_DEPS)
 
 # CPM lib - Stefano/dom
 
-gfxkp.lib: cpm_clib.lib $(TARGET_CLIB_DEPS)
+gfxkp.lib: cpm_clib.lib $(TARGET_CLIB_DEPS) $(KAYPRO84_TARGETS)
 	@echo ''
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''
@@ -829,7 +843,7 @@ bondwell2.lib: cpm_clib.lib $(BONDWELL2_TARGETS)
 	$(MAKE) -C classic/video/msm6255 TARGET=cpm SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=ixiy $(LIBLINKER) -IXIY -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
 
-gfxosborne1.lib: cpm_clib.lib $(TARGET_CLIB_DEPS)
+gfxosborne1.lib: cpm_clib.lib $(TARGET_CLIB_DEPS) $(OSBORNE1_TARGETS)
 	@echo ''
 	@echo '--- Building Osborne 1 graphics Library ---'
 	@echo ''
@@ -1025,7 +1039,7 @@ aqplus.lib: $(TARGET_CLIB_DEPS) aquarius_clib.lib
 
 
 # Aussie Byte library - Stefano
-aussie.lib: cpm_clib.lib
+aussie.lib: cpm_clib.lib $(AUSSIE_TARGETS)
 	@echo ''
 	@echo '--- Building Aussie Byte Library ---'
 	@echo ''
@@ -1258,7 +1272,7 @@ qx10.lib: cpm_clib.lib
 
 
 # Coleco Adam library
-adam.lib: coleco_clib.lib
+adam.lib: coleco_clib.lib $(ADAM_TARGETS)
 	@echo ''
 	@echo '--- Building Coleco Adam Library ---'
 	@echo ''
@@ -1316,7 +1330,7 @@ phc25_clib.lib: $(TARGET_CLIB_DEPS) $(PHC25_TARGETS)
 	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
 
 # MAP-1010 override library 
-map1010.lib: phc25_clib.lib
+map1010.lib: phc25_clib.lib $(MAP1010_TARGETS)
 	@echo ''
 	@echo '--- Building Seiko MAP-1010 Library ---'
 	@echo ''
@@ -1612,7 +1626,7 @@ sv8000_clib.lib: $(TARGET_CLIB_DEPS) $(SV8000_TARGETS)
 	TARGET=sv8000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsv8000 -x$(OUTPUT_DIRECTORY)/sv8000_clib @$(TARGET_DIRECTORY)/sv8000/sv8000.lst
 
 # Colecovision - dom/stefano
-coleco_clib.lib: $(TARGET_CLIB_DEPS)
+coleco_clib.lib: $(TARGET_CLIB_DEPS) $(COLECO_TARGETS)
 	@echo ''
 	@echo '--- Building Colecovision Library ---'
 	@echo ''
@@ -1801,7 +1815,7 @@ cpc_math.lib:
 	$(MAKE) -C math/float/cpcmath
 
 # Amstrad PCW libraries - Stefano
-pcw.lib: cpm_clib.lib
+pcw.lib: cpm_clib.lib $(PCW_TARGETS)
 	@echo ''
 	@echo '--- Building Amstrad PCW Library ---'
 	@echo ''
@@ -1873,7 +1887,7 @@ newbrain_clib.lib: $(TARGET_CLIB_DEPS)
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(TARGET_DIRECTORY)/newbrain/newbrain_cpm.lst
 
 # Northstar Advantage - Stefano
-northstar.lib: cpm_clib.lib
+northstar.lib: cpm_clib.lib $(NORTHSTAR_TARGETS)
 	@echo ''
 	@echo '--- Building Northstar Advantage graphics Library ---'
 	@echo ''
@@ -2190,7 +2204,7 @@ special_clib.lib: $(TARGET_CLIB_DEPS)
 	$(call buildgeneric,special,"wide portable")
 	TARGET=special TYPE=8080 $(LIBLINKER) -m8080 -DFORspecial -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/special_clib.lib @$(TARGET_DIRECTORY)/special/special.lst
 
-m100_clib.lib: $(TARGET_CLIB_DEPS)
+m100_clib.lib: $(TARGET_CLIB_DEPS) $(M100_TARGETS)
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
