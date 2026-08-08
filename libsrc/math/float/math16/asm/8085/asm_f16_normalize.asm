@@ -1,15 +1,17 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  feilipu, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_normalize - 8085 half floating point unpacked normalisation
+;  asm_f24_normalize - 8085 half floating point unpacked normalisation
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: exponent in d, sign in e[7], mantissa in hl
+;  unpacked: exponent in d, sign in e[7], mantissa in hl
+;
+;  Byte scan; unrolled residual walk jumps into reverse-label add hl,hl tree.
 ;
 ;-------------------------------------------------------------------------
 
@@ -20,171 +22,70 @@ EXTERN asm_f24_zero
 
 PUBLIC asm_f24_normalize
 
+
 .asm_f24_normalize
-    xor a
-    or a,h
-    jr Z,SLSB
-    and 0f0h
-    jr Z,S8L
-
-.S4L
-    add hl,hl
-    jr C,S4L1
-    add hl,hl
-    jr C,S4L2
-    add hl,hl
-    jr C,S4L3
-    ld a,-3
-    jp normdone
-
-.S4L1
-    ; rr hl reverse overshift
     ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ret
+    or a
+    ret m                       ; already normalised
+    jr nz,bitwalk
 
-.S4L2
+    ld a,l
+    or a
+    jp z,asm_f24_zero
+
+    ld h,l
+    ld l,0
+    ld a,d
+    sub 8
+    ld d,a
+    jp c,asm_f24_zero
+
     ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-1
-    jp normdone
+    or a
+    ret m
+    jp z,asm_f24_zero
 
-.S4L3
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-2
-    jp normdone
+.bitwalk
+    ld b,1
+    add a,a
+    jp m,s1
+    inc b
+    add a,a
+    jp m,s2
+    inc b
+    add a,a
+    jp m,s3
+    inc b
+    add a,a
+    jp m,s4
+    inc b
+    add a,a
+    jp m,s5
+    inc b
+    add a,a
+    jp m,s6
+    inc b
+    add a,a
+    jp p,asm_f24_zero           ; 7th trial still clear → zero
+    ; fall through to s7
 
-.S8L
+.s7
     add hl,hl
+.s6
     add hl,hl
+.s5
     add hl,hl
-    ld a,0f0h
-    and a,h
-    jr Z,S8L4more
+.s4
     add hl,hl
+.s3
     add hl,hl
-    jr C,S8L1
+.s2
     add hl,hl
-    jr C,S8L2
-    ld a,-6
-    jp normdone
+.s1
+    add hl,hl
 
-.S8L4more
-    add hl,hl
-    add hl,hl
-    add hl,hl
-    add hl,hl
-    ld a,-7
-    jp normdone
-
-.S8L1
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-4
-    jp normdone
-
-.S8L2
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ld a,-5
-
-.normdone
-    add a,d
-    jp NC,asm_f24_zero
+    ld a,d
+    sub b
+    jp c,asm_f24_zero
     ld d,a
     ret
-
-.SLSB
-    or a,l
-    jp Z,asm_f24_zero
-    and 0f0h
-    jr Z,S16L
-
-.S12L
-    ld a,l
-    add a
-    jr C,S12L1
-    jp M,S12L2
-    add a
-    jp M,S12L3
-    add a
-    ld h,a
-    ld l,0
-    ld a,-11
-    jp normdone
-
-.S12L1
-    rra
-    ld h,a
-    ld l,0
-    ld a,-8
-    jp normdone
-
-.S12L2
-    ld h,a
-    ld l,0
-    ld a,-9
-    jp normdone
-
-.S12L3
-    ld h,a
-    ld l,0
-    ld a,-10
-    jp normdone
-
-.S16L
-    ld a,l
-    add a
-    add a
-    add a
-    add a
-    add a
-    jr C,S16L1
-    jp M,S16L2
-    add a
-    jp M,S16L3
-    add a
-    ld h,a
-    ld l,0
-    ld a,-15
-    jp normdone
-
-.S16L1
-    rra
-    ld h,a
-    ld l,0
-    ld a,-12
-    jp normdone
-
-.S16L2
-    ld h,a
-    ld l,0
-    ld a,-13
-    jp normdone
-
-.S16L3
-    ld h,a
-    ld l,0
-    ld a,-14
-    jp normdone

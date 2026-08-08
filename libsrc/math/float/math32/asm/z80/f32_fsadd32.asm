@@ -177,16 +177,15 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 .al_5
     rra                         ; 4th lost bit in 6,5,4,3
     jr NC,al_6                  ; no shift by 16
-; here shift by 16
-; toss lost bits in a which are remote for 16 shift
-; consider only lost bits in d
-    ld a,d                      ; lost bits in a, keep only 8 most significant
+; here shift by 16 — fall through into .al_6
+; toss sticky in A (remote after >>16); only D (byte shifted out) matters
+    ld a,d                      ; lost high byte of lower half
     ex de,hl                    ; DE ← high half (old HL)
     ld hl,0                     ; hl zero
 
-; here no 8 or 16 shift, lost bits in a-reg bits 6,5,4, other bits zero's
+; no 8/16: sticky in A bits from the 2-/4-bit unrolls; after >>16: A=D
 .al_6
-    or a                        ; test lost bits
+    or a                        ; test lost bits (D-only when fell from >>16)
     jr Z,aligndone
     set 0,e                     ; lost bits
 ;   jr aligndone

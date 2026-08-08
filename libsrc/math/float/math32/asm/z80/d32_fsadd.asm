@@ -198,19 +198,22 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     rra                         ; shift in a zero, lost bits in 6,5,4
     jr NC,al_6                  ; no shift by 16
 ; here shift by 16
-; toss lost bits in a which are remote for 16 shift
-; consider only lost bits in d and h
-    ld a,d                      ; lost bits
-    or a,h                      ; test lost bits
+; toss sticky collected in A (too remote after >>16).  Match the >>8
+; path: only the byte leaving through D counts.  H may still hold bits
+; from the 2-/4-bit unroll steps — those are also below the kept sticky
+; window after >>16, so do not OR them in (issue #3043 Q2).
+    ld a,d                      ; lost high byte of the lower half
+    or a                        ; test D only
     ld e,l
     ld d,0
     ld h,d                      ; hl zero
     ld l,d
     jr Z,aldone
-    set 0,e                     ; lost bits
+    set 0,e                     ; jam sticky
     jr aldone
 
-; here no 8 or 16 shift, lost bits in a-reg bits 6,5,4, other bits zero's
+; here no 8 or 16 shift: sticky in A bits 6..4 plus any bits left in H
+; from the 2-/4-bit unrolled right shifts (still within the jam window)
 .al_6
     or a,h                      ; test lost bits
     ld h,0
@@ -351,9 +354,12 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; sub zero alignment from fadd
 ; difference larger-smaller in hlde
 ; exponent of result in c sign of result in b
-; now do normalize
-    scf
-    ex af,af                    ; if no C an alternate exit is taken
+; full normalize (0..23 left shifts).  m32_fsnormalize ends with
+; `ex af,af; ret`, so F' becomes the public flags.  CF clear = success
+; (overflow already took .foverflow with scf).  Do not scf here — that
+; left CF set on every fully-normalized add/sub result (#3043 Q1).
+    or a                        ; CF=0 for return via normalize
+    ex af,af
 
-    jp m32_fsnormalize          ; now begin to normalize
+    jp m32_fsnormalize
 

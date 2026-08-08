@@ -80,8 +80,8 @@ EXTERN m32_fsnormalize
     or a
     jr NZ,dldfright             ; go shift right
 ; exponent in c, sign in b[7]
-    ex af,af                    ; set carry off
-    jp m32_fsnormalize          ; piggy back on existing code in _fsnormalize
+    ex af,af                    ; F' ← F after `or a` (CF clear for success return)
+    jp m32_fsnormalize
 
 ; must shift right to make h = 0 and mantissa in lde
 .dldfright
