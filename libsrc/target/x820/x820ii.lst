@@ -1,4 +1,3 @@
-target/x820/stdio/generic_console
+target/x820/obj/x820/**/*.o
 @classic/games/games.lst
-target/x820/graphics/textpixl2
 @classic/gfx/gencon/gfx_gencon2.lst

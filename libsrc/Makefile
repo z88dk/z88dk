@@ -291,6 +291,7 @@ include target/tvc/tvc.mak
 include target/vector06c/vector06c.mak
 include target/vg5k/vg5k.mak
 include target/vz/vz.mak
+include target/x820/x820.mak
 include target/x07/x07.mak
 include target/z1013/z1013.mak
 include target/z80tvgame/z80tvgame.mak
@@ -859,7 +860,7 @@ tim011.lib: cpm_clib.lib $(TIM011_TARGETS)
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="wide portable gencon" SUBTYPE=tim011 TARGET_CFLAGS="-subtype=tim011"
 	TARGET=tim011 TYPE=z180 $(LIBLINKER) -mz180 -DFORtim011 -x$(OUTPUT_DIRECTORY)/tim011.lib @$(TARGET_DIRECTORY)/tim011/tim011.lst
 
-x820ii.lib: cpm_clib.lib
+x820ii.lib: cpm_clib.lib $(X820_TARGETS)
 	@echo ''
 	@echo '--- Building Xerox 820 II Library ---'
 	@echo ''
