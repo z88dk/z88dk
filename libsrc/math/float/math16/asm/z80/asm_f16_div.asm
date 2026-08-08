@@ -192,7 +192,7 @@ PUBLIC asm_f24_div_f24
     jp Z,d_zero
     cp 255
     jp NC,d_inf
-    ld hl,de
+    ex de,hl                    ; HL = quot (DE dead; D/E refilled)
     ld d,b
     ex af,af
     ld e,a

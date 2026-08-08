@@ -91,27 +91,25 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+12
     push af
     ld a,b
-    ld (de),a
+    ld (de),a                   ; expR = exp_a (byte)
     pop af
     ld de,sp+0
-    ld (de),l
+    ld (de),hl                  ; rem.lo (word) — 8085: ld (de),hl not (de),l/(de),h
     inc de
-    ld (de),h
     inc de
-    ld (de),a
+    ld (de),a                   ; rem.hi
     inc de
     xor a
-    ld (de),a
+    ld (de),a                   ; rem.x
 
     ld de,sp+20
     call get4
     call unp                    ; B=exp_b A=mhi HL=mlo
     ld de,sp+4
-    ld (de),l
+    ld (de),hl                  ; div.lo (word)
     inc de
-    ld (de),h
     inc de
-    ld (de),a
+    ld (de),a                   ; div.hi
 
     ld de,sp+12
     ld a,(de)
@@ -137,12 +135,12 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld (de),a
 
     ld de,sp+8
+    ld hl,0
+    ld (de),hl                  ; quot.lo = 0
+    inc de
+    inc de
     xor a
-    ld (de),a
-    inc de
-    ld (de),a
-    inc de
-    ld (de),a
+    ld (de),a                   ; quot.hi = 0
 
     call rem_lt_div
     jr NC,pre_ok
@@ -183,16 +181,12 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     call rem_add
 .g_done
 
-    ; B=qhi, HL = qmid:qlo (avoid partial DE updates)
+    ; B=qhi, HL = qmid:qlo
     ld de,sp+10
     ld a,(de)
     ld b,a                      ; qhi
     ld de,sp+8
-    ld a,(de)
-    ld l,a                      ; qlo
-    inc de
-    ld a,(de)
-    ld h,a                      ; qmid
+    ld hl,(de)                  ; qlo | qmid
 
     ld a,b
     or a
@@ -253,7 +247,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     pop af                      ; b copy
     pop hl                      ; flag in L (word was B=0 C=flag → L=flag)
     ld a,l
-    ld hl,de                    ; HL = low
+    ex de,hl                    ; HL = low (DE was low; DE dead next)
     ld de,bc                    ; DE = high → DEHL = result
     or a
     jr Z,done_nc
@@ -266,7 +260,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 ;--------------------------------------------------------------------
 .get4
-    ld hl,de
+    ex de,hl                    ; HL = ptr (DE dead; refilled from (hl+))
     ld c,(hl+)
     ld b,(hl+)
     ld e,(hl+)
@@ -319,53 +313,56 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 ;--------------------------------------------------------------------
 ; Stack helpers — called, so work base is sp+2 (ret at +0), like l_long_div_0.
 ; work: rem+2 div+6 quot+10 expR+14
+;
+; 8085 (de) forms only:
+;   ld a,(de) / ld (de),a / ld a,(de+) / ld (de+),a
+;   ld hl,(de) / ld (de),hl
+; Never ld (de),r (r≠A) or ld (de),n — those are faked via ex de,hl.
 ;--------------------------------------------------------------------
 
 .rem_shl
+    ; rem <<= 1: lo word via HL, then hi,x via A
     ld de,sp+2
-    ld a,(de)
-    add a,a
-    ld (de),a
+    ld hl,(de)
+    add hl,hl
+    ld (de),hl
+    inc de
     inc de
     ld a,(de)
     rla
-    ld (de),a
-    inc de
-    ld a,(de)
-    rla
-    ld (de),a
-    inc de
+    ld (de+),a
     ld a,(de)
     rla
     ld (de),a
     ret
 
 .rem_lt_div
+    ; unsigned compare rem[3:0] vs 0:div[2:0]; C if rem < div
     ld de,sp+5
-    ld a,(de)
+    ld a,(de)                   ; rem.x
     or a
     jr NZ,rlt_nc
     ld de,sp+4
-    ld a,(de)
+    ld a,(de)                   ; rem.hi
     ld c,a
     ld de,sp+8
-    ld a,(de)
+    ld a,(de)                   ; div.hi
     cp c
     jr C,rlt_nc
     jr NZ,rlt_c
     ld de,sp+3
-    ld a,(de)
+    ld a,(de)                   ; rem.mid
     ld c,a
     ld de,sp+7
-    ld a,(de)
+    ld a,(de)                   ; div.mid
     cp c
     jr C,rlt_nc
     jr NZ,rlt_c
     ld de,sp+2
-    ld a,(de)
+    ld a,(de)                   ; rem.lo
     ld c,a
     ld de,sp+6
-    ld a,(de)
+    ld a,(de)                   ; div.lo
     cp c
     jr C,rlt_nc
     jr Z,rlt_nc
@@ -377,56 +374,43 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ret
 
 .rem_try
+    ; rem -= 0:div (4-byte); C if borrow (failed)
+    ; DE → rem, HL → div  (cf. l_long_div_0)
     ld de,sp+6
+    ex de,hl                    ; HL = &div
+    ld de,sp+2                  ; DE = &rem
     ld a,(de)
-    ld c,a
-    ld de,sp+2
+    sub (hl)
+    ld (de+),a
+    inc hl
     ld a,(de)
-    sub c
-    ld (de),a
-    ld de,sp+7
+    sbc a,(hl)
+    ld (de+),a
+    inc hl
     ld a,(de)
-    ld c,a
-    ld de,sp+3
-    ld a,(de)
-    sbc a,c
-    ld (de),a
-    ld de,sp+8
-    ld a,(de)
-    ld c,a
-    ld de,sp+4
-    ld a,(de)
-    sbc a,c
-    ld (de),a
-    ld de,sp+5
+    sbc a,(hl)
+    ld (de+),a
     ld a,(de)
     sbc a,0
     ld (de),a
     ret
 
 .rem_add
+    ; rem += 0:div (restore)
     ld de,sp+6
+    ex de,hl                    ; HL = &div
+    ld de,sp+2                  ; DE = &rem
     ld a,(de)
-    ld c,a
-    ld de,sp+2
+    add a,(hl)
+    ld (de+),a
+    inc hl
     ld a,(de)
-    add a,c
-    ld (de),a
-    ld de,sp+7
+    adc a,(hl)
+    ld (de+),a
+    inc hl
     ld a,(de)
-    ld c,a
-    ld de,sp+3
-    ld a,(de)
-    adc a,c
-    ld (de),a
-    ld de,sp+8
-    ld a,(de)
-    ld c,a
-    ld de,sp+4
-    ld a,(de)
-    adc a,c
-    ld (de),a
-    ld de,sp+5
+    adc a,(hl)
+    ld (de+),a
     ld a,(de)
     adc a,0
     ld (de),a
@@ -434,17 +418,14 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 .rem_nz
     ld de,sp+2
-    ld a,(de)
-    inc de
+    ld a,(de+)
     ld c,a
-    ld a,(de)
+    ld a,(de+)
     or c
     ld c,a
-    inc de
-    ld a,(de)
+    ld a,(de+)
     or c
     ld c,a
-    inc de
     ld a,(de)
     or c
     ret
@@ -453,12 +434,10 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+10
     ld a,(de)
     add a,a                     ; C = old b7
-    ld (de),a
-    inc de
+    ld (de+),a
     ld a,(de)
     rla
-    ld (de),a
-    inc de
+    ld (de+),a
     ld a,(de)
     rla
     ld (de),a
@@ -471,13 +450,11 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     add a,a
     push af                     ; save C from shift
     or 1
-    ld (de),a
-    inc de
+    ld (de+),a
     pop af                      ; restore C
     ld a,(de)
     rla
-    ld (de),a
-    inc de
+    ld (de+),a
     ld a,(de)
     rla
     ld (de),a
@@ -487,14 +464,12 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+10
     ld a,(de)
     inc a
-    ld (de),a
+    ld (de+),a
     ret NZ
-    inc de
     ld a,(de)
     inc a
-    ld (de),a
+    ld (de+),a
     ret NZ
-    inc de
     ld a,(de)
     inc a
     ld (de),a

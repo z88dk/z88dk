@@ -69,7 +69,7 @@ PUBLIC asm_f24_div_f24
     push hl
     ld de,sp+8
     ld hl,(de)                  ; X.de
-    ld de,hl
+    ex de,hl                    ; DE = X.de (HL dead; restored next)
     pop hl                      ; DEHL = X
     ; stack [Y.hl][Y.de][X.hl][X.de], BC=cret
     push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
@@ -255,7 +255,7 @@ PUBLIC asm_f24_div_f24
     jp Z,d_res_zero
     cp 255
     jp NC,d_res_inf
-    ld hl,de
+    ex de,hl                    ; HL = quot (DE dead; refilled next)
     ld de,bc                    ; DEHL = result
 
     ; drop X.hl X.de cret Y.hl Y.de; restore cret
