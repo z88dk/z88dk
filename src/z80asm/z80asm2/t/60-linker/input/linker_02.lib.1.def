@@ -1,0 +1,19 @@
+begin library
+	begin module
+		name = L1
+		begin symbols
+			begin symbol
+				name = LA
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+			begin symbol
+				name = LB
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+		end symbols
+	end module
+end library

@@ -8,7 +8,6 @@
 
 #include "obj_file.h"
 #include "strings.h"
-#include <cstdint>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -16,42 +15,29 @@
 #include <unordered_set>
 #include <vector>
 
-#if 0
-struct LinkedSymbol {
-    ObjSymbolView* def = nullptr;       // where it was defined
-    ObjModuleView* module = nullptr;
-    bool resolved = false;
-    int value = 0;                  // final linked value
+class Linker {
+public:
+    explicit Linker() = default;
+
+    void add_input_modules(const std::vector<std::string>& filenames);
+    void add_input_libraries(const std::vector<std::string>& libraries);
+    void set_output_dir(std::string_view output_dir);
+    bool link();
+
+private:
+    std::vector<std::unique_ptr<ObjFile>> input_modules_;
+    std::vector<std::unique_ptr<ObjFile>> input_libraries_;
+    std::string output_dir_;
+    std::unordered_map<StringId, ObjModule*> defined_symbols_;
+    std::unordered_map<StringId, ObjModule*> undefined_symbols_;
+    std::unordered_set<ObjModule*> selected_modules_;
+    std::vector<ObjModule*> module_sequence_; // final sequence of modules to link
+
+    bool resolve_symbols();
+    bool add_module(ObjModule* module);
+    void pull_module_sequence();
 };
 
-struct LinkedSection {
-    StringId name_id;
-    uint start_address;
-    uint size;
-    std::vector<uint8_t> data;
-    std::vector<ObjExpr*> relocs;
-};
-
-struct LinkContext {
-    // Input object libraries and modules; they own the ObjLibrary's and ObjModule's
-    std::vector<std::unique_ptr<ObjLibrary>> input_modules;
-    std::vector<std::unique_ptr<ObjLibrary>> libraries;
-
-    // Library index
-    std::unordered_map<StringId, ObjModuleView*> symbol_to_module;
-
-    // Linking state
-    std::unordered_map<StringId, LinkedSymbol> global_symbols;
-    std::unordered_set<uint> unresolved_symbols;
-    std::unordered_set<ObjModuleView*> selected_modules;
-    std::vector<ObjModuleView*> final_modules;
-
-    // Output sections
-    std::vector<LinkedSection> linked_sections;
-};
-
-void link_files(const std::vector<std::string>& filenames,
+bool link_files(const std::vector<std::string>& objects,
                 const std::vector<std::string>& libraries,
-                const std::vector<std::string>& library_paths,
                 std::string_view output_dir);
-#endif
