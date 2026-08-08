@@ -214,9 +214,8 @@ The expanded floating point format is a useful tool for creating functions, as c
 half_t invf16 (half_t x);
 half_t divf16 (half_t x, half_t y);
 ```
-The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse. This can be used to advantage where a function requires only an inverse, this can be returned saving the multiplication associated with the divide.
-
-The Newton-Raphson method is used for finding the inverse, using full 16-bit expanded mantissa multiplies and adds for accuracy. Two N-R orthogonal iterations provide an accurate result for the IEEE-754 half float mantissa.
+**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores).  
+**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/`; keep inv for reciprocal-as-primitive / NR-based helpers.
 
 #### _sqrt()_ and _invsqrt()_
 
