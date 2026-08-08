@@ -234,6 +234,7 @@ include target/apple2/apple2.mak
 include target/attache/attache.mak
 include target/aussie/aussie.mak
 include target/bic/bic.mak
+include target/bit90/bit90.mak
 include target/bondwell/bondwell.mak
 include target/bondwell2/bondwell2.mak
 include target/c7420/c7420.mak
@@ -259,6 +260,7 @@ include target/lm80c/lm80c.mak
 include target/lviv/lviv.mak
 include target/lynx/lynx.mak
 include target/m100/m100.mak
+include target/m5/m5.mak
 include target/map1010/map1010.mak
 include target/mc1000/mc1000.mak
 include target/micro8085/micro8085.mak
@@ -274,12 +276,14 @@ include target/ondra/ondra.mak
 include target/osborne1/osborne1.mak
 include target/p2000/p2000.mak
 include target/pacman/pacman.mak
+include target/pasopia7/pasopia7.mak
 include target/pc6001/pc6001.mak
 include target/pc88/pc88.mak
 include target/pcw/pcw.mak
 include target/pencil2/pencil2.mak
 include target/phc25/phc25.mak
 include target/pk8000/pk8000.mak
+include target/pmd85/pmd85.mak
 include target/pps/pps.mak
 include target/primo/primo.mak
 include target/pv1000/pv1000.mak
@@ -1282,7 +1286,7 @@ adam.lib: coleco_clib.lib $(ADAM_TARGETS)
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(TARGET_DIRECTORY)/adam/adam.lst
 
 # SORD M5 library - Stefano
-m5_clib.lib: $(TARGET_CLIB_DEPS)
+m5_clib.lib: $(TARGET_CLIB_DEPS) $(M5_TARGETS)
 	@echo ''
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
@@ -1523,7 +1527,7 @@ multi8_clib.lib: $(TARGET_CLIB_DEPS) $(MULTI8_TARGETS)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(TARGET_DIRECTORY)/multi8/multi8.lst
 
 # Pasopia7 Multi8 - dom
-pasopia7_clib.lib: $(TARGET_CLIB_DEPS)
+pasopia7_clib.lib: $(TARGET_CLIB_DEPS) $(PASOPIA7_TARGETS)
 	@echo ''
 	@echo '--- Building Toshiba Pasopia7 Library ---'
 	@echo ''
@@ -1636,7 +1640,7 @@ coleco_clib.lib: $(TARGET_CLIB_DEPS) $(COLECO_TARGETS)
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(TARGET_DIRECTORY)/coleco/coleco.lst
 
 # Bit90 (colecovision clone + enhancements) - dom/stefano
-bit90.lib: coleco_clib.lib
+bit90.lib: coleco_clib.lib $(BIT90_TARGETS)
 	@echo ''
 	@echo '--- Building Bit-90 Library ---'
 	@echo ''
@@ -2181,7 +2185,7 @@ s1mp3_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C target/s1mp3
 	TARGET=s1mp3 TYPE=z80 $(LIBLINKER) -DFORs1mp3 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/s1mp3_clib.lib @$(TARGET_DIRECTORY)/s1mp3/s1mp3.lst
 
-pmd85_clib.lib: $(TARGET_CLIB_DEPS)
+pmd85_clib.lib: $(TARGET_CLIB_DEPS) $(PMD85_TARGETS)
 	@echo ''
 	@echo '--- Building pmd85 Library ---'
 	@echo ''
