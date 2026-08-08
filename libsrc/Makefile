@@ -287,6 +287,7 @@ include target/srr/srr.mak
 include target/sv8000/sv8000.mak
 include target/tim011/tim011.mak
 include target/ts2068/ts2068.mak
+include target/tvc/tvc.mak
 include target/vector06c/vector06c.mak
 include target/vg5k/vg5k.mak
 include target/vz/vz.mak
@@ -1146,22 +1147,19 @@ mtx_clib.lib: $(TARGET_CLIB_DEPS) $(MTX_TARGETS)
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(TARGET_DIRECTORY)/mtx/mtx.lst
 
 # Videoton TV Computer library - Sandor
-tvc_clib.lib: $(TARGET_CLIB_DEPS)
+tvc_clib.lib: $(TARGET_CLIB_DEPS) $(TVC_TARGETS)
 	@echo ''
 	@echo '--- Building Videoton TV Computer Library ---'
 	@echo ''
 	$(call buildgeneric,tvc)
 	$(MAKE) -C classic/games TARGET=tvc
-	$(MAKE) -C target/tvc/sound TARGET=tvc
-	$(MAKE) -C target/tvc TARGET=tvc
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(TARGET_DIRECTORY)/tvc/tvc.lst
 
 # Videoton TV Computer ROM implemented graphics library - Sandor
-tvc_romgfx.lib: tvc_clib.lib
+tvc_romgfx.lib: tvc_clib.lib $(TVCROMGFX_TARGETS)
 	@echo ''
 	@echo '--- Building Videoton TV Computer ROM based Gfx Library ---'
 	@echo ''
-	$(MAKE) -C target/tvc/romgfx TARGET=tvc
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_romgfx @$(TARGET_DIRECTORY)/tvc/tvc_romgfx.lst
 
 # Enterprise library - Stefano
