@@ -290,7 +290,7 @@ extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
 extern struct nodepair *statement(void);
-extern Node    *doasm(void);
+extern Node    *doasm(int file_scope);
 extern void     dopragma(void);
 extern Node    *doasmfunc(char wantbr);
 
