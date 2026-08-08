@@ -50,7 +50,7 @@ obj/kc160-crt0:
 
 # this one uses iy in place of ix
 obj/ixiy-crt0:
-	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/ixiy/ixiy/ixiy -I.. -IXIY -D__SDCC_IX  @crt0_z80.lst
+	NEWLIB_ROOT=$(NEWLIB_ROOT) $(ASSEMBLER) -Oobj/ixiy/ixiy/ixiy -I.. -IXIY -D__SDCC_IX -D__CLASSIC @crt0_z80.lst
 	@touch $@
 
 
