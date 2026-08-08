@@ -2377,77 +2377,89 @@ sp1-all:
 sp1-clean:
 	$(MAKE) -C sprites/software/sp1 clean
 
-z80_crt0.lib: $(DIRS) $(OBJS)
+# The crt0 objects are built by classic/z80_crt0s, which records what each
+# one depends on in obj/<cpu>-crt0.parent.d (paths relative to here). Pulling
+# those in lets us relink a crt0 library when its objects actually change,
+# instead of never.
+CRT0_DIR    = classic/z80_crt0s
+CRT0_STAMP  = $(CRT0_DIR)/obj/$(1)-crt0
+
+$(CRT0_DIR)/obj/%-crt0:
+	$(MAKE) -C $(CRT0_DIR)
+
+-include $(wildcard $(CRT0_DIR)/obj/*-crt0.parent.d)
+
+z80_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,z80)
 	@echo ''
 	@echo '--- Building z80 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-ez80_z80_crt0.lib: $(DIRS) $(OBJS) z80_crt0.lib
+ez80_z80_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,ez80_z80) z80_crt0.lib
 	@echo ''
 	@echo '--- Building ez80_z80 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ez80_z80_crt0 @$(LISTFILE_DIRECTORY)/ez80_z80.lst
 
-z180_crt0.lib: $(DIRS) $(OBJS) ez80_z80_crt0.lib
+z180_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,z180) ez80_z80_crt0.lib
 	@echo ''
 	@echo '--- Building z180 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_crt0 @$(LISTFILE_DIRECTORY)/z180.lst
 
-z80iy_crt0.lib: $(DIRS) $(OBJS) z180_crt0.lib
+z80iy_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,ixiy) z180_crt0.lib
 	@echo ''
 	@echo '--- Building ixiy crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=ixiy $(LIBLINKER) -mz80 -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-8080_crt0.lib: $(DIRS) $(OBJS) z80iy_crt0.lib
+8080_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,8080) z80iy_crt0.lib
 	@echo ''
 	@echo '--- Building 8080 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_crt0 @$(LISTFILE_DIRECTORY)/8080.lst
 
-8085_crt0.lib: $(DIRS) $(OBJS) 8080_crt0.lib
+8085_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,8085) 8080_crt0.lib
 	@echo ''
 	@echo '--- Building 8085 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_crt0 @$(LISTFILE_DIRECTORY)/8085.lst
 
-z80n_crt0.lib: $(DIRS) $(OBJS) 8085_crt0.lib
+z80n_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,z80n) 8085_crt0.lib
 	@echo ''
 	@echo '--- Building z80n crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=z80n $(LIBLINKER) -mz80n -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80n_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
 
-gbz80_crt0.lib: $(DIRS) $(OBJS) z80n_crt0.lib
+gbz80_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,gbz80) z80n_crt0.lib
 	@echo ''
 	@echo '--- Building gbz80 crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gbz80_crt0 @$(LISTFILE_DIRECTORY)/gbz80.lst
 
-r2ka_crt0.lib: $(DIRS) $(OBJS) gbz80_crt0.lib
+r2ka_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,r2ka) gbz80_crt0.lib
 	@echo ''
 	@echo '--- Building r2ka crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=r2ka $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2ka_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
-r4k_crt0.lib: $(DIRS) $(OBJS) r2ka_crt0.lib
+r4k_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,r4k) r2ka_crt0.lib
 	@echo ''
 	@echo '--- Building r4k crt Library ---'
 	@echo ''
 	$(call buildcrt)
 	TYPE=r4k $(LIBLINKER) -mr4k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r4k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
-kc160_crt0.lib: $(DIRS) $(OBJS) r4k_crt0.lib
+kc160_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,kc160) r4k_crt0.lib
 	@echo ''
 	@echo '--- Building kc160 crt Library ---'
 	@echo ''
