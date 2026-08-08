@@ -12,9 +12,13 @@
 ; m32_fsnormalize - z80, z180, z80n normalisation code
 ;-------------------------------------------------------------------------
 ;
-;    enter here with af' carry clear for m32_float32, m32_float32u
-;
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
+;
+;    af' is not used for control flow inside this routine.  Exit does
+;    `ex af,af; ret`, so F' becomes the public F.  Callers that want a
+;    success return (CF clear) must place that in af' before the call
+;    (m32_float32 / m32_float32u / d32_fsadd sub→normalize).  Overflow
+;    and other error exits set CF in the caller and do not enter here.
 ;
 ;-------------------------------------------------------------------------
 
@@ -23,7 +27,6 @@ SECTION code_fp_math32
 
 PUBLIC m32_fsnormalize
 
-; enter here with af' carry clear for float functions m32_float32, m32_float32u
 .m32_fsnormalize
     xor a
     or a,l

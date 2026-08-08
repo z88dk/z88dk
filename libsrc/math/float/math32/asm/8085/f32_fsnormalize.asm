@@ -10,9 +10,8 @@
 ; m32_fsnormalize - 8085 normalisation code
 ;-------------------------------------------------------------------------
 ;
-;    enter here with af' carry clear for m32_float32, m32_float32u
-;
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
+;    result packed IEEE DEHL (no af' — 8085 has no alternate registers)
 ;
 ;-------------------------------------------------------------------------
 
