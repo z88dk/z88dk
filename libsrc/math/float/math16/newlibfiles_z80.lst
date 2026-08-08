@@ -6,6 +6,7 @@
 ../../../math/float/math16/asm/z80/asm_f16_compare.asm
 ../../../math/float/math16/asm/z80/asm_f16_discardfraction.asm
 ../../../math/float/math16/asm/z80/asm_f16_div.asm
+../../../math/float/math16/asm/z80/asm_f16_inv.asm
 ../../../math/float/math16/asm/z80/asm_f16_div2.asm
 ../../../math/float/math16/asm/z80/asm_f16_f24_int.asm
 ../../../math/float/math16/asm/z80/asm_f16_f24_long.asm
