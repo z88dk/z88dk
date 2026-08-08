@@ -1500,6 +1500,12 @@ void ObjModule::unpack(std::shared_ptr<const BinaryFile> file, size_t ptr) {
     // the sections are loaded on demand
 }
 
+std::string ObjModule::module_name_string() {
+    return "module " + (modname() ? std::string(modname()->name()) : std::string())
+           +
+           " file " + std::string(filename()) + " offset " + int_to_hex(base_offset());
+}
+
 //-----------------------------------------------------------------------------
 // Library
 //-----------------------------------------------------------------------------
@@ -1856,7 +1862,7 @@ ObjFile::ObjFile(std::string_view filename)
         obj_module_->unpack(file_, 0);
     }
     else {
-        fatal_error("Invalid object file type: " + std::string(filename));
+        fatal_error("Invalid object file: " + std::string(filename));
     }
 }
 

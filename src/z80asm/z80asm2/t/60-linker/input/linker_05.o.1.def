@@ -1,0 +1,37 @@
+begin library
+	begin module
+		name = M1
+		begin symbols
+			begin symbol
+				name = A
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+			begin symbol
+				name = B
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+		end symbols
+	end module
+	begin module
+		name = M2
+		swap_ixiy = 1
+		begin symbols
+			begin symbol
+				name = A
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+			begin symbol
+				name = B
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+		end symbols
+	end module
+end library

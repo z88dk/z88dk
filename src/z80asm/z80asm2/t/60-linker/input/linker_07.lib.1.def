@@ -1,0 +1,27 @@
+begin library
+	begin module
+		name = L1_M1
+		begin symbols
+			begin symbol
+				name = B
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+		end symbols
+	end module
+	begin module
+		name = L1_M2
+		begin symbols
+			begin symbol
+				name = A
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+		end symbols
+		begin externs
+			name = B
+		end externs
+	end module
+end library

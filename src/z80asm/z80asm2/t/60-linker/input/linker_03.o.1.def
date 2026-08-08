@@ -1,0 +1,24 @@
+begin library
+	begin module
+		name = M1
+		begin symbols
+			begin symbol
+				name = A
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+			begin symbol
+				name = B
+				scope = Public
+				type = Constant
+				value = 0
+			end symbol
+		end symbols
+		begin externs
+			name = E1
+			name = E2
+			name = E3
+		end externs
+	end module
+end library
