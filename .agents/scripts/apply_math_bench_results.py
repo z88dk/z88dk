@@ -138,17 +138,29 @@ def replace_result_block(
 ) -> tuple[str, int]:
     """Update one RESULT block whose title line matches title_re."""
     lines = text.splitlines(keepends=True)
-    title_pat = re.compile(title_re)
+    # Match whole title line (strip); avoid accidental substring hits.
+    title_pat = re.compile(rf"^(?:{title_re})\s*$")
     hits = 0
     for i, line in enumerate(lines):
-        if not title_pat.search(line.rstrip("\n")):
+        if not title_pat.match(line.rstrip("\n")):
             continue
         hits = 1
         for b in range(i, max(-1, i - 4), -1):
             if lines[b].startswith("Z88DK "):
                 lines[b] = f"Z88DK {date_full}\n"
                 break
-        for j in range(i, min(len(lines), i + 22)):
+        # Only edit this RESULT block: stop before the next Z88DK-dated entry
+        # (do not walk into the following block's size/cycle/time lines).
+        j_end = len(lines)
+        for j in range(i + 1, len(lines)):
+            if lines[j].startswith("Z88DK "):
+                j_end = j
+                break
+            # numbered archive entries "11." / "10b." before next Z88DK
+            if re.match(r"^\d+[a-z]?\.\s*$", lines[j]):
+                j_end = j
+                break
+        for j in range(i, j_end):
             if re.search(r"^\d+ bytes less page zero", lines[j]):
                 lines[j] = f"{size} bytes less page zero\n"
             m = re.match(r"^(cycle count\s*=\s*)\d+\s*$", lines[j])
