@@ -1869,13 +1869,14 @@ static disc_spec rc700_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
 };
 
-// RC-700 blank system-disk formats: uniform MFM/FM throughout, boot tracks reserved
-// (0xe5-filled), first_sector_offset=1 (MAME/real-HW 1-based sector IDs).
-// See rcbios/SYSTEM_DISK_CREATION.md for how to install CCP+BDOS after creation.
-// NOTE: 5.25" track 0 is written as uniform MFM here; that track must be replaced
-// with the required mixed-density (FM side0 / MFM side1) format using bin2imd.py.
+// RC-700 blank data-disk formats: MFM data area with the real mixed-density Track 0
+// (FM side 0 / MFM side 1) emitted by the IMD writer, and Tracks 0-1 zero-filled so RC702
+// autoload sees no boot signature and treats the disk as a (non-bootable) data diskette.
+// first_sector_offset=1 (MAME/real-HW 1-based sector IDs).
+// See rcbios/SYSTEM_DISK_CREATION.md for how to install CCP+BDOS to make one bootable.
 
-// 5.25" DS/DD blank system disk — 36 cylinders, 9 sectors x 512 B, MFM 250 kbps, 2:1 skew
+// 5.25" DS/DD data disk — 36 cylinders, 9 sectors x 512 B, MFM 250 kbps, 2:1 skew.
+// Track 0: FM 16x128 (side 0) / MFM 16x256 (side 1); Tracks 0-1 zero-filled (data diskette).
 static disc_spec rc700_5dd_spec = {
     .name = "RC-700 5\" DS/DD system",
     .disk_mode = MFM250,
@@ -1892,10 +1893,15 @@ static disc_spec rc700_5dd_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
     .has_skew = 1,
-    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 },
+    .mixed_density_track0 = 1,
+    .t0s0_mode = FM250,  .t0s0_sectors = 16, .t0s0_sector_size = 128,
+    .t0s1_mode = MFM250, .t0s1_sectors = 16, .t0s1_sector_size = 256,
+    .boot_zero_tracks = 2
 };
 
-// 8" DS/DD blank system disk — 77 cylinders, 15 sectors x 512 B, MFM 500 kbps, 4:1 skew
+// 8" DS/DD data disk — 77 cylinders, 15 sectors x 512 B, MFM 500 kbps, 4:1 skew.
+// Track 0: FM 26x128 (side 0) / MFM 26x256 (side 1); Tracks 0-1 zero-filled (data diskette).
 static disc_spec rc700_8dd_spec = {
     .name = "RC-700 8\" DS/DD system",
     .disk_mode = MFM500,
@@ -1912,7 +1918,11 @@ static disc_spec rc700_8dd_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
     .has_skew = 1,
-    .skew_tab = { 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11 }
+    .skew_tab = { 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11 },
+    .mixed_density_track0 = 1,
+    .t0s0_mode = FM500,  .t0s0_sectors = 26, .t0s0_sector_size = 128,
+    .t0s1_mode = MFM500, .t0s1_sectors = 26, .t0s1_sector_size = 256,
+    .boot_zero_tracks = 2
 };
 
 // 8" SS/SD blank system disk (IBM 3740-compatible) — 77 tracks, 26 sectors x 128 B, FM 500 kbps, 6:1 skew
@@ -2791,7 +2801,13 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     h = cpm_create(spec);
     if (boot_filename != NULL) {
         size_t bootlen;
-        size_t max_bootsize = spec->boottracks * spec->sectors_per_track * spec->sector_size * (spec->alternate_sides + 1);
+        // Formats with a zero-filled mixed-density boot region (RC702 rc700-8dd/5dd) take the
+        // boot payload at sector level: the physical boot-region size, spliced by the IMD
+        // writer with each track/side's native density.  Others use the legacy flat boot track.
+        int sector_level = (spec->boot_zero_tracks > 0);
+        size_t max_bootsize = sector_level
+            ? disc_boot_region_size(spec)
+            : spec->boottracks * spec->sectors_per_track * spec->sector_size * (spec->alternate_sides + 1);
         if ((binary_fp = fopen(boot_filename, "rb")) != NULL) {
             void* bootbuf;
             if (fseek(binary_fp, 0, SEEK_END)) {
@@ -2806,7 +2822,10 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
             bootbuf = malloc(max_bootsize);
             if (1 != fread(bootbuf, bootlen, 1, binary_fp)) { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",binary_name); }
             fclose(binary_fp);
-            disc_write_boot_track(h, bootbuf, bootlen);
+            if (sector_level)
+                disc_write_boot_region(h, bootbuf, bootlen);
+            else
+                disc_write_boot_track(h, bootbuf, bootlen);
             free(bootbuf);
         }
     } else if (f->bootsector) {

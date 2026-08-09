@@ -45,6 +45,27 @@ typedef struct {
     // Optional 2nd side options
     uint8_t   side2_sector_numbering;   /* If set, sector numbering is progressive from side 0 to side 1 */
 
+    // Optional mixed-density boot region (RC702: Track 0 is FM on side 0, MFM on side 1).
+    // disc_spec otherwise assumes ONE density/geometry for every track; these fields let a
+    // format override just Track 0's per-side geometry so the emitted IMD physically matches
+    // the real diskette (side 0 = FM 128 B, side 1 = MFM 256 B).  Only the IMD writer honours
+    // them.  The uniform in-memory image still carries a full-size dummy Track 0; its bytes are
+    // ignored on output when boot_zero_tracks covers Track 0.
+    uint8_t   mixed_density_track0;     /* If set, Track 0 uses the t0sX_* geometry below */
+    uint8_t   t0s0_mode;                /* enum diskmode for Track 0 side 0 (e.g. FM500) */
+    uint8_t   t0s0_sectors;             /* sectors per track, Track 0 side 0 */
+    uint16_t  t0s0_sector_size;         /* sector size in bytes, Track 0 side 0 */
+    uint8_t   t0s1_mode;                /* enum diskmode for Track 0 side 1 (e.g. MFM500) */
+    uint8_t   t0s1_sectors;             /* sectors per track, Track 0 side 1 */
+    uint16_t  t0s1_sector_size;         /* sector size in bytes, Track 0 side 1 */
+
+    // Non-bootable "data diskette" emission.  When boot_zero_tracks > 0 the IMD writer emits
+    // that many leading tracks (both sides) with all sector bytes = 0x00 instead of the image's
+    // filler.  RC702 autoload reads Track 0 into RAM and dispatches on the " RC702"/" RC700"
+    // signatures there; zeroing Tracks 0-1 removes any signature so autoload treats the disk as
+    // a data diskette (not bootable) rather than halting on a stray/garbage boot track.
+    uint8_t   boot_zero_tracks;         /* # leading tracks whose sector data is zero-filled (0 = off) */
+
 } disc_spec;
 
 typedef struct disc_handle_s disc_handle;
@@ -63,6 +84,8 @@ extern disc_handle *fat_create(disc_spec* spec);
 extern void fat_mount(disc_handle *h);
 
 extern void disc_write_boot_track(disc_handle *h, void *data, size_t len);
+extern size_t disc_boot_region_size(disc_spec *spec);
+extern void disc_write_boot_region(disc_handle *h, void *data, size_t len);
 extern void disc_write_file(disc_handle *h, char filename[11], void *data, size_t len);
 extern void disc_free(disc_handle *h);
 
