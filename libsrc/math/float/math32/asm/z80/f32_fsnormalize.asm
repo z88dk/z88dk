@@ -11,10 +11,12 @@
 ;
 ;  unpacked: h==0; mantissa=lde, sign in b, exponent in c
 ;
-;  ex de,hl → E:HL; byte scan; unrolled residual walk jumps into
-;  reverse-label shift tree (add hl,hl / rl de); ex de,hl → pack.
+;  ex de,hl → E:HL; D = total left-shift count (byte align + residual).
+;  Sign stays in B (no push).  Residual: jp m tree, add hl,hl / rl e.
+;  Pack on E:HL like mul/sqr (sla e / rl b / rra / ld d,a / rr e).
 ;
 ;  af' unused for control flow.  Exit: ex af,af; ret (F' → public F).
+;  Note: jr m/p do not exist; sign/parity branches stay jp.
 ;
 ;-------------------------------------------------------------------------
 
@@ -25,10 +27,8 @@ PUBLIC m32_fsnormalize
 
 
 .m32_fsnormalize
-    ld a,b
-    push af                     ; save sign
-
-    ex de,hl                    ; E = high, HL = mid:low, D = 0
+    ex de,hl                    ; E = high, HL = mid:low
+    ld d,0                      ; shift total
 
     ; ---------------------------------------------------------------
     ; Byte scan on E:HL
@@ -36,8 +36,8 @@ PUBLIC m32_fsnormalize
 
     ld a,e
     or a
-    jp m,no_shift               ; already normalised
-    jr nz,bitwalk
+    jp m,no_bit_shift           ; already normalised, D = 0
+    jr nz,bitwalk               ; residual only (D = 0)
 
     ld a,h
     or a
@@ -45,108 +45,93 @@ PUBLIC m32_fsnormalize
 
     ld a,l
     or a
-    jp z,normzero
+    jr z,normzero
 
-    ; leading in L → exp −16
+    ; leading in L → align 16
     ld e,l
     ld hl,0
-    ld a,c
-    sub 16
-    ld c,a
-    jp c,normzero
-    jp got_lead
+    ld d,16
+    jr got_lead
 
 .need8
     ld e,h
     ld h,l
     ld l,0
-    ld a,c
-    sub 8
-    ld c,a
-    jp c,normzero
+    ld d,8
+    ; fall through — E was non-zero H
 
 .got_lead
     ld a,e
     or a
-    jp m,no_shift
-    jp z,normzero
+    jp m,no_bit_shift           ; normalised after byte align only
+    ; E non-zero; fall into bitwalk (A = E, D = 8 or 16)
 
     ; ---------------------------------------------------------------
-    ; Unrolled residual walk on A (copy of E); jump into shift tree
-    ; B = residual count (set here, only used after shifts)
+    ; Residual walk on A; D accumulates 1..7; jump into shift tree
     ; ---------------------------------------------------------------
 
 .bitwalk
-    ld b,1
+    inc d
     add a,a
     jp m,s1
-    inc b
+    inc d
     add a,a
     jp m,s2
-    inc b
+    inc d
     add a,a
     jp m,s3
-    inc b
+    inc d
     add a,a
     jp m,s4
-    inc b
+    inc d
     add a,a
     jp m,s5
-    inc b
+    inc d
     add a,a
     jp m,s6
-    inc b
+    inc d
     add a,a
     jp p,normzero               ; 7th trial still clear → zero
-    ; fall through to s7
+    ; fall through to s7 (D = base+7)
 
-    ; reverse-label residual shifts (more shifts enter higher)
 .s7
     add hl,hl
-    rl de
+    rl e
 .s6
     add hl,hl
-    rl de
+    rl e
 .s5
     add hl,hl
-    rl de
+    rl e
 .s4
     add hl,hl
-    rl de
+    rl e
 .s3
     add hl,hl
-    rl de
+    rl e
 .s2
     add hl,hl
-    rl de
+    rl e
 .s1
     add hl,hl
-    rl de
+    rl e
 
+.no_bit_shift
+    ; A = C − D (final exp); B = sign; E:HL = normalised mant
     ld a,c
-    sub b
-    jp c,normzero
-    ld c,a                      ; final exp
+    sub d
+    jr c,normzero
 
-.no_shift
-    ex de,hl                    ; E:HL → LDE
-
-    pop af                      ; sign
-    ld b,a
-    ld a,c
-
-    ; pack IEEE DEHL
-    rl l
-    rl b
-    rra
-    rr l
-    ld h,a
-    ex de,hl
+    ; pack IEEE DEHL (mul/sqr style on E high)
+    sla e                       ; drop implicit 1 → C
+    rl b                        ; sign → C
+    rra                         ; A = sign|exp
+    ld d,a
+    rr e                        ; last exp bit into E; mant bits without implicit 1
     ex af,af
-    ret
+    ret                         ; DEHL
 
 .normzero
-    pop af                      ; drop sign
     ld hl,0
     ld de,hl
     ex af,af

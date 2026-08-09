@@ -38,7 +38,7 @@ PUBLIC m32_fsnormalize32
 
     ld a,l
     or a
-    jp z,normzero
+    jr z,normzero
 
     ; leading in L → +24
     ld d,l
@@ -47,16 +47,16 @@ PUBLIC m32_fsnormalize32
     ld a,b
     sub 24
     ld b,a
-    jp c,normzero
-    jp got_lead
+    jr c,normzero
+    jr got_lead
 
 .need16
     ex de,hl                    ; DE ← old HL, HL ← 0 (old DE was 0)
     ld a,b
     sub 16
     ld b,a
-    jp c,normzero
-    jp got_lead
+    jr c,normzero
+    jr got_lead
 
 .need8
     ld d,e
@@ -66,20 +66,22 @@ PUBLIC m32_fsnormalize32
     ld a,b
     sub 8
     ld b,a
-    jp c,normzero
+    jr c,normzero
+    ; fall through
 
 .got_lead
     ld a,d
     or a
-    ret m
-    jp z,normzero
+    ret m                       ; no jr m
+    jr z,normzero
 
 .bitwalk
-    ; A = leading byte; save exp/sign — residual count in C temporarily
+    ; A = leading byte; save exp/sign — residual count in B
+    ; DE is full high half: keep rl de (not rl e alone)
     push bc                     ; exp + sign
     ld b,1
     add a,a
-    jp m,s1
+    jp m,s1                     ; no jr m
     inc b
     add a,a
     jp m,s2
@@ -97,7 +99,7 @@ PUBLIC m32_fsnormalize32
     jp m,s6
     inc b
     add a,a
-    jp p,bitwalk_zero           ; 7th trial still clear → zero
+    jp p,bitwalk_zero           ; no jr p
     ; fall through to s7
 
     ; B = residual; stack has exp+sign
@@ -129,7 +131,7 @@ PUBLIC m32_fsnormalize32
     cpl
     inc a                       ; −residual
     add a,b
-    jp nc,normzero
+    jr nc,normzero
     ld b,a
     ret
 
