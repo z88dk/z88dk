@@ -475,6 +475,37 @@ static void emit_trace_check(const char *buf)
         }
 }
 
+/* [IR_FRAMEPROBE] Emit-site frame-access accounting. note_slot_use records
+   WHICH vreg a slot access belongs to and whether the read is redundant;
+   vemit sees the instruction that actually comes out. Counting at the emit
+   site is what makes the numbers convertible to bytes — rec_slotuse also
+   counts non-emitting slot_off guard calls, so event counts overstate by a
+   ratio that varies per function (measured 1.5x-3.6x on binary-trees).
+
+   Byte model for one (ix/iy+d) instruction: 3 bytes (prefix + opcode + disp),
+   6 when the other operand is a 16-bit pair (z80asm expands `ld (ix+d),hl`
+   and friends into two 3-byte accesses), 4 for an immediate byte store
+   (DD 36 d n). Validated against the assembler listing — see the commit. */
+static int  fh_cur_v = -1;      /* vreg of the slot access in progress */
+static int  fh_cur_red = 0;     /* ...and whether that read was redundant */
+static int  fh_nv;              /* bound for the two arrays below */
+static int *rec_fh_bytes;       /* bytes of frame access attributed to v */
+static int *rec_fh_redbytes;    /* ...of which, on redundant reads */
+static int  frameprobe_on(void);
+
+static int frameprobe_line_bytes(const char *b)
+{
+    if (!strstr(b, "(ix") && !strstr(b, "(iy")) return 0;
+    /* 16-bit pair operand -> two accesses */
+    if (strstr(b, ",hl") || strstr(b, ",de") || strstr(b, ",bc")
+        || strstr(b, "hl,(") || strstr(b, "de,(") || strstr(b, "bc,("))
+        return 6;
+    /* `ld (ix+d),<imm>` — DD 36 d n */
+    const char *c = strstr(b, "),");
+    if (c && (c[2] == '-' || (c[2] >= '0' && c[2] <= '9'))) return 4;
+    return 3;
+}
+
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
     if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
@@ -484,7 +515,7 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
     if (emit_trace_on < 0)  emit_trace_on  = getenv("IR_EMIT_TRACE") ? 1 : 0;
     int acarry = a_carry_enabled();
     int hlcarry = hl_carry_enabled();
-    if (spill_stats_on || verify_on || clob_verify_on || emit_trace_on || acarry || hlcarry) {
+    if (spill_stats_on || verify_on || clob_verify_on || emit_trace_on || acarry || hlcarry || frameprobe_on()) {
         /* Fully-expanded instruction text. Buffer only when a probe is on; the
            emitted bytes are unchanged. */
         char buf[256];
@@ -494,6 +525,13 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
         if (spill_stats_on) {
             if (strstr(buf, "(ix") || strstr(buf, "(iy")) L.spill_ix++;
             if (strstr(buf, "add\thl,sp")) L.spill_sp++;
+        }
+        if (frameprobe_on() && rec_fh_bytes && fh_cur_v >= 0 && fh_cur_v < fh_nv) {
+            int nb = frameprobe_line_bytes(buf);
+            if (nb) {
+                rec_fh_bytes[fh_cur_v] += nb;
+                if (fh_cur_red) rec_fh_redbytes[fh_cur_v] += nb;
+            }
         }
         if ((verify_on || clob_verify_on) && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
             verify_len += snprintf(verify_buf + verify_len,
@@ -2376,6 +2414,8 @@ static void rec_reset(void)
 {
     free(rec_reg); free(rec_slot); free(rec_remat); free(rec_slotuse);
     free(rec_slotwrite); free(rec_fh_red); free(rec_fh_seen);
+    free(rec_fh_bytes); free(rec_fh_redbytes);
+    rec_fh_bytes = rec_fh_redbytes = NULL; fh_cur_v = -1; fh_cur_red = 0; fh_nv = 0;
     rec_reg = rec_slot = rec_remat = rec_slotuse = rec_slotwrite = NULL;
     rec_fh_red = NULL; rec_fh_seen = NULL;
     rec_nv = 0; rec_counting = 0;
@@ -2399,6 +2439,9 @@ static void rec_begin(const Func *f)
     rec_slotwrite = calloc((size_t)rec_nv, sizeof(int));
     rec_fh_red    = calloc((size_t)rec_nv, sizeof(int));
     rec_fh_seen   = calloc((size_t)rec_nv, 1);
+    rec_fh_bytes    = calloc((size_t)rec_nv, sizeof(int));
+    rec_fh_redbytes = calloc((size_t)rec_nv, sizeof(int));
+    fh_nv = rec_nv;
     if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite) {
         rec_reset(); return; }
     rec_counting = 1;
@@ -2415,10 +2458,18 @@ static void note_slot_use(int v)
     if (!rec_counting || v < 0 || v >= rec_nv || !rec_slotuse) return;
     rec_slotuse[v]++;
     if (slot_write_ctx && rec_slotwrite) rec_slotwrite[v]++;
+    /* Was v ALREADY read in this call-free region? That, and only that, makes
+       THIS read redundant — sample the latch BEFORE updating it. (Testing
+       rec_fh_red[v] > 0 instead means "v was ever redundant", which wrongly
+       tags every later read, including the first one in a fresh region.) */
+    int was_seen = rec_fh_seen ? rec_fh_seen[v] : 0;
     if (rec_fh_seen && rec_fh_red) {
         if (slot_write_ctx) rec_fh_seen[v] = 0;      /* write refreshes the slot */
-        else { if (rec_fh_seen[v]) rec_fh_red[v]++; rec_fh_seen[v] = 1; }
+        else { if (was_seen) rec_fh_red[v]++; rec_fh_seen[v] = 1; }
     }
+    /* Hand the emit site the attribution for whatever instruction follows. */
+    fh_cur_v   = v;
+    fh_cur_red = (!slot_write_ctx && was_seen) ? 1 : 0;
 }
 
 /* A call / asm clobbers the register file, so a reload after it is NOT
@@ -2540,7 +2591,23 @@ static void rec_end(const Func *f)
                                  ALU straight off (ix+d) instead.
            Split by class (param / named local / compiler temp) because the
            fixes differ, and reported per function so a target can be picked.
-           Reads are the honest emitted count (rec_slotuse - rec_slotwrite). */
+           Reads are the honest emitted count (rec_slotuse - rec_slotwrite);
+           `bytes` / `redbytes` are counted at the EMIT site (vemit) and are the
+           convertible figures — validated to the assembler listing exactly on
+           binary-trees (360) and to 0.5% on emu.c (6105 vs 6072).
+
+           TWO THINGS A CONSUMER MUST KNOW.
+           (1) The pass driver re-lowers functions (dead-store, deadframe,
+               spflip), so a function can print more than once — keep the LAST
+               line per name. On emu.c that is 74 lines for 45 functions;
+               summing all of them gives 8250 instead of 6105.
+           (2) `redundant` is an UPPER BOUND on the residency opportunity, not a
+               saving. It counts every re-read in a call-free region, including
+               ones no allocator could avoid because no register was free. The
+               check: emu.c redundant = 3546 bytes, but sdcc compiles the same
+               source with 4151 bytes of frame access against 80cc's 6072 — so
+               at most 1921 is addressable. Use this census to find WHERE the
+               traffic is, and the sdcc delta to bound HOW MUCH. */
         if (frameprobe_on()) {
             long rd[3] = {0,0,0}, wr[3] = {0,0,0}, red[3] = {0,0,0};
             long rd_w4 = 0, red_w4 = 0;
@@ -2561,12 +2628,22 @@ static void rec_end(const Func *f)
             }
             long tr = rd[0]+rd[1]+rd[2], tw = wr[0]+wr[1]+wr[2];
             long tred = red[0]+red[1]+red[2];
+            /* Emit-site bytes: the convertible number. tb is every byte of
+               (ix/iy+d) this function emitted; trb the subset spent on reads
+               classed redundant. tb is checkable against the listing. */
+            long tb = 0, trb = 0;
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                tb  += rec_fh_bytes    ? rec_fh_bytes[v]    : 0;
+                trb += rec_fh_redbytes ? rec_fh_redbytes[v] : 0;
+            }
             if (tr + tw > 0)
                 fprintf(stderr,
                     "FRAMEPROBE %s spilled=%d reads=%ld writes=%ld redundant=%ld"
+                    " bytes=%ld redbytes=%ld"
                     " | param r=%ld/red=%ld local r=%ld/red=%ld temp r=%ld/red=%ld"
                     " | w4 r=%ld/red=%ld\n",
                     f->fn ? ir_sym_name(f->fn) : "?", nspill, tr, tw, tred,
+                    tb, trb,
                     rd[0], red[0], rd[1], red[1], rd[2], red[2], rd_w4, red_w4);
         }
         /* [IR_PARAMRELOAD, INERT] Per-PARAM actual slot READ count from this
