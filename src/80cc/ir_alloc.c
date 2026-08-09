@@ -685,10 +685,10 @@ static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED
    the selection keeps cheap-slot CPUs byte-identical regardless. */
 static int callsplit_on(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_CALLSPLIT"); c = !(e && e[0] == '0'); } return c; }
 
-/* [IR_IYLONG] Opt-in: run the IY packs in a function the BC veto excludes.
-   They self-guard with a per-op op_clobbers IR_R_IY check over the
-   candidate's live range, so the whole-function veto buys them nothing. */
-static int iylong_on(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_IYLONG"); c = (e && e[0] != '0'); } return c; }
+/* [IR_IYLONG=0] Opt OUT of running the IY packs in a function the BC veto
+   excludes. They self-guard with a per-op op_clobbers IR_R_IY check over the
+   candidate's live range, so the BC veto buys them nothing. */
+static int iylong_off(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_IYLONG"); c = (e && e[0] == '0'); } return c; }
 static int de_operand_realizable(const Func *f, int v,
                                  const int *use_count, const int *write_count,
                                  const int *def_kind, const int *wd_base)
@@ -2647,9 +2647,30 @@ static void ir_iy_temp_pack(Func *f, const int *bb_first_op,
        ir_bc_pack; last_fhi tracks only the IY-packed temps (BC-packed cands ride
        BC, so they don't constrain IY). */
     int packed = 0, last_fhi = -1;
+    /* Cost of OPENING an IY home in a function that does not already own one:
+       `push iy` in the prologue (2B) and `pop iy` at EVERY exit (2B each).
+       The in-loop rule below treats that as one-time, which holds for a
+       single-exit function and fails badly otherwise: clisp's l_read has six
+       returns, so the save costs 2 + 2*6 = 14 bytes against the ~15 its single
+       tenant saves at two use sites, and the resulting growth then costs two
+       jr->jp relaxations on top. The g0 model cannot see this — it is in
+       CYCLES, where the save is ~29 per invocation no matter how many exits
+       exist, while the BYTE cost scales with them.
+       Charge it against the tenants actually taken: each IY home removes about
+       one slot store + reload (~11B in sp mode), so the k-th tenant is only
+       worth opening when 11*(k+1) covers the save. */
+    int iy_open_cost = 0;
+    if (f->idx3_reg == IR_PR_NONE) {
+        int n_ret = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++)
+                if (f->bbs[b].ops[j].kind == IR_RET) n_ret++;
+        iy_open_cost = 2 + 2 * (n_ret > 0 ? n_ret : 1);
+    }
     for (int i = 0; i < nc; i++) {
         int v = cand[i].vreg;
         if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;      /* BC took it */
+        if (11 * (packed + 1) < iy_open_cost) continue;       /* save not covered */
         /* IN-LOOP only. An IY home costs a per-CALL prologue save (push iy /
            pop iy) that the isolated g0_index_benefit cannot see. It amortises
            only when the temp spills every loop iteration (the saved per-iter
@@ -3521,6 +3542,17 @@ void ir_alloc(Func *f)
        is fine for the first measurement. */
     int has_long = 0;
     int has_bc_clobber = 0;
+    /* IY has its own veto, and it is far narrower than BC's. Only IR_ASM is
+       genuinely opaque to IY — inline asm can blast anything and, unlike a
+       call, the lowerer has no save/restore point around it. Everything else
+       has_bc_clobber lists is BC-specific and provably IY-clean (see the
+       op_clobbers notes): l_case walks its table through BC, dload/dstore
+       clobber BC, width-4 arithmetic stages the low half through BC, and the
+       acc helpers destroy IX but not IY.
+       This stays a cheap whole-function belt to the packs' braces — both IY
+       packs additionally test op_clobbers(o) & IR_R_IY per op across the
+       candidate's live range, which subsumes it. */
+    int has_iy_clobber = 0;
     for (int v = 0; v < f->n_vregs && !has_long; v++)
         if (f->vregs[v].width == 4) has_long = 1;
     /* Calls used to exclude PR_BC entirely. Task #319 added save/restore
@@ -3530,7 +3562,7 @@ void ir_alloc(Func *f)
        still exclude (long ops use BC for low-half staging, and
        IR_ST_MEM IR_MEM_VREG with offset clobbers BC for the
        `ld bc,N; add hl,bc` offset add). */
-    for (int i = 0; i < f->n_bbs && !has_bc_clobber; i++) {
+    for (int i = 0; i < f->n_bbs && !(has_bc_clobber && has_iy_clobber); i++) {
         BB *bb = &f->bbs[i];
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *o = &bb->ops[j];
@@ -3563,8 +3595,10 @@ void ir_alloc(Func *f)
                LOCAL has no backing slot, so it couldn't be reloaded after
                the asm anyway (emit_bc_reload would read a bogus offset).
                Disqualify PR_BC for the whole function. */
-            if (o->kind == IR_ASM)
+            if (o->kind == IR_ASM) {
                 has_bc_clobber = 1;
+                has_iy_clobber = 1;
+            }
             /* Wide-accumulator float/long-long ops (IR_ACC_*) call helpers
                (dadd/dmul/l_int2long_s_float/…) that clobber BC, and — unlike
                IR_CALL/IR_HCALL — gen_acc_* emit NO push bc/pop bc around them.
@@ -3608,7 +3642,10 @@ void ir_alloc(Func *f)
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
-    int iy_region_ok = bc_region_ok || iylong_on();
+    /* IR_IYLONG=0 restores the OLD gating (IY packing rides the BC veto), not
+       "no IY packing at all" — the opt-out has to be a revert, not a third
+       behaviour. */
+    int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
     if (bc_region_ok || iy_region_ok) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
