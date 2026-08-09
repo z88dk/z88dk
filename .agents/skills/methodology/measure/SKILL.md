@@ -308,16 +308,74 @@ z88dk-ticks -m8085 bench.bin -x bench.map \
 
 | Flag / define | Role |
 |---------------|------|
-| `-DSTATIC -DTIMER -D__Z88DK` | Locals + TIMER labels (classic benches) |
+| `-DSTATIC -DTIMER -D__Z88DK` | Locals + TIMER labels (classic benches); **no** `-DPRINTF` |
+| `-DPRINTF` | Accuracy / print path only — **not** for published TIMER ticks |
 | `--math32` / `--math-mbf32` | Float library (`@{ZCC_LIBCPU}` picks `math32_8085` with `-clib=8085`) |
-| `--math16` | Half float; use **`z88dk-classic/*.c`** (parent sources lack `_Float16` / `DT=1e-1`) |
-| 8085 math16 | also `-lmath32_8085` (higher helpers) per classic recipes |
+| `--math16` | Half float TIMER; use **`z88dk-classic/*.c`** (parent sources lack `_Float16` / `DT=1e-1`) |
+| 8085 math16 | TIMER: `--math16` and, when the readme says so, **`-lmath32_8085` only** (helper side-link). That is **not** `--math32` |
 | Size | “bytes less page zero” ≈ **binary size** of the TIMER build (`.bin`) |
-| Parallel host work | Fan out **ticks** (and builds only with **separate dirs**); do not parallel bare `zcc` in one tree cwd |
+| Parallel host work | Fan out **ticks** and **builds** only with **separate workdirs + per-job `TMPDIR`**; never parallel bare `zcc` in one cwd |
 
 Parent `readme.txt` holds **CLASSIC Z80 / 8085 SUMMARY** tables; full RESULT
 blocks are often duplicated in parent + `z88dk-classic/`. Math32 comparison
 tables also live in `libsrc/math/float/math32/readme.md`.
+
+### TIMER vs PRINTF (math16 / math32)
+
+| Purpose | Defines | Maths flags |
+|---------|---------|-------------|
+| **Speed (publish ticks)** | `-DSTATIC -DTIMER`, **no** `PRINTF` | Exactly the TIMER recipe in the readme |
+| **Accuracy** | `-DPRINTF` (often without TIMER) | May need a **full main** float lib for `printf`/`fprintf` (e.g. `--math32` with or without `--math16`) |
+
+**Never** combine **`--math16 --math32`** on a math16 **TIMER** line to “fix” a link error. That selects IEEE32 mode, pulls `fsdiv`, and can put **~65%+** of spectral cycles in math32 while still labelling the row math16 (invalid size and ticks).
+
+**sccz80 bare `1.0` under `__MATH_MATH16`:** an untyped `1.0` is still **double/f48** (`ddiv` / `dswap` / `l_f48_ftof16`). That fails with only `--math16` and is **not** a PRINTF issue. Fix in bench C for pure half TIMER, e.g.:
+
+```c
+return (DOUBLE)1.0 / (DOUBLE)((i+j)*(i+j+1)/2+i+1);
+```
+
+(or an equivalent half literal). Then prove purity on the map:
+
+```bash
+rg '__code_fp_math32_size|__code_fp_math16_size|fsdiv|divf16' prog.map
+# pure math16 TIMER: __code_fp_math32_size = $0000; hotspots in asm_f16_div / divf16
+```
+
+`-lmath32_8085` on an 8085 math16 TIMER recipe is only a **library side-link** for helpers; map may still show **zero** `code_fp_math32` if nothing from that product is referenced.
+
+### Full math16/math32 matrix remeasure (4 workers)
+
+When revising published **math16 / math32** numbers across sccz80 / 80cc / zsdcc
+and classic / newlib:
+
+1. Force-rebuild and install float products first:
+   `make -C libsrc/math/float/math32 && make -C libsrc/math/float/math16`
+   then `make -C libsrc install` (or copy `math32*.lib` / `math16*.lib` into
+   `lib/clibs/`).
+2. Run an isolated workdir matrix from
+   **`.agents/scripts/run_math_benches.sh`** (copy under `/tmp/…` for a run if
+   preferred) with **`THREADS=4`**. Each job: private directory +
+   `export TMPDIR=$job/tmp` (zcc temp races otherwise cause flaky
+   `undefined symbol: dmul` / f48 link errors). Copy **newlib** `zpragma.inc`
+   only for **new** jobs — not into classic workdirs.
+3. Classic: `+test` TIMER recipes from `z88dk-classic/readme.txt`
+   (`-o name.bin -m -lndos`). Newlib: `+z80 -startup=0 … -create-app` with
+   that bench’s `zpragma.inc` when present. Math16 TIMER jobs must use
+   **`--math16` only** (plus documented `-lmath32_8085` on 8085), never
+   `--math16 --math32`.
+4. Record TSV columns: `id bench clib compiler cpu math size ticks status wall_s`.
+   Size = TIMER binary byte length (“bytes less page zero”).
+5. Before publish: for every math16 row, confirm map
+   `__code_fp_math32_size = $0000` (or no `fsdiv` / `cm32_*` in hotspots).
+6. Publish: update **parent SUMMARY** tick lines and matching **RESULT** blocks
+   in parent + `z88dk-classic/` / `z88dk-new/` — **size + ticks + date only**
+   (no new prose unless a new exception). Exceptions already in tree:
+   - 80cc n-body math32 — invalid second energy (omit publish)
+   - 80cc whetstone math32 — never reaches TIMER_STOP (SKIP)
+7. Wiki drop-ins: regenerate full paste files for `Benchmarks.md` and
+   `Classic--Maths-Libraries.md` (local drafts may be `wiki-Benchmarks.md` /
+   `wiki-Classic--Maths-Libraries.md`; not product commits).
 
 When publishing a library opt:
 
@@ -331,6 +389,8 @@ When publishing a library opt:
 
 Long-running benches (e.g. spectral-norm, pi) need large counters and patience;
 100% CPU with rising runtime is normal, not a hang, if PC is advancing.
+Spectral-norm math32 is ~8–20e9 cycles (~5–15 min wall per job on a typical
+host); plan the 4-thread matrix for well over an hour.
 
 ### Float energy / accuracy when `printf %f` is broken
 
@@ -387,6 +447,8 @@ tree; they are **not** part of the product PR.
 | Restoring `fsdiv` vs NR `fsinv`×mul | Swap only div `.asm`; rebuild z80+8085 (+z80n/z180 if measuring HW mul); suite 16/16; TIMER: **whetstone** shows ~1.4×; **n-body / spectral** often **0%** (mul/sqrt-hot) |
 | “`1.0f/x` same speed as `inv(x)`” | sccz80 rewrites literal `1.0f/x` → `inv`; map shows only `fsinv`. Force runtime numerator (`static float one=1`) or `a/b` to hit `fsdiv` |
 | z80n/z180 inv faster, div unchanged | HW mul is on NR inv / mul cores; restoring div does not use `mulu_32h_*` — z80n div TIMER ≡ plain z80 |
+| math16 spectral “worse” after `--math16 --math32` link fix | Map: large `__code_fp_math32_size`; hotspots **~65% in `fsdiv`**, not `f16_div`. Discard row; use pure `--math16` + casted `1.0` |
+| TIMER math16 link: `ddiv` / `l_f48_ftof16` | Bare `1.0` under `__MATH_MATH16` → f48 path; cast to `DOUBLE` / half literal. Not fixed by adding `--math32` |
 
 ### Float library A/B (math32 / math16)
 
