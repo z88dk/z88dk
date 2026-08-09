@@ -1,9 +1,0 @@
-% z88dk-z80asm -v -b -dump-after-link-collection -lt/60-linker//input/linker_08.lib.1.lib -lt/60-linker//input/linker_08.lib.2.lib t/60-linker//input/linker_08.o.1.o
-Define constant: __CPU_ZILOG__ = 1
-Define constant: __CPU_Z80__ = 1
-Define constant: __FLOAT_GENMATH__ = 1
-Assembler: skipping object file t/60-linker/input/linker_08.o.1.o...
-Linker: Pulled modules in order of appearance:
-  module M1 file t/60-linker/input/linker_08.o.1.o offset $18
-  module L1_M1 file t/60-linker/input/linker_08.lib.1.lib offset $18
-  module L2_M1 file t/60-linker/input/linker_08.lib.2.lib offset $18

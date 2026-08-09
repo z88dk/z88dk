@@ -1,0 +1,9 @@
+% z88dk-z80asm -v -b -dump-after-module-resolver -lt/60-linker//input/module_resolver_05.lib.1.lib t/60-linker//input/module_resolver_05.o.1.o
+Define constant: __CPU_ZILOG__ = 1
+Define constant: __CPU_Z80__ = 1
+Define constant: __FLOAT_GENMATH__ = 1
+Assembler: skipping object file t/60-linker/input/module_resolver_05.o.1.o...
+error: Incompatible -IXIY setting for module M2 file t/60-linker/input/module_resolver_05.o.1.o offset $AC
+note: Current -IXIY setting: false
+note: Module -IXIY setting:  true
+Assembly completed with 1 error

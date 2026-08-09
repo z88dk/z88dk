@@ -114,7 +114,7 @@ static constexpr UsageGroup usage_layout[] = {
             OptionType::DUMP_AFTER_SYMBOL_COLLECTION,
             OptionType::DUMP_AFTER_LAYOUT,
             OptionType::DUMP_AFTER_ASSEMBLY,
-            OptionType::DUMP_AFTER_LINK_COLLECTION,
+            OptionType::DUMP_AFTER_MODULE_RESOLVER,
         }
     },
 #endif
@@ -562,8 +562,8 @@ void Args::parse_arg(std::string_view arg,
             options.dump_after_assembly = true;
             return;
 
-        case OptionType::DUMP_AFTER_LINK_COLLECTION:
-            options.dump_after_link_collection = true;
+        case OptionType::DUMP_AFTER_MODULE_RESOLVER:
+            options.dump_after_module_resolver = true;
             return;
 #endif
 

@@ -15,9 +15,36 @@
 #include <unordered_set>
 #include <vector>
 
-class Linker {
+class ModuleResolver {
 public:
-    explicit Linker() = default;
+    ModuleResolver(const std::vector<std::unique_ptr<ObjFile>>& input_modules,
+                   const std::vector<std::unique_ptr<ObjFile>>& input_libraries);
+
+    bool resolve();
+    std::vector<ObjModule*> module_sequence() const {
+        return module_sequence_;
+    }
+
+private:
+    const std::vector<std::unique_ptr<ObjFile>>& input_modules_;
+    const std::vector<std::unique_ptr<ObjFile>>& input_libraries_;
+    std::unordered_map<StringId, ObjModule*> defined_symbols_;
+    std::unordered_map<StringId, ObjModule*> undefined_symbols_;
+    std::unordered_set<ObjModule*> selected_modules_;
+    std::vector<ObjModule*> module_sequence_; // final sequence of modules to link
+
+    bool resolve_symbols();
+    bool add_module(ObjModule* module);
+    void pull_module_sequence();
+};
+
+class SectionLayout;
+class RelocationPass;
+class OutputWriter;
+
+class LinkerDriver {
+public:
+    explicit LinkerDriver() = default;
 
     void add_input_modules(const std::vector<std::string>& filenames);
     void add_input_libraries(const std::vector<std::string>& libraries);
@@ -28,14 +55,6 @@ private:
     std::vector<std::unique_ptr<ObjFile>> input_modules_;
     std::vector<std::unique_ptr<ObjFile>> input_libraries_;
     std::string output_dir_;
-    std::unordered_map<StringId, ObjModule*> defined_symbols_;
-    std::unordered_map<StringId, ObjModule*> undefined_symbols_;
-    std::unordered_set<ObjModule*> selected_modules_;
-    std::vector<ObjModule*> module_sequence_; // final sequence of modules to link
-
-    bool resolve_symbols();
-    bool add_module(ObjModule* module);
-    void pull_module_sequence();
 };
 
 bool link_files(const std::vector<std::string>& objects,

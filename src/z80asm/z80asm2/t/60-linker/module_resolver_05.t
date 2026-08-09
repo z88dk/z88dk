@@ -5,7 +5,7 @@ use Modern::Perl;
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
 
-# module with incompatible CPU
+# module with incompatible swap_ixiy
 
 my @temp;
 my @input;
@@ -25,7 +25,7 @@ for my $def (<$dir/input/$self.lib.*.def>) {
 }
 
 capture_nok(
-    "build/Debug/z88dk-z80asm -v -b -dump-after-link-collection @libs @input",
+    "build/Debug/z88dk-z80asm -v -b -dump-after-module-resolver @libs @input",
     "$dir/expected/$self.txt" );
 
 unlink @temp if Test::More->builder->is_passing;

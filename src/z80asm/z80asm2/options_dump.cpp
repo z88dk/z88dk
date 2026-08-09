@@ -10,9 +10,9 @@
 #include "options_dump.h"
 #include "strings.h"
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
-#include "string_utils.h"
 
 [[noreturn]]
 void dump_after_cmdline_and_exit() {
@@ -57,8 +57,8 @@ void dump_after_cmdline_and_exit() {
             << g_args.options.dump_after_layout << "\n"
             << "dump_after_assembly\t"
             << g_args.options.dump_after_assembly << "\n"
-            << "dump_after_link_collection\t"
-            << g_args.options.dump_after_link_collection << "\n"
+            << "dump_after_module_resolver\t"
+            << g_args.options.dump_after_module_resolver << "\n"
             << "m4_options\t"
             << g_args.options.m4_options << "\n"
             << "perl_options\t"
