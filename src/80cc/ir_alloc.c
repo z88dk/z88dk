@@ -684,6 +684,11 @@ static int ranged_on(void) { static int c = -1; if (c < 0) c = getenv("IR_RANGED
    (byte-identical to pre-flip). The dear-slot CPU gate (deref_gap>=15) inside
    the selection keeps cheap-slot CPUs byte-identical regardless. */
 static int callsplit_on(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_CALLSPLIT"); c = !(e && e[0] == '0'); } return c; }
+
+/* [IR_IYLONG] Opt-in: run the IY packs in a function the BC veto excludes.
+   They self-guard with a per-op op_clobbers IR_R_IY check over the
+   candidate's live range, so the whole-function veto buys them nothing. */
+static int iylong_on(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_IYLONG"); c = (e && e[0] != '0'); } return c; }
 static int de_operand_realizable(const Func *f, int v,
                                  const int *use_count, const int *write_count,
                                  const int *def_kind, const int *wd_base)
@@ -3586,7 +3591,25 @@ void ir_alloc(Func *f)
                 has_prepushed_call = 1;
                 break;
             }
-    if (!has_long && !has_bc_clobber) {
+    /* has_long / has_bc_clobber are BC vetoes: long ops stage the low half
+       through BC, l_case walks its table through BC, dload/dstore clobber BC
+       with no save/restore point. They say nothing about IY, yet they gate the
+       whole region — so one 32-bit value anywhere in a function also disables
+       IY packing for it.
+
+       The IY packs do not need a whole-function guarantee: both check
+       op_clobbers(o) & IR_R_IY per op across the candidate's live range, which
+       is strictly more precise. op_clobbers models exactly the cases the veto
+       stands in for — IR_ASM / IR_SWITCH / IR_ACC_* / helper calls return
+       IR_R_ALL, plain calls preserve IX/IY, and width-4 arithmetic clobbers
+       HL/DE/BC but not IY. [IR_IYLONG] lets them run on that basis.
+
+       The general picker (collect_home_candidates / unified_arbitrate) is NOT
+       included: it proposes several register classes at once and its safety
+       cannot be argued from the IY-clean check alone. */
+    int bc_region_ok = !has_long && !has_bc_clobber;
+    int iy_region_ok = bc_region_ok || iylong_on();
+    if (bc_region_ok || iy_region_ok) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
            / load_to_de copy from BC); it doesn't update BC on writes.
@@ -3851,8 +3874,11 @@ void ir_alloc(Func *f)
            validated default for a long time, and the dual path only complicated the
            interactions the unified allocator is consolidating.) */
         {
-            Cand *pool = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 6,
-                                sizeof(Cand));
+            /* General picker: BC region only — see the note on the gate. */
+            Cand *pool = bc_region_ok
+                ? calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1) * 6,
+                         sizeof(Cand))
+                : NULL;
             if (pool) {
                 /* B4 increment 3: one generator emits ALL candidates (in the
                    former proposer order + tags), calling the class realizability
@@ -3902,18 +3928,22 @@ void ir_alloc(Func *f)
            5a cost-benefit eviction (default on, --opt-disable=bc-evict): it may
            first evict a picker-placed BC tenant that a denser disjoint temp group
            out-benefits, then pack the freed BC. */
+        if (bc_region_ok)
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
                    write_count, use_count, cost_benefit);
         /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
            reduction chain in IY (add iy,de), taking the spill losers BC couldn't. */
+        if (iy_region_ok)
         ir_iy_reduction_pack(f, bb_in_loop, use_count);
         /* S3 Tier A (default on, --opt-disable=iy-temp-pack opts out): pack the
            born-killed word temps BC declined into IY over disjoint ranges, if a
            reduction pack didn't already claim IY. Cost-gated to dear-slot CPUs. */
+        if (iy_region_ok)
         ir_iy_temp_pack(f, bb_first_op, bb_in_loop, def_kind, write_count, use_count);
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
            fallback below BC-pack — a single-def/single-use word transient with
            no register free goes on the stack (push/pop) instead of a slot. */
+        if (bc_region_ok)
         ir_stack_spill(f, bb_first_op, def_kind, write_count);
         /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
            ALL register placement so it fires ONLY on reused deref/binop values
@@ -4142,7 +4172,7 @@ void ir_alloc(Func *f)
            CPU cost gate (§2.1): only pays where a frame-slot read is DEAR
            relative to BC (dear-slot z80/z180/808x); cheap-slot CPUs (ez80/kc160/
            rabbit) self-suppress → byte-identical. */
-        if (callsplit_on()
+        if (bc_region_ok && callsplit_on()
             && g0_word_cost(GR_SLOT, GK_READ) - g0_word_cost(GR_BC, GK_READ) >= 15) {
             int nv = f->n_vregs;
             /* Call positions in the allocator's global op-index space. */
