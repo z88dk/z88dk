@@ -294,6 +294,7 @@ include target/radio86/radio86.mak
 include target/rc700/rc700.mak
 include target/rex/rex.mak
 include target/rx78/rx78.mak
+include target/s1mp3/s1mp3.mak
 include target/sam/sam.mak
 include target/sc3000/sc3000.mak
 include target/sms/sms.mak
@@ -2177,12 +2178,11 @@ osca_clib.lib: $(TARGET_CLIB_DEPS) $(SDCARD_OBJS)
 	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(TARGET_DIRECTORY)/osca/osca.lst
 
 # s1mp3
-s1mp3_clib.lib: $(TARGET_CLIB_DEPS)
+s1mp3_clib.lib: $(TARGET_CLIB_DEPS) $(S1MP3_TARGETS)
 	@echo ''
 	@echo '--- Building s1mp3 Library ---'
 	@echo ''
 	$(call buildgeneric,s1mp3)
-	$(MAKE) -C target/s1mp3
 	TARGET=s1mp3 TYPE=z80 $(LIBLINKER) -DFORs1mp3 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/s1mp3_clib.lib @$(TARGET_DIRECTORY)/s1mp3/s1mp3.lst
 
 pmd85_clib.lib: $(TARGET_CLIB_DEPS) $(PMD85_TARGETS)
