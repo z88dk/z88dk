@@ -60,7 +60,7 @@ struct Options {
     bool dump_after_symbol_collection = false;
     bool dump_after_layout = false;
     bool dump_after_assembly = false;
-    bool dump_after_link_collection = false;
+    bool dump_after_module_resolver = false;
 #endif
     std::string m4_options;
     std::string perl_options;

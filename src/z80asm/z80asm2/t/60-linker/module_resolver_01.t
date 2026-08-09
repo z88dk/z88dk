@@ -25,7 +25,7 @@ for my $def (<$dir/input/$self.lib.*.def>) {
 }
 
 capture_ok(
-    "build/Debug/z88dk-z80asm -v -b -dump-after-link-collection @libs @input",
+    "build/Debug/z88dk-z80asm -v -b -dump-after-module-resolver @libs @input",
     "$dir/expected/$self.txt" );
 
 unlink @temp if Test::More->builder->is_passing;

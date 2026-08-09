@@ -49,5 +49,5 @@ X(DUMP_AFTER_PARSE, "-dump-after-parse", false, "", "Dump the AST after parsing 
 X(DUMP_AFTER_SYMBOL_COLLECTION, "-dump-after-symbol-collection", false, "", "Dump the AST after symbol collection and exit")
 X(DUMP_AFTER_LAYOUT, "-dump-after-layout", false, "", "Dump the AST after layout processing and exit")
 X(DUMP_AFTER_ASSEMBLY, "-dump-after-assembly", false, "", "Dump the object library after assembly and exit")
-X(DUMP_AFTER_LINK_COLLECTION, "-dump-after-link-collection", false, "", "Dump the modules after link collection and exit")
+X(DUMP_AFTER_MODULE_RESOLVER, "-dump-after-module-resolver", false, "", "Dump the modules after module resolution and exit")
 #endif
