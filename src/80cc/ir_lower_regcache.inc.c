@@ -1723,6 +1723,8 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
 /* store_dehl + cache wire-up for long-result op sites. After store_dehl:
    HL junk, DE=high, BC=low. Invalidate HL/DE/DEHL then re-cache DEHL=vreg
    so a follow-on load_to_dehl(vreg) recovers via `ld l,c; ld h,b`. */
+static void cache_dehl_no_spill(FILE *out, int vreg_id);
+
 static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
 {
     /* Lazy-spill: skip a provably-dead width-4 slot store (its slot is
@@ -1733,9 +1735,16 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
        `ld hl,bc`. Mirrors spill_and_swap_unless_dead for width-2. */
     ss_note_store(f, vreg_id);
     if (!L.la.cur_store_dehl_bc_dead && ss_store_dead_here()) {
-        emit(out, "ld\tbc,hl");
-        invalidate_hl_cache();
-        cache_dehl(vreg_id);
+        /* This IS the no-spill case, so publish it the same way
+           cache_dehl_no_spill does rather than hand-rolling a weaker version.
+           Both arrive with DE=high and HL=low and write no slot; the only
+           difference was that this branch then threw the HL knowledge away
+           (invalidate_hl_cache), which forces every later read through
+           `ld hl,bc` and therefore makes the `ld bc,hl` stash look mandatory.
+           Advertising HL instead lets a same-BB reader take the low half
+           straight from the register — and lets the no-bc-stash conditions
+           apply here too. */
+        cache_dehl_no_spill(out, vreg_id);
         return;
     }
     int bc_dead = L.la.cur_store_dehl_bc_dead;
