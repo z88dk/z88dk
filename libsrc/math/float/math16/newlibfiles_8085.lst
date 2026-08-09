@@ -24,6 +24,7 @@
 ../../../math/float/math16/asm/8085/asm_f16_add.asm
 ../../../math/float/math16/asm/8085/asm_f16_mul.asm
 ../../../math/float/math16/asm/8085/asm_f16_div.asm
+../../../math/float/math16/asm/8085/asm_f16_inv.asm
 ../../../math/float/math16/asm/8085/asm_f16_floor.asm
 ../../../math/float/math16/asm/8085/asm_f16_ceil.asm
 ../../../math/float/math16/asm/8085/asm_f16_poly.asm

@@ -1,9 +1,29 @@
 ;
-;  feilipu, 2020 May / 2026 July (8085)
+;  feilipu, 2020 May / 2026 August (8085)
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
 ;-------------------------------------------------------------------------
-;  asm_f16_div / inv — Newton reciprocal (stack, no exx)
+;  asm_f16_div / asm_f24_div — 8085 half / f24 restoring divide
 ;-------------------------------------------------------------------------
-; sccz80: HL = y, stack = [uret][x] → HL = x/y
+;
+; f24: D=exp (bias 127), E[7]=sign, HL=16-bit left-aligned mant.
+;
+; Restoring 16-bit mant (stack locals; no exx / IX / djnz / bit):
+;   rem in A:HL, div on stack, quot in DE
+;   trial: sub hl,bc / sbc a,0; restore on borrow; rem <<= 1
+;   1×: 16 steps × 1 bit (size; was 8×2).  rl de for quot bit.
+;
+; sccz80 half: HL = y, stack = [uret][x] → HL = x/y
+;
+; Internal body entry (div_body):
+;   DEHL = X (dividend)
+;   stack = [cret][Y.hl][Y.de][ ... caller words ... ]
+;   Exit: DEHL = result; stack = [cret][ ... caller words ... ]
+;         (Y consumed)
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -11,153 +31,300 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
+EXTERN asm_f24_zero
 EXTERN asm_f24_inf
-EXTERN asm_f24_mul_callee
-EXTERN asm_f24_add_callee
-EXTERN asm_f24_mul_f24
 
-PUBLIC asm_f16_inv
 PUBLIC asm_f16_div_callee
-PUBLIC asm_f24_inv
 PUBLIC asm_f24_div_callee
 PUBLIC asm_f24_div_f24
 
+
+;--------------------------------------------------------------------
+; half: HL=y, [uret][x] → HL = x/y
 ;--------------------------------------------------------------------
 .asm_f16_div_callee
-    call asm_f24_f16
-    call asm_f24_inv
+    call asm_f24_f16            ; y → f24
     push de
-    push hl                     ; [inv][uret][x]
+    push hl                     ; [y.hl][y.de][uret][x]
     ld de,sp+6
-    ld hl,(de)
-    call asm_f24_f16
-    call asm_f24_mul_f24        ; drops inv; [uret][x]
+    ld hl,(de)                  ; x half
+    call asm_f24_f16            ; DEHL = x
+    call div_body               ; Y consumed; [uret][x]
     pop bc
-    pop af
+    pop af                      ; drop x half
     push bc
     jp asm_f16_f24
 
+;--------------------------------------------------------------------
+; f24: DEHL=Y, [cret][X.hl][X.de] → DEHL = X/Y; stack [cret]
+;--------------------------------------------------------------------
 .asm_f24_div_callee
 .asm_f24_div_f24
-    call asm_f24_inv
-    jp asm_f24_mul_callee
-
-;--------------------------------------------------------------------
-.asm_f16_inv
-    ld a,$7c
-    and h
-    cp $7c
-    jp Z,inv_half_max
-    call asm_f24_f16
-    call asm_f24_inv
-    jp asm_f16_f24
-
-.inv_half_max
-    ld a,h
-    and 003h
-    or l
-    jp NZ,inv_half_nan
-    and a
-    ld a,h
-    and 080h
-    ld h,a
-    ld l,0
-    ret
-
-.inv_half_nan
-    ld hl,07C80h
-    ret
-
-;--------------------------------------------------------------------
-.asm_f24_inv
-    ld a,d
-    or a
-    jp Z,asm_f24_inf
-
-    push de                     ; [orig]
-
-    ld de,07e80h                ; D' scale, e[7]=1 (negative)
-
+    pop bc                      ; cret
     push de
-    push hl                     ; D' for Newton 2
-    push de
-    push hl                     ; D' for Newton 1
-    ; stack: [D'1][D'2][orig]
-
-    ; polynomial X0 = 140/33 + (-64/11 + 256/99 * Dp) * Dp
-    ld bc,08100h
-    push bc
-    ld bc,087c1h
-    push bc                     ; 140/33
-    ld a,e
-    and 07fh
-    ld e,a                      ; Dp positive
-    push de
-    push hl                     ; Dp
-    ld bc,08180h
-    push bc
-    ld bc,0ba2fh
-    push bc                     ; -64/11
-    ld bc,08000h
-    push bc
-    ld bc,0a57fh
-    push bc                     ; 256/99
-    call asm_f24_mul_callee
-    call asm_f24_add_callee
-    call asm_f24_mul_callee
-    call asm_f24_add_callee     ; DEHL = X0; stack [D'1][D'2][orig]
-
-    call inv_newton
-    call inv_newton
-
-    pop bc                      ; B=orig.exp C=orig.sign (push de → low=E)
-    ld a,b
-    sub 07fh
-    ld b,a
-    xor a
-    sub b
-    add a,07eh
-    ld d,a
-    ld e,c
-    ret
-
-;--------------------------------------------------------------------
-; X := X + X*(1 + D'*X)  with D' negative ⇒ 1 - |D|*X
-; Entry: DEHL=X, stack=[D'.hl][D'.de]...
-;--------------------------------------------------------------------
-.inv_newton
-    ; CALL entry: [nret][D'.hl][D'.de]...
-    push de
-    push hl                     ; X for final add
-    push de
-    push hl                     ; X for second mul
-    push de
-    push hl                     ; X for D'*X
-    ; stack [Xhl][Xde] x3 [nret][D'.hl][D'.de]...
-    ;         +0..+10          +12  +14    +16
-
-    ; DEHL = D', mul with X on stack
-    ld de,sp+14
-    ld hl,(de)                  ; D'.hl
+    push hl                     ; [Y.hl][Y.de][X.hl][X.de]
+    ; DEHL ← X (under Y)
+    ld de,sp+4
+    ld hl,(de)                  ; X.hl
     push hl
-    ld de,sp+18                 ; D'.de at +16+2
-    ld hl,(de)
-    ex de,hl
-    pop hl                      ; DEHL=D'
-    call asm_f24_mul_callee     ; D'*X; [X][X][nret][D']...
-
-    ld bc,07f00h
+    ld de,sp+8
+    ld hl,(de)                  ; X.de
+    ex de,hl                    ; DE = X.de (HL dead; restored next)
+    pop hl                      ; DEHL = X
+    ; stack [Y.hl][Y.de][X.hl][X.de], BC=cret
+    push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
+    call div_body               ; Y consumed → [cret][X.hl][X.de]
+    pop bc                      ; cret
+    pop af                      ; X.hl
+    pop af                      ; X.de
     push bc
-    ld bc,08000h
-    push bc                     ; 1.0
-    call asm_f24_add_callee     ; 1+D'*X; [X][X][D']...
-
-    call asm_f24_mul_callee     ; X*(1+D'*X); [X][nret][D']...
-    call asm_f24_add_callee     ; X + that; [nret][D'.hl][D'.de]...
-
-    ; drop D' under nret without losing DEHL result
-    pop bc                      ; nret
-    pop af                      ; D'.hl
-    pop af                      ; D'.de
-    push bc                     ; nret
     ret
+
+
+;--------------------------------------------------------------------
+; div_body: DEHL=X, [cret][Y.hl][Y.de][rest...] → DEHL=X/Y, [cret][rest...]
+;--------------------------------------------------------------------
+.div_body
+    push de
+    push hl                     ; [X.hl][X.de][cret][Y.hl][Y.de][rest...]
+    ;               +0    +2    +4    +6    +8
+
+    ; sign = X.E xor Y.E
+    ld de,sp+2
+    ld a,(de)                   ; X.E
+    ld de,sp+8
+    ld l,a
+    ld a,(de)                   ; Y.E
+    xor l
+    and 080h
+    ld c,a                      ; C = sign
+
+    ld de,sp+9
+    ld a,(de)                   ; Y.exp
+    ld b,a
+    or a
+    jp Z,d_y_zero
+    cp 255
+    jp Z,d_y_hi
+    ld de,sp+3
+    ld a,(de)                   ; X.exp
+    or a
+    jp Z,d_x_zero
+    cp 255
+    jp Z,d_x_hi
+    ; expR = X.exp - Y.exp + 127
+    ld e,b                      ; Y.exp
+    ld d,a                      ; X.exp in D; A also X.exp
+    sub e
+    ld e,a
+    ld d,0
+    jp NC,d_ep
+    ld d,0ffh
+.d_ep
+    ld hl,127
+    add hl,de
+    ld a,h
+    or a
+    jp NZ,d_exp_bad
+    ld a,l
+    cp 255
+    jp NC,d_of
+    or a
+    jp Z,d_to_zero              ; exp 0 → flush zero (no subnormals)
+    ld b,a                      ; B=expR C=sign
+    push bc                     ; [expR/sign][X.hl][X.de][cret][Y.hl][Y.de]...
+    ;               +0          +2    +4    +6    +8    +10
+
+    ld de,sp+2
+    ld hl,(de)                  ; rem = X.mant
+    ld de,sp+8
+    ld a,(de)
+    ld c,a
+    inc de
+    ld a,(de)
+    ld b,a                      ; BC = Y.mant
+
+    xor a
+    push hl
+    sub hl,bc
+    pop hl
+    jr NC,d_pre_ok
+    add hl,hl
+    rla
+    push af
+    ld de,sp+3
+    ld a,(de)
+    dec a
+    ld (de),a
+    pop af
+.d_pre_ok
+    push bc                     ; [div][expR/sign][X...][cret][Y...]
+    ld bc,16
+    push bc                     ; [count][div][expR/sign]...
+    ld de,0
+
+.d_lp
+    push de
+    push af
+    ld de,sp+6
+    ld a,(de)
+    ld c,a
+    inc de
+    ld a,(de)
+    ld b,a
+    pop af
+
+    or a
+    sub hl,bc
+    sbc a,0
+    jr C,d_ns1
+    scf
+    jr d_q1
+
+.d_ns1
+    add hl,bc
+    adc a,0
+    or a
+.d_q1
+    pop de
+    rl de
+    add hl,hl
+    rla
+
+    ; dec count without clobbering rem hi in A
+    push de
+    push af
+    ld de,sp+4                  ; [af][quot][count]...
+    ld a,(de)
+    dec a
+    ld (de),a
+    jr Z,d_loop_done
+    pop af
+    pop de
+    jr d_lp
+
+.d_loop_done
+    pop af                      ; rem hi (discard)
+    pop de                      ; quot
+    pop bc                      ; count
+    pop bc                      ; div
+    pop bc                      ; B=expR C=sign
+
+    ld a,d
+    and 080h
+    jr NZ,d_normed
+    ld a,e
+    add a,a
+    ld e,a
+    ld a,d
+    rla
+    ld d,a
+    dec b
+.d_normed
+    ld a,b
+    or a
+    jp Z,d_res_zero
+    cp 255
+    jp NC,d_res_inf
+    ex de,hl                    ; HL = quot (DE dead; refilled next)
+    ld de,bc                    ; DEHL = result
+
+    ; drop X.hl X.de cret Y.hl Y.de; restore cret
+    ; stack: X.hl X.de cret Y.hl Y.de rest...
+    pop bc                      ; X.hl
+    pop af                      ; X.de
+    pop bc                      ; cret
+    pop af                      ; Y.hl
+    pop af                      ; Y.de
+    push bc                     ; cret
+    ret
+
+; ---- specials (stack [X.hl][X.de][cret][Y.hl][Y.de]..., C=sign) ----
+
+.d_y_zero
+    ld de,sp+3
+    ld a,(de)
+    or a
+    jr NZ,d_to_inf
+    jp d_to_nan
+
+.d_x_zero
+    jp d_to_zero
+
+.d_y_hi
+    ld de,sp+6
+    ld hl,(de)
+    ld a,h
+    or l
+    jr NZ,d_to_nan
+    ld de,sp+3
+    ld a,(de)
+    cp 255
+    jr NZ,d_to_zero
+    jp d_to_nan
+
+.d_x_hi
+    ld de,sp+0
+    ld hl,(de)
+    ld a,h
+    or l
+    jr NZ,d_to_nan
+    jp d_to_inf
+
+.d_exp_bad
+    ld a,h
+    rla
+    jr C,d_to_zero
+.d_of
+    jp d_to_inf
+
+.d_to_zero
+    ld e,c
+    pop af
+    pop af
+    pop bc
+    pop af
+    pop af
+    push bc
+    jp asm_f24_zero
+
+.d_to_inf
+    ld e,c
+    pop af
+    pop af
+    pop bc
+    pop af
+    pop af
+    push bc
+    jp asm_f24_inf
+
+.d_to_nan
+    pop af
+    pop af
+    pop bc
+    pop af
+    pop af
+    push bc
+    ld hl,0c000h
+    ld de,0ff00h
+    ret
+
+.d_res_zero
+    ld e,c
+    pop af
+    pop af
+    pop bc
+    pop af
+    pop af
+    push bc
+    jp asm_f24_zero
+
+.d_res_inf
+    ld e,c
+    pop af
+    pop af
+    pop bc
+    pop af
+    pop af
+    push bc
+    jp asm_f24_inf
