@@ -214,8 +214,9 @@ The expanded floating point format is a useful tool for creating functions, as c
 half_t invf16 (half_t x);
 half_t divf16 (half_t x, half_t y);
 ```
-**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores).  
-**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/`; keep inv for reciprocal-as-primitive / NR-based helpers.
+**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).  
+
+**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/` and for plain `1/n` (restoring div is faster than NR inv). sccz80 no longer rewrites half/IEEE literal `1.0/x` to inv — that is ordinary divide. Keep explicit `invf16` for reciprocal-as-primitive / NR-based helpers.
 
 #### _sqrt()_ and _invsqrt()_
 

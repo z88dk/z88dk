@@ -19,6 +19,9 @@
 ; Work (14) under [sign][a][b][flag][ret]:
 ;   +0..+3 rem   +4..+6 div   +8..+10 quot   +12 expR
 ;
+; Denormals: not supported (math32 policy).  exp==0 is ±0 on input;
+; result underflow flushes to signed zero (no gradual underflow).
+;
 ; Result DEHL = a / b.
 ;
 ;-------------------------------------------------------------------------
@@ -128,9 +131,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     cp 255
     jp NC,x_of
     or a
-    jr NZ,eok
-    inc a
-.eok
+    jp Z,x_uflow                ; exp 0 → flush zero (no subnormals)
     ld de,sp+12
     ld (de),a
 
@@ -268,18 +269,20 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld hl,bc
     ret
 
+; Class: 0=±0 (exp==0, denorms flushed), 1=finite, 2=±inf, 3=NaN
 .cls
     ld a,d
     and 07fh
     cp 07fh
     jr Z,cls_hi
-    ld a,d
-    and 07fh
-    or e
-    or h
-    or l
-    ld a,0
-    ret Z
+    or a
+    jr NZ,cls_fin               ; top 7 exp bits set
+    ld a,e
+    and 080h
+    jr NZ,cls_fin               ; exp LSB set
+    xor a                       ; exp==0 → ±0 (incl. IEEE denormals)
+    ret
+.cls_fin
     ld a,1
     ret
 .cls_hi
@@ -292,22 +295,15 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld a,3
     ret
 
-; DEHL IEEE → B=exp, A=mhi, HL=mlo
+; DEHL IEEE → B=exp, A=mhi, HL=mlo  (finite normals only; cls filtered zeros)
 .unp
     ex de,hl                    ; HL = D:E, DE = H:L (mlo)
     add hl,hl                   ; H=exp, L=top mant bits
     ld b,h                      ; B = exp
-    ld a,b
-    or a
     ld a,l
-    jr Z,unp0
     scf
     rra                         ; A = mhi with implicit 1
     ex de,hl                    ; HL = mlo
-    ret
-.unp0
-    and 07fh
-    ex de,hl
     ret
 
 ;--------------------------------------------------------------------

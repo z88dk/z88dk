@@ -312,10 +312,9 @@ void test_int_to_float_store()
     Assert(approx_equal(itf_a[1], 0.0, EPSILON), "int 0 -> float arr [1]");
 }
 
-/* `1.0 / x` is lowered to the reciprocal helper (l_f32_invf / l_f16_invf)
-   on IEEE-f32 and f16, and stays a full divide elsewhere — either way the
-   result must match. The divisor comes from a runtime-written global so the
-   quotient can't const-fold away. */
+/* Reciprocal via ordinary divide `1.0 / x` (IEEE math32/math16: restoring
+   fsdiv after sccz80 dropped the inversef rewrite for float/half). Divisor
+   comes from a runtime-written global so the quotient can't const-fold away. */
 static FLOAT recip_in[3];
 static int   recip_den[2];
 void test_reciprocal()
@@ -324,8 +323,8 @@ void test_reciprocal()
     Assert(approx_equal(1.0 / recip_in[0], 0.25,  EPSILON), "1/4 = 0.25");
     Assert(approx_equal(1.0 / recip_in[1], 2.0,   EPSILON), "1/0.5 = 2");
     Assert(approx_equal(1.0 / recip_in[2], 0.125, EPSILON), "1/8 = 0.125");
-    /* int reciprocal: sint2f feeds invf directly (the eval_A shape) — the
-       int-to-float result must survive in the DEHL cache for invf. */
+    /* int → float then divide (eval_A-shaped); result must be correct after
+       the int-to-float conversion feeds the divisor. */
     recip_den[0] = 4; recip_den[1] = 8;
     Assert(approx_equal(1.0 / recip_den[0], 0.25,  EPSILON), "1/int4 = 0.25");
     Assert(approx_equal(1.0 / recip_den[1], 0.125, EPSILON), "1/int8 = 0.125");

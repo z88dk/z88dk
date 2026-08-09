@@ -14,7 +14,7 @@
 ; Restoring 16-bit mant (same strategy as math32 fsdiv):
 ;   rem in A:HL (17-bit), div in BC, quot in DE
 ;   trial: sbc hl,bc / sbc a,0; restore on borrow; rem <<= 1
-;   2× unroll (8×2 bits).  No IX.
+;   1×: 16 steps × 1 bit (size; was 8×2).  No IX.
 ;
 ; Prenorm: if rem < div, rem<<=1 and exp-- so first quot bit is 1.
 ; asm_f24_inv remains for reciprocal-only use.
@@ -107,9 +107,7 @@ PUBLIC asm_f24_div_f24
     cp 255
     jp NC,d_of
     or a
-    jr NZ,d_eok
-    inc a                       ; exp 0 → 1 (no denorms)
-.d_eok
+    jp Z,d_uf                   ; exp 0 → flush zero (no subnormals)
     ld e,a                      ; E = expR
     pop hl                      ; mant_x = rem
 
@@ -131,7 +129,7 @@ PUBLIC asm_f24_div_f24
     ld de,0                     ; quot
     ; A:HL = rem, BC = div; B' = bit-pair count
     exx
-    ld b,8                      ; 8 × 2 bits
+    ld b,16                     ; 16 × 1 bit
     exx
 
 .d_lp
@@ -148,23 +146,6 @@ PUBLIC asm_f24_div_f24
     adc a,0
     or a                        ; C = 0 → quot bit 0
 .d_q1
-    rl e
-    rl d
-    add hl,hl
-    rla
-    ; --- bit ---
-    or a
-    sbc hl,bc
-    sbc a,0
-    jr C,d_ns2
-    scf
-    jr d_q2
-
-.d_ns2
-    add hl,bc
-    adc a,0
-    or a
-.d_q2
     rl e
     rl d
     add hl,hl

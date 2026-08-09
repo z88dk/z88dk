@@ -14,7 +14,7 @@
 ; Restoring 16-bit mant (stack locals; no exx / IX / djnz / bit):
 ;   rem in A:HL, div on stack, quot in DE
 ;   trial: sub hl,bc / sbc a,0; restore on borrow; rem <<= 1
-;   2× unroll (8×2 bits).  rl de for quot bit.
+;   1×: 16 steps × 1 bit (size; was 8×2).  rl de for quot bit.
 ;
 ; sccz80 half: HL = y, stack = [uret][x] → HL = x/y
 ;
@@ -130,9 +130,7 @@ PUBLIC asm_f24_div_f24
     cp 255
     jp NC,d_of
     or a
-    jr NZ,d_eok
-    inc a
-.d_eok
+    jp Z,d_to_zero              ; exp 0 → flush zero (no subnormals)
     ld b,a                      ; B=expR C=sign
     push bc                     ; [expR/sign][X.hl][X.de][cret][Y.hl][Y.de]...
     ;               +0          +2    +4    +6    +8    +10
@@ -161,7 +159,7 @@ PUBLIC asm_f24_div_f24
     pop af
 .d_pre_ok
     push bc                     ; [div][expR/sign][X...][cret][Y...]
-    ld bc,8
+    ld bc,16
     push bc                     ; [count][div][expR/sign]...
     ld de,0
 
@@ -188,33 +186,6 @@ PUBLIC asm_f24_div_f24
     adc a,0
     or a
 .d_q1
-    pop de
-    rl de
-    add hl,hl
-    rla
-
-    push de
-    push af
-    ld de,sp+6
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld b,a
-    pop af
-
-    or a
-    sub hl,bc
-    sbc a,0
-    jr C,d_ns2
-    scf
-    jr d_q2
-
-.d_ns2
-    add hl,bc
-    adc a,0
-    or a
-.d_q2
     pop de
     rl de
     add hl,hl
