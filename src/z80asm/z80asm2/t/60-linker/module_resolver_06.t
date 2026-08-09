@@ -5,7 +5,7 @@ use Modern::Perl;
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
 
-# two modules loaded, unresolved external definitions, no libraries needed
+# Single library module resolves one undefined
 
 my @temp;
 my @input;
@@ -24,8 +24,8 @@ for my $def (<$dir/input/$self.lib.*.def>) {
     run_ok("perl tools/z80objcopy.pl $def $lib");
 }
 
-capture_nok(
-    "build/Debug/z88dk-z80asm -v -b -dump-after-link-collection @libs @input",
+capture_ok(
+    "build/Debug/z88dk-z80asm -v -b -dump-after-module-resolver @libs @input",
     "$dir/expected/$self.txt" );
 
 unlink @temp if Test::More->builder->is_passing;

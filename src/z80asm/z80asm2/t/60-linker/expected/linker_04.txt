@@ -1,9 +1,0 @@
-% z88dk-z80asm -v -b -dump-after-link-collection -lt/60-linker//input/linker_04.lib.1.lib t/60-linker//input/linker_04.o.1.o
-Define constant: __CPU_ZILOG__ = 1
-Define constant: __CPU_Z80__ = 1
-Define constant: __FLOAT_GENMATH__ = 1
-Assembler: skipping object file t/60-linker/input/linker_04.o.1.o...
-error: Incompatible CPU setting for module M2 file t/60-linker/input/linker_04.o.1.o offset $AC
-note: Current CPU setting: z80
-note: Module CPU setting:  r2ka
-Assembly completed with 1 error

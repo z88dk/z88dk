@@ -22,26 +22,12 @@
 #include <utility>
 #include <vector>
 
-void Linker::add_input_modules(const std::vector<std::string>& filenames) {
-    for (auto& filename : filenames) {
-        std::string o_filename = get_o_filename(filename, output_dir_);
-        auto obj_file = std::make_unique<ObjFile>(o_filename);
-        input_modules_.push_back(std::move(obj_file));
-    }
-}
+ModuleResolver::ModuleResolver(
+    const std::vector<std::unique_ptr<ObjFile>>& input_modules,
+    const std::vector<std::unique_ptr<ObjFile>>& input_libraries)
+    : input_modules_(input_modules), input_libraries_(input_libraries) {}
 
-void Linker::add_input_libraries(const std::vector<std::string>& libraries) {
-    for (auto& libname : libraries) {
-        auto obj_file = std::make_unique<ObjFile>(libname);
-        input_libraries_.push_back(std::move(obj_file));
-    }
-}
-
-void Linker::set_output_dir(std::string_view output_dir) {
-    output_dir_ = output_dir;
-}
-
-bool Linker::link() {
+bool ModuleResolver::resolve() {
     // pull in modules from libraries until all symbols are resolved
     if (!resolve_symbols()) {
         return false; // error already reported
@@ -51,7 +37,7 @@ bool Linker::link() {
     pull_module_sequence();
 
 #ifdef _DEBUG
-    if (g_args.options.dump_after_link_collection) {
+    if (g_args.options.dump_after_module_resolver) {
         std::cout << "Linker: Pulled modules in order of appearance:" << std::endl;
         for (auto& module : module_sequence_) {
             std::cout << "  " << module->module_name_string() << std::endl;
@@ -63,7 +49,7 @@ bool Linker::link() {
     return true;
 }
 
-bool Linker::resolve_symbols() {
+bool ModuleResolver::resolve_symbols() {
     // add all input modules
     for (auto& obj_file : input_modules_) {
         for (size_t i = 0; i < obj_file->num_modules(); ++i) {
@@ -117,9 +103,9 @@ bool Linker::resolve_symbols() {
     }
 }
 
-bool Linker::add_module(ObjModule* module) {
+bool ModuleResolver::add_module(ObjModule* module) {
     // check if CPU and swap_ixiy are compatible with the current settings
-    if (!!g_args.options.swap_ixiy != !!module->swap_ixiy() ) {
+    if (!!g_args.options.swap_ixiy != !!module->swap_ixiy()) {
         g_diag.error(SourceLoc(),
                      "Incompatible -IXIY setting for " + module->module_name_string());
         g_diag.note(SourceLoc(),
@@ -183,7 +169,7 @@ bool Linker::add_module(ObjModule* module) {
     return true;
 }
 
-void Linker::pull_module_sequence() {
+void ModuleResolver::pull_module_sequence() {
     // pull input modules in order of appearance
     for (auto& obj_file : input_modules_) {
         for (size_t i = 0; i < obj_file->num_modules(); ++i) {
@@ -217,10 +203,36 @@ void Linker::pull_module_sequence() {
     release_assert(selected_modules_.empty());
 }
 
+void LinkerDriver::add_input_modules(const std::vector<std::string>&
+                                     filenames) {
+    for (auto& filename : filenames) {
+        std::string o_filename = get_o_filename(filename, output_dir_);
+        auto obj_file = std::make_unique<ObjFile>(o_filename);
+        input_modules_.push_back(std::move(obj_file));
+    }
+}
+
+void LinkerDriver::add_input_libraries(const std::vector<std::string>&
+                                       libraries) {
+    for (auto& libname : libraries) {
+        auto obj_file = std::make_unique<ObjFile>(libname);
+        input_libraries_.push_back(std::move(obj_file));
+    }
+}
+
+void LinkerDriver::set_output_dir(std::string_view output_dir) {
+    output_dir_ = output_dir;
+}
+
+bool LinkerDriver::link() {
+    ModuleResolver resolver(input_modules_, input_libraries_);
+    return resolver.resolve();
+}
+
 bool link_files(const std::vector<std::string>& objects,
                 const std::vector<std::string>& libraries,
                 std::string_view output_dir) {
-    Linker linker;
+    LinkerDriver linker;
     linker.add_input_modules(objects);
     linker.add_input_libraries(libraries);
     linker.set_output_dir(output_dir);

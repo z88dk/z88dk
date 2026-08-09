@@ -61,5 +61,5 @@ Diagnostic Options:
                 Dump the AST after layout processing and exit
   -dump-after-assembly
                 Dump the object library after assembly and exit
-  -dump-after-link-collection
-                Dump the modules after link collection and exit
+  -dump-after-module-resolver
+                Dump the modules after module resolution and exit
