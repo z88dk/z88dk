@@ -219,6 +219,8 @@ static int build_cast(Builder *b, Node *n);
 static int build_cond(Builder *b, Node *n, int true_bb, int false_bb);
 static int build_muldiv_integer(Builder *b, Node *n);
 static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k);
+static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
+                                    Kind dst_k, int dst_w, int dst_uns);
 static int init_typed_region(Builder *b, int base, int off,
                              Type *t, Node *init, int *budget);
 
@@ -1299,6 +1301,16 @@ static int widen_arg_to_param(Builder *b, int v, Node *a, Type *pt)
     }
     if (!kind_is_integer(pt->kind)) return v;
     Kind ak  = a->type ? (Kind)a->type->kind : KIND_NONE;
+    /* Register-tier float arg to an INTEGER param (`f(dbl)` where f takes an
+       int): convert here, as the front end leaves it to codegen. A register
+       float is the same width as the param, so nothing below would catch it
+       and the raw IEEE bit pattern was pushed. The acc tier build_fails
+       earlier instead of reaching this. (The `return` path shares this
+       function but converts on its own and skips the call — converting twice
+       would run f2sint over an already-converted int.) */
+    if (is_register_float_kind(ak) && !is_acc_int_kind(pt->kind))
+        return coerce_float_to_int_kind(b, v, a, pt->kind, type_width(pt),
+                                        pt->isunsigned);
     if (!kind_is_integer(ak)) return v;
     int  uns = a->type && a->type->isunsigned;
     int  aw  = b->f->vregs[v].width;
@@ -1870,22 +1882,54 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     return v;
 }
 
+/* Register-tier float (f16 / IEEE-32) → int/long: l_f{16,32}_f2{s,u}{int,long},
+   HL/DEHL in, HL (ret_w 2) or DEHL (ret_w 4) out. Shared by the OP_CAST path
+   and the implicit conversions below. Returns -1 when src_k is not a
+   register float kind. */
+static int emit_int_from_float_reg(Builder *b, int v, Kind src_k,
+                                   int dst_uns, int ret_w)
+{
+    const char *helper = float_helper(src_k, (ret_w == 4)
+        ? (dst_uns ? "f2ulong" : "f2slong")
+        : (dst_uns ? "f2uint"  : "f2sint"));
+    if (!helper) return -1;
+    int conv_v = new_temp(b, ret_w);
+    b->f->vregs[conv_v].width = (int16_t)ret_w;
+    int *args = calloc(1, sizeof(int)); args[0] = v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = conv_v;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = helper; hi->args = args;
+    hi->n_args = 1; hi->ret_vreg = conv_v;
+    op->hcall = hi;
+    return conv_v;
+}
+
 /* Coerce a float/double RHS to an INTEGER destination — the implicit
    conversion the front end leaves to codegen (`int i = dbl;`, `return dbl;`
    from an int function, `arr[k] = dbl;`). Mirrors OP_CAST's acc-float→int:
    ifix/f2s{int,long} to int/long, then narrow to a byte dst. Without it the
    6-byte double flows into the integer width-coercion below and gets a plain
-   CONV_TRUNC (a bail at 6→1, garbage otherwise). Source must be the 5/6/8-byte
-   acc double (the default `double`); f16 / f32-tier and long long dsts are
-   handled by their own cast paths. Returns v unchanged when it doesn't apply. */
+   CONV_TRUNC (a bail at 6→1, garbage otherwise). Source is either the
+   5/6/8-byte acc double or the register tier (f16 / IEEE-32 `double` under
+   --math32); a long long dst is left to its own cast path. `dst_uns` picks
+   f2u* over f2s* for the register tier (the acc-tier ifix path is signed
+   only). Returns v unchanged when it doesn't apply. */
 static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
-                                    Kind dst_k, int dst_w)
+                                    Kind dst_k, int dst_w, int dst_uns)
 {
     if (v < 0) return v;
     Kind sk = node_value_kind(src);
-    if (!is_acc_float_kind(sk)) return v;
+    if (!is_acc_float_kind(sk) && !is_register_float_kind(sk)) return v;
     if (!kind_is_integer(dst_k) || is_acc_int_kind(dst_k)) return v;
-    int iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+    int iv;
+    if (is_register_float_kind(sk)) {
+        iv = emit_int_from_float_reg(b, v, sk, dst_uns,
+                                     (dst_w == 4) ? 4 : 2);
+        if (iv < 0) return v;
+    } else {
+        iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+    }
     if (dst_w == 1) {
         int bt = new_temp_kind(b, KIND_CHAR);
         Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
@@ -2004,6 +2048,90 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     st->mem.bank_fn = bf;
     return res;
     #undef COMPOUND_ARITH
+}
+
+/* INTEGER compound-assign with a register-float rhs — `i += dbl`, `l *= f`.
+   C computes in the common type, so this is `i = (int)((float)i OP dbl)`:
+   load the integer lvalue, widen it to the rhs's float kind, run the float
+   helper, convert back and store. Same lvalue shapes as
+   build_float_compound (local / global / *ptr).
+
+   Without it these landed in build_compound_int, which combined the raw
+   IEEE bit pattern with the integer — silently, because a register float is
+   the same width as the integer lvalue so no width coercion fired. (The
+   acc tier reaches build_compound_int too but bails there on the 5/6-byte
+   width, so it never miscompiled.) */
+static int build_int_compound_float(Builder *b, Node *n, const char *stem,
+                                    Kind fk)
+{
+    if (!n->left || n->left->ast_type != OP_DEREF || !n->left->operand)
+        return build_fail("int-float compound-assign LHS shape not supported");
+    Type *lt  = n->left->type;
+    Kind  lk  = lt ? lt->kind : KIND_NONE;
+    int   lw  = type_width(lt);
+    int   uns = lt && lt->isunsigned;
+    if (lw != 1 && lw != 2 && lw != 4)
+        return build_fail("int-float compound-assign width %d", lw);
+    Node *lvn = n->left->operand;
+
+    int rv = build_expr(b, n->right);
+    if (rv < 0) return -1;
+    rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+
+    /* int lvalue --(widen)--> float, OP, --(narrow)--> int */
+    #define INTF_ARITH(LV, OUT) do {                                        \
+        int fl_ = emit_float_reg_from_int(b, (LV), fk, uns);                \
+        if (fl_ < 0) return build_fail("int-float compound: widen failed");  \
+        int fr_ = emit_float_arith(b, fk, stem, fl_, rv);                   \
+        if (fr_ < 0) return build_fail("int-float compound: %s failed", stem);\
+        (OUT) = emit_int_from_float_reg(b, fr_, fk, uns,                    \
+                                        (lw == 4) ? 4 : 2);                 \
+        if ((OUT) < 0) return build_fail("int-float compound: narrow failed");\
+        if (lw == 1) {                                                      \
+            int bt_ = new_temp_kind(b, KIND_CHAR);                          \
+            Op *tr_ = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);                 \
+            tr_->dst = bt_; tr_->src[0] = (OUT);                            \
+            (OUT) = bt_;                                                    \
+        }                                                                   \
+    } while (0)
+
+    if (lvn->ast_type == AST_LOCAL_VAR) {
+        int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
+        if (lhs_v < 0)
+            return build_fail("int-float compound-assign: unknown local");
+        int res; INTF_ARITH(lhs_v, res);
+        ir_emit_mov(cur_bb(b), lhs_v, res);
+        return lhs_v;
+    }
+    if (lvn->ast_type == AST_GLOBAL_VAR) {
+        SYMBOL *g = lvn->sym;
+        if (!g) return build_fail("int-float compound-assign: null global");
+        int loaded = new_temp_kind(b, lk);
+        b->f->vregs[loaded].width = (int16_t)lw;
+        Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+        ld->dst = loaded; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g;
+        int res; INTF_ARITH(loaded, res);
+        Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+        st->src[0] = res; st->mem.kind = IR_MEM_SYM; st->mem.sym = g;
+        return res;
+    }
+    /* *ptr op= rhs (pages the bank on both load and store if namespaced) */
+    SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
+    int ptr_v = build_expr(b, lvn);
+    if (ptr_v < 0) return -1;
+    int loaded = new_temp_kind(b, lk);
+    b->f->vregs[loaded].width = (int16_t)lw;
+    Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+    ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
+    ld->mem.base = ptr_v; ld->mem.elem = lk;
+    ld->mem.bank_fn = bf;
+    int res; INTF_ARITH(loaded, res);
+    Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+    st->src[0] = res; st->mem.kind = IR_MEM_VREG;
+    st->mem.base = ptr_v; st->mem.elem = lk;
+    st->mem.bank_fn = bf;
+    return res;
+    #undef INTF_ARITH
 }
 
 /* Compute `lv op rv` for a fixed-point (_Accum) compound assign. add/sub are
@@ -4631,6 +4759,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return build_fail("float bitwise/shift compound-assign invalid");
         }
 
+        /* INTEGER lvalue with a register-float rhs (`i += dbl`): compute in
+           the float type and convert back, per C's usual arithmetic
+           conversions. Below this, build_compound_int would combine the raw
+           IEEE bits with the integer. */
+        if ((n->ast_type == OP_AADD || n->ast_type == OP_ASUB)
+            && n->left && n->left->type
+            && kind_is_integer(n->left->type->kind)
+            && !is_acc_int_kind(n->left->type->kind)
+            && n->right
+            && is_register_float_kind(node_value_kind(n->right)))
+            return build_int_compound_float(b, n,
+                       (n->ast_type == OP_AADD) ? "add" : "sub",
+                       node_value_kind(n->right));
+
         /* long long compound-assign (ast_opt folds `x = x OP y` here). */
         if (n->left && n->left->type
             && is_acc_int_kind(n->left->type->kind)) {
@@ -4675,6 +4817,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 return build_float_compound(b, n, "div");
             return build_fail("float %%= invalid");
         }
+
+        /* Integer lvalue, register-float rhs (`i *= dbl`) — see the AADD
+           case. `%=` on a float operand is invalid C and falls through to
+           the integer path's own diagnostic. */
+        if ((n->ast_type == OP_AMULT || n->ast_type == OP_ADIV)
+            && n->left->type && kind_is_integer(n->left->type->kind)
+            && !is_acc_int_kind(n->left->type->kind)
+            && n->right
+            && is_register_float_kind(node_value_kind(n->right)))
+            return build_int_compound_float(b, n,
+                       (n->ast_type == OP_AMULT) ? "mul" : "div",
+                       node_value_kind(n->right));
 
         /* long long compound *= /= %= (ast_opt folds `x = x OP y` here). */
         if (n->left->type && is_acc_int_kind(n->left->type->kind)) {
@@ -4978,13 +5132,19 @@ static int build_assign(Builder *b, Node *n)
         /* Float/double RHS into an integer local (`int i = dbl;`): convert
            float→int first, then store. Without this the 6-byte double
            reaches the byte/general paths below and gets a plain CONV_TRUNC
-           (bail at 6→1, garbage at 6→2/4). */
+           (bail at 6→1, garbage at 6→2/4); a register-tier f16/f32 RHS is
+           the same width as the int local, so it slipped through as a raw
+           bit-pattern MOV. */
         if (kind_is_integer(lk) && !is_acc_int_kind(lk)
-            && n->right && is_acc_float_kind(node_value_kind(n->right))) {
+            && n->right
+            && (is_acc_float_kind(node_value_kind(n->right))
+                || is_register_float_kind(node_value_kind(n->right)))) {
             int rv = build_expr(b, n->right);
             if (rv < 0) return -1;
             rv = coerce_float_to_int_kind(b, rv, n->right, lk,
-                                          b->f->vregs[dst_v].width);
+                                          b->f->vregs[dst_v].width,
+                                          n->left->type
+                                          && n->left->type->isunsigned);
             if (rv != dst_v) ir_emit_mov(cur_bb(b), dst_v, rv);
             return dst_v;
         }
@@ -5107,11 +5267,27 @@ static int build_assign(Builder *b, Node *n)
            read a folded double-member ADDRESS as an integer and wrongly
            convert (ifix) a double→double member store. */
         Kind store_k = n->type ? n->type->kind : KIND_NONE;
-        if ((store_k == KIND_PTR || store_k == KIND_ARRAY) && n->type->ptr)
-            store_k = n->type->ptr->kind;
+        Type *store_t = n->type;
+        if ((store_k == KIND_PTR || store_k == KIND_ARRAY) && n->type->ptr) {
+            store_t = n->type->ptr;
+            store_k = store_t->kind;
+        }
         if (is_acc_float_kind(node_value_kind(n->right))
             && kind_is_integer(store_k) && !is_acc_int_kind(store_k))
             rhs_v = emit_acc_to_int(b, rhs_v, 4);
+        /* Same for the register tier (f16 / IEEE-32 `double` under --math32):
+           convert to the destination's width. Unlike the acc tier there is no
+           width mismatch to trip the coercion below, so without this the raw
+           float bit pattern was stored into the integer lvalue. */
+        else if (is_register_float_kind(node_value_kind(n->right))
+                 && kind_is_integer(store_k) && !is_acc_int_kind(store_k)) {
+            int sw = type_width(store_t);
+            int cv = emit_int_from_float_reg(b, rhs_v,
+                        node_value_kind(n->right),
+                        store_t && store_t->isunsigned,
+                        (sw == 4) ? 4 : 2);
+            if (cv >= 0) rhs_v = cv;
+        }
     }
     if (n->left->ast_type == AST_GLOBAL_VAR) {
         /* FARACC (`__banked`) global store: map the far address then
@@ -5777,18 +5953,10 @@ static int build_cast(Builder *b, Node *n)
         && !is_acc_int_kind(dst_k) && !kind_is_fixed(dst_k)) {
         int dst_uns = n->type && n->type->isunsigned;
         int ret_w = (dst_w == 4) ? 4 : 2;
-        const char *helper = float_helper(src_k, (ret_w == 4)
-            ? (dst_uns ? "f2ulong" : "f2slong")
-            : (dst_uns ? "f2uint"  : "f2sint"));
-        int conv_v = new_temp(b, ret_w);
-        b->f->vregs[conv_v].width = (int16_t)ret_w;
-        int *args = calloc(1, sizeof(int)); args[0] = src_v;
-        Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-        op->dst = conv_v;
-        HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-        hi->name = helper; hi->args = args;
-        hi->n_args = 1; hi->ret_vreg = conv_v;
-        op->hcall = hi;
+        int conv_v = emit_int_from_float_reg(b, src_v, src_k, dst_uns, ret_w);
+        if (conv_v < 0)
+            return build_fail("float→int cast kind %d width %d",
+                              (int)src_k, dst_w);
         if (dst_w == 1) {
             int bt = new_temp_kind(b, KIND_CHAR);
             Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
@@ -6853,12 +7021,18 @@ static int build_stmt(Builder *b, Node *n)
                first (to the return type's width), so the byte/int widening
                below handles the ABI. Without it the raw double reached the
                return unconverted (garbage). */
+            int ret_f2i = 0;
             {
                 Kind retk0 = b->ret_type ? b->ret_type->kind : KIND_NONE;
                 if (kind_is_integer(retk0) && !is_acc_int_kind(retk0)
-                    && is_acc_float_kind(node_value_kind(rv)))
+                    && (is_acc_float_kind(node_value_kind(rv))
+                        || is_register_float_kind(node_value_kind(rv)))) {
                     v = coerce_float_to_int_kind(b, v, rv, retk0,
-                                                 type_width(b->ret_type));
+                                                 type_width(b->ret_type),
+                                                 b->ret_type
+                                                 && b->ret_type->isunsigned);
+                    ret_f2i = 1;
+                }
             }
             /* Widen byte retvals to int — z80 return ABI puts the
                value in HL even when the C return type is char. */
@@ -6880,8 +7054,12 @@ static int build_stmt(Builder *b, Node *n)
                    implicit C conversion to codegen, else a long long returner
                    that `return`s an int produces only HL/2 bytes and the
                    caller reads the rest as garbage. widen_arg_to_param keys
-                   off the SOURCE node's type vs the target Type. */
-                v = widen_arg_to_param(b, v, rv, b->ret_type);
+                   off the SOURCE node's type vs the target Type — so skip it
+                   when the float→int coercion above already produced the
+                   return type's width (rv still reads as a float there, and
+                   it would convert a second time). */
+                if (!ret_f2i)
+                    v = widen_arg_to_param(b, v, rv, b->ret_type);
             }
         }
         ir_emit_ret(cur_bb(b), v);
@@ -6948,11 +7126,14 @@ static int build_stmt(Builder *b, Node *n)
             {
                 Kind vk0 = (Kind)n->sym->type;
                 if (kind_is_integer(vk0) && !is_acc_int_kind(vk0)
-                    && is_acc_float_kind(node_value_kind(n->declvar))) {
+                    && (is_acc_float_kind(node_value_kind(n->declvar))
+                        || is_register_float_kind(node_value_kind(n->declvar)))) {
                     int iv = build_expr(b, n->declvar);
                     if (iv < 0) return -1;
                     iv = coerce_float_to_int_kind(b, iv, n->declvar, vk0,
-                                                  b->f->vregs[v].width);
+                                                  b->f->vregs[v].width,
+                                                  n->sym->ctype
+                                                  && n->sym->ctype->isunsigned);
                     if (iv != v) ir_emit_mov(cur_bb(b), v, iv);
                     return 0;
                 }
