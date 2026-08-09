@@ -64,15 +64,15 @@ second number error: 1 * 10^(-4)
 cycle count  = 2247889896
 time @ 4MHz  = 2247889896 / 4*10^6 = 9 min 22 sec
 
-Z88DK July 31, 2026
+Z88DK August 9, 2026
 zsdcc #12070 / new / math32
-6183 bytes less page zero
+6208 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 765151351
-time @ 4MHz  = 765151351 / 4*10^6 =  3 min 11 sec
+cycle count  = 761726416
+time @ 4MHz  = 761726416 / 4*10^6 =  3 min 10 sec
 
 Z88DK April 28, 2021
 sccz80 / new
@@ -84,22 +84,22 @@ second number error: 1 * 10^(-4)
 cycle count  = 2376486525
 time @ 4MHz  = 2376486525 / 4*10^6 = 9 min 53 sec
 
-Z88DK July 31, 2026
+Z88DK August 9, 2026
 sccz80 / new / math32
-5168 bytes less page zero
+5193 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 711903319
-time @ 4MHz  = 711903319 / 4*10^6 =  2 min 58 sec
+cycle count  = 708478605
+time @ 4MHz  = 708478605 / 4*10^6 =  2 min 57 sec
 
-Z88DK May 3, 2021
+Z88DK August 9, 2026
 sccz80 / new / math16
-3309 bytes less page zero
+3236 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 357718801
-time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec
+cycle count  = 363824289
+time @ 4MHz  = 363824289 / 4*10^6 =  1 min 31 sec

@@ -88,7 +88,7 @@ Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fs
 | See codegen / library expansion | `z88dk-dis`, assembler **`-l` listing**, map file refs |
 | Peephole compiler output (sccz80 path) | **`z88dk-copt`** + `lib/z80rules.*` (see §9) |
 | Correctness of float/int libraries | `test/suites/math` (`make test_*_8085.bin` etc.) |
-| Publishable microbenchmarks | `support/benchmarks/*` + classic `+test` TIMER recipes |
+| Publishable microbenchmarks | `support/benchmarks/*` + classic `+test` TIMER recipes; matrix scripts under `.agents/scripts/` |
 | A/B “did this patch matter?” | Swap one `.asm`, rebuild lib, **same** `zcc` line, compare ticks **and** `cmp` binaries |
 | Assembler synthetic expansion | `z88dk-z80asm -m8085 -l` and read the `.lis` opcodes |
 
@@ -344,7 +344,14 @@ rg '__code_fp_math32_size|__code_fp_math16_size|fsdiv|divf16' prog.map
 
 `-lmath32_8085` on an 8085 math16 TIMER recipe is only a **library side-link** for helpers; map may still show **zero** `code_fp_math32` if nothing from that product is referenced.
 
-### Full math16/math32 matrix remeasure (4 workers)
+### Full math16/math32 matrix remeasure (scripts)
+
+Agent tooling lives under **`.agents/scripts/`** (documented by this skill):
+
+| Script | Role |
+|--------|------|
+| **`.agents/scripts/run_math_benches.sh`** | 4-worker TIMER matrix: build + `z88dk-ticks` → `results.tsv` |
+| **`.agents/scripts/apply_math_bench_results.py`** | Apply TSV into parent/child `readme.txt` (size + ticks + date only) |
 
 When revising published **math16 / math32** numbers across sccz80 / 80cc / zsdcc
 and classic / newlib:
@@ -353,27 +360,41 @@ and classic / newlib:
    `make -C libsrc/math/float/math32 && make -C libsrc/math/float/math16`
    then `make -C libsrc install` (or copy `math32*.lib` / `math16*.lib` into
    `lib/clibs/`).
-2. Run an isolated workdir matrix from
-   **`.agents/scripts/run_math_benches.sh`** (copy under `/tmp/…` for a run if
-   preferred) with **`THREADS=4`**. Each job: private directory +
-   `export TMPDIR=$job/tmp` (zcc temp races otherwise cause flaky
-   `undefined symbol: dmul` / f48 link errors). Copy **newlib** `zpragma.inc`
-   only for **new** jobs — not into classic workdirs.
+2. Run the matrix (edit `ROOT` / `WORK` / `PATH` at top of the shell script if
+   needed, or copy under `/tmp/…`):
+
+   ```bash
+   bash .agents/scripts/run_math_benches.sh
+   # → $WORK/results.tsv  (id bench clib compiler cpu math size ticks status wall_s)
+   ```
+
+   Each job: private directory + `export TMPDIR=$job/tmp` (zcc temp races
+   otherwise cause flaky `undefined symbol: dmul` / f48 link errors).
+   Copy **newlib** `zpragma.inc` only for **new** jobs — not into classic workdirs.
 3. Classic: `+test` TIMER recipes from `z88dk-classic/readme.txt`
    (`-o name.bin -m -lndos`). Newlib: `+z80 -startup=0 … -create-app` with
    that bench’s `zpragma.inc` when present. Math16 TIMER jobs must use
    **`--math16` only** (plus documented `-lmath32_8085` on 8085), never
    `--math16 --math32`.
-4. Record TSV columns: `id bench clib compiler cpu math size ticks status wall_s`.
-   Size = TIMER binary byte length (“bytes less page zero”).
-5. Before publish: for every math16 row, confirm map
+4. Before publish: for every math16 row, confirm map
    `__code_fp_math32_size = $0000` (or no `fsdiv` / `cm32_*` in hotspots).
-6. Publish: update **parent SUMMARY** tick lines and matching **RESULT** blocks
-   in parent + `z88dk-classic/` / `z88dk-new/` — **size + ticks + date only**
+   Discard polluted spectral math16 rows; remeasure pure after `eval_A` cast.
+5. Apply numbers into tree readmes:
+
+   ```bash
+   python3 .agents/scripts/apply_math_bench_results.py \
+     --results /tmp/z88dk-bench-YYYYMMDD/results.tsv \
+     --date 'August 9, 2026' \
+     --date-summary 'Aug 9, 2026'
+   # optional: --dry-run   --list
+   ```
+
+   Updates **parent SUMMARY** tick lines and matching **RESULT** blocks in
+   parent + `z88dk-classic/` / `z88dk-new/` — **size + ticks + date only**
    (no new prose unless a new exception). Exceptions already in tree:
    - 80cc n-body math32 — invalid second energy (omit publish)
    - 80cc whetstone math32 — never reaches TIMER_STOP (SKIP)
-7. Wiki drop-ins: regenerate full paste files for `Benchmarks.md` and
+6. Wiki drop-ins: regenerate full paste files for `Benchmarks.md` and
    `Classic--Maths-Libraries.md` (local drafts may be `wiki-Benchmarks.md` /
    `wiki-Classic--Maths-Libraries.md`; not product commits).
 
