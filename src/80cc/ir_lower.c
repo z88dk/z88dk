@@ -2239,9 +2239,28 @@ RegMask op_clobbers(const Func *f, const Op *op)
             return (IR_R_ALL & ~IR_R_IY & ~IR_R_IX) & ~op->call->preserved;
         return IR_R_ALL;
     case IR_ASM: case IR_PUSH_ARG:
-    case IR_PUSH_STRUCT: case IR_SWITCH: case IR_RET: case IR_MEMSET:
-    case IR_MEMCPY: case IR_ACC_UNOP: case IR_ACC_BINOP: case IR_ACC_CMP:
+    case IR_PUSH_STRUCT: case IR_RET: case IR_MEMSET:
+    case IR_MEMCPY:
         return IR_R_ALL;               /* opaque: helper call / whole-reg-set */
+    /* Table dispatch is NOT opaque. gen_switch emits only the l_case /
+       l_long_case / l_i64_case call, and all three walk the table through
+       HL/DE/BC/A — verified against libsrc/l/sccz80/9-common/l_case.asm,
+       .../i32/l_long_case.asm and the gbz80 variant, none of which names an
+       index register (l_long_case's only `ix` is a 2014 comment recording that
+       its IX use was REMOVED). So an IX/IY home survives a switch. */
+    case IR_SWITCH:
+        return IR_R_ALL & ~IR_R_IX & ~IR_R_IY;
+    /* The wide-accumulator helpers DO destroy IX — mm48_fpmul pops the return
+       address into IX and runs `add ix,sp` with no matching push, which is why
+       a function on this tier is flagged uses_acc and addresses sp-relative.
+       IY is a different story: across every acc backend (math48 921 files,
+       am9511 558, daimath32, mbf32, mbf64, z88math, cpcmath, and the i64
+       helpers) NOTHING writes IY, and the two float routines that use it at all
+       — genmath fdiv and the math32 clang __f* set — bracket it with push iy /
+       pop iy. 80cc's own gen_acc_* emit only `call` and `ld`. So IY survives
+       the acc tier and only IX must be given up. */
+    case IR_ACC_UNOP: case IR_ACC_BINOP: case IR_ACC_CMP:
+        return IR_R_ALL & ~IR_R_IY;
     case IR_MUL:
         return IR_R_HL|IR_R_DE|IR_R_BC|IR_R_A|IR_R_F;
     case IR_SHL: case IR_SHR:
