@@ -3671,34 +3671,20 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 optb_dehl_src = op->src[0];
         }
         if (optb_dehl_src >= 0) {
-            load_to_dehl_adj(out, f, optb_dehl_src, 0);
-            emit(out, "push\tde");           /* save src[1] high */
-            emit(out, "push\thl");           /* save src[1] low */
-            L.cur_sp_adjust += 4;
-            emit(out, "ld\thl,4");
-            emit(out, "add\thl,sp");          /* HL → src[0].b0 */
-            emit_sp(out, -2, "pop\tbc");             /* C=s1.b0, B=s1.b1 */
-            emit(out, "ld\ta,c");
-            emit(out, "add\ta,(hl)");
-            emit(out, "ld\tc,a");
-            emit(out, "inc\thl");
-            emit(out, "ld\ta,b");
-            emit(out, "adc\ta,(hl)");
-            emit(out, "ld\tb,a");
-            emit(out, "inc\thl");
-            emit_sp(out, -2, "pop\tde");             /* E=s1.b2, D=s1.b3 */
-            emit(out, "ld\ta,e");
-            emit(out, "adc\ta,(hl)");
-            emit(out, "ld\te,a");
-            emit(out, "inc\thl");
-            emit(out, "ld\ta,d");
-            emit(out, "adc\ta,(hl)");
-            emit(out, "ld\td,a");
-            emit(out, "ld\thl,bc");           /* HL = result low */
-            /* Drop the data-stack frame. */
-            emit(out, "pop\tbc");
-            emit(out, "pop\tbc");
-            L.cur_sp_adjust -= 4;
+            /* Pop the stacked operand into BC a half at a time and add it to
+               DEHL with the 16-bit ALU, instead of pushing the OTHER operand
+               as well and byte-walking one of them through (hl). The carry
+               chain survives because neither `pop` nor `ex de,hl` touches
+               flags — the same idiom the constant-add path above uses. 7 bytes
+               against the byte-walk's ~30, and the pops retire the data-stack
+               frame so no separate teardown is needed. */
+            load_to_dehl_adj(out, f, optb_dehl_src, 0);  /* DEHL = other src */
+            emit_sp(out, -2, "pop\tbc");      /* BC = stacked LOW  */
+            emit(out, "add\thl,bc");          /* HL = result LOW, sets carry */
+            emit_sp(out, -2, "pop\tbc");      /* BC = stacked HIGH (flags kept) */
+            emit(out, "ex\tde,hl");           /* HL = other HIGH */
+            emit(out, "adc\thl,bc");          /* HL = result HIGH + carry */
+            emit(out, "ex\tde,hl");           /* DEHL = result */
             L.la.cur_stack_long_top = -1;
             store_dehl_finalize(out, f, op->dst);
             return 0;
