@@ -5608,6 +5608,41 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                     && (nxt2->src[0] == op->dst
                         || nxt2->src[1] == op->dst))
                     L.la.cur_dehl_dst_no_bc_stash = 1;
+                /* Same conclusion for a dead-dst long that is immediately
+                   PUSHED as a call argument. cache_dehl_no_spill skips the
+                   slot write and stashes BC=low so a later cache hit can
+                   recover HL via `ld hl,bc` — but it also advertises rs.hl,
+                   and gen_push_arg's consumer takes `push de` / `push hl`,
+                   reading HL and DE and never BC. If BC is then clobbered
+                   before anything reads the value again, the stash is dead.
+                   This is the producer-side half of the argument case: the
+                   push's own load_to_dehl is a cache hit, so no_bc there has
+                   nothing left to suppress. */
+                if (fp_active(f) && op->dst >= 0
+                    && f->vregs[op->dst].width == 4
+                    && j + 1 < bb->n_ops
+                    && (bb->ops[j + 1].kind == IR_PUSH_ARG
+                        || bb->ops[j + 1].kind == IR_PUSH_DEHL_LONG)
+                    && bb->ops[j + 1].src[0] == op->dst) {
+                    int V = op->dst;
+                    for (int k = j + 2; k < bb->n_ops; k++) {
+                        const Op *ko = &bb->ops[k];
+                        int uses[16];
+                        int nu = ir_op_uses(ko, uses,
+                                    (int)(sizeof uses / sizeof uses[0]));
+                        int reads_v = 0;
+                        for (int u = 0; u < nu; u++)
+                            if (uses[u] == V) { reads_v = 1; break; }
+                        if (reads_v) break;       /* read first → stash may hit */
+                        if (ko->kind == IR_CALL || ko->kind == IR_HCALL
+                            || ko->kind == IR_ASM
+                            || (ko->dst >= 0 && ko->dst < f->n_vregs
+                                && f->vregs[ko->dst].width == 4)) {
+                            L.la.cur_dehl_dst_no_bc_stash = 1;
+                            break;
+                        }
+                    }
+                }
             }
             if (L.la.cur_dst_dead && op->dst >= 0
                 && f->vregs[op->dst].width == 4
