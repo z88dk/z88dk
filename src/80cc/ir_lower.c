@@ -2497,6 +2497,105 @@ static void rec_end(const Func *f)
                             f->fn ? ir_sym_name(f->fn) : "?", v, vr->width, reads);
             }
         }
+        /* [IR_PARAMHOME, INERT] Sizing probe for the param register-home lever.
+           IR_PARAMRELOAD above says WHICH params are reloaded and how often;
+           this says what a register home would be WORTH, which is the number
+           the lever has to be argued on.
+
+           The gap this measures: a param read in place costs the frame-address
+           setup plus the load at EVERY use, while a register home pays that
+           once and then 2 bytes (push/pop) per call the live range crosses —
+           what sdcc does with BC. The existing residency gates never see these
+           values: IR_SPLIT_PROBE / IR_GPHOME_PROBE report nothing on a function
+           whose params are read in place, because such a param is not a spilled
+           reused vreg and so never enters the call-split candidate set.
+
+           Per candidate: emitted reads (honest — belief-cache hits already
+           removed), writes, calls crossed, and whether it is ever a deref base
+           (the class Phase-1 call-split excludes, since `ld a,(bc)` serves those
+           without a reload). `save` is bytes under the model below; the raw
+           counts are there so the model can be re-argued without re-running.
+
+           Approximations, all deliberately conservative:
+             - the span is first-to-last op referencing v in linear op order,
+               ignoring control flow, so a loop-carried param under-counts the
+               calls actually crossed (save is over-stated for those — the
+               deref/write columns are the ones to check before trusting a row);
+             - only width<=2 scores, since a 4-byte param cannot live in one
+               pair. Wider params print with save=0 rather than being dropped,
+               so the reads they cost stay visible.
+
+           IR_PARAMHOME=1 per-candidate lines + a per-function total;
+           IR_PARAMHOME=2 adds the function totals for functions with no
+           candidate, to confirm coverage rather than silence. */
+        if (getenv("IR_PARAMHOME")) {
+            int verbose = getenv("IR_PARAMHOME")[0] == '2';
+            /* Bytes per counted read event. The two modes count DIFFERENT
+               things, so the cost has to follow suit or fp reads score double:
+                 sp — one event is a whole operand. `ld hl,N / add hl,sp` (4B)
+                      forms the address once, then the load: +4B for a word
+                      (ld a,(hl) / inc hl / ld h,(hl) / ld l,a), +1B for a byte.
+                 fp — one event is a single (ix+d) byte access, 3B, no setup;
+                      a word operand therefore counts twice and costs 3B twice.
+               Cross-check on ItemCheck: 10 sp events and 20 fp events describe
+               the same ten word loads, and 10*8 vs 20*3 put the two modes in
+               the same range instead of an artificial 2x apart. */
+            int fp = fp_active(f) && !L.cur_frameless;
+            int cost_w = fp ? 3 : 8;      /* per read event, width-2 operand */
+            int cost_b = fp ? 3 : 5;      /* per read event, width-1 operand */
+            int fn_cands = 0, fn_reads = 0, fn_save = 0;
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                const VReg *vr = &f->vregs[v];
+                if (!(vr->flags & IR_VREG_PARAM)) continue;
+                if (f->vreg_to_phys && f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+                int reads  = rec_slotuse[v] - (rec_slotwrite ? rec_slotwrite[v] : 0);
+                int writes = rec_slotwrite ? rec_slotwrite[v] : 0;
+                if (reads < 2) continue;
+                /* Walk the function once: linear op index, first/last reference
+                   to v, calls between them, and any use as a deref base. */
+                int idx = 0, first = -1, last = -1, deref = 0;
+                int ncall_before_first = 0, ncall_before_last = 0, ncall = 0;
+                for (int b = 0; b < f->n_bbs; b++)
+                    for (int j = 0; j < f->bbs[b].n_ops; j++, idx++) {
+                        const Op *o = &f->bbs[b].ops[j];
+                        if (o->kind == IR_CALL || o->kind == IR_HCALL) ncall++;
+                        int u[16];
+                        int nu = ir_op_uses(o, u, 16);
+                        int refs = (o->dst == v);
+                        for (int k = 0; k < nu && !refs; k++) refs = (u[k] == v);
+                        if (!refs) continue;
+                        if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                            && o->mem.kind == IR_MEM_VREG && o->mem.base == v)
+                            deref = 1;
+                        if (first < 0) { first = idx; ncall_before_first = ncall; }
+                        last = idx; ncall_before_last = ncall;
+                    }
+                int calls = (first < 0) ? 0
+                          : ncall_before_last - ncall_before_first;
+                int save = 0;
+                if (vr->width >= 1 && vr->width <= 2) {
+                    int rc = (vr->width == 1) ? cost_b : cost_w;
+                    save = (reads - 1) * rc - 2 * calls;
+                    if (save < 0) save = 0;
+                }
+                fn_cands++; fn_reads += reads; fn_save += save;
+                /* span = ops between first and last reference: a long span is
+                   more likely to lose the register to pressure, so it tempers
+                   `save` without changing it. */
+                fprintf(stderr,
+                        "PARAMHOME %s v%d w=%d reads=%d writes=%d calls=%d "
+                        "span=%d deref=%d save=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", v, vr->width,
+                        reads, writes, calls, (first < 0) ? 0 : last - first,
+                        deref, save);
+            }
+            if (fn_cands || verbose)
+                fprintf(stderr, "PARAMHOME-FN %s mode=%s cands=%d reads=%d "
+                        "save=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", fp ? "fp" : "sp",
+                        fn_cands, fn_reads, fn_save);
+        }
         /* [IR_DEADSTORE, INERT] Write-only (dead-store) byte-slot report. Uses
            the read/write split: reads[v] = rec_slotuse[v] - rec_slotwrite[v].
            Coalescing-aware: readb[p]=1 iff SOME spill covering byte p was read,
