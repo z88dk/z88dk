@@ -2307,6 +2307,17 @@ static int  *rec_slotuse;
    missed write site only over-counts reads → a live-looking slot → conservative
    (store kept). Never over-count writes. */
 static int  *rec_slotwrite;
+/* [IR_FRAMEPROBE, inert] Frame-traffic census. rec_fh_red[v] counts REDUNDANT
+   slot reads of v: a read in the same call-free region as an earlier read of v
+   with no intervening write. That is the residency opportunity — a value the
+   lowerer re-fetched when it could have kept it in a register — as distinct
+   from a first read (unavoidable) or a read after a call (the register would
+   have been clobbered anyway). rec_fh_seen[v] is the per-region latch, cleared
+   at every call/hcall/asm and BB boundary by frameprobe_region_break(). */
+static int  *rec_fh_red;
+static char *rec_fh_seen;
+static int   frameprobe_on(void)
+{ static int c = -1; if (c < 0) c = getenv("IR_FRAMEPROBE") ? 1 : 0; return c; }
 static int   dsx_on = -1;
 /* [IR_DEADSTORE] dead-spill vreg ids found by the last render's read/write split
    (populated in rec_end, consumed by the driver to mark IR_VREG_DEAD_SPILL and
@@ -2364,8 +2375,9 @@ static int ff_enabled(void)
 static void rec_reset(void)
 {
     free(rec_reg); free(rec_slot); free(rec_remat); free(rec_slotuse);
-    free(rec_slotwrite);
+    free(rec_slotwrite); free(rec_fh_red); free(rec_fh_seen);
     rec_reg = rec_slot = rec_remat = rec_slotuse = rec_slotwrite = NULL;
+    rec_fh_red = NULL; rec_fh_seen = NULL;
     rec_nv = 0; rec_counting = 0;
 }
 
@@ -2385,6 +2397,8 @@ static void rec_begin(const Func *f)
     rec_remat = calloc((size_t)rec_nv, sizeof(int));
     rec_slotuse = calloc((size_t)rec_nv, sizeof(int));
     rec_slotwrite = calloc((size_t)rec_nv, sizeof(int));
+    rec_fh_red    = calloc((size_t)rec_nv, sizeof(int));
+    rec_fh_seen   = calloc((size_t)rec_nv, 1);
     if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite) {
         rec_reset(); return; }
     rec_counting = 1;
@@ -2401,6 +2415,17 @@ static void note_slot_use(int v)
     if (!rec_counting || v < 0 || v >= rec_nv || !rec_slotuse) return;
     rec_slotuse[v]++;
     if (slot_write_ctx && rec_slotwrite) rec_slotwrite[v]++;
+    if (rec_fh_seen && rec_fh_red) {
+        if (slot_write_ctx) rec_fh_seen[v] = 0;      /* write refreshes the slot */
+        else { if (rec_fh_seen[v]) rec_fh_red[v]++; rec_fh_seen[v] = 1; }
+    }
+}
+
+/* A call / asm clobbers the register file, so a reload after it is NOT
+   redundant — reset the latches. Also called at each BB boundary. */
+static void frameprobe_region_break(void)
+{
+    if (rec_fh_seen && rec_nv > 0) memset(rec_fh_seen, 0, (size_t)rec_nv);
 }
 
 static void rec_note(int bucket, int v)
@@ -2500,6 +2525,49 @@ static void rec_end(const Func *f)
                frameless (frame_size=0). Only every-byte-dead qualifies: a
                partial shrink would move live slot offsets. */
             L.frame_fully_dead = (deadbytes == fs);
+        }
+        /* [IR_FRAMEPROBE, INERT] Frame-traffic census. The +1921B (emu.c) /
+           +192B (binary-trees) that 80cc spends on (ix+d) over sdcc is three
+           different diseases wearing one symptom, and the aggregate cannot
+           tell them apart:
+             REDUNDANT reads  -> residency: the value was re-fetched inside a
+                                 call-free region when a register would have
+                                 held it. Fixable by keeping it resident.
+             FIRST reads      -> unavoidable given the value is spilled at all.
+             spilled VREGS    -> allocation pressure: too many values spilled
+                                 in the first place. A different lever.
+             width-4 traffic  -> a long costs 4 slot bytes per touch; sdcc does
+                                 ALU straight off (ix+d) instead.
+           Split by class (param / named local / compiler temp) because the
+           fixes differ, and reported per function so a target can be picked.
+           Reads are the honest emitted count (rec_slotuse - rec_slotwrite). */
+        if (frameprobe_on()) {
+            long rd[3] = {0,0,0}, wr[3] = {0,0,0}, red[3] = {0,0,0};
+            long rd_w4 = 0, red_w4 = 0;
+            int nspill = 0;
+            for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
+                if (!rec_slotuse[v]) continue;
+                const VReg *vr = &f->vregs[v];
+                int cls = (vr->flags & IR_VREG_PARAM) ? 0 : (vr->sym ? 1 : 2);
+                int r = rec_slotuse[v] - (rec_slotwrite ? rec_slotwrite[v] : 0);
+                int w = rec_slotwrite ? rec_slotwrite[v] : 0;
+                if (r < 0) r = 0;
+                rd[cls] += r; wr[cls] += w;
+                red[cls] += rec_fh_red ? rec_fh_red[v] : 0;
+                if (vr->width == 4) {
+                    rd_w4 += r; red_w4 += rec_fh_red ? rec_fh_red[v] : 0;
+                }
+                nspill++;
+            }
+            long tr = rd[0]+rd[1]+rd[2], tw = wr[0]+wr[1]+wr[2];
+            long tred = red[0]+red[1]+red[2];
+            if (tr + tw > 0)
+                fprintf(stderr,
+                    "FRAMEPROBE %s spilled=%d reads=%ld writes=%ld redundant=%ld"
+                    " | param r=%ld/red=%ld local r=%ld/red=%ld temp r=%ld/red=%ld"
+                    " | w4 r=%ld/red=%ld\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", nspill, tr, tw, tred,
+                    rd[0], red[0], rd[1], red[1], rd[2], red[2], rd_w4, red_w4);
         }
         /* [IR_PARAMRELOAD, INERT] Per-PARAM actual slot READ count from this
            render — the honest mirage test. The allocator-side census counts raw
@@ -5432,10 +5500,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             && home_is_slotbacked(f, L.cur_func_ehome)
             && L.cur_home_exit_flush_bb < 0)
             home_flush(out, f);   /* keep belief; slot now coherent */
+        if (frameprobe_on()) frameprobe_region_break();   /* BB boundary */
         for (int j = 0; j < bb->n_ops; j++) {
             const Op *op = &bb->ops[j];
             int rc;
             lower_verify_op_entry(bb->id, j);
+            if (frameprobe_on()
+                && (op->kind == IR_CALL || op->kind == IR_HCALL
+                    || op->kind == IR_ASM))
+                frameprobe_region_break();
 
             /* Commutative-swap: if the next op is a commutative long binop
                with dst in the non-first-loaded src slot, rotate dst into the
