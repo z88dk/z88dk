@@ -177,6 +177,7 @@ typedef struct {
         int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
         int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
         int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
+        int cur_push_dehl_bc_dead;
         int cur_dehl_dst_dead_safe, cur_dst_dead;
         int cur_remat_def_dead;  /* remat NO_SLOT def with no same-BB reader → skip it */
         int cur_br_value_dead;   /* BR_ZERO/COND: tested value dead after → test in place */
@@ -5532,6 +5533,41 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                call/hcall/asm or another width-4 result, not a read. Always
                correct to elide: store_dehl_cached drops the cache claim, so a
                later read reloads via (ix+d). */
+            /* Same question for a long value being PUSHED as a call
+               argument. gen_push_dehl_long loads DEHL and pushes it, then the
+               call clobbers BC — so the BC=low stash the load leaves behind is
+               dead unless something reads the value between the push and that
+               clobber. The helper-call path already reasons this way
+               (hcall_vreg_used_after), but an ordinary call's arguments go
+               through IR_PUSH_DEHL_LONG, which never asked. That is the
+               `ld hl,<lo> / ld de,<hi> / ld bc,hl / push de / push hl / call`
+               sequence: binary-trees passes a long to NewTreeNode and
+               BottomUpTree, so it pays the stash on every one.
+               Keyed on src[0] rather than dst — a push has no dst. */
+            L.la.cur_push_dehl_bc_dead = 0;
+            if (fp_active(f)
+                && (op->kind == IR_PUSH_DEHL_LONG || op->kind == IR_PUSH_ARG)
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && f->vregs[op->src[0]].width == 4) {
+                int V = op->src[0];
+                for (int k = j + 1; k < bb->n_ops; k++) {
+                    const Op *ko = &bb->ops[k];
+                    int uses[16];
+                    int nu = ir_op_uses(ko, uses,
+                                (int)(sizeof uses / sizeof uses[0]));
+                    int reads_v = 0;
+                    for (int u = 0; u < nu; u++)
+                        if (uses[u] == V) { reads_v = 1; break; }
+                    if (reads_v) break;           /* read first → stash may hit */
+                    if (ko->kind == IR_CALL || ko->kind == IR_HCALL
+                        || ko->kind == IR_ASM
+                        || (ko->dst >= 0 && ko->dst < f->n_vregs
+                            && f->vregs[ko->dst].width == 4)) {
+                        L.la.cur_push_dehl_bc_dead = 1;
+                        break;
+                    }
+                }
+            }
             L.la.cur_store_dehl_bc_dead = 0;
             if (fp_active(f) && op->dst >= 0
                 && f->vregs[op->dst].width == 4) {

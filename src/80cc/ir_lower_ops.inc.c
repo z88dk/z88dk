@@ -1244,6 +1244,12 @@ static int gen_push_arg(FILE *out, Func *f, const Op *op)
     int v = op->src[0];
     int w = (v >= 0 && v < f->n_vregs) ? f->vregs[v].width : 2;
     if (w == 4) {
+        /* The call clobbers BC before anything reads this argument back, so
+           the BC=low stash load_to_dehl leaves behind is dead. Skipping it
+           also drops the DEHL cache claim (publish_dehl_from_hl does both
+           under no_bc), which is what makes it correct and not merely
+           smaller — a later read reloads from the slot. */
+        L.la.cur_load_to_dehl_no_bc = L.la.cur_push_dehl_bc_dead;
         load_to_dehl(out, f, v);
         emit(out, "push\tde");
         emit(out, "push\thl");
@@ -1266,6 +1272,12 @@ static int gen_push_dehl_long(FILE *out, Func *f, const Op *op)
         return -1;
     }
     if (!dehl_has(op->src[0])) {
+        /* The call this argument belongs to clobbers BC before anything reads
+           the value back, so the BC=low stash load_to_dehl would leave is
+           dead — skip it and drop the cache claim with it (publish_dehl_from_hl
+           does both under no_bc, which is what keeps this correct rather than
+           merely smaller: a later read reloads from the slot). */
+        L.la.cur_load_to_dehl_no_bc = L.la.cur_push_dehl_bc_dead;
         load_to_dehl(out, f, op->src[0]);
         emit(out, "push\tde");       /* high half */
         emit(out, "push\thl");       /* low half — popped first */
