@@ -32,6 +32,17 @@ static SYMBOL* addgotosym(char*);
 GOTO_TAB* gotoq;
 static int gotocnt = 0;
 
+/* Is there a real token left on the CURRENT line at/after lptr?
+   dolabel's `:` probe uses this to stay inside one line — see the
+   comment there. Whitespace-only (or exhausted) means no. */
+static int more_on_this_line(void)
+{
+    for (int i = lptr; line[i]; i++)
+        if (line[i] != ' ' && line[i] != '\t')
+            return 1;
+    return 0;
+}
+
 /*
  *      Endeavour to find a label for a goto statement
  *
@@ -47,12 +58,28 @@ Node *dolabel(void)
     savelptr = lptr;
     if (symname(sname)) {
 
-        /* Phase L3c-8h: cmatch is already shimmed (L3c-5), so this
-           routes through the tokeniser. The legacy savelptr-based
-           backtrack on the no-match branch still works — cmatch
-           leaves lptr where blanks() landed, which lptr=savelptr
-           restores. */
-        if (cmatch(':')) {
+        /* The `:` probe must not cross a line boundary. cmatch() calls
+           blanks(), which REFILLS line[] with the next line once the
+           identifier ends the current one — and then `lptr = savelptr`
+           below restores an index from the OLD line into the NEW line's
+           buffer, dropping the parser mid-token further down it. That is
+           why a call statement whose `(` starts a new line failed:
+
+               printf
+               ( "…", item );
+
+           `printf` ends line N, the probe pulled in line N+1, and the
+           restore left the cursor at line N's offset inside it — lexing
+           phantom identifiers out of a later `return` ("n", "rn",
+           "turn", …) or erroring with "Invalid expression".
+
+           sccz80 reads the `:` with a bare gch(), which never refills, so
+           its backtrack is always within one line. Keep that invariant by
+           bailing before cmatch when nothing is left on this line — the
+           restore below is then provably safe. A label split across lines
+           (`foo` newline `:`) is not recognised, which is also what
+           sccz80 does. */
+        if (more_on_this_line() && cmatch(':')) {
 
             if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
                 /* Label already goto'd, find some others with same stack. */
