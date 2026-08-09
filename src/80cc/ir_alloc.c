@@ -4183,11 +4183,25 @@ void ir_alloc(Func *f)
                        same slot eight times (histbench's const-multiply chain).
                        Both differences ride on `is_param`. */
                     int is_param = (vr->flags & IR_VREG_PARAM) != 0;
-                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-                    if (wdb && wdb[v]) continue;         /* deref base — direct (bc) */
-                    if (use_count[v] < 2) continue;
+                    /* [IR_CALLSPLIT_LOG=3] Name the filter that drops a PARAM.
+                       The cs-reject log further down only fires once a value has
+                       survived to the span check, so anything dropped up here was
+                       invisible — which is why the param class read as "not a
+                       candidate" when it is really rejected one filter at a time.
+                       Log only: the `continue` stays at the call site, because a
+                       macro hiding `continue` inside do{}while(0) continues the
+                       MACRO's loop and falls through to the next filter. */
+                    const char *cslog0 = getenv("IR_CALLSPLIT_LOG");
+                    int cslog3 = cslog0 && cslog0[0] == '3';
+                    #define CS_WHY(why) do { if (cslog3 && is_param) \
+                        fprintf(stderr, "  cs-skip %s v%d param=%d uses=%d %s\n", \
+                            f->fn?ir_sym_name(f->fn):"?", v, is_param, \
+                            use_count[v], (why)); } while (0)
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) { CS_WHY("not-spill"); continue; }
+                    if (wdb && wdb[v]) { CS_WHY("deref-base"); continue; }
+                    if (use_count[v] < 2) { CS_WHY("uses<2"); continue; }
                     int lo = first_use[v], hi = last_use[v];
-                    if (lo < 0 || hi < 0 || hi < lo) continue;
+                    if (lo < 0 || hi < 0 || hi < lo) { CS_WHY("no-range"); continue; }
                     /* Must CROSS a call. Extending to loop-carried multi-BB
                        values (GENERAL_LOOP_HOME_PLAN Phase 1a) was a NO-OP: the
                        only new BC-free-safe admit was ptrbench init_data v1 —
@@ -4199,7 +4213,7 @@ void ir_alloc(Func *f)
                     int crosses = 0;
                     for (int c = 0; c < ncall; c++)
                         if (callpos[c] >= lo && callpos[c] <= hi) { crosses = 1; break; }
-                    if (!crosses && !is_param) continue;
+                    if (!crosses && !is_param) { CS_WHY("no-call-cross"); continue; }
                     int best_lo = -1, best_hi = -1;
                     int best_reads = cs_best_span(f, v, bb_first_op, is_param,
                                                   &best_lo, &best_hi);
@@ -4209,7 +4223,8 @@ void ir_alloc(Func *f)
                        `ld bc,(slot); ld hl,bc` isn't amortised over only 2 reuses.
                        Density is the primary metric, so keep ≥3; the ≥15 CPU gate
                        above already byte-suppresses cheap-slot CPUs. */
-                    if (best_reads < 3 || best_lo < 0 || best_hi < best_lo) continue;
+                    if (best_reads < 3 || best_lo < 0 || best_hi < best_lo)
+                        { CS_WHY("span<3"); continue; }
                     /* Reject the span if, inside [best_lo,best_hi], V is consumed
                        by an op that reads BC DIRECTLY (compare/branch-test/step/
                        fused/deref) rather than through load_to_hl/load_to_de: those
@@ -4369,6 +4384,7 @@ void ir_alloc(Func *f)
                                 f->fn ? ir_sym_name(f->fn) : "?", v, best_reads,
                                 best_lo, best_hi);
                 }
+                #undef CS_WHY
             }
             free(callpos);
             free(wdb);
