@@ -1,25 +1,11 @@
-target/pmd85/stdio/CRT_FONT
-target/pmd85/stdio/conio_vars
-target/pmd85/stdio/conio_map_colour
-target/pmd85/stdio/generic_console
-target/pmd85/stdio/generic_console_vpeek
-target/pmd85/stdio/generic_console_ioctl
+target/pmd85/obj/pmd85/**/*.o
 @classic/stdio/stdio.lst
 classic/stdio/obj/${TYPE}/inkey/getk
 classic/stdio/obj/${TYPE}/inkey/fgetc_cons
 
 @classic/input/input_keyboard.lst
 
-target/pmd85/games/joystick
-target/pmd85/games/keys_joystick
 @classic/games/games.lst
-target/pmd85/graphics/clg
-target/pmd85/graphics/w_pixladdr
-target/pmd85/graphics/w_plotpixl
-target/pmd85/graphics/w_respixl
-target/pmd85/graphics/w_xorpixl
-target/pmd85/graphics/w_pointxy
-target/pmd85/graphics/__set_graphics_colour
 @classic/gfx/portable/gfx_portable_w.lst
 @classic/gfx/wide/gfx_wide.lst
 
