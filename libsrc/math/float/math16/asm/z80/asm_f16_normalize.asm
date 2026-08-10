@@ -1,5 +1,6 @@
 ;
 ;  feilipu, 2026 August
+;  ped7g, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +12,9 @@
 ;
 ;  unpacked: exponent in d, sign in e[7], mantissa in hl
 ;
-;  Byte scan; unrolled residual walk jumps into reverse-label add hl,hl tree.
+;  Byte scan; residual merge loop.  add hl,hl does not set S from H.
+;  Until normalised H.7 is 0.  Entry leaves A = H with A.7 clear, so each
+;  step is or h / jp p (cheaper than ld a,h / or a).
 ;
 ;-------------------------------------------------------------------------
 
@@ -27,7 +30,7 @@ PUBLIC asm_f24_normalize
     ld a,h
     or a
     ret m                       ; already normalised
-    jr nz,bitwalk
+    jr nz,need_shift            ; A = H, A.7 clear
 
     ld a,l
     or a
@@ -44,45 +47,15 @@ PUBLIC asm_f24_normalize
     or a
     ret m
     jp z,asm_f24_zero
+    ; A = H, A.7 clear → need_shift
 
-.bitwalk
-    ld b,1
-    add a,a
-    jp m,s1
+.need_shift
+    ld b,0
+.shift_loop
     inc b
-    add a,a
-    jp m,s2
-    inc b
-    add a,a
-    jp m,s3
-    inc b
-    add a,a
-    jp m,s4
-    inc b
-    add a,a
-    jp m,s5
-    inc b
-    add a,a
-    jp m,s6
-    inc b
-    add a,a
-    jp p,asm_f24_zero           ; 7th trial still clear → zero
-    ; fall through to s7
-
-.s7
     add hl,hl
-.s6
-    add hl,hl
-.s5
-    add hl,hl
-.s4
-    add hl,hl
-.s3
-    add hl,hl
-.s2
-    add hl,hl
-.s1
-    add hl,hl
+    or h                        ; S from H.7 (A.7 was 0 until then)
+    jp p,shift_loop
 
     ld a,d
     sub b

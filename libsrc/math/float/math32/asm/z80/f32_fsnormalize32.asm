@@ -1,5 +1,6 @@
 ;
 ;  feilipu, 2026 August
+;  ped7g, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +13,8 @@
 ;  unpacked: mantissa=dehl, exponent in b, sign in c[7]
 ;  DEHL is already add hl,hl / rl de layout.
 ;
-;  Byte scan; unrolled residual walk jumps into reverse-label shift tree.
+;  Byte scan; residual merge loop (add hl,hl / rl de).
+;  z80asm rl de → rl e; rl d, so SF is already D.7 (no or d needed).
 ;
 ;-------------------------------------------------------------------------
 
@@ -26,7 +28,7 @@ PUBLIC m32_fsnormalize32
     ld a,d
     or a
     ret m                       ; already normalised
-    jr nz,bitwalk
+    jr nz,need_shift
 
     ld a,e
     or a
@@ -48,7 +50,7 @@ PUBLIC m32_fsnormalize32
     sub 24
     ld b,a
     jr c,normzero
-    jr got_lead
+    jr bitshift_check
 
 .need16
     ex de,hl                    ; DE ← old HL, HL ← 0 (old DE was 0)
@@ -56,7 +58,7 @@ PUBLIC m32_fsnormalize32
     sub 16
     ld b,a
     jr c,normzero
-    jr got_lead
+    jr bitshift_check
 
 .need8
     ld d,e
@@ -69,63 +71,26 @@ PUBLIC m32_fsnormalize32
     jr c,normzero
     ; fall through
 
-.got_lead
+.bitshift_check
     ld a,d
     or a
-    ret m                       ; no jr m
+    ret m                       ; normalised after byte align only
     jr z,normzero
 
-.bitwalk
-    ; A = leading byte; save exp/sign — residual count in B
-    ; DE is full high half: keep rl de (not rl e alone)
+    ; ---------------------------------------------------------------
+    ; Residual: count in temp B; exp+sign on stack
+    ; rl de ends with rl d → SF = D.7 (Z80)
+    ; ---------------------------------------------------------------
+
+.need_shift
     push bc                     ; exp + sign
-    ld b,1
-    add a,a
-    jp m,s1                     ; no jr m
+    ld b,0
+.shift_loop
     inc b
-    add a,a
-    jp m,s2
-    inc b
-    add a,a
-    jp m,s3
-    inc b
-    add a,a
-    jp m,s4
-    inc b
-    add a,a
-    jp m,s5
-    inc b
-    add a,a
-    jp m,s6
-    inc b
-    add a,a
-    jp p,bitwalk_zero           ; no jr p
-    ; fall through to s7
+    add hl,hl
+    rl de
+    jp p,shift_loop             ; D.7 not set yet
 
-    ; B = residual; stack has exp+sign
-.s7
-    add hl,hl
-    rl de
-.s6
-    add hl,hl
-    rl de
-.s5
-    add hl,hl
-    rl de
-.s4
-    add hl,hl
-    rl de
-.s3
-    add hl,hl
-    rl de
-.s2
-    add hl,hl
-    rl de
-.s1
-    add hl,hl
-    rl de
-
-    ; B = residual, stack: exp+sign
     ld a,b                      ; residual
     pop bc                      ; B = exp, C = sign
     cpl
@@ -135,8 +100,6 @@ PUBLIC m32_fsnormalize32
     ld b,a
     ret
 
-.bitwalk_zero
-    pop bc                      ; drop exp+sign
 .normzero
     xor a
     ld b,a

@@ -1,5 +1,6 @@
 ;
 ;  feilipu, 2026 August
+;  ped7g, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,11 +10,11 @@
 ; m32_fsnormalize - 8085 normalisation
 ;-------------------------------------------------------------------------
 ;
-;  unpacked: h==0; mantissa=lde, sign in b, exponent in c
+;  unpacked: h==0 (discarded); mantissa=lde, sign in b, exponent in c
 ;  result packed IEEE DEHL (no af')
 ;
-;  ex de,hl → E:HL; byte scan; unrolled residual walk jumps into
-;  reverse-label shift tree (add hl,hl / rl de); ex de,hl → pack.
+;  Same strategy as z80: A:HL residual loop (add hl,hl / adc a,a),
+;  byte align first, pack with rla/rra through A only.
 ;
 ;-------------------------------------------------------------------------
 
@@ -24,122 +25,68 @@ PUBLIC m32_fsnormalize
 
 
 .m32_fsnormalize
-    ld a,b
-    push af                     ; save sign
+    ex de,hl                    ; E = high, HL = mid:low
+    ld d,0                      ; shift total
 
-    ex de,hl                    ; E = high, HL = mid:low, D = 0
+    ; ---------------------------------------------------------------
+    ; Byte scan on E:HL and byte-alignment of it
+    ; ---------------------------------------------------------------
 
     ld a,e
     or a
-    jp m,no_shift
-    jr nz,bitwalk
+    jp m,normalised             ; already normalised (hot path)
+    jr nz,need_shift            ; non-zero lead in E, D = 0, A:HL ready
+    or h
+    jr nz,need8                 ; non-zero lead in H, align by byte first
+    or l
+    jr z,normzero               ; all zeroes (no lead), return zero float
 
-    ld a,h
-    or a
-    jr nz,need8
-
-    ld a,l
-    or a
-    jp z,normzero
-
-    ld e,l
-    ld hl,0
-    ld a,c
-    sub 16
-    ld c,a
-    jp c,normzero
-    jp got_lead
+; .need16 ; A == L ; leading non zero is in L → exp -16
+    ld l,h                      ; A:HL shifted by 16 (hl = 0)
+    ld d,16
+    jr bitshift_check           ; process byte-aligned non-zero lead
 
 .need8
-    ld e,h
+    ; A == H ; leading non zero is in H → exp -8
     ld h,l
-    ld l,0
+    ld l,e                      ; A:HL shifted by 8 (l = 0)
+    ld d,8
+.bitshift_check                 ; check SF set by last `or` instruction
+    jp m,normalised             ; normalised by 8/16 shift, pack it
+    ; fall through to need_shift
+
+    ; ---------------------------------------------------------------
+    ; Normalization shifts of A:HL; D incremented by shifts (+1..7)
+    ; A is 0x01..0x7F upon entry
+    ; ---------------------------------------------------------------
+
+.need_shift
+    inc d                       ; ++shifts (to --exp)
+    add hl,hl
+    adc a,a                     ; A:HL << 1 and check for leading one
+    jp p,need_shift             ; not leading yet, keep shifting
+
+.normalised                     ; calculate final exp and prepare for packing
+    ; A:HL = normalised 24b mant (A.7 = implicit 1); B = sign; C = exp
+    add a,a                     ; drop implicit 1 → C, A = mant high << 1
+    ld e,a
     ld a,c
-    sub 8
-    ld c,a
-    jp c,normzero
+    sub d                       ; a = final exp
+    jr c,normzero
 
-.got_lead
-    ld a,e
-    or a
-    jp m,no_shift
-    jp z,normzero
-
-.bitwalk
-    ld b,1
-    add a,a
-    jp m,s1
-    inc b
-    add a,a
-    jp m,s2
-    inc b
-    add a,a
-    jp m,s3
-    inc b
-    add a,a
-    jp m,s4
-    inc b
-    add a,a
-    jp m,s5
-    inc b
-    add a,a
-    jp m,s6
-    inc b
-    add a,a
-    jp p,normzero               ; 7th trial still clear → zero
-    ; fall through to s7
-
-.s7
-    add hl,hl
-    rl de
-.s6
-    add hl,hl
-    rl de
-.s5
-    add hl,hl
-    rl de
-.s4
-    add hl,hl
-    rl de
-.s3
-    add hl,hl
-    rl de
-.s2
-    add hl,hl
-    rl de
-.s1
-    add hl,hl
-    rl de
-
-    ld a,c
-    sub b
-    jp c,normzero
-    ld c,a
-
-.no_shift
-    ex de,hl                    ; E:HL → LDE
-
-    pop af
-    ld b,a
-    ld a,c
-
-    ld h,a
-    ld a,l
-    rla
-    ld l,a
+    ld d,a                      ; D = final exp (temp)
     ld a,b
-    rla
-    ld a,h
-    rra
-    ld h,a
-    ld a,l
-    rra
-    ld l,a
-    ex de,hl
+    add a,a                     ; sign → C (B is 0 or 80h)
+    ld a,d
+    rra                         ; A = sign|exp
+    ld d,a
+    ld a,e
+    rra                         ; last exp bit into E; mant bits without i1
+    ld e,a
+    ; DEHL: D = sign|exp, E = exp0|mant, H = mid, L = low
     ret
 
 .normzero
-    pop af
     ld hl,0
     ld de,hl
     ret

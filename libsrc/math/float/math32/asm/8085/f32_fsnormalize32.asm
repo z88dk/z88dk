@@ -1,5 +1,6 @@
 ;
 ;  feilipu, 2026 August
+;  ped7g, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +13,9 @@
 ;  unpacked: mantissa=dehl, exponent in b, sign in c[7]
 ;  DEHL is already add hl,hl / rl de layout.
 ;
-;  Byte scan; unrolled residual walk jumps into reverse-label shift tree.
+;  Byte scan; residual merge loop.  8085 rl de does not set S (-----VC).
+;  Until normalised D.7 is 0.  Entry leaves A = D with A.7 clear, so each
+;  step is or d / jp p (cheaper than ld a,d / or a).
 ;
 ;-------------------------------------------------------------------------
 
@@ -26,7 +29,7 @@ PUBLIC m32_fsnormalize32
     ld a,d
     or a
     ret m
-    jr nz,bitwalk
+    jr nz,need_shift            ; A = D, A.7 clear
 
     ld a,e
     or a
@@ -47,7 +50,7 @@ PUBLIC m32_fsnormalize32
     sub 24
     ld b,a
     jp c,normzero
-    jp got_lead
+    jp bitshift_check
 
 .need16
     ex de,hl
@@ -55,7 +58,7 @@ PUBLIC m32_fsnormalize32
     sub 16
     ld b,a
     jp c,normzero
-    jp got_lead
+    jp bitshift_check
 
 .need8
     ld d,e
@@ -66,59 +69,24 @@ PUBLIC m32_fsnormalize32
     sub 8
     ld b,a
     jp c,normzero
+    ; fall through
 
-.got_lead
+.bitshift_check
     ld a,d
     or a
     ret m
     jp z,normzero
+    ; A = D, A.7 clear → need_shift
 
-.bitwalk
+.need_shift
     push bc                     ; exp + sign
-    ld b,1
-    add a,a
-    jp m,s1
+    ld b,0
+.shift_loop
     inc b
-    add a,a
-    jp m,s2
-    inc b
-    add a,a
-    jp m,s3
-    inc b
-    add a,a
-    jp m,s4
-    inc b
-    add a,a
-    jp m,s5
-    inc b
-    add a,a
-    jp m,s6
-    inc b
-    add a,a
-    jp p,bitwalk_zero           ; 7th trial still clear → zero
-    ; fall through to s7
-
-.s7
     add hl,hl
-    rl de
-.s6
-    add hl,hl
-    rl de
-.s5
-    add hl,hl
-    rl de
-.s4
-    add hl,hl
-    rl de
-.s3
-    add hl,hl
-    rl de
-.s2
-    add hl,hl
-    rl de
-.s1
-    add hl,hl
-    rl de
+    rl de                       ; 8085 RDEL: flags -----VC (S not set)
+    or d                        ; S from D.7 (A.7 was 0 until then)
+    jp p,shift_loop
 
     ld a,b
     pop bc
@@ -129,8 +97,6 @@ PUBLIC m32_fsnormalize32
     ld b,a
     ret
 
-.bitwalk_zero
-    pop bc                      ; drop exp+sign
 .normzero
     xor a
     ld b,a
