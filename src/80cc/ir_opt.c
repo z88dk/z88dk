@@ -2183,6 +2183,29 @@ static int narrow_kind(const Op *op)
     }
 }
 
+/* A comparison yields 0 or 1, so its high byte is always zero and narrowing
+   the dst is exact for every compare kind. Deliberately NOT part of
+   narrow_kind: that table doubles as the USE-side "reads only the low byte"
+   test, and a compare reads BOTH its operands in full. The 8-bit lowering is
+   commit_flag_bool (`ld a,0 / skip / inc a`) in ir_lower_analysis.inc.c. */
+static int cmp_result_kind(const Op *op)
+{
+    switch (op->kind) {
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* Def-side gate: does this op have an 8-bit lowering for its dst? */
+static int narrow_def_kind(const Op *op)
+{
+    return narrow_kind(op) || cmp_result_kind(op);
+}
+
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
    is clear — so v's value provably fits in 8 bits and a zero/cond test on
    its low byte is a test of the whole value. */
@@ -2204,6 +2227,12 @@ static int v_fits_byte(const Func *f, int v)
                byte_val-gated use cases (CMP_EQ/NE, SWITCH, BR_ZERO) even
                though the value is a literal 0 or 1. */
             if (op->kind == IR_LD_IMM && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A boolean is 0 or 1. Without this the compare results narrowed
+               by narrow_def_kind would still fail every byte_val-gated use
+               (BR_ZERO / BR_COND / SWITCH / byte CMP_EQ) — which is where
+               a bool is nearly always consumed. */
+            if (cmp_result_kind(op))
                 continue;
             return 0;
         }
@@ -2340,7 +2369,7 @@ int ir_opt_narrow_byte(Func *f)
             int d = op->dst;
             if (d < 0 || d >= f->n_vregs) continue;
             hasdef[d] = 1;
-            if (!narrow_kind(op)) {
+            if (!narrow_def_kind(op)) {
                 bad[d] = 1;
                 if (badkind[d] < 0) badkind[d] = (int)op->kind;
             }
