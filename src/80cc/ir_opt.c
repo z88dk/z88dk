@@ -2224,6 +2224,16 @@ static int v_is_sx_of_byte(const Func *f, int v)
    truth-test counts too WHEN v provably fits a byte (a byte-mask AND, e.g.
    `crc & 0x80`): then testing the low byte is testing the whole value, so
    the producer can stay 8-bit (no `ld h,0` widen for the branch). */
+/* [IR_NARROWPROBE] Census of values that COULD have been byte-width but were
+   not. Two gates reject a candidate: some def has no 8-bit lowering
+   (narrow_kind), or some use needs more than the low byte
+   (demands_low_byte_only). Knowing WHICH gate, and which op kind, is what
+   picks the next piece of narrowing work — the pass already earns 617B on
+   emu.c and the width census says roughly 4400B is still on the table. */
+static int nb_probe_on(void)
+{ static int c = -1; if (c < 0) c = getenv("IR_NARROWPROBE") ? 1 : 0; return c; }
+static int nb_block_use = -1;   /* op kind of the use that refused, or -1 */
+
 static int demands_low_byte_only(const Func *f, int v)
 {
     int byte_val = v_fits_byte(f, v);
@@ -2244,7 +2254,9 @@ static int demands_low_byte_only(const Func *f, int v)
             if (narrow_kind(u) && u->dst >= 0
                 && f->vregs[u->dst].width == 1) {
                 /* SHL count position needs full value, not just byte. */
-                if (u->kind == IR_SHL && u->src[1] == v) return 0;
+                if (u->kind == IR_SHL && u->src[1] == v) {
+                    nb_block_use = (int)u->kind; return 0;
+                }
                 continue;
             }
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
@@ -2285,6 +2297,7 @@ static int demands_low_byte_only(const Func *f, int v)
                 && u->src[1] == -1 && u->imm == 0
                 && v_is_sx_of_byte(f, v))
                 continue;
+            nb_block_use = (int)u->kind;
             return 0;
         }
     }
@@ -2301,7 +2314,9 @@ int ir_opt_narrow_byte(Func *f)
        the same temp in both arms; narrowing the vreg narrows both. */
     char *bad = calloc((size_t)f->n_vregs, 1);   /* def disqualifies */
     char *hasdef = calloc((size_t)f->n_vregs, 1);
-    if (!bad || !hasdef) { free(bad); free(hasdef); return 0; }
+    int  *badkind = calloc((size_t)f->n_vregs, sizeof(int));  /* [probe] why */
+    if (!bad || !hasdef || !badkind) { free(bad); free(hasdef); free(badkind); return 0; }
+    for (int i = 0; i < f->n_vregs; i++) badkind[i] = -1;
     for (int b = 0; b < f->n_bbs; b++) {
         const BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++) {
@@ -2309,7 +2324,10 @@ int ir_opt_narrow_byte(Func *f)
             int d = op->dst;
             if (d < 0 || d >= f->n_vregs) continue;
             hasdef[d] = 1;
-            if (!narrow_kind(op)) bad[d] = 1;
+            if (!narrow_kind(op)) {
+                bad[d] = 1;
+                if (badkind[d] < 0) badkind[d] = (int)op->kind;
+            }
         }
     }
     int changed = 0, pass_changed;
@@ -2326,8 +2344,27 @@ int ir_opt_narrow_byte(Func *f)
         }
         changed += pass_changed;
     } while (pass_changed);
+    /* [IR_NARROWPROBE] Anything still width-2 with a def is a rejected
+       candidate — report which gate refused it and the op kind responsible.
+       Emitted per function; a consumer should aggregate by (gate, kind). */
+    if (nb_probe_on()) {
+        for (int d = 0; d < f->n_vregs; d++) {
+            if (!hasdef[d] || f->vregs[d].width != 2) continue;
+            if (bad[d]) {
+                fprintf(stderr, "NARROWPROBE %s v%d gate=def kind=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", d, badkind[d]);
+            } else {
+                nb_block_use = -1;
+                (void)demands_low_byte_only(f, d);
+                fprintf(stderr, "NARROWPROBE %s v%d gate=use kind=%d fits=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", d, nb_block_use,
+                        v_fits_byte(f, d));
+            }
+        }
+    }
     free(bad);
     free(hasdef);
+    free(badkind);
     return changed;
 }
 
