@@ -2170,6 +2170,14 @@ static int narrow_kind(const Op *op)
         return 1;
     case IR_SHL:
         return op->src[1] == -1;   /* imm count only (byte path) */
+    /* A constant in [0,255] has an 8-bit lowering (`ld a,n` / a byte home)
+       and its high byte is zero, so narrowing is exact. This was the single
+       largest def-gate rejection on emu.c (409 of 1258, IR_NARROWPROBE) and
+       is what leaves `ld hl,1` x163 / `ld hl,0` x94 at pair width. Values
+       outside [0,255] stay wide: conservative, and the interesting constants
+       in byte code are small. */
+    case IR_LD_IMM:
+        return (op->imm & ~0xFFLL) == 0;
     default:
         return 0;
     }
@@ -2187,9 +2195,17 @@ static int v_fits_byte(const Func *f, int v)
             const Op *op = &bb->ops[j];
             if (op->dst != v) continue;
             seen = 1;
-            if (op->kind != IR_AND || op->src[1] != -1
-                || (op->imm & ~0xFFLL) != 0)
-                return 0;
+            /* Masked to <=0xFF, the original form. */
+            if (op->kind == IR_AND && op->src[1] == -1
+                && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A constant in [0,255] fits a byte by inspection. Without this
+               a `c = 1` def made v_fits_byte false, which then refused the
+               byte_val-gated use cases (CMP_EQ/NE, SWITCH, BR_ZERO) even
+               though the value is a literal 0 or 1. */
+            if (op->kind == IR_LD_IMM && (op->imm & ~0xFFLL) == 0)
+                continue;
+            return 0;
         }
     }
     return seen;
