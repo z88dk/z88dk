@@ -228,7 +228,8 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
         "nb_c_zsdcc_z80_m32",
         ("support/benchmarks/n-body/readme.txt", "summary", dict(compiler="zsdcc", cpu="z80", math="math32")),
         ("support/benchmarks/n-body/readme.txt", "result", dict(title=r"zsdcc / classic / math32")),
-        ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"zsdcc #12070 / classic|zsdcc / classic / math32")),
+        # Never match historical "zsdcc #12070 / classic" (math48-era April 2021).
+        ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"zsdcc / classic / math32")),
     )
     add(
         "nb_c_sccz80_z80_m16",
@@ -309,7 +310,8 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
     )
     add(
         "sn_n_sccz80_z80_m32",
-        ("support/benchmarks/spectral-norm/readme.txt", "result", dict(title=r"sccz80 / new c library / math32|sccz80 / new c library")),
+        # Never match bare "sccz80 / new c library" (math48-era April 2020).
+        ("support/benchmarks/spectral-norm/readme.txt", "result", dict(title=r"sccz80 / new c library / math32")),
         ("support/benchmarks/spectral-norm/z88dk-new/readme.txt", "result", dict(title=r"sccz80 / new c library / math32")),
     )
 
@@ -437,6 +439,7 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
     )
     add(
         "wh_n_zsdcc_z80_m32",
+        # math32 rows may be remeasured (including revision-tagged titles that name math32).
         ("support/benchmarks/whetstone/readme.txt", "result", dict(title=r"zsdcc.*new c library / math32", whet=True)),
         ("support/benchmarks/whetstone/z88dk-new/readme.txt", "result", dict(title=r"zsdcc.*new c library / math32", whet=True)),
     )

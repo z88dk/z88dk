@@ -96,7 +96,7 @@ time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
 
 Z88DK August 10, 2026
-zsdcc #12555 / classic c library / math32
+zsdcc #15242 / classic c library / math32
 5699 bytes less page zero
 
 error: 2 * 10^(-7)

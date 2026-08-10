@@ -86,15 +86,15 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK August 10, 2026
+Z88DK April 28, 2021
 zsdcc #12070 / classic
-6597 bytes less page zero
+5246 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 843047242
-time @ 4MHz  = 843047242 / 4*10^6 =  3 min 31 sec
+cycle count  = 2253709929
+time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 
 Z88DK January 3, 2022

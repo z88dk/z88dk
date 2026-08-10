@@ -70,7 +70,7 @@ time @ 4MHz  = 3736214166 / 4*10^6 = 15 min 34 sec
 
 
 Z88DK August 10, 2026
-zsdcc #12070 / new / math32
+zsdcc #15242 / new / math32
 3964 bytes less page zero
 
 cycle count  = 1385735782

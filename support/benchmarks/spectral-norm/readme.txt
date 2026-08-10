@@ -107,14 +107,14 @@ cycle count  = 8632065790
 time @ 4MHz  = 8632065790 / 4*10^6 = 35 min 58 sec
 
 5.
-Z88DK August 10, 2026
+Z88DK April 20, 2020
 sccz80 / new c library
-4980 bytes less page zero
+3895 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 4212422397
-time @ 4MHz  = 4212422397 / 4*10^6 =  17 min 33 sec
+cycle count  = 8906227168
+time @ 4MHz  = 8906227168 / 4*10^6 = 37 min 07 sec
 
 48-bit float implementation causes relative slowdown.
 
@@ -143,7 +143,7 @@ time @ 4MHz  = 4425446444 / 4*10^6 =  18 min 26 sec
 
 8.
 Z88DK August 10, 2026
-zsdcc #12419 / new c library / math32
+zsdcc #15242 / new c library / math32
 5479 bytes less page zero
 
 error: 2 * 10^(-7)

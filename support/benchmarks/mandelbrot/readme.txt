@@ -129,7 +129,7 @@ IEEE 32-bit float implementation (truncated high-half 32×32).
 
 6.
 Z88DK August 10, 2026
-zsdcc #12070 / new c library / math32
+zsdcc #15242 / new c library / math32
 3964 bytes less page zero
 
 cycle count  = 1385735782

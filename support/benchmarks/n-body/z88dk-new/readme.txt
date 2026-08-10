@@ -65,7 +65,7 @@ cycle count  = 2247889896
 time @ 4MHz  = 2247889896 / 4*10^6 = 9 min 22 sec
 
 Z88DK August 10, 2026
-zsdcc #12070 / new / math32
+zsdcc #15242 / new / math32
 6208 bytes less page zero
 
 first number error : 5 * 10^(-7)

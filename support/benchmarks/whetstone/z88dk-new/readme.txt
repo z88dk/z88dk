@@ -93,7 +93,7 @@ MWIPS        = 4.3743 / 1000 = 0.0043743
 
 
 Z88DK August 10, 2026
-zsdcc #12250 / new c library / math32
+zsdcc #15242 / new c library / math32
 24 bit mantissa + 8 bit exponent
 9963 bytes less page zero
 
