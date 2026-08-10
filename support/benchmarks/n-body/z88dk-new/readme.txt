@@ -66,13 +66,13 @@ time @ 4MHz  = 2247889896 / 4*10^6 = 9 min 22 sec
 
 Z88DK August 10, 2026
 zsdcc #15242 / new / math32
-6208 bytes less page zero
+6221 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 761726416
-time @ 4MHz  = 761726416 / 4*10^6 =  3 min 10 sec
+cycle count  = 979455792
+time @ 4MHz  = 979455792 / 4*10^6 =  4 min  5 sec
 
 Z88DK April 28, 2021
 sccz80 / new
@@ -86,13 +86,13 @@ time @ 4MHz  = 2376486525 / 4*10^6 = 9 min 53 sec
 
 Z88DK August 10, 2026
 sccz80 / new / math32
-4834 bytes less page zero
+4827 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 521067955
-time @ 4MHz  = 521067955 / 4*10^6 =  2 min 10 sec
+cycle count  = 790641371
+time @ 4MHz  = 790641371 / 4*10^6 =  3 min 18 sec
 
 Z88DK August 10, 2026
 sccz80 / new / math16

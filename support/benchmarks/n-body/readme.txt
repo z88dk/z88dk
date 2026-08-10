@@ -196,16 +196,16 @@ Energy: -0.1690752 / -0.1690808 (N=1000).
 10.
 Z88DK August 10, 2026
 sccz80 / new c library / math32
-4834 bytes less page zero
+4827 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 521067955
-time @ 4MHz  = 521067955 / 4*10^6 =  2 min 10 sec
+cycle count  = 790641371
+time @ 4MHz  = 790641371 / 4*10^6 =  3 min 18 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
-(After rebuild newlib math32.lib + z80.lib with truncated 32×32.)
+(After sccz80 newlib math32 *_fastcall header remap; sqrt path correct.)
 
 11.
 Z88DK August 10, 2026
