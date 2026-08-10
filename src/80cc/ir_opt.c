@@ -2200,10 +2200,35 @@ static int cmp_result_kind(const Op *op)
     }
 }
 
+/* A load whose result is only ever read as a byte can read ONE byte. Every
+   target here is little-endian, so the low byte is the one at the base
+   address — `ld a,(_sym)` for a global, `ld a,(hl)` for an indirect — and
+   gen_ld_mem already has both forms. The exclusions, each a real defect:
+
+     - a PORT read ignores the dst width and commits a word, which would
+       overrun a one-byte slot (and half-reading a 16-bit port is observable);
+     - a VOLATILE access must keep the width the program asked for;
+     - a post-stepped deref (`*p++`) steps by the ACCESS width, and the
+       byte-lowering steps by one — narrowing a width-2 walk would advance the
+       pointer half as far;
+     - any other mem kind (POOL, FRAME) has no byte path here to fall into. */
+static int ldmem_narrowable(const Op *op)
+{
+    if (op->kind != IR_LD_MEM) return 0;
+    if (op->mem.kind != IR_MEM_SYM && op->mem.kind != IR_MEM_VREG) return 0;
+    if (op->mem.volatile_) return 0;
+    if (op->mem.post_step != 0) return 0;
+    /* __addressmod banked access: the byte path pages in exactly like the word
+       path, but no suite exercises it, so leave it at the width it asked for
+       rather than ship an unvalidated change to banked reads. */
+    if (op->mem.bank_fn) return 0;
+    return 1;
+}
+
 /* Def-side gate: does this op have an 8-bit lowering for its dst? */
 static int narrow_def_kind(const Op *op)
 {
-    return narrow_kind(op) || cmp_result_kind(op);
+    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op);
 }
 
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
