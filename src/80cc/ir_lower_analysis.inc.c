@@ -1133,8 +1133,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
     if (!IS_GBZ80()) {
         emit(out, "ex\tde,hl");                    /* byte-walk: DE -> HL */
     } else {
-        emit(out, "ld\th,d");
-        emit(out, "ld\tl,e");
+        emit_de_to_hl(out);
     }
     invalidate_de_cache();
 }

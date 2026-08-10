@@ -1729,7 +1729,7 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             switch (byte_shift) {
             case 1: emit(out,"ld\tl,h"); emit(out,"ld\th,e");
                     emit(out,"ld\te,d"); emit(out,"ld\td,0"); break;
-            case 2: emit(out,"ld\tl,e"); emit(out,"ld\th,d");
+            case 2: emit_de_to_hl(out);
                     emit(out,"ld\te,0"); emit(out,"ld\td,0"); break;
             case 3: emit(out,"ld\tl,d"); emit(out,"ld\th,0");
                     emit(out,"ld\te,0"); emit(out,"ld\td,0"); break;
@@ -2280,7 +2280,7 @@ static void emit_gb_long_load(FILE *out, const char *sym, int off) {
     emit(out, "ld\ta,(hl+)"); emit(out, "ld\tb,a");   /* B = b1  -> BC = low */
     emit(out, "ld\ta,(hl+)"); emit(out, "ld\te,a");   /* E = b2 */
     emit(out, "ld\td,(hl)");                          /* D = b3  -> DE = high */
-    emit(out, "ld\tl,c"); emit(out, "ld\th,b");       /* HL = low */
+    emit_bc_to_hl(out);                              /* HL = low */
     invalidate_a_cache();
     invalidate_bc_cache();
 }
@@ -2599,8 +2599,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 /* p lives in BC — write the bumped pointer back there so
                    the next iteration sees it (a slot store alone would
                    leave BC stale → infinite loop). */
-                emit(out, "ld\tc,l");
-                emit(out, "ld\tb,h");
+                emit_hl_to_bc(out);
                 invalidate_hl_cache();
                 cache_bc(base);
             } else {
@@ -2630,8 +2629,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             emit(out, "ld\td,(hl)");                   /* DE = *p, HL = p+1 */
             emit_hl_add_offset(out, op->mem.post_step - 1, 0, 0);  /* HL = p+step */
             if (vreg_in_pr_bc(f, base)) {
-                emit(out, "ld\tc,l");
-                emit(out, "ld\tb,h");                  /* BC home = p+step */
+                emit_hl_to_bc(out);                    /* BC home = p+step */
                 invalidate_hl_cache();
                 cache_bc(base);
             } else {
@@ -2665,8 +2663,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 cache_de(op->dst);                     /* value preserved in DE */
                 return 0;
             }
-            emit(out, "ld\tl,e");
-            emit(out, "ld\th,d");                      /* HL = value */
+            emit_de_to_hl(out);                        /* HL = value */
             invalidate_de_cache();
             commit_hl_word(out, f, op->dst);
             return 0;
@@ -2741,8 +2738,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 load_byte_adv(out, "b", 0);     /* B = byte 1  (BC = LOW) */
                 load_byte_adv(out, "e", 0);     /* E = byte 2 */
                 load_byte_adv(out, "d", 1);     /* D = byte 3  (DE = HIGH) */
-                emit(out, "ld\tl,c");
-                emit(out, "ld\th,b");       /* HL = LOW */
+                emit_bc_to_hl(out);         /* HL = LOW */
             } else {
                 emit(out, "ld\te,(hl)");        /* E = byte 0 */
                 emit(out, "inc\thl");
@@ -4625,8 +4621,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                ex de,hl is a 56T push/pop emulation; build the layout
                directly instead (A=b3, C=b2, D=b1, E=b0 here). */
             if (IS_GBZ80()) {
-                emit(out, "ld\th,d");          /* H = b1 */
-                emit(out, "ld\tl,e");          /* L = b0  -> HL = low */
+                emit_de_to_hl(out);            /* HL = b1b0 = low half */
                 emit(out, "ld\td,a");          /* D = b3 */
                 emit(out, "ld\te,c");          /* E = b2  -> DE = high */
             } else {
@@ -4714,8 +4709,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             /* Normalise to canonical DEHL. gbz80 builds it directly to
                dodge the 56T ex de,hl emulation (A=b3, C=b2, D=b1, E=b0). */
             if (IS_GBZ80()) {
-                emit(out, "ld\th,d");           /* H = b1 */
-                emit(out, "ld\tl,e");           /* L = b0  -> HL = low */
+                emit_de_to_hl(out);             /* HL = b1b0 = low half */
                 emit(out, "ld\td,a");           /* D = b3 */
                 emit(out, "ld\te,c");           /* E = b2  -> DE = high */
             } else {

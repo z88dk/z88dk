@@ -229,7 +229,7 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
         if (!strcmp(rp, "hl"))
             return 1;                                /* HL = addr; caller cache_hl */
         if (!strcmp(rp, "de")) { emit_hl_to_de(out); }
-        else                   { emit(out, "ld\tc,l"); emit(out, "ld\tb,h"); }
+        else                   { emit_hl_to_bc(out); }
         invalidate_hl_cache();                       /* HL overwritten by the recompute */
         return 1;
     }
@@ -316,8 +316,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         && byte_home_holds(vreg_id) && f->vregs[vreg_id].width == 2
         && sp_adj == 0) {
         ss_note_cache_read(f, vreg_id);
-        emit(out, "ld\tl,e");
-        emit(out, "ld\th,d");
+        emit_de_to_hl(out);
         hl_about_to_change(vreg_id);   /* HL = home copy; DE still = home */
         return;
     }
@@ -335,8 +334,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        through to a slot reload (e.g. a call result cached in DE by gen_call). */
     if (de_has(vreg_id) && f->vregs[vreg_id].width == 2) {
         ss_note_cache_read(f, vreg_id);
-        emit(out, "ld\tl,e");
-        emit(out, "ld\th,d");
+        emit_de_to_hl(out);
         hl_about_to_change(vreg_id);
         return;
     }

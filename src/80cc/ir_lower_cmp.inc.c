@@ -1231,8 +1231,7 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
             emit(out, "ld\td,0");
             break;
         case 2: /* L=E H=D E=0 D=0; chain the zero through r,r */
-            emit(out, "ld\tl,e");
-            emit(out, "ld\th,d");
+            emit_de_to_hl(out);
             emit(out, "ld\te,0");
             emit(out, "ld\td,e");
             break;

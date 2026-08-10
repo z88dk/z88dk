@@ -340,12 +340,10 @@
 ;; stays = low for any later consumer. (A frameless fastcall long param stored to
 ;; a global collapses to `ld b,h; ld c,l; ld (g),hl; ld (g+2),de`.)
 %title #285e byte-wise BC stash then redundant HL recovery (-2b, -8t)
-	ld	b,h
-	ld	c,l
+	ld	bc,hl
 	ld	hl,bc
 =
-	ld	b,h
-	ld	c,l
+	ld	bc,hl
 
 %title #286a SHL byte_shift=1 shuffle through BC (skip cache-hit HL recovery, -2b)
 	ld	hl,bc
@@ -947,17 +945,16 @@
 	ld	(%2),hl
 	ld	(%3),hl
 
-;; the value round-trips HL->DE->HL (ex de,hl … ld l,e;ld h,d) only to push it
+;; the value round-trips HL->DE->HL (ex de,hl … ld hl,de) only to push it
 ;; via DE across inc sp/inc sp — but the sp bump never touches HL, so push HL
 ;; directly. DE is left holding its prior (dead) value, not the staged HL: the
-;; ld l,e/ld h,d restore shows HL, not DE, is the live output.
+;; ld hl,de restore shows HL, not DE, is the live output.
 %title #DE7 drop dead DE-staging of an HL value across a stack-bump push (-4b)
 	ex	de,hl
 	inc	sp
 	inc	sp
 	push	de
-	ld	l,e
-	ld	h,d
+	ld	hl,de
 =
 	inc	sp
 	inc	sp
@@ -1013,33 +1010,29 @@
 	ld	de,%2
 	inc	hl
 
-;; #GB1: `ld bc,hl` immediately after `ld l,c; ld h,b` is a no-op — those two set
+;; #GB1: `ld bc,hl` immediately after `ld hl,bc` is a no-op — the first sets
 ;; HL=BC, so ld bc,hl writes BC=HL=BC (unchanged). From the DEHL/long-value
-;; staging. Consecutive-only: a label before ld bc,hl breaks the 3-line match.
-%title #GB1 drop no-op ld bc,hl after ld l,c;ld h,b (-1b)
-	ld	l,c
-	ld	h,b
+;; staging. Consecutive-only: a label before ld bc,hl breaks the 2-line match.
+%title #GB1 drop no-op ld bc,hl after ld hl,bc (-1b)
+	ld	hl,bc
 	ld	bc,hl
 =
-	ld	l,c
-	ld	h,b
+	ld	hl,bc
 
-;; #GB2: BC->HL copy (ld l,c;ld h,b) before a FULL HL reload is dead (HL
+;; #GB2: BC->HL copy (ld hl,bc) before a FULL HL reload is dead (HL
 ;; overwritten before use; BC unchanged). %not %1 (hl): ez80 `ld hl,(hl)` READS HL.
-%title #GB2 drop dead ld l,c;ld h,b before a full HL reload (-2b)
+%title #GB2 drop dead ld hl,bc before a full HL reload (-2b)
 %not %1 (hl)
-	ld	l,c
-	ld	h,b
+	ld	hl,bc
 	ld	hl,%1
 =
 	ld	hl,%1
 
-;; #GB3: DE->HL variant of #GB2 (ld h,d;ld l,e = HL=DE). Reverse ld d,h;ld e,l is
+;; #GB3: DE->HL variant of #GB2 (ld hl,de = HL=DE). The reverse ld de,hl is
 ;; NOT dead (DE holds the result) — excluded. %not %1 (hl) for ez80 ld hl,(hl).
-%title #GB3 drop dead ld h,d;ld l,e before a full HL reload (-2b)
+%title #GB3 drop dead ld hl,de before a full HL reload (-2b)
 %not %1 (hl)
-	ld	h,d
-	ld	l,e
+	ld	hl,de
 	ld	hl,%1
 =
 	ld	hl,%1
@@ -1048,8 +1041,7 @@
 ;; push bc directly (push hl==push bc when HL=BC). push de is the DEHL high half.
 %title #GB4 push bc instead of bc->hl copy for a dead push hl (-2b)
 %not %1 (hl)
-	ld	l,c
-	ld	h,b
+	ld	hl,bc
 	push	de
 	push	hl
 	ld	hl,%1
@@ -1060,28 +1052,25 @@
 
 ;; #GB5: #GB3 across an intervening `ld de,%1`. TWO guards: on ez80 either
 ;; `ld de,(hl)` (%1) or `ld hl,(hl)` (%2) reads HL, keeping the copy live.
-%title #GB5 drop dead ld h,d;ld l,e before ld de,X;ld hl,Y (-2b)
+%title #GB5 drop dead ld hl,de before ld de,X;ld hl,Y (-2b)
 %not %1 (hl)
 %not %2 (hl)
-	ld	h,d
-	ld	l,e
+	ld	hl,de
 	ld	de,%1
 	ld	hl,%2
 =
 	ld	de,%1
 	ld	hl,%2
 
-;; #GB6: DE->HL then the reverse HL->DE is a no-op (ld h,d;ld l,e sets HL=DE, then
+;; #GB6: DE->HL then the reverse HL->DE is a no-op (ld hl,de sets HL=DE, then
 ;; ld de,hl sets DE=HL=DE, unchanged). Drop the reverse copy; #GB3 then
-;; collapses the remaining ld h,d;ld l,e before its HL reload. Unconditional
+;; collapses the remaining ld hl,de before its HL reload. Unconditional
 ;; (no ld hl here; #GB3 carries the (hl) guard).
-%title #GB6 drop no-op ld de,hl after ld h,d;ld l,e (-2b)
-	ld	h,d
-	ld	l,e
+%title #GB6 drop no-op ld de,hl after ld hl,de (-2b)
+	ld	hl,de
 	ld	de,hl
 =
-	ld	h,d
-	ld	l,e
+	ld	hl,de
 
 ;; #GB7: fold two consecutive `add sp,N; add sp,M` into one. gbz80/z80 `add sp,d`
 ;; is a signed byte [-128,127]; %check can only bound ONE var, so bound EACH

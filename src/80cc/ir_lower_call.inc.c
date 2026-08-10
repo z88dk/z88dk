@@ -668,7 +668,7 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
         L.cur_sp_adjust -= w;
         if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
             emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
-            if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+            if (hi->acc_store_bc) { emit_hl_to_bc(out); }
             emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
         }
         invalidate_de_cache();
@@ -693,8 +693,7 @@ static int gen_acc_binop(FILE *out, Func *f, const Op *op)
     if (!wide_acc_result_dead_in_acc(f, hi->ret_vreg)) {
         emit_acc_slot_addr(out, f, hi->ret_vreg, 0);
         if (hi->acc_store_bc) {        /* l_i64_store wants the address in BC */
-            emit(out, "ld\tb,h");
-            emit(out, "ld\tc,l");
+            emit_hl_to_bc(out);
         }
         emit_c(out, CLOB_HL, "call\t%s", hi->acc_store);
     }
@@ -738,7 +737,7 @@ static int gen_acc_cmp(FILE *out, Func *f, const Op *op)
 static void store_acc_to_slot(FILE *out, const Func *f, int dst, const HelperInfo *hi)
 {
     emit_acc_slot_addr(out, f, dst, 0);
-    if (hi->acc_store_bc) { emit(out, "ld\tb,h"); emit(out, "ld\tc,l"); }
+    if (hi->acc_store_bc) { emit_hl_to_bc(out); }
     emit(out, "call\t%s", hi->acc_store);
     invalidate_hl_bc();
     *wide_acc_cell(f, dst) = dst;

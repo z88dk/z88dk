@@ -463,7 +463,7 @@ static void emit_trace_check(const char *buf)
 {
     static const char *const stg[] = {
         "ex\tde,hl", "ld\tbc,hl", "ld\tde,hl", "ld\td,h", "ld\te,l",
-        "push\thl", "pop\tde", "ld\tl,c", "ld\th,b", 0 };
+        "push\thl", "pop\tde", "ld\thl,bc", "ld\tl,c", "ld\th,b", 0 };
     for (int i = 0; stg[i]; i++)
         if (strcmp(buf, stg[i]) == 0) {
             char path[256];
@@ -579,6 +579,44 @@ static void emit(FILE *out, const char *fmt, ...)
     va_start(ap, fmt);
     vemit(out, fmt, ap);
     va_end(ap);
+}
+
+/* Word copy HL -> DE, the backend's commonest staging move (7 sites).
+   `ld de,hl` is accepted by z80asm on every target and assembles to exactly
+   what `ld d,h / ld e,l` does — except on Rabbit 4000/6000, where it is a
+   native ONE-byte instruction while the two 8-bit moves are page-prefixed at
+   2 bytes EACH. Four bytes to do what one byte does, at every HL->DE staging
+   site, is where r4k's whole IR_DS_SHARE byte regression came from.
+   Neither form touches flags and D/E do not alias H/L, so this is a pure
+   spelling change everywhere else. The copt rules that matched the pair as
+   TEXT (#G4, #IR-const/sym-to-DE, #GB6 in lib/80cc_rules.1) were updated to
+   match this form, so they keep firing. */
+static void emit_hl_to_de(FILE *out)
+{
+    emit(out, "ld\tde,hl");
+}
+
+/* Word copy DE -> HL, the mirror of emit_hl_to_de and the same bargain:
+   `ld hl,de` is one byte on Rabbit 4000/6000 against 4 for the two
+   page-prefixed 8-bit moves, and assembles to the same 2 bytes as the pair
+   everywhere else. The copt rules that matched the pair as TEXT (#GB3, #GB5,
+   #GB6, #DE7) were updated with it. */
+static void emit_de_to_hl(FILE *out)
+{
+    emit(out, "ld\thl,de");
+}
+
+/* HL <-> BC, same bargain again. The backend already spelled several of these
+   `ld bc,hl` / `ld hl,bc`; these two finish the job so no gp-pair copy is left
+   as two page-prefixed 8-bit moves on Rabbit. copt rules #285e, #GB1, #GB2 and
+   #GB4 matched the pair forms as TEXT and were updated with these. */
+static void emit_hl_to_bc(FILE *out)
+{
+    emit(out, "ld\tbc,hl");
+}
+static void emit_bc_to_hl(FILE *out)
+{
+    emit(out, "ld\thl,bc");
 }
 
 /* Emit a clobbering instruction: apply the declared register-cache clobbers
@@ -1002,10 +1040,18 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
     free(lines); free(size); free(bdep); free(linedep);
 }
 
-/* Post-render peephole: drop a dead one-way register copy `ld h,d; ld l,e`
-   (HL:=DE) or `ld d,h; ld e,l` (DE:=HL) when the destination pair is FULLY
-   reloaded before any use — the next real instruction (skipping labels /
-   blank / comment / C_LINE lines) overwrites the whole pair without reading it.
+/* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
+   or `ld de,hl` (DE:=HL) when the destination pair is FULLY reloaded before any
+   use — the next real instruction (skipping labels / blank / comment / C_LINE
+   lines) overwrites the whole pair without reading it.
+
+   The two-line spellings `ld h,d; ld l,e` / `ld d,h; ld e,l` are still matched:
+   this filter runs on rendered text, and it is cheaper to keep both forms here
+   than to require that every producer of a copy has been converted. THIS IS THE
+   THIRD CONSUMER of that text — the emitters, the copt rules in
+   lib/80cc_rules.1, and this. Changing how a copy is spelled means changing all
+   three together, or a fold silently stops firing: respelling the copy without
+   this hunk cost gbz80 79 bytes, entirely from copies that used to die here.
    The reload is then the first pair-touching instruction on EVERY path leaving
    the copy, so the copy is dead. Sound on all CPUs; in practice only gbz80
    emits the one-way form (z80 recovers via `ex de,hl`), where the copy is a
@@ -1029,18 +1075,20 @@ static void filter_dead_reg_copies(FILE *out, FILE *src)
     }
     char *drop = calloc((size_t)(n > 0 ? n : 1), 1);
     if (drop) {
-        for (int i = 0; i + 1 < n; i++) {
-            const char *pair;
-            if (strcmp(lines[i], "\tld\th,d\n") == 0
-                && strcmp(lines[i + 1], "\tld\tl,e\n") == 0) pair = "hl";
-            else if (strcmp(lines[i], "\tld\td,h\n") == 0
-                && strcmp(lines[i + 1], "\tld\te,l\n") == 0) pair = "de";
+        for (int i = 0; i < n; i++) {
+            const char *pair; int len;
+            if (strcmp(lines[i], "\tld\thl,de\n") == 0)      { pair = "hl"; len = 1; }
+            else if (strcmp(lines[i], "\tld\tde,hl\n") == 0) { pair = "de"; len = 1; }
+            else if (i + 1 < n && strcmp(lines[i], "\tld\th,d\n") == 0
+                     && strcmp(lines[i + 1], "\tld\tl,e\n") == 0) { pair = "hl"; len = 2; }
+            else if (i + 1 < n && strcmp(lines[i], "\tld\td,h\n") == 0
+                     && strcmp(lines[i + 1], "\tld\te,l\n") == 0) { pair = "de"; len = 2; }
             else continue;
-            int j = i + 2;
+            int j = i + len;
             while (j < n && hlde_skippable_between(lines[j])) j++;
             if (j < n && hlde_full_reload(lines[j], pair)) {
-                drop[i] = drop[i + 1] = 1;
-                i++;                                 /* consume the pair */
+                for (int k = 0; k < len; k++) drop[i + k] = 1;
+                i += len - 1;                        /* consume the copy */
             }
         }
     }
@@ -1933,8 +1981,7 @@ static const char *acc_prim(const Func *f, int vreg, const char *which)
 static void emit_acc_store_hl(FILE *out, const Func *f, int vreg)
 {
     if (vreg >= 0 && f->vregs[vreg].kind == KIND_LONGLONG) {
-        emit(out, "ld\tb,h");
-        emit(out, "ld\tc,l");
+        emit_hl_to_bc(out);
     }
     emit(out, "call\t%s", acc_prim(f, vreg, "store"));
 }
@@ -2036,21 +2083,6 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
         emit(out, "ld\t(hl),%s", reg);
         if (!last) emit(out, "inc\thl");
     }
-}
-
-/* Word copy HL -> DE, the backend's commonest staging move (7 sites).
-   `ld de,hl` is accepted by z80asm on every target and assembles to exactly
-   what `ld d,h / ld e,l` does — except on Rabbit 4000/6000, where it is a
-   native ONE-byte instruction while the two 8-bit moves are page-prefixed at
-   2 bytes EACH. Four bytes to do what one byte does, at every HL->DE staging
-   site, is where r4k's whole IR_DS_SHARE byte regression came from.
-   Neither form touches flags and D/E do not alias H/L, so this is a pure
-   spelling change everywhere else. The copt rules that matched the pair as
-   TEXT (#G4, #IR-const/sym-to-DE, #GB6 in lib/80cc_rules.1) were updated to
-   match this form, so they keep firing. */
-static void emit_hl_to_de(FILE *out)
-{
-    emit(out, "ld\tde,hl");
 }
 
 #include "ir_lower_regcache.inc.c"
@@ -3509,8 +3541,7 @@ static void emit_prologue(FILE *out, Func *f)
     } else if (fc_vreg >= 0) {
         int w = f->vregs[fc_vreg].width;
         if (w == 4) {
-            emit(out, "ld\tb,h");        /* low half → BC */
-            emit(out, "ld\tc,l");
+            emit_hl_to_bc(out);          /* low half → BC */
         } else if (w <= 2) {
             emit(out, "ex\tde,hl");      /* arg → DE */
         }
@@ -3526,12 +3557,10 @@ static void emit_prologue(FILE *out, Func *f)
     if (sc1) {
         sdcccall1_params(f, &sc1_p1, &sc1_p2, &sc1_r1, &sc1_r2, &sc1_ok);
         if (sc1_ok && sc1_r1 == SC1_HL) {
-            emit(out, "ld\tb,h");        /* 1st (int) → BC across frame alloc */
-            emit(out, "ld\tc,l");
+            emit_hl_to_bc(out);          /* 1st (int) → BC across frame alloc */
         } else if (sc1_ok && sc1_r1 == SC1_DEHL) {
             emit(out, "ex\tde,hl");      /* sc1 HLDE -> native DEHL (HL=lo, DE=hi) */
-            emit(out, "ld\tb,h");        /* low half → BC across frame alloc */
-            emit(out, "ld\tc,l");
+            emit_hl_to_bc(out);          /* low half → BC across frame alloc */
         } else if (sc1_ok && sc1_r2 == SC1_L) {
             emit(out, "ld\tc,l");        /* 2nd char (L) → C across frame alloc
                                             (1st char in A survives) */
@@ -3591,8 +3620,7 @@ static void emit_prologue(FILE *out, Func *f)
            (the pre-frame stash); HL was clobbered by the frame alloc.
            Reconstruct DEHL (low half from BC) and place it in the param's
            home (DEHL register or slot). */
-        emit(out, "ld\th,b");
-        emit(out, "ld\tl,c");
+        emit_bc_to_hl(out);
         store_dehl_finalize(out, f, fc_vreg);
     } else if (fc_vreg >= 0) {
         /* The arg is now in DE (stashed before the frame alloc). Place it
@@ -3640,12 +3668,10 @@ static void emit_prologue(FILE *out, Func *f)
             if (sc1_r1 == SC1_A) {         /* 1st char in A */
                 store_a_byte(out, f, sc1_p1);
             } else if (sc1_r1 == SC1_DEHL) { /* 1st long: low in BC, high in DE */
-                emit(out, "ld\th,b");      /* native DEHL: HL=low (from BC) */
-                emit(out, "ld\tl,c");
+                emit_bc_to_hl(out);        /* native DEHL: HL=low (from BC) */
                 store_dehl_finalize(out, f, sc1_p1);
             } else {                       /* 1st int stashed in BC */
-                emit(out, "ld\th,b");
-                emit(out, "ld\tl,c");
+                emit_bc_to_hl(out);
                 store_hl(out, f, sc1_p1);
             }
         }
