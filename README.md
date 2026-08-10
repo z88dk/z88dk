@@ -65,6 +65,12 @@ Floating-point comparisons cover genmath, math48, **mbf32** / **mbf32_8085**, IE
 
 CMake can drive Z88DK projects (a toolchain file is provided). See the [CMake](https://github.com/z88dk/z88dk/wiki/CMake) wiki page.
 
+## AI agents and skills
+
+The tree supports AI coding agents. Project rules live in root [`AGENTS.md`](AGENTS.md). Skills live under [`.agents/skills/`](.agents/skills/) (CPU, library, compiler, tools, style, measure). Symlinks [`.grok`](.grok) and [`.claude`](.claude) point at [`.agents`](.agents) so common hosts find the same skill root.
+
+Load a skill only when the task matches its topic. Do not bulk-read every skill. Prefer paths under `.agents/skills/` in links and prose.
+
 ## Using z88dk
 
 Important facts:
