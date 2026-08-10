@@ -95,14 +95,14 @@ cycle count  = 8617785182
 time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 zsdcc #12555 / classic c library / math32
-5819 bytes less page zero
+5699 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4443850004
-time @ 4MHz  = 4443850004 / 4*10^6 =  18 min 31 sec
+cycle count  = 4425446444
+time @ 4MHz  = 4425446444 / 4*10^6 =  18 min 26 sec
 
 
 Z88DK April 20, 2020
@@ -115,44 +115,44 @@ cycle count  = 14688455657
 time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic c library / math32
-5662 bytes less page zero
+5542 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4230851591
-time @ 4MHz  = 4230851591 / 4*10^6 =  17 min 38 sec
+cycle count  = 4212448031
+time @ 4MHz  = 4212448031 / 4*10^6 =  17 min 33 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic c library / 8085 / math32
-6823 bytes less page zero
+6707 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9060218940
-time @ 4MHz  = 9060218940 / 4*10^6 =  37 min 45 sec
+cycle count  = 9013766882
+time @ 4MHz  = 9013766882 / 4*10^6 =  37 min 33 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 80cc / classic c library / math32
-6332 bytes less page zero
+5890 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9429450646
-time @ 4MHz  = 9429450646 / 4*10^6 =  39 min 17 sec
+cycle count  = 4716380923
+time @ 4MHz  = 4716380923 / 4*10^6 =  19 min 39 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 80cc / classic c library / 8085 / math32
-7509 bytes less page zero
+7003 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 18529104893
-time @ 4MHz  = 18529104893 / 4*10^6 =  1 hr 17 min
+cycle count  = 9819185683
+time @ 4MHz  = 9819185683 / 4*10^6 =  40 min 55 sec
 
 
 Z88DK July 19, 2026
@@ -175,21 +175,21 @@ cycle count  = 6227757878
 time @ 4MHz  = 6227757878 / 4*10^6 = 25 min 57 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic c library / math16
-3868 bytes less page zero
+3833 bytes less page zero
 
-cycle count  = 2529478133
-time @ 4MHz  = 2529478133 / 4*10^6 =  10 min 32 sec
+cycle count  = 2531057653
+time @ 4MHz  = 2531057653 / 4*10^6 =  10 min 33 sec
 
 IEEE 16-bit half-float implementation (math16).
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic c library / 8085 / math16
-3837 bytes less page zero
+3802 bytes less page zero
 
-cycle count  = 3435564449
-time @ 4MHz  = 3435564449 / 4*10^6 =  14 min 19 sec
+cycle count  = 3438830098
+time @ 4MHz  = 3438830098 / 4*10^6 =  14 min 20 sec
 
 IEEE 16-bit half-float implementation (math16_8085).

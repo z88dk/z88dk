@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 # Remeasure support/benchmarks math16/math32 TIMER configs (classic + newlib).
 # Parallelism: 4 workers. Isolated workdirs (zcc is not cwd-safe in parallel).
+#
+# Paths are derived from this script's location (…/z88dk/.agents/scripts/), not
+# a hard-coded home directory. Override ROOT / ZCCCFG / WORK if needed.
 set -u
-export PATH=/home/phillip/Z80/z88dk/bin:$PATH
-export ZCCCFG=/home/phillip/Z80/z88dk/lib/config
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="${ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+export PATH="$ROOT/bin${PATH:+:$PATH}"
+export ZCCCFG="${ZCCCFG:-$ROOT/lib/config}"
 
-ROOT=/home/phillip/Z80/z88dk
 BENCH_ROOT="$ROOT/support/benchmarks"
-WORK=/tmp/z88dk-bench-20260809
+# Default workdir; override with WORK=… or pass a dated path.
+WORK="${WORK:-/tmp/z88dk-bench-$(date +%Y%m%d)}"
 JOBS_DIR="$WORK/jobs"
 RESULTS="$WORK/results.tsv"
 LOG="$WORK/run.log"
 STATUS="$WORK/status.txt"
-DATE_LABEL="August 9, 2026"
-THREADS=4
+DATE_LABEL="${DATE_LABEL:-$(date '+%B %-d, %Y')}"
+THREADS="${THREADS:-4}"
 COUNTER=999999999999
 
 mkdir -p "$JOBS_DIR"

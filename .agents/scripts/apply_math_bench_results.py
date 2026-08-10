@@ -136,46 +136,69 @@ def replace_result_block(
     *,
     whet: bool = False,
 ) -> tuple[str, int]:
-    """Update one RESULT block whose title line matches title_re."""
+    """Update one RESULT block whose title line matches title_re.
+
+    Prefer a match that is followed by a ``cycle count`` line (RESULT body).
+    Recipe-only title lines (compile command lists) are skipped so the first
+    hit is not a non-RESULT occurrence of the same label.
+    """
     lines = text.splitlines(keepends=True)
     # Match whole title line (strip); avoid accidental substring hits.
     title_pat = re.compile(rf"^(?:{title_re})\s*$")
-    hits = 0
-    for i, line in enumerate(lines):
-        if not title_pat.match(line.rstrip("\n")):
-            continue
-        hits = 1
-        for b in range(i, max(-1, i - 4), -1):
-            if lines[b].startswith("Z88DK "):
-                lines[b] = f"Z88DK {date_full}\n"
-                break
-        # Only edit this RESULT block: stop before the next Z88DK-dated entry
-        # (do not walk into the following block's size/cycle/time lines).
+
+    def block_end(i: int) -> int:
         j_end = len(lines)
         for j in range(i + 1, len(lines)):
             if lines[j].startswith("Z88DK "):
-                j_end = j
-                break
-            # numbered archive entries "11." / "10b." before next Z88DK
+                return j
             if re.match(r"^\d+[a-z]?\.\s*$", lines[j]):
-                j_end = j
-                break
+                return j
+        return j_end
+
+    def has_cycle_count(i: int, j_end: int) -> bool:
         for j in range(i, j_end):
-            if re.search(r"^\d+ bytes less page zero", lines[j]):
-                lines[j] = f"{size} bytes less page zero\n"
-            m = re.match(r"^(cycle count\s*=\s*)\d+\s*$", lines[j])
-            if m:
-                lines[j] = f"{m.group(1)}{ticks}\n"
-            if lines[j].startswith("time @ 4MHz"):
-                lines[j] = time_line(ticks, whet=whet) + "\n"
-            if whet and lines[j].startswith("KWIPS"):
-                kline, _ = kwips_lines(ticks)
-                lines[j] = kline + "\n"
-            if whet and lines[j].startswith("MWIPS"):
-                _, mline = kwips_lines(ticks)
-                lines[j] = mline + "\n"
-        break
-    return "".join(lines), hits
+            if re.match(r"^cycle count\s*=\s*\d+\s*$", lines[j]):
+                return True
+        return False
+
+    # Collect candidate title lines; prefer ones with a cycle-count body.
+    candidates: list[int] = []
+    for i, line in enumerate(lines):
+        if title_pat.match(line.rstrip("\n")):
+            candidates.append(i)
+    if not candidates:
+        return text, 0
+
+    chosen = None
+    for i in candidates:
+        if has_cycle_count(i, block_end(i)):
+            chosen = i
+            break
+    if chosen is None:
+        # No RESULT body for this title (summary-only / recipe-only).
+        return text, 0
+
+    i = chosen
+    for b in range(i, max(-1, i - 4), -1):
+        if lines[b].startswith("Z88DK "):
+            lines[b] = f"Z88DK {date_full}\n"
+            break
+    j_end = block_end(i)
+    for j in range(i, j_end):
+        if re.search(r"^\d+ bytes less page zero", lines[j]):
+            lines[j] = f"{size} bytes less page zero\n"
+        m = re.match(r"^(cycle count\s*=\s*)\d+\s*$", lines[j])
+        if m:
+            lines[j] = f"{m.group(1)}{ticks}\n"
+        if lines[j].startswith("time @ 4MHz"):
+            lines[j] = time_line(ticks, whet=whet) + "\n"
+        if whet and lines[j].startswith("KWIPS"):
+            kline, _ = kwips_lines(ticks)
+            lines[j] = kline + "\n"
+        if whet and lines[j].startswith("MWIPS"):
+            _, mline = kwips_lines(ticks)
+            lines[j] = mline + "\n"
+    return "".join(lines), 1
 
 
 # job_id → list of (path_rel, kind, kwargs)
@@ -205,7 +228,7 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
         "nb_c_zsdcc_z80_m32",
         ("support/benchmarks/n-body/readme.txt", "summary", dict(compiler="zsdcc", cpu="z80", math="math32")),
         ("support/benchmarks/n-body/readme.txt", "result", dict(title=r"zsdcc / classic / math32")),
-        ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"zsdcc / classic / math32")),
+        ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"zsdcc #12070 / classic|zsdcc / classic / math32")),
     )
     add(
         "nb_c_sccz80_z80_m16",
@@ -286,7 +309,7 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
     )
     add(
         "sn_n_sccz80_z80_m32",
-        ("support/benchmarks/spectral-norm/readme.txt", "result", dict(title=r"sccz80 / new c library / math32")),
+        ("support/benchmarks/spectral-norm/readme.txt", "result", dict(title=r"sccz80 / new c library / math32|sccz80 / new c library")),
         ("support/benchmarks/spectral-norm/z88dk-new/readme.txt", "result", dict(title=r"sccz80 / new c library / math32")),
     )
 
@@ -324,18 +347,18 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
     add(
         "md_c_sccz80_z80_m16",
         ("support/benchmarks/mandelbrot/readme.txt", "summary", dict(compiler="sccz80", cpu="z80", math="math16")),
-        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / classic / math16")),
+        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / classic c library / math16")),
         ("support/benchmarks/mandelbrot/z88dk-classic/readme.txt", "result", dict(title=r"sccz80 / classic / math16")),
     )
     add(
         "md_c_sccz80_8085_m16",
         ("support/benchmarks/mandelbrot/readme.txt", "summary", dict(compiler="sccz80", cpu="8085", math="math16")),
-        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / classic / 8085 / math16")),
+        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / classic c library / 8085 / math16")),
         ("support/benchmarks/mandelbrot/z88dk-classic/readme.txt", "result", dict(title=r"sccz80 / classic / 8085 / math16")),
     )
     add(
         "md_n_sccz80_z80_m32",
-        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / new / math32")),
+        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / new c library / math32|sccz80 / new / math32")),
         ("support/benchmarks/mandelbrot/z88dk-new/readme.txt", "result", dict(title=r"sccz80 / new / math32")),
     )
     add(
@@ -345,7 +368,7 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
     )
     add(
         "md_n_sccz80_z80_m16",
-        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / new / math16")),
+        ("support/benchmarks/mandelbrot/readme.txt", "result", dict(title=r"sccz80 / new c library / math16|sccz80 / new / math16")),
         ("support/benchmarks/mandelbrot/z88dk-new/readme.txt", "result", dict(title=r"sccz80 / new / math16")),
     )
 
@@ -530,10 +553,10 @@ def main(argv: list[str] | None = None) -> int:
         required=False,
         help="results.tsv from run_math_benches.sh",
     )
-    ap.add_argument("--date", default="August 9, 2026", help="RESULT date line")
+    ap.add_argument("--date", default="August 10, 2026", help="RESULT date line")
     ap.add_argument(
         "--date-summary",
-        default="Aug 9, 2026",
+        default="Aug 10, 2026",
         help="SUMMARY table parenthetical date",
     )
     ap.add_argument("--dry-run", action="store_true")

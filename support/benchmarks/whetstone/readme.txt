@@ -139,9 +139,9 @@ z88dk-classic/readme.txt.
 
 Compiler | CPU  | Library | Ticks           | KWIPS @ 4 MHz
 ---------|------|---------|-----------------|----------------
-sccz80   | z80  | math32  | 362_679_466     | 11.0290  (Aug 9, 2026)
-zsdcc    | z80  | math32  | 370_479_491     | 10.7968  (Aug 9, 2026)
-sccz80   | 8085 | math32  | 766_121_251   | 5.2211  (Aug 9, 2026)
+sccz80   | z80  | math32  | 362_151_861     | 11.0451  (Aug 10, 2026)
+zsdcc    | z80  | math32  | 369_951_886     | 10.8122  (Aug 10, 2026)
+sccz80   | 8085 | math32  | 764_716_694   | 5.2307  (Aug 10, 2026)
 sccz80   | z80  | mbf32   | 544_395_320     | 7.3476  (Jul 2026)
 sccz80   | 8085 | mbf32   | 548_321_291     | 7.2950  (Jul 2026)
 80cc     | z80  | mbf32   | 558_782_473     | 7.1584  (Jul 2026)
@@ -231,7 +231,7 @@ MWIPS        = 2.6816 / 1000 = 0.0026816
 SDCC implements its float library in C.
 
 8.
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 zsdcc #12250 / new c library / math32
 24 bit mantissa + 8 bit exponent
 9963 bytes less page zero
@@ -242,50 +242,50 @@ KWIPS        = 100*10*1 / 130.1669 = 7.6824
 MWIPS        = 7.6824 / 1000 = 0.0076824
 
 9.
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9161 bytes less page zero
+9034 bytes less page zero
 
-cycle count  = 516483652
-time @ 4MHz  = 516483652 / 4x10^6 = 129.1209 seconds
-KWIPS        = 100*10*1 / 129.1209 = 7.7447
-MWIPS        = 7.7447 / 1000 = 0.0077447
+cycle count  = 268628518
+time @ 4MHz  = 268628518 / 4x10^6 = 67.1571 seconds
+KWIPS        = 100*10*1 / 67.1571 = 14.8905
+MWIPS        = 14.8905 / 1000 = 0.0148905
 
 10.
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic c library / math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-9931 bytes less page zero
+9811 bytes less page zero
 
-cycle count  = 362679466
-time @ 4MHz  = 362679466 / 4x10^6 = 90.6699 seconds
-KWIPS        = 100*10*1 / 90.6699 = 11.0290
-MWIPS        = 11.0290 / 1000 = 0.0110290
+cycle count  = 362151861
+time @ 4MHz  = 362151861 / 4x10^6 = 90.5380 seconds
+KWIPS        = 100*10*1 / 90.5380 = 11.0451
+MWIPS        = 11.0451 / 1000 = 0.0110451
 
 (After floor/ceil call fix and ldexp negative-pw2 fix; exp path correct.)
 
 10b.
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 zsdcc / classic c library / math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-10712 bytes less page zero
+10592 bytes less page zero
 
-cycle count  = 370479491
-time @ 4MHz  = 370479491 / 4x10^6 = 92.6199 seconds
-KWIPS        = 100*10*1 / 92.6199 = 10.7968
-MWIPS        = 10.7968 / 1000 = 0.0107968
+cycle count  = 369951886
+time @ 4MHz  = 369951886 / 4x10^6 = 92.4880 seconds
+KWIPS        = 100*10*1 / 92.4880 = 10.8122
+MWIPS        = 10.8122 / 1000 = 0.0108122
 
 11.
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic c library / 8085 / math32
 IEEE 32-bit float (math32_8085)
-11760 bytes less page zero
+11644 bytes less page zero
 
-cycle count  = 766121251
-time @ 4MHz  = 766121251 / 4x10^6 = 191.5303 seconds
-KWIPS        = 100*10*1 / 191.5303 = 5.2211
-MWIPS        = 5.2211 / 1000 = 0.0052211
+cycle count  = 764716694
+time @ 4MHz  = 764716694 / 4x10^6 = 191.1792 seconds
+KWIPS        = 100*10*1 / 191.1792 = 5.2307
+MWIPS        = 5.2307 / 1000 = 0.0052307
 
 12.
 Z88DK July 19, 2026

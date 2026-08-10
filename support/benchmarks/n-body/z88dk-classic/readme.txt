@@ -86,15 +86,15 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 28, 2021
+Z88DK August 10, 2026
 zsdcc #12070 / classic
-5246 bytes less page zero
+6597 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 2253709929
-time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
+cycle count  = 843047242
+time @ 4MHz  = 843047242 / 4*10^6 =  3 min 31 sec
 
 
 Z88DK January 3, 2022
@@ -130,45 +130,45 @@ cycle count  = 1835079611
 time @ 4MHz  = 1835079611 / 4*10^6 =  7 min 39 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic / math32
-5792 bytes less page zero
+5672 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 791166003
-time @ 4MHz  = 791166003 / 4*10^6 =  3 min 18 sec
+cycle count  = 791103882
+time @ 4MHz  = 791103882 / 4*10^6 =  3 min 18 sec
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic / 8085 / math32
-7004 bytes less page zero
+6888 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 7 * 10^(-6)
 
-cycle count  = 1590093906
-time @ 4MHz  = 1590093906 / 4*10^6 =  6 min 38 sec
+cycle count  = 1589707677
+time @ 4MHz  = 1589707677 / 4*10^6 =  6 min 37 sec
 
 Energy: -0.1690752 / -0.1690808 (N=1000).
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic / math16
-4283 bytes less page zero
+4248 bytes less page zero
 
-cycle count  = 295597764
-time @ 4MHz  = 295597764 / 4*10^6 =  1 min 14 sec
+cycle count  = 295642916
+time @ 4MHz  = 295642916 / 4*10^6 =  1 min 14 sec
 
 IEEE 16-bit half-float (math16). DT=1e-1 for half range.
 
 
-Z88DK August 9, 2026
+Z88DK August 10, 2026
 sccz80 / classic / 8085 / math16
-4059 bytes less page zero
+4024 bytes less page zero
 
-cycle count  = 344362740
-time @ 4MHz  = 344362740 / 4*10^6 =  1 min 26 sec
+cycle count  = 344383717
+time @ 4MHz  = 344383717 / 4*10^6 =  1 min 26 sec
 
 IEEE 16-bit half-float (math16_8085). DT=1e-1 for half range.
