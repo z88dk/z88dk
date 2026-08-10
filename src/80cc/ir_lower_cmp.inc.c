@@ -4,6 +4,17 @@
    etc.): plain z80, z80n, ez80. NOT z180 (undoc index-half opcodes trap), NOT
    kc160 (z80asm rejects `iyl`/`iyh` as illegal identifiers), Rabbit (no index
    halves), 808x/gbz80 (no index registers). */
+/* [IR_CMPK] Byte-wise width-2 compare against a constant: keeps HL and DE free
+   where `sbc hl,de` clobbers both. Default on; IR_CMPK=0 opts out.
+   808x/gbz80 already lowered the compare byte-wise but still staged the constant
+   into DE via load_binop_operands; the immediate form frees it there too. */
+static int cmpk_enabled(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_CMPK"); v = (e && e[0] == '0') ? 0 : 1; }
+    return v;
+}
+
 static int cpu_has_index_halves(void)
 {
     return c_cpu == CPU_Z80 || IS_Z80N() || IS_EZ80();
@@ -330,6 +341,41 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         L.rs.a = -1;                      /* A clobbered; HL/DE/BC untouched */
         L.la.cur_skip_next_op = 1;
         return 0;
+    }
+    /* Width-2 UNSIGNED vs any CONSTANT, branch-fused, byte-wise through A:
+       `ld a,lo; sub K_lo; ld a,hi; sbc a,K_hi` lands CF = unsigned borrow
+       (x < K) using ONLY A. Same byte count as `ld de,K; and a; sbc hl,de`, but
+       that form DESTROYS HL and occupies DE; this one leaves both free, which is
+       what lets a loop-invariant stay resident (sieve's inner loop reloaded `i`
+       from the stack every iteration purely because DE was the compare's).
+       Reads the operand where it already lives (cmp_byte_src). The low-byte-zero
+       case above is shorter still, so it goes first. IR_CMPK. */
+    if ((op->kind == IR_CMP_ULT || op->kind == IR_CMP_UGE)
+        && cmpk_enabled()
+        && op->src[0] >= 0 && op->src[1] == -1 && op->imm_sym == NULL
+        && g_hc.branch_test_kind != 0
+        && f->vregs[op->src[0]].width == 2
+        && op->imm >= 0 && op->imm <= 0xffff) {
+        char klo[16], khi[16];
+        int cls = cmp_byte_src(f, op->src[0], cpu_has_index_halves(),
+                               klo, khi, sizeof klo);
+        if (cls) {
+            if (cls == 2 && op_is_ixd_slot(f, op->src[0]))
+                ss_note_reload(f, op->src[0]);
+            else
+                ss_note_cache_read(f, op->src[0]);
+            emit(out, "ld\ta,%s", klo);
+            emit(out, "sub\t%u", (unsigned)(op->imm & 0xff));
+            emit(out, "ld\ta,%s", khi);
+            emit(out, "sbc\ta,%u", (unsigned)(((uint16_t)op->imm >> 8) & 0xff));
+            int br_true = (g_hc.branch_test_kind == IR_BR_COND);
+            int want_carry = (cf_true_long == br_true);
+            emit(out, "jp\t%s,L_f%d_bb_%d", want_carry ? "c" : "nc",
+                 L.func_emit_idx, L.la.cur_branch_test_label);
+            L.rs.a = -1;              /* A clobbered; HL/DE/BC all survive */
+            L.la.cur_skip_next_op = 1;
+            return 0;
+        }
     }
     /* Signed byte vs const: bias both operands by 0x80 to map [-128,127] onto
        [0,255] order-preservingly, then an unsigned `cp`. `c < K` (signed) iff
