@@ -352,11 +352,8 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             L.la.cur_skip_next_op = 1;
             return 0;
         }
-        emit(out, "ld\thl,0");
-        emit_skip(out, f, cf_true_long ? "nc" : "c", 1);  /* skip inc when result is 0 */
-        emit(out, "inc\tl");
-        commit_hl_word(out, f, op->dst);
-        L.rs.a = -1;
+        L.rs.a = -1;                        /* the cp above clobbered A */
+        commit_carry_bool(out, f, op->dst, cf_true_long);
         return 0;
     }
     /* Byte compare vs small const: a width-1 operand loads zero-extended, so
@@ -483,8 +480,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
             L.la.cur_skip_next_op = 1;
             return 0;
         }
-        carry_to_bool(out, f, cf_true_long);
-        commit_hl_word(out, f, op->dst);
+        commit_carry_bool(out, f, op->dst, cf_true_long);
         return 0;
     }
     /* Byte-wise unsigned loop test: LHS in BC, RHS in a slot, branch-fused.
@@ -655,8 +651,7 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         L.la.cur_skip_next_op = 1;
         return 0;
     }
-    carry_to_bool(out, f, cf_true);
-    commit_hl_word(out, f, op->dst);
+    commit_carry_bool(out, f, op->dst, cf_true);
     return 0;
 }
 
@@ -794,8 +789,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
             L.la.cur_skip_next_op = 1;
             return 0;
         }
-        carry_to_bool(out, f, cf_true_gt);
-        commit_hl_word(out, f, op->dst);
+        commit_carry_bool(out, f, op->dst, cf_true_gt);
         return 0;
     }
     /* Swap operand load to reuse the ordering arithmetic (DE=src0, HL=src1). */
@@ -845,8 +839,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         L.la.cur_skip_next_op = 1;
         return 0;
     }
-    carry_to_bool(out, f, cf_true);
-    commit_hl_word(out, f, op->dst);
+    commit_carry_bool(out, f, op->dst, cf_true);
     return 0;
 }
 
@@ -966,10 +959,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             L.la.cur_skip_next_op = 1;
             return 0;
         }
-        emit(out, "ld\thl,0");
-        emit_skip(out, f, z_true_long ? "nz" : "z", 1);
-        emit(out, "inc\tl");
-        commit_hl_word(out, f, op->dst);
+        commit_flag_bool(out, f, op->dst, z_true_long ? "nz" : "z");
         return 0;
     }
     /* Byte == 0 / != 0 (e.g. `!flags[k]`): test the byte with `or a` (via
@@ -986,10 +976,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             L.la.cur_skip_next_op = 1;
             return 0;
         }
-        emit(out, "ld\thl,0");
-        emit_skip(out, f, z_true_b ? "nz" : "z", 1);
-        emit(out, "inc\tl");
-        commit_hl_word(out, f, op->dst);
+        commit_flag_bool(out, f, op->dst, z_true_b ? "nz" : "z");
         return 0;
     }
     /* Byte == byte / byte == const(0..255): compare in A with `cp`, no 16-bit
@@ -1017,10 +1004,7 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             L.la.cur_skip_next_op = 1;
             return 0;
         }
-        emit(out, "ld\thl,0");
-        emit_skip(out, f, z_true_b ? "nz" : "z", 1);
-        emit(out, "inc\tl");
-        commit_hl_word(out, f, op->dst);
+        commit_flag_bool(out, f, op->dst, z_true_b ? "nz" : "z");
         return 0;
     }
     /* Equality is sign-independent. Real-ALU CPUs: `or a; sbc hl,de` sets
@@ -1103,18 +1087,24 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
     }
     if (IS_RABBIT()) {
         /* Rabbit: HL = src0-src1. bool hl → 0/1 = NE; for EQ,
-           bool hl;dec hl;bool hl inverts it (logical NOT). */
+           bool hl;dec hl;bool hl inverts it (logical NOT). No flag-skip form
+           here, so a byte dst takes the boolean out of L rather than the
+           `ld a,0 / skip / inc a` shape — the commit still writes one byte. */
         emit(out, "bool\thl");
         if (z_true) {
             emit(out, "dec\thl");
             emit(out, "bool\thl");
         }
-    } else {
-        emit(out, "ld\thl,0");
-        emit_skip(out, f, z_true ? "nz" : "z", 1);
-        emit(out, "inc\tl");
+        if (op->dst >= 0 && op->dst < f->n_vregs && f->vregs[op->dst].width == 1) {
+            emit(out, "ld\ta,l");
+            invalidate_hl_keep_de();       /* `bool hl` overwrote HL */
+            commit_a_byte(out, f, op->dst);
+            return 0;
+        }
+        commit_hl_word(out, f, op->dst);
+        return 0;
     }
-    commit_hl_word(out, f, op->dst);
+    commit_flag_bool(out, f, op->dst, z_true ? "nz" : "z");
     return 0;
 }
 
