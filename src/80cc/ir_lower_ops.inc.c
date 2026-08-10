@@ -812,8 +812,7 @@ static int gen_memset(FILE *out, Func *f, const Op *op)
         emit(out, "djnz\tL_f%d_memset_loop_%d", L.func_emit_idx, lbl);
     } else {
         emit(out, "ld\t(hl),e");      /* dst[0] = fill */
-        emit(out, "ld\td,h");
-        emit(out, "ld\te,l");
+        emit_hl_to_de(out);
         emit(out, "inc\tde");         /* DE = dst+1, HL = dst */
         emit(out, "ld\tbc,%d", n - 1);
         emit(out, "ldir");
@@ -1740,7 +1739,7 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             switch (byte_shift) {
             case 1: emit(out,"ld\td,e"); emit(out,"ld\te,h");
                     emit(out,"ld\th,l"); emit(out,"ld\tl,0"); break;
-            case 2: emit(out,"ld\td,h"); emit(out,"ld\te,l");
+            case 2: emit_hl_to_de(out);
                     emit(out,"ld\th,0"); emit(out,"ld\tl,0"); break;
             case 3: emit(out,"ld\td,l"); emit(out,"ld\te,0");
                     emit(out,"ld\th,0"); emit(out,"ld\tl,0"); break;
@@ -1997,8 +1996,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tl,0");
             break;
         case 2: /* D=H E=L H=0 L=0; chain the zero through r,r */
-            emit(out, "ld\td,h");
-            emit(out, "ld\te,l");
+            emit_hl_to_de(out);
             emit(out, "ld\th,0");
             emit(out, "ld\tl,h");
             break;

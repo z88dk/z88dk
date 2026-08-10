@@ -228,7 +228,7 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
         emit(out, "add\thl,sp");
         if (!strcmp(rp, "hl"))
             return 1;                                /* HL = addr; caller cache_hl */
-        if (!strcmp(rp, "de")) { emit(out, "ld\td,h"); emit(out, "ld\te,l"); }
+        if (!strcmp(rp, "de")) { emit_hl_to_de(out); }
         else                   { emit(out, "ld\tc,l"); emit(out, "ld\tb,h"); }
         invalidate_hl_cache();                       /* HL overwritten by the recompute */
         return 1;
@@ -917,8 +917,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
            2 bytes against the 6+ the store cost, and it keeps the elided
            render's register state identical to the render the deadness was
            measured on — which is what makes "rd=0 last time" still true. */
-        emit(out, "ld\te,l");
-        emit(out, "ld\td,h");
+        emit_hl_to_de(out);
         cache_de(vreg_id);
         cache_hl(vreg_id);
         return 1;

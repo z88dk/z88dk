@@ -895,8 +895,7 @@ static int gen_hcall(FILE *out, Func *f, const Op *op)
                 for (int j = i + 1; j < hi->n_args; j++)
                     if (hi->args[j] == L.rs.hl) {
                         int keep = L.rs.hl;
-                        emit(out, "ld\te,l");
-                        emit(out, "ld\td,h");
+                        emit_hl_to_de(out);
                         cache_de(keep);
                         break;
                     }

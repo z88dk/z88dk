@@ -1163,8 +1163,7 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        physical DE pair (the copy would corrupt the resident home). */
     if (v >= 0 && f->de_fold_hint && f->de_fold_hint[v]
         && hl_has(v) && !g_hc.home_is_word && g_hc.de_home < 0) {
-        emit(out, "ld\td,h");
-        emit(out, "ld\te,l");
+        emit_hl_to_de(out);
         cache_de(v);
     }
 }

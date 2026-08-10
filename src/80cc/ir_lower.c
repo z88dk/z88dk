@@ -462,7 +462,7 @@ static void clob_verify_report(void)
 static void emit_trace_check(const char *buf)
 {
     static const char *const stg[] = {
-        "ex\tde,hl", "ld\tbc,hl", "ld\td,h", "ld\te,l",
+        "ex\tde,hl", "ld\tbc,hl", "ld\tde,hl", "ld\td,h", "ld\te,l",
         "push\thl", "pop\tde", "ld\tl,c", "ld\th,b", 0 };
     for (int i = 0; stg[i]; i++)
         if (strcmp(buf, stg[i]) == 0) {
@@ -2036,6 +2036,21 @@ static void store_byte_adv(FILE *out, const char *reg, int last)
         emit(out, "ld\t(hl),%s", reg);
         if (!last) emit(out, "inc\thl");
     }
+}
+
+/* Word copy HL -> DE, the backend's commonest staging move (7 sites).
+   `ld de,hl` is accepted by z80asm on every target and assembles to exactly
+   what `ld d,h / ld e,l` does — except on Rabbit 4000/6000, where it is a
+   native ONE-byte instruction while the two 8-bit moves are page-prefixed at
+   2 bytes EACH. Four bytes to do what one byte does, at every HL->DE staging
+   site, is where r4k's whole IR_DS_SHARE byte regression came from.
+   Neither form touches flags and D/E do not alias H/L, so this is a pure
+   spelling change everywhere else. The copt rules that matched the pair as
+   TEXT (#G4, #IR-const/sym-to-DE, #GB6 in lib/80cc_rules.1) were updated to
+   match this form, so they keep firing. */
+static void emit_hl_to_de(FILE *out)
+{
+    emit(out, "ld\tde,hl");
 }
 
 #include "ir_lower_regcache.inc.c"

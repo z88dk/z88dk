@@ -593,13 +593,12 @@
 	ld	hl,%2
 	ld	de,%1
 
-%title #G4 IR gbz80 ex de,hl + ld hl -> ld d,h;ld e,l (emulated ex is push/pop x4)
+%title #G4 IR gbz80 ex de,hl + ld hl -> ld de,hl (emulated ex is push/pop x4)
 %cpu gbz80
 	ex	de,hl
 	ld	hl,%1
 =
-	ld	d,h
-	ld	e,l
+	ld	de,hl
 	ld	hl,%1
 
 %title #IR drop dead ld a,l after a byte widen (ld l,a makes A==L, ld h,0 keeps it)
@@ -663,11 +662,10 @@
 	ld	de,%1
 	ld	hl,%2
 
-%title #IR const/sym straight to DE, gbz80 emulated-swap form (ld d,h;ld e,l copies HL->DE; same symbol/immediate-only guard)
+%title #IR const/sym straight to DE, gbz80 emulated-swap form (ld de,hl copies HL->DE; same symbol/immediate-only guard)
 %cpu gbz80
 	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
-	ld	d,h
-	ld	e,l
+	ld	de,hl
 	ld	hl,%2
 =
 	ld	de,%1
@@ -1074,14 +1072,13 @@
 	ld	hl,%2
 
 ;; #GB6: DE->HL then the reverse HL->DE is a no-op (ld h,d;ld l,e sets HL=DE, then
-;; ld d,h;ld e,l sets DE=HL=DE, unchanged). Drop the reverse pair; #GB3 then
+;; ld de,hl sets DE=HL=DE, unchanged). Drop the reverse copy; #GB3 then
 ;; collapses the remaining ld h,d;ld l,e before its HL reload. Unconditional
 ;; (no ld hl here; #GB3 carries the (hl) guard).
-%title #GB6 drop no-op ld d,h;ld e,l after ld h,d;ld l,e (-2b)
+%title #GB6 drop no-op ld de,hl after ld h,d;ld l,e (-2b)
 	ld	h,d
 	ld	l,e
-	ld	d,h
-	ld	e,l
+	ld	de,hl
 =
 	ld	h,d
 	ld	l,e
