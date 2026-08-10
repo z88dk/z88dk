@@ -659,7 +659,6 @@ static const char *float_helper(Kind k, const char *base)
         { "f2ulong", "l_f16_f2ulong", "l_f32_f2ulong" },
         { "ftof16",  NULL,            "l_f32_ftof16"  },
         { "f16tof",  NULL,            "l_f32_f16tof"  },
-        { "invf",    "l_f16_invf",    "l_f32_invf"    },
         { NULL, NULL, NULL }
     };
     int is16 = (k == KIND_FLOAT16);
@@ -1005,41 +1004,6 @@ static int emit_float_arith(Builder *b, Kind fk, const char *stem,
     HelperInfo *hi = calloc(1, sizeof(HelperInfo));
     hi->name = name; hi->args = args; hi->n_args = 2;
     hi->n_stacked = 1; hi->ret_vreg = dst;
-    op->hcall = hi;
-    return dst;
-}
-
-/* True when `n` is a numeric literal equal to 1 (int `1` or float `1.0`) —
-   the dividend that turns `1.0 / x` into a reciprocal. */
-static int node_is_numeric_one(Node *n)
-{
-    return n && n->ast_type == AST_LITERAL && (double)n->zval == 1.0;
-}
-
-/* Reciprocal-eligible float kinds, mirroring sccz80 zdiv_dconst: the half
-   float and IEEE single ship an inverse helper; the acc-tier 48/64-bit
-   doubles and MBF32 do not, so `1.0/x` stays a full divide there. */
-static int float_reciprocal_ok(Kind fk)
-{
-    if (fk == KIND_FLOAT16) return 1;
-    if (fk == KIND_DOUBLE && c_fp_size == 4 && c_maths_mode == MATHS_IEEE)
-        return 1;
-    return 0;
-}
-
-/* Emit a register-float reciprocal HCALL (l_f{16,32}_invf) computing 1/rv.
-   Unary ABI: operand in HL/DEHL, result in HL/DEHL. Returns the result
-   vreg or -1 if fk has no inverse helper. */
-static int emit_float_reciprocal(Builder *b, Kind fk, int rv)
-{
-    const char *name = float_helper(fk, "invf");
-    if (!name) return -1;
-    int dst = new_temp_kind(b, fk);
-    int *args = calloc(1, sizeof(int)); args[0] = rv;
-    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
     op->hcall = hi;
     return dst;
 }
@@ -2673,22 +2637,6 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
     Kind rk = n->right && n->right->type ? n->right->type->kind : KIND_NONE;
     if (n->ast_type != OP_MULT && n->ast_type != OP_DIV)
         return build_fail("float op %d not yet supported", (int)n->ast_type);
-    /* `1.0 / x` → reciprocal(x): a float divide is reciprocal-then-multiply,
-       so a unit numerator lets us call the inverse helper directly and skip
-       the trailing multiply-by-one (and the 1.0 operand load). Only where a
-       register-float inverse helper exists (see float_reciprocal_ok). */
-    if (n->ast_type == OP_DIV && node_is_numeric_one(n->left)) {
-        Kind rfk = (n->type && kind_is_floating(n->type->kind))
-                     ? n->type->kind
-                 : is_register_float_kind(rk) ? rk : KIND_NONE;
-        if (float_reciprocal_ok(rfk)) {
-            int r = build_operand_as_float_reg(b, n->right, rfk);
-            if (r < 0) return build_fail("reciprocal: divisor not promotable");
-            int dst = emit_float_reciprocal(b, rfk, r);
-            if (dst < 0) return build_fail("reciprocal emit failed");
-            return dst;
-        }
-    }
     /* 5/6-byte double mul/div → wide-accumulator op. */
     if (is_acc_float_kind(lk) && lk == rk) {
         int l = build_expr(b, n->left);
