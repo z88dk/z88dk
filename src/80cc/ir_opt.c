@@ -1808,6 +1808,74 @@ static int ir_opt_dead_defs(Func *f)
     return removed;
 }
 
+/* Mark-sweep liveness. ir_opt_dce is a use COUNT, so a self-referential
+   accumulator (`count -= x`) can never die: its own def keeps the count
+   non-zero. Mark from side-effecting roots instead, then sweep.
+   Roots are conservative — any kind dce_pure_kind does not vouch for, and any
+   dst that is addr-taken/volatile/the return value. `--opt-disable=dce-live`. */
+static int dce_root_op(const Func *f, const Op *op)
+{
+    switch (op->kind) {
+    case IR_ST_MEM: case IR_CALL: case IR_HCALL: case IR_RET:
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO: case IR_SWITCH:
+    case IR_ASM: case IR_PUSH_ARG: case IR_PUSH_STRUCT:
+        return 1;
+    default: break;
+    }
+    if (!dce_pure_kind(op)) return 1;            /* unknown kind: assume live */
+    if (op->dst >= 0 && op->dst < f->n_vregs
+        && (f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                       | IR_VREG_RETURN)))
+        return 1;                                /* memory-visible dst */
+    return 0;
+}
+
+static int ir_dce_marksweep(Func *f)
+{
+    if (!f || opt_disabled("dce-live")) return 0;
+    int nv = f->n_vregs;
+    char *live_v = calloc((size_t)(nv > 0 ? nv : 1), 1);
+    if (!live_v) return 0;
+    int changed = 1;
+    /* seed: any vreg read by a root op */
+    while (changed) {
+        changed = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *op = &f->bbs[b].ops[j];
+                int keep = dce_root_op(f, op)
+                        || (op->dst >= 0 && op->dst < nv && live_v[op->dst]);
+                if (!keep) continue;
+                int uses[16];
+                int nu = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
+                for (int u = 0; u < nu; u++)
+                    if (uses[u] >= 0 && uses[u] < nv && !live_v[uses[u]])
+                        { live_v[uses[u]] = 1; changed = 1; }
+                if (op->mem.base >= 0 && op->mem.base < nv && !live_v[op->mem.base])
+                    { live_v[op->mem.base] = 1; changed = 1; }
+            }
+    }
+    int dead = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int keep = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int live = dce_root_op(f, op)
+                    || (op->dst >= 0 && op->dst < nv && live_v[op->dst]);
+            if (!live) { dead++; continue; }
+            if (keep != j) bb->ops[keep] = bb->ops[j];
+            keep++;
+        }
+        bb->n_ops = keep;
+    }
+    if (dead && getenv("IR_DCEPROBE"))
+        fprintf(stderr, "DCEPROBE %s dead_ops=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", dead);
+    free(live_v);
+    return dead;
+}
+
 int ir_opt_dce(Func *f)
 {
     if (!f) return 0;
@@ -1847,6 +1915,7 @@ int ir_opt_dce(Func *f)
         free(use_count);
         removed += pass_changed;
     } while (pass_changed);
+    removed += ir_dce_marksweep(f);
     return removed;
 }
 
