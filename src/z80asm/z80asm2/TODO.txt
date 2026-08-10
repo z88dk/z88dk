@@ -1,5 +1,4 @@
 ## Pending issues
-- add git hash to copyright screen
 - BINARY must search in include path - check tests
 - INCLUDE must search in include path - check tests
 - FileMgr binary file shall use BinaryFile (memory-mapped file)
@@ -16,9 +15,9 @@
 - add import/export to ASCII to z80nm
 
 ## Linker Pipeline
-- [ ] Loading of input modules
-- [ ] Searching libraries for undefined symbols
-- [ ] Global symbol resolution (multiple definitions, extern/public)
+- [X] Loading of input modules
+- [X] Searching libraries for undefined symbols
+- [X] Global symbol resolution (multiple definitions, extern/public)
 - [ ] Segment layout and address assignment
 - [ ] Expression evaluation and patching (apply relocations)
 - [ ] Emission of Binary format
@@ -138,6 +137,107 @@ Linker script
 
 -T memmap.ld
 
+group names, page names and bank names cannot overlap
+
+###############################################################################
+# MEMORY BANKS
+###############################################################################
+
+BANK FIXED
+    BASE 0x0000
+    SIZE 0x4000
+
+    HOLE IOREG     AT 0x0000 SIZE 0x0100
+    RESERVE BOOT   AT 0x0100 SIZE 0x0100
+
+
+BANK SWITCHED
+    BASE 0xC000
+    SIZE 0x4000
+
+
+###############################################################################
+# BANK SWITCHING PAGES
+###############################################################################
+
+PAGE PAGE0 IN SWITCHED
+PAGE PAGE1 IN SWITCHED
+PAGE PAGE2 IN SWITCHED
+
+
+###############################################################################
+# GROUP DEFINITIONS
+###############################################################################
+
+# Code group (uncompressed)
+GROUP CODE MAXSIZE 0x3000 : code_* ""
+
+# Data group
+GROUP DATA MAXSIZE 0x2000 : data_*
+
+# BSS group
+GROUP BSS  MAXSIZE 0x1000 : bss_*
+
+# Interrupt vectors
+GROUP INT  MAXSIZE 0x0100 : int_*
+
+# Level data (to be banked)
+GROUP LEVEL1 MAXSIZE 0x2000 : level1_*
+GROUP LEVEL2 MAXSIZE 0x2000 : level2_*
+GROUP LEVEL3 MAXSIZE 0x2000 : level3_*
+
+
+###############################################################################
+# COMPRESSION RULES
+###############################################################################
+
+# Compress CODE into CODE_C, expand at runtime to 0x2000
+COMPRESS CODE USING zx7
+    STORED_AS CODE_C
+    EXPANDER zx7_expand
+    EXPANDS_TO 0x2000
+
+
+###############################################################################
+# PLACEMENT RULES
+###############################################################################
+
+# Place compressed CODE in FIXED bank after reserved areas
+PLACE CODE_C IN FIXED ALIGN 0x100 FILL 0xFF
+
+# Place DATA after CODE_C
+PLACE DATA AFTER CODE_C ALIGN 0x100 FILL 0x00
+
+# Place INT at absolute address
+PLACE INT AT 0x0000
+
+# Place BSS within a subrange of FIXED
+PLACE BSS WITHIN 0x3000 SIZE 0x0800
+
+# Place banked level data into pages
+PLACE LEVEL1 IN PAGE0
+PLACE LEVEL2 IN PAGE1
+PLACE LEVEL3 IN PAGE2
+
+
+###############################################################################
+# SYMBOL DEFINITIONS
+###############################################################################
+
+# Bank symbols
+SYMBOL fixed_start = FIXED.start
+SYMBOL fixed_end   = FIXED.end
+
+# Group symbols
+SYMBOL code_expanded_start = CODE.start
+SYMBOL code_expanded_end   = CODE.end
+
+# Offsets
+SYMBOL heap_start = DATA.end + 0x10
+SYMBOL stack_top  = FIXED.end - 0x20
+
+
+
 BANK <name>
     BASE <addr>
     SIZE <size>
@@ -145,13 +245,32 @@ BANK <name>
     HOLE    <name> AT <addr> SIZE <size>    ; hardware hole
     RESERVE <name> AT <addr> SIZE <size>    ; reserve memory
 
-GROUP CODE = code_*
-GROUP DATA = data_*
-GROUP BSS  = bss_*
+GROUP <name> MAXSIZE <size> : code_* ""
 
-PLACE CODE IN BANK0
-PLACE DATA AFTER CODE
-PLACE BSS  IN BANK1
+COMPRESS CODE USING zx7
+    STORED_AS CODE_C
+    EXPANDER zx7_expand
+    EXPANDS_TO 0x2000
+
+; USING tool compresses a binary file
+; EXPANDER expands the compressed data, 
+; source address of compressed data in HL and the target address in DE
+
+GROUP <name> MAXSIZE <size> : data_*
+GROUP <name> MAXSIZE <size> : bss_*
+GROUP <name> MAXSIZE <size> : int_*
+
+PAGE <name> IN <bank>
+
+PLACE <group> IN <bank>     ALIGN <align> FILL <fill>
+PLACE <group> AFTER <group> ALIGN <align> FILL <fill>
+PLACE <group> IN <page>     ALIGN <align> FILL <fill>
+PLACE <group> AT <addr>
+PLACE <group> WITHIN <addr> SIZE <size>
+PLACE CODE_C  IN BANK1
+
+SYMBOL <name> = <bank>.[start|end]  [+-] <offset>
+SYMBOL <name> = <group>.[start|end] [+-] <offset>
 
 bank switching
 
@@ -184,42 +303,3 @@ FARCALLS USING __bank_call
 
 Then the linker generates calls to __bank_call, passing the destination bank and address according to a documented ABI.
 That keeps the linker portable across virtually every Z80 banking scheme while still providing all the value of automatic trampoline generation. In my view, that's the cleanest separation of responsibilities.
-
-
-
-Mark and sweep algorithm:
-
-selected_modules = input modules
-unresolved = externs from input modules
-
-repeat:
-    added_any = false
-
-    for each library in input order:
-        for each module in library order:
-            if module not selected:
-                if module defines any symbol in unresolved:
-                    select(module)
-                    unresolved += module.externs
-                    added_any = true
-
-    remove from unresolved all symbols now defined in selected_modules
-
-until added_any == false
-
-if unresolved not empty:
-    error("Undefined symbols: ...")
-
-std::vector<ObjectModule*> final_modules;
-
-for (auto& lib : libraries_in_input_order) {
-    for (auto& mod : lib->modules) {
-        if (selected_modules.contains(mod.get())) {
-            final_modules.push_back(mod.get());
-        }
-    }
-}
-
-for (auto& mod : input_modules_in_order) {
-    final_modules.push_back(mod);
-}
