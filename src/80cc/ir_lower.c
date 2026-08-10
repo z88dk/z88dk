@@ -2406,14 +2406,32 @@ static int dsw_enabled(void)
     return dsw_on;
 }
 
-/* [IR_DS_SHARE, opt-in] Refine the coalesced-read veto: block a dead store only
-   when a byte-sharing reader never writes its own slot (the channel shape).
-   Default OFF until the gauntlet says otherwise — this is the check that stands
-   between the elision and the set_arg1 class of miscompile. */
+/* [IR_DS_SHARE] Refine the coalesced-read veto: block a dead store only when a
+   byte-sharing reader never writes its own slot (the channel shape), instead of
+   on any sharing reader at all. Default ON; `IR_DS_SHARE=0` opts out and
+   restores the pre-flip codegen byte-for-byte.
+
+   Flipped on after the 391-cell matrix (23 benches x 10 cpus x sp/fp): 0 cells
+   slower on ANY cpu and 0 cells larger on any cpu, net -1200B, every cell built
+   AND run in both configurations with no failures. Bytes and cycles move
+   together here because eliding a store removes memory traffic — there was no
+   byte-for-tick trade to weigh.
+
+   The r4k byte regression the first matrix showed was NOT this pass; it was the
+   HL->DE staging copy being spelled as two page-prefixed 8-bit moves on Rabbit
+   (fixed in 1b43c3a4c7, see emit_hl_to_de).
+
+   Careful with the predicate: "reads a slot it never wrote" is NOT
+   `rec_slotwrite == 0`. See the marking site — a MULTI-DEF reader can have one
+   def that stores and another that rides a register, and the first version of
+   this shipped that way and miscompiled emu.c. */
 static int ds_share = -1;
 static int ds_share_on(void)
 {
-    if (ds_share < 0) ds_share = getenv("IR_DS_SHARE") ? 1 : 0;
+    if (ds_share < 0) {
+        const char *e = getenv("IR_DS_SHARE");
+        ds_share = (e && e[0] == '0') ? 0 : 1;
+    }
     return ds_share;
 }
 
