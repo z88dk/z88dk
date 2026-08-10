@@ -3488,6 +3488,14 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 }
 
 
+/* [IR_ADDBC] `add hl,bc` when ONE operand is BC-resident. IR_ADDBC=0 opts out. */
+static int addbc_enabled(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_ADDBC"); v = (e && e[0] == '0') ? 0 : 1; }
+    return v;
+}
+
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
     /* LRA Phase 2b: accumulate directly in an index home. When dst is IX/IY-homed
@@ -3826,9 +3834,16 @@ static int gen_add(FILE *out, Func *f, const Op *op)
        slot (the IVSR walking-pointer bound `base(BC) + idx(HL)` shape). BC holds
        the value on entry AND after (add hl,bc doesn't write BC), so its cache
        stays valid. */
-    if (op->src[1] >= 0
-        && ((hl_has(op->src[0]) && bc_has(op->src[1]))
-            || (hl_has(op->src[1]) && bc_has(op->src[0])))) {
+    if (op->src[1] >= 0 && L.pending_spill_v < 0 && addbc_enabled()
+        && (bc_has(op->src[0]) || bc_has(op->src[1]))) {
+        /* Only ONE operand need be resident: load the other into HL (load_to_hl
+           preserves BC, as gen_sub's BC path relies on). Requiring BOTH cached
+           missed the commonest shape by far — `sym + index` with the index in BC
+           and the symbol still to materialise (`flags[k]`), which fell through to
+           the DE path and cost `ld e,c; ld d,b` plus DE itself. */
+        int bcv   = bc_has(op->src[1]) ? op->src[1] : op->src[0];
+        int other = (bcv == op->src[1]) ? op->src[0] : op->src[1];
+        load_to_hl(out, f, other);
         emit(out, "add\thl,bc");
         commit_hl_result(out, f, op->dst);
         return 0;
