@@ -66,8 +66,39 @@ Callee linkage: float helpers that pop a return address + stack args must be
 **`call`’d**, not bare **`jp`** (floor/ceil class bugs). Keep that rule when
 editing pack/add glue.
 
-**Measure / rebuild / wiki:** **[z88dk-tooling](../z88dk-tooling/SKILL.md)**
-(§ math32 rebuild, benches, wiki bold rules). Docs of record:
+### sccz80 + newlib: plain names vs `*_fastcall` (issue #3061)
+
+`math32.lib` products are assembled with **`-D__CLASSIC`**. Under that flag,
+`lm32/c/sccz80/{sin,sqrt,log,…}.asm` expose **stack-arg bridges** for plain
+names; the **DEHL** entry is `*_fastcall` (`defc sin_fastcall = _m32_sinf`).
+
+| Consumer | What must happen |
+|----------|------------------|
+| **Classic** `include/math/math_math32.h` | `#define sin(x) sin_fastcall(x)` (and peers) — already correct |
+| **Newlib** sccz80 + `--math32` | Same remaps under `__MATH_MATH32` in **`include/_DEVELOPMENT/proto/math.h`**, then `make -C include/_DEVELOPMENT common/math.h` |
+| **SDCC** | Single-arg `__DPROTO` already emits `#define sin(a) sin_fastcall(a)` — OK without the sccz80 block |
+| **math48** default newlib | Plain `sin` is true DEHL (`cm48_sccz80_sin`) — do **not** force math32 remaps off math48 |
+
+Without the newlib remaps, sccz80 marks plain `sin` as `__z88dk_fastcall` and
+emits `call sin` with DEHL, but the linked object is the **stack bridge** (ignores
+DEHL). Symptom: hotspots show **zero** `m32_fsinv` / `m32_fsinvsqrt` /
+`m32_fsmul32x32` entry hits, TIMER “too fast” (e.g. Whetstone ~15 KWIPS vs ~11),
+wrong numerics. Map proof of a healthy build: `sin_fastcall` / `sqrt_fastcall`
+present; app `.asm` shows `callsin_fastcall` not `callsin`.
+
+**Do not** “fair up” classic vs newlib by adding bench-only `invsqrt()` optims
+to one side only (n-body). Align source (`1.0/sqrt` vs half `invsqrtf16`) and
+remeasure both products after header fixes.
+
+### Higher-function C regen (`c/Makefile`)
+
+Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/asm/*.asm` (SDCC).
+8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only). **`make clean`** must
+only remove C-derived objects — never wipe hand-written peers in the same dir
+(math16: keep `cm16_sccz80_*.asm` under `c/8085/`).
+
+**Measure / rebuild / wiki:** **`methodology/measure`**
+(§ math32 rebuild, benches, classic/newlib A/B, wiki bold rules). Docs of record:
 `libsrc/math/float/math32/readme.md`, `support/benchmarks/*/readme.txt`.
 
 ---
@@ -115,4 +146,6 @@ Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fs
 
 - Half float: `library/math16`
 - Measure / A/B: `methodology/measure`
+- Newlib headers (math remaps): `library/newlib` · edit **proto** then regenerate
 - 8085 cores: `cpu/8085`
+- Issue class: z88dk **#3061** (classic vs newlib Whetstone)

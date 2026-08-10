@@ -270,17 +270,23 @@ Z80 CB ops slipped into an 8085 file.
 
 ```bash
 cd test/suites/math
-make test_math32_8085.bin    # IEEE math32 on 8085
-make test_math16.bin test_math16_8085.bin   # half float when f16 cores change
+make test_math32.bin test_math32_8085.bin    # IEEE math32 classic +test
+make test_math16.bin test_math16_8085.bin     # half float when f16 cores change
+make test_math32_rc2014_CODE.bin             # sccz80 **newlib** + math32 (+rc2014 -clib=new)
+# optional newlib math16 (no Makefile target — mirror math32 rc2014 recipe):
+#   zcc +rc2014 -vn -DMATH16 -D__MATH_MATH16 -fp-mode=ieee … -lmath16 -lmath32 -clib=new -subtype=basic
 make test_mbf32_8085.bin
 make test_mbf32_8080.bin
 make test_mbf32_gbz80.bin
+make all   # full matrix: genmath/bbc/cpc/mbf32*/am9511*/math48/math32*/math16*/fix16
 # each rule builds and runs ticks with the matching -mCPU
 ```
 
 Expect `N run, N passed, 0 failed` plus a suite tick count. Use after **any**
 change to integer long helpers or float cores. After `fsdiv` / `f16_div` edits:
-math32 **and** math16 suites on the CPUs that ship the object.
+math32 **and** math16 suites on the CPUs that ship the object. After **newlib
+math.h** / `__MATH_MATH32` remaps: always run **`test_math32_rc2014_CODE.bin`**
+(and a newlib math16 link if half API changed).
 
 ### Small probes
 
@@ -470,6 +476,10 @@ tree; they are **not** part of the product PR.
 | z80n/z180 inv faster, div unchanged | HW mul is on NR inv / mul cores; restoring div does not use `mulu_32h_*` — z80n div TIMER ≡ plain z80 |
 | math16 spectral “worse” after `--math16 --math32` link fix | Map: large `__code_fp_math32_size`; hotspots **~65% in `fsdiv`**, not `f16_div`. Discard row; use pure `--math16` + casted `1.0` |
 | TIMER math16 link: `ddiv` / `l_f48_ftof16` | Bare `1.0` under `__MATH_MATH16` → f48 path; cast to `DOUBLE` / half literal. Not fixed by adding `--math32` |
+| Classic ~11 vs newlib ~15 KWIPS Whetstone math32 | **Not** opt flags (`-O2` vs `-O3i` ≈ 0%). Hotspots: identical app C cycles; gap in math32 **wide path**. Root cause (#3061): sccz80 newlib called plain `sin`/`sqrt` (stack bridge) with DEHL. Fix: newlib `proto/math.h` `*_fastcall` remaps under `__MATH_MATH32`. After fix TIMER ≈ classic (~11 KWIPS / ~362M ticks). Map must show `sin_fastcall` / `sqrt_fastcall`; zero hits on `m32_fsinvsqrt` ⇒ still broken |
+| “Library symbol order picks a slower routine” | Same `math32.lib` for both products; module set differs only by `*_fastcall` vs plain wrappers. Prove with map + static call sites, not archive order alone |
+| Newlib n-body much faster than classic math32 | Check for **source** cheat (`invsqrt` under `__MATH_MATH32` only on newlib). Align to `1.0/sqrt` then remeasure; after #3061 header fix sccz80 new ≈ classic (~791M ticks) |
+| sccz80 newlib “correct” TIMER but wrong KWIPS | Remeasure **after** header regen (`make -C include/_DEVELOPMENT common/math.h`). Stale numbers from pre-#3061 trees are invalid for product claims |
 
 ### Float library A/B (math32 / math16)
 

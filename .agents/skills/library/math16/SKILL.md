@@ -22,9 +22,17 @@ Home under classic/newlib float trees (see `libsrc/math/float/` math16 paths and
 2. 8085: stack-only; no EXX/IX/IY; legal `(de)` stores only (`a`/`hl`/post-inc).
 3. Classic TIMER benches for math16: use **`z88dk-classic/*.c`** (parent sources may lack `_Float16`).
 4. 8085 math16 often also needs `-lmath32_8085` for higher helpers — match classic recipes.
-5. Suite: `make -C test/suites/math test_math16.bin test_math16_8085.bin` (and peers).
+5. Suite: `make -C test/suites/math test_math16.bin test_math16_8085.bin` (and peers). Newlib: `+rc2014 -clib=new` with `-lmath16 -lmath32` (mirror math32 rc2014 recipe).
+6. **`c/Makefile` clean:** only remove C-derived `8085/*.asm` (`$(AFILES8085)`); keep hand-written `cm16_sccz80_*.asm` in `c/8085/`.
+
+### Calling vs math32
+
+Many half API symbols are plain `defc sinf16 = _m16_sinf` (true DEHL) even with
+`-D__CLASSIC` — **not** the math32 stack-bridge trap. Still prefer map proof
+(`sinf16` / `sqrtf16` / `invsqrtf16`) after link. Fair n-body: math16 may keep
+`invsqrtf16`; math32 TIMER source should use `1.0/sqrt` on both classic and newlib.
 
 ## Related
 
-- `library/math32`, `cpu/8085`, `methodology/measure`
+- `library/math32`, `cpu/8085`, `methodology/measure`, `library/newlib` (header regen)
 - Product readme: math16 `README.md` under the float tree

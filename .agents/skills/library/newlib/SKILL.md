@@ -304,8 +304,41 @@ CP/M outputs need **`.com`** for ticks CP/M mode; some newlib links produce `*_C
 
 ---
 
+## 7. Headers: edit **proto**, regenerate **common**
+
+Newlib public headers live under `include/_DEVELOPMENT/`:
+
+| Path | Role |
+|------|------|
+| **`proto/*.h`** | Source of truth (m4 macros: `__DPROTO`, `__D2PROTO`, …) |
+| **`common/*.h`** | Generated: `m4 proto/foo.h > common/foo.h` |
+
+```bash
+cd include/_DEVELOPMENT
+# one file:
+make common/math.h
+# or force:
+make -B common/math.h
+```
+
+Do **not** hand-edit `common/` for lasting changes — edit **proto** and regenerate.
+
+### Math32 sccz80 remaps (`math.h`, issue #3061)
+
+Under `#ifdef __MATH_MATH32` / `#ifdef __SCCZ80`, `proto/math.h` remaps unary
+API names to `*_fastcall` (same idea as classic `math/math_math32.h`). Required
+because `math32.lib` is built with `-D__CLASSIC` and plain `sin`/`sqrt`/… are
+**stack bridges**, while sccz80 treats the plain name as DEHL fastcall.
+
+Details and map proofs: **`library/math32`**. After header edits: suite
+`test_math32_rc2014_CODE.bin` + remeasure newlib TIMER rows that call higher
+math (Whetstone, n-body).
+
+---
+
 ## Related
 
 - Classic: `library/classic`
+- Float products / calling: `library/math32`, `library/math16`
 - Measure I/O: `test/suites/target_io` (see `methodology/measure`)
 - Targets: `target/cpm`, `target/rc2014`
