@@ -2391,6 +2391,17 @@ static int dsw_enabled(void)
     return dsw_on;
 }
 
+/* [IR_DS_SHARE, opt-in] Refine the coalesced-read veto: block a dead store only
+   when a byte-sharing reader never writes its own slot (the channel shape).
+   Default OFF until the gauntlet says otherwise — this is the check that stands
+   between the elision and the set_arg1 class of miscompile. */
+static int ds_share = -1;
+static int ds_share_on(void)
+{
+    if (ds_share < 0) ds_share = getenv("IR_DS_SHARE") ? 1 : 0;
+    return ds_share;
+}
+
 static int dsx_enabled(void)
 {
     if (dsx_on < 0) {
@@ -2769,14 +2780,43 @@ static void rec_end(const Func *f)
            and NONE of its bytes read-by-others is a genuine dead store. No
            codegen change — this only prints; validates the model before elision. */
         char *readb = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
-        if (readb && rec_slotwrite) {
+        /* [IR_DS_SHARE] The byte a coalesced reader reads WITHOUT EVER WRITING
+           IT. `readb` blocks on any sharing reader at all, which is a blanket
+           distrust of the slot allocator: ir_slots coalesces only vregs whose
+           live ranges do not interfere, so a reader that also STORES its own
+           slot is served by that store, never by the dead one — v is not live
+           where the reader is, so v's store is either before the reader's def
+           (overwritten) or after its last use (unobservable).
+           What earned the distrust is the OTHER shape: a reader that reads a
+           slot it never wrote, so its value must have been put there by
+           somebody else's store — the slot is a channel between two vregs, and
+           the dead-looking store is the thing filling it. That is set_arg1 at
+           (ix-12), the miscompile this check was added for. Blocking on only
+           that shape keeps the protection and stops vetoing the rest. */
+        char *readb_chan = dsx_enabled() ? calloc((size_t)fs, 1) : NULL;
+        if (readb && readb_chan && rec_slotwrite) {
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
                 int is_spill = !f->vreg_to_phys || f->vreg_to_phys[v] == IR_PR_SPILL;
                 int off = is_spill ? f->vreg_spill_slot[v] : -1;
                 if (off < 0 || off >= fs) continue;
                 if (rec_slotuse[v] - rec_slotwrite[v] <= 0) continue;   /* not read */
                 int w = f->vregs[v].width > 0 ? f->vregs[v].width : 2;
-                for (int p = off; p < off + w && p < fs; p++) readb[p] = 1;
+                /* A reader is SELF-SERVED only if it has exactly ONE def and
+                   that def stored the slot: then the slot holds its own value
+                   at every read. rec_slotwrite>0 alone is not enough — a
+                   multi-def reader can have one def that stores and another
+                   that rides a register, and the non-storing path is then
+                   served by whatever was in the slot, which is the store we
+                   were about to elide. */
+                int ndef = 0;
+                for (int b = 0; b < f->n_bbs && ndef < 2; b++)
+                    for (int j = 0; j < f->bbs[b].n_ops; j++)
+                        if (f->bbs[b].ops[j].dst == v && ++ndef >= 2) break;
+                int self_served = (ndef == 1 && rec_slotwrite[v] > 0);
+                for (int p = off; p < off + w && p < fs; p++) {
+                    readb[p] = 1;
+                    if (!self_served) readb_chan[p] = 1;
+                }
             }
             int nfn = 0;
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
@@ -2797,8 +2837,9 @@ static void rec_end(const Func *f)
                                      | IR_VREG_NO_SLOT)))
                     continue;
                 int shared_read = 0;                    /* coalesced-with-a-reader? */
+                const char *blockmap = ds_share_on() ? readb_chan : readb;
                 for (int p = off; p < off + w && p < fs; p++)
-                    if (readb[p]) { shared_read = 1; break; }
+                    if (blockmap[p]) { shared_read = 1; break; }
                 if (shared_read) {
                     if (dsx_on >= 2)
                         fprintf(stderr, "IR_DEADSTORE:   v%d w=%d slot=%d write-only "
@@ -2818,6 +2859,7 @@ static void rec_end(const Func *f)
                         f->fn ? ir_sym_name(f->fn) : "?", nfn);
         }
         free(readb);
+        free(readb_chan);
         free(covered); free(live);
     }
     /* [#13, INERT] frameless-via-sp cost model. A function that emitted the IX
