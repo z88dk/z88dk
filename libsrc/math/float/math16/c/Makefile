@@ -2,6 +2,7 @@
 #
 # Z80:  sccz80 +new → asm/   (listed by newlibfiles_z80.lst)
 # 8085: sccz80 only → 8085/  (listed by newlibfiles_8085.lst)
+#       Hand-written cm16_sccz80_*.asm live in 8085/ and are not regenerated here.
 
 CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
@@ -25,4 +26,5 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 
 clean:
 	$(RM) asm/*.asm asm/*.err zcc_opt.def
-	$(RM) 8085/*.asm 8085/*.err
+	# Only C-derived higher functions; keep hand-written cm16_sccz80_*.asm
+	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err

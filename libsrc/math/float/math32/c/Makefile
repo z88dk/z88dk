@@ -26,4 +26,4 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 
 clean:
 	$(RM) asm/*.asm asm/*.err zcc_opt.def
-	$(RM) 8085/*.asm 8085/*.err
+	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err
