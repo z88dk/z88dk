@@ -92,30 +92,22 @@ static unsigned int last_index(unsigned int start, unsigned int step)
     return last;
 }
 
-/* NB the clear loops live in their own functions: written inline in
-   test_addridx they trip a SEPARATE, pre-existing fp-mode abort ("value read
-   with no live register and no stack slot", v0 phys BC) that reproduces on
-   master and has nothing to do with #ADDR. */
-static void clear_flags(void)
-{
-    int i;
-    for (i = 0; i < N; i++) flags[i] = 0;
-}
-
-static void clear_words(void)
-{
-    int i;
-    for (i = 0; i < WN; i++) words[i] = 0;
-}
-
+/* The clear loops are INLINE on purpose. Written this way the loop counter is
+   a call-split BC tenant whose frame slot shows zero uses in render 1 (the
+   in-span reads come from BC), so dead-frame elision used to declare the frame
+   dead, clear every slot and re-lower — leaving the out-of-span read with
+   neither register nor slot (require_slot abort, fp only). Moving them into
+   helpers hides that; keep them here. */
 static void test_addridx(void)
 {
+    int i;
+
     assertEqual(main_count, 1007);      /* the in-main sieve: primes in [2,7999] */
 
-    clear_flags();
+    for (i = 0; i < N; i++) flags[i] = 0;
     assertEqual(sieve_like(), 1007);
 
-    clear_flags();
+    for (i = 0; i < N; i++) flags[i] = 0;
     /* 0,2,..,7998 -> 4000 marks, all previously clear */
     assertEqual(mark_walk(0, 2), 4000);
     /* same walk again: every one already set, so none counted */
@@ -123,13 +115,13 @@ static void test_addridx(void)
     /* odd positions are still clear: 1,3,..,7999 -> 4000 */
     assertEqual(mark_walk(1, 2), 4000);
 
-    clear_flags();
+    for (i = 0; i < N; i++) flags[i] = 0;
     /* step 7 from 3: 3,10,..,7999 -> 1143 marks */
     assertEqual(mark_walk(3, 7), 1143);
     /* start beyond the bound: loop body never runs */
     assertEqual(mark_walk(N, 1), 0);
 
-    clear_words();
+    for (i = 0; i < WN; i++) words[i] = 0;
     /* first pass sums zeroes and writes k+1 */
     assertEqual(word_walk(0, 16), 0);
     /* second pass sums 1 + 17 + 33 + 49 = 100 */

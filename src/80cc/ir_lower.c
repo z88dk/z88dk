@@ -2628,8 +2628,13 @@ static void rec_end(const Func *f)
         char *live    = calloc((size_t)fs, 1);
         if (covered && live) {
             for (int v = 0; v < rec_nv && v < f->n_vregs; v++) {
-                int is_spill = !f->vreg_to_phys || f->vreg_to_phys[v] == IR_PR_SPILL;
-                int off = is_spill ? f->vreg_spill_slot[v] : -1;
+                /* ANY vreg owning a slot, not just the PR_SPILL ones: a
+                   call-split / ranged home has a REGISTER phys and a slot (its
+                   home outside the range). The clearing code below already
+                   drops every slot regardless of phys — scanning only PR_SPILL
+                   here meant the verdict was taken over fewer slots than it
+                   then cleared. */
+                int off = f->vreg_spill_slot[v];
                 if (off < 0 || off >= fs) continue;
                 int w = f->vregs[v].width > 0 ? f->vregs[v].width : 2;
                 /* rec_slotuse only counts frame LOAD/STORE via slot_off; it does
@@ -2639,8 +2644,20 @@ static void rec_end(const Func *f)
                    for the elision verdict force its bytes live unless it's a
                    plain width<=2 non-addr-taken spill (the paths slot_off fully
                    covers). Sound: at worst keeps a frame that could go. */
+                /* A RANGED home (call-split, or any home_lo/home_hi narrower
+                   than the function) lives in its REGISTER inside the range and
+                   in this slot outside it. Render 1 serves the in-range reads
+                   from the register, so rec_slotuse can be 0 while the slot is
+                   still the value's only home elsewhere — dropping it makes the
+                   re-lower read a vreg with neither register nor slot
+                   (require_slot abort). Not trustable, same as addr-taken. */
+                int ranged = (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
+                          || (f->home_lo && f->home_hi
+                              && (f->home_lo[v] != INT_MIN
+                                  || f->home_hi[v] != INT_MAX));
                 int trustable = w <= 2
-                             && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN);
+                             && !(f->vregs[v].flags & IR_VREG_ADDR_TAKEN)
+                             && !ranged;
                 for (int p = off; p < off + w && p < fs; p++) {
                     covered[p] = 1;
                     if (rec_slotuse[v] != 0 || !trustable) live[p] = 1;
