@@ -12,7 +12,12 @@
 ;; a byte LARGER than `ld hl,(nn)` on z80 anyway (no saving). Safe on DE-liveness:
 ;; the ex materialises the index in DE purely as the add's addend (old DE discarded
 ;; by `ld hl,_%1`, old HL/index consumed by the add), so DE is dead after.
+;; %notcpu 8085: NOT TRUE THERE. 8085 loads the index with LDSI+LHLX
+;; (`ld de,sp+N; ld hl,(de); ex de,hl`) and leaves it in DE across the add,
+;; reclaiming it with a LATER `ex de,hl` — so DE is live and the fold hands
+;; back the base instead of the index. sieve/z88dk-classic hangs on it.
 %title #ADDR fold ex-de-hl + symbol-address load + add into a direct de-load (-1b)
+%notcpu 8085
 	ex	de,hl
 	ld	hl,_%1
 	add	hl,de
@@ -157,17 +162,6 @@
 	ld	bc,%1
 =
 	ld	bc,%1
-
-;; NOT on ez80: there `ld hl,%1` can be `ld hl,(hl)` (native word deref,
-;; ed 27) which READS hl, so dropping the `ld hl,bc` that set the pointer
-;; miscompiles. No other CPU emits `ld hl,(hl)`, so the rule is safe there.
-%title #285b HL recovery overwritten by immediate ld hl (-2b, -8t)
-%notcpu ez80
-%notcpu ez80_z80
-	ld	hl,bc
-	ld	hl,%1
-=
-	ld	hl,%1
 
 ;; #285b2: a dead `ld hl,X` immediately overwritten by another `ld hl,Y` — drop
 ;; the first (HL not read between). `%not %2 (hl)`: ez80's `ld hl,(hl)` READS HL,
@@ -632,9 +626,9 @@
 =
 	ld	a,l
 
-%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). NOT ez80: ld de,(hl)/ld hl,(hl) READ the reg there, so the ex may be a live deref
-%notcpu ez80
-%notcpu ez80_z80
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (de first). %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref
+%not %1 (hl)
+%not %2 (hl)
 	ex	de,hl
 	ld	de,%1
 	ld	hl,%2
@@ -642,9 +636,9 @@
 	ld	de,%1
 	ld	hl,%2
 
-%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded (hl first)
-%notcpu ez80
-%notcpu ez80_z80
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded. %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref
+%not %1 (hl)
+%not %2 (hl)
 	ex	de,hl
 	ld	hl,%2
 	ld	de,%1
