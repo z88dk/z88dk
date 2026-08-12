@@ -11,18 +11,23 @@
 ;
 ; f24: D=exp (bias 127), E[7]=sign, HL=16-bit left-aligned mant.
 ;
-; Restoring 16-bit mant (stack locals; no exx / IX / djnz / bit):
-;   rem in A:HL, div on stack, quot in DE
-;   trial: sub hl,bc / sbc a,0; restore on borrow; rem <<= 1
-;   1×: 16 steps × 1 bit (size; was 8×2).  rl de for quot bit.
+; Hot path (register map, held for all 16 bits):
+;   A:HL = rem (17-bit; A is the high bit)
+;   BC   = div (full 16-bit mant)
+;   DE   = quot
+;   stack +0 = bit count (B is part of BC)
+;
+;   trial : sub hl,bc / sbc a,0; restore on borrow  (DSUB, no C-in)
+;   rem<< : add hl,hl / rla
+;   qbit  : rl de
+;
+; Labels match asm/z80/asm_f16_div.asm.  Specials use asm_f24_zero/inf/nan.
 ;
 ; sccz80 half: HL = y, stack = [uret][x] → HL = x/y
 ;
-; Internal body entry (div_body):
-;   DEHL = X (dividend)
-;   stack = [cret][Y.hl][Y.de][ ... caller words ... ]
-;   Exit: DEHL = result; stack = [cret][ ... caller words ... ]
-;         (Y consumed)
+; div_body:
+;   DEHL = X; stack = [cret][Y.hl][Y.de][...]
+;   → DEHL = X/Y; stack = [cret][...]  (Y consumed)
 ;
 ;-------------------------------------------------------------------------
 
@@ -33,15 +38,17 @@ EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
+EXTERN asm_f24_nan
 
 PUBLIC asm_f16_div_callee
 PUBLIC asm_f24_div_callee
 PUBLIC asm_f24_div_f24
 
 
-;--------------------------------------------------------------------
+;=========================================================================
 ; half: HL=y, [uret][x] → HL = x/y
-;--------------------------------------------------------------------
+;=========================================================================
+
 .asm_f16_div_callee
     call asm_f24_f16            ; y → f24
     push de
@@ -49,31 +56,31 @@ PUBLIC asm_f24_div_f24
     ld de,sp+6
     ld hl,(de)                  ; x half
     call asm_f24_f16            ; DEHL = x
-    call div_body               ; Y consumed; [uret][x]
+    call div_body
     pop bc
     pop af                      ; drop x half
     push bc
     jp asm_f16_f24
 
-;--------------------------------------------------------------------
+
+;=========================================================================
 ; f24: DEHL=Y, [cret][X.hl][X.de] → DEHL = X/Y; stack [cret]
-;--------------------------------------------------------------------
+;=========================================================================
+
 .asm_f24_div_callee
 .asm_f24_div_f24
     pop bc                      ; cret
     push de
     push hl                     ; [Y.hl][Y.de][X.hl][X.de]
-    ; DEHL ← X (under Y)
     ld de,sp+4
     ld hl,(de)                  ; X.hl
     push hl
     ld de,sp+8
     ld hl,(de)                  ; X.de
-    ex de,hl                    ; DE = X.de (HL dead; restored next)
+    ex de,hl
     pop hl                      ; DEHL = X
-    ; stack [Y.hl][Y.de][X.hl][X.de], BC=cret
-    push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
-    call div_body               ; Y consumed → [cret][X.hl][X.de]
+    push bc                     ; [cret][Y...][X...]
+    call div_body
     pop bc                      ; cret
     pop af                      ; X.hl
     pop af                      ; X.de
@@ -81,12 +88,13 @@ PUBLIC asm_f24_div_f24
     ret
 
 
-;--------------------------------------------------------------------
-; div_body: DEHL=X, [cret][Y.hl][Y.de][rest...] → DEHL=X/Y, [cret][rest...]
-;--------------------------------------------------------------------
+;=========================================================================
+; div_body
+;=========================================================================
+
 .div_body
     push de
-    push hl                     ; [X.hl][X.de][cret][Y.hl][Y.de][rest...]
+    push hl                     ; [X.hl][X.de][cret][Y.hl][Y.de]...
     ;               +0    +2    +4    +6    +8
 
     ; sign = X.E xor Y.E
@@ -103,37 +111,37 @@ PUBLIC asm_f24_div_f24
     ld a,(de)                   ; Y.exp
     ld b,a
     or a
-    jp Z,d_y_zero
+    jp Z,div_y_zero
     cp 255
-    jp Z,d_y_hi
+    jp Z,div_y_hi
     ld de,sp+3
     ld a,(de)                   ; X.exp
     or a
-    jp Z,d_x_zero
+    jp Z,div_x_zero
     cp 255
-    jp Z,d_x_hi
+    jp Z,div_x_hi
+
     ; expR = X.exp - Y.exp + 127
     ld e,b                      ; Y.exp
-    ld d,a                      ; X.exp in D; A also X.exp
+    ld d,a                      ; X.exp
     sub e
     ld e,a
     ld d,0
-    jp NC,d_ep
+    jp NC,div_exp_sx
     ld d,0ffh
-.d_ep
+.div_exp_sx
     ld hl,127
     add hl,de
     ld a,h
     or a
-    jp NZ,d_exp_bad
+    jp NZ,div_exp_bad
     ld a,l
     cp 255
-    jp NC,d_of
+    jp NC,div_overflow
     or a
-    jp Z,d_to_zero              ; exp 0 → flush zero (no subnormals)
+    jp Z,div_underflow          ; exp 0 → signed zero
     ld b,a                      ; B=expR C=sign
-    push bc                     ; [expR/sign][X.hl][X.de][cret][Y.hl][Y.de]...
-    ;               +0          +2    +4    +6    +8    +10
+    push bc                     ; [expR/sign][X...][cret][Y...]
 
     ld de,sp+2
     ld hl,(de)                  ; rem = X.mant
@@ -142,13 +150,14 @@ PUBLIC asm_f24_div_f24
     ld c,a
     inc de
     ld a,(de)
-    ld b,a                      ; BC = Y.mant
+    ld b,a                      ; BC = Y.mant = div
 
+;----- prenorm -----------------------------------------------------------
     xor a
     push hl
     sub hl,bc
     pop hl
-    jr NC,d_pre_ok
+    jr NC,div_prenorm_ok
     add hl,hl
     rla
     push af
@@ -157,62 +166,53 @@ PUBLIC asm_f24_div_f24
     dec a
     ld (de),a
     pop af
-.d_pre_ok
-    push bc                     ; [div][expR/sign][X...][cret][Y...]
-    ld bc,16
-    push bc                     ; [count][div][expR/sign]...
-    ld de,0
+.div_prenorm_ok
+    ; BC=div held, A:HL=rem
+    ld de,16
+    push de                     ; [count][expR/sign][X...][cret][Y...]
+    ld de,0                     ; quot
 
-.d_lp
-    push de
-    push af
-    ld de,sp+6
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld b,a
-    pop af
+;=========================================================================
+; Hot path — 16 bits.  BC=div, A:HL=rem, DE=quot, count on stack
+;=========================================================================
 
-    or a
+.div_bit_loop
+    ; trial (DSUB has no borrow-in)
     sub hl,bc
     sbc a,0
-    jr C,d_ns1
+    jr C,div_bit_fail
     scf
-    jr d_q1
+    jr div_quot_shift
 
-.d_ns1
+.div_bit_fail
     add hl,bc
     adc a,0
-    or a
-.d_q1
-    pop de
+    or a                        ; qbit = 0
+.div_quot_shift
     rl de
     add hl,hl
     rla
 
-    ; dec count without clobbering rem hi in A
+    ; dec count: preserve A (rem hi) and DE (quot); Z from dec (hl)
     push de
-    push af
-    ld de,sp+4                  ; [af][quot][count]...
-    ld a,(de)
-    dec a
-    ld (de),a
-    jr Z,d_loop_done
-    pop af
-    pop de
-    jr d_lp
-
-.d_loop_done
-    pop af                      ; rem hi (discard)
+    ld de,sp+2                  ; &count
+    push hl
+    ex de,hl                    ; HL = &count
+    dec (hl)
+    pop hl                      ; rem.lo
     pop de                      ; quot
-    pop bc                      ; count
-    pop bc                      ; div
+    jp NZ,div_bit_loop
+
+;=========================================================================
+; Pack
+;=========================================================================
+
+    pop bc                      ; drop count
     pop bc                      ; B=expR C=sign
 
     ld a,d
     and 080h
-    jr NZ,d_normed
+    jr NZ,div_normed
     ld a,e
     add a,a
     ld e,a
@@ -220,111 +220,97 @@ PUBLIC asm_f24_div_f24
     rla
     ld d,a
     dec b
-.d_normed
+.div_normed
     ld a,b
     or a
-    jp Z,d_res_zero
+    jp Z,div_res_zero
     cp 255
-    jp NC,d_res_inf
-    ex de,hl                    ; HL = quot (DE dead; refilled next)
-    ld de,bc                    ; DEHL = result
+    jp NC,div_res_inf
+    ex de,hl                    ; HL = quot
+    ld de,bc                    ; D=expR E=sign
 
     ; drop X.hl X.de cret Y.hl Y.de; restore cret
-    ; stack: X.hl X.de cret Y.hl Y.de rest...
     pop bc                      ; X.hl
     pop af                      ; X.de
     pop bc                      ; cret
     pop af                      ; Y.hl
     pop af                      ; Y.de
-    push bc                     ; cret
+    push bc
     ret
 
-; ---- specials (stack [X.hl][X.de][cret][Y.hl][Y.de]..., C=sign) ----
+;=========================================================================
+; Specials — stack [X.hl][X.de][cret][Y.hl][Y.de]..., C=sign
+;=========================================================================
 
-.d_y_zero
+.div_y_zero
     ld de,sp+3
     ld a,(de)
     or a
-    jr NZ,d_to_inf
-    jp d_to_nan
+    jr NZ,div_to_inf
+    jp div_to_nan
 
-.d_x_zero
-    jp d_to_zero
+.div_x_zero
+    jp div_to_zero
 
-.d_y_hi
+.div_y_hi
     ld de,sp+6
     ld hl,(de)
     ld a,h
     or l
-    jr NZ,d_to_nan
+    jr NZ,div_to_nan
     ld de,sp+3
     ld a,(de)
     cp 255
-    jr NZ,d_to_zero
-    jp d_to_nan
+    jr NZ,div_to_zero
+    jp div_to_nan
 
-.d_x_hi
+.div_x_hi
     ld de,sp+0
     ld hl,(de)
     ld a,h
     or l
-    jr NZ,d_to_nan
-    jp d_to_inf
+    jr NZ,div_to_nan
+    jp div_to_inf
 
-.d_exp_bad
+.div_exp_bad
     ld a,h
     rla
-    jr C,d_to_zero
-.d_of
-    jp d_to_inf
+    jr C,div_to_zero
+.div_overflow
+    jp div_to_inf
 
-.d_to_zero
+.div_underflow
+.div_to_zero
     ld e,c
-    pop af
-    pop af
-    pop bc
-    pop af
-    pop af
-    push bc
+    call div_drop5
     jp asm_f24_zero
 
-.d_to_inf
+.div_to_inf
     ld e,c
-    pop af
-    pop af
-    pop bc
-    pop af
-    pop af
-    push bc
+    call div_drop5
     jp asm_f24_inf
 
-.d_to_nan
-    pop af
-    pop af
-    pop bc
-    pop af
-    pop af
-    push bc
-    ld hl,0c000h
-    ld de,0ff00h
-    ret
+.div_to_nan
+    call div_drop5
+    jp asm_f24_nan
 
-.d_res_zero
+.div_res_zero
     ld e,c
-    pop af
-    pop af
-    pop bc
-    pop af
-    pop af
-    push bc
+    call div_drop5
     jp asm_f24_zero
 
-.d_res_inf
+.div_res_inf
     ld e,c
-    pop af
-    pop af
-    pop bc
-    pop af
-    pop af
-    push bc
+    call div_drop5
     jp asm_f24_inf
+
+; drop X.hl X.de cret Y.hl Y.de; leave cret on stack.  Preserves DE/HL/A/C as used.
+.div_drop5
+    pop hl                      ; return to special
+    pop af                      ; X.hl
+    pop af                      ; X.de
+    pop bc                      ; cret
+    pop af                      ; Y.hl
+    pop af                      ; Y.de
+    push bc                     ; cret
+    jp (hl)

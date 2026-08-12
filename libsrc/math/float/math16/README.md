@@ -192,6 +192,7 @@ Half and f24 **semantics** (bias, rounding sticky rules, specials at pack/expand
 |------|-----------------|------------|------|
 | **Half×half mul** (`asm_f16_mul_callee`) | Packed field extract; 11-bit mants; integer product; place (`>>5` / `>>6`+inc exp); pack via `asm_f16_f24` | `ex af,af` for sign; `srl`/`bit`/`set`; local Runer112 mulu with early-out entry for 11-bit and bit15-specialised entry for f24 | Sign on stack; open-coded logical EHL `>>`; one early-out `f16_8085_mulu_32_16x16` for both packed and f24 |
 | **f24 mul** (poly / inv / div / sqrt) | Left-aligned 16-bit mants; exp sum with bias 127; renorm + sticky | Alternate register set for second operand | Stack frame for second f24 (`ld de,sp+*`) |
+| **f24 div** (`asm_f16_div` / `asm_f24_div`) | Restoring 16×1-bit; prenorm if rem &lt; div; exp 0 → signed zero; specials via `asm_f24_zero` / `inf` / `nan` | rem `A:HL`, div `BC`, quot `DE`, count `B'` (`exx` + `djnz`) | rem `A:HL`, div `BC` (held), quot `DE`, count on stack (`dec (hl)`); labels match the z80 core |
 | **Expand** (`asm_f24_f16`) | Half → f24 | `rr hl` / `rra` path (cheaper on Z80) | Field extract + `add hl,hl` ×5 + implicit bit (no cheap 16-bit `rr`) |
 | **Pack** (`asm_f16_f24`) | f24 → half with low-bit rounding | `add hl,hl` for mant positioning | Same idea (`add hl,hl` ×3 + sign via A) |
 | **Add / compare / …** | Same algorithms | `exx`, native CB shifts | Stack second operand; open-coded shifts |
@@ -214,9 +215,11 @@ The expanded floating point format is a useful tool for creating functions, as c
 half_t invf16 (half_t x);
 half_t divf16 (half_t x, half_t y);
 ```
-**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).  
+**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).
 
-**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/` and for plain `1/n` (restoring div is faster than NR inv). sccz80 no longer rewrites half/IEEE literal `1.0/x` to inv — that is ordinary divide. Keep explicit `invf16` for reciprocal-as-primitive / NR-based helpers.
+Both cores use the same label set (`div_body`, `div_bit_loop`, `div_bit_fail`, `div_quot_shift`, `div_normed`, `div_zero` / `div_inf` / `div_nan`, …). The f24 mantissa is 16 bits, so the divisor stays in `BC` for the whole loop. The z80 core puts the step count in `B'` (`djnz`). The 8085 core keeps the count on the stack and updates it with `dec (hl)` so the hot path does not spill `AF` each bit. Specials call shared `asm_f24_zero`, `asm_f24_inf`, and `asm_f24_nan`.
+
+**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/` and for plain `1/n` (restoring div is faster than NR inv). sccz80 does not rewrite half/IEEE literal `1.0/x` to inv — that is ordinary divide. Keep explicit `invf16` for reciprocal-as-primitive / NR-based helpers.
 
 #### _sqrt()_ and _invsqrt()_
 

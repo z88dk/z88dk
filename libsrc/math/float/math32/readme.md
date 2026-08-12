@@ -291,7 +291,7 @@ float div (float x, float y);
 | z80 family | `asm/z80/f32_fsdiv.asm` | `math32`, `math32_ixiy`, `math32_z80n`, `math32_z180`, `math32_ez80_z80`, `math32_r2ka`, `math32_r4k`, `math32_kc160` |
 | 8085 | `asm/8085/f32_fsdiv.asm` | `math32_8085` |
 
-Both cores share the same control structure and label set (`div_enter`, `div_bit_loop`, `div_guard_*`, `div_pack_*`, specials). The z80 core keeps rem and div in the main and alternate register sets. The 8085 core keeps rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame.
+Both cores share the same control structure and label set (`div_enter`, `div_bit_loop`, `div_guard_*`, `div_pack_*`, specials). The z80 core keeps rem and div in the main and alternate register sets. The 8085 core keeps rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame. math16 f24 divide uses the same restoring plan on a 16-bit mantissa (see `math16/README.md`); there the divisor fits in `BC` for the whole loop.
 
 exp==0 inputs are ±0. Result underflow flushes to signed zero. No gradual underflow. Special exits use `m32_fpclassify` (8085 classify), `m32_fszero` / `m32_fsmax` (signed 0 / inf; CF cleared after `m32_fsmax`), and `m32_fsconst_pnan` for NaN.
 
