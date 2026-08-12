@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsdiv - z80 restoring IEEE single divide
+; m32_fsdiv — z80 restoring IEEE single divide
 ;-------------------------------------------------------------------------
 ;
 ; No index registers.  Main + alternate set only.
@@ -16,17 +16,24 @@
 ;   m32_fsdiv_callee DEHL = b; stack = ret, a         (drops a)
 ;
 ; 12-byte work frame under ret; b remains above ret for specials/unpack:
-;   +0..+2 d   +3..+5 r   +6 exp   +7 sign
+;   +0..+2 div   +3..+5 rem seed   +6 expR   +7 sign
 ;   +8..+11 a IEEE snapshot   +12 ret   +14 b
 ;
-; Hot path rem/div in hlhl'/dede' (cf. l_fast_divu_32_32x32):
+; Hot path (register-held rem + div, cf. l_fast_divu_32_32x32):
+;   MAIN: rem_hi / div_hi in HL/DE; ALT: rem_lo / div_lo in HL'/DE'
 ;   trial sbc with C = rem high bit from previous adc hl,hl chain;
-;   restore on borrow; quot bit from explicit scf / or a; rem <<= 1
-;   leaves C for the next trial.
+;   restore on borrow; quot bit via scf / or a; rem <<= 1 leaves C.
+;
+; Label map (aligned with asm/8085/f32_fsdiv.asm):
+;   div_enter/body, div_prenorm, div_bit_loop, div_bit_fail/ok,
+;   div_quot_shift, div_guard_*, div_round_up, div_pack*, specials.
+;
+; Reuses: m32_fsconst_* for NaN; m32_fszero / m32_fsmax for signed 0/inf
+; after frame drop (sign in D).  Classification remains open-coded (avoids
+; extra stack walks vs m32_fpclassify at this frame depth).
 ;
 ; Denormals: not supported (math32 policy).  exp==0 is ±0 on input;
 ; result underflow flushes to signed zero (no gradual underflow).
-; Specials exit via m32_fsconst_* after frame drop (NaN = pnan).
 ;
 ; Result DEHL = a / b.
 ;
@@ -35,8 +42,8 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fsconst_nzero, m32_fsconst_pzero
-EXTERN m32_fsconst_ninf, m32_fsconst_pinf, m32_fsconst_pnan
+EXTERN m32_fsconst_pnan
+EXTERN m32_fszero, m32_fsmax
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 
@@ -57,7 +64,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     inc hl
     ld h,(hl)
     ld l,a                      ; HLDE = a
-    jr div_body
+    jr div_enter
 
 ; ---- callee: drop a ----
 .m32_fsdiv_callee
@@ -84,7 +91,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     exx
     push bc                     ; ret → SP = ret, b
 
-.div_body
+.div_enter
     ; HLDE = a; SP = ret, b — snapshot a then open 12-byte frame
     ld a,h
     ex af,af                    ; A' = aH
@@ -279,7 +286,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     add hl,sp
     ld (hl),a
 
-.div_pre_norm
+.div_prenorm
     ; Load 24-bit rem/div into 32-bit hlhl'/dede'
     ; rem r2:r1:r0 at +5..+3; div d2:d1:d0 at +2..+0
     ld hl,3
@@ -318,15 +325,15 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     sbc hl,de
     exx
     sbc hl,de
-    jr C,div_pre_less
+    jr C,div_pre_lt
     exx
     add hl,de
     exx
     adc hl,de
     or a                        ; C = 0 for first trial
-    jr div_loop_start
+    jr div_bit_init
 
-.div_pre_less
+.div_pre_lt
     exx
     add hl,de
     exx
@@ -344,29 +351,29 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ; ---- 24-bit restoring (l_fast carry-linked style) ----
     ; C = rem bit32 into trial sbc.  MAIN B=count C=qhi; ALT BC'=qlo
     ; 1×: 24 steps × 1 bit
-.div_loop_start
+.div_bit_init
     ld c,0
     exx
     ld bc,0
     exx
     ld b,24
-.div_lp
+.div_bit_loop
     ; --- bit ---
     exx
     sbc hl,de
     exx
     sbc hl,de
-    jr NC,div_b1a
+    jr NC,div_bit_ok
     exx
     add hl,de
     exx
     adc hl,de
     or a
-    jr div_q1
+    jr div_quot_shift
 
-.div_b1a
+.div_bit_ok
     scf
-.div_q1
+.div_quot_shift
     exx
     rl c
     rl b
@@ -376,14 +383,14 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     add hl,hl
     exx
     adc hl,hl
-    djnz div_lp
+    djnz div_bit_loop
 
     ; guard / RNE — C = rem high bit after last rem<<1
     exx
     sbc hl,de
     exx
     sbc hl,de
-    jr C,div_guard_rest
+    jr C,div_guard_restore
     ; rem >= div: already subtracted; sticky = rem != 0
     ld a,h
     exx
@@ -391,20 +398,20 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     or l
     exx
     or l
-    jr NZ,div_rnd_up
+    jr NZ,div_round_up
     exx
     bit 0,c
     exx
-    jr Z,div_q_saved
-.div_rnd_up
+    jr Z,div_guard_done
+.div_round_up
     exx
     inc c
-    jr NZ,div_rnd_ok
+    jr NZ,div_round_ok
     inc b
-    jr NZ,div_rnd_ok
+    jr NZ,div_round_ok
     exx
     inc c
-    jr NZ,div_q_saved
+    jr NZ,div_guard_done
     ld c,080h
     push hl
     ld hl,8                     ; exp at +6, +2 for push
@@ -414,19 +421,19 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     pop hl
     cp 255
     jp Z,div_inf
-    jr div_q_saved
+    jr div_guard_done
 
-.div_rnd_ok
+.div_round_ok
     exx
-    jr div_q_saved
+    jr div_guard_done
 
-.div_guard_rest
+.div_guard_restore
     exx
     add hl,de
     exx
     adc hl,de
 
-.div_q_saved
+.div_guard_done
     ; C = qhi, BC' = qlo → B:D:E for pack
     ld b,c
     exx
@@ -444,9 +451,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld a,b
     and 07fh
     bit 0,c
-    jr Z,div_pk0
+    jr Z,div_pack_exp
     or 080h
-.div_pk0
+.div_pack_exp
     ld b,a
     ld a,c
     srl a
@@ -468,34 +475,30 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     call div_unwind
     ret
 
-; Cold exits: HL = m32_fsconst_*; drop then jp.
+; Cold exits — reuse m32_fszero / m32_fsmax (sign in D) after unwind.
 .div_nan
-    ld hl,m32_fsconst_pnan
-    jr div_drop_hl
+    call div_unwind
+    jp m32_fsconst_pnan
 
 .div_inf
     ld hl,7
     add hl,sp
     ld a,(hl)                   ; sign
-    rla
-    ld hl,m32_fsconst_pinf
-    jr NC,div_drop_hl
-    ld hl,m32_fsconst_ninf
-    jr div_drop_hl
+    and 080h
+    ld d,a                      ; D = sign for m32_fsmax
+    call div_unwind             ; preserves main DEHL (D kept)
+    call m32_fsmax
+    or a                        ; clear error CF from m32_fseexit
+    ret
 
 .div_zero
     ld hl,7
     add hl,sp
     ld a,(hl)                   ; sign
-    rla
-    ld hl,m32_fsconst_pzero
-    jr NC,div_drop_hl
-    ld hl,m32_fsconst_nzero
-.div_drop_hl
-    ex de,hl                    ; DE = const exit (main)
-    call div_unwind             ; preserves main DEHL / DE
-    ex de,hl
-    jp (hl)
+    and 080h
+    ld d,a
+    call div_unwind
+    jp m32_fszero
 
 ; Free 12-byte work + drop b; leave C ret on stack.
 ; CALL-safe: pops uret, restores it after.  Preserves main DEHL via exx.

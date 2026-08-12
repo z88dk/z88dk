@@ -1,4 +1,3 @@
-;
 ;  feilipu, 2026 August
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,15 +8,45 @@
 ; m32_fsdiv — 8085 restoring IEEE single divide
 ;-------------------------------------------------------------------------
 ;
-; Stack-only (no exx / IX / djnz / bit).  Restoring step after l_long_div_0:
-;   rem/div/quot on stack; trial via A sub/sbc; ld de,sp+* traffic.
+; Stack-only (no exx / IX / djnz).
+;
+; Hot path:
+;   DEHL     = rem (L=lo H=mid E=hi D=x)   — register-held remainder
+;   B        = bit count
+;   work+0..2 = div (lo,mid,hi)            — divisor on frame
+;     (Holding div.hi in C was measured slower: each trial needs C as a
+;      temporary for stack loads, forcing push/pop bc.)
+;
+; rem <<= 1 : add hl,hl / rl de
+; trial     : rem_sub / rem_add helpers
+;
+; Library reuse:
+;   m32_fpclassify     — classify (0 num, 1 zero, 2 nan, 3 inf)
+;   m32_fszero       — signed zero (sign in D)
+;   m32_fsmax        — signed inf  (sign in D)
+;   m32_fsconst_pnan — NaN
 ;
 ; Entry:
 ;   m32_fsdiv        DEHL = b; stack = ret, a [, b]
 ;   m32_fsdiv_callee DEHL = b; stack = ret, a   (drops a)
 ;
-; Work (14) under [sign][a][b][flag][ret]:
-;   +0..+3 rem   +4..+6 div   +8..+10 quot   +12 expR
+; Frame after open (SP = work base):
+;
+;   +0  div.lo      3-byte divisor mantissa
+;   +1  div.mid
+;   +2  div.hi
+;   +3  expR
+;   +4  quot.lo     3-byte quotient
+;   +5  quot.mid
+;   +6  quot.hi
+;   +7  (pad)
+;   +8  sign        word: L = sign in 0x80
+;   +10 a           IEEE snapshot (4)
+;   +14 b           IEEE snapshot (4)
+;   +18 flag        word: L = 1 if callee
+;   +20 ret
+;
+; Labels aligned with asm/z80/f32_fsdiv.asm.
 ;
 ; Denormals: not supported (math32 policy).  exp==0 is ±0 on input;
 ; result underflow flushes to signed zero (no gradual underflow).
@@ -29,20 +58,25 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fsconst_nzero, m32_fsconst_pzero
-EXTERN m32_fsconst_ninf, m32_fsconst_pinf, m32_fsconst_pnan
+EXTERN m32_fpclassify
+EXTERN m32_fszero, m32_fsmax
+EXTERN m32_fsconst_pnan
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 
+;=========================================================================
+; Entry
+;=========================================================================
+
 .m32_fsdiv
     xor a
-    jp dv_go
+    jp div_enter
 
 .m32_fsdiv_callee
     ld a,1
 
-.dv_go
+.div_enter
     ld b,0
     ld c,a
     push bc                     ; flag
@@ -50,7 +84,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push de
     push hl                     ; b
     ld de,sp+8
-    call get4                   ; a
+    call load4                  ; DEHL = a
     push de
     push hl                     ; a
 
@@ -65,203 +99,453 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld h,0
     push hl                     ; sign
 
-    ld hl,-14
+    ld hl,-8
     add hl,sp
     ld sp,hl
-    ; work+0  sign+14  a+16  b+20  flag+24  ret+26
+    ; work@0  sign@8  a@10  b@14  flag@18  ret@20
 
-    ld de,sp+16
-    call get4
-    call cls
-    cp 3
-    jp Z,x_nan
+;=========================================================================
+; Classify (m32_fpclassify: 0 num, 1 zero, 2 nan, 3 inf)
+;=========================================================================
+
+    ld de,sp+10
+    call load4
+    call m32_fpclassify
     cp 2
-    jp Z,x_ainf
-    or a
-    jp Z,x_azero
-    ld de,sp+20
-    call get4
-    call cls
+    jp Z,div_nan
     cp 3
-    jp Z,x_nan
+    jp Z,div_a_inf
+    dec a
+    jp Z,div_a_zero
+
+    ld de,sp+14
+    call load4
+    call m32_fpclassify
     cp 2
-    jp Z,x_binf
-    or a
-    jp Z,x_bzero
-    ld de,sp+16
-    call get4
-    call unp                    ; B=exp_a A=mhi HL=mlo
-    ld de,sp+12
+    jp Z,div_nan
+    cp 3
+    jp Z,div_b_inf
+    dec a
+    jp Z,div_b_zero
+
+;=========================================================================
+; Unpack a → rem (pushed), expR = exp_a
+;=========================================================================
+
+    ld de,sp+10
+    call load4
+    call ieee_unpack            ; B=exp_a A=mhi HL=mlo
+
+    ld de,sp+3
     push af
     ld a,b
-    ld (de),a                   ; expR = exp_a (byte)
+    ld (de),a                   ; expR
     pop af
-    ld de,sp+0
-    ld (de),hl                  ; rem.lo (word) — 8085: ld (de),hl not (de),l/(de),h
-    inc de
-    inc de
-    ld (de),a                   ; rem.hi
-    inc de
-    xor a
-    ld (de),a                   ; rem.x
 
-    ld de,sp+20
-    call get4
-    call unp                    ; B=exp_b A=mhi HL=mlo
+    ld e,a
+    ld d,0
+    push de
+    push hl                     ; rem high, rem low
+
+;=========================================================================
+; Unpack b → div frame; expR = exp_a - exp_b + 127
+;=========================================================================
+
+    ld de,sp+18
+    call load4
+    call ieee_unpack            ; B=exp_b A=mhi HL=mlo
+
     ld de,sp+4
-    ld (de),hl                  ; div.lo (word)
+    ld (de),hl                  ; div.lo:mid
     inc de
     inc de
     ld (de),a                   ; div.hi
 
-    ld de,sp+12
+    ld de,sp+7
     ld a,(de)
     sub b
     ld e,a
     ld d,0
-    jp NC,ep_ok
+    jp NC,div_exp_sx
     ld d,0ffh
-.ep_ok
+.div_exp_sx
     ld hl,127
     add hl,de
     ld a,h
     or a
-    jp NZ,x_expbad
+    jp NZ,div_exp_bad_p
     ld a,l
     cp 255
-    jp NC,x_of
+    jp NC,div_overflow_p
     or a
-    jp Z,x_uflow                ; exp 0 → flush zero (no subnormals)
-    ld de,sp+12
+    jp Z,div_underflow_p
+    ld de,sp+7
     ld (de),a
 
+    pop hl
+    pop de                      ; rem
+
+    push de
+    push hl
     ld de,sp+8
     ld hl,0
-    ld (de),hl                  ; quot.lo = 0
+    ld (de),hl
     inc de
     inc de
     xor a
-    ld (de),a                   ; quot.hi = 0
+    ld (de),a                   ; quot = 0
+    pop hl
+    pop de
 
-    call rem_lt_div
-    jr NC,pre_ok
-    call rem_shl
-    ld de,sp+12
+;=========================================================================
+; Prenorm
+;=========================================================================
+
+    call rem_sub
+    jr C,div_pre_lt
+    call rem_add
+    jr div_prenorm_done
+
+.div_pre_lt
+    call rem_add
+    add hl,hl
+    rl de
+    push de
+    ld de,sp+3+2
     ld a,(de)
     dec a
     ld (de),a
-.pre_ok
+    pop de
+.div_prenorm_done
+
+;=========================================================================
+; Hot path: 24 bits — rem in DEHL, B=count, div on frame
+;=========================================================================
 
     ld b,24
-.lp
-    call rem_try
-    jr C,q0
-    call quot_bit1
-    jr qdone
 
-.q0
+.div_bit_loop
+    call rem_sub
+    jr C,div_bit_fail
+    scf
+    jp div_quot_shift
+
+.div_bit_fail
     call rem_add
-    call quot_bit0
-.qdone
-    call rem_shl
+    or a
+
+.div_quot_shift
+    push de
+    push hl
+    ld de,sp+4+4                ; &quot
+    ld a,(de)
+    rla
+    ld (de+),a
+    ld a,(de)
+    rla
+    ld (de+),a
+    ld a,(de)
+    rla
+    ld (de),a
+    pop hl
+    pop de
+
+    add hl,hl
+    rl de
+
     dec b
-    jp NZ,lp
-    call rem_try
-    jr C,g_rest
-    call rem_nz
-    jr NZ,g_up
-    ld de,sp+8
+    jp NZ,div_bit_loop
+
+;=========================================================================
+; Guard + RNE
+;=========================================================================
+
+    call rem_sub
+    jr C,div_guard_restore
+
+    ld a,l
+    or h
+    or e
+    or d
+    jr NZ,div_round_up
+    ld de,sp+4
     ld a,(de)
     and 1
-    jr Z,g_done
-.g_up
-    call quot_inc
-    jr g_done
-
-.g_rest
-    call rem_add
-.g_done
-
-    ; B=qhi, HL = qmid:qlo
-    ld de,sp+10
+    jr Z,div_guard_done
+.div_round_up
+    ld de,sp+4
     ld a,(de)
-    ld b,a                      ; qhi
-    ld de,sp+8
-    ld hl,(de)                  ; qlo | qmid
+    inc a
+    ld (de+),a
+    jr NZ,div_guard_done
+    ld a,(de)
+    inc a
+    ld (de+),a
+    jr NZ,div_guard_done
+    ld a,(de)
+    inc a
+    ld (de),a
+    jr NZ,div_guard_done
+    ld a,080h
+    ld (de),a
+    ld de,sp+3
+    ld a,(de)
+    inc a
+    ld (de),a
+    jr div_guard_done
+
+.div_guard_restore
+    call rem_add
+.div_guard_done
+
+;=========================================================================
+; Pack
+;=========================================================================
+
+    ld de,sp+6
+    ld a,(de)
+    ld b,a
+    ld de,sp+4
+    ld hl,(de)
 
     ld a,b
     or a
     rla
-    jr C,pack
+    jr C,div_pack
     add hl,hl
     ld a,b
     rla
     ld b,a
-    ld de,sp+12
+    ld de,sp+3
     ld a,(de)
     dec a
     ld (de),a
-.pack
-    ld de,sp+12
-    ld a,(de)                   ; expR
+.div_pack
+    ld de,sp+3
+    ld a,(de)
     or a
-    jp Z,x_uflow
+    jp Z,div_underflow
     cp 255
-    jp NC,x_of
-    ld c,a                      ; exp
+    jp NC,div_overflow
+    ld c,a
     ld a,b
     and 07fh
     ld b,a
     ld a,c
     and 1
-    jr Z,pk0
+    jr Z,div_pack_exp
     ld a,b
     or 080h
     ld b,a
-.pk0
+.div_pack_exp
     ld a,c
     and 0feh
-    rra                         ; exp >> 1
+    rra
     ld c,a
-    ld de,sp+14
-    ld a,(de)                   ; sign
+    ld de,sp+8
+    ld a,(de)
     and 080h
     or c
-    ; A = sign|exp>>1, B = mhi, HL = mid:lo
     ld d,a
     ld e,b
-    ; DEHL = IEEE
 
-    ; free work/sign/a/b/flag; callee may drop a under ret
-    ; BC free: park high in BC, low in HL already as H:L of IEEE? 
-    ; IEEE DEHL: D,E,H,L — high word DE, low word HL.
-    ld bc,de                    ; BC = high
-    ; HL already low
-    ex de,hl                    ; DE = low, HL free for SP
-    ld hl,14
+;=========================================================================
+; Epilogue
+;=========================================================================
+
+    ld bc,de
+    ex de,hl
+    ld hl,8
     add hl,sp
-    ld sp,hl                    ; free work; BC=high DE=low
-    pop af                      ; sign
+    ld sp,hl
     pop af
-    pop af                      ; a copy
     pop af
-    pop af                      ; b copy
-    pop hl                      ; flag in L (word was B=0 C=flag → L=flag)
+    pop af
+    pop af
+    pop af
+    pop hl
     ld a,l
-    ex de,hl                    ; HL = low (DE was low; DE dead next)
-    ld de,bc                    ; DE = high → DEHL = result
+    ex de,hl
+    ld de,bc
     or a
-    jr Z,done_nc
-    pop bc                      ; ret
+    jr Z,div_done
+    pop bc
     pop af
-    pop af                      ; drop original a
+    pop af
     push bc
-.done_nc
+.div_done
     ret
 
-;--------------------------------------------------------------------
-.get4
-    ex de,hl                    ; HL = ptr (DE dead; refilled from (hl+))
+;=========================================================================
+; rem_sub / rem_add — CALL SP=work; B=count; DEHL=rem; div@work+0
+; Preserves B.  Uses C as temp.
+;=========================================================================
+
+.rem_sub
+    push de
+    ld de,sp+4
+    ld a,(de)
+    ld c,a
+    ld a,l
+    sub c
+    ld l,a
+    inc de
+    ld a,(de)
+    ld c,a
+    ld a,h
+    sbc a,c
+    ld h,a
+    inc de
+    ld a,(de)
+    ld c,a
+    pop de
+    ld a,e
+    sbc a,c
+    ld e,a
+    ld a,d
+    sbc a,0
+    ld d,a
+    ret
+
+.rem_add
+    push de
+    ld de,sp+4
+    ld a,(de)
+    ld c,a
+    ld a,l
+    add a,c
+    ld l,a
+    inc de
+    ld a,(de)
+    ld c,a
+    ld a,h
+    adc a,c
+    ld h,a
+    inc de
+    ld a,(de)
+    ld c,a
+    pop de
+    ld a,e
+    adc a,c
+    ld e,a
+    ld a,d
+    adc a,0
+    ld d,a
+    ret
+
+;=========================================================================
+; Specials — m32_fszero / m32_fsmax take sign in D
+;=========================================================================
+
+.div_exp_bad_p
+    pop af
+    pop af
+    jp div_exp_bad
+
+.div_overflow_p
+    pop af
+    pop af
+    jp div_overflow
+
+.div_underflow_p
+    pop af
+    pop af
+    jp div_underflow
+
+.div_nan
+    call drop_frame
+    jp m32_fsconst_pnan
+
+.div_a_inf
+    ld de,sp+14
+    call load4
+    call m32_fpclassify
+    cp 2
+    jp Z,div_nan
+    cp 3
+    jp Z,div_nan
+    ld de,sp+8
+    ld a,(de)
+    ld d,a
+    call drop_frame
+    call m32_fsmax
+    or a                        ; clear error CF from m32_fseexit
+    ret
+
+.div_a_zero
+    ld de,sp+14
+    call load4
+    call m32_fpclassify
+    dec a
+    jp Z,div_nan
+    ld de,sp+8
+    ld a,(de)
+    ld d,a
+    call drop_frame
+    jp m32_fszero
+
+.div_b_inf
+    ld de,sp+8
+    ld a,(de)
+    ld d,a
+    call drop_frame
+    jp m32_fszero
+
+.div_b_zero
+    ld de,sp+8
+    ld a,(de)
+    ld d,a
+    call drop_frame
+    call m32_fsmax
+    or a
+    ret
+
+.div_exp_bad
+    ld a,h
+    rla
+    jp C,div_underflow
+.div_overflow
+    ld de,sp+8
+    ld a,(de)
+    ld d,a
+    call drop_frame
+    call m32_fsmax
+    or a
+    ret
+
+.div_underflow
+    ld de,sp+8
+    ld a,(de)
+    ld d,a
+    call drop_frame
+    jp m32_fszero
+
+; CALL: ret@0 work@2.  Drops ret+work+sign+a+b+flag.  Preserves D.
+.drop_frame
+    ld hl,10
+    add hl,sp
+    ld sp,hl
+    pop af
+    pop af
+    pop af
+    pop af
+    pop af
+    pop hl
+    ld a,l
+    or a
+    ret Z
+    pop hl
+    pop af
+    pop af
+    push hl
+    ret
+
+;=========================================================================
+; Entry helpers
+;=========================================================================
+
+.load4
+    ex de,hl
     ld c,(hl+)
     ld b,(hl+)
     ld e,(hl+)
@@ -269,311 +553,12 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld hl,bc
     ret
 
-; Class: 0=±0 (exp==0, denorms flushed), 1=finite, 2=±inf, 3=NaN
-.cls
-    ld a,d
-    and 07fh
-    cp 07fh
-    jr Z,cls_hi
-    or a
-    jr NZ,cls_fin               ; top 7 exp bits set
-    ld a,e
-    and 080h
-    jr NZ,cls_fin               ; exp LSB set
-    xor a                       ; exp==0 → ±0 (incl. IEEE denormals)
-    ret
-.cls_fin
-    ld a,1
-    ret
-.cls_hi
-    ld a,e
-    and 07fh
-    or h
-    or l
-    ld a,2
-    ret Z
-    ld a,3
-    ret
-
-; DEHL IEEE → B=exp, A=mhi, HL=mlo  (finite normals only; cls filtered zeros)
-.unp
-    ex de,hl                    ; HL = D:E, DE = H:L (mlo)
-    add hl,hl                   ; H=exp, L=top mant bits
-    ld b,h                      ; B = exp
+.ieee_unpack
+    ex de,hl
+    add hl,hl
+    ld b,h
     ld a,l
     scf
-    rra                         ; A = mhi with implicit 1
-    ex de,hl                    ; HL = mlo
+    rra
+    ex de,hl
     ret
-
-;--------------------------------------------------------------------
-; Stack helpers — called, so work base is sp+2 (ret at +0), like l_long_div_0.
-; work: rem+2 div+6 quot+10 expR+14
-;
-; 8085 (de) forms only:
-;   ld a,(de) / ld (de),a / ld a,(de+) / ld (de+),a
-;   ld hl,(de) / ld (de),hl
-; Never ld (de),r (r≠A) or ld (de),n — those are faked via ex de,hl.
-;--------------------------------------------------------------------
-
-.rem_shl
-    ; rem <<= 1: lo word via HL, then hi,x via A
-    ld de,sp+2
-    ld hl,(de)
-    add hl,hl
-    ld (de),hl
-    inc de
-    inc de
-    ld a,(de)
-    rla
-    ld (de+),a
-    ld a,(de)
-    rla
-    ld (de),a
-    ret
-
-.rem_lt_div
-    ; unsigned compare rem[3:0] vs 0:div[2:0]; C if rem < div
-    ld de,sp+5
-    ld a,(de)                   ; rem.x
-    or a
-    jr NZ,rlt_nc
-    ld de,sp+4
-    ld a,(de)                   ; rem.hi
-    ld c,a
-    ld de,sp+8
-    ld a,(de)                   ; div.hi
-    cp c
-    jr C,rlt_nc
-    jr NZ,rlt_c
-    ld de,sp+3
-    ld a,(de)                   ; rem.mid
-    ld c,a
-    ld de,sp+7
-    ld a,(de)                   ; div.mid
-    cp c
-    jr C,rlt_nc
-    jr NZ,rlt_c
-    ld de,sp+2
-    ld a,(de)                   ; rem.lo
-    ld c,a
-    ld de,sp+6
-    ld a,(de)                   ; div.lo
-    cp c
-    jr C,rlt_nc
-    jr Z,rlt_nc
-.rlt_c
-    scf
-    ret
-.rlt_nc
-    or a
-    ret
-
-.rem_try
-    ; rem -= 0:div (4-byte); C if borrow (failed)
-    ; DE → rem, HL → div  (cf. l_long_div_0)
-    ld de,sp+6
-    ex de,hl                    ; HL = &div
-    ld de,sp+2                  ; DE = &rem
-    ld a,(de)
-    sub (hl)
-    ld (de+),a
-    inc hl
-    ld a,(de)
-    sbc a,(hl)
-    ld (de+),a
-    inc hl
-    ld a,(de)
-    sbc a,(hl)
-    ld (de+),a
-    ld a,(de)
-    sbc a,0
-    ld (de),a
-    ret
-
-.rem_add
-    ; rem += 0:div (restore)
-    ld de,sp+6
-    ex de,hl                    ; HL = &div
-    ld de,sp+2                  ; DE = &rem
-    ld a,(de)
-    add a,(hl)
-    ld (de+),a
-    inc hl
-    ld a,(de)
-    adc a,(hl)
-    ld (de+),a
-    inc hl
-    ld a,(de)
-    adc a,(hl)
-    ld (de+),a
-    ld a,(de)
-    adc a,0
-    ld (de),a
-    ret
-
-.rem_nz
-    ld de,sp+2
-    ld a,(de+)
-    ld c,a
-    ld a,(de+)
-    or c
-    ld c,a
-    ld a,(de+)
-    or c
-    ld c,a
-    ld a,(de)
-    or c
-    ret
-
-.quot_bit0
-    ld de,sp+10
-    ld a,(de)
-    add a,a                     ; C = old b7
-    ld (de+),a
-    ld a,(de)
-    rla
-    ld (de+),a
-    ld a,(de)
-    rla
-    ld (de),a
-    ret
-
-.quot_bit1
-    ; or 1 clears C — save carry from add a,a before setting bit0
-    ld de,sp+10
-    ld a,(de)
-    add a,a
-    push af                     ; save C from shift
-    or 1
-    ld (de+),a
-    pop af                      ; restore C
-    ld a,(de)
-    rla
-    ld (de+),a
-    ld a,(de)
-    rla
-    ld (de),a
-    ret
-
-.quot_inc
-    ld de,sp+10
-    ld a,(de)
-    inc a
-    ld (de+),a
-    ret NZ
-    ld a,(de)
-    inc a
-    ld (de+),a
-    ret NZ
-    ld a,(de)
-    inc a
-    ld (de),a
-    ret NZ
-    ld a,080h
-    ld (de),a
-    ld de,sp+14
-    ld a,(de)
-    inc a
-    ld (de),a
-    ret
-
-;--------------------------------------------------------------------
-; Specials: SP → work (no extra ret).  sign@+14 a@+16 b@+20 flag@+24
-;--------------------------------------------------------------------
-.x_nan
-    xor a
-    ld c,a                      ; sign unused
-    call drop_frame
-    jp m32_fsconst_pnan
-
-.x_ainf
-    ld de,sp+20
-    call get4
-    call cls
-    cp 2
-    jp Z,x_nan
-    cp 3
-    jp Z,x_nan
-    ld de,sp+14
-    ld a,(de)
-    ld c,a                      ; sign
-    call drop_frame
-    jp to_inf
-
-.x_azero
-    ld de,sp+20
-    call get4
-    call cls
-    or a
-    jp Z,x_nan
-    ld de,sp+14
-    ld a,(de)
-    ld c,a
-    call drop_frame
-    jp to_zero
-
-.x_binf
-    ld de,sp+14
-    ld a,(de)
-    ld c,a
-    call drop_frame
-    jp to_zero
-
-.x_bzero
-    ld de,sp+14
-    ld a,(de)
-    ld c,a
-    call drop_frame
-    jp to_inf
-
-.x_expbad
-    ld a,h
-    rla
-    jp C,x_uflow
-.x_of
-    ld de,sp+14
-    ld a,(de)
-    ld c,a
-    call drop_frame
-    jp to_inf
-
-.x_uflow
-    ld de,sp+14
-    ld a,(de)
-    ld c,a
-    call drop_frame
-    jp to_zero
-
-; SP on entry to drop_frame = work (via CALL → ret@+0, work@+2).
-; Drops ret+work+sign+a+b+flag.  Preserves C (sign).  Callee drops a under ret.
-.drop_frame
-    ld hl,16                    ; ret + work
-    add hl,sp
-    ld sp,hl                    ; → sign
-    pop af                      ; sign
-    pop af
-    pop af                      ; a
-    pop af
-    pop af                      ; b
-    pop de                      ; flag in E
-    ld a,e
-    or a
-    ret Z
-    pop de                      ; ret
-    pop af
-    pop af                      ; drop a
-    push de
-    ret
-
-.to_inf
-    ld a,c
-    rla
-    jp C,m32_fsconst_ninf
-    jp m32_fsconst_pinf
-
-.to_zero
-    ld a,c
-    rla
-    jp C,m32_fsconst_nzero
-    jp m32_fsconst_pzero

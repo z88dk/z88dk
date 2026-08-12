@@ -284,9 +284,18 @@ These functions are implemented in assembly language but they utilise the intrin
 float inv (float x);
 float div (float x, float y);
 ```
-**`div` / `m32_fsdiv`**: restoring 24-bit mantissa divide (z80 + 8085 cores; z80n/z180 use the z80 core). Replaced the old NR `fsinv`×`fsmul` path. Large win on divide-hot code (whetstone ~1.4×). Follows the library denorm policy: exp==0 inputs are ±0; result underflow flushes to signed zero (no gradual underflow). Specials use the shared `m32_fsconst_*` values (same as mul).
+**`div` / `m32_fsdiv`**: restoring 24-bit mantissa divide with RNE on the guard bit.
 
-**`inv` / `m32_fsinv`**: still Newton–Raphson (wide multiplies). For plain `1/n`, restoring `div` is faster on z80/8085/z80n/z180. sccz80 no longer rewrites IEEE literal `1.0f/x` to `inv` — that is ordinary divide → `fsdiv`. Explicit `inv(x)` still calls NR `fsinv`. Fixed-point `inversef` → `l_fix16_inv` / `l_fix32_inv` is unchanged.
+| Core | File | Products |
+|------|------|----------|
+| z80 family | `asm/z80/f32_fsdiv.asm` | `math32`, `math32_ixiy`, `math32_z80n`, `math32_z180`, `math32_ez80_z80`, `math32_r2ka`, `math32_r4k`, `math32_kc160` |
+| 8085 | `asm/8085/f32_fsdiv.asm` | `math32_8085` |
+
+Both cores share the same control structure and label set (`div_enter`, `div_bit_loop`, `div_guard_*`, `div_pack_*`, specials). The z80 core keeps rem and div in the main and alternate register sets. The 8085 core keeps rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame.
+
+exp==0 inputs are ±0. Result underflow flushes to signed zero. No gradual underflow. Special exits use `m32_fpclassify` (8085 classify), `m32_fszero` / `m32_fsmax` (signed 0 / inf; CF cleared after `m32_fsmax`), and `m32_fsconst_pnan` for NaN.
+
+**`inv` / `m32_fsinv`**: Newton–Raphson (wide multiplies). For plain `1/n`, restoring `div` is faster on z80, 8085, z80n, and z180. sccz80 does not rewrite IEEE literal `1.0f/x` to `inv`. That expression is ordinary divide → `fsdiv`. Explicit `inv(x)` calls NR `fsinv`. Fixed-point `inversef` → `l_fix16_inv` / `l_fix32_inv` is unchanged.
 
 #### _sqrt()_ and _invsqrt()_
 
@@ -387,7 +396,7 @@ If the value of the function depends on the value of the difference of 2 floatin
 
 Addition / subtraction use jam-sticky on lost bits (not full IEEE RNE). Results are typically within 1–2 ULP of a correctly rounded IEEE sum for ordinary cases; long add-heavy chains can accumulate small differences versus pure RNE or versus m48.
 
-Divide is restoring binary division (not NR), with RNE pack on the residual bit and denorm/underflow flush as above. Inverse remains NR. Both target full IEEE 24-bit mantissa accuracy on ordinary finite (normal) inputs.
+Divide is restoring binary division (not NR). The pack step uses RNE on the residual bit. Denorm and underflow flush as above. Inverse remains NR. Both target full IEEE 24-bit mantissa accuracy on ordinary finite (normal) inputs.
 
 The square root calculation also relies on N-R and is therefore an estimate. With the 3 iterations currently implemented the estimate is also accurate to the requirement of the IEEE 24-bit mantissa. With 1 iteration the result is good for 3D graphics in games and not much else.
 
