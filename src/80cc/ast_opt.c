@@ -554,6 +554,11 @@ static int nodes_equivalent(Node *a, Node *b)
     switch (a->ast_type) {
     case AST_LITERAL:
     case AST_STR_LIT:
+        /* Compare floating literals as values: the int64_t cast truncates,
+           so 1.5 and 1.2 would both reduce to 1 and count as the same node. */
+        if ((a->type && kind_is_floating(a->type->kind))
+            || (b->type && kind_is_floating(b->type->kind)))
+            return a->zval == b->zval;
         return (int64_t)a->zval == (int64_t)b->zval;
     case AST_LOCAL_VAR:
     case AST_GLOBAL_VAR:
@@ -658,8 +663,20 @@ static Node *try_simplify_binop(Node *node)
          x <  x  → 0      x >  x  → 0
          x <= x  → 1      x >= x  → 1
          x &  x  → x      x |  x  → x
-       OP_DIV / OP_MOD avoided: trapping when x == 0. */
-    if (l && r && nodes_equivalent(l, r) && is_side_effect_free(l)) {
+       OP_DIV / OP_MOD avoided: trapping when x == 0.
+
+       FLOATING OPERANDS ARE EXCLUDED. None of these identities hold once a
+       NaN can reach them: NaN-NaN is NaN not 0, and NaN compares false
+       against itself so `x == x` / `x <= x` / `x >= x` are 0 and `x != x`
+       is 1 -- the exact inverse of what the table says. `x != x` is the
+       canonical isnan() idiom, so folding it to 0 silently deletes a NaN
+       test. Inf breaks the arithmetic ones too (Inf-Inf is NaN). Only the
+       two IEEE formats can hold a NaN, but the rule is type-driven rather
+       than format-driven: a fold that is wrong under -fp-mode=ieee should
+       not be silently reinstated by the default format. */
+    if (l && r && nodes_equivalent(l, r) && is_side_effect_free(l)
+        && !(l->type && kind_is_floating(l->type->kind))
+        && !(r->type && kind_is_floating(r->type->kind))) {
         Type *t_int = node->type ? node->type : type_int;
         Type *t_op  = node->type ? node->type : (l->type ? l->type : type_int);
         switch (op) {
