@@ -24,7 +24,7 @@ Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
 |------|------|
 | `asm/z80/` | Z80-family cores; shared by z80n/z180/r2ka/… when the lst points here |
 | `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics |
-| `c/asm/`, `c/8085/` | Higher functions (C → precompiled asm); 8085 higher via sccz80 only |
+| `c/z80/`, `c/8085/` | Higher functions (C → precompiled asm); 8085 higher via sccz80 only |
 | `newlibfiles_*.lst` | Which modules land in each product |
 
 **CPU-specific** = same *operation* name, different ISA file (same one-op-per-file
@@ -92,7 +92,7 @@ remeasure both products after header fixes.
 
 ### Higher-function C regen (`c/Makefile`)
 
-Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/asm/*.asm` (SDCC).
+Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/z80/*.asm` (SDCC).
 8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only). **`make clean`** must
 only remove C-derived objects — never wipe hand-written peers in the same dir
 (math16: keep `cm16_sccz80_*.asm` under `c/8085/`).
