@@ -6,7 +6,7 @@
 ../../../math/float/math16/asm/asm_f16_nan.asm
 ../../../math/float/math16/asm/asm_f16_neg.asm
 ../../../math/float/math16/asm/8085/asm_f16_abs.asm
-../../../math/float/math16/asm/8085/asm_f16_classify.asm
+../../../math/float/math16/asm/asm_f16_classify.asm
 ../../../math/float/math16/asm/asm_f16_sigdig.asm
 ../../../math/float/math16/asm/8085/asm_f16_f32.asm
 ../../../math/float/math16/asm/8085/asm_f16_normalize.asm

@@ -2,7 +2,7 @@
 ../../../math/float/math16/asm/z80/asm_f16_abs.asm
 ../../../math/float/math16/asm/z80/asm_f16_add.asm
 ../../../math/float/math16/asm/z80/asm_f16_ceil.asm
-../../../math/float/math16/asm/z80/asm_f16_classify.asm
+../../../math/float/math16/asm/asm_f16_classify.asm
 ../../../math/float/math16/asm/z80/asm_f16_compare.asm
 ../../../math/float/math16/asm/z80/asm_f16_discardfraction.asm
 ../../../math/float/math16/asm/z80/asm_f16_div.asm

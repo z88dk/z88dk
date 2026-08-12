@@ -22,7 +22,7 @@ math/float/math16/asm/z80/asm_f16_inv
 math/float/math16/asm/z80/asm_f16_discardfraction
 math/float/math16/asm/z80/asm_f16_floor
 math/float/math16/asm/z80/asm_f16_ceil
-math/float/math16/asm/z80/asm_f16_classify
+math/float/math16/asm/asm_f16_classify
 math/float/math16/asm/z80/asm_f16_compare
 math/float/math16/asm/asm_f16_sigdig
 
