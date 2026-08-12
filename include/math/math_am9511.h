@@ -21,9 +21,9 @@
 #define MAXL2_F32           (+63.0)
 #define MINL2_F32           (-64.0)
 #define MAXLOG_F32          (+43.6657)
-#define MINLOG_F32          (−45.0)
+#define MINLOG_F32          (-45.0)
 #define MAXL10_F32          (+18.9638)
-#define MINL10_F32          (−19.5686)
+#define MINL10_F32          (-19.5686)
 
 #define HUGE_VAL_F32        ((unsigned long)0x7F800000)
 #define INFINITY_POS_F32    ((unsigned long)0x7F800000)
