@@ -1788,6 +1788,23 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
    and A holds the OTHER operand. `prefix` is the instruction up to the
    operand: "and\t" / "or\t" / "xor\t" / "sub\t" / "add\ta," etc. Does
    not disturb A; may clobber HL (sp-rel slot addressing). */
+/* A = A +/- K for a width-1 result. ±1 is `inc a` / `dec a`: 1 byte and 4T
+   against `add a,1`'s 2 bytes and 7T. The two differ in CARRY -- inc/dec leave
+   CF alone -- which is why this is confined to the byte add/sub sites, where
+   the result is the byte in A and the carry-out is not a modelled value (the
+   widening long paths build their carry with explicit `adc`, and the `cpl;
+   add a,1` negations depend on the carry and do not come through here).
+   `sub` is spelled without the `a,` operand to match the existing site. */
+static void emit_byte_add_imm(FILE *out, unsigned k, int is_sub)
+{
+    k &= 0xff;
+    int delta = is_sub ? -(int)k : (int)k;      /* value change mod 256 */
+    if (((delta % 256) + 256) % 256 == 1)   { emit(out, "inc\ta"); return; }
+    if (((delta % 256) + 256) % 256 == 255) { emit(out, "dec\ta"); return; }
+    if (is_sub) emit(out, "sub\t%u", k);
+    else        emit(out, "add\ta,%u", k);
+}
+
 static void byte_alu_operand(FILE *out, const Func *f,
                              const char *prefix, int m)
 {
@@ -1832,12 +1849,19 @@ static void byte_alu_operand(FILE *out, const Func *f,
             return;
         }
     }
-    pending_spill_resolve();
-    int off = slot_off(f, m) + L.cur_sp_adjust;
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
+    /* sp-mode: route through emit_byte_slot_addr so an HL that ALREADY holds a
+       slot address is reused (exact hit is free, a near slot costs an inc/dec)
+       and the address stays advertised for the next same-slot access. The
+       hand-rolled `ld hl,off; add hl,sp` that used to be here always recomputed
+       and then threw the address away via hl_about_to_change(-1), so three
+       accesses to one slot emitted three copies of it. Worst on gbz80/808x,
+       which have no (ix+d) and reach every slot through HL.
+       A live address belief implies no pending spill (store_a_byte leans on the
+       same invariant), so only resolve when there is none — pending_spill_resolve
+       itself clobbers HL and would drop the address we are about to reuse. */
+    if (L.cur_hl_addr_off < 0) pending_spill_resolve();
+    emit_byte_slot_addr(out, f, m);
     emit(out, "%s(hl)", prefix);
-    hl_about_to_change(-1);
 }
 
 /* Commit a width-1 result sitting in A. When the op is the condition of
@@ -3563,7 +3587,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            the accumulator when one is already cached. */
         if (op->src[1] == -1) {
             load_byte_to_a(out, f, op->src[0]);
-            emit(out, "add\ta,%u", (unsigned)(op->imm & 0xff));
+            emit_byte_add_imm(out, (unsigned)(op->imm & 0xff), 0);
         } else {
             int s0 = op->src[0], s1 = op->src[1];
             if (!a_has(s0) && a_has(s1)) { int t = s0; s0 = s1; s1 = t; }
@@ -3876,7 +3900,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
            src[0] into A can't strand it (no slot otherwise). */
         if (op->src[1] == -1) {
             load_byte_to_a(out, f, op->src[0]);
-            emit(out, "sub\t%u", (unsigned)(op->imm & 0xff));
+            emit_byte_add_imm(out, (unsigned)(op->imm & 0xff), 1);
         } else {
             if (a_has(op->src[1]) && !a_has(op->src[0]))
                 store_a_byte(out, f, op->src[1]);
