@@ -185,7 +185,7 @@ CPU-specific mantissa multiply and square helpers also live here (`f32_z80_*`, `
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/asm` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math32_8085.lib`.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math32_8085.lib`.
 
 ### c/sdcc and c/sccz80
 

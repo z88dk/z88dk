@@ -1,6 +1,6 @@
 # Helper makefile to generate the checked in .asm files
 #
-# Z80:  SDCC  → asm/   (c/asm/… listed by newlibfiles_z80.lst)
+# Z80:  SDCC  → z80/   (c/z80/… listed by newlibfiles_z80.lst)
 # 8085: sccz80 only → 8085/  (listed by newlibfiles_8085.lst)
 #       Same pattern as am9511/c/Makefile — do not use zsdcc/SDCC for 8085.
 
@@ -8,9 +8,10 @@ CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -I.
 
-all: $(addprefix asm/,$(AFILES))
+all: $(addprefix z80/,$(AFILES))
 
-asm/%.asm: %.c
+z80/%.asm: %.c
+	@mkdir -p z80
 	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -D__MATH_MATH32 -SO3 $(CFLAGS) -a $^ -o $@
 
 # 8085 higher functions: sccz80 only (zsdcc is Z80-only)
@@ -25,5 +26,5 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
 clean:
-	$(RM) asm/*.asm asm/*.err zcc_opt.def
+	$(RM) z80/*.asm z80/*.err zcc_opt.def
 	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err

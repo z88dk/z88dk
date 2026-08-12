@@ -1,6 +1,6 @@
 # Helper makefile to generate the checked in .asm files
 #
-# Z80:  sccz80 +new → asm/   (listed by newlibfiles_z80.lst)
+# Z80:  sccz80 +new → z80/   (c/z80/… listed by newlibfiles_z80.lst)
 # 8085: sccz80 only → 8085/  (listed by newlibfiles_8085.lst)
 #       Hand-written cm16_sccz80_*.asm live in 8085/ and are not regenerated here.
 
@@ -8,9 +8,10 @@ CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -Cc-D__MATH_MATH16 -D__MATH_MATH16 -I.
 
-all: $(addprefix asm/,$(AFILES))
+all: $(addprefix z80/,$(AFILES))
 
-asm/%.asm: %.c
+z80/%.asm: %.c
+	@mkdir -p z80
 	zcc +z80 -clib=new -O2 --opt-code-speed=all $(CFLAGS) -a $^ -o $@
 
 # 8085 higher functions: sccz80 only
@@ -25,6 +26,6 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
 clean:
-	$(RM) asm/*.asm asm/*.err zcc_opt.def
+	$(RM) z80/*.asm z80/*.err zcc_opt.def
 	# Only C-derived higher functions; keep hand-written cm16_sccz80_*.asm
 	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err

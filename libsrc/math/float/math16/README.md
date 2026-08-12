@@ -172,7 +172,7 @@ Intel 8085 cores only (`math16_8085.lib`). Same public entry names as the Z80 tr
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required. Higher-level 8085-only C lives under `c/8085/` when present.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math16_8085.lib`. Hand-written `cm16_sccz80_*.asm` bridges also live under `c/8085/`.
 
 ### c/sdcc and c/sccz80
 
