@@ -44,6 +44,7 @@ EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f16_zero
 EXTERN asm_f16_inf
+EXTERN asm_f16_nan
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
 
@@ -81,6 +82,8 @@ PUBLIC asm_f24_mul_f24
     jp Z,hmul_uzero
     rrca
     rrca
+    cp 31
+    jp Z,hmul_y_hi              ; y Inf/NaN
     ld b,a                      ; B = y.exp
     ld a,h
     and 003h
@@ -94,6 +97,8 @@ PUBLIC asm_f24_mul_f24
     jp Z,hmul_xzero_pop         ; jp: far labels (r4k/r2ka encoding can exceed jr)
     rrca
     rrca
+    cp 31
+    jp Z,hmul_x_hi              ; x Inf/NaN (y finite)
     ld c,a                      ; C = x.exp
     ld a,d
     and 003h
@@ -106,8 +111,8 @@ PUBLIC asm_f24_mul_f24
     ld a,b
     add a,c
     sub 15
-    jp Z,hmul_uzero
-    jp C,hmul_uzero
+    jp Z,hmul_uzero_fin         ; under: both finite, DE/HL are mant11
+    jp C,hmul_uzero_fin
     cp 31
     jp NC,hmul_uinf
 
@@ -184,7 +189,17 @@ ENDIF
 
 .hmul_xzero_pop
     pop hl                      ; drop y mant11
+    ; x==0, y finite nonzero → signed zero
+    jr hmul_uzero_fin
+
 .hmul_uzero
+    ; y==0; DE = x half: 0 × Inf/NaN → NaN
+    ld a,d
+    and 07ch
+    cp 07ch
+    jp Z,hmul_nan
+
+.hmul_uzero_fin
     ex af,af
     ld e,a
     jp asm_f16_zero
@@ -193,6 +208,34 @@ ENDIF
     ex af,af
     ld e,a
     jp asm_f16_inf
+
+    ; ---- cold specials (packed half) ----
+.hmul_y_hi                      ; y exp 31; HL=y, DE=x original halves
+    ld a,h
+    and 003h
+    or l
+    jp NZ,hmul_nan              ; y NaN
+    ld a,d
+    and 07ch
+    jp Z,hmul_nan               ; Inf × 0
+    cp 07ch
+    jr NZ,hmul_uinf             ; Inf × finite
+    ld a,d
+    and 003h
+    or e
+    jp NZ,hmul_nan              ; Inf × NaN
+    jr hmul_uinf                ; Inf × Inf
+
+.hmul_x_hi                      ; x exp 31; y finite, y mant11 on stack
+    pop hl                      ; drop y mant11
+    ld a,d
+    and 003h
+    or e
+    jp NZ,hmul_nan              ; x NaN
+    jr hmul_uinf                ; Inf × finite y
+
+.hmul_nan
+    jp asm_f16_nan
 
 
 ; enter here for floating asm_f24_mul_callee, x+y, x on stack, y in dehl, result in dehl

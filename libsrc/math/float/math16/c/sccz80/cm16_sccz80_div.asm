@@ -1,5 +1,6 @@
 
-; half __div (half left, half right)
+; half __div (half left, half right) — restoring div
+; sccz80 non-callee: leave left+right on stack (same protocol as mul).
 
 SECTION code_clib
 SECTION code_fp_math16
@@ -8,35 +9,26 @@ PUBLIC cm16_sccz80_div
 
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
-
-EXTERN asm_f24_mul_f24
-EXTERN asm_f24_inv
+EXTERN asm_f24_div_f24
 
 .cm16_sccz80_div
-
-    ; divide sccz80 half by sccz80 half
-    ;
-    ; enter : stack = sccz80_half left, sccz80_half right, ret
-    ;
-    ; exit  :    HL = sccz80_half(left/right)
+    ; enter : stack = left, right, ret  (right under ret)
+    ; exit  : HL = left/right; left+right remain for caller pops
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    pop bc                      ; pop return address
-    pop hl                      ; get right operand off of the stack
-    push bc                     ; save return address (inv uses bc)
-    call asm_f24_f16            ; expand to dehl
-    call asm_f24_inv
-    exx                         ; 1/y   d'  = eeeeeeee e' = s-------
-                                ;       hl' = 1mmmmmmm mmmmmmmm
-    pop bc                      ; pop return address again
-    pop hl                      ; get left operand off of the stack
+    pop bc                      ; ret
+    pop hl                      ; right (y)
+    exx
 
-    push bc
-    push bc
-    push bc                     ; return address on stack
-    call asm_f24_f16            ; expand to dehl
-                                ; x      d  = eeeeeeee e  = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
-    call asm_f24_mul_f24
-    jp asm_f16_f24              ; return HL = sccz80_half
+    pop hl                      ; left (x)
+    push hl                     ; leave left for caller
+    call asm_f24_f16            ; expand x → main
+    exx                         ; main = y half, alt = x f24
+
+    push hl                     ; leave right for caller
+    push bc                     ; ret
+    call asm_f24_f16            ; expand y → main
+    exx                         ; main = x f24, alt = y f24
+    call asm_f24_div_f24
+    jp asm_f16_f24

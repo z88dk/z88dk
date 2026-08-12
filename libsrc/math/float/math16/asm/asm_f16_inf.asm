@@ -31,9 +31,8 @@ PUBLIC asm_f16_inf
     xor a
     ld h,a              ; clear mantissa
     ld l,a
-    ; d = 143 = 127-15+31: packs to half Inf via asm_f16_f24 cp 31
-    ; (avoid d=0xff, which master pack maps to zero via signed sub)
-    ld d,127-15+31
+    ; d=255: pack path treats as IEEE special (Inf when mant==0)
+    ld d,255
     ret
 
 .asm_f16_inf

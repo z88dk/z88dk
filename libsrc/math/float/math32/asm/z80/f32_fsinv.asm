@@ -20,6 +20,7 @@ SECTION code_fp_math32
 
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
 EXTERN m32_fsconst_ninf, m32_fsconst_pinf
+EXTERN m32_fsconst_pnan, m32_fsconst_pzero, m32_fsconst_nzero
 
 PUBLIC m32_fsinv_fastcall
 PUBLIC _m32_invf
@@ -41,7 +42,25 @@ PUBLIC _m32_invf
 
     or a                        ; divide by zero?
     jr Z,divovl
+    inc a                       ; exp was 255?
+    jr NZ,inv_finite
 
+    ; exp 255: Inf → signed 0, NaN → NaN.  Stack has push af (sign in C).
+    pop af                      ; C = sign
+    push af                     ; keep sign; OR clobbers CF
+    ld a,l                      ; remaining hi mant after add hl,hl
+    or d
+    or e
+    jr NZ,inv_ret_nan
+    pop af
+    jp C,m32_fsconst_nzero
+    jp m32_fsconst_pzero
+
+.inv_ret_nan
+    pop af
+    jp m32_fsconst_pnan
+
+.inv_finite
     ld h,0bfh                   ; scale to -0.5 ≤ D' < -1.0
     srl l
     ex de,hl                    ; −D' in DEHL

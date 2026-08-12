@@ -19,7 +19,8 @@ SECTION code_fp_math32
 
 EXTERN m32_fsmul, m32_fsmul_callee
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd24x32
-EXTERN m32_fsconst_nnan
+EXTERN m32_fsconst_nnan, m32_fsconst_ninf
+EXTERN m32_fsconst_pnan, m32_fsconst_pinf, m32_fsconst_pzero
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 PUBLIC _m32_sqrtf, _m32_invsqrtf
@@ -32,6 +33,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push de
     push hl
     push bc
+    jp m32_fssqrt_fastcall
 
 ._m32_sqrtf
 .m32_fssqrt_fastcall
@@ -41,15 +43,30 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     ld a,e
     and 080h
     or b
-    jp Z,sqrt_zero
+    jp Z,sqrt_zero              ; ±0 (exp field 0)
     ld a,d
     add a,a
-    jp C,m32_fsconst_nnan
+    jp C,m32_fsconst_nnan       ; negative
+    ; cold: exp 255
+    ld a,e
+    add a,a
+    ld a,d
+    rla
+    inc a
+    jp NZ,sqrt_finite
+    ld a,e
+    and 07fh
+    or h
+    or l
+    jp NZ,m32_fsconst_pnan
+    jp m32_fsconst_pinf
+
+.sqrt_finite
     pop bc
     push de
     push hl
     push bc
-    call m32_fsinvsqrt_fastcall
+    call m32_fsinvsqrt_body
     jp m32_fsmul_callee
 
 
@@ -67,10 +84,30 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     ld a,e
     and 080h
     or b
-    jp Z,sqrt_zero
+    jp NZ,invsqrt_nz
+    ; ±0 → ±Inf (sign still in original D bit7)
+    ld a,d
+    add a,a
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf
+.invsqrt_nz
     ld a,d
     add a,a
     jp C,m32_fsconst_nnan
+    ld a,e
+    add a,a
+    ld a,d
+    rla
+    inc a
+    jp NZ,m32_fsinvsqrt_body
+    ld a,e
+    and 07fh
+    or h
+    or l
+    jp NZ,m32_fsconst_pnan
+    jp m32_fsconst_pzero        ; 1/sqrt(+Inf)=+0
+
+.m32_fsinvsqrt_body
 
     ld a,d
     or 080h

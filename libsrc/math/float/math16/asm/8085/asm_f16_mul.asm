@@ -17,6 +17,7 @@ SECTION code_fp_math16
 EXTERN asm_f16_f24
 EXTERN asm_f16_zero
 EXTERN asm_f16_inf
+EXTERN asm_f16_nan
 EXTERN asm_f24_zero
 EXTERN asm_f24_inf
 
@@ -51,6 +52,8 @@ PUBLIC f16_8085_mulu_32_16x16
     jp Z,hmul_uzero
     rrca
     rrca
+    cp 31
+    jp Z,hmul_y_hi
     ld b,a                      ; B = y.exp
     ld a,h
     and 003h
@@ -61,9 +64,11 @@ PUBLIC f16_8085_mulu_32_16x16
     ; ---- x: exp + mant11 ----
     ld a,d
     and 07ch
-    jr Z,hmul_xzero_pop
+    jp Z,hmul_xzero_pop
     rrca
     rrca
+    cp 31
+    jp Z,hmul_x_hi
     ld c,a                      ; C = x.exp
     ld a,d
     and 003h
@@ -231,13 +236,17 @@ PUBLIC f16_8085_mulu_32_16x16
 
 .hmul_xzero_pop
     pop hl                      ; drop y mant11
-.hmul_uzero
-    pop af                      ; sign
-    ld e,a
-    jp asm_f16_zero
+    ; x==0, y finite → signed zero
+    jp hmul_uzero_s
 
+.hmul_uzero
+    ; y==0; DE=x half; [sign][uret]
+    ld a,d
+    and 07ch
+    cp 07ch
+    jp Z,hmul_nan_s
 .hmul_uzero_s
-    pop af                      ; sign (ym already popped)
+    pop af                      ; sign
     ld e,a
     jp asm_f16_zero
 
@@ -250,6 +259,34 @@ PUBLIC f16_8085_mulu_32_16x16
     pop af                      ; sign (f24 exp already popped)
     ld e,a
     jp asm_f16_inf
+
+.hmul_y_hi                      ; y exp 31; HL=y DE=x; [sign][uret]
+    ld a,h
+    and 003h
+    or l
+    jp NZ,hmul_nan_s
+    ld a,d
+    and 07ch
+    jp Z,hmul_nan_s             ; Inf × 0
+    cp 07ch
+    jp NZ,hmul_uinf_s           ; Inf × finite
+    ld a,d
+    and 003h
+    or e
+    jp NZ,hmul_nan_s
+    jp hmul_uinf_s              ; Inf × Inf
+
+.hmul_x_hi                      ; x exp 31; [ym][sign][uret]
+    pop hl                      ; drop y mant11
+    ld a,d
+    and 003h
+    or e
+    jp NZ,hmul_nan_s
+    jp hmul_uinf_s
+
+.hmul_nan_s
+    pop af                      ; drop sign
+    jp asm_f16_nan
 
 
 .asm_f24_mul_callee
@@ -320,7 +357,8 @@ PUBLIC f16_8085_mulu_32_16x16
     ld l,a
 .fm4
     ld de,bc                    ; DEHL = result
-    ; drop [cret][Y.hl][Y.de][X.hl][X.de] (DEHL preserved)
+    ; drop [cret][Y][X].  BC=cret and DEHL live → 4× pop af wins over
+    ; stack-park + SP adjust (no free pair for the pointer).
     pop bc                      ; cret
     pop af
     pop af
@@ -330,12 +368,12 @@ PUBLIC f16_8085_mulu_32_16x16
     ret
 
 .mulov2
+    ; only E=sign needed; HL free → ld hl,n preserves DE
     ld e,c
     pop bc
-    pop af
-    pop af
-    pop af
-    pop af
+    ld hl,8
+    add hl,sp
+    ld sp,hl
     push bc
     jp asm_f24_inf
 
@@ -343,20 +381,18 @@ PUBLIC f16_8085_mulu_32_16x16
     ; [cret][Y][X], C=sign
     ld e,c
     pop bc
-    pop af
-    pop af
-    pop af
-    pop af
+    ld hl,8
+    add hl,sp
+    ld sp,hl
     push bc
     jp asm_f24_inf
 
 .mulz
     ld e,c
     pop bc
-    pop af
-    pop af
-    pop af
-    pop af
+    ld hl,8
+    add hl,sp
+    ld sp,hl
     push bc
     jp asm_f24_zero
 

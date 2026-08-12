@@ -352,26 +352,26 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 ;=========================================================================
 ; Epilogue
 ;=========================================================================
+;
+; Drop work+sign+a+b (18).  DEHL=result, BC free, flag still on frame.
+; Park hi in BC / lo in DE; SP via HL.  ld de,sp+n would lose parked lo.
+; Callee drops original a with two pops (4 B — pops beat another adjust).
+;
 
     ld bc,de
-    ex de,hl
-    ld hl,8
+    ex de,hl                    ; park: BC=hi, DE=lo
+    ld hl,18                    ; work(8)+sign(2)+a(4)+b(4)
     add hl,sp
     ld sp,hl
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop hl
+    pop hl                      ; flag
     ld a,l
-    ex de,hl
+    ex de,hl                    ; HL = result lo
     ld de,bc
     or a
     jr Z,div_done
-    pop bc
+    pop bc                      ; cret
     pop af
-    pop af
+    pop af                      ; drop original a
     push bc
 .div_done
     ret
@@ -476,13 +476,15 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+14
     call load4
     call m32_fpclassify
-    dec a
+    cp 2                        ; 0/NaN → NaN
+    jp Z,div_nan
+    dec a                       ; was zero? → 0/0 → NaN
     jp Z,div_nan
     ld de,sp+8
     ld a,(de)
     ld d,a
     call drop_frame
-    jp m32_fszero
+    jp m32_fszero               ; 0/num or 0/inf → signed 0
 
 .div_b_inf
     ld de,sp+8
@@ -520,24 +522,27 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     call drop_frame
     jp m32_fszero
 
-; CALL: ret@0 work@2.  Drops ret+work+sign+a+b+flag.  Preserves D.
+; CALL-safe: SP = uret, work, sign, a, b, flag, cret [, orig_a].
+; Drops work+sign+a+b+flag; restores uret so specials run.  Preserves D.
+; Callee also drops orig_a under cret.
 .drop_frame
-    ld hl,10
+    pop bc                      ; uret → specials
+    ld hl,18                    ; work(8)+sign(2)+a(4)+b(4)
     add hl,sp
     ld sp,hl
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop hl
+    pop hl                      ; flag
     ld a,l
     or a
-    ret Z
-    pop hl
+    jr NZ,drop_frame_callee
+    push bc                     ; uret
+    ret
+
+.drop_frame_callee
+    pop hl                      ; cret
     pop af
-    pop af
-    push hl
+    pop af                      ; drop original a
+    push hl                     ; cret
+    push bc                     ; uret
     ret
 
 ;=========================================================================

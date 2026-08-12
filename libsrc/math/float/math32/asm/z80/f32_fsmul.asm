@@ -101,19 +101,31 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
                                 ; second h = eeeeeeee, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
 
-    ld a,h                      ; calculate the exponent
+    ; cold: exp 255 / 0×Inf|NaN (push af preserves bias-adj C across e1 gate)
+    ld a,h
+    inc a
+    jp Z,mul_spec2              ; second exp was 255
+    ld a,h
     or a                        ; second exponent zero then result is zero
-    jp Z,mulzero                ; jp: RNE pack lengthens tail past jr range (r4k)
+    jp Z,mul_z2
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
+    push af                     ; adj second exp + C
     exx
+    ld a,h
+    inc a
+    jr NZ,mul_e1_finite
+    pop af
+    jp mul_spec1                ; first exp was 255 (second finite nonzero)
+.mul_e1_finite
+    pop af                      ; a = bias-adj second, C from sub
     ld b,a                      ; bias-adjusted second exp
     jr C,fmchkuf
 
     add a,h                     ; sum of exponents
     jp C,mulovl                 ; only if h != 0
     cp b                        ; a == b ⇒ first exp was 0
-    jp Z,mulzero                ; 0 * y -> signed zero
+    jp Z,mulzero                ; 0 * finite → signed zero
     jr fmnouf
 
 .fmchkuf
@@ -189,15 +201,53 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp C,m32_fsconst_ninf
     jp m32_fsconst_pinf
 
-.mulovl
-    ex af,af                    ; get sign
-    rla
-    jp C,m32_fsconst_ninf
-    jp m32_fsconst_pinf         ; done overflow
+    ; ---- cold specials ----
+    ; mant NaN test after unpack: L[6:0]|D|E (implicit bit in L.7)
+
+.mul_spec2                      ; second exp 255; first in h'
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,m32_fsconst_pnan      ; second is NaN
+    exx
+    ld a,h
+    or a
+    jp Z,m32_fsconst_pnan       ; Inf * 0
+    inc a
+    jr NZ,mulovl                ; Inf * finite nonzero → signed Inf
+    ; Inf * Inf/NaN
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,m32_fsconst_pnan      ; first is NaN
+    jr mulovl                   ; Inf * Inf → signed Inf
+
+.mul_spec1                      ; first exp 255; second finite 1..254; on first bank
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,m32_fsconst_pnan      ; first is NaN
+    jr mulovl                   ; Inf * finite → signed Inf
+
+.mul_z2                         ; second exp 0; first in h'
+    exx
+    ld a,h
+    inc a
+    jp Z,m32_fsconst_pnan       ; 0 * Inf/NaN
+    ; fall through: 0 * finite or 0 * 0 → signed zero
 
 .mulzero
     ex af,af                    ; get sign
     rla
     jp C,m32_fsconst_nzero
     jp m32_fsconst_pzero        ; done underflow
+
+.mulovl
+    ex af,af                    ; get sign
+    rla
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf         ; done overflow
 

@@ -243,34 +243,66 @@ PUBLIC asm_f24_div_f24
 ;=========================================================================
 
 .div_y_zero
+    ; Y is 0; X at sp+3 exp
     ld de,sp+3
     ld a,(de)
     or a
-    jr NZ,div_to_inf
-    jp div_to_nan
-
-.div_x_zero
-    jp div_to_zero
-
-.div_y_hi
-    ld de,sp+6
-    ld hl,(de)
-    ld a,h
-    or l
-    jr NZ,div_to_nan
-    ld de,sp+3
-    ld a,(de)
+    jp Z,div_to_nan             ; 0/0
     cp 255
-    jr NZ,div_to_zero
-    jp div_to_nan
-
-.div_x_hi
+    jp NZ,div_to_inf            ; finite/0 → inf
+    ; X exp 255: NaN or Inf over 0
     ld de,sp+0
     ld hl,(de)
     ld a,h
     or l
-    jr NZ,div_to_nan
-    jp div_to_inf
+    jp NZ,div_to_nan            ; NaN/0
+    jp div_to_inf               ; Inf/0 → Inf
+
+.div_x_zero
+    ; X is 0; inspect Y
+    ld de,sp+9
+    ld a,(de)                   ; Y.exp
+    or a
+    jp Z,div_to_nan             ; 0/0
+    cp 255
+    jp NZ,div_to_zero           ; 0/finite → 0
+    ld de,sp+6
+    ld hl,(de)                  ; Y.mant
+    ld a,h
+    or l
+    jp NZ,div_to_nan            ; 0/NaN
+    jp div_to_zero              ; 0/inf → 0
+
+.div_y_hi
+    ; Y exp 255
+    ld de,sp+6
+    ld hl,(de)
+    ld a,h
+    or l
+    jp NZ,div_to_nan            ; y NaN
+    ld de,sp+3
+    ld a,(de)                   ; X.exp
+    cp 255
+    jp Z,div_to_nan             ; Inf/Inf (X mant checked? if X NaN caught earlier)
+    jp div_to_zero              ; finite/Inf → 0
+
+.div_x_hi
+    ; X exp 255
+    ld de,sp+0
+    ld hl,(de)
+    ld a,h
+    or l
+    jp NZ,div_to_nan            ; X NaN
+    ld de,sp+9
+    ld a,(de)                   ; Y.exp
+    cp 255
+    jp NZ,div_to_inf            ; Inf/finite → Inf
+    ld de,sp+6
+    ld hl,(de)
+    ld a,h
+    or l
+    jp Z,div_to_nan             ; Inf/Inf
+    jp div_to_nan               ; Inf/NaN
 
 .div_exp_bad
     ld a,h

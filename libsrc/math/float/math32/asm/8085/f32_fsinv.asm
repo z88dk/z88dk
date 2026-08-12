@@ -13,6 +13,7 @@ SECTION code_fp_math32
 
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
 EXTERN m32_fsconst_ninf, m32_fsconst_pinf
+EXTERN m32_fsconst_pnan, m32_fsconst_pzero, m32_fsconst_nzero
 
 PUBLIC m32_fsinv_fastcall
 PUBLIC _m32_invf
@@ -39,7 +40,22 @@ PUBLIC _m32_invf
     push bc                         ; es
     or a
     jp Z,divovl
+    inc a                           ; exp was 255?
+    jp NZ,inv_finite
 
+    ; exp 255: Inf → signed 0, NaN → NaN
+    pop bc                          ; C = sign80
+    ld a,e
+    and 07fh
+    or h
+    or l
+    jp NZ,m32_fsconst_pnan
+    ld a,c
+    or a
+    jp NZ,m32_fsconst_nzero
+    jp m32_fsconst_pzero
+
+.inv_finite
     ex de,hl
     add hl,hl
     ld h,0bfh

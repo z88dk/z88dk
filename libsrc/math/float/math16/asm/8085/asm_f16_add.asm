@@ -20,6 +20,7 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_inf
+EXTERN asm_f24_nan
 EXTERN asm_f24_normalize
 
 PUBLIC asm_f16_add_callee
@@ -62,6 +63,18 @@ PUBLIC asm_f24_add_f24
     push de
     push hl
     push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
+
+    ; cold: exp 255 Inf/NaN (Y.de@+4 L=sign H=exp; X.de@+8)
+    ld de,sp+4
+    ld hl,(de)
+    ld a,h
+    inc a
+    jp Z,hadd_spec_y
+    ld de,sp+8
+    ld hl,(de)
+    ld a,h
+    inc a
+    jp Z,hadd_spec_x
 
     ; Y.de @+4 (L=sign,H=exp), X.de @+8
     ld de,sp+4
@@ -196,7 +209,9 @@ PUBLIC asm_f24_add_f24
 .finish_add
     pop de                      ; large.de
 .finish2
-    ; DEHL=result; drop [cret][Y.hl][Y.de][X.hl][X.de]
+    ; DEHL=result; stack [cret][Y.hl][Y.de][X.hl][X.de].
+    ; BC gets cret → no free pair to park DEHL for SP adjust; 4×pop af
+    ; (~40c) beats park+push/pop cret (~60c+).  (cf. fsmul 7-word bulk.)
     pop bc
     pop af
     pop af
@@ -216,15 +231,14 @@ PUBLIC asm_f24_add_f24
     ld a,h
     or l
     jp NZ,sub_ok
-    ; exact zero
+    ; exact zero — DE=0, HL free for SP adjust, then HL=0
     pop af                      ; drop large.de
     ld de,0
-    ld hl,0
     pop bc
-    pop af
-    pop af
-    pop af
-    pop af
+    ld hl,8
+    add hl,sp
+    ld sp,hl
+    ld hl,0
     push bc
     ret
 
@@ -276,11 +290,73 @@ PUBLIC asm_f24_add_f24
     ret
 
 .ovf_de
-    ; E already has sign; drop frame then inf
+    ; E already has sign; HL free → ld hl,n preserves DE
+    pop bc
+    ld hl,8
+    add hl,sp
+    ld sp,hl
+    push bc
+    jp asm_f24_inf
+
+    ; ---- cold specials (frame: [cret][Y.hl][Y.de][X.hl][X.de]) ----
+
+.hadd_spec_y                        ; Y.exp == 255
+    ld de,sp+2
+    ld hl,(de)                      ; Y.mant
+    ld a,h
+    or l
+    jp NZ,hadd_nan
+    ld de,sp+8
+    ld hl,(de)
+    ld a,h
+    inc a
+    jp NZ,hadd_inf_y                ; Inf + finite
+    ld de,sp+6
+    ld hl,(de)
+    ld a,h
+    or l
+    jp NZ,hadd_nan
+    ld de,sp+4
+    ld a,(de)                       ; Y.sign
+    ld b,a
+    ld de,sp+8
+    ld a,(de)
+    xor b
+    and 080h
+    jp NZ,hadd_nan                  ; Inf − Inf
+.hadd_inf_y
+    ld de,sp+4
+    ld a,(de)
+    and 080h
+    ld e,a
+    ld d,255
+    ld hl,0
+    jp hadd_epi
+
+.hadd_spec_x                        ; X.exp == 255, Y finite
+    ld de,sp+6
+    ld hl,(de)
+    ld a,h
+    or l
+    jp NZ,hadd_nan
+    ld de,sp+8
+    ld a,(de)
+    and 080h
+    ld e,a
+    ld d,255
+    ld hl,0
+    jp hadd_epi
+
+.hadd_nan
+    ld de,0
+    ld d,255
+    ld hl,04000h
+.hadd_epi
+    ; Same frame as finish2: cret in BC, 4× half-words under — keep pops.
     pop bc
     pop af
     pop af
     pop af
     pop af
     push bc
-    jp asm_f24_inf
+    ret

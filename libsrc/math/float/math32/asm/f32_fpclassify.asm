@@ -38,12 +38,15 @@ PUBLIC m32_fpclassify
     ; exit  : dehl = float x (unchanged)
     ;            a = 0 number, 1 zero, 2 nan, 3 inf
     ; uses  : af
+    ;
+    ; exp = (D << 1) | (E >> 7) with sign shifted out of D.
+    ; Must not AND between capturing E.7 into C and the rla — AND clears C
+    ; and would turn exp 255 into 254 (inf/NaN misclassified as finite).
 
     ld a,e
-    rlca                        ; C = exp bit 0 (E.7); E unchanged
+    add a,a                     ; C = E.7 (exp bit 0); DEHL unchanged
     ld a,d
-    and 07fh                    ; drop sign
-    rla                         ; A = full 8-bit exponent
+    rla                         ; A = full 8-bit exponent (sign out to C)
 
     or a
     jr Z,fpclass_zero           ; exp == 0 → ±0 (math32 denorm policy)

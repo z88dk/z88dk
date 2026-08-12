@@ -70,6 +70,16 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     call unpack_push                ; X
     ; +0 X +6 Y +12 flag +14 ret +16 left
 
+    ; cold: either exp 255 (Inf/NaN)
+    ld de,sp+4
+    ld a,(de)                       ; X.exp
+    inc a
+    jp Z,fa_spec_x
+    ld de,sp+10
+    ld a,(de)                       ; Y.exp
+    inc a
+    jp Z,fa_spec_y
+
     ; If Y.exp >= X.exp, swap X/Y slots (stack only)
     ld de,sp+4
     ld a,(de)                       ; X.exp
@@ -180,27 +190,104 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     scf
     jp epi
 
+    ; ---- cold specials (mant NaN: L[6:0]|E|D in slot) ----
+
+.fa_spec_x                          ; X.exp == 255
+    ld de,sp+0
+    ld a,(de)
+    and 07fh
+    ld b,a
+    ld de,sp+2
+    ld a,(de)
+    or b
+    ld b,a
+    ld de,sp+3
+    ld a,(de)
+    or b
+    jp NZ,fa_ret_nan                ; X NaN
+    ld de,sp+10
+    ld a,(de)
+    inc a
+    jp NZ,fa_ret_inf_x              ; Inf + finite/0
+    ld de,sp+6
+    ld a,(de)
+    and 07fh
+    ld b,a
+    ld de,sp+8
+    ld a,(de)
+    or b
+    ld b,a
+    ld de,sp+9
+    ld a,(de)
+    or b
+    jp NZ,fa_ret_nan                ; Y NaN
+    ld de,sp+5
+    ld a,(de)
+    ld b,a
+    ld de,sp+11
+    ld a,(de)
+    xor b
+    and 080h
+    jp NZ,fa_ret_nan                ; Inf − Inf
+.fa_ret_inf_x
+    ld de,sp+5
+    ld a,(de)
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
+    jp epi
+
+.fa_spec_y                          ; Y.exp == 255, X finite
+    ld de,sp+6
+    ld a,(de)
+    and 07fh
+    ld b,a
+    ld de,sp+8
+    ld a,(de)
+    or b
+    ld b,a
+    ld de,sp+9
+    ld a,(de)
+    or b
+    jp NZ,fa_ret_nan                ; Y NaN
+    ld de,sp+11
+    ld a,(de)
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
+    jp epi
+
+.fa_ret_nan
+    ld de,07fffh
+    ld hl,0ffffh                    ; canonical +NaN (m32_fsconst_pnan)
+    jp epi
+
 .ret0
     ld de,0
     ld hl,0
 
 .epi
-    ; discard X(6)+Y(6)+flag(2)=14 bytes
+    ; discard X(6)+Y(6)+flag(2)=14 bytes.  DEHL=result, flag under frame.
     push de
     push hl
     ld de,sp+16                     ; flag at +12 after X/Y; +4 for pushes → +16
     ld a,(de)
     pop hl
-    pop de
-    ld c,a
-    pop af                          ; X
-    pop af
-    pop af
-    pop af                          ; Y
-    pop af
-    pop af
-    pop af                          ; flag
-    ld a,c
+    pop de                          ; A=flag DEHL=result
+
+    ; BC free; park hi in BC, lo in DE; SP via HL (ld de,sp+n loses lo).
+    ld bc,de
+    ex de,hl
+    ld hl,14
+    add hl,sp
+    ld sp,hl
+    ex de,hl
+    ld de,bc                        ; DEHL restored; A=flag
+
     or a
     jp Z,done
     pop bc

@@ -47,6 +47,7 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 EXTERN asm_f24_inf
+EXTERN asm_f24_nan
 
 EXTERN asm_f24_normalize
 
@@ -101,6 +102,16 @@ PUBLIC asm_f24_add_f24
                                 ; y mantissa: hl  = 1mmmmmmm mmmmmmmm
     xor e                       ; check if op1.s==op2.s
     ex af,af                    ; save results sign in f' (C clear in af')
+
+    ; cold: either exp 255 (half Inf/NaN expanded). primary=y, alt=x
+    ld a,d
+    inc a
+    jp Z,hadd_spec_y
+    exx
+    ld a,d
+    inc a
+    jp Z,hadd_spec_x
+    exx                         ; primary=y again for sort
 
 ; sort larger from smaller and compute exponent difference
     ld a,d
@@ -241,4 +252,30 @@ PUBLIC asm_f24_add_f24
 ; exponent of result in e sign of result in d
 ; now do normalize
     jp asm_f24_normalize        ; now begin to normalize with dehl
+
+    ; ---- cold specials (f24: Inf HL=0, NaN HL≠0, exp 255) ----
+    ; entry: primary=y for hadd_spec_y; primary=x for hadd_spec_x
+
+.hadd_spec_y                    ; y exp 255
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan           ; y NaN
+    exx
+    ld a,d
+    inc a
+    jr NZ,hadd_ret_inf_y        ; Inf + finite → y Inf
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan           ; x NaN
+    ex af,af
+    jp M,asm_f24_nan            ; Inf − Inf
+.hadd_ret_inf_y
+    exx                         ; y primary
+    jp asm_f24_inf
+
+.hadd_spec_x                    ; x exp 255, y finite; primary=x
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
+    jp asm_f24_inf
 

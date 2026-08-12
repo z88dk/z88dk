@@ -68,11 +68,25 @@ PUBLIC asm_f24_invsqrt
     dec d
     jp Z,asm_f24_zero           ; zero exponent? zero result
 
+    ld a,d
+    inc a
+    jr NZ,sqrt_finite
+    ; exp 255: +Inf→+Inf, NaN/−Inf→NaN
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
+    bit 7,e
+    jp NZ,asm_f24_nan
+    jp asm_f24_inf
+
+.sqrt_finite
+    bit 7,e
+    jp NZ,asm_f24_nan           ; negative finite
     pop bc                      ; ret
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
     push bc                     ; ret
-    call asm_f24_invsqrt
+    call asm_f24_invsqrt_body
     jp asm_f24_mul_callee
 
 
@@ -84,6 +98,16 @@ PUBLIC asm_f24_invsqrt
     bit 7,e
     jp NZ,asm_f24_nan           ; negative number?
 
+    ld a,d
+    inc a
+    jr NZ,asm_f24_invsqrt_body
+    ; exp 255 non-neg: Inf→0, NaN→NaN
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
+    jp asm_f24_zero
+
+.asm_f24_invsqrt_body
     set 7,e                     ; make y negative
 
     push de                     ; -y msw on stack for w[2] - remove for 1 iteration

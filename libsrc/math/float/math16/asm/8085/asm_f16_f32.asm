@@ -115,10 +115,12 @@ PUBLIC asm_f32_f16
     ld l,a                      ; mantissa lsb to l
 
     ld a,d                      ; exponent to a
+    cp 255                      ; IEEE specials in f24 (from half exp 31)
+    jp Z,f16_f24_special
     sub a,127-15                ; convert from f24 bias to half exp
     jp M,asm_f16_zero           ; zero if number too small
     cp 31
-    jp NC,asm_f16_inf           ; infinity if number too large
+    jp NC,asm_f16_inf           ; overflow → infinity
 
     ; position mantissa: sla l; rl h ×3 ≡ add hl,hl ×3 (C ← old H7)
     ld b,a                      ; half exp
@@ -140,6 +142,18 @@ PUBLIC asm_f32_f16
     ld h,a
     ret
 
+.f16_f24_special
+    ; d==255: Inf if mant==0, else NaN (preserve sign in e)
+    ld a,h
+    or l
+    jp Z,asm_f16_inf
+    ld a,e
+    and 080h
+    or 07ch
+    ld h,a
+    ld l,080h
+    ret
+
 ; convert f32 to f16
 .asm_f16_f32
     call asm_f24_f32
@@ -152,6 +166,8 @@ PUBLIC asm_f32_f16
     jp Z,asm_f24_zero
     rrca
     rrca                        ; exp in A[4:0]
+    cp 31
+    jp Z,f24_f16_special        ; half Inf/NaN → f24 exp 255
     add a,127-15
     ld d,a
     ld a,h
@@ -165,4 +181,17 @@ PUBLIC asm_f32_f16
     ld a,h
     or 080h                     ; implicit 1
     ld h,a
+    ret
+
+.f24_f16_special
+    ; explicit mant only; Inf ⇒ HL=0; NaN ⇒ HL≠0 (no implicit 1)
+    ld a,h
+    and 003h
+    ld h,a
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    ld d,255
     ret

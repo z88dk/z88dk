@@ -34,11 +34,26 @@ PUBLIC asm_f24_invsqrt
     inc d
     dec d
     jp Z,asm_f24_zero
+    ld a,d
+    inc a
+    jp NZ,sqrt_finite
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
+    ld a,e
+    and 080h
+    jp NZ,asm_f24_nan
+    jp asm_f24_inf
+
+.sqrt_finite
+    ld a,e
+    and 080h
+    jp NZ,asm_f24_nan           ; negative finite
     pop bc
     push de
     push hl
     push bc
-    call asm_f24_invsqrt
+    call asm_f24_invsqrt_body
     jp asm_f24_mul_callee
 
 .asm_f24_invsqrt
@@ -48,7 +63,15 @@ PUBLIC asm_f24_invsqrt
     ld a,e
     and 080h
     jp NZ,asm_f24_nan
+    ld a,d
+    inc a
+    jp NZ,asm_f24_invsqrt_body
+    ld a,h
+    or l
+    jp NZ,asm_f24_nan
+    jp asm_f24_zero
 
+.asm_f24_invsqrt_body
     ld a,e
     or 080h
     ld e,a

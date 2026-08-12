@@ -55,10 +55,21 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld de,sp+6
     ld (de),a
 
+    ; cold: exp 255 / 0×Inf|NaN (stack: exp_x@1 mant_x@2/4/5; exp_y@7 mant_y@8/10/11)
+    ld de,sp+7
+    ld a,(de)                       ; exp_y
+    inc a
+    jp Z,fm_spec_y255
+    dec a
+    or a
+    jp Z,fm_spec_y0
+    ld de,sp+1
+    ld a,(de)                       ; exp_x
+    inc a
+    jp Z,fm_spec_x255
+
     ld de,sp+7
     ld a,(de)
-    or a
-    jp Z,fm_zero
     sub 07fh
     ld c,a                          ; bias-adjusted second exp
     ld de,sp+1
@@ -68,7 +79,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     add a,c                         ; sum of exponents
     jp C,fm_ovl                     ; only if first exp != 0
     cp c                            ; a == c ⇒ first exp was 0
-    jp Z,fm_zero
+    jp Z,fm_zero                    ; 0 * finite → signed zero
     jp fm_exp_done
 
 .fm_uf
@@ -119,24 +130,22 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     call pack_product
 
     ; DEHL=IEEE; stack: es_l LmH LmD es_r RmH RmD flag ret Lh Ld
+    ; Flag then bulk-drop 14 (7 words).  Park DEHL in BC/DE (same as fsadd epi).
     push de
     push hl
     ld de,sp+16
     ld a,(de)                   ; flag
     pop hl
     pop de                      ; A=flag DEHL=result
-    ld c,a                      ; C=flag (preserve across discards)
 
-    ; discard 7 words (es_l .. flag) -> stack: ret, Lh, Ld
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
+    ld bc,de
+    ex de,hl
+    ld hl,14
+    add hl,sp
+    ld sp,hl
+    ex de,hl
+    ld de,bc                    ; DEHL restored; A=flag
 
-    ld a,c
     or a
     jp Z,fm_done
 
@@ -219,6 +228,81 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp m32_fsconst_pinf
 
 
+    ; ---- cold specials (mant NaN: L[6:0]|E|D after unpack) ----
+
+.fm_spec_y0                         ; exp_y == 0
+    ld de,sp+1
+    ld a,(de)
+    inc a
+    jp Z,fm_ret_nan                 ; 0 * Inf/NaN
+    jp fm_zero
+
+.fm_spec_y255                       ; exp_y == 255
+    ld de,sp+8
+    ld a,(de)
+    and 07fh
+    ld b,a
+    ld de,sp+10
+    ld a,(de)
+    or b
+    ld b,a
+    ld de,sp+11
+    ld a,(de)
+    or b
+    jp NZ,fm_ret_nan                ; y is NaN
+    ld de,sp+1
+    ld a,(de)                       ; exp_x
+    or a
+    jp Z,fm_ret_nan                 ; Inf * 0
+    inc a
+    jp NZ,fm_ovl                    ; Inf * finite → signed Inf
+    ld de,sp+2
+    ld a,(de)
+    and 07fh
+    ld b,a
+    ld de,sp+4
+    ld a,(de)
+    or b
+    ld b,a
+    ld de,sp+5
+    ld a,(de)
+    or b
+    jp NZ,fm_ret_nan                ; x is NaN
+    jp fm_ovl                       ; Inf * Inf
+
+.fm_spec_x255                       ; exp_x == 255, y finite nonzero
+    ld de,sp+2
+    ld a,(de)
+    and 07fh
+    ld b,a
+    ld de,sp+4
+    ld a,(de)
+    or b
+    ld b,a
+    ld de,sp+5
+    ld a,(de)
+    or b
+    jp NZ,fm_ret_nan                ; x is NaN
+    jp fm_ovl                       ; Inf * finite
+
+.fm_ret_nan
+    ld de,sp+12
+    ld a,(de)
+    ld b,a                          ; B=flag
+    ; DEHL free: bulk-drop es_l..flag (14).  No CALL — that would push uret.
+    ld hl,14
+    add hl,sp
+    ld sp,hl
+    ld a,b
+    or a
+    jp Z,fm_nanret
+    pop de
+    pop af
+    pop af
+    push de
+.fm_nanret
+    jp m32_fsconst_pnan
+
 .fm_zero
     ; C will be sign from es_r; get flag
     ld de,sp+6
@@ -226,14 +310,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld c,a
     ld de,sp+12
     ld a,(de)
-    ld b,a                      ; B=flag C=sign
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
+    ld b,a                          ; B=flag C=sign
+    ld hl,14
+    add hl,sp
+    ld sp,hl
     ld a,b
     or a
     jp Z,fm_zret
@@ -253,14 +333,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld c,a
     ld de,sp+12
     ld a,(de)
-    ld b,a
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
-    pop af
+    ld b,a                          ; B=flag C=sign
+    ld hl,14
+    add hl,sp
+    ld sp,hl
     ld a,b
     or a
     jp Z,fm_ovret

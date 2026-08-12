@@ -209,32 +209,48 @@ PUBLIC asm_f24_div_f24
     jp div_inf
 
 .div_x_zero
-    ; 0 / y  (main = x zero)
+    ; 0 / y  (main = x zero; y on alt)
+    exx
+    ld a,d
+    or a
+    jp Z,div_nan_sw             ; 0/0
+    cp 255
+    jr NZ,div_zero_sw           ; 0/finite → signed 0
+    ld a,h
+    or l
+    jp NZ,div_nan_sw            ; 0/NaN
+    ; 0/inf → signed 0
+.div_zero_sw
+    exx
     jp div_zero
 
 .div_x_hi
     ld a,h
     or l
-    jp NZ,div_nan
-    exx
+    jp NZ,div_nan               ; x is NaN
+    exx                         ; y
     ld a,d
     cp 255
-    jr NZ,div_inf_sw
+    jr NZ,div_inf_sw            ; inf / finite → inf
     ld a,h
     or l
-    jp Z,div_nan
-    jp div_inf_sw
+    jp Z,div_nan_sw             ; inf/inf → NaN
+    jp div_nan_sw               ; inf/NaN → NaN
 
 .div_y_zero
-    ; x / 0 → inf (alt = y was zero; still on alt)
+    ; x / 0 → inf (alt = y was zero; x already finite nonzero)
     jp div_inf_sw
 
 .div_y_hi
     ld a,h
     or l
-    jp NZ,div_nan
+    jp NZ,div_nan               ; y is NaN (x finite)
     exx
-    jp div_zero
+    jp div_zero                 ; finite / inf → signed 0
+
+.div_nan_sw
+    exx
+    jp div_nan
 
 .div_zero
     ex af,af

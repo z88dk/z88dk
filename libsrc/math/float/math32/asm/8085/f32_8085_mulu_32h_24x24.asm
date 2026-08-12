@@ -132,6 +132,9 @@ PUBLIC m32_l0_mulu_32h_24x24
     pop hl
 .p3_done
 
+    ; DEHL=product, cret under x/y.  BC ← cret; both DE and HL live so a
+    ; bulk SP adjust needs a free pair for the pointer — BC holds cret,
+    ; stack-parking both halves costs more than 4× pop af (40c).
     pop bc                      ; ret
     pop af                      ; xHL
     pop af                      ; xDE

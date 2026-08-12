@@ -51,6 +51,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsnormalize
+EXTERN m32_fsconst_pnan
 
 PUBLIC m32_fssub, m32_fssub_callee
 PUBLIC m32_fsadd, m32_fsadd_callee
@@ -132,6 +133,16 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld h,a                      ; op2 mantissa: h = 00000000, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
     exx
     ld h,a                      ; op1 mantissa: h = 00000000, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
+
+    ; cold: either exp 255 (Inf/NaN).  Finite path: 2×(inc/jp) + 2×exx.
+    ld a,c
+    inc a
+    jp Z,add_spec1              ; op1 exp was 255
+    exx
+    ld a,c
+    inc a
+    jp Z,add_spec2              ; op2 exp was 255
+    exx
 
 ; sort larger from smaller and compute exponent difference
     ld a,c
@@ -297,6 +308,50 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     scf                         ; error
     ret
 
+    ; ---- cold specials (mant NaN: L[6:0]|D|E after unpack) ----
+    ; primary=op1, shadow=op2 on entry to add_spec1; primary=op2 for add_spec2
+
+.add_spec1                      ; op1 exp 255
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,m32_fsconst_pnan      ; op1 NaN
+    exx
+    ld a,c
+    inc a
+    jr NZ,add_ret_inf1          ; Inf + finite → Inf (op1)
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,m32_fsconst_pnan      ; op2 NaN
+    ex af,af
+    jp M,m32_fsconst_pnan       ; Inf − Inf → NaN
+.add_ret_inf1
+    exx                         ; op1 primary: sign in b
+    ld a,b
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
+    ret
+
+.add_spec2                      ; op2 exp 255, op1 finite; primary=op2
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,m32_fsconst_pnan      ; op2 NaN
+    ld a,b                      ; Inf + finite → Inf (op2)
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
+    ret
+
 ; here one alignment needed
 .alignone                       ; from fadd
     srl h
@@ -307,7 +362,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .alignone_a
     ex af,af
     jp M,fasub
-    jr doadd
+    jp doadd                    ; was jr; specials after foverflow lengthened range
 
 .alignzero
     ex af,af

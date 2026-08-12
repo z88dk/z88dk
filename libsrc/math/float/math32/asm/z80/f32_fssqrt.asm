@@ -34,7 +34,8 @@ SECTION code_fp_math32
 
 EXTERN m32_fsmul, m32_fsmul_callee
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
-EXTERN m32_fsconst_nnan, m32_fsconst_pzero
+EXTERN m32_fsconst_nnan, m32_fsconst_pzero, m32_fsconst_ninf
+EXTERN m32_fsconst_pnan, m32_fsconst_pinf
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 PUBLIC _m32_sqrtf, _m32_invsqrtf
@@ -47,46 +48,71 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push de
     push hl
     push bc                     ; ret
-    sla e
-    rl d
-    jr Z,m32_sqrt_zero          ; sqrt 0
-    jp C,m32_fsconst_nnan       ; negative number
-    rr de
-    call m32_fsinvsqrt_fastcall
-    jp m32_fsmul
+    call m32_fssqrt_fastcall
+    ret
 
 
 ._m32_sqrtf
 .m32_fssqrt_fastcall
     sla e
     rl d
-    jr Z,m32_sqrt_zero          ; sqrt 0
-    jp C,m32_fsconst_nnan       ; negative number
-    rr de
+    jr Z,m32_sqrt_zero          ; ±0
+    jp C,m32_fsconst_nnan       ; negative
+    rr de                       ; DEHL restored
+    ; cold: exp 255
+    ld a,e
+    add a,a
+    ld a,d
+    rla
+    inc a
+    jr NZ,sqrt_finite
+    ld a,e
+    and 07fh
+    or h
+    or l
+    jp NZ,m32_fsconst_pnan
+    jp m32_fsconst_pinf
+
+.sqrt_finite
     pop bc                      ; ret
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
     push bc                     ; ret
-    call m32_fsinvsqrt_fastcall
+    call m32_fsinvsqrt_body
     jp m32_fsmul_callee
 
 
 .m32_sqrt_zero
-    ld e,d                      ; use 0
-    ld h,d
-    ld l,d
-    rr d                        ; recover sign
+    ld de,0
+    ld hl,0
     ret
 
 
 ._m32_invsqrtf
+.m32_fsinvsqrt_fastcall
     sla e
     rl d
-    jr Z,m32_sqrt_zero          ; sqrt 0
-    jp C,m32_fsconst_nnan       ; negative number
+    jr NZ,invsqrt_nz
+    ; ±0 → ±Inf (sign in C after rl d)
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf
+.invsqrt_nz
+    jp C,m32_fsconst_nnan
     rr de
+    ld a,e
+    add a,a
+    ld a,d
+    rla
+    inc a
+    jr NZ,m32_fsinvsqrt_body
+    ld a,e
+    and 07fh
+    or h
+    or l
+    jp NZ,m32_fsconst_pnan
+    jp m32_fsconst_pzero        ; 1/sqrt(+Inf)=+0
 
-.m32_fsinvsqrt_fastcall         ; DEHL
+.m32_fsinvsqrt_body             ; DEHL finite non-neg
     ld b,d
     set 7,d                     ; make y negative
 
