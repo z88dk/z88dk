@@ -902,6 +902,7 @@
 #define __IO_APU_CONTROL  0xc001
 #define __IO_APU_STATUS  0xc001
 
+/* Status: BUSY|SIGN|ZERO|ERROR[4:1]|CARRY — ERROR is a 4-bit code (techdocs/amd/am9511a). */
 #define __IO_APU_STATUS_BUSY  0x80
 #define __IO_APU_STATUS_SIGN  0x40
 #define __IO_APU_STATUS_ZERO  0x20

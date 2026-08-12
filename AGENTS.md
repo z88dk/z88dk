@@ -71,6 +71,7 @@ Load only what the task needs. Paths are under `.agents/skills/`.
 | `library-newlib` | `library/newlib/` | CRT m4, FILE*, open, dual-stack |
 | `library-math32` | `library/math32/` | IEEE float cores, multi-CPU rebuild |
 | `library-math16` | `library/math16/` | Half float |
+| `library-am9511` | `library/am9511/` | Am9511A APU float, status/specials, techdocs |
 
 ### Compiler
 

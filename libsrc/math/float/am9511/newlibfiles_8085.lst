@@ -113,7 +113,6 @@
 ../../../math/float/am9511/lam32/c/sccz80/tan_fastcall.asm
 ../../../math/float/am9511/lam32/c/sccz80/tanh.asm
 ../../../math/float/am9511/lam32/c/sccz80/tanh_fastcall.asm
-
 ../../../math/float/am9511/asm/am32_acos.asm
 ../../../math/float/am9511/asm/am32_asin.asm
 ../../../math/float/am9511/asm/am32_atan.asm
@@ -125,6 +124,7 @@
 ../../../math/float/am9511/asm/am32_fabs.asm
 ../../../math/float/am9511/asm/am32_fadd.asm
 ../../../math/float/am9511/asm/am32_fdiv.asm
+../../../math/float/am9511/asm/am32_fspecial.asm
 ../../../math/float/am9511/asm/am32_finv.asm
 ../../../math/float/am9511/asm/am32_floor.asm
 ../../../math/float/am9511/asm/am32_fmul.asm
@@ -145,7 +145,6 @@
 ../../../math/float/am9511/asm/am32_sqrt.asm
 ../../../math/float/am9511/asm/am32_tan.asm
 ../../../math/float/am9511/asm/am32_util.asm
-
 ../../../math/float/am9511/asm/8085/am32_am9511.asm
 ../../../math/float/am9511/asm/8085/am32_compare.asm
 ../../../math/float/am9511/asm/8085/am32_discardfraction.asm
@@ -164,7 +163,6 @@
 ../../../math/float/am9511/asm/8085/am32_pushl.asm
 ../../../math/float/am9511/asm/8085/am32_read.asm
 ../../../math/float/am9511/asm/8085/am32_switch_arg.asm
-
 ../../../math/float/am9511/c/8085/am9511_acosh.asm
 ../../../math/float/am9511/c/8085/am9511_asinh.asm
 ../../../math/float/am9511/c/8085/am9511_atan2.asm
@@ -180,7 +178,6 @@
 ../../../math/float/am9511/c/8085/am9511_round.asm
 ../../../math/float/am9511/c/8085/am9511_sinh.asm
 ../../../math/float/am9511/c/8085/am9511_tanh.asm
-
 ../../../math/float/am9511/c/sdcc/cam32_sdcc_acos.asm
 ../../../math/float/am9511/c/sdcc/cam32_sdcc_acosh.asm
 ../../../math/float/am9511/c/sdcc/cam32_sdcc_asin.asm
@@ -232,7 +229,6 @@
 ../../../math/float/am9511/c/sdcc/cam32_sdcc_tan.asm
 ../../../math/float/am9511/c/sdcc/cam32_sdcc_tanh.asm
 ../../../math/float/am9511/c/sdcc/cam32_sdcc_zero.asm
-
 ../../../math/float/am9511/c/sccz80/cam32_sccz80_acos.asm
 ../../../math/float/am9511/c/sccz80/cam32_sccz80_acosh.asm
 ../../../math/float/am9511/c/sccz80/cam32_sccz80_asin.asm

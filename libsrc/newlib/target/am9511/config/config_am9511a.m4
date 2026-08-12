@@ -9,16 +9,22 @@ define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU0 Data Po
 define(`__IO_APU_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU0 Control Port
 define(`__IO_APU_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU0 Status Port == Control Port
 
+# Status register (AMD Am9511A datasheet — techdocs/amd/am9511a):
+#   BUSY(7) | SIGN(6) | ZERO(5) | ERROR[4:1] | CARRY(0)
+# ERROR is a 4-bit *code* (not four independent sticky flags).
+# While BUSY=1 the other status bits are undefined.
+#   1000b DIV0, 0100b NEGRT (sqrt/log neg), 1100b domain,
+#   XX10b UNDFL, XX01b OVRFL.  Mask ERROR field with 0x1E.
 define(`__IO_APU_STATUS_BUSY',  0x80)
 define(`__IO_APU_STATUS_SIGN',  0x40)
 define(`__IO_APU_STATUS_ZERO',  0x20)
-define(`__IO_APU_STATUS_DIV0',  0x10)
-define(`__IO_APU_STATUS_NEGRT', 0x08)
-define(`__IO_APU_STATUS_UNDFL', 0x04)
-define(`__IO_APU_STATUS_OVRFL', 0x02)
+define(`__IO_APU_STATUS_DIV0',  0x10)   # error code 1000b
+define(`__IO_APU_STATUS_NEGRT', 0x08)   # error code 0100b
+define(`__IO_APU_STATUS_UNDFL', 0x04)   # error code XX10b
+define(`__IO_APU_STATUS_OVRFL', 0x02)   # error code XX01b
 define(`__IO_APU_STATUS_CARRY', 0x01)
 
-define(`__IO_APU_STATUS_ERROR', 0x1E)
+define(`__IO_APU_STATUS_ERROR', 0x1E)   # bits 4..1
 
 define(`__IO_APU_COMMAND_SVREQ',0x80)
 
@@ -189,16 +195,20 @@ defc `__IO_APU_STATUS' = __IO_APU_STATUS
 ENDIF
 
 
+; Status register bit masks (AMD Am9511A datasheet — techdocs/amd/am9511a).
+; Layout: BUSY(7) SIGN(6) ZERO(5) ERROR[4:1] CARRY(0).
+; ERROR is a 4-bit *code* (not four independent sticky flags). While BUSY=1
+; other bits are undefined.  See libsrc/math/float/am9511/readme.md.
 defc `__IO_APU_STATUS_BUSY' = __IO_APU_STATUS_BUSY
 defc `__IO_APU_STATUS_SIGN' = __IO_APU_STATUS_SIGN
 defc `__IO_APU_STATUS_ZERO' = __IO_APU_STATUS_ZERO
-defc `__IO_APU_STATUS_DIV0' = __IO_APU_STATUS_DIV0
-defc `__IO_APU_STATUS_NEGRT' = __IO_APU_STATUS_NEGRT
-defc `__IO_APU_STATUS_UNDFL' = __IO_APU_STATUS_UNDFL
-defc `__IO_APU_STATUS_OVRFL' = __IO_APU_STATUS_OVRFL
+defc `__IO_APU_STATUS_DIV0' = __IO_APU_STATUS_DIV0      ; error code 1000b
+defc `__IO_APU_STATUS_NEGRT' = __IO_APU_STATUS_NEGRT     ; error code 0100b
+defc `__IO_APU_STATUS_UNDFL' = __IO_APU_STATUS_UNDFL     ; error code XX10b
+defc `__IO_APU_STATUS_OVRFL' = __IO_APU_STATUS_OVRFL     ; error code XX01b
 defc `__IO_APU_STATUS_CARRY' = __IO_APU_STATUS_CARRY
 
-defc `__IO_APU_STATUS_ERROR' = __IO_APU_STATUS_ERROR
+defc `__IO_APU_STATUS_ERROR' = __IO_APU_STATUS_ERROR     ; bits 4..1
 
 defc `__IO_APU_COMMAND_SVREQ' = __IO_APU_COMMAND_SVREQ
 
@@ -268,6 +278,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_APU_CONTROL'  __IO_APU_CONTROL
 `#define' `__IO_APU_STATUS'  __IO_APU_STATUS
 
+/* Status: BUSY|SIGN|ZERO|ERROR[4:1]|CARRY — ERROR is a 4-bit code (techdocs/amd/am9511a). */
 `#define' `__IO_APU_STATUS_BUSY'  __IO_APU_STATUS_BUSY
 `#define' `__IO_APU_STATUS_SIGN'  __IO_APU_STATUS_SIGN
 `#define' `__IO_APU_STATUS_ZERO'  __IO_APU_STATUS_ZERO
