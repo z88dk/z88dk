@@ -330,6 +330,108 @@ void test_reciprocal()
     Assert(approx_equal(1.0 / recip_den[1], 0.125, EPSILON), "1/int8 = 0.125");
 }
 
+#ifdef MATH_SPECIALS
+/*
+ * Light IEEE specials (Inf / NaN for /, *, +, sqrt).  Suite-gated on major
+ * z80 + 8085 products only — see Makefile (math32, math16, am9511).
+ */
+#ifdef MATH16
+/* Half has no isinf/isnan in the header — classify packed IEEE-754 binary16. */
+static int sp_isinf(FLOAT x)
+{
+    union { _Float16 f; unsigned u; } v;
+    v.f = x;
+    return ((v.u & 0x7c00u) == 0x7c00u) && ((v.u & 0x03ffu) == 0);
+}
+static int sp_isnan(FLOAT x)
+{
+    union { _Float16 f; unsigned u; } v;
+    v.f = x;
+    return ((v.u & 0x7c00u) == 0x7c00u) && ((v.u & 0x03ffu) != 0);
+}
+static int sp_iszero(FLOAT x)
+{
+    union { _Float16 f; unsigned u; } v;
+    v.f = x;
+    return (v.u & 0x7fffu) == 0;
+}
+#else
+#define sp_isinf(x) isinf(x)
+#define sp_isnan(x) isnan(x)
+#define sp_iszero(x) ((x) == (FLOAT)0.0)
+#endif
+
+/* Runtime zeros so 1/0 is not folded away at compile time. */
+static FLOAT sp_z, sp_o, sp_n1;
+
+void test_specials_div()
+{
+    FLOAT r, pinf;
+
+    sp_z = (FLOAT)0.0;
+    sp_o = (FLOAT)1.0;
+    sp_n1 = (FLOAT)(-1.0);
+
+    r = sp_o / sp_z;
+    Assert(sp_isinf(r), "1/0 is +Inf");
+    r = sp_n1 / sp_z;
+    Assert(sp_isinf(r), "(-1)/0 is Inf");
+    r = sp_z / sp_z;
+    Assert(sp_isnan(r), "0/0 is NaN");
+
+    pinf = sp_o / sp_z;
+    r = sp_o / pinf;
+    Assert(sp_iszero(r), "1/Inf is 0");
+    r = pinf / sp_o;
+    Assert(sp_isinf(r), "Inf/1 is Inf");
+    r = pinf / pinf;
+    Assert(sp_isnan(r), "Inf/Inf is NaN");
+}
+
+void test_specials_mul_add()
+{
+    FLOAT r, pinf, nanv;
+
+    sp_z = (FLOAT)0.0;
+    sp_o = (FLOAT)1.0;
+    pinf = sp_o / sp_z;
+    nanv = sp_z / sp_z;
+
+    r = pinf + pinf;
+    Assert(sp_isinf(r), "Inf+Inf is Inf");
+    r = pinf - pinf;
+    Assert(sp_isnan(r), "Inf-Inf is NaN");
+    r = sp_o + pinf;
+    Assert(sp_isinf(r), "1+Inf is Inf");
+
+    r = sp_z * pinf;
+    Assert(sp_isnan(r), "0*Inf is NaN");
+    r = sp_o * pinf;
+    Assert(sp_isinf(r), "1*Inf is Inf");
+    r = nanv * sp_o;
+    Assert(sp_isnan(r), "NaN*1 is NaN");
+    r = nanv + sp_o;
+    Assert(sp_isnan(r), "NaN+1 is NaN");
+}
+
+void test_specials_sqrt()
+{
+    FLOAT r, pinf;
+
+    sp_z = (FLOAT)0.0;
+    sp_o = (FLOAT)1.0;
+    sp_n1 = (FLOAT)(-1.0);
+    pinf = sp_o / sp_z;
+
+    r = SQRT(sp_n1);
+    Assert(sp_isnan(r), "sqrt(-1) is NaN");
+    r = SQRT(sp_z);
+    Assert(sp_iszero(r), "sqrt(0) is 0");
+    r = SQRT(pinf);
+    Assert(sp_isinf(r), "sqrt(+Inf) is +Inf");
+}
+#endif /* MATH_SPECIALS */
+
 /* Binary float arithmetic beyond integer-valued cases. Covers mantissa mul,
    signed products, zero, and basic add/sub — the paths exercised by IEEE
    math32 / 8085 ports (sticky-round mul, unpack/pack). Prefer exact == for
@@ -410,6 +512,11 @@ int suite_math()
     suite_add_test(test_fmod);
     suite_add_test(test_fmin);
     suite_add_test(test_fmax);
+#endif
+#ifdef MATH_SPECIALS
+    suite_add_test(test_specials_div);
+    suite_add_test(test_specials_mul_add);
+    suite_add_test(test_specials_sqrt);
 #endif
     return suite_run();
 }
