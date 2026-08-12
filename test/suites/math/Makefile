@@ -18,6 +18,12 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 #
 # Not enabled (no proper IEEE specials / stubs):
 #   genmath, math48, mbf32*, bbcmath, cpcmath, daimath32, fix16, 9511_rc2014
+#
+# 80cc note (CI default -compiler=80cc): algebraically folds same-SSA
+# identities such as `pinf - pinf` → 0 and can fold `x / x` → 1, so those
+# never call the float library.  math.c loads both operands from distinct
+# static cells (sp_a / sp_b) for Inf−Inf / Inf/Inf so specials actually run.
+# sccz80 does not fold these; a green sccz80 run alone does not prove CI.
 # ---------------------------------------------------------------------------
 
 all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_math16_8085.bin \
@@ -143,4 +149,6 @@ test_daimath32.bin: $(FPSOURCES)
 	$(runtest)
 
 clean:
-	rm -f *.bin *.map *.lis $(FPOBJECTS) $(FIXOBJECTS) zcc_opt.def *~
+	rm -f *.bin *.map *.lis *.err $(FPOBJECTS) $(FIXOBJECTS) zcc_opt.def *~
+	rm -f .ticks_history.txt
+	rm -rf specials

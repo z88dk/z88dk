@@ -361,12 +361,15 @@ static int sp_iszero(FLOAT x)
 #define sp_iszero(x) ((x) == (FLOAT)0.0)
 #endif
 
-/* Runtime zeros so 1/0 is not folded away at compile time. */
+/* Runtime cells so 1/0 and Inf−Inf are not folded away at compile time.
+ * 80cc algebraically rewrites `x - x` / same-SSA `x / x` to 0/1; load
+ * both operands from distinct static storage so the library runs. */
 static FLOAT sp_z, sp_o, sp_n1;
+static FLOAT sp_a, sp_b;
 
 void test_specials_div()
 {
-    FLOAT r, pinf;
+    FLOAT r;
 
     sp_z = (FLOAT)0.0;
     sp_o = (FLOAT)1.0;
@@ -379,38 +382,41 @@ void test_specials_div()
     r = sp_z / sp_z;
     Assert(sp_isnan(r), "0/0 is NaN");
 
-    pinf = sp_o / sp_z;
-    r = sp_o / pinf;
+    sp_a = sp_o / sp_z;         /* +Inf */
+    r = sp_o / sp_a;
     Assert(sp_iszero(r), "1/Inf is 0");
-    r = pinf / sp_o;
+    r = sp_a / sp_o;
     Assert(sp_isinf(r), "Inf/1 is Inf");
-    r = pinf / pinf;
+    sp_b = sp_a;
+    r = sp_a / sp_b;
     Assert(sp_isnan(r), "Inf/Inf is NaN");
 }
 
 void test_specials_mul_add()
 {
-    FLOAT r, pinf, nanv;
+    FLOAT r;
 
     sp_z = (FLOAT)0.0;
     sp_o = (FLOAT)1.0;
-    pinf = sp_o / sp_z;
-    nanv = sp_z / sp_z;
+    sp_a = sp_o / sp_z;         /* +Inf */
+    sp_b = sp_z / sp_z;         /* NaN */
 
-    r = pinf + pinf;
+    r = sp_a + sp_a;
     Assert(sp_isinf(r), "Inf+Inf is Inf");
-    r = pinf - pinf;
+    sp_b = sp_a;                /* second Inf in distinct cell */
+    r = sp_a - sp_b;
     Assert(sp_isnan(r), "Inf-Inf is NaN");
-    r = sp_o + pinf;
+    r = sp_o + sp_a;
     Assert(sp_isinf(r), "1+Inf is Inf");
 
-    r = sp_z * pinf;
+    r = sp_z * sp_a;
     Assert(sp_isnan(r), "0*Inf is NaN");
-    r = sp_o * pinf;
+    r = sp_o * sp_a;
     Assert(sp_isinf(r), "1*Inf is Inf");
-    r = nanv * sp_o;
+    sp_b = sp_z / sp_z;         /* NaN again after overwrite */
+    r = sp_b * sp_o;
     Assert(sp_isnan(r), "NaN*1 is NaN");
-    r = nanv + sp_o;
+    r = sp_b + sp_o;
     Assert(sp_isnan(r), "NaN+1 is NaN");
 }
 
