@@ -563,9 +563,22 @@ static int nodes_equivalent(Node *a, Node *b)
     case AST_LOCAL_VAR:
     case AST_GLOBAL_VAR:
         return a->sym == b->sym;
+    case OP_DEREF: case AST_DEREF:
+        /* A BITFIELD read carries its position in the node's TYPE, not in the
+           address: two fields sharing a storage unit have identical operands
+           and differ only in bit_offset/bit_size. Comparing the operands alone
+           made `r->rate` and `r->flag` equivalent, and cse-synth then replaced
+           the second read with the first field's value (a 1-bit flag read back
+           as its 12-bit neighbour). */
+        if ((a->type && a->type->bit_size > 0)
+            || (b->type && b->type->bit_size > 0)) {
+            if (!a->type || !b->type) return 0;
+            if (a->type->bit_size != b->type->bit_size
+                || a->type->bit_offset != b->type->bit_offset) return 0;
+        }
+        return nodes_equivalent(a->operand, b->operand);
     case OP_NEG: case OP_COMP: case OP_LNEG:
     case OP_CAST:
-    case OP_DEREF: case AST_DEREF:
     case OP_ADDR:  case AST_ADDR:
         return nodes_equivalent(a->operand, b->operand);
     case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV: case OP_MOD:
