@@ -112,12 +112,12 @@ time @ 4MHz  = 1017834192 / 4*10^6 =  4 min 14 sec
 
 Z88DK August 12, 2026
 sccz80 / classic / 8085 / math32
-4396 bytes less page zero
+4393 bytes less page zero
 
-cycle count  = 1053180625
-time @ 4MHz  = 1053180625 / 4*10^6 =  4 min 23 sec
+cycle count  = 1052849425
+time @ 4MHz  = 1052849425 / 4*10^6 =  4 min 23 sec
 
-(opt with sqr(): 900043536 ticks, 4663 bytes.)
+(opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 
 Z88DK August 10, 2026

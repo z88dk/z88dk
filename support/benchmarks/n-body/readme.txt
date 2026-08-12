@@ -60,7 +60,7 @@ sccz80   | z80  | math16  |   295_642_916 (Aug 10, 2026; DT=1e-1)
 sccz80   | 8085 | math16  |   344_383_717 (Aug 10, 2026; DT=1e-1)
 sccz80   | z80  | math32  |   791_103_882 (Aug 10, 2026)
 zsdcc    | z80  | math32  |   843_047_242 (Aug 10, 2026)
-sccz80   | 8085 | math32  | 1_564_396_728 (Aug 12, 2026)
+sccz80   | 8085 | math32  | 1_563_936_728 (Aug 12, 2026)
 sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
 sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
 80cc     | *    | math32  | builds; INVALID 2nd energy — omitted
@@ -181,13 +181,13 @@ IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 9.
 Z88DK August 12, 2026
 sccz80 / classic / 8085 / math32
-6846 bytes less page zero
+6843 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 7 * 10^(-6)
 
-cycle count  = 1564396728
-time @ 4MHz  = 1564396728 / 4*10^6 =  6 min 31 sec
+cycle count  = 1563936728
+time @ 4MHz  = 1563936728 / 4*10^6 =  6 min 31 sec
 
 IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits.
 

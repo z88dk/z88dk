@@ -204,21 +204,36 @@ Deliberate non-goals: one shared mul body for both CPUs; forcing Z80 expand into
 
 There are essentially two different grades of functions in this library. Those intrinsic functions written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. And derived functions, written in assembly code in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values using the internal `_f24` format.
 
+### Intrinsic Assembly Functions
+
+```C
+half_t addf16 (half_t x, half_t y);
+half_t subf16 (half_t x, half_t y);
+half_t mulf16 (half_t x, half_t y);
+half_t divf16 (half_t x, half_t y);
+```
+
+#### _div()_
+
+```C
+half_t divf16 (half_t x, half_t y);
+```
+
+**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).
+
+Both cores use the same label set (`div_body`, `div_bit_loop`, `div_bit_fail`, `div_quot_shift`, `div_normed`, `div_zero` / `div_inf` / `div_nan`, …). The f24 mantissa is 16 bits, so the divisor stays in `BC` for the whole loop. The z80 core puts the step count in `B'` (`djnz`). The 8085 core keeps the count on the stack and updates it with `dec (hl)` so the hot path does not spill `AF` each bit. Specials call shared `asm_f24_zero`, `asm_f24_inf`, and `asm_f24_nan`.
+
 ### Derived Floating Point Functions
 
 These functions are implemented in assembly language but they utilise the intrinsic assembly language functions to provide their returns. The use of the 16-bit mantissa expanded floating point format (`_f24`) functions to implement the derived functions means that their accuracy is maintained.
 
 The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `invf16()`, `fmaf16()` and the `polyf16()` functions.
 
-#### _div()_ and _inv()_
+#### _inv()_
 
 ```C
 half_t invf16 (half_t x);
-half_t divf16 (half_t x, half_t y);
 ```
-**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).
-
-Both cores use the same label set (`div_body`, `div_bit_loop`, `div_bit_fail`, `div_quot_shift`, `div_normed`, `div_zero` / `div_inf` / `div_nan`, …). The f24 mantissa is 16 bits, so the divisor stays in `BC` for the whole loop. The z80 core puts the step count in `B'` (`djnz`). The 8085 core keeps the count on the stack and updates it with `dec (hl)` so the hot path does not spill `AF` each bit. Specials call shared `asm_f24_zero`, `asm_f24_inf`, and `asm_f24_nan`.
 
 **`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/` and for plain `1/n` (restoring div is faster than NR inv). sccz80 does not rewrite half/IEEE literal `1.0/x` to inv — that is ordinary divide. Keep explicit `invf16` for reciprocal-as-primitive / NR-based helpers.
 

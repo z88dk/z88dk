@@ -213,6 +213,7 @@ There are several assembly intrinsic functions.
 float add (float x, float y);
 float sub (float x, float y);
 float mul (float x, float y);
+float div (float x, float y);
 ```
 Using these intrinsic functions (and the compact assembly square root and polynomial functions) it is possible to build efficient C language complex functions.
 
@@ -274,16 +275,12 @@ Rabbit (**r2ka**) and **kc160** also expose `m32_sqr_32h_24x24` for the same `_f
 
 Because square appears in inverse square root, hypotenuse, and many transcendental polynomials, the dedicated kernel is a useful optimisation on every target that can avoid a full multiply.
 
-### Derived Floating Point Functions
-
-These functions are implemented in assembly language but they utilise the intrinsic assembly language functions to provide their returns. The use of the 32-bit mantissa expanded floating point format functions to implement the derived functions means that their accuracy is maintained.
-
-#### _div()_ and _inv()_
+#### _div()_
 
 ```C
-float inv (float x);
 float div (float x, float y);
 ```
+
 **`div` / `m32_fsdiv`**: restoring 24-bit mantissa divide with RNE on the guard bit.
 
 | Core | File | Products |
@@ -294,6 +291,16 @@ float div (float x, float y);
 Both cores share the same control structure and label set (`div_enter`, `div_bit_loop`, `div_guard_*`, `div_pack_*`, specials). The z80 core keeps rem and div in the main and alternate register sets. The 8085 core keeps rem in `DEHL`, the bit count in `B`, and the 3-byte divisor on a short stack frame. math16 f24 divide uses the same restoring plan on a 16-bit mantissa (see `math16/README.md`); there the divisor fits in `BC` for the whole loop.
 
 exp==0 inputs are ±0. Result underflow flushes to signed zero. No gradual underflow. Special exits use `m32_fpclassify` (8085 classify), `m32_fszero` / `m32_fsmax` (signed 0 / inf; CF cleared after `m32_fsmax`), and `m32_fsconst_pnan` for NaN.
+
+### Derived Floating Point Functions
+
+These functions are implemented in assembly language but they utilise the intrinsic assembly language functions to provide their returns. The use of the 32-bit mantissa expanded floating point format functions to implement the derived functions means that their accuracy is maintained.
+
+#### _inv()_
+
+```C
+float inv (float x);
+```
 
 **`inv` / `m32_fsinv`**: Newton–Raphson (wide multiplies). For plain `1/n`, restoring `div` is faster on z80, 8085, z80n, and z180. sccz80 does not rewrite IEEE literal `1.0f/x` to `inv`. That expression is ordinary divide → `fsdiv`. Explicit `inv(x)` calls NR `fsinv`. Fixed-point `inversef` → `l_fix16_inv` / `l_fix32_inv` is unchanged.
 
@@ -417,10 +424,9 @@ Careful use of the intrinsic functions can result in significant performance imp
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
 #endif
 ```
-And we get about a __24–27%__ improvement for the n-body benchmark across the math32 CPU builds.
-Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
+On plain z80 and 8085 the `invsqrt`/`sqr` rewrite is about a __10–13%__ TIMER win (remeasured below). HW-mul builds (z80n / z180) still show larger relative gains on historical rows. Most of the gain is from using `invsqrt()` directly: `y=invsqrt(x)` instead of `y=l_f32_inv(x*invsqrt(x))`.
 
-Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). math32_8085 rows remeasured Aug 12, 2026; other non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). math32 and math32_8085 rows (base and opt) remeasured Aug 12, 2026; other rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
@@ -429,14 +435,14 @@ math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_8
 mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_835_079_611
 mbf32_8085                  | sccz80   | -0.1699168    | -0.1699168    | 1_849_800_062
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_920_041_872_
+math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_791_103_882_
 math32                      | zsdcc    | -0.1690752    | -0.1690864    | _0_984_851_361_
-math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_764_001_899__
+math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_714_165_809__
 math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_519_025_592_
 math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_396_603_258_
 math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_494_347_688_
 math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_380_149_278_
-math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_564_396_728_
+math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_563_936_728_
 math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_363_696_174__
 
 
@@ -463,9 +469,9 @@ math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_363
             }
 #endif
 ```
-For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–13%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks.
+For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–15%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks. After that rewrite, math32_8085 (opt) is faster in TIMER ticks than plain z80 math32 (opt); base (non-opt) still has z80 ahead of 8085.
 
-Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). math32_8085 rows remeasured Aug 12, 2026; other non-math32 rows are historical.
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). math32 and math32_8085 rows (base and opt) remeasured Aug 12, 2026; other rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
@@ -475,13 +481,13 @@ math48                      | sccz80   | 3_266_168_305
 mbf32                       | sccz80   | 1_798_158_288
 mbf32_8085                  | sccz80   | 1_805_825_674
 math32                      | zsdcc    | _1_384_979_312_
-math32                      | sccz80   | __1_118_985_198__
-math32                 (opt)| sccz80   | _1_137_807_104_
+math32                      | sccz80   | _1_017_833_592_
+math32                 (opt)| sccz80   | __1_004_767_801__
 math32_z80n                 | sccz80   | _0_777_474_379_
 math32_z80n            (opt)| sccz80   | _0_694_488_693_
 math32_z180                 | sccz80   | _0_723_374_585_
 math32_z180            (opt)| sccz80   | _0_642_181_961_
-math32_8085                 | sccz80   | _1_053_180_625_
-math32_8085            (opt)| sccz80   | __0_900_043_536__
+math32_8085                 | sccz80   | _1_052_849_425_
+math32_8085            (opt)| sccz80   | __0_899_712_336__
 
 ---
