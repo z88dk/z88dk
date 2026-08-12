@@ -354,19 +354,17 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 ;=========================================================================
 ;
 ; Drop work+sign+a+b (18).  DEHL=result, BC free, flag still on frame.
-; Park hi in BC / lo in DE; SP via HL.  ld de,sp+n would lose parked lo.
+; Park lo in BC; DE (hi) stays.  SP via HL; restore lo after flag pop.
 ; Callee drops original a with two pops (4 B — pops beat another adjust).
 ;
 
-    ld bc,de
-    ex de,hl                    ; park: BC=hi, DE=lo
+    ld bc,hl                    ; park lo; DE (hi) stays
     ld hl,18                    ; work(8)+sign(2)+a(4)+b(4)
     add hl,sp
     ld sp,hl
     pop hl                      ; flag
     ld a,l
-    ex de,hl                    ; HL = result lo
-    ld de,bc
+    ld hl,bc                    ; restore lo; DE still hi
     or a
     jr Z,div_done
     pop bc                      ; cret

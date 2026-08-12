@@ -138,13 +138,12 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     pop hl
     pop de                      ; A=flag DEHL=result
 
-    ld bc,de
-    ex de,hl
+    ; Park lo in BC; DE (hi) stays.  SP adjust via HL; restore lo.
+    ld bc,hl
     ld hl,14
     add hl,sp
     ld sp,hl
-    ex de,hl
-    ld de,bc                    ; DEHL restored; A=flag
+    ld hl,bc                    ; DEHL restored; A=flag
 
     or a
     jp Z,fm_done

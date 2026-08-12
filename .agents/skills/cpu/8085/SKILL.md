@@ -451,7 +451,47 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 
 ### 10. Synthetic opcodes
 
-The z88dk-z80asm assembler has a MACRO capability, and it has the capability to support "synthetic" opcodes. Synthetic opcodes are usually created by a series of useful operations that can be chained together without side effects. For example `ld bc,de` which is a 16-bit emulation by two 8-bit operations, or for example `ld a,(hl+)` which is an indirect load followed by an increment of the index register. These operations can make code more concise and easier to debug, or allow an operation supported by one CPU to be used across multiple CPUs without deploying conditional assembly.
+**z80asm** expands many **synthetic** source forms into short real-op sequences
+(no harmful flag/side effects for the forms below). They keep library code
+readable and portable across CPUs without `#if CPU` for the same transfer.
+
+#### 16-bit register-pair copies (full set)
+
+Synthetics of the form **`ld dst,src`** where **dst** and **src** are word
+register pairs. Each expands to **two 8-bit `ld`s** (high then low, or as the
+assembler tables define — e.g. `ld de,hl` → `ld d,h` / `ld e,l`).
+
+| Allowed pairs | Forbidden as word-copy synthetics |
+|---------------|-------------------------------------|
+| **`bc`**, **`de`**, **`hl`** — **any → any** (including “same” pair) | **`af`**, **`sp`** (not part of this word-copy set) |
+
+```asm
+    ld  bc,de          ; B←D, C←E
+    ld  bc,hl
+    ld  de,bc
+    ld  de,hl
+    ld  hl,bc
+    ld  hl,de
+```
+
+**Prefer these over hand-rolled two-byte moves** (`ld b,d` / `ld c,e`, …) and over
+swap dances when you only need to **park one pair**:
+
+```asm
+    ; Hold DEHL; need HL free for SP adjust — park lo only:
+    ld  bc,hl          ; park lo; DE (hi) stays
+    ld  hl,14
+    add hl,sp
+    ld  sp,hl
+    ld  hl,bc          ; restore lo
+```
+
+Do **not** invent `ld bc,de` + `ex de,hl` + SP math + reverse swaps when
+`ld bc,hl` / `ld hl,bc` is enough.
+
+Other common synthetics (not pair-copy): e.g. `ld a,(hl+)` (load + inc index).
+**Strict** assemble (`*_strict_*` / `-no-synth`) **forbids** free synthetics —
+fixtures under `src/z80asm/dev/cpu/` (see **`tool-z80asm`**).
 
 ## Pitfalls
 

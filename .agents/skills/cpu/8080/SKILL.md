@@ -18,6 +18,15 @@ Subset of 8085 without the ten extended opcodes. Classic products use
 4. SP-relative work: `ld hl,nn` / `add hl,sp` (watch flag clobber of `add hl,sp`).
 5. Stack-only locals still preferred for reentrancy.
 
+## Synthetic opcodes (z80asm)
+
+Same **word-copy** family as other CPUs (normal mode): **`ld dst,src`** for any
+of **`bc` / `de` / `hl`** to any of those pairs — each expands to two 8-bit
+`ld`s. Prefer over hand two-byte moves and over swap dances when parking one
+pair (`ld bc,hl` … `ld hl,bc`). **Not** for **`af`** or **`sp`**.
+
+Strict mode forbids free synthetics (`*_strict_*`, **`tool-z80asm`**).
+
 ## Assembler capability (last resort)
 
 Fixtures: `src/z80asm/dev/cpu/cpu_test_8080_{ok,err}.asm` and `*_strict_*`.

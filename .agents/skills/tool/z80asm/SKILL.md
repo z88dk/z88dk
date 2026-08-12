@@ -22,8 +22,22 @@ description: >
 | Listing | `-l` → `.lis` (verify synthetics / illegal ops) |
 | Object | default `.o`; `-d` date-based rebuild in library builds |
 
-Synthetics (`ld de,hl`, `ld a,(hl+)`, …) expand without harmful side effects when used as documented.
+### Synthetic opcodes (normal mode)
 
+Assembler **sugar** expanded to real ops (no harmful flag/side effects for the
+documented forms). **Strict** / `-no-synth` forbids free synthetics.
+
+**16-bit register-pair copies (full set)** — two 8-bit `ld`s each:
+
+| Allowed | Forbidden in this set |
+|---------|------------------------|
+| **`ld`** among **`bc` / `de` / `hl`** — **any → any** (`ld bc,de`, `ld de,hl`, `ld hl,bc`, …) | **`af`**, **`sp`** |
+
+Prefer these over hand two-byte moves and over swap dances when parking one pair
+(`ld bc,hl` … work … `ld hl,bc`). Same family on 8080/8085/z80/z80n/z180/gbz80
+(and related) in normal mode — coding rules still differ per **cpu/** skill.
+
+Other examples: `ld a,(hl+)` (load + inc). Listings (`-l`) show the expansion.
 ## CPU capability fixtures (how to read them)
 
 **Question these answer:** “If I assemble this **source line** with `z88dk-z80asm -m<cpu>`, does the assembler accept it, and what does it emit?”

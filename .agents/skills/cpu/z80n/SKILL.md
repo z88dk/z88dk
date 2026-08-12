@@ -197,6 +197,14 @@ If **c** is written **unchanged** from the previous value, only **I** is updated
 
 ---
 
+## Synthetic opcodes (z80asm)
+
+Inherits Z80 **word-copy** synthetics (normal mode): any of **`bc` / `de` / `hl`**
+to any of those pairs — two 8-bit loads each. Use to park a pair
+(`ld bc,hl` … `ld hl,bc`) rather than multi-insn swaps. **Not** **`af`** / **`sp`**.
+
+Strict forbids free synthetics. Next-only ops above are **native**, not this set.
+
 ## Assembler capability (last resort)
 
 Fixtures: `src/z80asm/dev/cpu/cpu_test_z80n_{ok,err}.asm` (+ `*_strict_*`).

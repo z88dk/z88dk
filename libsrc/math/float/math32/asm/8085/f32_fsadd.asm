@@ -279,14 +279,12 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     pop hl
     pop de                          ; A=flag DEHL=result
 
-    ; BC free; park hi in BC, lo in DE; SP via HL (ld de,sp+n loses lo).
-    ld bc,de
-    ex de,hl
+    ; Park lo in BC; DE (hi) stays.  SP adjust via HL; restore lo.
+    ld bc,hl
     ld hl,14
     add hl,sp
     ld sp,hl
-    ex de,hl
-    ld de,bc                        ; DEHL restored; A=flag
+    ld hl,bc                        ; DEHL restored; A=flag
 
     or a
     jp Z,done

@@ -22,10 +22,33 @@ Default classic and newlib CPU for most targets.
 
 ## Style in z88dk `libsrc`
 
-- Prefer synthetics (`ld de,hl`, `ld a,(hl+)`) when the assembler expands them cleanly.
+- Prefer synthetics when the assembler expands them cleanly (see below).
 - Match neighbour file whitespace (spaces in most math cores).
 - One major function per file — see `style/libsrc-layout`.
 - Hand-written library asm is **not** passed through `z88dk-copt`.
+
+## Synthetic opcodes (z80asm, all CPUs generally)
+
+**z80asm** (normal mode) expands many source forms into short real-op sequences.
+One important family is **16-bit register-pair copies**: each is two 8-bit
+loads (e.g. `ld de,hl` → `ld d,h` / `ld e,l`).
+
+### Word copies — full set
+
+| Form | Notes |
+|------|--------|
+| `ld bc,de` / `ld bc,hl` | any of **bc / de / hl** ← any of **bc / de / hl** |
+| `ld de,bc` / `ld de,hl` | same |
+| `ld hl,bc` / `ld hl,de` | same |
+
+**Not** in this set: **`af`**, **`sp`** (do not write `ld bc,af` / `ld hl,sp` as
+a “pair copy synthetic” for this purpose).
+
+Prefer `ld bc,hl` / `ld hl,bc` (or other pair) to **park and restore** a word
+instead of multi-instruction swap sequences when only one pair must move.
+
+Other synthetics exist (e.g. `ld a,(hl+)`). **Strict** mode forbids free
+synthetics — see **`tool-z80asm`** and `src/z80asm/dev/cpu/cpu_test_z80_*`.
 
 ## Contrast with 8085
 

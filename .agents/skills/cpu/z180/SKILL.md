@@ -18,6 +18,14 @@ Z80-compatible with extras (e.g. **`mlt`**). Used by `+z180`, `+yaz180`, `+scz18
 | math32 | `math32_z180.lib` via multi-CPU layout under `libsrc/math/float/math32/` |
 | Targets | See `target/z180`, `target/yaz180`, `target/scz180` |
 
+## Synthetic opcodes (z80asm)
+
+Same **word-copy** set as Z80 (normal mode): any of **`bc` / `de` / `hl`** ← any
+of those pairs (`ld de,hl`, `ld bc,hl`, `ld hl,bc`, …) = two 8-bit loads.
+Prefer to park/restore a pair instead of swap chains. **Not** **`af`** / **`sp`**.
+
+Strict forbids free synthetics — **`tool-z80asm`**.
+
 ## Assembler capability (last resort)
 
 Fixtures under `src/z80asm/dev/cpu/` answer: does **z80asm** accept this **source line** for this CPU, and what encoding does it emit?
