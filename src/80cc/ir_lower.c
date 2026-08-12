@@ -4813,7 +4813,17 @@ int ir_lower_func(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
  deadframe_retry:
-    rout = elide_labels ? tmpfile() : NULL;
+    /* Render into a DISCARDABLE buffer whether or not labels are being elided.
+       The dead-store / dead-frame retries below `goto deadframe_retry` and
+       render the function again, discarding the first attempt with
+       `fclose(rout)` — which only discards anything when rout is a temp file.
+       With rout aliased to `out` (what --opt-disable=label-elide used to do)
+       the first render stayed in the output and the retry APPENDED a second
+       copy of the whole function: two bodies, both carrying L_f<n>_bb_0, and
+       z80asm rejected the duplicate label. If tmpfile() is unavailable we fall
+       back to writing `out` directly and must then suppress the retries, since
+       there is no way to take the first render back. */
+    rout = tmpfile();
     if (!rout) { rout = out; elide_labels = 0; }
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
@@ -4978,7 +4988,9 @@ int ir_lower_func(FILE *out, Func *f)
             marked++;
         }
         free(st_base);
-        if (marked) {
+        /* rout==out means tmpfile() failed: the first render is already in the
+           output and cannot be taken back, so a retry would duplicate it. */
+        if (marked && rout != out) {
             ds_retry_done = 1;
             ir_assign_slots(f);                 /* drop dead slots, recompact */
             L.cur_frameless = frameless_ok(f);
@@ -4994,7 +5006,7 @@ int ir_lower_func(FILE *out, Func *f)
        construction — a dead slot is never addressed, so dropping it and the
        frame shifts nothing that is emitted. The scratch render is discarded. */
     if (deadframe_on() && !df_retry_done && rc == 0
-        && L.frame_fully_dead && f->frame_size > 0) {
+        && L.frame_fully_dead && f->frame_size > 0 && rout != out) {
         df_retry_done = 1;
         /* Clear EVERY slot, not just the PR_SPILL ones. A vreg with a RANGED
            register home (home_lo/home_hi narrower than the whole function)
@@ -5052,9 +5064,10 @@ int ir_lower_func(FILE *out, Func *f)
             if ((tix || tiy) && v[0] == '2') abort();
         }
     }
-    if (elide_labels) {
-        if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb, f);
-        else { rewind(rout); char buf[1024];   /* error path: copy verbatim */
+    if (rout != out) {
+        if (elide_labels && rc == 0)
+            emit_dropping_dead_bb_labels(out, rout, max_bb, f);
+        else { rewind(rout); char buf[1024];   /* verbatim: no elision, or error */
                while (fgets(buf, sizeof buf, rout)) fputs(buf, out); }
         fclose(rout);
     }
