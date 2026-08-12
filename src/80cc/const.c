@@ -586,6 +586,17 @@ void dofloat(enum maths_mode mode,double raw, unsigned char fa[])
                          0);
                 raw = 0.0;
             }
+        } else if ( e == min_exp - 1 ) {
+            /* One exponent below the minimum is a ROUNDING case, not an
+               underflow: with the mantissa in [0.5,1) such a value is at least
+               half the smallest representable, so round-to-nearest takes it UP
+               to that value rather than to zero. Flushing it instead breaks the
+               formats' own "smallest positive" macros -- TINY_POS_AM9511 is
+               written 2.7e-20 for a true minimum of 2^-65 = 2.7105e-20, and
+               zeroing it turned the math suite's epsilon into 0, so every
+               approximate comparison failed. No diagnostic: the value is
+               representable to within one rounding step. */
+            raw = raw < 0 ? -ldexp(0.5, min_exp) : ldexp(0.5, min_exp);
         } else if ( e < min_exp ) {
             warningfmt("fp-range",
                        "Floating point constant underflows the selected floating point format; using zero");
