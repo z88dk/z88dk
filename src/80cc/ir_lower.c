@@ -1895,6 +1895,17 @@ static void emit_byte_slot_addr(FILE *out, const Func *f, int v);
    HL tenant MOVES to DE (it is not clobbered), so swaps route here
    rather than through hl_about_to_change. */
 static void hl_about_to_change(int v_new);
+
+/* Cross-BB HL slot-address carry (default on; IR_HLADDR_BB=0 reverts). */
+static int hladdr_bb_carry_on(void)
+{
+    static int on = -1;
+    if (on < 0) {
+        const char *e = getenv("IR_HLADDR_BB");
+        on = (e && *e == '0') ? 0 : 1;
+    }
+    return on;
+}
 static void swap_hl_de_caches(void);
 
 /* Lazy-spill choke-point helpers. Defined
@@ -4449,10 +4460,29 @@ int ir_lower_func(FILE *out, Func *f)
                    slot uninitialised → garbage. gen_bitop's width-1 AND/OR/XOR
                    is that path; restrict to it. */
                 const Op *uop = &bb->ops[use_j];
-                if (!((uop->kind == IR_AND || uop->kind == IR_OR
-                       || uop->kind == IR_XOR)
-                      && uop->dst >= 0 && f->vregs[uop->dst].width == 1))
-                    continue;
+                int use_ok = (uop->kind == IR_AND || uop->kind == IR_OR
+                              || uop->kind == IR_XOR)
+                             && uop->dst >= 0 && f->vregs[uop->dst].width == 1;
+                /* Byte EQ/NE between two width-1 VREGS also qualifies: it takes
+                   gen_cmp_eq_ne's `cp` path, which reads one operand through
+                   load_byte_to_a and the other through byte_alu_operand — both
+                   rematerialise. The two folds that run ahead of it
+                   (try_cmp_ixd_fold, try_exx_compare) are width-2 only, so they
+                   cannot reach a byte operand and read its (absent) slot.
+                   Requiring src[1] to be a real vreg keeps the const-RHS shapes
+                   out: `b == 0` goes to emit_test_zero and an out-of-range
+                   constant to the widened path, neither of which remats.
+                   This is what lets the compared byte stay in A rather than be
+                   evicted by a global load, so the A-carry can hand it to the
+                   next block and the value's own slot — and often the whole
+                   frame — falls away. */
+                if (!use_ok && (uop->kind == IR_CMP_EQ || uop->kind == IR_CMP_NE)
+                    && uop->src[0] >= 0 && uop->src[0] < f->n_vregs
+                    && uop->src[1] >= 0 && uop->src[1] < f->n_vregs
+                    && f->vregs[uop->src[0]].width == 1
+                    && f->vregs[uop->src[1]].width == 1)
+                    use_ok = 1;
+                if (!use_ok) continue;
                 /* no memory-writing op between the load and its use */
                 int hazard = 0;
                 for (int k = j + 1; k < use_j && !hazard; k++) {
@@ -5226,6 +5256,11 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     int *bb_bc_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
     if (bb_bc_out)
         for (int i = 0; i < f->n_bbs; i++) bb_bc_out[i] = -1;
+    /* Per-render HL slot-ADDRESS out map, the address analogue of bb_hl_out:
+       the canonical slot offset HL points at when this BB ends, -1 = none. */
+    int *bb_hl_addr_out = malloc((size_t)(f->n_bbs > 0 ? f->n_bbs : 1) * sizeof(int));
+    if (bb_hl_addr_out)
+        for (int i = 0; i < f->n_bbs; i++) bb_hl_addr_out[i] = -1;
     /* Per-pass state reset (everything that was at function entry except
        func_emit_idx, which the caller bumps once for both passes). */
     L.cmp_label_counter = 0;
@@ -5458,6 +5493,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         /* No pending spill crosses into a BB yet — the cross-BB inherit
            lands with the defer step. Clear it so nothing leaks. */
         L.pending_spill_v = -1;
+        int hl_clobbered_at_entry = 0;
         /* Word DE-home exit-flush hoist: this block is the region's sole,
            dedicated exit — physical DE still holds the final accumulator (the
            region proof; nothing has emitted since the exit branch). Flush it to
@@ -5478,6 +5514,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             if (home_live) {
                 if (g_hc.home_is_word) word_home_exit_flush(out, f);
                 else                    byte_home_exit_flush(out, f);
+                /* Both flushes address the home's slot through HL, so HL no
+                   longer holds whatever the predecessors left in it — the
+                   address carry below must not re-assert their belief. */
+                hl_clobbered_at_entry = 1;
             }
             L.cur_byte_home_dirty = 0;
             L.cur_byte_home_vreg = -1;
@@ -5518,6 +5558,41 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
             invalidate_hl_cache();
         }
         entry_hl = -1;   /* consumed at the first BB; never re-seed */
+        /* Cross-BB HL slot-ADDRESS carry — the address analogue of the value
+           carry above, and the reason a slot accessed in two blocks used to
+           recompute `ld hl,off; add hl,sp` in each.
+
+           An address belief is NOT a value belief: it says HL points at slot K,
+           and a frame slot's absolute address is fixed for the function's
+           lifetime (mid-function pushes allocate BELOW the frame, they never
+           move slots). So unlike bb_hl_out there is no live_in test to apply —
+           the address cannot go stale, only the register can be clobbered.
+           Hence the conditions are purely physical: every predecessor lowered,
+           and all agreeing on the same slot, so the belief is true on every
+           incoming edge.
+
+           Runs AFTER the chain above because invalidate_hl_cache() there
+           clears cur_hl_addr_off (same reason the A-carry re-establishes rs.a
+           below). Skipped when the value carry took HL — the two are mutually
+           exclusive, since cache_hl_slot_addr clears rs.hl and
+           hl_about_to_change clears the address — and when a home exit-flush
+           already clobbered HL. IR_HLADDR_BB=0 opts out. */
+        if (carry < 0 && !hl_clobbered_at_entry && bb_hl_addr_out
+            && hladdr_bb_carry_on()) {
+            int addr_carry = -2;
+            for (int p = 0; p < bb_pred_cnt[bb->id]; p++) {
+                int pid = bb_preds[bb->id][p];
+                if (!bb_lowered[pid]) { addr_carry = -1; break; }
+                int o = bb_hl_addr_out[pid];
+                if (o < 0) { addr_carry = -1; break; }
+                if (addr_carry == -2) addr_carry = o;
+                else if (addr_carry != o) { addr_carry = -1; break; }
+            }
+            if (addr_carry >= 0) {
+                L.rs.hl = -1;
+                L.cur_hl_addr_off = addr_carry;
+            }
+        }
         /* A-cache carry: a byte tested in an if/switch chain is loaded to A for
            the first compare and stays there (cp/or a don't touch A, branches
            preserve it) — so the per-arm reload is dead. Carry A across the
@@ -6326,6 +6401,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                 (L.bb_byte_out[bb->id] >= 0 && L.cur_byte_home_dirty) ? 1 : 0;
         bb_hl_out[bb->id] = L.rs.hl;
         if (bb_bc_out) bb_bc_out[bb->id] = L.rs.bc;
+        if (bb_hl_addr_out) bb_hl_addr_out[bb->id] = L.cur_hl_addr_off;
         /* A holds a known byte here only if a byte compare (cp/or a) left it —
            word compares and calls clear rs.a. So rs.a captures A-preservation
            to the (branch) terminator; successors inherit it. */
@@ -6336,11 +6412,13 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
 
     rec_end(f);
     free(bb_bc_out);
+    free(bb_hl_addr_out);
     return 0;
 
 cleanup_err:
     /* Caller (ir_lower_func) owns the bb_* arrays and ir_free_liveness. */
     free(bb_bc_out);
+    free(bb_hl_addr_out);
     rec_reset();
     return -1;
 }
