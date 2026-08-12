@@ -7,7 +7,7 @@ math/float/math32/asm/z80/d32_fsutil
 math/float/math32/asm/z80/f32_f2long
 math/float/math32/asm/z80/f32_fabs
 math/float/math32/asm/z80/f32_floor
-math/float/math32/asm/z80/f32_fpclassify
+math/float/math32/asm/f32_fpclassify
 math/float/math32/asm/z80/f32_fsadd32
 math/float/math32/asm/z80/f32_fsceil
 math/float/math32/asm/z80/f32_fscompare

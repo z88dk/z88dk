@@ -363,7 +363,7 @@
 ../../../math/float/math32/asm/z80/f32_f2long.asm
 ../../../math/float/math32/asm/z80/f32_fabs.asm
 ../../../math/float/math32/asm/z80/f32_floor.asm
-../../../math/float/math32/asm/z80/f32_fpclassify.asm
+../../../math/float/math32/asm/f32_fpclassify.asm
 ../../../math/float/math32/asm/z80/f32_fsadd32.asm
 ../../../math/float/math32/asm/z80/f32_fsceil.asm
 ../../../math/float/math32/asm/z80/f32_fscompare.asm

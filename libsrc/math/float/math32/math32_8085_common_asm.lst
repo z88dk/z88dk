@@ -10,7 +10,7 @@ math/float/math32/asm/8085/f32_fsutil
 math/float/math32/asm/8085/f32_discardfraction
 math/float/math32/asm/8085/f32_fabs
 math/float/math32/asm/8085/f32_floor
-math/float/math32/asm/8085/f32_fpclassify
+math/float/math32/asm/f32_fpclassify
 math/float/math32/asm/8085/f32_fsceil
 math/float/math32/asm/8085/f32_fsdiv2
 math/float/math32/asm/8085/f32_fsfrexp

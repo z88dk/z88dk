@@ -10,7 +10,7 @@
 ../../../math/float/math32/asm/8085/f32_discardfraction.asm
 ../../../math/float/math32/asm/8085/f32_fabs.asm
 ../../../math/float/math32/asm/8085/f32_floor.asm
-../../../math/float/math32/asm/8085/f32_fpclassify.asm
+../../../math/float/math32/asm/f32_fpclassify.asm
 ../../../math/float/math32/asm/8085/f32_fsceil.asm
 ../../../math/float/math32/asm/8085/f32_fsdiv2.asm
 ../../../math/float/math32/asm/8085/f32_fsfrexp.asm
