@@ -15,7 +15,7 @@
 
 #define HUGE_POS_F32        (+3.4028234664e+38)
 #define TINY_POS_F32        (+1.1754943508e-38)
-#define HUGE_NEG_F32        (-1.7014118346e+38)
+#define HUGE_NEG_F32        (-3.4028234664e+38)
 #define TINY_NEG_F32        (-1.1754943508e-38)
 
 #define MAXL2_F32           (+127.999999914)

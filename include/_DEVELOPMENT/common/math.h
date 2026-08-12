@@ -155,7 +155,7 @@ typedef _Float16 half_t;
 
 #define HUGE_POS_F32            (+3.4028234664E+38)
 #define TINY_POS_F32            (+1.1754943508E-38)
-#define HUGE_NEG_F32            (-1.7014118346E+38)
+#define HUGE_NEG_F32            (-3.4028234664E+38)
 #define TINY_NEG_F32            (-1.1754943508E-38)
 
 #define MAXL2_F32               (+127.999999914)
