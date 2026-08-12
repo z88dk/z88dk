@@ -74,7 +74,7 @@ sccz80   | z80  | math16  |   789_222_173 (Aug 10, 2026)
 sccz80   | 8085 | math16  | 969_324_571 (Aug 10, 2026)
 sccz80   | z80  | math32  | 1_017_834_192 (Aug 10, 2026)
 zsdcc    | z80  | math32  | 1_283_829_412 (Aug 10, 2026)
-sccz80   | 8085 | math32  | 1_071_111_745 (Aug 10, 2026)
+sccz80   | 8085 | math32  | 1_053_180_625 (Aug 12, 2026)
 80cc     | z80  | math32  | 1_105_135_041 (Aug 10, 2026)
 80cc     | 8085 | math32  | 2_232_051_149 (Aug 10, 2026)
 sccz80   | 8085 | mbf32   | 1_805_825_674  (Jul 2026)
@@ -180,13 +180,13 @@ IEEE 32-bit float implementation.
 11.
 Z88DK August 10, 2026
 sccz80 / classic c library / 8085 / math32
-4438 bytes less page zero
+4396 bytes less page zero
 
-cycle count  = 1071111745
-time @ 4MHz  = 1071111745 / 4*10^6 =  4 min 28 sec
+cycle count  = 1053180625
+time @ 4MHz  = 1053180625 / 4*10^6 =  4 min 23 sec
 
 IEEE 32-bit float implementation (math32_8085).
-(opt with sqr(): 1167758008 ticks, 6401 bytes.)
+(opt with sqr(): 900043536 ticks, 4663 bytes.)
 
 12.
 Z88DK August 10, 2026

@@ -141,15 +141,15 @@ cycle count  = 791103882
 time @ 4MHz  = 791103882 / 4*10^6 =  3 min 18 sec
 
 
-Z88DK August 10, 2026
+Z88DK August 12, 2026
 sccz80 / classic / 8085 / math32
-6888 bytes less page zero
+6846 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 7 * 10^(-6)
 
-cycle count  = 1589707677
-time @ 4MHz  = 1589707677 / 4*10^6 =  6 min 37 sec
+cycle count  = 1564396728
+time @ 4MHz  = 1564396728 / 4*10^6 =  6 min 31 sec
 
 Energy: -0.1690752 / -0.1690808 (N=1000).
 
