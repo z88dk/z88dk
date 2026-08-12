@@ -1832,12 +1832,19 @@ static void byte_alu_operand(FILE *out, const Func *f,
             return;
         }
     }
-    pending_spill_resolve();
-    int off = slot_off(f, m) + L.cur_sp_adjust;
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
+    /* sp-mode: route through emit_byte_slot_addr so an HL that ALREADY holds a
+       slot address is reused (exact hit is free, a near slot costs an inc/dec)
+       and the address stays advertised for the next same-slot access. The
+       hand-rolled `ld hl,off; add hl,sp` that used to be here always recomputed
+       and then threw the address away via hl_about_to_change(-1), so three
+       accesses to one slot emitted three copies of it. Worst on gbz80/808x,
+       which have no (ix+d) and reach every slot through HL.
+       A live address belief implies no pending spill (store_a_byte leans on the
+       same invariant), so only resolve when there is none — pending_spill_resolve
+       itself clobbers HL and would drop the address we are about to reuse. */
+    if (L.cur_hl_addr_off < 0) pending_spill_resolve();
+    emit_byte_slot_addr(out, f, m);
     emit(out, "%s(hl)", prefix);
-    hl_about_to_change(-1);
 }
 
 /* Commit a width-1 result sitting in A. When the op is the condition of
