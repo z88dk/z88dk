@@ -27,8 +27,14 @@
 #elif MATH32 | AM9511
    #define EPSILON (0.000001)
    #define TINY_POSITIVE TINY_POS_F32
+/* dai32 is looser than the other 32-bit formats because its pow() is: the
+   binding case is pow(4,3) = 63.99893188476562, a relative error of 8.3e-6
+   against a format whose mantissa is only good to ~1.2e-7. 2e-5 clears that
+   with roughly 2.4x margin. This tolerance was never actually applied before
+   -- TINY_POS_AM9511 mis-encoded as ~9.2e18 sent every comparison down the
+   near-zero branch, making approx_equal vacuously true. */
 #elif MATHDAI32
-   #define EPSILON (0.000001)
+   #define EPSILON (0.00002)
    #define TINY_POSITIVE TINY_POS_AM9511
 #elif MBF32
    #define EPSILON (0.000001)

@@ -812,8 +812,7 @@ static int gen_memset(FILE *out, Func *f, const Op *op)
         emit(out, "djnz\tL_f%d_memset_loop_%d", L.func_emit_idx, lbl);
     } else {
         emit(out, "ld\t(hl),e");      /* dst[0] = fill */
-        emit(out, "ld\td,h");
-        emit(out, "ld\te,l");
+        emit_hl_to_de(out);
         emit(out, "inc\tde");         /* DE = dst+1, HL = dst */
         emit(out, "ld\tbc,%d", n - 1);
         emit(out, "ldir");
@@ -1244,6 +1243,12 @@ static int gen_push_arg(FILE *out, Func *f, const Op *op)
     int v = op->src[0];
     int w = (v >= 0 && v < f->n_vregs) ? f->vregs[v].width : 2;
     if (w == 4) {
+        /* The call clobbers BC before anything reads this argument back, so
+           the BC=low stash load_to_dehl leaves behind is dead. Skipping it
+           also drops the DEHL cache claim (publish_dehl_from_hl does both
+           under no_bc), which is what makes it correct and not merely
+           smaller — a later read reloads from the slot. */
+        L.la.cur_load_to_dehl_no_bc = L.la.cur_push_dehl_bc_dead;
         load_to_dehl(out, f, v);
         emit(out, "push\tde");
         emit(out, "push\thl");
@@ -1266,6 +1271,12 @@ static int gen_push_dehl_long(FILE *out, Func *f, const Op *op)
         return -1;
     }
     if (!dehl_has(op->src[0])) {
+        /* The call this argument belongs to clobbers BC before anything reads
+           the value back, so the BC=low stash load_to_dehl would leave is
+           dead — skip it and drop the cache claim with it (publish_dehl_from_hl
+           does both under no_bc, which is what keeps this correct rather than
+           merely smaller: a later read reloads from the slot). */
+        L.la.cur_load_to_dehl_no_bc = L.la.cur_push_dehl_bc_dead;
         load_to_dehl(out, f, op->src[0]);
         emit(out, "push\tde");       /* high half */
         emit(out, "push\thl");       /* low half — popped first */
@@ -1718,7 +1729,7 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             switch (byte_shift) {
             case 1: emit(out,"ld\tl,h"); emit(out,"ld\th,e");
                     emit(out,"ld\te,d"); emit(out,"ld\td,0"); break;
-            case 2: emit(out,"ld\tl,e"); emit(out,"ld\th,d");
+            case 2: emit_de_to_hl(out);
                     emit(out,"ld\te,0"); emit(out,"ld\td,0"); break;
             case 3: emit(out,"ld\tl,d"); emit(out,"ld\th,0");
                     emit(out,"ld\te,0"); emit(out,"ld\td,0"); break;
@@ -1728,7 +1739,7 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
             switch (byte_shift) {
             case 1: emit(out,"ld\td,e"); emit(out,"ld\te,h");
                     emit(out,"ld\th,l"); emit(out,"ld\tl,0"); break;
-            case 2: emit(out,"ld\td,h"); emit(out,"ld\te,l");
+            case 2: emit_hl_to_de(out);
                     emit(out,"ld\th,0"); emit(out,"ld\tl,0"); break;
             case 3: emit(out,"ld\td,l"); emit(out,"ld\te,0");
                     emit(out,"ld\th,0"); emit(out,"ld\tl,0"); break;
@@ -1777,6 +1788,23 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
    and A holds the OTHER operand. `prefix` is the instruction up to the
    operand: "and\t" / "or\t" / "xor\t" / "sub\t" / "add\ta," etc. Does
    not disturb A; may clobber HL (sp-rel slot addressing). */
+/* A = A +/- K for a width-1 result. ±1 is `inc a` / `dec a`: 1 byte and 4T
+   against `add a,1`'s 2 bytes and 7T. The two differ in CARRY -- inc/dec leave
+   CF alone -- which is why this is confined to the byte add/sub sites, where
+   the result is the byte in A and the carry-out is not a modelled value (the
+   widening long paths build their carry with explicit `adc`, and the `cpl;
+   add a,1` negations depend on the carry and do not come through here).
+   `sub` is spelled without the `a,` operand to match the existing site. */
+static void emit_byte_add_imm(FILE *out, unsigned k, int is_sub)
+{
+    k &= 0xff;
+    int delta = is_sub ? -(int)k : (int)k;      /* value change mod 256 */
+    if (((delta % 256) + 256) % 256 == 1)   { emit(out, "inc\ta"); return; }
+    if (((delta % 256) + 256) % 256 == 255) { emit(out, "dec\ta"); return; }
+    if (is_sub) emit(out, "sub\t%u", k);
+    else        emit(out, "add\ta,%u", k);
+}
+
 static void byte_alu_operand(FILE *out, const Func *f,
                              const char *prefix, int m)
 {
@@ -1821,12 +1849,19 @@ static void byte_alu_operand(FILE *out, const Func *f,
             return;
         }
     }
-    pending_spill_resolve();
-    int off = slot_off(f, m) + L.cur_sp_adjust;
-    emit(out, "ld\thl,%d", off);
-    emit(out, "add\thl,sp");
+    /* sp-mode: route through emit_byte_slot_addr so an HL that ALREADY holds a
+       slot address is reused (exact hit is free, a near slot costs an inc/dec)
+       and the address stays advertised for the next same-slot access. The
+       hand-rolled `ld hl,off; add hl,sp` that used to be here always recomputed
+       and then threw the address away via hl_about_to_change(-1), so three
+       accesses to one slot emitted three copies of it. Worst on gbz80/808x,
+       which have no (ix+d) and reach every slot through HL.
+       A live address belief implies no pending spill (store_a_byte leans on the
+       same invariant), so only resolve when there is none — pending_spill_resolve
+       itself clobbers HL and would drop the address we are about to reuse. */
+    if (L.cur_hl_addr_off < 0) pending_spill_resolve();
+    emit_byte_slot_addr(out, f, m);
     emit(out, "%s(hl)", prefix);
-    hl_about_to_change(-1);
 }
 
 /* Commit a width-1 result sitting in A. When the op is the condition of
@@ -1985,8 +2020,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             emit(out, "ld\tl,0");
             break;
         case 2: /* D=H E=L H=0 L=0; chain the zero through r,r */
-            emit(out, "ld\td,h");
-            emit(out, "ld\te,l");
+            emit_hl_to_de(out);
             emit(out, "ld\th,0");
             emit(out, "ld\tl,h");
             break;
@@ -2270,7 +2304,7 @@ static void emit_gb_long_load(FILE *out, const char *sym, int off) {
     emit(out, "ld\ta,(hl+)"); emit(out, "ld\tb,a");   /* B = b1  -> BC = low */
     emit(out, "ld\ta,(hl+)"); emit(out, "ld\te,a");   /* E = b2 */
     emit(out, "ld\td,(hl)");                          /* D = b3  -> DE = high */
-    emit(out, "ld\tl,c"); emit(out, "ld\th,b");       /* HL = low */
+    emit_bc_to_hl(out);                              /* HL = low */
     invalidate_a_cache();
     invalidate_bc_cache();
 }
@@ -2589,8 +2623,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 /* p lives in BC — write the bumped pointer back there so
                    the next iteration sees it (a slot store alone would
                    leave BC stale → infinite loop). */
-                emit(out, "ld\tc,l");
-                emit(out, "ld\tb,h");
+                emit_hl_to_bc(out);
                 invalidate_hl_cache();
                 cache_bc(base);
             } else {
@@ -2620,8 +2653,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
             emit(out, "ld\td,(hl)");                   /* DE = *p, HL = p+1 */
             emit_hl_add_offset(out, op->mem.post_step - 1, 0, 0);  /* HL = p+step */
             if (vreg_in_pr_bc(f, base)) {
-                emit(out, "ld\tc,l");
-                emit(out, "ld\tb,h");                  /* BC home = p+step */
+                emit_hl_to_bc(out);                    /* BC home = p+step */
                 invalidate_hl_cache();
                 cache_bc(base);
             } else {
@@ -2655,8 +2687,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 cache_de(op->dst);                     /* value preserved in DE */
                 return 0;
             }
-            emit(out, "ld\tl,e");
-            emit(out, "ld\th,d");                      /* HL = value */
+            emit_de_to_hl(out);                        /* HL = value */
             invalidate_de_cache();
             commit_hl_word(out, f, op->dst);
             return 0;
@@ -2731,8 +2762,7 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 load_byte_adv(out, "b", 0);     /* B = byte 1  (BC = LOW) */
                 load_byte_adv(out, "e", 0);     /* E = byte 2 */
                 load_byte_adv(out, "d", 1);     /* D = byte 3  (DE = HIGH) */
-                emit(out, "ld\tl,c");
-                emit(out, "ld\th,b");       /* HL = LOW */
+                emit_bc_to_hl(out);         /* HL = LOW */
             } else {
                 emit(out, "ld\te,(hl)");        /* E = byte 0 */
                 emit(out, "inc\thl");
@@ -3482,6 +3512,14 @@ static int try_index_half_word_add(FILE *out, Func *f, const Op *op)
 }
 
 
+/* [IR_ADDBC] `add hl,bc` when ONE operand is BC-resident. IR_ADDBC=0 opts out. */
+static int addbc_enabled(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_ADDBC"); v = (e && e[0] == '0') ? 0 : 1; }
+    return v;
+}
+
 static int gen_add(FILE *out, Func *f, const Op *op)
 {
     /* LRA Phase 2b: accumulate directly in an index home. When dst is IX/IY-homed
@@ -3549,7 +3587,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
            the accumulator when one is already cached. */
         if (op->src[1] == -1) {
             load_byte_to_a(out, f, op->src[0]);
-            emit(out, "add\ta,%u", (unsigned)(op->imm & 0xff));
+            emit_byte_add_imm(out, (unsigned)(op->imm & 0xff), 0);
         } else {
             int s0 = op->src[0], s1 = op->src[1];
             if (!a_has(s0) && a_has(s1)) { int t = s0; s0 = s1; s1 = t; }
@@ -3659,34 +3697,20 @@ static int gen_add(FILE *out, Func *f, const Op *op)
                 optb_dehl_src = op->src[0];
         }
         if (optb_dehl_src >= 0) {
-            load_to_dehl_adj(out, f, optb_dehl_src, 0);
-            emit(out, "push\tde");           /* save src[1] high */
-            emit(out, "push\thl");           /* save src[1] low */
-            L.cur_sp_adjust += 4;
-            emit(out, "ld\thl,4");
-            emit(out, "add\thl,sp");          /* HL → src[0].b0 */
-            emit_sp(out, -2, "pop\tbc");             /* C=s1.b0, B=s1.b1 */
-            emit(out, "ld\ta,c");
-            emit(out, "add\ta,(hl)");
-            emit(out, "ld\tc,a");
-            emit(out, "inc\thl");
-            emit(out, "ld\ta,b");
-            emit(out, "adc\ta,(hl)");
-            emit(out, "ld\tb,a");
-            emit(out, "inc\thl");
-            emit_sp(out, -2, "pop\tde");             /* E=s1.b2, D=s1.b3 */
-            emit(out, "ld\ta,e");
-            emit(out, "adc\ta,(hl)");
-            emit(out, "ld\te,a");
-            emit(out, "inc\thl");
-            emit(out, "ld\ta,d");
-            emit(out, "adc\ta,(hl)");
-            emit(out, "ld\td,a");
-            emit(out, "ld\thl,bc");           /* HL = result low */
-            /* Drop the data-stack frame. */
-            emit(out, "pop\tbc");
-            emit(out, "pop\tbc");
-            L.cur_sp_adjust -= 4;
+            /* Pop the stacked operand into BC a half at a time and add it to
+               DEHL with the 16-bit ALU, instead of pushing the OTHER operand
+               as well and byte-walking one of them through (hl). The carry
+               chain survives because neither `pop` nor `ex de,hl` touches
+               flags — the same idiom the constant-add path above uses. 7 bytes
+               against the byte-walk's ~30, and the pops retire the data-stack
+               frame so no separate teardown is needed. */
+            load_to_dehl_adj(out, f, optb_dehl_src, 0);  /* DEHL = other src */
+            emit_sp(out, -2, "pop\tbc");      /* BC = stacked LOW  */
+            emit(out, "add\thl,bc");          /* HL = result LOW, sets carry */
+            emit_sp(out, -2, "pop\tbc");      /* BC = stacked HIGH (flags kept) */
+            emit(out, "ex\tde,hl");           /* HL = other HIGH */
+            emit(out, "adc\thl,bc");          /* HL = result HIGH + carry */
+            emit(out, "ex\tde,hl");           /* DEHL = result */
             L.la.cur_stack_long_top = -1;
             store_dehl_finalize(out, f, op->dst);
             return 0;
@@ -3834,9 +3858,16 @@ static int gen_add(FILE *out, Func *f, const Op *op)
        slot (the IVSR walking-pointer bound `base(BC) + idx(HL)` shape). BC holds
        the value on entry AND after (add hl,bc doesn't write BC), so its cache
        stays valid. */
-    if (op->src[1] >= 0
-        && ((hl_has(op->src[0]) && bc_has(op->src[1]))
-            || (hl_has(op->src[1]) && bc_has(op->src[0])))) {
+    if (op->src[1] >= 0 && L.pending_spill_v < 0 && addbc_enabled()
+        && (bc_has(op->src[0]) || bc_has(op->src[1]))) {
+        /* Only ONE operand need be resident: load the other into HL (load_to_hl
+           preserves BC, as gen_sub's BC path relies on). Requiring BOTH cached
+           missed the commonest shape by far — `sym + index` with the index in BC
+           and the symbol still to materialise (`flags[k]`), which fell through to
+           the DE path and cost `ld e,c; ld d,b` plus DE itself. */
+        int bcv   = bc_has(op->src[1]) ? op->src[1] : op->src[0];
+        int other = (bcv == op->src[1]) ? op->src[0] : op->src[1];
+        load_to_hl(out, f, other);
         emit(out, "add\thl,bc");
         commit_hl_result(out, f, op->dst);
         return 0;
@@ -3869,7 +3900,7 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
            src[0] into A can't strand it (no slot otherwise). */
         if (op->src[1] == -1) {
             load_byte_to_a(out, f, op->src[0]);
-            emit(out, "sub\t%u", (unsigned)(op->imm & 0xff));
+            emit_byte_add_imm(out, (unsigned)(op->imm & 0xff), 1);
         } else {
             if (a_has(op->src[1]) && !a_has(op->src[0]))
                 store_a_byte(out, f, op->src[1]);
@@ -4629,8 +4660,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                ex de,hl is a 56T push/pop emulation; build the layout
                directly instead (A=b3, C=b2, D=b1, E=b0 here). */
             if (IS_GBZ80()) {
-                emit(out, "ld\th,d");          /* H = b1 */
-                emit(out, "ld\tl,e");          /* L = b0  -> HL = low */
+                emit_de_to_hl(out);            /* HL = b1b0 = low half */
                 emit(out, "ld\td,a");          /* D = b3 */
                 emit(out, "ld\te,c");          /* E = b2  -> DE = high */
             } else {
@@ -4718,8 +4748,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
             /* Normalise to canonical DEHL. gbz80 builds it directly to
                dodge the 56T ex de,hl emulation (A=b3, C=b2, D=b1, E=b0). */
             if (IS_GBZ80()) {
-                emit(out, "ld\th,d");           /* H = b1 */
-                emit(out, "ld\tl,e");           /* L = b0  -> HL = low */
+                emit_de_to_hl(out);             /* HL = b1b0 = low half */
                 emit(out, "ld\td,a");           /* D = b3 */
                 emit(out, "ld\te,c");           /* E = b2  -> DE = high */
             } else {

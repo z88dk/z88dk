@@ -228,8 +228,8 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
         emit(out, "add\thl,sp");
         if (!strcmp(rp, "hl"))
             return 1;                                /* HL = addr; caller cache_hl */
-        if (!strcmp(rp, "de")) { emit(out, "ld\td,h"); emit(out, "ld\te,l"); }
-        else                   { emit(out, "ld\tc,l"); emit(out, "ld\tb,h"); }
+        if (!strcmp(rp, "de")) { emit_hl_to_de(out); }
+        else                   { emit_hl_to_bc(out); }
         invalidate_hl_cache();                       /* HL overwritten by the recompute */
         return 1;
     }
@@ -316,8 +316,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         && byte_home_holds(vreg_id) && f->vregs[vreg_id].width == 2
         && sp_adj == 0) {
         ss_note_cache_read(f, vreg_id);
-        emit(out, "ld\tl,e");
-        emit(out, "ld\th,d");
+        emit_de_to_hl(out);
         hl_about_to_change(vreg_id);   /* HL = home copy; DE still = home */
         return;
     }
@@ -335,8 +334,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        through to a slot reload (e.g. a call result cached in DE by gen_call). */
     if (de_has(vreg_id) && f->vregs[vreg_id].width == 2) {
         ss_note_cache_read(f, vreg_id);
-        emit(out, "ld\tl,e");
-        emit(out, "ld\th,d");
+        emit_de_to_hl(out);
         hl_about_to_change(vreg_id);
         return;
     }
@@ -917,8 +915,7 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
            2 bytes against the 6+ the store cost, and it keeps the elided
            render's register state identical to the render the deadness was
            measured on — which is what makes "rd=0 last time" still true. */
-        emit(out, "ld\te,l");
-        emit(out, "ld\td,h");
+        emit_hl_to_de(out);
         cache_de(vreg_id);
         cache_hl(vreg_id);
         return 1;
@@ -1723,6 +1720,8 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
 /* store_dehl + cache wire-up for long-result op sites. After store_dehl:
    HL junk, DE=high, BC=low. Invalidate HL/DE/DEHL then re-cache DEHL=vreg
    so a follow-on load_to_dehl(vreg) recovers via `ld l,c; ld h,b`. */
+static void cache_dehl_no_spill(FILE *out, int vreg_id);
+
 static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
 {
     /* Lazy-spill: skip a provably-dead width-4 slot store (its slot is
@@ -1733,9 +1732,16 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
        `ld hl,bc`. Mirrors spill_and_swap_unless_dead for width-2. */
     ss_note_store(f, vreg_id);
     if (!L.la.cur_store_dehl_bc_dead && ss_store_dead_here()) {
-        emit(out, "ld\tbc,hl");
-        invalidate_hl_cache();
-        cache_dehl(vreg_id);
+        /* This IS the no-spill case, so publish it the same way
+           cache_dehl_no_spill does rather than hand-rolling a weaker version.
+           Both arrive with DE=high and HL=low and write no slot; the only
+           difference was that this branch then threw the HL knowledge away
+           (invalidate_hl_cache), which forces every later read through
+           `ld hl,bc` and therefore makes the `ld bc,hl` stash look mandatory.
+           Advertising HL instead lets a same-BB reader take the low half
+           straight from the register — and lets the no-bc-stash conditions
+           apply here too. */
+        cache_dehl_no_spill(out, vreg_id);
         return;
     }
     int bc_dead = L.la.cur_store_dehl_bc_dead;

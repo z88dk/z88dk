@@ -1133,8 +1133,7 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
     if (!IS_GBZ80()) {
         emit(out, "ex\tde,hl");                    /* byte-walk: DE -> HL */
     } else {
-        emit(out, "ld\th,d");
-        emit(out, "ld\tl,e");
+        emit_de_to_hl(out);
     }
     invalidate_de_cache();
 }
@@ -1163,8 +1162,7 @@ static void commit_hl_word(FILE *out, const Func *f, int v)
        physical DE pair (the copy would corrupt the resident home). */
     if (v >= 0 && f->de_fold_hint && f->de_fold_hint[v]
         && hl_has(v) && !g_hc.home_is_word && g_hc.de_home < 0) {
-        emit(out, "ld\td,h");
-        emit(out, "ld\te,l");
+        emit_hl_to_de(out);
         cache_de(v);
     }
 }
@@ -1258,18 +1256,50 @@ static void emit_skip(FILE *out, const Func *f, const char *cc, int skip_bytes)
         emit(out, "jp\t%s,ASMPC+%d", cc, 3 + skip_bytes);
 }
 
-/* Materialise carry flag to HL = 0 or 1. hl_one_when_carry chooses whether
-   HL=1 means carry-set or carry-clear. */
-static void carry_to_bool(FILE *out, const Func *f, int hl_one_when_carry)
+/* Materialise a flag condition as the 0/1 value of vreg `v` and commit it.
+   `cc_skip` is the condition under which the result is 0 — the one that skips
+   the increment.
+
+   A BYTE-wide dst builds the boolean in A (`ld a,0 / skip / inc a`, 3 bytes)
+   instead of HL (`ld hl,0 / skip / inc l`, 4 bytes), and commits one byte
+   rather than a pair — committing a word into a one-byte slot would overrun
+   its neighbour. `ld a,0`, never `xor a`: the skip tests the compare's flags
+   and `xor a` destroys them, while `ld` leaves them alone. Both increments are
+   one byte, so the skip distance is the same either way.
+
+   The byte form leaves HL ALONE, and that is the trap: the callers reach here
+   after arithmetic that destroyed HL (`sbc hl,de`, the sign-flip's `ld h,a`),
+   and every one of them relied on the `ld hl,0` above to make the belief
+   false. So drop the HL belief here — the word path destroys HL anyway, so
+   this is never weaker than what it replaces. Without it a compare of the same
+   operand pair straight after another one reads HL as if it still held the
+   left operand, and silently compares the previous result instead. */
+static void commit_flag_bool(FILE *out, const Func *f, int v, const char *cc_skip)
 {
+    if (v >= 0 && v < f->n_vregs && f->vregs[v].width == 1) {
+        invalidate_hl_keep_de();
+        emit(out, "ld\ta,0");
+        emit_skip(out, f, cc_skip, 1);
+        emit(out, "inc\ta");
+        commit_a_byte(out, f, v);
+        return;
+    }
     emit(out, "ld\thl,0");
-    emit_skip(out, f, hl_one_when_carry ? "nc" : "c", 1);
+    emit_skip(out, f, cc_skip, 1);
     emit(out, "inc\tl");
+    commit_hl_word(out, f, v);
+}
+
+/* commit_flag_bool for a carry-flag condition. carry_true_means_one chooses
+   whether the result is 1 on carry-set or on carry-clear. */
+static void commit_carry_bool(FILE *out, const Func *f, int v, int carry_true_means_one)
+{
+    commit_flag_bool(out, f, v, carry_true_means_one ? "nc" : "c");
 }
 
 /* After `sbc hl,de` for a signed compare: bit 7 of H plus the V flag encode
    the signed-ordered result. Rotate the correct sign bit into CF for
-   carry_to_bool. PO (no overflow) → sign of H is correct; PE (overflow) →
+   commit_carry_bool. PO (no overflow) → sign of H is correct; PE (overflow) →
    inverted, so XOR 0x80. Then RLA moves bit 7 into CF. */
 static void signed_result_to_carry(FILE *out)
 {

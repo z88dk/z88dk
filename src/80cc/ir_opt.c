@@ -1808,6 +1808,74 @@ static int ir_opt_dead_defs(Func *f)
     return removed;
 }
 
+/* Mark-sweep liveness. ir_opt_dce is a use COUNT, so a self-referential
+   accumulator (`count -= x`) can never die: its own def keeps the count
+   non-zero. Mark from side-effecting roots instead, then sweep.
+   Roots are conservative — any kind dce_pure_kind does not vouch for, and any
+   dst that is addr-taken/volatile/the return value. `--opt-disable=dce-live`. */
+static int dce_root_op(const Func *f, const Op *op)
+{
+    switch (op->kind) {
+    case IR_ST_MEM: case IR_CALL: case IR_HCALL: case IR_RET:
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO: case IR_SWITCH:
+    case IR_ASM: case IR_PUSH_ARG: case IR_PUSH_STRUCT:
+        return 1;
+    default: break;
+    }
+    if (!dce_pure_kind(op)) return 1;            /* unknown kind: assume live */
+    if (op->dst >= 0 && op->dst < f->n_vregs
+        && (f->vregs[op->dst].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
+                                       | IR_VREG_RETURN)))
+        return 1;                                /* memory-visible dst */
+    return 0;
+}
+
+static int ir_dce_marksweep(Func *f)
+{
+    if (!f || opt_disabled("dce-live")) return 0;
+    int nv = f->n_vregs;
+    char *live_v = calloc((size_t)(nv > 0 ? nv : 1), 1);
+    if (!live_v) return 0;
+    int changed = 1;
+    /* seed: any vreg read by a root op */
+    while (changed) {
+        changed = 0;
+        for (int b = 0; b < f->n_bbs; b++)
+            for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                const Op *op = &f->bbs[b].ops[j];
+                int keep = dce_root_op(f, op)
+                        || (op->dst >= 0 && op->dst < nv && live_v[op->dst]);
+                if (!keep) continue;
+                int uses[16];
+                int nu = ir_op_uses(op, uses, (int)(sizeof uses / sizeof uses[0]));
+                for (int u = 0; u < nu; u++)
+                    if (uses[u] >= 0 && uses[u] < nv && !live_v[uses[u]])
+                        { live_v[uses[u]] = 1; changed = 1; }
+                if (op->mem.base >= 0 && op->mem.base < nv && !live_v[op->mem.base])
+                    { live_v[op->mem.base] = 1; changed = 1; }
+            }
+    }
+    int dead = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int keep = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const Op *op = &bb->ops[j];
+            int live = dce_root_op(f, op)
+                    || (op->dst >= 0 && op->dst < nv && live_v[op->dst]);
+            if (!live) { dead++; continue; }
+            if (keep != j) bb->ops[keep] = bb->ops[j];
+            keep++;
+        }
+        bb->n_ops = keep;
+    }
+    if (dead && getenv("IR_DCEPROBE"))
+        fprintf(stderr, "DCEPROBE %s dead_ops=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", dead);
+    free(live_v);
+    return dead;
+}
+
 int ir_opt_dce(Func *f)
 {
     if (!f) return 0;
@@ -1847,6 +1915,7 @@ int ir_opt_dce(Func *f)
         free(use_count);
         removed += pass_changed;
     } while (pass_changed);
+    removed += ir_dce_marksweep(f);
     return removed;
 }
 
@@ -2170,9 +2239,65 @@ static int narrow_kind(const Op *op)
         return 1;
     case IR_SHL:
         return op->src[1] == -1;   /* imm count only (byte path) */
+    /* A constant in [0,255] has an 8-bit lowering (`ld a,n` / a byte home)
+       and its high byte is zero, so narrowing is exact. This was the single
+       largest def-gate rejection on emu.c (409 of 1258, IR_NARROWPROBE) and
+       is what leaves `ld hl,1` x163 / `ld hl,0` x94 at pair width. Values
+       outside [0,255] stay wide: conservative, and the interesting constants
+       in byte code are small. */
+    case IR_LD_IMM:
+        return (op->imm & ~0xFFLL) == 0;
     default:
         return 0;
     }
+}
+
+/* A comparison yields 0 or 1, so its high byte is always zero and narrowing
+   the dst is exact for every compare kind. Deliberately NOT part of
+   narrow_kind: that table doubles as the USE-side "reads only the low byte"
+   test, and a compare reads BOTH its operands in full. The 8-bit lowering is
+   commit_flag_bool (`ld a,0 / skip / inc a`) in ir_lower_analysis.inc.c. */
+static int cmp_result_kind(const Op *op)
+{
+    switch (op->kind) {
+    case IR_CMP_EQ:  case IR_CMP_NE:
+    case IR_CMP_LT:  case IR_CMP_LE:  case IR_CMP_GT:  case IR_CMP_GE:
+    case IR_CMP_ULT: case IR_CMP_ULE: case IR_CMP_UGT: case IR_CMP_UGE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/* A load whose result is only ever read as a byte can read ONE byte. Every
+   target here is little-endian, so the low byte is the one at the base
+   address — `ld a,(_sym)` for a global, `ld a,(hl)` for an indirect — and
+   gen_ld_mem already has both forms. The exclusions, each a real defect:
+
+     - a PORT read ignores the dst width and commits a word, which would
+       overrun a one-byte slot (and half-reading a 16-bit port is observable);
+     - a VOLATILE access must keep the width the program asked for;
+     - a post-stepped deref (`*p++`) steps by the ACCESS width, and the
+       byte-lowering steps by one — narrowing a width-2 walk would advance the
+       pointer half as far;
+     - any other mem kind (POOL, FRAME) has no byte path here to fall into. */
+static int ldmem_narrowable(const Op *op)
+{
+    if (op->kind != IR_LD_MEM) return 0;
+    if (op->mem.kind != IR_MEM_SYM && op->mem.kind != IR_MEM_VREG) return 0;
+    if (op->mem.volatile_) return 0;
+    if (op->mem.post_step != 0) return 0;
+    /* __addressmod banked access: the byte path pages in exactly like the word
+       path, but no suite exercises it, so leave it at the width it asked for
+       rather than ship an unvalidated change to banked reads. */
+    if (op->mem.bank_fn) return 0;
+    return 1;
+}
+
+/* Def-side gate: does this op have an 8-bit lowering for its dst? */
+static int narrow_def_kind(const Op *op)
+{
+    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op);
 }
 
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
@@ -2187,9 +2312,23 @@ static int v_fits_byte(const Func *f, int v)
             const Op *op = &bb->ops[j];
             if (op->dst != v) continue;
             seen = 1;
-            if (op->kind != IR_AND || op->src[1] != -1
-                || (op->imm & ~0xFFLL) != 0)
-                return 0;
+            /* Masked to <=0xFF, the original form. */
+            if (op->kind == IR_AND && op->src[1] == -1
+                && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A constant in [0,255] fits a byte by inspection. Without this
+               a `c = 1` def made v_fits_byte false, which then refused the
+               byte_val-gated use cases (CMP_EQ/NE, SWITCH, BR_ZERO) even
+               though the value is a literal 0 or 1. */
+            if (op->kind == IR_LD_IMM && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A boolean is 0 or 1. Without this the compare results narrowed
+               by narrow_def_kind would still fail every byte_val-gated use
+               (BR_ZERO / BR_COND / SWITCH / byte CMP_EQ) — which is where
+               a bool is nearly always consumed. */
+            if (cmp_result_kind(op))
+                continue;
+            return 0;
         }
     }
     return seen;
@@ -2224,6 +2363,16 @@ static int v_is_sx_of_byte(const Func *f, int v)
    truth-test counts too WHEN v provably fits a byte (a byte-mask AND, e.g.
    `crc & 0x80`): then testing the low byte is testing the whole value, so
    the producer can stay 8-bit (no `ld h,0` widen for the branch). */
+/* [IR_NARROWPROBE] Census of values that COULD have been byte-width but were
+   not. Two gates reject a candidate: some def has no 8-bit lowering
+   (narrow_kind), or some use needs more than the low byte
+   (demands_low_byte_only). Knowing WHICH gate, and which op kind, is what
+   picks the next piece of narrowing work — the pass already earns 617B on
+   emu.c and the width census says roughly 4400B is still on the table. */
+static int nb_probe_on(void)
+{ static int c = -1; if (c < 0) c = getenv("IR_NARROWPROBE") ? 1 : 0; return c; }
+static int nb_block_use = -1;   /* op kind of the use that refused, or -1 */
+
 static int demands_low_byte_only(const Func *f, int v)
 {
     int byte_val = v_fits_byte(f, v);
@@ -2244,7 +2393,9 @@ static int demands_low_byte_only(const Func *f, int v)
             if (narrow_kind(u) && u->dst >= 0
                 && f->vregs[u->dst].width == 1) {
                 /* SHL count position needs full value, not just byte. */
-                if (u->kind == IR_SHL && u->src[1] == v) return 0;
+                if (u->kind == IR_SHL && u->src[1] == v) {
+                    nb_block_use = (int)u->kind; return 0;
+                }
                 continue;
             }
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
@@ -2285,6 +2436,7 @@ static int demands_low_byte_only(const Func *f, int v)
                 && u->src[1] == -1 && u->imm == 0
                 && v_is_sx_of_byte(f, v))
                 continue;
+            nb_block_use = (int)u->kind;
             return 0;
         }
     }
@@ -2301,7 +2453,9 @@ int ir_opt_narrow_byte(Func *f)
        the same temp in both arms; narrowing the vreg narrows both. */
     char *bad = calloc((size_t)f->n_vregs, 1);   /* def disqualifies */
     char *hasdef = calloc((size_t)f->n_vregs, 1);
-    if (!bad || !hasdef) { free(bad); free(hasdef); return 0; }
+    int  *badkind = calloc((size_t)f->n_vregs, sizeof(int));  /* [probe] why */
+    if (!bad || !hasdef || !badkind) { free(bad); free(hasdef); free(badkind); return 0; }
+    for (int i = 0; i < f->n_vregs; i++) badkind[i] = -1;
     for (int b = 0; b < f->n_bbs; b++) {
         const BB *bb = &f->bbs[b];
         for (int j = 0; j < bb->n_ops; j++) {
@@ -2309,7 +2463,10 @@ int ir_opt_narrow_byte(Func *f)
             int d = op->dst;
             if (d < 0 || d >= f->n_vregs) continue;
             hasdef[d] = 1;
-            if (!narrow_kind(op)) bad[d] = 1;
+            if (!narrow_def_kind(op)) {
+                bad[d] = 1;
+                if (badkind[d] < 0) badkind[d] = (int)op->kind;
+            }
         }
     }
     int changed = 0, pass_changed;
@@ -2326,8 +2483,27 @@ int ir_opt_narrow_byte(Func *f)
         }
         changed += pass_changed;
     } while (pass_changed);
+    /* [IR_NARROWPROBE] Anything still width-2 with a def is a rejected
+       candidate — report which gate refused it and the op kind responsible.
+       Emitted per function; a consumer should aggregate by (gate, kind). */
+    if (nb_probe_on()) {
+        for (int d = 0; d < f->n_vregs; d++) {
+            if (!hasdef[d] || f->vregs[d].width != 2) continue;
+            if (bad[d]) {
+                fprintf(stderr, "NARROWPROBE %s v%d gate=def kind=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", d, badkind[d]);
+            } else {
+                nb_block_use = -1;
+                (void)demands_low_byte_only(f, d);
+                fprintf(stderr, "NARROWPROBE %s v%d gate=use kind=%d fits=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", d, nb_block_use,
+                        v_fits_byte(f, d));
+            }
+        }
+    }
     free(bad);
     free(hasdef);
+    free(badkind);
     return changed;
 }
 

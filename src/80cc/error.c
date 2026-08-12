@@ -26,6 +26,7 @@ static char   *c_default_categories[] = {
     "invalid-value",
     "invalid-function-definition",
     "limited-range",
+    "fp-range",
     "implicit-function-definition",
     "unsupported-feature",
     "division-by-zero",
