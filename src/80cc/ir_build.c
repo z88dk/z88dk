@@ -5040,6 +5040,14 @@ static int build_assign(Builder *b, Node *n)
                with element width from ctype->ptr. */
             Type *elem_t = n->left->sym->ctype
                          ? n->left->sym->ctype->ptr : NULL;
+            /* `ctype->ptr` is the ARRAY element type; a struct/union TAG has
+               none, so a folded offset-0 MEMBER store (`u.f = x` collapsed to
+               `(= (lv=u) x)`) fell back to KIND_INT/width 2. That silently
+               truncated any wider member to two bytes, and bailed outright on
+               a 6-byte double ("CONV_TRUNC 6→2 not supported"). The assignment
+               node's own type IS the member type -- the folded member READ at
+               the OP_DEREF case above leans on the same fact. */
+            if (!elem_t && n->type) elem_t = n->type;
             int elem_w = type_width(elem_t);
             Kind elem_k = elem_t ? elem_t->kind : KIND_INT;
             /* Wide float/double element (`double a[N]; a[0] = x;`): build the
