@@ -1788,6 +1788,16 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
    and A holds the OTHER operand. `prefix` is the instruction up to the
    operand: "and\t" / "or\t" / "xor\t" / "sub\t" / "add\ta," etc. Does
    not disturb A; may clobber HL (sp-rel slot addressing). */
+/* Bit position if `m` (a byte mask) has exactly one bit set, else -1. */
+static int single_bit_index(unsigned m)
+{
+    m &= 0xff;
+    if (m == 0 || (m & (m - 1)) != 0) return -1;
+    int n = 0;
+    while ((m >> n) != 1) n++;
+    return n;
+}
+
 /* A = A +/- K for a width-1 result. ±1 is `inc a` / `dec a`: 1 byte and 4T
    against `add a,1`'s 2 bytes and 7T. The two differ in CARRY -- inc/dec leave
    CF alone -- which is why this is confined to the byte add/sub sites, where
@@ -4442,16 +4452,38 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                    Slot layout: slot+i = byte i. */
                 static const char *dehl_byte_regs[4] =
                     { "c", "b", "e", "d" };
-                int emitted = 0;
+                /* A single-bit mask is `bit n,<src>`: same Z, one byte and
+                   several cycles cheaper than load-to-A + and, and it leaves
+                   A and CF alone instead of clobbering A and clearing CF.
+                   Sound ONLY here because this path fuses the test with the
+                   branch below and returns — the AND's value is dead, nothing
+                   reads the masked result. `bit` needs the CB prefix (absent
+                   on 8080/8085) and the (ix+d) form needs DD as well (absent
+                   on gbz80, which has no index register anyway). */
+                int bidx = single_bit_index((unsigned)b4[nz_idx]);
+                int can_bit = bidx >= 0 && !IS_808x();
+                int emitted = 0, did_bit = 0;
                 if (dehl_has(op->src[0])) {
-                    emit(out, "ld\ta,%s", dehl_byte_regs[nz_idx]);
+                    if (can_bit) {
+                        emit(out, "bit\t%d,%s", bidx,
+                             dehl_byte_regs[nz_idx]);
+                        did_bit = 1;
+                    } else {
+                        emit(out, "ld\ta,%s", dehl_byte_regs[nz_idx]);
+                    }
                     emitted = 1;
                 } else if (fp_active(f)) {
                     int ix_off = slot_ix_off(f, op->src[0])
                                + nz_idx;
                     if (fp_offset_fits(ix_off)) {
-                        emit(out, "ld\ta,(%s%+d)",
-                             frame_reg(), ix_off);
+                        if (can_bit && !IS_GBZ80()) {
+                            emit(out, "bit\t%d,(%s%+d)", bidx,
+                                 frame_reg(), ix_off);
+                            did_bit = 1;
+                        } else {
+                            emit(out, "ld\ta,(%s%+d)",
+                                 frame_reg(), ix_off);
+                        }
                         emitted = 1;
                     }
                 } else {
@@ -4459,13 +4491,19 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                             + L.cur_sp_adjust + nz_idx;
                     emit(out, "ld\thl,%d", off);
                     emit(out, "add\thl,sp");
-                    emit(out, "ld\ta,(hl)");
+                    if (can_bit) {
+                        emit(out, "bit\t%d,(hl)", bidx);
+                        did_bit = 1;
+                    } else {
+                        emit(out, "ld\ta,(hl)");
+                    }
                     hl_about_to_change(-1);
                     emitted = 1;
                 }
                 if (emitted) {
-                    emit(out, "and\t%u",
-                         (unsigned)b4[nz_idx]);
+                    if (!did_bit)
+                        emit(out, "and\t%u",
+                             (unsigned)b4[nz_idx]);
                     const char *cc =
                         (g_hc.branch_test_kind == IR_BR_ZERO)
                             ? "z" : "nz";
