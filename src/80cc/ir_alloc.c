@@ -3967,6 +3967,16 @@ void ir_alloc(Func *f)
                         top4 += acc[best];
                         acc[best] = 0;
                     }
+                    /* CAVEAT: maxlive is an UPPER BOUND, not the real pressure.
+                       It spans [first_use,last_use] and so ignores holes in a
+                       live range, which over-states badly in one long BB full
+                       of short temporaries. Measured against the frame the
+                       allocator actually assigns (which does real interference):
+                       interpbench vm_run maxlive=45 vs a 25-byte frame = 12
+                       words; listbench list_compute 20 vs 4; sieve_count 13 vs
+                       4. Treat maxlive>4 as "needs checking", not as proof the
+                       values cannot fit. frame_size is not available here — the
+                       probe runs before ir_assign_slots. */
                     fprintf(stderr,
                             "BYTEPRESS %-14s w=%d cands=%-3d maxlive=%-3d "
                             "hot=%-3d traffic=%-5ld top4=%ld\n",
