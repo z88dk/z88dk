@@ -6,15 +6,20 @@
  * `add hl,hl` or `srl h; rr l`, a byte shift by four can become a nibble swap,
  * and a RUNTIME count has to become a counted loop with its own exit test.
  *
- *   vshift   runtime counts on a word — the loop the compiler has to build
- *   bvshift  the same on a byte, where the register and the bound both differ
- *   kshift   constant counts spread across the range, each with its own best
- *            lowering, so the cost curve is what picks between them
- *   funnel   a shift pair recombined, the rotate idiom
- *   sarith   a signed right shift, which must be arithmetic rather than logical
+ *   vshift    runtime counts on a word — the loop the compiler has to build
+ *   bvshift   the same on a byte, where the register and the bound both differ
+ *   kshift    constant counts spread across the range, each with its own best
+ *             lowering, so the cost curve is what picks between them
+ *   kbshift   constant counts on a value that never leaves a byte — nibble
+ *             extraction and bit packing, where the choice is whether to keep
+ *             the whole sequence in the accumulator or widen it to a pair
+ *   ksbshift  the signed form, where the sign must propagate from bit 7
+ *   funnel    a shift pair recombined, the rotate idiom
+ *   sarith    a signed right shift, which must be arithmetic rather than logical
  *
  * maskbench and fixedbench shift by constants only; no other bench uses a shift
- * count that is not known at compile time.
+ * count that is not known at compile time, and none shifts a byte by a constant
+ * — charbench, lexbench and hashbench contain no `>>` at all.
  *
  * Every result is masked to 16 bits and every count stays inside 1..15, so the
  * checksum is identical on a 16-bit-int target and the verifying host.
@@ -26,7 +31,7 @@
 
 #define STREAM 600
 #define REPS   24
-#define CHK    24975u          /* host-verified (gcc -DHOST_VERIFY) */
+#define CHK    27656u          /* host-verified (gcc -DHOST_VERIFY) */
 
 /* Runtime count: neither half can be folded, so the compiler must emit a loop. */
 static unsigned int vshift(unsigned int v, int n)
@@ -59,6 +64,30 @@ static unsigned int kshift(unsigned int v)
     return acc & 0xffffu;
 }
 
+/* Constant counts on a value that never leaves a byte — nibble extraction and
+   bit packing, the commonest byte-shift shape in real code. Distinct from
+   kshift (16-bit) and bvshift (runtime count): a compiler may keep this whole
+   sequence in the accumulator, or widen each value to a pair and shift that. */
+static unsigned char kbshift(unsigned char v)
+{
+    unsigned char acc = 0;
+    acc = (unsigned char)(acc + (v >> 1));
+    acc = (unsigned char)(acc + (v >> 4));   /* the nibble */
+    acc = (unsigned char)(acc + (v >> 7));   /* the top bit */
+    acc = (unsigned char)(acc + (unsigned char)(v << 3));
+    return acc;
+}
+
+/* Signed byte: an arithmetic shift, so the sign must propagate from bit 7 and
+   not from bit 15 of a widened value. */
+static signed char ksbshift(signed char v)
+{
+    signed char acc = 0;
+    acc = (signed char)(acc + (v >> 1));
+    acc = (signed char)(acc + (v >> 3));
+    return acc;
+}
+
 /* Rotate: n stays in 1..15 so neither half shifts by the full width. */
 static unsigned int funnel(unsigned int v, int n)
 {
@@ -89,6 +118,9 @@ static unsigned int shift_compute(void)
             chk = (unsigned int)(chk + vshift(v, n));
             chk = (unsigned int)(chk + bvshift((unsigned char)(v >> 5), n & 7));
             chk = (unsigned int)(chk + kshift(v));
+            chk = (unsigned int)(chk + kbshift((unsigned char)(v >> 3)));
+            chk = (unsigned int)(chk
+                  + (unsigned int)(ksbshift((signed char)(v & 0xffu)) & 0xff));
             chk = (unsigned int)(chk + funnel(v, n));
             /* Negative on purpose, so the shift has to be arithmetic. */
             chk = (unsigned int)(chk
