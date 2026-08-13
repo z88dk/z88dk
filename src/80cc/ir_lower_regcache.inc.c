@@ -203,10 +203,23 @@ static int fp_tos_slot(const Func *f, int vreg_id)
    byte E/D-home already claimed DE's low half), so state is shared, not
    duplicated. Width-specific leaf ops dispatch on cur_home_is_word. */
 
-/* Rematerialize a width-2 constant vreg (LD_IMM / LD_SYM) into register pair
-   `rp` ("hl"/"de"/"bc"), re-emitting the constant instead of a slot reload.
+/* True when rematerialising vreg_id into a pair OTHER than HL would use HL as
+   scratch. `ld rr,K` (IR_LD_IMM) and `ld rr,_sym` (IR_LD_SYM) leave HL alone,
+   but the [remat-LEA] frame-address form recomputes `ld hl,off; add hl,sp` and
+   copies out, so it destroys HL. A caller holding a live operand in HL must ask
+   before rematerialising into DE or BC. */
+static int remat_word_clobbers_hl(const Func *f, int vreg_id)
+{
+    if (!g_hc.remat_def || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
+    const Op *o = g_hc.remat_def[vreg_id];
+    return o && o->kind == IR_LEA;
+}
+
+/* Rematerialize a width-2 constant vreg (LD_IMM / LD_SYM / LEA) into register
+   pair `rp` ("hl"/"de"/"bc"), re-emitting the constant instead of a slot reload.
    Returns 1 if emitted, 0 if vreg isn't rematerializable. Caller updates the
-   cache belief for `rp`. */
+   cache belief for `rp`. The LEA form clobbers HL when `rp` is not "hl" —
+   see remat_word_clobbers_hl. */
 static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp)
 {
     if (!g_hc.remat_def || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
