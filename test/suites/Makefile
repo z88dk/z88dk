@@ -7,7 +7,11 @@ SUBDIRS += charbench crcbench intbench ptrbench sieve rle \
            sortbench queenbench searchbench switchbench \
            structbench vecbench recordbench maskbench \
            strbench listbench interpbench matrixbench \
-           hashbench fixedbench histbench lexbench
+           hashbench fixedbench histbench lexbench \
+           widthbench predbench
+# bitfieldbench is NOT in SUBDIRS yet: it still fails on the non-z80 targets
+# (r2ka r4k 8080 8085 gbz80 kc160) — see its header. Add it here once that is
+# fixed; `make -C bitfieldbench COMPILER=80cc test.bin` runs the z80 case.
 
 ifeq ($(COMPILER),80cc)
 SUBDIRS += long_ir debuginfo
