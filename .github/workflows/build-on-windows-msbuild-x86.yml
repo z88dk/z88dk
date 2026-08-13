@@ -51,8 +51,28 @@ jobs:
         copy /y win32-latest\z88dk\lib\clibs\*.lib lib\clibs\
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
-        copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
-        copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        :: Newlib target libs live under lib/clibs/{sccz80,sdcc_ix}/ (cfg -L paths).
+        :: Nightly may still have empty libsrc/newlib/lib/{sccz80,sdcc_ix}/ dirs (README only).
+        :: Check for *.lib, not the directory — Windows `copy *.lib` fails if zero matches.
+        mkdir lib\clibs\sccz80 2>nul
+        mkdir lib\clibs\sdcc_ix 2>nul
+        mkdir libsrc\newlib\lib\sccz80 2>nul
+        mkdir libsrc\newlib\lib\sdcc_ix 2>nul
+        if exist win32-latest\z88dk\lib\clibs\sccz80\*.lib (
+          copy /y win32-latest\z88dk\lib\clibs\sccz80\*.lib lib\clibs\sccz80\
+          if exist win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib copy /y win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib lib\clibs\sdcc_ix\
+        ) else if exist win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib (
+          copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib lib\clibs\sccz80\
+          if exist win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib lib\clibs\sdcc_ix\
+        )
+        :: Optional dual-path install for any consumer still using libsrc/newlib/lib
+        if exist win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib (
+          copy /y win32-latest\z88dk\libsrc\newlib\lib\sccz80\*.lib libsrc\newlib\lib\sccz80\
+          if exist win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib copy /y win32-latest\z88dk\libsrc\newlib\lib\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        ) else if exist win32-latest\z88dk\lib\clibs\sccz80\*.lib (
+          copy /y win32-latest\z88dk\lib\clibs\sccz80\*.lib libsrc\newlib\lib\sccz80\
+          if exist win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib copy /y win32-latest\z88dk\lib\clibs\sdcc_ix\*.lib libsrc\newlib\lib\sdcc_ix\
+        )
     - name: Run z80asm tests
       run: |
         cd src\z80asm

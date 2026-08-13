@@ -21,24 +21,24 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .strrchrf
 ._strrchrf
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    ld      ix,4            ; +2 pushed IX +2 return address
+    add     ix,sp
     ld      e,0
     ld      h,e
     ld      l,e
-    exx         ; E'H'L'=NULL pointer, if char not found
-    pop     hl
-    pop     iy  ; IYl=char
-    pop     bc
-    pop     de  ; EBC=far pointer
-    push    de
-    push    bc
-    push    iy
-    push    hl
+    exx                     ; E'H'L'=NULL pointer, if char not found
+    ld      a,(ix+0)        ; A = char
+    ld      c,(ix+2)
+    ld      b,(ix+3)        ; BC = far offset
+    ld      e,(ix+4)        ; EBC = far pointer
+    ld      ixl,a           ; IXl = char (survives far calls + exx; IXh don't-care)
     call    __far_start
     ex      af,af'
     call    __far_page
 .strrchr1
     ld      a,(hl)
-    cp      iyl
+    cp      ixl
     jr      nz,strrchr2	; on if not found character
     push    bc
     push    de
@@ -53,5 +53,6 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     exx             ; EHL=pointer to last, or NULL
     ex      af,af'
     call    __far_end
+    pop     ix              ; restore caller's IX
     ret
 ENDIF

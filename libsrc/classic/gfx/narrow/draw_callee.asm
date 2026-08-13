@@ -1,7 +1,6 @@
 ; ----- void __CALLEE__ draw(int x, int y, int x2, int y2)
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  draw_callee
@@ -29,7 +28,15 @@ _draw_callee:
     push    af                          ; ret addr
 
 asm_draw:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+ELSE
+    EXTERN  __plot_ADDR
+    push    hl
+    ld      hl,plotpixel
+    ld      (__plot_ADDR),hl
+    pop     hl
+ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -38,8 +45,11 @@ asm_draw:
     call    plotpixel
     pop     de
     pop     hl
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      ix, plotpixel
+ENDIF
     call    Line
+
   IF    _GFX_PAGE_VRAM
     jp      __graphics_end
   ELSE
@@ -48,5 +58,3 @@ asm_draw:
     ENDIF
     ret
   ENDIF
-
-ENDIF

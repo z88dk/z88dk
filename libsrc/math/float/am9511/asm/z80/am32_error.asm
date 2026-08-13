@@ -1,8 +1,6 @@
 
 SECTION code_fp_am9511
 
-EXTERN asm_am9511_max
-
 EXTERN asm_am9511_const_pzero
 EXTERN asm_am9511_const_one
 EXTERN asm_am9511_const_pinf
@@ -15,6 +13,7 @@ PUBLIC asm_am9511_derror_znc
 PUBLIC asm_am9511_derror_nanc
 PUBLIC asm_am9511_derror_nannc
 PUBLIC asm_am9511_derror_infnc
+PUBLIC asm_am9511_derror_ninfnc
 PUBLIC asm_am9511_derror_pinfnc
 PUBLIC asm_am9511_derror_edom_zc
 PUBLIC asm_am9511_derror_edom_infc
@@ -65,8 +64,9 @@ PUBLIC asm_am9511_derror_erange_pinfc
 
 .asm_am9511_derror_infnc
     exx
-    call asm_am9511_max
+    call asm_am9511_const_pinf
     exx
+    scf
     ccf
     ret
 
@@ -88,7 +88,7 @@ PUBLIC asm_am9511_derror_erange_pinfc
 
 .asm_am9511_derror_edom_infc
     exx
-    call asm_am9511_max
+    call asm_am9511_const_pinf
     exx
     ret
 

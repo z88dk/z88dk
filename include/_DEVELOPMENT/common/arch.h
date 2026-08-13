@@ -11,19 +11,19 @@
 // target configuration goes here
 
 #ifdef __CPM
-#include <../../../libsrc/newlib/target/cpm/config_cpm.h>
+#include <../../../libsrc/target/cpm/config_cpm.h>
 #endif
 
 #ifdef __HBIOS
-#include <../../../libsrc/newlib/target/hbios/config_hbios.h>
+#include <../../../libsrc/target/hbios/config_hbios.h>
 #endif
 
 #ifdef __RC2014
-#include <../../../libsrc/newlib/target/rc2014/config_rc2014.h>
+#include <../../../libsrc/target/rc2014/config_rc2014.h>
 #endif
 
 #ifdef __SCZ180
-#include <../../../libsrc/newlib/target/scz180/config_scz180.h>
+#include <../../../libsrc/target/scz180/config_scz180.h>
 #endif
 
 #ifdef __SMS
@@ -55,7 +55,7 @@
 #endif
 
 #ifdef __YAZ180
-#include <../../../libsrc/newlib/target/yaz180/config_yaz180.h>
+#include <../../../libsrc/target/yaz180/config_yaz180.h>
 #endif
 
 #ifdef __ZXNEXT

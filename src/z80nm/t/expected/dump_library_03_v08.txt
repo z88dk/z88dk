@@ -1,0 +1,577 @@
+Library file test_t_dump_library_03_t.o at $0000: Z80LMF08
+Object  file test_t_dump_library_03_t.o at $0010: Z80RMF08
+  Name: module_z80_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0082: Z80RMF08
+  Name: module_z80_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $00F1: Z80RMF08
+  Name: module_z80_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $016A: Z80RMF08
+  Name: module_z80_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $01E0: Z80RMF08
+  Name: module_z180_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0253: Z80RMF08
+  Name: module_z180_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $02C3: Z80RMF08
+  Name: module_ez80_z80_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $033A: Z80RMF08
+  Name: module_ez80_z80_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $03AE: Z80RMF08
+  Name: module_ez80_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0421: Z80RMF08
+  Name: module_ez80_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0491: Z80RMF08
+  Name: module_z80n_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0504: Z80RMF08
+  Name: module_z80n_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0574: Z80RMF08
+  Name: module_r2ka_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $05E7: Z80RMF08
+  Name: module_r2ka_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0657: Z80RMF08
+  Name: module_r3k_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $06C9: Z80RMF08
+  Name: module_r3k_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0738: Z80RMF08
+  Name: module_gbz80_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $07AC: Z80RMF08
+  Name: module_gbz80_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $081D: Z80RMF08
+  Name: module_8080_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0890: Z80RMF08
+  Name: module_8080_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0900: Z80RMF08
+  Name: module_8085_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0973: Z80RMF08
+  Name: module_8085_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $09E3: Z80RMF08
+  Name: module_r800_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0A56: Z80RMF08
+  Name: module_r800_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0AC6: Z80RMF08
+  Name: module_r4k_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0B38: Z80RMF08
+  Name: module_r4k_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0BA7: Z80RMF08
+  Name: module_r5k_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0C19: Z80RMF08
+  Name: module_r5k_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0C88: Z80RMF08
+  Name: module_kc160_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0CFC: Z80RMF08
+  Name: module_kc160_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0D6D: Z80RMF08
+  Name: module_kc160_z80_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0DE5: Z80RMF08
+  Name: module_kc160_z80_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0E5A: Z80RMF08
+  Name: module_8080_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0ED4: Z80RMF08
+  Name: module_8080_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0F4B: Z80RMF08
+  Name: module_8085_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $0FC5: Z80RMF08
+  Name: module_8085_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $103C: Z80RMF08
+  Name: module_gbz80_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $10B7: Z80RMF08
+  Name: module_gbz80_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $112F: Z80RMF08
+  Name: module_z180_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $11A9: Z80RMF08
+  Name: module_z180_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1220: Z80RMF08
+  Name: module_z80n_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $129A: Z80RMF08
+  Name: module_z80n_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1311: Z80RMF08
+  Name: module_ez80_z80_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $138F: Z80RMF08
+  Name: module_ez80_z80_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $140A: Z80RMF08
+  Name: module_ez80_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1484: Z80RMF08
+  Name: module_ez80_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $14FB: Z80RMF08
+  Name: module_r800_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1575: Z80RMF08
+  Name: module_r800_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $15EC: Z80RMF08
+  Name: module_kc160_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1667: Z80RMF08
+  Name: module_kc160_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $16DF: Z80RMF08
+  Name: module_kc160_z80_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $175E: Z80RMF08
+  Name: module_kc160_z80_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $17DA: Z80RMF08
+  Name: module_r2ka_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1854: Z80RMF08
+  Name: module_r2ka_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $18CB: Z80RMF08
+  Name: module_r3k_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1944: Z80RMF08
+  Name: module_r3k_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $19BA: Z80RMF08
+  Name: module_r4k_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1A33: Z80RMF08
+  Name: module_r4k_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1AA9: Z80RMF08
+  Name: module_r5k_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1B22: Z80RMF08
+  Name: module_r5k_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1B98: Z80RMF08
+  Name: module_r6k_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1C0A: Z80RMF08
+  Name: module_r6k_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1C79: Z80RMF08
+  Name: module_r6k_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1CF2: Z80RMF08
+  Name: module_r6k_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1D68: Z80RMF08
+  Name: module_ti83_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1DDB: Z80RMF08
+  Name: module_ti83_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1E4B: Z80RMF08
+  Name: module_ti83_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1EC5: Z80RMF08
+  Name: module_ti83_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1F3C: Z80RMF08
+  Name: module_ti83plus_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $1FB3: Z80RMF08
+  Name: module_ti83plus_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $2027: Z80RMF08
+  Name: module_ti83plus_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $20A5: Z80RMF08
+  Name: module_ti83plus_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+

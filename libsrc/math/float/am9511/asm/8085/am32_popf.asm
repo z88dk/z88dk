@@ -10,8 +10,13 @@
 ;-------------------------------------------------------------------------
 ;  asm_am9511_popf - am9511 APU pop float
 ;-------------------------------------------------------------------------
-; 
-;  Load IEEE-754 float from Am9511 APU stack
+;
+;  Load IEEE-754 float from Am9511 APU stack.
+;
+;  Status register (after BUSY clears): see techdocs/amd/am9511a
+;  Am9511 Arithmetic Processor.pdf — BUSY|SIGN|ZERO|ERROR[4:1]|CARRY.
+;  ERROR is a 4-bit code (DIV0/NEGRT/UNDFL/OVRFL patterns), not four
+;  independent sticky bits.  ZERO must not use the normal bias convert.
 ;
 ;-------------------------------------------------------------------------
 
@@ -74,37 +79,39 @@ PUBLIC asm_am9511_popf
 
     ret
 
+    ; A = status & 0x3E.  OVRFL→±Inf, UNDFL→0, NEGRT→NaN, DIV0→±Inf, ZERO→0
 .errors
-    rrca                        ; relocate status bits
-    rrca
-    jp C,infinity               ; overflow
-    rrca
-    rrca
-    jp C,nan                    ; negative sqr or log
-    rrca
-    jp C,nan                    ; division by zero
-
+    rrca                        ; OVRFL
+    jp C,infinity
+    rrca                        ; UNDFL
+    jp C,zero
+    rrca                        ; NEGRT
+    jp C,nan
+    rrca                        ; DIV0 → ±Inf (0/0 handled in software specials)
+    jp C,infinity
+    ; ZERO
 .zero
     ld de,0
     ld hl,de
     ret
 
 .nan
-    ld a,d                      ; get sign
+    ld a,d
+    and 080h
     or 07fh
-    ld d,a                      ; nan exponent
-
-    ld hl,0ffffh                ; nan mantissa
-    ld e,h
+    ld d,a
+    ld e,0ffh
+    ld h,e
+    ld l,e
     ret
 
 .infinity
-    ld a,d                      ; get sign
+    ld a,d
+    and 080h
     or 07fh
-    ld d,a                      ; nan exponent
-
-    ld hl,0                     ; nan mantissa
+    ld d,a
     ld e,080h
+    ld hl,0
     ret
 
 

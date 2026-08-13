@@ -28,6 +28,10 @@ PUBLIC asm_am9511_fdiv2_fastcall
     dec d
     jp Z,zero_legal             ; return IEEE zero
 
+    ld a,d
+    inc a
+    jr Z,exp_max                ; Inf/NaN: unchanged
+
     dec d                       ; divide by 2
     jr Z,zero_underflow         ; capture underflow zero
 
@@ -40,6 +44,15 @@ PUBLIC asm_am9511_fdiv2_fastcall
     ld e,a
 
     ret                         ; return IEEE DEHL
+
+.exp_max
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ret
 
 .zero_legal
     ld e,d                      ; use 0

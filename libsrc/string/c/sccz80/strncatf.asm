@@ -8,10 +8,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
     SECTION   code_clib
     SECTION   code_far
-    EXTERN __far_start    ;Get the initial bindings
-    EXTERN __far_end   ;Reset to initial bindings
-    EXTERN __far_page    ;Page in the far segment
-    EXTERN l_far_incptrs  ;Increment a far pointer (returning near address)
+    EXTERN __far_start      ; Get the initial bindings
+    EXTERN __far_end        ; Reset to initial bindings
+    EXTERN __far_page       ; Page in the far segment
+    EXTERN l_far_incptrs    ; Increment a far pointer (returning near address)
     PUBLIC  strncatf
     PUBLIC  _strncatf
 
@@ -21,8 +21,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .strncatf
 ._strncatf
-    ld      ix,2
-    add     ix,sp  
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    push    iy              ; preserve caller's IY (used as char scratch below)
+    ld      ix,6            ; +2 pushed IX +2 pushed IY +2 return address
+    add     ix,sp
     ld      c,(ix+2)
     ld      b,(ix+3)
     ld      e,(ix+4)        ; E'B'C'=s2
@@ -49,7 +51,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 .catloop
     ld      a,ixl
     or      ixh
-    jr      z,strncat2	; on if copied n chars already
+    jr      z,strncat2	    ; on if copied n chars already
     call    __far_page
     ld      a,(hl)          ; char from s2
     ld      iyl,a
@@ -75,5 +77,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     ld      l,(ix+6)
     ld      h,(ix+7)
     ld      e,(ix+8)        ; EHL=s1
+    pop     iy              ; restore caller's IY
+    pop     ix              ; restore caller's IX
     ret
 ENDIF

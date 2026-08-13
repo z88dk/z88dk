@@ -31,18 +31,18 @@ Object  file test.lib at $03C7: Z80RMF13
     U         ext1
     U         ext2
   Expressions:
-    E U $0000 $0001: start1 % 256 (section text_1) (file file1.asm:123)
-    E S $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
-    E u $0000 $0001: 256 (section text_1) (file file1.asm:123)
-    E s $0000 $0001: 256 (section text_2) (file file1.asm:132)
-    E W $0000 $0001: msg1 (section data_1) (file file1.asm:231)
-    E L $0000 $0001: msg2 (section data_2) (file file1.asm:321)
-    E W $0000 $0001: ext1 (section data_1) (file file1.asm:231)
-    E L $0000 $0001: ext2 (section data_2) (file file1.asm:321)
-    E W $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
-    E = $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
-    E B $0000 $0001: start1 (section text_1) (file file1.asm:231)
-    E J $0000 $0001: start1 (section text_1) (file file1.asm:456)
+    E U8    $0000 $0001: start1 % 256 (section text_1) (file file1.asm:123)
+    E S8    $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
+    E U8-16 $0000 $0001: 256 (section text_1) (file file1.asm:123)
+    E S8-16 $0000 $0001: 256 (section text_2) (file file1.asm:132)
+    E U16   $0000 $0001: msg1 (section data_1) (file file1.asm:231)
+    E S32   $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E U16   $0000 $0001: ext1 (section data_1) (file file1.asm:231)
+    E S32   $0000 $0001: ext2 (section data_2) (file file1.asm:321)
+    E U16   $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
+    E =     $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
+    E U16BE $0000 $0001: start1 (section text_1) (file file1.asm:231)
+    E J8    $0000 $0001: start1 (section text_1) (file file1.asm:456)
 
 Object  file test.lib at $077E: Z80RMF13
   Deleted...
@@ -76,16 +76,16 @@ Object  file test.lib at $0B35: Z80RMF13
     U         ext1
     U         ext2
   Expressions:
-    E U $0000 $0001: start1 % 256 (section text_1) (file file1.asm:123)
-    E S $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
-    E u $0000 $0001: 256 (section text_1) (file file1.asm:123)
-    E s $0000 $0001: 256 (section text_2) (file file1.asm:132)
-    E W $0000 $0001: msg1 (section data_1) (file file1.asm:231)
-    E L $0000 $0001: msg2 (section data_2) (file file1.asm:321)
-    E W $0000 $0001: ext1 (section data_1) (file file1.asm:231)
-    E L $0000 $0001: ext2 (section data_2) (file file1.asm:321)
-    E W $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
-    E = $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
-    E B $0000 $0001: start1 (section text_1) (file file1.asm:231)
-    E J $0000 $0001: start1 (section text_1) (file file1.asm:456)
+    E U8    $0000 $0001: start1 % 256 (section text_1) (file file1.asm:123)
+    E S8    $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
+    E U8-16 $0000 $0001: 256 (section text_1) (file file1.asm:123)
+    E S8-16 $0000 $0001: 256 (section text_2) (file file1.asm:132)
+    E U16   $0000 $0001: msg1 (section data_1) (file file1.asm:231)
+    E S32   $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E U16   $0000 $0001: ext1 (section data_1) (file file1.asm:231)
+    E S32   $0000 $0001: ext2 (section data_2) (file file1.asm:321)
+    E U16   $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
+    E =     $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
+    E U16BE $0000 $0001: start1 (section text_1) (file file1.asm:231)
+    E J8    $0000 $0001: start1 (section text_1) (file file1.asm:456)
 

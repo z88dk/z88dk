@@ -13,16 +13,26 @@
 //                                m_HL.b.l = q;
 //                                q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
 //  m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
-#define SUBHLRR(a, b) do {      \
-            mp= l+1+(h<<8);     \
-            v= l-b+((h-a)<<8),  \
-            ff= v>>8,           \
-            fa= h,              \
-            fb= ~a,             \
-            h= ff,              \
-            l= v,               \
-            fr= h|l<<8,         \
-            fk=h^(ff&128);      \
+/* DSUB (HL - rr). The K flag (bit 5) is the 8085's signed-comparison
+   indicator: after the subtraction K = S ^ V (sign of the true signed
+   result), so `jp k` is taken iff HL < rr signed — including the
+   overflow case where the raw result sign alone is wrong. Compute it
+   as a clean 0/1 from the original operands (captured before h/l are
+   overwritten below). ff/fr/fa/fb/mp are left exactly as before so the
+   S/Z/C/H/parity flags are unchanged. */
+#define SUBHLRR(a, b) do {                                            \
+            int _hl0 = (h<<8)|l;                                      \
+            int _rr0 = (((a)&0xff)<<8)|((b)&0xff);                    \
+            int _res0 = (_hl0 - _rr0) & 0xffff;                       \
+            mp= l+1+(h<<8);                                           \
+            v= l-b+((h-a)<<8),                                        \
+            ff= v>>8,                                                 \
+            fa= h,                                                    \
+            fb= ~a,                                                   \
+            h= ff,                                                    \
+            l= v,                                                     \
+            fr= h|l<<8,                                               \
+            fk= ((_res0>>15) ^ (((_hl0 ^ _rr0) & (_hl0 ^ _res0))>>15)) & 1; \
         } while(0)
 
 void i8085_rim(uint8_t opcode)

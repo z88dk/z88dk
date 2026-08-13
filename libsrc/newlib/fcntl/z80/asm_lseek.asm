@@ -40,13 +40,23 @@ asm_lseek:
 
    cp 3
    jp nc, error_einval_lmc     ; if whence is invalid
-   
-   push bc                     ; save fd
+
+   ; Move offset to exx set; keep fd in hl and whence in c for the driver.
+
+   push de
+   push hl                     ; stack: offset high, offset low
+   ld l,c
+   ld h,b                      ; hl = fd
    ld c,a                      ; c = whence
-   
+
    exx
-   
-   ld c,a                      ; c = whence
+   pop hl
+   pop de                      ; dehl' = offset
+   ld c,a                      ; c' = whence
+   exx
+
+   ; main: hl = fd, c = whence
+   ;  alt: dehl = offset, c = whence
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $08

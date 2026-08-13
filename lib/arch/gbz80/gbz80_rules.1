@@ -54,6 +54,8 @@
 	add	sp,%1
 	ret
 
+%check -64 <= %1 <= 63
+%check -64 <= %2 <= 63
 	add	sp,%1
 	add	sp,%2
 =

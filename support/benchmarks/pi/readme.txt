@@ -56,6 +56,20 @@ Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
 
 
+CLASSIC Z80 / 8085 SUMMARY — PI.C (no ldiv)
+===========================================
+
+Timer-bounded classic +test. Full archive: z88dk-classic/readme.txt.
+
+Compiler | CPU  | Ticks
+---------|------|----------------
+sccz80   | z80  | 4_028_061_102
+sccz80   | 8085 | 7_380_146_447  (Jul 2026)
+80cc     | z80  | 4_197_516_586  (Jul 2026)
+80cc     | 8085 | 7_569_463_213  (Jul 2026)
+zsdcc    | z80  | 4_013_954_322
+
+
 RESULTS - PI.C (NO LDIV)
 ========================
 
@@ -140,12 +154,26 @@ time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
 It looks like IAR implements its 32-bit math in C.
 
 11.
-Z88DK December 12, 2022
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085 CPU
-7335 bytes less page zero
+7295 bytes less page zero
 
-cycle count  = 7824146079
-time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
+cycle count  = 7380146447
+time @ 4MHz  = 7380146447 / 4*10^6 = 30 min 45 sec
+
+Z88DK July 20, 2026
+80cc / classic c library
+7575 bytes less page zero
+
+cycle count  = 4197516586
+time @ 4MHz  = 4197516586 / 4*10^6 = 17 min 29 sec
+
+Z88DK July 20, 2026
+80cc / classic c library / 8085 CPU
+7745 bytes less page zero
+
+cycle count  = 7569463213
+time @ 4MHz  = 7569463213 / 4*10^6 = 31 min 32 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================

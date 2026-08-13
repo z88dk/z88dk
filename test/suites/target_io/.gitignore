@@ -1,0 +1,16 @@
+*.com
+*.COM
+*.bin
+*.map
+*.o
+*.def
+zcc_opt.def
+suite.dat
+a.dat
+b.dat
+fopen.dat
+# empty zcc stubs / intermediate names without extension
+test_cpm_new_z80
+test_rc2014_cpm
+APP.COM
+app

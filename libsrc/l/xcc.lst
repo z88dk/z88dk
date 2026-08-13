@@ -1,0 +1,10 @@
+${NEWLIB_ROOT}l/xcc/__mulint
+${NEWLIB_ROOT}l/xcc/__divuint
+${NEWLIB_ROOT}l/xcc/__divsint
+${NEWLIB_ROOT}l/xcc/__moduint
+${NEWLIB_ROOT}l/xcc/__smod16
+${NEWLIB_ROOT}l/xcc/__mullong
+${NEWLIB_ROOT}l/xcc/__divulong
+${NEWLIB_ROOT}l/xcc/__divslong
+${NEWLIB_ROOT}l/xcc/__modulong
+${NEWLIB_ROOT}l/xcc/__smod32

@@ -80,6 +80,55 @@ extern int __LIB__ cpm_bdos_hl_callee(unsigned int func,unsigned int arg) __SMAL
 #define getuid()   cpm_bdos_hl(CPM_SUID, 0xFF)
 #define setuid(u)  cpm_bdos(CPM_SUID, u)
 
+/* IOBYTE (page-0 $0003; BDOS get/set 7/8). BIOS maps logical → physical. */
+#define CPM_IOBYTE_CON_SHIFT   0
+#define CPM_IOBYTE_RDR_SHIFT   2
+#define CPM_IOBYTE_PUN_SHIFT   4
+#define CPM_IOBYTE_LST_SHIFT   6
+#define CPM_IOBYTE_FIELD_MASK  0x03
+
+#define CPM_IOBYTE_GET_CON(b)  (((unsigned char)(b) >> CPM_IOBYTE_CON_SHIFT) & CPM_IOBYTE_FIELD_MASK)
+#define CPM_IOBYTE_GET_RDR(b)  (((unsigned char)(b) >> CPM_IOBYTE_RDR_SHIFT) & CPM_IOBYTE_FIELD_MASK)
+#define CPM_IOBYTE_GET_PUN(b)  (((unsigned char)(b) >> CPM_IOBYTE_PUN_SHIFT) & CPM_IOBYTE_FIELD_MASK)
+#define CPM_IOBYTE_GET_LST(b)  (((unsigned char)(b) >> CPM_IOBYTE_LST_SHIFT) & CPM_IOBYTE_FIELD_MASK)
+
+#define CPM_IOBYTE_SET_FIELD(b, shift, val) \
+   ( (unsigned char)( ((b) & ~(CPM_IOBYTE_FIELD_MASK << (shift))) | (((val) & CPM_IOBYTE_FIELD_MASK) << (shift)) ) )
+
+/* Logical device values per physical slot (Seasip IOBYTE grid) */
+#define CPM_DEV_TTY   0   /* CON/RDR/PUN/LST value 00 */
+#define CPM_DEV_CRT   1   /* CON value 01; LST value 01 */
+#define CPM_DEV_BAT   2   /* CON value 10 — input←RDR, output→LST */
+#define CPM_DEV_UC1   3   /* CON value 11 */
+#define CPM_DEV_PTR   1   /* RDR value 01 */
+#define CPM_DEV_UR1   2   /* RDR value 10 */
+#define CPM_DEV_UR2   3   /* RDR value 11 */
+#define CPM_DEV_PTP   1   /* PUN value 01 */
+#define CPM_DEV_UP1   2   /* PUN value 10 */
+#define CPM_DEV_UP2   3   /* PUN value 11 */
+#define CPM_DEV_LPT   2   /* LST value 10 */
+#define CPM_DEV_UL1   3   /* LST value 11 */
+
+#define cpm_get_iobyte()  ((unsigned char)cpm_bdos_hl(CPM_GIOB, 0))
+#define cpm_set_iobyte(b) cpm_bdos(CPM_SIOB, (unsigned int)(unsigned char)(b))
+
+/*
+ * Map a logical device name to a stdio FILE* for portable +cpm apps.
+ * Recognises CRT: TTY: LPT: PTP: PTR: (and UC1: UL1: UP1: UR1: UP2: UR2:).
+ * BAT: has no single FILE* — set IOBYTE CON=BAT instead.
+ * Returns NULL if unknown or uninstantiated (e.g. TTY: without tty* CRT).
+ * Does not change IOBYTE; use cpm_set_iobyte() when cooperating with BIOS.
+ */
+#ifdef __SCCZ80
+extern void __LIB__ *cpm_device_file(char *name) __SMALLC __z88dk_fastcall;
+#else
+extern void *cpm_device_file(char *name);
+extern void *cpm_device_file_fastcall(char *name) __z88dk_fastcall;
+#define cpm_device_file(a) cpm_device_file_fastcall(a)
+#endif
+
+
+
 #ifdef __SCCZ80
 extern unsigned long __LIB__ cpm_get_offset(void *p) __SMALLC __z88dk_fastcall;
 #else

@@ -1,6 +1,5 @@
 ; ----- void  xorplot(int x, int y)
 
-
     SECTION code_graphics
 
     PUBLIC  xorplot
@@ -8,7 +7,6 @@
     PUBLIC  ___xorplot
 
     EXTERN  asm_xorplot
-
 
 xorplot:
 _xorplot:

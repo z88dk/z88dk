@@ -1,6 +1,5 @@
 ; ----- void  plot(int x, int y)
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  plot
@@ -8,7 +7,6 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___plot
 
     EXTERN  asm_plot
-
 
 plot:
 _plot:
@@ -21,4 +19,3 @@ ___plot:
     ld      h, e
     push    af                          ; ret addr
     jp      asm_plot
-ENDIF

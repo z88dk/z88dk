@@ -1,5 +1,8 @@
 **/*.lib
 
+80cc/ir_selftest
+80cc/z88dk-80cc
+
 common/t/test
 config.h
 copt/z88dk-copt

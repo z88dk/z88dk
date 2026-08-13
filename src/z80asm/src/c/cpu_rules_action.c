@@ -177935,7 +177935,7 @@ case CPU_EZ80_Z80: case CPU_EZ80_Z80_STRICT:
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
 switch (ctx->expr_value) {
-case 0: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
+case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
 default: error_hex2(ErrIntRange, ctx->expr_value);
 }}
 DO_stmt(0x49C7LL+(((ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
@@ -177951,7 +177951,7 @@ case CPU_EZ80_Z80: case CPU_EZ80_Z80_STRICT:
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
 switch (ctx->expr_value) {
-case 0: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
+case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
 default: error_hex2(ErrIntRange, ctx->expr_value);
 }}
 DO_stmt(0x49C7LL+(((ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
@@ -177967,7 +177967,7 @@ case CPU_EZ80: case CPU_EZ80_STRICT:
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
 switch (ctx->expr_value) {
-case 0: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
+case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
 default: error_hex2(ErrIntRange, ctx->expr_value);
 }}
 DO_stmt(0x52C7LL+(((ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
@@ -177983,7 +177983,7 @@ case CPU_EZ80: case CPU_EZ80_STRICT:
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
 switch (ctx->expr_value) {
-case 0: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
+case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
 default: error_hex2(ErrIntRange, ctx->expr_value);
 }}
 DO_stmt(0x52C7LL+(((ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
@@ -177999,7 +177999,7 @@ case CPU_8080: case CPU_8080_STRICT: case CPU_8085: case CPU_8085_STRICT: case C
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
 switch (ctx->expr_value) {
-case 0: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
+case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 16: case 24: case 32: case 40: case 48: case 56: break;
 default: error_hex2(ErrIntRange, ctx->expr_value);
 }}
 DO_stmt(0xC7LL+(((ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));
@@ -178008,7 +178008,7 @@ case CPU_R2KA: case CPU_R2KA_STRICT: case CPU_R3K: case CPU_R3K_STRICT: case CPU
 if (ctx->expr_in_parens) warning(ErrExprInParens, NULL);
 if (ctx->expr_error) { error(ErrConstExprExpected, NULL); } else {
 switch (ctx->expr_value) {
-case 16: case 24: case 32: case 40: case 56: break;
+case 2: case 3: case 4: case 5: case 7: case 16: case 24: case 32: case 40: case 56: break;
 default: error_hex2(ErrIntRange, ctx->expr_value);
 }}
 DO_stmt(0xC7LL+(((ctx->expr_value<8?ctx->expr_value*8:ctx->expr_value))));

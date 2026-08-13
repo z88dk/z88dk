@@ -70,7 +70,7 @@ asm0_vopen:
    
    push hl                     ; save sizeof(FDSTRUCT)
    
-   ld de,__stdio_heap
+   ld de,(__stdio_heap)
    call asm_heap_alloc         ; allocate out of stdio heap
    
    pop bc                      ; bc = sizeof(FDSTRUCT)
@@ -148,7 +148,7 @@ target_error_p2:
 
    ex de,hl                    ; hl = FDSTRUCT *
    
-   ld de,__stdio_heap
+   ld de,(__stdio_heap)
    call asm_heap_free
    
    jp error_mc - 1

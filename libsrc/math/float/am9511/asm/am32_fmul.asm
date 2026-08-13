@@ -5,10 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, August 2020 / specials 2026
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fmul - z80 floating point multiply
+; asm_am9511_fmul - am9511 floating point multiply
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -23,12 +23,15 @@ ENDIF
 EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
+EXTERN asm_am9511_spec_mul
 
 PUBLIC asm_am9511_fmul, asm_am9511_fmul_callee
 
 
-; enter here for floating multiply, x+y, x on stack, y in dehl, result in dehl
 .asm_am9511_fmul
+    call asm_am9511_spec_mul
+    ret C
+
     call asm_am9511_pushf           ; x
 
     call asm_am9511_pushf_fastcall  ; y
@@ -39,18 +42,25 @@ PUBLIC asm_am9511_fmul, asm_am9511_fmul_callee
     jp asm_am9511_popf
 
 
-; enter here for floating multiply callee, x+y, x on stack, y in dehl
 .asm_am9511_fmul_callee
-    call asm_am9511_pushf           ; x
+    call asm_am9511_spec_mul
+    jr NC,mcal_apu
+    pop bc
+    pop af
+    pop af
+    push bc
+    ret
 
-    call asm_am9511_pushf_fastcall  ; y
+.mcal_apu
+    call asm_am9511_pushf
+
+    call asm_am9511_pushf_fastcall
 
     ld a,__IO_APU_OP_FMUL
-    AM9511_OUT_APU_CONTROL        ; x * y
+    AM9511_OUT_APU_CONTROL
 
-    pop hl                          ; ret
+    pop hl
     pop de
-    ex (sp),hl                      ; ret back on stack
+    ex (sp),hl
 
     jp asm_am9511_popf
-

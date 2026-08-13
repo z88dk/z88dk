@@ -2041,192 +2041,256 @@ Object  file test_t_issue_2320_m_t.1.lib at $0014: Z80RMF18
   CPU:  z80n 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.z80n"
 
 Object  file test_t_issue_2320_m_t.1.lib at $008C: Z80RMF18
   Name: test_t_issue_2320_m_t.z80n-IXIY
   CPU:  z80n (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.z80n-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $010C: Z80RMF18
   Name: test_t_issue_2320_m_t.r6k
   CPU:  r6k 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r6k"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0184: Z80RMF18
   Name: test_t_issue_2320_m_t.r6k-IXIY
   CPU:  r6k (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r6k-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0200: Z80RMF18
   Name: test_t_issue_2320_m_t.z80
   CPU:  z80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.z80"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0278: Z80RMF18
   Name: test_t_issue_2320_m_t.z80-IXIY
   CPU:  z80 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.z80-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $02F4: Z80RMF18
   Name: test_t_issue_2320_m_t.z180
   CPU:  z180 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.z180"
 
 Object  file test_t_issue_2320_m_t.1.lib at $036C: Z80RMF18
   Name: test_t_issue_2320_m_t.z180-IXIY
   CPU:  z180 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.z180-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $03EC: Z80RMF18
   Name: test_t_issue_2320_m_t.r3k
   CPU:  r3k 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r3k"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0464: Z80RMF18
   Name: test_t_issue_2320_m_t.r3k-IXIY
   CPU:  r3k (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r3k-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $04E0: Z80RMF18
   Name: test_t_issue_2320_m_t.8085
   CPU:  8085 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.8085"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0558: Z80RMF18
   Name: test_t_issue_2320_m_t.8085-IXIY
   CPU:  8085 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.8085-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $05D8: Z80RMF18
   Name: test_t_issue_2320_m_t.r800
   CPU:  r800 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r800"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0650: Z80RMF18
   Name: test_t_issue_2320_m_t.r800-IXIY
   CPU:  r800 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r800-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $06D0: Z80RMF18
   Name: test_t_issue_2320_m_t.r5k
   CPU:  r5k 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r5k"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0748: Z80RMF18
   Name: test_t_issue_2320_m_t.r5k-IXIY
   CPU:  r5k (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r5k-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $07C4: Z80RMF18
   Name: test_t_issue_2320_m_t.kc160_z80
   CPU:  kc160_z80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.kc160_z80"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0844: Z80RMF18
   Name: test_t_issue_2320_m_t.kc160_z80-IXIY
   CPU:  kc160_z80 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.kc160_z80-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $08C8: Z80RMF18
   Name: test_t_issue_2320_m_t.ez80_z80
   CPU:  ez80_z80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.ez80_z80"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0944: Z80RMF18
   Name: test_t_issue_2320_m_t.ez80_z80-IXIY
   CPU:  ez80_z80 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.ez80_z80-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $09C8: Z80RMF18
   Name: test_t_issue_2320_m_t.ez80
   CPU:  ez80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.ez80"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0A40: Z80RMF18
   Name: test_t_issue_2320_m_t.ez80-IXIY
   CPU:  ez80 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.ez80-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0AC0: Z80RMF18
   Name: test_t_issue_2320_m_t.r2ka
   CPU:  r2ka 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r2ka"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0B38: Z80RMF18
   Name: test_t_issue_2320_m_t.r2ka-IXIY
   CPU:  r2ka (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r2ka-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0BB8: Z80RMF18
   Name: test_t_issue_2320_m_t.gbz80
   CPU:  gbz80 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.gbz80"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0C34: Z80RMF18
   Name: test_t_issue_2320_m_t.gbz80-IXIY
   CPU:  gbz80 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.gbz80-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0CB4: Z80RMF18
   Name: test_t_issue_2320_m_t.8080
   CPU:  8080 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.8080"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0D2C: Z80RMF18
   Name: test_t_issue_2320_m_t.8080-IXIY
   CPU:  8080 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.8080-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0DAC: Z80RMF18
   Name: test_t_issue_2320_m_t.r4k
   CPU:  r4k 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r4k"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0E24: Z80RMF18
   Name: test_t_issue_2320_m_t.r4k-IXIY
   CPU:  r4k (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.r4k-IXIY"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0EA0: Z80RMF18
   Name: test_t_issue_2320_m_t.kc160
   CPU:  kc160 
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.kc160"
 
 Object  file test_t_issue_2320_m_t.1.lib at $0F1C: Z80RMF18
   Name: test_t_issue_2320_m_t.kc160-IXIY
   CPU:  kc160 (-IXIY)
   Section "": 1 bytes
     C $0000: 00
+  Strings:
+    S   1 = "test_t_issue_2320_m_t.kc160-IXIY"
 
 END
 }

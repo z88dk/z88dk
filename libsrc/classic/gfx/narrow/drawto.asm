@@ -1,6 +1,5 @@
 ; ----- void  drawto(int x2, int y2)
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  drawto
@@ -8,6 +7,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     PUBLIC  ___drawto
 
     EXTERN  asm_drawto
+
 
 drawto:
 _drawto:
@@ -20,4 +20,3 @@ ___drawto:
     ld      d, l                        ; x2
     push    af                          ; ret addr
     jp      asm_drawto
-ENDIF

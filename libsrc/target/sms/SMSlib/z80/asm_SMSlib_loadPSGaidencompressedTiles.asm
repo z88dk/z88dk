@@ -26,8 +26,17 @@ asm_SMSlib_loadPSGaidencompressedTiles:
    ; enter : de = void *src
    ;         hl = unsigned int tilefrom
    ;
-   ; uses  : af, bc, de, hl, ix, iy
-   
+   ; uses  : af, bc, de, hl
+   ;
+   ; The decoder needs ix and iy, so it saves and restores them. Both are
+   ; callee-saved: sccz80 and sdcc use ix as a frame pointer, and 80cc parks
+   ; values in ix and iy, so a caller may hold live data in either. The
+   ; sccz80 and sdcc bindings only reorder arguments and jp here, so neither
+   ; compensates. Losing ix here destroys the caller frame.
+
+   push ix
+   push iy
+
    add hl,hl
    add hl,hl
    add hl,hl
@@ -202,5 +211,8 @@ _inLoop:
    ld hl,32
    add hl,sp
    ld sp,hl
-   
+
+   pop iy
+   pop ix
+
    ret

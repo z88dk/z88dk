@@ -1,0 +1,289 @@
+Library file test_t_dump_library_04_t.o at $0000: Z80LMF01
+Object  file test_t_dump_library_04_t.o at $0010: Z80RMF01
+  Name: module_z80n_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0080: Z80RMF01
+  Name: module_z80n_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $00ED: Z80RMF01
+  Name: module_r6k_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $015C: Z80RMF01
+  Name: module_r6k_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $01C8: Z80RMF01
+  Name: module_ti83_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0238: Z80RMF01
+  Name: module_ti83_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $02A5: Z80RMF01
+  Name: module_ti83plus_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0319: Z80RMF01
+  Name: module_ti83plus_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $038A: Z80RMF01
+  Name: module_z80_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $03F9: Z80RMF01
+  Name: module_z80_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0465: Z80RMF01
+  Name: module_z180_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $04D5: Z80RMF01
+  Name: module_z180_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0542: Z80RMF01
+  Name: module_r3k_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $05B1: Z80RMF01
+  Name: module_r3k_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $061D: Z80RMF01
+  Name: module_8085_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $068D: Z80RMF01
+  Name: module_8085_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $06FA: Z80RMF01
+  Name: module_r800_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $076A: Z80RMF01
+  Name: module_r800_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $07D7: Z80RMF01
+  Name: module_r5k_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0846: Z80RMF01
+  Name: module_r5k_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $08B2: Z80RMF01
+  Name: module_kc160_z80_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0927: Z80RMF01
+  Name: module_kc160_z80_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0999: Z80RMF01
+  Name: module_ez80_z80_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0A0D: Z80RMF01
+  Name: module_ez80_z80_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0A7E: Z80RMF01
+  Name: module_ez80_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0AEE: Z80RMF01
+  Name: module_ez80_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0B5B: Z80RMF01
+  Name: module_r2ka_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0BCB: Z80RMF01
+  Name: module_r2ka_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0C38: Z80RMF01
+  Name: module_gbz80_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0CA9: Z80RMF01
+  Name: module_gbz80_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0D17: Z80RMF01
+  Name: module_8080_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0D87: Z80RMF01
+  Name: module_8080_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0DF4: Z80RMF01
+  Name: module_r4k_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0E63: Z80RMF01
+  Name: module_r4k_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0ECF: Z80RMF01
+  Name: module_kc160_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $0F40: Z80RMF01
+  Name: module_kc160_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+

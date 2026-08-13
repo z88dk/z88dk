@@ -50,16 +50,22 @@ DEFC asm_BIFROST2_stop               = $C9B2
 DEFC program                         = $FDE8
 END
 
-capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF18
-  Name: ${test}
+capture_ok("z88dk-z80nm -a ${test}.o", <<'END');
+Object  file test_t_issue_0053_t.o at $0000: Z80RMF18
+  Name: test_t_issue_0053_t
   CPU:  z80 
-  Section "": 1 bytes, ORG \$FDE8
-    C \$0000: C9
+  Section "": 1 bytes, ORG $FDE8
+    C $0000: C9
   Symbols:
-    G C \$C9A9: asm_BIFROST2_start (section "") (file ${test}.asm:8)
-    G C \$C9B2: asm_BIFROST2_stop (section "") (file ${test}.asm:9)
-    G A \$0000: program (section "") (file ${test}.asm:18)
+    G C $C9A9: asm_BIFROST2_start (section "") (file test_t_issue_0053_t.asm:8)
+    G C $C9B2: asm_BIFROST2_stop (section "") (file test_t_issue_0053_t.asm:9)
+    G A $0000: program (section "") (file test_t_issue_0053_t.asm:18)
+  Strings:
+    S   1 = "asm_BIFROST2_start"
+    S   2 = "test_t_issue_0053_t.asm"
+    S   3 = "asm_BIFROST2_stop"
+    S   4 = "program"
+    S   5 = "test_t_issue_0053_t"
 END
 
 

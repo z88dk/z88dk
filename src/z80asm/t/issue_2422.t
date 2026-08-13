@@ -36,6 +36,10 @@ Object  file test_t_issue_2422_t.dir/test_t_issue_2422_t.o at $0000: Z80RMF18
     C $0000: 00
   Symbols:
     G A $0000: aa (section "") (file test_t_issue_2422_t.asm:2)
+  Strings:
+    S   1 = "aa"
+    S   2 = "test_t_issue_2422_t.asm"
+    S   3 = "test_t_issue_2422_t"
 END
 
 
@@ -75,6 +79,12 @@ Object  file test_t_issue_2422_t.dir/test_t_issue_2422_t.o at $0000: Z80RMF18
   Symbols:
     G A $0000: aa (section "") (file test_t_issue_2422_t.1.asm:2)
     G A $0001: bb (section "") (file test_t_issue_2422_t.2.asm:2)
+  Strings:
+    S   1 = "aa"
+    S   2 = "test_t_issue_2422_t.1.asm"
+    S   3 = "bb"
+    S   4 = "test_t_issue_2422_t.2.asm"
+    S   5 = "test_t_issue_2422_t"
 Object  file test_t_issue_2422_t.1.o at $0000: Z80RMF18
   Name: test_t_issue_2422_t.1
   CPU:  z80 
@@ -82,6 +92,10 @@ Object  file test_t_issue_2422_t.1.o at $0000: Z80RMF18
     C $0000: 00
   Symbols:
     G A $0000: aa (section "") (file test_t_issue_2422_t.1.asm:2)
+  Strings:
+    S   1 = "aa"
+    S   2 = "test_t_issue_2422_t.1.asm"
+    S   3 = "test_t_issue_2422_t.1"
 Object  file test_t_issue_2422_t.2.o at $0000: Z80RMF18
   Name: test_t_issue_2422_t.2
   CPU:  z80 
@@ -89,6 +103,10 @@ Object  file test_t_issue_2422_t.2.o at $0000: Z80RMF18
     C $0000: 00
   Symbols:
     G A $0000: bb (section "") (file test_t_issue_2422_t.2.asm:2)
+  Strings:
+    S   1 = "bb"
+    S   2 = "test_t_issue_2422_t.2.asm"
+    S   3 = "test_t_issue_2422_t.2"
 END
 
 path("$test.dir")->remove_tree;

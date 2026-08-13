@@ -275,8 +275,8 @@
     <ClCompile Include="..\..\src\z80asm\src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm\src\cpp\zfloat.def" />
     <None Include="..\..\src\z80asm\src\options.def" />
-    <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
     <None Include="..\..\src\z80asm\src\cpp\scan2.def" />
     <None Include="..\..\src\z80asm\src\cpp\scan2.re" />

@@ -6,19 +6,17 @@ PUBLIC cm32_sccz80_ldexp_callee
 EXTERN m32_fsldexp_callee
 
 ; float ldexpf(float x, int16_t pw2);
-
+; sccz80: SP = ret, pw2, x.HL, x.DE
+; core:   SP = ret, x.HL, x.DE, pw2  (same as am9511 / Z80 math32)
+;
+; Reverse like cam32_sccz80_ldexp_callee (ret in HL, not AF).
 .cm32_sccz80_ldexp_callee
-    ; Entry:
-    ; Stack: float left, int right, ret
-
-    ; Reverse the stack
-    pop af                      ;my return
-    pop bc                      ;int
-    pop hl                      ;float
-    pop de
-    push bc                     ;int
-    push de                     ;float
-    push hl
-    push af                     ;my return
-    jp m32_fsldexp_callee
-    
+    pop hl                          ; ret
+    pop bc                          ; pw2
+    pop de                          ; x.HL
+    ex (sp),hl                      ; HL = x.DE; (sp) = ret
+    push bc                         ; pw2
+    push hl                         ; x.DE
+    push de                         ; x.HL
+    call m32_fsldexp_callee
+    ret

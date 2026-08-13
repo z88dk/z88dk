@@ -567,7 +567,12 @@ Object  file test.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Symbols:
     G C \$0002: aa (section "") (file test.asm:2)
   Expressions:
-    E U \$0000 \$0000 1: aa (section text) (file test.asm:4)
+    E U8    \$0000 \$0000 1: aa (section text) (file test.asm:4)
+  Strings:
+    S   1 = "test.asm"
+    S   2 = "text"
+    S   3 = "aa"
+    S   4 = "test"
 ...
 
 ok run("z88dk-zobjcopy test.o test2.o");
@@ -581,7 +586,12 @@ Object  file test2.o at \$0000: Z80RMF$OBJ_FILE_VERSION
   Symbols:
     G C \$0002: aa (section "") (file test.asm:2)
   Expressions:
-    E U \$0000 \$0000 1: aa (section text) (file test.asm:4)
+    E U8    \$0000 \$0000 1: aa (section text) (file test.asm:4)
+  Strings:
+    S   1 = "test.asm"
+    S   2 = "text"
+    S   3 = "aa"
+    S   4 = "test"
 ...
 
 unlink "test.asm", "test.o", "test2.o" if Test::More->builder->is_passing;
@@ -1025,12 +1035,12 @@ sub check_zobjcopy_nm {
 	(my $out = $bmk) =~ s/$/.out/;
 	
 	is 0, system("$cmd $file > $out"), "$cmd $file > $out";
-	my $diff = system("diff -w $out $bmk");
-	is 0, $diff, "diff -w $out $bmk";
+	my $diff = system("diff -w $bmk $out");
+	is 0, $diff, "diff -w $bmk $out";
 	unlink $out unless $diff;
 	
 	if ($diff != 0 && $ENV{DEBUG}) {
-		system("'/c/Program Files/WinMerge/WinMergeU.exe' $out $bmk");
+		system("'/c/Program Files/WinMerge/WinMergeU.exe' $bmk $out");
 	}
 	
 	die if $ENV{DEBUG} && !Test::More->builder->is_passing;

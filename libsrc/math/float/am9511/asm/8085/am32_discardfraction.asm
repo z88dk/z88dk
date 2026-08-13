@@ -16,6 +16,8 @@ PUBLIC asm_am9511_discardfraction
 
 ; Entry: dehl = 32 bit float
 ; Exit:  dehl = 32 bit float without fractional part
+;        NC = already integer (result equals input)
+;        C  = fractional part was discarded
 
 .asm_am9511_discardfraction
     push de                     ; keep sign and exponent safe
@@ -25,14 +27,14 @@ PUBLIC asm_am9511_discardfraction
 
     ld a,d                      ; exponent
     or a
-    jp Z,return_zero            ; return IEEE zero
+    jp Z,zero_legal             ; exp 0 -> signed zero, NC
 
     sub $7f                     ; exponent value of 127 is 1.xx
-    jp C,return_zero
+    jp C,return_zero            ; |x| < 1 -> signed zero, C
 
     inc a
     cp 24
-    jp NC,shift_none            ; no shift needed, all integer
+    jp NC,shift_none            ; |x| >= 2^23: already integer, NC
 
                                 ; build mask of integer bits
                                 ; a = number of bits to keep
@@ -55,25 +57,42 @@ PUBLIC asm_am9511_discardfraction
     dec d
     jp NZ,shift_right
 
-    pop bc                      ; return mantissa bits
+    pop bc                      ; orig HL
     ld a,c
     and l
     ld l,a
+    cp c
+    jp NZ,frac_pop_de
     ld a,b
     and h
     ld h,a
+    cp b
+    jp NZ,frac_pop_de
 
-    pop bc                      ; return exponent and mantissa bits
-    ld a,c                      ; first bit of e is exponent
+    pop bc                      ; orig DE
+    ld a,c
     and e
     ld e,a
-
+    cp c
+    jp NZ,frac_done
     ld d,b                      ; get original sign and exponent
+    or a                        ; NC: unchanged
+    ret
+
+.frac_pop_de
+    pop bc                      ; orig DE
+    ld a,c
+    and e
+    ld e,a
+.frac_done
+    ld d,b
+    scf                         ; C: fraction discarded
     ret
 
 .shift_none
     pop hl                      ; return mantissa
     pop de                      ; return sign and exponent
+    or a                        ; NC
     ret
 
 .return_zero
@@ -86,9 +105,19 @@ PUBLIC asm_am9511_discardfraction
     ld de,0
     ld hl,de
 
-    ld a,d
     rra                         ; return sign and exponent
     ld d,a
+    scf                         ; C: discarded fraction
+    ret
 
+.zero_legal
+    pop hl
+    pop de
+    ld a,d
+    rla
+    ld de,0
+    ld hl,de
+    rra
+    ld d,a
+    or a                        ; NC: already integer zero
     ret                         ; return IEEE signed ZERO in DEHL
-

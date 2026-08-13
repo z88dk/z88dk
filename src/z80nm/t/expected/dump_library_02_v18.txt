@@ -1,0 +1,34 @@
+Library file test_t_dump_library_02_t.o at $0000: Z80LMF18
+Object  file test_t_dump_library_02_t.o at $0014: Z80RMF18
+  Name: module1
+  CPU:  z80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module1"
+
+Object  file test_t_dump_library_02_t.o at $0104: Z80RMF18
+  Name: module2
+  CPU:  z80 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module2"
+
+Library public symbols:
+  P   1 = "public1"
+  P   2 = "public2"

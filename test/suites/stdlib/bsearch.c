@@ -660,7 +660,7 @@ void bsearch_case1() {
   Assert(result->byte1 == 1, "Incorrect element found (byte1)");
   Assert(result->byte2 == 0x41, "Incorrect element found (byte2)");
 
-  return 0;
+  return;                          // bsearch_case1 is void (sdcc rejects `return 0;`)
 }
 
 

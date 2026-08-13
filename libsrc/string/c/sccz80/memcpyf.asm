@@ -16,8 +16,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 ; copies n bytes from src to dest
 .memcpyf
 ._memcpyf
-    ld      ix,2
-    add     ix,sp  
+    push    ix              ; preserve caller's IX (80cc fp frame pointer)
+    push    iy              ; preserve caller's IY (used as char scratch below)
+    ld      ix,6            ; +2 pushed IX +2 pushed IY +2 return address
+    add     ix,sp
     ld      c,(ix+6)
     ld      b,(ix+7)
     ld      e,(ix+8)    ; E'B'C'=dst
@@ -49,11 +51,13 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
     dec     ix
     jr      memcpy1
 .memcpy3
-    pop     ix
+    pop     ix              ; restore the frame-base IX (saved before the counter loop)
     ex      af,af'
     call    __far_end
     ld      l,(ix+6)
     ld      h,(ix+7)
     ld      e,(ix+8)        ; EHL=dst
+    pop     iy              ; restore caller's IY
+    pop     ix              ; restore caller's IX
     ret
 ENDIF

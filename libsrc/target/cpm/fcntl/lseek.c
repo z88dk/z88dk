@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <cpm.h>
 
-long lseek(int fd,long posn, int whence)
+long lseek(int fd,long posn, int whence) __z88dk_saveframe
 {
     struct fcb *fc = (struct fcb *)fd;
     unsigned long    pos;
@@ -20,9 +20,6 @@ long lseek(int fd,long posn, int whence)
     char    buffer[SECSIZE];
 
     switch(whence) {
-    case 0:
-        pos = fc->rwptr + posn;
-        break;
     case 1:
         pos = fc->rwptr + posn;
         break;

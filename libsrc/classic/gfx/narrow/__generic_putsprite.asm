@@ -11,8 +11,8 @@
 ;
 ;
 
-
     SECTION code_graphics
+
     PUBLIC  __generic_putsprite
 
     EXTERN  __gfx_vram_page_in
@@ -22,6 +22,7 @@
     EXTERN  respixel
     EXTERN  xorpixel
     INCLUDE "classic/gfx/grafix.inc"
+
 
 ; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
@@ -61,7 +62,8 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ELSE
     ex      (sp),hl
     inc     hl
-    ld      b,(hl)                      ; Height
+    ld      a,(hl)                      ; Height
+    ld      b,a
     inc     hl
     ld      (__spr_bitmap),hl
     dec     hl
@@ -97,8 +99,9 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
 ELSE
     push    hl
     ld      hl,(__spr_bitmap)
-    ld      c,(hl)
+    ld      a,(hl)
     pop     hl
+    ld      c,a
 ENDIF
     ;ld    b,a    ;Load width
     ld      b, 0                        ; Better, start from zero !!
@@ -146,8 +149,9 @@ ELSE
     ld      hl,(__spr_bitmap)
     inc     hl
     ld      (__spr_bitmap),hl
-    ld      c,(hl)
+    ld      a,(hl)
     pop     hl
+    ld      c,a
 ENDIF
 
     jr      noblockx
@@ -171,8 +175,9 @@ ELSE
     ld      hl,(__spr_bitmap)
     inc     hl
     ld      (__spr_bitmap),hl
-    ld      c,(hl)
+    ld      a,(hl)
     pop     hl
+    ld      c,a
 ENDIF
     jr      iloopx
 
@@ -197,7 +202,6 @@ noblockx:
     ENDIF
     ret
   ENDIF
-
 
 doand:
     pop     af                   ; Width
@@ -306,14 +310,13 @@ noblocka:
    ENDIF
     jp      __graphics_end
   ELSE
-   IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-   ELSE
+    ELSE
     pop     de
-   ENDIF
+    ENDIF
     ret
   ENDIF
-
 
 
 
@@ -425,11 +428,11 @@ noblocko:
    ENDIF
     jp      __graphics_end
   ELSE
-   IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
-   ELSE
+    ELSE
     pop     de
-   ENDIF
+    ENDIF
     ret
   ENDIF
 

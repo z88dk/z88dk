@@ -48,8 +48,26 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, N=1000.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt. N=1000.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|----------------
+sccz80   | z80  | math16  |   295_642_916 (Aug 10, 2026; DT=1e-1)
+sccz80   | 8085 | math16  |   344_383_717 (Aug 10, 2026; DT=1e-1)
+sccz80   | z80  | math32  |   791_103_882 (Aug 10, 2026)
+zsdcc    | z80  | math32  |   843_047_242 (Aug 10, 2026)
+sccz80   | 8085 | math32  | 1_563_936_728 (Aug 12, 2026)
+sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
+sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
+80cc     | *    | math32  | builds; INVALID 2nd energy — omitted
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 Z88DK April 28, 2021
@@ -137,71 +155,98 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK January 3, 2022
+Z88DK August 10, 2026
 sccz80 / classic / math32
-6052 bytes less page zero
+5672 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 995097719
-time @ 4MHz  = 995097719 / 4*10^6 =  4 min 9 sec
+cycle count  = 791103882
+time @ 4MHz  = 791103882 / 4*10^6 =  3 min 18 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
+(Truncated high-half 32×32 mantissa mul; suite 16/16.)
+
+8b.
+Z88DK August 10, 2026
+zsdcc / classic / math32
+6597 bytes less page zero
+
+cycle count  = 843047242
+time @ 4MHz  = 843047242 / 4*10^6 =  3 min 31 sec
+
+IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 
 9.
-Z88DK April 30, 2021
+Z88DK August 12, 2026
+sccz80 / classic / 8085 / math32
+6843 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 7 * 10^(-6)
+
+cycle count  = 1563936728
+time @ 4MHz  = 1563936728 / 4*10^6 =  6 min 31 sec
+
+IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits.
+
+Energy: -0.1690752 / -0.1690808 (N=1000).
+
+10.
+Z88DK August 10, 2026
 sccz80 / new c library / math32
-5149 bytes less page zero
+4827 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 754266702
-time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
+cycle count  = 790641371
+time @ 4MHz  = 790641371 / 4*10^6 =  3 min 18 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
+(After sccz80 newlib math32 *_fastcall header remap; sqrt path correct.)
 
-10.
-Z88DK May 3, 2021
+11.
+Z88DK August 10, 2026
 sccz80 / new / math16
-3309 bytes less page zero
+3431 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 357718801
-time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec
+cycle count  = 295697456
+time @ 4MHz  = 295697456 / 4*10^6 =  1 min 14 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
 
-11.
-Z88DK January 3, 2022
-sccz80 / classic / MBF32
-4989 bytes less page zero
-
-first number error : 1 * 10^(-7)
-second number error: 1 * 10^(-4)
-
-cycle count  = 1848679330
-time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
-
-Microsoft 32-bit float implementation, accurate to 7 significant digits.
-
 12.
-Z88DK December 12, 2022
-sccz80 / classic / 8085 / MBF32
-4868 bytes less page zero
+Z88DK July 19, 2026
+sccz80 / classic / MBF32
+4956 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1851095771
-time @ 4MHz  = 1851095771 / 4*10^6 =  7 min 43 sec
+cycle count  = 1835079611
+time @ 4MHz  = 1835079611 / 4*10^6 =  7 min 39 sec
 
 Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
 13.
+Z88DK July 19, 2026
+sccz80 / classic / 8085 / MBF32
+4729 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1849800062
+time @ 4MHz  = 1849800062 / 4*10^6 =  7 min 42 sec
+
+Microsoft 32-bit float implementation, accurate to 7 significant digits.
+
+14.
 HITECH C MSDOS V780pl2
 3736 bytes exact
 
@@ -211,7 +256,7 @@ second number error: 1 * 10^(-4)
 cycle count  = 1600543903
 time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
 
-14.
+15.
 HITECH C CPM V309-15
 5633 bytes exact
 

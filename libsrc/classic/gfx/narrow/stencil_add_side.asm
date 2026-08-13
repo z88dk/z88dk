@@ -9,26 +9,31 @@
 ;     Stefano Bodrato - 13/3/2009
 ;
 ;
-;    $Id: stencil_add_side.asm,v 1.7 2016-04-22 20:29:52 dom Exp $
+;    $Id: stencil_add_side.asm $
 ;
 
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  stencil_add_side
     PUBLIC  _stencil_add_side
 
     EXTERN  Line
     EXTERN  stencil_add_pixel
+
+    ; No paging required on the 'stencil' structures !
         ;EXTERN    __gfx_vram_page_in
         ;EXTERN    __gfx_vram_page_out
-    ;EXTERN    __graphics_end
+
     EXTERN  stencil_ptr
+    INCLUDE "classic/gfx/grafix.inc"
 
 stencil_add_side:
 _stencil_add_side:
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
     push    ix
     ld      ix, 2
     add     ix, sp
@@ -37,10 +42,10 @@ _stencil_add_side:
     ld      h, (ix+3)
     ld      (stencil_ptr), hl
 
-    ld      l, (ix+8)                   ;y0
-    ld      h, (ix+10)                  ;x0
     ld      e, (ix+4)                   ;y1
     ld      d, (ix+6)                   ;x1
+    ld      l, (ix+8)                   ;y0
+    ld      h, (ix+10)                  ;x0
 
     ;call    __gfx_vram_page_in
     ld      ix, stencil_add_pixel
@@ -48,4 +53,29 @@ _stencil_add_side:
         ;jp    __graphics_end
     pop     ix
     ret
+
+ELSE
+
+    EXTERN  __plot_ADDR
+    ld      hl,stencil_add_pixel
+    ld      (__plot_ADDR),hl
+
+    pop     af                          ; ret addr
+    pop     de                          ; y2
+    pop     hl
+    ld      d, l                        ; x2
+    pop     hl                          ; y
+    pop     bc
+
+    push    bc
+    push    hl
+    ld      h, c                        ; x
+    push    hl                          ; foo value, the original value is gone
+    push    de
+    
+    push    af                          ; ret addr
+
+    jp      Line
+
 ENDIF
+

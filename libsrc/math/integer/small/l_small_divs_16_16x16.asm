@@ -66,11 +66,15 @@ l0_small_divs_16_16x16:
    
    ld a,b
    xor c
-   jp m, l_neg_hl              ; negate quotient
-   
+   call m, l_neg_hl            ; negate quotient if signs differ, then fall
+                               ; through to the remainder fixup. A `jp` here
+                               ; returned early via l_neg_hl's ret, skipping
+                               ; the remainder negation -> wrong sign for the
+                               ; (-dividend, +divisor) case, e.g. -7 % 3.
+
    bit 7,b
    ret z                       ; if dividend was positive
-   
+
    jp l_neg_de                 ; negate remainder
 
 divide_by_zero:

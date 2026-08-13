@@ -1,7 +1,5 @@
 ; ----- void  xorplot(int x, int y)
 
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
 
     PUBLIC  xorplot_callee
@@ -15,7 +13,6 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     INCLUDE "classic/gfx/grafix.inc"
 
 
-
 xorplot_callee:
 _xorplot_callee:
     pop     bc                          ; ret addr
@@ -25,7 +22,9 @@ _xorplot_callee:
     push    bc                          ; ret addr
 
 asm_xorplot:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -38,4 +37,3 @@ asm_xorplot:
     ENDIF
     ret
   ENDIF
-ENDIF

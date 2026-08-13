@@ -26,7 +26,7 @@ time_t doepoch(int days, int hours, int minutes)
 }
 
 
-int stat(char *filename, struct stat *buf)
+int stat(char *filename, struct stat *buf) __z88dk_saveframe
 {
 
     int inode;

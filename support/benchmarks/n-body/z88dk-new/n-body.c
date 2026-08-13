@@ -76,8 +76,6 @@ void advance(int nbodies, struct planet * bodies)
       dz = b->z - b2->z;
 #ifdef __MATH_MATH16
       inv_distance = invsqrtf16(dx * dx + dy * dy + dz * dz);
-#elif __MATH_MATH32
-      inv_distance = invsqrt(dx * dx + dy * dy + dz * dz);
 #else
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
 #endif

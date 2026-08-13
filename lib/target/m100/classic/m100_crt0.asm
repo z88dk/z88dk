@@ -18,14 +18,14 @@
     PUBLIC    __Exit         ;jp'd to by exit()
     PUBLIC    l_dcal          ;jp(hl)
 
-    PUBLIC	ROMCALL_OP	; Opcode to use for ROM calls
+    PUBLIC  ROMCALL_OP  ; Opcode to use for ROM calls
 
 IFNDEF CLIB_FGETC_CONS_DELAY
     defc CLIB_FGETC_CONS_DELAY = 150
 ENDIF
 
     defc    TAR__clib_exit_stack_size = 4
-    ;	defc    TAR__fputc_cons_generic = 1
+    ;   defc    TAR__fputc_cons_generic = 1
     defc    TAR__register_sp = -1 
     defc    TAR__crt_enable_eidi = $02 ; ei on entry
     defc    CRT_KEY_DEL = 8
@@ -46,8 +46,15 @@ ENDIF
     PUBLIC  CURSON
     PUBLIC  CURSOFF
     PUBLIC  BEEP
-    PUBLIC  LCDSET
-    PUBLIC  LCDRES
+;    PUBLIC  LCDSET
+;    PUBLIC  LCDRES
+    PUBLIC  SHAPE
+    PUBLIC  SETINT_1D
+    PUBLIC  SET_LCD_ADDR
+    PUBLIC  SET_LCD
+    PUBLIC  PLOT_TBL
+    PUBLIC  PLOT_TBL2
+    PUBLIC  LCDSET_TAIL
 
 IFDEF __M10
     INCLUDE "target/m100/def/m10_romcalls.def"
@@ -62,16 +69,16 @@ ELSE
 ENDIF
 
 IF startup = 1 
-    defc	ROMCALL_OP = $CD	; CALL
-    INCLUDE	"target/m100/classic/ram.asm"
+    defc    ROMCALL_OP = $CD    ; CALL
+    INCLUDE "target/m100/classic/ram.asm"
 ELSE
-    defc	ROMCALL_OP = $F7	; RST6
-    INCLUDE	"target/m100/classic/optrom.asm"
+    defc    ROMCALL_OP = $F7    ; RST6
+    INCLUDE "target/m100/classic/optrom.asm"
 ENDIF
  
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
 
-    INCLUDE	"crt/classic/crt_section.inc"
+    INCLUDE "crt/classic/crt_section.inc"
 

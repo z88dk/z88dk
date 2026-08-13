@@ -30,7 +30,7 @@
 SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN asm_am9511_zero, asm_am9511_max
+EXTERN asm_am9511_zero, asm_am9511_max, asm_am9511_min
 
 PUBLIC asm_am9511_ldexp_callee
 
@@ -54,14 +54,24 @@ PUBLIC asm_am9511_ldexp_callee
     dec h
     jp Z,zero                   ; return IEEE signed zero
 
+    ld a,h
+    inc a
+    jr Z,inf_nan                ; exp was 0xff: return x
+
     ld de,sp+6
     ld a,(de)                   ; (int8_t)pw2
-    add h
-    ld h,a                      ; exponent returned
+    ld b,a                      ; save pw2 for wrap sign test
+    add h                       ; new_exp = exp + pw2
+    jr C,ldexp_wrap
 
-    jp C,max                    ; exponent is overflowed
-    jp Z,zero                   ; return IEEE underflow zero
+    or a
+    jr Z,uflow
+    ld c,a                      ; new_exp
+    inc a
+    jr Z,max                    ; new_exp == 0xff -> Inf
+    ld h,c                      ; h = new exp
 
+.ldexp_pack
     dec de
     ld a,(de)                   ; get original sign and exponent
     rla                         ; capture sign
@@ -79,6 +89,22 @@ PUBLIC asm_am9511_ldexp_callee
     pop af                      ; discard old pw2
     push bc                     ; replace return
 
+    or a                        ; NC = success
+    ret
+
+.ldexp_wrap
+    ld a,b
+    rla                         ; pw2 sign -> C (no bit)
+    jr C,uflow                  ; negative wrap -> under
+    jr max                      ; positive wrap -> over
+
+.inf_nan
+    pop bc                      ; return
+    pop hl                      ; L,H
+    pop de                      ; E,D
+    pop af                      ; pw2
+    push bc
+    or a                        ; NC
     ret
 
 .zero
@@ -88,6 +114,14 @@ PUBLIC asm_am9511_ldexp_callee
     pop af                      ; discard pw2
     push bc                     ; replace return
     jp asm_am9511_zero          ; return IEEE signed ZERO in DEHL
+
+.uflow
+    pop bc
+    pop hl
+    pop de                      ; sign in d
+    pop af
+    push bc
+    jp asm_am9511_min           ; signed 0 + scf
 
 .max
     pop bc                      ; pop return

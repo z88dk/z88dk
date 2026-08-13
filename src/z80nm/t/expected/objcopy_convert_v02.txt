@@ -1,0 +1,14 @@
+Library file test_t_objcopy_convert_t.2.o at $0000: Z80LMF02
+Object  file test_t_objcopy_convert_t.2.o at $0010: Z80RMF02
+  Name: module1
+  Section "": 16 bytes
+    C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Symbols:
+    G C $1234: label1
+  Externs:
+    U         x1
+    U         x2
+    U         x3
+  Expressions:
+    E U8    $1235: label1+123
+

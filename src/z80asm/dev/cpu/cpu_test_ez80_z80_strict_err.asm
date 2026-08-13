@@ -24231,7 +24231,6 @@
  rrd (zhl)                      ; Error
  rrhl                           ; Error
  rst -1                         ; Error
- rst 1                          ; Error
  rst 10                         ; Error
  rst 11                         ; Error
  rst 12                         ; Error
@@ -24241,7 +24240,6 @@
  rst 17                         ; Error
  rst 18                         ; Error
  rst 19                         ; Error
- rst 2                          ; Error
  rst 20                         ; Error
  rst 21                         ; Error
  rst 22                         ; Error
@@ -24251,7 +24249,6 @@
  rst 27                         ; Error
  rst 28                         ; Error
  rst 29                         ; Error
- rst 3                          ; Error
  rst 30                         ; Error
  rst 31                         ; Error
  rst 33                         ; Error
@@ -24261,7 +24258,6 @@
  rst 37                         ; Error
  rst 38                         ; Error
  rst 39                         ; Error
- rst 4                          ; Error
  rst 41                         ; Error
  rst 42                         ; Error
  rst 43                         ; Error
@@ -24270,7 +24266,6 @@
  rst 46                         ; Error
  rst 47                         ; Error
  rst 49                         ; Error
- rst 5                          ; Error
  rst 50                         ; Error
  rst 51                         ; Error
  rst 52                         ; Error
@@ -24278,14 +24273,11 @@
  rst 54                         ; Error
  rst 55                         ; Error
  rst 57                         ; Error
- rst 6                          ; Error
- rst 7                          ; Error
  rst 9                          ; Error
  rst v, 63                      ; Error
  rst v, 64                      ; Error
  rst v, 65                      ; Error
  rst.l -1                       ; Error
- rst.l 1                        ; Error
  rst.l 10                       ; Error
  rst.l 11                       ; Error
  rst.l 12                       ; Error
@@ -24295,7 +24287,6 @@
  rst.l 17                       ; Error
  rst.l 18                       ; Error
  rst.l 19                       ; Error
- rst.l 2                        ; Error
  rst.l 20                       ; Error
  rst.l 21                       ; Error
  rst.l 22                       ; Error
@@ -24305,7 +24296,6 @@
  rst.l 27                       ; Error
  rst.l 28                       ; Error
  rst.l 29                       ; Error
- rst.l 3                        ; Error
  rst.l 30                       ; Error
  rst.l 31                       ; Error
  rst.l 33                       ; Error
@@ -24315,7 +24305,6 @@
  rst.l 37                       ; Error
  rst.l 38                       ; Error
  rst.l 39                       ; Error
- rst.l 4                        ; Error
  rst.l 41                       ; Error
  rst.l 42                       ; Error
  rst.l 43                       ; Error
@@ -24324,7 +24313,6 @@
  rst.l 46                       ; Error
  rst.l 47                       ; Error
  rst.l 49                       ; Error
- rst.l 5                        ; Error
  rst.l 50                       ; Error
  rst.l 51                       ; Error
  rst.l 52                       ; Error
@@ -24332,11 +24320,8 @@
  rst.l 54                       ; Error
  rst.l 55                       ; Error
  rst.l 57                       ; Error
- rst.l 6                        ; Error
- rst.l 7                        ; Error
  rst.l 9                        ; Error
  rst.lis -1                     ; Error
- rst.lis 1                      ; Error
  rst.lis 10                     ; Error
  rst.lis 11                     ; Error
  rst.lis 12                     ; Error
@@ -24346,7 +24331,6 @@
  rst.lis 17                     ; Error
  rst.lis 18                     ; Error
  rst.lis 19                     ; Error
- rst.lis 2                      ; Error
  rst.lis 20                     ; Error
  rst.lis 21                     ; Error
  rst.lis 22                     ; Error
@@ -24356,7 +24340,6 @@
  rst.lis 27                     ; Error
  rst.lis 28                     ; Error
  rst.lis 29                     ; Error
- rst.lis 3                      ; Error
  rst.lis 30                     ; Error
  rst.lis 31                     ; Error
  rst.lis 33                     ; Error
@@ -24366,7 +24349,6 @@
  rst.lis 37                     ; Error
  rst.lis 38                     ; Error
  rst.lis 39                     ; Error
- rst.lis 4                      ; Error
  rst.lis 41                     ; Error
  rst.lis 42                     ; Error
  rst.lis 43                     ; Error
@@ -24375,7 +24357,6 @@
  rst.lis 46                     ; Error
  rst.lis 47                     ; Error
  rst.lis 49                     ; Error
- rst.lis 5                      ; Error
  rst.lis 50                     ; Error
  rst.lis 51                     ; Error
  rst.lis 52                     ; Error
@@ -24383,8 +24364,6 @@
  rst.lis 54                     ; Error
  rst.lis 55                     ; Error
  rst.lis 57                     ; Error
- rst.lis 6                      ; Error
- rst.lis 7                      ; Error
  rst.lis 9                      ; Error
  rst.s -1                       ; Error
  rst.s 0                        ; Error

@@ -8,13 +8,12 @@
 ;     Stefano Bodrato - 08/10/2009
 ;
 ;
-;    $Id: stencil_add_liner.asm,v 1.5 2016-04-22 20:29:51 dom Exp $
+;    $Id: stencil_add_liner.asm $
 ;
 
 ;; void stencil_add_liner(int dx, int dy, unsigned char *stencil)
 
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  stencil_add_liner
     PUBLIC  _stencil_add_liner
@@ -22,14 +21,18 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  Line_r
     EXTERN  stencil_add_pixel
 
+    ; No paging required on the 'stencil' structures !
         ;EXTERN    __gfx_vram_page_in
         ;EXTERN    __gfx_vram_page_out
 
     EXTERN  stencil_ptr
-    ;EXTERN    __graphics_end
+    INCLUDE "classic/gfx/grafix.inc"
 
 stencil_add_liner:
 _stencil_add_liner:
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
     push    ix
     ld      ix, 2
     add     ix, sp
@@ -47,8 +50,28 @@ _stencil_add_liner:
 
     ld      ix, stencil_add_pixel
     call    Line_r
-
         ;jp    __graphics_end
     pop     ix
     ret
+
+ELSE
+
+    EXTERN  __plot_ADDR
+    ld      hl,stencil_add_pixel
+    ld      (__plot_ADDR),hl
+
+    pop     af
+    pop     hl
+    ld      (stencil_ptr), hl
+
+    pop     de                          ; y
+    pop     hl                          ; x
+    push    hl
+    push    de
+
+    push    hl
+    push    af
+
+    jp      Line_r
+
 ENDIF

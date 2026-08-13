@@ -194,12 +194,14 @@ void asm_ORG(int address)
 
 void asm_PHASE(int address)
 {
+    local_labels_reset();
 	set_phase_directive(address);
 }
 
 void asm_DEPHASE()
 {
-	clear_phase_directive();
+    local_labels_reset();
+    clear_phase_directive();
 }
 
 /*-----------------------------------------------------------------------------
@@ -218,6 +220,7 @@ void asm_MODULE_default(void)
 
 void asm_SECTION(const char* name)
 {
+    local_labels_reset();
 	new_section(name);
 }
 

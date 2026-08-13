@@ -108,15 +108,19 @@ END_ASM
 run_ok("z88dk-z80asm -b $test.asm");
 check_bin_file("$test.bin", bytes(0, (0) x 15, 1,2,3,4));
 
-capture_ok("z88dk-z80nm -a $test.o", <<END);
-Object  file $test.o at \$0000: Z80RMF18
-  Name: $test
+capture_ok("z88dk-z80nm -a $test.o", <<'END');
+Object  file test_t_ALIGN_t.o at $0000: Z80RMF18
+  Name: test_t_ALIGN_t
   CPU:  z80 
   Section "": 0 bytes
   Section code: 1 bytes
-    C \$0000: 00
+    C $0000: 00
   Section data: 4 bytes, ALIGN 16
-    C \$0000: 01 02 03 04
+    C $0000: 01 02 03 04
+  Strings:
+    S   1 = "test_t_ALIGN_t"
+    S   2 = "code"
+    S   3 = "data"
 END
 
 run_ok("z88dk-z80asm -b -f0xff $test.asm");

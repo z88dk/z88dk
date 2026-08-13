@@ -1,0 +1,9 @@
+Object  file test_t_dump_symbols_t.o at $0000: Z80RMF03
+  Name: module1
+  Symbols:
+    L C $1234: x1
+    L A $1234: x2
+    L = $1234: x3
+    G C $1234: x4
+    G A $1234: x5
+    G = $1234: x6

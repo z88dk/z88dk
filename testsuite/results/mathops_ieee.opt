@@ -234,7 +234,11 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	call	l_f32_invf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
 	ret
 
 

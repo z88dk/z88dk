@@ -10,7 +10,7 @@ To verify the correct result, compile for the zx target
 and run on a spectrum emulator.
 
 classic/sccz80/8085
-zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 --opt-code-speed binary-trees.c -o bt --math-mbf32_8085 -lndos -create-app -pragma-define:CRT_HEAP_AMALLOC=1
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 --opt-code-speed binary-trees.c -o bt --math-mbf32 -lndos -create-app -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 binary-trees.c -o bt --math-mbf32 -lndos -create-app -pragma-define:CRT_HEAP_AMALLOC=1
@@ -27,10 +27,21 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80/8085
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32_8085 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+
+classic/80cc
+zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+
+classic/80cc/8085
+zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+
+# 80cc builds and TIMER completes, but cycle counts are ~50x lower than
+# sccz80 under the same flags (e.g. ~2.6M vs ~144M). Correctness not
+# verified (PRINTF path hits an 80cc parse issue on multi-line printf).
+# Do not publish 80cc RESULT rows until validated.
 
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 binary-trees.c -o bt.bin -lmath48 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
@@ -40,7 +51,9 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks bt.bin -x bt.map -start TIMER_START -end TIMER_END -counter 999999999999
+z88dk-ticks bt.bin -x bt.map -start TIMER_START -end TIMER_STOP -counter 999999999999
+
+For 8085 binaries add -m8085.
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -52,12 +65,12 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK January 31, 2023
+Z88DK July 20, 2026
 classic/sccz80/8085
-3775 bytes less page zero
+3609 bytes less page zero
 
-cycle count  = 137783936
-time @ 4MHz  = 137783936 / 4*10^6 = 34.45 sec
+cycle count  = 127055600
+time @ 4MHz  = 127055600 / 4*10^6 = 31.76 sec
 
 
 Z88DK August 28, 2022

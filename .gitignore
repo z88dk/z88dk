@@ -49,3 +49,5 @@ win32/z88dk.VC.db
 win32/.github/copilot-instructions.md
 
 .idea
+.vs/
+*.tidy-stamp

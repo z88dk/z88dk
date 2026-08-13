@@ -56,8 +56,30 @@ void test_long_division()
 void test_long_mod()
 {
      int32_t val = -1;
-     Assert( val % 2           == 1, "val % 2");
-     Assert( val % 4           == 1, "val % 4");
+     Assert( val % 2           == -1, "val % 2");   /* C99: remainder takes the dividend's sign */
+     Assert( val % 4           == -1, "val % 4");
+}
+
+/* char operands must promote to int (value-preserving: signed char
+   sign-extends) before the 16-bit divide helper. A prior 80cc bug widened
+   signed-char operands with `ld h,0` (zero-extend), so -100/7 computed as
+   156/7 == 22. Globals keep the operands out of the constant folder so the
+   l_div / l_div_u helper path is exercised. */
+signed char   schar_a, schar_b;
+unsigned char uchar_a, uchar_b;
+
+void test_char_division()
+{
+    schar_a = -100; schar_b = 7;
+    Assert( schar_a / schar_b == -14, "schar -100 / 7");
+    Assert( schar_a % schar_b == -2,  "schar -100 % 7");
+    schar_b = -9;
+    Assert( schar_a / schar_b == 11,  "schar -100 / -9");
+    Assert( schar_a % schar_b == -1,  "schar -100 % -9");
+
+    uchar_a = 200; uchar_b = 7;
+    Assert( uchar_a / uchar_b == 28,  "uchar 200 / 7");
+    Assert( uchar_a % uchar_b == 4,   "uchar 200 % 7");
 }
 
 void test_signed_division()
@@ -77,9 +99,9 @@ void test_signed_mod()
 {
     int16_t val = -1;
 
-    Assert( val % 2  == 1, "-1 % 2");
+    Assert( val % 2  == -1, "-1 % 2");      /* C99: remainder takes the dividend's sign */
     Assert( val % -4  == -1, "-1 % -4");
-    Assert( val % 8  == 1, "-1 % 8");
+    Assert( val % 8  == -1, "-1 % 8");
     Assert( val % -16  == -1, "-1 % -16");
     Assert( -val % -32  == 1, " 1 % -32");
     Assert( -val % 64  == 1, " 1 % 64");
@@ -97,6 +119,7 @@ int suite_division()
   #endif
 #endif
 
+    suite_add_test(test_char_division);
     suite_add_test(test_ulong_division);
     suite_add_test(test_long_division);
     suite_add_test(test_long_mod);

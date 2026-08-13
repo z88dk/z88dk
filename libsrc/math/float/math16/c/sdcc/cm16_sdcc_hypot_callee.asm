@@ -1,6 +1,7 @@
 
 ; half __hypot_callee (half left, half right)
 
+SECTION code_clib
 SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_hypot_callee

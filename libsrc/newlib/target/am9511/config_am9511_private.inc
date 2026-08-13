@@ -91,16 +91,20 @@ defc __IO_APU_STATUS = 0x43
 ENDIF
 
 
+; Status register bit masks (AMD Am9511A datasheet — techdocs/amd/am9511a).
+; Layout: BUSY(7) SIGN(6) ZERO(5) ERROR[4:1] CARRY(0).
+; ERROR is a 4-bit *code* (not four independent sticky flags). While BUSY=1
+; other bits are undefined.  See libsrc/math/float/am9511/readme.md.
 defc __IO_APU_STATUS_BUSY = 0x80
 defc __IO_APU_STATUS_SIGN = 0x40
 defc __IO_APU_STATUS_ZERO = 0x20
-defc __IO_APU_STATUS_DIV0 = 0x10
-defc __IO_APU_STATUS_NEGRT = 0x08
-defc __IO_APU_STATUS_UNDFL = 0x04
-defc __IO_APU_STATUS_OVRFL = 0x02
+defc __IO_APU_STATUS_DIV0 = 0x10      ; error code 1000b
+defc __IO_APU_STATUS_NEGRT = 0x08     ; error code 0100b
+defc __IO_APU_STATUS_UNDFL = 0x04     ; error code XX10b
+defc __IO_APU_STATUS_OVRFL = 0x02     ; error code XX01b
 defc __IO_APU_STATUS_CARRY = 0x01
 
-defc __IO_APU_STATUS_ERROR = 0x1E
+defc __IO_APU_STATUS_ERROR = 0x1E     ; bits 4..1
 
 defc __IO_APU_COMMAND_SVREQ = 0x80
 

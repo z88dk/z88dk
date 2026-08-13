@@ -13,8 +13,12 @@ float m32_fmodf (float x, float y)
     long k;
     float d;
 
-    if (y == 0.0)
-        return 0.0;
+    if (y == 0.0) {
+        /* match m32_fsconst_pnan (0x7fffffff) */
+        union float_long fl;
+        fl.l = 0x7fffffff;
+        return fl.f;
+    }
 
     k = (long)(x / y); // Note: In some cases, d may be zero.
     d = x - (float)k * y;

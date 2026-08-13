@@ -37,41 +37,54 @@ END
 
 capture_ok("z88dk-z80asm -l ${test}.asm", "");
 
-capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF18
-  Name: ${test}
+capture_ok("z88dk-z80nm -a ${test}.o", <<'END');
+Object  file test_t_issue_0655_t.o at $0000: Z80RMF18
+  Name: test_t_issue_0655_t
   CPU:  z80 
   Section "": 0 bytes
   Section rodata_driver: 257 bytes
-    C \$0000: 55 C3 08 D8 C3 07 D8 AA C9 C9 00 00 00 00 00 00
-    C \$0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0040: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0060: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0070: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0090: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$00A0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$00B0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$00C0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$00D0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$00E0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$00F0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    C \$0100: 00
+    C $0000: 55 C3 08 D8 C3 07 D8 AA C9 C9 00 00 00 00 00 00
+    C $0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0040: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0060: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0070: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0090: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $00A0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $00B0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $00C0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $00D0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $00E0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $00F0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    C $0100: 00
   Section bss_user: 0 bytes
   Symbols:
-    L C \$D800: CBASE (section rodata_driver) (file ${test}.asm:11)
-    L C \$D807: CLEARBUF (section rodata_driver) (file ${test}.asm:16)
-    L C \$D808: COMMAND (section rodata_driver) (file ${test}.asm:17)
-    L = \$0000: ENTRY (section rodata_driver) (file ${test}.asm:5)
-    L A \$0000: TESTING1 (section rodata_driver) (file ${test}.asm:3)
-    L C \$D806: TESTING2 (section rodata_driver) (file ${test}.asm:14)
-    L C \$D900: _cpm_bdos_head (section rodata_driver) (file ${test}.asm:21)
-    L A \$0001: _rodata_cpm_ccp_head (section rodata_driver) (file ${test}.asm:7)
+    L C $D800: CBASE (section rodata_driver) (file test_t_issue_0655_t.asm:11)
+    L C $D807: CLEARBUF (section rodata_driver) (file test_t_issue_0655_t.asm:16)
+    L C $D808: COMMAND (section rodata_driver) (file test_t_issue_0655_t.asm:17)
+    L = $0000: ENTRY (section rodata_driver) (file test_t_issue_0655_t.asm:5)
+    L A $0000: TESTING1 (section rodata_driver) (file test_t_issue_0655_t.asm:3)
+    L C $D806: TESTING2 (section rodata_driver) (file test_t_issue_0655_t.asm:14)
+    L C $D900: _cpm_bdos_head (section rodata_driver) (file test_t_issue_0655_t.asm:21)
+    L A $0001: _rodata_cpm_ccp_head (section rodata_driver) (file test_t_issue_0655_t.asm:7)
   Expressions:
-    E = \$0001 \$0001 0: ENTRY := _cpm_bdos_head (section rodata_driver) (file ${test}.asm:5)
+    E =     $0001 $0001 0: ENTRY := _cpm_bdos_head (section rodata_driver) (file test_t_issue_0655_t.asm:5)
+  Strings:
+    S   1 = "test_t_issue_0655_t.asm"
+    S   2 = "rodata_driver"
+    S   3 = "ENTRY"
+    S   4 = "_cpm_bdos_head"
+    S   5 = "CBASE"
+    S   6 = "CLEARBUF"
+    S   7 = "COMMAND"
+    S   8 = "TESTING1"
+    S   9 = "TESTING2"
+    S  10 = "_rodata_cpm_ccp_head"
+    S  11 = "test_t_issue_0655_t"
+    S  12 = "bss_user"
 END
 
 unlink_testfiles;

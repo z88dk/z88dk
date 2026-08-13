@@ -9,66 +9,112 @@
 ;    Since some platform (expecially the TI83) has very little stack space,
 ;    we undersize it; this will cause a crash if a big area is filled.
 ;
-;    GENERIC VERSION
-;   IT DOESN'T MAKE USE OF ALTERNATE REGISTERS
-;   IT IS BASED ON "pointxy" and "plotpixel"
 ;
-;    $Id: dfill2.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
+;   GENERIC VERSION
+;
+;   ZX81 friendly (DOESN'T USE ALTERNATE REGISTERS)
+;   8080 compatibility (not much optimized but it works)
+;
+;   BASED ON "pointxy" and "plotpixel"
+;
+;
+;    $Id: dfill2.asm $
 ;
 
-
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
-    INCLUDE "classic/gfx/grafix.inc"
 
     SECTION code_graphics
+
+    INCLUDE "classic/gfx/grafix.inc"
+
     PUBLIC  do_fill
     EXTERN  pointxy
     EXTERN  plotpixel
 
 
+IF  __CPU_INTEL__|__CPU_GBZ80__
+
+SWAP_FILLPTR MACRO
+    push    de
+    ex      de,hl         ; de=prev
+    ld      hl,(fillptr)  ; hl=new
+    ex      de,hl         ; de=new, hl=prev
+    ld      (fillptr),hl  ; (filptr)=prev
+    ex      de,hl         ; hl=new
+    pop     de
+ENDM
+
+ENDIF
+
+
+
 ;ix points to the table on stack (above)
 
 ;Entry:
-;     d=x0 e=y0
+;     e=x0 d=y0
 
 do_fill:
-    ld      hl, -_GFX_MAXY*3                 ; create buffer 1 on stack
-    add     hl, sp                      ; The stack size depends on the display height.
-    ld      sp, hl                      ; The worst case is when we paint a blank
-    push    hl                          ; display starting from the center.
+    ld      (spsave),sp
+    ld      hl, -_GFX_MAXY*3      ; create buffer 1 on stack
+    add     hl, sp                ; The stack size depends on the display height.
+    ld      sp, hl                ; The worst case is when we paint a blank
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    push    hl                    ; display starting from the center.
     pop     ix
+ELSE
+    ld      (fillptr),hl
+ENDIF
+
     ld      (hl), d
     inc     hl
     ld      (hl), e
     inc     hl
     ld      (hl), 255
-    ld      hl, -_GFX_MAXY*3                 ; create buffer 2 on stack
+    ld      hl, -_GFX_MAXY*3      ; create buffer 2 on stack
     add     hl, sp
     ld      sp, hl
 
 loop:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
     push    hl
+ELSE
+    push    hl
+    SWAP_FILLPTR
+    push    hl
+ENDIF
+
     call    cfill
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     pop     ix
     pop     hl
-
-;.asave    ld    a,0
-    ;and    a
+ELSE
+    pop     hl                    ; prev ptr
+    SWAP_FILLPTR
+    pop     hl                    ; prev ptr
+    SWAP_FILLPTR
+ENDIF
 
     push    de
     pop     af
 
-    ;;ex    af,af    ; Restore the Z flag
+    ;;ex    af,af                 ; Restore the Z flag
     ;;push    af
     ;;ex    af,af
     ;;pop    af
 
     jr      nz, loop
-    ld      hl, _GFX_MAXY*6                  ; restore the stack pointer (parm*2)
-    add     hl, sp
+
+
+    ld      hl,(spsave)
     ld      sp, hl
     ret
+
+;    ld      hl, _GFX_MAXY*6       ; restore the stack pointer (parm*2)
+;    add     hl, sp
+;    ld      sp, hl
+;    ret
 
 cfill:
     ;sub    a,a    ; Reset the Z flag
@@ -78,14 +124,23 @@ cfill:
     push    af
     pop     de
 
-    ;ld    (asave+1),a
-
 next:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      a, (ix+0)
-    cp      255                         ; stopper ?
-    ret     z                           ; return
+    cp      255                   ; stopper ?
+    ret     z                     ; return
     ld      b, a
     ld      c, (ix+1)
+ELSE
+    ld      a, (hl)
+    cp      255                   ; stopper ?
+    ret     z                     ; return
+    ld      b, a
+    inc     hl
+    ld      a, (hl)
+    ld      c, a
+    dec     hl
+ENDIF
 
     push    bc
 
@@ -128,19 +183,22 @@ l3:
     call    doplot
 
 l4:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     inc     ix
     inc     ix
+ELSE
+    inc     hl
+    inc     hl
+ENDIF
     jr      next
 
 doplot:
     push    bc
-    ld      (hl), 255
-
     push    hl
     ld      l, b
     ld      h, c
 
-    ;call    pixeladdress    ; bc must be saved by pixeladdress !
+    ;call    pixeladdress         ; bc must be saved by pixeladdress !
     push    de
     call    pointxy
     pop     de
@@ -151,15 +209,9 @@ doplot:
     ret
 dontret:
 
-    or      b                           ; Z flag set...
-;    or 1
-;    and a
+    or      b                     ; Z flag set...
 
-    ;ld    (asave+1),a
     push    af
-    ;pop de
-
-;    ld    (de),a
 
     push    hl
     ld      l, b
@@ -169,20 +221,32 @@ dontret:
 
     pop     de
 
+IF  __CPU_INTEL__|__CPU_GBZ80__
+    SWAP_FILLPTR
+ENDIF
     pop     bc
     ld      (hl), b
     inc     hl
     ld      (hl), c
     inc     hl
     ld      (hl), 255
+IF  __CPU_INTEL__|__CPU_GBZ80__
+    SWAP_FILLPTR
+ENDIF
 
-    ;ex    af,af    ; Save the Z flag
+    ;ex    af,af                  ; Save the Z flag
 
     xor     a
 
     ret
 
+
     SECTION bss_graphics
+
 spsave:
+    defw    0
+
+IF  __CPU_INTEL__|__CPU_GBZ80__
+fillptr:
     defw    0
 ENDIF

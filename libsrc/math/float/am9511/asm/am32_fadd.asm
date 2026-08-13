@@ -5,7 +5,7 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, August 2020 / specials 2026
 ;
 ;-------------------------------------------------------------------------
 ; asm_am9511_fadd - am9511 floating point add
@@ -23,12 +23,15 @@ ENDIF
 EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
+EXTERN asm_am9511_spec_add
 
 PUBLIC asm_am9511_fadd, asm_am9511_fadd_callee
 
 
-; enter here for floating add, x+y, x on stack, y in dehl, result in dehl
 .asm_am9511_fadd
+    call asm_am9511_spec_add
+    ret C
+
     call asm_am9511_pushf           ; x
 
     call asm_am9511_pushf_fastcall  ; y
@@ -39,17 +42,25 @@ PUBLIC asm_am9511_fadd, asm_am9511_fadd_callee
     jp asm_am9511_popf
 
 
-; enter here for floating add callee, x+y, x on stack, y in dehl
 .asm_am9511_fadd_callee
-    call asm_am9511_pushf           ; x
+    call asm_am9511_spec_add
+    jr NC,acal_apu
+    pop bc
+    pop af
+    pop af
+    push bc
+    ret
 
-    call asm_am9511_pushf_fastcall  ; y
+.acal_apu
+    call asm_am9511_pushf
+
+    call asm_am9511_pushf_fastcall
 
     ld a,__IO_APU_OP_FADD
-    AM9511_OUT_APU_CONTROL        ; x + y
+    AM9511_OUT_APU_CONTROL
 
-    pop hl                          ; ret
+    pop hl
     pop de
-    ex (sp),hl                      ; ret back on stack
+    ex (sp),hl
 
     jp asm_am9511_popf

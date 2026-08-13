@@ -15146,11 +15146,16 @@
  rrd                            ; CD @__z80asm__rrd x
  rrhl                           ; CB 2C CB 1D
  rst 16                         ; D7
+ rst 2                          ; D7
  rst 24                         ; DF
+ rst 3                          ; DF
  rst 32                         ; E7
+ rst 4                          ; E7
  rst 40                         ; EF
+ rst 5                          ; EF
  rst 56                         ; FF
- rv                             ; BA 61 E8 18 01 C9
+ rst 7                          ; FF
+ rv                             ; BA 66 E8 18 01 C9
  rz                             ; C8
  sbb a                          ; 7F 9F
  sbb b                          ; 7F 98

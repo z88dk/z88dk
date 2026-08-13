@@ -66,6 +66,7 @@ ${NEWLIB_ROOT}l/sdcc/____sdcc_store_dehl_bcix
 ${NEWLIB_ROOT}l/sdcc/____sdcc_cpu_pop_ei
 ${NEWLIB_ROOT}l/sdcc/____sdcc_cpu_pop_ei_jp
 ${NEWLIB_ROOT}l/sdcc/____sdcc_cpu_push_di
+${NEWLIB_ROOT}l/sdcc/___sdcc_call_bc
 ${NEWLIB_ROOT}l/sdcc/___sdcc_call_hl
 ${NEWLIB_ROOT}l/sdcc/___sdcc_call_iy
 ${NEWLIB_ROOT}l/sdcc/___sdcc_enter_ix

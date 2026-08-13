@@ -1,0 +1,2 @@
+Object  file test_t_dump_cpu_t.o at $0000: Z80RMF06
+  Name: module1

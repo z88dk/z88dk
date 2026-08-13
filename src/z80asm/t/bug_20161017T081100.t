@@ -32,7 +32,14 @@ Object  file ${test}1.o at \$0000: Z80RMF18
     U         __LOADER_head
     U         __LOADER_tail
   Expressions:
-    E W \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+    E U16   \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+  Strings:
+    S   1 = "${test}1.asm"
+    S   2 = "LOADER"
+    S   3 = "__LOADER_tail-__LOADER_head"
+    S   4 = "__LOADER_head"
+    S   5 = "__LOADER_tail"
+    S   6 = "${test}1"
 END
 
 
@@ -49,7 +56,14 @@ Object  file ${test}1.o at \$0000: Z80RMF18
     U         __LOADER_head
     U         __LOADER_tail
   Expressions:
-    E W \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+    E U16   \$0000 \$0001 3: __LOADER_tail-__LOADER_head (section LOADER) (file ${test}1.asm:3)
+  Strings:
+    S   1 = "test_t_bug_20161017T081100_t1.asm"
+    S   2 = "LOADER"
+    S   3 = "__LOADER_tail-__LOADER_head"
+    S   4 = "__LOADER_head"
+    S   5 = "__LOADER_tail"
+    S   6 = "test_t_bug_20161017T081100_t1"
 END
 
 

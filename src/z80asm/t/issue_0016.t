@@ -27,6 +27,11 @@ Object  file test_t_issue_0016_t.o at $0000: Z80RMF18
   Symbols:
     L A $0001: local_function (section "") (file test_t_issue_0016_t.asm:3)
     G A $0000: test_function (section "") (file test_t_issue_0016_t.asm:2)
+  Strings:
+    S   1 = "local_function"
+    S   2 = "test_t_issue_0016_t.asm"
+    S   3 = "test_function"
+    S   4 = "test_t_issue_0016_t"
 END
 
 # assemble to a new object file in a different directory
@@ -45,6 +50,11 @@ Object  file test_t_issue_0016_t.dir/zcc0000.o at $0000: Z80RMF18
   Symbols:
     L A $0001: local_function (section "") (file test_t_issue_0016_t.asm:3)
     G A $0000: test_function (section "") (file test_t_issue_0016_t.asm:2)
+  Strings:
+    S   1 = "local_function"
+    S   2 = "test_t_issue_0016_t.asm"
+    S   3 = "test_function"
+    S   4 = "test_t_issue_0016_t"
 END
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;

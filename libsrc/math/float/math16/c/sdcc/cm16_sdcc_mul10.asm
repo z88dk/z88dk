@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_mul10

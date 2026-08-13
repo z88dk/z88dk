@@ -2182,7 +2182,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           ADC(xl,ALURxy_TICKS);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d) // (R4K) LD (PW+d),A
-        if (israbbit4k()) r4k_ld_ipdd_a(opc);
+        if (israbbit4k() && ih) r4k_ld_ipdd_a(opc);
         else if( ih )
           ADC(get_memory_data(l|h<<8),ALUiHL_TICKS);
         else if( iy )
@@ -4442,8 +4442,9 @@ static void handle_ed_page(void)
         else if ( israbbit4k()) r4k_test_rp2(opc, 0); //
         else UNDOCUMENTED_NEG();
         break;
-    case 0x5c:   // (Z180) MLT DE // (R6K) TEST DE
-        if ( canz180() ) z180_mlt(opc);
+    case 0x5c:   // (Z180) MLT DE // (R6K) TEST DE // (KC160) RET3
+        if ( iskc160() ) kc160_ret3(opc);
+        else if ( canz180() ) z180_mlt(opc);
         else if ( israbbit6k()) r4k_test_rp2(opc, 1);
         else UNDOCUMENTED_NEG();
         break;
@@ -4571,11 +4572,13 @@ static void handle_ed_page(void)
         if ( c_cpu & (CPU_R3K|CPU_R4K)) r3k_setusr(opc);
         else if ( !israbbit() ) zilog_rld(opc);
         break;
-    case 0x74: 
-        UNDOCUMENTED_NEG();
+    case 0x74:  // (KC160) DIV HL,A
+        if ( iskc160() ) kc160_div_hl_a(opc);
+        else UNDOCUMENTED_NEG();
         break;
-    case 0x75: 
-        if (israbbit4k()) r4k_syscall(opc);
+    case 0x75:  // (KC160) DIV DEHL,BC
+        if ( iskc160() ) kc160_div_dehl_bc(opc);
+        else if (israbbit4k()) r4k_syscall(opc);
         else UNDOCUMENTED_RETN();
         break;
     case 0x76:  // IM1 (undoc) // (RCM) PUSH IP // (Z180) SLP // (KC160) MUL HL

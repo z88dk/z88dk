@@ -1,7 +1,5 @@
 ; ----- void  plot_callee(int x, int y)
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
-
     SECTION code_graphics
 
     PUBLIC  plot_callee
@@ -14,6 +12,7 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  plotpixel
     INCLUDE "classic/gfx/grafix.inc"
 
+
 plot_callee:
 _plot_callee:
     pop     bc                          ; ret addr
@@ -22,7 +21,9 @@ _plot_callee:
     ld      h, e
     push    bc                          ; ret addr
 asm_plot:
+    IF  !__CPU_INTEL__&!__CPU_GBZ80__
     push    ix
+    ENDIF
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
   ENDIF
@@ -35,4 +36,3 @@ asm_plot:
     ENDIF
     ret
   ENDIF
-ENDIF

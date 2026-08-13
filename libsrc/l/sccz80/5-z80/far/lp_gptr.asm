@@ -14,16 +14,22 @@ lp_gptr:
     ld     bc,hl
     call    __far_page
     ; hl = physical address
+    ; Stash the low two bytes on the stack rather than in ix: ix is the
+    ; frame pointer under -frameix and must survive. l_far_incptrs preserves
+    ; af (push/pop), so the pushed bytes outlive each call; the saved bank
+    ; lives in af' (read by __far_end), so de/hl are free to rebuild here.
     ld      a,(hl)
-    ld      ixl,a
+    push    af
     call    l_far_incptrs
     ld      a,(hl)
-    ld      ixh,a
+    push    af
     call    l_far_incptrs
     ld      e,(hl)
     ld      d,0
-    push    ix
-    pop     hl
+    pop     af
+    ld      h,a
+    pop     af
+    ld      l,a
     ex      af,af
     call    __far_end
     ret

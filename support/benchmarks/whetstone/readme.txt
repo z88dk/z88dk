@@ -131,8 +131,27 @@ This time can be plugged into the whetstone formulas above to compute
 exact KWIPS performance.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt.
+
+Compiler | CPU  | Library | Ticks           | KWIPS @ 4 MHz
+---------|------|---------|-----------------|----------------
+sccz80   | z80  | math32  | 362_151_861     | 11.0451  (Aug 10, 2026)
+zsdcc    | z80  | math32  | 369_951_886     | 10.8122  (Aug 10, 2026)
+sccz80   | 8085 | math32  | 735_953_018   | 5.4351  (Aug 12, 2026)
+sccz80   | z80  | mbf32   | 544_395_320     | 7.3476  (Jul 2026)
+sccz80   | 8085 | mbf32   | 548_321_291     | 7.2950  (Jul 2026)
+80cc     | z80  | mbf32   | 558_782_473     | 7.1584  (Jul 2026)
+80cc     | 8085 | mbf32   | 561_486_320     | 7.1240  (Jul 2026)
+sccz80   | z80  | genmath | 1_284_172_870   | 3.1148
+80cc     | *    | math32  | SKIP — does not reach TIMER_STOP
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 HITECH C CPM V309-15
@@ -212,50 +231,103 @@ MWIPS        = 2.6816 / 1000 = 0.0026816
 SDCC implements its float library in C.
 
 8.
-Z88DK April 30, 2021
-zsdcc #12250 / new c library / math32
+Z88DK August 10, 2026
+zsdcc #15242 / new c library / math32
 24 bit mantissa + 8 bit exponent
-10113 bytes less page zero
+9963 bytes less page zero
 
-cycle count  = 576187434
-time @ 4MHz  = 576187434 / 4x10^6 = 144.0468 seconds
-KWIPS        = 100*10*1 / 144.0468 = 6.9421
-MWIPS        = 6.9421 / 1000 = 0.0069421
+cycle count  = 520667516
+time @ 4MHz  = 520667516 / 4x10^6 = 130.1669 seconds
+KWIPS        = 100*10*1 / 130.1669 = 7.6824
+MWIPS        = 7.6824 / 1000 = 0.0076824
 
 9.
-Z88DK January 3, 2022
+Z88DK August 10, 2026
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8861 bytes less page zero
+8980 bytes less page zero
 
-cycle count  = 568209557
-time @ 4MHz  = 568209557 / 4x10^6 = 142.0524 seconds
-KWIPS        = 100*10*1 / 142.0524 = 7.0396
-MWIPS        = 7.0396 / 1000 = 0.0070396
+cycle count  = 362118261
+time @ 4MHz  = 362118261 / 4x10^6 = 90.5296 seconds
+KWIPS        = 100*10*1 / 90.5296 = 11.0461
+MWIPS        = 11.0461 / 1000 = 0.0110461
 
 10.
-Z88DK January 3, 2022
-sccz80 / classic c library / MBF32
-Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-6237 bytes less page zero
+Z88DK August 10, 2026
+sccz80 / classic c library / math32
+IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+9811 bytes less page zero
 
-cycle count  = 547041311
-time @ 4MHz  = 547041311 / 4x10^6 = 136.7603 seconds
-KWIPS        = 100*10*1 / 136.7603 = 7.3121
-MWIPS        = 7.3121 / 1000 = 0.0073121
+cycle count  = 362151861
+time @ 4MHz  = 362151861 / 4x10^6 = 90.5380 seconds
+KWIPS        = 100*10*1 / 90.5380 = 11.0451
+MWIPS        = 11.0451 / 1000 = 0.0110451
+
+(After floor/ceil call fix and ldexp negative-pw2 fix; exp path correct.)
+
+10b.
+Z88DK August 10, 2026
+zsdcc / classic c library / math32
+IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+10592 bytes less page zero
+
+cycle count  = 369951886
+time @ 4MHz  = 369951886 / 4x10^6 = 92.4880 seconds
+KWIPS        = 100*10*1 / 92.4880 = 10.8122
+MWIPS        = 10.8122 / 1000 = 0.0108122
 
 11.
-Z88DK December 12, 2022
-sccz80 / classic c library / 8085 CPU / MBF32
-Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-6078 bytes less page zero
+Z88DK August 12, 2026
+sccz80 / classic c library / 8085 / math32
+IEEE 32-bit float (math32_8085)
+11560 bytes less page zero
 
-cycle count  = 549312725
-time @ 4MHz  = 549312725 / 4x10^6 = 137.3281 seconds
-KWIPS        = 100*10*1 / 137.3281 = 7.2818
-MWIPS        = 7.2818 / 1000 = 0.0072818
+cycle count  = 735953018
+time @ 4MHz  = 735953018 / 4x10^6 = 183.9883 seconds
+KWIPS        = 100*10*1 / 183.9883 = 5.4351
+MWIPS        = 5.4351 / 1000 = 0.0054351
 
 12.
+Z88DK July 19, 2026
+sccz80 / classic c library / MBF32
+Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
+6206 bytes less page zero
+
+cycle count  = 544395320
+time @ 4MHz  = 544395320 / 4x10^6 = 136.0988 seconds
+KWIPS        = 100*10*1 / 136.0988 = 7.3476
+MWIPS        = 7.3476 / 1000 = 0.0073476
+
+13.
+Z88DK July 20, 2026
+80cc / classic c library / MBF32
+10122 bytes less page zero
+
+cycle count  = 558782473
+time @ 4MHz  = 558782473 / 4x10^6 = 139.6956 seconds
+KWIPS        = 100*10*1 / 139.6956 = 7.1584
+MWIPS        = 7.1584 / 1000 = 0.0071584
+
+Z88DK July 20, 2026
+80cc / classic c library / 8085 / MBF32
+9670 bytes less page zero
+
+cycle count  = 561486320
+time @ 4MHz  = 561486320 / 4x10^6 = 140.3716 seconds
+KWIPS        = 100*10*1 / 140.3716 = 7.1240
+MWIPS        = 7.1240 / 1000 = 0.0071240
+
+Z88DK July 19, 2026
+sccz80 / classic c library / 8085 CPU / MBF32
+Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
+5959 bytes less page zero
+
+cycle count  = 548321291
+time @ 4MHz  = 548321291 / 4x10^6 = 137.0803 seconds
+KWIPS        = 100*10*1 / 137.0803 = 7.2950
+MWIPS        = 7.2950 / 1000 = 0.0072950
+
+14.
 HITECH C MSDOS V780pl2
 24 bit mantissa + 8 bit exponent
 6919 bytes exact

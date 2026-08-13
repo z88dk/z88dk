@@ -21325,7 +21325,6 @@
  rst 17                         ; Error
  rst 18                         ; Error
  rst 19                         ; Error
- rst 2                          ; Error
  rst 20                         ; Error
  rst 21                         ; Error
  rst 22                         ; Error
@@ -21335,7 +21334,6 @@
  rst 27                         ; Error
  rst 28                         ; Error
  rst 29                         ; Error
- rst 3                          ; Error
  rst 30                         ; Error
  rst 31                         ; Error
  rst 33                         ; Error
@@ -21345,7 +21343,6 @@
  rst 37                         ; Error
  rst 38                         ; Error
  rst 39                         ; Error
- rst 4                          ; Error
  rst 41                         ; Error
  rst 42                         ; Error
  rst 43                         ; Error
@@ -21355,7 +21352,6 @@
  rst 47                         ; Error
  rst 48                         ; Error
  rst 49                         ; Error
- rst 5                          ; Error
  rst 50                         ; Error
  rst 51                         ; Error
  rst 52                         ; Error
@@ -21364,7 +21360,6 @@
  rst 55                         ; Error
  rst 57                         ; Error
  rst 6                          ; Error
- rst 7                          ; Error
  rst 8                          ; Error
  rst 9                          ; Error
  rst v, 63                      ; Error

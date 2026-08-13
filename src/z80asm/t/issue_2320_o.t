@@ -40,6 +40,10 @@ Object  file $test.1.o at \$0000: Z80RMF18
   Section "": 0 bytes
   Symbols:
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
+  Strings:
+    S   1 = "the_answer"
+    S   2 = "$test.1.asm"
+    S   3 = "$test.1"
 END
 
 		capture_ok("z88dk-z80nm -a $test.1.lib", <<END);
@@ -50,7 +54,13 @@ Object  file $test.1.lib at \$0014: Z80RMF18
   Section "": 0 bytes
   Symbols:
     G C \$002A: the_answer (section "") (file $test.1.asm:2)
+  Strings:
+    S   1 = "the_answer"
+    S   2 = "$test.1.asm"
+    S   3 = "$test.1"
 
+Library public symbols:
+  P   1 = "the_answer"
 END
 
 		# link with object and library

@@ -119,7 +119,7 @@ struct _mapping {
         { "ftofix32s", "l_f48_ftofix32s", "l_f16_ftofix32s", "l_f32_ftofix32s", "l_f64_ftofix32s", "l_fix16_ftofix32s", NULL },
         { "ftofix32u", "l_f48_ftofix32u", "l_f16_ftofix32u", "l_f32_ftofix32u", "l_f64_ftofix32u", "l_fix16_ftofix32u", NULL },
         { "fix32tof", "l_f48_fix32tof", "l_f16_fix32tof", "l_f32_fix32tof", "l_f64_fix32tof", "l_fix16_fix32tof", NULL },
-        { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL, "l_fix16_inv", "l_fix32_inv" }, // Called only for IEEE mode
+        { "inversef", NULL, NULL, NULL,  NULL, "l_fix16_inv", "l_fix32_inv" }, 
         { NULL }
 };
 
@@ -1500,8 +1500,8 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
-        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & SAVEFRAME )) &&
-            (currfn->ctype->flags & NAKED) == 0) {
+        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->flags & SAVEFRAME )) &&
+            (currfn->flags & NAKED) == 0) {
             gen_pop_frame();
             Zsp += 2;
         }
@@ -2852,10 +2852,11 @@ void zdiv_const(LVALUE *lval, int64_t value64)
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
     if ( isrhs == 0 && value == 1.0 &&
-        (c_maths_mode == MATHS_IEEE || lval->val_type == KIND_FLOAT16 || lval->val_type == KIND_ACCUM16 || lval->val_type == KIND_ACCUM32)) {
+        (lval->val_type == KIND_ACCUM16 || lval->val_type == KIND_ACCUM32)) {
         dcallrts("inversef",lval->val_type);
         return 1;
     }
+
     return 0;
 }
 
@@ -2945,6 +2946,24 @@ void zmod_const(LVALUE *lval, int64_t value64)
         templval.ltype = type_uint;
     else
         templval.ltype = type_int;
+
+    /* The x & (2^k-1) bitmask shortcut below is only valid for UNSIGNED
+       modulo; for signed x it yields |x| & mask, not the C99 sign-of-dividend
+       result (e.g. -1 % 2 would give 1, not -1). Route signed `%` through the
+       sign-correct l_div / l_long_mod helper instead. (value 1 -> 0 holds
+       either way, so leave it to the switch.) */
+    if ( !ulvalue(lval) && value != 1 ) {
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_ACCUM32 ) {
+            lpush();
+            vlongconst(value);
+            zmod(lval);
+        } else {
+            const2(value & 0xffff);
+            swap();
+            zmod(&templval);
+        }
+        return;
+    }
 
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_ACCUM32 ) {
         if ( value <= 256 && value > 0 ) {
@@ -5351,8 +5370,8 @@ void OutIndex(int val)
 
 void gen_push_frame(void)
 {
-    if ( (currfn->ctype->flags & NAKED) == 0) {
-        if ( (currfn->ctype->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+    if ( (currfn->flags & NAKED) == 0) {
+        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
                 ot("push\t");
                 outstr(FRAME_REGISTER);
@@ -5376,8 +5395,8 @@ void gen_push_frame(void)
 
 void gen_pop_frame(void)
 {
-    if ( (currfn->ctype->flags & NAKED) == 0) {
-        if ( (currfn->ctype->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
+    if ( (currfn->flags & NAKED) == 0) {
+        if ( (currfn->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {
             if ( !IS_808x() && !IS_GBZ80() ) {
                 ot("pop\t");
                 outstr(FRAME_REGISTER);

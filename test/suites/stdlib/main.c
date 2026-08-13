@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
 #ifndef __8080
   #ifndef __GBZ80
     res += test_qsort();
-    res += test_qsort_newlib();
     res += test_bsearch();
+    // test_qsort_newlib() lives in its own binary (test_newlib.bin) -- see main_newlib.c
  #endif
 #endif
 

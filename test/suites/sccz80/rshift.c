@@ -9,41 +9,41 @@ void test_rshift16_var(void)
      int  v = 0;
 
      // RHS is folded by compiler
-     Assert( val >> v == 0x8000 >> 0, ">>0");
+     Assert( val >> v == (int)0x8000 >> 0, ">>0");
      ++v;
-     Assert( val >> v == 0x8000 >> 1, ">>1");
+     Assert( val >> v == (int)0x8000 >> 1, ">>1");
      ++v;
-     Assert( val >> v == 0x8000 >> 2, ">>2");
+     Assert( val >> v == (int)0x8000 >> 2, ">>2");
      ++v;
-     Assert( val >> v == 0x8000 >> 3, ">>3");
+     Assert( val >> v == (int)0x8000 >> 3, ">>3");
      ++v;
-     Assert( val >> v == 0x8000 >> 4, ">>4");
+     Assert( val >> v == (int)0x8000 >> 4, ">>4");
      ++v;
-     Assert( val >> v == 0x8000 >> 5, ">>5");
+     Assert( val >> v == (int)0x8000 >> 5, ">>5");
      ++v;
-     Assert( val >> v == 0x8000 >> 6, ">>6");
+     Assert( val >> v == (int)0x8000 >> 6, ">>6");
      ++v;
-     Assert( val >> v == 0x8000 >> 7, ">>7");
+     Assert( val >> v == (int)0x8000 >> 7, ">>7");
      ++v;
-     Assert( val >> v == 0x8000 >> 8, ">>8");
+     Assert( val >> v == (int)0x8000 >> 8, ">>8");
      ++v;
-     Assert( val >> v == 0x8000 >> 9, ">>9");
+     Assert( val >> v == (int)0x8000 >> 9, ">>9");
      ++v;
-     Assert( val >> v == 0x8000 >> 10, ">>10");
+     Assert( val >> v == (int)0x8000 >> 10, ">>10");
      ++v;
-     Assert( val >> v == 0x8000 >> 11, ">>11");
+     Assert( val >> v == (int)0x8000 >> 11, ">>11");
      ++v;
-     Assert( val >> v == 0x8000 >> 12, ">>12");
+     Assert( val >> v == (int)0x8000 >> 12, ">>12");
      ++v;
-     Assert( val >> v == 0x8000 >> 13, ">>13");
+     Assert( val >> v == (int)0x8000 >> 13, ">>13");
      ++v;
-     Assert( val >> v == 0x8000 >> 14, ">>14");
+     Assert( val >> v == (int)0x8000 >> 14, ">>14");
      ++v;
-     Assert( val >> v == 0x8000 >> 15, ">>15");
+     Assert( val >> v == (int)0x8000 >> 15, ">>15");
      ++v;
-//     Assert( val >> v == 0x8000 >> 16, ">>16"); // Undefined
+//     Assert( val >> v == (int)0x8000 >> 16, ">>16"); // Undefined
      ++v;
-//     Assert( val >> v == 0x8000 >> 17, ">>17"); // Undefined
+//     Assert( val >> v == (int)0x8000 >> 17, ">>17"); // Undefined
 }
 
 void test_rshift32_var(void)
@@ -52,73 +52,73 @@ void test_rshift32_var(void)
      int  v = 0;
 
      // RHS is folded by compiler
-     Assert( val >> v == 0x80000000L >> 0, ">>0");
+     Assert( val >> v == (long)0x80000000L >> 0, ">>0");
      ++v;
-     Assert( val >> v == 0x80000000L >> 1, ">>1");
+     Assert( val >> v == (long)0x80000000L >> 1, ">>1");
      ++v;
-     Assert( val >> v == 0x80000000L >> 2, ">>2");
+     Assert( val >> v == (long)0x80000000L >> 2, ">>2");
      ++v;
-     Assert( val >> v == 0x80000000L >> 3, ">>3");
+     Assert( val >> v == (long)0x80000000L >> 3, ">>3");
      ++v;
-     Assert( val >> v == 0x80000000L >> 4, ">>4");
+     Assert( val >> v == (long)0x80000000L >> 4, ">>4");
      ++v;
-     Assert( val >> v == 0x80000000L >> 5, ">>5");
+     Assert( val >> v == (long)0x80000000L >> 5, ">>5");
      ++v;
-     Assert( val >> v == 0x80000000L >> 6, ">>6");
+     Assert( val >> v == (long)0x80000000L >> 6, ">>6");
      ++v;
-     Assert( val >> v == 0x80000000L >> 7, ">>7");
+     Assert( val >> v == (long)0x80000000L >> 7, ">>7");
      ++v;
-     Assert( val >> v == 0x80000000L >> 8, ">>8");
+     Assert( val >> v == (long)0x80000000L >> 8, ">>8");
      ++v;
-     Assert( val >> v == 0x80000000L >> 9, ">>9");
+     Assert( val >> v == (long)0x80000000L >> 9, ">>9");
      ++v;
-     Assert( val >> v == 0x80000000L >> 10, ">>10");
+     Assert( val >> v == (long)0x80000000L >> 10, ">>10");
      ++v;
-     Assert( val >> v == 0x80000000L >> 11, ">>11");
+     Assert( val >> v == (long)0x80000000L >> 11, ">>11");
      ++v;
-     Assert( val >> v == 0x80000000L >> 12, ">>12");
+     Assert( val >> v == (long)0x80000000L >> 12, ">>12");
      ++v;
-     Assert( val >> v == 0x80000000L >> 13, ">>13");
+     Assert( val >> v == (long)0x80000000L >> 13, ">>13");
      ++v;
-     Assert( val >> v == 0x80000000L >> 14, ">>14");
+     Assert( val >> v == (long)0x80000000L >> 14, ">>14");
      ++v;
-     Assert( val >> v == 0x80000000L >> 15, ">>15");
+     Assert( val >> v == (long)0x80000000L >> 15, ">>15");
      ++v;
-     Assert( val >> v == 0x80000000L >> 16, ">>16");
+     Assert( val >> v == (long)0x80000000L >> 16, ">>16");
      ++v;
-     Assert( val >> v == 0x80000000L >> 17, ">>17");
+     Assert( val >> v == (long)0x80000000L >> 17, ">>17");
      ++v;
-     Assert( val >> v == 0x80000000L >> 18, ">>18");
+     Assert( val >> v == (long)0x80000000L >> 18, ">>18");
      ++v;
-     Assert( val >> v == 0x80000000L >> 19, ">>19");
+     Assert( val >> v == (long)0x80000000L >> 19, ">>19");
      ++v;
-     Assert( val >> v == 0x80000000L >> 20, ">>20");
+     Assert( val >> v == (long)0x80000000L >> 20, ">>20");
      ++v;
-     Assert( val >> v == 0x80000000L >> 21, ">>21");
+     Assert( val >> v == (long)0x80000000L >> 21, ">>21");
      ++v;
-     Assert( val >> v == 0x80000000L >> 22, ">>22");
+     Assert( val >> v == (long)0x80000000L >> 22, ">>22");
      ++v;
-     Assert( val >> v == 0x80000000L >> 23, ">>23");
+     Assert( val >> v == (long)0x80000000L >> 23, ">>23");
      ++v;
-     Assert( val >> v == 0x80000000L >> 24, ">>24");
+     Assert( val >> v == (long)0x80000000L >> 24, ">>24");
      ++v;
-     Assert( val >> v == 0x80000000L >> 25, ">>25");
+     Assert( val >> v == (long)0x80000000L >> 25, ">>25");
      ++v;
-     Assert( val >> v == 0x80000000L >> 26, ">>26");
+     Assert( val >> v == (long)0x80000000L >> 26, ">>26");
      ++v;
-     Assert( val >> v == 0x80000000L >> 27, ">>27");
+     Assert( val >> v == (long)0x80000000L >> 27, ">>27");
      ++v;
-     Assert( val >> v == 0x80000000L >> 28, ">>28");
+     Assert( val >> v == (long)0x80000000L >> 28, ">>28");
      ++v;
-     Assert( val >> v == 0x80000000L >> 29, ">>29");
+     Assert( val >> v == (long)0x80000000L >> 29, ">>29");
      ++v;
-     Assert( val >> v == 0x80000000L >> 30, ">>30");
+     Assert( val >> v == (long)0x80000000L >> 30, ">>30");
      ++v;
-     Assert( val >> v == 0x80000000L >> 31, ">>31");
+     Assert( val >> v == (long)0x80000000L >> 31, ">>31");
      ++v;
-//     Assert( val >> v == 0x80000000L >> 32, ">>32"); // Undefined behaviour
+//     Assert( val >> v == (long)0x80000000L >> 32, ">>32"); // Undefined behaviour
      ++v;
-//     Assert( val >> v == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
+//     Assert( val >> v == (long)0x80000000L >> 33, ">>33"); // Undefined, but it should match
 }
 
 void test_rshift8_const(void)
@@ -142,24 +142,24 @@ void test_rshift16_const(void)
      int val = 0x8000;
 
      // RHS is folded by compiler
-     Assert( val >> 0 == 0x8000 >> 0, ">>0");
-     Assert( val >> 1 == 0x8000 >> 1, ">>1");
-     Assert( val >> 2 == 0x8000 >> 2, ">>2");
-     Assert( val >> 3 == 0x8000 >> 3, ">>3");
-     Assert( val >> 4 == 0x8000 >> 4, ">>4");
-     Assert( val >> 5 == 0x8000 >> 5, ">>5");
-     Assert( val >> 6 == 0x8000 >> 6, ">>6");
-     Assert( val >> 7 == 0x8000 >> 7, ">>7");
-     Assert( val >> 8 == 0x8000 >> 8, ">>8");
-     Assert( val >> 9 == 0x8000 >> 9, ">>9");
-     Assert( val >> 10 == 0x8000 >> 10, ">>10");
-     Assert( val >> 11 == 0x8000 >> 11, ">>11");
-     Assert( val >> 12 == 0x8000 >> 12, ">>12");
-     Assert( val >> 13 == 0x8000 >> 13, ">>13");
-     Assert( val >> 14 == 0x8000 >> 14, ">>14");
-     Assert( val >> 15 == 0x8000 >> 15, ">>15");
-//     Assert( val >> 16 == 0x8000 >> 16, ">>16"); // Undefined
-//     Assert( val >> 17 == 0x8000 >> 17, ">>17"); // Undefined
+     Assert( val >> 0 == (int)0x8000 >> 0, ">>0");
+     Assert( val >> 1 == (int)0x8000 >> 1, ">>1");
+     Assert( val >> 2 == (int)0x8000 >> 2, ">>2");
+     Assert( val >> 3 == (int)0x8000 >> 3, ">>3");
+     Assert( val >> 4 == (int)0x8000 >> 4, ">>4");
+     Assert( val >> 5 == (int)0x8000 >> 5, ">>5");
+     Assert( val >> 6 == (int)0x8000 >> 6, ">>6");
+     Assert( val >> 7 == (int)0x8000 >> 7, ">>7");
+     Assert( val >> 8 == (int)0x8000 >> 8, ">>8");
+     Assert( val >> 9 == (int)0x8000 >> 9, ">>9");
+     Assert( val >> 10 == (int)0x8000 >> 10, ">>10");
+     Assert( val >> 11 == (int)0x8000 >> 11, ">>11");
+     Assert( val >> 12 == (int)0x8000 >> 12, ">>12");
+     Assert( val >> 13 == (int)0x8000 >> 13, ">>13");
+     Assert( val >> 14 == (int)0x8000 >> 14, ">>14");
+     Assert( val >> 15 == (int)0x8000 >> 15, ">>15");
+//     Assert( val >> 16 == (int)0x8000 >> 16, ">>16"); // Undefined
+//     Assert( val >> 17 == (int)0x8000 >> 17, ">>17"); // Undefined
 }
 
 void test_rshift32_const(void)
@@ -167,40 +167,40 @@ void test_rshift32_const(void)
      long val = 0x80000000;
 
      // RHS is folded by compiler
-     Assert( val >> 0 == 0x80000000L >> 0, ">>0");
-     Assert( val >> 1 == 0x80000000L >> 1, ">>1");
-     Assert( val >> 2 == 0x80000000L >> 2, ">>2");
-     Assert( val >> 3 == 0x80000000L >> 3, ">>3");
-     Assert( val >> 4 == 0x80000000L >> 4, ">>4");
-     Assert( val >> 5 == 0x80000000L >> 5, ">>5");
-     Assert( val >> 6 == 0x80000000L >> 6, ">>6");
-     Assert( val >> 7 == 0x80000000L >> 7, ">>7");
-     Assert( val >> 8 == 0x80000000L >> 8, ">>8");
-     Assert( val >> 9 == 0x80000000L >> 9, ">>9");
-     Assert( val >> 10 == 0x80000000L >> 10, ">>10");
-     Assert( val >> 11 == 0x80000000L >> 11, ">>11");
-     Assert( val >> 12 == 0x80000000L >> 12, ">>12");
-     Assert( val >> 13 == 0x80000000L >> 13, ">>13");
-     Assert( val >> 14 == 0x80000000L >> 14, ">>14");
-     Assert( val >> 15 == 0x80000000L >> 15, ">>15");
-     Assert( val >> 16 == 0x80000000L >> 16, ">>16");
-     Assert( val >> 17 == 0x80000000L >> 17, ">>17");
-     Assert( val >> 18 == 0x80000000L >> 18, ">>18");
-     Assert( val >> 19 == 0x80000000L >> 19, ">>19");
-     Assert( val >> 20 == 0x80000000L >> 20, ">>20");
-     Assert( val >> 21 == 0x80000000L >> 21, ">>21");
-     Assert( val >> 22 == 0x80000000L >> 22, ">>22");
-     Assert( val >> 23 == 0x80000000L >> 23, ">>23");
-     Assert( val >> 24 == 0x80000000L >> 24, ">>24");
-     Assert( val >> 25 == 0x80000000L >> 25, ">>25");
-     Assert( val >> 26 == 0x80000000L >> 26, ">>26");
-     Assert( val >> 27 == 0x80000000L >> 27, ">>27");
-     Assert( val >> 28 == 0x80000000L >> 28, ">>28");
-     Assert( val >> 29 == 0x80000000L >> 29, ">>29");
-     Assert( val >> 30 == 0x80000000L >> 30, ">>30");
-     Assert( val >> 31 == 0x80000000L >> 31, ">>31");
-//     Assert( val >> 32 == 0x80000000L >> 32, ">>32"); // Undefined behaviour
-//     Assert( val >> 33 == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
+     Assert( val >> 0 == (long)0x80000000L >> 0, ">>0");
+     Assert( val >> 1 == (long)0x80000000L >> 1, ">>1");
+     Assert( val >> 2 == (long)0x80000000L >> 2, ">>2");
+     Assert( val >> 3 == (long)0x80000000L >> 3, ">>3");
+     Assert( val >> 4 == (long)0x80000000L >> 4, ">>4");
+     Assert( val >> 5 == (long)0x80000000L >> 5, ">>5");
+     Assert( val >> 6 == (long)0x80000000L >> 6, ">>6");
+     Assert( val >> 7 == (long)0x80000000L >> 7, ">>7");
+     Assert( val >> 8 == (long)0x80000000L >> 8, ">>8");
+     Assert( val >> 9 == (long)0x80000000L >> 9, ">>9");
+     Assert( val >> 10 == (long)0x80000000L >> 10, ">>10");
+     Assert( val >> 11 == (long)0x80000000L >> 11, ">>11");
+     Assert( val >> 12 == (long)0x80000000L >> 12, ">>12");
+     Assert( val >> 13 == (long)0x80000000L >> 13, ">>13");
+     Assert( val >> 14 == (long)0x80000000L >> 14, ">>14");
+     Assert( val >> 15 == (long)0x80000000L >> 15, ">>15");
+     Assert( val >> 16 == (long)0x80000000L >> 16, ">>16");
+     Assert( val >> 17 == (long)0x80000000L >> 17, ">>17");
+     Assert( val >> 18 == (long)0x80000000L >> 18, ">>18");
+     Assert( val >> 19 == (long)0x80000000L >> 19, ">>19");
+     Assert( val >> 20 == (long)0x80000000L >> 20, ">>20");
+     Assert( val >> 21 == (long)0x80000000L >> 21, ">>21");
+     Assert( val >> 22 == (long)0x80000000L >> 22, ">>22");
+     Assert( val >> 23 == (long)0x80000000L >> 23, ">>23");
+     Assert( val >> 24 == (long)0x80000000L >> 24, ">>24");
+     Assert( val >> 25 == (long)0x80000000L >> 25, ">>25");
+     Assert( val >> 26 == (long)0x80000000L >> 26, ">>26");
+     Assert( val >> 27 == (long)0x80000000L >> 27, ">>27");
+     Assert( val >> 28 == (long)0x80000000L >> 28, ">>28");
+     Assert( val >> 29 == (long)0x80000000L >> 29, ">>29");
+     Assert( val >> 30 == (long)0x80000000L >> 30, ">>30");
+     Assert( val >> 31 == (long)0x80000000L >> 31, ">>31");
+//     Assert( val >> 32 == (long)0x80000000L >> 32, ">>32"); // Undefined behaviour
+//     Assert( val >> 33 == (long)0x80000000L >> 33, ">>33"); // Undefined, but it should match
 }
 
 void test_rshift32_const_unsigned(void)

@@ -43,7 +43,7 @@ sub check_bin_file {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
 	my $got_bin = slurp($got_file);
-	eq_or_dump_diff($got_bin, $exp_bin, "bin file $got_file ok");
+	eq_or_dump_diff($exp_bin, $got_bin, "bin file $got_file ok");
 	
 	(Test::More->builder->is_passing) or die;
 }

@@ -1,22 +1,31 @@
-	section	.text,%1
+	%3section%2.text,%1
 =
 	SECTION	code_compiler
 
-	section	.rodata,%1
+	%3section%2.rodata,%1
 =
 	SECTION rodata_compiler
 
-	section	.bss,%1
+	%3section%2.bss,%1
 =
 	SECTION bss_compiler
 
-	section	.data,%1
+	%3section%2.data,%1
 =
 	SECTION data_compiler
 
-	section	.data.%2,%1
+	%3section%2.data.%2,%1
 =
 	SECTION data_compiler
+
+	.ident%1
+=
+;	.ident%1
+
+	.section%2
+=
+;	.section%2
+	SECTION UNASSIGNED
 
 	assume	adl = 1
 =

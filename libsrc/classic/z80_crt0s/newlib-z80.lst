@@ -71,9 +71,9 @@
 ../../math/integer/l_mulu_64_64x64
 ../../math/integer/l_mulu_72_64x8
 ../../math/integer/l_mulu_de
-../../math/float/math32/z80/f32_z80_mulu_32h_24x24
-../../math/float/math32/z80/f32_z80_mulu_32h_32x32
-../../math/float/math32/z80/f32_z80_sqr_32h_24x24
+../../math/float/math32/asm/z80/f32_z80_mulu_32h_24x24
+../../math/float/math32/asm/z80/f32_z80_mulu_32h_32x32
+../../math/float/math32/asm/z80/f32_z80_sqr_32h_24x24
 ../../arch/z80/z80/asm_z80_delay_ms
 ../../arch/z80/z80/asm_z80_delay_tstate
 

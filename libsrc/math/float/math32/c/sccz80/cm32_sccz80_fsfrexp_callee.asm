@@ -6,17 +6,17 @@ PUBLIC cm32_sccz80_frexp_callee
 EXTERN m32_fsfrexp_callee
 
 ; float frexpf(float x, int16_t *pw2);
+; sccz80: SP = ret, ptr, x.HL, x.DE
+; core:   SP = ret, x.HL, x.DE, ptr  (same as am9511 / Z80 math32)
+;
+; Reverse like cam32_sccz80_frexp_callee (ret in HL, not AF).
 .cm32_sccz80_frexp_callee
-    ; Entry:
-    ; Stack: float left, ptr right, ret
-
-    ; Reverse the stack
-    pop af                      ;my return
-    pop bc                      ;ptr
-    pop hl                      ;float
-    pop de
-    push bc                     ;ptr
-    push de                     ;float
-    push hl
-    push af                     ;my return
-    jp  m32_fsfrexp_callee
+    pop hl                          ; ret
+    pop bc                          ; ptr
+    pop de                          ; x.HL
+    ex (sp),hl                      ; HL = x.DE; (sp) = ret
+    push bc                         ; ptr
+    push hl                         ; x.DE
+    push de                         ; x.HL
+    call m32_fsfrexp_callee
+    ret

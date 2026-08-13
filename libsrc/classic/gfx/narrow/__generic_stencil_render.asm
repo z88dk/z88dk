@@ -1,7 +1,7 @@
 ;
 ;    z88dk GFX library
 ;    Render the "stencil" - plot/unplot based version.
-;     Stefano - Jul 2017
+;     Stefano - Jul 2017, June 2026
 ;
 ;    Render the "stencil".
 ;    The dithered horizontal lines base their pattern on the Y coordinate
@@ -15,8 +15,8 @@
 
     INCLUDE "classic/gfx/grafix.inc"
 
-IF  !__CPU_INTEL__&!__CPU_GBZ80__
     SECTION code_graphics
+
     PUBLIC  __generic_stencil_render
     EXTERN  dither_pattern
 
@@ -27,13 +27,25 @@ IF  !__CPU_INTEL__&!__CPU_GBZ80__
     EXTERN  __graphics_end
 
 ;
-;    $Id: stencil_render2.asm - Stefano Exp, 2017 $
+;    $Id: __generic_stencil_render.asm $
 ;
 
 __generic_stencil_render:
-    push    ix
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+    push    ix                          ;save callers
     ld      ix, 4
     add     ix, sp
+ELSE
+    ld      hl,2
+    add     hl, sp
+    ld      a,(hl)
+    ld      (smc1),a
+    inc     hl
+    inc     hl
+    ld      hl,(hl)
+    ld      (smc2),hl
+ENDIF
 
   IFDEF _GFX_PAGE_VRAM
     call    __gfx_vram_page_in
@@ -61,14 +73,20 @@ yloop:
     ENDIF
     ret
   ENDIF
+
 noret:
     push    bc
 
     ld      d, 0
     ld      e, c
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      l, (ix+2)                   ; stencil
     ld      h, (ix+3)
+ELSE
+    ld      hl,(smc2)
+ENDIF
+
     add     hl, de
     ld      a, (hl)                     ;X1
 
@@ -87,7 +105,12 @@ noret:
     ld      a, (hl)
     ld      b, a                        ; X2
 
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     ld      a, (ix+0)                   ; intensity
+ELSE
+    ld      a, (smc1)
+ENDIF
+
     call    dither_pattern
     ;ld    (pattern2+1),a
     ld      e, a
@@ -98,7 +121,15 @@ noret:
     ; adjust horizontal pattern position for the current line
     and     7
 pattern_shift:
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
+ELSE
+    push    af
+    ld      a,e
+    rrca
+    ld      e,a
+    pop     af
+ENDIF
     dec     a
     jr      nz, pattern_shift
 
@@ -112,7 +143,15 @@ pattern_shift:
     ld      l, c                        ; Y
 xloop:
     ;;;ld    h,a    ; X1
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
     rrc     e                           ; shifted pattern
+ELSE
+    push    af
+    ld      a,e
+    rrca
+    ld      e,a
+    pop     af
+ENDIF
     push    hl
     push    de
     push    bc
@@ -135,5 +174,20 @@ done:
     jr      nz, xloop
 
     jr      yloop
+
+
+    SECTION bss_graphics
+
+IF  !__CPU_INTEL__&!__CPU_GBZ80__
+
+; Z80 has got index registers
+
+ELSE
+
+smc1:
+    defb    0
+
+smc2:
+    defw    0
 
 ENDIF

@@ -15,11 +15,13 @@ l_i64_mod_u:
 	ld	de,__i64_extra
 	ld	bc,8
 	ldir
+	push	ix
 	ld	ix,__i64_extra
 	call	l_divu_64_64x64
 	;dehl'dehl = remainder, copy it into fac
 	ld	bc,__i64_acc
 	call	l_store_64_dehldehl_mbc
+	pop	ix
 	pop	de
         ld      hl,8
         add     hl,sp

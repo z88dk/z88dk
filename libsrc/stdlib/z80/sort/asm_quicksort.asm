@@ -66,7 +66,26 @@ SECTION code_stdlib
 
 PUBLIC asm_quicksort
 
-EXTERN __sort_parameters, asm0_memswap, l_compare_de_hl
+EXTERN __sort_parameters, asm0_memswap
+
+; The comparator is reached differently depending on the C library:
+;
+;   newlib  : ix = raw comparator; l_compare_de_hl marshals args per the
+;             (single) compiler this library was built for.
+;   classic : one shared library serves both sccz80 and sdcc, so the
+;             comparator ABI cannot be baked in at library build time.
+;             Instead ix points at a 6-byte on-stack closure
+;                 ix-3: jp user_fn
+;                 ix+0: jp <per-compiler comparator thunk>
+;             built by the qsort/bsearch entry (classic/stdlib/{qsort,_qsort}.asm).
+;             The core just does jp (ix) (l_jpix); the thunk does the
+;             save/marshal/call/sign-extract that l_compare_de_hl would.
+
+IF __CLASSIC
+   EXTERN l_jpix
+ELSE
+   EXTERN l_compare_de_hl
+ENDIF
 
 asm_quicksort:
 
@@ -403,7 +422,11 @@ left_squeeze_1:
    ; ix = compare
    ; stack = hi, j
    
+   IF __CLASSIC
+   call l_jpix                   ; compare(de=lo=pivot, hl=i) via closure thunk
+   ELSE
    call l_compare_de_hl          ; compare(de=lo=pivot, hl=i)
+   ENDIF
    
    ex de,hl
    ex (sp),hl
@@ -467,7 +490,11 @@ right_squeeze_1:
    ; ix = compare
    ; stack = hi, i
    
+   IF __CLASSIC
+   call l_jpix                 ; compare(de=j, hl=lo=pivot) via closure thunk
+   ELSE
    call l_compare_de_hl        ; compare(de=j, hl=lo=pivot)
+   ENDIF
    ex (sp),hl
 
    ; de = j

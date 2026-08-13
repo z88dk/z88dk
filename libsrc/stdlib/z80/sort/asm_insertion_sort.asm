@@ -16,7 +16,13 @@ PUBLIC asm_insertion_sort
 PUBLIC asm0_insertion_sort
 
 EXTERN error_znc
-EXTERN __sort_parameters, l_compare_de_hl, asm0_memswap
+EXTERN __sort_parameters, asm0_memswap
+
+IF __CLASSIC
+   EXTERN l_jpix               ; classic: comparator reached via ix closure (see asm_quicksort.asm)
+ELSE
+   EXTERN l_compare_de_hl
+ENDIF
 
 asm_insertion_sort:
 
@@ -92,7 +98,11 @@ insert_loop:
    
    sbc hl,bc                   ; hl = j-1
 
+   IF __CLASSIC
+   call l_jpix                 ; via closure thunk
+   ELSE
    call l_compare_de_hl
+   ENDIF
    jp p, insert_exit           ; if array[j] >= array[j-1]
 
    push bc

@@ -29,6 +29,8 @@ ENDIF
     SECTION data_video_vdp
     SECTION data_user
     SECTION data_alloc_balloc
+    SECTION data_stdlib
+    SECTION data_fcntl
     SECTION data_SMSlib
 
     ; Alignment sections

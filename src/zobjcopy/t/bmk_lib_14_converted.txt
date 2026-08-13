@@ -30,19 +30,39 @@ Object  file test2.lib at $0014: Z80RMF18
     U         ext1
     U         ext2
   Expressions:
-    E U $0000 $0001 2: start1 % 256 (section text_1) (file file1.asm:123)
-    E u $0000 $0001 2: 256 (section text_1) (file file1.asm:123)
-    E = $0000 $0000 2: _start := start1 (section text_1) (file file1.asm:321)
-    E B $0000 $0001 2: start1 (section text_1) (file file1.asm:231)
-    E J $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
-    E P $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
-    E S $0000 $0001 2: start2 % 127 (section text_2) (file file1.asm:132)
-    E s $0000 $0001 2: 256 (section text_2) (file file1.asm:132)
-    E W $0000 $0001 2: msg1 (section data_1) (file file1.asm:231)
-    E W $0000 $0001 2: ext1 (section data_1) (file file1.asm:231)
-    E W $0000 $0001 2: msg2-msg1 (section data_1) (file file1.asm:231)
-    E L $0000 $0001 2: msg2 (section data_2) (file file1.asm:321)
-    E L $0000 $0001 2: ext2 (section data_2) (file file1.asm:321)
+    E U8    $0000 $0001 2: start1 % 256 (section text_1) (file file1.asm:123)
+    E U8-16 $0000 $0001 2: 256 (section text_1) (file file1.asm:123)
+    E =     $0000 $0000 2: _start := start1 (section text_1) (file file1.asm:321)
+    E U16BE $0000 $0001 2: start1 (section text_1) (file file1.asm:231)
+    E J8    $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
+    E U24   $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
+    E S8    $0000 $0001 2: start2 % 127 (section text_2) (file file1.asm:132)
+    E S8-16 $0000 $0001 2: 256 (section text_2) (file file1.asm:132)
+    E U16   $0000 $0001 2: msg1 (section data_1) (file file1.asm:231)
+    E U16   $0000 $0001 2: ext1 (section data_1) (file file1.asm:231)
+    E U16   $0000 $0001 2: msg2-msg1 (section data_1) (file file1.asm:231)
+    E S32   $0000 $0001 2: msg2 (section data_2) (file file1.asm:321)
+    E S32   $0000 $0001 2: ext2 (section data_2) (file file1.asm:321)
+  Strings:
+    S   1 = "file1.asm"
+    S   2 = "text_1"
+    S   3 = "start1 % 256"
+    S   4 = "256"
+    S   5 = "_start"
+    S   6 = "start1"
+    S   7 = "text_2"
+    S   8 = "start2 % 127"
+    S   9 = "data_1"
+    S  10 = "msg1"
+    S  11 = "ext1"
+    S  12 = "msg2-msg1"
+    S  13 = "data_2"
+    S  14 = "msg2"
+    S  15 = "ext2"
+    S  16 = "main"
+    S  17 = "start2"
+    S  18 = "file1"
+    S  19 = "base"
 
 Object  file test2.lib at $04C4: Z80RMF18
   Name: file1
@@ -75,17 +95,42 @@ Object  file test2.lib at $04C4: Z80RMF18
     U         ext1
     U         ext2
   Expressions:
-    E U $0000 $0001 2: start1 % 256 (section text_1) (file file1.asm:123)
-    E u $0000 $0001 2: 256 (section text_1) (file file1.asm:123)
-    E = $0000 $0000 2: _start := start1 (section text_1) (file file1.asm:321)
-    E B $0000 $0001 2: start1 (section text_1) (file file1.asm:231)
-    E J $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
-    E P $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
-    E S $0000 $0001 2: start2 % 127 (section text_2) (file file1.asm:132)
-    E s $0000 $0001 2: 256 (section text_2) (file file1.asm:132)
-    E W $0000 $0001 2: msg1 (section data_1) (file file1.asm:231)
-    E W $0000 $0001 2: ext1 (section data_1) (file file1.asm:231)
-    E W $0000 $0001 2: msg2-msg1 (section data_1) (file file1.asm:231)
-    E L $0000 $0001 2: msg2 (section data_2) (file file1.asm:321)
-    E L $0000 $0001 2: ext2 (section data_2) (file file1.asm:321)
+    E U8    $0000 $0001 2: start1 % 256 (section text_1) (file file1.asm:123)
+    E U8-16 $0000 $0001 2: 256 (section text_1) (file file1.asm:123)
+    E =     $0000 $0000 2: _start := start1 (section text_1) (file file1.asm:321)
+    E U16BE $0000 $0001 2: start1 (section text_1) (file file1.asm:231)
+    E J8    $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
+    E U24   $0000 $0001 2: start1 (section text_1) (file file1.asm:456)
+    E S8    $0000 $0001 2: start2 % 127 (section text_2) (file file1.asm:132)
+    E S8-16 $0000 $0001 2: 256 (section text_2) (file file1.asm:132)
+    E U16   $0000 $0001 2: msg1 (section data_1) (file file1.asm:231)
+    E U16   $0000 $0001 2: ext1 (section data_1) (file file1.asm:231)
+    E U16   $0000 $0001 2: msg2-msg1 (section data_1) (file file1.asm:231)
+    E S32   $0000 $0001 2: msg2 (section data_2) (file file1.asm:321)
+    E S32   $0000 $0001 2: ext2 (section data_2) (file file1.asm:321)
+  Strings:
+    S   1 = "file1.asm"
+    S   2 = "text_1"
+    S   3 = "start1 % 256"
+    S   4 = "256"
+    S   5 = "_start"
+    S   6 = "start1"
+    S   7 = "text_2"
+    S   8 = "start2 % 127"
+    S   9 = "data_1"
+    S  10 = "msg1"
+    S  11 = "ext1"
+    S  12 = "msg2-msg1"
+    S  13 = "data_2"
+    S  14 = "msg2"
+    S  15 = "ext2"
+    S  16 = "main"
+    S  17 = "start2"
+    S  18 = "file1"
+    S  19 = "base"
 
+Library public symbols:
+  P   1 = "main"
+  P   2 = "_start"
+  P   3 = "msg1"
+  P   4 = "msg2"

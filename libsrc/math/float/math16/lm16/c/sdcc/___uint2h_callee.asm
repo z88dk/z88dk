@@ -1,4 +1,5 @@
 
+    SECTION code_clib
     SECTION code_fp_math16
 
     PUBLIC ___uint2h_callee

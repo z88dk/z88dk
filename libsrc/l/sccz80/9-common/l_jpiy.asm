@@ -1,14 +1,14 @@
-SECTION smc_clib
 
-PUBLIC l_jpiy, l_iy_addr
-EXTERN l_ret
+SECTION code_clib
+SECTION code_l_sccz80
+
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+
+
+PUBLIC l_jpiy
 
 l_jpiy:
-    jp l_ret    ; The jp address is modified by l_setiy.
 
-    ; You MUST call l_setiy first!
-    ; This should never happen, but just in case it does.. l_ret
+   jp (iy)
 
-defc l_iy_addr = l_jpiy+1
-
-; use for library code only!
+ENDIF

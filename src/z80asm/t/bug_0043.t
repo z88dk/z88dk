@@ -25,7 +25,12 @@ Object  file $test.o at \$0000: Z80RMF18
   Externs:
     U         one
   Expressions:
-    E W \$0000 \$0000 2: $sum (section "") (file $test.asm:2)
+    E U16   \$0000 \$0000 2: $sum (section "") (file $test.asm:2)
+  Strings:
+    S   1 = "test_t_bug_0043_t.asm"
+    S   2 = "$sum"
+    S   3 = "one"
+    S   4 = "test_t_bug_0043_t"
 END
 
 unlink_testfiles;

@@ -1,4 +1,3 @@
 @classic/stdio/stdio.lst
 
-
-target/s1mp3/**/*.o
+target/s1mp3/obj/s1mp3/**/*.o
