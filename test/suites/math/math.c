@@ -367,15 +367,15 @@ static int sp_iszero(FLOAT x)
 #define sp_iszero(x) ((x) == (FLOAT)0.0)
 #endif
 
-/* Runtime cells so 1/0 and Inf−Inf are not folded away at compile time.
- * 80cc algebraically rewrites `x - x` / same-SSA `x / x` to 0/1; load
- * both operands from distinct static storage so the library runs. */
+/* Runtime zeros so 1/0 is not a compile-time constant.
+ * Direct Inf−Inf / Inf/Inf (same local) is intentional: those ops are
+ * IEEE specials, not algebraic identities.  A compiler that folds float
+ * self-ops (x−x → 0, x/x → 1) will fail these cases — that is a gate. */
 static FLOAT sp_z, sp_o, sp_n1;
-static FLOAT sp_a, sp_b;
 
 void test_specials_div()
 {
-    FLOAT r;
+    FLOAT r, pinf;
 
     sp_z = (FLOAT)0.0;
     sp_o = (FLOAT)1.0;
@@ -388,41 +388,38 @@ void test_specials_div()
     r = sp_z / sp_z;
     Assert(sp_isnan(r), "0/0 is NaN");
 
-    sp_a = sp_o / sp_z;         /* +Inf */
-    r = sp_o / sp_a;
+    pinf = sp_o / sp_z;
+    r = sp_o / pinf;
     Assert(sp_iszero(r), "1/Inf is 0");
-    r = sp_a / sp_o;
+    r = pinf / sp_o;
     Assert(sp_isinf(r), "Inf/1 is Inf");
-    sp_b = sp_a;
-    r = sp_a / sp_b;
+    r = pinf / pinf;
     Assert(sp_isnan(r), "Inf/Inf is NaN");
 }
 
 void test_specials_mul_add()
 {
-    FLOAT r;
+    FLOAT r, pinf, nanv;
 
     sp_z = (FLOAT)0.0;
     sp_o = (FLOAT)1.0;
-    sp_a = sp_o / sp_z;         /* +Inf */
-    sp_b = sp_z / sp_z;         /* NaN */
+    pinf = sp_o / sp_z;
+    nanv = sp_z / sp_z;
 
-    r = sp_a + sp_a;
+    r = pinf + pinf;
     Assert(sp_isinf(r), "Inf+Inf is Inf");
-    sp_b = sp_a;                /* second Inf in distinct cell */
-    r = sp_a - sp_b;
+    r = pinf - pinf;
     Assert(sp_isnan(r), "Inf-Inf is NaN");
-    r = sp_o + sp_a;
+    r = sp_o + pinf;
     Assert(sp_isinf(r), "1+Inf is Inf");
 
-    r = sp_z * sp_a;
+    r = sp_z * pinf;
     Assert(sp_isnan(r), "0*Inf is NaN");
-    r = sp_o * sp_a;
+    r = sp_o * pinf;
     Assert(sp_isinf(r), "1*Inf is Inf");
-    sp_b = sp_z / sp_z;         /* NaN again after overwrite */
-    r = sp_b * sp_o;
+    r = nanv * sp_o;
     Assert(sp_isnan(r), "NaN*1 is NaN");
-    r = sp_b + sp_o;
+    r = nanv + sp_o;
     Assert(sp_isnan(r), "NaN+1 is NaN");
 }
 
