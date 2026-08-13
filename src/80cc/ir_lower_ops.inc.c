@@ -2447,19 +2447,94 @@ static void gen_port_out(FILE *out, const Op *op)
    existing sp-relative path, which is cheaper than reaching IX by hand anyway.
    fp mode only: without a frame register there is no indexed form to reach. */
 #define FRAME_IX_NONE (-100000)
+
+/* The frame slot this access names, or -1. `*ofs` receives the byte
+   displacement into it (the LEA's folded member offset plus the access's own
+   offset). */
+static int frame_slot_of(const Func *f, const Op *op, int *ofs)
+{
+    if (op->mem.kind != IR_MEM_VREG || op->mem.base < 0) return -1;
+    if (op->mem.base >= f->n_vregs || !g_hc.lea_def) return -1;
+    const Op *d = g_hc.lea_def[op->mem.base];
+    if (!d || d->src[0] < 0 || d->src[0] >= f->n_vregs) return -1;
+    if (slot_off(f, d->src[0]) < 0) return -1;
+    *ofs = (int)d->imm + op->mem.offset;
+    return d->src[0];
+}
+
+/* True when a word at `ofs` into `slot`'s frame slot has a direct addressing
+   form on this target — the same ladder load_to_hl_adj walks for a scalar
+   local: indexed off the frame register, Rabbit/kc160 sp-relative, or 8085
+   LDSI. Out of every range, the caller materialises the address instead. */
+static int frame_direct_ok(const Func *f, int slot, int ofs, int width)
+{
+    if (opt_disabled("frame-index")) return 0;
+    if (fp_active(f) && !L.cur_frameless) {
+        int d = slot_ix_off(f, slot) + ofs;
+        if (fp_offset_fits(d) && (width == 1 || fp_offset_fits(d + 1))) return 1;
+    }
+    int off = slot_off(f, slot) + L.cur_sp_adjust + ofs;
+    if (off < 0) return 0;
+    if (width == 2 && off <= sp_rel_max(f)) return 1;
+    /* 8085 LDSI+LHLX/SHLX is deliberately NOT offered here. The scalar slot
+       path uses it, but routing a member access through it miscompiled
+       long_ir test_struct (`struct copy *ptr = *ptr`) and the cause is not
+       yet understood — the emitted offsets account for the in-flight `push
+       de`, so something else about parking DE across the access is wrong. */
+    return 0;
+}
+
 static int frame_ix_disp(const Func *f, const Op *op, int width)
 {
+    if (opt_disabled("frame-index")) return FRAME_IX_NONE;
+    int ofs, slot = frame_slot_of(f, op, &ofs);
+    if (slot < 0) return FRAME_IX_NONE;
     if (!fp_active(f) || L.cur_frameless) return FRAME_IX_NONE;
-    if (op->mem.kind != IR_MEM_VREG || op->mem.base < 0) return FRAME_IX_NONE;
-    if (op->mem.base >= f->n_vregs) return FRAME_IX_NONE;
-    if (!g_hc.lea_def) return FRAME_IX_NONE;
-    const Op *d = g_hc.lea_def[op->mem.base];
-    if (!d || d->src[0] < 0 || d->src[0] >= f->n_vregs) return FRAME_IX_NONE;
-    if (slot_off(f, d->src[0]) < 0) return FRAME_IX_NONE;
-    int disp = slot_ix_off(f, d->src[0]) + (int)d->imm + op->mem.offset;
+    int disp = slot_ix_off(f, slot) + ofs;
     if (!fp_offset_fits(disp)) return FRAME_IX_NONE;
     if (width == 2 && !fp_offset_fits(disp + 1)) return FRAME_IX_NONE;
     return disp;
+}
+
+/* Word load from a frame slot at a displacement, via whichever direct form the
+   target has. Advertises nothing about the slot's own vreg — this is a part of
+   the slot, not its value. Returns 1 if emitted. */
+static int emit_frame_word_load(FILE *out, const Func *f, int slot, int ofs,
+                                const char *vol)
+{
+    if (fp_active(f) && !L.cur_frameless) {
+        int d = slot_ix_off(f, slot) + ofs;
+        if (fp_offset_fits(d) && fp_offset_fits(d + 1)) {
+            emit(out, "ld\thl,(%s%+d)%s", frame_reg(), d, vol);
+            return 1;
+        }
+    }
+    int off = slot_off(f, slot) + L.cur_sp_adjust + ofs;
+    if (off >= 0 && off <= sp_rel_max(f)) {
+        emit(out, "ld\thl,(sp+%d)%s", off, vol);
+        return 1;
+    }
+    return 0;
+}
+
+/* Word store of HL to a frame slot at a displacement. Mirror of the load.
+   Returns 1 if emitted; HL still holds the value afterwards. */
+static int emit_frame_word_store(FILE *out, const Func *f, int slot, int ofs,
+                                 const char *vol)
+{
+    if (fp_active(f) && !L.cur_frameless) {
+        int d = slot_ix_off(f, slot) + ofs;
+        if (fp_offset_fits(d) && fp_offset_fits(d + 1)) {
+            emit(out, "ld\t(%s%+d),hl%s", frame_reg(), d, vol);
+            return 1;
+        }
+    }
+    int off = slot_off(f, slot) + L.cur_sp_adjust + ofs;
+    if (off >= 0 && off <= sp_rel_max(f)) {
+        emit(out, "ld\t(sp+%d),hl%s", off, vol);
+        return 1;
+    }
+    return 0;
 }
 
 /* True when the LEA's dst is read only as the base of loads/stores that
@@ -2483,7 +2558,10 @@ static int lea_all_uses_indexed(const Func *f, const Op *lea)
                   ? ((o->dst >= 0) ? f->vregs[o->dst].width : 0)
                   : kind_scalar_width(o->mem.elem);
             if (w != 1 && w != 2) return 0;
-            if (frame_ix_disp(f, o, w) == FRAME_IX_NONE) return 0;
+            int uofs, uslot = frame_slot_of(f, o, &uofs);
+            if (uslot < 0) return 0;
+            if (w == 1) { if (frame_ix_disp(f, o, 1) == FRAME_IX_NONE) return 0; }
+            else if (!frame_direct_ok(f, uslot, uofs, 2)) return 0;
             seen++;
         }
     return seen > 0;
@@ -2607,17 +2685,19 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            FRAME_IX_NONE and fall through to the address-materialising path. */
         if (op->dst >= 0 && op->mem.post_step == 0 && !mem_bank_fn(&op->mem)) {
             int _w = f->vregs[op->dst].width;
-            if (_w == 1 || _w == 2) {
-                int disp = frame_ix_disp(f, op, _w);
+            int _ofs, _slot = frame_slot_of(f, op, &_ofs);
+            if (_slot >= 0 && _w == 1) {
+                int disp = frame_ix_disp(f, op, 1);
                 if (disp != FRAME_IX_NONE) {
-                    if (_w == 1) {
-                        emit(out, "ld\ta,(%s%+d)%s", frame_reg(), disp,
-                             mem_vol_stamp(op));
-                        return finalize_byte_result(out, f, op, 1);
-                    }
-                    hl_about_to_change(-1);
-                    emit(out, "ld\thl,(%s%+d)%s", frame_reg(), disp,
+                    emit(out, "ld\ta,(%s%+d)%s", frame_reg(), disp,
                          mem_vol_stamp(op));
+                    return finalize_byte_result(out, f, op, 1);
+                }
+            }
+            if (_slot >= 0 && _w == 2 && frame_direct_ok(f, _slot, _ofs, 2)) {
+                hl_about_to_change(-1);
+                if (emit_frame_word_load(out, f, _slot, _ofs,
+                                         mem_vol_stamp(op))) {
                     commit_hl_result(out, f, op->dst);
                     return 0;
                 }
@@ -3162,20 +3242,24 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
            write through the frame register instead of building the address. */
         if (op->src[0] >= 0 && op->mem.post_step == 0 && !mem_bank_fn(&op->mem)) {
             int _w = kind_scalar_width(op->mem.elem);
-            if (_w == 1 || _w == 2) {
-                int disp = frame_ix_disp(f, op, _w);
+            int _ofs, _slot = frame_slot_of(f, op, &_ofs);
+            if (_slot >= 0 && _w == 1) {
+                int disp = frame_ix_disp(f, op, 1);
                 if (disp != FRAME_IX_NONE) {
-                    if (_w == 1) {
-                        load_byte_to_a(out, f, op->src[0]);
-                        emit(out, "ld\t(%s%+d),a%s", frame_reg(), disp,
-                             mem_vol_stamp(op));
-                        return 0;
-                    }
-                    load_to_hl(out, f, op->src[0]);
-                    emit(out, "ld\t(%s%+d),hl%s", frame_reg(), disp,
+                    load_byte_to_a(out, f, op->src[0]);
+                    emit(out, "ld\t(%s%+d),a%s", frame_reg(), disp,
                          mem_vol_stamp(op));
                     return 0;
                 }
+            }
+            /* Test the addressing form BEFORE loading the value — falling
+               through with it already in HL only makes the generic path
+               reload it. */
+            if (_slot >= 0 && _w == 2 && frame_direct_ok(f, _slot, _ofs, 2)) {
+                load_to_hl(out, f, op->src[0]);
+                if (emit_frame_word_store(out, f, _slot, _ofs,
+                                          mem_vol_stamp(op)))
+                    return 0;
             }
         }
         /* Constant value folded into op->imm by ir_opt_const_fold. Store the
