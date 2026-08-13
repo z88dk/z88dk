@@ -8,7 +8,8 @@ SUBDIRS += charbench crcbench intbench ptrbench sieve rle \
            structbench vecbench recordbench maskbench \
            strbench listbench interpbench matrixbench \
            hashbench fixedbench histbench lexbench \
-           bitfieldbench widthbench predbench
+           bitfieldbench widthbench predbench \
+           shiftbench localbench divbench callbench
 
 ifeq ($(COMPILER),80cc)
 SUBDIRS += long_ir debuginfo
