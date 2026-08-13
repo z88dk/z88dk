@@ -1551,6 +1551,8 @@ typedef struct {
     int   opidx;       /* position of the mem op in the BB */
     int   addr_def;    /* position of the address ADD (mem.base's def) in the BB */
     int   gbase;       /* the non-index (grid base) operand vreg */
+    int   gslot;       /* if gbase is an IR_LEA: the frame slot it names, else -1 */
+    long  gofs;        /* ... and the LEA's folded byte displacement */
     int   shift;       /* SHL scale k */
     long  konst;       /* index constant (elements) */
     int   nterms;
@@ -1590,12 +1592,28 @@ static int addr_desc_build(Func *f, Op **defmap, const int *defpos,
     out->opidx = j;
     out->addr_def = (p < f->n_vregs) ? defpos[p] : -1;
     out->gbase = gbase; out->shift = k; out->addr_vreg = p;
+    /* `&local` gets a fresh vreg at every use (IR_LEA is not CSE-eligible —
+       it is rematerialised instead), so comparing gbase by vreg id would treat
+       three accesses to one array as three different bases. Record what the
+       LEA actually names so they can be matched by identity instead. */
+    out->gslot = -1; out->gofs = 0;
+    if (gbase >= 0 && gbase < f->n_vregs) {
+        const Op *gd = defmap[gbase];
+        if (gd && gd->kind == IR_LEA && gd->src[0] >= 0) {
+            out->gslot = gd->src[0];
+            out->gofs  = (long)gd->imm;
+        }
+    }
     return 1;
 }
 
 static int addr_desc_same_group(const MemDesc *a, const MemDesc *b)
 {
-    if (a->gbase != b->gbase || a->shift != b->shift) return 0;
+    if (a->shift != b->shift) return 0;
+    /* Same vreg, or two rematerialised LEAs naming the same slot+displacement. */
+    if (a->gbase != b->gbase
+        && !(a->gslot >= 0 && a->gslot == b->gslot && a->gofs == b->gofs))
+        return 0;
     if (a->nterms != b->nterms) return 0;
     for (int i = 0; i < a->nterms; i++)
         if (a->terms[i].vreg != b->terms[i].vreg
