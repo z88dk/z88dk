@@ -1206,8 +1206,11 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
            Right shift only — the LEFT shift has no use for it, because gbz80's
            `add a,a` is 1 byte / 4 cycles and four of them already match
            swap+and. Logical only: swap does not propagate a sign. */
-        if (IS_GBZ80() && !arith && count >= 4) {
-            emit(out, "swap\ta");
+        if ((IS_GBZ80() || IS_Z80N()) && !arith && count >= 4) {
+            /* z80n spells the same nibble exchange SWAPNIB (ed 23), also on A
+               and also 2 bytes. Its barrel shifts are no use here — they work
+               on DE with the count in B, not on a byte in A. */
+            emit(out, IS_Z80N() ? "swapnib" : "swap\ta");
             emit(out, "and\t%d", 0x0f);
             for (int k = 4; k < count; k++) emit(out, "srl\ta");
             return finalize_byte_result(out, f, op, 0);
