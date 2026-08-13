@@ -2389,7 +2389,7 @@ static int narrow_def_kind(const Func *f, const Op *op)
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
    is clear — so v's value provably fits in 8 bits and a zero/cond test on
    its low byte is a test of the whole value. */
-static int v_fits_byte(const Func *f, int v)
+static int v_fits_byte_d(const Func *f, int v, int depth)
 {
     int seen = 0;
     for (int b = 0; b < f->n_bbs; b++) {
@@ -2422,11 +2422,24 @@ static int v_fits_byte(const Func *f, int v)
                a bool is nearly always consumed. */
             if (cmp_result_kind(op))
                 continue;
+            /* A copy of a value that fits a byte fits a byte too. CSE folds a
+               duplicate CONV_ZX into a MOV from the first one, so without this
+               the SECOND byte shift of the same value in a function is refused
+               while the first is allowed — which is what kept the byte-shift
+               narrowing (and the gbz80 swap that rides on it) from firing
+               anywhere in the corpus. Depth-limited: copy chains are short, and
+               the bound also stops a MOV cycle from recursing. */
+            if (op->kind == IR_MOV && depth < 4
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && v_fits_byte_d(f, op->src[0], depth + 1))
+                continue;
             return 0;
         }
     }
     return seen;
 }
+
+static int v_fits_byte(const Func *f, int v) { return v_fits_byte_d(f, v, 0); }
 
 /* True if EVERY def of v is a sign-extend of a byte source — so v's value
    provably fits a signed byte [-128,127] and its sign bit is bit 7 (not
