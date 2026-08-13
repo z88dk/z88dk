@@ -911,7 +911,7 @@ static Node *try_simplify_binop(Node *node)
    the largest power of 2 that fits in a signed 16-bit int (well, 16384
    does — 32768 wraps to MIN_INT, but as a multiply factor it's fine).
    Caller should still respect the operand's bit width. */
-static int extract_pow2(int64_t v, int *shift)
+int extract_pow2(int64_t v, int *shift)
 {
     if (v <= 0) return 0;
     if (v & (v - 1)) return 0;  /* not a power of 2 */
