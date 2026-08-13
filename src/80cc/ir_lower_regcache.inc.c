@@ -1104,6 +1104,19 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
+    /* A REMAT word (LD_IMM / LD_SYM / LEA) has NO SLOT by construction — its
+       readers re-materialise it. The byte reads below would address its absent
+       slot: slot_off returns -1, so sp-mode emitted `ld hl,-1; add hl,sp;
+       ld a,(hl)` and read BELOW the stack. Re-materialise into HL and take the
+       low byte. Only surfaces where the value is read a BYTE at a time — the
+       word paths (load_to_hl/de/bc) already call emit_remat_word. */
+    if (vreg_id >= 0 && f->vregs[vreg_id].width == 2
+        && vreg_is_remat(f, vreg_id)) {
+        if (emit_remat_word(out, f, vreg_id, "hl")) {
+            emit(out, "ld\ta,l");
+            return;
+        }
+    }
     /* Past the register-cache hits: a slot read follows (fp or sp). */
     ss_note_reload(f, vreg_id);
     if (fp_active(f)) {
