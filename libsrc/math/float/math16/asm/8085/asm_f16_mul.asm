@@ -260,7 +260,8 @@ PUBLIC f16_8085_mulu_32_16x16
     ld e,a
     jp asm_f16_inf
 
-.hmul_y_hi                      ; y exp 31; HL=y DE=x; [sign][uret]
+; y.exp == 31.  HL=y DE=x; [sign][uret]
+.hmul_y_hi
     ld a,h
     and 003h
     or l

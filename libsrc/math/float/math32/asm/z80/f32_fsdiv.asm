@@ -122,60 +122,66 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     add hl,sp
     ld (hl),a                   ; sign
 
-    ; ---- specials ----
+    ; ---- specials gate (packed IEEE on frame) ----
+    ; a@+8..+11, b@+14..+17, sign@+7.  High byte = seeeeeee.
+    ; Finite nonzero falls through; exp 0 / 255 handled here.
+    ;
+    ;   a/0 → ±Inf (0/0 → NaN)   finite/Inf → ±0   Inf/Inf → NaN
+    ;   Inf/finite → ±Inf         NaN/* → NaN        */NaN → NaN
+    ;
     ld a,e                      ; aH
     and 07fh
     cp 07fh
-    jr NZ,div_a_ok
+    jr NZ,div_a_finite
     ld hl,10
     add hl,sp
-    bit 7,(hl)                  ; aL
-    jr Z,div_a_ok
+    bit 7,(hl)                  ; aL bit7 = exp LSB → must be 1 for exp 255
+    jr Z,div_a_finite
     ld a,(hl)
     and 07fh
     dec hl
     or (hl)                     ; aD
     dec hl
     or (hl)                     ; aE
-    jp NZ,div_nan
+    jp NZ,div_nan               ; a NaN
     ld hl,17
     add hl,sp
     ld a,(hl)
     and 07fh
     cp 07fh
-    jp NZ,div_inf
+    jp NZ,div_inf               ; Inf / finite-or-0
     dec hl
     bit 7,(hl)
     jp Z,div_inf
-    jp div_nan
+    jp div_nan                  ; Inf / Inf or Inf / NaN-high
 
-.div_a_ok
+.div_a_finite
     ld hl,17
     add hl,sp
-    ld a,(hl)                   ; b3
+    ld a,(hl)                   ; bH
     and 07fh
     cp 07fh
-    jr NZ,div_b_ok
+    jr NZ,div_b_finite
     dec hl
-    bit 7,(hl)                  ; b2
-    jr Z,div_b_ok
+    bit 7,(hl)                  ; b exp LSB
+    jr Z,div_b_finite
     ld a,(hl)
     and 07fh
     dec hl
     or (hl)
     dec hl
     or (hl)
-    jp NZ,div_nan
-    jp div_zero
+    jp NZ,div_nan               ; finite / NaN
+    jp div_zero                 ; finite / Inf → 0
 
-.div_b_ok
-    ; math32: exp==0 is ±0 (denormals not supported → flush to zero)
+.div_b_finite
+    ; exp==0 is ±0 (no denormals)
     ld hl,17
     add hl,sp
-    ld a,(hl)                   ; b3
+    ld a,(hl)                   ; bH
     add a,a
     ld b,a
-    dec hl                      ; b2
+    dec hl
     ld a,(hl)
     rlca
     and 1
@@ -192,7 +198,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     and 1
     or b                        ; exp a
     jp Z,div_nan                ; 0/0
-    jp div_inf                  ; x/0
+    jp div_inf                  ; finite/0
 
 .div_b_nz
     ld hl,11
@@ -200,12 +206,12 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld a,(hl)                   ; aH
     add a,a
     ld b,a
-    dec hl                      ; aL
+    dec hl
     ld a,(hl)
     rlca
     and 1
     or b                        ; exp a
-    jp Z,div_zero               ; 0/y (incl. denormal a)
+    jp Z,div_zero               ; 0 / finite
     ld c,a                      ; C = exp a (1..254)
     ; ---- unpack a → r +3..+5, exp → +6 (normals only) ----
     ld a,(hl)

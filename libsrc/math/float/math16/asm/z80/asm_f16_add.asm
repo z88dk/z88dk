@@ -103,7 +103,9 @@ PUBLIC asm_f24_add_f24
     xor e                       ; check if op1.s==op2.s
     ex af,af                    ; save results sign in f' (C clear in af')
 
-    ; cold: either exp 255 (half Inf/NaN expanded). primary=y, alt=x
+    ; ---- specials gate (f24 exp 255 = half Inf/NaN) ----
+    ; Finite: 2×(ld/inc/jp) + 2×exx.  primary=y, alt=x.
+    ;   NaN ± * → NaN;  Inf ± finite → Inf;  Inf−Inf → NaN
     ld a,d
     inc a
     jp Z,hadd_spec_y
@@ -254,16 +256,16 @@ PUBLIC asm_f24_add_f24
     jp asm_f24_normalize        ; now begin to normalize with dehl
 
     ; ---- cold specials (f24: Inf HL=0, NaN HL≠0, exp 255) ----
-    ; entry: primary=y for hadd_spec_y; primary=x for hadd_spec_x
 
-.hadd_spec_y                    ; y exp 255
+; y.exp == 255.  Primary = y, alt = x.
+.hadd_spec_y
     ld a,h
     or l
     jp NZ,asm_f24_nan           ; y NaN
     exx
     ld a,d
     inc a
-    jr NZ,hadd_ret_inf_y        ; Inf + finite → y Inf
+    jr NZ,hadd_ret_inf_y        ; Inf ± finite → y Inf
     ld a,h
     or l
     jp NZ,asm_f24_nan           ; x NaN
@@ -273,9 +275,10 @@ PUBLIC asm_f24_add_f24
     exx                         ; y primary
     jp asm_f24_inf
 
-.hadd_spec_x                    ; x exp 255, y finite; primary=x
+; x.exp == 255, y finite.  Primary = x.
+.hadd_spec_x
     ld a,h
     or l
-    jp NZ,asm_f24_nan
-    jp asm_f24_inf
+    jp NZ,asm_f24_nan           ; x NaN
+    jp asm_f24_inf              ; Inf ± finite → x Inf
 

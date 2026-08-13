@@ -70,7 +70,11 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     call unpack_push                ; X
     ; +0 X +6 Y +12 flag +14 ret +16 left
 
-    ; cold: either exp 255 (Inf/NaN)
+    ; ---- specials gate (finite: two exp loads + inc/jp) ----
+    ; X = left (stack), Y = right (was DEHL).  exp == 255 only.
+    ;   NaN ± *     → NaN
+    ;   Inf ± finite → Inf (sign of the Inf)
+    ;   Inf + Inf   → Inf if same sign, else NaN
     ld de,sp+4
     ld a,(de)                       ; X.exp
     inc a
@@ -190,9 +194,12 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     scf
     jp epi
 
-    ; ---- cold specials (mant NaN: L[6:0]|E|D in slot) ----
+    ; ---- cold specials ----
+    ; Slot mant: +0 L (MSB, implicit 1 in bit7), +2 E, +3 D.
+    ; NaN if L[6:0]|E|D nonzero after unpack.
 
-.fa_spec_x                          ; X.exp == 255
+; X.exp == 255 (left).
+.fa_spec_x
     ld de,sp+0
     ld a,(de)
     and 07fh
@@ -208,7 +215,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld de,sp+10
     ld a,(de)
     inc a
-    jp NZ,fa_ret_inf_x              ; Inf + finite/0
+    jp NZ,fa_ret_inf_x              ; Inf ± finite/0 → X Inf
+    ; Y also exp 255
     ld de,sp+6
     ld a,(de)
     and 07fh
@@ -239,7 +247,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld hl,0
     jp epi
 
-.fa_spec_y                          ; Y.exp == 255, X finite
+; Y.exp == 255, X finite (right Inf wins).
+.fa_spec_y
     ld de,sp+6
     ld a,(de)
     and 07fh
@@ -263,7 +272,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .fa_ret_nan
     ld de,07fffh
-    ld hl,0ffffh                    ; canonical +NaN (m32_fsconst_pnan)
+    ld hl,0ffffh                    ; canonical +NaN
     jp epi
 
 .ret0

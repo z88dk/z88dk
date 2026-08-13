@@ -55,42 +55,46 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld de,sp+6
     ld (de),a
 
-    ; cold: exp 255 / 0×Inf|NaN (stack: exp_x@1 mant_x@2/4/5; exp_y@7 mant_y@8/10/11)
+    ; ---- specials gate ----
+    ; Frame after unpack: x@0 (exp@1, mant@2/4/5), y@6 (exp@7, mant@8/10/11),
+    ; sign xor @6 overwrites y sign byte used as result sign.
+    ;   0 × finite → ±0     Inf × 0 → NaN     NaN × * → NaN
+    ;   Inf × finite → ±Inf  Inf × Inf → ±Inf
     ld de,sp+7
-    ld a,(de)                       ; exp_y
+    ld a,(de)                       ; y.exp
     inc a
-    jp Z,fm_spec_y255
+    jp Z,fm_spec_y                  ; y.exp == 255
     dec a
     or a
-    jp Z,fm_spec_y0
+    jp Z,fm_spec_y0                 ; y.exp == 0
     ld de,sp+1
-    ld a,(de)                       ; exp_x
+    ld a,(de)                       ; x.exp
     inc a
-    jp Z,fm_spec_x255
+    jp Z,fm_spec_x                  ; x.exp == 255, y finite nonzero
 
     ld de,sp+7
     ld a,(de)
     sub 07fh
-    ld c,a                          ; bias-adjusted second exp
+    ld c,a                          ; C = y.exp − bias
     ld de,sp+1
-    ld a,(de)                       ; first exp
-    jp C,fm_uf
+    ld a,(de)                       ; A = x.exp
+    jp C,fm_exp_uf
 
     add a,c                         ; sum of exponents
-    jp C,fm_ovl                     ; only if first exp != 0
-    cp c                            ; a == c ⇒ first exp was 0
-    jp Z,fm_zero                    ; 0 * finite → signed zero
-    jp fm_exp_done
+    jp C,fm_ovl                     ; overflow only if x.exp != 0
+    cp c                            ; sum == y.adj ⇒ x.exp == 0
+    jp Z,fm_zero
+    jp fm_exp_ok
 
-.fm_uf
-    add a,c                         ; add the exponents
-    jp NC,fm_zero                   ; underflow or first exp == 0
+.fm_exp_uf
+    add a,c
+    jp NC,fm_zero                   ; underflow or x.exp == 0
 
-.fm_exp_done
+.fm_exp_ok
     or a
     jp Z,fm_zero
     ld de,sp+7
-    ld (de),a
+    ld (de),a                       ; store exp sum
 
     ld de,sp+10
     ld a,(de)
@@ -227,16 +231,19 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jp m32_fsconst_pinf
 
 
-    ; ---- cold specials (mant NaN: L[6:0]|E|D after unpack) ----
+    ; ---- cold specials ----
+    ; Unpacked mant: L[6:0]|E|D nonzero ⇒ NaN (implicit 1 in L.7).
 
-.fm_spec_y0                         ; exp_y == 0
+; y.exp == 0
+.fm_spec_y0
     ld de,sp+1
     ld a,(de)
     inc a
-    jp Z,fm_ret_nan                 ; 0 * Inf/NaN
-    jp fm_zero
+    jp Z,fm_ret_nan                 ; Inf/NaN × 0
+    jp fm_zero                      ; finite × 0 or 0 × 0
 
-.fm_spec_y255                       ; exp_y == 255
+; y.exp == 255
+.fm_spec_y
     ld de,sp+8
     ld a,(de)
     and 07fh
@@ -248,13 +255,13 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld de,sp+11
     ld a,(de)
     or b
-    jp NZ,fm_ret_nan                ; y is NaN
+    jp NZ,fm_ret_nan                ; y NaN
     ld de,sp+1
-    ld a,(de)                       ; exp_x
+    ld a,(de)                       ; x.exp
     or a
-    jp Z,fm_ret_nan                 ; Inf * 0
+    jp Z,fm_ret_nan                 ; 0 × Inf
     inc a
-    jp NZ,fm_ovl                    ; Inf * finite → signed Inf
+    jp NZ,fm_ovl                    ; finite × Inf → ±Inf
     ld de,sp+2
     ld a,(de)
     and 07fh
@@ -266,10 +273,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld de,sp+5
     ld a,(de)
     or b
-    jp NZ,fm_ret_nan                ; x is NaN
-    jp fm_ovl                       ; Inf * Inf
+    jp NZ,fm_ret_nan                ; NaN × Inf
+    jp fm_ovl                       ; Inf × Inf
 
-.fm_spec_x255                       ; exp_x == 255, y finite nonzero
+; x.exp == 255, y finite nonzero
+.fm_spec_x
     ld de,sp+2
     ld a,(de)
     and 07fh
@@ -281,8 +289,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld de,sp+5
     ld a,(de)
     or b
-    jp NZ,fm_ret_nan                ; x is NaN
-    jp fm_ovl                       ; Inf * finite
+    jp NZ,fm_ret_nan                ; x NaN
+    jp fm_ovl                       ; Inf × finite
 
 .fm_ret_nan
     ld de,sp+12

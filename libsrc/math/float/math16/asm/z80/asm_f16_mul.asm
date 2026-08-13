@@ -209,8 +209,11 @@ ENDIF
     ld e,a
     jp asm_f16_inf
 
-    ; ---- cold specials (packed half) ----
-.hmul_y_hi                      ; y exp 31; HL=y, DE=x original halves
+    ; ---- cold specials (packed half: exp in bits 14..10 = 0x7c mask) ----
+    ;   0 × Inf → NaN;  Inf × finite → ±Inf;  NaN × * → NaN
+
+; y.exp == 31.  HL = y half, DE = x half.
+.hmul_y_hi
     ld a,h
     and 003h
     or l
@@ -226,7 +229,8 @@ ENDIF
     jp NZ,hmul_nan              ; Inf × NaN
     jr hmul_uinf                ; Inf × Inf
 
-.hmul_x_hi                      ; x exp 31; y finite, y mant11 on stack
+; x.exp == 31, y finite (y mant11 still on stack).
+.hmul_x_hi
     pop hl                      ; drop y mant11
     ld a,d
     and 003h

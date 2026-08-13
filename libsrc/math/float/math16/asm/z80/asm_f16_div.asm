@@ -197,8 +197,11 @@ PUBLIC asm_f24_div_f24
     ret
 
 ;=========================================================================
-; Specials — sign in A'
+; Specials — result sign in A'
 ;=========================================================================
+;   0/0 → NaN     0/finite|Inf → ±0     finite/0 → ±Inf
+;   Inf/Inf → NaN Inf/finite → ±Inf     finite/Inf → ±0
+;   NaN/* → NaN
 
 .div_underflow
     pop hl                      ; drop mant_x if parked
@@ -208,45 +211,47 @@ PUBLIC asm_f24_div_f24
     pop hl
     jp div_inf
 
+; x.exp == 0 (main = x; y on alt)
 .div_x_zero
-    ; 0 / y  (main = x zero; y on alt)
     exx
     ld a,d
     or a
     jp Z,div_nan_sw             ; 0/0
     cp 255
-    jr NZ,div_zero_sw           ; 0/finite → signed 0
+    jr NZ,div_zero_sw           ; 0/finite → ±0
     ld a,h
     or l
     jp NZ,div_nan_sw            ; 0/NaN
-    ; 0/inf → signed 0
+    ; 0/Inf → ±0
 .div_zero_sw
     exx
     jp div_zero
 
+; x.exp == 255
 .div_x_hi
     ld a,h
     or l
-    jp NZ,div_nan               ; x is NaN
+    jp NZ,div_nan               ; x NaN
     exx                         ; y
     ld a,d
     cp 255
-    jr NZ,div_inf_sw            ; inf / finite → inf
+    jr NZ,div_inf_sw            ; Inf / finite → Inf
     ld a,h
     or l
-    jp Z,div_nan_sw             ; inf/inf → NaN
-    jp div_nan_sw               ; inf/NaN → NaN
+    jp Z,div_nan_sw             ; Inf/Inf → NaN
+    jp div_nan_sw               ; Inf/NaN → NaN
 
+; y.exp == 0; x already finite nonzero
 .div_y_zero
-    ; x / 0 → inf (alt = y was zero; x already finite nonzero)
-    jp div_inf_sw
+    jp div_inf_sw               ; finite / 0 → Inf
 
+; y.exp == 255; x finite
 .div_y_hi
     ld a,h
     or l
-    jp NZ,div_nan               ; y is NaN (x finite)
+    jp NZ,div_nan               ; y NaN
     exx
-    jp div_zero                 ; finite / inf → signed 0
+    jp div_zero                 ; finite / Inf → ±0
 
 .div_nan_sw
     exx

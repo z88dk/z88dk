@@ -26,6 +26,10 @@
 ;   m32_fsmax        — signed inf  (sign in D)
 ;   m32_fsconst_pnan — NaN
 ;
+; Specials: classify then unpack.  Finite path pays two load4+classify
+; before unpack (clearer than open-coding; z80 fsdiv open-codes instead).
+; Algebra: a/0→±Inf (0/0→NaN); finite/Inf→±0; Inf/Inf→NaN; NaN/*→NaN.
+;
 ; Entry:
 ;   m32_fsdiv        DEHL = b; stack = ret, a [, b]
 ;   m32_fsdiv_callee DEHL = b; stack = ret, a   (drops a)
@@ -105,8 +109,10 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ; work@0  sign@8  a@10  b@14  flag@18  ret@20
 
 ;=========================================================================
-; Classify (m32_fpclassify: 0 num, 1 zero, 2 nan, 3 inf)
+; Specials gate (m32_fpclassify: 0 num, 1 zero, 2 nan, 3 inf)
 ;=========================================================================
+;   a/0 → ±Inf (0/0 → NaN)   finite/Inf → ±0   Inf/Inf → NaN
+;   Inf/finite → ±Inf         NaN/* → NaN        */NaN → NaN
 
     ld de,sp+10
     call load4
@@ -432,7 +438,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ret
 
 ;=========================================================================
-; Specials — m32_fszero / m32_fsmax take sign in D
+; Specials exits — m32_fszero / m32_fsmax take sign in D
 ;=========================================================================
 
 .div_exp_bad_p

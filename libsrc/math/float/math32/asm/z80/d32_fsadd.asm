@@ -134,14 +134,19 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     exx
     ld h,a                      ; op1 mantissa: h = 00000000, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
 
-    ; cold: either exp 255 (Inf/NaN).  Finite path: 2×(inc/jp) + 2×exx.
+    ; ---- specials gate (finite path: 2×(ld/inc/jp) + 2×exx) ----
+    ; exp == 255 only; zeros stay on the add path (exp 0 → no hidden 1).
+    ;   NaN ± *     → NaN
+    ;   Inf ± finite → Inf (sign of the Inf)
+    ;   Inf + Inf   → Inf if same sign, else NaN (Inf − Inf)
+    ; Convention: y = DEHL (op1/primary first), x = stack (op2).
     ld a,c
     inc a
-    jp Z,add_spec1              ; op1 exp was 255
+    jp Z,add_spec_y             ; y.exp == 255
     exx
     ld a,c
     inc a
-    jp Z,add_spec2              ; op2 exp was 255
+    jp Z,add_spec_x             ; x.exp == 255
     exx
 
 ; sort larger from smaller and compute exponent difference
@@ -308,28 +313,30 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     scf                         ; error
     ret
 
-    ; ---- cold specials (mant NaN: L[6:0]|D|E after unpack) ----
-    ; primary=op1, shadow=op2 on entry to add_spec1; primary=op2 for add_spec2
+    ; ---- cold specials ----
+    ; After unpack: NaN if L[6:0]|D|E nonzero (implicit 1 in L.7).
+    ; AF' holds sign-xor (S set ⇒ opposite signs ⇒ effective subtract).
 
-.add_spec1                      ; op1 exp 255
+; y.exp == 255.  Primary = y, alt = x.
+.add_spec_y
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; op1 NaN
+    jp NZ,m32_fsconst_pnan      ; y NaN
     exx
     ld a,c
     inc a
-    jr NZ,add_ret_inf1          ; Inf + finite → Inf (op1)
+    jr NZ,add_ret_inf_y         ; Inf ± finite → Inf (y)
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; op2 NaN
+    jp NZ,m32_fsconst_pnan      ; x NaN
     ex af,af
     jp M,m32_fsconst_pnan       ; Inf − Inf → NaN
-.add_ret_inf1
-    exx                         ; op1 primary: sign in b
+.add_ret_inf_y
+    exx                         ; y primary; sign in B
     ld a,b
     and 080h
     or 07fh
@@ -338,13 +345,14 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld hl,0
     ret
 
-.add_spec2                      ; op2 exp 255, op1 finite; primary=op2
+; x.exp == 255, y finite.  Primary = x.
+.add_spec_x
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; op2 NaN
-    ld a,b                      ; Inf + finite → Inf (op2)
+    jp NZ,m32_fsconst_pnan      ; x NaN
+    ld a,b                      ; Inf ± finite → Inf (x)
     and 080h
     or 07fh
     ld d,a

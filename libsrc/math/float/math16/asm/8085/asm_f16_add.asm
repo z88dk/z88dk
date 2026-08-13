@@ -64,7 +64,9 @@ PUBLIC asm_f24_add_f24
     push hl
     push bc                     ; [cret][Y.hl][Y.de][X.hl][X.de]
 
-    ; cold: exp 255 Inf/NaN (Y.de@+4 L=sign H=exp; X.de@+8)
+    ; ---- specials gate (f24 exp 255) ----
+    ; Frame: [cret][Y.hl][Y.de][X.hl][X.de]; de word L=sign H=exp.
+    ;   NaN ± * → NaN;  Inf ± finite → Inf;  Inf−Inf → NaN
     ld de,sp+4
     ld hl,(de)
     ld a,h
@@ -298,9 +300,11 @@ PUBLIC asm_f24_add_f24
     push bc
     jp asm_f24_inf
 
-    ; ---- cold specials (frame: [cret][Y.hl][Y.de][X.hl][X.de]) ----
+    ; ---- cold specials ----
+    ; f24: Inf HL=0, NaN HL≠0, exp 255 in de.H
 
-.hadd_spec_y                        ; Y.exp == 255
+; Y.exp == 255
+.hadd_spec_y
     ld de,sp+2
     ld hl,(de)                      ; Y.mant
     ld a,h
@@ -310,12 +314,12 @@ PUBLIC asm_f24_add_f24
     ld hl,(de)
     ld a,h
     inc a
-    jp NZ,hadd_inf_y                ; Inf + finite
+    jp NZ,hadd_inf_y                ; Inf ± finite → Y Inf
     ld de,sp+6
     ld hl,(de)
     ld a,h
     or l
-    jp NZ,hadd_nan
+    jp NZ,hadd_nan                  ; X NaN
     ld de,sp+4
     ld a,(de)                       ; Y.sign
     ld b,a
@@ -333,7 +337,8 @@ PUBLIC asm_f24_add_f24
     ld hl,0
     jp hadd_epi
 
-.hadd_spec_x                        ; X.exp == 255, Y finite
+; X.exp == 255, Y finite
+.hadd_spec_x
     ld de,sp+6
     ld hl,(de)
     ld a,h

@@ -93,161 +93,164 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fmrejoin
     xor a,h                     ; xor sign flags
-    ex af,af                    ; save sign flag in a[7]' and f' reg
+    ex af,af                    ; AF' = result sign (A'[7])
 
     add hl,hl                   ; shift exponent into h
     scf                         ; set implicit bit
     rr l                        ; shift msb into mantissa
 
-                                ; second h = eeeeeeee, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
+                                ; After unpack (x on stack, y was DEHL):
+                                ;   primary h,lde  = x (left / 2nd unpacked)
+                                ;   alt     h',lde' = y (right / 1st unpacked)
 
-    ; cold: exp 255 / 0×Inf|NaN (push af preserves bias-adj C across e1 gate)
+    ; ---- specials gate (finite×finite must stay hot) ----
+    ; exp 0 / 255 leave here.  Bias-adjust x, then probe y.
+    ; INC/DEC do not touch C, so the `sub 07fh` carry survives the y probe
+    ; without push/pop af (~13 T saved on the common path).
+    ;
+    ;   0 × finite → ±0     Inf × 0 → NaN     NaN × * → NaN
+    ;   Inf × finite → ±Inf  Inf × Inf → ±Inf
+    ;
     ld a,h
     inc a
-    jp Z,mul_spec2              ; second exp was 255
-    ld a,h
-    or a                        ; second exponent zero then result is zero
-    jp Z,mul_z2
-
-    sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
-    push af                     ; adj second exp + C
-    exx
+    jp Z,mul_spec_x             ; x.exp == 255
+    dec a
+    jp Z,mul_spec_x0            ; x.exp == 0
+    sub a,07fh                  ; A = x.exp − bias; C if x.exp < bias
+    ld b,a                      ; B = x bias-adjusted
+    exx                         ; → y; F.C kept
     ld a,h
     inc a
-    jr NZ,mul_e1_finite
-    pop af
-    jp mul_spec1                ; first exp was 255 (second finite nonzero)
-.mul_e1_finite
-    pop af                      ; a = bias-adj second, C from sub
-    ld b,a                      ; bias-adjusted second exp
-    jr C,fmchkuf
+    jp Z,mul_spec_y             ; y.exp == 255, x finite nonzero
+    dec a                       ; A = y.exp; F.C kept
+    jr C,mul_exp_uf
+    exx                         ; → x; A = y.exp, B = x.adj
+    add a,b                     ; sum = y.exp + (x.exp − bias)
+    jp C,mul_ovl                ; overflow only if y.exp != 0
+    cp b                        ; sum == x.adj ⇒ y.exp == 0
+    jp Z,mul_zero
+    jr mul_exp_ok
 
-    add a,h                     ; sum of exponents
-    jp C,mulovl                 ; only if h != 0
-    cp b                        ; a == b ⇒ first exp was 0
-    jp Z,mulzero                ; 0 * finite → signed zero
-    jr fmnouf
+.mul_exp_uf
+    exx                         ; → x; A = y.exp, B = x.adj
+    add a,b
+    jp NC,mul_zero              ; underflow or y.exp == 0
 
-.fmchkuf
-    add a,h                     ; add the exponents
-    jp NC,mulzero               ; underflow or first exp == 0 (add 0 never carries)
-
-.fmnouf
+.mul_exp_ok
+    exx                         ; → y for 24×24 (primary = y, alt = x)
     ld b,a
     or a
-    jp Z,mulzero                ; check sum of exponents for zero
+    jp Z,mul_zero               ; sum of exponents is zero
 
     ex af,af
     ld a,b
-    push af                     ; stack: sum of exponents a, and xor sign of exponents in f
+    push af                     ; A = exp sum, F = xor sign
 
-                                ; first  h  = eeeeeeee, lde  = 1mmmmmmm mmmmmmmm mmmmmmmm
-                                ; second h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
-                                ; sum of exponents in a', xor of exponents in sign f'
-                                ;
-                                ; multiplication of two 24-bit numbers into a 32-bit product
-    call m32_mulu_32h_24x24     ; exit  : HLDE  = 32-bit product
+                                ; y (1st): h  = exp, lde  = mant
+                                ; x (2nd): h' = exp, lde' = mant
+    call m32_mulu_32h_24x24     ; HLDE = 32-bit product
 
-    pop bc                      ; retrieve sign and exponent from stack = b,c[7]
+    pop bc                      ; B = exp sum, C[7] = sign
 
     bit 7,h                     ; need to shift result left if msb!=1
-    jr NZ,fm2
+    jr NZ,mul_normed
     sla e
     rl d
     adc hl,hl
-    jr fm3
+    jr mul_round
 
-.fm2
+.mul_normed
     inc b
-    jp Z,m32_fsconst_pnan       ; capture overflow from NaN
+    jp Z,m32_fsconst_pnan       ; exp was 255 (should not on finite path)
     inc b
-    jp Z,mulovl                 ; capture overflow into Inf
+    jp Z,mul_ovl                ; product overflow → Inf
     dec b
 
-.fm3
+.mul_round
     ld a,e
-    ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
+    ld e,h                      ; 24-bit mant HLD → EHL
     ld h,l
     ld l,d
 
     ; IEEE RNE: residual A → G=bit7, S=bits6..0 (via add a,a), B=L.0
     add a,a
-    jr NC,fm4                   ; G=0 → truncate
-    jr NZ,fm_up                 ; G=1 S≠0 → up
+    jr NC,mul_pack              ; G=0 → truncate
+    jr NZ,mul_round_up          ; G=1 S≠0 → up
     bit 0,l
-    jr Z,fm4                    ; tie, already even
-.fm_up
+    jr Z,mul_pack               ; tie, already even
+.mul_round_up
     inc l
-    jr NZ,fm4
+    jr NZ,mul_pack
     inc h
-    jr NZ,fm4
+    jr NZ,mul_pack
     inc e
-    jr NZ,fm4
-    ld hl,0                     ; mant overflow → 1.0, exp++ (E=0; sla e discards implicit 1)
+    jr NZ,mul_pack
+    ld hl,0                     ; mant overflow → 1.0, exp++
     ld e,l
     inc b
-    jr Z,fm_rnovl
+    jr Z,mul_round_ovl
 
-.fm4
+.mul_pack
     sla e                       ; adjust mantissa for exponent
     sla c                       ; put sign into C
     ld d,b                      ; put exponent in D
-    rr de                       ; put sign and 7 exp bits into place
-                                ; put last exp bit into place
-    ret                         ; return IEEE DEHL
+    rr de                       ; sign + exp into place
+    ret
 
-.fm_rnovl
+.mul_round_ovl
     sla c
     jp C,m32_fsconst_ninf
     jp m32_fsconst_pinf
 
     ; ---- cold specials ----
-    ; mant NaN test after unpack: L[6:0]|D|E (implicit bit in L.7)
+    ; After unpack: NaN if L[6:0]|D|E nonzero (implicit 1 sits in L.7).
 
-.mul_spec2                      ; second exp 255; first in h'
+; x.exp == 255.  Primary = x, alt = y.
+.mul_spec_x
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; second is NaN
+    jp NZ,m32_fsconst_pnan      ; x NaN
     exx
     ld a,h
     or a
-    jp Z,m32_fsconst_pnan       ; Inf * 0
+    jp Z,m32_fsconst_pnan       ; 0 × Inf
     inc a
-    jr NZ,mulovl                ; Inf * finite nonzero → signed Inf
-    ; Inf * Inf/NaN
+    jr NZ,mul_ovl               ; finite × Inf → ±Inf
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; first is NaN
-    jr mulovl                   ; Inf * Inf → signed Inf
+    jp NZ,m32_fsconst_pnan      ; NaN × Inf
+    jr mul_ovl                  ; Inf × Inf → ±Inf
 
-.mul_spec1                      ; first exp 255; second finite 1..254; on first bank
+; y.exp == 255, x finite nonzero.  Primary = y.
+.mul_spec_y
     ld a,l
     and 07fh
     or d
     or e
-    jp NZ,m32_fsconst_pnan      ; first is NaN
-    jr mulovl                   ; Inf * finite → signed Inf
+    jp NZ,m32_fsconst_pnan      ; y NaN
+    jr mul_ovl                  ; Inf × finite → ±Inf
 
-.mul_z2                         ; second exp 0; first in h'
+; x.exp == 0.  Primary = x; switch to y to test Inf/NaN.
+.mul_spec_x0
     exx
     ld a,h
     inc a
-    jp Z,m32_fsconst_pnan       ; 0 * Inf/NaN
-    ; fall through: 0 * finite or 0 * 0 → signed zero
+    jp Z,m32_fsconst_pnan       ; Inf/NaN × 0
+    ; fall through: finite × 0 or 0 × 0 → signed zero
 
-.mulzero
-    ex af,af                    ; get sign
+.mul_zero
+    ex af,af
     rla
     jp C,m32_fsconst_nzero
-    jp m32_fsconst_pzero        ; done underflow
+    jp m32_fsconst_pzero
 
-.mulovl
-    ex af,af                    ; get sign
+.mul_ovl
+    ex af,af
     rla
     jp C,m32_fsconst_ninf
-    jp m32_fsconst_pinf         ; done overflow
+    jp m32_fsconst_pinf
 
