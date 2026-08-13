@@ -1603,6 +1603,51 @@ static int addr_desc_same_group(const MemDesc *a, const MemDesc *b)
     return 1;
 }
 
+/* `&local + K` with a constant K is a frame address at a compile-time
+   displacement, so fold the ADD into the IR_LEA's own offset.
+
+   A struct member on a local arrives as LEA(slot); ADD(imm=member_offset);
+   LD_MEM, and while those stay apart every access pays an address computation
+   (`ld de,K; add hl,de`) for a displacement that is known at compile time. It
+   also hides the frame slot from the lowerer, which can only reach the
+   `(ix+d)` form a scalar local already uses when it can see which slot the
+   access belongs to. `--opt-disable=lea-offset` opts out. */
+int ir_opt_lea_offset(Func *f)
+{
+    if (!f || opt_disabled("lea-offset")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    Op **defmap = calloc((size_t)nv, sizeof(Op *));
+    int *ndefs  = calloc((size_t)nv, sizeof(int));
+    if (!defmap || !ndefs) { free(defmap); free(ndefs); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst >= 0 && o->dst < nv) { defmap[o->dst] = o; ndefs[o->dst]++; }
+        }
+
+    int folded = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_ADD || o->src[1] >= 0 || o->imm_sym) continue;
+            int s0 = o->src[0];
+            if (s0 < 0 || s0 >= nv || ndefs[s0] != 1) continue;
+            Op *d = defmap[s0];
+            if (!d || d->kind != IR_LEA || d->src[0] < 0) continue;
+            /* The base LEA keeps its own def — it may have other uses, and DCE
+               drops it when this was the only one. */
+            o->kind   = IR_LEA;
+            o->src[0] = d->src[0];
+            o->src[1] = -1;
+            o->imm    = d->imm + o->imm;
+            o->mem.base = -1;
+            folded++;
+        }
+    free(defmap); free(ndefs);
+    return folded;
+}
+
 int ir_opt_addr_cse(Func *f)
 {
     if (!f || opt_disabled("addr-cse")) return 0;

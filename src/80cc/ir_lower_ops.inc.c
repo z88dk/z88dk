@@ -150,13 +150,19 @@ static int gen_ld_str(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+static int lea_all_uses_indexed(const Func *f, const Op *lea);
+
 static int gen_lea(FILE *out, Func *f, const Op *op)
 {
+    /* Every use of this address became a frame-indexed access, so the address
+       itself is never read — emitting it would be four dead instructions. IR
+       DCE cannot see this: the uses still name the vreg as their mem.base. */
+    if (lea_all_uses_indexed(f, op)) return 0;
     if (op->src[0] < 0) {
         fputs("ir_lower: IR_LEA with no src\n", stderr);
         return -1;
     }
-    emit_acc_slot_addr(out, f, op->src[0], 0);
+    emit_slot_addr_ofs(out, f, op->src[0], 0, (int)op->imm);
     commit_hl_word(out, f, op->dst);
     return 0;
 }
@@ -2433,6 +2439,56 @@ static void gen_port_out(FILE *out, const Op *op)
     emit(out, "out\t(c),a");
 }
 
+/* A load/store through `&local + K` is a frame access at a known displacement,
+   so it can take the same `(ix+d)` form a scalar local already uses rather than
+   materialising the address in HL first. Returns the ix displacement, or
+   INT_MIN when this is not a frame address or the displacement (both bytes of a
+   word) is out of the signed-8-bit range — the caller then falls back to the
+   existing sp-relative path, which is cheaper than reaching IX by hand anyway.
+   fp mode only: without a frame register there is no indexed form to reach. */
+#define FRAME_IX_NONE (-100000)
+static int frame_ix_disp(const Func *f, const Op *op, int width)
+{
+    if (!fp_active(f) || L.cur_frameless) return FRAME_IX_NONE;
+    if (op->mem.kind != IR_MEM_VREG || op->mem.base < 0) return FRAME_IX_NONE;
+    if (op->mem.base >= f->n_vregs) return FRAME_IX_NONE;
+    if (!g_hc.lea_def) return FRAME_IX_NONE;
+    const Op *d = g_hc.lea_def[op->mem.base];
+    if (!d || d->src[0] < 0 || d->src[0] >= f->n_vregs) return FRAME_IX_NONE;
+    if (slot_off(f, d->src[0]) < 0) return FRAME_IX_NONE;
+    int disp = slot_ix_off(f, d->src[0]) + (int)d->imm + op->mem.offset;
+    if (!fp_offset_fits(disp)) return FRAME_IX_NONE;
+    if (width == 2 && !fp_offset_fits(disp + 1)) return FRAME_IX_NONE;
+    return disp;
+}
+
+/* True when the LEA's dst is read only as the base of loads/stores that
+   frame_ix_disp will handle indexed — so the address is never needed in a
+   register. Any other reader (a call argument, pointer arithmetic, a
+   post-stepped access) makes the address real and returns 0. */
+static int lea_all_uses_indexed(const Func *f, const Op *lea)
+{
+    if (!lea || lea->dst < 0) return 0;
+    int v = lea->dst, seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o == lea) continue;
+            if (o->src[0] == v || o->src[1] == v) return 0;
+            if (o->call || o->hcall) return 0;   /* args are listed elsewhere */
+            if (o->mem.kind != IR_MEM_VREG || o->mem.base != v) continue;
+            if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) return 0;
+            if (o->mem.post_step != 0 || mem_bank_fn(&o->mem)) return 0;
+            int w = (o->kind == IR_LD_MEM)
+                  ? ((o->dst >= 0) ? f->vregs[o->dst].width : 0)
+                  : kind_scalar_width(o->mem.elem);
+            if (w != 1 && w != 2) return 0;
+            if (frame_ix_disp(f, o, w) == FRAME_IX_NONE) return 0;
+            seen++;
+        }
+    return seen > 0;
+}
+
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
 {
     /* Port read. Result is a zero-extended byte in HL, matching the width-2
@@ -2545,6 +2601,28 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (op->mem.kind == IR_MEM_VREG) {
+        /* Frame access at a known displacement (`&local + K`): read it through
+           the frame register, exactly as a scalar local is read, instead of
+           building the address in HL first. Out-of-range displacements return
+           FRAME_IX_NONE and fall through to the address-materialising path. */
+        if (op->dst >= 0 && op->mem.post_step == 0 && !mem_bank_fn(&op->mem)) {
+            int _w = f->vregs[op->dst].width;
+            if (_w == 1 || _w == 2) {
+                int disp = frame_ix_disp(f, op, _w);
+                if (disp != FRAME_IX_NONE) {
+                    if (_w == 1) {
+                        emit(out, "ld\ta,(%s%+d)%s", frame_reg(), disp,
+                             mem_vol_stamp(op));
+                        return finalize_byte_result(out, f, op, 1);
+                    }
+                    hl_about_to_change(-1);
+                    emit(out, "ld\thl,(%s%+d)%s", frame_reg(), disp,
+                         mem_vol_stamp(op));
+                    commit_hl_result(out, f, op->dst);
+                    return 0;
+                }
+            }
+        }
         /* Fused (long)*p++ fastpath. When the load is a byte-to-long
            zero-extend with a post-inc on the base pointer (set only
            by the OP_CAST char→long path in ir_build), increment p's
@@ -3080,6 +3158,26 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (op->mem.kind == IR_MEM_VREG) {
+        /* Frame store at a known displacement — the mirror of the load above:
+           write through the frame register instead of building the address. */
+        if (op->src[0] >= 0 && op->mem.post_step == 0 && !mem_bank_fn(&op->mem)) {
+            int _w = kind_scalar_width(op->mem.elem);
+            if (_w == 1 || _w == 2) {
+                int disp = frame_ix_disp(f, op, _w);
+                if (disp != FRAME_IX_NONE) {
+                    if (_w == 1) {
+                        load_byte_to_a(out, f, op->src[0]);
+                        emit(out, "ld\t(%s%+d),a%s", frame_reg(), disp,
+                             mem_vol_stamp(op));
+                        return 0;
+                    }
+                    load_to_hl(out, f, op->src[0]);
+                    emit(out, "ld\t(%s%+d),hl%s", frame_reg(), disp,
+                         mem_vol_stamp(op));
+                    return 0;
+                }
+            }
+        }
         /* Constant value folded into op->imm by ir_opt_const_fold. Store the
            immediate straight to memory — no value register, no A/E clobber, no
            DE-cache drop (leaves PR_DE free). Width (1/2/4) from mem.elem. */

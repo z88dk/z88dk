@@ -199,6 +199,10 @@ typedef struct {
     int func_whome;       /* the word DE-home vreg, or -1 */
     int branch_test_kind; /* lookahead branch kind steering a fused compare (0=none) */
     const Op **remat_def; /* per-vreg rematerialising def (LD_IMM/LD_SYM), or NULL */
+    const Op **lea_def;   /* per-vreg IR_LEA def (single-def only), or NULL. Lets a
+                             load/store through a frame address reach the same
+                             `(ix+d)` form a scalar local uses, instead of
+                             materialising the address first. */
     const Op **byte_remat; /* per-vreg: a width-1 single-use LD_MEM from a global
                               (IR_MEM_SYM) with no memory-write between def and use
                               — rematerialise `ld a,(sym)` at the use instead of a
@@ -1942,6 +1946,31 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
    (no `add hl,ix`, so push/pop the frame reg then add the offset via DE;
    `adj` — the prior-push sp shift — does NOT apply since IX is fixed).
    Clobbers DE in fp-mode (acc callers invalidate DE around the call). */
+/* As emit_acc_slot_addr, plus a constant byte displacement into the slot (an
+   IR_LEA's folded member offset). `ofs` applies in BOTH modes, unlike `adj`,
+   which is the sp-push shift and is meaningless when IX holds the frame. */
+static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
+                               int ofs)
+{
+    if (fp_active(f)) {
+        int ixoff = slot_ix_off(f, vreg) + ofs;
+        /* ez80: lea hl,ix+d in one op, no DE clobber, vs push/pop + add. */
+        if (IS_EZ80() && ixoff >= -128 && ixoff <= 127) {
+            emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
+            return;
+        }
+        emit(out, "push\t%s", frame_reg());
+        emit(out, "pop\thl");
+        if (ixoff) {
+            emit(out, "ld\tde,%d", ixoff);
+            emit(out, "add\thl,de");
+        }
+    } else {
+        emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj + ofs);
+        emit(out, "add\thl,sp");
+    }
+}
+
 static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
 {
     if (fp_active(f)) {
@@ -4308,6 +4337,10 @@ int ir_lower_func(FILE *out, Func *f)
            strength-reduce each clustered access into an independent stepped IV,
            hiding the common index); ivsr then reduces just the anchor and the
            offset loads ride it. IR_NO_ADDR_CSE opts out. */
+        /* Fold a constant `&local + K` into the LEA before addr-cse groups
+           addresses, so a struct member is one frame address rather than a
+           base plus a run-time add. */
+        int leaofs  = ir_opt_lea_offset(f);
         int addrcse = ir_opt_addr_cse(f);
         /* Strength-reduce indexed-array address recomputes to stepped
            pointers right after LICM (loops found, base invariants
@@ -4390,7 +4423,7 @@ int ir_lower_func(FILE *out, Func *f)
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
-             || cse > 0 || addrcse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
+             || cse > 0 || addrcse > 0 || leaofs > 0 || pushes > 0 || deadret > 0 || reassoc > 0
              || rcoal > 0 || pruned > 0 || symcmp > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
@@ -4538,6 +4571,25 @@ int ir_lower_func(FILE *out, Func *f)
        re-emit the constant instead of reloading a slot. Built BEFORE
        ir_assign_slots so the NO_SLOT tagging (constants need no slot — they
        rematerialise) shrinks the frame and drops the def's spill store. */
+    {   /* Single-def IR_LEA map: which frame slot (and displacement) a
+           pointer vreg names. Ungated — it only records a fact. */
+        int nv = f->n_vregs > 0 ? f->n_vregs : 1;
+        int *nd = calloc((size_t)nv, sizeof(int));
+        g_hc.lea_def = calloc((size_t)nv, sizeof(const Op *));
+        if (nd && g_hc.lea_def) {
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    if (o->dst >= 0 && o->dst < nv) {
+                        nd[o->dst]++;
+                        g_hc.lea_def[o->dst] = (o->kind == IR_LEA) ? o : NULL;
+                    }
+                }
+            for (int v = 0; v < nv; v++)
+                if (nd[v] != 1) g_hc.lea_def[v] = NULL;
+        }
+        free(nd);
+    }
     g_hc.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                          sizeof(const Op *));
     if (g_hc.remat_def && !opt_disabled("remat")) {

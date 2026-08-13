@@ -237,7 +237,8 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
        byte-for-tick loss — ez80-fp is excluded from remat marking; see ir_lower.c.) */
     if (o->kind == IR_LEA && o->src[0] >= 0 && o->src[0] < f->n_vregs) {
         int src = o->src[0];
-        emit(out, "ld\thl,%d", slot_off(f, src) + L.cur_sp_adjust);
+        emit(out, "ld\thl,%d",
+             slot_off(f, src) + L.cur_sp_adjust + (int)o->imm);
         emit(out, "add\thl,sp");
         if (!strcmp(rp, "hl"))
             return 1;                                /* HL = addr; caller cache_hl */
