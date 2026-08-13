@@ -13,7 +13,7 @@ uint32_t pw_,px_,py_,pz_;
     } while (0)
 
 // Used for ex instructions
-#define SWAPR(r1,r2) { t = (r1); (r1) = (r2); (r1) = t; }
+#define SWAPR(r1,r2) { t = (r1); (r1) = (r2); (r2) = t; }
 
 
 // TODO: Flags may be wrong...
@@ -1312,12 +1312,12 @@ void r4k_ex_jkhl_bcde(uint8_t opcode)
         SWAPR(j_,b);
         SWAPR(k_,c);
         SWAPR(h_,d);
-        SWAPR(l_,c);
+        SWAPR(l_,e);
     } else {
         SWAPR(j,b);
         SWAPR(k,c);
         SWAPR(h,d);
-        SWAPR(l,c);
+        SWAPR(l,e);
     }
     st += 2;
 }
@@ -1890,9 +1890,9 @@ void r6k_swap_rp2(uint8_t opcode)
 {
     uint8_t reg = ((opcode & 0xf0) >> 4) - 0x0c; // 0 =bc, 1=de, 2=hl, 3 = jk
     uint8_t *slsb = get_rp2_lsb_ptr(reg, alts);
-    uint8_t *smsb = get_rp2_lsb_ptr(reg, alts);
+    uint8_t *smsb = get_rp2_msb_ptr(reg, alts);
     uint8_t *dlsb = get_rp2_lsb_ptr(reg, altd);
-    uint8_t *dmsb = get_rp2_lsb_ptr(reg, altd); 
+    uint8_t *dmsb = get_rp2_msb_ptr(reg, altd); 
     uint8_t t;
 
     if ( dmsb == smsb ) {
@@ -1937,12 +1937,12 @@ void r6k_ex_jkhl_bcde1(void)
         SWAPR(j_,b_);
         SWAPR(k_,c_);
         SWAPR(h_,d_);
-        SWAPR(l_,c_);
+        SWAPR(l_,e_);
     } else {
         SWAPR(j,b_);
         SWAPR(k,c_);
         SWAPR(h,d_);
-        SWAPR(l,c_);
+        SWAPR(l,e_);
     }
     st +=2;
 }
@@ -2168,10 +2168,53 @@ void r6k_tstnull_ps(uint8_t opcode)
     st+= 4;
 }
 
+/* Reverse the eight bits of a byte: result[7:0] = v[0:7]. */
+static uint8_t r6k_mirror_byte(uint8_t v)
+{
+    v = (uint8_t)(((v & 0xf0) >> 4) | ((v & 0x0f) << 4));
+    v = (uint8_t)(((v & 0xcc) >> 2) | ((v & 0x33) << 2));
+    v = (uint8_t)(((v & 0xaa) >> 1) | ((v & 0x55) << 1));
+    return v;
+}
+
+/* Pointer to one of B,C,D,E,H,L,-,A (the usual r encoding); index 6 is (HL)
+   and has no register, so callers must handle it before asking. */
+static uint8_t *get_r_ptr(int reg, uint8_t alt)
+{
+    switch (reg) {
+    case 0: return alt ? &b_ : &b;
+    case 1: return alt ? &c_ : &c;
+    case 2: return alt ? &d_ : &d;
+    case 3: return alt ? &e_ : &e;
+    case 4: return alt ? &h_ : &h;
+    case 5: return alt ? &l_ : &l;
+    case 7: return alt ? &a_ : &a;
+    }
+    return NULL;
+}
+
+/* R6K SWAP r — a bit MIRROR of the operand, r[7:0] = r[0:7]. The name belongs
+   to a family that reverses the operand's units: `swap r32` reverses the four
+   bytes of bcde, `swap rp2` the two bytes of a pair, and `swap r` the eight
+   bits of a single byte. Sets no flags. Source is chosen by ALTS and the
+   destination by ALTD, as in r6k_swap_rp2.
+   Encoding is ED x7: 0x87=B 0x97=C 0xa7=D 0xb7=E 0xc7=H 0xd7=L 0xe7=(HL)
+   0xf7=A. */
 void r6k_swap_r(uint8_t opcode)
 {
-    // Doc suggests that that this is a mirror?
-    UNIMPLEMENTED(0xed00|opcode, "swap r");
+    int reg = ((opcode >> 4) & 0x0f) - 8;
+
+    if ( reg == 6 ) {                       /* SWAP (HL) */
+        uint16_t addr = l | h << 8;
+        put_memory(addr, r6k_mirror_byte(get_memory_data(addr)));
+        st += 4;
+        return;
+    }
+    {
+        uint8_t *src = get_r_ptr(reg, alts);
+        uint8_t *dst = get_r_ptr(reg, altd);
+        if ( src && dst ) *dst = r6k_mirror_byte(*src);
+    }
     st += 4;
 }
 
