@@ -63,13 +63,26 @@ static void test_bfcse(void)
     assertEqual(pair(p), 1206);
     assertEqual(triple(p), 5 + 1206);
 
-    /* The neighbour must survive a flag write. (The OVERFLOW case —
-       `rate` at 4095 then ++ — is deliberately not asserted here: it fails
-       for an unrelated reason in the lowerer, where the correct masking IR
-       `AND v4 <- v2 (imm=4095)` is emitted but not honoured. That is a
-       separate bug and wants its own test once fixed.) */
+    /* The neighbour must survive a flag write. */
     set_all(&g, 4095, 0);
     g.flag = 1;
+    assertEqual(pair(p), 4095 + 10000);
+
+    /* OVERFLOW of the field must NOT carry into the neighbour. `g.rate++`
+       reached the IR as a step on the whole 16-bit STORAGE UNIT, so 4095+1
+       set bit 12 — the flag. Both step forms and the compound assign. */
+    set_all(&g, 4095, 1);
+    g.rate++;                       /* post */
+    assertEqual(pair(p), 0 + 10000);
+    set_all(&g, 4095, 1);
+    ++g.rate;                       /* pre */
+    assertEqual(pair(p), 0 + 10000);
+    set_all(&g, 4095, 1);
+    g.rate += 1;                    /* compound (always worked) */
+    assertEqual(pair(p), 0 + 10000);
+    /* Down past zero wraps the other way, again without touching the flag. */
+    set_all(&g, 0, 1);
+    g.rate--;
     assertEqual(pair(p), 4095 + 10000);
 
     /* Same through an array element, where the struct base is computed. */
