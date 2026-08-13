@@ -1585,13 +1585,19 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
             commit_hl_result(out, f, op->dst);
             return 0;
         }
-        /* 8080/gbz80: l_asr with a clean small count (never load the raw imm —
-           it carries the IR_SHR_ARITH marker bit). */
+        /* 8080 only (gbz80 has the CB shifts and takes the inline path above):
+           l_asr with a clean small count — never load the raw imm, it carries
+           the IR_SHR_ARITH marker bit. commit_hl_RESULT, not commit_hl_word:
+           the helper leaves the value in HL, and a PR_DE destination needs it
+           moved across. Committing it as a plain word left a DE-homed result
+           stranded, and the consumer then read the operand from its absent
+           slot — offset -1, i.e. one byte BELOW sp (`signed char >> const`
+           accumulated into a byte gave the wrong answer on 8080 alone). */
         load_to_de(out, f, op->src[0]);          /* value -> DE */
         emit(out, "ld\thl,%d", count);           /* count -> HL */
         emit_c(out, CLOB_HL, "call\tl_asr");
         invalidate_de_cache();
-        commit_hl_word(out, f, op->dst);
+        commit_hl_result(out, f, op->dst);
         return 0;
     }
 
