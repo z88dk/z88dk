@@ -1521,7 +1521,12 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
    shift-right and use the l_asr helper. #289 fix. */
 static int gen_sar16(FILE *out, Func *f, const Op *op)
 {
-    int has_sra = !(IS_8080() || IS_GBZ80());
+    /* gbz80 HAS the CB shift set — sra h (cb 2c) / rr l (cb 1d) / sra l
+       assemble for it. Only 8080 genuinely lacks a shift-right and needs the
+       l_asr helper; 8085 has the undocumented ARHL (`sra hl`), handled below.
+       gbz80 was excluded here in error, which sent its every arithmetic `>>`
+       to a library call. */
+    int has_sra = !IS_8080();
 
     if (op->src[1] < 0) {                        /* constant count */
         int count = (int)op->imm & 0x1f;
