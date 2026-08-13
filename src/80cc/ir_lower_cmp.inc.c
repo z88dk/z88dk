@@ -1198,6 +1198,20 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
         }
         load_byte_to_a(out, f, op->src[0]);
         cache_a(op->src[0]);
+        /* gbz80 `swap a` exchanges the nibbles, so a logical shift of 4 or more
+           gets its first four bits for one op: swap, mask the junk that came
+           down from the low nibble, then finish with the remainder. Flat saving
+           of 4 bytes / 8 cycles at every count in 4..7 (`srl a` is 2 bytes and
+           8 cycles, and so are `swap a` and `and n`).
+           Right shift only — the LEFT shift has no use for it, because gbz80's
+           `add a,a` is 1 byte / 4 cycles and four of them already match
+           swap+and. Logical only: swap does not propagate a sign. */
+        if (IS_GBZ80() && !arith && count >= 4) {
+            emit(out, "swap\ta");
+            emit(out, "and\t%d", 0x0f);
+            for (int k = 4; k < count; k++) emit(out, "srl\ta");
+            return finalize_byte_result(out, f, op, 0);
+        }
         for (int k = 0; k < count; k++)
             emit(out, arith ? "sra\ta" : "srl\ta");
         return finalize_byte_result(out, f, op, count == 0);
