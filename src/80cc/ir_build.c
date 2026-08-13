@@ -2912,6 +2912,18 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
             cv->dst = tmp; cv->src[0] = rhs_v;
             rhs_v = tmp;
+        } else if (lw == 2 && rw < 2 && k != IR_SHL && k != IR_SHR) {
+            /* Same convergence at width 2. Without it `int acc; acc += (signed
+               char)x;` emitted a MIXED-width ADD (width-2 dst, width-1 rhs) and
+               the lowerer zero-filled the high half — `acc += (signed char)(u ^
+               0x80u)` added 186 instead of -70. Shifts are excluded: their RHS
+               is a count, not an arithmetic operand. */
+            int tmp = new_temp(b, 2);
+            b->f->vregs[tmp].width = 2;
+            int uns = n->right->type && n->right->type->isunsigned;
+            Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = tmp; cv->src[0] = rhs_v;
+            rhs_v = tmp;
         }
         { Op *o = ir_emit_binop(cur_bb(b), k, lhs_v, lhs_v, rhs_v); o->imm |= shr_arith_bit; }  /* aliased */
         return lhs_v;
@@ -7150,8 +7162,27 @@ static int build_stmt(Builder *b, Node *n)
                and the intermediate slot. */
             int init_v = build_expr_hinted(b, n->declvar, v);
             if (init_v < 0) return -1;
-            if (init_v != v)
-                ir_emit_mov(cur_bb(b), v, init_v);
+            if (init_v != v) {
+                /* Converge the width before the copy — the same job the
+                   OP_ASSIGN path does. A bare MOV from a NARROWER vreg leaves
+                   the high half to the lowerer, which zero-fills: `signed char
+                   gs = -56; int a = gs;` initialised a to 200, while the
+                   identical assignment to a GLOBAL int was correct because
+                   that path converges. Signedness comes from the initialiser
+                   expression's type, as in OP_ASSIGN. */
+                int iw = b->f->vregs[init_v].width;
+                int vw = b->f->vregs[v].width;
+                if (iw != vw && (vw == 2 || vw == 4)) {
+                    OpKind cv = (iw > vw)
+                        ? IR_CONV_TRUNC
+                        : ((n->declvar->type && n->declvar->type->isunsigned)
+                           ? IR_CONV_ZX : IR_CONV_SX);
+                    Op *op = ir_op_emit(cur_bb(b), cv);
+                    op->dst = v; op->src[0] = init_v;
+                } else {
+                    ir_emit_mov(cur_bb(b), v, init_v);
+                }
+            }
         }
         return 0;
     }
