@@ -6630,7 +6630,17 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        shifts). Saves a frame slot and the LD_IMM/store/reload
        churn of the dumb path. */
     if (rhs && rhs->ast_type == AST_LITERAL) {
-        int64_t imm = (int64_t)rhs->zval;
+        /* A FIXED-POINT literal has to be Q-scaled, exactly as the AST_LITERAL
+           handler does: the raw zval of `1.5k` is 1, its representation is 384.
+           Taking zval verbatim made `1.5k + 1.5k` emit `384 + 1`, so
+           `(int)(1.5k+1.5k)` returned 1. Normally invisible because constant
+           folding collapses the pair first — it only surfaced with fold AND
+           prop off. Key off the literal's own type, like the scaled-materialise
+           path; a non-_Accum literal is unchanged. */
+        Kind rk = rhs->type ? rhs->type->kind : KIND_NONE;
+        int64_t imm = (rk == KIND_ACCUM16 || rk == KIND_ACCUM32)
+                    ? scale_literal_for_kind(rhs, rk)
+                    : (int64_t)rhs->zval;
         /* GT/LE with a const RHS has no correct direct lowering at any
            width — the const-RHS handlers only exist for LT/GE, and the
            GT/LE paths read an uninitialised slot for the constant
