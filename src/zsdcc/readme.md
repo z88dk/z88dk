@@ -1,3 +1,9 @@
+# zsdcc — SDCC 4.6.0 r16639
+
+Current baseline: **SDCC 4.6.0** (svn **r16639**, final release tag).  
+Patch: `sdcc-z88dk.patch` (snapshot `sdcc-16639-z88dk.patch`).  
+Makefile pin: `SDCC_VERSION=16639`.
+
 ## Instructions
 
 Windows and MacOSX users can get the zsdcc binary from the [nightly build](http://nightly.z88dk.org/).
@@ -8,9 +14,11 @@ For Linux users follow the instructions on the [installation page](https://githu
 
 `sdcc-z88dk.patch` is the current default standard patch.
 
-`sdcc-16561-z88dk.patch` is the current zsdcc patch, for comparison and building against sdcc 4.0.0 r16561.
+`sdcc-16639-z88dk.patch` is the current zsdcc patch, for comparison and building against sdcc 4.6.0 r16639 (final release tag).
 
-`sdcc-15248-z88dk.patch` is the current zsdcc patch, for comparison and building against sdcc 4.5.0 r15248.
+`sdcc-16561-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.6.0 RC1 r16561.
+
+`sdcc-15248-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.5.0 r15248.
 
 `sdcc-14648-z88dk.patch` is the previous zsdcc patch, retained for comparison and building against sdcc 4.4.0 r14648.
 
