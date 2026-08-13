@@ -1177,6 +1177,32 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
        logical srl/l_lsr zero-fills. */
     int arith = (op->imm & IR_SHR_ARITH) != 0;
 
+    /* Byte >> const, in A — the mirror of gen_shl's byte path. Only reached
+       when ir_opt_narrow_byte proved the shifted value fits a byte (an int
+       source would pull bits down out of its high byte), and only on CPUs
+       with the CB shifts: 8080 and 8085 have no CB prefix at all (8085's
+       undocumented ARHL is 16-bit `sra hl` only), so narrow_shr_kind declines
+       for both and the 16-bit path below still applies. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1 && op->src[1] < 0) {
+        int count = (int)op->imm & 7;
+        if (((int)(op->imm & 0xff)) >= 8) {
+            /* Logical: every data bit is gone. Arithmetic: the sign fills. */
+            if (!arith) {
+                emit(out, "xor\ta");
+                return finalize_byte_result(out, f, op, 0);
+            }
+            load_byte_to_a(out, f, op->src[0]);
+            emit(out, "add\ta,a");          /* CY = sign bit */
+            emit(out, "sbc\ta,a");          /* 0x00 / 0xFF */
+            return finalize_byte_result(out, f, op, 0);
+        }
+        load_byte_to_a(out, f, op->src[0]);
+        cache_a(op->src[0]);
+        for (int k = 0; k < count; k++)
+            emit(out, arith ? "sra\ta" : "srl\ta");
+        return finalize_byte_result(out, f, op, count == 0);
+    }
+
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         if (arith) {
             /* Arithmetic long `>>` → l_asr_dehl (count in A, value in DEHL,

@@ -2357,10 +2357,33 @@ static int ldmem_narrowable(const Op *op)
     return 1;
 }
 
-/* Def-side gate: does this op have an 8-bit lowering for its dst? */
-static int narrow_def_kind(const Op *op)
+static int v_fits_byte(const Func *f, int v);
+static int v_is_sx_of_byte(const Func *f, int v);
+
+/* A constant-count right shift narrows only when the SOURCE provably fits a
+   byte. Unlike a left shift — where the low byte of `src << n` depends only on
+   src's low byte — a right shift pulls bits DOWN out of the high byte, so
+   narrowing `0x0100 >> 1` to a byte shift would give 0 instead of 0x80.
+   Logical needs an unsigned byte source; arithmetic needs a sign-extended one,
+   so the sign bit being tested is bit 7 rather than bit 15. */
+static int narrow_shr_kind(const Func *f, const Op *op)
 {
-    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op);
+    if (op->kind != IR_SHR || op->src[1] != -1) return 0;
+    if (op->src[0] < 0 || op->src[0] >= f->n_vregs) return 0;
+    /* 8080 AND 8085 have no CB prefix, so neither `srl a` nor `sra a` exists
+       (8085's undocumented ARHL is the 16-bit `sra hl` only) — there is no byte
+       lowering to narrow into, so leave both on the 16-bit path. Every other
+       target has the CB set, gbz80 included. */
+    if (IS_808x()) return 0;
+    if (op->imm & IR_SHR_ARITH) return v_is_sx_of_byte(f, op->src[0]);
+    return v_fits_byte(f, op->src[0]);
+}
+
+/* Def-side gate: does this op have an 8-bit lowering for its dst? */
+static int narrow_def_kind(const Func *f, const Op *op)
+{
+    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op)
+        || narrow_shr_kind(f, op);
 }
 
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
@@ -2384,6 +2407,14 @@ static int v_fits_byte(const Func *f, int v)
                byte_val-gated use cases (CMP_EQ/NE, SWITCH, BR_ZERO) even
                though the value is a literal 0 or 1. */
             if (op->kind == IR_LD_IMM && (op->imm & ~0xFFLL) == 0)
+                continue;
+            /* A zero-extended byte fits a byte by construction. `unsigned char
+               v; v >> 1` builds CONV_ZX(v) then shifts, so without this the
+               shift's source never looks byte-valued and the whole chain stays
+               16-bit. */
+            if (op->kind == IR_CONV_ZX
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && f->vregs[op->src[0]].width == 1)
                 continue;
             /* A boolean is 0 or 1. Without this the compare results narrowed
                by narrow_def_kind would still fail every byte_val-gated use
@@ -2461,6 +2492,14 @@ static int demands_low_byte_only(const Func *f, int v)
                 }
                 continue;
             }
+            /* A constant-count right shift that itself narrowed to a byte.
+               An immediate-count SHR has no vreg count operand, so v can only
+               be the shifted VALUE — and the shift only narrowed because that
+               value fits a byte (narrow_shr_kind), which is the same condition
+               that makes reading just v's low byte correct here. */
+            if (u->kind == IR_SHR && u->src[1] == -1 && u->dst >= 0
+                && f->vregs[u->dst].width == 1)
+                continue;
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
                 continue;
             /* Switch index: the dispatch reads v then widens it to full width
@@ -2526,7 +2565,7 @@ int ir_opt_narrow_byte(Func *f)
             int d = op->dst;
             if (d < 0 || d >= f->n_vregs) continue;
             hasdef[d] = 1;
-            if (!narrow_def_kind(op)) {
+            if (!narrow_def_kind(f, op)) {
                 bad[d] = 1;
                 if (badkind[d] < 0) badkind[d] = (int)op->kind;
             }
