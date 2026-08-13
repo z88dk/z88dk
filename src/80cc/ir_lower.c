@@ -4835,9 +4835,31 @@ int ir_lower_func(FILE *out, Func *f)
     L.ss_cur_g = -1;
     L.ss_pinned = 0;
     if (!want_lazy) {
+        /* ss_op_base is the per-BB base of the FLAT op index — an addressing
+           map, not lazy-spill state. It is what makes L.ss_cur_g (the ambient
+           lowering point) valid, and ir_home_at() needs that point to honour a
+           RANGED register home: outside [home_lo,home_hi] the value lives in
+           its slot, not the register. With the map absent, ss_cur_g stayed -1,
+           ir_home_at skipped the bounds test and reported the raw assignment
+           everywhere — so a ranged BC home looked whole-function and
+           `ld bc,K` was emitted for a def OUTSIDE the span with no slot store.
+           The value then died at the first call that clobbered BC. Build it
+           here too so the non-lazy render sees the same homes. */
+        int nb = f->n_bbs > 0 ? f->n_bbs : 1;
+        int *nl_op_base = malloc((size_t)nb * sizeof(int));
+        if (nl_op_base) {
+            int t = 0;
+            for (int b = 0; b < f->n_bbs; b++) {
+                nl_op_base[b] = t;
+                t += f->bbs[b].n_ops;
+            }
+            L.ss_op_base = nl_op_base;
+        }
         rc = lower_func_render(rout, f, 0, NULL, bb_hl_out, bb_lowered,
                                bb_pending_out, bb_pred_cnt, bb_preds,
                                bb_alias);
+        L.ss_op_base = NULL;
+        free(nl_op_base);
     } else {
         bb_hl_out_p1 = malloc((size_t)f->n_bbs * sizeof(int));
         /* Snapshot the only operands the lowering loop mutates in place
