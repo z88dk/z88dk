@@ -91,7 +91,14 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
                   || hlde_belief_droppable(L.rs.hl);
     int hl_dst  = vreg_is_remat(f, op->dst)
                   || ir_home_at(f, op->dst) == IR_PR_HL;
-    if (L.la.cur_dst_dead || (hl_free && hl_dst)) {
+    /* A PR_STACK dst MUST be parked: its single use pops. Neither shortcut
+       below stores anything, so taking one leaves nothing on the stack and the
+       reader falls through to the slot path — and a PR_STACK vreg has no slot,
+       so it addressed sp-1 and read below the stack (`ld hl,-1; add hl,sp`).
+       Only visible where no index register was free to take the value instead,
+       i.e. the non-z80 targets. */
+    if (!vreg_is_pr_stack(f, op->dst)
+        && (L.la.cur_dst_dead || (hl_free && hl_dst))) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
