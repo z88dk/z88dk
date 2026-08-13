@@ -1531,6 +1531,23 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
             return 0;
         }
         if (count > 15) count = 15;              /* >>N (N>=16) == full sign fill */
+        if (count == 15) {
+            /* Full sign fill: every bit of the result is the sign bit, so both
+               bytes are the sign mask. The >=8 path below would reach the same
+               value by grinding the surviving byte down with seven `sra l`, and
+               8080/gbz80 would call l_asr for it. Needs no shift instruction at
+               all, so every CPU takes this. Also the shape the signed
+               divide-by-power-of-two reduction leans on for its bias. */
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,h");
+            emit(out, "add\ta,a");               /* CY = sign bit */
+            emit(out, "sbc\ta,a");               /* a = 0xFF if neg else 0x00 */
+            emit(out, "ld\th,a");
+            emit(out, "ld\tl,a");
+            invalidate_a_cache();
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
         if (has_sra && count >= 8) {
             /* `>>8` is a byte move: low = high byte, high = sign extension.
                Any residual (>>9..15) shifts the surviving bytes. */
