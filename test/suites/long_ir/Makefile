@@ -1,3 +1,10 @@
+# long_ir is the 80cc regression suite — the tests encode 80cc's IR and
+# lowering behaviour, and sccz80 is not expected to pass them. Claim the
+# default before make.config's `COMPILER ?= sccz80`, so a bare `make` here
+# tests the compiler these tests are about. An explicit COMPILER= on the
+# command line still wins.
+COMPILER ?= 80cc
+
 include ../make.config
 
 # $(SOURCES) is the framework (test.c) from make.config. Each suite .c
