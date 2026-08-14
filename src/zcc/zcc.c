@@ -1860,7 +1860,12 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-        snprintf(argbuf,sizeof(argbuf),"%s %s %s", select_cpu(CPU_MAP_TOOL_COPT), coptarg ? coptarg : "", rules[i]);
+        /* -compiler= lets a rule gate on which compiler produced the input: the
+           same rules file is applied to every compiler's output, and a fold that
+           is sound for one can be wrong for another (they differ in which
+           registers a sequence is free to clobber). See %compiler/%notcompiler. */
+        snprintf(argbuf,sizeof(argbuf),"%s -compiler=%s %s %s", select_cpu(CPU_MAP_TOOL_COPT),
+                 c_compiler_type, coptarg ? coptarg : "", rules[i]);
         if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
