@@ -9,7 +9,10 @@
 ;-------------------------------------------------------------------------
 ; m32_fsadd / m32_fssub - 8085 IEEE single add/sub
 ;-------------------------------------------------------------------------
-; Slot (6 bytes) after unpack:
+; Y lives in registers after unpack:
+;   B = sign byte (bit 7), C = exp, LDE = 24-bit mant (H = 0)
+;
+; X is one 6-byte stack slot:
 ;   +0 L = mant MSB (hidden 1 if exp!=0)
 ;   +1     0
 ;   +2 E = mant LSB
@@ -17,18 +20,16 @@
 ;   +4     exp
 ;   +5     sign (bit 7)
 ;
-; Frame after both unpacks (all stack, no BSS scratch):
+; After prologue:
 ;   +0   X slot (6)
-;   +6   Y slot (6)
-;  +12   drop_flag (2)
-;  +14   ret (2)
-;  +16   left IEEE if callee (4)
+;   +6   drop_flag (2)
+;   +8   ret (2)
+;  +10   left IEEE if callee (4)
 ;
-; X is kept as the larger-or-equal exponent operand.
+; Y is the larger-or-equal exponent operand.  Equal exponents do not swap.
 ;
-; Rounding: Digi jam-sticky (match z80 d32_fsadd). Lost bits from align
-; or sum>>1 OR into the mant LSB. Pack has no residual RNE.
-; Sub + normalize: packs as-is via m32_fsnormalize.
+; Rounding: Digi jam-sticky.  Lost bits from align or sum>>1 OR into
+; the mant LSB after the shift.  Pack has no residual RNE.
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -57,259 +58,260 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .fa_start
-    ; Explicit flag word L=0/1 (not push af — F may be 0)
-    ; BC free at entry; DEHL = Y preserved
     ld b,0
     ld c,a
     push bc                         ; drop flag
 
-    call unpack_push                ; Y from DEHL
-    ; +0 Y +6 flag +8 ret +10 left
+    call unpack_regs                ; Y: B,C,LDE from DEHL
+
+    push bc
+    push de
+    push hl                         ; park Y: +0 Y.hl +2 Y.de +4 Y.bc +6 flag +8 ret +10 X.HL +12 X.DE
     ld de,sp+10
     call load_ieee
-    call unpack_push                ; X
-    ; +0 X +6 Y +12 flag +14 ret +16 left
+    call unpack_push                ; X slot on top
+    ; +0 X(6) +6 Y.hl +8 Y.de +10 Y.bc +12 flag +14 ret +16 IEEE
 
-    ; ---- specials gate (finite: two exp loads + inc/jp) ----
-    ; X = left (stack), Y = right (was DEHL).  exp == 255 only.
-    ;   NaN ± *     → NaN
-    ;   Inf ± finite → Inf (sign of the Inf)
-    ;   Inf + Inf   → Inf if same sign, else NaN
-    ld de,sp+4
-    ld a,(de)                       ; X.exp
-    inc a
-    jp Z,fa_spec_x
+    ; Y.bc first (stays); park Y.mant once, copy X over oldY, drop X
     ld de,sp+10
-    ld a,(de)                       ; Y.exp
+    ld hl,(de)
+    ld bc,hl                        ; Y.bc
+    ld de,sp+6
+    ld hl,(de)
+    push hl                         ; Y.hl
+    ld de,sp+10                     ; Y.de at +8 +2
+    ld hl,(de)
+    push hl                         ; +0 Y.de +2 Y.hl +4 X(6) +10 oldY(6)
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+10
+    ld (de),hl
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+12
+    ld (de),hl
+    ld de,sp+8
+    ld hl,(de)
+    ld de,sp+14
+    ld (de),hl
+    pop de                          ; Y.de
+    pop hl                          ; Y.hl
+    ld a,l                          ; Y.MSB
+    ex de,hl                        ; HL = Y.de
+    ld de,sp+6
+    ex de,hl                        ; HL = SP+6, DE = Y.de
+    ld sp,hl                        ; drop original X
+    ld l,a
+    ld h,0
+    ; SP: X'(6) flag ret IEEE; Y in B,C,LDE
+
+    ; ---- specials (exp == 255).  Zeros stay on the add path. ----
+    ld a,c
     inc a
     jp Z,fa_spec_y
-
-    ; If Y.exp >= X.exp, swap X/Y slots (stack only)
-    ld de,sp+4
-    ld a,(de)                       ; X.exp
-    ld b,a
-    ld de,sp+10
-    ld a,(de)                       ; Y.exp
-    cp b
-    call NC,swap6
-
-    ld de,sp+4
+    push de
+    ld de,sp+6                      ; X.exp at +4 +2
     ld a,(de)
-    ld b,a
-    ld de,sp+10
-    ld a,(de)
-    ld c,a
-    ld a,b
-    sub c                           ; expdiff
+    pop de
+    inc a
+    jp Z,fa_spec_x
+    dec a                           ; A = X.exp (inc was only the 255 test)
+    cp c
+    jp Z,fa_ops                     ; equal: no swap, no align
+    jp C,fa_y_gt                    ; X.exp < Y.exp
+
+    sub c                           ; expdiff = X.exp - Y.exp
+    call fa_swap                    ; Y ← X; slot ← old Y; A kept
+    jp fa_align
+
+.fa_y_gt
+    ; A = X.exp, C = Y.exp (A unchanged by cp)
+    cpl
+    inc a
+    add a,c                         ; expdiff = Y.exp - X.exp
+
+.fa_align
     cp 24
-    jp NC,pack_x
+    jp NC,fa_pack                   ; small cannot affect Y
+    call fa_align_x
 
-    call align_y
-
-    ld de,sp+5
+.fa_ops
+    push de
+    ld de,sp+7                      ; X.sign at +5 +2
     ld a,(de)
-    ld b,a
-    ld de,sp+11
-    ld a,(de)
+    pop de
     xor b
     and 080h
-    jp NZ,do_sub
+    jp NZ,fa_sub
 
-    call mant_add
+    call fa_addx
     or a
-    jp Z,pack_x
-    call mant_shr1
-    ld de,sp+4
-    ld a,(de)
-    inc a
-    ld (de),a
-    jp Z,ovf
-    jp pack_x
+    jp Z,fa_pack
+    call fa_shr1
+    inc c
+    jp Z,fa_ovf
+    jp fa_pack
 
-.do_sub
-    call mant_sub
-    call mant_zero
-    jp Z,ret0
-    ld de,sp+0
-    ld a,(de)
-    rla
-    jp NC,do_sub_norm
-    call pack_x_rne
-    jp epi
-.do_sub_norm
-    call load_x_regs
-    call m32_fsnormalize
-    jp epi
-
-.pack_x
-    call pack_x_rne
-    jp epi
-
-
-; Pack X → IEEE DEHL (jam already in mant LSB)
-; SP: ret, X(6), Y(6), flag(2), ...
-.pack_x_rne
-    ; Digi jam: residual already in mant LSB; pack only
-    ld de,sp+7
-    ld a,(de)
-    ld b,a                          ; sign
-    ld de,sp+6
-    ld a,(de)
-    ld c,a                          ; exp
-    ld de,sp+2
-    ld a,(de)
-    ld l,a                          ; MSB
-    ld de,sp+5
-    ld a,(de)
-    push af                         ; mid
-    ld de,sp+6
-    ld a,(de)
-    ld e,a                          ; LSB
-    pop af
-    ld d,a
-    ld h,0
+.fa_sub
+    call fa_subx
+    jp C,fa_sub_rev                 ; borrow only if expdiff==0
+    call fa_mant_zero
+    jp Z,fa_ret0
     ld a,l
     rla
-    ld l,a
+    jp NC,fa_sub_norm
+    jp fa_pack
+
+.fa_sub_rev
+    call fa_neg24
     ld a,b
-    rla
-    ld a,c
-    rra
-    ld h,a
+    xor 080h
+    ld b,a
+    call fa_mant_zero
+    jp Z,fa_ret0
     ld a,l
-    rra
-    ld l,a
+    rla
+    jp NC,fa_sub_norm
+    jp fa_pack
+
+.fa_sub_norm
+    call m32_fsnormalize
+    jp fa_epi
+
+.fa_pack
+    call fa_pack_regs
+    jp fa_epi
+
+
+; Pack Y (B,C,LDE) → IEEE DEHL
+.fa_pack_regs
+    add hl,hl                       ; implicit 1 → CF; H was 0
+    ld h,c                          ; exp
+    ld a,b
+    rla                             ; sign → CF
+    rr hl
     ex de,hl
     ret
 
 
-.ovf
-    ld de,sp+5
-    ld a,(de)
+.fa_ovf
+    ld a,b
     and 080h
     or 07fh
     ld d,a
     ld e,080h
     ld hl,0
     scf
-    jp epi
+    jp fa_epi
 
-    ; ---- cold specials ----
-    ; Slot mant: +0 L (MSB, implicit 1 in bit7), +2 E, +3 D.
-    ; NaN if L[6:0]|E|D nonzero after unpack.
+.fa_ret0
+    ld de,0
+    ld hl,0
+    jp fa_epi
 
-; X.exp == 255 (left).
+
+; X.exp == 255.  Y finite (already checked).
 .fa_spec_x
     ld de,sp+0
-    ld a,(de)
+    ld hl,(de)                      ; MSB, 0
+    ld a,l
     and 07fh
-    ld b,a
     ld de,sp+2
-    ld a,(de)
-    or b
-    ld b,a
-    ld de,sp+3
-    ld a,(de)
-    or b
+    ld hl,(de)                      ; LSB, mid
+    or l
+    or h
     jp NZ,fa_ret_nan                ; X NaN
-    ld de,sp+10
+    ld de,sp+4
+    ld hl,(de)                      ; exp, sign
+    ld a,h
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
+    jp fa_epi
+
+; Y.exp == 255
+.fa_spec_y
+    ld a,l
+    and 07fh
+    or d
+    or e
+    jp NZ,fa_ret_nan                ; Y NaN
+    ld de,sp+4                      ; X.exp (Y.mant DE unused past here)
     ld a,(de)
     inc a
-    jp NZ,fa_ret_inf_x              ; Inf ± finite/0 → X Inf
-    ; Y also exp 255
-    ld de,sp+6
-    ld a,(de)
+    jp NZ,fa_ret_inf_y              ; Inf ± finite
+    ld de,sp+0
+    ld hl,(de)                      ; MSB, 0
+    ld a,l
     and 07fh
-    ld b,a
-    ld de,sp+8
-    ld a,(de)
-    or b
-    ld b,a
-    ld de,sp+9
-    ld a,(de)
-    or b
-    jp NZ,fa_ret_nan                ; Y NaN
-    ld de,sp+5
-    ld a,(de)
-    ld b,a
-    ld de,sp+11
+    ld de,sp+2
+    ld hl,(de)                      ; LSB, mid
+    or l
+    or h
+    jp NZ,fa_ret_nan                ; X NaN
+    ld de,sp+5                      ; X.sign (Y.mant DE unused past here)
     ld a,(de)
     xor b
     and 080h
     jp NZ,fa_ret_nan                ; Inf − Inf
-.fa_ret_inf_x
-    ld de,sp+5
-    ld a,(de)
+.fa_ret_inf_y
+    ld a,b
     and 080h
     or 07fh
     ld d,a
     ld e,080h
     ld hl,0
-    jp epi
-
-; Y.exp == 255, X finite (right Inf wins).
-.fa_spec_y
-    ld de,sp+6
-    ld a,(de)
-    and 07fh
-    ld b,a
-    ld de,sp+8
-    ld a,(de)
-    or b
-    ld b,a
-    ld de,sp+9
-    ld a,(de)
-    or b
-    jp NZ,fa_ret_nan                ; Y NaN
-    ld de,sp+11
-    ld a,(de)
-    and 080h
-    or 07fh
-    ld d,a
-    ld e,080h
-    ld hl,0
-    jp epi
+    jp fa_epi
 
 .fa_ret_nan
     ld de,07fffh
-    ld hl,0ffffh                    ; canonical +NaN
-    jp epi
+    ld hl,0ffffh
+    jp fa_epi
 
-.ret0
-    ld de,0
-    ld hl,0
 
-.epi
-    ; discard X(6)+Y(6)+flag(2)=14 bytes.  DEHL=result, flag under frame.
-    push de
-    push hl
-    ld de,sp+16                     ; flag at +12 after X/Y; +4 for pushes → +16
+.fa_epi
+    ; DEHL = result.  SP: X(6) flag ret IEEE.  BC free after pack.
+    ld bc,de                        ; park result high
+    ld de,sp+6                      ; flag / drop-X target
     ld a,(de)
-    pop hl
-    pop de                          ; A=flag DEHL=result
+    ex de,hl                        ; HL = SP+6, DE = result low
+    ld sp,hl                        ; drop X slot
+    ex de,hl                        ; HL = result low
+    ld de,bc                        ; DEHL = result
 
-    ; Park lo in BC; DE (hi) stays.  SP adjust via HL; restore lo.
-    ld bc,hl
-    ld hl,14
-    add hl,sp
-    ld sp,hl
-    ld hl,bc                        ; DEHL restored; A=flag
-
+    pop bc                          ; drop flag
     or a
-    jp Z,done
-    pop bc
+    jp Z,fa_done
+    pop bc                          ; ret
     pop af
-    pop af
+    pop af                          ; drop IEEE X
     push bc
-.done
+.fa_done
     ret
 
 
 ;------------------------------------------------------------------------------
-.unpack_push
-    call unpack_dehl
+.unpack_regs
+    ld a,d
+    ld b,a                          ; sign byte
+    ex de,hl
+    add hl,hl
+    ld c,h                          ; exp
+    ld a,255
+    add a,h                         ; CF = (exp!=0)
     ld a,l
-    pop hl
+    rra
+    ld l,a
+    ld h,0                          ; LDE = mant; DE was mid:lsb after ex
+    ret
+
+
+.unpack_push
+    call unpack_regs
+    ld a,l
+    pop hl                          ; ret
     push bc
     push de
     ld bc,hl
@@ -317,343 +319,6 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld h,0
     push hl
     push bc
-    ret
-
-
-.unpack_dehl
-    ex de,hl
-    ld a,h
-    ld b,a
-    add hl,hl
-    ld c,h
-    ; Implicit 1: CF=(exp!=0). 255+exp carries iff exp!=0 (subnormals/zero keep CF=0).
-    ld a,255
-    add a,h
-    ld a,l
-    rra
-    ld l,a
-    ld h,0
-    ret
-
-
-; Swap X/Y 6-byte slots; stack only (no BSS).
-; SP on entry: ret, X(6), Y(6), GS, ...
-.swap6
-    pop bc                          ; ret
-    ld de,sp+0
-    ex de,hl                        ; HL = &X
-    ld de,sp+6                      ; DE = &Y
-    push bc                         ; keep ret off to side… need BC free
-    ld b,6
-.swlp
-    ld a,(hl)
-    ld c,a
-    ld a,(de)
-    ld (hl),a
-    ld a,c
-    ld (de),a
-    inc hl
-    inc de
-    dec b
-    jp NZ,swlp
-    pop bc
-    push bc
-    ret
-
-
-; Align Y by A right shifts; jam sticky into Y mant LSB if bits lost.
-; SP: ret, X(6), Y(6), flag(2), ...
-
-.align_y
-    or a
-    ret Z
-    ld b,a
-    cp 16                           ; A still holds shift count (copt: drop ld a,b)
-    jp C,ay_byte8
-    sub 16
-    ld b,a
-    ld de,sp+10
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    or c
-    ld c,a                          ; lost mid|lsb
-    or a
-    jp Z,ay16_njam
-    ld de,sp+10                     ; Y.E (SP: ret, X, Y)
-    ld a,(de)
-    or 1
-    ld (de),a
-.ay16_njam
-    ld de,sp+8
-    ld a,(de)
-    ld l,a
-    xor a
-    ld (de),a
-    inc de
-    inc de
-    ld a,l
-    ld (de),a
-    inc de
-    xor a
-    ld (de),a
-
-.ay_byte8
-    ld a,b
-    cp 8
-    jp C,ay_bits
-    sub 8
-    ld b,a
-    ld de,sp+10
-    ld a,(de)
-    ld c,a                          ; lost LSB byte
-    or a
-    jp Z,ay8_njam
-    ld de,sp+10                     ; Y.E
-    ld a,(de)
-    or 1
-    ld (de),a
-.ay8_njam
-    ld de,sp+10
-    inc de
-    ld a,(de)
-    ld l,a
-    ld de,sp+8
-    ld a,(de)
-    ld h,a
-    xor a
-    ld (de),a
-    inc de
-    inc de
-    ld a,l
-    ld (de),a
-    inc de
-    ld a,h
-    ld (de),a
-
-.ay_bits
-    ld a,b
-    or a
-    ret Z
-    ; B = bit count. No push/pop per bit (Y at sp+8: ret,X,Y).
-.aylp
-    ld de,sp+8
-    ld a,(de)
-    ld l,a                          ; MSB
-    inc de
-    inc de
-    ld a,(de)
-    ld c,a                          ; mid
-    inc de
-    ld a,(de)
-    ld h,a                          ; LSB side in H packing (matches prior layout)
-    ld a,c
-    and 01h
-    jp Z,ay_njam
-    ld de,sp+10                     ; Y.E jam sticky
-    ld a,(de)
-    or 1
-    ld (de),a
-.ay_njam
-    ld a,l
-    or a
-    rra
-    ld l,a
-    ld a,h
-    rra
-    ld h,a
-    ld a,c
-    rra
-    ld c,a
-    ld de,sp+8
-    ld a,l
-    ld (de),a
-    inc de
-    inc de
-    ld a,c
-    ld (de),a
-    inc de
-    ld a,h
-    ld (de),a
-    dec b
-    jp NZ,aylp
-    ret
-
-
-; After CALL: ret, X(6), Y(6), flag(2)
-; X: +2 MSB … +7 sign; Y: +8 …
-
-.mant_add
-    ; X.E + Y.E → X (H = Y byte temp; no push af)
-    ld de,sp+10
-    ld a,(de)
-    ld h,a
-    ld de,sp+4
-    ld a,(de)
-    add a,h
-    ld (de),a
-    ld de,sp+11
-    ld a,(de)
-    ld h,a
-    ld de,sp+5
-    ld a,(de)
-    adc a,h
-    ld (de),a
-    ld de,sp+8
-    ld a,(de)
-    ld h,a
-    ld de,sp+2
-    ld a,(de)
-    adc a,h
-    ld (de),a
-    ld a,0
-    rla
-    ret
-
-
-.mant_sub
-    ld de,sp+8
-    ld a,(de)
-    ld h,a
-    ld de,sp+2
-    ld a,(de)
-    cp h
-    jp C,ms_rev
-    jp NZ,ms_do
-    ld de,sp+11
-    ld a,(de)
-    ld h,a
-    ld de,sp+5
-    ld a,(de)
-    cp h
-    jp C,ms_rev
-    jp NZ,ms_do
-    ld de,sp+10
-    ld a,(de)
-    ld h,a
-    ld de,sp+4
-    ld a,(de)
-    cp h
-    jp C,ms_rev
-.ms_do
-    ld de,sp+10
-    ld a,(de)
-    ld h,a
-    ld de,sp+4
-    ld a,(de)
-    sub h
-    ld (de),a
-    ld de,sp+11
-    ld a,(de)
-    ld h,a
-    ld de,sp+5
-    ld a,(de)
-    sbc a,h
-    ld (de),a
-    ld de,sp+8
-    ld a,(de)
-    ld h,a
-    ld de,sp+2
-    ld a,(de)
-    sbc a,h
-    ld (de),a
-    ret
-.ms_rev
-    ; Y - X → X, flip X.sign
-    ld de,sp+4
-    ld a,(de)
-    ld h,a
-    ld de,sp+10
-    ld a,(de)
-    sub h
-    ld de,sp+4
-    ld (de),a
-    ld de,sp+5
-    ld a,(de)
-    ld h,a
-    ld de,sp+11
-    ld a,(de)
-    sbc a,h
-    ld de,sp+5
-    ld (de),a
-    ld de,sp+2
-    ld a,(de)
-    ld h,a
-    ld de,sp+8
-    ld a,(de)
-    sbc a,h
-    ld de,sp+2
-    ld (de),a
-    ld de,sp+7
-    ld a,(de)
-    xor 080h
-    ld (de),a
-    ret
-
-
-.mant_zero
-    ld de,sp+2
-    ld a,(de)
-    ld h,a
-    ld de,sp+4
-    ld a,(de)
-    or h
-    ld h,a
-    ld de,sp+5
-    ld a,(de)
-    or h
-    ret
-
-
-.mant_shr1
-    ; SP: ret, X, Y, flag — jam bit out into X.E after >>1
-    ld de,sp+4
-    ld a,(de)
-    and 01h
-    ld c,a                          ; C = bit out
-    ld de,sp+2
-    ld a,(de)
-    or a
-    rra
-    ld (de),a
-    ld de,sp+5
-    ld a,(de)
-    rra
-    ld (de),a
-    ld de,sp+4
-    ld a,(de)
-    rra
-    ld (de),a
-    ld a,c
-    or a
-    ret Z
-    ld de,sp+4
-    ld a,(de)
-    or 1
-    ld (de),a
-    ret
-
-
-.load_x_regs
-    ld de,sp+7
-    ld a,(de)
-    ld b,a
-    ld de,sp+6
-    ld a,(de)
-    ld c,a
-    ld de,sp+2
-    ld a,(de)
-    ld l,a
-    ld de,sp+5
-    ld a,(de)
-    push af
-    ld de,sp+6
-    ld a,(de)
-    ld e,a
-    pop af
-    ld d,a
-    ld h,0
     ret
 
 
@@ -662,6 +327,249 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld c,(hl+)
     ld b,(hl+)
     ld e,(hl+)
-    ld d,(hl)                       ; last byte: no post-inc (HL → bc next)
+    ld d,(hl)
     ld hl,bc
+    ret
+
+
+;------------------------------------------------------------------------------
+; Swap Y (regs) with X (slot).  A = expdiff, preserved.
+; CALL: SP = ret, X(6), flag, ...
+; Slot words: (MSB,0), (LSB,mid), (exp,sign)
+;------------------------------------------------------------------------------
+.fa_swap
+    push af
+    push bc
+    push de
+    push hl                         ; Y
+    ; +0 Y.hl +2 Y.de +4 Y.bc +6 af +8 ret +10 X
+
+    ld de,sp+14
+    ld hl,(de)
+    ld bc,hl                        ; X.bc
+    ld de,sp+10
+    ld hl,(de)
+    push hl                         ; X.MSB
+    ld de,sp+14                     ; X.LSB:mid at +12 +2
+    ld hl,(de)
+    ex de,hl                        ; DE = X.de
+    pop hl                          ; X in B,C,LDE
+
+    push de
+    push hl                         ; park X.mant; BC stays
+    ; +0 X.hl +2 X.de +4 Y.hl +6 Y.de +8 Y.bc +10 af +12 ret +14 X
+
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+14
+    ld (de),hl                      ; X.MSB := Y.hl
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+16
+    ld (de),hl                      ; X.LSB:mid
+    ld de,sp+8
+    ld hl,(de)
+    ld de,sp+18
+    ld (de),hl                      ; X.exp:sign
+    pop hl
+    pop de                          ; X.mant; BC = X.bc
+    ; SP: Y(6) af ret X
+    pop af
+    pop af
+    pop af                          ; drop Y park
+    pop af                          ; expdiff
+    ret
+
+
+;------------------------------------------------------------------------------
+; Align X slot right by A bits.  Jam AFTER the shift into the new LSB.
+; CALL: SP = ret, X(6), flag, ...
+;------------------------------------------------------------------------------
+.fa_align_x
+    push bc
+    push de
+    push hl                         ; park Y
+    ld b,a                          ; count
+    ; +0 Y.hl +2 Y.de +4 Y.bc +6 ret +8 X.MSB ...
+
+    ld de,sp+10
+    ld hl,(de)                      ; LSB, mid
+    ld c,l                          ; LSB
+    ld de,sp+8
+    ld a,(de)
+    ld l,a                          ; MSB in L, mid stays in H
+
+    ld a,b
+    cp 16
+    jp C,ay8
+    sub 16
+    ld b,a
+    ld a,c
+    or h                            ; lost LSB|mid
+    ld c,l                          ; new LSB = old MSB
+    ld l,0
+    ld h,0
+    jp Z,ay8
+    ld a,c
+    or 1
+    ld c,a                          ; jam after >>16
+.ay8
+    ld a,b
+    or a
+    jp Z,ay_store
+    cp 8
+    jp C,ayb
+    sub 8
+    ld b,a
+    ld a,c                          ; lost LSB
+    ld c,h                          ; new LSB = old mid
+    ld h,l                          ; new mid = old MSB
+    ld l,0
+    or a
+    jp Z,ayb
+    ld a,c
+    or 1
+    ld c,a                          ; jam after >>8
+.ayb
+    ld a,b
+    or a
+    jp Z,ay_store
+.aylp
+    ld a,l
+    or a
+    rra
+    ld l,a
+    ld a,h
+    rra
+    ld h,a
+    ld a,c
+    rra
+    ld c,a
+    jp NC,ayn
+    ld a,c
+    or 1
+    ld c,a                          ; jam after >>1
+.ayn
+    dec b
+    jp NZ,aylp
+
+.ay_store
+    ld a,l                          ; MSB
+    ld l,c                          ; LSB:mid in HL
+    ld bc,hl                        ; park LSB:mid (count done)
+    ld l,a
+    ld h,0
+    ld de,sp+8                      ; X.MSB
+    ld (de),hl
+    ld hl,bc
+    ld de,sp+10                     ; X.LSB:mid
+    ld (de),hl
+    pop hl
+    pop de
+    pop bc
+    ret
+
+
+;------------------------------------------------------------------------------
+; LDE += X.mant.  A = 1 if overflow into bit 24, else 0.
+; CALL: SP = ret, X(6), ...
+;------------------------------------------------------------------------------
+.fa_addx
+    ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
+    ; Park sign/exp so BC can hold Y.de across the three (de) loads.
+    push bc
+    ld bc,de                        ; Y.de
+    ld de,sp+6                      ; X.LSB at +4 +2
+    ld a,(de)
+    add a,c
+    ld c,a
+    ld de,sp+7                      ; X.mid
+    ld a,(de)
+    adc a,b
+    ld b,a
+    ld de,sp+4                      ; X.MSB
+    ld a,(de)
+    adc a,l
+    ld l,a
+    ld de,bc
+    pop bc
+    ld a,0
+    rla
+    ret
+
+
+;------------------------------------------------------------------------------
+; LDE -= X.mant.  CF set if borrow.  B,C (sign,exp) preserved.
+; CALL: +0 ret +2 X.MSB +4 X.LSB +5 X.mid
+;------------------------------------------------------------------------------
+.fa_subx
+    ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
+    push bc
+    ld bc,de                        ; Y.de
+    ld de,sp+6                      ; X.LSB
+    ld a,(de)
+    ld e,a
+    ld a,c
+    sub e
+    ld c,a
+    ld de,sp+7                      ; X.mid
+    ld a,(de)
+    ld e,a
+    ld a,b
+    sbc a,e
+    ld b,a
+    ld de,sp+4                      ; X.MSB
+    ld a,(de)
+    ld e,a
+    ld a,l
+    sbc a,e
+    ld l,a
+    ld de,bc
+    pop bc
+    ld h,0
+    ret
+
+
+.fa_shr1
+    ; add overflow only: inject 1 at the top, jam lost LSB
+    scf
+    ld a,l
+    rra
+    ld l,a
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ld h,0
+    ret NC
+    ld a,e
+    or 1
+    ld e,a
+    ret
+
+
+.fa_neg24
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+    ld a,l
+    cpl
+    ld l,a
+    inc e
+    ret NZ
+    inc d
+    ret NZ
+    inc l
+    ret
+
+
+.fa_mant_zero
+    ld a,l
+    or d
+    or e
     ret
