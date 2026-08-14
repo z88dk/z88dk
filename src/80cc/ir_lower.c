@@ -82,6 +82,12 @@ struct RegState {
     int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
     int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
                    store from FA, so its residency is tracked independently */
+    int z_from_a;/* 1 when the LAST emitted instruction set Z/S from A's current
+                    value (an `and`/`or`/`xor` on A). Invalidate-by-default at
+                    the vemit chokepoint, like the `a` tracker above: anything
+                    else emitted clears it, so a stale claim is impossible. Lets
+                    a following truth-test of that byte skip its `or a` — the
+                    mask has already set Z. */
 };
 
 /* The lowerer's mutable state, grouped into one struct and accessed as
@@ -572,6 +578,12 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             }
         }
     }
+    /* Invalidate rs.z_from_a by default: every emitted line clears the claim,
+       and the byte-ALU emitter re-asserts it immediately after its own emit.
+       The mnemonic cannot be read off `fmt` — the ALU forms pass it as an
+       ARGUMENT ("%s%u" with pfx="and\t"), so the format string does not carry
+       it. */
+    L.rs.z_from_a = 0;
     fputc('\t', out);
     vfprintf(out, fmt, ap);
     fputc('\n', out);

@@ -447,6 +447,11 @@ static void emit_test_zero(FILE *out, Func *f, int src)
            routes a byte-mask AND / byte vreg here), so `or a` on the low
            byte sets Z for the whole value — no `ld h,0` widen. */
         if (!a_has(src)) load_byte_to_a(out, f, src);
+        /* The mask that produced this byte already set Z from it (`and K`), and
+           nothing has been emitted since — so the `or a` is dead. rs.z_from_a is
+           cleared by any other emitted line, so this can never act on a stale
+           claim. */
+        else if (L.rs.z_from_a) return;
         emit(out, "or\ta");
         return;
     }
@@ -1828,8 +1833,29 @@ static void emit_byte_add_imm(FILE *out, unsigned k, int is_sub)
     else        emit(out, "add\ta,%u", k);
 }
 
+/* True for the byte-ALU prefixes that leave Z/S set from the value they leave
+   in A — and/or/xor. `cp` flags a value it does not keep, and add/sub also move
+   carry, so neither qualifies. */
+static int alu_prefix_sets_z_from_a(const char *p)
+{
+    return (p[0]=='a' && p[1]=='n' && p[2]=='d')
+        || (p[0]=='o' && p[1]=='r')
+        || (p[0]=='x' && p[1]=='o' && p[2]=='r');
+}
+
+/* Wrapper: whatever route the operand takes, an and/or/xor leaves Z set from
+   the byte now in A, so record it for a following truth-test. */
+static void byte_alu_operand_emit(FILE *out, const Func *f,
+                                  const char *prefix, int m);
 static void byte_alu_operand(FILE *out, const Func *f,
                              const char *prefix, int m)
+{
+    byte_alu_operand_emit(out, f, prefix, m);
+    if (alu_prefix_sets_z_from_a(prefix)) L.rs.z_from_a = 1;
+}
+
+static void byte_alu_operand_emit(FILE *out, const Func *f,
+                                  const char *prefix, int m)
 {
     if (a_has(m))  { emit(out, "%sa", prefix); return; }
     /* Index-half home as an ALU source (add a,iyl / sub iyl / cp iyl …): the
@@ -4603,6 +4629,12 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 return 0;
             }
             emit(out, "%s%u", pfx, m);
+            /* and/or/xor set Z and S from the result now in A, so a following
+               truth-test of this byte needs no `or a`. sub/add/cp do not
+               qualify — what they leave in A is not what they flagged, or they
+               also move carry. */
+            if (op->kind == IR_AND || op->kind == IR_OR || op->kind == IR_XOR)
+                L.rs.z_from_a = 1;
         } else {
             int s0 = op->src[0], s1 = op->src[1];
             if (!a_has(s0) && a_has(s1)) { int t = s0; s0 = s1; s1 = t; }
