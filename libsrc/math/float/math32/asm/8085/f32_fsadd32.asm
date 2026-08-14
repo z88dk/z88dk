@@ -23,6 +23,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsnormalize32
+EXTERN l_neg_dehl
 
 PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
@@ -165,6 +166,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 .a32_sub
     call a32_subx
     jp C,a32_sub_rev                ; borrow: only possible if expdiff==0
+.a32_sub_mag
     ld a,d
     or e
     or h
@@ -177,20 +179,11 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jp a32_ret_y
 
 .a32_sub_rev
-    call a32_neg
+    call l_neg_dehl
     ld a,c
     xor 080h
     ld c,a
-    ld a,d
-    or e
-    or h
-    or l
-    jp Z,a32_zero
-    ld a,d
-    or a
-    jp M,a32_ret_y
-    call m32_fsnormalize32
-    jp a32_ret_y
+    jp a32_sub_mag
 
 
 .a32_ret_y
@@ -460,30 +453,4 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld a,l
     or 1
     ld l,a
-    ret
-
-
-;------------------------------------------------------------------------------
-; DEHL = −DEHL (two's complement)
-;------------------------------------------------------------------------------
-.a32_neg
-    ld a,l
-    cpl
-    ld l,a
-    ld a,h
-    cpl
-    ld h,a
-    ld a,e
-    cpl
-    ld e,a
-    ld a,d
-    cpl
-    ld d,a
-    inc l
-    ret NZ
-    inc h
-    ret NZ
-    inc e
-    ret NZ
-    inc d
     ret

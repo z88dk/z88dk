@@ -45,6 +45,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsnormalize32
+EXTERN l_neg_dehl
 
 PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
@@ -311,36 +312,17 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     exx
     ld h,a
     jr NC,noneg
-; borrowed: two's complement + flip sign (same as reverse-sub)
-    ld a,e
-    cpl
-    ld e,a
-    ld a,d
-    cpl
-    ld d,a
-    ld a,l
-    cpl
-    ld l,a
-    ld a,h
-    cpl
-    ld h,a
-    inc e
-    jr NZ,noneg_s
-    inc d
-    jr NZ,noneg_s
-    inc l
-    jr NZ,noneg_s
-    inc h
-.noneg_s
+    ; borrowed: two's complement + flip sign.  Normalize wants DEHL.
+    ex de,hl
+    call l_neg_dehl
     ld a,c
     xor 080h
     ld c,a
+    jp m32_fsnormalize32
+
 .noneg
-; sub zero alignment from fadd
 ; difference larger-smaller in hlde
 ; exponent of result in b sign of result in c
-; now do normalize
     ex de,hl
-
     jp m32_fsnormalize32        ; now begin to normalize with bc dehl
 

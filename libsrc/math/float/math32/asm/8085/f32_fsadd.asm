@@ -36,6 +36,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsnormalize
+EXTERN m32_fsconst_pnan
 
 PUBLIC m32_fssub, m32_fssub_callee
 PUBLIC m32_fsadd, m32_fsadd_callee
@@ -155,6 +156,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_sub
     call fa_subx
     jp C,fa_sub_rev                 ; borrow only if expdiff==0
+.fa_sub_mag
     call fa_mant_zero
     jp Z,fa_ret0
     ld a,l
@@ -167,12 +169,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,b
     xor 080h
     ld b,a
-    call fa_mant_zero
-    jp Z,fa_ret0
-    ld a,l
-    rla
-    jp NC,fa_sub_norm
-    jp fa_pack
+    jp fa_sub_mag
 
 .fa_sub_norm
     call m32_fsnormalize
@@ -196,11 +193,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .fa_ovf
     ld a,b
-    and 080h
-    or 07fh
-    ld d,a
-    ld e,080h
-    ld hl,0
+    call fa_mk_inf
     scf
     jp fa_epi
 
@@ -224,12 +217,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld de,sp+4
     ld hl,(de)                      ; exp, sign
     ld a,h
-    and 080h
-    or 07fh
-    ld d,a
-    ld e,080h
-    ld hl,0
-    jp fa_epi
+    jp fa_ret_inf
 
 ; Y.exp == 255
 .fa_spec_y
@@ -258,16 +246,12 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp NZ,fa_ret_nan                ; Inf − Inf
 .fa_ret_inf_y
     ld a,b
-    and 080h
-    or 07fh
-    ld d,a
-    ld e,080h
-    ld hl,0
+.fa_ret_inf
+    call fa_mk_inf
     jp fa_epi
 
 .fa_ret_nan
-    ld de,07fffh
-    ld hl,0ffffh
+    call m32_fsconst_pnan
     jp fa_epi
 
 
@@ -565,6 +549,16 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     inc d
     ret NZ
     inc l
+    ret
+
+
+; A[7] = sign.  DEHL = signed IEEE Inf.  CF destroyed (AND).
+.fa_mk_inf
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
     ret
 
 

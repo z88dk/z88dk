@@ -52,6 +52,7 @@ SECTION code_fp_math32
 
 EXTERN m32_fsnormalize
 EXTERN m32_fsconst_pnan
+EXTERN l_neg_dehl
 
 PUBLIC m32_fssub, m32_fssub_callee
 PUBLIC m32_fsadd, m32_fsadd_callee
@@ -313,11 +314,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 .foverflow
     ld a,b
-    and 080h
-    or 07fh                     ; max exponent, preserve sign
-    ld d,a
-    ld e,080h                   ; IEEE infinity (zero mantissa)
-    ld hl,0
+    call add_mk_inf
     scf                         ; error
     ret
 
@@ -346,12 +343,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .add_ret_inf_y
     exx                         ; y primary; sign in B
     ld a,b
-    and 080h
-    or 07fh
-    ld d,a
-    ld e,080h
-    ld hl,0
-    ret
+    jp add_mk_inf
 
 ; x.exp == 255, y finite.  Primary = x.
 .add_spec_x
@@ -361,6 +353,9 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     or e
     jp NZ,m32_fsconst_pnan      ; x NaN
     ld a,b                      ; Inf ± finite → Inf (x)
+
+; A[7] = sign.  DEHL = signed IEEE Inf.  CF destroyed (AND).
+.add_mk_inf
     and 080h
     or 07fh
     ld d,a
@@ -412,27 +407,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     exx
     ld h,a
     jr NC,noneg                 ; y >= x (or larger >= smaller)
-; borrowed: two's complement + flip sign (same as reverse-sub)
-    ld a,e
-    cpl
-    ld e,a
-    ld a,d
-    cpl
-    ld d,a
-    ld a,l
-    cpl
-    ld l,a
-    ld a,h
-    cpl
-    ld h,a
-    inc e
-    jr NZ,noneg_s
-    inc d
-    jr NZ,noneg_s
-    inc l
-    jr NZ,noneg_s
-    inc h
-.noneg_s
+    ; borrowed: two's complement + flip sign (HLDE → DEHL for l_neg_dehl)
+    ex de,hl
+    call l_neg_dehl
+    ex de,hl
     ld a,b
     xor 080h
     ld b,a
