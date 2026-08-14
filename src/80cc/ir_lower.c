@@ -1976,6 +1976,13 @@ static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
         if (ixoff) {
             emit(out, "ld\tde,%d", ixoff);
             emit(out, "add\thl,de");
+            /* The `ld de` above destroys DE, and with it the HIGH half of any
+               live DEHL long. Without this the long-store path kept believing
+               DE held the value and wrote the displacement's bytes instead:
+               long_ir structval test_struct_mixed_odd, every Rabbit in fp mode.
+               (sp mode escapes it — there the address is `ld hl,off; add hl,sp`,
+               which leaves DE alone; ez80 escapes via `lea`.) */
+            invalidate_de_cache();
         }
     } else {
         emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj + ofs);
@@ -1997,6 +2004,13 @@ static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
         if (ixoff) {
             emit(out, "ld\tde,%d", ixoff);
             emit(out, "add\thl,de");
+            /* The `ld de` above destroys DE, and with it the HIGH half of any
+               live DEHL long. Without this the long-store path kept believing
+               DE held the value and wrote the displacement's bytes instead:
+               long_ir structval test_struct_mixed_odd, every Rabbit in fp mode.
+               (sp mode escapes it — there the address is `ld hl,off; add hl,sp`,
+               which leaves DE alone; ez80 escapes via `lea`.) */
+            invalidate_de_cache();
         }
     } else {
         emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj);
