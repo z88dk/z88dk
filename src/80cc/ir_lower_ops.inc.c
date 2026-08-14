@@ -1854,6 +1854,20 @@ static void byte_alu_operand(FILE *out, const Func *f,
     if (alu_prefix_sets_z_from_a(prefix)) L.rs.z_from_a = 1;
 }
 
+/* The byte ALU ops that have an r6k `a,(sp+n)` form: add sub and or xor cp
+   (49 89/a9/c9/e9/d9/f9 nn). adc/sbc are NOT in that set, so they keep the
+   address-in-HL path. */
+static int alu_mem_prefix_ok(const char *p)
+{
+    static const char *ok[] = { "add\t", "sub\t", "and\t", "or\t",
+                                "xor\t", "cp\t", NULL };
+    for (int i = 0; ok[i]; i++) {
+        size_t n = strlen(ok[i]);
+        if (strncmp(p, ok[i], n) == 0) return 1;
+    }
+    return 0;
+}
+
 static void byte_alu_operand_emit(FILE *out, const Func *f,
                                   const char *prefix, int m)
 {
@@ -1908,6 +1922,25 @@ static void byte_alu_operand_emit(FILE *out, const Func *f,
        A live address belief implies no pending spill (store_a_byte leans on the
        same invariant), so only resolve when there is none — pending_spill_resolve
        itself clobbers HL and would drop the address we are about to reuse. */
+    /* Rabbit 6000 reads the slot as the ALU operand directly — `xor a,(sp+n)`
+       (49 d9 nn) instead of computing the address in HL and going through
+       `(hl)`. Only the 6000 has it; r3k/r4k/r5k reject the encoding. The
+       operand form REQUIRES the explicit accumulator (`xor a,(sp+4)` assembles,
+       `xor (sp+4)` does not), so normalise the prefix, which is spelled with
+       the `a,` for add/adc and without it for the rest. */
+    if (IS_R6K() && !fp_active(f) && alu_mem_prefix_ok(prefix)) {
+        int off = slot_off(f, m) + L.cur_sp_adjust;
+        if (off >= 0 && off <= 255) {
+            char mn[8];
+            size_t n = 0;
+            while (n < sizeof mn - 1 && prefix[n] && prefix[n] != '\t') {
+                mn[n] = prefix[n]; n++;
+            }
+            mn[n] = 0;
+            emit(out, "%s\ta,(sp+%d)", mn, off);
+            return;
+        }
+    }
     if (L.cur_hl_addr_off < 0) pending_spill_resolve();
     emit_byte_slot_addr(out, f, m);
     emit(out, "%s(hl)", prefix);
