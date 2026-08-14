@@ -1965,57 +1965,44 @@ static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
                                int ofs)
 {
     if (fp_active(f)) {
-        int ixoff = slot_ix_off(f, vreg) + ofs;
-        /* ez80: lea hl,ix+d in one op, no DE clobber, vs push/pop + add. */
-        if (IS_EZ80() && ixoff >= -128 && ixoff <= 127) {
-            emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
-            return;
+        /* ez80: lea hl,ix+d is one 3-byte op, beating the 4-byte sp form. */
+        if (IS_EZ80()) {
+            int ixoff = slot_ix_off(f, vreg) + ofs;
+            if (ixoff >= -128 && ixoff <= 127) {
+                emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
+                return;
+            }
         }
-        emit(out, "push\t%s", frame_reg());
-        emit(out, "pop\thl");
-        if (ixoff) {
-            emit(out, "ld\tde,%d", ixoff);
-            emit(out, "add\thl,de");
-            /* The `ld de` above destroys DE, and with it the HIGH half of any
-               live DEHL long. Without this the long-store path kept believing
-               DE held the value and wrote the displacement's bytes instead:
-               long_ir structval test_struct_mixed_odd, every Rabbit in fp mode.
-               (sp mode escapes it — there the address is `ld hl,off; add hl,sp`,
-               which leaves DE alone; ez80 escapes via `lea`.) */
-            invalidate_de_cache();
-        }
-    } else {
+        /* Everyone else reaches the slot through sp even while IX holds the
+           frame: `ld hl,N; add hl,sp` is 4 bytes against 7 for `push ix; pop hl;
+           ld de,d; add hl,de`, and it leaves DE ALONE. That `ld de` used to
+           destroy the high half of a live DEHL long (long_ir structval
+           test_struct_mixed_odd, every Rabbit in fp mode). `adj` counts here,
+           unlike in the ix form where it is meaningless.
+           Deliberately does not call slot_ix_off: that votes in ds_ixaccess,
+           and an address taken through sp is no reason to keep IX alive. */
         emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj + ofs);
         emit(out, "add\thl,sp");
+        return;
     }
+    emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj + ofs);
+    emit(out, "add\thl,sp");
 }
 
 static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
 {
-    if (fp_active(f)) {
+    if (fp_active(f) && IS_EZ80()) {
+        /* ez80: lea hl,ix+d is one 3-byte op, beating the 4-byte sp form. */
         int ixoff = slot_ix_off(f, vreg);
-        /* ez80: lea hl,ix+d in one op, no DE clobber, vs push/pop + add. */
-        if ((IS_EZ80()) && ixoff >= -128 && ixoff <= 127) {
+        if (ixoff >= -128 && ixoff <= 127) {
             emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
             return;
         }
-        emit(out, "push\t%s", frame_reg());
-        emit(out, "pop\thl");
-        if (ixoff) {
-            emit(out, "ld\tde,%d", ixoff);
-            emit(out, "add\thl,de");
-            /* The `ld de` above destroys DE, and with it the HIGH half of any
-               live DEHL long. Without this the long-store path kept believing
-               DE held the value and wrote the displacement's bytes instead:
-               long_ir structval test_struct_mixed_odd, every Rabbit in fp mode.
-               (sp mode escapes it — there the address is `ld hl,off; add hl,sp`,
-               which leaves DE alone; ez80 escapes via `lea`.) */
-            invalidate_de_cache();
-        }
-    } else {
-        emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj);
-        emit(out, "add\thl,sp");
     }
+    /* Otherwise address through sp in BOTH modes — see emit_slot_addr_ofs:
+       4 bytes rather than 7, and no DE clobber. */
+    emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj);
+    emit(out, "add\thl,sp");
 }
 
 /* Wide memory-accumulator primitive name for `vreg`, dispatched on its
