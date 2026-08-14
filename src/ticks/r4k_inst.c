@@ -1895,11 +1895,13 @@ void r6k_swap_rp2(uint8_t opcode)
     uint8_t *dmsb = get_rp2_msb_ptr(reg, altd); 
     uint8_t t;
 
+    /* Same directed-assignment rule as r6k_swap_r32: the source bank must not
+       be written when it differs from the destination. */
     if ( dmsb == smsb ) {
         SWAPR(*smsb, *slsb);
     } else {
-        SWAPR(*dmsb, *slsb);
-        SWAPR(*dlsb, *smsb);
+        *dmsb = *slsb;
+        *dlsb = *smsb;
     }
     st += 4;
 }
@@ -1954,15 +1956,19 @@ void r6k_swap_r32(uint8_t opcode, uint8_t isjkhl)
     uint8_t **src = get_r32_source_ptr(isjkhl);
     uint8_t t;
 
-    // B = E; C = D; D = C; E = B  
-    if ( altd == 0 && alts == 0 ) {
+    /* dest = reverse(src): B=E, C=D, D=C, E=B. ALTD picks the destination bank
+       and ALTS the source, so this is `bcde=de`, `bc'=de` or `bc'=de'` — a
+       directed assignment, NOT an exchange. Only when the two banks are the
+       same register file does it become one, and there it must be done as
+       swaps because a plain assignment would need a temporary. */
+    if ( dest[0] == src[0] ) {
         SWAPR(*dest[0], *src[3]);
         SWAPR(*dest[1], *src[2]);
     } else {
-        SWAPR(*dest[0], *src[3]);
-        SWAPR(*dest[1], *src[2]);
-        SWAPR(*dest[2], *src[1]);
-        SWAPR(*dest[3], *src[0]);
+        *dest[0] = *src[3];
+        *dest[1] = *src[2];
+        *dest[2] = *src[1];
+        *dest[3] = *src[0];
     }
     st += 4;
 }
