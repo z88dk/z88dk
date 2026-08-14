@@ -5576,14 +5576,27 @@ void copy_to_extern(const char *src, const char *dest, int size)
 }
 
 
+/* Rabbit I/O space selector. Both spaces address 16 bits and carry a byte, so
+   the only thing that varies is the prefix: plain `__sfr` is internal (ioi,
+   where the on-chip peripheral registers live, and what inp()/outp() use),
+   `__sfr __banked` is external (ioe). */
+static const char *rabbit_io_prefix(SYMBOL *sym)
+{
+    return sym->type == KIND_PORT16 ? "\tioe" : "\tioi";
+}
+
 void gen_intrinsic_in(SYMBOL *sym)
 {
     if ( c_cpu & CPU_RABBIT ) {
-        ol("ioi");
-        outstr("\tld\thl,("); outname(sym->name, 1); outstr(")"); nl();
+        /* The prefix binds to the instruction and must share its line; a lone
+           `ioi` is a syntax error. Byte-wide: `ld hl,(N)` would read the
+           adjacent port N+1 as the high half. */
+        outstr(rabbit_io_prefix(sym)); outstr("\tld\ta,("); outname(sym->name, 1); outstr(")"); nl();
         if ( c_cpu == CPU_R2KA ) {
             ol("nop"); // Rabbit bug workaround
         }
+        ol("ld\tl,a");
+        ol("ld\th,0");
         return;
     } else if ( IS_GBZ80() ) {
         outstr("\tldh\ta,("); outname(sym->name, 1); outstr(")"); nl();
@@ -5611,8 +5624,7 @@ void gen_intrinsic_out(SYMBOL *sym)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ld\ta,l");
-        ol("ioi");
-        outstr("\tld\t("); outname(sym->name, 1); outstr("),a"); nl();
+        outstr(rabbit_io_prefix(sym)); outstr("\tld\t("); outname(sym->name, 1); outstr("),a"); nl();
         if ( c_cpu == CPU_R2KA ) {
             ol("nop"); // Rabbit bug workaround
         }
