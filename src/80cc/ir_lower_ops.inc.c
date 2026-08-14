@@ -3640,6 +3640,52 @@ static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
    via ex de,hl. Result → HL → commit_hl_result. lo_op/hi_op are the low/high byte
    mnemonic prefixes incl. separator. Gated on g_hc.de_home (the orchestrator's
    residency decision); -1 ⇒ never fires ⇒ byte-identical. Returns 1 if emitted. */
+/* Rabbit 6000 word ALU straight against a frame slot, fp mode:
+
+       add hl,(ix+d)        in place of   ld de,(ix+d) / add hl,de
+
+   Only the 6000 has it (dd 80/90/a0/b0 d); r3k/r4k/r5k reject the encoding, as
+   does every z80. This belongs in the lowerer rather than copt for the reason
+   the sp-mode copt rules were removed in e766ef09a7: a peephole rewriting a
+   finished sequence cannot see whether the DE it consumes is still wanted.
+
+   src[1] only — `sub` is not commutative, and op_is_ixd_slot already encodes
+   the hazards (address-taken, volatile, remat slot collision, unspilled, both
+   halves of the word inside the displacement range). */
+static int try_binop_r6k_ixd(FILE *out, Func *f, const Op *op, const char *mnem)
+{
+    if (opt_disabled("r6k-ixd-alu")) return 0;
+    if (!IS_R6K() || !fp_active(f)) return 0;
+    if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
+    if (vreg_is_pr_de(f, op->dst)) return 0;   /* mirrors the hl,de path */
+    int s0 = op->src[0], s1 = op->src[1];
+    if (s0 < 0 || s1 < 0) return 0;
+    if (s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2) return 0;
+    if (L.pending_spill_v >= 0) return 0;
+    /* Cheap, side-effect-free gate first: op_is_ixd_slot goes through
+       slot_ix_off, which VOTES in the ds_ixaccess count below. Only when
+       src[0] is already in HL — load_binop_operands is free to pick which
+       operand lands in HL and can use whatever is resident, so forcing src[0]
+       there costs more than the fold saves. */
+    if (!hl_has(s0)) return 0;
+    /* This fold must not keep a frame alive on its own. A framed function with
+       no (ix+-d) access re-lowers frameless via sp (#13), and there this fold
+       does not fire at all (it is fp-only), so the sp form is exactly the code
+       we would have emitted anyway. Letting it vote instead pinned the frame
+       and cost the ~11B IX apparatus per function: callbench +81B/6 frames,
+       localbench +12B/1 frame, against -37B across every other bench. */
+    int ixvote = ds_ixaccess;
+    if (!op_is_ixd_slot(f, s1)) { ds_ixaccess = ixvote; return 0; }
+    int d = slot_ix_off(f, s1);
+    ds_ixaccess = ixvote;
+    load_to_hl(out, f, s0);
+    ss_note_reload(f, s1);
+    emit(out, "%s\thl,(%s%+d)", mnem, frame_reg(), d);
+    commit_hl_result(out, f, op->dst);
+    return 1;
+}
+
 static int try_binop_ixd_fold(FILE *out, Func *f, const Op *op,
                               const char *lo_op, const char *hi_op)
 {
@@ -4145,6 +4191,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (try_binop_ixd_fold(out, f, op, "add\ta,", "adc\ta,")) return 0;
+    if (try_binop_r6k_ixd(out, f, op, "add")) return 0;
     load_binop_operands(out, f, op);
     emit(out, "add\thl,de");
     /* PR_DE dst: commit moves HL→DE via ex de,hl (+4 T), saving the ~28-T
@@ -5287,6 +5334,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         snprintf(m, sizeof m, "%s\t", mnem);
         if (try_binop_ixd_fold(out, f, op, m, m)) return 0;
     }
+    if (try_binop_r6k_ixd(out, f, op, mnem)) return 0;
     load_binop_operands(out, f, op);    /* HL=src[0], DE=src[1] */
     /* Rabbit native HL=HL<op>DE in 1 byte (and/or r2k+, xor r4k); DE
        preserved so the HL finalize below is unchanged. Off elsewhere:
