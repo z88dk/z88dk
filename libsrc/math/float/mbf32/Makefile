@@ -16,6 +16,7 @@ all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_8080.lib $(OUT
 	$(OUTPUT_DIRECTORY)/mbf32_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/mbf32_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/mbf32_r4k.lib \
+	$(OUTPUT_DIRECTORY)/mbf32_r6k.lib \
 	$(OUTPUT_DIRECTORY)/mbf32_kc160.lib 
 
 $(OUTPUT_DIRECTORY)/mbf32.lib: $(addprefix obj/z80/, $(OBJECTS))
@@ -51,6 +52,9 @@ $(OUTPUT_DIRECTORY)/mbf32_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/mbf32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
 	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/mbf32_r4k @mbf32.lst
 
+$(OUTPUT_DIRECTORY)/mbf32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
+	TYPE=r6k $(LIBLINKER) -mr6k -x$(OUTPUT_DIRECTORY)/mbf32_r6k @mbf32.lst
+
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/z80/z80
@@ -64,6 +68,7 @@ dirs:
 	@mkdir -p obj/kc160/c/sccz80 obj/kc160/c/asm obj/kc160/z80
 	@mkdir -p obj/r2ka/c/sccz80 obj/r2ka/c/asm obj/r2ka/z80
 	@mkdir -p obj/r4k/c/sccz80 obj/r4k/c/asm obj/r4k/z80
+	@mkdir -p obj/r6k/c/sccz80 obj/r6k/c/asm obj/r6k/z80
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
