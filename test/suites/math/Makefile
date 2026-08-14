@@ -25,6 +25,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # ---------------------------------------------------------------------------
 
 all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_math16_8085.bin \
+	test_math16_r6k.bin \
 	test_math32.bin test_math32_z180.bin test_math32_z80n.bin \
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
 	test_math32_8085.bin \
@@ -149,6 +150,10 @@ test_math16.bin: $(FPSOURCES)
 test_math16_8085.bin: $(FPSOURCES)
 	$(call compile_8085, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"", --math16 -lmath32_8085)
 	$(runtest_8085)
+
+test_math16_r6k.bin: $(FPSOURCES)
+	$(call compile_r6k, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"", --math16 -lmath32_r6k)
+	$(runtest_r6k)
 
 test_daimath32.bin: $(FPSOURCES)
 	$(call compile, -DMATHDAI32 -D__MATH_DAI32 --math-dai32 -DMATH_LIBRARY="\"\\\"daimath32\\\"\"",)
