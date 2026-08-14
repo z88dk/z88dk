@@ -1692,7 +1692,18 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 3)) {
             emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off);
-            emit(out, "ld\t(%s%+d),de", frame_reg(), ix_off + 2);
+            /* Rabbit has a native `ld (ix+d),hl` (2 bytes) but NOT the DE form,
+               which z80asm synthesises as two `ld (ix+d),r` = 6 bytes. Swapping
+               the halves around the store costs 4 (ex + native + ex) and is
+               faster too. ez80/kc160 have both natively at 3 bytes, so they take
+               the direct form; plain z80 synthesises either way. */
+            if (IS_RABBIT()) {
+                emit(out, "ex\tde,hl");
+                emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off + 2);
+                emit(out, "ex\tde,hl");
+            } else {
+                emit(out, "ld\t(%s%+d),de", frame_reg(), ix_off + 2);
+            }
             /* DEHL cache contract: BC = low half so a later load_to_dehl_adj
                cache hit recovers HL via `ld hl,bc`. Dead when the next op
                clobbers BC first — store_dehl_cached then drops the claim. */
