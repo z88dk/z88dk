@@ -153,7 +153,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,c
     exx
     cp a,c                      ; nc if a>=c
-    jp Z,alignzero              ; no alignment needed, mantissas equal
+    jp Z,alignzero              ; no alignment needed, exponents equal
     jr NC,sort                  ; if a larger than c
     ld a,c
     exx
@@ -241,24 +241,28 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ex af,af                    ; carry clear
     jp P,doadd
 ; here for subtract, smaller shifted right at least 2, so no more than
-; one step of normalize
-    push hl
+; one step of normalize.  Primary = smaller, alt = larger.
+    exx                         ; larger
+    ld a,e
     exx
-    ex de,hl
-    ex (sp),hl
-    ex de,hl
+    sbc a,e
     exx
-    pop hl                      ; subtract the mantissas
-    sbc hl,de
+    ld e,a
+    ld a,d
     exx
-    sbc hl,de
-    push de
+    sbc a,d
     exx
-    ex (sp),hl
+    ld d,a
+    ld a,l
     exx
-    pop de
-; difference larger-smaller in hlde
-; exponent of result in c sign of result in b
+    sbc a,l
+    exx
+    ld l,a
+    ld a,h
+    exx
+    sbc a,h
+    exx
+    ld h,a                      ; larger − smaller in LDE; H = 0
     bit 7,l                     ; check for norm
     jr NZ,doadd1                ; no normalize step, pack it up
     sla e
@@ -267,25 +271,29 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     dec c
     jr doadd1                   ; pack
 
-; here for do add c has exponent of result (larger) b or b' has sign
+; here for do add: alt = larger (exp/sign).  Result stays there.
 .doadd
-    push hl
+    exx                         ; larger
+    ld a,e
     exx
-    ex de,hl
-    ex (sp),hl
-    ex de,hl
+    add a,e
     exx
-    pop hl                      ; add the mantissas
-    add hl,de
+    ld e,a
+    ld a,d
     exx
-    adc hl,de
-    push de
+    adc a,d
     exx
-    ex (sp),hl
+    ld d,a
+    ld a,l
     exx
-    pop de                      ; get least of sum
-    xor a
-    or a,h                      ; see if overflow to h
+    adc a,l
+    exx
+    ld l,a
+    ld a,h
+    exx
+    adc a,h                     ; overflow into A (H,H' were 0)
+    exx
+    ld h,a
     jr Z,doadd1
     rr hl
     rr de
@@ -382,37 +390,54 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; larger number in hl'de'
 ; c is clear
 .fasub
-    push hl
+    exx                         ; treat alt as minuend (y after alignzero)
+    ld a,e
     exx
-    ex de,hl
-    ex (sp),hl
-    ex de,hl
+    sbc a,e
     exx
-    pop hl                      ; subtract the mantissas
-    sbc hl,de
+    ld e,a
+    ld a,d
     exx
-    sbc hl,de
-    jr NC,noneg                 ; *** what if zero
-; fix up and subtract in reverse direction
+    sbc a,d
     exx
-    ld a,b                      ; get reversed sign
-    add hl,de                   ; reverse sub
+    ld d,a
+    ld a,l
     exx
-    adc hl,de                   ; reverse sub
+    sbc a,l
     exx
-    ex de,hl
-    or a
-    sbc hl,de
+    ld l,a
+    ld a,h
     exx
-    ex de,hl
-    sbc hl,de
-    ld b,a                      ; get proper sign to result
+    sbc a,h
+    exx
+    ld h,a
+    jr NC,noneg                 ; y >= x (or larger >= smaller)
+; borrowed: two's complement + flip sign (same as reverse-sub)
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    inc e
+    jr NZ,noneg_s
+    inc d
+    jr NZ,noneg_s
+    inc l
+    jr NZ,noneg_s
+    inc h
+.noneg_s
+    ld a,b
+    xor 080h
+    ld b,a
 .noneg
-    push de
-    exx
-    ex (sp),hl
-    exx
-    pop de                      ; get least part of result
+    ld h,0
 
 ; sub zero alignment from fadd
 ; difference larger-smaller in hlde
