@@ -52,9 +52,9 @@ Compiler | CPU  | Library | Ticks
 ---------|------|---------|-------------
 sccz80   | z80  | math32  | 122_234_069 (Aug 10, 2026)
 zsdcc    | z80  | math32  | 159_271_449 (Aug 10, 2026)
-sccz80   | 8085 | math32  | 185_601_477 (Aug 12, 2026)
+sccz80   | 8085 | math32  | 185_985_608 (Aug 15, 2026)
 80cc     | z80  | math32  | 165_845_935 (Aug 10, 2026)
-80cc     | 8085 | math32  | 298_934_611 (Aug 10, 2026)
+80cc     | 8085 | math32  | 278_191_376 (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 165_734_164  (Jul 2026)
 sccz80   | 8085 | mbf32   | 194_305_817  (Jul 2026)
 
@@ -135,12 +135,12 @@ time @ 4MHz  = 159271449 / 4*10^6 =   39.8 sec
 IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 
 8.
-Z88DK August 12, 2026
+Z88DK August 15, 2026
 sccz80 / classic c library / 8085 / math32
-5108 bytes less page zero
+5238 bytes less page zero
 
-cycle count  = 185601477
-time @ 4MHz  = 185601477 / 4*10^6 =   46.4 sec
+cycle count  = 185985608
+time @ 4MHz  = 185985608 / 4*10^6 =   46.5 sec
 
 IEEE 32-bit float implementation (math32_8085).
 
@@ -155,12 +155,12 @@ time @ 4MHz  = 165845935 / 4*10^6 =   41.5 sec
 IEEE 32-bit float implementation.
 
 10.
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 80cc / classic c library / 8085 / math32
-6145 bytes less page zero
+6225 bytes less page zero
 
-cycle count  = 298934611
-time @ 4MHz  = 298934611 / 4*10^6 =  1 min 15 sec
+cycle count  = 278191376
+time @ 4MHz  = 278191376 / 4*10^6 =  1 min 10 sec
 
 IEEE 32-bit float implementation (math32_8085).
 

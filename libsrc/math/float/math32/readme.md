@@ -426,7 +426,7 @@ Careful use of the intrinsic functions can result in significant performance imp
 ```
 On plain z80 and 8085 the `invsqrt`/`sqr` rewrite is about a __10–13%__ TIMER win (remeasured below). HW-mul builds (z80n / z180) still show larger relative gains on historical rows. Most of the gain is from using `invsqrt()` directly: `y=invsqrt(x)` instead of `y=l_f32_inv(x*invsqrt(x))`.
 
-Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). math32 and math32_8085 rows (base and opt) remeasured Aug 12, 2026; other rows are historical.
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). math32_8085 rows (base and opt) remeasured Aug 15, 2026. Other math32 rows remeasured Aug 12, 2026. Remaining rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
@@ -442,8 +442,8 @@ math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_519_
 math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_396_603_258_
 math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_494_347_688_
 math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_380_149_278_
-math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_563_936_728_
-math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_363_696_174__
+math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_526_136_021_
+math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_326_198_580__
 
 
 
@@ -469,9 +469,9 @@ math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_363
             }
 #endif
 ```
-For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–15%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks. After that rewrite, math32_8085 (opt) is faster in TIMER ticks than plain z80 math32 (opt); base (non-opt) still has z80 ahead of 8085.
+For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–16%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks. After the Aug 15, 2026 math32_8085 remeasure, 8085 base and opt TIMER ticks are both lower than the matching plain z80 math32 rows.
 
-Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). math32 and math32_8085 rows (base and opt) remeasured Aug 12, 2026; other rows are historical.
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). math32_8085 rows (base and opt) remeasured Aug 15, 2026. Other math32 rows remeasured Aug 12, 2026. Remaining rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
@@ -487,7 +487,7 @@ math32_z80n                 | sccz80   | _0_777_474_379_
 math32_z80n            (opt)| sccz80   | _0_694_488_693_
 math32_z180                 | sccz80   | _0_723_374_585_
 math32_z180            (opt)| sccz80   | _0_642_181_961_
-math32_8085                 | sccz80   | _1_052_849_425_
-math32_8085            (opt)| sccz80   | __0_899_712_336__
+math32_8085                 | sccz80   | _0_980_515_143_
+math32_8085            (opt)| sccz80   | __0_824_115_880__
 
 ---

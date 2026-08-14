@@ -141,7 +141,7 @@ Compiler | CPU  | Library | Ticks           | KWIPS @ 4 MHz
 ---------|------|---------|-----------------|----------------
 sccz80   | z80  | math32  | 362_151_861     | 11.0451  (Aug 10, 2026)
 zsdcc    | z80  | math32  | 369_951_886     | 10.8122  (Aug 10, 2026)
-sccz80   | 8085 | math32  | 735_953_018   | 5.4351  (Aug 12, 2026)
+sccz80   | 8085 | math32  | 663_596_725   | 6.0278  (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 544_395_320     | 7.3476  (Jul 2026)
 sccz80   | 8085 | mbf32   | 548_321_291     | 7.2950  (Jul 2026)
 80cc     | z80  | mbf32   | 558_782_473     | 7.1584  (Jul 2026)
@@ -277,15 +277,15 @@ KWIPS        = 100*10*1 / 92.4880 = 10.8122
 MWIPS        = 10.8122 / 1000 = 0.0108122
 
 11.
-Z88DK August 12, 2026
+Z88DK August 15, 2026
 sccz80 / classic c library / 8085 / math32
 IEEE 32-bit float (math32_8085)
-11560 bytes less page zero
+11641 bytes less page zero
 
-cycle count  = 735953018
-time @ 4MHz  = 735953018 / 4x10^6 = 183.9883 seconds
-KWIPS        = 100*10*1 / 183.9883 = 5.4351
-MWIPS        = 5.4351 / 1000 = 0.0054351
+cycle count  = 663596725
+time @ 4MHz  = 663596725 / 4x10^6 = 165.8992 seconds
+KWIPS        = 100*10*1 / 165.8992 = 6.0278
+MWIPS        = 6.0278 / 1000 = 0.0060278
 
 12.
 Z88DK July 19, 2026

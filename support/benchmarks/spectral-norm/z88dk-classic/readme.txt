@@ -125,14 +125,14 @@ cycle count  = 4212448031
 time @ 4MHz  = 4212448031 / 4*10^6 =  17 min 33 sec
 
 
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / classic c library / 8085 / math32
-6707 bytes less page zero
+6749 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9013766882
-time @ 4MHz  = 9013766882 / 4*10^6 =  37 min 33 sec
+cycle count  = 7938950247
+time @ 4MHz  = 7938950247 / 4*10^6 =  33 min  5 sec
 
 
 Z88DK August 10, 2026
@@ -145,14 +145,14 @@ cycle count  = 4716380923
 time @ 4MHz  = 4716380923 / 4*10^6 =  19 min 39 sec
 
 
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 80cc / classic c library / 8085 / math32
-7003 bytes less page zero
+7048 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9819185683
-time @ 4MHz  = 9819185683 / 4*10^6 =  40 min 55 sec
+cycle count  = 8416587188
+time @ 4MHz  = 8416587188 / 4*10^6 =  35 min  4 sec
 
 
 Z88DK July 19, 2026
