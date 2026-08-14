@@ -2210,7 +2210,12 @@ void r6k_swap_r(uint8_t opcode)
 {
     int reg = ((opcode >> 4) & 0x0f) - 8;
 
-    if ( reg == 6 ) {                       /* SWAP (HL) */
+    /* Index 6 would be (HL) under the usual r encoding, and ticks.c:4232 labels
+       ED E7 that way — but no such instruction exists: `swap hl` is the PAIR
+       form at ED EF (the xF column, handled by r6k_swap_rp2), and nothing
+       assembles to ED E7. Kept anyway on the maintainer's call: unreachable, so
+       harmless, and it is the reading the surrounding comments assume. */
+    if ( reg == 6 ) {                       /* ED E7, see above */
         uint16_t addr = l | h << 8;
         put_memory(addr, r6k_mirror_byte(get_memory_data(addr)));
         st += 4;
