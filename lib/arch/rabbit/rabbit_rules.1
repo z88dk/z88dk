@@ -356,39 +356,13 @@
 =
 	mulu	hl,de
 
-%cpu r6k
-	ex	de,hl
-	ld	hl,(sp+%1)
-	and	hl,de
-=
-	and	hl,(sp+%1)
-
-%cpu r6k
-	ex	de,hl
-	ld	hl,(sp+%1)
-	or	hl,de
-=
-	or	hl,(sp+%1)
-
-%cpu r6k
-	ex	de,hl
-	ld	hl,(sp+%1)
-	xor	hl,de
-=
-	xor	hl,(sp+%1)
-
-%cpu r6k
-	ex	de,hl
-	ld	hl,(sp+%1)
-	add	hl,de
-=
-	add	hl,(sp+%1)
-
-%cpu r6k
-	ex	de,hl
-	ld	hl,(sp+%1)
-	ex	de,hl
-	and	a
-	sbc	hl,de
-=
-	sub	hl,(sp+%1)
+;; REMOVED (2026-08-14): five `%cpu r6k` folds turning
+;;     ex de,hl / ld hl,(sp+N) / OP hl,de   into   OP hl,(sp+N)
+;; for OP in and/or/xor/add/sub. The fold changes what is left in DE: before it
+;; DE holds what the `ex` put there, after it DE still holds whatever it held
+;; before. That is fine for sccz80, whose DE is dead at these points, and these
+;; rules were valid for it. This file is shared by every compiler, though, and
+;; 80cc can leave DE live across the sequence — it miscompiled long_ir addridx
+;; and remat on r6k. copt cannot see DE liveness, so the rule cannot be gated
+;; here; same failure as #ADDR on 8085 (see lib/80cc_rules.1). The memory-operand
+;; form now comes from the 80cc lowerer, which does know whether DE is dead.
