@@ -2054,7 +2054,7 @@ void r6k_alu_hl_psd(uint8_t opcode)
 void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
 {
     uint8_t oper = (opcode & 1) + ((((opcode - 0x80) >> 4) & 0x0f) * 2);
-    uint8_t msb = iy ? yh : yh;
+    uint8_t msb = iy ? yh : xh;
     uint8_t lsb = iy ? yl : xl;
     uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
     uint16_t  rhs = (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
@@ -2145,7 +2145,7 @@ void r6k_alu_jkhl_ps(uint8_t opcode)
 void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
 {
     uint8_t oper = (opcode & 1) + ((((opcode - 0x80) >> 4) & 0x0f) * 2);
-    uint8_t msb = iy ? yh : yh;
+    uint8_t msb = iy ? yh : xh;
     uint8_t lsb = iy ? yl : xl;
     uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
     uint32_t  rhs = (get_memory(addr + 3, MEM_TYPE_DATA) << 24) | (get_memory(addr + 2, MEM_TYPE_DATA) << 16) | (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
