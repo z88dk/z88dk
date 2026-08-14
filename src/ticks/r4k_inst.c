@@ -1995,15 +1995,18 @@ void r6k_add_xy_d(uint8_t opc, uint8_t iy)
 // alu a,(ps+d)
 void r6k_alu_a_psd(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint32_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint8_t val = get_memory(addr, MEM_TYPE_PHYSICAL);
     uint8_t r8 =  alts ? a_ : a;
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
+    ALU_OP(oper, r, r8, val);
 
-    if ( altd ) a_ = r; else a = r;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        if ( altd ) a_ = r; else a = r;
+    }
 
     st += 10;
 }
@@ -2011,14 +2014,17 @@ void r6k_alu_a_psd(uint8_t opcode)
 // alu a,(sp+n)
 void r6k_alu_a_spn(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint8_t r;
     uint16_t addr = (sp + get_memory_inst(pc++));
     uint8_t val = get_memory(addr, MEM_TYPE_DATA);
     uint8_t r8 =  alts ? a_ : a;
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
+    ALU_OP(oper, r, r8, val);
 
-    if ( altd ) a_ = r; else a = r;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        if ( altd ) a_ = r; else a = r;
+    }
 
     st += 10;
 }
@@ -2026,16 +2032,19 @@ void r6k_alu_a_spn(uint8_t opcode)
 // alu hl,(ps+d)
 void r6k_alu_hl_psd(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint16_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint16_t val = get_memory(addr, MEM_TYPE_PHYSICAL) | (get_memory(addr+1, MEM_TYPE_PHYSICAL) << 8);
     uint16_t r16 = (*get_rp2_msb_ptr(2,alts) << 8) | *get_rp2_lsb_ptr(2,alts);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+    ALU_OP(oper, r, r16, val);
 
-    *get_rp2_lsb_ptr(2,altd) = r & 0xff;
-    *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *get_rp2_lsb_ptr(2,altd) = r & 0xff;
+        *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    }
 
     st += 12;
 }
@@ -2054,8 +2063,10 @@ void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
 
     ALU_OP(oper, r, lhs, rhs);
 
-    *get_rp2_msb_ptr(2,altd) = (r >> 8 ) & 0xff;
-    *get_rp2_lsb_ptr(2,altd) = (r >> 0 ) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *get_rp2_msb_ptr(2,altd) = (r >> 8 ) & 0xff;
+        *get_rp2_lsb_ptr(2,altd) = (r >> 0 ) & 0xff;
+    }
 
     st += 12;
 }
@@ -2063,15 +2074,18 @@ void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
 // alu hl,(sp+n)
 void r6k_alu_hl_spn(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint16_t r;
     uint16_t addr = (sp + get_memory_inst(pc++));
     uint16_t val = get_memory(addr, MEM_TYPE_DATA) | (get_memory(addr+1, MEM_TYPE_DATA) << 8);
     uint16_t r16 = (*get_rp2_msb_ptr(2,alts) << 8) | *get_rp2_lsb_ptr(2,alts);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+    ALU_OP(oper, r, r16, val);
 
-    *get_rp2_lsb_ptr(2,altd) = r & 0xff;
-    *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *get_rp2_lsb_ptr(2,altd) = r & 0xff;
+        *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    }
     
 
     st += 12;
@@ -2082,6 +2096,7 @@ void r6k_alu_hl_spn(uint8_t opcode)
 // alu jkhl,(ps+d)
 void r6k_alu_jkhl_psd(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint32_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
@@ -2090,13 +2105,15 @@ void r6k_alu_jkhl_psd(uint8_t opcode)
     uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
 
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
+    ALU_OP(oper, r, r32, val);
 
     reg32 = get_r32_dest_ptr(1);
-    *reg32[0] = (r >> 0)  & 0xff;
-    *reg32[1] = (r >> 8)  & 0xff;
-    *reg32[2] = (r >> 16) & 0xff;
-    *reg32[3] = (r >> 24) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *reg32[0] = (r >> 0)  & 0xff;
+        *reg32[1] = (r >> 8)  & 0xff;
+        *reg32[2] = (r >> 16) & 0xff;
+        *reg32[3] = (r >> 24) & 0xff;
+    }
 
     st += 16;
 }
@@ -2104,18 +2121,21 @@ void r6k_alu_jkhl_psd(uint8_t opcode)
 // alu jkhl,ps
 void r6k_alu_jkhl_ps(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint32_t r;
     uint32_t val = read_ps(opcode & 0x03);
     uint8_t **reg32 = get_r32_source_ptr(1);
     uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
+    ALU_OP(oper, r, r32, val);
 
     reg32 = get_r32_dest_ptr(1);
-    *reg32[0] = (r >> 0)  & 0xff;
-    *reg32[1] = (r >> 8)  & 0xff;
-    *reg32[2] = (r >> 16) & 0xff;
-    *reg32[3] = (r >> 24) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *reg32[0] = (r >> 0)  & 0xff;
+        *reg32[1] = (r >> 8)  & 0xff;
+        *reg32[2] = (r >> 16) & 0xff;
+        *reg32[3] = (r >> 24) & 0xff;
+    }
 
     st += 4;
 }
@@ -2136,10 +2156,12 @@ void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
     ALU_OP(oper, r, lhs, rhs);
 
     r32ptr = get_r32_dest_ptr(1);
-    *r32ptr[0] = (r >> 0  ) & 0xff;
-    *r32ptr[1] = (r >> 8  ) & 0xff;
-    *r32ptr[2] = (r >> 16 ) & 0xff;
-    *r32ptr[3] = (r >> 24 ) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *r32ptr[0] = (r >> 0  ) & 0xff;
+        *r32ptr[1] = (r >> 8  ) & 0xff;
+        *r32ptr[2] = (r >> 16 ) & 0xff;
+        *r32ptr[3] = (r >> 24 ) & 0xff;
+    }
 
     st += 16;
 }
@@ -2147,19 +2169,22 @@ void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
 // alu jkhl,(sp+n)
 void r6k_alu_jkhl_spn(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint16_t addr = (sp + get_memory_inst(pc++));
     uint32_t  rhs = (get_memory(addr + 3, MEM_TYPE_DATA) << 24) | (get_memory(addr + 2, MEM_TYPE_DATA) << 16) | (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
     uint8_t  **r32ptr = get_r32_source_ptr(1);
     uint32_t  lhs = (*r32ptr[3] << 24) | (*r32ptr[2] << 16) | (*r32ptr[1] << 8) | *r32ptr[0];
     uint16_t  r;
 
-    ALU_OP(((opcode >> 4) & 0x07), r, lhs, rhs);
+    ALU_OP(oper, r, lhs, rhs);
 
     r32ptr = get_r32_dest_ptr(1);
-    *r32ptr[0] = (r >> 0  ) & 0xff;
-    *r32ptr[1] = (r >> 8  ) & 0xff;
-    *r32ptr[2] = (r >> 16 ) & 0xff;
-    *r32ptr[3] = (r >> 24 ) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *r32ptr[0] = (r >> 0  ) & 0xff;
+        *r32ptr[1] = (r >> 8  ) & 0xff;
+        *r32ptr[2] = (r >> 16 ) & 0xff;
+        *r32ptr[3] = (r >> 24 ) & 0xff;
+    }
 
     st += 16;
 }
