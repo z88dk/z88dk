@@ -10,7 +10,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED -lmath48 -lmath16
 # the lib — needed by fastcall AND __sdcccall(1) function-pointer calls.
 JPTH = ../../../libsrc/l/sccz80/9-common/l_jpix.asm ../../../libsrc/l/sccz80/9-common/l_jpiy.asm
 
-all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin fp_to_int_reg.bin linewrap.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin jrelax.bin jrelax_fp.bin jrelax_8080.bin jrelax_gbz80.bin dsword.bin dsword_fp.bin dsword_8080.bin dsword_gbz80.bin deaddef.bin deaddef_fp.bin deaddef_8080.bin csparam.bin csparam_fp.bin csparam_8080.bin csparam_gbz80.bin rotl32.bin rotl32_fp.bin rotl32_8080.bin rotl32_gbz80.bin mux.bin mux_fp.bin mux_8080.bin mux_gbz80.bin demorgan.bin demorgan_fp.bin demorgan_8080.bin pack16.bin pack16_fp.bin pack16_8080.bin pack16_gbz80.bin cmphi.bin cmphi_fp.bin cmphi_8080.bin cmphi_gbz80.bin sfr.bin sfr_fp.bin sfr_8080.bin boolbyte.bin boolbyte_fp.bin boolbyte_8080.bin boolbyte_gbz80.bin narrowld.bin narrowld_fp.bin narrowld_8080.bin narrowld_gbz80.bin dsshare.bin dsshare_fp.bin dsshare_8080.bin dsshare_gbz80.bin addridx.bin addridx_fp.bin addridx_8080.bin addridx_8085.bin unionmem.bin unionmem_fp.bin bfcse.bin bfcse_fp.bin widen2.bin widen2_fp.bin addridx_r6k.bin binop_bc_r6k.bin boolbyte_r6k.bin bremat_r6k.bin bytecmp_r6k.bin byteparam_r6k.bin callsplit_r6k.bin cmphi_r6k.bin compoundwiden_r6k.bin csparam_r6k.bin deaddef_r6k.bin demorgan_r6k.bin dsshare_r6k.bin dsword_r6k.bin fcparam_r6k.bin fnptr_fastcall_r6k.bin jrelax_r6k.bin mux_r6k.bin narrowld_r6k.bin narrowmul_r6k.bin pack16_r6k.bin rotl32_r6k.bin storecall_r6k.bin structval_r6k.bin remat_r6k.bin sfr_r6k.bin
+all:	test.bin test_gbz80.bin test_8080.bin test_8085.bin irgaps.bin irgaps_gbz80.bin irgaps_8080.bin irgaps_8085.bin structval.bin structval_gbz80.bin structval_8080.bin structval_8085.bin fixed.bin sdcccall.bin sdcccall_kc160.bin wr.bin wr_fp.bin fp_promote.bin fp_promote_reg.bin fp_promote_f48f16.bin fp_promote_accum.bin aggregate_init.bin fnptr_fastcall.bin fnptr_fastcall_noidx.bin fnptr_fastcall_gbz80.bin fnptr_fastcall_8080.bin fnptr_fastcall_8085.bin faslot.bin libcall_abi.bin const_mult.bin cmp_gt.bin cmp_sign.bin remat.bin idxcmp.bin idxcmp_fp.bin ixdcmp.bin ixdcmp_fp.bin dehome.bin dehome_fp.bin looppr.bin looppr_fp.bin redwb.bin redwb_fp.bin redwb_8080.bin addrcse.bin addrcse_fp.bin idxhome.bin idxhome_fp.bin longlong.bin bitfield.bin umaxd.bin ternwiden.bin ternwiden_fp.bin fp_to_int.bin fp_to_int_reg.bin linewrap.bin widen.bin hwmul.bin hwmul_z180.bin hwmul_ez80.bin hwmul_z80n.bin hwmul_kc160.bin narrowmul.bin narrowmul_fp.bin narrowmul_8080.bin derefcmp.bin derefcmp_fp.bin bytecmp.bin bytecmp_fp.bin bytecmp_8080.bin bytecmp_gbz80.bin bremat.bin bremat_fp.bin bremat_8080.bin bremat_gbz80.bin byteparam.bin byteparam_fp.bin byteparam_8080.bin byteparam_gbz80.bin fcparam.bin fcparam_fp.bin fcparam_8080.bin fcparam_gbz80.bin storecall.bin storecall_fp.bin storecall_8080.bin storecall_gbz80.bin compoundwiden.bin compoundwiden_fp.bin compoundwiden_8080.bin compoundwiden_gbz80.bin ivsr_lftr.bin ivsr_lftr_fp.bin binop_bc.bin binop_bc_fp.bin binop_bc_8080.bin binop_bc_gbz80.bin callsplit.bin callsplit_fp.bin callsplit_8080.bin callsplit_8085.bin callsplit_gbz80.bin jrelax.bin jrelax_fp.bin jrelax_8080.bin jrelax_gbz80.bin dsword.bin dsword_fp.bin dsword_8080.bin dsword_gbz80.bin deaddef.bin deaddef_fp.bin deaddef_8080.bin csparam.bin csparam_fp.bin csparam_8080.bin csparam_gbz80.bin rotl32.bin rotl32_fp.bin rotl32_8080.bin rotl32_gbz80.bin mux.bin mux_fp.bin mux_8080.bin mux_gbz80.bin demorgan.bin demorgan_fp.bin demorgan_8080.bin pack16.bin pack16_fp.bin pack16_8080.bin pack16_gbz80.bin cmphi.bin cmphi_fp.bin cmphi_8080.bin cmphi_gbz80.bin sfr.bin sfr_fp.bin sfr_8080.bin boolbyte.bin boolbyte_fp.bin boolbyte_8080.bin boolbyte_gbz80.bin narrowld.bin narrowld_fp.bin narrowld_8080.bin narrowld_gbz80.bin dsshare.bin dsshare_fp.bin dsshare_8080.bin dsshare_gbz80.bin addridx.bin addridx_fp.bin addridx_8080.bin addridx_8085.bin unionmem.bin unionmem_fp.bin bfcse.bin bfcse_fp.bin widen2.bin widen2_fp.bin addridx_r6k.bin binop_bc_r6k.bin boolbyte_r6k.bin bremat_r6k.bin bytecmp_r6k.bin byteparam_r6k.bin callsplit_r6k.bin cmphi_r6k.bin compoundwiden_r6k.bin csparam_r6k.bin deaddef_r6k.bin demorgan_r6k.bin dsshare_r6k.bin dsword_r6k.bin fcparam_r6k.bin fnptr_fastcall_r6k.bin jrelax_r6k.bin mux_r6k.bin narrowld_r6k.bin narrowmul_r6k.bin pack16_r6k.bin rotl32_r6k.bin storecall_r6k.bin structval_r6k.bin remat_r6k.bin sfr_r6k.bin addridx_r2ka.bin binop_bc_r2ka.bin boolbyte_r2ka.bin bremat_r2ka.bin bytecmp_r2ka.bin byteparam_r2ka.bin callsplit_r2ka.bin cmphi_r2ka.bin compoundwiden_r2ka.bin csparam_r2ka.bin deaddef_r2ka.bin demorgan_r2ka.bin dsshare_r2ka.bin dsword_r2ka.bin fcparam_r2ka.bin fnptr_fastcall_r2ka.bin jrelax_r2ka.bin mux_r2ka.bin narrowld_r2ka.bin narrowmul_r2ka.bin pack16_r2ka.bin rotl32_r2ka.bin storecall_r2ka.bin structval_r2ka.bin remat_r2ka.bin sfr_r2ka.bin addridx_r4k.bin binop_bc_r4k.bin boolbyte_r4k.bin bremat_r4k.bin bytecmp_r4k.bin byteparam_r4k.bin callsplit_r4k.bin cmphi_r4k.bin compoundwiden_r4k.bin csparam_r4k.bin deaddef_r4k.bin demorgan_r4k.bin dsshare_r4k.bin dsword_r4k.bin fcparam_r4k.bin fnptr_fastcall_r4k.bin jrelax_r4k.bin mux_r4k.bin narrowld_r4k.bin narrowmul_r4k.bin pack16_r4k.bin rotl32_r4k.bin storecall_r4k.bin structval_r4k.bin remat_r4k.bin sfr_r4k.bin
 
 test.bin: $(SOURCES) long_ir.c
 	$(compile)
@@ -783,9 +783,11 @@ addridx_8085.bin: $(SOURCES) addridx.c
 	@$(MACHINE) -m8085 $@ || { echo "$(RED)" `date +%H:%M:%S` " Test failure $(RESET)" ; exit 1; }
 
 
-# Rabbit 6000 coverage: the suites that already earn non-z80 variants and
-# that build clean on r6k. irgaps/redwb and the float suites are held back
-# until the r6k math16 helpers land.
+# Rabbit coverage: the suites that already earn non-z80 variants. Every
+# long_ir suite passes on r2ka/r4k/r6k in both modes, so the set is a CI-cost
+# choice, not a capability one. The float suites are left out because the
+# global CFLAGS here link -lmath48/-lmath16, which resolve to the z80 builds;
+# a Rabbit float target needs the suffixed -lmath48_r2ka / -lmath16_r2ka.
 
 addridx_r6k.bin: $(SOURCES) addridx.c
 	$(compile_r6k)
@@ -890,3 +892,216 @@ remat_r6k.bin: $(SOURCES) remat.c
 sfr_r6k.bin: $(SOURCES) sfr.c
 	$(compile_r6k)
 	$(runtest_r6k)
+
+
+# --- Rabbit 2000 ---
+
+addridx_r2ka.bin: $(SOURCES) addridx.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+binop_bc_r2ka.bin: $(SOURCES) binop_bc.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+boolbyte_r2ka.bin: $(SOURCES) boolbyte.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bremat_r2ka.bin: $(SOURCES) bremat.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+bytecmp_r2ka.bin: $(SOURCES) bytecmp.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+byteparam_r2ka.bin: $(SOURCES) byteparam.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+callsplit_r2ka.bin: $(SOURCES) callsplit.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+cmphi_r2ka.bin: $(SOURCES) cmphi.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+compoundwiden_r2ka.bin: $(SOURCES) compoundwiden.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+csparam_r2ka.bin: $(SOURCES) csparam.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+deaddef_r2ka.bin: $(SOURCES) deaddef.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+demorgan_r2ka.bin: $(SOURCES) demorgan.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+dsshare_r2ka.bin: $(SOURCES) dsshare.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+dsword_r2ka.bin: $(SOURCES) dsword.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+fcparam_r2ka.bin: $(SOURCES) fcparam.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+fnptr_fastcall_r2ka.bin: $(SOURCES) fnptr_fastcall.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+jrelax_r2ka.bin: $(SOURCES) jrelax.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+mux_r2ka.bin: $(SOURCES) mux.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+narrowld_r2ka.bin: $(SOURCES) narrowld.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+narrowmul_r2ka.bin: $(SOURCES) narrowmul.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+pack16_r2ka.bin: $(SOURCES) pack16.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+rotl32_r2ka.bin: $(SOURCES) rotl32.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+storecall_r2ka.bin: $(SOURCES) storecall.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+structval_r2ka.bin: $(SOURCES) structval.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+remat_r2ka.bin: $(SOURCES) remat.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+sfr_r2ka.bin: $(SOURCES) sfr.c
+	$(compile_r2ka)
+	$(runtest_r2ka)
+
+# --- Rabbit 4000 ---
+
+addridx_r4k.bin: $(SOURCES) addridx.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+binop_bc_r4k.bin: $(SOURCES) binop_bc.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+boolbyte_r4k.bin: $(SOURCES) boolbyte.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+bremat_r4k.bin: $(SOURCES) bremat.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+bytecmp_r4k.bin: $(SOURCES) bytecmp.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+byteparam_r4k.bin: $(SOURCES) byteparam.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+callsplit_r4k.bin: $(SOURCES) callsplit.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+cmphi_r4k.bin: $(SOURCES) cmphi.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+compoundwiden_r4k.bin: $(SOURCES) compoundwiden.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+csparam_r4k.bin: $(SOURCES) csparam.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+deaddef_r4k.bin: $(SOURCES) deaddef.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+demorgan_r4k.bin: $(SOURCES) demorgan.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+dsshare_r4k.bin: $(SOURCES) dsshare.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+dsword_r4k.bin: $(SOURCES) dsword.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+fcparam_r4k.bin: $(SOURCES) fcparam.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+fnptr_fastcall_r4k.bin: $(SOURCES) fnptr_fastcall.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+jrelax_r4k.bin: $(SOURCES) jrelax.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+mux_r4k.bin: $(SOURCES) mux.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+narrowld_r4k.bin: $(SOURCES) narrowld.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+narrowmul_r4k.bin: $(SOURCES) narrowmul.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+pack16_r4k.bin: $(SOURCES) pack16.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+rotl32_r4k.bin: $(SOURCES) rotl32.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+storecall_r4k.bin: $(SOURCES) storecall.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+structval_r4k.bin: $(SOURCES) structval.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+remat_r4k.bin: $(SOURCES) remat.c
+	$(compile_r4k)
+	$(runtest_r4k)
+
+sfr_r4k.bin: $(SOURCES) sfr.c
+	$(compile_r4k)
+	$(runtest_r4k)
