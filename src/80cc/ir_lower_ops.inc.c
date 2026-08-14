@@ -2430,20 +2430,35 @@ static int emit_gb_const_word_store(FILE *out, const Func *f, int src,
    honour the same declaration identically.
 
    Three CPU families need entirely different instructions:
-     - Rabbit has no in/out at all. The `ioi` prefix redirects the NEXT memory
-       access to internal I/O space, so the access looks like a load/store.
+     - Rabbit has no in/out at all. An `ioi`/`ioe` prefix redirects the NEXT
+       memory access to an I/O space, so the access looks like a load/store.
+       The prefix binds to the instruction and must share its line: a lone
+       `ioi` is a z80asm syntax error, not a standalone opcode.
        The R2000 needs a following `nop` (errata).
      - gbz80 likewise has no in/out; `ldh` addresses the 0xFF00 page.
      - Z180/eZ80 have in0/out0, which reach L directly and save the A shuffle.
    The 16-bit (`__banked`) form puts the high byte in A, which Z80's `in a,(n)`
    drives onto the high address bus, and uses BC for the write. */
+
+/* Rabbit I/O space selector. Both spaces address 16 bits and carry a byte, so
+   the only thing that varies is the prefix: plain `__sfr` is internal (ioi,
+   where the on-chip peripheral registers live, and what inp()/outp() use),
+   `__sfr __banked` is external (ioe). */
+static const char *rabbit_io_prefix(const Op *op)
+{
+    return op->mem.port->kind == IR_PORT_KIND_16 ? "ioe" : "ioi";
+}
+
 static void gen_port_in(FILE *out, const Op *op)
 {
     const char *s = ir_sym_name(op->mem.sym);
     if (IS_RABBIT()) {
-        emit(out, "ioi");
-        emit(out, "ld\thl,(_%s)", s);
+        /* Byte-wide: the port carries one byte, and `ld hl,(N)` would read
+           the adjacent port N+1 as the high half. */
+        emit(out, "%s\tld\ta,(_%s)", rabbit_io_prefix(op), s);
         if (c_cpu == CPU_R2KA) emit(out, "nop");
+        emit(out, "ld\tl,a");
+        emit(out, "ld\th,0");
         return;
     }
     if (IS_GBZ80()) {
@@ -2474,8 +2489,7 @@ static void gen_port_out(FILE *out, const Op *op)
     const char *s = ir_sym_name(op->mem.sym);
     if (IS_RABBIT()) {
         emit(out, "ld\ta,l");
-        emit(out, "ioi");
-        emit(out, "ld\t(_%s),a", s);
+        emit(out, "%s\tld\t(_%s),a", rabbit_io_prefix(op), s);
         if (c_cpu == CPU_R2KA) emit(out, "nop");
         return;
     }
