@@ -1207,18 +1207,66 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
     free(lines); free(drop);
 }
 
+/* ---- branch-to-return: `jp [cc,]L_bb_N` where BB N's body is a bare `ret` -- */
+/* A one-armed `if` renders as `jp z,L; <then>; L: ret`, and nothing recovers it:
+   pass 0 threads only `jp`-trampolines, and copt has no label-reference count so
+   it cannot prove L dies. When the target block is a BARE `ret` the branch IS
+   the return — `jp cc,L` -> `ret cc`, `jp L` -> `ret`, 3B -> 1B, no tick cost.
+   Pass 2 then drops the label; the `ret` line stays for its fall-through
+   predecessor.
+
+   Frameless-only needs no gate: a framed return block starts `ld sp,ix`, an
+   interrupt one ends `reti`/`retn`, a `__critical` one is `ei; ret` — none match
+   a bare `ret`. Conditions are limited to nz/z/nc/c (as in relax_jp_parts):
+   `jp po` is emitted, but gbz80 has no P/V flag and Rabbit reassigned those
+   opcodes. Default-on; `--opt-disable=ret-thread` opts out. */
+static int is_bare_ret_line(const char *l)
+{
+    return !strcmp(l, "\tret\n") || !strcmp(l, "\tret\r\n") || !strcmp(l, "\tret");
+}
+
+/* `\tjp\t[cc,]L_f<i>_bb_<n>\n` -> condition ("" when unconditional) + BB number.
+   The operand must be the whole rest of the line, so the rewrite can replace it
+   outright. */
+static int retthread_parts(const char *l, char *cc, size_t ccsz, int *bb)
+{
+    if (strncmp(l, "\tjp\t", 4) != 0) return 0;
+    const char *p = l + 4;
+    cc[0] = '\0';
+    const char *comma = strchr(p, ',');
+    if (comma) {
+        size_t n = (size_t)(comma - p);
+        if (n == 0 || n >= ccsz) return 0;
+        memcpy(cc, p, n); cc[n] = '\0';
+        if (strcmp(cc, "nz") && strcmp(cc, "z") && strcmp(cc, "nc") && strcmp(cc, "c"))
+            return 0;                            /* po/pe/p/m: no portable ret */
+        p = comma + 1;
+    }
+    if (strncmp(p, "L_f", 3) != 0) return 0;
+    const char *u = strstr(p, "_bb_");
+    if (!u || u[4] < '0' || u[4] > '9') return 0;
+    int n = 0; const char *q = u + 4;
+    while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+    while (*q == '\r') q++;
+    if (*q != '\n' && *q != '\0') return 0;      /* trailing junk/comment */
+    *bb = n;
+    return 1;
+}
+
 static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                                          const Func *f)
 {
     char line[1024];
     char *ref = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
+    char *retlab = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
     int *thr = (max_bb >= 0) ? malloc(((size_t)max_bb + 1) * sizeof(int)) : NULL;
-    if (!ref || !thr) {                          /* OOM: copy verbatim */
-        free(ref); free(thr);
+    if (!ref || !thr || !retlab) {               /* OOM: copy verbatim */
+        free(ref); free(thr); free(retlab);
         rewind(rout);
         while (fgets(line, sizeof line, rout)) fputs(line, out);
         return;
     }
+    int do_retthread = !opt_disabled("ret-thread");
     /* Branch relaxation runs LAST: threading, dead-label elision and the
        peepholes below all change the span a `jr` has to reach, so measuring
        before them would be measuring the wrong function. `fout` is the real
@@ -1259,6 +1307,11 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                 for (int k = 0; k < npend; k++) thr[pend[k]] = m;
             }
         }
+        /* Same walk, second map: a label run whose first instruction is a bare
+           `ret` marks those BBs for the branch-to-return rewrite below. */
+        else if (npend > 0 && is_bare_ret_line(line)) {
+            for (int k = 0; k < npend; k++) retlab[pend[k]] = 1;
+        }
         npend = 0;
     }
     /* Also fold defc bb-aliases (`defc L_f<idx>_bb_<X> = L_f<idx>_bb_<Y>`) into the
@@ -1291,12 +1344,80 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
         if (hops > max_bb) thr[i] = -1;           /* cycle → don't thread */
         else if (t >= 0) thr[i] = t;
     }
+    /* Pass 0c: decide the rewrite PER LINE, once, so passes 1 and 2 agree (pass 1
+       must not mark a reference pass 2 deletes). All three read every line of
+       `rout` in order, so the line index is a shared key.
+
+       One line of lookahead, because two adjacent shapes are handled BETTER
+       downstream and converting would block them:
+         `jp cc,L_ret` + `jp X`    copt inverts the pair to one `jp !cc,X` (2B
+                                   relaxed) — beats `ret cc` + `jp X` (3B), and
+                                   in a loop the extra jump is on the hot path.
+         `jp cc,L_ret` + `L_ret:`  copt deletes a jump to the next label (0B).
+       The first pair is vetoed from both sides — converting the unconditional
+       tail blocks the same inversion — so an unconditional candidate preceded by
+       a conditional `jp` is left alone. A standalone `jp L_ret` still converts. */
+    long nlines = 0;
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) nlines++;
+    char *conv = do_retthread ? calloc((size_t)(nlines > 0 ? nlines : 1), 1) : NULL;
+    if (conv) {
+        long idx = 0, cand = -1;
+        int cand_tgt = -1, cand_cond = 0, prev_cond_jp = 0;
+        rewind(rout);
+        while (fgets(line, sizeof line, rout)) {
+            long here = idx++;
+            /* No code, and not adjacency for the lookahead: markers, blanks,
+               comments, and the defc aliases pass 2 defers. */
+            if (strncmp(line, "\tC_LINE", 7) == 0 || line[0] == '\n'
+                || line[0] == '\r' || line[0] == ';'
+                || strncmp(line, "defc L_f", 8) == 0)
+                continue;
+            if (cand >= 0) {                      /* resolve the pending candidate */
+                int veto = 0;
+                if (cand_cond && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ','))
+                    veto = 1;                     /* invert-me pair: leave to copt */
+                if (line[0] == 'L') {             /* jump to the very next label? */
+                    char *p = strstr(line, "_bb_");
+                    if (p && p[4] >= '0' && p[4] <= '9') {
+                        int n = 0; char *q = p + 4;
+                        while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+                        if (*q == ':' && n <= max_bb) {
+                            int t = (thr[n] >= 0) ? thr[n] : n;
+                            if (t == cand_tgt) veto = 1;
+                        }
+                    }
+                }
+                if (!veto) conv[cand] = 1;
+                cand = -1;
+            }
+            int this_cond_jp = 0;
+            if (strncmp(line, "\tjp\t", 4) == 0) {
+                this_cond_jp = (strchr(line, ',') != NULL);
+                char rcc[8]; int rbb;
+                if (retthread_parts(line, rcc, sizeof rcc, &rbb) && rbb <= max_bb) {
+                    int t = (thr[rbb] >= 0) ? thr[rbb] : rbb;
+                    if (t <= max_bb && retlab[t]) {
+                        if (!rcc[0]) { if (!prev_cond_jp) conv[here] = 1; }
+                        else { cand = here; cand_tgt = t; cand_cond = 1; }
+                    }
+                }
+            }
+            prev_cond_jp = this_cond_jp;
+        }
+        if (cand >= 0) conv[cand] = 1;            /* nothing follows: convert */
+    }
     /* Pass 1: mark every BB number that appears as a REFERENCE — using the
        THREADED target for jp operands, since pass 2 rewrites them. */
     rewind(rout);
+    long p1idx = 0;
     while (fgets(line, sizeof line, rout)) {
+        long here = p1idx++;
         int is_jp = (strncmp(line, "\tjp\t", 4) == 0);
         int is_defc = (strncmp(line, "defc L_f", 8) == 0);
+        /* A branch pass 2 will turn into a `ret` stops being a reference to its
+           target — skip it here so the label can still be dropped. */
+        if (conv && conv[here]) continue;
         for (char *p = strstr(line, "_bb_"); p; p = strstr(p, "_bb_")) {
             char *q = p + 4;
             if (*q < '0' || *q > '9') { p = q; continue; }
@@ -1327,8 +1448,18 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
        of the instruction stream makes the real (defc-are-nothing) adjacency
        visible to copt without changing the binary. */
     rewind(rout);
+    long p2idx = 0;
     while (fgets(line, sizeof line, rout)) {
+        long here = p2idx++;
         if (strncmp(line, "defc L_f", 8) == 0) continue;   /* defer to pass 3 */
+        if (conv && conv[here]) {                /* branch-to-return rewrite */
+            char rcc[8]; int rbb;
+            if (retthread_parts(line, rcc, sizeof rcc, &rbb)) {
+                if (rcc[0]) fprintf(dst, "\tret\t%s\n", rcc);
+                else        fputs("\tret\n", dst);
+                continue;
+            }
+        }
         if (line[0] == 'L') {
             char *p = strstr(line, "_bb_");
             if (p) {
@@ -1384,6 +1515,8 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     }
     free(ref);
     free(thr);
+    free(retlab);
+    free(conv);
 }
 
 /* HL value cache. Reset at each BB boundary and at any op that
@@ -2252,6 +2385,11 @@ static InstrEffects instr_effects(const char *line)
         || !strcmp(m,"SECTION") || !strcmp(m,"MODULE") || !strcmp(m,"LSTON")
         || !strcmp(m,"LSTOFF"))
         return e;
+    /* A CONDITIONAL `ret` (o0 holds the cc) is NOT a boundary — the not-taken
+       path stays in the function, so BC liveness must survive it. is_call is the
+       conservative "successor may read BC"; treating it as a boundary would let
+       filter_dead_bc_parks drop a park the fall-through still consumes. */
+    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1; return e; }
     if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) { e.is_boundary = 1; return e; }
     if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) { e.is_call = 1; return e; }
     if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; return e; }
