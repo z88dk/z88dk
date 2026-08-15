@@ -1551,6 +1551,8 @@ typedef struct {
     int   opidx;       /* position of the mem op in the BB */
     int   addr_def;    /* position of the address ADD (mem.base's def) in the BB */
     int   gbase;       /* the non-index (grid base) operand vreg */
+    int   gslot;       /* if gbase is an IR_LEA: the frame slot it names, else -1 */
+    long  gofs;        /* ... and the LEA's folded byte displacement */
     int   shift;       /* SHL scale k */
     long  konst;       /* index constant (elements) */
     int   nterms;
@@ -1590,17 +1592,78 @@ static int addr_desc_build(Func *f, Op **defmap, const int *defpos,
     out->opidx = j;
     out->addr_def = (p < f->n_vregs) ? defpos[p] : -1;
     out->gbase = gbase; out->shift = k; out->addr_vreg = p;
+    /* `&local` gets a fresh vreg at every use (IR_LEA is not CSE-eligible —
+       it is rematerialised instead), so comparing gbase by vreg id would treat
+       three accesses to one array as three different bases. Record what the
+       LEA actually names so they can be matched by identity instead. */
+    out->gslot = -1; out->gofs = 0;
+    if (gbase >= 0 && gbase < f->n_vregs) {
+        const Op *gd = defmap[gbase];
+        if (gd && gd->kind == IR_LEA && gd->src[0] >= 0) {
+            out->gslot = gd->src[0];
+            out->gofs  = (long)gd->imm;
+        }
+    }
     return 1;
 }
 
 static int addr_desc_same_group(const MemDesc *a, const MemDesc *b)
 {
-    if (a->gbase != b->gbase || a->shift != b->shift) return 0;
+    if (a->shift != b->shift) return 0;
+    /* Same vreg, or two rematerialised LEAs naming the same slot+displacement. */
+    if (a->gbase != b->gbase
+        && !(a->gslot >= 0 && a->gslot == b->gslot && a->gofs == b->gofs))
+        return 0;
     if (a->nterms != b->nterms) return 0;
     for (int i = 0; i < a->nterms; i++)
         if (a->terms[i].vreg != b->terms[i].vreg
             || a->terms[i].sign != b->terms[i].sign) return 0;
     return 1;
+}
+
+/* `&local + K` with a constant K is a frame address at a compile-time
+   displacement, so fold the ADD into the IR_LEA's own offset.
+
+   A struct member on a local arrives as LEA(slot); ADD(imm=member_offset);
+   LD_MEM, and while those stay apart every access pays an address computation
+   (`ld de,K; add hl,de`) for a displacement that is known at compile time. It
+   also hides the frame slot from the lowerer, which can only reach the
+   `(ix+d)` form a scalar local already uses when it can see which slot the
+   access belongs to. `--opt-disable=lea-offset` opts out. */
+int ir_opt_lea_offset(Func *f)
+{
+    if (!f || opt_disabled("lea-offset")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    Op **defmap = calloc((size_t)nv, sizeof(Op *));
+    int *ndefs  = calloc((size_t)nv, sizeof(int));
+    if (!defmap || !ndefs) { free(defmap); free(ndefs); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->dst >= 0 && o->dst < nv) { defmap[o->dst] = o; ndefs[o->dst]++; }
+        }
+
+    int folded = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            Op *o = &f->bbs[b].ops[j];
+            if (o->kind != IR_ADD || o->src[1] >= 0 || o->imm_sym) continue;
+            int s0 = o->src[0];
+            if (s0 < 0 || s0 >= nv || ndefs[s0] != 1) continue;
+            Op *d = defmap[s0];
+            if (!d || d->kind != IR_LEA || d->src[0] < 0) continue;
+            /* The base LEA keeps its own def — it may have other uses, and DCE
+               drops it when this was the only one. */
+            o->kind   = IR_LEA;
+            o->src[0] = d->src[0];
+            o->src[1] = -1;
+            o->imm    = d->imm + o->imm;
+            o->mem.base = -1;
+            folded++;
+        }
+    free(defmap); free(ndefs);
+    return folded;
 }
 
 int ir_opt_addr_cse(Func *f)
@@ -2294,16 +2357,39 @@ static int ldmem_narrowable(const Op *op)
     return 1;
 }
 
-/* Def-side gate: does this op have an 8-bit lowering for its dst? */
-static int narrow_def_kind(const Op *op)
+static int v_fits_byte(const Func *f, int v);
+static int v_is_sx_of_byte(const Func *f, int v);
+
+/* A constant-count right shift narrows only when the SOURCE provably fits a
+   byte. Unlike a left shift — where the low byte of `src << n` depends only on
+   src's low byte — a right shift pulls bits DOWN out of the high byte, so
+   narrowing `0x0100 >> 1` to a byte shift would give 0 instead of 0x80.
+   Logical needs an unsigned byte source; arithmetic needs a sign-extended one,
+   so the sign bit being tested is bit 7 rather than bit 15. */
+static int narrow_shr_kind(const Func *f, const Op *op)
 {
-    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op);
+    if (op->kind != IR_SHR || op->src[1] != -1) return 0;
+    if (op->src[0] < 0 || op->src[0] >= f->n_vregs) return 0;
+    /* 8080 AND 8085 have no CB prefix, so neither `srl a` nor `sra a` exists
+       (8085's undocumented ARHL is the 16-bit `sra hl` only) — there is no byte
+       lowering to narrow into, so leave both on the 16-bit path. Every other
+       target has the CB set, gbz80 included. */
+    if (IS_808x()) return 0;
+    if (op->imm & IR_SHR_ARITH) return v_is_sx_of_byte(f, op->src[0]);
+    return v_fits_byte(f, op->src[0]);
+}
+
+/* Def-side gate: does this op have an 8-bit lowering for its dst? */
+static int narrow_def_kind(const Func *f, const Op *op)
+{
+    return narrow_kind(op) || cmp_result_kind(op) || ldmem_narrowable(op)
+        || narrow_shr_kind(f, op);
 }
 
 /* True if EVERY def of v is an AND with an immediate mask whose high byte
    is clear — so v's value provably fits in 8 bits and a zero/cond test on
    its low byte is a test of the whole value. */
-static int v_fits_byte(const Func *f, int v)
+static int v_fits_byte_d(const Func *f, int v, int depth)
 {
     int seen = 0;
     for (int b = 0; b < f->n_bbs; b++) {
@@ -2322,17 +2408,38 @@ static int v_fits_byte(const Func *f, int v)
                though the value is a literal 0 or 1. */
             if (op->kind == IR_LD_IMM && (op->imm & ~0xFFLL) == 0)
                 continue;
+            /* A zero-extended byte fits a byte by construction. `unsigned char
+               v; v >> 1` builds CONV_ZX(v) then shifts, so without this the
+               shift's source never looks byte-valued and the whole chain stays
+               16-bit. */
+            if (op->kind == IR_CONV_ZX
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && f->vregs[op->src[0]].width == 1)
+                continue;
             /* A boolean is 0 or 1. Without this the compare results narrowed
                by narrow_def_kind would still fail every byte_val-gated use
                (BR_ZERO / BR_COND / SWITCH / byte CMP_EQ) — which is where
                a bool is nearly always consumed. */
             if (cmp_result_kind(op))
                 continue;
+            /* A copy of a value that fits a byte fits a byte too. CSE folds a
+               duplicate CONV_ZX into a MOV from the first one, so without this
+               the SECOND byte shift of the same value in a function is refused
+               while the first is allowed — which is what kept the byte-shift
+               narrowing (and the gbz80 swap that rides on it) from firing
+               anywhere in the corpus. Depth-limited: copy chains are short, and
+               the bound also stops a MOV cycle from recursing. */
+            if (op->kind == IR_MOV && depth < 4
+                && op->src[0] >= 0 && op->src[0] < f->n_vregs
+                && v_fits_byte_d(f, op->src[0], depth + 1))
+                continue;
             return 0;
         }
     }
     return seen;
 }
+
+static int v_fits_byte(const Func *f, int v) { return v_fits_byte_d(f, v, 0); }
 
 /* True if EVERY def of v is a sign-extend of a byte source — so v's value
    provably fits a signed byte [-128,127] and its sign bit is bit 7 (not
@@ -2398,6 +2505,14 @@ static int demands_low_byte_only(const Func *f, int v)
                 }
                 continue;
             }
+            /* A constant-count right shift that itself narrowed to a byte.
+               An immediate-count SHR has no vreg count operand, so v can only
+               be the shifted VALUE — and the shift only narrowed because that
+               value fits a byte (narrow_shr_kind), which is the same condition
+               that makes reading just v's low byte correct here. */
+            if (u->kind == IR_SHR && u->src[1] == -1 && u->dst >= 0
+                && f->vregs[u->dst].width == 1)
+                continue;
             if (byte_val && (u->kind == IR_BR_ZERO || u->kind == IR_BR_COND))
                 continue;
             /* Switch index: the dispatch reads v then widens it to full width
@@ -2463,7 +2578,7 @@ int ir_opt_narrow_byte(Func *f)
             int d = op->dst;
             if (d < 0 || d >= f->n_vregs) continue;
             hasdef[d] = 1;
-            if (!narrow_def_kind(op)) {
+            if (!narrow_def_kind(f, op)) {
                 bad[d] = 1;
                 if (badkind[d] < 0) badkind[d] = (int)op->kind;
             }

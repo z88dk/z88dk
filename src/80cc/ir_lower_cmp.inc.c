@@ -1177,6 +1177,49 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
        logical srl/l_lsr zero-fills. */
     int arith = (op->imm & IR_SHR_ARITH) != 0;
 
+    /* Byte >> const, in A — the mirror of gen_shl's byte path. Only reached
+       when ir_opt_narrow_byte proved the shifted value fits a byte (an int
+       source would pull bits down out of its high byte), and only on CPUs
+       with the CB shifts: 8080 and 8085 have no CB prefix at all (8085's
+       undocumented ARHL is 16-bit `sra hl` only), so narrow_shr_kind declines
+       for both and the 16-bit path below still applies. */
+    if (op->dst >= 0 && f->vregs[op->dst].width == 1 && op->src[1] < 0) {
+        int count = (int)op->imm & 7;
+        if (((int)(op->imm & 0xff)) >= 8) {
+            /* Logical: every data bit is gone. Arithmetic: the sign fills. */
+            if (!arith) {
+                emit(out, "xor\ta");
+                return finalize_byte_result(out, f, op, 0);
+            }
+            load_byte_to_a(out, f, op->src[0]);
+            emit(out, "add\ta,a");          /* CY = sign bit */
+            emit(out, "sbc\ta,a");          /* 0x00 / 0xFF */
+            return finalize_byte_result(out, f, op, 0);
+        }
+        load_byte_to_a(out, f, op->src[0]);
+        cache_a(op->src[0]);
+        /* gbz80 `swap a` exchanges the nibbles, so a logical shift of 4 or more
+           gets its first four bits for one op: swap, mask the junk that came
+           down from the low nibble, then finish with the remainder. Flat saving
+           of 4 bytes / 8 cycles at every count in 4..7 (`srl a` is 2 bytes and
+           8 cycles, and so are `swap a` and `and n`).
+           Right shift only — the LEFT shift has no use for it, because gbz80's
+           `add a,a` is 1 byte / 4 cycles and four of them already match
+           swap+and. Logical only: swap does not propagate a sign. */
+        if ((IS_GBZ80() || IS_Z80N()) && !arith && count >= 4) {
+            /* z80n spells the same nibble exchange SWAPNIB (ed 23), also on A
+               and also 2 bytes. Its barrel shifts are no use here — they work
+               on DE with the count in B, not on a byte in A. */
+            emit(out, IS_Z80N() ? "swapnib" : "swap\ta");
+            emit(out, "and\t%d", 0x0f);
+            for (int k = 4; k < count; k++) emit(out, "srl\ta");
+            return finalize_byte_result(out, f, op, 0);
+        }
+        for (int k = 0; k < count; k++)
+            emit(out, arith ? "sra\ta" : "srl\ta");
+        return finalize_byte_result(out, f, op, count == 0);
+    }
+
     if (op->dst >= 0 && f->vregs[op->dst].width == 4) {
         if (arith) {
             /* Arithmetic long `>>` → l_asr_dehl (count in A, value in DEHL,
@@ -1521,7 +1564,12 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
    shift-right and use the l_asr helper. #289 fix. */
 static int gen_sar16(FILE *out, Func *f, const Op *op)
 {
-    int has_sra = !(IS_8080() || IS_GBZ80());
+    /* gbz80 HAS the CB shift set — sra h (cb 2c) / rr l (cb 1d) / sra l
+       assemble for it. Only 8080 genuinely lacks a shift-right and needs the
+       l_asr helper; 8085 has the undocumented ARHL (`sra hl`), handled below.
+       gbz80 was excluded here in error, which sent its every arithmetic `>>`
+       to a library call. */
+    int has_sra = !IS_8080();
 
     if (op->src[1] < 0) {                        /* constant count */
         int count = (int)op->imm & 0x1f;
@@ -1531,6 +1579,23 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
             return 0;
         }
         if (count > 15) count = 15;              /* >>N (N>=16) == full sign fill */
+        if (count == 15) {
+            /* Full sign fill: every bit of the result is the sign bit, so both
+               bytes are the sign mask. The >=8 path below would reach the same
+               value by grinding the surviving byte down with seven `sra l`, and
+               8080/gbz80 would call l_asr for it. Needs no shift instruction at
+               all, so every CPU takes this. Also the shape the signed
+               divide-by-power-of-two reduction leans on for its bias. */
+            load_to_hl(out, f, op->src[0]);
+            emit(out, "ld\ta,h");
+            emit(out, "add\ta,a");               /* CY = sign bit */
+            emit(out, "sbc\ta,a");               /* a = 0xFF if neg else 0x00 */
+            emit(out, "ld\th,a");
+            emit(out, "ld\tl,a");
+            invalidate_a_cache();
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
         if (has_sra && count >= 8) {
             /* `>>8` is a byte move: low = high byte, high = sign extension.
                Any residual (>>9..15) shifts the surviving bytes. */
@@ -1563,13 +1628,19 @@ static int gen_sar16(FILE *out, Func *f, const Op *op)
             commit_hl_result(out, f, op->dst);
             return 0;
         }
-        /* 8080/gbz80: l_asr with a clean small count (never load the raw imm —
-           it carries the IR_SHR_ARITH marker bit). */
+        /* 8080 only (gbz80 has the CB shifts and takes the inline path above):
+           l_asr with a clean small count — never load the raw imm, it carries
+           the IR_SHR_ARITH marker bit. commit_hl_RESULT, not commit_hl_word:
+           the helper leaves the value in HL, and a PR_DE destination needs it
+           moved across. Committing it as a plain word left a DE-homed result
+           stranded, and the consumer then read the operand from its absent
+           slot — offset -1, i.e. one byte BELOW sp (`signed char >> const`
+           accumulated into a byte gave the wrong answer on 8080 alone). */
         load_to_de(out, f, op->src[0]);          /* value -> DE */
         emit(out, "ld\thl,%d", count);           /* count -> HL */
         emit_c(out, CLOB_HL, "call\tl_asr");
         invalidate_de_cache();
-        commit_hl_word(out, f, op->dst);
+        commit_hl_result(out, f, op->dst);
         return 0;
     }
 

@@ -347,7 +347,12 @@ static int gen_call(FILE *out, Func *f, const Op *op)
         /* Fastcall / sc1 fnptr: the fnptr is already in ix/iy (loaded above,
            before the args took A/HL/DE); dispatch via the jp(ix)/jp(iy) thunk
            (l_jpix/l_jpiy are pure `jp (ix)`, no A/HL/DE clobber). */
-        emit(out, "call\tl_jp%s", fc_idx);
+        /* Rabbit 4000+ has a real `call (ix)` / `call (iy)` (dd ea / fd ea), so
+           the thunk is pure overhead there — one opcode instead of a call into
+           a `jp (ix)` and its return. Earlier Rabbits (2000/3000) do not have
+           it and keep the thunk. */
+        if (IS_RABBIT4K()) emit(out, "call\t(%s)", fc_idx);
+        else               emit(out, "call\tl_jp%s", fc_idx);
     } else if (is_indirect && fc_ret) {
         /* [&__i64_acc?][retlabel][fnptr] already pushed above (before the
            args); just `ret` into the fnptr — its own `ret` returns to our
@@ -362,7 +367,9 @@ static int gen_call(FILE *out, Func *f, const Op *op)
            cur_sp_adjust. */
         load_to_hl_adj(out, f, ci->fnptr_vreg,
                        pre ? 0 : pushed_bytes + sp_adj_extra);
-        emit(out, "call\tl_jphl");
+        /* Rabbit 4000+: `call (hl)` (ed ea) replaces the l_jphl thunk. */
+        if (IS_RABBIT4K()) emit(out, "call\t(hl)");
+        else               emit(out, "call\tl_jphl");
     } else if ((ci->flags & SHORTCALL) && !(ci->flags & SHORTCALL_HL)) {
         /* __z88dk_shortcall: dispatch via the rst vector, with the value
            as an inline operand (defb if it fits a byte, else defw) that

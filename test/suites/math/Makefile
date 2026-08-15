@@ -25,12 +25,13 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # ---------------------------------------------------------------------------
 
 all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_math16_8085.bin \
+	test_math16_r6k.bin \
 	test_math32.bin test_math32_z180.bin test_math32_z80n.bin \
-	test_math32_r2ka.bin test_math32_r4k.bin test_math32_kc160.bin \
+	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
 	test_math32_8085.bin \
 	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
-	test_mbf32_r2ka.bin test_mbf32_r4k.bin test_mbf32_ez80_z80.bin test_mbf32_kc160.bin \
+	test_mbf32_r2ka.bin test_mbf32_r4k.bin test_mbf32_r6k.bin test_mbf32_ez80_z80.bin test_mbf32_kc160.bin \
 	test_9511.bin test_9511_8085.bin test_fixmath.bin
 
 test_fixmath.bin: $(FIXSOURCES)
@@ -86,6 +87,10 @@ test_mbf32_r4k.bin: $(FPSOURCES)
 	$(call compile_r4k, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_r4k)
 
+test_mbf32_r6k.bin: $(FPSOURCES)
+	$(call compile_r6k, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(runtest_r6k)
+
 test_mbf32_kc160.bin: $(FPSOURCES)
 	$(call compile_kc160, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_kc160)
@@ -114,6 +119,10 @@ test_math32_r4k.bin: $(FPSOURCES)
 	$(call compile_r4k, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_r4k)
 	$(runtest_r4k)
 
+test_math32_r6k.bin: $(FPSOURCES)
+	$(call compile_r6k, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_r6k)
+	$(runtest_r6k)
+
 test_math32_kc160.bin: $(FPSOURCES)
 	$(call compile_kc160, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_kc160)
 	$(runtest_kc160)
@@ -141,6 +150,10 @@ test_math16.bin: $(FPSOURCES)
 test_math16_8085.bin: $(FPSOURCES)
 	$(call compile_8085, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"", --math16 -lmath32_8085)
 	$(runtest_8085)
+
+test_math16_r6k.bin: $(FPSOURCES)
+	$(call compile_r6k, -DMATH16 -D__MATH_MATH16 -DMATH_SPECIALS -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16-8085\\\"\"", --math16 -lmath32_r6k)
+	$(runtest_r6k)
 
 test_daimath32.bin: $(FPSOURCES)
 	$(call compile, -DMATHDAI32 -D__MATH_DAI32 --math-dai32 -DMATH_LIBRARY="\"\\\"daimath32\\\"\"",)

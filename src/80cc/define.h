@@ -382,6 +382,11 @@ struct gototab_s {
 #define IS_KC160() (c_cpu == CPU_KC160)
 #define IS_RABBIT()   (c_cpu & CPU_RABBIT)            /* any Rabbit (r2k/r3k/r4k/r6k) */
 #define IS_RABBIT4K() (c_cpu & (CPU_R4K | CPU_R6K))   /* Rabbit 4000+ */
+/* Rabbit 6000 ONLY. `-mr6k` sets c_cpu to CPU_R4K|CPU_R6K (main.c), so testing
+   CPU_R6K alone is what distinguishes a 6000 from a 4000/5000 — needed for the
+   instructions only it has, e.g. `alu a,(sp+n)` / `alu hl,(sp+n)`, which r3k,
+   r4k and r5k all reject. */
+#define IS_R6K()      ((c_cpu & CPU_R6K) != 0)
 
 
 
