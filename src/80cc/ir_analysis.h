@@ -69,6 +69,20 @@ typedef struct {
     int end;         /* last global op-index where vreg is live; -1 if unused */
 } LiveRange;
 
+/* [IR_LIVEPROBE] Inert precision probe: counts how many `true` verdicts from
+   ir_live_ranges_overlap would become `false` under the precise (holes-honoured)
+   per-op liveness the dataflow already computes. Sizes the interference-model
+   lever before anything is built on it. Call once per function after allocation;
+   prints one line to stderr and resets. No-op unless IR_LIVEPROBE is set. */
+void ir_liveprobe_count_iv(const Func *f, int a, int b, int interval_ans,
+                           int alo, int ahi, int blo, int bhi);
+/* Bracket one candidate's scan against all sitting tenants, so the probe can
+   report DECISIONS changed (candidate blocked only by false edges), not just
+   edges flipped. */
+void ir_liveprobe_decision_begin(void);
+void ir_liveprobe_decision_end(void);
+void ir_liveprobe_flush(const char *fn);
+
 void ir_compute_live_ranges(Func *f);
 void ir_free_live_ranges(Func *f);
 

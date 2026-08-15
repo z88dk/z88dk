@@ -1325,6 +1325,22 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
 static int is_compared_counter(const Func *f, int v);
 static int is_deref_base(const Func *f, int v);
 static int is_stepped(const Func *f, int v);
+/* [IR_LIVEPROBE] The allocator's REAL interference test: inclusive overlap of
+   two [lo,hi] intervals. Six sites inline this over three different interval
+   arrays (pool[].lo/hi, cand[].flo/fhi, first_use[]/last_use[]) — routing them
+   through one helper is what lets the probe see the decisions that actually
+   allocate. `ir_live_ranges_overlap` is NOT that test: it is reached only by one
+   narrow counter-yield tie-break. Behaviour identical to the inlined form. */
+static inline int iv_overlap(const Func *f, int a, int b,
+                             int alo, int ahi, int blo, int bhi)
+{
+    int s = alo > blo ? alo : blo;
+    int e = ahi < bhi ? ahi : bhi;
+    int ans = s <= e;
+    ir_liveprobe_count_iv(f, a, b, ans, alo, ahi, blo, bhi);
+    return ans;
+}
+
 static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, int v,
                                        const long *idx_ben, int idx2_taken,
                                        int idx3_taken)
@@ -1526,13 +1542,14 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             /* Interval overlap against already-assigned BC vregs, using the
                [lo,hi] each carries in the pool (BC is multi-occupant). */
             int ok = 1;
+            ir_liveprobe_decision_begin();
             for (int j = 0; j < n && ok; j++) {
                 if (pool[j].vreg == v) continue;
                 if (f->vreg_to_phys[pool[j].vreg] != IR_PR_BC) continue;
-                int s = c->lo > pool[j].lo ? c->lo : pool[j].lo;
-                int e = c->hi < pool[j].hi ? c->hi : pool[j].hi;
-                if (s <= e) ok = 0;
+                if (iv_overlap(f, v, pool[j].vreg,
+                               c->lo, c->hi, pool[j].lo, pool[j].hi)) ok = 0;
             }
+            ir_liveprobe_decision_end();
             /* CONTENTION-CONDITIONAL counter yield. A compared counter
                ranks high globally (its STEP saving vs the frame slot) so it grabs
                BC first — but if it OVERLAPS an unassigned BC contender whose true
@@ -2185,13 +2202,14 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 int jlo, jhi;
                 bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
                 int blocks = 0, hotter = 0;
+                ir_liveprobe_decision_begin();
                 for (int i = 0; i < nc; i++) {                      /* blocks a cand? */
-                    int s = cand[i].flo > jlo ? cand[i].flo : jlo;
-                    int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
-                    if (s <= e) { blocks = 1;
+                    if (iv_overlap(f, cand[i].vreg, j,
+                                   cand[i].flo, cand[i].fhi, jlo, jhi)) { blocks = 1;
                         if (use_count[cand[i].vreg] >= use_count[j]) hotter = 1;
                     }
                 }
+                ir_liveprobe_decision_end();
                 /* Don't evict a WRITTEN loop-carried tenant (wc≥2 = an IV
                    redefined each iteration) for a mere AGGREGATE of colder disjoint
                    temps — the sum ignores the per-temp
@@ -2214,16 +2232,17 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 for (int i = 0; i < nc; i++) {
                     if (cand[i].flo <= last) continue;
                     int clash = 0;
+                    ir_liveprobe_decision_begin();
                     for (int j = 0; j < f->n_vregs && !clash; j++) {
                         if (f->vreg_to_phys[j] != IR_PR_BC) continue;
                         if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;
                         if (pass == 1 && evictable[j]) continue;   /* freed */
                         int jlo, jhi;
                         bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
-                        int s = cand[i].flo > jlo ? cand[i].flo : jlo;
-                        int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
-                        if (s <= e) clash = 1;
+                        if (iv_overlap(f, cand[i].vreg, j,
+                                       cand[i].flo, cand[i].fhi, jlo, jhi)) clash = 1;
                     }
+                    ir_liveprobe_decision_end();
                     if (clash) continue;
                     ben[pass] += cost_benefit[cand[i].vreg];
                     last = cand[i].fhi;
@@ -2249,15 +2268,16 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         int v = cand[i].vreg;
         if (cand[i].flo <= last_fhi) continue;   /* overlaps a packed sibling */
         int clash = 0;
+        ir_liveprobe_decision_begin();
         for (int j = 0; j < f->n_vregs && !clash; j++) {
             if (f->vreg_to_phys[j] != IR_PR_BC) continue;
             if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;   /* our own */
             int jlo, jhi;
             bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
-            int s = cand[i].flo > jlo ? cand[i].flo : jlo;
-            int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
-            if (s <= e) clash = 1;
+            if (iv_overlap(f, cand[i].vreg, j,
+                           cand[i].flo, cand[i].fhi, jlo, jhi)) clash = 1;
         }
+        ir_liveprobe_decision_end();
         if (clash) continue;
         f->vreg_to_phys[v] = IR_PR_BC;
         f->vregs[v].flags |= IR_VREG_BC_PACK;
@@ -4150,9 +4170,8 @@ void ir_alloc(Func *f)
                     int ph = f->vreg_to_phys[w];
                     if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
                     if (first_use[w] < 0 || last_use[w] < 0) continue;
-                    int s = lo > first_use[w] ? lo : first_use[w];
-                    int e = hi < last_use[w] ? hi : last_use[w];
-                    if (s <= e) { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                    if (iv_overlap(f, v, w, lo, hi, first_use[w], last_use[w]))
+                        { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
                 }
                 if (!de_busy) de_free++;
                 if (!de_busy || !bc_busy) de_or_bc_free++;
@@ -4245,9 +4264,8 @@ void ir_alloc(Func *f)
                         int ph = f->vreg_to_phys[w];
                         if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
                         if (first_use[w] < 0 || last_use[w] < 0) continue;
-                        int s = lo > first_use[w] ? lo : first_use[w];
-                        int e = hi < last_use[w] ? hi : last_use[w];
-                        if (s <= e) { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                        if (iv_overlap(f, v, w, lo, hi, first_use[w], last_use[w]))
+                            { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
                     }
                     int pair_busy = de_busy && bc_busy;   /* NEITHER pair free */
                     int callfree = 1;
@@ -4891,4 +4909,5 @@ void ir_alloc(Func *f)
     ir_ldslot_why_probe(f);
     ir_opres_why_probe(f);
     hr_recoverability_verify(f);
+    ir_liveprobe_flush(f->fn ? ir_sym_name(f->fn) : "?");
 }

@@ -608,6 +608,131 @@ const LiveRange *ir_live_range(const Func *f, int v)
     return &((const LiveRange *)f->live_ranges)[v];
 }
 
+/* ---- [IR_LIVEPROBE] inert interference-precision probe ------------------ */
+/* `ir_live_ranges_overlap` answers from ONE hole-free [start,end] pair, so in a
+   long BB every value spans most of the block and everything interferes with
+   everything. The dataflow above already produces the precise answer —
+   bb->live_in_per_op[] is a per-op BitSet — and ir_compute_live_ranges throws it
+   away collapsing to min/max. This probe measures what that costs: for every
+   query the allocator makes, how often does a `true` become `false` once the
+   holes are honoured?
+
+   Interference here is the standard notion: a and b interfere iff both are live
+   OUT of the same op (live_out(j) is live_in_per_op[j+1], or bb->live_out for
+   the last op — see ir_op_live_out). "Both live after some op" excludes the
+   touching-endpoint case (one's last use is the other's def), which is register
+   REUSE, not a conflict — the same exclusive reading hr_recoverability_verify
+   had to re-derive by hand.
+
+   INERT: counts only. The answer returned is always the interval one. */
+static long lp_queries, lp_true, lp_flips, lp_unrefinable;
+/* Decision level: one "decision" is a candidate's whole scan against every
+   sitting tenant. An edge flip only changes an outcome if EVERY blocking edge
+   for that candidate flips — the candidate has to come out unblocked. */
+static long lp_dec, lp_dec_blocked, lp_dec_flips, lp_unsound;
+static int  lp_dec_active, lp_dec_iv_any, lp_dec_pr_any;
+
+static int liveprobe_on(void)
+{
+    static int on = -1;
+    if (on < 0) on = getenv("IR_LIVEPROBE") != NULL;
+    return on;
+}
+
+/* IR_LIVEPROBE=2: also evaluate the precise answer on queries the interval model
+   already called FALSE. Precise must be a strict SUBSET — an interval spans the
+   union of a vreg's live points, so it can only over-approximate. A single
+   "precise says interfere, interval says not" is proof the precise definition is
+   WRONG (bad live-out indexing, say), and phase 2 would miscompile on it. Costs
+   a full scan per query, so it is not the default. */
+static int liveprobe_paranoid(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_LIVEPROBE"); on = (e && e[0] == '2'); }
+    return on;
+}
+
+/* 1 = live out of the same op somewhere, 0 = never, -1 = cannot tell (a BB with
+   ops but no per-op sets, i.e. the calloc in ir_compute_liveness failed). */
+static int live_overlap_precise(const Func *f, int a, int b)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        if (bb->n_ops <= 0) continue;
+        if (!bb->live_in_per_op) return -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const BitSet *lo = (j + 1 < bb->n_ops)
+                ? (const BitSet *)bb->live_in_per_op[j + 1]
+                : (const BitSet *)bb->live_out;
+            if (!lo) continue;
+            if (ir_bitset_get(lo, a) && ir_bitset_get(lo, b)) return 1;
+        }
+    }
+    return 0;
+}
+
+void ir_liveprobe_count_iv(const Func *f, int a, int b, int interval_ans,
+                           int alo, int ahi, int blo, int bhi)
+{
+    if (!liveprobe_on() || !f) return;
+    lp_queries++;
+    if (lp_dec_active) lp_dec_iv_any |= interval_ans;
+    if (!interval_ans) {                    /* false stays false; nothing to flip */
+        if (liveprobe_paranoid() && live_overlap_precise(f, a, b) == 1) {
+            lp_unsound++;                   /* MUST stay 0 — see liveprobe_paranoid */
+            const LiveRange *ra2 = ir_live_range(f, a), *rb2 = ir_live_range(f, b);
+            fprintf(stderr, "  LP_UNSOUND a=%d alloc_iv=[%d,%d] true_lr=[%d,%d]%s"
+                            " b=%d alloc_iv=[%d,%d] true_lr=[%d,%d]%s\n",
+                    a, alo, ahi, ra2?ra2->start:-9, ra2?ra2->end:-9,
+                    (f->vregs[a].flags & IR_VREG_PARAM) ? " PARAM" : "",
+                    b, blo, bhi, rb2?rb2->start:-9, rb2?rb2->end:-9,
+                    (f->vregs[b].flags & IR_VREG_PARAM) ? " PARAM" : "");
+        }
+        return;
+    }
+    lp_true++;
+    /* Precise is a SUBSET of interval (intervals over-approximate), so a `false`
+       interval answer can never hide a precise `true` — only true edges need the
+       refinement, and only they can contribute to lp_dec_pr_any. */
+    int p = live_overlap_precise(f, a, b);
+    if (p < 0)       { lp_unrefinable++; if (lp_dec_active) lp_dec_pr_any = 1; }
+    else if (p == 0) lp_flips++;
+    else if (lp_dec_active) lp_dec_pr_any = 1;
+}
+
+void ir_liveprobe_decision_begin(void)
+{
+    if (!liveprobe_on()) return;
+    lp_dec_active = 1; lp_dec_iv_any = 0; lp_dec_pr_any = 0;
+}
+
+void ir_liveprobe_decision_end(void)
+{
+    if (!liveprobe_on() || !lp_dec_active) return;
+    lp_dec++;
+    if (lp_dec_iv_any) {
+        lp_dec_blocked++;
+        if (!lp_dec_pr_any) lp_dec_flips++;   /* blocked ONLY by false edges */
+    }
+    lp_dec_active = 0;
+}
+
+void ir_liveprobe_flush(const char *fn)
+{
+    if (!liveprobe_on()) return;
+    if (lp_queries > 0)
+        fprintf(stderr,
+                "IR_LIVEPROBE %-24s queries=%-5ld true=%-5ld flips=%-5ld"
+                " flip_of_true=%5.1f%% decisions=%-4ld blocked=%-4ld"
+                " unblocked_by_precision=%-4ld unrefinable=%ld unsound=%ld\n",
+                fn ? fn : "?", lp_queries, lp_true, lp_flips,
+                lp_true ? 100.0 * (double)lp_flips / (double)lp_true : 0.0,
+                lp_dec, lp_dec_blocked, lp_dec_flips, lp_unrefinable, lp_unsound);
+    lp_queries = lp_true = lp_flips = lp_unrefinable = 0;
+    lp_dec = lp_dec_blocked = lp_dec_flips = lp_unsound = 0;
+    lp_dec_active = lp_dec_iv_any = lp_dec_pr_any = 0;
+}
+
 int ir_live_ranges_overlap(const Func *f, int a, int b)
 {
     const LiveRange *ra = ir_live_range(f, a);
@@ -617,7 +742,9 @@ int ir_live_ranges_overlap(const Func *f, int a, int b)
     /* Inclusive intervals: overlap iff max(starts) <= min(ends). */
     int s = ra->start > rb->start ? ra->start : rb->start;
     int e = ra->end   < rb->end   ? ra->end   : rb->end;
-    return s <= e;
+    int ans = s <= e;
+    ir_liveprobe_count_iv(f, a, b, ans, ra->start, ra->end, rb->start, rb->end);
+    return ans;
 }
 
 /* ----- Structural verifier -------------------------------------------- */
