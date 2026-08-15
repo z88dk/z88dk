@@ -3092,8 +3092,14 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
     }
   } while ( pc != end && st < counter  );
 
-
-  if ( counter != -1 )
+  /* Default -end is 0; +test programs leave 0000 after the first JP.
+   * Hitting the -counter cap then prints a bare 100000000 on stdout,
+   * which looks like a dead printf %.9f. Label that case. TIMER runs
+   * that reach -end still print the bare integer. */
+  if ( pc != end && st >= counter ) {
+    fprintf(stderr, "ticks: stopped at counter limit (%llu); raise -counter\n", st);
+    printf("Ticks: %llu (counter limit)\n", st);
+  } else if ( counter != -1 )
     printf("%llu\n", st);
   warn_existing_temp_breakpoints();
   if (profiler_enabled) {
