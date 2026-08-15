@@ -2720,16 +2720,20 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            BC/DE need not be copied into HL just to `ld a,(hl)`. Only when
            HL doesn't already hold the base (then `ld a,(hl)` is already
            free) and the value is a byte. Leaves HL/DE caches intact — the
-           (bc)/(de) load touches neither. IR_NO_GPDEREF opts out. */
+           (bc)/(de) load touches neither. IR_NO_GPDEREF opts out.
+           Gate on bc_has/de_has (live tenancy), not vreg_in_pr_bc/de
+           (allocator home): a global char* can be assigned BC without
+           ever being loaded there (`return *p_local` → ld a,(bc) with
+           BC=0). */
         if (op->dst >= 0 && f->vregs[op->dst].width == 1
             && op->mem.offset == 0 && !hl_has(op->mem.base)
             && !opt_disabled("gpderef")) {
-            if (vreg_in_pr_bc(f, op->mem.base)) {
+            if (bc_has(op->mem.base)) {
                 emit(out, "ld\ta,(bc)");
                 commit_a_byte(out, f, op->dst);
                 return 0;
             }
-            if (vreg_in_pr_de(f, op->mem.base)) {
+            if (de_has(op->mem.base)) {
                 emit(out, "ld\ta,(de)");
                 commit_a_byte(out, f, op->dst);
                 return 0;
