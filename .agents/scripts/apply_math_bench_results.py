@@ -243,6 +243,18 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
         ("support/benchmarks/n-body/readme.txt", "result", dict(title=r"sccz80 / classic / 8085 / math16")),
         ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"sccz80 / classic / 8085 / math16")),
     )
+    add(
+        "nb_c_80cc_z80_m32",
+        ("support/benchmarks/n-body/readme.txt", "summary", dict(compiler="80cc", cpu="z80", math="math32")),
+        ("support/benchmarks/n-body/readme.txt", "result", dict(title=r"80cc / classic / math32")),
+        ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"80cc / classic / math32")),
+    )
+    add(
+        "nb_c_80cc_8085_m32",
+        ("support/benchmarks/n-body/readme.txt", "summary", dict(compiler="80cc", cpu="8085", math="math32")),
+        ("support/benchmarks/n-body/readme.txt", "result", dict(title=r"80cc / classic / 8085 / math32")),
+        ("support/benchmarks/n-body/z88dk-classic/readme.txt", "result", dict(title=r"80cc / classic / 8085 / math32")),
+    )
     # n-body new
     add(
         "nb_n_sccz80_z80_m32",
@@ -420,17 +432,30 @@ def job_map() -> dict[str, list[tuple[str, str, dict]]]:
         "wh_c_sccz80_z80_m32",
         ("support/benchmarks/whetstone/readme.txt", "summary", dict(compiler="sccz80", cpu="z80", math="math32", whet=True)),
         ("support/benchmarks/whetstone/readme.txt", "result", dict(title=r"sccz80 / classic c library / math32", whet=True)),
-        ("support/benchmarks/whetstone/z88dk-classic/readme.txt", "result", dict(title=r"classic/sccz80.*math32|sccz80 / classic c library / math32", whet=True)),
+        ("support/benchmarks/whetstone/z88dk-classic/readme.txt", "result", dict(title=r"classic/sccz80/math32", whet=True)),
     )
     add(
         "wh_c_sccz80_8085_m32",
         ("support/benchmarks/whetstone/readme.txt", "summary", dict(compiler="sccz80", cpu="8085", math="math32", whet=True)),
         ("support/benchmarks/whetstone/readme.txt", "result", dict(title=r"sccz80 / classic c library / 8085 / math32", whet=True)),
+        ("support/benchmarks/whetstone/z88dk-classic/readme.txt", "result", dict(title=r"classic/sccz80/8085/math32", whet=True)),
     )
     add(
         "wh_c_zsdcc_z80_m32",
         ("support/benchmarks/whetstone/readme.txt", "summary", dict(compiler="zsdcc", cpu="z80", math="math32", whet=True)),
         ("support/benchmarks/whetstone/readme.txt", "result", dict(title=r"zsdcc / classic c library / math32", whet=True)),
+    )
+    add(
+        "wh_c_80cc_z80_m32",
+        ("support/benchmarks/whetstone/readme.txt", "summary", dict(compiler="80cc", cpu="z80", math="math32", whet=True)),
+        ("support/benchmarks/whetstone/readme.txt", "result", dict(title=r"80cc / classic c library / math32", whet=True)),
+        ("support/benchmarks/whetstone/z88dk-classic/readme.txt", "result", dict(title=r"classic/80cc/math32", whet=True)),
+    )
+    add(
+        "wh_c_80cc_8085_m32",
+        ("support/benchmarks/whetstone/readme.txt", "summary", dict(compiler="80cc", cpu="8085", math="math32", whet=True)),
+        ("support/benchmarks/whetstone/readme.txt", "result", dict(title=r"80cc / classic c library / 8085 / math32", whet=True)),
+        ("support/benchmarks/whetstone/z88dk-classic/readme.txt", "result", dict(title=r"classic/80cc/8085/math32", whet=True)),
     )
     add(
         "wh_n_sccz80_z80_m32",

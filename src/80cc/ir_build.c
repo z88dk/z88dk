@@ -1336,6 +1336,58 @@ static int sr_shift_left(Builder *b, int v, int sh, int w)
    unsigned alike. Covers C = 2^a (defensive), 2^a+2^b, and runs of 1-bits
    (2^a-2^b: 3,5,6,7,9,10,12,14,15,...). Returns the result vreg or -1 (use
    the helper). pow2 is normally already reduced at the AST level. */
+/* Signed `x / 2^k` and `x % 2^k`, replacing the bit-serial l_div / l_long_div
+   helper. An arithmetic shift rounds toward minus infinity, but C rounds the
+   quotient toward zero, so a negative dividend needs (2^k - 1) added before the
+   shift. The sign mask supplies that bias with no branch:
+
+       bias = (x >> W-1) & (2^k - 1)      0 when x >= 0, 2^k-1 when x < 0
+       q    = (x + bias) >> k             arithmetic
+       r    = x - ((x + bias) & ~(2^k-1)) since (q << k) == (x+bias) & ~mask
+
+   `x + bias` cannot overflow: bias is non-zero only when x is negative, so the
+   sum moves toward zero. The remainder form avoids shifting altogether beyond
+   the sign mask, which matters because a z80 shift costs per bit.
+
+   Only for a SIGNED dividend — the unsigned cases are already rewritten to a
+   plain shift/mask by the AST strength-reduction pass. */
+static int emit_const_sdiv_sr(Builder *b, int v, int shift, int w, int want_mod)
+{
+    if (w != 2 && w != 4) return -1;
+    if (shift <= 0 || shift > (w == 4 ? 31 : 15)) return -1;
+    Kind kw = (w == 4) ? KIND_LONG : KIND_INT;
+    int64_t mask = (((int64_t)1) << shift) - 1;
+
+    int sm = new_temp_kind(b, kw);
+    Op *s1 = ir_op_emit(cur_bb(b), IR_SHR);
+    s1->dst = sm; s1->src[0] = v; s1->src[1] = -1;
+    s1->imm = (int64_t)(w * 8 - 1) | IR_SHR_ARITH;
+
+    int bias = new_temp_kind(b, kw);
+    Op *an = ir_op_emit(cur_bb(b), IR_AND);
+    an->dst = bias; an->src[0] = sm; an->src[1] = -1; an->imm = mask;
+
+    int adj = new_temp_kind(b, kw);
+    ir_emit_binop(cur_bb(b), IR_ADD, adj, v, bias);
+
+    if (!want_mod) {
+        int q = new_temp_kind(b, kw);
+        Op *s2 = ir_op_emit(cur_bb(b), IR_SHR);
+        s2->dst = q; s2->src[0] = adj; s2->src[1] = -1;
+        s2->imm = (int64_t)shift | IR_SHR_ARITH;
+        return q;
+    }
+
+    int trunc = new_temp_kind(b, kw);
+    Op *a2 = ir_op_emit(cur_bb(b), IR_AND);
+    a2->dst = trunc; a2->src[0] = adj; a2->src[1] = -1;
+    a2->imm = -(((int64_t)1) << shift);          /* ~mask, sign-extended */
+
+    int r = new_temp_kind(b, kw);
+    ir_emit_binop(cur_bb(b), IR_SUB, r, v, trunc);
+    return r;
+}
+
 static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
 {
     if (w != 2 && w != 4) return -1;
@@ -2908,6 +2960,18 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         int rw = b->f->vregs[rhs_v].width;
         if (lw == 4 && rw < 4) {
             int tmp = new_temp_kind(b, KIND_LONG);
+            int uns = n->right->type && n->right->type->isunsigned;
+            Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = tmp; cv->src[0] = rhs_v;
+            rhs_v = tmp;
+        } else if (lw == 2 && rw < 2 && k != IR_SHL && k != IR_SHR) {
+            /* Same convergence at width 2. Without it `int acc; acc += (signed
+               char)x;` emitted a MIXED-width ADD (width-2 dst, width-1 rhs) and
+               the lowerer zero-filled the high half — `acc += (signed char)(u ^
+               0x80u)` added 186 instead of -70. Shifts are excluded: their RHS
+               is a count, not an arithmetic operand. */
+            int tmp = new_temp(b, 2);
+            b->f->vregs[tmp].width = 2;
             int uns = n->right->type && n->right->type->isunsigned;
             Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
             cv->dst = tmp; cv->src[0] = rhs_v;
@@ -6324,6 +6388,21 @@ static int build_muldiv_integer(Builder *b, Node *n)
     int unsigned_op = (n->type && n->type->isunsigned)
         || (n->left  && n->left->type  && n->left->type->isunsigned)
         || (n->right && n->right->type && n->right->type->isunsigned);
+    /* Signed division / remainder by a power of two: bias-and-shift instead of
+       the bit-serial helper. The unsigned forms never reach here — ast_opt
+       rewrites them to a shift and a mask — so this covers the signed half the
+       AST pass has to decline. */
+    if ((n->ast_type == OP_DIV || n->ast_type == OP_MOD)
+        && !unsigned_op && !is_flt && !is_fix16 && !is_fix32
+        && (width == 2 || width == 4)
+        && n->right && n->right->ast_type == AST_LITERAL) {
+        int shift;
+        if (extract_pow2((int64_t)n->right->zval, &shift)) {
+            int srd = emit_const_sdiv_sr(b, l, shift, width,
+                                         n->ast_type == OP_MOD);
+            if (srd >= 0) return srd;
+        }
+    }
     /* kc160: 16x16 int multiply is a single `mul de,hl` (low 16 bits are
        sign-agnostic, so the unsigned form serves signed and unsigned alike). */
     if (n->ast_type == OP_MULT && IS_KC160() && width == 2)
@@ -6618,7 +6697,17 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        shifts). Saves a frame slot and the LD_IMM/store/reload
        churn of the dumb path. */
     if (rhs && rhs->ast_type == AST_LITERAL) {
-        int64_t imm = (int64_t)rhs->zval;
+        /* A FIXED-POINT literal has to be Q-scaled, exactly as the AST_LITERAL
+           handler does: the raw zval of `1.5k` is 1, its representation is 384.
+           Taking zval verbatim made `1.5k + 1.5k` emit `384 + 1`, so
+           `(int)(1.5k+1.5k)` returned 1. Normally invisible because constant
+           folding collapses the pair first — it only surfaced with fold AND
+           prop off. Key off the literal's own type, like the scaled-materialise
+           path; a non-_Accum literal is unchanged. */
+        Kind rk = rhs->type ? rhs->type->kind : KIND_NONE;
+        int64_t imm = (rk == KIND_ACCUM16 || rk == KIND_ACCUM32)
+                    ? scale_literal_for_kind(rhs, rk)
+                    : (int64_t)rhs->zval;
         /* GT/LE with a const RHS has no correct direct lowering at any
            width — the const-RHS handlers only exist for LT/GE, and the
            GT/LE paths read an uninitialised slot for the constant
@@ -7150,8 +7239,27 @@ static int build_stmt(Builder *b, Node *n)
                and the intermediate slot. */
             int init_v = build_expr_hinted(b, n->declvar, v);
             if (init_v < 0) return -1;
-            if (init_v != v)
-                ir_emit_mov(cur_bb(b), v, init_v);
+            if (init_v != v) {
+                /* Converge the width before the copy — the same job the
+                   OP_ASSIGN path does. A bare MOV from a NARROWER vreg leaves
+                   the high half to the lowerer, which zero-fills: `signed char
+                   gs = -56; int a = gs;` initialised a to 200, while the
+                   identical assignment to a GLOBAL int was correct because
+                   that path converges. Signedness comes from the initialiser
+                   expression's type, as in OP_ASSIGN. */
+                int iw = b->f->vregs[init_v].width;
+                int vw = b->f->vregs[v].width;
+                if (iw != vw && (vw == 2 || vw == 4)) {
+                    OpKind cv = (iw > vw)
+                        ? IR_CONV_TRUNC
+                        : ((n->declvar->type && n->declvar->type->isunsigned)
+                           ? IR_CONV_ZX : IR_CONV_SX);
+                    Op *op = ir_op_emit(cur_bb(b), cv);
+                    op->dst = v; op->src[0] = init_v;
+                } else {
+                    ir_emit_mov(cur_bb(b), v, init_v);
+                }
+            }
         }
         return 0;
     }

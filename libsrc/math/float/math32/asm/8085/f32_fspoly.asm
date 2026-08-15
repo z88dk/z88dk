@@ -20,8 +20,8 @@
 ;   SP = ret, n(2), dptr(2), x.HL(2), x.DE(2)
 ;
 ; Expanded res lives in B/C/DEHL.  ld de,sp+* clobbers DE, so park the
-; full res (or at least DE) before any stack-pointer math.  The Z80 path
-; uses exx for the same reason.
+; full res (or at least DE) before any stack-pointer math.  BC is live
+; meta — do not ld bc,de to park DE.  The Z80 path uses exx.
 ;
 
 SECTION code_clib
@@ -69,77 +69,57 @@ PUBLIC _m32_polyf
     ld (de),a                       ; --n
     pop de                          ; restore mant DE
 
-    ; ---- res *= x (Y=res in regs; IEEE x on stack) ----
-    push bc
-    push de
-    push hl                         ; park res
-    ; SP: Rhl Rde Rbc ret n dptr xHL xDE
-    ;     0   2   4   6   8 10   12  14
-
-    ld de,sp+14
-    ld hl,(de)                      ; x.DE
+    ; ---- res *= x (Y in BC DEHL; IEEE x copied onto the stack) ----
     push hl
+    push de                         ; +0 Y.de +2 Y.hl +4 ret +6 n +8 dptr +10 xHL +12 xDE
+    ld de,sp+12
+    ld hl,(de)
+    push hl                         ; x.DE
     ld de,sp+14
-    ld hl,(de)                      ; x.HL
-    push hl
-    ; SP: xHL xDE Rhl Rde Rbc ret n dptr xHL xDE
-    ;     0   2   4   6   8  10 12 14  16  18
-
-    ; restore res into BC DEHL (inline — no call, no extra ret word)
+    ld hl,(de)
+    push hl                         ; x.HL
+    ; +0 xHL +2 xDE +4 Y.de +6 Y.hl
     ld de,sp+4
     ld hl,(de)
     push hl
     ld de,sp+8
     ld hl,(de)
-    push hl
-    ld de,sp+12
-    ld hl,(de)
-    ld bc,hl                        ; last word → BC (no push/pop)
-    pop de
-    pop hl
-
-    call m32_fsmul24x32             ; product; SP: Rhl Rde Rbc ret n dptr x
+    pop de                          ; DEHL = Y.mant; BC still meta
+    call m32_fsmul24x32             ; consumes x
     pop af
-    pop af
-    pop af                          ; drop parked res
+    pop af                          ; drop Y.de Y.hl
 
     ; ---- res += d[n] ----
-    push bc
-    push de
-    push hl                         ; park product
-    ; SP: Phl Pde Pbc ret n dptr x
-    ;     0   2   4   6  8  10  12
-
-    ld de,sp+10
-    ld hl,(de)                      ; dptr
-    ld de,sp+8
+    push hl
+    push de                         ; park product mant; BC stays
+    ; +0 P.de +2 P.hl +4 ret +6 n +8 dptr
+    ld de,sp+6
     ld a,(de)                       ; n
+    ld de,sp+8
+    ld hl,(de)                      ; dptr
     add a,a
     add a,a
     ld e,a
     ld d,0
     add hl,de                       ; &d[n]
-    call load_ieee_push
-    ; SP: xHL xDE Phl Pde Pbc ret n dptr x
-    ;     0   2   4   6   8  10 12 14  16
-
-    ; restore product into BC DEHL (inline)
+    ; IEEE push, BC preserved
+    ld de,(hl+)
+    push de                         ; LSW
+    ld e,(hl+)
+    ld d,(hl)                       ; MSW
+    pop hl
+    push de                         ; X.DE
+    push hl                         ; X.HL
+    ; +0 xHL +2 xDE +4 P.de +6 P.hl
     ld de,sp+4
     ld hl,(de)
     push hl
     ld de,sp+8
     ld hl,(de)
-    push hl
-    ld de,sp+12
-    ld hl,(de)
-    ld bc,hl                        ; last word → BC (no push/pop)
-    pop de
-    pop hl
-
-    call m32_fsadd24x32             ; sum; SP: Phl Pde Pbc ret n dptr x
+    pop de                          ; DEHL = product.mant; BC still meta
+    call m32_fsadd24x32             ; consumes x
     pop af
-    pop af
-    pop af                          ; drop parked product
+    pop af                          ; drop P.de P.hl
     jp fep0
 
 .fep1
@@ -223,22 +203,4 @@ PUBLIC _m32_polyf
     ld e,h
     ld h,l
     ld l,0
-    ret
-
-
-;-----------------------------------------------------------------------
-; load_ieee_push
-;   HL → IEEE float; push MSW then LSW (for fsmul24x32 / fsadd24x32).
-;   Return address is moved above the pushed float so ret is safe.
-;-----------------------------------------------------------------------
-.load_ieee_push
-    pop bc                          ; ret
-    ld de,(hl+)
-    push de                         ; LSW temp
-    ld e,(hl+)
-    ld d,(hl)                       ; MSW; no trailing post-inc (HL discarded)
-    pop hl                          ; LSW
-    push de                         ; MSW  → X.DE
-    push hl                         ; LSW  → X.HL
-    push bc                         ; ret
     ret

@@ -20,6 +20,7 @@ all: dirs $(OUTPUT_DIRECTORY)/math48.lib $(OUTPUT_DIRECTORY)/math48_ixiy.lib \
 	$(OUTPUT_DIRECTORY)/math48_z80n.lib \
 	$(OUTPUT_DIRECTORY)/math48_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/math48_r4k.lib \
+	$(OUTPUT_DIRECTORY)/math48_r6k.lib \
 	$(OUTPUT_DIRECTORY)/math48_z180.lib \
 	$(OUTPUT_DIRECTORY)/math48_ez80_z80.lib \
 	$(OUTPUT_DIRECTORY)/math48_kc160.lib
@@ -53,12 +54,16 @@ $(OUTPUT_DIRECTORY)/math48_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
 	@$(ASSEMBLER) -d -O=obj/r4k/ -I.. -mr4k -D__CLASSIC @math48impl.lst
 	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/math48_r4k @math48.lst
 
+$(OUTPUT_DIRECTORY)/math48_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
+	@$(ASSEMBLER) -d -O=obj/r6k/ -I.. -mr6k -D__CLASSIC @math48impl.lst
+	TYPE=r6k $(LIBLINKER) -mr6k -x$(OUTPUT_DIRECTORY)/math48_r6k @math48.lst
+
 $(OUTPUT_DIRECTORY)/math48_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	@$(ASSEMBLER) -d -O=obj/ixiy/ -I.. -mz80 -IXIY -D__CLASSIC @math48impl.lst
 	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_ixiy -IXIY @math48.lst
 
 dirs:
-	@mkdir -p obj/z80/cimpl obj/ixiy/cimpl obj/r2ka/cimpll obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl obj/kc160/cimpl obj/r4k/cimpl obj/r2ka/cimpl
+	@mkdir -p obj/z80/cimpl obj/ixiy/cimpl obj/r2ka/cimpll obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl obj/kc160/cimpl obj/r4k/cimpl obj/r2ka/cimpl obj/r6k/cimpl
 
 .PHONY: dirs
 

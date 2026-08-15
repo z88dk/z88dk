@@ -203,10 +203,23 @@ static int fp_tos_slot(const Func *f, int vreg_id)
    byte E/D-home already claimed DE's low half), so state is shared, not
    duplicated. Width-specific leaf ops dispatch on cur_home_is_word. */
 
-/* Rematerialize a width-2 constant vreg (LD_IMM / LD_SYM) into register pair
-   `rp` ("hl"/"de"/"bc"), re-emitting the constant instead of a slot reload.
+/* True when rematerialising vreg_id into a pair OTHER than HL would use HL as
+   scratch. `ld rr,K` (IR_LD_IMM) and `ld rr,_sym` (IR_LD_SYM) leave HL alone,
+   but the [remat-LEA] frame-address form recomputes `ld hl,off; add hl,sp` and
+   copies out, so it destroys HL. A caller holding a live operand in HL must ask
+   before rematerialising into DE or BC. */
+static int remat_word_clobbers_hl(const Func *f, int vreg_id)
+{
+    if (!g_hc.remat_def || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
+    const Op *o = g_hc.remat_def[vreg_id];
+    return o && o->kind == IR_LEA;
+}
+
+/* Rematerialize a width-2 constant vreg (LD_IMM / LD_SYM / LEA) into register
+   pair `rp` ("hl"/"de"/"bc"), re-emitting the constant instead of a slot reload.
    Returns 1 if emitted, 0 if vreg isn't rematerializable. Caller updates the
-   cache belief for `rp`. */
+   cache belief for `rp`. The LEA form clobbers HL when `rp` is not "hl" —
+   see remat_word_clobbers_hl. */
 static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp)
 {
     if (!g_hc.remat_def || vreg_id < 0 || vreg_id >= f->n_vregs) return 0;
@@ -224,7 +237,8 @@ static int emit_remat_word(FILE *out, const Func *f, int vreg_id, const char *rp
        byte-for-tick loss — ez80-fp is excluded from remat marking; see ir_lower.c.) */
     if (o->kind == IR_LEA && o->src[0] >= 0 && o->src[0] < f->n_vregs) {
         int src = o->src[0];
-        emit(out, "ld\thl,%d", slot_off(f, src) + L.cur_sp_adjust);
+        emit(out, "ld\thl,%d",
+             slot_off(f, src) + L.cur_sp_adjust + (int)o->imm);
         emit(out, "add\thl,sp");
         if (!strcmp(rp, "hl"))
             return 1;                                /* HL = addr; caller cache_hl */
@@ -1104,6 +1118,19 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
             return;
         }
     }
+    /* A REMAT word (LD_IMM / LD_SYM / LEA) has NO SLOT by construction — its
+       readers re-materialise it. The byte reads below would address its absent
+       slot: slot_off returns -1, so sp-mode emitted `ld hl,-1; add hl,sp;
+       ld a,(hl)` and read BELOW the stack. Re-materialise into HL and take the
+       low byte. Only surfaces where the value is read a BYTE at a time — the
+       word paths (load_to_hl/de/bc) already call emit_remat_word. */
+    if (vreg_id >= 0 && f->vregs[vreg_id].width == 2
+        && vreg_is_remat(f, vreg_id)) {
+        if (emit_remat_word(out, f, vreg_id, "hl")) {
+            emit(out, "ld\ta,l");
+            return;
+        }
+    }
     /* Past the register-cache hits: a slot read follows (fp or sp). */
     ss_note_reload(f, vreg_id);
     if (fp_active(f)) {
@@ -1665,7 +1692,18 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
         int ix_off = slot_ix_off(f, vreg_id);
         if (fp_offset_fits(ix_off) && fp_offset_fits(ix_off + 3)) {
             emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off);
-            emit(out, "ld\t(%s%+d),de", frame_reg(), ix_off + 2);
+            /* Rabbit has a native `ld (ix+d),hl` (2 bytes) but NOT the DE form,
+               which z80asm synthesises as two `ld (ix+d),r` = 6 bytes. Swapping
+               the halves around the store costs 4 (ex + native + ex) and is
+               faster too. ez80/kc160 have both natively at 3 bytes, so they take
+               the direct form; plain z80 synthesises either way. */
+            if (IS_RABBIT()) {
+                emit(out, "ex\tde,hl");
+                emit(out, "ld\t(%s%+d),hl", frame_reg(), ix_off + 2);
+                emit(out, "ex\tde,hl");
+            } else {
+                emit(out, "ld\t(%s%+d),de", frame_reg(), ix_off + 2);
+            }
             /* DEHL cache contract: BC = low half so a later load_to_dehl_adj
                cache hit recovers HL via `ld hl,bc`. Dead when the next op
                clobbers BC first — store_dehl_cached then drops the claim. */

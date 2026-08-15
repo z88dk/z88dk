@@ -194,6 +194,7 @@ PUBLIC _m32_invf
 
     ld de,sp+12
     call load_expanded
+    ; Y in regs, X on stack — add32 no longer parks Y
     call m32_fsmul32x32
     call m32_fsadd32x32
     call m32_fsmul32x32

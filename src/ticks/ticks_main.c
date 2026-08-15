@@ -153,7 +153,7 @@ static void usage(void)
     printf("  -pc X          X in hexadecimal is the initial PC value\n");
     printf("  -start X       X in hexadecimal is the PC condition to start the counter\n");
     printf("  -end X         X in hexadecimal is the PC condition to exit\n");
-    printf("  -counter X     X in decimal is another condition to exit\n");
+    printf("  -counter X     X in decimal is another condition to exit (default 100000000)\n");
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n");
     printf("  -d             Enable debugger\n");
     printf("  -v             Verbose logging\n");

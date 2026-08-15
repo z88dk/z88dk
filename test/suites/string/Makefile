@@ -10,7 +10,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 ifeq ($(COMPILER),xcc)
 all:	test.bin 
 else
-all:	test.bin test_r2ka.bin test_8080.bin test_8085.bin test_gbz80.bin test_rc2014_CODE.bin test_r4k.bin test_kc160.bin
+all:	test.bin test_r2ka.bin test_8080.bin test_8085.bin test_gbz80.bin test_rc2014_CODE.bin test_r4k.bin test_r6k.bin test_kc160.bin
 endif
 
 
@@ -42,6 +42,10 @@ test_kc160.bin: $(SOURCES)
 test_r4k.bin: $(SOURCES)
 	$(compile_r4k)
 	$(runtest_r4k)
+
+test_r6k.bin: $(SOURCES)
+	$(compile_r6k)
+	$(runtest_r6k)
 
 test_rc2014_CODE.bin: $(SOURCES)
 	$(compile_rc2014)

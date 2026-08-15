@@ -3,7 +3,7 @@ include ../make.config
 
 
 
-all:	test_scanf.bin test_sprintf.bin  test_scanf_r2ka.bin test_sprintf_r2ka.bin test_sprintf_8080.bin test_sprintf_gbz80.bin test_scanf_8080.bin test_sprintf_ez80_z80.bin test_scanf_ez80_z80.bin test_scanf_r4k.bin test_sprintf_r4k.bin
+all:	test_scanf.bin test_sprintf.bin  test_scanf_r2ka.bin test_sprintf_r2ka.bin test_sprintf_8080.bin test_sprintf_gbz80.bin test_scanf_8080.bin test_sprintf_ez80_z80.bin test_scanf_ez80_z80.bin test_scanf_r4k.bin test_scanf_r6k.bin test_sprintf_r4k.bin test_sprintf_r6k.bin
 
 
 test_scanf.bin: scanf.c $(SOURCES)
@@ -17,6 +17,10 @@ test_scanf_r2ka.bin: scanf.c $(SOURCES)
 test_scanf_r4k.bin: scanf.c $(SOURCES)
 	$(compile_r4k)
 	$(runtest_r4k)
+
+test_scanf_r6k.bin: scanf.c $(SOURCES)
+	$(compile_r6k)
+	$(runtest_r6k)
 
 test_scanf_8080.bin: scanf.c $(SOURCES)
 	$(compile_8080)
@@ -49,6 +53,10 @@ test_sprintf_r2ka.bin: sprintf.c $(SOURCES)
 test_sprintf_r4k.bin: sprintf.c $(SOURCES)
 	$(call compile_r4k)
 	$(runtest_r4k)
+
+test_sprintf_r6k.bin: sprintf.c $(SOURCES)
+	$(call compile_r6k)
+	$(runtest_r6k)
 
 
 test_sprintf_sdcc.bin: sprintf.c $(SOURCES)

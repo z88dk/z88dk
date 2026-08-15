@@ -84,15 +84,15 @@ second number error: 1 * 10^(-4)
 cycle count  = 2376486525
 time @ 4MHz  = 2376486525 / 4*10^6 = 9 min 53 sec
 
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / new / math32
-4827 bytes less page zero
+5017 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 790641371
-time @ 4MHz  = 790641371 / 4*10^6 =  3 min 18 sec
+cycle count  = 804375285
+time @ 4MHz  = 804375285 / 4*10^6 =  3 min 21 sec
 
 Z88DK August 10, 2026
 sccz80 / new / math16

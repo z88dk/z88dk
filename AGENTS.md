@@ -52,84 +52,86 @@ Assume a built tree (`bin/` tools present) unless the task is to build the toolc
 
 Load only what the task needs. Paths are under `.agents/skills/`.
 
+Each skill lives at `.agents/skills/<name>/SKILL.md`. The directory name is the `name:` field. Hosts that scan only one level under `skills/` need this flat layout. Do **not** add category folders.
+
 ### CPU
 
-| Skill | Path | When |
-|-------|------|------|
-| `cpu-8085` | `cpu/8085/` | 8085 asm, opcodes, stack rules, extended ops |
-| `cpu-z80` | `cpu/z80/` | Z80 IX/IY/exx library asm |
-| `cpu-z80n` | `cpu/z80n/` | Next Z80N ops, nextreg, copper; `+zxn` / math32_z80n |
-| `cpu-z180` | `cpu/z180/` | Z180 / mlt / related products |
-| `cpu-8080` | `cpu/8080/` | 8080 (no 8085 extended) |
-| `cpu-gbz80` | `cpu/gbz80/` | Game Boy CPU path |
+| Skill | When |
+|-------|------|
+| `cpu-8085` | 8085 asm, opcodes, stack rules, extended ops |
+| `cpu-z80` | Z80 IX/IY/exx library asm |
+| `cpu-z80n` | Next Z80N ops, nextreg, copper; `+zxn` / math32_z80n |
+| `cpu-z180` | Z180 / mlt / related products |
+| `cpu-8080` | 8080 (no 8085 extended) |
+| `cpu-gbz80` | Game Boy CPU path |
 
 ### Library
 
-| Skill | Path | When |
-|-------|------|------|
-| `library-classic` | `library/classic/` | Classic clib, multi-CPU, hybrid consoles |
-| `library-newlib` | `library/newlib/` | CRT m4, FILE*, open, dual-stack |
-| `library-math32` | `library/math32/` | IEEE float cores, multi-CPU rebuild |
-| `library-math16` | `library/math16/` | Half float |
-| `library-am9511` | `library/am9511/` | Am9511A APU float, status/specials, techdocs |
+| Skill | When |
+|-------|------|
+| `library-classic` | Classic clib, multi-CPU, hybrid consoles |
+| `library-newlib` | CRT m4, FILE*, open, dual-stack |
+| `library-math32` | IEEE float cores, multi-CPU rebuild |
+| `library-math16` | Half float |
+| `library-am9511` | Am9511A APU float, status/specials, techdocs |
 
 ### Compiler
 
-| Skill | Path | When |
-|-------|------|------|
-| `compiler-sccz80` | `compiler/sccz80/` | sccz80 + runtime + copt interaction |
-| `compiler-zsdcc` | `compiler/zsdcc/` | SDCC / sdcc_ix / sdcc_iy |
-| `compiler-80cc` | `compiler/80cc/` | 80cc |
+| Skill | When |
+|-------|------|
+| `compiler-sccz80` | sccz80 + runtime + copt interaction |
+| `compiler-zsdcc` | SDCC / sdcc_ix / sdcc_iy |
+| `compiler-80cc` | 80cc |
 
 ### Tools
 
-| Skill | Path | Binary / topic |
-|-------|------|----------------|
-| `tool-zcc` | `tool/zcc/` | `zcc` |
-| `tool-ticks` | `tool/ticks/` | `z88dk-ticks` |
-| `tool-z80asm` | `tool/z80asm/` | `z88dk-z80asm` |
-| `tool-copt` | `tool/copt/` | `z88dk-copt` / hand-asm hygiene |
-| `tool-z80nm` | `tool/z80nm/` | `z88dk-z80nm` |
-| `tool-dis` | `tool/dis/` | `z88dk-dis` |
-| `tool-appmake` | `tool/appmake/` | `z88dk-appmake` |
-| `tool-zobjcopy` | `tool/zobjcopy/` | `z88dk-zobjcopy` |
-| `tool-z88dk-lib` | `tool/z88dk-lib/` | `z88dk-lib` |
-| `tool-gdb` | `tool/gdb/` | `z88dk-gdb` |
-| `tool-zx0` / `tool-zx7` | `tool/zx0/`, `tool/zx7/` | compressors |
-| `tool-ucpp` / `tool-zpragma` | … | usually via zcc only |
-| `tool-asmpp` / `tool-asmstyle` / `tool-basck` | … | niche helpers |
+| Skill | Binary / topic |
+|-------|----------------|
+| `tool-zcc` | `zcc` |
+| `tool-ticks` | `z88dk-ticks` |
+| `tool-z80asm` | `z88dk-z80asm` |
+| `tool-copt` | `z88dk-copt` / hand-asm hygiene |
+| `tool-z80nm` | `z88dk-z80nm` |
+| `tool-dis` | `z88dk-dis` |
+| `tool-appmake` | `z88dk-appmake` |
+| `tool-zobjcopy` | `z88dk-zobjcopy` |
+| `tool-z88dk-lib` | `z88dk-lib` |
+| `tool-gdb` | `z88dk-gdb` |
+| `tool-zx0` / `tool-zx7` | compressors |
+| `tool-ucpp` / `tool-zpragma` | usually via zcc only |
+| `tool-asmpp` / `tool-asmstyle` / `tool-basck` | niche helpers |
 
 ### Targets (load only the named `+target`)
 
 **Do not** bulk-load target skills or walk all platforms. Open **one** skill when the task names that machine.
 
-| Skill | Path | `zcc` |
-|-------|------|-------|
-| `target-cpm` | `target/cpm/` | `+cpm` |
-| `target-rc2014` | `target/rc2014/` | `+rc2014` |
-| `target-zx` | `target/zx/` | `+zx` (48/128, not Next) |
-| `target-zxn` | `target/zxn/` | `+zxn` (Next; see also `cpu-z80n`) |
-| `target-sms` | `target/sms/` | `+sms` / Game Gear |
+| Skill | `zcc` |
+|-------|-------|
+| `target-cpm` | `+cpm` |
+| `target-rc2014` | `+rc2014` |
+| `target-zx` | `+zx` (48/128, not Next) |
+| `target-zxn` | `+zxn` (Next; see also `cpu-z80n`) |
+| `target-sms` | `+sms` / Game Gear |
 
-**Any other target:** `lib/config/<name>.cfg` (+ optional `libsrc/target/<name>/` and one `wiki/platforms/` page). No skill pack for the remaining 100+.
+**Any other target:** `lib/config/<name>.cfg` (+ optional `libsrc/target/<name>/` or `libsrc/newlib/target/<name>/`, and one `wiki/platforms/` page). No skill pack for the remaining 100+. Do not read other platforms for context.
+
+**Add a target skill later** only when agents hit the same platform repeatedly. One directory `.agents/skills/target-<name>/` with a narrow `description` that mentions `+name`. Keep it short (cfg card + classic/newlib + pitfalls).
 
 Host TIMER / suites: `+test` + `methodology-measure` / `tool-ticks`.
 
-Policy: `.agents/skills/target/README.md`.
-
 ### Style and methodology
 
-| Skill | Path | When |
-|-------|------|------|
-| `style-libsrc-layout` | `style/libsrc-layout/` | New or split library files |
-| `style-ste-writing` | `style/ste-writing/` | Human prose only (not code) |
-| `methodology-measure` | `methodology/measure/` | A/B, hotspots, benches, suites, wiki numbers |
+| Skill | When |
+|-------|------|
+| `style-libsrc-layout` | New or split library files |
+| `style-ste-writing` | Human prose only (not code) |
+| `methodology-measure` | A/B, hotspots, benches, suites, wiki numbers |
 
 ## Human docs vs agent skills
 
 | Audience | Location |
 |----------|----------|
-| Agents | `.agents/skills/**/SKILL.md`, this file |
+| Agents | `.agents/skills/<name>/SKILL.md`, this file |
 | Humans (wiki drafts) | `wiki/` |
 | Product library notes | e.g. `libsrc/math/float/math32/readme.md` |
 

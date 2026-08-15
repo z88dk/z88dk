@@ -48,8 +48,15 @@ zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone
 classic/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
 zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin -lmath48 -lndos -m
 
-Note: 80cc + --math32 builds but does not reach TIMER_STOP in a usable
-time (skipped; do not publish). Use --math-mbf32 for 80cc whetstone.
+classic/80cc/math32
+zcc +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math32 -lndos -m
+
+classic/80cc/8085/math32
+zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math32 -lndos -m
+
+Note: 80cc + --math32 reaches TIMER_STOP. Do not skip. Use IEEE-bit
+dumps if you need printed KWIPS intermediates; classic printf %f is
+not required for TIMER.
 
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
@@ -137,3 +144,47 @@ MWIPS        = 7.1240 / 1000 = 0.0071240
 
 8085+MBF32 -> 78.2 Seconds. (historical host measurement)
 8085+AM9511 ->30.4 Seconds. (historical host measurement)
+
+
+Z88DK August 15, 2026
+classic/sccz80/math32
+IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+9978 bytes less page zero
+
+cycle count  = 361935794
+time @ 4MHz  = 361935794 / 4x10^6 = 90.4839 seconds
+KWIPS        = 100*10*1 / 90.4839 = 11.0517
+MWIPS        = 11.0517 / 1000 = 0.0110517
+
+
+Z88DK August 15, 2026
+classic/sccz80/8085/math32
+IEEE 32-bit float (math32_8085)
+11581 bytes less page zero
+
+cycle count  = 663627145
+time @ 4MHz  = 663627145 / 4x10^6 = 165.9068 seconds
+KWIPS        = 100*10*1 / 165.9068 = 6.0275
+MWIPS        = 6.0275 / 1000 = 0.0060275
+
+
+Z88DK August 15, 2026
+classic/80cc/math32
+IEEE 32-bit float 24 bit mantissa + 8 bit exponent
+12530 bytes less page zero
+
+cycle count  = 368538024
+time @ 4MHz  = 368538024 / 4x10^6 = 92.1345 seconds
+KWIPS        = 100*10*1 / 92.1345 = 10.8537
+MWIPS        = 10.8537 / 1000 = 0.0108537
+
+
+Z88DK August 15, 2026
+classic/80cc/8085/math32
+IEEE 32-bit float (math32_8085)
+13988 bytes less page zero
+
+cycle count  = 667692507
+time @ 4MHz  = 667692507 / 4x10^6 = 166.9231 seconds
+KWIPS        = 100*10*1 / 166.9231 = 5.9908
+MWIPS        = 5.9908 / 1000 = 0.0059908

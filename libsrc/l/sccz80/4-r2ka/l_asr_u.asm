@@ -7,6 +7,7 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_asr_u
+PUBLIC l_asr_u_hl_by_e
 
 ; Entry: hl = bit shift counter
 ;        de = value to shift
@@ -14,6 +15,7 @@ PUBLIC l_asr_u
 ;
 .l_asr_u
     ex  de,hl
+.l_asr_u_hl_by_e
 .l_asr_u_1
     dec e
     ret m

@@ -15,6 +15,7 @@ all: dirs $(OUTPUT_DIRECTORY)/daimath32.lib $(OUTPUT_DIRECTORY)/daimath32_8080.l
 	$(OUTPUT_DIRECTORY)/daimath32_z180.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_r4k.lib \
+	$(OUTPUT_DIRECTORY)/daimath32_r6k.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_kc160.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_ez80_z80.lib 
 
@@ -34,6 +35,9 @@ $(OUTPUT_DIRECTORY)/daimath32_r2ka.lib: $(addprefix obj/r2ka/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/daimath32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
 	TYPE=r4k $(LIBLINKER) -mr4k -x$(OUTPUT_DIRECTORY)/daimath32_r4k @daimath32.lst
 
+$(OUTPUT_DIRECTORY)/daimath32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
+	TYPE=r6k $(LIBLINKER) -mr6k -x$(OUTPUT_DIRECTORY)/daimath32_r6k @daimath32.lst
+
 $(OUTPUT_DIRECTORY)/daimath32_ez80_z80.lib: $(addprefix obj/ez80_z80/, $(OBJECTS))
 	TYPE=ez80_z80 $(LIBLINKER) -mez80_z80 -x$(OUTPUT_DIRECTORY)/daimath32_ez80_z80 @daimath32.lst
 
@@ -47,7 +51,7 @@ $(OUTPUT_DIRECTORY)/daimath32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/8080/c/sccz80 obj/8080/c/asm obj/z80/z80 obj/8080/z80 
 	@mkdir -p obj/z80n/c/sccz80 obj/z80n/c/asm obj/z180/c/sccz80 obj/z180/c/asm  obj/r2ka/c/sccz80 obj/r2ka/c/asm 
-	@mkdir -p obj/ez80_z80/c/sccz80 obj/ez80_z80/c/asm 
+	@mkdir -p obj/ez80_z80/c/sccz80 obj/ez80_z80/c/asm  obj/r6k/c/sccz80 obj/r6k/c/asm
 	@mkdir -p obj/r4k/c/sccz80 obj/r4k/c/asm obj/kc160/c/sccz80 obj/kc160/c/asm
 
 clean:

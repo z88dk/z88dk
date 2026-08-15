@@ -67,7 +67,7 @@ CMake can drive Z88DK projects (a toolchain file is provided). See the [CMake](h
 
 ## AI agents and skills
 
-The tree supports AI coding agents. Project rules live in root [`AGENTS.md`](AGENTS.md). Skills live under [`.agents/skills/`](.agents/skills/) (CPU, library, compiler, tools, style, measure). Symlinks [`.grok`](.grok) and [`.claude`](.claude) point at [`.agents`](.agents) so common hosts find the same skill root.
+The tree supports AI coding agents. Project rules live in root [`AGENTS.md`](AGENTS.md). Skills live one level under [`.agents/skills/`](.agents/skills/) (`cpu-8085`, `tool-ticks`, …) so hosts that do not recurse still find them. Symlinks [`.grok`](.grok) and [`.claude`](.claude) point at [`.agents`](.agents) so common hosts share the same skill root.
 
 Load a skill only when the task matches its topic. Do not bulk-read every skill. Prefer paths under `.agents/skills/` in links and prose.
 

@@ -45,6 +45,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsnormalize32
+EXTERN l_neg_dehl
 
 PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
@@ -112,7 +113,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld a,b
     exx
     cp a,b                      ; nc if a>=b
-    jp Z,alignzero              ; no alignment needed, mantissas equal
+    jp Z,alignzero              ; no alignment needed, exponents equal
     jr NC,sort                  ; if a larger than b
     ld a,b
     exx
@@ -195,24 +196,28 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ex af,af                    ; carry clear
     jp P,doadd
 ; here for subtract, smaller shifted right at least 2, so no more than
-; one step of normalize
-    push hl
+; one step of normalize.  Primary = smaller, alt = larger.
+    exx                         ; larger
+    ld a,e
     exx
-    ex de,hl
-    ex (sp),hl
-    ex de,hl
+    sbc a,e
     exx
-    pop hl                      ; subtract the mantissas
-    sbc hl,de
+    ld e,a
+    ld a,d
     exx
-    sbc hl,de
-    push de
+    sbc a,d
     exx
-    ex (sp),hl
+    ld d,a
+    ld a,l
     exx
-    pop de
-; difference larger-smaller in hlde
-; exponent of result in c sign of result in b
+    sbc a,l
+    exx
+    ld l,a
+    ld a,h
+    exx
+    sbc a,h
+    exx
+    ld h,a                      ; larger − smaller in HLDE
     bit 7,h                     ; check for norm
     jr NZ,doadd1                ; no normalize step, pack it up
     sla e
@@ -221,27 +226,30 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     dec b
     jr doadd1                   ; pack
 
-; here for do add c has exponent of result (larger) b or b' has sign
+; here for do add: alt = larger (exp/sign).  Result stays there.
 .doadd
-    xor a
-    push hl
+    exx                         ; larger
+    ld a,e
     exx
-    ex de,hl
-    ex (sp),hl
-    ex de,hl
+    add a,e
     exx
-    pop hl                      ; add the mantissas
-    add hl,de
+    ld e,a
+    ld a,d
     exx
-    adc hl,de
-    adc a,a                     ; see if overflow from h
-    push de
+    adc a,d
     exx
-    ex (sp),hl
+    ld d,a
+    ld a,l
     exx
-    pop de                      ; get least of sum
-    jr Z,doadd1                 ; if no overflow
-    rra                         ; recover carry
+    adc a,l
+    exx
+    ld l,a
+    ld a,h
+    exx
+    adc a,h                     ; CF = bit-32 overflow
+    exx
+    ld h,a
+    jr NC,doadd1
     rr hl
     rr de
     jr NC,doadd0
@@ -282,42 +290,39 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 ; larger number in hl'de'
 ; C is clear
 .dosub
-    push hl
+    exx                         ; treat alt as minuend
+    ld a,e
     exx
+    sbc a,e
+    exx
+    ld e,a
+    ld a,d
+    exx
+    sbc a,d
+    exx
+    ld d,a
+    ld a,l
+    exx
+    sbc a,l
+    exx
+    ld l,a
+    ld a,h
+    exx
+    sbc a,h
+    exx
+    ld h,a
+    jr NC,noneg
+    ; borrowed: two's complement + flip sign.  Normalize wants DEHL.
     ex de,hl
-    ex (sp),hl
-    ex de,hl
-    exx
-    pop hl                      ; subtract the mantissas
-    sbc hl,de
-    exx
-    sbc hl,de
-    jr NC,noneg                 ; *** what if zero
-; fix up and subtract in reverse direction
-    exx
-    ld a,c                      ; get reversed sign
-    add hl,de                   ; reverse sub
-    exx
-    adc hl,de                   ; reverse sub
-    exx
-    ex de,hl
-    or a
-    sbc hl,de
-    exx
-    ex de,hl
-    sbc hl,de
-    ld c,a                      ; get proper sign to result
+    call l_neg_dehl
+    ld a,c
+    xor 080h
+    ld c,a
+    jp m32_fsnormalize32
+
 .noneg
-    push de
-    exx
-    ex (sp),hl
-    exx
-    pop de                      ; get least part of result
-; sub zero alignment from fadd
 ; difference larger-smaller in hlde
 ; exponent of result in b sign of result in c
-; now do normalize
     ex de,hl
-
     jp m32_fsnormalize32        ; now begin to normalize with bc dehl
 

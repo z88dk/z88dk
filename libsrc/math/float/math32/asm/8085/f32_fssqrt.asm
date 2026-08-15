@@ -219,6 +219,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push hl                         ; w for mul32
     call m32_fsmul32x32             ; w*w
     call m32_fsmul24x32             ; w*w*−y
+    ; Y in regs, IEEE 3.0 on stack
     call m32_fsadd24x32             ; 3 − w*w*y
     dec b                           ; /2
     call m32_fsmul32x32             ; w_keep * …
