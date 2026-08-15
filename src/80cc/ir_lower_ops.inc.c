@@ -1914,6 +1914,29 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             }
             return 0;
         }
+        /* Variable-count byte <<. The imm path below uses op->imm as
+           the count (0 here) and would emit <<0. Count in B, value in
+           A, `add a,a` loop — same portable body as const, no djnz. */
+        if (op->src[1] >= 0) {
+            int n = L.cmp_label_counter++;
+            int bc_live = (L.rs.bc >= 0);
+            if (!hl_has(op->src[1]))
+                load_to_hl(out, f, op->src[1]);
+            if (bc_live) emit(out, "push\tbc");
+            emit(out, "ld\tb,l");
+            load_byte_to_a(out, f, op->src[0]);
+            emit(out, "inc\tb");
+            emit(out, "dec\tb");
+            emit(out, "jr\tz,L_f%d_bshl_end_%d", L.func_emit_idx, n);
+            fprintf(out, "L_f%d_bshl_loop_%d:\n", L.func_emit_idx, n);
+            emit(out, "add\ta,a");
+            emit(out, "dec\tb");
+            emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
+            fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
+            if (bc_live) emit(out, "pop\tbc");
+            else         invalidate_bc_cache();
+            return finalize_byte_result(out, f, op, 0);
+        }
         /* Byte << const, in A (ir_opt_narrow_byte only narrows the
            imm-count form). `add a,a` per bit — CPU-portable (no CB
            shift needed on 8080/8085/gbz80). */
