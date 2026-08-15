@@ -19,6 +19,7 @@ description: >
 |------|--------|
 | CPU flag **before** binary | `z88dk-ticks -m8085 prog.bin` |
 | TIMER | `-x map -start TIMER_START -end TIMER_STOP -counter …` |
+| Default `-counter` | **100000000**. Whole-program `+test` PRINTF of n-body n≥~125 dies mid-loop; the `10000000x` line is the cap, not `%f`. Raise `-counter`. |
 | Hotspots | debugger `hotspot on` → file `hotspots` in cwd |
 | Models | `-m8080 -m8085 -mz80 -mz80n -mz180 -mgbz80 …` |
 

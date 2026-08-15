@@ -151,11 +151,18 @@ z88dk-ticks -m8085 prog.bin
 Use for correctness (`printf` / test harness). Prefer TIMER bounds for
 performance so CRT and I/O do not dominate.
 
+**Default `-counter` is 100000000.** A whole-program `+test` run with no
+`-counter` stops there and used to print a bare `100000000` (now
+`Ticks: … (counter limit)`). That is **not** program output. n-body
+`-DPRINTF` with n≥~125 is ~160M+ T-states, so the second `%.9f` never
+runs unless you pass `-counter 999999999999`. Isolated `%f` and n=100
+are under the cap and look fine.
+
 ### Common pitfalls
 
 1. **Missing `-m8085` / `-mz80n` / `-mz180`** on a non-Z80 binary, or flag **after** the binary path.
 2. **Start/end swapped** or wrong label (`TIMER_END` vs `TIMER_STOP` typos in docs).
-3. **Counter too small** → truncated measurement near the counter value.
+3. **Counter too small / default 1e8** → run stops mid-loop; stdout `10000000x` looks like a dead `%f`.
 4. **Comparing different `zcc` lines** (e.g. with/without `--opt-code-speed`) and
    blaming a library edit.
 5. **Historical published ticks** vs today’s compiler/lib — always remeasure both
@@ -397,9 +404,10 @@ and classic / newlib:
 
    Updates **parent SUMMARY** tick lines and matching **RESULT** blocks in
    parent + `z88dk-classic/` / `z88dk-new/` — **size + ticks + date only**
-   (no new prose unless a new exception). Exceptions already in tree:
-   - 80cc n-body math32 — invalid second energy (omit publish)
-   - 80cc whetstone math32 — never reaches TIMER_STOP (SKIP)
+   (no new prose unless a new exception). Do **not** skip 80cc math32
+   n-body or whetstone: TIMER completes; n-body second energy is valid as
+   IEEE bits if you do not want to wait on printf. +test `%f` works
+   when `z88dk-ticks` gets `-counter` above the run (default cap is 1e8).
 6. Wiki drop-ins: regenerate full paste files for `Benchmarks.md` and
    `Classic--Maths-Libraries.md` (local drafts may be `wiki-Benchmarks.md` /
    `wiki-Classic--Maths-Libraries.md`; not product commits).
@@ -419,18 +427,28 @@ Long-running benches (e.g. spectral-norm, pi) need large counters and patience;
 Spectral-norm math32 is ~8–20e9 cycles (~5–15 min wall per job on a typical
 host); plan the 4-thread matrix for well over an hour.
 
-### Float energy / accuracy when `printf %f` is broken
+### Float energy / accuracy on `+test`
 
-Classic 8085 `+test` can fail to link full float printf (`__printf_handle_far_s`
-and similar). For n-body-style energies, dump IEEE bits with `putchar` hex
-(union `float` ↔ `unsigned long`), then convert on the host:
+Classic `printf %f` on `+test` **works** (math32 `ftoa` included). Two
+separate traps have been mistaken for a dead `%f`:
+
+1. **`z88dk-ticks` default `-counter` is 1e8.** n-body n=100 is ~81M
+   (both energies print). n≥~125 is over the cap: first `%.9f` prints,
+   then ticks stops and prints `10000000x`. That number is the T-state
+   cap, not `ftoa`. Fix: `-counter 999999999999`. Official PRINTF
+   verify remains `+zx` / `+cpm` (no 1e8 cap).
+2. Classic 8085 `+test` can fail to **link** full float printf
+   (`__printf_handle_far_s` and similar) if `CLIB_OPT_PRINTF` is too
+   narrow. The benches set `0xffffffff` for that reason.
+
+TIMER builds have no print path — do not invent decimal energy from
+them. IEEE bits via `putchar` hex (union `float` ↔ `unsigned long`)
+are still the fast oracle:
 
 ```python
 import struct
 struct.unpack('>f', bytes.fromhex('be2d220a'))[0]  # → −0.16907516…
 ```
-
-Do not invent decimal energy from TIMER-only builds (no print path).
 
 ### Wiki pages (Benchmarks, Classic Maths Libraries)
 
@@ -480,6 +498,7 @@ tree; they are **not** part of the product PR.
 | “Library symbol order picks a slower routine” | Same `math32.lib` for both products; module set differs only by `*_fastcall` vs plain wrappers. Prove with map + static call sites, not archive order alone |
 | Newlib n-body much faster than classic math32 | Check for **source** cheat (`invsqrt` under `__MATH_MATH32` only on newlib). Align to `1.0/sqrt` then remeasure; after #3061 header fix sccz80 new ≈ classic (~791M ticks) |
 | sccz80 newlib “correct” TIMER but wrong KWIPS | Remeasure **after** header regen (`make -C include/_DEVELOPMENT common/math.h`). Stale numbers from pre-#3061 trees are invalid for product claims |
+| `+test` n-body second `%.9f` prints `10000000x` | Not `ftoa`. Default ticks `-counter` is 1e8; n=200 is ~161M. First energy prints, then the cap. Same on sccz80 and 80cc. Fix: `-counter 999999999999` |
 
 ### Float library A/B (math32 / math16)
 
