@@ -788,7 +788,7 @@ replace restart {
 
 replace restart {
 	pop	af
-	jp	PO,%1
+	jp	po,%1
 	ei
 %1:
 } by {
@@ -833,44 +833,44 @@ replace restart {
 replace restart {
 	ld	a,(hl)
 	and	a,#%5
-	jp	NZ,%1
+	jp	nz,%1
 	jp	%2
 %1:
 	jp	%3
 %2:
 	or	a, a
-	jp	NZ,%3
+	jp	nz,%3
 } by {
 	ld	a,(hl)
 	and	a,#%5
-	jp	NZ,%1
+	jp	nz,%1
 	jp	%2
 %1:
 	jp	%3
 %2:
 	ld	a,(hl)
 	and	a,#0x01
-	jp	NZ,%3
+	jp	nz,%3
 	; peephole z88dk-bugfix-6a
 }
 
 replace restart {
 	ld	a,(hl)
 	and	a,#%5
-	jp	NZ,%1
+	jp	nz,%1
 	jp	%2
 %1:
 	or	a, a
-	jp	NZ,%2
+	jp	nz,%2
 } by {
 	ld	a,(hl)
 	and	a,#%5
-	jp	NZ,%1
+	jp	nz,%1
 	jp	%2
 %1:
 	ld	a,(hl)
 	and	a,#0x01
-	jp	NZ,%2
+	jp	nz,%2
 	; peephole z88dk-bugfix-6b
 }
 
@@ -2011,41 +2011,41 @@ replace restart {
 } if notUsed('bc'), operandsNotRelated(%2 'l')
 
 replace restart {
-	jp	NC,%1
+	jp	nc,%1
 	jp	%2
 %1:
 } by {
-	jp	C,%2
+	jp	c,%2
 	; peephole 60 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
 replace restart {
-	jp	C,%1
+	jp	c,%1
 	jp	%2
 %1:
 } by {
-	jp	NC,%2
+	jp	nc,%2
 	; peephole 61 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
 replace restart {
-	jp	NZ,%1
+	jp	nz,%1
 	jp	%2
 %1:
 } by {
-	jp	Z,%2
+	jp	z,%2
 	; peephole 62 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
 replace restart {
-	jp	Z,%1
+	jp	z,%1
 	jp	%2
 %1:
 } by {
-	jp	NZ,%2
+	jp	nz,%2
 	; peephole 63 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
@@ -2079,14 +2079,14 @@ replace restart {
 	ld	a,#0x00
 %1:
 	bit	%2,a
-	jp	Z,%3
+	jp	z,%3
 } by {
 	ld	a,#0x00
 	jp	%3
 	; peephole 65a jumped directly to %3 instead of testing a first.
 %1:
 	bit	%2,a
-	jp	Z,%3
+	jp	z,%3
 } if labelRefCountChange(%3 +1)
 
 replace restart {
@@ -2112,7 +2112,7 @@ replace restart {
 replace restart {
 	ld	%1, #0x01
 	bit	0, %1
-	jp	Z, %2
+	jp	z, %2
 } by {
 	ld	%1, #0x01
 	; peephole 65d removed impossible jump to %2.
@@ -2121,21 +2121,21 @@ replace restart {
 replace restart {
 	rlca
 	and	a, #0x01
-	jp	Z, %1
+	jp	z, %1
 } by {
 	rlca
 	; peephole 65e removed and by changing jump condition.
-	jp	NC, %1
+	jp	nc, %1
 } if notUsed('a'), notUsedFrom(%1 'a')
 
 replace restart {
 	rlca
 	and	a, #0x01
-	jp	NZ, %1
+	jp	nz, %1
 } by {
 	rlca
 	; peephole 65f removed and by changing jump condition.
-	jp	C, %1
+	jp	c, %1
 } if notUsed('a'), notUsedFrom(%1 'a')
 
 replace restart {
@@ -2339,20 +2339,20 @@ replace restart {
 
 replace restart {
 	sub	a,#0xFF
-	jp	Z,%1
+	jp	z,%1
 } by {
 	inc	a
 	; peephole 84 replaced sub a,#0xFF by inc a.
-	jp	Z,%1
+	jp	z,%1
 }
 
 replace restart {
 	sub	a,#0xFF
-	jp	NZ,%1
+	jp	nz,%1
 } by {
 	inc	a
 	; peephole 85 replaced sub a,#0xFF by inc a.
-	jp	NZ,%1
+	jp	nz,%1
 }
 
 replace restart {
@@ -2533,67 +2533,67 @@ replace restart {
 
 replace restart {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	%3,#0x00
 } by {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	%3,a
 	; peephole 98 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	and	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	%3,#0x00
 } by {
 	and	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	%3,a
 	; peephole 99 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	sub	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	%3,#0x00
 } by {
 	sub	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	%3,a
 	; peephole 100 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	inc	a
-	jp	NZ,%1
+	jp	nz,%1
 	ld	%2,#0x00
 } by {
 	inc	a
-	jp	NZ,%1
+	jp	nz,%1
 	ld	%2,a
 	; peephole 101 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	dec	a
-	jp	NZ,%1
+	jp	nz,%1
 	ld	%2,#0x00
 } by {
 	dec	a
-	jp	NZ,%1
+	jp	nz,%1
 	ld	%2,a
 	; peephole 102 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	a,%3
 	or	a,a
 } by {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	or	a,%3
 	; peephole 103 shortened or using a (which has just been tested to be #0x00).
 } if canAssign('b' %3)
@@ -2601,12 +2601,12 @@ replace restart {
 
 replace restart {
 	sub	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	ld	a,%3
 	or	a,a
 } by {
 	sub	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	or	a,%3
 	; peephole 104 shortened or using a (which has just been tested to be #0x00).
 } if canAssign('b' %3)
@@ -2614,12 +2614,12 @@ replace restart {
 
 replace restart {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	push	%3
 	ld	%4,#0x00
 } by {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	push	%3
 	ld	%4,a
 	; peephole 105 replaced constant #0x00 by a (which has just been tested to be #0x00).
@@ -3067,20 +3067,20 @@ replace restart {
 replace restart {
 	sbc	a,%1
 	bit	7,a
-	jp	Z,%2
+	jp	z,%2
 } by {
 	sbc	a,%1
-	jp	P,%2
+	jp	p,%2
 	; peephole 140 used sign flag instead of testing bit 7.
 }
 
 replace restart {
 	sbc	a,%1
 	bit	7,a
-	jp	NZ,%2
+	jp	nz,%2
 } by {
 	sbc	a,%1
-	jp	M,%2
+	jp	m,%2
 	; peephole 141 used sign flag instead of testing bit 7.
 }
 
@@ -3125,12 +3125,12 @@ replace restart {
 
 replace restart {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	xor	a,a
 	jp	%3
 } by {
 	or	a,%1
-	jp	NZ,%2
+	jp	nz,%2
 	; peephole 145 removed redundant zeroing of a (which has just been tested to be #0x00).
 	jp	%3
 }
@@ -3461,36 +3461,36 @@ replace {
 } if labelInRange(%5)
 
 replace {
-	jp	Z,%5
+	jp	z,%5
 } by {
-	jr	Z,%5
+	jr	z,%5
 	; peephole 154 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
-	jp	NZ,%5
+	jp	nz,%5
 } by {
-	jr	NZ,%5
+	jr	nz,%5
 	; peephole 155 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
-	jp	C,%5
+	jp	c,%5
 } by {
-	jr	C,%5
+	jr	c,%5
 	; peephole 156 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
-	jp	NC,%5
+	jp	nc,%5
 } by {
-	jr	NC,%5
+	jr	nc,%5
 	; peephole 157 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
 	dec b
-	jr	NZ,	%5	
+	jr	nz,	%5	
 } by {
 	djnz	%5
 	; peephole 156 used djnz
