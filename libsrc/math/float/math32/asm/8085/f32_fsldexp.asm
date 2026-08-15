@@ -183,8 +183,9 @@ PUBLIC _m32_ldexpf
     ld e,a
     ld a,d
     rla
-    ld d,a
-    or a
+    ld d,a                          ; D = exp, C = sign
+    inc d
+    dec d                           ; Z iff exp==0; keep C (sign)
     jp Z,zero_legal
 
     ld a,e

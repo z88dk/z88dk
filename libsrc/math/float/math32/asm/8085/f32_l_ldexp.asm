@@ -24,7 +24,8 @@ PUBLIC l_f32_ldexp
     ld a,d
     rla
     ld d,a                          ; D = exp, C = sign
-    or a
+    inc d
+    dec d                           ; Z iff exp==0; keep C (sign)
     jp Z,zero_legal
 
     ld a,e
