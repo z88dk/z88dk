@@ -72,6 +72,15 @@ error: 2 * 10^(-7)
 cycle count  = 9474952331
 time @ 4MHz  = 9474952331 / 4*10^6 =  39 min 29 sec
 
+Z88DK August 15, 2026
+sccz80 / new c library / math32
+5161 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 4247660135
+time @ 4MHz  = 4247660135 / 4*10^6 =  17 min 42 sec
+
 Z88DK April 20, 2020
 sccz80 / new c library
 3895 bytes less page zero

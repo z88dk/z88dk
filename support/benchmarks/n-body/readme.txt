@@ -58,12 +58,13 @@ Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
 sccz80   | z80  | math16  |   295_642_916 (Aug 10, 2026; DT=1e-1)
 sccz80   | 8085 | math16  |   344_383_717 (Aug 10, 2026; DT=1e-1)
-sccz80   | z80  | math32  |   791_103_882 (Aug 10, 2026)
+sccz80   | z80  | math32  |   797_460_656 (Aug 15, 2026)
 zsdcc    | z80  | math32  |   843_047_242 (Aug 10, 2026)
-sccz80   | 8085 | math32  | 1_526_136_021 (Aug 15, 2026)
+sccz80   | 8085 | math32  | 1_526_138_871 (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
 sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
-80cc     | *    | math32  | builds; INVALID 2nd energy — omitted
+80cc     | z80  | math32 |   809_194_132 (Aug 15, 2026)
+80cc     | 8085 | math32 |   1_519_413_292 (Aug 15, 2026)
 
 
 RESULTS (full multi-toolchain archive)
@@ -155,15 +156,15 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / classic / math32
-5672 bytes less page zero
+5876 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 791103882
-time @ 4MHz  = 791103882 / 4*10^6 =  3 min 18 sec
+cycle count  = 797460656
+time @ 4MHz  = 797460656 / 4*10^6 =  3 min 19 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 (Truncated high-half 32×32 mantissa mul; suite 16/16.)
@@ -181,28 +182,48 @@ IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 9.
 Z88DK August 15, 2026
 sccz80 / classic / 8085 / math32
-6930 bytes less page zero
+6887 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 7 * 10^(-6)
 
-cycle count  = 1526136021
-time @ 4MHz  = 1526136021 / 4*10^6 =  6 min 22 sec
+cycle count  = 1526138871
+time @ 4MHz  = 1526138871 / 4*10^6 =  6 min 22 sec
 
 IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits.
 
 Energy: -0.1690752 / -0.1690808 (N=1000).
 
+9b.
+Z88DK August 15, 2026
+80cc / classic / math32
+8039 bytes less page zero
+
+cycle count  = 809194132
+time @ 4MHz  = 809194132 / 4*10^6 =  3 min 22 sec
+
+IEEE 32-bit float implementation.
+
+9c.
+Z88DK August 15, 2026
+80cc / classic / 8085 / math32
+8871 bytes less page zero
+
+cycle count  = 1519413292
+time @ 4MHz  = 1519413292 / 4*10^6 =  6 min 20 sec
+
+IEEE 32-bit float implementation.
+
 10.
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / new c library / math32
-4827 bytes less page zero
+5017 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 790641371
-time @ 4MHz  = 790641371 / 4*10^6 =  3 min 18 sec
+cycle count  = 804375285
+time @ 4MHz  = 804375285 / 4*10^6 =  3 min 21 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 (After sccz80 newlib math32 *_fastcall header remap; sqrt path correct.)

@@ -70,15 +70,15 @@ KWIPS        = 100*10*1 / 243.2248 = 4.1114
 MWIPS        = 4.1114 / 1000 = 0.0041114
 
 
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8980 bytes less page zero
+9151 bytes less page zero
 
-cycle count  = 362118261
-time @ 4MHz  = 362118261 / 4x10^6 = 90.5296 seconds
-KWIPS        = 100*10*1 / 90.5296 = 11.0461
-MWIPS        = 11.0461 / 1000 = 0.0110461
+cycle count  = 366266299
+time @ 4MHz  = 366266299 / 4x10^6 = 91.5666 seconds
+KWIPS        = 100*10*1 / 91.5666 = 10.9210
+MWIPS        = 10.9210 / 1000 = 0.0109210
 
 
 Z88DK April 28, 2021
