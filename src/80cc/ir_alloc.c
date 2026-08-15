@@ -3881,6 +3881,112 @@ void ir_alloc(Func *f)
                 }
             }
         }
+        /* [IR_BYTEPRESS] INERT — size the BYTE-PAIR opportunity by COST, not by
+           hotness. The earlier IR_BYTEPOP probe counted vregs passing
+           byte_home_realizable's gates, which include `use_count >= 8`; that
+           admits only loop-resident bytes, so it reported zero candidates
+           corpus-wide and the pair allocator was shelved as "no opportunity".
+           widthbench is the counter-example: mix_char holds SIX short-lived
+           byte values at once, spills every one, and reports zero under the old
+           probe because none is used 8+ times.
+
+           What actually decides whether byte homes pay is (a) how many byte
+           values are live SIMULTANEOUSLY — that is how many of C/E/B/D you
+           would need — and (b) how much frame traffic they carry. So report:
+
+             cands    width-1 vregs with no register home, not addr-taken or
+                      volatile, def-first, and whose live interval crosses no
+                      call (B/C/D/E are caller-clobbered, so a home is only
+                      safe across a call-free interval)
+             maxlive  the most of those live at any one op — the pressure the
+                      pair allocator would have to cover
+             hot      how many pass today's use_count>=8 gate (what IR_BYTEPOP
+                      counted); the gap to `cands` is what the old probe missed
+             traffic  total accesses over all candidates = frame loads/stores a
+                      byte home could remove
+             top4     traffic of the four highest-traffic candidates, i.e. what
+                      the four available byte homes could actually capture
+
+           Sizing only; no allocation decision is taken here. */
+        if (getenv("IR_BYTEPRESS")) {
+            int total_ops = 0;
+            for (int i = 0; i < f->n_bbs; i++) total_ops += f->bbs[i].n_ops;
+            for (int wsel = 1; wsel <= 2; wsel++) {
+            int *delta = calloc((size_t)(total_ops + 2), sizeof(int));
+            int *acc   = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                sizeof(int));
+            if (delta && acc) {
+                int cands = 0, hot = 0;
+                long traffic = 0;
+                for (int v = 0; v < f->n_vregs; v++) {
+                    const VReg *vr = &f->vregs[v];
+                    if (vr->width != wsel) continue;
+                    if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                        continue;
+                    if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
+                    if (write_count[v] < 1) continue;
+                    if (first_use[v] < 0 || last_use[v] < 0) continue;
+                    DefUseIdx du = vreg_def_first(f, v);
+                    if (du.first_def >= du.first_read) continue;  /* def-first */
+                    /* Interval call-free? B/C/D/E do not survive a call. */
+                    int callfree = 1, g = 0;
+                    for (int i = 0; i < f->n_bbs && callfree; i++)
+                        for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+                            OpKind k = f->bbs[i].ops[j].kind;
+                            if (k != IR_CALL && k != IR_HCALL && k != IR_ASM)
+                                continue;
+                            if (g >= first_use[v] && g <= last_use[v]) {
+                                callfree = 0; break;
+                            }
+                        }
+                    if (!callfree) continue;
+                    cands++;
+                    if (use_count[v] >= 8) hot++;
+                    acc[v] = use_count[v] + write_count[v];
+                    traffic += acc[v];
+                    int lo = first_use[v], hi = last_use[v];
+                    if (lo < 0) lo = 0;
+                    if (hi > total_ops) hi = total_ops;
+                    delta[lo]++; delta[hi + 1]--;
+                }
+                if (cands > 0) {
+                    int live = 0, maxlive = 0;
+                    for (int g = 0; g <= total_ops; g++) {
+                        live += delta[g];
+                        if (live > maxlive) maxlive = live;
+                    }
+                    /* traffic of the 4 busiest candidates — what C/E/B/D could
+                       actually capture. Selection sort over a tiny set. */
+                    long top4 = 0;
+                    for (int n = 0; n < 4; n++) {
+                        int best = -1;
+                        for (int v = 0; v < f->n_vregs; v++)
+                            if (acc[v] > 0 && (best < 0 || acc[v] > acc[best]))
+                                best = v;
+                        if (best < 0) break;
+                        top4 += acc[best];
+                        acc[best] = 0;
+                    }
+                    /* CAVEAT: maxlive is an UPPER BOUND, not the real pressure.
+                       It spans [first_use,last_use] and so ignores holes in a
+                       live range, which over-states badly in one long BB full
+                       of short temporaries. Measured against the frame the
+                       allocator actually assigns (which does real interference):
+                       interpbench vm_run maxlive=45 vs a 25-byte frame = 12
+                       words; listbench list_compute 20 vs 4; sieve_count 13 vs
+                       4. Treat maxlive>4 as "needs checking", not as proof the
+                       values cannot fit. frame_size is not available here — the
+                       probe runs before ir_assign_slots. */
+                    fprintf(stderr,
+                            "BYTEPRESS %-14s w=%d cands=%-3d maxlive=%-3d "
+                            "hot=%-3d traffic=%-5ld top4=%ld\n",
+                            f->fn ? ir_sym_name(f->fn) : "?", wsel,
+                            cands, maxlive, hot, traffic, top4);
+                }
+            }
+            free(delta); free(acc);
+            }
+        }
         /* Eligibility pass: collect candidates into an array, sort by
            use count descending (heuristic — most-used first), then
            greedy-allocate to BC checking non-overlap against already-

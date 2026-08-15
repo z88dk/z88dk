@@ -91,7 +91,14 @@ static int gen_ld_imm(FILE *out, Func *f, const Op *op)
                   || hlde_belief_droppable(L.rs.hl);
     int hl_dst  = vreg_is_remat(f, op->dst)
                   || ir_home_at(f, op->dst) == IR_PR_HL;
-    if (L.la.cur_dst_dead || (hl_free && hl_dst)) {
+    /* A PR_STACK dst MUST be parked: its single use pops. Neither shortcut
+       below stores anything, so taking one leaves nothing on the stack and the
+       reader falls through to the slot path — and a PR_STACK vreg has no slot,
+       so it addressed sp-1 and read below the stack (`ld hl,-1; add hl,sp`).
+       Only visible where no index register was free to take the value instead,
+       i.e. the non-z80 targets. */
+    if (!vreg_is_pr_stack(f, op->dst)
+        && (L.la.cur_dst_dead || (hl_free && hl_dst))) {
         emit(out, "ld\thl,%lld", (long long)op->imm);
     } else {
         emit(out, "ld\tde,%lld", (long long)op->imm);
@@ -143,13 +150,19 @@ static int gen_ld_str(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+static int lea_all_uses_indexed(const Func *f, const Op *lea);
+
 static int gen_lea(FILE *out, Func *f, const Op *op)
 {
+    /* Every use of this address became a frame-indexed access, so the address
+       itself is never read — emitting it would be four dead instructions. IR
+       DCE cannot see this: the uses still name the vreg as their mem.base. */
+    if (lea_all_uses_indexed(f, op)) return 0;
     if (op->src[0] < 0) {
         fputs("ir_lower: IR_LEA with no src\n", stderr);
         return -1;
     }
-    emit_acc_slot_addr(out, f, op->src[0], 0);
+    emit_slot_addr_ofs(out, f, op->src[0], 0, (int)op->imm);
     commit_hl_word(out, f, op->dst);
     return 0;
 }
@@ -434,6 +447,11 @@ static void emit_test_zero(FILE *out, Func *f, int src)
            routes a byte-mask AND / byte vreg here), so `or a` on the low
            byte sets Z for the whole value — no `ld h,0` widen. */
         if (!a_has(src)) load_byte_to_a(out, f, src);
+        /* The mask that produced this byte already set Z from it (`and K`), and
+           nothing has been emitted since — so the `or a` is dead. rs.z_from_a is
+           cleared by any other emitted line, so this can never act on a stale
+           claim. */
+        else if (L.rs.z_from_a) return;
         emit(out, "or\ta");
         return;
     }
@@ -1788,6 +1806,16 @@ static void gen_808x_long_const_shift(FILE *out, Func *f, const Op *op,
    and A holds the OTHER operand. `prefix` is the instruction up to the
    operand: "and\t" / "or\t" / "xor\t" / "sub\t" / "add\ta," etc. Does
    not disturb A; may clobber HL (sp-rel slot addressing). */
+/* Bit position if `m` (a byte mask) has exactly one bit set, else -1. */
+static int single_bit_index(unsigned m)
+{
+    m &= 0xff;
+    if (m == 0 || (m & (m - 1)) != 0) return -1;
+    int n = 0;
+    while ((m >> n) != 1) n++;
+    return n;
+}
+
 /* A = A +/- K for a width-1 result. ±1 is `inc a` / `dec a`: 1 byte and 4T
    against `add a,1`'s 2 bytes and 7T. The two differ in CARRY -- inc/dec leave
    CF alone -- which is why this is confined to the byte add/sub sites, where
@@ -1805,8 +1833,43 @@ static void emit_byte_add_imm(FILE *out, unsigned k, int is_sub)
     else        emit(out, "add\ta,%u", k);
 }
 
+/* True for the byte-ALU prefixes that leave Z/S set from the value they leave
+   in A — and/or/xor. `cp` flags a value it does not keep, and add/sub also move
+   carry, so neither qualifies. */
+static int alu_prefix_sets_z_from_a(const char *p)
+{
+    return (p[0]=='a' && p[1]=='n' && p[2]=='d')
+        || (p[0]=='o' && p[1]=='r')
+        || (p[0]=='x' && p[1]=='o' && p[2]=='r');
+}
+
+/* Wrapper: whatever route the operand takes, an and/or/xor leaves Z set from
+   the byte now in A, so record it for a following truth-test. */
+static void byte_alu_operand_emit(FILE *out, const Func *f,
+                                  const char *prefix, int m);
 static void byte_alu_operand(FILE *out, const Func *f,
                              const char *prefix, int m)
+{
+    byte_alu_operand_emit(out, f, prefix, m);
+    if (alu_prefix_sets_z_from_a(prefix)) L.rs.z_from_a = 1;
+}
+
+/* The byte ALU ops that have an r6k `a,(sp+n)` form: add sub and or xor cp
+   (49 89/a9/c9/e9/d9/f9 nn). adc/sbc are NOT in that set, so they keep the
+   address-in-HL path. */
+static int alu_mem_prefix_ok(const char *p)
+{
+    static const char *ok[] = { "add\t", "sub\t", "and\t", "or\t",
+                                "xor\t", "cp\t", NULL };
+    for (int i = 0; ok[i]; i++) {
+        size_t n = strlen(ok[i]);
+        if (strncmp(p, ok[i], n) == 0) return 1;
+    }
+    return 0;
+}
+
+static void byte_alu_operand_emit(FILE *out, const Func *f,
+                                  const char *prefix, int m)
 {
     if (a_has(m))  { emit(out, "%sa", prefix); return; }
     /* Index-half home as an ALU source (add a,iyl / sub iyl / cp iyl …): the
@@ -1859,6 +1922,25 @@ static void byte_alu_operand(FILE *out, const Func *f,
        A live address belief implies no pending spill (store_a_byte leans on the
        same invariant), so only resolve when there is none — pending_spill_resolve
        itself clobbers HL and would drop the address we are about to reuse. */
+    /* Rabbit 6000 reads the slot as the ALU operand directly — `xor a,(sp+n)`
+       (49 d9 nn) instead of computing the address in HL and going through
+       `(hl)`. Only the 6000 has it; r3k/r4k/r5k reject the encoding. The
+       operand form REQUIRES the explicit accumulator (`xor a,(sp+4)` assembles,
+       `xor (sp+4)` does not), so normalise the prefix, which is spelled with
+       the `a,` for add/adc and without it for the rest. */
+    if (IS_R6K() && !fp_active(f) && alu_mem_prefix_ok(prefix)) {
+        int off = slot_off(f, m) + L.cur_sp_adjust;
+        if (off >= 0 && off <= 255) {
+            char mn[8];
+            size_t n = 0;
+            while (n < sizeof mn - 1 && prefix[n] && prefix[n] != '\t') {
+                mn[n] = prefix[n]; n++;
+            }
+            mn[n] = 0;
+            emit(out, "%s\ta,(sp+%d)", mn, off);
+            return;
+        }
+    }
     if (L.cur_hl_addr_off < 0) pending_spill_resolve();
     emit_byte_slot_addr(out, f, m);
     emit(out, "%s(hl)", prefix);
@@ -2348,20 +2430,35 @@ static int emit_gb_const_word_store(FILE *out, const Func *f, int src,
    honour the same declaration identically.
 
    Three CPU families need entirely different instructions:
-     - Rabbit has no in/out at all. The `ioi` prefix redirects the NEXT memory
-       access to internal I/O space, so the access looks like a load/store.
+     - Rabbit has no in/out at all. An `ioi`/`ioe` prefix redirects the NEXT
+       memory access to an I/O space, so the access looks like a load/store.
+       The prefix binds to the instruction and must share its line: a lone
+       `ioi` is a z80asm syntax error, not a standalone opcode.
        The R2000 needs a following `nop` (errata).
      - gbz80 likewise has no in/out; `ldh` addresses the 0xFF00 page.
      - Z180/eZ80 have in0/out0, which reach L directly and save the A shuffle.
    The 16-bit (`__banked`) form puts the high byte in A, which Z80's `in a,(n)`
    drives onto the high address bus, and uses BC for the write. */
+
+/* Rabbit I/O space selector. Both spaces address 16 bits and carry a byte, so
+   the only thing that varies is the prefix: plain `__sfr` is internal (ioi,
+   where the on-chip peripheral registers live, and what inp()/outp() use),
+   `__sfr __banked` is external (ioe). */
+static const char *rabbit_io_prefix(const Op *op)
+{
+    return op->mem.port->kind == IR_PORT_KIND_16 ? "ioe" : "ioi";
+}
+
 static void gen_port_in(FILE *out, const Op *op)
 {
     const char *s = ir_sym_name(op->mem.sym);
     if (IS_RABBIT()) {
-        emit(out, "ioi");
-        emit(out, "ld\thl,(_%s)", s);
+        /* Byte-wide: the port carries one byte, and `ld hl,(N)` would read
+           the adjacent port N+1 as the high half. */
+        emit(out, "%s\tld\ta,(_%s)", rabbit_io_prefix(op), s);
         if (c_cpu == CPU_R2KA) emit(out, "nop");
+        emit(out, "ld\tl,a");
+        emit(out, "ld\th,0");
         return;
     }
     if (IS_GBZ80()) {
@@ -2392,8 +2489,7 @@ static void gen_port_out(FILE *out, const Op *op)
     const char *s = ir_sym_name(op->mem.sym);
     if (IS_RABBIT()) {
         emit(out, "ld\ta,l");
-        emit(out, "ioi");
-        emit(out, "ld\t(_%s),a", s);
+        emit(out, "%s\tld\t(_%s),a", rabbit_io_prefix(op), s);
         if (c_cpu == CPU_R2KA) emit(out, "nop");
         return;
     }
@@ -2414,6 +2510,134 @@ static void gen_port_out(FILE *out, const Op *op)
     emit(out, "ld\ta,l");
     emit(out, "ld\tbc,_%s", s);       /* clobbers BC — caller invalidates */
     emit(out, "out\t(c),a");
+}
+
+/* A load/store through `&local + K` is a frame access at a known displacement,
+   so it can take the same `(ix+d)` form a scalar local already uses rather than
+   materialising the address in HL first. Returns the ix displacement, or
+   INT_MIN when this is not a frame address or the displacement (both bytes of a
+   word) is out of the signed-8-bit range — the caller then falls back to the
+   existing sp-relative path, which is cheaper than reaching IX by hand anyway.
+   fp mode only: without a frame register there is no indexed form to reach. */
+#define FRAME_IX_NONE (-100000)
+
+/* The frame slot this access names, or -1. `*ofs` receives the byte
+   displacement into it (the LEA's folded member offset plus the access's own
+   offset). */
+static int frame_slot_of(const Func *f, const Op *op, int *ofs)
+{
+    if (op->mem.kind != IR_MEM_VREG || op->mem.base < 0) return -1;
+    if (op->mem.base >= f->n_vregs || !g_hc.lea_def) return -1;
+    const Op *d = g_hc.lea_def[op->mem.base];
+    if (!d || d->src[0] < 0 || d->src[0] >= f->n_vregs) return -1;
+    if (slot_off(f, d->src[0]) < 0) return -1;
+    *ofs = (int)d->imm + op->mem.offset;
+    return d->src[0];
+}
+
+/* True when a word at `ofs` into `slot`'s frame slot has a direct addressing
+   form on this target — the same ladder load_to_hl_adj walks for a scalar
+   local: indexed off the frame register, Rabbit/kc160 sp-relative, or 8085
+   LDSI. Out of every range, the caller materialises the address instead. */
+static int frame_direct_ok(const Func *f, int slot, int ofs, int width)
+{
+    if (opt_disabled("frame-index")) return 0;
+    if (fp_active(f) && !L.cur_frameless) {
+        int d = slot_ix_off(f, slot) + ofs;
+        if (fp_offset_fits(d) && (width == 1 || fp_offset_fits(d + 1))) return 1;
+    }
+    int off = slot_off(f, slot) + L.cur_sp_adjust + ofs;
+    if (off < 0) return 0;
+    if (width == 2 && off <= sp_rel_max(f)) return 1;
+    /* 8085 LDSI+LHLX/SHLX is deliberately NOT offered here. The scalar slot
+       path uses it, but routing a member access through it miscompiled
+       long_ir test_struct (`struct copy *ptr = *ptr`) and the cause is not
+       yet understood — the emitted offsets account for the in-flight `push
+       de`, so something else about parking DE across the access is wrong. */
+    return 0;
+}
+
+static int frame_ix_disp(const Func *f, const Op *op, int width)
+{
+    if (opt_disabled("frame-index")) return FRAME_IX_NONE;
+    int ofs, slot = frame_slot_of(f, op, &ofs);
+    if (slot < 0) return FRAME_IX_NONE;
+    if (!fp_active(f) || L.cur_frameless) return FRAME_IX_NONE;
+    int disp = slot_ix_off(f, slot) + ofs;
+    if (!fp_offset_fits(disp)) return FRAME_IX_NONE;
+    if (width == 2 && !fp_offset_fits(disp + 1)) return FRAME_IX_NONE;
+    return disp;
+}
+
+/* Word load from a frame slot at a displacement, via whichever direct form the
+   target has. Advertises nothing about the slot's own vreg — this is a part of
+   the slot, not its value. Returns 1 if emitted. */
+static int emit_frame_word_load(FILE *out, const Func *f, int slot, int ofs,
+                                const char *vol)
+{
+    if (fp_active(f) && !L.cur_frameless) {
+        int d = slot_ix_off(f, slot) + ofs;
+        if (fp_offset_fits(d) && fp_offset_fits(d + 1)) {
+            emit(out, "ld\thl,(%s%+d)%s", frame_reg(), d, vol);
+            return 1;
+        }
+    }
+    int off = slot_off(f, slot) + L.cur_sp_adjust + ofs;
+    if (off >= 0 && off <= sp_rel_max(f)) {
+        emit(out, "ld\thl,(sp+%d)%s", off, vol);
+        return 1;
+    }
+    return 0;
+}
+
+/* Word store of HL to a frame slot at a displacement. Mirror of the load.
+   Returns 1 if emitted; HL still holds the value afterwards. */
+static int emit_frame_word_store(FILE *out, const Func *f, int slot, int ofs,
+                                 const char *vol)
+{
+    if (fp_active(f) && !L.cur_frameless) {
+        int d = slot_ix_off(f, slot) + ofs;
+        if (fp_offset_fits(d) && fp_offset_fits(d + 1)) {
+            emit(out, "ld\t(%s%+d),hl%s", frame_reg(), d, vol);
+            return 1;
+        }
+    }
+    int off = slot_off(f, slot) + L.cur_sp_adjust + ofs;
+    if (off >= 0 && off <= sp_rel_max(f)) {
+        emit(out, "ld\t(sp+%d),hl%s", off, vol);
+        return 1;
+    }
+    return 0;
+}
+
+/* True when the LEA's dst is read only as the base of loads/stores that
+   frame_ix_disp will handle indexed — so the address is never needed in a
+   register. Any other reader (a call argument, pointer arithmetic, a
+   post-stepped access) makes the address real and returns 0. */
+static int lea_all_uses_indexed(const Func *f, const Op *lea)
+{
+    if (!lea || lea->dst < 0) return 0;
+    int v = lea->dst, seen = 0;
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o == lea) continue;
+            if (o->src[0] == v || o->src[1] == v) return 0;
+            if (o->call || o->hcall) return 0;   /* args are listed elsewhere */
+            if (o->mem.kind != IR_MEM_VREG || o->mem.base != v) continue;
+            if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) return 0;
+            if (o->mem.post_step != 0 || mem_bank_fn(&o->mem)) return 0;
+            int w = (o->kind == IR_LD_MEM)
+                  ? ((o->dst >= 0) ? f->vregs[o->dst].width : 0)
+                  : kind_scalar_width(o->mem.elem);
+            if (w != 1 && w != 2) return 0;
+            int uofs, uslot = frame_slot_of(f, o, &uofs);
+            if (uslot < 0) return 0;
+            if (w == 1) { if (frame_ix_disp(f, o, 1) == FRAME_IX_NONE) return 0; }
+            else if (!frame_direct_ok(f, uslot, uofs, 2)) return 0;
+            seen++;
+        }
+    return seen > 0;
 }
 
 static int gen_ld_mem(FILE *out, Func *f, const Op *op)
@@ -2528,6 +2752,30 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (op->mem.kind == IR_MEM_VREG) {
+        /* Frame access at a known displacement (`&local + K`): read it through
+           the frame register, exactly as a scalar local is read, instead of
+           building the address in HL first. Out-of-range displacements return
+           FRAME_IX_NONE and fall through to the address-materialising path. */
+        if (op->dst >= 0 && op->mem.post_step == 0 && !mem_bank_fn(&op->mem)) {
+            int _w = f->vregs[op->dst].width;
+            int _ofs, _slot = frame_slot_of(f, op, &_ofs);
+            if (_slot >= 0 && _w == 1) {
+                int disp = frame_ix_disp(f, op, 1);
+                if (disp != FRAME_IX_NONE) {
+                    emit(out, "ld\ta,(%s%+d)%s", frame_reg(), disp,
+                         mem_vol_stamp(op));
+                    return finalize_byte_result(out, f, op, 1);
+                }
+            }
+            if (_slot >= 0 && _w == 2 && frame_direct_ok(f, _slot, _ofs, 2)) {
+                hl_about_to_change(-1);
+                if (emit_frame_word_load(out, f, _slot, _ofs,
+                                         mem_vol_stamp(op))) {
+                    commit_hl_result(out, f, op->dst);
+                    return 0;
+                }
+            }
+        }
         /* Fused (long)*p++ fastpath. When the load is a byte-to-long
            zero-extend with a post-inc on the base pointer (set only
            by the OP_CAST char→long path in ir_build), increment p's
@@ -3063,6 +3311,30 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (op->mem.kind == IR_MEM_VREG) {
+        /* Frame store at a known displacement — the mirror of the load above:
+           write through the frame register instead of building the address. */
+        if (op->src[0] >= 0 && op->mem.post_step == 0 && !mem_bank_fn(&op->mem)) {
+            int _w = kind_scalar_width(op->mem.elem);
+            int _ofs, _slot = frame_slot_of(f, op, &_ofs);
+            if (_slot >= 0 && _w == 1) {
+                int disp = frame_ix_disp(f, op, 1);
+                if (disp != FRAME_IX_NONE) {
+                    load_byte_to_a(out, f, op->src[0]);
+                    emit(out, "ld\t(%s%+d),a%s", frame_reg(), disp,
+                         mem_vol_stamp(op));
+                    return 0;
+                }
+            }
+            /* Test the addressing form BEFORE loading the value — falling
+               through with it already in HL only makes the generic path
+               reload it. */
+            if (_slot >= 0 && _w == 2 && frame_direct_ok(f, _slot, _ofs, 2)) {
+                load_to_hl(out, f, op->src[0]);
+                if (emit_frame_word_store(out, f, _slot, _ofs,
+                                          mem_vol_stamp(op)))
+                    return 0;
+            }
+        }
         /* Constant value folded into op->imm by ir_opt_const_fold. Store the
            immediate straight to memory — no value register, no A/E clobber, no
            DE-cache drop (leaves PR_DE free). Width (1/2/4) from mem.elem. */
@@ -3368,6 +3640,52 @@ static int try_fp_bytewise_commutative(FILE *out, const Func *f, const Op *op,
    via ex de,hl. Result → HL → commit_hl_result. lo_op/hi_op are the low/high byte
    mnemonic prefixes incl. separator. Gated on g_hc.de_home (the orchestrator's
    residency decision); -1 ⇒ never fires ⇒ byte-identical. Returns 1 if emitted. */
+/* Rabbit 6000 word ALU straight against a frame slot, fp mode:
+
+       add hl,(ix+d)        in place of   ld de,(ix+d) / add hl,de
+
+   Only the 6000 has it (dd 80/90/a0/b0 d); r3k/r4k/r5k reject the encoding, as
+   does every z80. This belongs in the lowerer rather than copt for the reason
+   the sp-mode copt rules were removed in e766ef09a7: a peephole rewriting a
+   finished sequence cannot see whether the DE it consumes is still wanted.
+
+   src[1] only — `sub` is not commutative, and op_is_ixd_slot already encodes
+   the hazards (address-taken, volatile, remat slot collision, unspilled, both
+   halves of the word inside the displacement range). */
+static int try_binop_r6k_ixd(FILE *out, Func *f, const Op *op, const char *mnem)
+{
+    if (opt_disabled("r6k-ixd-alu")) return 0;
+    if (!IS_R6K() || !fp_active(f)) return 0;
+    if (op->dst < 0 || f->vregs[op->dst].width != 2) return 0;
+    if (vreg_is_pr_de(f, op->dst)) return 0;   /* mirrors the hl,de path */
+    int s0 = op->src[0], s1 = op->src[1];
+    if (s0 < 0 || s1 < 0) return 0;
+    if (s0 >= f->n_vregs || s1 >= f->n_vregs) return 0;
+    if (f->vregs[s0].width != 2) return 0;
+    if (L.pending_spill_v >= 0) return 0;
+    /* Cheap, side-effect-free gate first: op_is_ixd_slot goes through
+       slot_ix_off, which VOTES in the ds_ixaccess count below. Only when
+       src[0] is already in HL — load_binop_operands is free to pick which
+       operand lands in HL and can use whatever is resident, so forcing src[0]
+       there costs more than the fold saves. */
+    if (!hl_has(s0)) return 0;
+    /* This fold must not keep a frame alive on its own. A framed function with
+       no (ix+-d) access re-lowers frameless via sp (#13), and there this fold
+       does not fire at all (it is fp-only), so the sp form is exactly the code
+       we would have emitted anyway. Letting it vote instead pinned the frame
+       and cost the ~11B IX apparatus per function: callbench +81B/6 frames,
+       localbench +12B/1 frame, against -37B across every other bench. */
+    int ixvote = ds_ixaccess;
+    if (!op_is_ixd_slot(f, s1)) { ds_ixaccess = ixvote; return 0; }
+    int d = slot_ix_off(f, s1);
+    ds_ixaccess = ixvote;
+    load_to_hl(out, f, s0);
+    ss_note_reload(f, s1);
+    emit(out, "%s\thl,(%s%+d)", mnem, frame_reg(), d);
+    commit_hl_result(out, f, op->dst);
+    return 1;
+}
+
 static int try_binop_ixd_fold(FILE *out, Func *f, const Op *op,
                               const char *lo_op, const char *hi_op)
 {
@@ -3873,6 +4191,7 @@ static int gen_add(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (try_binop_ixd_fold(out, f, op, "add\ta,", "adc\ta,")) return 0;
+    if (try_binop_r6k_ixd(out, f, op, "add")) return 0;
     load_binop_operands(out, f, op);
     emit(out, "add\thl,de");
     /* PR_DE dst: commit moves HL→DE via ex de,hl (+4 T), saving the ~28-T
@@ -4404,6 +4723,12 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                 return 0;
             }
             emit(out, "%s%u", pfx, m);
+            /* and/or/xor set Z and S from the result now in A, so a following
+               truth-test of this byte needs no `or a`. sub/add/cp do not
+               qualify — what they leave in A is not what they flagged, or they
+               also move carry. */
+            if (op->kind == IR_AND || op->kind == IR_OR || op->kind == IR_XOR)
+                L.rs.z_from_a = 1;
         } else {
             int s0 = op->src[0], s1 = op->src[1];
             if (!a_has(s0) && a_has(s1)) { int t = s0; s0 = s1; s1 = t; }
@@ -4442,16 +4767,38 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                    Slot layout: slot+i = byte i. */
                 static const char *dehl_byte_regs[4] =
                     { "c", "b", "e", "d" };
-                int emitted = 0;
+                /* A single-bit mask is `bit n,<src>`: same Z, one byte and
+                   several cycles cheaper than load-to-A + and, and it leaves
+                   A and CF alone instead of clobbering A and clearing CF.
+                   Sound ONLY here because this path fuses the test with the
+                   branch below and returns — the AND's value is dead, nothing
+                   reads the masked result. `bit` needs the CB prefix (absent
+                   on 8080/8085) and the (ix+d) form needs DD as well (absent
+                   on gbz80, which has no index register anyway). */
+                int bidx = single_bit_index((unsigned)b4[nz_idx]);
+                int can_bit = bidx >= 0 && !IS_808x();
+                int emitted = 0, did_bit = 0;
                 if (dehl_has(op->src[0])) {
-                    emit(out, "ld\ta,%s", dehl_byte_regs[nz_idx]);
+                    if (can_bit) {
+                        emit(out, "bit\t%d,%s", bidx,
+                             dehl_byte_regs[nz_idx]);
+                        did_bit = 1;
+                    } else {
+                        emit(out, "ld\ta,%s", dehl_byte_regs[nz_idx]);
+                    }
                     emitted = 1;
                 } else if (fp_active(f)) {
                     int ix_off = slot_ix_off(f, op->src[0])
                                + nz_idx;
                     if (fp_offset_fits(ix_off)) {
-                        emit(out, "ld\ta,(%s%+d)",
-                             frame_reg(), ix_off);
+                        if (can_bit && !IS_GBZ80()) {
+                            emit(out, "bit\t%d,(%s%+d)", bidx,
+                                 frame_reg(), ix_off);
+                            did_bit = 1;
+                        } else {
+                            emit(out, "ld\ta,(%s%+d)",
+                                 frame_reg(), ix_off);
+                        }
                         emitted = 1;
                     }
                 } else {
@@ -4459,13 +4806,19 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                             + L.cur_sp_adjust + nz_idx;
                     emit(out, "ld\thl,%d", off);
                     emit(out, "add\thl,sp");
-                    emit(out, "ld\ta,(hl)");
+                    if (can_bit) {
+                        emit(out, "bit\t%d,(hl)", bidx);
+                        did_bit = 1;
+                    } else {
+                        emit(out, "ld\ta,(hl)");
+                    }
                     hl_about_to_change(-1);
                     emitted = 1;
                 }
                 if (emitted) {
-                    emit(out, "and\t%u",
-                         (unsigned)b4[nz_idx]);
+                    if (!did_bit)
+                        emit(out, "and\t%u",
+                             (unsigned)b4[nz_idx]);
                     const char *cc =
                         (g_hc.branch_test_kind == IR_BR_ZERO)
                             ? "z" : "nz";
@@ -4981,6 +5334,7 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         snprintf(m, sizeof m, "%s\t", mnem);
         if (try_binop_ixd_fold(out, f, op, m, m)) return 0;
     }
+    if (try_binop_r6k_ixd(out, f, op, mnem)) return 0;
     load_binop_operands(out, f, op);    /* HL=src[0], DE=src[1] */
     /* Rabbit native HL=HL<op>DE in 1 byte (and/or r2k+, xor r4k); DE
        preserved so the HL finalize below is unchanged. Off elsewhere:

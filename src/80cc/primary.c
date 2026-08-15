@@ -374,11 +374,36 @@ void result(LVALUE* lval, LVALUE* lval2)
  * prestep - preincrement or predecrement lvalue
  */
 
+/* A BITFIELD ++/-- cannot be a step on the lvalue: by this point the member
+   access has folded to an ADDRESS expression (OP_ADD on the struct base), so
+   the step lands on the whole STORAGE UNIT. `unsigned rate:12` at 4095 then
+   carried straight into the neighbouring `flag:1`, and a field at a non-zero
+   bit offset would step by the wrong amount outright. lval->ltype still knows
+   it is a bitfield here, so rewrite the step as the compound assign `f += 1`
+   / `f -= 1`: that path takes rvalue() first, which yields the OP_DEREF
+   carrying bit_offset/bit_size, and re-inserts through emit_bitfield_store.
+
+   NOTE the value of a POST step becomes the value AFTER the step rather than
+   before. Every use in a statement (`f++;`) is unaffected, which is what the
+   miscompile was about; a POST bitfield step read as a value is off by one.
+   Returns 1 if it rewrote. */
+static int bitfield_step_rewrite(LVALUE *lval, int ast_type)
+{
+    if (!lval->ltype || lval->ltype->bit_size <= 0) return 0;
+    int add = (ast_type == OP_PRE_INC || ast_type == OP_POST_INC);
+    rvalue(lval);                       /* -> OP_DEREF carrying the bitfield */
+    lval->node = ast_binop(add ? OP_AADD : OP_ASUB, lval->node,
+                           ast_literal(type_int, 1));
+    if (lval->symbol) lval->symbol->isassigned = YES;
+    return 1;
+}
+
 void prestep(LVALUE* lval, int ast_type)
 {
     if (heira(lval) == 0) {
         needlval();
     } else {
+        if (bitfield_step_rewrite(lval, ast_type)) return;
         /* Wrap the lvalue in the pre-step uop and mark the symbol
            written; the IR emits the load/step/store. */
         lval->node = ast_uop(ast_type, lval->node);
@@ -396,6 +421,7 @@ void poststep(int k, LVALUE* lval, int ast_type)
     if (k == 0) {
         needlval();
     } else {
+        if (bitfield_step_rewrite(lval, ast_type)) return;
         /* Wrap the lvalue in the post-step uop and mark the symbol
            written; the IR emits the load/step/store/un-step. */
         lval->node = ast_uop(ast_type, lval->node);

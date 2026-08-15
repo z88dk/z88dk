@@ -82,6 +82,12 @@ struct RegState {
     int fa;     /* vreg resident in the float accumulator (FA, math48 alt regs) */
     int i64_acc;/* vreg resident in __i64_acc (long long) — a SEPARATE physical
                    store from FA, so its residency is tracked independently */
+    int z_from_a;/* 1 when the LAST emitted instruction set Z/S from A's current
+                    value (an `and`/`or`/`xor` on A). Invalidate-by-default at
+                    the vemit chokepoint, like the `a` tracker above: anything
+                    else emitted clears it, so a stale claim is impossible. Lets
+                    a following truth-test of that byte skip its `or a` — the
+                    mask has already set Z. */
 };
 
 /* The lowerer's mutable state, grouped into one struct and accessed as
@@ -199,6 +205,10 @@ typedef struct {
     int func_whome;       /* the word DE-home vreg, or -1 */
     int branch_test_kind; /* lookahead branch kind steering a fused compare (0=none) */
     const Op **remat_def; /* per-vreg rematerialising def (LD_IMM/LD_SYM), or NULL */
+    const Op **lea_def;   /* per-vreg IR_LEA def (single-def only), or NULL. Lets a
+                             load/store through a frame address reach the same
+                             `(ix+d)` form a scalar local uses, instead of
+                             materialising the address first. */
     const Op **byte_remat; /* per-vreg: a width-1 single-use LD_MEM from a global
                               (IR_MEM_SYM) with no memory-write between def and use
                               — rematerialise `ld a,(sym)` at the use instead of a
@@ -568,6 +578,12 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             }
         }
     }
+    /* Invalidate rs.z_from_a by default: every emitted line clears the claim,
+       and the byte-ALU emitter re-asserts it immediately after its own emit.
+       The mnemonic cannot be read off `fmt` — the ALU forms pass it as an
+       ARGUMENT ("%s%u" with pfx="and\t"), so the format string does not carry
+       it. */
+    L.rs.z_from_a = 0;
     fputc('\t', out);
     vfprintf(out, fmt, ap);
     fputc('\n', out);
@@ -1942,25 +1958,51 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
    (no `add hl,ix`, so push/pop the frame reg then add the offset via DE;
    `adj` — the prior-push sp shift — does NOT apply since IX is fixed).
    Clobbers DE in fp-mode (acc callers invalidate DE around the call). */
-static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
+/* As emit_acc_slot_addr, plus a constant byte displacement into the slot (an
+   IR_LEA's folded member offset). `ofs` applies in BOTH modes, unlike `adj`,
+   which is the sp-push shift and is meaningless when IX holds the frame. */
+static void emit_slot_addr_ofs(FILE *out, const Func *f, int vreg, int adj,
+                               int ofs)
 {
     if (fp_active(f)) {
+        /* ez80: lea hl,ix+d is one 3-byte op, beating the 4-byte sp form. */
+        if (IS_EZ80()) {
+            int ixoff = slot_ix_off(f, vreg) + ofs;
+            if (ixoff >= -128 && ixoff <= 127) {
+                emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
+                return;
+            }
+        }
+        /* Everyone else reaches the slot through sp even while IX holds the
+           frame: `ld hl,N; add hl,sp` is 4 bytes against 7 for `push ix; pop hl;
+           ld de,d; add hl,de`, and it leaves DE ALONE. That `ld de` used to
+           destroy the high half of a live DEHL long (long_ir structval
+           test_struct_mixed_odd, every Rabbit in fp mode). `adj` counts here,
+           unlike in the ix form where it is meaningless.
+           Deliberately does not call slot_ix_off: that votes in ds_ixaccess,
+           and an address taken through sp is no reason to keep IX alive. */
+        emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj + ofs);
+        emit(out, "add\thl,sp");
+        return;
+    }
+    emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj + ofs);
+    emit(out, "add\thl,sp");
+}
+
+static void emit_acc_slot_addr(FILE *out, const Func *f, int vreg, int adj)
+{
+    if (fp_active(f) && IS_EZ80()) {
+        /* ez80: lea hl,ix+d is one 3-byte op, beating the 4-byte sp form. */
         int ixoff = slot_ix_off(f, vreg);
-        /* ez80: lea hl,ix+d in one op, no DE clobber, vs push/pop + add. */
-        if ((IS_EZ80()) && ixoff >= -128 && ixoff <= 127) {
+        if (ixoff >= -128 && ixoff <= 127) {
             emit(out, "lea\thl,%s%+d", frame_reg(), ixoff);
             return;
         }
-        emit(out, "push\t%s", frame_reg());
-        emit(out, "pop\thl");
-        if (ixoff) {
-            emit(out, "ld\tde,%d", ixoff);
-            emit(out, "add\thl,de");
-        }
-    } else {
-        emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj);
-        emit(out, "add\thl,sp");
     }
+    /* Otherwise address through sp in BOTH modes — see emit_slot_addr_ofs:
+       4 bytes rather than 7, and no DE clobber. */
+    emit(out, "ld\thl,%d", slot_off(f, vreg) + L.cur_sp_adjust + adj);
+    emit(out, "add\thl,sp");
 }
 
 /* Wide memory-accumulator primitive name for `vreg`, dispatched on its
@@ -4308,6 +4350,10 @@ int ir_lower_func(FILE *out, Func *f)
            strength-reduce each clustered access into an independent stepped IV,
            hiding the common index); ivsr then reduces just the anchor and the
            offset loads ride it. IR_NO_ADDR_CSE opts out. */
+        /* Fold a constant `&local + K` into the LEA before addr-cse groups
+           addresses, so a struct member is one frame address rather than a
+           base plus a run-time add. */
+        int leaofs  = ir_opt_lea_offset(f);
         int addrcse = ir_opt_addr_cse(f);
         /* Strength-reduce indexed-array address recomputes to stepped
            pointers right after LICM (loops found, base invariants
@@ -4390,7 +4436,7 @@ int ir_lower_func(FILE *out, Func *f)
         if ((hoisted > 0 || ivsr > 0 || fwd > 0 || cfold > 0
              || packs > 0 || dce > 0 || early > 0
              || late > 0 || match > 0 || narrow > 0 || ivnarrow > 0
-             || cse > 0 || addrcse > 0 || pushes > 0 || deadret > 0 || reassoc > 0
+             || cse > 0 || addrcse > 0 || leaofs > 0 || pushes > 0 || deadret > 0 || reassoc > 0
              || rcoal > 0 || pruned > 0 || symcmp > 0)
             && getenv("IR_OPT_VERBOSE"))
             fprintf(stderr,
@@ -4538,6 +4584,25 @@ int ir_lower_func(FILE *out, Func *f)
        re-emit the constant instead of reloading a slot. Built BEFORE
        ir_assign_slots so the NO_SLOT tagging (constants need no slot — they
        rematerialise) shrinks the frame and drops the def's spill store. */
+    {   /* Single-def IR_LEA map: which frame slot (and displacement) a
+           pointer vreg names. Ungated — it only records a fact. */
+        int nv = f->n_vregs > 0 ? f->n_vregs : 1;
+        int *nd = calloc((size_t)nv, sizeof(int));
+        g_hc.lea_def = calloc((size_t)nv, sizeof(const Op *));
+        if (nd && g_hc.lea_def) {
+            for (int b = 0; b < f->n_bbs; b++)
+                for (int j = 0; j < f->bbs[b].n_ops; j++) {
+                    const Op *o = &f->bbs[b].ops[j];
+                    if (o->dst >= 0 && o->dst < nv) {
+                        nd[o->dst]++;
+                        g_hc.lea_def[o->dst] = (o->kind == IR_LEA) ? o : NULL;
+                    }
+                }
+            for (int v = 0; v < nv; v++)
+                if (nd[v] != 1) g_hc.lea_def[v] = NULL;
+        }
+        free(nd);
+    }
     g_hc.remat_def = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
                          sizeof(const Op *));
     if (g_hc.remat_def && !opt_disabled("remat")) {
@@ -4813,7 +4878,17 @@ int ir_lower_func(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
  deadframe_retry:
-    rout = elide_labels ? tmpfile() : NULL;
+    /* Render into a DISCARDABLE buffer whether or not labels are being elided.
+       The dead-store / dead-frame retries below `goto deadframe_retry` and
+       render the function again, discarding the first attempt with
+       `fclose(rout)` — which only discards anything when rout is a temp file.
+       With rout aliased to `out` (what --opt-disable=label-elide used to do)
+       the first render stayed in the output and the retry APPENDED a second
+       copy of the whole function: two bodies, both carrying L_f<n>_bb_0, and
+       z80asm rejected the duplicate label. If tmpfile() is unavailable we fall
+       back to writing `out` directly and must then suppress the retries, since
+       there is no way to take the first render back. */
+    rout = tmpfile();
     if (!rout) { rout = out; elide_labels = 0; }
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
@@ -4825,9 +4900,31 @@ int ir_lower_func(FILE *out, Func *f)
     L.ss_cur_g = -1;
     L.ss_pinned = 0;
     if (!want_lazy) {
+        /* ss_op_base is the per-BB base of the FLAT op index — an addressing
+           map, not lazy-spill state. It is what makes L.ss_cur_g (the ambient
+           lowering point) valid, and ir_home_at() needs that point to honour a
+           RANGED register home: outside [home_lo,home_hi] the value lives in
+           its slot, not the register. With the map absent, ss_cur_g stayed -1,
+           ir_home_at skipped the bounds test and reported the raw assignment
+           everywhere — so a ranged BC home looked whole-function and
+           `ld bc,K` was emitted for a def OUTSIDE the span with no slot store.
+           The value then died at the first call that clobbered BC. Build it
+           here too so the non-lazy render sees the same homes. */
+        int nb = f->n_bbs > 0 ? f->n_bbs : 1;
+        int *nl_op_base = malloc((size_t)nb * sizeof(int));
+        if (nl_op_base) {
+            int t = 0;
+            for (int b = 0; b < f->n_bbs; b++) {
+                nl_op_base[b] = t;
+                t += f->bbs[b].n_ops;
+            }
+            L.ss_op_base = nl_op_base;
+        }
         rc = lower_func_render(rout, f, 0, NULL, bb_hl_out, bb_lowered,
                                bb_pending_out, bb_pred_cnt, bb_preds,
                                bb_alias);
+        L.ss_op_base = NULL;
+        free(nl_op_base);
     } else {
         bb_hl_out_p1 = malloc((size_t)f->n_bbs * sizeof(int));
         /* Snapshot the only operands the lowering loop mutates in place
@@ -4978,7 +5075,9 @@ int ir_lower_func(FILE *out, Func *f)
             marked++;
         }
         free(st_base);
-        if (marked) {
+        /* rout==out means tmpfile() failed: the first render is already in the
+           output and cannot be taken back, so a retry would duplicate it. */
+        if (marked && rout != out) {
             ds_retry_done = 1;
             ir_assign_slots(f);                 /* drop dead slots, recompact */
             L.cur_frameless = frameless_ok(f);
@@ -4994,7 +5093,7 @@ int ir_lower_func(FILE *out, Func *f)
        construction — a dead slot is never addressed, so dropping it and the
        frame shifts nothing that is emitted. The scratch render is discarded. */
     if (deadframe_on() && !df_retry_done && rc == 0
-        && L.frame_fully_dead && f->frame_size > 0) {
+        && L.frame_fully_dead && f->frame_size > 0 && rout != out) {
         df_retry_done = 1;
         /* Clear EVERY slot, not just the PR_SPILL ones. A vreg with a RANGED
            register home (home_lo/home_hi narrower than the whole function)
@@ -5052,9 +5151,10 @@ int ir_lower_func(FILE *out, Func *f)
             if ((tix || tiy) && v[0] == '2') abort();
         }
     }
-    if (elide_labels) {
-        if (rc == 0) emit_dropping_dead_bb_labels(out, rout, max_bb, f);
-        else { rewind(rout); char buf[1024];   /* error path: copy verbatim */
+    if (rout != out) {
+        if (elide_labels && rc == 0)
+            emit_dropping_dead_bb_labels(out, rout, max_bb, f);
+        else { rewind(rout); char buf[1024];   /* verbatim: no elision, or error */
                while (fgets(buf, sizeof buf, rout)) fputs(buf, out); }
         fclose(rout);
     }
