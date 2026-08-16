@@ -5004,6 +5004,36 @@ static int store_order_lhs_shape(Node *lv)
         && (lv->type->ptr || is_register_int_kind(lv->type->kind));
 }
 
+/* Is the LHS address a link-time CONSTANT — a symbol, or a symbol at a constant
+   offset? Then it is rematerialisable in one instruction (`ld hl,_sym+K`) and
+   hoisting is a pessimisation: it makes the address live across the RHS, so the
+   allocator parks it (`ld bc,hl` … `ld hl,bc`) where recomputing was cheaper.
+   Measured: this cost +16 ticks and 2 instructions in the test framework, which
+   is linked into every bench binary, so it showed up as a uniform +16 across 23
+   suites.
+   An aggregate NAME is its address (constant); a scalar name is an rvalue LOAD
+   and is not — which is what keeps `r[i]` (symbol + loaded index) hoistable. */
+static int store_order_addr_is_const(Node *n)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL:
+        return 1;
+    case OP_ADDR: case AST_ADDR:
+        return 1;
+    case AST_GLOBAL_VAR: case AST_LOCAL_VAR:
+        return n->type && (n->type->kind == KIND_ARRAY
+                           || n->type->kind == KIND_STRUCT);
+    case OP_CAST:
+        return store_order_addr_is_const(n->operand);
+    case OP_ADD: case OP_SUB:
+        return store_order_addr_is_const(n->left)
+            && store_order_addr_is_const(n->right);
+    default:
+        return 0;                    /* unknown shape: assume it costs to rebuild */
+    }
+}
+
 /* Does hoisting pay? Only when the stored VALUE is the awkward operand — it
    ends in a call (its result lands in the return registers and must survive the
    address computation) or it is wider than the 2-byte address. Anything else
@@ -5299,6 +5329,7 @@ static int build_assign(Builder *b, Node *n)
     int pre_addr = -1;
     if (storder_on() && n->left && n->right
         && is_side_effect_free(n->left)
+        && !store_order_addr_is_const(n->left)
         && store_order_lhs_shape(n->left)
         && store_order_rhs_pays(b, n))
         pre_addr = build_expr(b, n->left);      /* -1 on failure: fall through */
