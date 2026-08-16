@@ -156,6 +156,54 @@
 	ld	(hl),d
 	ex	de,hl
 
+;; #S1/#S2: the 8085/z80 sp-mode analogue of #G1. Same defect — a word spilled to
+;; a frame slot and read straight back — but the sp-relative address here is two
+;; instructions (`ld hl,N; add hl,sp`), not gbz80's one (`ld hl,sp+N`), so #G1
+;; cannot match it. Untouched by the ix+d rules too, since sp mode has no IX.
+;; Sound because the store leaves BOTH registers exactly as the reload would:
+;; store ends with HL = base+1 (the `inc hl`) and DE still holding the value;
+;; the reload also ends with HL = base+1 and DE = the same value. The only
+;; difference is A, which the reload clobbers and the fold preserves — dropping
+;; a write is always safe. The real fix is to not emit the reload at all (cache
+;; the register after the slot store); these rules exist to size that.
+%title #S1 elide store-then-reload of the same sp-rel word slot, de (-10b)
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ld	hl,%1
+	add	hl,sp
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+=
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+
+%title #S2 elide store-then-reload of the same sp-rel word slot, hl via ex (-10b)
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+	ld	hl,%1
+	add	hl,sp
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,%1
+	add	hl,sp
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+
 %title #284 paired ex de,hl cancellation (-2b, -8t)
 	ex	de,hl
 	ex	de,hl
