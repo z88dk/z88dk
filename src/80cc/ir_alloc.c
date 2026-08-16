@@ -2152,10 +2152,46 @@ static int collect_bc_temp_cands(const Func *f, const int *bb_first_op,
     return nc;
 }
 
+/* [IR_BCPERCAND] Per-candidate replacement for the whole-function BC veto.
+   bc_region_ok is three PER-OP facts (width-4 low-half staging, non-char
+   IR_SWITCH dispatch, IR_ACC_* helpers) promoted to a whole-function
+   disqualification, so one long or one switch anywhere kills BC homing
+   everywhere in the function. op_clobbers already returns the precise per-op
+   answer, and both IY packs already consume it that way. This asks the narrow
+   question instead: does anything inside THIS candidate's live range clobber BC?
+
+   Conservative in two directions on purpose. The live range is the hole-free
+   [start,end], so a value with a hole over the clobber still reads as crossing
+   it (that imprecision is the interference work's problem, not this one), and a
+   candidate is rejected outright if its range is unknown. */
+static int vreg_bc_clean(const Func *f, int v)
+{
+    const LiveRange *lr = ir_live_range(f, v);
+    if (!lr || lr->start < 0) return 0;
+    int g = 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+            if (g < lr->start || g > lr->end) continue;
+            if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) return 0;
+        }
+    return 1;
+}
+
+/* [IR_BCPERCAND=0] Default-on after the matrix: switchbench -1.96%..-5.63% and
+   widthbench -0.14%..-1.43% on all six valid-tick CPUs, every other suite within
+   12 ticks (the shared test.c, both signs); no new aborts over corpus x 10 CPUs x
+   sp/fp; adv_a -4/-6, clisp -59/-8, enigma unchanged. Opt out to revert. */
+static int bcpercand_on(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_BCPERCAND"); on = !(e && e[0] == '0'); }
+    return on;
+}
+
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count,
-                       const long *cost_benefit)
+                       const long *cost_benefit, int vetoed)
 {
     if (opt_disabled("bc-pack")) return;
     if (f->n_vregs <= 0) return;
@@ -2176,6 +2212,14 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     }
     int nc = collect_bc_temp_cands(f, bb_first_op, def_kind, write_count,
                                    use_count, itloc, itlo, ithi, cand);
+    /* [IR_BCPERCAND] In a function the whole-function veto rejected, keep only the
+       candidates whose own live range never crosses a BC clobber. */
+    if (vetoed) {
+        int k = 0;
+        for (int i2 = 0; i2 < nc; i2++)
+            if (vreg_bc_clean(f, cand[i2].vreg)) cand[k++] = cand[i2];
+        nc = k;
+    }
 
     /* 5a: cost-benefit EVICTION, folded into the packer (default ON;
        --opt-disable=bc-evict opts out). The BC pickers give a picker-placed tenant
@@ -3671,6 +3715,36 @@ void ir_alloc(Func *f)
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
+    /* [IR_BCVETO_PROBE] INERT — size the per-op BC veto. bc_region_ok is three
+       per-op facts (width-4 staging, non-char IR_SWITCH dispatch, IR_ACC_*
+       helpers) promoted to a WHOLE-FUNCTION disqualification, so one switch or
+       one long anywhere kills BC homing everywhere in the function. op_clobbers
+       already returns the precise per-op answer, and both IY packs already use it
+       that way ("op_clobbers(o) & IR_R_IY per op across the candidate's live
+       range"). This counts what the precise test would ADMIT that the blunt one
+       rejects: width-2 non-escaping vregs whose own live range never crosses a
+       BC-clobbering op. Upper bound — it ignores the packs' other predicates
+       (write-once, def kind, interference), so real wins are a subset. */
+    if (getenv("IR_BCVETO_PROBE") && !bc_region_ok) {
+        int cands = 0, clean = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            const LiveRange *lr = ir_live_range(f, v);
+            if (!lr || lr->start < 0) continue;
+            cands++;
+            int crosses = 0, g = 0;
+            for (int i = 0; i < f->n_bbs && !crosses; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+                    if (g < lr->start || g > lr->end) continue;
+                    if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) { crosses = 1; break; }
+                }
+            if (!crosses) clean++;
+        }
+        fprintf(stderr, "BCVETO %-22s has_long=%d has_bc_clobber=%d cands=%d bc_clean=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", has_long, has_bc_clobber, cands, clean);
+    }
     /* IR_IYLONG=0 restores the OLD gating (IY packing rides the BC veto), not
        "no IY packing at all" — the opt-out has to be a revert, not a third
        behaviour. */
@@ -4100,9 +4174,9 @@ void ir_alloc(Func *f)
            5a cost-benefit eviction (default on, --opt-disable=bc-evict): it may
            first evict a picker-placed BC tenant that a denser disjoint temp group
            out-benefits, then pack the freed BC. */
-        if (bc_region_ok)
+        if (bc_region_ok || bcpercand_on())
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
-                   write_count, use_count, cost_benefit);
+                   write_count, use_count, cost_benefit, !bc_region_ok);
         /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
            reduction chain in IY (add iy,de), taking the spill losers BC couldn't. */
         if (iy_region_ok)
