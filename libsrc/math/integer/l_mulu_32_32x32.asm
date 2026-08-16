@@ -41,9 +41,13 @@ ELIF __CLIB_OPT_IMATH <= 50
 
 ELIF __CLIB_OPT_IMATH > 50
 
-   EXTERN l_fast_muls_32_32x32, l0_fast_muls_32_32x32
-   defc l_mulu_32_32x32 = l_fast_muls_32_32x32
-   defc l0_mulu_32_32x32 = l0_fast_muls_32_32x32
+   ; Unsigned fast 32x32 has no l0_ kernel (that contract is
+   ; dede'/bcbc'/hlhl'=0, used only by small 64-bit). FAST 64-bit
+   ; and 24x16x8 call l_fast_mulu_* directly. Bind both names to
+   ; the dehl/dehl' unsigned entry so this module still PUBLICs l0_.
+   EXTERN l_fast_mulu_32_32x32
+   defc l_mulu_32_32x32 = l_fast_mulu_32_32x32
+   defc l0_mulu_32_32x32 = l_fast_mulu_32_32x32
 
 ENDIF
 
