@@ -80,6 +80,8 @@ void ir_liveprobe_count_iv(const Func *f, int a, int b, int interval_ans,
    report DECISIONS changed (candidate blocked only by false edges), not just
    edges flipped. */
 void ir_liveprobe_decision_begin(void);
+void ir_liveprobe_decision_begin_site(int site);
+void ir_liveprobe_decision_begin_cand(int site, int v, int lo, int hi);
 void ir_liveprobe_decision_end(void);
 void ir_liveprobe_flush(const char *fn);
 

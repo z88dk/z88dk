@@ -1542,7 +1542,7 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             /* Interval overlap against already-assigned BC vregs, using the
                [lo,hi] each carries in the pool (BC is multi-occupant). */
             int ok = 1;
-            ir_liveprobe_decision_begin();
+            ir_liveprobe_decision_begin_cand(0, v, c->lo, c->hi);
             for (int j = 0; j < n && ok; j++) {
                 if (pool[j].vreg == v) continue;
                 if (f->vreg_to_phys[pool[j].vreg] != IR_PR_BC) continue;
@@ -2202,7 +2202,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 int jlo, jhi;
                 bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
                 int blocks = 0, hotter = 0;
-                ir_liveprobe_decision_begin();
+                ir_liveprobe_decision_begin_site(1);
                 for (int i = 0; i < nc; i++) {                      /* blocks a cand? */
                     if (iv_overlap(f, cand[i].vreg, j,
                                    cand[i].flo, cand[i].fhi, jlo, jhi)) { blocks = 1;
@@ -2232,7 +2232,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 for (int i = 0; i < nc; i++) {
                     if (cand[i].flo <= last) continue;
                     int clash = 0;
-                    ir_liveprobe_decision_begin();
+                    ir_liveprobe_decision_begin_site(2);
                     for (int j = 0; j < f->n_vregs && !clash; j++) {
                         if (f->vreg_to_phys[j] != IR_PR_BC) continue;
                         if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;
@@ -2268,7 +2268,7 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         int v = cand[i].vreg;
         if (cand[i].flo <= last_fhi) continue;   /* overlaps a packed sibling */
         int clash = 0;
-        ir_liveprobe_decision_begin();
+        ir_liveprobe_decision_begin_site(3);
         for (int j = 0; j < f->n_vregs && !clash; j++) {
             if (f->vreg_to_phys[j] != IR_PR_BC) continue;
             if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;   /* our own */
