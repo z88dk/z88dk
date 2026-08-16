@@ -96,18 +96,19 @@ sort-rev-5000     63352461    15.8381 sec
 sort-equ-5000     41378393    10.3446 sec
 
 
-Z88DK March 14, 2022
-classic / zsdcc Build: 4.2.0 #13131
-1711 bytes less page zero
+Z88DK August 16, 2026
+classic / zsdcc 4.6.0 #16639
+1854 bytes less page zero
+Classic qsort now links quicksort (equals is the usual worst case).
 
                cycle count    time @ 4MHz
 
-sort-ran-20          76591     0.0191 sec
-sort-ord-20          48639     0.0122 sec
-sort-rev-20          69357     0.0173 sec
-sort-equ-20          48639     0.0122 sec
+sort-ran-20          51721     0.0129 sec
+sort-ord-20          39379     0.0098 sec
+sort-rev-20          46416     0.0116 sec
+sort-equ-20         121709     0.0304 sec
 
-sort-ran-5000     86069623    21.5174 sec
-sort-ord-5000     37803151     9.4508 sec
-sort-rev-5000     58230674    14.5577 sec
-sort-equ-5000     37803151     9.4508 sec
+sort-ran-5000     40235859    10.0590 sec
+sort-ord-5000     30382407     7.5956 sec
+sort-rev-5000     32248314     8.0621 sec
+sort-equ-5000   6716015259    1679.0038 sec

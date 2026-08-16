@@ -59,7 +59,7 @@ Compiler | CPU  | Library | Ticks
 sccz80   | z80  | math16  |   295_642_916 (Aug 10, 2026; DT=1e-1)
 sccz80   | 8085 | math16  |   344_383_717 (Aug 10, 2026; DT=1e-1)
 sccz80   | z80  | math32  |   797_460_656 (Aug 15, 2026)
-zsdcc    | z80  | math32  |   843_047_242 (Aug 10, 2026)
+zsdcc    | z80  | math32  |   849_403_541 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 1_526_138_871 (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
 sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
@@ -71,15 +71,15 @@ RESULTS (full multi-toolchain archive)
 ======================================
 
 1.
-Z88DK April 28, 2021
-zsdcc #12070 / new c library
-4332 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+4186 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-4)
 
-cycle count  = 2247889896
-time @ 4MHz  = 2247889896 / 4*10^6 = 9 min 22 sec
+cycle count  = 2245295168
+time @ 4MHz  = 2245295168 / 4*10^6 =  9 min 21 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -145,15 +145,15 @@ time @ 4MHz  = 2376486525 / 4*10^6 = 9 min 53 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 7.
-Z88DK April 28, 2021
-zsdcc #12070 / classic
-5246 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic
+4962 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 2253709929
-time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
+cycle count  = 2243368504
+time @ 4MHz  = 2243368504 / 4*10^6 =  9 min 21 sec
 
 8.
 Z88DK August 15, 2026
@@ -170,12 +170,12 @@ IEEE 32-bit float implementation, accurate to 7 significant digits.
 (Truncated high-half 32×32 mantissa mul; suite 16/16.)
 
 8b.
-Z88DK August 10, 2026
-zsdcc / classic / math32
-6597 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic / math32
+6800 bytes less page zero
 
-cycle count  = 843047242
-time @ 4MHz  = 843047242 / 4*10^6 =  3 min 31 sec
+cycle count  = 849403541
+time @ 4MHz  = 849403541 / 4*10^6 =  3 min 32 sec
 
 IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 

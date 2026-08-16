@@ -75,19 +75,19 @@ sccz80   | z80  | 4_769_143
 sccz80   | 8085 | 4_674_469   (Jul 2026)
 80cc     | z80  | 6_560_973   (Jul 2026)
 80cc     | 8085 | 5_607_379   (Jul 2026)
-zsdcc    | z80  | 4_110_873
+zsdcc    | z80  | 4_111_225  (Aug 16, 2026)
 
 
 RESULTS (full multi-toolchain archive)
 ======================================
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-8315 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+8316 bytes less page zero
 
-cycle count  = 3665494
-time @ 4MHZ  = 3665494 / 4*10^6 = 0.9163 sec
+cycle count  = 3679114
+time @ 4MHZ  = 3679114 / 4*10^6 =    0.9 sec
 
 2.
 HITECH C MSDOS V780pl2
@@ -104,12 +104,12 @@ cycle count  = 3714152
 time @ 4MHz  = 3714152 / 4*10^6 = 0.9285 sec
 
 4.
-Z88DK January 5, 2022
-zsdcc #12555 / classic c library
-9177 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+9184 bytes less page zero
 
-cycle count  = 4110873
-time @ 4MHZ  = 4110873 / 4*10^6 = 1.0277 sec
+cycle count  = 4111225
+time @ 4MHZ  = 4111225 / 4*10^6 =    1.0 sec
 
 5.
 HITECH C CPM V309-15

@@ -136,15 +136,15 @@ sort-rev-5000     44873477    11.2184 sec
 sort-equ-5000     40106741    10.0267 sec
 
 3.
-Z88DK March 25, 2017
-zsdcc #9852 / classic c library / shellsort
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library / quicksort
 
                cycle count    time @ 4MHz
 
-sort-ran-5000     85903658    21.4759 sec
-sort-ord-5000     38026708     9.5067 sec
-sort-rev-5000     58261603    14.5654 sec
-sort-equ-5000     38026708     9.5067 sec
+sort-ran-5000     40235859    10.0590 sec
+sort-ord-5000     30382407     7.5956 sec
+sort-rev-5000     32248314     8.0621 sec
+sort-equ-5000   6716015259    1679.0038 sec
 
 4.
 Z88DK March 25, 2017

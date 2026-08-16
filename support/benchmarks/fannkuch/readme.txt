@@ -63,7 +63,7 @@ sccz80   | z80  | 75_381_296
 sccz80   | 8085 | 67_749_895  (Jul 2026)
 80cc     | z80  | 88_892_408  (Jul 2026, -O2 --opt-code-speed)
 80cc     | 8085 | 77_390_398  (Jul 2026)
-zsdcc    | z80  | 59_756_269
+zsdcc    | z80  | 62_181_357  (Aug 16, 2026)
 
 
 RESULTS (full multi-toolchain archive)
@@ -77,12 +77,12 @@ cycle count  = 51982515
 time @ 4MHz  = 51982515 / 4x10^6 = 12.99 seconds
 
 2.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-1070 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+1109 bytes less page zero
 
-cycle count  = 56090095
-time @ 4MHz  = 56090095 / 4*10^6 = 14.02 sec
+cycle count  = 52705234
+time @ 4MHz  = 52705234 / 4*10^6 =   13.2 sec
 
 3.
 HITECH C CPM V309-15
@@ -99,12 +99,12 @@ cycle count  = 56708022
 time @ 4MHz  = 56708022 / 4x10^6 = 14.18 sec
 
 5.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-1304 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+2028 bytes less page zero
 
-cycle count  = 59756269
-time @ 4MHz  = 59756269 / 4*10^6 = 14.94 sec
+cycle count  = 62181357
+time @ 4MHz  = 62181357 / 4*10^6 =   15.5 sec
 
 6.
 SDCC 4.2.0 Linux

@@ -99,15 +99,15 @@ KWIPS        = 100*10*1 / 320.8179 = 3.1148
 MWIPS        = 3.1148 / 1000 = 0.0031148
 
 
-Z88DK January 3, 2022
-classic/zsdcc #12555/math48
+Z88DK August 16, 2026
+classic/zsdcc 4.6.0 #16639/math48
 40 bit mantissa + 8 bit exponent internal, 24 bit mantissa + 8 bit exponent exposed by compiler
-7064 bytes less page zero
+7083 bytes less page zero
 
-cycle count  = 917739704
-time @ 4MHz  = 917739704 / 4x10^6 = 229.4349 seconds
-KWIPS        = 100*10*1 / 230.1954 = 4.3585
-MWIPS        = 4.3585 / 1000 = 0.0043585
+cycle count  = 916750272
+time @ 4MHz  = 916750272 / 4x10^6 = 229.1876 seconds
+KWIPS        = 100*10*1 / 229.1876 = 4.3632
+MWIPS        = 4.3632 / 1000 = 0.0043632
 
 
 Z88DK July 19, 2026

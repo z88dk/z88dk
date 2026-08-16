@@ -78,20 +78,20 @@ the images to address 16384 to see a visual representation.
 RESULT
 ======
 
-Z88DK April 28, 2021
-zsdcc #12070 / classic
-2891 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic
+2771 bytes less page zero
 
-cycle count  = 3766086833
-time @ 4MHz  = 3766086833 / 4*10^6 = 15 min 41 sec
+cycle count  = 3727334560
+time @ 4MHz  = 3727334560 / 4*10^6 =  15 min 32 sec
 
 
-Z88DK August 10, 2026
-zsdcc #15242 / classic / math32
-3689 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic / math32
+3857 bytes less page zero
 
-cycle count  = 1283829412
-time @ 4MHz  = 1283829412 / 4*10^6 =  5 min 21 sec
+cycle count  = 1301251782
+time @ 4MHz  = 1301251782 / 4*10^6 =  5 min 25 sec
 
 
 Z88DK April 28, 2021

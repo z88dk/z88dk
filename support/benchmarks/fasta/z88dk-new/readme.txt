@@ -52,12 +52,12 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
-new/zsdcc #11566
-3171 bytes less page zero
+Z88DK August 16, 2026
+new/zsdcc 4.6.0 #16639
+3148 bytes less page zero
 
-cycle count  = 245055005
-time @ 4MHz  = 245055005 / 4*10^6 = 61.26 sec
+cycle count  = 241744905
+time @ 4MHz  = 241744905 / 4*10^6 =  1 min  0 sec
 
 
 Z88DK April 20, 2020

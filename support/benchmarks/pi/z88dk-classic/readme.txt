@@ -94,9 +94,9 @@ cycle count  = 7569463213
 time @ 4MHz  = 7569463213 / 4*10^6 = 31 min 32 sec
 
 
-Z88DK April 4, 2022
-zsdcc #13131 / classic c library
-7146 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+7175 bytes less page zero
 
-cycle count  = 4013954322
-time @ 4MHz  = 4013954322 / 4*10^6 = 16 min 43 sec
+cycle count  = 4012863322
+time @ 4MHz  = 4012863322 / 4*10^6 =  16 min 43 sec
