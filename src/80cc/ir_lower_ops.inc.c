@@ -1922,7 +1922,8 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             int bc_live = (L.rs.bc >= 0);
             if (!hl_has(op->src[1]))
                 load_to_hl(out, f, op->src[1]);
-            if (bc_live) emit(out, "push\tbc");
+            /* emit_sp: load_byte_to_a uses cur_sp_adjust for slot/TOS reads. */
+            if (bc_live) emit_sp(out, 2, "push\tbc");
             emit(out, "ld\tb,l");
             load_byte_to_a(out, f, op->src[0]);
             emit(out, "inc\tb");
@@ -1933,7 +1934,7 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
             emit(out, "dec\tb");
             emit(out, "jr\tnz,L_f%d_bshl_loop_%d", L.func_emit_idx, n);
             fprintf(out, "L_f%d_bshl_end_%d:\n", L.func_emit_idx, n);
-            if (bc_live) emit(out, "pop\tbc");
+            if (bc_live) emit_sp(out, -2, "pop\tbc");
             else         invalidate_bc_cache();
             return finalize_byte_result(out, f, op, 0);
         }
