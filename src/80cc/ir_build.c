@@ -737,6 +737,15 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
        load/store (no register residency, const-prop or store-forward). */
     if (sym->ctype && sym->ctype->isvolatile)
         b->f->vregs[v].flags |= IR_VREG_VOLATILE;
+    /* A `static` local's storage is its BSS symbol, not the frame — the front
+       end rewrites every ACCESS to the global shape (LD_SYM / sym[] mem ops),
+       so this vreg is never read. Left in place (the symbol map stays total)
+       but denied a slot: without this an aggregate reserves its whole size on
+       the stack and never touches it — pi.c's `static uint16_t r[2801]` cost a
+       dead 5602-byte frame, which also pushed every real temporary past the
+       8085 LDSI offset range, degrading each slot access to `ld hl,N; add hl,sp`. */
+    if (sym->storage == LSTATIC || sym->storage == STATIK)
+        b->f->vregs[v].flags |= IR_VREG_NO_SLOT;
     sym_map_set(b, sym, v);
     return v;
 }
@@ -7128,6 +7137,15 @@ static int build_stmt(Builder *b, Node *n)
                                   "out of int16_t slot range",
                                   n->sym->name, sz);
             int agg_v = new_local_vreg(b, n->sym);
+            /* A `static` aggregate is initialised ONCE, at load time, by the
+               data/BSS emitter — and every access goes through its symbol. The
+               runtime init below would write the initialiser a second time,
+               through LEA on a vreg that has no frame storage. Harmless-looking
+               before (it wrote to a dead stack copy, which is exactly what
+               reserved the object's whole size on the frame); with that copy
+               gone it is a wild store. Skip it: nothing reads what it writes. */
+            if (n->sym->storage == LSTATIC || n->sym->storage == STATIK)
+                return 0;
             if (n->declvar) {
                 int base = new_temp(b, 2);
                 Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
