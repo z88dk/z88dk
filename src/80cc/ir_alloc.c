@@ -2293,10 +2293,19 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
    stack-transient's def and its use (they'd break the push/pop TOS discipline
    or the LIFO balance). ALU/compare/load/store/conv are all fine: the value
    rides the stack across them untouched. */
+/* [IR_PARKCALL] Experiment: is a CALL really a hazard? The pop needs the park at
+   TOS (sp_adj==0). A BALANCED call restores that — the args are pushed ABOVE the
+   park and cleaned before the pop, and cur_sp_adjust is tracked through both. If
+   this holds, sccz80's shape (push addr / call / pop) becomes available. */
 static int stack_spill_span_hazard(OpKind k)
 {
     switch (k) {
     case IR_CALL: case IR_HCALL: case IR_ASM:
+    /* Wide (>4-byte) memory-accumulator ops are helper CALLS too — they carry a
+       HelperInfo just like IR_HCALL. They were missing here, which was invisible
+       while bc_region_ok vetoed the whole pass for such functions; lifting that
+       veto exposed it as a long_ir/longlong hang. */
+    case IR_ACC_BINOP: case IR_ACC_UNOP: case IR_ACC_CMP:
     case IR_LD_FAR: case IR_ST_FAR: case IR_LD_FARSYM:
     case IR_PUSH_ARG: case IR_PUSH_STRUCT:
     case IR_PUSH_DEHL_LONG: case IR_POP_DEHL_LONG:
@@ -4106,6 +4115,23 @@ void ir_alloc(Func *f)
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
            fallback below BC-pack — a single-def/single-use word transient with
            no register free goes on the stack (push/pop) instead of a slot. */
+        /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the
+           register-pressure fallback below BC-pack — a single-def/single-use word
+           transient with no register free goes on the stack (push/pop) instead of
+           a slot.
+
+           NB the bc_region_ok gate is WRONG IN PRINCIPLE and load-bearing in
+           practice. It is a BC veto (has_long: long ops stage the low half THROUGH
+           BC; has_bc_clobber: l_case / dload / dstore) and a park uses no BC at
+           all — it costs 536 of 5523 corpus functions and 509 parks worth −675
+           instructions. But removing it exposed TWO defects the veto was hiding:
+           the wide-accumulator helper calls missing from stack_spill_span_hazard
+           (fixed below — long_ir/longlong hung), and, still open, that the hazard
+           switches on op KIND and never WIDTH, so a park may span a width-4
+           IR_XOR/IR_AND/IR_OR whose lowering pushes both halves (emu.c
+           miscompiles: 146 bytes of output against 194KB). Lifting the veto needs
+           a DERIVED, width-aware span guard, not a longer switch. See
+           STORE_ORDER_PLAN.md. */
         if (bc_region_ok)
         ir_stack_spill(f, bb_first_op, def_kind, write_count);
         /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
