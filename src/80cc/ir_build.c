@@ -4983,11 +4983,13 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 /* LHS = RHS store. Dispatches by destination: bitfield (read-modify-
    write), whole-aggregate struct copy, bare local, global, pointer
    deref — each with int/float/double/_Accum/long long value handling. */
-/* [IR_STORDER] Opt-in while the matrix is pending; gate off is byte-identical. */
+/* [IR_STORDER=0] Default-on after the matrix: corpus x 10 CPUs x sp/fp with no
+   new aborts, corpus ticks unchanged on 23 of 24 suites and sortbench -0.084%,
+   pi faster on all six valid-tick CPUs (-0.27% to -0.80%). Opt out to revert. */
 static int storder_on(void)
 {
     static int on = -1;
-    if (on < 0) on = getenv("IR_STORDER") != NULL;
+    if (on < 0) { const char *e = getenv("IR_STORDER"); on = !(e && e[0] == '0'); }
     return on;
 }
 
