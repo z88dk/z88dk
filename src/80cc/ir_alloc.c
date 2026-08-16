@@ -2337,10 +2337,15 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
    stack-transient's def and its use (they'd break the push/pop TOS discipline
    or the LIFO balance). ALU/compare/load/store/conv are all fine: the value
    rides the stack across them untouched. */
-/* [IR_PARKCALL] Experiment: is a CALL really a hazard? The pop needs the park at
-   TOS (sp_adj==0). A BALANCED call restores that — the args are pushed ABOVE the
-   park and cleaned before the pop, and cur_sp_adjust is tracked through both. If
-   this holds, sccz80's shape (push addr / call / pop) becomes available. */
+/* KNOWN GAP: this switches on op KIND and never WIDTH, so it clears an op whose
+   LOWERING stages through the stack — a width-4 IR_XOR/IR_AND/IR_OR emits
+   `push de; push hl; … cur_sp_adjust += 4`, and a park spanning one is no longer
+   at TOS when popped (emu.c miscompiles). Harmless today only because
+   bc_region_ok vetoes the whole pass for such functions. The fix is to DERIVE
+   this: teach op_clobbers to report IR_R_SP for ops that push (it never sets it
+   for any op today, though instr_effects already does at text level), then test
+   `op_clobbers(o) & (IR_R_SP|IR_R_MEM)` instead of listing kinds. An enumeration
+   has already been wrong twice — IR_ACC_* below, and the width-4 case. */
 static int stack_spill_span_hazard(OpKind k)
 {
     switch (k) {
