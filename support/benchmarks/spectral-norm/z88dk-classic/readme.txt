@@ -22,7 +22,7 @@ sccz80/classic/8085/math32
 zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos -create-app
 
 80cc/classic/math32
-zcc +test -compiler=80cc -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos
 
 80cc/classic/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos
@@ -57,7 +57,8 @@ sccz80/classic/8085/math16
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math16 -lmath32_8085 -lndos -m
 
 80cc/classic/math32
-zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
 
 80cc/classic/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
@@ -135,14 +136,14 @@ cycle count  = 7938950247
 time @ 4MHz  = 7938950247 / 4*10^6 =  33 min  5 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 18, 2026
 80cc / classic c library / math32
-5975 bytes less page zero
+6416 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4327691495
-time @ 4MHz  = 4327691495 / 4*10^6 =  18 min  2 sec
+cycle count  = 4962667851
+time @ 4MHz  = 4962667851 / 4*10^6 =  20 min 41 sec
 
 
 Z88DK August 15, 2026

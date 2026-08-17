@@ -22,7 +22,7 @@ classic/sccz80/8085/math32
 zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1 -create-app
 
 classic/80cc/math32
-zcc +test -compiler=80cc -vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DPRINTF -O2 fasta.c -o fasta --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
@@ -51,7 +51,8 @@ classic/sccz80/8085/math32
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/80cc/math32
-zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
@@ -118,12 +119,12 @@ cycle count  = 185985608
 time @ 4MHz  = 185985608 / 4*10^6 =   46.5 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 18, 2026
 classic/80cc/math32
-5326 bytes less page zero
+5579 bytes less page zero
 
-cycle count  = 151392422
-time @ 4MHz  = 151392422 / 4*10^6 =   37.8 sec
+cycle count  = 173739114
+time @ 4MHz  = 173739114 / 4*10^6 =   43.4 sec
 
 
 Z88DK August 15, 2026

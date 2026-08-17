@@ -73,7 +73,7 @@ Compiler | CPU  | Ticks
 ---------|------|------------
 sccz80   | z80  | 4_769_143
 sccz80   | 8085 | 4_674_469   (Jul 2026)
-80cc     | z80  | 6_560_973   (Jul 2026)
+80cc     | z80  | 4_720_020   (Aug 18, 2026, -fframe-pointer)
 80cc     | 8085 | 5_607_379   (Jul 2026)
 zsdcc    | z80  | 4_111_225  (Aug 16, 2026)
 
@@ -150,12 +150,12 @@ cycle count  = 4674469
 time @ 4MHz  = 4674469 / 4*10^6 = 1.1686 sec
 
 9.
-Z88DK July 20, 2026
+Z88DK August 18, 2026
 80cc / classic c library
-9295 bytes less page zero
+9214 bytes less page zero
 
-cycle count  = 6560973
-time @ 4MHz  = 6560973 / 4*10^6 = 1.6402 sec
+cycle count  = 4720020
+time @ 4MHz  = 4720020 / 4*10^6 = 1.1800 sec
 
 10.
 Z88DK July 20, 2026

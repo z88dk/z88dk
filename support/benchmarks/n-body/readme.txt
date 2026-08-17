@@ -63,7 +63,7 @@ zsdcc    | z80  | math32  |   849_403_541 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 1_526_138_871 (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 1_835_079_611  (Jul 2026)
 sccz80   | 8085 | mbf32   | 1_849_800_062  (Jul 2026)
-80cc     | z80  | math32 |   809_194_132 (Aug 15, 2026)
+80cc     | z80  | math32 |   871_106_763 (Aug 18, 2026, -fframe-pointer)
 80cc     | 8085 | math32 |   1_519_413_292 (Aug 15, 2026)
 
 
@@ -184,12 +184,12 @@ IEEE 32-bit float implementation (math32_8085), accurate to 7 significant digits
 Energy: -0.1690752 / -0.1690808 (N=1000).
 
 9b.
-Z88DK August 15, 2026
+Z88DK August 18, 2026
 80cc / classic / math32
-8039 bytes less page zero
+9409 bytes less page zero
 
-cycle count  = 809194132
-time @ 4MHz  = 809194132 / 4*10^6 =  3 min 22 sec
+cycle count  = 871106763
+time @ 4MHz  = 871106763 / 4*10^6 =  3 min 38 sec
 
 IEEE 32-bit float implementation.
 

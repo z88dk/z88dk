@@ -147,7 +147,7 @@ sccz80   | 8085 | mbf32   | 548_321_291     | 7.2950  (Jul 2026)
 80cc     | z80  | mbf32   | 558_782_473     | 7.1584  (Jul 2026)
 80cc     | 8085 | mbf32   | 561_486_320     | 7.1240  (Jul 2026)
 sccz80   | z80  | genmath | 1_284_172_870   | 3.1148
-80cc     | z80  | math32  | 368_538_024               | 10.8537  (Aug 15, 2026)
+80cc     | z80  | math32  | 384_480_584               | 10.4036  (Aug 18, 2026, -fframe-pointer)
 80cc     | 8085 | math32  | 667_692_507               | 5.9908  (Aug 15, 2026)
 
 
@@ -289,15 +289,15 @@ KWIPS        = 100*10*1 / 165.9068 = 6.0275
 MWIPS        = 6.0275 / 1000 = 0.0060275
 
 11b.
-Z88DK August 15, 2026
+Z88DK August 18, 2026
 80cc / classic c library / math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-12530 bytes less page zero
+14145 bytes less page zero
 
-cycle count  = 368538024
-time @ 4MHz  = 368538024 / 4x10^6 = 92.1345 seconds
-KWIPS        = 100*10*1 / 92.1345 = 10.8537
-MWIPS        = 10.8537 / 1000 = 0.0108537
+cycle count  = 384480584
+time @ 4MHz  = 384480584 / 4x10^6 = 96.1201 seconds
+KWIPS        = 100*10*1 / 96.1201 = 10.4036
+MWIPS        = 10.4036 / 1000 = 0.0104036
 
 11c.
 Z88DK August 15, 2026

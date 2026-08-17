@@ -55,7 +55,7 @@ sccz80   | 8085 | math16  | 3_438_830_098 (Aug 10, 2026)
 sccz80   | z80  | math32  | 4_225_897_043 (Aug 15, 2026)
 zsdcc    | z80  | math32  | 4_438_922_816 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 7_938_950_247 (Aug 15, 2026)
-80cc     | z80  | math32  | 4_327_691_495 (Aug 15, 2026)
+80cc     | z80  | math32  | 4_962_667_851 (Aug 18, 2026, -fframe-pointer)
 80cc     | 8085 | math32  | 7_955_869_788 (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 6_346_228_466   (Jul 2026)
 sccz80   | 8085 | mbf32   | 6_227_757_878   (Jul 2026)
@@ -193,14 +193,14 @@ cycle count  = 7938950247
 time @ 4MHz  = 7938950247 / 4*10^6 =  33 min  5 sec
 
 12.
-Z88DK August 15, 2026
+Z88DK August 18, 2026
 80cc / classic c library / math32
-5975 bytes less page zero
+6416 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4327691495
-time @ 4MHz  = 4327691495 / 4*10^6 =  18 min  2 sec
+cycle count  = 4962667851
+time @ 4MHz  = 4962667851 / 4*10^6 =  20 min 41 sec
 
 13.
 Z88DK August 15, 2026

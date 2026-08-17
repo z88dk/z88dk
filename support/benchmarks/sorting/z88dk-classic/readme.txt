@@ -51,7 +51,9 @@ classic/zsdcc
 zcc +test -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ran-20.bin -lndos -m
 
 classic/80cc
-zcc +test -compiler=80cc -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -O2 sort.c -o sort-ran-20.bin -lndos -m
+zcc +test -compiler=80cc -vn -fframe-pointer -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -O2 sort.c -o sort-ran-20.bin -lndos -m
+# Same flags for STYLE=0..3 and NUM=20/5000.
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
 
 zcc +test -vn -DTIMER -DSTYLE=1 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ord-20.bin -lndos -m
 zcc +test -vn -DTIMER -DSTYLE=2 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-rev-20.bin -lndos -m
@@ -118,9 +120,9 @@ sort-rev-5000     32248314     8.0621 sec
 sort-equ-5000   6716015259    1679.0038 sec
 
 
-Z88DK August 17, 2026
+Z88DK August 18, 2026
 classic / 80cc
-1907 bytes less page zero
+1933 bytes less page zero
 Classic qsort (equals is the usual worst case).
 80cc + -clib=8085 does not link qsort.
 

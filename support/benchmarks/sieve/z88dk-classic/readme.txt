@@ -32,7 +32,8 @@ sccz80/classic/8085
 zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
 
 80cc/classic
-zcc +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+zcc +test -compiler=80cc -vn -fframe-pointer -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
 
 80cc/classic/8085
 zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
@@ -77,12 +78,12 @@ cycle count  = 4674469
 time @ 4MHz  = 4674469 / 4*10^6 = 1.1686 sec
 
 
-Z88DK July 20, 2026
+Z88DK August 18, 2026
 80cc / classic c library
-9295 bytes less page zero
+9214 bytes less page zero
 
-cycle count  = 6560973
-time @ 4MHz  = 6560973 / 4*10^6 = 1.6402 sec
+cycle count  = 4720020
+time @ 4MHz  = 4720020 / 4*10^6 = 1.1800 sec
 
 
 Z88DK July 20, 2026

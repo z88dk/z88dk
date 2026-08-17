@@ -34,6 +34,7 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt.bin --math-mbf
 
 classic/80cc
 zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+# Do not add -fframe-pointer: mbf32 clobbers IX.
 
 classic/80cc/8085
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1

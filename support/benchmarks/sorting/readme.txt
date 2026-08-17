@@ -61,9 +61,9 @@ sort-rev-20          46416     0.0116 sec
 sort-equ-20         121709     0.0304 sec
 
 3b.
-Z88DK August 17, 2026
+Z88DK August 18, 2026
 80cc / classic c library / quicksort
-1907 bytes less page zero
+1933 bytes less page zero
 
                cycle count    time @ 4MHz
 
