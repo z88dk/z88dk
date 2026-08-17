@@ -1642,6 +1642,25 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         cache_dehl(vreg_id);
         return;
     }
+    /* 8085 sp-relative long load: LDSI + LHLX per half, the extended-op
+       analogue of the Rabbit/kc160 path above. Read the LOW half first so it
+       can go straight to BC (the DEHL cache invariant) while DE is still free
+       to address the high half — 52c/9B against the byte walk's 66c/11B, and
+       60c/11B against 74c/13B when HL has to end up holding the low half.
+       A is untouched either way. LDSI's offset is an unsigned byte. */
+    if (IS_8085() && !opt_disabled("lhlx-long") && off >= 0 && off + 2 <= 255) {
+        emit(out, "ld\tde,sp+%d", off);
+        emit(out, "ld\thl,(de)");    /* HL = low half */
+        emit(out, "ld\tbc,hl");      /* BC = low half (cache invariant) */
+        emit(out, "ld\tde,sp+%d", off + 2);
+        emit(out, "ld\thl,(de)");    /* HL = high half */
+        emit(out, "ex\tde,hl");      /* DE = high half, HL = the address */
+        if (!no_hl)
+            emit(out, "ld\thl,bc");  /* HL = low half */
+        hl_about_to_change(no_hl ? -1 : vreg_id);
+        cache_dehl(vreg_id);
+        return;
+    }
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
     load_byte_adv(out, "c", 0);     /* C = byte 0 */
@@ -1739,6 +1758,26 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
             emit(out, "ld\t(sp+%d),hl", off + 2);
             emit(out, "ex\tde,hl");
         }
+        return;
+    }
+    /* 8085 sp-relative long store: SHLX the HIGH half, byte-walk the low one
+       DOWNWARDS. Only the high half can go through SHLX — the exit contract is
+       DE = high half, and SHLX wants the address in DE, so a second `ld (de),hl`
+       would leave DE holding an address instead of the value. Storing the high
+       half first and swapping back recovers DE (`ex de,hl` after the store puts
+       the value back), and the low half's two bytes go out through HL, which
+       reads B and C without disturbing DE. 62c/11B against 74c/13B.
+       A is untouched. LDSI's offset is an unsigned byte. */
+    if (IS_8085() && !opt_disabled("lhlx-long") && off >= 0 && off + 2 <= 255) {
+        emit(out, "ld\tbc,hl");          /* BC = low half (contract) */
+        emit(out, "ex\tde,hl");          /* HL = high half */
+        emit(out, "ld\tde,sp+%d", off + 2);
+        emit(out, "ld\t(de),hl");        /* slot+2..3 = high half */
+        emit(out, "ex\tde,hl");          /* DE = high half again (contract) */
+        emit(out, "dec\thl");            /* HL = &slot+1 */
+        emit(out, "ld\t(hl),b");         /* slot+1 = low half, high byte */
+        emit(out, "dec\thl");            /* HL = &slot+0 */
+        emit(out, "ld\t(hl),c");         /* slot+0 = low half, low byte */
         return;
     }
     /* Stash low half (HL) into BC so HL is free for slot addressing (BC is
