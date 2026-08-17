@@ -22,7 +22,7 @@
 #define ALUiXY_TICKS   (isez80() ? 3 : israbbit4k() ? 9 : israbbit() ? 7 : isr800() ? 5 : iskc160() ? 4 :                 15)
 #define ALUn_TICKS     (isez80() ? 2 :                    israbbit() ? 4 : isr800() ? 2 : iskc160() ? 1 : isgbz80() ? 8 :  7)
 
-#define LDrr_TICKS     (isez80() ? 1                    : israbbit() ? 2 : isr800() ? 1 : iskc160() ? 1 : isgbz80() ? 4 : is8080() ? 5 : 4 )
+#define LDrr_TICKS     (isez80() ? 1                    : israbbit() ? 2 : isr800() ? 1 : iskc160() ? 1 : isgbz80() ? 4 : (is8080()||isvm1()) ? 5 : 4 )
 
 #define CBr_TICKS      (isez80() ? 2                    : israbbit() ? 4 : isr800() ? 2 : iskc160() ? 2 : isz180() ? 7 : 8)
 
@@ -85,35 +85,43 @@
           t= get_memory_inst(pc++),         \
           put_memory(((t^128)-128+(b|a<<8))&65535, get_memory_inst(pc++))
 
+/* KR580VM1 OF (PSW bit 5): signed overflow of the last 8 bit ALU result.
+   It shares the slot the 8085 uses for K, which every ALU macro already
+   maintains. Logic ops leave OF alone; arithmetic ops recompute it. */
+#define VM1_OF_ARITH()  (isvm1() ? (fk = ((fr ^ fa) & (fr ^ fb)) >> 7 & 1) : (fk = 0))
+#define VM1_OF_LOGIC()  do { if (!isvm1()) fk = 0; } while (0)
+/* For CP, which never wrote fk: leave the 8085's K flag alone. */
+#define VM1_OF_ONLY()   do { if (isvm1()) fk = ((fr ^ fa) & (fr ^ fb)) >> 7 & 1; } while (0)
+
 #define INCW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : isr800() ? 2 : iskc160() ? 1 : 6, \
+          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6, \
           ++b || a++, \
           fk = (a|b) == 0 ? 1 : 0
 
 #define DECW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : isr800() ? 2 : iskc160() ? 1 : 6, \
+          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 2 : iskc160() ? 1 : 6, \
           b-- || a--, \
           fk = (a&b) == 0xff ? 1 : 0
 
 #define INC(r,r_) do {               \
-          st +=isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1  : iskc160() ? 1 : 4; \
+          st +=isez80() ? 1 : israbbit() ? 2 : (is8080()||isvm1()) ? 5 : isr800() ? 1  : iskc160() ? 1 : 4; \
           if (altd) {             \
             ff_= ff_&256            \
-                | (fr_= r_= (fa_= (alts ? r_ : r))+(fb_= 1)), fk = 0; \
+                | (fr_= r_= (fa_= (alts ? r_ : r))+(fb_= 1)), VM1_OF_ARITH(); \
           } else {                \
             ff= ff&256            \
-                | (fr= r= (fa= (alts ? r_ : r))+(fb= 1)), fk = 0; \
+                | (fr= r= (fa= (alts ? r_ : r))+(fb= 1)), VM1_OF_ARITH(); \
           }                       \
         } while (0)
 
 #define DEC(r,r_) do {                \
-          st +=isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : isr800() ? 1 : iskc160() ? 1 : 4; \
+          st +=isez80() ? 1 : israbbit() ? 2 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : 4; \
           if (altd) {          \
             ff_= ff_&256           \
-                | (fr_= r_= (fa_= (alts ? r_ : r))+(fb_= -1)), fk = 0; \
+                | (fr_= r_= (fa_= (alts ? r_ : r))+(fb_= -1)), VM1_OF_ARITH(); \
           } else {             \
             ff= ff&256           \
-                | (fr= r= (fa= (alts ? r_ : r))+(fb= -1)), fk = 0; \
+                | (fr= r= (fa= (alts ? r_ : r))+(fb= -1)), VM1_OF_ARITH(); \
           }                    \
         } while (0)
 
@@ -122,11 +130,11 @@
           if (altd) {           \
             fa_= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff_= ff_&256          \
-                | (fr_= put_memory(t,fa_+(fb_=1))), fk = 0; \
+                | (fr_= put_memory(t,fa_+(fb_=1))), VM1_OF_ARITH(); \
           } else {              \
             fa= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff= ff&256          \
-                | (fr= put_memory(t,fa+(fb=1))), fk = 0; \
+                | (fr= put_memory(t,fa+(fb=1))), VM1_OF_ARITH(); \
           }                      \
         } while(0)
 
@@ -135,11 +143,11 @@
           if (altd) {           \
             fa_= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff_= ff_&256          \
-                | (fr_= put_memory(t,fa_+(fb_=-1))), fk = 0; \
+                | (fr_= put_memory(t,fa_+(fb_=-1))), VM1_OF_ARITH(); \
           } else {              \
             fa= get_memory_data(t= (get_memory_inst(pc++)^128)-128+(b|a<<8)), \
             ff= ff&256          \
-                | (fr= put_memory(t,fa+(fb=-1))), fk = 0; \
+                | (fr= put_memory(t,fa+(fb=-1))), VM1_OF_ARITH(); \
           }                     \
         } while (0)
 
@@ -216,35 +224,35 @@
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)); \
           else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)); \
-          fk = 0; \
+          VM1_OF_ARITH(); \
       } while (0)
 
 #define ADC(b, n)  do {         \
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= b)+(ff_>>8&1)); \
           else fr= a= (ff= (fa= (alts?a_:a))+(fb= b)+(ff>>8&1)); \
-          fk = 0; \
+          VM1_OF_ARITH(); \
         } while (0)
 
 #define SUB(b, n)  do {         \
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+1); \
           else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+1); \
-          fk = 0; \
+          VM1_OF_ARITH(); \
         } while (0)
 
 #define SBC(b, n) do {             \
           st+= n;               \
           if ( altd ) fr_= a_= (ff_= (fa_= (alts?a_:a))+(fb_= ~b)+(ff_>>8&1^1)); \
           else fr= a= (ff= (fa= (alts?a_:a))+(fb= ~b)+(ff>>8&1^1)); \
-          fk = 0; \
+          VM1_OF_ARITH(); \
         } while (0)
 
 #define AND(b, n) do {          \
           st+= n;               \
           if ( altd ) { fa_= ~(a_= ff_= fr_= (alts?a_:a)&b); fb_= 0;} \
           else { fa= ~(a= ff= fr= (alts?a_:a)&b);  fb= 0; } \
-          fk = 0; \
+          VM1_OF_LOGIC(); \
       } while (0)
 
 
@@ -260,7 +268,7 @@
               | (ff= fr= a= (alts?a_:a)^b);     \
             fb= 0;                   \
           }                          \
-          fk = 0; \
+          VM1_OF_LOGIC(); \
         } while (0)
 
 #define OR(b, n) do {                  \
@@ -274,7 +282,7 @@
               | (ff= fr= a= (alts?a_:a)|b);       \
             fb= 0;                     \
           } \
-          fk = 0; \
+          VM1_OF_LOGIC(); \
         } while (0)
 
 
@@ -294,6 +302,7 @@
                 | b   &  40;    \
             fr&= 255;           \
           }                     \
+          VM1_OF_ONLY();         \
         } while (0)
 
 #define RET(n) do {             \
@@ -306,9 +315,9 @@
 #define RETC(c) do {            \
           ioi=ioe=0;            \
           if(c)                 \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  iskc160() ? 2 : 5;             \
+            st+= isez80() ? 2 : israbbit() ? 2 : (is8080()||isvm1()) ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 :  iskc160() ? 2 : 5;             \
           else                  \
-            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 : iskc160() ? 5 : 11,            \
+            st+= isez80() ? 6 : israbbit() ? 8 : (is8080()||isvm1()) ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 : iskc160() ? 5 : 11,            \
             mp= get_memory_data(sp++),      \
             pc= mp|= get_memory_data(sp++)<<8; \
         } while (0) 
@@ -316,11 +325,11 @@
 #define RETCI(c) do {           \
           ioi=ioe=0;            \
           if(c)                 \
-            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 : iskc160() ? 5 : 11,            \
+            st+= isez80() ? 6 : israbbit() ? 8 : (is8080()||isvm1()) ? 11 : is8085() ? 12 : isgbz80() ? 8 : isz180() ? 10 : isr800() ? 3 : iskc160() ? 5 : 11,            \
             mp= get_memory_data(sp++),      \
             pc= mp|= get_memory_data(sp++)<<8; \
           else                  \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 2 : 5; \
+            st+= isez80() ? 2 : israbbit() ? 2 : (is8080()||isvm1()) ?  5 : is8085() ?  6 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 2 : 5; \
         } while (0)
 
 #define PUSH(a, b, a_, b_) do {         \
@@ -365,7 +374,7 @@
 #define CALLC(c)  do  {         \
           ioi=ioe=0;            \
           if(c)                 \
-            st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : is8080() ? 11 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10,            \
+            st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : (is8080()||isvm1()) ? 11 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10,            \
             pc+= 2;             \
           else                  \
             st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : isr800() ? 5 : iskc160() ? 6 : 17,            \
@@ -384,7 +393,7 @@
             put_memory(--sp,t>>8),    \
             put_memory(--sp,t);    \
           else                  \
-            st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : is8080() ? 11 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10,            \
+            st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : (is8080()||isvm1()) ? 11 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10,            \
             pc+= 2;              \
         } while (0)
 
@@ -398,7 +407,7 @@
 
 #define EXSPI(a, b) do {        \
           ioi=ioe=0;            \
-          st+= isez80() ? 5 : israbbit() ? 13 : isz180() ? 16 : is8080() ? 18 : is8085() ? 16 : isr800() ? 4 : iskc160() ? 5 : 19, \
+          st+= isez80() ? 5 : israbbit() ? 13 : isz180() ? 16 : (is8080()||isvm1()) ? 18 : is8085() ? 16 : isr800() ? 4 : iskc160() ? 5 : 19, \
           t= get_memory_data(sp),    \
           put_memory(sp++,b),   \
           b= t,                 \
@@ -840,6 +849,23 @@ int f(void){
             | pv            // bit 2 parity
             | pv >> 1       // bit 1 v (cheat)
             ;
+    } else if ( isvm1() ) {
+        // bit 0 = carry
+        // bit 1 = 1
+        // bit 2 = P (parity, 8080 style - never overflow)
+        // bit 3 = MF, the current data bank
+        // bit 4 = AC half carry
+        // bit 5 = OF, signed overflow of the last 8 bit ALU op
+        // bit 6 = Z
+        // bit 7 = S sign flag
+        return  ff & 128  // S bit 7
+                | 0x02      // bit 1 always set
+                | ff >> 8 & 1 // C bit 0, so value 256
+                | !fr << 6    // Z, bit 6
+                | fk << 5     // OF, bit 5
+                | (vm1_mf ? 8 : 0) // MF, bit 3
+                | (fr ^ fa ^ fb ^ fb >> 8) & 16 // AC (half carry) bit 4
+                | (154020 >> ((fr ^ fr >> 4) & 15)) & 4; // P bit 2
     } else if ( is8080() && !c_z80asm_tests ) {
         // bit 0 = carry
         // bit 1 = 1
@@ -931,10 +957,11 @@ void setf(int a){
     // bit 5 = copy of A
     // bit 6 = Z
     // bit 7 = S sign flag
+    if ( isvm1() ) vm1_mf = (a >> 3) & 1;   // VM1 bank select lives in the PSW
     fr= ~a & 64;
     ff= a|= a<<8;
     fa= 255 & (fb= a & -129 | (a&4)<<5);
-    fk= (a&0x20)>>5;  // 8085 flag
+    fk= (a&0x20)>>5;  // 8085 K flag / VM1 OF flag
 }
 
 // get each of the flags as bools, pass f() or f_() as argument
@@ -974,7 +1001,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
     } 
 
 
-    if( intr && st>stint && ih && (alts == 0 && altd == 0 && ioi == 0 && ioe == 0)){
+    if( intr && st>stint && ih && (alts == 0 && altd == 0 && ioi == 0 && ioe == 0 && vm1_prefix_pending() == 0)){
       stint= st+intr;
       if( iff ){
         halted && (pc++, halted= 0);
@@ -1042,7 +1069,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           alts = 0;
           st += 2;
         } else {
-          st+= is8080() ? 7 : is8085() ? 5 : isz180() ? 3 : iskc160() ? 2 : 4;
+          st+= (is8080()||isvm1()) ? 7 : is8085() ? 5 : isz180() ? 3 : iskc160() ? 2 : 4;
           halted= 1;
           pc--;
           altd=0,alts=0;ioi=0;ioe=0;
@@ -1168,7 +1195,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           INCW(xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x33: // INC SP
-        st+= isez80() ? 1 : isgbz80() ? 8 : is8080() ? 5 : isr800() ? 1 : iskc160() ? 1 : 6;
+        st+= isez80() ? 1 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : 6;
         sp++;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x0b: // DEC BC / (R4K) LDF (lmn),BCDE LDF (lmn),JKHL
@@ -1191,7 +1218,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           DECW(xh, xl);
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x3b: // DEC SP
-        st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : isr800() ? 1 : iskc160() ? 1 : 6;
+        st+= isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 1 : 6;
         sp--;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x04: // INC B
@@ -1422,6 +1449,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x09: // ADD HL,BC // ADD IX,BC // ADD IY,BC
+        if ( vm1_mb ) { vm1_dadc(b, c); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }  // (VM1) CS DAD
         if( ih ) {
           if ( altd ) ADDRRRR_ALTD(h, l, b, c, h_, l_);
           else ADDRRRR(h, l, b, c);
@@ -1434,6 +1462,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x19: // ADD HL,DE // ADD IX,DE // ADD IY,DE
+        if ( vm1_mb ) { vm1_dadc(d, e); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }  // (VM1) CS DAD
         if( ih ) {
           if ( altd ) ADDRRRR_ALTD(h, l, d, e, h_, l_);
           ADDRRRR(h, l, d, e);
@@ -1446,6 +1475,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x29: // ADD HL,HL // ADD IX,IX // ADD IY,IY
+        if ( vm1_mb ) { vm1_dadc(h, l); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }  // (VM1) CS DAD
         if( ih ) {
           if ( altd ) ADDRRRR_ALTD(h, l, h, l, h_, l_);
           else ADDRRRR(h, l, h, l);
@@ -1458,6 +1488,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x39: // ADD HL,SP // ADD IX,SP // ADD IY,SP
+        if ( vm1_mb ) { vm1_dadc(sp >> 8, sp & 0xff); ih=1;altd=0,alts=0;ioi=0;ioe=0;break; }  // (VM1) CS DAD
         if( ih ) {
           if ( altd ) ADDISP_ALTD(h, l, h_, l_);
           else ADDISP(h, l);
@@ -1470,7 +1501,8 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x18: // JR
-        if ( is8085() ) { // (8085) RL DE (RDEL)
+        if ( isvm1() ) vm1_dsub(d, e);   // (VM1) SUB/SBC HL,DE (DSUB D)
+        else if ( is8085() ) { // (8085) RL DE (RDEL)
           long long savest = st;
           RL(e,e);
           RL(d,d);
@@ -1486,6 +1518,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x20: // JR NZ,s8
         if ( is8085() ) i8085_rim(opc); // (8085) RIM
+        else if ( isvm1() ) vm1_memop(opc);  // (VM1) (HL) <- (HL) OR A (ORX)
         else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 opcode JR NZ\n",pc-1);
           st+=4;
@@ -1494,6 +1527,11 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
         if ( is8085() ) i8085_ld_de_hln(opc);  // (8085) ld de,hl+nn (LDHI)
+        else if ( isvm1() ) {                  // (VM1) MB/CS prefix
+          t = get_memory_inst(pc);
+          if ( t == 0x00 || t == 0x7f ) vm1_smf(t == 0x00 ? 0 : 1);  // SMF0/SMF1
+          else { vm1_mb_prefix(); break; }
+        }
         else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR Z\n",pc-1);
           st+=4;
@@ -1501,6 +1539,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x30: // JR NC,s8
         if ( is8085() ) i8085_sim(opc); // (8085) SIM
+        else if ( isvm1() ) vm1_memop(opc);  // (VM1) (HL) <- (HL) XOR A (XRX)
         else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR NC\n",pc-1);
           st+=4;
@@ -1508,6 +1547,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x38: // JR C,s8
         if ( is8085() ) i8085_ld_de_spn(opc);  // (8085) LD DE,SP+nn (LDSI)
+        else if ( isvm1() ) { vm1_rs_prefix(); break; }   // (VM1) RS prefix
         else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode JR C\n",pc-1);
           st+=4;
@@ -1515,6 +1555,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x08: // EX AF,AF'
         if ( is8085() ) i8085_sub_hl_bc(opc);  // (8085) SUB HL,BC (DSUB)
+        else if ( isvm1() ) vm1_dsub(b, c);    // (VM1) SUB/SBC HL,BC (DSUB B)
         else if ( is8080()) {
           printf("%04x: ILLEGAL 8080 opcode EX AF,AF\n",pc-1);
           st+= 4;
@@ -1542,6 +1583,9 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 opcode DJNZ\n",pc-1);
           st+=4;
+          break;
+        } else if ( isvm1() ) {    // (VM1) (HL) <- (HL) AND A (ANX)
+          vm1_memop(opc);
           break;
         } else if ( is8085() ) {   // (8085) SRA HL (ARHL)
           SRA(h,h);
@@ -2988,6 +3032,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xd9: // EXX
         if ( is8085() ) i8085_ld_ide_hl(opc);  // (8085) ld (de),hl (SHLX)
+        else if ( isvm1() ) vm1_shlx();        // (VM1) ld (de),hl (SHLX)
         else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 instruction EXX\n",pc-1);
         } else if ( isgbz80() ) {  // RETI
@@ -3024,7 +3069,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xe9: // JP (HL)
-        st+= isez80() ? 3 : isz180() ? 3 : is8085() ? 6 : is8080() ? 5 : isr800() ? 1 : iskc160() ? 2 : 4;
+        st+= isez80() ? 3 : isz180() ? 3 : is8085() ? 6 : (is8080()||isvm1()) ? 5 : isr800() ? 1 : iskc160() ? 2 : 4;
         if( ih )
           pc= l | h<<8;
         else if( iy )
@@ -3033,7 +3078,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           pc= xl | xh<<8;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xf9: // LD SP,HL
-        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 4 : is8085() ? 6  : is8080() ? 5 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 1 : 6;
+        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 4 : is8085() ? 6  : (is8080()||isvm1()) ? 5 : isgbz80() ? 8 : isr800() ? 1 : iskc160() ? 1 : 6;
         if( ih )
           sp= (alts ? l_ : l) | (alts ? h_ : h)<<8;
         else if( iy )
@@ -3044,7 +3089,8 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0xdd: // OP DD // (8085) JP NK,nnnn //  (R4K) LD BCDE, PX, LD JKHL,PX
         if ( is8085() ) { // (8085) JP NK,nnnn (JNK nnnn)
           JPC(fk);
-        } else if ( is8080() ) {
+        } else if ( isvm1() ) vm1_dcmp(d, e);   // (VM1) CP HL,DE (DCMP D)
+        else if ( is8080() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xDD\n",pc-1);
         } else if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 prefix 0xDD\n",pc-1);
@@ -3057,7 +3103,8 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0xfd: // OP FD // (8085) JP K,nnnn // (R4K) LD BCDE,PZ, LD JKHL,PZ
         if ( is8085() ) { // (8085) JP K,nnnn (JK nnnn)
           JPCI(fk);
-        } else if ( is808x() ) {
+        } else if ( isvm1() ) vm1_jof();        // (VM1) JP OF,nnnn (JOF)
+        else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xFD\n",pc-1);
         } else if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 prefix 0xFD\n",pc-1);
@@ -3070,6 +3117,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         break;
       case 0xcb: // OP CB
 		if ( is8085() ) i8085_rstv(opc); 		// (8085) RSTV, OVRST8
+		else if ( isvm1() ) vm1_dcmp(b, c);     // (VM1) CP HL,BC (DCMP B)
 		else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xCB\n",pc-1);
         } else {
@@ -3079,6 +3127,9 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
       case 0xed: // OP ED // (8085) LD HL,(DE) // (R4K) LD BCDE,PY, LD JKHL, PY
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
           if ( get_memory_inst(pc) != 0xfe) i8085_ld_hl_ide(opc);
+          else handle_ed_page(); // Just for the hook code
+        } else if ( isvm1() ) { // (VM1) LD HL,(DE) (LHLX)
+          if ( get_memory_inst(pc) != 0xfe) vm1_lhlx();
           else handle_ed_page(); // Just for the hook code
         } else if ( is8080() ) {
           if ( get_memory_inst(pc) == 0xfe) handle_ed_page();
@@ -3090,6 +3141,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         else handle_ed_page();
         ih=1;altd=0,alts=0;ioi=0;ioe=0;//break;
     }
+    if ( isvm1() ) vm1_prefix_step();
   } while ( pc != end && st < counter  );
 
   /* Default -end is 0; +test programs leave 0000 after the first JP.
