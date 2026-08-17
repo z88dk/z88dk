@@ -4200,6 +4200,36 @@ static int gen_add(FILE *out, Func *f, const Op *op)
     return 0;
 }
 
+/* 8085 DSUB — `sub hl,bc`, HL = HL - BC in 1 byte / 10 cycles, CF = borrow out.
+   It replaces the six-instruction byte-wise form the 808x/gbz80 path uses
+   (`ld a,l / sub c / ld l,a / ld a,h / sbc a,b / ld h,a` — 6 bytes / 24
+   cycles), so each 16-bit subtract drops 5 bytes and 14 cycles. DSUB has no
+   borrow IN, which is exactly the LOW half of a wider subtract: the carry it
+   leaves feeds the `sbc a,` chain that finishes the upper bytes (`pop bc` and
+   `ld a,c` in between touch no flags).
+   Only the 8085 has it — 8080 and gbz80 keep the byte-wise form, and the z80
+   family has `sbc hl,bc`. Reverts with `--opt-disable=dsub`. */
+static int dsub_ok(void)
+{
+    return IS_8085() && !opt_disabled("dsub");
+}
+
+/* True iff no vreg in this function is homed in BC or a BC half. Staging a
+   subtrahend into BC for DSUB needs that: IR_SUB does not declare BC
+   clobbered (see op_clobbers — declaring it costs more in evicted BC homes
+   than the staging saves), so the only sound licence to write BC is a
+   function that keeps nothing there. Paired with an rs.bc check at the site,
+   which covers the lowerer's own transient parks. */
+static int func_has_bc_home(const Func *f)
+{
+    if (!f || !f->vreg_to_phys) return 1;          /* unknown: assume it does */
+    for (int v = 0; v < f->n_vregs; v++) {
+        int p = ir_home_at(f, v);
+        if (p == IR_PR_BC || p == IR_PR_B || p == IR_PR_C) return 1;
+    }
+    return 0;
+}
+
 static int gen_sub(FILE *out, Func *f, const Op *op)
 {
     if (try_de_home_def(out, f, op))
@@ -4271,12 +4301,22 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
                 /* gbz80/808x: no native 16-bit subtract (sbc hl,bc is
                    emulated) and ex de,hl is emulated. Subtract all 4
                    const bytes via sub/sbc a, landing HL=low/DE=high. */
+                if (dsub_ok()) {
+                    /* 8085: DSUB the low half. BC is free to stage the low
+                       const in — a width-4 op already declares it clobbered
+                       (op_clobbers `wide`), which is what lets the z80 branch
+                       below use `ld bc,K` at this same site. */
+                    emit(out, "ld\tbc,%u", (unsigned)(k & 0xffff));
+                    emit(out, "sub\thl,bc");
+                    invalidate_bc_cache();
+                } else {
                 emit(out, "ld\ta,l");
                 emit(out, "sub\t%u", (unsigned)(k & 0xff));
                 emit(out, "ld\tl,a");
                 emit(out, "ld\ta,h");
                 emit(out, "sbc\ta,%u", (unsigned)((k >> 8) & 0xff));
                 emit(out, "ld\th,a");
+                }
                 emit(out, "ld\ta,e");
                 emit(out, "sbc\ta,%u", (unsigned)((k >> 16) & 0xff));
                 emit(out, "ld\te,a");
@@ -4446,12 +4486,16 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
             /* gbz80/808x: sbc hl,bc and ex de,hl are emulated. Subtract
                byte-wise (a - b) — b is BC=low/DE=high, a's high half is
                the next stack word — landing HL=low/DE=high, no swaps. */
+            if (dsub_ok()) {
+                emit(out, "sub\thl,bc");            /* HL = a.LSW - b.LSW */
+            } else {
             emit(out, "ld\ta,l");
             emit(out, "sub\tc");                    /* a_b0 - b_b0 */
             emit(out, "ld\tl,a");
             emit(out, "ld\ta,h");
             emit(out, "sbc\ta,b");                  /* a_b1 - b_b1 */
             emit(out, "ld\th,a");                   /* HL = LOW result */
+            }
             emit(out, "pop\tbc");                   /* BC = a.MSW */
             emit(out, "ld\ta,c");
             emit(out, "sbc\ta,e");                  /* a_b2 - b_b2 */
@@ -4483,6 +4527,22 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         && L.pending_spill_v < 0) {
         load_to_hl(out, f, op->src[0]);       /* minuend → HL (preserves BC) */
         if (IS_808x() || IS_GBZ80()) {
+            if (dsub_ok()) {
+                /* DSUB reads the subtrahend where it already sits, so this
+                   path clobbers nothing the byte-wise form did not. A PR_DE
+                   dst takes the result out of HL — HL held the minuend, which
+                   the byte-wise form left alone, so its belief must go. */
+                emit(out, "sub\thl,bc");
+                if (vreg_is_pr_de(f, op->dst)) {
+                    emit_hl_to_de(out);
+                    invalidate_hl_cache();
+                    cache_de(op->dst);
+                    return 0;
+                }
+                invalidate_hl_keep_de();
+                commit_hl_result(out, f, op->dst);
+                return 0;
+            }
             if (vreg_is_pr_de(f, op->dst)) {
                 emit(out, "ld\ta,l"); emit(out, "sub\tc"); emit(out, "ld\te,a");
                 emit(out, "ld\ta,h"); emit(out, "sbc\ta,b"); emit(out, "ld\td,a");
@@ -4506,6 +4566,20 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         /* gbz80/808x: `sbc hl,de` is emulated (push/pop x4 + helper).
            Subtract byte-wise; write straight into DE when that's the dst
            (skips the ex de,hl that the sbc-path would need). */
+        if (dsub_ok() && !vreg_is_pr_de(f, op->dst)
+            && !func_has_bc_home(f) && L.rs.bc < 0) {
+            /* Stage the subtrahend into BC and DSUB: 3B/18c against the
+               byte-wise 6B/24c. Only where BC is ours to take — no BC home in
+               the function and nothing parked there right now. A PR_DE dst is
+               excluded: routing the result back out of HL spends the saving
+               again (5B/26c). */
+            emit(out, "ld\tbc,de");
+            emit(out, "sub\thl,bc");
+            invalidate_bc_cache();
+            invalidate_hl_keep_de();
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
         if (vreg_is_pr_de(f, op->dst)) {
             emit(out, "ld\ta,l");
             emit(out, "sub\te");

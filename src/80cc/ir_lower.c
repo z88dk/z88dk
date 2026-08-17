@@ -2550,6 +2550,13 @@ RegMask op_clobbers(const Func *f, const Op *op)
         /* 8085 word compares stage an operand into BC (`ld c,e; ld b,d`). */
         return IR_R_HL|IR_R_DE|IR_R_A|IR_R_F|wide|dst|ops
              | (IS_8085() ? IR_R_BC : 0);
+    /* NB IR_SUB deliberately does NOT claim BC on 8085, unlike the compares
+       above: the 8085 DSUB staging (`ld bc,de; sub hl,bc`, gen_sub) buys 3
+       bytes and 6 cycles per subtract, but declaring BC clobbered here costs
+       every BC home that spans a subtract — measured at +3.19% ticks on
+       predbench and +0.69% on divbench against ~1.3M cycles of wins
+       elsewhere, a net loss. gen_sub earns BC per function instead
+       (func_has_bc_home). */
     default:
         /* Everything else — loads/materialise/MOV/ALU/compare/conv/shift/store:
            HL workhorse + A scratch + DE (operand staging / `ex de,hl` word
