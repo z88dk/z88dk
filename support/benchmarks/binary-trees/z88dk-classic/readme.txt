@@ -38,10 +38,7 @@ zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed bin
 classic/80cc/8085
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
 
-# 80cc builds and TIMER completes, but cycle counts are ~50x lower than
-# sccz80 under the same flags (e.g. ~2.6M vs ~144M). Correctness not
-# verified (PRINTF path hits an 80cc parse issue on multi-line printf).
-# Do not publish 80cc RESULT rows until validated.
+# 80cc PRINTF output matches the N=8 reference. TIMER remesured Aug 17, 2026.
 
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 binary-trees.c -o bt.bin -lmath48 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
@@ -87,3 +84,19 @@ classic / zsdcc 4.6.0 #16639
 
 cycle count  = 149280700
 time @ 4MHz  = 149280700 / 4*10^6 =   37.3 sec
+
+
+Z88DK August 17, 2026
+classic/80cc
+4036 bytes less page zero
+
+cycle count  = 151405574
+time @ 4MHz  = 151405574 / 4*10^6 = 37.85 sec
+
+
+Z88DK August 17, 2026
+classic/80cc/8085
+3876 bytes less page zero
+
+cycle count  = 150137083
+time @ 4MHz  = 150137083 / 4*10^6 = 37.53 sec

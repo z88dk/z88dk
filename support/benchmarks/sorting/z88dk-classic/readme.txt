@@ -49,6 +49,10 @@ zcc +test -vn -DTIMER -DSTYLE=3 -DNUM=5000 -D__Z88DK -O2 sort.c -o sort-equ-5000
 
 classic/zsdcc
 zcc +test -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ran-20.bin -lndos -m
+
+classic/80cc
+zcc +test -compiler=80cc -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -O2 sort.c -o sort-ran-20.bin -lndos -m
+
 zcc +test -vn -DTIMER -DSTYLE=1 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ord-20.bin -lndos -m
 zcc +test -vn -DTIMER -DSTYLE=2 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-rev-20.bin -lndos -m
 zcc +test -vn -DTIMER -DSTYLE=3 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-equ-20.bin -lndos -m
@@ -112,3 +116,22 @@ sort-ran-5000     40235859    10.0590 sec
 sort-ord-5000     30382407     7.5956 sec
 sort-rev-5000     32248314     8.0621 sec
 sort-equ-5000   6716015259    1679.0038 sec
+
+
+Z88DK August 17, 2026
+classic / 80cc
+1907 bytes less page zero
+Classic qsort (equals is the usual worst case).
+80cc + -clib=8085 does not link qsort.
+
+               cycle count    time @ 4MHz
+
+sort-ran-20          50233     0.0126 sec
+sort-ord-20          38248     0.0096 sec
+sort-rev-20          45159     0.0113 sec
+sort-equ-20         117722     0.0294 sec
+
+sort-ran-5000     38866533     9.7166 sec
+sort-ord-5000     29294145     7.3235 sec
+sort-rev-5000     31126158     7.7815 sec
+sort-equ-5000   6453567759    1613.3919 sec
