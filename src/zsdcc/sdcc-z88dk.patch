@@ -127,6 +127,21 @@ Index: src/SDCCmain.c
      {
        struct dbuf_s adbFile;
  
+@@ -2921,6 +2912,13 @@
+           wassert (yyin);
+           yyparse ();
+           fclose (yyin);
++          /* Preamble just declared __builtin_memcpy. initBuiltIns() ran
++             first and bound builtin_memcpy to the __memcpy fallback. */
++          {
++            symbol *bm = findSym (SymbolTab, NULL, "__builtin_memcpy");
++            if (bm)
++              builtin_memcpy = bm;
++          }
+         }
+ 
+       preProcess (envp); // Sets yyin to pipe from preprocessor
+ 
 Index: src/SDCCopt.c
 ===================================================================
 --- src/SDCCopt.c	(revision 16639)
