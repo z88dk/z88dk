@@ -384,7 +384,11 @@ IF FORnc200
     defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-
+IF FORnorthstar
+    defc    _GFX_MAXX       = 640
+    defc    _GFX_MAXY       = 240
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
 
 IF FORondra
     defc    _GFX_MAXX    = 320
