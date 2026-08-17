@@ -220,14 +220,14 @@ KWIPS        = 100*10*1 / 320.8179 = 3.1148
 MWIPS        = 3.1148 / 1000 = 0.0031148
 
 7.
-SDCC 4.2.0 Linux
+SDCC 4.6.0 #16608 Linux
 24 bit mantissa + 8 bit exponent
-10935 bytes less page zero
+10364 bytes less page zero
 
-cycle count  = 1491668242
-time @ 4MHz  = 1491668242 / 4x10^6 = 372.9170 seconds
-KWIPS        = 100*10*1 / 372.9170 = 2.6816
-MWIPS        = 2.6816 / 1000 = 0.0026816
+cycle count  = 1850296726
+time @ 4MHz  = 1850296726 / 4x10^6 = 462.5742 seconds
+KWIPS        = 100*10*1 / 462.5742 = 2.1618
+MWIPS        = 2.1618 / 1000 = 0.0021618
 
 SDCC implements its float library in C.
 

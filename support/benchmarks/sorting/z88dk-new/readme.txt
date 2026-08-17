@@ -112,18 +112,18 @@ sort-rev-5000     42224444    10.5561 sec
 sort-equ-5000     36069168     9.0173 sec
 
 
-Z88DK March 21, 2022
-new c library / zsdcc 4.2.0 #13131 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
-1391 bytes less page zero
+Z88DK August 17, 2026
+new c library / zsdcc 4.6.0 #16639 / default newlib qsort
+1041 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          62688     0.0157 sec
-sort-ord-20          23578     0.0059 sec
-sort-rev-20          35845     0.0090 sec
-sort-equ-20          24948     0.0062 sec
+sort-ran-20          70266     0.0176 sec
+sort-ord-20          44330     0.0111 sec
+sort-rev-20          62510     0.0156 sec
+sort-equ-20          44330     0.0111 sec
 
-sort-ran-5000     50916067    12.7290 sec
-sort-ord-5000     47359197    11.8398 sec
-sort-rev-5000     38926382     9.7316 sec
-sort-equ-5000     28291376     7.0728 sec
+sort-ran-5000     81681998    20.4205 sec
+sort-ord-5000     35928280     8.9821 sec
+sort-rev-5000     54956814    13.7392 sec
+sort-equ-5000     35928280     8.9821 sec

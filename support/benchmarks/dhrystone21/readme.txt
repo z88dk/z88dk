@@ -119,13 +119,13 @@ dhrystones/s = 20000 / 70.0250 = 285.6121
 DMIPS        = 285.6121 / 1757 = 0.1625
 
 4.
-SDCC 4.2.0 Linux
-6825 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+6774 bytes less page zero
 
-cycle count  = 225522684
-time @ 4MHz  = 225522684 / 4x10^6 = 56.3807 seconds
-dhrystones/s = 20000 / 56.3807 = 354.7315
-DMIPS        = 354.7315 / 1757 = 0.20189
+cycle count  = 274542684
+time @ 4MHz  = 274542684 / 4x10^6 = 68.6357 seconds
+dhrystones/s = 20000 / 68.6357 = 291.393
+DMIPS        = 291.393 / 1757 = 0.16585
 
 5.
 IAR Z80 V4.06A

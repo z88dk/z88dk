@@ -162,13 +162,13 @@ cycle count  = 4247660135
 time @ 4MHz  = 4247660135 / 4*10^6 =  17 min 42 sec
 
 9.
-SDCC 4.2.0 Linux
-6013 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+6150 bytes less page zero
 
 error: 5 * 10^(-6)
 
-cycle count  = 15739496039
-time @ 4MHz  = 15739496039 / 4*10^6 = 65 min 35 sec
+cycle count  = 18120604224
+time @ 4MHz  = 18120604224 / 4*10^6 = 75 min 30 sec
 
 Slow speed & large size due to float implementation in C.
 

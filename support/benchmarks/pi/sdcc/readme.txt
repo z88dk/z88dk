@@ -32,20 +32,20 @@ TIMING
 ======
 
 sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 pi.c -o pi.ihx
-hex2bin pi.ihx
+makebin -p pi.ihx pi.bin
 
-TIMER_START = 0x213
+TIMER_START = 0x214
    0x009 (TIMER_START in pi.sym) -
    0x000 (_main in pi.sym) +
    0x20a (_main in pi.map)
 
-TIMER_STOP = 0x32e
+TIMER_STOP = 0x363
    0x124 (TIMER_STOP in pi.sym) -
    0x000 (_main in pi.sym) +
    0x20a (_main in pi.map)
 
-SIZE = 6591 bytes
-   402  (_CODE in pi.map) +
+SIZE = 6598 bytes
+   409  (_CODE in pi.map) +
    3    (_HEADER0 in pi.map) +
    3    (_HEADER1 in pi.map) +
    3    (_HEADER2 in pi.map) +
@@ -54,15 +54,15 @@ SIZE = 6591 bytes
    3    (_HEADER5 in pi.map) +
    3    (_HEADER6 in pi.map) +
    3    (_HEADER7 in pi.map) +
-   12   (_HEADER8 in pi.map) +
-   500  (_HOME in pi.map) +
+   16   (_HEADER8 in pi.map) +
+   495  (_HOME in pi.map) +
    37   (_GSINIT in pi.map) +
    1    (_GSFINAL in pi.map) +
    5616 (_DATA in pi.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks pi.bin -start 0213 -end 032e -counter 9999999999
+z88dk-ticks pi.bin -start 0214 -end 0363 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -74,8 +74,8 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
-6591 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+6598 bytes less page zero
 
-cycle count  = 6649404381
-time @ 4MHz  = 6649404381 / 4*10^6 = 27 min 42 sec
+cycle count  = 7218092827
+time @ 4MHz  = 7218092827 / 4*10^6 = 30 min 05 sec

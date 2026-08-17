@@ -107,11 +107,11 @@ cycle count  = 145563150
 time @ 4MHz  = 145563150 / 4*10^6 = 36.39 sec
 
 3.
-SDCC 4.2.0 Linux
-7158 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+7196 bytes less page zero
 
-cycle count  = 188126191
-time @ 4MHz  = 188126191 / 4*10^6 = 47.03 sec
+cycle count  = 193466493
+time @ 4MHz  = 193466493 / 4*10^6 = 48.37 sec
 
 Large size caused by float package implemented in C.
 

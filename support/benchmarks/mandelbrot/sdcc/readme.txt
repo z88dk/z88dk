@@ -21,7 +21,7 @@ COMPILATION
 Compilation:
 
 sdcc -mz80 -DTIMER --max-allocs-per-node200000 mandelbrot.c
-hex2bin mandelbrot.ihx
+makebin -p mandelbrot.ihx mandelbrot.bin
 
 TIMING & VERIFICATION
 =====================
@@ -38,13 +38,13 @@ TIMER_START = 0x21a
    0x000 (_main in mandelbrot.sym) +
    0x20a (_main in mandelbrot.map)
 
-TIMER_STOP = 0x4f6
+TIMER_STOP = 0x570
    0x2ec (TIMER_STOP in mandelbrot.sym) -
    0x000 (_main in mandelbrot.sym) +
    0x20a (_main in mandelbrot.map)
 
-SIZE = 3962 bytes
-   1511 (_CODE in mandelbrot.map) +
+SIZE = 4288 bytes
+   1548 (_CODE in mandelbrot.map) +
    3    (_HEADER0 in mandelbrot.map) +
    3    (_HEADER1 in mandelbrot.map) +
    3    (_HEADER2 in mandelbrot.map) +
@@ -53,17 +53,16 @@ SIZE = 3962 bytes
    3    (_HEADER5 in mandelbrot.map) +
    3    (_HEADER6 in mandelbrot.map) +
    3    (_HEADER7 in mandelbrot.map) +
-   12   (_HEADER8 in mandelbrot.map) +
-   2384 (_HOME in mandelbrot.map) +
+   16   (_HEADER8 in mandelbrot.map) +
+   2658 (_HOME in mandelbrot.map) +
    2    (_INITIALIZER in mandelbrot.map) +
    37   (_GSINIT in mandelbrot.map) +
    1    (_GSFINAL in mandelbrot.map) +
    2    (_INITIALIZED in mandelbrot.map)
-        (heap not included)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks mandelbrot.bin -start 021a -end 04f6 -counter 999999999999 -output verify.bin
+z88dk-ticks mandelbrot.bin -start 021a -end 0570 -counter 999999999999 -output verify.bin
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -85,8 +84,8 @@ the images to address 16384 to see a visual representation.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
-3962 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+4288 bytes less page zero
 
-cycle count  = 4991827956
-time @ 4MHz  = 4991827956 / 4*10^6 = 20 min 48 sec
+cycle count  = 7175307472
+time @ 4MHz  = 7175307472 / 4*10^6 = 29 min 54 sec

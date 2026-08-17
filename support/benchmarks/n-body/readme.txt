@@ -84,15 +84,15 @@ time @ 4MHz  = 2245295168 / 4*10^6 =  9 min 21 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 2.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-4739 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+4962 bytes less page zero
 
 first number error : 5 * 10^(-8)
-second number error: 1 * 10^(-4)
+second number error: 1 * 10^(-8)
 
-cycle count  = 2254312065
-time @ 4MHz  = 2254312065 / 4*10^6 = 9 min 24 sec
+cycle count  = 2243368504
+time @ 4MHz  = 2243368504 / 4*10^6 =  9 min 21 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -107,14 +107,14 @@ cycle count  = 2331516019
 time @ 4MHz  = 2331516019 / 4*10^6 = 9 min 43 sec
 
 4.
-SDCC 4.2.0 Linux
-7141 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+7283 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 3163137393
-time @ 4MHz  = 3163137393 / 4*10^6 = 13 min 11 sec
+cycle count  = 4361393645
+time @ 4MHz  = 4361393645 / 4*10^6 = 18 min 10 sec
 
 Slow speed & large size due to float implementation in C.
 
@@ -143,17 +143,6 @@ cycle count  = 2376486525
 time @ 4MHz  = 2376486525 / 4*10^6 = 9 min 53 sec
 
 Internal 48-bit float implementation causes relative slowdown.
-
-7.
-Z88DK August 16, 2026
-zsdcc 4.6.0 #16639 / classic
-4962 bytes less page zero
-
-first number error : 5 * 10^(-8)
-second number error: 1 * 10^(-8)
-
-cycle count  = 2243368504
-time @ 4MHz  = 2243368504 / 4*10^6 =  9 min 21 sec
 
 8.
 Z88DK August 15, 2026

@@ -35,39 +35,39 @@ TIMING
 Change back to the main directory.
 
 sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 n-body.c
-hex2bin n-body.ihx
+makebin -p n-body.ihx n-body.bin
 
-TIMER_START = 0x0d83
+TIMER_START = 0xd7a
    0xb79 (TIMER_START in n-body.sym) -
    0xb79 (_main in n-body.sym) +
    0x0d83 (_main in n-body.map)
 
-TIMER_STOP = 0x0dcc
+TIMER_STOP = 0xdc0
    0xbc2 (TIMER_STOP in n-body.sym) -
    0xb79 (_main in n-body.sym) +
    0x0d83 (_main in n-body.map)
 
-SIZE = 7141 bytes
-   4329 (_CODE in n-body.map) +
-   3 (_HEADER0 in n-body.map) +
-   3 (_HEADER1 in n-body.map) +
-   3 (_HEADER2 in n-body.map) +
-   3 (_HEADER3 in n-body.map) +
-   3 (_HEADER4 in n-body.map) +
-   3 (_HEADER5 in n-body.map) +
-   3 (_HEADER6 in n-body.map) +
-   3 (_HEADER7 in n-body.map) +
-   12 (_HEADER8 in n-body.map) +
-   2384 (_HOME in n-body.map) +
-   140 (_INITIALIZER in n-body.map) +
-   37 (_GSINIT in n-body.map) +
-   1 (_GSFINAL in n-body.map) +
-   74 (_DATA in n-body.map) +
-   140 (_INITIALIZED in n-body.map)
+SIZE = 7283 bytes
+   4193 (_CODE in n-body.map) +
+   3    (_HEADER0 in n-body.map) +
+   3    (_HEADER1 in n-body.map) +
+   3    (_HEADER2 in n-body.map) +
+   3    (_HEADER3 in n-body.map) +
+   3    (_HEADER4 in n-body.map) +
+   3    (_HEADER5 in n-body.map) +
+   3    (_HEADER6 in n-body.map) +
+   3    (_HEADER7 in n-body.map) +
+   16   (_HEADER8 in n-body.map) +
+   2658 (_HOME in n-body.map) +
+   140  (_INITIALIZER in n-body.map) +
+   37   (_GSINIT in n-body.map) +
+   1    (_GSFINAL in n-body.map) +
+   74   (_DATA in n-body.map) +
+   140  (_INITIALIZED in n-body.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks n-body.bin -start 0d8e -end 0dcc -counter 9999999999
+z88dk-ticks n-body.bin -start 0d7a -end 0dc0 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -79,11 +79,11 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
-7141 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+7283 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 3163137393
-time @ 4MHz  = 3163137393 / 4*10^6 = 13 min 11 sec
+cycle count  = 4361393645
+time @ 4MHz  = 4361393645 / 4*10^6 = 18 min 10 sec

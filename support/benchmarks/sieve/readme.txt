@@ -119,11 +119,11 @@ cycle count  = 7916099
 time @ 4MHz  = 7916099 / 4*10^6 = 1.979 sec
 
 6.
-SDCC 4.2.0 Linux
-8278 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+8279 bytes less page zero
 
-cycle count  = 4219481
-time @ 4MHz  = 4219481 / 4*10^6 = 1.0548 sec
+cycle count  = 4218689
+time @ 4MHz  = 4218689 / 4*10^6 = 1.0547 sec
 
 7.
 Z88DK April 20, 2020

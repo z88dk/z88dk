@@ -168,11 +168,11 @@ time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 48-bit float implementation causes relative slowdown.
 
 9.
-SDCC 4.2.0 Linux
-3962 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+4288 bytes less page zero
 
-cycle count  = 4991827956
-time @ 4MHz  = 4991827956 / 4*10^6 = 20 min 48 sec
+cycle count  = 7175307472
+time @ 4MHz  = 7175307472 / 4*10^6 = 29 min 54 sec
 
 Slow speed largely due to float implementation in C.
 

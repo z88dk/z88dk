@@ -25,16 +25,16 @@ RESULTS - 20 ITEMS
 ==================
 
 1.
-Z88DK March 25, 2017
-zsdcc #9852 / new c library / quicksort
-1303 bytes less page zero
+Z88DK August 17, 2026
+zsdcc 4.6.0 #16639 / new c library / quicksort
+1041 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          68554     0.0171 sec
-sort-ord-20          26210     0.0066 sec
-sort-rev-20          38369     0.0096 sec
-sort-equ-20          37122     0.0093 sec
+sort-ran-20          70266     0.0176 sec
+sort-ord-20          44330     0.0111 sec
+sort-rev-20          62510     0.0156 sec
+sort-equ-20          44330     0.0111 sec
 
 2.
 Z88DK March 25, 2017
@@ -49,16 +49,16 @@ sort-rev-20          41986     0.0105 sec
 sort-equ-20          41701     0.0104 sec
 
 3.
-Z88DK March 25, 2017
-zsdcc #9852 / classic c library / shellsort
-995 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library / quicksort
+1854 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          77922     0.0195 sec
-sort-ord-20          50242     0.0126 sec
-sort-rev-20          70672     0.0177 sec
-sort-equ-20          50242     0.0126 sec
+sort-ran-20          51721     0.0129 sec
+sort-ord-20          39379     0.0098 sec
+sort-rev-20          46416     0.0116 sec
+sort-equ-20         121709     0.0304 sec
 
 4.
 Z88DK March 25, 2017
@@ -73,15 +73,15 @@ sort-rev-20          75472     0.0189 sec
 sort-equ-20          53944     0.0135 sec
 
 5.
-SDCC 3.6.5 #9852 (MINGW64)
-1080 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+964 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20         113965     0.0285 sec
-sort-ord-20          99399     0.0248 sec
-sort-rev-20         116849     0.0292 sec
-sort-equ-20         184267     0.0461 sec
+sort-ran-20         109535     0.0274 sec
+sort-ord-20          95078     0.0238 sec
+sort-rev-20         111590     0.0279 sec
+sort-equ-20         180386     0.0451 sec
 
 6.
 HITECH C MSDOS V750
@@ -114,15 +114,15 @@ RESULTS - 5000 ITEMS
 ====================
 
 1.
-Z88DK March 25, 2017
-zsdcc #9852 / new c library / quicksort
+Z88DK August 17, 2026
+zsdcc 4.6.0 #16639 / new c library / quicksort
 
                cycle count    time @ 4MHz
 
-sort-ran-5000     59078884    14.7697 sec
-sort-ord-5000     50466524    12.6166 sec
-sort-rev-5000     40192485    10.0481 sec
-sort-equ-5000     32362669     8.0907 sec
+sort-ran-5000     81681998    20.4205 sec
+sort-ord-5000     35928280     8.9821 sec
+sort-rev-5000     54956814    13.7392 sec
+sort-equ-5000     35928280     8.9821 sec
 
 2.
 Z88DK March 25, 2017
@@ -158,17 +158,17 @@ sort-rev-5000     63068198    15.7670 sec
 sort-equ-5000     41381930    10.3455 sec
 
 5.
-SDCC 3.6.5 #9852 (MINGW64)
+SDCC 4.6.0 #16608 Linux
 
                cycle count    time @ 4MHz
 
-sort-ran-5000     77526792    19.3817 sec
-sort-ord-5000     61119685    15.2799 sec
-sort-rev-5000     67382381    16.8456 sec
+sort-ran-5000     75265433    18.8164 sec
+sort-ord-5000     59249752    14.8124 sec
+sort-rev-5000     65223791    16.3059 sec
 sort-equ-5000         did not finish*
 
 qsort is not present in library, instead one is supplied from the internet.
-* If this not a bug, will have to move down a place.
+Naive implementation stumbles on equal items edge case.
 
 6.
 HITECH C MSDOS V750
