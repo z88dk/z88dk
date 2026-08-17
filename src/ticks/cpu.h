@@ -19,10 +19,12 @@ extern char *c_target;
 #define CPU_R6K         2048
 #define CPU_KC160       4096
 #define CPU_KC160_Z80   8192
+#define CPU_KR580VM1    16384
 
 #define is8080() ( (c_cpu & CPU_8080) )
 #define is8085() ( (c_cpu & CPU_8085) )
-#define is808x() ( (c_cpu & (CPU_8080|CPU_8085)) )
+#define is808x() ( (c_cpu & (CPU_8080|CPU_8085|CPU_KR580VM1)) )
+#define isvm1() ((c_cpu & CPU_KR580VM1) == CPU_KR580VM1 )
 #define isgbz80() ( (c_cpu & CPU_GBZ80) == CPU_GBZ80 )
 #define isr800() ( (c_cpu & CPU_R800) == CPU_R800 )
 #define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K))
@@ -35,8 +37,8 @@ extern int israbbit6k(void);
 #define iskc160() ( c_cpu & (CPU_KC160|CPU_KC160_Z80) )
 #define iskc160z80() ( c_cpu & CPU_KC160_Z80 )
 #define iskc160ext() ( c_cpu & CPU_KC160 )
-#define canaltreg() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
-#define canindex() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
+#define canaltreg() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80|CPU_KR580VM1)) == 0 )
+#define canindex() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80|CPU_KR580VM1)) == 0 )
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80N|CPU_R800|CPU_EZ80))
 #define cansll() ( c_cpu & (CPU_Z80|CPU_Z80N))
 #define canz180() ( c_cpu & (CPU_Z180|CPU_EZ80))
