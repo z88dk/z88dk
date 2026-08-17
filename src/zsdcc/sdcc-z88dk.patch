@@ -128,9 +128,9 @@ Index: src/SDCCmain.c
        struct dbuf_s adbFile;
  
 @@ -2921,6 +2912,13 @@
-          wassert (yyin);
-          yyparse ();
-          fclose (yyin);
+           wassert (yyin);
+           yyparse ();
+           fclose (yyin);
 +          /* Preamble just declared __builtin_memcpy. initBuiltIns() ran
 +             first and bound builtin_memcpy to the __memcpy fallback. */
 +          {
