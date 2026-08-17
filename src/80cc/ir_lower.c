@@ -4798,11 +4798,17 @@ int ir_lower_func(FILE *out, Func *f)
                        cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
                        offset is fixed per function and cur_sp_adjust is tracked, so
                        fp==sp with only the target pair clobbered (no IX/DE gymnastics).
-                       EXCLUSIONS, each a measured non-win:
-                       - byte-wise CPUs (808x/gbz80): spill LEA values as data-stack
-                         transients (PR_STACK push/pop) not frame slots, so dropping
-                         the slot shifts the stack and offsets go inconsistent (irgaps
-                         miscompiles — the deferred "extend" step);
+                       EXCLUSIONS:
+                       - a PR_STACK tenant: its value is parked with push/pop, not in
+                         a frame slot, so dropping the slot orphans one half of that
+                         pair and every later sp-relative offset shifts (irgaps
+                         miscompiled). This USED to be spelled `!(IS_808x() ||
+                         IS_GBZ80())` — those CPUs park LEA values, so the CPU stood
+                         in for the fact. Measured: of the 99 LEAs the CPU test
+                         excluded, only 6 (8085) / 5 (gbz80) are actually parked, so
+                         the test cost ~93 per CPU. Asking the real question is both
+                         wider AND safer — it now also protects a parked LEA on z80
+                         and every other target, which the CPU test never covered;
                        - ez80 in FP mode: its cheap `lea`/`ld hl,(ix+d)` addressing
                          register-homes LEAs, so per-use recompute in a hot loop is a
                          byte-for-tick LOSS (interpbench ez80-fp −27B but +4.6% ticks).
@@ -4811,7 +4817,7 @@ int ir_lower_func(FILE *out, Func *f)
                        Store-base LEAs keep their slot (below). Default-on;
                        IR_REMAT_LEA=0 opts out. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
-                             && !(IS_808x() || IS_GBZ80())
+                             && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f))
                              && remat_lea_enabled())
                         rd = o;
