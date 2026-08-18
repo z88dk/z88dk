@@ -31,19 +31,19 @@ PUBLIC  l_long_asro
     ret     Z
 
     ld      b,a
+    ex      de,hl
 
 .loop
-    ex      de,hl
     sra     hl
-    ex      de,hl
 
-    ld      a,h
+    ld      a,d
     rra
-    ld      h,a
-    ld      a,l
+    ld      d,a
+    ld      a,e
     rra
-    ld      l,a
+    ld      e,a
 
     dec     b
     jp      NZ,loop
+    ex      de,hl
     ret

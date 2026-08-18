@@ -24,20 +24,20 @@ l_asr_dehl:
 
 l_asr_dehl_go:
    ld b,a
+   ex de,hl
 
 l_asr_dehl_loop:
 
-   ex de,hl
    sra hl                 ; MSW; C = old bit 0 of E
-   ex de,hl
 
-   ld a,h
+   ld a,d
    rra
-   ld h,a
-   ld a,l
+   ld d,a
+   ld a,e
    rra
-   ld l,a
+   ld e,a
 
    dec b
    jp nz, l_asr_dehl_loop
+   ex de,hl
    ret
