@@ -7,15 +7,13 @@ PUBLIC    l_case
 ; Entry: hl = value to switch on
 ;       (sp) = switch table (i.e. the return address)
 .l_case
-    ld d,h			;After de = switch value
-    ld e,l
+    ld de,hl			; switch value
     pop hl                  ;hl = switch table
 .swloop
-    ld c,(hl)
-    inc hl
-    ld b,(hl)               ;bc -> case addr, else 0
-    inc hl
-    ld a,b
+    ld a,(hl+)
+    ld c,a
+    ld a,(hl+)              ;bc -> case addr, else 0
+    ld b,a
     or c
     jr z,swend              ;default or continuation code
     ld a,(hl+)
@@ -24,8 +22,7 @@ PUBLIC    l_case
     jr nz,swloop
     cp d
     jr nz,swloop
-    ld h,b                  ;cases matched
-    ld l,c
+    ld hl,bc                ; cases matched
 .swend
     jp (hl)
 

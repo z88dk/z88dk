@@ -18,20 +18,17 @@ EXTERN __debug_framepointer
 
 l_debug_push_frame:
     pop     bc                          ; bc = return address into the body
-    ld      d,h
-    ld      e,l                         ; de = caller's hl (parked)
+    ld      de,hl                       ; park caller's hl
     ld      a,(__debug_framepointer)
     ld      l,a
     ld      a,(__debug_framepointer+1)
     ld      h,a                         ; hl = caller's frame pointer
     push    hl                          ; save it (this function's frame slot)
-    ld      hl,0
-    add     hl,sp                       ; hl = &saved frame pointer
+    ld      hl,sp+0                     ; hl = &saved frame pointer
     ld      a,l
     ld      (__debug_framepointer),a
     ld      a,h
     ld      (__debug_framepointer+1),a  ; __debug_framepointer = this frame
-    ld      h,d
-    ld      l,e                         ; restore caller's hl
+    ld      hl,de                       ; restore caller's hl
     push    bc                          ; return address back
     ret

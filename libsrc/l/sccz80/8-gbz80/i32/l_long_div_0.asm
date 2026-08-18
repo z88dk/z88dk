@@ -105,8 +105,7 @@ PUBLIC  l_long_div_0
 .div_loop
     rra                         ; save Carry
     ld      hl,sp+4             ; remainder
-    ld      d,h
-    ld      e,l
+    ld      de,hl               ; park remainder base
     ld      hl,sp+14            ; dividend
     rla                         ; restore Carry
 
@@ -119,7 +118,7 @@ PUBLIC  l_long_div_0
     inc     hl
     rl      (hl)
 
-    ex      de,hl
+    ld      hl,de               ; remainder (C preserved)
 
     ; rotate left remainder + dividend Carry
     rl      (hl)
@@ -130,9 +129,7 @@ PUBLIC  l_long_div_0
     inc     hl
     rl      (hl)
 
-    ; compare (remainder - divisor)
-    ld      hl,sp+4
-    ex      de,hl
+    ; compare (remainder - divisor); DE still remainder base
     ld      hl,sp+8
 
     ld      a,(de+)
@@ -148,7 +145,7 @@ PUBLIC  l_long_div_0
 
     ; subtract (remainder - divisor)
     ld      hl,sp+4
-    ex      de,hl
+    ld      de,hl
     ld      hl,sp+8
 
     ld      a,(de)

@@ -373,8 +373,12 @@ Do not fake `in a,(c)` / `out (c),a`.
 | `ex (sp),hl` | `call __z80asm__ex_sp_hl` | **148c** | almost never |
 
 `l_debug_push_frame.asm` parks HL in DE with two 8-bit loads because there
-is no cheap `ex`. `l_div.asm` still writes `ex de,hl` — that is the expensive
-synthetic. New code should prefer pair copies.
+is no cheap `ex`. `l_div.asm` remaps sccz80 DE/HL onto the SDCC BC/DE core
+with `ld bc,de` / `ld de,hl` (HL is dead after the copy). Do not write
+`ex de,hl` for a one-way move.
+
+`l_small_atoul` (`libsrc/l/util/8-gbz80/`) does `*10` as `*8 + *2` with the
+`*2` LSW in BC. Do not use `ex (sp),hl` there.
 
 ## Synthetic opcodes (z80asm, normal mode)
 

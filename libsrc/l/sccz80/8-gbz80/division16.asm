@@ -113,13 +113,11 @@ ___divu16_bcde:
         or      d
         jr      NZ,divide      ; Branch if divisor is non-zero
         ld      bc,0x00        ; Divide by zero error
-        ld      d,b
-        ld      e,c
+        ld      de,bc
         scf                     ; Set carry, invalid result
         ret
 divide:
-        ld      l,c             ; L = low byte of dividend/quotient
-        ld      h,b             ; H = high byte of dividend/quotient
+        ld      hl,bc           ; HL = dividend/quotient
         ld      bc,0x00        ; BC = remainder
         or      a               ; Clear carry to start
         ld      a,16           ; 16 bits in dividend
@@ -165,8 +163,7 @@ drop:
         jr      nodrop
 nodrop:
         ;; Shift last carry bit into quotient
-        ld      d,b             ; DE = remainder
-        ld      e,c
+        ld      de,bc           ; DE = remainder
         rl      l               ; Carry to L
         ld      c,l             ; C = low byte of quotient
         rl      h
