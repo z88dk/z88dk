@@ -62,6 +62,18 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin -
 classic/sccz80/8085/math16
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints n-body.c -o n-body.bin --math16 -lmath32_8085 -m -lndos
 
+classic/80cc/math32
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+
+classic/80cc/8085/math32
+zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
+
+Note: 80cc math32 TIMER is valid. Do not skip. +test PRINTF of n-body
+needs z88dk-ticks -counter larger than the run (default 1e8). The
+bare 10000000x line is that cap, not a dead %f. Official verify is
+still +zx / +cpm.
+
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 n-body.c -o n-body.bin -lmath48 -m -lndos
 
@@ -86,15 +98,15 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 28, 2021
-zsdcc #12070 / classic
-5246 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic
+4962 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 2253709929
-time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
+cycle count  = 2243368504
+time @ 4MHz  = 2243368504 / 4*10^6 =  9 min 21 sec
 
 
 Z88DK January 3, 2022
@@ -130,28 +142,44 @@ cycle count  = 1835079611
 time @ 4MHz  = 1835079611 / 4*10^6 =  7 min 39 sec
 
 
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / classic / math32
-5672 bytes less page zero
+5876 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 791103882
-time @ 4MHz  = 791103882 / 4*10^6 =  3 min 18 sec
+cycle count  = 797460656
+time @ 4MHz  = 797460656 / 4*10^6 =  3 min 19 sec
 
 
 Z88DK August 15, 2026
 sccz80 / classic / 8085 / math32
-6930 bytes less page zero
+6887 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 7 * 10^(-6)
 
-cycle count  = 1526136021
-time @ 4MHz  = 1526136021 / 4*10^6 =  6 min 22 sec
+cycle count  = 1526138871
+time @ 4MHz  = 1526138871 / 4*10^6 =  6 min 22 sec
 
 Energy: -0.1690752 / -0.1690808 (N=1000).
+
+
+Z88DK August 18, 2026
+80cc / classic / math32
+9409 bytes less page zero
+
+cycle count  = 871106763
+time @ 4MHz  = 871106763 / 4*10^6 =  3 min 38 sec
+
+
+Z88DK August 15, 2026
+80cc / classic / 8085 / math32
+8871 bytes less page zero
+
+cycle count  = 1519413292
+time @ 4MHz  = 1519413292 / 4*10^6 =  6 min 20 sec
 
 
 Z88DK August 10, 2026

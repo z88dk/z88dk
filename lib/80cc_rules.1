@@ -18,6 +18,10 @@
 ;; back the base instead of the index. sieve/z88dk-classic hangs on it.
 %title #ADDR fold ex-de-hl + symbol-address load + add into a direct de-load (-1b)
 %notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%notcpu r4k
+%notcpu r6k
 	ex	de,hl
 	ld	hl,_%1
 	add	hl,de

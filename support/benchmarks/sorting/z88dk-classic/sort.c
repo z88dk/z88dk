@@ -56,10 +56,10 @@ int numbers[NUM];
 
 int g_rand(void);
 
-int ascending_order(int *a, int *b)
+int ascending_order(const void *a, const void *b)
 {
    /* signed comparison is only good for |num| < 32768 */
-   return *a - *b;
+   return *(const int *)a - *(const int *)b;
 }
 
 void perform_sort(void)

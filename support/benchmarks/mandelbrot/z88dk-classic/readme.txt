@@ -27,7 +27,8 @@ classic/sccz80/8085/math16
 zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math16 -lmath32_8085 -lndos -m
 
 classic/80cc/math32
-zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
@@ -78,20 +79,20 @@ the images to address 16384 to see a visual representation.
 RESULT
 ======
 
-Z88DK April 28, 2021
-zsdcc #12070 / classic
-2891 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic
+2771 bytes less page zero
 
-cycle count  = 3766086833
-time @ 4MHz  = 3766086833 / 4*10^6 = 15 min 41 sec
+cycle count  = 3727334560
+time @ 4MHz  = 3727334560 / 4*10^6 =  15 min 32 sec
 
 
-Z88DK August 10, 2026
-zsdcc #15242 / classic / math32
-3689 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic / math32
+3857 bytes less page zero
 
-cycle count  = 1283829412
-time @ 4MHz  = 1283829412 / 4*10^6 =  5 min 21 sec
+cycle count  = 1301251782
+time @ 4MHz  = 1301251782 / 4*10^6 =  5 min 25 sec
 
 
 Z88DK April 28, 2021
@@ -102,38 +103,38 @@ cycle count  = 3596657568
 time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / classic / math32
-3609 bytes less page zero
+3780 bytes less page zero
 
-cycle count  = 1017834192
-time @ 4MHz  = 1017834192 / 4*10^6 =  4 min 14 sec
+cycle count  = 1031176011
+time @ 4MHz  = 1031176011 / 4*10^6 =  4 min 18 sec
 
 
 Z88DK August 15, 2026
 sccz80 / classic / 8085 / math32
-4520 bytes less page zero
+4494 bytes less page zero
 
-cycle count  = 980515143
-time @ 4MHz  = 980515143 / 4*10^6 =  4 min  5 sec
+cycle count  = 2041768834
+time @ 4MHz  = 2041768834 / 4*10^6 =  8 min 30 sec
 
 (opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 
-Z88DK August 10, 2026
+Z88DK August 18, 2026
 80cc / classic / math32
-4134 bytes less page zero
+4940 bytes less page zero
 
-cycle count  = 1105135041
-time @ 4MHz  = 1105135041 / 4*10^6 =  4 min 36 sec
+cycle count  = 1315040014
+time @ 4MHz  = 1315040014 / 4*10^6 =  5 min 29 sec
 
 
 Z88DK August 15, 2026
 80cc / classic / 8085 / math32
-4975 bytes less page zero
+4883 bytes less page zero
 
-cycle count  = 2061255175
-time @ 4MHz  = 2061255175 / 4*10^6 =  8 min 35 sec
+cycle count  = 2061364665
+time @ 4MHz  = 2061364665 / 4*10^6 =  8 min 35 sec
 
 
 Z88DK July 19, 2026

@@ -206,9 +206,12 @@ typedef enum {
     IR_LD_STR,          /* dst ← &string_literal_queue + imm; imm is the
                            byte offset, the `litlab` label resolves at
                            link time */
-    IR_LEA,             /* dst ← &src[0]'s frame slot (width-2 pointer).
+    IR_LEA,             /* dst ← &src[0]'s frame slot + imm (width-2 pointer).
                            src[0] must have IR_VREG_ADDR_TAKEN so the
-                           allocator keeps it in memory. */
+                           allocator keeps it in memory. `imm` is a constant
+                           byte displacement folded in by ir_opt_lea_offset —
+                           a struct member's offset, resolved at compile time
+                           rather than added at run time. */
     IR_LD_MEM,          /* dst ← *mem */
     IR_ST_MEM,          /* *mem ← src[0] */
 

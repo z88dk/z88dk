@@ -13,7 +13,7 @@ uint32_t pw_,px_,py_,pz_;
     } while (0)
 
 // Used for ex instructions
-#define SWAPR(r1,r2) { t = (r1); (r1) = (r2); (r1) = t; }
+#define SWAPR(r1,r2) { t = (r1); (r1) = (r2); (r2) = t; }
 
 
 // TODO: Flags may be wrong...
@@ -1312,12 +1312,12 @@ void r4k_ex_jkhl_bcde(uint8_t opcode)
         SWAPR(j_,b);
         SWAPR(k_,c);
         SWAPR(h_,d);
-        SWAPR(l_,c);
+        SWAPR(l_,e);
     } else {
         SWAPR(j,b);
         SWAPR(k,c);
         SWAPR(h,d);
-        SWAPR(l,c);
+        SWAPR(l,e);
     }
     st += 2;
 }
@@ -1890,16 +1890,18 @@ void r6k_swap_rp2(uint8_t opcode)
 {
     uint8_t reg = ((opcode & 0xf0) >> 4) - 0x0c; // 0 =bc, 1=de, 2=hl, 3 = jk
     uint8_t *slsb = get_rp2_lsb_ptr(reg, alts);
-    uint8_t *smsb = get_rp2_lsb_ptr(reg, alts);
+    uint8_t *smsb = get_rp2_msb_ptr(reg, alts);
     uint8_t *dlsb = get_rp2_lsb_ptr(reg, altd);
-    uint8_t *dmsb = get_rp2_lsb_ptr(reg, altd); 
+    uint8_t *dmsb = get_rp2_msb_ptr(reg, altd); 
     uint8_t t;
 
+    /* Same directed-assignment rule as r6k_swap_r32: the source bank must not
+       be written when it differs from the destination. */
     if ( dmsb == smsb ) {
         SWAPR(*smsb, *slsb);
     } else {
-        SWAPR(*dmsb, *slsb);
-        SWAPR(*dlsb, *smsb);
+        *dmsb = *slsb;
+        *dlsb = *smsb;
     }
     st += 4;
 }
@@ -1937,12 +1939,12 @@ void r6k_ex_jkhl_bcde1(void)
         SWAPR(j_,b_);
         SWAPR(k_,c_);
         SWAPR(h_,d_);
-        SWAPR(l_,c_);
+        SWAPR(l_,e_);
     } else {
         SWAPR(j,b_);
         SWAPR(k,c_);
         SWAPR(h,d_);
-        SWAPR(l,c_);
+        SWAPR(l,e_);
     }
     st +=2;
 }
@@ -1954,15 +1956,19 @@ void r6k_swap_r32(uint8_t opcode, uint8_t isjkhl)
     uint8_t **src = get_r32_source_ptr(isjkhl);
     uint8_t t;
 
-    // B = E; C = D; D = C; E = B  
-    if ( altd == 0 && alts == 0 ) {
+    /* dest = reverse(src): B=E, C=D, D=C, E=B. ALTD picks the destination bank
+       and ALTS the source, so this is `bcde=de`, `bc'=de` or `bc'=de'` — a
+       directed assignment, NOT an exchange. Only when the two banks are the
+       same register file does it become one, and there it must be done as
+       swaps because a plain assignment would need a temporary. */
+    if ( dest[0] == src[0] ) {
         SWAPR(*dest[0], *src[3]);
         SWAPR(*dest[1], *src[2]);
     } else {
-        SWAPR(*dest[0], *src[3]);
-        SWAPR(*dest[1], *src[2]);
-        SWAPR(*dest[2], *src[1]);
-        SWAPR(*dest[3], *src[0]);
+        *dest[0] = *src[3];
+        *dest[1] = *src[2];
+        *dest[2] = *src[1];
+        *dest[3] = *src[0];
     }
     st += 4;
 }
@@ -1989,15 +1995,18 @@ void r6k_add_xy_d(uint8_t opc, uint8_t iy)
 // alu a,(ps+d)
 void r6k_alu_a_psd(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint32_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint8_t val = get_memory(addr, MEM_TYPE_PHYSICAL);
     uint8_t r8 =  alts ? a_ : a;
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
+    ALU_OP(oper, r, r8, val);
 
-    if ( altd ) a_ = r; else a = r;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        if ( altd ) a_ = r; else a = r;
+    }
 
     st += 10;
 }
@@ -2005,14 +2014,17 @@ void r6k_alu_a_psd(uint8_t opcode)
 // alu a,(sp+n)
 void r6k_alu_a_spn(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint8_t r;
     uint16_t addr = (sp + get_memory_inst(pc++));
     uint8_t val = get_memory(addr, MEM_TYPE_DATA);
     uint8_t r8 =  alts ? a_ : a;
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r8, val);
+    ALU_OP(oper, r, r8, val);
 
-    if ( altd ) a_ = r; else a = r;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        if ( altd ) a_ = r; else a = r;
+    }
 
     st += 10;
 }
@@ -2020,16 +2032,19 @@ void r6k_alu_a_spn(uint8_t opcode)
 // alu hl,(ps+d)
 void r6k_alu_hl_psd(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint16_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
     uint16_t val = get_memory(addr, MEM_TYPE_PHYSICAL) | (get_memory(addr+1, MEM_TYPE_PHYSICAL) << 8);
     uint16_t r16 = (*get_rp2_msb_ptr(2,alts) << 8) | *get_rp2_lsb_ptr(2,alts);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+    ALU_OP(oper, r, r16, val);
 
-    *get_rp2_lsb_ptr(2,altd) = r & 0xff;
-    *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *get_rp2_lsb_ptr(2,altd) = r & 0xff;
+        *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    }
 
     st += 12;
 }
@@ -2039,7 +2054,7 @@ void r6k_alu_hl_psd(uint8_t opcode)
 void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
 {
     uint8_t oper = (opcode & 1) + ((((opcode - 0x80) >> 4) & 0x0f) * 2);
-    uint8_t msb = iy ? yh : yh;
+    uint8_t msb = iy ? yh : xh;
     uint8_t lsb = iy ? yl : xl;
     uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
     uint16_t  rhs = (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
@@ -2048,8 +2063,10 @@ void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
 
     ALU_OP(oper, r, lhs, rhs);
 
-    *get_rp2_msb_ptr(2,altd) = (r >> 8 ) & 0xff;
-    *get_rp2_lsb_ptr(2,altd) = (r >> 0 ) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *get_rp2_msb_ptr(2,altd) = (r >> 8 ) & 0xff;
+        *get_rp2_lsb_ptr(2,altd) = (r >> 0 ) & 0xff;
+    }
 
     st += 12;
 }
@@ -2057,15 +2074,18 @@ void r6k_alu_hl_xyd(uint8_t opcode, uint8_t iy)
 // alu hl,(sp+n)
 void r6k_alu_hl_spn(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint16_t r;
     uint16_t addr = (sp + get_memory_inst(pc++));
     uint16_t val = get_memory(addr, MEM_TYPE_DATA) | (get_memory(addr+1, MEM_TYPE_DATA) << 8);
     uint16_t r16 = (*get_rp2_msb_ptr(2,alts) << 8) | *get_rp2_lsb_ptr(2,alts);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r16, val);
+    ALU_OP(oper, r, r16, val);
 
-    *get_rp2_lsb_ptr(2,altd) = r & 0xff;
-    *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *get_rp2_lsb_ptr(2,altd) = r & 0xff;
+        *get_rp2_msb_ptr(2,altd) = (r >> 8) & 0xff;
+    }
     
 
     st += 12;
@@ -2076,6 +2096,7 @@ void r6k_alu_hl_spn(uint8_t opcode)
 // alu jkhl,(ps+d)
 void r6k_alu_jkhl_psd(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint32_t r;
     uint32_t ps = read_ps(opcode & 0x03);
     uint32_t addr = ps8se(ps,get_memory_inst(pc++));
@@ -2084,13 +2105,15 @@ void r6k_alu_jkhl_psd(uint8_t opcode)
     uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
 
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
+    ALU_OP(oper, r, r32, val);
 
     reg32 = get_r32_dest_ptr(1);
-    *reg32[0] = (r >> 0)  & 0xff;
-    *reg32[1] = (r >> 8)  & 0xff;
-    *reg32[2] = (r >> 16) & 0xff;
-    *reg32[3] = (r >> 24) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *reg32[0] = (r >> 0)  & 0xff;
+        *reg32[1] = (r >> 8)  & 0xff;
+        *reg32[2] = (r >> 16) & 0xff;
+        *reg32[3] = (r >> 24) & 0xff;
+    }
 
     st += 16;
 }
@@ -2098,18 +2121,21 @@ void r6k_alu_jkhl_psd(uint8_t opcode)
 // alu jkhl,ps
 void r6k_alu_jkhl_ps(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint32_t r;
     uint32_t val = read_ps(opcode & 0x03);
     uint8_t **reg32 = get_r32_source_ptr(1);
     uint32_t r32 = (*reg32[3] << 24) | (*reg32[2] << 16) | (*reg32[1] << 8) | (*reg32[0] << 0);
 
-    ALU_OP( ((opcode >> 4) & 0x07), r, r32, val);
+    ALU_OP(oper, r, r32, val);
 
     reg32 = get_r32_dest_ptr(1);
-    *reg32[0] = (r >> 0)  & 0xff;
-    *reg32[1] = (r >> 8)  & 0xff;
-    *reg32[2] = (r >> 16) & 0xff;
-    *reg32[3] = (r >> 24) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *reg32[0] = (r >> 0)  & 0xff;
+        *reg32[1] = (r >> 8)  & 0xff;
+        *reg32[2] = (r >> 16) & 0xff;
+        *reg32[3] = (r >> 24) & 0xff;
+    }
 
     st += 4;
 }
@@ -2119,7 +2145,7 @@ void r6k_alu_jkhl_ps(uint8_t opcode)
 void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
 {
     uint8_t oper = (opcode & 1) + ((((opcode - 0x80) >> 4) & 0x0f) * 2);
-    uint8_t msb = iy ? yh : yh;
+    uint8_t msb = iy ? yh : xh;
     uint8_t lsb = iy ? yl : xl;
     uint16_t  addr = (msb << 8|lsb) + (get_memory_inst(pc++)^128)-128;
     uint32_t  rhs = (get_memory(addr + 3, MEM_TYPE_DATA) << 24) | (get_memory(addr + 2, MEM_TYPE_DATA) << 16) | (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
@@ -2130,10 +2156,12 @@ void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
     ALU_OP(oper, r, lhs, rhs);
 
     r32ptr = get_r32_dest_ptr(1);
-    *r32ptr[0] = (r >> 0  ) & 0xff;
-    *r32ptr[1] = (r >> 8  ) & 0xff;
-    *r32ptr[2] = (r >> 16 ) & 0xff;
-    *r32ptr[3] = (r >> 24 ) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *r32ptr[0] = (r >> 0  ) & 0xff;
+        *r32ptr[1] = (r >> 8  ) & 0xff;
+        *r32ptr[2] = (r >> 16 ) & 0xff;
+        *r32ptr[3] = (r >> 24 ) & 0xff;
+    }
 
     st += 16;
 }
@@ -2141,19 +2169,22 @@ void r6k_alu_jkhl_xyd(uint8_t opcode, uint8_t iy)
 // alu jkhl,(sp+n)
 void r6k_alu_jkhl_spn(uint8_t opcode)
 {
+    int oper = (opcode >> 4) & 0x07;   /* cp (7) must not write back */
     uint16_t addr = (sp + get_memory_inst(pc++));
     uint32_t  rhs = (get_memory(addr + 3, MEM_TYPE_DATA) << 24) | (get_memory(addr + 2, MEM_TYPE_DATA) << 16) | (get_memory(addr + 1, MEM_TYPE_DATA) << 8) | get_memory(addr + 0, MEM_TYPE_DATA);
     uint8_t  **r32ptr = get_r32_source_ptr(1);
     uint32_t  lhs = (*r32ptr[3] << 24) | (*r32ptr[2] << 16) | (*r32ptr[1] << 8) | *r32ptr[0];
     uint16_t  r;
 
-    ALU_OP(((opcode >> 4) & 0x07), r, lhs, rhs);
+    ALU_OP(oper, r, lhs, rhs);
 
     r32ptr = get_r32_dest_ptr(1);
-    *r32ptr[0] = (r >> 0  ) & 0xff;
-    *r32ptr[1] = (r >> 8  ) & 0xff;
-    *r32ptr[2] = (r >> 16 ) & 0xff;
-    *r32ptr[3] = (r >> 24 ) & 0xff;
+    if ( oper != 7 ) {   /* cp sets flags only */
+        *r32ptr[0] = (r >> 0  ) & 0xff;
+        *r32ptr[1] = (r >> 8  ) & 0xff;
+        *r32ptr[2] = (r >> 16 ) & 0xff;
+        *r32ptr[3] = (r >> 24 ) & 0xff;
+    }
 
     st += 16;
 }
@@ -2168,10 +2199,58 @@ void r6k_tstnull_ps(uint8_t opcode)
     st+= 4;
 }
 
+/* Reverse the eight bits of a byte: result[7:0] = v[0:7]. */
+static uint8_t r6k_mirror_byte(uint8_t v)
+{
+    v = (uint8_t)(((v & 0xf0) >> 4) | ((v & 0x0f) << 4));
+    v = (uint8_t)(((v & 0xcc) >> 2) | ((v & 0x33) << 2));
+    v = (uint8_t)(((v & 0xaa) >> 1) | ((v & 0x55) << 1));
+    return v;
+}
+
+/* Pointer to one of B,C,D,E,H,L,-,A (the usual r encoding); index 6 is (HL)
+   and has no register, so callers must handle it before asking. */
+static uint8_t *get_r_ptr(int reg, uint8_t alt)
+{
+    switch (reg) {
+    case 0: return alt ? &b_ : &b;
+    case 1: return alt ? &c_ : &c;
+    case 2: return alt ? &d_ : &d;
+    case 3: return alt ? &e_ : &e;
+    case 4: return alt ? &h_ : &h;
+    case 5: return alt ? &l_ : &l;
+    case 7: return alt ? &a_ : &a;
+    }
+    return NULL;
+}
+
+/* R6K SWAP r — a bit MIRROR of the operand, r[7:0] = r[0:7]. The name belongs
+   to a family that reverses the operand's units: `swap r32` reverses the four
+   bytes of bcde, `swap rp2` the two bytes of a pair, and `swap r` the eight
+   bits of a single byte. Sets no flags. Source is chosen by ALTS and the
+   destination by ALTD, as in r6k_swap_rp2.
+   Encoding is ED x7: 0x87=B 0x97=C 0xa7=D 0xb7=E 0xc7=H 0xd7=L 0xe7=(HL)
+   0xf7=A. */
 void r6k_swap_r(uint8_t opcode)
 {
-    // Doc suggests that that this is a mirror?
-    UNIMPLEMENTED(0xed00|opcode, "swap r");
+    int reg = ((opcode >> 4) & 0x0f) - 8;
+
+    /* Index 6 would be (HL) under the usual r encoding, and ticks.c:4232 labels
+       ED E7 that way — but no such instruction exists: `swap hl` is the PAIR
+       form at ED EF (the xF column, handled by r6k_swap_rp2), and nothing
+       assembles to ED E7. Kept anyway on the maintainer's call: unreachable, so
+       harmless, and it is the reading the surrounding comments assume. */
+    if ( reg == 6 ) {                       /* ED E7, see above */
+        uint16_t addr = l | h << 8;
+        put_memory(addr, r6k_mirror_byte(get_memory_data(addr)));
+        st += 4;
+        return;
+    }
+    {
+        uint8_t *src = get_r_ptr(reg, alts);
+        uint8_t *dst = get_r_ptr(reg, altd);
+        if ( src && dst ) *dst = r6k_mirror_byte(*src);
+    }
     st += 4;
 }
 

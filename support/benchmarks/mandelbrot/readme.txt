@@ -72,11 +72,11 @@ Compiler | CPU  | Library | Ticks
 ---------|------|---------|----------------
 sccz80   | z80  | math16  |   789_222_173 (Aug 10, 2026)
 sccz80   | 8085 | math16  | 969_324_571 (Aug 10, 2026)
-sccz80   | z80  | math32  | 1_017_834_192 (Aug 10, 2026)
-zsdcc    | z80  | math32  | 1_283_829_412 (Aug 10, 2026)
-sccz80   | 8085 | math32  | 980_515_143 (Aug 15, 2026)
-80cc     | z80  | math32  | 1_105_135_041 (Aug 10, 2026)
-80cc     | 8085 | math32  | 2_061_255_175 (Aug 15, 2026)
+sccz80   | z80  | math32  | 1_031_176_011 (Aug 15, 2026)
+zsdcc    | z80  | math32  | 1_301_251_782 (Aug 16, 2026)
+sccz80   | 8085 | math32  | 2_041_768_834 (Aug 15, 2026)
+80cc     | z80  | math32  | 1_315_040_014 (Aug 18, 2026, -fframe-pointer)
+80cc     | 8085 | math32  | 2_061_364_665 (Aug 15, 2026)
 sccz80   | 8085 | mbf32   | 1_805_825_674  (Jul 2026)
 
 
@@ -98,42 +98,52 @@ cycle count  = 3256695469
 time @ 4MHz  = 3256695469 / 4x10^6 = 13 min 34 sec
 
 3.
-Z88DK April 28, 2021
-zsdcc #12070 / new c library
-1952 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+1921 bytes less page zero
 
-cycle count  = 3736214166
-time @ 4MHz  = 3736214166 / 4*10^6 = 15 min 34 sec
+cycle count  = 3731890506
+time @ 4MHz  = 3731890506 / 4*10^6 =  15 min 33 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 4.
-Z88DK April 28, 2021
-zsdcc #12070 / classic c library
-2891 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+2771 bytes less page zero
 
-cycle count  = 3766086833
-time @ 4MHz  = 3766086833 / 4*10^6 = 15 min 41 sec
+cycle count  = 3727334560
+time @ 4MHz  = 3727334560 / 4*10^6 =  15 min 32 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 5.
-Z88DK August 10, 2026
-zsdcc / classic c library / math32
-3689 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library / math32
+3857 bytes less page zero
 
-cycle count  = 1283829412
-time @ 4MHz  = 1283829412 / 4*10^6 =  5 min 21 sec
+cycle count  = 1301251782
+time @ 4MHz  = 1301251782 / 4*10^6 =  5 min 25 sec
 
 IEEE 32-bit float implementation (truncated high-half 32×32).
 
 6.
-Z88DK August 10, 2026
-zsdcc #15242 / new c library / math32
-3964 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / math32
+3007 bytes less page zero
 
-cycle count  = 1385735782
-time @ 4MHz  = 1385735782 / 4*10^6 =  5 min 46 sec
+cycle count  = 1324037732
+time @ 4MHz  = 1324037732 / 4*10^6 =  5 min 31 sec
+
+IEEE 32-bit float implementation.
+
+6b.
+Z88DK August 15, 2026
+sccz80 / new c library / math32
+2940 bytes less page zero
+
+cycle count  = 1049525678
+time @ 4MHz  = 1049525678 / 4*10^6 =  4 min 22 sec
 
 IEEE 32-bit float implementation.
 
@@ -158,21 +168,21 @@ time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 48-bit float implementation causes relative slowdown.
 
 9.
-SDCC 4.2.0 Linux
-3962 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+4288 bytes less page zero
 
-cycle count  = 4991827956
-time @ 4MHz  = 4991827956 / 4*10^6 = 20 min 48 sec
+cycle count  = 7175307472
+time @ 4MHz  = 7175307472 / 4*10^6 = 29 min 54 sec
 
 Slow speed largely due to float implementation in C.
 
 10.
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / classic c library / math32
-3609 bytes less page zero
+3780 bytes less page zero
 
-cycle count  = 1017834192
-time @ 4MHz  = 1017834192 / 4*10^6 =  4 min 14 sec
+cycle count  = 1031176011
+time @ 4MHz  = 1031176011 / 4*10^6 =  4 min 18 sec
 
 IEEE 32-bit float implementation.
 (Truncated high-half 32×32 mantissa mul.)
@@ -180,31 +190,31 @@ IEEE 32-bit float implementation.
 11.
 Z88DK August 15, 2026
 sccz80 / classic c library / 8085 / math32
-4520 bytes less page zero
+4494 bytes less page zero
 
-cycle count  = 980515143
-time @ 4MHz  = 980515143 / 4*10^6 =  4 min  5 sec
+cycle count  = 2041768834
+time @ 4MHz  = 2041768834 / 4*10^6 =  8 min 30 sec
 
 IEEE 32-bit float implementation (math32_8085).
 (opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 12.
-Z88DK August 10, 2026
+Z88DK August 18, 2026
 80cc / classic c library / math32
-4134 bytes less page zero
+4940 bytes less page zero
 
-cycle count  = 1105135041
-time @ 4MHz  = 1105135041 / 4*10^6 =  4 min 36 sec
+cycle count  = 1315040014
+time @ 4MHz  = 1315040014 / 4*10^6 =  5 min 29 sec
 
 IEEE 32-bit float implementation.
 
 13.
 Z88DK August 15, 2026
 80cc / classic c library / 8085 / math32
-4975 bytes less page zero
+4883 bytes less page zero
 
-cycle count  = 2061255175
-time @ 4MHz  = 2061255175 / 4*10^6 =  8 min 35 sec
+cycle count  = 2061364665
+time @ 4MHz  = 2061364665 / 4*10^6 =  8 min 35 sec
 
 IEEE 32-bit float implementation (math32_8085).
 

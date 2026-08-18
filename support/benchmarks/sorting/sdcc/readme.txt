@@ -40,12 +40,12 @@ The timer labels were placed purposely so that they would
 change little from compile to compile.  Addresses found
 for one of the compiles:
 
-TIMER_START = 0x3f0
+TIMER_START = 0x3aa
    0x023 (TIMER_START in sort-ran-20.sym) -
    0x03c (_main in sort-ran-20.sym) +
    0x409 (_main in sort-ran-20.map)
 
-TIMER_STOP = 0x407
+TIMER_STOP = 0x3bb
    0x03b (TIMER_STOP in sort-ran-20.sym) -
    0x03c (_main in sort-ran-20.sym) +
    0x409 (_main in sort-ran-20.map)
@@ -53,17 +53,21 @@ TIMER_STOP = 0x407
 The largest NUM=20 case was used to report size.
 (This is the sort-ran-20 program).
 	
-SIZE = 1080 bytes
-   0x03c9 (_CODE in sort-ran-20.map) +
-   0x0003 (_HEADER0 in sort-ran-20.map) +
-   0x0002 (_HEADER1 in sort-ran-20.map) +
-   0x0002 (_HEADER2 in sort-ran-20.map) +
-   0x0002 (_HEADER3 in sort-ran-20.map) +
-   0x0002 (_HEADER4 in sort-ran-20.map) +
-   0x0002 (_HEADER5 in sort-ran-20.map) +
-   0x0002 (_HEADER6 in sort-ran-20.map) +
-   0x0002 (_HEADER7 in sort-ran-20.map) +
-   0x000c (_HEADER8 in sort-ran-20.map) +
+SIZE = 964 bytes
+   819  (_CODE in sort-ran-20.map) +
+   3    (_HEADER0 in sort-ran-20.map) +
+   3    (_HEADER1 in sort-ran-20.map) +
+   3    (_HEADER2 in sort-ran-20.map) +
+   3    (_HEADER3 in sort-ran-20.map) +
+   3    (_HEADER4 in sort-ran-20.map) +
+   3    (_HEADER5 in sort-ran-20.map) +
+   3    (_HEADER6 in sort-ran-20.map) +
+   3    (_HEADER7 in sort-ran-20.map) +
+   16   (_HEADER8 in sort-ran-20.map) +
+   2    (_HOME in sort-ran-20.map) +
+   56   (_GSINIT in sort-ran-20.map) +
+   1    (_GSFINAL in sort-ran-20.map) +
+   46   (_DATA in sort-ran-20.map)
 	0x0023 (_GSINIT in sort-ran-20.map) +
    0x0001 (_GSFINAL in sort-ran-20.map) +
    0x002e (_DATA in sort-ran-20.map)
@@ -83,21 +87,19 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Not compile yet - some kind of error.
-
-SDCC 3.6.5 #9852 (MINGW64)
-1080 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+964 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20         113965     0.0285 sec
-sort-ord-20          99399     0.0248 sec
-sort-rev-20         116849     0.0292 sec
-sort-equ-20         184267     0.0461 sec
+sort-ran-20         109535     0.0274 sec
+sort-ord-20          95078     0.0238 sec
+sort-rev-20         111590     0.0279 sec
+sort-equ-20         180386     0.0451 sec
 
-sort-ran-5000     77526792    19.3817 sec
-sort-ord-5000     61119685    15.2799 sec
-sort-rev-5000     67382381    16.8456 sec
+sort-ran-5000     75265433    18.8164 sec
+sort-ord-5000     59249752    14.8124 sec
+sort-rev-5000     65223791    16.3059 sec
 sort-equ-5000         did not finish
 
 qsort not present in library, instead supplied from the internet.

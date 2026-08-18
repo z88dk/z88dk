@@ -87,6 +87,9 @@ static void normalize_types(Node *node)
     case AST_FUNC_CALL:
         for (int i = 0; i < array_len(node->args); i++)
             normalize_types(array_get_byindex(node->args, i));
+        /* A direct call carries a callee expression too when the parser
+           demoted it to a pointer call (expr.c, ptr == NULL). */
+        normalize_types(node->callee);
         /* Unwrap node->type from `KIND_FUNC` to the function's
            return type. The parser stamps the call node with the
            function's full type at construction; without unwrapping
@@ -104,6 +107,12 @@ static void normalize_types(Node *node)
     case AST_FUNCPTR_CALL:
         for (int i = 0; i < array_len(node->args); i++)
             normalize_types(array_get_byindex(node->args, i));
+        /* The callee expression is a child as well, and for `tab[i](x)` it is
+           where the index arithmetic lives. Skipping it left node->type NULL
+           through that whole subtree, so every pass that consults a type
+           declined to act: `tab[i]` kept an l_mult for the 2-byte stride that
+           the identical `itab[i]` reduces to `add hl,hl`. */
+        normalize_types(node->callee);
         break;
     case OP_USHR: case OP_USHL: case OP_SSHR: case OP_SSHL:
         /* Shifts don't apply the usual arithmetic conversions —

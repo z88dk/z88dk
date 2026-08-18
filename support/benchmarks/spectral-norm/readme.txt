@@ -52,11 +52,11 @@ Compiler | CPU  | Library | Ticks
 ---------|------|---------|-----------------
 sccz80   | z80  | math16  | 2_531_057_653 (Aug 10, 2026)
 sccz80   | 8085 | math16  | 3_438_830_098 (Aug 10, 2026)
-sccz80   | z80  | math32  | 4_212_448_031 (Aug 10, 2026)
-zsdcc    | z80  | math32  | 4_425_446_444 (Aug 10, 2026)
+sccz80   | z80  | math32  | 4_225_897_043 (Aug 15, 2026)
+zsdcc    | z80  | math32  | 4_438_922_816 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 7_938_950_247 (Aug 15, 2026)
-80cc     | z80  | math32  | 4_716_380_923 (Aug 10, 2026)
-80cc     | 8085 | math32  | 8_416_587_188 (Aug 15, 2026)
+80cc     | z80  | math32  | 4_962_667_851 (Aug 18, 2026, -fframe-pointer)
+80cc     | 8085 | math32  | 7_955_869_788 (Aug 15, 2026)
 sccz80   | z80  | mbf32   | 6_346_228_466   (Jul 2026)
 sccz80   | 8085 | mbf32   | 6_227_757_878   (Jul 2026)
 
@@ -74,26 +74,26 @@ cycle count  = 6790499956
 time @ 4MHz  = 6790499956 / 4*10^6 = 28 min 18 sec
 
 2.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-3358 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+3353 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8628617805
-time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
+cycle count  = 8624203411
+time @ 4MHz  = 8624203411 / 4*10^6 =  35 min 56 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 3.
-Z88DK April 30, 2021
-zsdcc #12250 / classic c library / math48
-3984 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library / math48
+3982 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8617785182
-time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
+cycle count  = 8613814814
+time @ 4MHz  = 8613814814 / 4*10^6 =  35 min 53 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -132,50 +132,60 @@ time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 [Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.
 
 7.
-Z88DK August 10, 2026
-zsdcc / classic c library / math32
-5699 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library / math32
+5899 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4425446444
-time @ 4MHz  = 4425446444 / 4*10^6 =  18 min 26 sec
+cycle count  = 4438922816
+time @ 4MHz  = 4438922816 / 4*10^6 =  18 min 30 sec
 
 8.
-Z88DK August 10, 2026
-zsdcc #15242 / new c library / math32
-5479 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / math32
+5293 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9474952331
-time @ 4MHz  = 9474952331 / 4*10^6 =  39 min 29 sec
+cycle count  = 4471074620
+time @ 4MHz  = 4471074620 / 4*10^6 =  18 min 38 sec
+
+8b.
+Z88DK August 15, 2026
+sccz80 / new c library / math32
+5161 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 4247660135
+time @ 4MHz  = 4247660135 / 4*10^6 =  17 min 42 sec
 
 9.
-SDCC 4.2.0 Linux
-6013 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+6150 bytes less page zero
 
 error: 5 * 10^(-6)
 
-cycle count  = 15739496039
-time @ 4MHz  = 15739496039 / 4*10^6 = 65 min 35 sec
+cycle count  = 18120604224
+time @ 4MHz  = 18120604224 / 4*10^6 = 75 min 30 sec
 
 Slow speed & large size due to float implementation in C.
 
 10.
-Z88DK August 10, 2026
+Z88DK August 15, 2026
 sccz80 / classic c library / math32
-5542 bytes less page zero
+5746 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4212448031
-time @ 4MHz  = 4212448031 / 4*10^6 =  17 min 33 sec
+cycle count  = 4225897043
+time @ 4MHz  = 4225897043 / 4*10^6 =  17 min 36 sec
 
 11.
 Z88DK August 15, 2026
 sccz80 / classic c library / 8085 / math32
-6749 bytes less page zero
+6705 bytes less page zero
 
 error: 2 * 10^(-7)
 
@@ -183,24 +193,24 @@ cycle count  = 7938950247
 time @ 4MHz  = 7938950247 / 4*10^6 =  33 min  5 sec
 
 12.
-Z88DK August 10, 2026
+Z88DK August 18, 2026
 80cc / classic c library / math32
-5890 bytes less page zero
+6416 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4716380923
-time @ 4MHz  = 4716380923 / 4*10^6 =  19 min 39 sec
+cycle count  = 4962667851
+time @ 4MHz  = 4962667851 / 4*10^6 =  20 min 41 sec
 
 13.
 Z88DK August 15, 2026
 80cc / classic c library / 8085 / math32
-7048 bytes less page zero
+6921 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 8416587188
-time @ 4MHz  = 8416587188 / 4*10^6 =  35 min  4 sec
+cycle count  = 7955869788
+time @ 4MHz  = 7955869788 / 4*10^6 =  33 min  9 sec
 
 14.
 Z88DK July 19, 2026

@@ -71,6 +71,7 @@ int ir_opt_cse(Func *f);
  * share ONE computed anchor address, with the constant byte delta folded into
  * each access's mem.offset. The redundant address chains die in DCE. Gated by
  * IR_NO_ADDR_CSE; returns the number of accesses repointed. */
+int ir_opt_lea_offset(Func *f);
 int ir_opt_addr_cse(Func *f);
 
 /* Loop-invariant code motion (roadmap #3e).

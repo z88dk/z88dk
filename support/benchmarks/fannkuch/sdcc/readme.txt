@@ -30,20 +30,20 @@ TIMING
 Change back to the main directory.
 
 sdcc -mz80 -DINLINE -DTIMER --max-allocs-per-node200000 fannkuch.c
-hex2bin fannkuch.ihx
+makebin -p fannkuch.ihx fannkuch.bin
 
-TIMER_START = 0x492
+TIMER_START = 0x47c
    0x288 (TIMER_START in fannkuch.sym) -
    0x288 (_main in fannkuch.sym) +
    0x492 (_main in fannkuch.map)
 
-TIMER_STOP = 0x498
+TIMER_STOP = 0x482
    0x28e (TIMER_STOP in fannkuch.sym) -
    0x288 (_main in fannkuch.sym) +
    0x492 (_main in fannkuch.map)
 
-SIZE = 962 bytes
-   792  (_CODE in fannkuch.map) +
+SIZE = 946 bytes
+   770  (_CODE in fannkuch.map) +
    3    (_HEADER0 in fannkuch.map) +
    3    (_HEADER1 in fannkuch.map) +
    3    (_HEADER2 in fannkuch.map) +
@@ -52,14 +52,15 @@ SIZE = 962 bytes
    3    (_HEADER5 in fannkuch.map) +
    3    (_HEADER6 in fannkuch.map) +
    3    (_HEADER7 in fannkuch.map) +
-   12   (_HEADER8 in fannkuch.map) +
+   16   (_HEADER8 in fannkuch.map) +
+   2    (_HOME in fannkuch.map) +
    37   (_GSINIT in fannkuch.map) +
    1    (_GSFINAL in fannkuch.map) +
    96   (_DATA in fannkuch.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks fannkuch.bin -start 0492 -end 0498 -counter 9999999999
+z88dk-ticks fannkuch.bin -start 047c -end 0482 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -71,8 +72,8 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
-962 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+946 bytes less page zero
 
-cycle count  = 57325388
-time @ 4MHz  = 57325388 / 4*10^6 = 14.33 sec
+cycle count  = 55733097
+time @ 4MHz  = 55733097 / 4*10^6 = 13.93 sec

@@ -37,6 +37,12 @@ int rpn_eval(const char* expr, char** vars);
 
 int debug = 0;
 char *c_cpu = "z80";
+/* Which compiler produced the input. A rule can be sound for one compiler and
+   wrong for another — the same rules file is applied to every compiler's
+   output, and they differ in which registers a sequence may clobber. Set with
+   -compiler=<name>; empty means "unknown", which makes %compiler never match
+   and %notcompiler always match, so an ungated rule behaves exactly as before. */
+char *c_compiler = "";
 int global_again = 0; /* signalize that rule set has changed */
 #define FIRSTLAB 'L'
 #define LASTLAB 'N'
@@ -773,6 +779,16 @@ static struct lnode* opt(struct lnode* r)
                 if ( !found ) {
                     break;
                 }
+            } else if ( strncmp(p->l_text, "%notcompiler", 12) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 13)-1,p->l_text + 13);
+                if ( strcmp(tbuf, c_compiler) == 0 )
+                    break;
+            } else if ( strncmp(p->l_text, "%compiler", 9) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 10)-1,p->l_text + 10);
+                if ( strcmp(tbuf, c_compiler) )
+                    break;
             } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
                 char  tbuf[1024];
                 snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
@@ -911,6 +927,8 @@ int main(int argc, char** argv)
             debug = 1;
         else if ( strncmp(argv[i], "-m",2) == 0 )
             c_cpu = argv[i] + 2;
+        else if ( strncmp(argv[i], "-compiler=", 10) == 0 )
+            c_compiler = argv[i] + 10;
         else if ( strncmp(argv[i], "-O", 2) == 0) {
             int j = c_options_num++;
             c_options = realloc(c_options, c_options_num * sizeof(c_options[0]));

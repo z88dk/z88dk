@@ -34,20 +34,20 @@ TIMING
 Change back to the main directory.
 
 sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 spectral-norm.c
-hex2bin spectral-norm.ihx
+makebin -p spectral-norm.ihx spectral-norm.bin
 
-TIMER_START = 0x428
+TIMER_START = 0x414
    0x21e(TIMER_START in spectral-norm.sym) -
    0x214 (_main in spectral-norm.sym) +
    0x41e (_main in spectral-norm.map)
 
-TIMER_STOP = 0x53d
+TIMER_STOP = 0x538
    0x333 (TIMER_STOP in spectral-norm.sym) -
    0x214 (_main in spectral-norm.sym) +
    0x41e (_main in spectral-norm.map)
 
-SIZE = 6013 bytes
-   2165 (_CODE in spectral-norm.map) +
+SIZE = 6150 bytes
+   2036 (_CODE in spectral-norm.map) +
    3    (_HEADER0 in spectral-norm.map) +
    3    (_HEADER1 in spectral-norm.map) +
    3    (_HEADER2 in spectral-norm.map) +
@@ -56,15 +56,15 @@ SIZE = 6013 bytes
    3    (_HEADER5 in spectral-norm.map) +
    3    (_HEADER6 in spectral-norm.map) +
    3    (_HEADER7 in spectral-norm.map) +
-   12   (_HEADER8 in spectral-norm.map) +
-   2554 (_HOME in spectral-norm.map) +
+   16   (_HEADER8 in spectral-norm.map) +
+   2816 (_HOME in spectral-norm.map) +
    37   (_GSINIT in spectral-norm.map) +
    1    (_GSFINAL in spectral-norm.map) +
    1220 (_DATA in spectral-norm.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks spectral-norm.bin -start 0428 -end 053d -counter 999999999999
+z88dk-ticks spectral-norm.bin -start 0414 -end 0538 -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -76,10 +76,10 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
-6013 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+6150 bytes less page zero
 
 error: 5 * 10^(-6)
 
-cycle count  = 15739496039
-time @ 4MHz  = 15739496039 / 4*10^6 = 65 min 35 sec
+cycle count  = 18120604224
+time @ 4MHz  = 18120604224 / 4*10^6 = 75 min 30 sec

@@ -22,6 +22,7 @@ More detailed, but still incomplete changelist:
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
 - [z80asm] #define now supported as alias for defc
+- [zsdcc] Upgraded to SDCC 4.6.0 r16639
 
 
 z88dk v2.4 - 02.10.2025

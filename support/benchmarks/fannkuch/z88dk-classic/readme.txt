@@ -33,7 +33,8 @@ classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
 
 classic/80cc
-zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
 
 classic/80cc/8085
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
@@ -76,12 +77,12 @@ cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 
-Z88DK July 20, 2026
+Z88DK August 18, 2026
 classic/80cc
-2345 bytes less page zero
+2008 bytes less page zero
 
-cycle count  = 88892408
-time @ 4MHz  = 88892408 / 4*10^6 = 22.22 sec
+cycle count  = 74090072
+time @ 4MHz  = 74090072 / 4*10^6 = 18.52 sec
 
 
 Z88DK July 20, 2026
@@ -92,9 +93,9 @@ cycle count  = 77390398
 time @ 4MHz  = 77390398 / 4*10^6 = 19.35 sec
 
 
-Z88DK April 20, 2020
-classic/zsdcc #11566
-1304 bytes less page zero
+Z88DK August 16, 2026
+classic/zsdcc 4.6.0 #16639
+2028 bytes less page zero
 
-cycle count  = 59756269
-time @ 4MHz  = 59756269 / 4*10^6 = 14.94 sec
+cycle count  = 62181357
+time @ 4MHz  = 62181357 / 4*10^6 =   15.5 sec

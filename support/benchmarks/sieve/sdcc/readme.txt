@@ -30,20 +30,20 @@ TIMING
 ======
 
 sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 sieve.c -o sieve.ihx
-hex2bin sieve.ihx
+makebin -p sieve.ihx sieve.bin
 
 TIMER_START = 0x217
    0x00d (TIMER_START in sieve.sym) -
    0x000 (_main in sieve.sym) +
    0x20a (_main in sieve.map)
 
-TIMER_STOP = 0x2ab
+TIMER_STOP = 0x2a6
    0x0a1 (TIMER_STOP in sieve.sym) -
    0x000 (_main in sieve.sym) +
    0x20a (_main in sieve.map)
 
-SIZE = 8278 bytes
-   196  (_CODE in sieve.map) +
+SIZE = 8279 bytes
+   191  (_CODE in sieve.map) +
    3    (_HEADER0 in sieve.map) +
    3    (_HEADER1 in sieve.map) +
    3    (_HEADER2 in sieve.map) +
@@ -52,14 +52,15 @@ SIZE = 8278 bytes
    3    (_HEADER5 in sieve.map) +
    3    (_HEADER6 in sieve.map) +
    3    (_HEADER7 in sieve.map) +
-   12   (_HEADER8 in sieve.map) +
+   16   (_HEADER8 in sieve.map) +
+   2    (_HOME in sieve.map) +
    37   (_GSINIT in sieve.map) +
    1    (_GSFINAL in sieve.map) +
    8008 (_DATA in sieve.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks sieve.bin -start 0217 -end 02ab -counter 9999999999
+z88dk-ticks sieve.bin -start 0217 -end 02a6 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -71,8 +72,8 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
-8278 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+8279 bytes less page zero
 
-cycle count  = 4219481
-time @ 4MHz  = 4219481 / 4*10^6 = 1.0548 sec
+cycle count  = 4218689
+time @ 4MHz  = 4218689 / 4*10^6 = 1.0547 sec

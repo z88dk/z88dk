@@ -51,7 +51,12 @@ add_job nb_c_sccz80_z80_m16 n-body classic sccz80 z80 math16 z88dk-classic/n-bod
   +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math16 -m -lndos
 add_job nb_c_sccz80_8085_m16 n-body classic sccz80 8085 math16 z88dk-classic/n-body.c \
   +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints --math16 -lmath32_8085 -m -lndos
-# 80cc n-body math32: known INVALID 2nd energy — still measure ticks for size/ticks revision note if published; skip publish per existing exception
+# 80cc n-body math32: TIMER valid — do not skip. +test PRINTF needs -counter > 1e8
+# (default cap prints 10000000x, which is not energy).
+add_job nb_c_80cc_z80_m32 n-body classic 80cc z80 math32 z88dk-classic/n-body.c \
+  +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos
+add_job nb_c_80cc_8085_m32 n-body classic 80cc 8085 math32 z88dk-classic/n-body.c \
+  +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos
 
 # spectral-norm
 add_job sn_c_sccz80_z80_m32 spectral-norm classic sccz80 z80 math32 z88dk-classic/spectral-norm.c \
@@ -99,13 +104,17 @@ add_job fa_c_80cc_z80_m32 fasta classic 80cc z80 math32 z88dk-classic/fasta.c \
 add_job fa_c_80cc_8085_m32 fasta classic 80cc 8085 math32 z88dk-classic/fasta.c \
   +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --math32 -m -lndos -pragma-define:CRT_HEAP_AMALLOC=1
 
-# whetstone (80cc math32 SKIP per existing note — not scheduled)
+# whetstone — 80cc math32 reaches TIMER_STOP; do not skip
 add_job wh_c_sccz80_z80_m32 whetstone classic sccz80 z80 math32 z88dk-classic/whetstone.c \
   +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
 add_job wh_c_sccz80_8085_m32 whetstone classic sccz80 8085 math32 z88dk-classic/whetstone.c \
   +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
 add_job wh_c_zsdcc_z80_m32 whetstone classic zsdcc z80 math32 z88dk-classic/whetstone.c \
   +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
+add_job wh_c_80cc_z80_m32 whetstone classic 80cc z80 math32 z88dk-classic/whetstone.c \
+  +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
+add_job wh_c_80cc_8085_m32 whetstone classic 80cc 8085 math32 z88dk-classic/whetstone.c \
+  +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK --math32 -lndos -m
 
 # ---------- newlib math32 / math16 ----------
 # n-body
@@ -141,6 +150,26 @@ add_job wh_n_sccz80_z80_m32 whetstone new sccz80 z80 math32 z88dk-new/whetstone.
   +z80 -vn -startup=0 -clib=new -O3 --opt-code-speed=inlineints -DSTATIC -DTIMER --math32 -m -pragma-include:zpragma.inc -create-app
 add_job wh_n_zsdcc_z80_m32 whetstone new zsdcc z80 math32 z88dk-new/whetstone.c \
   +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER --math32 -m -pragma-include:zpragma.inc -create-app
+
+# Optional filters, space-separated. Example:
+#   ONLY_MATH=math32 ONLY_COMPILER="sccz80 80cc" bash .agents/scripts/run_math_benches.sh
+if [[ -n "${ONLY_MATH:-}" || -n "${ONLY_COMPILER:-}" || -n "${ONLY_CLIB:-}" ]]; then
+  filtered=()
+  for spec in "${JOBS[@]}"; do
+    IFS='|' read -r _id _bench _clib _compiler _cpu _math _src _rest <<<"$spec"
+    if [[ -n "${ONLY_MATH:-}" && " ${ONLY_MATH} " != *" ${_math} "* ]]; then
+      continue
+    fi
+    if [[ -n "${ONLY_COMPILER:-}" && " ${ONLY_COMPILER} " != *" ${_compiler} "* ]]; then
+      continue
+    fi
+    if [[ -n "${ONLY_CLIB:-}" && " ${ONLY_CLIB} " != *" ${_clib} "* ]]; then
+      continue
+    fi
+    filtered+=("$spec")
+  done
+  JOBS=("${filtered[@]}")
+fi
 
 TOTAL=${#JOBS[@]}
 echo "total_jobs=$TOTAL" | tee -a "$STATUS"

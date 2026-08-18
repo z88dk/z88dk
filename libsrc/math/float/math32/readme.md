@@ -426,7 +426,7 @@ Careful use of the intrinsic functions can result in significant performance imp
 ```
 On plain z80 and 8085 the `invsqrt`/`sqr` rewrite is about a __10–13%__ TIMER win (remeasured below). HW-mul builds (z80n / z180) still show larger relative gains on historical rows. Most of the gain is from using `invsqrt()` directly: `y=invsqrt(x)` instead of `y=l_f32_inv(x*invsqrt(x))`.
 
-Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). math32_8085 rows (base and opt) remeasured Aug 15, 2026. Other math32 rows remeasured Aug 12, 2026. Remaining rows are historical.
+Timing: classic `+test`, sccz80 `-O2 -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (N=1000; `-m8085` for 8085 rows). math32 and math32_8085 base TIMER rows remeasured Aug 15, 2026. Remaining rows are historical.
 
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
@@ -435,14 +435,14 @@ math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_8
 mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_835_079_611
 mbf32_8085                  | sccz80   | -0.1699168    | -0.1699168    | 1_849_800_062
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_791_103_882_
-math32                      | zsdcc    | -0.1690752    | -0.1690864    | _0_984_851_361_
+math32                      | sccz80   | -0.1690752    | -0.1690867    | _0_797_460_656_
+math32                      | zsdcc    | -0.1690752    | -0.1690864    | _0_849_403_541_
 math32                 (opt)| sccz80   | -0.1690752    | -0.1690869    | __0_714_165_809__
 math32_z80n                 | sccz80   | -0.1690752    | -0.1690864    | _0_519_025_592_
 math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_396_603_258_
 math32_z180                 | sccz80   | -0.1690752    | -0.1690864    | _0_494_347_688_
 math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690869    | _0_380_149_278_
-math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_526_136_021_
+math32_8085                 | sccz80   | -0.1690752    | -0.1690808    | _1_526_138_871_
 math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_326_198_580__
 
 
@@ -469,25 +469,25 @@ math32_8085            (opt)| sccz80   | -0.1690752    | -0.1690809    | __1_326
             }
 #endif
 ```
-For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–16%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks. After the Aug 15, 2026 math32_8085 remeasure, 8085 base and opt TIMER ticks are both lower than the matching plain z80 math32 rows.
+For z80n / z180 / 8085, using `sqr()` instead of a full multiply yields roughly a __11–16%__ improvement on the mandelbrot loop (five `16_8x8` products vs a general 24×24). On plain z80 the same rewrite helps less (~1% here) because the general multiply path is already a different 3×`32_24x8` construction rather than eight hardware `16_8x8` multiplies; the dedicated square still wins on absolute ticks. After the Aug 15, 2026 remasure, 8085 base TIMER is the correct-image path (ldexp sign preserved).
 
-Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). math32_8085 rows (base and opt) remeasured Aug 15, 2026. Other math32 rows remeasured Aug 12, 2026. Remaining rows are historical.
+Timing: classic `+test`, sccz80 `-O3 --opt-code-speed=inlineints -DSTATIC -DTIMER`, `--math32` / `--math-mbf32`, `z88dk-ticks -start TIMER_START -end TIMER_STOP` (w=h=60; `-m8085` for 8085 rows; 8085 mbf32 uses `--opt-code-speed=all`). math32_8085 rows (base and opt) remeasured Aug 15, 2026. zsdcc math32 / math48 TIMER rows remeasured Aug 16, 2026 (zsdcc 4.6.0 #16639). Other math32 rows remeasured Aug 12, 2026. Remaining rows are historical.
 
 Library                     | Compiler | Ticks
 -|-|-
 genmath                     | sccz80   | 3_596_657_568
-math48                      | zsdcc    | 3_766_086_833
+math48                      | zsdcc    | 3_727_334_560
 math48                      | sccz80   | 3_266_168_305
 mbf32                       | sccz80   | 1_798_158_288
 mbf32_8085                  | sccz80   | 1_805_825_674
-math32                      | zsdcc    | _1_384_979_312_
-math32                      | sccz80   | _1_017_833_592_
+math32                      | zsdcc    | _1_301_251_782_
+math32                      | sccz80   | _1_031_176_011_
 math32                 (opt)| sccz80   | __1_004_767_801__
 math32_z80n                 | sccz80   | _0_777_474_379_
 math32_z80n            (opt)| sccz80   | _0_694_488_693_
 math32_z180                 | sccz80   | _0_723_374_585_
 math32_z180            (opt)| sccz80   | _0_642_181_961_
-math32_8085                 | sccz80   | _0_980_515_143_
+math32_8085                 | sccz80   | _2_041_768_834_
 math32_8085            (opt)| sccz80   | __0_824_115_880__
 
 ---

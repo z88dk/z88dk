@@ -105,6 +105,8 @@ BENCH_ROWS: list[tuple[str, str, str, bool]] = [
     ("nb_c_sccz80_z80_m16", "n-Body", "Z88DK/SCCZ80_CLASSIC/MATH16", False),
     ("nb_c_sccz80_8085_m16", "n-Body", "Z88DK/SCCZ80_CLASSIC/8085/MATH16", False),
     ("nb_c_zsdcc_z80_m32", "n-Body", "Z88DK/SDCC_CLASSIC/MATH32", False),
+    ("nb_c_80cc_z80_m32", "n-Body", "Z88DK/80CC_CLASSIC/MATH32", False),
+    ("nb_c_80cc_8085_m32", "n-Body", "Z88DK/80CC_CLASSIC/8085/MATH32", False),
     ("nb_n_sccz80_z80_m32", "n-Body", "Z88DK/SCCZ80_NEW/MATH32", False),
     ("nb_n_sccz80_z80_m16", "n-Body", "Z88DK/SCCZ80_NEW/MATH16", False),
     ("nb_n_zsdcc_z80_m32", "n-Body", "Z88DK/SDCC_NEW/MATH32", False),
@@ -112,6 +114,8 @@ BENCH_ROWS: list[tuple[str, str, str, bool]] = [
     ("wh_c_sccz80_z80_m32", "Whetstone 1.2", "Z88DK/SCCZ80_CLASSIC/MATH32", True),
     ("wh_c_sccz80_8085_m32", "Whetstone 1.2", "Z88DK/SCCZ80_CLASSIC/8085/MATH32", True),
     ("wh_c_zsdcc_z80_m32", "Whetstone 1.2", "Z88DK/SDCC_CLASSIC/MATH32", True),
+    ("wh_c_80cc_z80_m32", "Whetstone 1.2", "Z88DK/80CC_CLASSIC/MATH32", True),
+    ("wh_c_80cc_8085_m32", "Whetstone 1.2", "Z88DK/80CC_CLASSIC/8085/MATH32", True),
     ("wh_n_sccz80_z80_m32", "Whetstone 1.2", "Z88DK/SCCZ80/MATH32", True),
     ("wh_n_zsdcc_z80_m32", "Whetstone 1.2", "Z88DK/SDCC/MATH32", True),
 ]
@@ -242,6 +246,8 @@ CLASSIC_ROWS = [
     ("nb_c_sccz80_8085_m32", "n-body", "math32_8085", "sccz80"),
     ("nb_c_sccz80_z80_m16", "n-body", "math16", "sccz80"),
     ("nb_c_sccz80_8085_m16", "n-body", "math16_8085", "sccz80"),
+    ("nb_c_80cc_z80_m32", "n-body", "math32", "80cc"),
+    ("nb_c_80cc_8085_m32", "n-body", "math32_8085", "80cc"),
     # spectral
     ("sn_c_zsdcc_z80_m32", "spectral-norm", "math32", "zsdcc"),
     ("sn_c_sccz80_z80_m32", "spectral-norm", "math32", "sccz80"),
@@ -268,6 +274,8 @@ CLASSIC_ROWS = [
     ("wh_c_sccz80_z80_m32", "whetstone", "math32", "sccz80"),
     ("wh_c_zsdcc_z80_m32", "whetstone", "math32", "zsdcc"),
     ("wh_c_sccz80_8085_m32", "whetstone", "math32_8085", "sccz80"),
+    ("wh_c_80cc_z80_m32", "whetstone", "math32", "80cc"),
+    ("wh_c_80cc_8085_m32", "whetstone", "math32_8085", "80cc"),
 ]
 
 
@@ -313,7 +321,23 @@ def update_classic(text: str, ok: dict[str, dict[str, str]], date_note: str) -> 
         tick_us = fmt_us(ticks)
         tick_cell = f"__{tick_us}__" if bold else tick_us
 
+        sec_start, sec_end = None, None
         for i, ln in enumerate(lines):
+            if ln.startswith("### ") and sec in ln.lower():
+                sec_start = i
+                break
+        if sec_start is None:
+            print(f"classic section miss {sec} for {jid}", file=sys.stderr)
+            continue
+        sec_end = len(lines)
+        for j in range(sec_start + 1, len(lines)):
+            if lines[j].startswith("### "):
+                sec_end = j
+                break
+
+        for i, ln in enumerate(lines):
+            if i < sec_start or i >= sec_end:
+                continue
             if not re.search(lib_pat, ln):
                 continue
             if f"| {comp}" not in ln and f"| {comp} " not in ln:
@@ -444,26 +468,28 @@ def make_paste(ok: dict[str, dict[str, str]], date_note: str) -> str:
         "| Library | Compiler | CPU | Ticks | Size |",
         "|---------|----------|-----|------:|-----:|",
     ]
-    nb_z80 = ["nb_c_sccz80_z80_m32", "nb_c_zsdcc_z80_m32"]
+    nb_z80 = ["nb_c_sccz80_z80_m32", "nb_c_zsdcc_z80_m32", "nb_c_80cc_z80_m32"]
     nb_z80 = [j for j in nb_z80 if j in ok]
+    nb_85 = [j for j in ["nb_c_sccz80_8085_m32", "nb_c_80cc_8085_m32"] if j in ok]
     bz = best_jid(nb_z80) if nb_z80 else None
+    b5 = best_jid(nb_85) if nb_85 else None
     for jid, lib, comp, cpu in [
         ("nb_c_sccz80_z80_m32", "math32", "sccz80", "z80"),
         ("nb_c_zsdcc_z80_m32", "math32", "zsdcc", "z80"),
+        ("nb_c_80cc_z80_m32", "math32", "80cc", "z80"),
         ("nb_c_sccz80_8085_m32", "math32_8085", "sccz80", "8085"),
+        ("nb_c_80cc_8085_m32", "math32_8085", "80cc", "8085"),
         ("nb_c_sccz80_z80_m16", "math16", "sccz80", "z80"),
         ("nb_c_sccz80_8085_m16", "math16_8085", "sccz80", "8085"),
     ]:
         if jid not in ok:
             continue
-        bold = jid == bz or (cpu == "8085" and "math32" in lib and "math16" not in lib)
-        # only one 8085 math32 sccz80
-        if cpu == "8085" and "math16" not in lib:
-            bold = True
-        if "math16" in lib:
-            bold = False
-        if cpu == "z80" and "math32" in lib and "math16" not in lib:
-            bold = jid == bz
+        bold = False
+        if "math16" not in lib:
+            if cpu == "z80":
+                bold = jid == bz
+            elif cpu == "8085":
+                bold = jid == b5
         lines.append(row(jid, lib, comp, cpu, bold=bold))
 
     lines += [
@@ -546,14 +572,16 @@ def make_paste(ok: dict[str, dict[str, str]], date_note: str) -> str:
         "| Library | Compiler | CPU | Ticks | KWIPS @ 4 MHz | Size |",
         "|---------|----------|-----|------:|--------------:|-----:|",
     ]
-    wh_z80 = [j for j in ["wh_c_sccz80_z80_m32", "wh_c_zsdcc_z80_m32"] if j in ok]
-    wh_85 = [j for j in ["wh_c_sccz80_8085_m32"] if j in ok]
+    wh_z80 = [j for j in ["wh_c_sccz80_z80_m32", "wh_c_zsdcc_z80_m32", "wh_c_80cc_z80_m32"] if j in ok]
+    wh_85 = [j for j in ["wh_c_sccz80_8085_m32", "wh_c_80cc_8085_m32"] if j in ok]
     bz = best_kwips(wh_z80) if wh_z80 else None
     b5 = best_kwips(wh_85) if wh_85 else None
     for jid, lib, comp, cpu in [
         ("wh_c_sccz80_z80_m32", "math32", "sccz80", "z80"),
         ("wh_c_zsdcc_z80_m32", "math32", "zsdcc", "z80"),
+        ("wh_c_80cc_z80_m32", "math32", "80cc", "z80"),
         ("wh_c_sccz80_8085_m32", "math32_8085", "sccz80", "8085"),
+        ("wh_c_80cc_8085_m32", "math32_8085", "80cc", "8085"),
     ]:
         if jid not in ok:
             continue

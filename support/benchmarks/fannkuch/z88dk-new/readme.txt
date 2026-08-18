@@ -54,9 +54,9 @@ cycle count  = 77386481
 time @ 4MHz  = 77386481 / 4*10^6 = 19.35 sec
 
 
-Z88DK April 20, 2020
-new/zsdcc #11566
-1070 bytes less page zero
+Z88DK August 16, 2026
+new/zsdcc 4.6.0 #16639
+1109 bytes less page zero
 
-cycle count  = 56090095
-time @ 4MHz  = 56090095 / 4*10^6 = 14.02 sec
+cycle count  = 52705234
+time @ 4MHz  = 52705234 / 4*10^6 =   13.2 sec

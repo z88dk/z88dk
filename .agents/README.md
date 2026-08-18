@@ -6,19 +6,26 @@ Canonical tree for AI agent skills. **Do not duplicate** under other names.
 
 ```text
 .agents/
-  README.md          # this file
+  README.md
+  scripts/
   skills/
-    cpu/             # cpu-8085, cpu-z80, …
-    library/         # classic, newlib, math32, math16
-    compiler/        # sccz80, zsdcc, 80cc
-    tool/            # zcc, ticks, z80asm, copt, …
-    target/          # few high-use platforms (cpm, rc2014, zx, zxn, sms) + README policy
-    style/           # libsrc layout, STE writing
-    methodology/     # measure / A/B / benches
+    cpu-8085/              # + references/opcodes.md
+    cpu-z80/
+    library-classic/
+    library-math32/
+    compiler-sccz80/
+    tool-zcc/
+    tool-ticks/
+    target-cpm/
+    style-ste-writing/
+    methodology-measure/
+    …
 ```
 
-Each skill is a directory with a `SKILL.md` (YAML frontmatter + body).
+Each skill is `.agents/skills/<name>/SKILL.md`. The directory name equals the YAML `name:` field.
 Optional `references/` for large tables (e.g. 8085 opcodes).
+
+Claude Code and similar hosts scan **one** level under `skills/`. Do **not** add category folders (`cpu/`, `tool/`, …). Grouping lives in root `AGENTS.md`.
 
 **Targets:** 100+ platforms live in `lib/config/*.cfg`. Do **not** add a `SKILL.md` per target unless a platform truly needs repeated agent rules. Never bulk-load platforms into context.
 
@@ -35,12 +42,12 @@ Agents must **realpath-dedupe** so following both `.grok` and `.claude` does not
 
 ## Adding a skill
 
-1. Create `.agents/skills/<category>/<name>/SKILL.md`.
-2. Set a unique `name:` (prefer `category-name`, e.g. `tool-foo`, `target-bar`).
+1. Create `.agents/skills/<name>/SKILL.md`.
+2. Set a unique `name:` that matches the directory (prefer `category-name`, e.g. `tool-foo`, `target-bar`).
 3. Write a specific `description:` (triggers auto-invocation) — **narrow** so it does not fire on unrelated work.
-4. Link related skills by path under `.agents/skills/...`.
+4. Link related skills by `name` (e.g. `tool-z80asm`), or by path `.agents/skills/<name>/`.
 5. Keep agent-dense: tables, commands, pitfalls — not full human manuals.
-6. **Targets:** prefer cfg + wiki on demand; do not mass-create `target/*` skills.
+6. **Targets:** prefer cfg + wiki on demand; do not mass-create `target-*` skills.
 
 ## Source hierarchy when facts disagree
 
