@@ -505,6 +505,7 @@ fixtures under `src/z80asm/dev/cpu/` (see **`tool-z80asm`**).
 8. **Forward overlapping stack copy corrupts** — see multi-word frame rebuild above.
 9. **No copt pass on library asm** — hand-written `libsrc/**` is assembled as-is. Remove copy-backs (`ld r,a` then `ld a,r`) and other dead moves yourself. Match the **target file’s** whitespace (spaces vs tabs); do not reformat to sccz80/copt tab style. **Before finalising** any hand-coded math16/math32 (or similar) edit: scan for copt-equivalent wins (`ex de,hl` / `ld bc,hl` instead of push/pop transfers; drop `ld a,e` after `ld e,a`; pair zeros → `ld hl,0`; etc.) and run the matching suite. Do **not** use `xor a` for `ld a,0` when CF must survive. Full checklist: **`tool-copt`** and **`methodology-measure`** (“Before finalising hand-coded library work”).
 10. **Illegal `(de)` stores** — only `a` / `hl` / post-inc forms (§6). A “working” assemble that used faked `ld (de),l` means the toolchain or listing was not 8085-checked.
+11. **`__CPU_INTEL__` is set for 8085.** 9-common `IF __CPU_INTEL__` takes the 8080-portable path and will not emit `rl de` / `sra hl`. Do not “fix” those files with `#if __CPU_8085__`. Fork into `7-8085/` and list the module first (`l/util/8085.lst`, `l/sccz80/8085.lst`). Existing forks: `l_lsl_dehl`, `l_asr_dehl`, `l_long_asr`, `l_small_atoul` / `htoul` / `otoul` / `utoa`, `l_gint1sp`…`l_gint8sp`.
 
 ## Preference order (when writing 8085-only code)
 

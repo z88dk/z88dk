@@ -5,6 +5,14 @@ ${NEWLIB_ROOT}l/sccz80/7-8085/l_div
 ${NEWLIB_ROOT}l/sccz80/7-8085/l_div_u
 ${NEWLIB_ROOT}l/sccz80/7-8085/l_eq
 ${NEWLIB_ROOT}l/sccz80/7-8085/l_ge
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint1sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint2sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint3sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint4sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint5sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint6sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint7sp
+${NEWLIB_ROOT}l/sccz80/7-8085/l_gint8sp
 ${NEWLIB_ROOT}l/sccz80/7-8085/l_gt
 ${NEWLIB_ROOT}l/sccz80/7-8085/l_le
 ${NEWLIB_ROOT}l/sccz80/7-8085/l_lt
@@ -21,6 +29,7 @@ ${NEWLIB_ROOT}l/sccz80/7-8085/l_ult
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_add
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_and
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_asl
+${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_asr
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_cmp
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_div
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_div_0
