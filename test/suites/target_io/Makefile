@@ -22,6 +22,17 @@ COMMON_HOST   = io_tests.c fcntl_host.c ticks_host_fcntl.asm $(SOURCES)
 # -D string helpers for TIO_LABEL (sccz80/80cc)
 LABEL = -DTIO_LABEL="\"\\\"$(1)\\\"\""
 
+# +cpm -create-app (+newext) may emit APP.COM or an uppercase COM.
+# Two-step mv so GNU mv can change stored case on case-preserving hosts.
+define normalise_cpm_com
+	@if [ -f APP.COM ]; then mv -f APP.COM $@; \
+	 elif [ -f $(@:.com=_CODE.bin) ]; then cp $(@:.com=_CODE.bin) $@; \
+	 elif u=$$(printf '%s\n' '$@' | tr '[:lower:]' '[:upper:]'); [ -f "$$u" ]; then \
+		mv -f "$$u" $@.tmp && mv -f $@.tmp $@; \
+	 fi
+	@test -f $@ || { echo "missing $@ after link"; exit 1; }
+endef
+
 all: \
 	test_cpm_z80.com \
 	test_cpm_8085.com \
@@ -35,14 +46,16 @@ all: \
 # ---------------------------------------------------------------------------
 
 test_cpm_z80.com: $(COMMON_NATIVE)
-	zcc +cpm -vn $(CFLAGS) $(call LABEL,CPM) $^ -o $@ -m -create-app
+	zcc +cpm -vn $(CFLAGS) $(call LABEL,CPM) $^ -o $(@:.com=) -m -create-app
+	$(call normalise_cpm_com)
 	@echo "$(GREEN)" `date +%H:%M:%S` " Starting cpm/z80 target_io $(RESET)"
 	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) $@ \
 		|| { echo "$(RED)" `date +%H:%M:%S` " cpm/z80 target_io failure $(RESET)" ; exit 1; }
 	@echo "$(GREEN)" `date +%H:%M:%S` " cpm/z80 target_io completed $(RESET)"
 
 test_cpm_8085.com: $(COMMON_NATIVE)
-	zcc +cpm -vn -clib=8085 $(CFLAGS) $(call LABEL,CPM) $^ -o $@ -m -create-app
+	zcc +cpm -vn -clib=8085 $(CFLAGS) $(call LABEL,CPM) $^ -o $(@:.com=) -m -create-app
+	$(call normalise_cpm_com)
 	@echo "$(GREEN)" `date +%H:%M:%S` " Starting cpm/8085 target_io $(RESET)"
 	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) -m8085 $@ \
 		|| { echo "$(RED)" `date +%H:%M:%S` " cpm/8085 target_io failure $(RESET)" ; exit 1; }
@@ -57,9 +70,7 @@ test_cpm_new_z80.com: $(COMMON_NATIVE)
 	@# -DTIO_CPM_DEVICES: CRT has stdrdr/stdpun/stdlst + cpm_device_file
 	zcc +cpm -clib=new -startup=4 -vn $(CFLAGS) -DTIO_CPM_DEVICES $(call LABEL,CPM-NEW) \
 		$^ -o $(@:.com=) -m -create-app
-	@# -create-app may emit APP.COM; normalise for ticks
-	@if [ -f APP.COM ]; then mv -f APP.COM $@; elif [ -f $(@:.com=_CODE.bin) ]; then cp $(@:.com=_CODE.bin) $@; fi
-	@test -f $@ || { echo "missing $@ after link"; exit 1; }
+	$(call normalise_cpm_com)
 	@echo "$(GREEN)" `date +%H:%M:%S` " Starting cpm/newlib z80 target_io $(RESET)"
 	@printf '%s\n' '$(SCANF_INPUT)' | $(MACHINE) $@ \
 		|| { echo "$(RED)" `date +%H:%M:%S` " cpm/newlib z80 target_io failure $(RESET)" ; exit 1; }
