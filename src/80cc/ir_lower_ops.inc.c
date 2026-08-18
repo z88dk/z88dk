@@ -2626,6 +2626,17 @@ static int lea_all_uses_indexed(const Func *f, const Op *lea)
             if (o->call || o->hcall) return 0;   /* args are listed elsewhere */
             if (o->mem.kind != IR_MEM_VREG || o->mem.base != v) continue;
             if (o->kind != IR_LD_MEM && o->kind != IR_ST_MEM) return 0;
+            /* A store whose VALUE is a folded immediate (src[0] < 0) does NOT
+               take the frame-indexed path — gen_st_mem guards that on
+               `src[0] >= 0` — so it materialises the base with
+               `load_to_hl(mem.base)` and this use DOES need the address. Missing
+               that made this predicate disagree with the lowering: gen_lea
+               emitted nothing while a later store read the address, which was
+               invisible for as long as the LEA was rematerialised or had a slot,
+               and aborted the moment it was parked instead (localbench record()
+               in fp mode, `r.d = 0` after three field stores). Mirror the
+               lowering's own guard rather than re-deriving the condition. */
+            if (o->kind == IR_ST_MEM && o->src[0] < 0) return 0;
             if (o->mem.post_step != 0 || mem_bank_fn(&o->mem)) return 0;
             int w = (o->kind == IR_LD_MEM)
                   ? ((o->dst >= 0) ? f->vregs[o->dst].width : 0)
