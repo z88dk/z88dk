@@ -98,13 +98,21 @@ static int func_has_de_home(const Func *f)
    which condition blocks the rest — so the acceptance rate is known before any
    codegen moves. Emits nothing: gate-on output is byte-identical. */
 static long dp_total, dp_free, dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend;
+/* Second population: the park sites where DE is dead for a reason that needs no
+   knowledge of what is IN it — the op being lowered is a PUSH_ARG and the next
+   op is the CALL, so the only DE reader left is this op's own `push hl` and the
+   call clobbers DE regardless. Sound even against a byte staged in E, which is
+   what sank the belief-based gate. */
+static long dp_precall;
 static void depark_probe_report(void)
 {
     if (!dp_total) return;
     fprintf(stderr, "DEPARKPROBE sites=%ld free=%ld (%.0f%%) blocked:"
-            " de_home=%ld de_belief=%ld dehl=%ld pending=%ld\n",
+            " de_home=%ld de_belief=%ld dehl=%ld pending=%ld"
+            " | pre_call=%ld (%.0f%%)\n",
             dp_total, dp_free, 100.0 * (double)dp_free / (double)dp_total,
-            dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend);
+            dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend,
+            dp_precall, 100.0 * (double)dp_precall / (double)dp_total);
 }
 static int depark_probe_on(void)
 {
@@ -536,19 +544,53 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
             else if (L.rs.dehl >= 0)       { dp_blk_dehl++; why = "dehl"; }
             else if (L.pending_spill_v >= 0) { dp_blk_pend++; why = "pending"; }
             else                             dp_free++;
+            if (lower_cur_op && lower_cur_op->kind == IR_PUSH_ARG
+                && cur_bb && cur_op_idx + 1 < cur_bb->n_ops
+                && (cur_bb->ops[cur_op_idx + 1].kind == IR_CALL
+                    || cur_bb->ops[cur_op_idx + 1].kind == IR_HCALL))
+                dp_precall++;
             if (depark_probe_on() == 2)
                 fprintf(stderr, "DEPARKSITE %s v%d off=%d %s\n",
                         f && f->fn ? ir_sym_name(f->fn) : "?", vreg_id, off, why);
         }
-        /* NB no "DE is dead here, skip the park" shortcut: the register cache
-           has no BYTE-level DE tracking (rs.a/bc/de/hl only), so a value staged
-           in E or D alone — `ld a,(hl); ld e,a` before a store — is live with
-           NOTHING in the cache to say so, and dropping the park corrupted it
-           (rle, bitfieldbench). A belief-based test cannot be sound here, which
-           is what the comment above means; a sound version needs either a
-           caller-supplied "DE is dead for this load" hint at the sites that know
-           it, or real liveness. IR_DEPARK_PROBE sizes the prize: 19% of corpus
-           park sites, 46% of binary-trees'. */
+        /* Skip the park where DE is dead for a reason that does NOT depend on
+           knowing what is in it: the op being lowered is a width-2 PUSH_ARG whose
+           next op is the CALL. All that remains of this op is `push hl`
+           (gen_push_arg), and the call clobbers DE/E outright — so even a byte
+           staged in E with nothing in the cache to say so cannot be read before
+           it dies. That is what sank the belief-only version of this test
+           (rle/bitfieldbench: `ld a,(hl); ld e,a` then a store through E): the
+           evidence has to come from the control flow, not from the cache.
+           20c/3B against the parked 42c/5B; the
+           offset loses its +2 with the push gone. IR_DEPARK_PROBE sizes it: 5% of
+           corpus park sites, 23% of binary-trees'. `--opt-disable=depark` opts out.
+
+           NB there is deliberately no general "DE looks unused" shortcut here:
+           the register cache tracks only whole pairs (rs.a/bc/de/hl), so a value
+           living in E or D alone is invisible to it and any belief-only test is
+           unsound. Widening this needs real liveness, not a bigger gate. */
+        if (!opt_disabled("depark")
+            && !func_has_de_home(f) && L.pending_spill_v < 0
+            && lower_cur_op && lower_cur_op->kind == IR_PUSH_ARG
+            && cur_bb && cur_op_idx + 1 < cur_bb->n_ops
+            && (cur_bb->ops[cur_op_idx + 1].kind == IR_CALL
+                || cur_bb->ops[cur_op_idx + 1].kind == IR_HCALL)
+            /* ...and the call takes its arguments on the STACK. A believed DE or
+               DEHL tenant needs no check otherwise: one that is not recoverable
+               (no slot, not remat) cannot survive a call that clobbers DE/HL, so
+               it is already dead, and a recoverable one just reloads. The
+               exception is __sdcccall(1), which passes args in A/HL/DE — there
+               the cache hit can be the ONLY way the call reaches a slotless
+               value, so leave those parked. */
+            && !(cur_bb->ops[cur_op_idx + 1].kind == IR_CALL
+                 && cur_bb->ops[cur_op_idx + 1].call
+                 && (cur_bb->ops[cur_op_idx + 1].call->flags & SDCCCALL1))) {
+            emit(out, "ld\tde,sp+%d", off);
+            emit(out, "ld\thl,(de)");
+            invalidate_de_cache();
+            hl_about_to_change(vreg_id);
+            return;
+        }
         emit(out, "push\tde");
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\thl,(de)");
