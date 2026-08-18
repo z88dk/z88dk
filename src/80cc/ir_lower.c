@@ -374,6 +374,11 @@ typedef struct {
     int unknown;
     /* sub-register B/C (the park-liveness sweep needs B and C tracked separately) */
     int b_read, c_read, b_write, c_write;
+    /* sub-register D/E, for the 8085 slot-load DE park. Tracked apart from the
+       pair because that park exists to protect a consumer which may read only
+       E — a byte staged there is invisible to the whole-pair residency cache,
+       which is exactly what made the cache-based version of this test unsound. */
+    int d_read, e_read, d_write, e_write;
     int park;           /* the exact `ld bc,hl` low-half stash */
     int is_boundary;    /* ret/reti/retn — BC dead at exit (result ABI is DE:HL) */
     int is_call;        /* jp/jr/djnz/call/rst — a successor may read BC */
@@ -1154,7 +1159,112 @@ static int bc_tok(const char *ops, const char *reg)
     return 0;
 }
 
-/* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. */
+/* ---- the 8085 slot-load DE park ------------------------------------------
+   `load_slot_to_hl` reads a frame word with LDSI+LHLX, which needs the slot
+   address in DE, but load_to_hl must hand DE back untouched — so it parks it:
+
+        push de / ld de,sp+N+2 / ld hl,(de) / pop de      5B/42c
+
+   Unparked that is `ld de,sp+N / ld hl,(de)`, 3B/20c. Whether the park is needed
+   is a question about the FUTURE (is the old DE read before it is overwritten?),
+   which is why every attempt to answer it from the residency cache failed: the
+   cache is a record of the past, it tracks whole pairs so a byte staged in E is
+   invisible to it, and the producing idiom does not distinguish the two cases —
+   measured on the corpus, `ld de,sp+N` and `pop de` each precede roughly as many
+   needed parks as dead ones, because the nearest preceding DE write is usually
+   the PREVIOUS park's own code.
+
+   So it is decided here instead, on the rendered function, by the same backward
+   liveness sweep that drops dead `ld bc,hl` parks — which already has the two
+   properties this needs: sub-register tracking (a park protecting only E must
+   survive) and straight-line-only proof (a branch or call means live). The BC
+   rules do not transfer wholesale: `ret` is a boundary for BC but READS DE,
+   since the long result ABI is DE:HL.
+
+   DEFAULT-ON; `--opt-disable=de-park` reverts to always parking, byte for byte.
+   IR_DEPARK_SWEEP=1 additionally runs the forward-walk cross-check below and
+   reports the counts; =3 dumps the instruction window at any disagreement. */
+static long dpk_total, dpk_dead, dpk_funcs;
+static long dpk_agree, dpk_conserv, dpk_viol;   /* forward-walk cross-check */
+static void dpk_report(void)
+{
+    if (!dpk_total) return;
+    fprintf(stderr, "DEPARKSWEEP funcs=%ld parks=%ld dead=%ld (%.1f%%)"
+            " | vs forward walk: agree=%ld backward-more-precise=%ld VIOLATIONS=%ld\n",
+            dpk_funcs, dpk_total, dpk_dead,
+            100.0 * (double)dpk_dead / (double)dpk_total,
+            dpk_agree, dpk_conserv, dpk_viol);
+}
+static int de_sweep_on(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_DEPARK_SWEEP");
+                 v = e ? atoi(e) : 0;
+                 if (v) atexit(dpk_report); }
+    return v;
+}
+
+/* The four lines above, ending at `pop de` (index i). *offp gets the unparked
+   offset, i.e. the emitted one less the +2 it carries for the in-flight push.
+   Matched by exact re-render, so a comment or any other form is rejected; the
+   idiom is 8085-only by construction (LDSI + LHLX), so no CPU gate is needed. */
+static int de_park_group(char **lines, int i, int *offp)
+{
+    if (i < 3) return 0;
+    if (strcmp(lines[i],     "\tpop\tde\n"))     return 0;
+    if (strcmp(lines[i - 1], "\tld\thl,(de)\n")) return 0;
+    if (strcmp(lines[i - 3], "\tpush\tde\n"))    return 0;
+    int off = 0;
+    if (sscanf(lines[i - 2], "\tld\tde,sp+%d", &off) != 1) return 0;
+    if (off < 2) return 0;
+    char want[40];
+    snprintf(want, sizeof want, "\tld\tde,sp+%d\n", off);
+    if (strcmp(lines[i - 2], want)) return 0;
+    *offp = off - 2;
+    return 1;
+}
+
+/* VERIFIER (IR_DEPARK_SWEEP=1): an INDEPENDENT forward walk of the same buffer,
+   deciding the same question the other way round — from the park, does anything
+   read the old DE before both halves are overwritten? Stops at a label, branch,
+   call or return and reports UNKNOWN, so it proves less than the backward sweep
+   but shares none of its machinery. The two must never disagree in the unsafe
+   direction: backward=dead while forward=NEEDED is a miscompile, and is reported
+   as a VIOLATION. The opposite (forward unknown, backward dead) is just the
+   backward pass being more precise — it sees past a label, which is sound
+   because a label does not change what OUR path does next. */
+static int de_forward_needed(char **lines, int n, int start, int *readerp)
+{
+    int d_live = 1, e_live = 1;                  /* halves of the OLD DE */
+    for (int j = start; j < n; j++) {
+        if (lines[j][0] != '\t') return 2;       /* label: joins another path */
+        /* A LATER park is transparent to this one: its `push de` does read DE,
+           but its `pop de` puts the same value back, so the walk must step over
+           the whole group rather than call it a read. (Found by this verifier
+           disagreeing with the backward sweep on 9 corpus sites — every one a
+           park followed by another park.) */
+        int poff2;
+        if (j + 3 < n && !strcmp(lines[j], "\tpush\tde\n")
+            && de_park_group(lines, j + 3, &poff2)) { j += 3; continue; }
+        InstrEffects e = instr_effects(lines[j]);
+        /* Only a read of a half that is STILL LIVE counts: a staged `ld e,a`
+           kills the parked E, so the later `ld (hl),e` reads the new byte, not
+           the one the park was protecting. (The verifier's own second bug —
+           found by dumping the window at a disagreement, and the reason the
+           park@23 site in bitfieldbench is genuinely dead.) */
+        if ((e.d_read && d_live) || (e.e_read && e_live)) {
+            if (readerp) *readerp = j; return 1;
+        }
+        if (e.is_call || e.is_boundary) return 2;
+        if (e.d_write) d_live = 0;
+        if (e.e_write) e_live = 0;
+        if (!d_live && !e_live) return 0;        /* fully overwritten unread */
+    }
+    return 2;
+}
+
+/* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
+   the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
 {
     char buf[1024];
@@ -1185,9 +1295,47 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             if (strcmp(lines[i], "\tld\tbc,hl\n") == 0
                 && strcmp(lines[i + 1], "\tld\thl,bc\n") == 0)
                 drop[i + 1] = 1;
-        int b_live = 0, c_live = 0;
+        int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
+        int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
+        int de_rewrite = !opt_disabled("de-park");
+        int de_sweep   = (de_verify || de_rewrite);
+        if (de_verify) dpk_funcs++;
         for (int i = n - 1; i >= 0; i--) {
             if (drop[i]) continue;                 /* collapsed recover: gone */
+            int poff = 0;
+            if (de_sweep && de_park_group(lines, i, &poff)) {
+                int back_dead = (!d_live && !e_live);
+                int reader = -1;
+                int fwd = de_verify
+                        ? de_forward_needed(lines, n, i + 1, &reader) : -1;
+                if (de_verify) dpk_total++;
+                if (de_verify && back_dead && fwd == 1) {
+                    dpk_viol++;
+                    fprintf(stderr, "DEPARKVIOLATION park@%d off=%d reader@%d: %s",
+                            i, poff, reader,
+                            (reader >= 0 && reader < n) ? lines[reader] : "?\n");
+                    if (de_verify >= 3)
+                        for (int q = i; q <= reader && q < n && q < i + 60; q++)
+                            fprintf(stderr, "   %c%4d %s",
+                                    drop[q] ? 'x' : ' ', q, lines[q]);
+                } else if (de_verify && back_dead == (fwd == 0)) dpk_agree++;
+                else if (de_verify) dpk_conserv++;
+                if (back_dead) {
+                    if (de_verify) dpk_dead++;
+                    if (de_rewrite) {
+                        char *nl = malloc(40);
+                        if (nl) {
+                            snprintf(nl, 40, "\tld\tde,sp+%d\n", poff);
+                            free(lines[i - 2]); lines[i - 2] = nl;
+                            drop[i] = drop[i - 3] = 1;     /* pop de, push de */
+                        } else if (de_verify) dpk_dead--;   /* OOM: not dropped */
+                    }
+                }
+                /* Either way DE's liveness passes through unchanged: parked, the
+                   pair is restored; unparked, it was dead on both sides. */
+                i -= 3;
+                continue;
+            }
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
             int rb = e.b_read, rc = e.c_read, wb = e.b_write, wc = e.c_write;
             int park = e.park, boundary = e.is_boundary, call = e.is_call;
@@ -1195,15 +1343,19 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                so a park before it is droppable. A branch/call (`call`): BC may
                be read by a successor — treat as LIVE so only a park overwritten
                by straight-line code before the next branch is dropped. */
-            if (boundary) { b_live = c_live = 0; continue; }
-            if (call)     { b_live = c_live = 1; continue; }
-            if (park) {
+            /* BC is dead at a return; DE is not (result ABI DE:HL) — e.d_read
+               already says so, so route both through the same update below. */
+            if (boundary) { b_live = c_live = 0; }
+            else if (call){ b_live = c_live = 1; }
+            else if (park) {
                 if (!b_live && !c_live) drop[i] = 1;
                 b_live = c_live = 0;               /* park defines BC */
-                continue;
+            } else {
+                b_live = rb ? 1 : (wb ? 0 : b_live);
+                c_live = rc ? 1 : (wc ? 0 : c_live);
             }
-            b_live = rb ? 1 : (wb ? 0 : b_live);
-            c_live = rc ? 1 : (wc ? 0 : c_live);
+            d_live = e.d_read ? 1 : (e.d_write ? 0 : d_live);
+            e_live = e.e_read ? 1 : (e.e_write ? 0 : e_live);
         }
     }
     for (int i = 0; i < n; i++) {
@@ -2395,15 +2547,38 @@ static InstrEffects instr_effects(const char *line)
        path stays in the function, so BC liveness must survive it. is_call is the
        conservative "successor may read BC"; treating it as a boundary would let
        filter_dead_bc_parks drop a park the fall-through still consumes. */
-    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1; return e; }
-    if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) { e.is_boundary = 1; return e; }
-    if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) { e.is_call = 1; return e; }
-    if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; return e; }
+    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1; e.d_read = e.e_read = 1; return e; }
+    if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) {
+        /* is_boundary says BC is dead at exit. DE is NOT: the long and float
+           result ABI is DE:HL, so a return READS DE. The flag stays BC-only and
+           D/E are marked live here, so no consumer can inherit the BC rule. */
+        e.is_boundary = 1; e.d_read = e.e_read = 1; return e;
+    }
+    if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) {
+        /* A successor may read DE, and __sdcccall(1) passes arguments in it, so a
+           call READS DE even though the callee also clobbers it. */
+        e.is_call = 1; e.d_read = e.e_read = 1; return e;
+    }
+    if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; e.d_read = e.e_read = 1; return e; }
     if (!strcmp(m,"ldir")||!strcmp(m,"lddr")||!strcmp(m,"ldi")||!strcmp(m,"ldd")
         ||!strcmp(m,"cpir")||!strcmp(m,"cpdr")||!strcmp(m,"cpi")||!strcmp(m,"cpd")) {
-        e.b_read = e.c_read = 1; return e;
+        e.b_read = e.c_read = 1; e.d_read = e.e_read = 1; return e;
     }
     if (!strcmp(m,"ld")) {
+        /* D/E up front: every branch below returns, so both pairs are settled in
+           one place. A write is only recorded where the WHOLE half is replaced;
+           an auto-stepping `(de+)` reads before it writes, so the generic arm
+           marks it read and the park stays. */
+        if (!strcmp(o0,"de") || !strcmp(o0,"d") || !strcmp(o0,"e")) {
+            if (o0[0] == 'd' && !o0[1]) e.d_write = 1;
+            else if (o0[0] == 'e')      e.e_write = 1;
+            else                        e.d_write = e.e_write = 1;
+            e.d_read = bc_tok(src,"d")||bc_tok(src,"de");
+            e.e_read = bc_tok(src,"e")||bc_tok(src,"de");
+        } else {
+            e.d_read = bc_tok(ops,"d")||bc_tok(ops,"de");
+            e.e_read = bc_tok(ops,"e")||bc_tok(ops,"de");
+        }
         if (!strcmp(o0,"bc")) {
             e.b_write = e.c_write = 1;
             e.b_read = bc_tok(src,"b")||bc_tok(src,"bc");
@@ -2419,9 +2594,18 @@ static InstrEffects instr_effects(const char *line)
         e.c_read = bc_tok(ops,"c")||bc_tok(ops,"bc");
         return e;
     }
-    if (!strcmp(m,"pop")) { if (!strcmp(ops,"bc")) e.b_write = e.c_write = 1; return e; }
+    if (!strcmp(m,"pop")) {
+        if (!strcmp(ops,"bc")) e.b_write = e.c_write = 1;
+        if (!strcmp(ops,"de")) e.d_write = e.e_write = 1;
+        return e;
+    }
     e.b_read = bc_tok(ops,"b")||bc_tok(ops,"bc");
     e.c_read = bc_tok(ops,"c")||bc_tok(ops,"bc");
+    /* `ex de,hl`, `add hl,de`, `push de`, `ld (hl),e`, `sub e` … all land here and
+       count as reads. `ex`/`add` also WRITE DE, but read-only is the conservative
+       side: it keeps the park. */
+    e.d_read = bc_tok(ops,"d")||bc_tok(ops,"de");
+    e.e_read = bc_tok(ops,"e")||bc_tok(ops,"de");
     return e;
 }
 
