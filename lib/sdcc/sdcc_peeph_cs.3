@@ -15830,26 +15830,6 @@ replace restart {
 // if notVolatile
 
 replace restart {
-	ld	%1,%2 (%3)
-	set	%4, %2 (%3)
-} by {
-	ld	%1,%2 (%3)
-	set	%4,%1
-	; peephole z88dk-364b
-}
-// if notVolatile
-
-replace restart {
-	ld	%1,%2 (%3)
-	res	%4, %2 (%3)
-} by {
-	ld	%1,%2 (%3)
-	res	%4,%1
-	; peephole z88dk-364c
-}
-// if notVolatile
-
-replace restart {
 	ld	%3 (%4), %1
 	ld	%2, %1
 	ld	%3 (%4), %2
