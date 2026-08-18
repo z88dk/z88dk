@@ -1226,3 +1226,50 @@
 	%3	%2
 	ld	l,a
 	ld	h,0
+
+;; #XC0/#XC1/#XC2: a long built for a frame-slot store arrives as `ld bc,hl`
+;; (stash the low half, which the store's byte writes read from B and C) then
+;; `ex de,hl` (the store wants the high half in HL for SHLX). The following
+;; `ld de,sp+N` proves the ex's DE output is DEAD — only its HL output matters —
+;; so each half can be put where it belongs directly and the swap dropped.
+;; Halves EQUAL: one `ld hl,K` feeds both via `ld bc,hl`, 4 bytes and 14 cycles.
+;; Two different constants: load BC direct, 3 bytes and 12 cycles. High half
+;; constant only (a zero-extended word, HL loaded from memory): 1 byte and 4
+;; cycles. Constants are regex-restricted to an immediate or symbol address; a
+;; parenthesised operand would be `ld de,(nn)`, which 808x and gbz80 synthesise
+;; THROUGH HL, so reordering would clobber the half just loaded there.
+;; Order matters: the later rules would match the earlier patterns' tails and
+;; take a smaller win. Only `ld de,sp+N` (8085 LDSI) follows this shape, so z80
+;; output is unaffected — verified byte-identical across the bench corpus.
+%title #XC0 EQUAL constant long halves before a slot store: one load feeds both (-4b, -14t)
+	ld	hl,%1
+	%"ld	de,([_0-9][_0-9a-zA-Z+]*)"1
+	ld	bc,hl
+	ex	de,hl
+	ld	de,sp+%2
+=
+	ld	hl,%1
+	ld	bc,hl
+	ld	de,sp+%2
+
+%title #XC1 two constant long halves before a slot store: load bc direct, drop the ex (-3b, -12t)
+	%"ld	hl,([_0-9][_0-9a-zA-Z+]*)"1
+	%"ld	de,([_0-9][_0-9a-zA-Z+]*)"2
+	ld	bc,hl
+	ex	de,hl
+	ld	de,sp+%3
+=
+	ld	bc,%1
+	ld	hl,%2
+	ld	de,sp+%3
+
+%title #XC2 constant HIGH half before a slot store: keep bc from hl, drop the ex (-1b, -4t)
+	%"ld	de,([_0-9][_0-9a-zA-Z+]*)"1
+	ld	bc,hl
+	ex	de,hl
+	ld	de,sp+%2
+=
+	ld	bc,hl
+	ld	hl,%1
+	ld	de,sp+%2
+
