@@ -203,7 +203,7 @@ sub parser_tokens {
     my $instr_flag = qr/\b(?:call|call3|jp|jmp|jr|jre|jp3|lljp|ret|ret3|rst|flag)\b/i;
     my $am         = qr/\b(?:l|il|is|lil|lis|sil|sis)\b/i;
     my $flag =
-        qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge)\b/i;
+        qr/\b(?:nz|z|nc|c|po|pe|p|m|lz|lo|nv|v|x5|nx5|k|nk|ne|eq|ltu|leu|gtu|geu|lt|le|gt|ge|of)\b/i;
     my $instr_x  = qr/\b(cpd|cpdr|cpi|cpir|ind|indr|ini|inir|otdr|otir|outd|outi)\s+(x)\b/i;
     my $instr_xy = qr/\b(ldd|lddr|ldi|ldir)\s+(xy)\b/i;
 
@@ -211,6 +211,7 @@ sub parser_tokens {
 
     while ( !/\G \z 				/gcx ) {
         if    (/\G \s+ 			/gcx)    { }
+        elsif (/\G \( (\w+)	'	/gcx) { push @tokens, "_TK_IND_" . uc($1)."1"; }
         elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_" . uc($1); }
         elsif (
             /\G ($instr_flag) \s+ ($flag) \b

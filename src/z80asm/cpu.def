@@ -42,9 +42,11 @@ X(29,   r4k_strict,         "r4k_strict",       r4k,        none,       "__CPU_R
 X(30,   r5k_strict,         "r5k_strict",       r5k,        r4k,        "__CPU_RABBIT__ __CPU_R5K_STRICT__")
 X(31,   r6k,                "r6k",              r6k,        r5k,        "__CPU_RABBIT__ __CPU_R6K__")
 X(32,   r6k_strict,         "r6k_strict",       r6k,        r5k,        "__CPU_RABBIT__ __CPU_R6K_STRICT__")
-X(33,   ti83,               "ti83",             ti83,       z80,        "__CPU_ZILOG__ __CPU_TI83__")
-X(34,   ti83_strict,        "ti83_strict",      ti83,       z80,        "__CPU_ZILOG__ __CPU_TI83_STRICT__")
-X(35,   ti83plus,           "ti83plus",         ti83plus,   z80,        "__CPU_ZILOG__ __CPU_TI83PLUS__")
-X(36,   ti83plus_strict,    "ti83plus_strict",  ti83plus,   z80,        "__CPU_ZILOG__ __CPU_TI83PLUS_STRICT__")
+X(33,   ti83,               "ti83",             ti83,       z80,        "__CPU_ZILOG__ __CPU_Z80__ __CPU_TI83__")
+X(34,   ti83_strict,        "ti83_strict",      ti83,       z80,        "__CPU_ZILOG__ __CPU_Z80_STRICT__ __CPU_TI83_STRICT__")
+X(35,   ti83plus,           "ti83plus",         ti83plus,   z80,        "__CPU_ZILOG__ __CPU_Z80__ __CPU_TI83PLUS__")
+X(36,   ti83plus_strict,    "ti83plus_strict",  ti83plus,   z80,        "__CPU_ZILOG__ __CPU_Z80_STRICT__ __CPU_TI83PLUS_STRICT__")
+X(37,   vm1,				"vm1",              vm1,        i8080,      "__CPU_INTEL__ __CPU_VM1__")
+X(38,   vm1_strict,			"vm1_strict",       vm1,        i8080,      "__CPU_INTEL__ __CPU_VM1_STRICT__")
 
 #undef X

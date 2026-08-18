@@ -906,6 +906,7 @@ TOKEN_RE(TK_IND_IX, "(IX", "(" hspace0 "IX"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IY, "(IY", "(" hspace0 "IY"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HL, "(HL", "(" hspace0 "HL"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_SP, "(SP", "(" hspace0 "SP"i index_reg_suffix, p--; te--)
+TOKEN_RE(TK_IND_HL1, "(HL'", "(" hspace0 "HL'"i index_reg_suffix, p--; te--)
 
 TOKEN_RE(TK_IND_C,   "(C",   "(" hspace0 "C"i   index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HLI, "(HLI", "(" hspace0 "HLI"i index_reg_suffix, p--; te--)
@@ -1546,6 +1547,24 @@ TOKEN_OPCODE_RE(TK_LDD_XY,  "LDD XY",  "LDD"i  hspace1 "XY"i [^a-zA-Z_0-9], p--;
 TOKEN_OPCODE_RE(TK_LDDR_XY, "LDDR XY", "LDDR"i hspace1 "XY"i [^a-zA-Z_0-9], p--; te--; ) 
 TOKEN_OPCODE_RE(TK_LDI_XY,  "LDI XY",  "LDI"i  hspace1 "XY"i [^a-zA-Z_0-9], p--; te--; )  
 TOKEN_OPCODE_RE(TK_LDIR_XY, "LDIR XY", "LDIR"i hspace1 "XY"i [^a-zA-Z_0-9], p--; te--; ) 
+
+/* vm1 specific opcodes */
+TOKEN_OPCODE(MB) 
+TOKEN_OPCODE(ANX) 
+TOKEN_OPCODE(ANDL) 
+TOKEN_OPCODE(ORX) 
+TOKEN_OPCODE(ORL) 
+TOKEN_OPCODE(XRX) 
+TOKEN_OPCODE(XORL) 
+TOKEN_OPCODE(DCMP) 
+TOKEN_OPCODE(CPC) 
+TOKEN_OPCODE(PCHL1) 
+TOKEN_OPCODE(SPHL1) 
+TOKEN_OPCODE(XTHL1)
+TOKEN_OPCODE(JOF) 
+TOKEN_OPCODE(J_OF) 
+TOKEN_OPCODE(JP_OF) 
+TOKEN_OPCODE(JMP_OF)
 
 #undef TOKEN_OPCODE
 #undef TOKEN_KW

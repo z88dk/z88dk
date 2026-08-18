@@ -85,7 +85,8 @@ object-file-format/obj_v01.txt: \
 		../z80asm/cpu.def \
 		../z80asm/obj_range_type.def \
 		../z80asm/obj_symbol_scope.def \
-		../z80asm/obj_symbol_type.def
+		../z80asm/obj_symbol_type.def \
+		Makefile
 	perl object-file-format/make_docs.pl
 
 #------------------------------------------------------------------------------

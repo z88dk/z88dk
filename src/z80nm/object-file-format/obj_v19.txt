@@ -79,6 +79,8 @@ The format of the object file is as follows:
 |    |       |   34 : ti83_strict
 |    |       |   35 : ti83plus
 |    |       |   36 : ti83plus_strict
+|    |       |   37 : vm1
+|    |       |   38 : vm1_strict
 |    |       |
 |    | dword | * *swap_ixiy* : -IXIY option used in the assembly:
 |    |       |   0 : no -IXIY option used

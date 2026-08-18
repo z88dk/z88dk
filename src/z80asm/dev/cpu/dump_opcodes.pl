@@ -29,16 +29,9 @@ my $opcodes = Opcodes->from_file($input_file);
 my $sep = \"|";
 
 $opcodes = expand_consts($opcodes);
-my $opcode_table = make_opcode_table($opcodes);
 my $hex_table    = make_hex_table($opcodes);
 
 open( my $fh, ">", $output_file ) or die $!;
-print $fh $opcode_table->rule('=');
-print $fh $opcode_table->title;
-print $fh $opcode_table->rule('=');
-print $fh $opcode_table->body;
-print $fh $opcode_table->rule('=');
-print $fh "\n\n";
 print $fh $hex_table->rule('=');
 print $fh $hex_table->title;
 print $fh $hex_table->rule('=');
@@ -87,25 +80,6 @@ sub replace_const {
     }
 
     return $opcode1;
-}
-
-sub make_opcode_table {
-    my ($opcodes) = @_;
-    my $tb = Text::Table->new( $sep, "Assembly", $sep, "CPUs", $sep );
-
-    for my $asm ( sort keys %{ $opcodes->opcodes } ) {
-        my @cpus;
-        for my $cpu ( Opcode->cpus() ) {
-            if ( $opcodes->exists( $cpu, $asm ) ) {
-                push @cpus, $cpu;
-            }
-            else {
-                push @cpus, "-" . ( " " x ( length($cpu) - 1 ) );
-            }
-        }
-        $tb->add( $asm, "@cpus" );
-    }
-    return $tb;
 }
 
 sub make_hex_table {

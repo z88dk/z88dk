@@ -4865,6 +4865,370 @@ sub add_opcodes {
             my ($cpu) = @_;
             add_opcode_rabbit_altd( $cpu, "xor jkhl, bcde", [ 0xED, 0xEE ] );
         },
+        "mov <r>, <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $d ( 'b', 'c', 'd', 'e', 'h', 'l', 'm', 'a' ) {
+                for my $s ( 'b', 'c', 'd', 'e', 'h', 'l', 'm', 'a' ) {
+                    next if $d eq 'm' && $d eq $s;
+                    if ( !get_opcode( $cpu, "mov $d, $s" ) ) {
+                        add_opcode_vm1( $cpu, "mov $d, $s", 
+										[ 0x40 + 8 * R($d) + R($s) ] );
+                    }
+                }
+            }
+        },
+        "mvi <r>, N [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', 'm', 'a' ) {
+                if ( !get_opcode( $cpu, "mvi $r, %n" ) ) {
+                    add_opcode_vm1( $cpu, "mvi $r, %n", 
+									[ 0x06 + 8 * R($r), '%n' ] );
+                }
+            }
+        },
+        "ld <r>, <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $d ( 'b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a' ) {
+                for my $s ( 'b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a' ) {
+                    next if $d eq '(hl)' && $d eq $s;
+                    if ( !get_opcode( $cpu, "ld $d, $s" ) ) {
+                        add_opcode_vm1( $cpu, "ld $d, $s", 
+										[ 0x40 + 8 * R($d) + R($s) ] );
+                    }
+                }
+            }
+        },
+        "ld <r>, N [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a' ) {
+                if ( !get_opcode( $cpu, "ld $r, %n" ) ) {
+                    add_opcode_vm1( $cpu, "ld $r, %n", 
+									[ 0x06 + 8 * R($r), '%n' ] );
+                }
+            }
+        },
+        "lxi <r>, NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'b', 'd', 'h', 'sp' ) {
+                add_opcode_vm1( $cpu, "lxi $rp, %m", 
+								[ 0x01 + 16 * RP($rp), '%m', '%m' ] );
+            }
+        },
+        "lxi <rp>, NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl' ) {
+                add_opcode_vm1( $cpu, "lxi $rp, %m", 
+								[ 0x01 + 16 * RP($rp), '%m', '%m' ] );
+            }
+        },
+        "ld <rp>, NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl', 'sp' ) {
+                add_opcode_vm1( $cpu, "ld $rp, %m", 
+								[ 0x01 + 16 * RP($rp), '%m', '%m' ] );
+            }
+        },
+        "lda/sta [vm1]" => sub {
+            my ($cpu) = @_;
+			add_opcode_vm1( $cpu, "sta %m", [ 0x32, '%m', '%m' ] );
+			add_opcode_vm1( $cpu, "lda %m", [ 0x3A, '%m', '%m' ] );
+        },
+        "ld a, (NN) [vm1]" => sub {
+            my ($cpu) = @_;
+			add_opcode_vm1( $cpu, "ld (%m), a", [ 0x32, '%m', '%m' ] );
+			add_opcode_vm1( $cpu, "ld a, (%m)", [ 0x3A, '%m', '%m' ] );
+        },
+        "lhld/shld [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "shld %m", [ 0x22, '%m', '%m' ] );
+            add_opcode_vm1( $cpu, "lhld %m", [ 0x2A, '%m', '%m' ] );
+        },
+        "ld hl, (NN) [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "ld (%m), hl", [ 0x22, '%m', '%m' ] );
+            add_opcode_vm1( $cpu, "ld hl, (%m)", [ 0x2A, '%m', '%m' ] );
+        },
+        "ldax <r>/stax <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'b', 'd' ) {
+                add_opcode_vm1( $cpu, "ldax $rp", [ 0x0A + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "stax $rp", [ 0x02 + 16 * RP($rp) ] );
+            }
+        },
+        "ldax <rp>/stax <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de' ) {
+                add_opcode_vm1( $cpu, "ldax $rp", [ 0x0A + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "stax $rp", [ 0x02 + 16 * RP($rp) ] );
+            }
+        },
+        "ld a, (<rp>) [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de' ) {
+                add_opcode_vm1( $cpu, "ld a, ($rp)", [ 0x0A + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "ld ($rp), a", [ 0x02 + 16 * RP($rp) ] );
+            }
+        },
+        "<alu> <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $alu ( 'add', 'adc', 'sub', 'sbb', 'ana', 'xra', 'ora', 'cmp' ) {
+                for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', 'm', 'a' ) {
+                    if ( !get_opcode( $cpu, "$alu $r" ) ) {
+                        add_opcode_vm1( $cpu, "$alu $r", 
+										[ 0x80 + 8 * ALU($alu) + R($r) ] );
+                    }
+                }
+            }
+        },
+        "<alu> a, <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $alu ( 'add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp' ) {
+                my $a_ = ( $alu =~ /add|adc|sbc/ ? 'a, ' : '' );
+                for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a' ) {
+                    if ( !get_opcode( $cpu, "$alu $a_$r" ) ) {
+                        add_opcode_vm1( $cpu, "$alu $a_$r", 
+										[ 0x80 + 8 * ALU($alu) + R($r) ] );
+                    }
+                }
+            }
+        },
+        "<alu-extra> a, <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $alu ( 'add', 'adc', 'sub', 'sbc', 'and', 'xor', 'or', 'cp', 'cmp' ) {
+                for my $a_ ( 'a, ', '' ) {
+                    for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a' ) {
+                        if ( !get_opcode( $cpu, "$alu $a_$r" ) ) {
+                            add_opcode_vm1( $cpu, "$alu $a_$r", 
+											[ 0x80 + 8 * ALU($alu) + R($r) ] );
+                        }
+                    }
+                }
+            }
+        },
+        "inr/dcr <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', 'm', 'a' ) {
+                add_opcode_vm1( $cpu, "inr $r", [ 0x04 + 8 * R($r) ] );
+                add_opcode_vm1( $cpu, "dcr $r", [ 0x05 + 8 * R($r) ] );
+            }
+        },
+        "inc/dec <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $r ( 'b', 'c', 'd', 'e', 'h', 'l', '(hl)', 'a' ) {
+                if ( !get_opcode( $cpu, "inc $r" ) ) {
+                    add_opcode_vm1( $cpu, "inc $r", [ 0x04 + 8 * R($r) ] );
+                    add_opcode_vm1( $cpu, "dec $r", [ 0x05 + 8 * R($r) ] );
+                }
+            }
+        },
+        "inx/dcx <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'b', 'd', 'h', 'sp' ) {
+                add_opcode_vm1( $cpu, "inx $rp", [ 0x03 + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "dcx $rp", [ 0x0B + 16 * RP($rp) ] );
+            }
+        },
+        "inx/dcx <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl' ) {
+                add_opcode_vm1( $cpu, "inx $rp", [ 0x03 + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "dcx $rp", [ 0x0B + 16 * RP($rp) ] );
+            }
+        },
+        "inc/dec <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl', 'sp' ) {
+                add_opcode_vm1( $cpu, "inc $rp", [ 0x03 + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "dec $rp", [ 0x0B + 16 * RP($rp) ] );
+            }
+        },
+        "dad <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'b', 'd', 'h', 'sp' ) {
+                add_opcode_vm1( $cpu, "dad $rp", [ 0x09 + 16 * RP($rp) ] );
+            }
+        },
+        "dad <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl' ) {
+                add_opcode_vm1( $cpu, "dad $rp", [ 0x09 + 16 * RP($rp) ] );
+            }
+        },
+        "add hl, <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl', 'sp' ) {
+                add_opcode_vm1( $cpu, "add hl, $rp", [ 0x09 + 16 * RP($rp) ] );
+            }
+        },
+        "adc hl, <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl', 'sp' ) {
+                add_opcode_vm1( $cpu, "adc hl, $rp", 
+								[ 0x28, 0x09 + 16 * RP($rp) ] );
+            }
+        },
+        "pchl [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "pchl", [0xE9] );
+        },
+        "jp (hl) [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "jp (hl)", [0xE9] );
+        },
+        "jmp (hl) [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "jmp (hl)", [0xE9] );
+        },
+        "call NN [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "call %m", [ 0xCD, '%m', '%m' ] );
+        },
+        "c<flag> NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ( cpu_flags($cpu) ) {
+                add_opcode_vm1( $cpu, "c$f %m", 
+								[ 0xC4 + 8 * F($f), '%m', '%m' ] ) if $f ne 'p';
+            }
+        },
+        "c_<f> NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ( cpu_flags($cpu) ) {
+                add_opcode_vm1( $cpu, "c_$f %m", 
+								[ 0xC4 + 8 * F($f), '%m', '%m' ] );
+            }
+        },
+        "cp NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ('p') {
+                add_opcode_vm1( $cpu, "c$f %m", 
+								[ 0xC4 + 8 * F($f), '%m', '%m' ] );
+            }
+        },
+        "call <f>, NN [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ( cpu_flags($cpu) ) {
+                add_opcode_vm1( $cpu, "call $f, %m", [ 0xC4 + 8 * F($f), '%m', '%m' ] );
+            }
+        },
+        "rst NN [vm1]" => sub {
+            my ($cpu) = @_;
+			add_opcode_vm1(
+				$cpu, "rst %c",
+				[ 0xC7 . "+(%c<8?%c*8:%c)" ],
+				[    1, 2,    3,    4,    5,    6,    7,
+				  0, 8, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38 ]
+			);
+        },
+        "ret [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "ret", [0xC9] );
+        },
+        "r<f> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ( cpu_flags($cpu) ) {
+                add_opcode_vm1( $cpu, "r$f", [ 0xC0 + 8 * F($f) ] );
+            }
+        },
+        "r_<f> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ( cpu_flags($cpu) ) {
+                add_opcode_vm1( $cpu, "r_$f", [ 0xC0 + 8 * F($f) ] );
+            }
+        },
+        "ret <f> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $f ( cpu_flags($cpu) ) {
+                add_opcode_vm1( $cpu, "ret $f", [ 0xC0 + 8 * F($f) ] );
+            }
+        },
+        "push/pop <r> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'b', 'd', 'h', 'psw' ) {
+                add_opcode_vm1( $cpu, "push $rp", [ 0xC5 + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "pop $rp",  [ 0xC1 + 16 * RP($rp) ] );
+            }
+        },
+        "push/pop <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $rp ( 'bc', 'de', 'hl', 'af' ) {
+                add_opcode_vm1( $cpu, "push $rp", [ 0xC5 + 16 * RP($rp) ] );
+                add_opcode_vm1( $cpu, "pop $rp",  [ 0xC1 + 16 * RP($rp) ] );
+            }
+        },
+        "xthl [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "xthl", [0xE3] );
+        },
+        "ex (sp), hl [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "ex (sp), hl", [0xE3] );
+        },
+        "sphl [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "sphl", [0xF9] );
+        },
+        "ld sp, hl [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode_vm1( $cpu, "ld sp, hl", [0xF9] );
+        },
+        "dsub [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $asm ( 'dsub b', 'dsub bc', 'sub hl, bc' ) {
+                add_opcode_vm1( $cpu, $asm, [0x08] );
+            }
+            for my $asm ( 'dsub d', 'dsub de', 'sub hl, de' ) {
+                add_opcode_vm1( $cpu, $asm, [0x18] );
+            }
+        },
+        "sbc hl, <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+			add_opcode_vm1( $cpu, 'sbc hl, bc', [0x08] );
+			add_opcode_vm1( $cpu, 'sbc hl, de', [0x18] );
+        },
+        "dcmp [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $asm ( 'dcmp b', 'dcmp bc', 'cpc hl, bc' ) {
+                add_opcode_vm1( $cpu, $asm, [0xCB] );
+            }
+            for my $asm ( 'dcmp d', 'dcmp de', 'cpc hl, de' ) {
+                add_opcode_vm1( $cpu, $asm, [0xDD] );
+            }
+        },
+        "cpc hl, <rp> [vm1]" => sub {
+            my ($cpu) = @_;
+			add_opcode_vm1( $cpu, 'cpc hl, bc', [0xCB] );
+			add_opcode_vm1( $cpu, 'cpc hl, de', [0xDD] );
+        },
+        "ld (hl), <alu> (hl) [vm1]" => sub {
+            my ($cpu) = @_;
+			for my $asm ('anx', 'ld (hl), and (hl)', 'andl (hl)') {
+				add_opcode_vm1( $cpu, $asm, [0x10] );
+			}
+			for my $asm ('orx', 'ld (hl), or (hl)', 'orl (hl)') {
+				add_opcode_vm1( $cpu, $asm, [0x20] );
+			}
+			for my $asm ('xrx', 'ld (hl), xor (hl)', 'xorl (hl)') {
+				add_opcode_vm1( $cpu, $asm, [0x30] );
+			}
+        },
+        "shlx [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $asm ( 'shlx', 'shlde', 'ld (de), hl' ) {
+                add_opcode_vm1( $cpu, $asm, [0xD9] );
+            }
+        },
+        "lhlx [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $asm ( 'lhlx', 'lhlde', 'ld hl, (de)' ) {
+                add_opcode_vm1( $cpu, $asm, [0xED] );
+            }
+        },
+        "jof [vm1]" => sub {
+            my ($cpu) = @_;
+            for my $asm ( 'jof %m', 'j_of %m', 'jp of, %m', 'jmp of, %m' ) {
+                add_opcode( $cpu, $asm, [ 0xFD, '%m', '%m' ] );
+            }
+        },
     };
 
     $actions->{$key}->($cpu);
@@ -4875,6 +5239,7 @@ sub add_opcodes {
 #------------------------------------------------------------------------------
 require "opcodes_8080.pl";
 require "opcodes_8085.pl";
+require "opcodes_vm1.pl";
 require "opcodes_gbz80.pl";
 require "opcodes_z80.pl";
 require "opcodes_z80n.pl";

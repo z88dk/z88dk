@@ -180,7 +180,7 @@ my @tokens = (
 	'IND_A', 'IND_XP', 'IND_YP', 'IND_PP', 'IND_ZP',
 	
 	# Indirect 16-bit register
-	'IND_BC', 'IND_DE', 'IND_HL', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
+	'IND_BC', 'IND_DE', 'IND_HL', 'IND_HL1', 'IND_SP', 'IND_IX', 'IND_IY', 'IND_HLI', 'IND_HLD',
 	
 	# 8-bit registers
 	'B', 'C', 'D', 'E', 'H', 'L', 'A', 'F', 'I', 'R', 'M',
@@ -308,6 +308,11 @@ my @tokens = (
 	'IND_X', 'INDR_X', 'INI_X', 'INIR_X', 
 	'OTDR_X', 'OTIR_X', 'OUTD_X', 'OUTI_X',	
 	'LDD_XY', 'LDDR_XY', 'LDI_XY', 'LDIR_XY',
+	
+	# vm1 specific opcodes
+	'ANX', 'ANDL', 'ORX', 'ORL', 'XRX', 'XORL', 'DCMP', 'CPC',
+	'PCHL1', 'SPHL1', 'XTHL1',
+	'JOF', 'J_OF', 'JP_OF', 'JMP_OF',
 
 );
 
