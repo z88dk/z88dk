@@ -90,6 +90,31 @@ static int func_has_de_home(const Func *f)
     return 0;
 }
 
+/* [IR_DEPARK_PROBE] INERT — size the dead-DE frame word load. The 8085
+   LDSI/LHLX slot read below parks DE (push/pop) because load_to_hl must hand it
+   back untouched; where DE is provably free that park is 22 cycles and 2 bytes
+   of pure overhead (42c/5B against 20c/3B). This counts park sites and how many
+   a "no DE home, no DE or DEHL belief, no pending spill" gate would accept, and
+   which condition blocks the rest — so the acceptance rate is known before any
+   codegen moves. Emits nothing: gate-on output is byte-identical. */
+static long dp_total, dp_free, dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend;
+static void depark_probe_report(void)
+{
+    if (!dp_total) return;
+    fprintf(stderr, "DEPARKPROBE sites=%ld free=%ld (%.0f%%) blocked:"
+            " de_home=%ld de_belief=%ld dehl=%ld pending=%ld\n",
+            dp_total, dp_free, 100.0 * (double)dp_free / (double)dp_total,
+            dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend);
+}
+static int depark_probe_on(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_DEPARK_PROBE");
+                 v = e ? atoi(e) : 0;
+                 if (v) atexit(depark_probe_report); }
+    return v;
+}
+
 /* True if vreg_id is a stack-transient spill (IR_PR_STACK): pushed at its def,
    popped at its single use — no frame slot. See ir_stack_spill (ir_alloc). */
 static int vreg_is_pr_stack(const Func *f, int vreg_id)
@@ -503,6 +528,27 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        push/pop leaves cur_sp_adjust untouched; just shift the slot offset
        +2 for the in-flight push. */
     if ((IS_8085()) && off >= 0 && off + 2 <= 255) {
+        if (depark_probe_on()) {
+            const char *why = "FREE";
+            dp_total++;
+            if      (func_has_de_home(f))  { dp_blk_home++; why = "de_home"; }
+            else if (L.rs.de >= 0)         { dp_blk_de++;   why = "de_belief"; }
+            else if (L.rs.dehl >= 0)       { dp_blk_dehl++; why = "dehl"; }
+            else if (L.pending_spill_v >= 0) { dp_blk_pend++; why = "pending"; }
+            else                             dp_free++;
+            if (depark_probe_on() == 2)
+                fprintf(stderr, "DEPARKSITE %s v%d off=%d %s\n",
+                        f && f->fn ? ir_sym_name(f->fn) : "?", vreg_id, off, why);
+        }
+        /* NB no "DE is dead here, skip the park" shortcut: the register cache
+           has no BYTE-level DE tracking (rs.a/bc/de/hl only), so a value staged
+           in E or D alone — `ld a,(hl); ld e,a` before a store — is live with
+           NOTHING in the cache to say so, and dropping the park corrupted it
+           (rle, bitfieldbench). A belief-based test cannot be sound here, which
+           is what the comment above means; a sound version needs either a
+           caller-supplied "DE is dead for this load" hint at the sites that know
+           it, or real liveness. IR_DEPARK_PROBE sizes the prize: 19% of corpus
+           park sites, 46% of binary-trees'. */
         emit(out, "push\tde");
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\thl,(de)");
