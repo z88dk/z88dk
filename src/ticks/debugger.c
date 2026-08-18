@@ -1085,8 +1085,10 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         }
     }
 
-    // try globals
-    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name, fp->filename);
+    // try globals. There may be no frame at all - no debug info loaded, or a
+    // pc outside any known function - and cdb_find_symbol() copes with a null
+    // filename by skipping the file-local search.
+    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name, fp ? fp->filename : NULL);
     if (s != NULL && s->address_space.address_space == 'E') {
         debug_get_symbol_value_expression(s, fp, result);
         debug_stack_frames_free(first_frame_pointer);
@@ -1099,7 +1101,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         utstring_init(&prefixed);
         utstring_printf(&prefixed, "_%s", lookup->symbol_name);
 
-        s = cdb_find_symbol(utstring_body(&prefixed), fp->filename);
+        s = cdb_find_symbol(utstring_body(&prefixed), fp ? fp->filename : NULL);
         if (s != NULL && s->address_space.address_space == 'E') {
             debug_get_symbol_value_expression(s, fp, result);
             debug_stack_frames_free(first_frame_pointer);
@@ -1203,6 +1205,13 @@ static void info_section_locals() {
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
+    /* No frame - no debug info, or a pc outside any known function - so there
+       are no locals to report. */
+    if (fp == NULL) {
+        debug_stack_frames_free(first_frame_pointer);
+        return;
+    }
+
     debug_sym_function* fn = fp->function;
     if (fn != NULL) {
         debug_sym_function_argument* arg = fn->arguments;
@@ -1242,8 +1251,9 @@ static void info_section_globals() {
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
-    // file-local symbols
-    for (debug_sym_symbol *s = cdb_get_first_local_symbol(fp->filename); s != NULL; s = s->hh.next) {
+    // file-local symbols. Without a frame we have no file to scope them to,
+    // so skip straight to the globals below.
+    for (debug_sym_symbol *s = fp ? cdb_get_first_local_symbol(fp->filename) : NULL; s != NULL; s = s->hh.next) {
         if (s->address_space.address_space != 'E') {
             continue;
         }
@@ -1523,6 +1533,54 @@ static int cmd_registers(int argc, char **argv)
 
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
+
+    if (isvm1()) {
+        /* The VM1 has no shadow set and no index registers - the only extra
+           register pair is H1L1, reached through the RS prefix. */
+        if (interact_with_tty) {
+            bk.console(
+                FNT_CLR "af " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "bc " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "de " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "hl " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                FNT_CLR "hl'" FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n"
+
+                FNT_CLR "pc "  FNT_RST "$" FNT_BLD "%04X"   FNT_RST "  "
+                FNT_CLR "[pc]" FNT_RST "$" FNT_BLD "  %02X" FNT_RST "   "
+                FNT_CLR "sp "  FNT_RST "$" FNT_BLD "%04X"   FNT_RST "  "
+                FNT_CLR "[sp]" FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+                " S:"  FNT_BLD "%d" FNT_RST
+                " Z:"  FNT_BLD "%d" FNT_RST
+                " OF:" FNT_BLD "%d" FNT_RST
+                " AC:" FNT_BLD "%d" FNT_RST
+                " MF:" FNT_BLD "%d" FNT_RST
+                " P:"  FNT_BLD "%d" FNT_RST
+                " CY:" FNT_BLD "%d" FNT_RST "\n",
+                bk.f() | regs.a << 8, regs.c | regs.b << 8, regs.e | regs.d << 8,
+                regs.l | regs.h << 8, regs.l_ | regs.h_ << 8,
+                pc, bk.get_memory(pc, MEM_TYPE_INST), sp,
+                (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)),
+                (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0,
+                (bk.f() & 0x20) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0,
+                (bk.f() & 0x08) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0,
+                (bk.f() & 0x01) ? 1 : 0);
+        } else {
+            bk.console("pc=%04X, [pc]=%02X, bc=%04X, de=%04X, hl=%04X, hl'=%04X, af=%04X\n"
+                   "sp=%04X, [sp]=%04X\n"
+                   "f: S=%d Z=%d OF=%d AC=%d MF=%d P=%d CY=%d\n",
+                   pc, bk.get_memory(pc, MEM_TYPE_INST), regs.c | regs.b << 8,
+                   regs.e | regs.d << 8, regs.l | regs.h << 8, regs.l_ | regs.h_ << 8,
+                   bk.f() | regs.a << 8,
+                   sp, (bk.get_memory(sp+1, MEM_TYPE_DATA) << 8 | bk.get_memory(sp, MEM_TYPE_DATA)),
+                   (bk.f() & 0x80) ? 1 : 0, (bk.f() & 0x40) ? 1 : 0,
+                   (bk.f() & 0x20) ? 1 : 0, (bk.f() & 0x10) ? 1 : 0,
+                   (bk.f() & 0x08) ? 1 : 0, (bk.f() & 0x04) ? 1 : 0,
+                   (bk.f() & 0x01) ? 1 : 0);
+        }
+        if (regs.clockh || regs.clockl)
+            bk.console("clockh=%04X, clockhl=%04X\n", regs.clockh, regs.clockl);
+        return 0;
+    }
 
     if (interact_with_tty) {
         bk.console(

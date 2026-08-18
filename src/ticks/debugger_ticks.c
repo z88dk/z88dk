@@ -70,6 +70,15 @@ void get_regs(struct debugger_regs_t* regs)
     regs->xl = xl;
     regs->yh = yh;
     regs->yl = yl;
+
+    /* The VM1's RS prefix is implemented by exchanging h/l with h_/l_ for the
+       duration of one instruction, so when we stop between a prefix and its
+       instruction the pair are the wrong way round. Report them logically:
+       hl is always HL and hl' is always H1L1. */
+    if ( vm1_rs == 1 ) {
+        regs->h = h_;  regs->l = l_;
+        regs->h_ = h;  regs->l_ = l;
+    }
 }
 
 void set_regs(struct debugger_regs_t* regs)
@@ -97,6 +106,12 @@ void set_regs(struct debugger_regs_t* regs)
     xl = regs->xl;
     yh = regs->yh;
     yl = regs->yl;
+
+    /* Mirror of the exchange in get_regs() */
+    if ( vm1_rs == 1 ) {
+        h = regs->h_;  l = regs->l_;
+        h_ = regs->h;  l_ = regs->l;
+    }
 }
 
 void debugger_write_memory(int addr, uint8_t val)

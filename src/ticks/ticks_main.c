@@ -161,6 +161,7 @@ static void usage(void)
     printf("  -b <model>     Memory model (zxn/zx/z180/msx)\n");
     printf("  -m8080         Emulate an 8080\n");
     printf("  -m8085         Emulate an 8085 (mostly)\n");
+    printf("  -mvm1          Emulate a KR580VM1\n");
     printf("  -mgbz80        Emulate a gbz80 (mostly)\n");
     printf("  -mz80          Emulate a z80\n");
     printf("  -mz80_strict   Emulate a z80\n");
@@ -274,6 +275,8 @@ int main (int argc, char **argv){
             c_cpu = CPU_8080;
           } else if ( strcmp(&argv[0][1],"m8085") == 0 ) {
             c_cpu = CPU_8085;
+          } else if ( strcmp(&argv[0][1],"mvm1") == 0 ) {
+            c_cpu = CPU_KR580VM1;
           } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
