@@ -69,6 +69,27 @@ static int vreg_in_pr_bc(const Func *f, int vreg_id)
     return ir_home_at(f, vreg_id) == IR_PR_BC;
 }
 
+/* True iff any vreg in this function is homed in DE or a DE half. The 8085
+   LHLX deref below reads through DE, and a small-offset word deref is one of
+   the shapes op_de_clean promises is DE-CLEAN — that promise is what lets a
+   DE home stay resident across it. So the LHLX form is only available when
+   nothing is homed there, and the promise has nothing to protect. */
+static int func_has_de_home(const Func *f)
+{
+    if (!f || !f->vreg_to_phys) return 1;          /* unknown: assume it does */
+    if (g_hc.func_whome >= 0) return 1;
+    for (int v = 0; v < f->n_vregs; v++) {
+        int p = ir_home_at(f, v);
+        /* IR_PR_DEHL is deliberately NOT here: a DE:HL-resident long is a
+           short-lived born-and-consumed value, and every user of this predicate
+           clobbers HL as well (the base load), so such a long can never be live
+           across one. Vetoing whole functions for owning one cost binary-trees
+           7 bytes and 0.8% of its cycles by refusing the LHLX deref there. */
+        if (p == IR_PR_DE || p == IR_PR_E || p == IR_PR_D) return 1;
+    }
+    return 0;
+}
+
 /* True if vreg_id is a stack-transient spill (IR_PR_STACK): pushed at its def,
    popped at its single use — no frame slot. See ir_stack_spill (ir_alloc). */
 static int vreg_is_pr_stack(const Func *f, int vreg_id)

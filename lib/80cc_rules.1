@@ -688,9 +688,10 @@
 	ld	de,%1
 	ld	hl,%2
 
-%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded. %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref
+%title #IR drop dead ex de,hl when both DE and HL are immediately reloaded. %not (hl): ez80's ld de,(hl)/ld hl,(hl) READ the reg, so there the ex is a live deref. %not %2 (de): 8085 LHLX `ld hl,(de)` reads DE, and here it runs BEFORE `ld de,%1` overwrites it — so the ex is the live thing that put the address there (the de-first variant above is safe, its ld de,%1 lands first)
 %not %1 (hl)
 %not %2 (hl)
+%not %2 (de)
 	ex	de,hl
 	ld	hl,%2
 	ld	de,%1

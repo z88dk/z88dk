@@ -2960,12 +2960,66 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
                 return 0;
             }
         }
+        int dst_w = f->vregs[op->dst].width;
+        /* 8085 word deref: LHLX reads the word in one instruction, through DE.
+           `ld de,hl+n` (LDHI) folds the field offset in for free, so the whole
+           access is 3B/20c against the offset chain plus byte walk's 6B/36c;
+           at offset 0 getting the address into DE costs 2B/14c against 4B/24c.
+           It also leaves A alone, where the walk clobbers it, and reads the
+           word with ONE bus access rather than two.
+           DE is the price. A small-offset word deref is one of the shapes
+           op_de_clean promises is DE-clean, which is how a DE home survives
+           across it — so this is gated on the function keeping no DE home
+           (func_has_de_home). Offsets are LDHI's unsigned byte; a post-step
+           (`*p++`) steps the base through its own path and wants HL, and a
+           banked/far pointer needs its page-in, so both stay on the walk. */
+        int lhlx_deref = IS_8085() && dst_w == 2 && !opt_disabled("lhlx-deref")
+            && !func_has_de_home(f)
+            && op->mem.kind == IR_MEM_VREG && op->mem.post_step == 0
+            && op->mem.elem != KIND_CPTR && mem_bank_fn(&op->mem) == NULL
+            && op->mem.offset >= 0 && op->mem.offset <= 255;
+        /* At offset 0 the address only has to REACH DE, so take it from
+           wherever it already is rather than routing it through HL first:
+           a DE-resident base needs no move at all (and its belief survives —
+           LHLX leaves DE alone), and a BC-resident one is `ld de,bc` (3B/18c)
+           where going through HL would be `ld hl,bc; ex de,hl; ld hl,(de)`
+           (4B/22c). Only when HL does not already hold the base, which is the
+           cheapest case of all. */
+        if (lhlx_deref && op->mem.offset == 0 && !hl_has(op->mem.base)) {
+            if (de_has(op->mem.base)) {
+                emit(out, "ld\thl,(de)");           /* DE already the address */
+                commit_hl_word(out, f, op->dst);
+                return 0;
+            }
+            if (bc_has(op->mem.base)) {
+                emit(out, "ld\tde,bc");             /* address straight to DE */
+                emit(out, "ld\thl,(de)");
+                /* LHLX does not touch DE, so DE still holds the BASE — keep the
+                   belief so a second field read off the same pointer inside this
+                   block is a bare `ld hl,(de)`. */
+                cache_de(op->mem.base);
+                commit_hl_word(out, f, op->dst);
+                return 0;
+            }
+        }
         /* Indirect: base vreg holds the address; load through it.
            Cache-aware: if HL already holds the base, skip the load.
            Common after a post-inc save (`old = data`, then deref). */
         if (!hl_has(op->mem.base))
             load_to_hl(out, f, op->mem.base);
-        int dst_w = f->vregs[op->dst].width;
+        if (lhlx_deref) {
+            if (op->mem.offset == 0) {
+                emit(out, "ex\tde,hl");             /* DE = the address */
+                emit(out, "ld\thl,(de)");           /* HL = the word */
+                cache_de(op->mem.base);             /* DE still holds the base */
+            } else {
+                emit(out, "ld\tde,hl+%d", op->mem.offset);
+                emit(out, "ld\thl,(de)");           /* HL = the word */
+                invalidate_de_cache();              /* DE = base+n, not a vreg */
+            }
+            commit_hl_word(out, f, op->dst);
+            return 0;
+        }
         /* Word DE-home active: reach the field offset DE-clean (DE = home
            accumulator, BC = stepped base, neither free as scratch). A is
            free (the load below clobbers it). Any offset (A-add is
