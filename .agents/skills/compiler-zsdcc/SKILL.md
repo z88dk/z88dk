@@ -51,6 +51,9 @@ zcc +cpm -clib=sdcc_iy -vn hi.c -o hi
 - Intended for **Z80-class** work in this toolchain.
 - For **8080 / 8085 / gbz80** classic products, prefer **sccz80** (or 80cc), not zsdcc.
 - Library directory is often still `lib/clibs/sdcc_ix` even for `sdcc_iy`. Read `lib/config/<target>.cfg`.
+- **Vanilla SDCC** (`sdcc` from svn, `__sdcccall(1)`, banner `#16608`) is a
+  different toolchain. Bench recipes: **`methodology-sdcc-vanilla`**. Do not
+  write vanilla numbers into zsdcc RESULT blocks.
 
 ---
 

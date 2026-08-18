@@ -14,6 +14,48 @@ Binary: `z88dk-80cc`. Source: `src/80cc/`. Rules file: `lib/80cc_rules.1`.
 1. Select via `zcc -compiler=80cc` when the target allows it.
 2. Do not assume sccz80 or sdcc runtime helpers match 80cc output.
 3. Prefer reading `src/80cc` notes for current status before large work.
+4. Rebuild: `make -C src/80cc PREFIX=$(pwd)` from the z88dk root, then `make -C src/80cc PREFIX=$(pwd) install`.
+5. The `--version` / `-h` banner comes from `src/config.h` `Z88DK_VERSION`. That string can be stale after a rebuild. Prove a hunk with `strings bin/z88dk-80cc`, not the banner.
+
+## Frame pointer (Z80 benches)
+
+| Flag | Meaning |
+|------|---------|
+| `-fframe-pointer` | IX is the frame pointer (`ix+d` locals). Use on **Z80** 80cc TIMER / PRINTF recipes except mbf32. |
+| (default) | Omit the frame pointer. Locals via `sp`. IX is a spare index register. |
+| `--math-mbf32` | **Do not** add `-fframe-pointer`. mbf32 clobbers IX. |
+
+8085 has no IX. Do not pass `-fframe-pointer` on `-clib=8085`.
+
+Integer benches (sieve, fannkuch) are usually smaller and faster with `-fframe-pointer`. math32 TIMER is usually **slower and larger**: extra time is in 80cc C glue (`ix+d`, byte `add/adc a,(ix+d)`, spills around `l_f32_*`). math32 library cycle counts stay the same. Prove with ticks hotspots rolled up to the C function (`advance`, `selectRandom`), not to `CLIB_*` const symbols.
+
+Recipe comment used in `z88dk-classic/readme.txt`:
+
+```text
+# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+```
+
+## TIMER / correctness
+
+- Classic: `+test -compiler=80cc -DSTATIC -DTIMER -D__Z88DK` (no `PRINTF` for published ticks).
+- Some 80cc sources need `__asm__("TIMER_START:");` (same as vanilla SDCC).
+- Dhrystone: `-DNOSTRUCTASSIGN`. TIMER is **not** published (Run_Index loop exits in ~800 cycles).
+- 80cc+8085 sorting: qsort does not link. Do not invent 8085 80cc sort rows.
+- Mandelbrot image: `z88dk-ticks … -output verify.bin` then `z88dk-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin`. Compare to `z88dk-classic/image-golden.bin`. One edge pixel can differ (float). Many last-bytes-of-row (≈15) means missing variable-count byte `<<` (PR #3066).
+
+## PR #3066 (mandelbrot leftover pack)
+
+Not on `master` until merged. Branch `80cc_mandelbrot_pr`.
+
+| Hunk | Role |
+|------|------|
+| `gen_shl` width-1 + `op->src[1] >= 0` | Count in B, `add a,a` loop. Else `imm` is 0 and the leftover byte is `<< 0`. |
+| `gen_ld_mem` `ld a,(bc)` / `(de)` | Gate on `bc_has` / `de_has` (live), not `vreg_in_pr_bc` / `de`. |
+| `compound_assign.sh` `ca_char_shl_var` | Expect `00c0`. A lone `zcc +test` of that snippet can print `c0` even without the hunk. Trust the suite or the full mandelbrot image. |
+
+Use `emit_sp` for the BC push/pop. Three-way merge onto current master is clean. Do not cherry-pick only the last commit.
+
+Prove the binary has the fix: `strings bin/z88dk-80cc | rg bshl_loop`.
 
 ## Condensed wiki
 
@@ -83,4 +125,4 @@ Code generation options
 
 ## Related
 
-- `tool-zcc`, `tool-copt`
+- `tool-zcc`, `tool-copt`, `methodology-measure`, `methodology-sdcc-vanilla` (not 80cc)

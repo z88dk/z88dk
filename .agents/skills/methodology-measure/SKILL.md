@@ -333,6 +333,11 @@ Parent `readme.txt` holds **CLASSIC Z80 / 8085 SUMMARY** tables; full RESULT
 blocks are often duplicated in parent + `z88dk-classic/`. Math32 comparison
 tables also live in `libsrc/math/float/math32/readme.md`.
 
+**80cc Z80** TIMER lines use `-compiler=80cc -fframe-pointer` except `--math-mbf32`.
+Detail: **`compiler-80cc`**. **Vanilla SDCC** (`/usr/local/bin/sdcc`, `*/sdcc/`
+readmes, tag `#16608`): **`methodology-sdcc-vanilla`**. Do not mix those rows
+with zsdcc `#16639`.
+
 ### TIMER vs PRINTF (math16 / math32)
 
 | Purpose | Defines | Maths flags |
@@ -576,3 +581,4 @@ Hand-written `libsrc/**` is **not** copt'd. Full peephole rules and finalisation
 ## Related tool skills
 
 - `tool-ticks`, `tool-z80nm`, `tool-dis`, `tool-copt`, `tool-zcc`
+- `compiler-80cc`, `methodology-sdcc-vanilla`

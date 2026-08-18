@@ -80,8 +80,8 @@ Each skill lives at `.agents/skills/<name>/SKILL.md`. The directory name is the 
 | Skill | When |
 |-------|------|
 | `compiler-sccz80` | sccz80 + runtime + copt interaction |
-| `compiler-zsdcc` | SDCC / sdcc_ix / sdcc_iy |
-| `compiler-80cc` | 80cc |
+| `compiler-zsdcc` | zsdcc / sdcc_ix / sdcc_iy / patch pin |
+| `compiler-80cc` | 80cc, Z80 `-fframe-pointer`, #3066 |
 
 ### Tools
 
@@ -125,7 +125,8 @@ Host TIMER / suites: `+test` + `methodology-measure` / `tool-ticks`.
 |-------|------|
 | `style-libsrc-layout` | New or split library files |
 | `style-ste-writing` | Human prose only (not code) |
-| `methodology-measure` | A/B, hotspots, benches, suites, wiki numbers |
+| `methodology-measure` | A/B, hotspots, z88dk benches, suites, wiki numbers |
+| `methodology-sdcc-vanilla` | Stock `sdcc` benches (`*/sdcc/`), not zsdcc |
 
 ## Human docs vs agent skills
 
