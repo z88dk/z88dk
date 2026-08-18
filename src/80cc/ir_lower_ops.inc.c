@@ -5189,63 +5189,65 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
         int src0_cached = dehl_has(bsrc0);
         if (!src0_cached)
             load_to_dehl(out, f, bsrc0);
+        /* The LHS now sits in the canonical resting form: DE = high half and
+           BC = low half (the DEHL cache invariant, which is exactly why the
+           old code could `push bc` on the cached path), with HL a redundant
+           copy of the low half. So HL is EXPENDABLE — the value survives its
+           loss — which is what lets the fused path below address the RHS
+           through HL and leave the LHS entirely in registers. */
+        int src1_inline_pushed = (!fp_active(f)
+                                  && L.la.cur_dehl_inline_push == bsrc1
+                                  && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp);
+        /* Fused load+op: point HL at the RHS slot and `<op> (hl)` byte-wise
+           against the LHS bytes where they already live — C/B (low) and E/D
+           (high) — writing each result byte back IN PLACE, so the pair ends in
+           the resting form with no shuffle. This is gen_add's fused shape; the
+           bitop version used to `push de` + `push bc|hl` first, pop the halves
+           back one at a time, stash results in the OPPOSITE halves (E/D then
+           C/B) and normalise with `ld h,a; ld l,c; ex de,hl`. That cost two
+           pushes, two pops and a 3-instruction normalise — ~7 instructions and
+           ~56 cycles — per long AND/OR/XOR, for nothing: the halves only
+           collided because the result was being built swapped. md5's
+           MD5Transform alone carries 224 of these.
+           Fires only when the RHS is sp-relative (not fp, where computing HL
+           from IX costs more) and not DEHL-cached. Inline-push variant: src[1]
+           was parked at TOS by store_dehl_finalize (chain-OR accumulate) and
+           sits at sp+0 now that this path pushes nothing; it is dropped before
+           store_dehl_finalize so a chained dst push lands at sp+0 too. */
+        if (!fp_active(f) && (!dehl_has(bsrc1) || src1_inline_pushed)) {
+            static const char *lhs[4] = { "c", "b", "e", "d" };  /* b0..b3 */
+            int off = src1_inline_pushed ? 0
+                    : slot_off(f, bsrc1) + L.cur_sp_adjust;
+            emit(out, "ld\thl,%d", off);
+            emit(out, "add\thl,sp");       /* HL = &RHS; LHS untouched in BC/DE */
+            for (int i = 0; i < 4; i++) {
+                emit(out, "ld\ta,%s", lhs[i]);
+                emit(out, "%s\t(hl)", mnem);
+                emit(out, "ld\t%s,a", lhs[i]);   /* result byte, in place */
+                if (i < 3) emit(out, "inc\thl");
+            }
+            /* BC = low result, DE = high result — already canonical. Dropping
+               the inline-pushed RHS must NOT go through BC any more: BC now
+               holds the low result (the old code popped after its normalise,
+               when BC was free). Discard through AF instead — A is already
+               clobbered by the byte chain and F is irrelevant, so this is the
+               one place `pop af` is the right instruction. */
+            if (src1_inline_pushed) {
+                emit(out, "pop\taf");
+                emit(out, "pop\taf");
+                L.cur_sp_adjust -= 4;
+                L.la.cur_dehl_inline_push = -1;
+                invalidate_a_cache();
+            }
+            emit_bc_to_hl(out);            /* HL = low half: the DEHL contract */
+            store_dehl_finalize(out, f, op->dst);
+            return 0;
+        }
         emit(out, "push\tde");
         if (src0_cached)
             emit(out, "push\tbc");
         else
             emit(out, "push\thl");
-        /* Fused load+op: point HL at the RHS slot and `<op> (hl)` directly
-           with LHS bytes popped off the stack, folding the full DEHL load
-           into the byte-op chain. Fires only when RHS is sp-rel (not fp,
-           where computing HL from IX costs more) and not DEHL-cached.
-           Inline-push variant: src[1] was pushed by store_dehl_finalize
-           (chain-OR accumulate), sitting at sp+4 after the two pushes above;
-           pop it BEFORE store_dehl_finalize so a chained dst push lands at
-           sp+0. */
-        int src1_inline_pushed = (!fp_active(f)
-                                  && L.la.cur_dehl_inline_push == bsrc1
-                                  && L.cur_sp_adjust == L.la.cur_dehl_inline_push_base_sp);
-        if (!fp_active(f) && (!dehl_has(bsrc1) || src1_inline_pushed)) {
-            int off = src1_inline_pushed ? 4
-                    : slot_off(f, bsrc1) + 4 + L.cur_sp_adjust;
-            emit(out, "ld\thl,%d", off);
-            emit(out, "add\thl,sp");
-            emit(out, "pop\tbc");          /* BC = LHS low (B=byte1, C=byte0) */
-            emit(out, "ld\ta,c");
-            emit(out, "%s\t(hl)", mnem);   /* A = byte0 result */
-            emit(out, "ld\te,a");           /* stash byte0 in E */
-            emit(out, "inc\thl");
-            emit(out, "ld\ta,b");
-            emit(out, "%s\t(hl)", mnem);   /* A = byte1 result */
-            emit(out, "inc\thl");
-            emit(out, "ld\td,a");           /* stash byte1 in D */
-            emit(out, "pop\tbc");          /* BC = LHS high (B=byte3, C=byte2) */
-            emit(out, "ld\ta,c");
-            emit(out, "%s\t(hl)", mnem);   /* A = byte2 result */
-            emit(out, "inc\thl");
-            emit(out, "ld\tc,a");           /* stash byte2 in C */
-            emit(out, "ld\ta,b");
-            emit(out, "%s\t(hl)", mnem);   /* A = byte3 result */
-            /* Normalise to canonical DEHL. gbz80 builds it directly to
-               dodge the 56T ex de,hl emulation (A=b3, C=b2, D=b1, E=b0). */
-            if (IS_GBZ80()) {
-                emit_de_to_hl(out);             /* HL = b1b0 = low half */
-                emit(out, "ld\td,a");           /* D = b3 */
-                emit(out, "ld\te,c");           /* E = b2  -> DE = high */
-            } else {
-                emit(out, "ld\th,a");           /* H = byte3 */
-                emit(out, "ld\tl,c");           /* L = byte2 */
-                emit(out, "ex\tde,hl");        /* DEHL: D=b3 E=b2 H=b1 L=b0 */
-            }
-            if (src1_inline_pushed) {
-                emit(out, "pop\tbc");
-                emit(out, "pop\tbc");
-                L.cur_sp_adjust -= 4;
-                L.la.cur_dehl_inline_push = -1;
-            }
-            store_dehl_finalize(out, f, op->dst);
-            return 0;
-        }
         load_to_dehl_adj(out, f, bsrc1, 4);
         emit(out, "pop\tbc");          /* BC = src[0] LOW (C=b0, B=b1) */
         emit(out, "ld\ta,c");
