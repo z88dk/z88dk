@@ -183,6 +183,12 @@ typedef struct {
         int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
         int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
         int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
+        /* Fused byte-chain result: the value is already BC=low / DE=high with HL
+           NOT holding the low half. Every sink of store_dehl_finalize opens with
+           `ld bc,hl` to establish exactly that, so without this flag the fused
+           paths have to spend `ld hl,bc` purely to feed it back — 4 bytes and 16
+           cycles of round trip per site. Consumed (and cleared) by the sinks. */
+        int cur_dehl_bc_is_low;
         int cur_push_dehl_bc_dead;
         int cur_dehl_dst_dead_safe, cur_dst_dead;
         int cur_remat_def_dead;  /* remat NO_SLOT def with no same-BB reader → skip it */
@@ -5471,6 +5477,8 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
        previous op's value into an entry — NOT assertable here. */
     else if (L.la.cur_dehl_push_to_stack)
         bad = "cur_dehl_push_to_stack set at op entry (leaked)";
+    else if (L.la.cur_dehl_bc_is_low)
+        bad = "cur_dehl_bc_is_low set at op entry (leaked past a sink)";
     /* HL address-cache and value-cache are mutually exclusive. */
     else if (L.cur_hl_addr_off >= 0 && L.rs.hl >= 0)
         bad = "HL address-cache and value-cache both live";
@@ -5631,6 +5639,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.la.cur_dehl_inline_push = -1;
     L.la.cur_dehl_inline_push_base_sp = 0;
     L.la.cur_dehl_push_to_stack = 0;
+    L.la.cur_dehl_bc_is_low = 0;
     cur_emitted_file = NULL;
     cur_emitted_line = 0;
     L.la.shl_skip_n = 0;

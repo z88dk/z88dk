@@ -1800,9 +1800,16 @@ static void load_to_dehl(FILE *out, const Func *f, int vreg_id)
 
 static void store_dehl(FILE *out, const Func *f, int vreg_id)
 {
+    /* A fused byte chain hands us BC=low / DE=high with HL holding junk, where
+       every other producer hands us DE=high / HL=low. Consume that signal once
+       here; each path below either does not need HL (skip its `ld bc,hl`) or
+       restores it first. */
+    int bc_low = L.la.cur_dehl_bc_is_low;
+    L.la.cur_dehl_bc_is_low = 0;
     /* FP-relative long store. Preserves HL+DE entirely — no BC stash
        needed. PR_BC vregs survive across long stores when FP is on. */
     if (fp_active(f)) {
+        if (bc_low) emit_bc_to_hl(out);     /* fp paths store from HL */
         /* Deepest slot at TOS: discard the word (pop bc x2) and re-push
            DEHL — beats the synthetic long store. HL+DE kept, BC=low
            (contract). By-coincidence only. */
@@ -1847,6 +1854,14 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        half) afterwards. sp-mode + tos_pushpop_ok only. */
     if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         tw_log(vreg_id, 1, 0, off, off + 2 <= sp_rel_max(f));
+        /* This path discards the old slot contents THROUGH BC and pushes the low
+           half from HL, so a fused byte chain's BC=low / junk-HL form has to be
+           put back first. Two bytes, and measured to fire once in the whole bench
+           corpus (crcbench) — a special-cased discard here (`pop af` twice, or
+           `add sp,4` on gbz80/Rabbit) would be a hand-derived branch on a path
+           that essentially never runs, which is how the pop-clobbers-BC bug got
+           in in the first place. */
+        if (bc_low) emit_bc_to_hl(out);
         emit(out, "pop\tbc");           /* drop old low half */
         emit(out, "pop\tbc");           /* drop old high half */
         emit(out, "push\tde");          /* write high half (bytes 2-3) */
@@ -1858,8 +1873,9 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        half from DE (native ld (sp+d),de on kc160; ex-de-hl on Rabbit).
        Ends DE=high, BC=low (the contract). */
     if (off >= 0 && off + 2 <= sp_rel_max(f)) {
+        if (bc_low) emit_bc_to_hl(out);     /* this path stores the low half from HL */
         emit(out, "ld\t(sp+%d),hl", off);
-        emit(out, "ld\tbc,hl");
+        if (!bc_low) emit(out, "ld\tbc,hl");
         if (IS_KC160()) {
             emit(out, "ld\t(sp+%d),de", off + 2);
         } else {
@@ -1878,7 +1894,7 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        reads B and C without disturbing DE. 62c/11B against 74c/13B.
        A is untouched. LDSI's offset is an unsigned byte. */
     if (IS_8085() && !opt_disabled("lhlx-long") && off >= 0 && off + 2 <= 255) {
-        emit(out, "ld\tbc,hl");          /* BC = low half (contract) */
+        if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low half (contract) */
         emit(out, "ex\tde,hl");          /* HL = high half */
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\t(de),hl");        /* slot+2..3 = high half */
@@ -1891,8 +1907,9 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
     }
     /* Stash low half (HL) into BC so HL is free for slot addressing (BC is
        clobbered by contract). 8 T-states for ld bc,hl vs 21 for the
-       push hl ... pop bc round trip. */
-    emit(out, "ld\tbc,hl");      /* BC = low (B=hi byte, C=lo byte) */
+       push hl ... pop bc round trip. Already done when a fused byte chain left
+       the low half in BC. */
+    if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low (B=hi byte, C=lo byte) */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");         /* HL = &slot+0 */
     store_byte_adv(out, "c", 0);
@@ -1952,6 +1969,18 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
    advertised — its content is half of a long, not an int-class value. */
 static void cache_dehl_no_spill(FILE *out, int vreg_id)
 {
+    /* Arrived straight off a fused byte chain: BC already holds the low half and
+       HL holds junk, so the stash is not merely wasted but would read the wrong
+       register. Publish the DEHL cache without it and leave HL unclaimed — a
+       later reader recovers the low half itself via load_to_dehl's lazy
+       `ld hl,bc`. */
+    if (L.la.cur_dehl_bc_is_low) {
+        L.la.cur_dehl_bc_is_low = 0;
+        L.la.cur_dehl_dst_no_bc_stash = 0;
+        invalidate_hl_cache();          /* HL is junk; clears rs.de/rs.dehl too */
+        L.rs.dehl = vreg_id;
+        return;
+    }
     /* The `ld bc,hl` stash is wasted when the next consumer is the
        FP-mode byte-direct binop chain — it reads H/L directly and writes
        BC itself at the chain's tail, so subsequent ops still see BC=low. */
@@ -1977,7 +2006,10 @@ static int vreg_is_pr_dehl(const Func *f, int v);
    stacked-arg skip). */
 static void emit_dehl_stack_push(FILE *out, int vreg_id)
 {
-    emit(out, "ld\tbc,hl");
+    /* BC already the low half (fused byte chain) — the stash would read a junk
+       HL. The pushed image is the same either way. */
+    if (L.la.cur_dehl_bc_is_low) L.la.cur_dehl_bc_is_low = 0;
+    else                         emit(out, "ld\tbc,hl");
     emit(out, "push\tde");
     emit(out, "push\tbc");
     L.cur_sp_adjust += 4;
