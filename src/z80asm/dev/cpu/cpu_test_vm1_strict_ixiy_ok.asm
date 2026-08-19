@@ -44,6 +44,7 @@
  ana m                          ; A6
  andl (hl')                     ; 38 10
  andl (hl)                      ; 10
+ andm                           ; 10
  ani 0                          ; E6 00
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
@@ -66,10 +67,14 @@
  cnc 0x1234                     ; D4 34 12
  cnz 0x1234                     ; C4 34 12
  cp 0x1234                      ; F4 34 12
- cpc hl', bc                    ; 38 CB
- cpc hl', de                    ; 38 DD
- cpc hl, bc                     ; CB
- cpc hl, de                     ; DD
+ cp hl', bc                     ; 38 CB
+ cp hl', de                     ; 38 DD
+ cp hl, bc                      ; CB
+ cp hl, de                      ; DD
+ cpc hl', bc                    ; 38 28 CB
+ cpc hl', de                    ; 38 28 DD
+ cpc hl, bc                     ; 28 CB
+ cpc hl, de                     ; 28 DD
  cpe 0x1234                     ; EC 34 12
  cpi 0                          ; FE 00
  cpi 127                        ; FE 7F
@@ -398,6 +403,7 @@
  ori 255                        ; F6 FF
  orl (hl')                      ; 38 20
  orl (hl)                       ; 20
+ orm                            ; 20
  orx                            ; 20
  out 0                          ; D3 00
  out 127                        ; D3 7F
@@ -452,16 +458,18 @@
  sbb l                          ; 9D
  sbb l'                         ; 38 9D
  sbb m                          ; 9E
- sbc hl', bc                    ; 38 08
- sbc hl', de                    ; 38 18
- sbc hl, bc                     ; 08
- sbc hl, de                     ; 18
+ sbc hl', bc                    ; 38 28 08
+ sbc hl', de                    ; 38 28 18
+ sbc hl, bc                     ; 28 08
+ sbc hl, de                     ; 28 18
  sbi 0                          ; DE 00
  sbi 127                        ; DE 7F
  sbi 255                        ; DE FF
  shld 0x1234                    ; 22 34 12
  shlde                          ; D9
  shlx                           ; D9
+ smf0                           ; 28 00
+ smf1                           ; 28 7F
  sphl                           ; F9
  sphl'                          ; 38 F9
  sta 0x1234                     ; 32 34 12
@@ -488,6 +496,7 @@
  xchg                           ; EB
  xorl (hl')                     ; 38 30
  xorl (hl)                      ; 30
+ xorm                           ; 30
  xra a                          ; AF
  xra b                          ; A8
  xra c                          ; A9

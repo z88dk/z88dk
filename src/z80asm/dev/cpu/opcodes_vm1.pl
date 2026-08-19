@@ -121,6 +121,7 @@ for my $cpu1 ('vm1') {
         add_opcodes( $cpu, "lhlx [vm1]" );
 		
         add_opcodes( $cpu, "jof [vm1]" );
+		add_opcodes( $cpu, "smf0/smf1 [vm1]");
     }
 }
 

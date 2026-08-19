@@ -77,8 +77,8 @@ static cpu_lookup_t cpu_lut[] = {
     { "ti83_strict",        CPU_TI83_STRICT,        CPU_Z80,    CPU_TI83,       true,   },  // 34
     { "ti83plus",           CPU_TI83PLUS,           CPU_Z80,    CPU_TI83PLUS,   false,  },  // 35
     { "ti83plus_strict",    CPU_TI83PLUS_STRICT,    CPU_Z80,    CPU_TI83PLUS,   true,   },  // 36
-    { "vm1",                CPU_VM1,                CPU_8080,   CPU_VM1,        false,  },  // 37
-    { "vm1_strict",         CPU_VM1_STRICT,         CPU_8080,   CPU_VM1,        true,   },  // 38
+    { "vm1",                CPU_VM1,                CPU_UNDEF,  CPU_VM1,        false,  },  // 37
+    { "vm1_strict",         CPU_VM1_STRICT,         CPU_UNDEF,  CPU_VM1,        true,   },  // 38
 };
 
 static cpu_lookup_t* cpu_lu_hash = NULL;        // lookup from cpu name

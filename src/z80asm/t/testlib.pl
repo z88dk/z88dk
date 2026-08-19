@@ -611,8 +611,8 @@ sub cpu_compatible {
 	elsif ($code_cpu eq "kc160_z80" && $lib_cpu eq "8080") {
 		return 1;
 	}
-	elsif ($code_cpu eq "vm1" && $lib_cpu eq "8080") {
-		return 1;
+	elsif ($code_cpu eq "vm1") {
+		return 0;
 	}
 	else {
 		return 0;

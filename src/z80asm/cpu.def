@@ -46,7 +46,7 @@ X(33,   ti83,               "ti83",             ti83,       z80,        "__CPU_Z
 X(34,   ti83_strict,        "ti83_strict",      ti83,       z80,        "__CPU_ZILOG__ __CPU_Z80_STRICT__ __CPU_TI83_STRICT__")
 X(35,   ti83plus,           "ti83plus",         ti83plus,   z80,        "__CPU_ZILOG__ __CPU_Z80__ __CPU_TI83PLUS__")
 X(36,   ti83plus_strict,    "ti83plus_strict",  ti83plus,   z80,        "__CPU_ZILOG__ __CPU_Z80_STRICT__ __CPU_TI83PLUS_STRICT__")
-X(37,   vm1,				"vm1",              vm1,        i8080,      "__CPU_INTEL__ __CPU_VM1__")
-X(38,   vm1_strict,			"vm1_strict",       vm1,        i8080,      "__CPU_INTEL__ __CPU_VM1_STRICT__")
+X(37,   vm1,				"vm1",              vm1,        none,       "__CPU_INTEL__ __CPU_VM1__")
+X(38,   vm1_strict,			"vm1_strict",       vm1,        none,       "__CPU_INTEL__ __CPU_VM1_STRICT__")
 
 #undef X

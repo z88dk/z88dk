@@ -19614,6 +19614,8 @@ andl (hl')|vm1|_||38 10
 andl (hl')|vm1_strict|_||38 10
 andl (hl)|vm1|_||10
 andl (hl)|vm1_strict|_||10
+andm|vm1|_||10
+andm|vm1_strict|_||10
 ani %n|8080|_||E6 %n
 ani %n|8080_strict|_||E6 %n
 ani %n|8085|_||E6 %n
@@ -23564,12 +23566,16 @@ cp hl', %d|r5k|_||76;48 %d
 cp hl', %d|r5k_strict|_||76;48 %d
 cp hl', %d|r6k|_||76;48 %d
 cp hl', %d|r6k_strict|_||76;48 %d
+cp hl', bc|vm1|_||38 CB
+cp hl', bc|vm1_strict|_||38 CB
 cp hl', de|r4k|_||76;ED 48
 cp hl', de|r4k_strict|_||76;ED 48
 cp hl', de|r5k|_||76;ED 48
 cp hl', de|r5k_strict|_||76;ED 48
 cp hl', de|r6k|_||76;ED 48
 cp hl', de|r6k_strict|_||76;ED 48
+cp hl', de|vm1|_||38 DD
+cp hl', de|vm1_strict|_||38 DD
 cp hl, %d|r4k|_||48 %d
 cp hl, %d|r4k_strict|_||48 %d
 cp hl, %d|r5k|_||48 %d
@@ -23602,12 +23608,16 @@ cp hl, (pz+%d)|r6k|_||49;7B %d
 cp hl, (pz+%d)|r6k_strict|_||49;7B %d
 cp hl, (sp+%n)|r6k|_||49;FA %n
 cp hl, (sp+%n)|r6k_strict|_||49;FA %n
+cp hl, bc|vm1|_||CB
+cp hl, bc|vm1_strict|_||CB
 cp hl, de|r4k|_||ED 48
 cp hl, de|r4k_strict|_||ED 48
 cp hl, de|r5k|_||ED 48
 cp hl, de|r5k_strict|_||ED 48
 cp hl, de|r6k|_||ED 48
 cp hl, de|r6k_strict|_||ED 48
+cp hl, de|vm1|_||DD
+cp hl, de|vm1_strict|_||DD
 cp ixh|ez80|_||DD BC
 cp ixh|ez80_z80|_||DD BC
 cp ixh|r800|_||DD BC
@@ -23798,14 +23808,14 @@ cp.sil a, (iy)|ez80|_||52;FD BE 00
 cp.sil a, (iy)|ez80_strict|_||52;FD BE 00
 cp.sil a, (iy+%d)|ez80|_||52;FD BE %d
 cp.sil a, (iy+%d)|ez80_strict|_||52;FD BE %d
-cpc hl', bc|vm1|_||38 CB
-cpc hl', bc|vm1_strict|_||38 CB
-cpc hl', de|vm1|_||38 DD
-cpc hl', de|vm1_strict|_||38 DD
-cpc hl, bc|vm1|_||CB
-cpc hl, bc|vm1_strict|_||CB
-cpc hl, de|vm1|_||DD
-cpc hl, de|vm1_strict|_||DD
+cpc hl', bc|vm1|_||38 28 CB
+cpc hl', bc|vm1_strict|_||38 28 CB
+cpc hl', de|vm1|_||38 28 DD
+cpc hl', de|vm1_strict|_||38 28 DD
+cpc hl, bc|vm1|_||28 CB
+cpc hl, bc|vm1_strict|_||28 CB
+cpc hl, de|vm1|_||28 DD
+cpc hl, de|vm1_strict|_||28 DD
 cpd|8080|X||CD @__z80asm__cpd x
 cpd|8085|X||CD @__z80asm__cpd x
 cpd|ez80|_||ED A9
@@ -71355,6 +71365,8 @@ orl (hl')|vm1|_||38 20
 orl (hl')|vm1_strict|_||38 20
 orl (hl)|vm1|_||20
 orl (hl)|vm1_strict|_||20
+orm|vm1|_||20
+orm|vm1_strict|_||20
 orx|vm1|_||20
 orx|vm1_strict|_||20
 otd2r|ez80|_||ED BC
@@ -78855,8 +78867,8 @@ sbc hl', bc|r5k|_||76;ED 42
 sbc hl', bc|r5k_strict|_||76;ED 42
 sbc hl', bc|r6k|_||76;ED 42
 sbc hl', bc|r6k_strict|_||76;ED 42
-sbc hl', bc|vm1|_||38 08
-sbc hl', bc|vm1_strict|_||38 08
+sbc hl', bc|vm1|_||38 28 08
+sbc hl', bc|vm1_strict|_||38 28 08
 sbc hl', bc'|r6k|_||64;ED 42
 sbc hl', bc'|r6k_strict|_||64;ED 42
 sbc hl', de|r2ka|_||76;ED 52
@@ -78869,8 +78881,8 @@ sbc hl', de|r5k|_||76;ED 52
 sbc hl', de|r5k_strict|_||76;ED 52
 sbc hl', de|r6k|_||76;ED 52
 sbc hl', de|r6k_strict|_||76;ED 52
-sbc hl', de|vm1|_||38 18
-sbc hl', de|vm1_strict|_||38 18
+sbc hl', de|vm1|_||38 28 18
+sbc hl', de|vm1_strict|_||38 28 18
 sbc hl', de'|r6k|_||64;ED 52
 sbc hl', de'|r6k_strict|_||64;ED 52
 sbc hl', hl|r2ka|_||76;ED 62
@@ -78944,8 +78956,8 @@ sbc hl, bc|r6k|_||ED 42
 sbc hl, bc|r6k_strict|_||ED 42
 sbc hl, bc|r800|_||ED 42
 sbc hl, bc|r800_strict|_||ED 42
-sbc hl, bc|vm1|_||08
-sbc hl, bc|vm1_strict|_||08
+sbc hl, bc|vm1|_||28 08
+sbc hl, bc|vm1_strict|_||28 08
 sbc hl, bc|z180|_||ED 42
 sbc hl, bc|z180_strict|_||ED 42
 sbc hl, bc|z80|_||ED 42
@@ -78975,8 +78987,8 @@ sbc hl, de|r6k|_||ED 52
 sbc hl, de|r6k_strict|_||ED 52
 sbc hl, de|r800|_||ED 52
 sbc hl, de|r800_strict|_||ED 52
-sbc hl, de|vm1|_||18
-sbc hl, de|vm1_strict|_||18
+sbc hl, de|vm1|_||28 18
+sbc hl, de|vm1_strict|_||28 18
 sbc hl, de|z180|_||ED 52
 sbc hl, de|z180_strict|_||ED 52
 sbc hl, de|z80|_||ED 52
@@ -80974,6 +80986,10 @@ sls h|z80|_||CB 34
 sls h|z80n|_||CB 34
 sls l|z80|_||CB 35
 sls l|z80n|_||CB 35
+smf0|vm1|_||28 00
+smf0|vm1_strict|_||28 00
+smf1|vm1|_||28 7F
+smf1|vm1_strict|_||28 7F
 sphl|8080|_||F9
 sphl|8080_strict|_||F9
 sphl|8085|_||F9
@@ -85187,6 +85203,8 @@ xorl (hl')|vm1|_||38 30
 xorl (hl')|vm1_strict|_||38 30
 xorl (hl)|vm1|_||30
 xorl (hl)|vm1_strict|_||30
+xorm|vm1|_||30
+xorm|vm1_strict|_||30
 xra a|8080|_||AF
 xra a|8080_strict|_||AF
 xra a|8085|_||AF

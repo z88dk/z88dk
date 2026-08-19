@@ -8769,7 +8769,6 @@
  cp hl', -128                   ; Error
  cp hl', 0                      ; Error
  cp hl', 126                    ; Error
- cp hl', de                     ; Error
  cp hl, (ix)                    ; Error
  cp hl, (ix+0)                  ; Error
  cp hl, (ix+126)                ; Error
@@ -8800,7 +8799,6 @@
  cp hl, -128                    ; Error
  cp hl, 0                       ; Error
  cp hl, 126                     ; Error
- cp hl, de                      ; Error
  cp ixh                         ; Error
  cp ixl                         ; Error
  cp iyh                         ; Error

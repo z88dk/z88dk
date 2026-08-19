@@ -17,7 +17,7 @@ for my $cpu (@CPUS) {
 
 		for my $value (-1, 0, 1) {
 			for my $dd (qw( B  C  D  E  H  L  BC  DE  HL  IX IY )) {
-				next if $dd =~ /ix|iy/i && $cpu =~ /^80|gbz80/;
+				next if $dd =~ /ix|iy/i && $cpu =~ /^80|gbz80|^vm1/;
 				
 				my $r = ticks(<<END, "-m$cpu");
 					IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__

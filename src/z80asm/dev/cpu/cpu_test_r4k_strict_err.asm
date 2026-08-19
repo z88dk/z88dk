@@ -4594,6 +4594,7 @@
  and.sil a, (iy-128)            ; Error
  andl (hl')                     ; Error
  andl (hl)                      ; Error
+ andm                           ; Error
  ani 0                          ; Error
  ani 127                        ; Error
  ani 255                        ; Error
@@ -6143,6 +6144,7 @@
  cp a, iyl                      ; Error
  cp a, l                        ; Error
  cp a, l'                       ; Error
+ cp hl', bc                     ; Error
  cp hl, (ix)                    ; Error
  cp hl, (ix+0)                  ; Error
  cp hl, (ix+126)                ; Error
@@ -6170,6 +6172,7 @@
  cp hl, (sp+0)                  ; Error
  cp hl, (sp+127)                ; Error
  cp hl, (sp+255)                ; Error
+ cp hl, bc                      ; Error
  cp ixh                         ; Error
  cp ixl                         ; Error
  cp iyh                         ; Error
@@ -17216,6 +17219,7 @@
  ori 255                        ; Error
  orl (hl')                      ; Error
  orl (hl)                       ; Error
+ orm                            ; Error
  orx                            ; Error
  otd2r                          ; Error
  otd2r.l                        ; Error
@@ -22126,6 +22130,8 @@
  sls e                          ; Error
  sls h                          ; Error
  sls l                          ; Error
+ smf0                           ; Error
+ smf1                           ; Error
  sphl                           ; Error
  sphl'                          ; Error
  sr1reg                         ; Error
@@ -23183,6 +23189,7 @@
  xor.sil a, (iy-128)            ; Error
  xorl (hl')                     ; Error
  xorl (hl)                      ; Error
+ xorm                           ; Error
  xra a                          ; Error
  xra b                          ; Error
  xra c                          ; Error

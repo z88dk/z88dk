@@ -24696,6 +24696,8 @@
 |andl (hl')                 |vm1_strict      |-    |38 10                                                         |
 |andl (hl)                  |vm1             |-    |10                                                            |
 |andl (hl)                  |vm1_strict      |-    |10                                                            |
+|andm                       |vm1             |-    |10                                                            |
+|andm                       |vm1_strict      |-    |10                                                            |
 |ani %n                     |8080            |-    |E6 %n                                                         |
 |ani %n                     |8080_strict     |-    |E6 %n                                                         |
 |ani %n                     |8085            |-    |E6 %n                                                         |
@@ -32062,12 +32064,16 @@
 |cp hl', %d                 |r5k_strict      |-    |76 48 %d                                                      |
 |cp hl', %d                 |r6k             |-    |76 48 %d                                                      |
 |cp hl', %d                 |r6k_strict      |-    |76 48 %d                                                      |
+|cp hl', bc                 |vm1             |-    |38 CB                                                         |
+|cp hl', bc                 |vm1_strict      |-    |38 CB                                                         |
 |cp hl', de                 |r4k             |-    |76 ED 48                                                      |
 |cp hl', de                 |r4k_strict      |-    |76 ED 48                                                      |
 |cp hl', de                 |r5k             |-    |76 ED 48                                                      |
 |cp hl', de                 |r5k_strict      |-    |76 ED 48                                                      |
 |cp hl', de                 |r6k             |-    |76 ED 48                                                      |
 |cp hl', de                 |r6k_strict      |-    |76 ED 48                                                      |
+|cp hl', de                 |vm1             |-    |38 DD                                                         |
+|cp hl', de                 |vm1_strict      |-    |38 DD                                                         |
 |cp hl, %d                  |r4k             |-    |48 %d                                                         |
 |cp hl, %d                  |r4k_strict      |-    |48 %d                                                         |
 |cp hl, %d                  |r5k             |-    |48 %d                                                         |
@@ -32100,12 +32106,16 @@
 |cp hl, (pz+%d)             |r6k_strict      |-    |49 7B %d                                                      |
 |cp hl, (sp+%n)             |r6k             |-    |49 FA %n                                                      |
 |cp hl, (sp+%n)             |r6k_strict      |-    |49 FA %n                                                      |
+|cp hl, bc                  |vm1             |-    |CB                                                            |
+|cp hl, bc                  |vm1_strict      |-    |CB                                                            |
 |cp hl, de                  |r4k             |-    |ED 48                                                         |
 |cp hl, de                  |r4k_strict      |-    |ED 48                                                         |
 |cp hl, de                  |r5k             |-    |ED 48                                                         |
 |cp hl, de                  |r5k_strict      |-    |ED 48                                                         |
 |cp hl, de                  |r6k             |-    |ED 48                                                         |
 |cp hl, de                  |r6k_strict      |-    |ED 48                                                         |
+|cp hl, de                  |vm1             |-    |DD                                                            |
+|cp hl, de                  |vm1_strict      |-    |DD                                                            |
 |cp ixh                     |ez80            |-    |DD BC                                                         |
 |cp ixh                     |ez80_z80        |-    |DD BC                                                         |
 |cp ixh                     |r800            |-    |DD BC                                                         |
@@ -32296,14 +32306,14 @@
 |cp.sil a, (iy)             |ez80_strict     |-    |52 FD BE 00                                                   |
 |cp.sil a, (iy+%d)          |ez80            |-    |52 FD BE %d                                                   |
 |cp.sil a, (iy+%d)          |ez80_strict     |-    |52 FD BE %d                                                   |
-|cpc hl', bc                |vm1             |-    |38 CB                                                         |
-|cpc hl', bc                |vm1_strict      |-    |38 CB                                                         |
-|cpc hl', de                |vm1             |-    |38 DD                                                         |
-|cpc hl', de                |vm1_strict      |-    |38 DD                                                         |
-|cpc hl, bc                 |vm1             |-    |CB                                                            |
-|cpc hl, bc                 |vm1_strict      |-    |CB                                                            |
-|cpc hl, de                 |vm1             |-    |DD                                                            |
-|cpc hl, de                 |vm1_strict      |-    |DD                                                            |
+|cpc hl', bc                |vm1             |-    |38 28 CB                                                      |
+|cpc hl', bc                |vm1_strict      |-    |38 28 CB                                                      |
+|cpc hl', de                |vm1             |-    |38 28 DD                                                      |
+|cpc hl', de                |vm1_strict      |-    |38 28 DD                                                      |
+|cpc hl, bc                 |vm1             |-    |28 CB                                                         |
+|cpc hl, bc                 |vm1_strict      |-    |28 CB                                                         |
+|cpc hl, de                 |vm1             |-    |28 DD                                                         |
+|cpc hl, de                 |vm1_strict      |-    |28 DD                                                         |
 |cpd                        |8080            |X    |CD @__z80asm__cpd x                                           |
 |cpd                        |8085            |X    |CD @__z80asm__cpd x                                           |
 |cpd                        |ez80            |-    |ED A9                                                         |
@@ -85375,6 +85385,8 @@
 |orl (hl')                  |vm1_strict      |-    |38 20                                                         |
 |orl (hl)                   |vm1             |-    |20                                                            |
 |orl (hl)                   |vm1_strict      |-    |20                                                            |
+|orm                        |vm1             |-    |20                                                            |
+|orm                        |vm1_strict      |-    |20                                                            |
 |orx                        |vm1             |-    |20                                                            |
 |orx                        |vm1_strict      |-    |20                                                            |
 |otd2r                      |ez80            |-    |ED BC                                                         |
@@ -97633,8 +97645,8 @@
 |sbc hl', bc                |r5k_strict      |-    |76 ED 42                                                      |
 |sbc hl', bc                |r6k             |-    |76 ED 42                                                      |
 |sbc hl', bc                |r6k_strict      |-    |76 ED 42                                                      |
-|sbc hl', bc                |vm1             |-    |38 08                                                         |
-|sbc hl', bc                |vm1_strict      |-    |38 08                                                         |
+|sbc hl', bc                |vm1             |-    |38 28 08                                                      |
+|sbc hl', bc                |vm1_strict      |-    |38 28 08                                                      |
 |sbc hl', bc'               |r6k             |-    |64 ED 42                                                      |
 |sbc hl', bc'               |r6k_strict      |-    |64 ED 42                                                      |
 |sbc hl', de                |r2ka            |-    |76 ED 52                                                      |
@@ -97647,8 +97659,8 @@
 |sbc hl', de                |r5k_strict      |-    |76 ED 52                                                      |
 |sbc hl', de                |r6k             |-    |76 ED 52                                                      |
 |sbc hl', de                |r6k_strict      |-    |76 ED 52                                                      |
-|sbc hl', de                |vm1             |-    |38 18                                                         |
-|sbc hl', de                |vm1_strict      |-    |38 18                                                         |
+|sbc hl', de                |vm1             |-    |38 28 18                                                      |
+|sbc hl', de                |vm1_strict      |-    |38 28 18                                                      |
 |sbc hl', de'               |r6k             |-    |64 ED 52                                                      |
 |sbc hl', de'               |r6k_strict      |-    |64 ED 52                                                      |
 |sbc hl', hl                |r2ka            |-    |76 ED 62                                                      |
@@ -97722,8 +97734,8 @@
 |sbc hl, bc                 |r6k_strict      |-    |ED 42                                                         |
 |sbc hl, bc                 |r800            |-    |ED 42                                                         |
 |sbc hl, bc                 |r800_strict     |-    |ED 42                                                         |
-|sbc hl, bc                 |vm1             |-    |08                                                            |
-|sbc hl, bc                 |vm1_strict      |-    |08                                                            |
+|sbc hl, bc                 |vm1             |-    |28 08                                                         |
+|sbc hl, bc                 |vm1_strict      |-    |28 08                                                         |
 |sbc hl, bc                 |z180            |-    |ED 42                                                         |
 |sbc hl, bc                 |z180_strict     |-    |ED 42                                                         |
 |sbc hl, bc                 |z80             |-    |ED 42                                                         |
@@ -97753,8 +97765,8 @@
 |sbc hl, de                 |r6k_strict      |-    |ED 52                                                         |
 |sbc hl, de                 |r800            |-    |ED 52                                                         |
 |sbc hl, de                 |r800_strict     |-    |ED 52                                                         |
-|sbc hl, de                 |vm1             |-    |18                                                            |
-|sbc hl, de                 |vm1_strict      |-    |18                                                            |
+|sbc hl, de                 |vm1             |-    |28 18                                                         |
+|sbc hl, de                 |vm1_strict      |-    |28 18                                                         |
 |sbc hl, de                 |z180            |-    |ED 52                                                         |
 |sbc hl, de                 |z180_strict     |-    |ED 52                                                         |
 |sbc hl, de                 |z80             |-    |ED 52                                                         |
@@ -103852,6 +103864,10 @@
 |sls h                      |z80n            |-    |CB 34                                                         |
 |sls l                      |z80             |-    |CB 35                                                         |
 |sls l                      |z80n            |-    |CB 35                                                         |
+|smf0                       |vm1             |-    |28 00                                                         |
+|smf0                       |vm1_strict      |-    |28 00                                                         |
+|smf1                       |vm1             |-    |28 7F                                                         |
+|smf1                       |vm1_strict      |-    |28 7F                                                         |
 |sphl                       |8080            |-    |F9                                                            |
 |sphl                       |8080_strict     |-    |F9                                                            |
 |sphl                       |8085            |-    |F9                                                            |
@@ -108161,6 +108177,8 @@
 |xorl (hl')                 |vm1_strict      |-    |38 30                                                         |
 |xorl (hl)                  |vm1             |-    |30                                                            |
 |xorl (hl)                  |vm1_strict      |-    |30                                                            |
+|xorm                       |vm1             |-    |30                                                            |
+|xorm                       |vm1_strict      |-    |30                                                            |
 |xra a                      |8080            |-    |AF                                                            |
 |xra a                      |8080_strict     |-    |AF                                                            |
 |xra a                      |8085            |-    |AF                                                            |

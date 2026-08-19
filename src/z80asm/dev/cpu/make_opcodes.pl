@@ -5182,32 +5182,32 @@ sub add_opcodes {
         },
         "sbc hl, <rp> [vm1]" => sub {
             my ($cpu) = @_;
-			add_opcode_vm1( $cpu, 'sbc hl, bc', [0x08] );
-			add_opcode_vm1( $cpu, 'sbc hl, de', [0x18] );
+			add_opcode_vm1( $cpu, 'sbc hl, bc', [0x28, 0x08] );
+			add_opcode_vm1( $cpu, 'sbc hl, de', [0x28, 0x18] );
         },
         "dcmp [vm1]" => sub {
             my ($cpu) = @_;
-            for my $asm ( 'dcmp b', 'dcmp bc', 'cpc hl, bc' ) {
+            for my $asm ( 'dcmp b', 'dcmp bc', 'cp hl, bc' ) {
                 add_opcode_vm1( $cpu, $asm, [0xCB] );
             }
-            for my $asm ( 'dcmp d', 'dcmp de', 'cpc hl, de' ) {
+            for my $asm ( 'dcmp d', 'dcmp de', 'cp hl, de' ) {
                 add_opcode_vm1( $cpu, $asm, [0xDD] );
             }
         },
         "cpc hl, <rp> [vm1]" => sub {
             my ($cpu) = @_;
-			add_opcode_vm1( $cpu, 'cpc hl, bc', [0xCB] );
-			add_opcode_vm1( $cpu, 'cpc hl, de', [0xDD] );
+			add_opcode_vm1( $cpu, 'cpc hl, bc', [0x28, 0xCB] );
+			add_opcode_vm1( $cpu, 'cpc hl, de', [0x28, 0xDD] );
         },
         "ld (hl), <alu> (hl) [vm1]" => sub {
             my ($cpu) = @_;
-			for my $asm ('anx', 'ld (hl), and (hl)', 'andl (hl)') {
+			for my $asm ('anx', 'andm', 'ld (hl), and (hl)', 'andl (hl)') {
 				add_opcode_vm1( $cpu, $asm, [0x10] );
 			}
-			for my $asm ('orx', 'ld (hl), or (hl)', 'orl (hl)') {
+			for my $asm ('orx', 'orm', 'ld (hl), or (hl)', 'orl (hl)') {
 				add_opcode_vm1( $cpu, $asm, [0x20] );
 			}
-			for my $asm ('xrx', 'ld (hl), xor (hl)', 'xorl (hl)') {
+			for my $asm ('xrx', 'xorm', 'ld (hl), xor (hl)', 'xorl (hl)') {
 				add_opcode_vm1( $cpu, $asm, [0x30] );
 			}
         },
@@ -5228,6 +5228,11 @@ sub add_opcodes {
             for my $asm ( 'jof %m', 'j_of %m', 'jp of, %m', 'jmp of, %m' ) {
                 add_opcode( $cpu, $asm, [ 0xFD, '%m', '%m' ] );
             }
+        },
+        "smf0/smf1 [vm1]" => sub {
+            my ($cpu) = @_;
+            add_opcode( $cpu, "smf0", [ 0x28, 0x00 ] );
+            add_opcode( $cpu, "smf1", [ 0x28, 0x7F ] );
         },
     };
 
