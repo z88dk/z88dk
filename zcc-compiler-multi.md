@@ -18,15 +18,17 @@ A C translation unit can have more than one compiler body for the same function.
 
 `-compiler=multi` compiles the same `.c` file with sccz80 and with 80cc.
 
-On Z80-family CPUs that have IX (z80, z80n, z180, ez80, Rabbit, kc160, and the ixiy/strict maps) there are three variants:
+The number of variants follows 80cc CPU capability, not a private CPU list.
+
+sccz80 does not offer a frame-pointer mode in this design.
+
+Run `80cc-fp` only when 80cc treats the CPU as having IX.
 
 1. `sccz80` — sccz80 default. Locals use the stack. Multi does not pass `-frameix`.
-2. `80cc-sp` — 80cc with `-fomit-frame-pointer`.
-3. `80cc-fp` — 80cc with `-fframe-pointer` (IX frame).
+2. `80cc-sp` — 80cc with `-fomit-frame-pointer`. Always.
+3. `80cc-fp` — 80cc with `-fframe-pointer` (IX frame). Only when 80cc says IX exists.
 
-On 8080, 8085, and gbz80 there are two variants only: `sccz80` and `80cc-sp`.
-
-Those CPUs have no IX. 80cc already forces stack locals there.
+If 80cc says the CPU has no IX, the run is two variants: `sccz80` and `80cc-sp`.
 
 Each variant runs through `z88dk-copt` with the matching rule set.
 
@@ -73,11 +75,14 @@ The mix is not whole-program LTO.
 ### Goals
 
 1. Add `-compiler=multi`.
-2. Compile each `.c` file with three variants on Z80-family CPUs and two variants on 8080, 8085, and gbz80.
-3. Run copt on each variant with the matching rules.
-4. Select one body per function by size or by the v1 ticks metric.
-5. Stitch one assembly file that z80asm already accepts.
-6. Keep the existing assemble and link path after that file.
+2. Compile each `.c` file with the variant count that 80cc allows on that CPU.
+3. Pass the same CPU `-m` flags that zcc already uses for sccz80, 80cc, copt, and z80asm.
+4. Run copt on each variant with the matching rules.
+5. Select one body per function by size or by the v1 ticks metric.
+6. Stitch one assembly file that z80asm already accepts.
+7. Keep the existing assemble and link path after that file.
+8. With `-v`, print per-function winners and a selection summary.
+9. Keep the selector host-neutral so a later 80cc switch can reuse it. Do not change 80cc in v1.
 
 ### Non-goals
 
@@ -89,23 +94,31 @@ The mix is not whole-program LTO.
 6. Multi does not do whole-program selection across translation units.
 7. Multi does not add a per-function pragma in v1.
 8. Multi does not run a full program in `z88dk-ticks` to score a function in v1.
+9. Multi does not change `src/80cc` in v1. The later in-compiler switch is a design constraint only.
 
 ## Key decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Switch | `-compiler=multi` | User requirement. Matches `-compiler=sccz80`. |
-| Metric flags | `-compiler-multi-metric=size` (default) and `-compiler-multi-metric=ticks` | Same long-name style as `custom-copt-rules` in `src/zcc/zcc.c`. |
+| Metric flags | `-compiler-metric=size` (default) and `-compiler-metric=ticks` | Multi is already selected by `-compiler=multi`. |
 | Tool shape | New binary `z88dk-zcc-multi` | Parser and selector are not trivial. zcc already shells to copt and z80asm via `process()`. |
 | Data source | sccz80 variant | Named objects must appear once. sccz80 is the default compiler. |
 | Preprocess | Once per variant | Benches use `#ifdef __80CC`. One preprocess would drop that path. |
 | zcc_opt.def | sccz80 zpragma output only | A second zpragma pass would duplicate pragmas. |
 | Failure | Any variant compile or copt error fails the file | Silent fallback hides a broken compiler. |
 | Ticks v1 | Static T-state sum from a z80asm listing | Deterministic. Cheap. Needs no workload. True dynamic ticks is a later PR. |
+| Helper size | Each distinct helper once per function | A `call l_gint` is 3 bytes. The helper body is extra library code. Count it once, not per site. |
+| Helper ticks | Helper body once per call site | Same rule as other opcodes: each listing `call` once. Add the helper static sum. Do not multiply by loop trips. |
+| Metric goal | Be right about 90% of the time on TIMER-ish picks | Not a profiler. Charge helpers so a small helper-heavy body does not beat an inlined one. |
 | Tie-break | Equal ticks then size. Equal size then variant priority | Stable output. |
 | Variant priority | sccz80, then 80cc-sp, then 80cc-fp | sccz80 is the default compiler. 80cc-sp is the 80cc default. |
 | sccz80 frame | Stack default only. Do not pass `-frameix` | sccz80 frame-pointer codegen is marked broken in `src/sccz80/codegen.c`. The three-way mix is sccz80 + 80cc-sp + 80cc-fp. |
-| IX mix | Drop 80cc-fp for mbf32. Demote 80cc-fp if it would call a sccz80 body in the same file | 80cc treats IX as callee-saved. sccz80 default does not emit IX. mbf32 loads IX. |
+| Who gets 80cc-fp | Only if 80cc says the CPU has IX | Copy 80cc index-register tests. sccz80 has no frame-pointer path. Do not keep a private CPU list. |
+| CPU flags | Reuse `cpu_map[]` / `select_cpu()` | Do not invent a second CPU table. sccz80 and 80cc take `CPU_MAP_TOOL_SCCZ80`. |
+| `-v` stats | Per-function winners plus a file summary | A user must see counts, shares, and size or ticks saved against sccz80. |
+| Later 80cc host | Selector talks to named variant bodies, not to zcc | A later 80cc switch can emit `80cc-sp` and `80cc-fp` inside one compile. Do not change 80cc now. |
+| IX mix | 80cc-fp must not call a sccz80 body. Elevate the callee to 80cc-fp when that body exists | 80cc-fp keeps a live IX frame. sccz80 does not preserve IX. Prefer keeping 80cc-fp, not dropping it. |
 | sdcc | Out of scope | sdcc uses a different calling convention. |
 | Naked and interrupt | Selectable | They are ordinary labelled bodies after copt. |
 | File-scope asm | Not selectable. Take from the data variant | It is not a C function. |
@@ -117,11 +130,19 @@ The mix is not whole-program LTO.
 | Switch | Type | Default | Meaning |
 |--------|------|---------|---------|
 | `-compiler=multi` | existing `compiler` string | n/a | Enable multi mode. |
-| `-compiler-multi-metric=size` | new string | `size` | Select the smaller assembled body. |
-| `-compiler-multi-metric=ticks` | new string | | Select the lower static T-state sum. |
+| `-compiler-metric=size` | new string | `size` | Select the smaller assembled body. |
+| `-compiler-metric=ticks` | new string | | Select the lower static T-state sum. |
 | `-compiler-multi-report=path` | new string | unset | Write a TSV report. |
 
 Unknown metric values MUST be an error.
+
+`-compiler-metric` is only used with `-compiler=multi`.
+
+`option_parse()` matches a long name as a prefix.
+
+`-compiler-metric` and `-compiler-multi-report` MUST stand before `-compiler` in the option table.
+
+If they stand after it, `-compiler-metric=size` is parsed as `-compiler=-metric=size`.
 
 ### Precedence
 
@@ -184,15 +205,19 @@ C++ is not supported. `configure_compiler()` already rejects C++ except for ez80
 | `-O` | Peephole level for each variant. Same `peepholeopt` for all. |
 | `-Ca` | Assembler flags. Applied once to the stitch file. |
 | `-Cl` | Linker flags. Unchanged. |
-| `-v` | Print every tool command. Also print the selected variant per function. |
-| `-vn` | Quiet. No winner lines. |
-| `--math-mbf32` | Drop the 80cc-fp variant. See [Variant matrix](#variant-matrix). |
+| `-v` | Print every tool command. Print per-function winners and the selection summary. |
+| `-vn` | Quiet. No winner lines. No summary. |
+| `--math-mbf32` | Allowed with 80cc-fp. See [Float libraries and IX](#float-libraries-and-ix). |
 
 ### Verbose lines
 
 With `-v`, zcc MUST print one line per selectable function.
 
-Example:
+Then zcc MUST print a selection summary for the file.
+
+The tool `z88dk-zcc-multi --verbose` MUST emit the same text on stderr.
+
+Example per function:
 
 ```text
 zcc-multi: _foo selected=80cc-fp size=38 ticks=120 sccz80=42/130 80cc-sp=40/125 80cc-fp=38/120
@@ -201,6 +226,8 @@ zcc-multi: _foo selected=80cc-fp size=38 ticks=120 sccz80=42/130 80cc-sp=40/125 
 The line MUST name the C symbol with the `_` prefix.
 
 Missing variant columns MUST show `-`.
+
+After the function lines, print the summary. See [Selection summary](#selection-summary).
 
 ### Report file
 
@@ -211,12 +238,54 @@ The first line is a header.
 ```text
 function	selected	reason	size_sccz80	size_80cc-sp	size_80cc-fp	ticks_sccz80	ticks_80cc-sp	ticks_80cc-fp
 _foo	80cc-fp	metric	42	40	38	130	125	120
-_bar	sccz80	ix-callee	20	18	16	80	70	60
+_bar	80cc-fp	ix-elevate	20	18	16	80	70	60
 ```
 
-`reason` is `metric`, `only`, `ix-callee`, or `fallback`.
+`reason` is `metric`, `only`, `ix-elevate`, `ix-callee`, or `fallback`.
 
 The file MUST be parseable by `awk` and by a spreadsheet.
+
+### Selection summary
+
+With `-v`, after the per-function lines, print a summary block.
+
+The block MUST start with `zcc-multi-summary:`.
+
+Required fields, one key=value pair per line after the header, or one line with spaces. Use this exact shape:
+
+```text
+zcc-multi-summary: file=foo.c cpu=z80 metric=size functions=12
+zcc-multi-summary: selected sccz80=7 80cc-sp=4 80cc-fp=1
+zcc-multi-summary: share sccz80=58.3% 80cc-sp=33.3% 80cc-fp=8.3%
+zcc-multi-summary: bytes selected=410 sccz80=480 80cc-sp=455 80cc-fp=512 saved_vs_sccz80=70
+zcc-multi-summary: ticks selected=2100 sccz80=2400 80cc-sp=2300 80cc-fp=2600 saved_vs_sccz80=300
+zcc-multi-summary: mixed=5 only=1 ix-elevate=1 ix-callee=0 fallback=0
+```
+
+Meanings:
+
+| Field | Meaning |
+|-------|---------|
+| `functions` | Count of selectable C functions in the file |
+| `selected <variant>=N` | How many functions that variant won |
+| `share` | Same counts as percent of `functions`, one decimal |
+| `bytes selected` | Sum of assembled sizes of the winning bodies |
+| `bytes <variant>` | Sum of that variant's sizes for functions it emitted |
+| `saved_vs_sccz80` | `bytes sccz80` minus `bytes selected`. May be negative |
+| `ticks ...` | Same sums for the v1 ticks metric. Print even when the metric is size |
+| `mixed` | Functions where at least two variants had a body and the winner was not sccz80 |
+| `only` | Functions present in one variant only |
+| `ix-elevate` | Callee switched to 80cc-fp so an 80cc-fp caller stays valid |
+| `ix-callee` | Caller left 80cc-fp because the callee had no 80cc-fp body |
+| `fallback` | Functions that fell back from ticks to size |
+
+A missing variant (two-variant CPU) MUST omit that variant from `selected` and `share`.
+
+Do not count file-scope data as a function.
+
+The TSV report SHOULD grow a second table after a blank line, headed `summary`, with the same keys.
+
+A later 80cc host MUST print this same summary. Keep the prefix `zcc-multi-summary:` even inside 80cc so scripts stay stable.
 
 ## Variant matrix
 
@@ -224,54 +293,85 @@ Use the existing `CPU_TYPE_*` tokens from `src/zcc/zcc.c`.
 
 Do not invent a new CPU list.
 
-80cc forces `c_framepointer_is_ix = -1` for `CPU_8080`, `CPU_8085`, and `CPU_GBZ80` in `src/80cc/main.c`.
+Do not keep a table of which CPUs get two variants and which get three.
 
-Those CPUs have no IX. Multi MUST compile only the two stack variants there.
+Derive that from 80cc.
 
-On every other `CPU_TYPE_*` in this tree, 80cc accepts `-fframe-pointer`.
+### When IX exists
+
+`80cc-fp` is allowed only when 80cc treats the CPU as having IX.
+
+sccz80 does not do frame-pointer compilation. Do not consult sccz80 for this decision.
+
+Read the tests from 80cc. Do not copy a CPU name list into this document.
+
+80cc today:
+
+- `src/80cc/main.c` sets `c_framepointer_is_ix = -1` on CPUs with no index registers.
+- `IS_808x()` and `IS_GBZ80()` in `src/80cc/ir_lower.c` refuse IX save.
+
+If 80cc later treats another CPU as having no IX, multi MUST follow.
+
+A default of `-fomit-frame-pointer` on a CPU that still has IX is not a ban.
+
+On such a CPU multi MUST still run `80cc-fp`. The metric may then drop a larger body.
 
 sccz80 stays on its default stack frame on every CPU.
 
 Multi MUST NOT pass `-frameix` or `-frameiy` to sccz80.
 
-| `c_cpu` | Variants |
-|---------|----------|
-| `CPU_TYPE_8080` | sccz80, 80cc-sp |
-| `CPU_TYPE_8085` | sccz80, 80cc-sp |
-| `CPU_TYPE_GBZ80` | sccz80, 80cc-sp |
-| `CPU_TYPE_Z80` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_Z80N` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_Z180` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_EZ80` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_R2KA` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_R3K` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_R4K` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_R6K` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_KC160` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_IXIY` | sccz80, 80cc-sp, 80cc-fp |
-| `CPU_TYPE_STRICT` | sccz80, 80cc-sp, 80cc-fp |
+| IX on this CPU | Variants |
+|----------------|----------|
+| No | `sccz80`, `80cc-sp` |
+| Yes | `sccz80`, `80cc-sp`, `80cc-fp` |
 
 Variant names in reports and comments MUST be `sccz80`, `80cc-sp`, and `80cc-fp`.
+
+### CPU flags
+
+Each variant MUST receive the flags that a single-compiler zcc run already passes for that CPU.
+
+Take them from `cpu_map[]` in `src/zcc/zcc.c` via `select_cpu()`.
+
+| Tool | Map slot | Role |
+|------|----------|------|
+| sccz80 | `CPU_MAP_TOOL_SCCZ80` | Compiler `-m` |
+| 80cc | `CPU_MAP_TOOL_SCCZ80` | Same slot. 80cc is the sccz80-family compiler |
+| copt | `CPU_MAP_TOOL_COPT` | Peephole `-m` |
+| z80asm (size, ticks, final assemble) | `CPU_MAP_TOOL_Z80ASM` | Assembler `-m` |
+
+Do not hard-code `-mz80` for every CPU.
+
+Do not duplicate `cpu_map[]` in this document.
+
+`z88dk-zcc-multi --cpu=` MUST use the z80asm token from `select_cpu(CPU_MAP_TOOL_Z80ASM)` without a leading `-m`.
+
+If that slot contains extra assembler flags (for example `-IXIY`), pass them on the z80asm line. Do not drop them.
+
+copt CPU rules still come from `CPU_MAP_TOOL_CPURULES` as today.
+
+If `cpu_map[]` changes, the implementation MUST follow it.
 
 ### Forced drop of 80cc-fp
 
 Drop 80cc-fp when any of these hold.
 
-1. The CPU is 8080, 8085, or gbz80.
-2. The float mode is mbf32.
-3. The user reserved IX.
+1. 80cc says this CPU has no IX.
+2. The user reserved IX (`--reserve-regs-ix` on the zcc line or in `-Cc`).
 
-mbf32 detection MUST treat these as mbf32.
-
-- Alias `--math-mbf32` from `lib/config/alias.inc`
-- `-Cc-fp-mode=mbf32`
-- Preprocessor `__MATH_MBF32`
-
-`--reserve-regs-ix` on the zcc line or in `-Cc` also drops 80cc-fp.
+Do not drop 80cc-fp because of the float library.
 
 When 80cc-fp is dropped, the run is a two-variant run.
 
 The report MUST leave the 80cc-fp columns empty.
+
+### Float libraries and IX
+
+math32 does not use IX. Multi MAY use 80cc-fp with `--math32`.
+
+math48 uses IX. Both sccz80 and 80cc already compile against that library. Multi MUST still run 80cc-fp when the CPU has IX.
+
+An 80cc-fp C function that calls a **sccz80-selected C function** in the same file is a different problem. See [IX mix](#5-callee-saved-registers-especially-ix-and-iy).
 
 ### 80cc not present
 
@@ -348,6 +448,8 @@ CRT m4 MUST read the sccz80 `zcc_opt.def` only.
 
 Each variant compiles `.i` to `.opt` with `-ext=opt` and `-zcc-opt=` as today.
 
+The compiler CPU flag MUST be `select_cpu(CPU_MAP_TOOL_SCCZ80)`.
+
 sccz80 command extra flags come from `sccz80arg` except frame-pointer flags.
 
 80cc-sp MUST pass `-fomit-frame-pointer`.
@@ -417,7 +519,7 @@ If ucpp, zpragma, the compiler, or copt fails for any required variant, zcc MUST
 
 zcc MUST NOT drop that variant and continue.
 
-A missing optional 80cc-fp (mbf32 or no IX) is not a failure.
+A missing optional 80cc-fp (80cc force-off on this CPU, or reserved IX) is not a failure.
 
 If a function label is absent from every variant, the tool MUST fail.
 
@@ -531,7 +633,7 @@ z88dk-z80asm -mz80 -l -I"<z88dk>/lib" -o <tmp.o> <variant.asm>
 
 The tool MUST parse the `.lis` file.
 
-The size of a function is the sum of opcode bytes from the function label to the end of the function unit.
+The size of a function is the sum of opcode bytes from the function label to the end of the function unit, plus helper size as defined below.
 
 `INCLUDE "z80_crt0.hdr"` contributes no function bytes.
 
@@ -539,9 +641,57 @@ The size of a function is the sum of opcode bytes from the function label to the
 
 `defb` / `defw` / `defm` that belong to the function unit MUST be included.
 
-A `call l_mult` counts the `call` encoding only.
+A `call` encoding is part of the function body size.
+
+Then add each distinct helper that this function calls, once.
+
+Do not add the helper again for a second `call` to the same name.
 
 Relocatable operands count at their assembled width.
+
+### Helpers
+
+A helper is a runtime routine, not a selectable C function in this file.
+
+Treat these names as helpers:
+
+- `l_*` from `libsrc/l/sccz80/`
+- `d*` classic float helpers (`dadd`, `dload`, `dmul`, …)
+- `l_f16_*`, `l_f32_*`, `l_f48_*`, and the same prefixes for other math modes
+
+Do not treat `_foo` in this translation unit as a helper. That body is selected on its own.
+
+`rst` to a library stub is a helper if the stub has a known name.
+
+A call to an unknown name that is not a function in this file MUST be treated as a helper if it matches the prefixes above. Otherwise charge the `call` only.
+
+Measure a helper the same way as a function: assemble it, read the listing.
+
+Cache helper size and helper ticks for the process.
+
+If a helper calls another helper, include that callee once in the helper size.
+
+If the helper graph has a cycle, count each name once.
+
+Helper objects come from the classic libraries that this link would use.
+
+Walk `libsrc/l/sccz80` and `libsrc/math/float` only.
+
+Do not walk `libsrc/l/util` or other newlib trees.
+
+Those files INCLUDE `config_private.inc` from m4.
+
+Classic multi does not have that include.
+
+If a helper cannot be measured, charge the `call` only and keep `reason` as `metric`.
+
+This is not a link-time model.
+
+If two C functions both call `l_gint`, each function size includes `l_gint` once.
+
+That can over-count shared helpers for the final binary.
+
+That is accepted. The goal is to be right about 90% of the time, not to match the map.
 
 JR versus JP differences appear in the listing.
 
@@ -557,9 +707,15 @@ v1 MUST NOT run the function in `z88dk-ticks`.
 
 A function is not a program.
 
-Arguments, globals, and helpers are not available.
+Arguments and globals are not available.
 
 TIMER labels are not present in arbitrary code.
+
+Named helpers are available. Charge them as specified below.
+
+This is not a profiler.
+
+Do not unroll loops. Do not estimate trip counts.
 
 ### v1 definition
 
@@ -589,11 +745,16 @@ v1 does not run that binary.
 | Forward `jr cc` / `jp cc` | Not-taken cost |
 | Backward `jr cc` / `jp cc` / `djnz` | Taken cost, once |
 | Unconditional `jr` / `jp` | Always-taken cost |
-| `call` / `rst` to a helper or a C function | Cost of the call instruction only |
+| `call` / `rst` to a C function in this file | Cost of the call instruction only |
+| `call` / `rst` / `jp` to a helper | Cost of the call or jump, plus the helper static ticks, once per site |
 | `ret` / `ret cc` | Unconditional `ret` cost, or not-taken for a forward-style `ret cc` |
 | `halt` / illegal | Fail the ticks score for that function |
 
 Each instruction in the listing is counted once.
+
+A second `call l_gint4sp` in the same function adds the helper ticks again.
+
+Size does not. Size already added `l_gint4sp` once.
 
 Loops are not unrolled.
 
@@ -601,11 +762,17 @@ The score is not a workload measurement.
 
 It is a deterministic compile-time proxy.
 
+The aim is to be right about 90% of the time when one variant inlines work that the other hides in `l_*` calls.
+
 ### What the score is not
 
-The score undercounts a hot loop.
+The score still undercounts a hot loop.
 
-The score overcounts a rare error path.
+The score still overcounts a rare error path.
+
+Helper charge fixes the case where a small helper-heavy body beats a larger inlined body.
+
+It does not match TIMER.
 
 A user who needs true TIMER numbers MUST still run `z88dk-ticks` on the linked program.
 
@@ -647,6 +814,14 @@ The stitch file MUST be valid input for `z88dk-z80asm`.
 6. File-scope data, bss, and named rodata from the data variant.
 7. Literal pools from every variant that contributed a function.
 8. `GLOBAL` and `EXTERN` union.
+
+Do not copy the optimiser banner from a variant that contributed no function.
+
+copt can emit `defc i_N = i_M` after that banner.
+
+copt can chain more than one `defc`.
+
+Copy that `defc` only when the chain ends at a label in a selected body of that variant.
 
 ### Winner comment
 
@@ -759,9 +934,11 @@ z88dk-zcc-multi
 
 `--variant` MAY repeat.
 
-`--cpu` uses the z80asm token: `z80`, `z80n`, `z180`, `8080`, `8085`, `gbz80`, `ez80_z80`, `r2ka`, `r3k`, `r4k`, `r6k`, `kc160`.
+`--cpu` uses the z80asm token from `select_cpu(CPU_MAP_TOOL_Z80ASM)` with the leading `-m` removed.
 
 `--z80asm` defaults to `z88dk-z80asm`.
+
+`--verbose` MUST print the per-function lines and the selection summary on stderr.
 
 ### Exit codes
 
@@ -785,6 +962,44 @@ ZCCMULTIEXE    Name of the multi tool       default z88dk-zcc-multi
 ```
 
 `80CCRULES` already exists and points at `DESTDIR/lib/80cc_rules.1`.
+
+## Later host in 80cc
+
+v1 MUST NOT change `src/80cc`.
+
+The selector MUST still be written so a later 80cc switch can reuse it.
+
+The planned 80cc switch is a local compile option. It will run more than one codegen path inside one 80cc process. Typical paths are stack locals and IX frame. It will then pick one body per function with the same metric.
+
+That later switch MUST NOT need zcc `-compiler=multi`.
+
+### Seams that MUST stay host-neutral
+
+1. A **variant** is a name plus a post-copt assembly (or later IR) body list. It is not a zcc `compiler_type`.
+2. Names `80cc-sp` and `80cc-fp` are codegen modes. 80cc MAY emit both without a second process.
+3. The selector API MUST accept `N` named variants, a metric, a data-variant name, and a CPU token.
+4. The selector MUST NOT call `zcc` or read `c_compiler_type`.
+5. Size and ticks MUST come from the listing or from tables. They MUST NOT require a zcc temp-name scheme.
+6. The IX elevate rule MUST take a callee-save class per variant name, not "this came from sccz80.exe".
+7. The `-v` summary format MUST stay stable so 80cc can print the same lines.
+8. `src/zccmulti/` SHOULD stay a small C library plus a thin `main`. zcc links or execs it. Later 80cc MAY link the same library.
+
+### What zcc owns and 80cc will not need
+
+- Per-variant ucpp macros (`__80CC` vs not)
+- Two compiler binaries
+- `zcc_opt.def` split
+- sdcc rejection
+
+When 80cc hosts the selector, it only needs the 80cc-sp and 80cc-fp bodies. sccz80 is then an optional extra variant that zcc can still feed in.
+
+### What this forbids in v1
+
+Do not hide selection inside `src/zcc/zcc.c` only.
+
+Do not encode "three process() calls" as the only way to produce a variant.
+
+Do not name the library after zcc if that blocks 80cc from linking it. `src/zccmulti/` is acceptable. The public functions SHOULD use a short prefix such as `zccmulti_`.
 
 ## ABI compatibility
 
@@ -944,13 +1159,11 @@ It also does not use IX as scratch in the C body.
 
 A sccz80 function can still call a helper that loads IX.
 
-#### mbf32
+#### Float libraries
 
-`libsrc/math/float/mbf32/c/sccz80/l_f32_add.asm` does `ld ix, ___mbf32_FPADD`.
+math32 does not use IX. 80cc-fp may call math32 helpers.
 
-The 80cc skill says: do not use `-fframe-pointer` with `--math-mbf32`.
-
-Bench readmes repeat that line.
+math48 uses IX. Both compilers already emit calls that match that library. Multi does not drop 80cc-fp for math48.
 
 #### Classic integer helpers
 
@@ -964,17 +1177,23 @@ Unknown, long, float, i64, and far helpers are conservative.
 
 The compilers disagree on IX as a live-across-call register.
 
+**Limitation:** a selected **80cc-fp** function MUST NOT call a selected **sccz80** function in the same file.
+
+80cc-fp keeps the frame in IX across `call`. sccz80 does not preserve IX. After return, `(ix+d)` can be wrong.
+
 v1 MUST apply this rule.
 
-1. Drop 80cc-fp when mbf32 is on.
-2. Select bodies by metric first.
-3. Walk intra-file direct calls.
-4. If a selected 80cc-fp body calls a selected sccz80 body, demote the 80cc-fp body.
-5. Repeat until stable.
+1. Select bodies by metric first.
+2. Walk intra-file direct calls.
+3. If a selected 80cc-fp body calls a selected sccz80 body, and that callee has an 80cc-fp body, **elevate the callee** to 80cc-fp.
+4. Repeat until stable.
+5. If an 80cc-fp caller still calls sccz80 and the callee has no 80cc-fp body, demote the **caller** to the next-best non-fp variant.
 
-Demote means: take the next-best variant for the caller.
+Elevate means: keep the 80cc-fp caller. Switch the callee to 80cc-fp even if the metric preferred sccz80.
 
-`reason` is `ix-callee`.
+`reason` for an elevated callee is `ix-elevate`.
+
+`reason` for a demoted caller is `ix-callee`. Prefer elevate. Demote is the last resort.
 
 80cc-sp may still mix with sccz80.
 
@@ -984,9 +1203,9 @@ A sccz80 caller does not keep a live frame in IX.
 
 Library calls keep the 80cc assumption.
 
-Integer `l_*` helpers are treated as IX-safe.
+Integer `l_*` helpers and math32 are treated as IX-safe.
 
-mbf32 is not.
+Indirect calls (`jp (hl)`) are not walked. That remaining hole MUST stay in this document.
 
 **Verdict:** not fully consistent.
 
@@ -1066,11 +1285,7 @@ v1 treats same-named `l_*` / `d*` helpers as the same convention.
 
 If a later audit finds a helper that 80cc and sccz80 call differently, that helper name MUST be refused.
 
-The tool SHOULD emit a warning when a selected body calls a helper from a known IX-unsafe set.
-
-The v1 unsafe set is the mbf32 entry points.
-
-Those already drop 80cc-fp.
+The tool SHOULD emit a warning when a selected 80cc-fp body still calls a sccz80-selected function after elevate.
 
 ## ABI common subset
 
@@ -1079,7 +1294,7 @@ A function is in the common subset when all of these hold.
 1. It uses small-C, STDC, fastcall, or callee as both compilers implement them.
 2. It returns a type from the table above.
 3. It does not require sdcc register ABI.
-4. If it is 80cc-fp, it does not call a sccz80 body in the same file.
+4. If it is 80cc-fp, it does not call a sccz80-selected body in the same file. Elevate the callee to 80cc-fp when that body exists.
 5. Named data is identical across variants.
 
 v1 MAY select any function that both compilers emit under those rules.
@@ -1098,13 +1313,14 @@ Do not add a fourth variant for the flip.
 
 ## Observability
 
-1. `-v` winner lines from zcc.
-2. Optional TSV report.
-3. `; zcc-multi:` comments in the stitch file.
-4. `-a` lets a user read the stitch file.
-5. `-m` map still names `_foo` once.
+1. `-v` winner line per function.
+2. `-v` selection summary. Counts, shares, bytes, ticks, mixed vs sccz80.
+3. Optional TSV report. Functions plus a summary table.
+4. `; zcc-multi:` comments in the stitch file.
+5. `-a` lets a user read the stitch file.
+6. `-m` map still names `_foo` once.
 
-A user proves the selected compiler by reading the comment or the report.
+A user proves the selected compiler by reading the comment, the report, or the summary.
 
 The map cannot name the compiler.
 
@@ -1112,18 +1328,21 @@ The map cannot name the compiler.
 
 | Risk | Severity | Mitigation |
 |------|----------|------------|
-| IX live in 80cc-fp, clobbered by a sccz80 callee or mbf32 | High | Drop 80cc-fp for mbf32. Demote 80cc-fp that calls a sccz80 body |
+| IX live in 80cc-fp, clobbered by a sccz80 callee | High | Elevate the callee to 80cc-fp. Demote the caller only if no 80cc-fp body exists |
 | Duplicate `_var` | High | Data from sccz80 only. Fail on set or size mismatch |
 | `i_1` collision | High | Rewrite local labels |
 | Different inlining, missing labels | Medium | Use variants that have the function. Fail if none have it |
 | `#ifdef __80CC` changes data | Medium | Compare named objects. Fail the file |
 | Compile-time cost of N compiles and N copts | Medium | Opt-in switch. Share 80cc ucpp output |
-| mbf32 / IX | High | Drop 80cc-fp |
+| math48 uses IX | Low | Both compilers already call that library. Do not drop 80cc-fp |
 | Parallel zcc and `zcc_opt.def` | Low for current zcc | Def file is already under `/tmp/tmpzcc*`. Variants share one process |
 | 80cc internal flip hides as fp | Low | Still labelled 80cc-fp. Metric sees the real bytes |
-| Static ticks is not TIMER | Medium | Document it. Later PR for dynamic ticks |
+| Static ticks is not TIMER | Medium | Charge helpers. Still not a profiler. Later PR for dynamic ticks |
+| Shared helper charged to every caller | Low | Accepted. The goal is 90% right picks, not map-accurate size |
 | `-Cc` flag rejected by 80cc | Low | Fail the file. Do not filter in silence |
 | `CPU_TYPE_IXIY` swaps IX at assemble | Low | 80cc-fp still emits IX. Assembler swaps both sides |
+| Private CPU list drifts from 80cc | High | 80cc-fp follows `src/80cc/main.c` force-off only |
+| Selector glued to zcc `process()` | Medium | Keep `src/zccmulti` as a library. 80cc can link it later |
 
 ## Alternatives considered
 
@@ -1181,14 +1400,17 @@ Follow `test/suites/sccz80/Makefile`.
 2. Assert the stitch file contains exactly one `._foo` and one `._bar`.
 3. Assert each named data label appears once.
 4. Construct a fixture where 80cc-sp is smaller than sccz80 for `_foo`.
-5. Assert `-compiler-multi-metric=size` selects that smaller body.
-6. CPU matrix: z80 (3 variants: sccz80, 80cc-sp, 80cc-fp), 8085 (2: sccz80, 80cc-sp), gbz80 (2), 8080 (2).
-7. A compiler error in one variant fails the file.
-8. `-v` prints a selected line for each function.
-9. `--math-mbf32` on z80 does not run 80cc-fp.
-10. A 80cc-fp function that calls a sccz80-selected callee is demoted.
-11. `.asm` input is not rewritten.
-12. `-a` writes one `.asm` and stops.
+5. Assert `-compiler-metric=size` selects that smaller body.
+6. A helper-heavy sccz80 body versus an inlined 80cc body. Size MUST add each distinct `l_*` once. Ticks MUST add the helper sum once per `call`.
+7. CPU matrix: one CPU where 80cc exposes IX (3 variants), and one where it does not (2 variants).
+8. A compiler error in one variant fails the file.
+9. `-v` prints a selected line for each function and a `zcc-multi-summary:` block.
+10. The summary counts match the TSV. `functions` equals the number of `._` C functions.
+11. `--math-mbf32` on z80 still runs 80cc-fp when the CPU has IX.
+12. A 80cc-fp caller of a sccz80-selected callee elevates the callee to 80cc-fp when that body exists.
+13. `.asm` input is not rewritten.
+14. `-a` writes one `.asm` and stops.
+15. A discarded sccz80 body leaves `defc i_N = i_M` in the optimiser banner. The stitch file MUST omit that `defc`. The file MUST assemble.
 
 ### Fixture sketch
 
@@ -1243,9 +1465,12 @@ The metric and the IX rule are enough to implement.
 - `src/80cc/adr/0002-z80-register-model.md`
 - `src/80cc/adr/0011-index-register-allocation.md`
 - `src/80cc/adr/0012-frame-pointer-default-by-cpu.md`
+- `src/80cc/main.c` (frame-pointer pin per CPU)
+- `src/80cc/ir_lower.c` (`IS_808x()`, `IS_GBZ80()` refuse IX)
 - `lib/80cc_rules.1`, `lib/z80rules.*`
 - `lib/config/alias.inc`
-- `libsrc/math/float/mbf32/c/sccz80/l_f32_add.asm`
+- `libsrc/math/float/math32/` (no IX)
+- math48 classic float (uses IX; both compilers already call it)
 - `include/sys/compiler.h`
 - `.agents/skills/compiler-sccz80/SKILL.md`
 - `.agents/skills/compiler-80cc/SKILL.md`
@@ -1268,14 +1493,14 @@ The metric and the IX rule are enough to implement.
 - **Title:** tools: add z88dk-zcc-multi assembly parser
 - **Files:** `src/zccmulti/*`, `src/zccmulti/Makefile`, top-level tool build hook
 - **Depends on:** PR 1
-- **Changes:** Parse post-copt asm. List functions, data labels, and sections. No select yet. Add a small host test on checked-in fixtures from `src/80cc/fw_full.asm` shape.
+- **Changes:** Parse post-copt asm. List functions, data labels, and sections. No select yet. Split a small C library and a `main`. Add a small host test on checked-in fixtures from `src/80cc/fw_full.asm` shape.
 
 ### PR 3 — Size metric via z80asm listing
 
 - **Title:** tools: z88dk-zcc-multi size metric
 - **Files:** `src/zccmulti/*`
 - **Depends on:** PR 2
-- **Changes:** Invoke z80asm with `-l`. Count opcode bytes per function. Fail if assemble fails.
+- **Changes:** Invoke z80asm with `-l`. Count opcode bytes per function. Add each distinct helper once. Fail if assemble fails.
 
 ### PR 4 — Stitch writer
 
@@ -1289,28 +1514,28 @@ The metric and the IX rule are enough to implement.
 - **Title:** zcc: add -compiler=multi
 - **Files:** `src/zcc/zcc.c`, `src/zcc/zcc.h`, config keys `80CCEXE` and `ZCCMULTIEXE`
 - **Depends on:** PR 4
-- **Changes:** Parse `-compiler=multi` and the metric / report flags. Build the variant matrix. Reject frame-pointer leftovers. Run per-variant ucpp, zpragma, compile, and copt. Invoke `z88dk-zcc-multi`. Leave assemble and link unchanged. Print `-v` winner lines.
+- **Changes:** Parse `-compiler=multi` and the metric / report flags. Build the variant matrix from the 80cc IX tests. Pass `select_cpu()` flags. Reject frame-pointer leftovers. Run per-variant ucpp, zpragma, compile, and copt. Invoke `z88dk-zcc-multi`. Leave assemble and link unchanged. Print `-v` winner lines and the selection summary.
 
-### PR 6 — IX demote and mbf32 drop
+### PR 6 — IX elevate
 
-- **Title:** zcc-multi: drop 80cc-fp for mbf32 and demote IX-unsafe callers
-- **Files:** `src/zcc/zcc.c`, `src/zccmulti/*`
+- **Title:** zcc-multi: elevate sccz80 callees of 80cc-fp callers
+- **Files:** `src/zccmulti/*`
 - **Depends on:** PR 5
-- **Changes:** Implement the mbf32 and reserve-IX drops. Walk intra-file calls. Demote 80cc-fp callers of sccz80 bodies.
+- **Changes:** Walk intra-file calls. If 80cc-fp calls sccz80, switch the callee to 80cc-fp when that body exists. Demote the caller only when it does not. Do not drop 80cc-fp for float libraries.
 
 ### PR 7 — Acceptance suite
 
 - **Title:** test: zcc-multi size path
 - **Files:** `test/suites/zcc-multi/*`
 - **Depends on:** PR 5 and PR 6
-- **Changes:** Add the required cases. Cover z80, 8085, gbz80, and 8080. Fail-on-variant-error. Report and `-v` checks.
+- **Changes:** Add the required cases. Cover one IX CPU (3 variants) and one no-IX CPU (2 variants). Fail-on-variant-error. Report, `-v` winner lines, and summary counts.
 
 ### PR 8 — Static ticks metric
 
 - **Title:** tools: z88dk-zcc-multi static ticks metric
 - **Files:** `src/zccmulti/*`, shared timing tables or a thin include from `src/ticks/`
 - **Depends on:** PR 3
-- **Changes:** Implement the v1 T-state sum. Map `c_cpu` to the ticks model. Fall back to size on computed jumps. Tie-break as specified. Extend the suite with `-compiler-multi-metric=ticks`.
+- **Changes:** Implement the v1 T-state sum. Add helper static ticks once per call site. Map `c_cpu` to the ticks model. Fall back to size on computed jumps. Tie-break as specified. Extend the suite with `-compiler-metric=ticks`.
 
 PR 8 MAY land after PR 7.
 
@@ -1331,3 +1556,10 @@ PR 7 MUST not wait on ticks.
 - **Files:** wiki tool page for zcc
 - **Depends on:** PR 7
 - **Changes:** Human documentation. Not before the binary exists.
+
+### Later — 80cc in-process switch (not v1)
+
+- **Title:** 80cc: optional per-function sp/fp pick
+- **Files:** `src/80cc/*`, reuse `src/zccmulti/`
+- **Depends on:** the library seam in PR 2 and a closed IX-clobber audit
+- **Changes:** Out of v1. Do not start this until the zcc host is stable. 80cc then emits `80cc-sp` and `80cc-fp` in one compile and calls the same selector.
