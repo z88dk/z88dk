@@ -160,6 +160,8 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ; sum overflowed: >>1, jam, exp++
     call a32_shr1
     inc b
+    ld a,b
+    inc a                           ; new exp == 255 (was 254)
     jp Z,a32_ovf
     jp a32_ret_y
 

@@ -20,11 +20,12 @@
 ;   +4     exp
 ;   +5     sign (bit 7)
 ;
-; After prologue:
+; After prologue (Y park left in place; dropped in epi):
 ;   +0   X slot (6)
-;   +6   drop_flag (2)
-;   +8   ret (2)
-;  +10   left IEEE if callee (4)
+;   +6   Y park (6)
+;  +12   drop_flag (2)
+;  +14   ret (2)
+;  +16   left IEEE if callee (4)
 ;
 ; Y is the larger-or-equal exponent operand.  Equal exponents do not swap.
 ;
@@ -73,7 +74,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     call unpack_push                ; X slot on top
     ; +0 X(6) +6 Y.hl +8 Y.de +10 Y.bc +12 flag +14 ret +16 IEEE
 
-    ; Y.bc first (stays); park Y.mant once, copy X over oldY, drop X
+    ; Reload Y; leave Y park as pad (dropped in epi).
     ld de,sp+10
     ld hl,(de)
     ld bc,hl                        ; Y.bc
@@ -82,29 +83,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     push hl                         ; Y.hl
     ld de,sp+10                     ; Y.de at +8 +2
     ld hl,(de)
-    push hl                         ; +0 Y.de +2 Y.hl +4 X(6) +10 oldY(6)
-    ld de,sp+4
-    ld hl,(de)
-    ld de,sp+10
-    ld (de),hl
-    ld de,sp+6
-    ld hl,(de)
-    ld de,sp+12
-    ld (de),hl
-    ld de,sp+8
-    ld hl,(de)
-    ld de,sp+14
-    ld (de),hl
-    pop de                          ; Y.de
+    ex de,hl                        ; DE = Y.de
     pop hl                          ; Y.hl
-    ld a,l                          ; Y.MSB
-    ex de,hl                        ; HL = Y.de
-    ld de,sp+6
-    ex de,hl                        ; HL = SP+6, DE = Y.de
-    ld sp,hl                        ; drop original X
-    ld l,a
     ld h,0
-    ; SP: X'(6) flag ret IEEE; Y in B,C,LDE
+    ; SP: X(6) Y(6) flag ret IEEE; Y in B,C,LDE
 
     ; ---- specials (exp == 255).  Zeros stay on the add path. ----
     ld a,c
@@ -114,9 +96,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld de,sp+6                      ; X.exp at +4 +2
     ld a,(de)
     pop de
-    inc a
+    cp 255
     jp Z,fa_spec_x
-    dec a                           ; A = X.exp (inc was only the 255 test)
     cp c
     jp Z,fa_ops                     ; equal: no swap, no align
     jp C,fa_y_gt                    ; X.exp < Y.exp
@@ -150,6 +131,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp Z,fa_pack
     call fa_shr1
     inc c
+    ld a,c
+    inc a                           ; new exp == 255 (was 254)
     jp Z,fa_ovf
     jp fa_pack
 
@@ -180,14 +163,20 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp fa_epi
 
 
-; Pack Y (B,C,LDE) → IEEE DEHL
+; Pack Y (B,C,LDE) → IEEE DEHL.  Through A only (no rr hl helper).
 .fa_pack_regs
-    add hl,hl                       ; implicit 1 → CF; H was 0
-    ld h,c                          ; exp
+    ld a,l
+    ex de,hl                        ; HL = mid:lsb
+    add a,a                         ; drop hidden 1
+    ld e,a
     ld a,b
-    rla                             ; sign → CF
-    rr hl
-    ex de,hl
+    add a,a                         ; sign → C
+    ld a,c
+    rra                             ; sign|exp
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
     ret
 
 
@@ -256,17 +245,18 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 
 .fa_epi
-    ; DEHL = result.  SP: X(6) flag ret IEEE.  BC free after pack.
+    ; DEHL = result.  SP: X(6) Y(6) flag ret IEEE.  BC free after pack.
     ld bc,de                        ; park result high
-    ld de,sp+6                      ; flag / drop-X target
+    ld de,sp+12                     ; flag
     ld a,(de)
-    ex de,hl                        ; HL = SP+6, DE = result low
-    ld sp,hl                        ; drop X slot
+    ex de,hl                        ; HL = SP+12, DE = result low
+    ld sp,hl                        ; drop X + Y park
     ex de,hl                        ; HL = result low
     ld de,bc                        ; DEHL = result
 
     pop bc                          ; drop flag
-    or a
+    inc a                           ; Z from flag; keep CF (overflow)
+    dec a
     jp Z,fa_done
     pop bc                          ; ret
     pop af
@@ -318,7 +308,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 ;------------------------------------------------------------------------------
 ; Swap Y (regs) with X (slot).  A = expdiff, preserved.
-; CALL: SP = ret, X(6), flag, ...
+; CALL: SP = ret, X(6), Y park, flag, ...
 ; Slot words: (MSB,0), (LSB,mid), (exp,sign)
 ;------------------------------------------------------------------------------
 .fa_swap
@@ -367,7 +357,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 ;------------------------------------------------------------------------------
 ; Align X slot right by A bits.  Jam AFTER the shift into the new LSB.
-; CALL: SP = ret, X(6), flag, ...
+; CALL: SP = ret, X(6), Y park, flag, ...
 ;------------------------------------------------------------------------------
 .fa_align_x
     push bc
@@ -460,25 +450,23 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ;------------------------------------------------------------------------------
 .fa_addx
     ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
-    ; Park sign/exp so BC can hold Y.de across the three (de) loads.
     push bc
-    ld bc,de                        ; Y.de
-    ld de,sp+6                      ; X.LSB at +4 +2
-    ld a,(de)
-    add a,c
-    ld c,a
-    ld de,sp+7                      ; X.mid
+    ld a,l                          ; Y.MSB
+    ld bc,de                        ; Y.low16
+    ld de,sp+6                      ; X.low16
+    ld hl,(de)
+    add hl,bc                       ; low sum; C → MSB
+    ld b,a                          ; Y.MSB
+    push hl                         ; low sum
+    ld de,sp+6                      ; X.MSB
     ld a,(de)
     adc a,b
-    ld b,a
-    ld de,sp+4                      ; X.MSB
-    ld a,(de)
-    adc a,l
+    pop de                          ; DE = low sum
+    pop bc                          ; sign,exp
     ld l,a
-    ld de,bc
-    pop bc
     ld a,0
-    rla
+    rla                             ; A = bit24 (ld keeps C)
+    ld h,0
     ret
 
 
@@ -489,27 +477,24 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_subx
     ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
     push bc
-    ld bc,de                        ; Y.de
-    ld de,sp+6                      ; X.LSB
+    ld a,l                          ; Y.MSB
+    ld hl,de                        ; Y.low16
+    ld de,sp+6                      ; X.low16
+    push hl
+    ld hl,(de)
+    ld bc,hl
+    pop hl
+    sub hl,bc                       ; Y.low − X.low
+    ld b,a                          ; Y.MSB (C preserved)
+    push hl
+    ld de,sp+6                      ; X.MSB
     ld a,(de)
-    ld e,a
-    ld a,c
-    sub e
     ld c,a
-    ld de,sp+7                      ; X.mid
-    ld a,(de)
-    ld e,a
     ld a,b
-    sbc a,e
-    ld b,a
-    ld de,sp+4                      ; X.MSB
-    ld a,(de)
-    ld e,a
-    ld a,l
-    sbc a,e
+    sbc a,c
+    pop de
+    pop bc                          ; sign,exp
     ld l,a
-    ld de,bc
-    pop bc
     ld h,0
     ret
 

@@ -256,6 +256,8 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     set 0,e
 .doadd0
     inc b
+    ld a,b
+    inc a                       ; new exp == 255 (was 254)
     jr Z,foverflow
 .doadd1
     ex de,hl                    ; return BC DEHL
