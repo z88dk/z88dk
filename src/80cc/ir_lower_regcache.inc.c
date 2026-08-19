@@ -74,6 +74,31 @@ static int vreg_in_pr_bc(const Func *f, int vreg_id)
    the shapes op_de_clean promises is DE-CLEAN — that promise is what lets a
    DE home stay resident across it. So the LHLX form is only available when
    nothing is homed there, and the promise has nothing to protect. */
+/* True iff a DE-homed value is LIVE at the op being lowered — the question
+   func_has_de_home only answers for the whole function. An LHLX deref off an
+   address already in HL has to `ex de,hl`, which destroys DE, so it needs the
+   narrower answer: a function that homes something in DE somewhere may still
+   take the fold at an op where that value is not live.
+
+   Conservative wherever the answer is not known: no liveness context, or a
+   WORD DE-home (g_hc.func_whome), keeps the whole-function veto — the word
+   home is the one op_de_clean makes promises about, and those promises span
+   regions rather than single ops. */
+static int de_home_live_here(const Func *f)
+{
+    if (!f || !f->vreg_to_phys) return 1;
+    if (g_hc.func_whome >= 0) return 1;
+    if (!cur_bb) return 1;
+    const BitSet *li = ir_op_live_in(cur_bb, cur_op_idx);
+    if (!li) return 1;
+    for (int v = 0; v < f->n_vregs; v++) {
+        int p = ir_home_at(f, v);
+        if (p != IR_PR_DE && p != IR_PR_E && p != IR_PR_D) continue;
+        if (ir_bitset_get(li, v)) return 1;
+    }
+    return 0;
+}
+
 static int func_has_de_home(const Func *f)
 {
     if (!f || !f->vreg_to_phys) return 1;          /* unknown: assume it does */

@@ -3042,9 +3042,16 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            (func_has_de_home). Offsets are LDHI's unsigned byte; a post-step
            (`*p++`) steps the base through its own path and wants HL, and a
            banked/far pointer needs its page-in, so both stay on the walk. */
+        /* The DE question is asked PER SITE, not per function. The veto used
+           to be `no DE home anywhere in this function`, which in an
+           interpreter — where one hot vreg is DE-homed and every address is
+           COMPUTED into HL — refused the fold for the whole of it and left
+           each word deref as a 3-instruction byte walk (24T against LHLX's
+           14T). A function that homes something in DE can still take the fold
+           at an op where that value is not live. */
         int lhlx_deref = CPU_HAS_LD_HL_IND_DE() && dst_w == 2
             && !opt_disabled("lhlx-deref")
-            && !func_has_de_home(f)
+            && !de_home_live_here(f)
             && op->mem.kind == IR_MEM_VREG && op->mem.post_step == 0
             && op->mem.elem != KIND_CPTR && mem_bank_fn(&op->mem) == NULL
             && op->mem.offset >= 0
