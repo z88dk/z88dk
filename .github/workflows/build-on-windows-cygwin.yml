@@ -33,14 +33,14 @@ jobs:
       shell: cmd
       
     - name: Checkout from git
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with: 
         submodules: 'true'
 
     # Rolled: actions/cache never overwrites an existing key, so a fixed one is
     # written once and then frozen.
     - name: Cache perl modules
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           ~/perl5
@@ -50,7 +50,7 @@ jobs:
           ${{ runner.os }}-cygwin-perl5-
 
     - name: Setup Cygwin
-      uses: cygwin/cygwin-install-action@master
+      uses: cygwin/cygwin-install-action@v6
       with:
         platform: x64
         packages: >

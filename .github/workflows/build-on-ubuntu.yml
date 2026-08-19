@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout from git
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with: 
         submodules: 'true'
     # ccache only defaults to $HOME/.ccache when that directory already exists,
@@ -35,7 +35,7 @@ jobs:
     # Rolled because actions/cache never overwrites an existing key: a fixed one
     # is written once and cannot even recover from the 7-day eviction.
     - name: Cache perl modules
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           ~/perl5
@@ -45,7 +45,7 @@ jobs:
           ${{ runner.os }}-perl5-
 
     - name: Cache ccache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           ~/.ccache

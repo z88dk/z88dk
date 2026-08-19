@@ -27,7 +27,7 @@ jobs:
         git config --global core.autocrlf input
       shell: cmd
     - name: Checkout from git
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: 'true'
     - name: Install MSYS2
