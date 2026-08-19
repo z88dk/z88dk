@@ -688,9 +688,18 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         return 0;
     }
     int sflip_lt = signed_cmp_signflip(out, f, is_signed);
+    int cmp_kept_hl = 0;               /* the compare left HL/A untouched */
     if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
+    } else if (CPU_HAS_CP_HL_DE()) {
+        /* VM1 DCMP: HL-DE into the flags in ONE byte, landing the same CF
+           (unsigned borrow = src0<src1) as the four-instruction byte-wise
+           sequence below - and it writes no register at all, where that
+           sequence eats A and the z80's `sbc hl,de` eats HL. A sign flip
+           rewrote H, so only an unflipped compare may keep the HL belief. */
+        emit(out, "cp\thl,de");
+        cmp_kept_hl = !sflip_lt;
     } else {
         /* No usable native 16-bit sbc: 8080 expands `sbc hl,de` to a slow
            helper call, gbz80 lacks it. Byte-wise sub/sbc lands the same CF
@@ -710,8 +719,10 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         cc = want_carry ? "c" : "nc";
         emit(out, "jp\t%s,L_f%d_bb_%d",
              cc, L.func_emit_idx, L.la.cur_branch_test_label);
-        /* `sbc hl,de` clobbered HL but preserved DE — keep cache. */
-        invalidate_hl_keep_de();
+        /* `sbc hl,de` clobbered HL but preserved DE — keep cache. A VM1 `cp
+           hl,de` left HL alone, so a chained compare of the same value
+           reloads nothing. */
+        if (!cmp_kept_hl) invalidate_hl_keep_de();
         L.la.cur_skip_next_op = 1;
         return 0;
     }
@@ -880,9 +891,13 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         return 0;
     }
     int sflip_gt = signed_cmp_signflip(out, f, is_signed);
+    int cmp_kept_hl = 0;               /* the compare left HL/A untouched */
     if (!(IS_808x() || IS_GBZ80())) {
         emit(out, "and\ta");
         emit(out, "sbc\thl,de");
+    } else if (CPU_HAS_CP_HL_DE()) {
+        emit(out, "cp\thl,de");       /* VM1 DCMP, see gen_cmp_lt_ge */
+        cmp_kept_hl = !sflip_gt;       /* HL holds src1 here (swap-load) */
     } else {
         /* Byte-wise HL-DE (= src1-src0 after swap-load); CF=borrow iff
            src0>src1. sbc-emulation rationale: see gen_cmp_lt_ge. */
@@ -899,7 +914,7 @@ static int gen_cmp_gt_le(FILE *out, Func *f, const Op *op)
         const char *cc = want_carry ? "c" : "nc";
         emit(out, "jp\t%s,L_f%d_bb_%d",
              cc, L.func_emit_idx, L.la.cur_branch_test_label);
-        invalidate_hl_keep_de();
+        if (!cmp_kept_hl) invalidate_hl_keep_de();
         L.la.cur_skip_next_op = 1;
         return 0;
     }
@@ -1126,6 +1141,12 @@ static int gen_cmp_eq_ne(FILE *out, Func *f, const Op *op)
             if (k & 0xff) emit(out, "xor\t%u", (unsigned)(k & 0xff));
             emit(out, "or\th");                 /* Z iff HL==K */
         }
+    } else if (CPU_HAS_CP_HL_DE()) {
+        /* VM1 DCMP sets Z on equality with HL intact: one byte against the
+           six-instruction XOR chain below, which eats A and rewrites H. */
+        load_binop_operands(out, f, op);
+        emit(out, "cp\thl,de");
+        cmp_hl_holds_src0 = 1;
     } else {
         load_binop_operands(out, f, op);
         emit(out, "ld\ta,h");
