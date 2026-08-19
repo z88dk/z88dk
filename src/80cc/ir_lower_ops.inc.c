@@ -300,7 +300,20 @@ static int try_tos_rmw_reg(FILE *out, Func *f, const Op *op, int is_sub)
     ss_note_reload(f, v);             /* pop reads the slot */
     ss_note_store(f, v);              /* push writes it back */
     emit(out, "pop\thl");             /* consume dst */
-    if (is_sub) { emit(out, "and\ta"); emit(out, "sbc\thl,de"); }
+    if (is_sub && !CPU_HAS_SBC_HL()) {
+        /* Byte-wise rather than the `call __z80asm__sbc_hl_de` z80asm would
+           substitute (see gen_neg): 6 bytes and 28T against 4 bytes and 90T.
+           No `and a` is needed - `sub e` sets the borrow itself. A is dead
+           here, which is what the helper spends half its time preserving. */
+        emit(out, "ld\ta,l");
+        emit(out, "sub\te");
+        emit(out, "ld\tl,a");
+        emit(out, "ld\ta,h");
+        emit(out, "sbc\ta,d");
+        emit(out, "ld\th,a");
+        invalidate_a_cache();
+    }
+    else if (is_sub) { emit(out, "and\ta"); emit(out, "sbc\thl,de"); }
     else        emit(out, "add\thl,de");
     emit(out, "push\thl");
     /* Net sp unchanged; dst lives only at its TOS slot; HL is junk. */
@@ -1419,6 +1432,23 @@ static int gen_neg(FILE *out, Func *f, const Op *op)
         if (!hl_has(op->src[0]))
             load_to_hl(out, f, op->src[0]);
         emit(out, "neg\thl");
+    } else if (!CPU_HAS_SBC_HL()) {
+        /* No `sbc hl,de` here, and z80asm substitutes `call
+           __z80asm__sbc_hl_de` - 86T on the 8080, 82T on the 8085, 80T on the
+           gbz80, plus 19 bytes of linked helper. Most of that is the helper
+           being a SUBROUTINE: 31T of its 69T body preserves A and BC, and
+           neither is live at this site (the `or a` it replaces clobbered A
+           anyway). Negating byte-wise inline is the same 7 bytes and 29T.
+           `ld a,0` rather than `xor a` for the high half: it must not disturb
+           the borrow that `sub e` just set. */
+        load_to_de(out, f, op->src[0]);
+        emit(out, "xor\ta");            /* A = 0, CY = 0 */
+        emit(out, "sub\te");            /* A = 0 - e,  CY = borrow */
+        emit(out, "ld\tl,a");
+        emit(out, "ld\ta,0");           /* flags untouched */
+        emit(out, "sbc\ta,d");          /* A = 0 - d - borrow */
+        emit(out, "ld\th,a");
+        invalidate_a_cache();
     } else {
         load_to_de(out, f, op->src[0]);
         emit(out, "ld\thl,0");
