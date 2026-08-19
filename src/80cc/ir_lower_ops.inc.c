@@ -3012,11 +3012,15 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            (func_has_de_home). Offsets are LDHI's unsigned byte; a post-step
            (`*p++`) steps the base through its own path and wants HL, and a
            banked/far pointer needs its page-in, so both stay on the walk. */
-        int lhlx_deref = IS_8085() && dst_w == 2 && !opt_disabled("lhlx-deref")
+        int lhlx_deref = CPU_HAS_LD_HL_IND_DE() && dst_w == 2
+            && !opt_disabled("lhlx-deref")
             && !func_has_de_home(f)
             && op->mem.kind == IR_MEM_VREG && op->mem.post_step == 0
             && op->mem.elem != KIND_CPTR && mem_bank_fn(&op->mem) == NULL
-            && op->mem.offset >= 0 && op->mem.offset <= 255;
+            && op->mem.offset >= 0
+            /* A nonzero offset is reached with LDHI, which the 8085 has and
+               the KR580VM1 does not - there the fold is the offset-0 form. */
+            && op->mem.offset <= (IS_8085() ? 255 : 0);
         /* At offset 0 the address only has to REACH DE, so take it from
            wherever it already is rather than routing it through HL first:
            a DE-resident base needs no move at all (and its belief survives —
