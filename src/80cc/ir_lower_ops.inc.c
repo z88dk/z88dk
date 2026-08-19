@@ -3584,6 +3584,53 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 invalidate_hl_bc();
             }
         } else {
+            /* SHLX: `ld (de),hl` writes the word in ONE byte and leaves both
+               registers intact, where the generic path below spends three on
+               `ld (hl),e / inc hl / ld (hl),d` and ends with HL past the base.
+               It wants the mirror arrangement of that path - address in DE,
+               value in HL - so it fires exactly where the two already sit
+               that way and nothing has to be moved. That is the shape the
+               `ld hl,(de)` deref leaves behind, i.e. read-modify-write through
+               a pointer.
+               Offset 0 only: a nonzero one needs LDHI, which the VM1 lacks.
+               The 8085 has SHLX as well and wants the same fold, but that is a
+               change to shared codegen with its own gauntlet, so it is not
+               made from here. */
+            if (getenv("IR_SHLX_PROBE"))
+                fprintf(stderr, "SHLX-cand off=%d step=%d base_bc=%d base_de=%d "
+                        "base_hl=%d remat=%d val_hl=%d\n",
+                        op->mem.offset, op->mem.post_step,
+                        vreg_in_pr_bc(f, op->mem.base) || bc_has(op->mem.base),
+                        de_has(op->mem.base), hl_has(op->mem.base),
+                        vreg_is_remat(f, op->mem.base), hl_has(op->src[0]));
+            int shlx_bc = vreg_in_pr_bc(f, op->mem.base) || bc_has(op->mem.base);
+            int shlx_remat = vreg_is_remat(f, op->mem.base)
+                          && !remat_word_clobbers_hl(f, op->mem.base);
+            if (CPU_HAS_LD_IND_DE_HL() && !IS_8085()
+                && !opt_disabled("shlx-store")
+                && op->mem.offset == 0 && op->mem.post_step == 0
+                && op->mem.elem != KIND_CPTR && mem_bank_fn(&op->mem) == NULL
+                && (shlx_bc || shlx_remat)) {
+                /* The value goes to HL FIRST, then the address into DE by a
+                   route that cannot touch HL: `ld de,bc` off a BC-resident
+                   base, or `ld de,K` / `ld de,_sym` off a rematerialisable one
+                   (the LEA form recomputes through HL, hence
+                   remat_word_clobbers_hl). Ordering the other way round would
+                   need load_to_hl to promise it leaves DE alone, which it does
+                   not. 3B/20T against the generic 5B/29T. */
+                load_to_hl(out, f, op->src[0]);
+                /* The value load may have left DE alone - a read-modify-write
+                   through the same pointer arrives here with the address still
+                   there from the `ld hl,(de)` that read it - so ask before
+                   re-materialising it. */
+                if (!de_has(op->mem.base)) {
+                    if (shlx_bc) emit(out, "ld\tde,bc");
+                    else         emit_remat_word(out, f, op->mem.base, "de");
+                    cache_de(op->mem.base);
+                }
+                emit(out, "ld\t(de),hl");     /* both beliefs survive it */
+                return 0;
+            }
             /* [IR_HL_CARRY inc1] Base already resident in HL: load the value
                STRAIGHT to DE (load_to_de preserves HL on the common fp/native
                paths) instead of load_to_hl(value)+ex de,hl (which clobbers the
