@@ -9,7 +9,7 @@ CFILES = $(wildcard *.c)
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
-all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
+all: subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
 
 subdirs-all: $(SUBDIRS)
@@ -28,6 +28,9 @@ obj/$(TARGET)/%.o: %.asm
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) -mz80 $(CFLAGS) -o $@  $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(TARGET)

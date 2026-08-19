@@ -10,7 +10,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=z80 -DFLOAT_IS_48BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/genmath.lib \
+all: $(OUTPUT_DIRECTORY)/genmath.lib \
 	$(OUTPUT_DIRECTORY)/genmath_ixiy.lib \
 	$(OUTPUT_DIRECTORY)/genmath_zx81.lib \
 	$(OUTPUT_DIRECTORY)/genmath_ez80_z80.lib \
@@ -35,6 +35,9 @@ $(OUTPUT_DIRECTORY)/genmath_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 
 $(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy_zx81/, $(OBJECTS))
 	TYPE=ixiy_zx81 $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,z80 z80n r2ka ez80_z80 ixiy ixiy_zx81,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 obj/ixiy_zx81/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -I$(Z88DK_LIBSRC) -IXIY -mz80 -D__CLASSIC $(AFLAGS) -Oobj/ixiy_zx81 $^

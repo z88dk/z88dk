@@ -23,13 +23,16 @@ endif
 
 OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
-all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
+all: $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS))
 
 obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@ -O0 $^ -Ca-I../../.. -Ca-DFOR$(SUBTYPE)
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)

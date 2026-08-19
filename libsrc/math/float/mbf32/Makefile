@@ -10,7 +10,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=mbf32 -D__MATH_MBF32 -DFLOAT_IS_32BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_8080.lib $(OUTPUT_DIRECTORY)/mbf32_8085.lib $(OUTPUT_DIRECTORY)/mbf32_ixiy.lib $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib \
+all: $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_8080.lib $(OUTPUT_DIRECTORY)/mbf32_8085.lib $(OUTPUT_DIRECTORY)/mbf32_ixiy.lib $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib \
 	$(OUTPUT_DIRECTORY)/mbf32_z80n.lib \
 	$(OUTPUT_DIRECTORY)/mbf32_z180.lib \
 	$(OUTPUT_DIRECTORY)/mbf32_ez80_z80.lib \
@@ -55,6 +55,9 @@ $(OUTPUT_DIRECTORY)/mbf32_r4k.lib: $(addprefix obj/r4k/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/mbf32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
 	TYPE=r6k $(LIBLINKER) -mr6k -x$(OUTPUT_DIRECTORY)/mbf32_r6k @mbf32.lst
 
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,8080 8085 ez80_z80 gbz80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/z80/z80

@@ -16,7 +16,7 @@ OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 CFLAGS += -DFLOAT_IS_48BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/math48.lib $(OUTPUT_DIRECTORY)/math48_ixiy.lib \
+all: $(OUTPUT_DIRECTORY)/math48.lib $(OUTPUT_DIRECTORY)/math48_ixiy.lib \
 	$(OUTPUT_DIRECTORY)/math48_z80n.lib \
 	$(OUTPUT_DIRECTORY)/math48_r2ka.lib \
 	$(OUTPUT_DIRECTORY)/math48_r4k.lib \
@@ -61,6 +61,9 @@ $(OUTPUT_DIRECTORY)/math48_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/math48_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	@$(ASSEMBLER) -d -O=obj/ixiy/ -I.. -mz80 -IXIY -D__CLASSIC @math48impl.lst
 	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_ixiy -IXIY @math48.lst
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
 	@mkdir -p obj/z80/cimpl obj/ixiy/cimpl obj/r2ka/cimpll obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl obj/kc160/cimpl obj/r4k/cimpl obj/r2ka/cimpl obj/r6k/cimpl

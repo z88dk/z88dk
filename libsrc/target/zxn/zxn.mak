@@ -47,5 +47,25 @@ $(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTIC
 $(eval $(call buildtargetc,target/zxn,zxn,-clib=classic))
 $(eval $(call bifrost_zx0,zxn))
 
+# zx and zxn share the multicolour engine sources under target/zx. z80asm
+# expands a .asm.m4 into the .asm *beside the source*, not into the per-target
+# obj dir, so any file built by both targets is written and read by two
+# assemblies at once under -j -- the loser sees a half-written program and
+# reports "unbalanced control structure". Six files are shared this way:
+#
+#   bifrost2/z80/BIFROST2_ENGINE.asm    bifrost_l/z80/BIFROSTL_ENGINE.asm
+#   bifrost2/z80/BIFROST2_INSTALL.asm   bifrost_h/z80/BIFROSTH_ENGINE.asm
+#   nirvanam/z80/NIRVANAM_ENGINE.asm    nirvanap/z80/NIRVANAP_ENGINE.asm
+#
+# BIFROST2_ENGINE comes from the bifrost_zx0 rules; the rest come from
+# $(ZX_MULTICOLOUR_GLOBS), which both buildtargetasm stamps assemble. Order the
+# zxn side after the zx side in both places.
+#
+# Chaining zxn_clib.lib to zx_clib.lib does NOT fix this: make is free to build
+# $(ZXN_TARGETS) and zx_clib.lib concurrently, and the shared sources sit one in
+# each.
+target/zxn/obj/zxn/bifrost2_engine_48.bin.zx0: target/zx/obj/zx/bifrost2_engine_p3.bin.zx0
+target/zxn/obj/target-zxn-zxn: target/zx/obj/target-zx-zx
+
 target-zxn-clean:
 	$(RM) -fr target/zxn/obj

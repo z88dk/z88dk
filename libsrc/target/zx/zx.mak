@@ -80,8 +80,24 @@ ZX_MULTICOLOUR_GLOBS := "target/zx/bifrost2/c/sccz80/*.asm" target/zx/bifrost2/z
 	target/zx/bifrost2/z80/asm_BIFROST2_stop.asm \
         target/zx/bifrost2/z80/asm_BIFROST2_getAnimGroup.asm \
 	target/zx/bifrost2/z80/asm_BIFROST2_findAttrH.asm \
-	"target/zx/bifrost_h/c/sccz80/*.asm" "target/zx/bifrost_h/z80/*.asm" \
-	"target/zx/bifrost_l/c/sccz80/*.asm" "target/zx/bifrost_l/z80/*.asm" \
+	"target/zx/bifrost_h/c/sccz80/*.asm" \
+	target/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4 \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_getAnimGroup.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_getTile.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim2Frames.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim4Frames.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_setTile.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_stop.asm \
+	"target/zx/bifrost_l/c/sccz80/*.asm" \
+	target/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4 \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_findAttrH.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_getAnimGroup.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_getTile.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim2Frames.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim4Frames.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_setTile.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_stop.asm \
 	"target/zx/nirvanap/c/sccz80/*.asm" \
 	target/zx/nirvanap/z80/asm_NIRVANAP_spriteT.asm \
 	target/zx/nirvanap/z80/asm_NIRVANAP_drawW_di.asm \
@@ -100,8 +116,24 @@ ZX_MULTICOLOUR_GLOBS_ex := target/zx/bifrost2/c/sccz80/*.asm target/zx/bifrost2/
 	target/zx/bifrost2/z80/asm_BIFROST2_stop.asm \
 	target/zx/bifrost2/z80/asm_BIFROST2_getAnimGroup.asm \
 	target/zx/bifrost2/z80/asm_BIFROST2_findAttrH.asm \
-	target/zx/bifrost_h/c/sccz80/*.asm target/zx/bifrost_h/z80/*.asm \
-	target/zx/bifrost_l/c/sccz80/*.asm target/zx/bifrost_l/z80/*.asm \
+	target/zx/bifrost_h/c/sccz80/*.asm \
+	target/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4 \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_getAnimGroup.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_getTile.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim2Frames.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim4Frames.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_setTile.asm \
+	target/zx/bifrost_h/z80/asm_BIFROSTH_stop.asm \
+	target/zx/bifrost_l/c/sccz80/*.asm \
+	target/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4 \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_findAttrH.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_getAnimGroup.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_getTile.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim2Frames.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim4Frames.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_setTile.asm \
+	target/zx/bifrost_l/z80/asm_BIFROSTL_stop.asm \
 	target/zx/nirvanap/c/sccz80/*.asm \
 	target/zx/nirvanap/z80/asm_NIRVANAP_spriteT.asm \
 	target/zx/nirvanap/z80/asm_NIRVANAP_drawW_di.asm \
