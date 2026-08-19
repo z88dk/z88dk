@@ -490,8 +490,9 @@ static int is_boolean_op(int op)
 /* Conservative side-effect-free predicate: reading a non-volatile local
    or global, computing arithmetic over those, or taking an address. Any
    pre/post-step, assignment, function call, or unrecognised node is
-   rejected. */
-static int is_side_effect_free(Node *n)
+   rejected. Exported (ccdefs.h) — ir_build's store-operand reordering uses
+   it to prove the LHS address can be built before the RHS. */
+int is_side_effect_free(Node *n)
 {
     if (!n) return 1;
     switch (n->ast_type) {

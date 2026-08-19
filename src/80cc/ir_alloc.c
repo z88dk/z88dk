@@ -1325,6 +1325,22 @@ static long interval_benefit_x(const Func *f, int v, const int *bb_loop_depth,
 static int is_compared_counter(const Func *f, int v);
 static int is_deref_base(const Func *f, int v);
 static int is_stepped(const Func *f, int v);
+/* [IR_LIVEPROBE] The allocator's REAL interference test: inclusive overlap of
+   two [lo,hi] intervals. Six sites inline this over three different interval
+   arrays (pool[].lo/hi, cand[].flo/fhi, first_use[]/last_use[]) — routing them
+   through one helper is what lets the probe see the decisions that actually
+   allocate. `ir_live_ranges_overlap` is NOT that test: it is reached only by one
+   narrow counter-yield tie-break. Behaviour identical to the inlined form. */
+static inline int iv_overlap(const Func *f, int a, int b,
+                             int alo, int ahi, int blo, int bhi)
+{
+    int s = alo > blo ? alo : blo;
+    int e = ahi < bhi ? ahi : bhi;
+    int ans = s <= e;
+    ir_liveprobe_count_iv(f, a, b, ans, alo, ahi, blo, bhi);
+    return ans;
+}
+
 static int counter_yields_bc_to_index(const Func *f, const Cand *pool, int n, int v,
                                        const long *idx_ben, int idx2_taken,
                                        int idx3_taken)
@@ -1526,13 +1542,14 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
             /* Interval overlap against already-assigned BC vregs, using the
                [lo,hi] each carries in the pool (BC is multi-occupant). */
             int ok = 1;
+            ir_liveprobe_decision_begin_cand(0, v, c->lo, c->hi);
             for (int j = 0; j < n && ok; j++) {
                 if (pool[j].vreg == v) continue;
                 if (f->vreg_to_phys[pool[j].vreg] != IR_PR_BC) continue;
-                int s = c->lo > pool[j].lo ? c->lo : pool[j].lo;
-                int e = c->hi < pool[j].hi ? c->hi : pool[j].hi;
-                if (s <= e) ok = 0;
+                if (iv_overlap(f, v, pool[j].vreg,
+                               c->lo, c->hi, pool[j].lo, pool[j].hi)) ok = 0;
             }
+            ir_liveprobe_decision_end();
             /* CONTENTION-CONDITIONAL counter yield. A compared counter
                ranks high globally (its STEP saving vs the frame slot) so it grabs
                BC first — but if it OVERLAPS an unassigned BC contender whose true
@@ -2135,10 +2152,46 @@ static int collect_bc_temp_cands(const Func *f, const int *bb_first_op,
     return nc;
 }
 
+/* [IR_BCPERCAND] Per-candidate replacement for the whole-function BC veto.
+   bc_region_ok is three PER-OP facts (width-4 low-half staging, non-char
+   IR_SWITCH dispatch, IR_ACC_* helpers) promoted to a whole-function
+   disqualification, so one long or one switch anywhere kills BC homing
+   everywhere in the function. op_clobbers already returns the precise per-op
+   answer, and both IY packs already consume it that way. This asks the narrow
+   question instead: does anything inside THIS candidate's live range clobber BC?
+
+   Conservative in two directions on purpose. The live range is the hole-free
+   [start,end], so a value with a hole over the clobber still reads as crossing
+   it (that imprecision is the interference work's problem, not this one), and a
+   candidate is rejected outright if its range is unknown. */
+static int vreg_bc_clean(const Func *f, int v)
+{
+    const LiveRange *lr = ir_live_range(f, v);
+    if (!lr || lr->start < 0) return 0;
+    int g = 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+            if (g < lr->start || g > lr->end) continue;
+            if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) return 0;
+        }
+    return 1;
+}
+
+/* [IR_BCPERCAND=0] Default-on after the matrix: switchbench -1.96%..-5.63% and
+   widthbench -0.14%..-1.43% on all six valid-tick CPUs, every other suite within
+   12 ticks (the shared test.c, both signs); no new aborts over corpus x 10 CPUs x
+   sp/fp; adv_a -4/-6, clisp -59/-8, enigma unchanged. Opt out to revert. */
+static int bcpercand_on(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_BCPERCAND"); on = !(e && e[0] == '0'); }
+    return on;
+}
+
 static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                        const int *bb_first_op, const int *def_kind,
                        const int *write_count, const int *use_count,
-                       const long *cost_benefit)
+                       const long *cost_benefit, int vetoed)
 {
     if (opt_disabled("bc-pack")) return;
     if (f->n_vregs <= 0) return;
@@ -2159,6 +2212,14 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
     }
     int nc = collect_bc_temp_cands(f, bb_first_op, def_kind, write_count,
                                    use_count, itloc, itlo, ithi, cand);
+    /* [IR_BCPERCAND] In a function the whole-function veto rejected, keep only the
+       candidates whose own live range never crosses a BC clobber. */
+    if (vetoed) {
+        int k = 0;
+        for (int i2 = 0; i2 < nc; i2++)
+            if (vreg_bc_clean(f, cand[i2].vreg)) cand[k++] = cand[i2];
+        nc = k;
+    }
 
     /* 5a: cost-benefit EVICTION, folded into the packer (default ON;
        --opt-disable=bc-evict opts out). The BC pickers give a picker-placed tenant
@@ -2185,13 +2246,14 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 int jlo, jhi;
                 bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
                 int blocks = 0, hotter = 0;
+                ir_liveprobe_decision_begin_site(1);
                 for (int i = 0; i < nc; i++) {                      /* blocks a cand? */
-                    int s = cand[i].flo > jlo ? cand[i].flo : jlo;
-                    int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
-                    if (s <= e) { blocks = 1;
+                    if (iv_overlap(f, cand[i].vreg, j,
+                                   cand[i].flo, cand[i].fhi, jlo, jhi)) { blocks = 1;
                         if (use_count[cand[i].vreg] >= use_count[j]) hotter = 1;
                     }
                 }
+                ir_liveprobe_decision_end();
                 /* Don't evict a WRITTEN loop-carried tenant (wc≥2 = an IV
                    redefined each iteration) for a mere AGGREGATE of colder disjoint
                    temps — the sum ignores the per-temp
@@ -2214,16 +2276,17 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
                 for (int i = 0; i < nc; i++) {
                     if (cand[i].flo <= last) continue;
                     int clash = 0;
+                    ir_liveprobe_decision_begin_site(2);
                     for (int j = 0; j < f->n_vregs && !clash; j++) {
                         if (f->vreg_to_phys[j] != IR_PR_BC) continue;
                         if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;
                         if (pass == 1 && evictable[j]) continue;   /* freed */
                         int jlo, jhi;
                         bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
-                        int s = cand[i].flo > jlo ? cand[i].flo : jlo;
-                        int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
-                        if (s <= e) clash = 1;
+                        if (iv_overlap(f, cand[i].vreg, j,
+                                       cand[i].flo, cand[i].fhi, jlo, jhi)) clash = 1;
                     }
+                    ir_liveprobe_decision_end();
                     if (clash) continue;
                     ben[pass] += cost_benefit[cand[i].vreg];
                     last = cand[i].fhi;
@@ -2249,15 +2312,16 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
         int v = cand[i].vreg;
         if (cand[i].flo <= last_fhi) continue;   /* overlaps a packed sibling */
         int clash = 0;
+        ir_liveprobe_decision_begin_site(3);
         for (int j = 0; j < f->n_vregs && !clash; j++) {
             if (f->vreg_to_phys[j] != IR_PR_BC) continue;
             if (f->vregs[j].flags & IR_VREG_BC_PACK) continue;   /* our own */
             int jlo, jhi;
             bc_tenant_interval(j, itloc, itlo, ithi, first_use, last_use, &jlo, &jhi);
-            int s = cand[i].flo > jlo ? cand[i].flo : jlo;
-            int e = cand[i].fhi < jhi ? cand[i].fhi : jhi;
-            if (s <= e) clash = 1;
+            if (iv_overlap(f, cand[i].vreg, j,
+                           cand[i].flo, cand[i].fhi, jlo, jhi)) clash = 1;
         }
+        ir_liveprobe_decision_end();
         if (clash) continue;
         f->vreg_to_phys[v] = IR_PR_BC;
         f->vregs[v].flags |= IR_VREG_BC_PACK;
@@ -2273,10 +2337,24 @@ static void ir_bc_pack(Func *f, const int *first_use, const int *last_use,
    stack-transient's def and its use (they'd break the push/pop TOS discipline
    or the LIFO balance). ALU/compare/load/store/conv are all fine: the value
    rides the stack across them untouched. */
+/* KNOWN GAP: this switches on op KIND and never WIDTH, so it clears an op whose
+   LOWERING stages through the stack — a width-4 IR_XOR/IR_AND/IR_OR emits
+   `push de; push hl; … cur_sp_adjust += 4`, and a park spanning one is no longer
+   at TOS when popped (emu.c miscompiles). Harmless today only because
+   bc_region_ok vetoes the whole pass for such functions. The fix is to DERIVE
+   this: teach op_clobbers to report IR_R_SP for ops that push (it never sets it
+   for any op today, though instr_effects already does at text level), then test
+   `op_clobbers(o) & (IR_R_SP|IR_R_MEM)` instead of listing kinds. An enumeration
+   has already been wrong twice — IR_ACC_* below, and the width-4 case. */
 static int stack_spill_span_hazard(OpKind k)
 {
     switch (k) {
     case IR_CALL: case IR_HCALL: case IR_ASM:
+    /* Wide (>4-byte) memory-accumulator ops are helper CALLS too — they carry a
+       HelperInfo just like IR_HCALL. They were missing here, which was invisible
+       while bc_region_ok vetoed the whole pass for such functions; lifting that
+       veto exposed it as a long_ir/longlong hang. */
+    case IR_ACC_BINOP: case IR_ACC_UNOP: case IR_ACC_CMP:
     case IR_LD_FAR: case IR_ST_FAR: case IR_LD_FARSYM:
     case IR_PUSH_ARG: case IR_PUSH_STRUCT:
     case IR_PUSH_DEHL_LONG: case IR_POP_DEHL_LONG:
@@ -3642,6 +3720,36 @@ void ir_alloc(Func *f)
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
+    /* [IR_BCVETO_PROBE] INERT — size the per-op BC veto. bc_region_ok is three
+       per-op facts (width-4 staging, non-char IR_SWITCH dispatch, IR_ACC_*
+       helpers) promoted to a WHOLE-FUNCTION disqualification, so one switch or
+       one long anywhere kills BC homing everywhere in the function. op_clobbers
+       already returns the precise per-op answer, and both IY packs already use it
+       that way ("op_clobbers(o) & IR_R_IY per op across the candidate's live
+       range"). This counts what the precise test would ADMIT that the blunt one
+       rejects: width-2 non-escaping vregs whose own live range never crosses a
+       BC-clobbering op. Upper bound — it ignores the packs' other predicates
+       (write-once, def kind, interference), so real wins are a subset. */
+    if (getenv("IR_BCVETO_PROBE") && !bc_region_ok) {
+        int cands = 0, clean = 0;
+        for (int v = 0; v < f->n_vregs; v++) {
+            const VReg *vr = &f->vregs[v];
+            if (vr->width != 2) continue;
+            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) continue;
+            const LiveRange *lr = ir_live_range(f, v);
+            if (!lr || lr->start < 0) continue;
+            cands++;
+            int crosses = 0, g = 0;
+            for (int i = 0; i < f->n_bbs && !crosses; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
+                    if (g < lr->start || g > lr->end) continue;
+                    if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) { crosses = 1; break; }
+                }
+            if (!crosses) clean++;
+        }
+        fprintf(stderr, "BCVETO %-22s has_long=%d has_bc_clobber=%d cands=%d bc_clean=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", has_long, has_bc_clobber, cands, clean);
+    }
     /* IR_IYLONG=0 restores the OLD gating (IY packing rides the BC veto), not
        "no IY packing at all" — the opt-out has to be a revert, not a third
        behaviour. */
@@ -4071,9 +4179,9 @@ void ir_alloc(Func *f)
            5a cost-benefit eviction (default on, --opt-disable=bc-evict): it may
            first evict a picker-placed BC tenant that a denser disjoint temp group
            out-benefits, then pack the freed BC. */
-        if (bc_region_ok)
+        if (bc_region_ok || bcpercand_on())
         ir_bc_pack(f, first_use, last_use, bb_first_op, def_kind,
-                   write_count, use_count, cost_benefit);
+                   write_count, use_count, cost_benefit, !bc_region_ok);
         /* LRA Phase 2c (default on, IR_NO_LRA opts out): home a DE-dirty
            reduction chain in IY (add iy,de), taking the spill losers BC couldn't. */
         if (iy_region_ok)
@@ -4086,6 +4194,23 @@ void ir_alloc(Func *f)
         /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the register-pressure
            fallback below BC-pack — a single-def/single-use word transient with
            no register free goes on the stack (push/pop) instead of a slot. */
+        /* Stack-transient spill (default on, IR_NO_STACK_SPILL opts out): the
+           register-pressure fallback below BC-pack — a single-def/single-use word
+           transient with no register free goes on the stack (push/pop) instead of
+           a slot.
+
+           NB the bc_region_ok gate is WRONG IN PRINCIPLE and load-bearing in
+           practice. It is a BC veto (has_long: long ops stage the low half THROUGH
+           BC; has_bc_clobber: l_case / dload / dstore) and a park uses no BC at
+           all — it costs 536 of 5523 corpus functions and 509 parks worth −675
+           instructions. But removing it exposed TWO defects the veto was hiding:
+           the wide-accumulator helper calls missing from stack_spill_span_hazard
+           (fixed below — long_ir/longlong hung), and, still open, that the hazard
+           switches on op KIND and never WIDTH, so a park may span a width-4
+           IR_XOR/IR_AND/IR_OR whose lowering pushes both halves (emu.c
+           miscompiles: 146 bytes of output against 194KB). Lifting the veto needs
+           a DERIVED, width-aware span guard, not a longer switch. See
+           STORE_ORDER_PLAN.md. */
         if (bc_region_ok)
         ir_stack_spill(f, bb_first_op, def_kind, write_count);
         /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
@@ -4150,9 +4275,8 @@ void ir_alloc(Func *f)
                     int ph = f->vreg_to_phys[w];
                     if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
                     if (first_use[w] < 0 || last_use[w] < 0) continue;
-                    int s = lo > first_use[w] ? lo : first_use[w];
-                    int e = hi < last_use[w] ? hi : last_use[w];
-                    if (s <= e) { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                    if (iv_overlap(f, v, w, lo, hi, first_use[w], last_use[w]))
+                        { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
                 }
                 if (!de_busy) de_free++;
                 if (!de_busy || !bc_busy) de_or_bc_free++;
@@ -4245,9 +4369,8 @@ void ir_alloc(Func *f)
                         int ph = f->vreg_to_phys[w];
                         if (ph != IR_PR_DE && ph != IR_PR_BC) continue;
                         if (first_use[w] < 0 || last_use[w] < 0) continue;
-                        int s = lo > first_use[w] ? lo : first_use[w];
-                        int e = hi < last_use[w] ? hi : last_use[w];
-                        if (s <= e) { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
+                        if (iv_overlap(f, v, w, lo, hi, first_use[w], last_use[w]))
+                            { if (ph == IR_PR_DE) de_busy = 1; else bc_busy = 1; }
                     }
                     int pair_busy = de_busy && bc_busy;   /* NEITHER pair free */
                     int callfree = 1;
@@ -4891,4 +5014,5 @@ void ir_alloc(Func *f)
     ir_ldslot_why_probe(f);
     ir_opres_why_probe(f);
     hr_recoverability_verify(f);
+    ir_liveprobe_flush(f->fn ? ir_sym_name(f->fn) : "?");
 }

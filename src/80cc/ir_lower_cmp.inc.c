@@ -359,8 +359,26 @@ static int gen_cmp_lt_ge(FILE *out, Func *f, const Op *op)
         char klo[16], khi[16];
         int cls = cmp_byte_src(f, op->src[0], cpu_has_index_halves(),
                                klo, khi, sizeof klo);
+        int loaded = 0;
+        /* cmp_byte_src is a PRE-check: it reports where the operand ALREADY
+           lives, so an operand still in its frame slot reports nothing and this
+           path used to decline — leaving load_binop_operands to stage the
+           constant into DE (`ld de,K` + the same byte-wise subtract off e/d).
+           On 808x/gbz80 there is no `sbc hl,de` to justify that: bring the
+           operand into HL (which the fallback does anyway) and subtract the
+           immediate halves directly. 6B/22c against 7B/26c, and DE stays free
+           for whatever else wanted it. The already-addressable cases above keep
+           priority — they need no load at all. */
+        if (!cls && (IS_808x() || IS_GBZ80())) {
+            load_to_hl(out, f, op->src[0]);
+            snprintf(klo, sizeof klo, "l");
+            snprintf(khi, sizeof khi, "h");
+            cls = 1; loaded = 1;
+        }
         if (cls) {
-            if (cls == 2 && op_is_ixd_slot(f, op->src[0]))
+            if (loaded)
+                ;                      /* load_to_hl did its own accounting */
+            else if (cls == 2 && op_is_ixd_slot(f, op->src[0]))
                 ss_note_reload(f, op->src[0]);
             else
                 ss_note_cache_read(f, op->src[0]);

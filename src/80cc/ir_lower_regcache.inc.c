@@ -69,6 +69,60 @@ static int vreg_in_pr_bc(const Func *f, int vreg_id)
     return ir_home_at(f, vreg_id) == IR_PR_BC;
 }
 
+/* True iff any vreg in this function is homed in DE or a DE half. The 8085
+   LHLX deref below reads through DE, and a small-offset word deref is one of
+   the shapes op_de_clean promises is DE-CLEAN — that promise is what lets a
+   DE home stay resident across it. So the LHLX form is only available when
+   nothing is homed there, and the promise has nothing to protect. */
+static int func_has_de_home(const Func *f)
+{
+    if (!f || !f->vreg_to_phys) return 1;          /* unknown: assume it does */
+    if (g_hc.func_whome >= 0) return 1;
+    for (int v = 0; v < f->n_vregs; v++) {
+        int p = ir_home_at(f, v);
+        /* IR_PR_DEHL is deliberately NOT here: a DE:HL-resident long is a
+           short-lived born-and-consumed value, and every user of this predicate
+           clobbers HL as well (the base load), so such a long can never be live
+           across one. Vetoing whole functions for owning one cost binary-trees
+           7 bytes and 0.8% of its cycles by refusing the LHLX deref there. */
+        if (p == IR_PR_DE || p == IR_PR_E || p == IR_PR_D) return 1;
+    }
+    return 0;
+}
+
+/* [IR_DEPARK_PROBE] INERT — size the dead-DE frame word load. The 8085
+   LDSI/LHLX slot read below parks DE (push/pop) because load_to_hl must hand it
+   back untouched; where DE is provably free that park is 22 cycles and 2 bytes
+   of pure overhead (42c/5B against 20c/3B). This counts park sites and how many
+   a "no DE home, no DE or DEHL belief, no pending spill" gate would accept, and
+   which condition blocks the rest — so the acceptance rate is known before any
+   codegen moves. Emits nothing: gate-on output is byte-identical. */
+static long dp_total, dp_free, dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend;
+/* Second population: the park sites where DE is dead for a reason that needs no
+   knowledge of what is IN it — the op being lowered is a PUSH_ARG and the next
+   op is the CALL, so the only DE reader left is this op's own `push hl` and the
+   call clobbers DE regardless. Sound even against a byte staged in E, which is
+   what sank the belief-based gate. */
+static long dp_precall;
+static void depark_probe_report(void)
+{
+    if (!dp_total) return;
+    fprintf(stderr, "DEPARKPROBE sites=%ld free=%ld (%.0f%%) blocked:"
+            " de_home=%ld de_belief=%ld dehl=%ld pending=%ld"
+            " | pre_call=%ld (%.0f%%)\n",
+            dp_total, dp_free, 100.0 * (double)dp_free / (double)dp_total,
+            dp_blk_home, dp_blk_de, dp_blk_dehl, dp_blk_pend,
+            dp_precall, 100.0 * (double)dp_precall / (double)dp_total);
+}
+static int depark_probe_on(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_DEPARK_PROBE");
+                 v = e ? atoi(e) : 0;
+                 if (v) atexit(depark_probe_report); }
+    return v;
+}
+
 /* True if vreg_id is a stack-transient spill (IR_PR_STACK): pushed at its def,
    popped at its single use — no frame slot. See ir_stack_spill (ir_alloc). */
 static int vreg_is_pr_stack(const Func *f, int vreg_id)
@@ -482,6 +536,61 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        push/pop leaves cur_sp_adjust untouched; just shift the slot offset
        +2 for the in-flight push. */
     if ((IS_8085()) && off >= 0 && off + 2 <= 255) {
+        if (depark_probe_on()) {
+            const char *why = "FREE";
+            dp_total++;
+            if      (func_has_de_home(f))  { dp_blk_home++; why = "de_home"; }
+            else if (L.rs.de >= 0)         { dp_blk_de++;   why = "de_belief"; }
+            else if (L.rs.dehl >= 0)       { dp_blk_dehl++; why = "dehl"; }
+            else if (L.pending_spill_v >= 0) { dp_blk_pend++; why = "pending"; }
+            else                             dp_free++;
+            if (lower_cur_op && lower_cur_op->kind == IR_PUSH_ARG
+                && cur_bb && cur_op_idx + 1 < cur_bb->n_ops
+                && (cur_bb->ops[cur_op_idx + 1].kind == IR_CALL
+                    || cur_bb->ops[cur_op_idx + 1].kind == IR_HCALL))
+                dp_precall++;
+            if (depark_probe_on() == 2)
+                fprintf(stderr, "DEPARKSITE %s v%d off=%d %s\n",
+                        f && f->fn ? ir_sym_name(f->fn) : "?", vreg_id, off, why);
+        }
+        /* Skip the park where DE is dead for a reason that does NOT depend on
+           knowing what is in it: the op being lowered is a width-2 PUSH_ARG whose
+           next op is the CALL. All that remains of this op is `push hl`
+           (gen_push_arg), and the call clobbers DE/E outright — so even a byte
+           staged in E with nothing in the cache to say so cannot be read before
+           it dies. That is what sank the belief-only version of this test
+           (rle/bitfieldbench: `ld a,(hl); ld e,a` then a store through E): the
+           evidence has to come from the control flow, not from the cache.
+           20c/3B against the parked 42c/5B; the
+           offset loses its +2 with the push gone. IR_DEPARK_PROBE sizes it: 5% of
+           corpus park sites, 23% of binary-trees'. `--opt-disable=depark` opts out.
+
+           NB there is deliberately no general "DE looks unused" shortcut here:
+           the register cache tracks only whole pairs (rs.a/bc/de/hl), so a value
+           living in E or D alone is invisible to it and any belief-only test is
+           unsound. Widening this needs real liveness, not a bigger gate. */
+        if (!opt_disabled("depark")
+            && !func_has_de_home(f) && L.pending_spill_v < 0
+            && lower_cur_op && lower_cur_op->kind == IR_PUSH_ARG
+            && cur_bb && cur_op_idx + 1 < cur_bb->n_ops
+            && (cur_bb->ops[cur_op_idx + 1].kind == IR_CALL
+                || cur_bb->ops[cur_op_idx + 1].kind == IR_HCALL)
+            /* ...and the call takes its arguments on the STACK. A believed DE or
+               DEHL tenant needs no check otherwise: one that is not recoverable
+               (no slot, not remat) cannot survive a call that clobbers DE/HL, so
+               it is already dead, and a recoverable one just reloads. The
+               exception is __sdcccall(1), which passes args in A/HL/DE — there
+               the cache hit can be the ONLY way the call reaches a slotless
+               value, so leave those parked. */
+            && !(cur_bb->ops[cur_op_idx + 1].kind == IR_CALL
+                 && cur_bb->ops[cur_op_idx + 1].call
+                 && (cur_bb->ops[cur_op_idx + 1].call->flags & SDCCCALL1))) {
+            emit(out, "ld\tde,sp+%d", off);
+            emit(out, "ld\thl,(de)");
+            invalidate_de_cache();
+            hl_about_to_change(vreg_id);
+            return;
+        }
         emit(out, "push\tde");
         emit(out, "ld\tde,sp+%d", off + 2);
         emit(out, "ld\thl,(de)");
@@ -1642,6 +1751,25 @@ static void load_to_dehl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         cache_dehl(vreg_id);
         return;
     }
+    /* 8085 sp-relative long load: LDSI + LHLX per half, the extended-op
+       analogue of the Rabbit/kc160 path above. Read the LOW half first so it
+       can go straight to BC (the DEHL cache invariant) while DE is still free
+       to address the high half — 52c/9B against the byte walk's 66c/11B, and
+       60c/11B against 74c/13B when HL has to end up holding the low half.
+       A is untouched either way. LDSI's offset is an unsigned byte. */
+    if (IS_8085() && !opt_disabled("lhlx-long") && off >= 0 && off + 2 <= 255) {
+        emit(out, "ld\tde,sp+%d", off);
+        emit(out, "ld\thl,(de)");    /* HL = low half */
+        emit(out, "ld\tbc,hl");      /* BC = low half (cache invariant) */
+        emit(out, "ld\tde,sp+%d", off + 2);
+        emit(out, "ld\thl,(de)");    /* HL = high half */
+        emit(out, "ex\tde,hl");      /* DE = high half, HL = the address */
+        if (!no_hl)
+            emit(out, "ld\thl,bc");  /* HL = low half */
+        hl_about_to_change(no_hl ? -1 : vreg_id);
+        cache_dehl(vreg_id);
+        return;
+    }
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");
     load_byte_adv(out, "c", 0);     /* C = byte 0 */
@@ -1672,9 +1800,16 @@ static void load_to_dehl(FILE *out, const Func *f, int vreg_id)
 
 static void store_dehl(FILE *out, const Func *f, int vreg_id)
 {
+    /* A fused byte chain hands us BC=low / DE=high with HL holding junk, where
+       every other producer hands us DE=high / HL=low. Consume that signal once
+       here; each path below either does not need HL (skip its `ld bc,hl`) or
+       restores it first. */
+    int bc_low = L.la.cur_dehl_bc_is_low;
+    L.la.cur_dehl_bc_is_low = 0;
     /* FP-relative long store. Preserves HL+DE entirely — no BC stash
        needed. PR_BC vregs survive across long stores when FP is on. */
     if (fp_active(f)) {
+        if (bc_low) emit_bc_to_hl(out);     /* fp paths store from HL */
         /* Deepest slot at TOS: discard the word (pop bc x2) and re-push
            DEHL — beats the synthetic long store. HL+DE kept, BC=low
            (contract). By-coincidence only. */
@@ -1719,6 +1854,14 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        half) afterwards. sp-mode + tos_pushpop_ok only. */
     if (off == 0 && !fp_active(f) && tos_pushpop_noex_ok(f)) {
         tw_log(vreg_id, 1, 0, off, off + 2 <= sp_rel_max(f));
+        /* This path discards the old slot contents THROUGH BC and pushes the low
+           half from HL, so a fused byte chain's BC=low / junk-HL form has to be
+           put back first. Two bytes, and measured to fire once in the whole bench
+           corpus (crcbench) — a special-cased discard here (`pop af` twice, or
+           `add sp,4` on gbz80/Rabbit) would be a hand-derived branch on a path
+           that essentially never runs, which is how the pop-clobbers-BC bug got
+           in in the first place. */
+        if (bc_low) emit_bc_to_hl(out);
         emit(out, "pop\tbc");           /* drop old low half */
         emit(out, "pop\tbc");           /* drop old high half */
         emit(out, "push\tde");          /* write high half (bytes 2-3) */
@@ -1730,8 +1873,9 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
        half from DE (native ld (sp+d),de on kc160; ex-de-hl on Rabbit).
        Ends DE=high, BC=low (the contract). */
     if (off >= 0 && off + 2 <= sp_rel_max(f)) {
+        if (bc_low) emit_bc_to_hl(out);     /* this path stores the low half from HL */
         emit(out, "ld\t(sp+%d),hl", off);
-        emit(out, "ld\tbc,hl");
+        if (!bc_low) emit(out, "ld\tbc,hl");
         if (IS_KC160()) {
             emit(out, "ld\t(sp+%d),de", off + 2);
         } else {
@@ -1741,10 +1885,31 @@ static void store_dehl(FILE *out, const Func *f, int vreg_id)
         }
         return;
     }
+    /* 8085 sp-relative long store: SHLX the HIGH half, byte-walk the low one
+       DOWNWARDS. Only the high half can go through SHLX — the exit contract is
+       DE = high half, and SHLX wants the address in DE, so a second `ld (de),hl`
+       would leave DE holding an address instead of the value. Storing the high
+       half first and swapping back recovers DE (`ex de,hl` after the store puts
+       the value back), and the low half's two bytes go out through HL, which
+       reads B and C without disturbing DE. 62c/11B against 74c/13B.
+       A is untouched. LDSI's offset is an unsigned byte. */
+    if (IS_8085() && !opt_disabled("lhlx-long") && off >= 0 && off + 2 <= 255) {
+        if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low half (contract) */
+        emit(out, "ex\tde,hl");          /* HL = high half */
+        emit(out, "ld\tde,sp+%d", off + 2);
+        emit(out, "ld\t(de),hl");        /* slot+2..3 = high half */
+        emit(out, "ex\tde,hl");          /* DE = high half again (contract) */
+        emit(out, "dec\thl");            /* HL = &slot+1 */
+        emit(out, "ld\t(hl),b");         /* slot+1 = low half, high byte */
+        emit(out, "dec\thl");            /* HL = &slot+0 */
+        emit(out, "ld\t(hl),c");         /* slot+0 = low half, low byte */
+        return;
+    }
     /* Stash low half (HL) into BC so HL is free for slot addressing (BC is
        clobbered by contract). 8 T-states for ld bc,hl vs 21 for the
-       push hl ... pop bc round trip. */
-    emit(out, "ld\tbc,hl");      /* BC = low (B=hi byte, C=lo byte) */
+       push hl ... pop bc round trip. Already done when a fused byte chain left
+       the low half in BC. */
+    if (!bc_low) emit(out, "ld\tbc,hl");   /* BC = low (B=hi byte, C=lo byte) */
     emit(out, "ld\thl,%d", off);
     emit(out, "add\thl,sp");         /* HL = &slot+0 */
     store_byte_adv(out, "c", 0);
@@ -1804,6 +1969,18 @@ static void store_dehl_cached(FILE *out, const Func *f, int vreg_id)
    advertised — its content is half of a long, not an int-class value. */
 static void cache_dehl_no_spill(FILE *out, int vreg_id)
 {
+    /* Arrived straight off a fused byte chain: BC already holds the low half and
+       HL holds junk, so the stash is not merely wasted but would read the wrong
+       register. Publish the DEHL cache without it and leave HL unclaimed — a
+       later reader recovers the low half itself via load_to_dehl's lazy
+       `ld hl,bc`. */
+    if (L.la.cur_dehl_bc_is_low) {
+        L.la.cur_dehl_bc_is_low = 0;
+        L.la.cur_dehl_dst_no_bc_stash = 0;
+        invalidate_hl_cache();          /* HL is junk; clears rs.de/rs.dehl too */
+        L.rs.dehl = vreg_id;
+        return;
+    }
     /* The `ld bc,hl` stash is wasted when the next consumer is the
        FP-mode byte-direct binop chain — it reads H/L directly and writes
        BC itself at the chain's tail, so subsequent ops still see BC=low. */
@@ -1829,7 +2006,10 @@ static int vreg_is_pr_dehl(const Func *f, int v);
    stacked-arg skip). */
 static void emit_dehl_stack_push(FILE *out, int vreg_id)
 {
-    emit(out, "ld\tbc,hl");
+    /* BC already the low half (fused byte chain) — the stash would read a junk
+       HL. The pushed image is the same either way. */
+    if (L.la.cur_dehl_bc_is_low) L.la.cur_dehl_bc_is_low = 0;
+    else                         emit(out, "ld\tbc,hl");
     emit(out, "push\tde");
     emit(out, "push\tbc");
     L.cur_sp_adjust += 4;
