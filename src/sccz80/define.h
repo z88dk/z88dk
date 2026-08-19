@@ -380,16 +380,29 @@ struct gototab_s {
 #define CPU_R4K      512
 #define CPU_R6K      1024
 #define CPU_KC160    2048
+#define CPU_KR580VM1 4096
 
 #define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K)
 
 #define IS_8080() (c_cpu == CPU_8080 )
 #define IS_8085() (c_cpu == CPU_8085 )
-#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
+/* KR580VM1: an 8080 superset - no CB set, no IX/IY, no exx - so it belongs
+   with the 8080 family for every "not a z80" gate. */
+#define IS_KR580VM1() (c_cpu == CPU_KR580VM1)
+#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085 || c_cpu == CPU_KR580VM1)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
 #define IS_Z80N() (c_cpu == CPU_Z80N)
 #define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
 #define IS_KC160() (c_cpu == CPU_KC160)
+
+/* Popping an ARBITRARY stack word into AF is harmless - it lands in the flags
+   and nothing else. NOT on the KR580VM1: its POP PSW loads MF, the data-bank
+   select (PSW bit 3), so a word popped to discard it switches the bank and
+   every later data access reads the other 64K. The Russian instruction-set
+   document is explicit - POP PSW is the one data-transfer instruction that
+   touches the flags, and its table lists MF among them. A push/pop pair is
+   still fine: MF pushed is MF popped. */
+#define CPU_POP_AF_IS_SAFE() (!IS_KR580VM1())
 
 
 

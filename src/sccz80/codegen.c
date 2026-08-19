@@ -1293,7 +1293,15 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
             ret -= 4;
         }
 
-        ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
+        /* Discarding a stack word. Not through AF on the KR580VM1: POP PSW
+           loads MF, the data-bank select, so the bank would follow whatever
+           happened to be on the stack. */
+        if (CPU_POP_AF_IS_SAFE()) {
+            ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
+        } else {
+            ol("inc\tsp");
+            ol("inc\tsp");
+        }
         if (type->return_type->kind == KIND_LONGLONG) {
             ol("ld\tbc,__i64_acc");
             push("bc");
@@ -1623,8 +1631,11 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
             while (k) {
                 if (usebc) {
                     ol("pop\tbc");
-                } else {
+                } else if (CPU_POP_AF_IS_SAFE()) {
                     ol("pop\taf");
+                } else {
+                    ol("inc\tsp");       /* VM1: AF would take MF with it */
+                    ol("inc\tsp");
                 }
                 k -= 2;
             }
@@ -5401,8 +5412,11 @@ void gen_pop_frame(void)
                 ot("pop\t");
                 outstr(FRAME_REGISTER);
                 nl();
-            } else {
+            } else if (CPU_POP_AF_IS_SAFE()) {
                 ol("pop\taf");
+            } else {
+                ol("inc\tsp");           /* VM1: AF would take MF with it */
+                ol("inc\tsp");
             }
         } else if (c_debug_entry_points) {
             callrts("l_debug_pop_frame");

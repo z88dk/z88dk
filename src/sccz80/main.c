@@ -96,6 +96,7 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "CPU Targetting:", NULL, NULL, 0 },
     { 0, "m8080", OPT_ASSIGN|OPT_INT, "Generate output for the i8080", &c_cpu, NULL, CPU_8080 },
     { 0, "m8085", OPT_ASSIGN|OPT_INT, "Generate output for the i8085", &c_cpu, NULL, CPU_8085 },
+    { 0, "mvm1", OPT_ASSIGN|OPT_INT, "Generate output for the KR580VM1", &c_cpu, NULL, CPU_KR580VM1 },
     { 0, "mez80_z80", OPT_ASSIGN|OPT_INT, "Generate output for the ez80 in z80 mode", &c_cpu, NULL, CPU_EZ80_Z80 },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, NULL, CPU_Z80 },
     { 0, "mz80n", OPT_ASSIGN|OPT_INT, "Generate output for the z80n", &c_cpu, NULL, CPU_Z80N },
@@ -296,6 +297,11 @@ int main(int argc, char** argv)
     if ( c_cpu == CPU_8085 ) {
         c_notaltreg = 1;
         WriteDefined("CPU_8085", 1);
+    }
+
+    if ( c_cpu == CPU_KR580VM1 ) {
+        c_notaltreg = 1;
+        WriteDefined("CPU_KR580VM1", 1);
     }
 
     if ( c_cpu == CPU_GBZ80 ) {
