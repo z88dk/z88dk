@@ -89,7 +89,7 @@ jobs:
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
-        ./build.sh -v -b
+        MAKE_CONCURRENCY=-j4 ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin

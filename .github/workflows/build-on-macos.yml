@@ -30,11 +30,11 @@ jobs:
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
-        MAKE_CONCURRENCY=-j3 ./build.sh -v -l
+        ./build.sh -v -l
     - name: Build libraries
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
-        MAKE_CONCURRENCY=-j1 ./build.sh -v -b
+        MAKE_CONCURRENCY=-j3 ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
