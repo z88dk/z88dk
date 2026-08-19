@@ -21,9 +21,8 @@ Binary: `z88dk-80cc`. Source: `src/80cc/`. Rules file: `lib/80cc_rules.1`.
 
 | Flag | Meaning |
 |------|---------|
-| `-fframe-pointer` | IX is the frame pointer (`ix+d` locals). Use on **Z80** 80cc TIMER / PRINTF recipes except mbf32. |
+| `-fframe-pointer` | IX is the frame pointer (`ix+d` locals). Use on **Z80** 80cc TIMER / PRINTF recipes, including `--math-mbf32`. |
 | (default) | Omit the frame pointer. Locals via `sp`. IX is a spare index register. |
-| `--math-mbf32` | **Do not** add `-fframe-pointer`. mbf32 clobbers IX. |
 
 8085 has no IX. Do not pass `-fframe-pointer` on `-clib=8085`.
 
@@ -32,7 +31,7 @@ Integer benches (sieve, fannkuch) are usually smaller and faster with `-fframe-p
 Recipe comment used in `z88dk-classic/readme.txt`:
 
 ```text
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 ```
 
 ## TIMER / correctness

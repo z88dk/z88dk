@@ -34,7 +34,7 @@ zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 
 80cc/classic
 zcc +test -compiler=80cc -vn -fframe-pointer -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 80cc/classic/8085
 zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
@@ -63,36 +63,36 @@ RESULT
 PI.C
 
 
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 sccz80 / classic c library / 8085 CPU
-7295 bytes less page zero
+7390 bytes less page zero
 
-cycle count  = 7380146447
-time @ 4MHz  = 7380146447 / 4*10^6 = 30 min 45 sec
+cycle count  = 1922636057
+time @ 4MHz  = 1922636057 / 4*10^6 =  8 min  1 sec
 
 
-Z88DK April 4, 2022
+Z88DK August 19, 2026
 sccz80 / classic c library
-7154 bytes less page zero
+7252 bytes less page zero
 
-cycle count  = 4028061102
-time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
+cycle count  = 1992348390
+time @ 4MHz  = 1992348390 / 4*10^6 =  8 min 18 sec
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic c library
-7633 bytes less page zero
+7718 bytes less page zero
 
-cycle count  = 4272344605
-time @ 4MHz  = 4272344605 / 4*10^6 = 17 min 48 sec
+cycle count  = 2229596893
+time @ 4MHz  = 2229596893 / 4*10^6 =  9 min 17 sec
 
 
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 80cc / classic c library / 8085 CPU
-7745 bytes less page zero
+7639 bytes less page zero
 
-cycle count  = 7569463213
-time @ 4MHz  = 7569463213 / 4*10^6 = 31 min 32 sec
+cycle count  = 1979531647
+time @ 4MHz  = 1979531647 / 4*10^6 =  8 min 15 sec
 
 
 Z88DK August 16, 2026
