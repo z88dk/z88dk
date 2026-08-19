@@ -49,8 +49,8 @@ optimiser.ok: $(OPT_SCCZ80) $(OPT_80CC)
 	  --variant=sccz80:$(OPT_SCCZ80) --variant=80cc-sp:$(OPT_80CC)
 	test `grep -c '^\._foo$$' opt_stitch.asm` -eq 1
 	test `grep -c '^\._bar$$' opt_stitch.asm` -eq 1
-	! grep -q 'i_10_sccz80' opt_stitch.asm
-	! grep -q 'defc' opt_stitch.asm
+	test `grep -c 'i_10_sccz80' opt_stitch.asm` -eq 0
+	test `grep -c 'defc' opt_stitch.asm` -eq 0
 	z88dk-z80asm -mz80 -oopt_stitch.bin opt_stitch.asm
 	touch $@
 
