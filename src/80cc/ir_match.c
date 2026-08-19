@@ -903,9 +903,9 @@ static const PatternDef ir_patterns[] = {
 
     { .name = "rotl", .n_ops = 3,
       .flags = IR_PAT_EITHER_ORDER | IR_PAT_COMMUTATIVE,
-      /* gen_rotl emits CB shifts (srl/rr/set); on 8080/8085 (no CB ops)
+      /* gen_rotl emits CB shifts (srl/rr/set); on the 8080 family (no CB ops)
          leave the SHL|SHR|OR unfused so it lowers via the shift helpers. */
-      .exclude_cpus = CPU_8080 | CPU_8085,
+      .exclude_cpus = CPU_8080 | CPU_8085 | CPU_KR580VM1,
       .ops = {
           { .kind = IR_SHL, .dst = RV_T1, .src0 = RV_V,
             .imm_pred = IR_IMM_ANY, .width = 4 },

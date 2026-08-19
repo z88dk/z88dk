@@ -1583,11 +1583,11 @@ static int gen_shr(FILE *out, Func *f, const Op *op)
 static int gen_sar16(FILE *out, Func *f, const Op *op)
 {
     /* gbz80 HAS the CB shift set — sra h (cb 2c) / rr l (cb 1d) / sra l
-       assemble for it. Only 8080 genuinely lacks a shift-right and needs the
-       l_asr helper; 8085 has the undocumented ARHL (`sra hl`), handled below.
-       gbz80 was excluded here in error, which sent its every arithmetic `>>`
-       to a library call. */
-    int has_sra = !IS_8080();
+       assemble for it. 8080 genuinely lacks a shift-right and needs the
+       l_asr helper; 8085 has the undocumented ARHL (`sra hl`), handled below;
+       the KR580VM1 has neither, so it goes the 8080 way. gbz80 was excluded
+       here in error, which sent its every arithmetic `>>` to a library call. */
+    int has_sra = CPU_HAS_CB_SHIFTS() || CPU_HAS_SRA_HL();
 
     if (op->src[1] < 0) {                        /* constant count */
         int count = (int)op->imm & 0x1f;

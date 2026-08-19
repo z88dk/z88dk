@@ -2033,8 +2033,7 @@ static int param_caller_off(const Func *f, int vreg_id)
                        ipset 3 and gbz80/8080's bare di use no data stack → 0. */
                     + (f->is_interrupt ? 12
                        : ((f->flags & CRITICAL)
-                          && !(IS_RABBIT()) && !(IS_GBZ80())
-                          && !(IS_8080()) ? 2 : 0));
+                          && CPU_HAS_DI_SAVE() ? 2 : 0));
     /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
        / __z88dk_sdccdecl R→L (param0 lowest — just above the return addr).
        Must match emit_prologue. */
@@ -3632,8 +3631,12 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
                Gated to tos_pushpop_ok CPUs: kc160 has dear push/pop and cheap
                sp addressing, so `pop af` there is a byte win but a tick loss. */
             int n = f->frame_size;
-            while (n >= 2) { emit(out, "pop\taf"); n -= 2; }
-            if (n) emit(out, "inc\tsp");
+            /* Where a discarded word must not go through AF (VM1: PSW bit 3
+               is the data-bank select) `inc sp` reclaims it instead - the
+               same 10T per word, one byte more. */
+            if (CPU_POP_AF_IS_SAFE())
+                while (n >= 2) { emit(out, "pop\taf"); n -= 2; }
+            while (n-- > 0) emit(out, "inc\tsp");
         } else if (is_acc) {
             /* Result is in the accumulator (memory / alt-regs) — a plain
                sp restore is safe, nothing in HL/DE to preserve. */
@@ -3713,8 +3716,8 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
     if (f->flags & CRITICAL) {
         if (IS_RABBIT())
             emit(out, "ipres");
-        else if (IS_GBZ80() || IS_8080())
-            emit(out, "ei");          /* gbz80/8080: bare ei (IFF not readable) */
+        else if (!CPU_HAS_DI_SAVE())
+            emit(out, "ei");          /* gbz80/8080/VM1: bare ei (IFF not readable) */
         else
             emit(out, "call\tl_pop_ei");
     }
@@ -3887,7 +3890,7 @@ static void emit_prologue(FILE *out, Func *f)
            l_push_di (frame offsets account for the 2 bytes). */
         if (IS_RABBIT())
             emit(out, "ipset\t3");
-        else if (IS_GBZ80() || IS_8080())
+        else if (!CPU_HAS_DI_SAVE())
             emit(out, "di");
         else
             emit(out, "call\tl_push_di");

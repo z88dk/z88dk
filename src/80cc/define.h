@@ -370,12 +370,18 @@ struct gototab_s {
 #define CPU_R4K      512
 #define CPU_R6K      1024
 #define CPU_KC160    2048
+#define CPU_KR580VM1 4096
 
 #define CPU_RABBIT (CPU_R2KA|CPU_R3K|CPU_R4K|CPU_R6K)
 
 #define IS_8080() (c_cpu == CPU_8080 )
 #define IS_8085() (c_cpu == CPU_8085 )
-#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
+/* KR580VM1 (КР580ВМ1): a Soviet 8080 with ten extra instructions
+   and two prefixes. It is an 8080 superset - it has no CB set, no IX/IY and
+   no exx/af', so it belongs to the 8080 family for every "not a z80" gate.
+   What it adds over the 8080 is listed as the CPU_HAS_* flags below. */
+#define IS_KR580VM1() (c_cpu == CPU_KR580VM1)
+#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085 || c_cpu == CPU_KR580VM1)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
 #define IS_Z80N() (c_cpu == CPU_Z80N)
 #define IS_EZ80() (c_cpu == CPU_EZ80_Z80)
@@ -387,6 +393,83 @@ struct gototab_s {
    instructions only it has, e.g. `alu a,(sp+n)` / `alu hl,(sp+n)`, which r3k,
    r4k and r5k all reject. */
 #define IS_R6K()      ((c_cpu & CPU_R6K) != 0)
+
+/* ---------------------------------------------------------------------------
+   Instruction-selection flags.
+
+   Ask what the CPU CAN DO, not which CPU it is. A flag names one instruction
+   (or one closed family) and lists every CPU that has it, so a lowering site
+   reads as a capability test and a new CPU joins by editing this table.
+
+   The KR580VM1 column comes from the ten instructions it adds to the 8080:
+
+     08/18   sub hl,bc / sub hl,de      (DSUB)   S Z OF, and CY
+     CB/DD   cp  hl,bc / cp  hl,de      (DCMP)   the same flags, HL kept
+     28 xx   the CS prefix in front of dad/dsub/dcmp makes it take the carry:
+             adc hl,rr / sbc hl,rr / cpc hl,rr
+     10/20/30  ld (hl),and (hl) / or / xor      (ANX/ORX/XRX)  (hl) op= a
+     D9      ld (de),hl                (SHLX)
+     ED      ld hl,(de)                (LHLX)
+     FD      jp of,nn                  (JOF)    branch on the overflow flag
+     38 xx   the RS prefix substitutes the second pointer pair h'/l' for hl
+
+   Three of these (DSUB bc, SHLX, LHLX) the 8085 has as well, with the same
+   opcodes, so those flags carry both CPUs.
+   --------------------------------------------------------------------------- */
+
+/* 16-bit HL - rr, no carry in. 8085 DSUB reaches BC only; the VM1 reaches
+   BC and DE; the Rabbit has the DE form and no BC form. The z80 family has
+   no plain `sub hl,rr` at all - it subtracts through sbc with a cleared CY. */
+#define CPU_HAS_SUB_HL_BC() (IS_8085() || IS_KR580VM1())
+#define CPU_HAS_SUB_HL_DE() (IS_KR580VM1() || IS_RABBIT())
+
+/* 16-bit HL - rr - CY. z80 family: sbc hl,rr. VM1: the CS prefix on DSUB.
+   Unlike `sub hl,rr`, which the Rabbit has for DE only, every CPU with this
+   has the full set (bc, de, hl, sp). */
+#define CPU_HAS_SBC_HL()    (IS_KR580VM1() || !(IS_808x() || IS_GBZ80()))
+
+/* 16-bit compare that keeps HL - VM1 only, and better than the z80 here,
+   which has to `or a / sbc hl,de` and then rebuild HL. */
+#define CPU_HAS_CP_HL_BC()  (IS_KR580VM1())
+#define CPU_HAS_CP_HL_DE()  (IS_KR580VM1())
+
+/* Word load/store through DE, leaving HL free to be the value. */
+#define CPU_HAS_LD_HL_IND_DE() (IS_8085() || IS_KR580VM1())
+#define CPU_HAS_LD_IND_DE_HL() (IS_8085() || IS_KR580VM1())
+
+/* Read-modify-write of (hl) against A in one instruction: and/or/xor only,
+   no add or sub form. Worth having for the byte-blender loops (md5, crc). */
+#define CPU_HAS_MEM_ALU_A() (IS_KR580VM1())
+
+/* A second pointer pair, reached with the RS prefix. It is h'/l' to the
+   assembler; the prefix costs 4T and one byte per instruction that uses it. */
+#define CPU_HAS_ALT_HL()    (IS_KR580VM1())
+
+/* Branch on signed overflow. The 8085 spells the same flag K and has both
+   polarities (jk/jnk); the VM1 spells it OF and has the set form only. */
+#define CPU_HAS_JP_OF()     (IS_KR580VM1())
+#define CPU_HAS_JP_K()      (IS_8085())
+
+/* The CB shift/bit set (sra, rr, srl, bit, set, res). The whole 8080 family
+   is without it; the gbz80 has it even though it has no index registers. */
+#define CPU_HAS_CB_SHIFTS() (!IS_808x())
+
+/* The interrupt-enable state can be read back and put on the stack, so a
+   __critical region can restore what it found (l_push_di / l_pop_ei). The
+   8080 and the VM1 cannot read IFF, so they use a bare di/ei pair. */
+#define CPU_HAS_DI_SAVE()   (!(IS_RABBIT() || IS_GBZ80() || IS_8080() || IS_KR580VM1()))
+
+/* Popping an ARBITRARY stack word into AF is harmless - it lands in the flags
+   and nothing else. NOT true on the KR580VM1: MF, the data-bank select, is
+   PSW bit 3, so `pop af` of a word with bit 3 set switches the bank under the
+   program and every later data access reads the other 64K. `push af`/`pop af`
+   round-trips are fine (MF pushed is MF popped); only discarding stack words
+   through AF is not. */
+#define CPU_POP_AF_IS_SAFE() (!IS_KR580VM1())
+
+/* `sra hl` - the 8085's ARHL. The VM1 does not have it, and with no CB set
+   either its arithmetic right shift goes to the l_asr helper, as on the 8080. */
+#define CPU_HAS_SRA_HL()    (IS_8085())
 
 
 

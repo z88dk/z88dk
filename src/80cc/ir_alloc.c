@@ -2401,7 +2401,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
        fastpath via spill_de_unless_dead was the crash). EXCLUDED: ez80/kc160/
        rabbit (cheap native sp-relative slots — parking doesn't pay). */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
-          || IS_8080() || IS_8085() || IS_GBZ80())) return;
+          || IS_808x() || IS_GBZ80())) return;
 
     typedef struct { int vreg, flo, fhi; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
