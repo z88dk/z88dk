@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - "master"
-    paths-ignore:
-      - '**.md'
-      - 'doc/**'
+    tags:
+      - '*'
+  schedule:
+    - cron: '00 04 * * MON'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -108,9 +110,10 @@ jobs:
         with:
           images: ${{ env.REGISTRY_IMAGE }}
           tags: |
-            type=raw,value=latest
-            type=raw,value={{date 'YYYYMMDD'}}
-            type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+            type=raw,value={{date 'YYYYMMDD'}},enable=${{ github.event_name == 'schedule' }}
+            type=sha,format=short,enable=${{ github.event_name == 'push' }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
