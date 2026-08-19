@@ -5,10 +5,10 @@
  * every CPU and needs no reference table. Cases are chosen to cover the shapes
  * a divide core dispatches on:
  *
- *   - 16-bit divisors, which the 8085 core takes on a register-only fast path
- *     (l_long_div_0.asm div16) and the z80 fast-math family dispatches to
- *     l_fast_divu_32_32x16. This is the common case in C: a long divided by an
- *     int or a small constant.
+ *   - 16-bit divisors, which the 8085/8080/gbz80 cores take on a register-only
+ *     fast path (l_long_div_0.asm div16) and the z80 fast-math family dispatches
+ *     to l_fast_divu_32_32x16. This is the common case in C: a long divided by
+ *     an int or a small constant.
  *   - divisors either side of 0x8000, where the running remainder needs a 17th
  *     bit and the trial subtraction becomes unconditional.
  *   - genuine 32-bit divisors, powers of two, and 1 / 0xFFFFFFFF boundaries.

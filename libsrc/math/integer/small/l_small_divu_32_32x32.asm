@@ -9,6 +9,7 @@ PUBLIC l_small_divu_32_32x32
 PUBLIC l0_small_divu_32_32x32,  l1_small_divu_32_32x32
 
 EXTERN error_divide_by_zero_mc
+EXTERN l0_divu_32_32x16
 
    ; alternate entry to swap dividend / divisor
    
@@ -42,6 +43,18 @@ l_small_divu_32_32x32:
    jr z, divide_zero  
 
 l0_small_divu_32_32x32:
+
+   ; 16-bit divisor -> public 32/16 helper (small or fast via l_divu_32_32x16)
+
+   ld a,d
+   or e
+   jr nz, divu_32x32
+   push hl                     ; 16-bit divisor
+   exx                         ; dehl = dividend
+   pop bc                      ; bc = divisor  (l0_divu_32_32x16 contract)
+   jp l0_divu_32_32x16
+
+divu_32x32:
 
    xor a
    push hl
