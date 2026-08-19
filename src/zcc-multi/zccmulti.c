@@ -2,8 +2,8 @@
  * z88dk-zcc-multi
  *
  * Parse post-copt assembly from more than one compiler variant.
- * Pick one body per function by assembled size (default) or a
- * static T-state sum. Write one assembly file for z80asm.
+ * Pick one body per function by a static T-state sum (default)
+ * or assembled size. Write one assembly file for z80asm.
  */
 
 #include <ctype.h>
@@ -69,7 +69,7 @@ typedef struct {
 static const char *priority[] = { "sccz80", "80cc-sp", "80cc-fp", NULL };
 
 static char  *opt_cpu = "z80";
-static int    opt_metric = METRIC_SIZE;
+static int    opt_metric = METRIC_TICKS;
 static char  *opt_data_variant = "sccz80";
 static char  *opt_output;
 static char  *opt_report;
@@ -1708,7 +1708,7 @@ static void print_verbose(void)
 static void usage(void)
 {
     fprintf(stderr,
-            "Usage: z88dk-zcc-multi --cpu=<cpu> --metric=size|ticks\n"
+            "Usage: z88dk-zcc-multi --cpu=<cpu> --metric=ticks|size\n"
             "       --data-variant=<name> --variant=<name>:<path.asm>...\n"
             "       --output=<path.asm> [--report=<path.tsv>] [--verbose]\n"
             "       [--z80asm=<path>] [--asm-include=<dir>] [--list-dir=<dir>]\n");

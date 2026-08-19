@@ -349,7 +349,7 @@ static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_80cc_exe = "z88dk-80cc";
 static char  *c_zccmulti_exe = "z88dk-zcc-multi";
-static char  *c_compiler_metric = "size";
+static char  *c_compiler_metric = "ticks";
 static char  *c_compiler_multi_report = NULL;
 static char  *c_cpp_exe = "z88dk-ucpp";
 static char  *c_sdcc_preproc_exe = "z88dk-ucpp";
@@ -555,7 +555,7 @@ static option options[] = {
     { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
 
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
-    { 0, "compiler-metric", OPT_STRING, "Metric for -compiler=multi: size or ticks", &c_compiler_metric, NULL, 0},
+    { 0, "compiler-metric", OPT_STRING, "Metric for -compiler=multi: ticks (default) or size", &c_compiler_metric, NULL, 0},
     { 0, "compiler-multi-report", OPT_STRING, "Write a TSV winner report for -compiler=multi", &c_compiler_multi_report, NULL, 0},
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi)" , &c_compiler_type, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},

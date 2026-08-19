@@ -101,7 +101,7 @@ The mix is not whole-program LTO.
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Switch | `-compiler=multi` | User requirement. Matches `-compiler=sccz80`. |
-| Metric flags | `-compiler-metric=size` (default) and `-compiler-metric=ticks` | Multi is already selected by `-compiler=multi`. |
+| Metric flags | `-compiler-metric=ticks` (default) and `-compiler-metric=size` | Multi is already selected by `-compiler=multi`. Ticks matches TIMER better than size. |
 | Tool shape | New binary `z88dk-zcc-multi` | Parser and selector are not trivial. zcc already shells to copt and z80asm via `process()`. |
 | Data source | sccz80 variant | Named objects must appear once. sccz80 is the default compiler. |
 | Preprocess | Once per variant | Benches use `#ifdef __80CC`. One preprocess would drop that path. |
@@ -130,8 +130,8 @@ The mix is not whole-program LTO.
 | Switch | Type | Default | Meaning |
 |--------|------|---------|---------|
 | `-compiler=multi` | existing `compiler` string | n/a | Enable multi mode. |
-| `-compiler-metric=size` | new string | `size` | Select the smaller assembled body. |
-| `-compiler-metric=ticks` | new string | | Select the lower static T-state sum. |
+| `-compiler-metric=ticks` | new string | `ticks` | Select the lower static T-state sum. |
+| `-compiler-metric=size` | new string | | Select the smaller assembled body. |
 | `-compiler-multi-report=path` | new string | unset | Write a TSV report. |
 
 Unknown metric values MUST be an error.
@@ -1539,7 +1539,7 @@ The metric and the IX rule are enough to implement.
 
 PR 8 MAY land after PR 7.
 
-Size is the default metric.
+Ticks is the default metric.
 
 PR 7 MUST not wait on ticks.
 

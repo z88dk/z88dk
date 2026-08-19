@@ -5,7 +5,7 @@ all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helper
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
 	test -f twofuncs.c.asm
-	grep -q 'zcc-multi: metric=size' twofuncs.c.asm
+	grep -q 'zcc-multi: metric=ticks' twofuncs.c.asm
 	test `grep -c '^\._foo$$' twofuncs.c.asm` -eq 1
 	test `grep -c '^\._bar$$' twofuncs.c.asm` -eq 1
 	test `grep -c '^\._g' twofuncs.c.asm` -eq 1
