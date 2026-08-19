@@ -791,6 +791,7 @@ static const char *idx_pr_name(int pr)
 {
     if (pr == IR_PR_IX) return "ix";
     if (pr == IR_PR_IY) return "iy";
+    if (pr == IR_PR_HL_ALT) return "hl'";   /* VM1 idx2: the RS-prefixed pair */
     return NULL;
 }
 

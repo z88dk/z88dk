@@ -2603,8 +2603,17 @@ static int g0_word_cost(int reg, int kind)
        and letting idx_ben value ez80 sp homes correctly (fp slot stays cheaper). */
     static const int EZ80[GR_N][GK_N] = {
         /*SLOT*/{8,8,6,16}, /*BC*/{2,2,2,2}, /*DE*/{2,2,2,2}, /*IX*/{3,5,4,2}, /*IY*/{3,5,4,2} };
+    /* KR580VM1: an 8080-class slot (measured 44 read / 39 write / 68 word-RMW,
+       so the Z80 row is close) with h'l' as the index home. Its numbers are the
+       measured RS-prefixed idioms - push/pop 25 either way, `ld a,(hl'\')` 11,
+       `inc hl'\'` 9 - which beat IX/IY on deref because there is no
+       displacement to encode. See vm1_cost_bench.py. */
+    static const int VM1[GR_N][GK_N] = {
+        /*SLOT*/{44,39,44,68}, /*BC*/{10,10,7,6}, /*DE*/{10,10,7,6},
+        /*IX*/{25,25,11,9}, /*IY*/{25,25,11,9} };
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
+                         : IS_KR580VM1() ? VM1
                          : IS_RABBIT() ? RABBIT : Z80;
     int c = t[reg][kind];
     if (reg == GR_SLOT) {                             /* fp slot = (ix+d) */

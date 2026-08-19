@@ -62,6 +62,12 @@ int ir_idx2_reg(void)
 {
     if (!c_idx2_invariant) return IR_PR_NONE;
     if (opt_disabled("idx2")) return IR_PR_NONE;
+    /* The KR580VM1 has no index register but it does have a second pointer
+       pair, h'l', reached with the RS prefix. It is the same kind of home as
+       IX/IY - a full pair whose every access costs a prefix - so it plugs in
+       here rather than needing a class of its own. Measured (vm1_cost_bench):
+       read/write 25 cyc via push/pop, deref 11, step 9, against a slot at 44. */
+    if (IS_KR580VM1()) return IR_PR_HL_ALT;
     if (IS_808x() || IS_GBZ80()) return IR_PR_NONE;
     if (c_framepointer_is_ix == 1)                    /* frame IX → spare IY */
         return c_reserve_iy ? IR_PR_NONE : IR_PR_IY;
