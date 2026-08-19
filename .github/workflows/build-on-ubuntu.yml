@@ -17,13 +17,28 @@ jobs:
       uses: actions/checkout@v4
       with: 
         submodules: 'true'
-    - name: Cache multiple paths
+    # Split so the two can age differently, and rolled because actions/cache
+    # never overwrites an existing key: under the old fixed key the ccache was
+    # written once and then frozen, so its hit rate decayed as the tree moved on.
+    # restore-keys falls back to the most recent entry; each run saves a fresh one.
+    - name: Cache perl modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/perl5
+        key: ${{ runner.os }}-perl5-${{ hashFiles('.github/workflows/build-on-ubuntu.yml') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-perl5-${{ hashFiles('.github/workflows/build-on-ubuntu.yml') }}-
+          ${{ runner.os }}-perl5-
+
+    - name: Cache ccache
       uses: actions/cache@v4
       with:
         path: |
           ~/.ccache
-          ~/perl5
-        key: ${{ runner.os }}-cache3
+        key: ${{ runner.os }}-ccache-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-
     - name: Update apt 
       run: |
         sudo apt update

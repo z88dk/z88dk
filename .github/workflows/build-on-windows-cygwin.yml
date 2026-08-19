@@ -31,12 +31,18 @@ jobs:
       with: 
         submodules: 'true'
 
-    - name: Cache multiple paths
+    # Rolling key: actions/cache never overwrites an existing key, so a fixed
+    # one is written once and then frozen. restore-keys falls back to the most
+    # recent entry, and each run saves a fresh one.
+    - name: Cache perl modules
       uses: actions/cache@v4
       with:
         path: |
           ~/perl5
-        key: ${{ runner.os }}-cache3
+        key: ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-
+          ${{ runner.os }}-cygwin-perl5-
 
     - name: Setup Cygwin
       uses: cygwin/cygwin-install-action@master
@@ -70,7 +76,18 @@ jobs:
       shell: cmd
     - name: Install perl prerequisites
       run: |
-        PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
+        # Bootstrap cpanm from its standalone script rather than
+        # `cpan App::cpanminus`. The CPAN client configures itself, resolves a
+        # mirror and shells out constantly, which on cygwin -- where every
+        # fork() is expensive -- dominated this step. It also installs into the
+        # system perl, outside the ~/perl5 cache, so it was paid in full every
+        # run. Same approach the msys2 workflow already uses.
+        mkdir -p /usr/local/bin
+        curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o /usr/local/bin/cpanm
+        chmod +x /usr/local/bin/cpanm
+        which cpanm
+        cpanm --version
+        cpanm --local-lib=~/perl5 local::lib
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         cpanm --notest Clone XML::Twig Spreadsheet::ParseXLSX
         cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table YAML::Tiny
