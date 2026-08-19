@@ -224,6 +224,7 @@ extern Node    *ast_loop_reverse(Node *node);
 extern Node    *ast_typecheck(Node *node);
 extern Node    *ast_opt_run(Node *node);
 extern int      extract_pow2(int64_t v, int *shift);
+extern int      is_side_effect_free(Node *node);
 
 /* node.c */
 extern Node    *ast_decl(SYMBOL *sym, Node *declvar);

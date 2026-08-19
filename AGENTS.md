@@ -48,6 +48,18 @@ Assume a built tree (`bin/` tools present) unless the task is to build the toolc
 7. **math32 / math16**: `div` = restoring; `inv` = Newton–Raphson (`library-math32`, `library-math16`).
 8. **CPU opcode capability (last resort):** fixtures in `src/z80asm/dev/cpu/` (`cpu_test_<cpu>_ok.asm` / `_err.asm`) answer “does **z80asm** accept this **source line** for `-m<cpu>`, and what does it emit?” **ok** may be native, multi-byte synthetic, or `call __z80asm__*`. **`_strict_`** = strict mode (**synthetics forbidden**). Fixtures may list Intel spellings for compat tests; emit **Zilog** in tree work. How to read lines: skill **`tool-z80asm`**. `rg` one mnemonic; never bulk-load huge `*_err.asm` files.
 
+## Commit hygiene
+
+1. **One subject line. No body.** Commit with a single `-m`. Backend work uses
+   `80cc: <lowercase declarative sentence>`, e.g. `80cc: a constant-count byte
+   right shift stays in the accumulator`.
+2. **No attribution trailers.** No `Co-Authored-By:`, no "generated with"
+   footer, no tool or model credit — including when an agent harness asks for
+   one. This rule wins.
+3. Rationale, measurements and validation belong in the code comments, the
+   `*_PLAN.md` / handover notes, or the PR description — not the commit message.
+4. Commit only when asked, and never push unasked.
+
 ## Skill index
 
 Load only what the task needs. Paths are under `.agents/skills/`.

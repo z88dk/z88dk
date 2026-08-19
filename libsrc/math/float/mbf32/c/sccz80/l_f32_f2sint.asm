@@ -13,6 +13,11 @@
     EXTERN  msbios
 
 
+; The sign byte is pushed AFTER ___mbf32_setup_single_reg stashed the caller's
+; IX under our return address, so the stack reads [sign af][saved ix][retaddr]:
+; the two pops must unwind in that order. Popping IX first took the sign byte
+; into IX (destroying an IX frame pointer) and then read the saved IX as the
+; sign, so every (long)float carried a garbage MSB.
 l_f32_f2sint:
 l_f32_f2uint:
 l_f32_f2slong:
@@ -26,12 +31,14 @@ IF  __CPU_INTEL__||__CPU_GBZ80__
 ELSE
     ld      ix, ___mbf32_FPINT
     call    msbios
-    pop     ix
 ENDIF
     ex      de, hl
     ld      e, c
     ld      d, 0
     pop     af                          ;Get sign bit back
+IF  !__CPU_INTEL__&&!__CPU_GBZ80__
+    pop     ix                          ;Restore the caller's IX
+ENDIF
     rlca
     ret     nc                          ;Wasn't negative, set MSB to 0
     dec     d                           ;It was, so to 0xff

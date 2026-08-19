@@ -183,6 +183,12 @@ typedef struct {
         int cur_load_to_dehl_no_hl, cur_load_to_dehl_no_bc;
         int cur_stack_long_top, cur_dehl_inline_push, cur_dehl_inline_push_base_sp;
         int cur_dehl_push_to_stack, cur_store_dehl_bc_dead, cur_dehl_dst_no_bc_stash;
+        /* Fused byte-chain result: the value is already BC=low / DE=high with HL
+           NOT holding the low half. Every sink of store_dehl_finalize opens with
+           `ld bc,hl` to establish exactly that, so without this flag the fused
+           paths have to spend `ld hl,bc` purely to feed it back — 4 bytes and 16
+           cycles of round trip per site. Consumed (and cleared) by the sinks. */
+        int cur_dehl_bc_is_low;
         int cur_push_dehl_bc_dead;
         int cur_dehl_dst_dead_safe, cur_dst_dead;
         int cur_remat_def_dead;  /* remat NO_SLOT def with no same-BB reader → skip it */
@@ -368,6 +374,11 @@ typedef struct {
     int unknown;
     /* sub-register B/C (the park-liveness sweep needs B and C tracked separately) */
     int b_read, c_read, b_write, c_write;
+    /* sub-register D/E, for the 8085 slot-load DE park. Tracked apart from the
+       pair because that park exists to protect a consumer which may read only
+       E — a byte staged there is invisible to the whole-pair residency cache,
+       which is exactly what made the cache-based version of this test unsound. */
+    int d_read, e_read, d_write, e_write;
     int park;           /* the exact `ld bc,hl` low-half stash */
     int is_boundary;    /* ret/reti/retn — BC dead at exit (result ABI is DE:HL) */
     int is_call;        /* jp/jr/djnz/call/rst — a successor may read BC */
@@ -1148,7 +1159,112 @@ static int bc_tok(const char *ops, const char *reg)
     return 0;
 }
 
-/* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. */
+/* ---- the 8085 slot-load DE park ------------------------------------------
+   `load_slot_to_hl` reads a frame word with LDSI+LHLX, which needs the slot
+   address in DE, but load_to_hl must hand DE back untouched — so it parks it:
+
+        push de / ld de,sp+N+2 / ld hl,(de) / pop de      5B/42c
+
+   Unparked that is `ld de,sp+N / ld hl,(de)`, 3B/20c. Whether the park is needed
+   is a question about the FUTURE (is the old DE read before it is overwritten?),
+   which is why every attempt to answer it from the residency cache failed: the
+   cache is a record of the past, it tracks whole pairs so a byte staged in E is
+   invisible to it, and the producing idiom does not distinguish the two cases —
+   measured on the corpus, `ld de,sp+N` and `pop de` each precede roughly as many
+   needed parks as dead ones, because the nearest preceding DE write is usually
+   the PREVIOUS park's own code.
+
+   So it is decided here instead, on the rendered function, by the same backward
+   liveness sweep that drops dead `ld bc,hl` parks — which already has the two
+   properties this needs: sub-register tracking (a park protecting only E must
+   survive) and straight-line-only proof (a branch or call means live). The BC
+   rules do not transfer wholesale: `ret` is a boundary for BC but READS DE,
+   since the long result ABI is DE:HL.
+
+   DEFAULT-ON; `--opt-disable=de-park` reverts to always parking, byte for byte.
+   IR_DEPARK_SWEEP=1 additionally runs the forward-walk cross-check below and
+   reports the counts; =3 dumps the instruction window at any disagreement. */
+static long dpk_total, dpk_dead, dpk_funcs;
+static long dpk_agree, dpk_conserv, dpk_viol;   /* forward-walk cross-check */
+static void dpk_report(void)
+{
+    if (!dpk_total) return;
+    fprintf(stderr, "DEPARKSWEEP funcs=%ld parks=%ld dead=%ld (%.1f%%)"
+            " | vs forward walk: agree=%ld backward-more-precise=%ld VIOLATIONS=%ld\n",
+            dpk_funcs, dpk_total, dpk_dead,
+            100.0 * (double)dpk_dead / (double)dpk_total,
+            dpk_agree, dpk_conserv, dpk_viol);
+}
+static int de_sweep_on(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_DEPARK_SWEEP");
+                 v = e ? atoi(e) : 0;
+                 if (v) atexit(dpk_report); }
+    return v;
+}
+
+/* The four lines above, ending at `pop de` (index i). *offp gets the unparked
+   offset, i.e. the emitted one less the +2 it carries for the in-flight push.
+   Matched by exact re-render, so a comment or any other form is rejected; the
+   idiom is 8085-only by construction (LDSI + LHLX), so no CPU gate is needed. */
+static int de_park_group(char **lines, int i, int *offp)
+{
+    if (i < 3) return 0;
+    if (strcmp(lines[i],     "\tpop\tde\n"))     return 0;
+    if (strcmp(lines[i - 1], "\tld\thl,(de)\n")) return 0;
+    if (strcmp(lines[i - 3], "\tpush\tde\n"))    return 0;
+    int off = 0;
+    if (sscanf(lines[i - 2], "\tld\tde,sp+%d", &off) != 1) return 0;
+    if (off < 2) return 0;
+    char want[40];
+    snprintf(want, sizeof want, "\tld\tde,sp+%d\n", off);
+    if (strcmp(lines[i - 2], want)) return 0;
+    *offp = off - 2;
+    return 1;
+}
+
+/* VERIFIER (IR_DEPARK_SWEEP=1): an INDEPENDENT forward walk of the same buffer,
+   deciding the same question the other way round — from the park, does anything
+   read the old DE before both halves are overwritten? Stops at a label, branch,
+   call or return and reports UNKNOWN, so it proves less than the backward sweep
+   but shares none of its machinery. The two must never disagree in the unsafe
+   direction: backward=dead while forward=NEEDED is a miscompile, and is reported
+   as a VIOLATION. The opposite (forward unknown, backward dead) is just the
+   backward pass being more precise — it sees past a label, which is sound
+   because a label does not change what OUR path does next. */
+static int de_forward_needed(char **lines, int n, int start, int *readerp)
+{
+    int d_live = 1, e_live = 1;                  /* halves of the OLD DE */
+    for (int j = start; j < n; j++) {
+        if (lines[j][0] != '\t') return 2;       /* label: joins another path */
+        /* A LATER park is transparent to this one: its `push de` does read DE,
+           but its `pop de` puts the same value back, so the walk must step over
+           the whole group rather than call it a read. (Found by this verifier
+           disagreeing with the backward sweep on 9 corpus sites — every one a
+           park followed by another park.) */
+        int poff2;
+        if (j + 3 < n && !strcmp(lines[j], "\tpush\tde\n")
+            && de_park_group(lines, j + 3, &poff2)) { j += 3; continue; }
+        InstrEffects e = instr_effects(lines[j]);
+        /* Only a read of a half that is STILL LIVE counts: a staged `ld e,a`
+           kills the parked E, so the later `ld (hl),e` reads the new byte, not
+           the one the park was protecting. (The verifier's own second bug —
+           found by dumping the window at a disagreement, and the reason the
+           park@23 site in bitfieldbench is genuinely dead.) */
+        if ((e.d_read && d_live) || (e.e_read && e_live)) {
+            if (readerp) *readerp = j; return 1;
+        }
+        if (e.is_call || e.is_boundary) return 2;
+        if (e.d_write) d_live = 0;
+        if (e.e_write) e_live = 0;
+        if (!d_live && !e_live) return 0;        /* fully overwritten unread */
+    }
+    return 2;
+}
+
+/* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
+   the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
 {
     char buf[1024];
@@ -1179,9 +1295,47 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             if (strcmp(lines[i], "\tld\tbc,hl\n") == 0
                 && strcmp(lines[i + 1], "\tld\thl,bc\n") == 0)
                 drop[i + 1] = 1;
-        int b_live = 0, c_live = 0;
+        int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
+        int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
+        int de_rewrite = !opt_disabled("de-park");
+        int de_sweep   = (de_verify || de_rewrite);
+        if (de_verify) dpk_funcs++;
         for (int i = n - 1; i >= 0; i--) {
             if (drop[i]) continue;                 /* collapsed recover: gone */
+            int poff = 0;
+            if (de_sweep && de_park_group(lines, i, &poff)) {
+                int back_dead = (!d_live && !e_live);
+                int reader = -1;
+                int fwd = de_verify
+                        ? de_forward_needed(lines, n, i + 1, &reader) : -1;
+                if (de_verify) dpk_total++;
+                if (de_verify && back_dead && fwd == 1) {
+                    dpk_viol++;
+                    fprintf(stderr, "DEPARKVIOLATION park@%d off=%d reader@%d: %s",
+                            i, poff, reader,
+                            (reader >= 0 && reader < n) ? lines[reader] : "?\n");
+                    if (de_verify >= 3)
+                        for (int q = i; q <= reader && q < n && q < i + 60; q++)
+                            fprintf(stderr, "   %c%4d %s",
+                                    drop[q] ? 'x' : ' ', q, lines[q]);
+                } else if (de_verify && back_dead == (fwd == 0)) dpk_agree++;
+                else if (de_verify) dpk_conserv++;
+                if (back_dead) {
+                    if (de_verify) dpk_dead++;
+                    if (de_rewrite) {
+                        char *nl = malloc(40);
+                        if (nl) {
+                            snprintf(nl, 40, "\tld\tde,sp+%d\n", poff);
+                            free(lines[i - 2]); lines[i - 2] = nl;
+                            drop[i] = drop[i - 3] = 1;     /* pop de, push de */
+                        } else if (de_verify) dpk_dead--;   /* OOM: not dropped */
+                    }
+                }
+                /* Either way DE's liveness passes through unchanged: parked, the
+                   pair is restored; unparked, it was dead on both sides. */
+                i -= 3;
+                continue;
+            }
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
             int rb = e.b_read, rc = e.c_read, wb = e.b_write, wc = e.c_write;
             int park = e.park, boundary = e.is_boundary, call = e.is_call;
@@ -1189,15 +1343,19 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                so a park before it is droppable. A branch/call (`call`): BC may
                be read by a successor — treat as LIVE so only a park overwritten
                by straight-line code before the next branch is dropped. */
-            if (boundary) { b_live = c_live = 0; continue; }
-            if (call)     { b_live = c_live = 1; continue; }
-            if (park) {
+            /* BC is dead at a return; DE is not (result ABI DE:HL) — e.d_read
+               already says so, so route both through the same update below. */
+            if (boundary) { b_live = c_live = 0; }
+            else if (call){ b_live = c_live = 1; }
+            else if (park) {
                 if (!b_live && !c_live) drop[i] = 1;
                 b_live = c_live = 0;               /* park defines BC */
-                continue;
+            } else {
+                b_live = rb ? 1 : (wb ? 0 : b_live);
+                c_live = rc ? 1 : (wc ? 0 : c_live);
             }
-            b_live = rb ? 1 : (wb ? 0 : b_live);
-            c_live = rc ? 1 : (wc ? 0 : c_live);
+            d_live = e.d_read ? 1 : (e.d_write ? 0 : d_live);
+            e_live = e.e_read ? 1 : (e.e_write ? 0 : e_live);
         }
     }
     for (int i = 0; i < n; i++) {
@@ -1207,18 +1365,66 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
     free(lines); free(drop);
 }
 
+/* ---- branch-to-return: `jp [cc,]L_bb_N` where BB N's body is a bare `ret` -- */
+/* A one-armed `if` renders as `jp z,L; <then>; L: ret`, and nothing recovers it:
+   pass 0 threads only `jp`-trampolines, and copt has no label-reference count so
+   it cannot prove L dies. When the target block is a BARE `ret` the branch IS
+   the return — `jp cc,L` -> `ret cc`, `jp L` -> `ret`, 3B -> 1B, no tick cost.
+   Pass 2 then drops the label; the `ret` line stays for its fall-through
+   predecessor.
+
+   Frameless-only needs no gate: a framed return block starts `ld sp,ix`, an
+   interrupt one ends `reti`/`retn`, a `__critical` one is `ei; ret` — none match
+   a bare `ret`. Conditions are limited to nz/z/nc/c (as in relax_jp_parts):
+   `jp po` is emitted, but gbz80 has no P/V flag and Rabbit reassigned those
+   opcodes. Default-on; `--opt-disable=ret-thread` opts out. */
+static int is_bare_ret_line(const char *l)
+{
+    return !strcmp(l, "\tret\n") || !strcmp(l, "\tret\r\n") || !strcmp(l, "\tret");
+}
+
+/* `\tjp\t[cc,]L_f<i>_bb_<n>\n` -> condition ("" when unconditional) + BB number.
+   The operand must be the whole rest of the line, so the rewrite can replace it
+   outright. */
+static int retthread_parts(const char *l, char *cc, size_t ccsz, int *bb)
+{
+    if (strncmp(l, "\tjp\t", 4) != 0) return 0;
+    const char *p = l + 4;
+    cc[0] = '\0';
+    const char *comma = strchr(p, ',');
+    if (comma) {
+        size_t n = (size_t)(comma - p);
+        if (n == 0 || n >= ccsz) return 0;
+        memcpy(cc, p, n); cc[n] = '\0';
+        if (strcmp(cc, "nz") && strcmp(cc, "z") && strcmp(cc, "nc") && strcmp(cc, "c"))
+            return 0;                            /* po/pe/p/m: no portable ret */
+        p = comma + 1;
+    }
+    if (strncmp(p, "L_f", 3) != 0) return 0;
+    const char *u = strstr(p, "_bb_");
+    if (!u || u[4] < '0' || u[4] > '9') return 0;
+    int n = 0; const char *q = u + 4;
+    while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+    while (*q == '\r') q++;
+    if (*q != '\n' && *q != '\0') return 0;      /* trailing junk/comment */
+    *bb = n;
+    return 1;
+}
+
 static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                                          const Func *f)
 {
     char line[1024];
     char *ref = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
+    char *retlab = (max_bb >= 0) ? calloc((size_t)max_bb + 1, 1) : NULL;
     int *thr = (max_bb >= 0) ? malloc(((size_t)max_bb + 1) * sizeof(int)) : NULL;
-    if (!ref || !thr) {                          /* OOM: copy verbatim */
-        free(ref); free(thr);
+    if (!ref || !thr || !retlab) {               /* OOM: copy verbatim */
+        free(ref); free(thr); free(retlab);
         rewind(rout);
         while (fgets(line, sizeof line, rout)) fputs(line, out);
         return;
     }
+    int do_retthread = !opt_disabled("ret-thread");
     /* Branch relaxation runs LAST: threading, dead-label elision and the
        peepholes below all change the span a `jr` has to reach, so measuring
        before them would be measuring the wrong function. `fout` is the real
@@ -1259,6 +1465,11 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
                 for (int k = 0; k < npend; k++) thr[pend[k]] = m;
             }
         }
+        /* Same walk, second map: a label run whose first instruction is a bare
+           `ret` marks those BBs for the branch-to-return rewrite below. */
+        else if (npend > 0 && is_bare_ret_line(line)) {
+            for (int k = 0; k < npend; k++) retlab[pend[k]] = 1;
+        }
         npend = 0;
     }
     /* Also fold defc bb-aliases (`defc L_f<idx>_bb_<X> = L_f<idx>_bb_<Y>`) into the
@@ -1291,12 +1502,80 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
         if (hops > max_bb) thr[i] = -1;           /* cycle → don't thread */
         else if (t >= 0) thr[i] = t;
     }
+    /* Pass 0c: decide the rewrite PER LINE, once, so passes 1 and 2 agree (pass 1
+       must not mark a reference pass 2 deletes). All three read every line of
+       `rout` in order, so the line index is a shared key.
+
+       One line of lookahead, because two adjacent shapes are handled BETTER
+       downstream and converting would block them:
+         `jp cc,L_ret` + `jp X`    copt inverts the pair to one `jp !cc,X` (2B
+                                   relaxed) — beats `ret cc` + `jp X` (3B), and
+                                   in a loop the extra jump is on the hot path.
+         `jp cc,L_ret` + `L_ret:`  copt deletes a jump to the next label (0B).
+       The first pair is vetoed from both sides — converting the unconditional
+       tail blocks the same inversion — so an unconditional candidate preceded by
+       a conditional `jp` is left alone. A standalone `jp L_ret` still converts. */
+    long nlines = 0;
+    rewind(rout);
+    while (fgets(line, sizeof line, rout)) nlines++;
+    char *conv = do_retthread ? calloc((size_t)(nlines > 0 ? nlines : 1), 1) : NULL;
+    if (conv) {
+        long idx = 0, cand = -1;
+        int cand_tgt = -1, cand_cond = 0, prev_cond_jp = 0;
+        rewind(rout);
+        while (fgets(line, sizeof line, rout)) {
+            long here = idx++;
+            /* No code, and not adjacency for the lookahead: markers, blanks,
+               comments, and the defc aliases pass 2 defers. */
+            if (strncmp(line, "\tC_LINE", 7) == 0 || line[0] == '\n'
+                || line[0] == '\r' || line[0] == ';'
+                || strncmp(line, "defc L_f", 8) == 0)
+                continue;
+            if (cand >= 0) {                      /* resolve the pending candidate */
+                int veto = 0;
+                if (cand_cond && strncmp(line, "\tjp\t", 4) == 0 && !strchr(line, ','))
+                    veto = 1;                     /* invert-me pair: leave to copt */
+                if (line[0] == 'L') {             /* jump to the very next label? */
+                    char *p = strstr(line, "_bb_");
+                    if (p && p[4] >= '0' && p[4] <= '9') {
+                        int n = 0; char *q = p + 4;
+                        while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
+                        if (*q == ':' && n <= max_bb) {
+                            int t = (thr[n] >= 0) ? thr[n] : n;
+                            if (t == cand_tgt) veto = 1;
+                        }
+                    }
+                }
+                if (!veto) conv[cand] = 1;
+                cand = -1;
+            }
+            int this_cond_jp = 0;
+            if (strncmp(line, "\tjp\t", 4) == 0) {
+                this_cond_jp = (strchr(line, ',') != NULL);
+                char rcc[8]; int rbb;
+                if (retthread_parts(line, rcc, sizeof rcc, &rbb) && rbb <= max_bb) {
+                    int t = (thr[rbb] >= 0) ? thr[rbb] : rbb;
+                    if (t <= max_bb && retlab[t]) {
+                        if (!rcc[0]) { if (!prev_cond_jp) conv[here] = 1; }
+                        else { cand = here; cand_tgt = t; cand_cond = 1; }
+                    }
+                }
+            }
+            prev_cond_jp = this_cond_jp;
+        }
+        if (cand >= 0) conv[cand] = 1;            /* nothing follows: convert */
+    }
     /* Pass 1: mark every BB number that appears as a REFERENCE — using the
        THREADED target for jp operands, since pass 2 rewrites them. */
     rewind(rout);
+    long p1idx = 0;
     while (fgets(line, sizeof line, rout)) {
+        long here = p1idx++;
         int is_jp = (strncmp(line, "\tjp\t", 4) == 0);
         int is_defc = (strncmp(line, "defc L_f", 8) == 0);
+        /* A branch pass 2 will turn into a `ret` stops being a reference to its
+           target — skip it here so the label can still be dropped. */
+        if (conv && conv[here]) continue;
         for (char *p = strstr(line, "_bb_"); p; p = strstr(p, "_bb_")) {
             char *q = p + 4;
             if (*q < '0' || *q > '9') { p = q; continue; }
@@ -1327,8 +1606,18 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
        of the instruction stream makes the real (defc-are-nothing) adjacency
        visible to copt without changing the binary. */
     rewind(rout);
+    long p2idx = 0;
     while (fgets(line, sizeof line, rout)) {
+        long here = p2idx++;
         if (strncmp(line, "defc L_f", 8) == 0) continue;   /* defer to pass 3 */
+        if (conv && conv[here]) {                /* branch-to-return rewrite */
+            char rcc[8]; int rbb;
+            if (retthread_parts(line, rcc, sizeof rcc, &rbb)) {
+                if (rcc[0]) fprintf(dst, "\tret\t%s\n", rcc);
+                else        fputs("\tret\n", dst);
+                continue;
+            }
+        }
         if (line[0] == 'L') {
             char *p = strstr(line, "_bb_");
             if (p) {
@@ -1384,6 +1673,8 @@ static void emit_dropping_dead_bb_labels(FILE *out, FILE *rout, int max_bb,
     }
     free(ref);
     free(thr);
+    free(retlab);
+    free(conv);
 }
 
 /* HL value cache. Reset at each BB boundary and at any op that
@@ -2252,14 +2543,42 @@ static InstrEffects instr_effects(const char *line)
         || !strcmp(m,"SECTION") || !strcmp(m,"MODULE") || !strcmp(m,"LSTON")
         || !strcmp(m,"LSTOFF"))
         return e;
-    if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) { e.is_boundary = 1; return e; }
-    if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) { e.is_call = 1; return e; }
-    if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; return e; }
+    /* A CONDITIONAL `ret` (o0 holds the cc) is NOT a boundary — the not-taken
+       path stays in the function, so BC liveness must survive it. is_call is the
+       conservative "successor may read BC"; treating it as a boundary would let
+       filter_dead_bc_parks drop a park the fall-through still consumes. */
+    if (!strcmp(m,"ret") && o0[0]) { e.is_call = 1; e.d_read = e.e_read = 1; return e; }
+    if (!strcmp(m,"ret")||!strcmp(m,"reti")||!strcmp(m,"retn")) {
+        /* is_boundary says BC is dead at exit. DE is NOT: the long and float
+           result ABI is DE:HL, so a return READS DE. The flag stays BC-only and
+           D/E are marked live here, so no consumer can inherit the BC rule. */
+        e.is_boundary = 1; e.d_read = e.e_read = 1; return e;
+    }
+    if (!strcmp(m,"jp")||!strcmp(m,"jr")||!strcmp(m,"djnz")||!strcmp(m,"call")||!strcmp(m,"rst")) {
+        /* A successor may read DE, and __sdcccall(1) passes arguments in it, so a
+           call READS DE even though the callee also clobbers it. */
+        e.is_call = 1; e.d_read = e.e_read = 1; return e;
+    }
+    if (!strcmp(m,"exx")) { e.b_read = e.c_read = 1; e.d_read = e.e_read = 1; return e; }
     if (!strcmp(m,"ldir")||!strcmp(m,"lddr")||!strcmp(m,"ldi")||!strcmp(m,"ldd")
         ||!strcmp(m,"cpir")||!strcmp(m,"cpdr")||!strcmp(m,"cpi")||!strcmp(m,"cpd")) {
-        e.b_read = e.c_read = 1; return e;
+        e.b_read = e.c_read = 1; e.d_read = e.e_read = 1; return e;
     }
     if (!strcmp(m,"ld")) {
+        /* D/E up front: every branch below returns, so both pairs are settled in
+           one place. A write is only recorded where the WHOLE half is replaced;
+           an auto-stepping `(de+)` reads before it writes, so the generic arm
+           marks it read and the park stays. */
+        if (!strcmp(o0,"de") || !strcmp(o0,"d") || !strcmp(o0,"e")) {
+            if (o0[0] == 'd' && !o0[1]) e.d_write = 1;
+            else if (o0[0] == 'e')      e.e_write = 1;
+            else                        e.d_write = e.e_write = 1;
+            e.d_read = bc_tok(src,"d")||bc_tok(src,"de");
+            e.e_read = bc_tok(src,"e")||bc_tok(src,"de");
+        } else {
+            e.d_read = bc_tok(ops,"d")||bc_tok(ops,"de");
+            e.e_read = bc_tok(ops,"e")||bc_tok(ops,"de");
+        }
         if (!strcmp(o0,"bc")) {
             e.b_write = e.c_write = 1;
             e.b_read = bc_tok(src,"b")||bc_tok(src,"bc");
@@ -2275,9 +2594,18 @@ static InstrEffects instr_effects(const char *line)
         e.c_read = bc_tok(ops,"c")||bc_tok(ops,"bc");
         return e;
     }
-    if (!strcmp(m,"pop")) { if (!strcmp(ops,"bc")) e.b_write = e.c_write = 1; return e; }
+    if (!strcmp(m,"pop")) {
+        if (!strcmp(ops,"bc")) e.b_write = e.c_write = 1;
+        if (!strcmp(ops,"de")) e.d_write = e.e_write = 1;
+        return e;
+    }
     e.b_read = bc_tok(ops,"b")||bc_tok(ops,"bc");
     e.c_read = bc_tok(ops,"c")||bc_tok(ops,"bc");
+    /* `ex de,hl`, `add hl,de`, `push de`, `ld (hl),e`, `sub e` … all land here and
+       count as reads. `ex`/`add` also WRITE DE, but read-only is the conservative
+       side: it keeps the park. */
+    e.d_read = bc_tok(ops,"d")||bc_tok(ops,"de");
+    e.e_read = bc_tok(ops,"e")||bc_tok(ops,"de");
     return e;
 }
 
@@ -2412,6 +2740,13 @@ RegMask op_clobbers(const Func *f, const Op *op)
         /* 8085 word compares stage an operand into BC (`ld c,e; ld b,d`). */
         return IR_R_HL|IR_R_DE|IR_R_A|IR_R_F|wide|dst|ops
              | (IS_8085() ? IR_R_BC : 0);
+    /* NB IR_SUB deliberately does NOT claim BC on 8085, unlike the compares
+       above: the 8085 DSUB staging (`ld bc,de; sub hl,bc`, gen_sub) buys 3
+       bytes and 6 cycles per subtract, but declaring BC clobbered here costs
+       every BC home that spans a subtract — measured at +3.19% ticks on
+       predbench and +0.69% on divbench against ~1.3M cycles of wins
+       elsewhere, a net loss. gen_sub earns BC per function instead
+       (func_has_bc_home). */
     default:
         /* Everything else — loads/materialise/MOV/ALU/compare/conv/shift/store:
            HL workhorse + A scratch + DE (operand staging / `ex de,hl` word
@@ -4660,11 +4995,17 @@ int ir_lower_func(FILE *out, Func *f)
                        cur_sp_adjust; add hl,sp`) instead of spilling+reloading — the
                        offset is fixed per function and cur_sp_adjust is tracked, so
                        fp==sp with only the target pair clobbered (no IX/DE gymnastics).
-                       EXCLUSIONS, each a measured non-win:
-                       - byte-wise CPUs (808x/gbz80): spill LEA values as data-stack
-                         transients (PR_STACK push/pop) not frame slots, so dropping
-                         the slot shifts the stack and offsets go inconsistent (irgaps
-                         miscompiles — the deferred "extend" step);
+                       EXCLUSIONS:
+                       - a PR_STACK tenant: its value is parked with push/pop, not in
+                         a frame slot, so dropping the slot orphans one half of that
+                         pair and every later sp-relative offset shifts (irgaps
+                         miscompiled). This USED to be spelled `!(IS_808x() ||
+                         IS_GBZ80())` — those CPUs park LEA values, so the CPU stood
+                         in for the fact. Measured: of the 99 LEAs the CPU test
+                         excluded, only 6 (8085) / 5 (gbz80) are actually parked, so
+                         the test cost ~93 per CPU. Asking the real question is both
+                         wider AND safer — it now also protects a parked LEA on z80
+                         and every other target, which the CPU test never covered;
                        - ez80 in FP mode: its cheap `lea`/`ld hl,(ix+d)` addressing
                          register-homes LEAs, so per-use recompute in a hot loop is a
                          byte-for-tick LOSS (interpbench ez80-fp −27B but +4.6% ticks).
@@ -4673,7 +5014,7 @@ int ir_lower_func(FILE *out, Func *f)
                        Store-base LEAs keep their slot (below). Default-on;
                        IR_REMAT_LEA=0 opts out. */
                     else if (o->kind == IR_LEA && o->src[0] >= 0 && !func_has_call
-                             && !(IS_808x() || IS_GBZ80())
+                             && ir_home_at(f, o->dst) != IR_PR_STACK
                              && !(IS_EZ80() && fp_active(f))
                              && remat_lea_enabled())
                         rd = o;
@@ -5320,6 +5661,8 @@ static void lower_verify_op_entry(int bb_id, int op_idx)
        previous op's value into an entry — NOT assertable here. */
     else if (L.la.cur_dehl_push_to_stack)
         bad = "cur_dehl_push_to_stack set at op entry (leaked)";
+    else if (L.la.cur_dehl_bc_is_low)
+        bad = "cur_dehl_bc_is_low set at op entry (leaked past a sink)";
     /* HL address-cache and value-cache are mutually exclusive. */
     else if (L.cur_hl_addr_off >= 0 && L.rs.hl >= 0)
         bad = "HL address-cache and value-cache both live";
@@ -5480,6 +5823,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
     L.la.cur_dehl_inline_push = -1;
     L.la.cur_dehl_inline_push_base_sp = 0;
     L.la.cur_dehl_push_to_stack = 0;
+    L.la.cur_dehl_bc_is_low = 0;
     cur_emitted_file = NULL;
     cur_emitted_line = 0;
     L.la.shl_skip_n = 0;

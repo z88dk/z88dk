@@ -737,6 +737,15 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
        load/store (no register residency, const-prop or store-forward). */
     if (sym->ctype && sym->ctype->isvolatile)
         b->f->vregs[v].flags |= IR_VREG_VOLATILE;
+    /* A `static` local's storage is its BSS symbol, not the frame — the front
+       end rewrites every ACCESS to the global shape (LD_SYM / sym[] mem ops),
+       so this vreg is never read. Left in place (the symbol map stays total)
+       but denied a slot: without this an aggregate reserves its whole size on
+       the stack and never touches it — pi.c's `static uint16_t r[2801]` cost a
+       dead 5602-byte frame, which also pushed every real temporary past the
+       8085 LDSI offset range, degrading each slot access to `ld hl,N; add hl,sp`. */
+    if (sym->storage == LSTATIC || sym->storage == STATIK)
+        b->f->vregs[v].flags |= IR_VREG_NO_SLOT;
     sym_map_set(b, sym, v);
     return v;
 }
@@ -4974,6 +4983,78 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 /* LHS = RHS store. Dispatches by destination: bitfield (read-modify-
    write), whole-aggregate struct copy, bare local, global, pointer
    deref — each with int/float/double/_Accum/long long value handling. */
+/* [IR_STORDER=0] Default-on after the matrix: corpus x 10 CPUs x sp/fp with no
+   new aborts, corpus ticks unchanged on 23 of 24 suites and sortbench -0.084%,
+   pi faster on all six valid-tick CPUs (-0.27% to -0.80%). Opt out to revert. */
+static int storder_on(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_STORDER"); on = !(e && e[0] == '0'); }
+    return on;
+}
+
+/* Will build_assign take the pointer/indexed store branch — the only one that
+   consumes a pre-built address? Mirrors that branch's own predicate exactly; a
+   pure type test, so it is answerable before anything is emitted. Keep the two
+   in step: a mismatch does not miscompile (the address is simply built and left
+   unused, and DCE drops it) but it silently wastes the reorder. */
+static int store_order_lhs_shape(Node *lv)
+{
+    if (!lv->type) return 0;
+    return ((lv->type->kind == KIND_PTR || lv->type->kind == KIND_ARRAY)
+            || is_register_int_kind(lv->type->kind))
+        && (lv->type->ptr || is_register_int_kind(lv->type->kind));
+}
+
+/* Is the LHS address a link-time CONSTANT — a symbol, or a symbol at a constant
+   offset? Then it is rematerialisable in one instruction (`ld hl,_sym+K`) and
+   hoisting is a pessimisation: it makes the address live across the RHS, so the
+   allocator parks it (`ld bc,hl` … `ld hl,bc`) where recomputing was cheaper.
+   Measured: this cost +16 ticks and 2 instructions in the test framework, which
+   is linked into every bench binary, so it showed up as a uniform +16 across 23
+   suites.
+   An aggregate NAME is its address (constant); a scalar name is an rvalue LOAD
+   and is not — which is what keeps `r[i]` (symbol + loaded index) hoistable. */
+static int store_order_addr_is_const(Node *n)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL:
+        return 1;
+    case OP_ADDR: case AST_ADDR:
+        return 1;
+    case AST_GLOBAL_VAR: case AST_LOCAL_VAR:
+        return n->type && (n->type->kind == KIND_ARRAY
+                           || n->type->kind == KIND_STRUCT);
+    case OP_CAST:
+        return store_order_addr_is_const(n->operand);
+    case OP_ADD: case OP_SUB:
+        return store_order_addr_is_const(n->left)
+            && store_order_addr_is_const(n->right);
+    default:
+        return 0;                    /* unknown shape: assume it costs to rebuild */
+    }
+}
+
+/* Does hoisting pay? Only when the stored VALUE is the awkward operand — it
+   ends in a call (its result lands in the return registers and must survive the
+   address computation) or it is wider than the 2-byte address. Anything else
+   just lengthens the address's live range for nothing. */
+static int store_order_rhs_pays(Builder *b, Node *n)
+{
+    (void)b;
+    /* Width of the RHS *expression*, not of the store: `r[i] = d % (uint32_t)b`
+       narrows to a 2-byte element, but the arithmetic is 32-bit and lowers to a
+       helper CALL whose result occupies both register pairs. Keying off the
+       store's type misses exactly the case this exists for. */
+    if (n->right && n->right->type && type_width(n->right->type) > 2) return 1;
+    if (n->type && type_width(n->type) > 2) return 1;
+    /* A real call in the RHS. NB not-SEF is a poor proxy for "calls a helper" —
+       wide integer arithmetic is SEF at AST level yet still lowers to a call,
+       which the width tests above are what actually catch. */
+    return !is_side_effect_free(n->right);
+}
+
 static int build_assign(Builder *b, Node *n)
 {
     /* LHS = RHS. LHS is an lvalue: AST_LOCAL_VAR (address) or
@@ -5233,6 +5314,28 @@ static int build_assign(Builder *b, Node *n)
         }
         return dst_v;
     }
+    /* [IR_STORDER] Build the LHS ADDRESS before the RHS value.
+       See STORE_ORDER_PLAN.md. `a[i] = <expr>` normally evaluates the RHS
+       first and the address last, so when the RHS ends in a call returning a
+       wide value the result holds both register pairs and the address — built
+       last — has nowhere to go but a frame slot, with the result shuffled
+       around it. sccz80 (and 80cc's own COMPOUND-assign path) build the
+       address first and park it, which is 4 instructions against ~25.
+
+       C leaves the relative order of the two operands unspecified, so the swap
+       is legal outright; the side-effect-free gate means no DEFINED program can
+       observe it either way (`a[i++] = f()` is excluded by rule, not luck).
+       The second gate keeps it to where it pays: something is live across
+       something whichever order we pick, and address-first wins exactly when
+       the value is wider than the 2-byte address — the wide/call case. */
+    int pre_addr = -1;
+    if (storder_on() && n->left && n->right
+        && is_side_effect_free(n->left)
+        && !store_order_addr_is_const(n->left)
+        && store_order_lhs_shape(n->left)
+        && store_order_rhs_pays(b, n))
+        pre_addr = build_expr(b, n->left);      /* -1 on failure: fall through */
+
     /* Non-local LHS: for a float-literal RHS heading into an
        _Accum slot, allocate a typed hint vreg so the literal
        handler's scaling fires. */
@@ -5628,7 +5731,8 @@ static int build_assign(Builder *b, Node *n)
         /* `arr[i] = X` into a named address space: page in the bank at
            the store (namespace recovered from the array element type). */
         SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
-        int ptr_v = build_expr(b, n->left);
+        /* [IR_STORDER] consume the address built before the RHS, if any. */
+        int ptr_v = (pre_addr >= 0) ? pre_addr : build_expr(b, n->left);
         if (ptr_v < 0) return -1;
         /* Wide-value store (this path otherwise only handles 1/2/4-byte
            integers). The member/element lvalue type can read back as
@@ -7128,6 +7232,15 @@ static int build_stmt(Builder *b, Node *n)
                                   "out of int16_t slot range",
                                   n->sym->name, sz);
             int agg_v = new_local_vreg(b, n->sym);
+            /* A `static` aggregate is initialised ONCE, at load time, by the
+               data/BSS emitter — and every access goes through its symbol. The
+               runtime init below would write the initialiser a second time,
+               through LEA on a vreg that has no frame storage. Harmless-looking
+               before (it wrote to a dead stack copy, which is exactly what
+               reserved the object's whole size on the frame); with that copy
+               gone it is a wild store. Skip it: nothing reads what it writes. */
+            if (n->sym->storage == LSTATIC || n->sym->storage == STATIK)
+                return 0;
             if (n->declvar) {
                 int base = new_temp(b, 2);
                 Op *lea = ir_op_emit(cur_bb(b), IR_LEA);

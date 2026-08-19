@@ -88,6 +88,20 @@ A sub-interval of a value's live range over which its home register is provably 
 (un-clobbered) — the maximal span a *ranged home* can occupy without a save/restore. Its
 boundaries are the clobbering ops (chiefly calls) that bracket it.
 
+**Resident window**:
+The span a value is *actually* homed over — live range ∩ `[home_lo, home_hi]`
+(`hr_residency_window`). The *decision*, where a *clobber-free window* is the *capability*
+(the maximal span a home could occupy). What `IR_HOME_VERIFY` checks for overlap, and what
+ranged placement reads.
+_Avoid_: home window, live window.
+
+**Point interference**:
+Two values needing the register at the same program *point* — both live out of one op, so
+holes in a live range are honoured. Contrast the *interval* reading, which asks only whether
+two `[lo, hi]` spans overlap and so reports a conflict across a hole where neither value is
+live. Loop-body rounding is composed on top: both live anywhere in one loop span interfere.
+_Avoid_: precise interference (a quality claim, not a mechanism).
+
 **Call-crossing local**:
 A local whose live range spans a call. Its home register is clobbered by the call, so a
 ranged home for it must *save-around-call*. The dominant shape in emu.c's dense functions

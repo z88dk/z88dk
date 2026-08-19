@@ -608,6 +608,285 @@ const LiveRange *ir_live_range(const Func *f, int v)
     return &((const LiveRange *)f->live_ranges)[v];
 }
 
+/* ---- [IR_LIVEPROBE] inert interference-precision probe ------------------ */
+/* `ir_live_ranges_overlap` answers from ONE hole-free [start,end] pair, so in a
+   long BB every value spans most of the block and everything interferes with
+   everything. The dataflow above already produces the precise answer —
+   bb->live_in_per_op[] is a per-op BitSet — and ir_compute_live_ranges throws it
+   away collapsing to min/max. This probe measures what that costs: for every
+   query the allocator makes, how often does a `true` become `false` once the
+   holes are honoured?
+
+   Interference here is the standard notion: a and b interfere iff both are live
+   OUT of the same op (live_out(j) is live_in_per_op[j+1], or bb->live_out for
+   the last op — see ir_op_live_out). "Both live after some op" excludes the
+   touching-endpoint case (one's last use is the other's def), which is register
+   REUSE, not a conflict — the same exclusive reading hr_recoverability_verify
+   had to re-derive by hand.
+
+   INERT: counts only. The answer returned is always the interval one. */
+static long lp_queries, lp_true, lp_flips, lp_unrefinable;
+static const Func *lp_cur_f;
+/* Decision level: one "decision" is a candidate's whole scan against every
+   sitting tenant. An edge flip only changes an outcome if EVERY blocking edge
+   for that candidate flips — the candidate has to come out unblocked. */
+static long lp_dec, lp_dec_blocked, lp_dec_flips, lp_unsound;
+static long lp_flips_lx_survive, lp_flips_lx_cancel;
+static long lp_dec_flips_lx;
+static long lp_need_window, lp_need_saverestore, lp_need_step3;
+static long lp_ctl_inside, lp_ctl_outside;   /* control: ALL arbiter decisions */
+static int  lp_cand_v = -1, lp_cand_lo, lp_cand_hi;
+static int  lp_dec_pr_any_lx;
+static int  lp_dec_active, lp_dec_iv_any, lp_dec_pr_any;
+
+static int liveprobe_on(void)
+{
+    static int on = -1;
+    if (on < 0) on = getenv("IR_LIVEPROBE") != NULL;
+    return on;
+}
+
+/* IR_LIVEPROBE=2: also evaluate the precise answer on queries the interval model
+   already called FALSE. Precise must be a strict SUBSET — an interval spans the
+   union of a vreg's live points, so it can only over-approximate. A single
+   "precise says interfere, interval says not" is proof the precise definition is
+   WRONG (bad live-out indexing, say), and phase 2 would miscompile on it. Costs
+   a full scan per query, so it is not the default. */
+static int liveprobe_paranoid(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_LIVEPROBE"); on = (e && e[0] == '2'); }
+    return on;
+}
+
+/* 1 = live out of the same op somewhere, 0 = never, -1 = cannot tell (a BB with
+   ops but no per-op sets, i.e. the calloc in ir_compute_liveness failed). */
+static int live_overlap_precise(const Func *f, int a, int b)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        if (bb->n_ops <= 0) continue;
+        if (!bb->live_in_per_op) return -1;
+        for (int j = 0; j < bb->n_ops; j++) {
+            const BitSet *lo = (j + 1 < bb->n_ops)
+                ? (const BitSet *)bb->live_in_per_op[j + 1]
+                : (const BitSet *)bb->live_out;
+            if (!lo) continue;
+            if (ir_bitset_get(lo, a) && ir_bitset_get(lo, b)) return 1;
+        }
+    }
+    return 0;
+}
+
+
+/* [IR_LIVEPROBE] Loop-extension composed onto the precise relation — PROBE ONLY.
+   Audit §3 deviation 3: the allocator widens an in-loop interval to the WHOLE loop
+   body, so a single-static-use vreg in a loop cannot look like a one-op interval and
+   let a second tenant clobber the register every iteration (md5 MDPrint, issue 349).
+   Per-op liveness has no such rounding, so a flip found by live_overlap_precise might
+   be a genuine hole OR that same under-approximation. This composes the rounding back
+   on to tell them apart: both live ANYWHERE in one loop span => interfere.
+   Back-edge rule per the redesign plan: succ s with s.id <= p.id spans [s.id, p.id]
+   (the builder produces reducible CFGs). Duplicated liveness on purpose — it exists to
+   decide whether the real thing needs it, and is deleted either way. */
+static int bb_has_live(const BB *bb, int v)
+{
+    if (bb->live_in && ir_bitset_get((const BitSet *)bb->live_in, v)) return 1;
+    if (bb->live_out && ir_bitset_get((const BitSet *)bb->live_out, v)) return 1;
+    if (!bb->live_in_per_op) return 0;
+    for (int j = 0; j < bb->n_ops; j++)
+        if (ir_bitset_get((const BitSet *)bb->live_in_per_op[j], v)) return 1;
+    return 0;
+}
+
+static int live_in_span(const Func *f, int v, int lo, int hi)
+{
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        if (bb->id < lo || bb->id > hi) continue;
+        if (bb_has_live(bb, v)) return 1;
+    }
+    return 0;
+}
+
+static int live_overlap_precise_loopext(const Func *f, int a, int b)
+{
+    if (live_overlap_precise(f, a, b) == 1) return 1;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *p = &f->bbs[i];
+        for (int k = 0; k < 2; k++) {
+            int sc = p->succ[k];
+            if (sc < 0 || sc > p->id) continue;      /* not a back edge */
+            if (live_in_span(f, a, sc, p->id) && live_in_span(f, b, sc, p->id))
+                return 1;                            /* rounding says they clash */
+        }
+    }
+    return 0;
+}
+
+void ir_liveprobe_count_iv(const Func *f, int a, int b, int interval_ans,
+                           int alo, int ahi, int blo, int bhi)
+{
+    if (!liveprobe_on() || !f) return;
+    lp_cur_f = f;
+    lp_queries++;
+    if (lp_dec_active) lp_dec_iv_any |= interval_ans;
+    if (!interval_ans) {                    /* false stays false; nothing to flip */
+        if (liveprobe_paranoid() && live_overlap_precise(f, a, b) == 1) {
+            lp_unsound++;                   /* MUST stay 0 — see liveprobe_paranoid */
+            const LiveRange *ra2 = ir_live_range(f, a), *rb2 = ir_live_range(f, b);
+            fprintf(stderr, "  LP_UNSOUND a=%d alloc_iv=[%d,%d] true_lr=[%d,%d]%s"
+                            " b=%d alloc_iv=[%d,%d] true_lr=[%d,%d]%s\n",
+                    a, alo, ahi, ra2?ra2->start:-9, ra2?ra2->end:-9,
+                    (f->vregs[a].flags & IR_VREG_PARAM) ? " PARAM" : "",
+                    b, blo, bhi, rb2?rb2->start:-9, rb2?rb2->end:-9,
+                    (f->vregs[b].flags & IR_VREG_PARAM) ? " PARAM" : "");
+        }
+        return;
+    }
+    lp_true++;
+    /* Precise is a SUBSET of interval (intervals over-approximate), so a `false`
+       interval answer can never hide a precise `true` — only true edges need the
+       refinement, and only they can contribute to lp_dec_pr_any. */
+    int p = live_overlap_precise(f, a, b);
+    if (p < 0)       { lp_unrefinable++; if (lp_dec_active) { lp_dec_pr_any = 1; lp_dec_pr_any_lx = 1; } }
+    else if (p == 0) {
+        lp_flips++;
+        /* Does the flip survive the loop rounding, or was it that rounding's
+           absence (i.e. potentially an unsound pack)? */
+        int lx = live_overlap_precise_loopext(f, a, b);
+        if (lx) { lp_flips_lx_cancel++; if (lp_dec_active) lp_dec_pr_any_lx = 1; }
+        else      lp_flips_lx_survive++;
+    }
+    else if (lp_dec_active) { lp_dec_pr_any = 1; lp_dec_pr_any_lx = 1; }
+}
+
+
+/* [IR_LIVEPROBE] What would an unblocked ARBITER placement actually need?
+   Per RESIDENCY_REDESIGN_PLAN's Step-4 mapping: a value DEAD outside its span
+   (born-killed) has resident window == live range == an interval known at
+   alloc-time, so it needs only home_lo/hi — no Step-3 region proof. A value live
+   beyond its span needs the proof relocated to alloc time (Step 3, 3c deferred).
+   A call inside the span clobbers BC, so it needs a save/restore either way. */
+static int lp_live_outside(const Func *f, int v, int lo, int hi)
+{
+    int g = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++, g++) {
+            const BitSet *l = (j + 1 < bb->n_ops)
+                ? (const BitSet *)bb->live_in_per_op[j + 1]
+                : (const BitSet *)bb->live_out;
+            if (!l) continue;
+            if ((g < lo || g > hi) && ir_bitset_get(l, v)) return 1;
+        }
+    }
+    return 0;
+}
+
+static int lp_span_has_call(const Func *f, int lo, int hi)
+{
+    int g = 0;
+    for (int i = 0; i < f->n_bbs; i++) {
+        const BB *bb = &f->bbs[i];
+        for (int j = 0; j < bb->n_ops; j++, g++) {
+            if (g < lo || g > hi) continue;
+            OpKind k = bb->ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL) return 1;
+        }
+    }
+    return 0;
+}
+
+static long lp_site_blocked[4], lp_site_flips[4], lp_site_flips_lx[4];
+static int  lp_site;
+
+void ir_liveprobe_decision_begin_cand(int site, int v, int lo, int hi)
+{
+    ir_liveprobe_decision_begin_site(site);
+    if (!liveprobe_on()) return;
+    lp_cand_v = v; lp_cand_lo = lo; lp_cand_hi = hi;
+}
+
+void ir_liveprobe_decision_begin_site(int site)
+{
+    if (!liveprobe_on()) return;
+    lp_cand_v = -1;
+    lp_dec_active = 1; lp_dec_iv_any = 0; lp_dec_pr_any = 0; lp_dec_pr_any_lx = 0;
+    lp_site = (site >= 0 && site < 4) ? site : 0;
+}
+
+void ir_liveprobe_decision_begin(void)
+{
+    ir_liveprobe_decision_begin_site(0);
+}
+
+void ir_liveprobe_decision_end(void)
+{
+    if (!liveprobe_on() || !lp_dec_active) return;
+    lp_dec++;
+    if (lp_site == 0 && lp_cand_v >= 0 && lp_cur_f) {   /* control over ALL arbiter decisions */
+        if (lp_live_outside(lp_cur_f, lp_cand_v, lp_cand_lo, lp_cand_hi)) lp_ctl_outside++;
+        else lp_ctl_inside++;
+    }
+    if (lp_dec_iv_any) {
+        lp_dec_blocked++;
+        lp_site_blocked[lp_site]++;
+        if (!lp_dec_pr_any) { lp_dec_flips++; lp_site_flips[lp_site]++; }
+        if (!lp_dec_pr_any_lx) {
+            lp_dec_flips_lx++; lp_site_flips_lx[lp_site]++;
+            if (lp_site == 0 && lp_cand_v >= 0) {      /* arbiter survivors only */
+                const Func *cf = lp_cur_f;
+                if (cf) {
+                    int outside = lp_live_outside(cf, lp_cand_v, lp_cand_lo, lp_cand_hi);
+                    int call    = lp_span_has_call(cf, lp_cand_lo, lp_cand_hi);
+                    if (outside)   lp_need_step3++;
+                    else if (call) lp_need_saverestore++;
+                    else           lp_need_window++;
+                }
+            }
+        }
+    }
+    lp_dec_active = 0;
+}
+
+void ir_liveprobe_flush(const char *fn)
+{
+    if (!liveprobe_on()) return;
+    if (lp_queries > 0)
+        fprintf(stderr,
+                "IR_LIVEPROBE %-24s queries=%-5ld true=%-5ld flips=%-5ld"
+                " flip_of_true=%5.1f%% decisions=%-4ld blocked=%-4ld"
+                " unblocked_by_precision=%-4ld unrefinable=%ld unsound=%ld\n",
+                fn ? fn : "?", lp_queries, lp_true, lp_flips,
+                lp_true ? 100.0 * (double)lp_flips / (double)lp_true : 0.0,
+                lp_dec, lp_dec_blocked, lp_dec_flips, lp_unrefinable, lp_unsound);
+    if (lp_flips > 0 || lp_dec_flips > 0)
+        fprintf(stderr, "  LP_LOOPEXT flips_survive=%ld flips_cancelled=%ld"
+                        "  decisions_survive=%ld of %ld\n",
+                lp_flips_lx_survive, lp_flips_lx_cancel, lp_dec_flips_lx, lp_dec_flips);
+    if (lp_ctl_inside || lp_ctl_outside)
+        fprintf(stderr, "  LP_CTL arbiter_decisions born_killed=%ld live_beyond_span=%ld\n",
+                lp_ctl_inside, lp_ctl_outside);
+    if (lp_need_window || lp_need_saverestore || lp_need_step3)
+        fprintf(stderr, "  LP_NEED window_only=%ld save_restore=%ld step3=%ld\n",
+                lp_need_window, lp_need_saverestore, lp_need_step3);
+    if (lp_dec_blocked > 0)
+        fprintf(stderr, "  LP_SITE arbiter=%ld/%ld/%ld packA=%ld/%ld/%ld packB=%ld/%ld/%ld packC=%ld/%ld/%ld"
+                        "   (survive_lx/flips/blocked)\n",
+                lp_site_flips_lx[0], lp_site_flips[0], lp_site_blocked[0],
+                lp_site_flips_lx[1], lp_site_flips[1], lp_site_blocked[1],
+                lp_site_flips_lx[2], lp_site_flips[2], lp_site_blocked[2],
+                lp_site_flips_lx[3], lp_site_flips[3], lp_site_blocked[3]);
+    for (int i = 0; i < 4; i++) { lp_site_blocked[i] = 0; lp_site_flips[i] = 0; lp_site_flips_lx[i] = 0; }
+    lp_queries = lp_true = lp_flips = lp_unrefinable = 0;
+    lp_dec = lp_dec_blocked = lp_dec_flips = lp_unsound = 0;
+    lp_flips_lx_survive = lp_flips_lx_cancel = lp_dec_flips_lx = 0;
+    lp_need_window = lp_need_saverestore = lp_need_step3 = 0;
+    lp_ctl_inside = lp_ctl_outside = 0;
+    lp_dec_active = lp_dec_iv_any = lp_dec_pr_any = 0;
+}
+
 int ir_live_ranges_overlap(const Func *f, int a, int b)
 {
     const LiveRange *ra = ir_live_range(f, a);
@@ -617,7 +896,9 @@ int ir_live_ranges_overlap(const Func *f, int a, int b)
     /* Inclusive intervals: overlap iff max(starts) <= min(ends). */
     int s = ra->start > rb->start ? ra->start : rb->start;
     int e = ra->end   < rb->end   ? ra->end   : rb->end;
-    return s <= e;
+    int ans = s <= e;
+    ir_liveprobe_count_iv(f, a, b, ans, ra->start, ra->end, rb->start, rb->end);
+    return ans;
 }
 
 /* ----- Structural verifier -------------------------------------------- */

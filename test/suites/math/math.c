@@ -318,6 +318,21 @@ void test_int_to_float_store()
     Assert(approx_equal(itf_a[1], 0.0, EPSILON), "int 0 -> float arr [1]");
 }
 
+/* A float→long conversion must sign-extend into the high word. The mbf32 z80
+   routine saved the sign byte with a `push af` that landed ON TOP of the
+   caller's IX (stashed under the return address by ___mbf32_setup_single_reg),
+   then unwound the two in the wrong order: (long)-3.0 came back as 0x00fffffd
+   and (long)3.0 as 0xff000003, and the caller lost IX as well. The operand
+   comes from a runtime-written global so the conversion cannot const-fold. */
+static FLOAT f2l_in[2];
+void test_float_to_long()
+{
+    f2l_in[0] = -3.0; f2l_in[1] = 3.0;
+    Assert((long)f2l_in[0] == -3L, "(long)-3.0 == -3");
+    Assert((long)f2l_in[1] ==  3L, "(long)3.0 == 3");
+    Assert((int)f2l_in[0]  == -3,  "(int)-3.0 == -3");
+}
+
 /* Reciprocal via ordinary divide `1.0 / x` (IEEE math32/math16: restoring
    fsdiv after sccz80 dropped the inversef rewrite for float/half). Divisor
    comes from a runtime-written global so the quotient can't const-fold away. */
@@ -513,6 +528,7 @@ int suite_math()
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
     suite_add_test(test_int_to_float_store);
+    suite_add_test(test_float_to_long);
     suite_add_test(test_float_arithmetic);
     suite_add_test(test_reciprocal);
     suite_add_test(test_sqrt);
