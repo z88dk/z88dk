@@ -5393,10 +5393,23 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                holds the low result (the old code popped after its normalise,
                when BC was free). Discard through AF instead — A is already
                clobbered by the byte chain and F is irrelevant, so this is the
-               one place `pop af` is the right instruction. */
+               one place `pop af` is the right instruction — everywhere except
+               the KR580VM1, where F is NOT irrelevant: PSW bit 3 is MF, the
+               data-bank select, so popping an arbitrary word switches the bank
+               under the program. (md5's Transform does this 64 times; on the
+               VM1 it read the wrong 64K from the first one on.) There the
+               discard goes through HL, which the byte chain above left holding
+               a walked-past address and nothing reads again — same two bytes
+               and same 20T as the AF form. */
             if (src1_inline_pushed) {
-                emit(out, "pop\taf");
-                emit(out, "pop\taf");
+                if (CPU_POP_AF_IS_SAFE()) {
+                    emit(out, "pop\taf");
+                    emit(out, "pop\taf");
+                } else {
+                    emit(out, "pop\thl");
+                    emit(out, "pop\thl");
+                    invalidate_hl_cache();
+                }
                 L.cur_sp_adjust -= 4;
                 L.la.cur_dehl_inline_push = -1;
                 invalidate_a_cache();
