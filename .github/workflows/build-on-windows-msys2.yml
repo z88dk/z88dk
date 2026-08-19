@@ -29,9 +29,8 @@ jobs:
       with:
         msystem: MINGW64
         update: true
-        # The runner image already ships MSYS2. Installing a fresh copy puts a
-        # second one on D:, which is only 14G in total and is also where the
-        # workspace lives. `update: true` still refreshes the packages.
+        # The image already ships MSYS2; a fresh install puts a second copy on
+        # D:, which is 14G total and also holds the workspace.
         release: false
         install: >
             base-devel

@@ -31,9 +31,8 @@ jobs:
       with: 
         submodules: 'true'
 
-    # Rolling key: actions/cache never overwrites an existing key, so a fixed
-    # one is written once and then frozen. restore-keys falls back to the most
-    # recent entry, and each run saves a fresh one.
+    # Rolled: actions/cache never overwrites an existing key, so a fixed one is
+    # written once and then frozen.
     - name: Cache perl modules
       uses: actions/cache@v4
       with:
@@ -76,12 +75,9 @@ jobs:
       shell: cmd
     - name: Install perl prerequisites
       run: |
-        # Bootstrap cpanm from its standalone script rather than
-        # `cpan App::cpanminus`. The CPAN client configures itself, resolves a
-        # mirror and shells out constantly, which on cygwin -- where every
-        # fork() is expensive -- dominated this step. It also installs into the
-        # system perl, outside the ~/perl5 cache, so it was paid in full every
-        # run. Same approach the msys2 workflow already uses.
+        # Standalone cpanm rather than `cpan App::cpanminus`: the CPAN client
+        # shells out constantly, which is expensive under cygwin's fork(), and
+        # installs outside the ~/perl5 cache so it was never cached.
         mkdir -p /usr/local/bin
         curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o /usr/local/bin/cpanm
         chmod +x /usr/local/bin/cpanm

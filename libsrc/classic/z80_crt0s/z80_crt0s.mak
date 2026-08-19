@@ -1,42 +1,29 @@
-# crt0 objects, built directly into libsrc's own dependency graph.
+# crt0 objects, built directly into libsrc's dependency graph.
 #
-# This was a recursive $(MAKE) -C classic/z80_crt0s. Running the assembler from
-# libsrc/ instead removes two pieces of machinery that only existed to bridge
-# the two make processes:
+# Was a recursive $(MAKE) -C classic/z80_crt0s. Running the assembler from
+# libsrc/ drops the obj/<cpu>-crt0.parent.d pass, which only existed to respell
+# the sub-make's paths, and the crt0 library chain that kept eleven concurrent
+# sub-makes out of one directory.
 #
-#   - obj/<cpu>-crt0.parent.d, a second dependency pass whose only job was to
-#     respell the sub-make's paths as libsrc-relative ones. lstdeps.awk run
-#     from here emits those paths directly.
-#   - the serialisation. Eleven crt0 stamps meant up to eleven concurrent
-#     sub-makes into one directory, so the crt0 libraries were chained
-#     (z80 -> ez80_z80 -> ... -> kc160) to keep them apart. With one make
-#     process there is nothing to serialise and the chain is gone.
-#
-# Paths inside a z80asm @list-file resolve against the list file's own
-# directory, so the .lst files keep their ../../ spellings unchanged; only the
-# assembler's cwd moves. NEWLIB_ROOT is the prefix the l/*.lst files apply to
-# their entries and is empty here because libsrc/ is already the root.
+# Paths in a z80asm @list-file resolve against the list file's own directory, so
+# the .lst files are unchanged; only the assembler's cwd moves.
 
 CRT0_DIR    = classic/z80_crt0s
 CRT0S       = z80 ixiy z80n 8080 8085 gbz80 z180 ez80_z80 r2ka r4k kc160
 
-# NEWLIB_ROOT is the prefix the l/*.lst files apply to their entries. It must
-# end in a slash: those files are inconsistent, spelling entries both as
-# ${NEWLIB_ROOT}l/x and ${NEWLIB_ROOT}/l/x, and only a trailing slash makes both
-# resolve (the second becomes .//l/x, which normalises). It was ../../ when this
-# ran from classic/z80_crt0s; from libsrc/ the root is ./ -- not empty.
+# Must end in a slash: the l/*.lst files spell entries both ${NEWLIB_ROOT}l/x
+# and ${NEWLIB_ROOT}/l/x, and only a trailing slash resolves both. Was ../../
+# when this ran from classic/z80_crt0s; from libsrc/ it is ./, not empty.
 CRT0_ROOT   = ./
 
 LSTDEPS_AWK = lstdeps.awk
 LSTDEPS     = NEWLIB_ROOT=$(CRT0_ROOT) awk -v INC=classic -v EMIT_LSTS=1 -f $(LSTDEPS_AWK)
 
-# lstdeps resolves a name against the include path, so entries reached through
-# this directory come back as classic/z80_crt0s/../../arch/x.asm, and the root
-# prefix above leaves a ./ on the rest. Collapse both, as z80asm's own
-# norm_filename does, so a source has ONE name in the graph whether it is
-# reached from here or from $(OBJS). Getting this wrong does not fail loudly --
-# it silently splits the node in two and the crt0 libraries stop relinking when
-# their sources change.
+# lstdeps returns entries reached through this directory as
+# classic/z80_crt0s/../../arch/x.asm, and CRT0_ROOT leaves a ./ on the rest.
+# Collapse both, as z80asm's norm_filename does, so a source has one name in the
+# graph. Getting this wrong fails silently: the node splits in two and the crt0
+# libraries stop relinking when their sources change.
 NORMDEPS    = sed -e 's|//*|/|g' -e ':a' -e 's|[^/][^/]*/\.\./||' -e 'ta' -e 's|^\./||'
 
 # Stamp file standing in for "this cpu's crt0 objects are up to date".

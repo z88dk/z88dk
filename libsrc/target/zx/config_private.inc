@@ -29,10 +29,8 @@ defc __NIRVANAP_CHAR_TABLE  = 15360   ; default location of character set (8x8 p
 ; define(`__NIRVANAP_OPTIONS_WIDE_SPRITES', 0x02)
 
 
-; The engines below are shared with newlib, whose config carries the same
-; values (libsrc/newlib/target/zx/config_zx_private.inc). Keep the two in step:
-; without these the m4 expansion of BIFROSTH/BIFROSTL/NIRVANAM_ENGINE.asm.m4
-; still succeeds but leaves the symbols undefined at assembly time.
+; Shared with newlib/target/zx/config_zx_private.inc -- keep the two in step.
+; Without these the m4 expansion succeeds but leaves the symbols undefined.
 
 defc __BIFROSTH_ANIM_SPEED     = 4
 defc __BIFROSTH_ANIM_GROUP     = 4
