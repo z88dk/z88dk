@@ -445,8 +445,13 @@ struct gototab_s {
    assembler; the prefix costs 4T and one byte per instruction that uses it. */
 #define CPU_HAS_ALT_HL()    (IS_KR580VM1())
 
-/* Branch on signed overflow. The 8085 spells the same flag K and has both
-   polarities (jk/jnk); the VM1 spells it OF and has the set form only. */
+/* Branch on signed overflow - but the two flags do NOT come from the same
+   place, so they are not interchangeable. The 8085's K is set by DSUB, which
+   is why the signed WORD compare can fuse into `jp k`. The VM1's OF is set by
+   the 8-BIT alu ops only: its DSUB and DCMP set S, Z and CY and leave OF
+   alone. So `jp of` is the V flag the 8080 family otherwise lacks, useful for
+   a signed BYTE compare, and no use at all for a word one. The 8085 also has
+   both polarities (jk/jnk) where the VM1 has only the set form. */
 #define CPU_HAS_JP_OF()     (IS_KR580VM1())
 #define CPU_HAS_JP_K()      (IS_8085())
 
