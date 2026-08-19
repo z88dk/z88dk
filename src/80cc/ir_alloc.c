@@ -1452,6 +1452,24 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                for this value (read-only value on a cheap-slot target). G2: unless
                the setup/step keep-rule protects it (queen-pattern counter). */
             if (idx_ben && idx_ben[v] <= 0 && !(idx_keep && idx_keep[v])) continue;
+            /* A home that is DEAR TO FILL cannot take a parameter. The value
+               has to be read out of the caller's slot and moved into the pair
+               before the home serves anything, and the pair is callee-saved
+               across the whole function - on the VM1's h'l' that is 44T + 25T
+               + 21T of setup against the 19T a later read saves, so it wants
+               five reads just to break even. A COUNTER pays back at once,
+               because the home absorbs the STEP (35T an iteration) as well as
+               the reads; idx_ben cannot tell them apart because it prices
+               accesses and charges nothing for filling the home.
+               Measured on the VM1: rejecting param homes is a win on every
+               suite, in bytes AND ticks (charbench -34B/-10168T; -14B on
+               queenbench, lexbench, sieve and strbench). The same argument
+               applies to an IX/IY home, which is why idx_ben's missing setup
+               term is already noted for the Rabbit - but changing that is a
+               shared-codegen change with its own gauntlet, so this asks about
+               THIS home rather than about the CPU. */
+            if ((c->flags & CF_IDX2_PARAM) && f->idx2_reg == IR_PR_HL_ALT)
+                continue;
             if (c->flags & CF_IDX2_PARAM) {
                 int counter_waiting = 0;
                 for (int k = 0; k < n; k++)
@@ -1462,6 +1480,12 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                     }
                 if (counter_waiting) continue;
             }
+            if (getenv("IR_IDX2_PROBE"))
+                fprintf(stderr, "IDX2 take %s v%d ben=%ld param=%d counter=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?",
+                        v, idx_ben ? idx_ben[v] : -1L,
+                        (c->flags & CF_IDX2_PARAM) != 0,
+                        (c->flags & CF_IDX2_COUNTER) != 0);
             f->vreg_to_phys[v] = f->idx2_reg;
             idx2_taken = 1;
             continue;
