@@ -910,7 +910,7 @@ Do not keep losing-variant function bodies.
 
 Binary: `z88dk-zcc-multi`
 
-Source: `src/zccmulti/`
+Source: `src/zcc-multi/`
 
 zcc invokes it the same way it invokes `z88dk-copt`.
 
@@ -982,7 +982,7 @@ That later switch MUST NOT need zcc `-compiler=multi`.
 5. Size and ticks MUST come from the listing or from tables. They MUST NOT require a zcc temp-name scheme.
 6. The IX elevate rule MUST take a callee-save class per variant name, not "this came from sccz80.exe".
 7. The `-v` summary format MUST stay stable so 80cc can print the same lines.
-8. `src/zccmulti/` SHOULD stay a small C library plus a thin `main`. zcc links or execs it. Later 80cc MAY link the same library.
+8. `src/zcc-multi/` SHOULD stay a small C library plus a thin `main`. zcc links or execs it. Later 80cc MAY link the same library.
 
 ### What zcc owns and 80cc will not need
 
@@ -999,7 +999,7 @@ Do not hide selection inside `src/zcc/zcc.c` only.
 
 Do not encode "three process() calls" as the only way to produce a variant.
 
-Do not name the library after zcc if that blocks 80cc from linking it. `src/zccmulti/` is acceptable. The public functions SHOULD use a short prefix such as `zccmulti_`.
+Do not name the library after zcc if that blocks 80cc from linking it. `src/zcc-multi/` is acceptable. The public functions SHOULD use a short prefix such as `zccmulti_`.
 
 ## ABI compatibility
 
@@ -1342,7 +1342,7 @@ The map cannot name the compiler.
 | `-Cc` flag rejected by 80cc | Low | Fail the file. Do not filter in silence |
 | `CPU_TYPE_IXIY` swaps IX at assemble | Low | 80cc-fp still emits IX. Assembler swaps both sides |
 | Private CPU list drifts from 80cc | High | 80cc-fp follows `src/80cc/main.c` force-off only |
-| Selector glued to zcc `process()` | Medium | Keep `src/zccmulti` as a library. 80cc can link it later |
+| Selector glued to zcc `process()` | Medium | Keep `src/zcc-multi` as a library. 80cc can link it later |
 
 ## Alternatives considered
 
@@ -1491,21 +1491,21 @@ The metric and the IX rule are enough to implement.
 ### PR 2 — `z88dk-zcc-multi` parse skeleton
 
 - **Title:** tools: add z88dk-zcc-multi assembly parser
-- **Files:** `src/zccmulti/*`, `src/zccmulti/Makefile`, top-level tool build hook
+- **Files:** `src/zcc-multi/*`, `src/zcc-multi/Makefile`, top-level tool build hook
 - **Depends on:** PR 1
 - **Changes:** Parse post-copt asm. List functions, data labels, and sections. No select yet. Split a small C library and a `main`. Add a small host test on checked-in fixtures from `src/80cc/fw_full.asm` shape.
 
 ### PR 3 — Size metric via z80asm listing
 
 - **Title:** tools: z88dk-zcc-multi size metric
-- **Files:** `src/zccmulti/*`
+- **Files:** `src/zcc-multi/*`
 - **Depends on:** PR 2
 - **Changes:** Invoke z80asm with `-l`. Count opcode bytes per function. Add each distinct helper once. Fail if assemble fails.
 
 ### PR 4 — Stitch writer
 
 - **Title:** tools: z88dk-zcc-multi stitch by size
-- **Files:** `src/zccmulti/*`
+- **Files:** `src/zcc-multi/*`
 - **Depends on:** PR 3
 - **Changes:** Rewrite local labels. Copy named data from `--data-variant`. Emit winner comments. Write one `.asm`. Host tests for one `_foo` / one `_bar` and single data.
 
@@ -1519,7 +1519,7 @@ The metric and the IX rule are enough to implement.
 ### PR 6 — IX elevate
 
 - **Title:** zcc-multi: elevate sccz80 callees of 80cc-fp callers
-- **Files:** `src/zccmulti/*`
+- **Files:** `src/zcc-multi/*`
 - **Depends on:** PR 5
 - **Changes:** Walk intra-file calls. If 80cc-fp calls sccz80, switch the callee to 80cc-fp when that body exists. Demote the caller only when it does not. Do not drop 80cc-fp for float libraries.
 
@@ -1533,7 +1533,7 @@ The metric and the IX rule are enough to implement.
 ### PR 8 — Static ticks metric
 
 - **Title:** tools: z88dk-zcc-multi static ticks metric
-- **Files:** `src/zccmulti/*`, shared timing tables or a thin include from `src/ticks/`
+- **Files:** `src/zcc-multi/*`, shared timing tables or a thin include from `src/ticks/`
 - **Depends on:** PR 3
 - **Changes:** Implement the v1 T-state sum. Add helper static ticks once per call site. Map `c_cpu` to the ticks model. Fall back to size on computed jumps. Tie-break as specified. Extend the suite with `-compiler-metric=ticks`.
 
@@ -1546,7 +1546,7 @@ PR 7 MUST not wait on ticks.
 ### PR 9 — Optional dynamic ticks (later)
 
 - **Title:** tools: optional dynamic ticks harness for zcc-multi
-- **Files:** `src/zccmulti/*`
+- **Files:** `src/zcc-multi/*`
 - **Depends on:** PR 8
 - **Changes:** Only if a later review wants true `z88dk-ticks` scores. Out of v1.
 
@@ -1560,6 +1560,6 @@ PR 7 MUST not wait on ticks.
 ### Later — 80cc in-process switch (not v1)
 
 - **Title:** 80cc: optional per-function sp/fp pick
-- **Files:** `src/80cc/*`, reuse `src/zccmulti/`
+- **Files:** `src/80cc/*`, reuse `src/zcc-multi/`
 - **Depends on:** the library seam in PR 2 and a closed IX-clobber audit
 - **Changes:** Out of v1. Do not start this until the zcc host is stable. 80cc then emits `80cc-sp` and `80cc-fp` in one compile and calls the same selector.
