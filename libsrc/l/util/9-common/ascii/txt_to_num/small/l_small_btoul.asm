@@ -31,8 +31,15 @@ l_small_btoul:
 
 loop:
 
+IF __CPU_VM1__
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+ELSE
    pop af
    pop af
+ENDIF
    
    inc bc
    ld a,(bc)

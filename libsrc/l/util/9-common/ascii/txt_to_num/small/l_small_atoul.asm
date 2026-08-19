@@ -31,8 +31,15 @@ l_small_atoul:
 
 loop:
 
+IF __CPU_VM1__
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+ELSE
    pop af
    pop af
+ENDIF
    
    inc bc
    ld a,(bc)
@@ -163,7 +170,14 @@ overflow_1:
 
 overflow_0:
 
+IF __CPU_VM1__
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+ELSE
    pop af
    pop af
+ENDIF
    
    jr overflow_1
