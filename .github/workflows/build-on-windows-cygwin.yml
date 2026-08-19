@@ -79,7 +79,7 @@ jobs:
         # shells out constantly, which is expensive under cygwin's fork(), and
         # installs outside the ~/perl5 cache so it was never cached.
         mkdir -p /usr/local/bin
-        curl -L https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -o /usr/local/bin/cpanm
+        wget -q https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -O /usr/local/bin/cpanm
         chmod +x /usr/local/bin/cpanm
         which cpanm
         cpanm --version
