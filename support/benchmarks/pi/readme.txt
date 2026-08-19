@@ -63,10 +63,10 @@ Timer-bounded classic +test. Full archive: z88dk-classic/readme.txt.
 
 Compiler | CPU  | Ticks
 ---------|------|----------------
-sccz80   | z80  | 4_028_061_102
-sccz80   | 8085 | 7_380_146_447  (Jul 2026)
-80cc     | z80  | 4_272_344_605  (Aug 18, 2026, -fframe-pointer)
-80cc     | 8085 | 7_569_463_213  (Jul 2026)
+sccz80   | z80  | 1_992_348_390  (Aug 19, 2026)
+sccz80   | 8085 | 1_922_636_057  (Aug 19, 2026)
+80cc     | z80  | 2_229_596_893  (Aug 19, 2026)
+80cc     | 8085 | 1_979_531_647  (Aug 19, 2026)
 zsdcc    | z80  | 4_012_863_322  (Aug 16, 2026)
 
 
@@ -114,12 +114,12 @@ cycle count  = 4012863322
 time @ 4MHz  = 4012863322 / 4*10^6 =  16 min 43 sec
 
 6.
-Z88DK April 4, 2022
+Z88DK August 19, 2026
 sccz80 / classic c library
-7154 bytes less page zero
+7252 bytes less page zero
 
-cycle count  = 4028061102
-time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
+cycle count  = 1992348390
+time @ 4MHz  = 1992348390 / 4*10^6 =  8 min 18 sec
 
 7.
 HITECH C MSDOS V780pl2
@@ -154,26 +154,26 @@ time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
 It looks like IAR implements its 32-bit math in C.
 
 11.
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 sccz80 / classic c library / 8085 CPU
-7295 bytes less page zero
+7390 bytes less page zero
 
-cycle count  = 7380146447
-time @ 4MHz  = 7380146447 / 4*10^6 = 30 min 45 sec
+cycle count  = 1922636057
+time @ 4MHz  = 1922636057 / 4*10^6 =  8 min  1 sec
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic c library
-7633 bytes less page zero
+7718 bytes less page zero
 
-cycle count  = 4272344605
-time @ 4MHz  = 4272344605 / 4*10^6 = 17 min 48 sec
+cycle count  = 2229596893
+time @ 4MHz  = 2229596893 / 4*10^6 =  9 min 17 sec
 
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 80cc / classic c library / 8085 CPU
-7745 bytes less page zero
+7639 bytes less page zero
 
-cycle count  = 7569463213
-time @ 4MHz  = 7569463213 / 4*10^6 = 31 min 32 sec
+cycle count  = 1979531647
+time @ 4MHz  = 1979531647 / 4*10^6 =  8 min 15 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================

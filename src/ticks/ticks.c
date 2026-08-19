@@ -865,7 +865,14 @@ int f(void){
                 | fk << 5     // OF, bit 5
                 | (vm1_mf ? 8 : 0) // MF, bit 3
                 | (fr ^ fa ^ fb ^ fb >> 8) & 16 // AC (half carry) bit 4
-                | (154020 >> ((fr ^ fr >> 4) & 15)) & 4; // P bit 2
+                // P bit 2, exactly as the 8080 does it: parity of the RESULT
+                // after an ALU op, but the value setf() stashed after a POP
+                // PSW - which masks fa to 255, and that is what selects the
+                // second arm. Computing it from fr alone loses a popped P,
+                // because setf() puts only Z into fr (issue #3069).
+                | (fa & -256
+                    ? 154020 >> ((fr ^ fr >> 4) & 15)
+                    : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4;
     } else if ( is8080() && !c_z80asm_tests ) {
         // bit 0 = carry
         // bit 1 = 1
@@ -2771,6 +2778,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
 
             // 8080: S Z 0 AC 0 P 1 C
             // 8085: S Z K AC 0 P V C
+            // VM1:  S Z K AC MF P 1 C
             #if 0
             if ( is8085() ) { flags &= 0xf7; }
             else if ( is8080() && !c_z80asm_tests ) { flags |= 2; flags &= 0xd7; }

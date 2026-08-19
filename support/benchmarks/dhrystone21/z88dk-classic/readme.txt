@@ -30,7 +30,7 @@ zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DTIMER -D__Z88DK 
 
 classic/80cc
 zcc +test -compiler=80cc -vn -fframe-pointer -O2 -DTIMER -D__Z88DK -DNOSTRUCTASSIGN dhry_1.c dhry_2.c -o dhry.bin -m -lndos
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 # 80cc needs -DNOSTRUCTASSIGN (struct copy is unsupported).
 # TIMER is not published: the Run_Index loop exits immediately (~800 cycles).
 

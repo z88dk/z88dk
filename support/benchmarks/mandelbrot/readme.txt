@@ -75,8 +75,8 @@ sccz80   | 8085 | math16  | 969_324_571 (Aug 10, 2026)
 sccz80   | z80  | math32  | 1_031_176_011 (Aug 15, 2026)
 zsdcc    | z80  | math32  | 1_301_251_782 (Aug 16, 2026)
 sccz80   | 8085 | math32  | 2_041_768_834 (Aug 15, 2026)
-80cc     | z80  | math32  | 1_315_040_014 (Aug 18, 2026, -fframe-pointer)
-80cc     | 8085 | math32  | 2_061_364_665 (Aug 15, 2026)
+80cc     | z80  | math32  | 1_314_554_468 (Aug 19, 2026)
+80cc     | 8085 | math32  | 1_988_563_544 (Aug 19, 2026)
 sccz80   | 8085 | mbf32   | 1_805_825_674  (Jul 2026)
 
 
@@ -199,22 +199,22 @@ IEEE 32-bit float implementation (math32_8085).
 (opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 12.
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic c library / math32
-4940 bytes less page zero
+4764 bytes less page zero
 
-cycle count  = 1315040014
-time @ 4MHz  = 1315040014 / 4*10^6 =  5 min 29 sec
+cycle count  = 1314554468
+time @ 4MHz  = 1314554468 / 4*10^6 =  5 min 29 sec
 
 IEEE 32-bit float implementation.
 
 13.
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 80cc / classic c library / 8085 / math32
-4883 bytes less page zero
+4842 bytes less page zero
 
-cycle count  = 2061364665
-time @ 4MHz  = 2061364665 / 4*10^6 =  8 min 35 sec
+cycle count  = 1988563544
+time @ 4MHz  = 1988563544 / 4*10^6 =  8 min 17 sec
 
 IEEE 32-bit float implementation (math32_8085).
 

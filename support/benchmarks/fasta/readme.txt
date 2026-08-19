@@ -50,11 +50,11 @@ z88dk-classic/readme.txt. N=1000.
 
 Compiler | CPU  | Library | Ticks
 ---------|------|---------|-------------
-sccz80   | z80  | math32  | 122_937_964 (Aug 15, 2026)
+sccz80   | z80  | math32  | 123_137_988 (Aug 19, 2026)
 zsdcc    | z80  | math32  | 159_709_488 (Aug 16, 2026)
-sccz80   | 8085 | math32  | 185_985_608 (Aug 15, 2026)
-80cc     | z80  | math32  | 173_739_114 (Aug 18, 2026, -fframe-pointer)
-80cc     | 8085 | math32  | 260_585_004 (Aug 15, 2026)
+sccz80   | 8085 | math32  | 185_981_358 (Aug 19, 2026)
+80cc     | z80  | math32  | 159_261_134 (Aug 19, 2026)
+80cc     | 8085 | math32  | 260_580_754 (Aug 19, 2026)
 sccz80   | z80  | mbf32   | 165_734_164  (Jul 2026)
 sccz80   | 8085 | mbf32   | 194_305_817  (Jul 2026)
 
@@ -116,12 +116,12 @@ time @ 4MHz  = 165734164 / 4*10^6 = 41.43 sec
 Microsoft 32-bit float implementation.
 
 7.
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 sccz80 / classic c library / math32
-4305 bytes less page zero
+4367 bytes less page zero
 
-cycle count  = 122937964
-time @ 4MHz  = 122937964 / 4*10^6 =   30.7 sec
+cycle count  = 123137988
+time @ 4MHz  = 123137988 / 4*10^6 =   30.8 sec
 
 IEEE 32-bit float implementation.
 
@@ -136,32 +136,32 @@ time @ 4MHz  = 159709488 / 4*10^6 =   39.9 sec
 IEEE 32-bit float implementation (classic +test, -compiler=sdcc -SO3 --math32).
 
 8.
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 sccz80 / classic c library / 8085 / math32
-5211 bytes less page zero
+5267 bytes less page zero
 
-cycle count  = 185985608
-time @ 4MHz  = 185985608 / 4*10^6 =   46.5 sec
+cycle count  = 185981358
+time @ 4MHz  = 185981358 / 4*10^6 =   46.5 sec
 
 IEEE 32-bit float implementation (math32_8085).
 
 9.
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic c library / math32
-5579 bytes less page zero
+5524 bytes less page zero
 
-cycle count  = 173739114
-time @ 4MHz  = 173739114 / 4*10^6 =   43.4 sec
+cycle count  = 159261134
+time @ 4MHz  = 159261134 / 4*10^6 =   39.8 sec
 
 IEEE 32-bit float implementation.
 
 10.
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 80cc / classic c library / 8085 / math32
-6113 bytes less page zero
+6169 bytes less page zero
 
-cycle count  = 260585004
-time @ 4MHz  = 260585004 / 4*10^6 =  1 min  5 sec
+cycle count  = 260580754
+time @ 4MHz  = 260580754 / 4*10^6 =  1 min  5 sec
 
 IEEE 32-bit float implementation (math32_8085).
 
