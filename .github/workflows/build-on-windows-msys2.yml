@@ -29,6 +29,10 @@ jobs:
       with:
         msystem: MINGW64
         update: true
+        # The runner image already ships MSYS2. Installing a fresh copy puts a
+        # second one on D:, which is only 14G in total and is also where the
+        # workspace lives. `update: true` still refreshes the packages.
+        release: false
         install: >
             base-devel
             git
@@ -44,6 +48,11 @@ jobs:
             mingw-w64-x86_64-ragel
             re2c
             vim
+    - name: Disk after msys2 install
+      if: always()
+      run: |
+        echo '--- free space ---'
+        df -h
     - name: Install Strawberry Perl
       shell: powershell
       run: |
@@ -71,7 +80,7 @@ jobs:
       shell: msys2 {0}
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         echo "PERL5LIB=$PERL5LIB"
         perl -V
         ln -s /mingw64/bin/mingw32-make /mingw64/bin/make
@@ -79,27 +88,46 @@ jobs:
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         mkdir -p bin
         cp `which m4` bin/
         ./build.sh -v -l
+    - name: Disk after binaries
+      if: always()
+      run: |
+        echo '--- free space ---'
+        df -h
     - name: Build libraries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         MAKE_CONCURRENCY=-j4 ./build.sh -v -b
+    - name: Disk after libraries
+      if: always()
+      run: |
+        echo '--- free space ---'
+        df -h
+        du -sh libsrc bin lib examples test testsuite 2>/dev/null | sort -h
     - name: Build examples
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b -l -e
+    - name: Disk after examples
+      if: always()
+      run: |
+        echo '--- free space ---'
+        df -h
+        du -sh libsrc bin lib examples test testsuite 2>/dev/null | sort -h
     - name: Run tests
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         make -C libsrc install-clean
+        echo '--- free space after install-clean ---'
+        df -h
         ./build.sh -v -b -l -t
