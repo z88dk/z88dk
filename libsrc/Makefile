@@ -437,7 +437,10 @@ zx_clib.lib: $(TARGET_CLIB_DEPS) $(ZX_TARGETS) $(FZX_TARGETS)
 	$(MAKE) -C target/zx/classic/rs232 TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib  -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
 
-zxcpm.lib:  $(TARGET_CLIB_DEPS) $(ZX_TARGETS)
+# Serialised: zxcpm.lib runs the same sub-build(s) as zx_clib.lib, into the same obj
+# directory. The sub-make is in the recipe, so chaining the library is
+# enough to keep the two apart.
+zxcpm.lib:  $(TARGET_CLIB_DEPS) $(ZX_TARGETS) zx_clib.lib
 	@echo ''
 	@echo '--- Building ZX Spectrum CP/M Library ---'
 	@echo ''
@@ -1058,7 +1061,10 @@ bee_clib.lib: $(TARGET_CLIB_DEPS)
 	$(MAKE) -C classic/games TARGET=bee
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(TARGET_DIRECTORY)/bee/bee.lst
 
-microbee.lib: cpm_clib.lib
+# Serialised: microbee.lib runs the same sub-build(s) as bee_clib.lib, into the same obj
+# directory. The sub-make is in the recipe, so chaining the library is
+# enough to keep the two apart.
+microbee.lib: cpm_clib.lib bee_clib.lib
 	@echo ''
 	@echo '--- Building MicroBee Library (CP/M & graphics) ---'
 	@echo ''
@@ -1107,7 +1113,10 @@ sam_clib.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS)
 	$(MAKE) -C classic/games TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
 
-sam_cpm.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS)
+# Serialised: sam_cpm.lib runs the same sub-build(s) as sam_clib.lib, into the same obj
+# directory. The sub-make is in the recipe, so chaining the library is
+# enough to keep the two apart.
+sam_cpm.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS) sam_clib.lib
 	@echo ''
 	@echo '--- Building Sam Coupe CP/M Library ---'
 	@echo ''
@@ -1686,7 +1695,10 @@ nabu_cpm.lib: nabu_clib.lib
 	$(MAKE) -C classic/video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_cpm @$(TARGET_DIRECTORY)/nabu/nabu_cpm.lst
 
-nabu_int.lib: nabu_clib.lib
+# Serialised: nabu_int.lib runs the same sub-build(s) as nabu_cpm.lib, into the same obj
+# directory. The sub-make is in the recipe, so chaining the library is
+# enough to keep the two apart.
+nabu_int.lib: nabu_clib.lib nabu_cpm.lib
 	@echo ''
 	@echo '--- Building Nabu Interrupt Library ---'
 	@echo ''
@@ -1713,7 +1725,10 @@ hector1_clib.lib: $(TARGET_CLIB_DEPS) $(HECTOR_TARGETS)
 	TARGET=hector1 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
 
 # Hector/Victor/Lambda - dom
-hectorhr_clib.lib: $(TARGET_CLIB_DEPS) $(HECTOR_TARGETS)
+# Serialised: hectorhr_clib.lib runs the same sub-build(s) as hector1_clib.lib, into the same obj
+# directory. The sub-make is in the recipe, so chaining the library is
+# enough to keep the two apart.
+hectorhr_clib.lib: $(TARGET_CLIB_DEPS) $(HECTOR_TARGETS) hector1_clib.lib
 	@echo ''
 	@echo '--- Building HectorHR Library ---'
 	@echo ''	
