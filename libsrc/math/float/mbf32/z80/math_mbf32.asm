@@ -412,8 +412,15 @@ DIVLP:  PUSH    HL              ; Save divisor
         CCF
         JP      NC,RESDIV       ; Restore divisor if borrow
         LD      (DIV4),A        ; Re-save overflow count
+IF __CPU_VM1__
+        INC     SP
+        INC     SP
+        INC     SP
+        INC     SP
+ELSE
         POP     AF              ; Scrap divisor
         POP     AF
+ENDIF
         SCF                     ; Set carry to
         DEFB    0D2H            ; Skip "POP BC" and "POP HL"
 
