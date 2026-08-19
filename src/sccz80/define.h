@@ -389,6 +389,12 @@ struct gototab_s {
 /* KR580VM1: an 8080 superset - no CB set, no IX/IY, no exx - so it belongs
    with the 8080 family for every "not a z80" gate. */
 #define IS_KR580VM1() (c_cpu == CPU_KR580VM1)
+/* The 8080's LIMITS, which the VM1 shares even though it adds instructions of
+   its own: no CB rotate/shift set, and none of the 8085's extended ops (RDEL,
+   ARHL, DSUB...). Codegen that asks `IS_8080()` to mean "the cpu that has to
+   do this the long way" wants THIS - a bare IS_8080() sends the VM1 down a
+   path emitting `rl e` / `srl l` / `sra hl`, which it cannot execute. */
+#define IS_8080_CLASS() (IS_8080() || IS_KR580VM1())
 #define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085 || c_cpu == CPU_KR580VM1)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
 #define IS_Z80N() (c_cpu == CPU_Z80N)
