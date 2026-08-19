@@ -1,6 +1,7 @@
 include ../../Make.config
 
-TARGET = aquarius 
+TARGET = aquarius
+
 
 SUBDIRS = fcntl 
 CLEANDIRS = $(SUBDIRS:%=%-clean)

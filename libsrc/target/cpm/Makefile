@@ -1,6 +1,7 @@
 include ../../Make.config
 
-TARGET = cpm 
+TARGET = cpm
+
 
 SUBDIRS = graphics fcntl stdio time cpm gsx
 CLEANDIRS = $(SUBDIRS:%=%-clean)
