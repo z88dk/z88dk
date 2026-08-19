@@ -4323,7 +4323,17 @@ static int gen_add(FILE *out, Func *f, const Op *op)
    family has `sbc hl,bc`. Reverts with `--opt-disable=dsub`. */
 static int dsub_ok(void)
 {
-    return IS_8085() && !opt_disabled("dsub");
+    return CPU_HAS_SUB_HL_BC() && !opt_disabled("dsub");
+}
+
+/* The KR580VM1 has the DE form as well, which is the one the lowerer wants:
+   load_binop_operands already leaves the subtrahend in DE, so `sub hl,de` is
+   1 byte and 10 cycles with NO staging and no claim on BC - where the 8085
+   must first `ld bc,de` and can only do that when BC is free. */
+static int sub_hl_de_ok(void)
+{
+    return CPU_HAS_SUB_HL_DE() && !IS_RABBIT()   /* rabbit has its own branch */
+        && !opt_disabled("dsub");
 }
 
 /* True iff no vreg in this function is homed in BC or a BC half. Staging a
@@ -4679,6 +4689,22 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         /* gbz80/808x: `sbc hl,de` is emulated (push/pop x4 + helper).
            Subtract byte-wise; write straight into DE when that's the dst
            (skips the ex de,hl that the sbc-path would need). */
+        if (sub_hl_de_ok()) {
+            /* Subtract where the operands already are. Unlike the BC staging
+               below this needs no free register, so it fires on every word
+               subtract, and a PR_DE dst can afford the move out of HL because
+               the subtract itself cost one byte. */
+            emit(out, "sub\thl,de");
+            invalidate_hl_keep_de();
+            if (vreg_is_pr_de(f, op->dst)) {
+                emit_hl_to_de(out);
+                invalidate_hl_cache();
+                cache_de(op->dst);
+                return 0;
+            }
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
         if (dsub_ok() && !vreg_is_pr_de(f, op->dst)
             && !func_has_bc_home(f) && L.rs.bc < 0) {
             /* Stage the subtrahend into BC and DSUB: 3B/18c against the
