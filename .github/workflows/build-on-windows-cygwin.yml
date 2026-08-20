@@ -101,21 +101,10 @@ jobs:
           unzip 
           wget 
           zlib-devel 
-    # Note Makefile:34 already does CC := ccache $(CC) when ccache is on PATH,
-    # so these symlinks are only load-bearing for C++ -- CXX is never wrapped.
-    # The masquerade symlinks are made by hand rather than using the package's
-    # own directory, which sits in a different place on cygwin and msys2. The
-    # build exports CC/CXX as single words, so a "ccache g++" prefix is not an
-    # option -- src/z80asm/tools/build_ldflags.pl takes exactly two arguments.
-    # PATH is prepended per step rather than through GITHUB_PATH: that expects
-    # Windows-style paths, and CYGWIN_NOWINPATH strips them anyway.
+    # No compiler masquerade needed: the top-level Makefile wraps both CC and
+    # CXX with ccache itself when ccache is on PATH.
     - name: Configure ccache
       run: |
-        mkdir -p /usr/local/ccache-bin
-        for c in gcc cc g++ c++; do
-          ln -sf "$(command -v ccache)" /usr/local/ccache-bin/$c
-          ln -sf "$(command -v ccache)" /usr/local/ccache-bin/$c.exe
-        done
         echo "CCACHE_DIR=/cygdrive/c/ccache" >> $GITHUB_ENV
         echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
         # Compile the original source on a miss, not the preprocessed output.
@@ -149,8 +138,7 @@ jobs:
     - name: Build binaries
       run: |
         eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)
-        export PATH=/usr/local/ccache-bin:$PATH:/cygdrive/c/ProgramData/chocolatey/bin
-        command -v gcc
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -l
 
     # Hit rate is the only way to tell the cache is working.

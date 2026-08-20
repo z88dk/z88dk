@@ -112,19 +112,10 @@ jobs:
         perl -V
         ln -s /mingw64/bin/mingw32-make /mingw64/bin/make
         which make
-    # ccache goes in by masquerade, not as a "ccache gcc" prefix: the build
-    # exports CC/CXX as single words and src/z80asm/tools/build_ldflags.pl
-    # takes exactly two arguments. Symlinked by hand because the package's own
-    # masquerade directory differs between msys2 and cygwin. Both bare and
-    # .exe names, since make searches for either.
+    # No compiler masquerade needed: the top-level Makefile wraps both CC and
+    # CXX with ccache itself when ccache is on PATH.
     - name: Configure ccache
       run: |
-        export PATH=/mingw64/bin:/usr/bin:/bin
-        mkdir -p /usr/local/ccache-bin
-        for c in gcc cc g++ c++; do
-          ln -sf "$(command -v ccache)" /usr/local/ccache-bin/$c
-          ln -sf "$(command -v ccache)" /usr/local/ccache-bin/$c.exe
-        done
         echo "CCACHE_DIR=/c/ccache" >> $GITHUB_ENV
         echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
         # Compile the original source on a miss, not the preprocessed output.
@@ -136,10 +127,9 @@ jobs:
         echo "CCACHE_CPP2=1" >> $GITHUB_ENV
     - name: Build binaries
       run: |
-        export PATH=/usr/local/ccache-bin:/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
+        export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
         export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
-        command -v gcc
         mkdir -p bin
         cp `which m4` bin/
         ./build.sh -v -l

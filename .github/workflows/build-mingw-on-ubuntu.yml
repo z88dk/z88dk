@@ -40,18 +40,10 @@ jobs:
     - name: Install apt dependencies
       run: |
         sudo apt-get install -y ccache gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c
-    # The build exports CC/CXX as single words, so ccache has to come in via
-    # the /usr/lib/ccache symlinks rather than a "ccache gcc" prefix -- see
-    # src/z80asm/tools/build_ldflags.pl, which takes exactly two arguments.
-    # The symlinks for the cross compilers only exist once those packages are
-    # installed, hence running this after apt rather than before.
+    # No /usr/lib/ccache on PATH: the top-level Makefile wraps CC and CXX with
+    # ccache itself, which picks up the cross compilers this job exports.
     - name: Configure ccache
       run: |
-        sudo /usr/sbin/update-ccache-symlinks || true
-        for c in x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++; do
-          [ -e /usr/lib/ccache/$c ] || sudo ln -sf /usr/bin/ccache /usr/lib/ccache/$c
-        done
-        ls -l /usr/lib/ccache/ | grep mingw
         echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
         echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
         # Compile the original source on a miss, not the preprocessed output.
@@ -61,7 +53,6 @@ jobs:
         # Default in 4.x; set everywhere so the behaviour does not depend on
         # which ccache a platform happens to package.
         echo "CCACHE_CPP2=1" >> $GITHUB_ENV
-        echo "/usr/lib/ccache" >> $GITHUB_PATH
     - name: Install libxml2
       run: |
         set -ex

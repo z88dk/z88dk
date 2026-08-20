@@ -34,10 +34,8 @@ jobs:
       run: |
         brew install ccache cpanminus perl dos2unix boost ragel re2c make gmp m4
     # Pinned because ccache only defaults to $HOME/.ccache when that directory
-    # already exists, which on a fresh runner it does not. Homebrew's
-    # masquerade directory is not on PATH by default, so the compile steps
-    # prepend it themselves -- a "ccache gcc" prefix is not usable here, as
-    # src/z80asm/tools/build_ldflags.pl takes exactly two arguments.
+    # already exists, which on a fresh runner it does not. No masquerade: the
+    # top-level Makefile wraps CC and CXX itself when ccache is on PATH.
     - name: Configure ccache
       run: |
         echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
@@ -49,8 +47,6 @@ jobs:
         # Default in 4.x; set everywhere so the behaviour does not depend on
         # which ccache a platform happens to package.
         echo "CCACHE_CPP2=1" >> $GITHUB_ENV
-        echo "BREW_CCACHE_LIBEXEC=$(brew --prefix ccache)/libexec" >> $GITHUB_ENV
-        test -x "$(brew --prefix ccache)/libexec/gcc"
     - name: Install perl prerequisites
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
@@ -61,8 +57,7 @@ jobs:
         eval "$(/opt/homebrew/bin/brew shellenv)"
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
-        export PATH=$BREW_CCACHE_LIBEXEC:/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
-        command -v gcc
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         ./build.sh -v -l
     - name: Build libraries
       run: |
@@ -77,7 +72,7 @@ jobs:
         eval "$(/opt/homebrew/bin/brew shellenv)"
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
-        export PATH=$BREW_CCACHE_LIBEXEC:/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
     # After the sdcc build, not before it: sdcc is ~4800 files pinned to a
     # fixed revision, so it should hit every time. If it does not, or if the
