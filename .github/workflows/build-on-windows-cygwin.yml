@@ -114,6 +114,12 @@ jobs:
         # Default in 4.x; set everywhere so the behaviour does not depend on
         # which ccache a platform happens to package.
         echo "CCACHE_CPP2=1" >> $GITHUB_ENV
+        # ccache 3.x ignores CCACHE_MAXSIZE and stayed on its 1G default, so
+        # write the ceiling into the cache's own config instead. CCACHE_DIR is
+        # exported here as well because GITHUB_ENV only applies to later steps.
+        export CCACHE_DIR=/cygdrive/c/ccache
+        ccache -M 300M
+        ccache -s | head -3
 
     - name: Install choco packages
       run: |
