@@ -110,7 +110,7 @@ The mix is not whole-program LTO.
 | zcc_opt.def | sccz80 zpragma output only | A second zpragma pass would duplicate pragmas. |
 | Failure | Any variant compile or copt error fails the file | Silent fallback hides a broken compiler. |
 | Ticks | Static T-state sum from assembly source | 80cc listings can put a wrong source line on an opcode. Size still uses the listing. |
-| Loop trips | Literal bound only. Unknown stays 1 | Do not invent K. Overlapping backward edges multiply (B × C). |
+| Loop trips | Literal bound only. Unknown stays 1. Load 0 wraps | 8-bit 0 is 256. 16-bit 0 is 65536. `dec rr` does not set Z. Overlapping edges multiply (B × C). |
 | Block repeats | `21 × BC` for `ldir` / `cpir` and friends. Unknown BC is `ZCCMULTI_BLOCK_REP` (2) | Same stand-in on every variant. |
 | Helper charge | Differential. `(count[v] − min) × helper` | A shared `l_mult` in every body cancels. Extra sites change the winner. |
 | Helper walk | `libsrc/l/sccz80`, `libsrc/math/float`, `libsrc/math/integer` | Classic integer leaves sit under `math/integer`. Skip `obj/`. Do not assemble `config_private.inc` dispatchers. |
@@ -808,9 +808,18 @@ A trip count is used only when the bound is a literal load that the loop does no
 
 | Pattern | Trip |
 |---------|------|
-| `ld b,N` then `djnz` | N. `N <= 0` is 256 |
-| `ld r,N` then `dec r` and `jp nz` near the branch | N |
-| `ld bc,N` feeding a B or C loop | B is the high byte. C is the low byte |
+| `ld b,N` then `djnz` | N. `ld b,0` is 256 |
+| `ld r,N` then `dec r` and `jp nz` | N. `ld r,0` is 256. 8-bit `dec` sets Z |
+| `ld rr,N` then `dec rr` / `ld a,hi` / `or lo` / `jp nz` | N. `ld rr,0` is 65536 |
+| 8085 `ld rr,N` then `dec rr` / `jp nk` or `jp k` | N. Same wrap at 0. K sets when the pair goes 0 to −1 |
+| `ld bc,N` feeding a B or C 8-bit loop | B is the high byte. C is the low byte. A 0 byte is 256 |
+| `dec rr` then `jp nz` with no `or` | Not a counted loop. Trip stays 1 |
+
+`dec rr` does not set Z on any CPU. The portable 16-bit test is `or` through A.
+
+8085 `jp k` / `jp nk` after `dec rr` is a general 16-bit loop. It is not only for a load of 0.
+
+A load of 0 is a wrap. It is not an empty loop.
 
 Unknown bounds stay 1.
 
@@ -827,6 +836,8 @@ These opcodes are not one step in the score:
 `ldir`, `lddr`, `cpir`, `cpdr`, `inir`, `indr`, `otir`, `otdr`.
 
 If `ld bc,N` appears before the opcode in the function, use N.
+
+`ld bc,0` is 65536 repeats. It is the 16-bit wrap.
 
 Otherwise use `ZCCMULTI_BLOCK_REP`.
 
@@ -1535,7 +1546,11 @@ MSYS2 `mingw32-make` cannot run `! grep`. Use `test \`grep -c\` -eq 0` instead.
 12. A discarded sccz80 body leaves `defc i_N = i_M` in the optimiser banner. The stitch file MUST omit that `defc`. The file MUST assemble. Fixtures: `t/opt_sccz80.asm`, `t/opt_80cc.asm`.
 13. `jp (hl)` MUST NOT win on ticks. `reason` is `fallback`. Fixtures: `t/jp_hl.asm`, `t/jp_hl_alt.asm`.
 14. `ld b,8` / `djnz` MUST multiply the loop span. Fixture: `t/loop_count.asm` versus `t/loop_once.asm`.
-15. `ldir` with `ld bc,4` scores more than 70. Unknown BC scores `21 × 2` plus the other opcodes (52 on the unknown fixture). Fixtures: `t/ldir_bc.asm`, `t/ldir_unk.asm`.
+15. `ld b,0` / `djnz` MUST use 256 trips. Fixture: `t/loop_b0.asm`.
+16. `ld bc,0` / `dec bc` / `ld a,b` / `or c` / `jp nz` MUST use 65536 trips. Fixture: `t/loop_bc0.asm`.
+17. `dec bc` / `jp nz` with no `or` MUST NOT use a wrap trip. Fixture: `t/loop_bc_nz.asm`.
+18. 8085 `ld bc,8` / `dec bc` / `jp nk` MUST multiply the loop. `ld bc,0` wraps to 65536. Fixtures: `t/loop_8085_k.asm`, `t/loop_8085_k0.asm`.
+19. `ldir` with `ld bc,4` scores more than 70. Unknown BC scores `21 × 2` plus the other opcodes (52 on the unknown fixture). `ld bc,0` is 65536 repeats. Fixtures: `t/ldir_bc.asm`, `t/ldir_unk.asm`, `t/ldir_bc0.asm`.
 
 ### Fixture sketch
 

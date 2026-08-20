@@ -23,13 +23,17 @@ int listing_parse_line(const char *line, int *linenum, char *src, size_t src_sz)
 
 int ticks_for_src(int cpu_kind, int nbytes, const char *src, int backward, int *fallback);
 
-/* kind: 0=other, 1=jp, 2=jr, 3=djnz, 4=call, 5=ret */
+/* kind: 0=other, 1=jp, 2=jr, 3=djnz, 4=call, 5=ret.
+ * cc is the condition token (nz, k, nk, …) or empty. Either buffer may be NULL. */
 int parse_control(const char *src, int *kind, int *cond, int *indirect,
-                  char *target, size_t target_sz);
+                  char *target, size_t target_sz, char *cc, size_t cc_sz);
 
 /* Immediate operand after "ld r," / "ld rr,". Returns 1 and writes *val. */
 int parse_ld_imm(const char *src, char *reg, size_t reg_sz, long *val);
 
 int parse_dec_reg(const char *src, char *reg, size_t reg_sz);
+
+/* "or r" or "or a,r". Returns 1 and writes the source register. */
+int parse_or_reg(const char *src, char *reg, size_t reg_sz);
 
 #endif

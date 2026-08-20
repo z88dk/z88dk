@@ -165,7 +165,7 @@ static const char *mnem_and_rest(const char *src, char *mnem, size_t n)
 }
 
 int parse_control(const char *src, int *kind, int *cond, int *indirect,
-                  char *target, size_t target_sz)
+                  char *target, size_t target_sz, char *cc, size_t cc_sz)
 {
     char mnem[16];
     const char *p;
@@ -179,6 +179,8 @@ int parse_control(const char *src, int *kind, int *cond, int *indirect,
         *indirect = 0;
     if (target && target_sz)
         target[0] = 0;
+    if (cc && cc_sz)
+        cc[0] = 0;
 
     p = mnem_and_rest(src, mnem, sizeof(mnem));
     if (strcmp(mnem, "jp") == 0) {
@@ -213,6 +215,8 @@ int parse_control(const char *src, int *kind, int *cond, int *indirect,
     if (*p == ',' && is_cc_token(tok, strlen(tok))) {
         if (cond)
             *cond = 1;
+        if (cc && cc_sz)
+            snprintf(cc, cc_sz, "%s", tok);
         p = skip_ws(p + 1);
         if (*p == '.')
             p++;
@@ -225,6 +229,8 @@ int parse_control(const char *src, int *kind, int *cond, int *indirect,
         if (tok[0] && is_cc_token(tok, strlen(tok))) {
             if (cond)
                 *cond = 1;
+            if (cc && cc_sz)
+                snprintf(cc, cc_sz, "%s", tok);
         }
         return 1;
     }
@@ -264,6 +270,26 @@ int parse_dec_reg(const char *src, char *reg, size_t reg_sz)
     p = mnem_and_rest(src, mnem, sizeof(mnem));
     if (strcmp(mnem, "dec") != 0)
         return 0;
+    read_ident(p, r, sizeof(r));
+    if (!r[0])
+        return 0;
+    if (reg && reg_sz)
+        snprintf(reg, reg_sz, "%s", r);
+    return 1;
+}
+
+int parse_or_reg(const char *src, char *reg, size_t reg_sz)
+{
+    char mnem[16];
+    const char *p;
+    char r[16];
+
+    p = mnem_and_rest(src, mnem, sizeof(mnem));
+    if (strcmp(mnem, "or") != 0)
+        return 0;
+    p = skip_ws(p);
+    if (p[0] == 'a' && p[1] == ',')
+        p = skip_ws(p + 2);
     read_ident(p, r, sizeof(r));
     if (!r[0])
         return 0;
@@ -520,7 +546,7 @@ int ticks_for_src(int cpu_kind, int nbytes, const char *src, int backward, int *
     if (!mnem[0])
         return nbytes > 0 ? nbytes * 4 : 0;
 
-    parse_control(src, &kind, &cond, &indirect, NULL, 0);
+    parse_control(src, &kind, &cond, &indirect, NULL, 0, NULL, 0);
 
     if (cpu_kind == TICKS_CPU_8080 || cpu_kind == TICKS_CPU_8085)
         return ticks_808x(cpu_kind, nbytes, mnem, rest, cond, indirect, backward, fallback);

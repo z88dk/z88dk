@@ -574,48 +574,121 @@ static int find_ld_imm_before(Variant *v, Func *fn, int loop_start, const char *
         }
         if (!ok)
             continue;
-        if (!found || use > *val)
-            *val = use;
+        /* Last load before the loop is the bound, not the largest. */
+        *val = use;
         found = 1;
     }
     return found;
 }
 
+static int reg_is16(const char *r)
+{
+    return r && (strcmp(r, "bc") == 0 || strcmp(r, "de") == 0 ||
+                 strcmp(r, "hl") == 0 || strcmp(r, "sp") == 0 ||
+                 strcmp(r, "ix") == 0 || strcmp(r, "iy") == 0);
+}
+
+/*
+ * Literal 0 is a wrap, not an empty loop.
+ * 8-bit: ld b,0 / djnz does 256. 16-bit: ld bc,0 does 65536.
+ */
+static int trip_from_imm(long imm, int is16)
+{
+    unsigned long n = (unsigned long)imm;
+
+    if (is16) {
+        n &= 0xffffUL;
+        return n ? (int)n : 65536;
+    }
+    n &= 0xffUL;
+    return n ? (int)n : 256;
+}
+
+static int cc_is_zero(const char *cc)
+{
+    return cc && (strcmp(cc, "z") == 0 || strcmp(cc, "nz") == 0);
+}
+
+static int cc_is_k(const char *cc)
+{
+    return cc && (strcmp(cc, "k") == 0 || strcmp(cc, "nk") == 0);
+}
+
+/* b/c of bc, d/e of de, h/l of hl. */
+static int pair_half_of(const char *pair, const char *r)
+{
+    if (!pair || !r || !r[0] || r[1])
+        return 0;
+    if (strcmp(pair, "bc") == 0)
+        return r[0] == 'b' || r[0] == 'c';
+    if (strcmp(pair, "de") == 0)
+        return r[0] == 'd' || r[0] == 'e';
+    if (strcmp(pair, "hl") == 0)
+        return r[0] == 'h' || r[0] == 'l';
+    return 0;
+}
+
+/* dec rr does not set Z. The portable test is `or` of a pair half through A. */
+static int span_has_or_pair(Variant *v, int from, int to, const char *pair)
+{
+    int line;
+    char r[16];
+
+    if (from < 0)
+        from = 0;
+    for (line = from; line < to && line < v->nlines; line++) {
+        if (parse_or_reg(v->lines[line].text, r, sizeof(r)) &&
+            pair_half_of(pair, r))
+            return 1;
+    }
+    return 0;
+}
+
 /* Literal trip count only. Unknown bound stays 1 (compare bodies, do not invent K). */
-static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind)
+static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind,
+                      const char *cc)
 {
     long imm;
     char dreg[16];
     int line;
+    int win;
 
     if (kind == 3) { /* djnz */
         if (find_ld_imm_before(v, fn, loop_start, "b", &imm) &&
             !reg_written_in_span(v, loop_start, branch, "b") &&
-            !reg_written_in_span(v, loop_start, branch, "bc")) {
-            if (imm <= 0)
-                return 256;
-            if (imm > 65535)
-                return 1;
-            return (int)imm;
-        }
+            !reg_written_in_span(v, loop_start, branch, "bc"))
+            return trip_from_imm(imm, 0);
         return 1;
     }
 
     if (parse_dec_reg(v->lines[branch].text, dreg, sizeof(dreg)))
         return 1;
 
-    for (line = branch - 1; line >= loop_start && line >= branch - 6; line--) {
+    win = branch - 6;
+    if (win < loop_start)
+        win = loop_start;
+
+    for (line = branch - 1; line >= win; line--) {
         if (!parse_dec_reg(v->lines[line].text, dreg, sizeof(dreg)))
             continue;
         if (!find_ld_imm_before(v, fn, loop_start, dreg, &imm))
             return 1;
         if (reg_written_in_span(v, loop_start, line, dreg))
             return 1;
-        if (imm > 65535)
-            return 1;
-        if (imm <= 0)
-            return (dreg[1] == 0) ? 256 : 1;
-        return (int)imm;
+
+        if (!reg_is16(dreg)) {
+            /* 8-bit dec sets Z. */
+            if (cc && cc[0] && !cc_is_zero(cc))
+                return 1;
+            return trip_from_imm(imm, 0);
+        }
+
+        /* 16-bit dec does not set Z on any CPU. */
+        if (cc_is_k(cc) && opt_cpu_kind == TICKS_CPU_8085)
+            return trip_from_imm(imm, 1);
+        if (cc_is_zero(cc) && span_has_or_pair(v, win, branch, dreg))
+            return trip_from_imm(imm, 1);
+        return 1;
     }
     return 1;
 }
@@ -682,10 +755,11 @@ static void apply_loops(Variant *v)
         for (line = fn->start; line < fn->end && line < v->nlines; line++) {
             int kind = 0, cond = 0, indirect = 0;
             char target[64];
+            char cc[8];
             int dest, trip, i, fb = 0;
 
             if (!parse_control(v->lines[line].text, &kind, &cond, &indirect,
-                               target, sizeof(target)))
+                               target, sizeof(target), cc, sizeof(cc)))
                 continue;
             if (indirect) {
                 fn->bad_ticks = 1;
@@ -703,7 +777,7 @@ static void apply_loops(Variant *v)
                 v->lticks[line] = ticks_for_src(opt_cpu_kind, 3, v->lines[line].text, 1, &fb);
             else if (kind == 2 || kind == 3)
                 v->lticks[line] = ticks_for_src(opt_cpu_kind, 2, v->lines[line].text, 1, &fb);
-            trip = infer_trip(v, fn, dest, line, kind);
+            trip = infer_trip(v, fn, dest, line, kind, cc);
             if (trip <= 1)
                 continue;
             /* Overlapping backward edges multiply (outer B × inner C). */
@@ -743,12 +817,10 @@ static void apply_block_repeats(Variant *v)
 
             if (!is_block_repeat(v->lines[line].text))
                 continue;
-            if (find_ld_imm_before(v, fn, line, "bc", &bc) && bc > 0) {
-                if (bc > 65536)
-                    bc = 65536;
-            } else {
+            if (find_ld_imm_before(v, fn, line, "bc", &bc))
+                bc = trip_from_imm(bc, 1);
+            else
                 bc = ZCCMULTI_BLOCK_REP;
-            }
             /* Z80 ldir family: 21 T per repeat (last is 16; 21*n is a
              * conservative stand-in). Unknown BC uses ZCCMULTI_BLOCK_REP. */
             v->lticks[line] = 21 * (int)bc;
