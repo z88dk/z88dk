@@ -83,9 +83,8 @@ jobs:
     - name: Build sdcc needed for tests
       run: |
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
-    # After the sdcc build, not before it: sdcc is ~4800 files pinned to a
-    # fixed revision, so it should hit every time. If it does not, or if the
-    # cache is at its ceiling and evicting, this is where it shows up.
+    # sdcc itself is built with CC=$(OCC), the unwrapped compiler, so none of
+    # its ~4800 files reach ccache -- this reports the z88dk tools only.
     - name: ccache stats
       if: always()
       run: ccache -s

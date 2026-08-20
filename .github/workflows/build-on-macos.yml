@@ -22,6 +22,20 @@ jobs:
     - uses: actions/checkout@v5
       with: 
         submodules: 'true'
+    # This job was the only one rebuilding all 21 CPAN modules from source on
+    # every run -- homebrew packages almost no perl modules, so there is
+    # nothing to substitute; it just needs caching like the others.
+    # Rolled because actions/cache never overwrites an existing key, so a fixed
+    # one is written once and cannot even recover from the 7-day eviction.
+    - name: Cache perl modules
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/perl5
+        key: ${{ runner.os }}-perl5-${{ hashFiles('.github/workflows/build-on-macos.yml') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-perl5-${{ hashFiles('.github/workflows/build-on-macos.yml') }}-
+          ${{ runner.os }}-perl5-
     - name: Cache ccache
       uses: actions/cache@v5
       with:
@@ -50,22 +64,32 @@ jobs:
     - name: Install perl prerequisites
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
-        cpanm --notest Clone XML::Twig Spreadsheet::ParseXLSX
-        cpanm App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Test::PureASCII Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
+        # Into ~/perl5 rather than brew's own site_perl, which lives inside the
+        # homebrew prefix and is not sensibly cacheable. local::lib itself has
+        # to come first so the later steps can eval it.
+        cpanm --local-lib=~/perl5 local::lib
+        cpanm --local-lib=~/perl5 --notest Clone XML::Twig Spreadsheet::ParseXLSX
+        cpanm --local-lib=~/perl5 App::Prove Array::Compare Capture::Tiny Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::HexDifferences Test::PureASCII Text::Diff Text::Table Object::Tiny Object::Tiny::RW List::Uniq YAML::Tiny
+        # A cache that restores an empty tree is indistinguishable from a cold
+        # one in the log -- print the size so a silent miss is visible.
+        echo "perl5 tree: $(du -sh ~/perl5 2>/dev/null | cut -f1) in $(find ~/perl5 -type f 2>/dev/null | wc -l) files"
     - name: Build binaries
       run: |
         eval "$(/opt/homebrew/bin/brew shellenv)"
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -l
     - name: Build libraries
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         MAKE_CONCURRENCY=-j3 ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         ./build.sh -v -b -l -e
     - name: Build sdcc needed for tests
       run: |
@@ -73,14 +97,15 @@ jobs:
         export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
         export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
-    # After the sdcc build, not before it: sdcc is ~4800 files pinned to a
-    # fixed revision, so it should hit every time. If it does not, or if the
-    # cache is at its ceiling and evicting, this is where it shows up.
+    # sdcc itself is built with CC=$(OCC), the unwrapped compiler, so none of
+    # its ~4800 files reach ccache -- this reports the z88dk tools only.
     - name: ccache stats
       if: always()
       run: ccache -s
     - name: Run tests
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         MAKE_CONCURRENCY=-j3 ./build.sh -v -b -l -t
