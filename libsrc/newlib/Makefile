@@ -45,7 +45,7 @@ define config
 
 # +zx/+zxn use +z80 as part of the config stage so add the dependency
 target/zx/obj/config_private.inc: $(LIB_SCCZ80)/z80.lib
-target/zxn/obj/config_private.inc: $(LIB_SCCZ80)/zx.lib
+target/zxn/obj/config_private.inc: $(LIB_SDCC_IX)/zx.lib
 
 # Convenience target (eg make zx to build the zx libraries)
 .PHONY: $(1)
@@ -95,7 +95,11 @@ $(LIB_SCCZ80)/$(1).lib: $(call target_dir,$(1))/obj/config_private.inc
 	@mkdir -p $(LIB_SCCZ80)
 	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-I$(call target_dir,$(1))/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -O$(call target_dir,$(1))/obj/sccz80/x -I$(call target_dir,$(1))/obj -I.. -x$(LIB_SCCZ80)/$(1) -I$(Z88DK_LIB) @$(call target_dir,$(1))/library/$(1)_sccz80.lst
 
-$(LIB_SDCC_IX)/$(1).lib: $(call target_dir,$(1))/obj/config_private.inc
+# After the sccz80 library, not beside it. Both assemble the shared multicolour
+# sources under target/zx, and z80asm expands a .asm.m4 into the .asm next to
+# the source, so under -j the two runs write that one file at the same time.
+# On Windows that is a sharing violation rather than a corrupt file.
+$(LIB_SDCC_IX)/$(1).lib: $(call target_dir,$(1))/obj/config_private.inc $(LIB_SCCZ80)/$(1).lib
 	@mkdir -p $(LIB_SDCC_IX)
 	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-I$(call target_dir,$(1))/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -O$(call target_dir,$(1))/obj/sdcc_ix/x -I$(call target_dir,$(1))/obj -I.. -x$(LIB_SDCC_IX)/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @$(call target_dir,$(1))/library/$(1)_sdcc_ix.lst
 
