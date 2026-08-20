@@ -25,6 +25,7 @@ show_help_and_exit()
   echo "  -i    PATH Final installation directory"
   echo "  -t    Run tests"
   echo "  -z    Skip the z80asm tests"
+  echo "  -f    Skip the feature tests (hello world for every target)"
   echo "  -v    Be verbose"
   echo ""
   echo "Default is to build binaries and libraries"
@@ -77,6 +78,7 @@ do_examples=0
 do_libbuild=1
 do_tests=0
 skip_z80asm_tests=0
+skip_feature_tests=0
 
 DESTDIR=/usr/local
 
@@ -87,7 +89,7 @@ export ZCCCFG
 export PATH
 
 
-while getopts "bcCehkltzp:i:v" arg; do       # Handle all given arguments
+while getopts "bcCefhkltzp:i:v" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
@@ -99,6 +101,7 @@ while getopts "bcCehkltzp:i:v" arg; do       # Handle all given arguments
     i)     DESTDIR=$OPTARG  ;;
     t)     do_tests=1              ;;   # Run tests as well
     z)     skip_z80asm_tests=1     ;;   # Skip z80asm tests
+    f)     skip_feature_tests=1    ;;   # Skip the all-targets feature tests
     v)     export Q=               ;;   # verbose makefiles
     h | *) show_help_and_exit 0    ;;   # Show help on demand
   esac
@@ -212,12 +215,23 @@ if [ $do_tests = 1 ]; then              # Build tests or not...
   if [ -n "$MAKE_CONCURRENCY" ] && $MAKE --output-sync=target --version >/dev/null 2>&1; then
       MAKE_OUTPUT_SYNC="--output-sync=target"
   fi
-  $MAKE -C testsuite $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC
+  # test/Makefile's `all` is subdirs-all (suites + feature) plus src-all, so
+  # dropping either means naming the goals explicitly rather than using all.
   if [ $skip_z80asm_tests = 1 ]; then
-      $MAKE -C test $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC suites feature
+      if [ $skip_feature_tests = 1 ]; then
+          TEST_GOALS="suites"
+      else
+          TEST_GOALS="suites feature"
+      fi
   else
-      $MAKE -C test $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC
+      if [ $skip_feature_tests = 1 ]; then
+          TEST_GOALS="suites src-all"
+      else
+          TEST_GOALS=""
+      fi
   fi
+  $MAKE -C testsuite $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC
+  $MAKE -C test $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC $TEST_GOALS
 fi
 
 if [ $do_examples = 1 ]; then           # Build examples or not...
