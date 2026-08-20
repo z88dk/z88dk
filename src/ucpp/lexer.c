@@ -438,16 +438,21 @@ void flush_output(struct lexer_state *ls)
 	size_t x = ls->sbuf, y = 0, z;
 
 	if (ls->sbuf == 0) return;
+	errno = 0;
 	do {
 		z = fwrite(ls->output_buf + y, 1, x, ls->output);
 		x -= z;
 		y += z;
 	} while (z && x > 0);
 	if (!y) {
-		/* errno is the only thing that says why. The old text guessed at a
-		   full disk, which sent a CI failure investigation a long way in the
-		   wrong direction on a volume with 219G free. */
-		error(ls->line, "could not flush output: %s", strerror(errno));
+		/* Say what actually happened rather than guessing. errno is cleared
+		   above because fwrite does not have to set it, and reporting a stale
+		   value is worse than reporting none: the previous text blamed a full
+		   disk on a volume with 219G free, and errno alone then blamed a
+		   broken pipe on a write to a regular file. */
+		error(ls->line, "could not flush output: %s (ferror=%d, wanted %lu bytes)",
+			errno ? strerror(errno) : "fwrite returned 0, errno not set",
+			ferror(ls->output), (unsigned long)ls->sbuf);
 		die();
 	}
 	ls->sbuf = 0;
