@@ -631,7 +631,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     if ( p == 0 ) READ_BYTE(state, b);
                                     BUF_PRINTF("%-10s","stop");
                                 }
-                                else if ( isvm1() ) { handle_register8(state, 6, opbuf1, sizeof(opbuf1)); BUF_PRINTF("%-10s%s,and %s","ld", opbuf1, opbuf1); }
+                                else if ( isvm1() ) { BUF_PRINTF("%-10s%s","andl", handle_register8(state, 6, opbuf1, sizeof(opbuf1))); }
                                 else if ( is8080() ) BUF_PRINTF("nop");
                                 else if ( is8085() ) BUF_PRINTF("%-10shl","sra");
                                 else BUF_PRINTF("%-10s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));
@@ -644,8 +644,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 /* $20/$30 are the memory read-modify-write ops ORX/XRX;
                                    $28 is the MB (memory bank) / CS (carry select) prefix,
                                    $38 the RS (alternate H'L' register set) prefix. */
-                                if ( y == 4 ) { handle_register8(state, 6, opbuf1, sizeof(opbuf1)); BUF_PRINTF("%-10s%s,or %s","ld", opbuf1, opbuf1); }
-                                else if ( y == 6 ) { handle_register8(state, 6, opbuf1, sizeof(opbuf1)); BUF_PRINTF("%-10s%s,xor %s","ld", opbuf1, opbuf1); }
+                                if ( y == 4 ) { BUF_PRINTF("%-10s%s","orl", handle_register8(state, 6, opbuf1, sizeof(opbuf1))); }
+                                else if ( y == 6 ) { BUF_PRINTF("%-10s%s","xorl", handle_register8(state, 6, opbuf1, sizeof(opbuf1))); }
                                 else if ( y == 5 ) {
                                     uint8_t nb;
                                     PEEK_BYTE(state, nb);
@@ -923,12 +923,15 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         }
                         handle_register8(state, y, opbuf1, sizeof(opbuf1));
                         handle_register8(state, z, opbuf2, sizeof(opbuf2));
-                        if ( y == 6) {
-                            state->index = 0;
-                            handle_register8(state, z, opbuf2, sizeof(opbuf2));
-                        } else if ( z == 6 ) {
-                            state->index = 0;
-                            handle_register8(state, y, opbuf1, sizeof(opbuf1));  
+                        /* `ld (ix+d),h` takes the REAL h - he VM1 RS index 3 takes the h' form */
+                        if ( state->index != 3 ) {
+                            if ( y == 6) {
+                                state->index = 0;
+                                handle_register8(state, z, opbuf2, sizeof(opbuf2));
+                            } else if ( z == 6 ) {
+                                state->index = 0;
+                                handle_register8(state, y, opbuf1, sizeof(opbuf1));
+                            }
                         }
                         BUF_PRINTF("%-10s%s,%s", y == 6 || z == 6 ? handle_ez80_am(state,"ld") : "ld", opbuf1, opbuf2);
                     }
