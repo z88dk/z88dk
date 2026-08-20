@@ -40,6 +40,7 @@ Code Generation Options:
                         r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, 
                         r5k, r5k_strict, r6k, r6k_strict, 
                         r800, r800_strict, 
+                        vm1, vm1_strict, 
                         z180, z180_strict, z80, z80_strict, z80n, z80n_strict
   -no-synth             Do not assemble synthetic opcodes
   -float[=]FORMAT       Set default float format, one of:

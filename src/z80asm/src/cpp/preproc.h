@@ -105,6 +105,7 @@ private:
 	bool check_reptx();
 	bool check_gbz80_opcodes();
 	bool check_z80_ld_bit_opcodes();
+    bool check_vm1_ld_x_alu_x();
 
 	void do_if();
 	void do_else();
