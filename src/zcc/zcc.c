@@ -196,6 +196,8 @@ static void            configure_misc_options(void);
 static void            configure_maths_library(char **libstring);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
+static int             fill_sccz80_copt_rules(char **rules);
+static int             fill_80cc_copt_rules(char **rules);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
 static void            zsdcc_embed_adb(int filenumber);
@@ -1521,65 +1523,13 @@ int main(int argc, char **argv)
 
             } else if (compiler_type == CC_80CC) {
                 char  *rules[MAX_COPT_RULE_FILES];
-                int    num_rules = 0;
-
-                rules[num_rules++] = c_coptrules9;
-                rules[num_rules++] = c_80cc_opt;
-
-                if (c_coptrules_target) {
-                    rules[num_rules++] = c_coptrules_target;
-                }
-
-                if (coptrules_cpu) {
-                    rules[num_rules++] = coptrules_cpu;
-                }
-
-                if (c_coptrules_user) {
-                    rules[num_rules++] = c_coptrules_user;
-                }
+                int    num_rules = fill_80cc_copt_rules(rules);
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
             } else {
                 char  *rules[MAX_COPT_RULE_FILES];
-                int    num_rules = 0;
-
-                /* z80rules.9 implements intrinsics and RST substitution */
-                rules[num_rules++] = c_coptrules9;
-
-                switch (peepholeopt) {
-                case 0:
-                    break;
-                case 1:
-                    rules[num_rules++] = c_coptrules1;
-                    break;
-                case 2:
-                    rules[num_rules++] = c_coptrules2;
-                    rules[num_rules++] = c_coptrules1;
-                    break;
-                default:
-                    rules[num_rules++] = c_coptrules2;
-                    rules[num_rules++] = c_coptrules1;
-                    rules[num_rules++] = c_coptrules3;
-                    break;
-                }
-
-                if ( c_coptrules_target ) {
-                    rules[num_rules++] = c_coptrules_target;
-                }
-
-
-                if ( coptrules_cpu ) {
-                    rules[num_rules++] = coptrules_cpu;
-                }
-
-                if ( c_coptrules_sccz80 ) {
-                    rules[num_rules++] = c_coptrules_sccz80;
-                }
-
-                if ( c_coptrules_user ) {
-                    rules[num_rules++] = c_coptrules_user;
-                }
+                int    num_rules = fill_sccz80_copt_rules(rules);
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
             }
@@ -1867,6 +1817,56 @@ int main(int argc, char **argv)
     exit(0);    /* If this point is reached, all went well */
 }
 
+
+static int fill_sccz80_copt_rules(char **rules)
+{
+    int num_rules = 0;
+
+    /* z80rules.9 implements intrinsics and RST substitution */
+    rules[num_rules++] = c_coptrules9;
+
+    switch (peepholeopt) {
+    case 0:
+        break;
+    case 1:
+        rules[num_rules++] = c_coptrules1;
+        break;
+    case 2:
+        rules[num_rules++] = c_coptrules2;
+        rules[num_rules++] = c_coptrules1;
+        break;
+    default:
+        rules[num_rules++] = c_coptrules2;
+        rules[num_rules++] = c_coptrules1;
+        rules[num_rules++] = c_coptrules3;
+        break;
+    }
+
+    if (c_coptrules_target)
+        rules[num_rules++] = c_coptrules_target;
+    if (coptrules_cpu)
+        rules[num_rules++] = coptrules_cpu;
+    if (c_coptrules_sccz80)
+        rules[num_rules++] = c_coptrules_sccz80;
+    if (c_coptrules_user)
+        rules[num_rules++] = c_coptrules_user;
+    return num_rules;
+}
+
+static int fill_80cc_copt_rules(char **rules)
+{
+    int num_rules = 0;
+
+    rules[num_rules++] = c_coptrules9;
+    rules[num_rules++] = c_80cc_opt;
+    if (c_coptrules_target)
+        rules[num_rules++] = c_coptrules_target;
+    if (coptrules_cpu)
+        rules[num_rules++] = coptrules_cpu;
+    if (c_coptrules_user)
+        rules[num_rules++] = c_coptrules_user;
+    return num_rules;
+}
 
 static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
@@ -3141,6 +3141,19 @@ static int multi_arg_has(const char *args, const char *needle)
     return args && strstr(args, needle) != NULL;
 }
 
+static int multi_user_frame_flags(void)
+{
+    return multi_arg_has(comparg, "-fframe-pointer") ||
+           multi_arg_has(comparg, "-fomit-frame-pointer") ||
+           multi_arg_has(comparg, "-frameix") ||
+           multi_arg_has(comparg, "-frameiy") ||
+           multi_arg_has(sccz80arg, "-fframe-pointer") ||
+           multi_arg_has(sccz80arg, "-fomit-frame-pointer") ||
+           multi_arg_has(sccz80arg, "-frameix") ||
+           multi_arg_has(sccz80arg, "-frameiy");
+}
+
+/* Same three pins as src/80cc/main.c: no IX/IY on 8080, 8085, gbz80. */
 static int multi_cpu_has_ix(void)
 {
     return !(c_cpu == CPU_TYPE_8080 || c_cpu == CPU_TYPE_8085 || c_cpu == CPU_TYPE_GBZ80);
@@ -3152,21 +3165,23 @@ static int multi_reserve_ix(void)
            multi_arg_has(sccz80arg, "reserve-regs-ix");
 }
 
-static const char *multi_cpu_token(void)
+/* First -m token of select_cpu(Z80ASM), without the -m. */
+static void multi_cpu_from_map(char *cpu_tok, size_t n, const char **asm_flags)
 {
-    switch (c_cpu) {
-    case CPU_TYPE_Z80N:  return "z80n";
-    case CPU_TYPE_Z180:  return "z180";
-    case CPU_TYPE_R2KA:  return "r2ka";
-    case CPU_TYPE_R3K:   return "r3k";
-    case CPU_TYPE_R4K:   return "r4k";
-    case CPU_TYPE_R6K:   return "r6k";
-    case CPU_TYPE_8080:  return "8080";
-    case CPU_TYPE_8085:  return "8085";
-    case CPU_TYPE_GBZ80: return "gbz80";
-    case CPU_TYPE_EZ80:  return "ez80_z80";
-    case CPU_TYPE_KC160: return "kc160";
-    default:             return "z80";
+    const char *s = select_cpu(CPU_MAP_TOOL_Z80ASM);
+    const char *p;
+    size_t i = 0;
+
+    *asm_flags = (s && s[0]) ? s : "-mz80";
+    if (s && s[0] == '-' && s[1] == 'm') {
+        p = s + 2;
+        while (p[i] && p[i] != ' ' && i + 1 < n) {
+            cpu_tok[i] = p[i];
+            i++;
+        }
+        cpu_tok[i] = 0;
+    } else {
+        snprintf(cpu_tok, n, "z80");
     }
 }
 
@@ -3202,16 +3217,8 @@ static char *multi_compiler_args(int is_80cc, int frame_ix)
         snprintf(buf, sizeof(buf), "--bssseg=%s", opt_bss_seg);
         BuildOptions(&args, buf);
     }
-    if (sccz80arg) {
-        if (multi_arg_has(sccz80arg, "-fframe-pointer") ||
-            multi_arg_has(sccz80arg, "-fomit-frame-pointer") ||
-            multi_arg_has(sccz80arg, "-frameix") ||
-            multi_arg_has(sccz80arg, "-frameiy")) {
-            fprintf(stderr, "-compiler=multi selects frame-pointer flags per variant\n");
-            exit(1);
-        }
+    if (sccz80arg)
         BuildOptions(&args, sccz80arg);
-    }
     if (c_code_in_asm)
         BuildOptions(&args, "-cc");
     if (c_sccz80_r2l_calling)
@@ -3226,40 +3233,11 @@ static char *multi_compiler_args(int is_80cc, int frame_ix)
 static void multi_apply_copt(int filenumber, int is_80cc)
 {
     char  *rules[MAX_COPT_RULE_FILES];
-    int    num_rules = 0;
+    int    num_rules;
     char  *saved_type = c_compiler_type;
 
     c_compiler_type = is_80cc ? "80cc" : "sccz80";
-    rules[num_rules++] = c_coptrules9;
-    if (is_80cc) {
-        rules[num_rules++] = c_80cc_opt;
-    } else {
-        switch (peepholeopt) {
-        case 0:
-            break;
-        case 1:
-            rules[num_rules++] = c_coptrules1;
-            break;
-        case 2:
-            rules[num_rules++] = c_coptrules2;
-            rules[num_rules++] = c_coptrules1;
-            break;
-        default:
-            rules[num_rules++] = c_coptrules2;
-            rules[num_rules++] = c_coptrules1;
-            rules[num_rules++] = c_coptrules3;
-            break;
-        }
-        if (c_coptrules_sccz80)
-            rules[num_rules++] = c_coptrules_sccz80;
-    }
-    if (c_coptrules_target)
-        rules[num_rules++] = c_coptrules_target;
-    if (coptrules_cpu)
-        rules[num_rules++] = coptrules_cpu;
-    if (c_coptrules_user)
-        rules[num_rules++] = c_coptrules_user;
-
+    num_rules = is_80cc ? fill_80cc_copt_rules(rules) : fill_sccz80_copt_rules(rules);
     apply_copt_rules(filenumber, num_rules, rules, ".opt", ".op1", ".asm");
     c_compiler_type = saved_type;
 }
@@ -3319,14 +3297,7 @@ static int compile_c_multi(int filenumber)
     int    want_fp;
     int    status;
 
-    if (multi_arg_has(comparg, "-fframe-pointer") ||
-        multi_arg_has(comparg, "-fomit-frame-pointer") ||
-        multi_arg_has(comparg, "-frameix") ||
-        multi_arg_has(comparg, "-frameiy") ||
-        multi_arg_has(sccz80arg, "-fframe-pointer") ||
-        multi_arg_has(sccz80arg, "-fomit-frame-pointer") ||
-        multi_arg_has(sccz80arg, "-frameix") ||
-        multi_arg_has(sccz80arg, "-frameiy")) {
+    if (multi_user_frame_flags()) {
         fprintf(stderr, "-compiler=multi selects frame-pointer flags per variant\n");
         return 1;
     }
@@ -3357,11 +3328,16 @@ static int compile_c_multi(int filenumber)
     }
 
     out_asm = changesuffix(temporary_filenames[filenumber], ".asm");
-    off = 0;
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
-        "%s%s --cpu=%s --metric=%s --data-variant=sccz80 --output=\"%s\" --source=\"%s\"%s",
-        c_binary_dir, c_zccmulti_exe, multi_cpu_token(), c_compiler_metric, out_asm,
-        original_filenames[filenumber], verbose ? " --verbose" : "");
+    {
+        char cpu_tok[32];
+        const char *asm_flags;
+        multi_cpu_from_map(cpu_tok, sizeof(cpu_tok), &asm_flags);
+        off = 0;
+        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+            "%s%s --cpu=%s --asm-flags=\"%s\" --metric=%s --data-variant=sccz80 --output=\"%s\" --source=\"%s\"%s",
+            c_binary_dir, c_zccmulti_exe, cpu_tok, asm_flags, c_compiler_metric, out_asm,
+            original_filenames[filenumber], verbose ? " --verbose" : "");
+    }
     if (c_compiler_multi_report)
         off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --report=\"%s\"", c_compiler_multi_report);
     off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --z80asm=\"%s%s\"", c_binary_dir, c_z80asm_exe);
@@ -3572,10 +3548,7 @@ static void configure_compiler(void)
             fprintf(stderr, "-compiler=multi does not support the sdcc ABI\n");
             exit(1);
         }
-        if (multi_arg_has(comparg, "-fframe-pointer") ||
-            multi_arg_has(comparg, "-fomit-frame-pointer") ||
-            multi_arg_has(comparg, "-frameix") ||
-            multi_arg_has(comparg, "-frameiy")) {
+        if (multi_user_frame_flags()) {
             fprintf(stderr, "-compiler=multi selects frame-pointer flags per variant\n");
             exit(1);
         }

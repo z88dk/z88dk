@@ -1,6 +1,6 @@
 include ../make.config
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok
+all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok mul.ok ldir.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
@@ -54,7 +54,46 @@ optimiser.ok: $(OPT_SCCZ80) $(OPT_80CC)
 	z88dk-z80asm -mz80 -oopt_stitch.bin opt_stitch.asm
 	touch $@
 
+# jp (hl) must not win on ticks; reason is fallback.
+fallback.ok: ../../../src/zcc-multi/t/jp_hl.asm ../../../src/zcc-multi/t/jp_hl_alt.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=fb_stitch.asm --report=fb.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/jp_hl.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/jp_hl_alt.asm
+	grep -q 'fallback' fb.tsv
+	touch $@
+
+# ld b,8 / djnz must multiply the loop span.
+loopcount.ok: ../../../src/zcc-multi/t/loop_count.asm ../../../src/zcc-multi/t/loop_once.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=loop_stitch.asm --report=loop.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/loop_count.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/loop_once.asm
+	test `awk -F'	' '/^_foo/ {print $$6}' loop.tsv` -gt 40
+	touch $@
+
+# Shared l_mult cancels; scores are wrappers. Still must stitch and report.
+mul.ok: mul.c
+	zcc +test -vn -a -compiler=multi -compiler-multi-report=mul.tsv mul.c
+	grep -q '^_mul	' mul.tsv
+	test `grep -c '^\._mul$$' mul.c.asm` -eq 1
+	touch $@
+
+# ldir: ld bc,4 → 21*4; unknown BC → ZCCMULTI_BLOCK_REP (2) → 42.
+ldir.ok: ../../../src/zcc-multi/t/ldir_bc.asm ../../../src/zcc-multi/t/ldir_unk.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=ldir_bc_stitch.asm --report=ldir_bc.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/ldir_bc.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/ldir_bc.asm
+	test `awk -F'	' '/^_foo/ {print $$6}' ldir_bc.tsv` -gt 70
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=ldir_unk_stitch.asm --report=ldir_unk.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/ldir_unk.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/ldir_unk.asm
+	test `awk -F'	' '/^_foo/ {print $$6}' ldir_unk.tsv` -eq 52
+	touch $@
+
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm
 
 .PHONY: all clean

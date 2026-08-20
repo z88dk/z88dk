@@ -10,7 +10,7 @@ INSTALL ?= install
 
 CFLAGS += -std=gnu99 -Wall -pedantic
 
-OBJS = zccmulti.o
+OBJS = zccmulti.o zccmulti_ticks.o
 
 all: z88dk-zcc-multi$(EXESUFFIX)
 

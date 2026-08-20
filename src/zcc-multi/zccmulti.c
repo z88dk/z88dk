@@ -13,9 +13,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#ifndef _WIN32
 #include <dirent.h>
+#ifdef _WIN32
+#include <process.h>
+#define getpid _getpid
+#else
+#include <unistd.h>
 #endif
+
+#include "zccmulti_ticks.h"
 
 #ifdef _WIN32
 #define PATH_SEP '\\'
@@ -26,6 +32,13 @@
 #define MAX_VARIANTS 8
 #define MAX_FUNCS    4096
 #define MAX_LINE     4096
+
+/*
+ * Unknown BC on ldir/cpir/otdr and friends. The comparison only needs a
+ * shared stand-in: every variant with an unknown block repeat gets the
+ * same factor. 2 is conservative (one transfer + the repeat tax).
+ */
+#define ZCCMULTI_BLOCK_REP 2
 
 enum {
     METRIC_SIZE = 0,
@@ -38,8 +51,16 @@ enum {
     SEC_OTHER
 };
 
+enum {
+    LK_TEXT = 0,
+    LK_OPT_BANNER,
+    LK_STATICS_BANNER,
+    LK_SCOPE_BANNER
+};
+
 typedef struct {
     char  *text;
+    int    kind;
 } Line;
 
 typedef struct {
@@ -48,8 +69,11 @@ typedef struct {
     int    end;           /* one past last line */
     int    size;
     int    ticks;
+    int    base_size;     /* listing + loops, no helpers / intra-TU */
+    int    base_ticks;
     int    have_size;
     int    have_ticks;
+    int    bad_ticks;     /* jp (hl) / (ix) / (iy) — fall back to size */
 } Func;
 
 typedef struct {
@@ -64,6 +88,9 @@ typedef struct {
     int    statics;       /* Static Variables banner, or -1 */
     int    optimiser;     /* Optimiser additions banner, or -1 */
     int    scope;         /* Scope Defns banner, or -1 */
+    int   *lticks;        /* per-line static ticks */
+    int   *lmult;         /* per-line loop trip product (1 if unknown) */
+    int   *lfall;         /* per-line ticks fallback */
 } Variant;
 
 static const char *priority[] = { "sccz80", "80cc-sp", "80cc-fp", NULL };
@@ -75,10 +102,12 @@ static char  *opt_output;
 static char  *opt_report;
 static int    opt_verbose;
 static char  *opt_z80asm = "z88dk-z80asm";
+static char  *opt_asm_flags = NULL;   /* from select_cpu(), e.g. "-mz80 -IXIY" */
 static char **opt_includes;
 static int    nincludes;
 static char  *opt_list_dir;
 static char  *opt_source = "-";
+static int    opt_cpu_kind = TICKS_CPU_Z80;
 
 static Variant variants[MAX_VARIANTS];
 static int     nvariants;
@@ -213,9 +242,6 @@ static char *file_scope_label(const char *s)
         return NULL;
     start = p;
     p++;
-    if (!is_ident_start((unsigned char)*p) && *p != 0) {
-        /* "_" then ident: _foo */
-    }
     while (is_ident((unsigned char)*p))
         p++;
     if (p - start < 2)
@@ -244,6 +270,7 @@ static void add_line(Variant *v, const char *text)
     if (!v->lines)
         die("out of memory");
     v->lines[v->nlines].text = xstrdup(text);
+    v->lines[v->nlines].kind = LK_TEXT;
     v->nlines++;
 }
 
@@ -294,12 +321,18 @@ static void parse_variant(Variant *v)
         if (sc >= 0)
             sec = sc;
 
-        if (bk == 1 && v->optimiser < 0)
+        if (bk == 1 && v->optimiser < 0) {
             v->optimiser = i;
-        if (bk == 2 && v->statics < 0)
+            v->lines[i].kind = LK_OPT_BANNER;
+        }
+        if (bk == 2 && v->statics < 0) {
             v->statics = i;
-        if (bk == 3 && v->scope < 0)
+            v->lines[i].kind = LK_STATICS_BANNER;
+        }
+        if (bk == 3 && v->scope < 0) {
             v->scope = i;
+            v->lines[i].kind = LK_SCOPE_BANNER;
+        }
         if (bk) {
             if (v->trailer == v->nlines) {
                 v->trailer = i;
@@ -366,107 +399,75 @@ static int variant_rank(const char *name)
     return 100;
 }
 
-/* Crude static T-state from opcode bytes: 4 T per byte, plus known extras. */
-static int ticks_from_bytes(int nbytes, const char *src)
+static const char *asm_cpu_flags(void)
 {
-    const char *p = skip_ws(src);
-    int t = nbytes * 4;
-
-    if (nbytes <= 0)
-        return 0;
-    if (starts_with(p, "call"))
-        return 17;
-    if (starts_with(p, "ret"))
-        return (p[3] == 0 || p[3] == '\t' || p[3] == ' ' || p[3] == ';') ? 10 : 5;
-    if (starts_with(p, "jr"))
-        return 12;
-    if (starts_with(p, "jp"))
-        return 10;
-    if (starts_with(p, "djnz"))
-        return 13;
-    if (starts_with(p, "push"))
-        return 11;
-    if (starts_with(p, "pop"))
-        return 10;
-    if (starts_with(p, "rst"))
-        return 11;
-    return t;
+    return opt_asm_flags && opt_asm_flags[0] ? opt_asm_flags : NULL;
 }
 
-static int hex_digit(int c)
+static void temp_asm_path(char *buf, size_t n, const char *base)
 {
-    if (c >= '0' && c <= '9')
-        return c - '0';
-    if (c >= 'a' && c <= 'f')
-        return c - 'a' + 10;
-    if (c >= 'A' && c <= 'F')
-        return c - 'A' + 10;
-    return -1;
+    const char *dir = getenv("TMPDIR");
+    if (!dir || !dir[0])
+        dir = getenv("TEMP");
+    if (!dir || !dir[0])
+        dir = getenv("TMP");
+#ifdef _WIN32
+    if (!dir || !dir[0])
+        dir = ".";
+#else
+    if (!dir || !dir[0])
+        dir = "/tmp";
+#endif
+    snprintf(buf, n, "%s%czccmulti-%d-%s", dir, PATH_SEP, (int)getpid(), base);
 }
 
-/* Count assembled bytes on one z80asm listing line. */
-static int listing_byte_count(const char *line, char *src_out, size_t src_sz, int *linenum)
+static size_t append_asm_cmd(char *cmd, size_t off, size_t cap, const char *path)
 {
-    const char *p = line;
-    int nhex = 0;
-    int digits = 0;
     int i;
+    const char *flags = asm_cpu_flags();
 
-    *linenum = 0;
-    src_out[0] = 0;
+    if (flags)
+        off += (size_t)snprintf(cmd + off, cap - off, "%s -l %s", opt_z80asm, flags);
+    else
+        off += (size_t)snprintf(cmd + off, cap - off, "%s -m%s -l", opt_z80asm, opt_cpu);
+    for (i = 0; i < nincludes; i++)
+        off += (size_t)snprintf(cmd + off, cap - off, " -I\"%s\"", opt_includes[i]);
+    if (opt_list_dir)
+        off += (size_t)snprintf(cmd + off, cap - off, " -O\"%s\"", opt_list_dir);
+    off += (size_t)snprintf(cmd + off, cap - off, " \"%s\"", path);
+    return off;
+}
 
-    /* optional line number */
-    while (*p == ' ')
+/* Any stand-alone label: .mul1 / mul1: / ._foo / i_3. Not an instruction. */
+static int any_code_label(const char *s, char *out, size_t outsz)
+{
+    const char *p = skip_ws(s);
+    const char *t;
+    size_t n;
+    int had_dot = 0;
+
+    if (*p == '.') {
+        had_dot = 1;
         p++;
-    if (isdigit((unsigned char)*p)) {
-        *linenum = atoi(p);
-        while (isdigit((unsigned char)*p))
-            p++;
     }
-    while (*p == ' ')
-        p++;
-
-    /* optional 4-digit address */
-    if (hex_digit(p[0]) >= 0 && hex_digit(p[1]) >= 0 &&
-        hex_digit(p[2]) >= 0 && hex_digit(p[3]) >= 0 &&
-        (p[4] == ' ' || p[4] == '\t')) {
-        p += 4;
-        while (*p == ' ')
-            p++;
-        /* hex bytes: pairs, possibly packed */
-        while (hex_digit(p[0]) >= 0 && hex_digit(p[1]) >= 0) {
-            nhex++;
-            p += 2;
-            digits += 2;
-            if (digits >= 16)
-                break;
-            if (*p == ' ') {
-                /* packed field ends at 16 cols; we already cap */
-            }
-        }
-        while (*p == ' ')
-            p++;
-    }
-
-    snprintf(src_out, src_sz, "%s", skip_ws(p));
-
-    /* overflow continuation rows: only hex, no address after blank line-num field */
-    if (nhex == 0) {
-        /* continuation: lots of spaces then hex pairs */
-        i = 0;
-        while (line[i] == ' ')
-            i++;
-        if (i >= 12 && hex_digit(line[i]) >= 0) {
-            p = line + i;
-            while (hex_digit(p[0]) >= 0 && hex_digit(p[1]) >= 0) {
-                nhex++;
-                p += 2;
-            }
-        }
-    }
-
-    (void)i;
-    return nhex;
+    if (!is_ident_start((unsigned char)*p))
+        return 0;
+    t = p;
+    while (is_ident((unsigned char)*t))
+        t++;
+    n = (size_t)(t - p);
+    t = skip_ws(t);
+    if (*t == ':')
+        t = skip_ws(t + 1);
+    else if (!had_dot)
+        return 0;
+    if (*t != 0 && *t != ';' && *t != '\n')
+        return 0;
+    if (n < 1 || n >= outsz)
+        return 0;
+    memcpy(out, p, n);
+    out[n] = 0;
+    return 1;
 }
 
 static int run_cmd(const char *cmd)
@@ -480,6 +481,281 @@ static int run_cmd(const char *cmd)
     return 0;
 }
 
+static int find_label_line(Variant *v, Func *fn, const char *name)
+{
+    int line;
+    char lab[64];
+    char *gl;
+
+    if (!name || !name[0])
+        return -1;
+    for (line = fn->start; line < fn->end && line < v->nlines; line++) {
+        if (any_code_label(v->lines[line].text, lab, sizeof(lab))) {
+            if (strcmp(lab, name) == 0)
+                return line;
+            if (lab[0] == '_' && strcmp(lab + 1, name) == 0)
+                return line;
+            if (name[0] == '_' && strcmp(lab, name + 1) == 0)
+                return line;
+        }
+        gl = file_scope_label(v->lines[line].text);
+        if (gl) {
+            int hit = (strcmp(gl, name) == 0 ||
+                       (gl[0] == '_' && strcmp(gl + 1, name) == 0) ||
+                       (name[0] == '_' && strcmp(gl, name + 1) == 0));
+            free(gl);
+            if (hit)
+                return line;
+        }
+    }
+    return -1;
+}
+
+static int reg_written_in_span(Variant *v, int from, int to, const char *reg)
+{
+    int line;
+    char r[16];
+    long imm;
+
+    for (line = from; line < to && line < v->nlines; line++) {
+        const char *s = skip_ws(v->lines[line].text);
+        if (parse_ld_imm(s, r, sizeof(r), &imm) && strcmp(r, reg) == 0)
+            return 1;
+        if (strncasecmp(s, "ld", 2) == 0 && isspace((unsigned char)s[2])) {
+            const char *p = skip_ws(s + 2);
+            size_t n = strlen(reg);
+            if (strncmp(p, reg, n) == 0 && (p[n] == ',' || p[n] == ' ' || p[n] == '\t'))
+                return 1;
+        }
+        if (strncasecmp(s, "pop", 3) == 0 && isspace((unsigned char)s[3])) {
+            const char *p = skip_ws(s + 3);
+            if (strcmp(reg, "b") == 0 || strcmp(reg, "c") == 0 || strcmp(reg, "bc") == 0) {
+                if (strncmp(p, "bc", 2) == 0)
+                    return 1;
+            }
+            if (strcmp(reg, "d") == 0 || strcmp(reg, "e") == 0 || strcmp(reg, "de") == 0) {
+                if (strncmp(p, "de", 2) == 0)
+                    return 1;
+            }
+            if (strcmp(reg, "h") == 0 || strcmp(reg, "l") == 0 || strcmp(reg, "hl") == 0) {
+                if (strncmp(p, "hl", 2) == 0)
+                    return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+static int find_ld_imm_before(Variant *v, Func *fn, int loop_start, const char *reg, long *val)
+{
+    int line;
+    char r[16];
+    long imm;
+    int found = 0;
+
+    for (line = fn->start; line < loop_start; line++) {
+        long use = 0;
+        int ok = 0;
+
+        if (!parse_ld_imm(v->lines[line].text, r, sizeof(r), &imm))
+            continue;
+        if (strcmp(r, reg) == 0) {
+            use = imm;
+            ok = 1;
+        } else if (strcmp(r, "bc") == 0 && strcmp(reg, "b") == 0) {
+            use = (imm >> 8) & 0xff;
+            ok = 1;
+        } else if (strcmp(r, "bc") == 0 && strcmp(reg, "c") == 0) {
+            use = imm & 0xff;
+            ok = 1;
+        } else if (strcmp(r, "bc") == 0 && strcmp(reg, "bc") == 0) {
+            use = imm;
+            ok = 1;
+        }
+        if (!ok)
+            continue;
+        if (!found || use > *val)
+            *val = use;
+        found = 1;
+    }
+    return found;
+}
+
+/* Literal trip count only. Unknown bound stays 1 (compare bodies, do not invent K). */
+static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind)
+{
+    long imm;
+    char dreg[16];
+    int line;
+
+    if (kind == 3) { /* djnz */
+        if (find_ld_imm_before(v, fn, loop_start, "b", &imm) &&
+            !reg_written_in_span(v, loop_start, branch, "b") &&
+            !reg_written_in_span(v, loop_start, branch, "bc")) {
+            if (imm <= 0)
+                return 256;
+            if (imm > 65535)
+                return 1;
+            return (int)imm;
+        }
+        return 1;
+    }
+
+    if (parse_dec_reg(v->lines[branch].text, dreg, sizeof(dreg)))
+        return 1;
+
+    for (line = branch - 1; line >= loop_start && line >= branch - 6; line--) {
+        if (!parse_dec_reg(v->lines[line].text, dreg, sizeof(dreg)))
+            continue;
+        if (!find_ld_imm_before(v, fn, loop_start, dreg, &imm))
+            return 1;
+        if (reg_written_in_span(v, loop_start, line, dreg))
+            return 1;
+        if (imm > 65535)
+            return 1;
+        if (imm <= 0)
+            return (dreg[1] == 0) ? 256 : 1;
+        return (int)imm;
+    }
+    return 1;
+}
+
+static int looks_like_insn(const char *s)
+{
+    s = skip_ws(s);
+    if (*s == 0 || *s == ';' || *s == '.' || *s == '#')
+        return 0;
+    if (strncasecmp(s, "section", 7) == 0 && !is_ident((unsigned char)s[7]))
+        return 0;
+    if (strncasecmp(s, "global", 6) == 0 && !is_ident((unsigned char)s[6]))
+        return 0;
+    if (strncasecmp(s, "module", 6) == 0 && !is_ident((unsigned char)s[6]))
+        return 0;
+    if (strncasecmp(s, "include", 7) == 0 && !is_ident((unsigned char)s[7]))
+        return 0;
+    if (strncasecmp(s, "defc", 4) == 0 && !is_ident((unsigned char)s[4]))
+        return 0;
+    if (strncasecmp(s, "defs", 4) == 0 && !is_ident((unsigned char)s[4]))
+        return 0;
+    if (strncasecmp(s, "defb", 4) == 0 && !is_ident((unsigned char)s[4]))
+        return 0;
+    if (strncasecmp(s, "defw", 4) == 0 && !is_ident((unsigned char)s[4]))
+        return 0;
+    if (strncasecmp(s, "c_line", 6) == 0 && !is_ident((unsigned char)s[6]))
+        return 0;
+    if (strncasecmp(s, "public", 6) == 0 && !is_ident((unsigned char)s[6]))
+        return 0;
+    if (strncasecmp(s, "extern", 6) == 0 && !is_ident((unsigned char)s[6]))
+        return 0;
+    if (strncasecmp(s, "global", 6) == 0 && !is_ident((unsigned char)s[6]))
+        return 0;
+    if (strncasecmp(s, "elif", 4) == 0 && !is_ident((unsigned char)s[4]))
+        return 0;
+    if (strncasecmp(s, "endif", 5) == 0 && !is_ident((unsigned char)s[5]))
+        return 0;
+    if (strncasecmp(s, "if", 2) == 0 && !is_ident((unsigned char)s[2]))
+        return 0;
+    return isalpha((unsigned char)*s);
+}
+
+static void score_source_ticks(Variant *v)
+{
+    int i, fb;
+
+    for (i = 0; i < v->nlines; i++) {
+        if (!looks_like_insn(v->lines[i].text))
+            continue;
+        fb = 0;
+        v->lticks[i] = ticks_for_src(opt_cpu_kind, 1, v->lines[i].text, 0, &fb);
+        v->lfall[i] = fb;
+    }
+}
+
+static void apply_loops(Variant *v)
+{
+    int f;
+
+    for (f = 0; f < v->nfuncs; f++) {
+        Func *fn = &v->funcs[f];
+        int line;
+
+        for (line = fn->start; line < fn->end && line < v->nlines; line++) {
+            int kind = 0, cond = 0, indirect = 0;
+            char target[64];
+            int dest, trip, i, fb = 0;
+
+            if (!parse_control(v->lines[line].text, &kind, &cond, &indirect,
+                               target, sizeof(target)))
+                continue;
+            if (indirect) {
+                fn->bad_ticks = 1;
+                v->lfall[line] = 1;
+                continue;
+            }
+            if (kind != 1 && kind != 2 && kind != 3)
+                continue;
+            dest = find_label_line(v, fn, target);
+            if (dest < 0 || dest > line)
+                continue;
+            /* backward branch: use taken time */
+            v->lticks[line] = ticks_for_src(opt_cpu_kind, 1, v->lines[line].text, 1, &fb);
+            if (kind == 1)
+                v->lticks[line] = ticks_for_src(opt_cpu_kind, 3, v->lines[line].text, 1, &fb);
+            else if (kind == 2 || kind == 3)
+                v->lticks[line] = ticks_for_src(opt_cpu_kind, 2, v->lines[line].text, 1, &fb);
+            trip = infer_trip(v, fn, dest, line, kind);
+            if (trip <= 1)
+                continue;
+            /* Overlapping backward edges multiply (outer B × inner C). */
+            for (i = dest; i <= line && i < v->nlines; i++) {
+                long m = (long)v->lmult[i] * (long)trip;
+                if (m > 1000000)
+                    m = 1000000;
+                v->lmult[i] = (int)m;
+            }
+        }
+    }
+}
+
+static int is_block_repeat(const char *s)
+{
+    char m[16];
+    const char *p = skip_ws(s);
+    size_t n = 0;
+
+    while (isalpha((unsigned char)*p) && n + 1 < sizeof(m))
+        m[n++] = (char)tolower((unsigned char)*p++);
+    m[n] = 0;
+    return strcmp(m, "ldir") == 0 || strcmp(m, "lddr") == 0 ||
+           strcmp(m, "cpir") == 0 || strcmp(m, "cpdr") == 0 ||
+           strcmp(m, "inir") == 0 || strcmp(m, "indr") == 0 ||
+           strcmp(m, "otir") == 0 || strcmp(m, "otdr") == 0;
+}
+
+static void apply_block_repeats(Variant *v)
+{
+    int f, line;
+
+    for (f = 0; f < v->nfuncs; f++) {
+        Func *fn = &v->funcs[f];
+        for (line = fn->start; line < fn->end && line < v->nlines; line++) {
+            long bc;
+
+            if (!is_block_repeat(v->lines[line].text))
+                continue;
+            if (find_ld_imm_before(v, fn, line, "bc", &bc) && bc > 0) {
+                if (bc > 65536)
+                    bc = 65536;
+            } else {
+                bc = ZCCMULTI_BLOCK_REP;
+            }
+            /* Z80 ldir family: 21 T per repeat (last is 16; 21*n is a
+             * conservative stand-in). Unknown BC uses ZCCMULTI_BLOCK_REP. */
+            v->lticks[line] = 21 * (int)bc;
+        }
+    }
+}
+
 static void measure_variant(Variant *v)
 {
     char cmd[8192];
@@ -488,29 +764,29 @@ static void measure_variant(Variant *v)
     FILE *f;
     char buf[MAX_LINE];
     int i;
-    size_t off;
     char src[MAX_LINE];
     int linenum;
     int nbytes;
     int last_func = -1;
 
+    v->lticks = xmalloc((size_t)v->nlines * sizeof(int));
+    v->lmult = xmalloc((size_t)v->nlines * sizeof(int));
+    v->lfall = xmalloc((size_t)v->nlines * sizeof(int));
+    memset(v->lticks, 0, (size_t)v->nlines * sizeof(int));
+    memset(v->lfall, 0, (size_t)v->nlines * sizeof(int));
+    for (i = 0; i < v->nlines; i++)
+        v->lmult[i] = 1;
+
     obj = changesuffix(v->path, ".o");
     lis = changesuffix(v->path, ".lis");
 
-    off = 0;
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, "%s -m%s -l", opt_z80asm, opt_cpu);
-    for (i = 0; i < nincludes; i++)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " -I\"%s\"", opt_includes[i]);
-    if (opt_list_dir)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " -O\"%s\"", opt_list_dir);
-    snprintf(cmd + off, sizeof(cmd) - off, " \"%s\"", v->path);
+    append_asm_cmd(cmd, 0, sizeof(cmd), v->path);
 
     if (run_cmd(cmd))
         die("z80asm failed on %s", v->path);
 
     f = fopen(lis, "r");
     if (!f) {
-        /* listing sits next to the object in some versions */
         free(lis);
         lis = changesuffix(obj, ".lis");
         f = fopen(lis, "r");
@@ -521,8 +797,9 @@ static void measure_variant(Variant *v)
     while (fgets(buf, sizeof(buf), f)) {
         Func *fn = NULL;
         char *lab;
+        int src_line = -1;
 
-        nbytes = listing_byte_count(buf, src, sizeof(src), &linenum);
+        nbytes = listing_parse_line(buf, &linenum, src, sizeof(src));
         lab = file_scope_label(src);
         if (lab) {
             for (i = 0; i < v->nfuncs; i++) {
@@ -534,9 +811,9 @@ static void measure_variant(Variant *v)
             free(lab);
         }
         if (linenum > 0) {
+            src_line = linenum - 1;
             for (i = 0; i < v->nfuncs; i++) {
-                /* source lines are 1-based */
-                if (linenum - 1 >= v->funcs[i].start && linenum - 1 < v->funcs[i].end) {
+                if (src_line >= v->funcs[i].start && src_line < v->funcs[i].end) {
                     fn = &v->funcs[i];
                     last_func = i;
                     break;
@@ -548,7 +825,6 @@ static void measure_variant(Variant *v)
         if (!fn || nbytes <= 0)
             continue;
         fn->size += nbytes;
-        fn->ticks += ticks_from_bytes(nbytes, src);
         fn->have_size = 1;
         fn->have_ticks = 1;
     }
@@ -558,16 +834,29 @@ static void measure_variant(Variant *v)
     free(obj);
     free(lis);
 
+    score_source_ticks(v);
+    apply_loops(v);
+    apply_block_repeats(v);
+
     for (i = 0; i < v->nfuncs; i++) {
-        if (!v->funcs[i].have_size) {
-            /* empty body still has a label */
-            v->funcs[i].have_size = 1;
-            v->funcs[i].have_ticks = 1;
+        int line;
+        Func *fn = &v->funcs[i];
+        if (!fn->have_size) {
+            fn->have_size = 1;
+            fn->have_ticks = 1;
         }
+        fn->ticks = 0;
+        for (line = fn->start; line < fn->end && line < v->nlines; line++) {
+            if (v->lfall[line])
+                fn->bad_ticks = 1;
+            fn->ticks += v->lticks[line] * v->lmult[line];
+        }
+        fn->base_size = fn->size;
+        fn->base_ticks = fn->ticks;
     }
 }
 
-/* ---- helper size / ticks (spec: unique helper once for size, per call site for ticks) */
+/* ---- helper size / ticks (spec: differential extras only) */
 
 typedef struct {
     char *name;
@@ -689,22 +978,35 @@ static int extract_callee(const char *s, char *out, size_t outsz)
     return 1;
 }
 
+static int path_has_token(const char *path, const char *tok)
+{
+    const char *p;
+    size_t n;
+
+    if (!path || !tok || !tok[0])
+        return 0;
+    n = strlen(tok);
+    p = path;
+    while ((p = strstr(p, tok)) != NULL) {
+        char before = (p == path) ? '/' : p[-1];
+        char after = p[n];
+        int edge_b = (before == '/' || before == '\\' || before == '_' ||
+                      before == '-' || before == '.');
+        int edge_a = (after == 0 || after == '/' || after == '\\' ||
+                      after == '_' || after == '-' || after == '.');
+        if (edge_b && edge_a)
+            return 1;
+        p++;
+    }
+    return 0;
+}
+
 static int helper_path_rank(const char *path)
 {
     int rank = 1;
-    if (strstr(path, "9-common"))
+    if (path_has_token(path, "9-common") || path_has_token(path, "5-z80"))
         rank = 2;
-    if (strstr(path, "5-z80"))
-        rank = 2;
-    if (opt_cpu && strstr(path, opt_cpu))
-        rank = 4;
-    if (opt_cpu && strcmp(opt_cpu, "8085") == 0 && strstr(path, "8085"))
-        rank = 4;
-    if (opt_cpu && strcmp(opt_cpu, "8080") == 0 && strstr(path, "8080"))
-        rank = 4;
-    if (opt_cpu && strcmp(opt_cpu, "gbz80") == 0 && strstr(path, "gbz80"))
-        rank = 4;
-    if (opt_cpu && strncmp(opt_cpu, "ez80", 4) == 0 && strstr(path, "ez80"))
+    if (opt_cpu && path_has_token(path, opt_cpu))
         rank = 4;
     return rank;
 }
@@ -722,7 +1024,45 @@ static void helper_add_path(const char *name, const char *path)
     }
 }
 
-#ifndef _WIN32
+static void helper_add_publics(const char *path)
+{
+    FILE *f;
+    char buf[MAX_LINE];
+
+    f = fopen(path, "r");
+    if (!f)
+        return;
+    while (fgets(buf, sizeof(buf), f)) {
+        const char *p = skip_ws(buf);
+        char name[64];
+        if (strncasecmp(p, "public", 6) == 0 && isspace((unsigned char)p[6]))
+            p = skip_ws(p + 6);
+        else if (strncasecmp(p, "global", 6) == 0 && isspace((unsigned char)p[6]))
+            p = skip_ws(p + 6);
+        else
+            continue;
+        while (*p && *p != ';' && *p != '\n') {
+            const char *t;
+            size_t n;
+            if (*p == ',' || *p == ' ' || *p == '\t') {
+                p++;
+                continue;
+            }
+            t = p;
+            while (is_ident((unsigned char)*p))
+                p++;
+            n = (size_t)(p - t);
+            if (n > 0 && n < sizeof(name)) {
+                memcpy(name, t, n);
+                name[n] = 0;
+                helper_add_path(name, path);
+            }
+            p = skip_ws(p);
+        }
+    }
+    fclose(f);
+}
+
 static void helper_walk_dir(const char *dir)
 {
     DIR *d;
@@ -741,6 +1081,10 @@ static void helper_walk_dir(const char *dir)
         if (stat(path, &st) != 0)
             continue;
         if (S_ISDIR(st.st_mode)) {
+            if (strcmp(e->d_name, "obj") == 0 ||
+                strcmp(e->d_name, "Debug") == 0 ||
+                strcmp(e->d_name, "Release") == 0)
+                continue;
             helper_walk_dir(path);
             continue;
         }
@@ -752,11 +1096,11 @@ static void helper_walk_dir(const char *dir)
             memcpy(name, e->d_name, n - 4);
             name[n - 4] = 0;
             helper_add_path(name, path);
+            helper_add_publics(path);
         }
     }
     closedir(d);
 }
-#endif
 
 static void helper_index_sources(void)
 {
@@ -775,18 +1119,18 @@ static void helper_index_sources(void)
             slash = strrchr(root, '\\');
 #endif
         if (slash && (strcmp(slash + 1, "lib") == 0 || strcmp(slash + 1, "lib/") == 0)) {
+            char sub[4096];
             *slash = 0;
-#ifndef _WIN32
-            {
-                char sub[4096];
-                /* Classic only. libsrc/l/util and libsrc/math/integer
-                 * are newlib and INCLUDE config_private.inc from m4. */
-                snprintf(sub, sizeof(sub), "%s/libsrc/l/sccz80", root);
-                helper_walk_dir(sub);
-                snprintf(sub, sizeof(sub), "%s/libsrc/math/float", root);
-                helper_walk_dir(sub);
-            }
-#endif
+            /* Classic sccz80 helpers, float cores, and the integer
+             * mul/div leaves (small / fast / CPU). Dispatcher files
+             * that INCLUDE config_private.inc are still indexed so
+             * defc/jp aliases can be followed. */
+            snprintf(sub, sizeof(sub), "%s%clibsrc%cl%csccz80", root, PATH_SEP, PATH_SEP, PATH_SEP);
+            helper_walk_dir(sub);
+            snprintf(sub, sizeof(sub), "%s%clibsrc%cmath%cfloat", root, PATH_SEP, PATH_SEP, PATH_SEP);
+            helper_walk_dir(sub);
+            snprintf(sub, sizeof(sub), "%s%clibsrc%cmath%cinteger", root, PATH_SEP, PATH_SEP, PATH_SEP);
+            helper_walk_dir(sub);
         }
     }
 }
@@ -812,7 +1156,7 @@ static int copy_text_file(const char *from, const char *to)
     return 0;
 }
 
-static int measure_asm_totals(const char *path, int *size, int *ticks)
+static int measure_asm_totals(const char *path, int *size)
 {
     char cmd[8192];
     char tmpasm[4096];
@@ -822,30 +1166,23 @@ static int measure_asm_totals(const char *path, int *size, int *ticks)
     char buf[MAX_LINE];
     char src[MAX_LINE];
     int linenum, nbytes;
-    size_t off;
-    int i;
     const char *base;
 
     *size = 0;
-    *ticks = 0;
     base = strrchr(path, '/');
 #ifdef _WIN32
     if (!base)
         base = strrchr(path, '\\');
 #endif
     base = base ? base + 1 : path;
-    snprintf(tmpasm, sizeof(tmpasm), "/tmp/zccmulti-%s", base);
+    temp_asm_path(tmpasm, sizeof(tmpasm), base);
     if (copy_text_file(path, tmpasm))
         return 1;
     path = tmpasm;
     obj = changesuffix(path, ".zccmulti.o");
     lis = changesuffix(path, ".lis");
 
-    off = 0;
-    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, "%s -m%s -l", opt_z80asm, opt_cpu);
-    for (i = 0; i < nincludes; i++)
-        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " -I\"%s\"", opt_includes[i]);
-    snprintf(cmd + off, sizeof(cmd) - off, " \"%s\"", path);
+    append_asm_cmd(cmd, 0, sizeof(cmd), path);
 
     if (run_cmd(cmd)) {
         remove(obj);
@@ -869,11 +1206,9 @@ static int measure_asm_totals(const char *path, int *size, int *ticks)
         return 1;
     }
     while (fgets(buf, sizeof(buf), f)) {
-        nbytes = listing_byte_count(buf, src, sizeof(src), &linenum);
-        if (nbytes > 0) {
+        nbytes = listing_parse_line(buf, &linenum, src, sizeof(src));
+        if (nbytes > 0)
             *size += nbytes;
-            *ticks += ticks_from_bytes(nbytes, src);
-        }
     }
     fclose(f);
     remove(obj);
@@ -884,55 +1219,165 @@ static int measure_asm_totals(const char *path, int *size, int *ticks)
     return 0;
 }
 
-static int measure_helper(const char *name);
-
-static void charge_calls_in_file(const char *path, int *size, int *ticks, int *unique_names, int nunique)
+static int file_includes_config_private(const char *path)
 {
     FILE *f;
     char buf[MAX_LINE];
-    char tgt[256];
-    char seen[64][64];
-    int nseen = 0;
+    int hit = 0;
 
-    (void)unique_names;
-    (void)nunique;
     f = fopen(path, "r");
     if (!f)
-        return;
+        return 0;
     while (fgets(buf, sizeof(buf), f)) {
-        int i, known;
-        if (!extract_callee(buf, tgt, sizeof(tgt)))
-            continue;
-        if (!is_helper_name(tgt))
-            continue;
-        if (measure_helper(tgt) != 0)
-            continue;
-        i = helper_find(tgt);
-        if (i < 0)
-            continue;
-        *ticks += helpers[i].ticks;
-        known = 0;
-        for (i = 0; i < nseen; i++) {
-            if (strcmp(seen[i], tgt) == 0) {
-                known = 1;
-                break;
-            }
-        }
-        if (!known && nseen < 64) {
-            snprintf(seen[nseen], sizeof(seen[0]), "%s", tgt);
-            nseen++;
-            i = helper_find(tgt);
-            if (i >= 0)
-                *size += helpers[i].size;
+        if (strstr(buf, "config_private.inc")) {
+            hit = 1;
+            break;
         }
     }
     fclose(f);
+    return hit;
+}
+
+static int measure_helper(const char *name);
+
+static int parse_defc_alias(const char *s, char *rhs, size_t rhssz)
+{
+    const char *p = skip_ws(s);
+    char dummy[64];
+    size_t n;
+
+    if (strncasecmp(p, "defc", 4) != 0 || !isspace((unsigned char)p[4]))
+        return 0;
+    p = skip_ws(p + 4);
+    if (*p == '.')
+        p++;
+    while (is_ident((unsigned char)*p))
+        p++;
+    p = skip_ws(p);
+    if (*p != '=')
+        return 0;
+    p = skip_ws(p + 1);
+    if (*p == '.')
+        p++;
+    n = 0;
+    while (is_ident((unsigned char)*p) && n + 1 < rhssz)
+        dummy[n++] = *p++;
+    dummy[n] = 0;
+    if (n < 1)
+        return 0;
+    snprintf(rhs, rhssz, "%s", dummy);
+    return 1;
+}
+
+static int alias_prefers(const char *name)
+{
+    if (!name)
+        return 0;
+    if (opt_cpu && strcmp(opt_cpu, "z80n") == 0 && starts_with(name, "l_z80n_"))
+        return 4;
+    if (opt_cpu && (strcmp(opt_cpu, "z180") == 0 || starts_with(opt_cpu, "ez80")) &&
+        starts_with(name, "l_z180_"))
+        return 4;
+    if (opt_cpu && strcmp(opt_cpu, "kc160") == 0 && starts_with(name, "l_kc160_"))
+        return 4;
+    if (opt_cpu && (starts_with(opt_cpu, "r2") || starts_with(opt_cpu, "r3") ||
+                    starts_with(opt_cpu, "r4") || starts_with(opt_cpu, "r6")) &&
+        starts_with(name, "l_r2ka_"))
+        return 4;
+    if (starts_with(name, "l_small_"))
+        return 2;
+    if (starts_with(name, "l_fast_"))
+        return 1;
+    return 0;
+}
+
+static void charge_one_callee(const char *tgt, int *size, int *ticks, int mult,
+                              char seen[][64], int *nseen)
+{
+    int i, known;
+
+    if (!is_helper_name(tgt))
+        return;
+    if (measure_helper(tgt) != 0)
+        return;
+    i = helper_find(tgt);
+    if (i < 0 || (helpers[i].size == 0 && helpers[i].ticks == 0))
+        return;
+    *ticks += helpers[i].ticks * (mult > 0 ? mult : 1);
+    known = 0;
+    for (i = 0; i < *nseen; i++) {
+        if (strcmp(seen[i], tgt) == 0) {
+            known = 1;
+            break;
+        }
+    }
+    if (!known && *nseen < 64) {
+        snprintf(seen[*nseen], sizeof(seen[0]), "%s", tgt);
+        (*nseen)++;
+        i = helper_find(tgt);
+        if (i >= 0)
+            *size += helpers[i].size;
+    }
+}
+
+static int load_source_lines(const char *path, Variant *v)
+{
+    FILE *f;
+    char buf[MAX_LINE];
+    int i;
+
+    memset(v, 0, sizeof(*v));
+    v->path = xstrdup(path);
+    f = fopen(path, "r");
+    if (!f)
+        return 1;
+    while (fgets(buf, sizeof(buf), f)) {
+        size_t n = strlen(buf);
+        while (n && (buf[n - 1] == '\n' || buf[n - 1] == '\r'))
+            buf[--n] = 0;
+        add_line(v, buf);
+    }
+    fclose(f);
+    if (v->nlines <= 0)
+        return 1;
+    v->lticks = xmalloc((size_t)v->nlines * sizeof(int));
+    v->lmult = xmalloc((size_t)v->nlines * sizeof(int));
+    v->lfall = xmalloc((size_t)v->nlines * sizeof(int));
+    memset(v->lticks, 0, (size_t)v->nlines * sizeof(int));
+    memset(v->lfall, 0, (size_t)v->nlines * sizeof(int));
+    for (i = 0; i < v->nlines; i++)
+        v->lmult[i] = 1;
+    add_func(v, "_helper", 0);
+    v->funcs[0].end = v->nlines;
+    v->first_func = 0;
+    return 0;
+}
+
+static void free_source_lines(Variant *v)
+{
+    int i;
+    for (i = 0; i < v->nlines; i++)
+        free(v->lines[i].text);
+    free(v->lines);
+    for (i = 0; i < v->nfuncs; i++)
+        free(v->funcs[i].name);
+    free(v->funcs);
+    free(v->lticks);
+    free(v->lmult);
+    free(v->lfall);
+    free(v->path);
 }
 
 static int measure_helper(const char *name)
 {
     Helper *h = helper_get(name);
-    int sz = 0, tk = 0;
+    Variant src;
+    int sz = 0;
+    int line;
+    char seen[64][64];
+    int nseen = 0;
+    char best_alias[64];
+    int best_pref = -1;
 
     if (h->have)
         return 0;
@@ -946,66 +1391,218 @@ static int measure_helper(const char *name)
         return 1;
     }
     h->busy = 1;
-    if (measure_asm_totals(h->path, &sz, &tk) != 0) {
+    best_alias[0] = 0;
+
+    if (load_source_lines(h->path, &src) != 0) {
         h->busy = 0;
         h->have = 1;
         h->size = 0;
         h->ticks = 0;
         return 1;
     }
-    h->size = sz;
-    h->ticks = tk;
-    charge_calls_in_file(h->path, &h->size, &h->ticks, NULL, 0);
+    score_source_ticks(&src);
+    apply_loops(&src);
+    apply_block_repeats(&src);
+    h->ticks = 0;
+    for (line = 0; line < src.nlines; line++)
+        h->ticks += src.lticks[line] * src.lmult[line];
+
+    if (!file_includes_config_private(h->path) &&
+        measure_asm_totals(h->path, &sz) == 0)
+        h->size = sz;
+    else
+        h->size = 0;
+
+    for (line = 0; line < src.nlines; line++) {
+        char tgt[256];
+        char alias[64];
+        int pref;
+        if (extract_callee(src.lines[line].text, tgt, sizeof(tgt)))
+            charge_one_callee(tgt, &h->size, &h->ticks,
+                              src.lmult ? src.lmult[line] : 1, seen, &nseen);
+        if (parse_defc_alias(src.lines[line].text, alias, sizeof(alias))) {
+            pref = alias_prefers(alias);
+            if (pref > best_pref) {
+                best_pref = pref;
+                snprintf(best_alias, sizeof(best_alias), "%s", alias);
+            } else if (pref == 0 && best_pref < 0 && is_helper_name(alias)) {
+                snprintf(best_alias, sizeof(best_alias), "%s", alias);
+                best_pref = 0;
+            }
+        }
+    }
+    if (best_alias[0])
+        charge_one_callee(best_alias, &h->size, &h->ticks, 1, seen, &nseen);
+
+    free_source_lines(&src);
     h->busy = 0;
     h->have = 1;
     return 0;
 }
 
-static void charge_function_helpers(Variant *v, Func *fn)
+static int helper_call_weight(Variant *v, Func *fn, const char *hname)
+{
+    int line, n = 0;
+    char tgt[256];
+
+    for (line = fn->start; line < fn->end && line < v->nlines; line++) {
+        if (!extract_callee(v->lines[line].text, tgt, sizeof(tgt)))
+            continue;
+        if (strcmp(tgt, hname) != 0 &&
+            !(tgt[0] == '_' && strcmp(tgt + 1, hname) == 0) &&
+            !(hname[0] == '_' && strcmp(tgt, hname + 1) == 0))
+            continue;
+        if (!is_helper_name(tgt))
+            continue;
+        n += v->lmult ? v->lmult[line] : 1;
+    }
+    return n;
+}
+
+static void collect_helper_names(Func *fn, Variant *v, char names[][64], int *nn, int maxn)
 {
     int line;
     char tgt[256];
-    char seen[64][64];
-    int nseen = 0;
 
     for (line = fn->start; line < fn->end && line < v->nlines; line++) {
-        int i, known;
+        int i, known = 0;
         if (!extract_callee(v->lines[line].text, tgt, sizeof(tgt)))
             continue;
         if (!is_helper_name(tgt))
             continue;
-        if (measure_helper(tgt) != 0)
-            continue;
-        i = helper_find(tgt);
-        if (i < 0 || (helpers[i].size == 0 && helpers[i].ticks == 0))
-            continue;
-        /* ticks: helper body once per call site */
-        fn->ticks += helpers[i].ticks;
-        known = 0;
-        for (i = 0; i < nseen; i++) {
-            if (strcmp(seen[i], tgt) == 0) {
+        for (i = 0; i < *nn; i++) {
+            if (strcmp(names[i], tgt) == 0) {
                 known = 1;
                 break;
             }
         }
-        if (!known && nseen < 64) {
-            snprintf(seen[nseen], sizeof(seen[0]), "%s", tgt);
-            nseen++;
-            i = helper_find(tgt);
-            if (i >= 0)
-                fn->size += helpers[i].size;
+        if (!known && *nn < maxn) {
+            snprintf(names[*nn], sizeof(names[0]), "%s", tgt);
+            (*nn)++;
         }
     }
 }
 
-static void charge_all_helpers(void)
+/*
+ * Only helpers that *differ* between variants of the same function
+ * change the winner. A call to l_mult in every body cancels; adding
+ * its 16-step loop to every score is wasted work and hides the
+ * wrapper delta. Charge (count[v] - min_count) * helper cost.
+ */
+static void charge_differing_helpers(void)
 {
-    int v, f;
+    int v, f, fi, i;
+    char *fnames[MAX_FUNCS];
+    int nf = 0;
+    char names[64][64];
+
     helper_index_sources();
     for (v = 0; v < nvariants; v++) {
-        for (f = 0; f < variants[v].nfuncs; f++)
-            charge_function_helpers(&variants[v], &variants[v].funcs[f]);
+        for (f = 0; f < variants[v].nfuncs; f++) {
+            int seen = 0;
+            for (fi = 0; fi < nf; fi++) {
+                if (strcmp(fnames[fi], variants[v].funcs[f].name) == 0) {
+                    seen = 1;
+                    break;
+                }
+            }
+            if (!seen && nf < MAX_FUNCS)
+                fnames[nf++] = variants[v].funcs[f].name;
+        }
     }
+    for (fi = 0; fi < nf; fi++) {
+        int nn = 0;
+
+        for (v = 0; v < nvariants; v++) {
+            Func *fn = find_func(&variants[v], fnames[fi]);
+            if (fn)
+                collect_helper_names(fn, &variants[v], names, &nn, 64);
+        }
+        for (i = 0; i < nn; i++) {
+            int count[MAX_VARIANTS];
+            int minc = 0x7fffffff;
+
+            for (v = 0; v < nvariants; v++) {
+                Func *fn = find_func(&variants[v], fnames[fi]);
+                count[v] = fn ? helper_call_weight(&variants[v], fn, names[i]) : 0;
+                if (fn && count[v] < minc)
+                    minc = count[v];
+            }
+            if (minc == 0x7fffffff)
+                continue;
+            for (v = 0; v < nvariants; v++) {
+                Func *fn = find_func(&variants[v], fnames[fi]);
+                int extra, hi;
+
+                if (!fn)
+                    continue;
+                extra = count[v] - minc;
+                if (extra <= 0)
+                    continue;
+                if (measure_helper(names[i]) != 0)
+                    continue;
+                hi = helper_find(names[i]);
+                if (hi < 0)
+                    continue;
+                fn->ticks += helpers[hi].ticks * extra;
+                fn->size += helpers[hi].size;
+            }
+        }
+    }
+}
+
+/* Same-variant C callee body, once per call site (ticks) / unique (size). */
+static void charge_intra_tu(void)
+{
+    int v, f, line;
+
+    for (v = 0; v < nvariants; v++) {
+        for (f = 0; f < variants[v].nfuncs; f++) {
+            Func *fn = &variants[v].funcs[f];
+            char seen[64][64];
+            int nseen = 0;
+
+            fn->size = fn->base_size;
+            fn->ticks = fn->base_ticks;
+            for (line = fn->start; line < fn->end && line < variants[v].nlines; line++) {
+                char tgt[256];
+                char cname[256];
+                Func *cal;
+                int i, known, mult;
+
+                if (!extract_callee(variants[v].lines[line].text, tgt, sizeof(tgt)))
+                    continue;
+                if (tgt[0] == '_')
+                    snprintf(cname, sizeof(cname), "%s", tgt);
+                else
+                    snprintf(cname, sizeof(cname), "_%s", tgt);
+                cal = find_func(&variants[v], cname);
+                if (!cal)
+                    cal = find_func(&variants[v], tgt);
+                if (!cal || cal == fn)
+                    continue;
+                mult = variants[v].lmult ? variants[v].lmult[line] : 1;
+                fn->ticks += cal->base_ticks * mult;
+                known = 0;
+                for (i = 0; i < nseen; i++) {
+                    if (strcmp(seen[i], cal->name) == 0) {
+                        known = 1;
+                        break;
+                    }
+                }
+                if (!known && nseen < 64) {
+                    snprintf(seen[nseen], sizeof(seen[0]), "%s", cal->name);
+                    nseen++;
+                    fn->size += cal->base_size;
+                }
+            }
+        }
+    }
+}
+
+static int ticks_usable(const Func *a)
+{
+    return a && a->have_ticks && !a->bad_ticks;
 }
 
 static int better(const Func *a, const char *aname, const Func *b, const char *bname)
@@ -1014,7 +1611,7 @@ static int better(const Func *a, const char *aname, const Func *b, const char *b
     if (!b)
         return 1;
     if (opt_metric == METRIC_TICKS) {
-        if (a->have_ticks && b->have_ticks && a->ticks != b->ticks)
+        if (ticks_usable(a) && ticks_usable(b) && a->ticks != b->ticks)
             return a->ticks < b->ticks;
         if (a->have_size && b->have_size && a->size != b->size)
             return a->size < b->size;
@@ -1090,7 +1687,19 @@ static void collect_functions(void)
         choices[c].sel = best_v;
         if (npres == 1)
             strcpy(choices[c].reason, "only");
-        else
+        else if (opt_metric == METRIC_TICKS &&
+                 (!ticks_usable(best) ||
+                  (npres >= 2 && !ticks_usable(find_func(&variants[best_v], choices[c].name)))))
+            strcpy(choices[c].reason, "fallback");
+        else if (opt_metric == METRIC_TICKS) {
+            int used_ticks = 1;
+            for (v = 0; v < nvariants; v++) {
+                Func *fn = find_func(&variants[v], choices[c].name);
+                if (fn && !ticks_usable(fn))
+                    used_ticks = 0;
+            }
+            strcpy(choices[c].reason, used_ticks ? "metric" : "fallback");
+        } else
             strcpy(choices[c].reason, "metric");
     }
 }
@@ -1114,13 +1723,48 @@ static void choice_callee(const char *raw, char *out, size_t n)
     snprintf(out, n, "_%s", raw);
 }
 
+static int ix_unsafe_variant(const char *name)
+{
+    return strcmp(name, "80cc-fp") != 0;
+}
+
+static int choice_score(int ci, int v)
+{
+    if (ci < 0 || v < 0 || !choices[ci].present[v])
+        return 0x7fffffff;
+    return (opt_metric == METRIC_TICKS) ? choices[ci].ticks[v] : choices[ci].size[v];
+}
+
+static int best_non_fp(int ci)
+{
+    int v, best_v = -1;
+    const Func *best = NULL;
+    const char *best_name = NULL;
+
+    for (v = 0; v < nvariants; v++) {
+        Func *alt;
+        if (strcmp(variants[v].name, "80cc-fp") == 0)
+            continue;
+        alt = find_func(&variants[v], choices[ci].name);
+        if (!alt)
+            continue;
+        if (better(alt, variants[v].name, best, best_name)) {
+            best = alt;
+            best_name = variants[v].name;
+            best_v = v;
+        }
+    }
+    return best_v;
+}
+
 static void resolve_ix_mix(void)
 {
     int changed = 1;
     int guard = 0;
     int fp = variant_named("80cc-fp");
 
-    /* Prefer keeping 80cc-fp: elevate sccz80 callees to 80cc-fp. */
+    /* 80cc-fp keeps a live IX frame. Any other selected body may clobber IX.
+     * Pick the cheaper legal fix: elevate the callee, or demote the caller. */
     while (changed && guard++ < 64) {
         int c, line;
         changed = 0;
@@ -1138,7 +1782,9 @@ static void resolve_ix_mix(void)
             for (line = fn->start; line < fn->end; line++) {
                 char tgt[256];
                 char cname[256];
-                int ti, fp_ok;
+                int ti, can_elevate, demote_v;
+                long cost_el = 0x7fffffffL, cost_de = 0x7fffffffL;
+
                 if (!extract_callee(cv->lines[line].text, tgt, sizeof(tgt)))
                     continue;
                 choice_callee(tgt, cname, sizeof(cname));
@@ -1147,70 +1793,27 @@ static void resolve_ix_mix(void)
                     ti = choice_index(tgt);
                 if (ti < 0 || choices[ti].sel < 0)
                     continue;
-                if (strcmp(variants[choices[ti].sel].name, "sccz80") != 0)
+                if (!ix_unsafe_variant(variants[choices[ti].sel].name))
                     continue;
-                fp_ok = (fp >= 0 && find_func(&variants[fp], choices[ti].name) != NULL);
-                if (fp_ok) {
+
+                can_elevate = (fp >= 0 && find_func(&variants[fp], choices[ti].name) != NULL);
+                if (can_elevate)
+                    cost_el = (long)choice_score(ti, fp) - (long)choice_score(ti, choices[ti].sel);
+
+                demote_v = best_non_fp(c);
+                if (demote_v >= 0)
+                    cost_de = (long)choice_score(c, demote_v) - (long)choice_score(c, choices[c].sel);
+
+                if (can_elevate && cost_el <= cost_de) {
                     choices[ti].sel = fp;
                     strcpy(choices[ti].reason, "ix-elevate");
                     changed = 1;
                     break;
                 }
-            }
-        }
-    }
-
-    /* Last resort: callee has no 80cc-fp body. Demote the caller. */
-    changed = 1;
-    guard = 0;
-    while (changed && guard++ < 64) {
-        int c, line, v;
-        changed = 0;
-        for (c = 0; c < nchoices; c++) {
-            Variant *cv;
-            Func *fn;
-            if (choices[c].sel < 0)
-                continue;
-            if (strcmp(variants[choices[c].sel].name, "80cc-fp") != 0)
-                continue;
-            cv = &variants[choices[c].sel];
-            fn = find_func(cv, choices[c].name);
-            if (!fn)
-                continue;
-            for (line = fn->start; line < fn->end; line++) {
-                char tgt[256];
-                char cname[256];
-                int ti;
-                const Func *best = NULL;
-                const char *best_name = NULL;
-                int best_v = -1;
-                if (!extract_callee(cv->lines[line].text, tgt, sizeof(tgt)))
-                    continue;
-                choice_callee(tgt, cname, sizeof(cname));
-                ti = choice_index(cname);
-                if (ti < 0)
-                    ti = choice_index(tgt);
-                if (ti < 0 || choices[ti].sel < 0)
-                    continue;
-                if (strcmp(variants[choices[ti].sel].name, "sccz80") != 0)
-                    continue;
-                for (v = 0; v < nvariants; v++) {
-                    Func *alt;
-                    if (strcmp(variants[v].name, "80cc-fp") == 0)
-                        continue;
-                    alt = find_func(&variants[v], choices[c].name);
-                    if (!alt)
-                        continue;
-                    if (better(alt, variants[v].name, best, best_name)) {
-                        best = alt;
-                        best_name = variants[v].name;
-                        best_v = v;
-                    }
-                }
-                if (best_v < 0)
-                    die("80cc-fp %s calls sccz80 %s and cannot be demoted",
-                        choices[c].name, choices[ti].name);
-                choices[c].sel = best_v;
+                if (demote_v < 0)
+                    die("80cc-fp %s calls %s %s and cannot be demoted",
+                        choices[c].name, variants[choices[ti].sel].name, choices[ti].name);
+                choices[c].sel = demote_v;
                 strcpy(choices[c].reason, "ix-callee");
                 changed = 1;
                 break;
@@ -1233,22 +1836,21 @@ static void rewrite_locals(const char *variant, const char *in, char *out, size_
     safe[i] = 0;
 
     while (*p && o + 1 < outsz) {
-        if ((p == in || !is_ident((unsigned char)p[-1])) && is_local_label_token(p, 8)) {
-            const char *t = p;
-            while (is_ident((unsigned char)*t))
-                t++;
-            o += (size_t)snprintf(out + o, outsz - o, "%.*s_%s", (int)(t - p), p, safe);
-            p = t;
-            continue;
-        }
-        if ((p == in || !is_ident((unsigned char)p[-1])) && *p == '.' &&
-            is_local_label_token(p + 1, 8)) {
-            const char *t = p + 1;
-            while (is_ident((unsigned char)*t))
-                t++;
-            o += (size_t)snprintf(out + o, outsz - o, ".%.*s_%s", (int)(t - (p + 1)), p + 1, safe);
-            p = t;
-            continue;
+        if (p == in || !is_ident((unsigned char)p[-1])) {
+            const char *t = (*p == '.') ? p + 1 : p;
+            const char *u = t;
+            size_t n;
+            while (is_ident((unsigned char)*u))
+                u++;
+            n = (size_t)(u - t);
+            if (is_local_label_token(t, n)) {
+                if (*p == '.')
+                    o += (size_t)snprintf(out + o, outsz - o, ".%.*s_%s", (int)n, t, safe);
+                else
+                    o += (size_t)snprintf(out + o, outsz - o, "%.*s_%s", (int)n, t, safe);
+                p = u;
+                continue;
+            }
         }
         out[o++] = *p++;
     }
@@ -1293,16 +1895,26 @@ static int local_defc_rhs(const char *s, char *rhs, size_t rhssz)
     s = skip_ws(s + 4);
     if (*s == '.')
         s++;
-    if (!is_local_label_token(s, 8))
-        return 0;
+    {
+        const char *u = s;
+        while (is_ident((unsigned char)*u))
+            u++;
+        if (!is_local_label_token(s, (size_t)(u - s)))
+            return 0;
+    }
     eq = strchr(s, '=');
     if (!eq)
         return 0;
     s = skip_ws(eq + 1);
     if (*s == '.')
         s++;
-    if (!is_local_label_token(s, 8))
-        return 0;
+    {
+        const char *u = s;
+        while (is_ident((unsigned char)*u))
+            u++;
+        if (!is_local_label_token(s, (size_t)(u - s)))
+            return 0;
+    }
     t = s;
     while (is_ident((unsigned char)*t))
         t++;
@@ -1344,12 +1956,12 @@ static int local_defc_lhs(const char *s, char *lhs, size_t lhssz)
     s = skip_ws(s + 4);
     if (*s == '.')
         s++;
-    if (!is_local_label_token(s, 8))
-        return 0;
     t = s;
     while (is_ident((unsigned char)*t))
         t++;
     n = (size_t)(t - s);
+    if (!is_local_label_token(s, n))
+        return 0;
     if (n < 1 || n >= lhssz)
         return 0;
     memcpy(lhs, s, n);
@@ -1711,7 +2323,8 @@ static void usage(void)
             "Usage: z88dk-zcc-multi --cpu=<cpu> --metric=ticks|size\n"
             "       --data-variant=<name> --variant=<name>:<path.asm>...\n"
             "       --output=<path.asm> [--report=<path.tsv>] [--verbose]\n"
-            "       [--z80asm=<path>] [--asm-include=<dir>] [--list-dir=<dir>]\n");
+            "       [--z80asm=<path>] [--asm-flags=<z80asm -m…>]\n"
+            "       [--asm-include=<dir>] [--list-dir=<dir>]\n");
     exit(2);
 }
 
@@ -1763,6 +2376,8 @@ int main(int argc, char **argv)
             opt_verbose = 1;
         else if (starts_with(argv[i], "--z80asm="))
             opt_z80asm = argv[i] + 9;
+        else if (starts_with(argv[i], "--asm-flags="))
+            opt_asm_flags = argv[i] + 12;
         else if (starts_with(argv[i], "--asm-include="))
             add_include(argv[i] + 14);
         else if (starts_with(argv[i], "--list-dir="))
@@ -1779,11 +2394,14 @@ int main(int argc, char **argv)
     if (!find_variant(opt_data_variant) && nvariants)
         opt_data_variant = variants[0].name;
 
+    opt_cpu_kind = ticks_cpu_from_name(opt_cpu);
+
     for (i = 0; i < nvariants; i++) {
         parse_variant(&variants[i]);
         measure_variant(&variants[i]);
     }
-    charge_all_helpers();
+    charge_intra_tu();
+    charge_differing_helpers();
 
     collect_functions();
     resolve_ix_mix();
