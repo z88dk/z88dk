@@ -119,6 +119,7 @@ struct type_s {
         uint16_t hlcall_module;
         uint16_t hlcall_addr;
         int      sdcccall;       // __sdcccall(N) ABI version (0 = unset/legacy, 1 = register conv)
+        uint16_t preserved_regs; // __preserves_regs(...) set (PRESERVE_* bits)
     } funcattrs;
 
     UT_hash_handle hh;
@@ -167,6 +168,22 @@ enum symbol_flags {
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
         NONBANKED = 0x100000,       /* Symbol is in HOME section */
         SDCCCALL1 = 0x200000,    /* __sdcccall(1): SDCC register calling convention */
+};
+
+/* __preserves_regs(...) — individual z80 registers a callee promises NOT to
+   clobber. Recorded per-function in funcattrs.preserved_regs; the IR call-
+   clobber model removes a register PAIR from the clobber set only when BOTH
+   halves are listed (see preserve_to_regmask in ir_build.c). */
+enum {
+    PRESERVE_A  = 1u << 0,
+    PRESERVE_B  = 1u << 1,
+    PRESERVE_C  = 1u << 2,
+    PRESERVE_D  = 1u << 3,
+    PRESERVE_E  = 1u << 4,
+    PRESERVE_H  = 1u << 5,
+    PRESERVE_L  = 1u << 6,
+    PRESERVE_IX = 1u << 7,
+    PRESERVE_IY = 1u << 8,
 };
 
 
@@ -365,6 +382,11 @@ struct gototab_s {
 #define IS_KC160() (c_cpu == CPU_KC160)
 #define IS_RABBIT()   (c_cpu & CPU_RABBIT)            /* any Rabbit (r2k/r3k/r4k/r6k) */
 #define IS_RABBIT4K() (c_cpu & (CPU_R4K | CPU_R6K))   /* Rabbit 4000+ */
+/* Rabbit 6000 ONLY. `-mr6k` sets c_cpu to CPU_R4K|CPU_R6K (main.c), so testing
+   CPU_R6K alone is what distinguishes a 6000 from a 4000/5000 — needed for the
+   instructions only it has, e.g. `alu a,(sp+n)` / `alu hl,(sp+n)`, which r3k,
+   r4k and r5k all reject. */
+#define IS_R6K()      ((c_cpu & CPU_R6K) != 0)
 
 
 
@@ -616,7 +638,6 @@ struct nodepair {
     } while (0)
 
 
-extern UT_string *debug_utstr;
 extern UT_string *debug2_utstr;
 extern int        scope_block;
 extern char       c_debug_entry_points;

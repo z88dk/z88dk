@@ -1,4 +1,5 @@
 
+	SECTION code_clib
 	SECTION	code_fp_math16
 	PUBLIC	sinf16
 	EXTERN	_m16_sinf

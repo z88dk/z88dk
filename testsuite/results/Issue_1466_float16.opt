@@ -137,11 +137,12 @@
 
 
 ._func4e
-	pop	bc
-	pop	hl
-	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
 	push	bc
-	call	l_f16_invf
+	call	l_f16_div
 	ret
 
 

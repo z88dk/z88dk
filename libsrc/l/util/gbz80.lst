@@ -1,3 +1,10 @@
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/num_to_txt/small/l_small_ultob
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/num_to_txt/small/l_small_ultoh
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/num_to_txt/small/l_small_ultoo
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/num_to_txt/fast/l_fast_ultob
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/num_to_txt/fast/l_fast_ultoh
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/num_to_txt/fast/l_fast_ultoo
+${NEWLIB_ROOT}l/util/8-gbz80/ascii/txt_to_num/small/l_small_atoul
 @${NEWLIB_ROOT}l/util/common.lst
 ${NEWLIB_ROOT}l/util/5-z80/long/l_lsl_dehl
 ${NEWLIB_ROOT}l/util/5-z80/long/l_lsr_dehl

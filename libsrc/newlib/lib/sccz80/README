@@ -1,0 +1,2 @@
+Newlib library products moved to lib/clibs/sccz80/ (classic clibs layout).
+Third-party install: lib/clibs/sccz80/lib/<target>/ via z88dk-lib.

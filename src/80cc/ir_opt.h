@@ -71,6 +71,7 @@ int ir_opt_cse(Func *f);
  * share ONE computed anchor address, with the constant byte delta folded into
  * each access's mem.offset. The redundant address chains die in DCE. Gated by
  * IR_NO_ADDR_CSE; returns the number of accesses repointed. */
+int ir_opt_lea_offset(Func *f);
 int ir_opt_addr_cse(Func *f);
 
 /* Loop-invariant code motion (roadmap #3e).
@@ -136,6 +137,14 @@ int ir_opt_ivsr(Func *f);
 /* Dead pure-op elimination: side-effect-free ops whose dst has zero
  * function-wide uses, iterated to a fixed point. Returns removals. */
 int ir_opt_dce(Func *f);
+
+/* Fold a &symbol RHS of an EQ/NE compare into a symbol-immediate operand
+ * (Op.imm_sym), removing the LD_SYM materialisation. Run before DCE (which
+ * reclaims the now-dead LD_SYM). Returns folds made. */
+int ir_opt_sym_cmp_fold(Func *f);
+/* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
+ * sign-extended bits, so the sign-extend is dead. Run before DCE. */
+int ir_opt_conv_mask_fold(Func *f);
 
 /* Remove basic blocks unreachable from the entry (bb 0). ir_build leaves
  * dead split/forwarding BBs behind; a dead BB whose id sits below its

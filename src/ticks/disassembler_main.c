@@ -47,6 +47,7 @@ static void usage(char *program)
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnemonics)\n");
     printf("  -m8085         Disassemble 8085 code (with z80 mnemonics)\n");
+    printf("  -mvm1          Disassemble KR580VM1 code (with z80 mnemonics)\n");
     printf("  -mkc160        Disassemble KC160\n");
     printf("  -mkc160_z80    Disassemble KC160 in Z80 mode\n");
     
@@ -139,6 +140,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_8080;
                 } else if ( strcmp(&argv[0][1],"m8085") == 0 ) {
                     c_cpu = CPU_8085;
+                } else if ( strcmp(&argv[0][1],"mvm1") == 0 ) {
+                    c_cpu = CPU_KR580VM1;
                 } else if ( strcmp(&argv[0][1],"mez80_z80") == 0 ) {
                     c_cpu = CPU_EZ80;
                     c_adl_mode = 0;

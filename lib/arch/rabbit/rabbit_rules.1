@@ -179,6 +179,11 @@
 =
 	rr	hl
 
+	rr	d
+	rr	e
+=
+	rr	de
+
 	srl	d
 	rr	e
 =
@@ -351,6 +356,17 @@
 =
 	mulu	hl,de
 
+;; Rabbit 6000 ALU straight against a stack slot. SCCZ80 ONLY.
+;;
+;; The fold changes what is left in DE: before it DE holds what the `ex` put
+;; there, after it DE still holds whatever it held before. sccz80's DE is dead
+;; at these points, so the rule is sound for it. 80cc is not -- it can carry a
+;; live value in DE across this shape, and these rules miscompiled long_ir
+;; addridx and remat on r6k (dropped in e766ef09a7 for want of a way to say
+;; "sccz80 only"). copt cannot see DE liveness, so the gate is the only
+;; correct fix; 80cc emits the same form from its lowerer, which does know.
+
+%compiler sccz80
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
@@ -358,6 +374,7 @@
 =
 	and	hl,(sp+%1)
 
+%compiler sccz80
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
@@ -365,6 +382,7 @@
 =
 	or	hl,(sp+%1)
 
+%compiler sccz80
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
@@ -372,6 +390,7 @@
 =
 	xor	hl,(sp+%1)
 
+%compiler sccz80
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)
@@ -379,6 +398,7 @@
 =
 	add	hl,(sp+%1)
 
+%compiler sccz80
 %cpu r6k
 	ex	de,hl
 	ld	hl,(sp+%1)

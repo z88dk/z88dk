@@ -51,8 +51,23 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, the benchmark runs with N=7.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt and sibling directories.
+
+Compiler | CPU  | Ticks
+---------|------|-------------
+sccz80   | z80  | 75_381_296
+sccz80   | 8085 | 67_749_895  (Jul 2026)
+80cc     | z80  | 69_027_872  (Aug 19, 2026)
+80cc     | 8085 | 64_523_364  (Aug 19, 2026)
+zsdcc    | z80  | 62_181_357  (Aug 16, 2026)
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
 HITECH C MSDOS V780pl2
@@ -62,12 +77,12 @@ cycle count  = 51982515
 time @ 4MHz  = 51982515 / 4x10^6 = 12.99 seconds
 
 2.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-1070 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+1109 bytes less page zero
 
-cycle count  = 56090095
-time @ 4MHz  = 56090095 / 4*10^6 = 14.02 sec
+cycle count  = 52705234
+time @ 4MHz  = 52705234 / 4*10^6 =   13.2 sec
 
 3.
 HITECH C CPM V309-15
@@ -84,19 +99,19 @@ cycle count  = 56708022
 time @ 4MHz  = 56708022 / 4x10^6 = 14.18 sec
 
 5.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-1304 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+2028 bytes less page zero
 
-cycle count  = 59756269
-time @ 4MHz  = 59756269 / 4*10^6 = 14.94 sec
+cycle count  = 62181357
+time @ 4MHz  = 62181357 / 4*10^6 =   15.5 sec
 
 6.
-SDCC 4.2.0 Linux
-962 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+946 bytes less page zero
 
-cycle count  = 57325388
-time @ 4MHz  = 57325388 / 4*10^6 = 14.33 sec
+cycle count  = 55733097
+time @ 4MHz  = 55733097 / 4*10^6 = 13.93 sec
 
 7.
 Z88DK April 20, 2020
@@ -115,12 +130,28 @@ cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 9.
-Z88DK January 31, 2023
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085 CPU
-1782 bytes less page zero
+1719 bytes less page zero
 
-cycle count  = 64389094
-time @ 4MHz  = 64389094 / 4*10^6 = 16.10 sec
+cycle count  = 67749895
+time @ 4MHz  = 67749895 / 4*10^6 = 16.94 sec
+
+10.
+Z88DK August 19, 2026
+80cc / classic c library
+1871 bytes less page zero
+
+cycle count  = 69027872
+time @ 4MHz  = 69027872 / 4*10^6 =   17.3 sec
+
+11.
+Z88DK August 19, 2026
+80cc / classic c library / 8085 CPU
+1722 bytes less page zero
+
+cycle count  = 64523364
+time @ 4MHz  = 64523364 / 4*10^6 =   16.1 sec
 
 
 Background

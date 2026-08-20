@@ -24,6 +24,8 @@
 
 static char* subst(char* pat, char** vars);
 static char* install(char* str);
+static char* install_n(char* str, size_t len);
+static size_t interned_len(const char* str);
 static struct lnode* opt(struct lnode* r);
 int rpn_eval(const char* expr, char** vars);
 
@@ -35,6 +37,12 @@ int rpn_eval(const char* expr, char** vars);
 
 int debug = 0;
 char *c_cpu = "z80";
+/* Which compiler produced the input. A rule can be sound for one compiler and
+   wrong for another — the same rules file is applied to every compiler's
+   output, and they differ in which registers a sequence may clobber. Set with
+   -compiler=<name>; empty means "unknown", which makes %compiler never match
+   and %notcompiler always match, so an ungated rule behaves exactly as before. */
+char *c_compiler = "";
 int global_again = 0; /* signalize that rule set has changed */
 #define FIRSTLAB 'L'
 #define LASTLAB 'N'
@@ -46,6 +54,7 @@ char **c_options = NULL;
 
 struct lnode {
     char* l_text;
+    int   l_len; /* byte length of l_text (may contain embedded NULs) */
     struct lnode *l_prev, *l_next;
 };
 
@@ -59,7 +68,7 @@ void printlines(struct lnode* beg, struct lnode* end, FILE* out)
 {
     struct lnode* p;
     for (p = beg; p != end; p = p->l_next)
-        fputs(p->l_text, out);
+        fwrite(p->l_text, 1, p->l_len, out);
 }
 
 void printrule(struct onode* o, FILE* out)
@@ -92,41 +101,85 @@ void connect(struct lnode* p1, struct lnode* p2)
     p2->l_prev = p1;
 }
 
-/* install - install str in string table */
-static char* install(char* str)
+/* Registry of interned buffers that contain an embedded NUL, so their true
+   byte length can be recovered from the pointer (strlen would stop short). */
+static struct nulreg {
+    char*  ptr;
+    size_t len;
+}* nulregs = NULL;
+static int nulregs_n = 0, nulregs_cap = 0;
+
+static void register_nul(char* ptr, size_t len)
+{
+    int i;
+    for (i = 0; i < nulregs_n; i++)
+        if (nulregs[i].ptr == ptr)
+            return; /* already recorded (interning gives stable pointers) */
+    if (nulregs_n == nulregs_cap) {
+        nulregs_cap = nulregs_cap ? nulregs_cap * 2 : 16;
+        nulregs = (struct nulreg*)realloc(nulregs, nulregs_cap * sizeof *nulregs);
+        if (nulregs == NULL)
+            error("register_nul: out of memory\n");
+    }
+    nulregs[nulregs_n].ptr = ptr;
+    nulregs[nulregs_n].len = len;
+    nulregs_n++;
+}
+
+/* interned_len - byte length of an interned string (honours embedded NULs) */
+static size_t interned_len(const char* str)
+{
+    int i;
+    for (i = 0; i < nulregs_n; i++)
+        if (nulregs[i].ptr == str)
+            return nulregs[i].len;
+    return strlen(str);
+}
+
+/* install_n - install the first len bytes of str in the string table.
+   Preserves embedded NUL bytes (unlike the classic strlen/strcpy path). */
+static char* install_n(char* str, size_t len)
 {
     register struct hnode* p;
-    register char *p1, *p2, *s;
-    register int i;
+    register size_t i, k;
     static struct hnode {
-        char* h_str;
+        char*  h_str;
+        size_t h_len;
         struct hnode* h_ptr;
     } * htab[HSIZE] = { 0 };
 
-    s = str;
-    for (i = 0; *s; i += *s++)
-        ;
-    i = abs(i) % HSIZE;
+    for (i = 0, k = 0; k < len; k++)
+        i += (unsigned char)str[k];
+    i = i % HSIZE;
 
     for (p = htab[i]; p; p = p->h_ptr)
-        for (p1 = str, p2 = p->h_str; *p1++ == *p2++;)
-            if (p1[-1] == '\0')
-                return (p->h_str);
+        if (p->h_len == len && memcmp(p->h_str, str, len) == 0)
+            return (p->h_str);
 
     p = (struct hnode*)malloc(sizeof *p);
     if (p == NULL)
         error("install 1: out of memory\n");
-    p->h_str = (char*)malloc((s - str) + 1);
+    p->h_str = (char*)malloc(len + 1);
     if (p->h_str == NULL)
         error("install 2: out of memory\n");
-    strcpy(p->h_str, str);
+    memcpy(p->h_str, str, len);
+    p->h_str[len] = '\0';
+    p->h_len = len;
     p->h_ptr = htab[i];
     htab[i] = p;
+    if (memchr(p->h_str, '\0', len) != NULL)
+        register_nul(p->h_str, len);
     return (p->h_str);
 }
 
-/* insert - insert a new node with text s before node p */
-void insert(char* s, struct lnode* p)
+/* install - install str (null-terminated) in string table */
+static char* install(char* str)
+{
+    return install_n(str, strlen(str));
+}
+
+/* insert_n - insert a new node with text s (len bytes) before node p */
+void insert_n(char* s, int len, struct lnode* p)
 {
     struct lnode* n;
 
@@ -134,18 +187,49 @@ void insert(char* s, struct lnode* p)
     if (n == NULL)
         error("insert: out of memory\n");
     n->l_text = s;
+    n->l_len = len;
     connect(p->l_prev, n);
     connect(n, p);
+}
+
+/* insert - insert a new node with null-terminated text s before node p */
+void insert(char* s, struct lnode* p)
+{
+    insert_n(s, (int)strlen(s), p);
+}
+
+/* read_line - fgets replacement that preserves embedded NUL bytes.
+   Reads up to size-1 bytes or through the next '\n' (kept), whichever comes
+   first (so long lines chunk exactly as fgets did). Returns buf and sets
+   *outlen to the byte count, or NULL at EOF with nothing read. */
+static char* read_line(FILE* fp, char* buf, int size, int* outlen)
+{
+    int c, n = 0;
+
+    if ((c = fgetc(fp)) == EOF) {
+        *outlen = 0;
+        return NULL;
+    }
+    do {
+        buf[n++] = (char)c;
+        if (c == '\n' || n >= size - 1)
+            break;
+        c = fgetc(fp);
+    } while (c != EOF);
+    buf[n] = '\0';
+    *outlen = n;
+    return buf;
 }
 
 /* getlst - link lines from fp in between p1 and p2 */
 void getlst(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 {
     char lin[MAXLINE];
+    int len;
 
     connect(p1, p2);
-    while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
-        insert(install(lin), p2);
+    while (read_line(fp, lin, MAXLINE, &len) != NULL && strcmp(lin, quit)) {
+        insert_n(install_n(lin, len), len, p2);
     }
 }
 
@@ -155,9 +239,10 @@ void getlst_1(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
 {
     char lin[MAXLINE];
     int firstline = 1;
+    int len;
 
     connect(p1, p2);
-    while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
+    while (read_line(fp, lin, MAXLINE, &len) != NULL && strcmp(lin, quit)) {
         if (firstline) {
             char* p = lin;
             while (isspace(*p))
@@ -168,7 +253,7 @@ void getlst_1(FILE* fp, char* quit, struct lnode* p1, struct lnode* p2)
                 continue;
             firstline = 0;
         }
-        insert(install(lin), p2);
+        insert_n(install_n(lin, len), len, p2);
     }
 }
 
@@ -264,48 +349,115 @@ static char* parse_var(char** pp, char** vars, const char* who)
     return v;
 }
 
+/* Does one token match the value? A `"regex"` token (double-quoted; `%` is
+   reserved for variables) is matched as an anchored POSIX ERE — the whole value
+   must match; any other token is compared literally. */
+static int member_tok_matches(const char* tok, const char* val)
+{
+#ifdef USE_REGEXP
+    if (tok[0] == '"') {
+        char re[MAXLINE], anchored[MAXLINE + 8];
+        regex_t reg;
+        size_t n = strlen(tok);
+        size_t inner = (n >= 2 && tok[n - 1] == '"') ? n - 2 : n - 1;
+        int ok = 0;
+        if (inner >= sizeof re) inner = sizeof re - 1;
+        memcpy(re, tok + 1, inner);
+        re[inner] = 0;
+        snprintf(anchored, sizeof anchored, "^(%s)$", re);
+        if (regcomp(&reg, anchored, REG_EXTENDED) == 0) {
+            ok = (regexec(&reg, val, 0, NULL, 0) == 0);
+            regfree(&reg);
+        }
+        return ok;
+    }
+#endif
+    return strcmp(tok, val) == 0;
+}
+
 /* %is  %n tok tok ...   active if %n equals one of the tokens
    %not %n tok tok ...   active if %n equals none of the tokens
-   'want' is 1 for %is, 0 for %not. Square brackets around the token
-   list are optional and ignored. */
+   'want' is 1 for %is, 0 for %not. A token may be a literal or a `"regex"`
+   (anchored full-match). Square brackets around the list are optional/ignored. */
 int check_member(char* pat, char** vars, int want)
 {
-    char buf[1024];
     char* val;
-    char* tok;
+    char* p;
     int found = 0;
 
     val = parse_var(&pat, vars, want ? "%is" : "%not");
     if (val == 0)
         return 0;
-    snprintf(buf, sizeof(buf), "%s", pat);
-    for (tok = strtok(buf, " \t\n[]"); tok; tok = strtok(NULL, " \t\n[]")) {
-        if (strcmp(tok, val) == 0) {
-            found = 1;
+    p = pat;
+    while (*p && !found) {
+        char tok[MAXLINE];
+        size_t i = 0;
+        while (*p && (isspace((unsigned char)*p) || *p == '[' || *p == ']'))
+            p++;
+        if (!*p)
             break;
+        if (p[0] == '"') {
+            /* keep the whole "..." quoted form as one token (its regex may
+               contain spaces / [] that the plain tokenizer would split). */
+            tok[i++] = *p++;                                  /* " */
+            while (*p && (*p != '"' || p[-1] == '\\') && i + 1 < sizeof tok)
+                tok[i++] = *p++;
+            if (*p == '"' && i + 1 < sizeof tok)
+                tok[i++] = *p++;                              /* closing " */
+        } else {
+            while (*p && !isspace((unsigned char)*p) && *p != '[' && *p != ']'
+                   && i + 1 < sizeof tok)
+                tok[i++] = *p++;
         }
+        tok[i] = 0;
+        if (member_tok_matches(tok, val))
+            found = 1;
     }
     return want ? found : !found;
 }
 
-/* %notSame %n %m   active if the two variables differ */
+/* parse a "%n" variable reference (resolving to its value) OR a literal token
+   at *pp; advance *pp past it. A %n reference returns the variable's value; any
+   other token is returned verbatim (copied into buf). Skips leading whitespace. */
+static char* parse_var_or_token(char** pp, char** vars, char* buf, size_t bufsz)
+{
+    char* p = *pp;
+    while (*p && isspace((unsigned char)*p))
+        p++;
+    if (p[0] == '%' && isdigit((unsigned char)p[1])) {
+        char* v = vars[p[1] - '0'];
+        if (v == 0)
+            error("variable is not set\n");
+        *pp = p + 2;
+        return v;
+    }
+    size_t i = 0;
+    while (*p && !isspace((unsigned char)*p) && i + 1 < bufsz)
+        buf[i++] = *p++;
+    buf[i] = 0;
+    *pp = p;
+    return buf;
+}
+
+/* %notSame a b   active if the two operands differ. Each operand is a "%n"
+   variable reference or a literal token (so `%notSame %1 (hl)` works). */
 int check_notsame(char* pat, char** vars)
 {
+    char abuf[256], bbuf[256];
     char *a, *b;
 
-    a = parse_var(&pat, vars, "%notSame");
-    if (a == 0)
-        return 0;
-    b = parse_var(&pat, vars, "%notSame");
-    if (b == 0)
+    a = parse_var_or_token(&pat, vars, abuf, sizeof abuf);
+    b = parse_var_or_token(&pat, vars, bbuf, sizeof bbuf);
+    if (a == 0 || b == 0)
         return 0;
     return strcmp(a, b) != 0;
 }
 
-/* match - match ins against pat and set vars */
-int match(char* ins, char* pat, char** vars)
+/* match - match ins (inlen bytes, may contain NULs) against pat and set vars */
+int match(char* ins, int inlen, char* pat, char** vars)
 {
     char *p, lin[MAXLINE], *start = pat;
+    char* iend = ins + inlen;
 #ifdef USE_REGEXP
     char re[MAXLINE]; /* regular expression */
     char* istart = ins;
@@ -316,7 +468,7 @@ int match(char* ins, char* pat, char** vars)
     int reerr, eflags, mi;
 #endif
 
-    while (*ins && *pat)
+    while (ins < iend && *pat)
         if (pat[0] == '%') {
             switch (pat[1]) {
             case '%':
@@ -394,10 +546,10 @@ int match(char* ins, char* pat, char** vars)
                     fprintf(stderr, "error in \"%s\": ", start);
                     error("input pattern %n% is not allowed\n");
                 }
-                for (p = lin; *ins && *ins != pat[2];)
+                for (p = lin; ins < iend && *ins != pat[2];)
                     *p++ = *ins++;
                 *p = 0;
-                p = install(lin);
+                p = install_n(lin, (size_t)(p - lin));
                 if (vars[pat[1] - '0'] == 0)
                     vars[pat[1] - '0'] = p;
                 else if (vars[pat[1] - '0'] != p)
@@ -413,7 +565,7 @@ int match(char* ins, char* pat, char** vars)
         } else if (*pat++ != *ins++)
             return 0;
 
-    return *pat == *ins; /* compare end of string */
+    return *pat == '\0' && ins == iend; /* both fully consumed */
 }
 
 /* subst_imp - return result of substituting vars into pat */
@@ -467,15 +619,19 @@ char* subst_imp(char* pat, char** vars)
                     var+'0', start);
                 error(errormsg);
             }
-            for (s = vars[var]; i < MAXLINE && *s; s++ ) {
-                if (isprint(*s) ) {
-                   i += snprintf(lin+i,MAXLINE-i,"%s%s%c",needcomma ? "," : "", quotes == 0 ? "\"" : "", *s);
-                   needcomma = 0; quotes = 1;
-                } else {
-                   i += snprintf(lin+i,MAXLINE-i,"%s%s$%02x",quotes ? "\"," : "", needcomma ? "," : "", (unsigned char)*s);
-                   needcomma = 1; quotes = 0;
+            {
+                size_t vlen = interned_len(vars[var]), k;
+                for (k = 0; i < MAXLINE && k < vlen; k++ ) {
+                    unsigned char ch = (unsigned char)vars[var][k];
+                    if (isprint(ch) ) {
+                       i += snprintf(lin+i,MAXLINE-i,"%s%s%c",needcomma ? "," : "", quotes == 0 ? "\"" : "", ch);
+                       needcomma = 0; quotes = 1;
+                    } else {
+                       i += snprintf(lin+i,MAXLINE-i,"%s%s$%02x",quotes ? "\"," : "", needcomma ? "," : "", ch);
+                       needcomma = 1; quotes = 0;
+                    }
                 }
-	    }
+            }
             if ( quotes ) i += snprintf(lin+i,MAXLINE-i,"\"");
           
         } else if (pat[0] == '%' && isdigit(pat[1])) {
@@ -623,6 +779,16 @@ static struct lnode* opt(struct lnode* r)
                 if ( !found ) {
                     break;
                 }
+            } else if ( strncmp(p->l_text, "%notcompiler", 12) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 13)-1,p->l_text + 13);
+                if ( strcmp(tbuf, c_compiler) == 0 )
+                    break;
+            } else if ( strncmp(p->l_text, "%compiler", 9) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 10)-1,p->l_text + 10);
+                if ( strcmp(tbuf, c_compiler) )
+                    break;
             } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
                 char  tbuf[1024];
                 snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
@@ -650,7 +816,7 @@ static struct lnode* opt(struct lnode* r)
             } else if ( strncmp(p->l_text, "%title",6) == 0 ) {
                 snprintf(titlebuf,sizeof(titlebuf),"%s",p->l_text + 7);
             } else {
-                if (!match(c->l_text, p->l_text, vars))
+                if (!match(c->l_text, c->l_len, p->l_text, vars))
                     break;
                 c = c->l_prev;
                 ++lines;
@@ -755,11 +921,14 @@ int main(int argc, char** argv)
     int i, pass;
     struct lnode head, *p, tail;
 
+    if (getenv("COPT_DEBUG")) debug = 1;   /* env gate so it works through zcc */
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
             debug = 1;
         else if ( strncmp(argv[i], "-m",2) == 0 )
             c_cpu = argv[i] + 2;
+        else if ( strncmp(argv[i], "-compiler=", 10) == 0 )
+            c_compiler = argv[i] + 10;
         else if ( strncmp(argv[i], "-O", 2) == 0) {
             int j = c_options_num++;
             c_options = realloc(c_options, c_options_num * sizeof(c_options[0]));
@@ -778,6 +947,7 @@ int main(int argc, char** argv)
     getlst(stdin, "", &head, &tail);
 #endif
     head.l_text = tail.l_text = "";
+    head.l_len = tail.l_len = 0;
 
     pass = 0;
     do {

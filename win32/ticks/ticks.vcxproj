@@ -203,6 +203,7 @@
     <ClCompile Include="..\..\src\ticks\ticks.c" />
     <ClCompile Include="..\..\src\ticks\ticks_main.c" />
     <ClCompile Include="..\..\src\ticks\utf8.c" />
+    <ClCompile Include="..\..\src\ticks\vm1_inst.c" />
     <ClCompile Include="..\..\src\ticks\z180_inst.c" />
     <ClCompile Include="..\..\src\ticks\z80n_inst.c" />
     <ClCompile Include="..\..\src\ticks\zilog_inst.c" />

@@ -227,6 +227,13 @@
 %1%0:
 
 ;;
+;; equ
+%title equs
+%"[ \t]*"1%2	.equ	%3
+=
+    defc    %2 = %3
+
+;;
 ;; labels
 ;;
 
@@ -261,7 +268,7 @@
 =
 %1,%2@__sdcc_local_%0
 
-%1,%"[ \t]*"2%"[0-9]+"0$%"[ \t]*"7%"(\+|-)"8%9
+%"[^\";]*"1,%"[ \t]*"2%"[0-9]+"0$%"[ \t]*"7%"(\+|-)"8%9
 =
 %1,%2@__sdcc_local_%0%7%8%9
 
@@ -281,11 +288,11 @@
 =
 %1%0%2%7%8%9
 
-%1,%"[ \t]*"2%0$%9
+%"[^\";]*"1,%"[ \t]*"2%"[^\";]*"0$%9
 =
 %1,%2%0%9
 
-%1,%"[ \t]*"2%0$%"[ \t]*"7%"(\+|-)"8%9
+%"[^\";]*"1,%"[ \t]*"2%"[^\";]*"0$%"[ \t]*"7%"(\+|-)"8%9
 =
 %1,%2%0%7%8%9
 
@@ -297,7 +304,7 @@
 =
 %0%1
 
-%"[ \tA-Za-z_]+"0%1$%"[ \t]*"7%"(\+|-)"8%9
+%"[ \tA-Za-z_]+"0%"[^\";]*"1$%"[ \t]*"7%"(\+|-)"8%9
 =
 %0%1%7%8%9
 
@@ -352,6 +359,14 @@ C_LINE %2,"%1::x::%eval(%3 10000 * %4 +)::%5"
 =
 %0SECTION%1IGNORE
 
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_XABS (ABS)
+=
+%0SECTION%1IGNORE
+
+%"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_IIVT (ABS)
+=
+%0SECTION%1IGNORE
+
 %"[ \t]*"0.%"(AREA|area)"9%"[ \t]+"1_GSINIT
 =
 %0SECTION%1code_crt_init
@@ -388,7 +403,7 @@ IF 0
 =
 %activate
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 =
 %once
@@ -396,7 +411,7 @@ IF 0
 ENDIF
 	
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 
 %"[ \t]*"1.%"(AREA|area)"9%"[ \t]*"2_%0
@@ -625,6 +640,58 @@ __xinit_%0
 =
 	ld	ix,(%2 + %1)
 
+;; sdcc does not always put a space before the paren -- `ld hl, 0(hl)`. The
+;; spaced rules above miss those, so the offset reaches z80asm unconverted.
+;; The offset must be captured as an explicit number and the base as an
+;; explicit register: a bare %1 also matches EMPTY, which turns an ordinary
+;; `ld hl, (_sym + 0)` into `ld hl,(_sym + 0 + )`.
+
+	ld	%"[-0-9]+"1(sp), %2
+=
+	ld	(sp + %1),%2
+
+;; Rabbit 6000 ALU against a stack operand, and the 32-bit register loads.
+;; sdcc writes the offset ahead of the paren -- `cp hl, 0 (sp)` -- and is not
+;; consistent about the space, so each form is matched both ways. Only r6k has
+;; the ALU forms and only r4k+ the `ld bcde/jkhl`, but sdcc emits each solely
+;; for the CPU that has it, so no CPU gate is needed here.
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	a, %"[-0-9]+"1 (sp)
+=
+	%0	a,(sp + %1)
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	a, %"[-0-9]+"1(sp)
+=
+	%0	a,(sp + %1)
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	hl, %"[-0-9]+"1 (sp)
+=
+	%0	hl,(sp + %1)
+
+	%"(add|adc|sub|sbc|and|or|xor|cp)"0	hl, %"[-0-9]+"1(sp)
+=
+	%0	hl,(sp + %1)
+
+	ld	%"(bcde|jkhl)"0, %"[-0-9]+"1 (sp)
+=
+	ld	%0,(sp + %1)
+
+	ld	%"(bcde|jkhl)"0, %"[-0-9]+"1(sp)
+=
+	ld	%0,(sp + %1)
+
+	ld	hl, %"[-0-9]+"1(%"(hl|ix|iy|sp|de|bc)"2)
+=
+	ld	hl,(%2 + %1)
+
+	ld	iy, %"[-0-9]+"1(%"(hl|ix|iy|sp|de|bc)"2)
+=
+	ld	iy,(%2 + %1)
+
+	ld	ix, %"[-0-9]+"1(%"(hl|ix|iy|sp|de|bc)"2)
+=
+	ld	ix,(%2 + %1)
+
 ;;
 ;; GBZ80 instructions
 	ldhl	sp, %2
@@ -686,3 +753,22 @@ __xinit_%0
 	lea	bc, iy, %1
 =
 	lea	bc, iy %1
+
+;;
+;; Rabbit I/O prefixes
+;;
+;; `ioi`/`ioe` redirect the NEXT memory access to an I/O space. They are
+;; prefixes, not standalone opcodes: z80asm only accepts them on the same line
+;; as the access they bind to, so sdcc's own line for them is a syntax error.
+;; Emit the prefix byte instead, which is what libsrc's inp()/outp() do.
+
+	ioi
+=
+	defb	0d3h	; ioi
+
+	ioe
+=
+	defb	0dbh	; ioe
+
+    .r2k
+=

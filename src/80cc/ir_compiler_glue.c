@@ -31,7 +31,7 @@ const char *ir_sym_prefix(const SYMBOL *sym)
 
 /* For a symbol in a named address space (__addressmod), return the page-in
    "bank function" that maps its bank into the address window. The lowerer
-   must `call` it before accessing the symbol. Contract (matching sdcc):
+   must `call` it before accessing the symbol. Contract:
    the bank function preserves ALL registers, so the access is transparent —
    no register/cache clobber. Returns NULL for the default address space. */
 const SYMBOL *ir_sym_bank_fn(const SYMBOL *sym)
@@ -54,16 +54,18 @@ const SYMBOL *ir_namespace_bank_fn(const char *ns_name)
 }
 
 /* Spare index register for a loop-invariant resident — the one opposite the
-   frame pointer. c_framepointer_is_ix: 1=IX frame→spare IY, 0=IY frame→spare
-   IX, -1=sp-mode→IX (both free, pick IX). 808x/gbz80 have no index regs →
-   gate on CPU. */
+   frame pointer. c_framepointer_is_ix: 1=IX frame→spare IY, -1=sp-mode→IX (both
+   free, pick IX). 808x/gbz80 have no index regs → gate on CPU. A platform can
+   remove the spare from play: --reserve-regs-iy (the fp-mode spare) or, in
+   sp-mode, --reserve-regs-ix. */
 int ir_idx2_reg(void)
 {
     if (!c_idx2_invariant) return IR_PR_NONE;
-    if (getenv("IR_NO_IDX2")) return IR_PR_NONE;
+    if (opt_disabled("idx2")) return IR_PR_NONE;
     if (IS_808x() || IS_GBZ80()) return IR_PR_NONE;
-    if (c_framepointer_is_ix == 1) return IR_PR_IY;   /* frame IX → spare IY */
-    return IR_PR_IX;                                  /* frame IY, or sp-mode → IX */
+    if (c_framepointer_is_ix == 1)                    /* frame IX → spare IY */
+        return c_reserve_iy ? IR_PR_NONE : IR_PR_IY;
+    return c_reserve_ix ? IR_PR_NONE : IR_PR_IX;      /* sp-mode → IX */
 }
 
 /* Second index-register home = IY, available ONLY in true sp-mode (no frame
@@ -76,7 +78,8 @@ int ir_idx2_reg(void)
 int ir_idx3_reg(void)
 {
     if (!c_idx3_residency) return IR_PR_NONE;
-    if (getenv("IR_NO_IDX3")) return IR_PR_NONE;
+    if (opt_disabled("idx3")) return IR_PR_NONE;
+    if (c_reserve_iy) return IR_PR_NONE;               /* IY reserved by platform */
     if (ir_idx2_reg() != IR_PR_IX) return IR_PR_NONE;  /* need IX as idx2 */
     if (c_framepointer_is_ix != -1) return IR_PR_NONE; /* IY is the frame */
     if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
@@ -92,7 +95,7 @@ int ir_idx3_reg(void)
 int ir_exx_reg(void)
 {
     if (!c_exx_residency) return IR_PR_NONE;
-    if (getenv("IR_NO_EXX")) return IR_PR_NONE;
+    if (opt_disabled("exx")) return IR_PR_NONE;
     if (c_framepointer_is_ix != -1) return IR_PR_NONE;   /* sp-mode only */
     if (!(c_cpu == CPU_Z80 || IS_Z80N())) return IR_PR_NONE;
     return IR_PR_BC_ALT;
@@ -114,7 +117,27 @@ int ir_lower_to_output(Func *f)
     FILE *mem = tmpfile();
     if (!mem)
         return ir_lower_func(output, f);   /* degraded: direct emit */
-    int rc = ir_lower_func(mem, f);
+    /* [clone self-test, IR_CLONE_TEST] Lower a pristine deep CLONE instead of f.
+       If ir_clone_func is faithful the emitted asm is byte-identical to lowering
+       f directly (proven over the corpus) — the verifier gate before the clone
+       drives the frameless-via-sp flip. Skips f's own lowering, so f's backend
+       fields stay unset (the -debug cdb block below then emits nothing; run the
+       byte-identical check without -debug). */
+    if (getenv("IR_CLONE_TEST")) {
+        Func *fc = ir_clone_func(f);
+        if (fc) {
+            int rcx = ir_lower_func(mem, fc);
+            ir_free_cloned_func(fc);
+            if (rcx == 0) {
+                rewind(mem); char ch[4096]; size_t nn;
+                while ((nn = fread(ch, 1, sizeof ch, mem)) > 0)
+                    fwrite(ch, 1, nn, output);
+            }
+            fclose(mem);
+            return rcx;
+        }
+    }
+    int rc = ir_lower_func_flip(mem, f);
     if (rc == 0) {
         rewind(mem);
         char chunk[4096];
@@ -123,6 +146,28 @@ int ir_lower_to_output(Func *f)
             fwrite(chunk, 1, n, output);
     }
     fclose(mem);
+
+    /* -debug: emit the cdb stack local/param records now that slot assignment
+       is final. Locals get their real frame-base offset (vreg_spill_slot -
+       frame_size == slot_ix_off); params keep the frame-independent front-end
+       offset (they sit above the frame base, so it stays correct as the frame
+       grows). Register-resident locals with no slot are skipped (best-effort).
+       Parse-time STKLOC emission is deferred here (cdbfile.c). */
+    if (rc == 0 && c_debug_adb_defc && f->fn) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            SYMBOL *s = f->vregs[v].sym;
+            if (!s || s->storage != STKLOC) continue;
+            int off;
+            if (f->vregs[v].flags & (IR_VREG_PARAM | IR_VREG_PARAM_IN_PLACE)) {
+                off = s->offset.i;
+            } else {
+                int slot = f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1;
+                if (slot < 0) continue;
+                off = slot - f->frame_size;
+            }
+            debug_write_local_at(f->fn->name, s, off);
+        }
+    }
     return rc;
 }
 

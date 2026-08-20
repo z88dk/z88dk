@@ -18,7 +18,7 @@ ok=0
 fail=0
 failures=()
 
-# Compile $2 with --use-ir and assert no ir_build deferral fires
+# Compile $2 and assert no ir_build deferral fires
 # AND (optionally) that the asm contains a marker pattern $3.
 # $1 is the test name; $4 is the C source.
 run_cover() {
@@ -29,7 +29,7 @@ run_cover() {
     local asm="$WORK/$name.asm"
     local log="$WORK/$name.log"
     printf '%s\n' "$src" > "$cfile"
-    if ! ( cd "$WORK" && "$COMPILER" --use-ir "$name.c" 2>"$log" ); then
+    if ! ( cd "$WORK" && "$COMPILER" "$name.c" 2>"$log" ); then
         fail=$((fail+1))
         failures+=("$name: compile failed")
         return

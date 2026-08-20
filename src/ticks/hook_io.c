@@ -198,7 +198,7 @@ static void cmd_seek(void)
     if ( ret != -1 ) {
         int t = ( ret >> 16 ) & 0xffff;
         e = t % 256;
-        e = t / 256;
+        d = t / 256;
         t = ( ret >> 0 ) & 0xffff;
         l = t % 256;
         h = t / 256;

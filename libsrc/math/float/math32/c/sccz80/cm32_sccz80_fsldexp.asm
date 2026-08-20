@@ -5,26 +5,21 @@ PUBLIC cm32_sccz80_ldexp
 
 EXTERN m32_fsldexp_callee
 
-; float ldexpf(float x, int16_t pw2);
-
+; float ldexpf(float x, int16_t pw2) non-callee
+; sccz80: SP = ret, pw2, x.HL, x.DE — caller cleans 6 bytes
 .cm32_sccz80_ldexp
-
-    ; Entry:
-    ; Stack: float left, int right, ret
-    ; Reverse the stack
-    pop af                      ;my return
-    pop bc                      ;int
-    pop hl                      ;float
-    pop de
-    push af                     ;my return
-    push bc                     ;int
-    push de                     ;float
-    push hl
+    pop hl                          ; ret
+    pop bc                          ; pw2
+    pop de                          ; x.HL
+    ex (sp),hl                      ; HL = x.DE; (sp) = ret
+    push bc                         ; pw2
+    push hl                         ; x.DE
+    push de                         ; x.HL
     call m32_fsldexp_callee
 
-    pop af                      ;my return
-    push af
-    push af
-    push af
-    push af
+    pop bc                          ; ret
+    push bc
+    push bc
+    push bc
+    push bc                         ; ret + 3 dummy words (6 bytes args)
     ret

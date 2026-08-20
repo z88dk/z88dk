@@ -12,6 +12,8 @@ math/float/math32/c/sccz80/cm32_sccz80_cosh
 math/float/math32/c/sccz80/cm32_sccz80_dload
 math/float/math32/c/sccz80/cm32_sccz80_dloadb
 math/float/math32/c/sccz80/cm32_sccz80_exp
+math/float/math32/c/sccz80/cm32_sccz80_exp2
+math/float/math32/c/sccz80/cm32_sccz80_exp10
 math/float/math32/c/sccz80/cm32_sccz80_fabs
 math/float/math32/c/sccz80/cm32_sccz80_floor
 math/float/math32/c/sccz80/cm32_sccz80_fmax
@@ -49,6 +51,7 @@ math/float/math32/c/sccz80/cm32_sccz80_fssub
 math/float/math32/c/sccz80/cm32_sccz80_fssub_callee
 math/float/math32/c/sccz80/cm32_sccz80_fszero
 math/float/math32/c/sccz80/cm32_sccz80_log
+math/float/math32/c/sccz80/cm32_sccz80_log2
 math/float/math32/c/sccz80/cm32_sccz80_log10
 math/float/math32/c/sccz80/cm32_sccz80_modf
 math/float/math32/c/sccz80/cm32_sccz80_modf_callee

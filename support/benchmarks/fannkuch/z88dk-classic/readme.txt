@@ -32,6 +32,13 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuc
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
 
+classic/80cc
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
+# Z80 80cc: -fframe-pointer (IX).
+
+classic/80cc/8085
+zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
+
 classic/zsdcc
 zcc +test -vn -DSTATIC -DINLINE -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 fannkuch.c -o fannkuch.bin -lndos -m
 
@@ -40,7 +47,9 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks fannkuch.bin -x fannkuch.map -start TIMER_START -end TIMER_END -counter 999999999999
+z88dk-ticks fannkuch.bin -x fannkuch.map -start TIMER_START -end TIMER_STOP -counter 999999999999
+
+For 8085 binaries add -m8085.
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -52,12 +61,12 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK January 31, 2023
+Z88DK July 20, 2026
 classic/sccz80/8085
-1782 bytes less page zero
+1719 bytes less page zero
 
-cycle count  = 64389094
-time @ 4MHz  = 64389094 / 4*10^6 = 16.10 sec
+cycle count  = 67749895
+time @ 4MHz  = 67749895 / 4*10^6 = 16.94 sec
 
 
 Z88DK January 3, 2022
@@ -68,9 +77,25 @@ cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 
-Z88DK April 20, 2020
-classic/zsdcc #11566
-1304 bytes less page zero
+Z88DK August 19, 2026
+classic/80cc
+1871 bytes less page zero
 
-cycle count  = 59756269
-time @ 4MHz  = 59756269 / 4*10^6 = 14.94 sec
+cycle count  = 69027872
+time @ 4MHz  = 69027872 / 4*10^6 =   17.3 sec
+
+
+Z88DK August 19, 2026
+classic/80cc/8085
+1722 bytes less page zero
+
+cycle count  = 64523364
+time @ 4MHz  = 64523364 / 4*10^6 =   16.1 sec
+
+
+Z88DK August 16, 2026
+classic/zsdcc 4.6.0 #16639
+2028 bytes less page zero
+
+cycle count  = 62181357
+time @ 4MHz  = 62181357 / 4*10^6 =   15.5 sec

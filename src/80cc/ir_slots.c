@@ -11,6 +11,8 @@
 #include "ir_lower.h"
 #include "ir_analysis.h"
 
+extern char c_debug_adb_defc;   /* -debug: pin named-local slots (dedicated) */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,6 +70,14 @@ void ir_assign_slots(Func *f)
         if (v == f->word_home_vreg && f->vreg_to_phys
             && f->vreg_to_phys[v] == IR_PR_DE)
             needs_slot[v] = 1;
+        /* [IR_CALLSPLIT] A call-bounded split value is PR_BC only inside its
+           call-free span; outside it (and to reload it on entry) it lives in a
+           frame slot, which stays its canonical home. So it needs a slot despite
+           the register-pool assignment above (same as PR_E/PR_D / the word
+           DE-home). Its span is read-only, so the slot is only ever WRITTEN by
+           an out-of-span def and READ back to reload BC — never diverges. */
+        if (f->vregs[v].flags & IR_VREG_CALL_SPLIT)
+            needs_slot[v] = 1;
         /* Read-only param lives in the caller's pushed-arg slot;
            slot_off returns that caller offset directly. */
         if (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)
@@ -75,6 +85,11 @@ void ir_assign_slots(Func *f)
         /* A-only byte temp (compute_no_slot_bytes): every def is dst-dead, so
            the value rides A and never touches a slot — reserve none. */
         if (f->vregs[v].flags & IR_VREG_NO_SLOT)
+            needs_slot[v] = 0;
+        /* [IR_DEADSTORE] A dead-spill byte (slot written but never read): the
+           store is skipped on the re-lower and the value rides A — drop its slot
+           so the frame shrinks (and, if it empties, deadframe goes frameless). */
+        if (f->vregs[v].flags & IR_VREG_DEAD_SPILL)
             needs_slot[v] = 0;
     }
 
@@ -293,13 +308,19 @@ void ir_assign_slots(Func *f)
     for (int pass = 0; pass < 2; pass++) {
         for (int v = 0; v < n_vregs; v++) {
             if (v == hot) continue;   /* already seeded at offset 0 */
+            if (f->vregs[v].flags & IR_VREG_AUTOPUSH) continue;  /* placed at top below */
             if (!needs_slot[v]) {
                 if (pass == 0) f->vreg_spill_slot[v] = -1;
                 continue;
             }
             VReg *vr = &f->vregs[v];
             int is_pinned = (vr->flags & IR_VREG_PARAM)
-                         || (vr->flags & IR_VREG_ADDR_TAKEN);
+                         || (vr->flags & IR_VREG_ADDR_TAKEN)
+                         /* -debug: give every named local its own dedicated
+                            slot (no first-fit sharing) so its ,B,1,d cdb
+                            record is a stable, unambiguous frame offset across
+                            its whole scope. */
+                         || (c_debug_adb_defc && vr->sym != NULL);
             if ((pass == 0) != is_pinned) continue;
 
             int width = (vr->width > 0) ? vr->width : 2;
@@ -360,6 +381,22 @@ void ir_assign_slots(Func *f)
                v's interference row). */
             SLOT_ROW(chosen)[v >> 5] |= (uint32_t)1 << (v & 31);
         }
+    }
+
+    /* Auto-push params (IR_AUTOPUSH_PARAM) sit at the TOP of the frame: the
+       prologue materialises them with a `push` before the frame alloc, so they
+       land just below the return address / saved IX. Assign them the highest
+       offsets, after every other slot, each its own exclusive slot — offset
+       `frame_size - width` maps to ix-2/ix-4 (fp) or SP+(frame_size-width) (sp),
+       exactly where the push puts them. */
+    for (int v = 0; v < n_vregs; v++) {
+        if (!(f->vregs[v].flags & IR_VREG_AUTOPUSH)) continue;
+        /* A width-1 autopush param is materialised by `push hl` (byte in L), so
+           it occupies 2 stack bytes; its value sits at the slot base (low byte). */
+        int w = f->vregs[v].width;
+        int width = (w == 1) ? 2 : (w > 0 ? w : 2);
+        f->vreg_spill_slot[v] = offset;
+        offset += width;
     }
     f->frame_size = offset;
 

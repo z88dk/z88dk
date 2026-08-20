@@ -9,7 +9,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 ifeq ($(COMPILER),xcc)
 all: test.bin
 else
-all:	test.bin test_r2ka.bin test_8080.bin test_8085.bin test_gbz80.bin test_z180.bin test_ez80_z80.bin test_r4k.bin test_kc160.bin
+all:	test.bin test_r2ka.bin test_8080.bin test_8085.bin test_gbz80.bin test_z180.bin test_ez80_z80.bin test_r4k.bin test_r6k.bin test_kc160.bin test_z80n.bin
 endif
 
 
@@ -18,6 +18,10 @@ test.bin: $(SOURCES)
 	$(compile)
 	$(runtest)
 
+test_z80n.bin: $(SOURCES)
+	$(compile_z80n)
+	$(runtest_z80n)
+
 test_r2ka.bin: $(SOURCES)
 	$(compile_r2ka)
 	$(runtest_r2ka)
@@ -25,6 +29,10 @@ test_r2ka.bin: $(SOURCES)
 test_r4k.bin: $(SOURCES)
 	$(compile_r4k)
 	$(runtest_r4k)
+
+test_r6k.bin: $(SOURCES)
+	$(compile_r6k)
+	$(runtest_r6k)
 
 test_z180.bin: $(SOURCES)
 	$(compile_z180)

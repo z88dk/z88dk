@@ -1,4 +1,5 @@
 
+	SECTION code_clib
 	SECTION	code_fp_math16
 	PUBLIC	ldexpf16
 	EXTERN	cm16_sccz80_ldexp

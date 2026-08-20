@@ -94,7 +94,11 @@ __Exit:
 
 SYSCALL:
     ; a = command to execute
-IF __CPU_R4K__ | __CPU_R5K__
+; ED FE is the emulator trap everywhere EXCEPT Rabbit 4000 and later, where it is
+; the real instruction `ld hl,(sp+hl)`; there the trap must be ED FD. R6K was
+; missing here, so it fell to ED FE, executed it as a load and never trapped —
+; every +test binary built for rabbit6k ran past its console output and hung.
+IF __CPU_R4K__ | __CPU_R5K__ | __CPU_R6K__
     defb    $ED, $FD	;trap
 ELSE
     defb    $ED, $FE	;trap

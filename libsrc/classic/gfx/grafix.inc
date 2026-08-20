@@ -395,7 +395,6 @@ IF FORondra
     defc    _GFX_MAXY    = 256
 ENDIF
 
-
 IF FORosborne1
     defc    _GFX_MAXX    = 104
     defc    _GFX_MAXY    = 48
@@ -416,8 +415,6 @@ IF FORoz
     defc    _GFX_MAXY    = 80
     defc    _GFX_PAGE_VRAM = 1
 ENDIF
-
-
 
 IF FORp2000
     defc    _GFX_MAXX    = 78

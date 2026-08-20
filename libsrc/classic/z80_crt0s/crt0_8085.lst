@@ -3,5 +3,6 @@
 ../../arch/z80/z80/asm_z80_pop_ei
 ../../arch/z80/z80/asm_z80_get_int_state
 ../../arch/z80/z80/asm_z80_set_int_state
+@newlib-8085.lst
 @newlib-8080.lst
 

@@ -70,17 +70,32 @@ into the code at time begin and time stop points.
 When COMMAND is not defined, N=8.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks:
+z88dk-classic/readme.txt.
+
+Compiler | CPU  | Library | Ticks
+---------|------|---------|-------------
+sccz80   | z80  | mbf32   | 145_563_150
+sccz80   | 8085 | mbf32   | 127_055_600  (Jul 2026)
+zsdcc    | z80  | math48  | 149_280_700 (Aug 16, 2026)
+80cc     | z80  | mbf32   | 151_824_215 (Aug 19, 2026)
+80cc     | 8085 | mbf32   | 150_137_083 (Aug 19, 2026)
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 
 1.
-Z88DK August 28, 2022
-zsdcc #13131 / classic c library
-3536 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+3538 bytes less page zero
 
-cycle count  = 150118736
-time @ 4MHz  = 150118736 / 4*10^6 = 37.52 sec
+cycle count  = 149280700
+time @ 4MHz  = 149280700 / 4*10^6 =   37.3 sec
 
 2.
 Z88DK August 28, 2022
@@ -91,11 +106,11 @@ cycle count  = 145563150
 time @ 4MHz  = 145563150 / 4*10^6 = 36.39 sec
 
 3.
-SDCC 4.2.0 Linux
-7158 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+7196 bytes less page zero
 
-cycle count  = 188126191
-time @ 4MHz  = 188126191 / 4*10^6 = 47.03 sec
+cycle count  = 193466493
+time @ 4MHz  = 193466493 / 4*10^6 = 48.37 sec
 
 Large size caused by float package implemented in C.
 
@@ -107,12 +122,12 @@ cycle count  = 240336355
 time @ 4MHz  = 240336355 / 4x10^6 = 60.09 seconds
 
 5.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-2689 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+2632 bytes less page zero
 
-cycle count  = 6576349618
-time @ 4MHz  = 6576349618 / 4*10^6 = 27 min 24 sec
+cycle count  = 6570984020
+time @ 4MHz  = 6570984020 / 4*10^6 =  27 min 23 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
 Library optimization for fast realloc causes slow free block search
@@ -141,12 +156,12 @@ IAR is likely implementing a heap similar to z88dk's new c library
 where an emphasis is placed on the speed of realloc().
 
 8.
-Z88DK January 31, 2023
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085 CPU
-3775 bytes less page zero
+3609 bytes less page zero
 
-cycle count  = 137783936
-time @ 4MHz  = 137783936 / 4*10^6 = 34.45 sec
+cycle count  = 127055600
+time @ 4MHz  = 127055600 / 4*10^6 = 31.76 sec
 
 9.
 HITECH C CPM V309-15

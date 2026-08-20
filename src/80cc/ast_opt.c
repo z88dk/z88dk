@@ -295,9 +295,15 @@ Node *ast_fold_constants(Node *node)
            catches both `5/0` (folded directly) and `x/0` after
            const-prop turned `x = 0;` into a literal. Result is
            defined as zero to match legacy plnge2a behaviour. */
+        /* Compare the LITERAL VALUE, not a truncating cast of it. zval is a
+           zdouble, so `(int64_t)zval == 0` reads every float constant with
+           magnitude below 1 as zero — `x / (1.0/256.0)` (math_fix16.h's
+           FIX16_FROM_FLOAT) warned and then folded the whole division to a
+           literal zero. An integer literal 0 still has zval == 0.0, so the
+           direct comparison keeps the integer case exactly as it was. */
         if ((node->ast_type == OP_DIV || node->ast_type == OP_MOD)
             && R && R->ast_type == AST_LITERAL
-            && (int64_t)R->zval == 0) {
+            && R->zval == 0) {
             warningfmt_at("division-by-zero", node->filename, node->line,
                 "Division by zero, result set to be zero");
             Type *t = node->type ? node->type
@@ -484,8 +490,9 @@ static int is_boolean_op(int op)
 /* Conservative side-effect-free predicate: reading a non-volatile local
    or global, computing arithmetic over those, or taking an address. Any
    pre/post-step, assignment, function call, or unrecognised node is
-   rejected. */
-static int is_side_effect_free(Node *n)
+   rejected. Exported (ccdefs.h) — ir_build's store-operand reordering uses
+   it to prove the LHS address can be built before the RHS. */
+int is_side_effect_free(Node *n)
 {
     if (!n) return 1;
     switch (n->ast_type) {
@@ -548,13 +555,31 @@ static int nodes_equivalent(Node *a, Node *b)
     switch (a->ast_type) {
     case AST_LITERAL:
     case AST_STR_LIT:
+        /* Compare floating literals as values: the int64_t cast truncates,
+           so 1.5 and 1.2 would both reduce to 1 and count as the same node. */
+        if ((a->type && kind_is_floating(a->type->kind))
+            || (b->type && kind_is_floating(b->type->kind)))
+            return a->zval == b->zval;
         return (int64_t)a->zval == (int64_t)b->zval;
     case AST_LOCAL_VAR:
     case AST_GLOBAL_VAR:
         return a->sym == b->sym;
+    case OP_DEREF: case AST_DEREF:
+        /* A BITFIELD read carries its position in the node's TYPE, not in the
+           address: two fields sharing a storage unit have identical operands
+           and differ only in bit_offset/bit_size. Comparing the operands alone
+           made `r->rate` and `r->flag` equivalent, and cse-synth then replaced
+           the second read with the first field's value (a 1-bit flag read back
+           as its 12-bit neighbour). */
+        if ((a->type && a->type->bit_size > 0)
+            || (b->type && b->type->bit_size > 0)) {
+            if (!a->type || !b->type) return 0;
+            if (a->type->bit_size != b->type->bit_size
+                || a->type->bit_offset != b->type->bit_offset) return 0;
+        }
+        return nodes_equivalent(a->operand, b->operand);
     case OP_NEG: case OP_COMP: case OP_LNEG:
     case OP_CAST:
-    case OP_DEREF: case AST_DEREF:
     case OP_ADDR:  case AST_ADDR:
         return nodes_equivalent(a->operand, b->operand);
     case OP_ADD: case OP_SUB: case OP_MULT: case OP_DIV: case OP_MOD:
@@ -652,8 +677,20 @@ static Node *try_simplify_binop(Node *node)
          x <  x  → 0      x >  x  → 0
          x <= x  → 1      x >= x  → 1
          x &  x  → x      x |  x  → x
-       OP_DIV / OP_MOD avoided: trapping when x == 0. */
-    if (l && r && nodes_equivalent(l, r) && is_side_effect_free(l)) {
+       OP_DIV / OP_MOD avoided: trapping when x == 0.
+
+       FLOATING OPERANDS ARE EXCLUDED. None of these identities hold once a
+       NaN can reach them: NaN-NaN is NaN not 0, and NaN compares false
+       against itself so `x == x` / `x <= x` / `x >= x` are 0 and `x != x`
+       is 1 -- the exact inverse of what the table says. `x != x` is the
+       canonical isnan() idiom, so folding it to 0 silently deletes a NaN
+       test. Inf breaks the arithmetic ones too (Inf-Inf is NaN). Only the
+       two IEEE formats can hold a NaN, but the rule is type-driven rather
+       than format-driven: a fold that is wrong under -fp-mode=ieee should
+       not be silently reinstated by the default format. */
+    if (l && r && nodes_equivalent(l, r) && is_side_effect_free(l)
+        && !(l->type && kind_is_floating(l->type->kind))
+        && !(r->type && kind_is_floating(r->type->kind))) {
         Type *t_int = node->type ? node->type : type_int;
         Type *t_op  = node->type ? node->type : (l->type ? l->type : type_int);
         switch (op) {
@@ -875,7 +912,7 @@ static Node *try_simplify_binop(Node *node)
    the largest power of 2 that fits in a signed 16-bit int (well, 16384
    does — 32768 wraps to MIN_INT, but as a multiply factor it's fine).
    Caller should still respect the operand's bit width. */
-static int extract_pow2(int64_t v, int *shift)
+int extract_pow2(int64_t v, int *shift)
 {
     if (v <= 0) return 0;
     if (v & (v - 1)) return 0;  /* not a power of 2 */
@@ -2034,6 +2071,18 @@ static Node *cse_walk_lvalue(Node *lhs, cse_env *env, SYMBOL **lhs_local, int *u
         *lhs_local = lhs->sym;
         return lhs;
     }
+    /* A call as an lvalue base (e.g. `*foo()`-shaped targets the frontend
+       leaves as a bare call here). Its union stores `args` (an array*) in the
+       `left` slot and `callee` in `right`, so the generic left/right/operand
+       walk below would deref an array struct as a Node* and read off its end.
+       Walk it with the full cse_walk (which dispatches on ast_type and iterates
+       args correctly), then treat the destination as opaque. */
+    if (lhs->ast_type == AST_FUNC_CALL || lhs->ast_type == AST_FUNCPTR_CALL) {
+        int dummy_hb = 0;
+        lhs = cse_walk(lhs, env, &dummy_hb);
+        *unknown = 1;
+        return lhs;
+    }
     /* Defensive: if some earlier pass corrupted the LHS into a leaf
        form (literal etc.), don't crash trying to walk it as a binary
        expression — the union overlap would deref bit patterns. Just
@@ -2433,13 +2482,20 @@ static void collect_sef_subtrees(Node *node, array *bag)
         return;
     case AST_IF:
     case AST_TERNARY:
+        /* Only the (unconditional) cond feeds cross-occurrence synthesis. Do NOT
+           descend into the mutually-exclusive then/els arms: hoisting a subexpr
+           out of an arm to before the branch computes it on paths that don't use
+           it AND extends its live range across the branch (→ spill / a frame).
+           Repeats WITHIN one arm are still synthesised when synthesize_walk
+           recurses into that arm's compound. */
         collect_sef_subtrees(node->cond, bag);
-        collect_sef_subtrees(node->then, bag);
-        collect_sef_subtrees(node->els,  bag);
         return;
     case AST_SWITCH:
+        /* sw_expr only — not sw_body (the case arms are mutually exclusive; see
+           the IF note above). This is the condition() pessimisation: a subexpr in
+           2/16 arms was hoisted before the switch, computed on all 16 paths and
+           slotted across the dispatch. */
         collect_sef_subtrees(node->sw_expr, bag);
-        collect_sef_subtrees(node->sw_body, bag);
         return;
     case AST_SWITCH_CASE:
         collect_sef_subtrees(node->sw_value, bag);

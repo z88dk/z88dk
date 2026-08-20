@@ -575,7 +575,7 @@ static option options[] = {
     { 0, "Cg", OPT_FUNCTION,  "Add an option to ez80-clang" , &clangarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Compiler (xcc) options:", NULL, NULL, 0 },
-    { 0, "Cx", OPT_FUNCTION,  "Add an option to ez80-clang" , &xccarg, AddToArgs, 0},
+    { 0, "Cx", OPT_FUNCTION,  "Add an option to xcc" , &xccarg, AddToArgs, 0},
 
     { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
     { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
@@ -615,8 +615,8 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "-mz180", "DESTDIR/lib/arch/z180/z180_rules.1", "_z180", "-triple z180" }},    /* CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mr2ka"  , "-mr2ka"  , "-mr2ka"  , "-mr2ka", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL  }},          /* CPU_TYPE_R2KA     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , "-mr3k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r2ka", NULL   }},          /* CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mr4k"   , "-mr4k"   , "-mr4ka"  , "-mr4k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R4K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    {{ "-mr6k"   , "-mr6k"   , "-mr4ka"  , "-mr6k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R6K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr4k"   , "-mr4k"   , "-mr4k"  , "-mr4k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R4K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mr6k"   , "-mr6k"   , "-mr6k"  , "-mr6k", "DESTDIR/lib/arch/rabbit/rabbit_rules.1", "_r4k", NULL   }},          /* CPU_TYPE_R6K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8080"  , "-m8080"  , NULL   , "-m8080", "DESTDIR/lib/arch/8080/8080_rules.1", "_8080", NULL  }},          /* CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-m8085"  , "-m8085"  , NULL   , "-m8085", "DESTDIR/lib/arch/8085/8085_rules.1", "_8085", NULL  }},          /* CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80", NULL }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
@@ -1486,9 +1486,9 @@ int main(int argc, char **argv)
             } else if (compiler_type == CC_XCC) {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
-                rules[num_rules++] = c_sdccopt1;
-                rules[num_rules++] = c_sdccopt9;
+    
                 rules[num_rules++] = c_xcc_opt;
+                rules[num_rules++] = c_sdccopt9;
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
@@ -1496,7 +1496,20 @@ int main(int argc, char **argv)
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
 
+                rules[num_rules++] = c_coptrules9;
                 rules[num_rules++] = c_80cc_opt;
+
+                if (c_coptrules_target) {
+                    rules[num_rules++] = c_coptrules_target;
+                }
+
+                if (coptrules_cpu) {
+                    rules[num_rules++] = coptrules_cpu;
+                }
+
+                if (c_coptrules_user) {
+                    rules[num_rules++] = c_coptrules_user;
+                }
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
@@ -1847,7 +1860,12 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-        snprintf(argbuf,sizeof(argbuf),"%s %s %s", select_cpu(CPU_MAP_TOOL_COPT), coptarg ? coptarg : "", rules[i]);
+        /* -compiler= lets a rule gate on which compiler produced the input: the
+           same rules file is applied to every compiler's output, and a fold that
+           is sound for one can be wrong for another (they differ in which
+           registers a sequence is free to clobber). See %compiler/%notcompiler. */
+        snprintf(argbuf,sizeof(argbuf),"%s -compiler=%s %s %s", select_cpu(CPU_MAP_TOOL_COPT),
+                 c_compiler_type, coptarg ? coptarg : "", rules[i]);
         if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
@@ -3137,7 +3155,7 @@ static void configure_compiler(void)
         preprocarg = " -D__XCC";
         BuildOptions(&cpparg, preprocarg);
         c_compiler = "xcc";
-        add_option_to_compiler("-S --sdcccall 0 --c1mode");
+        add_option_to_compiler("-S -Of --sdcccall 0 --c1mode");
         c_cpp_exe = c_sdcc_preproc_exe;
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__XCC");

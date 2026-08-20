@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include "farmalloc.h"
 
-void *__far calloc_far (size_t nmemb, size_t size)
+void *__far calloc_far (size_t nmemb, size_t size) __z88dk_saveframe
 {
 	void * __far ptr;
 

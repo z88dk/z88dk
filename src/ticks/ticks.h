@@ -47,6 +47,7 @@ extern int c_ioport;
 extern int break_required;
 
 extern int c_rc2014_mode;
+extern int c_cpm_mode;
 extern int c_z80asm_tests;
 
 extern uint8_t verbose;
@@ -408,6 +409,24 @@ extern void i8085_ld_de_spn(uint8_t opcode);
 extern void i8085_ld_hl_ide(uint8_t opcode);
 extern void i8085_ld_ide_hl(uint8_t opcode);
 extern void i8085_sub_hl_bc(uint8_t opcode);
+
+/* KR580VM1 */
+extern int  vm1_mf;
+extern int  vm1_mb;
+extern int  vm1_rs;
+extern int  vm1_bank_select(void);
+extern void vm1_dsub(uint8_t rh, uint8_t rl);
+extern void vm1_dcmp(uint8_t rh, uint8_t rl);
+extern void vm1_dadc(uint8_t rh, uint8_t rl);
+extern void vm1_memop(uint8_t opcode);
+extern void vm1_lhlx(void);
+extern void vm1_shlx(void);
+extern void vm1_jof(void);
+extern void vm1_smf(int bank);
+extern void vm1_rs_prefix(void);
+extern void vm1_mb_prefix(void);
+extern void vm1_prefix_step(void);
+extern int  vm1_prefix_pending(void);
 
 // kc160
 extern void kc160_ld_rr_ixysd(uint8_t opcode);

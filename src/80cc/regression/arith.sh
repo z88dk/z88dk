@@ -1,6 +1,6 @@
 #!/bin/bash
 # 80cc regression: long mul/div/mod, int mod, OP_LNEG on long, and
-# local array initializer lists. All compiled with --use-ir, linked
+# local array initializer lists. All compiled through the IR pipeline, linked
 # with z80_clib + math libs, run under z88dk-ticks, and checked
 # against expected HL at the harness exit point.
 
@@ -23,8 +23,8 @@ run_test() {
     local bin="$WORK/$name.bin"
     local trace="$WORK/$name.trace"
     printf '%s\n' "$src" > "$cfile"
-    if ! ( cd "$WORK" && "$COMPILER" --use-ir "$name.c" 2>/dev/null ); then
-        fail=$((fail+1)); failures+=("$name: 80cc --use-ir failed"); return
+    if ! ( cd "$WORK" && "$COMPILER" "$name.c" 2>/dev/null ); then
+        fail=$((fail+1)); failures+=("$name: 80cc failed"); return
     fi
     if ! ( cd "$WORK" && reg_z80asm "$bin" "$HARNESS" "$asm" 2>/dev/null ); then
         fail=$((fail+1)); failures+=("$name: z80asm failed"); return

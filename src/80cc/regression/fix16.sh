@@ -1,7 +1,7 @@
 #!/bin/bash
 # 80cc regression: _Accum (fix-point) end-to-end.
 #
-# Each test compiles a short C program with --use-ir, links with the
+# Each test compiles a short C program, links with the
 # fix16 library, and runs under z88dk-ticks. main returns the test's
 # expected outcome via HL — checked at the harness's exit point. The
 # IR pipeline handles float literal → _Accum scaling (×256), routes
@@ -40,8 +40,8 @@ run_test() {
     local trace="$WORK/$name.trace"
 
     printf '%s\n' "$src" > "$cfile"
-    if ! ( cd "$WORK" && "$COMPILER" --use-ir "$name.c" 2>/dev/null ); then
-        fail=$((fail+1)); failures+=("$name: 80cc --use-ir failed"); return
+    if ! ( cd "$WORK" && "$COMPILER" "$name.c" 2>/dev/null ); then
+        fail=$((fail+1)); failures+=("$name: 80cc failed"); return
     fi
     if ! ( cd "$WORK" && reg_z80asm "$bin" "$HARNESS" "$asm" 2>/dev/null ); then
         fail=$((fail+1)); failures+=("$name: z80asm failed"); return

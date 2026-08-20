@@ -2,7 +2,7 @@
 #include <string.h>
 
 
-char *__far strdupf(const char *__far orig)
+char *__far strdupf(const char *__far orig) __z88dk_saveframe
 {
    char *__far ptr;
 

@@ -43,8 +43,13 @@
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()     intrinsic_label(TIMER_START)
-   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+   #ifdef __80CC
+      #define TIMER_START()     __asm__("TIMER_START:")
+      #define TIMER_STOP()      __asm__("TIMER_STOP:")
+   #else
+      #define TIMER_START()     intrinsic_label(TIMER_START)
+      #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+   #endif
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -58,8 +63,14 @@
    #endif
 #endif
 
+#ifdef __MATH_MATH16
+    #define DOUBLE          _Float16
+#else
+    #define DOUBLE          double
+#endif
 
-#include<stdio.h>
+#include <stdio.h>
+#include <math.h>
 
 unsigned char *output = (unsigned char *)0xc000;
 
@@ -69,9 +80,9 @@ int main (int argc, char **argv)
     STATIC unsigned char byte_acc;
     STATIC int i;
 	 STATIC int iter = 50;
-    STATIC double x, y;
-    STATIC double Zr, Zi, Cr, Ci, Tr, Ti;
-    STATIC double limit = 2.0;
+    STATIC DOUBLE x, y;
+    STATIC DOUBLE Zr, Zi, Cr, Ci, Tr, Ti;
+    STATIC DOUBLE limit = 2.0;
 
 #ifdef COMMAND
     w = argc > 1 ? atoi(argv[1]) : 60;

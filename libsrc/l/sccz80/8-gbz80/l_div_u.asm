@@ -11,10 +11,8 @@ l_div_u:
 	; Delegate to the sdcc routine 
 	; Entry BC=dividend, DE=divisor
 	; Exit: BC=quotient, DE=remainder
-	ld	c,e
-	ld	b,d
-	ex	de,hl
+	ld	bc,de
+	ld	de,hl
 	call	___divu16_bcde
-	ld	l,c
-	ld	h,b
+	ld	hl,bc
 	ret

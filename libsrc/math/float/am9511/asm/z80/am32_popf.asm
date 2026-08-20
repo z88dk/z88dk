@@ -10,8 +10,13 @@
 ;-------------------------------------------------------------------------
 ;  asm_am9511_popf - am9511 APU pop float
 ;-------------------------------------------------------------------------
-; 
-;  Load IEEE-754 float from Am9511 APU stack
+;
+;  Load IEEE-754 float from Am9511 APU stack.
+;
+;  Status register (after BUSY clears): see techdocs/amd/am9511a
+;  Am9511 Arithmetic Processor.pdf — BUSY|SIGN|ZERO|ERROR[4:1]|CARRY.
+;  ERROR is a 4-bit code (DIV0/NEGRT/UNDFL/OVRFL patterns), not four
+;  independent sticky bits.  ZERO must not use the normal bias convert.
 ;
 ;-------------------------------------------------------------------------
 
@@ -53,7 +58,10 @@ PUBLIC asm_am9511_popf
     in h,(c)                    ; load LSW from APU
     in l,(c)
 
-    and 07ch                    ; errors from status register
+    ; Re-read status (A was busy-rotated).  Mask ZERO|DIV0|NEGRT|UNDFL|OVRFL.
+    ; ZERO must be trapped: APU zero is not valid for the bias convert path.
+    AM9511_IN_APU_STATUS
+    and 03eh
     jr NZ,errors
 
     sla e                       ; remove leading 1 from mantissa
@@ -69,33 +77,41 @@ PUBLIC asm_am9511_popf
     ld d,a                      ; restore exponent
     ret
 
+    ; A = status & 0x3E.  APU range is smaller than IEEE; map codes:
+    ;   OVRFL → ±Inf, UNDFL → 0, NEGRT → NaN, DIV0 → ±Inf, ZERO → 0
+    ; DIV0 as ±Inf matches IEEE x/0 (0/0 is IEEE-gated before the APU).
 .errors
-    rrca                        ; relocate status bits (just for convenience)
-    bit 5,a                     ; zero
-    jr NZ,zero
-    bit 1,a
-    jr NZ,infinity              ; overflow
-    bit 2,a
-    jr NZ,zero                  ; underflow
-
-.nan
-    rl d                        ; get sign
-    ld de,0feffh
-    rr d                        ; nan exponent
-    ld h,e                      ; nan mantissa
-    ld l,e
-    ret
-
-.infinity
-    rl d                        ; get sign
-    ld de,0fe80h
-    rr d                        ; nan exponent
-    ld hl,0                     ; nan mantissa
-    ret
-
+    rrca                        ; OVRFL
+    jr C,infinity
+    rrca                        ; UNDFL
+    jr C,zero
+    rrca                        ; NEGRT
+    jr C,nan
+    rrca                        ; DIV0
+    jr C,infinity
+    ; ZERO
 .zero
     ld de,0
     ld h,d
     ld l,e
+    ret
+
+.nan
+    ld a,d
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,0ffh
+    ld h,e
+    ld l,e
+    ret
+
+.infinity
+    ld a,d
+    and 080h
+    or 07fh
+    ld d,a
+    ld e,080h
+    ld hl,0
     ret
 

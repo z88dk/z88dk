@@ -9,6 +9,73 @@ This library is designed expressly to support the AMD Am9511A (Intel 8231A) Arit
 
 ---
 
+## Documentation (canonical)
+
+Vendor and application notes live in the separate **[z88dk/techdocs](https://github.com/z88dk/techdocs)** tree, not in this product repo:
+
+| Path under `techdocs` | Document |
+|----------------------|----------|
+| [`amd/am9511a/Am9511 Arithmetic Processor.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/Am9511%20Arithmetic%20Processor.pdf) | AMD Am9511A datasheet (status register, command set, FDIV/SQRT behaviour) |
+| [`amd/am9511a/Am9511A-9512FP_Processor_Manual.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/Am9511A-9512FP_Processor_Manual.pdf) | Am9511A / 9512 floating-point processor manual |
+| [`amd/am9511a/Am9511_Algorithm_Details.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/Am9511_Algorithm_Details.pdf) | Algorithm details (ranges, stack use per op) |
+| [`amd/am9511a/An Efficient Software Driver for Am9511A.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/An%20Efficient%20Software%20Driver%20for%20Am9511A.pdf) | Host driver patterns |
+| [`amd/am9511a/HARWELL - Using the Am9511A.pdf`](https://github.com/z88dk/techdocs/blob/master/amd/am9511a/HARWELL%20-%20Using%20the%20Am9511A.pdf) | Application notes (Harwell) |
+
+Browse the folder: [techdocs/amd/am9511a](https://github.com/z88dk/techdocs/tree/master/amd/am9511a).
+
+### Status register (datasheet)
+
+From *Am9511 Arithmetic Processor* (status register section). While **BUSY=1**, the other status bits are **not defined**.
+
+```
+  7       6      5     4  3  2  1      0
+┌──────┬──────┬──────┬─────────────┬───────┐
+│ BUSY │ SIGN │ ZERO │ ERROR CODE  │ CARRY │
+└──────┴──────┴──────┴─────────────┴───────┘
+```
+
+| Field | Bit(s) | Meaning when BUSY=0 |
+|-------|--------|---------------------|
+| BUSY | 7 | `1` = command executing |
+| SIGN | 6 | `1` = TOS negative |
+| ZERO | 5 | `1` = TOS is zero |
+| ERROR CODE | **4–1** (4-bit field) | See table below — **not** four independent sticky bits |
+| CARRY | 0 | Carry/borrow from MSB |
+
+**ERROR CODE** (bits 4–1), as documented:
+
+| Pattern (b4…b1) | Mask value | Meaning |
+|-----------------|------------|---------|
+| `0000` | — | No error |
+| `1000` | `0x10` | Divide by zero |
+| `0100` | `0x08` | Square root or log of a negative |
+| `1100` | `0x18` | Arg of asin/acos, or eˣ, too large |
+| `XX10` | bit2 set | Underflow |
+| `XX01` | bit1 set | Overflow |
+
+z88dk names in `config_am9511_private.inc`: `DIV0=0x10`, `NEGRT=0x08`, `UNDFL=0x04`, `OVRFL=0x02`, `ERROR=0x1E`, plus `ZERO`/`SIGN`/`BUSY`/`CARRY`.
+
+### APU range vs IEEE (specials policy)
+
+The APU float format has **no Inf/NaN** and only a **7-bit unbiased** exponent (−64…+63), range about **±(2.7×10⁻²⁰ … 9.2×10¹⁸)** and zero (datasheet floating-point format section).
+
+- **IEEE exp 255** (Inf/NaN) cannot be pushed as APU specials: `pushf` clamps out-of-range IEEE values to APU max/zero. Binary ops that need Inf/NaN algebra are gated in software (`asm/am32_fspecial.asm`) **before** the chip.
+- **On-chip** errors are read in `popf` from the status register after BUSY clears. Typical mapping used by this library:
+  - **ZERO** → IEEE `0` (do **not** run the normal bias convert on APU zero)
+  - **OVRFL** → IEEE `±Inf` (sign from TOS/SIGN)
+  - **UNDFL** → IEEE `0`
+  - **DIV0** → IEEE `±Inf` for `x/0` (datasheet FDIV: result set to NOS; **0/0 → NaN** is handled in software specials)
+  - **NEGRT** (`0100`) → IEEE NaN (e.g. sqrt of negative)
+  - **`1100`** domain → IEEE NaN
+
+FDIV note (datasheet FDIV): if the divisor (TOS) is zero, **R is set equal to NOS** and divide-by-zero is reported; exponent overflow/underflow may also appear with mantissa “correct” and exponent offset by 128 when the APU range is exceeded.
+
+IEEE specials algebra (`0/0`, `Inf−Inf`, `0*Inf`, `sqrt(−x)`, …) is covered by
+`test/suites/math` (`test_9511.bin` / `test_9511_8085.bin` with `-DMATH_SPECIALS`).
+Do not link bare `-lm` ahead of `--math-am9511` if you need the APU `sqrt`.
+
+---
+
 ## Key Features
 
   *  All the intrinsic functions are written in z80 or 8085 assembly language.

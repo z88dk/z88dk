@@ -53,9 +53,14 @@ extern Node    *callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 
 /* cdbfile.c */
+extern char     c_debug_adb_defc;   /* -debug: emit sdcc-compatible cdb */
 extern void     debug_write_module(void);
 extern void     debug_write_symbol(SYMBOL *sym);
 extern void     debug_write_type(Type *type);
+/* Emit a stack local/param cdb record with an explicit frame-base offset.
+   Used post-lowering (ir_lower_to_output) so the ,B,1,d offset reflects the
+   backend's real slot placement, not the front-end nominal offset. */
+extern void     debug_write_local_at(const char *fn_name, SYMBOL *sym, int offset);
 
 #include "codegen.h"
 
@@ -218,6 +223,8 @@ extern Node    *ast_demote_unused_poststep(Node *node);
 extern Node    *ast_loop_reverse(Node *node);
 extern Node    *ast_typecheck(Node *node);
 extern Node    *ast_opt_run(Node *node);
+extern int      extract_pow2(int64_t v, int *shift);
+extern int      is_side_effect_free(Node *node);
 
 /* node.c */
 extern Node    *ast_decl(SYMBOL *sym, Node *declvar);
@@ -285,7 +292,7 @@ extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
 extern struct nodepair *statement(void);
-extern Node    *doasm(void);
+extern Node    *doasm(int file_scope);
 extern void     dopragma(void);
 extern Node    *doasmfunc(char wantbr);
 

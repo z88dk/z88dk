@@ -63,16 +63,31 @@ Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
 
 
-RESULTS
-=======
+CLASSIC Z80 / 8085 SUMMARY
+==========================
+
+Timer-bounded classic +test (main z80/8085). Full RESULT blocks and other
+toolchains: z88dk-classic/readme.txt and sibling directories.
+
+Compiler | CPU  | Ticks
+---------|------|------------
+sccz80   | z80  | 4_769_143
+sccz80   | 8085 | 4_674_469   (Jul 2026)
+80cc     | z80  | 5_363_484  (Aug 19, 2026)
+80cc     | 8085 | 4_882_239  (Aug 19, 2026)
+zsdcc    | z80  | 4_111_225  (Aug 16, 2026)
+
+
+RESULTS (full multi-toolchain archive)
+======================================
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-8315 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+8316 bytes less page zero
 
-cycle count  = 3665494
-time @ 4MHZ  = 3665494 / 4*10^6 = 0.9163 sec
+cycle count  = 3679114
+time @ 4MHZ  = 3679114 / 4*10^6 =    0.9 sec
 
 2.
 HITECH C MSDOS V780pl2
@@ -89,12 +104,12 @@ cycle count  = 3714152
 time @ 4MHz  = 3714152 / 4*10^6 = 0.9285 sec
 
 4.
-Z88DK January 5, 2022
-zsdcc #12555 / classic c library
-9177 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+9184 bytes less page zero
 
-cycle count  = 4110873
-time @ 4MHZ  = 4110873 / 4*10^6 = 1.0277 sec
+cycle count  = 4111225
+time @ 4MHZ  = 4111225 / 4*10^6 =    1.0 sec
 
 5.
 HITECH C CPM V309-15
@@ -104,11 +119,11 @@ cycle count  = 7916099
 time @ 4MHz  = 7916099 / 4*10^6 = 1.979 sec
 
 6.
-SDCC 4.2.0 Linux
-8278 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+8279 bytes less page zero
 
-cycle count  = 4219481
-time @ 4MHz  = 4219481 / 4*10^6 = 1.0548 sec
+cycle count  = 4218689
+time @ 4MHz  = 4218689 / 4*10^6 = 1.0547 sec
 
 7.
 Z88DK April 20, 2020
@@ -127,10 +142,26 @@ cycle count  = 4769143
 time @ 4MHz  = 4769143 / 4*10^6 = 1.1923 sec
 
 8.
-Z88DK January 5, 2022
+Z88DK July 20, 2026
 sccz80 / classic c library / 8085
-9278 bytes less page zero
+9151 bytes less page zero
 
-cycle count  = 5129695
-time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+cycle count  = 4674469
+time @ 4MHz  = 4674469 / 4*10^6 = 1.1686 sec
+
+9.
+Z88DK August 19, 2026
+80cc / classic c library
+9216 bytes less page zero
+
+cycle count  = 5363484
+time @ 4MHz  = 5363484 / 4*10^6 =    1.3 sec
+
+10.
+Z88DK August 19, 2026
+80cc / classic c library / 8085
+9171 bytes less page zero
+
+cycle count  = 4882239
+time @ 4MHz  = 4882239 / 4*10^6 =    1.2 sec
 

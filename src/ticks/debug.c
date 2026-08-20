@@ -409,6 +409,8 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
 
     debug_sym_symbol* s = malloc(sizeof(debug_sym_symbol));
 
+    s->belongs_to_function = NULL;
+
     char symbol_scope = *encoded++;
     switch (symbol_scope)
     {
@@ -498,14 +500,8 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
 
                 s->belongs_to_function = debug_find_function(function_name, file_name);
                 if (s->belongs_to_function) {
-                    debug_sym_function_argument* arg = malloc(sizeof(debug_sym_function_argument));
-                    arg->symbol = s;
-                    arg->next = NULL;
-
-                    debug_sym_function_argument* last = s->belongs_to_function->arguments;
-
-                    arg->next = last;
-                    s->belongs_to_function->arguments = arg;
+                    /* Linked into the argument list once the whole record has
+                       parsed - see below. */
                 } else {
                     bk.debug("Warning: could not find function %s.%s for argument %s.\n",
                         file_name, function_name, s->symbol_name);
@@ -525,6 +521,17 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     if (parse_address_space(encoded, &encoded, &s->address_space)) {
         bk.debug("Warning cannot parse address space.\n");
         goto err;
+    }
+
+    /* Only now that the record has parsed in full is it safe to publish the
+       symbol into its function's argument list: the err path below frees s,
+       and an entry linked earlier would leave the list holding freed memory
+       for every later walk of it (info locals, backtrace, print ...). */
+    if (s->belongs_to_function) {
+        debug_sym_function_argument* arg = malloc(sizeof(debug_sym_function_argument));
+        arg->symbol = s;
+        arg->next = s->belongs_to_function->arguments;
+        s->belongs_to_function->arguments = arg;
     }
 
     *result = encoded;

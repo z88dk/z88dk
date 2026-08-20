@@ -643,6 +643,31 @@ static Type *parse_type(void)
     return type;
 }
 
+/* Map a __preserves_regs register name to its PRESERVE_* bit(s). Accepts the
+   8-bit registers and the 16-bit pairs; case-insensitive. Unknown names (e.g.
+   the alt-bank regs, or a typo) contribute nothing — conservative. */
+static uint16_t preserve_reg_mask(const char *n)
+{
+    char b[8]; int i = 0;
+    for (; n[i] && i < (int)sizeof(b) - 1; i++)
+        b[i] = (n[i] >= 'A' && n[i] <= 'Z') ? (char)(n[i] + 32) : n[i];
+    b[i] = 0;
+    if (!strcmp(b, "a"))  return PRESERVE_A;
+    if (!strcmp(b, "b"))  return PRESERVE_B;
+    if (!strcmp(b, "c"))  return PRESERVE_C;
+    if (!strcmp(b, "d"))  return PRESERVE_D;
+    if (!strcmp(b, "e"))  return PRESERVE_E;
+    if (!strcmp(b, "h"))  return PRESERVE_H;
+    if (!strcmp(b, "l"))  return PRESERVE_L;
+    if (!strcmp(b, "ix")) return PRESERVE_IX;
+    if (!strcmp(b, "iy")) return PRESERVE_IY;
+    if (!strcmp(b, "af")) return PRESERVE_A;              /* F not a value reg */
+    if (!strcmp(b, "bc")) return PRESERVE_B | PRESERVE_C;
+    if (!strcmp(b, "de")) return PRESERVE_D | PRESERVE_E;
+    if (!strcmp(b, "hl")) return PRESERVE_H | PRESERVE_L;
+    return 0;
+}
+
 static void parse_trailing_modifiers(Type *type)
 {
     if ( c_use_r2l_calling_convention == NO ) {
@@ -793,13 +818,16 @@ static void parse_trailing_modifiers(Type *type)
             type->flags |= SHORTCALL_HL;
         } else if (swallow(KW_PRESERVES_REGS)) {
             needchar('(');
-            /* The body is a comma-separated list of register names
-               (af, bc, de, hl, …) — the parser doesn't record them,
-               only the fact that the attribute was present. Consume
-               any sequence of identifier / comma tokens until `)`. */
-            while (tk_match_kind_at_lptr(TK_IDENT)
-                || tk_match_kind_at_lptr(TK_COMMA))
-                ;
+            /* Comma-separated register names (a, f, b, c, …, af, bc, de, hl,
+               ix, iy). Record the preserved set so the call-clobber model can
+               keep a value resident in a preserved register across the call. */
+            if (!rcmatch(')')) {
+                do {
+                    char rname[NAMESIZE];
+                    if (symname(rname) == 0) { illname(rname); break; }
+                    type->funcattrs.preserved_regs |= preserve_reg_mask(rname);
+                } while (cmatch(','));
+            }
             needchar(')');
         } else {
             break;

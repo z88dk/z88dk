@@ -114,6 +114,33 @@ typedef enum {
                                         call — gen_call's whole-function BC-save
                                         must ignore it (Part 1). Slotless like any
                                         PR_BC vreg (stamped `ld bc,hl` at its def). */
+    IR_VREG_DE_PACK        = 1 << 8, /* LRA Phase 1: single-BB call-free word temp
+                                        locally allocated to DE (op_clobbers-clean
+                                        span, DE otherwise idle). DE sibling of
+                                        BC_PACK; call-free so gen_call ignores it. */
+    IR_VREG_AUTOPUSH       = 1 << 9, /* fastcall register param that spills: materialise
+                                        it by a `push` at entry (sccz80-style) instead of
+                                        stash+alloc+store. ir_assign_slots places it at the
+                                        TOP frame offset (where the push lands, just below
+                                        the return address / saved IX); emit_prologue pushes
+                                        instead of storing. Opt-in IR_AUTOPUSH_PARAM. */
+    IR_VREG_DEAD_SPILL     = 1 << 10, /* [IR_DEADSTORE] spill written but NEVER read
+                                        (reads==0, coalescing-checked in rec_end):
+                                        value rides its register to every use. Store
+                                        functions SKIP the slot store (+cache the reg);
+                                        ir_assign_slots drops its slot → frame shrinks →
+                                        deadframe frameless. Set on the re-lower once
+                                        the read/write split proves it dead. */
+    IR_VREG_CALL_SPLIT     = 1 << 11, /* [IR_CALLSPLIT] call-bounded live-range split:
+                                        a spilled reused word value made BC-resident
+                                        (vreg_to_phys=IR_PR_BC) only inside a call-free
+                                        span [home_lo,home_hi] with >=3 reads and NO
+                                        in-span write, spilled (slot-homed) elsewhere.
+                                        Read-only-in-span so the slot stays coherent
+                                        by construction: BC is an opportunistic cache
+                                        (entry reload via emit_bc_reload on a cold
+                                        belief), no exit spill. ir_assign_slots keeps
+                                        its slot despite the PR_BC home. */
 } VRegFlags;
 
 typedef struct {
@@ -123,7 +150,7 @@ typedef struct {
                            locals, overloaded as the slot byte count
                            (int16_t fits arrays up to ~32KB). */
     SYMBOL  *sym;       /* backing sym (NULL = compiler temp) */
-    uint8_t  flags;     /* VRegFlags bitset */
+    uint16_t flags;     /* VRegFlags bitset (>8 bits: IR_VREG_DE_PACK=1<<8) */
 } VReg;
 
 /* ----- Memory operand --------------------------------------------------- */
@@ -179,9 +206,12 @@ typedef enum {
     IR_LD_STR,          /* dst ← &string_literal_queue + imm; imm is the
                            byte offset, the `litlab` label resolves at
                            link time */
-    IR_LEA,             /* dst ← &src[0]'s frame slot (width-2 pointer).
+    IR_LEA,             /* dst ← &src[0]'s frame slot + imm (width-2 pointer).
                            src[0] must have IR_VREG_ADDR_TAKEN so the
-                           allocator keeps it in memory. */
+                           allocator keeps it in memory. `imm` is a constant
+                           byte displacement folded in by ir_opt_lea_offset —
+                           a struct member's offset, resolved at compile time
+                           rather than added at run time. */
     IR_LD_MEM,          /* dst ← *mem */
     IR_ST_MEM,          /* *mem ← src[0] */
 
@@ -319,8 +349,8 @@ typedef enum {
     /* Struct/union by-value argument push: src[0] = vreg holding the
        struct's address, imm = byte count (type->size). Allocates `size`
        bytes on the data stack and block-copies the struct in, so byte i
-       lands at sp+i (natural order, exact size — matches sccz80 and SDCC
-       sdcccall(0)). The copy reuses emit_block_copy (ldir on z80, the
+       lands at sp+i (natural order, exact size — the sdcccall(0) stacked
+       layout). The copy reuses emit_block_copy (ldir on z80, the
        __z80asm__ldir lib helper on 808x/gbz80). Like IR_PUSH_ARG it is a
        pre-pushed arg; the matching IR_CALL's caller-cleanup pops it. */
     IR_PUSH_STRUCT,
@@ -441,6 +471,11 @@ typedef struct {
                                emits the cleanup pops). 0 = legacy slot
                                path. */
     RegMask  clobbers;      /* derived from target attrs + ABI */
+    RegMask  preserved;     /* __preserves_regs(...): register PAIRS the callee
+                               guarantees to preserve (BC/DE/HL/A/IX/IY).
+                               op_clobbers subtracts this from a direct call's
+                               clobber set so a value may stay resident across
+                               the call. 0 for indirect / unannotated calls. */
 } CallInfo;
 
 /* IR_ACC_UNOP shape — selects how gen_acc_unop wires the accumulator
@@ -520,6 +555,10 @@ typedef struct {
     int      dst;           /* dst vreg id; -1 if no dst */
     int      src[2];        /* src vreg ids; -1 if unused */
     int64_t  imm;           /* immediate value (LD_IMM, ROTL imm count, etc.) */
+    SYMBOL  *imm_sym;       /* folded &symbol immediate RHS: when src[1]==-1 and
+                               imm_sym!=NULL the RHS operand is the link-time
+                               constant address `imm_sym + imm` (imm is the byte
+                               offset). Set by ir_opt_sym_cmp_fold for EQ/NE. */
     MemOp    mem;           /* LD_MEM / ST_MEM / LD_SYM / IR_IN / IR_OUT */
     int      label;         /* target BB id for IR_BR / IR_BR_COND / IR_BR_ZERO */
     CallInfo *call;         /* IR_CALL only — heap allocated */
@@ -531,6 +570,15 @@ typedef struct {
     const char *file;
     int         line;
 } Op;
+
+/* Phantom zero-trip guard: a BR_ZERO whose tested counter is a proven NONZERO
+   compile-time constant (constant-bound `for`), so it can never branch. Stored
+   in the otherwise-unused op->imm. Kept in the IR — every CFG/liveness/alloc
+   pass treats it as an ordinary BR_ZERO, so the pre-header→exit edge stays
+   visible and the loop's register allocation is unchanged (conservative,
+   analysis-only edge) — but the lowerer (gen_br_zero) emits NO code for it,
+   dropping the dead `ld a,h; or l; jp z`. Set in AST_LOOP_COUNTDOWN. */
+#define IR_BRZ_PHANTOM 1
 
 /* ----- Basic block ------------------------------------------------------ */
 
@@ -601,6 +649,14 @@ typedef struct {
        (IY callee-saved). */
     int        idx3_reg;
 
+    /* [#13] Set by ir_lower_func_flip when this function was FLIPPED from fp to
+       sp inside an otherwise-fp binary. sp-mode uses IX (idx2) / IY (idx3) as
+       scratch, but the fp CALLERS treat them as callee-saved (IX = frame ptr,
+       IY = fp's idx2). So a flipped fn that homes a value in IX/IY must push/pop
+       it on entry/exit (emit_prologue) and shift its sp-relative param/frame
+       offsets accordingly (param_caller_off) — else it trashes the caller. */
+    int        flipped_from_fp;
+
     /* exx/alt-bank home for a loop-INVARIANT word (IR_PR_BC_ALT), or
        IR_PR_NONE. Stamped by ir_build from ir_exx_reg(). Read-only in-loop so it
        persists across `exx`; the compare bridges through A. Frees an index
@@ -628,6 +684,25 @@ typedef struct {
        DE-clean; distinct from the word-accumulate semantics. Reverts to slot if
        no DE-clean region forms. See LOOP_REGALLOC_PLAN.md. */
     int        de_home_is_ptr;
+
+    /* Operand-residency fold hint (opt-in IR_RANGED, DENSITY_HANDOVER §4):
+       a per-vreg flag on a reused deref/binop RESULT that stayed IR_PR_SPILL.
+       Its def path leaves a DE CACHE copy (`ld d,h; ld e,l` + cache_de) so a
+       later in-range read prefers DE (sbc hl,de / e-d byte-wise, DE-clean)
+       instead of re-materialising in HL and spilling. The value stays SPILL
+       (slot always coherent) → a DE clobber falls back to the slot; the hint
+       is byte-safe by construction (worst case = a wasted `ld d,h; ld e,l`).
+       NULL if not built. */
+    unsigned char *de_fold_hint;   /* by vreg id */
+
+    /* Home residency region (ADR 0017 step 3b): the validated BB-id span
+       [home_region_lo, home_region_hi] over which the DE/byte home stays
+       register-resident — the OUTPUT of the cleanliness proof (compute_home_region),
+       stored in the table so the lowerer READS it rather than re-deriving. -1/-1 =
+       no region. Immutable proof output; the lowerer keeps a mutable working copy
+       (L.cur_home_region_*) initialised from this (it may disable the region mid-
+       render as a residency backstop). */
+    int        home_region_lo, home_region_hi;
 
     /* Function attributes — pulled from the symbol's ctype flags but
        hoisted here for the lowerer's convenience. */
@@ -683,6 +758,16 @@ typedef struct {
     PhysReg   *vreg_to_phys;    /* by vreg id; PR_SPILL means stack-only */
     int       *vreg_spill_slot; /* by vreg id; valid when vreg_to_phys == PR_SPILL */
 
+    /* Ranged residency (ADR 0017 Step 4): the flat op-index interval over which
+       vreg_to_phys[v] actually holds v. home_at() returns the register only when
+       the current lowering point falls inside [home_lo, home_hi]; outside it, v
+       reads from its slot. NULL until ir_alloc; the default fill is a whole-
+       function interval (INT_MIN..INT_MAX) so home_at == vreg_to_phys everywhere
+       (byte-identical). The ranged pack narrows these to disjoint sub-ranges so a
+       register time-shares across non-overlapping vregs. */
+    int       *home_lo;         /* by vreg id */
+    int       *home_hi;         /* by vreg id */
+
     /* Per-vreg [start, end] intervals in flattened BB-order op-index
        space. Filled by ir_compute_live_ranges; NULL until then. The
        allocator uses them for interference (two vregs interfere iff
@@ -694,6 +779,10 @@ typedef struct {
 /* ----- Constructors / destructors --------------------------------------- */
 
 Func *ir_func_new(SYMBOL *fn);
+/* Deep clone of the pre-backend IR (see ir.c). Lower the clone from scratch in
+   a chosen frame mode without mutating the original; reusable for inlining. */
+Func *ir_clone_func(const Func *s);
+void  ir_free_cloned_func(Func *d);
 void  ir_func_free(Func *f);
 
 int   ir_vreg_new(Func *f, Kind k, SYMBOL *sym, uint8_t flags);
@@ -756,6 +845,12 @@ int ir_bb_succ_at(const BB *bb, int i);   /* -1 if out of range */
 const char *ir_op_name(OpKind kind);
 
 const char *ir_phys_name(PhysReg pr);
+
+/* LRA (ir_lower.c): the verified per-op value-register clobber model + a vreg's
+   physical-register mask. Shared with the allocator (ir_alloc.c) so the DE-local
+   pack proves clean spans against the SAME model IR_VERIFY checks. */
+RegMask op_clobbers(const Func *f, const Op *op);
+RegMask phys_regmask(const Func *f, int vreg);
 
 /* ----- Compiler-internal accessors ------------------------------------- */
 

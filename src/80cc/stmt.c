@@ -210,7 +210,7 @@ struct nodepair *statement(void)
                 break;
             case TK_HASH:
                 if (match("#asm")) {
-                    pair->node = doasm();
+                    pair->node = doasm(0);
                     st = STASM;
                 }
                 break;
@@ -749,7 +749,7 @@ Node *doasmfunc(char wantbr)
  *      passed intact through parser
  */
 
-Node *doasm(void)
+Node *doasm(int file_scope)
 {
     asm_buf buf;
     asm_buf_init(&buf);
@@ -767,6 +767,20 @@ Node *doasm(void)
     if (c_eof)
         errorfmt("Unterminated assembler code",1);
     cmode = 1; /* then back to parse level */
+    /* File scope: there is no function body to hang an AST node on, so the
+       node built here would simply be discarded by the caller — which is why
+       a global `#asm` block vanished from the output. Emit the text straight
+       out at `#endasm` instead. sccz80 accepts file-scope asm and 80cc did
+       not, so this is a compatibility gap rather than a new feature.
+
+       Keyed on the caller, not on `currfn == NULL`: currfn is not reset when a
+       function finishes, so a second global block after the first function
+       would still look like it was inside one. */
+    if (file_scope) {
+        if (buf.data) outstr(buf.data);
+        free(buf.data);
+        return NULL;
+    }
     Node *n = ast_asm(buf.data ? buf.data : "");
     free(buf.data);
     return n;

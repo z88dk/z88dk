@@ -37,6 +37,7 @@ typedef struct {
     uint8_t   am;
     uint8_t   adl;
     uint8_t   kc_prefix;
+    uint8_t   vm1_mb;       /* KR580VM1: the MB/CS ($28) prefix has been seen */
 } dcontext;
 
 
@@ -53,7 +54,7 @@ typedef struct {
 } while (0)
 
 #define PEEK_BYTE_OFFS(state,offs,val) do { \
-    val = bk.get_memory(state->pc + offs, MEM_TYPE_INST); \
+    val = bk.get_memory(state->pc + (offs), MEM_TYPE_INST); \
 } while (0)
 
 #define BUF_PRINTF(fmt, ...) do { \
@@ -299,10 +300,24 @@ static char *handle_immed32(dcontext *state, char *buf, size_t buflen)
     return buf;
 }
 
+/* index 3 is the KR580VM1 alternate pointer pair H1L1, selected by the
+   RS ($38) prefix. It rides on the same state->index slot as ix/iy, which
+   the VM1 cannot reach (canindex() is false for it). */
 static char *handle_hl(int index)
 {
-    static char *table[] = { "hl", "ix", "iy"};
+    static char *table[] = { "hl", "ix", "iy", "hl'"};
     return table[index];
+}
+
+/* The KR580VM1's $28 prefix is called MB in front of a memory instruction,
+   where it selects the other bank, but CS in front of DAD/DSUB/DCMP, where
+   it instead makes them consume the carry. For those three we fold it into
+   the mnemonic (add/adc, sub/sbc, cp/cpc) rather than print a "mb " word. */
+static int vm1_is_cs_opcode(uint8_t op)
+{
+    return op == 0x08 || op == 0x18 ||      /* DSUB b,d */
+           (op & 0xcf) == 0x09 ||           /* DAD  rr  */
+           op == 0xcb || op == 0xdd;        /* DCMP b,d */
 }
 
 static char* handle_kc_prefix(uint8_t pfx)
@@ -327,20 +342,22 @@ static char* handle_kc_segment(uint8_t pfx)
 
 static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t buflen)
 {
-    static char *table[3][8] = {
+    static char *table[4][8] = {
         { "b", "c", "d", "e", "h", "l", "hl", "a" },
         { "b", "c", "d", "e", "ixh", "ixl", "ix", "a" },
-        { "b", "c", "d", "e", "iyh", "iyl", "iy", "a" }
+        { "b", "c", "d", "e", "iyh", "iyl", "iy", "a" },
+        { "b", "c", "d", "e", "h'", "l'", "hl'", "a" }
     };
     size_t offs = 0;
     size_t  linepos = 0;
     int index = state->index;
 
-    /* Turn off ixl/h handling for Rabbit and Z180 */
-    if ( !canixh() && y != 6 ) {
+    /* Turn off ixl/h handling for Rabbit and Z180. The VM1 alternate set
+       (index 3) does address its halves individually, so keep it. */
+    if ( !canixh() && y != 6 && index != 3 ) {
         index = 0;
     }
-    if ( y == 6 && index ) {
+    if ( y == 6 && index && index != 3 ) {
         int8_t displacement = state->displacement;
 
         if ( state->prefix != 0xcb )
@@ -369,24 +386,26 @@ static char *handle_displacement(dcontext *state, char *buf, size_t buflen)
 
 static char *handle_register16(dcontext *state, uint8_t p, int index)
 {
-    static char *table[3][4] = {
+    static char *table[4][4] = {
         { "bc", "de", "hl", "sp" },
         { "bc", "de", "ix", "sp" },
         { "bc", "de", "iy", "sp" },
+        { "bc", "de", "hl'", "sp" },
     };
-    
+
     return table[index][p];
 }
 
 static char *handle_register16_2(dcontext *state, uint8_t p, int index)
 {
-    static char *table[3][4] = {
+    static char *table[4][4] = {
         { "bc", "de", "hl", "af" },
         { "bc", "de", "ix", "af" },
         { "bc", "de", "iy", "af" },
+        { "bc", "de", "hl'", "af" },
     };
-    
-    
+
+
     return table[index][p];
 }
 
@@ -603,21 +622,56 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 if ( canaltreg() ) BUF_PRINTF("%-10saf,af\'","ex");
                                 else if (isgbz80() ) BUF_PRINTF("%-10s(%s),sp","ld",handle_addr16(state, opbuf1,sizeof(opbuf1)));
                                 else if (is8085() ) BUF_PRINTF("%-10shl,bc", "sub");
+                                else if (isvm1() ) BUF_PRINTF("%-10s%s,bc", state->vm1_mb ? "sbc" : "sub", handle_hl(state->index));
                                 else BUF_PRINTF("nop");
                             } else if ( y == 2 ) {
                                 if ( isgbz80() ) {
-                                    uint8_t p; 
-                                    PEEK_BYTE(state, p); 
+                                    uint8_t p;
+                                    PEEK_BYTE(state, p);
                                     if ( p == 0 ) READ_BYTE(state, b);
                                     BUF_PRINTF("%-10s","stop");
-                                } 
-                                else if ( is8080() ) BUF_PRINTF("nop");                            
-                                else if ( is8085() ) BUF_PRINTF("%-10shl","sra");                            
-                                else BUF_PRINTF("%-10s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));                  
+                                }
+                                else if ( isvm1() ) { BUF_PRINTF("%-10s%s","andl", handle_register8(state, 6, opbuf1, sizeof(opbuf1))); }
+                                else if ( is8080() ) BUF_PRINTF("nop");
+                                else if ( is8085() ) BUF_PRINTF("%-10shl","sra");
+                                else BUF_PRINTF("%-10s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));
                             } else if ( y == 3 ) {
                                 if ( is8085() ) BUF_PRINTF("%-10s%s","rl","de");
+                                else if ( isvm1() ) BUF_PRINTF("%-10s%s,de", state->vm1_mb ? "sbc" : "sub", handle_hl(state->index));
                                 else if ( !is8080() ) { BUF_PRINTF("%-10s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1))); dolf=1; }
                                 else BUF_PRINTF("nop");
+                            } else if ( isvm1() ) {
+                                /* $20/$30 are the memory read-modify-write ops ORX/XRX;
+                                   $28 is the MB (memory bank) / CS (carry select) prefix,
+                                   $38 the RS (alternate H'L' register set) prefix. */
+                                if ( y == 4 ) { BUF_PRINTF("%-10s%s","orl", handle_register8(state, 6, opbuf1, sizeof(opbuf1))); }
+                                else if ( y == 6 ) { BUF_PRINTF("%-10s%s","xorl", handle_register8(state, 6, opbuf1, sizeof(opbuf1))); }
+                                else if ( y == 5 ) {
+                                    uint8_t nb;
+                                    PEEK_BYTE(state, nb);
+                                    /* $28 $00 and $28 $7f are the SMF0/SMF1 bank-select ops */
+                                    if ( nb == 0x00 || nb == 0x7f ) {
+                                        READ_BYTE(state, nb);
+                                        BUF_PRINTF("%-10s", nb == 0 ? "smf0" : "smf1");
+                                    } else if ( state->vm1_mb || nb == 0x28 ) {
+                                        BUF_PRINTF("%-10s$%02x","defb",b);
+                                    } else {
+                                        uint8_t op;
+                                        /* an RS prefix may sit between us and the opcode */
+                                        PEEK_BYTE_OFFS(state, nb == 0x38 ? 1 : 0, op);
+                                        state->vm1_mb = 1;
+                                        if ( !vm1_is_cs_opcode(op) ) BUF_PRINTF("mb ");
+                                        continue;
+                                    }
+                                } else { /* y == 7 */
+                                    uint8_t nb;
+                                    PEEK_BYTE(state, nb);
+                                    if ( state->index || nb == 0x38 ) BUF_PRINTF("%-10s$%02x","defb",b);
+                                    else {
+                                        state->index = 3;
+                                        continue;
+                                    }
+                                }
                             } else if ( is8085() ) {
                                 if ( y == 4 ) BUF_PRINTF("%-10s","rim");
                                 else if ( y == 5 ) BUF_PRINTF("%-10sde,hl+%s","ld", handle_immed8(state, opbuf2, sizeof(opbuf2)));
@@ -631,7 +685,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                if ( isez80() && y == 6 && state->index )
                                    BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_hl(state->index == 1 ? 2 : 1), handle_register8(state, 6, opbuf1, sizeof(opbuf1)));
                                else BUF_PRINTF("%-10s%s,%s",handle_ez80_am(state, "ld"), handle_register16(state, p,state->index), handle_immed16(state, opbuf1, sizeof(opbuf1)));
-                           } else BUF_PRINTF("%-10s%s%s,%s", handle_ez80_am(state,"add"), handle_kc_prefix(state->kc_prefix),handle_hl(state->index), handle_register16(state, p, state->index));
+                           } else BUF_PRINTF("%-10s%s%s,%s", handle_ez80_am(state,state->vm1_mb ? "adc" : "add"), handle_kc_prefix(state->kc_prefix),handle_hl(state->index), handle_register16(state, p, state->index));
                             break;
                         case 2:
                             if ( q == 0 ) {
@@ -869,12 +923,15 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         }
                         handle_register8(state, y, opbuf1, sizeof(opbuf1));
                         handle_register8(state, z, opbuf2, sizeof(opbuf2));
-                        if ( y == 6) {
-                            state->index = 0;
-                            handle_register8(state, z, opbuf2, sizeof(opbuf2));
-                        } else if ( z == 6 ) {
-                            state->index = 0;
-                            handle_register8(state, y, opbuf1, sizeof(opbuf1));  
+                        /* `ld (ix+d),h` takes the REAL h - he VM1 RS index 3 takes the h' form */
+                        if ( state->index != 3 ) {
+                            if ( y == 6) {
+                                state->index = 0;
+                                handle_register8(state, z, opbuf2, sizeof(opbuf2));
+                            } else if ( z == 6 ) {
+                                state->index = 0;
+                                handle_register8(state, y, opbuf1, sizeof(opbuf1));
+                            }
                         }
                         BUF_PRINTF("%-10s%s,%s", y == 6 || z == 6 ? handle_ez80_am(state,"ld") : "ld", opbuf1, opbuf2);
                     }
@@ -945,7 +1002,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         else if ( q == 1 ) {
                             if ( p == 0 ) { BUF_PRINTF("%-10s", handle_ez80_am(state,"ret")); dolf=1; }
                             else if ( p == 1 && is8080() ) BUF_PRINTF("nop");
-                            else if ( p == 1 && is8085() ) BUF_PRINTF("%-10s(de),hl","ld");
+                            else if ( p == 1 && (is8085() || isvm1()) ) BUF_PRINTF("%-10s(de),%s","ld", handle_hl(state->index));
                             else if ( p == 1 && !isgbz80() ) BUF_PRINTF("exx");
                             else if ( p == 1 && isgbz80() ) { BUF_PRINTF("reti"); dolf=1; }
                             else if ( p == 2 ) {BUF_PRINTF("%-10s(%s%s)",handle_ez80_am(state,"jp"),handle_kc_prefix(state->kc_prefix),handle_register16(state, 2, state->index)); dolf = 1; }
@@ -963,6 +1020,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                     } else if  ( z == 3 ) {
                         if ( y == 0 ) { BUF_PRINTF("%-10s%s", handle_ez80_am(state,"jp"), handle_addr16(state, opbuf1, sizeof(opbuf1))); dolf=1; }
                         else if ( y == 1 && is8085() ) BUF_PRINTF("%-10sv,$0040","rst");
+                        else if ( y == 1 && isvm1() ) BUF_PRINTF("%-10s%s,bc", state->vm1_mb ? "cpc" : "cp", handle_hl(state->index));
                         else if ( y == 1 && is8080() ) BUF_PRINTF("nop");
                         else if ( y == 1 ) {
                             state->prefix = 0xcb;
@@ -1047,7 +1105,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                             if ( state->index && israbbit4k() ) BUF_PRINTF("%-10s%s,%s","ld",r4k_32b_table[state->index-1], r4k_ps_table[p]);
                             else if ( p == 0 ) BUF_PRINTF("%-10s%s", handle_ez80_am(state,"call"), handle_addr16(state, opbuf1, sizeof(opbuf1)));
                             else if ( p == 1 && is8085() ) BUF_PRINTF("%-10snk,%s", handle_ez80_am(state,"jp"),handle_addr16(state, opbuf1, sizeof(opbuf1))    );
-                            else if ( p == 1 && canindex() ) { 
+                            else if ( p == 1 && isvm1() ) BUF_PRINTF("%-10s%s,de", state->vm1_mb ? "cpc" : "cp", handle_hl(state->index));
+                            else if ( p == 1 && canindex() ) {
                                 uint8_t pk;
                                 PEEK_BYTE(state, pk);
                                 if ( (pk == 0xdd || pk == 0xfd) && !israbbit()) {
@@ -1057,7 +1116,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     continue; 
                                 }
                             }
-                            else if ( p == 2 && is8085() ) BUF_PRINTF("%-10shl,(de)","ld");
+                            else if ( p == 2 && (is8085() || isvm1()) ) BUF_PRINTF("%-10s%s,(de)","ld", handle_hl(state->index));
                             else if ( p == 2 && canindex() ) { // 0xED page
                                 READ_BYTE(state, b);
                                 uint8_t x = b >> 6;
@@ -1359,6 +1418,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                 }
                             }
                             else if ( p == 3 && is8085() ) BUF_PRINTF("%-10sk,%s", "jp",handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                            /* JOF - jump if the VM1's overflow flag (PSW bit 5) is set */
+                            else if ( p == 3 && isvm1() ) BUF_PRINTF("%-10sof,%s", "jp",handle_addr16(state, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");                            
                         }
                     } else if ( z == 6 ) {

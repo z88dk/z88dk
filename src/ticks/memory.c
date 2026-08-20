@@ -31,6 +31,7 @@ static void     msx_handle_out(int port, int value);
 static int      msx_handle_in(int port);
 
 static unsigned char *mem;
+static unsigned char *vm1_bank1;
 static unsigned char  zxnext_mmu[8] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 static unsigned char *zxn_banks[256];
 
@@ -170,9 +171,12 @@ static void z180_init(void)
 
 
 // Standard, 64k flat address space
-static void standard_init(void) 
+static void standard_init(void)
 {
     mem = calloc(65536, 1);
+    /* The KR580VM1 has a second 64k bank that holds data only - instructions
+       are always fetched from the main bank. */
+    if ( isvm1() ) vm1_bank1 = calloc(65536, 1);
     get_mem_addr = standard_get_memory_addr;
 }
 
@@ -181,6 +185,9 @@ static uint8_t *standard_get_memory_addr(uint32_t pc, memtype type)
 {
   int segment = pc / 8192;
   pc &= 0xffff;
+
+  if ( vm1_bank1 && type == MEM_TYPE_DATA && vm1_bank_select() )
+    return &vm1_bank1[pc];
 
   return &mem[pc & 65535];
 }

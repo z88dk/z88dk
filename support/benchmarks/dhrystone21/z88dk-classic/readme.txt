@@ -28,6 +28,12 @@ This simplifies the use of TICKS for timing.
 new/zsdcc
 zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DTIMER -D__Z88DK dhry_1.c dhry_2.c -o dhry.bin -m -lndos
 
+classic/80cc
+zcc +test -compiler=80cc -vn -fframe-pointer -O2 -DTIMER -D__Z88DK -DNOSTRUCTASSIGN dhry_1.c dhry_2.c -o dhry.bin -m -lndos
+# Z80 80cc: -fframe-pointer (IX).
+# 80cc needs -DNOSTRUCTASSIGN (struct copy is unsupported).
+# TIMER is not published: the Run_Index loop exits immediately (~800 cycles).
+
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
 
@@ -45,11 +51,11 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK March 10, 2022
-classic/zsdcc #13131
-7882 bytes less page zero
+Z88DK August 16, 2026
+classic/zsdcc 4.6.0 #16639
+7852 bytes less page zero
 
-cycle count  = 251880052
-time @ 4MHz  = 251880052 / 4x10^6 = 62.97 seconds
-dhrystones/s = 20000 / 62.97 = 317.6115
-DMIPS        = 317.6115 / 1757 = 0.18077
+cycle count  = 246162688
+time @ 4MHz  = 246162688 / 4x10^6 = 61.54 seconds
+dhrystones/s = 20000 / 61.54 = 324.9883
+DMIPS        = 324.9883 / 1757 = 0.1850

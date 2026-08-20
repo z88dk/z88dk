@@ -96,6 +96,14 @@ int debuglevel;
  */
 int c_framepointer_is_ix;
 
+/* Platform-reserved index registers: when set, the compiler must not use that
+   index register for ANY residency (idx2/idx3/exx-adjacent/LRA-IY homes).
+   --reserve-regs-iy leaves at most one index register (IX); --reserve-regs-ix
+   (sp-mode) removes IX as the spare index register so, with the default
+   idx3/LRA off, no index register is used at all. */
+int c_reserve_iy = 0;
+int c_reserve_ix = 0;
+
 /* Keep one loop-invariant in the spare index register (the one NOT used as
    the frame pointer). Command-line settable (--idx2-invariant / --no-idx2-
    invariant); IR_NO_IDX2 in the environment forces off. Resolved per-CPU to

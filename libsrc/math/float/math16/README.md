@@ -3,11 +3,11 @@
 
 This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point maths package, designed to work with the SCCZ80 IEEE-754 half precision 16-bit interfaces.
   
-This library is designed for z80, z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation. This library is also designed to be as fast as possible on the z80 processor.
+This library is designed for z80, z180, z80n, and Intel 8085 processors. On z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n, hardware `16_8x8` multiply accelerates mantissa work. On 8085, CPU-specific cores live under `asm/8085/` (shared specials/coeffs under `asm/`) (no `exx`/IX/IY; stack frames for the second operand) and link as **`math16_8085.lib`** via `--math16` with `-clib=8085`.
 
-The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. Either the math48 (`-lm`) or the math32 (`--math32`) libraries must be used in conjunction with math16 (`--math16`) to provide stdio input and output capabilities.
+The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose maths library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example. There is **no stdio / printf / scanf / dtoa requirement** on the math16 product itself; apps that need float print may pair another float library (e.g. math32) for I/O only.
 
-*@feilipu, May 2020*
+*@feilipu, May 2020 / 8085 July 2026*
 
 ---
 
@@ -17,7 +17,9 @@ The specialised nature of 16-bit floating point implies that this is an adjunct 
 
   *  All the code is re-entrant.
 
-  *  Register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
+  *  Z80 family: register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
+
+ *  8085: no alternate register set; second f24 operand and temps on the **stack** only (`ld de,sp+*`, `ld hl,(de)`). Extended 8085 ops preferred. Library asm is not copt’d.
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
@@ -156,17 +158,25 @@ Normal functions `f16_`, assume the calling convention of sccz80 or sdcc dependi
 
 The library is laid out in these directories.
 
-### z80
+### asm/
 
-Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the IEEE-754 standard and various low level functions necessary to implement a float package accessible from assembly language.  These functions are the intrinsic `math16` functions.
+Shared portable pieces used by every CPU product: specials (`zero` / `inf` / `nan` / `neg` / `sigdig`) and polynomial coefficient tables (`coeff_f16_*`).
+
+### asm/z80/
+
+Z80-family cores (also assembled for z180 / z80n / r2ka / … where the same sources apply). Intrinsic half and f24 operations, expand/pack, poly, sqrt, compare, etc.
+
+### asm/8085/
+
+Intel 8085 cores only (`math16_8085.lib`). Same public entry names as the Z80 tree where the API matches; implementation is stack-based (no `exx` / IX / IY). See **CPU implementation strategies** below and `asm/8085/README`.
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math16_8085.lib`. Hand-written `cm16_sccz80_*.asm` bridges also live under `c/8085/`.
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm/z80` (or `asm/8085`) directory. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
 ### lm16
 
@@ -174,9 +184,44 @@ Glue that connects the compilers and standard assembly interface to the `math16`
 
 An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple command line alternative to `-lmath16 -Cc-D__MATH_MATH16 -D__MATH_MATH16`.
 
+## CPU implementation strategies
+
+Half and f24 **semantics** (bias, rounding sticky rules, specials at pack/expand) are shared. **Code paths are CPU-specific** — there is no single cross-CPU source for hot cores.
+
+| Area | Shared strategy | Z80-family | 8085 |
+|------|-----------------|------------|------|
+| **Half×half mul** (`asm_f16_mul_callee`) | Packed field extract; 11-bit mants; integer product; place (`>>5` / `>>6`+inc exp); pack via `asm_f16_f24` | `ex af,af` for sign; `srl`/`bit`/`set`; local Runer112 mulu with early-out entry for 11-bit and bit15-specialised entry for f24 | Sign on stack; open-coded logical EHL `>>`; one early-out `f16_8085_mulu_32_16x16` for both packed and f24 |
+| **f24 mul** (poly / inv / div / sqrt) | Left-aligned 16-bit mants; exp sum with bias 127; renorm + sticky | Alternate register set for second operand | Stack frame for second f24 (`ld de,sp+*`) |
+| **f24 div** (`asm_f16_div` / `asm_f24_div`) | Restoring 16×1-bit; prenorm if rem &lt; div; exp 0 → signed zero; specials via `asm_f24_zero` / `inf` / `nan` | rem `A:HL`, div `BC`, quot `DE`, count `B'` (`exx` + `djnz`) | rem `A:HL`, div `BC` (held), quot `DE`, count on stack (`dec (hl)`); labels match the z80 core |
+| **classify** (`asm_f16_classify`) | Packed half in `HL`; return 0 number / 1 zero / 2 nan / 3 inf | Shared `asm/asm_f16_classify.asm` (no f24 expand; AF only) | Same shared source |
+| **Expand** (`asm_f24_f16`) | Half → f24 | `rr hl` / `rra` path (cheaper on Z80) | Field extract + `add hl,hl` ×5 + implicit bit (no cheap 16-bit `rr`) |
+| **Pack** (`asm_f16_f24`) | f24 → half with low-bit rounding | `add hl,hl` for mant positioning | Same idea (`add hl,hl` ×3 + sign via A) |
+| **Add / compare / …** | Same algorithms | `exx`, native CB shifts | Stack second operand; open-coded shifts |
+
+Deliberate non-goals: one shared mul body for both CPUs; forcing Z80 expand into the 8085 field form (or the reverse) — each form is the cheaper expand on that ISA.
+
 ## Function Discussion
 
 There are essentially two different grades of functions in this library. Those intrinsic functions written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. And derived functions, written in assembly code in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values using the internal `_f24` format.
+
+### Intrinsic Assembly Functions
+
+```C
+half_t addf16 (half_t x, half_t y);
+half_t subf16 (half_t x, half_t y);
+half_t mulf16 (half_t x, half_t y);
+half_t divf16 (half_t x, half_t y);
+```
+
+#### _div()_
+
+```C
+half_t divf16 (half_t x, half_t y);
+```
+
+**`divf16` / `asm_f16_div`** is a **restoring** divider on the f24 path (z80 + 8085 cores). Result exp 0 underflows to signed zero (no subnormals; same policy as half exp==0 → ±0).
+
+Both cores use the same label set (`div_body`, `div_bit_loop`, `div_bit_fail`, `div_quot_shift`, `div_normed`, `div_zero` / `div_inf` / `div_nan`, …). The f24 mantissa is 16 bits, so the divisor stays in `BC` for the whole loop. The z80 core puts the step count in `B'` (`djnz`). The 8085 core keeps the count on the stack and updates it with `dec (hl)` so the hot path does not spill `AF` each bit. Specials call shared `asm_f24_zero`, `asm_f24_inf`, and `asm_f24_nan`.
 
 ### Derived Floating Point Functions
 
@@ -184,15 +229,13 @@ These functions are implemented in assembly language but they utilise the intrin
 
 The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `invf16()`, `fmaf16()` and the `polyf16()` functions.
 
-#### _div()_ and _inv()_
+#### _inv()_
 
 ```C
 half_t invf16 (half_t x);
-half_t divf16 (half_t x, half_t y);
 ```
-The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse. This can be used to advantage where a function requires only an inverse, this can be returned saving the multiplication associated with the divide.
 
-The Newton-Raphson method is used for finding the inverse, using full 16-bit expanded mantissa multiplies and adds for accuracy. Two N-R orthogonal iterations provide an accurate result for the IEEE-754 half float mantissa.
+**`invf16` / `asm_f16_inv`** remains Newton–Raphson on the expanded mantissa. Prefer divide for general `/` and for plain `1/n` (restoring div is faster than NR inv). sccz80 does not rewrite half/IEEE literal `1.0/x` to inv — that is ordinary divide. Keep explicit `invf16` for reciprocal-as-primitive / NR-based helpers.
 
 #### _sqrt()_ and _invsqrt()_
 
@@ -292,4 +335,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-

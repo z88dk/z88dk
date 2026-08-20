@@ -6,7 +6,7 @@
 header_t *__far __far_heap; // First free block, 0 if no free blocks.
 
 
-void sbrk_far(void *__far ptr, size_t len)
+void sbrk_far(void *__far ptr, size_t len) __z88dk_saveframe
 {
     header_t *__far n = ptr;
 

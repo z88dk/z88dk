@@ -11,18 +11,18 @@ PUBLIC    l_glongsp
    add	hl,sp
    inc hl
    inc hl
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
+   ld a,(hl+)
+   ld c,a
+   ld a,(hl+)
+   ld b,a
+   ld a,(hl+)
+   ld e,a
+   ld a,(hl+)
+   ld d,a
 
    pop  hl	;Return address
    push de
    push bc
    push hl
-   ld   h,b
-   ld   l,c
+   ld   hl,bc
    ret

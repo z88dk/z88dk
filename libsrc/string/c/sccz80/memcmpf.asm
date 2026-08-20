@@ -19,8 +19,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_Z180__ && !__CPU_RABBIT__ && !__CP
 
 .memcmpf
 ._memcmpf
-    ld      ix,2
-    add     ix,sp  
+    push    ix              ; preserve caller's IX (80cc fp frame pointer; also
+                            ; repurposed as the byte counter below)
+    ld      ix,4            ; +2 pushed IX +2 return address
+    add     ix,sp
     ld      c,(ix+2)
     ld      b,(ix+3)
     ld      e,(ix+4)    ; E'B'C'=s2
@@ -55,6 +57,7 @@ equal:
 return:
     ex      af,af'
     call    __far_end
+    pop     ix              ; restore caller's IX
     ret
 
 different:

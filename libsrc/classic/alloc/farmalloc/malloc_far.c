@@ -33,7 +33,7 @@
 #include "farmalloc.h"
 
 
-void *__far malloc_far(size_t size)
+void *__far malloc_far(size_t size) __z88dk_saveframe
 {
 	header_t *__far h;
 	header_t *__far * __far f;

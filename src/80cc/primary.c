@@ -150,13 +150,26 @@ int primary(LVALUE* lval)
              * this way and it's safer... we're not GNU after all!
              */
             if (!rcmatch('(')) {
-
-                errorfmt("Unknown symbol: %s", 1, sname);
+                /* Undeclared identifier used as a value. sccz80 accepts this and
+                   emits a reference to the assembler symbol, which the shipped
+                   library relies on: libsrc's tms9918 driver reads
+                   `_tms9918_sprite_attribute`, a PUBLIC declared only in
+                   vdp_variables.asm and never in any C header. Treating it as
+                   fatal left 80cc unable to build that code at all, so warn and
+                   recover exactly as sccz80 does — an implicit `extern int`.
+                   Silence with -Wno-implicit-variable-definition. */
+                warningfmt("implicit-variable-definition",
+                           "Implicit declaration of '%s', assuming extern int", sname);
                 lval->symbol = addglb(sname, type_int, ID_VARIABLE, KIND_INT, 0, EXTERNAL);
                 lval->ltype = type_int;
                 lval->val_type = KIND_INT;
                 lval->ptr_type = KIND_NONE;
                 lval->indirect_kind = KIND_NONE;
+                /* 80cc builds an AST, so the recovered symbol needs a node too
+                   — sccz80's recovery stops at the lval fields. Without it
+                   ir_build sees an operand-less expression ("OP_DEREF without
+                   operand"). */
+                lval->node = ast_global_var(lval->symbol, sname);
 	            return(1);
             } else {
                 /* assume it's a function we haven't seen yet */
@@ -361,11 +374,36 @@ void result(LVALUE* lval, LVALUE* lval2)
  * prestep - preincrement or predecrement lvalue
  */
 
+/* A BITFIELD ++/-- cannot be a step on the lvalue: by this point the member
+   access has folded to an ADDRESS expression (OP_ADD on the struct base), so
+   the step lands on the whole STORAGE UNIT. `unsigned rate:12` at 4095 then
+   carried straight into the neighbouring `flag:1`, and a field at a non-zero
+   bit offset would step by the wrong amount outright. lval->ltype still knows
+   it is a bitfield here, so rewrite the step as the compound assign `f += 1`
+   / `f -= 1`: that path takes rvalue() first, which yields the OP_DEREF
+   carrying bit_offset/bit_size, and re-inserts through emit_bitfield_store.
+
+   NOTE the value of a POST step becomes the value AFTER the step rather than
+   before. Every use in a statement (`f++;`) is unaffected, which is what the
+   miscompile was about; a POST bitfield step read as a value is off by one.
+   Returns 1 if it rewrote. */
+static int bitfield_step_rewrite(LVALUE *lval, int ast_type)
+{
+    if (!lval->ltype || lval->ltype->bit_size <= 0) return 0;
+    int add = (ast_type == OP_PRE_INC || ast_type == OP_POST_INC);
+    rvalue(lval);                       /* -> OP_DEREF carrying the bitfield */
+    lval->node = ast_binop(add ? OP_AADD : OP_ASUB, lval->node,
+                           ast_literal(type_int, 1));
+    if (lval->symbol) lval->symbol->isassigned = YES;
+    return 1;
+}
+
 void prestep(LVALUE* lval, int ast_type)
 {
     if (heira(lval) == 0) {
         needlval();
     } else {
+        if (bitfield_step_rewrite(lval, ast_type)) return;
         /* Wrap the lvalue in the pre-step uop and mark the symbol
            written; the IR emits the load/step/store. */
         lval->node = ast_uop(ast_type, lval->node);
@@ -383,6 +421,7 @@ void poststep(int k, LVALUE* lval, int ast_type)
     if (k == 0) {
         needlval();
     } else {
+        if (bitfield_step_rewrite(lval, ast_type)) return;
         /* Wrap the lvalue in the post-step uop and mark the symbol
            written; the IR emits the load/step/store/un-step. */
         lval->node = ast_uop(ast_type, lval->node);

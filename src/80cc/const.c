@@ -193,7 +193,7 @@ int number(LVALUE *lval)
        (x86 yields the integer-indefinite 0x8000…, ARM saturates to 0), which
        made the typing — and any signed-vs-logical const-fold keyed off it —
        host-dependent. Exclude KIND_LONGLONG: a full-width 64-bit constant
-       stays signed unless U-suffixed, matching sccz80 (so e.g.
+       stays signed unless U-suffixed (so e.g.
        `0x8000000000000000LL >> 1` arithmetic-shifts like the signed runtime). */
     if (!isunsigned && tok_base != 10 && minus >= 0
         && lval->val_type != KIND_LONGLONG) {
@@ -530,8 +530,80 @@ static Type *get_member(Type *tag)
 
 
 
+/* Exponent limits of the selected format, expressed the way
+   decompose_float() works: value = mantissa * 2^exp, mantissa in [0.5,1),
+   which is exactly frexp()'s convention.
+
+   *has_specials says whether the format reserves encodings for Inf/NaN.
+   Only the two IEEE layouts do; MBF, z88, AM9511 and the 48-bit z80 format
+   are plain sign/exponent/mantissa with every exponent value meaning a
+   finite number, so a special has nowhere to go. */
+static void fp_format_limits(enum maths_mode mode, int *min_exp, int *max_exp,
+                             int *has_specials)
+{
+    switch ( mode ) {
+    case MATHS_IEEE:                       /* 8-bit exp, bias 126, 255 reserved */
+        *min_exp = -125; *max_exp = 128; *has_specials = 1; break;
+    case MATHS_IEEE16:                     /* 5-bit exp, bias 14, 31 reserved */
+        *min_exp = -13;  *max_exp = 16;  *has_specials = 1; break;
+    case MATHS_Z88:                        /* 8-bit exp, bias 127, 0 means zero */
+        *min_exp = -126; *max_exp = 128; *has_specials = 0; break;
+    case MATHS_AM9511:                     /* 7-bit two's-complement exp, bias 0 */
+        *min_exp = -64;  *max_exp = 63;  *has_specials = 0; break;
+    default:                               /* MBF32/40/64 and z80: bias 128 */
+        *min_exp = -127; *max_exp = 127; *has_specials = 0; break;
+    }
+}
+
 void dofloat(enum maths_mode mode,double raw, unsigned char fa[])
 {
+    int min_exp, max_exp, has_specials;
+
+    fp_format_limits(mode, &min_exp, &max_exp, &has_specials);
+
+    /* Range-check BEFORE decomposing. decompose_float() derives the exponent
+       from log(x)/log(2) and stores it in a uint8_t, so an Inf gives (int)inf
+       and a NaN gives (int)NaN -- both undefined -- while a merely oversized
+       finite value wraps the exponent field. All three used to emit a
+       plausible-looking wrong number: in the default 48-bit format +Inf came
+       out as -0.25, NaN as 0.5, and 3.4e38 as 0. */
+    if ( isnan(raw) || isinf(raw) ) {
+        if ( !has_specials ) {
+            errorfmt("%s cannot be represented in the selected floating point format",
+                     0, isnan(raw) ? "Not-a-number" : "Infinity");
+            raw = 0.0;
+        }
+        /* IEEE formats: the encoders below emit the reserved pattern. */
+    } else if ( raw != 0.0 ) {
+        int e;
+
+        frexp(fabs(raw), &e);
+        if ( e > max_exp ) {
+            if ( has_specials ) {
+                raw = raw < 0 ? -INFINITY : INFINITY;   /* IEEE overflow */
+            } else {
+                errorfmt("Floating point constant overflows the selected floating point format",
+                         0);
+                raw = 0.0;
+            }
+        } else if ( e == min_exp - 1 ) {
+            /* One exponent below the minimum is a ROUNDING case, not an
+               underflow: with the mantissa in [0.5,1) such a value is at least
+               half the smallest representable, so round-to-nearest takes it UP
+               to that value rather than to zero. Flushing it instead breaks the
+               formats' own "smallest positive" macros -- TINY_POS_AM9511 is
+               written 2.7e-20 for a true minimum of 2^-65 = 2.7105e-20, and
+               zeroing it turned the math suite's epsilon into 0, so every
+               approximate comparison failed. No diagnostic: the value is
+               representable to within one rounding step. */
+            raw = raw < 0 ? -ldexp(0.5, min_exp) : ldexp(0.5, min_exp);
+        } else if ( e < min_exp ) {
+            warningfmt("fp-range",
+                       "Floating point constant underflows the selected floating point format; using zero");
+            raw = 0.0;
+        }
+    }
+
     switch ( mode ) {
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);

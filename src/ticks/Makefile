@@ -1,6 +1,6 @@
 include ../Make.common
 
-OBJS = ticks.o rxk_inst.o r4k_inst.o i8085_inst.o z80n_inst.o gbz80_inst.o \
+OBJS = ticks.o rxk_inst.o r4k_inst.o i8085_inst.o vm1_inst.o z80n_inst.o gbz80_inst.o \
 	r800_inst.o z180_inst.o zilog_inst.o ez80_inst.o kc160_inst.o cpu.o backend.o \
 	hook_cpm.o hook_console.o hook_io.o hook_misc.o hook.o debugger.o breakpoints.o \
 	profiler.o exp_engine.o debugger_ticks.o linenoise.o utf8.o syms.o \

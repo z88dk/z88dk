@@ -84,16 +84,26 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
            specifiers into printf_format_option / scanf_format_option
            which main.c emits as `defc CRT_printf_format` etc. to
            drive the link-time printf/scanf variant selection. */
-        if (argnumber == watcharg) {
+        /* Only a STRING-LITERAL format carries a compile-time-known format: its
+           litq byte offset is the AST_STR_LIT node's `zval` (== val), so
+           litq+val+1 is the format text. For a non-literal format (a `char *`
+           variable) `val` is not a litq offset — the format is unknowable, so we
+           skip it entirely and contribute nothing to the variant selection.
+           (Scanning litq+val+1 on a non-literal used to read uninitialised
+           literal-queue memory: nondeterministic codegen.) The conversions
+           actually needed are almost always requested by the literal format
+           strings elsewhere in the program, so the literals pick the right
+           printf/scanf variant and the non-literal call rides it. */
+        if (argnumber == watcharg
+            && pair->node && pair->node->ast_type == AST_STR_LIT) {
             uint32_t format_option = 0;
             if (ptr)
                 debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
             minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
-            if (isscanf) {
+            if (isscanf)
                 scanf_format_option |= format_option;
-            } else {
+            else
                 printf_format_option |= format_option;
-            }
         }
 
         if (cmatch(',') == 0)

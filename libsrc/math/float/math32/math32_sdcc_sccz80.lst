@@ -6,8 +6,13 @@ math/float/math32/c/sdcc/cm32_sdcc___fs2uint
 math/float/math32/c/sdcc/cm32_sdcc___fs2uint_callee
 math/float/math32/c/sdcc/cm32_sdcc___fs2ulong
 math/float/math32/c/sdcc/cm32_sdcc___fs2ulong_callee
+math/float/math32/c/sdcc/cm32_sdcc___fseq
 math/float/math32/c/sdcc/cm32_sdcc___fseq_callee
+math/float/math32/c/sdcc/cm32_sdcc___fsgt
+math/float/math32/c/sdcc/cm32_sdcc___fsgt_callee
+math/float/math32/c/sdcc/cm32_sdcc___fslt
 math/float/math32/c/sdcc/cm32_sdcc___fslt_callee
+math/float/math32/c/sdcc/cm32_sdcc___fsneq
 math/float/math32/c/sdcc/cm32_sdcc___fsneq_callee
 math/float/math32/c/sdcc/cm32_sdcc___schar2fs
 math/float/math32/c/sdcc/cm32_sdcc___schar2fs_callee

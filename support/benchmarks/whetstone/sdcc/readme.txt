@@ -47,20 +47,20 @@ TIMING
 ======
 
 sdcc -mz80 -DTIMER --max-allocs-per-node200000 whetstone.c -o whetstone.ihx
-hex2bin whetstone.ihx
+makebin -p whetstone.ihx whetstone.bin
 
-TIMER_START = 0x0232
+TIMER_START = 0x21a
    0x010 (TIMER_START in whetstone.sym) -
    0x000 (_main in whetstone.sym) +
    0x20a (_main in whetstone.map)
 
-TIMER_STOP = 0x0bde
+TIMER_STOP = 0x9ca
    0x9d4 (TIMER_STOP in whetstone.sym) -
    0x000 (_main in whetstone.sym) +
    0x20a (_main in whetstone.map)
 
-SIZE = 10935 bytes
-   7897 (_CODE in whetstone.map) +
+SIZE = 10364 bytes
+   7076 (_CODE in whetstone.map) +
    3    (_HEADER0 in whetstone.map) +
    3    (_HEADER1 in whetstone.map) +
    3    (_HEADER2 in whetstone.map) +
@@ -69,15 +69,15 @@ SIZE = 10935 bytes
    3    (_HEADER5 in whetstone.map) +
    3    (_HEADER6 in whetstone.map) +
    3    (_HEADER7 in whetstone.map) +
-   12   (_HEADER8 in whetstone.map) +
-   2924 (_HOME in whetstone.map) +
+   16   (_HEADER8 in whetstone.map) +
+   3170 (_HOME in whetstone.map) +
    37   (_GSINIT in whetstone.map) +
    1    (_GSFINAL in whetstone.map) +
    40   (_DATA in whetstone.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks whetstone.bin -start 021a -end 0bde -counter 9999999999
+z88dk-ticks whetstone.bin -start 021a -end 09ca -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -89,11 +89,11 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 Linux
+SDCC 4.6.0 #16608 Linux
 24 bit mantissa + 8 bit exponent
-10935 bytes less page zero
+10364 bytes less page zero
 
-cycle count  = 1491668242
-time @ 4MHz  = 1491668242 / 4x10^6 = 372.9170 seconds
-KWIPS        = 100*10*1 / 372.9170 = 2.6816
-MWIPS        = 2.6816 / 1000 = 0.0026816
+cycle count  = 1850296726
+time @ 4MHz  = 1850296726 / 4x10^6 = 462.5742 seconds
+KWIPS        = 100*10*1 / 462.5742 = 2.1618
+MWIPS        = 2.1618 / 1000 = 0.0021618

@@ -56,6 +56,20 @@ Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
 
 
+CLASSIC Z80 / 8085 SUMMARY — PI.C (no ldiv)
+===========================================
+
+Timer-bounded classic +test. Full archive: z88dk-classic/readme.txt.
+
+Compiler | CPU  | Ticks
+---------|------|----------------
+sccz80   | z80  | 1_992_348_390  (Aug 19, 2026)
+sccz80   | 8085 | 1_922_636_057  (Aug 19, 2026)
+80cc     | z80  | 2_229_596_893  (Aug 19, 2026)
+80cc     | 8085 | 1_979_531_647  (Aug 19, 2026)
+zsdcc    | z80  | 4_012_863_322  (Aug 16, 2026)
+
+
 RESULTS - PI.C (NO LDIV)
 ========================
 
@@ -68,12 +82,12 @@ cycle count  = 1766815709
 time @ 4MHz  = 1766815709 / 4*10^6 =  7 min 22 sec
 
 2.
-Z88DK April 4, 2022
-zsdcc #13131 / new c library / fast int math
-9049 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / fast int math
+9021 bytes less page zero
 
-cycle count  = 1736106244
-time @ 4MHz  = 1736106244 / 4*10^6 =  7 min 14 sec
+cycle count  = 1740634644
+time @ 4MHz  = 1740634644 / 4*10^6 =  7 min 15 sec
 
 3.
 Z88DK April 4, 2022
@@ -84,28 +98,28 @@ cycle count  = 4028061102
 time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 4.
-Z88DK April 4, 2022
-zsdcc #13131 / new c library / small int math
-6299 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / small int math
+6298 bytes less page zero
 
-cycle count  = 4011979932
-time @ 4MHz  = 4011979932 / 4*10^6 = 16 min 43 sec
+cycle count  = 4010854332
+time @ 4MHz  = 4010854332 / 4*10^6 =  16 min 43 sec
 
 5.
-Z88DK April 4, 2022
-zsdcc #13131 / classic c library
-7146 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / classic c library
+7175 bytes less page zero
 
-cycle count  = 4013954322
-time @ 4MHz  = 4013954322 / 4*10^6 = 16 min 43 sec
+cycle count  = 4012863322
+time @ 4MHz  = 4012863322 / 4*10^6 =  16 min 43 sec
 
 6.
-Z88DK April 4, 2022
+Z88DK August 19, 2026
 sccz80 / classic c library
-7154 bytes less page zero
+7252 bytes less page zero
 
-cycle count  = 4028061102
-time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
+cycle count  = 1992348390
+time @ 4MHz  = 1992348390 / 4*10^6 =  8 min 18 sec
 
 7.
 HITECH C MSDOS V780pl2
@@ -122,11 +136,11 @@ cycle count  = 5532347800
 time @ 4MHz  = 5532347800 / 4*10^6 = 23 min 03 sec
 
 9.
-SDCC 4.2.0 Linux
-6591 bytes less page zero
+SDCC 4.6.0 #16608 Linux
+6598 bytes less page zero
 
-cycle count  = 6649404381
-time @ 4MHz  = 6649404381 / 4*10^6 = 27 min 42 sec
+cycle count  = 7218092827
+time @ 4MHz  = 7218092827 / 4*10^6 = 30 min 05 sec
 
 SDCC implements its 32-bit math in C.
 
@@ -140,12 +154,26 @@ time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
 It looks like IAR implements its 32-bit math in C.
 
 11.
-Z88DK December 12, 2022
+Z88DK August 19, 2026
 sccz80 / classic c library / 8085 CPU
-7335 bytes less page zero
+7390 bytes less page zero
 
-cycle count  = 7824146079
-time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
+cycle count  = 1922636057
+time @ 4MHz  = 1922636057 / 4*10^6 =  8 min  1 sec
+
+Z88DK August 19, 2026
+80cc / classic c library
+7718 bytes less page zero
+
+cycle count  = 2229596893
+time @ 4MHz  = 2229596893 / 4*10^6 =  9 min 17 sec
+
+Z88DK August 19, 2026
+80cc / classic c library / 8085 CPU
+7639 bytes less page zero
+
+cycle count  = 1979531647
+time @ 4MHz  = 1979531647 / 4*10^6 =  8 min 15 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
@@ -159,12 +187,12 @@ cycle count  = 1358535133
 time @ 4MHz  = 1358535133 / 4*10^6 =  5 min 39 sec
 
 2.
-Z88DK April 4, 2022
-zsdcc #13131 / new c library / fast int math
-9123 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / fast int math
+9109 bytes less page zero
 
-cycle count  = 1316559068
-time @ 4MHz  = 1316559068 / 4*10^6 =  5 min 29 sec
+cycle count  = 1312921068
+time @ 4MHz  = 1312921068 / 4*10^6 =  5 min 28 sec
 
 3.
 Z88DK April 4, 2022
@@ -175,12 +203,12 @@ cycle count  = 2578767150
 time @ 4MHz  = 2578767150 / 4*10^6 = 10 min 45 sec
 
 4.
-Z88DK April 4, 2022
-zsdcc #13131 / new c library / small int math
-6391 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / small int math
+6395 bytes less page zero
 
-cycle count  = 2551419380
-time @ 4MHz  = 2551419380 / 4*10^6 = 10 min 38 sec
+cycle count  = 2563247380
+time @ 4MHz  = 2563247380 / 4*10^6 =  10 min 41 sec
 
 5.
 HITECH C MSDOS V780pl2

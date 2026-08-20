@@ -84,6 +84,10 @@ static void DispInfo(option *arg, char *val);
 static void opt_code_speed(option *arg, char* val);
 static void atexit_deallocate(void);
 
+/* Swallowed no-op flags: options meaningful only to the sdcc/80cc backends
+   (e.g. from the --math-cpc alias) that sccz80 must accept and ignore rather
+   than reject as unknown. */
+static int c_ignored_flag;
 
 static option  sccz80_opts[] = {
     { 'v', "verbose", OPT_BOOL, "Be verbose", &c_verbose, NULL, 0 },
@@ -105,6 +109,8 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "Code generation options", NULL, NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, NULL, 0 },
     { 0, "disable-builtins", OPT_BOOL|OPT_DOUBLE_DASH, "Disable builtin functions",&c_disable_builtins, NULL, 0},
+    { 0, "reserve-regs-iy", OPT_BOOL|OPT_DOUBLE_DASH, "(ignored) sdcc/80cc register-reservation flag", &c_ignored_flag, NULL, 0},
+    { 0, "reserve-regs-ix", OPT_BOOL|OPT_DOUBLE_DASH, "(ignored) sdcc/80cc register-reservation flag", &c_ignored_flag, NULL, 0},
     { 0, "params-offset", OPT_INT, "=<num> Base offset for the function parameters (default: 2)",&c_params_offset,NULL, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, NULL, 0 },
     { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, NULL, MATHS_Z88 },

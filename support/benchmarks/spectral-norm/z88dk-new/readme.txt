@@ -54,23 +54,32 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-3358 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library
+3353 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8628617805
-time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
+cycle count  = 8624203411
+time @ 4MHz  = 8624203411 / 4*10^6 =  35 min 56 sec
 
-Z88DK July 4, 2021
-zsdcc #12419 / new c library / math32
-5453 bytes less page zero
+Z88DK August 16, 2026
+zsdcc 4.6.0 #16639 / new c library / math32
+5293 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9947615066
-time @ 4MHz  = 9947615066 / 4*10^6 = 41 min 27 sec
+cycle count  = 4471074620
+time @ 4MHz  = 4471074620 / 4*10^6 =  18 min 38 sec
+
+Z88DK August 15, 2026
+sccz80 / new c library / math32
+5161 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 4247660135
+time @ 4MHz  = 4247660135 / 4*10^6 =  17 min 42 sec
 
 Z88DK April 20, 2020
 sccz80 / new c library

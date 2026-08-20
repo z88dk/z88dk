@@ -19,8 +19,13 @@
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()     intrinsic_label(TIMER_START)
-   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+   #ifdef __80CC
+      #define TIMER_START()     __asm__("TIMER_START:")
+      #define TIMER_STOP()      __asm__("TIMER_STOP:")
+   #else
+      #define TIMER_START()     intrinsic_label(TIMER_START)
+      #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+   #endif
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -35,6 +40,11 @@
    #endif
 #endif
 
+#ifdef __MATH_MATH16
+    #define DOUBLE          _Float16
+#else
+    #define DOUBLE          double
+#endif
 
 #include <math.h>
 #include <stdio.h>
@@ -45,9 +55,9 @@
 #define days_per_year 365.24
 
 struct planet {
-  double x, y, z;
-  double vx, vy, vz;
-  double mass;
+  DOUBLE x, y, z;
+  DOUBLE vx, vy, vz;
+  DOUBLE mass;
 };
 
 /*
@@ -59,8 +69,8 @@ void advance(int nbodies, struct planet * bodies)
 {
   STATIC int i, j;
   STATIC struct planet *b, *b2;
-  STATIC double dx, dy, dz;
-  STATIC double inv_distance, mag;
+  STATIC DOUBLE dx, dy, dz;
+  STATIC DOUBLE inv_distance, mag;
 
   for (i = 0; i < nbodies; i++) {
     b = &(bodies[i]);
@@ -69,7 +79,11 @@ void advance(int nbodies, struct planet * bodies)
       dx = b->x - b2->x;
       dy = b->y - b2->y;
       dz = b->z - b2->z;
+#ifdef __MATH_MATH16
+      inv_distance = invsqrtf16(dx * dx + dy * dy + dz * dz);
+#else
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
+#endif
       mag = inv_distance * inv_distance * inv_distance;
       b->vx -= dx * b2->mass * mag;
       b->vy -= dy * b2->mass * mag;
@@ -87,13 +101,13 @@ void advance(int nbodies, struct planet * bodies)
   }
 }
 
-double energy(int nbodies, struct planet * bodies)
+DOUBLE energy(int nbodies, struct planet * bodies)
 {
-  STATIC double e;
+  STATIC DOUBLE e;
   STATIC int i, j;
   STATIC struct planet *b, *b2;
-  STATIC double dx, dy, dz;
-  STATIC double distance;
+  STATIC DOUBLE dx, dy, dz;
+  STATIC DOUBLE distance;
 
   e = 0.0;
   for (i = 0; i < nbodies; i++) {
@@ -104,7 +118,11 @@ double energy(int nbodies, struct planet * bodies)
       dx = b->x - b2->x;
       dy = b->y - b2->y;
       dz = b->z - b2->z;
+#ifdef __MATH_MATH16
+      distance = sqrtf16(dx * dx + dy * dy + dz * dz);
+#else
       distance = sqrt(dx * dx + dy * dy + dz * dz);
+#endif
       e -= (b->mass * b2->mass) / distance;
     }
   }
@@ -113,7 +131,7 @@ double energy(int nbodies, struct planet * bodies)
 
 void offset_momentum(int nbodies, struct planet * bodies)
 {
-  STATIC double px, py, pz;
+  STATIC DOUBLE px, py, pz;
   STATIC int i;
   
   px = py = pz = 0.0;
@@ -170,7 +188,11 @@ struct planet bodies[NBODIES] = {
   }
 };
 
+#ifdef __MATH_MATH16
+#define DT 1e-1         /* otherwise calculation exceeds half_t range */
+#else
 #define DT 1e-2
+#endif
 #define RECIP_DT (1.0/DT)
 
 /*
@@ -179,7 +201,7 @@ struct planet bodies[NBODIES] = {
  *
  * When all advances done, rescale bodies back to obtain correct energy.
  */
-void scale_bodies(int nbodies, struct planet * bodies, double scale) {
+void scale_bodies(int nbodies, struct planet * bodies, DOUBLE scale) {
     STATIC int i;
 
     for (i = 0; i < nbodies; i++) {

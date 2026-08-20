@@ -157,7 +157,7 @@ static const char *unquote_file(const char *file, char *buf, size_t n)
     return buf;
 }
 
-/* Echo the offending source line (gcc-style), indented, to stderr. The
+/* Echo the offending source line, indented, to stderr. The
    node filenames are the original sources (same as C_LINE), so this opens
    the real .c — best-effort, silent on any error. */
 static void build_fail_show_src(const char *file, int line)
@@ -186,7 +186,7 @@ static int build_fail(const char *fmt, ...)
     const char *file = unquote_file(cur_node_file, path, sizeof path);
     va_list ap;
     va_start(ap, fmt);
-    /* Lead with `file:line:` (gcc-style) so editors / make output scanners
+    /* Lead with `file:line:` so editors / make output scanners
        pick it up; the ir_build tag + function follow the `error:` keyword. */
     if (file && cur_node_line > 0)
         fprintf(stderr, "%s:%d: error: ir_build: [%s] ",
@@ -219,6 +219,8 @@ static int build_cast(Builder *b, Node *n);
 static int build_cond(Builder *b, Node *n, int true_bb, int false_bb);
 static int build_muldiv_integer(Builder *b, Node *n);
 static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k);
+static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
+                                    Kind dst_k, int dst_w, int dst_uns);
 static int init_typed_region(Builder *b, int base, int off,
                              Type *t, Node *init, int *budget);
 
@@ -368,7 +370,7 @@ static int is_acc_float_kind(Kind k)
    array index (`arr[i]`) and pointer deref (`*p`) — by recovering the
    namespace from the pointee/element type and stamping the page-in fn onto
    MemOp.bank_fn, which the lowerer pages on at the IR_MEM_VREG access
-   (matching sccz80, which pages for all of these). Only taking the ADDRESS
+   (all of these page a value in). Only taking the ADDRESS
    of a namespaced symbol (`&g`) still bails — the namespace escapes into a
    plain pointer whose later deref site can't recover it. */
 static int sym_is_namespaced(const SYMBOL *sym)
@@ -387,12 +389,60 @@ static const char *type_or_pointee_ns(const Type *t)
 /* Page-in (bank) function for an indirect access through a deref/index
    node `n`: the value type (n->type) carries the namespace, or it lives on
    the pointer operand's pointee type. NULL for the default space. */
+/* True iff `operand` is the live union member for this node kind — i.e. it is
+   a deref whose pointer operand we may follow. `operand` aliases left/args/
+   label/zval in node_s's union, so reading it on a non-deref node (e.g. an
+   AST_FUNC_CALL lvalue like `reg_align(p,0)[0] = x`, where the slot holds
+   `args`) yields a bogus Node* — dereferencing it crashes. */
+static int node_is_deref(const Node *n)
+{
+    return n && (n->ast_type == OP_DEREF || n->ast_type == AST_DEREF);
+}
+
+/* Translate a __preserves_regs PRESERVE_* set into an IR RegMask. A 16-bit
+   home register (BC/DE/HL) is treated as preserved only when BOTH halves are
+   listed — a half-preserved pair can't safely hold a whole value across the
+   call. A/IX/IY map directly. F is not a value-residency register. */
+static RegMask preserve_to_regmask(uint16_t p)
+{
+    RegMask m = 0;
+    if (p & PRESERVE_A) m |= IR_R_A;
+    if ((p & PRESERVE_B) && (p & PRESERVE_C)) m |= IR_R_BC;
+    if ((p & PRESERVE_D) && (p & PRESERVE_E)) m |= IR_R_DE;
+    if ((p & PRESERVE_H) && (p & PRESERVE_L)) m |= IR_R_HL;
+    if (p & PRESERVE_IX) m |= IR_R_IX;
+    if (p & PRESERVE_IY) m |= IR_R_IY;
+    return m;
+}
 static const SYMBOL *deref_bank_fn(const Node *n)
 {
     const char *ns = n ? type_or_pointee_ns(n->type) : NULL;
-    if (!ns && n && n->operand)
+    if (!ns && node_is_deref(n) && n->operand)
         ns = type_or_pointee_ns(n->operand->type);
     return ns ? ir_namespace_bank_fn(ns) : NULL;
+}
+
+/* True if a type is volatile-qualified, or (for a pointer type) points to a
+   volatile object. */
+static int type_or_pointee_volatile(const Type *t)
+{
+    if (!t) return 0;
+    if (t->isvolatile) return 1;
+    if (t->ptr && t->ptr->isvolatile) return 1;
+    return 0;
+}
+/* True if an indirect access through deref/index node `n` touches a volatile
+   object: the value type (n->type) carries it, or it lives on the pointer
+   operand's pointee type. Mirrors deref_bank_fn's navigation. Marks
+   op->mem.volatile_ so ir_match/ir_opt won't fuse the access and the lowerer
+   stamps it (copt won't elide a volatile load/store). */
+static int deref_is_volatile(const Node *n)
+{
+    if (!n) return 0;
+    if (type_or_pointee_volatile(n->type)) return 1;
+    if (node_is_deref(n) && n->operand
+        && type_or_pointee_volatile(n->operand->type)) return 1;
+    return 0;
 }
 
 /* A __far pointer (KIND_CPTR): every access through it routes via an
@@ -571,7 +621,7 @@ static const char *acc_name(const char *stem)
     if (!strcmp(stem, "ge"))       return f64 ? "l_f64_ge"  : "dge";
     if (!strcmp(stem, "eq"))       return f64 ? "l_f64_eq"  : "deq";
     if (!strcmp(stem, "ne"))       return f64 ? "l_f64_ne"  : "dne";
-    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_neg"    : "minusfa";
+    if (!strcmp(stem, "neg"))      return f64 ? "l_f64_negate" : "minusfa";
     if (!strcmp(stem, "ftof16"))   return f64 ? "l_f64_ftof16" : "l_f48_ftof16";
     if (!strcmp(stem, "f16tof"))   return f64 ? "l_f64_f16tof" : "l_f48_f16tof";
     if (!strcmp(stem, "sint2f"))   return f64 ? "l_f64_sint2f"  : "l_int2long_s_float";
@@ -611,7 +661,6 @@ static const char *float_helper(Kind k, const char *base)
         { "f2ulong", "l_f16_f2ulong", "l_f32_f2ulong" },
         { "ftof16",  NULL,            "l_f32_ftof16"  },
         { "f16tof",  NULL,            "l_f32_f16tof"  },
-        { "invf",    "l_f16_invf",    "l_f32_invf"    },
         { NULL, NULL, NULL }
     };
     int is16 = (k == KIND_FLOAT16);
@@ -674,11 +723,29 @@ static int new_local_vreg(Builder *b, SYMBOL *sym)
     } else {
         int w = width_for_kind(k);
         b->f->vregs[v].width = (int16_t)(w ? w : 2);
+        /* -debug: home every scalar local in memory so a breakpoint can read
+           it. Mark it address-taken (escaped): unlike a plain — or even
+           volatile — never-escaped local (which 80cc legitimately keeps in a
+           register / folds away), an escaped local must stay coherent in its
+           frame slot across every statement, since it could be aliased. Its
+           ,B,1,d cdb record is emitted post-lowering from the real slot
+           (debug_write_local_at). Aggregates already get ADDR_TAKEN above. */
+        if (c_debug_adb_defc)
+            b->f->vregs[v].flags |= IR_VREG_ADDR_TAKEN;
     }
     /* volatile local: force a memory slot so every access is a real
        load/store (no register residency, const-prop or store-forward). */
     if (sym->ctype && sym->ctype->isvolatile)
         b->f->vregs[v].flags |= IR_VREG_VOLATILE;
+    /* A `static` local's storage is its BSS symbol, not the frame — the front
+       end rewrites every ACCESS to the global shape (LD_SYM / sym[] mem ops),
+       so this vreg is never read. Left in place (the symbol map stays total)
+       but denied a slot: without this an aggregate reserves its whole size on
+       the stack and never touches it — pi.c's `static uint16_t r[2801]` cost a
+       dead 5602-byte frame, which also pushed every real temporary past the
+       8085 LDSI offset range, degrading each slot access to `ld hl,N; add hl,sp`. */
+    if (sym->storage == LSTATIC || sym->storage == STATIK)
+        b->f->vregs[v].flags |= IR_VREG_NO_SLOT;
     sym_map_set(b, sym, v);
     return v;
 }
@@ -952,41 +1019,6 @@ static int emit_float_arith(Builder *b, Kind fk, const char *stem,
     return dst;
 }
 
-/* True when `n` is a numeric literal equal to 1 (int `1` or float `1.0`) —
-   the dividend that turns `1.0 / x` into a reciprocal. */
-static int node_is_numeric_one(Node *n)
-{
-    return n && n->ast_type == AST_LITERAL && (double)n->zval == 1.0;
-}
-
-/* Reciprocal-eligible float kinds, mirroring sccz80 zdiv_dconst: the half
-   float and IEEE single ship an inverse helper; the acc-tier 48/64-bit
-   doubles and MBF32 do not, so `1.0/x` stays a full divide there. */
-static int float_reciprocal_ok(Kind fk)
-{
-    if (fk == KIND_FLOAT16) return 1;
-    if (fk == KIND_DOUBLE && c_fp_size == 4 && c_maths_mode == MATHS_IEEE)
-        return 1;
-    return 0;
-}
-
-/* Emit a register-float reciprocal HCALL (l_f{16,32}_invf) computing 1/rv.
-   Unary ABI: operand in HL/DEHL, result in HL/DEHL. Returns the result
-   vreg or -1 if fk has no inverse helper. */
-static int emit_float_reciprocal(Builder *b, Kind fk, int rv)
-{
-    const char *name = float_helper(fk, "invf");
-    if (!name) return -1;
-    int dst = new_temp_kind(b, fk);
-    int *args = calloc(1, sizeof(int)); args[0] = rv;
-    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-    op->dst = dst;
-    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-    hi->name = name; hi->args = args; hi->n_args = 1; hi->ret_vreg = dst;
-    op->hcall = hi;
-    return dst;
-}
-
 /* Emit a wide memory-accumulator binop (IR_ACC_BINOP) for a 5/6-byte
    double: stem "add"/"sub"/"mul"/"div" → dadd/dsub/dmul/ddiv (FA model,
    acc holds LHS). Returns the result vreg (width c_fp_size) or -1. */
@@ -1227,7 +1259,7 @@ static int widen_arg_to_param(Builder *b, int v, Node *a, Type *pt)
     if (kind_is_floating(pt->kind))
         return coerce_int_to_float_kind(b, v, a, pt->kind);
     /* _Accum / fixed param: a numeric LITERAL arg (e.g. EPSILON=0.1) scales to
-       Q-format at compile time — matching sccz80, which never calls the
+       Q-format at compile time — which never calls the
        runtime double→_Accum helper. Without this the double literal is pushed
        at its wide size and the callee's narrow _Accum param misaligns (the
        built `v` double is discarded). A non-literal _Accum arg is left as-is. */
@@ -1242,6 +1274,16 @@ static int widen_arg_to_param(Builder *b, int v, Node *a, Type *pt)
     }
     if (!kind_is_integer(pt->kind)) return v;
     Kind ak  = a->type ? (Kind)a->type->kind : KIND_NONE;
+    /* Register-tier float arg to an INTEGER param (`f(dbl)` where f takes an
+       int): convert here, as the front end leaves it to codegen. A register
+       float is the same width as the param, so nothing below would catch it
+       and the raw IEEE bit pattern was pushed. The acc tier build_fails
+       earlier instead of reaching this. (The `return` path shares this
+       function but converts on its own and skips the call — converting twice
+       would run f2sint over an already-converted int.) */
+    if (is_register_float_kind(ak) && !is_acc_int_kind(pt->kind))
+        return coerce_float_to_int_kind(b, v, a, pt->kind, type_width(pt),
+                                        pt->isunsigned);
     if (!kind_is_integer(ak)) return v;
     int  uns = a->type && a->type->isunsigned;
     int  aw  = b->f->vregs[v].width;
@@ -1303,6 +1345,58 @@ static int sr_shift_left(Builder *b, int v, int sh, int w)
    unsigned alike. Covers C = 2^a (defensive), 2^a+2^b, and runs of 1-bits
    (2^a-2^b: 3,5,6,7,9,10,12,14,15,...). Returns the result vreg or -1 (use
    the helper). pow2 is normally already reduced at the AST level. */
+/* Signed `x / 2^k` and `x % 2^k`, replacing the bit-serial l_div / l_long_div
+   helper. An arithmetic shift rounds toward minus infinity, but C rounds the
+   quotient toward zero, so a negative dividend needs (2^k - 1) added before the
+   shift. The sign mask supplies that bias with no branch:
+
+       bias = (x >> W-1) & (2^k - 1)      0 when x >= 0, 2^k-1 when x < 0
+       q    = (x + bias) >> k             arithmetic
+       r    = x - ((x + bias) & ~(2^k-1)) since (q << k) == (x+bias) & ~mask
+
+   `x + bias` cannot overflow: bias is non-zero only when x is negative, so the
+   sum moves toward zero. The remainder form avoids shifting altogether beyond
+   the sign mask, which matters because a z80 shift costs per bit.
+
+   Only for a SIGNED dividend — the unsigned cases are already rewritten to a
+   plain shift/mask by the AST strength-reduction pass. */
+static int emit_const_sdiv_sr(Builder *b, int v, int shift, int w, int want_mod)
+{
+    if (w != 2 && w != 4) return -1;
+    if (shift <= 0 || shift > (w == 4 ? 31 : 15)) return -1;
+    Kind kw = (w == 4) ? KIND_LONG : KIND_INT;
+    int64_t mask = (((int64_t)1) << shift) - 1;
+
+    int sm = new_temp_kind(b, kw);
+    Op *s1 = ir_op_emit(cur_bb(b), IR_SHR);
+    s1->dst = sm; s1->src[0] = v; s1->src[1] = -1;
+    s1->imm = (int64_t)(w * 8 - 1) | IR_SHR_ARITH;
+
+    int bias = new_temp_kind(b, kw);
+    Op *an = ir_op_emit(cur_bb(b), IR_AND);
+    an->dst = bias; an->src[0] = sm; an->src[1] = -1; an->imm = mask;
+
+    int adj = new_temp_kind(b, kw);
+    ir_emit_binop(cur_bb(b), IR_ADD, adj, v, bias);
+
+    if (!want_mod) {
+        int q = new_temp_kind(b, kw);
+        Op *s2 = ir_op_emit(cur_bb(b), IR_SHR);
+        s2->dst = q; s2->src[0] = adj; s2->src[1] = -1;
+        s2->imm = (int64_t)shift | IR_SHR_ARITH;
+        return q;
+    }
+
+    int trunc = new_temp_kind(b, kw);
+    Op *a2 = ir_op_emit(cur_bb(b), IR_AND);
+    a2->dst = trunc; a2->src[0] = adj; a2->src[1] = -1;
+    a2->imm = -(((int64_t)1) << shift);          /* ~mask, sign-extended */
+
+    int r = new_temp_kind(b, kw);
+    ir_emit_binop(cur_bb(b), IR_SUB, r, v, trunc);
+    return r;
+}
+
 static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
 {
     if (w != 2 && w != 4) return -1;
@@ -1351,8 +1445,8 @@ static int emit_const_mult_sr(Builder *b, int v, int64_t C, int w)
        add hl,de) the inline chain wins across the whole range — inline any int
        constant (max hi_bit+pop is 31). A LONG chain doubles/adds 32 bits per
        step (several ops each) and competes with l_long_mult, so keep the
-       tighter bound there. (An LCG's *25173 = 14+7 = 21 was just over the old
-       flat 20 and fell to l_mult → histbench -41%.) */
+       tighter bound there. (A flat bound near 20 wrongly fell back to l_mult
+       for constants like *25173 = 14+7 = 21, a large regression.) */
     if (hi_bit + pop <= (w == 2 ? 32 : 20)) {
         int acc = v;                            /* coefficient for 2^hi_bit */
         for (int bit = hi_bit - 1; bit >= 0; bit--) {
@@ -1778,7 +1872,7 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     int uns = src && src->type && src->type->isunsigned;
     /* Constant int → register/acc float: fold the conversion at compile time
        (store the float bit pattern) rather than emit a runtime l_f32_sint2f /
-       int→acc call. `Au[i] = 0` becomes a direct 0.0 store, matching sdcc. */
+       int→acc call. `Au[i] = 0` becomes a direct 0.0 store. */
     if (src && src->ast_type == AST_LITERAL && kind_is_integer(sk)
         && (is_register_float_kind(dst_k) || is_acc_float_kind(dst_k))) {
         int c = emit_float_const(b, (double)src->zval, dst_k);
@@ -1813,22 +1907,54 @@ static int coerce_int_to_float_kind(Builder *b, int v, Node *src, Kind dst_k)
     return v;
 }
 
+/* Register-tier float (f16 / IEEE-32) → int/long: l_f{16,32}_f2{s,u}{int,long},
+   HL/DEHL in, HL (ret_w 2) or DEHL (ret_w 4) out. Shared by the OP_CAST path
+   and the implicit conversions below. Returns -1 when src_k is not a
+   register float kind. */
+static int emit_int_from_float_reg(Builder *b, int v, Kind src_k,
+                                   int dst_uns, int ret_w)
+{
+    const char *helper = float_helper(src_k, (ret_w == 4)
+        ? (dst_uns ? "f2ulong" : "f2slong")
+        : (dst_uns ? "f2uint"  : "f2sint"));
+    if (!helper) return -1;
+    int conv_v = new_temp(b, ret_w);
+    b->f->vregs[conv_v].width = (int16_t)ret_w;
+    int *args = calloc(1, sizeof(int)); args[0] = v;
+    Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
+    op->dst = conv_v;
+    HelperInfo *hi = calloc(1, sizeof(HelperInfo));
+    hi->name = helper; hi->args = args;
+    hi->n_args = 1; hi->ret_vreg = conv_v;
+    op->hcall = hi;
+    return conv_v;
+}
+
 /* Coerce a float/double RHS to an INTEGER destination — the implicit
    conversion the front end leaves to codegen (`int i = dbl;`, `return dbl;`
    from an int function, `arr[k] = dbl;`). Mirrors OP_CAST's acc-float→int:
    ifix/f2s{int,long} to int/long, then narrow to a byte dst. Without it the
    6-byte double flows into the integer width-coercion below and gets a plain
-   CONV_TRUNC (a bail at 6→1, garbage otherwise). Source must be the 5/6/8-byte
-   acc double (the default `double`); f16 / f32-tier and long long dsts are
-   handled by their own cast paths. Returns v unchanged when it doesn't apply. */
+   CONV_TRUNC (a bail at 6→1, garbage otherwise). Source is either the
+   5/6/8-byte acc double or the register tier (f16 / IEEE-32 `double` under
+   --math32); a long long dst is left to its own cast path. `dst_uns` picks
+   f2u* over f2s* for the register tier (the acc-tier ifix path is signed
+   only). Returns v unchanged when it doesn't apply. */
 static int coerce_float_to_int_kind(Builder *b, int v, Node *src,
-                                    Kind dst_k, int dst_w)
+                                    Kind dst_k, int dst_w, int dst_uns)
 {
     if (v < 0) return v;
     Kind sk = node_value_kind(src);
-    if (!is_acc_float_kind(sk)) return v;
+    if (!is_acc_float_kind(sk) && !is_register_float_kind(sk)) return v;
     if (!kind_is_integer(dst_k) || is_acc_int_kind(dst_k)) return v;
-    int iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+    int iv;
+    if (is_register_float_kind(sk)) {
+        iv = emit_int_from_float_reg(b, v, sk, dst_uns,
+                                     (dst_w == 4) ? 4 : 2);
+        if (iv < 0) return v;
+    } else {
+        iv = emit_acc_to_int(b, v, (dst_w == 4) ? 4 : 2);
+    }
     if (dst_w == 1) {
         int bt = new_temp_kind(b, KIND_CHAR);
         Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
@@ -1897,7 +2023,7 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
        Acc tier (FA model) keeps lhs-first — it doesn't use the DEHL stack. */
     int fc_commutative = !is_acc
         && (!strcmp(stem, "add") || !strcmp(stem, "mul"))
-        && getenv("IR_NO_F32_STACK_ARG") == NULL;
+        && !opt_disabled("f32-stack-arg");
     #define COMPOUND_ARITH(LV) (is_acc \
         ? emit_acc_binop(b, stem, (LV), rv) \
         : fc_commutative ? emit_float_arith(b, fk, stem, rv, (LV)) \
@@ -1947,6 +2073,90 @@ static int build_float_compound(Builder *b, Node *n, const char *stem)
     st->mem.bank_fn = bf;
     return res;
     #undef COMPOUND_ARITH
+}
+
+/* INTEGER compound-assign with a register-float rhs — `i += dbl`, `l *= f`.
+   C computes in the common type, so this is `i = (int)((float)i OP dbl)`:
+   load the integer lvalue, widen it to the rhs's float kind, run the float
+   helper, convert back and store. Same lvalue shapes as
+   build_float_compound (local / global / *ptr).
+
+   Without it these landed in build_compound_int, which combined the raw
+   IEEE bit pattern with the integer — silently, because a register float is
+   the same width as the integer lvalue so no width coercion fired. (The
+   acc tier reaches build_compound_int too but bails there on the 5/6-byte
+   width, so it never miscompiled.) */
+static int build_int_compound_float(Builder *b, Node *n, const char *stem,
+                                    Kind fk)
+{
+    if (!n->left || n->left->ast_type != OP_DEREF || !n->left->operand)
+        return build_fail("int-float compound-assign LHS shape not supported");
+    Type *lt  = n->left->type;
+    Kind  lk  = lt ? lt->kind : KIND_NONE;
+    int   lw  = type_width(lt);
+    int   uns = lt && lt->isunsigned;
+    if (lw != 1 && lw != 2 && lw != 4)
+        return build_fail("int-float compound-assign width %d", lw);
+    Node *lvn = n->left->operand;
+
+    int rv = build_expr(b, n->right);
+    if (rv < 0) return -1;
+    rv = coerce_int_to_float_kind(b, rv, n->right, fk);
+
+    /* int lvalue --(widen)--> float, OP, --(narrow)--> int */
+    #define INTF_ARITH(LV, OUT) do {                                        \
+        int fl_ = emit_float_reg_from_int(b, (LV), fk, uns);                \
+        if (fl_ < 0) return build_fail("int-float compound: widen failed");  \
+        int fr_ = emit_float_arith(b, fk, stem, fl_, rv);                   \
+        if (fr_ < 0) return build_fail("int-float compound: %s failed", stem);\
+        (OUT) = emit_int_from_float_reg(b, fr_, fk, uns,                    \
+                                        (lw == 4) ? 4 : 2);                 \
+        if ((OUT) < 0) return build_fail("int-float compound: narrow failed");\
+        if (lw == 1) {                                                      \
+            int bt_ = new_temp_kind(b, KIND_CHAR);                          \
+            Op *tr_ = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);                 \
+            tr_->dst = bt_; tr_->src[0] = (OUT);                            \
+            (OUT) = bt_;                                                    \
+        }                                                                   \
+    } while (0)
+
+    if (lvn->ast_type == AST_LOCAL_VAR) {
+        int lhs_v = lvn->sym ? sym_map_get(b, lvn->sym) : -1;
+        if (lhs_v < 0)
+            return build_fail("int-float compound-assign: unknown local");
+        int res; INTF_ARITH(lhs_v, res);
+        ir_emit_mov(cur_bb(b), lhs_v, res);
+        return lhs_v;
+    }
+    if (lvn->ast_type == AST_GLOBAL_VAR) {
+        SYMBOL *g = lvn->sym;
+        if (!g) return build_fail("int-float compound-assign: null global");
+        int loaded = new_temp_kind(b, lk);
+        b->f->vregs[loaded].width = (int16_t)lw;
+        Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+        ld->dst = loaded; ld->mem.kind = IR_MEM_SYM; ld->mem.sym = g;
+        int res; INTF_ARITH(loaded, res);
+        Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+        st->src[0] = res; st->mem.kind = IR_MEM_SYM; st->mem.sym = g;
+        return res;
+    }
+    /* *ptr op= rhs (pages the bank on both load and store if namespaced) */
+    SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
+    int ptr_v = build_expr(b, lvn);
+    if (ptr_v < 0) return -1;
+    int loaded = new_temp_kind(b, lk);
+    b->f->vregs[loaded].width = (int16_t)lw;
+    Op *ld = ir_op_emit(cur_bb(b), IR_LD_MEM);
+    ld->dst = loaded; ld->mem.kind = IR_MEM_VREG;
+    ld->mem.base = ptr_v; ld->mem.elem = lk;
+    ld->mem.bank_fn = bf;
+    int res; INTF_ARITH(loaded, res);
+    Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
+    st->src[0] = res; st->mem.kind = IR_MEM_VREG;
+    st->mem.base = ptr_v; st->mem.elem = lk;
+    st->mem.bank_fn = bf;
+    return res;
+    #undef INTF_ARITH
 }
 
 /* Compute `lv op rv` for a fixed-point (_Accum) compound assign. add/sub are
@@ -2616,22 +2826,6 @@ static int build_muldiv_float(Builder *b, Node *n, int *handled)
     Kind rk = n->right && n->right->type ? n->right->type->kind : KIND_NONE;
     if (n->ast_type != OP_MULT && n->ast_type != OP_DIV)
         return build_fail("float op %d not yet supported", (int)n->ast_type);
-    /* `1.0 / x` → reciprocal(x): a float divide is reciprocal-then-multiply,
-       so a unit numerator lets us call the inverse helper directly and skip
-       the trailing multiply-by-one (and the 1.0 operand load). Only where a
-       register-float inverse helper exists (see float_reciprocal_ok). */
-    if (n->ast_type == OP_DIV && node_is_numeric_one(n->left)) {
-        Kind rfk = (n->type && kind_is_floating(n->type->kind))
-                     ? n->type->kind
-                 : is_register_float_kind(rk) ? rk : KIND_NONE;
-        if (float_reciprocal_ok(rfk)) {
-            int r = build_operand_as_float_reg(b, n->right, rfk);
-            if (r < 0) return build_fail("reciprocal: divisor not promotable");
-            int dst = emit_float_reciprocal(b, rfk, r);
-            if (dst < 0) return build_fail("reciprocal emit failed");
-            return dst;
-        }
-    }
     /* 5/6-byte double mul/div → wide-accumulator op. */
     if (is_acc_float_kind(lk) && lk == rk) {
         int l = build_expr(b, n->left);
@@ -2779,6 +2973,18 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
             Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
             cv->dst = tmp; cv->src[0] = rhs_v;
             rhs_v = tmp;
+        } else if (lw == 2 && rw < 2 && k != IR_SHL && k != IR_SHR) {
+            /* Same convergence at width 2. Without it `int acc; acc += (signed
+               char)x;` emitted a MIXED-width ADD (width-2 dst, width-1 rhs) and
+               the lowerer zero-filled the high half — `acc += (signed char)(u ^
+               0x80u)` added 186 instead of -70. Shifts are excluded: their RHS
+               is a count, not an arithmetic operand. */
+            int tmp = new_temp(b, 2);
+            b->f->vregs[tmp].width = 2;
+            int uns = n->right->type && n->right->type->isunsigned;
+            Op *cv = ir_op_emit(cur_bb(b), uns ? IR_CONV_ZX : IR_CONV_SX);
+            cv->dst = tmp; cv->src[0] = rhs_v;
+            rhs_v = tmp;
         }
         { Op *o = ir_emit_binop(cur_bb(b), k, lhs_v, lhs_v, rhs_v); o->imm |= shr_arith_bit; }  /* aliased */
         return lhs_v;
@@ -2807,6 +3013,21 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
         } else {
             int rhs_v = build_expr(b, n->right);
             if (rhs_v < 0) return -1;
+            /* Widen (or truncate) the RHS to the lvalue width before the op:
+               `g op= x` applies the usual arithmetic conversions, so a narrower
+               memory/register operand (e.g. `long_g += short_g`) must be sign- or
+               zero-extended to the result width — else the binop mixes widths and
+               the wide high bytes read stale storage. Signedness from the RHS
+               type (a `(short)` cast makes it signed → CONV_SX). */
+            if ((int)b->f->vregs[rhs_v].width != gv_w) {
+                int t = new_temp(b, gv_w);
+                b->f->vregs[t].width = (int16_t)gv_w;
+                OpKind cv = ((int)b->f->vregs[rhs_v].width > gv_w) ? IR_CONV_TRUNC
+                          : (n->right->type && n->right->type->isunsigned
+                             ? IR_CONV_ZX : IR_CONV_SX);
+                Op *c = ir_op_emit(cur_bb(b), cv);
+                c->dst = t; c->src[0] = rhs_v; rhs_v = t;
+            }
             { Op *o = ir_emit_binop(cur_bb(b), k, dst_g, loaded_g, rhs_v); o->imm |= shr_arith_bit; }
         }
         Op *st_g = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2841,6 +3062,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     ld->mem.kind  = IR_MEM_VREG;
     ld->mem.base  = ptr_v;
     ld->mem.elem  = elem_k;
+    ld->mem.volatile_ = deref_is_volatile(n->left);
     ld->mem.bank_fn = bf;
     int dst = new_temp(b, elem_w);
     b->f->vregs[dst].width = elem_w;
@@ -2853,6 +3075,18 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     } else {
         int rhs_v = build_expr(b, n->right);
         if (rhs_v < 0) return -1;
+        /* Widen/truncate the RHS to the element width before the op (usual
+           arithmetic conversions) — else `*(long*)p += (short)x` mixes widths
+           and the wide high bytes read stale storage. See the global path. */
+        if ((int)b->f->vregs[rhs_v].width != elem_w) {
+            int t = new_temp(b, elem_w);
+            b->f->vregs[t].width = (int16_t)elem_w;
+            OpKind cv = ((int)b->f->vregs[rhs_v].width > elem_w) ? IR_CONV_TRUNC
+                      : (n->right->type && n->right->type->isunsigned
+                         ? IR_CONV_ZX : IR_CONV_SX);
+            Op *c = ir_op_emit(cur_bb(b), cv);
+            c->dst = t; c->src[0] = rhs_v; rhs_v = t;
+        }
         { Op *o = ir_emit_binop(cur_bb(b), k, dst, loaded, rhs_v); o->imm |= shr_arith_bit; }
     }
     Op *st = ir_op_emit(cur_bb(b), IR_ST_MEM);
@@ -2860,6 +3094,7 @@ static int build_compound_int(Builder *b, Node *n, OpKind k)
     st->mem.kind  = IR_MEM_VREG;
     st->mem.base  = ptr_v;
     st->mem.elem  = elem_k;   /* NOT ld->mem.elem — `ld` may be realloc-stale */
+    st->mem.volatile_ = deref_is_volatile(n->left);
     st->mem.bank_fn = bf;
     return dst;
 }
@@ -2898,7 +3133,7 @@ static int build_compound_muldiv(Builder *b, Node *n)
     if (!is_local && !is_global) {
         /* `arr[i] *= x` into a named address space: page the bank on
            both the load and the store (the helper call between them
-           resets the dedup, so both re-page — matching sccz80). */
+           resets the dedup, so both re-page). */
         bf_md = (SYMBOL *)deref_bank_fn(n->left);
         ptr_v = build_expr(b, n->left->operand);
         if (ptr_v < 0) return -1;
@@ -3350,6 +3585,7 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             ld->mem.elem = (elem_w == 1) ? KIND_CHAR
                          : (elem_w == 2) ? KIND_INT
                          :                 KIND_LONG;
+            ld->mem.volatile_ = deref_is_volatile(n);
             ld->mem.bank_fn = (SYMBOL *)deref_bank_fn(n);  /* `*p++` into a space */
             if (!is_pre) EMIT_BUMP();
             #undef EMIT_BUMP
@@ -3672,6 +3908,25 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            uses the IR_CMP_EQ const-RHS fold (lowerer's byte-wise
            XOR-OR chain); int form goes through a fresh 0 vreg. */
         if (!n->operand) return build_fail("OP_LNEG with no operand");
+        /* !!x → (x != 0): both `!` are the same 0/1 coercion, so fold the
+           double negation to ONE normalize instead of `(x==0)==0` (two
+           IR_CMP_EQ). (!!! is already collapsed to ! by the AST optimiser,
+           so operand->operand is the coerced value.) */
+        if (n->operand->ast_type == OP_LNEG && n->operand->operand
+            && !getenv("IR_NO_NOTNOT_FOLD")) {
+            int xv = build_expr(b, n->operand->operand);
+            if (xv < 0) return -1;
+            int dst = new_temp_kind(b, KIND_INT);
+            if (b->f->vregs[xv].width == 4 || b->f->vregs[xv].width == 1) {
+                Op *op = ir_op_emit(cur_bb(b), IR_CMP_NE);
+                op->dst = dst; op->src[0] = xv; op->src[1] = -1; op->imm = 0;
+                return dst;
+            }
+            int zv = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), zv, 0);
+            ir_emit_binop(cur_bb(b), IR_CMP_NE, dst, xv, zv);
+            return dst;
+        }
         int v = build_expr(b, n->operand);
         if (v < 0) return -1;
         int dst = new_temp_kind(b, KIND_INT);
@@ -3705,7 +3960,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            and uses an overlapping-`ldir` fill for larger ones. Any const
            count (1..65536, ldir's BC limit) inlines; non-const falls
            through to the library memset (redirected below). */
-        if (strcmp(n->sym->name, "__builtin_memset") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_memset") == 0
             && n_args == 3) {
             Node *cnt = array_get_byindex(n->args, 2);
             if (cnt && cnt->ast_type == AST_LITERAL
@@ -3728,7 +3984,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            tiny counts unroll, larger ones use `ldir`, any const count
            (1..65536) inlines; non-const falls back to the library
            memcpy. memcpy returns dst (the dst vreg still holds it). */
-        if (strcmp(n->sym->name, "__builtin_memcpy") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_memcpy") == 0
             && n_args == 3) {
             Node *cnt = array_get_byindex(n->args, 2);
             if (cnt && cnt->ast_type == AST_LITERAL
@@ -3749,7 +4006,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
         /* Inline __builtin_strcpy (always — variable length, no const
            needed): IR_STRCPY (dst, src), lowered to a NUL-terminated
            copy loop. strcpy returns dst. */
-        if (strcmp(n->sym->name, "__builtin_strcpy") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_strcpy") == 0
             && n_args == 2 && ir_inline_block_ops_ok()) {
             int dst_v = build_expr(b, array_get_byindex(n->args, 0));
             if (dst_v < 0) return -1;
@@ -3765,7 +4023,8 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            string, src[1] = char vreg (or -1 + imm for a literal char),
            lowered to a scan loop leaving the match pointer / NULL in the
            result vreg. */
-        if (strcmp(n->sym->name, "__builtin_strchr") == 0
+        if (!c_disable_builtins
+            && strcmp(n->sym->name, "__builtin_strchr") == 0
             && n_args == 2 && ir_inline_block_ops_ok()) {
             Node *c_node = array_get_byindex(n->args, 1);
             int str_v = build_expr(b, array_get_byindex(n->args, 0));
@@ -4026,6 +4285,11 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
            rst/module/address operands aren't in the flags, so carry them
            as values. */
         ci->flags = flags;
+        /* __preserves_regs(...): the callee promises not to clobber these
+           register pairs, so op_clobbers(IR_CALL) will keep them out of the
+           call's clobber set (a value can stay resident across the call). */
+        if (n->sym->ctype)
+            ci->preserved = preserve_to_regmask(n->sym->ctype->funcattrs.preserved_regs);
         if (flags & SHORTCALL) {
             ci->shortcall_rst   = n->sym->ctype->funcattrs.shortcall_rst;
             ci->shortcall_value = n->sym->ctype->funcattrs.shortcall_value;
@@ -4516,6 +4780,20 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
             return build_fail("float bitwise/shift compound-assign invalid");
         }
 
+        /* INTEGER lvalue with a register-float rhs (`i += dbl`): compute in
+           the float type and convert back, per C's usual arithmetic
+           conversions. Below this, build_compound_int would combine the raw
+           IEEE bits with the integer. */
+        if ((n->ast_type == OP_AADD || n->ast_type == OP_ASUB)
+            && n->left && n->left->type
+            && kind_is_integer(n->left->type->kind)
+            && !is_acc_int_kind(n->left->type->kind)
+            && n->right
+            && is_register_float_kind(node_value_kind(n->right)))
+            return build_int_compound_float(b, n,
+                       (n->ast_type == OP_AADD) ? "add" : "sub",
+                       node_value_kind(n->right));
+
         /* long long compound-assign (ast_opt folds `x = x OP y` here). */
         if (n->left && n->left->type
             && is_acc_int_kind(n->left->type->kind)) {
@@ -4560,6 +4838,18 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
                 return build_float_compound(b, n, "div");
             return build_fail("float %%= invalid");
         }
+
+        /* Integer lvalue, register-float rhs (`i *= dbl`) — see the AADD
+           case. `%=` on a float operand is invalid C and falls through to
+           the integer path's own diagnostic. */
+        if ((n->ast_type == OP_AMULT || n->ast_type == OP_ADIV)
+            && n->left->type && kind_is_integer(n->left->type->kind)
+            && !is_acc_int_kind(n->left->type->kind)
+            && n->right
+            && is_register_float_kind(node_value_kind(n->right)))
+            return build_int_compound_float(b, n,
+                       (n->ast_type == OP_AMULT) ? "mul" : "div",
+                       node_value_kind(n->right));
 
         /* long long compound *= /= %= (ast_opt folds `x = x OP y` here). */
         if (n->left->type && is_acc_int_kind(n->left->type->kind)) {
@@ -4693,6 +4983,78 @@ static int build_expr_hinted(Builder *b, Node *n, int hint)
 /* LHS = RHS store. Dispatches by destination: bitfield (read-modify-
    write), whole-aggregate struct copy, bare local, global, pointer
    deref — each with int/float/double/_Accum/long long value handling. */
+/* [IR_STORDER=0] Default-on after the matrix: corpus x 10 CPUs x sp/fp with no
+   new aborts, corpus ticks unchanged on 23 of 24 suites and sortbench -0.084%,
+   pi faster on all six valid-tick CPUs (-0.27% to -0.80%). Opt out to revert. */
+static int storder_on(void)
+{
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("IR_STORDER"); on = !(e && e[0] == '0'); }
+    return on;
+}
+
+/* Will build_assign take the pointer/indexed store branch — the only one that
+   consumes a pre-built address? Mirrors that branch's own predicate exactly; a
+   pure type test, so it is answerable before anything is emitted. Keep the two
+   in step: a mismatch does not miscompile (the address is simply built and left
+   unused, and DCE drops it) but it silently wastes the reorder. */
+static int store_order_lhs_shape(Node *lv)
+{
+    if (!lv->type) return 0;
+    return ((lv->type->kind == KIND_PTR || lv->type->kind == KIND_ARRAY)
+            || is_register_int_kind(lv->type->kind))
+        && (lv->type->ptr || is_register_int_kind(lv->type->kind));
+}
+
+/* Is the LHS address a link-time CONSTANT — a symbol, or a symbol at a constant
+   offset? Then it is rematerialisable in one instruction (`ld hl,_sym+K`) and
+   hoisting is a pessimisation: it makes the address live across the RHS, so the
+   allocator parks it (`ld bc,hl` … `ld hl,bc`) where recomputing was cheaper.
+   Measured: this cost +16 ticks and 2 instructions in the test framework, which
+   is linked into every bench binary, so it showed up as a uniform +16 across 23
+   suites.
+   An aggregate NAME is its address (constant); a scalar name is an rvalue LOAD
+   and is not — which is what keeps `r[i]` (symbol + loaded index) hoistable. */
+static int store_order_addr_is_const(Node *n)
+{
+    if (!n) return 1;
+    switch (n->ast_type) {
+    case AST_LITERAL:
+        return 1;
+    case OP_ADDR: case AST_ADDR:
+        return 1;
+    case AST_GLOBAL_VAR: case AST_LOCAL_VAR:
+        return n->type && (n->type->kind == KIND_ARRAY
+                           || n->type->kind == KIND_STRUCT);
+    case OP_CAST:
+        return store_order_addr_is_const(n->operand);
+    case OP_ADD: case OP_SUB:
+        return store_order_addr_is_const(n->left)
+            && store_order_addr_is_const(n->right);
+    default:
+        return 0;                    /* unknown shape: assume it costs to rebuild */
+    }
+}
+
+/* Does hoisting pay? Only when the stored VALUE is the awkward operand — it
+   ends in a call (its result lands in the return registers and must survive the
+   address computation) or it is wider than the 2-byte address. Anything else
+   just lengthens the address's live range for nothing. */
+static int store_order_rhs_pays(Builder *b, Node *n)
+{
+    (void)b;
+    /* Width of the RHS *expression*, not of the store: `r[i] = d % (uint32_t)b`
+       narrows to a 2-byte element, but the arithmetic is 32-bit and lowers to a
+       helper CALL whose result occupies both register pairs. Keying off the
+       store's type misses exactly the case this exists for. */
+    if (n->right && n->right->type && type_width(n->right->type) > 2) return 1;
+    if (n->type && type_width(n->type) > 2) return 1;
+    /* A real call in the RHS. NB not-SEF is a poor proxy for "calls a helper" —
+       wide integer arithmetic is SEF at AST level yet still lowers to a call,
+       which the width tests above are what actually catch. */
+    return !is_side_effect_free(n->right);
+}
+
 static int build_assign(Builder *b, Node *n)
 {
     /* LHS = RHS. LHS is an lvalue: AST_LOCAL_VAR (address) or
@@ -4707,7 +5069,7 @@ static int build_assign(Builder *b, Node *n)
        and the storage unit's address as n->left — a global/local lvalue
        or, for a field in a byte beyond the first, the folded address
        expression `(+ (gv) K)`. The unit is byte-wide when the field
-       fits in one byte (matches sccz80's byte rmw), word-wide otherwise;
+       fits in one byte (a byte rmw), word-wide otherwise;
        a byte store is essential for a non-zero byte offset, where a word
        store would run past the struct into the next object. */
     {
@@ -4771,6 +5133,14 @@ static int build_assign(Builder *b, Node *n)
                with element width from ctype->ptr. */
             Type *elem_t = n->left->sym->ctype
                          ? n->left->sym->ctype->ptr : NULL;
+            /* `ctype->ptr` is the ARRAY element type; a struct/union TAG has
+               none, so a folded offset-0 MEMBER store (`u.f = x` collapsed to
+               `(= (lv=u) x)`) fell back to KIND_INT/width 2. That silently
+               truncated any wider member to two bytes, and bailed outright on
+               a 6-byte double ("CONV_TRUNC 6→2 not supported"). The assignment
+               node's own type IS the member type -- the folded member READ at
+               the OP_DEREF case above leans on the same fact. */
+            if (!elem_t && n->type) elem_t = n->type;
             int elem_w = type_width(elem_t);
             Kind elem_k = elem_t ? elem_t->kind : KIND_INT;
             /* Wide float/double element (`double a[N]; a[0] = x;`): build the
@@ -4863,13 +5233,19 @@ static int build_assign(Builder *b, Node *n)
         /* Float/double RHS into an integer local (`int i = dbl;`): convert
            float→int first, then store. Without this the 6-byte double
            reaches the byte/general paths below and gets a plain CONV_TRUNC
-           (bail at 6→1, garbage at 6→2/4). */
+           (bail at 6→1, garbage at 6→2/4); a register-tier f16/f32 RHS is
+           the same width as the int local, so it slipped through as a raw
+           bit-pattern MOV. */
         if (kind_is_integer(lk) && !is_acc_int_kind(lk)
-            && n->right && is_acc_float_kind(node_value_kind(n->right))) {
+            && n->right
+            && (is_acc_float_kind(node_value_kind(n->right))
+                || is_register_float_kind(node_value_kind(n->right)))) {
             int rv = build_expr(b, n->right);
             if (rv < 0) return -1;
             rv = coerce_float_to_int_kind(b, rv, n->right, lk,
-                                          b->f->vregs[dst_v].width);
+                                          b->f->vregs[dst_v].width,
+                                          n->left->type
+                                          && n->left->type->isunsigned);
             if (rv != dst_v) ir_emit_mov(cur_bb(b), dst_v, rv);
             return dst_v;
         }
@@ -4938,6 +5314,28 @@ static int build_assign(Builder *b, Node *n)
         }
         return dst_v;
     }
+    /* [IR_STORDER] Build the LHS ADDRESS before the RHS value.
+       See STORE_ORDER_PLAN.md. `a[i] = <expr>` normally evaluates the RHS
+       first and the address last, so when the RHS ends in a call returning a
+       wide value the result holds both register pairs and the address — built
+       last — has nowhere to go but a frame slot, with the result shuffled
+       around it. sccz80 (and 80cc's own COMPOUND-assign path) build the
+       address first and park it, which is 4 instructions against ~25.
+
+       C leaves the relative order of the two operands unspecified, so the swap
+       is legal outright; the side-effect-free gate means no DEFINED program can
+       observe it either way (`a[i++] = f()` is excluded by rule, not luck).
+       The second gate keeps it to where it pays: something is live across
+       something whichever order we pick, and address-first wins exactly when
+       the value is wider than the 2-byte address — the wide/call case. */
+    int pre_addr = -1;
+    if (storder_on() && n->left && n->right
+        && is_side_effect_free(n->left)
+        && !store_order_addr_is_const(n->left)
+        && store_order_lhs_shape(n->left)
+        && store_order_rhs_pays(b, n))
+        pre_addr = build_expr(b, n->left);      /* -1 on failure: fall through */
+
     /* Non-local LHS: for a float-literal RHS heading into an
        _Accum slot, allocate a typed hint vreg so the literal
        handler's scaling fires. */
@@ -4992,11 +5390,27 @@ static int build_assign(Builder *b, Node *n)
            read a folded double-member ADDRESS as an integer and wrongly
            convert (ifix) a double→double member store. */
         Kind store_k = n->type ? n->type->kind : KIND_NONE;
-        if ((store_k == KIND_PTR || store_k == KIND_ARRAY) && n->type->ptr)
-            store_k = n->type->ptr->kind;
+        Type *store_t = n->type;
+        if ((store_k == KIND_PTR || store_k == KIND_ARRAY) && n->type->ptr) {
+            store_t = n->type->ptr;
+            store_k = store_t->kind;
+        }
         if (is_acc_float_kind(node_value_kind(n->right))
             && kind_is_integer(store_k) && !is_acc_int_kind(store_k))
             rhs_v = emit_acc_to_int(b, rhs_v, 4);
+        /* Same for the register tier (f16 / IEEE-32 `double` under --math32):
+           convert to the destination's width. Unlike the acc tier there is no
+           width mismatch to trip the coercion below, so without this the raw
+           float bit pattern was stored into the integer lvalue. */
+        else if (is_register_float_kind(node_value_kind(n->right))
+                 && kind_is_integer(store_k) && !is_acc_int_kind(store_k)) {
+            int sw = type_width(store_t);
+            int cv = emit_int_from_float_reg(b, rhs_v,
+                        node_value_kind(n->right),
+                        store_t && store_t->isunsigned,
+                        (sw == 4) ? 4 : 2);
+            if (cv >= 0) rhs_v = cv;
+        }
     }
     if (n->left->ast_type == AST_GLOBAL_VAR) {
         /* FARACC (`__banked`) global store: map the far address then
@@ -5267,6 +5681,7 @@ static int build_assign(Builder *b, Node *n)
         op->mem.elem = (elem_w == 1) ? KIND_CHAR
                      : (elem_w == 2) ? KIND_INT
                      :                 KIND_LONG;
+        op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
     }
@@ -5284,9 +5699,9 @@ static int build_assign(Builder *b, Node *n)
        KIND_ARRAY long-element stores (`in[i] = long`) are gated
        off in sp mode only. With byte-pack + pointer-spill-skip +
        offset folds + the stack-free long store + post-step
-       fusion, fp mode is a net win on md5 so fp ungates; sp still
-       trails (the per-input-byte copy loop's slot walks), so sp
-       stays gated until that flips too. */
+       fusion, fp mode is a net win so fp ungates; sp still trails
+       (the per-input-byte copy loop's slot walks), so sp stays
+       gated until that flips too. */
     /* Address-yielding __far LHS (`fp[i] = v`, `*(fp+K) = v`): the
        parser folds the subscript-assign into a bare far-pointer
        expression (OP_ADD, type CPTR). Store through an lp_p* helper. */
@@ -5316,7 +5731,8 @@ static int build_assign(Builder *b, Node *n)
         /* `arr[i] = X` into a named address space: page in the bank at
            the store (namespace recovered from the array element type). */
         SYMBOL *bf = (SYMBOL *)deref_bank_fn(n->left);
-        int ptr_v = build_expr(b, n->left);
+        /* [IR_STORDER] consume the address built before the RHS, if any. */
+        int ptr_v = (pre_addr >= 0) ? pre_addr : build_expr(b, n->left);
         if (ptr_v < 0) return -1;
         /* Wide-value store (this path otherwise only handles 1/2/4-byte
            integers). The member/element lvalue type can read back as
@@ -5422,6 +5838,7 @@ static int build_assign(Builder *b, Node *n)
         op->mem.elem = (elem_w == 1) ? KIND_CHAR
                      : (elem_w == 2) ? KIND_INT
                      :                 KIND_LONG;
+        op->mem.volatile_ = deref_is_volatile(n->left);
         op->mem.bank_fn = bf;
         return rhs_v;
     }
@@ -5452,8 +5869,7 @@ static int build_cast(Builder *b, Node *n)
        steps the pointer, and zero-extends to long — bypassing the
        default 3-op IR sequence (IR_LD_MEM byte + IR_INC p +
        IR_CONV_ZX byte→long) which forces a byte spill across the
-       IR_INC. Hot inner pattern in crcbench's crc32 (per-byte
-       loop). */
+       IR_INC. Hot inner pattern in per-byte checksum loops. */
     if (dst_w == 4 && src_w == 1
         && n->operand
         && n->operand->ast_type == OP_DEREF
@@ -5661,18 +6077,10 @@ static int build_cast(Builder *b, Node *n)
         && !is_acc_int_kind(dst_k) && !kind_is_fixed(dst_k)) {
         int dst_uns = n->type && n->type->isunsigned;
         int ret_w = (dst_w == 4) ? 4 : 2;
-        const char *helper = float_helper(src_k, (ret_w == 4)
-            ? (dst_uns ? "f2ulong" : "f2slong")
-            : (dst_uns ? "f2uint"  : "f2sint"));
-        int conv_v = new_temp(b, ret_w);
-        b->f->vregs[conv_v].width = (int16_t)ret_w;
-        int *args = calloc(1, sizeof(int)); args[0] = src_v;
-        Op *op = ir_op_emit(cur_bb(b), IR_HCALL);
-        op->dst = conv_v;
-        HelperInfo *hi = calloc(1, sizeof(HelperInfo));
-        hi->name = helper; hi->args = args;
-        hi->n_args = 1; hi->ret_vreg = conv_v;
-        op->hcall = hi;
+        int conv_v = emit_int_from_float_reg(b, src_v, src_k, dst_uns, ret_w);
+        if (conv_v < 0)
+            return build_fail("float→int cast kind %d width %d",
+                              (int)src_k, dst_w);
         if (dst_w == 1) {
             int bt = new_temp_kind(b, KIND_CHAR);
             Op *tr = ir_op_emit(cur_bb(b), IR_CONV_TRUNC);
@@ -5984,7 +6392,7 @@ static int build_muldiv_integer(Builder *b, Node *n)
     if (n->ast_type == OP_MULT && !is_flt && !is_fix16 && !is_fix32
         && n->type && type_width(n->type) == 4
         && !IS_808x() && !IS_GBZ80()   /* l_mulu_32_16x16 undefined there */
-        && !getenv("IR_NO_NARROW_MUL")) {
+        && !opt_disabled("narrow-mul")) {
         Node *ln = mul_u16_narrow_src(n->left);   /* type width <= 2, unsigned */
         Node *rn = mul_u16_narrow_src(n->right);
         if (ln && rn) {
@@ -6084,6 +6492,21 @@ static int build_muldiv_integer(Builder *b, Node *n)
     int unsigned_op = (n->type && n->type->isunsigned)
         || (n->left  && n->left->type  && n->left->type->isunsigned)
         || (n->right && n->right->type && n->right->type->isunsigned);
+    /* Signed division / remainder by a power of two: bias-and-shift instead of
+       the bit-serial helper. The unsigned forms never reach here — ast_opt
+       rewrites them to a shift and a mask — so this covers the signed half the
+       AST pass has to decline. */
+    if ((n->ast_type == OP_DIV || n->ast_type == OP_MOD)
+        && !unsigned_op && !is_flt && !is_fix16 && !is_fix32
+        && (width == 2 || width == 4)
+        && n->right && n->right->ast_type == AST_LITERAL) {
+        int shift;
+        if (extract_pow2((int64_t)n->right->zval, &shift)) {
+            int srd = emit_const_sdiv_sr(b, l, shift, width,
+                                         n->ast_type == OP_MOD);
+            if (srd >= 0) return srd;
+        }
+    }
     /* kc160: 16x16 int multiply is a single `mul de,hl` (low 16 bits are
        sign-agnostic, so the unsigned form serves signed and unsigned alike). */
     if (n->ast_type == OP_MULT && IS_KC160() && width == 2)
@@ -6310,7 +6733,7 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        constant in [0,255] (`c == ' '`, `c >= 'a'`, `c <= 'z'`) stays a byte `cp`
        instead of widening c to int for a 16-bit compare — the C-promotion is
        value-preserving here, and a widened compare reloads/extends c per test
-       (lexbench classify: ~7 instrs/test vs 2). All EQ/NE and unsigned relations:
+       (~7 instrs/test vs 2). All EQ/NE and unsigned relations:
        ULE/UGT are canonicalised below to `<K+1`/`>=K+1` at the kept byte width, so
        K<=254 folds to a byte ULT/UGE and K==255 constant-folds (`eff>=tmax`) — both
        correct. Unsigned LHS so the zero-extended value is exactly the byte. */
@@ -6378,7 +6801,17 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
        shifts). Saves a frame slot and the LD_IMM/store/reload
        churn of the dumb path. */
     if (rhs && rhs->ast_type == AST_LITERAL) {
-        int64_t imm = (int64_t)rhs->zval;
+        /* A FIXED-POINT literal has to be Q-scaled, exactly as the AST_LITERAL
+           handler does: the raw zval of `1.5k` is 1, its representation is 384.
+           Taking zval verbatim made `1.5k + 1.5k` emit `384 + 1`, so
+           `(int)(1.5k+1.5k)` returned 1. Normally invisible because constant
+           folding collapses the pair first — it only surfaced with fold AND
+           prop off. Key off the literal's own type, like the scaled-materialise
+           path; a non-_Accum literal is unchanged. */
+        Kind rk = rhs->type ? rhs->type->kind : KIND_NONE;
+        int64_t imm = (rk == KIND_ACCUM16 || rk == KIND_ACCUM32)
+                    ? scale_literal_for_kind(rhs, rk)
+                    : (int64_t)rhs->zval;
         /* GT/LE with a const RHS has no correct direct lowering at any
            width — the const-RHS handlers only exist for LT/GE, and the
            GT/LE paths read an uninitialised slot for the constant
@@ -6704,6 +7137,32 @@ static int build_stmt(Builder *b, Node *n)
         if (rv && rv->ast_type == AST_COMPOUND_STMT
             && (!rv->stmts || array_len(rv->stmts) == 0))
             rv = NULL;
+        /* Lever 1: `return <a && b>` / `return <a || b>` — a value-context
+           boolean returned directly. Lower it as short-circuit branches to
+           two RET-const tails (`ld hl,1; ret` / `ld hl,0; ret`) instead of
+           materialising a 0/1 that crosses the &&/|| merge as a spilled slot
+           (which forces a frame + store/reload on every predicate function).
+           The standard jumping-code lowering for a boolean value. Small-int
+           returns only — the value of a boolean expression is `int`. */
+        if (rv && (rv->ast_type == OP_OROR || rv->ast_type == OP_ANDAND)
+            && b->ret_type && kind_is_integer(b->ret_type->kind)
+            && type_width(b->ret_type) <= 2
+            && !getenv("IR_NO_BOOL_RET_BRANCH")) {
+            int true_bb  = ir_bb_new(b->f);
+            int false_bb = ir_bb_new(b->f);
+            if (build_cond(b, rv, true_bb, false_bb) != 0) return -1;
+            b->cur_bb_id = true_bb;
+            int one = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), one, 1);
+            ir_emit_ret(cur_bb(b), one);
+            b->cur_bb_id = false_bb;
+            int zero = new_temp(b, 2);
+            ir_emit_ld_imm(cur_bb(b), zero, 0);
+            ir_emit_ret(cur_bb(b), zero);
+            /* trailing statements after a return are dead — park them. */
+            b->cur_bb_id = ir_bb_new(b->f);
+            return 0;
+        }
         if (rv) {
             v = build_expr(b, rv);
             if (v < 0) return -1;
@@ -6711,12 +7170,18 @@ static int build_stmt(Builder *b, Node *n)
                first (to the return type's width), so the byte/int widening
                below handles the ABI. Without it the raw double reached the
                return unconverted (garbage). */
+            int ret_f2i = 0;
             {
                 Kind retk0 = b->ret_type ? b->ret_type->kind : KIND_NONE;
                 if (kind_is_integer(retk0) && !is_acc_int_kind(retk0)
-                    && is_acc_float_kind(node_value_kind(rv)))
+                    && (is_acc_float_kind(node_value_kind(rv))
+                        || is_register_float_kind(node_value_kind(rv)))) {
                     v = coerce_float_to_int_kind(b, v, rv, retk0,
-                                                 type_width(b->ret_type));
+                                                 type_width(b->ret_type),
+                                                 b->ret_type
+                                                 && b->ret_type->isunsigned);
+                    ret_f2i = 1;
+                }
             }
             /* Widen byte retvals to int — z80 return ABI puts the
                value in HL even when the C return type is char. */
@@ -6738,8 +7203,12 @@ static int build_stmt(Builder *b, Node *n)
                    implicit C conversion to codegen, else a long long returner
                    that `return`s an int produces only HL/2 bytes and the
                    caller reads the rest as garbage. widen_arg_to_param keys
-                   off the SOURCE node's type vs the target Type. */
-                v = widen_arg_to_param(b, v, rv, b->ret_type);
+                   off the SOURCE node's type vs the target Type — so skip it
+                   when the float→int coercion above already produced the
+                   return type's width (rv still reads as a float there, and
+                   it would convert a second time). */
+                if (!ret_f2i)
+                    v = widen_arg_to_param(b, v, rv, b->ret_type);
             }
         }
         ir_emit_ret(cur_bb(b), v);
@@ -6763,6 +7232,15 @@ static int build_stmt(Builder *b, Node *n)
                                   "out of int16_t slot range",
                                   n->sym->name, sz);
             int agg_v = new_local_vreg(b, n->sym);
+            /* A `static` aggregate is initialised ONCE, at load time, by the
+               data/BSS emitter — and every access goes through its symbol. The
+               runtime init below would write the initialiser a second time,
+               through LEA on a vreg that has no frame storage. Harmless-looking
+               before (it wrote to a dead stack copy, which is exactly what
+               reserved the object's whole size on the frame); with that copy
+               gone it is a wild store. Skip it: nothing reads what it writes. */
+            if (n->sym->storage == LSTATIC || n->sym->storage == STATIK)
+                return 0;
             if (n->declvar) {
                 int base = new_temp(b, 2);
                 Op *lea = ir_op_emit(cur_bb(b), IR_LEA);
@@ -6806,11 +7284,14 @@ static int build_stmt(Builder *b, Node *n)
             {
                 Kind vk0 = (Kind)n->sym->type;
                 if (kind_is_integer(vk0) && !is_acc_int_kind(vk0)
-                    && is_acc_float_kind(node_value_kind(n->declvar))) {
+                    && (is_acc_float_kind(node_value_kind(n->declvar))
+                        || is_register_float_kind(node_value_kind(n->declvar)))) {
                     int iv = build_expr(b, n->declvar);
                     if (iv < 0) return -1;
                     iv = coerce_float_to_int_kind(b, iv, n->declvar, vk0,
-                                                  b->f->vregs[v].width);
+                                                  b->f->vregs[v].width,
+                                                  n->sym->ctype
+                                                  && n->sym->ctype->isunsigned);
                     if (iv != v) ir_emit_mov(cur_bb(b), v, iv);
                     return 0;
                 }
@@ -6871,8 +7352,27 @@ static int build_stmt(Builder *b, Node *n)
                and the intermediate slot. */
             int init_v = build_expr_hinted(b, n->declvar, v);
             if (init_v < 0) return -1;
-            if (init_v != v)
-                ir_emit_mov(cur_bb(b), v, init_v);
+            if (init_v != v) {
+                /* Converge the width before the copy — the same job the
+                   OP_ASSIGN path does. A bare MOV from a NARROWER vreg leaves
+                   the high half to the lowerer, which zero-fills: `signed char
+                   gs = -56; int a = gs;` initialised a to 200, while the
+                   identical assignment to a GLOBAL int was correct because
+                   that path converges. Signedness comes from the initialiser
+                   expression's type, as in OP_ASSIGN. */
+                int iw = b->f->vregs[init_v].width;
+                int vw = b->f->vregs[v].width;
+                if (iw != vw && (vw == 2 || vw == 4)) {
+                    OpKind cv = (iw > vw)
+                        ? IR_CONV_TRUNC
+                        : ((n->declvar->type && n->declvar->type->isunsigned)
+                           ? IR_CONV_ZX : IR_CONV_SX);
+                    Op *op = ir_op_emit(cur_bb(b), cv);
+                    op->dst = v; op->src[0] = init_v;
+                } else {
+                    ir_emit_mov(cur_bb(b), v, init_v);
+                }
+            }
         }
         return 0;
     }
@@ -6909,8 +7409,19 @@ static int build_stmt(Builder *b, Node *n)
                       ? get_or_create_label_bb(b, n->loop_step_label)
                       : ir_bb_new(b->f);
 
-        /* Pre-test: if counter==0, skip the loop. */
-        ir_emit_br_zero(cur_bb(b), counter, exit_bb);
+        /* Pre-test: if counter==0, skip the loop. When the trip count is a
+           compile-time-constant NON-ZERO literal (`for (i=0;i<K;i++)`, K const)
+           the guard can never fire — mark it a PHANTOM (imm=1): the CFG edge to
+           exit is kept (so the allocator sees the same liveness as a real guard
+           and does not perturb the loop's allocation), but the lowerer emits no
+           code for it (gen_br_zero). Nets the dead `ld a,h; or l; jp z` bytes
+           with zero allocation change. */
+        {
+            Op *g = ir_emit_br_zero(cur_bb(b), counter, exit_bb);
+            if (g && n->loop_init->ast_type == AST_LITERAL
+                && n->loop_init->zval != 0)
+                g->imm = IR_BRZ_PHANTOM;
+        }
         ir_emit_br(cur_bb(b), header_bb);
 
         b->cur_bb_id = header_bb;
@@ -7334,6 +7845,43 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
             }
         }
     }
+
+    /* Volatile correctness: a DIRECT access to a volatile global (IR_MEM_SYM)
+       must never be CSE'd or forwarded away — each read/write is an observable
+       side effect. The per-access builders stamp mem.volatile_ for pointer
+       derefs, but the direct-symbol paths did not, so ir_opt's st2ld/cse would
+       fold e.g. `vg + vg` to a single load. Normalise centrally here — after the
+       body is built, before ir_lower runs ir_opt — from the symbol's own type. */
+    for (int vb = 0; vb < f->n_bbs; vb++)
+        for (int vj = 0; vj < f->bbs[vb].n_ops; vj++) {
+            Op *o = &f->bbs[vb].ops[vj];
+            /* __sfr I/O port: the symbol is a PORT NUMBER, not storage, so a
+               direct access must become IR_MEM_PORT and lower to in/out (or
+               the CPU's equivalent) rather than a load/store to address N.
+               Rewriting here covers every builder that reaches a global —
+               plain read/write, compound assign, ++/-- — from one place.
+               Ports are volatile by nature: each access is observable, so it
+               must survive CSE, store-forwarding and dead-store elision. */
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_SYM && o->mem.sym
+                && (o->mem.sym->type == KIND_PORT8
+                    || o->mem.sym->type == KIND_PORT16)) {
+                PortInfo *pi = calloc(1, sizeof *pi);
+                pi->kind = (o->mem.sym->type == KIND_PORT16)
+                         ? IR_PORT_KIND_16 : IR_PORT_KIND_8;
+                pi->sym       = o->mem.sym;
+                pi->port_vreg = -1;
+                o->mem.kind      = IR_MEM_PORT;
+                o->mem.port      = pi;
+                o->mem.volatile_ = 1;
+                continue;
+            }
+            if ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                && o->mem.kind == IR_MEM_SYM && o->mem.sym
+                && o->mem.sym->ctype
+                && type_or_pointee_volatile(o->mem.sym->ctype))
+                o->mem.volatile_ = 1;
+        }
 
     rc = ir_lower_to_output(f);
     /* ir_lower has no build_fail of its own, so a lowering failure (nonzero

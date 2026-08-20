@@ -118,6 +118,18 @@ int main(void) {
     return n;
 }'
 
+# --- (f0) unsigned char <<= var — width-1 must not treat count as imm 0
+# Mandelbrot leftover byte: 0x0c << (8-60%8) == 0xc0.
+run_ca_test z80 "ca_char_shl_var" "00c0" '' '
+int w;
+int main(void) {
+    unsigned char byte_acc;
+    w = 60;
+    byte_acc = 12;
+    byte_acc <<= (8 - w % 8);
+    return byte_acc;
+}'
+
 # --- (f) int local <<= var — shift RHS keeps int even for long --
 run_ca_test z80 "ca_int_shl_var" "0050" '' '
 int rhs3;

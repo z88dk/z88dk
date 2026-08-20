@@ -1,3 +1,7 @@
+${NEWLIB_ROOT}l/util/7-8085/l_lsl_dehl
+${NEWLIB_ROOT}l/util/7-8085/l_asr_dehl
+${NEWLIB_ROOT}l/util/7-8085/ascii/num_to_txt/small/l_small_utoa
+${NEWLIB_ROOT}l/util/7-8085/ascii/txt_to_num/small/l_small_atoul
+${NEWLIB_ROOT}l/util/7-8085/ascii/txt_to_num/small/l_small_htoul
+${NEWLIB_ROOT}l/util/7-8085/ascii/txt_to_num/small/l_small_otoul
 @${NEWLIB_ROOT}l/util/8080.lst
-${NEWLIB_ROOT}l/util/8-8080/l_lsl_dehl
-${NEWLIB_ROOT}l/util/8-8080/l_lsr_dehl
