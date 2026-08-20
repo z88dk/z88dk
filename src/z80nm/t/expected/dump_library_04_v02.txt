@@ -287,3 +287,19 @@ Object  file test_t_dump_library_04_t.o at $0F40: Z80RMF02
     G C $0000: public1
     G C $0000: public2
 
+Object  file test_t_dump_library_04_t.o at $0FAE: Z80RMF02
+  Name: module_vm1_no_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+
+Object  file test_t_dump_library_04_t.o at $101D: Z80RMF02
+  Name: module_vm1_ixiy
+  Symbols:
+    L C $0000: local1
+    L C $0000: local2
+    G C $0000: public1
+    G C $0000: public2
+

@@ -1079,6 +1079,66 @@ Object  file test_t_dump_library_03_t.o at $47DC: Z80RMF19
     S   4 = "public2"
     S   5 = "module_ti83plus_strict_ixiy"
 
+Object  file test_t_dump_library_03_t.o at $48E4: Z80RMF19
+  Name: module_vm1_no_ixiy
+  CPU:  vm1 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_no_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $49E4: Z80RMF19
+  Name: module_vm1_ixiy
+  CPU:  vm1 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $4AE0: Z80RMF19
+  Name: module_vm1_strict_no_ixiy
+  CPU:  vm1_strict 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_strict_no_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $4BE8: Z80RMF19
+  Name: module_vm1_strict_ixiy
+  CPU:  vm1_strict (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_strict_ixiy"
+
 Symbol Index Table:
   P z80  public1 -> $0018
   P z80  public2 -> $0018
@@ -1224,6 +1284,14 @@ Symbol Index Table:
   P ti83plus_strict  public2 -> $0018
   P ti83plus_strict  (-IXIY) public1 -> $0118
   P ti83plus_strict  (-IXIY) public2 -> $0118
+  P vm1  public1 -> $48E4
+  P vm1  public2 -> $48E4
+  P vm1  (-IXIY) public1 -> $49E4
+  P vm1  (-IXIY) public2 -> $49E4
+  P vm1_strict  public1 -> $48E4
+  P vm1_strict  public2 -> $48E4
+  P vm1_strict  (-IXIY) public1 -> $49E4
+  P vm1_strict  (-IXIY) public2 -> $49E4
 Strings:
   S   1 = "public1"
   S   2 = "public2"

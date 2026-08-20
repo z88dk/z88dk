@@ -575,3 +575,35 @@ Object  file test_t_dump_library_03_t.o at $2631: Z80RMF09
     G C $0000: public1 (section "") (file "")
     G C $0000: public2 (section "") (file "")
 
+Object  file test_t_dump_library_03_t.o at $26C0: Z80RMF09
+  Name: module_vm1_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+
+Object  file test_t_dump_library_03_t.o at $2746: Z80RMF09
+  Name: module_vm1_ixiy
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+
+Object  file test_t_dump_library_03_t.o at $27C9: Z80RMF09
+  Name: module_vm1_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+
+Object  file test_t_dump_library_03_t.o at $2856: Z80RMF09
+  Name: module_vm1_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+
