@@ -178,8 +178,10 @@ jobs:
       run: |
         eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
-        # -f: feature builds hello world for ~150 targets and was 22.9m of a
-        # 47m test step. msys2 keeps it -- that job produces the mingw
+        # -f drops the feature tests (hello world for ~150 targets, 22.9m of a
+        # 47m step); -z drops src-all, whose z80asm prove suite is the only
+        # thing here that compiles for zx/zxn/z80 and so the only reason those
+        # would need building. msys2 runs both in full -- it produces the mingw
         # binaries people actually download, so it is the representative
         # Windows target; cygwin stays a POSIX-emulation smoke test.
-        MAKE_CONCURRENCY=-j8 ./build.sh -v -b -l -t -f
+        MAKE_CONCURRENCY=-j8 ./build.sh -v -b -l -t -f -z
