@@ -52,16 +52,28 @@ jobs:
           ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-
           ${{ runner.os }}-cygwin-perl5-
 
+    # C:\ccache for the same reason as C:\perl5 above -- ~ resolves to
+    # C:\Users\runneradmin here but to the cygwin root's /home in the build.
+    - name: Cache ccache
+      uses: actions/cache@v5
+      with:
+        path: |
+          C:\ccache
+        key: ${{ runner.os }}-ccache-cygwin-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-cygwin-
+
     - name: Setup Cygwin
       uses: cygwin/cygwin-install-action@v6
       with:
         platform: x64
         packages: >
-          autoconf 
-          automake 
-          bison 
-          dos2unix 
-          flex 
+          autoconf
+          automake
+          bison
+          ccache
+          dos2unix
+          flex
           gcc-core
           gcc-g++ 
           libcrypt-devel 
@@ -78,6 +90,22 @@ jobs:
           unzip 
           wget 
           zlib-devel 
+    # The masquerade symlinks are made by hand rather than using the package's
+    # own directory, which sits in a different place on cygwin and msys2. The
+    # build exports CC/CXX as single words, so a "ccache g++" prefix is not an
+    # option -- src/z80asm/tools/build_ldflags.pl takes exactly two arguments.
+    # PATH is prepended per step rather than through GITHUB_PATH: that expects
+    # Windows-style paths, and CYGWIN_NOWINPATH strips them anyway.
+    - name: Configure ccache
+      run: |
+        mkdir -p /usr/local/ccache-bin
+        for c in gcc cc g++ c++; do
+          ln -sf "$(command -v ccache)" /usr/local/ccache-bin/$c
+          ln -sf "$(command -v ccache)" /usr/local/ccache-bin/$c.exe
+        done
+        echo "CCACHE_DIR=/cygdrive/c/ccache" >> $GITHUB_ENV
+        echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
+
     - name: Install choco packages
       run: |
         choco install re2c
@@ -101,8 +129,14 @@ jobs:
     - name: Build binaries
       run: |
         eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)
-        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        export PATH=/usr/local/ccache-bin:$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        command -v gcc
         ./build.sh -v -l
+
+    # Hit rate is the only way to tell the cache is working.
+    - name: ccache stats
+      if: always()
+      run: ccache -s
 
     - name: Build libraries
       run: |
