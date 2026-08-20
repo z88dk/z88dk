@@ -101,6 +101,8 @@ jobs:
           unzip 
           wget 
           zlib-devel 
+    # Note Makefile:34 already does CC := ccache $(CC) when ccache is on PATH,
+    # so these symlinks are only load-bearing for C++ -- CXX is never wrapped.
     # The masquerade symlinks are made by hand rather than using the package's
     # own directory, which sits in a different place on cygwin and msys2. The
     # build exports CC/CXX as single words, so a "ccache g++" prefix is not an
@@ -116,6 +118,13 @@ jobs:
         done
         echo "CCACHE_DIR=/cygdrive/c/ccache" >> $GITHUB_ENV
         echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
+        # Compile the original source on a miss, not the preprocessed output.
+        # ccache 3.x (what cygwin ships) defaults the other way, and the
+        # preprocessor strips the "// fall through" comments that
+        # -Wimplicit-fallthrough reads -- with -Werror that is a hard failure.
+        # Default in 4.x; set everywhere so the behaviour does not depend on
+        # which ccache a platform happens to package.
+        echo "CCACHE_CPP2=1" >> $GITHUB_ENV
 
     - name: Install choco packages
       run: |

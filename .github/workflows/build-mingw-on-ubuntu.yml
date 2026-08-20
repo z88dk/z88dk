@@ -54,6 +54,13 @@ jobs:
         ls -l /usr/lib/ccache/ | grep mingw
         echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
         echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
+        # Compile the original source on a miss, not the preprocessed output.
+        # ccache 3.x (what cygwin ships) defaults the other way, and the
+        # preprocessor strips the "// fall through" comments that
+        # -Wimplicit-fallthrough reads -- with -Werror that is a hard failure.
+        # Default in 4.x; set everywhere so the behaviour does not depend on
+        # which ccache a platform happens to package.
+        echo "CCACHE_CPP2=1" >> $GITHUB_ENV
         echo "/usr/lib/ccache" >> $GITHUB_PATH
     - name: Install libxml2
       run: |
