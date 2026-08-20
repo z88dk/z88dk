@@ -57,6 +57,9 @@ jobs:
       run: |
         echo '--- free space ---'
         df -h
+        echo "TMP=$TMP TEMP=$TEMP"
+        echo "stray zcc temp entries: $(find . -maxdepth 5 -name 'zcc*' 2>/dev/null | wc -l)"
+        find . -maxdepth 5 -name 'zcc*' 2>/dev/null | head -5
     - name: Install Strawberry Perl
       shell: powershell
       run: |
@@ -102,6 +105,9 @@ jobs:
       run: |
         echo '--- free space ---'
         df -h
+        echo "TMP=$TMP TEMP=$TEMP"
+        echo "stray zcc temp entries: $(find . -maxdepth 5 -name 'zcc*' 2>/dev/null | wc -l)"
+        find . -maxdepth 5 -name 'zcc*' 2>/dev/null | head -5
     - name: Build libraries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
@@ -113,6 +119,9 @@ jobs:
       run: |
         echo '--- free space ---'
         df -h
+        echo "TMP=$TMP TEMP=$TEMP"
+        echo "stray zcc temp entries: $(find . -maxdepth 5 -name 'zcc*' 2>/dev/null | wc -l)"
+        find . -maxdepth 5 -name 'zcc*' 2>/dev/null | head -5
         du -sh libsrc bin lib examples test testsuite 2>/dev/null | sort -h
     - name: Build examples
       run: |
@@ -125,6 +134,9 @@ jobs:
       run: |
         echo '--- free space ---'
         df -h
+        echo "TMP=$TMP TEMP=$TEMP"
+        echo "stray zcc temp entries: $(find . -maxdepth 5 -name 'zcc*' 2>/dev/null | wc -l)"
+        find . -maxdepth 5 -name 'zcc*' 2>/dev/null | head -5
         du -sh libsrc bin lib examples test testsuite 2>/dev/null | sort -h
     - name: Run tests
       run: |

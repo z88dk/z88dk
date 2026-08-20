@@ -37,13 +37,16 @@ jobs:
       with: 
         submodules: 'true'
 
-    # Rolled: actions/cache never overwrites an existing key, so a fixed one is
-    # written once and then frozen.
+    # C:\perl5, not ~/perl5: actions/cache resolves ~ through node, to
+    # C:\Users\runneradmin, while cygwin's ~ is /home/runneradmin inside the
+    # cygwin root. The cache was watching a directory cpanm never wrote to, so
+    # nothing was ever stored and this step cost ~24 minutes every run.
+    # Rolled because actions/cache never overwrites an existing key.
     - name: Cache perl modules
       uses: actions/cache@v5
       with:
         path: |
-          ~/perl5
+          C:\perl5
         key: ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-
@@ -83,37 +86,37 @@ jobs:
       run: |
         # Standalone cpanm rather than `cpan App::cpanminus`: the CPAN client
         # shells out constantly, which is expensive under cygwin's fork(), and
-        # installs outside the ~/perl5 cache so it was never cached.
+        # installs outside the cached tree so it was never cached.
         mkdir -p /usr/local/bin
         wget -q https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm -O /usr/local/bin/cpanm
         chmod +x /usr/local/bin/cpanm
         which cpanm
         cpanm --version
-        cpanm --local-lib=~/perl5 local::lib
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        cpanm --local-lib=/cygdrive/c/perl5 local::lib
+        eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib)
         cpanm --notest Clone XML::Twig Spreadsheet::ParseXLSX
         cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Path::Tiny Regexp::Common Spreadsheet::ParseXLSX Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table YAML::Tiny
         
     - name: Build binaries
       run: |
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -l
 
     - name: Build libraries
       run: |
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         MAKE_CONCURRENCY=-j4 ./build.sh -v -b
 
     - name: Build examples
       run: |
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -e
 
     - name: Run tests
       run: |
-        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
         ./build.sh -v -b -l -t
