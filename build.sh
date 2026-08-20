@@ -204,11 +204,19 @@ fi
 
 
 if [ $do_tests = 1 ]; then              # Build tests or not...
-  $MAKE -C testsuite
+  # Test recipes print their own pass/fail lines, so a parallel run needs its
+  # output grouped per target or failures land in the middle of other suites'
+  # output. --output-sync wants make 4.0, and macOS without gmake still ships
+  # 3.81, so ask before using it.
+  MAKE_OUTPUT_SYNC=""
+  if [ -n "$MAKE_CONCURRENCY" ] && $MAKE --output-sync=target --version >/dev/null 2>&1; then
+      MAKE_OUTPUT_SYNC="--output-sync=target"
+  fi
+  $MAKE -C testsuite $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC
   if [ $skip_z80asm_tests = 1 ]; then
-      $MAKE -C test suites feature
+      $MAKE -C test $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC suites feature
   else
-      $MAKE -C test
+      $MAKE -C test $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC
   fi
 fi
 
