@@ -12,7 +12,7 @@ on:
       - 'doc/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -52,9 +52,9 @@ jobs:
           ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-
           ${{ runner.os }}-cygwin-perl5-
 
-    # A library build is ~98k z80asm processes, and Defender scans each exec
-    # and each object written. Excluding the trees it touches attacks the
-    # per-spawn cost, which is what makes cygwin ~9x slower per object than
+    # A library build is ~206k short-lived processes, and Defender scans every
+    # exec and every object written. Excluding the trees it touches attacks the
+    # per-spawn cost, which is what makes cygwin ~9x slower per process than
     # ubuntu on identical work.
     - name: Exclude build trees from Defender
       shell: powershell
