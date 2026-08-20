@@ -165,4 +165,4 @@ jobs:
       run: |
         eval $(perl -I /cygdrive/c/perl5/lib/perl5/ -Mlocal::lib=/cygdrive/c/perl5)
         export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
-        ./build.sh -v -b -l -t
+        MAKE_CONCURRENCY=-j8 ./build.sh -v -b -l -t

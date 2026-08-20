@@ -83,4 +83,4 @@ jobs:
     - name: Run tests
       run: |
         export PATH=/opt/homebrew/opt/m4/bin:/usr/local/bin:$PATH
-        ./build.sh -v -b -l -t
+        MAKE_CONCURRENCY=-j3 ./build.sh -v -b -l -t

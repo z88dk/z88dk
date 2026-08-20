@@ -185,4 +185,4 @@ jobs:
         make -C libsrc install-clean
         echo '--- free space after install-clean ---'
         df -h
-        ./build.sh -v -b -l -t
+        MAKE_CONCURRENCY=-j4 ./build.sh -v -b -l -t
