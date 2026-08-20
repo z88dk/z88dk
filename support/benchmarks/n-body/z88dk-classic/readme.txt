@@ -64,7 +64,7 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlinei
 
 classic/80cc/math32
 zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
@@ -166,20 +166,20 @@ time @ 4MHz  = 1526138871 / 4*10^6 =  6 min 22 sec
 Energy: -0.1690752 / -0.1690808 (N=1000).
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic / math32
-9409 bytes less page zero
+9381 bytes less page zero
 
-cycle count  = 871106763
-time @ 4MHz  = 871106763 / 4*10^6 =  3 min 38 sec
+cycle count  = 871168465
+time @ 4MHz  = 871168465 / 4*10^6 =  3 min 38 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 80cc / classic / 8085 / math32
-8871 bytes less page zero
+8832 bytes less page zero
 
-cycle count  = 1519413292
-time @ 4MHz  = 1519413292 / 4*10^6 =  6 min 20 sec
+cycle count  = 1492016293
+time @ 4MHz  = 1492016293 / 4*10^6 =  6 min 13 sec
 
 
 Z88DK August 10, 2026

@@ -40,8 +40,8 @@ classic/sccz80/MBF32 : 24 bit mantissa
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math-mbf32 -lndos -m
 
 classic/80cc/MBF32 : 24 bit mantissa
-zcc +test -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math-mbf32 -lndos -m
-# Do not add -fframe-pointer: mbf32 clobbers IX.
+zcc +test -compiler=80cc -vn -fframe-pointer -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math-mbf32 -lndos -m
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085/MBF32 : 24 bit mantissa
 zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math-mbf32 -lndos -m
@@ -51,7 +51,7 @@ zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -
 
 classic/80cc/math32
 zcc +test -compiler=80cc -vn -fframe-pointer -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math32 -lndos -m
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -O2 -DSTATIC -DTIMER -D__Z88DK whetstone.c -o whetstone.bin --math32 -lndos -m
@@ -123,26 +123,26 @@ KWIPS        = 100*10*1 / 136.0988 = 7.3476
 MWIPS        = 7.3476 / 1000 = 0.0073476
 
 
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 classic/80cc/MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-10122 bytes less page zero
+10384 bytes less page zero
 
-cycle count  = 558782473
-time @ 4MHz  = 558782473 / 4x10^6 = 139.6956 seconds
-KWIPS        = 100*10*1 / 139.6956 = 7.1584
-MWIPS        = 7.1584 / 1000 = 0.0071584
+cycle count  = 565813830
+time @ 4MHz  = 565813830 / 4x10^6 = 141.4535 seconds
+KWIPS        = 100*10*1 / 141.4535 = 7.0695
+MWIPS        = 7.0695 / 1000 = 0.0070695
 
 
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 classic/80cc/8085/MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-9670 bytes less page zero
+8372 bytes less page zero
 
-cycle count  = 561486320
-time @ 4MHz  = 561486320 / 4x10^6 = 140.3716 seconds
-KWIPS        = 100*10*1 / 140.3716 = 7.1240
-MWIPS        = 7.1240 / 1000 = 0.0071240
+cycle count  = 553345612
+time @ 4MHz  = 553345612 / 4x10^6 = 138.3364 seconds
+KWIPS        = 100*10*1 / 138.3364 = 7.2288
+MWIPS        = 7.2288 / 1000 = 0.0072288
 
 8085+MBF32 -> 78.2 Seconds. (historical host measurement)
 8085+AM9511 ->30.4 Seconds. (historical host measurement)
@@ -170,23 +170,23 @@ KWIPS        = 100*10*1 / 165.9068 = 6.0275
 MWIPS        = 6.0275 / 1000 = 0.0060275
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 classic/80cc/math32
 IEEE 32-bit float 24 bit mantissa + 8 bit exponent
-14145 bytes less page zero
+14111 bytes less page zero
 
-cycle count  = 384480584
-time @ 4MHz  = 384480584 / 4x10^6 = 96.1201 seconds
-KWIPS        = 100*10*1 / 96.1201 = 10.4036
-MWIPS        = 10.4036 / 1000 = 0.0104036
+cycle count  = 383323980
+time @ 4MHz  = 383323980 / 4x10^6 = 95.8310 seconds
+KWIPS        = 100*10*1 / 95.8310 = 10.4350
+MWIPS        = 10.4350 / 1000 = 0.0104350
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 classic/80cc/8085/math32
 IEEE 32-bit float (math32_8085)
-13988 bytes less page zero
+13944 bytes less page zero
 
-cycle count  = 667692507
-time @ 4MHz  = 667692507 / 4x10^6 = 166.9231 seconds
-KWIPS        = 100*10*1 / 166.9231 = 5.9908
-MWIPS        = 5.9908 / 1000 = 0.0059908
+cycle count  = 656225936
+time @ 4MHz  = 656225936 / 4x10^6 = 164.0565 seconds
+KWIPS        = 100*10*1 / 164.0565 = 6.0955
+MWIPS        = 6.0955 / 1000 = 0.0060955

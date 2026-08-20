@@ -28,7 +28,7 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlinei
 
 classic/80cc/math32
 zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
@@ -121,20 +121,20 @@ time @ 4MHz  = 2041768834 / 4*10^6 =  8 min 30 sec
 (opt with sqr(): 899712336 ticks, 4660 bytes.)
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic / math32
-4940 bytes less page zero
+4764 bytes less page zero
 
-cycle count  = 1315040014
-time @ 4MHz  = 1315040014 / 4*10^6 =  5 min 29 sec
+cycle count  = 1314554468
+time @ 4MHz  = 1314554468 / 4*10^6 =  5 min 29 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 80cc / classic / 8085 / math32
-4883 bytes less page zero
+4842 bytes less page zero
 
-cycle count  = 2061364665
-time @ 4MHz  = 2061364665 / 4*10^6 =  8 min 35 sec
+cycle count  = 1988563544
+time @ 4MHz  = 1988563544 / 4*10^6 =  8 min 17 sec
 
 
 Z88DK July 19, 2026
