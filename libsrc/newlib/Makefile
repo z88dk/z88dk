@@ -28,8 +28,13 @@ Q ?= @
 target_dir = $(if $(filter $(1),$(MIGRATED_TARGETS)),../target/$(1),target/$(1))
 
 
-.PHONY: all clean install-clean
+.PHONY: all clean install-clean print-targets
 all: $(TARGET)
+
+# build.sh asks for this so -p can be filtered: newlib's target names are
+# not the same set as the classic library's.
+print-targets:
+	@echo $(ALLTARGETS)
 
 clean: $(addsuffix -clean,$(TARGET))
 	@find . -name '*.err' | xargs $(RM)

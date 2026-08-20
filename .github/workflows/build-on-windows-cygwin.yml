@@ -159,7 +159,20 @@ jobs:
         # Oversubscribed on purpose. The runner has 4 cores, but the work is
         # ~200k short-lived processes and cygwin's fork emulation leaves them
         # blocked in DLL load and file I/O rather than on CPU.
-        MAKE_CONCURRENCY=-j8 ./build.sh -v -b
+        #
+        # -p restricts the build to what the suites link, which is all this job
+        # runs now that feature and examples are gone. The list spans two
+        # namespaces and each side ignores names it does not know:
+        #   classic  test cpm rc2014   -- the targets the suites compile for
+        #            z88 cpc           -- only for bbc_math / cpc_math, which
+        #                                 test/suites/math links via --math-bbc
+        #                                 and --math-cpc (see check_target in
+        #                                 libsrc/Makefile)
+        #   newlib   m am9511 math16 math32 cpm rc2014
+        # crt0 and the other maths libraries are in GENLIBS and always built.
+        # If a new suite fails to link here but passes elsewhere, this list is
+        # what needs widening.
+        MAKE_CONCURRENCY=-j8 ./build.sh -v -b -p "test cpm rc2014 z88 cpc m am9511 math16 math32"
 
     - name: Run tests
       run: |

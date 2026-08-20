@@ -194,14 +194,32 @@ fi
 
 
 if [ $do_libbuild = 1 ]; then           # Build libraries or not...
-  if [ $TARGETS ]; then
-	  MAKEARG="TARGETS=$TARGETS"
+  # TARGETS is passed as one quoted argument. Unquoted it split into
+  # `TARGETS=test` plus `cpm` and `rc2014` as stray goals, and the `[ $TARGETS ]`
+  # guard was itself a test(1) syntax error on a multi-word value, so it fell
+  # through and built everything -- -p only ever worked with a single target.
+  if [ -n "$TARGETS" ]; then
+	  $MAKE -C libsrc $MAKE_CONCURRENCY "TARGETS=$TARGETS"
   else
-	  MAKEARG=""
+	  $MAKE -C libsrc $MAKE_CONCURRENCY
   fi
-  $MAKE -C libsrc $MAKE_CONCURRENCY $MAKEARG
   $MAKE -C libsrc install
-  $MAKE -C libsrc/newlib $TARGETS $MAKE_CONCURRENCY
+  # newlib takes its targets as goals, and its names are a different set to the
+  # classic library's -- `test` and `rcmx000` exist only on the classic side, so
+  # passing -p through unfiltered would stop with "no rule to make target".
+  # Ask newlib what it knows rather than keeping a second copy of the list here.
+  if [ -n "$TARGETS" ]; then
+      NEWLIB_ALL=`$MAKE -s -C libsrc/newlib print-targets`
+      NEWLIB_GOALS=""
+      for t in $TARGETS; do
+          case " $NEWLIB_ALL " in
+              *" $t "*) NEWLIB_GOALS="$NEWLIB_GOALS $t" ;;
+          esac
+      done
+  else
+      NEWLIB_GOALS=""
+  fi
+  $MAKE -C libsrc/newlib $NEWLIB_GOALS $MAKE_CONCURRENCY
   $MAKE -C include/_DEVELOPMENT
 fi
 
