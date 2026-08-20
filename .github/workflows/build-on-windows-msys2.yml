@@ -30,6 +30,15 @@ jobs:
       uses: actions/checkout@v5
       with:
         submodules: 'true'
+    # A library build is ~200k short-lived processes, and Defender scans every
+    # exec and every object written. Excluding the trees it touches attacks the
+    # per-spawn cost, which is what the Windows builds are bound by.
+    - name: Exclude build trees from Defender
+      shell: powershell
+      run: |
+        foreach ($p in "${{ github.workspace }}", "C:\msys64", "C:\ccache") {
+          Add-MpPreference -ExclusionPath $p -ErrorAction SilentlyContinue
+        }
     # C:\ccache rather than ~/.ccache: actions/cache resolves ~ through node,
     # to C:\Users\runneradmin, which is not where the msys2 shell's ~ points.
     - name: Cache ccache
