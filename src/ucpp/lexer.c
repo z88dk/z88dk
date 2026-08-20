@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <limits.h>
+#include <errno.h>
 #include "ucppi.h"
 #include "mem.h"
 #ifdef UCPP_MMAP
@@ -443,7 +444,10 @@ void flush_output(struct lexer_state *ls)
 		y += z;
 	} while (z && x > 0);
 	if (!y) {
-		error(ls->line, "could not flush output (disk full ?)");
+		/* errno is the only thing that says why. The old text guessed at a
+		   full disk, which sent a CI failure investigation a long way in the
+		   wrong direction on a volume with 219G free. */
+		error(ls->line, "could not flush output: %s", strerror(errno));
 		die();
 	}
 	ls->sbuf = 0;
