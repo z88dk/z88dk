@@ -12,7 +12,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -D__CPC__ -D__NATIVE_MATH__ -D__MATH_CPC -DFLOAT_IS_48BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/cpc_math.lib $(OUTPUT_DIRECTORY)/464_math.lib $(OUTPUT_DIRECTORY)/664_math.lib $(OUTPUT_DIRECTORY)/6128_math.lib $(OUTPUT_DIRECTORY)/cpcz80_math.lib
+all: $(OUTPUT_DIRECTORY)/cpc_math.lib $(OUTPUT_DIRECTORY)/464_math.lib $(OUTPUT_DIRECTORY)/664_math.lib $(OUTPUT_DIRECTORY)/6128_math.lib $(OUTPUT_DIRECTORY)/cpcz80_math.lib
 
 
 $(OUTPUT_DIRECTORY)/cpc_math.lib: $(addprefix obj/cpc/, $(OBJECTS))
@@ -60,6 +60,9 @@ obj/6128/%.o: %.c
 obj/portable/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,cpc 464 664 6128 portable,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
 	@mkdir -p obj/cpc/c/sccz80 obj/464/c/sccz80 obj/664/c/sccz80 obj/6128/c/sccz80 obj/portable/c/sccz80

@@ -2,11 +2,17 @@ name: build-on-windows-msbuild-x64
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -24,7 +30,7 @@ jobs:
         perl -S cpan App::cpanminus
         perl -S cpanm App::Prove Array::Compare Capture::Tiny Clone CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny Object::Tiny::RW Spreadsheet::ParseXLSX Regexp::Common Test::Harness Test::HexDifferences Test::PureASCII Text::Diff Text::Table YAML::Tiny
     - name: Checkout from git
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with: 
         submodules: 'true'
     - name: Get latest nightly
@@ -32,7 +38,7 @@ jobs:
         curl -L -o z88dk-win32-latest.zip http://nightly.z88dk.org/z88dk-win32-latest.zip
         unzip -d win32-latest z88dk-win32-latest.zip
     - name: Find MSBuild
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
       with:
         msbuild-architecture: x64
     - name: Create config.h

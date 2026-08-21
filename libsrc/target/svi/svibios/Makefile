@@ -6,12 +6,15 @@ TARGET = svi
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o) 
 
-all: dirs $(addprefix obj/$(TARGET)/,$(OBJECTS))
+all: $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
 
 
 obj/$(TARGET)/%.o: %.asm
 	@$(ASSEMBLER) -DFOR$(TARGET) -I$(Z88DK_LIB)/../libsrc/ -I$(Z88DK_LIB) -Oobj/$(TARGET) $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(TARGET)

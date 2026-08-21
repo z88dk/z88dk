@@ -30,9 +30,13 @@ CC ?= gcc
 # Prefix for executables (eg z88dk-, hence z88dk-z80asm, z88dk-copt etc)
 CROSS ?= 0
 
+# OCC keeps the unwrapped compiler: sdcc's configure is invoked as
+# `CC=$(OCC) ./configure`, and a two-word value there would be parsed by the
+# shell as an assignment followed by a command.
 OCC := $(CC)
 ifneq (, $(shell which ccache))
    CC := ccache $(CC)
+   CXX := ccache $(CXX)
 endif
 
 Z88DK_PATH	= $(shell pwd)
@@ -47,7 +51,7 @@ endif
 
 # --> End of Configurable Options
 
-export CC INSTALL CFLAGS CROSS
+export CC CXX INSTALL CFLAGS CROSS
 
 BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/z88dk-sccz80$(EXESUFFIX) bin/z88dk-z80asm$(EXESUFFIX) \

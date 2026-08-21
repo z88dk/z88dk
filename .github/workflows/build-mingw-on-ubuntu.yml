@@ -2,11 +2,17 @@ name: build-mingw-on-ubuntu
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -14,15 +20,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout from git
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with: 
         submodules: 'true'
-    - name: Update apt 
+    # Keyed per workflow: restore-keys is a prefix match, so a shared
+    # "Linux-ccache-" prefix would let this job restore the native build's
+    # cache and vice versa.
+    - name: Cache ccache
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/.ccache
+        key: ${{ runner.os }}-ccache-mingw-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-mingw-
+    - name: Update apt
       run: |
         sudo apt-get update -y
     - name: Install apt dependencies
       run: |
-        sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c
+        sudo apt-get install -y ccache gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c
+    # No /usr/lib/ccache on PATH: the top-level Makefile wraps CC and CXX with
+    # ccache itself, which picks up the cross compilers this job exports.
+    - name: Configure ccache
+      run: |
+        echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+        echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
+        # Compile the original source on a miss, not the preprocessed output.
+        # ccache 3.x (what cygwin ships) defaults the other way, and the
+        # preprocessor strips the "// fall through" comments that
+        # -Wimplicit-fallthrough reads -- with -Werror that is a hard failure.
+        # Default in 4.x; set everywhere so the behaviour does not depend on
+        # which ccache a platform happens to package.
+        echo "CCACHE_CPP2=1" >> $GITHUB_ENV
     - name: Install libxml2
       run: |
         set -ex
@@ -59,3 +89,7 @@ jobs:
         export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig/
         export XML2CONFIG="/usr/x86_64-w64-mingw32/bin/xml2-config --prefix=/usr/x86_64-w64-mingw32"
         make
+    # Hit rate is the only way to tell the cache is working.
+    - name: ccache stats
+      if: always()
+      run: ccache -s

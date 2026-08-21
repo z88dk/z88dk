@@ -27,12 +27,12 @@ OBJECTS = $(CLASSIC_OBJECTS)
 
 .PHONY: dirs  $(NEWLIB_TARGETS)
 
-all: dirs sp1-zx.lib
+all: sp1-zx.lib
 
 sp1-zx.lib: obj/newlib-z80
 	$(Q)$(ASSEMBLER) -xsp1-zx "obj/z80/**/*.o"
 
-obj/newlib-z80: $(NEWLIBGLOBS_ex)
+obj/newlib-z80: $(NEWLIBGLOBS_ex) | dirs
 	$(Q)$(ASSEMBLER) -d -O=obj/z80/x/1/2/3/4 -I. -I$(Z88DK_LIBSRC) -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 	@touch $@
 

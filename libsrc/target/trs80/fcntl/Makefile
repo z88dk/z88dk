@@ -21,7 +21,7 @@ AFILES = fsync.asm
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 OBJECTS = $(addprefix obj/,$(OFILES))
 
-all: dirs $(OBJECTS)
+all: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/trsdos @trsdos.lst
 
 
@@ -30,6 +30,9 @@ obj/%.o: %.c
 
 obj/%.o: %.asm
 	$(ZCC) +trs80 $(CFLAGS) $^ -o $@
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(OBJECTS): | dirs
 
 dirs:
 	@mkdir -p obj

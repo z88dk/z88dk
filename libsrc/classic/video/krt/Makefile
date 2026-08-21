@@ -20,7 +20,7 @@ ASMFILES = $(wildcard stdio/*.asm) $(wildcard graphics/*.asm)
 
 OBJECTS = $(CFILES:.c=.o) $(ASMFILES:.asm=.o)
 
-all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
+all: $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS))
 
 obj/$(OBJSUBDIR)/%.o: %.c
 	@mkdir -p $(dirname $@)
@@ -28,6 +28,9 @@ obj/$(OBJSUBDIR)/%.o: %.c
 
 obj/$(OBJSUBDIR)/%.o: %.asm
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)/stdio obj/$(OBJSUBDIR)/graphics

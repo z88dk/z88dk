@@ -10,7 +10,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=am9511 -D__MATH_DAI32 -DFLOAT_IS_32BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/daimath32.lib $(OUTPUT_DIRECTORY)/daimath32_8080.lib \
+all: $(OUTPUT_DIRECTORY)/daimath32.lib $(OUTPUT_DIRECTORY)/daimath32_8080.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_z80n.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_z180.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_r2ka.lib \
@@ -47,6 +47,9 @@ $(OUTPUT_DIRECTORY)/daimath32_8080.lib: $(addprefix obj/8080/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/daimath32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 	TYPE=kc160 $(LIBLINKER) -mkc160 -x$(OUTPUT_DIRECTORY)/daimath32_kc160 @daimath32.lst
 
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,8080 ez80_z80 kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/8080/c/sccz80 obj/8080/c/asm obj/z80/z80 obj/8080/z80 
