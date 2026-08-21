@@ -25,6 +25,7 @@ show_help_and_exit()
   echo "  -i    PATH Final installation directory"
   echo "  -t    Run tests"
   echo "  -z    Skip the z80asm tests"
+  echo "  -f    Skip the feature tests (hello world for every target)"
   echo "  -v    Be verbose"
   echo ""
   echo "Default is to build binaries and libraries"
@@ -77,6 +78,7 @@ do_examples=0
 do_libbuild=1
 do_tests=0
 skip_z80asm_tests=0
+skip_feature_tests=0
 
 DESTDIR=/usr/local
 
@@ -87,7 +89,7 @@ export ZCCCFG
 export PATH
 
 
-while getopts "bcCehkltzp:i:v" arg; do       # Handle all given arguments
+while getopts "bcCefhkltzp:i:v" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
@@ -99,6 +101,7 @@ while getopts "bcCehkltzp:i:v" arg; do       # Handle all given arguments
     i)     DESTDIR=$OPTARG  ;;
     t)     do_tests=1              ;;   # Run tests as well
     z)     skip_z80asm_tests=1     ;;   # Skip z80asm tests
+    f)     skip_feature_tests=1    ;;   # Skip the all-targets feature tests
     v)     export Q=               ;;   # verbose makefiles
     h | *) show_help_and_exit 0    ;;   # Show help on demand
   esac
@@ -191,25 +194,62 @@ fi
 
 
 if [ $do_libbuild = 1 ]; then           # Build libraries or not...
-  if [ $TARGETS ]; then
-	  MAKEARG="TARGETS=$TARGETS"
+  # TARGETS is passed as one quoted argument. Unquoted it split into
+  # `TARGETS=test` plus `cpm` and `rc2014` as stray goals, and the `[ $TARGETS ]`
+  # guard was itself a test(1) syntax error on a multi-word value, so it fell
+  # through and built everything -- -p only ever worked with a single target.
+  if [ -n "$TARGETS" ]; then
+	  $MAKE -C libsrc $MAKE_CONCURRENCY "TARGETS=$TARGETS"
   else
-	  MAKEARG=""
+	  $MAKE -C libsrc $MAKE_CONCURRENCY
   fi
-  $MAKE -C libsrc $MAKE_CONCURRENCY $MAKEARG
   $MAKE -C libsrc install
-  $MAKE -C libsrc/newlib $TARGETS $MAKE_CONCURRENCY
+  # newlib takes its targets as goals, and its names are a different set to the
+  # classic library's -- `test` and `rcmx000` exist only on the classic side, so
+  # passing -p through unfiltered would stop with "no rule to make target".
+  # Ask newlib what it knows rather than keeping a second copy of the list here.
+  if [ -n "$TARGETS" ]; then
+      NEWLIB_ALL=`$MAKE -s -C libsrc/newlib print-targets`
+      NEWLIB_GOALS=""
+      for t in $TARGETS; do
+          case " $NEWLIB_ALL " in
+              *" $t "*) NEWLIB_GOALS="$NEWLIB_GOALS $t" ;;
+          esac
+      done
+  else
+      NEWLIB_GOALS=""
+  fi
+  $MAKE -C libsrc/newlib $NEWLIB_GOALS $MAKE_CONCURRENCY
   $MAKE -C include/_DEVELOPMENT
 fi
 
 
 if [ $do_tests = 1 ]; then              # Build tests or not...
-  $MAKE -C testsuite
-  if [ $skip_z80asm_tests = 1 ]; then
-      $MAKE -C test suites feature
-  else
-      $MAKE -C test
+  # Test recipes print their own pass/fail lines, so a parallel run needs its
+  # output grouped per target or failures land in the middle of other suites'
+  # output. --output-sync wants make 4.0, and macOS without gmake still ships
+  # 3.81, so ask before using it.
+  MAKE_OUTPUT_SYNC=""
+  if [ -n "$MAKE_CONCURRENCY" ] && $MAKE --output-sync=target --version >/dev/null 2>&1; then
+      MAKE_OUTPUT_SYNC="--output-sync=target"
   fi
+  # test/Makefile's `all` is subdirs-all (suites + feature) plus src-all, so
+  # dropping either means naming the goals explicitly rather than using all.
+  if [ $skip_z80asm_tests = 1 ]; then
+      if [ $skip_feature_tests = 1 ]; then
+          TEST_GOALS="suites"
+      else
+          TEST_GOALS="suites feature"
+      fi
+  else
+      if [ $skip_feature_tests = 1 ]; then
+          TEST_GOALS="suites src-all"
+      else
+          TEST_GOALS=""
+      fi
+  fi
+  $MAKE -C testsuite $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC
+  $MAKE -C test $MAKE_CONCURRENCY $MAKE_OUTPUT_SYNC $TEST_GOALS
 fi
 
 if [ $do_examples = 1 ]; then           # Build examples or not...

@@ -1,6 +1,7 @@
 include ../../Make.config
 
-TARGET = cpm 
+TARGET = cpm
+
 
 SUBDIRS = graphics fcntl stdio time cpm gsx
 CLEANDIRS = $(SUBDIRS:%=%-clean)
@@ -8,7 +9,7 @@ CLEANDIRS = $(SUBDIRS:%=%-clean)
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
-all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
+all: subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
 
 subdirs-all: $(SUBDIRS)
@@ -26,6 +27,9 @@ subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
 	@$(ASSEMBLER) -DFOR$(TARGET) -I../.. -Oobj/$(TARGET)  $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(TARGET)

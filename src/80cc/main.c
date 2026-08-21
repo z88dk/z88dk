@@ -345,6 +345,21 @@ int main(int argc, char** argv)
     gen_file_header(); /* intro code */
     parse(); /* process ALL input */
 
+    /* preproc.c closes at EOF and ccabort() on the error path; this only
+       catches a parse that returned without reaching either. Drain first, or
+       the close is itself what breaks the pipe. */
+    if (input != NULL) {
+        if (input_is_pipe) {
+            char drain[4096];
+            while (fread(drain, 1, sizeof(drain), input) > 0)
+                ;
+            cpp_close(input);
+        } else {
+            fclose(input);
+        }
+        input = NULL;
+    }
+
 
 
 

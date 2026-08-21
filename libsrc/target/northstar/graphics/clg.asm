@@ -10,6 +10,7 @@
     PUBLIC  clg
     PUBLIC  _clg
     ;EXTERN  generic_console_cls
+    EXTERN  __bdos
 
     EXTERN  __gfx_vram_page_in
     EXTERN  __gfx_vram_page_out
@@ -20,6 +21,10 @@
 
 clg:
 _clg:
+
+    ld      e,19h   ; CTRL-Y  to disable cursor
+    ld      c,2
+    call    __bdos
 
     call    __gfx_vram_page_in
     ; --- Set graphics page to page 0 ---

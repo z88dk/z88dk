@@ -46,7 +46,7 @@ OBJECTS = $(addprefix obj/z80/nodevice/,$(OFILES)) $(addprefix obj/z80/device/,$
 	$(addprefix obj/z180/nodevice/,$(OFILES)) $(addprefix obj/z180/device/,$(OFILES))
 
 
-all: dirs $(OBJECTS)
+all: $(OBJECTS)
 
 obj/z80/nodevice/%.o: %.c
 	$(ZCC) +cpm $(CFLAGS) $^ -o $@
@@ -80,6 +80,9 @@ obj/ixiy/device/%.o: %.c
 
 
 .PHONY:	dirs
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(OBJECTS): | dirs
 
 dirs:
 	@mkdir -p obj obj/z80/device obj/z80/nodevice \

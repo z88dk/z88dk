@@ -33,8 +33,8 @@ classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
 
 classic/80cc
-zcc +test -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
-# Do not add -fframe-pointer: mbf32 clobbers IX.
+zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:CRT_HEAP_AMALLOC=1
@@ -87,17 +87,17 @@ cycle count  = 149280700
 time @ 4MHz  = 149280700 / 4*10^6 =   37.3 sec
 
 
-Z88DK August 17, 2026
+Z88DK August 19, 2026
 classic/80cc
-4036 bytes less page zero
+4087 bytes less page zero
 
-cycle count  = 151405574
-time @ 4MHz  = 151405574 / 4*10^6 = 37.85 sec
+cycle count  = 151824215
+time @ 4MHz  = 151824215 / 4*10^6 =   38.0 sec
 
 
-Z88DK August 17, 2026
+Z88DK August 19, 2026
 classic/80cc/8085
 3876 bytes less page zero
 
 cycle count  = 150137083
-time @ 4MHz  = 150137083 / 4*10^6 = 37.53 sec
+time @ 4MHz  = 150137083 / 4*10^6 =   37.5 sec

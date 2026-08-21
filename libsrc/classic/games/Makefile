@@ -26,7 +26,7 @@ OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
 .PHONY: dirs 
 
-all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
+all: $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS))
 
 obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
@@ -36,6 +36,9 @@ obj/$(OBJSUBDIR)/%.o: %.asm
 
 obj/zxn/%.o: %.c
 	$(ZCC) +$(TARGET) -clib=classic $(CFLAGS) -o $@  $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR) 

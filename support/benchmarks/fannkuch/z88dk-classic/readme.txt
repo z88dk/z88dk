@@ -34,7 +34,7 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -
 
 classic/80cc
 zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
@@ -77,20 +77,20 @@ cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 classic/80cc
-2008 bytes less page zero
+1871 bytes less page zero
 
-cycle count  = 74090072
-time @ 4MHz  = 74090072 / 4*10^6 = 18.52 sec
+cycle count  = 69027872
+time @ 4MHz  = 69027872 / 4*10^6 =   17.3 sec
 
 
-Z88DK July 20, 2026
+Z88DK August 19, 2026
 classic/80cc/8085
-1984 bytes less page zero
+1722 bytes less page zero
 
-cycle count  = 77390398
-time @ 4MHz  = 77390398 / 4*10^6 = 19.35 sec
+cycle count  = 64523364
+time @ 4MHz  = 64523364 / 4*10^6 =   16.1 sec
 
 
 Z88DK August 16, 2026

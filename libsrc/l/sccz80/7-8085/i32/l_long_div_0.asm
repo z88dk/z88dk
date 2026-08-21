@@ -236,44 +236,52 @@ defc DIV16_FASTPATH = 1
 .div16
     ld      de,sp+8
     ld      hl,(de)
-    ld      bc,hl               ; BC = divisor (MSW known zero)
-    ld      a,c
-    or      b
+    ld      a,h
+    or      l
     jp      z,full_32           ; divisor 0 -> generic path handles it
+    ld      bc,hl               ; BC = divisor (MSW known zero)
 
     ld      de,sp+16
     ld      hl,(de)             ; HL = dividend MSW
-    ld      de,0                ; remainder = 0
-    call    d16_pass            ; -> HL = quotient MSW, DE = remainder
-
-    push    hl                  ; save quotient MSW          (sp shifts +2)
-    push    de                  ; save remainder             (sp shifts +4)
-    ld      de,sp+18            ; dividend LSW (14 + 4)
+    ld      de,hl               ; rem candidate = MSW
+    sub     hl,bc
+    jp      nc,d16_msw_ge       ; MSW >= D: need a real first pass
+    ld      hl,0                ; MSW < D: quot MSW = 0, DE = rem = MSW
+.d16_have_msw
+    ; HL = quot MSW, DE = rem.  Write MSW now so the second pass sits
+    ; on the original frame (no stacked quot).
+    push    de                  ; rem                              (sp +2)
+    ld      de,sp+18            ; quot MSW slot (16 + 2)
+    ld      (de),hl
+    ld      de,sp+16            ; dividend LSW (14 + 2)
     ld      hl,(de)
-    pop     de                  ; remainder back             (sp +2)
-    call    d16_pass            ; -> HL = quotient LSW, DE = final remainder
+    pop     de                  ; rem
+    call    d16_pass            ; -> HL = quot LSW, DE = rem
 
-    ld      bc,hl               ; park quotient LSW (divisor dead)
-    ld      hl,de               ; HL = remainder
-    ld      de,sp+6             ; remainder LSW slot (4 + 2)
+    ld      bc,hl               ; park quot LSW (divisor dead)
+    ld      hl,de
+    ld      de,sp+4             ; remainder LSW
     ld      (de),hl
     ld      hl,0
-    ld      de,sp+8             ; remainder MSW slot (6 + 2) - always zero
+    ld      de,sp+6             ; remainder MSW - always zero
     ld      (de),hl
     ld      hl,bc
-    ld      de,sp+16            ; quotient LSW slot (14 + 2)
-    ld      (de),hl
-    pop     hl                  ; quotient MSW               (sp +0)
-    ld      de,sp+16            ; quotient MSW slot
+    ld      de,sp+14            ; quot LSW
     ld      (de),hl
     ret
 
+.d16_msw_ge
+    ld      hl,de               ; restore MSW
+    ld      de,0                ; rem = 0
+    call    d16_pass            ; -> HL = quot MSW, DE = rem
+    jp      d16_have_msw
+
 ; One 16-bit pass.  HL = dividend half in, quotient half out; DE = remainder in
 ; and out; BC = divisor; A destroyed.  NB no sp-relative access in here - the
-; call has shifted sp by 2.
+; call has shifted sp by 2.  add hl,hl ignores carry in, so the entry C is
+; irrelevant.
 .d16_pass
     ld      a,16
-    or      a                   ; clear carry: first quotient bit is 0
 .d16_loop
     add     hl,hl               ; Q <<= 1 (bit 0 clear), CF = dividend MSB
     rl      de                  ; R = (R<<1)|CF, CF = R bit 16

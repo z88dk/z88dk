@@ -47,5 +47,16 @@ $(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTIC
 $(eval $(call buildtargetc,target/zxn,zxn,-clib=classic))
 $(eval $(call bifrost_zx0,zxn))
 
+# zx and zxn share the multicolour engine sources under target/zx, and z80asm
+# expands a .asm.m4 into the .asm beside the source rather than into the
+# per-target obj dir. Under -j both assemblies write and read that one file.
+# Order the zxn side after the zx side, for the bifrost_zx0 rules and for the
+# buildtargetasm stamps that assemble $(ZX_MULTICOLOUR_GLOBS).
+#
+# Chaining zxn_clib.lib to zx_clib.lib would not work: make may build
+# $(ZXN_TARGETS) and zx_clib.lib concurrently, one shared source in each.
+target/zxn/obj/zxn/bifrost2_engine_48.bin.zx0: target/zx/obj/zx/bifrost2_engine_p3.bin.zx0
+target/zxn/obj/target-zxn-zxn: target/zx/obj/target-zx-zx
+
 target-zxn-clean:
 	$(RM) -fr target/zxn/obj

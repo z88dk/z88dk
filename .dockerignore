@@ -1,0 +1,20 @@
+# The image needs the tree, not its history: .git alone is over 500M, which is
+# why the Dockerfile used to shallow-clone instead of taking the build context.
+.git
+.github
+
+# Build products. These must not be copied in: a host tree may hold binaries
+# for the wrong architecture entirely, and make would then consider them
+# up to date and skip rebuilding.
+bin/
+**/obj/
+lib/clibs/**/*.lib
+lib/*.lib
+libsrc/**/*.lib
+**/*.o
+**/*.a
+
+# Local scratch
+node_modules/
+**/*.swp
+*.tmp

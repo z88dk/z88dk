@@ -52,7 +52,7 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m 
 
 classic/80cc/math32
 zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 classic/80cc/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O2 fasta.c -o fasta.bin -m --math32 -lndos -pragma-define:CRT_HEAP_AMALLOC=1
@@ -103,33 +103,33 @@ cycle count  = 165734164
 time @ 4MHz  = 165734164 / 4*10^6 = 41.43 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 classic/sccz80/math32
-4305 bytes less page zero
+4367 bytes less page zero
 
-cycle count  = 122937964
-time @ 4MHz  = 122937964 / 4*10^6 =   30.7 sec
+cycle count  = 123137988
+time @ 4MHz  = 123137988 / 4*10^6 =   30.8 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 classic/sccz80/8085/math32
-5211 bytes less page zero
+5267 bytes less page zero
 
-cycle count  = 185985608
-time @ 4MHz  = 185985608 / 4*10^6 =   46.5 sec
+cycle count  = 185981358
+time @ 4MHz  = 185981358 / 4*10^6 =   46.5 sec
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 classic/80cc/math32
-5579 bytes less page zero
+5524 bytes less page zero
 
-cycle count  = 173739114
-time @ 4MHz  = 173739114 / 4*10^6 =   43.4 sec
+cycle count  = 159261134
+time @ 4MHz  = 159261134 / 4*10^6 =   39.8 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 classic/80cc/8085/math32
-6113 bytes less page zero
+6169 bytes less page zero
 
-cycle count  = 260585004
-time @ 4MHz  = 260585004 / 4*10^6 =  1 min  5 sec
+cycle count  = 260580754
+time @ 4MHz  = 260580754 / 4*10^6 =  1 min  5 sec

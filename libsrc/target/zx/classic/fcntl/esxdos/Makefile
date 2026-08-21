@@ -12,7 +12,7 @@ CLASSIC_OBJECTS = $(addprefix obj/,$(CFILES:.c=.o)) $(addprefix obj/,$(AFILES:.a
 
 NEWLIBGLOBS := 
 
-all: dirs $(OUTPUT_DIRECTORY)/esxdos.lib
+all: $(OUTPUT_DIRECTORY)/esxdos.lib
 
 .PHONY: dirs 
 
@@ -24,6 +24,9 @@ obj/%.o: %.c
 
 obj/%.o: %.asm
 	$(ZCC) +zx $(CFLAGS) -DESXDOS -o $@ $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(CLASSIC_OBJECTS): | dirs
 
 dirs:
 	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k

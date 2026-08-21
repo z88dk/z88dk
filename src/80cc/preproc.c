@@ -82,7 +82,18 @@ void vinline(void)
         ++lineno;
 
         if (k <= 0) {
-            fclose(input);
+            /* When the preprocessor was spawned (no --c1mode) this is a popen
+               stream: fclose would drop it without reaping the child or
+               looking at its status, so a preprocessor that failed part way
+               through left us having quietly compiled a truncated file. */
+            if (input_is_pipe) {
+                if (cpp_close(input) != 0) {
+                    fprintf(stderr, "Preprocessor failed for %s\n", Filename);
+                    errcnt++;
+                }
+            } else {
+                fclose(input);
+            }
             input = 0;
             c_eof = 1;
         }

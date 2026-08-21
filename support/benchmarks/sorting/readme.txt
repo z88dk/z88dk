@@ -61,16 +61,16 @@ sort-rev-20          46416     0.0116 sec
 sort-equ-20         121709     0.0304 sec
 
 3b.
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic c library / quicksort
 1933 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          50233     0.0126 sec
-sort-ord-20          38248     0.0096 sec
-sort-rev-20          45159     0.0113 sec
-sort-equ-20         117722     0.0294 sec
+sort-ran-20         50233     0.0126 sec
+sort-ord-20         38248     0.0096 sec
+sort-rev-20         45159     0.0113 sec
+sort-equ-20        117722     0.0294 sec
 
 4.
 Z88DK March 25, 2017
@@ -159,15 +159,15 @@ sort-rev-5000     32248314     8.0621 sec
 sort-equ-5000   6716015259    1679.0038 sec
 
 3b.
-Z88DK August 17, 2026
+Z88DK August 19, 2026
 80cc / classic c library / quicksort
 
                cycle count    time @ 4MHz
 
-sort-ran-5000     38866533     9.7166 sec
-sort-ord-5000     29294145     7.3235 sec
-sort-rev-5000     31126158     7.7815 sec
-sort-equ-5000   6453567759    1613.3919 sec
+sort-ran-5000    38866533     9.7166 sec
+sort-ord-5000    29294145     7.3235 sec
+sort-rev-5000    31126158     7.7815 sec
+sort-equ-5000  6453567759    1613.3919 sec
 
 4.
 Z88DK March 25, 2017

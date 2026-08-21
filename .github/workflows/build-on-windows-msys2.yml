@@ -1,10 +1,16 @@
 name: build-on-windows-msys2
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -21,19 +27,41 @@ jobs:
         git config --global core.autocrlf input
       shell: cmd
     - name: Checkout from git
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: 'true'
+    # A library build is ~200k short-lived processes, and Defender scans every
+    # exec and every object written. Excluding the trees it touches attacks the
+    # per-spawn cost, which is what the Windows builds are bound by.
+    - name: Exclude build trees from Defender
+      shell: powershell
+      run: |
+        foreach ($p in "${{ github.workspace }}", "C:\msys64", "C:\ccache") {
+          Add-MpPreference -ExclusionPath $p -ErrorAction SilentlyContinue
+        }
+    # C:\ccache rather than ~/.ccache: actions/cache resolves ~ through node,
+    # to C:\Users\runneradmin, which is not where the msys2 shell's ~ points.
+    - name: Cache ccache
+      uses: actions/cache@v5
+      with:
+        path: |
+          C:\ccache
+        key: ${{ runner.os }}-ccache-msys2-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-msys2-
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
         msystem: MINGW64
         update: true
+        # The image already ships MSYS2; a fresh install just puts a second
+        # copy on disk and costs the time to download it.
+        release: false
         install: >
             base-devel
             git
             m4
-            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-ccache
             mingw-w64-x86_64-expat
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-gmp
@@ -71,34 +99,53 @@ jobs:
       shell: msys2 {0}
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         echo "PERL5LIB=$PERL5LIB"
         perl -V
         ln -s /mingw64/bin/mingw32-make /mingw64/bin/make
         which make
+    # No compiler masquerade needed: the top-level Makefile wraps both CC and
+    # CXX with ccache itself when ccache is on PATH.
+    - name: Configure ccache
+      run: |
+        echo "CCACHE_DIR=/c/ccache" >> $GITHUB_ENV
+        echo "CCACHE_MAXSIZE=300M" >> $GITHUB_ENV
+        # Compile the original source on a miss, not the preprocessed output.
+        # ccache 3.x (what cygwin ships) defaults the other way, and the
+        # preprocessor strips the "// fall through" comments that
+        # -Wimplicit-fallthrough reads -- with -Werror that is a hard failure.
+        # Default in 4.x; set everywhere so the behaviour does not depend on
+        # which ccache a platform happens to package.
+        echo "CCACHE_CPP2=1" >> $GITHUB_ENV
     - name: Build binaries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         mkdir -p bin
         cp `which m4` bin/
         ./build.sh -v -l
+    # Hit rate is the only way to tell the cache is working.
+    - name: ccache stats
+      if: always()
+      run: |
+        export PATH=/mingw64/bin:/usr/bin:/bin
+        ccache -s
     - name: Build libraries
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
-        ./build.sh -v -b
+        MAKE_CONCURRENCY=-j4 ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
         ./build.sh -v -b -l -e
     - name: Run tests
       run: |
         export PATH=/mingw64/bin:/usr/bin:/bin:/c/Strawberry/perl/bin
-        export PERL5LIB="/d/a/_temp/msys64/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
+        export PERL5LIB="/mingw64/lib/perl5/site_perl:/c/Strawberry/perl/site/lib:/c/Strawberry/perl/vendor/lib"
         hash -r
-        ./build.sh -v -b -l -t
+        MAKE_CONCURRENCY=-j4 ./build.sh -v -b -l -t

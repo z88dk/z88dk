@@ -58,7 +58,7 @@ zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlinei
 
 80cc/classic/math32
 zcc +test -compiler=80cc -vn -fframe-pointer -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
-# Z80 80cc: -fframe-pointer (IX). Do not use with --math-mbf32 (mbf32 clobbers IX).
+# Z80 80cc: -fframe-pointer (IX).
 
 80cc/classic/8085/math32
 zcc +test -clib=8085 -compiler=80cc -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
@@ -136,24 +136,24 @@ cycle count  = 7938950247
 time @ 4MHz  = 7938950247 / 4*10^6 =  33 min  5 sec
 
 
-Z88DK August 18, 2026
+Z88DK August 19, 2026
 80cc / classic c library / math32
-6416 bytes less page zero
+6268 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 4962667851
-time @ 4MHz  = 4962667851 / 4*10^6 =  20 min 41 sec
+cycle count  = 4543479003
+time @ 4MHz  = 4543479003 / 4*10^6 =  18 min 56 sec
 
 
-Z88DK August 15, 2026
+Z88DK August 19, 2026
 80cc / classic c library / 8085 / math32
-6921 bytes less page zero
+6882 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 7955869788
-time @ 4MHz  = 7955869788 / 4*10^6 =  33 min  9 sec
+cycle count  = 7866270332
+time @ 4MHz  = 7866270332 / 4*10^6 =  32 min 47 sec
 
 
 Z88DK July 19, 2026
