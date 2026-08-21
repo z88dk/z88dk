@@ -514,7 +514,22 @@ again:
 
 
         if (symname(sname) ) {
-            if ((ptr = findglb(sname))) {
+            /* `sizeof` / `__builtin_offsetof` read as plain identifiers here.
+               The unparenthesised form is taken by the rmatch2() branch above;
+               a parenthesised one — `(sizeof(T) + 3) & ~3` — walks the paren
+               loop above and would be looked up as a global. Rewind past the
+               consumed parens and fold the whole initialiser instead. */
+            if (strcmp(sname, "sizeof") == 0
+             || strcmp(sname, "__builtin_offsetof") == 0) {
+                lptr = klptr;
+                parencount = 0;
+                if ( constexpr_z(&zvalue, &valtype, 1) ) {
+                    value = (double)zvalue;
+                    goto constdecl;
+                }
+                errorfmt("Expecting a constant expression for static initialisation\n",1);
+                junk();
+            } else if ((ptr = findglb(sname))) {
                 Type *ptype = ptr->ctype;
 
                 /* Actually found sommat..very good! */
