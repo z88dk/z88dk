@@ -384,13 +384,16 @@ IF FORnc200
     defc    _GFX_PAGE_VRAM = 1
 ENDIF
 
-
+IF FORnorthstar
+    defc    _GFX_MAXX       = 640
+    defc    _GFX_MAXY       = 240
+    defc    _GFX_PAGE_VRAM = 1
+ENDIF
 
 IF FORondra
     defc    _GFX_MAXX    = 320
     defc    _GFX_MAXY    = 256
 ENDIF
-
 
 IF FORosborne1
     defc    _GFX_MAXX    = 104
@@ -412,8 +415,6 @@ IF FORoz
     defc    _GFX_MAXY    = 80
     defc    _GFX_PAGE_VRAM = 1
 ENDIF
-
-
 
 IF FORp2000
     defc    _GFX_MAXX    = 78
