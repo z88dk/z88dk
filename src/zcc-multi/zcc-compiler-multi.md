@@ -165,6 +165,8 @@ If multi is on and the clib recipe is an sdcc recipe (`sdcc_ix`, `sdcc_iy`), zcc
 
 The error MUST say that `-compiler=multi` does not support the sdcc ABI.
 
+zcc MUST snapshot command-line multi after option parse. After subtype and clib expansion, if that snapshot is set and `c_compiler_type` is `sdcc`, fail with the ABI error. Otherwise restore `c_compiler_type` to `multi`. Do not test the clib name. The conflict is the `-compiler=sdcc` token in the recipe.
+
 ### Frame-pointer flags
 
 zcc has no native `-fframe-pointer` option.

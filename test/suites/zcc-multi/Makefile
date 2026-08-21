@@ -1,6 +1,6 @@
 include ../make.config
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok
+all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
@@ -142,7 +142,18 @@ ldimm.ok: ../../../src/zcc-multi/t/ldimm.asm ../../../src/zcc-multi/t/nops.asm
 	grep -q '^_foo	80cc-sp' ldimm.tsv
 	touch $@
 
+# Command-line multi vs a recipe that sets -compiler=sdcc is the sdcc ABI.
+sdcc_abi.ok: twofuncs.c
+	if zcc +cpm -clib=sdcc_iy -vn -c -compiler=multi twofuncs.c -o sdcc_abi.o 2>sdcc_abi.err; then exit 1; fi
+	grep -q -- '-compiler=multi does not support the sdcc ABI' sdcc_abi.err
+	if grep -q zsdcc sdcc_abi.err; then exit 1; fi
+	if zcc +cpm -clib=sdcc_ix -vn -c -compiler=multi twofuncs.c -o sdcc_abi.o 2>sdcc_abi.err; then exit 1; fi
+	grep -q -- '-compiler=multi does not support the sdcc ABI' sdcc_abi.err
+	if zcc +rc2014 -vn -c -compiler=multi twofuncs.c -o sdcc_abi.o 2>sdcc_abi.err; then exit 1; fi
+	grep -q -- '-compiler=multi does not support the sdcc ABI' sdcc_abi.err
+	touch $@
+
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm sdcc_abi.o
 
 .PHONY: all clean

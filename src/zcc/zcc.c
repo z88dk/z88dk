@@ -188,6 +188,7 @@ static void            parse_configfile(const char *config_line);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
+static void            keep_user_multi(void);
 
 static void            configure_assembler(void);
 static void            configure_compiler(void);
@@ -323,6 +324,7 @@ static enum iostyle    compiler_style = outimplied;
 #define CC_MULTI     5
 
 static char           *c_compiler_type = "sccz80";
+static int             c_want_multi = 0;
 static int             compiler_type = CC_SCCZ80;
 
 static char           *zcc_opt_dir = ".";
@@ -1081,7 +1083,8 @@ int main(int argc, char **argv)
             add_file_to_process(aa, 1);
         }
     }
-    processing_user_command_line_arg = 0; 
+    processing_user_command_line_arg = 0;
+    c_want_multi = (c_compiler_type && strcmp(c_compiler_type, "multi") == 0);
 
     if (c_print_specs) {
         print_specs();
@@ -1097,6 +1100,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Cannot find definition for -clib=%s\n", c_clib);
         exit(1);
     }
+    keep_user_multi();
 
     /* We must have at least a crt file - we can rely on defaults for everything else */
     if (c_crt0 == NULL) {
@@ -3153,6 +3157,20 @@ static int multi_user_frame_flags(void)
            multi_arg_has(sccz80arg, "-frameiy");
 }
 
+/* Command-line -compiler=multi survives CLIB/subtype expansion.
+ * A recipe that switches the compiler to sdcc is the sdcc ABI and is an error.
+ */
+static void keep_user_multi(void)
+{
+    if (!c_want_multi)
+        return;
+    if (c_compiler_type && strcmp(c_compiler_type, "sdcc") == 0) {
+        fprintf(stderr, "-compiler=multi does not support the sdcc ABI\n");
+        exit(1);
+    }
+    c_compiler_type = "multi";
+}
+
 /* Same three pins as src/80cc/main.c: no IX/IY on 8080, 8085, gbz80. */
 static int multi_cpu_has_ix(void)
 {
@@ -3544,10 +3562,6 @@ static void configure_compiler(void)
         compiler_style = filter_outspecified_flag;
         c_stylecpp = filter_out;
     } else if (strcmp(c_compiler_type,"multi") == 0 ) {
-        if (c_clib && strstr(c_clib, "sdcc")) {
-            fprintf(stderr, "-compiler=multi does not support the sdcc ABI\n");
-            exit(1);
-        }
         if (multi_user_frame_flags()) {
             fprintf(stderr, "-compiler=multi selects frame-pointer flags per variant\n");
             exit(1);
