@@ -26,10 +26,15 @@ ARG GIT_COUNT=0
 ENV git_rev=${GIT_REV} \
     git_count=${GIT_COUNT}
 
+# The library build was serial here while every CI job runs it with -j. That
+# is most of the image build, and it costs arm64 three times what it costs
+# amd64 -- 100.6m against 34.5m -- so the missing -j hurts there most.
+# Only the libraries: the top-level build is not -j safe, as src/z80nm,
+# src/z80asm and src/zobjcopy each compile ../common/*.o to the same paths.
 RUN cd ${Z88DK_PATH} \
     && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)" \
     && chmod 777 build.sh \
-    && BUILD_SDCC=1 BUILD_SDCC_HTTP=1 ./build.sh \
+    && MAKE_CONCURRENCY=-j$(nproc) BUILD_SDCC=1 BUILD_SDCC_HTTP=1 ./build.sh \
     && make install-clean bins-clean
 
 # The build deps stay behind in the builder rather than being apk del'd out of
