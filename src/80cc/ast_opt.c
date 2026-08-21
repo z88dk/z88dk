@@ -1927,9 +1927,26 @@ static void cse_env_invalidate_sym(cse_env *e, SYMBOL *sym)
 }
 
 /* "Interesting" enough to record. SEF is checked separately. */
+/* A candidate becomes a synthesized local (cse_make_stub_sym /
+   make_licm_stub_sym), so its type must be storable in one. `(void)x` is an
+   OP_CAST, interesting by shape, but ir_build rejects a void AST_DECL. Both
+   collectors then walk into the operand and hoist that instead. A NULL type
+   is left alone — the stub makers default it to int. */
+static int type_is_stub_storable(Node *n)
+{
+    if (!n || !n->type) return 1;
+    switch (n->type->kind) {
+    case KIND_NONE: case KIND_VOID: case KIND_FUNC: case KIND_ELLIPSES:
+        return 0;
+    default:
+        return 1;
+    }
+}
+
 static int is_cse_interesting(Node *n)
 {
     if (!n) return 0;
+    if (!type_is_stub_storable(n)) return 0;
     switch (n->ast_type) {
     case AST_LITERAL:
     case AST_STR_LIT:
