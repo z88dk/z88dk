@@ -1,6 +1,6 @@
 include ../make.config
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok
+all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
@@ -131,7 +131,18 @@ ldir.ok: ../../../src/zcc-multi/t/ldir_bc.asm ../../../src/zcc-multi/t/ldir_unk.
 	test `awk -F'	' '/^_foo/ {print $$6}' ldir_bc0.tsv` -gt 1000000
 	touch $@
 
+# Operand-based ticks: ld hl,1 is 10 T, not 4. nop+nop+ret (18) beats ld hl,1 / ret (20).
+ldimm.ok: ../../../src/zcc-multi/t/ldimm.asm ../../../src/zcc-multi/t/nops.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=ldimm_stitch.asm --report=ldimm.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/ldimm.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/nops.asm
+	test `awk -F'	' '/^_foo/ {print $$6}' ldimm.tsv` -eq 20
+	test `awk -F'	' '/^_foo/ {print $$7}' ldimm.tsv` -eq 18
+	grep -q '^_foo	80cc-sp' ldimm.tsv
+	touch $@
+
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm
 
 .PHONY: all clean

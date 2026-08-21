@@ -3,11 +3,6 @@
 
 #include <stddef.h>
 
-/* Static T-state estimate for one listing instruction.
- * Conditional insns use the not-taken time unless backward is set
- * (a loop-closing branch uses the taken time).
- * *fallback is set for jp (hl) / jp (ix) / jp (iy). */
-
 enum {
     TICKS_CPU_Z80 = 0,
     TICKS_CPU_Z80N,
@@ -17,21 +12,36 @@ enum {
     TICKS_CPU_GBZ80
 };
 
+enum {
+    CTL_NONE = 0,
+    CTL_JP,
+    CTL_JR,
+    CTL_DJNZ,
+    CTL_CALL,
+    CTL_RET
+};
+
 int ticks_cpu_from_name(const char *cpu);
 
-int listing_parse_line(const char *line, int *linenum, char *src, size_t src_sz);
+/* Opcode byte count and trailing source text. Listing line numbers are not used. */
+int listing_parse_line(const char *line, char *src, size_t src_sz);
 
-int ticks_for_src(int cpu_kind, int nbytes, const char *src, int backward, int *fallback);
+/*
+ * Documented T-states from the mnemonic and operands (clrhome).
+ * Conditional insns use the not-taken time unless backward is set.
+ * *fallback is set for jp (hl)/(ix)/(iy), halt, and unknown ops.
+ */
+int ticks_for_src(int cpu_kind, const char *src, int backward, int *fallback);
 
-/* kind: 0=other, 1=jp, 2=jr, 3=djnz, 4=call, 5=ret.
- * cc is the condition token (nz, k, nk, …) or empty. Either buffer may be NULL. */
+/* kind: CTL_*. cc is nz, k, nk, … or empty. Either buffer may be NULL. */
 int parse_control(const char *src, int *kind, int *cond, int *indirect,
                   char *target, size_t target_sz, char *cc, size_t cc_sz);
 
-/* Immediate operand after "ld r," / "ld rr,". Returns 1 and writes *val. */
+/* Immediate after "ld r," / "ld rr,". Returns 1 and writes *val. */
 int parse_ld_imm(const char *src, char *reg, size_t reg_sz, long *val);
 
-int parse_dec_reg(const char *src, char *reg, size_t reg_sz);
+/* "inc r" / "dec r". op is "inc" or "dec". */
+int parse_reg_op(const char *src, const char *op, char *reg, size_t reg_sz);
 
 /* "or r" or "or a,r". Returns 1 and writes the source register. */
 int parse_or_reg(const char *src, char *reg, size_t reg_sz);

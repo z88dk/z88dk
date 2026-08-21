@@ -52,16 +52,11 @@ enum {
 };
 
 enum {
-    LK_TEXT = 0,
-    LK_OPT_BANNER,
-    LK_STATICS_BANNER,
-    LK_SCOPE_BANNER
+    BANNER_NONE = 0,
+    BANNER_OPT,
+    BANNER_STATICS,
+    BANNER_SCOPE
 };
-
-typedef struct {
-    char  *text;
-    int    kind;
-} Line;
 
 typedef struct {
     char  *name;          /* "_foo" */
@@ -71,18 +66,18 @@ typedef struct {
     int    ticks;
     int    base_size;     /* listing + loops, no helpers / intra-TU */
     int    base_ticks;
-    int    have_size;
-    int    have_ticks;
-    int    bad_ticks;     /* jp (hl) / (ix) / (iy) — fall back to size */
+    int    bad_ticks;     /* jp (hl) / (ix) / (iy) / halt / unknown — size */
 } Func;
 
 typedef struct {
     char  *name;
     char  *path;
-    Line  *lines;
+    char **lines;
     int    nlines;
+    int    lines_cap;
     Func  *funcs;
     int    nfuncs;
+    int    funcs_cap;
     int    first_func;    /* first function line, or nlines */
     int    trailer;       /* line of first banner after functions, or nlines */
     int    statics;       /* Static Variables banner, or -1 */
@@ -139,6 +134,25 @@ static void *xmalloc(size_t n)
     return p;
 }
 
+static void *xrealloc(void *p, size_t n)
+{
+    void *q = realloc(p, n ? n : 1);
+    if (!q)
+        die("out of memory");
+    return q;
+}
+
+static const char *path_base(const char *path)
+{
+    const char *b = strrchr(path, '/');
+#ifdef _WIN32
+    const char *w = strrchr(path, '\\');
+    if (!b || (w && w > b))
+        b = w;
+#endif
+    return b ? b + 1 : path;
+}
+
 static char *xstrdup(const char *s)
 {
     size_t n = strlen(s) + 1;
@@ -166,6 +180,9 @@ static int starts_with(const char *s, const char *pfx)
 {
     return strncmp(s, pfx, strlen(pfx)) == 0;
 }
+
+static int pair_half_of(const char *pair, const char *r);
+static void choice_callee(const char *raw, char *out, size_t n);
 
 static int is_ident_start(int c)
 {
@@ -198,14 +215,14 @@ static int banner_kind(const char *s)
 {
     s = skip_ws(s);
     if (!starts_with(s, ";"))
-        return 0;
+        return BANNER_NONE;
     if (strstr(s, "Start of Optimiser additions"))
-        return 1;
+        return BANNER_OPT;
     if (strstr(s, "Start of Static Variables"))
-        return 2;
+        return BANNER_STATICS;
     if (strstr(s, "Start of Scope Defns"))
-        return 3;
-    return 0;
+        return BANNER_SCOPE;
+    return BANNER_NONE;
 }
 
 static int section_class(const char *s)
@@ -266,21 +283,21 @@ static int is_local_label_token(const char *tok, size_t n)
 
 static void add_line(Variant *v, const char *text)
 {
-    v->lines = realloc(v->lines, (size_t)(v->nlines + 1) * sizeof(Line));
-    if (!v->lines)
-        die("out of memory");
-    v->lines[v->nlines].text = xstrdup(text);
-    v->lines[v->nlines].kind = LK_TEXT;
-    v->nlines++;
+    if (v->nlines >= v->lines_cap) {
+        v->lines_cap = v->lines_cap ? v->lines_cap * 2 : 64;
+        v->lines = xrealloc(v->lines, (size_t)v->lines_cap * sizeof(char *));
+    }
+    v->lines[v->nlines++] = xstrdup(text);
 }
 
 static void add_func(Variant *v, const char *name, int start)
 {
     if (v->nfuncs >= MAX_FUNCS)
         die("too many functions in %s", v->path);
-    v->funcs = realloc(v->funcs, (size_t)(v->nfuncs + 1) * sizeof(Func));
-    if (!v->funcs)
-        die("out of memory");
+    if (v->nfuncs >= v->funcs_cap) {
+        v->funcs_cap = v->funcs_cap ? v->funcs_cap * 2 : 32;
+        v->funcs = xrealloc(v->funcs, (size_t)v->funcs_cap * sizeof(Func));
+    }
     memset(&v->funcs[v->nfuncs], 0, sizeof(Func));
     v->funcs[v->nfuncs].name = xstrdup(name);
     v->funcs[v->nfuncs].start = start;
@@ -313,7 +330,7 @@ static void parse_variant(Variant *v)
     v->statics = v->optimiser = v->scope = -1;
 
     for (i = 0; i < v->nlines; i++) {
-        const char *s = v->lines[i].text;
+        const char *s = v->lines[i];
         int sc = section_class(s);
         int bk = banner_kind(s);
         char *lab;
@@ -321,18 +338,12 @@ static void parse_variant(Variant *v)
         if (sc >= 0)
             sec = sc;
 
-        if (bk == 1 && v->optimiser < 0) {
+        if (bk == BANNER_OPT && v->optimiser < 0)
             v->optimiser = i;
-            v->lines[i].kind = LK_OPT_BANNER;
-        }
-        if (bk == 2 && v->statics < 0) {
+        if (bk == BANNER_STATICS && v->statics < 0)
             v->statics = i;
-            v->lines[i].kind = LK_STATICS_BANNER;
-        }
-        if (bk == 3 && v->scope < 0) {
+        if (bk == BANNER_SCOPE && v->scope < 0)
             v->scope = i;
-            v->lines[i].kind = LK_SCOPE_BANNER;
-        }
         if (bk) {
             if (v->trailer == v->nlines) {
                 v->trailer = i;
@@ -485,26 +496,16 @@ static int find_label_line(Variant *v, Func *fn, const char *name)
 {
     int line;
     char lab[64];
-    char *gl;
 
     if (!name || !name[0])
         return -1;
     for (line = fn->start; line < fn->end && line < v->nlines; line++) {
-        if (any_code_label(v->lines[line].text, lab, sizeof(lab))) {
-            if (strcmp(lab, name) == 0)
+        if (any_code_label(v->lines[line], lab, sizeof(lab))) {
+            if (strcasecmp(lab, name) == 0)
                 return line;
-            if (lab[0] == '_' && strcmp(lab + 1, name) == 0)
+            if (lab[0] == '_' && strcasecmp(lab + 1, name) == 0)
                 return line;
-            if (name[0] == '_' && strcmp(lab, name + 1) == 0)
-                return line;
-        }
-        gl = file_scope_label(v->lines[line].text);
-        if (gl) {
-            int hit = (strcmp(gl, name) == 0 ||
-                       (gl[0] == '_' && strcmp(gl + 1, name) == 0) ||
-                       (name[0] == '_' && strcmp(gl, name + 1) == 0));
-            free(gl);
-            if (hit)
+            if (name[0] == '_' && strcasecmp(lab, name + 1) == 0)
                 return line;
         }
     }
@@ -514,17 +515,22 @@ static int find_label_line(Variant *v, Func *fn, const char *name)
 static int reg_written_in_span(Variant *v, int from, int to, const char *reg)
 {
     int line;
-    char r[16];
     long imm;
 
     for (line = from; line < to && line < v->nlines; line++) {
-        const char *s = skip_ws(v->lines[line].text);
-        if (parse_ld_imm(s, r, sizeof(r), &imm) && strcmp(r, reg) == 0)
+        const char *s = skip_ws(v->lines[line]);
+        char wr[16];
+
+        if (parse_ld_imm(s, wr, sizeof(wr), &imm) && strcmp(wr, reg) == 0)
             return 1;
         if (strncasecmp(s, "ld", 2) == 0 && isspace((unsigned char)s[2])) {
             const char *p = skip_ws(s + 2);
             size_t n = strlen(reg);
             if (strncmp(p, reg, n) == 0 && (p[n] == ',' || p[n] == ' ' || p[n] == '\t'))
+                return 1;
+        }
+        if (parse_reg_op(s, "inc", wr, sizeof(wr)) || parse_reg_op(s, "dec", wr, sizeof(wr))) {
+            if (strcmp(wr, reg) == 0 || pair_half_of(reg, wr) || pair_half_of(wr, reg))
                 return 1;
         }
         if (strncasecmp(s, "pop", 3) == 0 && isspace((unsigned char)s[3])) {
@@ -557,19 +563,17 @@ static int find_ld_imm_before(Variant *v, Func *fn, int loop_start, const char *
         long use = 0;
         int ok = 0;
 
-        if (!parse_ld_imm(v->lines[line].text, r, sizeof(r), &imm))
+        if (!parse_ld_imm(v->lines[line], r, sizeof(r), &imm))
             continue;
         if (strcmp(r, reg) == 0) {
             use = imm;
             ok = 1;
-        } else if (strcmp(r, "bc") == 0 && strcmp(reg, "b") == 0) {
-            use = (imm >> 8) & 0xff;
-            ok = 1;
-        } else if (strcmp(r, "bc") == 0 && strcmp(reg, "c") == 0) {
-            use = imm & 0xff;
-            ok = 1;
-        } else if (strcmp(r, "bc") == 0 && strcmp(reg, "bc") == 0) {
-            use = imm;
+        } else if (pair_half_of(r, reg)) {
+            /* ld bc,N feeds B (high) and C (low). Same for de/hl. */
+            if (reg[0] == 'b' || reg[0] == 'd' || reg[0] == 'h')
+                use = (imm >> 8) & 0xff;
+            else
+                use = imm & 0xff;
             ok = 1;
         }
         if (!ok)
@@ -637,7 +641,7 @@ static int span_has_or_pair(Variant *v, int from, int to, const char *pair)
     if (from < 0)
         from = 0;
     for (line = from; line < to && line < v->nlines; line++) {
-        if (parse_or_reg(v->lines[line].text, r, sizeof(r)) &&
+        if (parse_or_reg(v->lines[line], r, sizeof(r)) &&
             pair_half_of(pair, r))
             return 1;
     }
@@ -653,7 +657,7 @@ static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind
     int line;
     int win;
 
-    if (kind == 3) { /* djnz */
+    if (kind == CTL_DJNZ) {
         if (find_ld_imm_before(v, fn, loop_start, "b", &imm) &&
             !reg_written_in_span(v, loop_start, branch, "b") &&
             !reg_written_in_span(v, loop_start, branch, "bc"))
@@ -661,15 +665,12 @@ static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind
         return 1;
     }
 
-    if (parse_dec_reg(v->lines[branch].text, dreg, sizeof(dreg)))
-        return 1;
-
     win = branch - 6;
     if (win < loop_start)
         win = loop_start;
 
     for (line = branch - 1; line >= win; line--) {
-        if (!parse_dec_reg(v->lines[line].text, dreg, sizeof(dreg)))
+        if (!parse_reg_op(v->lines[line], "dec", dreg, sizeof(dreg)))
             continue;
         if (!find_ld_imm_before(v, fn, loop_start, dreg, &imm))
             return 1;
@@ -695,39 +696,21 @@ static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind
 
 static int looks_like_insn(const char *s)
 {
+    static const char *dir[] = {
+        "section", "global", "module", "include", "defc", "defs",
+        "defb", "defw", "defl", "defm", "c_line", "public", "extern",
+        "elif", "endif", "ifdef", "ifndef", "macro", "endm", "if", NULL
+    };
+    int i;
+
     s = skip_ws(s);
     if (*s == 0 || *s == ';' || *s == '.' || *s == '#')
         return 0;
-    if (strncasecmp(s, "section", 7) == 0 && !is_ident((unsigned char)s[7]))
-        return 0;
-    if (strncasecmp(s, "global", 6) == 0 && !is_ident((unsigned char)s[6]))
-        return 0;
-    if (strncasecmp(s, "module", 6) == 0 && !is_ident((unsigned char)s[6]))
-        return 0;
-    if (strncasecmp(s, "include", 7) == 0 && !is_ident((unsigned char)s[7]))
-        return 0;
-    if (strncasecmp(s, "defc", 4) == 0 && !is_ident((unsigned char)s[4]))
-        return 0;
-    if (strncasecmp(s, "defs", 4) == 0 && !is_ident((unsigned char)s[4]))
-        return 0;
-    if (strncasecmp(s, "defb", 4) == 0 && !is_ident((unsigned char)s[4]))
-        return 0;
-    if (strncasecmp(s, "defw", 4) == 0 && !is_ident((unsigned char)s[4]))
-        return 0;
-    if (strncasecmp(s, "c_line", 6) == 0 && !is_ident((unsigned char)s[6]))
-        return 0;
-    if (strncasecmp(s, "public", 6) == 0 && !is_ident((unsigned char)s[6]))
-        return 0;
-    if (strncasecmp(s, "extern", 6) == 0 && !is_ident((unsigned char)s[6]))
-        return 0;
-    if (strncasecmp(s, "global", 6) == 0 && !is_ident((unsigned char)s[6]))
-        return 0;
-    if (strncasecmp(s, "elif", 4) == 0 && !is_ident((unsigned char)s[4]))
-        return 0;
-    if (strncasecmp(s, "endif", 5) == 0 && !is_ident((unsigned char)s[5]))
-        return 0;
-    if (strncasecmp(s, "if", 2) == 0 && !is_ident((unsigned char)s[2]))
-        return 0;
+    for (i = 0; dir[i]; i++) {
+        size_t n = strlen(dir[i]);
+        if (strncasecmp(s, dir[i], n) == 0 && !is_ident((unsigned char)s[n]))
+            return 0;
+    }
     return isalpha((unsigned char)*s);
 }
 
@@ -736,10 +719,10 @@ static void score_source_ticks(Variant *v)
     int i, fb;
 
     for (i = 0; i < v->nlines; i++) {
-        if (!looks_like_insn(v->lines[i].text))
+        if (!looks_like_insn(v->lines[i]))
             continue;
         fb = 0;
-        v->lticks[i] = ticks_for_src(opt_cpu_kind, 1, v->lines[i].text, 0, &fb);
+        v->lticks[i] = ticks_for_src(opt_cpu_kind, v->lines[i], 0, &fb);
         v->lfall[i] = fb;
     }
 }
@@ -758,7 +741,7 @@ static void apply_loops(Variant *v)
             char cc[8];
             int dest, trip, i, fb = 0;
 
-            if (!parse_control(v->lines[line].text, &kind, &cond, &indirect,
+            if (!parse_control(v->lines[line], &kind, &cond, &indirect,
                                target, sizeof(target), cc, sizeof(cc)))
                 continue;
             if (indirect) {
@@ -766,17 +749,12 @@ static void apply_loops(Variant *v)
                 v->lfall[line] = 1;
                 continue;
             }
-            if (kind != 1 && kind != 2 && kind != 3)
+            if (kind != CTL_JP && kind != CTL_JR && kind != CTL_DJNZ)
                 continue;
             dest = find_label_line(v, fn, target);
             if (dest < 0 || dest > line)
                 continue;
-            /* backward branch: use taken time */
-            v->lticks[line] = ticks_for_src(opt_cpu_kind, 1, v->lines[line].text, 1, &fb);
-            if (kind == 1)
-                v->lticks[line] = ticks_for_src(opt_cpu_kind, 3, v->lines[line].text, 1, &fb);
-            else if (kind == 2 || kind == 3)
-                v->lticks[line] = ticks_for_src(opt_cpu_kind, 2, v->lines[line].text, 1, &fb);
+            v->lticks[line] = ticks_for_src(opt_cpu_kind, v->lines[line], 1, &fb);
             trip = infer_trip(v, fn, dest, line, kind, cc);
             if (trip <= 1)
                 continue;
@@ -815,7 +793,7 @@ static void apply_block_repeats(Variant *v)
         for (line = fn->start; line < fn->end && line < v->nlines; line++) {
             long bc;
 
-            if (!is_block_repeat(v->lines[line].text))
+            if (!is_block_repeat(v->lines[line]))
                 continue;
             if (find_ld_imm_before(v, fn, line, "bc", &bc))
                 bc = trip_from_imm(bc, 1);
@@ -837,7 +815,6 @@ static void measure_variant(Variant *v)
     char buf[MAX_LINE];
     int i;
     char src[MAX_LINE];
-    int linenum;
     int nbytes;
     int last_func = -1;
 
@@ -866,14 +843,18 @@ static void measure_variant(Variant *v)
     if (!f)
         die("cannot read listing for %s", v->path);
 
+    /* Size from listing opcode bytes after the function label.
+     * Do not use listing line numbers (80cc can put the wrong source line
+     * on an opcode). */
     while (fgets(buf, sizeof(buf), f)) {
-        Func *fn = NULL;
         char *lab;
-        int src_line = -1;
 
-        nbytes = listing_parse_line(buf, &linenum, src, sizeof(src));
+        nbytes = listing_parse_line(buf, src, sizeof(src));
+        if (section_class(src) == SEC_DATA)
+            last_func = -1;
         lab = file_scope_label(src);
         if (lab) {
+            last_func = -1;
             for (i = 0; i < v->nfuncs; i++) {
                 if (strcmp(v->funcs[i].name, lab) == 0) {
                     last_func = i;
@@ -882,23 +863,8 @@ static void measure_variant(Variant *v)
             }
             free(lab);
         }
-        if (linenum > 0) {
-            src_line = linenum - 1;
-            for (i = 0; i < v->nfuncs; i++) {
-                if (src_line >= v->funcs[i].start && src_line < v->funcs[i].end) {
-                    fn = &v->funcs[i];
-                    last_func = i;
-                    break;
-                }
-            }
-        }
-        if (!fn && last_func >= 0 && nbytes)
-            fn = &v->funcs[last_func];
-        if (!fn || nbytes <= 0)
-            continue;
-        fn->size += nbytes;
-        fn->have_size = 1;
-        fn->have_ticks = 1;
+        if (last_func >= 0 && nbytes > 0)
+            v->funcs[last_func].size += nbytes;
     }
     fclose(f);
     remove(obj);
@@ -913,10 +879,6 @@ static void measure_variant(Variant *v)
     for (i = 0; i < v->nfuncs; i++) {
         int line;
         Func *fn = &v->funcs[i];
-        if (!fn->have_size) {
-            fn->have_size = 1;
-            fn->have_ticks = 1;
-        }
         fn->ticks = 0;
         for (line = fn->start; line < fn->end && line < v->nlines; line++) {
             if (v->lfall[line])
@@ -958,9 +920,7 @@ static Helper *helper_get(const char *name)
     int i = helper_find(name);
     if (i >= 0)
         return &helpers[i];
-    helpers = realloc(helpers, (size_t)(nhelpers + 1) * sizeof(Helper));
-    if (!helpers)
-        die("out of memory");
+    helpers = xrealloc(helpers, (size_t)(nhelpers + 1) * sizeof(Helper));
     memset(&helpers[nhelpers], 0, sizeof(Helper));
     helpers[nhelpers].name = xstrdup(name);
     nhelpers++;
@@ -995,58 +955,30 @@ static int is_helper_name(const char *name)
         return 0;
     if (n[0] == '_')
         n++;
+    if (is_local_label_token(n, strlen(n)))
+        return 0;
     if (n[0] == 'l' && n[1] == '_')
         return 1;
-    if (n[0] == 'd' && isalpha((unsigned char)n[1]))
+    /* Classic float cores: dadd, dmul, … — not the register "de". */
+    if (n[0] == 'd' && isalpha((unsigned char)n[1]) && n[2] != 0)
         return 1;
     return 0;
 }
 
 static int extract_callee(const char *s, char *out, size_t outsz)
 {
-    const char *p = skip_ws(s);
-    const char *t;
-    size_t n;
-    int is_jp = 0;
+    int kind = CTL_NONE, cond = 0, indirect = 0;
+    char target[256];
 
-    if (strncasecmp(p, "call", 4) == 0 && isspace((unsigned char)p[4]))
-        p = skip_ws(p + 4);
-    else if (strncasecmp(p, "jp", 2) == 0 && isspace((unsigned char)p[2])) {
-        p = skip_ws(p + 2);
-        is_jp = 1;
-    } else
+    if (!parse_control(s, &kind, &cond, &indirect, target, sizeof(target), NULL, 0))
         return 0;
-
-    if (is_jp && *p == '(')
+    if (indirect)
         return 0;
-
-    /* optional condition: jp nz, target / call z, target */
-    t = p;
-    while (isalpha((unsigned char)*p))
-        p++;
-    n = (size_t)(p - t);
-    p = skip_ws(p);
-    if (*p == ',' && n > 0 && n < 4) {
-        p = skip_ws(p + 1);
-        t = p;
-        if (*t == '.')
-            t++, p++;
-        while (is_ident((unsigned char)*p))
-            p++;
-        n = (size_t)(p - t);
-    } else {
-        p = t;
-        if (*p == '.')
-            p++;
-        t = p;
-        while (is_ident((unsigned char)*p))
-            p++;
-        n = (size_t)(p - t);
-    }
-    if (n < 1 || n >= outsz)
+    if (kind != CTL_JP && kind != CTL_CALL)
         return 0;
-    memcpy(out, t, n);
-    out[n] = 0;
+    if (!target[0])
+        return 0;
+    snprintf(out, outsz, "%s", target);
     return 1;
 }
 
@@ -1140,7 +1072,7 @@ static void helper_walk_dir(const char *dir)
     DIR *d;
     struct dirent *e;
     struct stat st;
-    char path[4096];
+    char path[8192];
 
     d = opendir(dir);
     if (!d)
@@ -1181,7 +1113,7 @@ static void helper_index_sources(void)
         return;
     helper_index_done = 1;
     for (i = 0; i < nincludes; i++) {
-        char root[4096];
+        char root[8192];
         char *slash;
         const char *inc = opt_includes[i];
         snprintf(root, sizeof(root), "%s", inc);
@@ -1191,7 +1123,7 @@ static void helper_index_sources(void)
             slash = strrchr(root, '\\');
 #endif
         if (slash && (strcmp(slash + 1, "lib") == 0 || strcmp(slash + 1, "lib/") == 0)) {
-            char sub[4096];
+            char sub[sizeof(root) + 32];
             *slash = 0;
             /* Classic sccz80 helpers, float cores, and the integer
              * mul/div leaves (small / fast / CPU). Dispatcher files
@@ -1237,16 +1169,11 @@ static int measure_asm_totals(const char *path, int *size)
     FILE *f;
     char buf[MAX_LINE];
     char src[MAX_LINE];
-    int linenum, nbytes;
+    int nbytes;
     const char *base;
 
     *size = 0;
-    base = strrchr(path, '/');
-#ifdef _WIN32
-    if (!base)
-        base = strrchr(path, '\\');
-#endif
-    base = base ? base + 1 : path;
+    base = path_base(path);
     temp_asm_path(tmpasm, sizeof(tmpasm), base);
     if (copy_text_file(path, tmpasm))
         return 1;
@@ -1278,7 +1205,7 @@ static int measure_asm_totals(const char *path, int *size)
         return 1;
     }
     while (fgets(buf, sizeof(buf), f)) {
-        nbytes = listing_parse_line(buf, &linenum, src, sizeof(src));
+        nbytes = listing_parse_line(buf, src, sizeof(src));
         if (nbytes > 0)
             *size += nbytes;
     }
@@ -1429,7 +1356,7 @@ static void free_source_lines(Variant *v)
 {
     int i;
     for (i = 0; i < v->nlines; i++)
-        free(v->lines[i].text);
+        free(v->lines[i]);
     free(v->lines);
     for (i = 0; i < v->nfuncs; i++)
         free(v->funcs[i].name);
@@ -1489,10 +1416,10 @@ static int measure_helper(const char *name)
         char tgt[256];
         char alias[64];
         int pref;
-        if (extract_callee(src.lines[line].text, tgt, sizeof(tgt)))
+        if (extract_callee(src.lines[line], tgt, sizeof(tgt)))
             charge_one_callee(tgt, &h->size, &h->ticks,
                               src.lmult ? src.lmult[line] : 1, seen, &nseen);
-        if (parse_defc_alias(src.lines[line].text, alias, sizeof(alias))) {
+        if (parse_defc_alias(src.lines[line], alias, sizeof(alias))) {
             pref = alias_prefers(alias);
             if (pref > best_pref) {
                 best_pref = pref;
@@ -1518,7 +1445,7 @@ static int helper_call_weight(Variant *v, Func *fn, const char *hname)
     char tgt[256];
 
     for (line = fn->start; line < fn->end && line < v->nlines; line++) {
-        if (!extract_callee(v->lines[line].text, tgt, sizeof(tgt)))
+        if (!extract_callee(v->lines[line], tgt, sizeof(tgt)))
             continue;
         if (strcmp(tgt, hname) != 0 &&
             !(tgt[0] == '_' && strcmp(tgt + 1, hname) == 0) &&
@@ -1538,7 +1465,7 @@ static void collect_helper_names(Func *fn, Variant *v, char names[][64], int *nn
 
     for (line = fn->start; line < fn->end && line < v->nlines; line++) {
         int i, known = 0;
-        if (!extract_callee(v->lines[line].text, tgt, sizeof(tgt)))
+        if (!extract_callee(v->lines[line], tgt, sizeof(tgt)))
             continue;
         if (!is_helper_name(tgt))
             continue;
@@ -1548,8 +1475,8 @@ static void collect_helper_names(Func *fn, Variant *v, char names[][64], int *nn
                 break;
             }
         }
-        if (!known && *nn < maxn) {
-            snprintf(names[*nn], sizeof(names[0]), "%s", tgt);
+        if (!known && *nn < maxn && strlen(tgt) < sizeof(names[0])) {
+            memcpy(names[*nn], tgt, strlen(tgt) + 1);
             (*nn)++;
         }
     }
@@ -1634,20 +1561,15 @@ static void charge_intra_tu(void)
             char seen[64][64];
             int nseen = 0;
 
-            fn->size = fn->base_size;
-            fn->ticks = fn->base_ticks;
             for (line = fn->start; line < fn->end && line < variants[v].nlines; line++) {
                 char tgt[256];
                 char cname[256];
                 Func *cal;
                 int i, known, mult;
 
-                if (!extract_callee(variants[v].lines[line].text, tgt, sizeof(tgt)))
+                if (!extract_callee(variants[v].lines[line], tgt, sizeof(tgt)))
                     continue;
-                if (tgt[0] == '_')
-                    snprintf(cname, sizeof(cname), "%s", tgt);
-                else
-                    snprintf(cname, sizeof(cname), "_%s", tgt);
+                choice_callee(tgt, cname, sizeof(cname));
                 cal = find_func(&variants[v], cname);
                 if (!cal)
                     cal = find_func(&variants[v], tgt);
@@ -1674,7 +1596,7 @@ static void charge_intra_tu(void)
 
 static int ticks_usable(const Func *a)
 {
-    return a && a->have_ticks && !a->bad_ticks;
+    return a && !a->bad_ticks;
 }
 
 static int better(const Func *a, const char *aname, const Func *b, const char *bname)
@@ -1685,12 +1607,9 @@ static int better(const Func *a, const char *aname, const Func *b, const char *b
     if (opt_metric == METRIC_TICKS) {
         if (ticks_usable(a) && ticks_usable(b) && a->ticks != b->ticks)
             return a->ticks < b->ticks;
-        if (a->have_size && b->have_size && a->size != b->size)
-            return a->size < b->size;
-    } else {
-        if (a->have_size && b->have_size && a->size != b->size)
-            return a->size < b->size;
     }
+    if (a->size != b->size)
+        return a->size < b->size;
     return variant_rank(aname) < variant_rank(bname);
 }
 
@@ -1724,9 +1643,7 @@ static void collect_functions(void)
         for (f = 0; f < variants[v].nfuncs; f++) {
             if (choice_index(variants[v].funcs[f].name) >= 0)
                 continue;
-            choices = realloc(choices, (size_t)(nchoices + 1) * sizeof(Choice));
-            if (!choices)
-                die("out of memory");
+            choices = xrealloc(choices, (size_t)(nchoices + 1) * sizeof(Choice));
             memset(&choices[nchoices], 0, sizeof(Choice));
             choices[nchoices].name = xstrdup(variants[v].funcs[f].name);
             choices[nchoices].sel = -1;
@@ -1759,10 +1676,6 @@ static void collect_functions(void)
         choices[c].sel = best_v;
         if (npres == 1)
             strcpy(choices[c].reason, "only");
-        else if (opt_metric == METRIC_TICKS &&
-                 (!ticks_usable(best) ||
-                  (npres >= 2 && !ticks_usable(find_func(&variants[best_v], choices[c].name)))))
-            strcpy(choices[c].reason, "fallback");
         else if (opt_metric == METRIC_TICKS) {
             int used_ticks = 1;
             for (v = 0; v < nvariants; v++) {
@@ -1857,7 +1770,7 @@ static void resolve_ix_mix(void)
                 int ti, can_elevate, demote_v;
                 long cost_el = 0x7fffffffL, cost_de = 0x7fffffffL;
 
-                if (!extract_callee(cv->lines[line].text, tgt, sizeof(tgt)))
+                if (!extract_callee(cv->lines[line], tgt, sizeof(tgt)))
                     continue;
                 choice_callee(tgt, cname, sizeof(cname));
                 ti = choice_index(cname);
@@ -1934,7 +1847,7 @@ static void emit_range(FILE *out, Variant *v, int start, int end)
     int i;
     char buf[MAX_LINE * 2];
     for (i = start; i < end && i < v->nlines; i++) {
-        rewrite_locals(v->name, v->lines[i].text, buf, sizeof(buf));
+        rewrite_locals(v->name, v->lines[i], buf, sizeof(buf));
         fputs(buf, out);
         fputc('\n', out);
     }
@@ -2010,7 +1923,7 @@ static int variant_defines_local(Variant *v, const char *lab)
         if (!fn)
             continue;
         for (line = fn->start; line < fn->end && line < v->nlines; line++) {
-            if (local_label_on_line(v->lines[line].text, lab))
+            if (local_label_on_line(v->lines[line], lab))
                 return 1;
         }
     }
@@ -2076,9 +1989,9 @@ static void emit_optimiser_pool(FILE *out, Variant *v)
 
     n = 0;
     for (i = from; i < to && i < v->nlines; i++) {
-        if (!local_defc_lhs(v->lines[i].text, lbuf, sizeof(lbuf)))
+        if (!local_defc_lhs(v->lines[i], lbuf, sizeof(lbuf)))
             continue;
-        if (!local_defc_rhs(v->lines[i].text, rbuf, sizeof(rbuf)))
+        if (!local_defc_rhs(v->lines[i], rbuf, sizeof(rbuf)))
             continue;
         if (n >= 256)
             break;
@@ -2101,7 +2014,7 @@ static void emit_optimiser_pool(FILE *out, Variant *v)
         }
         if (skip)
             continue;
-        rewrite_locals(v->name, v->lines[i].text, buf, sizeof(buf));
+        rewrite_locals(v->name, v->lines[i], buf, sizeof(buf));
         fputs(buf, out);
         fputc('\n', out);
     }
@@ -2126,7 +2039,7 @@ static void check_data_set(void)
     int nnames = 0;
 
     for (i = d->trailer; i < d->nlines; i++) {
-        char *lab = file_scope_label(d->lines[i].text);
+        char *lab = file_scope_label(d->lines[i]);
         if (!lab)
             continue;
         if (nnames < 512)
@@ -2139,7 +2052,7 @@ static void check_data_set(void)
         if (&variants[v] == d)
             continue;
         for (i = variants[v].trailer; i < variants[v].nlines; i++) {
-            char *lab = file_scope_label(variants[v].lines[i].text);
+            char *lab = file_scope_label(variants[v].lines[i]);
             int found = 0;
             int k;
             if (!lab)
@@ -2273,13 +2186,13 @@ static void write_report(void)
 
 static void compute_summary(int *sel_count, int *size_var, int *ticks_var,
                             int *size_sel, int *ticks_sel, int *size_base, int *ticks_base,
-                            int *mixed, int *only, int *ixcal, int *fallback)
+                            int *mixed, int *only, int *fallback)
 {
     int c, v;
     int sccz80_v = -1;
 
     *size_sel = *ticks_sel = *size_base = *ticks_base = 0;
-    *mixed = *only = *ixcal = *fallback = 0;
+    *mixed = *only = *fallback = 0;
     for (v = 0; v < nvariants; v++) {
         sel_count[v] = 0;
         size_var[v] = 0;
@@ -2305,9 +2218,6 @@ static void compute_summary(int *sel_count, int *size_var, int *ticks_var,
         }
         if (strcmp(choices[c].reason, "only") == 0)
             (*only)++;
-        else if (strcmp(choices[c].reason, "ix-callee") == 0 ||
-                 strcmp(choices[c].reason, "ix-elevate") == 0)
-            (*ixcal)++;
         else if (strcmp(choices[c].reason, "fallback") == 0)
             (*fallback)++;
         if (npres >= 2 && strcmp(variants[choices[c].sel].name, "sccz80") != 0)
@@ -2321,19 +2231,15 @@ static void print_summary(FILE *fp)
     int size_var[MAX_VARIANTS];
     int ticks_var[MAX_VARIANTS];
     int size_sel, ticks_sel, size_base, ticks_base;
-    int mixed, only, ixcal, fallback;
+    int mixed, only, fallback;
     int v;
     const char *base;
+    int ixe = 0, ixd = 0, c;
 
     compute_summary(sel_count, size_var, ticks_var, &size_sel, &ticks_sel,
-                    &size_base, &ticks_base, &mixed, &only, &ixcal, &fallback);
+                    &size_base, &ticks_base, &mixed, &only, &fallback);
 
-    base = strrchr(opt_source, '/');
-#ifdef _WIN32
-    if (!base)
-        base = strrchr(opt_source, '\\');
-#endif
-    base = base ? base + 1 : opt_source;
+    base = path_base(opt_source);
 
     fprintf(fp, "zcc-multi-summary: file=%s cpu=%s metric=%s functions=%d\n",
             base, opt_cpu, opt_metric == METRIC_TICKS ? "ticks" : "size", nchoices);
@@ -2355,18 +2261,14 @@ static void print_summary(FILE *fp)
     for (v = 0; v < nvariants; v++)
         fprintf(fp, " %s=%d", variants[v].name, ticks_var[v]);
     fprintf(fp, " saved_vs_sccz80=%d\n", ticks_base - ticks_sel);
-    {
-        int ixe = 0, ixd = 0, c;
-        for (c = 0; c < nchoices; c++) {
-            if (strcmp(choices[c].reason, "ix-elevate") == 0)
-                ixe++;
-            else if (strcmp(choices[c].reason, "ix-callee") == 0)
-                ixd++;
-        }
-        fprintf(fp, "zcc-multi-summary: mixed=%d only=%d ix-elevate=%d ix-callee=%d fallback=%d\n",
-                mixed, only, ixe, ixd, fallback);
-        (void)ixcal;
+    for (c = 0; c < nchoices; c++) {
+        if (strcmp(choices[c].reason, "ix-elevate") == 0)
+            ixe++;
+        else if (strcmp(choices[c].reason, "ix-callee") == 0)
+            ixd++;
     }
+    fprintf(fp, "zcc-multi-summary: mixed=%d only=%d ix-elevate=%d ix-callee=%d fallback=%d\n",
+            mixed, only, ixe, ixd, fallback);
 }
 
 static void print_verbose(void)
@@ -2402,9 +2304,7 @@ static void usage(void)
 
 static void add_include(const char *dir)
 {
-    opt_includes = realloc(opt_includes, (size_t)(nincludes + 1) * sizeof(char *));
-    if (!opt_includes)
-        die("out of memory");
+    opt_includes = xrealloc(opt_includes, (size_t)(nincludes + 1) * sizeof(char *));
     opt_includes[nincludes++] = xstrdup(dir);
 }
 

@@ -4,7 +4,7 @@
 |-------|-------|
 | Title | zcc multi-compiler selection |
 | Author | z88dk |
-| Date | 2026-08-20 |
+| Date | 2026-08-21 |
 | Status | Implemented |
 | Type | Specification |
 
@@ -761,13 +761,17 @@ Do not specialise the score on TIMER or on hotspot traces.
 
 The ticks score is a static T-state sum.
 
-Size uses the listing.
+Size uses listing opcode bytes after the function label. The tool does not use listing line numbers.
 
 Ticks use the assembly source text.
 
 80cc listings can put a wrong source line number on an opcode.
 
 The tool scores each source line that `looks_like_insn` accepts with `ticks_for_src`.
+
+`ticks_for_src` reads the mnemonic and the operands. It does not use a listing byte count. `ld hl,n` is 10 T. `ld a,n` is 7 T. `ld a,b` is 4 T. A z80asm synthetic `ld de,hl` is 8 T.
+
+An unknown mnemonic or `halt` sets the fallback flag.
 
 Tables live in `src/zcc-multi/zccmulti_ticks.c`.
 
@@ -812,7 +816,8 @@ A trip count is used only when the bound is a literal load that the loop does no
 | `ld r,N` then `dec r` and `jp nz` | N. `ld r,0` is 256. 8-bit `dec` sets Z |
 | `ld rr,N` then `dec rr` / `ld a,hi` / `or lo` / `jp nz` | N. `ld rr,0` is 65536 |
 | 8085 `ld rr,N` then `dec rr` / `jp nk` or `jp k` | N. Same wrap at 0. K sets when the pair goes 0 to −1 |
-| `ld bc,N` feeding a B or C 8-bit loop | B is the high byte. C is the low byte. A 0 byte is 256 |
+| `ld bc,N` / `ld de,N` / `ld hl,N` feeding an 8-bit half | High byte feeds B/D/H. Low byte feeds C/E/L. A 0 byte is 256 |
+| `inc` or `dec` of the counter inside the span | Not a counted loop. Trip stays 1 |
 | `dec rr` then `jp nz` with no `or` | Not a counted loop. Trip stays 1 |
 
 `dec rr` does not set Z on any CPU. The portable 16-bit test is `or` through A.
