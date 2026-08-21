@@ -123,7 +123,7 @@ ifdef BUILD_SDCC
 		--disable-r2k-port --disable-f8-port --disable-f8l-port\
 		--disable-non-free --disable-device-lib \
 		--disable-ucsim --disable-packihx \
-		--disable-sdcpp --disable-sdcdb --disable-sdbinutil
+		--disable-sdcpp --disable-sdcdb --disable-sdbinutils
 endif
 
 
