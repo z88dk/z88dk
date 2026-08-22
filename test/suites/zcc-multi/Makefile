@@ -1,6 +1,6 @@
 include ../make.config
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok ext8085.ok sdcc_abi.ok
+all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok ext8085.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
@@ -69,6 +69,31 @@ fallback.ok: ../../../src/zcc-multi/t/jp_hl.asm ../../../src/zcc-multi/t/jp_hl_a
 	grep -q 'fallback' fb.tsv
 	touch $@
 
+# If any variant is unusable, pick by size among all bodies. Do not mix
+# ticks of the usable pair with size of the fallback body.
+mixfb.ok: ../../../src/zcc-multi/t/mix_small.asm \
+	../../../src/zcc-multi/t/mix_fast.asm ../../../src/zcc-multi/t/mix_fb.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=mixfb_stitch.asm --report=mixfb.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/mix_small.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/mix_fast.asm \
+	  --variant=80cc-fp:../../../src/zcc-multi/t/mix_fb.asm
+	test `awk '/^_foo/ {print $$3}' mixfb.tsv` = fallback
+	grep -q '^_foo.sccz80' mixfb.tsv
+	touch $@
+
+# A function that exists in only one variant is still emitted.
+only.ok: ../../../src/zcc-multi/t/only_two.asm ../../../src/zcc-multi/t/only_one.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=only_stitch.asm --report=only.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/only_two.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/only_one.asm
+	test `grep -c '^\._foo$$' only_stitch.asm` -eq 1
+	test `grep -c '^\._bar$$' only_stitch.asm` -eq 1
+	test `awk '/^_bar/ {print $$3}' only.tsv` = only
+	grep -q '^_bar.sccz80' only.tsv
+	touch $@
+
 # ld b,8 / djnz must multiply the loop span.
 loopcount.ok: ../../../src/zcc-multi/t/loop_count.asm ../../../src/zcc-multi/t/loop_once.asm
 	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
@@ -135,6 +160,12 @@ ldir.ok: ../../../src/zcc-multi/t/ldir_bc.asm ../../../src/zcc-multi/t/ldir_unk.
 	  --variant=sccz80:../../../src/zcc-multi/t/ldir_bc0.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/ldir_bc0.asm
 	test `awk -F'	' '/^_foo/ {print $$6}' ldir_bc0.tsv` -gt 1000000
+	z88dk-zcc-multi --cpu=gbz80 --metric=ticks --data-variant=sccz80 \
+	  --output=ldir_gbz80_stitch.asm --report=ldir_gbz80.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/ldir_unk.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/ldir_unk.asm
+	test `awk '/^_foo/ {print $$3}' ldir_gbz80.tsv` = metric
+	test `awk -F'	' '/^_foo/ {print $$6}' ldir_gbz80.tsv` -eq 58
 	touch $@
 
 # Operand-based ticks: ld hl,1 is 10 T, not 4. nop+nop+ret (18) beats ld hl,1 / ret (20).
@@ -146,6 +177,67 @@ ldimm.ok: ../../../src/zcc-multi/t/ldimm.asm ../../../src/zcc-multi/t/nops.asm
 	test `awk -F'	' '/^_foo/ {print $$6}' ldimm.tsv` -eq 20
 	test `awk -F'	' '/^_foo/ {print $$7}' ldimm.tsv` -eq 18
 	grep -q '^_foo.80cc-sp' ldimm.tsv
+	touch $@
+
+# Word synthetic sra hl is 16 T, not 8. Two nop + ret (18) wins.
+srahl.ok: ../../../src/zcc-multi/t/srahl.asm ../../../src/zcc-multi/t/nops.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=srahl_stitch.asm --report=srahl.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/srahl.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/nops.asm
+	test `awk '/^_foo/ {print $$3}' srahl.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' srahl.tsv` -eq 26
+	test `awk '/^_foo/ {print $$7}' srahl.tsv` -eq 18
+	grep -q '^_foo.80cc-sp' srahl.tsv
+	touch $@
+
+# Pair copy and word rotate: native T-states when the CPU has the op,
+# else two 8-bit / CB ops. Rabbit rr hl is 2 T. ld de,hl is 4 T. bool hl is 2 T.
+r2ka.ok: ../../../src/zcc-multi/t/r2ka_rrhl.asm ../../../src/zcc-multi/t/r2ka_ldrr.asm \
+	../../../src/zcc-multi/t/r2ka_bool.asm ../../../src/zcc-multi/t/nops.asm
+	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
+	  --output=r2ka_rrhl_stitch.asm --report=r2ka_rrhl.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_rrhl.asm
+	test `awk '/^_foo/ {print $$3}' r2ka_rrhl.tsv` = metric
+	test `awk '/^_foo/ {print $$7}' r2ka_rrhl.tsv` -eq 12
+	grep -q '^_foo.80cc-sp' r2ka_rrhl.tsv
+	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
+	  --output=r2ka_ldrr_stitch.asm --report=r2ka_ldrr.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_ldrr.asm
+	test `awk '/^_foo/ {print $$7}' r2ka_ldrr.tsv` -eq 14
+	grep -q '^_foo.80cc-sp' r2ka_ldrr.tsv
+	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
+	  --output=r2ka_bool_stitch.asm --report=r2ka_bool.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_bool.asm
+	test `awk '/^_foo/ {print $$7}' r2ka_bool.tsv` -eq 12
+	grep -q '^_foo.80cc-sp' r2ka_bool.tsv
+	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
+	  --output=r2ka_addsp_stitch.asm --report=r2ka_addsp.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_addsp.asm
+	test `awk '/^_foo/ {print $$3}' r2ka_addsp.tsv` = metric
+	test `awk '/^_foo/ {print $$7}' r2ka_addsp.tsv` -eq 14
+	grep -q '^_foo.80cc-sp' r2ka_addsp.tsv
+	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
+	  --output=r2ka_ldix_stitch.asm --report=r2ka_ldix.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/mix_fast.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/r2ka_ldix.asm
+	test `awk '/^_foo/ {print $$3}' r2ka_ldix.tsv` = metric
+	test `awk '/^_foo/ {print $$7}' r2ka_ldix.tsv` -eq 21
+	grep -q '^_foo.80cc-sp' r2ka_ldix.tsv
+	touch $@
+
+# 80cc-fp ld hl,(ix+d) is two indexed loads (38 T), not unknown.
+ixword.ok: ../../../src/zcc-multi/t/ixword.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=ixword_stitch.asm --report=ixword.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/ixword.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/ixword.asm
+	test `awk '/^_foo/ {print $$3}' ixword.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' ixword.tsv` -eq 48
 	touch $@
 
 # 8085 extended ops (Zilog) have documented T-states. Unknown would
@@ -166,6 +258,71 @@ ext8085.ok: ../../../src/zcc-multi/t/8085_ext.asm \
 	grep -q '^_foo.80cc-sp' ext8085_pick.tsv
 	touch $@
 
+# gbz80 extras (Zilog) have documented cycle counts. Unknown would
+# fallback to size; a larger-but-faster body must still win on ticks.
+extgbz80.ok: ../../../src/zcc-multi/t/gbz80_ext.asm \
+	../../../src/zcc-multi/t/gbz80_slow.asm ../../../src/zcc-multi/t/gbz80_fast.asm
+	z88dk-zcc-multi --cpu=gbz80 --metric=ticks --data-variant=sccz80 \
+	  --output=extgbz80_stitch.asm --report=extgbz80.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/gbz80_ext.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/gbz80_ext.asm
+	test `awk '/^_foo/ {print $$3}' extgbz80.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' extgbz80.tsv` -eq 144
+	z88dk-zcc-multi --cpu=gbz80 --metric=ticks --data-variant=sccz80 \
+	  --output=extgbz80_pick.asm --report=extgbz80_pick.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/gbz80_slow.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/gbz80_fast.asm
+	test `awk '/^_foo/ {print $$3}' extgbz80_pick.tsv` = metric
+	grep -q '^_foo.80cc-sp' extgbz80_pick.tsv
+	touch $@
+
+# gbz80 ex de,hl is 56 T (four stack ops). Larger-but-faster body wins on ticks.
+gbz80ex.ok: ../../../src/zcc-multi/t/gbz80_ex.asm \
+	../../../src/zcc-multi/t/gbz80_ex_slow.asm
+	z88dk-zcc-multi --cpu=gbz80 --metric=ticks --data-variant=sccz80 \
+	  --output=gbz80ex_stitch.asm --report=gbz80ex.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/gbz80_ex_slow.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/gbz80_ex.asm
+	test `awk '/^_foo/ {print $$3}' gbz80ex.tsv` = metric
+	test `awk -F'	' '/^_foo/ {print $$6}' gbz80ex.tsv` -eq 176
+	test `awk -F'	' '/^_foo/ {print $$7}' gbz80ex.tsv` -eq 152
+	grep -q '^_foo.80cc-sp' gbz80ex.tsv
+	touch $@
+
+# Z180 extras (Zilog). mlt / in0 / out0 / tst / tstio / otim.
+extz180.ok: ../../../src/zcc-multi/t/z180_ext.asm \
+	../../../src/zcc-multi/t/z180_slow.asm ../../../src/zcc-multi/t/z180_fast.asm
+	z88dk-zcc-multi --cpu=z180 --metric=ticks --data-variant=sccz80 \
+	  --output=extz180_stitch.asm --report=extz180.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/z180_ext.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/z180_ext.asm
+	test `awk '/^_foo/ {print $$3}' extz180.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' extz180.tsv` -eq 94
+	z88dk-zcc-multi --cpu=z180 --metric=ticks --data-variant=sccz80 \
+	  --output=extz180_pick.asm --report=extz180_pick.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/z180_slow.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/z180_fast.asm
+	test `awk '/^_foo/ {print $$3}' extz180_pick.tsv` = metric
+	grep -q '^_foo.80cc-sp' extz180_pick.tsv
+	touch $@
+
+# Z80N extras (Zilog). mul / nextreg / add rr,a / push imm / swapnib.
+extz80n.ok: ../../../src/zcc-multi/t/z80n_ext.asm \
+	../../../src/zcc-multi/t/z80n_slow.asm ../../../src/zcc-multi/t/z80n_fast.asm
+	z88dk-zcc-multi --cpu=z80n --metric=ticks --data-variant=sccz80 \
+	  --output=extz80n_stitch.asm --report=extz80n.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/z80n_ext.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/z80n_ext.asm
+	test `awk '/^_foo/ {print $$3}' extz80n.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' extz80n.tsv` -eq 175
+	z88dk-zcc-multi --cpu=z80n --metric=ticks --data-variant=sccz80 \
+	  --output=extz80n_pick.asm --report=extz80n_pick.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/z80n_slow.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/z80n_fast.asm
+	test `awk '/^_foo/ {print $$3}' extz80n_pick.tsv` = metric
+	grep -q '^_foo.80cc-sp' extz80n_pick.tsv
+	touch $@
+
 # Command-line multi vs a recipe that sets -compiler=sdcc is the sdcc ABI.
 sdcc_abi.ok: twofuncs.c
 	if zcc +cpm -clib=sdcc_iy -vn -c -compiler=multi twofuncs.c -o sdcc_abi.o 2>sdcc_abi.err; then exit 1; fi
@@ -178,6 +335,6 @@ sdcc_abi.ok: twofuncs.c
 	touch $@
 
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm ext8085_stitch.asm ext8085_pick.asm opt_used.asm opt_used.bin sdcc_abi.o
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm mixfb_stitch.asm only_stitch.asm srahl_stitch.asm r2ka_rrhl_stitch.asm r2ka_ldrr_stitch.asm r2ka_bool_stitch.asm r2ka_addsp_stitch.asm r2ka_ldix_stitch.asm ixword_stitch.asm ext8085_stitch.asm ext8085_pick.asm extgbz80_stitch.asm extgbz80_pick.asm extz180_stitch.asm extz180_pick.asm extz80n_stitch.asm extz80n_pick.asm opt_used.asm opt_used.bin sdcc_abi.o
 
 .PHONY: all clean

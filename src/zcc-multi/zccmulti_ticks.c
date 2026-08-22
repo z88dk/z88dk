@@ -58,6 +58,12 @@ int ticks_cpu_from_name(const char *cpu)
         return TICKS_CPU_Z180;
     if (strcmp(cpu, "z80n") == 0)
         return TICKS_CPU_Z80N;
+    /* r2ka / r3k share the Rabbit 2000 word ops. r4k / r6k add more. */
+    if (strncmp(cpu, "r4", 2) == 0 || strncmp(cpu, "r5", 2) == 0 ||
+        strncmp(cpu, "r6", 2) == 0)
+        return TICKS_CPU_R4K;
+    if (strncmp(cpu, "r2", 2) == 0 || strncmp(cpu, "r3", 2) == 0)
+        return TICKS_CPU_R2KA;
     return TICKS_CPU_Z80;
 }
 
@@ -425,9 +431,137 @@ static int rp_is_hl(const char *tok)
 
 static int rp_copy_ok(const char *a, const char *b)
 {
-    /* z80asm synthetic: ld among bc/de/hl only. */
+    /* z80asm synthetic: ld among bc/de/hl only. Two 8-bit loads. */
     return (ident_eq(a, "bc") || ident_eq(a, "de") || ident_eq(a, "hl")) &&
            (ident_eq(b, "bc") || ident_eq(b, "de") || ident_eq(b, "hl"));
+}
+
+static int cpu_is_rabbit(int cpu)
+{
+    return cpu == TICKS_CPU_R2KA || cpu == TICKS_CPU_R4K;
+}
+
+/* z80asm expansion of `ex`. Native 4 T on Z80-family / 808x; gbz80 has
+ * no native swap (`push hl` / `push de` / `pop hl` / `pop de` = 56).
+ * `ex (sp),hl` is native on Z80-family / 808x and a helper on gbz80. */
+static int ticks_ex(int cpu, const char *rest)
+{
+    char a[64], b[64];
+    int ka, ixa = 0, ixb = 0;
+    const char *p;
+
+    p = copy_op(rest, a, sizeof(a));
+    copy_op(p, b, sizeof(b));
+    ka = classify(a, &ixa);
+    classify(b, &ixb);
+    if (cpu == TICKS_CPU_GBZ80) {
+        if (ka == OP_MEM_SP)
+            return 148;
+        if ((ident_eq(a, "de") && ident_eq(b, "hl")) ||
+            (ident_eq(a, "hl") && ident_eq(b, "de")))
+            return 56;
+        return -1;
+    }
+    if (cpu == TICKS_CPU_8080)
+        return (ka == OP_MEM_SP) ? 18 : 4;
+    if (cpu == TICKS_CPU_8085)
+        return (ka == OP_MEM_SP) ? 16 : 4;
+    if (ka == OP_MEM_SP)
+        return (ixa || ixb) ? 23 : 19;
+    return 4;
+}
+
+/* ldi / ldir family: one-trip stand-in. apply_block_repeats overwrites
+ * the repeating forms with 21 × BC. */
+static int ticks_xfer_once(const char *mnem)
+{
+    return strcmp(mnem, "ldi") == 0 || strcmp(mnem, "ldd") == 0 ||
+           strcmp(mnem, "cpi") == 0 || strcmp(mnem, "cpd") == 0 ||
+           strcmp(mnem, "ldir") == 0 || strcmp(mnem, "lddr") == 0 ||
+           strcmp(mnem, "cpir") == 0 || strcmp(mnem, "cpdr") == 0;
+}
+
+/* Two 8-bit ld r,r. Never a native 16-bit op on these chips. */
+static int ticks_rp_copy(int cpu)
+{
+    if (cpu == TICKS_CPU_8080)
+        return 10;
+    if (cpu_is_rabbit(cpu))
+        return 4;
+    return 8;
+}
+
+/*
+ * Pair rotate/shift: native T-states, else two CB ops, else -1 (helper call).
+ * 80cc emits the mnemonic; z80asm expands it per CPU.
+ */
+static int ticks_rp_shift(int cpu, const char *mnem, const char *rp)
+{
+    if (!rp || !rp[0])
+        return -1;
+    if (cpu == TICKS_CPU_8080)
+        return -1;
+    if (cpu == TICKS_CPU_8085) {
+        if (strcmp(mnem, "rl") == 0 && ident_eq(rp, "de"))
+            return 10;
+        if (strcmp(mnem, "sra") == 0 && ident_eq(rp, "hl"))
+            return 7;
+        return -1;
+    }
+    if (cpu_is_rabbit(cpu)) {
+        if (strcmp(mnem, "rl") == 0 && ident_eq(rp, "de"))
+            return 2;
+        if (strcmp(mnem, "rr") == 0 && (ident_eq(rp, "de") || ident_eq(rp, "hl")))
+            return 2;
+        if (cpu == TICKS_CPU_R4K) {
+            if (strcmp(mnem, "rl") == 0 &&
+                (ident_eq(rp, "bc") || ident_eq(rp, "hl")))
+                return 2;
+            if (strcmp(mnem, "rr") == 0 && ident_eq(rp, "bc"))
+                return 2;
+            if (strcmp(mnem, "rlc") == 0 &&
+                (ident_eq(rp, "bc") || ident_eq(rp, "de")))
+                return 2;
+            if (strcmp(mnem, "rrc") == 0 &&
+                (ident_eq(rp, "bc") || ident_eq(rp, "de")))
+                return 2;
+        }
+        return 8; /* two CB register ops at 4 T each */
+    }
+    return 16; /* two CB register ops at 8 T each (z80 / z180 / z80n / gbz80) */
+}
+
+/* Word load/store mnemonics. Native when the chip has them, else two byte ops. */
+static int ticks_ld_word(int cpu, int ka, int kb, const char *a, const char *b)
+{
+    int hl_a = (ka == OP_RP && rp_is_hl(a)) || ka == OP_IX;
+    int hl_b = (kb == OP_RP && rp_is_hl(b)) || kb == OP_IX;
+
+    if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_IX) {
+        if (cpu_is_rabbit(cpu) && hl_a)
+            return 11;
+        return 38; /* ld r,(ix+d) twice at 19 T */
+    }
+    if (ka == OP_MEM_IX && (kb == OP_RP || kb == OP_IX)) {
+        if (cpu_is_rabbit(cpu) && hl_b)
+            return 11;
+        return 38;
+    }
+    if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_HL)
+        return (cpu == TICKS_CPU_GBZ80) ? 32 : 26;
+    if (ka == OP_MEM_HL && (kb == OP_RP || kb == OP_IX))
+        return (cpu == TICKS_CPU_GBZ80) ? 32 : 26;
+    if (hl_a && kb == OP_MEM_RP)
+        return 34; /* z80asm: ex de,hl / two (hl) / ex */
+    if (ka == OP_MEM_RP && hl_b)
+        return 34;
+    if (cpu_is_rabbit(cpu)) {
+        if (hl_a && kb == OP_MEM_SP)
+            return 9;
+        if (ka == OP_MEM_SP && hl_b)
+            return 9;
+    }
+    return -1;
 }
 
 /* "sp+4" / "hl + 0" — 8085 ld de,sp+* / ld de,hl+*. Offset is unsigned. */
@@ -455,7 +589,8 @@ static int mem_rp_is(const char *tok, const char *rp)
     return ident_eq(p, rp);
 }
 
-static int ticks_z80_ld(const char *a, const char *b, int ka, int kb, int ixa, int ixb)
+static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
+                        int ixa, int ixb)
 {
     if (ka == OP_R8 && kb == OP_R8)
         return (ixa || ixb) ? 8 : 4;
@@ -488,7 +623,7 @@ static int ticks_z80_ld(const char *a, const char *b, int ka, int kb, int ixa, i
     if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_ABS)
         return (ka == OP_RP && rp_is_hl(a)) ? 16 : 20;
     if (ka == OP_RP && kb == OP_RP && rp_copy_ok(a, b))
-        return 8;
+        return ticks_rp_copy(cpu);
     if (ka == OP_RP && ident_eq(a, "sp") && kb == OP_RP && rp_is_hl(b))
         return 6;
     if (ka == OP_RP && ident_eq(a, "sp") && kb == OP_IX)
@@ -497,6 +632,13 @@ static int ticks_z80_ld(const char *a, const char *b, int ka, int kb, int ixa, i
         return 10;
     if (ka == OP_IR && kb == OP_R8)
         return 9;
+
+    /* Word via (ix+d) / (hl) / (de) / (sp+n). 80cc-fp emits ld rr,(ix+d). */
+    {
+        int t = ticks_ld_word(cpu, ka, kb, a, b);
+        if (t >= 0)
+            return t;
+    }
     return -1;
 }
 
@@ -536,6 +678,105 @@ static int is_alu8(const char *m)
            strcmp(m, "adc") == 0 || strcmp(m, "sbc") == 0;
 }
 
+static int is_shift8(const char *m)
+{
+    return strcmp(m, "rl") == 0 || strcmp(m, "rr") == 0 ||
+           strcmp(m, "rlc") == 0 || strcmp(m, "rrc") == 0 ||
+           strcmp(m, "sla") == 0 || strcmp(m, "sra") == 0 ||
+           strcmp(m, "srl") == 0 || strcmp(m, "sll") == 0;
+}
+
+static int set_fb(int *fallback, int t)
+{
+    if (fallback)
+        *fallback = 1;
+    return t;
+}
+
+/* Z180 extras. Zilog names. Documented T-states. slp is halt-like. */
+static int ticks_z180_ext(const char *mnem, const char *rest, int *fallback)
+{
+    char a[64];
+    int ka;
+
+    if (strcmp(mnem, "mlt") == 0)
+        return 17;
+    if (strcmp(mnem, "in0") == 0)
+        return 12;
+    if (strcmp(mnem, "out0") == 0)
+        return 13;
+    if (strcmp(mnem, "tstio") == 0)
+        return 12;
+    if (strcmp(mnem, "slp") == 0)
+        return set_fb(fallback, 8);
+    if (strcmp(mnem, "otim") == 0 || strcmp(mnem, "otdm") == 0)
+        return 14;
+    if (strcmp(mnem, "otimr") == 0 || strcmp(mnem, "otdmr") == 0)
+        return 16;
+    if (strcmp(mnem, "tst") == 0) {
+        copy_op(rest, a, sizeof(a));
+        ka = classify(a, NULL);
+        if (ka == OP_R8)
+            return 7;
+        if (ka == OP_IMM)
+            return 9;
+    }
+    return -1;
+}
+
+static int rp_adda(const char *tok)
+{
+    return ident_eq(tok, "hl") || ident_eq(tok, "de") || ident_eq(tok, "bc");
+}
+
+/* Z80N extras. Zilog names. Times from the Next extended-ISA list. */
+static int ticks_z80n_ext(const char *mnem, const char *rest)
+{
+    char a[64], b[64];
+    int ka, kb;
+    const char *p;
+
+    if (strcmp(mnem, "mul") == 0)
+        return 8;
+    if (strcmp(mnem, "swapnib") == 0 || strcmp(mnem, "mirror") == 0)
+        return 8;
+    if (strcmp(mnem, "test") == 0)
+        return 11;
+    if (strcmp(mnem, "bsla") == 0 || strcmp(mnem, "bsra") == 0 ||
+        strcmp(mnem, "bsrl") == 0 || strcmp(mnem, "bsrf") == 0 ||
+        strcmp(mnem, "brlc") == 0)
+        return 8;
+    if (strcmp(mnem, "outinb") == 0)
+        return 16;
+    if (strcmp(mnem, "pixelad") == 0 || strcmp(mnem, "pixeldn") == 0 ||
+        strcmp(mnem, "setae") == 0)
+        return 8;
+    if (strcmp(mnem, "ldix") == 0 || strcmp(mnem, "lddx") == 0)
+        return 16;
+    if (strcmp(mnem, "ldirx") == 0 || strcmp(mnem, "lddrx") == 0 ||
+        strcmp(mnem, "ldpirx") == 0)
+        return 16;
+    if (strcmp(mnem, "ldws") == 0)
+        return 14;
+
+    p = copy_op(rest, a, sizeof(a));
+    copy_op(p, b, sizeof(b));
+    ka = classify(a, NULL);
+    kb = classify(b, NULL);
+
+    if (strcmp(mnem, "nextreg") == 0)
+        return (kb == OP_R8) ? 17 : 20;
+    if (strcmp(mnem, "push") == 0 && ka == OP_IMM)
+        return 23;
+    if (strcmp(mnem, "add") == 0 && rp_adda(a)) {
+        if (kb == OP_R8 && ident_eq(b, "a"))
+            return 8;
+        if (kb == OP_IMM)
+            return 16;
+    }
+    return -1;
+}
+
 static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
 {
@@ -544,18 +785,22 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
     int ka, kb, ixa = 0, ixb = 0, t;
     const char *p;
 
-    if (strcmp(mnem, "halt") == 0) {
-        if (fallback)
-            *fallback = 1;
-        return 4;
-    }
+    if (strcmp(mnem, "halt") == 0)
+        return set_fb(fallback, 4);
     if ((strcmp(mnem, "jp") == 0) && indirect) {
-        if (fallback)
-            *fallback = 1;
         p = skip_ws(rest);
         if (*p == '(')
             p++;
-        return (ident_eq(p, "ix") || ident_eq(p, "iy")) ? 8 : 4;
+        return set_fb(fallback, (ident_eq(p, "ix") || ident_eq(p, "iy")) ? 8 : 4);
+    }
+    if (cpu == TICKS_CPU_Z180) {
+        t = ticks_z180_ext(mnem, rest, fallback);
+        if (t >= 0)
+            return t;
+    } else if (cpu == TICKS_CPU_Z80N) {
+        t = ticks_z80n_ext(mnem, rest);
+        if (t >= 0)
+            return t;
     }
     if (strcmp(mnem, "call") == 0)
         return cond ? pick(taken, 17, 10) : 17;
@@ -586,24 +831,20 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
         strcmp(mnem, "rlca") == 0 || strcmp(mnem, "rrca") == 0 ||
         strcmp(mnem, "rla") == 0 || strcmp(mnem, "rra") == 0)
         return 4;
+    if (cpu_is_rabbit(cpu) && strcmp(mnem, "bool") == 0)
+        return 2;
+    if (cpu_is_rabbit(cpu) &&
+        (strcmp(mnem, "ipset") == 0 || strcmp(mnem, "ipres") == 0))
+        return 4;
     if (strcmp(mnem, "neg") == 0)
         return 8;
     if (strcmp(mnem, "im") == 0)
         return 8;
     if (strcmp(mnem, "rld") == 0 || strcmp(mnem, "rrd") == 0)
         return 18;
-    if (strcmp(mnem, "ex") == 0) {
-        copy_op(rest, a, sizeof(a));
-        ka = classify(a, &ixa);
-        if (ka == OP_MEM_SP)
-            return ixa ? 23 : 19;
-        return 4;
-    }
-    if (strcmp(mnem, "ldi") == 0 || strcmp(mnem, "ldd") == 0 ||
-        strcmp(mnem, "cpi") == 0 || strcmp(mnem, "cpd") == 0)
-        return 16;
-    if (strcmp(mnem, "ldir") == 0 || strcmp(mnem, "lddr") == 0 ||
-        strcmp(mnem, "cpir") == 0 || strcmp(mnem, "cpdr") == 0)
+    if (strcmp(mnem, "ex") == 0)
+        return ticks_ex(cpu, rest);
+    if (ticks_xfer_once(mnem))
         return 16;
     if (strcmp(mnem, "ini") == 0 || strcmp(mnem, "ind") == 0 ||
         strcmp(mnem, "outi") == 0 || strcmp(mnem, "outd") == 0)
@@ -611,10 +852,6 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
     if (strcmp(mnem, "inir") == 0 || strcmp(mnem, "indr") == 0 ||
         strcmp(mnem, "otir") == 0 || strcmp(mnem, "otdr") == 0)
         return 16;
-    if (strcmp(mnem, "mlt") == 0)
-        return (cpu == TICKS_CPU_Z180) ? 17 : -1;
-    if (strcmp(mnem, "mul") == 0)
-        return (cpu == TICKS_CPU_Z80N) ? 8 : -1;
     if (strcmp(mnem, "in") == 0 || strcmp(mnem, "out") == 0) {
         p = copy_op(rest, a, sizeof(a));
         copy_op(p, b, sizeof(b));
@@ -631,7 +868,7 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
     kb = classify(b, &ixb);
 
     if (strcmp(mnem, "ld") == 0) {
-        t = ticks_z80_ld(a, b, ka, kb, ixa, ixb);
+        t = ticks_z80_ld(cpu, a, b, ka, kb, ixa, ixb);
         return t;
     }
     if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0)
@@ -639,6 +876,11 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
     if (strcmp(mnem, "add") == 0 || strcmp(mnem, "adc") == 0 ||
         strcmp(mnem, "sbc") == 0) {
         if (ka == OP_RP || ka == OP_IX) {
+            if (strcmp(mnem, "add") == 0 && ident_eq(a, "sp") && kb == OP_IMM)
+                return cpu_is_rabbit(cpu) ? 4 : -1;
+            /* add hl,a / add hl,imm16 are CPU extras, not add hl,rr. */
+            if (kb == OP_R8 || kb == OP_IMM)
+                return -1;
             if (strcmp(mnem, "add") == 0)
                 return (ka == OP_IX) ? 15 : 11;
             return 15; /* adc/sbc hl,rp */
@@ -653,11 +895,17 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
         return (kb == OP_MEM_IX) ? 20 : (kb == OP_MEM_HL ? 12 : 8);
     if (strcmp(mnem, "res") == 0 || strcmp(mnem, "set") == 0)
         return (kb == OP_MEM_IX) ? 23 : (kb == OP_MEM_HL ? 15 : 8);
-    if (strcmp(mnem, "rl") == 0 || strcmp(mnem, "rr") == 0 ||
-        strcmp(mnem, "rlc") == 0 || strcmp(mnem, "rrc") == 0 ||
-        strcmp(mnem, "sla") == 0 || strcmp(mnem, "sra") == 0 ||
-        strcmp(mnem, "srl") == 0 || strcmp(mnem, "sll") == 0)
-        return (ka == OP_MEM_IX) ? 23 : (ka == OP_MEM_HL ? 15 : 8);
+    if (is_shift8(mnem)) {
+        if (ka == OP_MEM_IX)
+            return 23;
+        if (ka == OP_MEM_HL)
+            return 15;
+        if (ka == OP_RP)
+            return ticks_rp_shift(cpu, mnem, a);
+        if (ka == OP_R8)
+            return 8;
+        return -1;
+    }
     return -1;
 }
 
@@ -697,9 +945,35 @@ static int ticks_808x_ld(int i8085, int ka, int kb, const char *a, const char *b
     if (ka == OP_MEM_ABS && kb == OP_RP)
         return rp_is_hl(b) ? 16 : 13;
     if (ka == OP_RP && kb == OP_RP && rp_copy_ok(a, b))
-        return i8085 ? 8 : 10;
+        return ticks_rp_copy(i8085 ? TICKS_CPU_8085 : TICKS_CPU_8080);
     if (ka == OP_RP && ident_eq(a, "sp") && kb == OP_RP && rp_is_hl(b))
         return i8085 ? 6 : 5;
+    {
+        int t = ticks_ld_word(i8085 ? TICKS_CPU_8085 : TICKS_CPU_8080, ka, kb, a, b);
+        if (t >= 0)
+            return t;
+    }
+    return -1;
+}
+
+/* 8085 extras. Zilog names. Intel dsub/rdel/ldsi/lhlx are not matched. */
+static int ticks_8085_ext(const char *mnem, const char *rest, int backward)
+{
+    char a[64], b[64];
+    const char *p;
+
+    if (strcmp(mnem, "rstv") == 0)
+        return pick(backward, 12, 6);
+    if (strcmp(mnem, "rst") == 0 && ident_eq(rest, "v"))
+        return pick(backward, 12, 6);
+    if (strcmp(mnem, "rim") == 0 || strcmp(mnem, "sim") == 0)
+        return 4;
+    p = copy_op(rest, a, sizeof(a));
+    copy_op(p, b, sizeof(b));
+    if (strcmp(mnem, "sub") == 0 && ident_eq(a, "hl") && ident_eq(b, "bc"))
+        return 10;
+    if (is_shift8(mnem))
+        return ticks_rp_shift(TICKS_CPU_8085, mnem, a);
     return -1;
 }
 
@@ -710,29 +984,22 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
     int i8085 = (cpu == TICKS_CPU_8085);
     char a[64], b[64];
     int ka, kb;
+    int t;
     const char *p;
 
-    if (strcmp(mnem, "halt") == 0) {
-        if (fallback)
-            *fallback = 1;
-        return i8085 ? 5 : 7;
-    }
-    if ((strcmp(mnem, "jp") == 0) && indirect) {
-        if (fallback)
-            *fallback = 1;
-        return i8085 ? 6 : 5;
+    if (strcmp(mnem, "halt") == 0)
+        return set_fb(fallback, i8085 ? 5 : 7);
+    if ((strcmp(mnem, "jp") == 0) && indirect)
+        return set_fb(fallback, i8085 ? 6 : 5);
+    if (i8085) {
+        t = ticks_8085_ext(mnem, rest, backward);
+        if (t >= 0)
+            return t;
     }
     if (strcmp(mnem, "call") == 0)
         return cond ? pick(taken, i8085 ? 18 : 17, 9) : (i8085 ? 18 : 17);
-    /* rst v (CB): z80asm accepts rstv and rst v,64. parse_control does
-     * not mark it conditional, so use backward for taken (12) vs 6. */
-    if (i8085 && strcmp(mnem, "rstv") == 0)
-        return pick(backward, 12, 6);
-    if (strcmp(mnem, "rst") == 0) {
-        if (i8085 && ident_eq(rest, "v"))
-            return pick(backward, 12, 6);
+    if (strcmp(mnem, "rst") == 0)
         return 12;
-    }
     if (strcmp(mnem, "ret") == 0)
         return cond ? pick(taken, 12, 6) : 10;
     if (strcmp(mnem, "jp") == 0)
@@ -748,9 +1015,7 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
     if (strcmp(mnem, "nop") == 0)
         return 4;
     if (strcmp(mnem, "ex") == 0)
-        return strstr(rest, "sp") ? (i8085 ? 16 : 18) : 4;
-    if (i8085 && (strcmp(mnem, "rim") == 0 || strcmp(mnem, "sim") == 0))
-        return 4;
+        return ticks_ex(i8085 ? TICKS_CPU_8085 : TICKS_CPU_8080, rest);
     if (strcmp(mnem, "in") == 0 || strcmp(mnem, "out") == 0)
         return 10;
     if (strcmp(mnem, "daa") == 0 || strcmp(mnem, "cpl") == 0 ||
@@ -767,15 +1032,6 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
 
     if (strcmp(mnem, "ld") == 0)
         return ticks_808x_ld(i8085, ka, kb, a, b);
-    /* 8085 extended (Zilog): sub hl,bc (08) 10, sra hl (10) 7, rl de (18) 10.
-     * jp k / jp nk are the generic 8085 jp cc times (10/7) above.
-     * Loads and rst v are handled earlier. */
-    if (i8085 && strcmp(mnem, "sub") == 0 && ident_eq(a, "hl") && ident_eq(b, "bc"))
-        return 10;
-    if (i8085 && strcmp(mnem, "sra") == 0 && ident_eq(a, "hl"))
-        return 7;
-    if (i8085 && strcmp(mnem, "rl") == 0 && ident_eq(a, "de"))
-        return 10;
     if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0) {
         if (ka == OP_RP)
             return i8085 ? 6 : 5;
@@ -800,6 +1056,47 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
     return -1;
 }
 
+static int ticks_gbz80_ld(const char *mnem, int ka, int kb,
+                          const char *a, const char *b)
+{
+    if (strcmp(mnem, "ldh") == 0) {
+        if ((ka == OP_R8 && kb == OP_MEM_ABS) || (ka == OP_MEM_ABS && kb == OP_R8))
+            return 12;
+        if ((ka == OP_R8 && kb == OP_MEM_C) || (ka == OP_MEM_C && kb == OP_R8))
+            return 8;
+        return -1;
+    }
+    /* ld hl,sp+* is 12. classify() treats "sp+n" as OP_RP. */
+    if (ident_eq(a, "hl") && plus_off_base(b, "sp"))
+        return 12;
+    if (ka == OP_RP && kb == OP_IMM)
+        return 12;
+    if (ka == OP_R8 && kb == OP_IMM)
+        return 8;
+    if (ka == OP_MEM_HL && kb == OP_IMM)
+        return 12;
+    if ((ka == OP_MEM_HL && kb == OP_R8) || (ka == OP_R8 && kb == OP_MEM_HL))
+        return 8;
+    if (ka == OP_R8 && kb == OP_R8)
+        return 4;
+    if ((ka == OP_R8 && kb == OP_MEM_RP) || (ka == OP_MEM_RP && kb == OP_R8))
+        return 8;
+    if ((ka == OP_R8 && kb == OP_MEM_C) || (ka == OP_MEM_C && kb == OP_R8))
+        return 8;
+    if (ka == OP_MEM_ABS && kb == OP_RP && ident_eq(b, "sp"))
+        return 20;
+    if ((ka == OP_R8 && kb == OP_MEM_ABS) || (ka == OP_MEM_ABS && kb == OP_R8))
+        return 16;
+    if (ka == OP_RP && kb == OP_RP)
+        return ticks_rp_copy(TICKS_CPU_GBZ80);
+    {
+        int t = ticks_ld_word(TICKS_CPU_GBZ80, ka, kb, a, b);
+        if (t >= 0)
+            return t;
+    }
+    return -1;
+}
+
 static int ticks_gbz80(const char *mnem, const char *rest,
                        int cond, int indirect, int backward, int *fallback)
 {
@@ -808,16 +1105,10 @@ static int ticks_gbz80(const char *mnem, const char *rest,
     int ka, kb;
     const char *p;
 
-    if (strcmp(mnem, "halt") == 0 || strcmp(mnem, "stop") == 0) {
-        if (fallback)
-            *fallback = 1;
-        return 4;
-    }
-    if ((strcmp(mnem, "jp") == 0) && indirect) {
-        if (fallback)
-            *fallback = 1;
-        return 4;
-    }
+    if (strcmp(mnem, "halt") == 0 || strcmp(mnem, "stop") == 0)
+        return set_fb(fallback, 4);
+    if ((strcmp(mnem, "jp") == 0) && indirect)
+        return set_fb(fallback, 4);
     if (strcmp(mnem, "call") == 0)
         return cond ? pick(taken, 24, 12) : 24;
     if (strcmp(mnem, "rst") == 0)
@@ -830,6 +1121,9 @@ static int ticks_gbz80(const char *mnem, const char *rest,
         return cond ? pick(taken, 16, 12) : 16;
     if (strcmp(mnem, "jr") == 0)
         return cond ? pick(taken, 12, 8) : 12;
+    /* djnz is not native (byte 10 is stop). z80asm expands to dec b / jr nz. */
+    if (strcmp(mnem, "djnz") == 0)
+        return pick(taken, 16, 12);
     if (strcmp(mnem, "push") == 0)
         return 16;
     if (strcmp(mnem, "pop") == 0)
@@ -841,33 +1135,26 @@ static int ticks_gbz80(const char *mnem, const char *rest,
         strcmp(mnem, "rrca") == 0 || strcmp(mnem, "rla") == 0 ||
         strcmp(mnem, "rra") == 0)
         return 4;
+    if (strcmp(mnem, "ex") == 0)
+        return ticks_ex(TICKS_CPU_GBZ80, rest);
+    if (ticks_xfer_once(mnem))
+        return 16;
 
     p = copy_op(rest, a, sizeof(a));
     copy_op(p, b, sizeof(b));
     ka = classify(a, NULL);
     kb = classify(b, NULL);
 
-    if (strcmp(mnem, "ld") == 0 || strcmp(mnem, "ldh") == 0) {
-        if (ka == OP_RP && kb == OP_IMM)
-            return 12;
-        if (ka == OP_R8 && kb == OP_IMM)
-            return 8;
-        if (ka == OP_MEM_HL && kb == OP_IMM)
-            return 12;
-        if ((ka == OP_MEM_HL && kb == OP_R8) || (ka == OP_R8 && kb == OP_MEM_HL))
-            return 8;
-        if (ka == OP_R8 && kb == OP_R8)
-            return 4;
-        if (ka == OP_RP && kb == OP_RP)
-            return 8;
-        return 8;
-    }
+    if (strcmp(mnem, "ld") == 0 || strcmp(mnem, "ldh") == 0)
+        return ticks_gbz80_ld(mnem, ka, kb, a, b);
     if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0) {
         if (ka == OP_RP)
             return 8;
         if (ka == OP_MEM_HL)
             return 12;
-        return 4;
+        if (ka == OP_R8)
+            return 4;
+        return -1;
     }
     if (strcmp(mnem, "add") == 0 && ka == OP_RP && ident_eq(a, "sp"))
         return 16;
@@ -879,10 +1166,25 @@ static int ticks_gbz80(const char *mnem, const char *rest,
             return 8;
         if (k == OP_IMM)
             return 8;
-        return 4;
+        if (k == OP_R8)
+            return 4;
+        return -1;
     }
     if (strcmp(mnem, "swap") == 0)
         return (ka == OP_MEM_HL) ? 16 : 8;
+    if (is_shift8(mnem)) {
+        if (ka == OP_MEM_HL)
+            return 16;
+        if (ka == OP_RP)
+            return ticks_rp_shift(TICKS_CPU_GBZ80, mnem, a);
+        if (ka == OP_R8)
+            return 8;
+        return -1;
+    }
+    if (strcmp(mnem, "bit") == 0)
+        return (kb == OP_MEM_HL) ? 12 : 8;
+    if (strcmp(mnem, "res") == 0 || strcmp(mnem, "set") == 0)
+        return (kb == OP_MEM_HL) ? 16 : 8;
     return -1;
 }
 

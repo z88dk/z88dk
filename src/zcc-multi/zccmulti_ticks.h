@@ -9,7 +9,9 @@ enum {
     TICKS_CPU_Z180,
     TICKS_CPU_8080,
     TICKS_CPU_8085,
-    TICKS_CPU_GBZ80
+    TICKS_CPU_GBZ80,
+    TICKS_CPU_R2KA,
+    TICKS_CPU_R4K
 };
 
 enum {
@@ -30,6 +32,7 @@ int listing_parse_line(const char *line, char *src, size_t src_sz);
  * Documented T-states from the mnemonic and operands (clrhome).
  * Conditional insns use the not-taken time unless backward is set.
  * *fallback is set for jp (hl)/(ix)/(iy), halt, and unknown ops.
+ * Documented z80asm expansions and helper costs are scored.
  */
 int ticks_for_src(int cpu_kind, const char *src, int backward, int *fallback);
 

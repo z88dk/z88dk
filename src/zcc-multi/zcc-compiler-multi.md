@@ -242,6 +242,8 @@ After the function lines, print the summary. See [Selection summary](#selection-
 
 `-compiler-multi-report=path` writes UTF-8 TSV.
 
+zcc passes the same path to every translation unit. A `@lst` job overwrites the file once per `.c` file. The file that remains is the last TU. Use `-v` summaries for a multi-file job, or pass a distinct report path per file.
+
 The first line is a header.
 
 ```text
@@ -771,26 +773,61 @@ Ticks use the assembly source text.
 
 The tool scores each source line that `looks_like_insn` accepts with `ticks_for_src`.
 
-`ticks_for_src` reads the mnemonic and the operands. It does not use a listing byte count. `ld hl,n` is 10 T. `ld a,n` is 7 T. `ld a,b` is 4 T. A z80asm synthetic `ld de,hl` is 8 T.
+`ticks_for_src` reads the mnemonic and the operands. It does not use a listing byte count. `ld hl,n` is 10 T. `ld a,n` is 7 T. `ld a,b` is 4 T.
 
-8085 extended ops use **Zilog** names. Intel `dsub` / `rdel` / `ldsi` / `lhlx` are not matched.
+Pair copies, word rotates, `ex`, and word loads use the same rule on every CPU. If the chip has the op, use the native time. If z80asm expands the mnemonic to a short inline sequence, use the sum of those ops. If z80asm emits a helper `call` and the cost is documented, use that cost. Repeating block ops (`ldir` and the other names in `apply_block_repeats`) use `21 × BC` on every CPU. An unknown mnemonic or a helper with no documented cost sets fallback. 80cc writes the mnemonic. The assembler chooses the expansion.
 
-| Source | T-states |
-|--------|----------|
-| `sub hl,bc` | 10 |
-| `sra hl` | 7 |
-| `rl de` | 10 |
-| `ld de,sp+*` / `ld de,hl+*` | 10 |
-| `ld hl,(de)` / `ld (de),hl` | 10 |
-| `rst v` | 12 taken / 6 not-taken |
-| `jp k,**` / `jp nk,**` | 10 taken / 7 not-taken |
-| `ex (sp),hl` | 16 (8085). 18 on 8080 |
+`ld` among `bc` / `de` / `hl` is two 8-bit loads: 8 T on Z80-family and 8085, 10 T on 8080, 4 T on Rabbit. `rl` / `rr` / `rlc` / `rrc` / `sla` / `sra` / `srl` / `sll` on a pair is 16 T as two CB ops on Z80 / Z180 / Z80N / gbz80, 8 T as two CB ops on Rabbit when the chip has no native form, 10 T for 8085 `rl de`, 7 T for 8085 `sra hl`, 2 T for Rabbit `rl de` / `rr de` / `rr hl` (and the extra Rabbit 4000 pair rotates). Other 8085 pair rotates are helper calls. `ex de,hl` is 4 T where it is native, 56 T on gbz80 (`push hl` / `push de` / `pop hl` / `pop de`). `ex (sp),hl` is 19 T on Z80 (23 T with IX), 16 T on 8085, 18 T on 8080, 148 T on gbz80 (helper). Rabbit `bool hl` is 2 T. Rabbit `ipset` / `ipres` is 4 T. Rabbit `add sp,n` is 4 T.
 
-`jp k` / `jp nk` already use the 8085 conditional-jp times.
+Word load through `(ix+d)` is two indexed byte ops (38 T) on Z80. Rabbit `ld hl,(ix+d)` is 11 T. Word load through `(hl)` is 26 T (32 T on gbz80). 80cc-fp emits `ld hl,(ix+d)`. That MUST score, not fallback.
+
+CPU extras use **Zilog** names on every model. Intel and Nintendo aliases are not matched. An unknown extra sets fallback, the same as `halt`. `slp` and `jp (c)` are halt-like and MUST set fallback.
+
+| `--cpu=` | Source | T-states |
+|----------|--------|----------|
+| 8085 | `sub hl,bc` | 10 |
+| 8085 | `sra hl` | 7 |
+| 8085 | `rl de` | 10 |
+| 8085 | `ld de,sp+*` / `ld de,hl+*` | 10 |
+| 8085 | `ld hl,(de)` / `ld (de),hl` | 10 |
+| 8085 | `rst v` / `rstv` | 12 taken / 6 not-taken |
+| 8085 | `jp k,**` / `jp nk,**` | 10 taken / 7 not-taken |
+| 8085 | `ex (sp),hl` | 16 (18 on 8080) |
+| gbz80 | `ld a,(hl+)` / `ld (hl+),a` / `ld a,(hl-)` / `ld (hl-),a` | 8 |
+| gbz80 | `ldh a,(*)` / `ldh (*),a` | 12 |
+| gbz80 | `ld a,(c)` / `ld (c),a` | 8 |
+| gbz80 | `ld hl,sp+*` | 12 |
+| gbz80 | `ex de,hl` | 56 |
+| gbz80 | `ex (sp),hl` | 148 |
+| gbz80 | `add sp,*` | 16 |
+| gbz80 | `swap r` / `swap (hl)` | 8 / 16 |
+| gbz80 | `ld (**),sp` | 20 |
+| gbz80 | `ld a,(**)` / `ld (**),a` | 16 |
+| gbz80 | `djnz` (synthetic `dec b` / `jr nz`) | 16 taken / 12 not-taken |
+| z180 | `mlt rr` | 17 |
+| z180 | `in0 r,(n)` | 12 |
+| z180 | `out0 (n),r` | 13 |
+| z180 | `tst r` / `tst n` | 7 / 9 |
+| z180 | `tstio n` | 12 |
+| z180 | `otim` / `otdm` | 14 |
+| z180 | `otimr` / `otdmr` | 16 (block stand-in is `21 × BC`) |
+| z80n | `mul de` / `mul d,e` | 8 |
+| z80n | `nextreg n,n` / `nextreg n,a` | 20 / 17 |
+| z80n | `add hl\|de\|bc,a` | 8 |
+| z80n | `add hl\|de\|bc,imm16` | 16 |
+| z80n | `push imm16` | 23 |
+| z80n | `swapnib` / `mirror a` | 8 |
+| z80n | `test n` | 11 |
+| z80n | `bsla` / `bsra` / `bsrl` / `bsrf` / `brlc` `de,b` | 8 |
+| z80n | `outinb` | 16 |
+| z80n | `pixelad` / `pixeldn` / `setae` | 8 |
+| z80n | `ldix` / `lddx` | 16 |
+| z80n | `ldirx` / `lddrx` / `ldpirx` | 16 (block stand-in is `21 × BC`) |
+| z80n | `ldws` | 14 |
 
 A stand-alone label (`L_foo:`, `.i_1`) is not an instruction. It MUST NOT set fallback. 80cc local labels have no leading dot.
 
-An unknown mnemonic or `halt` sets the fallback flag.
+An unknown mnemonic or `halt` sets the fallback flag. If any present body is unusable, the function MUST pick by size among all bodies. Do not mix ticks of the usable pair with size of the fallback body.
 
 Tables live in `src/zcc-multi/zccmulti_ticks.c`.
 
@@ -805,6 +842,8 @@ The CPU model follows `--cpu=`.
 | `8080` | 8080 |
 | `8085` | 8085 |
 | `gbz80` | gbz80 |
+| `r2ka` / `r3k` | Rabbit 2000 |
+| `r4k` / `r6k` | Rabbit 4000 |
 
 The ticks `-m` flag MUST stand before any binary path if a later change runs ticks.
 
@@ -1517,13 +1556,15 @@ MSYS2 `mingw32-make` cannot run `! grep`. Use `test \`grep -c\` -eq 0` instead.
 11. `-a` writes one `.asm` and stops.
 12. A discarded sccz80 body leaves `defc i_N = i_M` in the optimiser banner. The stitch file MUST omit that `defc`. The file MUST assemble. More than 256 unused aliases to a discarded body MUST still omit them. A selected body that jumps through `i_10` after 256 dummy aliases MUST keep `defc i_10 = i_8` and assemble. Fixtures: `t/opt_sccz80.asm`, `t/opt_80cc.asm`, `t/opt_used_sccz80.asm`.
 13. `jp (hl)` MUST NOT win on ticks. `reason` is `fallback`. Fixtures: `t/jp_hl.asm`, `t/jp_hl_alt.asm`.
+13a. If one variant is unusable, the pick MUST be size among all bodies. Fixture: `t/mix_small.asm` / `t/mix_fast.asm` / `t/mix_fb.asm`.
+13b. A function that exists in only one variant MUST still be emitted with `reason` `only`. Fixtures: `t/only_two.asm`, `t/only_one.asm`.
 14. `ld b,8` / `djnz` MUST multiply the loop span. Fixture: `t/loop_count.asm` versus `t/loop_once.asm`.
 15. `ld b,0` / `djnz` MUST use 256 trips. Fixture: `t/loop_b0.asm`.
 16. `ld bc,0` / `dec bc` / `ld a,b` / `or c` / `jp nz` MUST use 65536 trips. Fixture: `t/loop_bc0.asm`.
 17. `dec bc` / `jp nz` with no `or` MUST NOT use a wrap trip. Fixture: `t/loop_bc_nz.asm`.
 18. 8085 `ld bc,8` / `dec bc` / `jp nk` MUST multiply the loop. `ld bc,0` wraps to 65536. Fixtures: `t/loop_8085_k.asm`, `t/loop_8085_k0.asm`.
-19. `ldir` with `ld bc,4` scores more than 70. Unknown BC scores `21 × 2` plus the other opcodes (52 on the unknown fixture). `ld bc,0` is 65536 repeats. Fixtures: `t/ldir_bc.asm`, `t/ldir_unk.asm`, `t/ldir_bc0.asm`.
-20. All ten 8085 extended ops MUST score documented T-states (97 on the bundle fixture, including forward `jp k` / `jp nk` and `rstv`) with `reason` `metric`. A larger-but-faster body MUST beat a smaller slower body on ticks. Fixtures: `t/8085_ext.asm`, `t/8085_slow.asm`, `t/8085_fast.asm`. `t/loop_8085_k.asm` covers backward `jp nk`. A stand-alone `L_*` label MUST NOT set fallback.
+19. `ldir` with `ld bc,4` scores more than 70. Unknown BC scores `21 × 2` plus the other opcodes (`ret` makes 52 on Z80 and 58 on gbz80). `ld bc,0` is 65536 repeats. Fixtures: `t/ldir_bc.asm`, `t/ldir_unk.asm`, `t/ldir_bc0.asm`.
+20. CPU extras MUST score documented T-states with `reason` `metric`. A larger-but-faster body MUST beat a smaller slower body on ticks. Bundle sums: 8085 97, gbz80 144, z180 94, z80n 175. Fixtures: `t/8085_ext.asm`, `t/gbz80_ext.asm`, `t/z180_ext.asm`, `t/z80n_ext.asm` and the matching `*_slow.asm` / `*_fast.asm` pairs. `t/loop_8085_k.asm` covers backward `jp nk`. A stand-alone `L_*` label MUST NOT set fallback. A Z80 word shift `sra hl` MUST score 16 T. Fixture: `t/srahl.asm` versus `t/nops.asm`. Rabbit `rr hl` MUST score 2 T, `ld de,hl` MUST score 4 T, `bool hl` MUST score 2 T, `add sp,n` MUST score 4 T, `ld hl,(ix+0)` MUST score 11 T. Fixtures: `t/r2ka_rrhl.asm`, `t/r2ka_ldrr.asm`, `t/r2ka_bool.asm`, `t/r2ka_addsp.asm`, `t/r2ka_ldix.asm`. Z80 `ld hl,(ix+0)` MUST score 38 T plus `ret` (48 T) with `reason` `metric`. Fixture: `t/ixword.asm`. gbz80 `ex de,hl` MUST score 56 T. Fixtures: `t/gbz80_ex.asm` versus `t/gbz80_ex_slow.asm`.
 21. A command-line `-compiler=multi` with an sdcc clib recipe MUST print `-compiler=multi does not support the sdcc ABI` and MUST NOT invoke zsdcc. Suite: `sdcc_abi.ok`.
 
 ### Fixture sketch
@@ -1588,7 +1629,9 @@ This section records strategies that were considered for how multi picks a body.
 
 **Stand-alone labels are not instructions.** 80cc `L_foo:` has no leading dot. Scoring it as an unknown opcode would mark every 80cc function as `fallback` and drop ticks.
 
-**8085 extended ops in the ticks table, Zilog names only.** `sub hl,bc`, `sra hl`, `rl de`, `ld de,sp+*`, `ld de,hl+*`, `ld hl,(de)`, `ld (de),hl`, `rst v` / `rstv`, `jp k`, `jp nk`. Intel spellings are not matched. Tree sources emit Zilog.
+**CPU extras in the ticks table, Zilog names only.** 8085, gbz80, z180, z80n, and Rabbit share one rule. An unknown extra sets `fallback` and drops ticks. Pair copies, word rotates, `ex`, and word loads through `(ix+d)` / `(hl)` / `(sp+n)` use native time when the chip has the op, else the z80asm inline expansion or a documented helper cost. Repeating block ops use `21 × BC`. 80cc writes the mnemonic. The assembler chooses the expansion. Intel and Nintendo aliases are not matched. `slp` and `jp (c)` stay fallback.
+
+**Size among all bodies when any variant is unusable.** Mixing ticks of two usable bodies with size of a fallback body can pick a body that is neither smallest nor cheapest. The function uses size for every variant.
 
 **Naked and interrupt bodies are selectable.** After copt they are ordinary labelled units.
 
@@ -1622,11 +1665,11 @@ This section records strategies that were considered for how multi picks a body.
 
 **Ticks from listing line numbers.** 80cc can attribute an opcode to the wrong source line. Size still uses listing bytes after the function label.
 
-**Matching Intel 8085 names in the ticks model.** z88dk sources use Zilog. Intel forms stay for external-code compatibility in z80asm, not in this scorer.
+**Matching Intel 8085 names, or Nintendo gbz80 names, in the ticks model.** z88dk sources use Zilog. Intel and Nintendo forms stay for external-code compatibility in z80asm, not in this scorer.
 
 **Changing `src/80cc` in this version.** The selector talks to named variant bodies. A later 80cc host can emit `80cc-sp` and `80cc-fp` inside one compile. That switch is a design constraint. It is not this work.
 
-**Always using ticks when any variant has `jp (hl)` or an unknown opcode.** The function falls back to size. An indirect jump has no static T-state the model trusts.
+**Always using ticks when any variant has `jp (hl)` or an unknown opcode.** The function falls back to size for every variant. An indirect jump has no static T-state the model trusts.
 
 ## References
 

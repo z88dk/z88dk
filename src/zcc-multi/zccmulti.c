@@ -776,17 +776,26 @@ static void apply_loops(Variant *v)
 
 static int is_block_repeat(const char *s)
 {
+    static const char *rep[] = {
+        "ldir", "lddr", "cpir", "cpdr",
+        "inir", "indr", "otir", "otdr",
+        "ldirx", "lddrx", "ldpirx",
+        "otimr", "otdmr",
+        NULL
+    };
     char m[16];
     const char *p = skip_ws(s);
     size_t n = 0;
+    int i;
 
     while (isalpha((unsigned char)*p) && n + 1 < sizeof(m))
         m[n++] = (char)tolower((unsigned char)*p++);
     m[n] = 0;
-    return strcmp(m, "ldir") == 0 || strcmp(m, "lddr") == 0 ||
-           strcmp(m, "cpir") == 0 || strcmp(m, "cpdr") == 0 ||
-           strcmp(m, "inir") == 0 || strcmp(m, "indr") == 0 ||
-           strcmp(m, "otir") == 0 || strcmp(m, "otdr") == 0;
+    for (i = 0; rep[i]; i++) {
+        if (strcmp(m, rep[i]) == 0)
+            return 1;
+    }
+    return 0;
 }
 
 static void apply_block_repeats(Variant *v)
@@ -804,9 +813,11 @@ static void apply_block_repeats(Variant *v)
                 bc = trip_from_imm(bc, 1);
             else
                 bc = ZCCMULTI_BLOCK_REP;
-            /* Z80 ldir family: 21 T per repeat (last is 16; 21*n is a
-             * conservative stand-in). Unknown BC uses ZCCMULTI_BLOCK_REP. */
+            /* Repeating block ops: 21 T per trip (last is 16; 21*n is a
+             * stand-in). Unknown BC uses ZCCMULTI_BLOCK_REP. This pass
+             * owns the line score. */
             v->lticks[line] = 21 * (int)bc;
+            v->lfall[line] = 0;
         }
     }
 }
@@ -1604,15 +1615,14 @@ static int ticks_usable(const Func *a)
     return a && !a->bad_ticks;
 }
 
-static int better(const Func *a, const char *aname, const Func *b, const char *bname)
+static int better(const Func *a, const char *aname, const Func *b, const char *bname,
+                  int use_ticks)
 {
     /* return 1 if a wins over b. b may be NULL. */
     if (!b)
         return 1;
-    if (opt_metric == METRIC_TICKS) {
-        if (ticks_usable(a) && ticks_usable(b) && a->ticks != b->ticks)
-            return a->ticks < b->ticks;
-    }
+    if (use_ticks && ticks_usable(a) && ticks_usable(b) && a->ticks != b->ticks)
+        return a->ticks < b->ticks;
     if (a->size != b->size)
         return a->size < b->size;
     return variant_rank(aname) < variant_rank(bname);
@@ -1625,6 +1635,7 @@ typedef struct {
     int   size[MAX_VARIANTS];
     int   ticks[MAX_VARIANTS];
     int   present[MAX_VARIANTS];
+    int   use_ticks;      /* 0 if any present body is unusable */
 } Choice;
 
 static Choice *choices;
@@ -1662,6 +1673,12 @@ static void collect_functions(void)
         int best_v = -1;
         int npres = 0;
 
+        choices[c].use_ticks = (opt_metric == METRIC_TICKS);
+        for (v = 0; v < nvariants; v++) {
+            Func *fn = find_func(&variants[v], choices[c].name);
+            if (fn && !ticks_usable(fn))
+                choices[c].use_ticks = 0;
+        }
         for (v = 0; v < nvariants; v++) {
             Func *fn = find_func(&variants[v], choices[c].name);
             if (!fn)
@@ -1670,7 +1687,7 @@ static void collect_functions(void)
             choices[c].size[v] = fn->size;
             choices[c].ticks[v] = fn->ticks;
             npres++;
-            if (better(fn, variants[v].name, best, best_name)) {
+            if (better(fn, variants[v].name, best, best_name, choices[c].use_ticks)) {
                 best = fn;
                 best_name = variants[v].name;
                 best_v = v;
@@ -1681,16 +1698,8 @@ static void collect_functions(void)
         choices[c].sel = best_v;
         if (npres == 1)
             strcpy(choices[c].reason, "only");
-        else if (opt_metric == METRIC_TICKS) {
-            int used_ticks = 1;
-            for (v = 0; v < nvariants; v++) {
-                Func *fn = find_func(&variants[v], choices[c].name);
-                if (fn && !ticks_usable(fn))
-                    used_ticks = 0;
-            }
-            strcpy(choices[c].reason, used_ticks ? "metric" : "fallback");
-        } else
-            strcpy(choices[c].reason, "metric");
+        else
+            strcpy(choices[c].reason, choices[c].use_ticks ? "metric" : "fallback");
     }
 }
 
@@ -1722,7 +1731,7 @@ static int choice_score(int ci, int v)
 {
     if (ci < 0 || v < 0 || !choices[ci].present[v])
         return 0x7fffffff;
-    return (opt_metric == METRIC_TICKS) ? choices[ci].ticks[v] : choices[ci].size[v];
+    return choices[ci].use_ticks ? choices[ci].ticks[v] : choices[ci].size[v];
 }
 
 static int best_non_fp(int ci)
@@ -1738,7 +1747,7 @@ static int best_non_fp(int ci)
         alt = find_func(&variants[v], choices[ci].name);
         if (!alt)
             continue;
-        if (better(alt, variants[v].name, best, best_name)) {
+        if (better(alt, variants[v].name, best, best_name, choices[ci].use_ticks)) {
             best = alt;
             best_name = variants[v].name;
             best_v = v;
@@ -1873,47 +1882,51 @@ static int local_label_on_line(const char *s, const char *lab)
     return *s == 0 || *s == ';';
 }
 
-/* copt leftover: "defc i_10 = i_8". Return 1 and copy i_8. */
-static int local_defc_rhs(const char *s, char *rhs, size_t rhssz)
+/* After optional '.', copy a local-label ident into out. Advance *pp. */
+static int take_local_ident(const char **pp, char *out, size_t outsz)
 {
-    const char *eq, *t;
+    const char *s = skip_ws(*pp);
+    const char *t;
     size_t n;
 
-    s = skip_ws(s);
-    if (strncasecmp(s, "defc", 4) != 0 || !isspace((unsigned char)s[4]))
-        return 0;
-    s = skip_ws(s + 4);
     if (*s == '.')
         s++;
-    {
-        const char *u = s;
-        while (is_ident((unsigned char)*u))
-            u++;
-        if (!is_local_label_token(s, (size_t)(u - s)))
-            return 0;
-    }
-    eq = strchr(s, '=');
-    if (!eq)
-        return 0;
-    s = skip_ws(eq + 1);
-    if (*s == '.')
-        s++;
-    {
-        const char *u = s;
-        while (is_ident((unsigned char)*u))
-            u++;
-        if (!is_local_label_token(s, (size_t)(u - s)))
-            return 0;
-    }
     t = s;
     while (is_ident((unsigned char)*t))
         t++;
     n = (size_t)(t - s);
-    if (n < 1 || n >= rhssz)
+    if (!is_local_label_token(s, n) || n < 1 || n >= outsz)
         return 0;
-    memcpy(rhs, s, n);
-    rhs[n] = 0;
+    memcpy(out, s, n);
+    out[n] = 0;
+    *pp = t;
     return 1;
+}
+
+static const char *after_defc(const char *s)
+{
+    s = skip_ws(s);
+    if (strncasecmp(s, "defc", 4) != 0 || !isspace((unsigned char)s[4]))
+        return NULL;
+    return skip_ws(s + 4);
+}
+
+/* copt leftover: "defc i_10 = i_8". Return 1 and copy i_8. */
+static int local_defc_rhs(const char *s, char *rhs, size_t rhssz)
+{
+    char lhs[64];
+    const char *eq;
+
+    s = after_defc(s);
+    if (!s)
+        return 0;
+    if (!take_local_ident(&s, lhs, sizeof(lhs)))
+        return 0;
+    eq = strchr(s, '=');
+    if (!eq)
+        return 0;
+    s = skip_ws(eq + 1);
+    return take_local_ident(&s, rhs, rhssz);
 }
 
 static int variant_defines_local(Variant *v, const char *lab)
@@ -1937,26 +1950,10 @@ static int variant_defines_local(Variant *v, const char *lab)
 
 static int local_defc_lhs(const char *s, char *lhs, size_t lhssz)
 {
-    const char *t;
-    size_t n;
-
-    s = skip_ws(s);
-    if (strncasecmp(s, "defc", 4) != 0 || !isspace((unsigned char)s[4]))
+    s = after_defc(s);
+    if (!s)
         return 0;
-    s = skip_ws(s + 4);
-    if (*s == '.')
-        s++;
-    t = s;
-    while (is_ident((unsigned char)*t))
-        t++;
-    n = (size_t)(t - s);
-    if (!is_local_label_token(s, n))
-        return 0;
-    if (n < 1 || n >= lhssz)
-        return 0;
-    memcpy(lhs, s, n);
-    lhs[n] = 0;
-    return 1;
+    return take_local_ident(&s, lhs, lhssz);
 }
 
 typedef struct {
@@ -2046,8 +2043,7 @@ static void check_data_set(void)
 {
     Variant *d = data_variant();
     int v, i;
-    /* Compare file-scope data labels in trailers. Soft: fail if a
-     * named ._var appears in one trailer and not another. */
+    /* Named objects must exist in the data variant. */
     /* Collect from data variant first. */
     char *names[512];
     int nnames = 0;
@@ -2086,6 +2082,34 @@ static void check_data_set(void)
         free(names[i]);
 }
 
+static void emit_choice(FILE *out, int ci, int *used)
+{
+    Variant *sv;
+    Func *fn;
+
+    if (ci < 0)
+        return;
+    sv = &variants[choices[ci].sel];
+    fn = find_func(sv, choices[ci].name);
+    used[choices[ci].sel] = 1;
+    fprintf(out, "; zcc-multi: %s selected=%s size=%d ticks=%d reason=%s\n",
+            choices[ci].name, sv->name, fn ? fn->size : 0, fn ? fn->ticks : 0,
+            choices[ci].reason);
+    if (fn)
+        emit_range(out, sv, fn->start, fn->end);
+}
+
+static int data_has_func(Variant *d, const char *name)
+{
+    int i;
+
+    for (i = 0; i < d->nfuncs; i++) {
+        if (strcmp(d->funcs[i].name, name) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 static void write_stitch(void)
 {
     FILE *out;
@@ -2104,41 +2128,12 @@ static void write_stitch(void)
     emit_range(out, d, 0, d->first_func);
 
     /* Emit functions in data-variant order, then extras. */
-    for (i = 0; i < d->nfuncs; i++) {
-        int ci = choice_index(d->funcs[i].name);
-        Variant *sv;
-        Func *fn;
-        if (ci < 0)
-            continue;
-        sv = &variants[choices[ci].sel];
-        fn = find_func(sv, choices[ci].name);
-        used[choices[ci].sel] = 1;
-        fprintf(out, "; zcc-multi: %s selected=%s size=%d ticks=%d reason=%s\n",
-                choices[ci].name, sv->name, fn ? fn->size : 0, fn ? fn->ticks : 0,
-                choices[ci].reason);
-        if (fn)
-            emit_range(out, sv, fn->start, fn->end);
-    }
+    for (i = 0; i < d->nfuncs; i++)
+        emit_choice(out, choice_index(d->funcs[i].name), used);
     for (c = 0; c < nchoices; c++) {
-        int already = 0;
-        Variant *sv;
-        Func *fn;
-        for (i = 0; i < d->nfuncs; i++) {
-            if (strcmp(d->funcs[i].name, choices[c].name) == 0) {
-                already = 1;
-                break;
-            }
-        }
-        if (already)
+        if (data_has_func(d, choices[c].name))
             continue;
-        sv = &variants[choices[c].sel];
-        fn = find_func(sv, choices[c].name);
-        used[choices[c].sel] = 1;
-        fprintf(out, "; zcc-multi: %s selected=%s size=%d ticks=%d reason=%s\n",
-                choices[c].name, sv->name, fn ? fn->size : 0, fn ? fn->ticks : 0,
-                choices[c].reason);
-        if (fn)
-            emit_range(out, sv, fn->start, fn->end);
+        emit_choice(out, c, used);
     }
 
     /* Literal pools only from variants that contributed a function.
