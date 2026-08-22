@@ -1,0 +1,8 @@
+Copyright (C) Paulo Custodio 2023-2026
+
+Usage: z88dk-zx81bas [options] file.bas
+Options:
+  -o <file>    Specify output file (default: input with .p extension)
+  -k           Keep temporary files (for debugging)
+  -h           Show this help message
+  -v           Verbose mode
