@@ -706,6 +706,11 @@ static int looks_like_insn(const char *s)
     s = skip_ws(s);
     if (*s == 0 || *s == ';' || *s == '.' || *s == '#')
         return 0;
+    {
+        char lab[64];
+        if (any_code_label(s, lab, sizeof(lab)))
+            return 0;
+    }
     for (i = 0; dir[i]; i++) {
         size_t n = strlen(dir[i]);
         if (strncasecmp(s, dir[i], n) == 0 && !is_ident((unsigned char)s[n]))

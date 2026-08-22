@@ -21,13 +21,15 @@ description: >
 | See tool chain | `-v` |
 | Map for ticks | `-m` |
 | App image | `-create-app` |
-| Compiler | `-compiler=sccz80\|sdcc\|80cc\|…` or target default |
+| Compiler | `-compiler=sccz80\|sdcc\|80cc\|multi\|…` or target default |
 | Float | `--math32` / `--math16` / `--math-mbf32` … |
 | CPU | often via `-clib=8085` etc.; also `-m8085` where applicable |
 
 Env: `PATH` includes `bin/`, `ZCCCFG=lib/config`.
 
 **Pitfall:** parallel bare `zcc` in one cwd can corrupt shared `zcc_opt.def` — sequential or separate dirs.
+
+`-compiler=multi` compiles each C file with sccz80 and 80cc, then stitches one function body per name. Default metric is static ticks. sdcc clibs are an ABI error. Spec: `src/zcc-multi/zcc-compiler-multi.md`.
 
 
 ## Condensed reference (from wiki / tree)
@@ -52,7 +54,7 @@ Always pass a **target** (`+name` or `-target=name`). Full learning path: [Getti
 | Area | Behaviour |
 |------|-----------|
 | Inputs | `.c`, preprocessed C, `.asm` / `.s`, `.o`, `@list.lst` |
-| Compilers | `-compiler=sccz80|sdcc|80cc|ez80clang` (see live help) |
+| Compilers | `-compiler=sccz80|sdcc|80cc|multi|ez80clang` (see live help) |
 | Libraries | `-clib=` recipes from `lib/config/<target>.cfg` |
 | Output | linker binary; `-create-app` runs appmake |
 | Verbose | `-v` shows every tool command; `-vn` quiet |
@@ -79,3 +81,4 @@ Same compile line on both sides of an A/B library patch. Delete stale `.bin`/`.m
 
 - Driver front end: `tool-zcc`
 - Measurement: `methodology-measure`, `tool-ticks`
+- `-compiler=multi`: `src/zcc-multi/zcc-compiler-multi.md`

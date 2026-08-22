@@ -4,11 +4,11 @@
 |-------|-------|
 | Title | zcc multi-compiler selection |
 | Author | z88dk |
-| Date | 2026-08-21 |
-| Status | Implemented |
+| Date | 2026-08-22 |
+| Status | Live |
 | Type | Specification |
 
-This document is the specification of the live selector.
+This document describes the shipped selector. It is the record of the live tool.
 
 The key words MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY have the meanings in RFC 2119.
 
@@ -773,6 +773,23 @@ The tool scores each source line that `looks_like_insn` accepts with `ticks_for_
 
 `ticks_for_src` reads the mnemonic and the operands. It does not use a listing byte count. `ld hl,n` is 10 T. `ld a,n` is 7 T. `ld a,b` is 4 T. A z80asm synthetic `ld de,hl` is 8 T.
 
+8085 extended ops use **Zilog** names. Intel `dsub` / `rdel` / `ldsi` / `lhlx` are not matched.
+
+| Source | T-states |
+|--------|----------|
+| `sub hl,bc` | 10 |
+| `sra hl` | 7 |
+| `rl de` | 10 |
+| `ld de,sp+*` / `ld de,hl+*` | 10 |
+| `ld hl,(de)` / `ld (de),hl` | 10 |
+| `rst v` | 12 taken / 6 not-taken |
+| `jp k,**` / `jp nk,**` | 10 taken / 7 not-taken |
+| `ex (sp),hl` | 16 (8085). 18 on 8080 |
+
+`jp k` / `jp nk` already use the 8085 conditional-jp times.
+
+A stand-alone label (`L_foo:`, `.i_1`) is not an instruction. It MUST NOT set fallback. 80cc local labels have no leading dot.
+
 An unknown mnemonic or `halt` sets the fallback flag.
 
 Tables live in `src/zcc-multi/zccmulti_ticks.c`.
@@ -1461,7 +1478,7 @@ The map cannot name the compiler.
 | `i_1` collision | High | Rewrite local labels with a variant suffix |
 | Different inlining, missing labels | Medium | Use variants that have the function. Fail if none have it |
 | `#ifdef __80CC` changes data | Medium | Compare named objects. Fail the file |
-| Compile-time cost of N compiles and N copts | Medium | Opt-in switch. Share 80cc ucpp output |
+| Compile-time cost of N compiles and N copts | Medium | Opt-in switch. Two or three compiles per file |
 | math48 uses IX | Low | Both compilers already call that library. Do not drop 80cc-fp |
 | Parallel zcc and `zcc_opt.def` | Low for current zcc | Def file is already under `/tmp/tmpzcc*`. Variants share one process |
 | 80cc internal flip hides as fp | Low | Still labelled 80cc-fp. Metric sees the real bytes |
@@ -1472,60 +1489,6 @@ The map cannot name the compiler.
 | Private CPU list drifts from 80cc | High | 80cc-fp follows `src/80cc/main.c` force-off only |
 | Selector glued to zcc `process()` | Medium | Keep `src/zcc-multi` as a library. 80cc can link it later |
 | Listing linenum vs 80cc source | High | Score ticks from source text. Use the listing for size only |
-
-## Alternatives considered
-
-### Whole-file pick versus per-function stitch
-
-Whole-file pick would compile N times and keep one file.
-
-It is simpler.
-
-It cannot mix a small 80cc leaf with a small sccz80 caller.
-
-The user asked for per-function stitch.
-
-The tool uses per-function stitch.
-
-### User pragma versus automatic metric
-
-A pragma would let a user force `_foo` to 80cc-fp.
-
-It is clear.
-
-It is not automatic.
-
-The tool uses the metric.
-
-A pragma MAY appear in a later change.
-
-### Object stitch versus assembly stitch
-
-Object stitch would assemble each variant and then copy sections.
-
-z80asm objects can hold one module.
-
-Local labels would already be isolated.
-
-Helper EXTERNs would be cleaner.
-
-The user asked for post-copt assembly stitch.
-
-The tool stitches assembly.
-
-A later change MAY move the metric onto object listings only.
-
-The stitch output stays assembly so `-a` remains useful.
-
-### TIMER or hotspot scoring
-
-A later idea was to run `z88dk-ticks` or to use hotspot traces.
-
-That needs a program, arguments, and TIMER labels.
-
-The selector MUST stay a compile-time proxy.
-
-Do not specialise picks on TIMER.
 
 ## Tests
 
@@ -1558,6 +1521,8 @@ MSYS2 `mingw32-make` cannot run `! grep`. Use `test \`grep -c\` -eq 0` instead.
 17. `dec bc` / `jp nz` with no `or` MUST NOT use a wrap trip. Fixture: `t/loop_bc_nz.asm`.
 18. 8085 `ld bc,8` / `dec bc` / `jp nk` MUST multiply the loop. `ld bc,0` wraps to 65536. Fixtures: `t/loop_8085_k.asm`, `t/loop_8085_k0.asm`.
 19. `ldir` with `ld bc,4` scores more than 70. Unknown BC scores `21 × 2` plus the other opcodes (52 on the unknown fixture). `ld bc,0` is 65536 repeats. Fixtures: `t/ldir_bc.asm`, `t/ldir_unk.asm`, `t/ldir_bc0.asm`.
+20. All ten 8085 extended ops MUST score documented T-states (97 on the bundle fixture, including forward `jp k` / `jp nk` and `rstv`) with `reason` `metric`. A larger-but-faster body MUST beat a smaller slower body on ticks. Fixtures: `t/8085_ext.asm`, `t/8085_slow.asm`, `t/8085_fast.asm`. `t/loop_8085_k.asm` covers backward `jp nk`. A stand-alone `L_*` label MUST NOT set fallback.
+21. A command-line `-compiler=multi` with an sdcc clib recipe MUST print `-compiler=multi does not support the sdcc ABI` and MUST NOT invoke zsdcc. Suite: `sdcc_abi.ok`.
 
 ### Fixture sketch
 
@@ -1583,25 +1548,83 @@ The test driver runs zcc with `-a -compiler=multi -compiler-multi-report=out.tsv
 
 It greps the stitch file and the TSV.
 
-## Rollout
+The feature is off by default. Only `-compiler=multi` enables it. Existing `-compiler=sccz80` and `-compiler=80cc` do not change.
 
-The feature is off by default.
+## Reference: selection strategies
 
-Only `-compiler=multi` enables it.
+This section records strategies that were considered for how multi picks a body. It covers the strategies that shipped and the strategies that were rejected.
 
-Existing `-compiler=sccz80` and `-compiler=80cc` MUST not change.
+### Included
 
-Human wiki pages MAY follow once this selector is merged.
+**Per-function stitch.** Compile the file more than once. Pick one body per C function. Stitch those bodies into one assembly file. A whole-file pick would keep one compiler for every function in the file. That is simpler. It cannot mix a small 80cc leaf with a small sccz80 caller. The user asked for a mix per function.
 
-This specification is the record of the live tool.
+**Static ticks as the default metric. Size as the other metric.** The goal is a compile-time proxy that is right about 90% of the time on TIMER-ish picks. Size is available when the user wants smaller code. The tool does not run the program.
 
-## Open questions
+**Post-copt assembly stitch.** Each variant runs through `z88dk-copt` first. The selector reads that assembly. `-a` still shows one file a user can read. Object stitch would isolate local labels earlier. The user asked for assembly stitch after copt.
 
-1. Should a later version add `-compiler-multi-pragma` to force a function to one variant?
+**Ticks from source text. Size from the listing.** 80cc listings can put a wrong source line on an opcode. A listing byte count is still a sound size. Ticks use documented T-states from the mnemonic and operands.
 
-This version does not need that switch.
+**Literal loop trips, with wrap at 0.** Unknown bounds stay 1. `ld b,0` is 256. `ld bc,0` is 65536. `dec rr` does not set Z. 8085 `dec rr` / `jp nk` or `jp k` is a counted 16-bit loop. Overlapping edges multiply. This is a static stand-in. It is not a profiler.
 
-The metric and the IX rule are enough.
+**Block repeats as `21 × BC`.** `ldir` and friends are not one step. Unknown BC uses `ZCCMULTI_BLOCK_REP` (2) on every variant so the comparison stays fair.
+
+**Differential helper charge.** `(count[v] − min) × helper`. A shared `l_mult` in every body cancels. Extra call sites change the winner. Charging the full helper on every variant would hide an inlined body.
+
+**Intra-TU callee `base_*`.** A call to another selectable function in the same variant adds that callee body. Ticks add per site, with the loop product. Size adds the callee once. Nested C in one file is part of the body cost.
+
+**Tie-break: ticks, then size, then variant priority.** Priority is sccz80, then 80cc-sp, then 80cc-fp. Equal scores stay stable. sccz80 is the default compiler.
+
+**sccz80 as the data variant.** Named objects must appear once. sccz80 is the default compiler. File-scope data, bss, and GLOBAL come from that variant.
+
+**Any variant compile or copt error fails the file.** A silent fallback to one compiler would hide a broken 80cc or sccz80 path.
+
+**IX mix: costed elevate versus demote.** An 80cc-fp body keeps a live IX frame. A selected sccz80 or 80cc-sp body may clobber IX. The cheaper legal fix wins. Leaving an 80cc-fp caller on a non-fp callee is not legal.
+
+**Variant count from 80cc IX capability.** 80cc-fp runs only when 80cc treats the CPU as having IX. Copy the 80cc pins. Do not keep a private CPU name list. sccz80 has no frame-pointer path. Do not pass `-frameix`.
+
+**Snapshot command-line multi, then reject sdcc after clib expansion.** A clib recipe that sets `-compiler=sdcc` is the sdcc ABI. The conflict is that compiler token, not the clib name string.
+
+**Stand-alone labels are not instructions.** 80cc `L_foo:` has no leading dot. Scoring it as an unknown opcode would mark every 80cc function as `fallback` and drop ticks.
+
+**8085 extended ops in the ticks table, Zilog names only.** `sub hl,bc`, `sra hl`, `rl de`, `ld de,sp+*`, `ld de,hl+*`, `ld hl,(de)`, `ld (de),hl`, `rst v` / `rstv`, `jp k`, `jp nk`. Intel spellings are not matched. Tree sources emit Zilog.
+
+**Naked and interrupt bodies are selectable.** After copt they are ordinary labelled units.
+
+### Excluded
+
+**Whole-file pick.** Keep the compiler that wins a file-wide sum. Rejected because the mix is per function. A file can contain sccz80, 80cc-sp, and 80cc-fp bodies together.
+
+**Per-function pragma.** A pragma could force `_foo` to one variant. It is clear. It is not automatic. This version uses the metric and the IX rule. A pragma is not in this version.
+
+**Object stitch.** Assemble each variant and copy sections from objects. Local labels would already be isolated. Helper EXTERNs would be cleaner. Rejected because the user asked for post-copt assembly stitch, and `-a` must still show one assembly file.
+
+**TIMER, hotspot, or `z88dk-ticks` scoring.** That needs a program, arguments, and TIMER labels. It specialises on benches. The selector stays a compile-time proxy. A user who needs TIMER numbers still runs `z88dk-ticks` on the linked binary.
+
+**Whole-program LTO.** Selection does not cross translation units. Each `.c` file is its own stitch.
+
+**zsdcc and ez80clang as variants.** They do not share the classic small-C calling convention with sccz80 and 80cc. Mixing them in one object is an ABI break.
+
+**Mixing classic clib and newlib cores.** There is no designed bridge. Multi does not add one.
+
+**Silent fallback when one variant fails.** Hidden. A broken 80cc construct would look like an all-sccz80 file.
+
+**sccz80 `-frameix`.** sccz80 frame-pointer codegen is marked broken. The three-way mix is sccz80 stack plus 80cc-sp plus 80cc-fp.
+
+**A private table of CPU names for 80cc-fp.** That table would drift from 80cc. 80cc-fp follows the 80cc index-register tests.
+
+**Rejecting sdcc by clib name (`sdcc_ix` / `sdcc_iy` substring).** That is a proxy. The recipe overwrites `-compiler=` with `sdcc`. The snapshot keys off the compiler becoming `sdcc`.
+
+**Making every user `-compiler=` sticky.** Only `-compiler=multi` is restored after clib expansion. Other compilers still follow the last `-compiler=` and the recipe.
+
+**Charging a shared helper on every variant.** A common `l_mult` would hide the wrapper. Differential extras only.
+
+**Ticks from listing line numbers.** 80cc can attribute an opcode to the wrong source line. Size still uses listing bytes after the function label.
+
+**Matching Intel 8085 names in the ticks model.** z88dk sources use Zilog. Intel forms stay for external-code compatibility in z80asm, not in this scorer.
+
+**Changing `src/80cc` in this version.** The selector talks to named variant bodies. A later 80cc host can emit `80cc-sp` and `80cc-fp` inside one compile. That switch is a design constraint. It is not this work.
+
+**Always using ticks when any variant has `jp (hl)` or an unknown opcode.** The function falls back to size. An indirect jump has no static T-state the model trusts.
 
 ## References
 

@@ -430,6 +430,31 @@ static int rp_copy_ok(const char *a, const char *b)
            (ident_eq(b, "bc") || ident_eq(b, "de") || ident_eq(b, "hl"));
 }
 
+/* "sp+4" / "hl + 0" — 8085 ld de,sp+* / ld de,hl+*. Offset is unsigned. */
+static int plus_off_base(const char *tok, const char *rp)
+{
+    const char *p = skip_ws(tok);
+    size_t n = strlen(rp);
+
+    if (strncasecmp(p, rp, n) != 0)
+        return 0;
+    p += n;
+    if (isalnum((unsigned char)*p) || *p == '_')
+        return 0;
+    p = skip_ws(p);
+    return *p == '+';
+}
+
+static int mem_rp_is(const char *tok, const char *rp)
+{
+    const char *p = skip_ws(tok);
+
+    if (*p != '(')
+        return 0;
+    p = skip_ws(p + 1);
+    return ident_eq(p, rp);
+}
+
 static int ticks_z80_ld(const char *a, const char *b, int ka, int kb, int ixa, int ixb)
 {
     if (ka == OP_R8 && kb == OP_R8)
@@ -638,6 +663,15 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
 
 static int ticks_808x_ld(int i8085, int ka, int kb, const char *a, const char *b)
 {
+    /* 8085 extended loads (Zilog). Intel ldsi/ldhi/lhlx/shlx are not matched. */
+    if (i8085 && ident_eq(a, "de") &&
+        (plus_off_base(b, "sp") || plus_off_base(b, "hl")))
+        return 10;
+    if (i8085 && ident_eq(a, "hl") && kb == OP_MEM_RP && mem_rp_is(b, "de"))
+        return 10;
+    if (i8085 && ka == OP_MEM_RP && mem_rp_is(a, "de") && ident_eq(b, "hl"))
+        return 10;
+
     if (ka == OP_R8 && kb == OP_R8)
         return i8085 ? 4 : 5;
     if (ka == OP_R8 && kb == OP_IMM)
@@ -690,8 +724,15 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
     }
     if (strcmp(mnem, "call") == 0)
         return cond ? pick(taken, i8085 ? 18 : 17, 9) : (i8085 ? 18 : 17);
-    if (strcmp(mnem, "rst") == 0)
+    /* rst v (CB): z80asm accepts rstv and rst v,64. parse_control does
+     * not mark it conditional, so use backward for taken (12) vs 6. */
+    if (i8085 && strcmp(mnem, "rstv") == 0)
+        return pick(backward, 12, 6);
+    if (strcmp(mnem, "rst") == 0) {
+        if (i8085 && ident_eq(rest, "v"))
+            return pick(backward, 12, 6);
         return 12;
+    }
     if (strcmp(mnem, "ret") == 0)
         return cond ? pick(taken, 12, 6) : 10;
     if (strcmp(mnem, "jp") == 0)
@@ -707,7 +748,7 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
     if (strcmp(mnem, "nop") == 0)
         return 4;
     if (strcmp(mnem, "ex") == 0)
-        return strstr(rest, "sp") ? 18 : 4;
+        return strstr(rest, "sp") ? (i8085 ? 16 : 18) : 4;
     if (i8085 && (strcmp(mnem, "rim") == 0 || strcmp(mnem, "sim") == 0))
         return 4;
     if (strcmp(mnem, "in") == 0 || strcmp(mnem, "out") == 0)
@@ -726,6 +767,15 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
 
     if (strcmp(mnem, "ld") == 0)
         return ticks_808x_ld(i8085, ka, kb, a, b);
+    /* 8085 extended (Zilog): sub hl,bc (08) 10, sra hl (10) 7, rl de (18) 10.
+     * jp k / jp nk are the generic 8085 jp cc times (10/7) above.
+     * Loads and rst v are handled earlier. */
+    if (i8085 && strcmp(mnem, "sub") == 0 && ident_eq(a, "hl") && ident_eq(b, "bc"))
+        return 10;
+    if (i8085 && strcmp(mnem, "sra") == 0 && ident_eq(a, "hl"))
+        return 7;
+    if (i8085 && strcmp(mnem, "rl") == 0 && ident_eq(a, "de"))
+        return 10;
     if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0) {
         if (ka == OP_RP)
             return i8085 ? 6 : 5;

@@ -3315,11 +3315,6 @@ static int compile_c_multi(int filenumber)
     int    want_fp;
     int    status;
 
-    if (multi_user_frame_flags()) {
-        fprintf(stderr, "-compiler=multi selects frame-pointer flags per variant\n");
-        return 1;
-    }
-
     if (strcmp(c_compiler_metric, "size") && strcmp(c_compiler_metric, "ticks")) {
         fprintf(stderr, "Unknown -compiler-metric=%s (use size or ticks)\n", c_compiler_metric);
         return 1;

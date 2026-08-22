@@ -1,6 +1,6 @@
 include ../make.config
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok sdcc_abi.ok
+all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok ext8085.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
@@ -139,7 +139,25 @@ ldimm.ok: ../../../src/zcc-multi/t/ldimm.asm ../../../src/zcc-multi/t/nops.asm
 	  --variant=80cc-sp:../../../src/zcc-multi/t/nops.asm
 	test `awk -F'	' '/^_foo/ {print $$6}' ldimm.tsv` -eq 20
 	test `awk -F'	' '/^_foo/ {print $$7}' ldimm.tsv` -eq 18
-	grep -q '^_foo	80cc-sp' ldimm.tsv
+	grep -q '^_foo.80cc-sp' ldimm.tsv
+	touch $@
+
+# 8085 extended ops (Zilog) have documented T-states. Unknown would
+# fallback to size; a larger-but-faster body must still win on ticks.
+ext8085.ok: ../../../src/zcc-multi/t/8085_ext.asm \
+	../../../src/zcc-multi/t/8085_slow.asm ../../../src/zcc-multi/t/8085_fast.asm
+	z88dk-zcc-multi --cpu=8085 --metric=ticks --data-variant=sccz80 \
+	  --output=ext8085_stitch.asm --report=ext8085.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/8085_ext.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/8085_ext.asm
+	test `awk '/^_foo/ {print $$3}' ext8085.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' ext8085.tsv` -eq 97
+	z88dk-zcc-multi --cpu=8085 --metric=ticks --data-variant=sccz80 \
+	  --output=ext8085_pick.asm --report=ext8085_pick.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/8085_slow.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/8085_fast.asm
+	test `awk '/^_foo/ {print $$3}' ext8085_pick.tsv` = metric
+	grep -q '^_foo.80cc-sp' ext8085_pick.tsv
 	touch $@
 
 # Command-line multi vs a recipe that sets -compiler=sdcc is the sdcc ABI.
@@ -154,6 +172,6 @@ sdcc_abi.ok: twofuncs.c
 	touch $@
 
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm sdcc_abi.o
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm ext8085_stitch.asm ext8085_pick.asm sdcc_abi.o
 
 .PHONY: all clean
