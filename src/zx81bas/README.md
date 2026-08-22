@@ -16,8 +16,10 @@ assembly and linking.
 
 ## Comments
 
-Comments are enclosed in '/*'...'*/', or started by '#', or '//'; 
+Comments are enclosed in '/*'...'*/', or started by '//'; 
 in the ASM sections by ';'; in the BASIC sections by "'".
+The original T2P also used '#' as comment, but '#' is a valid
+BASIC token, so in zx81bas it is not considered a comment.
 
 ## Pragmas
 

@@ -3,7 +3,7 @@ Input file:  t/input/10_preproc_04.bas
 Output file: t/input/10_preproc_04.p
 Contents of t/input/10_preproc_04.bas.pp:
 #line 1 "t/input/10_preproc_04.bas"
-line 1
+line 1 
 line 2
 line 3
 line 4 has af'
