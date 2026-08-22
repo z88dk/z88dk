@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32505.173
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12105.206 oobstable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-z80nm", "z80nm\z80nm.vcxproj", "{E3CAFDD4-FBE2-4E7E-AB20-816C8B257F6B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -97,6 +97,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-font2pv1000", "z88dk-font2pv1000\z88dk-font2pv1000.vcxproj", "{1AA316C9-8CF8-453B-9714-179F67A2EC8B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-test", "common-test\common-test.vcxproj", "{4128F3D3-4ED7-4C8D-8305-F76A250520BC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-zx81bas", "z88dk-zx81bas\z88dk-zx81bas.vcxproj", "{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -306,6 +308,14 @@ Global
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|Win32.Build.0 = Release|Win32
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|x64.ActiveCfg = Release|x64
 		{4128F3D3-4ED7-4C8D-8305-F76A250520BC}.Release|x64.Build.0 = Release|x64
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Debug|Win32.Build.0 = Debug|Win32
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Debug|x64.ActiveCfg = Debug|x64
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Debug|x64.Build.0 = Debug|x64
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Release|Win32.ActiveCfg = Release|Win32
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Release|Win32.Build.0 = Release|Win32
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Release|x64.ActiveCfg = Release|x64
+		{C4E95586-ACF9-4F0F-88C7-6B2ED92DE5E2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

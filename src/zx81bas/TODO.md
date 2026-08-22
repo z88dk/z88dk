@@ -342,11 +342,9 @@ void emit_expr(const Expr& e, std::ostream& out) {
 
 ## Correct architecture
 
-1. Parsing - DONE
+1. Parsing
 Build AST only.
 No type decisions.
-
-1.1. Move AsmStmt to corresponding BASIC statement (previous REM or VARS variable)
 
 2. Symbol table construction
 From:
