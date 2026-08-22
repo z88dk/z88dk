@@ -16,6 +16,7 @@ int simple_getopt(int argc, char* argv[], const char* optstring);
 
 // options and global data
 extern bool g_verbose;                          // true to show progress
+extern bool g_keep_temp_files;                  // true to keep temporary files
 extern std::vector<std::string> g_temp_files;   // temp files to delete on exit
 
 #ifdef _DEBUG

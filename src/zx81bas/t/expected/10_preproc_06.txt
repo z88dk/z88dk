@@ -1,0 +1,4 @@
+% z88dk-zx81bas -d 1 t//input/10_preproc_06.bas
+Input file:  t/input/10_preproc_06.bas
+Output file: t/input/10_preproc_06.p
+error: Recursive include detected: t/input/10_preproc_06.inc

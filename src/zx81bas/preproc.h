@@ -7,12 +7,12 @@
 #pragma once
 
 #include <string>
-#include <cstdint>
+#include <vector>
 
-void remove_file(const std::string& filename);
-std::string normalize_path(const std::string& path);
-#ifdef _DEBUG
-void cat_file(const std::string& filename);
-#endif
+struct SrcLine {
+    std::string text;		// line text
+    std::string filename;	// source location
+    int line_num;
+};
 
-bool str_ends_with(const std::string& str, const std::string& ending);
+bool preproc(std::string input_file, std::vector<SrcLine>& out_lines);

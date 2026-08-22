@@ -7,6 +7,7 @@
 #include "../config.h"
 #include "errors.h"
 #include "options.h"
+#include "preproc.h"
 #include "utils.h"
 #include <filesystem>
 #include <iostream>
@@ -46,11 +47,21 @@ static void show_command_line(int argc, char* argv[]) {
 }
 #endif
 
+static void delete_temporary_files() {
+    if (!g_keep_temp_files) {
+        for (auto& f : g_temp_files) {
+            remove_file(f);
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     std::string output_file;
     g_verbose = false;
-    bool keep_temp_files = false;
     int opt;
+
+    // cleanup temporary files on exit (except -k)
+    atexit(delete_temporary_files);
 
 #ifdef _DEBUG
     g_verbose = true;
@@ -75,7 +86,7 @@ int main(int argc, char* argv[]) {
             g_verbose = true;
             break;
         case 'k':
-            keep_temp_files = true;
+            g_keep_temp_files = true;
             break;
 #ifdef _DEBUG
         case 'd':
@@ -118,17 +129,18 @@ int main(int argc, char* argv[]) {
         std::cout << "Output file: " << output_file << std::endl;
     }
 
+    // preprocess the input file
+    std::vector<SrcLine> src_lines;
+    if (!preproc(input_file, src_lines)) {
+        return EXIT_FAILURE;    // error already reported
+    }
+
 
 
     // remove temporary files if there were no errors
     if (get_error_count() > 0) {
         error("Errors occurred during processing. Exiting.");
         return EXIT_FAILURE;
-    }
-    if (!keep_temp_files) {
-        for (auto& f : g_temp_files) {
-            remove_file(f);
-        }
     }
 
     return get_error_count() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;

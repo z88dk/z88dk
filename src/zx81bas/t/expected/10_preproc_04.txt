@@ -1,0 +1,31 @@
+% z88dk-zx81bas -d 1 t//input/10_preproc_04.bas
+Input file:  t/input/10_preproc_04.bas
+Output file: t/input/10_preproc_04.p
+Contents of t/input/10_preproc_04.bas.pp:
+#line 1 "t/input/10_preproc_04.bas"
+line 1
+line 2
+line 3
+line 4 has af'
+line 5 has single quoted '^X' text
+line 6 has single quoted '\'' text
+line 7 hex '\00' byte
+line 8 has ; asm comment
+!ASM
+line 10 has 
+line 11 has ' basic comment
+!BASIC
+line 13 quote "inside ' string"
+line 14 escaped quote "inside \" string '"
+line 15 escaped quote "inside \" string \'"
+!ASM
+!AUTOSTART
+!AUTOSTART_LINE
+!INCREMENT
+!FAST
+!VERBOSE
+!VARS
+!DFILE
+!DFILE_COLAPSED
+!SYSVARS
+!BASIC
