@@ -41,6 +41,9 @@ The following pragma keywords are accepted:
 
 - #VARS u$ = "123": define a string variable.
 
+- #VARS z$ = "" <newline> #ASM <newline> ... <newline> #BASIC <newline>: define 
+  assembly code inside a BASIC variable.
+
 - #VARS a(2,3) = 11,12,13, 21,22,23: define a number array.
 
 - #VARS s$(2,3,4) = "abcd","efgh","ijkl", "0123","4567","8901": define a 
