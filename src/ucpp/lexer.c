@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <limits.h>
+#include <errno.h>
 #include "ucppi.h"
 #include "mem.h"
 #ifdef UCPP_MMAP
@@ -437,13 +438,21 @@ void flush_output(struct lexer_state *ls)
 	size_t x = ls->sbuf, y = 0, z;
 
 	if (ls->sbuf == 0) return;
+	errno = 0;
 	do {
 		z = fwrite(ls->output_buf + y, 1, x, ls->output);
 		x -= z;
 		y += z;
 	} while (z && x > 0);
 	if (!y) {
-		error(ls->line, "could not flush output (disk full ?)");
+		/* Say what actually happened rather than guessing. errno is cleared
+		   above because fwrite does not have to set it, and reporting a stale
+		   value is worse than reporting none: the previous text blamed a full
+		   disk on a volume with 219G free, and errno alone then blamed a
+		   broken pipe on a write to a regular file. */
+		error(ls->line, "could not flush output: %s (ferror=%d, wanted %lu bytes)",
+			errno ? strerror(errno) : "fwrite returned 0, errno not set",
+			ferror(ls->output), (unsigned long)ls->sbuf);
 		die();
 	}
 	ls->sbuf = 0;

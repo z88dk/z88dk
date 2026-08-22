@@ -4652,16 +4652,55 @@ int ir_lower_func(FILE *out, Func *f)
     }
     L.spill_ix = L.spill_sp = 0;   /* IR_SPILL_STATS: per-function reset */
 
-    /* __naked: emit the body asm verbatim — no prologue, no epilogue, no
-       frame, no BB labels, no trailing `ret` (the asm owns the entire
-       body). ir_build has already validated the body is asm-only. */
+    /* __naked: emit the body verbatim — no prologue, no epilogue, no frame,
+       no BB labels, no trailing `ret`. ir_build has already restricted the
+       body to asm blocks and argument-free calls.
+
+       Every op kind is accounted for. This loop used to emit IR_ASM and skip
+       the rest, which would silently DROP a call once one was allowed
+       through. IR_RET is the one deliberate skip — suppressing the epilogue
+       is the point of __naked. */
     if (f->is_naked) {
         L.func_emit_idx++;
         for (int i = 0; i < f->n_bbs; i++) {
             BB *bb = &f->bbs[i];
-            for (int o = 0; o < bb->n_ops; o++)
-                if (bb->ops[o].kind == IR_ASM)
-                    gen_asm(out, f, &bb->ops[o]);
+            for (int o = 0; o < bb->n_ops; o++) {
+                const Op *op = &bb->ops[o];
+                switch (op->kind) {
+                case IR_ASM:
+                    gen_asm(out, f, op);
+                    break;
+                case IR_RET:
+                    break;      /* the body provides its own ret/reti */
+                case IR_NOP:
+                    break;      /* emits nothing by definition */
+                case IR_CALL: {
+                    CallInfo *ci = op->call;
+                    if (!ci || !ci->target || ci->n_args != 0) {
+                        ir_lower_loc();
+                        fprintf(stderr, "ir_lower: __naked '%s' has a call "
+                                "shape that needs a frame\n",
+                                f->fn ? ir_sym_name(f->fn) : "?");
+                        ir_lower_src();
+                        return -1;
+                    }
+                    if (ci->is_critical)
+                        emit(out, (IS_RABBIT()) ? "ipset\t3" : "di");
+                    emit(out, "call\t%s%s",
+                         ir_sym_prefix(ci->target),
+                         ci->target_name ? ci->target_name
+                                         : ir_sym_name(ci->target));
+                    break;
+                }
+                default:
+                    ir_lower_loc();
+                    fprintf(stderr, "ir_lower: __naked '%s' contains an "
+                            "operation that needs a frame (ir op %d)\n",
+                            f->fn ? ir_sym_name(f->fn) : "?", (int)op->kind);
+                    ir_lower_src();
+                    return -1;
+                }
+            }
         }
         return 0;
     }

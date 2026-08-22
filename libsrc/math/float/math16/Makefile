@@ -10,7 +10,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -D__MATH_MATH16 -DFLOAT_IS_16BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/math16.lib \
+all: $(OUTPUT_DIRECTORY)/math16.lib \
 	$(OUTPUT_DIRECTORY)/math16_ixiy.lib \
 	$(OUTPUT_DIRECTORY)/math16_z80n.lib \
 	$(OUTPUT_DIRECTORY)/math16_z180.lib \
@@ -63,6 +63,9 @@ $(OUTPUT_DIRECTORY)/math16_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/math16_8085.lib:
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8085/x/x/x -I.. -m8085 -D__CLASSIC @newlibfiles_8085.lst
 	TYPE=8085 $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/math16_8085 @math16.lst
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
 	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/r6k/c

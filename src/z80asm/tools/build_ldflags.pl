@@ -3,8 +3,12 @@
 use strict;
 use warnings;
 
-@ARGV==2 or die "Usage: $0 CXX CROSS\n";
-my($gcc, $cross) = @ARGV;
+# CXX may be several words -- the top-level Makefile prefixes it with ccache
+# when ccache is installed -- so take the last argument as CROSS and treat
+# everything before it as the compiler.
+@ARGV>=2 or die "Usage: $0 CXX CROSS\n";
+my $cross = pop @ARGV;
+my $gcc   = join(' ', @ARGV);
 
 my $file = "build_ldflags$$";
 

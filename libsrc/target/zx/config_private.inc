@@ -29,3 +29,43 @@ defc __NIRVANAP_CHAR_TABLE  = 15360   ; default location of character set (8x8 p
 ; define(`__NIRVANAP_OPTIONS_WIDE_SPRITES', 0x02)
 
 
+; Shared with newlib/target/zx/config_zx_private.inc -- keep the two in step.
+; Without these the m4 expansion succeeds but leaves the symbols undefined.
+
+defc __BIFROSTH_ANIM_SPEED     = 4
+defc __BIFROSTH_ANIM_GROUP     = 4
+defc __BIFROSTH_STATIC_MIN     = 128
+defc __BIFROSTH_STATIC_OVERLAP = 128
+defc __BIFROSTH_TILE_IMAGES    = 48500
+defc __BIFROSTH_TILE_MAP       = 65281
+defc __BIFROSTH_TILE_ORDER     = 7
+defc __BIFROSTH_SHIFT_COLUMNS  = 0
+defc __BIFROSTH_SPRITE_MODE    = 0
+
+
+defc __BIFROSTL_ANIM_SPEED     = 4
+defc __BIFROSTL_ANIM_GROUP     = 4
+defc __BIFROSTL_STATIC_MIN     = 128
+defc __BIFROSTL_STATIC_OVERLAP = 128
+defc __BIFROSTL_TILE_IMAGES    = 48500
+defc __BIFROSTL_TILE_MAP       = 65281
+defc __BIFROSTL_TILE_ORDER     = 7
+
+
+defc __NIRVANAM_OPTIONS = 0
+
+defc __NIRVANAM_OPTIONS_WIDE_DRAW    = 0x01
+defc __NIRVANAM_OPTIONS_WIDE_SPRITES = 0x02
+
+defc __NIRVANAM_TOTAL_ROWS  = 22
+defc __NIRVANAM_HOLE        = 64994
+defc _NIRVANAM_HOLE         = 64994
+defc __NIRVANAM_HOLE_SIZE   = 0
+
+defc __NIRVANAM_TILE_IMAGES = 48000
+defc __NIRVANAM_WIDE_IMAGES = 54000
+defc __NIRVANAM_CHAR_TABLE  = 15360
+
+; define(`__NIRVANAM_TOTAL_ROWS', 22)
+
+

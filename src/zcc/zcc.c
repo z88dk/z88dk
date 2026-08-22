@@ -3500,6 +3500,14 @@ static void configure_compiler(void)
         snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
 
+        /* We hand 80cc a .i that ucpp and zpragma have already been over, so
+           tell it not to spawn a second preprocessor on it. Without this every
+           file is preprocessed twice, and 80cc reads that second ucpp off a
+           popen pipe it never closes on the normal path -- on Windows, where
+           pipe buffers are small, ucpp is often still mid-write when 80cc
+           exits and dies with EPIPE. zcc already passes --c1mode to zsdcc. */
+        add_option_to_compiler("--c1mode");
+
         // section redirect is fine in sccz80 so add it as a compiler option
         if (opt_code_seg != NULL)
         {

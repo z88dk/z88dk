@@ -10,7 +10,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=mbf64 -DFLOAT_IS_64BITS
 
-all: dirs $(OUTPUT_DIRECTORY)/mbf64.lib $(OUTPUT_DIRECTORY)/mbf64_ixiy.lib 
+all: $(OUTPUT_DIRECTORY)/mbf64.lib $(OUTPUT_DIRECTORY)/mbf64_ixiy.lib 
 
 
 $(OUTPUT_DIRECTORY)/mbf64.lib: $(addprefix obj/z80/, $(OBJECTS))
@@ -18,6 +18,9 @@ $(OUTPUT_DIRECTORY)/mbf64.lib: $(addprefix obj/z80/, $(OBJECTS))
 
 $(OUTPUT_DIRECTORY)/mbf64_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/mbf64_ixiy @mbf64.lst
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,ixiy z80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80

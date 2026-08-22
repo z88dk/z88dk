@@ -20,13 +20,16 @@ ASMFILES = $(wildcard *.asm)
 
 OBJECTS = $(CFILES:.c=.o) $(ASMFILES:.asm=.o)
 
-all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) $(SUBDIRS)
+all: $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) $(SUBDIRS)
 
 obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -Ca$(ASMFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
 	$(ZCC) +$(TARGET) $(CFLAGS) -Ca$(ASMFLAGS) -o $@  $^
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)

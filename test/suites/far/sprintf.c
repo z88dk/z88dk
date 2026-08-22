@@ -57,7 +57,10 @@ void test_sprintff_s()
 
     while ( test->pattern != NULL ) {
        snprintff(buf,100,test->pattern, teststr);
-       printf("Testing <%s> expect <%s> got <%s>\n",test->pattern, test->result,buf);
+       /* buf is __far here, unlike the two tests above, so it needs %S. With
+          %s printf read the low half of the pointer as a near address and
+          printed rubbish, while the Assert below went on passing. */
+       printf("Testing <%s> expect <%s> got <%S>\n",test->pattern, test->result,buf);
        Assert(strcmpf(buf, test->result) == 0, "Result didn't match");
        ++test;
     }

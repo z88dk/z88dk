@@ -13,7 +13,7 @@ OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 CFLAGS += -fp-mode=ieee
 
-all: dirs $(OUTPUT_DIRECTORY)/am9511.lib $(OUTPUT_DIRECTORY)/am9511_ixiy.lib $(OUTPUT_DIRECTORY)/am9511_8085.lib \
+all: $(OUTPUT_DIRECTORY)/am9511.lib $(OUTPUT_DIRECTORY)/am9511_ixiy.lib $(OUTPUT_DIRECTORY)/am9511_8085.lib \
 	$(OUTPUT_DIRECTORY)/am9511_z180.lib \
 	$(OUTPUT_DIRECTORY)/am9511h.lib
 
@@ -37,6 +37,9 @@ $(OUTPUT_DIRECTORY)/am9511h.lib: $(addprefix obj/z80h/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80h/x/x/x  -I.. -mz80 -D__CLASSIC -D__AM9511_HELPER_FUNC @newlibfiles_z80h.lst
 	TYPE=z80h $(LIBLINKER) -mz80 -x$(OUTPUT_DIRECTORY)/am9511h @am9511.lst
 
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(foreach d,z80 ixiy z180 8085 z80h,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 obj/z80h/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^

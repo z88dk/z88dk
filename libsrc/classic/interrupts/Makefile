@@ -1,4 +1,4 @@
-include ../Make.config
+include ../../Make.config
 
 TARGET ?= test
 
@@ -9,7 +9,7 @@ CLEANDIRS = $(SUBDIRS:%=%-clean)
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
-all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
+all: subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
 
 subdirs-all: $(SUBDIRS)
@@ -23,6 +23,9 @@ clean: subdirs-clean
 	$(RM) */*.o */*/*.o
 
 subdirs-clean: $(CLEANDIRS)
+
+# Order-only: dirs must finish before any object compiles. See Make.config.
+$(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
 	@mkdir -p obj/$(TARGET)

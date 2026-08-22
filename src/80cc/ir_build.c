@@ -6970,20 +6970,39 @@ static int build_binop_integer(Builder *b, Node *n, OpKind k, int hint)
     return dst;
 }
 
-static int naked_body_is_asm_only(const Node *n)
+/* True if `n` is a statement a __naked function can hold. There is no
+   prologue, frame or epilogue, so the body must run without them:
+
+     - asm blocks;
+     - a DIRECT call with NO arguments and no used result (`call _sym` needs
+       no frame; an argument would want a vreg, a result would want storage);
+     - labels and empty compounds, the residue of `do { … } while(0)`.
+
+   Nested compounds are recursed: `__asm__("…")` parses as a call expression,
+   so a body written with it arrives as a compound inside a compound and a
+   one-level scan refused even a single asm block. AST_JUMP is NOT accepted —
+   the naked emitter renders no BB labels, so a jump has no target. */
+static int naked_stmt_is_frameless(const Node *n)
 {
     if (!n) return 1;
-    if (n->ast_type == AST_ASM) return 1;
-    if (n->ast_type == AST_COMPOUND_STMT) {
+    switch (n->ast_type) {
+    case AST_ASM:
+    case AST_LABEL:
+        return 1;
+    case AST_COMPOUND_STMT: {
         if (!n->stmts) return 1;
         int ns = (int)array_len(n->stmts);
-        for (int i = 0; i < ns; i++) {
-            const Node *s = array_get_byindex(n->stmts, i);
-            if (s && s->ast_type != AST_ASM) return 0;
-        }
+        for (int i = 0; i < ns; i++)
+            if (!naked_stmt_is_frameless(array_get_byindex(n->stmts, i)))
+                return 0;
         return 1;
     }
-    return 0;
+    case AST_FUNC_CALL:
+        /* Direct, argument-free, result discarded — `call _sym`, nothing else. */
+        return n->sym != NULL && (!n->args || array_len(n->args) == 0);
+    default:
+        return 0;
+    }
 }
 
 /* ---- Control-context (short-circuit) condition lowering ----------------
@@ -7638,17 +7657,16 @@ static int ir_generate_code_impl(Node *body, SYMBOL *fn)
         }
     }
 
-    /* __naked: the user owns the entire body. No prologue/epilogue/frame
-       is generated — `is_naked` gates the IX setup, frame alloc and the
-       trailing `ret` off (the asm provides its own). Because there is no
-       frame, the body may contain ONLY asm; any C statement would have
-       nothing to run against. Reject anything else with a hard error. */
+    /* __naked: the user owns the entire body. No prologue/epilogue/frame is
+       generated — `is_naked` gates the IX setup, frame alloc and trailing
+       `ret` off. naked_stmt_is_frameless says what survives that. */
     if (fn->ctype && (fn->ctype->flags & NAKED)) {
         f->is_naked = 1;
-        if (!naked_body_is_asm_only(body)) {
+        if (!naked_stmt_is_frameless(body)) {
             errorfmt_at(body ? body->filename : NULL,
                         body ? body->line : 0, 0,
-                        "__naked function '%s' may contain only an asm block",
+                        "__naked function '%s' may contain only asm blocks and "
+                        "argument-free calls — it has no frame",
                         fn->name[0] ? fn->name : "?");
             builder_free(&b);
             ir_func_free(f);
