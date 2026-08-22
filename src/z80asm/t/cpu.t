@@ -60,7 +60,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		my $length = $addr;		# only compare output up to $length
 		
 		# run assembler
-		run_ok($asm_cmd);
+		run_ok($asm_cmd, "$test.err");
 
 		# read labels from map file and patch @bin
 		{
@@ -106,7 +106,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			run_ok("z88dk-dis -m$dis_cpu $file_bin > $test.asm");
 
 			# assemble
-			run_ok("z88dk-z80asm -m$dis_cpu -b -l $test.asm 2> $test.err");
+			run_ok("z88dk-z80asm -m$dis_cpu -b -l $test.asm 2> $test.err", "$test.err");
 			is slurp("$test.err"), "", "check errors";
 			
 			# compare
