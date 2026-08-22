@@ -42,8 +42,9 @@ helpers.ok: helpers.c
 # Discarded sccz80 body must not leave copt "defc i_N = i_M" in the stitch.
 OPT_SCCZ80 = ../../../src/zcc-multi/t/opt_sccz80.asm
 OPT_80CC = ../../../src/zcc-multi/t/opt_80cc.asm
+OPT_USED = ../../../src/zcc-multi/t/opt_used_sccz80.asm
 
-optimiser.ok: $(OPT_SCCZ80) $(OPT_80CC)
+optimiser.ok: $(OPT_SCCZ80) $(OPT_80CC) $(OPT_USED)
 	z88dk-zcc-multi --cpu=z80 --metric=size --data-variant=sccz80 \
 	  --output=opt_stitch.asm \
 	  --variant=sccz80:$(OPT_SCCZ80) --variant=80cc-sp:$(OPT_80CC)
@@ -52,6 +53,11 @@ optimiser.ok: $(OPT_SCCZ80) $(OPT_80CC)
 	test `grep -c 'i_10_sccz80' opt_stitch.asm` -eq 0
 	test `grep -c 'defc' opt_stitch.asm` -eq 0
 	z88dk-z80asm -mz80 -oopt_stitch.bin opt_stitch.asm
+	z88dk-zcc-multi --cpu=z80 --metric=size --data-variant=sccz80 \
+	  --output=opt_used.asm \
+	  --variant=sccz80:$(OPT_USED) --variant=80cc-sp:$(OPT_80CC)
+	grep -q 'i_10_sccz80' opt_used.asm
+	z88dk-z80asm -mz80 -oopt_used.bin opt_used.asm
 	touch $@
 
 # jp (hl) must not win on ticks; reason is fallback.
@@ -172,6 +178,6 @@ sdcc_abi.ok: twofuncs.c
 	touch $@
 
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm ext8085_stitch.asm ext8085_pick.asm sdcc_abi.o
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm ext8085_stitch.asm ext8085_pick.asm opt_used.asm opt_used.bin sdcc_abi.o
 
 .PHONY: all clean

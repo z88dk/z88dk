@@ -1959,9 +1959,16 @@ static int local_defc_lhs(const char *s, char *lhs, size_t lhssz)
     return 1;
 }
 
+typedef struct {
+    char lhs[64];
+    char rhs[64];
+    int  line;
+    int  keep;
+} OptAlias;
+
 /* Follow defc aliases. Keep the alias if a selected body defines the target. */
-static int defc_target_defined(const char *name, char lhs[][64], char rhs[][64],
-                               int ndefc, Variant *v, int depth)
+static int defc_target_defined(const char *name, const OptAlias *al, int ndefc,
+                               Variant *v, int depth)
 {
     int i;
 
@@ -1970,19 +1977,16 @@ static int defc_target_defined(const char *name, char lhs[][64], char rhs[][64],
     if (variant_defines_local(v, name))
         return 1;
     for (i = 0; i < ndefc; i++) {
-        if (strcmp(lhs[i], name) == 0)
-            return defc_target_defined(rhs[i], lhs, rhs, ndefc, v, depth + 1);
+        if (strcmp(al[i].lhs, name) == 0)
+            return defc_target_defined(al[i].rhs, al, ndefc, v, depth + 1);
     }
     return 0;
 }
 
 static void emit_optimiser_pool(FILE *out, Variant *v)
 {
-    int from, to, i, n;
-    char lhs[256][64];
-    char rhs[256][64];
-    int keep[256];
-    int line_of[256];
+    int from, to, i, n, cap;
+    OptAlias *al;
     char buf[MAX_LINE * 2];
     char lbuf[64], rbuf[64];
 
@@ -1992,27 +1996,31 @@ static void emit_optimiser_pool(FILE *out, Variant *v)
     to = v->statics >= 0 ? v->statics :
          (v->scope >= 0 ? v->scope : v->nlines);
 
+    al = NULL;
     n = 0;
+    cap = 0;
     for (i = from; i < to && i < v->nlines; i++) {
         if (!local_defc_lhs(v->lines[i], lbuf, sizeof(lbuf)))
             continue;
         if (!local_defc_rhs(v->lines[i], rbuf, sizeof(rbuf)))
             continue;
-        if (n >= 256)
-            break;
-        memcpy(lhs[n], lbuf, sizeof(lbuf));
-        memcpy(rhs[n], rbuf, sizeof(rbuf));
-        line_of[n] = i;
-        keep[n] = 0;
+        if (n >= cap) {
+            cap = cap ? cap * 2 : 64;
+            al = xrealloc(al, (size_t)cap * sizeof(*al));
+        }
+        memcpy(al[n].lhs, lbuf, sizeof(lbuf));
+        memcpy(al[n].rhs, rbuf, sizeof(rbuf));
+        al[n].line = i;
+        al[n].keep = 0;
         n++;
     }
     for (i = 0; i < n; i++)
-        keep[i] = defc_target_defined(rhs[i], lhs, rhs, n, v, 0);
+        al[i].keep = defc_target_defined(al[i].rhs, al, n, v, 0);
 
     for (i = from; i < to && i < v->nlines; i++) {
         int k, skip = 0;
         for (k = 0; k < n; k++) {
-            if (line_of[k] == i && !keep[k]) {
+            if (al[k].line == i && !al[k].keep) {
                 skip = 1;
                 break;
             }
@@ -2023,6 +2031,7 @@ static void emit_optimiser_pool(FILE *out, Variant *v)
         fputs(buf, out);
         fputc('\n', out);
     }
+    free(al);
 }
 
 static Variant *data_variant(void)

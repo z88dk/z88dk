@@ -1,15 +1,20 @@
-; Fixture: sccz80-like. Larger _foo. Smaller _bar.
-	MODULE	opt_sccz80
+; Selected sccz80 _bar jumps through i_10. i_8 lives in _bar.
+; 300 dummy aliases then defc i_10 = i_8 must still be kept.
+	MODULE	opt_used_sccz80
 
 	SECTION	code_compiler
 
 ._foo
-	jp	i_8
-.i_8
-	ld	hl,1
+	ld	hl,0
+	ld	de,1
+	add	hl,de
+	add	hl,de
+	add	hl,de
 	ret
 
 ._bar
+	jp	i_10
+.i_8
 	ld	hl,1
 	ret
 

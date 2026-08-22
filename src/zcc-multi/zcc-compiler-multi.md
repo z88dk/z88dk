@@ -946,6 +946,8 @@ copt can chain more than one `defc`.
 
 Copy that `defc` only when the chain ends at a label in a selected body of that variant.
 
+Track every alias in the pool. Do not stop at a fixed count. A large file (FreeRTOS `tasks.c`) can emit hundreds of `defc` lines. Aliases after the first 256 must still drop or stay with the same rule.
+
 ### Winner comment
 
 ```asm
@@ -1513,7 +1515,7 @@ MSYS2 `mingw32-make` cannot run `! grep`. Use `test \`grep -c\` -eq 0` instead.
 9. The TSV has a `summary` table.
 10. `.asm` input is not rewritten.
 11. `-a` writes one `.asm` and stops.
-12. A discarded sccz80 body leaves `defc i_N = i_M` in the optimiser banner. The stitch file MUST omit that `defc`. The file MUST assemble. Fixtures: `t/opt_sccz80.asm`, `t/opt_80cc.asm`.
+12. A discarded sccz80 body leaves `defc i_N = i_M` in the optimiser banner. The stitch file MUST omit that `defc`. The file MUST assemble. More than 256 unused aliases to a discarded body MUST still omit them. A selected body that jumps through `i_10` after 256 dummy aliases MUST keep `defc i_10 = i_8` and assemble. Fixtures: `t/opt_sccz80.asm`, `t/opt_80cc.asm`, `t/opt_used_sccz80.asm`.
 13. `jp (hl)` MUST NOT win on ticks. `reason` is `fallback`. Fixtures: `t/jp_hl.asm`, `t/jp_hl_alt.asm`.
 14. `ld b,8` / `djnz` MUST multiply the loop span. Fixture: `t/loop_count.asm` versus `t/loop_once.asm`.
 15. `ld b,0` / `djnz` MUST use 256 trips. Fixture: `t/loop_b0.asm`.
