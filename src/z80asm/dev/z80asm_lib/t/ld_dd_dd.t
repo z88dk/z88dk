@@ -42,13 +42,13 @@ for my $s (qw( BC DE HL BC_ DE_ HL_ IX IY )) {
 					ENDIF
 END
 				$s	=>	sub { my($t) = @_;
-							  return $v if $t->{cpu} =~ /^80|^gbz80/ && substr($s,0,2) eq substr($d,0,2);
-							  return 0 if ($s =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80/);
+							  return $v if $t->{cpu} =~ /^80|^gbz80|^vm1/ && substr($s,0,2) eq substr($d,0,2);
+							  return 0 if ($s =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80|^vm1/);
 							  return 0 if ($s =~ /_/ && $t->{cpu} !~ /^r.k/);
 							  return $v; },
 				$d	=>	sub { my($t) = @_;
-							  return $v if $t->{cpu} =~ /^80|^gbz80/ && substr($s,0,2) eq substr($d,0,2);
-							  return 0 if ($d =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80/);
+							  return $v if $t->{cpu} =~ /^80|^gbz80|^vm1/ && substr($s,0,2) eq substr($d,0,2);
+							  return 0 if ($d =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80|^vm1/);
 							  return 0 if ($d =~ /_/ && $t->{cpu} !~ /^r.k/);
 							  return $v; });
 			}

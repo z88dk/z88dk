@@ -22,7 +22,7 @@ for my $dd (qw( HL IX IY )) {
 			ENDIF
 END
 			$dd => sub { my($t) = @_;
-						 return 0 if ($dd =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80/);
+						 return 0 if ($dd =~ /IX|IY/i && $t->{cpu} =~ /^80|^gbz80|^vm1/);
 						 return $v==0 ? 0 : 1; });
 	}
 }

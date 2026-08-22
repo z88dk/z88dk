@@ -10,7 +10,12 @@ use Data::Dump 'dump';
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
 
-for my $version ( Obj::min_version .. Obj::max_version ) {
+my @test_versions = (Obj::min_version .. Obj::max_version);
+if ($ENV{TEST_VERSION}) {
+	@test_versions = ( 0+$ENV{TEST_VERSION} );
+}
+
+for my $version ( @test_versions ) {
     my $version_str = sprintf "%02d", $version;
 
     for my $cpu_id ( CPU::min_id .. CPU::max_id ) {
@@ -21,11 +26,11 @@ for my $version ( Obj::min_version .. Obj::max_version ) {
         $obj->version($version);
         $obj->cpu($cpu_name);
 
-        check_obj(
-            $obj,
-            "$dir/expected/${self}_v${version_str}_cpu_${cpu_name}.def",
-            "$dir/expected/${self}_v${version_str}_cpu_${cpu_name}.txt"
-        );
+		check_obj(
+			$obj,
+			"$dir/expected/${self}_v${version_str}_cpu_${cpu_name}.def",
+			"$dir/expected/${self}_v${version_str}_cpu_${cpu_name}.txt"
+		);
     }
 }
 

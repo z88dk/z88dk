@@ -162,6 +162,7 @@ for my $cpu (@CPUS) {
 
 			SKIP: {
 				skip "8085 has no N flag" if $cpu =~ /8085/;
+				skip "vm1  has no N flag" if $cpu =~ /vm1/;
 				
 				is $got_nflag, $nflag,				 	"N";
 			}

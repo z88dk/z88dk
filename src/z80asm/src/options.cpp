@@ -802,6 +802,15 @@ void Options::set_cpu(int cpu) {
     undefine_static_symbol("__CPU_KC160_Z80__");
     undefine_static_symbol("__CPU_KC160_Z80_STRICT__");
 
+    undefine_static_symbol("__CPU_VM1__");
+    undefine_static_symbol("__CPU_VM1_STRICT__");
+    undefine_static_symbol("__CPU_INTEL__");
+
+    undefine_static_symbol("__CPU_TI83__");
+    undefine_static_symbol("__CPU_TI83_STRICT__");
+    undefine_static_symbol("__CPU_TI83PLUS__");
+    undefine_static_symbol("__CPU_TI83PLUS_STRICT__");
+
     switch (cpu) {
     case CPU_Z80:
         m_cpu = CPU_Z80;
@@ -955,6 +964,41 @@ void Options::set_cpu(int cpu) {
         m_cpu = CPU_KC160_Z80_STRICT;
         define_static_symbol("__CPU_KC160_Z80_STRICT__");
         break;
+    case CPU_TI83:
+        m_cpu = CPU_Z80;
+        define_static_symbol("__CPU_Z80__");
+        define_static_symbol("__CPU_TI83__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_TI83_STRICT:
+        m_cpu = CPU_Z80;
+        define_static_symbol("__CPU_Z80_STRICT__");
+        define_static_symbol("__CPU_TI83_STRICT__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_TI83PLUS:
+        m_cpu = CPU_Z80;
+        define_static_symbol("__CPU_Z80__");
+        define_static_symbol("__CPU_TI83PLUS__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_TI83PLUS_STRICT:
+        m_cpu = CPU_Z80_STRICT;
+        define_static_symbol("__CPU_Z80_STRICT__");
+        define_static_symbol("__CPU_TI83PLUS_STRICT__");
+        define_static_symbol("__CPU_ZILOG__");
+        break;
+    case CPU_VM1:
+        m_cpu = CPU_VM1;
+        define_static_symbol("__CPU_VM1__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
+	case CPU_VM1_STRICT:
+        m_cpu = CPU_VM1_STRICT;
+        define_static_symbol("__CPU_VM1_STRICT__");
+        define_static_symbol("__CPU_INTEL__");
+        break;
+	
     default:
         xassert(0);
     }

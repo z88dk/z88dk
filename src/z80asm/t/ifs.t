@@ -475,7 +475,10 @@ spew("$test.asm", <<'END_ASM');
 															
 	if __CPU_TI83__				: defm "ti83 "  			: endif
 	if __CPU_TI83PLUS__			: defm "ti83plus "  		: endif
-															
+
+    if __CPU_VM1__				: defm "vm1 "				: endif
+    if __CPU_VM1_STRICT__		: defm "vm1_strict "		: endif
+	
 	if __SWAP_IX_IY__			: defm "-IXIY "				: endif
 			
 	if __FLOAT_GENMATH__		: defm "float_genmath "		: endif
@@ -528,6 +531,8 @@ my %defines = (
 	r6k_strict			=> "rabbit r6k_strict ",
 	ti83				=> "zilog z80_strict ti83 ",
 	ti83plus			=> "zilog z80_strict ti83plus ",
+	vm1					=> "intel vm1 ",
+	vm1_strict			=> "intel vm1_strict ",
 );
 
 for my $cpu (@CPUS, qw( ti83 ti83plus )) {

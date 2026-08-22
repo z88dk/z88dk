@@ -17,7 +17,7 @@ for my $cpu (@CPUS) {
 
 		for my $dd (qw( B  C  D  E  H  L  BC  DE  HL  IX IY 
 						B_ C_ D_ E_ H_ L_ BC_ DE_ HL_       )) {
-			next if $dd =~ /ix|iy/i && $cpu =~ /^80|gbz80/;
+			next if $dd =~ /ix|iy/i && $cpu =~ /^80|gbz80|^vm1/;
 			next if $dd =~ /_/ && $cpu !~ /^r4k|^r5k|^r6k/;
 			
 			my $reg = $dd =~ s/_/'/r;

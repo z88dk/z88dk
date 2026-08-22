@@ -575,3 +575,35 @@ Object  file test_t_dump_library_03_t.o at $20A5: Z80RMF08
     G C $0000: public1 (section "")
     G C $0000: public2 (section "")
 
+Object  file test_t_dump_library_03_t.o at $2120: Z80RMF08
+  Name: module_vm1_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $2192: Z80RMF08
+  Name: module_vm1_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $2201: Z80RMF08
+  Name: module_vm1_strict_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_03_t.o at $227A: Z80RMF08
+  Name: module_vm1_strict_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+

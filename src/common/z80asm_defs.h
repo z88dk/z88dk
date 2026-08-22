@@ -47,7 +47,13 @@ typedef enum {
     CPU_R5K_STRICT		= 30,
 	CPU_R6K				= 31,
 	CPU_R6K_STRICT		= 32,
-	
+    CPU_TI83            = 33,
+    CPU_TI83_STRICT     = 34,
+    CPU_TI83PLUS        = 35,
+    CPU_TI83PLUS_STRICT = 36,
+    CPU_VM1             = 37,
+    CPU_VM1_STRICT      = 38,
+
     CPU_UNDEF       	= -1,
 } cpu_t;
 

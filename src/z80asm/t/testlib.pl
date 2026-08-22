@@ -33,6 +33,7 @@ $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 			gbz80 		gbz80_strict 
 			kc160		kc160_strict
 			kc160_z80	kc160_z80_strict
+			vm1			vm1_strict
 );
 
 unlink_testfiles();
@@ -84,7 +85,7 @@ sub z80asm_ok {
     $options ||= "-b";
     $files ||= $asm_file;
 
-    run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
+    run_ok("z88dk-z80asm $options $files 2> ${test}.stderr", "${test}.stderr");
     check_bin_file($bin_file, $bin);
     check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
 	
@@ -216,22 +217,30 @@ sub capture_nok {
 
 #------------------------------------------------------------------------------
 sub run_ok {
-    my($cmd) = @_;
+    my($cmd, $output_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	ok 1, "Running: $cmd";
-    ok 0==system($cmd), $cmd;
+	my $ok = 0==system($cmd);
+    ok $ok, $cmd;
+	if (!$ok && $output_file) {
+		say STDERR path($output_file)->slurp;
+	}
 	
 	(Test::More->builder->is_passing) or die;
 }
 
 #------------------------------------------------------------------------------
 sub run_nok {
-    my($cmd) = @_;
+    my($cmd, $output_file) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	ok 1, "Running: $cmd";
-    ok 0!=system($cmd), $cmd;
+	my $ok = 0!=system($cmd);
+    ok $ok, $cmd;
+	if (!$ok && $output_file) {
+		say STDERR path($output_file)->slurp;
+	}
 	
 	(Test::More->builder->is_passing) or die;
 }
@@ -609,6 +618,9 @@ sub cpu_compatible {
 	}
 	elsif ($code_cpu eq "kc160_z80" && $lib_cpu eq "8080") {
 		return 1;
+	}
+	elsif ($code_cpu eq "vm1") {
+		return 0;
 	}
 	else {
 		return 0;

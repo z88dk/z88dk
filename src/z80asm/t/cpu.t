@@ -7,12 +7,12 @@ use Modern::Perl;
 # test error
 z80asm_nok("-mcc", "", "", <<END);
 error: illegal -m option: cc
-error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r6k,r6k_strict,r800,r800_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
+error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r6k,r6k_strict,r800,r800_strict,ti83,ti83_strict,ti83plus,ti83plus_strict,vm1,vm1_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
 END
 
 z80asm_nok("-m=cc", "", "", <<END);
 error: illegal -m option: cc
-error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r6k,r6k_strict,r800,r800_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
+error: list of available CPUs: 8080,8080_strict,8085,8085_strict,ez80,ez80_strict,ez80_z80,ez80_z80_strict,gbz80,gbz80_strict,kc160,kc160_strict,kc160_z80,kc160_z80_strict,r2ka,r2ka_strict,r3k,r3k_strict,r4k,r4k_strict,r5k,r5k_strict,r6k,r6k_strict,r800,r800_strict,ti83,ti83_strict,ti83plus,ti83plus_strict,vm1,vm1_strict,z180,z180_strict,z80,z80_strict,z80n,z80n_strict
 END
 
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
@@ -60,7 +60,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		my $length = $addr;		# only compare output up to $length
 		
 		# run assembler
-		run_ok($asm_cmd);
+		run_ok($asm_cmd, "$test.err");
 
 		# read labels from map file and patch @bin
 		{
@@ -106,7 +106,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			run_ok("z88dk-dis -m$dis_cpu $file_bin > $test.asm");
 
 			# assemble
-			run_ok("z88dk-z80asm -m$dis_cpu -b -l $test.asm 2> $test.err");
+			run_ok("z88dk-z80asm -m$dis_cpu -b -l $test.asm 2> $test.err", "$test.err");
 			is slurp("$test.err"), "", "check errors";
 			
 			# compare

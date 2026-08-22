@@ -16,7 +16,7 @@ for my $cpu (@CPUS) {
 		skip "$cpu does not have call (dd)" if $cpu =~ /_strict/;
 
 		for my $dd (qw( hl ix iy )) {
-			next if $dd =~ /ix|iy/ && $cpu =~ /^80|gbz80/;
+			next if $dd =~ /ix|iy/ && $cpu =~ /^80|gbz80|^vm1/;
 			my $r = ticks(<<END, "-m$cpu");
 				IF __CPU_R4K__ || __CPU_R5K__ || __CPU_R6K__
 					;; Enable R4K instruction mode on the R4K
