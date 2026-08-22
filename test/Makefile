@@ -47,4 +47,5 @@ src-all:
 	$(MAKE) -C ../src/z80nm test
 	$(MAKE) -C ../src/z80asm test
 	$(MAKE) -C ../src/zobjcopy test
+	$(MAKE) -C ../src/zx81bas test
 	#$(MAKE) -C ../src/80cc test

@@ -60,7 +60,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX)
+	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX) bin/z88dk-zx81bas$(EXESUFFIX)
 
 ALL = $(EXTRA_ALL) $(BINS) testsuite
 
@@ -190,6 +190,9 @@ bin/z88dk-ticks$(EXESUFFIX): src/config.h | bin
 bin/z88dk-lib$(EXESUFFIX): src/config.h | bin
 	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
 
+bin/z88dk-zx81bas$(EXESUFFIX): src/config.h | bin
+	$(MAKE) -C src/zx81bas PREFIX=`pwd` PREFIX_SHARE=`pwd` install
+
 
 libs: $(BINS)
 	$(MAKE) -C libsrc
@@ -202,7 +205,7 @@ install: install-clean
 	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/80cc PREFIX=$(DESTDIR)$(PREFIX) install
-	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR)$(PREFIX) PREFIX_SHARE=$(DESTDIR)$(prefix_share) install
+	$(MAKE) -C src/z80asm PREFIX=$(DESTDIR)$(PREFIX) PREFIX_SHARE=$(DESTDIR)$(prefix_share) install
 	$(MAKE) -C src/zcc PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)$(PREFIX) install
@@ -211,6 +214,7 @@ install: install-clean
 	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zx81bas PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C support/basck PREFIX=$(DESTDIR)$(PREFIX) install
 	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR)$(PREFIX) install
@@ -265,6 +269,7 @@ bins-clean:
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C src/zx0 clean
+	$(MAKE) -C src/zx81bas clean
 	$(MAKE) -C examples clean
 	$(MAKE) -C support clean
 	$(MAKE) -C test clean
