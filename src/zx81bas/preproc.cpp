@@ -369,14 +369,13 @@ static bool start_of_squoted_string(std::string& text, size_t pos) {
     return false;
 }
 
-// remove "//", "#" comments everywhere
+// remove "//" comments everywhere
 // remove "'" comments in BASIC
 // remove ";" comments in ASM
 // ignore quote in after af'
 // skip quotes in quoted strings escaped with backslash
 static void remove_comment(std::string& text,
-                           bool in_basic,
-                           bool remove_hash_comment) {
+                           bool in_basic) {
     size_t pos = 0;
     while (pos < text.size()) {
         if (pos + 3 < text.size() &&
@@ -405,9 +404,6 @@ static void remove_comment(std::string& text,
         else if (text.substr(pos, 2) == "//") {
             text.erase(pos);        // remove rest of line
         }
-        else if (remove_hash_comment && text[pos] == '#') {
-            text.erase(pos);        // remove rest of line
-        }
         else if (in_basic && text[pos] == '\'') {
             text.erase(pos);        // remove rest of line
         }
@@ -425,28 +421,23 @@ static void remove_comments(std::vector<SrcLine>& src_lines) {
     for (size_t row = 0; row < src_lines.size(); row++) {
         std::string& text = src_lines[row].text;
         bool this_line_basic = in_basic;
-        bool remove_hash_comment = true;
 
         size_t col = 0;
         if (match_directive(text, col, "ASM")) {
             in_basic = false;
             this_line_basic = true;
-            remove_hash_comment = false;
         }
         else if (match_directive(text, col, "BASIC")) {
             in_basic = true;
             this_line_basic = true;
-            remove_hash_comment = false;
         }
         else if (match_basic_pragma(text, col)) {
             this_line_basic = true;
-            remove_hash_comment = false;
         }
         else if (match_cpp_directive(text, col)) {
-            remove_hash_comment = false;
         }
 
-        remove_comment(text, this_line_basic, remove_hash_comment);
+        remove_comment(text, this_line_basic);
     }
 }
 
