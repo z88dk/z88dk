@@ -1452,6 +1452,24 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                for this value (read-only value on a cheap-slot target). G2: unless
                the setup/step keep-rule protects it (queen-pattern counter). */
             if (idx_ben && idx_ben[v] <= 0 && !(idx_keep && idx_keep[v])) continue;
+            /* A home that is DEAR TO FILL cannot take a parameter. The value
+               has to be read out of the caller's slot and moved into the pair
+               before the home serves anything, and the pair is callee-saved
+               across the whole function - on the VM1's h'l' that is 44T + 25T
+               + 21T of setup against the 19T a later read saves, so it wants
+               five reads just to break even. A COUNTER pays back at once,
+               because the home absorbs the STEP (35T an iteration) as well as
+               the reads; idx_ben cannot tell them apart because it prices
+               accesses and charges nothing for filling the home.
+               Measured on the VM1: rejecting param homes is a win on every
+               suite, in bytes AND ticks (charbench -34B/-10168T; -14B on
+               queenbench, lexbench, sieve and strbench). The same argument
+               applies to an IX/IY home, which is why idx_ben's missing setup
+               term is already noted for the Rabbit - but changing that is a
+               shared-codegen change with its own gauntlet, so this asks about
+               THIS home rather than about the CPU. */
+            if ((c->flags & CF_IDX2_PARAM) && f->idx2_reg == IR_PR_HL_ALT)
+                continue;
             if (c->flags & CF_IDX2_PARAM) {
                 int counter_waiting = 0;
                 for (int k = 0; k < n; k++)
@@ -1462,6 +1480,12 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                     }
                 if (counter_waiting) continue;
             }
+            if (getenv("IR_IDX2_PROBE"))
+                fprintf(stderr, "IDX2 take %s v%d ben=%ld param=%d counter=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?",
+                        v, idx_ben ? idx_ben[v] : -1L,
+                        (c->flags & CF_IDX2_PARAM) != 0,
+                        (c->flags & CF_IDX2_COUNTER) != 0);
             f->vreg_to_phys[v] = f->idx2_reg;
             idx2_taken = 1;
             continue;
@@ -2401,7 +2425,7 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
        fastpath via spill_de_unless_dead was the crash). EXCLUDED: ez80/kc160/
        rabbit (cheap native sp-relative slots — parking doesn't pay). */
     if (!(c_cpu == CPU_Z80 || IS_Z80N() || c_cpu == CPU_Z180
-          || IS_8080() || IS_8085() || IS_GBZ80())) return;
+          || IS_808x() || IS_GBZ80())) return;
 
     typedef struct { int vreg, flo, fhi; } SCand;
     SCand *cand = calloc((size_t)f->n_vregs, sizeof(SCand));
@@ -2603,8 +2627,17 @@ static int g0_word_cost(int reg, int kind)
        and letting idx_ben value ez80 sp homes correctly (fp slot stays cheaper). */
     static const int EZ80[GR_N][GK_N] = {
         /*SLOT*/{8,8,6,16}, /*BC*/{2,2,2,2}, /*DE*/{2,2,2,2}, /*IX*/{3,5,4,2}, /*IY*/{3,5,4,2} };
+    /* KR580VM1: an 8080-class slot (measured 44 read / 39 write / 68 word-RMW,
+       so the Z80 row is close) with h'l' as the index home. Its numbers are the
+       measured RS-prefixed idioms - push/pop 25 either way, `ld a,(hl'\')` 11,
+       `inc hl'\'` 9 - which beat IX/IY on deref because there is no
+       displacement to encode. See vm1_cost_bench.py. */
+    static const int VM1[GR_N][GK_N] = {
+        /*SLOT*/{44,39,44,68}, /*BC*/{10,10,7,6}, /*DE*/{10,10,7,6},
+        /*IX*/{25,25,11,9}, /*IY*/{25,25,11,9} };
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
+                         : IS_KR580VM1() ? VM1
                          : IS_RABBIT() ? RABBIT : Z80;
     int c = t[reg][kind];
     if (reg == GR_SLOT) {                             /* fp slot = (ix+d) */

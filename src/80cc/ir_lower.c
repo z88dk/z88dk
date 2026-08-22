@@ -1837,6 +1837,20 @@ static int frame_has_saved_iy(const Func *f)
     return 0;
 }
 
+/* True iff entry saved the alternate pointer pair for an idx2 home. On the VM1
+   h'l' IS the idx2 spare, and like IY it is callee-saved: the only code that
+   can hold a value there is other 80cc output, which saves it the same way, and
+   the 8080 library cannot reach it at all. The saved pair sits between the
+   locals and the return address, shifting caller-arg offsets up by 2. */
+static int frame_has_saved_althl(const Func *f)
+{
+    if (!f || f->is_naked || f->is_interrupt || !f->vreg_to_phys) return 0;
+    if (f->idx2_reg != IR_PR_HL_ALT) return 0;
+    for (int i = 0; i < f->n_vregs; i++)
+        if (f->vreg_to_phys[i] == IR_PR_HL_ALT) return 1;
+    return 0;
+}
+
 /* True iff the function contains an indirect (function-pointer) call. In sp
    mode the fnptr dispatch loads the pointer into idx2 = IX (`push hl; pop ix;
    jp (ix)` via l_jpix), clobbering IX. */
@@ -2026,6 +2040,7 @@ static int param_caller_off(const Func *f, int vreg_id)
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 4 : 2)
                     + (frame_has_debug_fp(f) ? 2 : 0)   /* l_debug_push_frame save */
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
+                    + (frame_has_saved_althl(f) ? 2 : 0) /* saved h'l' (VM1 idx2) */
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2) sit
@@ -2033,8 +2048,7 @@ static int param_caller_off(const Func *f, int vreg_id)
                        ipset 3 and gbz80/8080's bare di use no data stack → 0. */
                     + (f->is_interrupt ? 12
                        : ((f->flags & CRITICAL)
-                          && !(IS_RABBIT()) && !(IS_GBZ80())
-                          && !(IS_8080()) ? 2 : 0));
+                          && CPU_HAS_DI_SAVE() ? 2 : 0));
     /* Push order sets the layout: SMALLC/CALLEE L→R (param0 highest), STDC
        / __z88dk_sdccdecl R→L (param0 lowest — just above the return addr).
        Must match emit_prologue. */
@@ -2622,6 +2636,7 @@ RegMask phys_regmask(const Func *f, int v)
     case IR_PR_DEHL:              return IR_R_HL|IR_R_DE;
     case IR_PR_IX: case IR_PR_IXL: case IR_PR_IXH: return IR_R_IX;
     case IR_PR_IY: case IR_PR_IYL: case IR_PR_IYH: return IR_R_IY;
+    case IR_PR_HL_ALT:            return IR_R_HL_ALT;
     default:                      return 0;
     }
 }
@@ -3632,8 +3647,12 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
                Gated to tos_pushpop_ok CPUs: kc160 has dear push/pop and cheap
                sp addressing, so `pop af` there is a byte win but a tick loss. */
             int n = f->frame_size;
-            while (n >= 2) { emit(out, "pop\taf"); n -= 2; }
-            if (n) emit(out, "inc\tsp");
+            /* Where a discarded word must not go through AF (VM1: PSW bit 3
+               is the data-bank select) `inc sp` reclaims it instead - the
+               same 10T per word, one byte more. */
+            if (CPU_POP_AF_IS_SAFE())
+                while (n >= 2) { emit(out, "pop\taf"); n -= 2; }
+            while (n-- > 0) emit(out, "inc\tsp");
         } else if (is_acc) {
             /* Result is in the accumulator (memory / alt-regs) — a plain
                sp restore is safe, nothing in HL/DE to preserve. */
@@ -3669,10 +3688,12 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
            teardown above; this branch is the !fp_active acc-tier case only.) */
         if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
         emit(out, "pop\t%s", frame_reg());
-    } else if (!fp_active(f) && (frame_has_saved_iy(f) || frame_has_saved_ix(f))) {
+    } else if (!fp_active(f) && (frame_has_saved_iy(f) || frame_has_saved_ix(f)
+                                 || frame_has_saved_althl(f))) {
         /* Pure sp-mode: restore the saved index regs before the return address is
-           read. Prologue pushed IY (idx3) THEN IX (flipped idx2), so IX is on top
-           — pop it first. Touches only IX/IY/SP. */
+           read. Prologue pushed IY (idx3), IX (flipped idx2) then h'l' (VM1
+           idx2), so unwind in reverse. Touches only the saved pair and SP. */
+        if (frame_has_saved_althl(f)) emit(out, "pop\thl'");
         if (frame_has_saved_ix(f)) emit(out, "pop\tix");
         if (frame_has_saved_iy(f)) emit(out, "pop\tiy");
     }
@@ -3713,8 +3734,8 @@ static int lower_ret(FILE *out, Func *f, const Op *op)
     if (f->flags & CRITICAL) {
         if (IS_RABBIT())
             emit(out, "ipres");
-        else if (IS_GBZ80() || IS_8080())
-            emit(out, "ei");          /* gbz80/8080: bare ei (IFF not readable) */
+        else if (!CPU_HAS_DI_SAVE())
+            emit(out, "ei");          /* gbz80/8080/VM1: bare ei (IFF not readable) */
         else
             emit(out, "call\tl_pop_ei");
     }
@@ -3887,7 +3908,7 @@ static void emit_prologue(FILE *out, Func *f)
            l_push_di (frame offsets account for the 2 bytes). */
         if (IS_RABBIT())
             emit(out, "ipset\t3");
-        else if (IS_GBZ80() || IS_8080())
+        else if (!CPU_HAS_DI_SAVE())
             emit(out, "di");
         else
             emit(out, "call\tl_push_di");
@@ -3901,6 +3922,9 @@ static void emit_prologue(FILE *out, Func *f)
                                        IX (callee-saved — frame ptr for fp/sdcc
                                        callers, #13-flip's fp caller) */
         emit(out, "push\tix");
+    if (frame_has_saved_althl(f))   /* VM1 idx2 home: preserve the caller's h'l'.
+                                       Pushed last, so it pops first. */
+        emit(out, "push\thl'");
     if (frame_has_debug_fp(f))      /* no-IX -debug: chain __debug_framepointer.
                                        Pushes 2 bytes, preserves HL (fastcall arg),
                                        clobbers BC — must precede the fastcall/sc1
@@ -4099,6 +4123,7 @@ static void emit_prologue(FILE *out, Func *f)
        address, shifting args up another 2. */
     int retaddr_off = f->frame_size + (frame_has_saved_fp(f) ? 2 : 0)
                     + (frame_has_saved_iy(f) ? 2 : 0)   /* saved IY (idx3) */
+                    + (frame_has_saved_althl(f) ? 2 : 0) /* saved h'l' (VM1 idx2) */
                     + (frame_has_saved_ix(f) ? 2 : 0)  /* [#13] flipped-fn saved IX */
                     + (f->returns_longlong ? 2 : 0)
                     /* interrupt push-all (12) / critical l_push_di (2). */

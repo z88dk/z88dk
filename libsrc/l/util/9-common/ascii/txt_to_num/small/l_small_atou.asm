@@ -25,7 +25,12 @@ l_small_atou:
 
 loop:
 
+IF __CPU_VM1__
+   inc sp
+   inc sp
+ELSE
    pop af
+ENDIF
    
    inc de
    ld a,(de)

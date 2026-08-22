@@ -1415,6 +1415,7 @@
 	call	l_gint	;%9
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,%1
@@ -1754,6 +1755,7 @@
 ;
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
@@ -1765,6 +1767,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
@@ -1776,6 +1779,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	e,(hl)
 	inc	hl
@@ -2302,6 +2306,7 @@
 	ld	e,l
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	push	hl
 	call	l_gint	;
@@ -2318,6 +2323,7 @@
 	ld	l,a
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	push	hl
 	call	l_gint	;
@@ -2433,6 +2439,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,%1
 	push	hl
@@ -2631,6 +2638,7 @@
 	push	hl
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,(%1)
 	pop	de
@@ -3000,6 +3008,7 @@ $notcpu 8085
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	add	hl,hl
 	add	hl,hl
@@ -3016,6 +3025,7 @@ $notcpu 8085
 	ld	l,0
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	h,0
 	srl	l
@@ -3026,6 +3036,7 @@ $notcpu 8085
 	add	hl,hl
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	h,0
 	srl	h
@@ -3035,6 +3046,7 @@ $notcpu 8085
 	srl	l
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	h,0
 	srl	l
@@ -3073,6 +3085,7 @@ $notcpu 8085
 	ld	h,0
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	e,(hl)
 	ld	d,0
@@ -3122,6 +3135,7 @@ $notcpu 8085
 	ld	l,a
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	l,0
 	ld	a,1
@@ -3703,6 +3717,7 @@ $notcpu 8085
 	ex	de,hl
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	push	hl
 	ld	l,(hl)
@@ -3820,6 +3835,7 @@ $notcpu 8085
 	add	hl,sp
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %check 0 <= %1 <= 7
 	ld	e,(hl)
@@ -4058,6 +4074,7 @@ $notcpu 8085
 	jp	%2z,%1	;%5
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	push	hl
 	call	l_gint	;
@@ -4654,6 +4671,7 @@ $notcpu 8085
 =
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	or	128
@@ -4899,6 +4917,7 @@ $notcpu 8085
 	push	hl
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,(%1)
@@ -4920,6 +4939,7 @@ $notcpu 8085
 	ex	de,hl
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,(%1)
@@ -5047,6 +5067,7 @@ $notcpu 8085
 .i_%1
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	call	l_gint	;%1
@@ -5196,6 +5217,7 @@ $notcpu 8085
 	jp	i_%3	;EOS
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	de,32767
 	call	l_and
@@ -5230,6 +5252,7 @@ $notcpu 8085
 	ld	(hl),a
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	rlca
 	and	1
@@ -5239,6 +5262,7 @@ $notcpu 8085
 	jp	%5,%1	;%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	rlca
 	bit	%2,a
@@ -5266,6 +5290,7 @@ $notcpu 8085
 	ld	hl,%6
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	1
@@ -5277,6 +5302,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	2
@@ -5288,6 +5314,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	4
@@ -5299,6 +5326,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	8
@@ -5310,6 +5338,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	16
@@ -5321,6 +5350,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	32
@@ -5332,6 +5362,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	64
@@ -5343,6 +5374,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	a,(hl)
 	and	128
@@ -5795,6 +5827,7 @@ $notcpu 8085
 
 %title Clean up setting bit in char
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	push	hl
 	call	l_gchar

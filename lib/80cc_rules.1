@@ -784,6 +784,7 @@
 
 %title #DE-glob produce (_sym) ld-hl value in DE (no ld de,(nn) on 808x/gbz80) (-1b, -4t)
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	%"ld	hl,\((_[A-Za-z0-9_+]*)\)"1
@@ -945,6 +946,7 @@
 ;; match, but are guarded out for clarity (set n,(hl) is not encodable there).
 %title #RMW1 single-bit set on a word via set n,(hl) — kill the word round-trip
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,bc
 	ld	a,(hl+)
@@ -970,6 +972,7 @@
 ;; `ld hl,sp+n` the regex WOULD match, so 808x/gbz80 stay gated out.
 %title #DE6 const/sym into DE via ex/ld/ex -> ld de directly (-4b, -8t)
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ex	de,hl
