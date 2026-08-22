@@ -6,6 +6,8 @@
 
 #include "errors.h"
 #include "utils.h"
+#include <fstream>
+#include <iostream>
 #include <string>
 
 void remove_file(const std::string& filename) {
@@ -34,6 +36,21 @@ std::string normalize_path(const std::string& path) {
     }
     return output;
 }
+
+#ifdef _DEBUG
+void cat_file(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        error("Failed to open file: " + filename);
+        return;
+    }
+    std::string text;
+    std::cout << "Contents of " << filename << ":" << std::endl;
+    while (std::getline(file, text)) {
+        std::cout << text << std::endl;
+    }
+}
+#endif
 
 bool str_ends_with(const std::string& str, const std::string& ending) {
     if (str.length() >= ending.length()) {

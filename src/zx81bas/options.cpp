@@ -11,6 +11,7 @@
 
 // global state
 bool g_verbose = false;
+bool g_keep_temp_files = false;
 std::vector<std::string> g_temp_files;   // temp files to delete on exit
 
 #ifdef _DEBUG
