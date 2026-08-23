@@ -6,8 +6,13 @@
 
 #include "errors.h"
 #include "utils.h"
+#include <algorithm>
+#include <cctype>
+#include <cstdint>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 void remove_file(const std::string& filename) {
@@ -60,5 +65,27 @@ bool str_ends_with(const std::string& str, const std::string& ending) {
     else {
         return false;
     }
+}
+
+std::string str_tolower(std::string str) {
+    std::transform(str.begin(), str.end(), str.begin(), [](char c) {
+        return std::tolower(c);
+    });
+    return str;
+}
+
+std::string str_toupper(std::string str) {
+    std::transform(str.begin(), str.end(), str.begin(), [](char c) {
+        return std::toupper(c);
+    });
+    return str;
+}
+
+std::string int_to_hex(uint8_t value) {
+    std::ostringstream oss;
+    oss << "0x" << std::uppercase << std::hex
+        << std::setfill('0') << std::setw(2)
+        << static_cast<unsigned>(value);
+    return oss.str();
 }
 

@@ -12,6 +12,12 @@ Contents of t/input/10_preproc_10.bas.i:
 # 1 "t/input/10_preproc_10.inc"
 
 
+
+!ASM
+zero EQU 0
+ex af, af
+defm "ex af, af'"
+!BASIC
 # 3 "t/input/10_preproc_10.bas"
 !VERBOSE =  1 
 !DFILE_COLAPSED =  0 

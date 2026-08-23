@@ -1,0 +1,4 @@
+#ASM
+	defm "'"
+#BASIC
+	PRINT "'"
