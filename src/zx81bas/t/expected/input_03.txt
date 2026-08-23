@@ -1,0 +1,8 @@
+% z88dk-zx81bas -d 3 test_t_input_03_t.bas
+Input file:  test_t_input_03_t.bas
+Output file: test_t_input_03_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_03_t.bas.i" "test_t_input_03_t.bas.pp"
+Preprocessor output:
+test_t_input_03_t.bas:5: !ASM
+test_t_input_03_t.bas:6: 		ex af, af			
+test_t_input_03_t.bas:7: !BASIC

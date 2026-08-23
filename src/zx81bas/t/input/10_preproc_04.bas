@@ -1,7 +1,7 @@
 line 1/* comment */
 line 2// comment
 line 3'comment
-line 4 has af''comment
+line 4 has "af'" and af''comment
 line 5 has single quoted '^X' text'comment
 line 6 has single quoted '\'' text'comment
 line 7 hex '\00' byte'comment
