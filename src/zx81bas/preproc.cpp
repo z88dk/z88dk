@@ -14,6 +14,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 static const std::string_view cpp_command =
@@ -171,7 +172,7 @@ static bool read_source_file(const std::string& filename,
     std::string text;
     while (std::getline(infile, text)) {
         line_num++;
-        SrcLine src_line{ text, filename, line_num };
+        SrcLine src_line(std::move(text), filename, line_num);
         out_lines.emplace_back(std::move(src_line));
     }
 
@@ -374,15 +375,17 @@ static bool start_of_squoted_string(std::string& text, size_t pos) {
 // remove ";" comments in ASM
 // ignore quote in after af'
 // skip quotes in quoted strings escaped with backslash
+// replace af' by af
 static void remove_comment(std::string& text,
                            bool in_basic) {
     size_t pos = 0;
     while (pos < text.size()) {
-        if (pos + 3 < text.size() &&
+        if (pos + 2 < text.size() &&
                 tolower(text[pos]) == 'a' &&
                 tolower(text[pos + 1]) == 'f' &&
                 tolower(text[pos + 2]) == '\'') {
-            pos += 3;       // skip af'
+            text.erase(pos + 2, 1);     // remove quote in af'
+            pos += 2;                   // advance past af
         }
         else if (text[pos] == '"' ||
                  (text[pos] == '\'' && start_of_squoted_string(text, pos))) {
@@ -601,4 +604,30 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
 #endif
 
     return get_error_count() == 0;
+}
+
+bool match_ASM(const std::string& text) {
+    size_t pos = 0;
+    if (match_char(text, pos, '!')) {
+        std::string keyword;
+        if (match_ident(text, pos, keyword)) {
+            if (keyword == "ASM") {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool match_BASIC(const std::string& text) {
+    size_t pos = 0;
+    if (match_char(text, pos, '!')) {
+        std::string keyword;
+        if (match_ident(text, pos, keyword)) {
+            if (keyword == "BASIC") {
+                return true;
+            }
+        }
+    }
+    return false;
 }

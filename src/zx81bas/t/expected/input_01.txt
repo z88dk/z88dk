@@ -1,0 +1,24 @@
+% z88dk-zx81bas -d 1 test_t_input_01_t.bas
+Input file:  test_t_input_01_t.bas
+Output file: test_t_input_01_t.p
+Contents of test_t_input_01_t.bas.pp:
+#line 1 "test_t_input_01_t.bas"
+
+
+
+
+!ASM
+		ex af, af			
+!BASIC
+
+
+
+
+
+#line 1 "t/input/const.inc"
+
+
+
+#define FALSE 0
+#define TRUE 1
+#line 14 "test_t_input_01_t.bas"

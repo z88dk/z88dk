@@ -1,0 +1,28 @@
+% z88dk-zx81bas -d 2 test_t_input_02_t.bas
+Input file:  test_t_input_02_t.bas
+Output file: test_t_input_02_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_02_t.bas.i" "test_t_input_02_t.bas.pp"
+Contents of test_t_input_02_t.bas.i:
+
+# 1 "test_t_input_02_t.bas.pp"
+
+# 1 "test_t_input_02_t.bas"
+
+
+
+
+!ASM
+		ex af, af			
+!BASIC
+
+
+
+
+
+
+# 1 "t/input/const.inc"
+
+
+
+
+# 14 "test_t_input_02_t.bas"

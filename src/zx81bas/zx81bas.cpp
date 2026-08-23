@@ -6,12 +6,15 @@
 
 #include "../config.h"
 #include "errors.h"
+#include "lexer.h"
 #include "options.h"
 #include "preproc.h"
 #include "utils.h"
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <string_view>
+#include <vector>
 
 static constexpr std::string_view copyright =
     "Copyright (C) Paulo Custodio 2023-2026\n"
@@ -135,7 +138,13 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;    // error already reported
     }
 
+    // tokenize the preprocessed lines
+    TokFile tok_file;
+    if (!tok_file.tokenize(src_lines)) {
+        return EXIT_FAILURE;    // error already reported
+    }
 
+    // --- COMPLETE HERE ---
 
     // remove temporary files if there were no errors
     if (get_error_count() > 0) {

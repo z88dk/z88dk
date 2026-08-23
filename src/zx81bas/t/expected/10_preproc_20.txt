@@ -5,6 +5,8 @@ Output file: t/input/10_preproc_20.p
 Preprocessor output:
 t/input/10_preproc_20.inc:4: !ASM
 t/input/10_preproc_20.inc:5: zero EQU 0
-t/input/10_preproc_20.inc:6: !BASIC
+t/input/10_preproc_20.inc:6: ex af, af
+t/input/10_preproc_20.inc:7: defm "ex af, af'"
+t/input/10_preproc_20.inc:8: !BASIC
 t/input/10_preproc_20.bas:3: !VERBOSE =  1 
 t/input/10_preproc_20.bas:4: !DFILE_COLAPSED =  0 

@@ -1,0 +1,128 @@
+% z88dk-zx81bas -d 4 test_t_input_04_t.bas
+Input file:  test_t_input_04_t.bas
+Output file: test_t_input_04_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_04_t.bas.i" "test_t_input_04_t.bas.pp"
+Tokenized input:
+TokFile {
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!ASM"
+                filename: "test_t_input_04_t.bas"
+                line_num: 5
+            }
+        tokens: [
+            Token {
+                type: !
+                keyword: Unknown
+                text: "!"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: ""
+                filename: "test_t_input_04_t.bas"
+                line_num: 5
+            }
+            Token {
+                type: Identifier
+                keyword: ASM
+                text: "ASM"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: ""
+                filename: "test_t_input_04_t.bas"
+                line_num: 5
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		ex af, af			"
+                filename: "test_t_input_04_t.bas"
+                line_num: 6
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: Unknown
+                text: "ex"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: "		"
+                filename: "test_t_input_04_t.bas"
+                line_num: 6
+            }
+            Token {
+                type: Identifier
+                keyword: Unknown
+                text: "af"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 6
+            }
+            Token {
+                type: ,
+                keyword: Unknown
+                text: ","
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: ""
+                filename: "test_t_input_04_t.bas"
+                line_num: 6
+            }
+            Token {
+                type: Identifier
+                keyword: Unknown
+                text: "af"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 6
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!BASIC"
+                filename: "test_t_input_04_t.bas"
+                line_num: 7
+            }
+        tokens: [
+            Token {
+                type: !
+                keyword: Unknown
+                text: "!"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: ""
+                filename: "test_t_input_04_t.bas"
+                line_num: 7
+            }
+            Token {
+                type: Identifier
+                keyword: BASIC
+                text: "BASIC"
+                svalue: ""
+                ivalue: 0
+                nvalue: 0.000000
+                ws_before: ""
+                filename: "test_t_input_04_t.bas"
+                line_num: 7
+            }
+        ]
+    }
+}

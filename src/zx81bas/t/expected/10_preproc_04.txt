@@ -6,7 +6,7 @@ Contents of t/input/10_preproc_04.bas.pp:
 line 1 
 line 2
 line 3
-line 4 has af'
+line 4 has "af'" and af
 line 5 has single quoted '^X' text
 line 6 has single quoted '\'' text
 line 7 hex '\00' byte
