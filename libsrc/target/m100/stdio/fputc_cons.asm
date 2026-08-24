@@ -8,8 +8,6 @@
 ;
 ;	$Id: fputc_cons.asm$
 ;
-;	Prints at cooards from 4020-4021
-
     SECTION code_clib
     PUBLIC  fputc_cons_native
     PUBLIC  _fputc_cons_native
@@ -21,23 +19,16 @@ _fputc_cons_native:
     ld      hl, 2
     add     hl, sp
     ld      a, (hl)
-;	cp	12
-;	jr	z,cls
-  IF    STANDARDESCAPECHARS
-	; if slash-n encountered, print slash-r slash-n through ROM call
-    cp      10                          ; LF (n)?
-    jr      z, isLF
-  ENDIF
-	; if building for OPTROM, rst 6 is shortcut for "call system ROM by address"
+
+	push    af
     ROMCALL
-    defw    CHROUT
-    ret
-  IF    STANDARDESCAPECHARS
-isLF:
+    defw    $20   ; OUTC RST entry
+	pop     af
+
+    cp    13
+	ret   nz
+
+	ld    a,10
     ROMCALL
-    defw    CHROUT
-    ld      a, 13
-    ROMCALL
-    defw    CHROUT
-    ret
-  ENDIF
+    defw    $20   ; OUTC RST entry
+	ret
