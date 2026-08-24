@@ -1,0 +1,4 @@
+% z88dk-zx81bas -d 1 t//input/10_preproc_include_extra.bas
+Input file:  t/input/10_preproc_include_extra.bas
+Output file: t/input/10_preproc_include_extra.p
+error: Unexpected text after #include: extra

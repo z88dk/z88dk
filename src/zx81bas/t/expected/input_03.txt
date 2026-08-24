@@ -5,4 +5,44 @@ Output file: test_t_input_03_t.p
 Preprocessor output:
 test_t_input_03_t.bas:5: !ASM
 test_t_input_03_t.bas:6: 		ex af, af			
-test_t_input_03_t.bas:7: !BASIC
+test_t_input_03_t.bas:7: !ENDASM
+test_t_input_03_t.bas:9: !ASM
+test_t_input_03_t.bas:10: 		ret
+test_t_input_03_t.bas:11: !ENDASM
+test_t_input_03_t.bas:23: 10
+test_t_input_03_t.bas:24: 	@start10:
+test_t_input_03_t.bas:25: 11 	@start11:
+test_t_input_03_t.bas:26: 	@start12: 	12
+t/input/pragmas.inc:5: !AUTOSTART =  1 
+t/input/pragmas.inc:6: !AUTOSTART_LINE = 10
+t/input/pragmas.inc:7: !INCREMENT = 2
+t/input/pragmas.inc:8: !REMINVERT =  0 
+t/input/pragmas.inc:9: !FAST =  0 
+t/input/pragmas.inc:10: !VERBOSE =  1 
+t/input/pragmas.inc:11: !VARS A=1.23
+t/input/pragmas.inc:12: !VARS A(2,3)= 	1.1,1.2,1.3, 	2.1,2.2,2.3
+t/input/pragmas.inc:15: !VARS A$ = "HELLO"
+t/input/pragmas.inc:16: !VARS Z$ = ""
+t/input/pragmas.inc:17: !ASM
+t/input/pragmas.inc:18: z_code:	ld a, b
+t/input/pragmas.inc:19: 		add a, c
+t/input/pragmas.inc:20: 		ld c, a
+t/input/pragmas.inc:21: 		ld a, 0
+t/input/pragmas.inc:22: 		adc a, 0
+t/input/pragmas.inc:23: 		return
+t/input/pragmas.inc:24: !ENDASM
+t/input/pragmas.inc:25: !VARS B$(2,3,3)= 	"1.1","1.2","1.3", 	"2.1","2.2","2.3"
+t/input/pragmas.inc:28: !DFILE =  	"LINE 1",  	"LINE 2",  	"LINE 3",  	"LINE 4",  	"LINE 5",  	"LINE 6",  	"LINE 7",  	"LINE 8",  	"LINE 9",  	"LINE 10",  	"LINE 11",  	"LINE 12",  	"LINE 13",  	"LINE 14",  	"LINE 15",  	"LINE 16",  	"LINE 17",  	"LINE 18",  	"LINE 19",  	"LINE 20",  	"LINE 21",  	"LINE 22",  	"LINE 23",  	"LINE 24"
+t/input/pragmas.inc:53: !DFILE_COLAPSED =  0 
+t/input/pragmas.inc:54: !SYSVARS =  	0x00,0x00,0x00,0x74,0x00,0x75,0x00,0x8d,0x03,0x00,0x00,0x8e,0x03,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x54,0x00,0xff,0x02,0x00,0x00,0xff,0xff,0x00,0x37,  	0x74,0x00,0x00,0x00,0x00,0x00,0x00,0x8d,0x0c,0x00,0x00,0x2f,0xfd,0x00,0x00,0xf7,  	0x21,0x18,0x40,0x00,0x00,0x09,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00
+test_t_input_03_t.bas:38: 20 				REM 20
+test_t_input_03_t.bas:39:    @start21: 	REM 21
+test_t_input_03_t.bas:40: 22 @start22:	REM 22
+test_t_input_03_t.bas:41:    @start23: 23	REM 23
+test_t_input_03_t.bas:43: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
+test_t_input_03_t.bas:44: !ASM
+test_t_input_03_t.bas:45: 	start_rem:
+test_t_input_03_t.bas:46: !ENDASM
+test_t_input_03_t.bas:48: !ASM
+test_t_input_03_t.bas:49: 		ret
+test_t_input_03_t.bas:50: !ENDASM

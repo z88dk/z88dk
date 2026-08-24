@@ -1,0 +1,20 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_vars_error.bas
+Input file:  t/input/20_parser_vars_error.bas
+Output file: t/input/20_parser_vars_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_error.bas.i" "t/input/20_parser_vars_error.bas.pp"
+t/input/20_parser_vars_error.bas:1: error: unrecognized pragma statement 'NOT_VARS'
+t/input/20_parser_vars_error.bas:2: error: expected '=', found end of line
+t/input/20_parser_vars_error.bas:3: error: expected 'Float', found end of line
+t/input/20_parser_vars_error.bas:4: error: expected end of statement, found ','
+t/input/20_parser_vars_error.bas:5: error: expected end of statement, found ','
+t/input/20_parser_vars_error.bas:6: error: expected end of statement, found 'extra'
+t/input/20_parser_vars_error.bas:7: error: expected end of statement, found 'extra'
+t/input/20_parser_vars_error.bas:8: error: expected 'StringLiteral', found '10'
+t/input/20_parser_vars_error.bas:9: error: expected 'StringLiteral', found '1.23'
+t/input/20_parser_vars_error.bas:10: error: expected 'Float', found '"HELLO"'
+t/input/20_parser_vars_error.bas:11: error: expected 'Integer', found ')'
+t/input/20_parser_vars_error.bas:12: error: expected 'Integer', found ')'
+t/input/20_parser_vars_error.bas:13: error: expected ')', found 'TO'
+t/input/20_parser_vars_error.bas:14: error: expected 'Float', found '"A"'
+t/input/20_parser_vars_error.bas:15: error: expected 'StringLiteral', found '1'
+Parsing failed with errors.

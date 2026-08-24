@@ -1,0 +1,12 @@
+% z88dk-zx81bas -d 3 t//input/10_preproc.bas
+Input file:  t/input/10_preproc.bas
+Output file: t/input/10_preproc.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/10_preproc.bas.i" "t/input/10_preproc.bas.pp"
+Preprocessor output:
+t/input/10_preproc.inc:4: !ASM
+t/input/10_preproc.inc:5: zero EQU 0
+t/input/10_preproc.inc:6: ex af, af
+t/input/10_preproc.inc:7: defm "ex af, af'"
+t/input/10_preproc.inc:8: !ENDASM
+t/input/10_preproc.bas:3: !VERBOSE =  1 
+t/input/10_preproc.bas:4: !DFILE_COLAPSED =  0 

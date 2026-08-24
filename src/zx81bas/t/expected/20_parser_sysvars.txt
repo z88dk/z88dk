@@ -1,0 +1,22 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_sysvars.bas
+Input file:  t/input/20_parser_sysvars.bas
+Output file: t/input/20_parser_sysvars.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_sysvars.bas.i" "t/input/20_parser_sysvars.bas.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+        0x01
+        0x02
+        0x03
+    ]
+    stmts: [
+    ]
+}

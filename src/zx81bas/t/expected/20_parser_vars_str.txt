@@ -1,0 +1,177 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_vars_str.bas
+Input file:  t/input/20_parser_vars_str.bas
+Output file: t/input/20_parser_vars_str.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_str.bas.i" "t/input/20_parser_vars_str.bas.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        PragmaStrVarStmt {
+            TokLine {
+                source_type: BASIC
+                src_line:
+                    SrcLine {
+                        text: "!VARS A$="""
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 1
+                    }
+                tokens: [
+                    Token {
+                        type: !
+                        text: "!"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: Identifier
+                        keyword: VARS
+                        text: "VARS"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: Identifier
+                        text: "A$"
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: =
+                        text: "="
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: StringLiteral
+                        text: """"
+                        svalue: ""
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 1
+                    }
+                ]
+            }
+            name: A$
+            value: ""
+            asm: [
+                		ex af, af
+                		ret
+            ]
+        }
+        PragmaStrVarStmt {
+            TokLine {
+                source_type: BASIC
+                src_line:
+                    SrcLine {
+                        text: "!VARS B$="HELLO""
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 6
+                    }
+                tokens: [
+                    Token {
+                        type: !
+                        text: "!"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 6
+                    }
+                    Token {
+                        type: Identifier
+                        keyword: VARS
+                        text: "VARS"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 6
+                    }
+                    Token {
+                        type: Identifier
+                        text: "B$"
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 6
+                    }
+                    Token {
+                        type: =
+                        text: "="
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 6
+                    }
+                    Token {
+                        type: StringLiteral
+                        text: ""HELLO""
+                        svalue: "HELLO"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 6
+                    }
+                ]
+            }
+            name: B$
+            value: "HELLO"
+            asm: [
+            ]
+        }
+        PragmaStrVarStmt {
+            TokLine {
+                source_type: BASIC
+                src_line:
+                    SrcLine {
+                        text: "!VARS Z$ = """
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 7
+                    }
+                tokens: [
+                    Token {
+                        type: !
+                        text: "!"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 7
+                    }
+                    Token {
+                        type: Identifier
+                        keyword: VARS
+                        text: "VARS"
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 7
+                    }
+                    Token {
+                        type: Identifier
+                        text: "Z$"
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 7
+                    }
+                    Token {
+                        type: =
+                        text: "="
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 7
+                    }
+                    Token {
+                        type: StringLiteral
+                        text: """"
+                        svalue: ""
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_str.bas"
+                        line_num: 7
+                    }
+                ]
+            }
+            name: Z$
+            value: ""
+            asm: [
+                		ld a, 1
+                		ld b, 2
+                		add a, b
+                		ret
+            ]
+        }
+    ]
+}

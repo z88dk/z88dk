@@ -1,0 +1,349 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_vars_num_array.bas
+Input file:  t/input/20_parser_vars_num_array.bas
+Output file: t/input/20_parser_vars_num_array.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_vars_num_array.bas.i" "t/input/20_parser_vars_num_array.bas.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        PragmaNumVarArrayStmt {
+            TokLine {
+                source_type: BASIC
+                src_line:
+                    SrcLine {
+                        text: "!VARS A(10)=123"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                tokens: [
+                    Token {
+                        type: !
+                        text: "!"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: Identifier
+                        keyword: VARS
+                        text: "VARS"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: Identifier
+                        text: "A"
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: (
+                        text: "("
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: Integer
+                        text: "10"
+                        ivalue: 10
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: )
+                        text: ")"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: =
+                        text: "="
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                    Token {
+                        type: Integer
+                        text: "123"
+                        ivalue: 123
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 1
+                    }
+                ]
+            }
+            name: A
+            dimensions: [
+                10
+            ]
+            values: [
+                123.000000
+            ]
+        }
+        PragmaNumVarArrayStmt {
+            TokLine {
+                source_type: BASIC
+                src_line:
+                    SrcLine {
+                        text: "!VARS B(10)=123,4.56,78.9"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                tokens: [
+                    Token {
+                        type: !
+                        text: "!"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: Identifier
+                        keyword: VARS
+                        text: "VARS"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: Identifier
+                        text: "B"
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: (
+                        text: "("
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: Integer
+                        text: "10"
+                        ivalue: 10
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: )
+                        text: ")"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: =
+                        text: "="
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: Integer
+                        text: "123"
+                        ivalue: 123
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: Float
+                        text: "4.56"
+                        nvalue: 4.560000
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                    Token {
+                        type: Float
+                        text: "78.9"
+                        nvalue: 78.900000
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 2
+                    }
+                ]
+            }
+            name: B
+            dimensions: [
+                10
+            ]
+            values: [
+                123.000000
+                4.560000
+                78.900000
+            ]
+        }
+        PragmaNumVarArrayStmt {
+            TokLine {
+                source_type: BASIC
+                src_line:
+                    SrcLine {
+                        text: "!VARS C(2,3)= 	1.1,1.2,1.3, 	2.1,2.2,2.3"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                tokens: [
+                    Token {
+                        type: !
+                        text: "!"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Identifier
+                        keyword: VARS
+                        text: "VARS"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Identifier
+                        text: "C"
+                        ws_before: " "
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: (
+                        text: "("
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Integer
+                        text: "2"
+                        ivalue: 2
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Integer
+                        text: "3"
+                        ivalue: 3
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: )
+                        text: ")"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: =
+                        text: "="
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Float
+                        text: "1.1"
+                        nvalue: 1.100000
+                        ws_before: " 	"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Float
+                        text: "1.2"
+                        nvalue: 1.200000
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Float
+                        text: "1.3"
+                        nvalue: 1.300000
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Float
+                        text: "2.1"
+                        nvalue: 2.100000
+                        ws_before: " 	"
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Float
+                        text: "2.2"
+                        nvalue: 2.200000
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: ,
+                        text: ","
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                    Token {
+                        type: Float
+                        text: "2.3"
+                        nvalue: 2.300000
+                        filename: "t/input/20_parser_vars_num_array.bas"
+                        line_num: 3
+                    }
+                ]
+            }
+            name: C
+            dimensions: [
+                2
+                3
+            ]
+            values: [
+                1.100000
+                1.200000
+                1.300000
+                2.100000
+                2.200000
+                2.300000
+            ]
+        }
+    ]
+}

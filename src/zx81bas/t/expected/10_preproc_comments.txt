@@ -1,0 +1,20 @@
+% z88dk-zx81bas -d 1 t//input/10_preproc_comments.bas
+Input file:  t/input/10_preproc_comments.bas
+Output file: t/input/10_preproc_comments.p
+Contents of t/input/10_preproc_comments.bas.pp:
+#line 1 "t/input/10_preproc_comments.bas"
+line 1
+line 2 5.1 5.2
+
+
+
+line  6
+line  8
+
+
+line 10 
+
+
+
+
+

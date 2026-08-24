@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "dump_context.h"
+#include "errors.h"
 #include "lexer.h"
 #include "options.h"
 #include "preproc.h"
@@ -79,35 +80,25 @@ bool TokFile::tokenize(const std::vector<SrcLine>& src_lines) {
     bool ok = true;
 
     for (const auto& src_line : src_lines) {
+        if (match_ASM(src_line.text, src_line.filename, src_line.line_num)) {
+            source_type = SourceType::ASM;
+            continue;
+        }
+        else if (match_BASIC(src_line.text, src_line.filename, src_line.line_num)) {
+            source_type = SourceType::BASIC;
+            continue;
+        }
+
         TokLine tok_line;
+        tok_line.source_type = source_type;
         tok_line.src_line = src_line;
 
-        if (match_ASM(src_line.text)) {
-            if (!tokenize_line(src_line.text, SourceType::BASIC,
-                               src_line.filename, src_line.line_num,
-                               tok_line.tokens)) {
-                ok = false; // error already reported
-            }
-            tok_line.source_type = SourceType::BASIC;
-            source_type = SourceType::ASM;
+        if (!tokenize_line(src_line.text, source_type,
+                           src_line.filename, src_line.line_num,
+                           tok_line.tokens)) {
+            ok = false; // error already reported
         }
-        else if (match_BASIC(src_line.text)) {
-            if (!tokenize_line(src_line.text, SourceType::BASIC,
-                               src_line.filename, src_line.line_num,
-                               tok_line.tokens)) {
-                ok = false; // error already reported
-            }
-            tok_line.source_type = SourceType::BASIC;
-            source_type = SourceType::BASIC;
-        }
-        else {
-            if (!tokenize_line(src_line.text, source_type,
-                               src_line.filename, src_line.line_num,
-                               tok_line.tokens)) {
-                ok = false; // error already reported
-            }
-            tok_line.source_type = source_type;
-        }
+
 
         lines.push_back(std::move(tok_line));
     }
@@ -121,6 +112,5 @@ bool TokFile::tokenize(const std::vector<SrcLine>& src_lines) {
     }
 #endif
 
-
-    return ok;
+    return ok && get_error_count() == 0;
 }

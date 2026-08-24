@@ -1,0 +1,25 @@
+#DFILE = \
+	"LINE 1", \
+	"LINE 2", \
+	"LINE 3", \
+	"LINE 4", \
+	"LINE 5", \
+	"LINE 6", \
+	"LINE 7", \
+	"LINE 8", \
+	"LINE 9", \
+	"LINE 10", \
+	"LINE 11", \
+	"LINE 12", \
+	"LINE 13", \
+	"LINE 14", \
+	"LINE 15", \
+	"LINE 16", \
+	"LINE 17", \
+	"LINE 18", \
+	"LINE 19", \
+	"LINE 20", \
+	"LINE 21", \
+	"LINE 22", \
+	"LINE 23", \
+	"LINE 24"
