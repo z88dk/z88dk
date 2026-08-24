@@ -19,7 +19,7 @@ fgetc_cons:
 _fgetc_cons:
 
     ROMCALL
-    defw    KYREAD
+    defw    KY_KYREAD
 
 	;and	a
 	;jr	z,fgetc_cons
