@@ -1,6 +1,6 @@
 include ../make.config
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok ext8085.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
+all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok iy.ok ext8085.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
@@ -238,6 +238,48 @@ ixword.ok: ../../../src/zcc-multi/t/ixword.asm
 	  --variant=80cc-sp:../../../src/zcc-multi/t/ixword.asm
 	test `awk '/^_foo/ {print $$3}' ixword.tsv` = metric
 	test `awk '/^_foo/ {print $$6}' ixword.tsv` -eq 48
+	touch $@
+
+# IY matches IX. Pair copies must score, not fallback.
+# Z80 ld iy,hl = 25 T. ld iy,bc = 16 T. ld hl,(iy+d) = 38 T.
+# Rabbit ld iy,hl is native 4 T. Z180 ld iy,bc is push/pop 25 T.
+iy.ok: ../../../src/zcc-multi/t/iyld.asm ../../../src/zcc-multi/t/iyword.asm \
+	../../../src/zcc-multi/t/iybc.asm ../../../src/zcc-multi/t/nops.asm
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=iyld_stitch.asm --report=iyld.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/iyld.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/iyld.asm
+	test `awk '/^_foo/ {print $$3}' iyld.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' iyld.tsv` -eq 35
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=iyword_stitch.asm --report=iyword.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/iyword.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/iyword.asm
+	test `awk '/^_foo/ {print $$3}' iyword.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' iyword.tsv` -eq 48
+	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
+	  --output=iybc_stitch.asm --report=iybc.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/iybc.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/iybc.asm
+	test `awk '/^_foo/ {print $$3}' iybc.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' iybc.tsv` -eq 26
+	z88dk-zcc-multi --cpu=z80n --metric=ticks --data-variant=sccz80 \
+	  --output=iybc_z80n_stitch.asm --report=iybc_z80n.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/iybc.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/iybc.asm
+	test `awk '/^_foo/ {print $$6}' iybc_z80n.tsv` -eq 26
+	z88dk-zcc-multi --cpu=z180 --metric=ticks --data-variant=sccz80 \
+	  --output=iybc_z180_stitch.asm --report=iybc_z180.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/iybc.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/iybc.asm
+	test `awk '/^_foo/ {print $$3}' iybc_z180.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' iybc_z180.tsv` -eq 35
+	z88dk-zcc-multi --cpu=r2ka --metric=ticks --data-variant=sccz80 \
+	  --output=iyld_r2ka_stitch.asm --report=iyld_r2ka.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/nops.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/iyld.asm
+	test `awk '/^_foo/ {print $$3}' iyld_r2ka.tsv` = metric
+	test `awk '/^_foo/ {print $$7}' iyld_r2ka.tsv` -eq 14
 	touch $@
 
 # 8085 extended ops (Zilog) have documented T-states. Unknown would

@@ -429,6 +429,16 @@ static int rp_is_hl(const char *tok)
     return ident_eq(tok, "hl");
 }
 
+static int is_idx(const char *tok)
+{
+    return ident_eq(tok, "ix") || ident_eq(tok, "iy");
+}
+
+static int is_bd(const char *tok)
+{
+    return ident_eq(tok, "bc") || ident_eq(tok, "de");
+}
+
 static int rp_copy_ok(const char *a, const char *b)
 {
     /* z80asm synthetic: ld among bc/de/hl only. Two 8-bit loads. */
@@ -531,26 +541,66 @@ static int ticks_rp_shift(int cpu, const char *mnem, const char *rp)
     return 16; /* two CB register ops at 8 T each (z80 / z180 / z80n / gbz80) */
 }
 
+/*
+ * ld involving ix/iy as a whole register. Same rule as other synthetics:
+ * native time, else the z80asm expansion sum. IY matches IX.
+ *
+ * Rabbit ld hl,ix/iy and ld ix/iy,hl are native (FD/DD 7C / 7D) = 4 T.
+ * Z80/Z80N ld iy,bc is two prefixed 8-bit loads = 16 T. Z180 has no
+ * index halves, so push rp / pop iy = 25 T. ld iy,hl is push hl / pop iy
+ * = 25 T. ld ix,iy is push / pop of two index regs = 29 T.
+ */
+static int ticks_idx_copy(int cpu, const char *a, const char *b)
+{
+    int a_idx = is_idx(a);
+    int b_idx = is_idx(b);
+    int a_hl = rp_is_hl(a);
+    int b_hl = rp_is_hl(b);
+    int a_bd = is_bd(a);
+    int b_bd = is_bd(b);
+
+    if (!(a_idx || b_idx))
+        return -1;
+    if (!(a_idx || a_hl || a_bd) || !(b_idx || b_hl || b_bd))
+        return -1;
+    if (cpu_is_rabbit(cpu) && ((a_hl && b_idx) || (a_idx && b_hl)))
+        return 4;
+    if (a_idx && b_idx)
+        return 29;
+    if ((a_idx && b_hl) || (a_hl && b_idx))
+        return 25;
+    if ((a_idx && b_bd) || (a_bd && b_idx)) {
+        if (cpu == TICKS_CPU_Z80 || cpu == TICKS_CPU_Z80N)
+            return 16;
+        return 25;
+    }
+    return -1;
+}
+
 /* Word load/store mnemonics. Native when the chip has them, else two byte ops. */
 static int ticks_ld_word(int cpu, int ka, int kb, const char *a, const char *b)
 {
-    int hl_a = (ka == OP_RP && rp_is_hl(a)) || ka == OP_IX;
-    int hl_b = (kb == OP_RP && rp_is_hl(b)) || kb == OP_IX;
+    int hl_a = ka == OP_RP && rp_is_hl(a);
+    int hl_b = kb == OP_RP && rp_is_hl(b);
 
-    if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_IX) {
+    /* bc/de/hl through (ix+d)/(iy+d). ix/iy as the word is not this op. */
+    if (ka == OP_RP && kb == OP_MEM_IX) {
         if (cpu_is_rabbit(cpu) && hl_a)
             return 11;
         return 38; /* ld r,(ix+d) twice at 19 T */
     }
-    if (ka == OP_MEM_IX && (kb == OP_RP || kb == OP_IX)) {
+    if (ka == OP_MEM_IX && kb == OP_RP) {
         if (cpu_is_rabbit(cpu) && hl_b)
             return 11;
         return 38;
     }
-    if ((ka == OP_RP || ka == OP_IX) && kb == OP_MEM_HL)
+    if (ka == OP_RP && kb == OP_MEM_HL)
         return (cpu == TICKS_CPU_GBZ80) ? 32 : 26;
-    if (ka == OP_MEM_HL && (kb == OP_RP || kb == OP_IX))
+    if (ka == OP_MEM_HL && kb == OP_RP)
         return (cpu == TICKS_CPU_GBZ80) ? 32 : 26;
+    /* ld iy,(hl) / ld (hl),iy: push/pop + two (hl) byte ops. */
+    if ((ka == OP_IX && kb == OP_MEM_HL) || (ka == OP_MEM_HL && kb == OP_IX))
+        return 72;
     if (hl_a && kb == OP_MEM_RP)
         return 34; /* z80asm: ex de,hl / two (hl) / ex */
     if (ka == OP_MEM_RP && hl_b)
@@ -632,8 +682,13 @@ static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
         return 10;
     if (ka == OP_IR && kb == OP_R8)
         return 9;
+    if (ka == OP_IX || kb == OP_IX) {
+        int idx = ticks_idx_copy(cpu, a, b);
+        if (idx >= 0)
+            return idx;
+    }
 
-    /* Word via (ix+d) / (hl) / (de) / (sp+n). 80cc-fp emits ld rr,(ix+d). */
+    /* Word via (ix+d) / (iy+d) / (hl) / (de) / (sp+n). */
     {
         int t = ticks_ld_word(cpu, ka, kb, a, b);
         if (t >= 0)
