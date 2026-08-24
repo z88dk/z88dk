@@ -23,7 +23,7 @@ IF __IO_CF_8_BIT
 ; and bit 3 (DRQ, value = 0x08) sets.
 ; Or until bit 0 (ERR, value = 0x01) or bit 5 (WFT, value = 0x20) sets.
 ; If neither error bit is set, the device is ready right then.
-; Uses AF, DE
+; Uses AF
 ; return carry on success
 
 .ide_wait_ready

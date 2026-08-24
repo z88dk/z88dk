@@ -35,7 +35,6 @@ EXTERN ide_setup_lba
     ld a,__IDE_CMD_WRITE
     out (__IO_CF_IDE_COMMAND),a ;instruct drive to write a sector
 
-    call ide_wait_ready         ;make sure drive is ready to proceed
     call ide_wait_drq           ;wait until it wants the data
 
     ;Write a block of 512 bytes (one sector) from (HL++) to
@@ -57,11 +56,8 @@ ELSE
 
 ENDIF
 
-;   call ide_wait_ready
-;   ld a,__IDE_CMD_CACHE_FLUSH
-;   out (__IO_CF_IDE_COMMAND),a ;tell drive to flush its hardware cache
-
-    jp ide_wait_ready           ;wait until the write is complete
+    scf                         ;posted write; next command waits ready
+    ret
 
 ELSE
 
@@ -95,14 +91,10 @@ EXTERN ide_write_block
     ld de,__IO_PIO_IDE_COMMAND<<8|__IDE_CMD_WRITE
     call ide_write_byte_preset  ;instruct drive to write a sector
 
-    call ide_wait_ready         ;make sure drive is ready to proceed
     call ide_wait_drq           ;wait until it wants the data
     call ide_write_block        ;send the data to the drive from (HL++)
 
-;   call ide_wait_ready
-;   ld de, __IO_PIO_IDE_COMMAND<<8|__IDE_CMD_CACHE_FLUSH
-;   call ide_write_byte         ;tell drive to flush its hardware cache
-
-    jp ide_wait_ready           ;wait until the write is complete
+    scf                         ;posted write; next command waits ready
+    ret
 
 ENDIF

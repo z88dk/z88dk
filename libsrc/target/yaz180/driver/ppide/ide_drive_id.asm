@@ -39,8 +39,6 @@ ide_drive_id:
     ld e, __IDE_CMD_ID
     ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte     ;issue the command
-    call ide_wait_ready     ;make sure drive is ready to proceed
-    jr nc, error
     call ide_wait_drq       ;wait until it's got the data
     jr nc, error
     call ide_read_block     ;grab the data buffer in (HL++)

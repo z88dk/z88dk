@@ -35,7 +35,6 @@ EXTERN ide_setup_lba
     ld a,__IDE_CMD_READ
     out (__IO_CF_IDE_COMMAND),a ;ask the drive to read it
 
-    call ide_wait_ready         ;make sure drive is ready to proceed
     call ide_wait_drq           ;wait until it's got the data
 
     ;Read a block of 512 bytes (one sector) from the drive
@@ -92,7 +91,6 @@ EXTERN ide_read_block
     ld de,__IO_PIO_IDE_COMMAND<<8|__IDE_CMD_READ
     call ide_write_byte_preset  ;ask the drive to read it
 
-    call ide_wait_ready         ;make sure drive is ready to proceed
     call ide_wait_drq           ;wait until it's got the data
 
     call ide_read_block         ;grab the data into (HL++)
