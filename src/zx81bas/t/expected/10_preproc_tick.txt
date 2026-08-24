@@ -1,0 +1,27 @@
+% z88dk-zx81bas -d 1 t//input/10_preproc_tick.bas
+Input file:  t/input/10_preproc_tick.bas
+Output file: t/input/10_preproc_tick.p
+Contents of t/input/10_preproc_tick.bas.pp:
+#line 1 "t/input/10_preproc_tick.bas"
+line 1 
+line 2
+line 3
+line 4 has "af'" and af
+line 5 has single quoted '^X' text
+line 6 has single quoted '\'' text
+line 7 hex '\00' byte
+line 8 has ; asm comment
+!ASM
+line 10 has 
+line 11 has ' basic comment
+!ENDASM
+line 13 quote "inside ' string"
+line 14 escaped quote "inside \" string '"
+line 15 escaped quote "inside \" string \'"
+!ASM
+!AUTOSTART=1
+!AUTOSTART_LINE=10
+!INCREMENT=10
+!FAST=0
+!VERBOSE=1
+!ENDASM
