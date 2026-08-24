@@ -102,7 +102,7 @@ coverage:
 	gcov $(DEBUG_DIR)/*.gcno | perl tools/parse_gcov.pl | tee tools/coverage.txt
 
 CLEAN_PATTERNS = *.o *.gcov *.exe *.orig *.core *.bak *.new *~ *.pp *.i *.p
-CLEAN_DIRS = . t t/* 
+CLEAN_DIRS = . t t/* test
 CLEAN_FILES = \
   $(foreach d,$(CLEAN_DIRS), \
     $(foreach p,$(CLEAN_PATTERNS), \

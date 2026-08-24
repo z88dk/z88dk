@@ -1,0 +1,43 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_dfile.bas
+Input file:  t/input/20_parser_dfile.bas
+Output file: t/input/20_parser_dfile.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_dfile.bas.i" "t/input/20_parser_dfile.bas.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+        "LINE 1"
+        "LINE 2"
+        "LINE 3"
+        "LINE 4"
+        "LINE 5"
+        "LINE 6"
+        "LINE 7"
+        "LINE 8"
+        "LINE 9"
+        "LINE 10"
+        "LINE 11"
+        "LINE 12"
+        "LINE 13"
+        "LINE 14"
+        "LINE 15"
+        "LINE 16"
+        "LINE 17"
+        "LINE 18"
+        "LINE 19"
+        "LINE 20"
+        "LINE 21"
+        "LINE 22"
+        "LINE 23"
+        "LINE 24"
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+    ]
+}
