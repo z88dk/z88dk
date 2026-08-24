@@ -1,13 +1,14 @@
 # zx81bas - create a .p file from a zx81 BASIC and assembly program
 
 Compiles a zx81 BASIC program that has in-line assembly between '#ASM' 
-and '#BASIC'. The assembly code is pushed to z80asm for final assembly 
+and '#ENDASM'. The assembly code is pushed to z80asm for final assembly 
 and .p file creation. The .p is a tape image of a zx81 program than can 
-be run in emulators, e.g. EightyOne.
+be run in emulators, e.g. EightyOne. A symbol file is also created 
+to be loaded in EightyOne to help debugging.
 
 ## Compilation
 
-First the pragmas #PRAGMA are applied. Then the source file is sent 
+First the pragmas #<pragma> are applied. Then the source file is sent 
 to the C preprocessor, to handle macros, file includes and continuation
 lines ending with '\\'. Then the BASIC blocks are processed and translated
 into assembly DEFB and DEFW instructions. Finally the source composed by 
@@ -43,7 +44,7 @@ The following pragma keywords are accepted:
 
 - #VARS u$ = "123": define a string variable.
 
-- #VARS z$ = "" <newline> #ASM <newline> ... <newline> #BASIC <newline>: define 
+- #VARS z$ = "" <newline> #ASM <newline> ... <newline> #ENDASM <newline>: define 
   assembly code inside a BASIC variable.
 
 - #VARS a(2,3) = 11,12,13, 21,22,23: define a number array.
@@ -61,9 +62,9 @@ The following pragma keywords are accepted:
   of the compiled program, like SLOW/FAST mode, the various memory pointers
   e.g. DFILE, VARS, ...
 
-- #BASIC: following lines are interpreted as BASIC.
-
 - #ASM: following lines are interpreted as assembly.
+
+- #ENDASM: following lines are interpreted as BASIC.
 
 ## Labels
 
@@ -71,135 +72,65 @@ Line numbers in the BASIC code are optional. Any line can have a label
 '@' LABEL ':'. Label names are refered as '@' LABEL, e.g. 'GOTO @LABEL'.
 Label addresses are refered to as '&' LABEL, e.g. 'RAND USR &LABEL+5'.
 
+Assembly labels can also be defined in ASM 'label:' and used in 
+BASIC 'RAND USR &label'.
+
 Lines without numbers are auto-numbered according to #INCREMENT. The compiler
 checks if line numbers get too large (> 0x3FFF) or if a auto-numbered
 line number is larger than the next numbered line.
 
 ## Assembly
 
-Any block between #ASM and #BASIC is interpreted as assembly code. The code
+Any block between #ASM and #ENDASM is interpreted as assembly code. The code
 is compiled at the end of the previous BASIC line REM, or to the end 
 of the previous #VARS s$ = "" string variable. If there is no such previous 
 line, or the previous line is not REM, a new REM line is introduced.
 
 Assembly code can refer to @LABEL or &LABEL of labels defined in BASIC.
 
-Assembly code can define special '@' LABELs, e.g. '@LABEL:', whose BASIC 
-line number and address are exported to the BASIC code as @LABEL and &LABEL. 
-Normal labels 'label:' and '.label' are only defined inside the assembly code.
-
-The address of a BASIC variable is available as '&' VAR, e.g. 'RAND USR &z$'.
-
 ## BASIC
 
 Multiple statements can be written in one line separated by ':'.
 
-Hexadecimal numbers may be entered as 0xhh.
-
 Long lines can be split with backslash '\\' following on the next line.
 
-### Extended BASIC
+Hexadecimal numbers may be entered as 0xhh.
 
-- LET is optional.
+LET is optional.
 
-- IF condition THEN
-    true_statements
-  ELSE
-    false_statements
-  ENDIF
-  -->
-  IF NOT condition THEN GOTO @false
-  true_statements
-  GOTO @end
-  @false:
-  false_statements
-  @end:
+IF has ELSE in same line or IF/ELSE/ENDIF in multiple lines.
 
-- REPEAT
-    statements
-	IF condition1 THEN EXIT
-    statements
-  UNTIL condition2
-  -->
-  @start:
-  statements
-  IF condition1 THEN GOTO @end
-  statements
-  IF NOT condition2 THEN GOTO @start
-  @end:
-  
-- WHILE condition1
-    statements
-	IF condition2 THEN EXIT
-    statements
-  WEND
-  -->
-  @start:
-  IF NOT condition1 THEN GOTO @end
-  statements
-  IF condition2 THEN GOTO @end
-  statements
-  GOTO @start
-  @end:
+REPEAT / UNTIL condition and WHILE condition / WEND can be used for loops
+without GOTO labels. Inside REPEAT and WHILE loops EXIT can be used to jump 
+out of the loop.
 
-- EXIT
-  -->
-  GOTO @end
-  
-- END
-  -->
-  GOTO @end_of_basic
+END calls GOTO to a line after the end of the program. Different from STOP
+in that it cannot be CONTinued.
 
-- DEF PROCname(A, B)
-    LOCAL L
-	L = A+B
-	IF A=2 THEN EXIT
-	PRINT L
-	PROCname = L
-  ENDPROC
-  PROCname(10, 20)
-  LET A = 1 + PROCname(30, 40)
-  -->
-  LET PROCname_A = 10
-  LET PROCname_B = 20
-  GOSUB @PROC_name
-  LET PROCname_A = 30
-  LET PROCname_B = 40
-  GOSUB @PROC_name
-  LET A = 1 + PROCname
-  ...
-  STOP
-  @PROC_name:
-  LET PROCname_L = PROCname_A + PROCname_B
-  IF A=2 THEN RETURN
-  PRINT PROCname_L
-  LET PROCname = PROCname_L
-  RETURN
+Procedures with arguments, local variables and return value can be created.
+DEF PROCname(A,B) starts the procedure definition, ENDPROC ends it. 
+Assignment to PROCname defines the return value to be used in the 
+expression where the procedure is called. LOCAL A,B defines local variables.
+EXIT returns from the procedure. A procedure is called either as a statement 
+PROCname a,b or as an expression LET A=PROCname(a,b). Procedure arguments, 
+local variables and return value are defined as variables PROCnameArg that 
+are automatically assigned when calling the procedure, and calling and 
+returning is a GOSUB/RETURN. Recursion is not possible.
 
-- DEF FNname(A,B)=A+B
-  PRINT 1,FNname(10,20),2
-  -->
-  LET FNname_A = 10
-  LET FNname_B = 20
-  LET FNname = FNname_A + FNname_B
-  PRINT 1,FNname,2
+Functions with arguments can be created. A function definition is 
+DEF FNname(A,B) = expression. The expression is placed at the point of call
+after assigning the local variables FNnameA and FNnameB with the arguments.
 
-- PEEKW(X)
-  -->
-  PEEK(X)+256\*PEEK(X+1)
+PEEKW(X) is a shortcut for PEEK(X)+256\*PEEK(X+1).
 
-- POKEW(ADDR,X)
-  -->
-  POKE ADDR, X-256\*INT(X/256)
-  POKE ADDR+1, INT(X/256)
+POKEW(A,X) is a shortcut for POKE A,X-256\*INT(X/256):POKE A+1,INT(X/256).
 
-- DIV(A,B), A \\ B
-  -->
-  INT(A/B)
+DIV(A,B) and A\\B are shortcuts for INT(A/B).
 
-- MOD(A,B)
-  -->
-  A-B\*INT(A/B)
+MOD(A,B) is a shortcut for A-B\*INT(A/B).
+
+All BASIC extended features are lowered to standard zx81 BASIC instructions
+before compilation.
 
 ## Character set
 
@@ -220,11 +151,21 @@ The sequences recognized by t2p.exe (documentation in docs) are accepted:
 
 - Hexadecimal code: "\hh"
 
+- "%X" : encodes character X in inverted mode (i.e. +0x80).
+
 These additional sequences are also accepted:
 
-- "^X" : encodes character X in inverted mode.
+- "\r", "\n", "\v", "\f": encoded as newline (0x76).
 
-- "\r", "\n": encoded as newline (0x76).
+- "\t": encoded as space (0x00).
+
+- Block graphics can be written as ASCII art, where '.' is a blank, '#' is a 
+  black dot and '+' and 'x' are grayed blocks (even or odd). Example:
+
+    PRINT "{{######
+	         #....#}}"
+    PRINT "{{######
+	         xxxxxx}}"
 
 ## References
 

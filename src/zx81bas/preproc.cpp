@@ -105,17 +105,18 @@ static bool match_directive(const std::string& text, size_t& pos,
 static bool match_basic_pragma(const std::string& text, size_t& pos) {
     std::string keyword;
     if (match_hash_ident(text, pos, keyword)) {
-        if (keyword == "AUTOSTART" ||
+        if (keyword == "ASM" ||
+                keyword == "ENDASM" ||
+                keyword == "AUTOSTART" ||
                 keyword == "AUTOSTART_LINE" ||
                 keyword == "INCREMENT" ||
+                keyword == "REMINVERT" ||
                 keyword == "FAST" ||
                 keyword == "VERBOSE" ||
                 keyword == "VARS" ||
                 keyword == "DFILE" ||
                 keyword == "DFILE_COLAPSED" ||
-                keyword == "SYSVARS" ||
-                keyword == "ASM" ||
-                keyword == "BASIC") {
+                keyword == "SYSVARS") {
             return true;
         }
     }
@@ -142,7 +143,9 @@ static bool match_cpp_directive(const std::string& text, size_t& pos) {
 }
 
 static bool match_include(const std::string& text, size_t& pos,
-                          std::string& out_filename) {
+                          std::string& out_filename,
+                          bool& out_error) {
+    out_error = false;
     pos = 0;
     if (match_directive(text, pos, "include")) {
         if (match_quoted_filename(text, pos, out_filename)) {
@@ -150,6 +153,7 @@ static bool match_include(const std::string& text, size_t& pos,
             skip_whitespace(text, pos);
             if (pos < text.size()) {
                 error("Unexpected text after #include: " + text.substr(pos));
+                out_error = true;
             }
             return true;
         }
@@ -430,7 +434,7 @@ static void remove_comments(std::vector<SrcLine>& src_lines) {
             in_basic = false;
             this_line_basic = true;
         }
-        else if (match_directive(text, col, "BASIC")) {
+        else if (match_directive(text, col, "ENDASM")) {
             in_basic = true;
             this_line_basic = true;
         }
@@ -495,7 +499,12 @@ static bool process_file(const std::string& input_file,
         // check for #include "filename"
         std::string include_filename;
         size_t pos = 0;
-        if (match_include(src_line.text, pos, include_filename)) {
+        bool error = false;
+        if (match_include(src_line.text, pos, include_filename, error)) {
+            if (error) {
+                files_in_progress.erase(input_file);
+                return false;
+            }
             if (!process_file(include_filename, outfile, files_in_progress)) {
                 files_in_progress.erase(input_file);
                 return false;
@@ -606,12 +615,19 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
     return get_error_count() == 0;
 }
 
-bool match_ASM(const std::string& text) {
+static bool match_mode_change(const std::string& text,
+                              const std::string& find_keyword,
+                              const std::string& filename, int line_num) {
     size_t pos = 0;
     if (match_char(text, pos, '!')) {
         std::string keyword;
         if (match_ident(text, pos, keyword)) {
-            if (keyword == "ASM") {
+            if (keyword == find_keyword) {
+                skip_whitespace(text, pos);
+                if (pos < text.size()) {
+                    error(filename, line_num,
+                          "end of line expected, found '" + text.substr(pos) + "'");
+                }
                 return true;
             }
         }
@@ -619,15 +635,12 @@ bool match_ASM(const std::string& text) {
     return false;
 }
 
-bool match_BASIC(const std::string& text) {
-    size_t pos = 0;
-    if (match_char(text, pos, '!')) {
-        std::string keyword;
-        if (match_ident(text, pos, keyword)) {
-            if (keyword == "BASIC") {
-                return true;
-            }
-        }
-    }
-    return false;
+bool match_ASM(const std::string& text, const std::string& filename,
+               int line_num) {
+    return match_mode_change(text, "ASM", filename, line_num);
+}
+
+bool match_BASIC(const std::string& text, const std::string& filename,
+                 int line_num) {
+    return match_mode_change(text, "ENDASM", filename, line_num);
 }

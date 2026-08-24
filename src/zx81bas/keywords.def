@@ -5,6 +5,8 @@
 //-----------------------------------------------------------------------------
 
 // pragmas
+X("ASM", ASM)
+X("ENDASM", ENDASM)
 X("AUTOSTART", AUTOSTART)
 X("AUTOSTART_LINE", AUTOSTART_LINE)
 X("INCREMENT", INCREMENT)
@@ -15,8 +17,6 @@ X("VARS", VARS)
 X("DFILE", DFILE)
 X("DFILE_COLAPSED", DFILE_COLAPSED)
 X("SYSVARS", SYSVARS)
-X("ASM", ASM)
-X("BASIC", BASIC)
 
 // zx81 keywords
 X("RND", RND)

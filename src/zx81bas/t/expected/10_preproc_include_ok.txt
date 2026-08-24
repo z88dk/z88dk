@@ -1,0 +1,23 @@
+% z88dk-zx81bas -d 2 t//input/10_preproc_include_ok.bas
+Input file:  t/input/10_preproc_include_ok.bas
+Output file: t/input/10_preproc_include_ok.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/10_preproc_include_ok.bas.i" "t/input/10_preproc_include_ok.bas.pp"
+Contents of t/input/10_preproc_include_ok.bas.i:
+
+# 1 "t/input/10_preproc_include_ok.bas.pp"
+
+# 1 "t/input/10_preproc_include_ok.bas"
+
+
+# 1 "t/input/10_preproc_include_ok.inc"
+
+
+
+!ASM
+zero EQU 0
+ex af, af
+defm "ex af, af'"
+!ENDASM
+# 3 "t/input/10_preproc_include_ok.bas"
+!VERBOSE =  1 
+!DFILE_COLAPSED =  0 

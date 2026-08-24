@@ -1,8 +1,0 @@
-% z88dk-zx81bas -d 1 t//input/10_preproc_03.bas
-Input file:  t/input/10_preproc_03.bas
-Output file: t/input/10_preproc_03.p
-Contents of t/input/10_preproc_03.bas.pp:
-#line 1 "t/input/10_preproc_03.bas"
-"string/*with comment"
-string "not ended
-"\"" comment after  

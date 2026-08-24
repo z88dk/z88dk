@@ -1,0 +1,48 @@
+% z88dk-zx81bas -d 4 t//input/15_lexer_error.bas
+Input file:  t/input/15_lexer_error.bas
+Output file: t/input/15_lexer_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/15_lexer_error.bas.i" "t/input/15_lexer_error.bas.pp"
+t/input/15_lexer_error.bas:2: error: Unknown ZX81 encoding: "'""
+t/input/15_lexer_error.bas:4: error: Unknown ZX81 encoding: "'""
+t/input/15_lexer_error.bas:5: error: end of line expected, found 'extra'
+t/input/15_lexer_error.bas:6: error: end of line expected, found 'extra'
+Tokenized input:
+TokFile {
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	defm "'""
+                filename: "t/input/15_lexer_error.bas"
+                line_num: 2
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "defm"
+                ws_before: "	"
+                filename: "t/input/15_lexer_error.bas"
+                line_num: 2
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	PRINT "'""
+                filename: "t/input/15_lexer_error.bas"
+                line_num: 4
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: PRINT
+                text: "PRINT"
+                ws_before: "	"
+                filename: "t/input/15_lexer_error.bas"
+                line_num: 4
+            }
+        ]
+    }
+}

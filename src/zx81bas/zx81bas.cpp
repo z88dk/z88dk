@@ -5,14 +5,18 @@
 //-----------------------------------------------------------------------------
 
 #include "../config.h"
+#include "ast_stmt.h"
 #include "errors.h"
 #include "lexer.h"
 #include "options.h"
+#include "parser.h"
 #include "preproc.h"
 #include "utils.h"
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -142,6 +146,12 @@ int main(int argc, char* argv[]) {
     TokFile tok_file;
     if (!tok_file.tokenize(src_lines)) {
         return EXIT_FAILURE;    // error already reported
+    }
+
+    // parse the BASIC program
+    std::unique_ptr<Prog> prog;
+    if (!parse_basic_program(tok_file, prog)) {
+        return EXIT_FAILURE;
     }
 
     // --- COMPLETE HERE ---

@@ -1,0 +1,10 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_fast_error.bas
+Input file:  t/input/20_parser_fast_error.bas
+Output file: t/input/20_parser_fast_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_fast_error.bas.i" "t/input/20_parser_fast_error.bas.pp"
+t/input/20_parser_fast_error.bas:1: error: unrecognized pragma statement 'NOT_FAST'
+t/input/20_parser_fast_error.bas:2: error: expected '=', found end of line
+t/input/20_parser_fast_error.bas:3: error: expected '=', found '10'
+t/input/20_parser_fast_error.bas:4: error: expected 'Integer', found end of line
+t/input/20_parser_fast_error.bas:5: error: expected end of statement, found 'extra'
+Parsing failed with errors.

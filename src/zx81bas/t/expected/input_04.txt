@@ -5,39 +5,6 @@ Output file: test_t_input_04_t.p
 Tokenized input:
 TokFile {
     TokLine {
-        source_type: BASIC
-        src_line:
-            SrcLine {
-                text: "!ASM"
-                filename: "test_t_input_04_t.bas"
-                line_num: 5
-            }
-        tokens: [
-            Token {
-                type: !
-                keyword: Unknown
-                text: "!"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
-                ws_before: ""
-                filename: "test_t_input_04_t.bas"
-                line_num: 5
-            }
-            Token {
-                type: Identifier
-                keyword: ASM
-                text: "ASM"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
-                ws_before: ""
-                filename: "test_t_input_04_t.bas"
-                line_num: 5
-            }
-        ]
-    }
-    TokLine {
         source_type: ASM
         src_line:
             SrcLine {
@@ -48,46 +15,248 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                keyword: Unknown
                 text: "ex"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
                 ws_before: "		"
                 filename: "test_t_input_04_t.bas"
                 line_num: 6
             }
             Token {
                 type: Identifier
-                keyword: Unknown
                 text: "af"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
                 ws_before: " "
                 filename: "test_t_input_04_t.bas"
                 line_num: 6
             }
             Token {
                 type: ,
-                keyword: Unknown
                 text: ","
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
-                ws_before: ""
                 filename: "test_t_input_04_t.bas"
                 line_num: 6
             }
             Token {
                 type: Identifier
-                keyword: Unknown
                 text: "af"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
                 ws_before: " "
                 filename: "test_t_input_04_t.bas"
+                line_num: 6
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		ret"
+                filename: "test_t_input_04_t.bas"
+                line_num: 10
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "ret"
+                ws_before: "		"
+                filename: "test_t_input_04_t.bas"
+                line_num: 10
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "10"
+                filename: "test_t_input_04_t.bas"
+                line_num: 23
+            }
+        tokens: [
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                filename: "test_t_input_04_t.bas"
+                line_num: 23
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	@start10:"
+                filename: "test_t_input_04_t.bas"
+                line_num: 24
+            }
+        tokens: [
+            Token {
+                type: @
+                text: "@"
+                ws_before: "	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 24
+            }
+            Token {
+                type: Identifier
+                text: "start10"
+                filename: "test_t_input_04_t.bas"
+                line_num: 24
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 24
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "11 	@start11:"
+                filename: "test_t_input_04_t.bas"
+                line_num: 25
+            }
+        tokens: [
+            Token {
+                type: Integer
+                text: "11"
+                ivalue: 11
+                filename: "test_t_input_04_t.bas"
+                line_num: 25
+            }
+            Token {
+                type: @
+                text: "@"
+                ws_before: " 	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 25
+            }
+            Token {
+                type: Identifier
+                text: "start11"
+                filename: "test_t_input_04_t.bas"
+                line_num: 25
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 25
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	@start12: 	12"
+                filename: "test_t_input_04_t.bas"
+                line_num: 26
+            }
+        tokens: [
+            Token {
+                type: @
+                text: "@"
+                ws_before: "	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 26
+            }
+            Token {
+                type: Identifier
+                text: "start12"
+                filename: "test_t_input_04_t.bas"
+                line_num: 26
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 26
+            }
+            Token {
+                type: Integer
+                text: "12"
+                ivalue: 12
+                ws_before: " 	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 26
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!AUTOSTART =  1 "
+                filename: "t/input/pragmas.inc"
+                line_num: 5
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 5
+            }
+            Token {
+                type: Identifier
+                keyword: AUTOSTART
+                text: "AUTOSTART"
+                filename: "t/input/pragmas.inc"
+                line_num: 5
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 5
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "  "
+                filename: "t/input/pragmas.inc"
+                line_num: 5
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!AUTOSTART_LINE = 10"
+                filename: "t/input/pragmas.inc"
+                line_num: 6
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 6
+            }
+            Token {
+                type: Identifier
+                keyword: AUTOSTART_LINE
+                text: "AUTOSTART_LINE"
+                filename: "t/input/pragmas.inc"
+                line_num: 6
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 6
+            }
+            Token {
+                type: Integer
+                text: "10"
+                ivalue: 10
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
                 line_num: 6
             }
         ]
@@ -96,32 +265,3058 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
-                text: "!BASIC"
-                filename: "test_t_input_04_t.bas"
+                text: "!INCREMENT = 2"
+                filename: "t/input/pragmas.inc"
                 line_num: 7
             }
         tokens: [
             Token {
                 type: !
-                keyword: Unknown
                 text: "!"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
-                ws_before: ""
-                filename: "test_t_input_04_t.bas"
+                filename: "t/input/pragmas.inc"
                 line_num: 7
             }
             Token {
                 type: Identifier
-                keyword: BASIC
-                text: "BASIC"
-                svalue: ""
-                ivalue: 0
-                nvalue: 0.000000
-                ws_before: ""
-                filename: "test_t_input_04_t.bas"
+                keyword: INCREMENT
+                text: "INCREMENT"
+                filename: "t/input/pragmas.inc"
                 line_num: 7
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 7
+            }
+            Token {
+                type: Integer
+                text: "2"
+                ivalue: 2
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 7
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!REMINVERT =  0 "
+                filename: "t/input/pragmas.inc"
+                line_num: 8
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 8
+            }
+            Token {
+                type: Identifier
+                keyword: REMINVERT
+                text: "REMINVERT"
+                filename: "t/input/pragmas.inc"
+                line_num: 8
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 8
+            }
+            Token {
+                type: Integer
+                text: "0"
+                ivalue: 0
+                ws_before: "  "
+                filename: "t/input/pragmas.inc"
+                line_num: 8
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!FAST =  0 "
+                filename: "t/input/pragmas.inc"
+                line_num: 9
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 9
+            }
+            Token {
+                type: Identifier
+                keyword: FAST
+                text: "FAST"
+                filename: "t/input/pragmas.inc"
+                line_num: 9
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 9
+            }
+            Token {
+                type: Integer
+                text: "0"
+                ivalue: 0
+                ws_before: "  "
+                filename: "t/input/pragmas.inc"
+                line_num: 9
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!VERBOSE =  1 "
+                filename: "t/input/pragmas.inc"
+                line_num: 10
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 10
+            }
+            Token {
+                type: Identifier
+                keyword: VERBOSE
+                text: "VERBOSE"
+                filename: "t/input/pragmas.inc"
+                line_num: 10
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 10
+            }
+            Token {
+                type: Integer
+                text: "1"
+                ivalue: 1
+                ws_before: "  "
+                filename: "t/input/pragmas.inc"
+                line_num: 10
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!VARS A=1.23"
+                filename: "t/input/pragmas.inc"
+                line_num: 11
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 11
+            }
+            Token {
+                type: Identifier
+                keyword: VARS
+                text: "VARS"
+                filename: "t/input/pragmas.inc"
+                line_num: 11
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 11
+            }
+            Token {
+                type: =
+                text: "="
+                filename: "t/input/pragmas.inc"
+                line_num: 11
+            }
+            Token {
+                type: Float
+                text: "1.23"
+                nvalue: 1.230000
+                filename: "t/input/pragmas.inc"
+                line_num: 11
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!VARS A(2,3)= 	1.1,1.2,1.3, 	2.1,2.2,2.3"
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Identifier
+                keyword: VARS
+                text: "VARS"
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: (
+                text: "("
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Integer
+                text: "2"
+                ivalue: 2
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Integer
+                text: "3"
+                ivalue: 3
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: )
+                text: ")"
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: =
+                text: "="
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Float
+                text: "1.1"
+                nvalue: 1.100000
+                ws_before: " 	"
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Float
+                text: "1.2"
+                nvalue: 1.200000
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Float
+                text: "1.3"
+                nvalue: 1.300000
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Float
+                text: "2.1"
+                nvalue: 2.100000
+                ws_before: " 	"
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Float
+                text: "2.2"
+                nvalue: 2.200000
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+            Token {
+                type: Float
+                text: "2.3"
+                nvalue: 2.300000
+                filename: "t/input/pragmas.inc"
+                line_num: 12
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!VARS A$ = "HELLO""
+                filename: "t/input/pragmas.inc"
+                line_num: 15
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 15
+            }
+            Token {
+                type: Identifier
+                keyword: VARS
+                text: "VARS"
+                filename: "t/input/pragmas.inc"
+                line_num: 15
+            }
+            Token {
+                type: Identifier
+                text: "A$"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 15
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 15
+            }
+            Token {
+                type: StringLiteral
+                text: ""HELLO""
+                svalue: "HELLO"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 15
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!VARS Z$ = """
+                filename: "t/input/pragmas.inc"
+                line_num: 16
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 16
+            }
+            Token {
+                type: Identifier
+                keyword: VARS
+                text: "VARS"
+                filename: "t/input/pragmas.inc"
+                line_num: 16
+            }
+            Token {
+                type: Identifier
+                text: "Z$"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 16
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 16
+            }
+            Token {
+                type: StringLiteral
+                text: """"
+                svalue: ""
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 16
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "z_code:	ld a, b"
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "z_code"
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+            Token {
+                type: Identifier
+                text: "ld"
+                ws_before: "	"
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+            Token {
+                type: Identifier
+                text: "a"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+            Token {
+                type: Identifier
+                text: "b"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 18
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		add a, c"
+                filename: "t/input/pragmas.inc"
+                line_num: 19
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "add"
+                ws_before: "		"
+                filename: "t/input/pragmas.inc"
+                line_num: 19
+            }
+            Token {
+                type: Identifier
+                text: "a"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 19
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 19
+            }
+            Token {
+                type: Identifier
+                text: "c"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 19
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		ld c, a"
+                filename: "t/input/pragmas.inc"
+                line_num: 20
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "ld"
+                ws_before: "		"
+                filename: "t/input/pragmas.inc"
+                line_num: 20
+            }
+            Token {
+                type: Identifier
+                text: "c"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 20
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 20
+            }
+            Token {
+                type: Identifier
+                text: "a"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 20
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		ld a, 0"
+                filename: "t/input/pragmas.inc"
+                line_num: 21
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "ld"
+                ws_before: "		"
+                filename: "t/input/pragmas.inc"
+                line_num: 21
+            }
+            Token {
+                type: Identifier
+                text: "a"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 21
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 21
+            }
+            Token {
+                type: Integer
+                text: "0"
+                ivalue: 0
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 21
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		adc a, 0"
+                filename: "t/input/pragmas.inc"
+                line_num: 22
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "adc"
+                ws_before: "		"
+                filename: "t/input/pragmas.inc"
+                line_num: 22
+            }
+            Token {
+                type: Identifier
+                text: "a"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 22
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 22
+            }
+            Token {
+                type: Integer
+                text: "0"
+                ivalue: 0
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 22
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		return"
+                filename: "t/input/pragmas.inc"
+                line_num: 23
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: RETURN
+                text: "return"
+                ws_before: "		"
+                filename: "t/input/pragmas.inc"
+                line_num: 23
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!VARS B$(2,3,3)= 	"1.1","1.2","1.3", 	"2.1","2.2","2.3""
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: Identifier
+                keyword: VARS
+                text: "VARS"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: Identifier
+                text: "B$"
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: (
+                text: "("
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: Integer
+                text: "2"
+                ivalue: 2
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: Integer
+                text: "3"
+                ivalue: 3
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: Integer
+                text: "3"
+                ivalue: 3
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: )
+                text: ")"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: =
+                text: "="
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: StringLiteral
+                text: ""1.1""
+                svalue: "1.1"
+                ws_before: " 	"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: StringLiteral
+                text: ""1.2""
+                svalue: "1.2"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: StringLiteral
+                text: ""1.3""
+                svalue: "1.3"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: StringLiteral
+                text: ""2.1""
+                svalue: "2.1"
+                ws_before: " 	"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: StringLiteral
+                text: ""2.2""
+                svalue: "2.2"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+            Token {
+                type: StringLiteral
+                text: ""2.3""
+                svalue: "2.3"
+                filename: "t/input/pragmas.inc"
+                line_num: 25
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!DFILE =  	"LINE 1",  	"LINE 2",  	"LINE 3",  	"LINE 4",  	"LINE 5",  	"LINE 6",  	"LINE 7",  	"LINE 8",  	"LINE 9",  	"LINE 10",  	"LINE 11",  	"LINE 12",  	"LINE 13",  	"LINE 14",  	"LINE 15",  	"LINE 16",  	"LINE 17",  	"LINE 18",  	"LINE 19",  	"LINE 20",  	"LINE 21",  	"LINE 22",  	"LINE 23",  	"LINE 24""
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: Identifier
+                keyword: DFILE
+                text: "DFILE"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 1""
+                svalue: "LINE 1"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 2""
+                svalue: "LINE 2"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 3""
+                svalue: "LINE 3"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 4""
+                svalue: "LINE 4"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 5""
+                svalue: "LINE 5"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 6""
+                svalue: "LINE 6"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 7""
+                svalue: "LINE 7"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 8""
+                svalue: "LINE 8"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 9""
+                svalue: "LINE 9"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 10""
+                svalue: "LINE 10"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 11""
+                svalue: "LINE 11"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 12""
+                svalue: "LINE 12"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 13""
+                svalue: "LINE 13"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 14""
+                svalue: "LINE 14"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 15""
+                svalue: "LINE 15"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 16""
+                svalue: "LINE 16"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 17""
+                svalue: "LINE 17"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 18""
+                svalue: "LINE 18"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 19""
+                svalue: "LINE 19"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 20""
+                svalue: "LINE 20"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 21""
+                svalue: "LINE 21"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 22""
+                svalue: "LINE 22"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 23""
+                svalue: "LINE 23"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+            Token {
+                type: StringLiteral
+                text: ""LINE 24""
+                svalue: "LINE 24"
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 28
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!DFILE_COLAPSED =  0 "
+                filename: "t/input/pragmas.inc"
+                line_num: 53
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 53
+            }
+            Token {
+                type: Identifier
+                keyword: DFILE_COLAPSED
+                text: "DFILE_COLAPSED"
+                filename: "t/input/pragmas.inc"
+                line_num: 53
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 53
+            }
+            Token {
+                type: Integer
+                text: "0"
+                ivalue: 0
+                ws_before: "  "
+                filename: "t/input/pragmas.inc"
+                line_num: 53
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "!SYSVARS =  	0x00,0x00,0x00,0x74,0x00,0x75,0x00,0x8d,0x03,0x00,0x00,0x8e,0x03,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x54,0x00,0xff,0x02,0x00,0x00,0xff,0xff,0x00,0x37,  	0x74,0x00,0x00,0x00,0x00,0x00,0x00,0x8d,0x0c,0x00,0x00,0x2f,0xfd,0x00,0x00,0xf7,  	0x21,0x18,0x40,0x00,0x00,0x09,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+        tokens: [
+            Token {
+                type: !
+                text: "!"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Identifier
+                keyword: SYSVARS
+                text: "SYSVARS"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x74"
+                ivalue: 116
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x75"
+                ivalue: 117
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x8d"
+                ivalue: 141
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x03"
+                ivalue: 3
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x8e"
+                ivalue: 142
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x03"
+                ivalue: 3
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x54"
+                ivalue: 84
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0xff"
+                ivalue: 255
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x02"
+                ivalue: 2
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0xff"
+                ivalue: 255
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0xff"
+                ivalue: 255
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x37"
+                ivalue: 55
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x74"
+                ivalue: 116
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x8d"
+                ivalue: 141
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x0c"
+                ivalue: 12
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x2f"
+                ivalue: 47
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0xfd"
+                ivalue: 253
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0xf7"
+                ivalue: 247
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x21"
+                ivalue: 33
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x18"
+                ivalue: 24
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x40"
+                ivalue: 64
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x09"
+                ivalue: 9
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x40"
+                ivalue: 64
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                ws_before: "  	"
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: ,
+                text: ","
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+            Token {
+                type: Integer
+                text: "0x00"
+                ivalue: 0
+                filename: "t/input/pragmas.inc"
+                line_num: 54
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "20 				REM 20"
+                filename: "test_t_input_04_t.bas"
+                line_num: 38
+            }
+        tokens: [
+            Token {
+                type: Integer
+                text: "20"
+                ivalue: 20
+                filename: "test_t_input_04_t.bas"
+                line_num: 38
+            }
+            Token {
+                type: Identifier
+                keyword: REM
+                text: "REM"
+                ws_before: " 				"
+                filename: "test_t_input_04_t.bas"
+                line_num: 38
+            }
+            Token {
+                type: Integer
+                text: "20"
+                ivalue: 20
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 38
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "   @start21: 	REM 21"
+                filename: "test_t_input_04_t.bas"
+                line_num: 39
+            }
+        tokens: [
+            Token {
+                type: @
+                text: "@"
+                ws_before: "   "
+                filename: "test_t_input_04_t.bas"
+                line_num: 39
+            }
+            Token {
+                type: Identifier
+                text: "start21"
+                filename: "test_t_input_04_t.bas"
+                line_num: 39
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 39
+            }
+            Token {
+                type: Identifier
+                keyword: REM
+                text: "REM"
+                ws_before: " 	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 39
+            }
+            Token {
+                type: Integer
+                text: "21"
+                ivalue: 21
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 39
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "22 @start22:	REM 22"
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+        tokens: [
+            Token {
+                type: Integer
+                text: "22"
+                ivalue: 22
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+            Token {
+                type: @
+                text: "@"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+            Token {
+                type: Identifier
+                text: "start22"
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+            Token {
+                type: Identifier
+                keyword: REM
+                text: "REM"
+                ws_before: "	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+            Token {
+                type: Integer
+                text: "22"
+                ivalue: 22
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 40
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "   @start23: 23	REM 23"
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+        tokens: [
+            Token {
+                type: @
+                text: "@"
+                ws_before: "   "
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+            Token {
+                type: Identifier
+                text: "start23"
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+            Token {
+                type: Integer
+                text: "23"
+                ivalue: 23
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+            Token {
+                type: Identifier
+                keyword: REM
+                text: "REM"
+                ws_before: "	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+            Token {
+                type: Integer
+                text: "23"
+                ivalue: 23
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 41
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	REM COMMENT TEXT : COLONS ARE PART OF COMMENT"
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: REM
+                text: "REM"
+                ws_before: "	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "COMMENT"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "TEXT"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: :
+                text: ":"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "COLONS"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "ARE"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "PART"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "OF"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+            Token {
+                type: Identifier
+                text: "COMMENT"
+                ws_before: " "
+                filename: "test_t_input_04_t.bas"
+                line_num: 43
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "	start_rem:"
+                filename: "test_t_input_04_t.bas"
+                line_num: 45
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "start_rem"
+                ws_before: "	"
+                filename: "test_t_input_04_t.bas"
+                line_num: 45
+            }
+            Token {
+                type: :
+                text: ":"
+                filename: "test_t_input_04_t.bas"
+                line_num: 45
+            }
+        ]
+    }
+    TokLine {
+        source_type: ASM
+        src_line:
+            SrcLine {
+                text: "		ret"
+                filename: "test_t_input_04_t.bas"
+                line_num: 49
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                text: "ret"
+                ws_before: "		"
+                filename: "test_t_input_04_t.bas"
+                line_num: 49
             }
         ]
     }
