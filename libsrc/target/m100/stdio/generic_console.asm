@@ -42,17 +42,17 @@ generic_console_scrollup:
     call    generic_console_xypos
     ld      a, 13
     ROMCALL
-    defw    CHROUT
+    defw    $20
     ld      a, 10
     ROMCALL
-    defw    CHROUT
+    defw    $20
     pop     de
     pop     bc
     ret
 
 generic_console_cls:
     ROMCALL
-    defw    CLS
+    defw    KY_CLS
     ret
 
 ; c = x
@@ -63,7 +63,7 @@ generic_console_printc:
     call    generic_console_xypos
     ld      a, d
     ROMCALL
-    defw    CHROUT
+    defw    $20
     ret
 
 
@@ -71,11 +71,23 @@ generic_console_printc:
 ;	 c = column
 ; Exit:	hl = address
 generic_console_xypos:
-    ld      a, c
-    inc     a
-    ld      ($f63a), a                  ; CSRY
-    ld      a, b
-    inc     a
-    ld      ($f639), a                  ; CSRX
-    ret
+	push    bc
+    ld      a,27  ; ESC
+    ROMCALL
+    defw    $20
+    ld      a,'Y' ; gotoxy
+    ROMCALL
+    defw    $20
+	pop bc
+	push bc
+	ld a,b
+	add $1f
+    ROMCALL
+    defw    $20
+	pop bc
+	ld a,c
+	add $1f
+    ROMCALL
+    defw    $20
+	ret
 
