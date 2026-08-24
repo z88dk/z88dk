@@ -31,7 +31,16 @@ plotpixel:
     OR (HL)
 
     ROMCALL
-    defw LCDSET_TAIL
+    defw KY_LCDSET_TAIL
+
+;  KY_LCDSET_TAIL in ROM being like:
+;------------------------------------
+;  LD (HL),A
+;  LD B,D
+;  LD E,$01
+;  CALL SET_LCD
+;  JP SET_CLOCK_HL_16
+;------------------------------------
 
     POP  BC
     RET

@@ -26,7 +26,7 @@ ENDIF
 
     defc    TAR__clib_exit_stack_size = 4
     ;   defc    TAR__fputc_cons_generic = 1
-    defc    TAR__register_sp = -1 
+    defc    TAR__register_sp = -1
     defc    TAR__crt_enable_eidi = $02 ; ei on entry
     defc    CRT_KEY_DEL = 8
     defc    __CPU_CLOCK = 2400000
@@ -38,23 +38,25 @@ ENDIF
     INCLUDE "crt/classic/crt_rules.inc"
 
     ; ROM calls that the library use, they vary between the supported clones
-    PUBLIC  KYREAD
-    PUBLIC  KYPEND
-    PUBLIC  CLS
-    PUBLIC  CHROUT
-    PUBLIC  CURPOS
-    PUBLIC  CURSON
-    PUBLIC  CURSOFF
-    PUBLIC  BEEP
-;    PUBLIC  LCDSET
-;    PUBLIC  LCDRES
-    PUBLIC  SHAPE
-    PUBLIC  SETINT_1D
-    PUBLIC  SET_LCD_ADDR
-    PUBLIC  SET_LCD
-    PUBLIC  PLOT_TBL
-    PUBLIC  PLOT_TBL2
-    PUBLIC  LCDSET_TAIL
+    PUBLIC  KY_KYREAD
+    PUBLIC  KY_KYPEND
+    PUBLIC  KY_CLS
+;    PUBLIC  KY_CHROUT
+;    PUBLIC  KY_CURPOS
+;    PUBLIC  KY_CSRX
+;    PUBLIC  KY_CSRY
+    PUBLIC  KY_CURSON
+    PUBLIC  KY_CURSOFF
+;    PUBLIC  KY_BEEP
+;    PUBLIC  KY_LCDSET
+;    PUBLIC  KY_LCDRES
+    PUBLIC  KY_SHAPE
+    PUBLIC  KY_SETINT_1D
+    PUBLIC  KY_SET_LCD_ADDR
+    PUBLIC  KY_GET_LCD
+    PUBLIC  KY_PLOT_TBL
+    PUBLIC  KY_PLOT_TBL2
+    PUBLIC  KY_LCDSET_TAIL
 
 IFDEF __M10
     INCLUDE "target/m100/def/m10_romcalls.def"
@@ -71,12 +73,17 @@ ENDIF
 IF startup = 1 
     defc    ROMCALL_OP = $CD    ; CALL
     INCLUDE "target/m100/classic/ram.asm"
+    ; This trick would save 20 bytes only
+    ;defc  KY_PLOT_TBL = KYKYROM_PLOT_TBL
+    ;defc  KY_PLOT_TBL2 = KYKYROM_PLOT_TBL2
 ELSE
     defc    ROMCALL_OP = $F7    ; RST6
     INCLUDE "target/m100/classic/optrom.asm"
 ENDIF
- 
+
+
 l_dcal: jp      (hl)            ;Used for function pointer calls
+
 
     INCLUDE "crt/classic/crt_runtime_selection.inc" 
 

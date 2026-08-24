@@ -17,5 +17,5 @@
 clg:
 _clg:
     ROMCALL
-    defw    CLS
+    defw    KY_CLS
     ret

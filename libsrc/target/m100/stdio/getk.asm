@@ -18,12 +18,13 @@ getk:
 _getk:
 
     ROMCALL
-    defw    KYPEND
+    defw    KY_KYPEND   ; (CHSNS
+
     ld      a, 0
     JP      Z, INKEY_S_0
 
     ROMCALL
-    defw    KYREAD
+    defw    KY_KYREAD
 
   IF    STANDARDESCAPECHARS
     cp      13
