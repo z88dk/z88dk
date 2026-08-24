@@ -305,6 +305,8 @@ static void add_func(Variant *v, const char *name, int start)
     v->nfuncs++;
 }
 
+/* Split one post-copt .asm into function extents and copt banners.
+ * A data-section label is not a function. Trailer starts at the first banner. */
 static void parse_variant(Variant *v)
 {
     FILE *f;
@@ -512,6 +514,7 @@ static int find_label_line(Variant *v, Func *fn, const char *name)
     return -1;
 }
 
+/* 1 if the span stores reg (ld, inc/dec, or pop of the pair). */
 static int reg_written_in_span(Variant *v, int from, int to, const char *reg)
 {
     int line;
@@ -552,6 +555,8 @@ static int reg_written_in_span(Variant *v, int from, int to, const char *reg)
     return 0;
 }
 
+/* Last `ld reg,imm` before loop_start. Pair loads feed the named half.
+ * Return 1 and write *val. A later load replaces an earlier one. */
 static int find_ld_imm_before(Variant *v, Func *fn, int loop_start, const char *reg, long *val)
 {
     int line;
@@ -694,6 +699,7 @@ static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind
     return 1;
 }
 
+/* True if the line is an instruction. Directives, labels, and comments are not. */
 static int looks_like_insn(const char *s)
 {
     static const char *dir[] = {
@@ -719,6 +725,8 @@ static int looks_like_insn(const char *s)
     return isalpha((unsigned char)*s);
 }
 
+/* Per-line static ticks from source text. Unknown ops set lfall.
+ * Backward branches are still scored as one trip here. */
 static void score_source_ticks(Variant *v)
 {
     int i, fb;
@@ -732,6 +740,8 @@ static void score_source_ticks(Variant *v)
     }
 }
 
+/* Backward jr/jp/djnz: taken time, then a literal trip on the span.
+ * Unknown bound stays 1. Overlapping edges multiply (cap 1e6). */
 static void apply_loops(Variant *v)
 {
     int f;
@@ -798,6 +808,8 @@ static int is_block_repeat(const char *s)
     return 0;
 }
 
+/* ldir family: 21 × BC. Unknown BC uses ZCCMULTI_BLOCK_REP.
+ * This pass owns the line score and clears lfall. */
 static void apply_block_repeats(Variant *v)
 {
     int f, line;
@@ -813,15 +825,14 @@ static void apply_block_repeats(Variant *v)
                 bc = trip_from_imm(bc, 1);
             else
                 bc = ZCCMULTI_BLOCK_REP;
-            /* Repeating block ops: 21 T per trip (last is 16; 21*n is a
-             * stand-in). Unknown BC uses ZCCMULTI_BLOCK_REP. This pass
-             * owns the line score. */
             v->lticks[line] = 21 * (int)bc;
             v->lfall[line] = 0;
         }
     }
 }
 
+/* Size from listing opcode bytes after the function label.
+ * Ticks from source, then loops, then block repeats. Do not use listing line numbers. */
 static void measure_variant(Variant *v)
 {
     char cmd[8192];
@@ -962,6 +973,7 @@ static int is_c_func_name(const char *name)
     return 0;
 }
 
+/* Classic helper: l_* or a d* float core. A C function in this file is not a helper. */
 static int is_helper_name(const char *name)
 {
     const char *n = name;
@@ -981,6 +993,7 @@ static int is_helper_name(const char *name)
     return 0;
 }
 
+/* Target of call or jp. Indirect jp (hl)/(ix)/(iy) returns 0. */
 static int extract_callee(const char *s, char *out, size_t outsz)
 {
     int kind = CTL_NONE, cond = 0, indirect = 0;
@@ -1021,6 +1034,7 @@ static int path_has_token(const char *path, const char *tok)
     return 0;
 }
 
+/* Prefer a CPU leaf over 5-z80 / 9-common when several files export the name. */
 static int helper_path_rank(const char *path)
 {
     int rank = 1;
@@ -1122,6 +1136,8 @@ static void helper_walk_dir(const char *dir)
     closedir(d);
 }
 
+/* Index PUBLIC names under libsrc/l/sccz80, math/float, math/integer.
+ * Skip obj/. Run once. Missing files leave call-only charge. */
 static void helper_index_sources(void)
 {
     int i;
@@ -1176,6 +1192,7 @@ static int copy_text_file(const char *from, const char *to)
     return 0;
 }
 
+/* Assemble a helper copy and sum listing opcode bytes into *size. Return 0 on success. */
 static int measure_asm_totals(const char *path, int *size)
 {
     char cmd[8192];
@@ -1383,6 +1400,8 @@ static void free_source_lines(Variant *v)
     free(v->path);
 }
 
+/* Size and ticks of one classic helper. Follow call/jp/defc. Cycle-safe.
+ * Return 0 if measured. Failure leaves size/ticks 0 (call-only). */
 static int measure_helper(const char *name)
 {
     Helper *h = helper_get(name);
@@ -1455,6 +1474,7 @@ static int measure_helper(const char *name)
     return 0;
 }
 
+/* How many times fn calls hname, counting the loop product on each site. */
 static int helper_call_weight(Variant *v, Func *fn, const char *hname)
 {
     int line, n = 0;
@@ -1610,15 +1630,16 @@ static void charge_intra_tu(void)
     }
 }
 
+/* 1 if this body may use ticks. jp (hl)/halt/unknown sets bad_ticks. */
 static int ticks_usable(const Func *a)
 {
     return a && !a->bad_ticks;
 }
 
+/* 1 if a wins over b. b may be NULL. Ticks, then size, then variant priority. */
 static int better(const Func *a, const char *aname, const Func *b, const char *bname,
                   int use_ticks)
 {
-    /* return 1 if a wins over b. b may be NULL. */
     if (!b)
         return 1;
     if (use_ticks && ticks_usable(a) && ticks_usable(b) && a->ticks != b->ticks)
@@ -1651,6 +1672,8 @@ static int choice_index(const char *name)
     return -1;
 }
 
+/* One Choice per C function name. If any present body is unusable for ticks,
+ * pick size among all bodies. reason is metric, fallback, or only. */
 static void collect_functions(void)
 {
     int v, f, c;
@@ -1722,11 +1745,13 @@ static void choice_callee(const char *raw, char *out, size_t n)
     snprintf(out, n, "_%s", raw);
 }
 
+/* 1 if this variant may clobber IX. Only 80cc-fp keeps a live IX frame. */
 static int ix_unsafe_variant(const char *name)
 {
     return strcmp(name, "80cc-fp") != 0;
 }
 
+/* Active metric of variant v for this function. Missing body is INT_MAX. */
 static int choice_score(int ci, int v)
 {
     if (ci < 0 || v < 0 || !choices[ci].present[v])
@@ -1734,6 +1759,7 @@ static int choice_score(int ci, int v)
     return choices[ci].use_ticks ? choices[ci].ticks[v] : choices[ci].size[v];
 }
 
+/* Cheapest selected non-fp body for this function, or -1. */
 static int best_non_fp(int ci)
 {
     int v, best_v = -1;
@@ -1756,14 +1782,14 @@ static int best_non_fp(int ci)
     return best_v;
 }
 
+/* 80cc-fp must not call a selected non-fp body. Cheaper legal fix wins:
+ * elevate the callee to 80cc-fp, or demote the caller. Tie keeps elevate. */
 static void resolve_ix_mix(void)
 {
     int changed = 1;
     int guard = 0;
     int fp = variant_named("80cc-fp");
 
-    /* 80cc-fp keeps a live IX frame. Any other selected body may clobber IX.
-     * Pick the cheaper legal fix: elevate the callee, or demote the caller. */
     while (changed && guard++ < 64) {
         int c, line;
         changed = 0;
@@ -1821,6 +1847,7 @@ static void resolve_ix_mix(void)
     }
 }
 
+/* Suffix i_N / L_* with the variant name so two bodies cannot share a label. */
 static void rewrite_locals(const char *variant, const char *in, char *out, size_t outsz)
 {
     const char *p = in;
@@ -1980,6 +2007,8 @@ static int defc_target_defined(const char *name, const OptAlias *al, int ndefc,
     return 0;
 }
 
+/* Emit the copt optimiser banner. Keep leftover `defc i_N = i_M` only when
+ * the chain ends at a label in a selected body. Track the whole alias pool. */
 static void emit_optimiser_pool(FILE *out, Variant *v)
 {
     int from, to, i, n, cap;
@@ -2039,6 +2068,8 @@ static Variant *data_variant(void)
     return v;
 }
 
+/* Named file-scope objects must exist in the data variant (sccz80).
+ * A `#ifdef __80CC` layout change fails the file. */
 static void check_data_set(void)
 {
     Variant *d = data_variant();
@@ -2110,6 +2141,8 @@ static int data_has_func(Variant *d, const char *name)
     return 0;
 }
 
+/* One assembly file: data-variant header, selected bodies, optimiser pools
+ * from variants that contributed a function, then named data from sccz80. */
 static void write_stitch(void)
 {
     FILE *out;

@@ -44,6 +44,8 @@ static int hex_digit(int c)
     return -1;
 }
 
+/* Map a z80asm --cpu= token to a ticks table. Unknown names are Z80.
+ * kc160 uses Z180 times. */
 int ticks_cpu_from_name(const char *cpu)
 {
     if (!cpu)
@@ -67,6 +69,8 @@ int ticks_cpu_from_name(const char *cpu)
     return TICKS_CPU_Z80;
 }
 
+/* Listing opcode byte count, and the source text after the hex dump.
+ * Line numbers are ignored (80cc can put the wrong source line on an opcode). */
 int listing_parse_line(const char *line, char *src, size_t src_sz)
 {
     const char *p = line;
@@ -193,6 +197,8 @@ static const char *mnem_and_rest(const char *src, char *mnem, size_t n)
     return skip_ws(read_ident(src, mnem, n));
 }
 
+/* jp/jr/djnz/call/ret. *indirect is 1 for jp (hl)/(ix)/(iy).
+ * *cond is 1 when a condition code is present. Buffers may be NULL. */
 int parse_control(const char *src, int *kind, int *cond, int *indirect,
                   char *target, size_t target_sz, char *cc, size_t cc_sz)
 {
@@ -340,6 +346,7 @@ static int pick(int taken, int t_yes, int t_no)
     return taken ? t_yes : t_no;
 }
 
+/* One comma-separated operand, lowercased. Nested () stay in the token. */
 static const char *copy_op(const char *p, char *out, size_t n)
 {
     size_t i = 0;
@@ -373,6 +380,8 @@ static int ident_eq(const char *s, const char *tok)
     return s[n] == 0 || !(isalnum((unsigned char)s[n]) || s[n] == '_');
 }
 
+/* Operand kind. *ix is 1 for ix/iy, (ix+d)/(iy+d), and index halves.
+ * IY uses the same OP_IX / OP_MEM_IX tags as IX. */
 static int classify(const char *tok, int *ix)
 {
     char inner[32];
@@ -639,6 +648,7 @@ static int mem_rp_is(const char *tok, const char *rp)
     return ident_eq(p, rp);
 }
 
+/* Native and synthetic ld on Z80-family / Rabbit. Return -1 if unknown. */
 static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
                         int ixa, int ixb)
 {
@@ -697,6 +707,7 @@ static int ticks_z80_ld(int cpu, const char *a, const char *b, int ka, int kb,
     return -1;
 }
 
+/* inc/dec. *ix selects the prefixed 8-bit time (ixh / (ix+d) already classified). */
 static int ticks_z80_incdec(int k, int ix)
 {
     if (k == OP_MEM_IX)
@@ -712,6 +723,7 @@ static int ticks_z80_incdec(int k, int ix)
     return -1;
 }
 
+/* 8-bit ALU operand time. *ix is the prefixed (ix+d)/ixh extra. */
 static int ticks_z80_alu8(int k, int ix)
 {
     if (k == OP_MEM_IX)
@@ -785,6 +797,7 @@ static int rp_adda(const char *tok)
 }
 
 /* Z80N extras. Zilog names. Times from the Next extended-ISA list. */
+/* Next extras. Zilog names. Times from the Next extended-ISA list. */
 static int ticks_z80n_ext(const char *mnem, const char *rest)
 {
     char a[64], b[64];
@@ -832,6 +845,7 @@ static int ticks_z80n_ext(const char *mnem, const char *rest)
     return -1;
 }
 
+/* Z80, Z80N, Z180, Rabbit. Halt, jp (hl)/(ix)/(iy), and unknown set *fallback. */
 static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
                         int cond, int indirect, int backward, int *fallback)
 {
@@ -1032,6 +1046,7 @@ static int ticks_8085_ext(const char *mnem, const char *rest, int backward)
     return -1;
 }
 
+/* 8080 / 8085. No IX/IY. Halt and jp (hl) set *fallback. */
 static int ticks_808x(int cpu, const char *mnem, const char *rest,
                       int cond, int indirect, int backward, int *fallback)
 {
@@ -1152,6 +1167,7 @@ static int ticks_gbz80_ld(const char *mnem, int ka, int kb,
     return -1;
 }
 
+/* gbz80. No IX/IY. Halt, stop, and jp (hl) set *fallback. */
 static int ticks_gbz80(const char *mnem, const char *rest,
                        int cond, int indirect, int backward, int *fallback)
 {
@@ -1243,6 +1259,8 @@ static int ticks_gbz80(const char *mnem, const char *rest,
     return -1;
 }
 
+/* Documented T-states from the mnemonic and operands. Return 0 and set
+ * *fallback on halt, jp (hl)/(ix)/(iy), or an unknown form. */
 int ticks_for_src(int cpu_kind, const char *src, int backward, int *fallback)
 {
     char mnem[16];
