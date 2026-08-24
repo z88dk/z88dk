@@ -32,7 +32,7 @@ respixel:
     AND (HL)
 
     ROMCALL
-    defw LCDSET_TAIL
+    defw KY_LCDSET_TAIL
 
     POP  BC
     RET
