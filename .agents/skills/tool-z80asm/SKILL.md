@@ -21,6 +21,41 @@ description: >
 | Library | `-x name` + `@list.lst` |
 | Listing | `-l` → `.lis` (verify synthetics / illegal ops) |
 | Object | default `.o`; `-d` date-based rebuild in library builds |
+| `PHASE` / `DEPHASE` | Store bytes here; labels and `$` at a different run address. See below. |
+
+### `PHASE` expression … `DEPHASE`
+
+Assemble bytes at the **current storage PC** (the section, as the linker will place it). Resolve **labels and `$` / `ASMPC`** as if `ORG expression` were in effect.
+
+Wiki: [Tool — z80asm — directives](https://github.com/z88dk/z88dk/wiki/Tool---z80asm---directives). Source: `src/z80asm/src/c/directives.c` (`asm_PHASE` / `asm_DEPHASE`), `codearea.c` (`asmpc_phase`).
+
+**The linker has no knowledge of `PHASE`.** It is assembly-time only.
+
+| | Inside `PHASE` | After `DEPHASE` (or never phased) |
+|--|----------------|-------------------------------------|
+| Bytes | Occupy space at the **storage** PC in the current `SECTION` | Same: storage PC continues after the PHASE’d bytes |
+| Labels, `$` | Run address (`expression` + offset) | Storage / section address |
+| Symbol type | **`TYPE_CONSTANT`** — absolute, **not relocated** | **`TYPE_ADDRESS`** — linker relocates with the section |
+| Map file | `= $NNNN ; const, …` | `= $NNNN ; addr, …` |
+
+That split **guarantees the PHASE’d code cannot run where it is stored.** Runtime must copy it to `expression` (typically `ldir`) before `call` / `jp` to those labels. `jr` still works (relative offset is the same in both spaces). `call` / `jp` to a PHASE label go to the **run** address, not the storage address.
+
+```asm
+    ld  hl, start          ; storage address (relocatable)
+    ld  de, $8000          ; run address
+    ld  bc, end-start      ; size of the PHASE’d bytes
+    ldir
+    jp  $8000
+start:
+    PHASE $8000
+f1: ...                    ; f1 = $8000 (const), bytes sit at start
+    DEPHASE
+end:
+```
+
+**ROM-resident / in-situ code** (runs at its storage address: shell, FAT, IDE that is not LDIR’d) must **not** sit inside `PHASE`. Put it in another file/`SECTION` with no `PHASE`, or after `DEPHASE` in the same file. A second source with its own `SECTION` does not inherit a PHASE origin from an `INCLUDE` into a PHASE’d file.
+
+`PHASE` / `DEPHASE` reset module-local `@` labels. `PHASE` address is 0…`$FFFF`. Nested `PHASE` replaces the phase PC; `DEPHASE` ends phasing for the section (logical `$` = storage PC again).
 
 ### Synthetic opcodes (normal mode)
 
@@ -223,7 +258,7 @@ Via zcc, assembler flags pass through **`-Ca`**.
 | Page | Topic | Status |
 |------|--------|--------|
 | [command line](Tool---z80asm---command-line) | CLI flags | **verified** vs live `-h` |
-| [directives](Tool---z80asm---directives) | ORG, SECTION, FLOAT, … | **verified** (includes `@labels`) |
+| [directives](Tool---z80asm---directives) | ORG, SECTION, PHASE/DEPHASE, FLOAT, … | **verified** (includes `@labels`) |
 | [preprocessor](Tool---z80asm---preprocessor) | `#define`, MACRO, ASSERT, IF | **verified** |
 | [expressions](Tool---z80asm---expressions) | Operators, numbers, ASMPC | **verified** (2026-07-31 pass) |
 | [environment](Tool---z80asm---environment) | `Z80ASM`, `ZCCCFG` | **verified** (2026-07-31 pass) |
