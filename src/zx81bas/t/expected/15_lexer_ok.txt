@@ -9,24 +9,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "\  \' \ '\''\. \: \.'\:'\##\,,\~~"	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 2
+                location: t/input/15_lexer_ok.bas:2
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 2
+                location: t/input/15_lexer_ok.bas:2
             }
             Token {
                 type: StringLiteral
                 text: ""\  \' \ '\''\. \: \.'\:'\##\,,\~~""
                 svalue: "\  \' \ '\''\. \: \.'\:'\##\,,\~~"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 2
+                location: t/input/15_lexer_ok.bas:2
             }
         ]
     }
@@ -35,24 +32,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 3
+                location: t/input/15_lexer_ok.bas:3
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 3
+                location: t/input/15_lexer_ok.bas:3
             }
             Token {
                 type: StringLiteral
                 text: ""\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!""
                 svalue: "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 3
+                location: t/input/15_lexer_ok.bas:3
             }
         ]
     }
@@ -61,24 +55,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm " % \r\n\f\v\t\""						 "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 4
+                location: t/input/15_lexer_ok.bas:4
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 4
+                location: t/input/15_lexer_ok.bas:4
             }
             Token {
                 type: StringLiteral
                 text: "" % \r\n\f\v\t\"""
                 svalue: " % \r\n\f\v\t\""
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 4
+                location: t/input/15_lexer_ok.bas:4
             }
         ]
     }
@@ -87,24 +78,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "$:?()><=+-*/;,.""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 5
+                location: t/input/15_lexer_ok.bas:5
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 5
+                location: t/input/15_lexer_ok.bas:5
             }
             Token {
                 type: StringLiteral
                 text: ""$:?()><=+-*/;,.""
                 svalue: "$:?()><=+-*/;,."
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 5
+                location: t/input/15_lexer_ok.bas:5
             }
         ]
     }
@@ -113,24 +101,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "0123456789""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 6
+                location: t/input/15_lexer_ok.bas:6
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 6
+                location: t/input/15_lexer_ok.bas:6
             }
             Token {
                 type: StringLiteral
                 text: ""0123456789""
                 svalue: "0123456789"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 6
+                location: t/input/15_lexer_ok.bas:6
             }
         ]
     }
@@ -139,24 +124,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "ABCDEFGHIJKLMNOPQRSTUVWXYZ""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 7
+                location: t/input/15_lexer_ok.bas:7
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 7
+                location: t/input/15_lexer_ok.bas:7
             }
             Token {
                 type: StringLiteral
                 text: ""ABCDEFGHIJKLMNOPQRSTUVWXYZ""
                 svalue: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 7
+                location: t/input/15_lexer_ok.bas:7
             }
         ]
     }
@@ -165,24 +147,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "%\"""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 8
+                location: t/input/15_lexer_ok.bas:8
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 8
+                location: t/input/15_lexer_ok.bas:8
             }
             Token {
                 type: StringLiteral
                 text: ""%\"""
                 svalue: "%\""
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 8
+                location: t/input/15_lexer_ok.bas:8
             }
         ]
     }
@@ -191,24 +170,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 9
+                location: t/input/15_lexer_ok.bas:9
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 9
+                location: t/input/15_lexer_ok.bas:9
             }
             Token {
                 type: StringLiteral
                 text: ""%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
                 svalue: "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%."
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 9
+                location: t/input/15_lexer_ok.bas:9
             }
         ]
     }
@@ -217,24 +193,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "%0%1%2%3%4%5%6%7%8%9""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 10
+                location: t/input/15_lexer_ok.bas:10
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 10
+                location: t/input/15_lexer_ok.bas:10
             }
             Token {
                 type: StringLiteral
                 text: ""%0%1%2%3%4%5%6%7%8%9""
                 svalue: "%0%1%2%3%4%5%6%7%8%9"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 10
+                location: t/input/15_lexer_ok.bas:10
             }
         ]
     }
@@ -243,24 +216,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 11
+                location: t/input/15_lexer_ok.bas:11
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 11
+                location: t/input/15_lexer_ok.bas:11
             }
             Token {
                 type: StringLiteral
                 text: ""%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
                 svalue: "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 11
+                location: t/input/15_lexer_ok.bas:11
             }
         ]
     }
@@ -269,24 +239,21 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "\"\"**<=>=<>""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 12
+                location: t/input/15_lexer_ok.bas:12
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 12
+                location: t/input/15_lexer_ok.bas:12
             }
             Token {
                 type: StringLiteral
                 text: ""\"\"**<=>=<>""
                 svalue: "\"\"**<=>=<>"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 12
+                location: t/input/15_lexer_ok.bas:12
             }
         ]
     }
@@ -295,37 +262,32 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	ld a, '\n'"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 13
+                location: t/input/15_lexer_ok.bas:13
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "ld"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 13
+                location: t/input/15_lexer_ok.bas:13
             }
             Token {
                 type: Identifier
                 text: "a"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 13
+                location: t/input/15_lexer_ok.bas:13
             }
             Token {
                 type: ,
                 text: ","
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 13
+                location: t/input/15_lexer_ok.bas:13
             }
             Token {
                 type: CharConstant
                 text: "'\n'"
                 svalue: "\n"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 13
+                location: t/input/15_lexer_ok.bas:13
             }
         ]
     }
@@ -334,269 +296,228 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm #$%!&@() * ** ^+,-/\: = > >= <> < <= ? != ##&&. << == >> []^^{| || }~"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: #
                 text: "#"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: $
                 text: "$"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: %
                 text: "%"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: !
                 text: "!"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: &
                 text: "&"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: @
                 text: "@"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: (
                 text: "("
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: )
                 text: ")"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: *
                 text: "*"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: **
                 text: "**"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: **
                 text: "^"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: +
                 text: "+"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: ,
                 text: ","
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: -
                 text: "-"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: /
                 text: "/"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: \
                 text: "\"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: :
                 text: ":"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: =
                 text: "="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: >
                 text: ">"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: >=
                 text: ">="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: <>
                 text: "<>"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: <
                 text: "<"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: <=
                 text: "<="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: ?
                 text: "?"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "!="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "##"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "&&"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "."
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "<<"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "=="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: ">>"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "["
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "]"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "^^"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "{"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "|"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "||"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "}"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
             Token {
                 type: AsmOperator
                 text: "~"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 14
+                location: t/input/15_lexer_ok.bas:14
             }
         ]
     }
@@ -605,8 +526,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "\  \' \ '\''\. \: \.'\:'\##\,,\~~"	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 16
+                location: t/input/15_lexer_ok.bas:16
             }
         tokens: [
             Token {
@@ -614,16 +534,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 16
+                location: t/input/15_lexer_ok.bas:16
             }
             Token {
                 type: StringLiteral
                 text: ""\  \' \ '\''\. \: \.'\:'\##\,,\~~""
                 svalue: "\  \' \ '\''\. \: \.'\:'\##\,,\~~"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 16
+                location: t/input/15_lexer_ok.bas:16
             }
         ]
     }
@@ -632,8 +550,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 17
+                location: t/input/15_lexer_ok.bas:17
             }
         tokens: [
             Token {
@@ -641,16 +558,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 17
+                location: t/input/15_lexer_ok.bas:17
             }
             Token {
                 type: StringLiteral
                 text: ""\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!""
                 svalue: "\::\.:\:.\..\':\ :\'.\ .\@@\;;\!!"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 17
+                location: t/input/15_lexer_ok.bas:17
             }
         ]
     }
@@ -659,8 +574,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT " % \r\n\f\v\t\""						 "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 18
+                location: t/input/15_lexer_ok.bas:18
             }
         tokens: [
             Token {
@@ -668,16 +582,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 18
+                location: t/input/15_lexer_ok.bas:18
             }
             Token {
                 type: StringLiteral
                 text: "" % \r\n\f\v\t\"""
                 svalue: " % \r\n\f\v\t\""
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 18
+                location: t/input/15_lexer_ok.bas:18
             }
         ]
     }
@@ -686,8 +598,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "$:?()><=+-*/;,.""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 19
+                location: t/input/15_lexer_ok.bas:19
             }
         tokens: [
             Token {
@@ -695,16 +606,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 19
+                location: t/input/15_lexer_ok.bas:19
             }
             Token {
                 type: StringLiteral
                 text: ""$:?()><=+-*/;,.""
                 svalue: "$:?()><=+-*/;,."
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 19
+                location: t/input/15_lexer_ok.bas:19
             }
         ]
     }
@@ -713,8 +622,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "0123456789""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 20
+                location: t/input/15_lexer_ok.bas:20
             }
         tokens: [
             Token {
@@ -722,16 +630,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 20
+                location: t/input/15_lexer_ok.bas:20
             }
             Token {
                 type: StringLiteral
                 text: ""0123456789""
                 svalue: "0123456789"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 20
+                location: t/input/15_lexer_ok.bas:20
             }
         ]
     }
@@ -740,8 +646,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "ABCDEFGHIJKLMNOPQRSTUVWXYZ""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 21
+                location: t/input/15_lexer_ok.bas:21
             }
         tokens: [
             Token {
@@ -749,16 +654,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 21
+                location: t/input/15_lexer_ok.bas:21
             }
             Token {
                 type: StringLiteral
                 text: ""ABCDEFGHIJKLMNOPQRSTUVWXYZ""
                 svalue: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 21
+                location: t/input/15_lexer_ok.bas:21
             }
         ]
     }
@@ -767,8 +670,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "%\"""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 22
+                location: t/input/15_lexer_ok.bas:22
             }
         tokens: [
             Token {
@@ -776,16 +678,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 22
+                location: t/input/15_lexer_ok.bas:22
             }
             Token {
                 type: StringLiteral
                 text: ""%\"""
                 svalue: "%\""
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 22
+                location: t/input/15_lexer_ok.bas:22
             }
         ]
     }
@@ -794,8 +694,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 23
+                location: t/input/15_lexer_ok.bas:23
             }
         tokens: [
             Token {
@@ -803,16 +702,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 23
+                location: t/input/15_lexer_ok.bas:23
             }
             Token {
                 type: StringLiteral
                 text: ""%$%:%?%(%)%>%<%=%+%-%*%/%;%,%.""
                 svalue: "%$%:%?%(%)%>%<%=%+%-%*%/%;%,%."
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 23
+                location: t/input/15_lexer_ok.bas:23
             }
         ]
     }
@@ -821,8 +718,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "%0%1%2%3%4%5%6%7%8%9""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 24
+                location: t/input/15_lexer_ok.bas:24
             }
         tokens: [
             Token {
@@ -830,16 +726,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 24
+                location: t/input/15_lexer_ok.bas:24
             }
             Token {
                 type: StringLiteral
                 text: ""%0%1%2%3%4%5%6%7%8%9""
                 svalue: "%0%1%2%3%4%5%6%7%8%9"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 24
+                location: t/input/15_lexer_ok.bas:24
             }
         ]
     }
@@ -848,8 +742,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 25
+                location: t/input/15_lexer_ok.bas:25
             }
         tokens: [
             Token {
@@ -857,16 +750,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 25
+                location: t/input/15_lexer_ok.bas:25
             }
             Token {
                 type: StringLiteral
                 text: ""%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z""
                 svalue: "%A%B%C%D%E%F%G%H%I%J%K%L%M%N%O%P%Q%R%S%T%U%V%W%X%Y%Z"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 25
+                location: t/input/15_lexer_ok.bas:25
             }
         ]
     }
@@ -875,8 +766,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "\"\"**<=>=<>""
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 26
+                location: t/input/15_lexer_ok.bas:26
             }
         tokens: [
             Token {
@@ -884,16 +774,14 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 26
+                location: t/input/15_lexer_ok.bas:26
             }
             Token {
                 type: StringLiteral
                 text: ""\"\"**<=>=<>""
                 svalue: "\"\"**<=>=<>"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 26
+                location: t/input/15_lexer_ok.bas:26
             }
         ]
     }
@@ -902,8 +790,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT #$%!&@() * ** ^+,-/\: = > >= <> < <= ? != ##&&. << == >> []^^{| || }~"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
         tokens: [
             Token {
@@ -911,261 +798,221 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: #
                 text: "#"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: $
                 text: "$"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: %
                 text: "%"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: !
                 text: "!"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: &
                 text: "&"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: @
                 text: "@"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: (
                 text: "("
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: )
                 text: ")"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: *
                 text: "*"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: **
                 text: "**"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: **
                 text: "^"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: +
                 text: "+"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: ,
                 text: ","
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: -
                 text: "-"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: /
                 text: "/"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: \
                 text: "\"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: :
                 text: ":"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: =
                 text: "="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: >
                 text: ">"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: >=
                 text: ">="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: <>
                 text: "<>"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: <
                 text: "<"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: <=
                 text: "<="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: ?
                 text: "?"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "!="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "##"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "&&"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "."
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "<<"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "=="
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: ">>"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "["
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "]"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "^^"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "{"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "|"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "||"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "}"
                 ws_before: " "
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
             Token {
                 type: AsmOperator
                 text: "~"
-                filename: "t/input/15_lexer_ok.bas"
-                line_num: 27
+                location: t/input/15_lexer_ok.bas:27
             }
         ]
     }

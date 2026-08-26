@@ -17,7 +17,7 @@
 #include <vector>
 
 static void dump_stmt_common(const Stmt& stmt, DumpContext& ctx) {
-    stmt.tok_line.dump(ctx);
+    stmt.loc.dump(ctx);
 }
 
 static void dump_stmt_list(const char* name,
@@ -283,6 +283,14 @@ void RunStmt::dump(DumpContext ctx) const {
     ctx.line("}");
 }
 
+void ListStmt::dump(DumpContext ctx) const {
+    ctx.line("ListStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    dump_child_expr("target_expr", target_expr.get(), child_ctx);
+    ctx.line("}");
+}
+
 void NewStmt::dump(DumpContext ctx) const {
     ctx.line("NewStmt {");
     auto child_ctx = ctx.child();
@@ -338,6 +346,24 @@ void PokewStmt::dump(DumpContext ctx) const {
     ctx.line("}");
 }
 
+void PlotStmt::dump(DumpContext ctx) const {
+    ctx.line("PlotStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    dump_child_expr("x_expr", x_expr.get(), child_ctx);
+    dump_child_expr("y_expr", y_expr.get(), child_ctx);
+    ctx.line("}");
+}
+
+void UnplotStmt::dump(DumpContext ctx) const {
+    ctx.line("UnplotStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    dump_child_expr("x_expr", x_expr.get(), child_ctx);
+    dump_child_expr("y_expr", y_expr.get(), child_ctx);
+    ctx.line("}");
+}
+
 void RandStmt::dump(DumpContext ctx) const {
     ctx.line("RandStmt {");
     auto child_ctx = ctx.child();
@@ -351,6 +377,42 @@ void PauseStmt::dump(DumpContext ctx) const {
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
     dump_child_expr("duration", duration.get(), child_ctx);
+    ctx.line("}");
+}
+
+void FastStmt::dump(DumpContext ctx) const {
+    ctx.line("FastStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    ctx.line("}");
+}
+
+void SlowStmt::dump(DumpContext ctx) const {
+    ctx.line("SlowStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    ctx.line("}");
+}
+
+void ScrollStmt::dump(DumpContext ctx) const {
+    ctx.line("ScrollStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    ctx.line("}");
+}
+
+void ContStmt::dump(DumpContext ctx) const {
+    ctx.line("ContStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    ctx.line("}");
+}
+
+void ClearStmt::dump(DumpContext ctx) const {
+    ctx.line("ClearStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    dump_child_expr("ramtop_expr", ramtop_expr.get(), child_ctx);
     ctx.line("}");
 }
 

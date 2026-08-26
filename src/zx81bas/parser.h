@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "ast_expr.h"
 #include "ast_stmt.h"
 #include "lexer.h"
 #include <memory>
@@ -51,8 +52,27 @@ private:
     const Token& expect(Keyword keyword);
     const Token& peek(size_t offset = 0) const;
     const TokLine& line() const;
+    const SourceLoc& loc() const;
 
-    bool parse_stmt_block(const std::unordered_set<Keyword>& stop_keywords,
+    static bool is_string_variable(const std::string& name);
+    static bool is_func_one_arg(Keyword keyword);
+    static bool is_func_zero_arg(Keyword keyword);
+    static bool has_TO(const std::vector<Token>& tokens, size_t pos);
+
+    // expression parsers
+    std::unique_ptr<Expr> parse_primary();
+    std::unique_ptr<Expr> parse_unary_expr();
+    std::unique_ptr<Expr> parse_pow_expr();
+    std::unique_ptr<Expr> parse_mul_expr();
+    std::unique_ptr<Expr> parse_add_expr();
+    std::unique_ptr<Expr> parse_rel_expr();
+    std::unique_ptr<Expr> parse_and_expr();
+    std::unique_ptr<Expr> parse_or_expr();
+    std::unique_ptr<Expr> parse_expr();
+    std::unique_ptr<Expr> parse_assignable();
+
+    // statement parsers
+    void parse_stmt_block(const std::unordered_set<Keyword>& stop_keywords,
                           Keyword& out_stop_keyword,
                           std::vector<std::unique_ptr<Stmt>>& out_stmts);
     void parse_stmt_line(const std::unordered_set<Keyword>& stop_keywords,
@@ -81,7 +101,45 @@ private:
     std::unique_ptr<Stmt> parse_pragma_sysvars();
 
     // statement parsers
+    std::unique_ptr<Stmt> parse_stmt_let();
+    std::unique_ptr<Stmt> parse_stmt_dim();
+    std::unique_ptr<Stmt> parse_stmt_if();
+    std::unique_ptr<Stmt> parse_stmt_repeat();
+    std::unique_ptr<Stmt> parse_stmt_while();
+    std::unique_ptr<Stmt> parse_stmt_for();
+    std::unique_ptr<Stmt> parse_stmt_def();
+    std::unique_ptr<Stmt> parse_stmt_def_proc(const std::string& name);
+    std::unique_ptr<Stmt> parse_stmt_def_fn(const std::string& name);
+    std::unique_ptr<Stmt> parse_stmt_proc_call();
+    std::unique_ptr<Stmt> parse_stmt_local();
+    std::unique_ptr<Stmt> parse_stmt_exit();
+    std::unique_ptr<Stmt> parse_stmt_goto();
+    std::unique_ptr<Stmt> parse_stmt_gosub();
+    std::unique_ptr<Stmt> parse_stmt_return();
+    std::unique_ptr<Stmt> parse_stmt_stop();
+    std::unique_ptr<Stmt> parse_stmt_end();
+    std::unique_ptr<Stmt> parse_stmt_print();
+    std::unique_ptr<Stmt> parse_stmt_input();
     std::unique_ptr<Stmt> parse_stmt_rem();
+    std::unique_ptr<Stmt> parse_stmt_run();
+    std::unique_ptr<Stmt> parse_stmt_new();
+    std::unique_ptr<Stmt> parse_stmt_cls();
+    std::unique_ptr<Stmt> parse_stmt_load();
+    std::unique_ptr<Stmt> parse_stmt_save();
+    std::unique_ptr<Stmt> parse_stmt_poke();
+    std::unique_ptr<Stmt> parse_stmt_pokew();
+    std::unique_ptr<Stmt> parse_stmt_rand();
+    std::unique_ptr<Stmt> parse_stmt_pause();
+    std::unique_ptr<Stmt> parse_stmt_fast();
+    std::unique_ptr<Stmt> parse_stmt_slow();
+    std::unique_ptr<Stmt> parse_stmt_list();
+    std::unique_ptr<Stmt> parse_stmt_plot();
+    std::unique_ptr<Stmt> parse_stmt_unplot();
+    std::unique_ptr<Stmt> parse_stmt_scroll();
+    std::unique_ptr<Stmt> parse_stmt_cont();
+    std::unique_ptr<Stmt> parse_stmt_clear();
+
+    std::unique_ptr<DimItem> parse_dim_item();
 
 };
 

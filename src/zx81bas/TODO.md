@@ -1,3 +1,14 @@
+## TODO
+
+- add ZX Spectrum additional BASIC keywords as extended keywords
+- populate LOCAL in PROC from LOCAL statements
+- variable collection and symbol table creation
+- check of data types number/string
+- lower to standard BASIC
+- number lines
+- generate output file
+- parse of graphical images for 2x2 graphics
+
 ## Parser
 
 void lower_if_else(const IfElseStmt& s, std::vector<std::unique_ptr<Stmt>>& out) {

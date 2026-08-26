@@ -10,12 +10,15 @@
 #include "../preproc.h"
 #include <string>
 
+void SourceLoc::dump(DumpContext ctx) const {
+    ctx.line("location: " + filename + ":" + std::to_string(line_num));
+}
+
 void SrcLine::dump(DumpContext ctx) const {
     ctx.line("SrcLine {");
     auto child_ctx = ctx.child();
     child_ctx.line("text: \"" + text + "\"");
-    child_ctx.line("filename: \"" + filename + "\"");
-    child_ctx.line("line_num: " + std::to_string(line_num));
+    loc.dump(child_ctx);
     ctx.line("}");
 }
 

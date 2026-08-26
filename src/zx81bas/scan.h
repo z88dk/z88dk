@@ -11,5 +11,5 @@
 #include <vector>
 
 bool tokenize_line(const std::string& text, SourceType source_type,
-                   const std::string& filename, int line_num,
+                   const SourceLoc& loc,
                    std::vector<Token>& tokens);

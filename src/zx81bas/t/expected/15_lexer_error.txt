@@ -13,16 +13,14 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	defm "'""
-                filename: "t/input/15_lexer_error.bas"
-                line_num: 2
+                location: t/input/15_lexer_error.bas:2
             }
         tokens: [
             Token {
                 type: Identifier
                 text: "defm"
                 ws_before: "	"
-                filename: "t/input/15_lexer_error.bas"
-                line_num: 2
+                location: t/input/15_lexer_error.bas:2
             }
         ]
     }
@@ -31,8 +29,7 @@ TokFile {
         src_line:
             SrcLine {
                 text: "	PRINT "'""
-                filename: "t/input/15_lexer_error.bas"
-                line_num: 4
+                location: t/input/15_lexer_error.bas:4
             }
         tokens: [
             Token {
@@ -40,8 +37,7 @@ TokFile {
                 keyword: PRINT
                 text: "PRINT"
                 ws_before: "	"
-                filename: "t/input/15_lexer_error.bas"
-                line_num: 4
+                location: t/input/15_lexer_error.bas:4
             }
         ]
     }

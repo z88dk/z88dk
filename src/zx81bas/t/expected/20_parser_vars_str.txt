@@ -16,50 +16,7 @@ Prog {
     ]
     stmts: [
         PragmaStrVarStmt {
-            TokLine {
-                source_type: BASIC
-                src_line:
-                    SrcLine {
-                        text: "!VARS A$="""
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 1
-                    }
-                tokens: [
-                    Token {
-                        type: !
-                        text: "!"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: Identifier
-                        keyword: VARS
-                        text: "VARS"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: Identifier
-                        text: "A$"
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: =
-                        text: "="
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: StringLiteral
-                        text: """"
-                        svalue: ""
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 1
-                    }
-                ]
-            }
+            location: t/input/20_parser_vars_str.bas:1
             name: A$
             value: ""
             asm: [
@@ -68,102 +25,14 @@ Prog {
             ]
         }
         PragmaStrVarStmt {
-            TokLine {
-                source_type: BASIC
-                src_line:
-                    SrcLine {
-                        text: "!VARS B$="HELLO""
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 6
-                    }
-                tokens: [
-                    Token {
-                        type: !
-                        text: "!"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 6
-                    }
-                    Token {
-                        type: Identifier
-                        keyword: VARS
-                        text: "VARS"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 6
-                    }
-                    Token {
-                        type: Identifier
-                        text: "B$"
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 6
-                    }
-                    Token {
-                        type: =
-                        text: "="
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 6
-                    }
-                    Token {
-                        type: StringLiteral
-                        text: ""HELLO""
-                        svalue: "HELLO"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 6
-                    }
-                ]
-            }
+            location: t/input/20_parser_vars_str.bas:6
             name: B$
             value: "HELLO"
             asm: [
             ]
         }
         PragmaStrVarStmt {
-            TokLine {
-                source_type: BASIC
-                src_line:
-                    SrcLine {
-                        text: "!VARS Z$ = """
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 7
-                    }
-                tokens: [
-                    Token {
-                        type: !
-                        text: "!"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 7
-                    }
-                    Token {
-                        type: Identifier
-                        keyword: VARS
-                        text: "VARS"
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 7
-                    }
-                    Token {
-                        type: Identifier
-                        text: "Z$"
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 7
-                    }
-                    Token {
-                        type: =
-                        text: "="
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 7
-                    }
-                    Token {
-                        type: StringLiteral
-                        text: """"
-                        svalue: ""
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_str.bas"
-                        line_num: 7
-                    }
-                ]
-            }
+            location: t/input/20_parser_vars_str.bas:7
             name: Z$
             value: ""
             asm: [

@@ -6,13 +6,14 @@
 
 #pragma once
 
+#include "errors.h"
 #include <cstdint>
 #include <string>
 #include <vector>
 
 bool encode_zx81_char(const char*& p, bool check_keywords,
                       uint8_t& out_code,
-                      const std::string& filename, int line_num);
+                      const SourceLoc& loc);
 bool encode_zx81_string(const char*& p, char delimiter,
                         std::vector<uint8_t>& bytes,
-                        const std::string& filename, int line_num);
+                        const SourceLoc& loc);
