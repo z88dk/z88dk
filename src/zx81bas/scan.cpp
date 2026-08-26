@@ -41,7 +41,7 @@ static int parse_int_from_chars(std::string_view s, int base) {
 }
 
 bool tokenize_line(const std::string& text, SourceType source_type,
-                   const std::string& filename, int line_num,
+                   const SourceLoc& loc,
                    std::vector<Token>& tokens) {
     bool ok = true;
 
@@ -51,7 +51,7 @@ bool tokenize_line(const std::string& text, SourceType source_type,
 
     auto check_trailing_char = [&]() -> bool {
         if (isalnum(*p) || *p == '_') {
-            error(filename, line_num, "Invalid character '" + std::string(1, *p));
+            error(loc, "Invalid character '" + std::string(1, *p));
             ok = false;
             return false;
         }
@@ -60,8 +60,7 @@ bool tokenize_line(const std::string& text, SourceType source_type,
 
     while (*p) {
         Token token;
-        token.filename = filename;
-        token.line_num = line_num;
+        token.loc = loc;
 collect_token:
         const char* start = p;
 
@@ -252,7 +251,7 @@ yy6:
             {
                 // String literal
                 std::vector<uint8_t> bytes;
-                if (!encode_zx81_string(p, '"', bytes, filename, line_num)) {
+                if (!encode_zx81_string(p, '"', bytes, loc)) {
                     ok = false;
                     break;
                 }
@@ -348,13 +347,13 @@ yy15:
                 else {
                     // Char constant
                     std::vector<uint8_t> bytes;
-                    if (!encode_zx81_string(p, '\'', bytes, filename, line_num)) {
+                    if (!encode_zx81_string(p, '\'', bytes, loc)) {
                         ok = false;
                         break;
                     }
                     p++; // skip closing quote
                     if (bytes.size() != 1) {
-                        error(filename, line_num, "Char constant must be a single character");
+                        error(loc, "Char constant must be a single character");
                         ok = false;
                         break;
                     }

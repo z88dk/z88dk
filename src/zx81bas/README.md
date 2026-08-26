@@ -129,8 +129,10 @@ DIV(A,B) and A\\B are shortcuts for INT(A/B).
 
 MOD(A,B) is a shortcut for A-B\*INT(A/B).
 
+CLEAR accepts a ramtop value and lowers ramtop without deleting BASIC.
+
 All BASIC extended features are lowered to standard zx81 BASIC instructions
-before compilation.
+or assembly routines before compilation.
 
 ## Character set
 
