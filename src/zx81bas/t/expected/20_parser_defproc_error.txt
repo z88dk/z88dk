@@ -1,0 +1,13 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_defproc_error.bas
+Input file:  t/input/20_parser_defproc_error.bas
+Output file: t/input/20_parser_defproc_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_defproc_error.bas.i" "t/input/20_parser_defproc_error.bas.pp"
+t/input/20_parser_defproc_error.bas:2: error: expected end of statement, found 'x'
+t/input/20_parser_defproc_error.bas:3: error: expected '(', found end of line
+t/input/20_parser_defproc_error.bas:4: error: expected 'Identifier', found end of line
+t/input/20_parser_defproc_error.bas:5: error: expected 'Identifier', found '10'
+t/input/20_parser_defproc_error.bas:6: error: string variable 'A$' not allowed as parameter in DEF PROC statement
+t/input/20_parser_defproc_error.bas:7: error: expected 'Identifier', found ')'
+t/input/20_parser_defproc_error.bas:8: error: expected 'Identifier', found '10'
+t/input/20_parser_defproc_error.bas:10: error: expected ENDPROC
+Parsing failed with errors.

@@ -1,0 +1,7 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_while_error.bas
+Input file:  t/input/20_parser_while_error.bas
+Output file: t/input/20_parser_while_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_while_error.bas.i" "t/input/20_parser_while_error.bas.pp"
+t/input/20_parser_while_error.bas:1: error: expected end of statement, found 'x'
+t/input/20_parser_while_error.bas:3: error: expected 'WEND'
+Parsing failed with errors.

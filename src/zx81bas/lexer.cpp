@@ -80,11 +80,11 @@ bool TokFile::tokenize(const std::vector<SrcLine>& src_lines) {
     bool ok = true;
 
     for (const auto& src_line : src_lines) {
-        if (match_ASM(src_line.text, src_line.filename, src_line.line_num)) {
+        if (match_ASM(src_line.text, src_line.loc)) {
             source_type = SourceType::ASM;
             continue;
         }
-        else if (match_BASIC(src_line.text, src_line.filename, src_line.line_num)) {
+        else if (match_BASIC(src_line.text, src_line.loc)) {
             source_type = SourceType::BASIC;
             continue;
         }
@@ -94,7 +94,7 @@ bool TokFile::tokenize(const std::vector<SrcLine>& src_lines) {
         tok_line.src_line = src_line;
 
         if (!tokenize_line(src_line.text, source_type,
-                           src_line.filename, src_line.line_num,
+                           src_line.loc,
                            tok_line.tokens)) {
             ok = false; // error already reported
         }

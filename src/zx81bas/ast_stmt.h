@@ -7,8 +7,8 @@
 #pragma once
 
 #include "dump_context.h"
+#include "errors.h"
 #include "lexer.h"
-#include "preproc.h"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -17,10 +17,10 @@
 struct Expr;
 
 struct Stmt : TreeNode {
-    TokLine tok_line;			// source text, filename and line number
+    SourceLoc loc;			// source location
 
-    explicit Stmt(const TokLine& tok_line_)
-        : tok_line(tok_line_) {
+    explicit Stmt(const SourceLoc& loc_)
+        : loc(loc_) {
     }
 
 #ifdef _DEBUG
@@ -32,10 +32,10 @@ struct JumpTargetStmt : Stmt {
     std::string label;          // label, if any
     int basic_line_num = -1;    // line number in the source file, if any
 
-    explicit JumpTargetStmt(const TokLine& tok_line_,
+    explicit JumpTargetStmt(const SourceLoc& loc_,
                             const std::string& label_,
                             int basic_line_num_)
-        : Stmt(tok_line_), label(label_), basic_line_num(basic_line_num_) {
+        : Stmt(loc_), label(label_), basic_line_num(basic_line_num_) {
     }
 
 #ifdef _DEBUG
@@ -100,6 +100,20 @@ struct WhileStmt : Stmt {
     using Stmt::Stmt;
 
     std::unique_ptr<Expr> condition;               // condition1
+    std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct ForStmt : Stmt {
+    using Stmt::Stmt;
+
+    std::string var_name;               // loop variable
+    std::unique_ptr<Expr> start_expr;
+    std::unique_ptr<Expr> end_expr;
+    std::unique_ptr<Expr> step_expr;    // may be null (default = 1)
     std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
 
 #ifdef _DEBUG
@@ -197,14 +211,8 @@ struct StopStmt : Stmt {
 #endif
 };
 
-struct ForStmt : Stmt {
+struct EndStmt : Stmt {
     using Stmt::Stmt;
-
-    std::string var_name;               // loop variable
-    std::unique_ptr<Expr> start_expr;
-    std::unique_ptr<Expr> end_expr;
-    std::unique_ptr<Expr> step_expr;    // may be null (default = 1)
-    std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -276,6 +284,16 @@ struct RunStmt : Stmt {
 #endif
 };
 
+struct ListStmt : Stmt {
+    using Stmt::Stmt;
+
+    std::unique_ptr<Expr> target_expr;   // optional expression
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
 struct NewStmt : Stmt {
     using Stmt::Stmt;
 
@@ -312,14 +330,6 @@ struct SaveStmt : Stmt {
 #endif
 };
 
-struct EndStmt : Stmt {
-    using Stmt::Stmt;
-
-#ifdef _DEBUG
-    void dump(DumpContext ctx) const override;
-#endif
-};
-
 struct PokeStmt : Stmt {
     using Stmt::Stmt;
 
@@ -342,6 +352,28 @@ struct PokewStmt : Stmt {
 #endif
 };
 
+struct PlotStmt : Stmt {
+    using Stmt::Stmt;
+
+    std::unique_ptr<Expr> x_expr;
+    std::unique_ptr<Expr> y_expr;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct UnplotStmt : Stmt {
+    using Stmt::Stmt;
+
+    std::unique_ptr<Expr> x_expr;
+    std::unique_ptr<Expr> y_expr;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
 struct RandStmt : Stmt {
     using Stmt::Stmt;
 
@@ -356,6 +388,48 @@ struct PauseStmt : Stmt {
     using Stmt::Stmt;
 
     std::unique_ptr<Expr> duration;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct FastStmt : Stmt {
+    using Stmt::Stmt;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct SlowStmt : Stmt {
+    using Stmt::Stmt;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct ScrollStmt : Stmt {
+    using Stmt::Stmt;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct ContStmt : Stmt {
+    using Stmt::Stmt;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct ClearStmt : Stmt {
+    using Stmt::Stmt;
+
+    std::unique_ptr<Expr> ramtop_expr;   // optional ramtop expression
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -391,7 +465,7 @@ struct PragmaNumVarArrayStmt : Stmt {
     using Stmt::Stmt;
 
     std::string var_name;
-	std::vector<int> dims;			// dimensions
+    std::vector<int> dims;			// dimensions
     std::vector<double> values;
 
 #ifdef _DEBUG
@@ -403,7 +477,7 @@ struct PragmaStrVarArrayStmt : Stmt {
     using Stmt::Stmt;
 
     std::string var_name;
-	std::vector<int> dims;			// dimensions
+    std::vector<int> dims;			// dimensions
     std::vector<std::string> values;
 
 #ifdef _DEBUG
