@@ -19,7 +19,7 @@
 // lookup zx81 character code
 bool encode_zx81_char(const char*& p, bool check_keywords,
                       uint8_t& out_code,
-                      const std::string& filename, int line_num) {
+                      const SourceLoc& loc) {
     static std::vector<std::unordered_map<std::string, uint8_t>> zx81_char_map =
     []() {
         std::vector<std::unordered_map<std::string, uint8_t>> map;
@@ -60,17 +60,17 @@ bool encode_zx81_char(const char*& p, bool check_keywords,
     }
 
     // character not found
-    error(filename, line_num, "Unknown ZX81 encoding: \"" +
+    error(loc, "Unknown ZX81 encoding: \"" +
           std::string(p, strlen(p)) + "\"");
     return false;
 }
 
 bool encode_zx81_string(const char*& p, char delimiter,
                         std::vector<uint8_t>& bytes,
-                        const std::string& filename, int line_num) {
+                        const SourceLoc& loc) {
     while (*p && *p != delimiter) {
         uint8_t code;
-        if (encode_zx81_char(p, /*check_keywords=*/false, code, filename, line_num)) {
+        if (encode_zx81_char(p, /*check_keywords=*/false, code, loc)) {
             bytes.push_back(code);
         }
         else {
@@ -79,10 +79,9 @@ bool encode_zx81_string(const char*& p, char delimiter,
     }
 
     if (*p != delimiter) {
-        error(filename, line_num, "Unterminated string literal");
+        error(loc, "Unterminated string literal");
         return false;
     }
 
     return true;
 }
-

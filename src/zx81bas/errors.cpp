@@ -10,9 +10,10 @@
 
 static int error_count = 0;
 
-void error(const std::string& filename, int line, const std::string& message) {
-    if (!filename.empty()) {
-        std::cerr << filename << ":" << line << ": error: " << message << std::endl;
+void error(const SourceLoc& loc, const std::string& message) {
+    if (!loc.filename.empty()) {
+        std::cerr << loc.filename << ":" << loc.line_num << ": error: " << message <<
+                  std::endl;
     }
     else {
         std::cerr << "error: " << message << std::endl;

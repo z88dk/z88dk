@@ -1,0 +1,92 @@
+LET A=
+LET A=:
+LET A=1+
+LET A=@42
+LET A=@A$
+LET A=&42
+LET A=&A$
+LET A=(1+2
+LET A=(1+2:
+LET A=(1+2!
+LET A=CODE
+LET A=CODE:
+LET A=-
+LET A=-:
+LET A=-!
+LET A=+
+LET A=+:
+LET A=+!
+LET A=NOT
+LET A=NOT:
+LET A=NOT!
+LET A=2**
+LET A=2**:
+LET A=2**!
+LET A=2/
+LET A=2 DIV
+LET A=2 MOD
+LET A=2*
+LET A=2+
+LET A=2-
+LET A=2=
+LET A=2<>
+LET A=2>
+LET A=2>=
+LET A=2<
+LET A=2<=
+LET A=2 AND
+LET A=2 OR
+LET !=2
+LET A$(2
+LET A$(=
+LET A$(1 TO
+LET A$(TO=
+LET UNTIL=10
+LET A=PROCx(
+LET A
+A=
+A=:
+A=1+
+A=@42
+A=@A$
+A=&42
+A=&A$
+A=(1+2
+A=(1+2:
+A=(1+2!
+A=CODE
+A=CODE:
+A=-
+A=-:
+A=-!
+A=+
+A=+:
+A=+!
+A=NOT
+A=NOT:
+A=NOT!
+A=2**
+A=2**:
+A=2**!
+A=2/
+A=2 DIV
+A=2 MOD
+A=2*
+A=2+
+A=2-
+A=2=
+A=2<>
+A=2>
+A=2>=
+A=2<
+A=2<=
+A=2 AND
+A=2 OR
+!=2
+A$(2
+A$(=
+A$(1 TO
+A$(TO=
+UNTIL=10
+A=PROCx(
+A

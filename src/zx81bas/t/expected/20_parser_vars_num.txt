@@ -16,98 +16,12 @@ Prog {
     ]
     stmts: [
         PragmaNumVarStmt {
-            TokLine {
-                source_type: BASIC
-                src_line:
-                    SrcLine {
-                        text: "!VARS A=123"
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 1
-                    }
-                tokens: [
-                    Token {
-                        type: !
-                        text: "!"
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: Identifier
-                        keyword: VARS
-                        text: "VARS"
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: Identifier
-                        text: "A"
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: =
-                        text: "="
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 1
-                    }
-                    Token {
-                        type: Integer
-                        text: "123"
-                        ivalue: 123
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 1
-                    }
-                ]
-            }
+            location: t/input/20_parser_vars_num.bas:1
             name: A
             value: 123.000000
         }
         PragmaNumVarStmt {
-            TokLine {
-                source_type: BASIC
-                src_line:
-                    SrcLine {
-                        text: "!VARS B=1.23"
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 2
-                    }
-                tokens: [
-                    Token {
-                        type: !
-                        text: "!"
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 2
-                    }
-                    Token {
-                        type: Identifier
-                        keyword: VARS
-                        text: "VARS"
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 2
-                    }
-                    Token {
-                        type: Identifier
-                        text: "B"
-                        ws_before: " "
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 2
-                    }
-                    Token {
-                        type: =
-                        text: "="
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 2
-                    }
-                    Token {
-                        type: Float
-                        text: "1.23"
-                        nvalue: 1.230000
-                        filename: "t/input/20_parser_vars_num.bas"
-                        line_num: 2
-                    }
-                ]
-            }
+            location: t/input/20_parser_vars_num.bas:2
             name: B
             value: 1.230000
         }

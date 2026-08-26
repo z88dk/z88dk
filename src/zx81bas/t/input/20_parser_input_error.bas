@@ -1,0 +1,3 @@
+INPUT
+INPUT A,
+INPUT A x

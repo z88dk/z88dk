@@ -202,8 +202,7 @@ static void map_line_numbers(std::vector<SrcLine>& src_lines) {
             }
         }
 
-        src_line.filename = filename;
-        src_line.line_num = line_num;
+        src_line.loc = SourceLoc(filename, line_num);
     }
 }
 
@@ -515,7 +514,7 @@ static bool process_file(const std::string& input_file,
         }
 
         // sync line numbers
-        while (line_num < src_line.line_num) {
+        while (line_num < src_line.loc.line_num) {
             outfile << std::endl;
             line_num++;
         }
@@ -605,7 +604,7 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
     if (g_dump_step == 3) {
         std::cout << "Preprocessor output:" << std::endl;
         for (const auto& src_line : out_lines) {
-            std::cout << src_line.filename << ":" << src_line.line_num << ": "
+            std::cout << src_line.loc.filename << ":" << src_line.loc.line_num << ": "
                       << src_line.text << std::endl;
         }
         exit(EXIT_SUCCESS);
@@ -617,7 +616,7 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
 
 static bool match_mode_change(const std::string& text,
                               const std::string& find_keyword,
-                              const std::string& filename, int line_num) {
+                              const SourceLoc& loc) {
     size_t pos = 0;
     if (match_char(text, pos, '!')) {
         std::string keyword;
@@ -625,7 +624,7 @@ static bool match_mode_change(const std::string& text,
             if (keyword == find_keyword) {
                 skip_whitespace(text, pos);
                 if (pos < text.size()) {
-                    error(filename, line_num,
+                    error(loc,
                           "end of line expected, found '" + text.substr(pos) + "'");
                 }
                 return true;
@@ -635,12 +634,10 @@ static bool match_mode_change(const std::string& text,
     return false;
 }
 
-bool match_ASM(const std::string& text, const std::string& filename,
-               int line_num) {
-    return match_mode_change(text, "ASM", filename, line_num);
+bool match_ASM(const std::string& text, const SourceLoc& loc) {
+    return match_mode_change(text, "ASM", loc);
 }
 
-bool match_BASIC(const std::string& text, const std::string& filename,
-                 int line_num) {
-    return match_mode_change(text, "ENDASM", filename, line_num);
+bool match_BASIC(const std::string& text, const SourceLoc& loc) {
+    return match_mode_change(text, "ENDASM", loc);
 }
