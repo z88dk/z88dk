@@ -30,17 +30,16 @@ void Token::dump(DumpContext ctx) const {
     if (!ws_before.empty()) {
         child_ctx.line("ws_before: \"" + ws_before + "\"");
     }
-    child_ctx.line("filename: \"" + filename + "\"");
-    child_ctx.line("line_num: " + std::to_string(line_num));
+    loc.dump(child_ctx);
     ctx.line("}");
 }
 
 void TokLine::dump(DumpContext ctx) const {
     ctx.line("TokLine {");
     auto child_ctx = ctx.child();
-    child_ctx.line("source_type: " + 
-				std::string(source_type == SourceType::BASIC ? 
-							"BASIC" : "ASM"));
+    child_ctx.line("source_type: " +
+                   std::string(source_type == SourceType::BASIC ?
+                               "BASIC" : "ASM"));
     child_ctx.line("src_line:");
     src_line.dump(child_ctx.child());
     child_ctx.line("tokens: [");

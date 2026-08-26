@@ -1,0 +1,97 @@
+% z88dk-zx81bas -d 5 t//input/20_parser_let_error.bas
+Input file:  t/input/20_parser_let_error.bas
+Output file: t/input/20_parser_let_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/20_parser_let_error.bas.i" "t/input/20_parser_let_error.bas.pp"
+t/input/20_parser_let_error.bas:1: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:2: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:3: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:4: error: expected 'Identifier', found '42'
+t/input/20_parser_let_error.bas:5: error: label reference cannot be a string variable
+t/input/20_parser_let_error.bas:6: error: expected 'Identifier', found '42'
+t/input/20_parser_let_error.bas:7: error: label reference cannot be a string variable
+t/input/20_parser_let_error.bas:8: error: expected ')', found end of line
+t/input/20_parser_let_error.bas:9: error: expected ')', found ':'
+t/input/20_parser_let_error.bas:10: error: expected ')', found '!'
+t/input/20_parser_let_error.bas:11: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:12: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:13: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:14: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:15: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:16: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:17: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:18: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:19: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:20: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:21: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:22: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:23: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:24: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:25: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:26: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:27: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:28: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:29: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:30: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:31: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:32: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:33: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:34: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:35: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:36: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:37: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:38: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:39: error: expected variable name, found '!='
+t/input/20_parser_let_error.bas:40: error: expected ')', found end of line
+t/input/20_parser_let_error.bas:41: error: unexpected token '=' in expression
+t/input/20_parser_let_error.bas:42: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:43: error: unexpected token '=' in expression
+t/input/20_parser_let_error.bas:44: error: expected variable name, found 'UNTIL'
+t/input/20_parser_let_error.bas:45: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:46: error: expected '=', found end of line
+t/input/20_parser_let_error.bas:47: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:48: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:49: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:50: error: expected 'Identifier', found '42'
+t/input/20_parser_let_error.bas:51: error: label reference cannot be a string variable
+t/input/20_parser_let_error.bas:52: error: expected 'Identifier', found '42'
+t/input/20_parser_let_error.bas:53: error: label reference cannot be a string variable
+t/input/20_parser_let_error.bas:54: error: expected ')', found end of line
+t/input/20_parser_let_error.bas:55: error: expected ')', found ':'
+t/input/20_parser_let_error.bas:56: error: expected ')', found '!'
+t/input/20_parser_let_error.bas:57: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:58: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:59: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:60: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:61: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:62: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:63: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:64: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:65: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:66: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:67: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:68: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:69: error: expected expression term, found ':'
+t/input/20_parser_let_error.bas:70: error: unexpected token '!' in expression
+t/input/20_parser_let_error.bas:71: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:72: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:73: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:74: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:75: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:76: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:77: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:78: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:79: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:80: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:81: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:82: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:83: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:84: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:85: error: expected a BASIC language statement, found '!='
+t/input/20_parser_let_error.bas:86: error: expected ')', found end of line
+t/input/20_parser_let_error.bas:87: error: unexpected token '=' in expression
+t/input/20_parser_let_error.bas:88: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:89: error: unexpected token '=' in expression
+t/input/20_parser_let_error.bas:90: error: unrecognized statement 'UNTIL'
+t/input/20_parser_let_error.bas:91: error: expected expression term, found end of line
+t/input/20_parser_let_error.bas:92: error: unrecognized statement 'A'
+Parsing failed with errors.

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "dump_context.h"
+#include "errors.h"
 #include "preproc.h"
 #include <string>
 #include <vector>
@@ -38,8 +39,7 @@ struct Token : TreeNode {
     int ivalue = 0;
     double nvalue = 0.0;
     std::string ws_before;  // white space before token
-    std::string filename;
-    int line_num = 0;
+    SourceLoc loc;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
