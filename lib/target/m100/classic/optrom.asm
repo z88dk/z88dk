@@ -5,7 +5,13 @@
 ;
 
     ; guaranteed safe place to put some variables
-    defc ALTLCD_RAM = $FCC0
+
+    IFDEF __T200
+        defc ALTLCD_RAM = $F7B0
+    ELSE
+        defc ALTLCD_RAM = $FCC0
+    ENDIF
+	
     defc ALTLCD_LEN = 320        
 
     defc CRT_ORG_DATA = ALTLCD_RAM
@@ -127,7 +133,7 @@ intcall:
 stdon:
 	push	af
 	push	hl ; 26C8, F1 C9  POP PSW, RET
-	ld	hl, POPAFRET ; it returns to this location --> pop psw; ret
+	ld	hl, KY_POPAFRET ; it returns to this location --> pop psw; ret
 	ex	(sp), hl
 opexit:
 	xor	a
