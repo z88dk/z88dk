@@ -21,4 +21,5 @@ target/g800/graphics/obj/${TARGET}/clsgraph
 target/g800/graphics/obj/${TARGET}/plotpixel
 target/g800/graphics/obj/${TARGET}/scrollup_1px
 target/g800/graphics/obj/${TARGET}/scrollup_4px
+target/g800/graphics/obj/${TARGET}/scrollup_6px
 @classic/gfx/narrow/gfx_narrow.lst
