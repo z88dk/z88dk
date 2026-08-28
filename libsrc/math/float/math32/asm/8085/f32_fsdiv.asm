@@ -86,8 +86,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push bc                     ; flag
 
     push de
-    push hl                     ; b
-    ld de,sp+8
+    push hl                     ; b → SP = b (4), flag (2), ret (2), a
+    ld de,sp+8                  ; a, not 4/6: b+flag+ret sit under SP
     call load4                  ; DEHL = a
     push de
     push hl                     ; a
