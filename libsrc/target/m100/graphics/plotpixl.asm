@@ -21,6 +21,19 @@
 
 
 plotpixel:
+
+IF  _GFX_MAXX<>256
+    ld      a, h
+    cp      _GFX_MAXX
+    ret     nc
+ENDIF
+
+IF  _GFX_MAXY<>256
+    ld      a, l
+    cp      _GFX_MAXY
+    ret     nc                          ; y0    out of range
+ENDIF
+
     push    bc
     ld      d, h
     ld      e, l
