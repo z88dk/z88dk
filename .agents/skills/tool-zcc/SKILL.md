@@ -29,7 +29,7 @@ Env: `PATH` includes `bin/`, `ZCCCFG=lib/config`.
 
 **Pitfall:** parallel bare `zcc` in one cwd can corrupt shared `zcc_opt.def` — sequential or separate dirs.
 
-`-compiler=multi` compiles each C file with sccz80 and 80cc, then stitches one function body per name. Default metric is static ticks. sdcc clibs are an ABI error. Spec: `src/zcc-multi/zcc-compiler-multi.md`.
+`-compiler=multi` compiles each C file with sccz80 and 80cc, then stitches one function body per name. Default metric is static ticks. Metric and report flags are `--multi-compiler-metric` and `--multi-compiler-report` (double dash; do not use a `-compiler-*` name). sdcc clibs are an ABI error. Spec: `src/zcc-multi/zcc-compiler-multi.md`.
 
 
 ## Condensed reference (from wiki / tree)

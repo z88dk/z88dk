@@ -103,7 +103,7 @@ The mix is not whole-program LTO.
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Switch | `-compiler=multi` | User requirement. Matches `-compiler=sccz80`. |
-| Metric flags | `-compiler-metric=ticks` (default) and `-compiler-metric=size` | Multi is already selected by `-compiler=multi`. Ticks is the compile-time proxy. |
+| Metric flags | `--multi-compiler-metric=ticks` (default) and `--multi-compiler-metric=size` | Double-dash names. They do not share a prefix with `-compiler`. Ticks is the compile-time proxy. |
 | Tool shape | Binary `z88dk-zcc-multi` | Parser and selector are not trivial. zcc already shells to copt and z80asm via `process()`. |
 | Data source | sccz80 variant | Named objects must appear once. sccz80 is the default compiler. |
 | Preprocess | Once per variant | Benches use `#ifdef __80CC`. One preprocess would drop that path. |
@@ -135,19 +135,19 @@ The mix is not whole-program LTO.
 | Switch | Type | Default | Meaning |
 |--------|------|---------|---------|
 | `-compiler=multi` | existing `compiler` string | n/a | Enable multi mode. |
-| `-compiler-metric=ticks` | new string | `ticks` | Select the lower static T-state sum. |
-| `-compiler-metric=size` | new string | | Select the smaller assembled body. |
-| `-compiler-multi-report=path` | new string | unset | Write a TSV report. |
+| `--multi-compiler-metric=ticks` | new string | `ticks` | Select the lower static T-state sum. |
+| `--multi-compiler-metric=size` | new string | | Select the smaller assembled body. |
+| `--multi-compiler-report=path` | new string | unset | Write a TSV report. |
 
 Unknown metric values MUST be an error.
 
-`-compiler-metric` is only used with `-compiler=multi`.
+`--multi-compiler-metric` is only used with `-compiler=multi`.
 
-`option_parse()` matches a long name as a prefix.
+`option_parse()` matches a long name as a prefix. A single-hyphen name that starts with `compiler-` is parsed as `-compiler`.
 
-`-compiler-metric` and `-compiler-multi-report` MUST stand before `-compiler` in the option table.
+The metric and report flags MUST use a double hyphen. Their long names MUST NOT start with `compiler`.
 
-If they stand after it, `-compiler-metric=size` is parsed as `-compiler=-metric=size`.
+Do not accept `-compiler-metric` or `-compiler-multi-report`.
 
 ### Precedence
 
@@ -240,7 +240,7 @@ After the function lines, print the summary. See [Selection summary](#selection-
 
 ### Report file
 
-`-compiler-multi-report=path` writes UTF-8 TSV.
+`--multi-compiler-report=path` writes UTF-8 TSV.
 
 zcc passes the same path to every translation unit. A `@lst` job overwrites the file once per `.c` file. The file that remains is the last TU. Use `-v` summaries for a multi-file job, or pass a distinct report path per file.
 
@@ -1547,7 +1547,7 @@ MSYS2 `mingw32-make` cannot run `! grep`. Use `test \`grep -c\` -eq 0` instead.
 2. Assert the stitch file contains exactly one `._foo` and one `._bar`.
 3. Assert each named data label appears once.
 4. CPU matrix: z80 has 80cc-fp columns. 8085 does not.
-5. `-compiler-metric` default is ticks. The stitch banner says `metric=ticks`.
+5. `--multi-compiler-metric` default is ticks. The stitch banner says `metric=ticks`.
 6. Shared `l_mult` still stitches (`mul.c`). Differential charge must not fail the file.
 7. A compiler error in one variant fails the file.
 8. `-v` prints a selected line for each function and a `zcc-multi-summary:` block.
@@ -1587,7 +1587,7 @@ int bar(int n)
 int g;
 ```
 
-The test driver runs zcc with `-a -compiler=multi -compiler-multi-report=out.tsv`.
+The test driver runs zcc with `-a -compiler=multi --multi-compiler-report=out.tsv`.
 
 It greps the stitch file and the TSV.
 

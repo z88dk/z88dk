@@ -3,7 +3,7 @@ include ../make.config
 all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok iy.ok ext8085.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
-	zcc +test -vn -a -compiler=multi -compiler-multi-report=z80.tsv twofuncs.c
+	zcc +test -vn -a -compiler=multi --multi-compiler-report=z80.tsv twofuncs.c
 	test -f twofuncs.c.asm
 	grep -q 'zcc-multi: metric=ticks' twofuncs.c.asm
 	test `grep -c '^\._foo$$' twofuncs.c.asm` -eq 1
@@ -14,7 +14,7 @@ stitch_z80.ok: twofuncs.c
 	touch $@
 
 stitch_8085.ok: twofuncs.c
-	zcc +test -vn -clib=8085 -a -compiler=multi -compiler-multi-report=8085.tsv twofuncs.c
+	zcc +test -vn -clib=8085 -a -compiler=multi --multi-compiler-report=8085.tsv twofuncs.c
 	test -f twofuncs.c.asm
 	test `grep -c '80cc-fp' 8085.tsv` -eq 0
 	test `grep -c '^\._foo$$' twofuncs.c.asm` -eq 1
@@ -26,7 +26,7 @@ stitch_z80.bin.ok: twofuncs.c
 	touch $@
 
 stitch_z80_verbose.ok: twofuncs.c
-	zcc +test -v -a -compiler=multi -compiler-multi-report=verbose.tsv twofuncs.c 2>verbose.err
+	zcc +test -v -a -compiler=multi --multi-compiler-report=verbose.tsv twofuncs.c 2>verbose.err
 	grep -q 'zcc-multi-summary: file=' verbose.err
 	grep -q 'zcc-multi-summary: selected' verbose.err
 	grep -q 'zcc-multi-summary: share' verbose.err
@@ -34,7 +34,7 @@ stitch_z80_verbose.ok: twofuncs.c
 	touch $@
 
 helpers.ok: helpers.c
-	zcc +test -vn -a -compiler=multi -compiler-multi-report=helpers.tsv helpers.c
+	zcc +test -vn -a -compiler=multi --multi-compiler-report=helpers.tsv helpers.c
 	grep -q '^_sum	' helpers.tsv
 	test `grep -c '^\._sum$$' helpers.c.asm` -eq 1
 	touch $@
@@ -138,7 +138,7 @@ loopzero.ok: ../../../src/zcc-multi/t/loop_b0.asm ../../../src/zcc-multi/t/loop_
 
 # Shared l_mult cancels; scores are wrappers. Still must stitch and report.
 mul.ok: mul.c
-	zcc +test -vn -a -compiler=multi -compiler-multi-report=mul.tsv mul.c
+	zcc +test -vn -a -compiler=multi --multi-compiler-report=mul.tsv mul.c
 	grep -q '^_mul	' mul.tsv
 	test `grep -c '^\._mul$$' mul.c.asm` -eq 1
 	touch $@

@@ -559,9 +559,10 @@ static option options[] = {
     { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
 
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
-    { 0, "compiler-metric", OPT_STRING, "Metric for -compiler=multi: ticks (default) or size", &c_compiler_metric, NULL, 0},
-    { 0, "compiler-multi-report", OPT_STRING, "Write a TSV winner report for -compiler=multi", &c_compiler_multi_report, NULL, 0},
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi)" , &c_compiler_type, NULL, 0},
+    /* Double-dash. Do not use a -compiler-* name: option_parse matches prefixes. */
+    { 0, "multi-compiler-metric", OPT_STRING|OPT_DOUBLE_DASH, "Metric for -compiler=multi: ticks (default) or size", &c_compiler_metric, NULL, 0},
+    { 0, "multi-compiler-report", OPT_STRING|OPT_DOUBLE_DASH, "Write a TSV winner report for -compiler=multi", &c_compiler_multi_report, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
     { 0, "no-nop-comment", OPT_BOOL|OPT_DOUBLE_DASH,  "Disable nop-comment inlined asm in sdcc output" , &c_disable_nop_comment, NULL, 0},
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
@@ -3316,7 +3317,7 @@ static int compile_c_multi(int filenumber)
     int    status;
 
     if (strcmp(c_compiler_metric, "size") && strcmp(c_compiler_metric, "ticks")) {
-        fprintf(stderr, "Unknown -compiler-metric=%s (use size or ticks)\n", c_compiler_metric);
+        fprintf(stderr, "Unknown --multi-compiler-metric=%s (use size or ticks)\n", c_compiler_metric);
         return 1;
     }
 
