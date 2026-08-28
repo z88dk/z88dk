@@ -277,6 +277,9 @@ extern void __LIB__  scrollup_1px(void);
 /* Scroll the graphics map 4 pixel up */
 extern void __LIB__  scrollup_4px(void);
 
+/* Scroll the graphics map 6 pixel up */
+extern void __LIB__  scrollup_6px(void);
+
 
 /* Clear area of graphics map */
 __ZPROTO4(void,,clga,int,tlx,int,tly,int,tlx2,int,tly2)
