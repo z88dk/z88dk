@@ -1,2 +1,3 @@
 target/northstar/obj/northstar/**/*.o
 @classic/gfx/wide/gfx_wide.lst
+@classic/games/games.lst
