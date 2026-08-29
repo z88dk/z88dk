@@ -3480,15 +3480,6 @@ Prog {
         }
         ClearStmt {
             location: test_t_input_05_t.bas:483
-            ramtop_expr: 
-                null
-        }
-        ClearStmt {
-            location: test_t_input_05_t.bas:484
-            ramtop_expr: 
-                NumberExpr {
-                    value: 30000.000000
-                }
         }
     ]
 }
