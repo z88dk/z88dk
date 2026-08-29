@@ -89,7 +89,7 @@ struct RepeatStmt : Stmt {
     using Stmt::Stmt;
 
     std::vector<std::unique_ptr<Stmt>> body;   // full body, including EXIT
-    std::unique_ptr<Expr> until_condition;     // condition2
+    std::unique_ptr<Expr> condition;     // condition2
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -160,7 +160,7 @@ struct DefFnStmt : Stmt {
 
     std::string name;                         // FNname
     std::vector<std::string> params;          // A, B
-    std::unique_ptr<Expr> body;               // A+B
+    std::unique_ptr<Expr> expr;               // A+B
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -352,17 +352,6 @@ struct PokewStmt : Stmt {
 #endif
 };
 
-struct OutStmt : Stmt {
-    using Stmt::Stmt;
-
-    std::unique_ptr<Expr> port;
-    std::unique_ptr<Expr> value;
-
-#ifdef _DEBUG
-    void dump(DumpContext ctx) const override;
-#endif
-};
-
 struct PlotStmt : Stmt {
     using Stmt::Stmt;
 
@@ -388,7 +377,7 @@ struct UnplotStmt : Stmt {
 struct RandStmt : Stmt {
     using Stmt::Stmt;
 
-    std::unique_ptr<Expr> seed;
+    std::unique_ptr<Expr> seed_expr;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -398,7 +387,7 @@ struct RandStmt : Stmt {
 struct PauseStmt : Stmt {
     using Stmt::Stmt;
 
-    std::unique_ptr<Expr> duration;
+    std::unique_ptr<Expr> duration_expr;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;

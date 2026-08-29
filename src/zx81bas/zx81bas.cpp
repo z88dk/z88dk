@@ -11,6 +11,7 @@
 #include "options.h"
 #include "parser.h"
 #include "preproc.h"
+#include "semantic.h"
 #include "utils.h"
 #include <cstdlib>
 #include <filesystem>
@@ -151,6 +152,11 @@ int main(int argc, char* argv[]) {
     // parse the BASIC program
     std::unique_ptr<Prog> prog;
     if (!parse_basic_program(tok_file, prog)) {
+        return EXIT_FAILURE;
+    }
+
+    // semantic check of the program
+    if (!semantic_check(*prog)) {
         return EXIT_FAILURE;
     }
 

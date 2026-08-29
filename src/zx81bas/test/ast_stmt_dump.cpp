@@ -95,7 +95,7 @@ void RepeatStmt::dump(DumpContext ctx) const {
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
     dump_stmt_list("body", body, child_ctx);
-    dump_child_expr("until_condition", until_condition.get(), child_ctx);
+    dump_child_expr("condition", condition.get(), child_ctx);
     ctx.line("}");
 }
 
@@ -142,7 +142,7 @@ void DefFnStmt::dump(DumpContext ctx) const {
     dump_stmt_common(*this, child_ctx);
     child_ctx.line("name: \"" + name + "\"");
     dump_string_list("params", params, child_ctx);
-    dump_child_expr("body", body.get(), child_ctx);
+    dump_child_expr("body", expr.get(), child_ctx);
     ctx.line("}");
 }
 
@@ -346,15 +346,6 @@ void PokewStmt::dump(DumpContext ctx) const {
     ctx.line("}");
 }
 
-void OutStmt::dump(DumpContext ctx) const {
-    ctx.line("OutStmt {");
-    auto child_ctx = ctx.child();
-    dump_stmt_common(*this, child_ctx);
-    dump_child_expr("port", port.get(), child_ctx);
-    dump_child_expr("value", value.get(), child_ctx);
-    ctx.line("}");
-}
-
 void PlotStmt::dump(DumpContext ctx) const {
     ctx.line("PlotStmt {");
     auto child_ctx = ctx.child();
@@ -377,7 +368,7 @@ void RandStmt::dump(DumpContext ctx) const {
     ctx.line("RandStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    dump_child_expr("seed", seed.get(), child_ctx);
+    dump_child_expr("seed", seed_expr.get(), child_ctx);
     ctx.line("}");
 }
 
@@ -385,7 +376,7 @@ void PauseStmt::dump(DumpContext ctx) const {
     ctx.line("PauseStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    dump_child_expr("duration", duration.get(), child_ctx);
+    dump_child_expr("duration", duration_expr.get(), child_ctx);
     ctx.line("}");
 }
 

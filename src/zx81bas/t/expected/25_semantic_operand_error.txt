@@ -1,0 +1,163 @@
+% z88dk-zx81bas -d 6 t//input/25_semantic_operand_error.bas
+Input file:  t/input/25_semantic_operand_error.bas
+Output file: t/input/25_semantic_operand_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/25_semantic_operand_error.bas.i" "t/input/25_semantic_operand_error.bas.pp"
+t/input/25_semantic_operand_error.bas:1: error: Array index expression must be a number
+t/input/25_semantic_operand_error.bas:2: error: Array index expression must be a number
+t/input/25_semantic_operand_error.bas:3: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:4: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:5: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:6: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:7: error: Slice 'from' expression must be a number
+t/input/25_semantic_operand_error.bas:8: error: Slice 'to' expression must be a number
+t/input/25_semantic_operand_error.bas:9: error: Slice base expression must be a string
+t/input/25_semantic_operand_error.bas:10: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:11: error: Unary operator requires a number operand
+t/input/25_semantic_operand_error.bas:12: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:13: error: Unary operator requires a number operand
+t/input/25_semantic_operand_error.bas:14: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:15: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:16: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:17: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:17: error: Binary arithmetic operators require number operands
+t/input/25_semantic_operand_error.bas:18: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:19: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:19: error: Binary arithmetic operators require number operands
+t/input/25_semantic_operand_error.bas:20: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:21: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:21: error: Binary arithmetic operators require number operands
+t/input/25_semantic_operand_error.bas:22: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:23: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:23: error: Binary arithmetic operators require number operands
+t/input/25_semantic_operand_error.bas:24: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:25: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:25: error: Binary arithmetic operators require number operands
+t/input/25_semantic_operand_error.bas:26: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:27: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:27: error: Binary arithmetic operators require number operands
+t/input/25_semantic_operand_error.bas:28: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:29: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:29: error: Binary logical operators require number operands
+t/input/25_semantic_operand_error.bas:30: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:31: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:31: error: Binary logical operators require number operands
+t/input/25_semantic_operand_error.bas:32: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:33: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:34: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:35: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:36: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:37: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:38: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:39: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:40: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:41: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:42: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:43: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:44: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:45: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:46: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:47: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:48: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:49: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:50: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:51: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:52: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:53: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:54: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:55: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:56: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:57: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:58: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:59: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:60: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:61: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:62: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:63: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:64: error: Function argument must be a string
+t/input/25_semantic_operand_error.bas:65: error: Function argument must be a string
+t/input/25_semantic_operand_error.bas:66: error: Function argument must be a string
+t/input/25_semantic_operand_error.bas:67: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:68: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:69: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:70: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:71: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:72: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:73: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:74: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:75: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:76: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:77: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:78: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:79: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:80: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:81: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:82: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:83: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:84: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:85: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:86: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:87: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:88: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:89: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:90: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:91: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:92: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:93: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:94: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:95: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:96: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:97: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:98: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:99: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:100: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:101: error: Function argument must be a number
+t/input/25_semantic_operand_error.bas:102: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:103: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:104: error: PROC call argument must be a number
+t/input/25_semantic_operand_error.bas:105: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:106: error: FN call arguments must be numbers
+t/input/25_semantic_operand_error.bas:107: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:108: error: Array dimension expression must be a number
+t/input/25_semantic_operand_error.bas:109: error: Array dimension expression must be a number
+t/input/25_semantic_operand_error.bas:110: error: IF condition must be a number
+t/input/25_semantic_operand_error.bas:111: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:111: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:112: error: UNTIL condition must be a number
+t/input/25_semantic_operand_error.bas:113: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:113: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:114: error: WHILE condition must be a number
+t/input/25_semantic_operand_error.bas:115: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:115: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:116: error: FOR start expression must be a number
+t/input/25_semantic_operand_error.bas:117: error: FOR end expression must be a number
+t/input/25_semantic_operand_error.bas:118: error: FOR step expression must be a number
+t/input/25_semantic_operand_error.bas:119: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:119: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:120: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:120: error: Type mismatch in LET statement
+t/input/25_semantic_operand_error.bas:121: error: PROC call argument must be a number
+t/input/25_semantic_operand_error.bas:121: error: PROC call argument must be a number
+t/input/25_semantic_operand_error.bas:122: error: PROC call argument must be a number
+t/input/25_semantic_operand_error.bas:122: error: PROC call argument must be a number
+t/input/25_semantic_operand_error.bas:123: error: DEF FN expression must return a number
+t/input/25_semantic_operand_error.bas:124: error: GOTO expression must be a number
+t/input/25_semantic_operand_error.bas:125: error: GOTO expression must be a number
+t/input/25_semantic_operand_error.bas:126: error: AT argument must be a number
+t/input/25_semantic_operand_error.bas:126: error: AT argument must be a number
+t/input/25_semantic_operand_error.bas:126: error: AT argument must be a number
+t/input/25_semantic_operand_error.bas:126: error: Binary expression operands must have the same type
+t/input/25_semantic_operand_error.bas:127: error: RUN expression must be a number
+t/input/25_semantic_operand_error.bas:128: error: LIST expression must be a number
+t/input/25_semantic_operand_error.bas:129: error: LOAD expression must be a string
+t/input/25_semantic_operand_error.bas:130: error: SAVE expression must be a string
+t/input/25_semantic_operand_error.bas:131: error: POKE expression must be a number
+t/input/25_semantic_operand_error.bas:131: error: POKE expression must be a number
+t/input/25_semantic_operand_error.bas:132: error: POKEW expression must be a number
+t/input/25_semantic_operand_error.bas:132: error: POKEW expression must be a number
+t/input/25_semantic_operand_error.bas:133: error: PLOT expression must be a number
+t/input/25_semantic_operand_error.bas:133: error: PLOT expression must be a number
+t/input/25_semantic_operand_error.bas:134: error: UNPLOT expression must be a number
+t/input/25_semantic_operand_error.bas:134: error: UNPLOT expression must be a number
+t/input/25_semantic_operand_error.bas:135: error: RAND expression must be a number
+t/input/25_semantic_operand_error.bas:136: error: PAUSE expression must be a number
+Semantic check failed with 158 errors

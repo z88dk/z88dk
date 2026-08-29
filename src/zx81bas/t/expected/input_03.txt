@@ -176,80 +176,84 @@ test_t_input_03_t.bas:261: 	FOR J=1 TO 10 STEP 2
 test_t_input_03_t.bas:262: 		A=I*J:NEXT:NEXT
 test_t_input_03_t.bas:268: DEF PROCname(A, B)
 test_t_input_03_t.bas:269:     LOCAL L
-test_t_input_03_t.bas:270: 	L = A + B
-test_t_input_03_t.bas:271: 	IF A = 2 THEN EXIT
-test_t_input_03_t.bas:272: 	RESULT = L
-test_t_input_03_t.bas:273: 	PROCname = L
-test_t_input_03_t.bas:274: ENDPROC
-test_t_input_03_t.bas:276: PROCname 10, 20
-test_t_input_03_t.bas:277: PROCname(30, 40)
-test_t_input_03_t.bas:279: A = 1 + PROCname(50, 60)
-test_t_input_03_t.bas:281: DEF procempty()
-test_t_input_03_t.bas:282: 	procempty = PI
-test_t_input_03_t.bas:283: ENDPROC
-test_t_input_03_t.bas:285: procempty
-test_t_input_03_t.bas:286: procempty()
-test_t_input_03_t.bas:287: A = 1 + procempty()
-test_t_input_03_t.bas:293: DEF FNname(A,B) = A + B
-test_t_input_03_t.bas:295: A = FNname(10,20)
-test_t_input_03_t.bas:297: DEF fnempty() = PI
-test_t_input_03_t.bas:299: A = fnempty()
-test_t_input_03_t.bas:305: 	GOTO 1000
-test_t_input_03_t.bas:306: 	GOTO 1000+20*N
-test_t_input_03_t.bas:307: 	GOTO @label1
-test_t_input_03_t.bas:313: 	GOSUB 1000
-test_t_input_03_t.bas:314: 	GOSUB 1000+20*N
-test_t_input_03_t.bas:315: 	GOSUB @label1
-test_t_input_03_t.bas:321: 	RETURN
-test_t_input_03_t.bas:327: 	STOP
-test_t_input_03_t.bas:333: 	END
-test_t_input_03_t.bas:339: 	PRINT
-test_t_input_03_t.bas:340: 	PRINT ,
-test_t_input_03_t.bas:341: 	PRINT ;
-test_t_input_03_t.bas:342: 	PRINT 2*3
-test_t_input_03_t.bas:343: 	PRINT TAB 8;
-test_t_input_03_t.bas:344: 	PRINT AT 10,10;
-test_t_input_03_t.bas:345: 	PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
-test_t_input_03_t.bas:351: 	INPUT A, ABC
-test_t_input_03_t.bas:352: 	INPUT A(1,2)
-test_t_input_03_t.bas:353: 	INPUT A$
-test_t_input_03_t.bas:354: 	INPUT A$(1,2)
-test_t_input_03_t.bas:355: 	INPUT A$(1 TO 2)
-test_t_input_03_t.bas:356: 	INPUT A$(1,2)(3 TO 4)
-test_t_input_03_t.bas:357: 	INPUT A$(TO 3)
-test_t_input_03_t.bas:358: 	INPUT A$(2 TO)
-test_t_input_03_t.bas:359: 	INPUT A,A$
-test_t_input_03_t.bas:365: 	REM
-test_t_input_03_t.bas:366: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
-test_t_input_03_t.bas:367: !ASM
-test_t_input_03_t.bas:368: 	start_rem:
-test_t_input_03_t.bas:369: !ENDASM
+test_t_input_03_t.bas:270: 	LOCAL L1, L2
+test_t_input_03_t.bas:271: 	IF 1 THEN
+test_t_input_03_t.bas:272: 		LOCAL L2, L3
+test_t_input_03_t.bas:273: 	ENDIF
+test_t_input_03_t.bas:274: 	L = A + B
+test_t_input_03_t.bas:275: 	IF A = 2 THEN EXIT
+test_t_input_03_t.bas:276: 	RESULT = L
+test_t_input_03_t.bas:277: 	PROCname = L
+test_t_input_03_t.bas:278: ENDPROC
+test_t_input_03_t.bas:280: PROCname 10, 20
+test_t_input_03_t.bas:281: PROCname(30, 40)
+test_t_input_03_t.bas:283: A = 1 + PROCname(50, 60)
+test_t_input_03_t.bas:285: DEF procempty()
+test_t_input_03_t.bas:286: 	procempty = PI
+test_t_input_03_t.bas:287: ENDPROC
+test_t_input_03_t.bas:289: procempty
+test_t_input_03_t.bas:290: procempty()
+test_t_input_03_t.bas:291: A = 1 + procempty()
+test_t_input_03_t.bas:297: DEF FNname(A,B) = A + B
+test_t_input_03_t.bas:299: A = FNname(10,20)
+test_t_input_03_t.bas:301: DEF fnempty() = PI
+test_t_input_03_t.bas:303: A = fnempty()
+test_t_input_03_t.bas:309: 	GOTO 1000
+test_t_input_03_t.bas:310: 	GOTO 1000+20*N
+test_t_input_03_t.bas:311: 	GOTO @label1
+test_t_input_03_t.bas:317: 	GOSUB 1000
+test_t_input_03_t.bas:318: 	GOSUB 1000+20*N
+test_t_input_03_t.bas:319: 	GOSUB @label1
+test_t_input_03_t.bas:325: 	RETURN
+test_t_input_03_t.bas:331: 	STOP
+test_t_input_03_t.bas:337: 	END
+test_t_input_03_t.bas:343: 	PRINT
+test_t_input_03_t.bas:344: 	PRINT ,
+test_t_input_03_t.bas:345: 	PRINT ;
+test_t_input_03_t.bas:346: 	PRINT 2*3
+test_t_input_03_t.bas:347: 	PRINT TAB 8;
+test_t_input_03_t.bas:348: 	PRINT AT 10,10;
+test_t_input_03_t.bas:349: 	PRINT AT 10,10;"HELLO";TAB 10;"WORLD";
+test_t_input_03_t.bas:355: 	INPUT A, ABC
+test_t_input_03_t.bas:356: 	INPUT A(1,2)
+test_t_input_03_t.bas:357: 	INPUT A$
+test_t_input_03_t.bas:358: 	INPUT A$(1,2)
+test_t_input_03_t.bas:359: 	INPUT A$(1 TO 2)
+test_t_input_03_t.bas:360: 	INPUT A$(1,2)(3 TO 4)
+test_t_input_03_t.bas:361: 	INPUT A$(TO 3)
+test_t_input_03_t.bas:362: 	INPUT A$(2 TO)
+test_t_input_03_t.bas:363: 	INPUT A,A$
+test_t_input_03_t.bas:369: 	REM
+test_t_input_03_t.bas:370: 	REM COMMENT TEXT : COLONS ARE PART OF COMMENT
 test_t_input_03_t.bas:371: !ASM
-test_t_input_03_t.bas:372: 		ret
+test_t_input_03_t.bas:372: 	start_rem:
 test_t_input_03_t.bas:373: !ENDASM
-test_t_input_03_t.bas:379: 	RUN 
-test_t_input_03_t.bas:380: 	RUN 1000
-test_t_input_03_t.bas:381: 	RUN 1000+20*N
-test_t_input_03_t.bas:382: 	RUN @label1
-test_t_input_03_t.bas:388: 	NEW
-test_t_input_03_t.bas:394: 	CLS
-test_t_input_03_t.bas:400: 	LOAD "file"
-test_t_input_03_t.bas:406: 	SAVE "file"
-test_t_input_03_t.bas:412: 	POKE 16384,255
-test_t_input_03_t.bas:418: 	POKEW 16384,255
-test_t_input_03_t.bas:424: 	RAND USR 16514
-test_t_input_03_t.bas:430: 	PAUSE 50
-test_t_input_03_t.bas:436: 	FAST
-test_t_input_03_t.bas:442: 	SLOW
-test_t_input_03_t.bas:448: 	LIST
-test_t_input_03_t.bas:449: 	LIST 10
-test_t_input_03_t.bas:450: 	LIST 10*4
-test_t_input_03_t.bas:451: 	LIST @start
-test_t_input_03_t.bas:452: 	
-test_t_input_03_t.bas:457: 	PLOT 0,1
-test_t_input_03_t.bas:458: 	PLOT X,Y
-test_t_input_03_t.bas:464: 	UNPLOT 0,1
-test_t_input_03_t.bas:465: 	UNPLOT X,Y
-test_t_input_03_t.bas:471: 	SCROLL
-test_t_input_03_t.bas:477: 	CONT
-test_t_input_03_t.bas:483: 	CLEAR
+test_t_input_03_t.bas:375: !ASM
+test_t_input_03_t.bas:376: 		ret
+test_t_input_03_t.bas:377: !ENDASM
+test_t_input_03_t.bas:383: 	RUN 
+test_t_input_03_t.bas:384: 	RUN 1000
+test_t_input_03_t.bas:385: 	RUN 1000+20*N
+test_t_input_03_t.bas:386: 	RUN @label1
+test_t_input_03_t.bas:392: 	NEW
+test_t_input_03_t.bas:398: 	CLS
+test_t_input_03_t.bas:404: 	LOAD "file"
+test_t_input_03_t.bas:410: 	SAVE "file"
+test_t_input_03_t.bas:416: 	POKE 16384,255
+test_t_input_03_t.bas:422: 	POKEW 16384,255
+test_t_input_03_t.bas:428: 	RAND USR 16514
+test_t_input_03_t.bas:434: 	PAUSE 50
+test_t_input_03_t.bas:440: 	FAST
+test_t_input_03_t.bas:446: 	SLOW
+test_t_input_03_t.bas:452: 	LIST
+test_t_input_03_t.bas:453: 	LIST 10
+test_t_input_03_t.bas:454: 	LIST 10*4
+test_t_input_03_t.bas:455: 	LIST @start
+test_t_input_03_t.bas:456: 	
+test_t_input_03_t.bas:461: 	PLOT 0,1
+test_t_input_03_t.bas:462: 	PLOT X,Y
+test_t_input_03_t.bas:468: 	UNPLOT 0,1
+test_t_input_03_t.bas:469: 	UNPLOT X,Y
+test_t_input_03_t.bas:475: 	SCROLL
+test_t_input_03_t.bas:481: 	CONT
+test_t_input_03_t.bas:487: 	CLEAR
