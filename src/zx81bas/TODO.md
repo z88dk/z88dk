@@ -1,13 +1,10 @@
 ## TODO
 
-- add ZX Spectrum additional BASIC keywords as extended keywords
-- populate LOCAL in PROC from LOCAL statements
 - variable collection and symbol table creation
-- check of data types number/string
 - lower to standard BASIC
+- map each exit to the corresponding structure
 - number lines
 - generate output file
-- parse of graphical images for 2x2 graphics
 
 ## Parser
 

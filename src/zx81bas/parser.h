@@ -8,6 +8,7 @@
 
 #include "ast_expr.h"
 #include "ast_stmt.h"
+#include "errors.h"
 #include "lexer.h"
 #include <memory>
 #include <stdexcept>
@@ -54,7 +55,6 @@ private:
     const TokLine& line() const;
     const SourceLoc& loc() const;
 
-    static bool is_string_variable(const std::string& name);
     static bool is_func_one_arg(Keyword keyword);
     static bool is_func_zero_arg(Keyword keyword);
     static bool has_TO(const std::vector<Token>& tokens, size_t pos);
@@ -140,6 +140,5 @@ private:
     std::unique_ptr<Stmt> parse_stmt_clear();
 
     std::unique_ptr<DimItem> parse_dim_item();
-
 };
 

@@ -4,6 +4,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "ast.h"
 #include "ast_expr.h"
 #include "ast_stmt.h"
 #include "dump_context.h"
@@ -14,6 +15,7 @@
 #include "release_assert.h"
 #include "scan.h"
 #include "utils.h"
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -178,21 +180,18 @@ std::unique_ptr<Expr> Parser::parse_primary() {
 
     // Number
     if (match(TokenType::Integer)) {
-        auto number_expr = std::make_unique<NumberExpr>();
-        number_expr->value = t.ivalue;
+        auto number_expr = std::make_unique<NumberExpr>(t.ivalue, loc());
         return number_expr;
     }
 
     if (match(TokenType::Float)) {
-        auto number_expr = std::make_unique<NumberExpr>();
-        number_expr->value = t.nvalue;
+        auto number_expr = std::make_unique<NumberExpr>(t.nvalue, loc());
         return number_expr;
     }
 
     // String literal
     if (match(TokenType::StringLiteral)) {
-        auto string_expr = std::make_unique<StringLiteralExpr>();
-        string_expr->value = t.svalue;
+        auto string_expr = std::make_unique<StringLiteralExpr>(t.svalue, loc());
         return string_expr;
     }
 
@@ -203,8 +202,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         if (is_string_variable(name)) {
             syntax_error("label reference cannot be a string variable");
         }
-        auto label_ref = std::make_unique<LabelLineRefExpr>();
-        label_ref->name = name;
+        auto label_ref = std::make_unique<LabelLineRefExpr>(name, loc());
         return label_ref;
     }
 
@@ -215,8 +213,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         if (is_string_variable(name)) {
             syntax_error("label reference cannot be a string variable");
         }
-        auto label_ref = std::make_unique<LabelAddrRefExpr>();
-        label_ref->name = name;
+        auto label_ref = std::make_unique<LabelAddrRefExpr>(name, loc());
         return label_ref;
     }
 
@@ -250,8 +247,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                 expect(TokenType::RightParen);
             }
 
-            auto proc_call = std::make_unique<ProcCallExpr>();
-            proc_call->name = name;
+            auto proc_call = std::make_unique<ProcCallExpr>(name, loc());
             proc_call->args = std::move(args);
             return proc_call;
         }
@@ -273,16 +269,14 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                 expect(TokenType::RightParen);
             }
 
-            auto fn_call = std::make_unique<FnCallExpr>();
-            fn_call->name = name;
+            auto fn_call = std::make_unique<FnCallExpr>(name, loc());
             fn_call->args = std::move(args);
             return fn_call;
         }
 
         // 1. Zero-argument function (PI, RND, INKEY$)
         if (is_func_zero_arg(t.keyword)) {
-            auto func_call = std::make_unique<BasicFuncCallExpr>();
-            func_call->name = name;
+            auto func_call = std::make_unique<BasicFuncCallExpr>(t.keyword, loc());
             return func_call;
         }
 
@@ -296,8 +290,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                 expect(TokenType::RightParen);
             }
 
-            auto func_call = std::make_unique<BasicFuncCallExpr>();
-            func_call->name = name;
+            auto func_call = std::make_unique<BasicFuncCallExpr>(t.keyword, loc());
             func_call->args = std::move(args);
             return func_call;
         }
@@ -305,8 +298,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 3. One-argument function without parentheses: FUNC expr
         if (is_func_one_arg(t.keyword)) {
             auto arg = parse_unary_expr();
-            auto func_call = std::make_unique<BasicFuncCallExpr>();
-            func_call->name = name;
+            auto func_call = std::make_unique<BasicFuncCallExpr>(t.keyword, loc());
             func_call->args.push_back(std::move(arg));
             return func_call;
         }
@@ -332,10 +324,8 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                     to_expr = nullptr;
                 }
 
-                auto base = std::make_unique<VariableExpr>();
-                base->name = name;
-                auto slice = std::make_unique<SliceExpr>();
-                slice->base = std::move(base);
+                auto base = std::make_unique<VariableExpr>(name, loc());
+                auto slice = std::make_unique<SliceExpr>(std::move(base), loc());
                 slice->from = std::move(from_expr);
                 slice->to = std::move(to_expr);
                 return slice;
@@ -357,10 +347,8 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                     to_expr = nullptr;
                 }
 
-                auto base = std::make_unique<VariableExpr>();
-                base->name = name;
-                auto slice = std::make_unique<SliceExpr>();
-                slice->base = std::move(base);
+                auto base = std::make_unique<VariableExpr>(name, loc());
+                auto slice = std::make_unique<SliceExpr>(std::move(base), loc());
                 slice->from = std::move(from_expr);
                 slice->to = std::move(to_expr);
                 return slice;
@@ -376,15 +364,13 @@ std::unique_ptr<Expr> Parser::parse_primary() {
 
             expect(TokenType::RightParen);
 
-            auto array_ref = std::make_unique<ArrayRefExpr>();
-            array_ref->name = name;
+            auto array_ref = std::make_unique<ArrayRefExpr>(name, loc());
             array_ref->indices = std::move(indices);
             return array_ref;
         }
 
         // 5. Simple variable
-        auto var = std::make_unique<VariableExpr>();
-        var->name = name;
+        auto var = std::make_unique<VariableExpr>(name, loc());
         return var;
     }
 
@@ -397,9 +383,7 @@ std::unique_ptr<Expr> Parser::parse_unary_expr() {
     // Unary minus
     if (match(TokenType::Minus)) {
         auto inner = parse_unary_expr();
-        auto u = std::make_unique<UnaryExpr>();
-        u->op = TokenType::Minus;
-        u->operand = std::move(inner);
+        auto u = std::make_unique<UnaryExpr>(TokenType::Minus, std::move(inner), loc());
         return u;
     }
 
@@ -412,9 +396,7 @@ std::unique_ptr<Expr> Parser::parse_unary_expr() {
     // NOT
     if (match(Keyword::NOT)) {
         auto inner = parse_unary_expr();
-        auto u = std::make_unique<UnaryExpr>();
-        u->op = TokenType::NOT;
-        u->operand = std::move(inner);
+        auto u = std::make_unique<UnaryExpr>(TokenType::NOT, std::move(inner), loc());
         return u;
     }
 
@@ -430,10 +412,8 @@ std::unique_ptr<Expr> Parser::parse_pow_expr() {
         TokenType op = peek().type;
         ++pos;
         auto right = parse_unary_expr();
-        auto binary = std::make_unique<BinaryExpr>();
-        binary->op = op;
-        binary->left = std::move(left);
-        binary->right = std::move(right);
+        auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
+                      std::move(right), loc());
         left = std::move(binary);
     }
 
@@ -463,10 +443,8 @@ std::unique_ptr<Expr> Parser::parse_mul_expr() {
         if (binary_op != TokenType::None) {
             ++pos;
             auto right = parse_pow_expr();
-            auto binary = std::make_unique<BinaryExpr>();
-            binary->op = binary_op;
-            binary->left = std::move(left);
-            binary->right = std::move(right);
+            auto binary = std::make_unique<BinaryExpr>(binary_op, std::move(left),
+                          std::move(right), loc());
             left = std::move(binary);
         }
         else {
@@ -485,10 +463,8 @@ std::unique_ptr<Expr> Parser::parse_add_expr() {
         if (op == TokenType::Plus || op == TokenType::Minus) {
             ++pos;
             auto right = parse_mul_expr();
-            auto binary = std::make_unique<BinaryExpr>();
-            binary->op = op;
-            binary->left = std::move(left);
-            binary->right = std::move(right);
+            auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
+                          std::move(right), loc());
             left = std::move(binary);
         }
         else {
@@ -509,10 +485,8 @@ std::unique_ptr<Expr> Parser::parse_rel_expr() {
                 op == TokenType::Greater || op == TokenType::GreaterEqual) {
             ++pos;
             auto right = parse_add_expr();
-            auto binary = std::make_unique<BinaryExpr>();
-            binary->op = op;
-            binary->left = std::move(left);
-            binary->right = std::move(right);
+            auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
+                          std::move(right), loc());
             left = std::move(binary);
         }
         else {
@@ -530,10 +504,8 @@ std::unique_ptr<Expr> Parser::parse_and_expr() {
         TokenType op = TokenType::AND;
         ++pos;
         auto right = parse_rel_expr();
-        auto binary = std::make_unique<BinaryExpr>();
-        binary->op = op;
-        binary->left = std::move(left);
-        binary->right = std::move(right);
+        auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
+                      std::move(right), loc());
         left = std::move(binary);
     }
 
@@ -548,10 +520,8 @@ std::unique_ptr<Expr> Parser::parse_or_expr() {
         TokenType op = TokenType::OR;
         ++pos;
         auto right = parse_and_expr();
-        auto binary = std::make_unique<BinaryExpr>();
-        binary->op = op;
-        binary->left = std::move(left);
-        binary->right = std::move(right);
+        auto binary = std::make_unique<BinaryExpr>(op, std::move(left),
+                      std::move(right), loc());
         left = std::move(binary);
     }
 
@@ -599,15 +569,13 @@ std::unique_ptr<Expr> Parser::parse_assignable() {
         }
         expect(TokenType::RightParen);
 
-        auto arr = std::make_unique<ArrayRefExpr>();
-        arr->name = name;
+        auto arr = std::make_unique<ArrayRefExpr>(name, loc());
         arr->indices = std::move(indices);
         base = std::move(arr);
     }
     else {
         // Simple variable A or A$
-        auto var = std::make_unique<VariableExpr>();
-        var->name = name;
+        auto var = std::make_unique<VariableExpr>(name, loc());
         base = std::move(var);
     }
 
@@ -632,8 +600,7 @@ std::unique_ptr<Expr> Parser::parse_assignable() {
         }
         expect(TokenType::RightParen);
 
-        auto slice = std::make_unique<SliceExpr>();
-        slice->base = std::move(base);
+        auto slice = std::make_unique<SliceExpr>(std::move(base), loc());
         slice->from = std::move(from);
         slice->to = std::move(to);
         return slice;
@@ -647,10 +614,6 @@ bool Parser::parse() {
     Keyword stop_kw = Keyword::None;
     parse_stmt_block({}, stop_kw, prog.stmts);
     return get_error_count() == 0;
-}
-
-bool Parser::is_string_variable(const std::string& name) {
-    return !name.empty() && name.back() == '$';
 }
 
 bool Parser::is_func_one_arg(Keyword keyword) {
@@ -1267,13 +1230,13 @@ std::unique_ptr<Stmt> Parser::parse_stmt_unplot() {
 
 std::unique_ptr<Stmt> Parser::parse_stmt_rand() {
     auto stmt = std::make_unique<RandStmt>(loc());
-    stmt->seed = parse_expr();
+    stmt->seed_expr = parse_expr();
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_pause() {
     auto stmt = std::make_unique<PauseStmt>(loc());
-    stmt->duration = parse_expr();
+    stmt->duration_expr = parse_expr();
     return stmt;
 }
 
@@ -1437,7 +1400,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
         if (terminator == Keyword::None) {
             syntax_error("expected 'UNTIL'");
         }
-        stmt->until_condition = parse_expr();
+        stmt->condition = parse_expr();
         return stmt;
     }
 
@@ -1449,7 +1412,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
     if (terminator != Keyword::UNTIL) {
         syntax_error("expected 'UNTIL'");
     }
-    stmt->until_condition = parse_expr();
+    stmt->condition = parse_expr();
     return stmt;
 }
 
@@ -1504,8 +1467,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
         step_expr = parse_expr();
     }
     else {
-        auto default_step = std::make_unique<NumberExpr>();
-        default_step->value = 1.0;
+        auto default_step = std::make_unique<NumberExpr>(1.0, loc());
         step_expr = std::move(default_step);
     }
 
@@ -1637,7 +1599,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
     expect(TokenType::RightParen);
     expect(TokenType::Equal);
 
-    stmt->body = parse_expr();
+    stmt->expr = parse_expr();
 
     return stmt;
 }
@@ -1686,7 +1648,10 @@ std::unique_ptr<Stmt> Parser::parse_stmt_local() {
         if (is_string_variable(name)) {
             syntax_error("string variable '" + name + "' not allowed in LOCAL statement");
         }
-        stmt->locals.push_back(name);
+        if (std::find(stmt->locals.begin(), stmt->locals.end(),
+                      name) == stmt->locals.end()) {
+            stmt->locals.push_back(name);
+        }
         if (match(TokenType::Comma)) {
             continue;
         }
