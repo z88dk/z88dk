@@ -547,4 +547,3 @@ A = fnempty()
 
 
 	CLEAR
-	CLEAR 30000

@@ -253,4 +253,3 @@ test_t_input_03_t.bas:465: 	UNPLOT X,Y
 test_t_input_03_t.bas:471: 	SCROLL
 test_t_input_03_t.bas:477: 	CONT
 test_t_input_03_t.bas:483: 	CLEAR
-test_t_input_03_t.bas:484: 	CLEAR 30000

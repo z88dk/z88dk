@@ -346,6 +346,15 @@ void PokewStmt::dump(DumpContext ctx) const {
     ctx.line("}");
 }
 
+void OutStmt::dump(DumpContext ctx) const {
+    ctx.line("OutStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    dump_child_expr("port", port.get(), child_ctx);
+    dump_child_expr("value", value.get(), child_ctx);
+    ctx.line("}");
+}
+
 void PlotStmt::dump(DumpContext ctx) const {
     ctx.line("PlotStmt {");
     auto child_ctx = ctx.child();
@@ -412,7 +421,6 @@ void ClearStmt::dump(DumpContext ctx) const {
     ctx.line("ClearStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    dump_child_expr("ramtop_expr", ramtop_expr.get(), child_ctx);
     ctx.line("}");
 }
 

@@ -11518,28 +11518,4 @@ TokFile {
             }
         ]
     }
-    TokLine {
-        source_type: BASIC
-        src_line:
-            SrcLine {
-                text: "	CLEAR 30000"
-                location: test_t_input_04_t.bas:484
-            }
-        tokens: [
-            Token {
-                type: Identifier
-                keyword: CLEAR
-                text: "CLEAR"
-                ws_before: "	"
-                location: test_t_input_04_t.bas:484
-            }
-            Token {
-                type: Integer
-                text: "30000"
-                ivalue: 30000
-                ws_before: " "
-                location: test_t_input_04_t.bas:484
-            }
-        ]
-    }
 }

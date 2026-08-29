@@ -352,6 +352,17 @@ struct PokewStmt : Stmt {
 #endif
 };
 
+struct OutStmt : Stmt {
+    using Stmt::Stmt;
+
+    std::unique_ptr<Expr> port;
+    std::unique_ptr<Expr> value;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
 struct PlotStmt : Stmt {
     using Stmt::Stmt;
 
@@ -428,8 +439,6 @@ struct ContStmt : Stmt {
 
 struct ClearStmt : Stmt {
     using Stmt::Stmt;
-
-    std::unique_ptr<Expr> ramtop_expr;   // optional ramtop expression
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
