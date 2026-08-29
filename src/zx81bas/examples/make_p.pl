@@ -7,7 +7,11 @@
 use Modern::Perl;
 use Path::Tiny;
 
-@ARGV == 1 or die "Usage: $0 file.bas\n";
+my @z80asm_options;
+while ( @ARGV && $ARGV[0] =~ /^-/ ) {
+    push @z80asm_options, shift @ARGV;
+}
+@ARGV == 1 or die "Usage: $0 [-z80asm-options] file.bas\n";
 my $input_bas = shift;
 
 # read code
@@ -33,8 +37,8 @@ while (<$fh>) {
 
 # make assembly
 ( my $output_asm = $input_bas ) =~ s/\.\w+$/.asm/;
-path($output_asm)->spew(@asm);
-run("z88dk-z80asm -b -m -r16514 $output_asm");
+path($output_asm)->spew_raw(@asm);
+run("z88dk-z80asm -b -m -l -r16514 @z80asm_options $output_asm");
 
 # read binary output, insert as REM in basic
 ( my $bin_file = $input_bas ) =~ s/\.\w+$/.bin/;
@@ -60,7 +64,7 @@ my @syms;
 while ( my ( $name, $value ) = each %labels ) {
     push @syms, sprintf( "%04X %s\n", $value, $name );
 }
-path($sym_file)->spew( sort @syms );
+path($sym_file)->spew_raw( sort @syms );
 
 # translate labels in basic and hex numbers
 for (@basic) {
@@ -70,7 +74,7 @@ for (@basic) {
 
 # output basic
 ( my $output_b81 = $input_bas ) =~ s/\.\w+$/.b81/;
-path($output_b81)->spew(@basic);
+path($output_b81)->spew_raw(@basic);
 
 # convert to .P
 ( my $output_p = $input_bas ) =~ s/\.\w+$/.p/;
