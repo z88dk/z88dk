@@ -11,7 +11,7 @@ find(
         return if /^test_t/;    # ignore test files
         return
             unless
-/\.(cpp|h|c|def|re|rl|lst|lis|pl|t|pm|txt|md|asm|inc|m4|AZM|HEX|PRN)$/;
+/\.(cpp|h|c|def|re|rl|lst|lis|pl|t|pm|txt|md|asm|inc|bas|m4|AZM|HEX|PRN)$/;
         file_is_pure_ascii( { forbid_control => 1, forbid_cr => 1 }, $_ );
     },
     "."

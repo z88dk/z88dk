@@ -1296,14 +1296,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_cont() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_clear() {
-    auto stmt = std::make_unique<ClearStmt>(loc());
-
-    // Parse expression, if any
-    if (!at_end_of_stmt()) {
-        stmt->ramtop_expr = parse_expr();
-    }
-
-    return stmt;
+    return std::make_unique<ClearStmt>(loc());
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_exit() {

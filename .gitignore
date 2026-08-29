@@ -51,3 +51,4 @@ win32/.github/copilot-instructions.md
 .idea
 .vs/
 *.tidy-stamp
+*.dump
