@@ -94,7 +94,7 @@ Multiple statements can be written in one line separated by ':'.
 
 Long lines can be split with backslash '\\' following on the next line.
 
-Hexadecimal numbers may be entered as 0xhh.
+Hexadecimal numbers may be entered as 0xhh, binary numbers as 0b0101.
 
 LET is optional.
 
@@ -129,8 +129,6 @@ DIV(A,B) and A\\B are shortcuts for INT(A/B).
 
 MOD(A,B) is a shortcut for A-B\*INT(A/B).
 
-CLEAR accepts a ramtop value and lowers ramtop without deleting BASIC.
-
 All BASIC extended features are lowered to standard zx81 BASIC instructions
 or assembly routines before compilation.
 
@@ -160,14 +158,6 @@ These additional sequences are also accepted:
 - "\r", "\n", "\v", "\f": encoded as newline (0x76).
 
 - "\t": encoded as space (0x00).
-
-- Block graphics can be written as ASCII art, where '.' is a blank, '#' is a 
-  black dot and '+' and 'x' are grayed blocks (even or odd). Example:
-
-    PRINT "{{######
-	         #....#}}"
-    PRINT "{{######
-	         xxxxxx}}"
 
 ## References
 
