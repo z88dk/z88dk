@@ -9,6 +9,9 @@
 #include "dump_context.h"
 #include <vector>
 #include <memory>
+#include <string>
+
+bool is_string_variable(const std::string& name);
 
 #ifdef _DEBUG
 
