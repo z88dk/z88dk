@@ -44,4 +44,4 @@ defc    KY_SET_LCD_ADDR       = $753B
 defc    KY_GET_LCD            = $74F5
 defc    KY_PLOT_TBL           = $7643
 defc    KY_PLOT_TBL2          = $764D
-defc    KY_LCDSET_TAIL        = $7498   ; SET_LCD-$5D
+defc    KY_LCDSET_TAIL        = KY_GET_LCD-$5D
