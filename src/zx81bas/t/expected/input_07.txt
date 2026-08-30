@@ -1,0 +1,135 @@
+% z88dk-zx81bas -d 7 test_t_input_07_t.bas
+Input file:  test_t_input_07_t.bas
+Output file: test_t_input_07_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_07_t.bas.i" "test_t_input_07_t.bas.pp"
+Symtab {
+    vars: [
+        "A" {
+            location: t/input/pragmas.inc:11
+        }
+        "A$" {
+            location: t/input/pragmas.inc:15
+        }
+        "ABC" {
+            location: test_t_input_07_t.bas:92
+        }
+        "B" {
+            location: test_t_input_07_t.bas:82
+        }
+        "C" {
+            location: test_t_input_07_t.bas:82
+        }
+        "D" {
+            location: test_t_input_07_t.bas:179
+        }
+        "E" {
+            location: test_t_input_07_t.bas:180
+        }
+        "I" {
+            location: test_t_input_07_t.bas:247
+        }
+        "I1" {
+            location: test_t_input_07_t.bas:365
+        }
+        "J" {
+            location: test_t_input_07_t.bas:249
+        }
+        "L" {
+            location: test_t_input_07_t.bas:269
+        }
+        "L1" {
+            location: test_t_input_07_t.bas:269
+        }
+        "L2" {
+            location: test_t_input_07_t.bas:269
+        }
+        "L3" {
+            location: test_t_input_07_t.bas:269
+        }
+        "PROCEMPTY" {
+            location: test_t_input_07_t.bas:287
+        }
+        "PROCNAME" {
+            location: test_t_input_07_t.bas:278
+        }
+        "RESULT" {
+            location: test_t_input_07_t.bas:277
+        }
+        "S" {
+            location: test_t_input_07_t.bas:246
+        }
+        "X" {
+            location: test_t_input_07_t.bas:463
+        }
+        "Y" {
+            location: test_t_input_07_t.bas:463
+        }
+        "Z$" {
+            location: t/input/pragmas.inc:16
+        }
+    ]
+    arrays: [
+        "A" {
+            location: t/input/pragmas.inc:12
+        }
+        "A$" {
+            location: test_t_input_07_t.bas:95
+        }
+        "B" {
+            location: test_t_input_07_t.bas:169
+        }
+        "B$" {
+            location: t/input/pragmas.inc:25
+        }
+        "C" {
+            location: test_t_input_07_t.bas:169
+        }
+        "C$" {
+            location: test_t_input_07_t.bas:170
+        }
+        "I" {
+            location: test_t_input_07_t.bas:365
+        }
+    ]
+    procs: [
+        "PROCEMPTY" {
+            location: test_t_input_07_t.bas:286
+        }
+        "PROCNAME" {
+            location: test_t_input_07_t.bas:269
+        }
+    ]
+    fns: [
+        "FNEMPTY" {
+            location: test_t_input_07_t.bas:302
+        }
+        "FNNAME" {
+            location: test_t_input_07_t.bas:298
+        }
+    ]
+    labels: [
+        "LABEL1" {
+            location: test_t_input_07_t.bas:29
+        }
+        "LABEL2" {
+            location: test_t_input_07_t.bas:31
+        }
+        "LABEL3" {
+            location: test_t_input_07_t.bas:32
+        }
+    ]
+    line_nums: [
+        10 {
+            location: test_t_input_07_t.bas:30
+        }
+        11 {
+            location: test_t_input_07_t.bas:31
+        }
+        12 {
+            location: test_t_input_07_t.bas:32
+        }
+        1000 {
+            location: test_t_input_07_t.bas:492
+        }
+    ]
+}

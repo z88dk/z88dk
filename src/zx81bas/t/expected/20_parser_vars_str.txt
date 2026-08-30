@@ -20,8 +20,8 @@ Prog {
             name: A$
             value: ""
             asm: [
-                		ex af, af
-                		ret
+                		EX AF, AF
+                		RET
             ]
         }
         PragmaStrVarStmt {
@@ -36,10 +36,10 @@ Prog {
             name: Z$
             value: ""
             asm: [
-                		ld a, 1
-                		ld b, 2
-                		add a, b
-                		ret
+                		LD A, 1
+                		LD B, 2
+                		ADD A, B
+                		RET
             ]
         }
     ]

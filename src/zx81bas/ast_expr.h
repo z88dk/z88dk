@@ -129,15 +129,15 @@ struct UnaryExpr : Expr {
 
 struct BinaryExpr : Expr {
     TokenType op;        // + - * / ** AND OR NOT = < > <= >= <>
-    std::unique_ptr<Expr> left;
-    std::unique_ptr<Expr> right;
+    std::unique_ptr<Expr> lhs;
+    std::unique_ptr<Expr> rhs;
 
     explicit BinaryExpr(TokenType op_,
-                        std::unique_ptr<Expr> left_,
-                        std::unique_ptr<Expr> right_, SourceLoc loc_)
-        : Expr(left_->type, loc_), op(op_),
-          left(std::move(left_)),
-          right(std::move(right_)) {}
+                        std::unique_ptr<Expr> lhs_,
+                        std::unique_ptr<Expr> rhs_, SourceLoc loc_)
+        : Expr(lhs_->type, loc_), op(op_),
+          lhs(std::move(lhs_)),
+          rhs(std::move(rhs_)) {}
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;

@@ -197,9 +197,9 @@ static void compute_expr_type(Expr& expr) {
         expr.type = un_expr->operand->type;
     }
     else if (auto bin_expr = dynamic_cast<BinaryExpr*>(&expr)) {
-        compute_expr_type(*bin_expr->left);
-        compute_expr_type(*bin_expr->right);
-        if (bin_expr->left->type != bin_expr->right->type) {
+        compute_expr_type(*bin_expr->lhs);
+        compute_expr_type(*bin_expr->rhs);
+        if (bin_expr->lhs->type != bin_expr->rhs->type) {
             error(bin_expr->loc, "Binary expression operands must have the same type");
         }
         switch (bin_expr->op) {
@@ -212,13 +212,13 @@ static void compute_expr_type(Expr& expr) {
         case TokenType::Power:
         case TokenType::IntDivide:
         case TokenType::MOD:
-            if (bin_expr->left->type != ExprType::Number) {
+            if (bin_expr->lhs->type != ExprType::Number) {
                 error(bin_expr->loc, "Binary arithmetic operators require number operands");
             }
             break;
         case TokenType::AND:
         case TokenType::OR:
-            if (bin_expr->left->type != ExprType::Number) {
+            if (bin_expr->lhs->type != ExprType::Number) {
                 error(bin_expr->loc, "Binary logical operators require number operands");
             }
             break;
@@ -234,7 +234,7 @@ static void compute_expr_type(Expr& expr) {
             error(bin_expr->loc, "Unknown binary operator");
             break;
         }
-        expr.type = bin_expr->left->type;
+        expr.type = bin_expr->lhs->type;
     }
     else if (auto fn_call_expr = dynamic_cast<BasicFuncCallExpr*>(&expr)) {
         for (auto& arg_expr : fn_call_expr->args) {

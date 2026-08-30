@@ -18,7 +18,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_error.bas:2
             }

@@ -1,6 +1,5 @@
 ## TODO
 
-- variable collection and symbol table creation
 - lower to standard BASIC
 - map each exit to the corresponding structure
 - number lines
@@ -349,63 +348,6 @@ void emit_expr(const Expr& e, std::ostream& out) {
 }
 
 ## Correct architecture
-
-1. Parsing
-Build AST only.
-No type decisions.
-
-2. Symbol table construction
-From:
-
-DIM A(...) -> numeric array
-
-DIM A$(...) -> string array
-
-LET A$ = ... -> string variable
-
-LET A = ... -> numeric variable
-
-DEF FN -> numeric function
-
-DEF PROC -> procedure
-
-3. Type inference
-For each expression:
-
-numbers -> numeric
-
-string literals -> string
-
-CODE expr -> numeric
-
-CHR$ expr -> string
-
-LEN expr -> numeric
-
-PEEK expr -> numeric
-
-STR$ expr -> string
-
-slices -> string
-
-array refs -> type of array
-
-variables -> type from symbol table
-
-4. Type checking
-Check:
-
-LHS type matches RHS type
-
-slice LHS must be string
-
-array element type matches RHS
-
-numeric operators only on numeric expressions
-
-string operators only on string expressions
-
-function argument types match function requirements
 
 5. Lowering / code generation
 
