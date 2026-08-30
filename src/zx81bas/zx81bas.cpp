@@ -20,6 +20,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include "symtab.h"
 
 static constexpr std::string_view copyright =
     "Copyright (C) Paulo Custodio 2023-2026\n"
@@ -157,6 +158,12 @@ int main(int argc, char* argv[]) {
 
     // semantic check of the program
     if (!semantic_check(*prog)) {
+        return EXIT_FAILURE;
+    }
+
+    // create symbol table
+    std::unique_ptr<Symtab> symtab;
+    if (!create_symtab(*prog, symtab)) {
         return EXIT_FAILURE;
     }
 

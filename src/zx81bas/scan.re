@@ -6,9 +6,9 @@
 
 #include "errors.h"
 #include "lexer.h"
+#include "utils.h"
 #include "zx81chars.h"
 #include <cctype>
-#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -260,7 +260,7 @@ collect_token:
                 ++p; // include trailing $ in identifier
             }
             token.type = TokenType::Identifier;
-            token.text = std::string(start, p);
+            token.text = str_toupper(std::string(start, p));    // BASIC is case insensitive
             token.keyword = lookup_keyword(token.text);
             goto push_token;
         }

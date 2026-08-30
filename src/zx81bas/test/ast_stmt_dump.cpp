@@ -187,7 +187,7 @@ void ForStmt::dump(DumpContext ctx) const {
     ctx.line("ForStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    child_ctx.line("var_name: \"" + var_name + "\"");
+    child_ctx.line("name: \"" + name + "\"");
     dump_child_expr("start_expr", start_expr.get(), child_ctx);
     dump_child_expr("end_expr", end_expr.get(), child_ctx);
     dump_child_expr("step_expr", step_expr.get(), child_ctx);
@@ -419,7 +419,7 @@ void PragmaStrVarStmt::dump(DumpContext ctx) const {
     ctx.line("PragmaStrVarStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    child_ctx.line("name: " + var_name);
+    child_ctx.line("name: " + name);
     child_ctx.line("value: \"" + value + "\"");
     dump_asm_lines(asm_lines, child_ctx);
     ctx.line("}");
@@ -429,7 +429,7 @@ void PragmaNumVarStmt::dump(DumpContext ctx) const {
     ctx.line("PragmaNumVarStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    child_ctx.line("name: " + var_name);
+    child_ctx.line("name: " + name);
     child_ctx.line("value: " + std::to_string(value));
     ctx.line("}");
 }
@@ -438,7 +438,7 @@ void PragmaNumVarArrayStmt::dump(DumpContext ctx) const {
     ctx.line("PragmaNumVarArrayStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    child_ctx.line("name: " + var_name);
+    child_ctx.line("name: " + name);
     child_ctx.line("dimensions: [");
     auto grandchild_ctx = child_ctx.child();
     for (auto dim : dims) {
@@ -458,7 +458,7 @@ void PragmaStrVarArrayStmt::dump(DumpContext ctx) const {
     ctx.line("PragmaStrVarArrayStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    child_ctx.line("name: " + var_name);
+    child_ctx.line("name: " + name);
     child_ctx.line("dimensions: [");
     auto grandchild_ctx = child_ctx.child();
     for (auto dim : dims) {

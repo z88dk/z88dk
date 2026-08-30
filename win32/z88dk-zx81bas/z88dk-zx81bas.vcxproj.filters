@@ -60,6 +60,9 @@
     <ClInclude Include="..\..\src\zx81bas\semantic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\zx81bas\symtab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\zx81bas\errors.cpp">
@@ -115,6 +118,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\zx81bas\ast.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zx81bas\symtab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zx81bas\test\symtab_dump.cpp">
+      <Filter>Source Files\test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

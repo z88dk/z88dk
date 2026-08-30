@@ -309,7 +309,8 @@ WHILE A<>2
 
 
 
-FOR I=1 TO 10:S=S+I:NEXT I
+LET S=0
+FOR I=1 TO 10:LET S=S+I:NEXT I
 
 FOR I=1 TO 10:FOR J=1 TO 10:A=I*J:NEXT J:NEXT I
 
@@ -373,7 +374,7 @@ A = fnempty()
 
 
 	GOTO 1000
-	GOTO 1000+20*N
+	GOTO 1000+20*A
 	GOTO @label1
 
 
@@ -381,7 +382,7 @@ A = fnempty()
 
 
 	GOSUB 1000
-	GOSUB 1000+20*N
+	GOSUB 1000+20*A
 	GOSUB @label1
 
 
@@ -427,6 +428,7 @@ A = fnempty()
 	INPUT A$(TO 3)
 	INPUT A$(2 TO)
 	INPUT A,A$
+	INPUT I1,I(10)
 
 
 
@@ -448,7 +450,7 @@ A = fnempty()
 
 	RUN 
 	RUN 1000
-	RUN 1000+20*N
+	RUN 1000+20*A
 	RUN @label1
 
 
@@ -518,12 +520,13 @@ A = fnempty()
 	LIST
 	LIST 10
 	LIST 10*4
-	LIST @start
+	LIST @label1
 	
 
 
 
 
+	X=0:Y=0
 	PLOT 0,1
 	PLOT X,Y
 
@@ -551,3 +554,5 @@ A = fnempty()
 
 
 	CLEAR
+
+1000

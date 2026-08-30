@@ -14,7 +14,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:2
             }
@@ -37,7 +37,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:3
             }
@@ -60,7 +60,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:4
             }
@@ -83,7 +83,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:5
             }
@@ -106,7 +106,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:6
             }
@@ -129,7 +129,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:7
             }
@@ -152,7 +152,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:8
             }
@@ -175,7 +175,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:9
             }
@@ -198,7 +198,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:10
             }
@@ -221,7 +221,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:11
             }
@@ -244,7 +244,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:12
             }
@@ -267,13 +267,13 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "ld"
+                text: "LD"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:13
             }
             Token {
                 type: Identifier
-                text: "a"
+                text: "A"
                 ws_before: " "
                 location: t/input/15_lexer_ok.bas:13
             }
@@ -301,7 +301,7 @@ TokFile {
         tokens: [
             Token {
                 type: Identifier
-                text: "defm"
+                text: "DEFM"
                 ws_before: "	"
                 location: t/input/15_lexer_ok.bas:14
             }

@@ -951,16 +951,16 @@ std::unique_ptr<Stmt> Parser::parse_pragma_verbose() {
 
 std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
     // parse var[$][(n,n...,n)]
-    std::string var_name;
+    std::string name;
     std::vector<int> dims;
-    parse_vars_def(var_name, dims);
+    parse_vars_def(name, dims);
     expect(TokenType::Equal);
 
-    if (is_string_variable(var_name)) {
+    if (is_string_variable(name)) {
         if (dims.size() == 0) {
             // #VARS A$="XXX"
             auto stmt = std::make_unique<PragmaStrVarStmt>(loc());
-            stmt->var_name = var_name;
+            stmt->name = name;
             const Token& str = expect(TokenType::StringLiteral);
             stmt->value = str.svalue;
             collect_asm_lines(cur_line + 1, stmt->asm_lines);
@@ -969,7 +969,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
         else {
             // #VARS A$(n,n,...,n)="XXX","XXX",...
             auto stmt = std::make_unique<PragmaStrVarArrayStmt>(loc());
-            stmt->var_name = var_name;
+            stmt->name = name;
             stmt->dims = std::move(dims);
             while (true) {
                 const Token& str = expect(TokenType::StringLiteral);
@@ -988,7 +988,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
         if (dims.size() == 0) {
             // #VARS A=123
             auto stmt = std::make_unique<PragmaNumVarStmt>(loc());
-            stmt->var_name = var_name;
+            stmt->name = name;
             if (peek().type == TokenType::Integer) {
                 const Token& num = expect(TokenType::Integer);
                 stmt->value = num.ivalue;
@@ -1002,7 +1002,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
         else {
             // #VARS A(n,n,...,n)=123,456,...
             auto stmt = std::make_unique<PragmaNumVarArrayStmt>(loc());
-            stmt->var_name = var_name;
+            stmt->name = name;
             stmt->dims = std::move(dims);
             while (true) {
                 if (peek().type == TokenType::Integer) {
@@ -1453,8 +1453,8 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
         syntax_error("expected variable name, found '" + peek().text + "'");
     }
     const Token& ident = expect(TokenType::Identifier);
-    std::string var_name = ident.text;
-    if (is_string_variable(var_name)) {
+    std::string name = ident.text;
+    if (is_string_variable(name)) {
         syntax_error("FOR variable cannot be a string variable");
     }
     expect(TokenType::Equal);
@@ -1472,7 +1472,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
     }
 
     auto stmt = std::make_unique<ForStmt>(loc());
-    stmt->var_name = var_name;
+    stmt->name = name;
     stmt->start_expr = std::move(start_expr);
     stmt->end_expr = std::move(end_expr);
     stmt->step_expr = std::move(step_expr);
@@ -1491,9 +1491,9 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
         }
         if (!at_end_of_stmt() && peek().type == TokenType::Identifier) {
             std::string next_var = peek().text;
-            if (next_var != var_name) {
+            if (next_var != name) {
                 syntax_error("NEXT variable '" + next_var +
-                             "' does not match FOR variable '" + var_name + "'");
+                             "' does not match FOR variable '" + name + "'");
             }
             pos++; // consume variable
         }
@@ -1510,9 +1510,9 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
     }
     if (!at_end_of_stmt() && peek().type == TokenType::Identifier) {
         std::string next_var = peek().text;
-        if (next_var != var_name) {
+        if (next_var != name) {
             syntax_error("NEXT variable '" + next_var +
-                         "' does not match FOR variable '" + var_name + "'");
+                         "' does not match FOR variable '" + name + "'");
         }
         pos++; // consume variable
     }

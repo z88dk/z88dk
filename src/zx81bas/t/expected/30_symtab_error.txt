@@ -1,0 +1,70 @@
+% z88dk-zx81bas -d 7 t//input/30_symtab_error.bas
+Input file:  t/input/30_symtab_error.bas
+Output file: t/input/30_symtab_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/30_symtab_error.bas.i" "t/input/30_symtab_error.bas.pp"
+t/input/30_symtab_error.bas:2: error: Duplicate label: LABEL1
+t/input/30_symtab_error.bas:1: error: Previous label defined here
+t/input/30_symtab_error.bas:4: error: Duplicate line number: 10
+t/input/30_symtab_error.bas:3: error: Previous line number defined here
+t/input/30_symtab_error.bas:7: error: Duplicate procedure: PROCA
+t/input/30_symtab_error.bas:5: error: Previous procedure defined here
+t/input/30_symtab_error.bas:10: error: Duplicate function: FNA
+t/input/30_symtab_error.bas:9: error: Previous function defined here
+t/input/30_symtab_error.bas:11: error: Undefined label: LABEL
+t/input/30_symtab_error.bas:12: error: Undefined variable: LABEL
+t/input/30_symtab_error.bas:13: error: Undefined variable: N1
+t/input/30_symtab_error.bas:14: error: Undefined array: N
+t/input/30_symtab_error.bas:16: error: Undefined variable: N$
+t/input/30_symtab_error.bas:17: error: Undefined variable: N1
+t/input/30_symtab_error.bas:18: error: Undefined variable: N2
+t/input/30_symtab_error.bas:19: error: Undefined variable: N1
+t/input/30_symtab_error.bas:20: error: Undefined variable: N1
+t/input/30_symtab_error.bas:21: error: Undefined variable: N1
+t/input/30_symtab_error.bas:22: error: Undefined variable: N1
+t/input/30_symtab_error.bas:23: error: Undefined procedure: PROCN
+t/input/30_symtab_error.bas:23: error: Undefined variable: N1
+t/input/30_symtab_error.bas:24: error: Undefined function: FNN
+t/input/30_symtab_error.bas:24: error: Undefined variable: N1
+t/input/30_symtab_error.bas:25: error: Undefined variable: N1
+t/input/30_symtab_error.bas:26: error: Undefined variable: N1
+t/input/30_symtab_error.bas:26: error: Undefined variable: N2
+t/input/30_symtab_error.bas:26: error: Undefined variable: N3
+t/input/30_symtab_error.bas:27: error: Undefined variable: N1
+t/input/30_symtab_error.bas:27: error: Undefined variable: N2
+t/input/30_symtab_error.bas:28: error: Undefined variable: N1
+t/input/30_symtab_error.bas:28: error: Undefined variable: N2
+t/input/30_symtab_error.bas:29: error: Undefined variable: N1
+t/input/30_symtab_error.bas:29: error: Undefined variable: N2
+t/input/30_symtab_error.bas:29: error: Undefined variable: N3
+t/input/30_symtab_error.bas:29: error: Undefined variable: N4
+t/input/30_symtab_error.bas:31: error: Undefined variable: N1
+t/input/30_symtab_error.bas:33: error: Undefined variable: N1
+t/input/30_symtab_error.bas:33: error: Undefined variable: N2
+t/input/30_symtab_error.bas:34: error: Undefined variable: N1
+t/input/30_symtab_error.bas:36: error: Undefined line number: 123
+t/input/30_symtab_error.bas:37: error: Undefined label: LABEL
+t/input/30_symtab_error.bas:38: error: Undefined line number: 123
+t/input/30_symtab_error.bas:39: error: Undefined label: LABEL
+t/input/30_symtab_error.bas:40: error: Undefined variable: N1
+t/input/30_symtab_error.bas:40: error: Undefined variable: N$
+t/input/30_symtab_error.bas:40: error: Undefined variable: N1
+t/input/30_symtab_error.bas:40: error: Undefined variable: N2
+t/input/30_symtab_error.bas:40: error: Undefined variable: N3
+t/input/30_symtab_error.bas:40: error: Undefined variable: N4
+t/input/30_symtab_error.bas:41: error: Undefined line number: 123
+t/input/30_symtab_error.bas:42: error: Undefined label: LABEL
+t/input/30_symtab_error.bas:43: error: Undefined line number: 123
+t/input/30_symtab_error.bas:44: error: Undefined label: LABEL
+t/input/30_symtab_error.bas:45: error: Undefined variable: N$
+t/input/30_symtab_error.bas:46: error: Undefined variable: N$
+t/input/30_symtab_error.bas:47: error: Undefined variable: N1
+t/input/30_symtab_error.bas:47: error: Undefined variable: N2
+t/input/30_symtab_error.bas:48: error: Undefined variable: N1
+t/input/30_symtab_error.bas:48: error: Undefined variable: N2
+t/input/30_symtab_error.bas:49: error: Undefined variable: N1
+t/input/30_symtab_error.bas:49: error: Undefined variable: N2
+t/input/30_symtab_error.bas:50: error: Undefined variable: N1
+t/input/30_symtab_error.bas:50: error: Undefined variable: N2
+t/input/30_symtab_error.bas:51: error: Undefined variable: N1
+t/input/30_symtab_error.bas:52: error: Undefined variable: N1
+Symbols check failed with 65 errors

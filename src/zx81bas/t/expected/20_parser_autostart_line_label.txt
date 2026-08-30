@@ -5,7 +5,7 @@ Output file: t/input/20_parser_autostart_line_label.p
 Prog {
     auto_start: false
     auto_start_line: 0
-    auto_start_label: "start"
+    auto_start_label: "START"
     increment: 10
     rem_invert: false
     fast_mode: false
