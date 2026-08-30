@@ -12,11 +12,26 @@ EXTERN asm_HeapAlloc
 .HeapCalloc_callee
 ._HeapCalloc_callee
 
+   ; A return address can't go through AF on these CPUs: the flags byte does not
+   ; read back what was pushed, and on the VM1 pop af also switches the data bank.
+   IF __CPU_INTEL__ | __CPU_GBZ80__
+   pop hl
+   pop de
+   pop bc
+   ex (sp),hl
+   ld a,b
+   ld b,h
+   ld h,a
+   ld a,c
+   ld c,l
+   ld l,a
+   ELSE
    pop af
    pop de
    pop hl
    pop bc
    push af
+   ENDIF
 
 .asm_HeapCalloc
 

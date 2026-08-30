@@ -14,6 +14,25 @@
 
 ; sccz80
 vfprintf:
+    ; A return address can't go through AF on these CPUs: the flags byte does not
+    ; read back what was pushed, and on the VM1 pop af also switches the data bank.
+    IF __CPU_INTEL__ | __CPU_GBZ80__
+    ld      hl,4
+    add     hl,sp
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)          ; fmt
+    inc     hl
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)          ; fp
+    ld      hl,2
+    add     hl,sp
+    ld      a,(hl)
+    inc     hl
+    ld      h,(hl)
+    ld      l,a             ; ap
+    ELSE
     pop     af
     pop     hl      ; ap
     pop     de      ; fmt
@@ -22,6 +41,7 @@ vfprintf:
     push    de
     push    hl
     push    af
+    ENDIF
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
     push    ix
 ENDIF
