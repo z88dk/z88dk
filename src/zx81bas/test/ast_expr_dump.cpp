@@ -95,8 +95,8 @@ void BinaryExpr::dump(DumpContext ctx) const {
     auto child_ctx = ctx.child();
     dump_expr_base(this, child_ctx);
     child_ctx.line("op: " + token_type_name(op));
-    dump_child_expr("left", left.get(), child_ctx);
-    dump_child_expr("right", right.get(), child_ctx);
+    dump_child_expr("lhs", lhs.get(), child_ctx);
+    dump_child_expr("rhs", rhs.get(), child_ctx);
     ctx.line("}");
 }
 

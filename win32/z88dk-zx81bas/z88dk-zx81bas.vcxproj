@@ -151,6 +151,7 @@
     <ClInclude Include="..\..\src\zx81bas\release_assert.h" />
     <ClInclude Include="..\..\src\zx81bas\scan.h" />
     <ClInclude Include="..\..\src\zx81bas\semantic.h" />
+    <ClInclude Include="..\..\src\zx81bas\symtab.h" />
     <ClInclude Include="..\..\src\zx81bas\utils.h" />
     <ClInclude Include="..\..\src\zx81bas\zx81chars.h" />
   </ItemGroup>
@@ -165,11 +166,13 @@
     <ClCompile Include="..\..\src\zx81bas\preproc.cpp" />
     <ClCompile Include="..\..\src\zx81bas\scan.cpp" />
     <ClCompile Include="..\..\src\zx81bas\semantic.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\symtab.cpp" />
     <ClCompile Include="..\..\src\zx81bas\test\ast_dump.cpp" />
     <ClCompile Include="..\..\src\zx81bas\test\ast_expr_dump.cpp" />
     <ClCompile Include="..\..\src\zx81bas\test\ast_stmt_dump.cpp" />
     <ClCompile Include="..\..\src\zx81bas\test\lexer_dump.cpp" />
     <ClCompile Include="..\..\src\zx81bas\test\preproc_dump.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\test\symtab_dump.cpp" />
     <ClCompile Include="..\..\src\zx81bas\utils.cpp" />
     <ClCompile Include="..\..\src\zx81bas\zx81bas.cpp" />
     <ClCompile Include="..\..\src\zx81bas\zx81chars.cpp" />
