@@ -2090,11 +2090,18 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
         /* In-place long << 1 on a stack slot. Walks the 4 bytes
            via `sla (hl); rl (hl); rl (hl); rl (hl)` from LSB up,
            skipping the DEHL roundtrip. Smaller than 4 × `sla
-           (ix+d)`; works in FP mode (sp still valid). */
-        if (count == 1
+           (ix+d)`; works in FP mode (sp still valid). CB-gated: the
+           808x parts fall through to gen_808x_long_const_shift below,
+           as the >> lowering already does. Also gated on !dehl_has:
+           this shifts the slot in memory, so the slot has to be the
+           live copy. With src cached in DEHL the slot is stale and
+           the shift lands on whatever the frame reserved. */
+        if (CPU_HAS_CB_SHIFTS()
+            && count == 1
             && op->dst == op->src[0]
             && !L.la.cur_dst_dead
             && !vreg_in_pr_bc(f, op->dst)
+            && !dehl_has(op->src[0])
             && vreg_is_spilled(f, op->dst)) {
             int off = slot_off(f, op->dst) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off);
