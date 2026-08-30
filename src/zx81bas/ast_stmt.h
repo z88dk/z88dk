@@ -110,7 +110,7 @@ struct WhileStmt : Stmt {
 struct ForStmt : Stmt {
     using Stmt::Stmt;
 
-    std::string var_name;               // loop variable
+    std::string name;               // loop variable
     std::unique_ptr<Expr> start_expr;
     std::unique_ptr<Expr> end_expr;
     std::unique_ptr<Expr> step_expr;    // may be null (default = 1)
@@ -437,7 +437,7 @@ struct ClearStmt : Stmt {
 struct PragmaNumVarStmt : Stmt {
     using Stmt::Stmt;
 
-    std::string var_name;
+    std::string name;
     double value;
 
 #ifdef _DEBUG
@@ -448,7 +448,7 @@ struct PragmaNumVarStmt : Stmt {
 struct PragmaStrVarStmt : Stmt {
     using Stmt::Stmt;
 
-    std::string var_name;
+    std::string name;
     std::string value;
 
     // ASM statement if any
@@ -462,7 +462,7 @@ struct PragmaStrVarStmt : Stmt {
 struct PragmaNumVarArrayStmt : Stmt {
     using Stmt::Stmt;
 
-    std::string var_name;
+    std::string name;
     std::vector<int> dims;			// dimensions
     std::vector<double> values;
 
@@ -474,7 +474,7 @@ struct PragmaNumVarArrayStmt : Stmt {
 struct PragmaStrVarArrayStmt : Stmt {
     using Stmt::Stmt;
 
-    std::string var_name;
+    std::string name;
     std::vector<int> dims;			// dimensions
     std::vector<std::string> values;
 
