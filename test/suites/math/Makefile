@@ -30,7 +30,7 @@ all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_m
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
 	test_math32_8085.bin \
 	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
-	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
+	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_vm1.bin test_mbf32_gbz80.bin \
 	test_mbf32_r2ka.bin test_mbf32_r4k.bin test_mbf32_r6k.bin test_mbf32_ez80_z80.bin test_mbf32_kc160.bin \
 	test_9511.bin test_9511_8085.bin test_fixmath.bin
 
@@ -66,6 +66,13 @@ test_mbf32_8085.bin: $(FPSOURCES)
 test_9511.bin: $(FPSOURCES)
 	$(call compile, -DAM9511 --math-am9511 -DMATH_SPECIALS -DMATH_LIBRARY="\"\\\"AM9511-z80\\\"\"")
 	$(runtest)
+
+# vm1 gets the mbf32 row only: math32/math16 have no _vm1 product (their 8085
+# cores use LDSI and RDEL, which the KR580VM1 spends on the RS prefix and
+# DSUB D), and there is no am9511_vm1 either. Same shape as the 8080 row.
+test_mbf32_vm1.bin: $(FPSOURCES)
+	$(call compile_vm1, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(runtest_vm1)
 
 test_9511_8085.bin: $(FPSOURCES)
 	$(call compile_8085, -DAM9511 --math-am9511 -DMATH_SPECIALS -DMATH_LIBRARY="\"\\\"AM9511-8085\\\"\"")

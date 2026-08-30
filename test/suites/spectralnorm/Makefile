@@ -11,7 +11,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # so cross-compiler comparison is apples-to-apples); the index-register-less
 # CPUs (8080/8085/gbz80 — the strategic sp-mode targets) use the 32-bit MBF
 # library, mirroring the math suite.
-all:	test.bin test_8080.bin test_8085.bin test_gbz80.bin test_z80n.bin
+all:	test.bin test_8080.bin test_8085.bin test_vm1.bin test_gbz80.bin test_z80n.bin
 
 
 test.bin: $(SOURCES)
@@ -29,6 +29,10 @@ test_8080.bin: $(SOURCES)
 test_8085.bin: $(SOURCES)
 	$(call compile_8085,--math-mbf32)
 	$(runtest_8085)
+
+test_vm1.bin: $(SOURCES)
+	$(call compile_vm1,--math-mbf32)
+	$(runtest_vm1)
 
 test_gbz80.bin: $(SOURCES)
 	$(call compile_gbz80,--math-mbf32)
