@@ -3,7 +3,7 @@ include ../make.config
 
 
 
-all:	test_scanf.bin test_sprintf.bin  test_scanf_r2ka.bin test_sprintf_r2ka.bin test_sprintf_8080.bin test_sprintf_gbz80.bin test_scanf_8080.bin test_sprintf_ez80_z80.bin test_scanf_ez80_z80.bin test_scanf_r4k.bin test_scanf_r6k.bin test_sprintf_r4k.bin test_sprintf_r6k.bin
+all:	test_scanf.bin test_sprintf.bin  test_scanf_r2ka.bin test_sprintf_r2ka.bin test_sprintf_8080.bin test_sprintf_vm1.bin test_sprintf_gbz80.bin test_scanf_8080.bin test_scanf_vm1.bin test_sprintf_ez80_z80.bin test_scanf_ez80_z80.bin test_scanf_r4k.bin test_scanf_r6k.bin test_sprintf_r4k.bin test_sprintf_r6k.bin
 
 
 test_scanf.bin: scanf.c $(SOURCES)
@@ -26,6 +26,10 @@ test_scanf_8080.bin: scanf.c $(SOURCES)
 	$(compile_8080)
 	$(runtest_8080)
 
+test_scanf_vm1.bin: scanf.c $(SOURCES)
+	$(compile_vm1)
+	$(runtest_vm1)
+
 test_scanf_ez80_z80.bin: scanf.c $(SOURCES)
 	$(compile_ez80_z80)
 	$(runtest_ez80_z80)
@@ -37,6 +41,10 @@ test_sprintf.bin: sprintf.c $(SOURCES)
 test_sprintf_8080.bin: sprintf.c $(SOURCES)
 	$(call compile_8080)
 	$(runtest_8080)
+
+test_sprintf_vm1.bin: sprintf.c $(SOURCES)
+	$(call compile_vm1)
+	$(runtest_vm1)
 
 test_sprintf_gbz80.bin: sprintf.c $(SOURCES)
 	$(call compile_gbz80)

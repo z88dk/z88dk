@@ -13,9 +13,9 @@ CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 ifeq ($(COMPILER),xcc)
 all:	test.bin test_newlib.bin
 else
-all:	test.bin test_r2ka.bin test_8080.bin test_ez80_z80.bin \
+all:	test.bin test_r2ka.bin test_8080.bin test_vm1.bin test_ez80_z80.bin \
 	test_z180.bin test_z80n.bin test_kc160.bin \
-	test_newlib.bin test_newlib_r2ka.bin test_newlib_8080.bin test_newlib_ez80_z80.bin \
+	test_newlib.bin test_newlib_r2ka.bin test_newlib_8080.bin test_newlib_vm1.bin test_newlib_ez80_z80.bin \
 	test_newlib_z180.bin test_newlib_z80n.bin test_newlib_kc160.bin
 endif
 
@@ -34,6 +34,10 @@ test_r2ka.bin: $(SOURCES)
 test_8080.bin: $(SOURCES)
 	$(compile_8080)
 	$(runtest_8080)
+
+test_vm1.bin: $(SOURCES)
+	$(compile_vm1)
+	$(runtest_vm1)
 
 test_ez80_z80.bin: $(SOURCES)
 	$(compile_ez80_z80)
@@ -74,6 +78,10 @@ test_newlib_r2ka.bin: $(NEWLIB_SOURCES)
 test_newlib_8080.bin: $(NEWLIB_SOURCES)
 	$(compile_8080)
 	$(runtest_8080)
+
+test_newlib_vm1.bin: $(NEWLIB_SOURCES)
+	$(compile_vm1)
+	$(runtest_vm1)
 
 test_newlib_ez80_z80.bin: $(NEWLIB_SOURCES)
 	$(compile_ez80_z80)

@@ -34,10 +34,23 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
    ld e,l
  ENDIF
    pop bc ; return value
+   ; Discarding through AF is fine where F is scratch, but the VM1's pop af
+   ; loads MF, the data-bank flag, and the stack moves with the bank.
+   IF __CPU_VM1__
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   inc sp
+   ELSE
    pop af ;dump arg
    pop af ;dump arg
    pop af ;dump arg
    pop af ;dump arg
+   ENDIF
    push bc
    ret
 ELSE

@@ -54,7 +54,15 @@ EXTERN  l_long_div_0, l_long_neg_mhl
     ; a = (a/b)*b + a%b
     ; remainder takes sign of the dividend
 
+    ; BC comes back as AF to land B in A. Not on the VM1: pop af loads MF from
+    ; bit 3 of C - the divisor's sign byte - and a negative divisor then sends
+    ; every access to the wrong bank. BC is dead until the remainder reloads it.
+IF __CPU_VM1__
+    pop     bc                  ;restore sign info
+    ld      a,b                 ;sign of dividend
+ELSE
     pop     af                  ;restore sign info
+ENDIF
 
     ld      hl,sp+0             ;remainder
     or      a,a                 ;test sign of dividend

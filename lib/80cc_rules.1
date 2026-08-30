@@ -17,6 +17,7 @@
 ;; reclaiming it with a LATER `ex de,hl` — so DE is live and the fold hands
 ;; back the base instead of the index. sieve/z88dk-classic hangs on it.
 %title #ADDR fold ex-de-hl + symbol-address load + add into a direct de-load (-1b)
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -784,6 +785,7 @@
 
 %title #DE-glob produce (_sym) ld-hl value in DE (no ld de,(nn) on 808x/gbz80) (-1b, -4t)
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	%"ld	hl,\((_[A-Za-z0-9_+]*)\)"1
@@ -945,6 +947,7 @@
 ;; match, but are guarded out for clarity (set n,(hl) is not encodable there).
 %title #RMW1 single-bit set on a word via set n,(hl) — kill the word round-trip
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,bc
 	ld	a,(hl+)
@@ -970,6 +973,7 @@
 ;; `ld hl,sp+n` the regex WOULD match, so 808x/gbz80 stay gated out.
 %title #DE6 const/sym into DE via ex/ld/ex -> ld de directly (-4b, -8t)
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ex	de,hl

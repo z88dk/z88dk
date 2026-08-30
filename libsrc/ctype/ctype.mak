@@ -7,6 +7,7 @@ CTYPE_TARGETS := ctype/obj/newlib-z80-ctype \
 		ctype/obj/newlib-ixiy-ctype \
 		ctype/obj/newlib-8080-ctype \
 		ctype/obj/newlib-8085-ctype \
+		ctype/obj/newlib-vm1-ctype \
 		ctype/obj/newlib-gbz80-ctype \
 		ctype/obj/newlib-z180-ctype \
 		ctype/obj/newlib-r4k-ctype \
@@ -28,6 +29,7 @@ $(eval $(call buildnew,ctype,z80n,-mz80n,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,ixiy,-mz80 -IXIY,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,8080,-m8080,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,8085,-m8085,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
+$(eval $(call buildnew,ctype,vm1,-mvm1,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,gbz80,-mgbz80,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,z180,-mz180,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,ez80_z80,-mez80_z80,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))

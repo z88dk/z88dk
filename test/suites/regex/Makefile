@@ -11,7 +11,7 @@ ifeq ($(COMPILER),xcc)
 all: test.bin
 else
 all:	test.bin test_r2ka.bin test_kc160.bin test_r4k.bin test_r6k.bin \
-	test_8080.bin test_8085.bin test_gbz80.bin test_ez80_z80.bin
+	test_8080.bin test_8085.bin test_vm1.bin test_gbz80.bin test_ez80_z80.bin
 endif
 
 
@@ -42,6 +42,10 @@ test_8080.bin: $(SOURCES)
 test_8085.bin: $(SOURCES)
 	$(compile_8085)
 	$(runtest_8085)
+
+test_vm1.bin: $(SOURCES)
+	$(compile_vm1)
+	$(runtest_vm1)
 
 test_gbz80.bin: $(SOURCES)
 	$(compile_gbz80)

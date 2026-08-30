@@ -300,7 +300,20 @@ static int try_tos_rmw_reg(FILE *out, Func *f, const Op *op, int is_sub)
     ss_note_reload(f, v);             /* pop reads the slot */
     ss_note_store(f, v);              /* push writes it back */
     emit(out, "pop\thl");             /* consume dst */
-    if (is_sub) { emit(out, "and\ta"); emit(out, "sbc\thl,de"); }
+    if (is_sub && !CPU_HAS_SBC_HL()) {
+        /* Byte-wise rather than the `call __z80asm__sbc_hl_de` z80asm would
+           substitute (see gen_neg): 6 bytes and 28T against 4 bytes and 90T.
+           No `and a` is needed - `sub e` sets the borrow itself. A is dead
+           here, which is what the helper spends half its time preserving. */
+        emit(out, "ld\ta,l");
+        emit(out, "sub\te");
+        emit(out, "ld\tl,a");
+        emit(out, "ld\ta,h");
+        emit(out, "sbc\ta,d");
+        emit(out, "ld\th,a");
+        invalidate_a_cache();
+    }
+    else if (is_sub) { emit(out, "and\ta"); emit(out, "sbc\thl,de"); }
     else        emit(out, "add\thl,de");
     emit(out, "push\thl");
     /* Net sp unchanged; dst lives only at its TOS slot; HL is junk. */
@@ -1419,6 +1432,23 @@ static int gen_neg(FILE *out, Func *f, const Op *op)
         if (!hl_has(op->src[0]))
             load_to_hl(out, f, op->src[0]);
         emit(out, "neg\thl");
+    } else if (!CPU_HAS_SBC_HL()) {
+        /* No `sbc hl,de` here, and z80asm substitutes `call
+           __z80asm__sbc_hl_de` - 86T on the 8080, 82T on the 8085, 80T on the
+           gbz80, plus 19 bytes of linked helper. Most of that is the helper
+           being a SUBROUTINE: 31T of its 69T body preserves A and BC, and
+           neither is live at this site (the `or a` it replaces clobbered A
+           anyway). Negating byte-wise inline is the same 7 bytes and 29T.
+           `ld a,0` rather than `xor a` for the high half: it must not disturb
+           the borrow that `sub e` just set. */
+        load_to_de(out, f, op->src[0]);
+        emit(out, "xor\ta");            /* A = 0, CY = 0 */
+        emit(out, "sub\te");            /* A = 0 - e,  CY = borrow */
+        emit(out, "ld\tl,a");
+        emit(out, "ld\ta,0");           /* flags untouched */
+        emit(out, "sbc\ta,d");          /* A = 0 - d - borrow */
+        emit(out, "ld\th,a");
+        invalidate_a_cache();
     } else {
         load_to_de(out, f, op->src[0]);
         emit(out, "ld\thl,0");
@@ -2060,11 +2090,18 @@ static int gen_shl(FILE *out, Func *f, const Op *op)
         /* In-place long << 1 on a stack slot. Walks the 4 bytes
            via `sla (hl); rl (hl); rl (hl); rl (hl)` from LSB up,
            skipping the DEHL roundtrip. Smaller than 4 × `sla
-           (ix+d)`; works in FP mode (sp still valid). */
-        if (count == 1
+           (ix+d)`; works in FP mode (sp still valid). CB-gated: the
+           808x parts fall through to gen_808x_long_const_shift below,
+           as the >> lowering already does. Also gated on !dehl_has:
+           this shifts the slot in memory, so the slot has to be the
+           live copy. With src cached in DEHL the slot is stale and
+           the shift lands on whatever the frame reserved. */
+        if (CPU_HAS_CB_SHIFTS()
+            && count == 1
             && op->dst == op->src[0]
             && !L.la.cur_dst_dead
             && !vreg_in_pr_bc(f, op->dst)
+            && !dehl_has(op->src[0])
             && vreg_is_spilled(f, op->dst)) {
             int off = slot_off(f, op->dst) + L.cur_sp_adjust;
             emit(out, "ld\thl,%d", off);
@@ -3012,11 +3049,22 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            (func_has_de_home). Offsets are LDHI's unsigned byte; a post-step
            (`*p++`) steps the base through its own path and wants HL, and a
            banked/far pointer needs its page-in, so both stay on the walk. */
-        int lhlx_deref = IS_8085() && dst_w == 2 && !opt_disabled("lhlx-deref")
-            && !func_has_de_home(f)
+        /* The DE question is asked PER SITE, not per function. The veto used
+           to be `no DE home anywhere in this function`, which in an
+           interpreter — where one hot vreg is DE-homed and every address is
+           COMPUTED into HL — refused the fold for the whole of it and left
+           each word deref as a 3-instruction byte walk (24T against LHLX's
+           14T). A function that homes something in DE can still take the fold
+           at an op where that value is not live. */
+        int lhlx_deref = CPU_HAS_LD_HL_IND_DE() && dst_w == 2
+            && !opt_disabled("lhlx-deref")
+            && !de_home_live_here(f)
             && op->mem.kind == IR_MEM_VREG && op->mem.post_step == 0
             && op->mem.elem != KIND_CPTR && mem_bank_fn(&op->mem) == NULL
-            && op->mem.offset >= 0 && op->mem.offset <= 255;
+            && op->mem.offset >= 0
+            /* A nonzero offset is reached with LDHI, which the 8085 has and
+               the KR580VM1 does not - there the fold is the offset-0 form. */
+            && op->mem.offset <= (IS_8085() ? 255 : 0);
         /* At offset 0 the address only has to REACH DE, so take it from
            wherever it already is rather than routing it through HL first:
            a DE-resident base needs no move at all (and its belief survives —
@@ -3580,6 +3628,53 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
                 invalidate_hl_bc();
             }
         } else {
+            /* SHLX: `ld (de),hl` writes the word in ONE byte and leaves both
+               registers intact, where the generic path below spends three on
+               `ld (hl),e / inc hl / ld (hl),d` and ends with HL past the base.
+               It wants the mirror arrangement of that path - address in DE,
+               value in HL - so it fires exactly where the two already sit
+               that way and nothing has to be moved. That is the shape the
+               `ld hl,(de)` deref leaves behind, i.e. read-modify-write through
+               a pointer.
+               Offset 0 only: a nonzero one needs LDHI, which the VM1 lacks.
+               The 8085 has SHLX as well and wants the same fold, but that is a
+               change to shared codegen with its own gauntlet, so it is not
+               made from here. */
+            if (getenv("IR_SHLX_PROBE"))
+                fprintf(stderr, "SHLX-cand off=%d step=%d base_bc=%d base_de=%d "
+                        "base_hl=%d remat=%d val_hl=%d\n",
+                        op->mem.offset, op->mem.post_step,
+                        vreg_in_pr_bc(f, op->mem.base) || bc_has(op->mem.base),
+                        de_has(op->mem.base), hl_has(op->mem.base),
+                        vreg_is_remat(f, op->mem.base), hl_has(op->src[0]));
+            int shlx_bc = vreg_in_pr_bc(f, op->mem.base) || bc_has(op->mem.base);
+            int shlx_remat = vreg_is_remat(f, op->mem.base)
+                          && !remat_word_clobbers_hl(f, op->mem.base);
+            if (CPU_HAS_LD_IND_DE_HL() && !IS_8085()
+                && !opt_disabled("shlx-store")
+                && op->mem.offset == 0 && op->mem.post_step == 0
+                && op->mem.elem != KIND_CPTR && mem_bank_fn(&op->mem) == NULL
+                && (shlx_bc || shlx_remat)) {
+                /* The value goes to HL FIRST, then the address into DE by a
+                   route that cannot touch HL: `ld de,bc` off a BC-resident
+                   base, or `ld de,K` / `ld de,_sym` off a rematerialisable one
+                   (the LEA form recomputes through HL, hence
+                   remat_word_clobbers_hl). Ordering the other way round would
+                   need load_to_hl to promise it leaves DE alone, which it does
+                   not. 3B/20T against the generic 5B/29T. */
+                load_to_hl(out, f, op->src[0]);
+                /* The value load may have left DE alone - a read-modify-write
+                   through the same pointer arrives here with the address still
+                   there from the `ld hl,(de)` that read it - so ask before
+                   re-materialising it. */
+                if (!de_has(op->mem.base)) {
+                    if (shlx_bc) emit(out, "ld\tde,bc");
+                    else         emit_remat_word(out, f, op->mem.base, "de");
+                    cache_de(op->mem.base);
+                }
+                emit(out, "ld\t(de),hl");     /* both beliefs survive it */
+                return 0;
+            }
             /* [IR_HL_CARRY inc1] Base already resident in HL: load the value
                STRAIGHT to DE (load_to_de preserves HL on the common fp/native
                paths) instead of load_to_hl(value)+ex de,hl (which clobbers the
@@ -4319,7 +4414,17 @@ static int gen_add(FILE *out, Func *f, const Op *op)
    family has `sbc hl,bc`. Reverts with `--opt-disable=dsub`. */
 static int dsub_ok(void)
 {
-    return IS_8085() && !opt_disabled("dsub");
+    return CPU_HAS_SUB_HL_BC() && !opt_disabled("dsub");
+}
+
+/* The KR580VM1 has the DE form as well, which is the one the lowerer wants:
+   load_binop_operands already leaves the subtrahend in DE, so `sub hl,de` is
+   1 byte and 10 cycles with NO staging and no claim on BC - where the 8085
+   must first `ld bc,de` and can only do that when BC is free. */
+static int sub_hl_de_ok(void)
+{
+    return CPU_HAS_SUB_HL_DE() && !IS_RABBIT()   /* rabbit has its own branch */
+        && !opt_disabled("dsub");
 }
 
 /* True iff no vreg in this function is homed in BC or a BC half. Staging a
@@ -4675,6 +4780,22 @@ static int gen_sub(FILE *out, Func *f, const Op *op)
         /* gbz80/808x: `sbc hl,de` is emulated (push/pop x4 + helper).
            Subtract byte-wise; write straight into DE when that's the dst
            (skips the ex de,hl that the sbc-path would need). */
+        if (sub_hl_de_ok()) {
+            /* Subtract where the operands already are. Unlike the BC staging
+               below this needs no free register, so it fires on every word
+               subtract, and a PR_DE dst can afford the move out of HL because
+               the subtract itself cost one byte. */
+            emit(out, "sub\thl,de");
+            invalidate_hl_keep_de();
+            if (vreg_is_pr_de(f, op->dst)) {
+                emit_hl_to_de(out);
+                invalidate_hl_cache();
+                cache_de(op->dst);
+                return 0;
+            }
+            commit_hl_result(out, f, op->dst);
+            return 0;
+        }
         if (dsub_ok() && !vreg_is_pr_de(f, op->dst)
             && !func_has_bc_home(f) && L.rs.bc < 0) {
             /* Stage the subtrahend into BC and DSUB: 3B/18c against the
@@ -5286,10 +5407,23 @@ static int gen_bitop(FILE *out, Func *f, const Op *op)
                holds the low result (the old code popped after its normalise,
                when BC was free). Discard through AF instead — A is already
                clobbered by the byte chain and F is irrelevant, so this is the
-               one place `pop af` is the right instruction. */
+               one place `pop af` is the right instruction — everywhere except
+               the KR580VM1, where F is NOT irrelevant: PSW bit 3 is MF, the
+               data-bank select, so popping an arbitrary word switches the bank
+               under the program. (md5's Transform does this 64 times; on the
+               VM1 it read the wrong 64K from the first one on.) There the
+               discard goes through HL, which the byte chain above left holding
+               a walked-past address and nothing reads again — same two bytes
+               and same 20T as the AF form. */
             if (src1_inline_pushed) {
-                emit(out, "pop\taf");
-                emit(out, "pop\taf");
+                if (CPU_POP_AF_IS_SAFE()) {
+                    emit(out, "pop\taf");
+                    emit(out, "pop\taf");
+                } else {
+                    emit(out, "pop\thl");
+                    emit(out, "pop\thl");
+                    invalidate_hl_cache();
+                }
                 L.cur_sp_adjust -= 4;
                 L.la.cur_dehl_inline_push = -1;
                 invalidate_a_cache();

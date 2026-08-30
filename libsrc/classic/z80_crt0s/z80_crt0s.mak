@@ -9,7 +9,7 @@
 # the .lst files are unchanged; only the assembler's cwd moves.
 
 CRT0_DIR    = classic/z80_crt0s
-CRT0S       = z80 ixiy z80n 8080 8085 gbz80 z180 ez80_z80 r2ka r4k kc160
+CRT0S       = z80 ixiy z80n 8080 8085 vm1 gbz80 z180 ez80_z80 r2ka r4k kc160
 
 # Must end in a slash: the l/*.lst files spell entries both ${NEWLIB_ROOT}l/x
 # and ${NEWLIB_ROOT}/l/x, and only a trailing slash resolves both. Was ../../
@@ -49,6 +49,7 @@ $(eval $(call crt0,ixiy,     crt0_z80.lst,   -IXIY -D__SDCC_IX -D__CLASSIC))
 $(eval $(call crt0,z80n,     crt0_z80n.lst,  -D__SDCC_IX -D__CLASSIC -mz80n))
 $(eval $(call crt0,8080,     crt0_8080.lst,  -DCPU_8080 -D__CLASSIC -m8080))
 $(eval $(call crt0,8085,     crt0_8085.lst,  -DCPU_8085 -D__CLASSIC -m8085))
+$(eval $(call crt0,vm1,      crt0_vm1.lst,   -DCPU_VM1 -D__CLASSIC -mvm1))
 $(eval $(call crt0,gbz80,    crt0_gbz80.lst, -DCPU_GBZ80 -D__CLASSIC -mgbz80))
 $(eval $(call crt0,z180,     crt0_z180.lst,  -D__SDCC_IX -D__CLASSIC -mz180))
 $(eval $(call crt0,ez80_z80, crt0_ez80.lst,  -D__SDCC_IX -D__CLASSIC -mez80_z80 -DEZ80))

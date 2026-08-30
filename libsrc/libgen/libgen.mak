@@ -7,6 +7,7 @@ LIBGEN_TARGETS := libgen/obj/newlib-z80-libgen \
 		libgen/obj/newlib-ixiy-libgen \
 		libgen/obj/newlib-8080-libgen \
 		libgen/obj/newlib-8085-libgen \
+		libgen/obj/newlib-vm1-libgen \
 		libgen/obj/newlib-gbz80-libgen \
 		libgen/obj/newlib-r4k-libgen \
 		libgen/obj/newlib-z180-libgen \
@@ -27,6 +28,7 @@ $(eval $(call buildnew,libgen,z80n,-mz80n,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,ixiy,-mz80 -IXIY,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,8080,-m8080,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,8085,-m8085,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
+$(eval $(call buildnew,libgen,vm1,-mvm1,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,gbz80,-mgbz80,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,z180,-mz180,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,ez80_z80,-mez80_z80,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))

@@ -141,6 +141,7 @@
 	call	l_eq
 	jr	c,%1
 
+%notcpu vm1
 %notcpu 8085
 	pop	de
 	call	l_pint
@@ -155,6 +156,7 @@
 	call	l_gchar
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,%1	;const
 	call	l_gint
@@ -293,6 +295,7 @@
 	ld	h,0
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 	ld	hl,(%1)
 	ld	h,0
@@ -607,6 +610,7 @@
 =
 	call	l_gint7de	;
 
+%notcpu vm1
 %notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
@@ -615,6 +619,7 @@
 	ld	hl,%1	;const
 	call	l_gcharsp	;
 
+%notcpu vm1
 %notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
@@ -623,6 +628,7 @@
 	ld	hl,%1	;const
 	call	l_gintsp	;
 
+%notcpu vm1
 %notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp

@@ -1293,7 +1293,15 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
             ret -= 4;
         }
 
-        ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
+        /* Discarding a stack word. Not through AF on the KR580VM1: POP PSW
+           loads MF, the data-bank select, so the bank would follow whatever
+           happened to be on the stack. */
+        if (CPU_POP_AF_IS_SAFE()) {
+            ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
+        } else {
+            ol("inc\tsp");
+            ol("inc\tsp");
+        }
         if (type->return_type->kind == KIND_LONGLONG) {
             ol("ld\tbc,__i64_acc");
             push("bc");
@@ -1623,8 +1631,11 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
             while (k) {
                 if (usebc) {
                     ol("pop\tbc");
-                } else {
+                } else if (CPU_POP_AF_IS_SAFE()) {
                     ol("pop\taf");
+                } else {
+                    ol("inc\tsp");       /* VM1: AF would take MF with it */
+                    ol("inc\tsp");
                 }
                 k -= 2;
             }
@@ -1748,7 +1759,7 @@ static void quikmult(int type, int32_t size, char preserve)
         ol("add\thl,hl");         \
         if ( IS_8085() ) {        \
             ol("rl\tde");         \
-        } else if ( IS_8080() ) { \
+        } else if ( IS_8080_CLASS() ) { \
             ol("ld\ta,e");        \
             ol("rla");            \
             ol("ld\te,a");        \
@@ -1813,7 +1824,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 ol("ld\tl,0");
                 break;
             case 6:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     ol("add\thl,hl");
                     if ( IS_8085() ) {
                         ol("rl\tde");
@@ -1825,7 +1836,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 3:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     if ( IS_8085() ) {
                         ol("push\tde");
                         ol("push\thl");
@@ -1872,7 +1883,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 40:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     ol("add\thl,hl");
                     if ( IS_8085() ) {
                         ol("rl\tde");
@@ -1884,7 +1895,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 20:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     ol("add\thl,hl");
                     if ( IS_8085() ) {
                         ol("rl\tde");
@@ -1896,7 +1907,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 10:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     ol("add\thl,hl");
                     if ( IS_8085() ) {
                         ol("rl\tde");
@@ -1908,7 +1919,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 5:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     if ( IS_8085() ) {
                         ol("push\tde");
                         ol("push\thl");
@@ -1963,7 +1974,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 7:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     if ( IS_8085() ) {
                         ol("push\tde");
                         ol("push\thl");
@@ -2032,7 +2043,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 9:
-                if ( !IS_8080() ) {
+                if ( !IS_8080_CLASS() ) {
                     if ( IS_8085() ) {
                         ol("push\tde");
                         ol("push\thl");
@@ -2485,7 +2496,10 @@ void zsub(LVALUE* lval)
     case KIND_CPTR:
     case KIND_ACCUM32:
         if ( c_speed_optimisation & OPT_SUB32 ) {
-            if ( IS_8085() ) {
+            if ( IS_8085() || IS_KR580VM1() ) {
+                /* Both have DSUB B. Beats the z80 route below (13 bytes/78T)
+                   and the byte-wise one (14/68); the VM1's own `sbc hl,bc`
+                   would not, since that route spends its gain on ex de,hl. */
                 ol("ld\tbc,hl");        /* 11 bytes: 8 + 10 + 10 + 10 + 6*4 = 62T */
                 ol("pop\thl");
                 ol("sub\thl,bc");
@@ -2496,7 +2510,7 @@ void zsub(LVALUE* lval)
                 ol("ld\ta,b");
                 ol("sbc\td");
                 ol("ld\td,a");
-            } else if ( IS_8080() || IS_GBZ80() ) {
+            } else if ( IS_8080_CLASS() || IS_GBZ80() ) {
                 ol("pop\tbc");          /* 14 bytes: 10 + 6*4 + 10 + 6*4 = 68T */
                 ol("ld\ta,c");
                 ol("sub\tl");
@@ -2540,11 +2554,17 @@ void zsub(LVALUE* lval)
         // Fall through
     default:
         if ( c_speed_optimisation & OPT_SUB16 ) {
-            if ( IS_8085() ) {
+            if ( IS_KR580VM1() ) {
+                /* DSUB D. The 8085 has to stage through BC because its DSUB
+                   only takes that pair; the VM1 subtracts DE where it sits,
+                   which is the shortest form on any cpu here. */
+                ol("ex\tde,hl");        /* 2 bytes: 4 + 10 = 14T */
+                ol("sub\thl,de");
+            } else if ( IS_8085() ) {
                 ol("ex\tde,hl");        /* 4 bytes: 4 + 8 + 10 = 22T */
                 ol("ld\tbc,de");
                 ol("sub\thl,bc");
-            } else if ( IS_8080() || IS_GBZ80() ) {
+            } else if ( IS_8080_CLASS() || IS_GBZ80() ) {
                 ol("ld\ta,e");          /* 6 bytes: 4 + 4 + 4 + 4 + 4 + 4 +  = 24T */
                 ol("sub\tl");
                 ol("ld\tl,a");
@@ -3605,12 +3625,12 @@ void asr_const(LVALUE *lval, int64_t value64)
                 ol("ld\te,a");
                 ol("ld\th,a");
             }
-        } else if ( value == 25 && ulvalue(lval) && !IS_8080() ) {
+        } else if ( value == 25 && ulvalue(lval) && !IS_8080_CLASS() ) {
             ol("ld\tl,d"); /* 8 bytes, 29T */
             ol("ld\th,0");
             if ( IS_8085() ) ol("sra\thl"); else ol("srl\tl");
             ol("ld\tde,0");
-        } else if ( value == 27 && ulvalue(lval)  && !IS_8080()) {
+        } else if ( value == 27 && ulvalue(lval)  && !IS_8080_CLASS()) {
             ol("ld\tl,d"); /* 12 bytes, 47T */
             ol("ld\th,0");
             if ( IS_8085() ) ol("sra\thl"); else ol("srl\tl");
@@ -3872,7 +3892,7 @@ void asl_const(LVALUE *lval, int64_t value64)
             ol("add\thl,hl");
             if ( IS_8085() ) {
                 ol("rl\tde");
-            } else if ( IS_8080() ) {
+            } else if ( IS_8080_CLASS() ) {
                 ol("ld\ta,e");
                 ol("rla");
                 ol("ld\te,a");
@@ -4204,7 +4224,7 @@ void zeq_const(LVALUE *lval, int64_t value64)
             }
             ol("scf");
             set_carry(lval);
-        } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
+        } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080_CLASS() && !IS_GBZ80() ) {
             constbc((uint32_t)value % 65536);
             if ( IS_8085() ) {                  // 17 bytes or 14 with zero top word
                 if ( (uint32_t)value / 65536 == 0 ) {
@@ -4387,7 +4407,7 @@ void zne_const(LVALUE *lval, int64_t value64)
             ol("scf");
             set_carry(lval);
         } else {
-            if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
+            if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080_CLASS() && !IS_GBZ80() ) {
                 constbc((uint32_t)value % 65536);
                 if ( IS_8085() ) {              // 17 bytes, 14 bytes if zero top word
                     if ( (uint32_t)value / 65536 == 0 ) {
@@ -5401,8 +5421,11 @@ void gen_pop_frame(void)
                 ot("pop\t");
                 outstr(FRAME_REGISTER);
                 nl();
-            } else {
+            } else if (CPU_POP_AF_IS_SAFE()) {
                 ol("pop\taf");
+            } else {
+                ol("inc\tsp");           /* VM1: AF would take MF with it */
+                ol("inc\tsp");
             }
         } else if (c_debug_entry_points) {
             callrts("l_debug_pop_frame");

@@ -41,6 +41,7 @@ STDIO_OBJS := $(addprefix classic/stdio/obj/z80/, $(STDIO_OBJECTS)) \
 	$(addprefix classic/stdio/obj/r4k/,$(STDIO_OBJECTS)) \
 	$(addprefix classic/stdio/obj/8080/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix classic/stdio/obj/8085/,$(STDIO_8085_OBJECTS)) \
+	$(addprefix classic/stdio/obj/vm1/,$(STDIO_8085_OBJECTS)) \
 	$(addprefix classic/stdio/obj/8080-binary/,$(STDIO_8080_OBJECTS)) \
 	$(addprefix classic/stdio/obj/8085-binary/,$(STDIO_8085_OBJECTS)) \
 	$(addprefix classic/stdio/obj/gbz80/,$(STDIO_GBZ80_OBJECTS)) \
@@ -61,6 +62,7 @@ $(eval $(call buildbit,classic/stdio,ixiy,test,-Ca-IXIY,-mz80 -IXIY))
 $(eval $(call buildbit,classic/stdio,ixiy-binary,cpm,-Ca-IXIY,-mz80 -IXIY))
 $(eval $(call buildbit,classic/stdio,8080,test,-DCPU_8080 -clib=8080,-m8080))
 $(eval $(call buildbit,classic/stdio,8085,test,-DCPU_8085 -clib=8085,-m8085))
+$(eval $(call buildbit,classic/stdio,vm1,test,-DCPU_VM1 -clib=vm1,-mvm1))
 $(eval $(call buildbit,classic/stdio,8080-binary,cpm,-DCPU_8080 -clib=8080,-m8080))
 $(eval $(call buildbit,classic/stdio,8085-binary,cpm,-DCPU_8085 -clib=8085,-m8085))
 $(eval $(call buildbit,classic/stdio,gbz80,test,-DCPU_GBZ80 -clib=gbz80,-mgbz80))

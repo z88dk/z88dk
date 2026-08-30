@@ -1193,6 +1193,7 @@
 	exx
 
 %notcpu 8080
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	call	l_sub
@@ -1256,6 +1257,7 @@
 	call	ufloat
 	call	dpush
 
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,%1	;const
@@ -1268,6 +1270,7 @@
 	call	l_gintspsp	;
 	ld	hl,%2	;const
 
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,%1	;const
@@ -1280,6 +1283,7 @@
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,%1	;const
@@ -1290,6 +1294,7 @@
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
 
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	ld	hl,%1	;const

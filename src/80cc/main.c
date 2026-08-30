@@ -107,6 +107,7 @@ static option  sccz80_opts[] = {
     { 0, "mr6k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 4000", &c_cpu, NULL, CPU_R4K|CPU_R6K },
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy CPU", &c_cpu, NULL, CPU_GBZ80 },
     { 0, "mkc160", OPT_ASSIGN|OPT_INT, "Generate output for the KC160", &c_cpu, NULL, CPU_KC160 },
+    { 0, "mvm1", OPT_ASSIGN|OPT_INT, "Generate output for the KR580VM1", &c_cpu, NULL, CPU_KR580VM1 },
     { 0, "", OPT_HEADER, "Code generation options", NULL, NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, NULL, 0 },
     { 0, "disable-builtins", OPT_BOOL|OPT_DOUBLE_DASH, "Disable builtin functions",&c_disable_builtins, NULL, 0},
@@ -322,6 +323,12 @@ int main(int argc, char** argv)
         c_notaltreg = 1;
         c_framepointer_is_ix = -1;   /* no IX/IY on 8085 */
         WriteDefined("CPU_8085", 1);
+    }
+
+    if ( c_cpu == CPU_KR580VM1 ) {
+        c_notaltreg = 1;             /* the shadow set is the h'/l' pair only */
+        c_framepointer_is_ix = -1;   /* no IX/IY on the KR580VM1 */
+        WriteDefined("CPU_KR580VM1", 1);
     }
 
     if ( c_cpu == CPU_GBZ80 ) {

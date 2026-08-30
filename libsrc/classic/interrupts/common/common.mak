@@ -10,6 +10,7 @@ INT_COMMON_OBJS := $(addprefix classic/interrupts/common/obj/z80/, $(INT_COMMON_
 	$(addprefix classic/interrupts/common/obj/z80n/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix classic/interrupts/common/obj/8080/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix classic/interrupts/common/obj/8085/,$(INT_COMMON_OBJECTS)) \
+	$(addprefix classic/interrupts/common/obj/vm1/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix classic/interrupts/common/obj/gbz80/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix classic/interrupts/common/obj/z180/,$(INT_COMMON_OBJECTS)) \
 	$(addprefix classic/interrupts/common/obj/ez80_z80/,$(INT_COMMON_OBJECTS)) \
@@ -28,6 +29,7 @@ $(eval $(call buildbit,classic/interrupts/common,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/interrupts/common,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/interrupts/common,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,classic/interrupts/common,8085,test,-clib=8085,-m8085))
+$(eval $(call buildbit,classic/interrupts/common,vm1,test,-clib=vm1,-mvm1))
 $(eval $(call buildbit,classic/interrupts/common,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/interrupts/common,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/interrupts/common,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
