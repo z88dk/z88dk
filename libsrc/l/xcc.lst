@@ -9,3 +9,4 @@ ${NEWLIB_ROOT}l/xcc/__divslong
 ${NEWLIB_ROOT}l/xcc/__modulong
 ${NEWLIB_ROOT}l/xcc/__smod32
 ${NEWLIB_ROOT}l/xcc/___muluint2ulong
+${NEWLIB_ROOT}l/xcc/___fscmp

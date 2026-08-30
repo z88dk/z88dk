@@ -377,6 +377,17 @@ __xinit_%0
 
 
 
+%title xcc spells the float helpers one underscore short of z88dk's
+	call%"[ \t]+"1%"__fs[a-z0-9]+"2
+=
+	EXTERN	_%2
+	call	_%2
+
+%title ... and the matching GLOBAL declaration
+	GLOBAL%"[ \t]+"1%"__fs[a-z0-9]+"2
+=
+	GLOBAL	_%2
+
 %title Rename xcc ___muluint2ulong call to xcc-specific register-ABI helper
 	call	___muluint2ulong
 =
