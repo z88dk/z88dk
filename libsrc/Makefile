@@ -2066,14 +2066,14 @@ test8085_clib.lib: $(TARGET_CLIB_DEPS) test8080_clib.lib
 	$(call buildgeneric,test)
 	TARGET=test TYPE=8085 $(LIBLINKER2) -m8085 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8085_clib @$(TARGET_DIRECTORY)/test/test8085.lst
 
-testvm1_clib.lib: $(TARGET_CLIB_DEPS) test8080_clib.lib
+testvm1_clib.lib: $(TARGET_CLIB_DEPS) test8085_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (vm1) ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=vm1 $(LIBLINKER2) -mvm1 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testvm1_clib @$(TARGET_DIRECTORY)/test/testvm1.lst
 
-testgbz80_clib.lib: $(TARGET_CLIB_DEPS) test8085_clib.lib
+testgbz80_clib.lib: $(TARGET_CLIB_DEPS) testvm1_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (gbz80) ---'
 	@echo ''
