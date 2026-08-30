@@ -61,6 +61,7 @@ STDLIB_NEWLIB_TARGETS := \
 		classic/stdlib/obj/newlib-ixiy-classic-stdlib \
 		classic/stdlib/obj/newlib-8080-classic-stdlib \
 		classic/stdlib/obj/newlib-8085-classic-stdlib \
+		classic/stdlib/obj/newlib-vm1-classic-stdlib \
 		classic/stdlib/obj/newlib-gbz80-classic-stdlib \
 		classic/stdlib/obj/newlib-ez80_z80-classic-stdlib \
 		classic/stdlib/obj/newlib-z180-classic-stdlib \
@@ -76,6 +77,7 @@ STDLIB_OBJS := \
 	$(addprefix classic/stdlib/obj/z80n/,$(STDLIB_OBJECTS)) \
 	$(addprefix classic/stdlib/obj/8080/,$(STDLIB_8080_OBJECTS)) \
 	$(addprefix classic/stdlib/obj/8085/,$(STDLIB_8085_OBJECTS)) \
+	$(addprefix classic/stdlib/obj/vm1/,$(STDLIB_8085_OBJECTS)) \
 	$(addprefix classic/stdlib/obj/gbz80/,$(STDLIB_GBZ80_OBJECTS)) \
 	$(addprefix classic/stdlib/obj/ez80_z80/,$(STDLIB_OBJECTS)) \
 	$(addprefix classic/stdlib/obj/z180/,$(STDLIB_OBJECTS)) \
@@ -94,6 +96,7 @@ $(eval $(call buildbit,classic/stdlib,z80,test))
 $(eval $(call buildbit,classic/stdlib,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/stdlib,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,classic/stdlib,8085,test,-clib=8085,-m8085))
+$(eval $(call buildbit,classic/stdlib,vm1,test,-clib=vm1,-mvm1))
 $(eval $(call buildbit,classic/stdlib,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/stdlib,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,classic/stdlib,r4k,test,-clib=rabbit4k,-mr4k))
@@ -109,6 +112,7 @@ $(eval $(call buildnew,classic/stdlib,z80n,-mz80n,$(STDLIB_NEWLIBGLOBS),$(STDLIB
 $(eval $(call buildnew,classic/stdlib,ixiy,-mz80 -IXIY,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,8080,-m8080,$(STDLIB_8080_NEWLIBGLOBS),$(STDLIB_8080_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,8085,-m8085,$(STDLIB_8085_NEWLIBGLOBS),$(STDLIB_8085_NEWLIBGLOBS_ex)))
+$(eval $(call buildnew,classic/stdlib,vm1,-mvm1,$(STDLIB_8085_NEWLIBGLOBS),$(STDLIB_8085_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,gbz80,-mgbz80,$(STDLIB_GBZ80_NEWLIBGLOBS),$(STDLIB_GBZ80_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,z180,-mz180,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,ez80_z80,-mez80_z80,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))

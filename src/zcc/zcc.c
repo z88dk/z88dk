@@ -638,11 +638,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     {{ "-mgbz80" , "-mgbz80" , "-msm83" , "-mgbz80", "DESTDIR/lib/arch/gbz80/gbz80_rules.1", "_gbz80", NULL }},       /* CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mez80_z80"   , "-mez80_z80" ,  "-mez80_z80" ,   "-mez80", "DESTDIR/lib/arch/ez80/ez80_rules.1", "_ez80_z80",  "-triple z80" }},           /* CPU_TYPE_EZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mkc160" , "-mkc160" ,  "-mz80" , "-mkc160", "DESTDIR/lib/arch/kc160/kc160_rules.1", "_kc160",  "-triple z180" }},           /* CPU_TYPE_KC160   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
-    /* The KR580VM1 is an 8080 superset, so it links the 8080 library. The flag
-       is -mvm1, as it is for ticks and z88dk-dis. z80asm does not know the CPU
-       yet - assembly of -mvm1 output fails until it does, and only 80cc
-       generates code for it. */
-    {{ "-mvm1", "-mvm1", NULL, "-mvm1", "DESTDIR/lib/arch/vm1/vm1_rules.1", "_8080", NULL }},  /* CPU_TYPE_KR580VM1 : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
+    {{ "-mvm1", "-mvm1", NULL, "-mvm1", "DESTDIR/lib/arch/vm1/vm1_rules.1", "_vm1", NULL }},  /* CPU_TYPE_KR580VM1 : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT */
     {{ "-mz80 -IXIY"   , "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_ixiy",  "-triple z80"   }},          /* CPU_TYPE_IXIY     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
     {{ "-mz80_strict",  "-mz80"   , "-mz80"   , "-mz80", "DESTDIR/lib/arch/z80/z80_rules.1", "_strict",  "-triple z80"   }},          /* CPU_TYPE_STRICT  : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT, CPU_TOOL_LIBNAME */
 };

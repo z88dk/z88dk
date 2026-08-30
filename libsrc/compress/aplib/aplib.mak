@@ -9,6 +9,7 @@ APLIB_TARGETS := compress/aplib/obj/newlib-z80-compress-aplib \
 	compress/aplib/obj/newlib-ixiy-compress-aplib \
 	compress/aplib/obj/newlib-8080-compress-aplib \
 	compress/aplib/obj/newlib-8085-compress-aplib \
+	compress/aplib/obj/newlib-vm1-compress-aplib \
 	compress/aplib/obj/newlib-gbz80-compress-aplib \
 	compress/aplib/obj/newlib-ez80_z80-compress-aplib \
 	compress/aplib/obj/newlib-z180-compress-aplib \
@@ -28,6 +29,7 @@ $(eval $(call buildnew,compress/aplib,z80n,-mz80n,$(APLIB_GLOBS),$(APLIB_GLOBS_e
 $(eval $(call buildnew,compress/aplib,ixiy,-mz80 -IXIY,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,8080,-m8080,$(APLIB_8080_GLOBS),$(APLIB_8080_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,8085,-m8085,$(APLIB_8080_GLOBS),$(APLIB_8080_GLOBS_ex)))
+$(eval $(call buildnew,compress/aplib,vm1,-mvm1,$(APLIB_8080_GLOBS),$(APLIB_8080_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,gbz80,-mgbz80,$(APLIB_8080_GLOBS),$(APLIB_8080_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,z180,-mz180,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,ez80_z80,-mez80_z80,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))

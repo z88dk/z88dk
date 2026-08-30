@@ -7,6 +7,7 @@ LOCALE_TARGETS := locale/obj/newlib-z80-locale \
 		locale/obj/newlib-ixiy-locale \
 		locale/obj/newlib-8080-locale \
 		locale/obj/newlib-8085-locale \
+		locale/obj/newlib-vm1-locale \
 		locale/obj/newlib-gbz80-locale \
 		locale/obj/newlib-z180-locale \
 		locale/obj/newlib-r4k-locale \
@@ -28,6 +29,7 @@ $(eval $(call buildnew,locale,z80n,-mz80n,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,ixiy,-mz80 -IXIY,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,8080,-m8080,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,8085,-m8085,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
+$(eval $(call buildnew,locale,vm1,-mvm1,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,gbz80,-mgbz80,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,z180,-mz180,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,ez80_z80,-mez80_z80,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))

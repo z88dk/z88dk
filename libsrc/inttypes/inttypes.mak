@@ -7,6 +7,7 @@ INTTYPES_TARGETS := inttypes/obj/newlib-z80-inttypes \
 		inttypes/obj/newlib-ixiy-inttypes \
 		inttypes/obj/newlib-8080-inttypes \
 		inttypes/obj/newlib-8085-inttypes \
+		inttypes/obj/newlib-vm1-inttypes \
 		inttypes/obj/newlib-gbz80-inttypes \
 		inttypes/obj/newlib-z180-inttypes \
 		inttypes/obj/newlib-r4k-inttypes \
@@ -28,6 +29,7 @@ $(eval $(call buildnew,inttypes,z80n,-mz80n,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_e
 $(eval $(call buildnew,inttypes,ixiy,-mz80 -IXIY,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,8080,-m8080,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,8085,-m8085,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
+$(eval $(call buildnew,inttypes,vm1,-mvm1,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,gbz80,-mgbz80,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,z180,-mz180,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,ez80_z80,-mez80_z80,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))

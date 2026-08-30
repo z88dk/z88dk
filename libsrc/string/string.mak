@@ -7,6 +7,7 @@ STRING_TARGETS := string/obj/newlib-z80-string \
 		string/obj/newlib-ixiy-string \
 		string/obj/newlib-8080-string \
 		string/obj/newlib-8085-string \
+		string/obj/newlib-vm1-string \
 		string/obj/newlib-gbz80-string \
 		string/obj/newlib-ez80_z80-string \
 		string/obj/newlib-z180-string \
@@ -27,6 +28,7 @@ $(eval $(call buildnew,string,z80n,-mz80n,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 $(eval $(call buildnew,string,ixiy,-mz80 -IXIY,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 $(eval $(call buildnew,string,8080,-m8080,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 $(eval $(call buildnew,string,8085,-m8085,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
+$(eval $(call buildnew,string,vm1,-mvm1,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 $(eval $(call buildnew,string,gbz80,-mgbz80,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 $(eval $(call buildnew,string,z180,-mz180,$(STRING_GLOBS),$(STRING_GLOBS_ex)))
 $(eval $(call buildnew,string,ez80_z80,-mez80_z80,$(STRING_GLOBS),$(STRING_GLOBS_ex)))

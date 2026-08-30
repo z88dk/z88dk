@@ -17,7 +17,7 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxvio.lib
-GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib vm1_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += gfxtek.lib gfxregis.lib
 
 
@@ -130,7 +130,7 @@ TOCREATE += $(call check_target,special,special_clib.lib)
 TOCREATE += $(call check_target,super80,super80_clib.lib super80_vduem_clib.lib)
 TOCREATE += $(call check_target,sv8000,sv8000_clib.lib)
 TOCREATE += $(call check_target,svi,svi_clib.lib)
-TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib test8085_clib.lib testrcm_clib.lib testrcm4k_clib.lib testkc160_clib.lib testgbz80_clib.lib)
+TOCREATE += $(call check_target,test,test_clib.lib testz180_clib.lib testez80_z80_clib.lib test8080_clib.lib test8085_clib.lib testvm1_clib.lib testrcm_clib.lib testrcm4k_clib.lib testkc160_clib.lib testgbz80_clib.lib)
 TOCREATE += $(call check_target,ti82,ti82_clib.lib)
 TOCREATE += $(call check_target,ti83,ti83_clib.lib)
 TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
@@ -150,7 +150,7 @@ TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,x820ii,x820ii.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
 TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
-TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib r4k_clib.lib kc160_clib.lib)
+TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib vm1_clib.lib r2ka_clib.lib r4k_clib.lib kc160_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
@@ -1410,8 +1410,16 @@ ixiy_clib.lib: $(TARGET_CLIB_DEPS) z80_clib.lib
 	$(call buildgeneric,z80)
 	TARGET=z80 TYPE=8085 $(LIBLINKER2) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
+# Barebone z80/vm1 clib
+vm1_clib.lib: $(TARGET_CLIB_DEPS) 8085_clib.lib
+	@echo ''
+	@echo '--- Building +z80 (vm1) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=vm1 $(LIBLINKER2) -mvm1 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/vm1_clib @$(TARGET_DIRECTORY)/z80/808x.lst
+
 # Barebone z80/r2ka clib
-r2ka_clib.lib: $(TARGET_CLIB_DEPS) 8085_clib.lib
+r2ka_clib.lib: $(TARGET_CLIB_DEPS) vm1_clib.lib
 	@echo ''
 	@echo '--- Building +z80 (r2ka) Library ---'
 	@echo ''
@@ -2058,6 +2066,13 @@ test8085_clib.lib: $(TARGET_CLIB_DEPS) test8080_clib.lib
 	$(call buildgeneric,test)
 	TARGET=test TYPE=8085 $(LIBLINKER2) -m8085 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8085_clib @$(TARGET_DIRECTORY)/test/test8085.lst
 
+testvm1_clib.lib: $(TARGET_CLIB_DEPS) test8080_clib.lib
+	@echo ''
+	@echo '--- Building Test System Library (vm1) ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=vm1 $(LIBLINKER2) -mvm1 -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testvm1_clib @$(TARGET_DIRECTORY)/test/testvm1.lst
+
 testgbz80_clib.lib: $(TARGET_CLIB_DEPS) test8085_clib.lib
 	@echo ''
 	@echo '--- Building Test System Library (gbz80) ---'
@@ -2447,6 +2462,12 @@ z80iy_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,ixiy)
 	@echo '--- Building 8085 crt Library ---'
 	@echo ''
 	TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_crt0 @$(LISTFILE_DIRECTORY)/8085.lst
+
+vm1_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,vm1)
+	@echo ''
+	@echo '--- Building vm1 crt Library ---'
+	@echo ''
+	TYPE=vm1 $(LIBLINKER) -mvm1 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vm1_crt0 @$(LISTFILE_DIRECTORY)/vm1.lst
 
 z80n_crt0.lib: $(DIRS) $(OBJS) $(call CRT0_STAMP,z80n)
 	@echo ''

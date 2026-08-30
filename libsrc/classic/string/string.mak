@@ -18,6 +18,7 @@ string_OBJS := $(addprefix classic/string/obj/z80/, $(string_OBJECTS)) \
 	$(addprefix classic/string/obj/z80n/,$(string_OBJECTS)) \
 	$(addprefix classic/string/obj/8080/,$(string_8080_OBJECTS)) \
 	$(addprefix classic/string/obj/8085/,$(string_8080_OBJECTS)) \
+	$(addprefix classic/string/obj/vm1/,$(string_8080_OBJECTS)) \
 	$(addprefix classic/string/obj/gbz80/,$(string_GBZ80_OBJECTS)) \
 	$(addprefix classic/string/obj/z180/,$(string_OBJECTS)) \
 	$(addprefix classic/string/obj/ez80_z80/,$(string_OBJECTS))  \
@@ -34,6 +35,7 @@ $(eval $(call buildbit,classic/string,z80,test))
 $(eval $(call buildbit,classic/string,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/string,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,classic/string,8085,test,-clib=8085,-m8085))
+$(eval $(call buildbit,classic/string,vm1,test,-clib=vm1,-mvm1))
 $(eval $(call buildbit,classic/string,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/string,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,classic/string,r4k,test,-clib=rabbit4k,-mr4k))

@@ -12,6 +12,7 @@ MALLOC_OBJS := $(addprefix classic/alloc/malloc-classic/obj/z80/, $(MALLOC_OBJEC
 	$(addprefix classic/alloc/malloc-classic/obj/z80n/,$(MALLOC_OBJECTS)) \
 	$(addprefix classic/alloc/malloc-classic/obj/8080/,$(MALLOC_OBJECTS)) \
 	$(addprefix classic/alloc/malloc-classic/obj/8085/,$(MALLOC_OBJECTS)) \
+	$(addprefix classic/alloc/malloc-classic/obj/vm1/,$(MALLOC_OBJECTS)) \
 	$(addprefix classic/alloc/malloc-classic/obj/gbz80/,$(MALLOC_OBJECTS)) \
 	$(addprefix classic/alloc/malloc-classic/obj/z180/,$(MALLOC_OBJECTS)) \
 	$(addprefix classic/alloc/malloc-classic/obj/ez80_z80/,$(MALLOC_OBJECTS)) \
@@ -29,6 +30,7 @@ $(eval $(call buildbit,classic/alloc/malloc-classic,z80,test))
 $(eval $(call buildbit,classic/alloc/malloc-classic,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/alloc/malloc-classic,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,classic/alloc/malloc-classic,8085,test,-clib=8085,-m8085))
+$(eval $(call buildbit,classic/alloc/malloc-classic,vm1,test,-clib=vm1,-mvm1))
 $(eval $(call buildbit,classic/alloc/malloc-classic,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/alloc/malloc-classic,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,classic/alloc/malloc-classic,r4k,test,-clib=rabbit4k,-mr4k))

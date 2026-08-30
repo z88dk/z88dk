@@ -7,6 +7,7 @@ SETJMP_TARGETS := setjmp/obj/newlib-z80-setjmp \
 		setjmp/obj/newlib-ixiy-setjmp \
 		setjmp/obj/newlib-8080-setjmp \
 		setjmp/obj/newlib-8085-setjmp \
+		setjmp/obj/newlib-vm1-setjmp \
 		setjmp/obj/newlib-gbz80-setjmp \
 		setjmp/obj/newlib-z180-setjmp \
 		setjmp/obj/newlib-r4k-setjmp \
@@ -28,6 +29,7 @@ $(eval $(call buildnew,setjmp,z80n,-mz80n,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 $(eval $(call buildnew,setjmp,ixiy,-mz80 -IXIY,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 $(eval $(call buildnew,setjmp,8080,-m8080,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 $(eval $(call buildnew,setjmp,8085,-m8085,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
+$(eval $(call buildnew,setjmp,vm1,-mvm1,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 $(eval $(call buildnew,setjmp,gbz80,-mgbz80,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 $(eval $(call buildnew,setjmp,z180,-mz180,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))
 $(eval $(call buildnew,setjmp,ez80_z80,-mez80_z80,$(SETJMP_GLOBS),$(SETJMP_GLOBS_ex)))

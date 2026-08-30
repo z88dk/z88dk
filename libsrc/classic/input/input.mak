@@ -10,6 +10,7 @@ INPUT_OBJS := $(addprefix classic/input/obj/z80/, $(INPUT_OBJECTS)) \
 	$(addprefix classic/input/obj/z80n/,$(INPUT_OBJECTS)) \
 	$(addprefix classic/input/obj/8080/,$(INPUT_OBJECTS)) \
 	$(addprefix classic/input/obj/8085/,$(INPUT_OBJECTS)) \
+	$(addprefix classic/input/obj/vm1/,$(INPUT_OBJECTS)) \
 	$(addprefix classic/input/obj/z180/,$(INPUT_OBJECTS)) \
 	$(addprefix classic/input/obj/r4k/,$(INPUT_OBJECTS)) \
 	$(addprefix classic/input/obj/kc160/,$(INPUT_OBJECTS)) \
@@ -26,6 +27,7 @@ $(eval $(call buildbit,classic/input,z80,test))
 $(eval $(call buildbit,classic/input,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/input,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,classic/input,8085,test,-clib=8085,-m8085))
+$(eval $(call buildbit,classic/input,vm1,test,-clib=vm1,-mvm1))
 $(eval $(call buildbit,classic/input,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/input,r2ka,test,-clib=rabbit,-mr2ka))
 $(eval $(call buildbit,classic/input,r4k,test,-clib=rabbit4k,-mr4k))
