@@ -239,6 +239,16 @@ C_LINE %2,"%1::x::%eval(%3 10000 * %4 +)::%5"
 =
 %2defc %0%3=%4%1
 
+%title z88dk printf/scanf option word: bare hex needs a 0x prefix
+	defc%"[ \t]+"2%"(CRT_[A-Za-z0-9_]*_format|CLIB_OPT_[A-Za-z0-9_]+)"3%"[ \t]*=[ \t]*"4%"[0-9A-Fa-f]{8}"5
+=
+	defc%2%3%40x%5
+
+%title z88dk printf/scanf option word, OR-accumulate form
+	defc%"[ \t]+"2%"(CRT_[A-Za-z0-9_]*_format|CLIB_OPT_[A-Za-z0-9_]+)"3%"[ \t]*=[ \t]*"4%"[A-Za-z0-9_]+"5%"[ \t]*\|[ \t]*"6%"[0-9A-Fa-f]{8}"7
+=
+	defc%2%3%4%5%60x%7
+
 ;;
 ;; asxxx syntax for LSB / MSB
 ;;
@@ -365,6 +375,13 @@ __xinit_%0
 ;; xcc-specific peephole / helper-name rules (post-translation)
 ;; ------------------------------------------------------------------
 
+
+
+%title Rename xcc ___muluint2ulong call to xcc-specific register-ABI helper
+	call	___muluint2ulong
+=
+	EXTERN	___xcc_muluint2ulong
+	call	___xcc_muluint2ulong
 
 %title Rename xcc __divsint call to xcc-specific alias (avoid stack-based sdcc symbol clash)
 	call	__divsint
