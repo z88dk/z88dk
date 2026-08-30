@@ -388,6 +388,17 @@ __xinit_%0
 =
 	GLOBAL	_%2
 
+%title Rename the xcc outlined shift helpers to xcc-specific register-ABI symbols
+	call%"[ \t]+"1__%"(shl16|shr16u|shr16s)"2
+=
+	EXTERN	__xcc_%2
+	call	__xcc_%2
+
+%title ... and their GLOBAL declarations
+	GLOBAL%"[ \t]+"1__%"(shl16|shr16u|shr16s)"2
+=
+	GLOBAL	__xcc_%2
+
 %title Rename xcc ___muluint2ulong call to xcc-specific register-ABI helper
 	call	___muluint2ulong
 =

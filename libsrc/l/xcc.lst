@@ -10,3 +10,6 @@ ${NEWLIB_ROOT}l/xcc/__modulong
 ${NEWLIB_ROOT}l/xcc/__smod32
 ${NEWLIB_ROOT}l/xcc/___muluint2ulong
 ${NEWLIB_ROOT}l/xcc/___fscmp
+${NEWLIB_ROOT}l/xcc/__xcc_shl16
+${NEWLIB_ROOT}l/xcc/__xcc_shr16u
+${NEWLIB_ROOT}l/xcc/__xcc_shr16s
