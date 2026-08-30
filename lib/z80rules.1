@@ -112,6 +112,7 @@
 	dec	hl
 	push	hl
 
+%notcpu vm1
 %notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
@@ -174,6 +175,7 @@
 	push	hl
 	push	de
 
+%notcpu vm1
 %notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
@@ -189,6 +191,7 @@
 	push	hl
 	push	de
 
+%notcpu vm1
 %notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
@@ -845,6 +848,7 @@
 	ld	d,0
 	ld	hl,%1	;const
 
+%notcpu vm1
 %notcpu 8085
 	call	l_gint	;%9
 	push	hl
@@ -1401,6 +1405,7 @@
 	push	bc
 	ld	hl,%1	;const
 
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	push	hl
@@ -2490,6 +2495,7 @@
 	and	a
 	jr	%1
 
+%notcpu vm1
 %notcpu 8085
 	call	l_gint	;%2
 	ld	de,%1
@@ -2800,7 +2806,8 @@
 	ld	h,0
 	ex	de,hl
 
-$notcpu 8085
+%notcpu vm1
+%notcpu 8085
 	call	l_gint	;
 	call	l_glong
 =
@@ -2876,6 +2883,7 @@ $notcpu 8085
 	call	l_glong2sp
 	ld	hl,%1
 
+%notcpu vm1
 %notcpu 8085
 %notcpu gbz80
 	call	l_glonghlp
@@ -2960,6 +2968,7 @@ $notcpu 8085
 	pop	hl
 	push	hl
 
+%notcpu vm1
 %notcpu 8085
 	push	de
 	ld	hl,%1	;const
@@ -5137,6 +5146,7 @@ $notcpu 8085
 	add	hl,sp
 	call	l_gint	;%4
 
+%notcpu vm1
 %notcpu 8085
 	ex	de,hl
 	call	l_pint
@@ -5146,6 +5156,7 @@ $notcpu 8085
 	ld	(hl),d
 	ex	de,hl
 
+%notcpu vm1
 %notcpu 8085
 	call	l_gint	;%1
 	ld	bc,%2
@@ -5632,6 +5643,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %title Load 8 bit value into integer
+%notcpu vm1
 %notcpu 8085
 	ld	l,(hl)
 	ld	h,0
@@ -6927,6 +6939,7 @@ $notcpu 8085
 	%3c	(hl)
 	ld	hl,%2
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6937,6 +6950,7 @@ $notcpu 8085
 =
 	call	l_gint3	;
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6946,6 +6960,7 @@ $notcpu 8085
 =
 	call	l_gint2	;
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6954,6 +6969,7 @@ $notcpu 8085
 =
 	call	l_gint1	;
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6965,6 +6981,7 @@ $notcpu 8085
 =
 	call	l_gint%1	;
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6977,6 +6994,7 @@ $notcpu 8085
 =
 	call	l_gint%1sp	;
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6988,6 +7006,7 @@ $notcpu 8085
 =
 	call	l_gchar3
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -6998,6 +7017,7 @@ $notcpu 8085
 =
 	call	l_gchar2
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -7007,6 +7027,7 @@ $notcpu 8085
 =
 	call	l_gchar1
 
+%notcpu vm1
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
@@ -7270,6 +7291,7 @@ $notcpu 8085
 	dec	sp
 	push	hl
 
+%notcpu vm1
 %notcpu 8085
 %title Avoid going via stack
 	push	hl
