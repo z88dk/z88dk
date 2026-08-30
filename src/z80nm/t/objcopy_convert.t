@@ -9,7 +9,12 @@ use ObjModule;
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
 
-for my $version ( Obj::min_version .. Obj::max_version ) {
+my @test_versions = (Obj::min_version .. Obj::max_version);
+if ($ENV{TEST_VERSION}) {
+	@test_versions = ( 0+$ENV{TEST_VERSION} );
+}
+
+for my $version ( @test_versions ) {
     my $version_str = sprintf "%02d", $version;
 
     run_ok("perl z80objcopy.pl $dir/input/$self.def $test.1.o");

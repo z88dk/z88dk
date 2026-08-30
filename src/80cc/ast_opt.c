@@ -170,6 +170,9 @@ static int try_fold_binop_decimal(int kind, zdouble l, zdouble r, zdouble *out)
  * apply the local rewrite (literal-on-literal fold, cast narrowing,
  * div/0 + over-width-shift warnings) on the now-folded children.
  */
+/* Defined with the dead-code pass below; the ternary fold needs it. */
+static int literal_truthy(Node *n);
+
 static void fold_visit(const AstSlot *slot, void *ctx)
 {
     (void)ctx;
@@ -380,6 +383,28 @@ Node *ast_fold_constants(Node *node)
                 }
             }
         }
+        return node;
+    }
+
+    /* `cond ? a : b` with a literal cond and a literal in the selected
+       arm. Only ONE arm is evaluated, so replacing the ternary by that
+       arm is correct whatever the other arm contains. Gated on the
+       selected arm already being a literal: that keeps this a pure
+       constant fold, and leaves every non-constant shape to
+       ast_dead_code (which performs the same collapse later in
+       ast_opt_run). It matters here because constexpr() folds a
+       constant expression with THIS pass alone — without it,
+       `char buf[C ? X : Y]` was rejected as "Expecting constant
+       expression". The arm is returned verbatim, exactly as
+       ast_dead_code returns it. */
+    case AST_TERNARY: {
+        Node *cinner = node->cond;
+        while (cinner && cinner->ast_type == OP_DEREF) cinner = cinner->operand;
+        int t = literal_truthy(cinner);
+        if (t == 1 && node->then && node->then->ast_type == AST_LITERAL)
+            return node->then;
+        if (t == 0 && node->els && node->els->ast_type == AST_LITERAL)
+            return node->els;
         return node;
     }
 
@@ -1902,9 +1927,26 @@ static void cse_env_invalidate_sym(cse_env *e, SYMBOL *sym)
 }
 
 /* "Interesting" enough to record. SEF is checked separately. */
+/* A candidate becomes a synthesized local (cse_make_stub_sym /
+   make_licm_stub_sym), so its type must be storable in one. `(void)x` is an
+   OP_CAST, interesting by shape, but ir_build rejects a void AST_DECL. Both
+   collectors then walk into the operand and hoist that instead. A NULL type
+   is left alone — the stub makers default it to int. */
+static int type_is_stub_storable(Node *n)
+{
+    if (!n || !n->type) return 1;
+    switch (n->type->kind) {
+    case KIND_NONE: case KIND_VOID: case KIND_FUNC: case KIND_ELLIPSES:
+        return 0;
+    default:
+        return 1;
+    }
+}
+
 static int is_cse_interesting(Node *n)
 {
     if (!n) return 0;
+    if (!type_is_stub_storable(n)) return 0;
     switch (n->ast_type) {
     case AST_LITERAL:
     case AST_STR_LIT:

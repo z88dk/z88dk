@@ -32,7 +32,6 @@ EXTERN ide_wait_ready, ide_wait_drq
 
     ld a,__IDE_CMD_ID
     out (__IO_CF_IDE_COMMAND),a
-    call ide_wait_ready         ;make sure drive is ready to proceed
     call ide_wait_drq           ;wait until it's got the data
 
     ;Read a block of 512 bytes (one sector) from the drive
@@ -83,7 +82,6 @@ EXTERN ide_read_block
 
     ld de,__IO_PIO_IDE_COMMAND<<8|__IDE_CMD_ID
     call ide_write_byte         ;issue the command
-    call ide_wait_ready         ;make sure drive is ready to proceed
     call ide_wait_drq           ;wait until it's got the data
 
     call ide_read_block         ;grab the data buffer in (HL++)

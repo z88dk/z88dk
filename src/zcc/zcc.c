@@ -189,13 +189,17 @@ static void            parse_configfile(const char *config_line);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
+static void            keep_user_multi(void);
 
 static void            configure_assembler(void);
 static void            configure_compiler(void);
+static int             compile_c_multi(int filenumber);
 static void            configure_misc_options(void);
 static void            configure_maths_library(char **libstring);
 
 static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
+static int             fill_sccz80_copt_rules(char **rules);
+static int             fill_80cc_copt_rules(char **rules);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            zsdcc_asm_filter_sections(int filenumber, char* ext);
 static void            zsdcc_embed_adb(int filenumber);
@@ -318,8 +322,10 @@ static enum iostyle    compiler_style = outimplied;
 #define CC_EZ80CLANG 2
 #define CC_80CC      3
 #define CC_XCC       4
+#define CC_MULTI     5
 
 static char           *c_compiler_type = "sccz80";
+static int             c_want_multi = 0;
 static int             compiler_type = CC_SCCZ80;
 
 static char           *zcc_opt_dir = ".";
@@ -347,6 +353,9 @@ static char  *c_ez80clang_exe = "ez80-clang";
 static char  *c_sdcc_exe = "z88dk-zsdcc";
 static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_80cc_exe = "z88dk-80cc";
+static char  *c_zccmulti_exe = "z88dk-zcc-multi";
+static char  *c_compiler_metric = "ticks";
+static char  *c_compiler_multi_report = NULL;
 static char  *c_cpp_exe = "z88dk-ucpp";
 static char  *c_sdcc_preproc_exe = "z88dk-ucpp";
 static char  *c_zpragma_exe = "z88dk-zpragma";
@@ -428,6 +437,8 @@ static arg_t  config[] = {
 
     { "COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)" },
     { "SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, NULL, "Name of sccz80 binary" },
+    { "80CCEXE", 0, SetStringConfig, &c_80cc_exe, NULL, "Name of 80cc binary" },
+    { "ZCCMULTIEXE", 0, SetStringConfig, &c_zccmulti_exe, NULL, "Name of the multi-compiler stitch tool" },
     { "ZSDCCEXE", 0, SetStringConfig, &c_sdcc_exe, NULL, "Name of the sdcc binary" },
     { "EZ80CLANGEXE", 0, SetStringConfig, &c_ez80clang_exe, NULL, "Name of the ez80-clang binary" },
 
@@ -550,7 +561,10 @@ static option options[] = {
     { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
 
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
-    { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc)" , &c_compiler_type, NULL, 0},
+    { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc,ez80clang,80cc,multi)" , &c_compiler_type, NULL, 0},
+    /* Double-dash. Do not use a -compiler-* name: option_parse matches prefixes. */
+    { 0, "multi-compiler-metric", OPT_STRING|OPT_DOUBLE_DASH, "Metric for -compiler=multi: ticks (default) or size", &c_compiler_metric, NULL, 0},
+    { 0, "multi-compiler-report", OPT_STRING|OPT_DOUBLE_DASH, "Write a TSV winner report for -compiler=multi", &c_compiler_multi_report, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
     { 0, "no-nop-comment", OPT_BOOL|OPT_DOUBLE_DASH,  "Disable nop-comment inlined asm in sdcc output" , &c_disable_nop_comment, NULL, 0},
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
@@ -1077,7 +1091,8 @@ int main(int argc, char **argv)
             add_file_to_process(aa, 1);
         }
     }
-    processing_user_command_line_arg = 0; 
+    processing_user_command_line_arg = 0;
+    c_want_multi = (c_compiler_type && strcmp(c_compiler_type, "multi") == 0);
 
     if (c_print_specs) {
         print_specs();
@@ -1093,6 +1108,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Cannot find definition for -clib=%s\n", c_clib);
         exit(1);
     }
+    keep_user_multi();
 
     /* We must have at least a crt file - we can rely on defaults for everything else */
     if (c_crt0 == NULL) {
@@ -1381,6 +1397,24 @@ int main(int argc, char **argv)
         case CFILE:
         case CXXFILE:
             if (m4only) continue;
+            if (compiler_type == CC_MULTI) {
+                if (get_filetype_by_suffix(original_filenames[i]) == CXXFILE) {
+                    fprintf(stderr, "Only -compiler=ez80clang supports c++\n");
+                    exit(1);
+                }
+                if (preprocessonly || dependencyonly) {
+                    char zpragma_args[1024];
+                    snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=\"%s\"", zcc_opt_def);
+                    if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                        exit(1);
+                    if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
+                        exit(1);
+                    continue;
+                }
+                if (compile_c_multi(i))
+                    exit(1);
+                goto CASE_ASMFILE;
+            }
             /* past clang+llvm related pre-processing */
             if (compiler_type == CC_SDCC || compiler_type == CC_EZ80CLANG) {
                 char zpragma_args[1024];
@@ -1501,65 +1535,13 @@ int main(int argc, char **argv)
 
             } else if (compiler_type == CC_80CC) {
                 char  *rules[MAX_COPT_RULE_FILES];
-                int    num_rules = 0;
-
-                rules[num_rules++] = c_coptrules9;
-                rules[num_rules++] = c_80cc_opt;
-
-                if (c_coptrules_target) {
-                    rules[num_rules++] = c_coptrules_target;
-                }
-
-                if (coptrules_cpu) {
-                    rules[num_rules++] = coptrules_cpu;
-                }
-
-                if (c_coptrules_user) {
-                    rules[num_rules++] = c_coptrules_user;
-                }
+                int    num_rules = fill_80cc_copt_rules(rules);
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 
             } else {
                 char  *rules[MAX_COPT_RULE_FILES];
-                int    num_rules = 0;
-
-                /* z80rules.9 implements intrinsics and RST substitution */
-                rules[num_rules++] = c_coptrules9;
-
-                switch (peepholeopt) {
-                case 0:
-                    break;
-                case 1:
-                    rules[num_rules++] = c_coptrules1;
-                    break;
-                case 2:
-                    rules[num_rules++] = c_coptrules2;
-                    rules[num_rules++] = c_coptrules1;
-                    break;
-                default:
-                    rules[num_rules++] = c_coptrules2;
-                    rules[num_rules++] = c_coptrules1;
-                    rules[num_rules++] = c_coptrules3;
-                    break;
-                }
-
-                if ( c_coptrules_target ) {
-                    rules[num_rules++] = c_coptrules_target;
-                }
-
-
-                if ( coptrules_cpu ) {
-                    rules[num_rules++] = coptrules_cpu;
-                }
-
-                if ( c_coptrules_sccz80 ) {
-                    rules[num_rules++] = c_coptrules_sccz80;
-                }
-
-                if ( c_coptrules_user ) {
-                    rules[num_rules++] = c_coptrules_user;
-                }
+                int    num_rules = fill_sccz80_copt_rules(rules);
 
                 apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
             }
@@ -1847,6 +1829,56 @@ int main(int argc, char **argv)
     exit(0);    /* If this point is reached, all went well */
 }
 
+
+static int fill_sccz80_copt_rules(char **rules)
+{
+    int num_rules = 0;
+
+    /* z80rules.9 implements intrinsics and RST substitution */
+    rules[num_rules++] = c_coptrules9;
+
+    switch (peepholeopt) {
+    case 0:
+        break;
+    case 1:
+        rules[num_rules++] = c_coptrules1;
+        break;
+    case 2:
+        rules[num_rules++] = c_coptrules2;
+        rules[num_rules++] = c_coptrules1;
+        break;
+    default:
+        rules[num_rules++] = c_coptrules2;
+        rules[num_rules++] = c_coptrules1;
+        rules[num_rules++] = c_coptrules3;
+        break;
+    }
+
+    if (c_coptrules_target)
+        rules[num_rules++] = c_coptrules_target;
+    if (coptrules_cpu)
+        rules[num_rules++] = coptrules_cpu;
+    if (c_coptrules_sccz80)
+        rules[num_rules++] = c_coptrules_sccz80;
+    if (c_coptrules_user)
+        rules[num_rules++] = c_coptrules_user;
+    return num_rules;
+}
+
+static int fill_80cc_copt_rules(char **rules)
+{
+    int num_rules = 0;
+
+    rules[num_rules++] = c_coptrules9;
+    rules[num_rules++] = c_80cc_opt;
+    if (c_coptrules_target)
+        rules[num_rules++] = c_coptrules_target;
+    if (coptrules_cpu)
+        rules[num_rules++] = coptrules_cpu;
+    if (c_coptrules_user)
+        rules[num_rules++] = c_coptrules_user;
+    return num_rules;
+}
 
 static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
@@ -3116,6 +3148,248 @@ static void configure_assembler(void)
 
 
 
+static int multi_arg_has(const char *args, const char *needle)
+{
+    return args && strstr(args, needle) != NULL;
+}
+
+static int multi_user_frame_flags(void)
+{
+    return multi_arg_has(comparg, "-fframe-pointer") ||
+           multi_arg_has(comparg, "-fomit-frame-pointer") ||
+           multi_arg_has(comparg, "-frameix") ||
+           multi_arg_has(comparg, "-frameiy") ||
+           multi_arg_has(sccz80arg, "-fframe-pointer") ||
+           multi_arg_has(sccz80arg, "-fomit-frame-pointer") ||
+           multi_arg_has(sccz80arg, "-frameix") ||
+           multi_arg_has(sccz80arg, "-frameiy");
+}
+
+/* Command-line -compiler=multi survives CLIB/subtype expansion.
+ * A recipe that switches the compiler to sdcc is the sdcc ABI and is an error.
+ */
+static void keep_user_multi(void)
+{
+    if (!c_want_multi)
+        return;
+    if (c_compiler_type && strcmp(c_compiler_type, "sdcc") == 0) {
+        fprintf(stderr, "-compiler=multi does not support the sdcc ABI\n");
+        exit(1);
+    }
+    c_compiler_type = "multi";
+}
+
+/* Same three pins as src/80cc/main.c: no IX/IY on 8080, 8085, gbz80. */
+static int multi_cpu_has_ix(void)
+{
+    return !(c_cpu == CPU_TYPE_8080 || c_cpu == CPU_TYPE_8085 || c_cpu == CPU_TYPE_GBZ80);
+}
+
+static int multi_reserve_ix(void)
+{
+    return multi_arg_has(comparg, "reserve-regs-ix") ||
+           multi_arg_has(sccz80arg, "reserve-regs-ix");
+}
+
+/* First -m token of select_cpu(Z80ASM), without the -m. */
+static void multi_cpu_from_map(char *cpu_tok, size_t n, const char **asm_flags)
+{
+    const char *s = select_cpu(CPU_MAP_TOOL_Z80ASM);
+    const char *p;
+    size_t i = 0;
+
+    *asm_flags = (s && s[0]) ? s : "-mz80";
+    if (s && s[0] == '-' && s[1] == 'm') {
+        p = s + 2;
+        while (p[i] && p[i] != ' ' && i + 1 < n) {
+            cpu_tok[i] = p[i];
+            i++;
+        }
+        cpu_tok[i] = 0;
+    } else {
+        snprintf(cpu_tok, n, "z80");
+    }
+}
+
+static void multi_reset_source(int filenumber, char *src)
+{
+    if (filelist[filenumber] != src) {
+        free(filelist[filenumber]);
+        filelist[filenumber] = muststrdup(src);
+    }
+}
+
+static char *multi_compiler_args(int is_80cc, int frame_ix)
+{
+    char  buf[FILENAME_MAX + 128];
+    char *args = NULL;
+
+    snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80), zcc_opt_def);
+    BuildOptions(&args, buf);
+
+    if (opt_code_seg != NULL) {
+        snprintf(buf, sizeof(buf), "--codeseg=%s", opt_code_seg);
+        BuildOptions(&args, buf);
+    }
+    if (opt_const_seg != NULL) {
+        snprintf(buf, sizeof(buf), "--constseg=%s", opt_const_seg);
+        BuildOptions(&args, buf);
+    }
+    if (opt_data_seg != NULL) {
+        snprintf(buf, sizeof(buf), "--dataseg=%s", opt_data_seg);
+        BuildOptions(&args, buf);
+    }
+    if (opt_bss_seg != NULL) {
+        snprintf(buf, sizeof(buf), "--bssseg=%s", opt_bss_seg);
+        BuildOptions(&args, buf);
+    }
+    if (sccz80arg)
+        BuildOptions(&args, sccz80arg);
+    if (c_code_in_asm)
+        BuildOptions(&args, "-cc");
+    if (c_sccz80_r2l_calling)
+        BuildOptions(&args, "-set-r2l-by-default");
+    if (c_generate_debug_info)
+        BuildOptions(&args, "-debug-defc");
+    if (is_80cc)
+        BuildOptions(&args, frame_ix ? "-fframe-pointer" : "-fomit-frame-pointer");
+    return args;
+}
+
+static void multi_apply_copt(int filenumber, int is_80cc)
+{
+    char  *rules[MAX_COPT_RULE_FILES];
+    int    num_rules;
+    char  *saved_type = c_compiler_type;
+
+    c_compiler_type = is_80cc ? "80cc" : "sccz80";
+    num_rules = is_80cc ? fill_80cc_copt_rules(rules) : fill_sccz80_copt_rules(rules);
+    apply_copt_rules(filenumber, num_rules, rules, ".opt", ".op1", ".asm");
+    c_compiler_type = saved_type;
+}
+
+static int multi_run_variant(int filenumber, char *src_c, const char *vname, int is_80cc, int frame_ix, const char *cpp_extra, const char *zpragma_opt)
+{
+    char  *ccargs;
+    char   cppbuf[4096];
+    char   zpragma_args[FILENAME_MAX + 64];
+    char  *saved_compiler;
+    enum iostyle saved_style;
+
+    multi_reset_source(filenumber, src_c);
+
+    snprintf(cppbuf, sizeof(cppbuf), "%s%s", cpparg ? cpparg : "", cpp_extra ? cpp_extra : "");
+    if (process(".c", ".i2", c_cpp_exe, cppbuf, c_stylecpp, filenumber, YES, YES))
+        return 1;
+    snprintf(zpragma_args, sizeof(zpragma_args), "-sccz80 -zcc-opt=\"%s\"", zpragma_opt);
+    if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, filenumber, YES, NO))
+        return 1;
+
+    ccargs = multi_compiler_args(is_80cc, frame_ix);
+    saved_compiler = c_compiler;
+    saved_style = compiler_style;
+    c_compiler = is_80cc ? c_80cc_exe : c_sccz80_exe;
+    compiler_style = outspecified_flag;
+    if (process(".i", ".opt", c_compiler, ccargs, compiler_style, filenumber, YES, NO)) {
+        free(ccargs);
+        c_compiler = saved_compiler;
+        compiler_style = saved_style;
+        return 1;
+    }
+    free(ccargs);
+    c_compiler = saved_compiler;
+    compiler_style = saved_style;
+
+    multi_apply_copt(filenumber, is_80cc);
+
+    {
+        char dest_ext[64];
+        snprintf(dest_ext, sizeof(dest_ext), ".%s.asm", vname);
+        if (copy_file(temporary_filenames[filenumber], ".asm", temporary_filenames[filenumber], dest_ext)) {
+            fprintf(stderr, "Couldn't copy multi variant %s\n", vname);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int compile_c_multi(int filenumber)
+{
+    char  *src_c;
+    char   throwaway[FILENAME_MAX + 1];
+    char   cmd[16384];
+    char  *out_asm;
+    size_t off;
+    int    want_fp;
+    int    status;
+
+    if (strcmp(c_compiler_metric, "size") && strcmp(c_compiler_metric, "ticks")) {
+        fprintf(stderr, "Unknown --multi-compiler-metric=%s (use size or ticks)\n", c_compiler_metric);
+        return 1;
+    }
+
+    src_c = muststrdup(filelist[filenumber]);
+    snprintf(throwaway, sizeof(throwaway), "%s/zcc_opt_80cc.def", zcc_opt_dir);
+
+    if (multi_run_variant(filenumber, src_c, "sccz80", 0, 0, "", zcc_opt_def)) {
+        free(src_c);
+        return 1;
+    }
+    if (multi_run_variant(filenumber, src_c, "80cc-sp", 1, 0, " -D__80CC", throwaway)) {
+        free(src_c);
+        return 1;
+    }
+
+    want_fp = multi_cpu_has_ix() && !multi_reserve_ix();
+    if (want_fp) {
+        if (multi_run_variant(filenumber, src_c, "80cc-fp", 1, 1, " -D__80CC", throwaway)) {
+            free(src_c);
+            return 1;
+        }
+    }
+
+    out_asm = changesuffix(temporary_filenames[filenumber], ".asm");
+    {
+        char cpu_tok[32];
+        const char *asm_flags;
+        multi_cpu_from_map(cpu_tok, sizeof(cpu_tok), &asm_flags);
+        off = 0;
+        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+            "%s%s --cpu=%s --asm-flags=\"%s\" --metric=%s --data-variant=sccz80 --output=\"%s\" --source=\"%s\"%s",
+            c_binary_dir, c_zccmulti_exe, cpu_tok, asm_flags, c_compiler_metric, out_asm,
+            original_filenames[filenumber], verbose ? " --verbose" : "");
+    }
+    if (c_compiler_multi_report)
+        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --report=\"%s\"", c_compiler_multi_report);
+    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --z80asm=\"%s%s\"", c_binary_dir, c_z80asm_exe);
+    if (c_install_dir)
+        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --asm-include=\"%slib\"", c_install_dir);
+    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off, " --asm-include=\"%s\"", zcc_opt_dir);
+    off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+        " --variant=sccz80:\"%s.sccz80.asm\" --variant=80cc-sp:\"%s.80cc-sp.asm\"",
+        temporary_filenames[filenumber], temporary_filenames[filenumber]);
+    if (want_fp)
+        off += (size_t)snprintf(cmd + off, sizeof(cmd) - off,
+            " --variant=80cc-fp:\"%s.80cc-fp.asm\"", temporary_filenames[filenumber]);
+
+    if (verbose) {
+        fprintf(stderr, "%s\n", cmd);
+        fflush(stderr);
+    }
+    status = system(cmd);
+    if (status != 0) {
+        fprintf(stderr, "z88dk-zcc-multi failed for %s\n", original_filenames[filenumber]);
+        free(src_c);
+        free(out_asm);
+        return 1;
+    }
+
+    free(filelist[filenumber]);
+    filelist[filenumber] = out_asm;
+    free(src_c);
+    return 0;
+}
+
 static void configure_compiler(void)
 {
     char *preprocarg;
@@ -3298,6 +3572,22 @@ static void configure_compiler(void)
         c_cpp_exe = c_ez80clang_exe;
         compiler_style = filter_outspecified_flag;
         c_stylecpp = filter_out;
+    } else if (strcmp(c_compiler_type,"multi") == 0 ) {
+        if (multi_user_frame_flags()) {
+            fprintf(stderr, "-compiler=multi selects frame-pointer flags per variant\n");
+            exit(1);
+        }
+        compiler_type = CC_MULTI;
+        preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
+        BuildOptions(&cpparg, preprocarg);
+        BuildOptions(&asmargs, "-D__SCCZ80");
+        BuildOptions(&linkargs, "-D__SCCZ80");
+        BuildOptions(&asmargs, "-D__80CC");
+        BuildOptions(&linkargs, "-D__80CC");
+        BuildOptions(&asmargs, "-D__COMPILER_MULTI");
+        BuildOptions(&linkargs, "-D__COMPILER_MULTI");
+        c_compiler = c_sccz80_exe;
+        compiler_style = outspecified_flag;
     } else {
         printf("Unknown compiler type: %s\n",c_compiler_type);
         exit(1);
@@ -3559,6 +3849,12 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".def");
             remove_file_with_extension(temporary_filenames[j], ".tmp");
             remove_file_with_extension(temporary_filenames[j], ".lis");
+            remove_file_with_extension(temporary_filenames[j], ".sccz80.i2");
+            remove_file_with_extension(temporary_filenames[j], ".sccz80.i");
+            remove_file_with_extension(temporary_filenames[j], ".sccz80.asm");
+            remove_file_with_extension(temporary_filenames[j], ".80cc-sp.asm");
+            remove_file_with_extension(temporary_filenames[j], ".80cc-fp.asm");
+            remove_file_with_extension(temporary_filenames[j], ".zccmulti.o");
         }
         /* Cleanup zcc_opt files */
         remove(zcc_opt_def);

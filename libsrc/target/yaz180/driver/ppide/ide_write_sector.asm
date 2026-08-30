@@ -37,13 +37,9 @@ ide_write_sector:
     ld e, __IDE_CMD_WRITE
     ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte     ;instruct drive to write a sector
-    call ide_wait_ready     ;make sure drive is ready to proceed
-    jr nc, error
     call ide_wait_drq       ;wait until it wants the data
     jr nc, error
     call ide_write_block    ;send the data to the drive from (HL++)
-    call ide_wait_ready
-    jr nc, error
 ;   ld e, __IDE_CMD_CACHE_FLUSH
 ;   ld a, __IO_PIO_IDE_COMMAND
 ;   call ide_write_byte     ;tell drive to flush its hardware cache

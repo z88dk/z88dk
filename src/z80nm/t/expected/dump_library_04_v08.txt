@@ -287,3 +287,19 @@ Object  file test_t_dump_library_04_t.o at $0FA9: Z80RMF08
     G C $0000: public1 (section "")
     G C $0000: public2 (section "")
 
+Object  file test_t_dump_library_04_t.o at $101A: Z80RMF08
+  Name: module_vm1_no_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+
+Object  file test_t_dump_library_04_t.o at $108C: Z80RMF08
+  Name: module_vm1_ixiy
+  Symbols:
+    L C $0000: local1 (section "")
+    L C $0000: local2 (section "")
+    G C $0000: public1 (section "")
+    G C $0000: public2 (section "")
+

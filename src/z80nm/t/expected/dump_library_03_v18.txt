@@ -961,7 +961,7 @@ Object  file test_t_dump_library_03_t.o at $3EC0: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $3FC0: Z80RMF18
   Name: module_ti83_no_ixiy
-  CPU:  (invalid 33) 
+  CPU:  ti83 
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -976,7 +976,7 @@ Object  file test_t_dump_library_03_t.o at $3FC0: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $40BC: Z80RMF18
   Name: module_ti83_ixiy
-  CPU:  (invalid 33) (-IXIY)
+  CPU:  ti83 (-IXIY)
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -991,7 +991,7 @@ Object  file test_t_dump_library_03_t.o at $40BC: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $41B4: Z80RMF18
   Name: module_ti83_strict_no_ixiy
-  CPU:  (invalid 34) 
+  CPU:  ti83_strict 
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -1006,7 +1006,7 @@ Object  file test_t_dump_library_03_t.o at $41B4: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $42B8: Z80RMF18
   Name: module_ti83_strict_ixiy
-  CPU:  (invalid 34) (-IXIY)
+  CPU:  ti83_strict (-IXIY)
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -1021,7 +1021,7 @@ Object  file test_t_dump_library_03_t.o at $42B8: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $43B8: Z80RMF18
   Name: module_ti83plus_no_ixiy
-  CPU:  (invalid 35) 
+  CPU:  ti83plus 
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -1036,7 +1036,7 @@ Object  file test_t_dump_library_03_t.o at $43B8: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $44B8: Z80RMF18
   Name: module_ti83plus_ixiy
-  CPU:  (invalid 35) (-IXIY)
+  CPU:  ti83plus (-IXIY)
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -1051,7 +1051,7 @@ Object  file test_t_dump_library_03_t.o at $44B8: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $45B4: Z80RMF18
   Name: module_ti83plus_strict_no_ixiy
-  CPU:  (invalid 36) 
+  CPU:  ti83plus_strict 
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -1066,7 +1066,7 @@ Object  file test_t_dump_library_03_t.o at $45B4: Z80RMF18
 
 Object  file test_t_dump_library_03_t.o at $46BC: Z80RMF18
   Name: module_ti83plus_strict_ixiy
-  CPU:  (invalid 36) (-IXIY)
+  CPU:  ti83plus_strict (-IXIY)
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -1078,6 +1078,66 @@ Object  file test_t_dump_library_03_t.o at $46BC: Z80RMF18
     S   3 = "public1"
     S   4 = "public2"
     S   5 = "module_ti83plus_strict_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $47C0: Z80RMF18
+  Name: module_vm1_no_ixiy
+  CPU:  vm1 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_no_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $48BC: Z80RMF18
+  Name: module_vm1_ixiy
+  CPU:  vm1 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $49B4: Z80RMF18
+  Name: module_vm1_strict_no_ixiy
+  CPU:  vm1_strict 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_strict_no_ixiy"
+
+Object  file test_t_dump_library_03_t.o at $4AB8: Z80RMF18
+  Name: module_vm1_strict_ixiy
+  CPU:  vm1_strict (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_strict_ixiy"
 
 Library public symbols:
   P   1 = "public1"

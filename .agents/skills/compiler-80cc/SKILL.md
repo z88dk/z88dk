@@ -12,10 +12,11 @@ Binary: `z88dk-80cc`. Source: `src/80cc/`. Rules file: `lib/80cc_rules.1`.
 ## Agent facts
 
 1. Select via `zcc -compiler=80cc` when the target allows it.
-2. Do not assume sccz80 or sdcc runtime helpers match 80cc output.
-3. Prefer reading `src/80cc` notes for current status before large work.
-4. Rebuild: `make -C src/80cc PREFIX=$(pwd)` from the z88dk root, then `make -C src/80cc PREFIX=$(pwd) install`.
-5. The `--version` / `-h` banner comes from `src/config.h` `Z88DK_VERSION`. That string can be stale after a rebuild. Prove a hunk with `strings bin/z88dk-80cc`, not the banner.
+2. `-compiler=multi` also runs 80cc. It always compiles `80cc-sp`. It compiles `80cc-fp` when 80cc treats the CPU as having IX. Spec: `src/zcc-multi/zcc-compiler-multi.md`.
+3. Do not assume sccz80 or sdcc runtime helpers match 80cc output.
+4. Prefer reading `src/80cc` notes for current status before large work.
+5. Rebuild: `make -C src/80cc PREFIX=$(pwd)` from the z88dk root, then `make -C src/80cc PREFIX=$(pwd) install`.
+6. The `--version` / `-h` banner comes from `src/config.h` `Z88DK_VERSION`. That string can be stale after a rebuild. Prove a hunk with `strings bin/z88dk-80cc`, not the banner.
 
 ## Frame pointer (Z80 benches)
 
@@ -125,3 +126,4 @@ Code generation options
 ## Related
 
 - `tool-zcc`, `tool-copt`, `methodology-measure`, `methodology-sdcc-vanilla` (not 80cc)
+- Multi selector: `src/zcc-multi/zcc-compiler-multi.md`

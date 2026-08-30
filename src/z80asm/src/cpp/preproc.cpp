@@ -334,6 +334,7 @@ void Preproc::parse_line(const ScannedLine& line) {
 	if (check_hash()) return;
 	if (check_gbz80_opcodes()) return;
 	if (check_z80_ld_bit_opcodes()) return;
+    if (check_vm1_ld_x_alu_x()) return;
 
 	// last check - macro call
 	if (check_macro_call()) return;
@@ -666,6 +667,276 @@ bool Preproc::check_z80_ld_bit_opcodes() {
     else {
 		return false;
     }
+}
+
+bool Preproc::check_vm1_ld_x_alu_x() {
+    ScannedLine out;
+
+    // ld (hl), and (hl) --> andl (hl)
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(Keyword::HL) &&
+        m_line.peek(3).is(TType::RParen) &&
+        m_line.peek(4).is(TType::Comma) &&
+        m_line.peek(5).is(Keyword::AND) &&
+        m_line.peek(6).is(TType::LParen) &&
+        m_line.peek(7).is(Keyword::HL) &&
+        m_line.peek(8).is(TType::RParen) &&
+        m_line.peek(9).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "andl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // ld (hl), or (hl) --> orl (hl)
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(Keyword::HL) &&
+        m_line.peek(3).is(TType::RParen) &&
+        m_line.peek(4).is(TType::Comma) &&
+        m_line.peek(5).is(Keyword::OR) &&
+        m_line.peek(6).is(TType::LParen) &&
+        m_line.peek(7).is(Keyword::HL) &&
+        m_line.peek(8).is(TType::RParen) &&
+        m_line.peek(9).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "orl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // ld (hl), xor (hl) --> xorl (hl)
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(Keyword::HL) &&
+        m_line.peek(3).is(TType::RParen) &&
+        m_line.peek(4).is(TType::Comma) &&
+        m_line.peek(5).is(Keyword::XOR) &&
+        m_line.peek(6).is(TType::LParen) &&
+        m_line.peek(7).is(Keyword::HL) &&
+        m_line.peek(8).is(TType::RParen) &&
+        m_line.peek(9).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "xorl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // ld (hl'), and (hl') --> andl (hl')
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(Keyword::HL1) &&
+        m_line.peek(3).is(TType::RParen) &&
+        m_line.peek(4).is(TType::Comma) &&
+        m_line.peek(5).is(Keyword::AND) &&
+        m_line.peek(6).is(TType::LParen) &&
+        m_line.peek(7).is(Keyword::HL1) &&
+        m_line.peek(8).is(TType::RParen) &&
+        m_line.peek(9).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "andl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl'"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // ld (hl'), or (hl') --> orl (hl')
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(Keyword::HL1) &&
+        m_line.peek(3).is(TType::RParen) &&
+        m_line.peek(4).is(TType::Comma) &&
+        m_line.peek(5).is(Keyword::OR) &&
+        m_line.peek(6).is(TType::LParen) &&
+        m_line.peek(7).is(Keyword::HL1) &&
+        m_line.peek(8).is(TType::RParen) &&
+        m_line.peek(9).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "orl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl'"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // ld (hl'), xor (hl') --> xorl (hl')
+    if (m_line.peek(0).is(Keyword::LD) &&
+        m_line.peek(1).is(TType::LParen) &&
+        m_line.peek(2).is(Keyword::HL1) &&
+        m_line.peek(3).is(TType::RParen) &&
+        m_line.peek(4).is(TType::Comma) &&
+        m_line.peek(5).is(Keyword::XOR) &&
+        m_line.peek(6).is(TType::LParen) &&
+        m_line.peek(7).is(Keyword::HL1) &&
+        m_line.peek(8).is(TType::RParen) &&
+        m_line.peek(9).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "xorl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl'"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // mb ld (hl), and (hl) --> mb andl (hl)
+    if (m_line.peek(0).is(Keyword::MB) &&
+        m_line.peek(1).is(Keyword::LD) &&
+        m_line.peek(2).is(TType::LParen) &&
+        m_line.peek(3).is(Keyword::HL) &&
+        m_line.peek(4).is(TType::RParen) &&
+        m_line.peek(5).is(TType::Comma) &&
+        m_line.peek(6).is(Keyword::AND) &&
+        m_line.peek(7).is(TType::LParen) &&
+        m_line.peek(8).is(Keyword::HL) &&
+        m_line.peek(9).is(TType::RParen) &&
+        m_line.peek(10).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "mb"},
+                     Token{TType::Ident, false, "andl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // mb ld (hl), or (hl) --> mb orl (hl)
+    if (m_line.peek(0).is(Keyword::MB) &&
+        m_line.peek(1).is(Keyword::LD) &&
+        m_line.peek(2).is(TType::LParen) &&
+        m_line.peek(3).is(Keyword::HL) &&
+        m_line.peek(4).is(TType::RParen) &&
+        m_line.peek(5).is(TType::Comma) &&
+        m_line.peek(6).is(Keyword::OR) &&
+        m_line.peek(7).is(TType::LParen) &&
+        m_line.peek(8).is(Keyword::HL) &&
+        m_line.peek(9).is(TType::RParen) &&
+        m_line.peek(10).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "mb"},
+                     Token{TType::Ident, false, "orl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // mb ld (hl), xor (hl) --> mb xorl (hl)
+    if (m_line.peek(0).is(Keyword::MB) &&
+        m_line.peek(1).is(Keyword::LD) &&
+        m_line.peek(2).is(TType::LParen) &&
+        m_line.peek(3).is(Keyword::HL) &&
+        m_line.peek(4).is(TType::RParen) &&
+        m_line.peek(5).is(TType::Comma) &&
+        m_line.peek(6).is(Keyword::XOR) &&
+        m_line.peek(7).is(TType::LParen) &&
+        m_line.peek(8).is(Keyword::HL) &&
+        m_line.peek(9).is(TType::RParen) &&
+        m_line.peek(10).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "mb"},
+                     Token{TType::Ident, false, "xorl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // mb ld (hl'), and (hl') --> mb andl (hl')
+    if (m_line.peek(0).is(Keyword::MB) &&
+        m_line.peek(1).is(Keyword::LD) &&
+        m_line.peek(2).is(TType::LParen) &&
+        m_line.peek(3).is(Keyword::HL1) &&
+        m_line.peek(4).is(TType::RParen) &&
+        m_line.peek(5).is(TType::Comma) &&
+        m_line.peek(6).is(Keyword::AND) &&
+        m_line.peek(7).is(TType::LParen) &&
+        m_line.peek(8).is(Keyword::HL1) &&
+        m_line.peek(9).is(TType::RParen) &&
+        m_line.peek(10).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "mb"},
+                     Token{TType::Ident, false, "andl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl'"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // mb ld (hl'), or (hl') --> mb orl (hl')
+    if (m_line.peek(0).is(Keyword::MB) &&
+        m_line.peek(1).is(Keyword::LD) &&
+        m_line.peek(2).is(TType::LParen) &&
+        m_line.peek(3).is(Keyword::HL1) &&
+        m_line.peek(4).is(TType::RParen) &&
+        m_line.peek(5).is(TType::Comma) &&
+        m_line.peek(6).is(Keyword::OR) &&
+        m_line.peek(7).is(TType::LParen) &&
+        m_line.peek(8).is(Keyword::HL1) &&
+        m_line.peek(9).is(TType::RParen) &&
+        m_line.peek(10).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "mb"},
+                     Token{TType::Ident, false, "orl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl'"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    // mb ld (hl'), xor (hl') --> mb xorl (hl')
+    if (m_line.peek(0).is(Keyword::MB) &&
+        m_line.peek(1).is(Keyword::LD) &&
+        m_line.peek(2).is(TType::LParen) &&
+        m_line.peek(3).is(Keyword::HL1) &&
+        m_line.peek(4).is(TType::RParen) &&
+        m_line.peek(5).is(TType::Comma) &&
+        m_line.peek(6).is(Keyword::XOR) &&
+        m_line.peek(7).is(TType::LParen) &&
+        m_line.peek(8).is(Keyword::HL1) &&
+        m_line.peek(9).is(TType::RParen) &&
+        m_line.peek(10).is(TType::Newline))
+    {
+        out.append({ Token{TType::Ident, false, "mb"},
+                     Token{TType::Ident, false, "xorl"},
+                     Token{TType::LParen, false},
+                     Token{TType::Ident, false, "hl'"},
+                     Token{TType::RParen, false},
+                     Token{TType::Newline, false} });
+        push_expanded(out, defines());
+        return true;
+    }
+
+    return false;
 }
 
 void Preproc::do_if() {

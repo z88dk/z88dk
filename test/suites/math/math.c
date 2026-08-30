@@ -436,6 +436,17 @@ void test_specials_mul_add()
     Assert(sp_isnan(r), "NaN*1 is NaN");
     r = nanv + sp_o;
     Assert(sp_isnan(r), "NaN+1 is NaN");
+
+#ifdef MATH32
+    /* Finite overflow: two max normals → Inf, not NaN (#3071).
+     * Bits so the add is not a compile-time constant. */
+    {
+        union { FLOAT f; unsigned long u; } mx;
+        mx.u = 0x7f7ffffful;
+        r = mx.f + mx.f;
+        Assert(sp_isinf(r), "FLT_MAX+FLT_MAX is Inf");
+    }
+#endif
 }
 
 void test_specials_sqrt()

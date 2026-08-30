@@ -61,7 +61,7 @@ Object  file test_t_dump_library_04_t.o at $0304: Z80RMF18
 
 Object  file test_t_dump_library_04_t.o at $03FC: Z80RMF18
   Name: module_ti83_no_ixiy
-  CPU:  (invalid 33) 
+  CPU:  ti83 
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -76,7 +76,7 @@ Object  file test_t_dump_library_04_t.o at $03FC: Z80RMF18
 
 Object  file test_t_dump_library_04_t.o at $04F8: Z80RMF18
   Name: module_ti83_ixiy
-  CPU:  (invalid 33) (-IXIY)
+  CPU:  ti83 (-IXIY)
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -91,7 +91,7 @@ Object  file test_t_dump_library_04_t.o at $04F8: Z80RMF18
 
 Object  file test_t_dump_library_04_t.o at $05F0: Z80RMF18
   Name: module_ti83plus_no_ixiy
-  CPU:  (invalid 35) 
+  CPU:  ti83plus 
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -106,7 +106,7 @@ Object  file test_t_dump_library_04_t.o at $05F0: Z80RMF18
 
 Object  file test_t_dump_library_04_t.o at $06F0: Z80RMF18
   Name: module_ti83plus_ixiy
-  CPU:  (invalid 35) (-IXIY)
+  CPU:  ti83plus (-IXIY)
   Symbols:
     L C $0000: local1 (section "") (file "")
     L C $0000: local2 (section "") (file "")
@@ -538,6 +538,36 @@ Object  file test_t_dump_library_04_t.o at $2264: Z80RMF18
     S   3 = "public1"
     S   4 = "public2"
     S   5 = "module_kc160_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $2360: Z80RMF18
+  Name: module_vm1_no_ixiy
+  CPU:  vm1 
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_no_ixiy"
+
+Object  file test_t_dump_library_04_t.o at $245C: Z80RMF18
+  Name: module_vm1_ixiy
+  CPU:  vm1 (-IXIY)
+  Symbols:
+    L C $0000: local1 (section "") (file "")
+    L C $0000: local2 (section "") (file "")
+    G C $0000: public1 (section "") (file "")
+    G C $0000: public2 (section "") (file "")
+  Strings:
+    S   1 = "local1"
+    S   2 = "local2"
+    S   3 = "public1"
+    S   4 = "public2"
+    S   5 = "module_vm1_ixiy"
 
 Library public symbols:
   P   1 = "public1"

@@ -37,8 +37,6 @@ ide_read_sector:
     ld e, __IDE_CMD_READ    
     ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte     ;ask the drive to read it
-    call ide_wait_ready     ;make sure drive is ready to proceed
-    jr nc, error
     call ide_wait_drq       ;wait until it's got the data
     jr nc, error
     call ide_read_block     ;grab the data into (HL++)

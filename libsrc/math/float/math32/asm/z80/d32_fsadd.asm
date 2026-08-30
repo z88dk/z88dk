@@ -302,6 +302,8 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     set 0,e
 .doadd0
     inc c
+    ld a,c
+    inc a                       ; new exp == 255 (was 254)
     jr Z,foverflow
 .doadd1
 ; now pack result

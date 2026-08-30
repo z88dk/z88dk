@@ -36,6 +36,7 @@ OPT("-m", "[=]CPU", set_cpu(opt_arg), "Assemble for the specified CPU, default z
 	HELP_CONTINUE "r2ka, r2ka_strict, r3k, r3k_strict, r4k, r4k_strict, " \
 	HELP_CONTINUE "r5k, r5k_strict, r6k, r6k_strict, " \
 	HELP_CONTINUE "r800, r800_strict, " \
+	HELP_CONTINUE "vm1, vm1_strict, " \
 	HELP_CONTINUE "z180, z180_strict, z80, z80_strict, z80n, z80n_strict")
 OPT("-no-synth", nullptr, m_no_synth = true, "Do not assemble synthetic opcodes")
 OPT("-float", "[=]FORMAT", set_float_option(opt_arg), "Set default float format, one of:" \

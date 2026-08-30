@@ -53,8 +53,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     pop bc                      ; ret
     push de
     push hl                     ; b
-    push bc                     ; ret → SP = ret, b, a
-    ld hl,4
+    push bc                     ; ret → SP = ret (2), b (4), a
+    ld hl,6                     ; a, not 4: ret+b sit under SP (#3088)
     add hl,sp
     ld e,(hl)
     inc hl

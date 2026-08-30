@@ -51,6 +51,18 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_OPCODE(opcode)	 \
 	TOKEN_OPCODE1(opcode, #opcode)
 
+#define TOKEN_ALWAYS_OPCODE1(opcode, string)	 \
+	string <CAT> i										<NL> \
+	{													<NL> \
+		<TAB>		sym.tok        = TK_##opcode;		<NL> \
+		<TAB>		sym.tok_opcode = TK_##opcode;		<NL> \
+		<TAB>		expect_opcode  = false;				<NL> \
+		<TAB>		fbreak; 							<NL> \
+	};													<NL>
+
+#define TOKEN_ALWAYS_OPCODE(opcode)	 \
+	TOKEN_ALWAYS_OPCODE1(opcode, #opcode)
+
 #define TOKEN_RABBIT1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \

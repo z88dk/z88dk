@@ -1909,6 +1909,7 @@ northstar.lib: cpm_clib.lib $(NORTHSTAR_TARGETS)
 	@echo '--- Building Northstar Advantage graphics Library ---'
 	@echo ''
 	$(MAKE) -C classic/gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=northstar
+	$(MAKE) -C classic/games TARGET=cpm SUBTYPE=northstar
 	TARGET=northstar TYPE=z80 $(LIBLINKER) -DFORnorthstar -x$(OUTPUT_DIRECTORY)/northstar @$(TARGET_DIRECTORY)/northstar/northstar.lst
 
 # TIKI-100 library - Stefano

@@ -22,6 +22,8 @@ More detailed, but still incomplete changelist:
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
 - [z80asm] #define now supported as alias for defc
+- [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
+- [zcc] multi metric/report flags are --multi-compiler-metric and --multi-compiler-report
 - [zsdcc] Upgraded to SDCC 4.6.0 r16639
 
 

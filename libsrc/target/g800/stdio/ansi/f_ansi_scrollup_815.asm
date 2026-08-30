@@ -13,14 +13,11 @@
     section code_graphics
     PUBLIC  ansi_SCROLLUP
 	
-	EXTERN scrollup_4px
-	EXTERN scrollup_1px
+	EXTERN scrollup_6px
 
 
 
 ansi_SCROLLUP:
 
-	call  scrollup_1px
-	call  scrollup_4px
-	jp  scrollup_1px
+	jp  scrollup_6px
 	

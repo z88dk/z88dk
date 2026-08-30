@@ -70,9 +70,10 @@ for my $cpu ( Opcode->cpus ) {
         {
             my $skip = 0;
 
-            # special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
+            # special case: 'djnz ASMPC' is translated to 'djnz NN' 
+			# in 8080/8085/vm1
             if ( $asm =~ /^(jr|djnz)/ ) {
-                if ( $cpu =~ /^80/ ) {
+                if ( $cpu =~ /^80|^vm1/ ) {
                     $skip = 1 if $asm =~ /ASMPC/;    # DIS
                 }
                 else {
@@ -106,7 +107,7 @@ sub add {
     #say "$cpu\t$asm\t",$opcode->to_string if $asm =~ /ld hl, sp/;
 
     # special case for intel: jr and djnz %j is converted to %m
-    if ( $opcode->cpu =~ /^80/ && $asm =~ /^(jr|djnz)/ ) {
+    if ( $opcode->cpu =~ /^80|^vm1/ && $asm =~ /^(jr|djnz)/ ) {
         $opcode = $opcode->clone( sub { s/%j/%m/; }, sub { } );
     }
 

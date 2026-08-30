@@ -41,7 +41,7 @@ open(my $out, ">", "$FILE.rl2") or die "Output to $FILE.rl2 failed: $!\n";
 push @TEMP, "$FILE.rl2";
 
 while (<$in>) {
-	s/^#.*//; 
+	s/^#.*//;
 	s/<MAP>(.*)/expand_map($1)/ge;
 	s/^\"\".*//; 
 	s/\t+/ /g; 

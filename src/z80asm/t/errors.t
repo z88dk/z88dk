@@ -82,7 +82,7 @@ spew("$test.1.asm", <<'END');
 		defc G256    =  256
 END
 
-run_ok("z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err", "$test.err");
 check_text_file("$test.err", <<END);
 $test.asm:4: warning: integer range: -\$81
   ^---- L_129

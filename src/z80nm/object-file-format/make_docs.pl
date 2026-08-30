@@ -155,7 +155,6 @@ The format of the object file is as follows:
 |    | dword | * *cpu_id* : CPU id:
 @@ for my $cpu (0 .. $#cpus) { 
 @@     next unless $cpus[$cpu];
-@@     next if $version < 19 && $cpu >= 33;
 @@     $OUT .= "|    |       |   ".sprintf("%2d : %s\n", $cpu, $cpus[$cpu]);
 @@ }
 |    |       |
