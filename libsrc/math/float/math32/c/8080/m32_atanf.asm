@@ -6,9 +6,9 @@
 ;	Module compile time: Mon Aug 31 20:47:55 2026
 
 
-	C_LINE	0,"m32_fmodf.c"
+	C_LINE	0,"m32_atanf.c"
 
-	MODULE	m32_fmodf_c
+	MODULE	m32_atanf_c
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -249,23 +249,32 @@
 	C_LINE	89,"m32_math.h"
 	C_LINE	90,"m32_math.h"
 	C_LINE	91,"m32_math.h"
-	C_LINE	9,"m32_fmodf.c"
-	C_LINE	11,"m32_fmodf.c"
+	C_LINE	2,"m32_atanf.c"
+	C_LINE	21,"m32_atanf.c"
+	C_LINE	23,"m32_atanf.c"
 	SECTION	code_compiler
 
-; Function m32_fmodf flags 0x00000200 __smallc 
-; double m32_fmodf(double x, double y)
-; parameter 'double y' at sp+2 size(4)
-; parameter 'double x' at sp+6 size(4)
-	C_LINE	12,"m32_fmodf.c::m32_fmodf::0::0"
-._m32_fmodf
+; Function m32_atanf flags 0x00000208 __smallc __z88dk_fastcall 
+; double m32_atanf(double f)
+; parameter 'double f' at sp+2 size(4)
+	C_LINE	24,"m32_atanf.c::m32_atanf::0::0"
+._m32_atanf
+	push	de
+	push	hl
 	push	bc
 	push	bc
-	push	bc
-	push	bc
-	ld	hl,10	;const
+	dec	sp
+	ld	hl,0	;const
 	add	hl,sp
-	call	l_glong2sp
+	push	hl
+	ld	hl,7	;const
+	add	hl,sp
+	call	l_glong
+	call	_m32_fabsf
+	pop	bc
+	call	l_plong
+	push	de
+	push	hl
 	ld	hl,0	;const
 	ld	d,h
 	ld	e,l
@@ -273,27 +282,14 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	push	bc
-	push	bc
 	ld	hl,0	;const
-	add	hl,sp
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	inc	hl
-	ld	(hl),127
-	ld	hl,0	;const
-	add	hl,sp
-	call	l_glong
-	ld	b,h
-	ld	c,l
-	ld	hl,12	;const
-	add	hl,sp
-	ld	sp,hl
-	ld	h,b
-	ld	l,c
+	ld	d,h
+	ld	e,l
+	inc	sp
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	ret
 
 
@@ -301,58 +297,76 @@
 	ld	hl,4	;const
 	add	hl,sp
 	push	hl
-	ld	hl,16	;const
+	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong2sp
-	ld	hl,16	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_div
-	call	l_f32_f2slong
-	pop	bc
-	call	l_plong
 	ld	hl,0	;const
-	add	hl,sp
-	push	hl
-	ld	hl,16	;const
-	add	hl,sp
-	call	l_glong2sp
-	ld	hl,10	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_slong2f
-	push	de
-	push	hl
-	ld	hl,20	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_mul
-	call	l_f32_sub
-	pop	bc
-	call	l_plong
-	ld	hl,0	;const
-	add	hl,sp
-	call	l_glong2sp
-	ld	hl,14	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_ge
-	ld	a,h
-	or	l
+	ld	de,16256
+	call	l_f32_gt
+	pop	de
+	ld	a,l
+	ld	(de),a
+	and	a
 	jp	z,i_3	;
 	ld	hl,0	;const
 	add	hl,sp
-	call	l_glong2sp
-	ld	hl,14	;const
-	add	hl,sp
+	push	hl
 	call	l_glong
-	call	l_f32_sub
-	jp	i_4	;
+	call	_m32_invf
+	pop	bc
+	call	l_plong
 .i_3
 	ld	hl,0	;const
 	add	hl,sp
+	push	hl
+	call	l_glong2sp
+	ld	hl,_m32_coeff_atan
+	push	hl
+	ld	hl,7	;const
+	push	hl
+	call	_m32_polyf
+	pop	bc
+	call	l_plong
+	ld	hl,4	;const
+	add	hl,sp
+	ld	a,(hl)
+	and	a
+	jp	z,i_4	;
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
 	call	l_glong
+	ld	bc,16329
+	push	bc
+	ld	bc,4058
+	push	bc
+	call	l_f32_sub
+	pop	bc
+	call	l_plong
 .i_4
+	ld	hl,5	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,d
+	xor	128
+	ld	d,a
+	jp	i_6	;
+.i_5
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+.i_6
+	inc	sp
 	pop	bc
 	pop	bc
 	pop	bc
@@ -536,6 +550,7 @@
 	GLOBAL	_m32_ldexpf
 	GLOBAL	_m32_hypotf
 	GLOBAL	_m32_polyf
+	GLOBAL	_m32_coeff_atan
 
 
 ; --- End of Scope Defns ---

@@ -6,9 +6,9 @@
 ;	Module compile time: Mon Aug 31 20:47:55 2026
 
 
-	C_LINE	0,"m32_fmodf.c"
+	C_LINE	0,"m32_atan2f.c"
 
-	MODULE	m32_fmodf_c
+	MODULE	m32_atan2f_c
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -249,112 +249,192 @@
 	C_LINE	89,"m32_math.h"
 	C_LINE	90,"m32_math.h"
 	C_LINE	91,"m32_math.h"
-	C_LINE	9,"m32_fmodf.c"
-	C_LINE	11,"m32_fmodf.c"
+	C_LINE	2,"m32_atan2f.c"
+	C_LINE	4,"m32_atan2f.c"
 	SECTION	code_compiler
 
-; Function m32_fmodf flags 0x00000200 __smallc 
-; double m32_fmodf(double x, double y)
-; parameter 'double y' at sp+2 size(4)
-; parameter 'double x' at sp+6 size(4)
-	C_LINE	12,"m32_fmodf.c::m32_fmodf::0::0"
-._m32_fmodf
+; Function m32_atan2f flags 0x00000200 __smallc 
+; double m32_atan2f(double y, double x)
+; parameter 'double x' at sp+2 size(4)
+; parameter 'double y' at sp+6 size(4)
+	C_LINE	5,"m32_atan2f.c::m32_atan2f::0::0"
+._m32_atan2f
 	push	bc
 	push	bc
-	push	bc
-	push	bc
-	ld	hl,10	;const
+	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
 	ld	e,l
-	call	l_f32_eq
+	call	l_f32_ne
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	push	bc
-	push	bc
-	ld	hl,0	;const
-	add	hl,sp
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	inc	hl
-	ld	(hl),127
-	ld	hl,0	;const
+	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	ld	b,h
-	ld	c,l
-	ld	hl,12	;const
-	add	hl,sp
-	ld	sp,hl
-	ld	h,b
-	ld	l,c
-	ret
-
-
-.i_2
-	ld	hl,4	;const
-	add	hl,sp
-	push	hl
-	ld	hl,16	;const
-	add	hl,sp
-	call	l_glong2sp
-	ld	hl,16	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_div
-	call	l_f32_f2slong
-	pop	bc
-	call	l_plong
-	ld	hl,0	;const
-	add	hl,sp
-	push	hl
-	ld	hl,16	;const
-	add	hl,sp
-	call	l_glong2sp
-	ld	hl,10	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_slong2f
+	call	_m32_fabsf
 	push	de
 	push	hl
-	ld	hl,20	;const
-	add	hl,sp
-	call	l_glong
-	call	l_f32_mul
-	call	l_f32_sub
-	pop	bc
-	call	l_plong
-	ld	hl,0	;const
-	add	hl,sp
-	call	l_glong2sp
 	ld	hl,14	;const
 	add	hl,sp
 	call	l_glong
+	call	_m32_fabsf
 	call	l_f32_ge
 	ld	a,h
 	or	l
 	jp	z,i_3	;
 	ld	hl,0	;const
 	add	hl,sp
+	push	hl
+	ld	hl,12	;const
+	add	hl,sp
 	call	l_glong2sp
-	ld	hl,14	;const
+	ld	hl,12	;const
 	add	hl,sp
 	call	l_glong
+	call	l_f32_div
+	call	_m32_atanf
+	pop	bc
+	call	l_plong
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_4	;
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_ge
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_glong2sp
+	ld	hl,4059	;const
+	ld	de,16457
+	call	l_f32_add
+	pop	bc
+	call	l_plong
+	jp	i_6	;EOS
+.i_5
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_glong2sp
+	ld	hl,4059	;const
+	ld	de,16457
 	call	l_f32_sub
-	jp	i_4	;
+	pop	bc
+	call	l_plong
+	jp	i_7	;EOS
 .i_3
 	ld	hl,0	;const
 	add	hl,sp
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,16	;const
+	add	hl,sp
 	call	l_glong
-.i_4
+	call	l_f32_div
+	call	_m32_atanf
+	ld	a,d
+	xor	128
+	ld	d,a
+	pop	bc
+	call	l_plong
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_8	;
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_glong2sp
+	ld	hl,4058	;const
+	ld	de,16329
+	call	l_f32_sub
+	pop	bc
+	call	l_plong
+	jp	i_9	;EOS
+.i_8
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_glong2sp
+	ld	hl,4058	;const
+	ld	de,16329
+	call	l_f32_add
+	pop	bc
+	call	l_plong
+.i_9
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
 	pop	bc
 	pop	bc
+	ret
+
+
+.i_2
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_gt
+	ld	a,h
+	or	l
+	jp	z,i_11	;
+	ld	hl,4058	;const
+	ld	de,16329
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_11
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_13	;
+	ld	hl,4058	;const
+	ld	de,49097
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_13
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
 	pop	bc
 	pop	bc
 	ret
@@ -363,6 +443,11 @@
 	SECTION	bss_compiler
 	SECTION	code_compiler
 ; --- Start of Optimiser additions ---
+	defc	i_6 = i_7
+	defc	i_4 = i_6
+	defc	i_7 = i_9
+	defc	i_12 = i_13
+	defc	i_10 = i_13
 
 
 ; --- Start of Static Variables ---

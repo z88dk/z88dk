@@ -3,10 +3,13 @@
 # Z80:  SDCC  → z80/   (c/z80/… listed by newlibfiles_z80.lst)
 # 8085: sccz80 only → 8085/  (listed by newlibfiles_8085.lst)
 #       Same pattern as am9511/c/Makefile — do not use zsdcc/SDCC for 8085.
+# 8080: sccz80 only → 8080/
 
 CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -I.
+
+.PHONY: all z80 8085 8080 clean
 
 all: $(addprefix z80/,$(AFILES))
 
@@ -25,7 +28,7 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 	zcc +test -clib=8085 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
-# 8080 higher functions: sccz80 only
+# 8080 higher functions: sccz80 only (zsdcc is Z80-only)
 CFILES8080 = $(wildcard *.c)
 AFILES8080 = $(CFILES8080:.c=.asm)
 

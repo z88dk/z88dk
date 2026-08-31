@@ -15,6 +15,7 @@
 ../../../math/float/math32/asm/8085/f32_fsdiv2.asm
 ../../../math/float/math32/asm/8085/f32_fsfrexp.asm
 ../../../math/float/math32/asm/8085/f32_fsload.asm
+../../../math/float/math32/asm/8085/f32_fsread_callee.asm
 ../../../math/float/math32/asm/8085/f32_fsmul10u.asm
 ../../../math/float/math32/asm/8085/f32_fsmul2.asm
 ../../../math/float/math32/asm/8085/f32_fsmul.asm
@@ -93,6 +94,8 @@
 ../../../math/float/math32/c/sccz80/cm32_sccz80_fsfrexp_callee.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_fshypot.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_fshypot_callee.asm
+../../../math/float/math32/c/sccz80/cm32_sccz80_fspoly.asm
+../../../math/float/math32/c/sccz80/cm32_sccz80_fspoly_callee.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_fsinv.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_fsinvsqrt.asm
 ../../../math/float/math32/c/sccz80/cm32_sccz80_fsldexp.asm

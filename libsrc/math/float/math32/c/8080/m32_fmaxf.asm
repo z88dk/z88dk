@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Mon Aug 31 20:15:50 2026
+;	Module compile time: Mon Aug 31 20:47:55 2026
 
 
 	C_LINE	0,"m32_fmaxf.c"

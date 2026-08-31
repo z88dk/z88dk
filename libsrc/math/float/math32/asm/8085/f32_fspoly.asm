@@ -74,8 +74,8 @@ PUBLIC _m32_polyf
     push de                         ; +0 Y.de +2 Y.hl +4 ret +6 n +8 dptr +10 xHL +12 xDE
     ld de,sp+12
     ld hl,(de)
-    push hl                         ; x.DE
-    ld de,sp+14
+    push hl                         ; x.DE; x.HL slides to +12
+    ld de,sp+12
     ld hl,(de)
     push hl                         ; x.HL
     ; +0 xHL +2 xDE +4 Y.de +6 Y.hl
