@@ -2123,10 +2123,43 @@ enum { REC_REG, REC_SLOT, REC_REMAT };
 static void rec_note(int bucket, int v);      /* record a recovery of v */
 static void rec_note_violation(const Func *f, int v);  /* require_slot fail */
 
+/* [home-demote] An UNREALIZABLE HOME: a register-homed vreg is slotless by
+   construction (ir_slots gives slot=-1 to anything not IR_PR_SPILL), so if the
+   lowerer reaches a read with the register no longer holding it there is nothing
+   to reload from. That was a hard `exit(1)`. The allocator has no proactive
+   realizability check — today's safety is only that the ranking rarely picks
+   such a candidate, which is why re-ranking experiments (a cost-model change,
+   a new loop-depth model) walk straight into it.
+
+   So record it instead of dying, and let the driver demote the vreg to
+   IR_PR_SPILL and re-lower — the same render-retry the dead-store and dead-frame
+   elisions use. The offending render is discarded. If it fires again AFTER the
+   demote, something deeper is wrong and we still abort.
+   `--opt-disable=home-demote` restores the immediate abort. */
+static int hd_retry_ok;          /* this render is discardable → recovery possible */
+static int hd_bad[32];
+static int hd_nbad;
+
+static int hd_record(const Func *f, int v)
+{
+    if (!hd_retry_ok || opt_disabled("home-demote")) return 0;
+    if (v < 0 || v >= f->n_vregs) return 0;
+    for (int i = 0; i < hd_nbad; i++) if (hd_bad[i] == v) return 1;
+    if (hd_nbad >= (int)(sizeof hd_bad / sizeof hd_bad[0])) return 0;
+    hd_bad[hd_nbad++] = v;
+    /* Keep this doomed render arithmetically sane — a negative slot offset
+       would feed `ld hl,-1; add hl,sp` through the rest of the emit path. The
+       text is thrown away and ir_assign_slots reassigns every slot on the
+       retry, so the value written here is never observed. */
+    if (f->vreg_spill_slot) ((Func *)f)->vreg_spill_slot[v] = 0;
+    return 1;
+}
+
 static void require_slot(const Func *f, int vreg_id)
 {
     if (slot_off(f, vreg_id) >= 0) return;
     rec_note_violation(f, vreg_id);   /* B4: unrealizable home (about to abort) */
+    if (hd_record(f, vreg_id)) return;
     ir_lower_loc();
     fprintf(stderr, "ir_lower: value read with no live register and no stack slot "
             "(v%d, phys %d, width %d). This usually means a variable is read "
@@ -5282,6 +5315,7 @@ int ir_lower_func(FILE *out, Func *f)
     FILE *rout;
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
+    int hd_retry_done = 0;   /* [home-demote] unrealizable home: one re-lower */
  deadframe_retry:
     /* Render into a DISCARDABLE buffer whether or not labels are being elided.
        The dead-store / dead-frame retries below `goto deadframe_retry` and
@@ -5295,6 +5329,9 @@ int ir_lower_func(FILE *out, Func *f)
        there is no way to take the first render back. */
     rout = tmpfile();
     if (!rout) { rout = out; elide_labels = 0; }
+    /* [home-demote] Recovery needs a discardable render and one attempt only. */
+    hd_nbad = 0;
+    hd_retry_ok = (rout != out) && !hd_retry_done;
     /* Static lazy-spill state — off unless the two-pass path arms it. */
     L.ss_phase = 0;
     L.ss_op_base = NULL;
@@ -5426,6 +5463,40 @@ int ir_lower_func(FILE *out, Func *f)
         L.ss_op_store = NULL;
         L.ss_op_reload = NULL;
         L.ss_op_cacheread = NULL;
+    }
+    /* [home-demote] The render found a register home it could not realize (a
+       slotless value read with its register gone). Demote those vregs to
+       IR_PR_SPILL so ir_assign_slots gives them a frame slot, and render again.
+       Costs the slot traffic the home was meant to save; the alternative was
+       exit(1). Runs before the elisions below because it is a correctness
+       fallback, not an optimisation. */
+    if (hd_nbad > 0 && !hd_retry_done && rout != out) {
+        int demoted = 0;
+        for (int i = 0; i < hd_nbad; i++) {
+            int v = hd_bad[i];
+            if (v < 0 || v >= f->n_vregs) continue;
+            if (getenv("IR_HOMEDEMOTE_LOG"))
+                fprintf(stderr, "IR_HOMEDEMOTE: %s v%d phys=%d w=%d -> SPILL\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", v,
+                        f->vreg_to_phys ? f->vreg_to_phys[v] : -1,
+                        f->vregs[v].width);
+            if (f->vreg_to_phys) f->vreg_to_phys[v] = IR_PR_SPILL;
+            /* These three all suppress a slot; the point is to get one. */
+            f->vregs[v].flags &= ~(IR_VREG_NO_SLOT | IR_VREG_DEAD_SPILL
+                                   | IR_VREG_PARAM_IN_PLACE);
+            if (f->home_lo) f->home_lo[v] = 0;
+            if (f->home_hi) f->home_hi[v] = INT_MAX;
+            demoted++;
+        }
+        if (demoted) {
+            hd_retry_done = 1;
+            hd_nbad = 0;
+            ir_assign_slots(f);
+            L.cur_frameless = frameless_ok(f);
+            free(bb_hl_out_p1); bb_hl_out_p1 = NULL;
+            fclose(rout);
+            goto deadframe_retry;
+        }
     }
     /* [IR_DEADSTORE] Dead byte-spill elision: the render's read/write split
        (rec_end) listed byte spills WRITTEN but never READ (ds_dead), coalescing-

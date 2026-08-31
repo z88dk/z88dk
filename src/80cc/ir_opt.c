@@ -1798,7 +1798,125 @@ static int dce_pure_kind(const Op *op)
     }
 }
 
-/* ---- Dead DEFS (per-BB) --------------------------------------------------
+/* Control transfer? A BB can carry a MID-BLOCK branch before its terminator
+   (`BR_COND L; BR M`), so later ops run only on the fall-through. */
+static int dd_is_branch(OpKind k)
+{
+    switch (k) {
+    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+    case IR_SWITCH: case IR_RET:
+    case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+        return 1;
+    default: return 0;
+    }
+}
+
+/* Is `d` live on ANY edge out of `bb`? Deliberately not `bb->live_out`:
+   `succ[2]` can silently drop a third target (see ir_opt_prune_bbs), and a
+   missing edge would make a live def look dead. Enumerate from the branch OPS
+   as prune does, plus succ[] for the fall-through. */
+static int dd_live_on_any_succ(const Func *f, const BB *bb, int d)
+{
+    #define DD_TGT(sid) do {                                                 \
+        int _s = (sid);                                                      \
+        if (_s >= 0 && _s < f->n_bbs) {                                      \
+            const BitSet *_li = (const BitSet *)f->bbs[_s].live_in;          \
+            if (!_li) return 1;              /* no liveness — assume live */ \
+            if (ir_bitset_get(_li, d)) return 1;                             \
+        }                                                                    \
+    } while (0)
+
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *op = &bb->ops[j];
+        switch (op->kind) {
+        case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
+        case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
+            DD_TGT(op->label);
+            break;
+        case IR_SWITCH:
+            if (op->sw) {
+                for (int c = 0; c < op->sw->n_cases; c++)
+                    DD_TGT(op->sw->target_bb[c]);
+                DD_TGT(op->sw->default_bb);
+            }
+            break;
+        default: break;
+        }
+    }
+    DD_TGT(bb->succ[0]);
+    DD_TGT(bb->succ[1]);
+    #undef DD_TGT
+    return 0;
+}
+
+/* [IR_DEADDEF_PROBE] Inert per-function sizing probe. Needs liveness.
+     succ_miss  branch targets missing from succ[] (corpus-wide: 0)
+     midbr_def  defs after a mid-block branch — why the redef rule stays guarded
+     cur        dead defs the redef-in-BB rule alone finds
+     ext        EXTRA ones the "dead on every successor" rule finds */
+static void ir_deaddef_probe(Func *f)
+{
+    int succ_miss = 0, midbr_def = 0, cur = 0, ext = 0;
+    int uses[16], defs[8];
+
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        int seen_branch = 0;
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            /* succ[] completeness */
+            if (op->kind == IR_BR || op->kind == IR_BR_COND
+                || op->kind == IR_BR_ZERO || op->kind == IR_DEREF_CMP_BR
+                || op->kind == IR_COPY_STEP_BRZ) {
+                int t = op->label, found = 0;
+                for (int s = 0; s < ir_bb_n_succ(bb); s++)
+                    if (ir_bb_succ_at(bb, s) == t) found = 1;
+                if (!found) succ_miss++;
+            } else if (op->kind == IR_SWITCH && op->sw) {
+                for (int c = 0; c <= op->sw->n_cases; c++) {
+                    int t = (c < op->sw->n_cases) ? op->sw->target_bb[c]
+                                                  : op->sw->default_bb;
+                    int found = 0;
+                    for (int s = 0; s < ir_bb_n_succ(bb); s++)
+                        if (ir_bb_succ_at(bb, s) == t) found = 1;
+                    if (!found) succ_miss++;
+                }
+            }
+            if (seen_branch && ir_op_defs(op, defs, 8) > 0) midbr_def++;
+            if (dd_is_branch(op->kind)) seen_branch = 1;
+
+            int d = op->dst;
+            if (d < 0 || d >= f->n_vregs || !dce_pure_kind(op)) continue;
+            if (f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))
+                continue;
+
+            /* Walk to the end of the BB. A read anywhere disqualifies. A
+               redef BEFORE the first branch kills for every path; a redef
+               after it kills only the fall-through, so the verdict then rests
+               on successor liveness. */
+            int read = 0, redef_pre = 0, passed = 0;
+            for (int k = j + 1; k < bb->n_ops; k++) {
+                int nu = ir_op_uses(&bb->ops[k], uses, 16);
+                for (int u = 0; u < nu && u < 16; u++)
+                    if (uses[u] == d) { read = 1; break; }
+                if (read) break;
+                int nd = ir_op_defs(&bb->ops[k], defs, 8);
+                for (int x = 0; x < nd; x++)
+                    if (defs[x] == d && !passed) { redef_pre = 1; break; }
+                if (redef_pre) break;
+                if (dd_is_branch(bb->ops[k].kind)) passed = 1;
+            }
+            if (read) continue;
+            if (redef_pre) { cur++; continue; }
+            if (!dd_live_on_any_succ(f, bb, d))
+                ext++;
+        }
+    }
+    fprintf(stderr, "DEADDEF_PROBE %-24s succ_miss=%d midbr_def=%d cur=%d ext=%d\n",
+            f->fn ? ir_sym_name(f->fn) : "?", succ_miss, midbr_def, cur, ext);
+}
+
+/* ---- Dead DEFS --------------------------------------------------
    ir_opt_dce below is a per-VREG use count: it drops a def only when the vreg
    is never used ANYWHERE. That cannot see a redundant def, because 80cc maps
    one local to one vreg — a reassigned local keeps the same vreg, so an earlier
@@ -1809,18 +1927,26 @@ static int dce_pure_kind(const Op *op)
    what lets the frame disappear) but leaves the `LD_IMM r <- 0` stranded, and
    DCE keeps it because r is still read by the return/next call.
 
-   Removing it is sound WITHIN A BB with no dataflow: if a def's vreg is
-   redefined later in the same BB with no read in between, every later reader
-   sees the second def, and the first def already killed whatever preceded it —
-   so no path can observe the first. Cross-BB cases need real liveness and are
-   deliberately not attempted here.
+   Two kill rules. Within a BB: if a def's vreg is redefined later with no read
+   in between, no path can observe the first def. Across the edges: a def unread
+   to the end of the BB and live on no successor is unobservable too — that one
+   needs real liveness, and is the case a mid-block branch forces (see
+   dd_live_on_any_succ). `--opt-disable=dead-def-live` drops back to the first
+   rule alone.
 
    Excludes address-taken/volatile vregs (memory may be observed elsewhere) and
    reuses dce_pure_kind so an op with side effects is never dropped — a CALL
    defining a dead dst still has to run. `--opt-disable=dead-def` opts out. */
 static int ir_opt_dead_defs(Func *f)
 {
+    if (getenv("IR_DEADDEF_PROBE")) {
+        ir_compute_liveness(f);
+        ir_deaddef_probe(f);
+    }
     if (opt_disabled("dead-def")) return 0;
+    /* The reach-the-end case is decided by liveness on every successor edge. */
+    int have_live = !opt_disabled("dead-def-live");
+    if (have_live) ir_compute_liveness(f);
     int removed = 0;
     for (int b = 0; b < f->n_bbs; b++) {
         BB *bb = &f->bbs[b];
@@ -1830,31 +1956,31 @@ static int ir_opt_dead_defs(Func *f)
             int d = op->dst, dead = 0;
             if (d >= 0 && d < f->n_vregs && dce_pure_kind(op)
                 && !(f->vregs[d].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE))) {
+                /* A redef BEFORE any branch kills on every path. A redef
+                   AFTER one kills only the fall-through — the taken edge may
+                   still read the first def (umaxd's loop lost an IR_INC that
+                   way), so those fall to the live-on-any-successor test, as
+                   does a scan that runs off the end of the BB. */
+                int read = 0, redef_pre = 0, passed = 0;
                 for (int k = j + 1; k < bb->n_ops; k++) {
-                    /* A BB here can hold a MID-BLOCK conditional branch (the
-                       `BR_COND …; BR …` tail), so a later op is NOT guaranteed
-                       to execute: control may leave first and a successor read
-                       the value. Stop at any control transfer — without this,
-                       umaxd's loop lost an IR_INC whose value the next block
-                       consumed on the taken path. */
-                    switch (bb->ops[k].kind) {
-                    case IR_BR: case IR_BR_COND: case IR_BR_ZERO:
-                    case IR_SWITCH: case IR_RET:
-                    case IR_DEREF_CMP_BR: case IR_COPY_STEP_BRZ:
-                        k = bb->n_ops; continue;      /* end the scan */
-                    default: break;
-                    }
                     int uses[16];
-                    int nu = ir_op_uses(&bb->ops[k], uses, 16), read = 0;
+                    int nu = ir_op_uses(&bb->ops[k], uses, 16);
                     for (int u = 0; u < nu && u < 16; u++)
                         if (uses[u] == d) { read = 1; break; }
                     if (read) break;                  /* observed — keep */
                     int defs[8];
-                    int nd = ir_op_defs(&bb->ops[k], defs, 8), redef = 0;
+                    int nd = ir_op_defs(&bb->ops[k], defs, 8);
                     for (int x = 0; x < nd; x++)
-                        if (defs[x] == d) { redef = 1; break; }
-                    if (redef) { dead = 1; break; }   /* killed unread */
+                        if (defs[x] == d && !passed) { redef_pre = 1; break; }
+                    if (redef_pre) break;             /* killed unread */
+                    if (dd_is_branch(bb->ops[k].kind)) passed = 1;
                 }
+                if (redef_pre)
+                    dead = 1;
+                else if (!read && have_live
+                         && !(f->vregs[d].flags & IR_VREG_RETURN)
+                         && !dd_live_on_any_succ(f, bb, d))
+                    dead = 1;                         /* dead on every successor */
             }
             if (dead) {
                 if (getenv("IR_DEADDEF_LOG"))

@@ -1114,6 +1114,11 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
         return 0;
     }
 
+    /* A char scrutinee is staged in A, not widened to HL first: the bias/bound
+       and the cp chain both work in A, and the table path re-widens for the
+       index anyway. `--opt-disable=switch-byte-a` reverts. */
+    int byte_a = !opt_disabled("switch-byte-a");
+
     if (sw->is_char && !is_long) {
         /* A dense contiguous char switch → jump table + `jp (hl)` instead of the
            linear cp chain. Size-benefit (no span cap — a full 256-way bytecode
@@ -1141,9 +1146,16 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
                    when neither fires, skip the HL->A->HL round-trip — load_to_hl
                    already has the index in HL (avoids a duplicate ld l,a;ld h,0). */
                 int need_a = (mn != 0) || (span < 256 && !in_range);
-                load_to_hl(out, f, op->src[0]);
+                int via_a  = need_a && byte_a;
+                if (via_a) {
+                    /* load_to_hl's widen would be overwritten by the one below
+                       without ever being read: 2 instrs, 11 T per dispatch. */
+                    load_byte_to_a(out, f, op->src[0]);
+                } else {
+                    load_to_hl(out, f, op->src[0]);
+                }
                 if (need_a) {
-                    emit(out, "ld\ta,l");
+                    if (!via_a) emit(out, "ld\ta,l");
                     if (mn != 0) emit(out, "sub\t%d", (int)mn);   /* 0-base */
                     if (span < 256 && !in_range) {  /* span==256 covers all bytes */
                         emit(out, "cp\t%d", span);                /* bounds… */
@@ -1173,8 +1185,13 @@ static int gen_switch(FILE *out, Func *f, const Op *op)
         }
         /* Inline cp chain — cp is cheap and the table's call/terminator
            overhead doesn't pay for byte compares. */
-        load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
-        emit(out, "ld\ta,l");
+        /* The chain only compares in A, so the HL widen is pure loss. */
+        if (byte_a) {
+            load_byte_to_a(out, f, op->src[0]);
+        } else {
+            load_to_hl(out, f, op->src[0]);  /* no-op on HL hit; records cacheread */
+            emit(out, "ld\ta,l");
+        }
         for (int i = 0; i < sw->n_cases; i++) {
             int k = (int)(sw->values[i] & 0xFF);
             if (k == 0) emit(out, "and\ta");
