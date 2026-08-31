@@ -1,5 +1,5 @@
 ;
-;  feilipu, 2026 July / August
+;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -98,12 +98,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld a,c
     inc a
     jp Z,fa_spec_y
-    push de
-    push hl                         ; Y.MSB lives in L
-    ld hl,sp+8                      ; X.exp at +4 +4
+    push hl                         ; Y.MSB lives in L; DE stays
+    ld hl,sp+6                      ; X.exp at +4 +2
     ld a,(hl)
     pop hl
-    pop de
     cp 255
     jp Z,fa_spec_x
     cp c
@@ -126,12 +124,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     call fa_align_x
 
 .fa_ops
-    push de
-    push hl                         ; Y.MSB lives in L
-    ld hl,sp+9                      ; X.sign at +5 +4
+    push hl                         ; Y.MSB lives in L; DE stays
+    ld hl,sp+7                      ; X.sign at +5 +2
     ld a,(hl)
     pop hl
-    pop de
     xor b
     and 080h
     jp NZ,fa_sub
@@ -482,31 +478,29 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; CALL: SP = ret, X(6), ...
 ;------------------------------------------------------------------------------
 .fa_addx
-    push bc
+    ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
+    ; Preload X.MSB so add hl,bc Carry is not lost to ld hl,sp+n.
+    push bc                         ; +0 se +2 ret +4 X.MSB +6 X.low
     ld a,l                          ; Y.MSB
-    ld bc,de                        ; Y.low16
-    ld hl,sp+6                      ; X.low16
+    ld bc,de                        ; Y.low
+    ld hl,sp+4
+    ld d,(hl)                       ; D = X.MSB
+    inc hl
+    inc hl
     ld e,(hl)
     inc hl
-    ld d,(hl)
-    ex de,hl
-    add hl,bc                       ; low sum; C → MSB
-    ld b,a                          ; Y.MSB
-    ld a,0
-    rla                             ; A = cy (ld hl,sp+n clobbers C)
-    ld c,a
-    push hl                         ; low sum
-    ld hl,sp+6                      ; X.MSB
-    ld a,c
-    rra                             ; restore cy
-    ld a,(hl)
-    adc a,b
-    pop de                          ; DE = low sum
-    pop bc                          ; sign,exp
+    ld h,(hl)
+    ld l,e                          ; HL = X.low
+    add hl,bc                       ; C → MSB
+    ld e,a                          ; E = Y.MSB
+    ld a,d
+    adc a,e                         ; MSB sum; C = bit24
+    ex de,hl                        ; DE = low sum
     ld l,a
     ld a,0
-    rla                             ; A = bit24 (ld keeps C)
+    rla                             ; A = bit24
     ld h,0
+    pop bc
     ret
 
 
@@ -515,38 +509,31 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
 ;------------------------------------------------------------------------------
 .fa_subx
-    push bc                         ; sign,exp
-    ld a,l
-    push af                         ; Y.MSB
-    ld hl,sp+8                      ; X.low
+    ; CALL: +0 ret +2 X.MSB +4 X.LSB:mid
+    ; Preload X so the sbc chain is not split by ld hl,sp+n.
+    push bc                         ; +0 se +2 ret +4 X.MSB +6 X.low
+    ld a,l                          ; Y.MSB
+    ld hl,sp+4
+    ld b,(hl)                       ; B = X.MSB
+    inc hl
+    inc hl
     ld c,(hl)
     inc hl
-    ld b,(hl)
-    ex de,hl                        ; HL = Y.low
-    ld a,l
-    sub c
-    ld l,a
-    ld a,h
-    sbc a,b
-    ld h,a                          ; HL = low diff; C = borrow
-    ex de,hl                        ; DE = low diff
-    ld a,0
-    rla
-    ld b,a                          ; B = borrow
-    pop af                          ; A = Y.MSB
-    push de                         ; low diff
+    ld h,(hl)
+    ld l,c                          ; HL = X.low
     ld c,a                          ; C = Y.MSB
-    ld hl,sp+6                      ; X.MSB
-    ld a,(hl)
-    ld e,a                          ; E = X.MSB
-    ld a,b
-    rra                             ; C flag = borrow
+    ld a,e
+    sub l
+    ld l,a
+    ld a,d
+    sbc a,h
+    ld h,a                          ; HL = Y.low − X.low
     ld a,c
-    sbc a,e                         ; Y.MSB - X.MSB - borrow
-    pop de
-    pop bc                          ; sign,exp
+    sbc a,b                         ; Y.MSB − X.MSB − borrow
+    ex de,hl                        ; DE = low diff
     ld l,a
     ld h,0
+    pop bc
     ret
 
 
