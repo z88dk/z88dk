@@ -3175,10 +3175,11 @@ static void keep_user_multi(void)
     c_compiler_type = "multi";
 }
 
-/* Same three pins as src/80cc/main.c: no IX/IY on 8080, 8085, gbz80. */
+/* Same pins as src/80cc/main.c: no IX/IY on 8080, 8085, vm1, gbz80. */
 static int multi_cpu_has_ix(void)
 {
-    return !(c_cpu == CPU_TYPE_8080 || c_cpu == CPU_TYPE_8085 || c_cpu == CPU_TYPE_GBZ80);
+    return !(c_cpu == CPU_TYPE_8080 || c_cpu == CPU_TYPE_8085 ||
+             c_cpu == CPU_TYPE_KR580VM1 || c_cpu == CPU_TYPE_GBZ80);
 }
 
 static int multi_reserve_ix(void)

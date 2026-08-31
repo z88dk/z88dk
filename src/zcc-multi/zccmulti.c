@@ -689,7 +689,8 @@ static int infer_trip(Variant *v, Func *fn, int loop_start, int branch, int kind
             return trip_from_imm(imm, 0);
         }
 
-        /* 16-bit dec does not set Z on any CPU. */
+        /* 16-bit dec does not set Z on any CPU. 8085 K sets on underflow.
+         * VM1 OF is not K. Do not treat jp of as a counted 16-bit loop. */
         if (cc_is_k(cc) && opt_cpu_kind == TICKS_CPU_8085)
             return trip_from_imm(imm, 1);
         if (cc_is_zero(cc) && span_has_or_pair(v, win, branch, dreg))

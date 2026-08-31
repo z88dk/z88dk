@@ -1,10 +1,10 @@
 include ../make.config
 
 # zcc writes zcc_opt.def and <file>.c.asm in this directory. Parallel
-# stitch_z80 / stitch_8085 (and helpers/mul) race under MAKE_CONCURRENCY=-j.
+# stitch_z80 / stitch_8085 / stitch_vm1 (and helpers/mul) race under MAKE_CONCURRENCY=-j.
 .NOTPARALLEL:
 
-all: stitch_z80.ok stitch_8085.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok iy.ok ext8085.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
+all: stitch_z80.ok stitch_8085.ok stitch_vm1.ok stitch_z80.bin.ok stitch_z80_verbose.ok helpers.ok optimiser.ok fallback.ok mixfb.ok only.ok loopcount.ok loopzero.ok mul.ok ldir.ok ldimm.ok srahl.ok r2ka.ok ixword.ok iy.ok ext8085.ok extvm1.ok extgbz80.ok gbz80ex.ok extz180.ok extz80n.ok sdcc_abi.ok
 
 stitch_z80.ok: twofuncs.c
 	zcc +test -vn -a -compiler=multi --multi-compiler-report=z80.tsv twofuncs.c
@@ -21,6 +21,13 @@ stitch_8085.ok: twofuncs.c
 	zcc +test -vn -clib=8085 -a -compiler=multi --multi-compiler-report=8085.tsv twofuncs.c
 	test -f twofuncs.c.asm
 	test `grep -c '80cc-fp' 8085.tsv` -eq 0
+	test `grep -c '^\._foo$$' twofuncs.c.asm` -eq 1
+	touch $@
+
+stitch_vm1.ok: twofuncs.c
+	zcc +test -vn -clib=vm1 -a -compiler=multi --multi-compiler-report=vm1.tsv twofuncs.c
+	test -f twofuncs.c.asm
+	test `grep -c '80cc-fp' vm1.tsv` -eq 0
 	test `grep -c '^\._foo$$' twofuncs.c.asm` -eq 1
 	touch $@
 
@@ -110,9 +117,11 @@ loopcount.ok: ../../../src/zcc-multi/t/loop_count.asm ../../../src/zcc-multi/t/l
 # ld b,0 is 256 trips; ld bc,0 with or-through-A is 65536.
 # dec bc / jp nz without or is not a counted loop.
 # 8085 jp nk after dec bc is a general 16-bit loop (any N, and 0 wraps).
+# VM1 jp of after dec bc is not: OF is not K.
 loopzero.ok: ../../../src/zcc-multi/t/loop_b0.asm ../../../src/zcc-multi/t/loop_bc0.asm \
 	../../../src/zcc-multi/t/loop_bc_nz.asm ../../../src/zcc-multi/t/loop_8085_k.asm \
-	../../../src/zcc-multi/t/loop_8085_k0.asm ../../../src/zcc-multi/t/loop_once.asm
+	../../../src/zcc-multi/t/loop_8085_k0.asm ../../../src/zcc-multi/t/loop_vm1_of.asm \
+	../../../src/zcc-multi/t/loop_once.asm
 	z88dk-zcc-multi --cpu=z80 --metric=ticks --data-variant=sccz80 \
 	  --output=loop_b0_stitch.asm --report=loop_b0.tsv \
 	  --variant=sccz80:../../../src/zcc-multi/t/loop_b0.asm \
@@ -138,6 +147,11 @@ loopzero.ok: ../../../src/zcc-multi/t/loop_b0.asm ../../../src/zcc-multi/t/loop_
 	  --variant=sccz80:../../../src/zcc-multi/t/loop_8085_k0.asm \
 	  --variant=80cc-sp:../../../src/zcc-multi/t/loop_once.asm
 	test `awk -F'	' '/^_foo/ {print $$6}' loop_8085_k0.tsv` -gt 100000
+	z88dk-zcc-multi --cpu=vm1 --metric=ticks --data-variant=sccz80 \
+	  --output=loop_vm1_of_stitch.asm --report=loop_vm1_of.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/loop_vm1_of.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/loop_once.asm
+	test `awk -F'	' '/^_foo/ {print $$6}' loop_vm1_of.tsv` -lt 80
 	touch $@
 
 # Shared l_mult cancels; scores are wrappers. Still must stitch and report.
@@ -304,6 +318,24 @@ ext8085.ok: ../../../src/zcc-multi/t/8085_ext.asm \
 	grep -q '^_foo.80cc-sp' ext8085_pick.tsv
 	touch $@
 
+# VM1 extended ops (Zilog) have documented T-states. Base times are 8080.
+# Unknown would fallback to size; a larger-but-faster body must still win.
+extvm1.ok: ../../../src/zcc-multi/t/vm1_ext.asm \
+	../../../src/zcc-multi/t/vm1_slow.asm ../../../src/zcc-multi/t/vm1_fast.asm
+	z88dk-zcc-multi --cpu=vm1 --metric=ticks --data-variant=sccz80 \
+	  --output=extvm1_stitch.asm --report=extvm1.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/vm1_ext.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/vm1_ext.asm
+	test `awk '/^_foo/ {print $$3}' extvm1.tsv` = metric
+	test `awk '/^_foo/ {print $$6}' extvm1.tsv` -eq 135
+	z88dk-zcc-multi --cpu=vm1 --metric=ticks --data-variant=sccz80 \
+	  --output=extvm1_pick.asm --report=extvm1_pick.tsv \
+	  --variant=sccz80:../../../src/zcc-multi/t/vm1_slow.asm \
+	  --variant=80cc-sp:../../../src/zcc-multi/t/vm1_fast.asm
+	test `awk '/^_foo/ {print $$3}' extvm1_pick.tsv` = metric
+	grep -q '^_foo.80cc-sp' extvm1_pick.tsv
+	touch $@
+
 # gbz80 extras (Zilog) have documented cycle counts. Unknown would
 # fallback to size; a larger-but-faster body must still win on ticks.
 extgbz80.ok: ../../../src/zcc-multi/t/gbz80_ext.asm \
@@ -381,6 +413,6 @@ sdcc_abi.ok: twofuncs.c
 	touch $@
 
 clean:
-	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm mixfb_stitch.asm only_stitch.asm srahl_stitch.asm r2ka_rrhl_stitch.asm r2ka_ldrr_stitch.asm r2ka_bool_stitch.asm r2ka_addsp_stitch.asm r2ka_ldix_stitch.asm ixword_stitch.asm ext8085_stitch.asm ext8085_pick.asm extgbz80_stitch.asm extgbz80_pick.asm extz180_stitch.asm extz180_pick.asm extz80n_stitch.asm extz80n_pick.asm opt_used.asm opt_used.bin sdcc_abi.o
+	$(RM) *.ok *.asm *.o *.bin *.map *.tsv *.lis *.sym *.err twofuncs twofuncs.bin fb_stitch.asm loop_stitch.asm loop_b0_stitch.asm loop_bc0_stitch.asm loop_bc_nz_stitch.asm loop_8085_k_stitch.asm loop_8085_k0_stitch.asm loop_vm1_of_stitch.asm ldir_bc0_stitch.asm ldimm_stitch.asm mixfb_stitch.asm only_stitch.asm srahl_stitch.asm r2ka_rrhl_stitch.asm r2ka_ldrr_stitch.asm r2ka_bool_stitch.asm r2ka_addsp_stitch.asm r2ka_ldix_stitch.asm ixword_stitch.asm ext8085_stitch.asm ext8085_pick.asm extvm1_stitch.asm extvm1_pick.asm extgbz80_stitch.asm extgbz80_pick.asm extz180_stitch.asm extz180_pick.asm extz80n_stitch.asm extz80n_pick.asm opt_used.asm opt_used.bin sdcc_abi.o
 
 .PHONY: all clean

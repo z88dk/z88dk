@@ -54,6 +54,8 @@ int ticks_cpu_from_name(const char *cpu)
         return TICKS_CPU_8085;
     if (strcmp(cpu, "8080") == 0)
         return TICKS_CPU_8080;
+    if (strcmp(cpu, "vm1") == 0)
+        return TICKS_CPU_VM1;
     if (strcmp(cpu, "gbz80") == 0)
         return TICKS_CPU_GBZ80;
     if (strcmp(cpu, "z180") == 0 || strcmp(cpu, "kc160") == 0)
@@ -125,7 +127,7 @@ int listing_parse_line(const char *line, char *src, size_t src_sz)
 static int is_cc_token(const char *s, size_t n)
 {
     static const char *cc[] = {
-        "z", "nz", "c", "nc", "po", "pe", "p", "m", "k", "nk", "v", NULL
+        "z", "nz", "c", "nc", "po", "pe", "p", "m", "k", "nk", "v", "of", NULL
     };
     int i;
     char buf[8];
@@ -395,18 +397,19 @@ static int classify(const char *tok, int *ix)
     if (tok[0] == '(') {
         p = skip_ws(tok + 1);
         p = read_ident(p, inner, sizeof(inner));
-        if (strcmp(inner, "ix") == 0 || strcmp(inner, "iy") == 0) {
+        if (ident_eq(inner, "ix") || ident_eq(inner, "iy")) {
             if (ix)
                 *ix = 1;
             return OP_MEM_IX;
         }
-        if (strcmp(inner, "hl") == 0)
+        /* ident_eq so VM1 (hl') is (hl) plus the RS prefix. */
+        if (ident_eq(inner, "hl"))
             return OP_MEM_HL;
-        if (strcmp(inner, "bc") == 0 || strcmp(inner, "de") == 0)
+        if (ident_eq(inner, "bc") || ident_eq(inner, "de"))
             return OP_MEM_RP;
-        if (strcmp(inner, "sp") == 0)
+        if (ident_eq(inner, "sp"))
             return OP_MEM_SP;
-        if (strcmp(inner, "c") == 0)
+        if (ident_eq(inner, "c"))
             return OP_MEM_C;
         return OP_MEM_ABS;
     }
@@ -481,7 +484,7 @@ static int ticks_ex(int cpu, const char *rest)
             return 56;
         return -1;
     }
-    if (cpu == TICKS_CPU_8080)
+    if (cpu == TICKS_CPU_8080 || cpu == TICKS_CPU_VM1)
         return (ka == OP_MEM_SP) ? 18 : 4;
     if (cpu == TICKS_CPU_8085)
         return (ka == OP_MEM_SP) ? 16 : 4;
@@ -503,7 +506,7 @@ static int ticks_xfer_once(const char *mnem)
 /* Two 8-bit ld r,r. Never a native 16-bit op on these chips. */
 static int ticks_rp_copy(int cpu)
 {
-    if (cpu == TICKS_CPU_8080)
+    if (cpu == TICKS_CPU_8080 || cpu == TICKS_CPU_VM1)
         return 10;
     if (cpu_is_rabbit(cpu))
         return 4;
@@ -518,7 +521,7 @@ static int ticks_rp_shift(int cpu, const char *mnem, const char *rp)
 {
     if (!rp || !rp[0])
         return -1;
-    if (cpu == TICKS_CPU_8080)
+    if (cpu == TICKS_CPU_8080 || cpu == TICKS_CPU_VM1)
         return -1;
     if (cpu == TICKS_CPU_8085) {
         if (strcmp(mnem, "rl") == 0 && ident_eq(rp, "de"))
@@ -978,15 +981,18 @@ static int ticks_z80ish(int cpu, const char *mnem, const char *rest,
     return -1;
 }
 
-static int ticks_808x_ld(int i8085, int ka, int kb, const char *a, const char *b)
+static int ticks_808x_ld(int cpu, int ka, int kb, const char *a, const char *b)
 {
-    /* 8085 extended loads (Zilog). Intel ldsi/ldhi/lhlx/shlx are not matched. */
+    int i8085 = (cpu == TICKS_CPU_8085);
+    /* LHLX / SHLX. 8085 ldsi/ldhi are not VM1 ops (those bytes are prefixes). */
     if (i8085 && ident_eq(a, "de") &&
         (plus_off_base(b, "sp") || plus_off_base(b, "hl")))
         return 10;
-    if (i8085 && ident_eq(a, "hl") && kb == OP_MEM_RP && mem_rp_is(b, "de"))
+    if ((i8085 || cpu == TICKS_CPU_VM1) &&
+        ident_eq(a, "hl") && kb == OP_MEM_RP && mem_rp_is(b, "de"))
         return 10;
-    if (i8085 && ka == OP_MEM_RP && mem_rp_is(a, "de") && ident_eq(b, "hl"))
+    if ((i8085 || cpu == TICKS_CPU_VM1) &&
+        ka == OP_MEM_RP && mem_rp_is(a, "de") && ident_eq(b, "hl"))
         return 10;
 
     if (ka == OP_R8 && kb == OP_R8)
@@ -1014,11 +1020,11 @@ static int ticks_808x_ld(int i8085, int ka, int kb, const char *a, const char *b
     if (ka == OP_MEM_ABS && kb == OP_RP)
         return rp_is_hl(b) ? 16 : 13;
     if (ka == OP_RP && kb == OP_RP && rp_copy_ok(a, b))
-        return ticks_rp_copy(i8085 ? TICKS_CPU_8085 : TICKS_CPU_8080);
+        return ticks_rp_copy(cpu);
     if (ka == OP_RP && ident_eq(a, "sp") && kb == OP_RP && rp_is_hl(b))
         return i8085 ? 6 : 5;
     {
-        int t = ticks_ld_word(i8085 ? TICKS_CPU_8085 : TICKS_CPU_8080, ka, kb, a, b);
+        int t = ticks_ld_word(cpu, ka, kb, a, b);
         if (t >= 0)
             return t;
     }
@@ -1046,15 +1052,84 @@ static int ticks_8085_ext(const char *mnem, const char *rest, int backward)
     return -1;
 }
 
-/* 8080 / 8085. No IX/IY. Halt and jp (hl) set *fallback. */
+static int is_bc_de(const char *s)
+{
+    return ident_eq(s, "bc") || ident_eq(s, "de");
+}
+
+static int is_rp_tok(const char *s)
+{
+    return ident_eq(s, "bc") || ident_eq(s, "de") ||
+           ident_eq(s, "hl") || ident_eq(s, "sp");
+}
+
+/* ANX / ORX / XRX: ld (hl),and (hl) and the or / xor forms. */
+static int vm1_mem_alu(const char *b)
+{
+    b = skip_ws(b);
+    if (strncmp(b, "and", 3) == 0)
+        b += 3;
+    else if (strncmp(b, "xor", 3) == 0)
+        b += 3;
+    else if (strncmp(b, "or", 2) == 0)
+        b += 2;
+    else
+        return 0;
+    return mem_rp_is(skip_ws(b), "hl");
+}
+
+/* RS prefix: hl' / h' / l' / (hl'). Each prefix byte is +4 T. */
+static int vm1_has_rs(const char *rest)
+{
+    const char *p;
+
+    for (p = rest; *p && *p != ';' && *p != '\n'; p++) {
+        if (*p == '\'')
+            return 1;
+    }
+    return 0;
+}
+
+/* VM1 extras. Zilog names. Intel dsub/lhlx/anx are not matched.
+ * CS forms (adc/sbc/cpc hl,rp) are 10 T plus the 4 T prefix.
+ * RS on an operand is added by the caller. */
+static int ticks_vm1_ext(const char *mnem, const char *rest)
+{
+    char a[64], b[64];
+    const char *p;
+
+    if (strcmp(mnem, "smf0") == 0)
+        return 8;
+    if (strcmp(mnem, "smf1") == 0)
+        return 9;
+    p = copy_op(rest, a, sizeof(a));
+    copy_op(p, b, sizeof(b));
+    if (strcmp(mnem, "cpc") == 0 && ident_eq(a, "hl") && is_bc_de(b))
+        return 14;
+    if (strcmp(mnem, "adc") == 0 && ident_eq(a, "hl") && is_rp_tok(b))
+        return 14;
+    if (strcmp(mnem, "sbc") == 0 && ident_eq(a, "hl") && is_bc_de(b))
+        return 14;
+    if (strcmp(mnem, "sub") == 0 && ident_eq(a, "hl") && is_bc_de(b))
+        return 10;
+    if (strcmp(mnem, "cp") == 0 && ident_eq(a, "hl") && is_bc_de(b))
+        return 10;
+    if (strcmp(mnem, "ld") == 0 && mem_rp_is(a, "hl") && vm1_mem_alu(b))
+        return 10;
+    return -1;
+}
+
+/* 8080 / 8085 / VM1. No IX/IY. Halt and jp (hl) set *fallback.
+ * VM1 uses 8080 base times. Each RS prefix byte is +4 T. */
 static int ticks_808x(int cpu, const char *mnem, const char *rest,
                       int cond, int indirect, int backward, int *fallback)
 {
     int taken = backward || !cond;
     int i8085 = (cpu == TICKS_CPU_8085);
+    int ivm1 = (cpu == TICKS_CPU_VM1);
     char a[64], b[64];
     int ka, kb;
-    int t;
+    int t = -1;
     const char *p;
 
     if (strcmp(mnem, "halt") == 0)
@@ -1066,64 +1141,70 @@ static int ticks_808x(int cpu, const char *mnem, const char *rest,
         if (t >= 0)
             return t;
     }
+    if (ivm1) {
+        t = ticks_vm1_ext(mnem, rest);
+        if (t >= 0)
+            goto rs;
+    }
     if (strcmp(mnem, "call") == 0)
-        return cond ? pick(taken, i8085 ? 18 : 17, 9) : (i8085 ? 18 : 17);
-    if (strcmp(mnem, "rst") == 0)
-        return 12;
-    if (strcmp(mnem, "ret") == 0)
-        return cond ? pick(taken, 12, 6) : 10;
-    if (strcmp(mnem, "jp") == 0)
-        return cond ? pick(taken, 10, i8085 ? 7 : 10) : 10;
-    if (strcmp(mnem, "jr") == 0)
-        return cond ? pick(taken, 12, 7) : 12;
-    if (strcmp(mnem, "djnz") == 0)
-        return pick(taken, 13, 8);
-    if (strcmp(mnem, "push") == 0)
-        return i8085 ? 12 : 11;
-    if (strcmp(mnem, "pop") == 0)
-        return 10;
-    if (strcmp(mnem, "nop") == 0)
-        return 4;
-    if (strcmp(mnem, "ex") == 0)
-        return ticks_ex(i8085 ? TICKS_CPU_8085 : TICKS_CPU_8080, rest);
-    if (strcmp(mnem, "in") == 0 || strcmp(mnem, "out") == 0)
-        return 10;
-    if (strcmp(mnem, "daa") == 0 || strcmp(mnem, "cpl") == 0 ||
-        strcmp(mnem, "scf") == 0 || strcmp(mnem, "ccf") == 0 ||
-        strcmp(mnem, "rlca") == 0 || strcmp(mnem, "rrca") == 0 ||
-        strcmp(mnem, "rla") == 0 || strcmp(mnem, "rra") == 0 ||
-        strcmp(mnem, "di") == 0 || strcmp(mnem, "ei") == 0)
-        return 4;
+        t = cond ? pick(taken, i8085 ? 18 : 17, 9) : (i8085 ? 18 : 17);
+    else if (strcmp(mnem, "rst") == 0)
+        t = 12;
+    else if (strcmp(mnem, "ret") == 0)
+        t = cond ? pick(taken, 12, 6) : 10;
+    else if (strcmp(mnem, "jp") == 0)
+        t = cond ? pick(taken, 10, i8085 ? 7 : 10) : 10;
+    else if (strcmp(mnem, "jr") == 0)
+        t = cond ? pick(taken, 12, 7) : 12;
+    else if (strcmp(mnem, "djnz") == 0)
+        t = pick(taken, 13, 8);
+    else if (strcmp(mnem, "push") == 0)
+        t = i8085 ? 12 : 11;
+    else if (strcmp(mnem, "pop") == 0)
+        t = 10;
+    else if (strcmp(mnem, "nop") == 0)
+        t = 4;
+    else if (strcmp(mnem, "ex") == 0)
+        t = ticks_ex(cpu, rest);
+    else if (strcmp(mnem, "in") == 0 || strcmp(mnem, "out") == 0)
+        t = 10;
+    else if (strcmp(mnem, "daa") == 0 || strcmp(mnem, "cpl") == 0 ||
+             strcmp(mnem, "scf") == 0 || strcmp(mnem, "ccf") == 0 ||
+             strcmp(mnem, "rlca") == 0 || strcmp(mnem, "rrca") == 0 ||
+             strcmp(mnem, "rla") == 0 || strcmp(mnem, "rra") == 0 ||
+             strcmp(mnem, "di") == 0 || strcmp(mnem, "ei") == 0)
+        t = 4;
+    else {
+        p = copy_op(rest, a, sizeof(a));
+        copy_op(p, b, sizeof(b));
+        ka = classify(a, NULL);
+        kb = classify(b, NULL);
 
-    p = copy_op(rest, a, sizeof(a));
-    copy_op(p, b, sizeof(b));
-    ka = classify(a, NULL);
-    kb = classify(b, NULL);
-
-    if (strcmp(mnem, "ld") == 0)
-        return ticks_808x_ld(i8085, ka, kb, a, b);
-    if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0) {
-        if (ka == OP_RP)
-            return i8085 ? 6 : 5;
-        if (ka == OP_MEM_HL)
-            return 10;
-        if (ka == OP_R8)
-            return i8085 ? 4 : 5;
-        return -1;
+        if (strcmp(mnem, "ld") == 0)
+            t = ticks_808x_ld(cpu, ka, kb, a, b);
+        else if (strcmp(mnem, "inc") == 0 || strcmp(mnem, "dec") == 0) {
+            if (ka == OP_RP)
+                t = i8085 ? 6 : 5;
+            else if (ka == OP_MEM_HL)
+                t = 10;
+            else if (ka == OP_R8)
+                t = i8085 ? 4 : 5;
+        } else if (strcmp(mnem, "add") == 0 && ka == OP_RP)
+            t = 10;
+        else if (is_alu8(mnem)) {
+            int k = (kb != OP_EMPTY) ? kb : ka;
+            if (k == OP_MEM_HL)
+                t = 7;
+            else if (k == OP_IMM)
+                t = 7;
+            else if (k == OP_R8)
+                t = 4;
+        }
     }
-    if (strcmp(mnem, "add") == 0 && ka == OP_RP)
-        return 10;
-    if (is_alu8(mnem)) {
-        int k = (kb != OP_EMPTY) ? kb : ka;
-        if (k == OP_MEM_HL)
-            return 7;
-        if (k == OP_IMM)
-            return 7;
-        if (k == OP_R8)
-            return 4;
-        return -1;
-    }
-    return -1;
+rs:
+    if (t >= 0 && ivm1 && vm1_has_rs(rest))
+        t += 4;
+    return t;
 }
 
 static int ticks_gbz80_ld(const char *mnem, int ka, int kb,
@@ -1277,7 +1358,8 @@ int ticks_for_src(int cpu_kind, const char *src, int backward, int *fallback)
 
     parse_control(src, NULL, &cond, &indirect, NULL, 0, NULL, 0);
 
-    if (cpu_kind == TICKS_CPU_8080 || cpu_kind == TICKS_CPU_8085)
+    if (cpu_kind == TICKS_CPU_8080 || cpu_kind == TICKS_CPU_8085 ||
+        cpu_kind == TICKS_CPU_VM1)
         t = ticks_808x(cpu_kind, mnem, rest, cond, indirect, backward, fallback);
     else if (cpu_kind == TICKS_CPU_GBZ80)
         t = ticks_gbz80(mnem, rest, cond, indirect, backward, fallback);
