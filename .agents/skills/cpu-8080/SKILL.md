@@ -15,7 +15,7 @@ Intel 8080, April 1974. Successor to the 8008 (not binary-compatible). This is t
 
 z88dk writes **Zilog** mnemonics. Pastraiser and Intel manuals use Intel names (`MOV`, `LXI`, `DAD`). Translate on the way in.
 
-Classic path `libsrc/l/sccz80/8-8080/`, products `8080_crt0.lib` / `8080_clib.lib` / `cpm8080_clib.lib`. Assemble `-m8080`. Typical: `zcc +cpm -clib=8080` or `+z80 -clib=8080`. `-D__8080` sets `__CPU_INTEL__`. 9-common `IF __CPU_INTEL__` is the 8080-portable path. **No** `math32` / `math16` 8080 product (those cores need 8085 extras or Z80). Float: **`--math-mbf32`**.
+Classic path `libsrc/l/sccz80/8-8080/`, products `8080_crt0.lib` / `8080_clib.lib` / `cpm8080_clib.lib`. Assemble `-m8080`. Typical: `zcc +cpm -clib=8080` or `+z80 -clib=8080`. `-D__8080` sets `__CPU_INTEL__`. 9-common `IF __CPU_INTEL__` is the 8080-portable path. **`--math32`** links `math32_8080.lib` (IEEE, sccz80, `asm/8080/`). Default 8080 float remains **`--math-mbf32`**. There is no `math16_8080`.
 
 **This skill is complete for 8080 work.** Load `cpu-8085` only when emitting 8085 extended ops.
 

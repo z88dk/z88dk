@@ -1,7 +1,7 @@
 ---
 name: library-math32
 description: >
-  math32 IEEE single float library: multi-CPU layout (asm/z80 vs asm/8085),
+  math32 IEEE single float library: multi-CPU layout (asm/z80, asm/8085, asm/8080),
   products math32*.lib, rounding policy, div=restoring / inv=NR, force rebuild.
   Use when editing libsrc/math/float/math32 or A/B float divide/mul.
 ---
@@ -14,9 +14,9 @@ Link via **`--math32`** (`-lmath32@{ZCC_LIBCPU}`).
 ## 0b. Math32 multi-CPU float library (layout + policy)
 
 Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
-`math32_{z80n,z180,r2ka,kc160,8085,…}.lib`. Link via **`--math32`**
-(`-lmath32@{ZCC_LIBCPU}` — 8085 selects `math32_8085` automatically; no separate
-`--math32_8085` flag).
+`math32_{z80n,z180,r2ka,kc160,8085,8080,…}.lib`. Link via **`--math32`**
+(`-lmath32@{ZCC_LIBCPU}` — 8085 selects `math32_8085`, 8080 selects
+`math32_8080`; no separate `--math32_8085` / `--math32_8080` flag).
 
 ### Layout
 
@@ -24,7 +24,8 @@ Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
 |------|------|
 | `asm/z80/` | Z80-family cores; shared by z80n/z180/r2ka/… when the lst points here |
 | `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics |
-| `c/z80/`, `c/8085/` | Higher functions (C → precompiled asm); 8085 higher via sccz80 only |
+| `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL |
+| `c/z80/`, `c/8085/`, `c/8080/` | Higher functions (C → precompiled asm); 8080/8085 higher via sccz80 only |
 | `newlibfiles_*.lst` | Which modules land in each product |
 
 **CPU-specific** = same *operation* name, different ISA file (same one-op-per-file
@@ -46,7 +47,7 @@ engines are not bit-identical.
 
 | Op | Algorithm | Notes |
 |----|-----------|--------|
-| **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** cores; z80n/z180 share z80 `asm/z80/f32_fsdiv.asm` |
+| **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** + **8080** cores; z80n/z180 share z80 `asm/z80/f32_fsdiv.asm` |
 | **`inv` / `m32_fsinv`** | Newton–Raphson | Still mul-heavy; HW mul helps inv only |
 | math16 | Same split: restoring `asm_f16_div`, NR `asm_f16_inv` | |
 
@@ -93,7 +94,8 @@ remeasure both products after header fixes.
 ### Higher-function C regen (`c/Makefile`)
 
 Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/z80/*.asm` (SDCC).
-8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only). **`make clean`** must
+8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only).
+8080: `make -C …/c 8080` → `c/8080/*.asm` (sccz80 only). **`make clean`** must
 only remove C-derived objects — never wipe hand-written peers in the same dir
 (math16: keep `cm16_sccz80_*.asm` under `c/8085/`).
 

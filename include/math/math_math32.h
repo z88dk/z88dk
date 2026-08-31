@@ -219,6 +219,12 @@ extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_cal
 #define hypot(a,b) hypot_callee(a,b)
 #endif
 
+__ZPROTO3(double_t,,poly,double_t,x,double_t *,d,unsigned int,n)
+#ifndef __STDC_ABI_ONLY
+extern double_t __LIB__ poly_callee(double_t x,double_t *d,unsigned int n) __smallc __z88dk_callee;
+#define poly(a,b,c) poly_callee(a,b,c)
+#endif
+
 /* Helper functions */
 extern double_t __LIB__ atof(char *);
 __ZPROTO3(void,,ftoa,double_t,d,int,l,char *,b)

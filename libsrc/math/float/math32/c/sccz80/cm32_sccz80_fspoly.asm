@@ -20,6 +20,20 @@ EXTERN m32_fspoly_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
+IF __CPU_INTEL__ | __CPU_GBZ80__
+    ; sccz80 already has callee order (ret, n, dptr, x).
+    ; Consume args via callee, then restore 4 dummy words.
+    ; Never pop af (8080 F is not a return slot). No exx.
+    pop bc                      ; ret
+    call m32_fspoly_callee
+    push bc
+    push bc
+    push bc
+    push bc
+    push bc
+    ret
+ELSE
+
     pop af                      ; my return
     pop hl                      ; (uint16_t)n
     pop de                      ; (float*)d
@@ -46,3 +60,5 @@ EXTERN m32_fspoly_callee
     push af
     push af
     ret
+
+ENDIF

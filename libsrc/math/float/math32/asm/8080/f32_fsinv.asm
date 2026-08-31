@@ -1,11 +1,12 @@
 ;
-;  feilipu, 2026 July
+;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-; 8085 m32_fsinv — Newton–Raphson reciprocal (from former f32_fsdiv).
+; 8080 m32_fsinv — Newton–Raphson reciprocal.
+; Same control as 8085.  Frame via ld hl,sp+n / ld a,(hl+).
 ;
 
 SECTION code_clib
@@ -20,7 +21,7 @@ PUBLIC _m32_invf
 
 
 .divovl
-    pop bc                          ; es: B=exp C=sign80
+    pop bc
     ld a,c
     or a
     jp NZ,m32_fsconst_ninf
@@ -31,20 +32,19 @@ PUBLIC _m32_invf
 .m32_fsinv_fastcall
     ld a,d
     and 080h
-    ld c,a                          ; sign80
+    ld c,a
     ld a,e
     add a,a
     ld a,d
     rla
-    ld b,a                          ; oexp
-    push bc                         ; es
+    ld b,a
+    push bc
     or a
     jp Z,divovl
-    inc a                           ; exp was 255?
+    inc a
     jp NZ,inv_finite
 
-    ; exp 255: Inf → signed 0, NaN → NaN
-    pop bc                          ; C = sign80
+    pop bc
     ld a,e
     and 07fh
     or h
@@ -63,22 +63,22 @@ PUBLIC _m32_invf
     or a
     rra
     ld l,a
-    ex de,hl                        ; DEHL = −D' IEEE
+    ex de,hl
 
     push de
-    push hl                         ; SP: −D' es
+    push hl
 
     call unpack
-    ld c,0                          ; positive D'
+    ld c,0
 
     push bc
     push de
-    push hl                         ; spare D'
+    push hl
     ld de,04087h
     ld hl,0c1f0h
     push de
-    push hl                         ; 140/33
-    ld de,sp+4
+    push hl
+    ld hl,sp+4
     call load_expanded
     push bc
     push de
@@ -86,12 +86,12 @@ PUBLIC _m32_invf
     ld de,0c0bah
     ld hl,02e8ch
     push de
-    push hl                         ; −64/11
+    push hl
     ld de,04025h
     ld hl,07eb5h
     push de
-    push hl                         ; 256/99
-    ld de,sp+8
+    push hl
+    ld hl,sp+8
     call load_expanded
     call m32_fsmul24x32
     call m32_fsadd24x32
@@ -105,23 +105,23 @@ PUBLIC _m32_invf
     call nr_step
 
     pop af
-    pop af                          ; drop −D'
+    pop af
 
     push bc
     push de
     push hl
-    ld de,sp+5
-    ld a,(de)
+    ld hl,sp+5
+    ld a,(hl)
     ld b,a
-    ld de,sp+7
-    ld a,(de)
+    ld hl,sp+7
+    ld a,(hl)
     ld c,a
     ld a,b
     sub c
     add a,126
     ld b,a
-    ld de,sp+6
-    ld a,(de)
+    ld hl,sp+6
+    ld a,(hl)
     ld c,a
     pop hl
     pop de
@@ -180,11 +180,15 @@ PUBLIC _m32_invf
     push de
     push hl
 
-    ld de,sp+20
-    ld hl,(de)
+    ld hl,sp+20
+    ld a,(hl+)
+    ld h,(hl)
+    ld l,a
     push hl
-    ld de,sp+24
-    ld hl,(de)
+    ld hl,sp+24
+    ld a,(hl+)
+    ld h,(hl)
+    ld l,a
     ex de,hl
     pop hl
     call unpack
@@ -192,9 +196,8 @@ PUBLIC _m32_invf
     push de
     push hl
 
-    ld de,sp+12
+    ld hl,sp+12
     call load_expanded
-    ; Y in regs, X on stack — add32 no longer parks Y
     call m32_fsmul32x32
     call m32_fsadd32x32
     call m32_fsmul32x32
@@ -225,16 +228,14 @@ PUBLIC _m32_invf
     ret
 
 
+; HL → expanded 6-byte (hl,de,bc).  Exit BC DEHL.  Uses A.
 .load_expanded
+    ld e,(hl+)
+    ld d,(hl+)
     push de
-    ld hl,(de)
-    push hl
-    ex de,hl
-    inc hl
-    inc hl
-    ld de,(hl+)
+    ld e,(hl+)
+    ld d,(hl+)
     ld c,(hl+)
     ld b,(hl)
     pop hl
-    pop af
     ret

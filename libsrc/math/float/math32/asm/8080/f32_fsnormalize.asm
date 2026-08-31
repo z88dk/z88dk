@@ -1,13 +1,12 @@
 ;
-;  feilipu, 2026 July
-;  ped7g, 2026 July
+;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize - 8085 normalisation
+; m32_fsnormalize - 8080 normalisation
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked: h==0 (discarded); mantissa=lde, sign in b, exponent in c

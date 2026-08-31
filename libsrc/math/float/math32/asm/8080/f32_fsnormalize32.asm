@@ -1,21 +1,20 @@
 ;
-;  feilipu, 2026 July
-;  ped7g, 2026 July
+;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize32 - 8085 unpacked 32-bit normalisation
+; m32_fsnormalize32 - 8080 unpacked 32-bit normalisation
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked: mantissa=dehl, exponent in b, sign in c[7]
-;  DEHL is already add hl,hl / rl de layout.
+;  DEHL is already add hl,hl / rla-through-A layout.
 ;
-;  Byte scan; residual merge loop.  8085 rl de does not set S (-----VC).
-;  Until normalised D.7 is 0.  Entry leaves A = D with A.7 clear, so each
-;  step is or d / jp p (cheaper than ld a,d / or a).
+;  Same control as 8085: byte scan then residual loop.  rla does not set S;
+;  until normalised D.7 is 0.  Entry leaves A = D with A.7 clear, so each
+;  step is or d / jp p.
 ;
 ;-------------------------------------------------------------------------
 
@@ -84,7 +83,12 @@ PUBLIC m32_fsnormalize32
 .shift_loop
     inc b
     add hl,hl
-    rl de                       ; 8085 RDEL: flags -----VC (S not set)
+    ld a,e                      ; rl de through A
+    rla
+    ld e,a
+    ld a,d
+    rla
+    ld d,a
     or d                        ; S from D.7 (A.7 was 0 until then)
     jp p,shift_loop
 
