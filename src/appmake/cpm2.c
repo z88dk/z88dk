@@ -2288,11 +2288,11 @@ static disc_spec ns_ssdd_spec = {
 };
 
 // Northstar Micro-Disk System MDS-A-D DS 350K
-// SSDD 48 tpi 5.25" - 512 x 10
+// DSDD 48 tpi 5.25" - 512 x 10
 static disc_spec ns_dsdd_spec = {
      .name = "Northstar DSDD",
      .sectors_per_track = 10,
-     .tracks = 35,
+     .tracks = 70,
      .sides = 2,
      .sector_size = 512,
      .gap3_length = 0x2a,   //?
@@ -2300,7 +2300,7 @@ static disc_spec ns_dsdd_spec = {
      .boottracks = 2,
      .directory_entries = 64,
      .alternate_sides = 1,
-     .extent_size = 1024,
+     .extent_size = 2048,
      .byte_size_extents = 1,
      .first_sector_offset = 0,
      .has_skew = 1,
