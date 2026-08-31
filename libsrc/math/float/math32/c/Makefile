@@ -25,6 +25,18 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 	zcc +test -clib=8085 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
+# 8080 higher functions: sccz80 only
+CFILES8080 = $(wildcard *.c)
+AFILES8080 = $(CFILES8080:.c=.asm)
+
+8080: $(addprefix 8080/,$(AFILES8080))
+
+8080/%.asm: %.c
+	@mkdir -p 8080
+	zcc +test -clib=8080 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
+	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
+
 clean:
 	$(RM) z80/*.asm z80/*.err zcc_opt.def
 	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err
+	$(RM) $(addprefix 8080/,$(AFILES8080)) 8080/*.err
