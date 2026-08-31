@@ -5,20 +5,20 @@ description: >
   timings), and extended-instruction usage. Strong rule: stack-only locals and
   intermediates; static/BSS only for cross-call state. Prefer when writing or
   reviewing 8085 library asm, mapping Intel↔Zilog, choosing stack frames,
-  K-flag loops, restoring float/integer divide, legal (de) stores, or /cpu-8085.
+  K-flag loops, restoring float/integer divide, legal (de) stores,
+  jr-as-jp synthetics, or /cpu-8085.
 ---
 
 # CPU — 8085
 
-z88dk uses **Zilog mnemonics** for 8085 sources. Extended opcodes are first-class
-on every 8085. Design notes: https://feilipu.me/2021/09/27/8085-software/
+Compatible extension of the Intel 8080 (April 1974). Same documented 8080 ops; ten extra ops in 8080 unused cells. **This skill is complete for 8085 work.** Load `cpu-8080` only when the binary must also run on 8080.
 
-## Opcode reference (Zilog mnemonics)
+z88dk uses **Zilog mnemonics** for 8085 sources. Extended opcodes are first-class on every 8085. Design notes: https://feilipu.me/2021/09/27/8085-software/
 
 ## Conventions (always follow)
 
 1. **Mnemonics are Zilog**, as in Z80 assembly — not Intel 8080/8085 names.
-2. **Opcode bytes and timings are 8085**, not Z80 (many encodings differ or do not exist on Z80).
+2. **Opcode bytes and timings are 8085**, not 8080 and not Z80.
 3. **Undocumented / extended** opcodes are noted in tables (column or section).
 4. Immediate forms: `*` = 8-bit immediate (d8), `**` = 16-bit immediate/address (d16/a16). These `*`/`**` are operand placeholders only.
 5. For **LDHI** / **LDSI** equivalents (`ld de,hl+*` / `ld de,sp+*`), the 8-bit offset is **unsigned**.
@@ -156,22 +156,33 @@ These are **not** standard Z80 opcodes at those encodings (Z80 uses `CB`/`DD`/`E
 | `rrca` / `rra` | `-----0C` | **V forced 0** |
 | `add hl,rp` | `-----VC` | V and C (not C alone) |
 | 8-bit ALU (`add`…`cp`, immediates) | `SZKAPVC` | Full set |
+| `daa` | `SZKAPVC` | |
+| `cpl` | `-------` | **No flags** (Z80 `cpl` sets H,N) |
 | `sub hl,bc` (undoc) | `SZKAPVC` | Full set |
 | `sra hl` (undoc) | `-----0C` | V←0, C from bit 0 |
 | `rl de` (undoc) | `-----VC` | V and C |
 | `scf` | `------1` | C←1 |
 | `ccf` | `------C` | C toggled |
-| `pop af` | `SZKAPVC` | Restores **all** flags including K,V |
+| `pop af` | `SZKAPVC` | Restores **all** flags including K,V. Bit 3 stays 0 |
 
 Logical ops still use the full pastraiser mask `SZKAPVC` (how individual bits are computed is instruction-defined; do not invent Z80 N-flag behavior — 8085 has **no N flag**).
 
 ## Timing notes
 
-- Base machine cycles as in the reference tables (8085 T-states / clocks from pastraiser).
+Pastraiser T-states (8085 clocks). Not 8080 (many documented ops differ by 1T).
+
 - Conditional **ret**: 12 taken / 6 not taken.
-- Conditional **jp**: 10 / 7.
+- Conditional **jp**: 10 / 7 (address bytes skipped when not taken).
 - Conditional **call**: 18 / 9.
-- `halt` is 5 cycles (8085).
+- `call **` 18, `ret` 10, `rst` 12.
+- `halt` is **5**.
+- `push` 12, `pop` 10.
+- 8-bit ALU register **4**, `(hl)` 7, immediate 7.
+- `ld r,r'` **4**, `ld r,(hl)` / `ld (hl),r` 7.
+- 8-bit `inc`/`dec` r **4**; `(hl)` 10. 16-bit `inc`/`dec` rp **6**.
+- `add hl,rp` 10, `ex de,hl` 4, `ex (sp),hl` **16**.
+- `ld hl,(**)` / `ld (**),hl` 16; `ld a,(**)` / `ld (**),a` 13.
+- `jp (hl)` / `ld sp,hl` 6.
 
 ## Coding rules for this project
 
@@ -179,7 +190,7 @@ Logical ops still use the full pastraiser mask `SZKAPVC` (how individual bits ar
 2. Register pairs: `bc`, `de`, `hl`, `af`, `sp` — never Intel `B`, `D`, `H`, `PSW` in new code.
 3. Use `(hl)`, `(bc)`, `(de)`, `(**)` for memory; never `M`.
 4. Prefer undocumented ops when they clearly win (e.g. `sub hl,bc`, `ld hl,(de)`, `ld (de),hl`, `ld de,hl+*`) **and** the target assembler/CPU path supports them.
-5. Never assume Z80 instruction timings or prefix opcodes exist on 8085.
+5. Never assume Z80 instruction timings or prefix opcodes exist on 8085. **`jr` / `jr cc` are allowed** in normal mode (synthetics on): z80asm emits `jp` / `jp cc` (3 bytes; cond `jp` is 10/7). Same source then assembles for Z80, where `jr` is native. **Strict** / `-no-synth` rejects `jr`. Do not expect a 2-byte relative branch (`18` is `rl de`).
 6. When optimizing, consult [references/opcodes.md](references/opcodes.md) for exact size/cycle/flag data.
 7. **Assembler support last resort:** fixtures `src/z80asm/dev/cpu/cpu_test_8085_{ok,err}.asm` (and `*_strict_*`). **ok** = z80asm accepts that source form (native, synthetic, or `call __z80asm__*`). **err** = rejected. **`_strict_`** = **synthetics forbidden**. Fixtures may include **Intel** spellings for external-compat testing; **z88dk always writes Zilog**. Full decode: **`tool-z80asm`**. `rg` only; do not bulk-read.
 
@@ -294,7 +305,7 @@ Document every slot. Drop consumed args in one epilogue:
     push bc            ; return
 ```
 
-**`pop af` and the return address:** F bit 3 is hardwired 0 on the 8085, so a word popped into AF can never be a faithful 16-bit value (`$FFFF` → `$FF7F`). **Never `pop af` the return address** (and never `push af` / `ret` a return path that depends on an intact address). **Do** use `pop af` to **discard** intermediate stack words on return when A/F need not be preserved — the corrupted F is irrelevant because the value is thrown away.
+**`pop af` and the return address:** F bit 3 is hardwired 0 on the 8085 (K and V **are** restored), so a word popped into AF can never be a faithful 16-bit value (`$FFFF` → `$FFF7`). **Never `pop af` the return address** (and never `push af` / `ret` a return path that depends on an intact address). **Do** use `pop af` to **discard** intermediate stack words on return when A/F need not be preserved — the corrupted F is irrelevant because the value is thrown away.
 
 #### Multi-word frame rebuild (no `exx`)
 
@@ -353,18 +364,18 @@ Do not copy Z80 `dec bc; jp nz` semantics.
 Alternatively 16-bit loops can be created using the **`dec bc / inc b / inc c`** set up to create inner and outer loops, using any 16 bit register pair. Typically **`bc`** would be used, as **`hl`** and **`de`** have other priority uses.
 
 ```asm
-   dec bc
-   inc b
-   inc c
-
+    dec bc
+    inc b
+    inc c
 loop:
-   ; code body to be repeated bc times.
-
-   dec c
-   jr NZ,loop
-   dec b
-   jr NZ,loop
+    ; body, repeated BC times
+    dec c
+    jr  nz,loop        ; → jp nz on 8085; native jr on Z80
+    dec b
+    jr  nz,loop
 ```
+
+**`jr nz` is allowed** in normal mode. Use it when the same source may also build for Z80. Strict mode: write `jp nz`. `jp k` / `jp nk` have no `jr` form (Z80 has no K).
 
 ### 6. Multiply / divide building blocks — `rl de` + `sub hl,bc`
 
@@ -435,14 +446,14 @@ On 8085, **`ld (de),r` / `ld (de),n` are illegal**. Valid: **`ld a,(de)`**, **`l
 
 ### 8. Extra 16-bit slot — `ex (sp),hl`
 
-Push a scratch word; **`ex (sp),hl`** swaps with it when AF/BC/DE/HL are full. **Do not** use `push af`/`pop af` as a free 16-bit temp or to hold a return address: F bit 3 is hardwired 0 (`$FFFF` → `$FF7F` on the round trip). **`pop af` is fine only when the popped word is discarded** (e.g. clearing intermediates off the stack in an epilogue).
+Push a scratch word; **`ex (sp),hl`** swaps with it when AF/BC/DE/HL are full (16c). **Do not** use `push af`/`pop af` as a free 16-bit temp or to hold a return address: F bit 3 is hardwired 0 (`$FFFF` → `$FFF7` on the round trip). **`pop af` is fine only when the popped word is discarded** (e.g. clearing intermediates off the stack in an epilogue).
 
 ### 9. I/O and Z80-only ops to avoid
 
 | Prefer on 8085 | Avoid (Z80-only or wrong) |
 |----------------|---------------------------|
 | `out (*),a` / `in a,(*)` (byte in A) | `outi`, `in r,(c)`, block I/O |
-| `dec b` / `jp nz` | `djnz` |
+| `dec b` / `jr nz` (→ `jp nz`) | native `djnz` (`10` is `sra hl`) |
 | Stack + DE for second long | `exx`, IX/IY as default temps |
 | `sub hl,bc` | Assuming `sbc hl,de` exists |
 | Open-coded extended-op sequences | Assuming Z80 library mul/div cores |
@@ -451,15 +462,11 @@ Assembler must be **8085-aware** (these encodings are not Z80 prefixes).
 
 ### 10. Synthetic opcodes
 
-**z80asm** expands many **synthetic** source forms into short real-op sequences
-(no harmful flag/side effects for the forms below). They keep library code
-readable and portable across CPUs without `#if CPU` for the same transfer.
+**z80asm** expands many **synthetic** source forms into short real-op sequences (no harmful flag/side effects for the forms below). They keep library code readable and portable across CPUs without `#if CPU` for the same transfer.
 
 #### 16-bit register-pair copies (full set)
 
-Synthetics of the form **`ld dst,src`** where **dst** and **src** are word
-register pairs. Each expands to **two 8-bit `ld`s** (high then low, or as the
-assembler tables define — e.g. `ld de,hl` → `ld d,h` / `ld e,l`).
+Synthetics of the form **`ld dst,src`** where **dst** and **src** are word register pairs. Each expands to **two 8-bit `ld`s** (high then low, or as the assembler tables define — e.g. `ld de,hl` → `ld d,h` / `ld e,l`).
 
 | Allowed pairs | Forbidden as word-copy synthetics |
 |---------------|-------------------------------------|
@@ -474,8 +481,7 @@ assembler tables define — e.g. `ld de,hl` → `ld d,h` / `ld e,l`).
     ld  hl,de
 ```
 
-**Prefer these over hand-rolled two-byte moves** (`ld b,d` / `ld c,e`, …) and over
-swap dances when you only need to **park one pair**:
+**Prefer these over hand-rolled two-byte moves** (`ld b,d` / `ld c,e`, …) and over swap dances when you only need to **park one pair**:
 
 ```asm
     ; Hold DEHL; need HL free for SP adjust — park lo only:
@@ -486,22 +492,23 @@ swap dances when you only need to **park one pair**:
     ld  hl,bc          ; restore lo
 ```
 
-Do **not** invent `ld bc,de` + `ex de,hl` + SP math + reverse swaps when
-`ld bc,hl` / `ld hl,bc` is enough.
+Do **not** invent `ld bc,de` + `ex de,hl` + SP math + reverse swaps when `ld bc,hl` / `ld hl,bc` is enough.
 
 Other common synthetics (not pair-copy): e.g. `ld a,(hl+)` (load + inc index).
-**Strict** assemble (`*_strict_*` / `-no-synth`) **forbids** free synthetics —
-fixtures under `src/z80asm/dev/cpu/` (see **`tool-z80asm`**).
+
+**`jr` / `jr cc`:** allowed in **normal** mode as `jp` / `jp cc`. Use them when the same source may also build for Z80. **Strict** / `-no-synth` rejects `jr`. Cost as a 3-byte `jp` (cond 10/7), not as Z80’s 2-byte `jr`. `18` is native `rl de`, not `jr`.
+
+**Strict** assemble (`*_strict_*` / `-no-synth`) **forbids** free synthetics — fixtures under `src/z80asm/dev/cpu/` (see **`tool-z80asm`**).
 
 ## Pitfalls
 
-1. **`pop af` never for function return** — F bit 3 is hardwired 0, so AF cannot hold a correct return address. Use BC/DE/HL for the return word. **`pop af` is OK only to discard** intermediate stack values when the popped data is unused. AF is also not a clean 16-bit temp (`$FFFF` → `$FF7F`).
+1. **`pop af` never for function return** — F bit 3 is hardwired 0, so AF cannot hold a correct return address. Use BC/DE/HL for the return word. **`pop af` is OK only to discard** intermediate stack values when the popped data is unused. AF is also not a clean 16-bit temp (`$FFFF` → `$FFF7`).
 2. **`sub hl,bc` has no borrow-in** — multi-precision use A + `sbc`.
 3. **K ≠ Z on 16-bit dec** — pre-dec + `jp k`/`jp nk`.
 4. **Offsets on `ld de,sp+*` / `ld de,hl+*` are unsigned.**
 5. **`rst v`** only if **0040h** is defined.
 6. **`rla` / `rra` / `rlca` / `rrca` do not set Z** — never `rla; jp z,...`. Test with `or a` / `and a` / explicit mask first, or use `inc`/`dec` on a copy.
-7. **No `exx`, IX, IY, `djnz`** — second long operand on stack; counted loops via `dec b`/`jp nz` or K pre-dec (§5).
+7. **No `exx`, IX, IY, native `djnz` / native `jr`.** `jr` **is allowed** in normal mode (→ `jp`; shared Z80 source). Strict: write `jp`. Second long operand on stack; counted loops via `dec b`/`jr nz` or K pre-dec (§5).
 8. **Forward overlapping stack copy corrupts** — see multi-word frame rebuild above.
 9. **No copt pass on library asm** — hand-written `libsrc/**` is assembled as-is. Remove copy-backs (`ld r,a` then `ld a,r`) and other dead moves yourself. Match the **target file’s** whitespace (spaces vs tabs); do not reformat to sccz80/copt tab style. **Before finalising** any hand-coded math16/math32 (or similar) edit: scan for copt-equivalent wins (`ex de,hl` / `ld bc,hl` instead of push/pop transfers; drop `ld a,e` after `ld e,a`; pair zeros → `ld hl,0`; etc.) and run the matching suite. Do **not** use `xor a` for `ld a,0` when CF must survive. Full checklist: **`tool-copt`** and **`methodology-measure`** (“Before finalising hand-coded library work”).
 10. **Illegal `(de)` stores** — only `a` / `hl` / post-inc forms (§6). A “working” assemble that used faked `ld (de),l` means the toolchain or listing was not 8085-checked.
@@ -521,6 +528,7 @@ fixtures under `src/z80asm/dev/cpu/` (see **`tool-z80asm`**).
 ## Related
 
 - Full opcode grid: [references/opcodes.md](references/opcodes.md)
+- 8080-only jobs (no extras): `cpu-8080` — do not load both for one CPU
 - How to read z80asm ok/err fixtures: `.agents/skills/tool-z80asm/SKILL.md` (`src/z80asm/dev/cpu/`)
 - Measurement / A/B: `.agents/skills/methodology-measure/SKILL.md`
 - copt vs library asm: `.agents/skills/tool-copt/SKILL.md`

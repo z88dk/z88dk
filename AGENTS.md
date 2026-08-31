@@ -74,7 +74,7 @@ Each skill lives at `.agents/skills/<name>/SKILL.md`. The directory name is the 
 | `cpu-z80` | Z80 IX/IY/exx library asm |
 | `cpu-z80n` | Next Z80N ops, nextreg, copper; `+zxn` / math32_z80n |
 | `cpu-z180` | Z180 / mlt / related products |
-| `cpu-8080` | 8080 (no 8085 extended) |
+| `cpu-8080` | Intel 8080 original ISA; no extras; Pastraiser flags |
 | `cpu-vm1` | KR580VM1: 8080 + RS/MB, HL′, dual bank, not 8085 extras |
 | `cpu-gbz80` | Game Boy CPU path |
 
