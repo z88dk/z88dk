@@ -468,6 +468,18 @@ static int  hlde_belief_droppable(int v)
     const Func *f = cur_lazy_func;
     if (!f || v < 0) return 0;
     if (f->vreg_spill_slot && f->vreg_spill_slot[v] >= 0) return 1;
+    /* An IN-PLACE PARAM is recoverable too, and for the same reason: it has a
+       memory home — the caller's frame — that slot_off() reaches via
+       param_caller_off. It just is not a SPILL slot, so vreg_spill_slot is -1
+       for it and the test above missed every one. That is not a corner case:
+       params are most of what the indirect word store stores, and missing them
+       is what kept gen_st_mem's DE-direct path (IR_HL_CARRY inc1) off for
+       `p->field = param` — the store then routed the value through HL, evicted
+       the base, and paid a park + restore to get it back.
+       NB this is a MEMORY home, so the register-home hazard the predicate exists
+       to avoid does not apply: a NO_SLOT vreg whose only home is a register is
+       still excluded, and dropping its belief would still strand it. */
+    if (f->vregs && (f->vregs[v].flags & IR_VREG_PARAM_IN_PLACE)) return 1;
     return vreg_is_remat(f, v);
 }
 static void clob_verify_report(void)
@@ -536,7 +548,8 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
     if (emit_trace_on < 0)  emit_trace_on  = getenv("IR_EMIT_TRACE") ? 1 : 0;
     int acarry = a_carry_enabled();
     int hlcarry = hl_carry_enabled();
-    if (spill_stats_on || verify_on || clob_verify_on || emit_trace_on || acarry || hlcarry || frameprobe_on()) {
+    if (spill_stats_on || verify_on || clob_verify_on || getenv("IR_HOME_SLOT_VERIFY")
+        || emit_trace_on || acarry || hlcarry || frameprobe_on()) {
         /* Fully-expanded instruction text. Buffer only when a probe is on; the
            emitted bytes are unchanged. */
         char buf[256];
@@ -554,7 +567,8 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
                 if (fh_cur_red) rec_fh_redbytes[fh_cur_v] += nb;
             }
         }
-        if ((verify_on || clob_verify_on) && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
+        if ((verify_on || clob_verify_on || getenv("IR_HOME_SLOT_VERIFY"))
+            && verify_len + (int)strlen(buf) + 2 < (int)sizeof verify_buf)
             verify_len += snprintf(verify_buf + verify_len,
                                    sizeof verify_buf - verify_len, "%s\n", buf);
         if (emit_trace_on) emit_trace_check(buf);
@@ -774,11 +788,23 @@ static int hlde_full_reload(const char *s, const char *pair)
    DEFAULT-ON; `IR_JR=0` opts out (byte-identical to the pre-relaxation
    compiler). Regression: test/suites/long_ir/jrelax.c. */
 static int relax_uc = -1;
-static int relax_uncond_ok(void)     /* IR_JR_UNCOND=1: allow uncond-in-loop */
+/* The one conversion that cannot pay for itself is an always-taken branch, and
+   the paragraph above prices that from the Z80's timings. It is not a universal
+   fact. An unconditional `jr` is +2 T on z80 but CHEAPER than `jp` on the
+   gameboy (12 cycles vs 16) and on z180 (8 vs 9), and free on kc160. So the
+   exclusion is per-CPU, measured on lexbench — -12 B on every target, and:
+
+     ez80  -0.66 %   gbz80 -0.58 %   z180 -0.18 %   kc160  0.00 %   → relax
+     z80   +0.33 %   z80n  +0.33 %   r2ka  +3.15 %  r4k   +3.05 %   → keep the jp
+
+   `IR_JR_UNCOND=1` forces it on anywhere, `=0` off. */
+static int relax_uncond_ok(void)
 {
     if (relax_uc < 0) {
         const char *e = getenv("IR_JR_UNCOND");
-        relax_uc = (e && e[0] == '1');
+        if (e) relax_uc = (e[0] == '1');
+        else   relax_uc = IS_GBZ80() || IS_EZ80() || IS_KC160()
+                       || c_cpu == CPU_Z180;
     }
     return relax_uc;
 }
@@ -2803,6 +2829,28 @@ RegMask op_clobbers(const Func *f, const Op *op)
     }
 }
 
+/* [IR_HOME_SLOT_VERIFY] Inert allocator/lowerer coherence check.
+
+   A normal pair home is slotless.  A pair-homed value that still has a stack
+   slot is therefore a transitional / ranged-home shape: both the lowerer's
+   register belief and a memory copy exist.  If an unrelated op clobbers the
+   pair while the value is still live, the two cannot both be authoritative.
+   In particular, a later reload can read a stale slot after a definition was
+   stamped only into the home register.  That is the hist_pass hang exposed by
+   the frequency-weight stress ranking.
+
+   Check the FINAL allocation, after any deferred general-DE home has either
+   formed or reverted, rather than the allocator's earlier proposal.  This is
+   intentionally a verifier, not an allocation veto: op_clobbers is a
+   conservative model and the report tells us which lowering contracts must be
+   made explicit before a new ranking can be promoted.  A home definition is
+   excluded; it establishes the value and is responsible for maintaining the
+   chosen canonical copy. */
+static int home_slot_verify_enabled(void)
+{
+    return getenv("IR_HOME_SLOT_VERIFY") != NULL;
+}
+
 /* ---- B4 recoverability verifier state (per function, final render) ---- */
 static int   rec_on = -1;         /* -1 = unqueried; 0/1/2 = off/on/verbose */
 static int  *rec_reg;             /* per-vreg: uses recovered from a register */
@@ -2828,6 +2876,12 @@ static int  *rec_slotuse;
    missed write site only over-counts reads → a live-looking slot → conservative
    (store kept). Never over-count writes. */
 static int  *rec_slotwrite;
+/* [IR_HOME_SLOT_VERIFY] Per-vreg coherence bit for a pair home that also has a
+   slot.  A definition makes the slot stale until one of the normal store
+   helpers writes it.  The actual-emission verifier reports only a subsequent
+   destructive home clobber while this bit is set. */
+static char *home_slot_dirty;
+static int   home_slot_dirty_nv;
 /* [IR_FRAMEPROBE, inert] Frame-traffic census. rec_fh_red[v] counts REDUNDANT
    slot reads of v: a read in the same call-free region as an earlier read of v
    with no intervening write. That is the residency opportunity — a value the
@@ -2927,9 +2981,11 @@ static void rec_reset(void)
     free(rec_reg); free(rec_slot); free(rec_remat); free(rec_slotuse);
     free(rec_slotwrite); free(rec_fh_red); free(rec_fh_seen);
     free(rec_fh_bytes); free(rec_fh_redbytes);
+    free(home_slot_dirty);
     rec_fh_bytes = rec_fh_redbytes = NULL; fh_cur_v = -1; fh_cur_red = 0; fh_nv = 0;
     rec_reg = rec_slot = rec_remat = rec_slotuse = rec_slotwrite = NULL;
     rec_fh_red = NULL; rec_fh_seen = NULL;
+    home_slot_dirty = NULL; home_slot_dirty_nv = 0;
     rec_nv = 0; rec_counting = 0;
 }
 
@@ -2939,7 +2995,7 @@ static void rec_begin(const Func *f)
 {
     rec_reset();
     ds_ixaccess = 0;                  /* [#13] per-render (ix+-d)-access count */
-    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled()
+    if ((!rec_enabled() && !deadframe_on() && !dsx_enabled() && !home_slot_verify_enabled()
          && !ff_enabled())
         || L.ss_phase == 1 || f->n_vregs <= 0)
         return;
@@ -2953,8 +3009,11 @@ static void rec_begin(const Func *f)
     rec_fh_seen   = calloc((size_t)rec_nv, 1);
     rec_fh_bytes    = calloc((size_t)rec_nv, sizeof(int));
     rec_fh_redbytes = calloc((size_t)rec_nv, sizeof(int));
+    home_slot_dirty  = calloc((size_t)rec_nv, 1);
+    home_slot_dirty_nv = rec_nv;
     fh_nv = rec_nv;
-    if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite) {
+    if (!rec_reg || !rec_slot || !rec_remat || !rec_slotuse || !rec_slotwrite
+        || !home_slot_dirty) {
         rec_reset(); return; }
     rec_counting = 1;
 }
@@ -2970,6 +3029,8 @@ static void note_slot_use(int v)
     if (!rec_counting || v < 0 || v >= rec_nv || !rec_slotuse) return;
     rec_slotuse[v]++;
     if (slot_write_ctx && rec_slotwrite) rec_slotwrite[v]++;
+    if (slot_write_ctx && home_slot_dirty && v < home_slot_dirty_nv)
+        home_slot_dirty[v] = 0;
     /* Was v ALREADY read in this call-free region? That, and only that, makes
        THIS read redundant — sample the latch BEFORE updating it. (Testing
        rec_fh_red[v] > 0 instead means "v was ever redundant", which wrongly
@@ -3400,6 +3461,75 @@ static void rec_end(const Func *f)
 
 /* Cross-check the just-lowered op's emitted instructions against op_clobbers.
    Logs (does not abort) so a full corpus run reveals every model gap. */
+/* Actual-emission half of IR_HOME_SLOT_VERIFY.  instr_effects has already
+   reduced push/pop-protected scratch use and register swaps, so this observes
+   a net destructive write rather than op_clobbers' conservative may-clobber
+   classification.  The static allocation has a pair home and a slot only in
+   the transitional/ranged cases that need this check. */
+static void home_slot_verify_mark_defs(const Func *f, const Op *op)
+{
+    if (!home_slot_verify_enabled() || L.ss_phase == 1 || !home_slot_dirty
+        || !f->vreg_to_phys || !f->vreg_spill_slot || L.ss_cur_g < 0)
+        return;
+    int defs[8];
+    int nd = ir_op_defs(op, defs, 8);
+    for (int d = 0; d < nd; d++) {
+        int v = defs[d];
+        if (v < 0 || v >= home_slot_dirty_nv) continue;
+        PhysReg pr = f->vreg_to_phys[v];
+        if ((pr != IR_PR_BC && pr != IR_PR_DE) || f->vreg_spill_slot[v] < 0)
+            continue;
+        const LiveRange *lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) continue;
+        int lo = lr->start, hi = lr->end;
+        if (f->home_lo && f->home_lo[v] > lo) lo = f->home_lo[v];
+        if (f->home_hi && f->home_hi[v] < hi) hi = f->home_hi[v];
+        if (L.ss_cur_g >= lo && L.ss_cur_g <= hi) home_slot_dirty[v] = 1;
+    }
+}
+
+static void home_slot_verify_actual(const Func *f, const Op *op,
+                                    RegMask actual, RegMask swapped)
+{
+    if (!home_slot_verify_enabled() || L.ss_phase == 1 || !cur_bb
+        || !f->vreg_to_phys || !f->vreg_spill_slot || L.ss_cur_g < 0)
+        return;
+    for (int v = 0; v < f->n_vregs; v++) {
+        PhysReg pr = f->vreg_to_phys[v];
+        if ((pr != IR_PR_BC && pr != IR_PR_DE) || f->vreg_spill_slot[v] < 0)
+            continue;
+        if (v >= home_slot_dirty_nv || !home_slot_dirty[v]) continue;
+        const LiveRange *lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) continue;
+        int lo = lr->start, hi = lr->end;
+        if (f->home_lo && f->home_lo[v] > lo) lo = f->home_lo[v];
+        if (f->home_hi && f->home_hi[v] < hi) hi = f->home_hi[v];
+        if (L.ss_cur_g < lo || L.ss_cur_g > hi) continue;
+
+        RegMask home = phys_regmask(f, v);
+        if (!(actual & home & ~swapped)) continue;
+        int defs[8];
+        int nd = ir_op_defs(op, defs, 8), is_def = 0;
+        for (int d = 0; d < nd; d++)
+            if (defs[d] == v) { is_def = 1; break; }
+        if (is_def) continue;  /* definition established the dirty home */
+        const BitSet *live = NULL;
+        if (cur_op_idx + 1 < cur_bb->n_ops)
+            live = ir_op_live_in(cur_bb, cur_op_idx + 1);
+        else if (cur_bb->live_out)
+            live = (const BitSet *)cur_bb->live_out;
+        if (!live || !ir_bitset_get(live, v)) continue;
+
+        fprintf(stderr,
+            "IR_HOME_SLOT_VERIFY: %s v%d %s slot=%d res=[%d,%d] "
+            "net-clobbered at bb%d op%d %s while live — ambiguous home/slot authority\n",
+            f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr),
+            f->vreg_spill_slot[v], lo, hi, cur_bb->id, cur_op_idx,
+            ir_op_name(op->kind));
+        if (getenv("IR_HOME_SLOT_VERIFY_ABORT")) abort();
+    }
+}
+
 static void ir_verify_op(const Func *f, const Op *op, const char *buf)
 {
     RegMask actual = 0, pushed = 0; int unknown = 0;
@@ -3423,6 +3553,7 @@ static void ir_verify_op(const Func *f, const Op *op, const char *buf)
           actual |= e.writes; self_pres |= e.self_pres; swapped |= e.swapped;
           if (e.unknown) unknown = 1; }
     }
+    home_slot_verify_actual(f, op, actual, swapped);
     /* IR_CLOB_VERIFY stale-cache check: the op's emitted code ACTUALLY wrote a
        reg (in `actual`), yet rs.<reg> still equals the pre-op snapshot (a live
        vreg) — the physical reg was clobbered but the residency cache still claims
@@ -4832,6 +4963,11 @@ int ir_lower_func(FILE *out, Func *f)
            reclaims the dead LD_SYM). After cse so a folded compare's imm_sym
            can't confuse value numbering. */
         int symcmp  = ir_opt_sym_cmp_fold(f);
+        (void)ir_opt_sym_addr_fold(f);   /* &g+K -> one symbol immediate */
+        /* Then the DEREF of such an address -> an absolute load. After
+           sym_addr_fold so a base it just folded is visible; before dce,
+           which reclaims the LD_SYM once every use has folded. */
+        (void)ir_opt_sym_deref_fold(f);
         (void)ir_opt_conv_mask_fold(f);   /* AND(sx,mask)→zx; dce reclaims the sx */
         int dce     = ir_opt_dce(f);
         /* Re-type promoted int ops whose result is only truncated to a
@@ -5316,6 +5452,24 @@ int ir_lower_func(FILE *out, Func *f)
     int df_retry_done = 0;   /* dead-frame elision: at most one re-lower */
     int ds_retry_done = 0;   /* [IR_DEADSTORE] dead byte-spill elision: one re-lower */
     int hd_retry_done = 0;   /* [home-demote] unrealizable home: one re-lower */
+    /* [IR_HOMEMAP] Inert: dump every vreg's home, slot and residency window.
+       hr_recoverability_verify only compares vregs that BOTH carry a pair/byte
+       home in vreg_to_phys, so it is blind to a home clobbered by a register
+       used as SCRATCH. This shows the raw map so the two can be told apart. */
+    if (getenv("IR_HOMEMAP")) {
+        for (int v = 0; v < f->n_vregs; v++) {
+            PhysReg pr = f->vreg_to_phys ? f->vreg_to_phys[v] : IR_PR_SPILL;
+            const LiveRange *lr = ir_live_range(f, v);
+            fprintf(stderr, "HOMEMAP %-16s v%-4d phys=%-6s slot=%-5d "
+                    "home=[%d,%d] live=[%d,%d] w=%d flags=%#x\n",
+                    f->fn ? ir_sym_name(f->fn) : "?", v, ir_phys_name(pr),
+                    f->vreg_spill_slot ? f->vreg_spill_slot[v] : -1,
+                    f->home_lo ? f->home_lo[v] : -1,
+                    f->home_hi ? f->home_hi[v] : -1,
+                    lr ? lr->start : -1, lr ? lr->end : -1,
+                    f->vregs[v].width, f->vregs[v].flags);
+        }
+    }
  deadframe_retry:
     /* Render into a DISCARDABLE buffer whether or not labels are being elided.
        The dead-store / dead-frame retries below `goto deadframe_retry` and
@@ -6921,17 +7075,21 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
                global index so pass 1 records against it and pass 2's
                verdict (ss_store_dead) is read for it. */
             L.ss_cur_g = L.ss_op_base ? L.ss_op_base[bb->id] + j : -1;
-            if (verify_on > 0 || clob_verify_on > 0) {
+            if (verify_on > 0 || clob_verify_on > 0 || home_slot_verify_enabled()) {
                 verify_len = 0;   /* capture this op's emitted asm */
                 clob_snap_hl = L.rs.hl; clob_snap_de = L.rs.de;   /* rs.* at op entry */
                 clob_snap_bc = L.rs.bc; clob_snap_a  = L.rs.a;
             }
+            home_slot_verify_mark_defs(f, op);
             if (op->kind == IR_RET) {
                 rc = lower_ret(out, f, op);
             } else {
                 rc = lower_op(out, f, op);
             }
-            if (verify_on > 0 || clob_verify_on > 0) { verify_buf[verify_len] = 0; ir_verify_op(f, op, verify_buf); }
+            if (verify_on > 0 || clob_verify_on > 0 || home_slot_verify_enabled()) {
+                verify_buf[verify_len] = 0;
+                ir_verify_op(f, op, verify_buf);
+            }
             /* [IR_CALLSPLIT] A def of a call-split value OUTSIDE its BC span
                writes the slot (its canonical home) but does NOT update BC, so a
                BC belief left over from the span now LIES (holds the pre-def

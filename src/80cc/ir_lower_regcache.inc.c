@@ -639,6 +639,75 @@ static void load_to_hl(FILE *out, const Func *f, int vreg_id)
     load_to_hl_adj(out, f, vreg_id, 0);
 }
 
+/* [SYMADDR_DEREF] Would `load_to_hl(v)` reach the REMATERIALISE rung?
+
+   A mirror of every rung load_to_hl_adj tries BEFORE emit_remat_word: a park to
+   pop, a register that already holds the value, or a register home to copy from.
+   If any of those hold, the base is already cheap to reach (2-3 bytes) and there
+   is nothing to fold. Conservative in the safe direction — a false 0 only loses
+   the fold, never correctness. The PR_STACK rung is the one that MUST be
+   mirrored: its load is a `pop` that balances a `push` at the def, and
+   rematerialising the address instead would leak the parked word.
+
+   Width is 2 because that is the only width emit_remat_word handles, and the
+   byte rungs (idxhalf, a_has) sit above it. */
+static int hl_load_takes_remat(const Func *f, int v)
+{
+    if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
+    if (vreg_is_pr_stack(f, v)) return 0;
+    if (hl_has(v) || bc_has(v) || de_has(v)) return 0;
+    if (g_hc.home_is_word && v == g_hc.func_whome && byte_home_holds(v)) return 0;
+    if (vreg_in_exx(f, v) || vreg_in_idx2(f, v) || vreg_in_pr_bc(f, v)) return 0;
+    return 1;
+}
+
+/* [SYMADDR_DEREF] Load `base` into HL for a deref at constant offset `off`,
+   folding the offset into the symbol where the base is a rematerialisable
+   `&symbol`. Returns the offset the CALLER still has to add: 0 when it folded,
+   `off` unchanged otherwise.
+
+   `gen_ld_sym` already folds its own offset, so `&g.field` is one `ld hl,_g+K`.
+   The DEREF of a struct-member address did not: the base materialised bare and
+   the field offset became a separate add —
+
+       ld hl,_suite / ld de,206 / add hl,de     7 bytes
+       ld hl,_suite+206                         3 bytes
+
+   Same fold, same rematerialisation licence: the address is a link-time
+   constant, so folding a constant into it is free. Only fires where the base
+   would otherwise be rematerialised (hl_load_takes_remat) — a base already
+   sitting in a register is cheaper to copy than to re-emit, and folding there
+   would trade 2 bytes for 3.
+
+   LD_IMM bases are deliberately NOT folded here: a NO_SLOT immediate had its
+   own miscompile (see the remat marking in ir_lower.c) and the address-of case
+   is where the offsets are.
+
+   Negative and zero totals fall through to the plain load — `_sym+-4` is a
+   formatting question, not a codegen one, and the small-offset case is already
+   an inc/dec chain. */
+static int load_to_hl_fold_off(FILE *out, const Func *f, int base, int off)
+{
+    if (off <= 0 || !g_hc.remat_def) goto plain;
+    if (opt_disabled("symaddr-deref")) goto plain;
+    if (!hl_load_takes_remat(f, base)) goto plain;
+    {
+        const Op *o = g_hc.remat_def[base];
+        if (!o || o->kind != IR_LD_SYM || !o->mem.sym) goto plain;
+        if (o->mem.offset + off <= 0) goto plain;
+        emit(out, "ld\thl,%s%s+%d", ir_sym_prefix(o->mem.sym),
+             ir_sym_name(o->mem.sym), o->mem.offset + off);
+        rec_note(REC_REMAT, base);
+        /* HL is base+off, NOT the base vreg — no belief to advertise. Every
+           consumer below commits its own (commit_hl_word / commit_a_byte). */
+        invalidate_hl_cache();
+        return 0;
+    }
+plain:
+    load_to_hl(out, f, base);
+    return off;
+}
+
 /* Load 16-bit value into DE (binop second operand). Cache-aware: DE hit
    is a no-op; HL hit uses `ex de,hl`; else load via HL then ex de,hl.
    After: rs.de = vreg_id; HL holds whatever DE was (junk). */
@@ -2200,6 +2269,16 @@ static int cmp_bytewise_shape_ok(const Func *f, const Op *o)
     if (!f->vreg_to_phys) return 0;
     if (!vreg_in_pr_bc(f, s0)) return 0;     /* LHS in BC */
     if (!vreg_is_spilled(f, s1)) return 0;   /* RHS in a slot */
+    /* ...and it must HAVE one. A rematerialisable constant (LD_IMM / LD_SYM /
+       remat LEA) is IR_PR_SPILL but carries IR_VREG_NO_SLOT, so vreg_is_spilled
+       says yes while slot_off returns -1 and the sp form emits `ld hl,-1;
+       add hl,sp` — a garbage address the byte-walk then compares against. Read
+       those by rematerialising instead. cmp_bytewise_mem_shape_ok and
+       word_dehome_signed_test_shape_ok both already make this check; this one
+       did not, which was latent until a pass started folding more addresses
+       into LD_SYM (ptrbench matrix_walk_global). */
+    if (g_hc.remat_def && g_hc.remat_def[s1]) return 0;
+    if (f->vreg_spill_slot && f->vreg_spill_slot[s1] < 0) return 0;
     if (f->vregs[s1].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     if (fp_active(f)) {
         int ix = slot_ix_off(f, s1);
@@ -2643,6 +2722,13 @@ static int sp_cmp_slot(const Func *f, int v)
 {
     if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
     if (!vreg_is_spilled(f, v)) return 0;
+    /* Spilled is not the same as HAVING A SLOT. A rematerialisable constant
+       (LD_IMM / LD_SYM / remat LEA) is IR_PR_SPILL but NO_SLOT, so slot_off
+       returns -1 and the caller emits `ld hl,-1; add hl,sp` — an address below
+       sp that the byte-walk then compares against. Same guard as
+       cmp_bytewise_mem_shape_ok and word_dehome_signed_test_shape_ok. */
+    if (g_hc.remat_def && g_hc.remat_def[v]) return 0;
+    if (f->vreg_spill_slot && f->vreg_spill_slot[v] < 0) return 0;
     if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     return 1;
 }

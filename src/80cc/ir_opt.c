@@ -17,6 +17,7 @@ extern int ir_cpu_const_store_ok(int width);
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <limits.h>
 
 /* Shadow entry: the most recent IR_ST_MEM at this address; the stored
    vreg is the value live there until invalidated.
@@ -2108,6 +2109,215 @@ int ir_opt_dce(Func *f)
     return removed;
 }
 
+/* ---- Fold `&g + K` into the symbol's own offset --------------------------
+   A symbol address is a link-time constant, so the address of a member at a
+   constant offset is one too. The frontend still builds it in two steps —
+   `t = &g` then `r = t + K` — which lowers to `ld hl,g; ld de,K; add hl,de`:
+   four instructions and ten bytes for what the assembler can fold into one
+   `ld hl,g+K` (three). 80cc already folds the LOAD form (`ld hl,(g+K)`); this
+   is the ADDRESS form, and it is the shape every `&s.member` / `&a[const]` /
+   struct-member access through a global takes. The test framework's own
+   `suite.name` / `suite.num_tests` accesses hit it eight times in one 132-line
+   file, and that file is linked into every benchmark binary.
+
+   Rewrite `ADD dst, (LD_SYM &g+o), K` to `LD_SYM dst, &g+(o+K)` in place; the
+   original LD_SYM is left for the following DCE to reclaim if it is now dead
+   (it often is not — the base is usually read too). Per-BB, width-2, plain
+   symbols only (no namespaced/addressmod bank, matching sym_cmp_fold).
+   --opt-disable=sym-addr-fold opts out. */
+int ir_opt_sym_addr_fold(Func *f)
+{
+    if (!f) return 0;
+    /* DEFAULT-ON; `IR_SYMADDR=0` opts out. A folded ADD becomes a symbol
+       address, which the allocator treats as rematerialisable and drops the slot
+       for — that exposed two lowerer byte-walk compares (cmp_bytewise_shape_ok,
+       sp_cmp_slot) which read a NO_SLOT vreg's slot and emitted `ld hl,-1;
+       add hl,sp`. Both now carry the guard their two siblings already had; the
+       fold is only safe with those in place. */
+    {
+        const char *e = getenv("IR_SYMADDR");
+        if (e && e[0] == '0') return 0;
+    }
+    if (opt_disabled("sym-addr-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    /* FUNCTION-WIDE, not per-BB: the addend is materialised by its own LD_IMM
+       which loop-invariant motion has usually hoisted into another block, so a
+       per-BB scan sees the ADD but not the constant. A vreg counts as a symbol
+       address (or a constant) when it has exactly ONE def and that def says so,
+       which makes the value the same everywhere it is read. */
+    SYMBOL **sym = calloc((size_t)nv, sizeof(SYMBOL *));
+    int     *off = calloc((size_t)nv, sizeof(int));
+    int     *isk = calloc((size_t)nv, sizeof(int));
+    int64_t *kval = calloc((size_t)nv, sizeof(int64_t));
+    int     *ndef = calloc((size_t)nv, sizeof(int));
+    if (!sym || !off || !isk || !kval || !ndef) {
+        free(sym); free(off); free(isk); free(kval); free(ndef); return 0;
+    }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->dst >= 0 && op->dst < nv) ndef[op->dst]++;
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->dst < 0 || op->dst >= nv || ndef[op->dst] != 1) continue;
+            if (op->kind == IR_LD_SYM && op->mem.sym && !op->mem.bank_fn) {
+                sym[op->dst] = op->mem.sym; off[op->dst] = op->mem.offset;
+            } else if (op->kind == IR_LD_IMM && !op->imm_sym) {
+                isk[op->dst] = 1; kval[op->dst] = op->imm;
+            }
+        }
+    /* A folded ADD becomes a symbol address, and a symbol address is
+       REMATERIALISABLE — the allocator drops its slot and rebuilds it at each
+       reader. That does not compose with a pointer-store RMW, which holds the
+       base in a register across the value's `pop hl`; the same exclusion is why
+       ir_alloc's symbol-address remat skips IR_ST_MEM bases. Folding one here
+       miscompiled ptrbench. Mark every store base and leave those alone. */
+    int *st_base = calloc((size_t)nv, sizeof(int));
+    if (!st_base) { free(sym); free(off); free(isk); free(kval); free(ndef); return 0; }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->kind == IR_ST_MEM && o->mem.kind == IR_MEM_VREG
+                && o->mem.base >= 0 && o->mem.base < nv)
+                st_base[o->mem.base] = 1;
+        }
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_ADD || op->imm_sym) continue;
+            if (op->dst >= 0 && op->dst < nv && st_base[op->dst]) continue;
+            if (op->dst < 0 || op->dst >= nv) continue;
+            if (f->vregs[op->dst].width != 2) continue;
+            int s0 = op->src[0], s1 = op->src[1];
+            SYMBOL *g = NULL; int64_t k = 0; int base = -1;
+            if (s0 >= 0 && s0 < nv && sym[s0]) {
+                if (s1 == -1)                           { g = sym[s0]; k = op->imm;  base = s0; }
+                else if (s1 >= 0 && s1 < nv && isk[s1]) { g = sym[s0]; k = kval[s1]; base = s0; }
+            } else if (s1 >= 0 && s1 < nv && sym[s1]
+                       && s0 >= 0 && s0 < nv && isk[s0]) {
+                g = sym[s1]; k = kval[s0]; base = s1;        /* commuted */
+            }
+            if (!g || k < INT_MIN || k > INT_MAX) continue;
+            int o = off[base] + (int)k;
+            memset(&op->mem, 0, sizeof op->mem);
+            op->kind = IR_LD_SYM;
+            op->mem.kind = IR_MEM_SYM;
+            op->mem.sym = g;
+            op->mem.offset = o;
+            op->src[0] = op->src[1] = -1;
+            op->imm = 0;
+            if (ndef[op->dst] == 1) { sym[op->dst] = g; off[op->dst] = o; }
+            changed++;
+        }
+    }
+    free(sym); free(off); free(isk); free(kval); free(ndef); free(st_base);
+    return changed;
+}
+
+/* ---- Fold a deref through a &symbol base into an absolute load ----------
+   The sibling of ir_opt_sym_addr_fold. That one folds the ADDRESS form
+   (`&g + K` -> one symbol immediate); this folds the DEREF of such an address
+   into the absolute `IR_MEM_SYM` load the same access gets when the frontend
+   sees it directly:
+
+       g.b                 ->  LD_MEM sym[&g+202]   ->  ld hl,(_g+202)     3 B
+       p = &g; ... p->b    ->  LD_MEM [v15+202]     ->  ld hl,_g+202       7 B
+                                                        ld a,(hl+)
+                                                        ld h,(hl); ld l,a
+
+   Both name the same link-time-constant address, so the second form is pure
+   loss — 4 bytes and ~20 T a site. It appears whenever the base survives as its
+   own vreg: a `&g` that LICM hoisted to a preheader, or one CSE shared between
+   several member reads. `test/framework/test.c` — linked into EVERY benchmark
+   binary — takes it 14 times for `suite.setup` / `suite.teardown` / `suite.tests`.
+
+   Rewrite `LD_MEM dst, [v + K]` to `LD_MEM dst, sym[&g + (o + K)]` when v has
+   exactly ONE def and that def is `LD_SYM &g + o`. The base vreg's use goes
+   away; when every use folds, the following DCE reclaims the LD_SYM AND the
+   allocator drops its slot.
+
+   Function-wide single-def, for the same reason sym_addr_fold is: the LD_SYM
+   has usually been hoisted out of the block that derefs it.
+
+   EXCLUSIONS:
+   - post_step != 0: the base is `p++`-stepped after the load. The absolute form
+     has no base to step, so folding would silently drop the increment.
+   - bank_fn, on the deref OR the symbol: an __addressmod access must call the
+     page-in function, and the two mem kinds recover the namespace differently.
+   - a symbol whose ir_sym_prefix() is not "_": the IR_MEM_SYM lowering hardcodes
+     the underscore, where gen_ld_sym asks ir_sym_prefix. Only __LIB__ FUNC
+     symbols differ, and their address is not dereferenced as data — but this
+     routes NEW traffic onto that path, so do not rely on it.
+   - a negative total offset: it addresses outside the object, and the lowering
+     spells the offset `+%d` (`_g+-4`).
+   `elem` and `volatile_` are preserved — the fold changes how the address is
+   formed, never the width or the number of accesses.
+   --opt-disable=sym-deref-fold opts out. */
+int ir_opt_sym_deref_fold(Func *f)
+{
+    if (!f) return 0;
+    if (opt_disabled("sym-deref-fold")) return 0;
+    int nv = f->n_vregs;
+    if (nv <= 0) return 0;
+    SYMBOL **sym  = calloc((size_t)nv, sizeof(SYMBOL *));
+    int     *off  = calloc((size_t)nv, sizeof(int));
+    int     *ndef = calloc((size_t)nv, sizeof(int));
+    if (!sym || !off || !ndef) { free(sym); free(off); free(ndef); return 0; }
+
+    /* Count defs with ir_op_defs, NOT op->dst: a post-stepping `*p++` load or
+       store REDEFINES its base in place (base += step) and reports that through
+       ir_op_defs with no dst of its own. Counting dst alone made such a base
+       look single-def — so `p = &arr; a = *p++; b = *p;` folded the SECOND load
+       back to &arr+0 and read element 0 twice (long_ir irgaps test_ptr_post_inc,
+       every CPU). Excluding the deref that carries post_step is not enough; it
+       is the OTHER uses of a stepped base that go wrong. */
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int defs[8];
+            int nd = ir_op_defs(&f->bbs[b].ops[j], defs, 8);
+            for (int k = 0; k < nd; k++)
+                if (defs[k] >= 0 && defs[k] < nv) ndef[defs[k]]++;
+        }
+    for (int b = 0; b < f->n_bbs; b++)
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            const Op *op = &f->bbs[b].ops[j];
+            if (op->kind != IR_LD_SYM || op->dst < 0 || op->dst >= nv) continue;
+            if (ndef[op->dst] != 1) continue;
+            if (!op->mem.sym || op->mem.bank_fn) continue;
+            if (ir_sym_bank_fn(op->mem.sym)) continue;
+            if (strcmp(ir_sym_prefix(op->mem.sym), "_") != 0) continue;
+            sym[op->dst] = op->mem.sym;
+            off[op->dst] = op->mem.offset;
+        }
+
+    int changed = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        BB *bb = &f->bbs[b];
+        for (int j = 0; j < bb->n_ops; j++) {
+            Op *op = &bb->ops[j];
+            if (op->kind != IR_LD_MEM) continue;
+            if (op->mem.kind != IR_MEM_VREG) continue;
+            if (op->mem.post_step || op->mem.bank_fn) continue;
+            int v = op->mem.base;
+            if (v < 0 || v >= nv || !sym[v]) continue;
+            long total = (long)off[v] + (long)op->mem.offset;
+            if (total < 0 || total > INT_MAX) continue;
+            op->mem.kind   = IR_MEM_SYM;
+            op->mem.sym    = sym[v];
+            op->mem.offset = (int)total;
+            op->mem.base   = -1;
+            changed++;
+        }
+    }
+    free(sym); free(off); free(ndef);
+    return changed;
+}
+
 /* ---- Fold a &symbol RHS of an EQ/NE compare into a symbol immediate ------
    A symbol address is a link-time constant, so `if (p == &g)` should lower to
    `ld hl,(p); ld de,g; sbc hl,de` exactly like `if (p == 5)` folds `5` into the
@@ -3214,6 +3424,15 @@ int ir_opt_reduce_coalesce(Func *f)
     if (!f) return 0;
     if (!c_word_resident || opt_disabled("word-resident")) return 0;
     if (opt_disabled("reduce-coalesce")) return 0;
+    /* The in-place form this builds is only worth building where the DE home
+       can step it in `add hl,de; ex de,hl`. The gameboy has no `ex de,hl`, so
+       each step becomes `add hl,de` plus two byte moves and the rewrite creates
+       a shape it cannot pay for. Measured over 16 gbz80 benches: the transform
+       fires on two of them and BOTH are better without it — lexbench -27 B
+       -1.74 %, divbench -21 B -1.58 % — with the other fourteen byte-identical.
+       Nothing else on the CPU regresses, so this is a plain exclusion, not a
+       cost gate. */
+    if (IS_GBZ80()) return 0;
     int nv = f->n_vregs;
     if (nv <= 0) return 0;
 

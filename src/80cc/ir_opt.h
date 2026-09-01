@@ -142,6 +142,8 @@ int ir_opt_dce(Func *f);
  * (Op.imm_sym), removing the LD_SYM materialisation. Run before DCE (which
  * reclaims the now-dead LD_SYM). Returns folds made. */
 int ir_opt_sym_cmp_fold(Func *f);
+int ir_opt_sym_addr_fold(Func *f);
+int ir_opt_sym_deref_fold(Func *f);
 /* Rewrite AND(CONV_SX(x), full-source-mask) → CONV_ZX(x): the mask clears the
  * sign-extended bits, so the sign-extend is dead. Run before DCE. */
 int ir_opt_conv_mask_fold(Func *f);

@@ -3109,8 +3109,18 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
         /* Indirect: base vreg holds the address; load through it.
            Cache-aware: if HL already holds the base, skip the load.
            Common after a post-inc save (`old = data`, then deref). */
-        if (!hl_has(op->mem.base))
-            load_to_hl(out, f, op->mem.base);
+        /* [SYMADDR_DEREF] A rematerialisable `&symbol` base folds the field
+           offset into the address (`ld hl,_sym+K`) instead of materialising the
+           base and adding — 3 bytes for what was 7. Returns the offset still
+           owed; 0 means it folded and the add below is skipped. Not on the LHLX
+           path, which reaches the field with its own `ld de,hl+n`. */
+        int mem_off = op->mem.offset;
+        if (!hl_has(op->mem.base)) {
+            if (lhlx_deref)
+                load_to_hl(out, f, op->mem.base);
+            else
+                mem_off = load_to_hl_fold_off(out, f, op->mem.base, mem_off);
+        }
         if (lhlx_deref) {
             if (op->mem.offset == 0) {
                 emit(out, "ex\tde,hl");             /* DE = the address */
@@ -3129,14 +3139,14 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
            free (the load below clobbers it). Any offset (A-add is
            constant-size), so no struct-size cap. */
         if (g_hc.home_is_word && dst_w == 2 && op->dst != g_hc.func_whome
-            && op->mem.offset > 3) {
-            emit_pair_add_de_clean(out, "hl", "l", "h", op->mem.offset,
+            && mem_off > 3) {
+            emit_pair_add_de_clean(out, "hl", "l", "h", mem_off,
                                    L.rs.a < 0);
         } else {
             /* Width 4 can't clobber DE (needed for the high half) —
                scratch through BC; widths 1/2 use DE. Small offsets
                become inc/dec hl chains. */
-            emit_hl_add_offset(out, op->mem.offset, dst_w == 4, 0);
+            emit_hl_add_offset(out, mem_off, dst_w == 4, 0);
         }
         if (dst_w == 1) {
             /* Byte load into A. If dst is dead-after-next (the
@@ -3352,9 +3362,19 @@ static int gen_st_mem(FILE *out, Func *f, const Op *op)
        (`t = &sym; *t = v`): fold to the DIRECT absolute store `ld (sym+off),hl`
        (the MEM_SYM path below), skipping the base-pointer load AND the HL→DE
        value shuffle (`ex de,hl; ld hl,dst; ld (hl),e; inc hl; ld (hl),d` → one
-       `ld (sym),hl`). Excludes post-step (no pointer to step) and banked syms. */
+       `ld (sym),hl`). Excludes post-step (no pointer to step) and banked syms.
+
+       ALSO excludes an IR_PR_STACK base. That home parks the address with a
+       `push` at its def and consumes it with the `pop` inside load_to_hl at its
+       single use; taking the absolute shortcut skips the load, so the pushed
+       word is never popped and the frame is corrupted from there on. Falling
+       through to the normal path costs the base load and stays balanced.
+       Latent until ir_opt_sym_deref_fold started folding the LOAD half of a
+       `sym.field++` RMW, which dropped the base from two uses to one — and one
+       use is exactly the condition for PR_STACK. */
     if (op->mem.kind == IR_MEM_VREG && op->mem.base >= 0 && op->src[0] >= 0
         && !op->mem.post_step
+        && !vreg_is_pr_stack(f, op->mem.base)
         && g_hc.remat_def && op->mem.base < f->n_vregs
         && g_hc.remat_def[op->mem.base]
         && g_hc.remat_def[op->mem.base]->kind == IR_LD_SYM
