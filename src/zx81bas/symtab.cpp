@@ -375,6 +375,7 @@ bool create_symtab(const Prog& prog, std::unique_ptr<Symtab>& out_symtab) {
     auto symtab = std::make_unique<Symtab>();
 
     // pass 1: collect all symbols from the program
+    collect_defined_symbols(prog.vars, *symtab);
     collect_defined_symbols(prog.stmts, *symtab);
 
     // pass 2: check for duplicates and report errors

@@ -12,6 +12,7 @@
 #include "../dump_context.h"
 #include "../lexer.h"
 #include "../utils.h"
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -500,6 +501,33 @@ void Prog::dump(DumpContext ctx) const {
     }
     child_ctx.line("]");
     dump_stmt_list("stmts", stmts, child_ctx);
+    dump_stmt_list("vars", vars, child_ctx);
+    child_ctx.line("procs: [");
+    auto procs_ctx = child_ctx.child();
+    std::vector<std::string> proc_names;
+    for (const auto& [name, proc] : procs) {
+        proc_names.push_back(name);
+    }
+    std::sort(proc_names.begin(), proc_names.end());
+    for (const auto& name : proc_names) {
+        if (auto& proc = procs.at(name)) {
+            proc->dump(procs_ctx);
+        }
+    }
+    child_ctx.line("]");
+    child_ctx.line("fns: [");
+    auto fns_ctx = child_ctx.child();
+    std::vector<std::string> fn_names;
+    for (const auto& [name, fn] : fns) {
+        fn_names.push_back(name);
+    }
+    std::sort(fn_names.begin(), fn_names.end());
+    for (const auto& name : fn_names) {
+        if (auto& fn = fns.at(name)) {
+            fn->dump(fns_ctx);
+        }
+    }
+    child_ctx.line("]");
     ctx.line("}");
 }
 

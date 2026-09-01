@@ -2,7 +2,6 @@
 
 - number lines
 - generate output file
-- create Visitor and Walker patterns
 - add constructors to xxxStmt
 - add printer commands LPRINT, LLIST, COPY
 - detect duplicated PROC arguments and locals
@@ -421,3 +420,61 @@ Convert ASCII strings to ZX81 character set.
 Write .P / .P81 / .TAP.
 
 This separation keeps your compiler clean and debuggable.
+
+
+Let's look at your pipeline again:
+
+Preprocess
+
+Tokenize
+
+Parse
+
+Semantic rewrite (visitor)
+
+remove LOCAL
+
+extract PROC/FN
+
+rewrite identifiers
+
+move pragma vars
+
+canonicalize bodies
+
+Symbol collection
+
+now trivial
+
+Lowering
+
+now trivial
+
+This is exactly the structure used in real compilers.
+
+You've solved the hardest part
+The moment you unify:
+
+a recursive walker
+
+enter/leave hooks
+
+mark-and-erase mutation
+
+canonical top-level structure
+
+your compiler becomes much easier to extend.
+
+You can now add:
+
+constant folding
+
+dead-code elimination
+
+call-graph construction
+
+recursion detection
+
+inlining
+
+lowering passes

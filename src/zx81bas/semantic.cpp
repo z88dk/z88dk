@@ -769,7 +769,37 @@ static void verify_expr_types(const std::vector<std::unique_ptr<Stmt>>& stmts) {
     }
 }
 
+
+// move Pragma-Stmt to the vars section
+struct PragmaMover : ASTWalker {
+    using ASTWalker::visit; // so that base class visit methods are visible
+
+    Prog& prog;
+    PragmaMover(Prog& p) : prog(p) {}
+
+    void visit(PragmaNumVarStmt& stmt) override {
+        prog.vars.push_back(stmt.clone());
+        stmt.mark_for_removal = true;
+    }
+    void visit(PragmaStrVarStmt& stmt) override {
+        prog.vars.push_back(stmt.clone());
+        stmt.mark_for_removal = true;
+    }
+    void visit(PragmaNumVarArrayStmt& stmt) override {
+        prog.vars.push_back(stmt.clone());
+        stmt.mark_for_removal = true;
+    }
+    void visit(PragmaStrVarArrayStmt& stmt) override {
+        prog.vars.push_back(stmt.clone());
+        stmt.mark_for_removal = true;
+    }
+};
+
 bool semantic_check(Prog& prog) {
+    // move Pragma-Stmt to the vars section
+    PragmaMover mover(prog);
+    prog.accept(mover);
+
     check_top_level(prog);
 
     // first collect LOCAL statements, then rewrite DEF PROCs
