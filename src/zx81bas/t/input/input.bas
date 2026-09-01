@@ -1,150 +1,13 @@
-//------------------------------------------------------------------------------
-// Start with some ASM to check that a REM line is created
-//------------------------------------------------------------------------------
-
-#ASM
-		ex af, af'			; tick is removed in preprocessing
-#ENDASM
-
-#ASM
-		ret
-#ENDASM
-
-//------------------------------------------------------------------------------
-// Define macros to be used in the file
-//------------------------------------------------------------------------------
-
+#include "t/input/asm0.inc"
 #include "t/input/const.inc"
-
-//------------------------------------------------------------------------------
-// Test pragmas
-//------------------------------------------------------------------------------
-
 #include "t/input/pragmas.inc"
-
-//------------------------------------------------------------------------------
-// check labels and line numbers in BASIC
-//------------------------------------------------------------------------------
-
-@label1:		LET A = 1
-10				LET A = 1
-11 @label2:		LET A = 1
-@label3: 12		LET A = 1
-
-//------------------------------------------------------------------------------
-// check labels in ASM
-//------------------------------------------------------------------------------
-
-#ASM
-label4:			nop
-#ENDASM
-
-//------------------------------------------------------------------------------
-// check comments
-//------------------------------------------------------------------------------
-
-// comment		// comment
-	LET A = /*
-	
-		*/ 1	'  comment
-#ASM			// comment
-	ld a, /*
-
-		*/ 1	;  comment
-#ENDASM			/* comment */
-
-// comment		// comment
-	LET A = /*
-	
-		*/ 1	'  comment
-#ASM			// comment
-	ld a, /*
-
-		*/ 1	;  comment
-#ENDASM			/* comment */
-
-//------------------------------------------------------------------------------
-// check ticks
-//------------------------------------------------------------------------------
-
-#ASM
-	; Test cpp with ticks
- 	ex af, aF'				; ASM comment
-#ENDASM
-	LET A$ = /* multi-
- 			    -line-
- 			    -comment */ "HELLO WORLD"		' BASIC comment
-
-//------------------------------------------------------------------------------
-// check colon as statment separator
-//------------------------------------------------------------------------------
-
-	LET A=1:LET B=2::LET C=3:::
-#ASM
-	ld a,1:ld a,2::ld a,3:::
-#ENDASM
-
-//------------------------------------------------------------------------------
-// check LET statements
-//------------------------------------------------------------------------------
-
-	LET A=1
-	LET ABC=1
-	LET A(1,2)=1
-	LET A$="HELLO"
-	LET A$(1,2)="A"
-	LET A$(1 TO 2)="AB"
-	LET A$(1,2)(3 TO 4)="AB"
-	LET A$(TO 3)="ABC"
-	LET A$(2 TO)="BCD"
-
-	A=1
-	ABC=1
-	A(1,2)=1
-	A$="HELLO"
-	A$(1,2)="A"
-	A$(1 TO 2)="AB"
-	A$(1,2)(3 TO 4)="AB"
-	A$(TO 3)="ABC"
-	A$(2 TO)="BCD"
-
-//------------------------------------------------------------------------------
-// check usage of functions without arguments
-//------------------------------------------------------------------------------
-
-	LET A=RND
-	LET A$=INKEY$
-	LET A=PI
-
-//------------------------------------------------------------------------------
-// check usage of functions with one argument
-//------------------------------------------------------------------------------
-
-	LET A=CODE"A"
-	LET A=CODE("A")
-	LET A=VAL("1")
-	LET A=LEN("HELLO")
-	LET A=SIN 0
-	LET A=COS 0
-	LET A=TAN 0
-	LET A=ASN 0
-	LET A=ACS 0
-	LET A=ATN 0
-	LET A=LN 1
-	LET A=EXP 1
-	LET A=SQR 2
-	LET A=SGN +1
-	LET A=SGN -1
-	LET A=ABS +1
-	LET A=ABS -1
-	LET A=PEEK 0
-	LET A=PEEKW 0
-	LET A=USR 0
-	LET A$=STR$2
-	LET A$=CHR$0
-	LET A=NOT 0
-	LET A=1 AND 1
-	LET A=0 OR 0
+#include "t/input/asm1.inc"
+#include "t/input/labels.inc"
+#include "t/input/comments.inc"
+#include "t/input/ticks.inc"
+#include "t/input/colon.inc"
+#include "t/input/let.inc"
+#include "t/input/func.inc"
 
 //------------------------------------------------------------------------------
 // check operators
@@ -490,3 +353,5 @@ A = fnempty()
 	CLEAR
 
 1000
+
+#include "t/input/asm2.inc"

@@ -15,9 +15,253 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <string>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
-// verify that DefProcStmt and Pragma nodes only appear at the top level of the program
+// move local variable declarations to the DefProcStmt nodes
+static void collect_local(DefProcStmt& proc_stmt,
+                          std::vector<std::unique_ptr<Stmt>>& stmts) {
+    for (auto i = stmts.begin(); i != stmts.end(); ) {
+        if (auto if_stmt = dynamic_cast<IfStmt*>(i->get())) {
+            collect_local(proc_stmt, if_stmt->then_stmts);
+            collect_local(proc_stmt, if_stmt->else_stmts);
+            ++i;
+        }
+        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(i->get())) {
+            collect_local(proc_stmt, repeat_stmt->body);
+            ++i;
+        }
+        else if (auto while_stmt = dynamic_cast<WhileStmt*>(i->get())) {
+            collect_local(proc_stmt, while_stmt->body);
+            ++i;
+        }
+        else if (auto for_stmt = dynamic_cast<ForStmt*>(i->get())) {
+            collect_local(proc_stmt, for_stmt->body);
+            ++i;
+        }
+        else if (auto local_stmt = dynamic_cast<LocalStmt*>(i->get())) {
+            for (auto& local_var : local_stmt->locals) {
+                if (std::find(proc_stmt.locals.begin(), proc_stmt.locals.end(), local_var)
+                        == proc_stmt.locals.end()) {
+                    proc_stmt.locals.push_back(local_var);
+                }
+            }
+
+            i = stmts.erase(i);
+        }
+        else {
+            ++i;
+        }
+    }
+}
+
+static void collect_local(Prog& prog) {
+    for (const auto& stmt : prog.stmts) {
+        if (dynamic_cast<LocalStmt*>(stmt.get())) {
+            error(stmt->loc,
+                  "LOCAL statement is not allowed outside of a DEF PROC");
+        }
+        else if (auto def_proc_stmt = dynamic_cast<DefProcStmt*>(stmt.get())) {
+            collect_local(*def_proc_stmt, def_proc_stmt->body);
+        }
+    }
+}
+
+// rewrite DEF FN expression replacing each paramater by <FNname><parameter>
+static std::unique_ptr<Expr> rewrite_expr(Expr& expr,
+        const std::string& fn_name,
+        const std::unordered_set<std::string>& params) {
+    if (auto num_expr = dynamic_cast<NumberExpr*>(&expr)) {
+        return std::make_unique<NumberExpr>(num_expr->value, num_expr->loc);
+    }
+    else if (auto label_ref = dynamic_cast<LabelLineRefExpr*>(&expr)) {
+        return std::make_unique<LabelLineRefExpr>(label_ref->name, label_ref->loc);
+    }
+    else if (auto label_addr_ref = dynamic_cast<LabelAddrRefExpr*>(&expr)) {
+        return std::make_unique<LabelAddrRefExpr>(label_addr_ref->name,
+                label_addr_ref->loc);
+    }
+    else if (auto str_expr = dynamic_cast<StringLiteralExpr*>(&expr)) {
+        return std::make_unique<StringLiteralExpr>(str_expr->value, str_expr->loc);
+    }
+    else if (auto var_expr = dynamic_cast<VariableExpr*>(&expr)) {
+        std::string new_name = var_expr->name;
+        auto it = params.find(new_name);
+        if (it != params.end()) {
+            new_name = fn_name + var_expr->name;
+        }
+        return std::make_unique<VariableExpr>(new_name, var_expr->loc);
+    }
+    else if (auto array_ref_expr = dynamic_cast<ArrayRefExpr*>(&expr)) {
+        std::vector<std::unique_ptr<Expr>> rewritten_indices;
+        for (auto& index_expr : array_ref_expr->indices) {
+            auto rewritten_index = rewrite_expr(*index_expr, fn_name, params);
+            rewritten_indices.push_back(std::move(rewritten_index));
+        }
+        auto rewritten_array_ref = std::make_unique<ArrayRefExpr>(
+                                       array_ref_expr->name, array_ref_expr->loc);
+        rewritten_array_ref->indices = std::move(rewritten_indices);
+        return rewritten_array_ref;
+    }
+    else if (auto slice_expr = dynamic_cast<SliceExpr*>(&expr)) {
+        auto rewritten_base = rewrite_expr(*slice_expr->base, fn_name, params);
+        auto rewritten_slice = std::make_unique<SliceExpr>(
+                                   std::move(rewritten_base), slice_expr->loc);
+        if (slice_expr->from) {
+            auto rewritten_from = rewrite_expr(*slice_expr->from, fn_name, params);
+            rewritten_slice->from = std::move(rewritten_from);
+        }
+        if (slice_expr->to) {
+            auto rewritten_to = rewrite_expr(*slice_expr->to, fn_name, params);
+            rewritten_slice->to = std::move(rewritten_to);
+        }
+        return rewritten_slice;
+    }
+    else if (auto un_expr = dynamic_cast<UnaryExpr*>(&expr)) {
+        auto rewritten_operand = rewrite_expr(*un_expr->operand, fn_name, params);
+        auto rewritten_unary = std::make_unique<UnaryExpr>(un_expr->op,
+                               std::move(rewritten_operand), un_expr->loc);
+        return rewritten_unary;
+    }
+    else if (auto bin_expr = dynamic_cast<BinaryExpr*>(&expr)) {
+        auto rewritten_lhs = rewrite_expr(*bin_expr->lhs, fn_name, params);
+        auto rewritten_rhs = rewrite_expr(*bin_expr->rhs, fn_name, params);
+        auto rewritten_binary = std::make_unique<BinaryExpr>(bin_expr->op,
+                                std::move(rewritten_lhs),
+                                std::move(rewritten_rhs),
+                                bin_expr->loc);
+        return rewritten_binary;
+    }
+    else if (auto fn_call_expr = dynamic_cast<BasicFuncCallExpr*>(&expr)) {
+        std::vector<std::unique_ptr<Expr>> rewritten_args;
+        for (auto& arg_expr : fn_call_expr->args) {
+            auto rewritten_arg = rewrite_expr(*arg_expr, fn_name, params);
+            rewritten_args.push_back(std::move(rewritten_arg));
+        }
+        auto rewritten_fn_call = std::make_unique<BasicFuncCallExpr>
+                                 (fn_call_expr->keyword, fn_call_expr->loc);
+        rewritten_fn_call->args = std::move(rewritten_args);
+        return rewritten_fn_call;
+    }
+    else if (auto proc_call_expr = dynamic_cast<ProcCallExpr*>(&expr)) {
+        std::vector<std::unique_ptr<Expr>> rewritten_args;
+        for (auto& arg_expr : proc_call_expr->args) {
+            auto rewritten_arg = rewrite_expr(*arg_expr, fn_name, params);
+            rewritten_args.push_back(std::move(rewritten_arg));
+        }
+        auto rewritten_proc_call = std::make_unique<ProcCallExpr>
+                                   (proc_call_expr->name, proc_call_expr->loc);
+        rewritten_proc_call->args = std::move(rewritten_args);
+        return rewritten_proc_call;
+    }
+    else if (auto fn_call_expr = dynamic_cast<FnCallExpr*>(&expr)) {
+        std::vector<std::unique_ptr<Expr>> rewritten_args;
+        for (auto& arg_expr : fn_call_expr->args) {
+            auto rewritten_arg = rewrite_expr(*arg_expr, fn_name, params);
+            rewritten_args.push_back(std::move(rewritten_arg));
+        }
+        auto rewritten_fn_call = std::make_unique<ProcCallExpr>
+                                 (fn_call_expr->name, fn_call_expr->loc);
+        rewritten_fn_call->args = std::move(rewritten_args);
+        return rewritten_fn_call;
+    }
+    else {
+        error(expr.loc, "Unknown expression type");
+        return std::make_unique<NumberExpr>(0, expr.loc);
+    }
+}
+
+// rewrite DEF FN replacing all parameters by <FNname><param>
+static void rewrite_def_fn(DefFnStmt& def_fn_stmt) {
+    // collect set of parameters
+    std::unordered_set<std::string> params;
+    for (auto& param : def_fn_stmt.params) {
+        if (params.count(param) > 0) {
+            error(def_fn_stmt.loc, "Duplicate parameter '" + param + "'");
+        }
+        params.insert(param);
+    }
+
+    auto rewritten = rewrite_expr(*def_fn_stmt.expr, def_fn_stmt.name, params);
+    def_fn_stmt.expr = std::move(rewritten);
+}
+
+static void rewrite_def_fn(std::vector<std::unique_ptr<Stmt>>& stmts,
+                           int level) {
+    for (auto& stmt : stmts) {
+        if (auto if_stmt = dynamic_cast<IfStmt*>(stmt.get())) {
+            rewrite_def_fn(if_stmt->then_stmts, level + 1);
+            rewrite_def_fn(if_stmt->else_stmts, level + 1);
+        }
+        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
+            rewrite_def_fn(repeat_stmt->body, level + 1);
+        }
+        else if (auto while_stmt = dynamic_cast<WhileStmt*>(stmt.get())) {
+            rewrite_def_fn(while_stmt->body, level + 1);
+        }
+        else if (auto for_stmt = dynamic_cast<ForStmt*>(stmt.get())) {
+            rewrite_def_fn(for_stmt->body, level + 1);
+        }
+        else if (auto def_proc_stmt = dynamic_cast<DefProcStmt*>(stmt.get())) {
+            rewrite_def_fn(def_proc_stmt->body, level + 1);
+        }
+        else if (auto def_fn_stmt = dynamic_cast<DefFnStmt*>(stmt.get())) {
+            if (level > 0) {
+                error(def_fn_stmt->loc,
+                      "DEF FN statement is not allowed inside another statement block");
+            }
+            else {
+                rewrite_def_fn(*def_fn_stmt);
+            }
+        }
+    }
+}
+
+static void rewrite_def_fn(Prog& prog) {
+    rewrite_def_fn(prog.stmts, 0);
+}
+
+// rewrite DEF PROC replacing all parameters and locals by <PROCname><param>
+static void rewrite_def_proc(DefProcStmt& def_proc_stmt) {
+    (void)def_proc_stmt;
+}
+
+static void rewrite_def_proc(std::vector<std::unique_ptr<Stmt>>& stmts,
+                             int level) {
+    for (auto& stmt : stmts) {
+        if (auto if_stmt = dynamic_cast<IfStmt*>(stmt.get())) {
+            rewrite_def_proc(if_stmt->then_stmts, level + 1);
+            rewrite_def_proc(if_stmt->else_stmts, level + 1);
+        }
+        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
+            rewrite_def_proc(repeat_stmt->body, level + 1);
+        }
+        else if (auto while_stmt = dynamic_cast<WhileStmt*>(stmt.get())) {
+            rewrite_def_proc(while_stmt->body, level + 1);
+        }
+        else if (auto for_stmt = dynamic_cast<ForStmt*>(stmt.get())) {
+            rewrite_def_proc(for_stmt->body, level + 1);
+        }
+        else if (auto def_proc_stmt = dynamic_cast<DefProcStmt*>(stmt.get())) {
+            if (level > 0) {
+                error(def_proc_stmt->loc,
+                      "DEF PROC statement is not allowed inside another statement block");
+            }
+            else {
+                rewrite_def_proc(def_proc_stmt->body, level + 1);   // check for inner DEF PROCs
+                rewrite_def_proc(*def_proc_stmt);                   // rewrite
+            }
+        }
+    }
+}
+
+static void rewrite_def_proc(Prog& prog) {
+    rewrite_def_proc(prog.stmts, 0);
+}
+
+// verify that DefProcStmt, DefFnStmt and Pragma nodes only appear at the top level of the program
 static void check_lower_level(const std::vector<std::unique_ptr<Stmt>>& stmts) {
     for (const auto& stmt : stmts) {
         if (auto if_stmt = dynamic_cast<IfStmt*>(stmt.get())) {
@@ -84,55 +328,6 @@ static void check_top_level(const Prog& prog) {
         }
         else {
             // ok
-        }
-    }
-}
-
-// move local variable declarations to the DefProcStmt nodes
-static void process_local(DefProcStmt& proc_stmt,
-                          std::vector<std::unique_ptr<Stmt>>& stmts) {
-    for (auto i = stmts.begin(); i != stmts.end(); ) {
-        if (auto if_stmt = dynamic_cast<IfStmt*>(i->get())) {
-            process_local(proc_stmt, if_stmt->then_stmts);
-            process_local(proc_stmt, if_stmt->else_stmts);
-            ++i;
-        }
-        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(i->get())) {
-            process_local(proc_stmt, repeat_stmt->body);
-            ++i;
-        }
-        else if (auto while_stmt = dynamic_cast<WhileStmt*>(i->get())) {
-            process_local(proc_stmt, while_stmt->body);
-            ++i;
-        }
-        else if (auto for_stmt = dynamic_cast<ForStmt*>(i->get())) {
-            process_local(proc_stmt, for_stmt->body);
-            ++i;
-        }
-        else if (auto local_stmt = dynamic_cast<LocalStmt*>(i->get())) {
-            for (auto& local_var : local_stmt->locals) {
-                if (std::find(proc_stmt.locals.begin(), proc_stmt.locals.end(), local_var)
-                        == proc_stmt.locals.end()) {
-                    proc_stmt.locals.push_back(local_var);
-                }
-            }
-
-            i = stmts.erase(i);
-        }
-        else {
-            ++i;
-        }
-    }
-}
-
-static void process_local(Prog& prog) {
-    for (const auto& stmt : prog.stmts) {
-        if (dynamic_cast<LocalStmt*>(stmt.get())) {
-            error(stmt->loc,
-                  "LOCAL statement is not allowed outside of a DEF PROC");
-        }
-        else if (auto def_proc_stmt = dynamic_cast<DefProcStmt*>(stmt.get())) {
-            process_local(*def_proc_stmt, def_proc_stmt->body);
         }
     }
 }
@@ -576,7 +771,19 @@ static void verify_expr_types(const std::vector<std::unique_ptr<Stmt>>& stmts) {
 
 bool semantic_check(Prog& prog) {
     check_top_level(prog);
-    process_local(prog);
+
+    // first collect LOCAL statements, then rewrite DEF PROCs
+    collect_local(prog);
+    rewrite_def_proc(prog);
+
+    // rewrite DEF FNs
+    rewrite_def_fn(prog);
+
+#if 0
+    move_pragmas_to_end(prog);
+    detect_recursion(prog);
+#endif
+
     verify_expr_types(prog.stmts);
 
 #ifdef _DEBUG

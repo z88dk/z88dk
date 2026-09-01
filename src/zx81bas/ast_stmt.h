@@ -15,13 +15,13 @@
 #include <vector>
 
 struct Expr;
+struct ASTVisitor;
 
 struct Stmt : TreeNode {
     SourceLoc loc;			// source location
 
-    explicit Stmt(const SourceLoc& loc_)
-        : loc(loc_) {
-    }
+    explicit Stmt(const SourceLoc& loc_);
+    virtual void accept(ASTVisitor&) = 0;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override = 0;
@@ -34,9 +34,8 @@ struct JumpTargetStmt : Stmt {
 
     explicit JumpTargetStmt(const SourceLoc& loc_,
                             const std::string& label_,
-                            int basic_line_num_)
-        : Stmt(loc_), label(label_), basic_line_num(basic_line_num_) {
-    }
+                            int basic_line_num_);
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -44,10 +43,11 @@ struct JumpTargetStmt : Stmt {
 };
 
 struct LetStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> lhs;     // variable, array ref, slice
     std::unique_ptr<Expr> rhs;     // expression
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -64,9 +64,10 @@ struct DimItem {
 };
 
 struct DimStmt : Stmt {
-    using Stmt::Stmt;
-
     std::vector<DimItem> items;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -74,11 +75,12 @@ struct DimStmt : Stmt {
 };
 
 struct IfStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> condition;
     std::vector<std::unique_ptr<Stmt>> then_stmts;
     std::vector<std::unique_ptr<Stmt>> else_stmts;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -86,10 +88,11 @@ struct IfStmt : Stmt {
 };
 
 struct RepeatStmt : Stmt {
-    using Stmt::Stmt;
-
     std::vector<std::unique_ptr<Stmt>> body;   // full body, including EXIT
     std::unique_ptr<Expr> condition;     // condition2
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -97,10 +100,11 @@ struct RepeatStmt : Stmt {
 };
 
 struct WhileStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> condition;               // condition1
     std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -108,13 +112,26 @@ struct WhileStmt : Stmt {
 };
 
 struct ForStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;               // loop variable
     std::unique_ptr<Expr> start_expr;
     std::unique_ptr<Expr> end_expr;
     std::unique_ptr<Expr> step_expr;    // may be null (default = 1)
     std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+// produced during lowering
+struct NextStmt : Stmt {
+    std::string name;               // loop variable
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -122,12 +139,14 @@ struct ForStmt : Stmt {
 };
 
 struct DefProcStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;                         // PROCname
     std::vector<std::string> params;          // A, B
     std::vector<std::string> locals;          // L
     std::vector<std::unique_ptr<Stmt>> body;  // statements inside PROC
+    bool called = false;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -135,10 +154,11 @@ struct DefProcStmt : Stmt {
 };
 
 struct ProcCallStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;                         // PROCname
     std::vector<std::unique_ptr<Expr>> args;  // 10, 20
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -146,9 +166,10 @@ struct ProcCallStmt : Stmt {
 };
 
 struct LocalStmt : Stmt {
-    using Stmt::Stmt;
-
     std::vector<std::string> locals;          // L
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -156,11 +177,12 @@ struct LocalStmt : Stmt {
 };
 
 struct DefFnStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;                         // FNname
     std::vector<std::string> params;          // A, B
     std::unique_ptr<Expr> expr;               // A+B
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -169,6 +191,7 @@ struct DefFnStmt : Stmt {
 
 struct ExitStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -176,9 +199,10 @@ struct ExitStmt : Stmt {
 };
 
 struct GotoStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> target_expr;   // numeric expression or LabelLineRefExpr
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -186,9 +210,10 @@ struct GotoStmt : Stmt {
 };
 
 struct GosubStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> target_expr;   // numeric expression or LabelLineRefExpr
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -197,6 +222,7 @@ struct GosubStmt : Stmt {
 
 struct ReturnStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -205,6 +231,7 @@ struct ReturnStmt : Stmt {
 
 struct StopStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -213,6 +240,7 @@ struct StopStmt : Stmt {
 
 struct EndStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -242,9 +270,10 @@ struct PrintItem {
 };
 
 struct PrintStmt : Stmt {
-    using Stmt::Stmt;
-
     std::vector<PrintItem> items;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -252,9 +281,10 @@ struct PrintStmt : Stmt {
 };
 
 struct InputStmt : Stmt {
-    using Stmt::Stmt;
-
     std::vector<std::unique_ptr<Expr>> vars;      // variables, array refs, slices
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -262,12 +292,11 @@ struct InputStmt : Stmt {
 };
 
 struct RemStmt : Stmt {
+    std::string text;   			// comment text
+    std::vector<TokLine> asm_lines;	// ASM statements
+
     using Stmt::Stmt;
-
-    std::string text;   // raw comment text
-
-    // ASM statement if any
-    std::vector<TokLine> asm_lines;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -275,9 +304,10 @@ struct RemStmt : Stmt {
 };
 
 struct RunStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> target_expr;   // optional expression
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -285,9 +315,10 @@ struct RunStmt : Stmt {
 };
 
 struct ListStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> target_expr;   // optional expression
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -296,6 +327,7 @@ struct ListStmt : Stmt {
 
 struct NewStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -304,6 +336,7 @@ struct NewStmt : Stmt {
 
 struct ClsStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -311,9 +344,10 @@ struct ClsStmt : Stmt {
 };
 
 struct LoadStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> filename_expr;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -321,9 +355,10 @@ struct LoadStmt : Stmt {
 };
 
 struct SaveStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> filename_expr;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -331,10 +366,11 @@ struct SaveStmt : Stmt {
 };
 
 struct PokeStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> address;
     std::unique_ptr<Expr> value;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -342,10 +378,11 @@ struct PokeStmt : Stmt {
 };
 
 struct PokewStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> address;
     std::unique_ptr<Expr> value;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -353,10 +390,11 @@ struct PokewStmt : Stmt {
 };
 
 struct PlotStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> x_expr;
     std::unique_ptr<Expr> y_expr;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -364,10 +402,11 @@ struct PlotStmt : Stmt {
 };
 
 struct UnplotStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> x_expr;
     std::unique_ptr<Expr> y_expr;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -375,9 +414,10 @@ struct UnplotStmt : Stmt {
 };
 
 struct RandStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> seed_expr;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -385,9 +425,10 @@ struct RandStmt : Stmt {
 };
 
 struct PauseStmt : Stmt {
-    using Stmt::Stmt;
-
     std::unique_ptr<Expr> duration_expr;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -396,6 +437,7 @@ struct PauseStmt : Stmt {
 
 struct FastStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -404,6 +446,7 @@ struct FastStmt : Stmt {
 
 struct SlowStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -412,6 +455,7 @@ struct SlowStmt : Stmt {
 
 struct ScrollStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -420,6 +464,7 @@ struct ScrollStmt : Stmt {
 
 struct ContStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -428,6 +473,7 @@ struct ContStmt : Stmt {
 
 struct ClearStmt : Stmt {
     using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -435,10 +481,11 @@ struct ClearStmt : Stmt {
 };
 
 struct PragmaNumVarStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;
     double value;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -446,13 +493,12 @@ struct PragmaNumVarStmt : Stmt {
 };
 
 struct PragmaStrVarStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;
     std::string value;
+    std::vector<TokLine> asm_lines;	// ASM statements
 
-    // ASM statement if any
-    std::vector<TokLine> asm_lines;
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -460,11 +506,12 @@ struct PragmaStrVarStmt : Stmt {
 };
 
 struct PragmaNumVarArrayStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;
     std::vector<int> dims;			// dimensions
     std::vector<double> values;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -472,11 +519,12 @@ struct PragmaNumVarArrayStmt : Stmt {
 };
 
 struct PragmaStrVarArrayStmt : Stmt {
-    using Stmt::Stmt;
-
     std::string name;
     std::vector<int> dims;			// dimensions
     std::vector<std::string> values;
+
+    using Stmt::Stmt;
+    void accept(ASTVisitor& v) override;
 
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
@@ -496,8 +544,9 @@ struct Prog : TreeNode {
 
     std::vector<std::unique_ptr<Stmt>> stmts;
 
+    void accept(ASTVisitor& v);
+
 #ifdef _DEBUG
     void dump(DumpContext ctx) const override;
 #endif
 };
-

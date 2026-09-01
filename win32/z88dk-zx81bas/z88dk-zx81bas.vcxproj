@@ -145,6 +145,7 @@
     <ClInclude Include="..\..\src\zx81bas\dump_context.h" />
     <ClInclude Include="..\..\src\zx81bas\errors.h" />
     <ClInclude Include="..\..\src\zx81bas\lexer.h" />
+    <ClInclude Include="..\..\src\zx81bas\lower.h" />
     <ClInclude Include="..\..\src\zx81bas\options.h" />
     <ClInclude Include="..\..\src\zx81bas\parser.h" />
     <ClInclude Include="..\..\src\zx81bas\preproc.h" />
@@ -158,9 +159,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\zx81bas\ast.cpp" />
     <ClCompile Include="..\..\src\zx81bas\ast_expr.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\ast_stmt.cpp" />
     <ClCompile Include="..\..\src\zx81bas\dump_context.cpp" />
     <ClCompile Include="..\..\src\zx81bas\errors.cpp" />
     <ClCompile Include="..\..\src\zx81bas\lexer.cpp" />
+    <ClCompile Include="..\..\src\zx81bas\lower.cpp" />
     <ClCompile Include="..\..\src\zx81bas\options.cpp" />
     <ClCompile Include="..\..\src\zx81bas\parser.cpp" />
     <ClCompile Include="..\..\src\zx81bas\preproc.cpp" />

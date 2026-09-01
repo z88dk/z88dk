@@ -61,7 +61,7 @@ static void collect_defined_symbols(const std::vector<std::unique_ptr<Stmt>>&
                 }
             }
         }
-        else if (auto  dim_stmt = dynamic_cast<DimStmt*>(stmt.get())) {
+        else if (auto dim_stmt = dynamic_cast<DimStmt*>(stmt.get())) {
             for (const auto& dim_item : dim_stmt->items) {
                 // may be assigned multiple times, store the first location only
                 auto it = symtab.arrays.find(dim_item.name);
@@ -98,15 +98,17 @@ static void collect_defined_symbols(const std::vector<std::unique_ptr<Stmt>>&
                 symtab.procs[def_proc_stmt->name] = def_proc_stmt;
             }
             for (const auto& param : def_proc_stmt->params) {
-                auto it = symtab.vars.find(param);
+                std::string var_name = def_proc_stmt->name + param;
+                auto it = symtab.vars.find(var_name);
                 if (it == symtab.vars.end()) {
-                    symtab.vars[param] = def_proc_stmt->loc;
+                    symtab.vars[var_name] = def_proc_stmt->loc;
                 }
             }
             for (const auto& local : def_proc_stmt->locals) {
-                auto it = symtab.vars.find(local);
+                std::string var_name = def_proc_stmt->name + local;
+                auto it = symtab.vars.find(var_name);
                 if (it == symtab.vars.end()) {
-                    symtab.vars[local] = def_proc_stmt->loc;
+                    symtab.vars[var_name] = def_proc_stmt->loc;
                 }
             }
             collect_defined_symbols(def_proc_stmt->body, symtab);
@@ -121,9 +123,10 @@ static void collect_defined_symbols(const std::vector<std::unique_ptr<Stmt>>&
                 symtab.fns[def_fn_stmt->name] = def_fn_stmt;
             }
             for (const auto& param : def_fn_stmt->params) {
-                auto it = symtab.vars.find(param);
+                std::string var_name = def_fn_stmt->name + param;
+                auto it = symtab.vars.find(var_name);
                 if (it == symtab.vars.end()) {
-                    symtab.vars[param] = def_fn_stmt->loc;
+                    symtab.vars[var_name] = def_fn_stmt->loc;
                 }
             }
         }

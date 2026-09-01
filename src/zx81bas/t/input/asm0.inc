@@ -1,6 +1,12 @@
 //------------------------------------------------------------------------------
-// define macros to be used in the file
+// Start with some ASM to check that a REM line is created
 //------------------------------------------------------------------------------
 
-#define FALSE 0
-#define TRUE 1
+#ASM
+		ex af, af'			; tick is removed in preprocessing
+#ENDASM
+
+#ASM
+		ret
+#ENDASM
+

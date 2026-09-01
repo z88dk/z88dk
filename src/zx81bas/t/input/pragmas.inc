@@ -13,15 +13,6 @@
 	1.1,1.2,1.3,\
 	2.1,2.2,2.3
 #VARS A$ = "HELLO"
-#VARS Z$ = ""
-#ASM
-z_code:	ld a, b
-		add a, c
-		ld c, a
-		ld a, 0
-		adc a, 0
-		return
-#ENDASM
 #VARS B$(2,3,3)=\
 	"1.1","1.2","1.3",\
 	"2.1","2.2","2.3"
