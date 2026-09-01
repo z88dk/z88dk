@@ -7,7 +7,7 @@ PX4_GLOBS_ex := \
 	target/px4/stdio/ansi/*.asm
 
 
-PX4_TARGETS := target/px4/obj/target-px4-px4
+PX4_TARGETS := target/px4/obj/target-px4-px4 classic/games/obj/.stamp-cpm-px4 classic/gfx/obj/.stamp-cpm-px4
 
 
 CLEAN += target-px4-clean

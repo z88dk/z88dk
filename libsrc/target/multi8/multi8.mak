@@ -11,7 +11,7 @@ MULTI8_GLOBS_ex := \
 	target/multi8/stdio/*.asm 
 
 
-MULTI8_TARGETS := target/multi8/obj/target-multi8-multi8
+MULTI8_TARGETS := target/multi8/obj/target-multi8-multi8 classic/games/obj/.stamp-multi8 classic/gfx/obj/.stamp-multi8
 		
 
 CLEAN += target-multi8-clean

@@ -7,7 +7,7 @@ AUSSIE_GLOBS_ex := \
 	target/aussie/graphics/*.asm
 
 
-AUSSIE_TARGETS := target/aussie/obj/target-aussie-aussie
+AUSSIE_TARGETS := target/aussie/obj/target-aussie-aussie classic/games/obj/.stamp-cpm-aussie classic/gfx/obj/.stamp-cpm-aussie
 
 
 CLEAN += target-aussie-clean

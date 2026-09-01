@@ -13,7 +13,7 @@ GL6000_GL6000OBS_ex := \
 	target/gl6000/video/*.asm 
 
 
-GL6000_TARGETS := target/gl6000/obj/target-gl6000-gl6000
+GL6000_TARGETS := target/gl6000/obj/target-gl6000-gl6000 classic/games/obj/.stamp-gl6000 classic/gfx/obj/.stamp-gl6000
 		
 
 CLEAN += target-gl6000-clean

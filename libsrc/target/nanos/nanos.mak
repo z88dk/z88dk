@@ -7,7 +7,7 @@ NANOS_GLOBS_ex := \
 	target/nanos/stdio/*.asm 
 
 
-NANOS_TARGETS := target/nanos/obj/target-nanos-nanos
+NANOS_TARGETS := target/nanos/obj/target-nanos-nanos classic/games/obj/.stamp-cpm-nanos classic/gfx/obj/.stamp-cpm-nanos
 		
 
 CLEAN += target-nanos-clean

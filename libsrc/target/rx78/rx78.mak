@@ -13,7 +13,7 @@ RX78_GLOBS_ex := \
 	target/rx78/stdio/*.asm 
 
 
-RX78_TARGETS := target/rx78/obj/target-rx78-rx78
+RX78_TARGETS := target/rx78/obj/target-rx78-rx78 classic/games/obj/.stamp-rx78 classic/gfx/obj/.stamp-rx78
 		
 
 CLEAN += target-rx78-clean

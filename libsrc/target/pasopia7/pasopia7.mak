@@ -7,7 +7,7 @@ PASOPIA7_GLOBS_ex := \
 	target/pasopia7/stdio/*.asm
 
 
-PASOPIA7_TARGETS := target/pasopia7/obj/target-pasopia7-pasopia7
+PASOPIA7_TARGETS := target/pasopia7/obj/target-pasopia7-pasopia7 classic/games/obj/.stamp-pasopia7 classic/gfx/obj/.stamp-pasopia7
 
 
 CLEAN += target-pasopia7-clean

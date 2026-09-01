@@ -12,7 +12,8 @@ MZ2500_OFILES = $(addprefix target/mz2500/obj/mz2500/, $(MZ2500_CFILES:.c=.o))
 
 
 MZ2500_TARGETS := target/mz2500/obj/target-mz2500-mz2500 \
-	$(MZ2500_OFILES)
+	$(MZ2500_OFILES) \
+	classic/games/obj/.stamp-cpm-mz2500 classic/gfx/obj/.stamp-mz2500
 		
 
 CLEAN += target-mz2500-clean

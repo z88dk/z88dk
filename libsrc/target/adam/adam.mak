@@ -5,7 +5,7 @@ ADAM_GLOBS_ex := \
 	target/adam/*.asm
 
 
-ADAM_TARGETS := target/adam/obj/target-adam-adam
+ADAM_TARGETS := target/adam/obj/target-adam-adam classic/games/obj/.stamp-cpm-coleco classic/gfx/obj/.stamp-cpm-coleco
 
 
 CLEAN += target-adam-clean

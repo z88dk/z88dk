@@ -5,7 +5,7 @@ C7420_GLOBS_ex := \
 	target/c7420/stdio/*.asm 
 
 
-C7420_TARGETS := target/c7420/obj/target-c7420-c7420
+C7420_TARGETS := target/c7420/obj/target-c7420-c7420 classic/gfx/obj/.stamp-c7420
 		
 
 CLEAN += target-c7420-clean

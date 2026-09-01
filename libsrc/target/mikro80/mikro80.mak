@@ -11,7 +11,7 @@ MIKRO80_GLOBS_ex := \
 	target/mikro80/stdio/*.asm 
 
 
-MIKRO80_TARGETS := target/mikro80/obj/target-mikro80-mikro80
+MIKRO80_TARGETS := target/mikro80/obj/target-mikro80-mikro80 classic/games/obj/.stamp-mikro80 classic/gfx/obj/.stamp-mikro80
 		
 
 CLEAN += target-mikro80-clean

@@ -7,7 +7,7 @@ TIM011_GLOBS_ex := \
 	target/tim011/stdio/*.asm 
 
 
-TIM011_TARGETS := target/tim011/obj/target-tim011-tim011
+TIM011_TARGETS := target/tim011/obj/target-tim011-tim011 classic/games/obj/.stamp-cpm-tim011 classic/gfx/obj/.stamp-cpm-tim011
 		
 
 CLEAN += target-tim011-clean

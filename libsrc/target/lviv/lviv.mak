@@ -11,7 +11,7 @@ LVIV_GLOBS_ex := \
 	target/lviv/stdio/*.asm 
 
 
-LVIV_TARGETS := target/lviv/obj/target-lviv-lviv
+LVIV_TARGETS := target/lviv/obj/target-lviv-lviv classic/games/obj/.stamp-lviv classic/gfx/obj/.stamp-lviv
 		
 
 CLEAN += target-lviv-clean

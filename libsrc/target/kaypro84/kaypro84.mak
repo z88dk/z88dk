@@ -5,7 +5,7 @@ KAYPRO84_GLOBS_ex := \
 	target/kaypro84/graphics/*.asm
 
 
-KAYPRO84_TARGETS := target/kaypro84/obj/target-kaypro84-kaypro84
+KAYPRO84_TARGETS := target/kaypro84/obj/target-kaypro84-kaypro84 classic/gfx/obj/.stamp-cpm-kaypro
 
 
 CLEAN += target-kaypro84-clean

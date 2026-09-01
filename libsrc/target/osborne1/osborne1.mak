@@ -5,7 +5,7 @@ OSBORNE1_GLOBS_ex := \
 	target/osborne1/graphics/*.asm
 
 
-OSBORNE1_TARGETS := target/osborne1/obj/target-osborne1-osborne1
+OSBORNE1_TARGETS := target/osborne1/obj/target-osborne1-osborne1 classic/gfx/obj/.stamp-cpm-osborne1
 
 
 CLEAN += target-osborne1-clean

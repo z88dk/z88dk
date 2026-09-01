@@ -7,7 +7,7 @@ PK8000_GLOBS_ex := \
 	target/pk8000/stdio/*.asm 
 
 
-PK8000_TARGETS := target/pk8000/obj/target-pk8000-pk8000
+PK8000_TARGETS := target/pk8000/obj/target-pk8000-pk8000 classic/gfx/obj/.stamp-pk8000
 		
 
 CLEAN += target-pk8000-clean

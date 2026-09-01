@@ -11,7 +11,7 @@ HOMELAB2_GLOBS_ex := \
 	target/homelab2/stdio/*.asm 
 
 
-HOMELAB2_TARGETS := target/homelab2/obj/target-homelab2-homelab2
+HOMELAB2_TARGETS := target/homelab2/obj/target-homelab2-homelab2 classic/games/obj/.stamp-homelab2 classic/gfx/obj/.stamp-homelab2
 		
 
 CLEAN += target-homelab2-clean

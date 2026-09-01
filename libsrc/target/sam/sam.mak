@@ -82,7 +82,8 @@ SAM_OFILES = $(addprefix target/sam/obj/sam/, $(SAM_CFILES:.c=.o))
 
 
 SAM_TARGETS := target/sam/obj/target-sam-sam target/sam/obj/target-sam-samcpm \
-	$(SAM_OFILES)
+	$(SAM_OFILES) \
+	classic/games/obj/.stamp-sam classic/gfx/obj/.stamp-sam
 		
 
 CLEAN += target-sam-clean

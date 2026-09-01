@@ -48,6 +48,7 @@ BIFROST2_GEN = bifrost2_engine_48.bin.zx0 bifrost2_engine_p3.bin.zx0
 
 
 TS2068_TARGETS := target/ts2068/obj/target-ts2068-ts2068 \
+classic/games/obj/.stamp-ts2068 classic/gfx/obj/.stamp-ts2068-wide \
 	$(TS2068_OFILES)
 		
 

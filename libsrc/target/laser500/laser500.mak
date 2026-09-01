@@ -13,7 +13,7 @@ LASER500_GLOBS_ex := \
 	target/laser500/stdio/*.asm 
 
 
-LASER500_TARGETS := target/laser500/obj/target-laser500-laser500
+LASER500_TARGETS := target/laser500/obj/target-laser500-laser500 classic/games/obj/.stamp-laser500 classic/gfx/obj/.stamp-laser500
 		
 
 CLEAN += target-laser500-clean

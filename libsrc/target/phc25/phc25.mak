@@ -15,7 +15,7 @@ PHC25_GLOBS_ex := \
 	target/phc25/stdio/*.asm
 
 
-PHC25_TARGETS := target/phc25/obj/target-phc25-phc25
+PHC25_TARGETS := target/phc25/obj/target-phc25-phc25 classic/games/obj/.stamp-phc25 classic/gfx/obj/.stamp-phc25
 		
 
 CLEAN += target-phc25-clean

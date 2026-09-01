@@ -5,7 +5,7 @@ NORTHSTAR_GLOBS_ex := \
 	target/northstar/graphics/*.asm
 
 
-NORTHSTAR_TARGETS := target/northstar/obj/target-northstar-northstar
+NORTHSTAR_TARGETS := target/northstar/obj/target-northstar-northstar classic/games/obj/.stamp-cpm-northstar classic/gfx/obj/.stamp-cpm-northstar
 
 
 CLEAN += target-northstar-clean

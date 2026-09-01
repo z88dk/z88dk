@@ -7,7 +7,7 @@ X820_GLOBS_ex := \
 	target/x820/stdio/*.asm
 
 
-X820_TARGETS := target/x820/obj/target-x820-x820
+X820_TARGETS := target/x820/obj/target-x820-x820 classic/games/obj/.stamp-cpm-x820ii classic/gfx/obj/.stamp-cpm-x820ii
 
 
 CLEAN += target-x820-clean

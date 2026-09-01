@@ -14,7 +14,8 @@ REX_OFILES = $(addprefix target/rex/obj/rex/, $(REX_CFILES:.c=.o))
 
 
 REX_TARGETS := target/rex/obj/target-rex-rex \
-	$(REX_OFILES)
+	$(REX_OFILES) \
+	classic/gfx/obj/.stamp-rex
 
 
 CLEAN += target-rex-clean

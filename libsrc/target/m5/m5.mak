@@ -7,7 +7,7 @@ M5_GLOBS_ex := \
 	target/m5/stdio/*.asm
 
 
-M5_TARGETS := target/m5/obj/target-m5-m5
+M5_TARGETS := target/m5/obj/target-m5-m5 classic/games/obj/.stamp-m5 classic/gfx/obj/.stamp-m5
 
 
 CLEAN += target-m5-clean

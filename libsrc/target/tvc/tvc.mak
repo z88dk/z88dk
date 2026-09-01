@@ -29,7 +29,8 @@ TVCROMGFX_OFILES = $(addprefix target/tvc/romgfx/obj/tvc/, $(TVCROMGFX_CFILES:.c
 
 
 TVC_TARGETS := target/tvc/obj/target-tvc-tvc \
-	$(TVC_OFILES)
+	$(TVC_OFILES) \
+	classic/games/obj/.stamp-tvc classic/gfx/obj/.stamp-tvc
 
 TVCROMGFX_TARGETS := target/tvc/romgfx/obj/target-tvc-romgfx-tvc \
 	$(TVCROMGFX_OFILES)

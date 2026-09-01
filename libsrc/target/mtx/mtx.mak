@@ -16,7 +16,7 @@ MTX_CFILES = $(wildcard target/mtx/rs232/*.c)
 MTX_OFILES = $(addprefix target/mtx/obj/mtx/, $(MTX_CFILES:.c=.o)) 
 
 
-MTX_TARGETS := target/mtx/obj/target-mtx-mtx  $(MTX_OFILES) 
+MTX_TARGETS := target/mtx/obj/target-mtx-mtx  $(MTX_OFILES) classic/games/obj/.stamp-mtx classic/gfx/obj/.stamp-mtx
 		
 
 CLEAN += target-mtx-clean

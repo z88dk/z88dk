@@ -14,7 +14,7 @@ HECTOR_GLOBS_ex := \
 	target/hector/stdio/*.asm 
 
 
-HECTOR_TARGETS := target/hector/obj/target-hector-hector1 target/hector/obj/target-hector-hectorhr
+HECTOR_TARGETS := target/hector/obj/target-hector-hector1 target/hector/obj/target-hector-hectorhr classic/games/obj/.stamp-hector1 classic/games/obj/.stamp-hectorhr classic/gfx/obj/.stamp-hector1 classic/gfx/obj/.stamp-hectorhr
 		
 
 CLEAN += target-hector-clean

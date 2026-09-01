@@ -9,7 +9,7 @@ PENCIL2_GLOBS_ex := \
 	target/pencil2/stdio/*.asm 
 
 
-PENCIL2_TARGETS := target/pencil2/obj/target-pencil2-pencil2
+PENCIL2_TARGETS := target/pencil2/obj/target-pencil2-pencil2 classic/games/obj/.stamp-pencil2 classic/gfx/obj/.stamp-pencil2
 		
 
 CLEAN += target-pencil2-clean

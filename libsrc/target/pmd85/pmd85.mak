@@ -9,7 +9,7 @@ PMD85_GLOBS_ex := \
 	target/pmd85/stdio/*.asm
 
 
-PMD85_TARGETS := target/pmd85/obj/target-pmd85-pmd85
+PMD85_TARGETS := target/pmd85/obj/target-pmd85-pmd85 classic/games/obj/.stamp-pmd85 classic/gfx/obj/.stamp-pmd85
 
 
 CLEAN += target-pmd85-clean

@@ -9,7 +9,7 @@ PV1000_GLOBS_ex := \
 	target/pv1000/stdio/*.asm 
 
 
-PV1000_TARGETS := target/pv1000/obj/target-pv1000-pv1000
+PV1000_TARGETS := target/pv1000/obj/target-pv1000-pv1000 classic/games/obj/.stamp-pv1000 classic/gfx/obj/.stamp-pv1000
 		
 
 CLEAN += target-pv1000-clean

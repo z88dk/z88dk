@@ -15,7 +15,7 @@ VECTOR06C_GLOBS_ex := \
 	target/vector06c/stdio/*.asm 
 
 
-VECTOR06C_TARGETS := target/vector06c/obj/target-vector06c-vector06c
+VECTOR06C_TARGETS := target/vector06c/obj/target-vector06c-vector06c classic/games/obj/.stamp-vector06c classic/gfx/obj/.stamp-vector06c classic/gfx/obj/.stamp-vector06c-portable
 		
 
 CLEAN += target-vector06c-clean

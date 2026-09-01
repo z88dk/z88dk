@@ -13,7 +13,7 @@ ABC80_GLOBS_ex := \
 	target/abc80/time/*.asm 
 
 
-ABC80_TARGETS := target/abc80/obj/target-abc80-abc80
+ABC80_TARGETS := target/abc80/obj/target-abc80-abc80 classic/games/obj/.stamp-abc80 classic/gfx/obj/.stamp-abc80
 		
 
 CLEAN += target-abc80-clean

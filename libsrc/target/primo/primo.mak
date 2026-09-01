@@ -11,7 +11,7 @@ PRIMO_GLOBS_ex := \
 	target/primo/stdio/*.asm 
 
 
-PRIMO_TARGETS := target/primo/obj/target-primo-primo
+PRIMO_TARGETS := target/primo/obj/target-primo-primo classic/games/obj/.stamp-primo classic/gfx/obj/.stamp-primo
 		
 
 CLEAN += target-primo-clean

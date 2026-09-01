@@ -7,7 +7,7 @@ MICRO8085_GLOBS_ex := \
 	target/micro8085/stdio/*.asm 
 
 
-MICRO8085_TARGETS := target/micro8085/obj/target-micro8085-micro8085
+MICRO8085_TARGETS := target/micro8085/obj/target-micro8085-micro8085 classic/gfx/obj/.stamp-micro8085
 		
 
 CLEAN += target-micro8085-clean

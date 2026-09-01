@@ -7,7 +7,7 @@ HGMC_GLOBS_ex := \
 	target/hgmc/stdio/*.asm 
 
 
-HGMC_TARGETS := target/hgmc/obj/target-hgmc-hgmc
+HGMC_TARGETS := target/hgmc/obj/target-hgmc-hgmc classic/games/obj/.stamp-hgmc classic/gfx/obj/.stamp-hgmc
 		
 
 CLEAN += target-hgmc-clean

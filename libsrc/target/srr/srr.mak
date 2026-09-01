@@ -20,7 +20,8 @@ SRR_OFILES = $(addprefix target/srr/obj/srr/, $(SRR_CFILES:.c=.o))
 
 
 SRR_TARGETS := target/srr/obj/target-srr-srr \
-	$(SRR_OFILES)
+	$(SRR_OFILES) \
+	classic/games/obj/.stamp-srr classic/gfx/obj/.stamp-srr
 		
 
 CLEAN += target-srr-clean

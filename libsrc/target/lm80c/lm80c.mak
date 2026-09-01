@@ -9,7 +9,7 @@ LM80C_GLOBS_ex := \
 LM80C_CFILES = $(wildcard target/lm80c/rs232/*.c)
 LM80C_OFILES = $(addprefix target/lm80c/obj/lm80c/, $(LM80C_CFILES:.c=.o))
 
-LM80C_TARGETS := target/lm80c/obj/target-lm80c-lm80c $(LM80C_OFILES)
+LM80C_TARGETS := target/lm80c/obj/target-lm80c-lm80c $(LM80C_OFILES) classic/games/obj/.stamp-lm80c classic/gfx/obj/.stamp-lm80c
 		
 
 CLEAN += target-lm80c-clean

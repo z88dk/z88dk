@@ -9,7 +9,7 @@ SV8000_GLOBS_ex := \
 	target/sv8000/psg/*.asm 
 
 
-SV8000_TARGETS := target/sv8000/obj/target-sv8000-sv8000
+SV8000_TARGETS := target/sv8000/obj/target-sv8000-sv8000 classic/games/obj/.stamp-sv8000 classic/gfx/obj/.stamp-sv8000
 		
 
 CLEAN += target-sv8000-clean

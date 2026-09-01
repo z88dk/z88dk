@@ -7,7 +7,7 @@ M100_GLOBS_ex := \
 	target/m100/stdio/*.asm
 
 
-M100_TARGETS := target/m100/obj/target-m100-m100
+M100_TARGETS := target/m100/obj/target-m100-m100 classic/games/obj/.stamp-m100 classic/gfx/obj/.stamp-m100
 
 
 CLEAN += target-m100-clean

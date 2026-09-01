@@ -5,7 +5,7 @@ HEMC_GLOBS_ex := \
 	target/hemc/stdio/*.asm 
 
 
-HEMC_TARGETS := target/hemc/obj/target-hemc-hemc
+HEMC_TARGETS := target/hemc/obj/target-hemc-hemc classic/gfx/obj/.stamp-hemc
 		
 
 CLEAN += target-hemc-clean

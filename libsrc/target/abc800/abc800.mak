@@ -9,7 +9,7 @@ ABC800_GLOBS_ex := \
 	target/abc800/stdio/*.asm 
 
 
-ABC800_TARGETS := target/abc800/obj/target-abc800-abc800
+ABC800_TARGETS := target/abc800/obj/target-abc800-abc800 classic/games/obj/.stamp-abc800 classic/gfx/obj/.stamp-abc800
 		
 
 CLEAN += target-abc800-clean

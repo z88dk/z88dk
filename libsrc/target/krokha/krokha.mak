@@ -9,7 +9,7 @@ KROKHA_GLOBS_ex := \
 	target/krokha/stdio/*.asm 
 
 
-KROKHA_TARGETS := target/krokha/obj/target-krokha-krokha
+KROKHA_TARGETS := target/krokha/obj/target-krokha-krokha classic/games/obj/.stamp-krokha classic/gfx/obj/.stamp-krokha
 		
 
 CLEAN += target-krokha-clean

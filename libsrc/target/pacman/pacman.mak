@@ -11,7 +11,7 @@ PACMAN_GLOBS_ex := \
 	target/pacman/time/*.asm
 
 
-PACMAN_TARGETS := target/pacman/obj/target-pacman-pacman
+PACMAN_TARGETS := target/pacman/obj/target-pacman-pacman classic/games/obj/.stamp-pacman classic/gfx/obj/.stamp-pacman
 
 
 CLEAN += target-pacman-clean

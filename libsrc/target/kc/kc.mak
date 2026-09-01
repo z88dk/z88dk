@@ -7,7 +7,7 @@ KC_GLOBS_ex := \
 	target/kc/stdio/*.asm 
 
 
-KC_TARGETS := target/kc/obj/target-kc-kc
+KC_TARGETS := target/kc/obj/target-kc-kc classic/games/obj/.stamp-kc classic/gfx/obj/.stamp-kc
 		
 
 CLEAN += target-kc-clean

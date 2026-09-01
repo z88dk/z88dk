@@ -15,7 +15,7 @@ VZ_GLOBS_ex := \
 	target/vz/stdio/ansi/*.asm 
 
 
-VZ_TARGETS := target/vz/obj/target-vz-vz
+VZ_TARGETS := target/vz/obj/target-vz-vz classic/games/obj/.stamp-vz classic/gfx/obj/.stamp-vz
 		
 
 CLEAN += target-vz-clean

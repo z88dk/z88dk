@@ -13,7 +13,7 @@ LYNX_GLOBS_ex := \
 	target/lynx/stdio/*.asm 
 
 
-LYNX_TARGETS := target/lynx/obj/target-lynx-lynx
+LYNX_TARGETS := target/lynx/obj/target-lynx-lynx classic/games/obj/.stamp-lynx classic/gfx/obj/.stamp-lynx
 		
 
 CLEAN += target-lynx-clean

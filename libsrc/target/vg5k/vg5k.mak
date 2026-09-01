@@ -14,7 +14,7 @@ VG5K_GLOBS_ex := \
 	target/vg5k/stdio/*.asm \
 	target/vg5k/stdio/ansi/*.asm 
 
-VG5K_TARGETS := target/vg5k/obj/target-vg5k-vg5k
+VG5K_TARGETS := target/vg5k/obj/target-vg5k-vg5k classic/games/obj/.stamp-vg5k classic/gfx/obj/.stamp-vg5k
 		
 
 CLEAN += target-vg5k-clean

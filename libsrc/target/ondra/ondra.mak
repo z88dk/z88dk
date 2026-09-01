@@ -11,7 +11,7 @@ ONDRA_GLOBS_ex := \
 	target/ondra/stdio/*.asm 
 
 
-ONDRA_TARGETS := target/ondra/obj/target-ondra-ondra
+ONDRA_TARGETS := target/ondra/obj/target-ondra-ondra classic/games/obj/.stamp-ondra classic/gfx/obj/.stamp-ondra
 		
 
 CLEAN += target-ondra-clean

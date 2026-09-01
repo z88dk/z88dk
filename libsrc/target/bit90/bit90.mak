@@ -5,7 +5,7 @@ BIT90_GLOBS_ex := \
 	target/bit90/games/*.asm
 
 
-BIT90_TARGETS := target/bit90/obj/target-bit90-bit90
+BIT90_TARGETS := target/bit90/obj/target-bit90-bit90 classic/games/obj/.stamp-cpm-bit90
 
 
 CLEAN += target-bit90-clean

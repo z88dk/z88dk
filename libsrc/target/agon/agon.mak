@@ -11,7 +11,7 @@ AGON_GLOBS_ex := \
 	target/agon/stdio/*.asm 
 
 
-AGON_TARGETS := target/agon/obj/target-agon-agon
+AGON_TARGETS := target/agon/obj/target-agon-agon classic/games/obj/.stamp-agon classic/gfx/obj/.stamp-agon
 		
 
 CLEAN += target-agon-clean

@@ -17,7 +17,7 @@ PC88_GLOBS_ex := \
 	target/pc88/time/*.asm 
 
 
-PC88_TARGETS := target/pc88/obj/target-pc88-pc88
+PC88_TARGETS := target/pc88/obj/target-pc88-pc88 classic/games/obj/.stamp-pc88 classic/gfx/obj/.stamp-pc88
 		
 
 CLEAN += target-pc88-clean

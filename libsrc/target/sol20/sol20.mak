@@ -7,7 +7,7 @@ SOL20_GLOBS_ex := \
 	target/sol20/stdio/*.asm 
 
 
-SOL20_TARGETS := target/sol20/obj/target-sol20-sol20
+SOL20_TARGETS := target/sol20/obj/target-sol20-sol20 classic/games/obj/.stamp-sol20 classic/gfx/obj/.stamp-sol20
 		
 
 CLEAN += target-sol20-clean

@@ -9,7 +9,7 @@ PX8_GLOBS_ex := \
 	target/px8/stdio/ansi/*.asm
 
 
-PX8_TARGETS := target/px8/obj/target-px8-px8
+PX8_TARGETS := target/px8/obj/target-px8-px8 classic/games/obj/.stamp-cpm-px8 classic/gfx/obj/.stamp-cpm-px8
 
 
 CLEAN += target-px8-clean

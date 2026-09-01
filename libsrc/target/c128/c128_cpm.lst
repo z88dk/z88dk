@@ -1,8 +1,8 @@
-target/c128/c128/obj/c128/*
-target/c128/psg/obj/c128/*
-target/c128/games/joystick
-target/c128/games/bit_open
-target/c128/games/bit_open_di
-target/c128/games/bit_close
-target/c128/games/bit_close_ei
+target/c128/obj/${TARGET}/target/c128/c128/*.o
+target/c128/obj/${TARGET}/target/c128/psg/*.o
+target/c128/obj/${TARGET}/x/target/c128/games/joystick.o
+target/c128/obj/${TARGET}/x/target/c128/games/bit_open.o
+target/c128/obj/${TARGET}/x/target/c128/games/bit_open_di.o
+target/c128/obj/${TARGET}/x/target/c128/games/bit_close.o
+target/c128/obj/${TARGET}/x/target/c128/games/bit_close_ei.o
 @classic/games/games.lst

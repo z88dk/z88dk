@@ -9,7 +9,7 @@ MYVISION_GLOBS_ex := \
 	target/myvision/psg/*.asm 
 
 
-MYVISION_TARGETS := target/myvision/obj/target-myvision-myvision
+MYVISION_TARGETS := target/myvision/obj/target-myvision-myvision classic/games/obj/.stamp-myvision classic/gfx/obj/.stamp-myvision
 		
 
 CLEAN += target-myvision-clean

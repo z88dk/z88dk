@@ -5,7 +5,7 @@ BIC_GLOBS_ex := \
 	target/bic/psg/*.asm 
 
 
-BIC_TARGETS := target/bic/obj/target-bic-bic
+BIC_TARGETS := target/bic/obj/target-bic-bic classic/games/obj/.stamp-cpm-bic
 		
 
 CLEAN += target-bic-clean

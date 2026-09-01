@@ -1,6 +1,6 @@
-target/c128/graphics/udg/clsgraph
-target/c128/graphics/udg/plotpixl
-target/c128/graphics/udg/respixl
-target/c128/graphics/udg/xorpixl
-target/c128/graphics/udg/pointxy
+target/c128/obj/${TARGET}/x/target/c128/graphics/udg/clsgraph.o
+target/c128/obj/${TARGET}/x/target/c128/graphics/udg/plotpixl.o
+target/c128/obj/${TARGET}/x/target/c128/graphics/udg/respixl.o
+target/c128/obj/${TARGET}/x/target/c128/graphics/udg/xorpixl.o
+target/c128/obj/${TARGET}/x/target/c128/graphics/udg/pointxy.o
 @classic/gfx/text6/gfx_text6.lst

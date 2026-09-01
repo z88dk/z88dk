@@ -7,7 +7,7 @@ COLECO_GLOBS_ex := \
 	target/coleco/stdio/*.asm
 
 
-COLECO_TARGETS := target/coleco/obj/target-coleco-coleco
+COLECO_TARGETS := target/coleco/obj/target-coleco-coleco classic/games/obj/.stamp-coleco classic/gfx/obj/.stamp-coleco
 
 
 CLEAN += target-coleco-clean

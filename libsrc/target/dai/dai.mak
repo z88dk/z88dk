@@ -5,7 +5,7 @@ DAI_GLOBS_ex := \
 	target/dai/stdio/*.asm 
 
 
-DAI_TARGETS := target/dai/obj/target-dai-dai
+DAI_TARGETS := target/dai/obj/target-dai-dai classic/gfx/obj/.stamp-dai
 		
 
 CLEAN += target-dai-clean

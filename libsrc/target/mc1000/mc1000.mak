@@ -17,7 +17,7 @@ MC1000_GLOBS_ex := \
 	target/mc1000/time/*.asm 
 
 
-MC1000_TARGETS := target/mc1000/obj/target-mc1000-mc1000
+MC1000_TARGETS := target/mc1000/obj/target-mc1000-mc1000 classic/games/obj/.stamp-mc1000 classic/gfx/obj/.stamp-mc1000
 		
 
 CLEAN += target-mc1000-clean

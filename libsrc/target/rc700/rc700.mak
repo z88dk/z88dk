@@ -9,7 +9,7 @@ RC700_GLOBS_ex := \
 	target/rc700/time/*.asm 
 
 
-RC700_TARGETS := target/rc700/obj/target-rc700-rc700
+RC700_TARGETS := target/rc700/obj/target-rc700-rc700 classic/games/obj/.stamp-cpm-rc700 classic/gfx/obj/.stamp-cpm-rc700
 		
 
 CLEAN += target-rc700-clean

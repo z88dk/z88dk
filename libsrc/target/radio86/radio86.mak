@@ -7,7 +7,7 @@ RADIO86_GLOBS_ex := \
 	target/radio86/stdio/*.asm 
 
 
-RADIO86_TARGETS := target/radio86/obj/target-radio86-radio86
+RADIO86_TARGETS := target/radio86/obj/target-radio86-radio86 classic/gfx/obj/.stamp-radio86
 		
 
 CLEAN += target-radio86-clean

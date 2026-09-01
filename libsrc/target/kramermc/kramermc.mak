@@ -5,7 +5,7 @@ KRAMERMC_GLOBS_ex := \
 	target/kramermc/stdio/*.asm 
 
 
-KRAMERMC_TARGETS := target/kramermc/obj/target-kramermc-kramermc
+KRAMERMC_TARGETS := target/kramermc/obj/target-kramermc-kramermc classic/gfx/obj/.stamp-kramermc
 		
 
 CLEAN += target-kramermc-clean

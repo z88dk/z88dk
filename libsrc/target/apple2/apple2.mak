@@ -7,7 +7,7 @@ APPLE2_GLOBS_ex := \
 	target/apple2/stdio/*.asm 
 
 
-APPLE2_TARGETS := target/apple2/obj/target-apple2-apple2
+APPLE2_TARGETS := target/apple2/obj/target-apple2-apple2 classic/games/obj/.stamp-cpm-apple2
 		
 
 CLEAN += target-apple2-clean

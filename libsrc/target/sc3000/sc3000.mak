@@ -11,7 +11,7 @@ SC3000_GLOBS_ex := \
 	target/sc3000/time/*.asm 
 
 
-SC3000_TARGETS := target/sc3000/obj/target-sc3000-sc3000
+SC3000_TARGETS := target/sc3000/obj/target-sc3000-sc3000 classic/games/obj/.stamp-sc3000 classic/gfx/obj/.stamp-sc3000
 		
 
 CLEAN += target-sc3000-clean

@@ -20,6 +20,7 @@ MZ_OFILES = $(addprefix target/mz/obj/mz/, $(MZ_CFILES:.c=.o))
 
 
 MZ_TARGETS := target/mz/obj/target-mz-mz \
+classic/games/obj/.stamp-mz classic/gfx/obj/.stamp-mz \
 	$(MZ_OFILES)
 		
 

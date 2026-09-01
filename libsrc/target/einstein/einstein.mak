@@ -7,7 +7,7 @@ EINSTEIN_GLOBS_ex := \
 	target/einstein/stdio/*.asm 
 
 
-EINSTEIN_TARGETS := target/einstein/obj/target-einstein-einstein
+EINSTEIN_TARGETS := target/einstein/obj/target-einstein-einstein classic/games/obj/.stamp-cpm-einstein classic/gfx/obj/.stamp-cpm-einstein
 		
 
 CLEAN += target-einstein-clean

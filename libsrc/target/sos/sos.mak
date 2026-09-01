@@ -14,7 +14,8 @@ SOS_OFILES = $(addprefix target/sos/obj/sos/, $(SOS_CFILES:.c=.o))
 
 
 SOS_TARGETS := target/sos/obj/target-sos-sos \
-	$(SOS_OFILES)
+	$(SOS_OFILES) \
+	classic/games/obj/.stamp-sos classic/gfx/obj/.stamp-sos
 		
 
 CLEAN += target-sos-clean

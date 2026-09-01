@@ -11,7 +11,7 @@ ATTACHE_GLOBS_ex := \
 	target/attache/time/*.asm
 
 
-ATTACHE_TARGETS := target/attache/obj/target-attache-attache
+ATTACHE_TARGETS := target/attache/obj/target-attache-attache classic/games/obj/.stamp-cpm-attache classic/gfx/obj/.stamp-cpm-attache
 		
 
 CLEAN += target-attache-clean

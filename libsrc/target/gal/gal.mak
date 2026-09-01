@@ -19,7 +19,7 @@ GAL_GLOBS_ex := \
 	target/gal/time/*.asm 
 
 
-GAL_TARGETS := target/gal/obj/target-gal-gal
+GAL_TARGETS := target/gal/obj/target-gal-gal classic/games/obj/.stamp-gal classic/gfx/obj/.stamp-gal
 		
 
 CLEAN += target-gal-clean

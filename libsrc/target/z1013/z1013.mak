@@ -11,7 +11,7 @@ Z1013_GLOBS_ex := \
 	target/z1013/stdio/ansi/*.asm 
 
 
-Z1013_TARGETS := target/z1013/obj/target-z1013-z1013
+Z1013_TARGETS := target/z1013/obj/target-z1013-z1013 classic/games/obj/.stamp-z1013 classic/gfx/obj/.stamp-z1013
 		
 
 CLEAN += target-z1013-clean

@@ -33,7 +33,7 @@ ZXN_CFILES = target/zx/tape/tape_save.c
 ZXN_OFILES = $(addprefix target/zxn/obj/zxn/, $(ZXN_CFILES:.c=.o)) 
 
 
-ZXN_TARGETS := target/zxn/obj/target-zxn-zxn $(ZXN_OFILES)
+ZXN_TARGETS := target/zxn/obj/target-zxn-zxn $(ZXN_OFILES) classic/games/obj/.stamp-zxn classic/gfx/obj/.stamp-zxn-wide
 		
 
 CLEAN += target-zxn-clean

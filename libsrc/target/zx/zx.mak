@@ -151,7 +151,7 @@ ZX_OFILES = $(addprefix target/zx/obj/zx/, $(ZX_CFILES:.c=.o))
 BIFROST2_GEN = bifrost2_engine_48.bin.zx0 bifrost2_engine_p3.bin.zx0
 
 
-ZX_TARGETS := target/zx/obj/target-zx-zx $(ZX_OFILES) target/zx/obj/target-zx-zxcpm
+ZX_TARGETS := target/zx/obj/target-zx-zx $(ZX_OFILES) target/zx/obj/target-zx-zxcpm classic/games/obj/.stamp-zx classic/gfx/obj/.stamp-zx-narrow
 		
 
 CLEAN += target-zx-clean

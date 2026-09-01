@@ -15,7 +15,7 @@ P2000_GLOBS_ex := \
 	target/p2000/time/*.asm
 
 
-P2000_TARGETS := target/p2000/obj/target-p2000-p2000
+P2000_TARGETS := target/p2000/obj/target-p2000-p2000 classic/games/obj/.stamp-p2000 classic/gfx/obj/.stamp-p2000
 
 
 CLEAN += target-p2000-clean

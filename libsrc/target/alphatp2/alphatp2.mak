@@ -16,7 +16,7 @@ ALPHATP2_OFILES = $(addprefix target/alphatp2/obj/alphatp2/, $(ALPHATP2_CFILES:.
 
 
 
-ALPHATP2_TARGETS := target/alphatp2/obj/target-alphatp2-alphatp2  $(ALPHATP2_OFILES) 
+ALPHATP2_TARGETS := target/alphatp2/obj/target-alphatp2-alphatp2  $(ALPHATP2_OFILES) classic/games/obj/.stamp-alphatp2 classic/gfx/obj/.stamp-alphatp2
 		
 
 CLEAN += target-alphatp2-clean

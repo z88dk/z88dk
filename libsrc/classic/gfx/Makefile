@@ -22,6 +22,7 @@ subdirs-clean: $(SUBDIRS_CLEAN)
 
 clean: subdirs-clean
 	$(RM) */*.o */*/*.o  */*/*/*.o
+	$(RM) -fr obj
 	$(MAKE) -C text clean
 	$(MAKE) -C text6 clean
 	$(MAKE) -C text clean

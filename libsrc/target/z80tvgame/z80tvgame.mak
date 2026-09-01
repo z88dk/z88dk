@@ -9,7 +9,7 @@ Z80TVGAME_GLOBS_ex := \
 	target/z80tvgame/stdio/*.asm 
 
 
-Z80TVGAME_TARGETS := target/z80tvgame/obj/target-z80tvgame-z80tvgame
+Z80TVGAME_TARGETS := target/z80tvgame/obj/target-z80tvgame-z80tvgame classic/games/obj/.stamp-z80tvgame classic/gfx/obj/.stamp-z80tvgame
 		
 
 CLEAN += target-z80tvgame-clean

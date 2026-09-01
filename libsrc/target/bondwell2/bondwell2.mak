@@ -7,7 +7,7 @@ BONDWELL2_GLOBS_ex := \
 	target/bondwell2/stdio/*.asm 
 
 
-BONDWELL2_TARGETS := target/bondwell2/obj/target-bondwell2-bondwell2
+BONDWELL2_TARGETS := target/bondwell2/obj/target-bondwell2-bondwell2 classic/games/obj/.stamp-cpm-bondwell2 classic/gfx/obj/.stamp-cpm-bondwell2
 		
 
 CLEAN += target-bondwell2-clean

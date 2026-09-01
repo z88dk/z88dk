@@ -5,7 +5,7 @@ ALTAIR8800_GLOBS_ex := \
 	target/altair8800/stdio/*.asm 
 
 
-ALTAIR8800_TARGETS := target/altair8800/obj/target-altair8800-altair8800
+ALTAIR8800_TARGETS := target/altair8800/obj/target-altair8800-altair8800 classic/gfx/obj/.stamp-altair8800
 		
 
 CLEAN += target-altair8800-clean

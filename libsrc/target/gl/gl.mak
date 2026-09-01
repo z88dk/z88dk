@@ -9,7 +9,7 @@ GL_GLOBS_ex := \
 	target/gl/video/*.asm 
 
 
-GL_TARGETS := target/gl/obj/target-gl-gl
+GL_TARGETS := target/gl/obj/target-gl-gl classic/games/obj/.stamp-gl classic/gfx/obj/.stamp-gl
 		
 
 CLEAN += target-gl-clean

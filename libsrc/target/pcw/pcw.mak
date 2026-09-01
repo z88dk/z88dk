@@ -9,7 +9,7 @@ PCW_GLOBS_ex := \
 	target/pcw/psg/*.asm
 
 
-PCW_TARGETS := target/pcw/obj/target-pcw-pcw
+PCW_TARGETS := target/pcw/obj/target-pcw-pcw classic/games/obj/.stamp-cpm-pcw classic/gfx/obj/.stamp-cpm-pcw
 
 
 CLEAN += target-pcw-clean

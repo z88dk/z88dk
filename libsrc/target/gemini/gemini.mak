@@ -9,7 +9,7 @@ GEMINI_GLOBS_ex := \
 	target/gemini/stdio/ansi/*.asm 
 
 
-GEMINI_TARGETS := target/gemini/obj/target-gemini-gemini
+GEMINI_TARGETS := target/gemini/obj/target-gemini-gemini classic/games/obj/.stamp-cpm-gemini classic/gfx/obj/.stamp-cpm-gemini
 		
 
 CLEAN += target-gemini-clean
