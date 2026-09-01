@@ -224,7 +224,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ex de,hl
     pop hl
 
-    call m32_mulu_32h_32x32
+    call m32_mulu_32h_32x32         ; in stack X,Y 32-bit mants; out DEHL=high 32
     ; DEHL = product; SP: Xhl Xde es Yhl Yde Ybc ret Xhl Xde Xbc
 
     pop bc                          ; drop Xhl

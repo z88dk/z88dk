@@ -82,7 +82,7 @@ PUBLIC _m32_polyf
     ld h,(hl)
     ld l,a
     pop de                          ; DEHL = Y.mant; BC still meta
-    call m32_fsmul24x32
+    call m32_fsmul24x32             ; in Y, stack x; out BCDEHL = Y*x expanded
     pop af
     pop af                          ; drop Y.de Y.hl
 
@@ -120,7 +120,7 @@ PUBLIC _m32_polyf
     ld h,(hl)
     ld l,a
     pop de                          ; DEHL = product.mant
-    call m32_fsadd24x32
+    call m32_fsadd24x32             ; in product, stack d[n]; out Y = res+d[n]
     pop af
     pop af                          ; drop P.de P.hl
     jp fep0

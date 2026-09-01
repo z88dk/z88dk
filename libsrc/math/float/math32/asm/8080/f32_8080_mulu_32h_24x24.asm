@@ -36,14 +36,12 @@ PUBLIC m32_l0_mulu_32h_24x24
     jp Z,p1_zero
     push af
     ld hl,sp+4
-    ld a,(hl)
-    ld c,a                      ; x.L
+    ld c,(hl)                   ; x.L
     ld hl,sp+6
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)                   ; x.DE
-    pop af
-    call mulu_32_24x8
+    pop af                      ; A = y.E
+    call mulu_32_24x8           ; in CDE=x A=y.E; out BCDE=32-bit
     ld e,d
     ld d,c
     ld c,b
@@ -66,14 +64,12 @@ PUBLIC m32_l0_mulu_32h_24x24
     jp Z,p2_zero
     push af
     ld hl,sp+8
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)                   ; x.L
     ld hl,sp+10
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    pop af
-    call mulu_32_24x8
+    ld e,(hl+)
+    ld d,(hl)                   ; x.DE
+    pop af                      ; A = y.D
+    call mulu_32_24x8           ; in CDE=x A=y.D; out BCDE=32-bit
     pop hl                      ; accL
     add hl,de
     ex de,hl
@@ -105,14 +101,12 @@ PUBLIC m32_l0_mulu_32h_24x24
     jp Z,p3_zero
     push af
     ld hl,sp+8
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)                   ; x.L
     ld hl,sp+10
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    pop af
-    call mulu_32_24x8
+    ld e,(hl+)
+    ld d,(hl)                   ; x.DE
+    pop af                      ; A = y.L
+    call mulu_32_24x8           ; in CDE=x A=y.L; out BCDE=32-bit
     pop hl
     add hl,de
     ex de,hl

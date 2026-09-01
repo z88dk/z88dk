@@ -63,13 +63,10 @@ PUBLIC m32_compare, m32_compare_callee
 .push_float_at
     ; HL = pointer to IEEE float (LSW then MSW)
     pop bc
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
+    ld e,(hl+)
+    ld d,(hl+)
     push de                     ; LSW
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     pop hl                      ; HL = LSW
     push de                     ; MSW
@@ -81,24 +78,21 @@ PUBLIC m32_compare, m32_compare_callee
 ; SP: ret, L.L, L.H, R.L, R.H
 .cmp_lr_copies
     ld hl,sp+8
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     call exp_zero
     jp Z,cp_rz
 
     ld hl,sp+4
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     call exp_zero
     jp Z,cp_lz
 
     ld hl,sp+5
-    ld a,(hl)
-    ld b,a
+    ld b,(hl)                       ; L.sign|exp
     ld hl,sp+9
-    ld a,(hl)
+    ld a,(hl)                       ; R.sign|exp
     ld c,a
     xor b
     and 080h
@@ -109,8 +103,7 @@ PUBLIC m32_compare, m32_compare_callee
     jp C,cp_neg
     ; both +: high first L.H - R.H
     ld hl,sp+4
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)                       ; DE = L.H
     ld hl,sp+8
     ld a,e
@@ -123,8 +116,7 @@ PUBLIC m32_compare, m32_compare_callee
     or c
     jp NZ,hi_fin
     ld hl,sp+2
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+6
     ld a,e
@@ -140,8 +132,7 @@ PUBLIC m32_compare, m32_compare_callee
 .cp_neg
     ; both -: high first R.H - L.H
     ld hl,sp+8
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+4
     ld a,e
@@ -154,8 +145,7 @@ PUBLIC m32_compare, m32_compare_callee
     or c
     jp NZ,hi_fin
     ld hl,sp+6
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+2
     ld a,e
@@ -178,24 +168,21 @@ PUBLIC m32_compare, m32_compare_callee
 ; SP: ret, R.L, R.H, rt, rr, L.L, L.H
 .cmp_lr_callee
     ld hl,sp+4
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     call exp_zero
     jp Z,cc_rz
 
     ld hl,sp+12
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     call exp_zero
     jp Z,cc_lz
 
     ld hl,sp+13
-    ld a,(hl)
-    ld b,a
+    ld b,(hl)                       ; R.sign|exp
     ld hl,sp+5
-    ld a,(hl)
+    ld a,(hl)                       ; L.sign|exp
     ld c,a
     xor b
     and 080h
@@ -205,8 +192,7 @@ PUBLIC m32_compare, m32_compare_callee
     rla
     jp C,cc_neg
     ld hl,sp+12
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+4
     ld a,e
@@ -219,8 +205,7 @@ PUBLIC m32_compare, m32_compare_callee
     or c
     jp NZ,hi_fin
     ld hl,sp+10
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+2
     ld a,e
@@ -235,8 +220,7 @@ PUBLIC m32_compare, m32_compare_callee
 
 .cc_neg
     ld hl,sp+4
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+12
     ld a,e
@@ -249,8 +233,7 @@ PUBLIC m32_compare, m32_compare_callee
     or c
     jp NZ,hi_fin
     ld hl,sp+2
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ld hl,sp+10
     ld a,e
@@ -278,8 +261,7 @@ PUBLIC m32_compare, m32_compare_callee
 
 .cp_rz
     ld hl,sp+4
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     call exp_zero
     jp Z,lr_eq
@@ -298,8 +280,7 @@ PUBLIC m32_compare, m32_compare_callee
 
 .cc_rz
     ld hl,sp+12
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     call exp_zero
     jp Z,lr_eq

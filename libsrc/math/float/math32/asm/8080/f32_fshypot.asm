@@ -22,27 +22,27 @@ PUBLIC m32_fshypot_callee
 
 
 .m32_fshypot
-    call m32_fssqr_fastcall
+    call m32_fssqr_fastcall         ; in DEHL=y; out DEHL=sqr(y)
     push de
-    push hl
-    ld hl,sp+6
-    call m32_fsload
-    call m32_fssqr_fastcall
-    call m32_fsadd_callee
-    call m32_fssqrt_fastcall
+    push hl                         ; SP: sqr(y), ret, x
+    ld hl,sp+6                      ; HL = &x
+    call m32_fsload                 ; in HL=ptr; out DEHL=x
+    call m32_fssqr_fastcall         ; DEHL = sqr(x)
+    call m32_fsadd_callee           ; in DEHL=sqr(x), stack sqr(y); out DEHL=sum
+    call m32_fssqrt_fastcall        ; DEHL = hypot
     or a
     ret
 
 
 .m32_fshypot_callee
-    call m32_fssqr_fastcall
+    call m32_fssqr_fastcall         ; in DEHL=y; out DEHL=sqr(y)
     push de
     push hl
     ld hl,sp+6
-    call m32_fsload
-    call m32_fssqr_fastcall
-    call m32_fsadd_callee
-    call m32_fssqrt_fastcall
+    call m32_fsload                 ; DEHL = x
+    call m32_fssqr_fastcall         ; DEHL = sqr(x)
+    call m32_fsadd_callee           ; DEHL = sqr(x)+sqr(y)
+    call m32_fssqrt_fastcall        ; DEHL = hypot
     pop bc
     pop af
     pop af

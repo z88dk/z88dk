@@ -115,7 +115,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_align
     cp 24
     jp NC,fa_pack                   ; small cannot affect Y
-    call fa_align_x
+    call fa_align_x                 ; in A=expdiff; X slot >>= A, jam sticky
 
 .fa_ops
     push de
@@ -126,10 +126,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     and 080h
     jp NZ,fa_sub
 
-    call fa_addx
+    call fa_addx                    ; in Y=LDE, X slot; out LDE=sum, A=bit24
     or a
     jp Z,fa_pack
-    call fa_shr1
+    call fa_shr1                    ; in LDE, A=1; out LDE>>=1 with hidden 1
     inc c
     ld a,c
     inc a                           ; new exp == 255 (was 254)
@@ -137,7 +137,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp fa_pack
 
 .fa_sub
-    call fa_subx
+    call fa_subx                    ; in Y=LDE, X slot; out LDE=diff, CF=borrow
     jp C,fa_sub_rev                 ; borrow only if expdiff==0
 .fa_sub_mag
     call fa_mant_zero
@@ -268,8 +268,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 ;------------------------------------------------------------------------------
 .unpack_regs
-    ld a,d
-    ld b,a                          ; sign byte
+    ld b,d                          ; sign byte
     ex de,hl
     add hl,hl
     ld c,h                          ; exp

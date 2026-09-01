@@ -9,7 +9,7 @@
 ;
 ; Unpacked: B=exp, C[7]=sign, DEHL=32-bit mant (hidden 1). Same as 8085.
 ;
-; Frame: ld hl,sp+n, ld a,(hl+), ld (hl),e / inc hl / ld (hl),d.
+; Frame: ld hl,sp+n, ld a,(hl+), ld (hl+),e / ld (hl),d.
 ; No ld de,sp+*, ld hl,(de), or exx.
 ;
 
@@ -68,13 +68,11 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push de                         ; save X.de
     ex de,hl                        ; DE = X.hl
     ld hl,sp+10                     ; ieee.HL after push
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.hl
     pop de                          ; X.de
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.de
     ; SP: Y ret X.hl X.de (12); BC = X.bc
 
@@ -88,53 +86,46 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+0
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; w0 = Yhl
 
     ld hl,sp+4
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+2
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; w1 = Yde
 
     ld hl,sp+6
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+4
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; w2 = Ybc
 
     ld hl,sp+8
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+6
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; w3 = ret
 
     ld hl,sp+10
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+8
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; w4 = X.hl
 
     ld hl,sp+12
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; w5 = X.de
 
     ld hl,sp+12
-    ld (hl),c
-    inc hl
+    ld (hl+),c
     ld (hl),b                       ; w6 = X.bc
 
     ; SP: Yhl Yde Ybc ret Xhl Xde Xbc
@@ -227,7 +218,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ex de,hl
     pop hl
 
-    call m32_mulu_32h_32x32
+    call m32_mulu_32h_32x32         ; in stack X,Y 32-bit mants; out DEHL=high 32
     ; DEHL = product; SP: Xhl Xde es Yhl Yde Ybc ret Xhl Xde Xbc
 
     pop bc                          ; drop Xhl

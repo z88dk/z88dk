@@ -111,18 +111,15 @@ PUBLIC _m32_invf
     push de
     push hl
     ld hl,sp+5
-    ld a,(hl)
-    ld b,a
+    ld b,(hl)
     ld hl,sp+7
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)
     ld a,b
     sub c
     add a,126
-    ld b,a
+    ld b,a                          ; packed exp
     ld hl,sp+6
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)                       ; sign
     pop hl
     pop de
     pop af

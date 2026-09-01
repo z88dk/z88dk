@@ -29,8 +29,7 @@ PUBLIC l_f32_f2slong, l_f32_f2ulong, l_f32_f2sint, l_f32_f2uint
 .l_f32_f2slong
 .l_f32_f2ulong
     ld b,d                          ; B = sign | exp[7:1] (for sign later)
-    ld a,d
-    ld c,a
+    ld c,d
     ld a,e
     rla                             ; rl e via A
     ld e,a

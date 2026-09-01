@@ -56,12 +56,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push bc                     ; ret → SP = ret (2), b (4), a
     ld hl,6                     ; a, not 4: ret+b sit under SP (#3088)
     add hl,sp
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld a,(hl)
-    inc hl
+    ld e,(hl+)
+    ld d,(hl+)
+    ld a,(hl+)
     ld h,(hl)
     ld l,a                      ; HLDE = a
     jr div_enter
@@ -73,12 +70,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push hl                     ; b → SP = b, a
     ld hl,4
     add hl,sp
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld a,(hl)
-    inc hl
+    ld e,(hl+)
+    ld d,(hl+)
+    ld a,(hl+)
     ld h,(hl)
     ld l,a                      ; HLDE = a
     exx
@@ -105,12 +99,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ; ---- store a (+8..+11) and sign (+7) ----
     ld hl,8
     add hl,sp
-    ld (hl),c                   ; aE
-    inc hl
-    ld (hl),b                   ; aD
-    inc hl
-    ld (hl),a                   ; aL
-    inc hl
+    ld (hl+),c                  ; aE
+    ld (hl+),b                  ; aD
+    ld (hl+),a                  ; aL
     ex af,af
     ld (hl),a                   ; aH
     ld e,a                      ; E = aH
@@ -297,17 +288,13 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ; rem r2:r1:r0 at +5..+3; div d2:d1:d0 at +2..+0
     ld hl,3
     add hl,sp
-    ld e,(hl)                   ; r0
-    inc hl
-    ld d,(hl)                   ; r1
-    inc hl
+    ld e,(hl+)                  ; r0
+    ld d,(hl+)                  ; r1
     ld a,(hl)                   ; r2
     ld hl,0
     add hl,sp
-    ld c,(hl)                   ; d0
-    inc hl
-    ld b,(hl)                   ; d1
-    inc hl
+    ld c,(hl+)                  ; d0
+    ld b,(hl+)                  ; d1
     ld l,(hl)                   ; d2
     ld h,0                      ; HL = div_hi
     push bc                     ; div_lo
@@ -374,11 +361,11 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     add hl,de
     exx
     adc hl,de
-    or a
+    or a                            ; quot bit = 0
     jr div_quot_shift
 
 .div_bit_ok
-    scf
+    scf                             ; quot bit = 1 (rl c/b consumes C)
 .div_quot_shift
     exx
     rl c

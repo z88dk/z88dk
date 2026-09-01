@@ -35,8 +35,7 @@ PUBLIC m32__dtoa_digits
     add a,'0'                   ; a = decimal digit
 
     exx
-    ld (hl),a                   ; write decimal digit
-    inc hl
+    ld (hl+),a                  ; write decimal digit
 
     exx
     ld a,d

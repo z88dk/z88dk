@@ -30,9 +30,9 @@ PUBLIC m32_fshypot_callee
     ; x at SP+6
     ld de,sp+6
     call load_float_de              ; DEHL = x
-    call m32_fssqr_fastcall
-    call m32_fsadd_callee           ; drops sqr(y); SP: ret, x
-    call m32_fssqrt_fastcall
+    call m32_fssqr_fastcall         ; DEHL = sqr(x)
+    call m32_fsadd_callee           ; drops sqr(y); DEHL = sum; SP: ret, x
+    call m32_fssqrt_fastcall        ; DEHL = hypot
     or a
     ret                             ; leave x under ret
 
@@ -45,9 +45,9 @@ PUBLIC m32_fshypot_callee
     push de
     push hl                         ; SP: sqr(y), ret, x
     ld de,sp+6
-    call load_float_de
-    call m32_fssqr_fastcall
-    call m32_fsadd_callee           ; SP: ret, x
+    call load_float_de              ; DEHL = x
+    call m32_fssqr_fastcall         ; DEHL = sqr(x)
+    call m32_fsadd_callee           ; DEHL = sum; SP: ret, x
     call m32_fssqrt_fastcall
     ; drop x under ret: pop ret, drop x, push ret
     pop bc                          ; ret

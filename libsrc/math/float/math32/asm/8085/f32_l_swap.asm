@@ -32,13 +32,10 @@ PUBLIC l_f32_swap
     ld b,4
 .swloop
     ld a,(de)
-    ld c,a
-    ld a,(hl)
-    ld (de),a
-    ld a,c
-    ld (hl),a
-    inc de
-    inc hl
+    ld c,a                          ; right byte (ld (de),r is A-only)
+    ld a,(hl)                       ; left byte
+    ld (de+),a                      ; left → right
+    ld (hl+),c                      ; right → left
     dec b
     jp NZ,swloop
     pop bc                          ; BC = ret

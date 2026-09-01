@@ -47,13 +47,12 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     push bc
 
     ld hl,sp+0
-    ld a,(hl)
-    ld b,a
+    ld b,(hl)                       ; x.sign
     ld hl,sp+6
-    ld a,(hl)
+    ld a,(hl)                       ; y.sign
     xor b
     ld hl,sp+6
-    ld (hl),a
+    ld (hl),a                       ; result sign at y.sign slot
 
     ; ---- specials gate ----
     ; Frame: x@0 (exp@1, mant@2/4/5), y@6 (exp@7, mant@8/10/11),
@@ -96,37 +95,30 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld (hl),a                       ; store exp sum
 
     ld hl,sp+10
-    ld c,(hl)
-    inc hl
+    ld c,(hl+)
     ld b,(hl)
     push bc                         ; y.DE
     ld hl,sp+10
-    ld c,(hl)
-    inc hl
+    ld c,(hl+)
     ld b,(hl)
     push bc                         ; y.HL
     ld hl,sp+6
-    ld a,(hl)
-    ld c,a                          ; x.L (mant high)
+    ld c,(hl)                       ; x.L (mant high)
     ld hl,sp+8
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)                       ; DE = x.DE
     ld l,c                          ; LDE = x mant
 
-    call m32_mulu_32h_24x24
+    call m32_mulu_32h_24x24         ; in LDE=x, stack y; out HLDE=high 32
 
     push de
     push hl                         ; product high lives in HL
     ld hl,sp+10                     ; sign/exp at +6/+7 +4
-    ld a,(hl)
-    ld c,a
-    inc hl
-    ld a,(hl)
-    ld b,a
+    ld c,(hl+)
+    ld b,(hl)
     pop hl
-    pop de
-    call pack_product
+    pop de                          ; BC = sign/exp, HLDE = product
+    call pack_product               ; in BC=sign/exp HLDE=prod; out DEHL=IEEE
 
     ; DEHL=IEEE; stack: es_l LmH LmD es_r RmH RmD flag ret Lh Ld
     push de
@@ -281,8 +273,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fm_ret_nan
     ld hl,sp+12
-    ld a,(hl)
-    ld b,a                          ; B=flag
+    ld b,(hl)                       ; B=flag
     ld hl,14
     add hl,sp
     ld sp,hl
@@ -298,11 +289,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fm_zero
     ld hl,sp+6
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)
     ld hl,sp+12
-    ld a,(hl)
-    ld b,a                          ; B=flag C=sign
+    ld b,(hl)                       ; B=flag C=sign
     ld hl,14
     add hl,sp
     ld sp,hl
@@ -321,11 +310,9 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fm_ovl
     ld hl,sp+6
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)
     ld hl,sp+12
-    ld a,(hl)
-    ld b,a                          ; B=flag C=sign
+    ld b,(hl)                       ; B=flag C=sign
     ld hl,14
     add hl,sp
     ld sp,hl
@@ -345,8 +332,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .unpack_dehl
     ex de,hl
-    ld a,h
-    ld c,a
+    ld c,h                          ; C = sign byte
     add hl,hl
     scf
     ld a,l

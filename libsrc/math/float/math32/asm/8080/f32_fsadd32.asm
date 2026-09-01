@@ -61,13 +61,11 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push de
     ex de,hl                        ; DE = X.hl
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     pop de                          ; X.de
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     push bc                         ; X.bc | Y | ret | X.hl | X.de
 
@@ -79,53 +77,46 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+0
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+4
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+2
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+6
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+4
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+8
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+6
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+10
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+8
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+12
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+12
-    ld (hl),c
-    inc hl
+    ld (hl+),c
     ld (hl),b                       ; Y.hl Y.de Y.bc ret X.hl X.de X.bc
 
     pop hl
@@ -210,22 +201,19 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+8
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.hl := meta
     ld hl,sp+2
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.de := low
     ld hl,sp+4
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+12
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.bc := high
     ld hl,sp+6
     ld sp,hl                        ; drop park
@@ -285,22 +273,19 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+16
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     ld hl,sp+6
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+18
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     ld hl,sp+8
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+20
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     pop hl
@@ -395,12 +380,10 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld bc,de                        ; park small.de
     ex de,hl                        ; DE = small.hl
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.hl
     ld hl,sp+12
-    ld (hl),c
-    inc hl
+    ld (hl+),c
     ld (hl),b                       ; X.de
     pop hl
     pop de

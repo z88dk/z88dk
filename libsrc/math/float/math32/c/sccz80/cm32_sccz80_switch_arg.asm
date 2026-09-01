@@ -23,11 +23,9 @@ PUBLIC cm32_sccz80_switch_arg
 .loop
     ld c,(hl)
     ld a,(de)
-    ld (hl),a
+    ld (hl+),a                      ; (de) → (hl)
     ld a,c
-    ld (de),a
-    inc de
-    inc hl
+    ld (de+),a                      ; saved (hl) → (de); (de) is A-only
     djnz loop
     ret
 

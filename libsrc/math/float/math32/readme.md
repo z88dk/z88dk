@@ -17,7 +17,7 @@ This library is also designed to be as fast as possible on the z80 processor, us
 
 Intel 8080 and 8085 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`). Those builds do not use the alternate register set or index registers. `--math32` selects the product for the active CPU via `@{ZCC_LIBCPU}`. The default 8080 float library remains MBF32. Pass `--math32` to link IEEE math32.
 
-*@feilipu, May 2019 - August 2023*
+*@feilipu, May 2019 - September 2026*
 
 ---
 
@@ -27,15 +27,15 @@ Intel 8080 and 8085 have separate stack-based cores (`math32_8080.lib`, `math32_
 
   *  All the code is re-entrant.
 
-  *  Register use on the Z80-family cores is limited to the main and alternate set (including af'). NO index registers were abused in the process. The 8080 and 8085 cores use the main set and the stack only.
+  *  Register use on the Z80-family cores is limited to the main and alternate set (including af'). NO index registers were abused in the process. The 8080 and 8085 cores use the main register set and the stack only.
 
-  *  Made for the Spectrum Next (z80n) and Agon Lite (ez80). The z80n `mul de` and the z180 (ez80) `mlt nn`, and r2ka `mul` multiply instructions are used to full advantage to accelerate all floating point calculations.
+  *  Made for the Spectrum Next (z80n) and Agon Lite (ez80). The z80n `mul de` and the z180 (ez80) `mlt nn`, and r2ka `mul` multiply instructions are used to full advantage to accelerate all floating point calculations. Full support for Intel 8080 and 8085, Zilog z80 and variants, and Digi Rabbit processors.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm. The dedicated square kernel is separate: five `16_8x8` products via `l_mulu_de`, matching the z80n/z180 square layout.
+  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Product function paths (mul, sqr, div, poly, invsqrt/sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. The Addition/Subtraction function uses a jam-sticky on lost bits as this proves to provide better accuracy on repeated additions.
 
-  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Product/pack paths (mul, sqr, div, poly, invsqrt/sqrt) use IEEE-754 round-to-nearest-even (RNE) on the residual byte. Add/sub use Digi jam-sticky on lost bits.
+  *  Derived functions are calculated with a full 32-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required, using a polynomial function. This is equivalent to a fused 32-bit multiply-add process, with the rounded IEEE-754 mantissa produced as a final result.
 
-  *  Derived functions are calculated with a 32-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required. This is equivalent to a fused multiply-add process.
+  *  For all platforms, the software multiply is implemented with a `32_24x8` unrolled multiply algorithm. The dedicated square kernel is separate: five `16_8x8` products via `l_mulu_de`, matching the z80n/z180 square layout.
 
   *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
 
