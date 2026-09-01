@@ -6066,4 +6066,10 @@ Prog {
             label: "ZX81BASENDOFPROGRAM"
         }
     ]
+    vars: [
+    ]
+    procs: [
+    ]
+    fns: [
+    ]
 }
