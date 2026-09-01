@@ -1,6 +1,9 @@
 //------------------------------------------------------------------------------
-// define macros to be used in the file
+// check colon as statment separator
 //------------------------------------------------------------------------------
 
-#define FALSE 0
-#define TRUE 1
+	LET A=1:LET B=2::LET C=3:::
+#ASM
+	ld a,1:ld a,2::ld a,3:::
+#ENDASM
+

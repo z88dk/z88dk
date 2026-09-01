@@ -16,10 +16,10 @@ static void dump_expr_base(const Expr* e, DumpContext ctx) {
         ctx.line("nullptr");
         return;
     }
-    ctx.line("type: " + std::string((e->type == ExprType::Number) ? "Number" :
-                                    "String"));
-    ctx.line("location: " + e->loc.filename + ":" + std::to_string(
-                 e->loc.line_num));
+    ctx.line("type: " + std::string((e->type == ExprType::Number) ?
+                                    "Number" : "String"));
+    ctx.line("location: " + e->loc.filename + ":" +
+             std::to_string(e->loc.line_num));
 }
 
 void NumberExpr::dump(DumpContext ctx) const {
