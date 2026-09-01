@@ -1,11 +1,36 @@
 ## TODO
 
-- lower to standard BASIC
-- map each exit to the corresponding structure
 - number lines
 - generate output file
+- create Visitor and Walker patterns
+- add constructors to xxxStmt
+- add printer commands LPRINT, LLIST, COPY
+- detect duplicated PROC arguments and locals
+- detect PROC recursion
+- detect FN recursion
+- add tests to verify all lowering constructs
+- check number of arguments vs parameters in PROC
+- check number of arguments vs parameters in FN
+- split JumpTargetStmt in LabelTargetStmt and LineNumTargetStmt
+- lower VARS section
+- solve LET A=FNid(10)+FNid(20)
 
 ## Parser
+
+void visit(DefProcStmt& proc) override {
+    symtab.add_proc(proc);
+
+    auto it = std::find_if(
+        prog.stmts.begin(),
+        prog.stmts.end(),
+        [&](auto& ptr){ return ptr.get() == &proc; }
+    );
+
+    if (it != prog.stmts.end())
+        prog.stmts.erase(it);
+
+    StmtWalker::visit(proc); // walk its body
+}
 
 void lower_if_else(const IfElseStmt& s, std::vector<std::unique_ptr<Stmt>>& out) {
 
@@ -347,10 +372,6 @@ void emit_expr(const Expr& e, std::ostream& out) {
     }
 }
 
-## Correct architecture
-
-5. Lowering / code generation
-
 ## Mapping of labels
 
 1. T2P behavior
@@ -375,3 +396,28 @@ start2:
 	RAND USR &start2			' ASM labels can be refered in BASIC like &name
 
 Conclusion: ASM lines don't need BASIC line numbers or @labels.
+
+## Pipeline
+
+1. Parse
+AST contains extended BASIC.
+
+2. Semantic analysis
+Type checks, symbol table, label resolution, etc.
+
+3. Lowering (AST -> simpler AST)
+Rewrite extended constructs into plain ZX81 BASIC AST.
+
+4. Line numbering
+Assign ZX81 line numbers after lowering.
+
+5. Codegen
+Convert AST nodes to ZX81 tokenized BASIC lines.
+
+6. ZX81 string encoding
+Convert ASCII strings to ZX81 character set.
+
+7. File output
+Write .P / .P81 / .TAP.
+
+This separation keeps your compiler clean and debuggable.

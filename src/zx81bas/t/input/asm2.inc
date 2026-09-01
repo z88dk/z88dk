@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
-// define macros to be used in the file
+// End with some ASM to check that a final REM line is created
 //------------------------------------------------------------------------------
 
-#define FALSE 0
-#define TRUE 1
+#ASM
+end:		jp 0
+#ENDASM

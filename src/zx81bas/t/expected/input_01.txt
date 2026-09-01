@@ -3,6 +3,7 @@ Input file:  test_t_input_01_t.bas
 Output file: test_t_input_01_t.p
 Contents of test_t_input_01_t.bas.pp:
 #line 1 "test_t_input_01_t.bas"
+#line 1 "t/input/asm0.inc"
 
 
 
@@ -15,22 +16,15 @@ Contents of test_t_input_01_t.bas.pp:
 		ret
 !ENDASM
 
-
-
-
-
+#line 2 "test_t_input_01_t.bas"
 #line 1 "t/input/const.inc"
+
 
 
 
 #define FALSE 0
 #define TRUE 1
-#line 18 "test_t_input_01_t.bas"
-
-
-
-
-
+#line 3 "test_t_input_01_t.bas"
 #line 1 "t/input/pragmas.inc"
 
 
@@ -47,15 +41,6 @@ Contents of test_t_input_01_t.bas.pp:
 
 
 !VARS A$ = "HELLO"
-!VARS Z$ = ""
-!ASM
-z_code:	ld a, b
-		add a, c
-		ld c, a
-		ld a, 0
-		adc a, 0
-		return
-!ENDASM
 !VARS B$(2,3,3)= 	"1.1","1.2","1.3", 	"2.1","2.2","2.3"
 
 
@@ -86,8 +71,23 @@ z_code:	ld a, b
 
 !DFILE_COLAPSED = FALSE
 !SYSVARS =  	0x00,0x00,0x00,0x74,0x00,0x75,0x00,0x8d,0x03,0x00,0x00,0x8e,0x03,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x54,0x00,0xff,0x02,0x00,0x00,0xff,0xff,0x00,0x37,  	0x74,0x00,0x00,0x00,0x00,0x00,0x00,0x8d,0x0c,0x00,0x00,0x2f,0xfd,0x00,0x00,0xf7,  	0x21,0x18,0x40,0x00,0x00,0x09,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,  	0x00,0x00,0x00,0x00
-#line 24 "test_t_input_01_t.bas"
+#line 4 "test_t_input_01_t.bas"
+#line 1 "t/input/asm1.inc"
 
+
+
+
+!VARS Z$ = ""
+!ASM
+z_code:	ld a, b
+		add a, c
+		ld c, a
+		ld a, 0
+		adc a, 0
+		return
+!ENDASM
+#line 5 "test_t_input_01_t.bas"
+#line 1 "t/input/labels.inc"
 
 
 
@@ -104,7 +104,8 @@ z_code:	ld a, b
 !ASM
 label4:			nop
 !ENDASM
-
+#line 6 "test_t_input_01_t.bas"
+#line 1 "t/input/comments.inc"
 
 
 
@@ -129,6 +130,8 @@ label4:			nop
 
 !ENDASM			 
 
+#line 7 "test_t_input_01_t.bas"
+#line 1 "t/input/ticks.inc"
 
 
 
@@ -141,6 +144,8 @@ label4:			nop
 
 
 
+#line 8 "test_t_input_01_t.bas"
+#line 1 "t/input/colon.inc"
 
 
 
@@ -150,6 +155,8 @@ label4:			nop
 	ld a,1:ld a,2::ld a,3:::
 !ENDASM
 
+#line 9 "test_t_input_01_t.bas"
+#line 1 "t/input/let.inc"
 
 
 
@@ -174,6 +181,16 @@ label4:			nop
 	A$(TO 3)="ABC"
 	A$(2 TO)="BCD"
 
+
+
+
+
+	DEF FNid(A) = A+0
+
+	LET A=10*FNid(42)
+	LET A(FNid(42)) = 25
+#line 10 "test_t_input_01_t.bas"
+#line 1 "t/input/func.inc"
 
 
 
@@ -211,6 +228,10 @@ label4:			nop
 	LET A=NOT 0
 	LET A=1 AND 1
 	LET A=0 OR 0
+
+	LET A=ABS FNid(-3)
+	LET A=FNid(5) + FNid(7)
+#line 11 "test_t_input_01_t.bas"
 
 
 
@@ -556,3 +577,13 @@ A = fnempty()
 	CLEAR
 
 1000
+
+#line 1 "t/input/asm2.inc"
+
+
+
+
+!ASM
+end:		jp 0
+!ENDASM
+#line 358 "test_t_input_01_t.bas"

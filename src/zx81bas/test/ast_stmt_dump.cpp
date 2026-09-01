@@ -142,7 +142,7 @@ void DefFnStmt::dump(DumpContext ctx) const {
     dump_stmt_common(*this, child_ctx);
     child_ctx.line("name: \"" + name + "\"");
     dump_string_list("params", params, child_ctx);
-    dump_child_expr("body", expr.get(), child_ctx);
+    dump_child_expr("expr", expr.get(), child_ctx);
     ctx.line("}");
 }
 
@@ -192,6 +192,14 @@ void ForStmt::dump(DumpContext ctx) const {
     dump_child_expr("end_expr", end_expr.get(), child_ctx);
     dump_child_expr("step_expr", step_expr.get(), child_ctx);
     dump_stmt_list("body", body, child_ctx);
+    ctx.line("}");
+}
+
+void NextStmt::dump(DumpContext ctx) const {
+    ctx.line("NextStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    child_ctx.line("name: \"" + name + "\"");
     ctx.line("}");
 }
 

@@ -1,6 +1,13 @@
 //------------------------------------------------------------------------------
-// define macros to be used in the file
+// ASM in the VARS area is always last
 //------------------------------------------------------------------------------
 
-#define FALSE 0
-#define TRUE 1
+#VARS Z$ = ""
+#ASM
+z_code:	ld a, b
+		add a, c
+		ld c, a
+		ld a, 0
+		adc a, 0
+		return
+#ENDASM
