@@ -40,4 +40,10 @@ Prog {
     ]
     stmts: [
     ]
+    vars: [
+    ]
+    procs: [
+    ]
+    fns: [
+    ]
 }

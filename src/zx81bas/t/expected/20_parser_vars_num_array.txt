@@ -54,4 +54,10 @@ Prog {
             ]
         }
     ]
+    vars: [
+    ]
+    procs: [
+    ]
+    fns: [
+    ]
 }
