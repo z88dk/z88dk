@@ -14,6 +14,8 @@ PENCIL2_TARGETS := target/pencil2/obj/target-pencil2-pencil2 classic/games/obj/.
 
 CLEAN += target-pencil2-clean
 
+$(eval $(call gfx_stamp_args,pencil2,TARGET=pencil2))
+
 target-pencil2: $(PENCIL2_TARGETS)
 
 .PHONY: target-pencil2 target-pencil2-clean

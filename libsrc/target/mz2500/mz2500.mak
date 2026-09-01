@@ -18,6 +18,8 @@ MZ2500_TARGETS := target/mz2500/obj/target-mz2500-mz2500 \
 
 CLEAN += target-mz2500-clean
 
+$(eval $(call gfx_stamp_args,mz2500,TARGET=mz2500))
+
 target-mz2500: $(MZ2500_TARGETS)
 
 .PHONY: target-mz2500 target-mz2500-clean

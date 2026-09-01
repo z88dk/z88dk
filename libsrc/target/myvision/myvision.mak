@@ -14,6 +14,8 @@ MYVISION_TARGETS := target/myvision/obj/target-myvision-myvision classic/games/o
 
 CLEAN += target-myvision-clean
 
+$(eval $(call gfx_stamp_args,myvision,TARGET=myvision))
+
 target-myvision: $(MYVISION_TARGETS)
 
 .PHONY: target-myvision target-myvision-clean

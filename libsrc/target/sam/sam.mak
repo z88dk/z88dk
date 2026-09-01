@@ -88,6 +88,8 @@ SAM_TARGETS := target/sam/obj/target-sam-sam target/sam/obj/target-sam-samcpm \
 
 CLEAN += target-sam-clean
 
+$(eval $(call gfx_stamp_args,sam,TARGET=sam FLAVOUR=wide))
+
 target-sam: $(SAM_TARGETS)
 
 .PHONY: target-sam target-sam-clean

@@ -14,6 +14,8 @@ PV1000_TARGETS := target/pv1000/obj/target-pv1000-pv1000 classic/games/obj/.stam
 
 CLEAN += target-pv1000-clean
 
+$(eval $(call gfx_stamp_args,pv1000,TARGET=pv1000 FLAVOUR="gencon narrow"))
+
 target-pv1000: $(PV1000_TARGETS)
 
 .PHONY: target-pv1000 target-pv1000-clean

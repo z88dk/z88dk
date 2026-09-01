@@ -1,0 +1,5 @@
+$(eval $(call gfx_stamp_args,bee,TARGET=bee FLAVOUR="gencon narrow"))
+$(eval $(call gfx_stamp_args,bee-cpm,TARGET=bee FLAVOUR="gencon text6 narrow"))
+$(eval $(call gfx_stamp_args,bee-hr,TARGET=bee FLAVOUR=wide SUBTYPE=beehr))
+$(eval $(call gfx_stamp_args,bee-hr320,TARGET=bee FLAVOUR=wide SUBTYPE=beehr320))
+$(eval $(call gfx_stamp_args,bee-hr512,TARGET=bee FLAVOUR=wide SUBTYPE=beehr512))

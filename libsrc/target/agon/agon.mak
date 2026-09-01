@@ -16,6 +16,8 @@ AGON_TARGETS := target/agon/obj/target-agon-agon classic/games/obj/.stamp-agon c
 
 CLEAN += target-agon-clean
 
+$(eval $(call gfx_stamp_args,agon,TARGET=agon FLAVOUR=wide))
+
 target-agon: $(AGON_TARGETS)
 
 .PHONY: target-agon target-agon-clean

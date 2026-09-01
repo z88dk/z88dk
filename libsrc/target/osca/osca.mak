@@ -6,6 +6,8 @@ OSCA_TARGETS := target/osca/obj/target-osca-osca $(OSCA_OFILES) classic/games/ob
 
 CLEAN += target-osca-clean
 
+$(eval $(call gfx_stamp_args,osca,TARGET=osca FLAVOUR=wide))
+
 target-osca: $(OSCA_TARGETS)
 
 .PHONY: target-osca target-osca-clean

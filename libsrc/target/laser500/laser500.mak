@@ -18,6 +18,8 @@ LASER500_TARGETS := target/laser500/obj/target-laser500-laser500 classic/games/o
 
 CLEAN += target-laser500-clean
 
+$(eval $(call gfx_stamp_args,laser500,TARGET=laser500 FLAVOUR=wide))
+
 target-laser500: $(LASER500_TARGETS)
 
 .PHONY: target-laser500 target-laser500-clean

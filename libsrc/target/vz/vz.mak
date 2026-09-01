@@ -16,6 +16,8 @@ VZ_GLOBS_ex := \
 
 
 VZ_TARGETS := target/vz/obj/target-vz-vz classic/games/obj/.stamp-vz classic/gfx/obj/.stamp-vz
+
+$(eval $(call gfx_stamp_args,vz,TARGET=vz))
 		
 
 CLEAN += target-vz-clean

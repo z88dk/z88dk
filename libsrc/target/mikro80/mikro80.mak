@@ -16,6 +16,8 @@ MIKRO80_TARGETS := target/mikro80/obj/target-mikro80-mikro80 classic/games/obj/.
 
 CLEAN += target-mikro80-clean
 
+$(eval $(call gfx_stamp_args,mikro80,TARGET=mikro80 FLAVOUR="gencon narrow"))
+
 target-mikro80: $(MIKRO80_TARGETS)
 
 .PHONY: target-mikro80 target-mikro80-clean

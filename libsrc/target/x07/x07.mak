@@ -24,6 +24,8 @@ X07_TARGETS := target/x07/obj/target-x07-x07  $(X07_OFILES) classic/games/obj/.s
 
 CLEAN += target-x07-clean
 
+$(eval $(call gfx_stamp_args,x07,TARGET=x07 FLAVOUR=narrow))
+
 target-x07: $(X07_TARGETS)
 
 .PHONY: target-x07 target-x07-clean

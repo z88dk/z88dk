@@ -14,6 +14,8 @@ PMD85_TARGETS := target/pmd85/obj/target-pmd85-pmd85 classic/games/obj/.stamp-pm
 
 CLEAN += target-pmd85-clean
 
+$(eval $(call gfx_stamp_args,pmd85,TARGET=pmd85 FLAVOUR="portable wide"))
+
 target-pmd85: $(PMD85_TARGETS)
 
 .PHONY: target-pmd85 target-pmd85-clean

@@ -7,6 +7,8 @@ CPC_TARGETS := target/cpc/obj/target-cpc-cpc $(CPC_OFILES) classic/games/obj/.st
 
 CLEAN += target-cpc-clean
 
+$(eval $(call gfx_stamp_args,cpc,TARGET=cpc FLAVOUR=wide))
+
 target-cpc: $(CPC_TARGETS)
 
 .PHONY: target-cpc target-cpc-clean

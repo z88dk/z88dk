@@ -18,6 +18,8 @@ PC88_GLOBS_ex := \
 
 
 PC88_TARGETS := target/pc88/obj/target-pc88-pc88 classic/games/obj/.stamp-pc88 classic/gfx/obj/.stamp-pc88
+
+$(eval $(call gfx_stamp_args,pc88,TARGET=pc88 FLAVOUR=wide))
 		
 
 CLEAN += target-pc88-clean

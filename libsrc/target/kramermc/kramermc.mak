@@ -10,6 +10,8 @@ KRAMERMC_TARGETS := target/kramermc/obj/target-kramermc-kramermc classic/gfx/obj
 
 CLEAN += target-kramermc-clean
 
+$(eval $(call gfx_stamp_args,kramermc,TARGET=kramermc FLAVOUR="gencon narrow"))
+
 target-kramermc: $(KRAMERMC_TARGETS)
 
 .PHONY: target-kramermc target-kramermc-clean

@@ -32,6 +32,11 @@ C128HR480_TARGETS := $(C128_c128hr480_TARGETS)
 
 CLEAN += target-c128-clean
 
+$(eval $(call gfx_stamp_args,c128,TARGET=c128 FLAVOUR="text narrow"))
+$(eval $(call gfx_stamp_args,c128udg,TARGET=c128 FLAVOUR="text6 narrow" SUBTYPE=c128udg))
+$(eval $(call gfx_stamp_args,c128hr,TARGET=c128 FLAVOUR=wide SUBTYPE=c128hr))
+$(eval $(call gfx_stamp_args,c128hr480,TARGET=c128 FLAVOUR=wide SUBTYPE=c128hr480))
+
 target-c128: $(C128_TARGETS) $(C128UDG_TARGETS) $(C128HR_TARGETS) $(C128HR480_TARGETS)
 
 .PHONY: target-c128 target-c128-clean

@@ -20,6 +20,8 @@ PHC25_TARGETS := target/phc25/obj/target-phc25-phc25 classic/games/obj/.stamp-ph
 
 CLEAN += target-phc25-clean
 
+$(eval $(call gfx_stamp_args,phc25,TARGET=phc25))
+
 target-phc25: $(PHC25_TARGETS)
 
 .PHONY: target-phc25 target-phc25-clean

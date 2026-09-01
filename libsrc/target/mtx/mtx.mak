@@ -21,6 +21,8 @@ MTX_TARGETS := target/mtx/obj/target-mtx-mtx  $(MTX_OFILES) classic/games/obj/.s
 
 CLEAN += target-mtx-clean
 
+$(eval $(call gfx_stamp_args,mtx,TARGET=mtx))
+
 target-mtx: $(MTX_TARGETS)
 
 .PHONY: target-mtx target-mtx-clean

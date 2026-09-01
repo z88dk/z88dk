@@ -18,6 +18,8 @@ LYNX_TARGETS := target/lynx/obj/target-lynx-lynx classic/games/obj/.stamp-lynx c
 
 CLEAN += target-lynx-clean
 
+$(eval $(call gfx_stamp_args,lynx,TARGET=lynx FLAVOUR="gencon narrow"))
+
 target-lynx: $(LYNX_TARGETS)
 
 .PHONY: target-lynx target-lynx-clean

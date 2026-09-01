@@ -12,6 +12,8 @@ SOL20_TARGETS := target/sol20/obj/target-sol20-sol20 classic/games/obj/.stamp-so
 
 CLEAN += target-sol20-clean
 
+$(eval $(call gfx_stamp_args,sol20,TARGET=sol20 FLAVOUR="portable gencon"))
+
 target-sol20: $(SOL20_TARGETS)
 
 .PHONY: target-sol20 target-sol20-clean

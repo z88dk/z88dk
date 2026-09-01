@@ -16,6 +16,8 @@ SC3000_TARGETS := target/sc3000/obj/target-sc3000-sc3000 classic/games/obj/.stam
 
 CLEAN += target-sc3000-clean
 
+$(eval $(call gfx_stamp_args,sc3000,TARGET=sc3000))
+
 target-sc3000: $(SC3000_TARGETS)
 
 .PHONY: target-sc3000 target-sc3000-clean

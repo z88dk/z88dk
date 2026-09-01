@@ -24,6 +24,8 @@ GAL_TARGETS := target/gal/obj/target-gal-gal classic/games/obj/.stamp-gal classi
 
 CLEAN += target-gal-clean
 
+$(eval $(call gfx_stamp_args,gal,TARGET=gal))
+
 target-gal: $(GAL_TARGETS)
 
 .PHONY: target-gal target-gal-clean

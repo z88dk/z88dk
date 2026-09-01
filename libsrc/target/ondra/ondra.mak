@@ -16,6 +16,8 @@ ONDRA_TARGETS := target/ondra/obj/target-ondra-ondra classic/games/obj/.stamp-on
 
 CLEAN += target-ondra-clean
 
+$(eval $(call gfx_stamp_args,ondra,TARGET=ondra FLAVOUR=wide))
+
 target-ondra: $(ONDRA_TARGETS)
 
 .PHONY: target-ondra target-ondra-clean

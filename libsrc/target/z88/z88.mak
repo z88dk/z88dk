@@ -39,6 +39,8 @@ Z88_OFILES = $(addprefix target/z88/obj/z88/, $(Z88_CFILES:.c=.o))
 
 
 Z88_TARGETS := target/z88/obj/target-z88-z88  $(Z88_OFILES) classic/games/obj/.stamp-z88 classic/gfx/obj/.stamp-z88-wide
+
+$(eval $(call gfx_stamp,z88,wide))
 		
 
 CLEAN += target-z88-clean

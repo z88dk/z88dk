@@ -20,6 +20,8 @@ PPS_OFILES = $(addprefix target/pps/obj/pps/, $(PPS_CFILES:.c=.o))
 PPS_TARGETS := target/pps/obj/target-pps-pps \
 classic/games/obj/.stamp-pps classic/gfx/obj/.stamp-pps \
 	$(PPS_OFILES)
+
+$(eval $(call gfx_stamp_args,pps,TARGET=pps))
 		
 
 CLEAN += target-pps-clean

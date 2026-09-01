@@ -38,6 +38,8 @@ TVCROMGFX_TARGETS := target/tvc/romgfx/obj/target-tvc-romgfx-tvc \
 
 CLEAN += target-tvc-clean
 
+$(eval $(call gfx_stamp_args,tvc,TARGET=tvc))
+
 target-tvc: $(TVC_TARGETS) $(TVCROMGFX_TARGETS)
 
 .PHONY: target-tvc target-tvc-clean

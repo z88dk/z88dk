@@ -18,6 +18,8 @@ GL6000_TARGETS := target/gl6000/obj/target-gl6000-gl6000 classic/games/obj/.stam
 
 CLEAN += target-gl6000-clean
 
+$(eval $(call gfx_stamp_args,gl6000,TARGET=gl SUBTYPE=gl6000 FLAVOUR=narrow))
+
 target-gl6000: $(GL6000_TARGETS)
 
 .PHONY: target-gl6000 target-gl6000-clean

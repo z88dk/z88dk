@@ -19,6 +19,8 @@ NABU_TARGETS := target/nabu/obj/target-nabu-nabu $(NABU_OFILES) classic/games/ob
 
 CLEAN += target-nabu-clean
 
+$(eval $(call gfx_stamp_args,nabu,TARGET=nabu))
+
 target-nabu: $(NABU_TARGETS)
 
 .PHONY: target-nabu target-nabu-clean

@@ -12,6 +12,8 @@ MICRO8085_TARGETS := target/micro8085/obj/target-micro8085-micro8085 classic/gfx
 
 CLEAN += target-micro8085-clean
 
+$(eval $(call gfx_stamp_args,micro8085,TARGET=micro8085))
+
 target-micro8085: $(MICRO8085_TARGETS)
 
 .PHONY: target-micro8085 target-micro8085-clean

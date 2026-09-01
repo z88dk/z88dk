@@ -10,6 +10,8 @@ C7420_TARGETS := target/c7420/obj/target-c7420-c7420 classic/gfx/obj/.stamp-c742
 
 CLEAN += target-c7420-clean
 
+$(eval $(call gfx_stamp_args,c7420,TARGET=c7420))
+
 target-c7420: $(C7420_TARGETS)
 
 .PHONY: target-c7420 target-c7420-clean

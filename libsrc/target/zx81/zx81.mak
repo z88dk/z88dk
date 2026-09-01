@@ -92,6 +92,19 @@ GFX81MT192_TARGETS := target/zx81/obj/target-zx81-zx81mt192 classic/gfx/obj/.sta
 GFX81G007_TARGETS := target/zx81/obj/target-zx81-zx81g007 classic/gfx/obj/.stamp-zx81-g007
 GFX81HR384_TARGETS := target/zx81/obj/target-zx81-zx81hr384 classic/gfx/obj/.stamp-zx81-hr384
 
+$(eval $(call gfx_stamp_args,zx81,TARGET=zx81 FLAVOUR=narrow))
+$(eval $(call gfx_stamp_args,zx81-phrg,TARGET=zx81 FLAVOUR=narrow SUBTYPE=zx81phrg))
+$(eval $(call gfx_stamp_args,zx81-lambda,TARGET=zx81 FLAVOUR=narrow SUBTYPE=lambda))
+$(eval $(call gfx_stamp_args,zx81-udg,TARGET=zx81 SUBTYPE=zx81udg FLAVOUR="narrow text6"))
+$(eval $(call gfx_stamp_args,zx81-hr64,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr64))
+$(eval $(call gfx_stamp_args,zx81-g64,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81g64))
+$(eval $(call gfx_stamp_args,zx81-mt64,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81mt64))
+$(eval $(call gfx_stamp_args,zx81-hr128,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr128))
+$(eval $(call gfx_stamp_args,zx81-hr192,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr192))
+$(eval $(call gfx_stamp_args,zx81-mt192,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81mt192))
+$(eval $(call gfx_stamp_args,zx81-g007,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81g007))
+$(eval $(call gfx_stamp_args,zx81-hr384,TARGET=zx81 FLAVOUR=wide SUBTYPE=zx81hr384))
+
 ZX81_TARGETS := \
 	$(ZX81_BASE_TARGETS) \
 	$(LAMBDA_TARGETS) \

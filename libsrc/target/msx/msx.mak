@@ -24,6 +24,8 @@ MSX_TARGETS := \
 
 CLEAN += target-msx-clean
 
+$(eval $(call gfx_stamp_args,msx,TARGET=msx))
+
 target-msx: $(MSX_TARGETS)
 
 .PHONY: target-msx target-msx-clean

@@ -37,6 +37,9 @@ ENTERPRISE_HRG_TARGETS := \
 
 CLEAN += target-enterprise-clean
 
+$(eval $(call gfx_stamp_args,enterprise,TARGET=enterprise FLAVOUR=wide))
+$(eval $(call gfx_stamp_args,enterprisehr,TARGET=enterprise FLAVOUR=wide SUBTYPE=enterprisehr))
+
 target-enterprise: $(ENTERPRISE_TARGETS) $(ENTERPRISE_GFX_TARGETS) $(ENTERPRISE_HRG_TARGETS)
 
 .PHONY: target-enterprise target-enterprise-clean

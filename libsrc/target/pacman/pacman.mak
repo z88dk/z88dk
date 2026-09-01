@@ -13,6 +13,8 @@ PACMAN_GLOBS_ex := \
 
 PACMAN_TARGETS := target/pacman/obj/target-pacman-pacman classic/games/obj/.stamp-pacman classic/gfx/obj/.stamp-pacman
 
+$(eval $(call gfx_stamp_args,pacman,TARGET=pacman FLAVOUR="text6 narrow"))
+
 
 CLEAN += target-pacman-clean
 

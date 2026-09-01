@@ -14,6 +14,8 @@ Z80TVGAME_TARGETS := target/z80tvgame/obj/target-z80tvgame-z80tvgame classic/gam
 
 CLEAN += target-z80tvgame-clean
 
+$(eval $(call gfx_stamp_args,z80tvgame,TARGET=z80tvgame))
+
 target-z80tvgame: $(Z80TVGAME_TARGETS)
 
 .PHONY: target-z80tvgame target-z80tvgame-clean

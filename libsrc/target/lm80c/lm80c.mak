@@ -14,6 +14,8 @@ LM80C_TARGETS := target/lm80c/obj/target-lm80c-lm80c $(LM80C_OFILES) classic/gam
 
 CLEAN += target-lm80c-clean
 
+$(eval $(call gfx_stamp_args,lm80c,TARGET=lm80c))
+
 target-lm80c: $(LM80C_TARGETS)
 
 .PHONY: target-lm80c target-lm80c-clean

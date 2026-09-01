@@ -12,6 +12,8 @@ RADIO86_TARGETS := target/radio86/obj/target-radio86-radio86 classic/gfx/obj/.st
 
 CLEAN += target-radio86-clean
 
+$(eval $(call gfx_stamp_args,radio86,TARGET=radio86 FLAVOUR="gencon portable"))
+
 target-radio86: $(RADIO86_TARGETS)
 
 .PHONY: target-radio86 target-radio86-clean

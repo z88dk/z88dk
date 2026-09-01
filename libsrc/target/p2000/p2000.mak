@@ -17,6 +17,8 @@ P2000_GLOBS_ex := \
 
 P2000_TARGETS := target/p2000/obj/target-p2000-p2000 classic/games/obj/.stamp-p2000 classic/gfx/obj/.stamp-p2000
 
+$(eval $(call gfx_stamp_args,p2000,TARGET=p2000 FLAVOUR="text6 narrow"))
+
 
 CLEAN += target-p2000-clean
 

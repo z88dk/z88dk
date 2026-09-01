@@ -21,6 +21,8 @@ ALPHATP2_TARGETS := target/alphatp2/obj/target-alphatp2-alphatp2  $(ALPHATP2_OFI
 
 CLEAN += target-alphatp2-clean
 
+$(eval $(call gfx_stamp_args,alphatp2,TARGET=alphatp2 FLAVOUR="gencon narrow"))
+
 target-alphatp2: $(ALPHATP2_TARGETS)
 
 .PHONY: target-alphatp2 target-alphatp2-clean

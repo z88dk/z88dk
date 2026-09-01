@@ -16,6 +16,8 @@ PRIMO_TARGETS := target/primo/obj/target-primo-primo classic/games/obj/.stamp-pr
 
 CLEAN += target-primo-clean
 
+$(eval $(call gfx_stamp_args,primo,TARGET=primo))
+
 target-primo: $(PRIMO_TARGETS)
 
 .PHONY: target-primo target-primo-clean

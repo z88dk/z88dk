@@ -20,6 +20,34 @@ CPM_FCNTL_TARGETS := $(foreach cpu,$(CPM_VARIANTS),$(foreach device,nodevice dev
 
 CPM_TARGETS := $(CPM_ASM_TARGETS) $(CPM_C_TARGETS) $(CPM_FCNTL_TARGETS) classic/gfx/obj/.stamp-cpm
 
+$(eval $(call gfx_stamp_args,cpm,TARGET=cpm FLAVOUR=portable))
+$(eval $(call gfx_stamp_args,cpm-px4,TARGET=cpm SUBTYPE=px4 FLAVOUR=narrow))
+$(eval $(call gfx_stamp_args,cpm-px8,TARGET=cpm SUBTYPE=px8 FLAVOUR=wide))
+$(eval $(call gfx_stamp_args,cpm-v1050,TARGET=cpm FLAVOUR=wide SUBTYPE=v1050))
+$(eval $(call gfx_stamp_args,cpm-v1050udg,TARGET=cpm SUBTYPE=v1050udg FLAVOUR="gencon narrow"))
+$(eval $(call gfx_stamp_args,cpm-kaypro,TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro))
+$(eval $(call gfx_stamp_args,cpm-kaypro83,TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro83))
+$(eval $(call gfx_stamp_args,cpm-attache,TARGET=cpm FLAVOUR=wide SUBTYPE=attache))
+$(eval $(call gfx_stamp_args,cpm-bondwell,TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell))
+$(eval $(call gfx_stamp_args,cpm-bondwell2,TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2 TARGET_CFLAGS="-subtype=bondwell2"))
+$(eval $(call gfx_stamp_args,cpm-osborne1,TARGET=cpm FLAVOUR=narrow SUBTYPE=osborne1))
+$(eval $(call gfx_stamp_args,cpm-rc700,TARGET=cpm FLAVOUR="portable narrow gencon" SUBTYPE=rc700))
+$(eval $(call gfx_stamp_args,cpm-x1,TARGET=cpm FLAVOUR=wide SUBTYPE=x1))
+$(eval $(call gfx_stamp_args,cpm-tim011,TARGET=cpm FLAVOUR="wide portable gencon" SUBTYPE=tim011 TARGET_CFLAGS="-subtype=tim011"))
+$(eval $(call gfx_stamp_args,cpm-x820ii,TARGET=cpm FLAVOUR="narrow gencon" SUBTYPE=x820ii))
+$(eval $(call gfx_stamp_args,cpm-gsx,TARGET=cpm SUBTYPE=gsx FLAVOUR=wide))
+$(eval $(call gfx_stamp_args,cpm-aussie,TARGET=cpm SUBTYPE=aussie FLAVOUR=wide))
+$(eval $(call gfx_stamp_args,cpm-smc777,TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide))
+$(eval $(call gfx_stamp_args,cpm-z80retro,TARGET=cpm FLAVOUR=narrow SUBTYPE=z80retro))
+$(eval $(call gfx_stamp_args,cpm-gemini,TARGET=cpm FLAVOUR=narrow SUBTYPE=gemini))
+$(eval $(call gfx_stamp_args,cpm-einstein,TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein))
+$(eval $(call gfx_stamp_args,cpm-nanos,TARGET=cpm FLAVOUR="narrow gencon" SUBTYPE=nanos))
+$(eval $(call gfx_stamp_args,cpm-northstar,TARGET=cpm FLAVOUR=wide SUBTYPE=northstar))
+$(eval $(call gfx_stamp_args,cpm-tiki100,TARGET=cpm FLAVOUR=wide SUBTYPE=tiki100))
+$(eval $(call gfx_stamp_args,cpm-pcw,TARGET=cpm FLAVOUR=wide SUBTYPE=pcw))
+$(eval $(call gfx_stamp_args,cpm-mbc200,TARGET=cpm FLAVOUR=wide SUBTYPE=mbc200))
+$(eval $(call gfx_stamp_args,h19alt,TARGET=cpm SUBTYPE=h19alt FLAVOUR="gencon text6 narrow"))
+
 CLEAN += target-cpm-clean
 
 target-cpm: $(CPM_TARGETS)

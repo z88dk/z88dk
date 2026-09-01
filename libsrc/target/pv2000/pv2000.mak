@@ -10,6 +10,8 @@ PV2000_TARGETS := target/pv2000/obj/target-pv2000-pv2000 classic/games/obj/.stam
 
 CLEAN += target-pv2000-clean
 
+$(eval $(call gfx_stamp_args,pv2000,TARGET=pv2000))
+
 target-pv2000: $(PV2000_TARGETS)
 
 .PHONY: target-pv2000 target-pv2000-clean

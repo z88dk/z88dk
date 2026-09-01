@@ -16,6 +16,8 @@ LVIV_TARGETS := target/lviv/obj/target-lviv-lviv classic/games/obj/.stamp-lviv c
 
 CLEAN += target-lviv-clean
 
+$(eval $(call gfx_stamp_args,lviv,TARGET=lviv FLAVOUR="narrow portable"))
+
 target-lviv: $(LVIV_TARGETS)
 
 .PHONY: target-lviv target-lviv-clean

@@ -16,6 +16,8 @@ HOMELAB_TARGETS := target/homelab/obj/target-homelab-homelab classic/games/obj/.
 
 CLEAN += target-homelab-clean
 
+$(eval $(call gfx_stamp_args,homelab,TARGET=homelab FLAVOUR="gencon narrow"))
+
 target-homelab: $(HOMELAB_TARGETS)
 
 .PHONY: target-homelab target-homelab-clean

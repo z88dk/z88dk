@@ -16,6 +16,8 @@ Z1013_TARGETS := target/z1013/obj/target-z1013-z1013 classic/games/obj/.stamp-z1
 
 CLEAN += target-z1013-clean
 
+$(eval $(call gfx_stamp_args,z1013,TARGET=z1013 FLAVOUR="gencon narrow"))
+
 target-z1013: $(Z1013_TARGETS)
 
 .PHONY: target-z1013 target-z1013-clean

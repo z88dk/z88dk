@@ -12,6 +12,8 @@ HGMC_TARGETS := target/hgmc/obj/target-hgmc-hgmc classic/games/obj/.stamp-hgmc c
 
 CLEAN += target-hgmc-clean
 
+$(eval $(call gfx_stamp_args,hgmc,TARGET=hgmc))
+
 target-hgmc: $(HGMC_TARGETS)
 
 .PHONY: target-hgmc target-hgmc-clean

@@ -14,6 +14,8 @@ SV8000_TARGETS := target/sv8000/obj/target-sv8000-sv8000 classic/games/obj/.stam
 
 CLEAN += target-sv8000-clean
 
+$(eval $(call gfx_stamp_args,sv8000,TARGET=sv8000))
+
 target-sv8000: $(SV8000_TARGETS)
 
 .PHONY: target-sv8000 target-sv8000-clean

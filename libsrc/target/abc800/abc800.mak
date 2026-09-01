@@ -14,6 +14,8 @@ ABC800_TARGETS := target/abc800/obj/target-abc800-abc800 classic/games/obj/.stam
 
 CLEAN += target-abc800-clean
 
+$(eval $(call gfx_stamp_args,abc800,TARGET=abc800))
+
 target-abc800: $(ABC800_TARGETS)
 
 .PHONY: target-abc800 target-abc800-clean

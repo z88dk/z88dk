@@ -12,6 +12,8 @@ M100_TARGETS := target/m100/obj/target-m100-m100 classic/games/obj/.stamp-m100 c
 
 CLEAN += target-m100-clean
 
+$(eval $(call gfx_stamp_args,m100,TARGET=m100 FLAVOUR=narrow))
+
 target-m100: $(M100_TARGETS)
 
 .PHONY: target-m100 target-m100-clean

@@ -4,6 +4,8 @@ OZ_OFILES := $(addprefix target/oz/obj/oz/,$(OZ_CFILES:.c=.o))
 
 OZ_TARGETS := target/oz/obj/target-oz-oz $(OZ_OFILES) classic/games/obj/.stamp-oz classic/gfx/obj/.stamp-oz
 
+$(eval $(call gfx_stamp_args,oz,TARGET=oz))
+
 CLEAN += target-oz-clean
 
 target-oz: $(OZ_TARGETS)

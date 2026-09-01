@@ -22,6 +22,8 @@ SRR_OFILES = $(addprefix target/srr/obj/srr/, $(SRR_CFILES:.c=.o))
 SRR_TARGETS := target/srr/obj/target-srr-srr \
 	$(SRR_OFILES) \
 	classic/games/obj/.stamp-srr classic/gfx/obj/.stamp-srr
+
+$(eval $(call gfx_stamp_args,srr,TARGET=srr FLAVOUR="gencon narrow"))
 		
 
 CLEAN += target-srr-clean

@@ -22,6 +22,8 @@ MC1000_TARGETS := target/mc1000/obj/target-mc1000-mc1000 classic/games/obj/.stam
 
 CLEAN += target-mc1000-clean
 
+$(eval $(call gfx_stamp_args,mc1000,TARGET=mc1000))
+
 target-mc1000: $(MC1000_TARGETS)
 
 .PHONY: target-mc1000 target-mc1000-clean

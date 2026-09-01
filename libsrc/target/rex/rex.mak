@@ -20,6 +20,8 @@ REX_TARGETS := target/rex/obj/target-rex-rex \
 
 CLEAN += target-rex-clean
 
+$(eval $(call gfx_stamp_args,rex,TARGET=rex))
+
 target-rex: $(REX_TARGETS)
 
 .PHONY: target-rex target-rex-clean

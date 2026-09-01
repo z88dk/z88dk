@@ -19,6 +19,9 @@ HECTOR_TARGETS := target/hector/obj/target-hector-hector1 target/hector/obj/targ
 
 CLEAN += target-hector-clean
 
+$(eval $(call gfx_stamp_args,hector1,TARGET=hector FLAVOUR=narrow SUBTYPE=hector1))
+$(eval $(call gfx_stamp_args,hectorhr,TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr))
+
 target-hector: $(HECTOR_TARGETS)
 
 .PHONY: target-hector target-hector-clean

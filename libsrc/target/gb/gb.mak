@@ -4,6 +4,8 @@ GB_TARGETS := target/gb/obj/target-gb-gb classic/games/obj/.stamp-gb classic/gfx
 
 CLEAN += target-gb-clean
 
+$(eval $(call gfx_stamp_args,gb,TARGET=gb FLAVOUR="gencon portable"))
+
 target-gb: $(GB_TARGETS)
 
 .PHONY: target-gb target-gb-clean

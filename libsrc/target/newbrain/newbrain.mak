@@ -6,6 +6,8 @@ NEWBRAIN_TARGETS := target/newbrain/obj/target-newbrain-newbrain $(NEWBRAIN_OFIL
 
 CLEAN += target-newbrain-clean
 
+$(eval $(call gfx_stamp_args,newbrain,TARGET=newbrain))
+
 target-newbrain: $(NEWBRAIN_TARGETS)
 
 .PHONY: target-newbrain target-newbrain-clean

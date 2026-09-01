@@ -24,6 +24,11 @@ NC200_TARGETS := target/nc/obj/target-nc-nc200 classic/games/obj/.stamp-nc200 cl
 
 CLEAN += target-nc-clean
 
+$(eval $(call gfx_stamp_args,nc,TARGET=nc))
+$(eval $(call gfx_stamp_args,nc100,TARGET=nc FLAVOUR=wide SUBTYPE=nc100))
+$(eval $(call gfx_stamp_args,zcn,TARGET=nc FLAVOUR=wide SUBTYPE=zcn))
+$(eval $(call gfx_stamp_args,nc200,TARGET=nc FLAVOUR=wide SUBTYPE=nc200))
+
 target-nc: $(NC_TARGETS) $(NC100_TARGETS) $(ZCN_TARGETS) $(NC200_TARGETS)
 
 .PHONY: target-nc target-nc-clean

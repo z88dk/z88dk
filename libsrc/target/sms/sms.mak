@@ -29,6 +29,8 @@ SMS_TARGETS := target/sms/obj/target-sms-sms classic/games/obj/.stamp-sms classi
 
 CLEAN += target-sms-clean
 
+$(eval $(call gfx_stamp_args,sms,TARGET=sms))
+
 target-sms: $(SMS_TARGETS)
 
 .PHONY: target-sms target-sms-clean

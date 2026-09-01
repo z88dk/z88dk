@@ -13,6 +13,8 @@ ZX80_TARGETS := \
 	classic/games/obj/.stamp-zx80 \
 	classic/gfx/obj/.stamp-zx80
 
+$(eval $(call gfx_stamp_args,zx80,TARGET=zx80))
+
 CLEAN += target-zx80-clean
 
 target-zx80: $(ZX80_TARGETS)

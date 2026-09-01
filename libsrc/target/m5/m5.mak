@@ -12,6 +12,8 @@ M5_TARGETS := target/m5/obj/target-m5-m5 classic/games/obj/.stamp-m5 classic/gfx
 
 CLEAN += target-m5-clean
 
+$(eval $(call gfx_stamp_args,m5,TARGET=m5))
+
 target-m5: $(M5_TARGETS)
 
 .PHONY: target-m5 target-m5-clean

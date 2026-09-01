@@ -6,6 +6,10 @@ AQUARIUS_TARGETS := target/aquarius/obj/target-aquarius-aquarius $(AQUARIUS_OFIL
 
 CLEAN += target-aquarius-clean
 
+$(eval $(call gfx_stamp_args,aquarius,TARGET=aquarius FLAVOUR="text6 narrow"))
+$(eval $(call gfx_stamp_args,aq48,TARGET=aquarius SUBTYPE=aq48 FLAVOUR="text narrow"))
+$(eval $(call gfx_stamp_args,aqplus,TARGET=aquarius SUBTYPE=aqplus FLAVOUR=wide))
+
 target-aquarius: $(AQUARIUS_TARGETS)
 
 .PHONY: target-aquarius target-aquarius-clean

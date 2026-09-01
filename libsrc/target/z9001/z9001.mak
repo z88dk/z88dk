@@ -16,6 +16,8 @@ Z9001_TARGETS := target/z9001/obj/target-z9001-z9001 classic/games/obj/.stamp-z9
 
 CLEAN += target-z9001-clean
 
+$(eval $(call gfx_stamp_args,z9001,TARGET=z9001 FLAVOUR="gencon wide"))
+
 target-z9001: $(Z9001_TARGETS)
 
 .PHONY: target-z9001 target-z9001-clean

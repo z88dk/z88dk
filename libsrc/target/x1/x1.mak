@@ -22,6 +22,8 @@ X1_CPM_TARGETS := target/x1/obj/target-x1-x1 $(X1_OFILES) classic/gfx/obj/.stamp
 
 CLEAN += target-x1-clean
 
+$(eval $(call gfx_stamp_args,x1,TARGET=x1 FLAVOUR=wide))
+
 target-x1: $(X1_TARGETS) $(X1_CPM_TARGETS)
 
 .PHONY: target-x1 target-x1-clean

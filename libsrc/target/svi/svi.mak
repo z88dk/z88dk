@@ -12,6 +12,8 @@ target/svi/obj/target-svi-support: $(SVI_SOURCES)
 
 CLEAN += target-svi-clean
 
+$(eval $(call gfx_stamp_args,svi,TARGET=svi))
+
 target-svi: $(SVI_TARGETS)
 
 .PHONY: target-svi target-svi-clean

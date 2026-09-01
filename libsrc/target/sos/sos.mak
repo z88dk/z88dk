@@ -20,6 +20,8 @@ SOS_TARGETS := target/sos/obj/target-sos-sos \
 
 CLEAN += target-sos-clean
 
+$(eval $(call gfx_stamp_args,sos,TARGET=sos))
+
 target-sos: $(SOS_TARGETS)
 
 .PHONY: target-sos target-sos-clean

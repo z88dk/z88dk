@@ -14,6 +14,8 @@ GL_TARGETS := target/gl/obj/target-gl-gl classic/games/obj/.stamp-gl classic/gfx
 
 CLEAN += target-gl-clean
 
+$(eval $(call gfx_stamp_args,gl,TARGET=gl))
+
 target-gl: $(GL_TARGETS)
 
 .PHONY: target-gl target-gl-clean

@@ -19,6 +19,8 @@ VG5K_TARGETS := target/vg5k/obj/target-vg5k-vg5k classic/games/obj/.stamp-vg5k c
 
 CLEAN += target-vg5k-clean
 
+$(eval $(call gfx_stamp_args,vg5k,TARGET=vg5k FLAVOUR="gencon narrow"))
+
 target-vg5k: $(VG5K_TARGETS)
 
 .PHONY: target-vg5k target-vg5k-clean

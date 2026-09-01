@@ -10,6 +10,8 @@ HEMC_TARGETS := target/hemc/obj/target-hemc-hemc classic/gfx/obj/.stamp-hemc
 
 CLEAN += target-hemc-clean
 
+$(eval $(call gfx_stamp_args,hemc,TARGET=hemc FLAVOUR="gencon narrow"))
+
 target-hemc: $(HEMC_TARGETS)
 
 .PHONY: target-hemc target-hemc-clean

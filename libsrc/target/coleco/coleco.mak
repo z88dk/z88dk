@@ -12,6 +12,9 @@ COLECO_TARGETS := target/coleco/obj/target-coleco-coleco classic/games/obj/.stam
 
 CLEAN += target-coleco-clean
 
+$(eval $(call gfx_stamp_args,coleco,TARGET=coleco))
+$(eval $(call gfx_stamp_args,cpm-coleco,TARGET=coleco FLAVOUR=narrow))
+
 target-coleco: $(COLECO_TARGETS)
 
 .PHONY: target-coleco target-coleco-clean

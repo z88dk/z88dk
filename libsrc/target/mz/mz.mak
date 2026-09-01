@@ -26,6 +26,8 @@ classic/games/obj/.stamp-mz classic/gfx/obj/.stamp-mz \
 
 CLEAN += target-mz-clean
 
+$(eval $(call gfx_stamp_args,mz,TARGET=mz))
+
 target-mz: $(MZ_TARGETS)
 
 .PHONY: target-mz target-mz-clean

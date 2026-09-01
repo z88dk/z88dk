@@ -6,6 +6,8 @@ HDOS_TARGETS := target/hdos/obj/target-hdos-hdos $(HDOS_OFILES) classic/gfx/obj/
 
 CLEAN += target-hdos-clean
 
+$(eval $(call gfx_stamp_args,h19,TARGET=cpm SUBTYPE=h19 FLAVOUR="gencon text narrow"))
+
 target-hdos: $(HDOS_TARGETS)
 
 .PHONY: target-hdos target-hdos-clean

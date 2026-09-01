@@ -18,6 +18,8 @@ RX78_TARGETS := target/rx78/obj/target-rx78-rx78 classic/games/obj/.stamp-rx78 c
 
 CLEAN += target-rx78-clean
 
+$(eval $(call gfx_stamp_args,rx78,TARGET=rx78))
+
 target-rx78: $(RX78_TARGETS)
 
 .PHONY: target-rx78 target-rx78-clean

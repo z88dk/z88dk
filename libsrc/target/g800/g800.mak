@@ -6,6 +6,11 @@ G800_TARGETS := target/g800/obj/target-g800-g815 target/g800/obj/target-g800-e20
 
 CLEAN += target-g800-clean
 
+$(eval $(call gfx_stamp_args,g800,TARGET=g800))
+$(eval $(call gfx_stamp_args,g800-g815,TARGET=g800 FLAVOUR=narrow SUBTYPE=g815))
+$(eval $(call gfx_stamp_args,g800-e200,TARGET=g800 FLAVOUR=narrow SUBTYPE=e200))
+$(eval $(call gfx_stamp_args,g800-g850,TARGET=g800 FLAVOUR=narrow SUBTYPE=g850))
+
 target-g800: $(G800_TARGETS)
 
 .PHONY: target-g800 target-g800-clean

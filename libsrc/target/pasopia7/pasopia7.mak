@@ -12,6 +12,8 @@ PASOPIA7_TARGETS := target/pasopia7/obj/target-pasopia7-pasopia7 classic/games/o
 
 CLEAN += target-pasopia7-clean
 
+$(eval $(call gfx_stamp_args,pasopia7,TARGET=pasopia7 FLAVOUR="gencon narrow"))
+
 target-pasopia7: $(PASOPIA7_TARGETS)
 
 .PHONY: target-pasopia7 target-pasopia7-clean

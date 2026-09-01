@@ -7,6 +7,9 @@ ACEUDG_TARGETS := target/ace/obj/target-ace-aceudg classic/gfx/obj/.stamp-ace-ud
 
 CLEAN += target-ace-clean
 
+$(eval $(call gfx_stamp_args,ace,TARGET=ace FLAVOUR="text narrow"))
+$(eval $(call gfx_stamp_args,ace-udg,TARGET=ace SUBTYPE=aceudg FLAVOUR="gencon text6 narrow"))
+
 target-ace: $(ACE_TARGETS) $(ACEUDG_TARGETS)
 
 .PHONY: target-ace target-ace-clean

@@ -19,6 +19,8 @@ SPC1000_TARGETS := target/spc1000/obj/target-spc1000-spc1000 classic/games/obj/.
 
 CLEAN += target-spc1000-clean
 
+$(eval $(call gfx_stamp_args,spc1000,TARGET=spc1000))
+
 target-spc1000: $(SPC1000_TARGETS)
 
 .PHONY: target-spc1000 target-spc1000-clean

@@ -16,6 +16,8 @@ S1MP3_TARGETS := target/s1mp3/obj/target-s1mp3-s1mp3 \
 
 CLEAN += target-s1mp3-clean
 
+$(eval $(call gfx_stamp_args,s1mp3,TARGET=s1mp3))
+
 target-s1mp3: $(S1MP3_TARGETS)
 
 .PHONY: target-s1mp3 target-s1mp3-clean
