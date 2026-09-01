@@ -8,10 +8,12 @@
 #include "ast_stmt.h"
 #include "errors.h"
 #include "lexer.h"
+#include "lower.h"
 #include "options.h"
 #include "parser.h"
 #include "preproc.h"
 #include "semantic.h"
+#include "symtab.h"
 #include "utils.h"
 #include <cstdlib>
 #include <filesystem>
@@ -20,7 +22,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include "symtab.h"
 
 static constexpr std::string_view copyright =
     "Copyright (C) Paulo Custodio 2023-2026\n"
@@ -164,6 +165,12 @@ int main(int argc, char* argv[]) {
     // create symbol table
     std::unique_ptr<Symtab> symtab;
     if (!create_symtab(*prog, symtab)) {
+        return EXIT_FAILURE;
+    }
+
+    // lower the program
+    std::unique_ptr<Prog> lowered_prog;
+    if (!lower_prog(*prog, *symtab, lowered_prog)) {
         return EXIT_FAILURE;
     }
 

@@ -23,3 +23,7 @@ UNTIL 0
 FOR I=1 TO 10
 	DEF FNh()=PI
 NEXT
+
+DEF FNi(A,A)=A+A
+
+DEF FNB()=FNB()

@@ -1568,6 +1568,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
     if (terminator == Keyword::None) {
         syntax_error("expected ENDPROC");
     }
+
     return stmt;
 }
 
@@ -1600,7 +1601,6 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
     expect(TokenType::Equal);
 
     stmt->expr = parse_expr();
-
     return stmt;
 }
 

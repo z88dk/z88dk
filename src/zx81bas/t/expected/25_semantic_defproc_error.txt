@@ -9,4 +9,11 @@ t/input/25_semantic_defproc_error.bas:15: error: DEF PROC statement is not allow
 t/input/25_semantic_defproc_error.bas:20: error: DEF PROC statement is not allowed inside another statement block
 t/input/25_semantic_defproc_error.bas:25: error: DEF PROC statement is not allowed inside another statement block
 t/input/25_semantic_defproc_error.bas:30: error: DEF PROC statement is not allowed inside another statement block
-Semantic check failed with 7 errors
+t/input/25_semantic_defproc_error.bas:2: error: DEF PROC statement is not allowed inside another statement block
+t/input/25_semantic_defproc_error.bas:7: error: DEF PROC statement is not allowed inside another statement block
+t/input/25_semantic_defproc_error.bas:12: error: DEF PROC statement is not allowed inside another statement block
+t/input/25_semantic_defproc_error.bas:15: error: DEF PROC statement is not allowed inside another statement block
+t/input/25_semantic_defproc_error.bas:20: error: DEF PROC statement is not allowed inside another statement block
+t/input/25_semantic_defproc_error.bas:25: error: DEF PROC statement is not allowed inside another statement block
+t/input/25_semantic_defproc_error.bas:30: error: DEF PROC statement is not allowed inside another statement block
+Semantic check failed with 14 errors
