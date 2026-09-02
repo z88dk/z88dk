@@ -229,11 +229,9 @@ PUBLIC _m32_invf
 
 ; HL → expanded 6-byte (hl,de,bc).  Exit BC DEHL.  Uses A.
 .load_expanded
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     ld c,(hl+)
     ld b,(hl)
     pop hl

@@ -104,8 +104,7 @@ PUBLIC _m32_polyf
     ld e,a
     ld d,0
     add hl,de                       ; &d[n]
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de                         ; LSW
     ld e,(hl+)
     ld d,(hl)
@@ -177,8 +176,7 @@ PUBLIC _m32_polyf
 
 
 .load_expand_ieee
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de
     ld e,(hl+)
     ld d,(hl)

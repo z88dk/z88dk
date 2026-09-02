@@ -33,8 +33,7 @@ PUBLIC l_f32_swap
     ld a,(hl)                       ; left byte
     ld (de+),a                      ; left → right
     ld (hl+),c                      ; right → left
-    dec b
-    jp NZ,swloop
+    djnz swloop
     pop bc                          ; BC = ret
     pop hl                          ; left LSW
     pop de                          ; left MSW → DEHL = left

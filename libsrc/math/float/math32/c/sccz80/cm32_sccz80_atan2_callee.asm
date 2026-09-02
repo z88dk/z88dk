@@ -87,13 +87,11 @@ ELIF __CPU_INTEL__
     cp 8
     jp Z,atan2_call
     push bc
-    ld de,sp+2
-    ld hl,de
+    ld hl,sp+2                  ; frame after saved step (8080: not ld de,sp+*)
     ld e,a
     ld d,0
     add hl,de
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de
     ld e,(hl+)
     ld d,(hl)

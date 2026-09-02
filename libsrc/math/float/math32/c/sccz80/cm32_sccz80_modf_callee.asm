@@ -90,13 +90,11 @@ ELIF __CPU_INTEL__
     cp 6
     jp Z,modf_call
     push bc
-    ld de,sp+2                  ; frame after saved step
-    ld hl,de
+    ld hl,sp+2                  ; frame after saved step (8080: not ld de,sp+*)
     ld e,a
     ld d,0
     add hl,de                   ; HL -> word[i]
-    ld e,(hl+)
-    ld d,(hl+)                  ; DE = word[i]
+    ld de,(hl+)                 ; DE = word[i]
     push de
     ld e,(hl+)
     ld d,(hl)                   ; DE = word[i+1]

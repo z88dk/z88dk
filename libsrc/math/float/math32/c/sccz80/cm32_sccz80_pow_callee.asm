@@ -97,13 +97,11 @@ ELIF __CPU_INTEL__
     cp 8
     jp Z,pow_call
     push bc                     ; save step
-    ld de,sp+2                  ; DE -> frame (ret,y,x)
-    ld hl,de
+    ld hl,sp+2                  ; frame after saved step (8080: not ld de,sp+*)
     ld e,a
     ld d,0
     add hl,de                   ; HL -> word[i]
-    ld e,(hl+)
-    ld d,(hl+)                  ; DE = word[i], HL -> word[i+1]
+    ld de,(hl+)                 ; DE = word[i], HL -> word[i+1]
     push de                     ; save word[i]
     ld e,(hl+)
     ld d,(hl)                   ; DE = word[i+1], HL at high of word[i+1]

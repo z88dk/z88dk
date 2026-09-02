@@ -240,11 +240,9 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .load_expanded
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     ld c,(hl+)
     ld b,(hl)
     pop hl

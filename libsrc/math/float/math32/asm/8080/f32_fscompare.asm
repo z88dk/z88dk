@@ -62,8 +62,7 @@ PUBLIC m32_compare, m32_compare_callee
 .push_float_at
     ; HL = pointer to IEEE float (LSW then MSW)
     pop bc
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de                     ; LSW
     ld e,(hl+)
     ld d,(hl)
@@ -106,9 +105,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)                       ; DE = L.H
     ld hl,sp+8
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -119,9 +117,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+6
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
@@ -135,9 +132,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+4
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -148,9 +144,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+2
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
@@ -195,9 +190,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+4
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -208,9 +202,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+2
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
@@ -223,9 +216,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+12
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -236,9 +228,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+10
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
