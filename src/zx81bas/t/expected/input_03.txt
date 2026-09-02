@@ -106,6 +106,9 @@ t/input/func.inc:36: 	LET A=1 AND 1
 t/input/func.inc:37: 	LET A=0 OR 0
 t/input/func.inc:39: 	LET A=ABS FNid(-3)
 t/input/func.inc:40: 	LET A=FNid(5) + FNid(7)
+t/input/func.inc:42: 	DEF FNf(A) = A*A
+t/input/func.inc:43: 	
+t/input/func.inc:44: 	
 test_t_input_03_t.bas:16: 	LET A=1+2
 test_t_input_03_t.bas:17: 	LET A=1+-2
 test_t_input_03_t.bas:18: 	LET A=1-2

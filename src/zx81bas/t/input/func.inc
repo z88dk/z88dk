@@ -38,3 +38,7 @@
 
 	LET A=ABS FNid(-3)
 	LET A=FNid(5) + FNid(7)
+
+	DEF FNf(A) = A*A
+	'DEF FNg(B) = FNf(B+1) + 3
+	'LET X = FNg(10)
