@@ -19,6 +19,11 @@ IF __CPU_GBZ80__
     ld hl,sp+8                      ; left
     ld de,hl
     ld hl,sp+4                      ; right
+ELIF __CPU_8085__
+    ld de,sp+8                      ; left
+    ex de,hl
+    ld de,sp+4                      ; right
+    ex de,hl                        ; DE = left, HL = right
 ELSE
     ld hl,8                         ;Left
     add hl,sp

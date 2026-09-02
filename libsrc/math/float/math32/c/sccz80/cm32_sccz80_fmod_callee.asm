@@ -47,6 +47,40 @@ IF __CPU_GBZ80__
     add sp,8
     ret
 
+ELIF __CPU_8085__
+
+; Same left-rotate as pow. Word loads via ld hl,(de) / ld (de),hl.
+
+.cm32_sccz80_fmod_callee
+    ld de,sp+0
+    ld hl,(de)
+    ld bc,hl                    ; BC = ret_outer
+    ld de,sp+2
+    ld hl,(de)
+    ld de,sp+0
+    ld (de),hl
+    ld de,sp+4
+    ld hl,(de)
+    ld de,sp+2
+    ld (de),hl
+    ld de,sp+6
+    ld hl,(de)
+    ld de,sp+4
+    ld (de),hl
+    ld de,sp+8
+    ld hl,(de)
+    ld de,sp+6
+    ld (de),hl
+    ld hl,bc
+    ld de,sp+8
+    ld (de),hl
+    call _m32_fmodf
+    pop bc
+    pop bc
+    pop bc
+    pop bc
+    ret
+
 ELIF __CPU_INTEL__
 
 ; Same left-rotate callee bridge as pow.
