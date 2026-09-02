@@ -1260,7 +1260,93 @@ static int gen_critical_leave(FILE *out, Func *f, const Op *op)
    nested calls pair LIFO with their gen_call pops. */
 #define BC_ARGS_SAVE_MAX 8
 static int bc_args_save_stack[BC_ARGS_SAVE_MAX];
+/* Whether the matching `push bc` was actually emitted for that entry — see
+   bc_tenant_live_to_call. */
+static int bc_args_saved_stack[BC_ARGS_SAVE_MAX];
 static int bc_args_save_depth;
+
+/* [IR_BCSAVE_LIVE=1] Save BC around a call only when a PR_BC tenant is LIVE
+   there, instead of whenever the function has one anywhere.
+
+   func_has_pr_bc is a whole-function question and every BC save in the lowerer
+   asks it. strbench's str_compute is the cost: its BC tenant (`seed`) has its
+   last use at instruction 138, yet the three calls at 180/195/211 — inside the
+   REPS loop — each still emit `push bc` / `pop bc` around a dead register, worth
+   +2.64 % on that bench. The tenant set already excludes IR_VREG_BC_PACK and
+   IR_VREG_CALL_SPLIT, ranged homes whose spans are call-free; this adds the
+   liveness the plain whole-function home lacks.
+
+   ASK ir_live_range, NOT ir_op_live_in. The per-op live-in sets give a TIGHTER
+   answer and it is not a usable one here: driving the skip from them miscompiles
+   enigma fp (RXSEC -> RXSC), and per-site bisection shows every save site fails
+   independently, so the fault is the query and not any one caller. The hole-free
+   [start,end] the allocator itself uses fills liveness holes, which makes it a
+   conservative superset — and on that query enigma is correct while strbench
+   keeps the whole win. Do not "tighten" this back to the live-in sets. */
+static int bcsave_live_on(void)
+{
+    static int c = -1;
+    if (c < 0) { const char *e = getenv("IR_BCSAVE_LIVE"); c = (e && e[0] == '1'); }
+    return c;
+}
+
+/* True if v is one of the plain PR_BC tenants a call must preserve. */
+static int bc_plain_tenant(const Func *f, int v)
+{
+    return f->vreg_to_phys[v] == IR_PR_BC
+        && !(f->vregs[v].flags & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT));
+}
+
+/* Op (bb,j) in the allocator's flat op-index space, which is what a LiveRange
+   is expressed in. -1 if bb is not this function's. */
+static int bc_op_global_index(const Func *f, const BB *bb, int j)
+{
+    int g = 0;
+    for (int b = 0; b < f->n_bbs; b++) {
+        if (&f->bbs[b] == bb) return g + j;
+        g += f->bbs[b].n_ops;
+    }
+    return -1;
+}
+
+/* Does any plain tenant's live range meet [lo,hi]? Anything unknown answers
+   yes, so an incomplete query costs a save, never correctness. */
+static int bc_tenant_live_over(const Func *f, int lo, int hi)
+{
+    for (int v = 0; v < f->n_vregs; v++) {
+        if (!bc_plain_tenant(f, v)) continue;
+        const LiveRange *lr = ir_live_range(f, v);
+        if (!lr || lr->start < 0) return 1;
+        if (lr->start <= hi && lr->end >= lo) return 1;
+    }
+    return 0;
+}
+
+/* For a save emitted immediately before the call being lowered. */
+static int bc_tenant_live_here(const Func *f)
+{
+    if (!bcsave_live_on() || !f || !f->vreg_to_phys || !cur_bb) return 1;
+    int g = bc_op_global_index(f, cur_bb, cur_op_idx);
+    if (g < 0) return 1;
+    return bc_tenant_live_over(f, g, g);
+}
+
+/* For the pre-pushed variant, where the save is emitted at the call's FIRST arg
+   push rather than at the call. Liveness AT that push is not the question — a
+   tenant can be defined between the push and the call and still need preserving,
+   and under nesting (f(a, g(b))) the next call reached from f's push is g's, not
+   f's. Take the window to the END of the block: ir_build only sets pre_pushed
+   when the push group and its call share a block, so that covers the whole
+   group and anything after it. */
+static int bc_tenant_live_to_call(const Func *f)
+{
+    if (!bcsave_live_on() || !f || !f->vreg_to_phys || !cur_bb) return 1;
+    int lo = bc_op_global_index(f, cur_bb, cur_op_idx);
+    if (lo < 0) return 1;
+    int hi = bc_op_global_index(f, cur_bb, cur_bb->n_ops - 1);
+    if (hi < lo) hi = lo;
+    return bc_tenant_live_over(f, lo, hi);
+}
 
 static int func_has_pr_bc(const Func *f)
 {
@@ -1283,10 +1369,17 @@ static int gen_push_arg(FILE *out, Func *f, const Op *op)
         && bc_args_save_depth < BC_ARGS_SAVE_MAX) {
         /* First push of this call: save the PR_BC tenant BELOW the
            arg block (a save in gen_call would land above the args).
-           gen_call's matching pop restores it after the cleanup. */
-        emit(out, "push\tbc");
+           gen_call's matching pop restores it after the cleanup.
+           An entry is stacked whether or not the push is emitted, and carries
+           that fact, so gen_call's pop stays paired with THIS call rather than
+           reaching into an enclosing one's save. */
+        int save = bc_tenant_live_to_call(f);
+        if (save) {
+            emit(out, "push\tbc");
+            L.cur_sp_adjust += 2;
+        }
+        bc_args_saved_stack[bc_args_save_depth] = save;
         bc_args_save_stack[bc_args_save_depth++] = L.rs.bc;
-        L.cur_sp_adjust += 2;
     }
     int v = op->src[0];
     int w = (v >= 0 && v < f->n_vregs) ? f->vregs[v].width : 2;
@@ -2767,9 +2860,6 @@ static int gen_ld_mem(FILE *out, Func *f, const Op *op)
     if (op->mem.kind == IR_MEM_SYM) {
         int dst_w = (op->dst >= 0)
                   ? f->vregs[op->dst].width : 2;
-        if (getenv("IR_LDMEM_TRACE"))
-            fprintf(stderr, "LD_MEM SYM dst=v%d width=%d\n",
-                    op->dst, dst_w);
         if (dst_w == 4) {
             /* Long load from a global, mirror of the long-store path:
                `ld hl,(_sym)` low half, `ld de,(_sym+2)` high half

@@ -2059,9 +2059,6 @@ static int ir_dce_marksweep(Func *f)
         }
         bb->n_ops = keep;
     }
-    if (dead && getenv("IR_DCEPROBE"))
-        fprintf(stderr, "DCEPROBE %s dead_ops=%d\n",
-                f->fn ? ir_sym_name(f->fn) : "?", dead);
     free(live_v);
     return dead;
 }

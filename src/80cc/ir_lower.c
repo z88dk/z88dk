@@ -5629,11 +5629,6 @@ int ir_lower_func(FILE *out, Func *f)
         for (int i = 0; i < hd_nbad; i++) {
             int v = hd_bad[i];
             if (v < 0 || v >= f->n_vregs) continue;
-            if (getenv("IR_HOMEDEMOTE_LOG"))
-                fprintf(stderr, "IR_HOMEDEMOTE: %s v%d phys=%d w=%d -> SPILL\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", v,
-                        f->vreg_to_phys ? f->vreg_to_phys[v] : -1,
-                        f->vregs[v].width);
             if (f->vreg_to_phys) f->vreg_to_phys[v] = IR_PR_SPILL;
             /* These three all suppress a slot; the point is to get one. */
             f->vregs[v].flags &= ~(IR_VREG_NO_SLOT | IR_VREG_DEAD_SPILL

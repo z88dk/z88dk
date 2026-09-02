@@ -81,6 +81,7 @@ static int cs_best_span(const Func *f, int v, const int *bb_first_op,
     return best;
 }
 
+
 /* Record a home decided AFTER the word-home pre-pick snapshot was taken. That
    snapshot is what the lowerer restores when the speculative DE word-home fails
    to form a region, and the restore is a WHOLE-ARRAY memcpy — so a decision made
@@ -223,6 +224,68 @@ static inline void add_cand(Cand *out, int *n, int v, long benefit,
     out[*n].allowed = allowed;
     out[*n].flags = flags;
     (*n)++;
+}
+
+/* [IR_CS_EVICT] The residency benefit v draws from BC over the op-index range
+   [lo,hi], in the SAME units ir_alloc builds cost_benefit in: depth-weighted
+   COST_WRITE_W per def and COST_DEREF_W / COST_READ_W per use. cost_benefit
+   itself is whole-function, which is the wrong measure for a call-split — the
+   split only owns BC over its span — so this is the ranged form of it. Pass the
+   whole function ([0, INT_MAX]) to reproduce cost_benefit for a tenant.
+
+   Deliberately the SAME weights rather than the g0 T-state row: this number is
+   compared against cost_benefit for the eviction decision, and two numbers in
+   different units cannot be compared. */
+/* [IR_CS_EVICT] Depth-weighted count of the calls inside [lo,hi]. A BC tenant
+   whose home spans a call does not hold BC across it: gen_call save/restores the
+   pair and the register belief goes COLD, so the first read after every call
+   reloads from the slot. cost_benefit credits those reads as if the register
+   served them. A call-bounded split has no such calls in its span by
+   construction, which is exactly why comparing the two on raw cost_benefit
+   favours the wrong one. */
+static long cs_call_weight(const Func *f, int lo, int hi,
+                           const int *bb_first_op, const int *bb_loop_depth)
+{
+    long n = 0;
+    int depth_flat = opt_disabled("depth-weight");
+    for (int b = 0; b < f->n_bbs; b++) {
+        int depth = bb_loop_depth[b];
+        if (depth_flat && depth > 1) depth = 1;
+        long w = 1;
+        for (int dw = 0; dw < depth && dw < 8; dw++) w *= 4;
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int g = bb_first_op[b] + j;
+            if (g < lo || g > hi) continue;
+            OpKind k = f->bbs[b].ops[j].kind;
+            if (k == IR_CALL || k == IR_HCALL) n += w;
+        }
+    }
+    return n;
+}
+
+static long cs_span_benefit(const Func *f, int v, int lo, int hi,
+                            const int *bb_first_op, const int *bb_loop_depth)
+{
+    long ben = 0;
+    int depth_flat = opt_disabled("depth-weight");
+    for (int b = 0; b < f->n_bbs; b++) {
+        int depth = bb_loop_depth[b];
+        if (depth_flat && depth > 1) depth = 1;
+        long w = 1;
+        for (int dw = 0; dw < depth && dw < 8; dw++) w *= 4;
+        for (int j = 0; j < f->bbs[b].n_ops; j++) {
+            int g = bb_first_op[b] + j;
+            if (g < lo || g > hi) continue;
+            const Op *o = &f->bbs[b].ops[j];
+            if (o->dst == v) ben += w * COST_WRITE_W;
+            int mb = ((o->kind == IR_LD_MEM || o->kind == IR_ST_MEM)
+                      && o->mem.kind == IR_MEM_VREG) ? o->mem.base : -1;
+            int u[16]; int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+            for (int k = 0; k < nu; k++)
+                if (u[k] == v) ben += w * (v == mb ? COST_DEREF_W : COST_READ_W);
+        }
+    }
+    return ben;
 }
 
 /* Op-kinds whose width-2 lowering STAMPS a PR_BC dst into BC (end in
@@ -689,6 +752,48 @@ static int callsplit_on(void) { static int c = -1; if (c < 0) { const char *e = 
    excludes. They self-guard with a per-op op_clobbers IR_R_IY check over the
    candidate's live range, so the BC veto buys them nothing. */
 static int iylong_off(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_IYLONG"); c = (e && e[0] == '0'); } return c; }
+
+/* [IR_CS_EVICT=0/1] Let a call-bounded split EVICT a picker-placed BC tenant it
+   out-benefits, instead of silently losing BC to whoever the picker placed
+   first. Defaults to whatever IR_PREPUSH_NARROW is: the arbitration gap only
+   becomes reachable once the narrowing admits whole-function BC candidates into
+   functions with pre-pushed calls, so the default build stays byte-identical and
+   the opt-in configuration is self-contained. Force either way to isolate it. */
+static int prepushnarrow_on(void);
+static int cs_evict_on(void)
+{
+    static int c = -1;
+    if (c < 0) {
+        const char *e = getenv("IR_CS_EVICT");
+        c = e ? (e[0] == '1') : prepushnarrow_on();
+    }
+    return c;
+}
+
+/* [IR_PREPUSH_NARROW=1] Narrow the whole-function pre-pushed-call veto to the
+   calls that can really lose BC (prepush_bc_hazard).
+
+   OPT-IN, not default, and for the same reason as the gbz80 cost row: the
+   matrix is a NET win on both axes but not a clean one. Corpus size −9163 B
+   (−0.95 %) over 536 cells, 330 files smaller against 77 larger; ticks −0.69 %
+   aggregate over the valid-tick CPUs, 130 cells faster against 38 slower. But
+   five benches regress and two badly — divbench +3.30 sp / +6.94 fp and
+   shiftbench +2.27 / +6.03, plus bitfieldbench +2.8/+3.3, strbench fp +2.64 and
+   structbench sp +0.32 — against wins of predbench −8.40, strbench sp −5.48,
+   hashbench −4.96, ptrbench −4.93, sortbench −4.40, localbench −4.12,
+   fixedbench −3.93.
+
+   NOT the missing push/pop charge: pricing a BC home for the `push bc` /
+   `pop bc` pair it now pays at each spanned pre-pushed call was BUILT and
+   REFUTED — at the natural weight divbench does not move at all, and at 20x it
+   recovers 1.3M of 4.6M while distorting everything else. The regression is a
+   placement problem, not a ranking one. Find it before flipping this on. */
+static int prepushnarrow_on(void)
+{
+    static int c = -1;
+    if (c < 0) { const char *e = getenv("IR_PREPUSH_NARROW"); c = (e && e[0] == '1'); }
+    return c;
+}
 
 /* [IR_MWBC] The corrected loop-depth weight plus the two cost-model repairs that
    ride with it (the conditional-execution discount in interval_benefit_x and the
@@ -1555,12 +1660,6 @@ static void unified_arbitrate(Func *f, Cand *pool, int n, const long *idx_ben,
                     }
                 if (counter_waiting) continue;
             }
-            if (getenv("IR_IDX2_PROBE"))
-                fprintf(stderr, "IDX2 take %s v%d ben=%ld param=%d counter=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?",
-                        v, idx_ben ? idx_ben[v] : -1L,
-                        (c->flags & CF_IDX2_PARAM) != 0,
-                        (c->flags & CF_IDX2_COUNTER) != 0);
             f->vreg_to_phys[v] = f->idx2_reg;
             idx2_taken = 1;
             continue;
@@ -2367,7 +2466,7 @@ static int collect_bc_temp_cands(const Func *f, const int *bb_first_op,
    [start,end], so a value with a hole over the clobber still reads as crossing
    it (that imprecision is the interference work's problem, not this one), and a
    candidate is rejected outright if its range is unknown. */
-static int vreg_bc_clean(const Func *f, int v)
+static int vreg_reg_clean(const Func *f, int v, RegMask m)
 {
     const LiveRange *lr = ir_live_range(f, v);
     if (!lr || lr->start < 0) return 0;
@@ -2375,9 +2474,101 @@ static int vreg_bc_clean(const Func *f, int v)
     for (int i = 0; i < f->n_bbs; i++)
         for (int j = 0; j < f->bbs[i].n_ops; j++, g++) {
             if (g < lr->start || g > lr->end) continue;
-            if (op_clobbers(f, &f->bbs[i].ops[j]) & IR_R_BC) return 0;
+            if (op_clobbers(f, &f->bbs[i].ops[j]) & m) return 0;
         }
     return 1;
+}
+
+static int vreg_bc_clean(const Func *f, int v)
+{
+    return vreg_reg_clean(f, v, IR_R_BC);
+}
+
+/* Mirrors BC_ARGS_SAVE_MAX in ir_lower_ops.inc.c — a different TU, so this
+   cannot read it. If that cap moves, move this with it. */
+#define BC_ARGS_SAVE_MAX_PROBE 8
+
+/* [IR_PREPUSH_NARROW] Does a pre-pushed-arg call in this function actually
+   endanger a BC home?
+
+   The whole-function `has_prepushed_call` veto was written when gen_call had no
+   way to save BC around a call whose args were already on the stack — the save
+   would have landed above the arg block — leaving only emit_bc_reload, a slot
+   read that a slotless LOCAL cannot serve. The lowerer no longer works that
+   way: gen_push_arg emits `push bc` at the call's FIRST push (op->imm == 1),
+   BELOW the arg block, stacks the cache belief on bc_args_save_stack, and
+   gen_call pops it after the cleanup. func_has_pr_bc gates it and does not care
+   whether the tenant is a param or a local.
+
+   Two things that save does NOT cover, and this reports either:
+
+     (a) IR_PUSH_STRUCT. gen_push_struct emits no save and its block copy is
+         ldir, which eats BC as the counter. It is rejected wherever it appears
+         in the function, not just when it is the arg that goes first: the copy
+         kills BC MID-GROUP, so a later arg in the same call cannot be served
+         from BC either, and the pop only restores after the call.
+     (b) A pre-pushed call reaching gen_call with the save stack EMPTY — nothing
+         to pop. ir_build stamps the marker on the first IR_PUSH_ARG only (a
+         struct taking that slot leaves the call unmarked), and gen_push_arg
+         skips the save once BC_ARGS_SAVE_MAX is reached.
+
+   Simulate the emitter rather than re-deriving the pairing: the save stack is
+   pushed at every imm == 1 and popped at every pre-pushed call, in the order
+   the ops are EMITTED, which is this linear walk. Reading the marker per call
+   gets nesting wrong — for f(a, g(b)) the push of g's result carries imm == 0
+   because it is f's SECOND push, yet f's save was already emitted at `push a`. */
+static int prepush_bc_hazard(const Func *f)
+{
+    int depth = 0;
+    for (int i = 0; i < f->n_bbs; i++)
+        for (int j = 0; j < f->bbs[i].n_ops; j++) {
+            const Op *o = &f->bbs[i].ops[j];
+            if (o->kind == IR_PUSH_STRUCT)
+                return 1;                                   /* (a) */
+            if (o->kind == IR_PUSH_ARG && o->imm == 1) {
+                if (depth < BC_ARGS_SAVE_MAX_PROBE) depth++;
+            } else if (o->kind == IR_CALL && o->call
+                       && o->call->pre_pushed > 0) {
+                if (depth > 0) depth--;
+                else return 1;                              /* (b) */
+            }
+        }
+    return 0;
+}
+
+/* The register a placed home of class R would OWN, as an op_clobbers mask —
+   what vreg_reg_clean must find undisturbed for that home to be realisable on
+   the per-candidate basis. RC_BYTE is two different homes: a single-BB
+   candidate takes slotless C, anything else takes E, the slot-backed low half
+   of DE. The index and alt classes take whatever ir_idx2_reg / ir_idx3_reg /
+   ir_exx_reg resolved to for this CPU and frame mode — IY under an IX frame, IX
+   in sp-mode, h'l' on the KR580VM1, BC' for exx.
+
+   NB the alt-bank answer is meaningful even though op_clobbers never NAMES an
+   alt register: it returns IR_R_ALL for the opaque ops (call, asm, push/ret,
+   memset/memcpy, an unaudited helper), and IR_R_ALL covers the alt bits. So an
+   exx home reads clean exactly when its range crosses nothing opaque, which is
+   the right contract. */
+static RegMask class_home_mask(const Func *f, unsigned R, unsigned flags)
+{
+    int pr;
+    switch (R) {
+    case RC_BC:     return IR_R_BC;
+    case RC_DE_ACC: return IR_R_DE;
+    case RC_BYTE:   return (flags & CF_BYTE_SINGLE_BB) ? IR_R_BC : IR_R_DE;
+    case RC_IDX2:   pr = f->idx2_reg; break;
+    case RC_IDX3:   pr = f->idx3_reg; break;
+    case RC_EXX:    pr = f->exx_reg;  break;
+    default:        return 0;
+    }
+    switch (pr) {
+    case IR_PR_IX:     return IR_R_IX;
+    case IR_PR_IY:     return IR_R_IY;
+    case IR_PR_HL_ALT: return IR_R_HL_ALT;
+    case IR_PR_DE_ALT: return IR_R_DE_ALT;
+    case IR_PR_BC_ALT: return IR_R_BC_ALT;
+    default:           return 0;    /* class unavailable — no register to own */
+    }
 }
 
 /* [IR_BCPERCAND=0] Default-on after the matrix: switchbench -1.96%..-5.63% and
@@ -3919,8 +4110,11 @@ void ir_alloc(Func *f)
                `is_param || !has_prepushed_call` guard below, not here. */
         }
     }
-    /* A pre-pushed-arg call restores the PR_BC tenant via emit_bc_reload
-       (slot read), which a slotless LOCAL candidate can't satisfy. */
+    /* A pre-pushed-arg call used to disqualify every non-param BC candidate in
+       the function, because gen_call could only restore the tenant via
+       emit_bc_reload (a slot read) which a slotless LOCAL cannot satisfy. The
+       lowerer now saves BC below the arg block instead, so this is narrowed to
+       the calls that genuinely lose it — see prepush_bc_hazard. */
     int has_prepushed_call = 0;
     for (int i = 0; i < f->n_bbs && !has_prepushed_call; i++)
         for (int j = 0; j < f->bbs[i].n_ops; j++)
@@ -3929,6 +4123,8 @@ void ir_alloc(Func *f)
                 has_prepushed_call = 1;
                 break;
             }
+    if (has_prepushed_call && prepushnarrow_on() && !prepush_bc_hazard(f))
+        has_prepushed_call = 0;
     /* has_long / has_bc_clobber are BC vetoes: long ops stage the low half
        through BC, l_case walks its table through BC, dload/dstore clobber BC
        with no save/restore point. They say nothing about IY, yet they gate the
@@ -3946,6 +4142,10 @@ void ir_alloc(Func *f)
        included: it proposes several register classes at once and its safety
        cannot be argued from the IY-clean check alone. */
     int bc_region_ok = !has_long && !has_bc_clobber;
+    /* IR_IYLONG=0 restores the OLD gating (IY packing rides the BC veto), not
+       "no IY packing at all" — the opt-out has to be a revert, not a third
+       behaviour. */
+    int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
     /* [IR_BCVETO_PROBE] INERT — size the per-op BC veto. bc_region_ok is three
        per-op facts (width-4 staging, non-char IR_SWITCH dispatch, IR_ACC_*
        helpers) promoted to a WHOLE-FUNCTION disqualification, so one switch or
@@ -3955,7 +4155,12 @@ void ir_alloc(Func *f)
        range"). This counts what the precise test would ADMIT that the blunt one
        rejects: width-2 non-escaping vregs whose own live range never crosses a
        BC-clobbering op. Upper bound — it ignores the packs' other predicates
-       (write-once, def kind, interference), so real wins are a subset. */
+       (write-once, def kind, interference), so real wins are a subset. The
+       PER-CLASS breakdown that does apply them is BCVETOC, below; this line
+       stays because it is the number the corpus survey was taken with.
+       picker_maps=0 marks a function the IY veto ALSO rejects, so the block
+       below never runs and no BCVETOC line follows — 4 of 5523 corpus
+       functions are in that state. */
     if (getenv("IR_BCVETO_PROBE") && !bc_region_ok) {
         int cands = 0, clean = 0;
         for (int v = 0; v < f->n_vregs; v++) {
@@ -3973,13 +4178,10 @@ void ir_alloc(Func *f)
                 }
             if (!crosses) clean++;
         }
-        fprintf(stderr, "BCVETO %-22s has_long=%d has_bc_clobber=%d cands=%d bc_clean=%d\n",
-                f->fn ? ir_sym_name(f->fn) : "?", has_long, has_bc_clobber, cands, clean);
+        fprintf(stderr, "BCVETO %-22s has_long=%d has_bc_clobber=%d cands=%d bc_clean=%d picker_maps=%d\n",
+                f->fn ? ir_sym_name(f->fn) : "?", has_long, has_bc_clobber, cands, clean,
+                iy_region_ok);
     }
-    /* IR_IYLONG=0 restores the OLD gating (IY packing rides the BC veto), not
-       "no IY packing at all" — the opt-out has to be a revert, not a third
-       behaviour. */
-    int iy_region_ok = iylong_off() ? bc_region_ok : !has_iy_clobber;
     if (bc_region_ok || iy_region_ok) {
         /* Per-vreg write count: any op with dst == v writes the vreg.
            Lowerer's PR_BC short-circuit only handles reads (load_to_hl
@@ -4511,6 +4713,160 @@ void ir_alloc(Func *f)
            --opt-disable=orchestrator — was retired: the orchestrator has been the
            validated default for a long time, and the dual path only complicated the
            interactions the unified allocator is consolidating.) */
+        /* [IR_PREPUSH_PROBE] INERT — size the OTHER whole-function veto.
+           bc_home_realizable rejects every non-param candidate in a function
+           containing one pre-pushed-arg call, and iv_home_realizable rejects
+           every candidate outright. The stated reason is that gen_call cannot
+           wrap such a call in push/pop bc because the save would land above the
+           arg block, leaving only emit_bc_reload (a slot read) — fine for a
+           PARAM, impossible for a slotless LOCAL.
+
+           The lowerer no longer works that way. gen_push_arg stamps the call's
+           FIRST push (op->imm == 1) and emits `push bc` THERE — below the arg
+           block — and gen_call pops it after the cleanup, gated on
+           func_has_pr_bc, which is tenant-agnostic. That machinery predates the
+           gate. What it does NOT cover:
+
+             (a) a by-value struct arg — gen_push_struct emits no save and its
+                 block copy is ldir, which eats BC as the counter;
+             (b) a call that reaches gen_call with the save stack EMPTY, so
+                 there is nothing to pop — either because ir_build stamped the
+                 marker on a push that never ran, or because BC_ARGS_SAVE_MAX
+                 (8) capped the stack and the save was silently skipped.
+
+           This measures the narrowing: classify each function's pre-pushed
+           calls, then run the REAL generator twice — once with
+           has_prepushed_call as computed today, once with it reduced to (a)||(b)
+           — and report both proposal counts. Zero codegen change; the value the
+           allocator uses below is untouched. */
+        if (getenv("IR_PREPUSH_PROBE") && has_prepushed_call && f->n_vregs > 0) {
+            int npre = 0, nstruct = 0, uncovered = 0;
+            /* SIMULATE THE EMITTER, do not re-derive the pairing. gen_push_arg
+               pushes onto bc_args_save_stack at every imm == 1 push (capped at
+               BC_ARGS_SAVE_MAX) and gen_call pops iff the depth is non-zero, in
+               the order the ops are EMITTED — which is this linear walk. A
+               per-call or per-BB reading of the marker gets nested calls wrong:
+               for f(a, g(b)) the push of g's result carries imm == 0 because it
+               is f's second push, yet f's save was already emitted at `push a`.
+               The depth counter is what actually decides, so count that. */
+            int depth = 0;
+            for (int i = 0; i < f->n_bbs; i++)
+                for (int j = 0; j < f->bbs[i].n_ops; j++) {
+                    const Op *o = &f->bbs[i].ops[j];
+                    if (o->kind == IR_PUSH_ARG && o->imm == 1) {
+                        if (depth < BC_ARGS_SAVE_MAX_PROBE) depth++;
+                    } else if (o->kind == IR_PUSH_STRUCT) {
+                        nstruct++;
+                    } else if (o->kind == IR_CALL && o->call
+                               && o->call->pre_pushed > 0) {
+                        npre++;
+                        if (depth > 0) depth--;
+                        else uncovered++;   /* no save to restore from */
+                    }
+                }
+            /* Ask the SHIPPED predicate, so probe and gate cannot drift; the
+               struct/uncovered counts above are only the breakdown. */
+            int narrow = prepush_bc_hazard(f);
+            Cand *a = calloc((size_t)f->n_vregs * 10, sizeof(Cand));
+            Cand *b = calloc((size_t)f->n_vregs * 10, sizeof(Cand));
+            if (a && b) {
+                int na = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 has_prepushed_call, entry_live,
+                                                 bb_in_loop, first_use, last_use, a);
+                int nb = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 narrow, entry_live,
+                                                 bb_in_loop, first_use, last_use, b);
+                fprintf(stderr, "PREPUSH %-22s calls=%-2d struct=%-2d uncovered=%-2d "
+                        "narrow=%d now=%-3d then=%-3d gain=%d\n",
+                        f->fn ? ir_sym_name(f->fn) : "?", npre, nstruct, uncovered,
+                        narrow, na, nb, nb - na);
+                if (getenv("IR_PREPUSH_PROBE")[0] == '2')
+                    for (int i = 0; i < nb; i++) {
+                        int fresh = 1;
+                        for (int k = 0; k < na; k++)
+                            if (a[k].vreg == b[i].vreg && a[k].allowed == b[i].allowed
+                                && a[k].flags == b[i].flags) { fresh = 0; break; }
+                        if (fresh)
+                            fprintf(stderr, "PREPUSHV %-22s v%-4d allowed=%#x flags=%#x "
+                                    "uses=%-3d lo=%-4d hi=%-4d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", b[i].vreg,
+                                    b[i].allowed, b[i].flags, use_count[b[i].vreg],
+                                    b[i].lo, b[i].hi);
+                    }
+            }
+            free(a); free(b);
+        }
+        /* [IR_BCVETO_PROBE] INERT step 1 — the PER-CLASS cost of the veto.
+           The BCVETO line at the gate answers only "how many width-2 vregs
+           would a BC home have admitted". This asks the question the fix needs:
+           for every candidate the REAL generator proposes, is the register that
+           class would own clobbered anywhere in the candidate's live range?
+
+           Faithful by construction, because it calls collect_home_candidates
+           itself — every proposer predicate (write-once, def kind, class
+           availability, the DE sub-shapes) is already applied, so these are not
+           the kind of upper bound the BC-pack survey had to discount to 12%.
+           Two imprecisions remain, both conservative: the live range is the
+           hole-free [start,end] (vreg_reg_clean's, and the same one ir_bc_pack
+           ships with), and nothing here models interference between two
+           candidates that would want the same register.
+
+           Zero codegen change — the pool is built, counted and freed, and the
+           real `pool` below stays NULL for a vetoed function. IR_BCVETO_PROBE=2
+           adds a BCVETOV line per candidate for drilling into one function. */
+        if (getenv("IR_BCVETO_PROBE") && !bc_region_ok && f->n_vregs > 0) {
+            static const struct { unsigned R; const char *name; } CL[] = {
+                { RC_BC,   "BC"   }, { RC_BYTE, "BYTE" }, { RC_IDX2,  "IDX2"  },
+                { RC_IDX3, "IDX3" }, { RC_EXX,  "EXX"  }, { RC_DE_ACC, "DEACC" } };
+            enum { NCL = (int)(sizeof CL / sizeof CL[0]) };
+            /* Room for every proposer to fire on every vreg: BC, EXX, idx2,
+               byte, idx3, IV-BC and the four DE sub-shapes = 10. (The live
+               allocator sizes its pool at 6 because the classes are mutually
+               exclusive in practice; a probe should not rely on that.) */
+            Cand *pp = calloc((size_t)f->n_vregs * 10, sizeof(Cand));
+            if (pp) {
+                int pn = collect_home_candidates(f, use_count, write_count,
+                                                 def_kind, all_defs_ok,
+                                                 has_prepushed_call, entry_live,
+                                                 bb_in_loop, first_use, last_use,
+                                                 pp);
+                int detail = getenv("IR_BCVETO_PROBE")[0] == '2';
+                int prop[NCL], clean[NCL], tp = 0, tc = 0;
+                for (int c = 0; c < NCL; c++) prop[c] = clean[c] = 0;
+                for (int i = 0; i < pn; i++)
+                    for (int c = 0; c < NCL; c++) {
+                        if (!(pp[i].allowed & CL[c].R)) continue;
+                        RegMask m = class_home_mask(f, CL[c].R, pp[i].flags);
+                        int ok = m && vreg_reg_clean(f, pp[i].vreg, m);
+                        prop[c]++;
+                        clean[c] += ok;
+                        if (detail)
+                            fprintf(stderr, "BCVETOV %-22s v%-4d %-5s mask=%#06x "
+                                    "uses=%-3d lo=%-4d hi=%-4d flags=%#x clean=%d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", pp[i].vreg,
+                                    CL[c].name, (unsigned)m, use_count[pp[i].vreg],
+                                    pp[i].lo, pp[i].hi, pp[i].flags, ok);
+                    }
+                /* prepush / callfree are on the line because they explain a
+                   zero: bc_home_realizable rejects every non-param vreg in a
+                   function with a pre-pushed call, and the byte/index/exx
+                   classes need a call-free function outright. A function whose
+                   BCVETO count is large but whose BCVETOC total is 0 is not
+                   being held back by this veto at all. */
+                fprintf(stderr, "BCVETOC %-22s prepush=%d callfree=%d",
+                        f->fn ? ir_sym_name(f->fn) : "?",
+                        has_prepushed_call, func_is_call_free(f));
+                for (int c = 0; c < NCL; c++) {
+                    fprintf(stderr, " %s=%d/%d", CL[c].name, prop[c], clean[c]);
+                    tp += prop[c];
+                    tc += clean[c];
+                }
+                fprintf(stderr, " tot=%d/%d\n", tp, tc);
+                free(pp);
+            }
+        }
         {
             /* General picker: BC region only — see the note on the gate. */
             Cand *pool = bc_region_ok
@@ -5055,6 +5411,151 @@ void ir_alloc(Func *f)
                         int s = occ_lo > wlo ? occ_lo : wlo;
                         int e = occ_hi < whi ? occ_hi : whi;
                         if (s <= e) { bc_busy = 1; bc_blocker = w; }
+                    }
+                    /* [IR_CS_EVICT] The split loses BC to whoever the picker
+                       placed first, by ORDER, not by merit — the same fixed
+                       priority ir_bc_pack's 5a eviction already turned into a
+                       competition for its own packs. Turn it into one here too.
+
+                       The comparison cannot be raw cost_benefit on both sides.
+                       cost_benefit is whole-function, so it credits the tenant
+                       for reads it does not actually serve: a tenant whose home
+                       spans a call does NOT hold BC across it (gen_call
+                       save/restores the pair and the belief goes cold), so the
+                       first read after every call reloads from the slot anyway.
+                       A call-bounded split has no calls in its span by
+                       construction. Discount the tenant by what those calls cost
+                       it — per spanned call, the push/pop pair (about a write,
+                       COST_WRITE_W) plus one cold reload (a read, COST_READ_W).
+
+                       Only a PICKER-placed tenant is evictable. An
+                       IR_VREG_BC_PACK or IR_VREG_CALL_SPLIT blocker is another
+                       ranged claim that already won its own competition; if one
+                       of those overlaps, stand down. So is an IR_VREG_INDUCTION
+                       blocker, and that one is load-bearing: an IV in BC is
+                       stepped IN PLACE (`inc bc`) every iteration, so evicting it
+                       turns a register step into a slot read-modify-write on
+                       every trip — a cost no span-local read saving repays.
+                       ir_bc_pack's 5a eviction carries the same guard in its own
+                       form ("don't evict a WRITTEN loop-carried tenant for a mere
+                       AGGREGATE of colder disjoint temps"). Without it, lexbench
+                       trades its loop counter for a 5-read split and pays 13 %.
+                       Reverting to SPILL is sound
+                       here for the same reason it is in 5a — ir_assign_slots runs
+                       later, in the lowerer, and materialises a slot for every
+                       SPILL vreg — and goes through alloc_note_late_home so the
+                       word-home prepick snapshot stays in step. */
+                    if (bc_busy && cs_evict_on()) {
+                        long gain = cs_span_benefit(f, v, best_lo, best_hi,
+                                                    bb_first_op, bb_loop_depth);
+                        long adj_loss = 0;
+                        int nblock = 0, blocked_hard = 0;
+                        for (int w = 0; w < nv && !blocked_hard; w++) {
+                            if (w == v || f->vreg_to_phys[w] != IR_PR_BC) continue;
+                            const LiveRange *lw = ir_live_range(f, w);
+                            int wlo = lw && lw->start >= 0 ? lw->start : first_use[w];
+                            int whi = lw && lw->start >= 0 ? lw->end   : last_use[w];
+                            if (wlo < 0 || whi < 0) continue;
+                            int ss = occ_lo > wlo ? occ_lo : wlo;
+                            int ee = occ_hi < whi ? occ_hi : whi;
+                            if (ss > ee) continue;                  /* disjoint */
+                            if (f->vregs[w].flags
+                                & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT
+                                   | IR_VREG_INDUCTION)) {
+                                blocked_hard = 1;                   /* stand down */
+                                break;
+                            }
+                            long tenant = cost_benefit ? cost_benefit[w]
+                                        : cs_span_benefit(f, w, 0, INT_MAX,
+                                                          bb_first_op, bb_loop_depth);
+                            long disc = cs_call_weight(f, wlo, whi, bb_first_op,
+                                                       bb_loop_depth)
+                                      * (COST_READ_W + COST_WRITE_W);
+                            tenant -= disc;
+                            if (tenant < 0) tenant = 0;
+                            adj_loss += tenant;
+                            nblock++;
+                        }
+                        /* A FLOOR, and it is honest tuning rather than a
+                           derivation: no monotone function of these numbers
+                           separates the confirmed evictions from the refuted one.
+                           Measured, z80: divbench gain=304 adj=51, shiftbench
+                           304/51, bitfieldbench 304/276 — all three recover the
+                           regression in full. lexbench gain=41 adj=17 has the
+                           BEST ratio of the four (2.4x against bitfieldbench's
+                           1.1x) and is the one that costs 13 %. The difference is
+                           magnitude: the good cases are deep-loop values scoring
+                           in the hundreds, lexbench's are straight-line values
+                           scoring in the tens, where two unit-weighted access
+                           counts are inside the model's own error. So decline
+                           below the floor rather than pretend the model can rank
+                           there. IR_CS_EVICT_MIN retunes it; 100 sits between the
+                           measured 41 that was wrong and the 304 that was right. */
+                        long min_gain = 100;
+                        { const char *e = getenv("IR_CS_EVICT_MIN");
+                          if (e) min_gain = strtol(e, NULL, 10); }
+                        if (!blocked_hard && nblock > 0 && gain > adj_loss
+                            && gain >= min_gain) {
+                            for (int w = 0; w < nv; w++) {
+                                if (w == v || f->vreg_to_phys[w] != IR_PR_BC) continue;
+                                if (f->vregs[w].flags
+                                    & (IR_VREG_BC_PACK | IR_VREG_CALL_SPLIT
+                                       | IR_VREG_INDUCTION)) continue;
+                                const LiveRange *lw = ir_live_range(f, w);
+                                int wlo = lw && lw->start >= 0 ? lw->start : first_use[w];
+                                int whi = lw && lw->start >= 0 ? lw->end   : last_use[w];
+                                if (wlo < 0 || whi < 0) continue;
+                                int ss = occ_lo > wlo ? occ_lo : wlo;
+                                int ee = occ_hi < whi ? occ_hi : whi;
+                                if (ss > ee) continue;
+                                alloc_note_late_home(f, w, IR_PR_SPILL);
+                            }
+                            bc_busy = 0;
+                            if (getenv("IR_CALLSPLIT_LOG") || getenv("IR_ALLOC_PROBE"))
+                                fprintf(stderr, "CSEVICT %s split=v%d span=[%d,%d] "
+                                        "gain=%ld adj_loss=%ld evicted=%d\n",
+                                        f->fn ? ir_sym_name(f->fn) : "?", v,
+                                        best_lo, best_hi, gain, adj_loss, nblock);
+                        }
+                    }
+                    if (bc_busy && cslog2) {
+                        /* The DECLINED evictions, under the same
+                           IR_CALLSPLIT_LOG=2 as the other cs-reject lines: what
+                           the split is worth over its span against what each
+                           picker-placed blocker draws from BC over its whole
+                           home, in one unit (cs_span_benefit reproduces
+                           cost_benefit when given the whole function). Read it
+                           beside the CSEVICT line above, which reports the
+                           evictions that were TAKEN — the two together are what
+                           you need to retune IR_CS_EVICT_MIN. */
+                        long gain = cs_span_benefit(f, v, best_lo, best_hi,
+                                                    bb_first_op, bb_loop_depth);
+                        for (int w = 0; w < nv; w++) {
+                            if (w == v || f->vreg_to_phys[w] != IR_PR_BC) continue;
+                            const LiveRange *lw = ir_live_range(f, w);
+                            int wlo = lw && lw->start >= 0 ? lw->start : first_use[w];
+                            int whi = lw && lw->start >= 0 ? lw->end   : last_use[w];
+                            if (wlo < 0 || whi < 0) continue;
+                            int ss = occ_lo > wlo ? occ_lo : wlo;
+                            int ee = occ_hi < whi ? occ_hi : whi;
+                            if (ss > ee) continue;
+                            fprintf(stderr, "CSEVICT %s split=v%d(uc=%d,wc=%d,reads=%d) "
+                                    "span=[%d,%d] "
+                                    "gain=%ld | blocker=v%d flags=%#x live=[%d,%d] "
+                                    "loss=%ld cb=%ld uc=%d wc=%d\n",
+                                    f->fn ? ir_sym_name(f->fn) : "?", v,
+                                    use_count[v], write_count[v], best_reads,
+                                    best_lo, best_hi, gain, w, f->vregs[w].flags,
+                                    wlo, whi,
+                                    cs_span_benefit(f, w, 0, INT_MAX, bb_first_op,
+                                                    bb_loop_depth),
+                                    cost_benefit ? cost_benefit[w] : -1,
+                                    use_count[w], write_count[w]);
+                            fprintf(stderr, "        wcalls_blocker=%ld wcalls_span=%ld\n",
+                                    cs_call_weight(f, wlo, whi, bb_first_op, bb_loop_depth),
+                                    cs_call_weight(f, best_lo, best_hi, bb_first_op,
+                                                   bb_loop_depth));
+                        }
                     }
                     if (bc_busy) {
                         if (cslog2) {
