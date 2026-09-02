@@ -5,10 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 high-32 of 32x32
+;-------------------------------------------------------------------------
 ;
 ; A6 happy-path: inline word loads via ld hl,(de); skip zero 16-bit limbs.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

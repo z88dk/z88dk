@@ -5,14 +5,15 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 l_f32_swap — sccz80 float operand swap
+;-------------------------------------------------------------------------
 ;
 ; Entry: DEHL = right; stack = ret, left.LSW, left.MSW
 ; Exit:  DEHL = left;  stack = ret, right.LSW, right.MSW
 ;
 ; Z80 stock (pop af / ex de,hl / ex (sp),hl / …) fails on 8085 ticks
 ; for that exact sequence. This version block-swaps the two floats.
-;
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -25,23 +26,30 @@ PUBLIC l_f32_swap
     ; DEHL = right; SP: left (4)
     push de
     push hl                         ; SP: right(4), left(4)
-    ; Swap the two 4-byte blocks
     push bc                         ; free BC; SP: ret, right, left
-    ld de,sp+2                      ; &right
-    ld hl,sp+6                      ; &left
-    ld b,4
-.swloop
-    ld a,(de)
-    ld c,a                          ; right byte (ld (de),r is A-only)
-    ld a,(hl)                       ; left byte
-    ld (de+),a                      ; left → right
-    ld (hl+),c                      ; right → left
-    dec b
-    jp NZ,swloop
+    ; Swap two words with ld hl,(de) / ld (de),hl
+    ld de,sp+2
+    ld hl,(de)                      ; right LSW
+    ld bc,hl
+    ld de,sp+6
+    ld hl,(de)                      ; left LSW
+    ld de,sp+2
+    ld (de),hl
+    ld hl,bc
+    ld de,sp+6
+    ld (de),hl
+    ld de,sp+4
+    ld hl,(de)                      ; right MSW
+    ld bc,hl
+    ld de,sp+8
+    ld hl,(de)                      ; left MSW
+    ld de,sp+4
+    ld (de),hl
+    ld hl,bc
+    ld de,sp+8
+    ld (de),hl
     pop bc                          ; BC = ret
-    ; SP: left(4), right(4)
     pop hl                          ; left LSW
     pop de                          ; left MSW → DEHL = left
-    ; SP: right(4)
     push bc                         ; ret
     ret

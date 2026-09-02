@@ -36,8 +36,6 @@
 ; result underflow flushes to signed zero (no gradual underflow).
 ;
 ; Result DEHL = a / b.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

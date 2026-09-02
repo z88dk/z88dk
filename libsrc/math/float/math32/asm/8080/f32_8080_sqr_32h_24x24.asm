@@ -5,15 +5,14 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;------------------------------------------------------------------------------
-;
+;-------------------------------------------------------------------------
 ; 8080: high 32 of 24-bit square. Same five-term engine as 8085.
+;-------------------------------------------------------------------------
+;
 ; 8×8 via shift-add (no hardware mul). Beats 3×24×8 mulu(x,x).
 ;
 ; enter : abc = lde  = 24-bit multiplier  = x
 ; exit  : hlde  = 32-bit product
-;
-;------------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

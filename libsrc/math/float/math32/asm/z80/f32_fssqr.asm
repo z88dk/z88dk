@@ -34,8 +34,6 @@
 ;   for underflow, maximum left shift is 1 place
 ;   so we should report 32 bits of accuracy (don't need all 48 bits)
 ;   = 24 bits significant + 1 bit shift + 7 bits rounding
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

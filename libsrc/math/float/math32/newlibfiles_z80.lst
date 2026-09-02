@@ -376,7 +376,7 @@
 ../../../math/float/math32/asm/z80/f32_fshexpop.asm
 ../../../math/float/math32/asm/z80/f32_fshypot.asm
 ../../../math/float/math32/asm/z80/f32_fsldexp.asm
-../../../math/float/math32/asm/z80/f32_fsload.asm
+../../../math/float/math32/asm/f32_fsload.asm
 ../../../math/float/math32/asm/z80/f32_fsmul.asm
 ../../../math/float/math32/asm/z80/f32_fsmul10u.asm
 ../../../math/float/math32/asm/z80/f32_fsmul2.asm

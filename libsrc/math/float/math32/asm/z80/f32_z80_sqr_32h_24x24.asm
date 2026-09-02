@@ -5,7 +5,9 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;------------------------------------------------------------------------------
+;-------------------------------------------------------------------------
+; m32_sqr_32h_24x24 — z80 high-32 of 24-bit square
+;-------------------------------------------------------------------------
 ;
 ; square of two 24-bit numbers into a 32-bit product
 ;
@@ -32,8 +34,6 @@
 ; exit  : hlde  = 32-bit product
 ;
 ; uses  : af, bc, de, hl
-;
-;------------------------------------------------------------------------------
 
 IF __CPU_Z80__
 

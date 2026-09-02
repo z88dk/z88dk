@@ -1,3 +1,4 @@
+;
 ;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,8 +38,6 @@
 ;   +14 b           IEEE snapshot (4)
 ;   +18 flag        word: L = 1 if callee
 ;   +20 ret
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -350,17 +349,14 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 .rem_sub
     push de                     ; rem high
-    ld d,h
-    ld e,l                      ; DE = rem mid:lo
+    ld de,hl                    ; DE = rem mid:lo
     ld hl,sp+4                  ; &div
     ld a,e
-    sub (hl)                    ; rem.lo - div.lo
+    sub (hl+)                   ; rem.lo - div.lo
     ld e,a
-    inc hl
     ld a,d
-    sbc a,(hl)                  ; rem.mid - div.mid
+    sbc a,(hl+)                 ; rem.mid - div.mid
     ld d,a
-    inc hl
     ld a,(hl)
     ld c,a                      ; C = div.hi (do not pop rem high into BC)
     pop hl                      ; rem high
@@ -375,17 +371,14 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 .rem_add
     push de                     ; rem high
-    ld d,h
-    ld e,l                      ; DE = rem mid:lo
+    ld de,hl                    ; DE = rem mid:lo
     ld hl,sp+4                  ; &div
     ld a,e
-    add a,(hl)                  ; rem.lo + div.lo
+    add a,(hl+)                 ; rem.lo + div.lo
     ld e,a
-    inc hl
     ld a,d
-    adc a,(hl)                  ; rem.mid + div.mid
+    adc a,(hl+)                 ; rem.mid + div.mid
     ld d,a
-    inc hl
     ld a,(hl)
     ld c,a                      ; C = div.hi (B is bit count)
     pop hl                      ; rem high

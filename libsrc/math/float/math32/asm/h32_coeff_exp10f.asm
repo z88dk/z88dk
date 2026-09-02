@@ -1,4 +1,14 @@
 ;
+;  feilipu, 2019 May
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+; Coefficients for exp10f()
+;-------------------------------------------------------------------------
+;
 ; Extracted from cephes-math
 ;
 ; Cephes is a C language library for special functions of mathematical physics
@@ -23,10 +33,6 @@
 ;    u = u * x + 2.3025850931327687;
 ;    return u * x + 9.9999999999984258e-1;
 ;  }
-;
-;-------------------------------------------------------------------------
-; Coefficients for exp10f()
-;-------------------------------------------------------------------------
 
 SECTION rodata_clib
 SECTION rodata_fp_math32

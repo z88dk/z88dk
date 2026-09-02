@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8080 m32_fssqr — IEEE single square (always +)
-; Rounding: IEEE RNE. Stack only (no BSS).
+;-------------------------------------------------------------------------
 ;
+; Rounding: IEEE RNE. Stack only (no BSS).
 
 SECTION code_clib
 SECTION code_fp_math32

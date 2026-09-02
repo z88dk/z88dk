@@ -18,8 +18,6 @@
 ;
 ;  af' unused for control flow.  Exit: ex af,af; ret (F' → public F).
 ;  Note: jr m/p do not exist; sign/parity branches stay jp.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

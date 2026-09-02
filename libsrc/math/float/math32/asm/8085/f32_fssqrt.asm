@@ -5,14 +5,16 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 sqrt / invsqrt — Quake + 3× Newton on expanded 32-bit paths.
+;-------------------------------------------------------------------------
+;
 ; Stack only (no BSS). Same algorithm as Z80 f32_fssqrt.asm.
 ;
 ; w[i+1] = w[i] * (3 − w[i]*w[i]*y) / 2
 ; w[0]   = 0x5f375a86 − (as_int(y) >> 1)
 ;
 ; One reserved −y under the frame; each NR step pushes a working copy.
-;
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -253,7 +255,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push de
     ld hl,(de)
     push hl
-    ex de,hl                    ; HL = ptr (DE still held pointer)
+    ex de,hl                    ; HL = ptr
     inc hl
     inc hl
     ld de,(hl+)

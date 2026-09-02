@@ -5,16 +5,15 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-
 ;-------------------------------------------------------------------------
 ; m32_compare / m32_compare_callee - 8080 IEEE float compare
 ;-------------------------------------------------------------------------
+;
 ; Sign/magnitude + high-word first early-out + no left-copy on callee.
 ;
 ; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
 ;
 ; Frame access via ld hl,sp+n and ld r,(hl).  No ld de,sp+* / ld hl,(de).
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -63,8 +62,7 @@ PUBLIC m32_compare, m32_compare_callee
 .push_float_at
     ; HL = pointer to IEEE float (LSW then MSW)
     pop bc
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de                     ; LSW
     ld e,(hl+)
     ld d,(hl)
@@ -107,9 +105,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)                       ; DE = L.H
     ld hl,sp+8
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -120,9 +117,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+6
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
@@ -136,9 +132,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+4
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -149,9 +144,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+2
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
@@ -196,9 +190,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+4
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -209,9 +202,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+2
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a
@@ -224,9 +216,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+12
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     jp NZ,hi_fin
@@ -237,9 +228,8 @@ PUBLIC m32_compare, m32_compare_callee
     ld d,(hl)
     ld hl,sp+10
     ld a,e
-    sub (hl)
+    sub (hl+)
     ld c,a
-    inc hl
     ld a,d
     sbc a,(hl)
     ld b,a

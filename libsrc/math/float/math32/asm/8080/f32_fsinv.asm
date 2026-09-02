@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8080 m32_fsinv — Newton–Raphson reciprocal.
-; Same control as 8085.  Frame via ld hl,sp+n / ld a,(hl+).
+;-------------------------------------------------------------------------
 ;
+; Same control as 8085.  Frame via ld hl,sp+n / ld a,(hl+).
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -227,11 +229,9 @@ PUBLIC _m32_invf
 
 ; HL → expanded 6-byte (hl,de,bc).  Exit BC DEHL.  Uses A.
 .load_expanded
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     ld c,(hl+)
     ld b,(hl)
     pop hl

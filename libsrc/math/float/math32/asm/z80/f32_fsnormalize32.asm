@@ -15,8 +15,6 @@
 ;
 ;  Byte scan; residual merge loop (add hl,hl / rl de).
 ;  z80asm rl de → rl e; rl d, so SF is already D.7 (no or d needed).
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fmin_callee
 
-IFDEF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 
 ; 8085: C helper is already callee and AF-safe for the return path
 EXTERN _m32_fminf

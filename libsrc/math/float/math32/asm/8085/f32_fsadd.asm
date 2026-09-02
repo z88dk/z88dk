@@ -5,10 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-
 ;-------------------------------------------------------------------------
 ; m32_fsadd / m32_fssub - 8085 IEEE single add/sub
 ;-------------------------------------------------------------------------
+;
 ; Y lives in registers after unpack:
 ;   B = sign byte (bit 7), C = exp, LDE = 24-bit mant (H = 0)
 ;
@@ -31,7 +31,6 @@
 ;
 ; Rounding: Digi jam-sticky.  Lost bits from align or sum>>1 OR into
 ; the mant LSB after the shift.  Pack has no residual RNE.
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -26,8 +26,6 @@
 ;       x = x*(1.5f-xhalf*x*x); // 3rd N-R Iteration (to gild the lily)
 ;       return x;
 ;   }
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

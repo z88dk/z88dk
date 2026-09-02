@@ -5,7 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 expanded 32-bit mantissa add
+;-------------------------------------------------------------------------
+;
 ; B=exp, C[7]=sign, DEHL=mant (D=MSB)
 ;
 ; Y stays in BC DEHL.  X stays on the stack.  No BSS.
@@ -17,7 +20,6 @@
 ; After either prologue:
 ;   Y = larger-or-equal exponent (equal: Y is left / original Y)
 ;   stack = ret, small.hl, small.de, small.bc
-;
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -1,13 +1,19 @@
 ;
+;  feilipu, 2019 May
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+; Coefficients for logf()
+;-------------------------------------------------------------------------
+;
 ; Extracted from cephes-math
 ;
 ; Cephes is a C language library for special functions of mathematical physics
 ; and related items of interest to scientists and engineers.
 ; https://fossies.org/
-;
-;-------------------------------------------------------------------------
-; Coefficients for logf()
-;-------------------------------------------------------------------------
 
 SECTION rodata_clib
 SECTION rodata_fp_math32

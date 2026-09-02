@@ -1,3 +1,4 @@
+;
 ;  feilipu, 2026 July
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,8 +57,6 @@
 ; result underflow flushes to signed zero (no gradual underflow).
 ;
 ; Result DEHL = a / b.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -391,13 +390,11 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+4                  ; &div
     ex de,hl                    ; HL = &div, DE = rem.lo:mid
     ld a,e
-    sub (hl)                    ; rem.lo - div.lo
+    sub (hl+)                   ; rem.lo - div.lo
     ld e,a
-    inc hl
     ld a,d
-    sbc a,(hl)                  ; rem.mid - div.mid
+    sbc a,(hl+)                 ; rem.mid - div.mid
     ld d,a
-    inc hl
     ld a,(hl)
     ld c,a                      ; C = div.hi
     pop hl                      ; rem high
@@ -415,13 +412,11 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+4                  ; &div
     ex de,hl                    ; HL = &div, DE = rem.lo:mid
     ld a,e
-    add a,(hl)                  ; rem.lo + div.lo
+    add a,(hl+)                 ; rem.lo + div.lo
     ld e,a
-    inc hl
     ld a,d
-    adc a,(hl)                  ; rem.mid + div.mid
+    adc a,(hl+)                 ; rem.mid + div.mid
     ld d,a
-    inc hl
     ld a,(hl)
     ld c,a                      ; C = div.hi
     pop hl                      ; rem high

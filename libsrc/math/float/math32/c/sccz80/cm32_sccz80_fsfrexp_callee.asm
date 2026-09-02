@@ -14,7 +14,23 @@ EXTERN m32_fsfrexp_callee
     pop hl                          ; ret
     pop bc                          ; ptr
     pop de                          ; x.HL
+IF __CPU_GBZ80__
+    push de                         ; save x.HL
+    ld d,h
+    ld e,l                          ; DE = ret
+    ld hl,sp+2                      ; &x.DE
+    ld a,(hl)
+    ld (hl),e
+    ld e,a
+    inc hl
+    ld a,(hl)
+    ld (hl),d
+    ld h,a
+    ld l,e                          ; HL = x.DE; (sp+2) = ret
+    pop de                          ; DE = x.HL
+ELSE
     ex (sp),hl                      ; HL = x.DE; (sp) = ret
+ENDIF
     push bc                         ; ptr
     push hl                         ; x.DE
     push de                         ; x.HL

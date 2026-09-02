@@ -5,7 +5,9 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 expanded 32-bit mantissa multiply (NR inv / accurate poly path).
+;-------------------------------------------------------------------------
 ;
 ; Unpacked: B=exp, C[7]=sign, DEHL=32-bit mant (hidden 1). Same as Z80.
 ;
@@ -32,7 +34,6 @@
 ;   SP+8  X.hl
 ;   SP+10 X.de
 ;   SP+12 X.bc
-;
 
 SECTION code_clib
 SECTION code_fp_math32

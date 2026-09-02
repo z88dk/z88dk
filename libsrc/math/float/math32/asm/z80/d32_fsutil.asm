@@ -1,13 +1,15 @@
 ;
+;  feilipu, 2019 April
+;  adapted for z80, z180, and z80n
+;
 ;  Copyright (c) 2015 Digi International Inc.
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, 2019 April
-;  adapted for z80, z180, and z80n
-;
+;-------------------------------------------------------------------------
+; m32_fsneg / m32_fszero / m32_fsmin / m32_fsmax / m32_fsnan
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
