@@ -121,6 +121,14 @@ typedef struct {
        read falls through to require_slot (a loud abort, never a silent wrong
        pop). */
     int cur_stack_resident_spadj;
+    /* [IR_PARK_VERIFY] Shadow stack depth counted from the EMITTED TEXT, not
+       from cur_sp_adjust. Only ~24 of 218 pushes go through emit_sp, so
+       cur_sp_adjust cannot see the lowerings that use push/pop as scratch —
+       which is exactly the interleaving that makes a park unsafe. pv_depth
+       counts every push/pop vemit renders; pv_park_depth is the depth the
+       parked word sits at (-1 = no park). Verifier only; no codegen effect. */
+    int pv_depth, pv_park_depth, pv_park_vreg;
+    int pv_expect_push, pv_expect_pop;
     /* NO_SLOT byte emergency spill via AF (replaces the old below-sp `ld
        (ix-(frame+1)),a` / sp-1 write). When a slotless byte in A must survive an
        A-clobber (e.g. a store whose address load uses `ld a,(hl+)`), it is parked
@@ -243,6 +251,7 @@ static LowerState L = {
     .cur_home_region_lo = -1, .cur_home_region_hi = -1,
     .cur_home_exit_flush_bb = -1, .pending_spill_v = -1,
     .cur_stack_resident = -1,
+    .pv_park_depth = -1, .pv_park_vreg = -1,
 };
 
 
@@ -539,6 +548,41 @@ static int frameprobe_line_bytes(const char *b)
     return 3;
 }
 
+/* [IR_PARK_VERIFY] Inert. STORE_ORDER_PLAN.md's prescribed increment 1: make the
+   IR_PR_STACK park's TOS invariant CHECKABLE, so the span guard can later be
+   widened against a real gate instead of a hand-written op-kind list.
+
+   The shipped invariant is `stack_parked()`: cur_sp_adjust unchanged since the
+   park. That is not a TOS test — only 24 of 218 push sites and 26 of 196 pop
+   sites go through emit_sp, so every other lowering moves the real stack
+   invisibly. This counts push/pop off the RENDERED TEXT (the one chokepoint they
+   all share) and reports two things the shipped test cannot see:
+
+     STEAL  someone else's `pop` takes the word sitting at the park's depth —
+            the failure STORE_ORDER_PLAN.md names (spill_de_unless_dead's
+            TOS-slot fastpath discarding a park it believes is a frame slot).
+     DEPTH  the park's own pop fires at a depth that is not where it parked.
+
+   Both are silent today; the park just returns the wrong word. Note the shipped
+   guard is not equivalent to a depth check even when it passes, because a
+   BALANCED push/pop pair between park and use leaves cur_sp_adjust untouched
+   while having consumed the parked word in between. */
+static long pv_steal, pv_depth_bad, pv_parks;
+static void park_verify_report(void)
+{
+    fprintf(stderr, "IR_PARK_VERIFY parks=%ld steal=%ld depth_mismatch=%ld\n",
+            pv_parks, pv_steal, pv_depth_bad);
+}
+static int park_verify_on = -1;
+/* `push xx` / `pop xx` off the emitted line; +1/-1/0 in words. */
+static int pv_line_delta(const char *b)
+{
+    while (*b == '\t' || *b == ' ') b++;
+    if (!strncmp(b, "push", 4)) return 1;
+    if (!strncmp(b, "pop", 3))  return -1;
+    return 0;
+}
+
 static void vemit(FILE *out, const char *fmt, va_list ap)
 {
     if (spill_stats_on < 0) spill_stats_on = getenv("IR_SPILL_STATS") ? 1 : 0;
@@ -546,10 +590,12 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
     if (clob_verify_on < 0) { clob_verify_on = getenv("IR_CLOB_VERIFY") ? 1 : 0;
                               if (clob_verify_on) atexit(clob_verify_report); }
     if (emit_trace_on < 0)  emit_trace_on  = getenv("IR_EMIT_TRACE") ? 1 : 0;
+    if (park_verify_on < 0) { park_verify_on = getenv("IR_PARK_VERIFY") ? 1 : 0;
+                              if (park_verify_on) atexit(park_verify_report); }
     int acarry = a_carry_enabled();
     int hlcarry = hl_carry_enabled();
     if (spill_stats_on || verify_on || clob_verify_on || getenv("IR_HOME_SLOT_VERIFY")
-        || emit_trace_on || acarry || hlcarry || frameprobe_on()) {
+        || emit_trace_on || acarry || hlcarry || frameprobe_on() || park_verify_on) {
         /* Fully-expanded instruction text. Buffer only when a probe is on; the
            emitted bytes are unchanged. */
         char buf[256];
@@ -572,6 +618,35 @@ static void vemit(FILE *out, const char *fmt, va_list ap)
             verify_len += snprintf(verify_buf + verify_len,
                                    sizeof verify_buf - verify_len, "%s\n", buf);
         if (emit_trace_on) emit_trace_check(buf);
+        if (park_verify_on) {
+            int d = pv_line_delta(buf);
+            if (d > 0) {
+                L.pv_depth++;
+                if (L.pv_expect_push) {          /* this push IS the park */
+                    L.pv_park_depth = L.pv_depth;
+                    L.pv_park_vreg  = L.cur_stack_resident;
+                    L.pv_expect_push = 0; pv_parks++;
+                }
+            } else if (d < 0) {
+                if (L.pv_expect_pop) {           /* the park's designated pop */
+                    if (L.pv_depth != L.pv_park_depth) {
+                        pv_depth_bad++;
+                        fprintf(stderr, "PARK_DEPTH fn=%s v%d parked_at=%d popped_at=%d\n",
+                                (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
+                                L.pv_park_vreg, L.pv_park_depth, L.pv_depth);
+                    }
+                    L.pv_park_depth = -1; L.pv_park_vreg = -1; L.pv_expect_pop = 0;
+                } else if (L.pv_park_depth >= 0 && L.pv_depth == L.pv_park_depth) {
+                    pv_steal++;                  /* somebody else took the park */
+                    fprintf(stderr, "PARK_STEAL fn=%s v%d at_depth=%d by: %s\n",
+                            (cur_lazy_func && cur_lazy_func->fn) ? ir_sym_name(cur_lazy_func->fn) : "?",
+                            L.pv_park_vreg, L.pv_depth, buf);
+                    L.pv_park_depth = -1; L.pv_park_vreg = -1;
+                }
+                L.pv_depth--;
+            }
+            L.pv_expect_push = L.pv_expect_pop = 0;
+        }
         /* IR_A_CARRY partner: invalidate-by-default A tracker. Keep rs.a only if
            this line PROVABLY preserves A's value (recognised AND either does not
            write A or self-preserves it, e.g. `or a`/`and a` flag tests). An
@@ -5177,6 +5252,14 @@ int ir_lower_func(FILE *out, Func *f)
            value's `pop hl`; bitfield store miscompile). Keep those slotted — their
            pre-change behaviour (read-remat + slot) is correct. */
         int *store_base = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1), sizeof(int));
+        /* ...UNLESS every such store folds to an absolute `ld (sym+off),hl`.
+           That path (gen_st_mem) never materialises the base at all, so the
+           register-across-the-value hazard the exclusion guards simply does not
+           arise, and keeping the slot leaves a DEAD store to a slot nothing ever
+           reads. Track the stores that CANNOT fold; a base with none of those is
+           safe to treat as the plain symbol-address constant it is. */
+        int *store_base_hard = calloc((size_t)(f->n_vregs > 0 ? f->n_vregs : 1),
+                                      sizeof(int));
         /* remat-LEA is gated to CALLLESS functions (see the [IR_REMAT_LEA] note):
            recomputing a frame-slot address mid-call-argument-marshalling would need
            cur_sp_adjust to reflect the already-pushed args, and a &local passed to a
@@ -5184,14 +5267,18 @@ int ir_lower_func(FILE *out, Func *f)
            function with no IR_CALL has no such marshalling, so every remat point is
            sp-adjust-safe. */
         int func_has_call = 0;
-        if (ndef && store_base) {
+        if (ndef && store_base && store_base_hard) {
             for (int b = 0; b < f->n_bbs; b++)
                 for (int j = 0; j < f->bbs[b].n_ops; j++) {
                     const Op *so = &f->bbs[b].ops[j];
                     if (so->kind == IR_CALL) func_has_call = 1;
                     if (so->kind == IR_ST_MEM && so->mem.kind == IR_MEM_VREG
-                        && so->mem.base >= 0 && so->mem.base < f->n_vregs)
+                        && so->mem.base >= 0 && so->mem.base < f->n_vregs) {
                         store_base[so->mem.base] = 1;
+                        /* Mirrors gen_st_mem's fold precondition. */
+                        if (so->mem.post_step || so->src[0] < 0)
+                            store_base_hard[so->mem.base] = 1;
+                    }
                 }
             /* Count via ir_op_defs — some ops define through a non-dst field
                (e.g. IR_POSTSTEP self-steps src[0]); counting op->dst alone
@@ -5259,13 +5346,15 @@ int ir_lower_func(FILE *out, Func *f)
                            compose with just-in-time rematerialisation (the base in
                            HL is clobbered by the value's `pop hl` — bitfield-on-
                            global, MMIO `*(T*)K = v`); those keep their slot. */
-                        if (store_base[d]) continue;
+                        if (store_base[d]
+                            && (store_base_hard[d] || rd->kind != IR_LD_SYM))
+                            continue;
                         f->vregs[d].flags |= IR_VREG_NO_SLOT;
                     }
                 }
             free(ndef);
         }
-        free(store_base);
+        free(store_base); free(store_base_hard);
     }
     ir_assign_slots(f);
     /* Frameless (Tier-B): decided once frame_size + homes are known; must be set
@@ -6096,6 +6185,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         for (int i = 0; i < f->n_bbs; i++) L.bb_byte_out_dirty[i] = 0;
     L.cur_sp_adjust = 0;
     L.cur_stack_resident = -1;
+    L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
     L.af_park_depth = 0;
     bc_args_save_depth = 0;
     L.la.cur_stack_long_top = -1;
@@ -6173,6 +6263,7 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
            a BB boundary would shift sp for unrelated code. */
         L.cur_sp_adjust = 0;
         L.cur_stack_resident = -1;   /* stack-transient never crosses a BB */
+        L.pv_depth = 0; L.pv_park_depth = -1; L.pv_park_vreg = -1;
         /* BC carry across the BB boundary — the exact mirror of the HL carry
            below. Previously the BC belief simply SURVIVED a boundary with no
            check, which is unsound: BC may be taken by a transient deref base or

@@ -753,6 +753,20 @@ static int callsplit_on(void) { static int c = -1; if (c < 0) { const char *e = 
    candidate's live range, so the BC veto buys them nothing. */
 static int iylong_off(void) { static int c = -1; if (c < 0) { const char *e = getenv("IR_IYLONG"); c = (e && e[0] == '0'); } return c; }
 
+/* [IR_GBZ80_COST=1] Opt IN to the measured gbz80 cost row (see GBZ80[] in
+   g0_word_cost). OPT-IN, not default: the row is right — gbz80 was using the
+   Z80 numbers and its slot really is ~30 % cheaper — but making it true flips a
+   near-tie in histbench's hist_pass, where BC moves from v26 (live [28,31]) to
+   the shorter, colder v25, for -14 B across divbench+matrixbench against
+   +10 % ticks on histbench. The row needs the ranking tie broken before it can
+   be the default; until then gbz80 keeps the (wrong but tuned) Z80 row. */
+static int gbz80_cost_on(void)
+{
+    static int c = -1;
+    if (c < 0) { const char *e = getenv("IR_GBZ80_COST"); c = e && e[0] == '1'; }
+    return c;
+}
+
 /* [IR_CS_EVICT=0/1] Let a call-bounded split EVICT a picker-placed BC tenant it
    out-benefits, instead of silently losing BC to whoever the picker placed
    first. Defaults to whatever IR_PREPUSH_NARROW is: the arbitration gap only
@@ -773,25 +787,35 @@ static int cs_evict_on(void)
 /* [IR_PREPUSH_NARROW=1] Narrow the whole-function pre-pushed-call veto to the
    calls that can really lose BC (prepush_bc_hazard).
 
-   OPT-IN, not default, and for the same reason as the gbz80 cost row: the
-   matrix is a NET win on both axes but not a clean one. Corpus size −9163 B
-   (−0.95 %) over 536 cells, 330 files smaller against 77 larger; ticks −0.69 %
-   aggregate over the valid-tick CPUs, 130 cells faster against 38 slower. But
-   five benches regress and two badly — divbench +3.30 sp / +6.94 fp and
-   shiftbench +2.27 / +6.03, plus bitfieldbench +2.8/+3.3, strbench fp +2.64 and
-   structbench sp +0.32 — against wins of predbench −8.40, strbench sp −5.48,
-   hashbench −4.96, ptrbench −4.93, sortbench −4.40, localbench −4.12,
-   fixedbench −3.93.
+   DEFAULT-ON; `IR_PREPUSH_NARROW=0` opts out (and takes IR_CS_EVICT with it).
 
-   NOT the missing push/pop charge: pricing a BC home for the `push bc` /
-   `pop bc` pair it now pays at each spanned pre-pushed call was BUILT and
-   REFUTED — at the natural weight divbench does not move at all, and at 20x it
-   recovers 1.3M of 4.6M while distorting everything else. The regression is a
-   placement problem, not a ranking one. Find it before flipping this on. */
+   It was opt-in for a long time because ALONE it regresses five benches and two
+   badly — divbench +3.30 sp / +6.94 fp, shiftbench +2.27 / +6.03, bitfieldbench
+   +2.8/+3.3, strbench fp +2.64, structbench sp +0.32. That is still true of the
+   narrowing on its own, and the note that used to stand here said "find it
+   before flipping this on".
+
+   It was found, and it is not a placement problem: those regressions are the
+   `push bc` / `pop bc` pairs the narrowing adds around calls, and IR_BCSAVE_LIVE
+   removes the ones whose tenant is not live. PAIRED WITH IT the three bad
+   benches go to EXACTLY zero:
+
+     divbench 0.000 %   shiftbench 0.000 %   bitfieldbench 0.000 %
+
+   and the corpus reads −1.70 % fp / −1.51 % sp ticks, 19 cpu-modes faster
+   against 2, with only three regressing cells left in the whole matrix
+   (structbench sp +0.32 %, matrixbench fp +0.20 %, strbench fp +0.14 %). Size is
+   −11728 B (−1.56 %), 461 cells smaller against 36 larger. The two gates are
+   therefore a PAIR — flipping this one alone reinstates the divbench and
+   shiftbench regressions. Do not separate them.
+
+   Refuted en route: pricing a BC home for the push/pop pair it pays at each
+   spanned pre-pushed call. At the natural weight divbench does not move at all;
+   at 20x it recovers 1.3M of 4.6M while distorting everything else. */
 static int prepushnarrow_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_PREPUSH_NARROW"); c = (e && e[0] == '1'); }
+    if (c < 0) { const char *e = getenv("IR_PREPUSH_NARROW"); c = !(e && e[0] == '0'); }
     return c;
 }
 
@@ -1311,38 +1335,6 @@ static int collect_home_candidates(const Func *f,
     scan_wd_props(f, bb_in_loop, wd_base, wd_acc, wd_ldef, wd_lread);
     build_idx3_addr(f, wd_base, wd_addr);
 
-    /* [IR_MWBC_PROBE] Inert: size the multi-write BC home. bc_home_realizable
-       caps a plain LOCAL at write_count==1 (an induction var gets 2), so a
-       reassigned loop variable can never hold BC — interpbench's `pc` costs
-       7.30M T in its frame slot for exactly this reason. Lists the vregs that
-       fail ONLY that gate and already satisfy all_defs_ok (every def is a
-       bc_safe_producer, which is what stamping BC on each def needs). */
-    if (getenv("IR_MWBC_PROBE")) {
-        int cf = func_is_call_free(f);
-        for (int v = 0; v < f->n_vregs; v++) {
-            const VReg *vr = &f->vregs[v];
-            if (vr->width != 2) continue;
-            if (vr->flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE
-                             | IR_VREG_PARAM)) continue;
-            /* An induction vreg reaches BC by its own route (iv_home_realizable),
-               so it is not a multi-write candidate — but it is the value a
-               multi-write home most often displaces, so list it too. */
-            if (vr->flags & IR_VREG_INDUCTION) {
-                fprintf(stderr, "MWBC_INDUCT %s v%d uses=%d writes=%d def=%d prep=%d entry=%d\n",
-                        f->fn ? ir_sym_name(f->fn) : "?", v, use_count[v], write_count[v],
-                        def_kind[v], has_prepushed_call, entry_live ? ir_bitset_get(entry_live, v) : 0);
-                continue;
-            }
-            if (f->vreg_to_phys[v] != IR_PR_SPILL) continue;
-            if (use_count[v] < 2 || write_count[v] < 2) continue;
-            if (has_prepushed_call) continue;
-            if (entry_live && ir_bitset_get(entry_live, v)) continue;
-            fprintf(stderr, "MWBC %-20s v%-4d uses=%-3d writes=%-3d "
-                    "all_defs_ok=%d callfree=%d\n",
-                    f->fn ? ir_sym_name(f->fn) : "?", v,
-                    use_count[v], write_count[v], all_defs_ok[v], cf);
-        }
-    }
 
     /* (1) BC — read-free/write-once/IVSR word (tag 0). */
     for (int v = 0; v < f->n_vregs; v++)
@@ -2825,6 +2817,24 @@ static void ir_stack_spill(Func *f, const int *bb_first_op, const int *def_kind,
                 continue;
         }
 
+        /* A symbol ADDRESS whose one use is an ST_MEM base costs nothing at
+           all: gen_st_mem folds `t = &sym; *t = v` into the direct absolute
+           store `ld (sym+off),hl`, so the base is never materialised. Parking
+           it BLOCKS that fold — the fold has to decline a PR_STACK base or the
+           pushed word is never popped (see gen_st_mem) — and we pay the base
+           load plus a push/pop plus the three-instruction store-through-pointer
+           where one `ld (sym),hl` would do. Every `global.field = v` in a
+           function that also reads the field takes this path, because folding
+           the LOAD half of the RMW is what drops the base to the single use
+           PR_STACK wants. Leave it alone and let the fold have it. */
+        if (bb->ops[lo].kind == IR_LD_SYM && bb->ops[lo].mem.sym
+            && bb->ops[hi].kind == IR_ST_MEM
+            && bb->ops[hi].mem.kind == IR_MEM_VREG
+            && bb->ops[hi].mem.base == v
+            && !bb->ops[hi].mem.post_step
+            && bb->ops[hi].src[0] >= 0)
+            continue;
+
         int span_ok = 1;
         for (int j = lo + 1; j <= hi && span_ok; j++)
             if (stack_spill_span_hazard(bb->ops[j].kind)) span_ok = 0;
@@ -2997,6 +3007,24 @@ static int g0_word_cost(int reg, int kind)
        and letting idx_ben value ez80 sp homes correctly (fp slot stays cheaper). */
     static const int EZ80[GR_N][GK_N] = {
         /*SLOT*/{8,8,6,16}, /*BC*/{2,2,2,2}, /*DE*/{2,2,2,2}, /*IX*/{3,5,4,2}, /*IY*/{3,5,4,2} };
+    /* gbz80 was falling through to the Z80 row, which is wrong in both
+       directions at once. An sp-local is NATIVE here — `ld hl,sp+n` is one
+       2-byte op — where the Z80 needs `ld hl,n; add hl,sp`, so the Z80 row
+       over-charges the slot by ~30 %. And there is no `ld a,(bc)`-style deref in
+       use and no `ex de,hl`, so reaching a GP-pair home's pointee costs
+       `ld h,b; ld l,c; ld a,(hl)` — 16, not the Z80 row's 7. Both errors say
+       "prefer a register home" where the hardware does not, which is what left
+       lexbench and ptrbench paying for word-resident DE homes that do not earn
+       their HL<->DE traffic. Measured with gbz80_cost_bench.py (empty-loop
+       anchored, ticks -mgbz80): slot 32/36/40/76, bc+de 8/8/16/8 — the pairs are
+       symmetric because neither has a cheap deref. IX/IY do not exist on this CPU, so
+       they are priced ABOVE the slot: idx_ben then comes out strictly negative
+       and every index home is rejected. Pricing them AT the slot instead makes
+       idx_ben exactly 0, which is a boundary the BC/index yield reads as "an
+       index is available" — that alone cost histbench 10 %. */
+    static const int GBZ80[GR_N][GK_N] = {
+        /*SLOT*/{32,36,40,76}, /*BC*/{8,8,16,8}, /*DE*/{8,8,16,8},
+        /*IX*/{99,99,99,99}, /*IY*/{99,99,99,99} };
     /* KR580VM1: an 8080-class slot (measured 44 read / 39 write / 68 word-RMW,
        so the Z80 row is close) with h'l' as the index home. Its numbers are the
        measured RS-prefixed idioms - push/pop 25 either way, `ld a,(hl'\')` 11,
@@ -3008,6 +3036,7 @@ static int g0_word_cost(int reg, int kind)
     const int (*t)[GK_N] = IS_KC160() ? KC160
                          : IS_EZ80() ? EZ80
                          : IS_KR580VM1() ? VM1
+                         : (IS_GBZ80() && gbz80_cost_on()) ? GBZ80
                          : IS_RABBIT() ? RABBIT : Z80;
     int c = t[reg][kind];
     if (reg == GR_SLOT) {                             /* fp slot = (ix+d) */
@@ -4955,19 +4984,48 @@ void ir_alloc(Func *f)
            transient with no register free goes on the stack (push/pop) instead of
            a slot.
 
-           NB the bc_region_ok gate is WRONG IN PRINCIPLE and load-bearing in
-           practice. It is a BC veto (has_long: long ops stage the low half THROUGH
-           BC; has_bc_clobber: l_case / dload / dstore) and a park uses no BC at
-           all — it costs 536 of 5523 corpus functions and 509 parks worth −675
-           instructions. But removing it exposed TWO defects the veto was hiding:
-           the wide-accumulator helper calls missing from stack_spill_span_hazard
-           (fixed below — long_ir/longlong hung), and, still open, that the hazard
-           switches on op KIND and never WIDTH, so a park may span a width-4
-           IR_XOR/IR_AND/IR_OR whose lowering pushes both halves (emu.c
-           miscompiles: 146 bytes of output against 194KB). Lifting the veto needs
-           a DERIVED, width-aware span guard, not a longer switch. See
-           STORE_ORDER_PLAN.md. */
-        if (bc_region_ok)
+           The `bc_region_ok` gate that used to gate this call is GONE. It was a
+           BC veto (has_long: long ops stage the low half THROUGH BC;
+           has_bc_clobber: l_case / dload / dstore) standing in front of a pass
+           that uses no BC at all — wrong in principle, and load-bearing only
+           because it hid two real defects. Both are now closed: the missing
+           wide-accumulator helper calls in stack_spill_span_hazard (`f4dd243d59`,
+           long_ir/longlong hung without it), and the width-blind span that let a
+           park cross a width-4 IR_XOR/AND/OR whose lowering pushes both halves —
+           that one no longer reproduces, and emu.c is behaviourally clean in both
+           frame modes with the veto removed.
+
+           Re-measured on removal, because the 2026-08-16 figures in
+           STORE_ORDER_PLAN.md (536 functions, 509 parks, −675 instructions) were
+           taken before the BC-veto narrowing landed and no longer hold: the real
+           effect is +54 parks corpus-wide (214 → 268) and −31..−43 B per
+           cpu-mode, concentrated almost entirely in ONE shape — switch dispatch,
+           which is what `has_bc_clobber`'s l_case arm was vetoing (switchbench
+           −15..−47 B on every CPU; md5sum is the only other file that moves, and
+           it grows on 4 of 11 cpu-modes).
+
+           It is dropped in SP mode only, because that is where the measurement
+           says it pays. A park trades a slot access for push/pop, and an fp slot
+           is `(ix+d)` — cheap enough that the trade inverts:
+
+             switchbench  sp -40 B and -2.07 % ticks   fp -15 B but +0.72 %
+             md5          sp  +9 B and -0.30 % ticks   fp -18 B but +0.44 %
+
+           Both files are byte-for-tick in fp and a win on both axes in sp, which
+           is the trade this tree rejects and takes respectively. 8080/8085/gbz80
+           have no index register, so -fframe-pointer is a no-op there and they
+           want the SP answer in both modes (switchbench 8080 -1.94 %, 8085
+           -2.84 %, identical sp and fp) — hence the CPU test rather than a bare
+           `c_framepointer_is_ix` one.
+
+           The standing gate for this area is now `IR_PARK_VERIFY`, which checks
+           the park's TOS invariant against the EMITTED TEXT rather than
+           cur_sp_adjust (only 24 of 218 push sites maintain that). It reports 268
+           parks / 0 steals / 0 depth mismatches with the veto fully off. Run it
+           before widening stack_spill_span_hazard any further. */
+        int fp_ix_frame = (c_framepointer_is_ix != -1)
+                       && !IS_808x() && !IS_GBZ80();
+        if (bc_region_ok || !fp_ix_frame)
         ir_stack_spill(f, bb_first_op, def_kind, write_count);
         /* DENSITY §4 fail-safe DE-cache fold hint (opt-in IR_RANGED). Runs after
            ALL register placement so it fires ONLY on reused deref/binop values

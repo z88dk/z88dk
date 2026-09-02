@@ -381,6 +381,7 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
        when it is actually TOS: sp_adj==0 and it's the resident park (the allocator
        forbids calls / other stack ops between def and use). */
     if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id) && sp_adj == 0) {
+        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
         ss_note_reload(f, vreg_id);
         emit_sp(out, -2, "pop\thl");
         L.cur_stack_resident = -1;
@@ -717,6 +718,7 @@ static void load_to_de(FILE *out, const Func *f, int vreg_id)
        Checked FIRST — before the DE-cache hit — so a stale cache_de(dst) can't
        skip the balancing pop. Doesn't disturb HL. See load_to_hl_adj. */
     if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
         ss_note_reload(f, vreg_id);
         emit_sp(out, -2, "pop\tde");
         L.cur_stack_resident = -1;
@@ -923,6 +925,7 @@ static void load_to_de_preserve_hl(FILE *out, const Func *f, int vreg_id)
        so a stale cache_de(dst) can't skip the balancing pop. (The generic push-hl
        path below would shove HL on top of the park and pop the wrong word.) */
     if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
         ss_note_reload(f, vreg_id);
         emit_sp(out, -2, "pop\tde");
         L.cur_stack_resident = -1;
@@ -1028,8 +1031,9 @@ static void store_hl_impl(FILE *out, const Func *f, int vreg_id)
        load_to_* check the park before any cache, so a caller's later cache_hl(v)
        can't skip the pop. */
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
-        emit_sp(out, 2, "push\thl");
         L.cur_stack_resident = vreg_id;
+        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        emit_sp(out, 2, "push\thl");
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         return;
     }
@@ -1150,8 +1154,9 @@ static int store_hl_keep_hl_impl(FILE *out, const Func *f, int vreg_id)
         return 1;
     }
     if (vreg_id >= 0 && vreg_is_pr_stack(f, vreg_id)) {
-        emit_sp(out, 2, "push\thl");            /* HL preserved by push */
         L.cur_stack_resident = vreg_id;
+        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        emit_sp(out, 2, "push\thl");            /* HL preserved by push */
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         return 1;
     }
@@ -1264,6 +1269,7 @@ static void load_byte_to_a(FILE *out, const Func *f, int vreg_id)
     /* Stack-transient word parked at TOS: pop into HL, low byte → A. Before the
        A-cache hit so a stale a_has can't skip the pop. */
     if (vreg_is_pr_stack(f, vreg_id) && stack_parked(vreg_id)) {
+        L.pv_expect_pop = 1;      /* [IR_PARK_VERIFY] this pop is the park's */
         ss_note_reload(f, vreg_id);
         emit_sp(out, -2, "pop\thl");
         L.cur_stack_resident = -1;

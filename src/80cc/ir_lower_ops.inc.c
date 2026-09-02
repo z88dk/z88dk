@@ -1282,11 +1282,17 @@ static int bc_args_save_depth;
    independently, so the fault is the query and not any one caller. The hole-free
    [start,end] the allocator itself uses fills liveness holes, which makes it a
    conservative superset — and on that query enigma is correct while strbench
-   keeps the whole win. Do not "tighten" this back to the live-in sets. */
+   keeps the whole win. Do not "tighten" this back to the live-in sets.
+
+   DEFAULT-ON; `IR_BCSAVE_LIVE=0` opts out. Flipped together with
+   IR_PREPUSH_NARROW, which it is the necessary partner of: the narrowing alone
+   regresses divbench +6.94 fp and shiftbench +6.03 fp on the push/pop pairs it
+   adds, and removing the pairs whose tenant is not live takes both to exactly
+   zero. See the note at prepushnarrow_on. */
 static int bcsave_live_on(void)
 {
     static int c = -1;
-    if (c < 0) { const char *e = getenv("IR_BCSAVE_LIVE"); c = (e && e[0] == '1'); }
+    if (c < 0) { const char *e = getenv("IR_BCSAVE_LIVE"); c = !(e && e[0] == '0'); }
     return c;
 }
 

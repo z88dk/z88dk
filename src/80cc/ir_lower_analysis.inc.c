@@ -1068,8 +1068,9 @@ static void spill_and_swap_unless_dead(FILE *out, const Func *f, int vreg)
        intervening sp-relative slot reads stay correct. Handled before the
        cur_dst_dead early-out so the push/pop always balances. */
     if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
-        emit_sp(out, 2, "push\thl");
         L.cur_stack_resident = vreg;
+        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        emit_sp(out, 2, "push\thl");
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         /* The value now lives at TOS, not in HL. Forget any HL belief: it must
            NOT be re-advertised (commit_hl_word skips cache_hl for us) — a reader
@@ -1212,8 +1213,9 @@ static void spill_de_unless_dead(FILE *out, const Func *f, int vreg)
        `ld de,K` LD_IMM fastpath reaches here, and PR_STACK is neither dst-dead
        nor register-pool). Its single use pops it; the caller must NOT cache_hl. */
     if (vreg >= 0 && vreg_is_pr_stack(f, vreg)) {
-        emit_sp(out, 2, "push\tde");
         L.cur_stack_resident = vreg;
+        L.pv_expect_push = 1;     /* [IR_PARK_VERIFY] this push IS the park */
+        emit_sp(out, 2, "push\tde");
         L.cur_stack_resident_spadj = L.cur_sp_adjust;
         invalidate_de_cache();
         return;
