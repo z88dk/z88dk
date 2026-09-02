@@ -10,7 +10,44 @@ EXTERN _m32_fmodf
 ; Synthetics: memory index/source only via HL or DE (never BC).
 ; Post-inc/dec forms: ld r,(hl+)/(hl-), ld (hl-),r etc.
 
-IFDEF __CPU_INTEL__
+IF __CPU_GBZ80__
+
+; Same left-rotate as pow. No ex (sp),hl (148c helper).
+
+.cm32_sccz80_fmod_callee
+    ld b,0
+.fmod_bub
+    ld a,b
+    cp 8
+    jr Z,fmod_call
+    push bc                     ; save step
+    ld hl,sp+2
+    ld c,a
+    ld b,0
+    add hl,bc                   ; HL -> word[i]
+    ld e,(hl+)
+    ld d,(hl+)                  ; DE = word[i]
+    ld c,(hl+)
+    ld b,(hl)                   ; BC = word[i+1]; HL at hi
+    ld (hl),d
+    dec hl
+    ld (hl),e                   ; word[i+1] <- old word[i]
+    dec hl
+    ld (hl),b
+    dec hl
+    ld (hl),c                   ; word[i] <- old word[i+1]
+    pop bc
+    ld a,b
+    add a,2
+    ld b,a
+    jr fmod_bub
+
+.fmod_call
+    call _m32_fmodf
+    add sp,8
+    ret
+
+ELIF __CPU_INTEL__
 
 ; Same left-rotate callee bridge as pow.
 

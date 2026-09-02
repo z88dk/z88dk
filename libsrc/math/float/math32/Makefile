@@ -25,7 +25,8 @@ all: $(OUTPUT_DIRECTORY)/math32.lib \
 	$(OUTPUT_DIRECTORY)/math32_r6k.lib \
 	$(OUTPUT_DIRECTORY)/math32_kc160.lib \
 	$(OUTPUT_DIRECTORY)/math32_8085.lib \
-	$(OUTPUT_DIRECTORY)/math32_8080.lib
+	$(OUTPUT_DIRECTORY)/math32_8080.lib \
+	$(OUTPUT_DIRECTORY)/math32_gbz80.lib
 
 $(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS)) 
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
@@ -71,11 +72,15 @@ $(OUTPUT_DIRECTORY)/math32_8080.lib: $(addprefix obj/8080/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/8080/x/x/x -I.. -m8080 -D__CLASSIC @newlibfiles_8080.lst
 	TYPE=8080 $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/math32_8080 @math32.lst
 
+$(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
+	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/gbz80/x/x/x -I.. -mgbz80 -D__CLASSIC @newlibfiles_gbz80.lst
+	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/math32_gbz80 @math32.lst
+
 # Order-only: dirs must finish before any object compiles. See Make.config.
-$(foreach d,8080 8085 ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
+$(foreach d,8080 8085 gbz80 ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/r6k/c
+	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

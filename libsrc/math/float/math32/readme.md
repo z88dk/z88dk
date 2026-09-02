@@ -15,7 +15,7 @@ This library is designed for z180 (ez80), z80n, and Rabbit 2000 / 3000 processor
 
 This library is also designed to be as fast as possible on the z80 processor, using a `32_24x8` basis multiply function.
 
-Intel 8080 and 8085 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`). Those builds do not use the alternate register set or index registers. `--math32` selects the product for the active CPU via `@{ZCC_LIBCPU}`. The default 8080 float library remains MBF32. Pass `--math32` to link IEEE math32.
+Intel 8080, 8085, and gbz80 have separate stack-based cores (`math32_8080.lib`, `math32_8085.lib`, `math32_gbz80.lib`). Those builds do not use the alternate register set or index registers. `--math32` selects the product for the active CPU via `@{ZCC_LIBCPU}`. The default 8080 and gbz80 float libraries remain MBF32. Pass `--math32` to link IEEE math32.
 
 *@feilipu, May 2019 - September 2026*
 
@@ -27,7 +27,7 @@ Intel 8080 and 8085 have separate stack-based cores (`math32_8080.lib`, `math32_
 
   *  All the code is re-entrant.
 
-  *  Register use on the Z80-family cores is limited to the main and alternate set (including af'). NO index registers were abused in the process. The 8080 and 8085 cores use the main register set and the stack only.
+  *  Register use on the Z80-family cores is limited to the main and alternate set (including af'). NO index registers were abused in the process. The 8080, 8085, and gbz80 cores use the main register set and the stack only.
 
   *  Made for the Spectrum Next (z80n) and Agon Lite (ez80). The z80n `mul de` and the z180 (ez80) `mlt nn`, and r2ka `mul` multiply instructions are used to full advantage to accelerate all floating point calculations. Full support for Intel 8080 and 8085, Zilog z80 and variants, and Digi Rabbit processors.
 
@@ -173,7 +173,7 @@ The library is laid out in these directories: shared assembly, CPU-specific core
 
 ### asm
 
-Contains **8080-compatible** shared assembly: coefficient tables, float constants, and other routines that need no Z80-only or 8085-only instructions. The Z80-family, 8085, and 8080 builds assemble this tree.
+Contains **8080-compatible** shared assembly: coefficient tables, float constants, and cores that are identical on 8080 / 8085 / gbz80 (and on Z80 when the 8080 encoding is the same size). No Z80-only or 8085-only instructions. The Z80-family, 8085, 8080, and gbz80 builds assemble this tree. Z80 still keeps its own copies where `res` / `bit` / `exx` / `srl` are smaller (`fabs`, `floor`, `ceil`, `f2long`, `fserror`).
 
 ### asm/z80
 
@@ -189,13 +189,17 @@ CPU-specific mantissa multiply and square helpers also live here (`f32_z80_*`, `
 
 8080-specific intrinsic implementations (original 8080 ISA, stack-based locals, no alternate registers, no 8085 extras). Selected when building `math32_8080.lib`. Frame access uses `ld hl,sp+n` and byte walks through A. Cheap synthetics only (`ld r,(hl+)`, word copies, `jr` as `jp`). CPU-specific mantissa helpers are `f32_8080_mulu_32h_24x24`, `f32_8080_mulu_32h_32x32`, and `f32_8080_sqr_32h_24x24` (five-term 8×8, same algebra as 8085). Listed in `newlibfiles_8080.lst`.
 
+### asm/gbz80
+
+Game Boy CPU (LR35902) cores for `math32_gbz80.lib`. Same stack-only frame contract as 8080/8085. Prefer natives `ld hl,sp+*`, `ld a,(hl+)`, CB `rl`/`sla`, and `jr`. No S/P flags: leading-one tests use `bit 7`. No cheap `ex de,hl` / `ex (sp),hl` — use pair copies and open-coded stack swaps. Mantissa helpers are `f32_gbz80_mulu_32h_24x24`, `f32_gbz80_mulu_32h_32x32`, and `f32_gbz80_sqr_32h_24x24`. Listed in `newlibfiles_gbz80.lst`.
+
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math32_8085.lib`. For 8080, the same sccz80 path writes `c/8080` (`make -C c 8080`) into `math32_8080.lib`.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Compiled versions for the Z80 family are prepared and saved in `c/z80` to be assembled and built as required (Z80 codegen). For 8085, higher-level helpers are precompiled with **sccz80** into `c/8085` (`make -C c 8085`) and linked into `math32_8085.lib`. For 8080, the same sccz80 path writes `c/8080` (`make -C c 8080`) into `math32_8080.lib`. For gbz80, `make -C c gbz80` writes `c/gbz80` into `math32_gbz80.lib`.
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm` / `asm/z80` (and for 8085 / 8080, `asm/8085` / `asm/8080`) directories. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the `asm` / `asm/z80` (and for 8085 / 8080 / gbz80, `asm/8085` / `asm/8080` / `asm/gbz80`) directories. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here. Multi-arg sccz80 callee bridges that must not `pop af` a float word use `IF __CPU_INTEL__ | __CPU_GBZ80__` (same AF-safe left-rotate as 8080/8085).
 
 ### lm32
 
@@ -203,7 +207,7 @@ Glue that connects the compilers and standard assembly interface to the `math32`
 
 An alias is provided to simplify usage of the library. `--math32` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1`.
 
-For Intel 8085 (`-clib=8085` / `-m8085`), `--math32` links `math32_8085.lib` via `@{ZCC_LIBCPU}`. For Intel 8080 (`-clib=8080` / `-m8080`), `--math32` links `math32_8080.lib`. Higher-level C helpers for 8080 and 8085 are built with **sccz80 only** (zsdcc is Z80-only). The default 8080 float library remains MBF32.
+For Intel 8085 (`-clib=8085` / `-m8085`), `--math32` links `math32_8085.lib` via `@{ZCC_LIBCPU}`. For Intel 8080 (`-clib=8080` / `-m8080`), `--math32` links `math32_8080.lib`. For gbz80 (`-clib=gbz80` / `-mgbz80`), `--math32` links `math32_gbz80.lib`. Higher-level C helpers for 8080, 8085, and gbz80 are built with **sccz80 only** (zsdcc is Z80-only). The default 8080 and gbz80 float libraries remain MBF32.
 
 ## Function Discussion
 
@@ -257,7 +261,7 @@ The mantissa multiplication is not a "correct" multiply, as not all carry bits a
 
 IEEE RNE on the residual byte is applied in `_fsmul` / `_fssqr` when packing the 24-bit mantissa.
 
-The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, `f32_8085_sqr_*`, `f32_8080_sqr_*`).
+The square function is related to the multiply function, but is simplified by ignoring the sign bit and using a dedicated `sqr_32h_24x24` kernel instead of the general `mulu_32h_24x24`. IEEE packing still goes through the shared `_fssqr` / `sqr()` path on every architecture; only the mantissa square helper is CPU-selected (`f32_z80_sqr_*`, `f32_z80n_sqr_*`, `f32_z180_sqr_*`, `f32_r2ka_sqr_*`, `f32_kc160_sqr_*`, `f32_8085_sqr_*`, `f32_8080_sqr_*`, `f32_gbz80_sqr_*`).
 
 For the 8×8-oriented CPUs the square uses the same high-32-of-48 algebraic expansion (and the same truncation / rounding-byte layout as the general 24×24 high product):
 

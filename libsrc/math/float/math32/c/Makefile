@@ -9,7 +9,7 @@ CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -I.
 
-.PHONY: all z80 8085 8080 clean
+.PHONY: all z80 8085 8080 gbz80 clean
 
 all: $(addprefix z80/,$(AFILES))
 
@@ -39,7 +39,19 @@ AFILES8080 = $(CFILES8080:.c=.asm)
 	zcc +test -clib=8080 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
+# gbz80 higher functions: sccz80 only (zsdcc is Z80-only)
+CFILESGBZ80 = $(wildcard *.c)
+AFILESGBZ80 = $(CFILESGBZ80:.c=.asm)
+
+gbz80: $(addprefix gbz80/,$(AFILESGBZ80))
+
+gbz80/%.asm: %.c
+	@mkdir -p gbz80
+	zcc +test -clib=gbz80 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
+	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
+
 clean:
 	$(RM) z80/*.asm z80/*.err zcc_opt.def
 	$(RM) $(addprefix 8085/,$(AFILES8085)) 8085/*.err
 	$(RM) $(addprefix 8080/,$(AFILES8080)) 8080/*.err
+	$(RM) $(addprefix gbz80/,$(AFILESGBZ80)) gbz80/*.err
