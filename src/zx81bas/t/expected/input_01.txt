@@ -231,6 +231,10 @@ label4:			nop
 
 	LET A=ABS FNid(-3)
 	LET A=FNid(5) + FNid(7)
+
+	DEF FNf(A) = A*A
+	
+	
 #line 11 "test_t_input_01_t.bas"
 
 

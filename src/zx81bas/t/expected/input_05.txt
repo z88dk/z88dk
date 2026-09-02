@@ -1667,6 +1667,31 @@ Prog {
                         }
                 }
         }
+        DefFnStmt {
+            location: t/input/func.inc:42
+            name: "FNF"
+            params: [
+                "A"
+            ]
+            expr: 
+                BinaryExpr {
+                    type: Number
+                    location: t/input/func.inc:42
+                    op: *
+                    lhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/input/func.inc:42
+                            name: "A"
+                        }
+                    rhs: 
+                        VariableExpr {
+                            type: Number
+                            location: t/input/func.inc:42
+                            name: "A"
+                        }
+                }
+        }
         LetStmt {
             location: test_t_input_05_t.bas:16
             lhs: 
