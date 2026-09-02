@@ -21,6 +21,19 @@ X1_TARGETS := target/x1/obj/target-x1-x1 $(X1_OFILES) classic/games/obj/.stamp-x
 X1_CPM_TARGETS := target/x1/obj/target-x1-x1 $(X1_OFILES) classic/gfx/obj/.stamp-cpm-x1
 
 CLEAN += target-x1-clean
+x1_cpm.lib: x1_clib.lib $(X1_CPM_TARGETS)
+	@echo ''
+	@echo '--- Building Sharp X1 Library ---'
+	@echo ''
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(TARGET_DIRECTORY)/x1/x1_common.lst
+
+x1_clib.lib: $(TARGET_CLIB_DEPS) $(X1_TARGETS)
+	@echo ''
+	@echo '--- Building Sharp X1 Library ---'
+	@echo ''
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(TARGET_DIRECTORY)/x1/x1.lst
+
+TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 
 $(eval $(call gfx_stamp_args,x1,TARGET=x1 FLAVOUR=wide))
 

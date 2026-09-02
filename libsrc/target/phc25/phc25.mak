@@ -19,6 +19,11 @@ PHC25_TARGETS := target/phc25/obj/target-phc25-phc25 classic/games/obj/.stamp-ph
 		
 
 CLEAN += target-phc25-clean
+TOCREATE += $(call check_target,phc25,phc25_clib.lib)
+
+phc25_clib.lib: $(TARGET_CLIB_DEPS) $(PHC25_TARGETS)
+	$(MAKE) -C classic/video/mc6847 TARGET=phc25
+	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
 
 $(eval $(call gfx_stamp_args,phc25,TARGET=phc25))
 

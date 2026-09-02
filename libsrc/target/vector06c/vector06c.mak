@@ -19,6 +19,10 @@ VECTOR06C_TARGETS := target/vector06c/obj/target-vector06c-vector06c classic/gam
 		
 
 CLEAN += target-vector06c-clean
+TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
+
+vector06c_clib.lib: $(TARGET_CLIB_DEPS) $(VECTOR06C_TARGETS)
+	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(TARGET_DIRECTORY)/vector06c/vector06c.lst
 
 $(eval $(call gfx_stamp_args,vector06c,TARGET=vector06c FLAVOUR=wide))
 $(eval $(call gfx_stamp_portable,vector06c-portable,vector06c))

@@ -17,6 +17,13 @@ ABC80_TARGETS := target/abc80/obj/target-abc80-abc80 classic/games/obj/.stamp-ab
 		
 
 CLEAN += target-abc80-clean
+abc80_clib.lib: $(TARGET_CLIB_DEPS) $(ABC80_TARGETS)
+	@echo ''
+	@echo '--- Building ABC80 Library ---'
+	@echo ''
+	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(TARGET_DIRECTORY)/abc80/abc80.lst
+
+TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 
 $(eval $(call gfx_stamp_args,abc80,TARGET=abc80))
 

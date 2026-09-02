@@ -17,10 +17,14 @@ P2000_GLOBS_ex := \
 
 P2000_TARGETS := target/p2000/obj/target-p2000-p2000 classic/games/obj/.stamp-p2000 classic/gfx/obj/.stamp-p2000
 
+p2000_clib.lib: $(TARGET_CLIB_DEPS) $(P2000_TARGETS)
+	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(TARGET_DIRECTORY)/p2000/p2000.lst
+
 $(eval $(call gfx_stamp_args,p2000,TARGET=p2000 FLAVOUR="text6 narrow"))
 
 
 CLEAN += target-p2000-clean
+TOCREATE += $(call check_target,p2000,p2000_clib.lib)
 
 target-p2000: $(P2000_TARGETS)
 

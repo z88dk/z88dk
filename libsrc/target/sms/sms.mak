@@ -28,6 +28,11 @@ SMS_TARGETS := target/sms/obj/target-sms-sms classic/video/tms9918/obj/sms class
 		
 
 CLEAN += target-sms-clean
+TOCREATE += $(call check_target,sms,sms_clib.lib)
+
+sms_clib.lib: $(TARGET_CLIB_DEPS) $(SMS_TARGETS)
+	$(MAKE) -C classic/video/tms9918 TARGET=sms
+	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(TARGET_DIRECTORY)/sms/sms.lst
 
 $(eval $(call gfx_stamp_args,sms,TARGET=sms))
 

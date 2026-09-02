@@ -39,6 +39,13 @@ $(eval $(call gfx_stamp,zxn,wide))
 		
 
 CLEAN += target-zxn-clean
+zxn_clib.lib: $(TARGET_CLIB_DEPS) $(ZXN_TARGETS) zx_clib.lib
+	@echo ''
+	@echo '--- Building ZX Spectrum Next Library ---'
+	@echo ''
+	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
+
+TOCREATE += $(call check_target,zxn, zxn_clib.lib)
 
 target-zxn: $(ZXN_TARGETS)
 

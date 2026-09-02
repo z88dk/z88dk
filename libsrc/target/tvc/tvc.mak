@@ -35,8 +35,15 @@ TVC_TARGETS := target/tvc/obj/target-tvc-tvc \
 TVCROMGFX_TARGETS := target/tvc/romgfx/obj/target-tvc-romgfx-tvc \
 	$(TVCROMGFX_OFILES)
 
+tvc_clib.lib: $(TARGET_CLIB_DEPS) $(TVC_TARGETS)
+	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(TARGET_DIRECTORY)/tvc/tvc.lst
+
+tvc_romgfx.lib: tvc_clib.lib $(TVCROMGFX_TARGETS)
+	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_romgfx @$(TARGET_DIRECTORY)/tvc/tvc_romgfx.lst
+
 
 CLEAN += target-tvc-clean
+TOCREATE += $(call check_target,tvc,tvc_clib.lib tvc_romgfx.lib)
 
 $(eval $(call gfx_stamp_args,tvc,TARGET=tvc))
 

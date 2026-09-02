@@ -25,6 +25,13 @@ classic/games/obj/.stamp-mz classic/gfx/obj/.stamp-mz \
 		
 
 CLEAN += target-mz-clean
+mz_clib.lib: $(TARGET_CLIB_DEPS) $(MZ_TARGETS)
+	@echo ''
+	@echo '--- Building Sharp MZ Library ---'
+	@echo ''
+	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(TARGET_DIRECTORY)/mz/mz.lst
+
+TOCREATE += $(call check_target,mz,mz_clib.lib)
 
 $(eval $(call gfx_stamp_args,mz,TARGET=mz))
 

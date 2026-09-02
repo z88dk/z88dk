@@ -35,7 +35,17 @@ ENTERPRISE_HRG_TARGETS := \
 	$(ENTERPRISE_HRG_OFILES) \
 	classic/gfx/obj/.stamp-enterprisehr
 
+enterprise_clib.lib: $(TARGET_CLIB_DEPS) $(ENTERPRISE_TARGETS)
+	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(TARGET_DIRECTORY)/enterprise/enterprise.lst
+
+gfxep.lib: $(TARGET_CLIB_DEPS) enterprise_clib.lib $(ENTERPRISE_GFX_TARGETS)
+	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(TARGET_DIRECTORY)/enterprise/gfxep.lst
+
+gfxephr.lib: $(TARGET_CLIB_DEPS) gfxep.lib $(ENTERPRISE_HRG_TARGETS)
+	TARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(TARGET_DIRECTORY)/enterprise/gfxephr.lst
+
 CLEAN += target-enterprise-clean
+TOCREATE += $(call check_target,enterprise,enterprise_clib.lib gfxep.lib gfxephr.lib)
 
 $(eval $(call gfx_stamp_args,enterprise,TARGET=enterprise FLAVOUR=wide))
 $(eval $(call gfx_stamp_args,enterprisehr,TARGET=enterprise FLAVOUR=wide SUBTYPE=enterprisehr))

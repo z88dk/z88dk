@@ -11,6 +11,11 @@ M5_TARGETS := target/m5/obj/target-m5-m5 classic/video/tms9918/obj/m5 classic/ga
 
 
 CLEAN += target-m5-clean
+TOCREATE += $(call check_target,m5,m5_clib.lib)
+
+m5_clib.lib: $(TARGET_CLIB_DEPS) $(M5_TARGETS)
+	$(MAKE) -C classic/video/tms9918 TARGET=m5
+	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(TARGET_DIRECTORY)/m5/m5.lst
 
 $(eval $(call gfx_stamp_args,m5,TARGET=m5))
 

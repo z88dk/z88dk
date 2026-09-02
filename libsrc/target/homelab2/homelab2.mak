@@ -15,6 +15,13 @@ HOMELAB2_TARGETS := target/homelab2/obj/target-homelab2-homelab2 classic/games/o
 		
 
 CLEAN += target-homelab2-clean
+homelab2_clib.lib: $(TARGET_CLIB_DEPS) $(HOMELAB2_TARGETS)
+	@echo ''
+	@echo '--- Building Homelab2 Library ---'
+	@echo ''
+	TARGET=homelab2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab2 -x$(OUTPUT_DIRECTORY)/homelab2_clib @$(TARGET_DIRECTORY)/homelab2/homelab2.lst
+
+TOCREATE += $(call check_target,homelab2,homelab2_clib.lib)
 
 $(eval $(call gfx_stamp_args,homelab2,TARGET=homelab2 FLAVOUR="gencon narrow"))
 

@@ -6,6 +6,25 @@ ACE_TARGETS := target/ace/obj/target-ace-ace $(ACE_OFILES) classic/games/obj/.st
 ACEUDG_TARGETS := target/ace/obj/target-ace-aceudg classic/gfx/obj/.stamp-ace-udg
 
 CLEAN += target-ace-clean
+ace_clib.lib: $(TARGET_CLIB_DEPS) $(ACE_TARGETS)
+	@echo ''
+	@echo '--- Building Jupiter Ace Library ---'
+	@echo ''
+	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(TARGET_DIRECTORY)/ace/ace.lst
+
+gfxace.lib: $(TARGET_CLIB_DEPS) ace_clib.lib $(ACE_TARGETS)
+	@echo ''
+	@echo '--- Building Jupiter Ace Graphics Library ---'
+	@echo ''
+	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -x$(OUTPUT_DIRECTORY)/gfxace @$(TARGET_DIRECTORY)/ace/gfxace.lst
+
+gfxaceudg.lib: $(TARGET_CLIB_DEPS) gfxace.lib $(ACEUDG_TARGETS)
+	@echo ''
+	@echo '--- Building Jupiter Ace UDG based Graphics Library ---'
+	@echo ''
+	TARGET=aceudg TYPE=z80 $(LIBLINKER) -DFORaceudg -x$(OUTPUT_DIRECTORY)/gfxaceudg @$(TARGET_DIRECTORY)/ace/gfxaceudg.lst
+
+TOCREATE += $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 
 $(eval $(call gfx_stamp_args,ace,TARGET=ace FLAVOUR="text narrow"))
 $(eval $(call gfx_stamp_args,ace-udg,TARGET=ace SUBTYPE=aceudg FLAVOUR="gencon text6 narrow"))

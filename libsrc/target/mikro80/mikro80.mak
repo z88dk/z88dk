@@ -15,6 +15,13 @@ MIKRO80_TARGETS := target/mikro80/obj/target-mikro80-mikro80 classic/games/obj/.
 		
 
 CLEAN += target-mikro80-clean
+mikro80_clib.lib: $(TARGET_CLIB_DEPS) $(MIKRO80_TARGETS)
+	@echo ''
+	@echo '--- Building Mikro80 Library ---'
+	@echo ''
+	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(TARGET_DIRECTORY)/mikro80/mikro80.lst
+
+TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
 
 $(eval $(call gfx_stamp_args,mikro80,TARGET=mikro80 FLAVOUR="gencon narrow"))
 

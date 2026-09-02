@@ -18,6 +18,19 @@ HECTOR_TARGETS := target/hector/obj/target-hector-hector1 target/hector/obj/targ
 		
 
 CLEAN += target-hector-clean
+hector1_clib.lib: $(TARGET_CLIB_DEPS) $(HECTOR_TARGETS)
+	@echo ''
+	@echo '--- Building Hector/Victor/Lambda Library ---'
+	@echo ''
+	TARGET=hector1 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhector1 -x$(OUTPUT_DIRECTORY)/hector1_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
+
+hectorhr_clib.lib: $(TARGET_CLIB_DEPS) $(HECTOR_TARGETS) hector1_clib.lib
+	@echo ''
+	@echo '--- Building HectorHR Library ---'
+	@echo ''
+	TARGET=hectorhr TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -DFORhectorhr -x$(OUTPUT_DIRECTORY)/hectorhr_clib @$(TARGET_DIRECTORY)/hector/hector1.lst
+
+TOCREATE += $(call check_target,hector,hector1_clib.lib hectorhr_clib.lib)
 
 $(eval $(call gfx_stamp_args,hector1,TARGET=hector FLAVOUR=narrow SUBTYPE=hector1))
 $(eval $(call gfx_stamp_args,hectorhr,TARGET=hector FLAVOUR=narrow SUBTYPE=hectorhr))

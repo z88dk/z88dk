@@ -13,6 +13,13 @@ GEMINI_TARGETS := target/gemini/obj/target-gemini-gemini classic/games/obj/.stam
 		
 
 CLEAN += target-gemini-clean
+gemini.lib: cpm_clib.lib $(GEMINI_TARGETS)
+	@echo ''
+	@echo '--- Building Gemini Galaxy Library (CP/M & graphics) ---'
+	@echo ''
+	TARGET=gemini TYPE=z80 $(LIBLINKER) -DFORgemini -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gemini.lib @$(TARGET_DIRECTORY)/gemini/gemini.lst
+
+TOCREATE += $(call check_target,gemini,gemini.lib $(CPMLIBS))
 
 target-gemini: $(GEMINI_TARGETS)
 

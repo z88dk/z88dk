@@ -13,6 +13,13 @@ KROKHA_TARGETS := target/krokha/obj/target-krokha-krokha classic/games/obj/.stam
 		
 
 CLEAN += target-krokha-clean
+krokha_clib.lib: $(TARGET_CLIB_DEPS) $(KROKHA_TARGETS)
+	@echo ''
+	@echo '--- Building Krokha (tiny) Library ---'
+	@echo ''
+	TARGET=krokha TYPE=8080 $(LIBLINKER) -m8080 -DFORkrokha -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/krokha_clib @$(TARGET_DIRECTORY)/krokha/krokha.lst
+
+TOCREATE += $(call check_target,krokha,krokha_clib.lib)
 
 $(eval $(call gfx_stamp_portable_args,krokha,TARGET=krokha FLAVOUR=gencon))
 

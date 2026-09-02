@@ -11,6 +11,14 @@ BONDWELL2_TARGETS := target/bondwell2/obj/target-bondwell2-bondwell2 classic/gam
 		
 
 CLEAN += target-bondwell2-clean
+bondwell2.lib: cpm_clib.lib $(BONDWELL2_TARGETS)
+	@echo ''
+	@echo '--- Building Bondwell 2 Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/msm6255 TARGET=cpm SUBTYPE=bondwell2
+	TARGET=bondwell2 TYPE=ixiy $(LIBLINKER) -IXIY -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
+
+TOCREATE += $(call check_target,bondwell2,bondwell2.lib $(CPMLIBS))
 
 target-bondwell2: $(BONDWELL2_TARGETS)
 

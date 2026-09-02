@@ -11,6 +11,13 @@ M100_TARGETS := target/m100/obj/target-m100-m100 classic/games/obj/.stamp-m100 c
 
 
 CLEAN += target-m100-clean
+m100_clib.lib: $(TARGET_CLIB_DEPS) $(M100_TARGETS)
+	@echo ''
+	@echo '--- Building m100 Library ---'
+	@echo ''
+	TARGET=m100 TYPE=8085 $(LIBLINKER) -m8085 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(TARGET_DIRECTORY)/m100/m100.lst
+
+TOCREATE += $(call check_target,m100,m100_clib.lib)
 
 $(eval $(call gfx_stamp_args,m100,TARGET=m100 FLAVOUR=narrow))
 

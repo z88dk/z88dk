@@ -9,6 +9,13 @@ KAYPRO84_TARGETS := target/kaypro84/obj/target-kaypro84-kaypro84 classic/gfx/obj
 
 
 CLEAN += target-kaypro84-clean
+gfxkp.lib: cpm_clib.lib $(TARGET_CLIB_DEPS) $(KAYPRO84_TARGETS)
+	@echo ''
+	@echo '--- Building Kaypro graphics Library ---'
+	@echo ''
+	TARGET=kaypro TYPE=z80 $(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(TARGET_DIRECTORY)/kaypro84/gfxkp.lst
+
+TOCREATE += $(call check_target,kaypro,gfxkp.lib $(CPMLIBS))
 
 target-kaypro84: $(KAYPRO84_TARGETS)
 

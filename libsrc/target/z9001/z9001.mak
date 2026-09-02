@@ -15,6 +15,14 @@ Z9001_TARGETS := target/z9001/obj/target-z9001-z9001 classic/games/obj/.stamp-z9
 		
 
 CLEAN += target-z9001-clean
+z9001_clib.lib: $(TARGET_CLIB_DEPS) $(Z9001_TARGETS)
+	@echo ''
+	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/krt TARGET=z9001
+	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(TARGET_DIRECTORY)/z9001/z9001.lst
+
+TOCREATE += $(call check_target,z9001,z9001_clib.lib)
 
 $(eval $(call gfx_stamp_args,z9001,TARGET=z9001 FLAVOUR="gencon wide"))
 

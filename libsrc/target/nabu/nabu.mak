@@ -18,6 +18,27 @@ NABU_OFILES := $(patsubst target/nabu/%,target/nabu/obj/nabu/%,$(NABU_CFILES:.c=
 NABU_TARGETS := target/nabu/obj/target-nabu-nabu $(NABU_OFILES) classic/video/tms9918/obj/nabu classic/games/obj/.stamp-nabu classic/gfx/obj/.stamp-nabu
 
 CLEAN += target-nabu-clean
+nabu_clib.lib: $(TARGET_CLIB_DEPS) $(NABU_TARGETS)
+	@echo ''
+	@echo '--- Building Nabu Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/tms9918 TARGET=nabu
+	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_clib @$(TARGET_DIRECTORY)/nabu/nabu.lst
+
+nabu_cpm.lib: nabu_clib.lib $(NABU_TARGETS)
+	@echo ''
+	@echo '--- Building Nabu CP/M Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/tms9918 TARGET=nabu
+	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_cpm @$(TARGET_DIRECTORY)/nabu/nabu_cpm.lst
+
+nabu_int.lib: nabu_clib.lib nabu_cpm.lib
+	@echo ''
+	@echo '--- Building Nabu Interrupt Library ---'
+	@echo ''
+	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_int @$(TARGET_DIRECTORY)/nabu/nabu_int.lst
+
+TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 
 $(eval $(call gfx_stamp_args,nabu,TARGET=nabu))
 

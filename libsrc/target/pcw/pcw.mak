@@ -13,6 +13,13 @@ PCW_TARGETS := target/pcw/obj/target-pcw-pcw classic/games/obj/.stamp-cpm-pcw cl
 
 
 CLEAN += target-pcw-clean
+pcw.lib: cpm_clib.lib $(PCW_TARGETS)
+	@echo ''
+	@echo '--- Building Amstrad PCW Library ---'
+	@echo ''
+	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(TARGET_DIRECTORY)/pcw/pcw.lst
+
+TOCREATE += $(call check_target,pcw,pcw.lib $(CPMLIBS))
 
 target-pcw: $(PCW_TARGETS)
 

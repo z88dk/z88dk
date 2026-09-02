@@ -17,6 +17,13 @@ LASER500_TARGETS := target/laser500/obj/target-laser500-laser500 classic/games/o
 		
 
 CLEAN += target-laser500-clean
+laser500_clib.lib: $(TARGET_CLIB_DEPS) $(LASER500_TARGETS)
+	@echo ''
+	@echo '--- Building VTech Laser 350/500/700 Library ---'
+	@echo ''
+	TARGET=laser500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlaser500 -x$(OUTPUT_DIRECTORY)/laser500_clib @$(TARGET_DIRECTORY)/laser500/laser500.lst
+
+TOCREATE += $(call check_target,laser500,laser500_clib.lib)
 
 $(eval $(call gfx_stamp_args,laser500,TARGET=laser500 FLAVOUR=wide))
 

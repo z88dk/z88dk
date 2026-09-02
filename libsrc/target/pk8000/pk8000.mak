@@ -11,6 +11,10 @@ PK8000_TARGETS := target/pk8000/obj/target-pk8000-pk8000 classic/gfx/obj/.stamp-
 		
 
 CLEAN += target-pk8000-clean
+TOCREATE += $(call check_target,pk8000,pk8000_clib.lib)
+
+pk8000_clib.lib: $(TARGET_CLIB_DEPS) $(PK8000_TARGETS)
+	TARGET=pk8000 TYPE=8080 $(LIBLINKER) -m8080 -DFORpk8000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pk8000_clib @$(TARGET_DIRECTORY)/pk8000/pk8000.lst
 
 $(eval $(call gfx_stamp_portable,pk8000,pk8000))
 

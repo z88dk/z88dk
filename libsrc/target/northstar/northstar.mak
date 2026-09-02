@@ -9,6 +9,13 @@ NORTHSTAR_TARGETS := target/northstar/obj/target-northstar-northstar classic/gam
 
 
 CLEAN += target-northstar-clean
+northstar.lib: cpm_clib.lib $(NORTHSTAR_TARGETS)
+	@echo ''
+	@echo '--- Building Northstar Advantage graphics Library ---'
+	@echo ''
+	TARGET=northstar TYPE=z80 $(LIBLINKER) -DFORnorthstar -x$(OUTPUT_DIRECTORY)/northstar @$(TARGET_DIRECTORY)/northstar/northstar.lst
+
+TOCREATE += $(call check_target,northstar,northstar.lib $(CPMLIBS))
 
 target-northstar: $(NORTHSTAR_TARGETS)
 

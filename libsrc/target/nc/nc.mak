@@ -23,6 +23,31 @@ ZCN_TARGETS := target/nc/obj/target-nc-zcn classic/games/obj/.stamp-zcn classic/
 NC200_TARGETS := target/nc/obj/target-nc-nc200 classic/games/obj/.stamp-nc200 classic/gfx/obj/.stamp-nc200
 
 CLEAN += target-nc-clean
+nc_clib.lib: $(TARGET_CLIB_DEPS) $(NC_TARGETS)
+	@echo ''
+	@echo '--- Building Amstrad NC Library ---'
+	@echo ''
+	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(TARGET_DIRECTORY)/nc/nc.lst
+
+gfxnc100.lib: $(TARGET_CLIB_DEPS) nc_clib.lib $(NC100_TARGETS)
+	@echo ''
+	@echo '--- Building NC-100 Graphics Library ---'
+	@echo ''
+	TARGET=nc100 TYPE=z80 $(LIBLINKER) -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(TARGET_DIRECTORY)/nc/gfxnc.lst
+
+gfxzcn.lib: $(TARGET_CLIB_DEPS) gfxnc100.lib $(ZCN_TARGETS)
+	@echo ''
+	@echo '--- Building NC-100 Graphics Library (ZCN)---'
+	@echo ''
+	TARGET=zcn TYPE=z80 $(LIBLINKER) -DFORnc100 -DFORzcn -x$(OUTPUT_DIRECTORY)/gfxzcn @$(TARGET_DIRECTORY)/nc/gfxnc.lst
+
+gfxnc200.lib: $(TARGET_CLIB_DEPS) gfxzcn.lib $(NC200_TARGETS)
+	@echo ''
+	@echo '--- Building NC-200 Graphics Library ---'
+	@echo ''
+	TARGET=nc200 TYPE=z80 $(LIBLINKER) -DFORnc200 -x$(OUTPUT_DIRECTORY)/gfxnc200 @$(TARGET_DIRECTORY)/nc/gfxnc.lst
+
+TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib)
 
 $(eval $(call gfx_stamp_args,nc,TARGET=nc))
 $(eval $(call gfx_stamp_args,nc100,TARGET=nc FLAVOUR=wide SUBTYPE=nc100))

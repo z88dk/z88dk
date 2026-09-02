@@ -23,6 +23,13 @@ GAL_TARGETS := target/gal/obj/target-gal-gal classic/games/obj/.stamp-gal classi
 		
 
 CLEAN += target-gal-clean
+gal_clib.lib: $(TARGET_CLIB_DEPS) $(GAL_TARGETS)
+	@echo ''
+	@echo '--- Building Galaksija Library ---'
+	@echo ''
+	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(TARGET_DIRECTORY)/gal/gal.lst
+
+TOCREATE += $(call check_target,gal,gal_clib.lib)
 
 $(eval $(call gfx_stamp_args,gal,TARGET=gal))
 

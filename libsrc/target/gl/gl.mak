@@ -13,6 +13,14 @@ GL_TARGETS := target/gl/obj/target-gl-gl classic/games/obj/.stamp-gl classic/gfx
 		
 
 CLEAN += target-gl-clean
+gl_clib.lib: $(TARGET_CLIB_DEPS) $(GL_TARGETS)
+	@echo ''
+	@echo '--- Building Genius Leader 2000/4000 Library ---'
+	@echo ''
+	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl -x$(OUTPUT_DIRECTORY)/gl_clib @$(TARGET_DIRECTORY)/gl/gl.lst
+
+
+TOCREATE += $(call check_target,gl,gl_clib.lib)
 
 $(eval $(call gfx_stamp_args,gl,TARGET=gl))
 

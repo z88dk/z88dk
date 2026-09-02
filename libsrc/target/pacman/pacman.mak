@@ -13,10 +13,14 @@ PACMAN_GLOBS_ex := \
 
 PACMAN_TARGETS := target/pacman/obj/target-pacman-pacman classic/games/obj/.stamp-pacman classic/gfx/obj/.stamp-pacman
 
+pacman_clib.lib: $(TARGET_CLIB_DEPS) $(PACMAN_TARGETS)
+	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(TARGET_DIRECTORY)/pacman/pacman.lst
+
 $(eval $(call gfx_stamp_args,pacman,TARGET=pacman FLAVOUR="text6 narrow"))
 
 
 CLEAN += target-pacman-clean
+TOCREATE += $(call check_target,pacman,pacman_clib.lib)
 
 target-pacman: $(PACMAN_TARGETS)
 

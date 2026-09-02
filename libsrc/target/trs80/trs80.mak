@@ -29,6 +29,42 @@ $(TRSDOS_OBJECTS):
 	$(MAKE) -C target/trs80/fcntl obj/$(@F)
 
 CLEAN += target-trs80-clean
+trs80_clib.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(TARGET_DIRECTORY)/trs80/trs80.lst
+	@touch $@
+
+trs80_cpm.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_cpm @$(TARGET_DIRECTORY)/trs80/trs80_cpm.lst
+	@touch $@
+
+gfxtrs80.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(TARGET_DIRECTORY)/trs80/gfxtrs80.lst
+	@touch $@
+
+gfxtrs80m2.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) $(TRS80M2_MC6845_OBJECTS) classic/gfx/obj/.stamp-trs80m2
+	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
+	@touch $@
+
+gfxtrs80m4.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) classic/gfx/obj/.stamp-trs80m4
+	TARGET=trs80m4 TYPE=z80 $(LIBLINKER) -DFORtrs80m4 -x$(OUTPUT_DIRECTORY)/gfxtrs80m4 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m4.lst
+	@touch $@
+
+gfxeg2000.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) classic/gfx/obj/.stamp-eg2000
+	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(TARGET_DIRECTORY)/trs80/gfxeg2000.lst
+	@touch $@
+
+gfxhrg1.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) classic/gfx/obj/.stamp-hrg1
+	TARGET=hrg1 TYPE=z80 $(LIBLINKER) -DFORhrg1 -x$(OUTPUT_DIRECTORY)/gfxhrg1 @$(TARGET_DIRECTORY)/trs80/gfxhrg1.lst
+	@touch $@
+
+grafyx4_3.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-trs80 classic/gfx/obj/.stamp-trs80-base classic/gfx/obj/.stamp-grafyx3
+	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx4_3 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
+	@touch $@
+
+grafyx4.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-trs80 classic/gfx/obj/.stamp-trs80-base classic/gfx/obj/.stamp-grafyx4
+	TARGET=grafyx4 TYPE=z80 $(LIBLINKER) -DFORgrafyx4 -x$(OUTPUT_DIRECTORY)/grafyx4 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
+	@touch $@
+TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxtrs80m2.lib gfxtrs80m4.lib gfxeg2000.lib grafyx4_3.lib grafyx4.lib gfxhrg1.lib trs80_cpm.lib)
 
 $(eval $(call gfx_stamp_args,trs80,TARGET=trs80 FLAVOUR="text6 narrow"))
 $(eval $(call gfx_stamp_args,trs80-base,TARGET=trs80))

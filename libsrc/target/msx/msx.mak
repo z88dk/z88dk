@@ -25,7 +25,20 @@ MSX_TARGETS := \
 
 MSX2_TARGETS := $(MSX_TARGETS) classic/video/tms9918/obj/msx2
 
+msx_clib.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
+	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
+
+msxbios.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
+	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @$(TARGET_DIRECTORY)/msx/arch_msxbios.lst
+
+cpm_msx.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
+	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/cpm_msx @$(TARGET_DIRECTORY)/msx/cpm_msx.lst
+
+msx2.lib: $(TARGET_CLIB_DEPS) $(MSX2_TARGETS)
+	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
+
 CLEAN += target-msx-clean
+TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib msxbios.lib cpm_msx.lib)
 
 $(eval $(call gfx_stamp_args,msx,TARGET=msx))
 

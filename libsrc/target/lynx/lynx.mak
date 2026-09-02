@@ -17,6 +17,11 @@ LYNX_TARGETS := target/lynx/obj/target-lynx-lynx classic/games/obj/.stamp-lynx c
 		
 
 CLEAN += target-lynx-clean
+TOCREATE += $(call check_target,lynx,lynx_clib.lib)
+
+lynx_clib.lib: $(TARGET_CLIB_DEPS) $(LYNX_TARGETS)
+	$(MAKE) -C classic/video/mc6845 TARGET=lynx
+	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(TARGET_DIRECTORY)/lynx/lynx.lst
 
 $(eval $(call gfx_stamp_args,lynx,TARGET=lynx FLAVOUR="gencon narrow"))
 

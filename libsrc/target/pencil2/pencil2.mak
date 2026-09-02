@@ -13,6 +13,11 @@ PENCIL2_TARGETS := target/pencil2/obj/target-pencil2-pencil2 classic/video/tms99
 		
 
 CLEAN += target-pencil2-clean
+TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
+
+pencil2_clib.lib: $(TARGET_CLIB_DEPS) $(PENCIL2_TARGETS)
+	$(MAKE) -C classic/video/tms9918 TARGET=pencil2
+	TARGET=pencil2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpencil2 -x$(OUTPUT_DIRECTORY)/pencil2_clib @$(TARGET_DIRECTORY)/pencil2/pencil2.lst
 
 $(eval $(call gfx_stamp_args,pencil2,TARGET=pencil2))
 

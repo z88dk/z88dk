@@ -13,9 +13,13 @@ ZX80_TARGETS := \
 	classic/games/obj/.stamp-zx80 \
 	classic/gfx/obj/.stamp-zx80
 
+zx80_clib.lib: $(TARGET_CLIB_DEPS) $(ZX80_TARGETS)
+	TARGET=zx80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(TARGET_DIRECTORY)/zx80/zx80.lst
+
 $(eval $(call gfx_stamp_args,zx80,TARGET=zx80))
 
 CLEAN += target-zx80-clean
+TOCREATE += $(call check_target,zx80, zx80_clib.lib)
 
 target-zx80: $(ZX80_TARGETS)
 

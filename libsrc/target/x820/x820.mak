@@ -11,6 +11,13 @@ X820_TARGETS := target/x820/obj/target-x820-x820 classic/games/obj/.stamp-cpm-x8
 
 
 CLEAN += target-x820-clean
+x820ii.lib: cpm_clib.lib $(X820_TARGETS)
+	@echo ''
+	@echo '--- Building Xerox 820 II Library ---'
+	@echo ''
+	TARGET=x820ii TYPE=z80 $(LIBLINKER) -DFORx820ii -x$(OUTPUT_DIRECTORY)/x820ii.lib @$(TARGET_DIRECTORY)/x820/x820ii.lst
+
+TOCREATE += $(call check_target,x820ii,x820ii.lib $(CPMLIBS))
 
 target-x820: $(X820_TARGETS)
 

@@ -13,6 +13,14 @@ MYVISION_TARGETS := target/myvision/obj/target-myvision-myvision classic/video/t
 		
 
 CLEAN += target-myvision-clean
+myvision_clib.lib: $(TARGET_CLIB_DEPS) $(MYVISION_TARGETS)
+	@echo ''
+	@echo '--- Building Nichibutsu My Vision Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/tms9918 TARGET=myvision
+	TARGET=myvision TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmyvision -x$(OUTPUT_DIRECTORY)/myvision_clib @$(TARGET_DIRECTORY)/myvision/myvision.lst
+
+TOCREATE += $(call check_target,myvision,myvision_clib.lib)
 
 $(eval $(call gfx_stamp_args,myvision,TARGET=myvision))
 

@@ -4,7 +4,18 @@ NEWBRAIN_OFILES := $(patsubst target/newbrain/%,target/newbrain/obj/newbrain/%,$
 
 NEWBRAIN_TARGETS := target/newbrain/obj/target-newbrain-newbrain $(NEWBRAIN_OFILES) classic/games/obj/.stamp-newbrain classic/gfx/obj/.stamp-newbrain
 
+nbdrv.lib:
+	$(MAKE) -C target/newbrain/fcntl all
+
 CLEAN += target-newbrain-clean
+newbrain_clib.lib:  $(TARGET_CLIB_DEPS) $(NEWBRAIN_TARGETS)
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(TARGET_DIRECTORY)/newbrain/newbrain.lst
+	@touch $@
+
+newbrain_cpm.lib:  $(TARGET_CLIB_DEPS) $(NEWBRAIN_TARGETS)
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(TARGET_DIRECTORY)/newbrain/newbrain_cpm.lst
+	@touch $@
+TOCREATE += $(call check_target,newbrain,newbrain_clib.lib newbrain_cpm.lib nbdrv.lib)
 
 $(eval $(call gfx_stamp_args,newbrain,TARGET=newbrain))
 

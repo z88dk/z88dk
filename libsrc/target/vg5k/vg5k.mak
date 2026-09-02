@@ -18,6 +18,10 @@ VG5K_TARGETS := target/vg5k/obj/target-vg5k-vg5k classic/games/obj/.stamp-vg5k c
 		
 
 CLEAN += target-vg5k-clean
+TOCREATE += $(call check_target,vg5k,vg5k_clib.lib)
+
+vg5k_clib.lib: $(TARGET_CLIB_DEPS) $(VG5K_TARGETS)
+	TARGET=vg5k TYPE=ixiy $(LIBLINKER) -IXIY -DFORvg5k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(TARGET_DIRECTORY)/vg5k/vg5k.lst
 
 $(eval $(call gfx_stamp_args,vg5k,TARGET=vg5k FLAVOUR="gencon narrow"))
 

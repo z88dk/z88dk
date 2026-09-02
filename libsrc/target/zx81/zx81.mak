@@ -113,7 +113,89 @@ ZX81_TARGETS := \
 	$(GFX81HR128_TARGETS) $(GFX81HR192_TARGETS) $(GFX81MT192_TARGETS) \
 	$(GFX81G007_TARGETS) $(GFX81HR384_TARGETS)
 
+zx81_clib.lib: $(TARGET_CLIB_DEPS) zx80_clib.lib $(ZX81_BASE_TARGETS)
+	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
+
+lambda_clib.lib: $(TARGET_CLIB_DEPS) zx81_clib.lib $(LAMBDA_TARGETS)
+	TARGET=zx81 SUBTARGET=lambda TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
+
+gfx81.lib: $(TARGET_CLIB_DEPS) lambda_clib.lib $(GFX81_TARGETS)
+	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81 @$(TARGET_DIRECTORY)/zx81/gfx81.lst
+	@touch $@
+
+gfx81phrg.lib: $(TARGET_CLIB_DEPS) lambda_clib.lib $(GFX81PHRG_TARGETS)
+	TARGET=zx81phrg TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81phrg -x$(OUTPUT_DIRECTORY)/gfx81phrg @$(TARGET_DIRECTORY)/zx81/gfx81phrg.lst
+	@touch $@
+
+gfxlambda.lib: $(TARGET_CLIB_DEPS) gfx81.lib $(LAMBDA_TARGETS)
+	TARGET=lambda TYPE=ixiy $(LIBLINKER) -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/gfxlambda @$(TARGET_DIRECTORY)/zx81/gfx81.lst
+
+gfx81udg.lib: $(TARGET_CLIB_DEPS) gfxlambda.lib $(GFX81UDG_TARGETS)
+	TARGET=zx81udg TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81udg -x$(OUTPUT_DIRECTORY)/gfx81udg @$(TARGET_DIRECTORY)/zx81/gfx81udg.lst
+
+gfx81hr64.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81HR64_TARGETS)
+	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
+	@touch $@
+
+gfx81arx64.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81HR64_TARGETS)
+	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx64 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+	@touch $@
+
+gfx81g064.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81G64_TARGETS)
+	TARGET=zx81g64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81g64 -DG007 -x$(OUTPUT_DIRECTORY)/gfx81g064 @$(TARGET_DIRECTORY)/zx81/gfx81g007.lst
+	@touch $@
+
+gfx81mt64.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81MT64_TARGETS)
+	TARGET=zx81mt64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt64 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt64 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
+	@touch $@
+
+gfx81hr128.lib: $(TARGET_CLIB_DEPS) gfx81hr64.lib $(GFX81HR128_TARGETS)
+	TARGET=zx81hr128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -x$(OUTPUT_DIRECTORY)/gfx81hr128 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
+	@touch $@
+
+gfx81arx128.lib: $(TARGET_CLIB_DEPS) gfx81hr64.lib $(GFX81HR128_TARGETS)
+	TARGET=zx81hr128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx128 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+	@touch $@
+
+gfx81hr192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81HR192_TARGETS)
+	TARGET=zx81hr192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
+	@touch $@
+
+gfx81arx192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81HR192_TARGETS)
+	TARGET=zx81hr192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+	@touch $@
+
+gfx81mt192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81MT192_TARGETS)
+	TARGET=zx81mt192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81mt192 -DMTHRG -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(TARGET_DIRECTORY)/zx81/gfx81mt.lst
+	@touch $@
+
+gfx81g007.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81G007_TARGETS)
+	TARGET=zx81g007 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81g007 -DG007 -x$(OUTPUT_DIRECTORY)/gfx81g007 @$(TARGET_DIRECTORY)/zx81/gfx81g007.lst
+	@touch $@
+
+gfx81hr384.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81HR384_TARGETS)
+	TARGET=zx81hr384 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr384 -x$(OUTPUT_DIRECTORY)/gfx81hr384 @$(TARGET_DIRECTORY)/zx81/gfx81hri.lst
+	@touch $@
+
+m81.lib:
+	$(MAKE) -C math/float/zxmath m81
+
+m81_tiny.lib:
+	$(MAKE) -C math/float/zxmath m81_tiny
+
+mlambda.lib:
+	$(MAKE) -C math/float/zxmath mlambda
+	$(MAKE) -C math/float/zxmath mlambdav1
+	$(MAKE) -C math/float/zxmath mlambdav3
+
+mlambda_tiny.lib:
+	$(MAKE) -C math/float/zxmath mlambda_tiny
+	$(MAKE) -C math/float/zxmath mlambdav1_tiny
+	$(MAKE) -C math/float/zxmath mlambdav3_tiny
+
 CLEAN += target-zx81-clean
+TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
+TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib gfx81phrg.lib gfx81arx64.lib gfx81g064.lib gfx81mt64.lib gfx81arx128.lib gfx81arx192.lib gfx81mt192.lib gfx81g007.lib)
 
 target-zx81: $(ZX81_TARGETS)
 

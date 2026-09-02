@@ -17,6 +17,13 @@ RX78_TARGETS := target/rx78/obj/target-rx78-rx78 classic/games/obj/.stamp-rx78 c
 		
 
 CLEAN += target-rx78-clean
+rx78_clib.lib: $(TARGET_CLIB_DEPS) $(RX78_TARGETS)
+	@echo ''
+	@echo '--- Building Bandai RX78 Library ---'
+	@echo ''
+	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(TARGET_DIRECTORY)/rx78/rx78.lst
+
+TOCREATE += $(call check_target,rx78,rx78_clib.lib)
 
 $(eval $(call gfx_stamp_args,rx78,TARGET=rx78))
 

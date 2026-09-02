@@ -18,6 +18,15 @@ SPC1000_TARGETS := target/spc1000/obj/target-spc1000-spc1000 classic/video/tms99
 		
 
 CLEAN += target-spc1000-clean
+spc1000_clib.lib: $(TARGET_CLIB_DEPS) $(SPC1000_TARGETS)
+	@echo ''
+	@echo '--- Building Samsung SPC-1000 Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/tms9918 TARGET=spc1000
+	$(MAKE) -C classic/video/mc6847 TARGET=spc1000
+	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(TARGET_DIRECTORY)/spc1000/spc1000.lst
+
+TOCREATE += $(call check_target,spc1000,spc1000_clib.lib)
 
 $(eval $(call gfx_stamp_args,spc1000,TARGET=spc1000))
 

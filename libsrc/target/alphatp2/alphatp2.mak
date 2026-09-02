@@ -20,6 +20,14 @@ ALPHATP2_TARGETS := target/alphatp2/obj/target-alphatp2-alphatp2  $(ALPHATP2_OFI
 		
 
 CLEAN += target-alphatp2-clean
+alphatp2_clib.lib: $(TARGET_CLIB_DEPS) $(ALPHATP2_TARGETS)
+	@echo ''
+	@echo '--- Building Alpha P2 Library ---'
+	@echo ''
+	TARGET=alphatp2 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -DFORalphatp2 -x$(OUTPUT_DIRECTORY)/alphatp2_clib @$(TARGET_DIRECTORY)/alphatp2/alphatp2.lst
+
+
+TOCREATE += $(call check_target,alphatp2,alphatp2_clib.lib)
 
 $(eval $(call gfx_stamp_args,alphatp2,TARGET=alphatp2 FLAVOUR="gencon narrow"))
 

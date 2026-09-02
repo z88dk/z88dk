@@ -15,6 +15,15 @@ PRIMO_TARGETS := target/primo/obj/target-primo-primo classic/games/obj/.stamp-pr
 		
 
 CLEAN += target-primo-clean
+primo_clib.lib: $(TARGET_CLIB_DEPS) $(PRIMO_TARGETS)
+	@echo ''
+	@echo '--- Building Primo A-32/48/64 Library ---'
+	@echo ''
+	TARGET=primo TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORprimo -x$(OUTPUT_DIRECTORY)/primo_clib @$(TARGET_DIRECTORY)/primo/primo.lst
+
+
+
+TOCREATE += $(call check_target,primo,primo_clib.lib)
 
 $(eval $(call gfx_stamp_args,primo,TARGET=primo))
 

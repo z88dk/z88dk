@@ -55,6 +55,19 @@ $(eval $(call gfx_stamp,ts2068,wide))
 		
 
 CLEAN += target-ts2068-clean
+ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib $(TS2068_TARGETS)
+	@echo ''
+	@echo '--- Building TS2068 (Spectrum clone) Library ---'
+	@echo ''
+	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(TARGET_DIRECTORY)/ts2068/ts2068.lst
+
+m2068.lib:
+	@echo ''
+	@echo '--- Building Timex TS2068 Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/float/zxmath m2068
+
+TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 
 target-ts2068: $(TS2068_TARGETS)
 

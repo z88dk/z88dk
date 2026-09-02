@@ -11,6 +11,13 @@ APPLE2_TARGETS := target/apple2/obj/target-apple2-apple2 classic/games/obj/.stam
 		
 
 CLEAN += target-apple2-clean
+apple2.lib: cpm_clib.lib $(APPLE2_TARGETS)
+	@echo ''
+	@echo '--- Building Apple II SoftCard Library ---'
+	@echo ''
+	TARGET=apple2 TYPE=z80 $(LIBLINKER) -DFORapple2 -x$(OUTPUT_DIRECTORY)/apple2 @$(TARGET_DIRECTORY)/apple2/apple2.lst
+
+TOCREATE += $(call check_target,apple2,apple2.lib $(CPMLIBS))
 
 target-apple2: $(APPLE2_TARGETS)
 

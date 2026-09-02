@@ -19,6 +19,10 @@ SOS_TARGETS := target/sos/obj/target-sos-sos \
 		
 
 CLEAN += target-sos-clean
+TOCREATE += $(call check_target,sos,sos_clib.lib)
+
+sos_clib.lib: $(TARGET_CLIB_DEPS) $(SOS_TARGETS)
+	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(TARGET_DIRECTORY)/sos/sos.lst
 
 $(eval $(call gfx_stamp_args,sos,TARGET=sos))
 

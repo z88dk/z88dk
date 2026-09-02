@@ -23,6 +23,13 @@ X07_TARGETS := target/x07/obj/target-x07-x07  $(X07_OFILES) classic/games/obj/.s
 		
 
 CLEAN += target-x07-clean
+x07_clib.lib: $(TARGET_CLIB_DEPS) $(X07_TARGETS)
+	@echo ''
+	@echo '--- Building Canon X-07 Library ---'
+	@echo ''
+	TARGET=x07 TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(TARGET_DIRECTORY)/x07/x07.lst
+
+TOCREATE += $(call check_target,x07,x07_clib.lib)
 
 $(eval $(call gfx_stamp_args,x07,TARGET=x07 FLAVOUR=narrow))
 

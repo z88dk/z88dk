@@ -11,6 +11,13 @@ HGMC_TARGETS := target/hgmc/obj/target-hgmc-hgmc classic/games/obj/.stamp-hgmc c
 		
 
 CLEAN += target-hgmc-clean
+hgmc_clib.lib: $(TARGET_CLIB_DEPS) $(HGMC_TARGETS)
+	@echo ''
+	@echo '--- Building Hübler Grafik MC Library ---'
+	@echo ''
+	TARGET=hgmc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhgmc -x$(OUTPUT_DIRECTORY)/hgmc_clib @$(TARGET_DIRECTORY)/hgmc/hgmc.lst
+
+TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 
 $(eval $(call gfx_stamp_args,hgmc,TARGET=hgmc))
 

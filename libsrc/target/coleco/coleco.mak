@@ -11,6 +11,14 @@ COLECO_TARGETS := target/coleco/obj/target-coleco-coleco classic/video/tms9918/o
 
 
 CLEAN += target-coleco-clean
+coleco_clib.lib: $(TARGET_CLIB_DEPS) $(COLECO_TARGETS)
+	@echo ''
+	@echo '--- Building Colecovision Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/tms9918 TARGET=coleco
+	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(TARGET_DIRECTORY)/coleco/coleco.lst
+
+TOCREATE += $(call check_target,coleco,coleco_clib.lib)
 
 $(eval $(call gfx_stamp_args,coleco,TARGET=coleco))
 $(eval $(call gfx_stamp_args,cpm-coleco,TARGET=coleco FLAVOUR=narrow))

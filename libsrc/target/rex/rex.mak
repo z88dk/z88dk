@@ -19,6 +19,10 @@ REX_TARGETS := target/rex/obj/target-rex-rex \
 
 
 CLEAN += target-rex-clean
+TOCREATE += $(call check_target,rex,rex_clib.lib)
+
+rex_clib.lib: $(TARGET_CLIB_DEPS) $(REX_TARGETS)
+	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(TARGET_DIRECTORY)/rex/rex6000.lst
 
 $(eval $(call gfx_stamp_args,rex,TARGET=rex))
 

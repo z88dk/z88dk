@@ -15,6 +15,13 @@ LVIV_TARGETS := target/lviv/obj/target-lviv-lviv classic/games/obj/.stamp-lviv c
 		
 
 CLEAN += target-lviv-clean
+lviv_clib.lib: $(TARGET_CLIB_DEPS) $(LVIV_TARGETS)
+	@echo ''
+	@echo '--- Building PK-01 Lviv/Lvov Library ---'
+	@echo ''
+	TARGET=lviv TYPE=8080 $(LIBLINKER) -m8080 -DFORlviv -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lviv_clib @$(TARGET_DIRECTORY)/lviv/lviv.lst
+
+TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 
 $(eval $(call gfx_stamp_portable_args,lviv,TARGET=lviv FLAVOUR=narrow))
 

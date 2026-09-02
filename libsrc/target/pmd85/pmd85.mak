@@ -13,6 +13,10 @@ PMD85_TARGETS := target/pmd85/obj/target-pmd85-pmd85 classic/games/obj/.stamp-pm
 
 
 CLEAN += target-pmd85-clean
+TOCREATE += $(call check_target,pmd85,pmd85_clib.lib)
+
+pmd85_clib.lib: $(TARGET_CLIB_DEPS) $(PMD85_TARGETS)
+	TARGET=pmd85 TYPE=8080 $(LIBLINKER) -m8080 -DFORpmd85 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pmd85_clib @$(TARGET_DIRECTORY)/pmd85/pmd85.lst
 
 $(eval $(call gfx_stamp_portable_args,pmd85,TARGET=pmd85 FLAVOUR=wide))
 

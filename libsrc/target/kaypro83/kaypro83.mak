@@ -9,6 +9,10 @@ KAYPRO83_TARGETS := target/kaypro83/obj/target-kaypro83-kaypro83 classic/gfx/obj
 		
 
 CLEAN += target-kaypro83-clean
+gfxkp83.lib: cpm_clib.lib $(KAYPRO83_TARGETS)
+	TARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(TARGET_DIRECTORY)/kaypro83/gfxkp83.lst
+
+TOCREATE += $(call check_target,kaypro83,gfxkp83.lib $(CPMLIBS))
 
 target-kaypro83: $(KAYPRO83_TARGETS)
 

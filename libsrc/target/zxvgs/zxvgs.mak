@@ -11,8 +11,12 @@ ZXVGS_GLOBS_ex := \
 
 ZXVGS_TARGETS := target/zxvgs/obj/target-zxvgs-zxvgs
 
+zxvgs.lib: $(ZXVGS_TARGETS)
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(TARGET_DIRECTORY)/zxvgs/zxvgs.lst
+
 
 CLEAN += target-zxvgs-clean
+TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 
 target-zxvgs: $(ZXVGS_TARGETS)
 

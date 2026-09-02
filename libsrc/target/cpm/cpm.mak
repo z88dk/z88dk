@@ -1,3 +1,5 @@
+CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxh19alt.lib gfxvio.lib gfxgsx.lib
+
 CPM_SOURCES := $(shell find target/cpm -type f -name '*.asm' ! -path 'target/cpm/driver/*')
 CPM_CFILES := $(shell find target/cpm -type f -name '*.c')
 CPM_FCNTL_CFILES := $(shell find target/cpm/fcntl -type f -name '*.c')
@@ -47,6 +49,111 @@ $(eval $(call gfx_stamp_args,cpm-mbc200,TARGET=cpm FLAVOUR=wide SUBTYPE=mbc200))
 $(eval $(call gfx_stamp_args,h19alt,TARGET=cpm SUBTYPE=h19alt FLAVOUR="gencon text6 narrow"))
 
 CLEAN += target-cpm-clean
+v1050.lib: cpm_clib.lib gfx1050udg.lib classic/games/obj/.stamp-cpm-v1050 classic/gfx/obj/.stamp-cpm-v1050
+	@echo ''
+	@echo '--- Building Visual 1050 Library (CP/M) ---'
+	@echo ''
+	TARGET=v1050 TYPE=z80 $(LIBLINKER) -DFORv1050 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/v1050.lib @$(TARGET_DIRECTORY)/v1050/v1050.lst
+
+gfx1050udg.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-cpm-v1050udg
+	@echo ''
+	@echo '--- Building Visual 1050 UDG based Graphics Library ---'
+	@echo ''
+	TARGET=v1050udg TYPE=z80 $(LIBLINKER) -DFORv1050udg -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gfx1050udg.lib @$(TARGET_DIRECTORY)/v1050/gfx1050udg.lst
+
+gfxgsx.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-cpm-gsx
+	@echo ''
+	@echo '--- Building GSX based Z88DK GFX Library ---'
+	@echo ''
+	TARGET=gsx TYPE=z80 $(LIBLINKER) -DFORcpm -DFORgsx -x$(OUTPUT_DIRECTORY)/gfxgsx @$(TARGET_DIRECTORY)/cpm/gfxgsx.lst
+	@touch $@
+
+cpm_clib.lib: $(TARGET_CLIB_DEPS) $(CPM_TARGETS)
+	@echo ''
+	@echo '--- Building CP/M Library ---'
+	@echo ''
+	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+
+cpmdevice.lib: cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library ---'
+	@echo ''
+	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
+
+cpm8080_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (8080)---'
+	@echo ''
+	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
+
+cpmdevice_8080.lib: cpm8080_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (8080) ---'
+	@echo ''
+	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/cpmdevice_8080 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
+
+cpm8085_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (8085)---'
+	@echo ''
+	TARGET=cpm TYPE=8085 DEVICE=nodevice $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8085_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
+
+cpmdevice_8085.lib: cpm8085_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (8085) ---'
+	@echo ''
+	TARGET=cpm TYPE=8085 DEVICE=device $(LIBLINKER) -m8085 -x$(OUTPUT_DIRECTORY)/cpmdevice_8085 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
+
+cpmixiy_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (IXIY)---'
+	@echo ''
+	TARGET=cpm TYPE=ixiy DEVICE=nodevice $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmixiy_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+
+cpmz180_clib.lib: $(TARGET_CLIB_DEPS) cpm_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Library (z180)---'
+	@echo ''
+	TARGET=cpm TYPE=z180 DEVICE=nodevice $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpmz180_clib @$(TARGET_DIRECTORY)/cpm/cpm.lst
+
+cpmdevice_z180.lib: cpmz180_clib.lib
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (z180) ---'
+	@echo ''
+	TARGET=cpm TYPE=z180 DEVICE=device $(LIBLINKER) -mz180 -x$(OUTPUT_DIRECTORY)/cpmdevice_z180 @$(TARGET_DIRECTORY)/cpm/fcntl/fcntl.lst
+
+mbc200.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-mbc200 classic/gfx/obj/.stamp-cpm-mbc200
+	@echo ''
+	@echo '--- Building Sanyo MBC-200 Library (CP/M) ---'
+	@echo ''
+	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
+
+z80retro_cpm.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-z80retro classic/gfx/obj/.stamp-cpm-z80retro
+	@echo ''
+	@echo '--- Building z80retro! CP/M Library ---'
+	@echo ''
+	$(MAKE) -C classic/video/tms9918 TARGET=cpm SUBTYPE=z80retro
+	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
+
+tiki100.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-tiki100 classic/gfx/obj/.stamp-cpm-tiki100
+	@echo ''
+	@echo '--- Building TIKI-100 Library ---'
+	@echo ''
+	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(TARGET_DIRECTORY)/tiki100/tiki100.lst
+
+gfxh19.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.stamp-h19alt
+	TARGET=h19 TYPE=z80 $(LIBLINKER) -DFORh19 -x$(OUTPUT_DIRECTORY)/gfxh19 @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19.lst
+	@touch $@
+
+gfxh19alt.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.stamp-h19alt
+	TARGET=h19alt TYPE=z80 $(LIBLINKER) -DFORh19alt -x$(OUTPUT_DIRECTORY)/gfxh19alt @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19alt.lst
+	@touch $@
+
+TOCREATE += $(call check_target,cpm,$(CPMLIBS))
+TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
+TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
+TOCREATE += $(call check_target,v1050,v1050.lib gfx1050udg.lib $(CPMLIBS))
+TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
 
 target-cpm: $(CPM_TARGETS)
 

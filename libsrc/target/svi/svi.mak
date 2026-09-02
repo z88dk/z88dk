@@ -7,12 +7,19 @@ SVI_TARGETS := \
 	classic/games/obj/.stamp-svi \
 	classic/gfx/obj/.stamp-svi
 
+svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib $(SVI_TARGETS)
+	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
+
+svibios.lib: $(TARGET_CLIB_DEPS) msx_clib.lib $(SVI_TARGETS)
+	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @$(TARGET_DIRECTORY)/svi/arch_svibios.lst
+
 target/svi/obj/target-svi-support: $(SVI_SOURCES)
 	$(Q)mkdir -p $(dir $@)
 	$(MAKE) -C target/svi
 	@touch $@
 
 CLEAN += target-svi-clean
+TOCREATE += $(call check_target,svi,svi_clib.lib svibios.lib)
 
 $(eval $(call gfx_stamp_args,svi,TARGET=svi))
 

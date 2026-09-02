@@ -11,6 +11,10 @@ SOL20_TARGETS := target/sol20/obj/target-sol20-sol20 classic/games/obj/.stamp-so
 		
 
 CLEAN += target-sol20-clean
+TOCREATE += $(call check_target,sol20,sol20_clib.lib)
+
+sol20_clib.lib: $(TARGET_CLIB_DEPS) $(SOL20_TARGETS)
+	TARGET=sol20 TYPE=8080 $(LIBLINKER) -m8080 -DFORsol20 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sol20_clib @$(TARGET_DIRECTORY)/sol20/sol20.lst
 
 $(eval $(call gfx_stamp_portable_args,sol20,TARGET=sol20 FLAVOUR=gencon))
 

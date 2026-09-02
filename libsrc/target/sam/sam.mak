@@ -84,9 +84,16 @@ SAM_OFILES = $(patsubst target/sam/%,target/sam/obj/sam/%,$(SAM_CFILES:.c=.o))
 SAM_TARGETS := target/sam/obj/target-sam-sam target/sam/obj/target-sam-samcpm \
 	$(SAM_OFILES) \
 	classic/games/obj/.stamp-sam classic/gfx/obj/.stamp-sam
+
+sam_clib.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS)
+	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
+
+sam_cpm.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS) sam_clib.lib
+	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
 		
 
 CLEAN += target-sam-clean
+TOCREATE += $(call check_target,sam,sam_clib.lib sam_cpm.lib)
 
 $(eval $(call gfx_stamp_args,sam,TARGET=sam FLAVOUR=wide))
 

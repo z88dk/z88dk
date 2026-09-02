@@ -11,6 +11,10 @@ MAP1010_TARGETS := target/map1010/obj/target-map1010-map1010
 
 
 CLEAN += target-map1010-clean
+TOCREATE += $(call check_target,map1010,map1010.lib)
+
+map1010.lib: phc25_clib.lib $(MAP1010_TARGETS)
+	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORmap1010 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/map1010 @$(TARGET_DIRECTORY)/map1010/map1010.lst
 
 target-map1010: $(MAP1010_TARGETS)
 

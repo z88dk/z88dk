@@ -11,6 +11,13 @@ TIM011_TARGETS := target/tim011/obj/target-tim011-tim011 classic/games/obj/.stam
 		
 
 CLEAN += target-tim011-clean
+tim011.lib: cpm_clib.lib $(TIM011_TARGETS)
+	@echo ''
+	@echo '--- Building Tim-011 Library ---'
+	@echo ''
+	TARGET=tim011 TYPE=z180 $(LIBLINKER) -mz180 -DFORtim011 -x$(OUTPUT_DIRECTORY)/tim011.lib @$(TARGET_DIRECTORY)/tim011/tim011.lst
+
+TOCREATE += $(call check_target,tim011,tim011.lib)
 
 $(eval $(call gfx_stamp_portable_args,cpm-tim011,TARGET=cpm SUBTYPE=tim011 FLAVOUR="wide gencon" TARGET_CFLAGS="-subtype=tim011"))
 

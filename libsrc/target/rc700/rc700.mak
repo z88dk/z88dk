@@ -13,6 +13,13 @@ RC700_TARGETS := target/rc700/obj/target-rc700-rc700 classic/games/obj/.stamp-cp
 		
 
 CLEAN += target-rc700-clean
+rc700.lib: cpm_clib.lib $(RC700_TARGETS)
+	@echo ''
+	@echo '--- Building RC-700 Library ---'
+	@echo ''
+	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(TARGET_DIRECTORY)/rc700/rc700.lst
+
+TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
 
 $(eval $(call gfx_stamp_portable_args,cpm-rc700,TARGET=cpm SUBTYPE=rc700 FLAVOUR="narrow gencon"))
 

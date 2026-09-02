@@ -13,6 +13,13 @@ PX8_TARGETS := target/px8/obj/target-px8-px8 classic/games/obj/.stamp-cpm-px8 cl
 
 
 CLEAN += target-px8-clean
+px8.lib: cpm_clib.lib $(PX8_TARGETS)
+	@echo ''
+	@echo '--- Building PX-8/Geneva Library ---'
+	@echo ''
+	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(TARGET_DIRECTORY)/px8/px8.lst
+
+TOCREATE += $(call check_target,px8,px8.lib $(CPMLIBS))
 
 target-px8: $(PX8_TARGETS)
 

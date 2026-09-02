@@ -157,6 +157,18 @@ $(eval $(call gfx_stamp,zx,narrow))
 		
 
 CLEAN += target-zx-clean
+mzx.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/float/zxmath mzx
+
+mzx_tiny.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/float/zxmath mzx_tiny
+
 
 target-zx: $(ZX_TARGETS)
 
@@ -181,5 +193,72 @@ $(eval $(call bifrost_zx0,zx))
 
 $(eval $(call buildtargetasm,target/zx,z80,zxcpm,-mz80,$(ZXCPM_GLOBS),$(ZXCPM_GLOBS_ex)))
 
+# ZX support libraries
+define zx_support
+ZX_$(1)_CFILES := $(wildcard target/zx/classic/$(2)/*.c)
+ZX_$(1)_ASMFILES := $(wildcard target/zx/classic/$(2)/*.asm)
+ZX_$(1)_C_OBJECTS := $$(patsubst target/zx/%,target/zx/obj/support/%,$$(ZX_$(1)_CFILES:.c=.o))
+ZX_$(1)_ASM_OBJECTS := $$(patsubst target/zx/%,target/zx/obj/support/%,$$(ZX_$(1)_ASMFILES:.asm=.o))
+ZX_$(1)_OBJECTS := $$(ZX_$(1)_C_OBJECTS) $$(ZX_$(1)_ASM_OBJECTS)
+
+$$(ZX_$(1)_C_OBJECTS): target/zx/obj/support/classic/$(2)/%.o: target/zx/classic/$(2)/%.c
+	$(Q)mkdir -p $$(dir $$@)
+	$$(ZCC) +zx $$(CFLAGS) $(3) -c -o $$@ $$<
+
+$$(ZX_$(1)_ASM_OBJECTS): target/zx/obj/support/classic/$(2)/%.o: target/zx/classic/$(2)/%.asm
+	$(Q)mkdir -p $$(dir $$@)
+	$$(ZCC) +zx $$(CFLAGS) $(3) -c -o $$@ $$<
+endef
+
+$(eval $(call zx_support,microdrive,fcntl/microdrive))
+$(eval $(call zx_support,plus3,fcntl/plus3,-DPLUS3))
+$(eval $(call zx_support,zxbasdrv,fcntl/zxbasdrv))
+$(eval $(call zx_support,esxdos,fcntl/esxdos,-DESXDOS))
+$(eval $(call zx_support,rs232plus,rs232/plus3))
+$(eval $(call zx_support,rs232if1,rs232/if1))
+$(eval $(call zx_support,rs232morex,rs232/morex))
+
+ZX_SUPPORT_LIBS := p3.lib zxmdv.lib zxbasdrv.lib zxbasdos.lib esxdos.lib rs232plus.lib rs232if1.lib rs232morex.lib
+ZX_LIBS := zx_clib.lib zxcpm.lib mzx.lib mzx_tiny.lib $(ZX_SUPPORT_LIBS)
+TOCREATE += $(call check_target,zx,$(ZX_LIBS))
+
+# ZX Spectrum libraries
+zx_clib.lib: $(TARGET_CLIB_DEPS) $(ZX_TARGETS) $(FZX_TARGETS) $(ZX_SUPPORT_LIBS)
+	@echo ''
+	@echo '--- Building ZX Spectrum Library ---'
+	@echo ''
+	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zx_clib @$(TARGET_DIRECTORY)/zx/zx.lst
+
+zxcpm.lib: $(TARGET_CLIB_DEPS) $(ZX_TARGETS) zx_clib.lib
+	@echo ''
+	@echo '--- Building ZX Spectrum CP/M Library ---'
+	@echo ''
+	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(TARGET_DIRECTORY)/zx/zx_cpm.lst
+
+p3.lib: $(ZX_plus3_OBJECTS) target/zx/classic/fcntl/plus3/plus3.lst
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/p3 @target/zx/classic/fcntl/plus3/plus3.lst
+
+zxmdv.lib: $(ZX_microdrive_OBJECTS) target/zx/classic/fcntl/microdrive/mdvlist
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zxmdv @target/zx/classic/fcntl/microdrive/mdvlist
+
+zxbasdrv.lib: $(ZX_zxbasdrv_OBJECTS) target/zx/classic/fcntl/zxbasdrv/zxbdlst
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zxbasdrv @target/zx/classic/fcntl/zxbasdrv/zxbdlst
+
+zxbasdos.lib: $(ZX_zxbasdrv_OBJECTS) target/zx/classic/fcntl/zxbasdrv/zxbdlst2
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zxbasdos @target/zx/classic/fcntl/zxbasdrv/zxbdlst2
+
+esxdos.lib: $(ZX_esxdos_OBJECTS) target/zx/classic/fcntl/esxdos/esxdos.lst
+	$(LIBLINKER) -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/esxdos @target/zx/classic/fcntl/esxdos/esxdos.lst
+
+rs232plus.lib: $(ZX_rs232plus_OBJECTS) target/zx/classic/rs232/plus3/p3list
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232plus @target/zx/classic/rs232/plus3/p3list
+
+rs232if1.lib: $(ZX_rs232if1_OBJECTS) target/zx/classic/rs232/if1/if1list
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232if1 @target/zx/classic/rs232/if1/if1list
+
+rs232morex.lib: $(ZX_rs232morex_OBJECTS) target/zx/classic/rs232/morex/morexlist
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232morex @target/zx/classic/rs232/morex/morexlist
+
 target-zx-clean:
 	$(RM) -fr target/zx/obj
+	$(RM) p3.lib zxmdv.lib zxbasdrv.lib zxbasdos.lib esxdos.lib rs232plus.lib rs232if1.lib rs232morex.lib

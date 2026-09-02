@@ -15,6 +15,13 @@ MULTI8_TARGETS := target/multi8/obj/target-multi8-multi8 classic/games/obj/.stam
 		
 
 CLEAN += target-multi8-clean
+multi8_clib.lib: $(TARGET_CLIB_DEPS) $(MULTI8_TARGETS)
+	@echo ''
+	@echo '--- Building Mitsubishi Multi8 Library ---'
+	@echo ''
+	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(TARGET_DIRECTORY)/multi8/multi8.lst
+
+TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 
 $(eval $(call gfx_stamp_args,multi8,TARGET=multi8 FLAVOUR=wide))
 
