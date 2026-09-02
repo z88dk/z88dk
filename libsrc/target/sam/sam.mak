@@ -78,7 +78,7 @@ SAM_CPM_GLOBS_ex := \
 
 SAM_CFILES = 
 
-SAM_OFILES = $(addprefix target/sam/obj/sam/, $(SAM_CFILES:.c=.o))
+SAM_OFILES = $(patsubst target/sam/%,target/sam/obj/sam/%,$(SAM_CFILES:.c=.o))
 
 
 SAM_TARGETS := target/sam/obj/target-sam-sam target/sam/obj/target-sam-samcpm \

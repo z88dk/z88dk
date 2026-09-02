@@ -13,9 +13,9 @@ NABU_GLOBS_ex := \
 	target/nabu/stdio/*.asm
 
 NABU_CFILES := $(shell find target/nabu -type f -name '*.c')
-NABU_OFILES := $(addprefix target/nabu/obj/nabu/,$(NABU_CFILES:.c=.o))
+NABU_OFILES := $(patsubst target/nabu/%,target/nabu/obj/nabu/%,$(NABU_CFILES:.c=.o))
 
-NABU_TARGETS := target/nabu/obj/target-nabu-nabu $(NABU_OFILES) classic/games/obj/.stamp-nabu classic/gfx/obj/.stamp-nabu
+NABU_TARGETS := target/nabu/obj/target-nabu-nabu $(NABU_OFILES) classic/video/tms9918/obj/nabu classic/games/obj/.stamp-nabu classic/gfx/obj/.stamp-nabu
 
 CLEAN += target-nabu-clean
 
@@ -24,6 +24,8 @@ $(eval $(call gfx_stamp_args,nabu,TARGET=nabu))
 target-nabu: $(NABU_TARGETS)
 
 .PHONY: target-nabu target-nabu-clean
+
+$(eval $(call buildtms9918,nabu,nabu))
 
 $(eval $(call buildtargetasm,target/nabu,z80,nabu,-mz80,$(NABU_GLOBS),$(NABU_GLOBS_ex)))
 $(eval $(call buildtargetc,target/nabu,nabu))

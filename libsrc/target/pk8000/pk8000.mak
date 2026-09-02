@@ -12,7 +12,7 @@ PK8000_TARGETS := target/pk8000/obj/target-pk8000-pk8000 classic/gfx/obj/.stamp-
 
 CLEAN += target-pk8000-clean
 
-$(eval $(call gfx_stamp_args,pk8000,TARGET=pk8000 FLAVOUR=portable))
+$(eval $(call gfx_stamp_portable,pk8000,pk8000))
 
 target-pk8000: $(PK8000_TARGETS)
 

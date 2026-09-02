@@ -41,7 +41,7 @@ $(eval $(call buildbit,classic/alloc/malloc-classic,kc160,test,-clib=kc160,-mkc1
 
 
 classic/alloc/malloc-classic/obj/%:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
 classic-alloc-malloc-clean:
 	$(RM) -fr classic/alloc/malloc-classic/obj classic/alloc/malloc-classic/*.o

@@ -20,7 +20,7 @@ target/ace/obj/${TARGET}/x/target/ace/games/joystick.o
 @target/ace/ace/ace.lst
 target/ace/obj/${TARGET}/x/target/ace/tape/tape_load_block.o
 target/ace/obj/${TARGET}/x/target/ace/tape/tape_load_block_callee.o
-target/ace/obj/${TARGET}/target/ace/tape/tape_save.o
+target/ace/obj/${TARGET}/tape/tape_save.o
 target/ace/obj/${TARGET}/x/target/ace/tape/tape_save_block.o
 target/ace/obj/${TARGET}/x/target/ace/tape/tape_save_block_callee.o
 @classic/input/input_keyboard.lst

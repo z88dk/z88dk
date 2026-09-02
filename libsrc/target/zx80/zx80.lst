@@ -4,7 +4,7 @@ target/zx80/obj/zx80/x/target/zx80/stdio/getk.o
 target/zx80/obj/zx80/x/target/zx80/stdio/zx80_decode_keys.o
 target/zx81/obj/zx80/x/target/zx81/stdio/fputc_cons.o
 target/zx81/obj/zx80/x/target/zx81/stdio/generic_console.o
-target/zx80/obj/zx80/target/zx80/stdlib/sleep.o
+target/zx80/obj/zx80/stdlib/sleep.o
 @classic/stdio/ansicore.lst
 target/zx81/stdio/ansi_text/f_ansi_bel
 target/zx81/stdio/ansi_text/f_ansi_attr

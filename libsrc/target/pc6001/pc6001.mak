@@ -15,7 +15,7 @@ PC6001_GLOBS_ex := \
 
 PC6001_TARGETS := target/pc6001/obj/target-pc6001-pc6001 classic/games/obj/.stamp-pc6001 classic/gfx/obj/.stamp-pc6001
 
-$(eval $(call gfx_stamp_args,pc6001,TARGET=pc6001 FLAVOUR="narrow portable"))
+$(eval $(call gfx_stamp_portable_args,pc6001,TARGET=pc6001 FLAVOUR=narrow))
 		
 
 CLEAN += target-pc6001-clean

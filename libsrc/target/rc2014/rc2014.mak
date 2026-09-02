@@ -1,1 +1,1 @@
-$(eval $(call gfx_stamp_args,rc2014,TARGET=rc2014 FLAVOUR=portable))
+$(eval $(call gfx_stamp_portable,rc2014,rc2014))

@@ -1,5 +1,6 @@
-target/c128/obj/${TARGET}/target/c128/c128/*.o
-target/c128/obj/${TARGET}/target/c128/psg/*.o
+target/c128/obj/${TARGET}/c128/*.o
+target/c128/obj/${TARGET}/psg/*.o
+target/c128/obj/${TARGET}/x/target/c128/c128/*.o
 target/c128/obj/${TARGET}/x/target/c128/games/joystick.o
 target/c128/obj/${TARGET}/x/target/c128/games/bit_open.o
 target/c128/obj/${TARGET}/x/target/c128/games/bit_open_di.o

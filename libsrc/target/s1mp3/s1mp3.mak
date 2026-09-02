@@ -6,7 +6,7 @@ S1MP3_GLOBS_ex := \
 
 S1MP3_CFILES = $(wildcard target/s1mp3/*/*.c)
 
-S1MP3_OFILES = $(addprefix target/s1mp3/obj/s1mp3/, $(S1MP3_CFILES:.c=.o))
+S1MP3_OFILES = $(patsubst target/s1mp3/%,target/s1mp3/obj/s1mp3/%,$(S1MP3_CFILES:.c=.o))
 
 
 S1MP3_TARGETS := target/s1mp3/obj/target-s1mp3-s1mp3 \

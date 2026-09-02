@@ -12,6 +12,8 @@ TIM011_TARGETS := target/tim011/obj/target-tim011-tim011 classic/games/obj/.stam
 
 CLEAN += target-tim011-clean
 
+$(eval $(call gfx_stamp_portable_args,cpm-tim011,TARGET=cpm SUBTYPE=tim011 FLAVOUR="wide gencon" TARGET_CFLAGS="-subtype=tim011"))
+
 target-tim011: $(TIM011_TARGETS)
 
 .PHONY: target-tim011 target-tim011-clean

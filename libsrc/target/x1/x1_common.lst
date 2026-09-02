@@ -34,9 +34,9 @@ target/x1/obj/${TARGET}/x/target/x1/graphics/w_respixl.o
 target/x1/obj/${TARGET}/x/target/x1/graphics/w_xorpixl.o
 target/x1/obj/${TARGET}/x/target/x1/graphics/w_pointxy.o
 @classic/gfx/wide/gfx_wide.lst
-target/x1/obj/${TARGET}/target/x1/x1/subcpu_command.o
-target/x1/obj/${TARGET}/target/x1/x1/subcpu_get.o
-target/x1/obj/${TARGET}/target/x1/x1/subcpu_set.o
+target/x1/obj/${TARGET}/x1/subcpu_command.o
+target/x1/obj/${TARGET}/x1/subcpu_get.o
+target/x1/obj/${TARGET}/x1/subcpu_set.o
 target/x1/obj/${TARGET}/x/target/x1/x1/set_crtc.o
 target/x1/obj/${TARGET}/x/target/x1/x1/set_crtc_10.o
 target/x1/obj/${TARGET}/x/target/x1/x1/set_crtc_reg.o
@@ -50,8 +50,8 @@ target/x1/obj/${TARGET}/x/target/x1/x1/x1_set_palette.o
 target/x1/obj/${TARGET}/x/target/x1/x1/x1_load_pcg.o
 target/x1/obj/${TARGET}/x/target/x1/x1/asm_load_pcg.o
 target/x1/obj/${TARGET}/x/target/x1/x1/asm_x1_keyboard_handler.o
-target/x1/obj/${TARGET}/target/x1/time/clock.o
-target/x1/obj/${TARGET}/target/x1/time/time.o
+target/x1/obj/${TARGET}/time/clock.o
+target/x1/obj/${TARGET}/time/time.o
 target/x1/obj/${TARGET}/x/target/x1/psg/set_psg.o
 target/x1/obj/${TARGET}/x/target/x1/psg/set_psg_callee.o
 target/x1/obj/${TARGET}/x/target/x1/psg/get_psg.o

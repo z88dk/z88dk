@@ -10,7 +10,7 @@ DAI_TARGETS := target/dai/obj/target-dai-dai classic/gfx/obj/.stamp-dai
 
 CLEAN += target-dai-clean
 
-$(eval $(call gfx_stamp_args,dai,TARGET=dai FLAVOUR=portable))
+$(eval $(call gfx_stamp_portable,dai,dai))
 
 target-dai: $(DAI_TARGETS)
 

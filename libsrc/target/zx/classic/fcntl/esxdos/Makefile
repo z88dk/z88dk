@@ -29,7 +29,7 @@ obj/%.o: %.asm
 $(CLASSIC_OBJECTS): | dirs
 
 dirs:
-	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
+	$(Q)mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
 
 clean:
 	$(RM) -fr obj

@@ -17,7 +17,7 @@ obj/$(TARGET)/%.o: %.asm
 $(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/$(TARGET)
+	$(Q)mkdir -p obj/$(TARGET)
 
 clean: 
 	$(RM) -r obj

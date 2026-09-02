@@ -15,7 +15,7 @@ X07_GLOBS_ex := \
 
 X07_CFILES = 
 
-X07_OFILES = $(addprefix target/x07/obj/x07/, $(X07_CFILES:.c=.o)) 
+X07_OFILES = $(patsubst target/x07/%,target/x07/obj/x07/%,$(X07_CFILES:.c=.o))
 
 
 

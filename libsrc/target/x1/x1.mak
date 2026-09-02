@@ -15,7 +15,7 @@ X1_GLOBS_ex := \
 	target/x1/x1/*.asm
 
 X1_CFILES := $(wildcard target/x1/x1/*.c) $(wildcard target/x1/time/*.c)
-X1_OFILES := $(addprefix target/x1/obj/x1/,$(X1_CFILES:.c=.o))
+X1_OFILES := $(patsubst target/x1/%,target/x1/obj/x1/%,$(X1_CFILES:.c=.o))
 
 X1_TARGETS := target/x1/obj/target-x1-x1 $(X1_OFILES) classic/games/obj/.stamp-x1 classic/gfx/obj/.stamp-x1
 X1_CPM_TARGETS := target/x1/obj/target-x1-x1 $(X1_OFILES) classic/gfx/obj/.stamp-cpm-x1

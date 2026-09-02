@@ -58,7 +58,7 @@ $(eval $(call crt0,r4k,      crt0_r2ka.lst,  -D__SDCC_IX -D__CLASSIC -mr4k))
 $(eval $(call crt0,kc160,    crt0_kc160.lst, -D__SDCC_IX -D__CLASSIC -mkc160))
 
 $(CRT0_DIR)/obj:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
 CLEAN += crt0s-clean
 

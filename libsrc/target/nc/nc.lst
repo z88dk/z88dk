@@ -3,13 +3,13 @@ target/nc/obj/${TARGET}/x/target/nc/stdio/fputc_cons.o
 target/nc/obj/${TARGET}/x/target/nc/stdio/CRT_FONT.o
 @classic/stdio/stdio.lst
 target/nc/obj/${TARGET}/x/target/nc/fcntl/open.o
-target/nc/obj/${TARGET}/target/nc/fcntl/opendir.o
+target/nc/obj/${TARGET}/fcntl/opendir.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/creat.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/close.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/fsync.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/read.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/write.o
-target/nc/obj/${TARGET}/target/nc/fcntl/lseek.o
+target/nc/obj/${TARGET}/fcntl/lseek.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/readbyte.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/_fsize.o
 target/nc/obj/${TARGET}/x/target/nc/fcntl/_fsizehandle.o

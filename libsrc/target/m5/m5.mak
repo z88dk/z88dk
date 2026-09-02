@@ -7,7 +7,7 @@ M5_GLOBS_ex := \
 	target/m5/stdio/*.asm
 
 
-M5_TARGETS := target/m5/obj/target-m5-m5 classic/games/obj/.stamp-m5 classic/gfx/obj/.stamp-m5
+M5_TARGETS := target/m5/obj/target-m5-m5 classic/video/tms9918/obj/m5 classic/games/obj/.stamp-m5 classic/gfx/obj/.stamp-m5
 
 
 CLEAN += target-m5-clean
@@ -17,6 +17,8 @@ $(eval $(call gfx_stamp_args,m5,TARGET=m5))
 target-m5: $(M5_TARGETS)
 
 .PHONY: target-m5 target-m5-clean
+
+$(eval $(call buildtms9918,m5,m5))
 
 $(eval $(call buildtargetasm,target/m5,z80,m5,-mz80,$(M5_GLOBS),$(M5_GLOBS_ex)))
 

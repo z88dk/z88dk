@@ -9,9 +9,9 @@ target/enterprise/obj/${TARGET}/x/target/enterprise/games/bit_open_di.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/games/bit_close.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/games/bit_close_ei.o
 @classic/games/games.lst
-target/enterprise/obj/${TARGET}/target/enterprise/tape/tape_load_block.o
-target/enterprise/obj/${TARGET}/target/enterprise/tape/tape_save_block.o
-target/enterprise/obj/${TARGET}/target/enterprise/tape/tape_save.o
+target/enterprise/obj/${TARGET}/tape/tape_load_block.o
+target/enterprise/obj/${TARGET}/tape/tape_save_block.o
+target/enterprise/obj/${TARGET}/tape/tape_save.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/exos_capture_channel.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/exos_capture_channel_callee.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/exos_channel_read_status.o
@@ -37,6 +37,6 @@ target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/get_exos_variable
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/set_exos_variable.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/set_exos_variable_callee.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/toggle_exos_variable.o
-target/enterprise/obj/${TARGET}/target/enterprise/enterprise/exos_set_vmode.o
+target/enterprise/obj/${TARGET}/enterprise/exos_set_vmode.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/exos_reset_font.o
 target/enterprise/obj/${TARGET}/x/target/enterprise/enterprise/lpt_ready.o

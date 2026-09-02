@@ -31,7 +31,7 @@ obj/$(TARGET)/%.o: %.asm
 $(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/$(TARGET)
+	$(Q)mkdir -p obj/$(TARGET)
 
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 

@@ -15,7 +15,7 @@ MZ_GLOBS_ex := \
 
 MZ_CFILES = $(wildcard target/mz/tape/*.c) 
 
-MZ_OFILES = $(addprefix target/mz/obj/mz/, $(MZ_CFILES:.c=.o)) 
+MZ_OFILES = $(patsubst target/mz/%,target/mz/obj/mz/%,$(MZ_CFILES:.c=.o))
 
 
 

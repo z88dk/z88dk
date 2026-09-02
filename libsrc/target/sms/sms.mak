@@ -24,7 +24,7 @@ SMS_GLOBS_ex := \
 	target/sms/vram/c/sccz80/*.asm target/sms/vram/z80/*.asm 
 
 
-SMS_TARGETS := target/sms/obj/target-sms-sms classic/games/obj/.stamp-sms classic/gfx/obj/.stamp-sms
+SMS_TARGETS := target/sms/obj/target-sms-sms classic/video/tms9918/obj/sms classic/games/obj/.stamp-sms classic/gfx/obj/.stamp-sms
 		
 
 CLEAN += target-sms-clean
@@ -34,6 +34,8 @@ $(eval $(call gfx_stamp_args,sms,TARGET=sms))
 target-sms: $(SMS_TARGETS)
 
 .PHONY: target-sms target-sms-clean
+
+$(eval $(call buildtms9918,sms,sms))
 
 
 $(eval $(call buildtargetasm,target/sms,z80,sms,-mz80,$(SMS_GLOBS),$(SMS_GLOBS_ex)))

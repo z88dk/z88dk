@@ -33,7 +33,7 @@ $(eval $(call buildbit,classic/algorithm/AStarSearch,kc160,test,-clib=kc160,-mkc
 
 
 classic/algorithm/AStarSearch/obj/%:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
 classic-algorithm-astar-clean:
 	$(RM) -fr classic/algorithm/AStarSearch/obj classic/algorithm/AStarSearch/*.o

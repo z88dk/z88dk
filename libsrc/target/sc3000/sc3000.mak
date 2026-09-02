@@ -11,7 +11,7 @@ SC3000_GLOBS_ex := \
 	target/sc3000/time/*.asm 
 
 
-SC3000_TARGETS := target/sc3000/obj/target-sc3000-sc3000 classic/games/obj/.stamp-sc3000 classic/gfx/obj/.stamp-sc3000
+SC3000_TARGETS := target/sc3000/obj/target-sc3000-sc3000 classic/video/tms9918/obj/sc3000 classic/games/obj/.stamp-sc3000 classic/gfx/obj/.stamp-sc3000
 		
 
 CLEAN += target-sc3000-clean
@@ -21,6 +21,8 @@ $(eval $(call gfx_stamp_args,sc3000,TARGET=sc3000))
 target-sc3000: $(SC3000_TARGETS)
 
 .PHONY: target-sc3000 target-sc3000-clean
+
+$(eval $(call buildtms9918,sc3000,sc3000))
 
 
 $(eval $(call buildtargetasm,target/sc3000,z80,sc3000,-mz80,$(SC3000_GLOBS),$(SC3000_GLOBS_ex)))

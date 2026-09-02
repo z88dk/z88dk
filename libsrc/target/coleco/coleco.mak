@@ -7,7 +7,7 @@ COLECO_GLOBS_ex := \
 	target/coleco/stdio/*.asm
 
 
-COLECO_TARGETS := target/coleco/obj/target-coleco-coleco classic/games/obj/.stamp-coleco classic/gfx/obj/.stamp-coleco
+COLECO_TARGETS := target/coleco/obj/target-coleco-coleco classic/video/tms9918/obj/coleco classic/games/obj/.stamp-coleco classic/gfx/obj/.stamp-coleco
 
 
 CLEAN += target-coleco-clean
@@ -18,6 +18,8 @@ $(eval $(call gfx_stamp_args,cpm-coleco,TARGET=coleco FLAVOUR=narrow))
 target-coleco: $(COLECO_TARGETS)
 
 .PHONY: target-coleco target-coleco-clean
+
+$(eval $(call buildtms9918,coleco,coleco))
 
 $(eval $(call buildtargetasm,target/coleco,z80,coleco,-mz80,$(COLECO_GLOBS),$(COLECO_GLOBS_ex)))
 

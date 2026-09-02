@@ -25,7 +25,7 @@ $(1): $(OUTPUT_DIRECTORY)/$(1).lib
 
 
 $(1)_dir:
-	@mkdir -p obj/$(1)/c/sccz80
+	$(Q)mkdir -p obj/$(1)/c/sccz80
 .PHONY: $(1)_dir
 
 $(OUTPUT_DIRECTORY)/$(1).lib: $(1)_dir $(addprefix obj/$(1)/, $(OBJECTS))

@@ -14,7 +14,7 @@ KROKHA_TARGETS := target/krokha/obj/target-krokha-krokha classic/games/obj/.stam
 
 CLEAN += target-krokha-clean
 
-$(eval $(call gfx_stamp_args,krokha,TARGET=krokha FLAVOUR="gencon portable"))
+$(eval $(call gfx_stamp_portable_args,krokha,TARGET=krokha FLAVOUR=gencon))
 
 target-krokha: $(KROKHA_TARGETS)
 

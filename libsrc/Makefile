@@ -16,9 +16,24 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
-CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxvio.lib gfxgsx.lib
+CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxh19alt.lib gfxvio.lib gfxgsx.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib vm1_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += gfxtek.lib gfxregis.lib
+
+rs232cpc_booster.lib:
+	$(MAKE) -C target/cpc/rs232/booster all
+
+rs232cpc_sti.lib:
+	$(MAKE) -C target/cpc/rs232/sti all
+
+nbdrv.lib:
+	$(MAKE) -C target/newbrain/fcntl all
+
+flosdos.lib:
+	$(MAKE) -C target/osca/fcntl/flos all
+
+flosxdos.lib:
+	$(MAKE) -C target/osca/fcntl/flosmulti all
 
 
 TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib gfxvdm.lib)
@@ -41,7 +56,7 @@ TOCREATE += $(call check_target,bondwell2,bondwell2.lib $(CPMLIBS))
 TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128udg.lib gfx128hr.lib gfx128hr480.lib c128cpm.lib)
 TOCREATE += $(call check_target,c7420,c7420_clib.lib)
 TOCREATE += $(call check_target,coleco,coleco_clib.lib)
-TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib cpccpm.lib)
+TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib cpccpm.lib rs232cpc_booster.lib rs232cpc_sti.lib)
 TOCREATE += $(call check_target,cpm,$(CPMLIBS))
 TOCREATE += $(call check_target,dai,dai_clib.lib)
 TOCREATE += $(call check_target,einstein,einstein.lib einstein256.lib $(CPMLIBS))
@@ -88,11 +103,11 @@ TOCREATE += $(call check_target,nanos,nanos.lib)
 TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib nascomcpm.lib)
 TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib)
-TOCREATE += $(call check_target,newbrain,newbrain_clib.lib newbrain_cpm.lib)
+TOCREATE += $(call check_target,newbrain,newbrain_clib.lib newbrain_cpm.lib nbdrv.lib)
 TOCREATE += $(call check_target,northstar,northstar.lib $(CPMLIBS))
 TOCREATE += $(call check_target,osborne,gfxosborne1.lib $(CPMLIBS))
 TOCREATE += $(call check_target,ondra,ondra_clib.lib)
-TOCREATE += $(call check_target,osca,osca_clib.lib)
+TOCREATE += $(call check_target,osca,osca_clib.lib flosdos.lib flosxdos.lib)
 TOCREATE += $(call check_target,oz,ozansi_clib.lib)
 TOCREATE += $(call check_target,p2000,p2000_clib.lib)
 TOCREATE += $(call check_target,pacman,pacman_clib.lib)
@@ -212,6 +227,10 @@ include target/rc2014/rc2014.mak
 include target/rcmx000/rcmx000.mak
 include target/smc777/smc777.mak
 include target/super80/super80.mak
+include target/special/special.mak
+include target/z80/z80.mak
+include target/phc20/phc20.mak
+include target/test/test.mak
 include classic/z80_crt0s/z80_crt0s.mak
 include classic/gfx/x11/x11.mak
 include classic/input/input.mak
@@ -956,15 +975,15 @@ gfxbee.lib:  cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(TARGET_DIRECTORY)/bee/beegfx.lst
 	@touch $@
 
-gfxbee640.lib:  cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/obj/.stamp-bee-cpm classic/gfx/obj/.stamp-bee-hr classic/gfx/obj/.stamp-bee-hr320 classic/gfx/obj/.stamp-bee-hr512
+gfxbee640.lib:  gfxbee.lib cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/obj/.stamp-bee-cpm classic/gfx/obj/.stamp-bee-hr classic/gfx/obj/.stamp-bee-hr320 classic/gfx/obj/.stamp-bee-hr512
 	TARGET=beehr TYPE=z80 $(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(TARGET_DIRECTORY)/bee/beegfxhr.lst
 	@touch $@
 
-gfxbee320.lib:  cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/obj/.stamp-bee-cpm classic/gfx/obj/.stamp-bee-hr classic/gfx/obj/.stamp-bee-hr320 classic/gfx/obj/.stamp-bee-hr512
+gfxbee320.lib:  gfxbee640.lib cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/obj/.stamp-bee-cpm classic/gfx/obj/.stamp-bee-hr classic/gfx/obj/.stamp-bee-hr320 classic/gfx/obj/.stamp-bee-hr512
 	TARGET=beehr320 TYPE=z80 $(LIBLINKER) -DFORbeehr320 -x$(OUTPUT_DIRECTORY)/gfxbee320.lib @$(TARGET_DIRECTORY)/bee/beegfxhr320.lst
 	@touch $@
 
-gfxbee512.lib:  cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/obj/.stamp-bee-cpm classic/gfx/obj/.stamp-bee-hr classic/gfx/obj/.stamp-bee-hr320 classic/gfx/obj/.stamp-bee-hr512
+gfxbee512.lib:  gfxbee320.lib cpm_clib.lib bee_clib.lib classic/games/obj/.stamp-bee classic/gfx/obj/.stamp-bee-cpm classic/gfx/obj/.stamp-bee-hr classic/gfx/obj/.stamp-bee-hr320 classic/gfx/obj/.stamp-bee-hr512
 	TARGET=beehr512 TYPE=z80 $(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(TARGET_DIRECTORY)/bee/beegfxhr512.lst
 	@touch $@
 # Gemini Galaxy library - Stefano
@@ -1025,7 +1044,7 @@ cpm_msx.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/cpm_msx @$(TARGET_DIRECTORY)/msx/cpm_msx.lst
 	@touch $@
 
-msx2.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
+msx2.lib: $(TARGET_CLIB_DEPS) $(MSX2_TARGETS)
 	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
 	@touch $@
 # MTX library - Stefano
@@ -1087,11 +1106,11 @@ einstein256.lib: cpm_clib.lib $(EINSTEIN_TARGETS)
 	$(MAKE) -C classic/video/tms9918 TARGET=cpm SUBTYPE=einstein256
 	TARGET=einstein256 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein256 -x$(OUTPUT_DIRECTORY)/einstein256 @$(TARGET_DIRECTORY)/einstein/einstein256.lst
 
-excali64_clib.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-excali64 classic/gfx/obj/.stamp-excali64
+excali64_clib.lib:  $(TARGET_CLIB_DEPS) $(EXCALI64_MC6845_OBJECTS) classic/games/obj/.stamp-excali64 classic/gfx/obj/.stamp-excali64
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_clib @$(TARGET_DIRECTORY)/excali64/excali64.lst
 	@touch $@
 
-excali64_cpm.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-excali64 classic/gfx/obj/.stamp-excali64
+excali64_cpm.lib:  excali64_clib.lib $(TARGET_CLIB_DEPS) $(EXCALI64_MC6845_OBJECTS) classic/games/obj/.stamp-excali64 classic/gfx/obj/.stamp-excali64
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(TARGET_DIRECTORY)/excali64/excali64_cpm.lst
 	@touch $@
 
@@ -1327,7 +1346,7 @@ fp1100_clib.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-cpm-fp1100 classi
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(TARGET_DIRECTORY)/fp1100/fp1100.lst
 	@touch $@
 
-fp1100_cpm.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-cpm-fp1100 classic/gfx/obj/.stamp-fp1100
+fp1100_cpm.lib:  fp1100_clib.lib $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-cpm-fp1100 classic/gfx/obj/.stamp-fp1100
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_cpm @$(TARGET_DIRECTORY)/fp1100/fp1100_cpm.lst
 	@touch $@
 # Z80 TV Game
@@ -1378,11 +1397,11 @@ super80_vduem_clib.lib: $(TARGET_CLIB_DEPS) super80_clib.lib classic/games/obj/.
 
 
 # Triumph Adler Alphatronic PC - dom
-alphatro_clib.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-alphatro classic/gfx/obj/.stamp-alphatro
+alphatro_clib.lib:  $(TARGET_CLIB_DEPS) $(ALPHATRO_MC6845_OBJECTS) classic/games/obj/.stamp-alphatro classic/gfx/obj/.stamp-alphatro
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(TARGET_DIRECTORY)/alphatro/alphatro.lst
 	@touch $@
 
-alphatro_cpm.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-alphatro classic/gfx/obj/.stamp-alphatro
+alphatro_cpm.lib:  alphatro_clib.lib $(TARGET_CLIB_DEPS) $(ALPHATRO_MC6845_OBJECTS) classic/games/obj/.stamp-alphatro classic/gfx/obj/.stamp-alphatro
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_cpm @$(TARGET_DIRECTORY)/alphatro/alphatro_cpm.lst
 	@touch $@
 # SPC-1000 - dom
@@ -1560,7 +1579,7 @@ cpc_clib.lib:  $(TARGET_CLIB_DEPS) $(CPC_TARGETS)
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(TARGET_DIRECTORY)/cpc/cpc.lst
 	@touch $@
 
-cpccpm.lib:  $(TARGET_CLIB_DEPS) $(CPC_TARGETS)
+cpccpm.lib:  cpc_clib.lib $(TARGET_CLIB_DEPS) $(CPC_TARGETS)
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(TARGET_DIRECTORY)/cpc/cpc_cpm.lst
 	@touch $@
 
@@ -1582,7 +1601,7 @@ pcw.lib: cpm_clib.lib $(PCW_TARGETS)
 	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(TARGET_DIRECTORY)/pcw/pcw.lst
 
 # Commodore 128 (Z80 mode) library - Stefano
-c128cpm.lib:  $(TARGET_CLIB_DEPS) $(C128_CPM_TARGETS)
+c128cpm.lib:  c128ansi_clib.lib $(TARGET_CLIB_DEPS) $(C128_CPM_TARGETS)
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(TARGET_DIRECTORY)/c128/c128_cpm.lst
 	@touch $@
 
@@ -1669,7 +1688,7 @@ g815_clib.lib:  $(TARGET_CLIB_DEPS) $(G800_TARGETS)
 	TARGET=g815 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g815_clib @$(TARGET_DIRECTORY)/g800/g815.lst
 	@touch $@
 
-g815b.lib:  $(TARGET_CLIB_DEPS) $(G800_TARGETS)
+g815b.lib:  g815_clib.lib $(TARGET_CLIB_DEPS) $(G800_TARGETS)
 	TARGET=g815 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g815b @$(TARGET_DIRECTORY)/g800/g800.lst
 	@touch $@
 
@@ -1677,7 +1696,7 @@ g850_clib.lib:  $(TARGET_CLIB_DEPS) $(G800_TARGETS)
 	TARGET=g850 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(TARGET_DIRECTORY)/g800/g850.lst
 	@touch $@
 
-g850b.lib:  $(TARGET_CLIB_DEPS) $(G800_TARGETS)
+g850b.lib:  g850_clib.lib $(TARGET_CLIB_DEPS) $(G800_TARGETS)
 	TARGET=g850 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(TARGET_DIRECTORY)/g800/g850b.lst
 	@touch $@
 # Camputers Lynx - Stefano Bodrato
@@ -1787,27 +1806,27 @@ gfxtrs80.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(TARGET_DIRECTORY)/trs80/gfxtrs80.lst
 	@touch $@
 
-gfxtrs80m2.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+gfxtrs80m2.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) $(TRS80M2_MC6845_OBJECTS) classic/gfx/obj/.stamp-trs80m2
 	TARGET=trs80m2 TYPE=z80 $(LIBLINKER) -DFORtrs80m2 -x$(OUTPUT_DIRECTORY)/gfxtrs80m2 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m2.lst
 	@touch $@
 
-gfxtrs80m4.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+gfxtrs80m4.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) classic/gfx/obj/.stamp-trs80m4
 	TARGET=trs80m4 TYPE=z80 $(LIBLINKER) -DFORtrs80m4 -x$(OUTPUT_DIRECTORY)/gfxtrs80m4 @$(TARGET_DIRECTORY)/trs80/gfxtrs80m4.lst
 	@touch $@
 
-gfxeg2000.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+gfxeg2000.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) classic/gfx/obj/.stamp-eg2000
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(TARGET_DIRECTORY)/trs80/gfxeg2000.lst
 	@touch $@
 
-gfxhrg1.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS)
+gfxhrg1.lib:  $(TARGET_CLIB_DEPS) $(TRS80_TARGETS) classic/gfx/obj/.stamp-hrg1
 	TARGET=hrg1 TYPE=z80 $(LIBLINKER) -DFORhrg1 -x$(OUTPUT_DIRECTORY)/gfxhrg1 @$(TARGET_DIRECTORY)/trs80/gfxhrg1.lst
 	@touch $@
 
-grafyx4_3.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-trs80 classic/gfx/obj/.stamp-trs80-base
+grafyx4_3.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-trs80 classic/gfx/obj/.stamp-trs80-base classic/gfx/obj/.stamp-grafyx3
 	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx4_3 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
 	@touch $@
 
-grafyx4.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-trs80 classic/gfx/obj/.stamp-trs80-base
+grafyx4.lib:  $(TARGET_CLIB_DEPS) classic/games/obj/.stamp-trs80 classic/gfx/obj/.stamp-trs80-base classic/gfx/obj/.stamp-grafyx4
 	TARGET=grafyx4 TYPE=z80 $(LIBLINKER) -DFORgrafyx4 -x$(OUTPUT_DIRECTORY)/grafyx4 @$(TARGET_DIRECTORY)/trs80/grafyx.lst
 	@touch $@
 # Canon X-07 lib - Stefano
@@ -1866,7 +1885,7 @@ mikro80_clib.lib: $(TARGET_CLIB_DEPS) $(MIKRO80_TARGETS)
 	@echo ''
 	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(TARGET_DIRECTORY)/mikro80/mikro80.lst
 
-special_clib.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-special
+special_clib.lib: $(TARGET_CLIB_DEPS) $(SPECIAL_TARGETS)
 	@echo ''
 	@echo '--- Building Specialist Library ---'
 	@echo ''
@@ -1994,15 +2013,15 @@ gfxh19alt.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.
 	TARGET=h19alt TYPE=z80 $(LIBLINKER) -DFORh19alt -x$(OUTPUT_DIRECTORY)/gfxh19alt @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19alt.lst
 	@touch $@
 
-gfxvio.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.stamp-h19alt
+gfxvio.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-vio
 	TARGET=vio TYPE=8080 $(LIBLINKER) -m8080 -DFORvio -x$(OUTPUT_DIRECTORY)/gfxvio @$(Z88DK_LIBSRC)/classic/video/vio/video_vio.lst
 	@touch $@
 
-gfxvdm.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.stamp-h19alt
+gfxvdm.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-vdm
 	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(Z88DK_LIBSRC)/classic/video/vdm/video_vdm.lst
 	@touch $@
 
-nanos.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.stamp-h19alt
+nanos.lib:  $(TARGET_CLIB_DEPS) $(NANOS_TARGETS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.stamp-h19alt
 	TARGET=nanos TYPE=z80 $(LIBLINKER) -mz80 -DFORnanos -x$(OUTPUT_DIRECTORY)/nanos @$(Z88DK_LIBSRC)/target/nanos/nanos.lst
 	@touch $@
 # Preempt multitasking library - dom

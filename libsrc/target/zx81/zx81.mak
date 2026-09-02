@@ -121,7 +121,7 @@ target-zx81: $(ZX81_TARGETS)
 
 define buildzx81asm
 target/zx81/obj/target-zx81-$(2): $(3)
-	@mkdir -p target/zx81/obj/$(2)
+	$(Q)mkdir -p target/zx81/obj/$(2)
 	$(Q)$(ASSEMBLER) -d -O=target/zx81/obj/$(2)/x -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/zx81 -I$(Z88DK_LIB) -I$(Z88DK_LIB)/target/zx81/def -Itarget/zx81 -Itarget/zx81/obj/$(2) -I$(Z88DK_LIBSRC)/classic $(4) -I$(Z88DK_LIB) -D__CLASSIC -DFOR$(2) $(1)
 	$(Q)touch $$@
 endef

@@ -14,6 +14,8 @@ RC700_TARGETS := target/rc700/obj/target-rc700-rc700 classic/games/obj/.stamp-cp
 
 CLEAN += target-rc700-clean
 
+$(eval $(call gfx_stamp_portable_args,cpm-rc700,TARGET=cpm SUBTYPE=rc700 FLAVOUR="narrow gencon"))
+
 target-rc700: $(RC700_TARGETS)
 
 .PHONY: target-rc700 target-rc700-clean

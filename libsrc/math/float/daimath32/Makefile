@@ -17,7 +17,7 @@ all: $(OUTPUT_DIRECTORY)/daimath32.lib $(OUTPUT_DIRECTORY)/daimath32_8080.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_r4k.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_r6k.lib \
 	$(OUTPUT_DIRECTORY)/daimath32_kc160.lib \
-	$(OUTPUT_DIRECTORY)/daimath32_ez80_z80.lib 
+	$(OUTPUT_DIRECTORY)/daimath32_ez80_z80.lib
 
 
 $(OUTPUT_DIRECTORY)/daimath32.lib: $(addprefix obj/z80/, $(OBJECTS))
@@ -52,10 +52,10 @@ $(OUTPUT_DIRECTORY)/daimath32_kc160.lib: $(addprefix obj/kc160/, $(OBJECTS))
 $(foreach d,8080 ez80_z80 kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/8080/c/sccz80 obj/8080/c/asm obj/z80/z80 obj/8080/z80 
-	@mkdir -p obj/z80n/c/sccz80 obj/z80n/c/asm obj/z180/c/sccz80 obj/z180/c/asm  obj/r2ka/c/sccz80 obj/r2ka/c/asm 
-	@mkdir -p obj/ez80_z80/c/sccz80 obj/ez80_z80/c/asm  obj/r6k/c/sccz80 obj/r6k/c/asm
-	@mkdir -p obj/r4k/c/sccz80 obj/r4k/c/asm obj/kc160/c/sccz80 obj/kc160/c/asm
+	$(Q)mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/8080/c/sccz80 obj/8080/c/asm obj/z80/z80 obj/8080/z80
+	$(Q)mkdir -p obj/z80n/c/sccz80 obj/z80n/c/asm obj/z180/c/sccz80 obj/z180/c/asm  obj/r2ka/c/sccz80 obj/r2ka/c/asm
+	$(Q)mkdir -p obj/ez80_z80/c/sccz80 obj/ez80_z80/c/asm  obj/r6k/c/sccz80 obj/r6k/c/asm
+	$(Q)mkdir -p obj/r4k/c/sccz80 obj/r4k/c/asm obj/kc160/c/sccz80 obj/kc160/c/asm
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

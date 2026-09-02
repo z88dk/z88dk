@@ -30,7 +30,7 @@ ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 
 ZXN_CFILES = target/zx/tape/tape_save.c
 
-ZXN_OFILES = $(addprefix target/zxn/obj/zxn/, $(ZXN_CFILES:.c=.o)) 
+ZXN_OFILES = $(patsubst target/zx/%,target/zxn/obj/zxn/%,$(ZXN_CFILES:.c=.o))
 
 
 ZXN_TARGETS := target/zxn/obj/target-zxn-zxn $(ZXN_OFILES) classic/games/obj/.stamp-zxn classic/gfx/obj/.stamp-zxn-wide
@@ -46,7 +46,9 @@ target-zxn: $(ZXN_TARGETS)
 
 
 $(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZXN_GLOBS_ex) $(ZX_MULTICOLOUR_GLOBS_ex) $(addprefix target/zxn/obj/zxn/, $(BIFROST2_GEN))))
-$(eval $(call buildtargetc,target/zxn,zxn,-clib=classic))
+target/zxn/obj/zxn/%.o: target/zx/%.c
+	$(Q)mkdir -p $(dir $@)
+	$(ZCC) +zxn -clib=classic -Ca-I$(dir $<) -c -o $@ $<
 $(eval $(call bifrost_zx0,zxn))
 
 # zx and zxn share the multicolour engine sources under target/zx, and z80asm

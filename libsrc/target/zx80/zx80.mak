@@ -8,7 +8,7 @@ ZX80_GLOBS_ex := \
 
 ZX80_TARGETS := \
 	target/zx80/obj/target-zx80-zx80 \
-	target/zx80/obj/zx80/target/zx80/stdlib/sleep.o \
+	target/zx80/obj/zx80/stdlib/sleep.o \
 	target/zx81/obj/target-zx81-zx80 \
 	classic/games/obj/.stamp-zx80 \
 	classic/gfx/obj/.stamp-zx80

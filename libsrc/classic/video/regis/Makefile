@@ -29,7 +29,7 @@ obj/$(OBJSUBDIR)/%.o: %.asm
 $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/$(OBJSUBDIR)
+	$(Q)mkdir -p obj/$(OBJSUBDIR)
 
 clean: 
 	$(RM) -fr obj zcc_opt.def *.err

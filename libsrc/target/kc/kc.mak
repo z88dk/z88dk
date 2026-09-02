@@ -12,7 +12,7 @@ KC_TARGETS := target/kc/obj/target-kc-kc classic/games/obj/.stamp-kc classic/gfx
 
 CLEAN += target-kc-clean
 
-$(eval $(call gfx_stamp_args,kc,TARGET=kc FLAVOUR="wide portable"))
+$(eval $(call gfx_stamp_portable_args,kc,TARGET=kc FLAVOUR=wide))
 
 target-kc: $(KC_TARGETS)
 

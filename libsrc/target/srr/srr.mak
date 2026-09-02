@@ -15,7 +15,7 @@ SRR_GLOBS_ex := \
 
 SRR_CFILES = $(wildcard target/srr/srr/*.c) 
 
-SRR_OFILES = $(addprefix target/srr/obj/srr/, $(SRR_CFILES:.c=.o)) 
+SRR_OFILES = $(patsubst target/srr/%,target/srr/obj/srr/%,$(SRR_CFILES:.c=.o))
 
 
 

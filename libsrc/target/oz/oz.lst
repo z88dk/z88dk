@@ -20,7 +20,7 @@ target/oz/obj/${TARGET}/x/target/oz/oz/restore_a000.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozcopy.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozdetectmodel.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozinput/ozclick.o
-target/oz/obj/${TARGET}/target/oz/oz/ozinput/ozeditline.o
+target/oz/obj/${TARGET}/oz/ozinput/ozeditline.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozinput/ozkbdon.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozinput/ozkbdoff.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozinput/ozkeyclear.o
@@ -49,7 +49,7 @@ target/oz/obj/${TARGET}/x/target/oz/oz/ozscreen/ozfast.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozscreen/ozsetlight.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozscreen/oztogglelight.o
 target/oz/obj/${TARGET}/x/target/oz/oz/ozscreen/ozsetlcdstate.o
-target/oz/obj/${TARGET}/target/oz/oz/oztime/oztime.o
+target/oz/obj/${TARGET}/oz/oztime/oztime.o
 target/oz/obj/${TARGET}/x/target/oz/oz/oztime/ozhour.o
 target/oz/obj/${TARGET}/x/target/oz/oz/oztime/ozmin.o
 target/oz/obj/${TARGET}/x/target/oz/oz/oztime/ozsec.o

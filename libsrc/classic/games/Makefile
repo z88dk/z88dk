@@ -6,14 +6,14 @@ TARGET ?= test
 
 CFLAGS += $(TARGET_CFLAGS)
 
-ifeq ($(SUBTYPE),) 
+ifeq ($(SUBTYPE),)
 SUBTYPE=$(TARGET)
 OBJSUBDIR = $(TARGET)
 else
 OBJSUBDIR = $(SUBTYPE)
 endif
 
-GENOBJECTS = 
+GENOBJECTS =
 CUSTOBJECTS = bit_frequency.o bit_play.o buzzer_play.o synth_play.o psg_play.o bit_save_zx.o joystick_type.o bit_load_msx.o bit_load_vg5000.o
 
 ifeq ($(SUBSET),)
@@ -24,7 +24,7 @@ endif
 
 OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
-.PHONY: dirs 
+.PHONY: dirs
 
 all: $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS))
 
@@ -41,7 +41,7 @@ obj/zxn/%.o: %.c
 $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/$(OBJSUBDIR) 
+	$(Q)mkdir -p obj/$(OBJSUBDIR)
 
 clean:
 	$(RM) -fr obj

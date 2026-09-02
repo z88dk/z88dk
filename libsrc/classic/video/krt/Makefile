@@ -23,7 +23,7 @@ OBJECTS = $(CFILES:.c=.o) $(ASMFILES:.asm=.o)
 all: $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS))
 
 obj/$(OBJSUBDIR)/%.o: %.c
-	@mkdir -p $(dirname $@)
+	$(Q)mkdir -p $(dirname $@)
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
@@ -33,7 +33,7 @@ obj/$(OBJSUBDIR)/%.o: %.asm
 $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/$(OBJSUBDIR)/stdio obj/$(OBJSUBDIR)/graphics
+	$(Q)mkdir -p obj/$(OBJSUBDIR)/stdio obj/$(OBJSUBDIR)/graphics
 
 clean: 
 	$(RM) -fr obj zcc_opt.def *.err

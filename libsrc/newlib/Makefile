@@ -7,7 +7,7 @@
 Z80ASM = z88dk-z80asm
 ZX0 = z88dk-zx0
 
-ALLTARGETS = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx zxn 
+ALLTARGETS = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx zxn
 TARGET = $(ALLTARGETS)
 
 # Targets whose sources live under libsrc/target/ (classic-aligned), not newlib/target/
@@ -54,11 +54,11 @@ target/zxn/obj/config_private.inc: $(LIB_SDCC_IX)/zx.lib
 
 # Convenience target (eg make zx to build the zx libraries)
 .PHONY: $(1)
-$(1): $(LIB_SCCZ80)/$(1).lib $(LIB_SDCC_IX)/$(1).lib 
+$(1): $(LIB_SCCZ80)/$(1).lib $(LIB_SDCC_IX)/$(1).lib
 
 $(call target_dir,$(1))/obj/config_private.inc: $(call target_dir,$(1))/config.m4
-	@mkdir -p $(call target_dir,$(1))/obj/sccz80 $(call target_dir,$(1))/obj/sdcc_ix 
-	@mkdir -p $(LIB_SCCZ80) $(LIB_SDCC_IX)
+	$(Q)mkdir -p $(call target_dir,$(1))/obj/sccz80 $(call target_dir,$(1))/obj/sdcc_ix
+	$(Q)mkdir -p $(LIB_SCCZ80) $(LIB_SDCC_IX)
 	$(eval cpu := $(shell \
 		if [ "$(1)" = "z180" ]; then \
 			echo "z180"; \
@@ -97,7 +97,7 @@ endef
 
 define build_libs
 $(LIB_SCCZ80)/$(1).lib: $(call target_dir,$(1))/obj/config_private.inc
-	@mkdir -p $(LIB_SCCZ80)
+	$(Q)mkdir -p $(LIB_SCCZ80)
 	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-I$(call target_dir,$(1))/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -O$(call target_dir,$(1))/obj/sccz80/x -I$(call target_dir,$(1))/obj -I.. -x$(LIB_SCCZ80)/$(1) -I$(Z88DK_LIB) @$(call target_dir,$(1))/library/$(1)_sccz80.lst
 
 # After the sccz80 library, not beside it. Both assemble the shared multicolour
@@ -105,7 +105,7 @@ $(LIB_SCCZ80)/$(1).lib: $(call target_dir,$(1))/obj/config_private.inc
 # the source, so under -j the two runs write that one file at the same time.
 # On Windows that is a sharing violation rather than a corrupt file.
 $(LIB_SDCC_IX)/$(1).lib: $(call target_dir,$(1))/obj/config_private.inc $(LIB_SCCZ80)/$(1).lib
-	@mkdir -p $(LIB_SDCC_IX)
+	$(Q)mkdir -p $(LIB_SDCC_IX)
 	TARGET=$(1) TYPE=$(cpu) $(Z80ASM) -m$(cpu) -d -m4=-I$(call target_dir,$(1))/obj -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I../ -O$(call target_dir,$(1))/obj/sdcc_ix/x -I$(call target_dir,$(1))/obj -I.. -x$(LIB_SDCC_IX)/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @$(call target_dir,$(1))/library/$(1)_sdcc_ix.lst
 
 endef

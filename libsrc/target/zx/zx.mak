@@ -145,7 +145,7 @@ ZX_MULTICOLOUR_GLOBS_ex := target/zx/bifrost2/c/sccz80/*.asm target/zx/bifrost2/
 
 ZX_CFILES = target/zx/tape/tape_save.c
 
-ZX_OFILES = $(addprefix target/zx/obj/zx/, $(ZX_CFILES:.c=.o)) 
+ZX_OFILES = $(patsubst target/zx/%,target/zx/obj/zx/%,$(ZX_CFILES:.c=.o))
 
 
 BIFROST2_GEN = bifrost2_engine_48.bin.zx0 bifrost2_engine_p3.bin.zx0
@@ -165,7 +165,7 @@ target-zx: $(ZX_TARGETS)
 # Arg1: machine
 define bifrost_zx0
 target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0: 
-	@mkdir -p target/$(1)/obj/$(1)
+	$(Q)mkdir -p target/$(1)/obj/$(1)
 	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
 	$(ZX0) -f $$(@:.zx0=)
 

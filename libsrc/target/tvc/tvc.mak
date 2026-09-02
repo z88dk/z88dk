@@ -14,7 +14,7 @@ TVC_GLOBS_ex := \
 
 TVC_CFILES = $(wildcard target/tvc/*.c) $(wildcard target/tvc/sound/*.c)
 
-TVC_OFILES = $(addprefix target/tvc/obj/tvc/, $(TVC_CFILES:.c=.o))
+TVC_OFILES = $(patsubst target/tvc/%,target/tvc/obj/tvc/%,$(TVC_CFILES:.c=.o))
 
 
 # romgfx is a library of its own (tvc_romgfx.lib) so it gets its own object
@@ -25,7 +25,7 @@ TVCROMGFX_GLOBS_ex := target/tvc/romgfx/*.asm
 
 TVCROMGFX_CFILES = $(wildcard target/tvc/romgfx/*.c)
 
-TVCROMGFX_OFILES = $(addprefix target/tvc/romgfx/obj/tvc/, $(TVCROMGFX_CFILES:.c=.o))
+TVCROMGFX_OFILES = $(patsubst target/tvc/romgfx/%,target/tvc/romgfx/obj/tvc/%,$(TVCROMGFX_CFILES:.c=.o))
 
 
 TVC_TARGETS := target/tvc/obj/target-tvc-tvc \

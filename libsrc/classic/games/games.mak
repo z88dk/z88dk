@@ -19,14 +19,14 @@ GAMES_STAMP_SOURCES := $(shell find classic/games -type f \( -name '*.asm' -o -n
 
 define games_stamp
 classic/games/obj/.stamp-$(1): $(GAMES_STAMP_SOURCES)
-	@mkdir -p $$(dir $$@)
+	$(Q)mkdir -p $$(dir $$@)
 	$(MAKE) -C classic/games TARGET=$(1)
 	@touch $$@
 endef
 
 define games_stamp_args
 classic/games/obj/.stamp-$(1): $(GAMES_STAMP_SOURCES)
-	@mkdir -p $$(dir $$@)
+	$(Q)mkdir -p $$(dir $$@)
 	$(MAKE) -C classic/games $(2)
 	@touch $$@
 endef

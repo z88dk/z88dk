@@ -1,6 +1,6 @@
 ACE_SOURCES := $(shell find target/ace -type f -name '*.asm')
 ACE_CFILES := $(wildcard target/ace/tape/*.c)
-ACE_OFILES := $(addprefix target/ace/obj/ace/,$(ACE_CFILES:.c=.o))
+ACE_OFILES := $(patsubst target/ace/%,target/ace/obj/ace/%,$(ACE_CFILES:.c=.o))
 
 ACE_TARGETS := target/ace/obj/target-ace-ace $(ACE_OFILES) classic/games/obj/.stamp-ace classic/gfx/obj/.stamp-ace
 ACEUDG_TARGETS := target/ace/obj/target-ace-aceudg classic/gfx/obj/.stamp-ace-udg

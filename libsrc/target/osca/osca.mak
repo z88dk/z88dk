@@ -1,6 +1,6 @@
 OSCA_SOURCES := $(shell find target/osca -type f -name '*.asm')
 OSCA_CFILES := $(shell find target/osca -type f -name '*.c')
-OSCA_OFILES := $(addprefix target/osca/obj/osca/,$(OSCA_CFILES:.c=.o))
+OSCA_OFILES := $(patsubst target/osca/%,target/osca/obj/osca/%,$(OSCA_CFILES:.c=.o))
 
 OSCA_TARGETS := target/osca/obj/target-osca-osca $(OSCA_OFILES) classic/games/obj/.stamp-osca classic/gfx/obj/.stamp-osca
 

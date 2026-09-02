@@ -34,7 +34,7 @@ Z88_GLOBS_ex := \
 
 Z88_CFILES = $(wildcard target/z88/fcntl/*.c) $(wildcard target/z88/net/*.c) $(wildcard target/z88/rs232/*.c) $(wildcard target/z88/time/*.c) $(wildcard target/z88/z88/*.c)
 
-Z88_OFILES = $(addprefix target/z88/obj/z88/, $(Z88_CFILES:.c=.o)) 
+Z88_OFILES = $(patsubst target/z88/%,target/z88/obj/z88/%,$(Z88_CFILES:.c=.o))
 
 
 

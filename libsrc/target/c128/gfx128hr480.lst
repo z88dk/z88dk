@@ -1,4 +1,4 @@
-target/c128/obj/${TARGET}/target/c128/graphics_64k/clg.o
+target/c128/obj/${TARGET}/graphics_64k/clg.o
 target/c128/obj/${TARGET}/x/target/c128/graphics_64k/w_pixladdr.o
 target/c128/obj/${TARGET}/x/target/c128/graphics/__c128_vaddr.o
 target/c128/obj/${TARGET}/x/target/c128/graphics/w_plotpixl.o

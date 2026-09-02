@@ -10,7 +10,7 @@ REX_GLOBS_ex := \
 
 REX_CFILES = $(wildcard target/rex/graphics/*.c)
 
-REX_OFILES = $(addprefix target/rex/obj/rex/, $(REX_CFILES:.c=.o))
+REX_OFILES = $(patsubst target/rex/%,target/rex/obj/rex/%,$(REX_CFILES:.c=.o))
 
 
 REX_TARGETS := target/rex/obj/target-rex-rex \

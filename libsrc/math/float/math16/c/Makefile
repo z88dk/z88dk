@@ -11,7 +11,7 @@ CFLAGS += -Cc-D__MATH_MATH16 -D__MATH_MATH16 -I.
 all: $(addprefix z80/,$(AFILES))
 
 z80/%.asm: %.c
-	@mkdir -p z80
+	$(Q)mkdir -p z80
 	zcc +z80 -clib=new -O2 --opt-code-speed=all $(CFLAGS) -a $^ -o $@
 
 # 8085 higher functions: sccz80 only
@@ -21,7 +21,7 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 8085: $(addprefix 8085/,$(AFILES8085))
 
 8085/%.asm: %.c
-	@mkdir -p 8085
+	$(Q)mkdir -p 8085
 	zcc +test -clib=8085 -compiler=sccz80 -D__MATH_MATH16 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 

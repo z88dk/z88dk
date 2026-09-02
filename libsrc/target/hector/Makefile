@@ -19,7 +19,7 @@ obj/interact/%.o: %.asm
 $(HECTOR_OBJS): | dirs
 
 dirs:
-	@mkdir -p obj/$(SUBTYPE)/stdio obj/$(SUBTYPE)/graphics
+	$(Q)mkdir -p obj/$(SUBTYPE)/stdio obj/$(SUBTYPE)/graphics
 
 clean:
 	$(RM) -fr obj

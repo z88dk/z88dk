@@ -9,7 +9,7 @@ SOS_GLOBS_ex := \
 
 SOS_CFILES = $(wildcard target/sos/tape/*.c) 
 
-SOS_OFILES = $(addprefix target/sos/obj/sos/, $(SOS_CFILES:.c=.o)) 
+SOS_OFILES = $(patsubst target/sos/%,target/sos/obj/sos/%,$(SOS_CFILES:.c=.o))
 
 
 

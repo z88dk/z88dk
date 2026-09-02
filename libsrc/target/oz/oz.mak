@@ -1,6 +1,6 @@
 OZ_SOURCES := $(shell find target/oz -type f -name '*.asm')
 OZ_CFILES := $(shell find target/oz -type f -name '*.c')
-OZ_OFILES := $(addprefix target/oz/obj/oz/,$(OZ_CFILES:.c=.o))
+OZ_OFILES := $(patsubst target/oz/%,target/oz/obj/oz/%,$(OZ_CFILES:.c=.o))
 
 OZ_TARGETS := target/oz/obj/target-oz-oz $(OZ_OFILES) classic/games/obj/.stamp-oz classic/gfx/obj/.stamp-oz
 

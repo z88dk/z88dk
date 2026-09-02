@@ -12,7 +12,7 @@ ALPHATP2_GLOBS_ex := \
 
 ALPHATP2_CFILES = 
 
-ALPHATP2_OFILES = $(addprefix target/alphatp2/obj/alphatp2/, $(ALPHATP2_CFILES:.c=.o)) 
+ALPHATP2_OFILES = $(patsubst target/alphatp2/%,target/alphatp2/obj/alphatp2/%,$(ALPHATP2_CFILES:.c=.o))
 
 
 

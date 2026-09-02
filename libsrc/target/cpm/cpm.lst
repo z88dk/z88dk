@@ -4,9 +4,9 @@ target/cpm/obj/${TYPE}/x/target/cpm/stdio/fputc_cons.o
 target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console.o
 target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console_vt52.o
 target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console_h19.o
-target/cpm/obj/${TYPE}/target/cpm/stdio/stdpun_dev.o
-target/cpm/obj/${TYPE}/target/cpm/stdio/stdrdr_dev.o
-target/cpm/obj/${TYPE}/target/cpm/stdio/stdlst_dev.o
+target/cpm/obj/${TYPE}/stdio/stdpun_dev.o
+target/cpm/obj/${TYPE}/stdio/stdrdr_dev.o
+target/cpm/obj/${TYPE}/stdio/stdlst_dev.o
 target/cpm/obj/${TYPE}/x/target/cpm/cpm/__bdos.o
 @classic/stdio/stdio_binary.lst
 

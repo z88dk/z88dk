@@ -15,10 +15,10 @@ ENTERPRISE_TAPE_CFILES := $(wildcard target/enterprise/tape/*.c)
 ENTERPRISE_GFX_CFILES := $(wildcard target/enterprise/graphics/*.c)
 ENTERPRISE_HRG_CFILES := $(wildcard target/enterprise/graphics_hr/*.c)
 
-ENTERPRISE_OFILES := $(addprefix target/enterprise/obj/enterprise/,$(ENTERPRISE_CFILES:.c=.o))
-ENTERPRISE_TAPE_OFILES := $(addprefix target/enterprise/obj/enterprise/,$(ENTERPRISE_TAPE_CFILES:.c=.o))
-ENTERPRISE_GFX_OFILES := $(addprefix target/enterprise/obj/enterprise/,$(ENTERPRISE_GFX_CFILES:.c=.o))
-ENTERPRISE_HRG_OFILES := $(addprefix target/enterprise/obj/enterprisehr/,$(ENTERPRISE_HRG_CFILES:.c=.o))
+ENTERPRISE_OFILES := $(patsubst target/enterprise/%,target/enterprise/obj/enterprise/%,$(ENTERPRISE_CFILES:.c=.o))
+ENTERPRISE_TAPE_OFILES := $(patsubst target/enterprise/%,target/enterprise/obj/enterprise/%,$(ENTERPRISE_TAPE_CFILES:.c=.o))
+ENTERPRISE_GFX_OFILES := $(patsubst target/enterprise/%,target/enterprise/obj/enterprise/%,$(ENTERPRISE_GFX_CFILES:.c=.o))
+ENTERPRISE_HRG_OFILES := $(patsubst target/enterprise/%,target/enterprise/obj/enterprisehr/%,$(ENTERPRISE_HRG_CFILES:.c=.o))
 
 ENTERPRISE_TARGETS := \
 	target/enterprise/obj/target-enterprise-enterprise \
@@ -46,20 +46,20 @@ target-enterprise: $(ENTERPRISE_TARGETS) $(ENTERPRISE_GFX_TARGETS) $(ENTERPRISE_
 
 $(eval $(call buildtargetasm,target/enterprise,z80,enterprise,-mz80,$(ENTERPRISE_GLOBS),$(ENTERPRISE_GLOBS_ex)))
 
-target/enterprise/obj/enterprise/target/enterprise/enterprise/%.o: target/enterprise/enterprise/%.c
-	@mkdir -p $(dir $@)
+target/enterprise/obj/enterprise/enterprise/%.o: target/enterprise/enterprise/%.c
+	$(Q)mkdir -p $(dir $@)
 	$(ZCC) +enterprise $(CFLAGS) -c -o $@ $<
 
-target/enterprise/obj/enterprise/target/enterprise/tape/%.o: target/enterprise/tape/%.c
-	@mkdir -p $(dir $@)
+target/enterprise/obj/enterprise/tape/%.o: target/enterprise/tape/%.c
+	$(Q)mkdir -p $(dir $@)
 	$(ZCC) +enterprise $(CFLAGS) -c -o $@ $<
 
-target/enterprise/obj/enterprise/target/enterprise/graphics/%.o: target/enterprise/graphics/%.c
-	@mkdir -p $(dir $@)
+target/enterprise/obj/enterprise/graphics/%.o: target/enterprise/graphics/%.c
+	$(Q)mkdir -p $(dir $@)
 	$(ZCC) +test $(CFLAGS) -c -o $@ $<
 
-target/enterprise/obj/enterprisehr/target/enterprise/graphics_hr/%.o: target/enterprise/graphics_hr/%.c
-	@mkdir -p $(dir $@)
+target/enterprise/obj/enterprisehr/graphics_hr/%.o: target/enterprise/graphics_hr/%.c
+	$(Q)mkdir -p $(dir $@)
 	$(ZCC) +test $(CFLAGS) -c -o $@ $<
 
 target-enterprise-clean:

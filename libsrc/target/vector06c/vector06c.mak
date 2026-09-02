@@ -21,7 +21,7 @@ VECTOR06C_TARGETS := target/vector06c/obj/target-vector06c-vector06c classic/gam
 CLEAN += target-vector06c-clean
 
 $(eval $(call gfx_stamp_args,vector06c,TARGET=vector06c FLAVOUR=wide))
-$(eval $(call gfx_stamp_args,vector06c-portable,TARGET=vector06c FLAVOUR=portable))
+$(eval $(call gfx_stamp_portable,vector06c-portable,vector06c))
 
 target-vector06c: $(VECTOR06C_TARGETS)
 
