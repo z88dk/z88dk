@@ -1,0 +1,6 @@
+; eZ80 Z80-mode: same mlt mantissa helpers as Z180 (ED 4C/5C/6C/7C).
+; Helpers are gated IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__.
+../../../math/float/math32/asm/z80/f32_z180_mulu_32h_24x24
+../../../math/float/math32/asm/z80/f32_z180_mulu_32h_32x32
+../../../math/float/math32/asm/z80/f32_z180_sqr_32h_24x24
+@newlibfiles_z80.lst

@@ -24,7 +24,7 @@
 ;
 ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-IF __CPU_Z180__ | __CPU_EZ80__
+IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
 
 SECTION code_clib
 SECTION code_fp_math32
