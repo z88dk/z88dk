@@ -175,20 +175,28 @@
           dh= v>>8,              \
           dl= v
 
+/* Rabbit relative branches are FLAT — one number, no taken/not-taken split:
+   `JR e`, `JR cc,e` and `DJNZ e` are 5 clocks on the 2000/3000 and 6 on the
+   4000/6000. No `JR` form carried an `israbbit()` arm at all, so all three fell
+   through to the z80's 12 taken / 7 not-taken and the emulator priced rabbit's
+   CHEAPEST branch encoding as its dearest. `JP nn` had the opposite fault (see
+   `case 0xc3`). Together they made rabbit ticks useless for any compiler
+   decision between `jp` and `jr`: lexbench moved -4.6 % (r2ka) / -2.3 %
+   (r4k, r6k) once both were right, with every non-rabbit CPU bit-identical. */
 #define JRCI(c)                 \
           if(c)                 \
-            st+= isez80() ? 3 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : iskc160() ? 3 : 12,            \
+            st+= isez80() ? 3 : israbbit4k() ? 6 : israbbit() ? 5 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : iskc160() ? 3 : 12,            \
             pc+= (get_memory_inst(pc)^128)-127; \
           else                  \
-            st+= isez80() ? 2 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : iskc160() ? 2 : 7,             \
+            st+= isez80() ? 2 : israbbit4k() ? 6 : israbbit() ? 5 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : iskc160() ? 2 : 7,             \
             pc++
 
 #define JRC(c)                  \
           if(c)                 \
-            st+= isez80() ? 2 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : iskc160() ? 2 : 7,             \
+            st+= isez80() ? 2 : israbbit4k() ? 6 : israbbit() ? 5 : isgbz80() ? 8 : isz180() ? 6 : isr800() ? 2 : iskc160() ? 2 : 7,             \
             pc++;               \
           else                  \
-            st+= isez80() ? 3 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : iskc160() ? 3 : 12,            \
+            st+= isez80() ? 3 : israbbit4k() ? 6 : israbbit() ? 5 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : iskc160() ? 3 : 12,            \
             pc+= (get_memory_inst(pc)^128)-127
 
 // ld rr,(nn)
@@ -1519,7 +1527,7 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           printf("%04x: ILLEGAL 8080 opcode JR\n",pc-1);
           st+=4;
         } else {
-            st+= isez80() ? 3 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : iskc160() ? 3 : 12;
+            st+= isez80() ? 3 : israbbit4k() ? 6 : israbbit() ? 5 : isgbz80() ? 8 : isz180() ? 8 : isr800() ? 3 : iskc160() ? 3 : 12;
             mp= pc+= (get_memory_inst(pc)^128)-127;
         }
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
@@ -1606,10 +1614,10 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
           break;
         }
         if( ( altd && --b_) || ( altd == 0 && --b) )
-          st+= isez80() ? 4 :israbbit() ? 5 : isr800() ? 3 : iskc160() ? 4 : 13,
+          st+= isez80() ? 4 : israbbit4k() ? 6 : israbbit() ? 5 : isr800() ? 3 : iskc160() ? 4 : 13,
           mp= pc+= (get_memory_inst(pc)^128)-127;
         else
-          st+= isez80() ? 2 : israbbit() ? 5 : isr800() ? 2 : iskc160() ? 3 : 8,
+          st+= isez80() ? 2 : israbbit4k() ? 6 : israbbit() ? 5 : isr800() ? 2 : iskc160() ? 3 : 8,
           pc++;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0x27: // DAA / (RCM) add sp,d / (EZ80) ld hl,(ix+d) (prefixed)
@@ -2812,7 +2820,11 @@ void cpu_run(long long counter, long long stint, int intr, int start, int end)
         else PUSH(a, f(), a_, f_());
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
-        st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10;
+        /* 7 on every rabbit, same as `JP f,mn` in JPC/JPCI. This read
+           `israbbit() ? 3 : israbbit() ? 7` — the 7 was the original value and
+           `5fa1a542a1` ("Fix more ez80 timings") inserted the 3 in front of it,
+           shadowing it, which made `jp mn` cheaper than `jp f,mn`. */
+        st+= isez80() ? 4 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : isr800() ? 3 : iskc160() ? 3 : 10;
         ioi=ioe=0;
         mp= pc= get_memory_inst(pc) | get_memory_inst(pc+1)<<8;
         ih=1;altd=0,alts=0;ioi=0;ioe=0;break;
