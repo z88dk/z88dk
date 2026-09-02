@@ -1,6 +1,13 @@
 ;
-; 8085 sccz80 callee float read (no exx). hypot_callee needs this.
+;  feilipu, 2026 September
 ;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+; 8085 sccz80 callee float read (no exx). hypot_callee needs this.
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

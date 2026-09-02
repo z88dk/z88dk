@@ -38,8 +38,6 @@
 ; 4) 4th section add or subtract
 ;
 ; 5) 5th section normalize in separate file d32_fsnormalize32.asm
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -16,7 +16,7 @@ More detailed, but still incomplete changelist:
 - [classic] +z88 Support for 512z64 graphics
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
 - [newlib] library products install under lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/ (classic clibs layout)
-- [all] math32 floating point support for Intel 8080, 8085, and gbz80
+- [all] math32 floating point support for Intel 8080, 8085, and Nintendo gbz80
 - [all] math16 half-precision floating point support for Intel 8085
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
 - [ucpp] Big fixes for #line handling

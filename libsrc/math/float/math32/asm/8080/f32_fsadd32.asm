@@ -5,12 +5,14 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8080 expanded 32-bit mantissa add
+;-------------------------------------------------------------------------
+;
 ; B=exp, C[7]=sign, DEHL=mant (D=MSB)
 ;
 ; Same control as 8085.  Frame: ld hl,sp+n.  Park Y.HL before SP math.
 ; ld hl,sp+n clobbers C — save carry around adc/sbc.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

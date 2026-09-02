@@ -5,10 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-
 ;-------------------------------------------------------------------------
 ; m32_fsadd / m32_fssub - 8080 IEEE single add/sub
 ;-------------------------------------------------------------------------
+;
 ; Y lives in registers after unpack:
 ;   B = sign byte (bit 7), C = exp, LDE = 24-bit mant (H = 0)
 ;
@@ -35,7 +35,6 @@
 ; 8080: HL as frame pointer (ld hl,sp+n).  Park Y.HL first — L is the
 ; live mantissa MSB.  ld hl,sp+n clobbers C; save it around adc/sbc.
 ; No ld de,sp+*, ld hl,(de), ld (de),hl, sub hl,bc, or rl de.
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

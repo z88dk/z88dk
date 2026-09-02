@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8080 m32_fshypot — hypotf(x,y) = sqrt(sqr(x)+sqr(y))
-; Same control as 8085.  x from stack via m32_fsload (HL pointer).
+;-------------------------------------------------------------------------
 ;
+; Same control as 8085.  x from stack via m32_fsload (HL pointer).
 
 SECTION code_clib
 SECTION code_fp_math32

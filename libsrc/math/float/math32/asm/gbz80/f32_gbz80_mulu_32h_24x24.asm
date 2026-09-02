@@ -5,13 +5,14 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80: high 32 bits of 24x24 unsigned product
+;-------------------------------------------------------------------------
 ;
 ; Same three-pass engine as 8085.  Frame access via ld hl,sp+n and
 ; ld r,(hl) — no ld de,sp+*, ld hl,(de), or exx.
 ;
 ; 24x8 inner: product B:A:HL, multiplicand C:DE (same as Z80/8085).
-;
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -5,10 +5,13 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
+; m32_ldexp — apply signed exponent adjustment
+;-------------------------------------------------------------------------
+;
 ; 8080-compatible (shared: 8080 / 8085 / gbz80)
 ; Entry: DEHL = float, A = signed exponent adjustment
 ; Exit:  DEHL = adjusted float
-;
 
 SECTION code_clib
 SECTION code_fp_math32

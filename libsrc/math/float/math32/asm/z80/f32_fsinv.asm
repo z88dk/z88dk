@@ -12,8 +12,6 @@
 ; D' := D / 2^(e+1)   ∈ [0.5, 1)   (stored as −D' IEEE for NR)
 ; X  := 140/33 + (−64/11 + 256/99 × D') × D'
 ; X  := X + X × (1 − D' × X)   (×2 refinements)
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

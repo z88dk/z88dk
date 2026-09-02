@@ -14,8 +14,6 @@
 ;
 ;  Same strategy as z80: A:HL residual loop (add hl,hl / adc a,a),
 ;  byte align first, pack with rla/rra through A only.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -24,8 +24,6 @@
 ;   A = 1  zero          (exp == 0; denormals count as zero)
 ;   A = 2  NaN           (exp == 255, mantissa != 0)
 ;   A = 3  inf           (exp == 255, mantissa == 0)
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

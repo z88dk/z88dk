@@ -15,8 +15,6 @@
 ;  Same control as 8085: byte scan then residual loop.  rla does not set S;
 ;  until normalised D.7 is 0.  Entry leaves A = D with A.7 clear, so each
 ;  step is or d / jp p.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80 m32_fsmul2 — multiply by 2 (increment exponent)
-; rl de expanded through A.
+;-------------------------------------------------------------------------
 ;
+; rl de expanded through A.
 
 SECTION code_clib
 SECTION code_fp_math32

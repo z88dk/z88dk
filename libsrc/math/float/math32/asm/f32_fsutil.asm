@@ -6,6 +6,8 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
+; m32_fsutil — shared IEEE single helpers
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

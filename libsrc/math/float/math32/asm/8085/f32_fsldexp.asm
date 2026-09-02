@@ -5,7 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 m32_fsldexp / m32_dmulpow2 — x * 2^n
+;-------------------------------------------------------------------------
+;
 ; Core ABI matches am9511 / Z80 math32.
 ;
 ; Core m32_fsldexp_callee:
@@ -16,7 +19,6 @@
 ;   enter : SP = ret, pw2, x.HL, x.DE  — reverse then core
 ;
 ; Uses ld de,sp+d and ld hl,(de). Never parks ret in AF.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

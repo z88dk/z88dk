@@ -12,14 +12,11 @@
 ; The hypotenuse is the longest side of a right-angled triangle.
 ; The hypotf() function is used to find hypotenuse when
 ; other two sides are provided.
-; 
+;
 ; float hypotf(float x, float y)
 ; {
 ;   return sqrtf( sqrf(x) + sqrf(y);
 ; }
-;
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

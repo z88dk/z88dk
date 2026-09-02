@@ -5,6 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
+; m32_fsload — load IEEE single from (HL)
+;-------------------------------------------------------------------------
+;
 ; 8080-compatible (shared: 8080 / 8085 / gbz80 / z80)
 
 SECTION code_clib

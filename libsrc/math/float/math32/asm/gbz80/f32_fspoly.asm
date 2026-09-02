@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80 m32_fspoly — Horner via expanded 32-bit mantissa mul/add.
-; Same algorithm as 8085.  Park DE (not BC) before ld hl,sp+n.
+;-------------------------------------------------------------------------
 ;
+; Same algorithm as 8085.  Park DE (not BC) before ld hl,sp+n.
 
 SECTION code_clib
 SECTION code_fp_math32

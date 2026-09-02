@@ -32,8 +32,6 @@
 ;
 ; one packed IEEE number on stack, the other unpacked number in bcdehl
 ; unpacked format: mantissa= dehl, exponent in b, sign in c[7]
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

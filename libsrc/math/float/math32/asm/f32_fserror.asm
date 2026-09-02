@@ -5,9 +5,12 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
+; m32_derror — math32 error / special returns
+;-------------------------------------------------------------------------
+;
 ; 8080-compatible (shared: 8080 / 8085 / gbz80)
 ; Stack only. No exx.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

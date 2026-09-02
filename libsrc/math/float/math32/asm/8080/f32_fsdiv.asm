@@ -1,3 +1,4 @@
+;
 ;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,8 +38,6 @@
 ;   +14 b           IEEE snapshot (4)
 ;   +18 flag        word: L = 1 if callee
 ;   +20 ret
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -5,14 +5,13 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-
 ;-------------------------------------------------------------------------
 ; m32_compare / m32_compare_callee - 8085 IEEE float compare
 ;-------------------------------------------------------------------------
+;
 ; Sign/magnitude + high-word first early-out + no left-copy on callee.
 ;
 ; Exit: Z=equal, NZ=unequal, C=left<right, NC=left>=right, HL=1
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

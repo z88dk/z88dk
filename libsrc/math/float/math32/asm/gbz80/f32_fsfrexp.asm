@@ -5,7 +5,9 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80 frexpf — fraction and exponent (core ABI matches am9511 / Z80).
+;-------------------------------------------------------------------------
 ;
 ; Core m32_fsfrexp_callee:
 ;   enter : stack = float *pw2, float x, ret
@@ -15,7 +17,6 @@
 ;   enter : SP = ret, ptr, x.HL, x.DE  — reverse then core
 ;
 ; Frame via ld hl,sp+n. Never parks ret in AF.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -5,13 +5,14 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80 expanded 32-bit mantissa multiply (NR inv / accurate poly path).
+;-------------------------------------------------------------------------
 ;
 ; Unpacked: B=exp, C[7]=sign, DEHL=32-bit mant (hidden 1). Same as 8085.
 ;
 ; Frame: ld hl,sp+n, ld a,(hl+), ld (hl+),e / ld (hl),d.
 ; Native ld hl,sp+* / ld a,(hl+). No exx. No cheap ex de,hl.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

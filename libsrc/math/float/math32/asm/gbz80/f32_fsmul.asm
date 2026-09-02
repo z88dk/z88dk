@@ -5,14 +5,15 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80 m32_fsmul / m32_fsmul_callee
+;-------------------------------------------------------------------------
 ;
 ; Rounding: IEEE RNE.  Residual = low 8 of high-32 product (in E after mul).
 ;   G = residual.7, S = residual[6:0]!=0, B = mant LSB
 ;   round_up = G && (S || B); then 24-bit mant++ (overflow → >>1, exp++).
 ;
 ; Frame access via ld hl,sp+n.  Native ld hl,sp+* / ld a,(hl+). No exx. No cheap ex de,hl.
-;
 
 SECTION code_clib
 SECTION code_fp_math32

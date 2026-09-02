@@ -23,8 +23,6 @@
 ;       fl.l |= 0x3f000000; /* mantissa between 0.5 and 1 */
 ;       return(fl.f);
 ;   }
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

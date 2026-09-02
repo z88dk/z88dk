@@ -14,8 +14,6 @@
 ;
 ;  Same control as 8085: byte scan then residual loop.  gbz80 has no S flag:
 ;  use bit 7,d / bit 7,a.  bit 7 clobbers Z — do not chain jr nz from a prior or a.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

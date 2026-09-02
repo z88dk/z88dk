@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; gbz80 sqrt / invsqrt — Quake + 3× Newton on expanded 32-bit paths.
-; Same algorithm as 8085.  Frame via ld hl,sp+n / ld a,(hl+).
+;-------------------------------------------------------------------------
 ;
+; Same algorithm as 8085.  Frame via ld hl,sp+n / ld a,(hl+).
 
 SECTION code_clib
 SECTION code_fp_math32
