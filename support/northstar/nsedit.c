@@ -17,12 +17,14 @@
         nsedit extract image.nsi DOSNAME outfile
         nsedit insert image.nsi infile DOSNAME <GO address>
         nsedit delete image.nsi DOSNAME
+        nsedit compress image.nsi
 
 
     Common file types:
-        1 executable program files
+        0 system file or not specified
+        1 executable binary files
         2 BASIC programs
-        3 BASIC DATA
+        ? 3 BASIC DATA ?
 
 */
 
@@ -472,114 +474,131 @@ static int move_blocks(
     return 1;
 }
 
-// int compress_image(FILE *img)
-// {
-//     NSDirEntry dir[DIR_ENTRIES];
-// 
-//     long total_blocks;
-//     uint8_t *image;
-//     long image_size;
-// 
-//     uint16_t next_block = 4;
-// 
-//     if (!read_directory(img, dir))
-//         return 0;
-// 
-//     total_blocks = image_blocks(img);
-//     image_size = total_blocks * BLOCK_SIZE;
-// 
-//     image = malloc(image_size);
-// 
-//     if (!image)
-//     {
-//         fprintf(stderr, "Out of memory\n");
-//         return 0;
-//     }
-// 
-//     rewind(img);
-// 
-//     if (fread(image, 1, image_size, img) != (size_t)image_size)
-//     {
-//         free(image);
-//         return 0;
-//     }
-// 
-//     uint8_t *new_image = calloc(1, image_size);
-// 
-//     if (!new_image)
-//     {
-//         free(image);
-//         return 0;
-//     }
-// 
-//     /* preserve directory area */
-//     memcpy(new_image,
-//            image,
-//            DIR_BLOCKS * BLOCK_SIZE);
-// 
-//     for (int i = 1; i < DIR_ENTRIES; i++)
-//     {
-//         if (dir[i].name[0] == ' ')
-//             continue;
-// 
-//         if (dir[i].start_block <= 4)
-//             continue;
-// 
-//         uint16_t old_start =
-//             dir[i].start_block;
-// 
-//         uint16_t len =
-//             dir[i].length;
-// 
-//         long old_offset =
-//             (long)old_start * BLOCK_SIZE;
-// 
-//         long new_offset =
-//             (long)next_block * BLOCK_SIZE;
-// 
-//         long bytes =
-//             (long)len * BLOCK_SIZE;
-// 
-//         if ((new_offset + bytes) > image_size)
-//         {
-//             free(image);
-//             free(new_image);
-//             return 0;
-//         }
-// 
-//         memmove(new_image + new_offset,
-//                 image + old_offset,
-//                 bytes);
-// 
-//         dir[i].start_block = next_block;
-// 
-//         next_block += len;
-//     }
-// 
-//     /* write updated directory into memory image */
-//     memcpy(new_image,
-//            dir,
-//            sizeof(dir));
-// 
-//     rewind(img);
-// 
-//     if (fwrite(new_image,
-//                1,
-//                image_size,
-//                img) != (size_t)image_size)
-//     {
-//         free(image);
-//         free(new_image);
-//         return 0;
-//     }
-// 
-//     fflush(img);
-// 
-//     free(image);
-//     free(new_image);
-// 
-//     return 1;
-// }
+int compress_image(FILE *img)
+{
+    NSDirEntry dir[DIR_ENTRIES];
+
+    long total_blocks;
+    uint8_t *image;
+    long image_size;
+
+    if (!read_directory(img, dir))
+        return 0;
+
+    uint16_t next_block = 4;
+
+    for (int i = 1; i < DIR_ENTRIES; i++)
+    {
+        if (dir[i].name[0] == ' ')
+            continue;
+
+        if (dir[i].start_block == 4)
+        {
+            next_block = dir[i].start_block +
+                         dir[i].length;
+            break;
+        }
+    }
+
+    if (!read_directory(img, dir))
+        return 0;
+
+    total_blocks = image_blocks(img);
+    image_size = total_blocks * BLOCK_SIZE;
+
+    image = malloc(image_size);
+
+    if (!image)
+    {
+        fprintf(stderr, "Out of memory\n");
+        return 0;
+    }
+
+    rewind(img);
+
+    if (fread(image, 1, image_size, img) != (size_t)image_size)
+    {
+        free(image);
+        return 0;
+    }
+
+    uint8_t *new_image = calloc(1, image_size);
+
+    if (!new_image)
+    {
+        free(image);
+        return 0;
+    }
+
+    /* preserve directory area */
+   // memcpy(new_image,
+   //        image,
+   //        DIR_BLOCKS * BLOCK_SIZE);
+   memcpy(new_image, image, image_size);
+
+    for (int i = 1; i < DIR_ENTRIES; i++)
+    {
+        if (dir[i].name[0] == ' ')
+            continue;
+
+        if (dir[i].start_block <= 4)
+            continue;
+
+        uint16_t old_start =
+            dir[i].start_block;
+
+        uint16_t len =
+            dir[i].length;
+
+        long old_offset =
+            (long)old_start * BLOCK_SIZE;
+
+        long new_offset =
+            (long)next_block * BLOCK_SIZE;
+
+        long bytes =
+            (long)len * BLOCK_SIZE;
+
+        if ((new_offset + bytes) > image_size)
+        {
+            free(image);
+            free(new_image);
+            return 0;
+        }
+
+        memmove(new_image + new_offset,
+                image + old_offset,
+                bytes);
+
+        dir[i].start_block = next_block;
+
+        next_block += len;
+    }
+
+    /* write updated directory into memory image */
+    memcpy(new_image,
+           dir,
+           sizeof(dir));
+
+    rewind(img);
+
+    if (fwrite(new_image,
+               1,
+               image_size,
+               img) != (size_t)image_size)
+    {
+        free(image);
+        free(new_image);
+        return 0;
+    }
+
+    fflush(img);
+
+    free(image);
+    free(new_image);
+
+    return 1;
+}
 
 static void usage(void)
 {
@@ -590,7 +609,7 @@ static void usage(void)
         "  nsedit dir image.nsi\n"
         "  nsedit extract image.nsi DOSNAME outfile\n"
         "  nsedit insert image.nsi infile DOSNAME GOADDRESS\n"
-//        "  nsedit compress image.nsi\n"
+        "  nsedit compress image.nsi\n"
         "  nsedit delete image.nsi DOSNAME\n");
 }
 
@@ -704,6 +723,7 @@ int main(int argc,char *argv[])
         }
 
         heading_summary(img);
+        compress_image(img);
         if(!insert_file(
                 img,
                 argv[3],
@@ -718,33 +738,33 @@ int main(int argc,char *argv[])
         return 0;
     }
 
-//  if(strcmp(argv[1],"compress")==0)
-//  {
-//      if(argc!=3)
-//      {
-//          usage();
-//          return 1;
-//      }
-//
-//      img=fopen(argv[2],"r+b");
-//
-//      if(!img)
-//      {
-//          perror(argv[2]);
-//          return 1;
-//      }
-//
-//      heading_summary(img);
-//      if(!compress_image(img))
-//      {
-//          fprintf(stderr,
-//                  "Compression failed\n");
-//      } else  printf ("Compression OK\n");
-//
-//      fclose(img);
-//
-//      return 0;
-//  }
+    if(strcmp(argv[1],"compress")==0)
+    {
+        if(argc!=3)
+        {
+            usage();
+            return 1;
+        }
+  
+        img=fopen(argv[2],"r+b");
+  
+        if(!img)
+        {
+            perror(argv[2]);
+            return 1;
+        }
+  
+        heading_summary(img);
+        if(!compress_image(img))
+        {
+            fprintf(stderr,
+                    "Compression failed\n");
+        } else  printf ("Compression OK\n");
+  
+        fclose(img);
+  
+        return 0;
+    }
 
 
     if(strcmp(argv[1],"delete")==0)
