@@ -15,7 +15,7 @@
     Commands:
         nsedit dir image.nsi
         nsedit extract image.nsi DOSNAME outfile
-        nsedit insert image.nsi infile DOSNAME <GO address>
+        nsedit insert image.nsi infile DOSNAME <GO_ADDRESS> <FORCE_SECTOR>
         nsedit delete image.nsi DOSNAME
         nsedit compress image.nsi
 
@@ -340,7 +340,8 @@ static int insert_file(
     FILE *img,
     const char *hostfile,
     const char *dosname,
-    uint16_t goaddr)
+    uint16_t goaddr,
+    uint16_t force_sec)
 {
     NSDirEntry dir[DIR_ENTRIES];
 
@@ -390,7 +391,11 @@ static int insert_file(
 
     blocks=(uint16_t)((filesize+(BLOCK_SIZE-1))/BLOCK_SIZE);
 
-    start=first_free_block(dir);
+    if (force_sec)
+        start = force_sec;
+    else
+        start=first_free_block(dir);
+
 
     max_blocks=(long)image_blocks(img);
 
@@ -485,6 +490,7 @@ int compress_image(FILE *img)
     if (!read_directory(img, dir))
         return 0;
 
+    // Skip the unmovable portion in the directory
     uint16_t next_block = 4;
 
     for (int i = 1; i < DIR_ENTRIES; i++)
@@ -530,11 +536,8 @@ int compress_image(FILE *img)
         return 0;
     }
 
-    /* preserve directory area */
-   // memcpy(new_image,
-   //        image,
-   //        DIR_BLOCKS * BLOCK_SIZE);
-   memcpy(new_image, image, image_size);
+    /* Preserve disk image and directory area*/
+    memcpy(new_image, image, image_size);
 
     for (int i = 1; i < DIR_ENTRIES; i++)
     {
@@ -608,7 +611,7 @@ static void usage(void)
         "Usage:\n"
         "  nsedit dir image.nsi\n"
         "  nsedit extract image.nsi DOSNAME outfile\n"
-        "  nsedit insert image.nsi infile DOSNAME GOADDRESS\n"
+        "  nsedit insert image.nsi infile DOSNAME <GO_ADDR> <FORCE_SEC>\n"
         "  nsedit compress image.nsi\n"
         "  nsedit delete image.nsi DOSNAME\n");
 }
@@ -686,15 +689,16 @@ int main(int argc,char *argv[])
 
     if(strcmp(argv[1],"insert")==0)
     {
-        if(argc!=5 && argc!=6)
+        if(argc!=5 && argc!=6 && argc!=7)
         {
             usage();
             return 1;
         }
 
         uint16_t goaddr = 0;
+        uint16_t force_sec = 0;
 
-        if(argc == 6)
+        if(argc >= 6)
         {
             char *end;
 
@@ -709,6 +713,24 @@ int main(int argc,char *argv[])
                         "Invalid GO address\n");
                 return 1;
             }
+
+            if(argc == 7)
+            {
+                char *end;
+
+                force_sec = (uint16_t)strtoul(
+                                argv[6],
+                                &end,
+                                10);
+
+                if(*end)
+                {
+                    fprintf(stderr,
+                            "Invalid sector value\n");
+                    return 1;
+                }
+            }   
+
         } else {
                 fprintf(stderr,
                         "WARNING - Setting GO address to 0\n");
@@ -723,12 +745,14 @@ int main(int argc,char *argv[])
         }
 
         heading_summary(img);
-        compress_image(img);
+
+        if (!force_sec) compress_image(img);
         if(!insert_file(
                 img,
                 argv[3],
                 argv[4],
-                goaddr))
+                goaddr,
+                force_sec))
         {
             fprintf(stderr,"Insert failed\n");
         } else  printf ("Insert OK\n");
