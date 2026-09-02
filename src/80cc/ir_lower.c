@@ -773,11 +773,13 @@ static int hlde_full_reload(const char *s, const char *pair)
 
    Ticks: `jr cc` is 12 T taken / 7 T not-taken vs `jp cc`'s flat 10 T, and an
    unconditional `jr` is a flat +2 T. So the ONLY conversion that cannot pay for
-   itself is one that is always taken — and inside a loop that is exactly the
-   unconditional jump. Excluding those (and only those) is what makes this a win
-   on both axes; on z80 it takes the aggregate from −0.167 % to −0.458 % ticks
-   and cuts the slower cells from 10 to 4 (worst +0.18 %), for roughly half the
-   bytes. Two structural proxies were tried and REFUTED first — do not retry:
+   itself is one that is always taken — which is exactly the unconditional jump.
+   Excluding those (and only those) is what makes this a win on both axes; on
+   z80 it takes the aggregate from −0.167 % to −0.458 % ticks and cuts the
+   slower cells from 10 to 4 (worst +0.18 %), for roughly half the bytes. The
+   exclusion was once qualified by loop depth; the block below says why it no
+   longer is. Two structural proxies were tried and REFUTED first — do not
+   retry:
      - forward-only (skip back edges): 13 slower cells instead of 15. A taken
        FORWARD guard costs the same +2 T, so direction is not taken-ness.
      - skip everything at max loop depth: no tick change at all (the hot branch
@@ -791,20 +793,70 @@ static int relax_uc = -1;
 /* The one conversion that cannot pay for itself is an always-taken branch, and
    the paragraph above prices that from the Z80's timings. It is not a universal
    fact. An unconditional `jr` is +2 T on z80 but CHEAPER than `jp` on the
-   gameboy (12 cycles vs 16) and on z180 (8 vs 9), and free on kc160. So the
-   exclusion is per-CPU, measured on lexbench — -12 B on every target, and:
+   gameboy (12 cycles vs 16) and on z180 (8 vs 9), and free on kc160 — so the
+   question is per-CPU, and on the CPUs that pay the +2 T the answer is a flat
+   NO. An unconditional jump is always taken WHEREVER it stands, so there is no
+   sub-case to carve out; the loop-depth qualifier this rule used to carry is
+   gone, and §3 below records what it cost.
 
-     ez80  -0.66 %   gbz80 -0.58 %   z180 -0.18 %   kc160  0.00 %   → relax
-     z80   +0.33 %   z80n  +0.33 %   r2ka  +3.15 %  r4k   +3.05 %   → keep the jp
+   1. Relaxing unconditional jumps on z80 IS worth real bytes, and it is a
+      byte-for-tick trade the corpus rejects. Whole bench corpus, both frame
+      modes, `IR_JR_UNCOND=1` vs default:
 
-   `IR_JR_UNCOND=1` forces it on anywhere, `=0` off. */
+        SIZE   z80 -211 B, z80n -211 B, r2ka/r4k/r6k -239 B each; 55 of 58
+               cells smaller, ZERO larger. emu.c -142 B sp / -169 B fp.
+        TICKS  z80 +0.148 % sp / +0.166 % fp — 58 of 58 cells SLOWER, none
+               faster. Worst listbench +1.30 %, ptrbench +0.91 %, rle +0.90 %.
+
+      A single-bench figure will understate this badly: predbench alone reads
+      +0.028 %, five times under the aggregate, and it is the second-quietest
+      bench in the set. Measure the corpus.
+
+   2. Two finer rules were tried and REFUTED. Both relaxed an in-loop
+      unconditional jump only where it CROSSES a loop boundary — a jump that
+      leaves or enters a nest runs once per loop entry, not once per iteration.
+      Either way every cell stayed slower, so the trade only got cheaper, never
+      free: crossing-in-either-direction kept 51 % of the bytes for +0.031 %,
+      leaving-only kept 19 % for +0.011 %. They also inherited a wrong loop
+      model — the back-edge-span depth approximation counts a diamond JOIN as a
+      back edge (charbench `schar_mix`: the arm laid out after the join makes
+      the join look one level deeper), so the genuine back edge read as
+      "leaves the nest" and got relaxed. Any retry needs real natural loops.
+
+   3. The loop-depth qualifier that used to allow relaxation OUTSIDE a loop
+      bought 3 bytes over the whole corpus (3 sites) and 11-14 B on emu.c, and
+      cost 25 622 ticks on predbench alone — `sat()` is a loop-free leaf called
+      from a hot loop, so its jumps are cold by loop depth and hot in fact.
+      Depth is a per-function property and call frequency is not. Dropping the
+      qualifier: 2 benches faster, 0 slower, +3 B.
+
+   4. RABBIT RELAXES, and it is the one CPU here where doing so is free money.
+      The figures that once excluded it (+3.15 % r2ka, +3.05 % r4k) were an
+      EMULATOR artifact: `src/ticks/ticks.c` gave no `JR` form an `israbbit()`
+      arm, so rabbit paid the z80's 12/7 for its cheapest branch, while `JP nn`
+      read 3 through a shadowed clause. Rabbit `jr` is 5 clocks on the
+      2000/3000 and 6 on the 4000/6000 against `jp`'s flat 7 — CHEAPER in both
+      bytes and clocks, unlike z80. With the emulator fixed, remeasured over
+      the corpus in both frame modes:
+
+        SIZE   r2ka -121 B sp / -124 B fp, r4k and r6k the same;
+               29 of 29 benches smaller, ZERO larger, on every variant
+        TICKS  r2ka -0.342 % sp / -0.336 % fp, r4k -0.168 % / -0.164 %,
+               r6k -0.171 % / -0.167 %
+               174 of 174 cells FASTER, ZERO slower
+
+      r4k/r6k gaining exactly half of r2ka's ticks is the 1-clock-vs-2-clock
+      saving per converted jump showing through, which is the check that the
+      win is the branch and not something else.
+
+   `IR_JR_UNCOND=1` forces relaxation on anywhere, `=0` off. */
 static int relax_uncond_ok(void)
 {
     if (relax_uc < 0) {
         const char *e = getenv("IR_JR_UNCOND");
         if (e) relax_uc = (e[0] == '1');
         else   relax_uc = IS_GBZ80() || IS_EZ80() || IS_KC160()
-                       || c_cpu == CPU_Z180;
+                       || IS_RABBIT() || c_cpu == CPU_Z180;
     }
     return relax_uc;
 }
@@ -973,36 +1025,6 @@ static int relax_in_ji_window(char **lines, int n, int i)
     return 0;
 }
 
-/* Per-BB loop-nesting depth, the same cheap back-edge-span approximation the
-   selection code in this file already uses (`bdep`): count the [target..source]
-   spans of back edges containing each BB. Ranking only — never correctness. */
-static int *relax_bb_depth(const Func *f, int *out_max)
-{
-    *out_max = 0;
-    if (!f || f->n_bbs <= 0) return NULL;
-    int *d = calloc((size_t)f->n_bbs, sizeof(int));
-    if (!d) return NULL;
-    for (int i = 0; i < f->n_bbs; i++)
-        for (int s = 0; s < ir_bb_n_succ(&f->bbs[i]); s++) {
-            int t = ir_bb_succ_at(&f->bbs[i], s);
-            if (t < 0 || t > i) continue;                 /* back-edge: t <= i */
-            for (int b = t; b <= i && b < f->n_bbs; b++) d[b]++;
-        }
-    for (int i = 0; i < f->n_bbs; i++) if (d[i] > *out_max) *out_max = d[i];
-    return d;
-}
-
-/* `L_f<idx>_bb_<n>:` -> n, else -1. */
-static int relax_bb_of_label(const char *l)
-{
-    if (l[0] != 'L') return -1;
-    const char *p = strstr(l, "_bb_");
-    if (!p || p[4] < '0' || p[4] > '9') return -1;
-    int n = 0; const char *q = p + 4;
-    while (*q >= '0' && *q <= '9') n = n * 10 + (*q++ - '0');
-    return (*q == ':') ? n : -1;
-}
-
 static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
 {
     char buf[1024];
@@ -1019,31 +1041,6 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
             while (fgets(buf, sizeof buf, src)) fputs(buf, out); return; }
     }
     int *size = malloc((size_t)(n > 0 ? n : 1) * sizeof(int));
-    /* Innermost-loop exclusion. A branch in the hottest loop is taken on nearly
-       every iteration, where `jr` costs +2 T over `jp` with no not-taken saving
-       to offset it — that is where the whole measured tick cost lives (5 benches,
-       one dominant loop each). Loop DEPTH is the usable proxy: unlike branch
-       direction (tried, refuted — a taken forward guard costs the same), depth
-       actually tracks iteration count. Attribute each line to the BB label above
-       it and skip conversion at max depth. Ranking only: skipping merely forgoes
-       bytes. */
-    int maxdep = 0;
-    int *bdep = relax_bb_depth(f, &maxdep);
-    int *linedep = (bdep && n > 0) ? calloc((size_t)n, sizeof(int)) : NULL;
-    if (linedep) {
-        int cur = 0;                                 /* prologue: depth 0 */
-        for (int i = 0; i < n; i++) {
-            int b = relax_bb_of_label(lines[i]);
-            /* An elided (dead) BB label leaves its lines attributed to the
-               preceding BB — it fell through from there, so same loop. */
-            if (b >= 0 && b < f->n_bbs) cur = bdep[b];
-            linedep[i] = cur;
-        }
-    }
-    if (getenv("IR_JR_LOG"))
-        fprintf(stderr, "IR_JR: fn=%s n_bbs=%d maxdep=%d bdep=%s linedep=%s\n",
-                (f && f->fn) ? ir_sym_name(f->fn) : "?", f ? f->n_bbs : -1,
-                maxdep, bdep ? "y" : "n", linedep ? "y" : "n");
     if (size) {
         for (int i = 0; i < n; i++) size[i] = relax_line_size(lines[i]);
         /* Converting shrinks the span, which can bring further branches into
@@ -1056,15 +1053,13 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
                 if (!relax_jp_parts(lines[i], cc, sizeof cc, tgt, sizeof tgt))
                     continue;
                 if (relax_in_ji_window(lines, n, i)) continue;
-                /* Never relax an UNCONDITIONAL jump inside a loop: it is
-                   taken every iteration, so `jr` is a flat +2 T with nothing to
-                   pay for it, whereas a CONDITIONAL at the same spot still wins
-                   whenever it falls through (7 T vs `jp cc`'s flat 10 T). This
-                   one rule is what turns the tick picture around — see the
-                   header comment. `IR_JR_UNCOND=1` opts out (byte-max variant).
-                */
-                if (!cc[0] && linedep && linedep[i] >= 1 && !relax_uncond_ok())
-                    continue;
+                /* Never relax an UNCONDITIONAL jump on a CPU where `jr` is
+                   the dearer encoding: it is taken every time it is reached, so
+                   the +2 T is unconditional too, whereas a CONDITIONAL at the
+                   same spot still wins whenever it falls through (7 T vs
+                   `jp cc`'s flat 10 T). This one rule is what turns the tick
+                   picture around — see the header comment. */
+                if (!cc[0] && !relax_uncond_ok()) continue;
                 int t = -1;
                 for (int j = 0; j < n; j++)
                     if (relax_label_name(lines[j], lbl, sizeof lbl)
@@ -1090,7 +1085,7 @@ static void filter_relax_branches(FILE *out, FILE *src, const Func *f)
         }
     }
     for (int i = 0; i < n; i++) { fputs(lines[i], out); free(lines[i]); }
-    free(lines); free(size); free(bdep); free(linedep);
+    free(lines); free(size);
 }
 
 /* Post-render peephole: drop a dead one-way register copy `ld hl,de` (HL:=DE)
