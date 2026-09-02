@@ -5583,6 +5583,86 @@ TokFile {
         source_type: BASIC
         src_line:
             SrcLine {
+                text: "	DEF FNf(A) = A*A"
+                location: t/input/func.inc:42
+            }
+        tokens: [
+            Token {
+                type: Identifier
+                keyword: DEF
+                text: "DEF"
+                ws_before: "	"
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: Identifier
+                text: "FNF"
+                ws_before: " "
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: (
+                text: "("
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: )
+                text: ")"
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: =
+                text: "="
+                ws_before: " "
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                ws_before: " "
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: *
+                text: "*"
+                location: t/input/func.inc:42
+            }
+            Token {
+                type: Identifier
+                text: "A"
+                location: t/input/func.inc:42
+            }
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	"
+                location: t/input/func.inc:43
+            }
+        tokens: [
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
+                text: "	"
+                location: t/input/func.inc:44
+            }
+        tokens: [
+        ]
+    }
+    TokLine {
+        source_type: BASIC
+        src_line:
+            SrcLine {
                 text: "	LET A=1+2"
                 location: test_t_input_04_t.bas:16
             }

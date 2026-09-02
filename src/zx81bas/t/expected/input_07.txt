@@ -25,6 +25,9 @@ Symtab {
         "E" {
             location: test_t_input_07_t.bas:43
         }
+        "FNFA" {
+            location: t/input/func.inc:42
+        }
         "FNIDA" {
             location: t/input/let.inc:29
         }
@@ -120,6 +123,9 @@ Symtab {
     fns: [
         "FNEMPTY" {
             location: test_t_input_07_t.bas:165
+        }
+        "FNF" {
+            location: t/input/func.inc:42
         }
         "FNID" {
             location: t/input/let.inc:29

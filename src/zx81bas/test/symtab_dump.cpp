@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#ifdef _DEBUG
+
 #include "../dump_context.h"
 #include "../symtab.h"
 #include <algorithm>
@@ -104,3 +106,5 @@ void Symtab::dump(DumpContext ctx) const {
     dump_symtab_map("line_nums", line_nums, child_ctx);
     ctx.line("}");
 }
+
+#endif
