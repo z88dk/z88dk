@@ -26,7 +26,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_math16_8085.bin \
 	test_math16_r6k.bin \
-	test_math32.bin test_math32_z180.bin test_math32_z80n.bin \
+	test_math32.bin test_math32_z180.bin test_math32_ez80_z80.bin test_math32_z80n.bin \
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
 	test_math32_8085.bin test_math32_8080.bin test_math32_gbz80.bin \
 	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
@@ -113,6 +113,10 @@ test_math32.bin: $(FPSOURCES)
 test_math32_z180.bin: $(FPSOURCES)
 	$(call compile_z180, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_z180)
 	$(runtest_z180)
+
+test_math32_ez80_z80.bin: $(FPSOURCES)
+	$(call compile_ez80_z80, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32-ez80_z80\\\"\"", -lmath32_ez80_z80)
+	$(runtest_ez80_z80)
 
 test_math32_z80n.bin: $(FPSOURCES)
 	$(call compile_z80n, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32_z80n)
