@@ -68,28 +68,28 @@ static long image_blocks(FILE *fp)
 
 static void heading_summary(FILE *img)
 {
-	int img_blk = image_blocks(img);
-	
-	switch (img_blk) {
-	case 350:
-		printf ("SSSD - 35 tracks, 256 bytes/sec\n");
-		BLOCK_SIZE = 256;
-		break;
-	case 700:
-		printf ("SSDD - 35 tracks, 512 bytes/sec\n");
-		BLOCK_SIZE = 512;
-		break;
-	case 1400:
-		printf ("SSDD - 70 tracks, 512 bytes/sec\n");
-		BLOCK_SIZE = 512;
-		break;
-	default:
-		printf ("Unknown disk type !\n");
-		BLOCK_SIZE = 512;
-		break;
-	}
-	
-	printf ("%uK disk image\n", img_blk*BLOCK_SIZE/1024);
+    int img_blk = image_blocks(img);
+    
+    switch (img_blk) {
+    case 350:
+        printf ("SSSD - 35 tracks, 256 bytes/sec\n");
+        BLOCK_SIZE = 256;
+        break;
+    case 700:
+        printf ("SSDD - 35 tracks, 512 bytes/sec\n");
+        BLOCK_SIZE = 512;
+        break;
+    case 1400:
+        printf ("SSDD - 70 tracks, 512 bytes/sec\n");
+        BLOCK_SIZE = 512;
+        break;
+    default:
+        printf ("Unknown disk type !\n");
+        BLOCK_SIZE = 512;
+        break;
+    }
+    
+    printf ("%uK disk image\n", img_blk*BLOCK_SIZE/1024);
 }
 
 static int read_directory(FILE *fp, NSDirEntry dir[DIR_ENTRIES])
@@ -189,18 +189,18 @@ static void list_directory(FILE *fp)
         if (dir[i].name[0] == ' ')
             continue;
 
-		// Getting rid of BLOCK_SIZE, we try to keep this stuff dynamic
-		if (dir[i].type & 0x80) {
-			bytes_len += dir[i].length*512;
-			used_dd += dir[i].length;
-		} else {
-			used += dir[i].length;
-			bytes_len += dir[i].length*256;
-		}
+        // Getting rid of BLOCK_SIZE, we try to keep this stuff dynamic
+        if (dir[i].type & 0x80) {
+            bytes_len += dir[i].length*512;
+            used_dd += dir[i].length;
+        } else {
+            used += dir[i].length;
+            bytes_len += dir[i].length*256;
+        }
     }
 
-	long total_bytes = image_blocks(fp) * BLOCK_SIZE;
-	long free_bytes = total_bytes - DIR_BLOCKS * BLOCK_SIZE - bytes_len;
+    long total_bytes = image_blocks(fp) * BLOCK_SIZE;
+    long free_bytes = total_bytes - DIR_BLOCKS * BLOCK_SIZE - bytes_len;
 
     printf("\n('*' = Double Density)\n");
 
@@ -218,61 +218,61 @@ static void list_directory(FILE *fp)
 
         entry_name(name,&dir[i]);
 
-		uint8_t meta0 = dir[i].go_address & 0xff;
-		uint8_t meta1 = dir[i].go_address >> 8;
-		uint8_t meta2 = dir[i].reserved;
+        uint8_t meta0 = dir[i].go_address & 0xff;
+        uint8_t meta1 = dir[i].go_address >> 8;
+        uint8_t meta2 = dir[i].reserved;
 
         if ((dir[i].type & 0x7f) == 0)
         {
-			if ((i==0) && (dir[i].start_block==0))
-				printf(
-					"%-8s     0         [DIR]  %02Xh,%02Xh,%02Xh\n---------------------------\n",
-					name,
-					meta0,
-					meta1,
-					meta2);
-			else
-			if (dir[i].start_block==4) {
-				printf(
-					"%-8s     4   %4u  [BOOT] %02Xh,%02Xh,%02Xh\n---------------------------\n",
-					name,
-					dir[i].length,
-					meta0,
-					meta1,
-					meta2);
-			} else {
-				printf(
-					"%-8s %5u  %4u   %c%2u    %02Xh,%02Xh,%02Xh\n",
-					name,
-					dir[i].start_block,
-					dir[i].length,
-					(dir[i].type & 0x80) ? '*' : ' ',
-					dir[i].type & 0x7f,
-					meta0,
-					meta1,
-					meta2);
-			}
+            if ((i==0) && (dir[i].start_block==0))
+                printf(
+                    "%-8s     0         [DIR]  %02Xh,%02Xh,%02Xh\n---------------------------\n",
+                    name,
+                    meta0,
+                    meta1,
+                    meta2);
+            else
+            if (dir[i].start_block==4) {
+                printf(
+                    "%-8s     4   %4u  [BOOT] %02Xh,%02Xh,%02Xh\n---------------------------\n",
+                    name,
+                    dir[i].length,
+                    meta0,
+                    meta1,
+                    meta2);
+            } else {
+                printf(
+                    "%-8s %5u  %4u   %c%2u    %02Xh,%02Xh,%02Xh\n",
+                    name,
+                    dir[i].start_block,
+                    dir[i].length,
+                    (dir[i].type & 0x80) ? '*' : ' ',
+                    dir[i].type & 0x7f,
+                    meta0,
+                    meta1,
+                    meta2);
+            }
         }
         else
         {
-			if (dir[i].start_block==4) {
-				printf(
-					"%-8s     4   %4u  [CPM]  %02Xh,%02Xh,%02Xh\n---------------------------\n",
-					name,
-					dir[i].length,
-					meta0,
-					meta1,
-					meta2);
-			} else {
-				printf(
-					"%-8s %5u  %4u   %c%2u  %04Xh\n",
-					name,
-					dir[i].start_block,
-					dir[i].length,
-					(dir[i].type & 0x80) ? '*' : ' ',
-					dir[i].type & 0x7f,
-					dir[i].go_address);
-			}
+            if (dir[i].start_block==4) {
+                printf(
+                    "%-8s     4   %4u  [CPM]  %02Xh,%02Xh,%02Xh\n---------------------------\n",
+                    name,
+                    dir[i].length,
+                    meta0,
+                    meta1,
+                    meta2);
+            } else {
+                printf(
+                    "%-8s %5u  %4u   %c%2u  %04Xh\n",
+                    name,
+                    dir[i].start_block,
+                    dir[i].length,
+                    (dir[i].type & 0x80) ? '*' : ' ',
+                    dir[i].type & 0x7f,
+                    dir[i].go_address);
+            }
         }
     }
     printf("\n\nUsed blocks : %u SD + %u DD, %u bytes", used, used_dd, bytes_len);
@@ -431,10 +431,10 @@ static int insert_file(
 
     dir[slot].start_block=start;
     dir[slot].length=blocks;
-	if (BLOCK_SIZE == 512)
-		dir[slot].type=129;
-	else
-		dir[slot].type=1;
+    if (BLOCK_SIZE == 512)
+        dir[slot].type=129;
+    else
+        dir[slot].type=1;
     dir[slot].go_address=goaddr;
 
     if(!write_directory(img,dir))
@@ -472,114 +472,114 @@ static int move_blocks(
     return 1;
 }
 
-int compress_image(FILE *img)
-{
-    NSDirEntry dir[DIR_ENTRIES];
-
-    long total_blocks;
-    uint8_t *image;
-    long image_size;
-
-    uint16_t next_block = 4;
-
-    if (!read_directory(img, dir))
-        return 0;
-
-    total_blocks = image_blocks(img);
-    image_size = total_blocks * BLOCK_SIZE;
-
-    image = malloc(image_size);
-
-    if (!image)
-    {
-        fprintf(stderr, "Out of memory\n");
-        return 0;
-    }
-
-    rewind(img);
-
-    if (fread(image, 1, image_size, img) != (size_t)image_size)
-    {
-        free(image);
-        return 0;
-    }
-
-    uint8_t *new_image = calloc(1, image_size);
-
-    if (!new_image)
-    {
-        free(image);
-        return 0;
-    }
-
-    /* preserve directory area */
-    memcpy(new_image,
-           image,
-           DIR_BLOCKS * BLOCK_SIZE);
-
-    for (int i = 1; i < DIR_ENTRIES; i++)
-    {
-        if (dir[i].name[0] == ' ')
-            continue;
-
-        if (dir[i].start_block <= 4)
-            continue;
-
-        uint16_t old_start =
-            dir[i].start_block;
-
-        uint16_t len =
-            dir[i].length;
-
-        long old_offset =
-            (long)old_start * BLOCK_SIZE;
-
-        long new_offset =
-            (long)next_block * BLOCK_SIZE;
-
-        long bytes =
-            (long)len * BLOCK_SIZE;
-
-        if ((new_offset + bytes) > image_size)
-        {
-            free(image);
-            free(new_image);
-            return 0;
-        }
-
-        memmove(new_image + new_offset,
-                image + old_offset,
-                bytes);
-
-        dir[i].start_block = next_block;
-
-        next_block += len;
-    }
-
-    /* write updated directory into memory image */
-    memcpy(new_image,
-           dir,
-           sizeof(dir));
-
-    rewind(img);
-
-    if (fwrite(new_image,
-               1,
-               image_size,
-               img) != (size_t)image_size)
-    {
-        free(image);
-        free(new_image);
-        return 0;
-    }
-
-    fflush(img);
-
-    free(image);
-    free(new_image);
-
-    return 1;
-}
+// int compress_image(FILE *img)
+// {
+//     NSDirEntry dir[DIR_ENTRIES];
+// 
+//     long total_blocks;
+//     uint8_t *image;
+//     long image_size;
+// 
+//     uint16_t next_block = 4;
+// 
+//     if (!read_directory(img, dir))
+//         return 0;
+// 
+//     total_blocks = image_blocks(img);
+//     image_size = total_blocks * BLOCK_SIZE;
+// 
+//     image = malloc(image_size);
+// 
+//     if (!image)
+//     {
+//         fprintf(stderr, "Out of memory\n");
+//         return 0;
+//     }
+// 
+//     rewind(img);
+// 
+//     if (fread(image, 1, image_size, img) != (size_t)image_size)
+//     {
+//         free(image);
+//         return 0;
+//     }
+// 
+//     uint8_t *new_image = calloc(1, image_size);
+// 
+//     if (!new_image)
+//     {
+//         free(image);
+//         return 0;
+//     }
+// 
+//     /* preserve directory area */
+//     memcpy(new_image,
+//            image,
+//            DIR_BLOCKS * BLOCK_SIZE);
+// 
+//     for (int i = 1; i < DIR_ENTRIES; i++)
+//     {
+//         if (dir[i].name[0] == ' ')
+//             continue;
+// 
+//         if (dir[i].start_block <= 4)
+//             continue;
+// 
+//         uint16_t old_start =
+//             dir[i].start_block;
+// 
+//         uint16_t len =
+//             dir[i].length;
+// 
+//         long old_offset =
+//             (long)old_start * BLOCK_SIZE;
+// 
+//         long new_offset =
+//             (long)next_block * BLOCK_SIZE;
+// 
+//         long bytes =
+//             (long)len * BLOCK_SIZE;
+// 
+//         if ((new_offset + bytes) > image_size)
+//         {
+//             free(image);
+//             free(new_image);
+//             return 0;
+//         }
+// 
+//         memmove(new_image + new_offset,
+//                 image + old_offset,
+//                 bytes);
+// 
+//         dir[i].start_block = next_block;
+// 
+//         next_block += len;
+//     }
+// 
+//     /* write updated directory into memory image */
+//     memcpy(new_image,
+//            dir,
+//            sizeof(dir));
+// 
+//     rewind(img);
+// 
+//     if (fwrite(new_image,
+//                1,
+//                image_size,
+//                img) != (size_t)image_size)
+//     {
+//         free(image);
+//         free(new_image);
+//         return 0;
+//     }
+// 
+//     fflush(img);
+// 
+//     free(image);
+//     free(new_image);
+// 
+//     return 1;
+// }
 
 static void usage(void)
 {
@@ -616,8 +616,8 @@ int main(int argc,char *argv[])
             perror(argv[2]);
             return 1;
         }
-		
-		heading_summary(img);
+        
+        heading_summary(img);
         list_directory(img);
         fclose(img);
 
@@ -640,7 +640,7 @@ int main(int argc,char *argv[])
             return 1;
         }
 
-		heading_summary(img);
+        heading_summary(img);
         read_directory(img,dir);
 
         int idx=find_entry(dir,argv[3]);
@@ -693,7 +693,7 @@ int main(int argc,char *argv[])
         } else {
                 fprintf(stderr,
                         "WARNING - Setting GO address to 0\n");
-		}
+        }
 
         img=fopen(argv[2],"r+b");
 
@@ -703,7 +703,7 @@ int main(int argc,char *argv[])
             return 1;
         }
 
-		heading_summary(img);
+        heading_summary(img);
         if(!insert_file(
                 img,
                 argv[3],
@@ -718,33 +718,33 @@ int main(int argc,char *argv[])
         return 0;
     }
 
-//	if(strcmp(argv[1],"compress")==0)
-//	{
-//		if(argc!=3)
-//		{
-//			usage();
-//			return 1;
-//		}
+//  if(strcmp(argv[1],"compress")==0)
+//  {
+//      if(argc!=3)
+//      {
+//          usage();
+//          return 1;
+//      }
 //
-//		img=fopen(argv[2],"r+b");
+//      img=fopen(argv[2],"r+b");
 //
-//		if(!img)
-//		{
-//			perror(argv[2]);
-//			return 1;
-//		}
+//      if(!img)
+//      {
+//          perror(argv[2]);
+//          return 1;
+//      }
 //
-//		heading_summary(img);
-//		if(!compress_image(img))
-//		{
-//			fprintf(stderr,
-//					"Compression failed\n");
-//		} else  printf ("Compression OK\n");
+//      heading_summary(img);
+//      if(!compress_image(img))
+//      {
+//          fprintf(stderr,
+//                  "Compression failed\n");
+//      } else  printf ("Compression OK\n");
 //
-//		fclose(img);
+//      fclose(img);
 //
-//		return 0;
-//	}
+//      return 0;
+//  }
 
 
     if(strcmp(argv[1],"delete")==0)
@@ -763,7 +763,7 @@ int main(int argc,char *argv[])
             return 1;
         }
 
-		heading_summary(img);
+        heading_summary(img);
         read_directory(img,dir);
 
         int idx=find_entry(dir,argv[3]);
