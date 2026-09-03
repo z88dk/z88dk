@@ -16,6 +16,15 @@ C128_GLOBS_ex := \
 	target/c128/stdio/*.asm \
 	target/c128/stdio/ansi/*.asm
 
+C128_c128_GLOBS := $(C128_GLOBS)
+C128_c128_GLOBS_ex := $(C128_GLOBS_ex)
+C128_c128udg_GLOBS := "target/c128/graphics/udg/*.asm"
+C128_c128udg_GLOBS_ex := target/c128/graphics/udg/*.asm
+C128_c128hr_GLOBS := "target/c128/graphics/*.asm"
+C128_c128hr_GLOBS_ex := target/c128/graphics/*.asm
+C128_c128hr480_GLOBS := "target/c128/graphics/*.asm" "target/c128/graphics_64k/*.asm"
+C128_c128hr480_GLOBS_ex := target/c128/graphics/*.asm target/c128/graphics_64k/*.asm
+
 C128_CFILES := $(call rwildcard,target/c128,*.c)
 
 define c128_variant
@@ -37,9 +46,9 @@ $(eval $(call gfx_stamp_args,c128udg,TARGET=c128 FLAVOUR="text6 narrow" SUBTYPE=
 $(eval $(call gfx_stamp_args,c128hr,TARGET=c128 FLAVOUR=wide SUBTYPE=c128hr))
 $(eval $(call gfx_stamp_args,c128hr480,TARGET=c128 FLAVOUR=wide SUBTYPE=c128hr480))
 define c128_asm
-target/c128/obj/target-c128-$(1): $(C128_GLOBS_ex)
+target/c128/obj/target-c128-$(1): $$(C128_$(1)_GLOBS_ex)
 	$(Q)mkdir -p target/c128/obj/$(1)
-	$$(Q)$$(ASSEMBLER) -d -O=target/c128/obj/$(1)/x -m4=-I$$(Z88DK_LIB)/../src/m4 -m4=-I$$(Z88DK_LIBSRC)/target/c128 -I$$(Z88DK_LIB) -I$$(Z88DK_LIB)/target/c128/def -Itarget/c128 -Itarget/c128/obj/$(1) -I$$(Z88DK_LIBSRC)/classic -mz80 -DFORc128 -I$$(Z88DK_LIB) -D__CLASSIC $$(C128_GLOBS)
+	$$(Q)$$(ASSEMBLER) -d -O=target/c128/obj/$(1)/x -m4=-I$$(Z88DK_LIB)/../src/m4 -m4=-I$$(Z88DK_LIBSRC)/target/c128 -I$$(Z88DK_LIB) -I$$(Z88DK_LIB)/target/c128/def -Itarget/c128 -Itarget/c128/obj/$(1) -I$$(Z88DK_LIBSRC)/classic -mz80 -DFOR$(1) -I$$(Z88DK_LIB) -D__CLASSIC $$(C128_$(1)_GLOBS)
 	$$(Q)touch $$@
 endef
 $(foreach variant,c128 c128udg c128hr c128hr480,$(eval $(call c128_asm,$(variant))))

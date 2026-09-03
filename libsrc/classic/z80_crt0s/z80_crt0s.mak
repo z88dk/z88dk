@@ -33,6 +33,17 @@ CRT0_STAMP  = $(CRT0_DIR)/obj/$(1)-crt0
 # $(2) = list file, relative to $(CRT0_DIR)
 # $(3) = assembler flags
 define crt0
+$(CRT0_DIR)/obj/$(strip $(1))-crt0.d: $(CRT0_DIR)/$(strip $(2)) $$(LSTDEPS_AWK) | $(CRT0_DIR)/obj
+	$(Q)( $$(LSTDEPS)                $(CRT0_DIR)/$(strip $(2)) | $$(NORMDEPS) | sed 's|^|$(CRT0_DIR)/obj/$(strip $(1))-crt0: |'; \
+	      $$(LSTDEPS) -v ONLY_LSTS=1 $(CRT0_DIR)/$(strip $(2)) | $$(NORMDEPS) | sed 's|^|$(CRT0_DIR)/obj/$(strip $(1))-crt0.d: |' ) > $$@
+
+$(CRT0_DIR)/obj/$(strip $(1))-crt0: | $(CRT0_DIR)/obj
+	$(Q)NEWLIB_ROOT=$$(CRT0_ROOT) $$(ASSEMBLER) -d -O$(CRT0_DIR)/obj/$(strip $(1)) -Iclassic $(strip $(3)) @$(CRT0_DIR)/$(strip $(2))
+	@touch $$@
+
+-include $(CRT0_DIR)/obj/$(strip $(1))-crt0.d
+endef
+
 $(eval $(call crt0,z80,      crt0_z80.lst,   -D__SDCC_IX -D__CLASSIC -mz80))
 $(eval $(call crt0,ixiy,     crt0_z80.lst,   -IXIY -D__SDCC_IX -D__CLASSIC))
 $(eval $(call crt0,z80n,     crt0_z80n.lst,  -D__SDCC_IX -D__CLASSIC -mz80n))
@@ -46,17 +57,6 @@ $(eval $(call crt0,r2ka,     crt0_r2ka.lst,  -D__SDCC_IX -D__CLASSIC -mr2ka))
 $(eval $(call crt0,r4k,      crt0_r2ka.lst,  -D__SDCC_IX -D__CLASSIC -mr4k))
 $(eval $(call crt0,kc160,    crt0_kc160.lst, -D__SDCC_IX -D__CLASSIC -mkc160))
 CLEAN += crt0s-clean
-
-$(CRT0_DIR)/obj/$(strip $(1))-crt0.d: $(CRT0_DIR)/$(strip $(2)) $$(LSTDEPS_AWK) | $(CRT0_DIR)/obj
-	$(Q)( $$(LSTDEPS)                $(CRT0_DIR)/$(strip $(2)) | $$(NORMDEPS) | sed 's|^|$(CRT0_DIR)/obj/$(strip $(1))-crt0: |'; \
-	      $$(LSTDEPS) -v ONLY_LSTS=1 $(CRT0_DIR)/$(strip $(2)) | $$(NORMDEPS) | sed 's|^|$(CRT0_DIR)/obj/$(strip $(1))-crt0.d: |' ) > $$@
-
-$(CRT0_DIR)/obj/$(strip $(1))-crt0: | $(CRT0_DIR)/obj
-	$(Q)NEWLIB_ROOT=$$(CRT0_ROOT) $$(ASSEMBLER) -d -O$(CRT0_DIR)/obj/$(strip $(1)) -Iclassic $(strip $(3)) @$(CRT0_DIR)/$(strip $(2))
-	@touch $$@
-
--include $(CRT0_DIR)/obj/$(strip $(1))-crt0.d
-endef
 
 
 $(CRT0_DIR)/obj:

@@ -84,10 +84,13 @@ GFX81_TARGETS := $(ZX81_BASE_TARGETS)
 GFX81PHRG_TARGETS := target/zx81/obj/target-zx81-zx81phrg classic/gfx/obj/.stamp-zx81-phrg
 GFX81UDG_TARGETS := target/zx81/obj/target-zx81-zx81udg classic/gfx/obj/.stamp-zx81-udg
 GFX81HR64_TARGETS := target/zx81/obj/target-zx81-zx81hr64 classic/gfx/obj/.stamp-zx81-hr64
+GFX81ARX64_TARGETS := target/zx81/obj/target-zx81-zx81arx64 classic/gfx/obj/.stamp-zx81-hr64
 GFX81G64_TARGETS := target/zx81/obj/target-zx81-zx81g64 classic/gfx/obj/.stamp-zx81-g64
 GFX81MT64_TARGETS := target/zx81/obj/target-zx81-zx81mt64 classic/gfx/obj/.stamp-zx81-mt64
 GFX81HR128_TARGETS := target/zx81/obj/target-zx81-zx81hr128 classic/gfx/obj/.stamp-zx81-hr128
+GFX81ARX128_TARGETS := target/zx81/obj/target-zx81-zx81arx128 classic/gfx/obj/.stamp-zx81-hr128
 GFX81HR192_TARGETS := target/zx81/obj/target-zx81-zx81hr192 classic/gfx/obj/.stamp-zx81-hr192
+GFX81ARX192_TARGETS := target/zx81/obj/target-zx81-zx81arx192 classic/gfx/obj/.stamp-zx81-hr192
 GFX81MT192_TARGETS := target/zx81/obj/target-zx81-zx81mt192 classic/gfx/obj/.stamp-zx81-mt192
 GFX81G007_TARGETS := target/zx81/obj/target-zx81-zx81g007 classic/gfx/obj/.stamp-zx81-g007
 GFX81HR384_TARGETS := target/zx81/obj/target-zx81-zx81hr384 classic/gfx/obj/.stamp-zx81-hr384
@@ -120,7 +123,7 @@ TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81
 define buildzx81asm
 target/zx81/obj/target-zx81-$(2): $(3)
 	$(Q)mkdir -p target/zx81/obj/$(2)
-	$(Q)$(ASSEMBLER) -d -O=target/zx81/obj/$(2)/x -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/zx81 -I$(Z88DK_LIB) -I$(Z88DK_LIB)/target/zx81/def -Itarget/zx81 -Itarget/zx81/obj/$(2) -I$(Z88DK_LIBSRC)/classic $(4) -I$(Z88DK_LIB) -D__CLASSIC -DFOR$(2) $(1)
+	$(Q)$(ASSEMBLER) -d -O=target/zx81/obj/$(2)/x -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/zx81 -I$(Z88DK_LIB) -I$(Z88DK_LIBSRC)/target/zx81/def -Itarget/zx81 -Itarget/zx81/obj/$(2) -I$(Z88DK_LIBSRC)/classic $(4) -I$(Z88DK_LIB) -D__CLASSIC -DFOR$(2) $(5) $(1)
 	$(Q)touch $$@
 endef
 $(eval $(call buildzx81asm,$(ZX81_BASE_GLOBS),zx81,$(ZX81_BASE_GLOBS_ex),-IXIY))
@@ -128,10 +131,13 @@ $(eval $(call buildzx81asm,$(ZX81_PHRG_GLOBS),zx81phrg,$(ZX81_PHRG_GLOBS_ex),-IX
 $(eval $(call buildzx81asm,$(ZX81_BASE_GLOBS),lambda,$(ZX81_BASE_GLOBS_ex),-IXIY))
 $(eval $(call buildzx81asm,$(ZX81_UDG_GLOBS),zx81udg,$(ZX81_UDG_GLOBS_ex),-IXIY))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr64,$(ZX81_HR_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81arx64,$(ZX81_HR_GLOBS_ex),-IXIY -DFORzx81hr64,-DARX816))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81g64,$(ZX81_HR_GLOBS_ex),-IXIY -DG007))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81mt64,$(ZX81_HR_GLOBS_ex),-IXIY -DMTHRG))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr128,$(ZX81_HR_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81arx128,$(ZX81_HR_GLOBS_ex),-IXIY -DFORzx81hr128,-DARX816))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr192,$(ZX81_HR_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81arx192,$(ZX81_HR_GLOBS_ex),-IXIY -DFORzx81hr192,-DARX816))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81mt192,$(ZX81_HR_GLOBS_ex),-IXIY -DMTHRG))
 $(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81g007,$(ZX81_HR_GLOBS_ex),-IXIY -DG007))
 $(eval $(call buildzx81asm,$(ZX81_HRI_GLOBS),zx81hr384,$(ZX81_HRI_GLOBS_ex),-IXIY))
@@ -160,8 +166,8 @@ gfx81hr64.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81HR64_TARGETS)
 	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
 	@touch $@
 
-gfx81arx64.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81HR64_TARGETS)
-	TARGET=zx81hr64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx64 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+gfx81arx64.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81ARX64_TARGETS)
+	TARGET=zx81hr64 ARX_TARGET=zx81arx64 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr64 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx64 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
 	@touch $@
 
 gfx81g064.lib: $(TARGET_CLIB_DEPS) gfx81udg.lib $(GFX81G64_TARGETS)
@@ -176,16 +182,16 @@ gfx81hr128.lib: $(TARGET_CLIB_DEPS) gfx81hr64.lib $(GFX81HR128_TARGETS)
 	TARGET=zx81hr128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -x$(OUTPUT_DIRECTORY)/gfx81hr128 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
 	@touch $@
 
-gfx81arx128.lib: $(TARGET_CLIB_DEPS) gfx81hr64.lib $(GFX81HR128_TARGETS)
-	TARGET=zx81hr128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx128 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+gfx81arx128.lib: $(TARGET_CLIB_DEPS) gfx81hr64.lib $(GFX81ARX128_TARGETS)
+	TARGET=zx81hr128 ARX_TARGET=zx81arx128 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr128 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx128 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
 	@touch $@
 
 gfx81hr192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81HR192_TARGETS)
 	TARGET=zx81hr192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(TARGET_DIRECTORY)/zx81/gfx81hr.lst
 	@touch $@
 
-gfx81arx192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81HR192_TARGETS)
-	TARGET=zx81hr192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
+gfx81arx192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81ARX192_TARGETS)
+	TARGET=zx81hr192 ARX_TARGET=zx81arx192 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81hr192 -DARX816 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(TARGET_DIRECTORY)/zx81/gfx81arx.lst
 	@touch $@
 
 gfx81mt192.lib: $(TARGET_CLIB_DEPS) gfx81hr128.lib $(GFX81MT192_TARGETS)
