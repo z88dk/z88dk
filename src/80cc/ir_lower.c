@@ -1536,6 +1536,127 @@ static int xline_c_call(const char *line)
     return p[0] == '_' && p[1] != '_' && p[1] != 0;
 }
 
+/* IR_BCFLOW: follow intra-function branches when deciding BC liveness in the
+   park sweep. Without it every branch is treated as "a successor may read BC",
+   which keeps a stash alive that the target provably never reads — 64 of the
+   151 `ld bc,hl` left on emu.c reach a branch to a LOCAL label. See
+   bc_live_at_labels().
+
+   Corpus -248 B over 47 cells with ZERO larger, every CPU smaller (8080 -36,
+   8085 -32, z80/z80n/z180/rabbit/kc160 -24, ez80 -20, gbz80 -16); emu.c -157 B
+   sp / -149 fp, clisp -381, adv_a -16. Ticks -0.0278% on the z80 corpus, 4
+   cells faster and 0 slower -- it only ever deletes an instruction.
+   IR_BCFLOW=0 opts out, byte-identical to the pre-flip compiler.
+   IR_BCFLOW_DBG=1 reports the label count and how many have BC dead. */
+static int  bcflow_on = -1;
+static int  bcflow_enabled(void)
+{
+    if (bcflow_on < 0) {
+        const char *e = getenv("IR_BCFLOW");
+        bcflow_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+    }
+    return bcflow_on;
+}
+
+/* [IR_BCFLOW] Is this line a label of the form `name:` at column 0? */
+static int xline_label(const char *l, char *out, size_t n)
+{
+    if (*l == '\t' || *l == ' ' || *l == ';' || *l == '.' || *l == '\n') return 0;
+    size_t i = 0;
+    while (l[i] && l[i] != ':' && l[i] != '\n' && l[i] != ' ' && l[i] != '\t') i++;
+    if (l[i] != ':' || i == 0 || i >= n) return 0;
+    memcpy(out, l, i); out[i] = 0;
+    return 1;
+}
+
+/* [IR_BCFLOW] The branch target of `l`, or NULL. Handles `jp L`, `jr cc,L` and
+   `djnz L`; an indirect `jp (hl)` has no static target and answers NULL, which
+   the caller must treat as "unknown, assume live". */
+static int xline_branch_target(const char *l, char *out, size_t n)
+{
+    const char *p = l;
+    if (*p != '\t') return 0;
+    p++;
+    int is_jp = !strncmp(p, "jp", 2) && (p[2] == '\t' || p[2] == ' ');
+    int is_jr = !strncmp(p, "jr", 2) && (p[2] == '\t' || p[2] == ' ');
+    int is_dj = !strncmp(p, "djnz", 4) && (p[4] == '\t' || p[4] == ' ');
+    if (!is_jp && !is_jr && !is_dj) return 0;
+    p += is_dj ? 4 : 2;
+    while (*p == '\t' || *p == ' ') p++;
+    const char *comma = strchr(p, ',');
+    if (comma) { p = comma + 1; while (*p == '\t' || *p == ' ') p++; }
+    if (*p == '(') return 0;                  /* jp (hl) / (ix) / (iy) */
+    size_t i = 0;
+    while (p[i] && p[i] != '\n' && p[i] != '\r' && p[i] != ' ' && p[i] != '\t'
+           && p[i] != ';' && i + 1 < n) { out[i] = p[i]; i++; }
+    out[i] = 0;
+    return i > 0;
+}
+
+/* [IR_BCFLOW] BC liveness at every label, by iterating the backward transfer to
+   a fixpoint. Starts optimistic (dead everywhere) and only ever adds liveness,
+   so it converges; the iteration cap is a belt-and-braces bail that answers
+   "live" for anything unsettled. The transfer mirrors the sweep's own, which is
+   why the two must be changed together.
+
+   A switch arm reached only through `jp (hl)` is not a problem: its live-in is
+   computed by the linear backward walk through the arm itself, and the recorded
+   value is consulted only by branches that name it. */
+static void bc_live_at_labels(char **lines, int n, char **lbl,
+                              int nlbl, char *lb, char *lc, char *lf)
+{
+    for (int iter = 0; iter < 8; iter++) {
+        int changed = 0;
+        int b_live = 0, c_live = 0, f_live = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            char nm[64];
+            if (xline_label(lines[i], nm, sizeof nm)) {
+                for (int k = 0; k < nlbl; k++)
+                    if (!strcmp(lbl[k], nm)) {
+                        if ((lb[k] | b_live) != lb[k]) { lb[k] |= (char)b_live; changed = 1; }
+                        if ((lc[k] | c_live) != lc[k]) { lc[k] |= (char)c_live; changed = 1; }
+                        if ((lf[k] | f_live) != lf[k]) { lf[k] |= (char)f_live; changed = 1; }
+                        break;
+                    }
+                continue;
+            }
+            InstrEffects e = instr_effects(lines[i]);
+            char tgt[64];
+            int has_tgt = xline_branch_target(lines[i], tgt, sizeof tgt);
+            if (e.is_boundary) { b_live = c_live = f_live = 0; continue; }
+            if (has_tgt) {
+                int tb = 1, tc = 1, tf = 1, found = 0;
+                for (int k = 0; k < nlbl; k++)
+                    if (!strcmp(lbl[k], tgt)) { tb = lb[k]; tc = lc[k]; tf = lf[k];
+                                                found = 1; break; }
+                if (!found) { tb = tc = tf = 1; }   /* target outside this buffer */
+                /* A conditional branch also falls through; djnz READS B; a
+                   conditional branch READS F. */
+                int cond = strchr(lines[i], ',') != NULL;
+                int dj   = !strncmp(lines[i] + 1, "djnz", 4);
+                b_live = (cond || dj) ? (tb | b_live) : tb;
+                c_live = cond ? (tc | c_live) : tc;
+                f_live = cond ? 1 : tf;
+                if (dj) b_live = 1;
+                continue;
+            }
+            if (e.is_call) {   /* call/rst, or an indirect jump */
+                if (xline_c_call(lines[i]) && bccall_enabled())
+                     { b_live = c_live = f_live = 0; }
+                else { b_live = c_live = f_live = 1; }
+                continue;
+            }
+            if (xora_line_reads_f(lines[i]))   f_live = 1;
+            else if (e.writes & IR_R_F)        f_live = 0;
+            if (e.park) { b_live = c_live = 0; continue; }
+            b_live = e.b_read ? 1 : (e.b_write ? 0 : b_live);
+            c_live = e.c_read ? 1 : (e.c_write ? 0 : c_live);
+        }
+        if (!changed) return;
+    }
+    for (int k = 0; k < nlbl; k++) { lb[k] = 1; lc[k] = 1; lf[k] = 1; }  /* unsettled */
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -1574,6 +1695,34 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
            seen nothing yet. */
         int f_live = 1;
         int do_xora = xora_enabled();
+        /* [IR_BCFLOW] Label table + BC liveness at each label, so a branch can
+           be followed instead of assumed to read BC. */
+        char **lbl = NULL; char *lb = NULL, *lc = NULL, *lf = NULL;
+        int nlbl = 0, bcflow = bcflow_enabled();
+        if (bcflow) {
+            lbl = calloc((size_t)(n > 0 ? n : 1), sizeof *lbl);
+            lb  = calloc((size_t)(n > 0 ? n : 1), 1);
+            lc  = calloc((size_t)(n > 0 ? n : 1), 1);
+            lf  = calloc((size_t)(n > 0 ? n : 1), 1);
+            if (!lbl || !lb || !lc || !lf) bcflow = 0;
+            else {
+                for (int i = 0; i < n; i++) {
+                    char nm[64];
+                    if (xline_label(lines[i], nm, sizeof nm)) {
+                        lbl[nlbl] = strdup(nm);
+                        if (!lbl[nlbl]) { bcflow = 0; break; }
+                        nlbl++;
+                    }
+                }
+            }
+            if (bcflow) bc_live_at_labels(lines, n, lbl, nlbl, lb, lc, lf);
+            if (getenv("IR_BCFLOW_DBG")) {
+                int dead = 0;
+                for (int k = 0; k < nlbl; k++) if (!lb[k] && !lc[k]) dead++;
+                fprintf(stderr, "BCFLOW lines=%d labels=%d bc-dead-labels=%d\n",
+                        n, nlbl, dead);
+            }
+        }
         int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
         int de_rewrite = !opt_disabled("de-park");
         int de_sweep   = (de_verify || de_rewrite);
@@ -1614,6 +1763,7 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 i -= 3;
                 continue;
             }
+            char bftgt[64];
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
             /* [IR_XORA] f_live here is the answer for the code AFTER line i,
                which is exactly what decides whether defining F costs anything.
@@ -1627,6 +1777,16 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                same `_sym` discriminator, so an asm-linkage call stays a reader.
                Checked first: xora_line_reads_f calls every branch a reader. */
             if (xline_c_call(lines[i]) && bccall_enabled()) f_live = 0;
+            /* [IR_BCFLOW] An UNCONDITIONAL branch to a label in this function
+               reads no flags — take the target's. A conditional one reads F by
+               definition and stays a reader. */
+            else if (bcflow && !strchr(lines[i], ',')
+                     && xline_branch_target(lines[i], bftgt, sizeof bftgt)) {
+                int tf = 1;
+                for (int k = 0; k < nlbl; k++)
+                    if (!strcmp(lbl[k], bftgt)) { tf = lf[k]; break; }
+                f_live = tf;
+            }
             else if (xora_line_reads_f(lines[i]))   f_live = 1;
             else if (e.is_boundary)            f_live = 0;   /* bare ret: F dead */
             else if (e.writes & IR_R_F)        f_live = 0;
@@ -1644,6 +1804,20 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                asm-linkage call, a conditional call) stays conservative. */
             else if (call && xline_c_call(lines[i]) && bccall_enabled())
                           { b_live = c_live = 0; }
+            /* [IR_BCFLOW] A branch to a label in this function is not a black
+               box: take the liveness the fixpoint computed for its target (plus
+               the fall-through for a conditional, and B for djnz). */
+            else if (call && bcflow
+                     && xline_branch_target(lines[i], bftgt, sizeof bftgt)) {
+                int tb = 1, tc = 1;
+                for (int k = 0; k < nlbl; k++)
+                    if (!strcmp(lbl[k], bftgt)) { tb = lb[k]; tc = lc[k]; break; }
+                int cond = strchr(lines[i], ',') != NULL;
+                int dj   = !strncmp(lines[i] + 1, "djnz", 4);
+                b_live = (cond || dj) ? (tb | b_live) : tb;
+                c_live = cond ? (tc | c_live) : tc;
+                if (dj) b_live = 1;
+            }
             else if (call){ b_live = c_live = 1; }
             else if (park) {
                 if (!b_live && !c_live) drop[i] = 1;
@@ -1655,6 +1829,8 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             d_live = e.d_read ? 1 : (e.d_write ? 0 : d_live);
             e_live = e.e_read ? 1 : (e.e_write ? 0 : e_live);
         }
+        for (int k = 0; k < nlbl; k++) free(lbl[k]);
+        free(lbl); free(lb); free(lc); free(lf);
     }
     for (int i = 0; i < n; i++) {
         if (!drop || !drop[i]) fputs(lines[i], out);

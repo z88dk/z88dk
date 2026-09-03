@@ -1776,6 +1776,11 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
         return 0;
     }
     if (src_w == 2 && dst_w == 2) {
+        /* UNREACHABLE in practice — the frontend folds a same-width conversion
+           and never emits CONV_TRUNC for it. Instrumented 2026-09-03 across the
+           28-bench corpus, the whole long_ir suite, emu.c and clisp: zero hits.
+           So do not bother giving this the commit_hl_result treatment the 4->2
+           case below gets; it was tried and is worth exactly nothing. */
         load_to_hl(out, f, op->src[0]);
         store_hl(out, f, op->dst);
         return 0;
