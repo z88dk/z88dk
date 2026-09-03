@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -395,16 +395,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -424,8 +424,8 @@ ENDIF
 ; ---------------------------------
 _m32_asinhf:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	c, l
 	ld	b, h
 	ld	hl, -12
@@ -440,14 +440,22 @@ _m32_asinhf:
 	ld	e,(ix-2)
 	ld	d,(ix-1)
 	call	_m32_fabsf
-	call	_m32_mul2f
 	ex	(sp), hl
 	ld	(ix-10),e
 	ld	(ix-9),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	call	_m32_mul2f
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	pop	hl
+	pop	de
+	push	de
+	push	hl
 	call	_m32_sqrf
 	ld	bc,0x3f80
 	push	bc
@@ -457,15 +465,22 @@ _m32_asinhf:
 	push	hl
 	call	___fsadd_callee
 	call	_m32_sqrtf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
-	call	_m32_fabsf
+	ld	c,(ix-10)
+	ld	b,(ix-9)
+	push	bc
+	ld	c,(ix-12)
+	ld	b,(ix-11)
+	push	bc
+	push	de
+	push	hl
+	call	___fsadd_callee
+	push	de
+	push	hl
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fsdiv_callee
 	push	de
 	push	hl
 	ld	l,(ix-6)
@@ -475,17 +490,28 @@ _m32_asinhf:
 	ld	h,(ix-7)
 	push	hl
 	call	___fsadd_callee
-	call	_m32_invf
-	push	de
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	call	___fsadd_callee
 	call	_m32_logf
+	push	hl
+	push	de
+	ld	bc,0x0000
+	push	bc
+	push	bc
+	ld	c,(ix-2)
+	ld	b,(ix-1)
+	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	call	___fslt_callee
+	ld	a, l
+	pop	de
+	pop	hl
+	or	a, a
+	jr	z,l_m32_asinhf_00103
+	ld	a, d
+	xor	a,0x80
+	ld	d, a
+l_m32_asinhf_00103:
 	ld	sp, ix
 	pop	ix
 	ret

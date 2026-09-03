@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_atanhf.c"
@@ -262,6 +262,102 @@
 ._m32_atanhf
 	push	de
 	push	hl
+	add	sp,-4
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_ge
+	ld	a,h
+	or	l
+	jp	nz,i_3	;
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,49024
+	call	l_f32_le
+	ld	a,h
+	or	l
+	jr	z,i_4
+.i_3
+	ld	hl,1	;const
+.i_4
+	ld	a,h
+	or	l
+	jp	z,i_2	;
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	ld	hl,sp+0
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),128
+	inc	hl
+	ld	(hl),127
+	ld	hl,sp+0
+	call	l_glong
+	add	sp,8
+	ret
+
+
+.i_5
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,49024
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_6	;
+	ld	hl,sp+0
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),128
+	inc	hl
+	ld	(hl),255
+	ld	hl,sp+0
+	call	l_glong
+	add	sp,8
+	ret
+
+
+.i_6
+	ld	hl,sp+0
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	ld	hl,sp+0
+	call	l_glong
+	add	sp,8
+	ret
+
+
+.i_2
+	ld	hl,sp+4
+	call	l_glong
 	push	de
 	push	hl
 	ld	hl,0	;const
@@ -269,7 +365,7 @@
 	call	l_f32_add
 	push	de
 	push	hl
-	ld	hl,sp+4
+	ld	hl,sp+8
 	call	l_glong
 	ld	bc,16256
 	push	bc
@@ -279,7 +375,7 @@
 	call	l_f32_div
 	call	_m32_div2f
 	call	_m32_logf
-	add	sp,4
+	add	sp,8
 	ret
 
 

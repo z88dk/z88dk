@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Mon Aug 31 20:47:55 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_atanhf.c"
@@ -206,10 +206,12 @@
 	C_LINE	212,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	216,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	218,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	223,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	222,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	224,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	225,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	236,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	229,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	230,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	231,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	242,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	37,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"m32_math.h"
 	C_LINE	37,"m32_math.h"
@@ -260,14 +262,121 @@
 ._m32_atanhf
 	push	de
 	push	hl
-	push	de
-	push	hl
+	push	bc
+	push	bc
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_ge
+	ld	a,h
+	or	l
+	jp	nz,i_3	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,49024
+	call	l_f32_le
+	ld	a,h
+	or	l
+	jr	z,i_4
+.i_3
+	ld	hl,1	;const
+.i_4
+	ld	a,h
+	or	l
+	jp	z,i_2	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	ld	hl,0	;const
+	add	hl,sp
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),128
+	inc	hl
+	ld	(hl),127
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_5
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,49024
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_6	;
+	ld	hl,0	;const
+	add	hl,sp
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),128
+	inc	hl
+	ld	(hl),255
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_6
+	ld	hl,0	;const
+	add	hl,sp
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_2
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
 	ld	hl,0	;const
 	ld	de,16256
 	call	l_f32_add
 	push	de
 	push	hl
-	ld	hl,4	;const
+	ld	hl,8	;const
 	add	hl,sp
 	call	l_glong
 	ld	bc,16256
@@ -278,6 +387,8 @@
 	call	l_f32_div
 	call	_m32_div2f
 	call	_m32_logf
+	pop	bc
+	pop	bc
 	pop	bc
 	pop	bc
 	ret
@@ -419,6 +530,8 @@
 	GLOBAL	fmod_callee
 	GLOBAL	hypot
 	GLOBAL	hypot_callee
+	GLOBAL	poly
+	GLOBAL	poly_callee
 	GLOBAL	atof
 	GLOBAL	ftoa
 	GLOBAL	ftoe

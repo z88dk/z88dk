@@ -28,7 +28,7 @@ float m32_atanf (float f) __z88dk_fastcall
     if((val = m32_fabsf(f)) == 0.0)
         return 0.0;
     if(recip = (val > 1.0))
-        val = m32_invf(val);
+        val = 1.0/val;
     val = m32_polyf(val, m32_coeff_atan, 7);
     if(recip)
         val = M_PI_2 - val;

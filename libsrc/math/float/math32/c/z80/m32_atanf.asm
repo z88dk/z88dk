@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -396,16 +396,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -425,8 +425,8 @@ ENDIF
 ; ---------------------------------
 _m32_atanf:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	c, l
 	ld	b, h
 	ld	hl, -9
@@ -451,7 +451,7 @@ _m32_atanf:
 	or	a, e
 	or	a, b
 	or	a, c
-	jr	NZ,l_m32_atanf_00102
+	jr	nz,l_m32_atanf_00102
 	ld	hl,0x0000
 	ld	e,l
 	ld	d,h
@@ -474,12 +474,21 @@ l_m32_atanf_00102:
 	ld	(ix-5),l
 	ld	a,l
 	or	a, a
-	jr	Z,l_m32_atanf_00104
+	jr	z,l_m32_atanf_00104
+	pop	de
 	pop	hl
 	push	hl
-	ld	e,(ix-7)
-	ld	d,(ix-6)
-	call	_m32_invf
+	push	de
+	ex	de,hl
+	pop	hl
+	push	hl
+	push	de
+	push	hl
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fsdiv_callee
 	ex	(sp), hl
 	ld	(ix-7),e
 	ld	(ix-6),d
@@ -497,7 +506,7 @@ l_m32_atanf_00104:
 	call	_m32_polyf
 	ld	a,(ix-5)
 	or	a, a
-	jr	Z,l_m32_atanf_00106
+	jr	z,l_m32_atanf_00106
 	push	de
 	push	hl
 	ld	hl,0x3fc9
@@ -522,7 +531,7 @@ l_m32_atanf_00106:
 	pop	de
 	pop	hl
 	or	a, a
-	jr	Z,l_m32_atanf_00109
+	jr	z,l_m32_atanf_00109
 	ld	a, d
 	xor	a,0x80
 	ld	d, a

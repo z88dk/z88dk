@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:57 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_acoshf.c"
@@ -262,14 +262,42 @@
 ._m32_acoshf
 	push	de
 	push	hl
-	call	_m32_mul2f
-	push	de
-	push	hl
+	add	sp,-4
 	ld	hl,sp+4
 	call	l_glong
 	push	de
 	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_2	;
+	ld	hl,sp+0
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	ld	hl,sp+0
+	call	l_glong
+	add	sp,8
+	ret
+
+
+.i_2
+	ld	hl,sp+4
+	call	l_glong
+	call	_m32_mul2f
+	push	de
+	push	hl
 	ld	hl,sp+8
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,sp+12
 	call	l_glong
 	call	_m32_sqrf
 	push	de
@@ -279,10 +307,14 @@
 	call	l_f32_sub
 	call	_m32_sqrtf
 	call	l_f32_add
-	call	_m32_invf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
 	call	l_f32_sub
 	call	_m32_logf
-	add	sp,4
+	add	sp,8
 	ret
 
 

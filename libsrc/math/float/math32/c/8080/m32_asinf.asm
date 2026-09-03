@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Mon Aug 31 20:47:55 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_asinf.c"
@@ -206,10 +206,12 @@
 	C_LINE	212,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	216,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	218,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	223,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	222,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	224,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	225,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	236,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	229,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	230,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	231,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	242,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	37,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"m32_math.h"
 	C_LINE	37,"m32_math.h"
@@ -267,7 +269,7 @@
 	ld	hl,8	;const
 	add	hl,sp
 	call	l_glong
-	call	fabs_fastcall
+	call	_m32_fabsf
 	push	de
 	push	hl
 	ld	hl,0	;const
@@ -276,9 +278,7 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	push	bc
-	push	bc
-	ld	hl,0	;const
+	ld	hl,4	;const
 	add	hl,sp
 	ld	(hl),255
 	inc	hl
@@ -287,12 +287,12 @@
 	ld	(hl),255
 	inc	hl
 	ld	(hl),255
-	ld	hl,0	;const
+	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong
 	ld	b,h
 	ld	c,l
-	ld	hl,16	;const
+	ld	hl,12	;const
 	add	hl,sp
 	ld	sp,hl
 	ld	h,b
@@ -322,8 +322,13 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong
-	call	l_f32_div
-	call	_m32_atanf
+	push	de
+	push	hl
+	call	_m32_atan2f
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	ld	b,h
 	ld	c,l
 	ld	hl,12	;const
@@ -470,6 +475,8 @@
 	GLOBAL	fmod_callee
 	GLOBAL	hypot
 	GLOBAL	hypot_callee
+	GLOBAL	poly
+	GLOBAL	poly_callee
 	GLOBAL	atof
 	GLOBAL	ftoa
 	GLOBAL	ftoe

@@ -577,6 +577,20 @@ void test_math32_edges()
     Assert(r.f >= (FLOAT)(-1.0) && r.f <= vo, "sin(10000) in [-1,1]");
     r.f = cos((FLOAT)10000.0);
     Assert(r.f >= (FLOAT)(-1.0) && r.f <= vo, "cos(10000) in [-1,1]");
+
+    Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
+    Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
+    Assert(approx_equal(asin((FLOAT)1.0), (FLOAT)M_PI_2, EPSILON), "asin(1) is pi/2");
+    Assert(approx_equal(asin((FLOAT)(-1.0)), (FLOAT)(-M_PI_2), EPSILON), "asin(-1) is -pi/2");
+    Assert(approx_equal(asinh((FLOAT)(-1.0)), -asinh((FLOAT)1.0), EPSILON), "asinh is odd");
+    Assert(approx_equal(POW((FLOAT)(-2.0), (FLOAT)3.0), (FLOAT)(-8.0), EPSILON), "pow(-2,3) is -8");
+    Assert(POW((FLOAT)(-2.0), (FLOAT)2.0) == (FLOAT)4.0, "pow(-2,2) is 4");
+
+    a.f = acosh((FLOAT)0.5);
+    Assert(((a.u & 0x7f800000ul) == 0x7f800000ul) && (a.u & 0x007ffffful), "acosh(0.5) is NaN");
+    a.f = (FLOAT)0.0;
+    r.f = log(a.f);
+    Assert(r.u == 0xff800000ul, "log(0) is -Inf");
 }
 #endif
 

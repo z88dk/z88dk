@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_log2f.c"
@@ -275,18 +275,31 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	add	sp,-4
-	ld	hl,sp+0
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	inc	hl
-	ld	(hl),255
-	ld	hl,sp+0
+	ld	hl,sp+10
+	push	hl
+	ld	hl,sp+16
 	call	l_glong
-	add	sp,22
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_3	;
+	ld	hl,0	;const
+	ld	de,65408
+	jp	i_4	;
+.i_3
+	ld	hl,65535	;const
+	ld	de,65535
+.i_4
+	pop	bc
+	call	l_plong
+	ld	hl,sp+10
+	call	l_glong
+	add	sp,18
 	ret
 
 
@@ -310,7 +323,7 @@
 	call	l_f32_lt
 	ld	a,h
 	or	l
-	jp	z,i_3	;
+	jp	z,i_5	;
 	pop	hl
 	dec	hl
 	push	hl
@@ -325,8 +338,8 @@
 	call	l_f32_sub
 	pop	bc
 	call	l_plong
-	jp	i_4	;EOS
-.i_3
+	jp	i_6	;EOS
+.i_5
 	ld	hl,sp+14
 	push	hl
 	call	l_glong
@@ -337,7 +350,7 @@
 	call	l_f32_sub
 	pop	bc
 	call	l_plong
-.i_4
+.i_6
 	ld	hl,sp+2
 	push	hl
 	ld	hl,sp+16

@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Mon Aug 31 20:47:55 2026
+;	Module compile time: Fri Sep  4 00:14:29 2026
 
 
 	C_LINE	0,"m32_asinhf.c"
@@ -206,10 +206,12 @@
 	C_LINE	212,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	216,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	218,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	223,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	222,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	224,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	225,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	236,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	229,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	230,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	231,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	242,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	37,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"m32_math.h"
 	C_LINE	37,"m32_math.h"
@@ -260,11 +262,29 @@
 ._m32_asinhf
 	push	de
 	push	hl
+	push	bc
+	push	bc
+	push	bc
+	push	bc
+	ld	hl,4	;const
+	add	hl,sp
+	push	hl
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong
 	call	_m32_fabsf
+	pop	bc
+	call	l_plong
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
 	call	_m32_mul2f
 	push	de
 	push	hl
-	ld	hl,4	;const
+	ld	hl,10	;const
 	add	hl,sp
 	call	l_glong
 	call	_m32_sqrf
@@ -276,16 +296,48 @@
 	call	_m32_sqrtf
 	push	de
 	push	hl
-	ld	hl,8	;const
+	ld	hl,14	;const
 	add	hl,sp
 	call	l_glong
-	call	_m32_fabsf
 	call	l_f32_add
-	call	_m32_invf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
 	call	l_f32_add
 	call	_m32_logf
 	pop	bc
-	pop	bc
+	call	l_plong
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_2	;
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,d
+	xor	128
+	ld	d,a
+	jp	i_3	;
+.i_2
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+.i_3
+	ld	b,h
+	ld	c,l
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	h,b
+	ld	l,c
 	ret
 
 
@@ -425,6 +477,8 @@
 	GLOBAL	fmod_callee
 	GLOBAL	hypot
 	GLOBAL	hypot_callee
+	GLOBAL	poly
+	GLOBAL	poly_callee
 	GLOBAL	atof
 	GLOBAL	ftoa
 	GLOBAL	ftoe

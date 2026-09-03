@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -396,16 +396,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -425,8 +425,8 @@ ENDIF
 ; ---------------------------------
 _m32_log2f:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	c, l
 	ld	b, h
 	ld	hl, -18
@@ -447,16 +447,35 @@ _m32_log2f:
 	push	hl
 	call	___fslt_callee
 	bit	0,l
-	jr	NZ,l_m32_log2f_00102
+	jr	nz,l_m32_log2f_00102
+	ld	hl,0
+	add	hl, sp
+	ld	a,(ix-3)
+	and	a,0x7f
+	or	a,(ix-4)
+	or	a,(ix-5)
+	or	a,(ix-6)
+	jr	nz,l_m32_log2f_00108
+	xor	a, a
+	ld	c, a
+	ld	de,0xff80
+	jr	l_m32_log2f_00109
+l_m32_log2f_00108:
 	ld	a,0xff
-	ld	(ix-18),a
-	ld	(ix-17),a
-	ld	(ix-16),a
-	ld	(ix-15),a
+	ld	c,0xff
+	ld	de,0xffff
+l_m32_log2f_00109:
+	ld	(hl), a
+	inc	hl
+	ld	(hl), c
+	inc	hl
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
 	pop	hl
+	pop	de
+	push	de
 	push	hl
-	ld	e,(ix-16)
-	ld	d,(ix-15)
 	jp	l_m32_log2f_00106
 l_m32_log2f_00102:
 	ld	hl,16
@@ -485,7 +504,7 @@ l_m32_log2f_00102:
 	pop	bc
 	ld	a,(ix-3)
 	or	a, a
-	jr	Z,l_m32_log2f_00104
+	jr	z,l_m32_log2f_00104
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	dec	hl
@@ -524,38 +543,42 @@ l_m32_log2f_00105:
 	ld	e,(ix-12)
 	ld	d,(ix-11)
 	call	_m32_sqrf
-	ld	(ix-10),l
-	ld	(ix-9),h
-	ld	(ix-8),e
-	ld	(ix-7),d
-	ld	hl,0x0009
 	push	hl
-	ld	hl,_m32_coeff_logf
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
+	push	de
+	ld	bc,0x0009
+	push	bc
+	ld	bc,_m32_coeff_logf
+	push	bc
+	ld	c,(ix-12)
+	ld	b,(ix-11)
+	push	bc
+	ld	c,(ix-14)
+	ld	b,(ix-13)
+	push	bc
 	call	_m32_polyf
-	ld	c,(ix-8)
-	ld	b,(ix-7)
-	push	bc
-	ld	c,(ix-10)
-	ld	b,(ix-9)
-	push	bc
+	ld	(ix-6),l
+	ld	(ix-5),h
+	ld	(ix-4),e
+	ld	(ix-3),d
+	pop	de
+	pop	hl
+	push	hl
+	push	de
 	push	de
 	push	hl
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	ld	c,(ix-6)
+	ld	b,(ix-5)
+	push	bc
 	call	___fsmul_callee
 	ld	(ix-6),l
 	ld	(ix-5),h
 	ld	(ix-4),e
 	ld	(ix-3),d
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	ld	e,(ix-8)
-	ld	d,(ix-7)
+	pop	de
+	pop	hl
 	call	_m32_div2f
 	push	de
 	push	hl

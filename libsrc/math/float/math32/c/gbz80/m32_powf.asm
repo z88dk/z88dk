@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Fri Sep  4 00:15:24 2026
 
 
 	C_LINE	0,"m32_powf.c"
@@ -261,7 +261,8 @@
 ; parameter 'double x' at sp+6 size(4)
 	C_LINE	35,"m32_powf.c::m32_powf::0::0"
 ._m32_powf
-	ld	hl,sp+2
+	add	sp,-16
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -274,29 +275,12 @@
 	jp	z,i_2	;
 	ld	hl,0	;const
 	ld	de,16256
+	add	sp,16
 	ret
 
 
 .i_2
-	ld	hl,sp+6
-	call	l_glong
-	push	de
-	push	hl
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	call	l_f32_le
-	ld	a,h
-	or	l
-	jp	z,i_3	;
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
-	ret
-
-
-.i_3
-	ld	hl,sp+2
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -305,14 +289,15 @@
 	call	l_f32_eq
 	ld	a,h
 	or	l
-	jp	z,i_4	;
-	ld	hl,sp+6
+	jp	z,i_3	;
+	ld	hl,sp+22
 	call	l_glong
+	add	sp,16
 	ret
 
 
-.i_4
-	ld	hl,sp+2
+.i_3
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -321,15 +306,31 @@
 	call	l_f32_eq
 	ld	a,h
 	or	l
-	jp	z,i_5	;
-	ld	hl,sp+6
+	jp	z,i_4	;
+	ld	hl,sp+22
 	call	l_glong
-	call	_m32_invf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
+	add	sp,16
 	ret
 
 
-.i_5
-	ld	hl,sp+2
+.i_4
+	ld	hl,sp+22
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_gt
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -339,14 +340,15 @@
 	ld	a,h
 	or	l
 	jp	z,i_6	;
-	ld	hl,sp+6
+	ld	hl,sp+22
 	call	l_glong
 	call	_m32_sqrtf
+	add	sp,16
 	ret
 
 
 .i_6
-	ld	hl,sp+2
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -356,14 +358,15 @@
 	ld	a,h
 	or	l
 	jp	z,i_7	;
-	ld	hl,sp+6
+	ld	hl,sp+22
 	call	l_glong
 	call	_m32_invsqrtf
+	add	sp,16
 	ret
 
 
 .i_7
-	ld	hl,sp+2
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -373,14 +376,15 @@
 	ld	a,h
 	or	l
 	jp	z,i_8	;
-	ld	hl,sp+6
+	ld	hl,sp+22
 	call	l_glong
 	call	_m32_sqrf
+	add	sp,16
 	ret
 
 
 .i_8
-	ld	hl,sp+2
+	ld	hl,sp+18
 	call	l_glong
 	push	de
 	push	hl
@@ -390,23 +394,205 @@
 	ld	a,h
 	or	l
 	jp	z,i_9	;
-	ld	hl,sp+6
+	ld	hl,sp+22
 	call	l_glong
 	call	_m32_sqrf
-	call	_m32_invf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
+	add	sp,16
 	ret
 
 
 .i_9
-	ld	hl,sp+6
+	ld	hl,sp+22
 	call	l_glong
 	call	_m32_logf
 	push	de
 	push	hl
-	ld	hl,sp+6
+	ld	hl,sp+22
 	call	l_glong
 	call	l_f32_mul
 	call	_m32_expf
+	add	sp,16
+	ret
+
+
+.i_5
+	ld	hl,sp+22
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_10	;
+	ld	hl,sp+18
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_gt
+	ld	a,h
+	or	l
+	jp	z,i_11	;
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	add	sp,16
+	ret
+
+
+.i_11
+	ld	hl,sp+12
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),128
+	inc	hl
+	ld	(hl),127
+	ld	hl,sp+12
+	call	l_glong
+	add	sp,16
+	ret
+
+
+.i_10
+	ld	hl,sp+18
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16384
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_12	;
+	ld	hl,sp+22
+	call	l_glong
+	call	_m32_sqrf
+	add	sp,16
+	ret
+
+
+.i_12
+	ld	hl,sp+18
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,49152
+	call	l_f32_eq
+	ld	a,h
+	or	l
+	jp	z,i_13	;
+	ld	hl,sp+22
+	call	l_glong
+	call	_m32_sqrf
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_div
+	add	sp,16
+	ret
+
+
+.i_13
+	ld	hl,sp+4
+	push	hl
+	ld	hl,sp+20
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,sp+14
+	push	hl
+	call	_m32_modff
+	add	sp,6
+	pop	bc
+	call	l_plong
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_ne
+	ld	a,h
+	or	l
+	jp	z,i_14	;
+	ld	hl,sp+12
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	inc	hl
+	ld	(hl),255
+	ld	hl,sp+12
+	call	l_glong
+	add	sp,16
+	ret
+
+
+.i_14
+	ld	hl,sp+0
+	push	hl
+	ld	hl,sp+24
+	call	l_glong
+	ld	a,d
+	xor	128
+	ld	d,a
+	call	_m32_logf
+	push	de
+	push	hl
+	ld	hl,sp+24
+	call	l_glong
+	call	l_f32_mul
+	call	_m32_expf
+	pop	bc
+	call	l_plong
+	ld	hl,sp+8
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16384
+	push	de
+	push	hl
+	call	_m32_fmodf
+	add	sp,8
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_ne
+	ld	a,h
+	or	l
+	jp	z,i_15	;
+	ld	hl,sp+0
+	push	hl
+	call	l_glong
+	ld	a,d
+	xor	128
+	ld	d,a
+	pop	bc
+	call	l_plong
+.i_15
+	ld	hl,sp+0
+	call	l_glong
+	add	sp,16
 	ret
 
 
