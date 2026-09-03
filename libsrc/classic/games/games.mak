@@ -39,12 +39,14 @@ endef
 
 define games_stamp
 classic/games/obj/.stamp-$(1): $(call games_objects,$(1),)
+	$(Q)mkdir -p $$(dir $$@)
 	$(Q)touch $$@
 $(if $(GAMES_RULE_$(1)),,$(eval GAMES_RULE_$(1) := 1)$(eval $(call games_object_rules,$(1),$(1),,$(1))))
 endef
 
 define games_stamp_args
 classic/games/obj/.stamp-$(1): $(call games_objects,$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))),$(call games_arg_subset,$(2)))
+	$(Q)mkdir -p $$(dir $$@)
 	$(Q)touch $$@
 $(if $(GAMES_RULE_$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2)))),,$(eval GAMES_RULE_$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))) := 1)$(eval $(call games_object_rules,$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))),$(call games_arg_target,$(2)),$(call games_arg_cflags,$(2)),$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))))))
 endef
