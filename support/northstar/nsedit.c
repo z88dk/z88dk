@@ -259,7 +259,7 @@ static void list_directory(FILE *fp)
         {
             if (dir[i].start_block==4) {
                 printf(
-                    "%-8s     4   %4u  [CPM]  %02Xh,%02Xh,%02Xh\n---------------------------\n",
+                    "%-8s     4   %4u  <boot> %02Xh,%02Xh,%02Xh\n---------------------------\n",
                     name,
                     dir[i].length,
                     meta0,
@@ -482,29 +482,16 @@ static int move_blocks(
 int compress_image(FILE *img)
 {
     NSDirEntry dir[DIR_ENTRIES];
+    NSDirEntry newdir[DIR_ENTRIES];
 
     long total_blocks;
-    uint8_t *image;
     long image_size;
 
-    if (!read_directory(img, dir))
-        return 0;
+    uint8_t *image;
+    uint8_t *new_image;
 
-    // Skip the unmovable portion in the directory
+    int protected_last = 0;
     uint16_t next_block = 4;
-
-    for (int i = 1; i < DIR_ENTRIES; i++)
-    {
-        if (dir[i].name[0] == ' ')
-            continue;
-
-        if (dir[i].start_block == 4)
-        {
-            next_block = dir[i].start_block +
-                         dir[i].length;
-            break;
-        }
-    }
 
     if (!read_directory(img, dir))
         return 0;
@@ -513,12 +500,8 @@ int compress_image(FILE *img)
     image_size = total_blocks * BLOCK_SIZE;
 
     image = malloc(image_size);
-
     if (!image)
-    {
-        fprintf(stderr, "Out of memory\n");
         return 0;
-    }
 
     rewind(img);
 
@@ -528,7 +511,7 @@ int compress_image(FILE *img)
         return 0;
     }
 
-    uint8_t *new_image = calloc(1, image_size);
+    new_image = calloc(1, image_size);
 
     if (!new_image)
     {
@@ -536,31 +519,85 @@ int compress_image(FILE *img)
         return 0;
     }
 
-    /* Preserve disk image and directory area*/
+    /* start from original image */
     memcpy(new_image, image, image_size);
 
+    /*
+        Protect all entries from the beginning
+        up to (and including) the entry
+        starting at block 4.
+    */
     for (int i = 1; i < DIR_ENTRIES; i++)
     {
         if (dir[i].name[0] == ' ')
             continue;
 
-        if (dir[i].start_block <= 4)
+        if (dir[i].start_block == 4)
+        {
+            protected_last = i;
+
+            next_block =
+                dir[i].start_block +
+                dir[i].length;
+
+            break;
+        }
+    }
+
+    /*
+        Collect movable entries.
+    */
+    int list[DIR_ENTRIES];
+    int count = 0;
+
+    for (int i = protected_last + 1;
+         i < DIR_ENTRIES;
+         i++)
+    {
+        if (dir[i].name[0] == ' ')
             continue;
 
-        uint16_t old_start =
-            dir[i].start_block;
+        list[count++] = i;
+    }
+
+    /*
+        Sort by physical position.
+    */
+    for (int a = 0; a < count - 1; a++)
+    {
+        for (int b = a + 1; b < count; b++)
+        {
+            if (dir[list[a]].start_block >
+                dir[list[b]].start_block)
+            {
+                int t = list[a];
+                list[a] = list[b];
+                list[b] = t;
+            }
+        }
+    }
+
+    /*
+        Relocate files.
+    */
+    for (int n = 0; n < count; n++)
+    {
+        int i = list[n];
 
         uint16_t len =
             dir[i].length;
 
         long old_offset =
-            (long)old_start * BLOCK_SIZE;
+            (long)dir[i].start_block *
+            BLOCK_SIZE;
 
         long new_offset =
-            (long)next_block * BLOCK_SIZE;
+            (long)next_block *
+            BLOCK_SIZE;
 
         long bytes =
-            (long)len * BLOCK_SIZE;
+            (long)len *
+            BLOCK_SIZE;
 
         if ((new_offset + bytes) > image_size)
         {
@@ -569,26 +606,55 @@ int compress_image(FILE *img)
             return 0;
         }
 
-        memmove(new_image + new_offset,
-                image + old_offset,
-                bytes);
+        memmove(
+            new_image + new_offset,
+            image + old_offset,
+            bytes);
 
         dir[i].start_block = next_block;
 
         next_block += len;
     }
 
-    /* write updated directory into memory image */
-    memcpy(new_image,
-           dir,
-           sizeof(dir));
+    /*
+        Rebuild directory.
+
+        Entries before the first
+        block-4 entry remain exactly
+        where they are.
+
+        All remaining live entries
+        are packed together.
+    */
+    memset(newdir, ' ', sizeof(newdir));
+
+    for (int i = 0;
+         i <= protected_last;
+         i++)
+    {
+        newdir[i] = dir[i];
+    }
+
+    int dst = protected_last + 1;
+
+    for (int n = 0; n < count; n++)
+    {
+        newdir[dst++] =
+            dir[list[n]];
+    }
+
+    memcpy(
+        new_image,
+        newdir,
+        sizeof(newdir));
 
     rewind(img);
 
-    if (fwrite(new_image,
-               1,
-               image_size,
-               img) != (size_t)image_size)
+    if (fwrite(
+            new_image,
+            1,
+            image_size,
+            img) != (size_t)image_size)
     {
         free(image);
         free(new_image);
@@ -602,6 +668,7 @@ int compress_image(FILE *img)
 
     return 1;
 }
+
 
 static void usage(void)
 {
