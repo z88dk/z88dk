@@ -24,7 +24,7 @@
         0 system file or not specified
         1 executable binary files
         2 BASIC programs
-        ? 3 BASIC DATA ?
+        3 BASIC DATA
 
 */
 
@@ -141,7 +141,7 @@ static int find_entry(
     for(int i=0;i<8 && name[i];i++)
         dosname[i]=name[i];
 
-    for(int i=1;i<DIR_ENTRIES;i++)
+    for(int i=0;i<DIR_ENTRIES;i++)
     {
         if(memcmp(dir[i].name,dosname,8)==0)
             return i;
@@ -363,7 +363,7 @@ static int insert_file(
         return 0;
     }
 
-    for(int i=1;i<DIR_ENTRIES;i++)
+    for(int i=0;i<DIR_ENTRIES;i++)
     {
         if(dir[i].name[0]==' ')
         {
@@ -527,7 +527,7 @@ int compress_image(FILE *img)
         up to (and including) the entry
         starting at block 4.
     */
-    for (int i = 1; i < DIR_ENTRIES; i++)
+    for (int i = 0; i < DIR_ENTRIES; i++)
     {
         if (dir[i].name[0] == ' ')
             continue;
