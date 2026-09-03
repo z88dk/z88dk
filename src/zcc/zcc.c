@@ -3433,6 +3433,8 @@ static void configure_compiler(void)
         BuildOptions(&cpparg, preprocarg);
         c_compiler = "xcc";
         add_option_to_compiler("-S -Of --sdcccall 0 --runtime=z88dk-classic --c1mode");
+        snprintf(buf, sizeof(buf), "-zcc-opt=\"%s\"", zcc_opt_def);
+        add_option_to_compiler(buf);
         c_cpp_exe = c_sdcc_preproc_exe;
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__XCC");
