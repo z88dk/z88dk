@@ -526,6 +526,60 @@ void test_float_arithmetic()
     Assert(approx_equal(c, (FLOAT)0.333333333, EPSILON), "1/3 ~ 0.333...");
 }
 
+#ifdef MATH32
+/* IEEE edges that the math32 cores document: FTZ/specials, exp overflow,
+ * signed zero sqrt, packed qNaN divide, dissimilar-magnitude add (align). */
+void test_math32_edges()
+{
+    union { FLOAT f; unsigned long u; } a, b, r;
+    static FLOAT vz, vo;
+
+    vz = (FLOAT)0.0;
+    vo = (FLOAT)1.0;
+
+    a.u = 0x80000000ul; /* -0 */
+    r.f = SQRT(a.f);
+    Assert(r.u == 0x80000000ul, "sqrt(-0) is -0");
+    r.f = invsqrt(a.f);
+    Assert(r.u == 0xff800000ul, "invsqrt(-0) is -Inf");
+
+    r.f = exp((FLOAT)100.0);
+    Assert(r.f == (FLOAT)HUGE_POS_F32, "exp(100) overflows to HUGE_POS");
+    r.f = exp((FLOAT)(-100.0));
+    Assert(r.f == vz, "exp(-100) underflows to 0");
+
+    a.u = 0x7fc00000ul; /* qNaN, quiet bit only */
+    b.f = (FLOAT)2.0;
+    r.f = a.f / b.f;
+    Assert(((r.u & 0x7f800000ul) == 0x7f800000ul) && (r.u & 0x007ffffful), "qNaN/2 is NaN");
+    r.f = a.f / a.f;
+    Assert(((r.u & 0x7f800000ul) == 0x7f800000ul) && (r.u & 0x007ffffful), "qNaN/qNaN is NaN");
+
+    a.u = 0x3f800000ul; /* 1.0 */
+    b.u = ((unsigned long)(127-5) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f840000ul, "1+2^-5");
+    b.u = ((unsigned long)(127-8) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f808000ul, "1+2^-8");
+    b.u = ((unsigned long)(127-16) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800080ul, "1+2^-16");
+    b.u = ((unsigned long)(127-20) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800008ul, "1+2^-20");
+    b.u = ((unsigned long)(127-23) << 23);
+    r.f = a.f + b.f;
+    Assert(r.u == 0x3f800001ul, "1+2^-23");
+
+    /* Past the sin/cos |x|>=128 gate: result must be in [-1,1], not wrap junk. */
+    r.f = sin((FLOAT)10000.0);
+    Assert(r.f >= (FLOAT)(-1.0) && r.f <= vo, "sin(10000) in [-1,1]");
+    r.f = cos((FLOAT)10000.0);
+    Assert(r.f >= (FLOAT)(-1.0) && r.f <= vo, "cos(10000) in [-1,1]");
+}
+#endif
+
 int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
@@ -553,6 +607,9 @@ int suite_math()
     suite_add_test(test_specials_div);
     suite_add_test(test_specials_mul_add);
     suite_add_test(test_specials_sqrt);
+#endif
+#ifdef MATH32
+    suite_add_test(test_math32_edges);
 #endif
     return suite_run();
 }

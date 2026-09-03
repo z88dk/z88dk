@@ -50,6 +50,16 @@ float m32_sinf (float f) __z88dk_fastcall
         x = -x;
     }
 
+    /* Octant reduction is binary32.  |x| >= 128 (biased exp >= 134) is
+     * reduced with fmod(2π) so j cannot wrap.  Large-x accuracy is still
+     * limited by π in single precision. */
+    {
+        union float_long u;
+        u.f = x;
+        if( (((uint32_t)u.l >> 23) & 0xff) >= (127+7) )
+            x = m32_fmodf(x, (float)(2.0 * M_PI));
+    }
+
     j = (int)(x * M_4_PI); /* integer part of x/(PI/4) */
     y = (float)j;
 

@@ -70,7 +70,7 @@ extern float m32_coeff_exp2f[];
 float m32_exp2f (float x) __z88dk_fastcall
 {
     float z;
-#if 0
+
     if( x > MAXL2_F32 )
     {
 	    return( HUGE_POS_F32 );
@@ -80,7 +80,7 @@ float m32_exp2f (float x) __z88dk_fastcall
     {
 	    return(0.0);
     }
-#endif
+
 	if( x == 0.0 )
 		return 1.0;
 

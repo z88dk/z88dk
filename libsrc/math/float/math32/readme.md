@@ -79,7 +79,7 @@ sign  exponent     mantissa
   x   11111111     xxx... not a number
 ```
 
-The package is loosely based on IEEE-754. It keeps the packed format. Product results pack with round-to-nearest-even on a residual byte. Add / sub use jam-sticky alignment. Denormal numbers are not supported. math32 treats any number with a zero exponent as signed zero.
+The package is loosely based on IEEE-754. It keeps the packed format. Product results pack with round-to-nearest-even on a residual byte. Add / sub use jam-sticky alignment. Denormal numbers are not supported. math32 treats any number with a zero exponent as signed zero, including a normalize result whose biased exponent is exactly 0. Quiet NaN is `0x7FFFFFFF` (payload is not propagated). `sqrt(-0)` returns `-0`. `invsqrt(-0)` returns `-Inf`.
 
 ```text
 IEEE floating point format:  seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
@@ -267,7 +267,7 @@ float sqrt (float x);
 float invsqrt (float x);
 ```
 
-`invsqrt()` seeds Newton–Raphson with the Quake-class constant `0x5f375a86` (see [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf)), then iterates with `sqr()`. `sqrt(x)` is `x * invsqrt(x)`.
+`invsqrt()` seeds Newton–Raphson with the Quake-class constant `0x5f375a86` (see [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf)), then three unrolled Newton–Raphson iterations on the expanded 32-bit helpers. `sqrt(x)` is `x * invsqrt(x)`. The IEEE `sqr()` intrinsic (24-bit `sqr_32h_24x24`) is a separate function for user code and is not a subroutine of those iterations.
 
 Two NR iterations give about 5 or 6 significant digits. Three iterations (the default) approach 7 significant digits for this library. One iteration is often enough for 3D games and is substantially faster.
 
@@ -356,6 +356,10 @@ Divide is restoring binary division (not NR). The pack step uses RNE on the resi
 Square root also relies on Newton–Raphson and is therefore an estimate. With the three iterations currently implemented, the estimate meets the IEEE 24-bit mantissa requirement. With one iteration the result is good for 3D graphics in games and not much else.
 
 The remaining power and trigonometric functions rely on polynomial expansion. They are only as accurate as the algorithms and coefficients fed into that process. The default tables come from Hi-Tech C and Cephes.
+
+`exp` / `exp2` / `exp10` clamp at `MAXLOG_*` / `MINLOG_*`: overflow returns `HUGE_POS_F32`, underflow returns `+0`.
+
+`sin` and `cos` reduce by octants of π/4 in binary32. For `|x| >= 128` they first apply `fmod(x, 2π)` in single precision so the octant index cannot wrap. That keeps the result in `[-1, 1]`. It is not a correctly rounded reduction against true π; large-argument trigonometric values remain estimates.
 
 ---
 

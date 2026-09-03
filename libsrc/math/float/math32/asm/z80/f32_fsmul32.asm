@@ -85,9 +85,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
 .fmrejoin
     ld a,b                      ; calculate the exponent
-    or a                        ; second exponent zero then result is zero
-    jp Z,mulzero
-
+    ; ±0 is classified by the IEEE caller (fsmul / inv / sqrt / poly)
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
 

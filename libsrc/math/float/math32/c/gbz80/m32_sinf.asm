@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Thu Sep  3 23:50:16 2026
 
 
 	C_LINE	0,"m32_sinf.c"
@@ -300,6 +300,44 @@
 	pop	bc
 	call	l_plong
 .i_2
+	add	sp,-4
+	ld	hl,sp+0
+	push	hl
+	ld	hl,sp+17
+	call	l_glong
+	pop	bc
+	call	l_plong
+	ld	hl,sp+0
+	call	l_glong
+	ld	l,d
+	rl	e
+	rl	l
+	ld	h,0
+	rl	h
+	ld	de,0
+	ld	h,0
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,134	;const
+	ld	de,0
+	call	l_long_uge
+	jp	nc,i_3	;
+	ld	hl,sp+15
+	push	hl
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,4059	;const
+	ld	de,16585
+	push	de
+	push	hl
+	call	_m32_fmodf
+	add	sp,8
+	pop	bc
+	call	l_plong
+.i_3
+	add	sp,4
 	ld	hl,sp+1
 	push	hl
 	ld	hl,sp+13
@@ -330,7 +368,7 @@
 	ld	h,(hl)
 	ld	l,a
 	and	1
-	jp	z,i_3	;
+	jp	z,i_4	;
 	ld	hl,sp+1
 	inc	(hl)
 	ld	a,(hl+)
@@ -346,7 +384,7 @@
 	call	l_f32_add
 	pop	bc
 	call	l_plong
-.i_3
+.i_4
 	ld	hl,sp+1
 	push	hl
 	ld	a,(hl)
@@ -368,7 +406,7 @@
 	sub	e
 	ld	a,h
 	sbc	d
-	jp	nc,i_4	;
+	jp	nc,i_5	;
 	ld	hl,sp+0
 	push	hl
 	ld	a,(hl)	;l_gchar
@@ -399,7 +437,7 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-.i_4
+.i_5
 	ld	hl,sp+11
 	push	hl
 	call	l_glong
@@ -428,15 +466,15 @@
 	ld	l,a
 	ld	de,1
 	call	l_eq
-	jp	c,i_6	;
+	jp	c,i_7	;
 	ld	hl,sp+1
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
 	ld	de,2
 	call	l_eq
-	jp	nc,i_5	;
-.i_6
+	jp	nc,i_6	;
+.i_7
 	ld	hl,sp+7
 	push	hl
 	ld	hl,sp+5
@@ -462,8 +500,8 @@
 	call	l_f32_add
 	pop	bc
 	call	l_plong
-	jp	i_8	;EOS
-.i_5
+	jp	i_9	;EOS
+.i_6
 	ld	hl,sp+7
 	push	hl
 	ld	hl,sp+5
@@ -487,21 +525,21 @@
 	call	l_f32_add
 	pop	bc
 	call	l_plong
-.i_8
+.i_9
 	ld	hl,sp+0
 	ld	a,(hl)
 	rla
-	jp	nc,i_9	;
+	jp	nc,i_10	;
 	ld	hl,sp+7
 	call	l_glong
 	ld	a,d
 	xor	128
 	ld	d,a
-	jp	i_10	;
-.i_9
+	jp	i_11	;
+.i_10
 	ld	hl,sp+7
 	call	l_glong
-.i_10
+.i_11
 	add	sp,19
 	ret
 

@@ -73,8 +73,11 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .sqrt_zero
-    ld de,0
-    ld hl,0
+    ld hl,0                     ; ±0: keep sign in D.7
+    ld e,l
+    ld a,d
+    and 080h
+    ld d,a
     ret
 
 

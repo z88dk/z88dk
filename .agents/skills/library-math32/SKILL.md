@@ -9,8 +9,7 @@ description: >
 
 # Library — math32
 
-Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`
-(working rewrite may live as root `math32-README.md` until merged).
+Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`.
 Link via **`--math32`** (`-lmath32@{ZCC_LIBCPU}`).
 
 ## 0b. Math32 multi-CPU float library (layout + policy)

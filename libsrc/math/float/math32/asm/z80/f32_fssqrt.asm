@@ -81,8 +81,11 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .m32_sqrt_zero
-    ld de,0
-    ld hl,0
+    ld hl,0                     ; ±0: sign in C after rl d
+    ld e,l
+    ld d,h
+    ret NC
+    ld d,080h
     ret
 
 

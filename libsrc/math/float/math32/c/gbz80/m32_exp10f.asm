@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Sep  2 09:30:58 2026
+;	Module compile time: Thu Sep  3 23:50:16 2026
 
 
 	C_LINE	0,"m32_exp10f.c"
@@ -268,20 +268,55 @@
 	call	l_glong
 	push	de
 	push	hl
+	ld	hl,60505	;const
+	ld	de,16920
+	call	l_f32_gt
+	ld	a,h
+	or	l
+	jp	z,i_2	;
+	ld	hl,65535	;const
+	ld	de,32639
+	add	sp,8
+	ret
+
+
+.i_2
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,47128	;const
+	ld	de,49687
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_3	;
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	add	sp,8
+	ret
+
+
+.i_3
+	ld	hl,sp+4
+	call	l_glong
+	push	de
+	push	hl
 	ld	hl,0	;const
 	ld	d,h
 	ld	e,l
 	call	l_f32_eq
 	ld	a,h
 	or	l
-	jp	z,i_2	;
+	jp	z,i_4	;
 	ld	hl,0	;const
 	ld	de,16256
 	add	sp,8
 	ret
 
 
-.i_2
+.i_4
 	ld	hl,sp+0
 	push	hl
 	ld	hl,sp+6

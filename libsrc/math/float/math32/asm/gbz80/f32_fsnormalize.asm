@@ -82,6 +82,7 @@ PUBLIC m32_fsnormalize
     ld a,c
     sub d                       ; a = final exp
     jr c,normzero
+    jr z,normzero               ; FTZ: exp==0 is signed zero, not a denormal
 
     ld d,a                      ; D = final exp (temp)
     ld a,b
@@ -96,6 +97,9 @@ PUBLIC m32_fsnormalize
     ret
 
 .normzero
-    ld hl,0
-    ld de,hl
+    ld hl,0                     ; signed zero (sign in B)
+    ld e,l
+    ld a,b
+    and 080h
+    ld d,a
     ret

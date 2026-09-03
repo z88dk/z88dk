@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Mon Aug 31 20:47:55 2026
+;	Module compile time: Thu Sep  3 23:50:16 2026
 
 
 	C_LINE	0,"m32_exp10f.c"
@@ -206,10 +206,12 @@
 	C_LINE	212,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	216,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	218,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	223,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	222,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	224,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	225,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
-	C_LINE	236,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	229,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	230,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	231,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
+	C_LINE	242,"/data/z88dk/lib/config/../..//include/math/math_math32.h"
 	C_LINE	37,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"m32_math.h"
 	C_LINE	37,"m32_math.h"
@@ -266,13 +268,52 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong2sp
+	ld	hl,60505	;const
+	ld	de,16920
+	call	l_f32_gt
+	ld	a,h
+	or	l
+	jp	z,i_2	;
+	ld	hl,65535	;const
+	ld	de,32639
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_2
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,47128	;const
+	ld	de,49687
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_3	;
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_3
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
 	ld	e,l
 	call	l_f32_eq
 	ld	a,h
 	or	l
-	jp	z,i_2	;
+	jp	z,i_4	;
 	ld	hl,0	;const
 	ld	de,16256
 	pop	bc
@@ -282,7 +323,7 @@
 	ret
 
 
-.i_2
+.i_4
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
@@ -485,6 +526,8 @@
 	GLOBAL	fmod_callee
 	GLOBAL	hypot
 	GLOBAL	hypot_callee
+	GLOBAL	poly
+	GLOBAL	poly_callee
 	GLOBAL	atof
 	GLOBAL	ftoa
 	GLOBAL	ftoe
