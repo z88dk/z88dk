@@ -16,11 +16,10 @@ CLEAN += target-pencil2-clean
 TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
 
 $(eval $(call gfx_stamp_args,pencil2,TARGET=pencil2))
-$(eval $(call buildtms9918,pencil2,pencil2))
+$(eval $(call buildvideo,tms9918,TMS9918,pencil2,))
 $(eval $(call buildtargetasm,target/pencil2,z80,pencil2,-mz80,$(PENCIL2_GLOBS),$(PENCIL2_GLOBS_ex)))
 
 pencil2_clib.lib: $(TARGET_CLIB_DEPS) $(PENCIL2_TARGETS)
-	$(MAKE) -C classic/video/tms9918 TARGET=pencil2
 	TARGET=pencil2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpencil2 -x$(OUTPUT_DIRECTORY)/pencil2_clib @$(TARGET_DIRECTORY)/pencil2/pencil2.lst
 
 

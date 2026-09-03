@@ -13,17 +13,17 @@ LYNX_GLOBS_ex := \
 	target/lynx/stdio/*.asm 
 
 
-LYNX_TARGETS := target/lynx/obj/target-lynx-lynx classic/games/obj/.stamp-lynx classic/gfx/obj/.stamp-lynx
+LYNX_TARGETS := target/lynx/obj/target-lynx-lynx classic/video/mc6845/obj/lynx classic/games/obj/.stamp-lynx classic/gfx/obj/.stamp-lynx
 		
 
 CLEAN += target-lynx-clean
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 
 $(eval $(call gfx_stamp_args,lynx,TARGET=lynx FLAVOUR="gencon narrow"))
+$(eval $(call buildvideo,mc6845,MC6845,lynx,))
 $(eval $(call buildtargetasm,target/lynx,z80,lynx,-mz80,$(LYNX_GLOBS),$(LYNX_GLOBS_ex)))
 
 lynx_clib.lib: $(TARGET_CLIB_DEPS) $(LYNX_TARGETS)
-	$(MAKE) -C classic/video/mc6845 TARGET=lynx
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(TARGET_DIRECTORY)/lynx/lynx.lst
 
 

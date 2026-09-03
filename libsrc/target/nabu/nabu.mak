@@ -20,7 +20,7 @@ NABU_TARGETS := target/nabu/obj/target-nabu-nabu $(NABU_OFILES) classic/video/tm
 CLEAN += target-nabu-clean
 TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib nabu_int.lib)
 $(eval $(call gfx_stamp_args,nabu,TARGET=nabu))
-$(eval $(call buildtms9918,nabu,nabu))
+$(eval $(call buildvideo,tms9918,TMS9918,nabu,))
 $(eval $(call buildtargetasm,target/nabu,z80,nabu,-mz80,$(NABU_GLOBS),$(NABU_GLOBS_ex)))
 $(eval $(call buildtargetc,target/nabu,nabu))
 
@@ -28,14 +28,12 @@ nabu_clib.lib: $(TARGET_CLIB_DEPS) $(NABU_TARGETS)
 	@echo ''
 	@echo '--- Building Nabu Library ---'
 	@echo ''
-	$(MAKE) -C classic/video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_clib @$(TARGET_DIRECTORY)/nabu/nabu.lst
 
 nabu_cpm.lib: nabu_clib.lib $(NABU_TARGETS)
 	@echo ''
 	@echo '--- Building Nabu CP/M Library ---'
 	@echo ''
-	$(MAKE) -C classic/video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_cpm @$(TARGET_DIRECTORY)/nabu/nabu_cpm.lst
 
 nabu_int.lib: nabu_clib.lib nabu_cpm.lib

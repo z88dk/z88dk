@@ -18,11 +18,10 @@ CLEAN += target-sc3000-clean
 TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
 
 $(eval $(call gfx_stamp_args,sc3000,TARGET=sc3000))
-$(eval $(call buildtms9918,sc3000,sc3000))
+$(eval $(call buildvideo,tms9918,TMS9918,sc3000,))
 $(eval $(call buildtargetasm,target/sc3000,z80,sc3000,-mz80,$(SC3000_GLOBS),$(SC3000_GLOBS_ex)))
 
 sc3000_clib.lib: $(TARGET_CLIB_DEPS) $(SC3000_TARGETS)
-	$(MAKE) -C classic/video/tms9918 TARGET=sc3000
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(TARGET_DIRECTORY)/sc3000/sc3000.lst
 
 

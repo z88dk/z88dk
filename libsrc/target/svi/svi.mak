@@ -11,6 +11,8 @@ SVI_TARGETS := \
 CLEAN += target-svi-clean
 TOCREATE += $(call check_target,svi,svi_clib.lib svibios.lib)
 $(eval $(call gfx_stamp_args,svi,TARGET=svi))
+$(eval $(call buildvideo,tms9918,TMS9918,svi,))
+$(eval $(call buildvideo,mc6845,MC6845,svi,))
 
 svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib $(SVI_TARGETS)
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
@@ -33,12 +35,6 @@ target/svi/obj/target-svi-msx: $(MSX_GLOBS_ex)
 target-svi: $(SVI_TARGETS)
 
 .PHONY: target-svi target-svi-clean
-
-classic/video/tms9918/obj/svi:
-	$(Q)$(MAKE) -C classic/video/tms9918 TARGET=svi
-
-classic/video/mc6845/obj/svi:
-	$(Q)$(MAKE) -C classic/video/mc6845 TARGET=svi
 
 target-svi-clean:
 	$(RM) -fr target/svi/obj target/svi/rs232/obj target/svi/svibios/obj

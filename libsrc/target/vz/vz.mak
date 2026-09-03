@@ -15,9 +15,10 @@ VZ_GLOBS_ex := \
 	target/vz/stdio/ansi/*.asm 
 
 
-VZ_TARGETS := target/vz/obj/target-vz-vz classic/games/obj/.stamp-vz classic/gfx/obj/.stamp-vz
+VZ_TARGETS := target/vz/obj/target-vz-vz classic/video/mc6847/obj/vz classic/games/obj/.stamp-vz classic/gfx/obj/.stamp-vz
 
 $(eval $(call gfx_stamp_args,vz,TARGET=vz))
+$(eval $(call buildvideo,mc6847,MC6847,vz,))
 		
 
 CLEAN += target-vz-clean
@@ -28,7 +29,6 @@ vz_clib.lib: $(TARGET_CLIB_DEPS) $(VZ_TARGETS)
 	@echo ''
 	@echo '--- Building VZ200/300 Library ---'
 	@echo ''
-	$(MAKE) -C classic/video/mc6847 TARGET=vz
 	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(TARGET_DIRECTORY)/vz/vz200.lst
 
 

@@ -15,7 +15,7 @@ LM80C_TARGETS := target/lm80c/obj/target-lm80c-lm80c $(LM80C_OFILES) classic/vid
 CLEAN += target-lm80c-clean
 TOCREATE += $(call check_target,lm80c,lm80c_clib.lib)
 $(eval $(call gfx_stamp_args,lm80c,TARGET=lm80c))
-$(eval $(call buildtms9918,lm80c,lm80c))
+$(eval $(call buildvideo,tms9918,TMS9918,lm80c,))
 $(eval $(call buildtargetasm,target/lm80c,z80,lm80c,-mz80,$(LM80C_GLOBS),$(LM80C_GLOBS_ex)))
 $(eval $(call buildtargetc,target/lm80c,lm80c))
 
@@ -23,7 +23,6 @@ lm80c_clib.lib: $(TARGET_CLIB_DEPS) $(LM80C_TARGETS)
 	@echo ''
 	@echo '--- Building LM80-C Library ---'
 	@echo ''
-	$(MAKE) -C classic/video/tms9918 TARGET=lm80c
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(TARGET_DIRECTORY)/lm80c/lm80c.lst
 
 

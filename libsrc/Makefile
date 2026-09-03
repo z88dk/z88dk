@@ -61,6 +61,7 @@ include classic/games/games.mak
 include classic/gfx/retrofit/retrofit.mak
 include classic/gfx/portable/portable.mak
 include classic/gfx/gfx.mak
+include classic/video/video.mak
 include classic/video/tek401x/tek.mak
 include classic/video/regis/regis.mak
 include target/alphatro/alphatro.mak
@@ -290,28 +291,6 @@ ndos.lib:
 
 gendos.lib:
 	$(MAKE) -C classic/fcntl/gen_rnd
-
-# 64/32 column library for TS2068 - dom/stefano/alvin
-# use -DROMFONT for a tiny 36 columns mode
-# or -DPACKEDFONT for tiny 64->85 column modes
-# ZX Spectrum maths library - Stefano
-# TS2068 maths library - Stefano
-# Apple II SoftCard CP/M lib - Stefano
-# Epson PX4 lib - Stefano
-# Epson PX8 lib - Stefano
-gfxtek.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-tek
-	@echo ''
-	@echo '--- Building TEK4010 graphics Library ---'
-	@echo ''
-	$(MAKE) -C classic/video/tek401x TARGET=test
-	TARGET=tek TYPE=z80 $(LIBLINKER) -mz80 -DFORtek -x$(OUTPUT_DIRECTORY)/gfxtek @$(Z88DK_LIBSRC)/classic/video/tek401x/video_tek.lst
-
-gfxregis.lib: $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-regis
-	@echo ''
-	@echo '--- Building ReGIS graphics Library ---'
-	@echo ''
-	$(MAKE) -C classic/video/regis TARGET=test
-	TARGET=regis TYPE=z80 $(LIBLINKER) -mz80 -DFORregis -x$(OUTPUT_DIRECTORY)/gfxregis @$(Z88DK_LIBSRC)/classic/video/regis/video_regis.lst
 
 # Preempt multitasking library - dom
 preempt.lib:

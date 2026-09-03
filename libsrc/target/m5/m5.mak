@@ -14,11 +14,10 @@ CLEAN += target-m5-clean
 TOCREATE += $(call check_target,m5,m5_clib.lib)
 
 $(eval $(call gfx_stamp_args,m5,TARGET=m5))
-$(eval $(call buildtms9918,m5,m5))
+$(eval $(call buildvideo,tms9918,TMS9918,m5,))
 $(eval $(call buildtargetasm,target/m5,z80,m5,-mz80,$(M5_GLOBS),$(M5_GLOBS_ex)))
 
 m5_clib.lib: $(TARGET_CLIB_DEPS) $(M5_TARGETS)
-	$(MAKE) -C classic/video/tms9918 TARGET=m5
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(TARGET_DIRECTORY)/m5/m5.lst
 
 

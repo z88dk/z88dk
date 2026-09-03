@@ -15,17 +15,17 @@ PHC25_GLOBS_ex := \
 	target/phc25/stdio/*.asm
 
 
-PHC25_TARGETS := target/phc25/obj/target-phc25-phc25 classic/games/obj/.stamp-phc25 classic/gfx/obj/.stamp-phc25
+PHC25_TARGETS := target/phc25/obj/target-phc25-phc25 classic/video/mc6847/obj/phc25 classic/games/obj/.stamp-phc25 classic/gfx/obj/.stamp-phc25
 		
 
 CLEAN += target-phc25-clean
 TOCREATE += $(call check_target,phc25,phc25_clib.lib)
 
 $(eval $(call gfx_stamp_args,phc25,TARGET=phc25))
+$(eval $(call buildvideo,mc6847,MC6847,phc25,))
 $(eval $(call buildtargetasm,target/phc25,z80,phc25,-mz80,$(PHC25_GLOBS),$(MULTI8_GLOBS_ex)))
 
 phc25_clib.lib: $(TARGET_CLIB_DEPS) $(PHC25_TARGETS)
-	$(MAKE) -C classic/video/mc6847 TARGET=phc25
 	TARGET=phc25 TYPE=z80 $(LIBLINKER) -DFORphc25 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/phc25_clib @$(TARGET_DIRECTORY)/phc25/phc25.lst
 
 

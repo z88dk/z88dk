@@ -47,6 +47,7 @@ $(eval $(call gfx_stamp_args,cpm-tiki100,TARGET=cpm FLAVOUR=wide SUBTYPE=tiki100
 $(eval $(call gfx_stamp_args,cpm-pcw,TARGET=cpm FLAVOUR=wide SUBTYPE=pcw))
 $(eval $(call gfx_stamp_args,cpm-mbc200,TARGET=cpm FLAVOUR=wide SUBTYPE=mbc200))
 $(eval $(call gfx_stamp_args,h19alt,TARGET=cpm SUBTYPE=h19alt FLAVOUR="gencon text6 narrow"))
+$(eval $(call buildvideo,tms9918,TMS9918,cpm,z80retro))
 
 CLEAN += target-cpm-clean
 TOCREATE += $(call check_target,cpm,$(CPMLIBS))
@@ -153,11 +154,10 @@ mbc200.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-mbc200 classic/gfx/obj/.st
 	@echo ''
 	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
 
-z80retro_cpm.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-z80retro classic/gfx/obj/.stamp-cpm-z80retro
+z80retro_cpm.lib: cpm_clib.lib classic/video/tms9918/obj/z80retro classic/games/obj/.stamp-cpm-z80retro classic/gfx/obj/.stamp-cpm-z80retro
 	@echo ''
 	@echo '--- Building z80retro! CP/M Library ---'
 	@echo ''
-	$(MAKE) -C classic/video/tms9918 TARGET=cpm SUBTYPE=z80retro
 	TARGET=z80retro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80retro -x$(OUTPUT_DIRECTORY)/z80retro_cpm @$(TARGET_DIRECTORY)/z80retro/z80retro.lst
 
 tiki100.lib: cpm_clib.lib classic/games/obj/.stamp-cpm-tiki100 classic/gfx/obj/.stamp-cpm-tiki100
