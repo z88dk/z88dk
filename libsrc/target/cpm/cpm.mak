@@ -1,8 +1,8 @@
 CPMLIBS = cpm_clib.lib cpmixiy_clib.lib cpmz180_clib.lib cpm8080_clib.lib cpm8085_clib.lib cpmdevice.lib cpmdevice_8080.lib cpmdevice_8085.lib cpmdevice_z180.lib gfxh19.lib gfxh19alt.lib gfxvio.lib gfxgsx.lib
 
-CPM_SOURCES := $(shell find target/cpm -type f -name '*.asm' ! -path 'target/cpm/driver/*')
-CPM_CFILES := $(shell find target/cpm -type f -name '*.c')
-CPM_FCNTL_CFILES := $(shell find target/cpm/fcntl -type f -name '*.c')
+CPM_SOURCES := $(wildcard target/cpm/*/*.asm)
+CPM_CFILES := $(wildcard target/cpm/*/*.c)
+CPM_FCNTL_CFILES := $(wildcard target/cpm/fcntl/*.c)
 CPM_NONFCNTL_CFILES := $(filter-out $(CPM_FCNTL_CFILES),$(CPM_CFILES))
 
 CPM_VARIANTS := 8080 8085 z80 ixiy z180
@@ -49,6 +49,31 @@ $(eval $(call gfx_stamp_args,cpm-mbc200,TARGET=cpm FLAVOUR=wide SUBTYPE=mbc200))
 $(eval $(call gfx_stamp_args,h19alt,TARGET=cpm SUBTYPE=h19alt FLAVOUR="gencon text6 narrow"))
 
 CLEAN += target-cpm-clean
+TOCREATE += $(call check_target,cpm,$(CPMLIBS))
+TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
+TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
+TOCREATE += $(call check_target,v1050,v1050.lib gfx1050udg.lib $(CPMLIBS))
+TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
+define cpm_asm
+target/cpm/obj/target-cpm-$(1): $(CPM_SOURCES)
+	$(Q)mkdir -p target/cpm/obj/$(1)
+	$$(Q)$$(ASSEMBLER) -d -O=target/cpm/obj/$(1)/x -m4=-I$$(Z88DK_LIB)/../src/m4 -m4=-I$$(Z88DK_LIBSRC)/target/cpm -I$$(Z88DK_LIB) -I$$(Z88DK_LIB)/target/cpm/def -Itarget/cpm -Itarget/cpm/obj/$(1) -I$$(Z88DK_LIBSRC)/classic $(2) -DSTANDARDESCAPECHARS -D__CLASSIC -DFORcpm $$(CPM_SOURCES)
+	$$(Q)touch $$@
+endef
+$(foreach cpu,$(CPM_VARIANTS),$(eval $(call cpm_asm,$(cpu),$(CPM_ASMFLAGS_$(cpu)))))
+define cpm_c_rule
+target/cpm/obj/$(1)/%.o: target/cpm/%.c
+	$(Q)mkdir -p $$(dir $$@)
+	$$(ZCC) +cpm $$(CPM_CLIBFLAGS_$(1)) $$(CFLAGS) -c -o $$@ $$<
+endef
+$(foreach cpu,$(CPM_VARIANTS),$(eval $(call cpm_c_rule,$(cpu))))
+define cpm_fcntl_rule
+target/cpm/obj/$(1)/$(2)/fcntl/%.o: target/cpm/fcntl/%.c
+	$(Q)mkdir -p $$(dir $$@)
+	$$(ZCC) +cpm $$(CPM_CLIBFLAGS_$(1)) $$(CFLAGS) $(if $(filter device,$(2)),-DDEVICES) -c -o $$@ $$<
+endef
+$(foreach cpu,$(CPM_VARIANTS),$(foreach device,nodevice device,$(eval $(call cpm_fcntl_rule,$(cpu),$(device)))))
+
 v1050.lib: cpm_clib.lib gfx1050udg.lib classic/games/obj/.stamp-cpm-v1050 classic/gfx/obj/.stamp-cpm-v1050
 	@echo ''
 	@echo '--- Building Visual 1050 Library (CP/M) ---'
@@ -149,40 +174,16 @@ gfxh19alt.lib:  $(TARGET_CLIB_DEPS) classic/gfx/obj/.stamp-h19 classic/gfx/obj/.
 	TARGET=h19alt TYPE=z80 $(LIBLINKER) -DFORh19alt -x$(OUTPUT_DIRECTORY)/gfxh19alt @$(Z88DK_LIBSRC)/classic/video/h19/gfxh19alt.lst
 	@touch $@
 
-TOCREATE += $(call check_target,cpm,$(CPMLIBS))
-TOCREATE += $(call check_target,mbc200,mbc200.lib $(CPMLIBS))
-TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
-TOCREATE += $(call check_target,v1050,v1050.lib gfx1050udg.lib $(CPMLIBS))
-TOCREATE += $(call check_target,z80retro,z80retro_cpm.lib)
 
 target-cpm: $(CPM_TARGETS)
 
 .PHONY: target-cpm target-cpm-clean
 
-define cpm_asm
-target/cpm/obj/target-cpm-$(1): $(CPM_SOURCES)
-	$(Q)mkdir -p target/cpm/obj/$(1)
-	$$(Q)$$(ASSEMBLER) -d -O=target/cpm/obj/$(1)/x -m4=-I$$(Z88DK_LIB)/../src/m4 -m4=-I$$(Z88DK_LIBSRC)/target/cpm -I$$(Z88DK_LIB) -I$$(Z88DK_LIB)/target/cpm/def -Itarget/cpm -Itarget/cpm/obj/$(1) -I$$(Z88DK_LIBSRC)/classic $(2) -D__CLASSIC -DFORcpm $$(CPM_SOURCES)
-	$$(Q)touch $$@
-endef
 
-$(foreach cpu,$(CPM_VARIANTS),$(eval $(call cpm_asm,$(cpu),$(CPM_ASMFLAGS_$(cpu)))))
 
-define cpm_c_rule
-target/cpm/obj/$(1)/%.o: target/cpm/%.c
-	$(Q)mkdir -p $$(dir $$@)
-	$$(ZCC) +cpm $$(CPM_CLIBFLAGS_$(1)) $$(CFLAGS) -c -o $$@ $$<
-endef
 
-$(foreach cpu,$(CPM_VARIANTS),$(eval $(call cpm_c_rule,$(cpu))))
 
-define cpm_fcntl_rule
-target/cpm/obj/$(1)/$(2)/fcntl/%.o: target/cpm/fcntl/%.c
-	$(Q)mkdir -p $$(dir $$@)
-	$$(ZCC) +cpm $$(CPM_CLIBFLAGS_$(1)) $$(CFLAGS) $(if $(filter device,$(2)),-DDEVICES) -c -o $$@ $$<
-endef
 
-$(foreach cpu,$(CPM_VARIANTS),$(foreach device,nodevice device,$(eval $(call cpm_fcntl_rule,$(cpu),$(device)))))
 
 target-cpm-clean:
 	$(RM) -fr target/cpm/obj

@@ -15,7 +15,7 @@ GAMES_NEWLIB_TARGETS := classic/games/obj/newlib-z80-classic-games \
 
 # Target library sub-builds. Keep the stamp separate from the objects while
 # the existing .lst files still use obj/${TARGET} paths.
-GAMES_STAMP_SOURCES := $(shell find classic/games -type f \( -name '*.asm' -o -name '*.c' -o -name 'Makefile' \))
+GAMES_STAMP_SOURCES := $(call rwildcard,classic/games,*.asm) $(call rwildcard,classic/games,*.c) $(call rwildcard,classic/games,Makefile)
 
 define games_stamp
 classic/games/obj/.stamp-$(1): $(GAMES_STAMP_SOURCES)
@@ -30,7 +30,6 @@ classic/games/obj/.stamp-$(1): $(GAMES_STAMP_SOURCES)
 	$(MAKE) -C classic/games $(2)
 	@touch $$@
 endef
-
 $(eval $(call games_stamp,z88))
 $(eval $(call games_stamp,zx))
 $(eval $(call games_stamp,zxn))
@@ -76,7 +75,6 @@ $(eval $(call games_stamp_args,enterprise,TARGET=enterprise))
 $(eval $(call games_stamp_args,smc777,TARGET=smc777))
 $(eval $(call games_stamp_args,cpm-smc777,TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777))
 $(eval $(call games_stamp_args,cpm-bic,TARGET=cpm SUBTYPE=bic))
-$(eval $(call games_stamp_args,cpm-coleco,TARGET=cpm SUBTYPE=coleco))
 $(eval $(call games_stamp_args,m5,TARGET=m5))
 $(eval $(call games_stamp_args,cpm-mbc200,TARGET=cpm SUBTYPE=mbc200))
 $(eval $(call games_stamp_args,mc1000,TARGET=mc1000))
@@ -151,14 +149,8 @@ $(eval $(call games_stamp_args,homelab,TARGET=homelab))
 $(eval $(call games_stamp_args,homelab2,TARGET=homelab2))
 $(eval $(call games_stamp_args,krokha,TARGET=krokha))
 $(eval $(call games_stamp_args,cpm-nanos,TARGET=cpm SUBTYPE=nanos))
-
 OBJS += $(GAMES_NEWLIB_TARGETS)
 CLEAN += games-clean
-
-games: $(GAMES_NEWLIB_TARGETS)
-
-.PHONY: games games-clean
-
 $(eval $(call buildnew,classic/games,z80,-mz80,$(GAMES_NEWLIBGLOBS),$(GAMES_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/games,r2ka,-mr2ka,$(GAMES_NEWLIBGLOBS),$(GAMES_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/games,z80n,-mz80n,$(GAMES_NEWLIBGLOBS),$(GAMES_NEWLIBGLOBS_ex)))
@@ -168,6 +160,11 @@ $(eval $(call buildnew,classic/games,8085,-m8085,$(GAMES_NEWLIBGLOBS),$(GAMES_NE
 $(eval $(call buildnew,classic/games,gbz80,-mgbz80,$(GAMES_NEWLIBGLOBS),$(GAMES_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/games,z180,-mz180,$(GAMES_NEWLIBGLOBS),$(GAMES_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/games,ez80_z80,-mez80_z80,$(GAMES_NEWLIBGLOBS),$(GAMES_NEWLIBGLOBS_ex)))
+
+games: $(GAMES_NEWLIB_TARGETS)
+
+.PHONY: games games-clean
+
 
 games-clean: 
 	$(RM) -fr classic/games/obj

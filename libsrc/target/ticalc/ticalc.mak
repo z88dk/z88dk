@@ -19,6 +19,13 @@ TICALC_$(1)_TARGETS := \
 	classic/gfx/obj/.stamp-$(1)
 endef
 
+CLEAN += target-ticalc-clean
+TOCREATE += $(call check_target,ti82,ti82_clib.lib)
+TOCREATE += $(call check_target,ti83,ti83_clib.lib)
+TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
+TOCREATE += $(call check_target,ti85,ti85_clib.lib)
+TOCREATE += $(call check_target,ti86,ti86_clib.lib)
+
 $(foreach target,ti82 ti83 ti83p ti85 ti86,$(eval $(call gfx_stamp_args,$(target),TARGET=$(target) FLAVOUR="gray narrow")))
 
 $(foreach target,ti82 ti83 ti83p ti85 ti86,$(eval $(call ticalc_targets,$(target))))
@@ -32,12 +39,7 @@ endef
 
 $(foreach target,ti82 ti83 ti83p ti85 ti86,$(eval $(call ticalc_library,$(target))))
 
-CLEAN += target-ticalc-clean
-TOCREATE += $(call check_target,ti82,ti82_clib.lib)
-TOCREATE += $(call check_target,ti83,ti83_clib.lib)
-TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
-TOCREATE += $(call check_target,ti85,ti85_clib.lib)
-TOCREATE += $(call check_target,ti86,ti86_clib.lib)
+
 
 target-ticalc: $(TICALC_TARGETS)
 

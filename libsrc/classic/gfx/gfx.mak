@@ -4,7 +4,7 @@
 # still use obj/${TARGET} paths. This file owns the recursive gfx build
 # definitions; libsrc/Makefile only names the stamps as prerequisites.
 
-GFX_STAMP_SOURCES := $(shell find classic/gfx -type f \( -name '*.asm' -o -name '*.c' -o -name 'Makefile' \))
+GFX_STAMP_SOURCES := $(call rwildcard,classic/gfx,*.asm) $(call rwildcard,classic/gfx,*.c) $(call rwildcard,classic/gfx,Makefile)
 
 define gfx_stamp
 classic/gfx/obj/.stamp-$(1)-$(2): $(GFX_STAMP_SOURCES)
@@ -26,7 +26,6 @@ classic/gfx/obj/.stamp-$(1): $(GFX_STAMP_SOURCES) $(GFXPORTABLE_OBJS)
 	$(MAKE) -C classic/gfx TARGET=$(2) $(if $(3),SUBTYPE=$(3)) FLAVOUR=common
 	@touch $$@
 endef
-
 define gfx_stamp_portable_args
 GFX_STAMP_$(1)_MISSING := $(filter-out $(wildcard $(3)),$(3))
 classic/gfx/obj/.stamp-$(1): $(GFX_STAMP_SOURCES) $(GFXPORTABLE_OBJS) $$(if $$(GFX_STAMP_$(1)_MISSING),gfx-stamp-missing-$(1))

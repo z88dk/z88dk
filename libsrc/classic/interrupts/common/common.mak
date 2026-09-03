@@ -20,10 +20,6 @@ INT_COMMON_OBJS := $(addprefix classic/interrupts/common/obj/z80/, $(INT_COMMON_
 OBJS += $(INT_COMMON_OBJS) 
 CLEAN += interrupts-common-clean
 
-interrupts-common: $(INT_COMMON_OBJS) $(INT_COMMON_NEWLIB_TARGETS)
-
-.PHONY: interrupts-common interrupts-common-clean
-
 $(eval $(call buildbit,classic/interrupts/common,z80,test))
 $(eval $(call buildbit,classic/interrupts/common,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/interrupts/common,z80n,test,-clib=z80n,-mz80n))
@@ -34,6 +30,11 @@ $(eval $(call buildbit,classic/interrupts/common,gbz80,test,-clib=gbz80,-mgbz80)
 $(eval $(call buildbit,classic/interrupts/common,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/interrupts/common,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/interrupts/common,kc160,test,-clib=kc160,-mkc160))
+
+interrupts-common: $(INT_COMMON_OBJS) $(INT_COMMON_NEWLIB_TARGETS)
+
+.PHONY: interrupts-common interrupts-common-clean
+
 
 
 interrupts-common-clean:

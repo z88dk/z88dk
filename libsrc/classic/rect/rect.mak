@@ -16,10 +16,6 @@ RECT_OBJS := $(addprefix classic/rect/obj/z80/, $(RECT_OBJECTS)) \
 OBJS += $(RECT_OBJS)
 CLEAN += rect-clean
 
-rect: $(RECT_OBJS)
-
-.PHONY: rect rect-clean
-
 $(eval $(call buildbit,classic/rect,z80,test))
 $(eval $(call buildbit,classic/rect,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/rect,8080,test,-clib=8080,-m8080))
@@ -30,6 +26,11 @@ $(eval $(call buildbit,classic/rect,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/rect,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/rect,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/rect,kc160,test,-clib=kc160,-mkc160))
+
+rect: $(RECT_OBJS)
+
+.PHONY: rect rect-clean
+
 
 
 rect-clean:

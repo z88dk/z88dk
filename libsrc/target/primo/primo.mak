@@ -15,6 +15,10 @@ PRIMO_TARGETS := target/primo/obj/target-primo-primo classic/games/obj/.stamp-pr
 		
 
 CLEAN += target-primo-clean
+TOCREATE += $(call check_target,primo,primo_clib.lib)
+$(eval $(call gfx_stamp_args,primo,TARGET=primo))
+$(eval $(call buildtargetasm,target/primo,z80,primo,-mz80 -IXIY,$(PRIMO_GLOBS),$(PRIMO_GLOBS_ex)))
+
 primo_clib.lib: $(TARGET_CLIB_DEPS) $(PRIMO_TARGETS)
 	@echo ''
 	@echo '--- Building Primo A-32/48/64 Library ---'
@@ -23,16 +27,13 @@ primo_clib.lib: $(TARGET_CLIB_DEPS) $(PRIMO_TARGETS)
 
 
 
-TOCREATE += $(call check_target,primo,primo_clib.lib)
 
-$(eval $(call gfx_stamp_args,primo,TARGET=primo))
 
 target-primo: $(PRIMO_TARGETS)
 
 .PHONY: target-primo target-primo-clean
 
 
-$(eval $(call buildtargetasm,target/primo,z80,primo,-mz80 -IXIY,$(PRIMO_GLOBS),$(PRIMO_GLOBS_ex)))
 
 target-primo-clean:
 	$(RM) -fr target/primo/obj

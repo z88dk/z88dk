@@ -18,10 +18,6 @@ LOCALE_TARGETS := locale/obj/newlib-z80-locale \
 OBJS += $(LOCALE_TARGETS)
 CLEAN += locale-clean
 
-locale: $(LOCALE_TARGETS)
-
-.PHONY: locale locale-clean
-
 $(eval $(call buildnew,locale,z80,-mz80,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,r2ka,-mr2ka,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,r4k,-mr4k,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
@@ -34,6 +30,11 @@ $(eval $(call buildnew,locale,gbz80,-mgbz80,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,z180,-mz180,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,ez80_z80,-mez80_z80,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
 $(eval $(call buildnew,locale,kc160,-mkc160,$(LOCALE_GLOBS),$(LOCALE_GLOBS_ex)))
+
+locale: $(LOCALE_TARGETS)
+
+.PHONY: locale locale-clean
+
 
 locale-clean:
 	$(RM) -fr locale/obj

@@ -18,10 +18,6 @@ ERROR_TARGETS := error/obj/newlib-z80-error \
 OBJS += $(ERROR_TARGETS)
 CLEAN += error-clean
 
-error: $(ERROR_TARGETS)
-
-.PHONY: error error-clean
-
 $(eval $(call buildnew,error,z80,-mz80,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
 $(eval $(call buildnew,error,r2ka,-mr2ka,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
 $(eval $(call buildnew,error,r4k,-mr4k,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
@@ -34,6 +30,11 @@ $(eval $(call buildnew,error,gbz80,-mgbz80,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
 $(eval $(call buildnew,error,z180,-mz180,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
 $(eval $(call buildnew,error,ez80_z80,-mez80_z80,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
 $(eval $(call buildnew,error,kc160,-mkc160,$(ERROR_GLOBS),$(ERROR_GLOBS_ex)))
+
+error: $(ERROR_TARGETS)
+
+.PHONY: error error-clean
+
 
 error-clean:
 	$(RM) -fr error/obj

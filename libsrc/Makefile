@@ -18,6 +18,9 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
+# Recursive wildcard expansion for portable source discovery.
+rwildcard = $(foreach entry,$(wildcard $(1)/*),$(call rwildcard,$(entry),$(2)) $(filter $(subst *,%,$(2)),$(entry)))
+
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib z180_crt0.lib 8080_crt0.lib 8085_crt0.lib vm1_crt0.lib gbz80_crt0.lib r2ka_crt0.lib r4k_crt0.lib ez80_z80_crt0.lib kc160_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += gfxtek.lib gfxregis.lib
 
@@ -98,6 +101,9 @@ include time/time.mak
 include sound/ay/ay.mak
 include sound/sn76489/sn76489.mak
 include sound/saa1099/saa1099.mak
+
+# Targets depend on some common code + target specific (include stdio in here)
+TARGET_CLIB_DEPS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS) $(SOUND_SAA1099_TARGETS) $(SOUND_AY_TARGETS) $(SOUND_SN76489_TARGETS) $(TIME_TARGETS)
 
 # To be replaced with a wildcard include at some point
 include target/abc80/abc80.mak
@@ -217,9 +223,6 @@ include target/zxn/zxn.mak
 include target/zxvgs/zxvgs.mak
 
 all: $(GENLIBS) $(TOCREATE)
-
-# Targets depend on some common code + target specific (include stdio in here)
-TARGET_CLIB_DEPS = $(STDIO_OBJS) $(X11_OBJS) $(GFXPORTABLE_OBJS) $(RETROFIT_OBJS) $(GAMES_NEWLIB_TARGETS) $(INPUT_OBJS) $(SOUND_SAA1099_TARGETS) $(SOUND_AY_TARGETS) $(SOUND_SN76489_TARGETS) $(TIME_TARGETS)
 
 # Generic maths build - dom, stefano
 genmath.lib:

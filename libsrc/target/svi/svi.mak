@@ -1,4 +1,4 @@
-SVI_SOURCES := $(shell find target/svi -type f \( -name '*.asm' -o -name '*.c' -o -name 'Makefile' \))
+SVI_SOURCES := $(call rwildcard,target/svi,*.asm) $(call rwildcard,target/svi,*.c) $(call rwildcard,target/svi,Makefile)
 
 SVI_TARGETS := \
 	target/svi/obj/target-svi-support \
@@ -6,6 +6,10 @@ SVI_TARGETS := \
 	classic/video/mc6845/obj/svi \
 	classic/games/obj/.stamp-svi \
 	classic/gfx/obj/.stamp-svi
+
+CLEAN += target-svi-clean
+TOCREATE += $(call check_target,svi,svi_clib.lib svibios.lib)
+$(eval $(call gfx_stamp_args,svi,TARGET=svi))
 
 svi_clib.lib: $(TARGET_CLIB_DEPS) msx_clib.lib $(SVI_TARGETS)
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
@@ -18,10 +22,7 @@ target/svi/obj/target-svi-support: $(SVI_SOURCES)
 	$(MAKE) -C target/svi
 	@touch $@
 
-CLEAN += target-svi-clean
-TOCREATE += $(call check_target,svi,svi_clib.lib svibios.lib)
 
-$(eval $(call gfx_stamp_args,svi,TARGET=svi))
 
 target-svi: $(SVI_TARGETS)
 

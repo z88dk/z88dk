@@ -157,6 +157,46 @@ $(eval $(call gfx_stamp,zx,narrow))
 		
 
 CLEAN += target-zx-clean
+define bifrost_zx0
+target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0: 
+	$(Q)mkdir -p target/$(1)/obj/$(1)
+	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
+	$(ZX0) -f $$(@:.zx0=)
+
+target/$(1)/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0 
+	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -DPLUS3 -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
+	$(ZX0) -f $$(@:.zx0=)
+endef
+$(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(ZX_ONLY_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(ZX_ONLY_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
+$(eval $(call buildtargetc,target/zx,zx))
+$(eval $(call bifrost_zx0,zx))
+$(eval $(call buildtargetasm,target/zx,z80,zxcpm,-mz80,$(ZXCPM_GLOBS),$(ZXCPM_GLOBS_ex)))
+define zx_support
+ZX_$(1)_CFILES := $(wildcard target/zx/classic/$(2)/*.c)
+ZX_$(1)_ASMFILES := $(wildcard target/zx/classic/$(2)/*.asm)
+ZX_$(1)_C_OBJECTS := $$(patsubst target/zx/%,target/zx/obj/support/%,$$(ZX_$(1)_CFILES:.c=.o))
+ZX_$(1)_ASM_OBJECTS := $$(patsubst target/zx/%,target/zx/obj/support/%,$$(ZX_$(1)_ASMFILES:.asm=.o))
+ZX_$(1)_OBJECTS := $$(ZX_$(1)_C_OBJECTS) $$(ZX_$(1)_ASM_OBJECTS)
+
+$$(ZX_$(1)_C_OBJECTS): target/zx/obj/support/classic/$(2)/%.o: target/zx/classic/$(2)/%.c
+	$(Q)mkdir -p $$(dir $$@)
+	$$(ZCC) +zx $$(CFLAGS) $(3) -c -o $$@ $$<
+
+$$(ZX_$(1)_ASM_OBJECTS): target/zx/obj/support/classic/$(2)/%.o: target/zx/classic/$(2)/%.asm
+	$(Q)mkdir -p $$(dir $$@)
+	$$(ZCC) +zx $$(CFLAGS) $(3) -c -o $$@ $$<
+endef
+$(eval $(call zx_support,microdrive,fcntl/microdrive))
+$(eval $(call zx_support,plus3,fcntl/plus3,-DPLUS3))
+$(eval $(call zx_support,zxbasdrv,fcntl/zxbasdrv))
+$(eval $(call zx_support,esxdos,fcntl/esxdos,-DESXDOS))
+$(eval $(call zx_support,rs232plus,rs232/plus3))
+$(eval $(call zx_support,rs232if1,rs232/if1))
+$(eval $(call zx_support,rs232morex,rs232/morex))
+ZX_SUPPORT_LIBS := p3.lib zxmdv.lib zxbasdrv.lib zxbasdos.lib esxdos.lib rs232plus.lib rs232if1.lib rs232morex.lib
+ZX_LIBS := zx_clib.lib zxcpm.lib mzx.lib mzx_tiny.lib $(ZX_SUPPORT_LIBS)
+TOCREATE += $(call check_target,zx,$(ZX_LIBS))
+
 mzx.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Maths Library ---'
@@ -175,52 +215,13 @@ target-zx: $(ZX_TARGETS)
 .PHONY: target-zx target-zx-clean
 
 # Arg1: machine
-define bifrost_zx0
-target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0: 
-	$(Q)mkdir -p target/$(1)/obj/$(1)
-	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
-	$(ZX0) -f $$(@:.zx0=)
-
-target/$(1)/obj/$(1)/bifrost2_engine_p3.bin.zx0: target/$(1)/obj/$(1)/bifrost2_engine_48.bin.zx0 
-	$(Q)$(ASSEMBLER) -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-Itarget/$(1) -g -I$(Z88DK_LIB) -DSTRIPVECTOR -DPLUS3 -b -o$$(@:.zx0=) target/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4
-	$(ZX0) -f $$(@:.zx0=)
-endef
 
 
-$(eval $(call buildtargetasm,target/zx,z80,zx,-mz80,$(ZX_GLOBS) $(ZX_ONLY_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZX_GLOBS_ex) $(ZX_ONLY_GLOBS_ex) $(BIFROST2_DEPS_ex) $(addprefix target/zx/obj/zx/, $(BIFROST2_GEN))))
-$(eval $(call buildtargetc,target/zx,zx))
-$(eval $(call bifrost_zx0,zx))
 
-$(eval $(call buildtargetasm,target/zx,z80,zxcpm,-mz80,$(ZXCPM_GLOBS),$(ZXCPM_GLOBS_ex)))
 
 # ZX support libraries
-define zx_support
-ZX_$(1)_CFILES := $(wildcard target/zx/classic/$(2)/*.c)
-ZX_$(1)_ASMFILES := $(wildcard target/zx/classic/$(2)/*.asm)
-ZX_$(1)_C_OBJECTS := $$(patsubst target/zx/%,target/zx/obj/support/%,$$(ZX_$(1)_CFILES:.c=.o))
-ZX_$(1)_ASM_OBJECTS := $$(patsubst target/zx/%,target/zx/obj/support/%,$$(ZX_$(1)_ASMFILES:.asm=.o))
-ZX_$(1)_OBJECTS := $$(ZX_$(1)_C_OBJECTS) $$(ZX_$(1)_ASM_OBJECTS)
 
-$$(ZX_$(1)_C_OBJECTS): target/zx/obj/support/classic/$(2)/%.o: target/zx/classic/$(2)/%.c
-	$(Q)mkdir -p $$(dir $$@)
-	$$(ZCC) +zx $$(CFLAGS) $(3) -c -o $$@ $$<
 
-$$(ZX_$(1)_ASM_OBJECTS): target/zx/obj/support/classic/$(2)/%.o: target/zx/classic/$(2)/%.asm
-	$(Q)mkdir -p $$(dir $$@)
-	$$(ZCC) +zx $$(CFLAGS) $(3) -c -o $$@ $$<
-endef
-
-$(eval $(call zx_support,microdrive,fcntl/microdrive))
-$(eval $(call zx_support,plus3,fcntl/plus3,-DPLUS3))
-$(eval $(call zx_support,zxbasdrv,fcntl/zxbasdrv))
-$(eval $(call zx_support,esxdos,fcntl/esxdos,-DESXDOS))
-$(eval $(call zx_support,rs232plus,rs232/plus3))
-$(eval $(call zx_support,rs232if1,rs232/if1))
-$(eval $(call zx_support,rs232morex,rs232/morex))
-
-ZX_SUPPORT_LIBS := p3.lib zxmdv.lib zxbasdrv.lib zxbasdos.lib esxdos.lib rs232plus.lib rs232if1.lib rs232morex.lib
-ZX_LIBS := zx_clib.lib zxcpm.lib mzx.lib mzx_tiny.lib $(ZX_SUPPORT_LIBS)
-TOCREATE += $(call check_target,zx,$(ZX_LIBS))
 
 # ZX Spectrum libraries
 zx_clib.lib: $(TARGET_CLIB_DEPS) $(ZX_TARGETS) $(FZX_TARGETS) $(ZX_SUPPORT_LIBS)

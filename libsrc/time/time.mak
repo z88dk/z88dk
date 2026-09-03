@@ -44,10 +44,6 @@ TIME_OBJS := $(addprefix time/obj/z80/, $(TIME_OBJECTS)) \
 OBJS += $(TIME_OBJS) $(TIME_TARGETS)
 CLEAN += time-clean
 
-time: $(TIME_OBJS) $(TIME_TARGETS)
-
-.PHONY: time time-clean
-
 $(eval $(call buildbit,time,z80,test))
 $(eval $(call buildbit,time,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,time,8080,test,-clib=8080,-m8080))
@@ -60,7 +56,6 @@ $(eval $(call buildbit,time,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,time,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,time,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,time,kc160,test,-clib=kc160,-mkc160))
-
 $(eval $(call buildnew,time,z80,-mz80,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
 $(eval $(call buildnew,time,r2ka,-mr2ka,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
 $(eval $(call buildnew,time,r4k,-mr4k,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
@@ -73,6 +68,12 @@ $(eval $(call buildnew,time,gbz80,-mgbz80,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
 $(eval $(call buildnew,time,z180,-mz180,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
 $(eval $(call buildnew,time,ez80_z80,-mez80_z80,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
 $(eval $(call buildnew,time,kc160,-mkc160,$(TIME_GLOBS),$(TIME_GLOBS_ex)))
+
+time: $(TIME_OBJS) $(TIME_TARGETS)
+
+.PHONY: time time-clean
+
+
 
 
 time-clean:

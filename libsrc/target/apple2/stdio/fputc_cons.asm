@@ -16,8 +16,6 @@
 	EXTERN	a2_ctl
     EXTERN CLIB_FPUTC_CLS_CODE
     
-	defc STANDARDESCAPECHARS=1
-
 ;
 ; Entry:        hl = points to char
 ;

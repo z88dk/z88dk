@@ -29,6 +29,9 @@ $(eval $(call gfx_stamp_args,srr,TARGET=srr FLAVOUR="gencon narrow"))
 CLEAN += target-srr-clean
 TOCREATE += $(call check_target,srr,srr_clib.lib)
 
+$(eval $(call buildtargetasm,target/srr,z80,srr,-mz80,$(SRR_GLOBS),$(SRR_GLOBS_ex)))
+$(eval $(call buildtargetc,target/srr,srr))
+
 srr_clib.lib: $(TARGET_CLIB_DEPS) $(SRR_TARGETS)
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/srr_clib @$(TARGET_DIRECTORY)/srr/srr.lst
 
@@ -36,8 +39,6 @@ target-srr: $(SRR_TARGETS)
 
 .PHONY: target-srr target-srr-clean
 
-$(eval $(call buildtargetasm,target/srr,z80,srr,-mz80,$(SRR_GLOBS),$(SRR_GLOBS_ex)))
-$(eval $(call buildtargetc,target/srr,srr))
 
 target-srr-clean:
 	$(RM) -fr target/srr/obj

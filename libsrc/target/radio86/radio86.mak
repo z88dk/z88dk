@@ -11,22 +11,23 @@ RADIO86_TARGETS := target/radio86/obj/target-radio86-radio86 classic/gfx/obj/.st
 		
 
 CLEAN += target-radio86-clean
+TOCREATE += $(call check_target,radio86,radio86_clib.lib)
+$(eval $(call gfx_stamp_portable_args,radio86,TARGET=radio86 FLAVOUR=gencon))
+$(eval $(call buildtargetasm,target/radio86,8080,radio86,-m8080,$(RADIO86_GLOBS),$(RADIO86_GLOBS_ex)))
+
 radio86_clib.lib: $(TARGET_CLIB_DEPS) $(RADIO86_TARGETS)
 	@echo ''
 	@echo '--- Building Radio86 Library ---'
 	@echo ''
 	TARGET=radio86 TYPE=8080 $(LIBLINKER) -m8080 -DFORradio86 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/radio86_clib @$(TARGET_DIRECTORY)/radio86/radio86.lst
 
-TOCREATE += $(call check_target,radio86,radio86_clib.lib)
 
-$(eval $(call gfx_stamp_portable_args,radio86,TARGET=radio86 FLAVOUR=gencon))
 
 target-radio86: $(RADIO86_TARGETS)
 
 .PHONY: target-radio86 target-radio86-clean
 
 
-$(eval $(call buildtargetasm,target/radio86,8080,radio86,-m8080,$(RADIO86_GLOBS),$(RADIO86_GLOBS_ex)))
 
 target-radio86-clean:
 	$(RM) -fr target/radio86/obj

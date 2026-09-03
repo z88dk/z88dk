@@ -76,8 +76,8 @@ ZX81_BASE_TARGETS := \
 	classic/gfx/obj/.stamp-zx81
 
 LAMBDA_TARGETS := \
-	$(ZX81_BASE_TARGETS) \
 	target/zx81/obj/target-zx81-lambda \
+	classic/games/obj/.stamp-zx81-lambda \
 	classic/gfx/obj/.stamp-zx81-lambda
 
 GFX81_TARGETS := $(ZX81_BASE_TARGETS)
@@ -95,6 +95,7 @@ GFX81HR384_TARGETS := target/zx81/obj/target-zx81-zx81hr384 classic/gfx/obj/.sta
 $(eval $(call gfx_stamp_args,zx81,TARGET=zx81 FLAVOUR=narrow))
 $(eval $(call gfx_stamp_args,zx81-phrg,TARGET=zx81 FLAVOUR=narrow SUBTYPE=zx81phrg))
 $(eval $(call gfx_stamp_args,zx81-lambda,TARGET=zx81 FLAVOUR=narrow SUBTYPE=lambda))
+$(eval $(call games_stamp_args,zx81-lambda,TARGET=zx81 SUBTYPE=lambda ASM_TARGET=zx81))
 $(eval $(call gfx_stamp_args,zx81-udg,TARGET=zx81 SUBTYPE=zx81udg FLAVOUR="narrow text6"))
 $(eval $(call gfx_stamp_args,zx81-hr64,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81hr64))
 $(eval $(call gfx_stamp_args,zx81-g64,TARGET=zx81 FLAVOUR="narrow gray" SUBTYPE=zx81g64))
@@ -113,11 +114,33 @@ ZX81_TARGETS := \
 	$(GFX81HR128_TARGETS) $(GFX81HR192_TARGETS) $(GFX81MT192_TARGETS) \
 	$(GFX81G007_TARGETS) $(GFX81HR384_TARGETS)
 
+CLEAN += target-zx81-clean
+TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
+TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib gfx81phrg.lib gfx81arx64.lib gfx81g064.lib gfx81mt64.lib gfx81arx128.lib gfx81arx192.lib gfx81mt192.lib gfx81g007.lib)
+define buildzx81asm
+target/zx81/obj/target-zx81-$(2): $(3)
+	$(Q)mkdir -p target/zx81/obj/$(2)
+	$(Q)$(ASSEMBLER) -d -O=target/zx81/obj/$(2)/x -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/zx81 -I$(Z88DK_LIB) -I$(Z88DK_LIB)/target/zx81/def -Itarget/zx81 -Itarget/zx81/obj/$(2) -I$(Z88DK_LIBSRC)/classic $(4) -I$(Z88DK_LIB) -D__CLASSIC -DFOR$(2) $(1)
+	$(Q)touch $$@
+endef
+$(eval $(call buildzx81asm,$(ZX81_BASE_GLOBS),zx81,$(ZX81_BASE_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_PHRG_GLOBS),zx81phrg,$(ZX81_PHRG_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_BASE_GLOBS),lambda,$(ZX81_BASE_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_UDG_GLOBS),zx81udg,$(ZX81_UDG_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr64,$(ZX81_HR_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81g64,$(ZX81_HR_GLOBS_ex),-IXIY -DG007))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81mt64,$(ZX81_HR_GLOBS_ex),-IXIY -DMTHRG))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr128,$(ZX81_HR_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr192,$(ZX81_HR_GLOBS_ex),-IXIY))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81mt192,$(ZX81_HR_GLOBS_ex),-IXIY -DMTHRG))
+$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81g007,$(ZX81_HR_GLOBS_ex),-IXIY -DG007))
+$(eval $(call buildzx81asm,$(ZX81_HRI_GLOBS),zx81hr384,$(ZX81_HRI_GLOBS_ex),-IXIY))
+
 zx81_clib.lib: $(TARGET_CLIB_DEPS) zx80_clib.lib $(ZX81_BASE_TARGETS)
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
 
 lambda_clib.lib: $(TARGET_CLIB_DEPS) zx81_clib.lib $(LAMBDA_TARGETS)
-	TARGET=zx81 SUBTARGET=lambda TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
+	TARGET=lambda TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(TARGET_DIRECTORY)/zx81/zx81.lst
 
 gfx81.lib: $(TARGET_CLIB_DEPS) lambda_clib.lib $(GFX81_TARGETS)
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81 @$(TARGET_DIRECTORY)/zx81/gfx81.lst
@@ -193,33 +216,12 @@ mlambda_tiny.lib:
 	$(MAKE) -C math/float/zxmath mlambdav1_tiny
 	$(MAKE) -C math/float/zxmath mlambdav3_tiny
 
-CLEAN += target-zx81-clean
-TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
-TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr128.lib gfx81hr192.lib gfx81hr384.lib m81.lib m81_tiny.lib gfx81phrg.lib gfx81arx64.lib gfx81g064.lib gfx81mt64.lib gfx81arx128.lib gfx81arx192.lib gfx81mt192.lib gfx81g007.lib)
 
 target-zx81: $(ZX81_TARGETS)
 
 .PHONY: target-zx81 target-zx81-clean
 
-define buildzx81asm
-target/zx81/obj/target-zx81-$(2): $(3)
-	$(Q)mkdir -p target/zx81/obj/$(2)
-	$(Q)$(ASSEMBLER) -d -O=target/zx81/obj/$(2)/x -m4=-I$(Z88DK_LIB)/../src/m4 -m4=-I$(Z88DK_LIBSRC)/target/zx81 -I$(Z88DK_LIB) -I$(Z88DK_LIB)/target/zx81/def -Itarget/zx81 -Itarget/zx81/obj/$(2) -I$(Z88DK_LIBSRC)/classic $(4) -I$(Z88DK_LIB) -D__CLASSIC -DFOR$(2) $(1)
-	$(Q)touch $$@
-endef
 
-$(eval $(call buildzx81asm,$(ZX81_BASE_GLOBS),zx81,$(ZX81_BASE_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_PHRG_GLOBS),zx81phrg,$(ZX81_PHRG_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_GFX_GLOBS),lambda,$(ZX81_GFX_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_UDG_GLOBS),zx81udg,$(ZX81_UDG_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr64,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81g64,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81mt64,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr128,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81hr192,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81mt192,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HR_GLOBS),zx81g007,$(ZX81_HR_GLOBS_ex),-IXIY))
-$(eval $(call buildzx81asm,$(ZX81_HRI_GLOBS),zx81hr384,$(ZX81_HRI_GLOBS_ex),-IXIY))
 
 target-zx81-clean:
 	$(RM) -fr target/zx81/obj

@@ -15,6 +15,10 @@ Z1013_TARGETS := target/z1013/obj/target-z1013-z1013 classic/games/obj/.stamp-z1
 		
 
 CLEAN += target-z1013-clean
+TOCREATE += $(call check_target,z1013,z1013_clib.lib)
+$(eval $(call gfx_stamp_args,z1013,TARGET=z1013 FLAVOUR="gencon narrow"))
+$(eval $(call buildtargetasm,target/z1013,z80,z1013,-mz80,$(Z1013_GLOBS),$(Z1013_GLOBS_ex)))
+
 z1013_clib.lib: $(TARGET_CLIB_DEPS) $(Z1013_TARGETS)
 	@echo ''
 	@echo '--- Building Robotron Z1013 Library ---'
@@ -22,16 +26,13 @@ z1013_clib.lib: $(TARGET_CLIB_DEPS) $(Z1013_TARGETS)
 	$(MAKE) -C classic/video/krt TARGET=z1013
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(TARGET_DIRECTORY)/z1013/z1013.lst
 
-TOCREATE += $(call check_target,z1013,z1013_clib.lib)
 
-$(eval $(call gfx_stamp_args,z1013,TARGET=z1013 FLAVOUR="gencon narrow"))
 
 target-z1013: $(Z1013_TARGETS)
 
 .PHONY: target-z1013 target-z1013-clean
 
 
-$(eval $(call buildtargetasm,target/z1013,z80,z1013,-mz80,$(Z1013_GLOBS),$(Z1013_GLOBS_ex)))
 
 target-z1013-clean:
 	$(RM) -fr target/z1013/obj

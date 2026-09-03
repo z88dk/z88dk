@@ -35,6 +35,14 @@ TVC_TARGETS := target/tvc/obj/target-tvc-tvc \
 TVCROMGFX_TARGETS := target/tvc/romgfx/obj/target-tvc-romgfx-tvc \
 	$(TVCROMGFX_OFILES)
 
+CLEAN += target-tvc-clean
+TOCREATE += $(call check_target,tvc,tvc_clib.lib tvc_romgfx.lib)
+$(eval $(call gfx_stamp_args,tvc,TARGET=tvc))
+$(eval $(call buildtargetasm,target/tvc,z80,tvc,-mz80,$(TVC_GLOBS),$(TVC_GLOBS_ex)))
+$(eval $(call buildtargetasm,target/tvc/romgfx,z80,tvc,-mz80,$(TVCROMGFX_GLOBS),$(TVCROMGFX_GLOBS_ex)))
+$(eval $(call buildtargetc,target/tvc,tvc,-DTVC -D__TVC__ $(CFLAGS)))
+$(eval $(call buildtargetc,target/tvc/romgfx,tvc,-DTVC -D__TVC__ $(CFLAGS)))
+
 tvc_clib.lib: $(TARGET_CLIB_DEPS) $(TVC_TARGETS)
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(TARGET_DIRECTORY)/tvc/tvc.lst
 
@@ -42,19 +50,12 @@ tvc_romgfx.lib: tvc_clib.lib $(TVCROMGFX_TARGETS)
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_romgfx @$(TARGET_DIRECTORY)/tvc/tvc_romgfx.lst
 
 
-CLEAN += target-tvc-clean
-TOCREATE += $(call check_target,tvc,tvc_clib.lib tvc_romgfx.lib)
 
-$(eval $(call gfx_stamp_args,tvc,TARGET=tvc))
 
 target-tvc: $(TVC_TARGETS) $(TVCROMGFX_TARGETS)
 
 .PHONY: target-tvc target-tvc-clean
 
-$(eval $(call buildtargetasm,target/tvc,z80,tvc,-mz80,$(TVC_GLOBS),$(TVC_GLOBS_ex)))
-$(eval $(call buildtargetasm,target/tvc/romgfx,z80,tvc,-mz80,$(TVCROMGFX_GLOBS),$(TVCROMGFX_GLOBS_ex)))
-$(eval $(call buildtargetc,target/tvc,tvc,-DTVC -D__TVC__ $(CFLAGS)))
-$(eval $(call buildtargetc,target/tvc/romgfx,tvc,-DTVC -D__TVC__ $(CFLAGS)))
 
 target-tvc-clean:
 	$(RM) -fr target/tvc/obj target/tvc/romgfx/obj

@@ -13,6 +13,8 @@ else
 OBJSUBDIR = $(SUBTYPE)
 endif
 
+ASM_TARGET ?= $(SUBTYPE)
+
 GENOBJECTS =
 CUSTOBJECTS = bit_frequency.o bit_play.o buzzer_play.o synth_play.o psg_play.o bit_save_zx.o joystick_type.o bit_load_msx.o bit_load_vg5000.o
 
@@ -32,7 +34,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../../ -Ca-DFOR$(SUBTYPE)
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../../ -Ca-DFOR$(ASM_TARGET)
 
 obj/zxn/%.o: %.c
 	$(ZCC) +$(TARGET) -clib=classic $(CFLAGS) -o $@  $^

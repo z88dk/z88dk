@@ -38,22 +38,23 @@ Z88_OFILES = $(patsubst target/z88/%,target/z88/obj/z88/%,$(Z88_CFILES:.c=.o))
 
 Z88_TARGETS := target/z88/obj/target-z88-z88  $(Z88_OFILES) classic/games/obj/.stamp-z88 classic/gfx/obj/.stamp-z88-wide
 
+$(eval $(call gfx_stamp,z88,wide))
+CLEAN += target-z88-clean
+TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
+$(eval $(call buildtargetasm,target/z88,z80,z88,-mz80,$(Z88_GLOBS),$(Z88_GLOBS_ex)))
+$(eval $(call buildtargetc,target/z88,z88))
+
 z88_clib.lib: $(TARGET_CLIB_DEPS) $(Z88_TARGETS)
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(TARGET_DIRECTORY)/z88/z88.lst
 
-$(eval $(call gfx_stamp,z88,wide))
 		
 
-CLEAN += target-z88-clean
-TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 
 target-z88: $(Z88_TARGETS)
 
 .PHONY: target-z88 target-z88-clean
 
 
-$(eval $(call buildtargetasm,target/z88,z80,z88,-mz80,$(Z88_GLOBS),$(Z88_GLOBS_ex)))
-$(eval $(call buildtargetc,target/z88,z88))
 
 
 target-z88-clean:

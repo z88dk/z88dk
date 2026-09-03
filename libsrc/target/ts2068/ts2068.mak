@@ -55,6 +55,9 @@ $(eval $(call gfx_stamp,ts2068,wide))
 		
 
 CLEAN += target-ts2068-clean
+TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
+$(eval $(call buildtargetasm,target/ts2068,z80,ts2068,-mz80,$(TS2068_GLOBS),$(TS2068_GLOBS_ex)))
+
 ts2068_clib.lib: $(TARGET_CLIB_DEPS) zxn_clib.lib $(TS2068_TARGETS)
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
@@ -67,13 +70,11 @@ m2068.lib:
 	@echo ''
 	$(MAKE) -C math/float/zxmath m2068
 
-TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 
 target-ts2068: $(TS2068_TARGETS)
 
 .PHONY: target-ts2068 target-ts2068-clean
 
-$(eval $(call buildtargetasm,target/ts2068,z80,ts2068,-mz80,$(TS2068_GLOBS),$(TS2068_GLOBS_ex)))
 target/ts2068/obj/ts2068/%.o: target/zx/%.c
 	$(Q)mkdir -p $(dir $@)
 	$(ZCC) +ts2068 -Ca-I$(dir $<) -c -o $@ $<

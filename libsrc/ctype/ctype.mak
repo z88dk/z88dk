@@ -18,10 +18,6 @@ CTYPE_TARGETS := ctype/obj/newlib-z80-ctype \
 OBJS += $(CTYPE_TARGETS)
 CLEAN += ctype-clean
 
-ctype: $(CTYPE_TARGETS)
-
-.PHONY: ctype ctype-clean
-
 $(eval $(call buildnew,ctype,z80,-mz80,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,r2ka,-mr2ka,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,r4k,-mr4k,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
@@ -34,6 +30,11 @@ $(eval $(call buildnew,ctype,gbz80,-mgbz80,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,z180,-mz180,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,ez80_z80,-mez80_z80,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
 $(eval $(call buildnew,ctype,kc160,-mkc160,$(CTYPE_GLOBS),$(CTYPE_GLOBS_ex)))
+
+ctype: $(CTYPE_TARGETS)
+
+.PHONY: ctype ctype-clean
+
 
 ctype-clean:
 	$(RM) -fr ctype/obj

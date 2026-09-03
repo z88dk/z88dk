@@ -25,6 +25,11 @@ MSX_TARGETS := \
 
 MSX2_TARGETS := $(MSX_TARGETS) classic/video/tms9918/obj/msx2
 
+CLEAN += target-msx-clean
+TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib msxbios.lib cpm_msx.lib)
+$(eval $(call gfx_stamp_args,msx,TARGET=msx))
+$(eval $(call buildtargetasm,target/msx,z80,msx,-mz80,$(MSX_GLOBS),$(MSX_GLOBS_ex)))
+
 msx_clib.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
 
@@ -37,10 +42,7 @@ cpm_msx.lib: $(TARGET_CLIB_DEPS) $(MSX_TARGETS)
 msx2.lib: $(TARGET_CLIB_DEPS) $(MSX2_TARGETS)
 	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
 
-CLEAN += target-msx-clean
-TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib msxbios.lib cpm_msx.lib)
 
-$(eval $(call gfx_stamp_args,msx,TARGET=msx))
 
 target-msx: $(MSX_TARGETS)
 
@@ -52,7 +54,6 @@ classic/video/tms9918/obj/msx:
 classic/video/tms9918/obj/msx2:
 	$(Q)$(MAKE) -C classic/video/tms9918 TARGET=msx SUBTYPE=msx2
 
-$(eval $(call buildtargetasm,target/msx,z80,msx,-mz80,$(MSX_GLOBS),$(MSX_GLOBS_ex)))
 
 target/msx/obj/target-msx-support: target/msx/obj/target-msx-msx
 	$(Q)mkdir -p $(dir $@)
