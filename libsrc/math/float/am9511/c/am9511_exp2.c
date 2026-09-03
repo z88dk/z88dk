@@ -19,17 +19,18 @@
 
 float am9511_exp2 (float x) __z88dk_fastcall
 {
-#if 0
+    union float_long fl;
+
     if( x > MAXL2_F32 )
     {
-        return( HUGE_POS_F32 );
+        fl.l = (int32_t)INFINITY_POS_F32;
+        return fl.f;
     }
 
     if( x < MINL2_F32 )
     {
-        return(0.0);
+        return 0.0;
     }
-#endif
 
     if( x == 0.0 )
         return 1.0;

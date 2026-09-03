@@ -6,5 +6,9 @@
 
 float am9511_asinh (float x) __z88dk_fastcall
 {
-    return log( mul2( fabs(x)) + 1 / (( sqrt( sqr(x) + 1.0) + fabs(x))));
+    float a, r;
+
+    a = fabs(x);
+    r = log( mul2(a) + 1.0 / (sqrt(sqr(a) + 1.0) + a) );
+    return x < 0.0 ? -r : r;
 }

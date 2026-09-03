@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -365,16 +365,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -394,17 +394,22 @@ ENDIF
 ; ---------------------------------
 _am9511_round:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	c, l
 	ld	b, h
 	ld	hl, -18
 	add	hl, sp
 	ld	sp, hl
-	pop	hl
-	push	bc
-	ld	(ix-16),e
-	ld	(ix-15),d
+	ld	hl,0
+	add	hl, sp
+	ld	(hl), c
+	inc	hl
+	ld	(hl), b
+	inc	hl
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
 	ld	a,(ix-18)
 	ld	(ix-4),a
 	ld	a,(ix-17)
@@ -431,13 +436,13 @@ _am9511_round:
 	and	a,0x7f
 	ld	(ix-1),a
 	ld	a,0x17
-l_am9511_round_00151:
+l_am9511_round_00156:
 	srl	(ix-1)
 	rr	(ix-2)
 	rr	(ix-3)
 	rr	(ix-4)
 	dec	a
-	jr	NZ, l_am9511_round_00151
+	jr	nz,l_am9511_round_00156
 	ld	a,(ix-4)
 	ld	l,0x00
 	add	a,0x81
@@ -452,9 +457,9 @@ l_am9511_round_00151:
 	ccf
 	rra
 	sbc	a,0x80
-	jp	NC, l_am9511_round_00112
+	jp	nc, l_am9511_round_00112
 	bit	7,(ix-9)
-	jr	Z,l_am9511_round_00106
+	jr	z,l_am9511_round_00106
 	ld	bc,0x0000
 	ld	e,0x00
 	ld	a,(ix-11)
@@ -463,7 +468,7 @@ l_am9511_round_00151:
 	ld	a,(ix-10)
 	and	a,(ix-9)
 	inc	a
-	jp	NZ,l_am9511_round_00113
+	jp	nz,l_am9511_round_00113
 	ld	bc,0x0000
 	set	7, e
 	ld	a, d
@@ -477,15 +482,15 @@ l_am9511_round_00106:
 	xor	a, a
 	ld	(ix-1),a
 	inc	a
-	jr	l_am9511_round_00156
-l_am9511_round_00155:
+	jr	l_am9511_round_00161
+l_am9511_round_00160:
 	sra	(ix-1)
 	rr	(ix-2)
 	rr	(ix-3)
 	rr	(ix-4)
-l_am9511_round_00156:
+l_am9511_round_00161:
 	dec	a
-	jr	NZ, l_am9511_round_00155
+	jr	nz,l_am9511_round_00160
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	ld	(ix-8),l
@@ -505,30 +510,27 @@ l_am9511_round_00156:
 	or	a,a
 	or	a,(ix-3)
 	or	a,(ix-4)
-	jr	NZ,l_am9511_round_00104
+	jr	nz,l_am9511_round_00104
 	ld	l, c
 	ld	h, b
 	jr	l_am9511_round_00114
 l_am9511_round_00104:
-	ld	a,(ix-10)
-	push	af
-	ld	bc,0x0000
+	ld	b,(ix-10)
+	xor	a, a
+	ld	c, a
 	ld	de,0x0040
-	pop	af
-	inc	a
-	jr	l_am9511_round_00158
-l_am9511_round_00157:
+	inc	b
+	jr	l_am9511_round_00163
+l_am9511_round_00162:
 	sra	d
 	rr	e
-	rr	b
 	rr	c
-l_am9511_round_00158:
-	dec	a
-	jr	NZ, l_am9511_round_00157
-	ld	a, c
+	rr	a
+l_am9511_round_00163:
+	djnz	l_am9511_round_00162
 	add	a,(ix-14)
 	ld	(ix-4),a
-	ld	a, b
+	ld	a, c
 	adc	a,(ix-13)
 	ld	(ix-3),a
 	ld	a, e
@@ -555,7 +557,7 @@ l_am9511_round_00112:
 	ld	a,(ix-10)
 	sub	a,0x80
 	or	a,(ix-9)
-	jr	NZ,l_am9511_round_00109
+	jr	nz,l_am9511_round_00109
 	push	de
 	push	bc
 	push	de
@@ -572,9 +574,9 @@ l_am9511_round_00113:
 	ld	(ix-16),e
 	ld	(ix-15),d
 	pop	hl
+	pop	de
+	push	de
 	push	hl
-	ld	e,(ix-16)
-	ld	d,(ix-15)
 l_am9511_round_00114:
 	ld	sp, ix
 	pop	ix

@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -364,16 +364,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -392,24 +392,82 @@ ENDIF
 ; Function am9511_exp2
 ; ---------------------------------
 _am9511_exp2:
+	push	ix
+	ld	ix,	+0
+	add	ix, sp
+	push	af
+	push	af
+	push	hl
+	ld	c,l
+	ld	b,h
+	push	de
+	push	de
+	push	bc
+	ld	hl,0x427c
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	pop	de
+	pop	bc
+	or	a, a
+	jr	z,l_am9511_exp2_00102
+	ld	hl,0
+	add	hl, sp
+	xor	a, a
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl),0x80
+	inc	hl
+	ld	(hl),0x7f
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	jr	l_am9511_exp2_00107
+l_am9511_exp2_00102:
+	push	bc
+	push	de
+	ld	hl,0xc280
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
+	call	___fslt_callee
+	ld	a, l
+	pop	de
+	pop	bc
+	or	a, a
+	jr	z,l_am9511_exp2_00104
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
+	jr	l_am9511_exp2_00107
+l_am9511_exp2_00104:
 	ld	a, d
 	and	a,0x7f
 	or	a, e
-	or	a, h
-	or	a, l
-	jr	NZ,l_am9511_exp2_00102
+	or	a, b
+	or	a, c
+	jr	nz,l_am9511_exp2_00106
 	ld	de,0x3f80
 	ld	hl,0x0000
-	jr	l_am9511_exp2_00103
-l_am9511_exp2_00102:
+	jr	l_am9511_exp2_00107
+l_am9511_exp2_00106:
 	push	de
-	push	hl
+	push	bc
 	ld	hl,0x3f31
 	push	hl
 	ld	hl,0x7218
 	push	hl
 	call	___fsmul_callee
-	jp	_exp_fastcall
-l_am9511_exp2_00103:
+	call	_exp_fastcall
+l_am9511_exp2_00107:
+	ld	sp, ix
+	pop	ix
 	ret
 	SECTION IGNORE

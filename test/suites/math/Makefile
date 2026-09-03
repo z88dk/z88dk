@@ -12,13 +12,13 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 # IEEE specials harness (-DMATH_SPECIALS in math.c): light Inf/NaN checks
 # (div, mul/add, sqrt).  Enabled on products that pass:
 #   math32, math32_ez80_z80, math32_8085, math32_8080, math32_gbz80,
-#   math16, math16_8085, 9511, 9511_8085
+#   math16, math16_8085, am9511, am9511_8085
 #
 # Other math32 CPU products (z180/z80n/r2ka/…) share specials cores but are
 # not suite-gated here — add -DMATH_SPECIALS after a green run if desired.
 #
 # Not enabled (no proper IEEE specials / stubs):
-#   genmath, math48, mbf32*, bbcmath, cpcmath, daimath32, fix16, 9511_rc2014
+#   genmath, math48, mbf32*, bbcmath, cpcmath, daimath32, fix16, am9511_rc2014
 #
 # Folding gate: math.c uses direct forms (pinf - pinf, pinf / pinf).  Those
 # are IEEE specials, not algebraic identities.  Any compiler that generalises
@@ -30,10 +30,10 @@ all: test_genmath.bin test_daimath32.bin test_bbcmath.bin test_math16.bin test_m
 	test_math32.bin test_math32_z180.bin test_math32_ez80_z80.bin test_math32_z80n.bin \
 	test_math32_r2ka.bin test_math32_r4k.bin test_math32_r6k.bin test_math32_kc160.bin \
 	test_math32_8085.bin test_math32_8080.bin test_math32_gbz80.bin \
-	test_math48.bin test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
+	test_math48.bin test_math48_rc2014_CODE.bin test_am9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_vm1.bin test_mbf32_gbz80.bin \
 	test_mbf32_r2ka.bin test_mbf32_r4k.bin test_mbf32_r6k.bin test_mbf32_ez80_z80.bin test_mbf32_kc160.bin \
-	test_9511.bin test_9511_8085.bin test_fixmath.bin
+	test_am9511.bin test_am9511_8085.bin test_fixmath.bin
 
 test_fixmath.bin: $(FIXSOURCES)
 	$(call compile, -DFIX16 -DMATH_LIBRARY="\"\\\"fix16\\\"\"", -lm)
@@ -64,7 +64,7 @@ test_mbf32_8085.bin: $(FPSOURCES)
 	$(call compile_8085, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_8085)
 
-test_9511.bin: $(FPSOURCES)
+test_am9511.bin: $(FPSOURCES)
 	$(call compile, -DAM9511 --math-am9511 -DMATH_SPECIALS -DMATH_LIBRARY="\"\\\"AM9511-z80\\\"\"")
 	$(runtest)
 
@@ -75,7 +75,7 @@ test_mbf32_vm1.bin: $(FPSOURCES)
 	$(call compile_vm1, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
 	$(runtest_vm1)
 
-test_9511_8085.bin: $(FPSOURCES)
+test_am9511_8085.bin: $(FPSOURCES)
 	$(call compile_8085, -DAM9511 --math-am9511 -DMATH_SPECIALS -DMATH_LIBRARY="\"\\\"AM9511-8085\\\"\"")
 	$(runtest_8085)
 
@@ -155,7 +155,7 @@ test_math48_rc2014_CODE.bin: $(FPSOURCES)
 	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)
 	$(runtest_rc2014)
 
-test_9511_rc2014_CODE.bin: $(FPSOURCES)
+test_am9511_rc2014_CODE.bin: $(FPSOURCES)
 	$(call compile_rc2014, -DAM9511 -D__MATH_AM9511 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"AM9511\\\"\"", -lam9511)
 	$(runtest_rc2014)
 

@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler
-; Version 4.5.0 #15248 (Linux)
+; Version 4.6.0 #16639 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
-	
+
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -364,16 +364,16 @@
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
-	
+
 IF 0
-	
+
 ; .area _INITIALIZED removed by z88dk
-	
-	
+
+
 ENDIF
-	
+
 ;--------------------------------------------------------
-; absolute external ram data
+; absolute ram data
 ;--------------------------------------------------------
 	SECTION IGNORE
 ;--------------------------------------------------------
@@ -393,8 +393,8 @@ ENDIF
 ; ---------------------------------
 _am9511_atan2:
 	push	ix
-	ld	ix,0
-	add	ix,sp
+	ld	ix,	+0
+	add	ix, sp
 	ld	hl, -5
 	add	hl, sp
 	ld	sp, hl
@@ -414,7 +414,7 @@ _am9511_atan2:
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
-	jp	Z, l_am9511_atan2_00118
+	jp	z, l_am9511_atan2_00118
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	ld	e,(ix+10)
@@ -439,7 +439,7 @@ _am9511_atan2:
 	push	hl
 	call	___fslt_callee
 	bit	0,l
-	jr	NZ,l_am9511_atan2_00110
+	jr	nz,l_am9511_atan2_00110
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
@@ -470,9 +470,9 @@ _am9511_atan2:
 	pop	de
 	pop	hl
 	or	a, a
-	jp	Z, l_am9511_atan2_00111
+	jp	z, l_am9511_atan2_00111
 	bit	0,(ix-5)
-	jr	NZ,l_am9511_atan2_00102
+	jr	nz,l_am9511_atan2_00102
 	ld	bc,0x4049
 	push	bc
 	ld	bc,0x0fdb
@@ -510,7 +510,7 @@ l_am9511_atan2_00110:
 	ld	d, a
 	ld	a,(ix-5)
 	or	a, a
-	jr	Z,l_am9511_atan2_00107
+	jr	z,l_am9511_atan2_00107
 	ld	bc,0x3fc9
 	push	bc
 	ld	bc,0x0fdb
@@ -542,14 +542,14 @@ l_am9511_atan2_00118:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	Z,l_am9511_atan2_00115
+	jr	z,l_am9511_atan2_00115
 	ld	de,0x3fc9
 	ld	hl,0x0fdb
 	jr	l_am9511_atan2_00120
 l_am9511_atan2_00115:
 	ld	a,(ix-5)
 	or	a, a
-	jr	Z,l_am9511_atan2_00119
+	jr	z,l_am9511_atan2_00119
 	ld	de,0xbfc9
 	ld	hl,0x0fdb
 	jr	l_am9511_atan2_00120
