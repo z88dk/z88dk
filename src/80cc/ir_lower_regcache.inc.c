@@ -481,6 +481,21 @@ static void load_to_hl_adj(FILE *out, const Func *f, int vreg_id, int sp_adj)
         hl_about_to_change(vreg_id);
         return;
     }
+    /* [IR_BYTE_REMAT] Re-issue the global load rather than read the slot the
+       remat table dropped (an sc1 register byte arg arrives here). sp_adj is
+       irrelevant — an absolute load is position-independent. */
+    if (width == 1) {
+        const Op *br = byte_remat_of(f, vreg_id);
+        if (br) {
+            char s[80]; byte_remat_symstr(s, sizeof s, br);
+            emit(out, "ld\ta,(%s)", s);
+            cache_a(vreg_id);
+            emit(out, "ld\tl,a");
+            emit(out, "ld\th,0");
+            hl_about_to_change(vreg_id);
+            return;
+        }
+    }
     /* Rematerialize a constant/address instead of reloading its slot: a
        loop-invariant `ld hl,<const>` (10T) beats `ld hl,(ix+d)` (19T) and
        spills nothing. Cache-miss only (every register hit was checked above).

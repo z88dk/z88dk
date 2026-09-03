@@ -1783,8 +1783,17 @@ static int gen_conv_trunc(FILE *out, Func *f, const Op *op)
     if (src_w == 4 && dst_w == 2) {
         /* Long → int: just take the low half (HL of DEHL). */
         load_to_dehl(out, f, op->src[0]);
-        store_hl(out, f, op->dst);
-        invalidate_hl_cache();
+        /* [IR_TRUNCRES] HL holds the result — say so. The old form spilled it
+           and then invalidated the cache, so the consumer one op later reloaded
+           the slot that had just been written (`ld (ix-N),hl; ld de,(ix-N)`
+           where `ex de,hl` would do). commit_hl_result also lets the dead-store
+           pass drop the spill outright and routes a PR_DE dst into DE. */
+        if (truncres_enabled()) {
+            commit_hl_result(out, f, op->dst);
+        } else {
+            store_hl(out, f, op->dst);
+            invalidate_hl_cache();
+        }
         return 0;
     }
     if (src_w == 4 && dst_w == 1) {
@@ -5872,6 +5881,18 @@ static void push_arg_byte_to_a(FILE *out, const Func *f, int vreg, int sp_adj)
        is dropped on any real A change): skip the reload. Mirrors load_byte_to_a's
        a_has fast path, which this helper otherwise reimplements without. */
     if (a_has(vreg)) return;
+    /* [IR_CALL_BREMAT] The byte is a single-use global load with no memory write
+       between it and this call — re-issue the load instead of reading a slot the
+       byte-remat table already dropped. */
+    {
+        const Op *br = byte_remat_of(f, vreg);
+        if (br) {
+            char s[80]; byte_remat_symstr(s, sizeof s, br);
+            emit(out, "ld\ta,(%s)", s);
+            cache_a(vreg);
+            return;
+        }
+    }
     if (fp_active(f)) {
         int ixoff = slot_ix_off(f, vreg);
         if (fp_offset_fits(ixoff)) {

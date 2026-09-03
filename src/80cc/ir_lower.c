@@ -436,6 +436,89 @@ static int  remat_lea_enabled(void)
     return remat_lea_on;
 }
 
+/* IR_CALL_BREMAT: let a CALL ARGUMENT be the single use that qualifies a
+   global byte load for [IR_BYTE_REMAT]. A byte argument is a TERMINAL consumer —
+   the marshaller reads it once and pushes it — so re-issuing `ld a,(sym)` at the
+   push site costs the same 3 bytes as the slot reload it replaces and drops the
+   def's spill store AND the slot. The witness is emu.c's `effective_string`
+   family: `return effective_ext(ptr, string_base_page, string_num_pages)` spills
+   both globals to the frame purely to read them straight back one op later.
+   Every byte-argument read path is remat-aware (push_arg_byte_to_a for a stacked
+   arg, load_to_hl_adj's width-1 path for an sc1 register arg, load_byte_to_a for a
+   fastcall one); a path that is not aborts in require_slot rather than reading an
+   absent slot.
+
+   Default ON. The corpus does not contain the shape at all (638 cells byte-
+   identical either way), so the evidence is emu.c: -131 B fp / -272 B sp, with
+   long_ir 650/650 sp+fp, enigma sp+fp and emu.c behavioural sp+fp green. The
+   other consumers this was measured against buy nothing and are deliberately NOT
+   in the list: IR_PUSH_ARG (0 B — pre-pushed args never carry the shape) and
+   IR_RET (0 B — a returned global is already slotless). IR_CALL_BREMAT=0 opts
+   out, byte-identical to the pre-flip compiler. */
+static int  call_bremat_on = -1;
+static int  call_bremat_enabled(void)
+{
+    if (call_bremat_on < 0) {
+        const char *e = getenv("IR_CALL_BREMAT");
+        call_bremat_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+    }
+    return call_bremat_on;
+}
+
+/* IR_FCLONG_CARRY: carry an auto-pushed width-4 fastcall param in its arrival
+   registers past the prologue instead of reloading the four bytes the entry push
+   just wrote. The push materialises the slot but leaves the long in DE:HL, so one
+   `ld bc,hl` re-establishes the DEHL cache invariant (BC = low half) and the
+   first read is then free. See the [IR_FCLONG_CARRY] sites in emit_prologue,
+   fclong_carry_pays (which keeps the stash out of the functions it cannot pay
+   for) and the entry_dehl seed in ir_lower_func — the entry BB clears rs.dehl
+   unconditionally, so the claim has to be re-asserted there.
+
+   Default ON. Like the byte-remat call-argument extension, the bench corpus does
+   not contain the shape (638 cells byte-identical either way, as are adv_a and
+   clisp); the evidence is emu.c -60 B fp / -51 B sp, long_ir/fclong.c -32 B, and
+   ticks follow the bytes (a 4-byte (ix+d) reload for one register move). Gates:
+   long_ir 650/650 sp+fp, enigma sp+fp, emu.c behavioural sp+fp, IR_CLOB_VERIFY
+   unchanged at 4 pre-existing sites. IR_FCLONG_CARRY=0 opts out, byte-identical
+   to the pre-flip compiler. */
+static int  fclong_carry_on = -1;
+static int  fclong_carry_enabled(void)
+{
+    if (fclong_carry_on < 0) {
+        const char *e = getenv("IR_FCLONG_CARRY");
+        fclong_carry_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+    }
+    return fclong_carry_on;
+}
+
+/* IR_TRUNCRES: a long->int narrowing leaves its result in HL, so say so instead
+   of spilling it and then invalidating the cache — which made the consumer one
+   op later reload the slot that had just been written. commit_hl_result also
+   lets the dead-store pass drop the spill outright, and routes a PR_DE dst into
+   DE. See gen_conv_trunc.
+
+   Default ON. Corpus -285 B over 38 cells with ZERO larger, every CPU gaining
+   (gbz80/8085 -30, z80/z80n/z180 -28, rabbit/8080 -26, kc160 -20, ez80 -17);
+   emu.c -210 B sp / -247 B fp, clisp -212 / -146. Ticks follow the bytes: z80
+   corpus -0.131%, 3 cells faster and 0 slower. IR_TRUNCRES=0 opts out,
+   byte-identical to the pre-flip compiler.
+
+   NB this needed the expr.c member-offset fix first. Until then it miscompiled
+   long_ir/aggregate_init in sp mode — not through any fault of its own, but
+   because `s.arr[i]` on a local struct was reading past the end of the struct
+   and this change moved which garbage landed where, so the test's sum stopped
+   cancelling to zero. The 2->2 narrowing case is left on the old path; it was
+   never measured on its own. */
+static int  truncres_on = -1;
+static int  truncres_enabled(void)
+{
+    if (truncres_on < 0) {
+        const char *e = getenv("IR_TRUNCRES");
+        truncres_on = (e && e[0] == '0') ? 0 : 1;   /* default ON; =0 opts out */
+    }
+    return truncres_on;
+}
+
 /* IR_HL_CARRY (opt-in, WIP): the same invalidate-by-default tracker extended to
    HL and DE — the vehicle for HL/DE operand-residency carry (the #2 size bucket).
    Increment 0 = the inert safety net: rs.hl/rs.de survive across raw emits and are
@@ -1359,6 +1442,100 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
     return 2;
 }
 
+/* [IR_XORA] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
+   difference is that `xor a` DEFINES the flags, and the lowerer cannot say
+   whether that matters — it models registers, not F. The rendered text can, so
+   the rewrite rides the backward park sweep below, which already walks each
+   function bottom-up with one instr_effects call per line.
+
+   Does this line READ the flags? Anything not recognised as flag-transparent
+   answers yes, so the sweep can only ever be too careful. Two deliberate
+   readings: a branch or call answers yes because its successor is outside this
+   walk, and a CONDITIONLESS `ret` answers no — F is dead at a function exit (the
+   return ABI is A / HL / DE:HL), the same assumption the BC sweep already
+   makes for BC.
+
+   Default ON. Corpus -230 B over 132 cells with ZERO larger, every CPU smaller
+   (gbz80 -40, 8080/8085 -26, z80/z80n/z180 -25, rabbit/ez80/kc160 -21); emu.c
+   -38 B fp / -52 B sp. Ticks follow: 7 T becomes 4 T at every site and nothing
+   else moves. IR_XORA=0 opts out, byte-identical to the pre-flip compiler. NB
+   the rewrite rides the park sweep, so --opt-disable=bc-live also turns it
+   off. */
+static int  xora_on = -1;
+static int  xora_enabled(void)
+{
+    if (xora_on < 0) {
+        const char *e = getenv("IR_XORA");
+        xora_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; IR_XORA=0 opts out */
+    }
+    return xora_on;
+}
+
+static int xora_line_reads_f(const char *line)
+{
+    const char *p = line;
+    if (*p != ' ' && *p != '\t') return 0;      /* label / defc: no code */
+    while (*p == ' ' || *p == '\t') p++;
+    if (!*p || *p == ';' || *p == '\n' || *p == '\r') return 0;
+    char m[16] = {0}; int mi = 0;
+    while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r'
+           && *p != ';' && mi < 15) m[mi++] = *p++;
+    while (*p == ' ' || *p == '\t') p++;
+    static const char *const transparent[] = {
+        "ld", "ldh", "inc", "dec", "and", "or", "xor", "cp", "add", "sub",
+        "neg", "cpl", "scf", "rlca", "rrca", "sla", "sra", "srl", "sll",
+        "bit", "set", "res", "nop", "halt", "di", "ei", "in", "out",
+        "ldi", "ldir", "ldd", "lddr", "exx", "pop", "mlt", "swap",
+        "nextreg", "bsla", "bsra", "bsrl", "bsrf", "brlc", "ipset", "defc",
+        "C_LINE", "MODULE", "GLOBAL", "SECTION", "EXTERN", "PUBLIC",
+        NULL
+    };
+    /* `ex af,af'` reads F; `ex de,hl` / `ex (sp),hl` do not. `push af` reads F;
+       every other push does not. */
+    if (!strcmp(m, "ex"))   return !strncmp(p, "af", 2);
+    if (!strcmp(m, "push")) return !strncmp(p, "af", 2);
+    if (!strcmp(m, "ret"))  return *p != 0 && *p != '\n' && *p != '\r';
+    for (int i = 0; transparent[i]; i++)
+        if (!strcmp(m, transparent[i])) return 0;
+    return 1;   /* adc/sbc/rl/rr/rla/rra/daa/ccf, every branch, anything unknown */
+}
+
+/* IR_BCCALL: treat a `call _sym` as killing BC in the park sweep (see
+   xline_c_call). IR_BCCALL=0 opts out. */
+static int  bccall_on = -1;
+static int  bccall_enabled(void)
+{
+    if (bccall_on < 0) {
+        const char *e = getenv("IR_BCCALL");
+        bccall_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+    }
+    return bccall_on;
+}
+
+/* [IR_BCCALL] Is this line a call to a COMPILED C function (`call _sym`)? No
+   z88dk calling convention passes an argument in BC — smallc and stdc stack
+   theirs, fastcall uses HL/DE:HL or the memory accumulator, __sdcccall(1) uses
+   A/HL and DE — so BC is dead going INTO such a call, and the `ld bc,hl` DEHL
+   stash that so often precedes one is dead the moment it is written.
+
+   The leading single underscore is what makes this safe: it is the C-symbol
+   prefix, so every asm-linkage target is excluded, and with them the one helper
+   80cc emits that DOES take an argument in BC — `l_i64_store`, the
+   acc_store_bc convention, which is reached through emit_acc_store_hl. A
+   conditional `call cc,_sym` is excluded too (its operand starts with the
+   condition), as is anything double-underscored. */
+static int xline_c_call(const char *line)
+{
+    const char *p = line;
+    if (*p != ' ' && *p != '\t') return 0;
+    while (*p == ' ' || *p == '\t') p++;
+    if (strncmp(p, "call", 4)) return 0;
+    p += 4;
+    if (*p != ' ' && *p != '\t') return 0;
+    while (*p == ' ' || *p == '\t') p++;
+    return p[0] == '_' && p[1] != '_' && p[1] != 0;
+}
+
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
    the DE park sweep above — one pass, one line decomposition per line. */
 static void filter_dead_bc_parks(FILE *out, FILE *src)
@@ -1392,6 +1569,11 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 && strcmp(lines[i + 1], "\tld\thl,bc\n") == 0)
                 drop[i + 1] = 1;
         int b_live = 0, c_live = 0, d_live = 0, e_live = 0;
+        /* [IR_XORA] F-liveness for the `ld a,0` -> `xor a` rewrite. Starts LIVE:
+           the buffer end is the end of this function's text, and the walk has
+           seen nothing yet. */
+        int f_live = 1;
+        int do_xora = xora_enabled();
         int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
         int de_rewrite = !opt_disabled("de-park");
         int de_sweep   = (de_verify || de_rewrite);
@@ -1433,6 +1615,21 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 continue;
             }
             InstrEffects e = instr_effects(lines[i]);   /* single query (composes bc_line_effect) */
+            /* [IR_XORA] f_live here is the answer for the code AFTER line i,
+               which is exactly what decides whether defining F costs anything.
+               Rewrite first, then fold line i into the liveness. */
+            if (do_xora && !f_live && !strcmp(lines[i], "\tld\ta,0\n")) {
+                char *nl = strdup("\txor\ta\n");
+                if (nl) { free(lines[i]); lines[i] = nl; }
+            }
+            /* A call to compiled C code neither reads the flags nor preserves
+               them — the same fact about BC that [IR_BCCALL] rests on, and the
+               same `_sym` discriminator, so an asm-linkage call stays a reader.
+               Checked first: xora_line_reads_f calls every branch a reader. */
+            if (xline_c_call(lines[i]) && bccall_enabled()) f_live = 0;
+            else if (xora_line_reads_f(lines[i]))   f_live = 1;
+            else if (e.is_boundary)            f_live = 0;   /* bare ret: F dead */
+            else if (e.writes & IR_R_F)        f_live = 0;
             int rb = e.b_read, rc = e.c_read, wb = e.b_write, wc = e.c_write;
             int park = e.park, boundary = e.is_boundary, call = e.is_call;
             /* `ret` (boundary): BC is dead at exit (long result ABI is DE:HL),
@@ -1442,6 +1639,11 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
             /* BC is dead at a return; DE is not (result ABI DE:HL) — e.d_read
                already says so, so route both through the same update below. */
             if (boundary) { b_live = c_live = 0; }
+            /* [IR_BCCALL] A branch's successor may read BC; a call to a compiled
+               C function cannot — see xline_c_call. Everything else (a jump, an
+               asm-linkage call, a conditional call) stays conservative. */
+            else if (call && xline_c_call(lines[i]) && bccall_enabled())
+                          { b_live = c_live = 0; }
             else if (call){ b_live = c_live = 1; }
             else if (park) {
                 if (!b_live && !c_live) drop[i] = 1;
@@ -4120,6 +4322,31 @@ static int param_stack_width(const Func *f)
     return total;
 }
 
+/* [IR_FCLONG_CARRY] Does the ENTRY block read `v` before anything that destroys
+   the arrival registers anyway? Only then does the BC stash pay for itself. Past
+   a call — or past the end of the entry block — the value has to come from its
+   slot regardless, and the stash is a dead byte. The use test runs before the
+   kind test so a call that reads `v` as an ARGUMENT still counts as a use. */
+static int fclong_carry_pays(const Func *f, int v)
+{
+    if (f->n_bbs <= 0 || v < 0) return 0;
+    const BB *bb = &f->bbs[0];
+    for (int j = 0; j < bb->n_ops; j++) {
+        const Op *o = &bb->ops[j];
+        int u[16];
+        int nu = ir_op_uses(o, u, (int)(sizeof u / sizeof u[0]));
+        for (int i = 0; i < nu; i++) if (u[i] == v) return 1;
+        switch (o->kind) {
+        case IR_CALL: case IR_HCALL: case IR_ASM:
+        case IR_ACC_BINOP: case IR_ACC_UNOP: case IR_ACC_CMP:
+            return 0;
+        default:
+            break;
+        }
+    }
+    return 0;
+}
+
 static void emit_prologue(FILE *out, Func *f)
 {
     /* Register-save prologue: interrupt enter, critical enter, then frame
@@ -4199,7 +4426,16 @@ static void emit_prologue(FILE *out, Func *f)
            `push hl`. The push IS the store — no stash, no reconstruct, and it
            drops out of the frame alloc below. */
         int w = f->vregs[fc_vreg].width;
-        if (w == 4) { emit(out, "push\tde"); emit(out, "push\thl"); autopush_bytes = 4; }
+        if (w == 4) {
+            emit(out, "push\tde"); emit(out, "push\thl"); autopush_bytes = 4;
+            /* [IR_FCLONG_CARRY] The push materialised the slot but left the whole
+               long in DE:HL. Stash the low half in BC (free at fastcall entry) to
+               re-establish the DEHL cache invariant "BC = low half", so the first
+               read is served from registers instead of reloading the 4 bytes we
+               just pushed. One `ld bc,hl` buys a 12-byte (ix+d) pair reload. */
+            if (fclong_carry_enabled() && fclong_carry_pays(f, fc_vreg))
+                emit_hl_to_bc(out);
+        }
         else        { emit(out, "push\thl");                        autopush_bytes = 2; }
     } else if (fc_vreg >= 0) {
         int w = f->vregs[fc_vreg].width;
@@ -4271,6 +4507,16 @@ static void emit_prologue(FILE *out, Func *f)
         else
             invalidate_hl_bc();
         invalidate_de_cache();
+        /* [IR_FCLONG_CARRY] DE still holds the high half and BC the low one (the
+           stash above); the frame alloc touches neither. Claim DEHL last —
+           invalidate_de_cache/invalidate_hl_cache both clear rs.dehl. When the
+           alloc also left HL intact, say so: the cache hit then emits nothing at
+           all rather than `ld hl,bc`. */
+        if (f->vregs[fc_vreg].width == 4 && fclong_carry_enabled()
+            && fclong_carry_pays(f, fc_vreg)) {
+            if (alloc_size <= 4) hl_about_to_change(fc_vreg);
+            cache_dehl(fc_vreg);
+        }
     } else if (fc_vreg >= 0 && f->vregs[fc_vreg].width > 4) {
         /* wide (acc-tier) arg: still in fa / __i64_acc (memory) — store it
            to the param's slot, like gen_ld_mem's wide path. */
@@ -5165,6 +5411,12 @@ int ir_lower_func(FILE *out, Func *f)
                     && uop->src[1] >= 0 && uop->src[1] < f->n_vregs
                     && f->vregs[uop->src[0]].width == 1
                     && f->vregs[uop->src[1]].width == 1)
+                    use_ok = 1;
+                /* [IR_CALL_BREMAT] A call ARGUMENT is a terminal consumer too:
+                   the marshaller reads the byte once and pushes it, through
+                   push_arg_byte_to_a (stacked), load_to_hl_adj (sc1 register)
+                   or load_byte_to_a (fastcall) — all three rematerialise. */
+                if (!use_ok && uop->kind == IR_CALL && call_bremat_enabled())
                     use_ok = 1;
                 if (!use_ok) continue;
                 /* no memory-writing op between the load and its use */
@@ -6211,6 +6463,10 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
        entry BB has no predecessors, so its HL-carry below would reset it — seed
        it in so the first use reads HL instead of reloading the pushed slot. */
     int entry_hl = L.rs.hl;
+    /* [IR_FCLONG_CARRY] Same for a width-4 autopush param: the prologue left the
+       long in DE:BC (+ HL when the alloc spared it), so seed the DEHL cache past
+       the entry BB's unconditional invalidate_de_cache. */
+    int entry_dehl = L.rs.dehl;
 
     for (int i = 0; i < f->n_bbs; i++) {
         BB *bb = &f->bbs[i];
@@ -6371,7 +6627,15 @@ static int lower_func_render(FILE *out, Func *f, int lazy,
         } else {
             invalidate_hl_cache();
         }
+        /* [IR_FCLONG_CARRY] Re-assert the entry DEHL residency the branches above
+           just cleared (every one of them ends in invalidate_de_cache /
+           invalidate_hl_cache, both of which drop rs.dehl). Entry BB only, and
+           only while the value is still live there. */
+        if (bb_pred_cnt[bb->id] == 0 && entry_dehl >= 0 && bb->live_in
+            && ir_bitset_get((const BitSet *)bb->live_in, entry_dehl))
+            cache_dehl(entry_dehl);
         entry_hl = -1;   /* consumed at the first BB; never re-seed */
+        entry_dehl = -1;
         /* Cross-BB HL slot-ADDRESS carry — the address analogue of the value
            carry above, and the reason a slot accessed in two blocks used to
            recompute `ld hl,off; add hl,sp` in each.

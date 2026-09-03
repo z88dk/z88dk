@@ -624,12 +624,21 @@ int heirb(LVALUE* lval)
                     cscale(lval->ltype, &val);
                     val += lval->offset;
                     if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY &&  (ptr->ctype->kind != KIND_PTR && ptr->ctype->kind != KIND_CPTR)) {
-                        /* constant offset to array on stack */
-                        lval->offset = val;
+                        /* Constant offset to an array on the stack. Add only the
+                           INDEX part: `val` had lval->offset folded into it just
+                           above, and that offset is ALREADY in lval->node — the
+                           member step (`.blah`) emitted its own OP_ADD for it, and
+                           so did any earlier subscript. Adding `val` whole counted
+                           it twice, so `s.blah[i]` on a LOCAL struct addressed
+                           2*offsetof(blah) + i*elem: `struct x { int a; char c;
+                           struct y blah[3]; }` put blah at 6 instead of 3, and
+                           blah[2] then read two bytes past the end of the struct.
+                           The two branches below already compensate this way. */
                         if (array_node) {
                             lval->node = ast_binop(OP_ADD, array_node,
-                                                   ast_literal(type_int, val));
+                                                   ast_literal(type_int, val - lval->offset));
                         }
+                        lval->offset = val;
                     } else if( lval->is_const ) {
                         /* Constant offset to cast to pointer constant */
                         lval->const_val += (val - lval->offset);
