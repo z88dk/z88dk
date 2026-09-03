@@ -299,6 +299,9 @@ extern Node    *doasmfunc(char wantbr);
 
 /* sym.c */
 extern SYMBOL  *findstc(char *sname);
+extern void     stc_declare(const char *sname, SYMBOL *sym);
+extern void     stc_reset(void);
+extern int      stc_shadows(const char *sname, int level);
 extern SYMBOL  *findglb(const char *sname);
 extern SYMBOL  *findloc(char *sname);
 extern SYMBOL  *addglb(char *sname, Type *type, enum ident_type id, Kind kind, int value, enum storage_type storage);
