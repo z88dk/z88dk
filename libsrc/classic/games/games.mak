@@ -13,22 +13,40 @@ GAMES_NEWLIB_TARGETS := classic/games/obj/newlib-z80-classic-games \
 	classic/games/obj/newlib-z180-classic-games \
 	classic/games/obj/newlib-ez80_z80-classic-games
 
-# Target library sub-builds. Keep the stamp separate from the objects while
-# the existing .lst files still use obj/${TARGET} paths.
-GAMES_STAMP_SOURCES := $(call rwildcard,classic/games,*.asm) $(call rwildcard,classic/games,*.c) $(call rwildcard,classic/games,Makefile)
+# Target library sub-builds.
+GAMES_COBJECTS := bit_frequency.o bit_play.o buzzer_play.o synth_play.o \
+	psg_play.o bit_save_zx.o joystick_type.o bit_load_msx.o bit_load_vg5000.o
+GAMES_ASMOBJECTS := $(notdir $(wildcard classic/games/*.asm))
+GAMES_ASMOBJECTS := $(GAMES_ASMOBJECTS:.asm=.o)
+
+games_arg_target = $(patsubst TARGET=%,%,$(filter TARGET=%,$(1)))
+games_arg_subtype = $(patsubst SUBTYPE=%,%,$(filter SUBTYPE=%,$(1)))
+games_arg_cflags = $(subst ",,$(patsubst TARGET_CFLAGS=%,%,$(filter TARGET_CFLAGS=%,$(1))))
+games_arg_subset = $(patsubst SUBSET=%,%,$(filter SUBSET=%,$(1)))
+
+games_objects = $(addprefix classic/games/obj/$(1)/,$(GAMES_COBJECTS) $(if $(2),$(2:.asm=.o),$(GAMES_ASMOBJECTS)))
+
+define games_object_rules
+classic/games/obj/$(1):
+	$$(Q)mkdir -p $$@
+
+classic/games/obj/$(1)/%.o: classic/games/%.c | classic/games/obj/$(1)
+	$$(ZCC) +$(2) $(if $(filter zxn,$(2)),-clib=classic,) $$(CFLAGS) $(3) -Iclassic/games -o $$@ $$^
+
+classic/games/obj/$(1)/%.o: classic/games/%.asm | classic/games/obj/$(1)
+	$$(ZCC) +$(2) $$(CFLAGS) $(3) -o $$@ -O0 $$^ -Ca-I$$(Z88DK_LIBSRC) -Ca-DFOR$(4)
+endef
 
 define games_stamp
-classic/games/obj/.stamp-$(1): $(GAMES_STAMP_SOURCES)
-	$(Q)mkdir -p $$(dir $$@)
-	$(MAKE) -C classic/games TARGET=$(1)
-	@touch $$@
+classic/games/obj/.stamp-$(1): $(call games_objects,$(1),)
+	$(Q)touch $$@
+$(if $(GAMES_RULE_$(1)),,$(eval GAMES_RULE_$(1) := 1)$(eval $(call games_object_rules,$(1),$(1),,$(1))))
 endef
 
 define games_stamp_args
-classic/games/obj/.stamp-$(1): $(GAMES_STAMP_SOURCES)
-	$(Q)mkdir -p $$(dir $$@)
-	$(MAKE) -C classic/games $(2)
-	@touch $$@
+classic/games/obj/.stamp-$(1): $(call games_objects,$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))),$(call games_arg_subset,$(2)))
+	$(Q)touch $$@
+$(if $(GAMES_RULE_$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2)))),,$(eval GAMES_RULE_$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))) := 1)$(eval $(call games_object_rules,$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))),$(call games_arg_target,$(2)),$(call games_arg_cflags,$(2)),$(or $(call games_arg_subtype,$(2)),$(call games_arg_target,$(2))))))
 endef
 $(eval $(call games_stamp,z88))
 $(eval $(call games_stamp,zx))
