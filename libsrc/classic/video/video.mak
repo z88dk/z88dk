@@ -8,26 +8,33 @@ MC6847_VIDEO_SUBDIRS := stdio graphics
 video_asm_sources = $(wildcard classic/video/$(2)/*.asm $(addsuffix /*.asm,$(addprefix classic/video/$(2)/,$($(1)_VIDEO_SUBDIRS))))
 video_c_sources = $(wildcard classic/video/$(2)/*.c $(addsuffix /*.c,$(addprefix classic/video/$(2)/,$($(1)_VIDEO_SUBDIRS))))
 
-video_asm_objects = $(patsubst classic/video/$(1)/%.asm,classic/video/$(1)/obj/$(3)/%.o,$(call video_asm_sources,$(2),$(1)))
-video_c_objects = $(patsubst classic/video/$(1)/%.c,classic/video/$(1)/obj/$(3)/%.o,$(call video_c_sources,$(2),$(1)))
+video_object_path = $(if $(filter krt msm6255,$(1)),classic/video/$(1)/obj/$(2)/$(patsubst classic/video/$(1)/%,%,$(basename $(3))).o,$(dir $(3))obj/$(2)/$(notdir $(basename $(3))).o)
+video_asm_objects = $(foreach s,$(call video_asm_sources,$(2),$(1)),$(call video_object_path,$(1),$(3),$(s)))
+video_c_objects = $(foreach s,$(call video_c_sources,$(2),$(1)),$(call video_object_path,$(1),$(3),$(s)))
 video_objects = $(call video_asm_objects,$(1),$(2),$(3)) $(call video_c_objects,$(1),$(2),$(3))
 
 define video_direct_asm_rules
-$(call video_asm_objects,$(1),$(2),$(3)): classic/video/$(1)/obj/$(3)/%.o: classic/video/$(1)/%.asm
+
+$(foreach s,$(call video_asm_sources,$(2),$(1)),$(call video_object_path,$(1),$(3),$(s)): $(s)
 	$$(Q)mkdir -p $$(@D)
 	$$(Q)$$(ASSEMBLER) -DFOR$(3) -I$$(Z88DK_LIBSRC) -I$$(Z88DK_LIB) -Iclassic/video/$(1) -o=$$@ $$<
+)
 endef
 
 define video_zcc_asm_rules
-$(call video_asm_objects,$(1),$(2),$(3)): classic/video/$(1)/obj/$(3)/%.o: classic/video/$(1)/%.asm
+
+$(foreach s,$(call video_asm_sources,$(2),$(1)),$(call video_object_path,$(1),$(3),$(s)): $(s)
 	$$(Q)mkdir -p $$(@D)
 	$$(ZCC) +$(4) $(if $(5),-subtype=$(5)) -Ca-DFOR$(3) -Ca-I$$(Z88DK_LIBSRC) -Ca-I$$(Z88DK_LIB) -c -o $$@ $$<
+)
 endef
 
 define video_c_rules
-$(call video_c_objects,$(1),$(2),$(3)): classic/video/$(1)/obj/$(3)/%.o: classic/video/$(1)/%.c
+
+$(foreach s,$(call video_c_sources,$(2),$(1)),$(call video_object_path,$(1),$(3),$(s)): $(s)
 	$$(Q)mkdir -p $$(@D)
 	$$(ZCC) +$(4) $(if $(5),-subtype=$(5)) -Iclassic/video/$(1) -c -o $$@ $$<
+)
 endef
 
 define video_rules
