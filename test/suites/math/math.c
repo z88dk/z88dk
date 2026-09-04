@@ -575,15 +575,18 @@ void test_math32_edges()
     /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
      * One relational per Assert: sccz80 && of two float compares can leave
      * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail.
-     * MSYS2 CI fails the float <= 1 check; print IEEE bits (and fmod)
-     * before the compares so the log shows Inf vs finite>1 vs ~0.72. */
+     * MSYS2 CI: sin(128) is 0x7ece0965 (~1e38), fmod bits match Linux.
+     * Print sin(fmod) before sin(128): if sin(fmod) is ~0.72 the inner
+     * fmod in m32_sinf is the split; if both explode it is poly/int. */
     {
         static char pbuf[64];
 
         a.f = (FLOAT)128.0;
         printf("probe 128 bits=0x%lx\n", a.u);
-        r.f = FMOD(a.f, (FLOAT)(2.0 * M_PI));
-        printf("probe fmod(128,2pi) bits=0x%lx\n", r.u);
+        b.f = FMOD(a.f, (FLOAT)(2.0 * M_PI));
+        printf("probe fmod(128,2pi) bits=0x%lx\n", b.u);
+        r.f = sin(b.f);
+        printf("probe sin(fmod) bits=0x%lx\n", r.u);
 
         r.f = sin(a.f);
         printf("probe sin(128) bits=0x%lx\n", r.u);
