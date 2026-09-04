@@ -7,32 +7,51 @@
 #include "ast.h"
 #include "ast_expr.h"
 #include "ast_stmt.h"
+#include "errors.h"
+#include <memory>
+#include <string>
+#include <utility>
 
 Stmt::Stmt(const SourceLoc& loc_)
     : loc(loc_) {
 }
 
-JumpTargetStmt::JumpTargetStmt(const SourceLoc& loc_,
-                               const std::string& label_,
-                               int basic_line_num_)
-    : Stmt(loc_), label(label_), basic_line_num(basic_line_num_) {
+LabelStmt::LabelStmt(const std::string& label_, const SourceLoc& loc_)
+    : Stmt(loc_), label(label_) {
 }
 
-std::unique_ptr<Stmt> JumpTargetStmt::clone() const {
-    auto s = std::make_unique<JumpTargetStmt>(loc, label, basic_line_num);
+std::unique_ptr<Stmt> LabelStmt::clone() const {
+    auto s = std::make_unique<LabelStmt>(label, loc);
     s->mark_for_removal = mark_for_removal;
     return s;
 }
 
-void JumpTargetStmt::accept(ASTVisitor& v) {
+void LabelStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
-std::unique_ptr<Stmt> LetStmt::clone() const {
-    auto s = std::make_unique<LetStmt>(loc);
+LineNumStmt::LineNumStmt(int line_num_, const SourceLoc& loc_)
+    : Stmt(loc_), line_num(line_num_) {
+}
+
+std::unique_ptr<Stmt> LineNumStmt::clone() const {
+    auto s = std::make_unique<LineNumStmt>(line_num, loc);
     s->mark_for_removal = mark_for_removal;
-    s->lhs = lhs->clone();
-    s->rhs = rhs->clone();
+    return s;
+}
+
+void LineNumStmt::accept(ASTVisitor& v) {
+    v.visit(*this);
+}
+
+LetStmt::LetStmt(std::unique_ptr<Expr> lhs_, std::unique_ptr<Expr> rhs_,
+                 const SourceLoc& loc_)
+    : Stmt(loc_), lhs(std::move(lhs_)), rhs(std::move(rhs_)) {
+}
+
+std::unique_ptr<Stmt> LetStmt::clone() const {
+    auto s = std::make_unique<LetStmt>(lhs->clone(), rhs->clone(), loc);
+    s->mark_for_removal = mark_for_removal;
     return s;
 }
 
@@ -58,10 +77,13 @@ void DimStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+IfStmt::IfStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
+    : Stmt(loc_), condition(std::move(condition_)) {
+}
+
 std::unique_ptr<Stmt> IfStmt::clone() const {
-    auto s = std::make_unique<IfStmt>(loc);
+    auto s = std::make_unique<IfStmt>(condition->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->condition = condition->clone();
     for (auto& stmt : then_stmts) {
         s->then_stmts.push_back(stmt->clone());
     }
@@ -75,14 +97,15 @@ void IfStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+RepeatStmt::RepeatStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
+    : Stmt(loc_), condition(std::move(condition_)) {
+}
+
 std::unique_ptr<Stmt> RepeatStmt::clone() const {
-    auto s = std::make_unique<RepeatStmt>(loc);
+    auto s = std::make_unique<RepeatStmt>(condition->clone(), loc);
     s->mark_for_removal = mark_for_removal;
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
-    }
-    if (condition) {
-        s->condition = condition->clone();
     }
     return s;
 }
@@ -91,10 +114,13 @@ void RepeatStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+WhileStmt::WhileStmt(std::unique_ptr<Expr> condition_, const SourceLoc& loc_)
+    : Stmt(loc_), condition(std::move(condition_)) {
+}
+
 std::unique_ptr<Stmt> WhileStmt::clone() const {
-    auto s = std::make_unique<WhileStmt>(loc);
+    auto s = std::make_unique<WhileStmt>(condition->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->condition = condition->clone();
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -105,15 +131,20 @@ void WhileStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+ForStmt::ForStmt(const std::string& name_, std::unique_ptr<Expr> start_expr_,
+                 std::unique_ptr<Expr> end_expr_, std::unique_ptr<Expr> step_expr_,
+                 const SourceLoc& loc_)
+    : Stmt(loc_), name(name_), start_expr(std::move(start_expr_)),
+      end_expr(std::move(end_expr_)), step_expr(std::move(step_expr_)) {
+}
+
 std::unique_ptr<Stmt> ForStmt::clone() const {
-    auto s = std::make_unique<ForStmt>(loc);
+    auto s = std::make_unique<ForStmt>(name,
+                                       start_expr->clone(),
+                                       end_expr->clone(),
+                                       step_expr->clone(),
+                                       loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
-    s->start_expr = start_expr->clone();
-    s->end_expr = end_expr->clone();
-    if (step_expr) {
-        s->step_expr = step_expr->clone();
-    }
     for (auto& stmt : body) {
         s->body.push_back(stmt->clone());
     }
@@ -124,10 +155,13 @@ void ForStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+NextStmt::NextStmt(const std::string& name_, const SourceLoc& loc_)
+    : Stmt(loc_), name(name_) {
+}
+
 std::unique_ptr<Stmt> NextStmt::clone() const {
-    auto s = std::make_unique<NextStmt>(loc);
+    auto s = std::make_unique<NextStmt>(name, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
     return s;
 }
 
@@ -135,10 +169,13 @@ void NextStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+DefProcStmt::DefProcStmt(const std::string& name_, const SourceLoc& loc_)
+    : Stmt(loc_), name(name_) {
+}
+
 std::unique_ptr<Stmt> DefProcStmt::clone() const {
-    auto s = std::make_unique<DefProcStmt>(loc);
+    auto s = std::make_unique<DefProcStmt>(name, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
     s->params = params;
     s->locals = locals;
     s->called = called;
@@ -152,10 +189,13 @@ void DefProcStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+ProcCallStmt::ProcCallStmt(const std::string& name_, const SourceLoc& loc_)
+    : Stmt(loc_), name(name_) {
+}
+
 std::unique_ptr<Stmt> ProcCallStmt::clone() const {
-    auto s = std::make_unique<ProcCallStmt>(loc);
+    auto s = std::make_unique<ProcCallStmt>(name, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
     for (auto& arg : args) {
         s->args.push_back(arg->clone());
     }
@@ -177,10 +217,13 @@ void LocalStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+DefFnStmt::DefFnStmt(const std::string& name_, const SourceLoc& loc_)
+    : Stmt(loc_), name(name_) {
+}
+
 std::unique_ptr<Stmt> DefFnStmt::clone() const {
-    auto s = std::make_unique<DefFnStmt>(loc);
+    auto s = std::make_unique<DefFnStmt>(name, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
     s->params = params;
     s->expr = expr->clone();
     return s;
@@ -200,10 +243,13 @@ void ExitStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+GotoStmt::GotoStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), target_expr(std::move(target_expr_)) {
+}
+
 std::unique_ptr<Stmt> GotoStmt::clone() const {
-    auto s = std::make_unique<GotoStmt>(loc);
+    auto s = std::make_unique<GotoStmt>(target_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->target_expr = target_expr->clone();
     return s;
 }
 
@@ -211,10 +257,13 @@ void GotoStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+GosubStmt::GosubStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), target_expr(std::move(target_expr_)) {
+}
+
 std::unique_ptr<Stmt> GosubStmt::clone() const {
-    auto s = std::make_unique<GosubStmt>(loc);
+    auto s = std::make_unique<GosubStmt>(target_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->target_expr = target_expr->clone();
     return s;
 }
 
@@ -292,10 +341,13 @@ void InputStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+RemStmt::RemStmt(const std::string& text_, const SourceLoc& loc_)
+    : Stmt(loc_), text(text_) {
+}
+
 std::unique_ptr<Stmt> RemStmt::clone() const {
-    auto s = std::make_unique<RemStmt>(loc);
+    auto s = std::make_unique<RemStmt>(text, loc);
     s->mark_for_removal = mark_for_removal;
-    s->text = text;
     s->asm_lines = asm_lines;
     return s;
 }
@@ -350,10 +402,13 @@ void ClsStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+LoadStmt::LoadStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), filename_expr(std::move(filename_expr_)) {
+}
+
 std::unique_ptr<Stmt> LoadStmt::clone() const {
-    auto s = std::make_unique<LoadStmt>(loc);
+    auto s = std::make_unique<LoadStmt>(filename_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->filename_expr = filename_expr->clone();
     return s;
 }
 
@@ -361,10 +416,13 @@ void LoadStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+SaveStmt::SaveStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), filename_expr(std::move(filename_expr_)) {
+}
+
 std::unique_ptr<Stmt> SaveStmt::clone() const {
-    auto s = std::make_unique<SaveStmt>(loc);
+    auto s = std::make_unique<SaveStmt>(filename_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->filename_expr = filename_expr->clone();
     return s;
 }
 
@@ -372,11 +430,16 @@ void SaveStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PokeStmt::PokeStmt(std::unique_ptr<Expr> address_expr_,
+                   std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), address_expr(std::move(address_expr_)),
+      value_expr(std::move(value_expr_)) {
+}
+
 std::unique_ptr<Stmt> PokeStmt::clone() const {
-    auto s = std::make_unique<PokeStmt>(loc);
+    auto s = std::make_unique<PokeStmt>(address_expr->clone(), value_expr->clone(),
+                                        loc);
     s->mark_for_removal = mark_for_removal;
-    s->address = address->clone();
-    s->value = value->clone();
     return s;
 }
 
@@ -384,11 +447,16 @@ void PokeStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PokewStmt::PokewStmt(std::unique_ptr<Expr> address_expr_,
+                     std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), address_expr(std::move(address_expr_)),
+      value_expr(std::move(value_expr_)) {
+}
+
 std::unique_ptr<Stmt> PokewStmt::clone() const {
-    auto s = std::make_unique<PokewStmt>(loc);
+    auto s = std::make_unique<PokewStmt>(address_expr->clone(), value_expr->clone(),
+                                         loc);
     s->mark_for_removal = mark_for_removal;
-    s->address = address->clone();
-    s->value = value->clone();
     return s;
 }
 
@@ -396,11 +464,14 @@ void PokewStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PlotStmt::PlotStmt(std::unique_ptr<Expr> x_expr_, std::unique_ptr<Expr> y_expr_,
+                   const SourceLoc& loc_)
+    : Stmt(loc_), x_expr(std::move(x_expr_)), y_expr(std::move(y_expr_)) {
+}
+
 std::unique_ptr<Stmt> PlotStmt::clone() const {
-    auto s = std::make_unique<PlotStmt>(loc);
+    auto s = std::make_unique<PlotStmt>(x_expr->clone(), y_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->x_expr = x_expr->clone();
-    s->y_expr = y_expr->clone();
     return s;
 }
 
@@ -408,11 +479,14 @@ void PlotStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+UnplotStmt::UnplotStmt(std::unique_ptr<Expr> x_expr_,
+                       std::unique_ptr<Expr> y_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), x_expr(std::move(x_expr_)), y_expr(std::move(y_expr_)) {
+}
+
 std::unique_ptr<Stmt> UnplotStmt::clone() const {
-    auto s = std::make_unique<UnplotStmt>(loc);
+    auto s = std::make_unique<UnplotStmt>(x_expr->clone(), y_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->x_expr = x_expr->clone();
-    s->y_expr = y_expr->clone();
     return s;
 }
 
@@ -420,12 +494,13 @@ void UnplotStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+RandStmt::RandStmt(std::unique_ptr<Expr> seed_expr_, const SourceLoc& loc_)
+    : Stmt(loc_), seed_expr(std::move(seed_expr_)) {
+}
+
 std::unique_ptr<Stmt> RandStmt::clone() const {
-    auto s = std::make_unique<RandStmt>(loc);
+    auto s = std::make_unique<RandStmt>(seed_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    if (seed_expr) {
-        s->seed_expr = seed_expr->clone();
-    }
     return s;
 }
 
@@ -433,10 +508,14 @@ void RandStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PauseStmt::PauseStmt(std::unique_ptr<Expr> duration_expr_,
+                     const SourceLoc& loc_)
+    : Stmt(loc_), duration_expr(std::move(duration_expr_)) {
+}
+
 std::unique_ptr<Stmt> PauseStmt::clone() const {
-    auto s = std::make_unique<PauseStmt>(loc);
+    auto s = std::make_unique<PauseStmt>(duration_expr->clone(), loc);
     s->mark_for_removal = mark_for_removal;
-    s->duration_expr = duration_expr->clone();
     return s;
 }
 
@@ -494,11 +573,14 @@ void ClearStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PragmaNumVarStmt::PragmaNumVarStmt(std::string name_, double value_,
+                                   const SourceLoc& loc_)
+    : Stmt(loc_), name(std::move(name_)), value(value_) {
+}
+
 std::unique_ptr<Stmt> PragmaNumVarStmt::clone() const {
-    auto s = std::make_unique<PragmaNumVarStmt>(loc);
+    auto s = std::make_unique<PragmaNumVarStmt>(name, value, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
-    s->value = value;
     return s;
 }
 
@@ -506,11 +588,14 @@ void PragmaNumVarStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PragmaStrVarStmt::PragmaStrVarStmt(std::string name_, std::string value_,
+                                   const SourceLoc& loc_)
+    : Stmt(loc_), name(std::move(name_)), value(std::move(value_)) {
+}
+
 std::unique_ptr<Stmt> PragmaStrVarStmt::clone() const {
-    auto s = std::make_unique<PragmaStrVarStmt>(loc);
+    auto s = std::make_unique<PragmaStrVarStmt>(name, value, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
-    s->value = value;
     s->asm_lines = asm_lines;
     return s;
 }
@@ -519,10 +604,14 @@ void PragmaStrVarStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PragmaNumVarArrayStmt::PragmaNumVarArrayStmt(std::string name_,
+        const SourceLoc& loc_)
+    : Stmt(loc_), name(std::move(name_)) {
+}
+
 std::unique_ptr<Stmt> PragmaNumVarArrayStmt::clone() const {
-    auto s = std::make_unique<PragmaNumVarArrayStmt>(loc);
+    auto s = std::make_unique<PragmaNumVarArrayStmt>(name, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
     s->dims = dims;
     s->values = values;
     return s;
@@ -532,10 +621,14 @@ void PragmaNumVarArrayStmt::accept(ASTVisitor& v) {
     v.visit(*this);
 }
 
+PragmaStrVarArrayStmt::PragmaStrVarArrayStmt(std::string name_,
+        const SourceLoc& loc_)
+    : Stmt(loc_), name(std::move(name_)) {
+}
+
 std::unique_ptr<Stmt> PragmaStrVarArrayStmt::clone() const {
-    auto s = std::make_unique<PragmaStrVarArrayStmt>(loc);
+    auto s = std::make_unique<PragmaStrVarArrayStmt>(name, loc);
     s->mark_for_removal = mark_for_removal;
-    s->name = name;
     s->dims = dims;
     s->values = values;
     return s;

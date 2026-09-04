@@ -13,7 +13,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <unordered_map>
 
 struct Expr;
 struct ASTVisitor;
@@ -31,13 +30,22 @@ struct Stmt : TreeNode {
 #endif
 };
 
-struct JumpTargetStmt : Stmt {
-    std::string label;          // label, if any
-    int basic_line_num = -1;    // line number in the source file, if any
+struct LabelStmt : Stmt {
+    std::string label;
 
-    explicit JumpTargetStmt(const SourceLoc& loc_,
-                            const std::string& label_,
-                            int basic_line_num_);
+    explicit LabelStmt(const std::string& label_, const SourceLoc& loc_);
+    std::unique_ptr<Stmt> clone() const override;
+    void accept(ASTVisitor& v) override;
+
+#ifdef _DEBUG
+    void dump(DumpContext ctx) const override;
+#endif
+};
+
+struct LineNumStmt : Stmt {
+    int line_num = -1;    // line number in the source file
+
+    explicit LineNumStmt(int line_num_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -50,7 +58,9 @@ struct LetStmt : Stmt {
     std::unique_ptr<Expr> lhs;     // variable, array ref, slice
     std::unique_ptr<Expr> rhs;     // expression
 
-    using Stmt::Stmt;
+    explicit LetStmt(std::unique_ptr<Expr> lhs_,
+                     std::unique_ptr<Expr> rhs_,
+                     const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -85,7 +95,8 @@ struct IfStmt : Stmt {
     std::vector<std::unique_ptr<Stmt>> then_stmts;
     std::vector<std::unique_ptr<Stmt>> else_stmts;
 
-    using Stmt::Stmt;
+    explicit IfStmt(std::unique_ptr<Expr> condition_,
+                    const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -98,7 +109,8 @@ struct RepeatStmt : Stmt {
     std::vector<std::unique_ptr<Stmt>> body;   // full body, including EXIT
     std::unique_ptr<Expr> condition;     // condition2
 
-    using Stmt::Stmt;
+    explicit RepeatStmt(std::unique_ptr<Expr> condition_,
+                        const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -111,7 +123,8 @@ struct WhileStmt : Stmt {
     std::unique_ptr<Expr> condition;               // condition1
     std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
 
-    using Stmt::Stmt;
+    explicit WhileStmt(std::unique_ptr<Expr> condition_,
+                       const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -127,7 +140,11 @@ struct ForStmt : Stmt {
     std::unique_ptr<Expr> step_expr;    // may be null (default = 1)
     std::vector<std::unique_ptr<Stmt>> body;       // full body, including EXIT
 
-    using Stmt::Stmt;
+    explicit ForStmt(const std::string& name_,
+                     std::unique_ptr<Expr> start_expr_,
+                     std::unique_ptr<Expr> end_expr_,
+                     std::unique_ptr<Expr> step_expr_,
+                     const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -140,7 +157,7 @@ struct ForStmt : Stmt {
 struct NextStmt : Stmt {
     std::string name;               // loop variable
 
-    using Stmt::Stmt;
+    explicit NextStmt(const std::string& name_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -156,7 +173,7 @@ struct DefProcStmt : Stmt {
     std::vector<std::unique_ptr<Stmt>> body;  // statements inside PROC
     bool called = false;
 
-    using Stmt::Stmt;
+    explicit DefProcStmt(const std::string& name_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -169,7 +186,7 @@ struct ProcCallStmt : Stmt {
     std::string name;                         // PROCname
     std::vector<std::unique_ptr<Expr>> args;  // 10, 20
 
-    using Stmt::Stmt;
+    explicit ProcCallStmt(const std::string& name_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -195,7 +212,7 @@ struct DefFnStmt : Stmt {
     std::vector<std::string> params;          // A, B
     std::unique_ptr<Expr> expr;               // A+B
 
-    using Stmt::Stmt;
+    explicit DefFnStmt(const std::string& name_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -217,7 +234,7 @@ struct ExitStmt : Stmt {
 struct GotoStmt : Stmt {
     std::unique_ptr<Expr> target_expr;   // numeric expression or LabelLineRefExpr
 
-    using Stmt::Stmt;
+    explicit GotoStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -229,7 +246,7 @@ struct GotoStmt : Stmt {
 struct GosubStmt : Stmt {
     std::unique_ptr<Expr> target_expr;   // numeric expression or LabelLineRefExpr
 
-    using Stmt::Stmt;
+    explicit GosubStmt(std::unique_ptr<Expr> target_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -318,7 +335,7 @@ struct RemStmt : Stmt {
     std::string text;   			// comment text
     std::vector<TokLine> asm_lines;	// ASM statements
 
-    using Stmt::Stmt;
+    explicit RemStmt(const std::string& text_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -374,7 +391,7 @@ struct ClsStmt : Stmt {
 struct LoadStmt : Stmt {
     std::unique_ptr<Expr> filename_expr;
 
-    using Stmt::Stmt;
+    explicit LoadStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -386,7 +403,7 @@ struct LoadStmt : Stmt {
 struct SaveStmt : Stmt {
     std::unique_ptr<Expr> filename_expr;
 
-    using Stmt::Stmt;
+    explicit SaveStmt(std::unique_ptr<Expr> filename_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -396,10 +413,11 @@ struct SaveStmt : Stmt {
 };
 
 struct PokeStmt : Stmt {
-    std::unique_ptr<Expr> address;
-    std::unique_ptr<Expr> value;
+    std::unique_ptr<Expr> address_expr;
+    std::unique_ptr<Expr> value_expr;
 
-    using Stmt::Stmt;
+    explicit PokeStmt(std::unique_ptr<Expr> address_expr_,
+                      std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -409,10 +427,11 @@ struct PokeStmt : Stmt {
 };
 
 struct PokewStmt : Stmt {
-    std::unique_ptr<Expr> address;
-    std::unique_ptr<Expr> value;
+    std::unique_ptr<Expr> address_expr;
+    std::unique_ptr<Expr> value_expr;
 
-    using Stmt::Stmt;
+    explicit PokewStmt(std::unique_ptr<Expr> address_expr_,
+                       std::unique_ptr<Expr> value_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -425,7 +444,8 @@ struct PlotStmt : Stmt {
     std::unique_ptr<Expr> x_expr;
     std::unique_ptr<Expr> y_expr;
 
-    using Stmt::Stmt;
+    explicit PlotStmt(std::unique_ptr<Expr> x_expr_, std::unique_ptr<Expr> y_expr_,
+                      const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -438,7 +458,8 @@ struct UnplotStmt : Stmt {
     std::unique_ptr<Expr> x_expr;
     std::unique_ptr<Expr> y_expr;
 
-    using Stmt::Stmt;
+    explicit UnplotStmt(std::unique_ptr<Expr> x_expr_,
+                        std::unique_ptr<Expr> y_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -450,7 +471,7 @@ struct UnplotStmt : Stmt {
 struct RandStmt : Stmt {
     std::unique_ptr<Expr> seed_expr;
 
-    using Stmt::Stmt;
+    explicit RandStmt(std::unique_ptr<Expr> seed_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -462,7 +483,7 @@ struct RandStmt : Stmt {
 struct PauseStmt : Stmt {
     std::unique_ptr<Expr> duration_expr;
 
-    using Stmt::Stmt;
+    explicit PauseStmt(std::unique_ptr<Expr> duration_expr_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -525,7 +546,8 @@ struct PragmaNumVarStmt : Stmt {
     std::string name;
     double value;
 
-    using Stmt::Stmt;
+    explicit PragmaNumVarStmt(std::string name_, double value_,
+                              const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -539,7 +561,8 @@ struct PragmaStrVarStmt : Stmt {
     std::string value;
     std::vector<TokLine> asm_lines;	// ASM statements
 
-    using Stmt::Stmt;
+    explicit PragmaStrVarStmt(std::string name_, std::string value_,
+                              const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -553,7 +576,7 @@ struct PragmaNumVarArrayStmt : Stmt {
     std::vector<int> dims;			// dimensions
     std::vector<double> values;
 
-    using Stmt::Stmt;
+    explicit PragmaNumVarArrayStmt(std::string name_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -567,7 +590,7 @@ struct PragmaStrVarArrayStmt : Stmt {
     std::vector<int> dims;			// dimensions
     std::vector<std::string> values;
 
-    using Stmt::Stmt;
+    explicit PragmaStrVarArrayStmt(std::string name_, const SourceLoc& loc_);
     std::unique_ptr<Stmt> clone() const override;
     void accept(ASTVisitor& v) override;
 
@@ -588,11 +611,8 @@ struct Prog : TreeNode {
     std::vector<uint8_t> sysvars_data;   // raw SYSVAR data
 
     std::vector<std::unique_ptr<Stmt>> stmts;
-    std::vector<std::unique_ptr<Stmt>> vars;
-    std::unordered_map<std::string, std::unique_ptr<DefProcStmt>> procs;
-    std::unordered_map<std::string, std::unique_ptr<DefFnStmt>> fns;
+    std::vector<std::unique_ptr<Stmt>> pragma_vars;
 
-    std::unique_ptr<Prog> clone() const;
     void accept(ASTVisitor& v);
 
 #ifdef _DEBUG

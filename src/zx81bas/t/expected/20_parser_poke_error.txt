@@ -7,4 +7,4 @@ t/input/20_parser_poke_error.bas:2: error: expected ',', found end of line
 t/input/20_parser_poke_error.bas:3: error: expected ',', found '!'
 t/input/20_parser_poke_error.bas:4: error: expected expression term, found end of line
 t/input/20_parser_poke_error.bas:5: error: expected end of statement, found '!'
-Parsing failed with errors.
+5 errors found
