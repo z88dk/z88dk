@@ -5,7 +5,9 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085: high 32 bits of 24x24 unsigned product
+;-------------------------------------------------------------------------
 ;
 ; Happy-path optimised (A1/A2):
 ;  - open-coded 32-bit accumulate (no adc hl,bc library stub)
@@ -15,7 +17,6 @@
 ;  - LZ path restores mid from C (no push af during leading-zero scan)
 ;
 ; Square kernel is in f32_8085_sqr_32h_24x24.asm (m32_sqr_32h_24x24).
-;
 
 SECTION code_clib
 SECTION code_fp_math32

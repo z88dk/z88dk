@@ -5,12 +5,14 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8080 expanded 32-bit mantissa add
+;-------------------------------------------------------------------------
+;
 ; B=exp, C[7]=sign, DEHL=mant (D=MSB)
 ;
 ; Same control as 8085.  Frame: ld hl,sp+n.  Park Y.HL before SP math.
 ; ld hl,sp+n clobbers C — save carry around adc/sbc.
-;
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -61,13 +63,11 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     push de
     ex de,hl                        ; DE = X.hl
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     pop de                          ; X.de
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     push bc                         ; X.bc | Y | ret | X.hl | X.de
 
@@ -79,53 +79,46 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+0
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+4
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+2
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+6
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+4
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+8
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+6
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+10
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+8
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+12
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     ld hl,sp+12
-    ld (hl),c
-    inc hl
+    ld (hl+),c
     ld (hl),b                       ; Y.hl Y.de Y.bc ret X.hl X.de X.bc
 
     pop hl
@@ -210,22 +203,19 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+8
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.hl := meta
     ld hl,sp+2
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.de := low
     ld hl,sp+4
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+12
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.bc := high
     ld hl,sp+6
     ld sp,hl                        ; drop park
@@ -285,22 +275,19 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+16
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     ld hl,sp+6
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+18
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
     ld hl,sp+8
     ld e,(hl+)
     ld d,(hl)
     ld hl,sp+20
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d
 
     pop hl
@@ -395,12 +382,10 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld bc,de                        ; park small.de
     ex de,hl                        ; DE = small.hl
     ld hl,sp+10
-    ld (hl),e
-    inc hl
+    ld (hl+),e
     ld (hl),d                       ; X.hl
     ld hl,sp+12
-    ld (hl),c
-    inc hl
+    ld (hl+),c
     ld (hl),b                       ; X.de
     pop hl
     pop de

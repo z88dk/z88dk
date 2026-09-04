@@ -47,6 +47,7 @@ extern void OutIndex(int);
 
 
 static void swap(void);
+static void ex_sp_hl(void);
 static void dpush_under(Kind val_type);
 static void push(const char *ret);
 static void pop(const char *ret);
@@ -940,6 +941,21 @@ static void swap(void)
     }
 }
 
+/* Swap HL with TOS. Native `ex (sp),hl` on Z80/808x.
+ * gbz80 has no such opcode — z80asm would emit call __z80asm__ex_sp_hl (148c).
+ * Open-code through BC (36c). Clobbers BC; preserves DE and AF. */
+static void ex_sp_hl(void)
+{
+    if ( IS_GBZ80() ) {
+        ol("ld\tb,h");
+        ol("ld\tc,l");
+        ol("pop\thl");
+        ol("push\tbc");
+    } else {
+        ol("ex\t(sp),hl");
+    }
+}
+
 /* Print partial instruction to get an immediate value */
 /*      into the primary register */
 void immed(void)
@@ -1068,9 +1084,18 @@ int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push
 {
     if (expr == KIND_LONG || expr == KIND_CPTR || ( c_fp_size == 4 && expr == KIND_DOUBLE)) {
         if (is_last_argument == 0 || (functype->flags & FASTCALL) == 0 ) {
-            swap(); /* MSW -> hl */
-            ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
-            push("de"); /* LSW -> stack, addr = hl */
+            if ( IS_GBZ80() ) {
+                /* HL=LSW, DE=MSW, TOS=addr. Leave HL=addr, stack=LSW,MSW. */
+                ol("ld\tb,h");
+                ol("ld\tc,l");
+                ol("pop\thl");
+                ol("push\tde");
+                push("bc");
+            } else {
+                swap(); /* MSW -> hl */
+                ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
+                push("de"); /* LSW -> stack, addr = hl */
+            }
             return 4;
         }
     } else if ( expr == KIND_LONGLONG ) {
@@ -1121,12 +1146,33 @@ void dpush_under(Kind val_type)
    // Only called for KIND_DOUBLE
     if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
         if ( c_fp_size == 4 ) {
-            ol("pop\tbc");  // addr2 -> bc
-            swap(); /* MSW -> hl */
-            ol("ex\t(sp),hl"); /* MSW -> stack, addr1 -> hl */
-            push("de"); /* LSW -> stack, addr1 = hl */
-            push("hl");     // addr -> stack
-            ol("push\tbc"); // addr2 -> stack
+            if ( IS_GBZ80() ) {
+                int loop = getlabel();
+                push("de");
+                push("hl");
+                ol("ld\thl,sp+0");
+                ol("ld\td,h");
+                ol("ld\te,l");
+                ol("ld\thl,sp+4");
+                ol("ld\tb,4");
+                postlabel(loop);
+                ol("ld\ta,(de)");
+                ol("ld\tc,(hl)");
+                ol("ld\t(hl),a");
+                ol("ld\ta,c");
+                ol("ld\t(de),a");
+                ol("inc\thl");
+                ol("inc\tde");
+                ol("dec\tb");
+                opjumpr("nz,", loop);
+            } else {
+                ol("pop\tbc");  // addr2 -> bc
+                swap(); /* MSW -> hl */
+                ol("ex\t(sp),hl"); /* MSW -> stack, addr1 -> hl */
+                push("de"); /* LSW -> stack, addr1 = hl */
+                push("hl");     // addr -> stack
+                ol("push\tbc"); // addr2 -> stack
+            }
         } else {
            dcallrts("dpush_under_long",KIND_DOUBLE);
            Zsp -= c_fp_size;
@@ -1134,11 +1180,11 @@ void dpush_under(Kind val_type)
     } else {
         if ( c_fp_size == 4 ) {
             swap(); /* MSW -> hl */
-            ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
+            ex_sp_hl(); /* MSW -> stack, addr -> hl */
             push("de"); /* LSW -> stack, addr = hl */
             push("hl");
         } else if (c_fp_size == 2 ) {
-            ol("ex\t(sp),hl"); /* float -> stack, addr -> hl */
+            ex_sp_hl(); /* float -> stack, addr -> hl */
             push("hl");
         } else {
             dcallrts("dpush_under_int",KIND_DOUBLE);
@@ -5195,7 +5241,7 @@ void gen_conv_sint2long(void)
 void gen_swap_float(Kind type)
 {
     if (type == KIND_FLOAT16 || type == KIND_ACCUM16) {
-        ol("ex\t(sp),hl");
+        ex_sp_hl();
     } else {
         callrts("fswap");
     }
@@ -5816,10 +5862,10 @@ void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned ch
     if ( float_kind == KIND_FLOAT16 || float_kind == KIND_ACCUM16) {
         if ( stacked_kind == KIND_LONG ) {
             pop("de");      // LSW
-            ol("ex\t(sp),hl");  // hl = MSW, stack = float
-            ol("ex\tde,hl");
+            ex_sp_hl();  // hl = MSW, stack = float
+            swap();
             zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
-            if (!operator_is_commutative) ol("ex\t(sp),hl");
+            if (!operator_is_commutative) ex_sp_hl();
         } else if ( stacked_kind == KIND_LONGLONG) {
             /* Pop the longlong into the accumulator */
             ol("exx");
@@ -5830,12 +5876,12 @@ void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned ch
             push("hl");
             /* And convert */
             zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
-            if (!operator_is_commutative)  ol("ex\t(sp),hl");
+            if (!operator_is_commutative)  ex_sp_hl();
         } else {
             // 2 bytes on stack
-            ol("ex\t(sp),hl");  //
+            ex_sp_hl();
             zconvert_to_decimal(stacked_kind, float_kind, isunsigned, float_unsigned);
-            if (!operator_is_commutative)  ol("ex\t(sp),hl");
+            if (!operator_is_commutative)  ex_sp_hl();
         }
     } else if ( stacked_kind == KIND_LONGLONG ) {
         /* Pop the longlong into the accumulator
@@ -5960,20 +6006,50 @@ void zconvert_to_long(unsigned char tounsigned, Kind from, unsigned char fromuns
 
 void zwiden_stack_to_long(LVALUE *lval)
 {
-    if ( IS_808x() || IS_GBZ80() ) {
-        int label = getlabel();
+    if ( IS_GBZ80() ) {
+        /* Park DEHL, widen the stacked int, restore DEHL.
+         * `ex (sp),hl` would be call __z80asm__ex_sp_hl (148c each). */
+        push("de");
+        push("hl");
+        ol("ld\thl,sp+4");
+        ol("ld\ta,(hl+)");
+        ol("ld\th,(hl)");
+        ol("ld\tl,a");
+        if ( lval->ltype->isunsigned ) {
+            ol("ld\tde,0");
+        } else {
+            ol("ld\ta,h");
+            ol("rlca");
+            ol("sbc\ta");
+            ol("ld\te,a");
+            ol("ld\td,a");
+        }
+        ol("ld\tb,h");
+        ol("ld\tc,l");
+        ol("ld\thl,sp+4");
+        ol("ld\ta,e");
+        ol("ld\t(hl+),a");
+        ol("ld\ta,d");
+        ol("ld\t(hl),a");
+        pop("hl");
+        pop("de");
+        push("bc");
+    } else if ( IS_808x() ) {
         // We have a value in dehl that we must preserve
         ol("ld\tb,h");
         ol("ld\tc,l");
         ol("ld\thl,0");
-        ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
-        ol("ld\ta,h");
-        ol("rlca");
-        opjumpr("nc,",label);
-        ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
-        ol("dec\thl");
-        ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
-        postlabel(label);
+        ol("ex\t(sp),hl");
+        if ( lval->ltype->isunsigned == 0 ) {
+            int label = getlabel();
+            ol("ld\ta,h");
+            ol("rlca");
+            opjumpr("nc,",label);
+            ol("ex\t(sp),hl");
+            ol("dec\thl");
+            ol("ex\t(sp),hl");
+            postlabel(label);
+        }
         push("hl");
         ol("ld\th,b");
         ol("ld\tl,c");

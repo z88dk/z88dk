@@ -1,35 +1,61 @@
 ---
 name: library-math32
 description: >
-  math32 IEEE single float library: multi-CPU layout (asm/z80, asm/8085, asm/8080),
-  products math32*.lib, rounding policy, div=restoring / inv=NR, force rebuild.
-  Use when editing libsrc/math/float/math32 or A/B float divide/mul.
+  math32 IEEE single float library: multi-CPU layout (asm/z80, asm/8085,
+  asm/8080, asm/gbz80), products math32*.lib including ez80_z80 / gbz80,
+  rounding policy, div=restoring / inv=NR, force rebuild. Use when editing
+  libsrc/math/float/math32 or A/B float divide/mul.
 ---
 
 # Library — math32
 
-Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`.
+Home: `libsrc/math/float/math32/`. Docs of record: `libsrc/math/float/math32/readme.md`
+(working rewrite may live as root `math32-README.md` until merged).
 Link via **`--math32`** (`-lmath32@{ZCC_LIBCPU}`).
 
 ## 0b. Math32 multi-CPU float library (layout + policy)
 
 Home: `libsrc/math/float/math32/`. Products: `math32.lib` (plain z80) plus
-`math32_{z80n,z180,r2ka,kc160,8085,8080,…}.lib`. Link via **`--math32`**
-(`-lmath32@{ZCC_LIBCPU}` — 8085 selects `math32_8085`, 8080 selects
-`math32_8080`; no separate `--math32_8085` / `--math32_8080` flag).
+`math32_{z80n,z180,ez80_z80,r2ka,kc160,8085,8080,gbz80,…}.lib`. Link via
+**`--math32`** (`-lmath32@{ZCC_LIBCPU}` — e.g. 8085 → `math32_8085`, 8080 →
+`math32_8080`, gbz80 → `math32_gbz80`, ez80_z80 → `math32_ez80_z80`; no
+separate `--math32_8085` flag).
 
 ### Layout
 
 | Tree | Role |
 |------|------|
-| `asm/z80/` | Z80-family cores; shared by z80n/z180/r2ka/… when the lst points here |
+| `asm/z80/` | Z80-family cores; shared by z80n/z180/ez80_z80/r2ka/… when the lst points here |
 | `asm/8085/` | Stack-only 8085 cores (no EXX / IX / IY); extended opcodes + synthetics |
 | `asm/8080/` | Stack-only 8080 cores (original ISA; no 8085 extras). `ld hl,sp+n`; park HL |
-| `c/z80/`, `c/8085/`, `c/8080/` | Higher functions (C → precompiled asm); 8080/8085 higher via sccz80 only |
-| `newlibfiles_*.lst` | Which modules land in each product |
+| `asm/gbz80/` | Stack-only Game Boy cores (`ld hl,sp+*`, `bit 7` leading-one; no cheap `ex`) |
+| `c/z80/`, `c/8085/`, `c/8080/`, `c/gbz80/` | Higher functions (C → precompiled asm); 8080/8085/gbz80 higher via **sccz80 only** |
+| `newlibfiles_*.lst` | Which modules land in each product (`newlibfiles_ez80_z80.lst`, `newlibfiles_gbz80.lst`, …) |
 
 **CPU-specific** = same *operation* name, different ISA file (same one-op-per-file
-map as §0). Do not invent a second taxonomy for 8085.
+map as §0). Do not invent a second taxonomy for 8085 / gbz80.
+
+### eZ80 Z80-mode product (mlt)
+
+eZ80 Z80-mode has the same `mlt` encodings as Z180 (`ED 4C/5C/6C/7C`).
+`math32_ez80_z80.lib` is built from **`newlibfiles_ez80_z80.lst`**, which
+selects the Z180 mantissa helpers (`f32_z180_mulu_*` / `f32_z180_sqr_*`).
+
+Those helpers are gated:
+
+```asm
+IF __CPU_Z180__ | __CPU_EZ80__ | __CPU_EZ80_Z80__
+```
+
+| Assemble as | Define set |
+|-------------|------------|
+| `-mz180` | `__CPU_Z180__` |
+| `-mez80` (ADL) | `__CPU_EZ80__` |
+| `-mez80_z80` | **`__CPU_EZ80_Z80__`** |
+
+Do **not** build eZ80 from `@newlibfiles_z80.lst` alone: the plain-Z80 helpers
+are `IF __CPU_Z80__` only and assemble **empty** on `-mez80_z80`. Suite gate:
+`test/suites/math` → `test_math32_ez80_z80.bin`.
 
 ### Rounding policy (do not mix casually)
 
@@ -47,7 +73,7 @@ engines are not bit-identical.
 
 | Op | Algorithm | Notes |
 |----|-----------|--------|
-| **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** + **8080** cores; z80n/z180 share z80 `asm/z80/f32_fsdiv.asm` |
+| **`div` / `m32_fsdiv`** | **Restoring** 24-bit mantissa | z80 + **8085** + **8080** + **gbz80** cores; z80n/z180/ez80_z80 share z80 `asm/z80/f32_fsdiv.asm` |
 | **`inv` / `m32_fsinv`** | Newton–Raphson | Still mul-heavy; HW mul helps inv only |
 | math16 | Same split: restoring `asm_f16_div`, NR `asm_f16_inv` | |
 
@@ -95,7 +121,8 @@ remeasure both products after header fixes.
 
 Z80 higher funcs: `make -C libsrc/math/float/math32/c` → `c/z80/*.asm` (SDCC).
 8085: `make -C …/c 8085` → `c/8085/*.asm` (sccz80 only).
-8080: `make -C …/c 8080` → `c/8080/*.asm` (sccz80 only). **`make clean`** must
+8080: `make -C …/c 8080` → `c/8080/*.asm` (sccz80 only).
+gbz80: `make -C …/c gbz80` → `c/gbz80/*.asm` (sccz80 only). **`make clean`** must
 only remove C-derived objects — never wipe hand-written peers in the same dir
 (math16: keep `cm16_sccz80_*.asm` under `c/8085/`).
 
@@ -111,9 +138,10 @@ only remove C-derived objects — never wipe hand-written peers in the same dir
 
 Sources: `libsrc/math/float/math32/` (per-CPU under `asm/z80/`, `asm/8085/`, …).
 Shared Z80-family add lives in `asm/z80/d32_fsadd.asm` and is assembled into
-**each** of `math32.lib`, `math32_z80n.lib`, `math32_z180.lib`, `math32_r2ka.lib`,
-`math32_kc160.lib`, … Changing that file requires **rebuilding every product that
-lists it**, not only `math32_8085.lib`.
+**each** of `math32.lib`, `math32_z80n.lib`, `math32_z180.lib`,
+`math32_ez80_z80.lib`, `math32_r2ka.lib`, `math32_kc160.lib`, … Changing that
+file requires **rebuilding every product that lists it**, not only
+`math32_8085.lib`.
 
 ```bash
 cd libsrc/math/float/math32
@@ -126,13 +154,15 @@ TYPE=8085 z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m8085 \
 cp -f ../../../math32_8085.lib ../../../lib/clibs/   # or: make -C libsrc install
 
 # Z80-family products that share asm/z80/d32_fsadd.asm (repeat per CPU)
-for cpu in z80 z80n z180 r2ka kc160; do
-  lst=newlibfiles_${cpu}.lst
-  case $cpu in z80) lst=newlibfiles_z80.lst; lib=math32 ;;
-    *) lib=math32_$cpu ;; esac
+for cpu in z80 z80n z180 ez80_z80 r2ka kc160; do
+  case $cpu in
+    z80) lst=newlibfiles_z80.lst; lib=math32; masm=z80 ;;
+    ez80_z80) lst=newlibfiles_ez80_z80.lst; lib=math32_ez80_z80; masm=ez80_z80 ;;
+    *) lst=newlibfiles_${cpu}.lst; lib=math32_$cpu; masm=$cpu ;;
+  esac
   rm -f obj/$cpu/math/float/math32/asm/z80/d32_fsadd.o ../../../$lib.lib
-  z88dk-z80asm -d -I"$ZCCCFG/.." -O=obj/$cpu/x/x/x -I.. -m$cpu -D__CLASSIC @$lst
-  TYPE=$cpu z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m$cpu -x../../../$lib @math32.lst
+  z88dk-z80asm -d -I"$ZCCCFG/.." -O=obj/$cpu/x/x/x -I.. -m$masm -D__CLASSIC @$lst
+  TYPE=$cpu z88dk-z80asm -d -I"$ZCCCFG/.." -I.. -m$masm -x../../../$lib @math32.lst
   cp -f ../../../$lib.lib ../../../lib/clibs/
 done
 ```
@@ -141,6 +171,7 @@ Or: `make -C libsrc/math/float/math32` then install all `math32*.lib` into
 `lib/clibs/`. After install, **delete** suite/bench `.bin`/`.map` before remeasure.
 
 Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fsadd|ay16_njam'`.
+For eZ80: `z88dk-z80nm lib/clibs/math32_ez80_z80.lib | rg 'm32_mulu_32h|f32_z180'`.
 
 ---
 
@@ -149,5 +180,7 @@ Prove the object is current: `z88dk-z80nm lib/clibs/math32_8085.lib | rg 'f32_fs
 - Half float: `library-math16`
 - Measure / A/B: `methodology-measure`
 - Newlib headers (math remaps): `library-newlib` · edit **proto** then regenerate
-- 8085 cores: `cpu-8085`
+- 8085 cores: `cpu-8085` · 8080: `cpu-8080` · gbz80: `cpu-gbz80`
+- Z180 / eZ80 Z80-mode `mlt`: `cpu-z180`
 - Issue class: z88dk **#3061** (classic vs newlib Whetstone)
+- Suite: `test/suites/math` (`test_math32*.bin`, including `test_math32_ez80_z80.bin`)

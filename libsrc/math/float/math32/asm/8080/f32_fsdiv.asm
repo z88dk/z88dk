@@ -1,3 +1,4 @@
+;
 ;  feilipu, 2026 September
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,8 +38,6 @@
 ;   +14 b           IEEE snapshot (4)
 ;   +18 flag        word: L = 1 if callee
 ;   +20 ret
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -70,10 +69,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push hl                     ; a
 
     ld hl,sp+3
-    ld a,(hl)
-    ld c,a
+    ld c,(hl)                   ; a.sign|exp
     ld hl,sp+7
-    ld a,(hl)
+    ld a,(hl)                   ; b.sign|exp
     xor c
     and 080h
     ld l,a
@@ -86,8 +84,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ; work@0  sign@8  a@10  b@14  flag@18  ret@20
 
     ld hl,sp+10
-    call load4
-    call m32_fpclassify
+    call load4                      ; DEHL = a
+    call m32_fpclassify             ; A = 0 num, 1 zero, 2 nan, 3 inf
     cp 2
     jp Z,div_nan
     cp 3
@@ -96,8 +94,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jp Z,div_a_zero
 
     ld hl,sp+14
-    call load4
-    call m32_fpclassify
+    call load4                      ; DEHL = b
+    call m32_fpclassify             ; A = class(b)
     cp 2
     jp Z,div_nan
     cp 3
@@ -111,8 +109,7 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld c,a
     push hl                     ; mlo
     ld hl,sp+5                  ; expR at +3+2
-    ld a,b
-    ld (hl),a
+    ld (hl),b
     pop hl
     ld e,c
     ld d,0
@@ -126,10 +123,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld a,l
     ld e,h                      ; E = mid
     ld hl,sp+4                  ; &div (work at +4 under rem)
-    ld (hl),a
-    inc hl
-    ld (hl),e
-    inc hl
+    ld (hl+),a
+    ld (hl+),e
     ld (hl),c                   ; div hi
 
     ld hl,sp+7
@@ -160,10 +155,8 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     push hl                     ; park rem; L is rem low
     xor a
     ld hl,sp+8                  ; quot at +4 +4
-    ld (hl),a
-    inc hl
-    ld (hl),a
-    inc hl
+    ld (hl+),a
+    ld (hl+),a
     ld (hl),a                   ; quot = 0
     pop hl
     pop de                      ; rem
@@ -195,14 +188,14 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld b,24
 
 .div_bit_loop
-    call rem_sub
+    call rem_sub                    ; in DEHL=rem; CF if rem < div
     jr C,div_bit_fail
-    scf
+    scf                             ; quot bit = 1 (shifted in at quot_shift)
     jp div_quot_shift
 
 .div_bit_fail
-    call rem_add
-    or a
+    call rem_add                    ; restore rem; CF from trial is junk
+    or a                            ; quot bit = 0
 
 .div_quot_shift
     push de
@@ -212,12 +205,10 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     rla                         ; C restored
     ld a,(hl)
     rla
-    ld (hl),a
-    inc hl
+    ld (hl+),a
     ld a,(hl)
     rla
-    ld (hl),a
-    inc hl
+    ld (hl+),a
     ld a,(hl)
     rla
     ld (hl),a
@@ -251,17 +242,15 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld hl,sp+4
     ld a,(hl)
     inc a
-    ld (hl),a
-    inc hl
+    ld (hl+),a                  ; NZ from inc a (ld/inc hl keep flags)
     jr NZ,div_guard_done
     ld a,(hl)
     inc a
-    ld (hl),a
-    inc hl
+    ld (hl+),a                  ; NZ from inc a
     jr NZ,div_guard_done
     ld a,(hl)
     inc a
-    ld (hl),a
+    ld (hl),a                   ; NZ from inc a
     jr NZ,div_guard_done
     ld a,080h
     ld (hl),a
@@ -276,11 +265,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 .div_guard_done
 
     ld hl,sp+6
-    ld a,(hl)
-    ld b,a                      ; B = quot.hi
+    ld b,(hl)                   ; B = quot.hi
     ld hl,sp+4
-    ld e,(hl)
-    inc hl
+    ld e,(hl+)
     ld d,(hl)
     ex de,hl                    ; HL = quot.lo:mid
 
@@ -355,28 +342,23 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 ;=========================================================================
 ; rem_sub / rem_add — CALL SP=work; B=count; DEHL=rem; div@work+0
-; Preserves B.  Uses C as temp.  Parks rem.high, pointer in HL.
+; Preserves B (bit count).  C holds div.hi for the last sbc/adc.
+; lo/mid use sub (hl) / sbc a,(hl) so C stays free until div.hi.
+; Parks rem.high; pointer in HL.
 ;=========================================================================
 
 .rem_sub
     push de                     ; rem high
-    ld d,h
-    ld e,l                      ; DE = rem mid:lo
+    ld de,hl                    ; DE = rem mid:lo
     ld hl,sp+4                  ; &div
-    ld a,(hl)
-    ld c,a
     ld a,e
-    sub c
+    sub (hl+)                   ; rem.lo - div.lo
     ld e,a
-    inc hl
-    ld a,(hl)
-    ld c,a
     ld a,d
-    sbc a,c
+    sbc a,(hl+)                 ; rem.mid - div.mid
     ld d,a
-    inc hl
     ld a,(hl)
-    ld c,a
+    ld c,a                      ; C = div.hi (do not pop rem high into BC)
     pop hl                      ; rem high
     ld a,l
     sbc a,c
@@ -388,32 +370,25 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ret
 
 .rem_add
-    push de
-    ld d,h
-    ld e,l
-    ld hl,sp+4
-    ld a,(hl)
-    ld c,a
+    push de                     ; rem high
+    ld de,hl                    ; DE = rem mid:lo
+    ld hl,sp+4                  ; &div
     ld a,e
-    add a,c
+    add a,(hl+)                 ; rem.lo + div.lo
     ld e,a
-    inc hl
-    ld a,(hl)
-    ld c,a
     ld a,d
-    adc a,c
+    adc a,(hl+)                 ; rem.mid + div.mid
     ld d,a
-    inc hl
     ld a,(hl)
-    ld c,a
-    pop hl
+    ld c,a                      ; C = div.hi (B is bit count)
+    pop hl                      ; rem high
     ld a,l
     adc a,c
     ld l,a
     ld a,h
     adc a,0
     ld h,a
-    ex de,hl
+    ex de,hl                    ; DE = high, HL = low
     ret
 
 .div_exp_bad_p
@@ -444,10 +419,9 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     cp 3
     jp Z,div_nan
     ld hl,sp+8
-    ld a,(hl)
-    ld d,a
-    call drop_frame
-    call m32_fsmax
+    ld d,(hl)                   ; sign for ±Inf
+    call drop_frame             ; D kept; SP restored
+    call m32_fsmax              ; DEHL = signed Inf from D.7
     or a
     ret
 
@@ -460,24 +434,21 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     dec a
     jp Z,div_nan
     ld hl,sp+8
-    ld a,(hl)
-    ld d,a
-    call drop_frame
-    jp m32_fszero
+    ld d,(hl)                   ; sign for ±0
+    call drop_frame             ; D kept; SP restored
+    jp m32_fszero               ; DEHL = signed 0 from D.7
 
 .div_b_inf
     ld hl,sp+8
-    ld a,(hl)
-    ld d,a
-    call drop_frame
-    jp m32_fszero
+    ld d,(hl)                   ; sign for ±0
+    call drop_frame             ; D kept; SP restored
+    jp m32_fszero               ; DEHL = signed 0 from D.7
 
 .div_b_zero
     ld hl,sp+8
-    ld a,(hl)
-    ld d,a
-    call drop_frame
-    call m32_fsmax
+    ld d,(hl)                   ; sign for ±Inf
+    call drop_frame             ; D kept; SP restored
+    call m32_fsmax              ; DEHL = signed Inf from D.7
     or a
     ret
 
@@ -487,19 +458,17 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     jp C,div_underflow
 .div_overflow
     ld hl,sp+8
-    ld a,(hl)
-    ld d,a
-    call drop_frame
-    call m32_fsmax
+    ld d,(hl)                   ; sign for ±Inf
+    call drop_frame             ; D kept; SP restored
+    call m32_fsmax              ; DEHL = signed Inf from D.7
     or a
     ret
 
 .div_underflow
     ld hl,sp+8
-    ld a,(hl)
-    ld d,a
-    call drop_frame
-    jp m32_fszero
+    ld d,(hl)                   ; sign for ±0
+    call drop_frame             ; D kept; SP restored
+    jp m32_fszero               ; DEHL = signed 0 from D.7
 
 .drop_frame
     pop bc                      ; uret

@@ -14,20 +14,30 @@ PUBLIC cm32_sccz80_switch_arg
     ; Stack: sccz80 right, sccz80 left, ret1
     ;
     ; Uses de, hl, bc, a
-    ld hl,8         ;Left
+    ; HL is reloaded after the pair move — do not use ex de,hl on gbz80 (56c).
+IF __CPU_GBZ80__
+    ld hl,sp+8                      ; left
+    ld de,hl
+    ld hl,sp+4                      ; right
+ELIF __CPU_8085__
+    ld de,sp+8                      ; left
+    ex de,hl
+    ld de,sp+4                      ; right
+    ex de,hl                        ; DE = left, HL = right
+ELSE
+    ld hl,8                         ;Left
     add hl,sp
     ex de,hl
-    ld hl,4         ;Right
+    ld hl,4                         ;Right
     add hl,sp
+ENDIF
     ld b,4
 .loop
     ld c,(hl)
     ld a,(de)
-    ld (hl),a
+    ld (hl+),a                      ; (de) → (hl)
     ld a,c
-    ld (de),a
-    inc de
-    inc hl
+    ld (de+),a                      ; saved (hl) → (de); (de) is A-only
     djnz loop
     ret
 

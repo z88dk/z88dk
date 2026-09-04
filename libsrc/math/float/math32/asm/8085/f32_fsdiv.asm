@@ -1,3 +1,4 @@
+;
 ;  feilipu, 2026 July
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,8 +57,6 @@
 ; result underflow flushes to signed zero (no gradual underflow).
 ;
 ; Result DEHL = a / b.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -231,14 +230,14 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld b,24
 
 .div_bit_loop
-    call rem_sub
+    call rem_sub                    ; in DEHL=rem; CF if rem < div
     jr C,div_bit_fail
-    scf
+    scf                             ; quot bit = 1 (shifted in at quot_shift)
     jp div_quot_shift
 
 .div_bit_fail
-    call rem_add
-    or a
+    call rem_add                    ; restore rem; CF from trial is junk
+    or a                            ; quot bit = 0
 
 .div_quot_shift
     push de
@@ -282,15 +281,15 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
     ld de,sp+4
     ld a,(de)
     inc a
-    ld (de+),a
+    ld (de+),a                  ; NZ from inc a (ld/inc de keep flags)
     jr NZ,div_guard_done
     ld a,(de)
     inc a
-    ld (de+),a
+    ld (de+),a                  ; NZ from inc a
     jr NZ,div_guard_done
     ld a,(de)
     inc a
-    ld (de),a
+    ld (de),a                   ; NZ from inc a
     jr NZ,div_guard_done
     ld a,080h
     ld (de),a
@@ -382,59 +381,52 @@ PUBLIC m32_fsdiv, m32_fsdiv_callee
 
 ;=========================================================================
 ; rem_sub / rem_add — CALL SP=work; B=count; DEHL=rem; div@work+0
-; Preserves B.  Uses C as temp.
+; Preserves B (bit count).  Pointer in HL so lo/mid can sub (hl).
+; C holds div.hi for the last sbc/adc (cannot pop rem high into BC).
 ;=========================================================================
 
 .rem_sub
-    push de
-    ld de,sp+4
-    ld a,(de)
-    ld c,a
-    ld a,l
-    sub c
-    ld l,a
-    inc de
-    ld a,(de)
-    ld c,a
-    ld a,h
-    sbc a,c
-    ld h,a
-    inc de
-    ld a,(de)
-    ld c,a
-    pop de
+    push de                     ; rem high
+    ld de,sp+4                  ; &div
+    ex de,hl                    ; HL = &div, DE = rem.lo:mid
     ld a,e
-    sbc a,c
+    sub (hl+)                   ; rem.lo - div.lo
     ld e,a
     ld a,d
-    sbc a,0
+    sbc a,(hl+)                 ; rem.mid - div.mid
     ld d,a
+    ld a,(hl)
+    ld c,a                      ; C = div.hi
+    pop hl                      ; rem high
+    ld a,l
+    sbc a,c
+    ld l,a
+    ld a,h
+    sbc a,0
+    ld h,a
+    ex de,hl                    ; DE = high, HL = lo:mid
     ret
 
 .rem_add
-    push de
-    ld de,sp+4
-    ld a,(de)
-    ld c,a
-    ld a,l
-    add a,c
-    ld l,a
-    inc de
-    ld a,(de)
-    ld c,a
-    ld a,h
-    adc a,c
-    ld h,a
-    inc de
-    ld a,(de)
-    ld c,a
-    pop de
+    push de                     ; rem high
+    ld de,sp+4                  ; &div
+    ex de,hl                    ; HL = &div, DE = rem.lo:mid
     ld a,e
-    adc a,c
+    add a,(hl+)                 ; rem.lo + div.lo
     ld e,a
     ld a,d
-    adc a,0
+    adc a,(hl+)                 ; rem.mid + div.mid
     ld d,a
+    ld a,(hl)
+    ld c,a                      ; C = div.hi
+    pop hl                      ; rem high
+    ld a,l
+    adc a,c
+    ld l,a
+    ld a,h
+    adc a,0
+    ld h,a
+    ex de,hl                    ; DE = high, HL = lo:mid
     ret
 
 ;=========================================================================

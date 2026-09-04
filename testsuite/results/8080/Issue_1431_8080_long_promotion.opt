@@ -28,13 +28,6 @@
 	ld	c,l
 	ld	hl,0
 	ex	(sp),hl
-	ld	a,h
-	rlca
-	jr	nc,i_3
-	ex	(sp),hl
-	dec	hl
-	ex	(sp),hl
-.i_3
 	push	hl
 	ld	h,b
 	ld	l,c

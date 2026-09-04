@@ -5,7 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 m32_fspoly — Horner via expanded 32-bit mantissa mul/add.
+;-------------------------------------------------------------------------
+;
 ; Same algorithm as Z80 f32_fspoly.asm (no exx / af').
 ;
 ; float polyf(float x, float d[], uint16_t n)
@@ -22,7 +25,6 @@
 ; Expanded res lives in B/C/DEHL.  ld de,sp+* clobbers DE, so park the
 ; full res (or at least DE) before any stack-pointer math.  BC is live
 ; meta — do not ld bc,de to park DE.  The Z80 path uses exx.
-;
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -85,7 +87,7 @@ PUBLIC _m32_polyf
     ld de,sp+8
     ld hl,(de)
     pop de                          ; DEHL = Y.mant; BC still meta
-    call m32_fsmul24x32             ; consumes x
+    call m32_fsmul24x32             ; in Y, stack x; out BCDEHL = Y*x expanded
     pop af
     pop af                          ; drop Y.de Y.hl
 
@@ -117,7 +119,7 @@ PUBLIC _m32_polyf
     ld de,sp+8
     ld hl,(de)
     pop de                          ; DEHL = product.mant; BC still meta
-    call m32_fsadd24x32             ; consumes x
+    call m32_fsadd24x32             ; in product, stack d[n]; out Y = res+d[n]
     pop af
     pop af                          ; drop P.de P.hl
     jp fep0

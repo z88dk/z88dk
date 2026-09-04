@@ -8,10 +8,8 @@
 ;-------------------------------------------------------------------------
 ; m32_fsdiv2 - z80, z180, z80n floating point divide by 2
 ;-------------------------------------------------------------------------
-; 
-; Division by 2 is decrementing the exponent. An easy optimisation.
 ;
-;-------------------------------------------------------------------------
+; Division by 2 is decrementing the exponent. An easy optimisation.
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -496,5 +496,6 @@ How to read lines and `rg` without loading huge files: skill **`tool-z80asm`**.
 - Full opcode grid: [references/opcodes.md](references/opcodes.md)
 - Assembler: `tool-z80asm`
 - Measure: `methodology-measure`, `tool-ticks`
+- Float: **`library-math32`** — `--math32` on `-clib=gbz80` / `-mgbz80` links `math32_gbz80.lib` (stack-only cores under `asm/gbz80/`; higher C via `make -C …/c gbz80`)
 - Target: `lib/config/gb.cfg`, `libsrc/target/gb/`
 - sccz80 runtime examples: `libsrc/l/sccz80/8-gbz80/`

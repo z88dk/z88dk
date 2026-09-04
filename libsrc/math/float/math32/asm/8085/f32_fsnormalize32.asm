@@ -16,8 +16,6 @@
 ;  Byte scan; residual merge loop.  8085 rl de does not set S (-----VC).
 ;  Until normalised D.7 is 0.  Entry leaves A = D with A.7 clear, so each
 ;  step is or d / jp p (cheaper than ld a,d / or a).
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

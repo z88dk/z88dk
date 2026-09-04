@@ -1,0 +1,76 @@
+;
+;  feilipu, 2026 September
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+; gbz80 m32_fsmul2 — multiply by 2 (increment exponent)
+;-------------------------------------------------------------------------
+;
+; rl de expanded through A.
+
+SECTION code_clib
+SECTION code_fp_math32
+
+PUBLIC m32_fsmul2_fastcall
+PUBLIC _m32_mul2f
+
+._m32_mul2f
+.m32_fsmul2_fastcall
+    ld a,e
+    rla
+    ld e,a
+    ld a,d
+    rla
+    ld d,a                          ; D = exp, C = sign
+
+    inc d
+    dec d
+    jp Z,zero_legal
+
+    inc d                           ; *2
+    jr Z,exp_max
+    ld a,d
+    inc a
+    jr Z,overflow
+
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ret
+
+.exp_max
+    dec d
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    ret
+
+.zero_legal
+    ld e,d
+    ld hl,de
+    ld a,d
+    rra
+    ld d,a
+    ret
+
+.overflow
+    ld e,0
+    ld h,e
+    ld l,e
+    ld a,d
+    rra
+    ld d,a
+    ld a,e
+    rra
+    ld e,a
+    scf
+    ret

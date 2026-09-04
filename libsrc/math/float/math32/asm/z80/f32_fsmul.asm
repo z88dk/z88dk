@@ -23,7 +23,7 @@
 ;   ab*f*2^8 + c*de*2^8 +
 ;   c*f
 ;
-; = a*d*2^32 + a*e*2^24 + b*d*2^24 + b*e*2^16 + 
+; = a*d*2^32 + a*e*2^24 + b*d*2^24 + b*e*2^16 +
 ;   a*f*2^16 + b*f*2^8 +
 ;   c*d*2^16 + c*e*2^8 +
 ;   c*f
@@ -44,8 +44,6 @@
 ;   for underflow, maximum left shift is 1 place
 ;   so we should report 32 bits of accuracy (don't need all 48 bits)
 ;   = 24 bits significant + 1 bit shift + 7 bits rounding
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -5,9 +5,11 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8080 m32_fspoly — Horner via expanded 32-bit mantissa mul/add.
-; Same algorithm as 8085.  Park DE (not BC) before ld hl,sp+n.
+;-------------------------------------------------------------------------
 ;
+; Same algorithm as 8085.  Park DE (not BC) before ld hl,sp+n.
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -82,7 +84,7 @@ PUBLIC _m32_polyf
     ld h,(hl)
     ld l,a
     pop de                          ; DEHL = Y.mant; BC still meta
-    call m32_fsmul24x32
+    call m32_fsmul24x32             ; in Y, stack x; out BCDEHL = Y*x expanded
     pop af
     pop af                          ; drop Y.de Y.hl
 
@@ -102,8 +104,7 @@ PUBLIC _m32_polyf
     ld e,a
     ld d,0
     add hl,de                       ; &d[n]
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de                         ; LSW
     ld e,(hl+)
     ld d,(hl)
@@ -120,7 +121,7 @@ PUBLIC _m32_polyf
     ld h,(hl)
     ld l,a
     pop de                          ; DEHL = product.mant
-    call m32_fsadd24x32
+    call m32_fsadd24x32             ; in product, stack d[n]; out Y = res+d[n]
     pop af
     pop af                          ; drop P.de P.hl
     jp fep0
@@ -175,8 +176,7 @@ PUBLIC _m32_polyf
 
 
 .load_expand_ieee
-    ld e,(hl+)
-    ld d,(hl+)
+    ld de,(hl+)
     push de
     ld e,(hl+)
     ld d,(hl)

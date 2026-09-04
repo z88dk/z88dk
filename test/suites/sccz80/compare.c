@@ -206,6 +206,35 @@ void test_ulong_compare_0x10_0x20()
 
     ulong_compare(a,b);
 }
+
+/* a is stacked, b is primary — hits zwiden_stack_to_long on 8080/8085/gbz80 */
+long add_si_long(int a, long b)
+{
+    return a + b;
+}
+
+long add_ui_long(unsigned int a, long b)
+{
+    return a + b;
+}
+
+void test_sint_long_promote()
+{
+    Assert( add_si_long(2, 3L) == 5L, "2 + 3L");
+    Assert( add_si_long(-2, 3L) == 1L, "-2 + 3L");
+    Assert( add_si_long(-2, -3L) == -5L, "-2 + -3L");
+    Assert( add_si_long(32767, 1L) == 32768L, "32767 + 1L");
+    Assert( add_si_long(-32768, -1L) == -32769L, "-32768 + -1L");
+    Assert( add_si_long(-1, 0x10000L) == 65535L, "-1 + 0x10000L");
+}
+
+void test_uint_long_promote()
+{
+    Assert( add_ui_long(2, 3L) == 5L, "2u + 3L");
+    Assert( add_ui_long(32768U, 1L) == 32769L, "32768u + 1L");
+    Assert( add_ui_long(65535U, 1L) == 65536L, "65535u + 1L");
+    Assert( add_ui_long(65535U, -1L) == 65534L, "65535u + -1L");
+}
  
  
 
@@ -276,6 +305,8 @@ int suite_compare()
     suite_add_test(test_ulong_compare_0x1000_0xf8009000);
     suite_add_test(test_ulong_compare_0x1000_0xf0f09000);
     suite_add_test(test_ulong_compare_0x10_0x20);
+    suite_add_test(test_sint_long_promote);
+    suite_add_test(test_uint_long_promote);
 #ifdef ENABLE_LLTESTS
     suite_add_test(test_llong_compare);
     suite_add_test(test_ullong_compare);

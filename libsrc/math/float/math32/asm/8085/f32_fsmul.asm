@@ -5,12 +5,13 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;-------------------------------------------------------------------------
 ; 8085 m32_fsmul / m32_fsmul_callee
+;-------------------------------------------------------------------------
 ;
 ; Rounding: IEEE RNE.  Residual = low 8 of high-32 product (in E after mul).
 ;   G = residual.7, S = residual[6:0]!=0, B = mant LSB
 ;   round_up = G && (S || B); then 24-bit mant++ (overflow → >>1, exp++).
-;
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -97,41 +98,31 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld (de),a                       ; store exp sum
 
     ld de,sp+10
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld b,a
-    push bc
-    ld de,sp+10
-    ld a,(de)
-    ld c,a
-    inc de
-    ld a,(de)
-    ld b,a
-    push bc
+    ld hl,(de)                      ; y.DE
+    push hl
+    ld de,sp+10                     ; y.HL (shifted after push)
+    ld hl,(de)
+    push hl
     ld de,sp+6
     ld a,(de)
-    ld l,a
+    ld l,a                          ; x.L (HL is product later — keep L)
     ld de,sp+8
-    ld a,(de)
+    ld a,(de+)
     ld c,a
-    ld de,sp+9
     ld a,(de)
     ld d,a
-    ld e,c
+    ld e,c                          ; LDE = x mant
 
-    call m32_mulu_32h_24x24
+    call m32_mulu_32h_24x24         ; in LDE=x, stack y; out HLDE=high 32
 
-    push de
+    push de                         ; park product low; HL = product high
     ld de,sp+8
-    ld a,(de)
+    ld a,(de+)
     ld c,a
-    inc de
     ld a,(de)
     ld b,a
-    pop de
-    call pack_product
+    pop de                          ; BC = sign/exp, HLDE = product
+    call pack_product               ; in BC=sign/exp HLDE=prod; out DEHL=IEEE
 
     ; DEHL=IEEE; stack: es_l LmH LmD es_r RmH RmD flag ret Lh Ld
     ; Flag then bulk-drop 14 (7 words).  Park DEHL in BC/DE (same as fsadd epi).
@@ -360,8 +351,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .unpack_dehl
     ex de,hl
-    ld a,h
-    ld c,a
+    ld c,h                          ; C = sign byte
     add hl,hl
     scf
     ld a,l

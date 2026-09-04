@@ -16,15 +16,13 @@ More detailed, but still incomplete changelist:
 - [classic] +z88 Support for 512z64 graphics
 - [classic] targets +hbios, +scz180, +yaz180, +rc2014 migrated
 - [newlib] library products install under lib/clibs/{sccz80,sdcc_ix,sdcc_iy}/ (classic clibs layout)
-- [all] math32 floating point support for Intel 8080 (MIT licence)
-- [all] math32 floating point support for Intel 8085 (MIT licence)
-- [all] math16 half-precision floating point support for Intel 8085 (MIT licence)
+- [all] math32 floating point support for Intel 8080, 8085, and Nintendo gbz80
+- [all] math16 half-precision floating point support for Intel 8085
 - [all] AI agent support via AGENTS.md and .agents/skills (Grok/Claude discovery symlinks)
 - [ucpp] Big fixes for #line handling
 - [z88dk-dis] Support for decoding rst calls
 - [z80asm] #define now supported as alias for defc
 - [zcc] add multi compiler selection tool (sccz80, 80cc-sp, 80cc-fp)
-- [zcc] multi metric/report flags are --multi-compiler-metric and --multi-compiler-report
 - [zsdcc] Upgraded to SDCC 4.6.0 r16639
 
 
@@ -33,10 +31,10 @@ z88dk v2.4 - 02.10.2025
 Headline features for this release:
 
 - Far heap support for many new targets providing access for up to
-  4MB of memory from C 
+  4MB of memory from C
 - New classic targets: Hector1 and HectorHR
 - Support for the Rabbit 6000 processor
-- z80asm supports local labels 
+- z80asm supports local labels
 
 More detailed, but still incomplete changelist:
 
@@ -52,11 +50,11 @@ More detailed, but still incomplete changelist:
 - [classic] +m100: Support for more hardware variants
 - [classic] +msx: Support for far heap (MSXDOS)
 - [classic] +nc: Generic console, graphics fixes
-- [classic] +nc: Bootable disc images for NC200: -subtype=ncboot 
+- [classic] +nc: Bootable disc images for NC200: -subtype=ncboot
 - [classic] +nc: Inkey keyboard driver
 - [classic] +pv1000: Fixes to support running on genuine hardware
-- [classic] +sam: Support for far heap 
-- [classic] +zx: Support for far heap 
+- [classic] +sam: Support for far heap
+- [classic] +zx: Support for far heap
 - [classic] +zx81 ARX hires graphics updates
 - [classic] -llib3d is now integrated into target library
 - [classic] More near-heap size choice pragmas
@@ -218,7 +216,7 @@ Detailed but incomplete changelist:
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
 - [z80asm] Macros are now supported
-- [z80asm] New ASSERT directive 
+- [z80asm] New ASSERT directive
 - [z80asm] New FLOAT directive
 - [zsdcc] Upgraded to SDCC 4.2.0 r13131
 

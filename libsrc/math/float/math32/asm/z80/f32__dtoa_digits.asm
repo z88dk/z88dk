@@ -1,3 +1,13 @@
+;
+;  feilipu, 2019 April
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+; m32__dtoa_digits — generate decimal digits
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -35,8 +45,7 @@ PUBLIC m32__dtoa_digits
     add a,'0'                   ; a = decimal digit
 
     exx
-    ld (hl),a                   ; write decimal digit
-    inc hl
+    ld (hl+),a                  ; write decimal digit
 
     exx
     ld a,d

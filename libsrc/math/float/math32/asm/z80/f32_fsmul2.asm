@@ -10,8 +10,6 @@
 ;-------------------------------------------------------------------------
 ;
 ; Multiplication by 2 is incrementing the exponent. An easy optimisation.
-;
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

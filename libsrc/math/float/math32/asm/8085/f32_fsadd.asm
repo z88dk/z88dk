@@ -5,10 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-
 ;-------------------------------------------------------------------------
 ; m32_fsadd / m32_fssub - 8085 IEEE single add/sub
 ;-------------------------------------------------------------------------
+;
 ; Y lives in registers after unpack:
 ;   B = sign byte (bit 7), C = exp, LDE = 24-bit mant (H = 0)
 ;
@@ -31,7 +31,6 @@
 ;
 ; Rounding: Digi jam-sticky.  Lost bits from align or sum>>1 OR into
 ; the mant LSB after the shift.  Pack has no residual RNE.
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -115,7 +114,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 .fa_align
     cp 24
     jp NC,fa_pack                   ; small cannot affect Y
-    call fa_align_x
+    call fa_align_x                 ; in A=expdiff; X slot >>= A, jam sticky
 
 .fa_ops
     push de
@@ -126,10 +125,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     and 080h
     jp NZ,fa_sub
 
-    call fa_addx
+    call fa_addx                    ; in Y=LDE, X slot; out LDE=sum, A=bit24
     or a
     jp Z,fa_pack
-    call fa_shr1
+    call fa_shr1                    ; in LDE, A=1; out LDE>>=1 with hidden 1
     inc c
     ld a,c
     inc a                           ; new exp == 255 (was 254)
@@ -137,7 +136,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp fa_pack
 
 .fa_sub
-    call fa_subx
+    call fa_subx                    ; in Y=LDE, X slot; out LDE=diff, CF=borrow
     jp C,fa_sub_rev                 ; borrow only if expdiff==0
 .fa_sub_mag
     call fa_mant_zero
@@ -268,8 +267,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 
 ;------------------------------------------------------------------------------
 .unpack_regs
-    ld a,d
-    ld b,a                          ; sign byte
+    ld b,d                          ; sign byte
     ex de,hl
     add hl,hl
     ld c,h                          ; exp
