@@ -32,10 +32,12 @@ jobs:
       with:
         path: |
           ~/perl5
-        key: ${{ runner.os }}-perl5-${{ hashFiles('.github/workflows/build-on-macos.yml') }}-${{ github.run_id }}
+        # Do not restore a bare "perl5-" prefix: that reuses XS built for an
+        # older Homebrew perl (5.42 Util.so on 5.44) and src/common tests then
+        # fail with "Perl API version ... does not match" after a green prove.
+        key: ${{ runner.os }}-perl5-5.44-${{ hashFiles('.github/workflows/build-on-macos.yml') }}-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-perl5-${{ hashFiles('.github/workflows/build-on-macos.yml') }}-
-          ${{ runner.os }}-perl5-
+          ${{ runner.os }}-perl5-5.44-${{ hashFiles('.github/workflows/build-on-macos.yml') }}-
     - name: Cache ccache
       uses: actions/cache@v5
       with:
