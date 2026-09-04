@@ -17,10 +17,6 @@ RETROFIT_OBJS := $(addprefix classic/gfx/retrofit/obj/z80/, $(RETROFIT_OBJECTS))
 OBJS += $(RETROFIT_OBJS)
 CLEAN += classic-gfx-retrofit-clean
 
-classic-gfx-retrofit: $(RETROFIT_OBJS)
-
-.PHONY: classic-gfx-retrofit classic-gfx-retrofit-clean
-
 $(eval $(call buildbit,classic/gfx/retrofit,z80,test))
 $(eval $(call buildbit,classic/gfx/retrofit,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/gfx/retrofit,8080,test,-clib=8080,-m8080))
@@ -31,6 +27,11 @@ $(eval $(call buildbit,classic/gfx/retrofit,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/gfx/retrofit,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/gfx/retrofit,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/gfx/retrofit,kc160,test,-clib=kc160,-mkc160))
+
+classic-gfx-retrofit: $(RETROFIT_OBJS)
+
+.PHONY: classic-gfx-retrofit classic-gfx-retrofit-clean
+
 
 
 classic-gfx-retrofit-clean:

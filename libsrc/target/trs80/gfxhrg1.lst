@@ -1,8 +1,8 @@
-target/trs80/gfxhrg1/clsgraph
-target/trs80/gfxhrg1/w_plotpixl
-target/trs80/gfxhrg1/w_xorpixl
-target/trs80/gfxhrg1/w_respixl
-target/trs80/gfxhrg1/w_pointxy
-target/trs80/gfxhrg1/w_pixladdr
-target/trs80/gfxhrg1/w_putsprite
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/clsgraph.o
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/w_plotpixl.o
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/w_xorpixl.o
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/w_respixl.o
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/w_pointxy.o
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/w_pixladdr.o
+target/trs80/obj/trs80/x/target/trs80/gfxhrg1/w_putsprite.o
 @classic/gfx/wide/gfx_wide.lst

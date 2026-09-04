@@ -20,10 +20,6 @@ REGEX_OBJS := $(addprefix regex/obj/z80/, $(REGEX_OBJECTS)) \
 OBJS += $(REGEX_OBJS)
 CLEAN += regex-clean
 
-regex: $(REGEX_OBJS)
-
-.PHONY: regex regex-clean
-
 $(eval $(call buildbit,regex,z80,test))
 $(eval $(call buildbit,regex,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,regex,8080,test,-clib=8080,-m8080))
@@ -36,6 +32,11 @@ $(eval $(call buildbit,regex,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,regex,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,regex,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,regex,kc160,test,-clib=kc160,-mkc160))
+
+regex: $(REGEX_OBJS)
+
+.PHONY: regex regex-clean
+
 
 
 regex-clean:

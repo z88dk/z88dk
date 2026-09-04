@@ -78,22 +78,33 @@ SAM_CPM_GLOBS_ex := \
 
 SAM_CFILES = 
 
-SAM_OFILES = $(addprefix target/sam/obj/sam/, $(SAM_CFILES:.c=.o))
+SAM_OFILES = $(patsubst target/sam/%,target/sam/obj/sam/%,$(SAM_CFILES:.c=.o))
 
 
 SAM_TARGETS := target/sam/obj/target-sam-sam target/sam/obj/target-sam-samcpm \
-	$(SAM_OFILES)
-		
+	$(SAM_OFILES) \
+	classic/games/obj/.stamp-sam classic/gfx/obj/.stamp-sam
 
 CLEAN += target-sam-clean
+TOCREATE += $(call check_target,sam,sam_clib.lib sam_cpm.lib)
+$(eval $(call gfx_stamp_args,sam,TARGET=sam FLAVOUR=wide))
+$(eval $(call buildtargetasm,target/sam,z80,sam,-mz80,$(SAM_GLOBS),$(SAM_GLOBS_ex)))
+$(eval $(call buildtargetasm,target/sam,z80,samcpm,-mz80,$(SAM_CPM_GLOBS),$(SAM_CPM_GLOBS_ex)))
+$(eval $(call buildtargetc,target/sam,sam))
+
+sam_clib.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS)
+	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(TARGET_DIRECTORY)/sam/sam.lst
+
+sam_cpm.lib: $(TARGET_CLIB_DEPS) $(SAM_TARGETS) sam_clib.lib
+	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_cpm @$(TARGET_DIRECTORY)/sam/sam_cpm.lst
+		
+
+
 
 target-sam: $(SAM_TARGETS)
 
 .PHONY: target-sam target-sam-clean
 
-$(eval $(call buildtargetasm,target/sam,z80,sam,-mz80,$(SAM_GLOBS),$(SAM_GLOBS_ex)))
-$(eval $(call buildtargetasm,target/sam,z80,samcpm,-mz80,$(SAM_CPM_GLOBS),$(SAM_CPM_GLOBS_ex)))
-$(eval $(call buildtargetc,target/sam,sam))
 
 target-sam-clean:
 	$(RM) -fr target/sam/obj

@@ -7,20 +7,32 @@ LM80C_GLOBS_ex := \
 	target/lm80c/stdio/*.asm 
 
 LM80C_CFILES = $(wildcard target/lm80c/rs232/*.c)
-LM80C_OFILES = $(addprefix target/lm80c/obj/lm80c/, $(LM80C_CFILES:.c=.o))
+LM80C_OFILES = $(patsubst target/lm80c/%,target/lm80c/obj/lm80c/%,$(LM80C_CFILES:.c=.o))
 
-LM80C_TARGETS := target/lm80c/obj/target-lm80c-lm80c $(LM80C_OFILES)
+LM80C_TARGETS := target/lm80c/obj/target-lm80c-lm80c $(LM80C_OFILES) classic/video/tms9918/obj/lm80c classic/games/obj/.stamp-lm80c classic/gfx/obj/.stamp-lm80c
 		
 
 CLEAN += target-lm80c-clean
+TOCREATE += $(call check_target,lm80c,lm80c_clib.lib)
+$(eval $(call gfx_stamp_args,lm80c,TARGET=lm80c))
+$(eval $(call buildvideo,tms9918,TMS9918,lm80c,))
+$(eval $(call buildtargetasm,target/lm80c,z80,lm80c,-mz80,$(LM80C_GLOBS),$(LM80C_GLOBS_ex)))
+$(eval $(call buildtargetc,target/lm80c,lm80c))
+
+lm80c_clib.lib: $(TARGET_CLIB_DEPS) $(LM80C_TARGETS)
+	@echo ''
+	@echo '--- Building LM80-C Library ---'
+	@echo ''
+	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(TARGET_DIRECTORY)/lm80c/lm80c.lst
+
+
 
 target-lm80c: $(LM80C_TARGETS)
 
 .PHONY: target-lm80c target-lm80c-clean
 
 
-$(eval $(call buildtargetasm,target/lm80c,z80,lm80c,-mz80,$(LM80C_GLOBS),$(LM80C_GLOBS_ex)))
-$(eval $(call buildtargetc,target/lm80c,lm80c))
+
 
 target-lm80c-clean:
 	$(RM) -fr target/lm80c/obj

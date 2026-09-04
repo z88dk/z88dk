@@ -1,2 +1,2 @@
-target/newbrain/cpmzcall
+target/newbrain/obj/${TARGET}/x/target/newbrain/cpmzcall.o
 @target/newbrain/newbrain_common.lst

@@ -16,10 +16,6 @@ ALLOC_FARMALLOC_OBJS := $(addprefix classic/alloc/farmalloc/obj/z80/, $(ALLOC_FA
 OBJS += $(ALLOC_FARMALLOC_OBJS)
 CLEAN += alloc-farmalloc-clean
 
-alloc-farmalloc: $(ALLOC_FARMALLOC_OBJS)
-
-.PHONY: alloc-farmalloc alloc-farmalloc-clean
-
 $(eval $(call buildbit,classic/alloc/farmalloc,z80,test))
 $(eval $(call buildbit,classic/alloc/farmalloc,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/alloc/farmalloc,8080,test,-clib=8080,-m8080))
@@ -30,6 +26,11 @@ $(eval $(call buildbit,classic/alloc/farmalloc,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/alloc/farmalloc,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/alloc/farmalloc,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/alloc/farmalloc,kc160,test,-clib=kc160,-mkc160))
+
+alloc-farmalloc: $(ALLOC_FARMALLOC_OBJS)
+
+.PHONY: alloc-farmalloc alloc-farmalloc-clean
+
 
 
 alloc-farmalloc-clean:

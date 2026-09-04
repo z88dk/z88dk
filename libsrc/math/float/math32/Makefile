@@ -85,7 +85,7 @@ $(OUTPUT_DIRECTORY)/math32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 $(foreach d,8080 8085 gbz80 ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c
+	$(Q)mkdir -p obj/z80/c obj/ixiy/c obj/z80n/c obj/z180/c obj/ez80_z80/c obj/r2ka/c obj/r4k/c obj/kc160/c obj/8085/c obj/8080/c obj/gbz80/c obj/r6k/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

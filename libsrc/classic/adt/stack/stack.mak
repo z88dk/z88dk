@@ -18,10 +18,6 @@ STACK_OBJS := $(addprefix classic/adt/stack/obj/z80/, $(STACK_OBJECTS)) \
 OBJS += $(STACK_OBJS) 
 CLEAN += classic-adt-stack-clean
 
-classic-adt-stack: $(STACK_OBJS) $(STACK_NEWLIB_TARGETS)
-
-.PHONY: classic-adt-stack classic-adt-stack-clean
-
 $(eval $(call buildbit,classic/adt/stack,z80,test))
 $(eval $(call buildbit,classic/adt/stack,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/adt/stack,r2ka,test,-clib=rabbit,-mr2ka))
@@ -30,6 +26,11 @@ $(eval $(call buildbit,classic/adt/stack,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/adt/stack,kc160,test,-clib=kc160,-mkc160))
 $(eval $(call buildbit,classic/adt/stack,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/adt/stack,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
+
+classic-adt-stack: $(STACK_OBJS) $(STACK_NEWLIB_TARGETS)
+
+.PHONY: classic-adt-stack classic-adt-stack-clean
+
 
 
 classic-adt-stack-clean:

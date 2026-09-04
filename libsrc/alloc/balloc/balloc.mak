@@ -16,10 +16,6 @@ BALLOC_TARGETS := alloc/balloc/obj/newlib-z80-alloc-balloc \
 OBJS += $(BALLOC_TARGETS)
 CLEAN += alloc-balloc-clean
 
-alloc-balloc: $(BALLOC_OBJS) $(BALLOC_TARGETS)
-
-.PHONY: alloc-balloc alloc-balloc-clean
-
 $(eval $(call buildnew,alloc/balloc,z80,-mz80,$(BALLOC_GLOBS),$(BALLOC_GLOBS_ex)))
 $(eval $(call buildnew,alloc/balloc,r2ka,-mr2ka,$(BALLOC_GLOBS),$(BALLOC_GLOBS_ex)))
 $(eval $(call buildnew,alloc/balloc,r4k,-mr4k,$(BALLOC_GLOBS),$(BALLOC_GLOBS_ex)))
@@ -28,6 +24,11 @@ $(eval $(call buildnew,alloc/balloc,ixiy,-mz80 -IXIY,$(BALLOC_GLOBS),$(BALLOC_GL
 $(eval $(call buildnew,alloc/balloc,z180,-mz180,$(BALLOC_GLOBS),$(BALLOC_GLOBS_ex)))
 $(eval $(call buildnew,alloc/balloc,ez80_z80,-mez80_z80,$(BALLOC_GLOBS),$(BALLOC_GLOBS_ex)))
 $(eval $(call buildnew,alloc/balloc,kc160,-mkc160,$(BALLOC_GLOBS),$(BALLOC_GLOBS_ex)))
+
+alloc-balloc: $(BALLOC_OBJS) $(BALLOC_TARGETS)
+
+.PHONY: alloc-balloc alloc-balloc-clean
+
 
 
 alloc-balloc-clean:

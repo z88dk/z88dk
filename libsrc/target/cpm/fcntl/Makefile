@@ -85,7 +85,7 @@ obj/ixiy/device/%.o: %.c
 $(OBJECTS): | dirs
 
 dirs:
-	@mkdir -p obj obj/z80/device obj/z80/nodevice \
+	$(Q)mkdir -p obj obj/z80/device obj/z80/nodevice \
 	obj/8080/device obj/8080/nodevice \
 	obj/8085/device obj/8085/nodevice \
 	obj/ixiy/device obj/ixiy/nodevice \

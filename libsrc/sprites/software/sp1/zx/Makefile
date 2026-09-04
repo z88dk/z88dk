@@ -38,7 +38,7 @@ obj/newlib-z80: $(NEWLIBGLOBS_ex) | dirs
 
 
 dirs:
-	@mkdir -p obj/z80 
+	$(Q)mkdir -p obj/z80
 
 
 clean:

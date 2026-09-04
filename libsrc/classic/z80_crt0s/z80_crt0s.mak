@@ -56,11 +56,12 @@ $(eval $(call crt0,ez80_z80, crt0_ez80.lst,  -D__SDCC_IX -D__CLASSIC -mez80_z80 
 $(eval $(call crt0,r2ka,     crt0_r2ka.lst,  -D__SDCC_IX -D__CLASSIC -mr2ka))
 $(eval $(call crt0,r4k,      crt0_r2ka.lst,  -D__SDCC_IX -D__CLASSIC -mr4k))
 $(eval $(call crt0,kc160,    crt0_kc160.lst, -D__SDCC_IX -D__CLASSIC -mkc160))
+CLEAN += crt0s-clean
+
 
 $(CRT0_DIR)/obj:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
-CLEAN += crt0s-clean
 
 .PHONY: crt0s-clean
 

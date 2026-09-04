@@ -26,7 +26,7 @@ obj/svi/%.o: %.asm
 $(addprefix obj/msx/,$(OBJECTS)) $(addprefix obj/svi/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/svi obj/msx
+	$(Q)mkdir -p obj/svi obj/msx
 
 clean: 
 	$(RM) -r obj

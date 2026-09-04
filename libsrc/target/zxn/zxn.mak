@@ -30,22 +30,34 @@ ZXN_GLOBS_ex := $(ZX_GLOBS_ex) \
 
 ZXN_CFILES = target/zx/tape/tape_save.c
 
-ZXN_OFILES = $(addprefix target/zxn/obj/zxn/, $(ZXN_CFILES:.c=.o)) 
+ZXN_OFILES = $(patsubst target/zx/%,target/zxn/obj/zxn/%,$(ZXN_CFILES:.c=.o))
 
 
-ZXN_TARGETS := target/zxn/obj/target-zxn-zxn $(ZXN_OFILES)
+ZXN_TARGETS := target/zxn/obj/target-zxn-zxn $(ZXN_OFILES) classic/games/obj/.stamp-zxn classic/gfx/obj/.stamp-zxn-wide
+
+$(eval $(call gfx_stamp,zxn,wide))
 		
 
 CLEAN += target-zxn-clean
+TOCREATE += $(call check_target,zxn, zxn_clib.lib)
+$(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZXN_GLOBS_ex) $(ZX_MULTICOLOUR_GLOBS_ex) $(addprefix target/zxn/obj/zxn/, $(BIFROST2_GEN))))
+$(eval $(call bifrost_zx0,zxn))
+
+zxn_clib.lib: $(TARGET_CLIB_DEPS) $(ZXN_TARGETS) zx_clib.lib
+	@echo ''
+	@echo '--- Building ZX Spectrum Next Library ---'
+	@echo ''
+	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -Itarget/zx/newlib -x$(OUTPUT_DIRECTORY)/zxn_clib @$(TARGET_DIRECTORY)/zxn/zxn.lst
+
 
 target-zxn: $(ZXN_TARGETS)
 
 .PHONY: target-zxn target-zxn-clean
 
 
-$(eval $(call buildtargetasm,target/zxn,z80n,zxn,-mz80n,$(ZXN_GLOBS) $(ZX_MULTICOLOUR_GLOBS),$(ZXN_GLOBS_ex) $(ZX_MULTICOLOUR_GLOBS_ex) $(addprefix target/zxn/obj/zxn/, $(BIFROST2_GEN))))
-$(eval $(call buildtargetc,target/zxn,zxn,-clib=classic))
-$(eval $(call bifrost_zx0,zxn))
+target/zxn/obj/zxn/%.o: target/zx/%.c
+	$(Q)mkdir -p $(dir $@)
+	$(ZCC) +zxn -clib=classic -Ca-I$(dir $<) -c -o $@ $<
 
 # zx and zxn share the multicolour engine sources under target/zx, and z80asm
 # expands a .asm.m4 into the .asm beside the source rather than into the

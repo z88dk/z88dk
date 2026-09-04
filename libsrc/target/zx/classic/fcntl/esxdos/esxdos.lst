@@ -1,2 +1,1 @@
-obj/*.o
-obj/**/*.o
+target/zx/obj/support/classic/fcntl/esxdos/*.o

@@ -37,21 +37,6 @@ jobs:
       with: 
         submodules: 'true'
 
-    # C:\perl5, not ~/perl5: actions/cache resolves ~ through node, to
-    # C:\Users\runneradmin, while cygwin's ~ is /home/runneradmin inside the
-    # cygwin root. The cache was watching a directory cpanm never wrote to, so
-    # nothing was ever stored and this step cost ~24 minutes every run.
-    # Rolled because actions/cache never overwrites an existing key.
-    - name: Cache perl modules
-      uses: actions/cache@v5
-      with:
-        path: |
-          C:\perl5
-        key: ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-${{ github.run_id }}
-        restore-keys: |
-          ${{ runner.os }}-cygwin-perl5-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-
-          ${{ runner.os }}-cygwin-perl5-
-
     # A library build is ~206k short-lived processes, and Defender scans every
     # exec and every object written. Excluding the trees it touches attacks the
     # per-spawn cost, which is what makes cygwin ~9x slower per process than
@@ -101,6 +86,24 @@ jobs:
           unzip 
           wget 
           zlib-devel 
+    - name: Identify perl runtime
+      id: perl_runtime
+      run: |
+        echo "version=$(perl -MConfig -e 'print \"$Config{version}-$Config{archname}\"')" >> "$GITHUB_OUTPUT"
+    # C:\perl5, not ~/perl5: actions/cache resolves ~ through node, to
+    # C:\Users\runneradmin, while cygwin's ~ is /home/runneradmin inside the
+    # cygwin root. The cache was watching a directory cpanm never wrote to, so
+    # nothing was ever stored and this step cost ~24 minutes every run.
+    # Rolled because actions/cache never overwrites an existing key.
+    - name: Cache perl modules
+      uses: actions/cache@v5
+      with:
+        path: |
+          C:\perl5
+        key: ${{ runner.os }}-${{ runner.arch }}-cygwin-perl5-${{ steps.perl_runtime.outputs.version }}-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-cygwin-perl5-${{ steps.perl_runtime.outputs.version }}-${{ hashFiles('.github/workflows/build-on-windows-cygwin.yml') }}-
+          ${{ runner.os }}-${{ runner.arch }}-cygwin-perl5-${{ steps.perl_runtime.outputs.version }}-
     # No compiler masquerade needed: the top-level Makefile wraps both CC and
     # CXX with ccache itself when ccache is on PATH.
     - name: Configure ccache

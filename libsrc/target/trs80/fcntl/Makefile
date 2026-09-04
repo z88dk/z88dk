@@ -35,7 +35,7 @@ obj/%.o: %.asm
 $(OBJECTS): | dirs
 
 dirs:
-	@mkdir -p obj
+	$(Q)mkdir -p obj
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* obj/*.o* $(OUTPUT_DIRECTORY)/trsdos.lib

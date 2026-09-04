@@ -31,10 +31,6 @@ ARCHZ80_OBJS := $(addprefix arch/z80/obj/z80/, $(ARCHZ80_OBJECTS)) \
 OBJS += $(ARCHZ80_OBJS) $(ARCHZ80_TARGETS)
 CLEAN += arch-z80-clean
 
-arch-z80: $(ARCHZ80_OBJS) $(ARCHZ80_TARGETS)
-
-.PHONY: arch/z80 arch/z80-clean
-
 $(eval $(call buildbit,arch/z80,z80,test))
 $(eval $(call buildbit,arch/z80,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,arch/z80,z80n,test,-clib=z80n,-mz80n))
@@ -43,7 +39,6 @@ $(eval $(call buildbit,arch/z80,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,arch/z80,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,arch/z80,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,arch/z80,kc160,test,-clib=kc160,-mkc160))
-
 $(eval $(call buildnew,arch/z80,z80,-mz80,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_ex)))
 $(eval $(call buildnew,arch/z80,r2ka,-mr2ka,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_ex)))
 $(eval $(call buildnew,arch/z80,r4k,-mr4k,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_ex)))
@@ -54,6 +49,12 @@ $(eval $(call buildnew,arch/z80,gbz80,-mgbz80,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_e
 $(eval $(call buildnew,arch/z80,z180,-mz180,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_ex)))
 $(eval $(call buildnew,arch/z80,ez80_z80,-mez80_z80,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_ex)))
 $(eval $(call buildnew,arch/z80,kc160,-mkc160,$(ARCHZ80_GLOBS),$(ARCHZ80_GLOBS_ex)))
+
+arch-z80: $(ARCHZ80_OBJS) $(ARCHZ80_TARGETS)
+
+.PHONY: arch/z80 arch/z80-clean
+
+
 
 
 arch-z80-clean:

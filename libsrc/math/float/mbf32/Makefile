@@ -64,19 +64,19 @@ $(OUTPUT_DIRECTORY)/mbf32_r6k.lib: $(addprefix obj/r6k/, $(OBJECTS))
 $(foreach d,8080 8085 vm1 ez80_z80 gbz80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/z80/z80
-	@mkdir -p obj/z80n/c/sccz80 obj/z80n/c/asm obj/z80n/z80
-	@mkdir -p obj/8080/c/sccz80 obj/8080/c/asm obj/8080/z80
-	@mkdir -p obj/8085/c/sccz80 obj/8085/c/asm obj/8085/z80
-	@mkdir -p obj/vm1/c/sccz80 obj/vm1/c/asm obj/vm1/z80
-	@mkdir -p obj/ixiy/c/sccz80 obj/ixiy/c/asm obj/ixiy/z80
-	@mkdir -p obj/gbz80/c/sccz80 obj/gbz80/c/asm obj/gbz80/z80
-	@mkdir -p obj/z180/c/sccz80 obj/z180/c/asm obj/z180/z80
-	@mkdir -p obj/ez80_z80/c/sccz80 obj/ez80_z80/c/asm obj/ez80_z80/z80
-	@mkdir -p obj/kc160/c/sccz80 obj/kc160/c/asm obj/kc160/z80
-	@mkdir -p obj/r2ka/c/sccz80 obj/r2ka/c/asm obj/r2ka/z80
-	@mkdir -p obj/r4k/c/sccz80 obj/r4k/c/asm obj/r4k/z80
-	@mkdir -p obj/r6k/c/sccz80 obj/r6k/c/asm obj/r6k/z80
+	$(Q)mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/z80/z80
+	$(Q)mkdir -p obj/z80n/c/sccz80 obj/z80n/c/asm obj/z80n/z80
+	$(Q)mkdir -p obj/8080/c/sccz80 obj/8080/c/asm obj/8080/z80
+	$(Q)mkdir -p obj/8085/c/sccz80 obj/8085/c/asm obj/8085/z80
+	$(Q)mkdir -p obj/vm1/c/sccz80 obj/vm1/c/asm obj/vm1/z80
+	$(Q)mkdir -p obj/ixiy/c/sccz80 obj/ixiy/c/asm obj/ixiy/z80
+	$(Q)mkdir -p obj/gbz80/c/sccz80 obj/gbz80/c/asm obj/gbz80/z80
+	$(Q)mkdir -p obj/z180/c/sccz80 obj/z180/c/asm obj/z180/z80
+	$(Q)mkdir -p obj/ez80_z80/c/sccz80 obj/ez80_z80/c/asm obj/ez80_z80/z80
+	$(Q)mkdir -p obj/kc160/c/sccz80 obj/kc160/c/asm obj/kc160/z80
+	$(Q)mkdir -p obj/r2ka/c/sccz80 obj/r2ka/c/asm obj/r2ka/z80
+	$(Q)mkdir -p obj/r4k/c/sccz80 obj/r4k/c/asm obj/r4k/z80
+	$(Q)mkdir -p obj/r6k/c/sccz80 obj/r6k/c/asm obj/r6k/z80
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

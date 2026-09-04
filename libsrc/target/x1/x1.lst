@@ -1,4 +1,4 @@
 @target/x1/x1_common.lst
-target/x1/stdio/getk
-target/x1/stdio/fgetc_cons
+target/x1/obj/${TARGET}/x/target/x1/stdio/getk.o
+target/x1/obj/${TARGET}/x/target/x1/stdio/fgetc_cons.o
 @classic/stdio/stdio.lst

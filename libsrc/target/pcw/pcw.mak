@@ -9,16 +9,24 @@ PCW_GLOBS_ex := \
 	target/pcw/psg/*.asm
 
 
-PCW_TARGETS := target/pcw/obj/target-pcw-pcw
+PCW_TARGETS := target/pcw/obj/target-pcw-pcw classic/games/obj/.stamp-cpm-pcw classic/gfx/obj/.stamp-cpm-pcw
 
 
 CLEAN += target-pcw-clean
+TOCREATE += $(call check_target,pcw,pcw.lib $(CPMLIBS))
+$(eval $(call buildtargetasm,target/pcw,z80,pcw,-mz80,$(PCW_GLOBS),$(PCW_GLOBS_ex)))
+
+pcw.lib: cpm_clib.lib $(PCW_TARGETS)
+	@echo ''
+	@echo '--- Building Amstrad PCW Library ---'
+	@echo ''
+	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(TARGET_DIRECTORY)/pcw/pcw.lst
+
 
 target-pcw: $(PCW_TARGETS)
 
 .PHONY: target-pcw target-pcw-clean
 
-$(eval $(call buildtargetasm,target/pcw,z80,pcw,-mz80,$(PCW_GLOBS),$(PCW_GLOBS_ex)))
 
 target-pcw-clean:
 	$(RM) -fr target/pcw/obj

@@ -27,10 +27,6 @@ string_OBJS := $(addprefix classic/string/obj/z80/, $(string_OBJECTS)) \
 OBJS += $(string_OBJS) 
 CLEAN += classic-string-clean
 
-classic-string: $(string_OBJS) 
-
-.PHONY: classic-string classic-string-clean
-
 $(eval $(call buildbit,classic/string,z80,test))
 $(eval $(call buildbit,classic/string,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/string,8080,test,-clib=8080,-m8080))
@@ -44,6 +40,11 @@ $(eval $(call buildbit,classic/string,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/string,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/string,kc160,test,-clib=kc160,-mkc160))
 
+classic-string: $(string_OBJS)
+
+.PHONY: classic-string classic-string-clean
+
+
 
 classic-string-clean:
-	$(RM) -fr string/obj 
+	$(RM) -fr string/obj

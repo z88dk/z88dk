@@ -65,8 +65,8 @@ obj/portable/%.o: %.c
 $(foreach d,cpc 464 664 6128 portable,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/cpc/c/sccz80 obj/464/c/sccz80 obj/664/c/sccz80 obj/6128/c/sccz80 obj/portable/c/sccz80
-	@mkdir -p obj/cpc/z80 obj/464/z80 obj/664/z80 obj/6128/z80 obj/portable/z80
+	$(Q)mkdir -p obj/cpc/c/sccz80 obj/464/c/sccz80 obj/664/c/sccz80 obj/6128/c/sccz80 obj/portable/c/sccz80
+	$(Q)mkdir -p obj/cpc/z80 obj/464/z80 obj/664/z80 obj/6128/z80 obj/portable/z80
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

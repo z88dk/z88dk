@@ -19,10 +19,6 @@ ZX7_OBJS := $(addprefix classic/compress/zx7/obj/z80/, $(ZX7_OBJECTS)) \
 OBJS += $(ZX7_OBJS) 
 CLEAN += compress-zx7-clean
 
-compress-zx7: $(ZX7_OBJS) $(ZX7_NEWLIB_TARGETS)
-
-.PHONY: compress-zx7 compress-zx7-clean
-
 $(eval $(call buildbit,classic/compress/zx7,z80,test))
 $(eval $(call buildbit,classic/compress/zx7,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/compress/zx7,r2ka,test,-clib=rabbit,-mr2ka))
@@ -32,6 +28,11 @@ $(eval $(call buildbit,classic/compress/zx7,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/compress/zx7,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/compress/zx7,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/compress/zx7,kc160,test,-clib=kc160,-mkc160))
+
+compress-zx7: $(ZX7_OBJS) $(ZX7_NEWLIB_TARGETS)
+
+.PHONY: compress-zx7 compress-zx7-clean
+
 
 
 compress-zx7-clean:

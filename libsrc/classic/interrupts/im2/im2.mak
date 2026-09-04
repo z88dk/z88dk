@@ -16,16 +16,17 @@ INT_IM2_OBJS := $(addprefix classic/interrupts/im2/obj/z80/, $(INT_IM2_OBJECTS))
 OBJS += $(INT_IM2_OBJS) 
 CLEAN += interrupts-im2-clean
 
-interrupts-im2: $(INT_IM2_OBJS) $(INT_IM2_NEWLIB_TARGETS)
-
-.PHONY: interrupts-im2 interrupts-im2-clean
-
 $(eval $(call buildbit,classic/interrupts/im2,z80,test))
 $(eval $(call buildbit,classic/interrupts/im2,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/interrupts/im2,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/interrupts/im2,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/interrupts/im2,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/interrupts/im2,kc160,test,-clib=kc160,-mkc160))
+
+interrupts-im2: $(INT_IM2_OBJS) $(INT_IM2_NEWLIB_TARGETS)
+
+.PHONY: interrupts-im2 interrupts-im2-clean
+
 
 
 interrupts-im2-clean:
