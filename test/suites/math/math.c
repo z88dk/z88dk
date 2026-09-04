@@ -573,14 +573,14 @@ void test_math32_edges()
     Assert(r.u == 0x3f800001ul, "1+2^-23");
 
     /* Past the sin/cos |x|>=128 gate: result must be in [-1,1], not wrap junk.
-     * One relational per Assert: Assert_real takes int, so a float && can
-     * pass IEEE 1.0 in DEHL (HL=0) and look like a failed test. */
-    r.f = sin((FLOAT)10000.0);
-    Assert(r.f >= (FLOAT)(-1.0), "sin(10000) >= -1");
-    Assert(r.f <= (FLOAT)1.0, "sin(10000) <= 1");
-    r.f = cos((FLOAT)10000.0);
-    Assert(r.f >= (FLOAT)(-1.0), "cos(10000) >= -1");
-    Assert(r.f <= (FLOAT)1.0, "cos(10000) <= 1");
+     * Compare |y| to 1 so a negative IEEE value is not integer-compared. */
+    {
+        FLOAT s, c;
+        s = sin((FLOAT)10000.0);
+        Assert(FABS(s) <= (FLOAT)1.0, "sin(10000) in [-1,1]");
+        c = cos((FLOAT)10000.0);
+        Assert(FABS(c) <= (FLOAT)1.0, "cos(10000) in [-1,1]");
+    }
 
     Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
     Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");

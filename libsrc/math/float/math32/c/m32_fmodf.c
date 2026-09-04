@@ -20,7 +20,14 @@ float m32_fmodf (float x, float y)
         return fl.f;
     }
 
-    k = (long)(x / y); // Note: In some cases, d may be zero.
+    k = (long)(x / y); /* trunc toward 0; d can land just below 0 or at y */
     d = x - (float)k * y;
-    return d >= y ? d - y : d;
+    if (y > 0.0) {
+        if (d < 0.0) d += y;
+        if (d >= y) d -= y;
+    } else {
+        if (d > 0.0) d += y;
+        if (d <= y) d -= y;
+    }
+    return d;
 }
