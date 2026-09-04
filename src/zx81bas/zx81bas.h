@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "ast_stmt.h"
-#include "symtab.h"
-#include <memory>
+#include <string>
 
-bool lower_prog(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog);
+static inline const std::string SYMBOL_PREFIX = "ZX81BAS";
+static inline const std::string CPP_DEFINE = "__" + SYMBOL_PREFIX + "__";
+static inline const std::string END_OF_PROGRAM =
+    SYMBOL_PREFIX + "ENDOFPROGRAM";

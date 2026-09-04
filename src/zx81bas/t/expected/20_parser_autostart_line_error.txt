@@ -10,4 +10,4 @@ t/input/20_parser_autostart_line_error.bas:5: error: expected '=', found '10'
 t/input/20_parser_autostart_line_error.bas:6: error: expected end of statement, found 'EXTRA'
 t/input/20_parser_autostart_line_error.bas:7: error: expected '= number|@label' after '#AUTOSTART_LINE'
 t/input/20_parser_autostart_line_error.bas:8: error: expected 'Identifier', found '123'
-Parsing failed with errors.
+8 errors found
