@@ -1403,20 +1403,47 @@ static int de_park_group(char **lines, int i, int *offp)
     return 1;
 }
 
-/* VERIFIER (IR_DEPARK_SWEEP=1): an INDEPENDENT forward walk of the same buffer,
-   deciding the same question the other way round — from the park, does anything
-   read the old DE before both halves are overwritten? Stops at a label, branch,
-   call or return and reports UNKNOWN, so it proves less than the backward sweep
-   but shares none of its machinery. The two must never disagree in the unsafe
-   direction: backward=dead while forward=NEEDED is a miscompile, and is reported
-   as a VIOLATION. The opposite (forward unknown, backward dead) is just the
-   backward pass being more precise — it sees past a label, which is sound
-   because a label does not change what OUR path does next. */
-static int de_forward_needed(char **lines, int n, int start, int *readerp)
+/* VERIFIER (IR_DEPARK_SWEEP=1): an INDEPENDENT forward search of the same
+   buffer, deciding the same question the other way round — from the park, does
+   ANY path read the old DE before both halves are overwritten? It shares none
+   of the backward sweep's machinery, so the two must never disagree in the
+   unsafe direction: backward=dead while forward=NEEDED is a miscompile, and is
+   reported as a VIOLATION. The opposite (forward unknown, backward dead) is the
+   backward pass being more precise.
+
+   [IR_DEFLOW] The walk FOLLOWS branches, because the backward sweep now does.
+   Before that it stopped at one and answered "reader" — which was the same
+   conservative answer the sweep gave, so the two agreed; once the sweep started
+   following branches, that stale answer produced four bogus violations on emu.c
+   and the verifier would have flagged every real one the same way. Following
+   both arms of a conditional keeps it an independent check rather than a weaker
+   one. A call and a `ret` still answer READER: both genuinely read DE (the
+   __sdcccall(1) argument and the DE:HL result ABI), which is the boundary of
+   what [IR_DEFLOW] claims.
+
+   `seen` memoises (line, liveness-state) so a loop terminates; revisiting a
+   state contributes nothing the in-progress visit will not already report. */
+static int xline_label(const char *l, char *out, size_t n);
+static int xline_branch_target(const char *l, char *out, size_t n);
+
+static int de_label_line(char **lines, int n, const char *name)
 {
-    int d_live = 1, e_live = 1;                  /* halves of the OLD DE */
+    char nm[64];
+    for (int i = 0; i < n; i++)
+        if (xline_label(lines[i], nm, sizeof nm) && !strcmp(nm, name)) return i;
+    return -1;
+}
+
+static int de_fwd_walk(char **lines, int n, int start, int d_live, int e_live,
+                       unsigned char *seen, int depth, int *readerp)
+{
+    if (depth > 64) return 2;
     for (int j = start; j < n; j++) {
-        if (lines[j][0] != '\t') return 2;       /* label: joins another path */
+        int st = (d_live ? 2 : 0) | (e_live ? 1 : 0);
+        if (!st) return 0;                       /* fully overwritten unread */
+        if (seen[j] & (1u << st)) return 0;      /* already explored this state */
+        seen[j] |= (unsigned char)(1u << st);
+        if (lines[j][0] != '\t') continue;       /* label: just falls through */
         /* A LATER park is transparent to this one: its `push de` does read DE,
            but its `pop de` puts the same value back, so the walk must step over
            the whole group rather than call it a read. (Found by this verifier
@@ -1426,6 +1453,18 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
         if (j + 3 < n && !strcmp(lines[j], "\tpush\tde\n")
             && de_park_group(lines, j + 3, &poff2)) { j += 3; continue; }
         InstrEffects e = instr_effects(lines[j]);
+        char tgt[64];
+        int is_br = !e.is_boundary && xline_branch_target(lines[j], tgt, sizeof tgt);
+        if (is_br) {
+            int t = de_label_line(lines, n, tgt);
+            if (t < 0) return 2;                 /* target outside this buffer */
+            int r = de_fwd_walk(lines, n, t, d_live, e_live, seen, depth + 1,
+                                readerp);
+            if (r) return r;                     /* reader, or unknown */
+            if (!strchr(lines[j], ','))          /* unconditional: no fall-through */
+                return 0;
+            continue;                            /* conditional: try the other arm */
+        }
         /* Only a read of a half that is STILL LIVE counts: a staged `ld e,a`
            kills the parked E, so the later `ld (hl),e` reads the new byte, not
            the one the park was protecting. (The verifier's own second bug —
@@ -1437,9 +1476,127 @@ static int de_forward_needed(char **lines, int n, int start, int *readerp)
         if (e.is_call || e.is_boundary) return 2;
         if (e.d_write) d_live = 0;
         if (e.e_write) e_live = 0;
-        if (!d_live && !e_live) return 0;        /* fully overwritten unread */
     }
     return 2;
+}
+
+static int de_forward_needed(char **lines, int n, int start, int *readerp)
+{
+    unsigned char *seen = calloc((size_t)(n > 0 ? n : 1), 1);
+    if (!seen) return 2;
+    int r = de_fwd_walk(lines, n, start, 1, 1, seen, 0, readerp);
+    free(seen);
+    return r;
+}
+
+static int xline_c_call(const char *line);
+
+/* ---- [IR_DELIVE_PROBE] inert sizing of the DE-liveness opportunity --------
+   The park sweep above keeps a DE park alive whenever it cannot prove the old
+   pair dead, and instr_effects marks BOTH a branch and a call as READING DE
+   (a successor may read it; __sdcccall(1) passes arguments in it). BC and F
+   were freed of exactly those two blanket assumptions -- see bc_live_at_labels
+   and xline_c_call -- and DE is the register that has not been.
+
+   Before building that, size it. This walks FORWARD from each park and records
+   the FIRST thing that ends the walk, which is an upper bound on what any
+   liveness improvement could recover: a park whose old DE is genuinely read by
+   straight-line code is needed whatever the sweep learns about branches.
+
+     READ    a real read of a still-live half   -- park is NEEDED, unrecoverable
+     CCALL   `call _sym` with no read before it -- recoverable IF the convention
+                                                   at that site passes nothing in DE
+     XCALL   any other call/rst                 -- asm linkage, stays conservative
+     BRANCH  jp/jr/djnz to a label              -- recoverable via a DE fixpoint
+     LABEL   fell into a label                  -- ditto (needs the join's answer)
+     RET     a return                           -- reads DE only when the function
+                                                   returns a long/float (DE:HL)
+     DEAD    both halves overwritten unread     -- the sweep already drops these
+     END     ran off the buffer
+
+   Counts both the 8085 slot-load park (de_park_group, the only one the sweep
+   rewrites today) and every GENERIC `push de` ... `pop de` group, to say whether
+   the opportunity is 8085-only. Nothing is rewritten; IR_DELIVE_PROBE=2 lists
+   each park with its class. */
+enum { DPB_READ, DPB_CCALL, DPB_XCALL, DPB_BRANCH, DPB_LABEL, DPB_RET,
+       DPB_DEAD, DPB_END, DPB_NCLASS };
+static const char *const dpb_name[DPB_NCLASS] =
+    { "READ", "CCALL", "XCALL", "BRANCH", "LABEL", "RET", "DEAD", "END" };
+static long dpb_slot[DPB_NCLASS], dpb_gen[DPB_NCLASS];
+static long dpb_nslot, dpb_ngen, dpb_funcs;
+static void dpb_report(void)
+{
+    if (!dpb_nslot && !dpb_ngen) return;
+    fprintf(stderr, "DELIVEPROBE funcs=%ld | 8085 slot-parks=%ld generic push/pop-de parks=%ld\n",
+            dpb_funcs, dpb_nslot, dpb_ngen);
+    fprintf(stderr, "  %-7s %8s %8s\n", "class", "slot", "generic");
+    for (int k = 0; k < DPB_NCLASS; k++)
+        fprintf(stderr, "  %-7s %8ld %8ld\n", dpb_name[k], dpb_slot[k], dpb_gen[k]);
+    fprintf(stderr, "  RECOVERABLE(CCALL+BRANCH+LABEL+RET) slot=%ld generic=%ld\n",
+            dpb_slot[DPB_CCALL] + dpb_slot[DPB_BRANCH] + dpb_slot[DPB_LABEL]
+              + dpb_slot[DPB_RET],
+            dpb_gen[DPB_CCALL] + dpb_gen[DPB_BRANCH] + dpb_gen[DPB_LABEL]
+              + dpb_gen[DPB_RET]);
+}
+static int de_probe_on(void)
+{
+    static int v = -1;
+    if (v < 0) { const char *e = getenv("IR_DELIVE_PROBE");
+                 v = e ? atoi(e) : 0;
+                 if (v) atexit(dpb_report); }
+    return v;
+}
+
+/* The forward classification. Mirrors de_forward_needed's walk -- including its
+   two hard-won corrections (a later park is transparent; a read only counts on a
+   half that is still live) -- but tests control transfer BEFORE the read, since
+   instr_effects marks a branch as a DE read and that is precisely the assumption
+   being sized. */
+static int de_probe_class(char **lines, int n, int start)
+{
+    int d_live = 1, e_live = 1;
+    for (int j = start; j < n; j++) {
+        if (lines[j][0] != '\t') return DPB_LABEL;
+        int poff2;
+        if (j + 3 < n && !strcmp(lines[j], "\tpush\tde\n")
+            && de_park_group(lines, j + 3, &poff2)) { j += 3; continue; }
+        InstrEffects e = instr_effects(lines[j]);
+        char tgt[64];
+        if (e.is_boundary) return DPB_RET;
+        if (xline_branch_target(lines[j], tgt, sizeof tgt)) return DPB_BRANCH;
+        if (e.is_call) {
+            if (!strncmp(lines[j] + 1, "ret", 3)) return DPB_RET;  /* `ret cc` */
+            return xline_c_call(lines[j]) ? DPB_CCALL : DPB_XCALL;
+        }
+        if ((e.d_read && d_live) || (e.e_read && e_live)) return DPB_READ;
+        if (e.d_write) d_live = 0;
+        if (e.e_write) e_live = 0;
+        if (!d_live && !e_live) return DPB_DEAD;
+    }
+    return DPB_END;
+}
+
+/* A GENERIC park: `pop de` at i whose matching `push de` is at the same stack
+   depth, with no label, no other stack traffic and no `pop de` in between. The
+   conservative bail-outs matter more than the coverage -- an unmatched push, an
+   `inc sp` or a label all mean the depth cannot be trusted. Returns the push
+   index, or -1. */
+static int de_generic_park(char **lines, int i)
+{
+    if (strcmp(lines[i], "\tpop\tde\n")) return -1;
+    int depth = 0;
+    for (int j = i - 1; j >= 0 && j > i - 400; j--) {
+        if (lines[j][0] != '\t') return -1;              /* label: joins */
+        const char *l = lines[j] + 1;
+        if (!strncmp(l, "push\t", 5)) {
+            if (depth == 0) return (!strcmp(l, "push\tde\n")) ? j : -1;
+            depth--;
+            continue;
+        }
+        if (!strncmp(l, "pop\t", 4)) { depth++; continue; }
+        if (strstr(l, "sp")) return -1;                  /* inc sp / ld sp,ix / … */
+    }
+    return -1;
 }
 
 /* [IR_XORA] `ld a,0` is 2 bytes and 7 T; `xor a` is 1 and 4. The only
@@ -1558,6 +1715,29 @@ static int  bcflow_enabled(void)
     return bcflow_on;
 }
 
+/* IR_DEFLOW: follow intra-function branches when deciding DE liveness in the
+   park sweep, exactly as [IR_BCFLOW] does for BC. Without it a branch is a black
+   box that "may read DE", which keeps an 8085 slot-load park alive whose target
+   provably never reads the pair.
+
+   DE could not simply ride the BC rules, and the difference is recorded in
+   instr_effects: a `ret` READS DE (the long and float result ABI is DE:HL) where
+   BC is dead at exit, and a call reads it because __sdcccall(1) passes arguments
+   there. So only the BRANCH assumption is lifted here -- calls and returns stay
+   conservative, which is what separates this from the wider opportunity sized by
+   [IR_DELIVE_PROBE].
+
+   IR_DEFLOW=0 opts out. */
+static int  deflow_on = -1;
+static int  deflow_enabled(void)
+{
+    if (deflow_on < 0) {
+        const char *e = getenv("IR_DEFLOW");
+        deflow_on = (e && e[0] == '0') ? 0 : 1;    /* default ON; =0 opts out */
+    }
+    return deflow_on;
+}
+
 /* [IR_BCFLOW] Is this line a label of the form `name:` at column 0? */
 static int xline_label(const char *l, char *out, size_t n)
 {
@@ -1603,11 +1783,15 @@ static int xline_branch_target(const char *l, char *out, size_t n)
    computed by the linear backward walk through the arm itself, and the recorded
    value is consulted only by branches that name it. */
 static void bc_live_at_labels(char **lines, int n, char **lbl,
-                              int nlbl, char *lb, char *lc, char *lf)
+                              int nlbl, char *lb, char *lc, char *lf,
+                              char *ldl, char *lel)
 {
     for (int iter = 0; iter < 8; iter++) {
         int changed = 0;
         int b_live = 0, c_live = 0, f_live = 0;
+        /* [IR_DEFLOW] DE starts DEAD like the rest, and is only tracked when
+           the caller asked for it (ldl/lel non-NULL). */
+        int d_live = 0, e_live = 0;
         for (int i = n - 1; i >= 0; i--) {
             char nm[64];
             if (xline_label(lines[i], nm, sizeof nm)) {
@@ -1616,20 +1800,33 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                         if ((lb[k] | b_live) != lb[k]) { lb[k] |= (char)b_live; changed = 1; }
                         if ((lc[k] | c_live) != lc[k]) { lc[k] |= (char)c_live; changed = 1; }
                         if ((lf[k] | f_live) != lf[k]) { lf[k] |= (char)f_live; changed = 1; }
+                        if (ldl && (ldl[k] | d_live) != ldl[k]) { ldl[k] |= (char)d_live; changed = 1; }
+                        if (lel && (lel[k] | e_live) != lel[k]) { lel[k] |= (char)e_live; changed = 1; }
                         break;
                     }
                 continue;
             }
+            /* [IR_DEFLOW] A park is transparent to DE -- parked, the pair is
+               restored; unparked, it was dead on both sides -- so step over the
+               whole group rather than let its own push/pop decide. This mirrors
+               what the sweep does with `i -= 3`, and the group carries no B/C or
+               F effect, so skipping it changes nothing for them. */
+            int poff;
+            if (ldl && de_park_group(lines, i, &poff)) { i -= 3; continue; }
             InstrEffects e = instr_effects(lines[i]);
             char tgt[64];
             int has_tgt = xline_branch_target(lines[i], tgt, sizeof tgt);
-            if (e.is_boundary) { b_live = c_live = f_live = 0; continue; }
+            if (e.is_boundary) { b_live = c_live = f_live = 0;
+                                 d_live = e_live = 1;      /* result ABI DE:HL */
+                                 continue; }
             if (has_tgt) {
-                int tb = 1, tc = 1, tf = 1, found = 0;
+                int tb = 1, tc = 1, tf = 1, td = 1, te = 1, found = 0;
                 for (int k = 0; k < nlbl; k++)
                     if (!strcmp(lbl[k], tgt)) { tb = lb[k]; tc = lc[k]; tf = lf[k];
+                                                if (ldl) td = ldl[k];
+                                                if (lel) te = lel[k];
                                                 found = 1; break; }
-                if (!found) { tb = tc = tf = 1; }   /* target outside this buffer */
+                if (!found) { tb = tc = tf = 1; td = te = 1; }  /* outside this buffer */
                 /* A conditional branch also falls through; djnz READS B; a
                    conditional branch READS F. */
                 int cond = strchr(lines[i], ',') != NULL;
@@ -1638,23 +1835,30 @@ static void bc_live_at_labels(char **lines, int n, char **lbl,
                 c_live = cond ? (tc | c_live) : tc;
                 f_live = cond ? 1 : tf;
                 if (dj) b_live = 1;
+                d_live = cond ? (td | d_live) : td;
+                e_live = cond ? (te | e_live) : te;
                 continue;
             }
             if (e.is_call) {   /* call/rst, or an indirect jump */
                 if (xline_c_call(lines[i]) && bccall_enabled())
                      { b_live = c_live = f_live = 0; }
                 else { b_live = c_live = f_live = 1; }
+                d_live = e_live = 1;    /* __sdcccall(1) passes args in DE */
                 continue;
             }
             if (xora_line_reads_f(lines[i]))   f_live = 1;
             else if (e.writes & IR_R_F)        f_live = 0;
+            d_live = e.d_read ? 1 : (e.d_write ? 0 : d_live);
+            e_live = e.e_read ? 1 : (e.e_write ? 0 : e_live);
             if (e.park) { b_live = c_live = 0; continue; }
             b_live = e.b_read ? 1 : (e.b_write ? 0 : b_live);
             c_live = e.c_read ? 1 : (e.c_write ? 0 : c_live);
         }
         if (!changed) return;
     }
-    for (int k = 0; k < nlbl; k++) { lb[k] = 1; lc[k] = 1; lf[k] = 1; }  /* unsettled */
+    for (int k = 0; k < nlbl; k++) { lb[k] = 1; lc[k] = 1; lf[k] = 1;
+                                     if (ldl) ldl[k] = 1;
+                                     if (lel) lel[k] = 1; }   /* unsettled */
 }
 
 /* Backward BC-liveness sweep: delete every dead `ld bc,hl` park. Also carries
@@ -1698,24 +1902,36 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
         /* [IR_BCFLOW] Label table + BC liveness at each label, so a branch can
            be followed instead of assumed to read BC. */
         char **lbl = NULL; char *lb = NULL, *lc = NULL, *lf = NULL;
+        /* [IR_DEFLOW] DE liveness at each label, from the same fixpoint. */
+        char *ldl = NULL, *lel = NULL;
         int nlbl = 0, bcflow = bcflow_enabled();
-        if (bcflow) {
+        int deflow = deflow_enabled();
+        if (bcflow || deflow) {
             lbl = calloc((size_t)(n > 0 ? n : 1), sizeof *lbl);
             lb  = calloc((size_t)(n > 0 ? n : 1), 1);
             lc  = calloc((size_t)(n > 0 ? n : 1), 1);
             lf  = calloc((size_t)(n > 0 ? n : 1), 1);
-            if (!lbl || !lb || !lc || !lf) bcflow = 0;
+            if (deflow) {
+                ldl = calloc((size_t)(n > 0 ? n : 1), 1);
+                lel = calloc((size_t)(n > 0 ? n : 1), 1);
+                if (!ldl || !lel) deflow = 0;
+            }
+            if (!lbl || !lb || !lc || !lf) bcflow = deflow = 0;
             else {
                 for (int i = 0; i < n; i++) {
                     char nm[64];
                     if (xline_label(lines[i], nm, sizeof nm)) {
                         lbl[nlbl] = strdup(nm);
-                        if (!lbl[nlbl]) { bcflow = 0; break; }
+                        if (!lbl[nlbl]) { bcflow = deflow = 0; break; }
                         nlbl++;
                     }
                 }
             }
-            if (bcflow) bc_live_at_labels(lines, n, lbl, nlbl, lb, lc, lf);
+            /* One fixpoint serves both: DE is computed only when asked for, so
+               IR_DEFLOW=0 leaves the BC/F answers bit-for-bit unchanged. */
+            if (bcflow || deflow)
+                bc_live_at_labels(lines, n, lbl, nlbl, lb, lc, lf,
+                                  deflow ? ldl : NULL, deflow ? lel : NULL);
             if (getenv("IR_BCFLOW_DBG")) {
                 int dead = 0;
                 for (int k = 0; k < nlbl; k++) if (!lb[k] && !lc[k]) dead++;
@@ -1723,12 +1939,28 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                         n, nlbl, dead);
             }
         }
+        int de_probe   = de_probe_on();              /* IR_DELIVE_PROBE */
+        if (de_probe) dpb_funcs++;
         int de_verify  = de_sweep_on();              /* IR_DEPARK_SWEEP */
         int de_rewrite = !opt_disabled("de-park");
         int de_sweep   = (de_verify || de_rewrite);
         if (de_verify) dpk_funcs++;
         for (int i = n - 1; i >= 0; i--) {
             if (drop[i]) continue;                 /* collapsed recover: gone */
+            if (de_probe) {                        /* [IR_DELIVE_PROBE] inert */
+                int pp = 0, cls = -1, gen = 0, pj = -1;
+                if (de_park_group(lines, i, &pp)) {
+                    cls = de_probe_class(lines, n, i + 1);
+                    dpb_nslot++; dpb_slot[cls]++;
+                } else if ((pj = de_generic_park(lines, i)) >= 0) {
+                    cls = de_probe_class(lines, n, i + 1);
+                    dpb_ngen++; dpb_gen[cls]++; gen = 1;
+                }
+                if (cls >= 0 && de_probe >= 2)
+                    fprintf(stderr, "  DEPARK %s @%d %-6s span=%d\n",
+                            gen ? "generic" : "slot   ", i, dpb_name[cls],
+                            gen ? i - pj : 3);
+            }
             int poff = 0;
             if (de_sweep && de_park_group(lines, i, &poff)) {
                 int back_dead = (!d_live && !e_live);
@@ -1826,11 +2058,26 @@ static void filter_dead_bc_parks(FILE *out, FILE *src)
                 b_live = rb ? 1 : (wb ? 0 : b_live);
                 c_live = rc ? 1 : (wc ? 0 : c_live);
             }
-            d_live = e.d_read ? 1 : (e.d_write ? 0 : d_live);
-            e_live = e.e_read ? 1 : (e.e_write ? 0 : e_live);
+            /* [IR_DEFLOW] A branch to a label in this function is not a black
+               box for DE either: take the liveness the fixpoint computed for its
+               target, plus the fall-through for a conditional. A call and a
+               `ret` are NOT covered -- both genuinely read DE (argument and
+               result ABI), which is why this is branch-only. */
+            if (deflow && !e.is_boundary
+                && xline_branch_target(lines[i], bftgt, sizeof bftgt)) {
+                int td = 1, te = 1;
+                for (int k = 0; k < nlbl; k++)
+                    if (!strcmp(lbl[k], bftgt)) { td = ldl[k]; te = lel[k]; break; }
+                int cond = strchr(lines[i], ',') != NULL;
+                d_live = cond ? (td | d_live) : td;
+                e_live = cond ? (te | e_live) : te;
+            } else {
+                d_live = e.d_read ? 1 : (e.d_write ? 0 : d_live);
+                e_live = e.e_read ? 1 : (e.e_write ? 0 : e_live);
+            }
         }
         for (int k = 0; k < nlbl; k++) free(lbl[k]);
-        free(lbl); free(lb); free(lc); free(lf);
+        free(lbl); free(lb); free(lc); free(lf); free(ldl); free(lel);
     }
     for (int i = 0; i < n; i++) {
         if (!drop || !drop[i]) fputs(lines[i], out);

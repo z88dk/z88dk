@@ -2743,13 +2743,20 @@ static int sp_cmp_slot(const Func *f, int v)
 {
     if (v < 0 || v >= f->n_vregs || f->vregs[v].width != 2) return 0;
     if (!vreg_is_spilled(f, v)) return 0;
-    /* Spilled is not the same as HAVING A SLOT. A rematerialisable constant
+    /* Spilled is not the same as HAVING AN ADDRESS. A rematerialisable constant
        (LD_IMM / LD_SYM / remat LEA) is IR_PR_SPILL but NO_SLOT, so slot_off
        returns -1 and the caller emits `ld hl,-1; add hl,sp` — an address below
-       sp that the byte-walk then compares against. Same guard as
-       cmp_bytewise_mem_shape_ok and word_dehome_signed_test_shape_ok. */
+       sp that the byte-walk then compares against.
+
+       Ask slot_off, which is what the caller actually emits from. Asking
+       vreg_spill_slot instead ALSO rejects every PARAMETER: a param is homed in
+       the caller's frame, so it has no spill slot (-1) while slot_off returns a
+       perfectly good offset. That cost structbench's `i < n` its byte-walk
+       compare, which forced the bound into DE, which evicted the running sum to
+       a stack-transient home -- three pop/push pairs per iteration, +10.5% on
+       z80 sp for 117 B. */
     if (g_hc.remat_def && g_hc.remat_def[v]) return 0;
-    if (f->vreg_spill_slot && f->vreg_spill_slot[v] < 0) return 0;
+    if (slot_off(f, v) < 0) return 0;
     if (f->vregs[v].flags & (IR_VREG_ADDR_TAKEN | IR_VREG_VOLATILE)) return 0;
     return 1;
 }
