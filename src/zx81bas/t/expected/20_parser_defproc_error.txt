@@ -10,4 +10,4 @@ t/input/20_parser_defproc_error.bas:6: error: string variable 'A$' not allowed a
 t/input/20_parser_defproc_error.bas:7: error: expected 'Identifier', found ')'
 t/input/20_parser_defproc_error.bas:8: error: expected 'Identifier', found '10'
 t/input/20_parser_defproc_error.bas:10: error: expected ENDPROC
-Parsing failed with errors.
+8 errors found

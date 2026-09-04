@@ -20,10 +20,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 
-static constexpr std::string_view copyright =
+static const std::string COPYRIGHT =
     "Copyright (C) Paulo Custodio 2023-2026\n"
 #ifdef Z88DK_VERSION
     "Version: " Z88DK_VERSION "\n"
@@ -32,7 +31,7 @@ static constexpr std::string_view copyright =
 
 static void show_usage(const char* prog_name) {
     std::string cmd = std::filesystem::path(prog_name).stem().generic_string();
-    std::cout << copyright;
+    std::cout << COPYRIGHT;
     std::cout << "Usage: " << cmd << " [options] file.bas" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout <<
@@ -142,45 +141,107 @@ int main(int argc, char* argv[]) {
     // preprocess the input file
     std::vector<SrcLine> src_lines;
     if (!preproc(input_file, src_lines)) {
-        return EXIT_FAILURE;    // error already reported
+        exit_error_status();
     }
 
     // tokenize the preprocessed lines
     TokFile tok_file;
     if (!tok_file.tokenize(src_lines)) {
-        return EXIT_FAILURE;    // error already reported
+        exit_error_status();
     }
+
+#ifdef _DEBUG
+    if (g_dump_step == 4) {
+        if (get_error_count() == 0) {
+            std::cout << "Tokenized input:" << std::endl;
+            DumpContext ctx(std::cout);
+            tok_file.dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
 
     // parse the BASIC program
     std::unique_ptr<Prog> prog;
     if (!parse_basic_program(tok_file, prog)) {
-        return EXIT_FAILURE;
+        exit_error_status();
     }
+
+#ifdef _DEBUG
+    if (g_dump_step == 5) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog->dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
+
+    // collect declarations
+    std::unique_ptr<Symtab> decl_symtab;
+    if (!create_symtab(*prog, decl_symtab)) {
+        exit_error_status();
+    }
+
+#ifdef _DEBUG
+    if (g_dump_step == 6) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            decl_symtab->dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
 
     // semantic check of the program
     if (!semantic_check(*prog)) {
-        return EXIT_FAILURE;
+        exit_error_status();
     }
 
-    // create symbol table
+#ifdef _DEBUG
+    if (g_dump_step == 7) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog->dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
+
+    // create the symbol table
     std::unique_ptr<Symtab> symtab;
     if (!create_symtab(*prog, symtab)) {
-        return EXIT_FAILURE;
+        exit_error_status();
     }
+
+#ifdef _DEBUG
+    if (g_dump_step == 8) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            symtab->dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
 
     // lower the program
     std::unique_ptr<Prog> lowered_prog;
     if (!lower_prog(*prog, *symtab, lowered_prog)) {
-        return EXIT_FAILURE;
+        exit_error_status();
     }
+
+#ifdef _DEBUG
+    if (g_dump_step == 9) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog->dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
 
     // --- COMPLETE HERE ---
 
-    // remove temporary files if there were no errors
-    if (get_error_count() > 0) {
-        error("Errors occurred during processing. Exiting.");
-        return EXIT_FAILURE;
-    }
-
-    return get_error_count() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+    // exit with error status if any errors occurred during processing
+    exit_error_status();
 }

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <iostream>
-#include <string_view>
+#include <string>
 
 //-----------------------------------------------------------------------------
 // helper for dumping AST in a readable format
@@ -17,7 +17,7 @@ struct DumpContext {
     int indent{0};
 
     DumpContext(std::ostream& os_, int indent_ = 0);
-    void line(std::string_view text);
+    void line(const std::string& text);
     DumpContext child() const;
 };
 

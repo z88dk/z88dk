@@ -5,4 +5,4 @@ Output file: t/input/20_parser_repeat_error.p
 t/input/20_parser_repeat_error.bas:1: error: expected expression term, found end of line
 t/input/20_parser_repeat_error.bas:2: error: expected end of statement, found 'X'
 t/input/20_parser_repeat_error.bas:4: error: expected 'UNTIL'
-Parsing failed with errors.
+3 errors found
