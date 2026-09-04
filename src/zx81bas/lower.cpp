@@ -14,6 +14,8 @@
 #include "release_assert.h"
 #include "symtab.h"
 #include "utils.h"
+#include "zx81bas.h"
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
@@ -41,7 +43,7 @@ struct LoweredExpr {
 
 static std::string gen_label(const std::string& prefix) {
     static int counter = 0;
-    return "ZX81BAS" + std::to_string(counter++) + str_toupper(prefix);;
+    return SYMBOL_PREFIX + std::to_string(counter++) + str_toupper(prefix);;
 }
 
 static void append_stmts(std::vector<std::unique_ptr<Stmt>>& dst,
@@ -200,18 +202,17 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
 
             // create LET <PROC><PARAM>=lowered_arg
             std::string arg_name = proc_call_expr->name + param_name;
-            auto assign_arg_stmt = std::make_unique<LetStmt>(proc_call_expr->loc);
-            assign_arg_stmt->lhs = std::make_unique<VariableExpr>(arg_name,
-                                   proc_call_expr->loc);
-            assign_arg_stmt->rhs = std::move(lowered_arg.rewritten);
+            auto assign_arg_stmt = std::make_unique<LetStmt>(
+                                       std::make_unique<VariableExpr>(arg_name, proc_call_expr->loc),
+                                       std::move(lowered_arg.rewritten), proc_call_expr->loc);
             lowered.preamble.push_back(std::move(assign_arg_stmt));
         }
 
         // create GOSUB @<PROC>
         auto label_ref = std::make_unique<LabelLineRefExpr>(proc_call_expr->name,
                          proc_call_expr->loc);
-        auto gosub_stmt = std::make_unique<GosubStmt>(proc_call_expr->loc);
-        gosub_stmt->target_expr = std::move(label_ref);
+        auto gosub_stmt = std::make_unique<GosubStmt>(std::move(label_ref),
+                          proc_call_expr->loc);
         lowered.preamble.push_back(std::move(gosub_stmt));
 
         // rewritten expression is proc name
@@ -237,10 +238,9 @@ static LoweredExpr lower_expr(Expr& expr, Symtab& symtab) {
 
             // create LET <FN><PARAM>=lowered_arg
             std::string arg_name = fn_call_expr->name + param_name;
-            auto assign_arg_stmt = std::make_unique<LetStmt>(fn_call_expr->loc);
-            assign_arg_stmt->lhs = std::make_unique<VariableExpr>(arg_name,
-                                   fn_call_expr->loc);
-            assign_arg_stmt->rhs = std::move(lowered_arg.rewritten);
+            auto assign_arg_stmt = std::make_unique<LetStmt>(
+                                       std::make_unique<VariableExpr>(arg_name, fn_call_expr->loc),
+                                       std::move(lowered_arg.rewritten), fn_call_expr->loc);
             lowered.preamble.push_back(std::move(assign_arg_stmt));
         }
 
@@ -261,9 +261,13 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                   std::vector<ControlStackEntry>& control_stack,
                   Prog& out_prog) {
     for (auto& stmt : stmts) {
-        if (auto jump_target_stmt = dynamic_cast<JumpTargetStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<JumpTargetStmt>(jump_target_stmt->loc,
-                            jump_target_stmt->label, jump_target_stmt->basic_line_num);
+        if (auto label_stmt = dynamic_cast<LabelStmt*>(stmt.get())) {
+            auto new_stmt = std::make_unique<LabelStmt>(label_stmt->label, label_stmt->loc);
+            out_prog.stmts.push_back(std::move(new_stmt));
+        }
+        else if (auto line_num_stmt = dynamic_cast<LineNumStmt*>(stmt.get())) {
+            auto new_stmt = std::make_unique<LineNumStmt>(line_num_stmt->line_num,
+                            line_num_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto let_stmt = dynamic_cast<LetStmt*>(stmt.get())) {
@@ -271,9 +275,8 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             append_stmts(out_prog.stmts, lowered_lhs.preamble);
             auto lowered_rhs = lower_expr(*let_stmt->rhs, symtab);
             append_stmts(out_prog.stmts, lowered_rhs.preamble);
-            auto new_stmt = std::make_unique<LetStmt>(let_stmt->loc);
-            new_stmt->lhs = std::move(lowered_lhs.rewritten);
-            new_stmt->rhs = std::move(lowered_rhs.rewritten);
+            auto new_stmt = std::make_unique<LetStmt>(std::move(lowered_lhs.rewritten),
+                            std::move(lowered_rhs.rewritten), let_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto dim_stmt = dynamic_cast<DimStmt*>(stmt.get())) {
@@ -327,8 +330,8 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                                                     std::move(operand), loc);
                 }
 
-                auto new_stmt = std::make_unique<IfStmt>(if_stmt->loc);
-                new_stmt->condition = std::move(lowered_condition.rewritten);
+                auto new_stmt = std::make_unique<IfStmt>(std::move(lowered_condition.rewritten),
+                                if_stmt->loc);
                 append_stmts(new_stmt->then_stmts, lowered_then.stmts);
                 continue;
             }
@@ -353,11 +356,10 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                 }
 
                 // IF NOT cond THEN GOTO @end_label
-                auto new_if_stmt = std::make_unique<IfStmt>(if_stmt->loc);
-                new_if_stmt->condition = std::move(lowered_condition.rewritten);
-                auto goto_stmt = std::make_unique<GotoStmt>(if_stmt->loc);
-                goto_stmt->target_expr =
-                    std::make_unique<LabelLineRefExpr>(end_label, if_stmt->loc);
+                auto new_if_stmt = std::make_unique<IfStmt>(std::move(
+                                       lowered_condition.rewritten), if_stmt->loc);
+                auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                                 (end_label, if_stmt->loc), if_stmt->loc);
                 new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
                 out_prog.stmts.push_back(std::move(new_if_stmt));
 
@@ -365,8 +367,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                 append_stmts(out_prog.stmts, lowered_then.stmts);
 
                 // @end_label:
-                auto target_stmt = std::make_unique<JumpTargetStmt>
-                                   (if_stmt->loc, end_label, -1);
+                auto target_stmt = std::make_unique<LabelStmt>(end_label, if_stmt->loc);
                 out_prog.stmts.push_back(std::move(target_stmt));
 
                 continue;
@@ -395,11 +396,10 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             }
 
             // IF NOT cond THEN GOTO @else_label
-            auto new_if_stmt = std::make_unique<IfStmt>(if_stmt->loc);
-            new_if_stmt->condition = std::move(lowered_condition.rewritten);
-            auto goto_stmt = std::make_unique<GotoStmt>(if_stmt->loc);
-            goto_stmt->target_expr =
-                std::make_unique<LabelLineRefExpr>(else_label, if_stmt->loc);
+            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
+                                   lowered_condition.rewritten), if_stmt->loc);
+            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                             (else_label, if_stmt->loc), if_stmt->loc);
             new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
             out_prog.stmts.push_back(std::move(new_if_stmt));
 
@@ -407,21 +407,19 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             append_stmts(out_prog.stmts, lowered_then.stmts);
 
             //     GOTO @end_label
-            goto_stmt = std::make_unique<GotoStmt>(if_stmt->loc);
-            goto_stmt->target_expr =
-                std::make_unique<LabelLineRefExpr>(end_label, if_stmt->loc);
+            goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                                                   (end_label, if_stmt->loc), if_stmt->loc);
             out_prog.stmts.push_back(std::move(goto_stmt));
 
             // @else_label:
-            auto target_stmt = std::make_unique<JumpTargetStmt>
-                               (if_stmt->loc, else_label, -1);
+            auto target_stmt = std::make_unique<LabelStmt>(else_label, if_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
             //     else_stms
             append_stmts(out_prog.stmts, lowered_else.stmts);
 
             // @end_label:
-            target_stmt = std::make_unique<JumpTargetStmt>(if_stmt->loc, end_label, -1);
+            target_stmt = std::make_unique<LabelStmt>(end_label, if_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
         }
         else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
@@ -437,8 +435,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             // @end:
 
             // @start:
-            auto target_stmt = std::make_unique<JumpTargetStmt>(repeat_stmt->loc,
-                               start_label, -1);
+            auto target_stmt = std::make_unique<LabelStmt>(start_label, repeat_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
             // body
@@ -453,17 +450,15 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             lowered_condition.rewritten = std::make_unique<UnaryExpr>(TokenType::NOT,
                                           std::move(operand), loc);
 
-            auto new_if_stmt = std::make_unique<IfStmt>(repeat_stmt->loc);
-            new_if_stmt->condition = std::move(lowered_condition.rewritten);
-            auto goto_stmt = std::make_unique<GotoStmt>(repeat_stmt->loc);
-            goto_stmt->target_expr = std::make_unique<LabelLineRefExpr>(start_label,
-                                     repeat_stmt->loc);
+            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
+                                   lowered_condition.rewritten), repeat_stmt->loc);
+            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                             (start_label, repeat_stmt->loc), repeat_stmt->loc);
             new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
             out_prog.stmts.push_back(std::move(new_if_stmt));
 
             // @end:
-            target_stmt = std::make_unique<JumpTargetStmt>(repeat_stmt->loc,
-                          end_label, -1);
+            target_stmt = std::make_unique<LabelStmt>(end_label, repeat_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
             // drop the loop for EXIT
@@ -483,8 +478,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             // @end:
 
             // @start:
-            auto target_stmt = std::make_unique<JumpTargetStmt>(while_stmt->loc,
-                               start_label, -1);
+            auto target_stmt = std::make_unique<LabelStmt>(start_label, while_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
             //     IF NOT condition THEN GOTO @end
@@ -496,11 +490,10 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             lowered_condition.rewritten = std::make_unique<UnaryExpr>(TokenType::NOT,
                                           std::move(operand), loc);
 
-            auto new_if_stmt = std::make_unique<IfStmt>(while_stmt->loc);
-            new_if_stmt->condition = std::move(lowered_condition.rewritten);
-            auto goto_stmt = std::make_unique<GotoStmt>(while_stmt->loc);
-            goto_stmt->target_expr = std::make_unique<LabelLineRefExpr>(end_label,
-                                     while_stmt->loc);
+            auto new_if_stmt = std::make_unique<IfStmt>(std::move(
+                                   lowered_condition.rewritten), while_stmt->loc);
+            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                             (end_label, while_stmt->loc), while_stmt->loc);
             new_if_stmt->then_stmts.push_back(std::move(goto_stmt));
             out_prog.stmts.push_back(std::move(new_if_stmt));
 
@@ -508,14 +501,12 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             lower(while_stmt->body, symtab, control_stack, out_prog);
 
             //     GOTO @start
-            goto_stmt = std::make_unique<GotoStmt>(while_stmt->loc);
-            goto_stmt->target_expr = std::make_unique<LabelLineRefExpr>(start_label,
-                                     while_stmt->loc);
+            goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                                                   (start_label, while_stmt->loc), while_stmt->loc);
             out_prog.stmts.push_back(std::move(goto_stmt));
 
             // @end:
-            target_stmt = std::make_unique<JumpTargetStmt>(while_stmt->loc,
-                          end_label, -1);
+            target_stmt = std::make_unique<LabelStmt>(end_label, while_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
             // drop the loop for EXIT
@@ -540,24 +531,22 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             auto lowered_step = lower_expr(*for_stmt->step_expr, symtab);
             append_stmts(out_prog.stmts, lowered_step.preamble);
 
-            auto new_for_stmt = std::make_unique<ForStmt>(for_stmt->loc);
-            new_for_stmt->name = for_stmt->name;
-            new_for_stmt->start_expr = std::move(lowered_start.rewritten);
-            new_for_stmt->end_expr = std::move(lowered_end.rewritten);
-            new_for_stmt->step_expr = std::move(lowered_step.rewritten);
+            auto new_for_stmt = std::make_unique<ForStmt>(for_stmt->name,
+                                std::move(lowered_start.rewritten),
+                                std::move(lowered_end.rewritten),
+                                std::move(lowered_step.rewritten),
+                                for_stmt->loc);
             out_prog.stmts.push_back(std::move(new_for_stmt));
 
             // body
             lower(for_stmt->body, symtab, control_stack, out_prog);
 
             // NEXT var
-            auto next_stmt = std::make_unique<NextStmt>(for_stmt->loc);
-            next_stmt->name = for_stmt->name;
+            auto next_stmt = std::make_unique<NextStmt>(for_stmt->name, for_stmt->loc);
             out_prog.stmts.push_back(std::move(next_stmt));
 
             // @end:
-            auto target_stmt = std::make_unique<JumpTargetStmt>(for_stmt->loc,
-                               end_label, -1);
+            auto target_stmt = std::make_unique<LabelStmt>(end_label, for_stmt->loc);
             out_prog.stmts.push_back(std::move(target_stmt));
 
             // drop the loop for EXIT
@@ -579,18 +568,17 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
 
                 // create LET <PROC><PARAM>=lowered_arg
                 std::string arg_name = proc_call_stmt->name + param_name;
-                auto assign_arg_stmt = std::make_unique<LetStmt>(proc_call_stmt->loc);
-                assign_arg_stmt->lhs = std::make_unique<VariableExpr>(arg_name,
-                                       proc_call_stmt->loc);
-                assign_arg_stmt->rhs = std::move(lowered_arg.rewritten);
+                auto assign_arg_stmt = std::make_unique<LetStmt>(
+                                           std::make_unique<VariableExpr>(arg_name, proc_call_stmt->loc),
+                                           std::move(lowered_arg.rewritten), proc_call_stmt->loc);
                 out_prog.stmts.push_back(std::move(assign_arg_stmt));
             }
 
             // create GOSUB @<PROC>
             auto label_ref = std::make_unique<LabelLineRefExpr>(proc_call_stmt->name,
                              proc_call_stmt->loc);
-            auto gosub_stmt = std::make_unique<GosubStmt>(proc_call_stmt->loc);
-            gosub_stmt->target_expr = std::move(label_ref);
+            auto gosub_stmt = std::make_unique<GosubStmt>(std::move(label_ref),
+                              proc_call_stmt->loc);
             out_prog.stmts.push_back(std::move(gosub_stmt));
         }
         else if (auto exit_stmt = dynamic_cast<ExitStmt*>(stmt.get())) {
@@ -602,8 +590,8 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                 auto label_ref = std::make_unique<LabelLineRefExpr>
                                  (control_stack.back().end_label,
                                   exit_stmt->loc);
-                auto goto_stmt = std::make_unique<GotoStmt>(exit_stmt->loc);
-                goto_stmt->target_expr = std::move(label_ref);
+                auto goto_stmt = std::make_unique<GotoStmt>(std::move(label_ref),
+                                 exit_stmt->loc);
                 out_prog.stmts.push_back(std::move(goto_stmt));
             }
             else if (control_stack.back().type == ControlStackEntry::Type::Proc) {
@@ -616,17 +604,17 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             }
         }
         else if (auto goto_stmt = dynamic_cast<GotoStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<GotoStmt>(goto_stmt->loc);
             auto lowered_target = lower_expr(*goto_stmt->target_expr, symtab);
             append_stmts(out_prog.stmts, lowered_target.preamble);
-            new_stmt->target_expr = std::move(lowered_target.rewritten);
+            auto new_stmt = std::make_unique<GotoStmt>(std::move(lowered_target.rewritten),
+                            goto_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto gosub_stmt = dynamic_cast<GosubStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<GosubStmt>(gosub_stmt->loc);
             auto lowered_target = lower_expr(*gosub_stmt->target_expr, symtab);
             append_stmts(out_prog.stmts, lowered_target.preamble);
-            new_stmt->target_expr = std::move(lowered_target.rewritten);
+            auto new_stmt = std::make_unique<GosubStmt>(std::move(lowered_target.rewritten),
+                            gosub_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto return_stmt = dynamic_cast<ReturnStmt*>(stmt.get())) {
@@ -638,11 +626,9 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto end_stmt = dynamic_cast<EndStmt*>(stmt.get())) {
-            // GOTO @end_of_program_label
-            auto goto_stmt = std::make_unique<GotoStmt>(end_stmt->loc);
-            goto_stmt->target_expr = std::make_unique<LabelLineRefExpr>
-                                     (std::string(end_of_program_label),
-                                      end_stmt->loc);
+            // GOTO @END_OF_PROGRAM
+            auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                             (END_OF_PROGRAM, end_stmt->loc), end_stmt->loc);
             out_prog.stmts.push_back(std::move(goto_stmt));
         }
         else if (auto print_stmt = dynamic_cast<PrintStmt*>(stmt.get())) {
@@ -699,8 +685,7 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             }
         }
         else if (auto rem_stmt = dynamic_cast<RemStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<RemStmt>(rem_stmt->loc);
-            new_stmt->text = rem_stmt->text;
+            auto new_stmt = std::make_unique<RemStmt>(rem_stmt->text, rem_stmt->loc);
             new_stmt->asm_lines = rem_stmt->asm_lines;
             out_prog.stmts.push_back(std::move(new_stmt));
         }
@@ -731,38 +716,36 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto load_stmt = dynamic_cast<LoadStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<LoadStmt>(load_stmt->loc);
             auto lowered_filename = lower_expr(*load_stmt->filename_expr, symtab);
             append_stmts(out_prog.stmts, lowered_filename.preamble);
-            new_stmt->filename_expr = std::move(lowered_filename.rewritten);
+            auto new_stmt = std::make_unique<LoadStmt>(std::move(
+                                lowered_filename.rewritten), load_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto save_stmt = dynamic_cast<SaveStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<SaveStmt>(save_stmt->loc);
             auto lowered_filename = lower_expr(*save_stmt->filename_expr, symtab);
             append_stmts(out_prog.stmts, lowered_filename.preamble);
-            new_stmt->filename_expr = std::move(lowered_filename.rewritten);
+            auto new_stmt = std::make_unique<SaveStmt>(std::move(
+                                lowered_filename.rewritten), save_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto poke_stmt = dynamic_cast<PokeStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<PokeStmt>(poke_stmt->loc);
-
-            auto lowered_address = lower_expr(*poke_stmt->address, symtab);
+            auto lowered_address = lower_expr(*poke_stmt->address_expr, symtab);
             append_stmts(out_prog.stmts, lowered_address.preamble);
-            new_stmt->address = std::move(lowered_address.rewritten);
 
-            auto lowered_value = lower_expr(*poke_stmt->value, symtab);
+            auto lowered_value = lower_expr(*poke_stmt->value_expr, symtab);
             append_stmts(out_prog.stmts, lowered_value.preamble);
-            new_stmt->value = std::move(lowered_value.rewritten);
 
+            auto new_stmt = std::make_unique<PokeStmt>(std::move(lowered_address.rewritten),
+                            std::move(lowered_value.rewritten), poke_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto pokew_stmt = dynamic_cast<PokewStmt*>(stmt.get())) {
             // POKE address, value-256*int(value/256) : POKE address+1, int(value/256)
-            auto lowered_address = lower_expr(*pokew_stmt->address, symtab);
+            auto lowered_address = lower_expr(*pokew_stmt->address_expr, symtab);
             append_stmts(out_prog.stmts, lowered_address.preamble);
 
-            auto lowered_value = lower_expr(*pokew_stmt->value, symtab);
+            auto lowered_value = lower_expr(*pokew_stmt->value_expr, symtab);
             append_stmts(out_prog.stmts, lowered_value.preamble);
 
             // value/256
@@ -793,10 +776,8 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                                pokew_stmt->loc);
 
             // POKE address, value-256*INT(value/256)
-            auto new_stmt1 = std::make_unique<PokeStmt>(pokew_stmt->loc);
-            new_stmt1->address = lowered_address.rewritten->clone();
-            new_stmt1->value = std::move(val_mod_256);
-
+            auto new_stmt1 = std::make_unique<PokeStmt>(lowered_address.rewritten->clone(),
+                             std::move(val_mod_256), pokew_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt1));
 
             // address+1
@@ -807,54 +788,46 @@ static void lower(const std::vector<std::unique_ptr<Stmt>>& stmts,
                                pokew_stmt->loc);
 
             // POKE address+1, INT(value/256)
-            auto new_stmt2 = std::make_unique<PokeStmt>(pokew_stmt->loc);
-            new_stmt2->address = std::move(addr_plus_1);
-            new_stmt2->value = std::move(int_val_div_256);
-
+            auto new_stmt2 = std::make_unique<PokeStmt>(std::move(addr_plus_1),
+                             std::move(int_val_div_256), pokew_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt2));
         }
         else if (auto plot_stmt = dynamic_cast<PlotStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<PlotStmt>(plot_stmt->loc);
-
             auto lowered_x = lower_expr(*plot_stmt->x_expr, symtab);
             append_stmts(out_prog.stmts, lowered_x.preamble);
-            new_stmt->x_expr = std::move(lowered_x.rewritten);
 
             auto lowered_y = lower_expr(*plot_stmt->y_expr, symtab);
             append_stmts(out_prog.stmts, lowered_y.preamble);
-            new_stmt->y_expr = std::move(lowered_y.rewritten);
 
+            auto new_stmt = std::make_unique<PlotStmt>(std::move(lowered_x.rewritten),
+                            std::move(lowered_y.rewritten), plot_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto unplot_stmt = dynamic_cast<UnplotStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<UnplotStmt>(unplot_stmt->loc);
-
             auto lowered_x = lower_expr(*unplot_stmt->x_expr, symtab);
             append_stmts(out_prog.stmts, lowered_x.preamble);
-            new_stmt->x_expr = std::move(lowered_x.rewritten);
 
             auto lowered_y = lower_expr(*unplot_stmt->y_expr, symtab);
             append_stmts(out_prog.stmts, lowered_y.preamble);
-            new_stmt->y_expr = std::move(lowered_y.rewritten);
 
+            auto new_stmt = std::make_unique<UnplotStmt>(std::move(lowered_x.rewritten),
+                            std::move(lowered_y.rewritten), unplot_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto rand_stmt = dynamic_cast<RandStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<RandStmt>(rand_stmt->loc);
-
             auto lowered_seed = lower_expr(*rand_stmt->seed_expr, symtab);
             append_stmts(out_prog.stmts, lowered_seed.preamble);
-            new_stmt->seed_expr = std::move(lowered_seed.rewritten);
 
+            auto new_stmt = std::make_unique<RandStmt>(std::move(lowered_seed.rewritten),
+                            rand_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto pause_stmt = dynamic_cast<PauseStmt*>(stmt.get())) {
-            auto new_stmt = std::make_unique<PauseStmt>(pause_stmt->loc);
-
             auto lowered_duration = lower_expr(*pause_stmt->duration_expr, symtab);
             append_stmts(out_prog.stmts, lowered_duration.preamble);
-            new_stmt->duration_expr = std::move(lowered_duration.rewritten);
 
+            auto new_stmt = std::make_unique<PauseStmt>
+                            (std::move(lowered_duration.rewritten), pause_stmt->loc);
             out_prog.stmts.push_back(std::move(new_stmt));
         }
         else if (auto fast_stmt = dynamic_cast<FastStmt*>(stmt.get())) {
@@ -909,23 +882,28 @@ static void lower(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
         }
     }
 
-    // location of end of program, used for GOTO @end_of_program_label
+    // location of end of program, used for GOTO @END_OF_PROGRAM
     SourceLoc end_of_program_loc = prog.stmts.empty() ? SourceLoc{} :
                                    prog.stmts.back()->loc;
 
     if (num_procs_called > 0) {
-        // if any PROCs are called, add a GOTO @end_of_program_label at the end of the program
-        auto goto_stmt = std::make_unique<GotoStmt>(end_of_program_loc);
-        goto_stmt->target_expr = std::make_unique<LabelLineRefExpr>
-                                 (std::string(end_of_program_label), end_of_program_loc);
+        // if any PROCs are called, add a GOTO @END_OF_PROGRAM at the end of the program
+        auto goto_stmt = std::make_unique<GotoStmt>(std::make_unique<LabelLineRefExpr>
+                         (END_OF_PROGRAM, end_of_program_loc), end_of_program_loc);
         out_prog->stmts.push_back(std::move(goto_stmt));
 
-        // now add all procs definitions
+        // now add all procs definitions ordered by name
+        std::vector<std::string> proc_names;
         for (auto& [name, def_proc] : symtab.procs) {
+            proc_names.push_back(name);
+        }
+        std::sort(proc_names.begin(), proc_names.end());
+        for (auto& name : proc_names) {
+            auto& def_proc = symtab.procs[name];
+
             if (def_proc->called) {
                 // add target label for the proc
-                auto target_stmt = std::make_unique<JumpTargetStmt>(def_proc->loc,
-                                   def_proc->name, -1);
+                auto target_stmt = std::make_unique<LabelStmt>(def_proc->name, def_proc->loc);
                 out_prog->stmts.push_back(std::move(target_stmt));
 
                 // add stack entry for the proc
@@ -944,9 +922,8 @@ static void lower(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
     }
 
     // Add end label for END statement
-    auto target_stmt = std::make_unique<JumpTargetStmt>(end_of_program_loc,
-                       std::string(
-                           end_of_program_label), -1);
+    auto target_stmt = std::make_unique<LabelStmt>(END_OF_PROGRAM,
+                       end_of_program_loc);
     out_prog->stmts.push_back(std::move(target_stmt));
 }
 
@@ -954,15 +931,12 @@ bool lower_prog(Prog& prog, Symtab& symtab, std::unique_ptr<Prog>& out_prog) {
     lower(prog, symtab, out_prog);
 
 #ifdef _DEBUG
-    if (g_dump_step == 8) {
-        if (get_error_count() > 0) {
-            std::cerr << "Semantic check failed with " << get_error_count() << " errors\n";
-        }
-        else {
+    if (g_dump_step == 9) {
+        if (get_error_count() == 0) {
             DumpContext ctx(std::cout);
             out_prog->dump(ctx);
         }
-        exit(EXIT_SUCCESS);
+        exit_error_status();
     }
 #endif
 

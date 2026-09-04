@@ -5,4 +5,4 @@ Output file: t/input/20_parser_input_error.p
 t/input/20_parser_input_error.bas:1: error: expected variable name, found end of line
 t/input/20_parser_input_error.bas:2: error: expected variable name, found end of line
 t/input/20_parser_input_error.bas:3: error: expected end of statement, found 'X'
-Parsing failed with errors.
+3 errors found

@@ -5,69 +5,200 @@
 //-----------------------------------------------------------------------------
 
 #include "ast.h"
+#include "ast_stmt.h"
+#include "errors.h"
+#include "semantic.h"
+#include <algorithm>
+#include <unordered_set>
+
+struct RecursionDetector : ASTWalker {
+    using ASTWalker::visit; // so that base class visit methods are visible
+
+    Prog& prog;
+    std::string cur_func;
+    std::unordered_map<std::string, std::vector<std::string>> call_tree;
+    std::unordered_map<std::string, SourceLoc> defined_loc;
+
+    explicit RecursionDetector(Prog& p) : prog(p) {}
+
+    void enter(DefProcStmt& stmt) override {
+        cur_func = stmt.name;
+        defined_loc[stmt.name] = stmt.loc;
+    }
+
+    void leave(DefProcStmt&) override {
+        cur_func.clear();
+    }
+
+    void enter(DefFnStmt& stmt) override {
+        cur_func = stmt.name;
+        defined_loc[stmt.name] = stmt.loc;
+    }
+
+    void leave(DefFnStmt&) override {
+        cur_func.clear();
+    }
+
+    void visit(ProcCallStmt& stmt) {
+        if (!cur_func.empty()) {
+            auto called = call_tree[cur_func];
+            if (std::find(called.begin(), called.end(), stmt.name)
+                    == called.end()) {
+                called.push_back(stmt.name);
+            }
+        }
+    }
+
+    void visit(ProcCallExpr& expr) {
+        if (!cur_func.empty()) {
+            auto called = call_tree[cur_func];
+            if (std::find(called.begin(), called.end(), expr.name)
+                    == called.end()) {
+                called.push_back(expr.name);
+            }
+        }
+    }
+
+    void visit(FnCallExpr& expr) {
+        if (!cur_func.empty()) {
+            auto called = call_tree[cur_func];
+            if (std::find(called.begin(), called.end(), expr.name)
+                    == called.end()) {
+                called.push_back(expr.name);
+            }
+        }
+    }
+
+    // detect recursion
+    bool reaches_self(const std::string& start,
+                      const std::string& current,
+                      std::unordered_set<std::string> visited) {
+        if (!visited.insert(current).second) {
+            return false;
+        }
+
+        auto it = call_tree.find(current);
+        if (it == call_tree.end()) {
+            return false;
+        }
+
+        for (const auto& callee : it->second) {
+            if (callee == start) {
+                return true;
+            }
+
+            if (reaches_self(start, callee, visited)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void check_recursion() {
+        for (const auto& [func, called] : call_tree) {
+            std::unordered_set<std::string> visited;
+
+            for (const auto& callee : called) {
+                if (callee == func ||
+                        reaches_self(func, callee, visited)) {
+                    SourceLoc loc;
+                    auto it = defined_loc.find(func);
+                    if (it != defined_loc.end()) {
+                        loc = it->second;
+                    }
+                    error(loc, "Recursion not allowed");
+                    break;
+                }
+            }
+        }
+    }
+};
+
+bool semantic_check(Prog& prog) {
+    // check for recursion in procedures and functions
+    RecursionDetector detector(prog);
+    prog.accept(detector);
+    detector.check_recursion();
+    if (get_error_count() > 0) {
+        return false;
+    }
+
+    return get_error_count() == 0;
+}
+
+#if 0
+static void collect_decl_symbols(Prog& prog) {
+    create_symtab(prog, prog.decl_symbols);
+
+#ifdef _DEBUG
+    if (g_dump_step == 6) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog.dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
+}
+
+static void semantic_check_ast_rewrite(Prog& prog) {
+    (void)prog;
+
+#ifdef _DEBUG
+    if (g_dump_step == 7) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog.dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
+}
+
+static void collect_def_symbols(Prog& prog) {
+    create_symtab(prog, prog.def_symbols);
+
+#ifdef _DEBUG
+    if (g_dump_step == 8) {
+        if (get_error_count() == 0) {
+            DumpContext ctx(std::cout);
+            prog.dump(ctx);
+        }
+        exit_error_status();
+    }
+#endif
+}
+
+bool semantic_check(Prog& prog) {
+    collect_decl_symbols(prog);
+    if (get_error_count() > 0) {
+        return false;
+    }
+
+    semantic_check_ast_rewrite(prog);
+    if (get_error_count() > 0) {
+        return false;
+    }
+
+    collect_def_symbols(prog);
+    return get_error_count() == 0;
+}
+
+#if 0
+
+#include "ast.h"
 #include "ast_expr.h"
 #include "ast_stmt.h"
 #include "dump_context.h"
 #include "errors.h"
-#include "options.h"
-#include "semantic.h"
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-
-// move local variable declarations to the DefProcStmt nodes
-static void collect_local(DefProcStmt& proc_stmt,
-                          std::vector<std::unique_ptr<Stmt>>& stmts) {
-    for (auto i = stmts.begin(); i != stmts.end(); ) {
-        if (auto if_stmt = dynamic_cast<IfStmt*>(i->get())) {
-            collect_local(proc_stmt, if_stmt->then_stmts);
-            collect_local(proc_stmt, if_stmt->else_stmts);
-            ++i;
-        }
-        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(i->get())) {
-            collect_local(proc_stmt, repeat_stmt->body);
-            ++i;
-        }
-        else if (auto while_stmt = dynamic_cast<WhileStmt*>(i->get())) {
-            collect_local(proc_stmt, while_stmt->body);
-            ++i;
-        }
-        else if (auto for_stmt = dynamic_cast<ForStmt*>(i->get())) {
-            collect_local(proc_stmt, for_stmt->body);
-            ++i;
-        }
-        else if (auto local_stmt = dynamic_cast<LocalStmt*>(i->get())) {
-            for (auto& local_var : local_stmt->locals) {
-                if (std::find(proc_stmt.locals.begin(), proc_stmt.locals.end(), local_var)
-                        == proc_stmt.locals.end()) {
-                    proc_stmt.locals.push_back(local_var);
-                }
-            }
-
-            i = stmts.erase(i);
-        }
-        else {
-            ++i;
-        }
-    }
-}
-
-static void collect_local(Prog& prog) {
-    for (const auto& stmt : prog.stmts) {
-        if (dynamic_cast<LocalStmt*>(stmt.get())) {
-            error(stmt->loc,
-                  "LOCAL statement is not allowed outside of a DEF PROC");
-        }
-        else if (auto def_proc_stmt = dynamic_cast<DefProcStmt*>(stmt.get())) {
-            collect_local(*def_proc_stmt, def_proc_stmt->body);
-        }
-    }
-}
 
 // rewrite DEF FN expression replacing each paramater by <FNname><parameter>
 static std::unique_ptr<Expr> rewrite_expr(Expr& expr,
@@ -221,44 +352,6 @@ static void rewrite_def_fn(std::vector<std::unique_ptr<Stmt>>& stmts,
 
 static void rewrite_def_fn(Prog& prog) {
     rewrite_def_fn(prog.stmts, 0);
-}
-
-// rewrite DEF PROC replacing all parameters and locals by <PROCname><param>
-static void rewrite_def_proc(DefProcStmt& def_proc_stmt) {
-    (void)def_proc_stmt;
-}
-
-static void rewrite_def_proc(std::vector<std::unique_ptr<Stmt>>& stmts,
-                             int level) {
-    for (auto& stmt : stmts) {
-        if (auto if_stmt = dynamic_cast<IfStmt*>(stmt.get())) {
-            rewrite_def_proc(if_stmt->then_stmts, level + 1);
-            rewrite_def_proc(if_stmt->else_stmts, level + 1);
-        }
-        else if (auto repeat_stmt = dynamic_cast<RepeatStmt*>(stmt.get())) {
-            rewrite_def_proc(repeat_stmt->body, level + 1);
-        }
-        else if (auto while_stmt = dynamic_cast<WhileStmt*>(stmt.get())) {
-            rewrite_def_proc(while_stmt->body, level + 1);
-        }
-        else if (auto for_stmt = dynamic_cast<ForStmt*>(stmt.get())) {
-            rewrite_def_proc(for_stmt->body, level + 1);
-        }
-        else if (auto def_proc_stmt = dynamic_cast<DefProcStmt*>(stmt.get())) {
-            if (level > 0) {
-                error(def_proc_stmt->loc,
-                      "DEF PROC statement is not allowed inside another statement block");
-            }
-            else {
-                rewrite_def_proc(def_proc_stmt->body, level + 1);   // check for inner DEF PROCs
-                rewrite_def_proc(*def_proc_stmt);                   // rewrite
-            }
-        }
-    }
-}
-
-static void rewrite_def_proc(Prog& prog) {
-    rewrite_def_proc(prog.stmts, 0);
 }
 
 // verify that DefProcStmt, DefFnStmt and Pragma nodes only appear at the top level of the program
@@ -688,22 +781,22 @@ static void verify_expr_types(const std::vector<std::unique_ptr<Stmt>>& stmts) {
             }
         }
         else if (auto poke_stmt = dynamic_cast<const PokeStmt*>(stmt.get())) {
-            compute_expr_type(*poke_stmt->address);
-            if (poke_stmt->address->type != ExprType::Number) {
+            compute_expr_type(*poke_stmt->address_expr);
+            if (poke_stmt->address_expr->type != ExprType::Number) {
                 error(poke_stmt->loc, "POKE expression must be a number");
             }
-            compute_expr_type(*poke_stmt->value);
-            if (poke_stmt->value->type != ExprType::Number) {
+            compute_expr_type(*poke_stmt->value_expr);
+            if (poke_stmt->value_expr->type != ExprType::Number) {
                 error(poke_stmt->loc, "POKE expression must be a number");
             }
         }
         else if (auto pokew_stmt = dynamic_cast<const PokewStmt*>(stmt.get())) {
-            compute_expr_type(*pokew_stmt->address);
-            if (pokew_stmt->address->type != ExprType::Number) {
+            compute_expr_type(*pokew_stmt->address_expr);
+            if (pokew_stmt->address_expr->type != ExprType::Number) {
                 error(pokew_stmt->loc, "POKEW expression must be a number");
             }
-            compute_expr_type(*pokew_stmt->value);
-            if (pokew_stmt->value->type != ExprType::Number) {
+            compute_expr_type(*pokew_stmt->value_expr);
+            if (pokew_stmt->value_expr->type != ExprType::Number) {
                 error(pokew_stmt->loc, "POKEW expression must be a number");
             }
         }
@@ -770,12 +863,114 @@ static void verify_expr_types(const std::vector<std::unique_ptr<Stmt>>& stmts) {
 }
 
 
+// collect LocalStmt variables and store them in DefProcStmt
+// report duplicate parameters and locals
+// report nested DEF PROC
+struct LocalCollector : ASTWalker {
+    using ASTWalker::visit; // so that base class visit methods are visible
+
+    Prog& prog;
+    DefProcStmt* cur_proc = nullptr;
+    std::unordered_set<std::string> local_vars;
+    LocalCollector(Prog& p) : prog(p) {}
+
+    void enter(DefProcStmt& stmt) override {
+        if (cur_proc != nullptr) {
+            error(stmt.loc, "Nested DEF PROC not allowed");
+            stmt.mark_for_removal = true;
+        }
+        else {
+            cur_proc = &stmt;
+            for (auto& var : stmt.params) {
+                if (local_vars.count(var) > 0) {
+                    error(stmt.loc, "Duplicate variable: '" + var + "'");
+                }
+                else {
+                    local_vars.insert(var);
+                }
+            }
+        }
+    }
+    void leave(DefProcStmt&) override {
+        cur_proc = nullptr;
+        local_vars.clear();
+    }
+    void visit(LocalStmt& stmt) override {
+        if (cur_proc == nullptr) {
+            error(stmt.loc, "LOCAL outside DEF PROC not allowed");
+        }
+        else {
+            for (auto& var : stmt.locals) {
+                if (local_vars.count(var) > 0) {
+                    error(stmt.loc, "Duplicate variable: '" + var + "'");
+                }
+                else {
+                    local_vars.insert(var);
+                    cur_proc->locals.push_back(var);
+                }
+            }
+        }
+        stmt.mark_for_removal = true;
+    }
+};
+
+static void collect_def_proc_locals(Prog& prog) {
+    LocalCollector collector(prog);
+    prog.accept(collector);
+}
+
+
+// rewrite def proc bodies replacing local variables and parameters
+// by <proc-name><param-name>
+struct DefProcRewritter : ASTWalker {
+    using ASTWalker::visit; // so that base class visit methods are visible
+
+    Prog& prog;
+    DefProcStmt* cur_proc = nullptr;
+    std::unordered_set<std::string> local_vars;
+    DefProcRewritter(Prog& p) : prog(p) {}
+
+    void enter(DefProcStmt& stmt) override {
+        if (cur_proc != nullptr) {
+            error(stmt.loc, "Nested DEF PROC not allowed");
+            stmt.mark_for_removal = true;
+        }
+        else {
+            cur_proc = &stmt;
+            for (auto& var : stmt.params) {
+                local_vars.insert(var);
+            }
+            for (auto& var : stmt.locals) {
+                local_vars.insert(var);
+            }
+        }
+    }
+    void leave(DefProcStmt&) override {
+        cur_proc = nullptr;
+        local_vars.clear();
+    }
+    void visit(VariableExpr& expr) {
+        if (cur_proc != nullptr) {
+            if (local_vars.count(expr.name) > 0) {
+                expr.name = cur_proc->name + expr.name;
+            }
+        }
+    }
+};
+
+static void rewrite_def_proc_bodies(Prog& prog) {
+    DefProcRewritter rewritter(prog);
+    prog.accept(rewritter);
+}
+
+
+#if 0
 // move Pragma-Stmt to the vars section
 struct PragmaMover : ASTWalker {
     using ASTWalker::visit; // so that base class visit methods are visible
 
     Prog& prog;
-    PragmaMover(Prog& p) : prog(p) {}
+    explicit PragmaMover(Prog& p) : prog(p) {}
 
     void visit(PragmaNumVarStmt& stmt) override {
         prog.vars.push_back(stmt.clone());
@@ -795,39 +990,70 @@ struct PragmaMover : ASTWalker {
     }
 };
 
-bool semantic_check(Prog& prog) {
-    // move Pragma-Stmt to the vars section
+static void move_pragmas_to_vars(Prog& prog) {
     PragmaMover mover(prog);
     prog.accept(mover);
+}
+#endif
+
+
+#if 0
+// move all DefProcStmt to the prog header, removing from the statement list
+struct DefProcMover : ASTWalker {
+    using ASTWalker::visit; // so that base class visit methods are visible
+
+    Prog& prog;
+    DefProcMover(Prog& p) : prog(p) {}
+
+    void enter(DefProcStmt& stmt) override {
+        auto it = prog.procs.find(stmt.name);
+        if (it != prog.procs.end()) {
+            error(stmt.loc, "Duplicate definition: '" + stmt.name + "'");
+            error(it->second->loc, "Previous definition here");
+        }
+        else {
+            prog.procs[stmt.name] = stmt.clone();
+        }
+        stmt.mark_for_removal = true;
+    }
+};
+
+static void move_def_proc_to_prog(Prog& prog) {
+    DefProcMover mover(prog);
+    prog.accept(mover);
+}
+#endif
+
+
+bool semantic_check(Prog& prog) {
+    // DEF PROC
+    collect_def_proc_locals(prog);
+    rewrite_def_proc_bodies(prog);
+
+
+    verify_expr_types(prog.stmts);
+
+
+
+#if 0
+    // move pragma vars
+    move_pragmas_to_vars(prog);
+
+    // move procs to prog header
+    move_def_proc_to_prog(prog);
+#endif
+
+    // ---- HERE ----
 
     check_top_level(prog);
-
-    // first collect LOCAL statements, then rewrite DEF PROCs
-    collect_local(prog);
-    rewrite_def_proc(prog);
 
     // rewrite DEF FNs
     rewrite_def_fn(prog);
 
-#if 0
-    move_pragmas_to_end(prog);
-    detect_recursion(prog);
-#endif
-
-    verify_expr_types(prog.stmts);
-
-#ifdef _DEBUG
-    if (g_dump_step == 6) {
-        if (get_error_count() > 0) {
-            std::cerr << "Semantic check failed with " << get_error_count() << " errors\n";
-        }
-        else {
-            DumpContext ctx(std::cout);
-            prog.dump(ctx);
-        }
-        exit(EXIT_SUCCESS);
-    }
-#endif
+    //detect_recursion(prog);
 
     return get_error_count() == 0;
 }
+
+#endif
+#endif

@@ -8,4 +8,4 @@ t/input/20_parser_label_error.bas:3: error: unrecognized statement 'LABEL'
 t/input/20_parser_label_error.bas:4: error: multiple line numbers in the same line are not allowed
 t/input/20_parser_label_error.bas:5: error: multiple labels in the same line are not allowed
 t/input/20_parser_label_error.bas:6: error: multiple line numbers in the same line are not allowed
-Parsing failed with errors.
+6 errors found

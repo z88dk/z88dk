@@ -17,4 +17,4 @@ t/input/20_parser_vars_error.bas:12: error: expected 'Integer', found ')'
 t/input/20_parser_vars_error.bas:13: error: expected ')', found 'TO'
 t/input/20_parser_vars_error.bas:14: error: expected 'Float', found '"A"'
 t/input/20_parser_vars_error.bas:15: error: expected 'StringLiteral', found '1'
-Parsing failed with errors.
+15 errors found

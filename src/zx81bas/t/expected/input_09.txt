@@ -1,0 +1,25 @@
+% z88dk-zx81bas -d 9 test_t_input_09_t.bas
+Input file:  test_t_input_09_t.bas
+Output file: test_t_input_09_t.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_09_t.bas.i" "test_t_input_09_t.bas.pp"
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
+    ]
+    dfile_colapsed: false
+    sysvars_data: [
+    ]
+    stmts: [
+        LabelStmt {
+            location: :0
+            label: "ZX81BASENDOFPROGRAM"
+        }
+    ]
+    pragma_vars: [
+    ]
+}

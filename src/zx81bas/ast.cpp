@@ -26,8 +26,24 @@ void erase_marked(std::vector<std::unique_ptr<T>>& vec) {
     );
 }
 
+void ASTWalker::visit(LetStmt& s) {
+    s.lhs->accept(*this);
+    s.rhs->accept(*this);
+}
+
+void ASTWalker::visit(DimStmt& s) {
+    for (auto& item : s.items) {
+        for (auto& dim : item.dims) {
+            dim->accept(*this);
+        }
+    }
+}
+
 void ASTWalker::visit(IfStmt& s) {
     enter(s);
+
+    s.condition->accept(*this);
+
     for (auto& st : s.then_stmts) {
         st->accept(*this);
     }
@@ -43,28 +59,42 @@ void ASTWalker::visit(IfStmt& s) {
 
 void ASTWalker::visit(RepeatStmt& s) {
     enter(s);
+
     for (auto& st : s.body) {
         st->accept(*this);
     }
     erase_marked(s.body);
+
+    s.condition->accept(*this);
+
     leave(s);
 }
 
 void ASTWalker::visit(WhileStmt& s) {
     enter(s);
+
+    s.condition->accept(*this);
+
     for (auto& st : s.body) {
         st->accept(*this);
     }
     erase_marked(s.body);
+
     leave(s);
 }
 
 void ASTWalker::visit(ForStmt& s) {
     enter(s);
+
+    s.start_expr->accept(*this);
+    s.end_expr->accept(*this);
+    s.step_expr->accept(*this);
+
     for (auto& st : s.body) {
         st->accept(*this);
     }
     erase_marked(s.body);
+
     leave(s);
 }
 
@@ -75,6 +105,99 @@ void ASTWalker::visit(DefProcStmt& s) {
     }
     erase_marked(s.body);
     leave(s);
+}
+
+void ASTWalker::visit(ProcCallStmt& s) {
+    for (auto& arg : s.args) {
+        arg->accept(*this);
+    }
+}
+
+void ASTWalker::visit(DefFnStmt& s) {
+    enter(s);
+    s.expr->accept(*this);
+    leave(s);
+}
+
+void ASTWalker::visit(GotoStmt& s) {
+    s.target_expr->accept(*this);
+}
+
+void ASTWalker::visit(GosubStmt& s) {
+    s.target_expr->accept(*this);
+}
+
+void ASTWalker::visit(PrintStmt& s) {
+    for (auto& item : s.items) {
+        switch (item.type) {
+        case PrintItem::Type::Expr:
+            item.expr->accept(*this);
+            break;
+        case PrintItem::Type::At:
+            item.line_expr->accept(*this);
+            item.col_expr->accept(*this);
+            break;
+        case PrintItem::Type::Tab:
+            item.tab_expr->accept(*this);
+            break;
+        default:
+            ;
+        }
+    }
+}
+
+void ASTWalker::visit(InputStmt& s) {
+    for (auto& var : s.vars) {
+        var->accept(*this);
+    }
+}
+
+void ASTWalker::visit(RunStmt& s) {
+    if (s.target_expr) {
+        s.target_expr->accept(*this);
+    }
+}
+
+void ASTWalker::visit(ListStmt& s) {
+    if (s.target_expr) {
+        s.target_expr->accept(*this);
+    }
+}
+
+void ASTWalker::visit(LoadStmt& s) {
+    s.filename_expr->accept(*this);
+}
+
+void ASTWalker::visit(SaveStmt& s) {
+    s.filename_expr->accept(*this);
+}
+
+void ASTWalker::visit(PokeStmt& s) {
+    s.address_expr->accept(*this);
+    s.value_expr->accept(*this);
+}
+
+void ASTWalker::visit(PokewStmt& s) {
+    s.address_expr->accept(*this);
+    s.value_expr->accept(*this);
+}
+
+void ASTWalker::visit(PlotStmt& s) {
+    s.x_expr->accept(*this);
+    s.y_expr->accept(*this);
+}
+
+void ASTWalker::visit(UnplotStmt& s) {
+    s.x_expr->accept(*this);
+    s.y_expr->accept(*this);
+}
+
+void ASTWalker::visit(RandStmt& s) {
+    s.seed_expr->accept(*this);
+}
+
+void ASTWalker::visit(PauseStmt& s) {
+    s.duration_expr->accept(*this);
 }
 
 void ASTWalker::visit(ArrayRefExpr& e) {
@@ -132,37 +255,6 @@ void ASTWalker::visit(FnCallExpr& e) {
         arg->accept(*this);
     }
     leave(e);
-}
-
-std::unique_ptr<Prog> Prog::clone() const {
-    auto p = std::make_unique<Prog>();
-    p->auto_start = auto_start;
-    p->auto_start_line = auto_start_line;
-    p->auto_start_label = auto_start_label;
-    p->increment = increment;
-    p->rem_invert = rem_invert;
-    p->fast_mode = fast_mode;
-    p->dfile_lines = dfile_lines;
-    p->dfile_colapsed = dfile_colapsed;
-    p->sysvars_data = sysvars_data;
-
-    for (auto& st : stmts) {
-        p->stmts.push_back(st->clone());
-    }
-    for (auto& st : vars) {
-        p->vars.push_back(st->clone());
-    }
-    for (auto& [name, proc] : procs) {
-        auto cloned = proc->clone();
-        p->procs[name] = std::unique_ptr<DefProcStmt>(
-                             static_cast<DefProcStmt*>(cloned.release()));
-    }
-    for (auto& [name, fn] : fns) {
-        auto cloned = fn->clone();
-        p->fns[name] = std::unique_ptr<DefFnStmt>(
-                           static_cast<DefFnStmt*>(cloned.release()));
-    }
-    return p;
 }
 
 void Prog::accept(ASTVisitor& v) {

@@ -11,8 +11,8 @@
 #include "../ast_stmt.h"
 #include "../dump_context.h"
 #include "../lexer.h"
+#include "../symtab.h"
 #include "../utils.h"
-#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -59,16 +59,19 @@ static void dump_asm_lines(const std::vector<TokLine>& asm_lines,
     ctx.line("]");
 }
 
-void JumpTargetStmt::dump(DumpContext ctx) const {
-    ctx.line("JumpTargetStmt {");
+void LabelStmt::dump(DumpContext ctx) const {
+    ctx.line("LabelStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    if (!label.empty()) {
-        child_ctx.line("label: \"" + label + "\"");
-    }
-    if (basic_line_num >= 0) {
-        child_ctx.line("basic_line_num: " + std::to_string(basic_line_num));
-    }
+    child_ctx.line("label: \"" + label + "\"");
+    ctx.line("}");
+}
+
+void LineNumStmt::dump(DumpContext ctx) const {
+    ctx.line("LineNumStmt {");
+    auto child_ctx = ctx.child();
+    dump_stmt_common(*this, child_ctx);
+    child_ctx.line("line_num: " + std::to_string(line_num));
     ctx.line("}");
 }
 
@@ -341,8 +344,8 @@ void PokeStmt::dump(DumpContext ctx) const {
     ctx.line("PokeStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    dump_child_expr("address", address.get(), child_ctx);
-    dump_child_expr("value", value.get(), child_ctx);
+    dump_child_expr("address", address_expr.get(), child_ctx);
+    dump_child_expr("value", value_expr.get(), child_ctx);
     ctx.line("}");
 }
 
@@ -350,8 +353,8 @@ void PokewStmt::dump(DumpContext ctx) const {
     ctx.line("PokewStmt {");
     auto child_ctx = ctx.child();
     dump_stmt_common(*this, child_ctx);
-    dump_child_expr("address", address.get(), child_ctx);
-    dump_child_expr("value", value.get(), child_ctx);
+    dump_child_expr("address", address_expr.get(), child_ctx);
+    dump_child_expr("value", value_expr.get(), child_ctx);
     ctx.line("}");
 }
 
@@ -501,33 +504,7 @@ void Prog::dump(DumpContext ctx) const {
     }
     child_ctx.line("]");
     dump_stmt_list("stmts", stmts, child_ctx);
-    dump_stmt_list("vars", vars, child_ctx);
-    child_ctx.line("procs: [");
-    auto procs_ctx = child_ctx.child();
-    std::vector<std::string> proc_names;
-    for (const auto& [name, proc] : procs) {
-        proc_names.push_back(name);
-    }
-    std::sort(proc_names.begin(), proc_names.end());
-    for (const auto& name : proc_names) {
-        if (auto& proc = procs.at(name)) {
-            proc->dump(procs_ctx);
-        }
-    }
-    child_ctx.line("]");
-    child_ctx.line("fns: [");
-    auto fns_ctx = child_ctx.child();
-    std::vector<std::string> fn_names;
-    for (const auto& [name, fn] : fns) {
-        fn_names.push_back(name);
-    }
-    std::sort(fn_names.begin(), fn_names.end());
-    for (const auto& name : fn_names) {
-        if (auto& fn = fns.at(name)) {
-            fn->dump(fns_ctx);
-        }
-    }
-    child_ctx.line("]");
+    dump_stmt_list("pragma_vars", pragma_vars, child_ctx);
     ctx.line("}");
 }
 

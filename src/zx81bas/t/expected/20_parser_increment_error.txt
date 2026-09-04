@@ -10,4 +10,4 @@ t/input/20_parser_increment_error.bas:5: error: expected '=', found '10'
 t/input/20_parser_increment_error.bas:6: error: expected end of statement, found 'EXTRA'
 t/input/20_parser_increment_error.bas:7: error: expected 'Integer', found '-'
 t/input/20_parser_increment_error.bas:8: error: #INCREMENT must be positive
-Parsing failed with errors.
+8 errors found

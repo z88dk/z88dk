@@ -16,10 +16,6 @@ Prog {
     ]
     stmts: [
     ]
-    vars: [
-    ]
-    procs: [
-    ]
-    fns: [
+    pragma_vars: [
     ]
 }

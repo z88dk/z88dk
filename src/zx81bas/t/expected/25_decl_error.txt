@@ -1,0 +1,53 @@
+% z88dk-zx81bas -d 6 t//input/25_decl_error.bas
+Input file:  t/input/25_decl_error.bas
+Output file: t/input/25_decl_error.p
+% z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "t/input/25_decl_error.bas.i" "t/input/25_decl_error.bas.pp"
+t/input/25_decl_error.bas:3: error: Duplicate label: 'LABEL1'
+t/input/25_decl_error.bas:2: error: Previous definition
+t/input/25_decl_error.bas:10: error: Duplicate line number: '10'
+t/input/25_decl_error.bas:9: error: Previous definition
+t/input/25_decl_error.bas:13: error: Decreasing line number
+t/input/25_decl_error.bas:17: error: Nested PROC
+t/input/25_decl_error.bas:22: error: Duplicate definition: 'PROCC'
+t/input/25_decl_error.bas:21: error: Previous definition
+t/input/25_decl_error.bas:25: error: Duplicate parameter: 'A'
+t/input/25_decl_error.bas:28: error: LOCAL outside PROC
+t/input/25_decl_error.bas:32: error: Duplicate variable: 'A'
+t/input/25_decl_error.bas:34: error: Duplicate variable: 'B'
+t/input/25_decl_error.bas:41: error: Duplicate definition: 'FNA'
+t/input/25_decl_error.bas:40: error: Previous definition
+t/input/25_decl_error.bas:44: error: Duplicate parameter: 'A'
+t/input/25_decl_error.bas:47: error: Undefined label: 'LABEL'
+t/input/25_decl_error.bas:48: error: Undefined label: 'LABEL'
+t/input/25_decl_error.bas:49: error: Undefined label: 'LABEL'
+t/input/25_decl_error.bas:50: error: Undefined label: 'LABEL'
+t/input/25_decl_error.bas:51: error: Undefined label: 'LABEL'
+t/input/25_decl_error.bas:52: error: Undefined label: 'LABEL'
+t/input/25_decl_error.bas:55: error: Undefined line number: '1'
+t/input/25_decl_error.bas:56: error: Undefined line number: '1'
+t/input/25_decl_error.bas:57: error: Undefined line number: '1'
+t/input/25_decl_error.bas:58: error: Undefined line number: '1'
+t/input/25_decl_error.bas:61: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:62: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:63: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:64: error: Undefined variable: 'X$'
+t/input/25_decl_error.bas:66: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:67: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:68: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:68: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:68: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:72: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:75: error: Undefined variable: 'X'
+t/input/25_decl_error.bas:78: error: Undefined array: 'X'
+t/input/25_decl_error.bas:79: error: Undefined array: 'X$'
+t/input/25_decl_error.bas:82: error: Undefined procedure: 'PROCX'
+t/input/25_decl_error.bas:83: error: Undefined procedure: 'PROCX'
+t/input/25_decl_error.bas:84: error: Undefined procedure: 'PROCX'
+t/input/25_decl_error.bas:88: error: Procedure 'PROCG' expects 2 arguments, got 1
+t/input/25_decl_error.bas:89: error: Procedure 'PROCG' expects 2 arguments, got 3
+t/input/25_decl_error.bas:90: error: Procedure 'PROCG' expects 2 arguments, got 1
+t/input/25_decl_error.bas:91: error: Procedure 'PROCG' expects 2 arguments, got 3
+t/input/25_decl_error.bas:94: error: Undefined function: 'FNX'
+t/input/25_decl_error.bas:98: error: Function 'FND' expects 2 arguments, got 1
+t/input/25_decl_error.bas:99: error: Function 'FND' expects 2 arguments, got 3
+48 errors found

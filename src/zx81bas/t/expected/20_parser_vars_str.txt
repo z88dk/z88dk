@@ -43,10 +43,6 @@ Prog {
             ]
         }
     ]
-    vars: [
-    ]
-    procs: [
-    ]
-    fns: [
+    pragma_vars: [
     ]
 }

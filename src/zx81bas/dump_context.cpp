@@ -6,13 +6,12 @@
 
 #include "dump_context.h"
 #include <string>
-#include <string_view>
 
 DumpContext::DumpContext(std::ostream& os_, int indent_)
     : os(os_), indent(indent_) {
 }
 
-void DumpContext::line(std::string_view text) {
+void DumpContext::line(const std::string& text) {
     os << std::string(indent * 4, ' ') << text << std::endl;
 }
 

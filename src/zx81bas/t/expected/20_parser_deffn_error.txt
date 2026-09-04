@@ -9,4 +9,4 @@ t/input/20_parser_deffn_error.bas:4: error: string variable 'A$' not allowed as 
 t/input/20_parser_deffn_error.bas:5: error: expected 'Identifier', found ')'
 t/input/20_parser_deffn_error.bas:6: error: expected 'Identifier', found '10'
 t/input/20_parser_deffn_error.bas:7: error: expected expression term, found end of line
-Parsing failed with errors.
+7 errors found

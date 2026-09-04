@@ -6,4 +6,4 @@ t/input/20_parser_print_error.bas:1: error: expected expression term, found end 
 t/input/20_parser_print_error.bas:2: error: expected ',', found end of line
 t/input/20_parser_print_error.bas:3: error: expected expression term, found end of line
 t/input/20_parser_print_error.bas:4: error: expected expression term, found end of line
-Parsing failed with errors.
+4 errors found

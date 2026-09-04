@@ -7,6 +7,7 @@
 #include "errors.h"
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 static int error_count = 0;
 
@@ -28,4 +29,16 @@ void error(const std::string& message) {
 
 int get_error_count() {
     return error_count;
+}
+
+[[noreturn]]
+void exit_error_status() {
+    if (error_count > 0) {
+        std::cerr << std::to_string(error_count)
+                  << " error" << (error_count > 1 ? "s" : "")
+                  << " found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    exit(EXIT_SUCCESS);
 }

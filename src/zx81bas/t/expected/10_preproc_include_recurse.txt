@@ -2,3 +2,4 @@
 Input file:  t/input/10_preproc_include_recurse.bas
 Output file: t/input/10_preproc_include_recurse.p
 error: Recursive include detected: t/input/10_preproc_include_recurse.inc
+1 error found

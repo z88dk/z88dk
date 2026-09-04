@@ -2,7 +2,9 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 my $dir  = path($0)->dirname;
 my $self = path($0)->basename(".t");
-capture_ok( "build/Debug/z88dk-zx81bas -d 7 $dir/input/$self.bas",
+
+copy( "$dir/input/input.bas", "$test.bas" );
+capture_ok( "build/Debug/z88dk-zx81bas -d 9 $test.bas",
     "$dir/expected/$self.txt" );
 
 unlink_testfiles;
