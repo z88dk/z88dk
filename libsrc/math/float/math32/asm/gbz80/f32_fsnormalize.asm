@@ -26,7 +26,9 @@ PUBLIC m32_fsnormalize
     ld h,d
     ld l,e                          ; HL↔DE without ex (56c)
     pop de
-    ld d,0                      ; shift total
+    ; D = shift count + 1.  sub D then sets C for both underflow and
+    ; FTZ exp==0 (signed zero), so one jr c covers both; inc a restores exp.
+    ld d,1
 
     ; ---------------------------------------------------------------
     ; Byte scan on E:HL and byte-alignment of it
@@ -47,7 +49,7 @@ PUBLIC m32_fsnormalize
     ; lead in H → byte-align by 8; A holds H (ld below keep flags unused)
     ld h,l
     ld l,e                          ; A:HL shifted by 8 (l = 0)
-    ld d,8
+    ld d,9                          ; 8 + 1
     bit 7,a
     jr nz,normalised
     jr need_shift
@@ -58,7 +60,7 @@ PUBLIC m32_fsnormalize
     jr z,normzero                   ; all zeroes
     ; lead in L → byte-align by 16
     ld l,h                          ; A:HL shifted by 16 (hl = 0)
-    ld d,16
+    ld d,17                         ; 16 + 1
     bit 7,a
     jr nz,normalised
     ; fall through to need_shift
@@ -80,9 +82,9 @@ PUBLIC m32_fsnormalize
     add a,a                     ; drop implicit 1 → C, A = mant high << 1
     ld e,a
     ld a,c
-    sub d                       ; a = final exp
-    jr c,normzero
-    jr z,normzero               ; FTZ: exp==0 is signed zero, not a denormal
+    sub d                       ; a = final exp - 1; C if exp <= 0
+    jr c,normzero               ; FTZ signed zero (exp==0) and underflow
+    inc a                       ; a = final exp
 
     ld d,a                      ; D = final exp (temp)
     ld a,b
