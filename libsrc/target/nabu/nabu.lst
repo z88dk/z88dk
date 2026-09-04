@@ -1,4 +1,4 @@
-target/nabu/stdio/fputc_cons.asm
-target/nabu/stdio/fgetc_cons.asm
-target/nabu/stdio/getk.asm
+target/nabu/obj/${TARGET}/x/target/nabu/stdio/fputc_cons.o
+target/nabu/obj/${TARGET}/x/target/nabu/stdio/fgetc_cons.o
+target/nabu/obj/${TARGET}/x/target/nabu/stdio/getk.o
 @target/nabu/nabu_cpm.lst

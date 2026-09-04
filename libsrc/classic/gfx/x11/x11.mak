@@ -21,10 +21,6 @@ X11_OBJS := $(addprefix classic/gfx/x11/obj/z80/, $(X11_OBJECTS)) \
 OBJS += $(X11_OBJS) 
 CLEAN += gfx-x11-clean
 
-gfx-x11: $(X11_OBJS) $(X11_NEWLIB_TARGETS)
-
-.PHONY: gfx-x11 gfx-x11-clean
-
 $(eval $(call buildbit,classic/gfx/x11,z80,test))
 $(eval $(call buildbit,classic/gfx/x11,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/gfx/x11,r2ka,test,-clib=rabbit,-mr2ka))
@@ -36,6 +32,11 @@ $(eval $(call buildbit,classic/gfx/x11,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/gfx/x11,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/gfx/x11,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/gfx/x11,kc160,test,-clib=kc160,-mkc160))
+
+gfx-x11: $(X11_OBJS) $(X11_NEWLIB_TARGETS)
+
+.PHONY: gfx-x11 gfx-x11-clean
+
 
 
 gfx-x11-clean:

@@ -46,7 +46,7 @@ obj/z80h/%.o: %.c
 
 
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c  obj/8085/c obj/z180 obj/z80h obj/8080
+	$(Q)mkdir -p obj/z80/c obj/ixiy/c  obj/8085/c obj/z180 obj/z80h obj/8080
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc

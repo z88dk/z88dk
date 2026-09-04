@@ -44,10 +44,6 @@ SOUND_AY_OBJS := $(addprefix sound/ay/obj/z80/, $(SOUND_AY_OBJECTS)) \
 OBJS += $(SOUND_AY_OBJS) $(SOUND_AY_TARGETS)
 CLEAN += sound-ay-clean
 
-sound-ay: $(SOUND_AY_OBJS) $(SOUND_AY_TARGETS)
-
-.PHONY: sound-ay sound-ay-clean
-
 $(eval $(call buildbit,sound/ay,z80,test))
 $(eval $(call buildbit,sound/ay,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,sound/ay,8080,test,-clib=8080,-m8080))
@@ -59,7 +55,6 @@ $(eval $(call buildbit,sound/ay,r4k,test,-clib=rabbit4k,-mr4k))
 $(eval $(call buildbit,sound/ay,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,sound/ay,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,sound/ay,kc160,test,-clib=kc160,-mkc160))
-
 $(eval $(call buildnew,sound/ay,z80,-mz80,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS_ex)))
 $(eval $(call buildnew,sound/ay,r2ka,-mr2ka,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS_ex)))
 $(eval $(call buildnew,sound/ay,r4k,-mr4k,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS_ex)))
@@ -71,6 +66,12 @@ $(eval $(call buildnew,sound/ay,gbz80,-mgbz80,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS
 $(eval $(call buildnew,sound/ay,z180,-mz180,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS_ex)))
 $(eval $(call buildnew,sound/ay,ez80_z80,-mez80_z80,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS_ex)))
 $(eval $(call buildnew,sound/ay,kc160,-mkc160,$(SOUND_AY_GLOBS),$(SOUND_AY_GLOBS_ex)))
+
+sound-ay: $(SOUND_AY_OBJS) $(SOUND_AY_TARGETS)
+
+.PHONY: sound-ay sound-ay-clean
+
+
 
 
 sound-ay-clean:

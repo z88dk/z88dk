@@ -23,7 +23,7 @@ $(OUTPUT_DIRECTORY)/mbf64_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 $(foreach d,ixiy z80,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
+	$(Q)mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

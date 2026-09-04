@@ -1,7 +1,7 @@
-target/newbrain/stdio/fgetc_cons
-target/newbrain/stdio/getk
-target/newbrain/stdio/fputc_cons
+target/newbrain/obj/${TARGET}/x/target/newbrain/stdio/fgetc_cons.o
+target/newbrain/obj/${TARGET}/x/target/newbrain/stdio/getk.o
+target/newbrain/obj/${TARGET}/x/target/newbrain/stdio/fputc_cons.o
 @classic/stdio/stdio.lst
-target/newbrain/zcall
+target/newbrain/obj/${TARGET}/x/target/newbrain/zcall.o
 @target/newbrain/newbrain_common.lst
 

@@ -46,4 +46,5 @@ ENDIF
     SECTION bss_SMSlib
     SECTION bss_video_vdp
     SECTION bss_splib2
+    SECTION bss_stdlib
     SECTION bss_user

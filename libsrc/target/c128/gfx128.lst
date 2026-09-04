@@ -1,2 +1,2 @@
-target/c128/graphics/textpixl
+target/c128/obj/${TARGET}/x/target/c128/graphics/textpixl.o
 @classic/gfx/text/gfx_text.lst

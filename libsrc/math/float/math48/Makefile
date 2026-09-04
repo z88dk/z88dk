@@ -66,7 +66,7 @@ $(OUTPUT_DIRECTORY)/math48_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 $(foreach d,ez80_z80 ixiy kc160 r2ka r4k r6k z180 z80 z80n,$(addprefix obj/$(d)/,$(OBJECTS))): | dirs
 
 dirs:
-	@mkdir -p obj/z80/cimpl obj/ixiy/cimpl obj/r2ka/cimpll obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl obj/kc160/cimpl obj/r4k/cimpl obj/r2ka/cimpl obj/r6k/cimpl
+	$(Q)mkdir -p obj/z80/cimpl obj/ixiy/cimpl obj/r2ka/cimpll obj/z80n/cimpl obj/z180/cimpl obj/ez80_z80/cimpl obj/kc160/cimpl obj/r4k/cimpl obj/r2ka/cimpl obj/r6k/cimpl
 
 .PHONY: dirs
 

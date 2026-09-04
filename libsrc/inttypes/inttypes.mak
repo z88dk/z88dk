@@ -18,10 +18,6 @@ INTTYPES_TARGETS := inttypes/obj/newlib-z80-inttypes \
 OBJS += $(INTTYPES_TARGETS)
 CLEAN += inttypes-clean
 
-inttypes: $(INTTYPES_TARGETS)
-
-.PHONY: inttypes inttypes-clean
-
 $(eval $(call buildnew,inttypes,z80,-mz80,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,r2ka,-mr2ka,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,r4k,-mr4k,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
@@ -34,6 +30,11 @@ $(eval $(call buildnew,inttypes,gbz80,-mgbz80,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS
 $(eval $(call buildnew,inttypes,z180,-mz180,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,ez80_z80,-mez80_z80,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
 $(eval $(call buildnew,inttypes,kc160,-mkc160,$(INTTYPES_GLOBS),$(INTTYPES_GLOBS_ex)))
+
+inttypes: $(INTTYPES_TARGETS)
+
+.PHONY: inttypes inttypes-clean
+
 
 inttypes-clean:
 	$(RM) -fr inttypes/obj

@@ -9,22 +9,30 @@ SOS_GLOBS_ex := \
 
 SOS_CFILES = $(wildcard target/sos/tape/*.c) 
 
-SOS_OFILES = $(addprefix target/sos/obj/sos/, $(SOS_CFILES:.c=.o)) 
+SOS_OFILES = $(patsubst target/sos/%,target/sos/obj/sos/%,$(SOS_CFILES:.c=.o))
 
 
 
 SOS_TARGETS := target/sos/obj/target-sos-sos \
-	$(SOS_OFILES)
+	$(SOS_OFILES) \
+	classic/games/obj/.stamp-sos classic/gfx/obj/.stamp-sos
 		
 
 CLEAN += target-sos-clean
+TOCREATE += $(call check_target,sos,sos_clib.lib)
+
+$(eval $(call gfx_stamp_args,sos,TARGET=sos))
+$(eval $(call buildtargetasm,target/sos,z80,sos,-mz80,$(SOS_GLOBS),$(SOS_GLOBS_ex)))
+$(eval $(call buildtargetc,target/sos,sos))
+
+sos_clib.lib: $(TARGET_CLIB_DEPS) $(SOS_TARGETS)
+	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(TARGET_DIRECTORY)/sos/sos.lst
+
 
 target-sos: $(SOS_TARGETS)
 
 .PHONY: target-sos target-sos-clean
 
-$(eval $(call buildtargetasm,target/sos,z80,sos,-mz80,$(SOS_GLOBS),$(SOS_GLOBS_ex)))
-$(eval $(call buildtargetc,target/sos,sos))
 
 target-sos-clean:
 	$(RM) -fr target/sos/obj

@@ -20,10 +20,6 @@ INT_IM1_OBJS := $(addprefix classic/interrupts/im1/obj/z80/, $(INT_IM1_OBJECTS))
 OBJS += $(INT_IM1_OBJS) 
 CLEAN += interrupts-im1-clean
 
-interrupts-im1: $(INT_IM1_OBJS) $(INT_IM1_NEWLIB_TARGETS)
-
-.PHONY: interrupts-im1 interrupts-im1-clean
-
 $(eval $(call buildbit,classic/interrupts/im1,z80,test))
 $(eval $(call buildbit,classic/interrupts/im1,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/interrupts/im1,z80n,test,-clib=z80n,-mz80n))
@@ -34,6 +30,11 @@ $(eval $(call buildbit,classic/interrupts/im1,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/interrupts/im1,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/interrupts/im1,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/interrupts/im1,kc160,test,-clib=kc160,-mkc160))
+
+interrupts-im1: $(INT_IM1_OBJS) $(INT_IM1_NEWLIB_TARGETS)
+
+.PHONY: interrupts-im1 interrupts-im1-clean
+
 
 
 interrupts-im1-clean:

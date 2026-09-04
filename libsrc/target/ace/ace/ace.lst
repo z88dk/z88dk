@@ -1,2 +1,2 @@
-target/ace/ace/ace_freemem
-target/ace/ace/zx_print_buf
+target/ace/obj/${TARGET}/x/target/ace/ace/ace_freemem.o
+target/ace/obj/${TARGET}/x/target/ace/ace/zx_print_buf.o

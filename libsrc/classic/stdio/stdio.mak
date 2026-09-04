@@ -52,10 +52,6 @@ STDIO_OBJS := $(addprefix classic/stdio/obj/z80/, $(STDIO_OBJECTS)) \
 OBJS += $(STDIO_OBJS)
 CLEAN += classic-stdio-clean
 
-classic-stdio: $(STDIO_OBJS)
-
-.PHONY: classic-stdio classic-stdio-clean
-
 $(eval $(call buildbit,classic/stdio,z80,test))
 $(eval $(call buildbit,classic/stdio,z80-binary,cpm))
 $(eval $(call buildbit,classic/stdio,ixiy,test,-Ca-IXIY,-mz80 -IXIY))
@@ -73,6 +69,11 @@ $(eval $(call buildbit,classic/stdio,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/stdio,z180-binary,cpm,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/stdio,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/stdio,kc160,test,-clib=kc160,-mkc160))
+
+classic-stdio: $(STDIO_OBJS)
+
+.PHONY: classic-stdio classic-stdio-clean
+
 
 
 classic-stdio-clean:

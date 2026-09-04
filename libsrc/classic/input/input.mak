@@ -19,10 +19,6 @@ INPUT_OBJS := $(addprefix classic/input/obj/z80/, $(INPUT_OBJECTS)) \
 OBJS += $(INPUT_OBJS)
 CLEAN += classic-input-clean
 
-input: $(INPUT_OBJS)
-
-.PHONY: classic-input classic-input-clean
-
 $(eval $(call buildbit,classic/input,z80,test))
 $(eval $(call buildbit,classic/input,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/input,8080,test,-clib=8080,-m8080))
@@ -35,6 +31,11 @@ $(eval $(call buildbit,classic/input,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/input,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/input,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/input,kc160,test,-clib=kc160,-mkc160))
+
+input: $(INPUT_OBJS)
+
+.PHONY: classic-input classic-input-clean
+
 
 
 

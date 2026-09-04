@@ -20,5 +20,5 @@ clean:
 $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/8080 obj/z80
+	$(Q)mkdir -p obj/8080 obj/z80
 

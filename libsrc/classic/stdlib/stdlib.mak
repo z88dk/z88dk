@@ -88,10 +88,6 @@ STDLIB_OBJS := \
 OBJS += $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
 CLEAN += classic-stdlib-clean
 
-classic-stdlib: $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
-
-.PHONY: classic-stdlib classic-stdlib-clean
-
 $(eval $(call buildbit,classic/stdlib,z80,test))
 $(eval $(call buildbit,classic/stdlib,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/stdlib,8080,test,-clib=8080,-m8080))
@@ -104,7 +100,6 @@ $(eval $(call buildbit,classic/stdlib,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/stdlib,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/stdlib,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/stdlib,kc160,test,-clib=kc160,-mkc160))
-
 $(eval $(call buildnew,classic/stdlib,z80,-mz80,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,r2ka,-mr2ka,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,r4k,-mr4k,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
@@ -117,6 +112,12 @@ $(eval $(call buildnew,classic/stdlib,gbz80,-mgbz80,$(STDLIB_GBZ80_NEWLIBGLOBS),
 $(eval $(call buildnew,classic/stdlib,z180,-mz180,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,ez80_z80,-mez80_z80,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
 $(eval $(call buildnew,classic/stdlib,kc160,-mkc160,$(STDLIB_NEWLIBGLOBS),$(STDLIB_NEWLIBGLOBS_ex)))
+
+classic-stdlib: $(STDLIB_OBJS) $(STDLIB_NEWLIB_TARGETS)
+
+.PHONY: classic-stdlib classic-stdlib-clean
+
+
 
 
 classic-stdlib-clean:

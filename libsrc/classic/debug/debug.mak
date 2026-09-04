@@ -16,10 +16,6 @@ DEBUG_OBJS := $(addprefix classic/debug/obj/z80/, $(DEBUG_OBJECTS)) \
 OBJS += $(DEBUG_OBJS)
 CLEAN += debug-clean
 
-debug: $(DEBUG_OBJS)
-
-.PHONY: debug debug-clean
-
 $(eval $(call buildbit,classic/debug,z80,test))
 $(eval $(call buildbit,classic/debug,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/debug,r2ka,test,-clib=rabbit,-mr2ka))
@@ -28,6 +24,11 @@ $(eval $(call buildbit,classic/debug,z80n,test,-clib=z80n,-mz80n))
 $(eval $(call buildbit,classic/debug,z180,test,-clib=z180,-mz180))
 $(eval $(call buildbit,classic/debug,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/debug,kc160,test,-clib=kc160,-mkc160))
+
+debug: $(DEBUG_OBJS)
+
+.PHONY: debug debug-clean
+
 
 
 debug-clean:

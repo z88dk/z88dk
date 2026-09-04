@@ -22,10 +22,6 @@ MALLOC_OBJS := $(addprefix classic/alloc/malloc-classic/obj/z80/, $(MALLOC_OBJEC
 OBJS += $(MALLOC_OBJS) $(MALLOC_NEWLIB_TARGETS)
 CLEAN += classic-alloc-malloc-clean
 
-classic-alloc-malloc: $(MALLOC_OBJS) $(MALLOC_NEWLIB_TARGETS)
-
-.PHONY: classic-alloc-malloc classic-alloc-malloc-clean
-
 $(eval $(call buildbit,classic/alloc/malloc-classic,z80,test))
 $(eval $(call buildbit,classic/alloc/malloc-classic,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/alloc/malloc-classic,8080,test,-clib=8080,-m8080))
@@ -39,9 +35,14 @@ $(eval $(call buildbit,classic/alloc/malloc-classic,z180,test,-clib=z180,-mz180)
 $(eval $(call buildbit,classic/alloc/malloc-classic,ez80_z80,test,-clib=ez80_z80,-mez80_z80))
 $(eval $(call buildbit,classic/alloc/malloc-classic,kc160,test,-clib=kc160,-mkc160))
 
+classic-alloc-malloc: $(MALLOC_OBJS) $(MALLOC_NEWLIB_TARGETS)
+
+.PHONY: classic-alloc-malloc classic-alloc-malloc-clean
+
+
 
 classic/alloc/malloc-classic/obj/%:
-	@mkdir -p $@
+	$(Q)mkdir -p $@
 
 classic-alloc-malloc-clean:
 	$(RM) -fr classic/alloc/malloc-classic/obj classic/alloc/malloc-classic/*.o

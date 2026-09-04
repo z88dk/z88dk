@@ -14,7 +14,7 @@ CFLAGS += -I.
 all: $(addprefix z80/,$(AFILES))
 
 z80/%.asm: %.c
-	@mkdir -p z80
+	$(Q)mkdir -p z80
 	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -D__MATH_MATH32 -SO3 $(CFLAGS) -a $^ -o $@
 
 # 8085 higher functions: sccz80 only (zsdcc is Z80-only)
@@ -24,7 +24,7 @@ AFILES8085 = $(CFILES8085:.c=.asm)
 8085: $(addprefix 8085/,$(AFILES8085))
 
 8085/%.asm: %.c
-	@mkdir -p 8085
+	$(Q)mkdir -p 8085
 	zcc +test -clib=8085 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 
@@ -35,7 +35,7 @@ AFILES8080 = $(CFILES8080:.c=.asm)
 8080: $(addprefix 8080/,$(AFILES8080))
 
 8080/%.asm: %.c
-	@mkdir -p 8080
+	$(Q)mkdir -p 8080
 	zcc +test -clib=8080 -compiler=sccz80 -fp-mode=ieee -D__MATH_MATH32 \
 	    -O2 --opt-code-speed=all -I. $(CFLAGS) -a $^ -o $@
 

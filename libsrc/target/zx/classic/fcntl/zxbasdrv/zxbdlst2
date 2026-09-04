@@ -1,4 +1,4 @@
-rnd_loadblock
-rnd_saveblock
-rnd_erase
-zxgetfname2
+target/zx/obj/support/classic/fcntl/zxbasdrv/rnd_loadblock.o
+target/zx/obj/support/classic/fcntl/zxbasdrv/rnd_saveblock.o
+target/zx/obj/support/classic/fcntl/zxbasdrv/rnd_erase.o
+target/zx/obj/support/classic/fcntl/zxbasdrv/zxgetfname2.o

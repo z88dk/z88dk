@@ -16,10 +16,6 @@ GFXPORTABLE_OBJS := $(addprefix classic/gfx/portable/obj/ixiy/,$(GFXPORTABLE_OBJ
 OBJS += $(GFXPORTABLE_OBJS) 
 CLEAN += gfx-portable-clean
 
-gfx-portable: $(GFXPORTABLE_OBJS) $(GFXPORTABLE_NEWLIB_TARGETS)
-
-.PHONY: gfx-portable gfx-portable-clean
-
 $(eval $(call buildbit,classic/gfx/portable,z80,test))
 $(eval $(call buildbit,classic/gfx/portable,ixiy,test,-Ca-IXIY,-IXIY))
 $(eval $(call buildbit,classic/gfx/portable,r2ka,test,-clib=rabbit,-mr2ka))
@@ -28,6 +24,11 @@ $(eval $(call buildbit,classic/gfx/portable,8080,test,-clib=8080,-m8080))
 $(eval $(call buildbit,classic/gfx/portable,8085,test,-clib=8085,-m8085))
 $(eval $(call buildbit,classic/gfx/portable,gbz80,test,-clib=gbz80,-mgbz80))
 $(eval $(call buildbit,classic/gfx/portable,z180,test,-clib=z180,-mz180))
+
+gfx-portable: $(GFXPORTABLE_OBJS) $(GFXPORTABLE_NEWLIB_TARGETS)
+
+.PHONY: gfx-portable gfx-portable-clean
+
 
 
 gfx-portable-clean:

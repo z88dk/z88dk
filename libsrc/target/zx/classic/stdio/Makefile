@@ -40,7 +40,7 @@ obj/$(TARGET)/%.o: %.c
 $(addprefix obj/$(TARGET)/,$(OBJECTS)): | dirs
 
 dirs:
-	@mkdir -p obj/$(TARGET)/ansi
+	$(Q)mkdir -p obj/$(TARGET)/ansi
 
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 

@@ -17,10 +17,6 @@ LIBGEN_TARGETS := libgen/obj/newlib-z80-libgen \
 OBJS += $(LIBGEN_TARGETS)
 CLEAN += libgen-clean
 
-libgen: $(LIBGEN_TARGETS)
-
-.PHONY: libgen libgen-clean
-
 $(eval $(call buildnew,libgen,z80,-mz80,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,r2ka,-mr2ka,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,r4k,-mr4k,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
@@ -33,6 +29,11 @@ $(eval $(call buildnew,libgen,gbz80,-mgbz80,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,z180,-mz180,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,ez80_z80,-mez80_z80,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
 $(eval $(call buildnew,libgen,kc160,-mkc160,$(LIBGEN_GLOBS),$(LIBGEN_GLOBS_ex)))
+
+libgen: $(LIBGEN_TARGETS)
+
+.PHONY: libgen libgen-clean
+
 
 libgen-clean:
 	$(RM) -fr libgen/obj

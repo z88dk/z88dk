@@ -1,18 +1,18 @@
-target/cpm/stdio/obj/${TYPE}/fgetc_cons
-target/cpm/stdio/obj/${TYPE}/getk
-target/cpm/stdio/obj/${TYPE}/fputc_cons
-target/cpm/stdio/obj/${TYPE}/generic_console
-target/cpm/stdio/obj/${TYPE}/generic_console_vt52
-target/cpm/stdio/obj/${TYPE}/generic_console_h19
-target/cpm/cpm/obj/${TYPE}/__bdos
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/fgetc_cons.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/getk.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/fputc_cons.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console_vt52.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/generic_console_h19.o
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/__bdos.o
 @classic/stdio/stdio_binary.lst
 
-target/cpm/time/obj/${TYPE}/clock
-target/cpm/time/obj/${TYPE}/time
-target/cpm/cpm/obj/${TYPE}/cpm_platform_init
+target/cpm/obj/${TYPE}/x/target/cpm/time/clock.o
+target/cpm/obj/${TYPE}/x/target/cpm/time/time.o
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/cpm_platform_init.o
 @target/cpm/fcntl/fcntl.lst
 @target/cpm/gsx.lst
-target/cpm/cpm/obj/${TYPE}/execl
-target/cpm/cpm/obj/${TYPE}/playzb4
-target/cpm/stdio/obj/${TYPE}/joystick
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/execl.o
+target/cpm/obj/${TYPE}/x/target/cpm/cpm/playzb4.o
+target/cpm/obj/${TYPE}/x/target/cpm/stdio/joystick.o
 

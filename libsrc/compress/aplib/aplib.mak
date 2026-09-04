@@ -18,10 +18,6 @@ APLIB_TARGETS := compress/aplib/obj/newlib-z80-compress-aplib \
 OBJS += $(APLIB_TARGETS)
 CLEAN += compress-aplib-clean
 
-compress-aplib: $(APLIB_TARGETS)
-
-.PHONY: compress-aplib compress-aplib-clean
-
 $(eval $(call buildnew,compress/aplib,z80,-mz80,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,r2ka,-mr2ka,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,r4k,-mr4k,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
@@ -34,6 +30,11 @@ $(eval $(call buildnew,compress/aplib,gbz80,-mgbz80,$(APLIB_8080_GLOBS),$(APLIB_
 $(eval $(call buildnew,compress/aplib,z180,-mz180,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,ez80_z80,-mez80_z80,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
 $(eval $(call buildnew,compress/aplib,kc160,-mkc160,$(APLIB_GLOBS),$(APLIB_GLOBS_ex)))
+
+compress-aplib: $(APLIB_TARGETS)
+
+.PHONY: compress-aplib compress-aplib-clean
+
 
 
 compress-aplib-clean:

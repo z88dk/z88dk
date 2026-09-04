@@ -17,10 +17,6 @@ FONT4x8_TARGETS := font/font_4x8/obj/newlib-z80-font-font_4x8 \
 OBJS += $(FONT4x8_TARGETS)
 CLEAN += font_4x8-clean
 
-font_4x8: $(FONT4x8_TARGETS)
-
-.PHONY: font_4x8 font_4x8-clean
-
 $(eval $(call buildnew,font/font_4x8,z80,-mz80 -I$(Z88DK_LIBSRC),$(FONT4x8_GLOBS),$(FONT4x8_GLOBS_ex)))
 $(eval $(call buildnew,font/font_4x8,r2ka,-mr2ka -I$(Z88DK_LIBSRC),$(FONT4x8_GLOBS),$(FONT4x8_GLOBS_ex)))
 $(eval $(call buildnew,font/font_4x8,r4k,-mr4k -I$(Z88DK_LIBSRC),$(FONT4x8_GLOBS),$(FONT4x8_GLOBS_ex)))
@@ -33,6 +29,11 @@ $(eval $(call buildnew,font/font_4x8,gbz80,-mgbz80 -I$(Z88DK_LIBSRC),$(FONT4x8_G
 $(eval $(call buildnew,font/font_4x8,z180,-mz180 -I$(Z88DK_LIBSRC),$(FONT4x8_GLOBS),$(FONT4x8_GLOBS_ex)))
 $(eval $(call buildnew,font/font_4x8,ez80_z80,-mez80_z80 -I$(Z88DK_LIBSRC),$(FONT4x8_GLOBS),$(FONT4x8_GLOBS_ex)))
 $(eval $(call buildnew,font/font_4x8,kc160,-mkc160 -I$(Z88DK_LIBSRC),$(FONT4x8_GLOBS),$(FONT4x8_GLOBS_ex)))
+
+font_4x8: $(FONT4x8_TARGETS)
+
+.PHONY: font_4x8 font_4x8-clean
+
 
 
 font_4x8-clean:
