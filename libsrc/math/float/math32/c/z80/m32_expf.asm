@@ -429,22 +429,46 @@ _m32_expf:
 	add	ix, sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -12
+	ld	hl, -16
 	add	hl, sp
 	ld	sp, hl
-	ld	l, c
-	ld	h, b
-	ex	(sp), hl
+	ld	(ix-12),c
+	ld	(ix-11),b
 	ld	(ix-10),e
 	ld	(ix-9),d
-	pop	de
-	pop	hl
+	ld	hl,0
+	add	hl, sp
+	ex	de, hl
+	ld	hl,4
+	add	hl, sp
+	ld	bc,0x0004
+	ldir
+	ld	hl,0+1+1+1
+	add	hl,sp
+	ld	a,(hl)
+	ld	h,a
+	and	a,0x7f
+	cp	a,0x43
+	jr	c,l_m32_expf_00102
+	add	hl, hl
+	jr	nc,l_m32_expf_00113
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
+	jr	l_m32_expf_00114
+l_m32_expf_00113:
+	ld	de,0x7f7f
+	ld	hl,0xffff
+l_m32_expf_00114:
+	jp	l_m32_expf_00111
+l_m32_expf_00102:
+	sub	a,0x42
+	jr	c,l_m32_expf_00108
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
-	push	de
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	ld	hl,0x42b1
 	push	hl
@@ -453,11 +477,11 @@ _m32_expf:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	z,l_m32_expf_00102
+	jr	z,l_m32_expf_00104
 	ld	de,0x7f7f
 	ld	hl,0xffff
-	jp	l_m32_expf_00107
-l_m32_expf_00102:
+	jp	l_m32_expf_00111
+l_m32_expf_00104:
 	ld	hl,0xc2ae
 	push	hl
 	ld	hl,0xac50
@@ -471,30 +495,27 @@ l_m32_expf_00102:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	z,l_m32_expf_00104
+	jr	z,l_m32_expf_00108
 	ld	hl,0x0000
 	ld	e,l
 	ld	d,h
-	jp	l_m32_expf_00107
-l_m32_expf_00104:
+	jp	l_m32_expf_00111
+l_m32_expf_00108:
 	ld	a,(ix-9)
 	and	a,0x7f
 	or	a,(ix-10)
 	or	a,(ix-11)
 	or	a,(ix-12)
-	jr	nz,l_m32_expf_00106
+	jr	nz,l_m32_expf_00110
 	ld	de,0x3f80
 	ld	hl,0x0000
-	jp	l_m32_expf_00107
-l_m32_expf_00106:
-	pop	de
-	pop	hl
+	jp	l_m32_expf_00111
+l_m32_expf_00110:
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
-	push	de
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	ld	hl,0x3fb8
 	push	hl
@@ -579,7 +600,7 @@ l_m32_expf_00106:
 	push	de
 	push	hl
 	call	_m32_ldexpf
-l_m32_expf_00107:
+l_m32_expf_00111:
 	ld	sp, ix
 	pop	ix
 	ret

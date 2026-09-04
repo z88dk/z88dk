@@ -71,14 +71,21 @@ float m32_exp2f (float x) __z88dk_fastcall
 {
     float z;
 
-    if( x > MAXL2_F32 )
+    /* |x| < 32: in range for MAXL2 (~128).  |x| >= 128 overflows. */
     {
-	    return( HUGE_POS_F32 );
-    }
-
-    if( x < MINL2_F32 )
-    {
-	    return(0.0);
+        union float_long u;
+        uint8_t hi;
+        u.f = x;
+        hi = m32_ieee_hi(u);
+        if( (hi & 0x7f) >= 0x43 )
+            return (hi & 0x80) ? 0.0 : HUGE_POS_F32;
+        if( (hi & 0x7f) >= 0x42 )
+        {
+            if( x > MAXL2_F32 )
+                return HUGE_POS_F32;
+            if( x < MINL2_F32 )
+                return 0.0;
+        }
     }
 
 	if( x == 0.0 )

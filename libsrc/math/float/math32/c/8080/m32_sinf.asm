@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Sep  3 23:50:16 2026
+;	Module compile time: Fri Sep  4 21:14:57 2026
 
 
 	C_LINE	0,"m32_sinf.c"
@@ -215,42 +215,42 @@
 	C_LINE	37,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"m32_math.h"
 	C_LINE	37,"m32_math.h"
-	C_LINE	48,"m32_math.h"
-	C_LINE	49,"m32_math.h"
-	C_LINE	50,"m32_math.h"
-	C_LINE	51,"m32_math.h"
-	C_LINE	52,"m32_math.h"
 	C_LINE	53,"m32_math.h"
 	C_LINE	54,"m32_math.h"
+	C_LINE	55,"m32_math.h"
+	C_LINE	56,"m32_math.h"
 	C_LINE	57,"m32_math.h"
 	C_LINE	58,"m32_math.h"
 	C_LINE	59,"m32_math.h"
-	C_LINE	60,"m32_math.h"
-	C_LINE	61,"m32_math.h"
 	C_LINE	62,"m32_math.h"
+	C_LINE	63,"m32_math.h"
+	C_LINE	64,"m32_math.h"
 	C_LINE	65,"m32_math.h"
 	C_LINE	66,"m32_math.h"
 	C_LINE	67,"m32_math.h"
-	C_LINE	68,"m32_math.h"
-	C_LINE	69,"m32_math.h"
 	C_LINE	70,"m32_math.h"
 	C_LINE	71,"m32_math.h"
+	C_LINE	72,"m32_math.h"
+	C_LINE	73,"m32_math.h"
 	C_LINE	74,"m32_math.h"
 	C_LINE	75,"m32_math.h"
 	C_LINE	76,"m32_math.h"
-	C_LINE	77,"m32_math.h"
-	C_LINE	78,"m32_math.h"
 	C_LINE	79,"m32_math.h"
+	C_LINE	80,"m32_math.h"
+	C_LINE	81,"m32_math.h"
 	C_LINE	82,"m32_math.h"
 	C_LINE	83,"m32_math.h"
 	C_LINE	84,"m32_math.h"
-	C_LINE	85,"m32_math.h"
-	C_LINE	86,"m32_math.h"
 	C_LINE	87,"m32_math.h"
 	C_LINE	88,"m32_math.h"
 	C_LINE	89,"m32_math.h"
 	C_LINE	90,"m32_math.h"
 	C_LINE	91,"m32_math.h"
+	C_LINE	92,"m32_math.h"
+	C_LINE	93,"m32_math.h"
+	C_LINE	94,"m32_math.h"
+	C_LINE	95,"m32_math.h"
+	C_LINE	96,"m32_math.h"
 	C_LINE	33,"m32_sinf.c"
 	C_LINE	35,"m32_sinf.c"
 	C_LINE	36,"m32_sinf.c"
@@ -315,21 +315,14 @@
 	call	l_glong
 	pop	bc
 	call	l_plong
-	ld	hl,2	;const
+	ld	hl,3	;const
 	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,7
-	call	l_asr_u
-	inc	e
+	ld	l,(hl)
 	ld	h,0
 	ld	de,0
-	push	de
-	push	hl
-	ld	hl,134	;const
-	ld	de,0
-	call	l_long_uge
+	ld	a,l
+	sub	67
+	ccf
 	jp	nc,i_3	;
 	ld	hl,15	;const
 	add	hl,sp

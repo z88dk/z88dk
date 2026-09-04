@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Sep  4 01:14:35 2026
+;	Module compile time: Fri Sep  4 21:28:05 2026
 
 
 	C_LINE	0,"am9511_exp2.c"
@@ -179,35 +179,35 @@
 	C_LINE	39,"/data/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
-	C_LINE	97,"am9511_math.h"
-	C_LINE	98,"am9511_math.h"
-	C_LINE	99,"am9511_math.h"
-	C_LINE	100,"am9511_math.h"
-	C_LINE	101,"am9511_math.h"
-	C_LINE	102,"am9511_math.h"
+	C_LINE	103,"am9511_math.h"
 	C_LINE	104,"am9511_math.h"
+	C_LINE	105,"am9511_math.h"
+	C_LINE	106,"am9511_math.h"
 	C_LINE	107,"am9511_math.h"
 	C_LINE	108,"am9511_math.h"
-	C_LINE	109,"am9511_math.h"
 	C_LINE	110,"am9511_math.h"
-	C_LINE	111,"am9511_math.h"
-	C_LINE	112,"am9511_math.h"
+	C_LINE	113,"am9511_math.h"
+	C_LINE	114,"am9511_math.h"
 	C_LINE	115,"am9511_math.h"
 	C_LINE	116,"am9511_math.h"
 	C_LINE	117,"am9511_math.h"
-	C_LINE	119,"am9511_math.h"
-	C_LINE	120,"am9511_math.h"
+	C_LINE	118,"am9511_math.h"
 	C_LINE	121,"am9511_math.h"
-	C_LINE	124,"am9511_math.h"
+	C_LINE	122,"am9511_math.h"
+	C_LINE	123,"am9511_math.h"
 	C_LINE	125,"am9511_math.h"
 	C_LINE	126,"am9511_math.h"
 	C_LINE	127,"am9511_math.h"
-	C_LINE	128,"am9511_math.h"
-	C_LINE	129,"am9511_math.h"
+	C_LINE	130,"am9511_math.h"
+	C_LINE	131,"am9511_math.h"
 	C_LINE	132,"am9511_math.h"
 	C_LINE	133,"am9511_math.h"
 	C_LINE	134,"am9511_math.h"
 	C_LINE	135,"am9511_math.h"
+	C_LINE	138,"am9511_math.h"
+	C_LINE	139,"am9511_math.h"
+	C_LINE	140,"am9511_math.h"
+	C_LINE	141,"am9511_math.h"
 	C_LINE	18,"am9511_exp2.c"
 	C_LINE	20,"am9511_exp2.c"
 	SECTION	code_compiler
@@ -221,16 +221,50 @@
 	push	hl
 	push	bc
 	push	bc
-	ld	de,sp+4
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	de,sp+6
 	ex	de,hl
-	call	l_glong2sp
+	call	l_glong
+	pop	bc
+	call	l_plong
+	ld	hl,3	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+	dec	sp
+	ld	a,l
+	pop	hl
+	ld	l,a
+	push	hl
+	ld	h,0
+	ld	a,127
+	and	l
+	ld	l,a
+	sub	67
+	ccf
+	jp	nc,i_2	;
+	pop	hl
+	push	hl
+	ld	h,0
+	ld	a,l
+	and	128
+	jp	z,i_3	;
 	ld	hl,0	;const
-	ld	de,17020
-	call	l_f32_gt
-	ld	a,h
-	or	l
-	jp	z,i_2	;
-	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	inc	sp
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_3
+	ld	hl,1	;const
 	add	hl,sp
 	xor	a
 	ld	(hl),a
@@ -240,9 +274,10 @@
 	ld	(hl),128
 	inc	hl
 	ld	(hl),127
-	ld	de,sp+0
+	ld	de,sp+1
 	ex	de,hl
 	call	l_glong
+	inc	sp
 	pop	bc
 	pop	bc
 	pop	bc
@@ -251,18 +286,38 @@
 
 
 .i_2
-	ld	de,sp+4
+	pop	hl
+	push	hl
+	ld	h,0
+	ld	a,127
+	and	l
+	ld	l,a
+	sub	66
+	ccf
+	jp	nc,i_4	;
+	ld	de,sp+5
 	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
-	ld	de,49792
-	call	l_f32_lt
+	ld	de,17020
+	call	l_f32_gt
 	ld	a,h
 	or	l
-	jp	z,i_3	;
-	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
+	jp	z,i_5	;
+	ld	hl,1	;const
+	add	hl,sp
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),128
+	inc	hl
+	ld	(hl),127
+	ld	de,sp+1
+	ex	de,hl
+	call	l_glong
+	inc	sp
 	pop	bc
 	pop	bc
 	pop	bc
@@ -270,7 +325,29 @@
 	ret
 
 
-.i_3
+.i_5
+	ld	de,sp+5
+	ex	de,hl
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,49792
+	call	l_f32_lt
+	ld	a,h
+	or	l
+	jp	z,i_6	;
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	inc	sp
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_6
+	inc	sp
 	ld	de,sp+4
 	ex	de,hl
 	call	l_glong2sp
@@ -280,7 +357,7 @@
 	call	l_f32_eq
 	ld	a,h
 	or	l
-	jp	z,i_4	;
+	jp	z,i_7	;
 	ld	hl,0	;const
 	ld	de,16256
 	pop	bc
@@ -290,7 +367,7 @@
 	ret
 
 
-.i_4
+.i_7
 	ld	de,sp+4
 	ex	de,hl
 	call	l_glong2sp
@@ -308,6 +385,7 @@
 	SECTION	bss_compiler
 	SECTION	code_compiler
 ; --- Start of Optimiser additions ---
+	defc	i_4 = i_6
 
 
 ; --- Start of Static Variables ---

@@ -466,19 +466,10 @@ l_m32_sinf_00102:
 	add	hl, sp
 	ld	bc,0x0004
 	ldir
-	ld	hl,0+1+1
+	ld	hl,0+1+1+1
 	add	hl,sp
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	xor	a, a
-	ld	b,0x07
-	ld	a,e
-l_m32_sinf_00165:
-	srl	d
-	rra
-	djnz	l_m32_sinf_00165
-	sub	a,0x86
+	ld	a, (hl)
+	sub	a,0x43
 	jr	c,l_m32_sinf_00104
 	ld	hl,0x40c9
 	push	hl
