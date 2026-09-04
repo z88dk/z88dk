@@ -574,13 +574,35 @@ void test_math32_edges()
 
     /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
      * One relational per Assert: sccz80 && of two float compares can leave
-     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
-    r.f = sin((FLOAT)128.0);
-    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
-    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
-    r.f = cos((FLOAT)128.0);
-    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
-    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail.
+     * MSYS2 CI fails the float <= 1 check; print IEEE bits (and fmod)
+     * before the compares so the log shows Inf vs finite>1 vs ~0.72. */
+    {
+        static char pbuf[64];
+
+        a.f = (FLOAT)128.0;
+        printf("probe 128 bits=0x%lx\n", a.u);
+        r.f = FMOD(a.f, (FLOAT)(2.0 * M_PI));
+        printf("probe fmod(128,2pi) bits=0x%lx\n", r.u);
+
+        r.f = sin(a.f);
+        printf("probe sin(128) bits=0x%lx\n", r.u);
+        snprintf(pbuf, sizeof(pbuf), "sin(128) >= -1 bits=0x%lx", r.u);
+        Assert(r.f >= (FLOAT)(-1.0), pbuf);
+        snprintf(pbuf, sizeof(pbuf), "sin(128) <= 1 bits=0x%lx", r.u);
+        Assert(r.f <= (FLOAT)1.0, pbuf);
+        snprintf(pbuf, sizeof(pbuf), "sin(128) |x|<=1 bits=0x%lx", r.u);
+        Assert((r.u & 0x7ffffffful) <= 0x3f800000ul, pbuf);
+
+        r.f = cos(a.f);
+        printf("probe cos(128) bits=0x%lx\n", r.u);
+        snprintf(pbuf, sizeof(pbuf), "cos(128) >= -1 bits=0x%lx", r.u);
+        Assert(r.f >= (FLOAT)(-1.0), pbuf);
+        snprintf(pbuf, sizeof(pbuf), "cos(128) <= 1 bits=0x%lx", r.u);
+        Assert(r.f <= (FLOAT)1.0, pbuf);
+        snprintf(pbuf, sizeof(pbuf), "cos(128) |x|<=1 bits=0x%lx", r.u);
+        Assert((r.u & 0x7ffffffful) <= 0x3f800000ul, pbuf);
+    }
 
     Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
     Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
