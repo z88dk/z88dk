@@ -572,11 +572,15 @@ void test_math32_edges()
     r.f = a.f + b.f;
     Assert(r.u == 0x3f800001ul, "1+2^-23");
 
-    /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134). */
+    /* |x|>=128 uses fmod(2π). 128 is exact and is the gate (biased exp 134).
+     * One relational per Assert: sccz80 && of two float compares can leave
+     * IEEE 1.0 in DEHL, so HL is 0 and Assert_real(int) sees a fail. */
     r.f = sin((FLOAT)128.0);
-    Assert(r.f >= (FLOAT)(-1.0) && r.f <= (FLOAT)1.0, "sin(128) in [-1,1]");
+    Assert(r.f >= (FLOAT)(-1.0), "sin(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "sin(128) <= 1");
     r.f = cos((FLOAT)128.0);
-    Assert(r.f >= (FLOAT)(-1.0) && r.f <= (FLOAT)1.0, "cos(128) in [-1,1]");
+    Assert(r.f >= (FLOAT)(-1.0), "cos(128) >= -1");
+    Assert(r.f <= (FLOAT)1.0, "cos(128) <= 1");
 
     Assert(approx_equal(acos((FLOAT)(-1.0)), (FLOAT)M_PI, EPSILON), "acos(-1) is pi");
     Assert(approx_equal(acos((FLOAT)(-0.5)), (FLOAT)(2.0*M_PI/3.0), (FLOAT)0.00001), "acos(-0.5) is 2pi/3");
