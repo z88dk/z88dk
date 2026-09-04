@@ -25,7 +25,7 @@ struct SymbolDefinitionCollector : ASTWalker {
 
     explicit SymbolDefinitionCollector(Prog& p, Symtab& s) : prog(p), symtab(s) {}
 
-    void visit(LabelStmt& stmt) {
+    void visit(LabelStmt& stmt) override {
         // label already defined?
         auto it = symtab.labels.find(stmt.label);
         if (it != symtab.labels.end()) {
@@ -36,7 +36,7 @@ struct SymbolDefinitionCollector : ASTWalker {
         symtab.labels[stmt.label] = &stmt;
     }
 
-    void visit(LineNumStmt& stmt) {
+    void visit(LineNumStmt& stmt) override {
         // label already defined?
         auto it = symtab.line_nums.find(stmt.line_num);
         if (it != symtab.line_nums.end()) {
@@ -148,7 +148,7 @@ struct SymbolDefinitionCollector : ASTWalker {
         }
     }
 
-    void leave(DefProcStmt&) {
+    void leave(DefProcStmt&) override {
         proc_nesting--;
         if (proc_nesting == 0) {
             cur_def_proc = nullptr;

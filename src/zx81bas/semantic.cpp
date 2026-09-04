@@ -39,7 +39,7 @@ struct RecursionDetector : ASTWalker {
         cur_func.clear();
     }
 
-    void visit(ProcCallStmt& stmt) {
+    void visit(ProcCallStmt& stmt) override {
         if (!cur_func.empty()) {
             auto called = call_tree[cur_func];
             if (std::find(called.begin(), called.end(), stmt.name)
@@ -49,7 +49,7 @@ struct RecursionDetector : ASTWalker {
         }
     }
 
-    void visit(ProcCallExpr& expr) {
+    void visit(ProcCallExpr& expr) override {
         if (!cur_func.empty()) {
             auto called = call_tree[cur_func];
             if (std::find(called.begin(), called.end(), expr.name)
@@ -59,7 +59,7 @@ struct RecursionDetector : ASTWalker {
         }
     }
 
-    void visit(FnCallExpr& expr) {
+    void visit(FnCallExpr& expr) override {
         if (!cur_func.empty()) {
             auto called = call_tree[cur_func];
             if (std::find(called.begin(), called.end(), expr.name)
