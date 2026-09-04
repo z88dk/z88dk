@@ -19,7 +19,8 @@ struct ASTVisitor {
     virtual ~ASTVisitor() = default;
 
     // visit methods for each statement type
-    virtual void visit(JumpTargetStmt&) {}
+    virtual void visit(LabelStmt&) {}
+    virtual void visit(LineNumStmt&) {}
     virtual void visit(LetStmt&) {}
     virtual void visit(DimStmt&) {}
     virtual void visit(IfStmt&) {}
@@ -91,6 +92,8 @@ struct ASTWalker : ASTVisitor {
     virtual void leave(ForStmt&) {}
     virtual void enter(DefProcStmt&) {}
     virtual void leave(DefProcStmt&) {}
+    virtual void enter(DefFnStmt&) {}
+    virtual void leave(DefFnStmt&) {}
 
     // enter/leave hooks for expressions holding other expressions type
     virtual void enter(ArrayRefExpr&) {}
@@ -109,11 +112,29 @@ struct ASTWalker : ASTVisitor {
     virtual void leave(FnCallExpr&) {}
 
     // ---- Default recursive behavior ----
+    void visit(LetStmt&) override;
+    void visit(DimStmt&) override;
     void visit(IfStmt& s) override;
     void visit(RepeatStmt& s) override;
     void visit(WhileStmt& s) override;
     void visit(ForStmt& s) override;
     void visit(DefProcStmt& s) override;
+    void visit(ProcCallStmt& s) override;
+    void visit(DefFnStmt& s) override;
+    void visit(GotoStmt& s) override;
+    void visit(GosubStmt& s) override;
+    void visit(PrintStmt& s) override;
+    void visit(InputStmt& s) override;
+    void visit(RunStmt& s) override;
+    void visit(ListStmt& s) override;
+    void visit(LoadStmt& s) override;
+    void visit(SaveStmt& s) override;
+    void visit(PokeStmt& s) override;
+    void visit(PokewStmt& s) override;
+    void visit(PlotStmt& s) override;
+    void visit(UnplotStmt& s) override;
+    void visit(RandStmt& s) override;
+    void visit(PauseStmt& s) override;
 
     void visit(ArrayRefExpr& e) override;
     void visit(SliceExpr& e) override;

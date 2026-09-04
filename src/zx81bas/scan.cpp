@@ -11,13 +11,12 @@
 #include "zx81chars.h"
 #include <cctype>
 #include <string>
-#include <string_view>
 #include <vector>
 
 
 
 // Remove underscores
-static double parse_float_from_chars(std::string_view s) {
+static double parse_float_from_chars(const std::string& s) {
     std::string t;
     t.reserve(s.size());
     for (char c : s) {
@@ -29,7 +28,7 @@ static double parse_float_from_chars(std::string_view s) {
 }
 
 // Remove underscores
-static int parse_int_from_chars(std::string_view s, int base) {
+static int parse_int_from_chars(const std::string& s, int base) {
     std::string t;
     t.reserve(s.size());
     for (char c : s) {
@@ -43,8 +42,6 @@ static int parse_int_from_chars(std::string_view s, int base) {
 bool tokenize_line(const std::string& text, SourceType source_type,
                    const SourceLoc& loc,
                    std::vector<Token>& tokens) {
-    bool ok = true;
-
     const char* p = text.c_str();
     const char* limit = p + text.size();
     const char* marker = nullptr;
@@ -52,7 +49,6 @@ bool tokenize_line(const std::string& text, SourceType source_type,
     auto check_trailing_char = [&]() -> bool {
         if (isalnum(*p) || *p == '_') {
             error(loc, "Invalid character '" + std::string(1, *p));
-            ok = false;
             return false;
         }
         return true;
@@ -252,7 +248,6 @@ yy6:
                 // String literal
                 std::vector<uint8_t> bytes;
                 if (!encode_zx81_string(p, '"', bytes, loc)) {
-                    ok = false;
                     break;
                 }
                 p++; // skip closing quote
@@ -348,13 +343,11 @@ yy15:
                     // Char constant
                     std::vector<uint8_t> bytes;
                     if (!encode_zx81_string(p, '\'', bytes, loc)) {
-                        ok = false;
                         break;
                     }
                     p++; // skip closing quote
                     if (bytes.size() != 1) {
                         error(loc, "Char constant must be a single character");
-                        ok = false;
                         break;
                     }
                     token.text = std::string(start, p);
@@ -1607,5 +1600,5 @@ push_token:
         tokens.push_back(token);
     }
 
-    return ok;
+    return get_error_count() == 0;
 }

@@ -478,3 +478,319 @@ recursion detection
 inlining
 
 lowering passes
+
+
+
+
+
+
+The correct pipeline (clean, robust, used in real compilers)
+Phase 1 - Structural Scan (Declarations Only)
+You walk the program without entering procedure bodies.
+
+You collect:
+
+Procedure names
+
+Parameter names
+
+Global variable declarations
+
+Constant definitions
+
+Label names
+
+You do not collect local variables yet.
+You do not rewrite anything yet.
+
+This produces the Declaration Table.
+
+What this table is used for:
+Checking that calls refer to existing procedures
+
+Checking that argument counts match parameter counts
+
+Checking that labels exist
+
+Checking that constants are not redefined
+
+Ensuring no name collisions between global categories
+
+This table is stable and does not depend on rewriting.
+
+Phase 2 - Semantic Pass (Inside Procedure Bodies)
+Now you enter each procedure body.
+
+You use the Declaration Table to validate:
+
+Calls
+
+Parameter usage
+
+Category correctness (array vs scalar vs label vs proc)
+
+During this pass you also:
+
+Rewrite local variables ? procname_varname
+
+Rewrite parameters ? procname_paramname
+
+Rewrite implicit locals (if BASIC allows them)
+
+You do not check undefined variables yet.
+Because rewriting is still happening.
+
+Phase 3 - Build the Definition Table (Post-Rewrite)
+Now that all variables have their final names, you do a second scan:
+
+You collect:
+
+All rewritten variable names
+
+All rewritten array names
+
+All rewritten labels
+
+All rewritten procedure names
+
+All rewritten constants
+
+This produces the Definition Table.
+
+What this table is used for:
+Detecting undefined variables
+
+Detecting undefined arrays
+
+Detecting undefined labels
+
+Detecting illegal redefinitions after rewriting
+
+Ensuring the final lowered program is internally consistent
+
+This table is built after rewriting because only then do you know the final names.
+
+
+Final recommended pipeline (simple and bulletproof)
+1. Parse ? AST
+No symbol table yet.
+
+2. Declaration Pass (no rewriting)
+Build Declaration Table:
+
+Procedures
+
+Parameters
+
+Globals
+
+Constants
+
+Labels
+
+3. Semantic Pass (with rewriting)
+Use Declaration Table to:
+
+Validate calls
+
+Validate categories
+
+Rewrite locals and parameters
+
+Rewrite implicit locals
+
+Rewrite arrays
+
+4. Definition Pass (post-rewrite)
+Build Definition Table:
+
+All rewritten names
+
+All rewritten labels
+
+All rewritten arrays
+
+5. Undefined-variable check
+Use Definition Table to:
+
+Detect undefined variables
+
+Detect undefined arrays
+
+Detect undefined labels
+
+6. Lower to ZX81 BASIC
+
+
+
+
+
+
+You detect non-trivial indirect recursion in a BASIC compiler by treating it as a graph-cycle detection problem in your semantic analysis phase. Nothing else-no symbol table, no lowering, no runtime layout-is required.
+
+The trick is to build a call graph from your rewritten PROC/FN bodies and then run a cycle-detection algorithm (DFS or SCC). That's all recursion is: a cycle in the call graph.
+
+? Concise takeaway
+Build a call graph during semantic analysis and detect cycles (direct or indirect).  
+You do not need the symbol table to do this.
+
+?? Why recursion detection belongs in semantic analysis
+Your pipeline has:
+
+Preprocess
+
+Tokenize
+
+Parse
+
+Semantic check ? this is where recursion detection must happen
+
+Create symbol table
+
+Lowering
+
+You already rewrite PROC/FN bodies in semantic analysis. That means you already have:
+
+canonical names
+
+canonical bodies
+
+ASTs with call expressions
+
+This is everything needed to detect recursion.
+
+Symbol table creation happens after rewriting, but recursion detection does not require symbol resolution-only name matching.
+
+?? What recursion detection actually needs
+To detect recursion, you need only:
+
+A list of all PROC/FN names
+
+Their canonical AST bodies
+
+A way to extract calls from each body
+
+A graph representation: caller ? callee
+
+You do not need:
+
+variable scopes
+
+storage offsets
+
+type information
+
+lowered identifiers
+
+symbol table entries
+
+Indirect recursion is just a cycle:
+
+Code
+A ? B ? C ? A
+Direct recursion is a trivial cycle:
+
+Code
+A ? A
+?? How to implement it cleanly
+1. During semantic_check, build a call graph
+For each PROC/FN:
+
+Walk its rewritten AST
+
+For every call expression, record an edge
+
+Store edges in an adjacency list
+
+Example structure:
+
+cpp
+std::unordered_map<std::string, std::vector<std::string>> call_graph;
+2. Run DFS cycle detection
+Classic algorithm:
+
+Maintain visited and in_stack sets
+
+DFS from each node
+
+If you ever see a node already in in_stack, you found a cycle ? recursion
+
+3. Or use Tarjan SCC
+Tarjan's strongly connected components algorithm finds all cycles in one pass.
+Any SCC with size = 2 is indirect recursion.
+Any SCC of size 1 with a self-edge is direct recursion.
+
+4. Report recursion errors (or mark recursive procs)
+Depending on your BASIC dialect:
+
+If recursion is illegal ? error
+
+If recursion is allowed ? annotate the PROC/FN as recursive
+
+5. Lowering becomes trivial
+Lowering should never detect recursion.
+If lowering detects recursion, your architecture is wrong.
+
+Lowering should only:
+
+emit code
+
+not perform semantic checks
+
+not inspect call relationships
+
+?? Why symbol table is irrelevant
+You mentioned:
+
+In semantic_check I don't have a symbol table yet and cannot detect indirect recursion.
+
+But recursion detection does not require symbol resolution.
+You already know the names of PROC/FN definitions and the names of calls.
+That's enough.
+
+If a call refers to an undefined PROC/FN, that's a separate semantic error.
+
+?? Example: detecting indirect recursion
+Given:
+
+Code
+PROC A
+  CALL B
+ENDPROC
+
+PROC B
+  CALL C
+ENDPROC
+
+PROC C
+  CALL A
+ENDPROC
+Call graph:
+
+Code
+A ? B
+B ? C
+C ? A
+DFS or SCC will detect the cycle {A, B, C}.
+
+?? Non-obvious insight
+You should build the call graph after rewriting identifiers, because rewriting may change the canonical names of PROC/FN parameters or locals, and you want the call graph to reflect the final canonical form.
+
+This is why recursion detection belongs in semantic analysis after rewriting but before symbol table creation.
+
+?? Final recommendation
+Detect recursion in semantic_check by building a call graph and running cycle detection.  
+Do not attempt recursion detection in lowering.
+Do not rely on the symbol table.
+
+If you want, I can sketch the exact C++ code for:
+
+building the call graph from your AST
+
+DFS cycle detection
+
+Tarjan SCC detection
+
+integrating it into your existing pipeline
+
+Just tell me which style you prefer.

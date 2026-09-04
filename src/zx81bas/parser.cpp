@@ -701,9 +701,14 @@ void Parser::parse_stmt_line(const std::unordered_set<Keyword>& stop_keywords,
     std::string label;
     int basic_line_num = -1;
     if (parse_label_line_num(label, basic_line_num)) {
-        auto jump_target_stmt =
-            std::make_unique<JumpTargetStmt>(loc(), label, basic_line_num);
-        out_stmts.push_back(std::move(jump_target_stmt));
+        if (basic_line_num >= 0) {
+            auto line_num_stmt = std::make_unique<LineNumStmt>(basic_line_num, loc());
+            out_stmts.push_back(std::move(line_num_stmt));
+        }
+        if (!label.empty()) {
+            auto label_stmt = std::make_unique<LabelStmt>(label, loc());
+            out_stmts.push_back(std::move(label_stmt));
+        }
     }
 
     // parse a colon-sepatated statement list
@@ -855,7 +860,7 @@ std::unique_ptr<Stmt> Parser::create_rem_stmt() {
                   rem_line.src_line.loc,
                   rem_line.tokens);
 
-    auto stmt = std::make_unique<RemStmt>(rem_line.src_line.loc);
+    auto stmt = std::make_unique<RemStmt>("", rem_line.src_line.loc);
     collect_asm_lines(cur_line, stmt->asm_lines);
     return stmt;
 }
@@ -959,17 +964,14 @@ std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
     if (is_string_variable(name)) {
         if (dims.size() == 0) {
             // #VARS A$="XXX"
-            auto stmt = std::make_unique<PragmaStrVarStmt>(loc());
-            stmt->name = name;
             const Token& str = expect(TokenType::StringLiteral);
-            stmt->value = str.svalue;
+            auto stmt = std::make_unique<PragmaStrVarStmt>(name, str.svalue, loc());
             collect_asm_lines(cur_line + 1, stmt->asm_lines);
             return stmt;
         }
         else {
             // #VARS A$(n,n,...,n)="XXX","XXX",...
-            auto stmt = std::make_unique<PragmaStrVarArrayStmt>(loc());
-            stmt->name = name;
+            auto stmt = std::make_unique<PragmaStrVarArrayStmt>(name, loc());
             stmt->dims = std::move(dims);
             while (true) {
                 const Token& str = expect(TokenType::StringLiteral);
@@ -987,8 +989,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
     else {
         if (dims.size() == 0) {
             // #VARS A=123
-            auto stmt = std::make_unique<PragmaNumVarStmt>(loc());
-            stmt->name = name;
+            auto stmt = std::make_unique<PragmaNumVarStmt>(name, 0, loc());
             if (peek().type == TokenType::Integer) {
                 const Token& num = expect(TokenType::Integer);
                 stmt->value = num.ivalue;
@@ -1001,8 +1002,7 @@ std::unique_ptr<Stmt> Parser::parse_pragma_vars() {
         }
         else {
             // #VARS A(n,n,...,n)=123,456,...
-            auto stmt = std::make_unique<PragmaNumVarArrayStmt>(loc());
-            stmt->name = name;
+            auto stmt = std::make_unique<PragmaNumVarArrayStmt>(name, loc());
             stmt->dims = std::move(dims);
             while (true) {
                 if (peek().type == TokenType::Integer) {
@@ -1106,10 +1106,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_let() {
     auto rhs = parse_expr();
 
     // Build AST node
-    auto stmt = std::make_unique<LetStmt>(loc());
-    stmt->lhs = std::move(lhs);
-    stmt->rhs = std::move(rhs);
-
+    auto stmt = std::make_unique<LetStmt>(std::move(lhs), std::move(rhs), loc());
     return stmt;
 }
 
@@ -1129,8 +1126,6 @@ std::unique_ptr<Stmt> Parser::parse_stmt_dim() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_rem() {
-    auto stmt = std::make_unique<RemStmt>(loc());
-
     // concatenate all remaining tokens in the line into a
     // single string for the REM statement
     // include the whitespace before each token to preserve the original formatting
@@ -1145,7 +1140,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_rem() {
         text.erase(0, 1);
     }
 
-    stmt->text = text;
+    auto stmt = std::make_unique<RemStmt>(text, loc());
     check_end_of_stmt();
 
     // collect assembly following REM
@@ -1185,58 +1180,60 @@ std::unique_ptr<Stmt> Parser::parse_stmt_cls() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_load() {
-    auto stmt = std::make_unique<LoadStmt>(loc());
-    stmt->filename_expr = parse_expr();
+    auto stmt = std::make_unique<LoadStmt>(parse_expr(), loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_save() {
-    auto stmt = std::make_unique<SaveStmt>(loc());
-    stmt->filename_expr = parse_expr();
+    auto stmt = std::make_unique<SaveStmt>(parse_expr(), loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_poke() {
-    auto stmt = std::make_unique<PokeStmt>(loc());
-    stmt->address = parse_expr();
+    auto address_expr = parse_expr();
     expect(TokenType::Comma);
-    stmt->value = parse_expr();
+    auto value_expr = parse_expr();
+    auto stmt = std::make_unique<PokeStmt>(std::move(address_expr),
+                                           std::move(value_expr), loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_pokew() {
-    auto stmt = std::make_unique<PokewStmt>(loc());
-    stmt->address = parse_expr();
+    auto address_expr = parse_expr();
     expect(TokenType::Comma);
-    stmt->value = parse_expr();
+    auto value_expr = parse_expr();
+    auto stmt = std::make_unique<PokewStmt>(std::move(address_expr),
+                                            std::move(value_expr), loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_plot() {
-    auto stmt = std::make_unique<PlotStmt>(loc());
-    stmt->x_expr = parse_expr();
+    auto x_expr = parse_expr();
     expect(TokenType::Comma);
-    stmt->y_expr = parse_expr();
+    auto y_expr = parse_expr();
+    auto stmt = std::make_unique<PlotStmt>(std::move(x_expr), std::move(y_expr),
+                                           loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_unplot() {
-    auto stmt = std::make_unique<UnplotStmt>(loc());
-    stmt->x_expr = parse_expr();
+    auto x_expr = parse_expr();
     expect(TokenType::Comma);
-    stmt->y_expr = parse_expr();
+    auto y_expr = parse_expr();
+    auto stmt = std::make_unique<UnplotStmt>(std::move(x_expr), std::move(y_expr),
+                loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_rand() {
-    auto stmt = std::make_unique<RandStmt>(loc());
-    stmt->seed_expr = parse_expr();
+    auto seed_expr = parse_expr();
+    auto stmt = std::make_unique<RandStmt>(std::move(seed_expr), loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_pause() {
-    auto stmt = std::make_unique<PauseStmt>(loc());
-    stmt->duration_expr = parse_expr();
+    auto duration_expr = parse_expr();
+    auto stmt = std::make_unique<PauseStmt>(std::move(duration_expr), loc());
     return stmt;
 }
 
@@ -1267,14 +1264,12 @@ std::unique_ptr<Stmt> Parser::parse_stmt_exit() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_goto() {
-    auto stmt = std::make_unique<GotoStmt>(loc());
-    stmt->target_expr = parse_expr();
+    auto stmt = std::make_unique<GotoStmt>(parse_expr(), loc());
     return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_gosub() {
-    auto stmt = std::make_unique<GosubStmt>(loc());
-    stmt->target_expr = parse_expr();
+    auto stmt = std::make_unique<GosubStmt>(parse_expr(), loc());
     return stmt;
 }
 
@@ -1339,8 +1334,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_if() {
     auto condition = parse_expr();
     expect(Keyword::THEN);
 
-    auto stmt = std::make_unique<IfStmt>(loc());
-    stmt->condition = std::move(condition);
+    auto stmt = std::make_unique<IfStmt>(std::move(condition), loc());
 
     // THEN at end of line -> block form:
     // IF condition THEN
@@ -1386,7 +1380,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_if() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
-    auto stmt = std::make_unique<RepeatStmt>(loc());
+    auto stmt = std::make_unique<RepeatStmt>(nullptr, loc());
 
     // REPEAT at end of line -> block form:
     // REPEAT
@@ -1417,10 +1411,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_repeat() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_while() {
-    auto condition = parse_expr();
-
-    auto stmt = std::make_unique<WhileStmt>(loc());
-    stmt->condition = std::move(condition);
+    auto stmt = std::make_unique<WhileStmt>(parse_expr(), loc());
 
     // WHILE condition at end of line -> block form:
     // WHILE condition
@@ -1471,11 +1462,11 @@ std::unique_ptr<Stmt> Parser::parse_stmt_for() {
         step_expr = std::move(default_step);
     }
 
-    auto stmt = std::make_unique<ForStmt>(loc());
-    stmt->name = name;
-    stmt->start_expr = std::move(start_expr);
-    stmt->end_expr = std::move(end_expr);
-    stmt->step_expr = std::move(step_expr);
+    auto stmt = std::make_unique<ForStmt>(name,
+                                          std::move(start_expr),
+                                          std::move(end_expr),
+                                          std::move(step_expr),
+                                          loc());
 
     // FOR ... at end of line -> block form:
     // FOR var=start TO end [STEP step]
@@ -1534,8 +1525,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def() {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
-    auto stmt = std::make_unique<DefProcStmt>(loc());
-    stmt->name = name;
+    auto stmt = std::make_unique<DefProcStmt>(name, loc());
 
     expect(TokenType::LeftParen);
 
@@ -1573,8 +1563,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_proc(const std::string& name) {
 }
 
 std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
-    auto stmt = std::make_unique<DefFnStmt>(loc());
-    stmt->name = name;
+    auto stmt = std::make_unique<DefFnStmt>(name, loc());
 
     expect(TokenType::LeftParen);
 
@@ -1607,8 +1596,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt_def_fn(const std::string& name) {
 std::unique_ptr<Stmt> Parser::parse_stmt_proc_call() {
     const Token& ident = expect(TokenType::Identifier);
 
-    auto stmt = std::make_unique<ProcCallStmt>(loc());
-    stmt->name = ident.text;
+    auto stmt = std::make_unique<ProcCallStmt>(ident.text, loc());
 
     bool has_parens = peek().type == TokenType::LeftParen;
     if (has_parens) {
@@ -1708,20 +1696,6 @@ bool parse_basic_program(const TokFile& tok_file,
         out_prog = std::move(prog);
     }
 
-#ifdef _DEBUG
-    if (g_dump_step == 5) {
-        if (ok) {
-            DumpContext ctx(std::cout);
-            out_prog->dump(ctx);
-            exit(EXIT_SUCCESS);
-        }
-        else {
-            std::cout << "Parsing failed with errors." << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-#endif
-
-    return ok;
+    return get_error_count() == 0;
 }
 

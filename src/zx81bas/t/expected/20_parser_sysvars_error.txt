@@ -12,4 +12,4 @@ t/input/20_parser_sysvars_error.bas:7: error: expected 'Integer', found '1.23'
 t/input/20_parser_sysvars_error.bas:8: error: expected 'Integer', found '1.23'
 t/input/20_parser_sysvars_error.bas:9: error: expected 'Integer', found '"HELLO"'
 t/input/20_parser_sysvars_error.bas:10: error: values must be in range 0..255, found 256
-Parsing failed with errors.
+10 errors found

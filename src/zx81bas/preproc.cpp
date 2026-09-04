@@ -9,16 +9,16 @@
 #include "preproc.h"
 #include "release_assert.h"
 #include "utils.h"
+#include "zx81bas.h"
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <string_view>
 #include <unordered_set>
 #include <utility>
 #include <vector>
 
-static const std::string_view cpp_command =
-    "z88dk-ucpp -lg -zI -Z -D__ZX81BAS__";
+static inline const std::string CPP_COMMAND =
+    "z88dk-ucpp -lg -zI -Z -D" + CPP_DEFINE;
 
 // scan a string
 static void skip_whitespace(const std::string& text, size_t& pos) {
@@ -527,8 +527,9 @@ static bool process_file(const std::string& input_file,
 
 static bool preproc_with_cpp(const std::string& input_file,
                              const std::string& output_file) {
-    std::string cmd = std::string(cpp_command)  +
-                      " -o \"" + output_file + "\" \"" + input_file + "\"";
+    std::string cmd = CPP_COMMAND  +
+                      " -o \"" + output_file +
+                      "\" \"" + input_file + "\"";
     if (g_verbose) {
         std::cout << "% " << cmd << std::endl;
     }
@@ -572,8 +573,10 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
 
 #ifdef _DEBUG
     if (g_dump_step == 1) {
-        cat_file(prepared_file);
-        exit(EXIT_SUCCESS);
+        if (get_error_count() == 0) {
+            cat_file(prepared_file);
+        }
+        exit_error_status();
     }
 #endif
 
@@ -587,8 +590,10 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
 
 #ifdef _DEBUG
     if (g_dump_step == 2) {
-        cat_file(preproc_file);
-        exit(EXIT_SUCCESS);
+        if (get_error_count() == 0) {
+            cat_file(preproc_file);
+        }
+        exit_error_status();
     }
 #endif
 
@@ -602,12 +607,14 @@ bool preproc(std::string input_file, std::vector<SrcLine>& out_lines) {
 
 #ifdef _DEBUG
     if (g_dump_step == 3) {
-        std::cout << "Preprocessor output:" << std::endl;
-        for (const auto& src_line : out_lines) {
-            std::cout << src_line.loc.filename << ":" << src_line.loc.line_num << ": "
-                      << src_line.text << std::endl;
+        if (get_error_count() == 0) {
+            std::cout << "Preprocessor output:" << std::endl;
+            for (const auto& src_line : out_lines) {
+                std::cout << src_line.loc.filename << ":" << src_line.loc.line_num << ": "
+                          << src_line.text << std::endl;
+            }
         }
-        exit(EXIT_SUCCESS);
+        exit_error_status();
     }
 #endif
 

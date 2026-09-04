@@ -7,5 +7,6 @@
 #pragma once
 
 #include "ast_stmt.h"
+#include "symtab.h"
 
 bool semantic_check(Prog& prog);

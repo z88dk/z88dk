@@ -77,7 +77,6 @@ std::string to_string(const std::vector<Token>& tokens) {
 bool TokFile::tokenize(const std::vector<SrcLine>& src_lines) {
     lines.clear();
     SourceType source_type = SourceType::BASIC;
-    bool ok = true;
 
     for (const auto& src_line : src_lines) {
         if (match_ASM(src_line.text, src_line.loc)) {
@@ -96,21 +95,12 @@ bool TokFile::tokenize(const std::vector<SrcLine>& src_lines) {
         if (!tokenize_line(src_line.text, source_type,
                            src_line.loc,
                            tok_line.tokens)) {
-            ok = false; // error already reported
+            // error already reported
         }
 
 
         lines.push_back(std::move(tok_line));
     }
 
-#ifdef _DEBUG
-    if (g_dump_step == 4) {
-        std::cout << "Tokenized input:" << std::endl;
-        DumpContext ctx(std::cout);
-        dump(ctx);
-        exit(EXIT_SUCCESS);
-    }
-#endif
-
-    return ok && get_error_count() == 0;
+    return get_error_count() == 0;
 }

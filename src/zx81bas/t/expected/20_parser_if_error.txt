@@ -7,4 +7,4 @@ t/input/20_parser_if_error.bas:2: error: expected 'THEN', found 'ELSE'
 t/input/20_parser_if_error.bas:3: error: expected expression term, found 'ELSE'
 t/input/20_parser_if_error.bas:4: error: unrecognized statement 'UNTIL'
 t/input/20_parser_if_error.bas:6: error: expected 'ENDIF'
-Parsing failed with errors.
+5 errors found

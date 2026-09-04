@@ -10,4 +10,4 @@ t/input/20_parser_for_error.bas:7: error: expected end of statement, found 'X'
 t/input/20_parser_for_error.bas:8: error: expected variable name, found 'UNTIL'
 t/input/20_parser_for_error.bas:9: error: expected expression term, found end of line
 t/input/20_parser_for_error.bas:11: error: missing NEXT
-Parsing failed with errors.
+8 errors found

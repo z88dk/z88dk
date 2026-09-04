@@ -2,161 +2,20 @@
 Input file:  test_t_input_07_t.bas
 Output file: test_t_input_07_t.p
 % z88dk-ucpp -lg -zI -Z -D__ZX81BAS__ -o "test_t_input_07_t.bas.i" "test_t_input_07_t.bas.pp"
-Symtab {
-    vars: [
-        "A" {
-            location: t/input/pragmas.inc:11
-        }
-        "A$" {
-            location: t/input/pragmas.inc:15
-        }
-        "ABC" {
-            location: t/input/let.inc:6
-        }
-        "B" {
-            location: t/input/colon.inc:5
-        }
-        "C" {
-            location: t/input/colon.inc:5
-        }
-        "D" {
-            location: test_t_input_07_t.bas:42
-        }
-        "E" {
-            location: test_t_input_07_t.bas:43
-        }
-        "FNFA" {
-            location: t/input/func.inc:42
-        }
-        "FNIDA" {
-            location: t/input/let.inc:29
-        }
-        "FNNAMEA" {
-            location: test_t_input_07_t.bas:161
-        }
-        "FNNAMEB" {
-            location: test_t_input_07_t.bas:161
-        }
-        "I" {
-            location: test_t_input_07_t.bas:110
-        }
-        "I1" {
-            location: test_t_input_07_t.bas:228
-        }
-        "J" {
-            location: test_t_input_07_t.bas:112
-        }
-        "L" {
-            location: test_t_input_07_t.bas:138
-        }
-        "PROCEMPTY" {
-            location: test_t_input_07_t.bas:150
-        }
-        "PROCNAME" {
-            location: test_t_input_07_t.bas:141
-        }
-        "PROCNAMEA" {
-            location: test_t_input_07_t.bas:132
-        }
-        "PROCNAMEB" {
-            location: test_t_input_07_t.bas:132
-        }
-        "PROCNAMEL" {
-            location: test_t_input_07_t.bas:132
-        }
-        "PROCNAMEL1" {
-            location: test_t_input_07_t.bas:132
-        }
-        "PROCNAMEL2" {
-            location: test_t_input_07_t.bas:132
-        }
-        "PROCNAMEL3" {
-            location: test_t_input_07_t.bas:132
-        }
-        "RESULT" {
-            location: test_t_input_07_t.bas:140
-        }
-        "S" {
-            location: test_t_input_07_t.bas:109
-        }
-        "X" {
-            location: test_t_input_07_t.bas:326
-        }
-        "Y" {
-            location: test_t_input_07_t.bas:326
-        }
-        "Z$" {
-            location: t/input/asm1.inc:5
-        }
+Prog {
+    auto_start: false
+    auto_start_line: 0
+    auto_start_label: ""
+    increment: 10
+    rem_invert: false
+    fast_mode: false
+    dfile_lines: [
     ]
-    arrays: [
-        "A" {
-            location: t/input/pragmas.inc:12
-        }
-        "A$" {
-            location: t/input/let.inc:9
-        }
-        "B" {
-            location: test_t_input_07_t.bas:32
-        }
-        "B$" {
-            location: t/input/pragmas.inc:16
-        }
-        "C" {
-            location: test_t_input_07_t.bas:32
-        }
-        "C$" {
-            location: test_t_input_07_t.bas:33
-        }
-        "I" {
-            location: test_t_input_07_t.bas:228
-        }
+    dfile_colapsed: false
+    sysvars_data: [
     ]
-    procs: [
-        "PROCEMPTY" {
-            location: test_t_input_07_t.bas:149
-        }
-        "PROCNAME" {
-            location: test_t_input_07_t.bas:132
-        }
+    stmts: [
     ]
-    fns: [
-        "FNEMPTY" {
-            location: test_t_input_07_t.bas:165
-        }
-        "FNF" {
-            location: t/input/func.inc:42
-        }
-        "FNID" {
-            location: t/input/let.inc:29
-        }
-        "FNNAME" {
-            location: test_t_input_07_t.bas:161
-        }
-    ]
-    labels: [
-        "LABEL1" {
-            location: t/input/labels.inc:5
-        }
-        "LABEL2" {
-            location: t/input/labels.inc:7
-        }
-        "LABEL3" {
-            location: t/input/labels.inc:8
-        }
-    ]
-    line_nums: [
-        10 {
-            location: t/input/labels.inc:6
-        }
-        11 {
-            location: t/input/labels.inc:7
-        }
-        12 {
-            location: t/input/labels.inc:8
-        }
-        1000 {
-            location: test_t_input_07_t.bas:355
-        }
+    pragma_vars: [
     ]
 }
